@@ -90,6 +90,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _soulAuraLeft = 0;
     _soulSkillSoulOut = 0;
     _hideFashion = 0;
+    _innateTrump = NULL;
 }
 
 /*
@@ -246,6 +247,8 @@ Fighter::~Fighter()
 {
     if (!_halo)
         SAFE_DELETE(_halo);
+    if (!_innateTrump)
+        SAFE_DELETE(_innateTrump);
     if (!_fashion)
         SAFE_DELETE(_fashion);
     if (_weapon)
@@ -328,6 +331,16 @@ UInt32 Fighter::getHaloId()
 UInt32 Fighter::getHaloTypeId()
 {
 	return _halo ? _halo->GetTypeId() : 0;
+}
+
+UInt32 Fighter::getInnateTrumpId()
+{
+	return _innateTrump ? _innateTrump->getId() : 0;
+}
+
+UInt32 Fighter::getInnateTrumpTypeId()
+{
+	return _innateTrump ? _innateTrump->GetTypeId() : 0;
 }
 
 UInt32 Fighter::getFashionId()
@@ -700,6 +713,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 0x28: field = "ring"; break;
 	case 0x30: field = "peerless"; break;
 	case 0x33: field = "hideFashion"; break;
+	case 0x70: field = "innateTrump"; break;
     }
 
 	if(field != NULL)
@@ -772,6 +786,12 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v ,bool writedb)
 		{
 			st << static_cast<UInt32>(v[i]);
 		}
+
+        if(0x33 == t[i])
+        {
+			st << static_cast<UInt32>(getPortrait());
+        }
+
         if (writedb)
             updateToDB(t[i], v[i]);
 	}
@@ -821,7 +841,8 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
                 esa.appendAttrToStream(st);
             }
 
-            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion || equip->getClass() == Item_Halo)
+            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion ||
+               equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
             {
                 st << ied.maxTRank << ied.trumpExp;
             }
@@ -830,6 +851,13 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
                 ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
                 lba.appendAttrToStream(st);
             }
+
+            if(0x70== t[i])
+            {
+                UInt16 skillId = getInnateSkill();
+                st << skillId;
+            }
+
 			if(writedb)
 				updateToDB(t[i], equip->getId());
 		}
@@ -888,6 +916,61 @@ ItemEquip * Fighter::setHalo( ItemHalo* r, bool writedb )
 
     sendModification(0x1f, r, writedb);
 	return rr;
+}
+
+ItemEquip * Fighter::setInnateTrump(ItemInnateTrump* r, bool writedb)
+{
+	ItemEquip * rr = _innateTrump;
+	_innateTrump = r;
+
+    if (rr)
+    {
+        const GData::AttrExtra* attr = rr->getAttrExtra();
+        if (attr)
+            delSkillsFromCT(attr->skills, writedb);
+    }
+
+    if (r)
+    {
+        const GData::AttrExtra* attr = r->getAttrExtra();
+        if (attr)
+            addSkillsFromCT(attr->skills, writedb, true);
+    }
+
+    if(writedb && r)
+    {
+        //判断穿法宝的成就
+        GameAction()->doAttainment(_owner, 10211, 0);
+    }
+
+    _attrDirty = true;
+    _bPDirty = true;
+    if(r != NULL)
+        r->DoEquipBind(true);
+
+    sendModification(0x70, r, writedb);
+	return rr;
+}
+
+UInt16 Fighter::getInnateSkill()
+{
+   ItemEquip * innateTrump = getInnateTrump(); 
+
+   if(innateTrump)
+   {
+        const GData::AttrExtra* attr = innateTrump->getAttrExtra();
+
+        if(attr)
+        {
+            if(attr->skills.size() > 0)
+            {
+                if(attr->skills[0])
+                    return attr->skills[0]->getId();
+            }
+        }
+   }
+
+   return 0;
 }
 
 ItemWeapon * Fighter::setWeapon( ItemWeapon * w, bool writedb )
@@ -1064,7 +1147,7 @@ inline bool checkTrumpMutually(Player* _owner, UInt32 trumpid)
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
-    if (trump && trump->getClass() == Item_Halo)
+    if (trump && (trump->getClass() == Item_Halo || trump->getClass() == Item_InnateTrump))
     {
         //return setHalo((ItemHalo*)trump, writedb);
         // XXX: 直接放入包裹
@@ -1707,6 +1790,12 @@ void Fighter::rebuildEquipAttr()
         addTrumpAttr(halo);
     }
 
+	ItemEquip * innateTrump = getInnateTrump();
+    if (innateTrump != NULL)
+    { // XXX: like trump
+        addTrumpAttr(innateTrump);
+    }
+
 	equip = getWeapon();
 	if(equip != NULL)
 	{
@@ -2220,6 +2309,7 @@ Fighter * Fighter::clone(Player * player)
     fgt->peerless = peerless;
 	fgt->_owner = player;
 	fgt->_halo = NULL;
+	fgt->_innateTrump = NULL;
 	fgt->_fashion = NULL;
 	fgt->_weapon = NULL;
 	fgt->_ring = NULL;
@@ -2280,6 +2370,13 @@ ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
         pos = 9;
         return _halo;
     }
+
+    if (_innateTrump != NULL && _innateTrump->getId() == id)
+    {
+        pos = 10;
+        return _innateTrump;
+    }
+
     if(_fashion != NULL && _fashion->getId() == id)
     {
         pos = 0;
@@ -2336,6 +2433,14 @@ void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
 	bool found = false;
 	switch(pos)
 	{
+    case 10:
+        if (_innateTrump == equip)
+        {
+            _innateTrump = NULL;
+			sendModification(0x70, NULL, true);
+			found = true;
+        }
+        break;
     case 9:
         if (_halo == equip)
         {
@@ -2414,6 +2519,10 @@ Fighter * Fighter::cloneWithEquip(Player * player)
         fgt->_halo = new ItemHalo(*_halo);
     else
         fgt->_halo = NULL;
+    if (_innateTrump != NULL)
+        fgt->_innateTrump = new ItemInnateTrump(*_innateTrump);
+    else
+        fgt->_innateTrump = NULL;
     if (_fashion != NULL)
         fgt->_fashion = new ItemFashion(*_fashion);
     else
@@ -5448,7 +5557,8 @@ void Fighter::SSOpen(UInt16 id)
         return;
 
     //
-    if (item->getClass() != Item_Trump && item->getClass() != Item_Halo && item->getClass() != Item_Fashion)
+    if (item->getClass() != Item_Trump && item->getClass() != Item_Halo && 
+        item->getClass() != Item_Fashion && item->getClass() != Item_InnateTrump)
     {
         if(!pkg->DelItem2(item, 1, ToSkillStrengthenOpen))
             return;
@@ -5552,7 +5662,9 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
     if (!item)
         return 0;
 
-    if ((item->getClass() == Item_Trump || item->getClass() == Item_Fashion || item->getClass() == Item_Halo) && itemNum > 1)
+    if ((item->getClass() == Item_Trump || item->getClass() == Item_Fashion ||
+         item->getClass() == Item_Halo || item->getClass() == Item_InnateTrump) && 
+         (itemNum > 1))
         return 0;
 
     const GData::ItemBaseType& ibt = item->GetItemType();
@@ -5589,7 +5701,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
             break;
     }
 
-    if (item->getClass() != Item_Trump && item->getClass() != Item_Fashion && item->getClass() != Item_Halo)
+    if (item->getClass() != Item_Trump && item->getClass() != Item_Fashion && item->getClass() != Item_Halo && item->getClass() != Item_InnateTrump)
     {
         if(!pkg->DelItem2(item, yanum-itemNum, ToSkillStrengthenOpen))
             return 0;
@@ -6441,6 +6553,10 @@ UInt32 Fighter::calcEquipBattlePoint()
 	ItemEquip * halo = this->getHalo();
     if (halo != NULL)
         fgt->addTrumpAttr(halo);
+
+	ItemEquip * innateTrump = this->getInnateTrump();
+    if (innateTrump != NULL)
+        fgt->addTrumpAttr(innateTrump);
 
 	equip = this->getWeapon();
 	if(equip != NULL)

@@ -2188,6 +2188,8 @@ namespace GObject
 
         // 所有将互斥法宝
         bool checkTrumpMutually(UInt32 trumpid);
+        //先天法宝遵循互斥规则
+        bool checkInnateTrumpMutually(UInt32 innateTrumpId);
 
     private:
         bool m_hasTripod;

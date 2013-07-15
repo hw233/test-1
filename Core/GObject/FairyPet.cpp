@@ -100,6 +100,7 @@ namespace GObject
         }
         pet->_owner = player;
         pet->_halo = NULL;
+        pet->_innateTrump = NULL;
         pet->_fashion = NULL;
         pet->_weapon = NULL;
         pet->_ring = NULL;
