@@ -12331,6 +12331,8 @@ void BattleSimulator::doSkillEffectExtra_BleedTypeDmg(BattleFighter* bf, const G
             else
                 appendDefStatus(e_unBleedType, 0, bf);
 
+            if(bf->isSoulOut())
+                continue;
             UInt32 hpMax = bf->getMaxHP();
             UInt32 hp = efv[i] * static_cast<float>(hpMax);
             UInt32 hpr = bf->regenHP(hp);
