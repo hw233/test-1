@@ -107,6 +107,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         updateSkillStrengthen(activeSkill[idx]);
     }
 
+    _abnormalTypeSkill = NULL;
+    _bleedTypeSkill = NULL;
+
     updatePassiveSkill100(_fighter->getPassiveSkillPreAtk100(), _passiveSkillPrvAtk100);
     updatePassiveSkill100(_fighter->getPassiveSkillAftAtk100(), _passiveSkillAftAtk100);
     updatePassiveSkill100(_fighter->getPassiveSkillBeAtk100(), _passiveSkillBeAtk100);

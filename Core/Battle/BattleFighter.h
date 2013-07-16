@@ -1095,14 +1095,38 @@ private:
     void setCriticalDmgReduce(float v) { _criticaldmgreduce = v; }
 
     UInt8 _abnormalTypeCnt;
-    void addAbnormalTypeCnt() { printf("abnormal:%u\n", _abnormalTypeCnt); if(_abnormalTypeCnt < 5) ++_abnormalTypeCnt; }
+    bool addAbnormalTypeCnt()
+    {
+        printf("abnormal:%u\n", _abnormalTypeCnt);
+        if(_abnormalTypeCnt < 5)
+        {
+            ++_abnormalTypeCnt;
+            return true;
+        }
+        return false;
+    }
     UInt8 getAbnormalTypeCnt() { return _abnormalTypeCnt; }
     void useAbnormalTypeCnt() { if(_abnormalTypeCnt >= 3) _abnormalTypeCnt -= 3; }
+    const GData::SkillBase* _abnormalTypeSkill;
+    void setAbnormalTypeSkill(const GData::SkillBase* skill) { _abnormalTypeSkill = skill; }
+    const GData::SkillBase* getAbnormalTypeSkill() { return _abnormalTypeSkill; }
 
     UInt8 _bleedTypeCnt;
-    void addBleedTypeCnt() { printf("bleed:%u\n", _bleedTypeCnt); if(_bleedTypeCnt < 5) ++_bleedTypeCnt; }
+    bool addBleedTypeCnt()
+    {
+        printf("bleed:%u\n", _bleedTypeCnt);
+        if(_bleedTypeCnt < 5)
+        {
+            ++_bleedTypeCnt;
+            return true;
+        }
+        return false;
+    }
     UInt8 getBleedTypeCnt() { return _bleedTypeCnt; }
     void useBleedTypeCnt() { if(_bleedTypeCnt >= 3) _bleedTypeCnt -= 3; }
+    const GData::SkillBase* _bleedTypeSkill;
+    void setBleedTypeSkill(const GData::SkillBase* skill) { _bleedTypeSkill = skill; }
+    const GData::SkillBase* getBleedTypeSkill() { return _bleedTypeSkill; }
 
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;

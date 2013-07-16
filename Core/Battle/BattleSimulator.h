@@ -310,7 +310,9 @@ private:
         e_soulout = 95,    // 元神出窍
         e_unSoulout = 96,    // 解除
         e_abnormalType = 97,    // 异常类状态
-        e_BleedType = 98,    // 流血类状态
+        e_unAbnormalType = 98,    // 异常类状态消失
+        e_bleedType = 99,    // 流血类状态
+        e_unBleedType = 100,    // 流血类状态消失
 
         e_MAX_STATE,
     };
