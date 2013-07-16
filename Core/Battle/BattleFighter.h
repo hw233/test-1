@@ -1097,7 +1097,6 @@ private:
     UInt8 _abnormalTypeCnt;
     bool addAbnormalTypeCnt()
     {
-        printf("abnormal:%u\n", _abnormalTypeCnt);
         if(_abnormalTypeCnt < 5)
         {
             ++_abnormalTypeCnt;
@@ -1114,7 +1113,6 @@ private:
     UInt8 _bleedTypeCnt;
     bool addBleedTypeCnt()
     {
-        printf("bleed:%u\n", _bleedTypeCnt);
         if(_bleedTypeCnt < 5)
         {
             ++_bleedTypeCnt;

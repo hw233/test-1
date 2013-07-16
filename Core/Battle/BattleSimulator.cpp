@@ -12222,7 +12222,6 @@ void BattleSimulator::doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, cons
             else
                 appendDefStatus(e_unAbnormalType, 0, bf);
 
-            printf("doSkillEffectExtra_AbnormalTypeDmg\n");
             AtkList atklist;
             getAtkList(bf, skill, atklist);
             UInt8 cnt2 = atklist.size();
@@ -12230,55 +12229,78 @@ void BattleSimulator::doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, cons
             {
                 BattleFighter* target = static_cast<BattleFighter *>(atklist[j].bf);
 
-                bool pr2 = bf->calcPierce(target);
-                float cf = 0.0f;
-                bool cs2 = false;
-                if(cs2)
-                {
-                    UInt8 s = bf->getSide();
-                    if(s < 2)
-                        _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
+                UInt8 target_stun = target->getStunRound();
+                bool enterEvade = target->getEvad100();
+                bool defend100 = target->getDefend100();
 
-                }
-                if(first)
+                if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(target, NULL))))
                 {
-                    cs = cs2;
-                    pr = pr2;
-                    first = false;
-                }
 
-                float atk = 0;
-                float def = 0;
-                float reduce = 0;
-                bool isPhysic = false;
-                if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
-                {
-                    atk = efv[i] * calcAttack(bf, cs2, target, NULL);
-                    def = getBFDefend(target);
-                    reduce = getBFAtkReduce(target);
-                    isPhysic = true;
+                    bool pr2 = bf->calcPierce(target);
+                    float cf = 0.0f;
+                    bool cs2 = false;
+                    if(cs2)
+                    {
+                        UInt8 s = bf->getSide();
+                        if(s < 2)
+                            _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
+
+                    }
+                    if(first)
+                    {
+                        cs = cs2;
+                        pr = pr2;
+                        first = false;
+                    }
+
+                    float atk = 0;
+                    float def = 0;
+                    float reduce = 0;
+                    bool isPhysic = false;
+                    if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
+                    {
+                        atk = efv[i] * calcAttack(bf, cs2, target, NULL);
+                        def = getBFDefend(target);
+                        reduce = getBFAtkReduce(target);
+                        isPhysic = true;
+                    }
+                    else
+                    {
+                        atk = efv[i] * calcMagAttack(bf, cs2, target, NULL);
+                        def = getBFMagDefend(target);
+                        reduce = getBFMagAtkReduce(target);
+                        isPhysic = false;
+                    }
+
+                    float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
+                    float factor = atklist[j].factor;
+                    float dmg = _formula->calcDamage(atk * factor, def, bf->getLevel(), toughFactor, reduce);
+                    dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+                    dmg = dmg > 0 ? dmg : 1;
+
+                    UInt32 curDmg = dmg;
+                    makeDamage(target, curDmg);
+                    appendDefStatus(e_damNormal, dmg, target, isPhysic ? e_damagePhysic : e_damageMagic);
+                    if(target->getHP() == 0)
+                        onDead(false, target);
+                    else if(_winner == 0)
+                        onDamage(target, true, NULL);
                 }
+                else if(!defend100 && !enterEvade)
+                    appendDefStatus(e_damEvade, 0, target);
                 else
                 {
-                    atk = efv[i] * calcMagAttack(bf, cs2, target, NULL);
-                    def = getBFMagDefend(target);
-                    reduce = getBFMagAtkReduce(target);
-                    isPhysic = false;
+                    if(!defend100)
+                    {
+                        appendDefStatus(e_damEvade, 0, target);
+                        target->setEvad100(false);
+                    }
+                    else
+                    {
+                        appendDefStatus(e_damOut, 0, target);
+                        target->setDefend100(false);
+                    }
                 }
-
-                float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
-                float factor = atklist[j].factor;
-                float dmg = _formula->calcDamage(atk * factor, def, bf->getLevel(), toughFactor, reduce);
-                dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
-                dmg = dmg > 0 ? dmg : 1;
-
-                UInt32 curDmg = dmg;
-                makeDamage(target, curDmg);
-                appendDefStatus(e_damNormal, dmg, target, isPhysic ? e_damagePhysic : e_damageMagic);
-                if(target->getHP() == 0)
-                    onDead(false, target);
-                else if(_winner == 0)
-                    onDamage(target, true, NULL);
             }
             return;
         }
@@ -12309,34 +12331,12 @@ void BattleSimulator::doSkillEffectExtra_BleedTypeDmg(BattleFighter* bf, const G
             else
                 appendDefStatus(e_unBleedType, 0, bf);
 
-            printf("doSkillEffectExtra_BleedTypeDmg\n");
             UInt32 hpMax = bf->getMaxHP();
             UInt32 hp = efv[i] * static_cast<float>(hpMax);
             UInt32 hpr = bf->regenHP(hp);
             if(hpr == 0)
                 continue;
             appendDefStatus(e_damHpAdd, hpr, bf);
-#if 0
-            //该效果可触发神农宝鼎
-            for(size_t i = 0; i < _onTherapy.size(); ++ i)
-            {
-                BattleFighter* bo = _onTherapy[i];
-                if(!bo || bo->getHP() == 0)
-                    continue;
-                if(bo->getSide() == bf->getSide())
-                {
-                    const GData::SkillBase* pskill = bo->getPassiveSkillOnTherapy();
-                    if(!pskill)
-                        continue;
-                    hpr = bo->regenHP(hpr * pskill->effect->hpP, false);
-                    if(hpr != 0)
-                    {
-                        appendDefStatus(e_skill, pskill->getId(), bo);
-                        appendDefStatus(e_damHpAdd, hpr, bo);
-                    }
-                }
-            }
-#endif
             return;
         }
     }
