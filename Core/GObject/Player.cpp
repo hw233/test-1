@@ -1690,29 +1690,34 @@ namespace GObject
         udpLog("register", action, "", "", "", "", "act", num);
     }
 
-    void Player::transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1)
+    void Player::transformUdpLog(UInt32 id, UInt32 type, UInt32 * moneys, UInt8 val1)
     {
         // 属性转移udp日志
         char action[64] = "";
         if (type & 0x01)
         {
             snprintf (action, 64, "F_%d_%d", id, 1);
-            udpLog("transform", action, "", "", "", "", "act", money1);
+            udpLog("transform", action, "", "", "", "", "act", moneys[0]);
         }
         if (type & 0x02)
         {
             snprintf (action, 64, "F_%d_%d_%d", id, 2, val1);
-            udpLog("transform", action, "", "", "", "", "act", money2);
+            udpLog("transform", action, "", "", "", "", "act", moneys[1]);
         }
         if (type & 0x08)
         {
             snprintf (action, 64, "F_%d_%d", id, 8);
-            udpLog("transform", action, "", "", "", "", "act", money3);
+            udpLog("transform", action, "", "", "", "", "act", moneys[2]);
         }
         if (type & 0x10)
         {
             snprintf (action, 64, "F_%d_%d", id, 10);
-            udpLog("transform", action, "", "", "", "", "act", money4);
+            udpLog("transform", action, "", "", "", "", "act", moneys[3]);
+        }
+        if (type & 0x20)
+        {
+            snprintf (action, 64, "F_%d_%d", id, 20);
+            udpLog("transform", action, "", "", "", "", "act", moneys[4]);
         }
     }
 
@@ -16988,15 +16993,12 @@ void EventTlzAuto::notify(bool isBeginAuto)
     UInt8 Player::transformUseMoney(Fighter * fFgt, Fighter * tFgt, UInt8 type)
     {
         UInt32 money = 0;
-        UInt32 money1 = 0;
-        UInt32 money2 = 0;
-        UInt32 money3 = 0;
-        UInt32 money4 = 0;
+        UInt32 moneys[5] = {0};
         UInt8 val1 = 0;
         if (type & 0x01)
         {
              money += 10;
-             money1 += 10;
+             moneys[0] += 10;
         }
         if (type & 0x02)
         {
@@ -17004,25 +17006,25 @@ void EventTlzAuto::notify(bool isBeginAuto)
             if (p >= 1.80f)
             {
                 money += 100;
-                money2 += 100;
+                moneys[1] += 100;
                 val1 = 4;
             }
             else if (p >= 1.50f)
             {
                 money += 60;
-                money2 += 60;
+                moneys[1] += 60;
                 val1 = 3;
             }
             else if (p >= 1.20f)
             {
                 money += 30;
-                money2 += 30;
+                moneys[1] += 30;
                 val1 = 2;
             }
             else
             {
                 money += 10;
-                money2 += 10;
+                moneys[1] += 10;
                 val1 = 1;
             }
 
@@ -17030,22 +17032,22 @@ void EventTlzAuto::notify(bool isBeginAuto)
             if (c >= 9.0f)
             {
                 money += 100;
-                money2 += 100;
+                moneys[1] += 100;
             }
             else if (c >= 8.0f)
             {
                 money += 60;
-                money2 += 60;
+                moneys[1] += 60;
             }
             else if (c >= 7.0f)
             {
                 money += 30;
-                money2 += 30;
+                moneys[1] += 30;
             }
             else
             {
                 money += 10;
-                money2 += 10;
+                moneys[1] += 10;
             }
         }
         if (type & 0x08)
@@ -17064,12 +17066,12 @@ void EventTlzAuto::notify(bool isBeginAuto)
             UInt8 tXinxiu = tSoul->getXinxiu();
             money += (std::max(f,t) * 10);
             money += abs(int(fPracLev-tPracLev))*1;
-            money3 += (std::max(f,t) * 10);
-            money3 += abs(int(fPracLev-tPracLev))*1;
+            moneys[2] += (std::max(f,t) * 10);
+            moneys[2] += abs(int(fPracLev-tPracLev))*1;
             if (fXinxiu != tXinxiu)
             {
                 money += 50;
-                money3 += 50;
+                moneys[2] += 50;
             }
         }
         if (type & 0x10)
@@ -17082,7 +17084,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 t += tFgt->getElixirAttrByOffset(i);
             }
             money += abs(int(f-t))*1;
-            money4 += abs(int(f-t))*1;
+            moneys[3] += abs(int(f-t))*1;
         }
         if (type & 0x20)
         {
@@ -17090,6 +17092,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             UInt8 tLevel = tFgt->getXingchenLvl();
 
             money += abs(int(fLevel - tLevel)) * 10;
+            moneys[4] += abs(int(fLevel - tLevel)) * 10;
         }
         //34是测试区
         if(getGold() < money && cfg.serverNum != 34)
@@ -17103,7 +17106,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             useGold(money, &ci);
         }
 
-        transformUdpLog(1164, type, money1, money2, money3, money4, val1);
+        transformUdpLog(1164, type, moneys, val1);
         
         return 0;
     }

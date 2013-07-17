@@ -1949,7 +1949,7 @@ namespace GObject
         void tripodUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num = 1);
         void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
-        void transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1);
+        void transformUdpLog(UInt32 id, UInt32 type, UInt32 * moneys, UInt8 val1);
         void dreamerUdpLog(UInt32 id, UInt32 type, UInt32 num = 1);
         void blueDiamondAwardUdpLog(UInt8 type);
         void cFriendAwardUdpLog(UInt8 type);
