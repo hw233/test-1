@@ -100,6 +100,7 @@ namespace GObject
         }
         pet->_owner = player;
         pet->_halo = NULL;
+        pet->_innateTrump = NULL;
         pet->_fashion = NULL;
         pet->_weapon = NULL;
         pet->_ring = NULL;
@@ -583,15 +584,10 @@ namespace GObject
                     }
                 }
             }
-            if(newskill == 0)
+            if(newskill == 0 || newskill != oldskill)
             {
                 skills = Itoa(oldskill);
                 delSkills(skills);
-            }
-            else if(newskill != oldskill)
-            {
-                skills = Itoa(newskill);
-                setSkills(skills, false);
             }
         }
         if (eq)

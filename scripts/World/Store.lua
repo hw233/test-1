@@ -510,6 +510,8 @@ function loadStore()
         store:add(11,9048,9000)
         store:add(11,9049,9000)
         -- 龙魂法宝
+        store:add(12,1541,50000)
+        store:add(12,1542,20000)
         store:add(12,1535,20000)
         store:add(12,1640,10000)
         store:add(12,1641,10000)

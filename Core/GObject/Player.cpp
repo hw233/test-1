@@ -3233,6 +3233,13 @@ namespace GObject
 		st << Stream::eos;
     }
 
+    void Player::sendFighterSSListWithNoSkill()
+    {
+        Stream st;
+        makeFighterSSListWithNoSkill(st);
+		send(st);
+    }
+
 	/*void Player::xingchenInfo()
 	{
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
@@ -3299,6 +3306,8 @@ namespace GObject
 				st << buffid[i] << buffleft[i];
 			}
             st << static_cast<UInt8>(fgt->getHideFashion());
+            st << static_cast<UInt32>(fgt->getPortrait());
+
             fgt->xingchenInfo(st);
 		}
 	}
@@ -16500,7 +16509,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {1531, 1534},
             {1650, 1653},
             {1651, 1654},
-            {1652, 1655}
+            {1652, 1655},
         };
         if ((trumpid >= 1529 && trumpid <= 1534)
                 || (trumpid >= 1650 && trumpid <= 1655))
@@ -16528,6 +16537,45 @@ void EventTlzAuto::notify(bool isBeginAuto)
                         sendMsgCode(0, 1032);
                         return true;
                     }
+                }
+            }
+        }
+        return false;
+    }
+
+    bool Player::checkInnateTrumpMutually(UInt32 innateTrumpid)
+    {
+        static UInt32 muttrumps[][2] = {
+            {1529, 1532},
+            {1530, 1533},
+            {1531, 1534},
+            {1650, 1653},
+            {1651, 1654},
+            {1652, 1655},
+            {1541, 1541},
+            {1542, 1542}
+        };
+
+        if ((innateTrumpid >= 1529 && innateTrumpid <= 1534) ||
+            (innateTrumpid >= 1650 && innateTrumpid <= 1655)
+         || (innateTrumpid >= 1541 && innateTrumpid <= 1542))
+        {
+            size_t i = 0;
+            for (; i < sizeof(muttrumps)/(sizeof(UInt32)*2); ++i)
+            {
+                if (innateTrumpid == muttrumps[i][0] || innateTrumpid == muttrumps[i][1])
+                    break;
+            }
+
+            for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+            {
+                Fighter* fgt = it->second;
+                UInt32 innateTrumpId = fgt->getInnateTrumpTypeId();
+
+                if (innateTrumpId == muttrumps[i][0] || innateTrumpId == muttrumps[i][1])
+                {
+                    sendMsgCode(0, 1032);
+                    return true;
                 }
             }
         }

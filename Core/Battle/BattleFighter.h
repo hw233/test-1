@@ -1020,10 +1020,12 @@ private:
     void setDecWaveDmg(float v) { _dec_wave_dmg = v; }
 
     UInt8 _lingqu_last;
+    UInt8 _lingqu_times;
     bool _lingqu;
     inline bool getLingQu() { return _lingqu; }
-    inline void setLingQu(bool v, UInt8 l) { _hp = 1; _lingqu = v; _lingqu_last = l; }
+    inline void setLingQu(bool v, UInt8 l) { _hp = 1; _lingqu = v; _lingqu_last = l; _lingqu_times = 9; }
     inline bool isLingQu() { return _lingqu_last != 0; }
+    inline UInt8& getLingQuTimes() { return _lingqu_times; }
     bool releaseLingQu();
 
     UInt8 _soulout_last;
@@ -1092,11 +1094,49 @@ private:
     float getCriticalDmgReduce() { return _criticaldmgreduce; }
     void setCriticalDmgReduce(float v) { _criticaldmgreduce = v; }
 
+    UInt8 _abnormalTypeCnt;
+    bool addAbnormalTypeCnt()
+    {
+        if(_abnormalTypeCnt < 5)
+        {
+            ++_abnormalTypeCnt;
+            return true;
+        }
+        return false;
+    }
+    UInt8 getAbnormalTypeCnt() { return _abnormalTypeCnt; }
+    void useAbnormalTypeCnt() { if(_abnormalTypeCnt >= 3) _abnormalTypeCnt -= 3; }
+    const GData::SkillBase* _abnormalTypeSkill;
+    void setAbnormalTypeSkill(const GData::SkillBase* skill) { _abnormalTypeSkill = skill; }
+    const GData::SkillBase* getAbnormalTypeSkill() { return _abnormalTypeSkill; }
+
+    UInt8 _bleedTypeCnt;
+    bool addBleedTypeCnt()
+    {
+        if(_bleedTypeCnt < 5)
+        {
+            ++_bleedTypeCnt;
+            return true;
+        }
+        return false;
+    }
+    UInt8 getBleedTypeCnt() { return _bleedTypeCnt; }
+    void useBleedTypeCnt() { if(_bleedTypeCnt >= 3) _bleedTypeCnt -= 3; }
+    const GData::SkillBase* _bleedTypeSkill;
+    void setBleedTypeSkill(const GData::SkillBase* skill) { _bleedTypeSkill = skill; }
+    const GData::SkillBase* getBleedTypeSkill() { return _bleedTypeSkill; }
+
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
+    std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg100;
+    std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg100;
+    std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillAbnormalTypeDmg100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillBleedTypeDmg100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillBleedTypeDmg(bool noPossibleTarget = false);
 
 public:
 	enum StatusFlag

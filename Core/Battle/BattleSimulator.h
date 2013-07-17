@@ -309,6 +309,10 @@ private:
         e_unLingShiBleed = 94,   // 解除灵蚀
         e_soulout = 95,    // 元神出窍
         e_unSoulout = 96,    // 解除
+        e_abnormalType = 97,    // 异常类状态
+        e_unAbnormalType = 98,    // 异常类状态消失
+        e_bleedType = 99,    // 流血类状态
+        e_unBleedType = 100,    // 流血类状态消失
 
         e_MAX_STATE,
     };
@@ -527,6 +531,8 @@ private:
     void doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
     bool doSkillEffectExtra_Dead(BattleFighter* bf, const GData::SkillBase* skill);
+    void doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, const GData::SkillBase* skill, bool& cs, bool& pr);
+    void doSkillEffectExtra_BleedTypeDmg(BattleFighter* bf, const GData::SkillBase* skill);
     bool doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, UInt32 dmg);
     bool doSkillDmg(BattleFighter* bf, const GData::SkillBase* skill);
     void doPassiveSkillBegDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
@@ -547,6 +553,9 @@ private:
     bool doDarkVigorAttack(BattleFighter* bf, float darkVigor);
     void doSkillEffectExtraCounter(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill);
     void doPassiveSkillOnCounter(BattleFighter* bf, BattleFighter* bo);
+
+    void calcAbnormalTypeCnt(BattleObject* bo);
+    void calcBleedTypeCnt(BattleObject* bo);
 
 private:
 	int _id, _winner, _turns;

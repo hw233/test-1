@@ -206,6 +206,9 @@ public:
 
     void setCapacity(float c, bool = true);
 	inline float getCapacity() {return _capacity;}
+    
+    //获取先天技能
+    UInt16 getInnateSkill();
 
     // 装备无双技能
     void setPeerless(UInt16 pl, bool = true);
@@ -377,6 +380,10 @@ public:
     inline std::vector<UInt16>& getPassiveSkillDeadFake() { return _rpasskl[GData::SKILL_DEAD_FAKE-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillDeadFake100() { return _passkl[GData::SKILL_DEAD_FAKE-GData::SKILL_PASSSTART]; }
 
+    inline std::vector<UInt16>& getPassiveSkillAbnormalTypeDmg100() { return _passkl[GData::SKILL_ABNORMAL_TYPE_DMG-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillBleedTypeDmg100() { return _passkl[GData::SKILL_BLEED_TYPE_DMG-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillBleedTypeDmg() { return _rpasskl[GData::SKILL_BLEED_TYPE_DMG-GData::SKILL_PASSSTART]; }
+
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
@@ -438,6 +445,7 @@ public:
     void addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true, bool = false, bool = true);
     void delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true);
 
+	inline ItemInnateTrump* getInnateTrump() { return _innateTrump; }
 	inline ItemHalo* getHalo() { return _halo; }
 	inline ItemFashion* getFashion() { return _fashion; }
 	inline ItemWeapon * getWeapon() { return _weapon; }
@@ -502,6 +510,7 @@ public:
 	UInt32 getBuffData(UInt8 idx, UInt32 now = TimeUtil::Now());
 	void setBuffData(UInt8, UInt32, bool = true);
 
+	UInt32 getInnateTrumpId();
 	UInt32 getHaloId();
 	UInt32 getFashionId();
 	UInt32 getWeaponId();
@@ -509,6 +518,7 @@ public:
 	UInt32 getAmuletId();
 	UInt32 getRingId();
 
+	UInt32 getInnateTrumpTypeId();
 	UInt32 getHaloTypeId();
 	UInt32 getFashionTypeId();
     UInt16 getPortrait();
@@ -519,6 +529,7 @@ public:
 	inline UInt8 getColor() { return _color; }
 	static UInt8 getColor2(float);
 
+	ItemEquip * setInnateTrump(ItemInnateTrump* r, bool = true);
 	ItemEquip * setHalo(ItemHalo* r, bool = true);
 	ItemEquip * setFashion(ItemFashion* r, bool = true);
 	ItemWeapon * setWeapon(ItemWeapon * w, bool = true);
@@ -810,6 +821,7 @@ protected:
 	ItemEquip * _amulet;
 	ItemEquip * _trump[TRUMP_UPMAX];    // 法宝
 	ItemEquip * _lingbao[e_lb_max];// 灵宝
+    ItemInnateTrump * _innateTrump; // 先天法宝
 
 	bool _attrDirty;
 	UInt32 _maxHP;
@@ -924,7 +936,7 @@ public:
     void makeFighterSSInfoWithNoSkill(Stream& st);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid);
     bool appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);
-    void PeerlessSSNotify(UInt16 id);
+    void PeerlessSSNotify(UInt16 id, bool writedb);
 
     UInt16 calcSkillBattlePoint(UInt16 skillId, UInt8 type);
 
