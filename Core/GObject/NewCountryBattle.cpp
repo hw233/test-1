@@ -500,7 +500,7 @@ void NewCountryBattle::process(UInt32 curtime)
     m_tickTime += NCBATTLE_TIME;
 
     handleBattle();     //战斗
-    TRACE_LOG("NewCountryBattle=>>所有战斗开始结束时间差:[%"I64_FMT"u]", TimeUtil::GetTick() - tick);
+    TRACE_LOG("NewCountryBattle=>>所有战斗开始结束时间差:[%" I64_FMT "u]", TimeUtil::GetTick() - tick);
     if(curtime >= globalCountryBattle.getEndTime())
     {   //策划要求这里调结束
         m_pairPlayer.clear();
@@ -514,7 +514,7 @@ void NewCountryBattle::process(UInt32 curtime)
     makePairPlayers();  //配对玩家
     updateFirst();      //广播荣誉王连胜王
     sendAllInfo();      //发送所有玩家的个人数据
-    TRACE_LOG("NewCountryBattle=>>配对所有玩家开始结束时间差:[%"I64_FMT"u]", TimeUtil::GetTick() - tick);
+    TRACE_LOG("NewCountryBattle=>>配对所有玩家开始结束时间差:[%" I64_FMT "u]", TimeUtil::GetTick() - tick);
 }
 
 void NewCountryBattle::prepare(UInt16 rt)

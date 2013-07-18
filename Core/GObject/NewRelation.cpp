@@ -33,7 +33,7 @@ void NewRelation::setMood(UInt8 status)
     if(status != m_mood)
     {
         m_mood = status;
-        DB().PushUpdateData("REPLACE INTO `new_relation` (`playerId`, `mood`, `sign`) VALUES (%"I64_FMT"u, %u, '%s')", this->_owner->getId(), m_mood, m_sign.c_str());
+        DB().PushUpdateData("REPLACE INTO `new_relation` (`playerId`, `mood`, `sign`) VALUES (%" I64_FMT "u, %u, '%s')", this->_owner->getId(), m_mood, m_sign.c_str());
     }
 }
 
@@ -48,7 +48,7 @@ void NewRelation::setSign(std::string& status)
         return;
 
     m_sign = status;
-    DB().PushUpdateData("REPLACE INTO `new_relation` (`playerId`, `mood`, `sign`) VALUES (%"I64_FMT"u, %u, '%s')", this->_owner->getId(), m_mood, m_sign.c_str());
+    DB().PushUpdateData("REPLACE INTO `new_relation` (`playerId`, `mood`, `sign`) VALUES (%" I64_FMT "u, %u, '%s')", this->_owner->getId(), m_mood, m_sign.c_str());
 }
 
 void NewRelation::beAttack(Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup, Player *defer)

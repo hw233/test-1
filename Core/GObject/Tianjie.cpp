@@ -2232,7 +2232,7 @@ bool Tianjie::attackBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
                     ++i;
                 }
                 bool ret = m_atkinfo.insert(info).second;
-                TRACE_LOG("WBOSS INSERT ret: %u (pid: %"I64_FMT"u, dmg: %u)", ret, pl->getId(), damage);
+                TRACE_LOG("WBOSS INSERT ret: %u (pid: %" I64_FMT "u, dmg: %u)", ret, pl->getId(), damage);
 
                // UInt32 bossMaxHP = nflist[0].fighter->getBaseHP();
                 UInt32 bossMaxHP = nflist[0].fighter->getMaxHP();

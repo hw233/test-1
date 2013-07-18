@@ -616,6 +616,7 @@ namespace GData
 				}
 				break;
             case Item_Halo:
+            case Item_InnateTrump:
 			case Item_Fashion: // XXX:
 			case Item_Trump:
 				{

@@ -90,6 +90,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _soulAuraLeft = 0;
     _soulSkillSoulOut = 0;
     _hideFashion = 0;
+    _innateTrump = NULL;
 }
 
 /*
@@ -246,6 +247,8 @@ Fighter::~Fighter()
 {
     if (!_halo)
         SAFE_DELETE(_halo);
+    if (!_innateTrump)
+        SAFE_DELETE(_innateTrump);
     if (!_fashion)
         SAFE_DELETE(_fashion);
     if (_weapon)
@@ -328,6 +331,16 @@ UInt32 Fighter::getHaloId()
 UInt32 Fighter::getHaloTypeId()
 {
 	return _halo ? _halo->GetTypeId() : 0;
+}
+
+UInt32 Fighter::getInnateTrumpId()
+{
+	return _innateTrump ? _innateTrump->getId() : 0;
+}
+
+UInt32 Fighter::getInnateTrumpTypeId()
+{
+	return _innateTrump ? _innateTrump->GetTypeId() : 0;
 }
 
 UInt32 Fighter::getFashionId()
@@ -546,9 +559,9 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 		if(_owner == NULL)
 			return;
 		if(v > 0)
-			DB1().PushUpdateData("REPLACE INTO `fighter_buff`(`playerId`, `id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u, %u)", _owner->getId(), _id, t - FIGHTER_BUFF_START, v);
+			DB1().PushUpdateData("REPLACE INTO `fighter_buff`(`playerId`, `id`, `buffId`, `data`) VALUES(%" I64_FMT "u, %u, %u, %u)", _owner->getId(), _id, t - FIGHTER_BUFF_START, v);
 		else
-			DB1().PushUpdateData("DELETE FROM `fighter_buff` WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `buffId` = %u", _owner->getId(), _id, t - FIGHTER_BUFF_START);
+			DB1().PushUpdateData("DELETE FROM `fighter_buff` WHERE `playerId` = %" I64_FMT "u AND `id` = %u AND `buffId` = %u", _owner->getId(), _id, t - FIGHTER_BUFF_START);
 		return;
 	}
     if (t >= 0x0a && t < 0x0a+ getMaxTrumps())
@@ -557,7 +570,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         if (getAllTrumpId(trumps)) {
             std::string str;
             if (value2string(trumps, getMaxTrumps(), str)) {
-                DB2().PushUpdateData("UPDATE `fighter` SET `trump` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `trump` = '%s' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", str.c_str(), _id, _owner->getId());
             }
         }
     }
@@ -567,7 +580,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         if (getAllLingbaoId(lbs)) {
             std::string str;
             if (value2string(lbs, getMaxLingbaos(), str)) {
-                DB2().PushUpdateData("UPDATE `fighter` SET `lingbao` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `lingbao` = '%s' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", str.c_str(), _id, _owner->getId());
             }
         }
     }
@@ -584,7 +597,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             if (_expFlush || _expMods >= 10 || now > _expEnd) // XXX: 等级变化，10次变化，10分钟
             {
 #endif
-                DB2().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `experience` = %" I64_FMT "u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", v, _id, _owner->getId());
 #if 0
                 _expFlush = false;
                 _expMods = 0;
@@ -596,18 +609,18 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 
 	case 4:
         if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-            DB2().PushUpdateData("UPDATE `fighter` SET `potential` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
+            DB2().PushUpdateData("UPDATE `fighter` SET `potential` = %u.%02u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", v / 100, v % 100, _id, _owner->getId());
         return;
     case 5:
         if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-            DB2().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
+            DB2().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", v / 100, v % 100, _id, _owner->getId());
         return;
 	case 6:
         {
             ++_pexpMods;
             if (_pexpMods >= 3 || _forceWrite) // XXX: 半小时一次
             {
-                DB2().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %" I64_FMT "u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", v, _id, _owner->getId());
                 _pexpMods = 0;
                 _forceWrite = false;
             }
@@ -632,20 +645,20 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         {
             std::string str;
             if (value2string(_acupoints, ACUPOINTS_MAX, str)) {
-                DB2().PushUpdateData("UPDATE `fighter` SET `acupoints` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `acupoints` = '%s' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", str.c_str(), _id, _owner->getId());
             }
         }
         break;
     case 0x31: // peerless
         break;
     case 0x32: // cittaslot
-        // DB2().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
+        // DB2().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", _cittaslot, _id, _owner->getId());
         break;
     case 0x2a:
         { // skill
             std::string str;
             if (value2string(_skill, getUpSkillsMax(), str)) {
-                DB2().PushUpdateData("UPDATE `fighter` SET `skill` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `skill` = '%s' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", str.c_str(), _id, _owner->getId());
             }
         }
         break;
@@ -654,12 +667,12 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             if (_skills.size()) {
                 std::string str;
                 if (value2string(&_skills[0], _skills.size(), str)) {
-                    DB2().PushUpdateData("UPDATE `fighter` SET `skills` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                    DB2().PushUpdateData("UPDATE `fighter` SET `skills` = '%s' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", str.c_str(), _id, _owner->getId());
                 }
             }
             else
             {
-                DB2().PushUpdateData("UPDATE `fighter` SET `skills` = '' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `skills` = '' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", _id, _owner->getId());
             }
         }
         break;
@@ -667,7 +680,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         { // citta
             std::string str;
             if (value2string(_citta, getUpCittasNum(), str)) {
-                DB2().PushUpdateData("UPDATE `fighter` SET `citta` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `citta` = '%s' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", str.c_str(), _id, _owner->getId());
             }
         }
         break;
@@ -676,12 +689,12 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             if (_cittas.size()) {
                 std::string str;
                 if (value2string(&_cittas[0], _cittas.size(), str)) {
-                    DB2().PushUpdateData("UPDATE `fighter` SET `cittas` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                    DB2().PushUpdateData("UPDATE `fighter` SET `cittas` = '%s' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", str.c_str(), _id, _owner->getId());
                 }
             }
             else
             {
-                DB2().PushUpdateData("UPDATE `fighter` SET `cittas` = '' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `cittas` = '' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", _id, _owner->getId());
             }
         }
         break;
@@ -700,12 +713,13 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 0x28: field = "ring"; break;
 	case 0x30: field = "peerless"; break;
 	case 0x33: field = "hideFashion"; break;
+	case 0x70: field = "innateTrump"; break;
     }
 
 	if(field != NULL)
 	{
 		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-			DB2().PushUpdateData("UPDATE `fighter` SET `%s` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", field, v, _id, _owner->getId());
+			DB2().PushUpdateData("UPDATE `fighter` SET `%s` = %" I64_FMT "u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", field, v, _id, _owner->getId());
 	}
 }
 
@@ -772,6 +786,12 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v ,bool writedb)
 		{
 			st << static_cast<UInt32>(v[i]);
 		}
+
+        if(0x33 == t[i])
+        {
+			st << static_cast<UInt32>(getPortrait());
+        }
+
         if (writedb)
             updateToDB(t[i], v[i]);
 	}
@@ -821,7 +841,8 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
                 esa.appendAttrToStream(st);
             }
 
-            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion || equip->getClass() == Item_Halo)
+            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion ||
+               equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
             {
                 st << ied.maxTRank << ied.trumpExp;
             }
@@ -830,6 +851,13 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
                 ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
                 lba.appendAttrToStream(st);
             }
+
+            if(0x70== t[i])
+            {
+                UInt16 skillId = getInnateSkill();
+                st << skillId;
+            }
+
 			if(writedb)
 				updateToDB(t[i], equip->getId());
 		}
@@ -888,6 +916,61 @@ ItemEquip * Fighter::setHalo( ItemHalo* r, bool writedb )
 
     sendModification(0x1f, r, writedb);
 	return rr;
+}
+
+ItemEquip * Fighter::setInnateTrump(ItemInnateTrump* r, bool writedb)
+{
+	ItemEquip * rr = _innateTrump;
+	_innateTrump = r;
+
+    if (rr)
+    {
+        const GData::AttrExtra* attr = rr->getAttrExtra();
+        if (attr)
+            delSkillsFromCT(attr->skills, writedb);
+    }
+
+    if (r)
+    {
+        const GData::AttrExtra* attr = r->getAttrExtra();
+        if (attr)
+            addSkillsFromCT(attr->skills, writedb, true);
+    }
+
+    if(writedb && r)
+    {
+        //判断穿法宝的成就
+        GameAction()->doAttainment(_owner, 10211, 0);
+    }
+
+    _attrDirty = true;
+    _bPDirty = true;
+    if(r != NULL)
+        r->DoEquipBind(true);
+
+    sendModification(0x70, r, writedb);
+	return rr;
+}
+
+UInt16 Fighter::getInnateSkill()
+{
+   ItemEquip * innateTrump = getInnateTrump(); 
+
+   if(innateTrump)
+   {
+        const GData::AttrExtra* attr = innateTrump->getAttrExtra();
+
+        if(attr)
+        {
+            if(attr->skills.size() > 0)
+            {
+                if(attr->skills[0])
+                    return attr->skills[0]->getId();
+            }
+        }
+   }
+
+   return 0;
 }
 
 ItemWeapon * Fighter::setWeapon( ItemWeapon * w, bool writedb )
@@ -1064,7 +1147,7 @@ inline bool checkTrumpMutually(Player* _owner, UInt32 trumpid)
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
-    if (trump && trump->getClass() == Item_Halo)
+    if (trump && (trump->getClass() == Item_Halo || trump->getClass() == Item_InnateTrump))
     {
         //return setHalo((ItemHalo*)trump, writedb);
         // XXX: 直接放入包裹
@@ -1707,6 +1790,12 @@ void Fighter::rebuildEquipAttr()
         addTrumpAttr(halo);
     }
 
+	ItemEquip * innateTrump = getInnateTrump();
+    if (innateTrump != NULL)
+    { // XXX: like trump
+        addTrumpAttr(innateTrump);
+    }
+
 	equip = getWeapon();
 	if(equip != NULL)
 	{
@@ -2220,6 +2309,7 @@ Fighter * Fighter::clone(Player * player)
     fgt->peerless = peerless;
 	fgt->_owner = player;
 	fgt->_halo = NULL;
+	fgt->_innateTrump = NULL;
 	fgt->_fashion = NULL;
 	fgt->_weapon = NULL;
 	fgt->_ring = NULL;
@@ -2280,6 +2370,13 @@ ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
         pos = 9;
         return _halo;
     }
+
+    if (_innateTrump != NULL && _innateTrump->getId() == id)
+    {
+        pos = 10;
+        return _innateTrump;
+    }
+
     if(_fashion != NULL && _fashion->getId() == id)
     {
         pos = 0;
@@ -2329,6 +2426,14 @@ void Fighter::findTrumpByTypeId(std::vector<ItemEquip*>& ret, UInt32 id)
                 ret.push_back(_trump[idx]);
         }
     }
+
+    if(_innateTrump)
+    {
+        if(_innateTrump->GetItemType().getId() == id)
+        {
+            ret.push_back(_innateTrump);
+        }
+    }
 }
 
 void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
@@ -2336,6 +2441,14 @@ void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
 	bool found = false;
 	switch(pos)
 	{
+    case 10:
+        if (_innateTrump == equip)
+        {
+            _innateTrump = NULL;
+			sendModification(0x70, NULL, true);
+			found = true;
+        }
+        break;
     case 9:
         if (_halo == equip)
         {
@@ -2400,7 +2513,7 @@ void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
 		DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
 		if(toWhere != 0 && equip->getQuality() >= 4)
 		{
-			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, _owner->getId(), equip->GetItemType().getId(), equip->getId(), toWhere, TimeUtil::Now());
+			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, _owner->getId(), equip->GetItemType().getId(), equip->getId(), toWhere, TimeUtil::Now());
 		}
 		SAFE_DELETE(equip);
 	}
@@ -2414,6 +2527,10 @@ Fighter * Fighter::cloneWithEquip(Player * player)
         fgt->_halo = new ItemHalo(*_halo);
     else
         fgt->_halo = NULL;
+    if (_innateTrump != NULL)
+        fgt->_innateTrump = new ItemInnateTrump(*_innateTrump);
+    else
+        fgt->_innateTrump = NULL;
     if (_fashion != NULL)
         fgt->_fashion = new ItemFashion(*_fashion);
     else
@@ -2536,7 +2653,7 @@ void Fighter::updateToDBPetSkill()
     }
     if(!str4.empty())
         skills += str4;
-    DB2().PushUpdateData("UPDATE `fighter` SET `skill` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", skills.c_str(), getId(), _owner->getId());
+    DB2().PushUpdateData("UPDATE `fighter` SET `skill` = '%s' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", skills.c_str(), getId(), _owner->getId());
 }
 
 bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
@@ -2875,7 +2992,12 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
 
     // 装备无双技能，通知前端符文相关内容
     if(peerless)
-        PeerlessSSNotify(peerless);
+        PeerlessSSNotify(peerless, writedb);
+    else
+    {
+        if (_owner && writedb)
+            _owner->sendFighterSSListWithNoSkill();
+    }
 }
 
 UInt8 Fighter::getAcupointCnt()
@@ -3174,6 +3296,8 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
         }
 
         SSSendSSInfo(skill);
+        if(_owner && writedb)
+            _owner->sendFighterSSListWithNoSkill();
     }
     else
     {
@@ -3188,6 +3312,8 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
                 _skill[src] ^= _skill[idx];
                 ret = true;
             }
+            if(_owner && writedb)
+                _owner->sendFighterSSListWithNoSkill();
         }
         else
         { // upgrade
@@ -3238,6 +3364,8 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     _skill[i] = 0;
     _skillBPDirty = true;
     sendModification(0x2a, 0, i, writedb);
+    if(_owner && writedb)
+        _owner->sendFighterSSListWithNoSkill();
 #else
     _skill[idx] = 0;
     sendModification(0x2a, 0, idx, writedb);
@@ -3646,6 +3774,8 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
                         s->cond == GData::SKILL_DEAD_FAKE ||
+                        s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
+                        s->cond == GData::SKILL_BLEED_TYPE_DMG ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
@@ -3694,6 +3824,8 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTRES ||
                         s->cond == GData::SKILL_DEAD ||
                         s->cond == GData::SKILL_DEAD_FAKE ||
+                        s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
+                        s->cond == GData::SKILL_BLEED_TYPE_DMG ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
@@ -4745,7 +4877,7 @@ void Fighter::updateForgeAttr(bool notify)
         _owner->send(st);
     }
 
-    DB2().PushUpdateData("UPDATE `fighter` SET `attrType1` = %u, `attrValue1` = %u, `attrType2` = %u, `attrValue2` = %u, `attrType3` = %u, `attrValue3` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _attrType1, _attrValue1, _attrType2, _attrValue2, _attrType3, _attrValue3, _id, _owner->getId());
+    DB2().PushUpdateData("UPDATE `fighter` SET `attrType1` = %u, `attrValue1` = %u, `attrType2` = %u, `attrValue2` = %u, `attrType3` = %u, `attrValue3` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", _attrType1, _attrValue1, _attrType2, _attrValue2, _attrType3, _attrValue3, _id, _owner->getId());
 
     _attrDirty = true;
     _bPDirty = true;
@@ -5171,7 +5303,7 @@ bool Fighter::addElixirAttrByOffset(UInt8 off, Int32 v)
         st << Stream::eos;
         _owner->send(st);
 
-        DB1().PushUpdateData("REPLACE INTO `elixir` (`id`, `playerId`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `attack`, `defend`, `critical`, `pierce`, `evade`, `counter`, `tough`, `action`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", _id, _owner->getId(), _elixirattr.strength, _elixirattr.physique, _elixirattr.agility, _elixirattr.intelligence, _elixirattr.will, _elixirattr.soul, _elixirattr.attack, _elixirattr.defend, _elixirattr.critical, _elixirattr.pierce, _elixirattr.evade, _elixirattr.counter, _elixirattr.tough, _elixirattr.action);
+        DB1().PushUpdateData("REPLACE INTO `elixir` (`id`, `playerId`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `attack`, `defend`, `critical`, `pierce`, `evade`, `counter`, `tough`, `action`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", _id, _owner->getId(), _elixirattr.strength, _elixirattr.physique, _elixirattr.agility, _elixirattr.intelligence, _elixirattr.will, _elixirattr.soul, _elixirattr.attack, _elixirattr.defend, _elixirattr.critical, _elixirattr.pierce, _elixirattr.evade, _elixirattr.counter, _elixirattr.tough, _elixirattr.action);
     }
     return ret;
 #undef MV
@@ -5433,7 +5565,8 @@ void Fighter::SSOpen(UInt16 id)
         return;
 
     //
-    if (item->getClass() != Item_Trump && item->getClass() != Item_Halo && item->getClass() != Item_Fashion)
+    if (item->getClass() != Item_Trump && item->getClass() != Item_Halo && 
+        item->getClass() != Item_Fashion && item->getClass() != Item_InnateTrump)
     {
         if(!pkg->DelItem2(item, 1, ToSkillStrengthenOpen))
             return;
@@ -5459,6 +5592,7 @@ void Fighter::SSOpen(UInt16 id)
             SSUpdate2DB(id, ss);
             _owner->skillStrengthenLog(1, 1);
             _owner->sendMsgCode(0, 1023);
+            _owner->sendFighterSSListWithNoSkill();
         }
         else
         {
@@ -5536,7 +5670,9 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
     if (!item)
         return 0;
 
-    if ((item->getClass() == Item_Trump || item->getClass() == Item_Fashion || item->getClass() == Item_Halo) && itemNum > 1)
+    if ((item->getClass() == Item_Trump || item->getClass() == Item_Fashion ||
+         item->getClass() == Item_Halo || item->getClass() == Item_InnateTrump) && 
+         (itemNum > 1))
         return 0;
 
     const GData::ItemBaseType& ibt = item->GetItemType();
@@ -5573,7 +5709,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
             break;
     }
 
-    if (item->getClass() != Item_Trump && item->getClass() != Item_Fashion && item->getClass() != Item_Halo)
+    if (item->getClass() != Item_Trump && item->getClass() != Item_Fashion && item->getClass() != Item_Halo && item->getClass() != Item_InnateTrump)
     {
         if(!pkg->DelItem2(item, yanum-itemNum, ToSkillStrengthenOpen))
             return 0;
@@ -5631,7 +5767,10 @@ void Fighter::SSDismiss(UInt16 skillid, bool isDel, Mail * mail)
     ss.curVal = 0;
     ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
     if(!isDel)
+    {
         SSUpdate2DB(skillid, ss);
+        _owner->sendFighterSSListWithNoSkill();
+    }
 }
 
 void Fighter::SSDismissAll(bool isDel)
@@ -5675,7 +5814,7 @@ void Fighter::SSSendSSInfo(UInt16 skill)
 
 void Fighter::SSUpdate2DB(UInt16 id, SStrengthen& ss)
 {
-    DB1().PushUpdateData("REPLACE INTO `skill_strengthen` (`id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl`, `maxLvl`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), SKILL_ID(id), ss.father, ss.maxVal, ss.curVal, ss.lvl, ss.maxLvl);
+    DB1().PushUpdateData("REPLACE INTO `skill_strengthen` (`id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl`, `maxLvl`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), SKILL_ID(id), ss.father, ss.maxVal, ss.curVal, ss.lvl, ss.maxLvl);
     SSNotify(id, ss);
 }
 
@@ -5688,18 +5827,21 @@ void Fighter::SSNotify(UInt16 id, SStrengthen& ss)
     _owner->send(st);
 }
 
-void Fighter::PeerlessSSNotify(UInt16 id)
+void Fighter::PeerlessSSNotify(UInt16 id, bool writedb)
 {
     UInt16 sid = SKILL_ID(id);
     std::map<UInt16, SStrengthen>::iterator it = m_ss.find(sid);
     if (it == m_ss.end())
         return;
     SSNotify(id, it->second);
+
+    if(_owner && writedb)
+        _owner->sendFighterSSListWithNoSkill();
 }
 
 void Fighter::SSDeleteDB(UInt16 id)
 {
-    DB1().PushUpdateData("DELETE FROM `skill_strengthen` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND `skillid` = %u", getId(), _owner->getId(), id);
+    DB1().PushUpdateData("DELETE FROM `skill_strengthen` WHERE `id` = %u AND `playerId` = %" I64_FMT "u AND `skillid` = %u", getId(), _owner->getId(), id);
 }
 
 void Fighter::SSFromDB(UInt16 id, SStrengthen& ss)
@@ -5740,7 +5882,7 @@ void Fighter::reload2ndSoul()
 
     DBSecondSoul dbss;
     char sqlstr[1024] = {0};
-    sprintf(sqlstr, "SELECT `fighterId`, `playerId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `skills` FROM `second_soul` WHERE `playerId`=%"I64_FMT"u AND `fighterId`=%u", _owner->getId(), _id);
+    sprintf(sqlstr, "SELECT `fighterId`, `playerId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `skills` FROM `second_soul` WHERE `playerId`=%" I64_FMT "u AND `fighterId`=%u", _owner->getId(), _id);
     if(execu->Extract(sqlstr, dbss) != DB::DB_OK)
         return;
     {
@@ -5769,7 +5911,7 @@ void Fighter::resetLevelAndExp(UInt8 maxLevel)
     UInt64 exp = GData::expTable.getLevelMin(maxLevel);
     _level = maxLevel;
     _exp = exp;
-    DB1().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u, `level`=%u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", exp, _level, _id, _owner->getId());
+    DB1().PushUpdateData("UPDATE `fighter` SET `experience` = %" I64_FMT "u, `level`=%u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", exp, _level, _id, _owner->getId());
 }
 
 void Fighter::checkBPDirty()
@@ -6054,7 +6196,7 @@ bool Fighter::quickUpGrade(UInt8 type)
 void Fighter::updateDBxingchen()
 {
     DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`)\
-            VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
+            VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
             m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2]);
 }
 
@@ -6334,7 +6476,7 @@ void Fighter::dismissXingchen()
             GObject::mailPackageManager.push(pmail->id, mitem, size, true);
     }
 
-    DB1().PushUpdateData("DELETE FROM `fighter_xingchen` WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", getId(), _owner->getId());
+    DB1().PushUpdateData("DELETE FROM `fighter_xingchen` WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", getId(), _owner->getId());
 }
 
 /*
@@ -6419,6 +6561,10 @@ UInt32 Fighter::calcEquipBattlePoint()
 	ItemEquip * halo = this->getHalo();
     if (halo != NULL)
         fgt->addTrumpAttr(halo);
+
+	ItemEquip * innateTrump = this->getInnateTrump();
+    if (innateTrump != NULL)
+        fgt->addTrumpAttr(innateTrump);
 
 	equip = this->getWeapon();
 	if(equip != NULL)

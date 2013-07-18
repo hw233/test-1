@@ -142,7 +142,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                     }
 
                     pd = 0;
-                    DB1().PushUpdateData("UPDATE `practice_data` SET place = %u where `id`= %"I64_FMT"u", PPLACE_MAX, def->getId());
+                    DB1().PushUpdateData("UPDATE `practice_data` SET place = %u where `id`= %" I64_FMT "u", PPLACE_MAX, def->getId());
 
                     SYSMSG(title, 2333);
                     SYSMSGV(content, 2334, pl->getCountry(), pl->getName().c_str());
@@ -257,7 +257,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         pp->cdend = now + pp->traintime * 60 + 60 * 60;
         pp->winnerid = 0;
 
-        DB1().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
+        DB1().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %" I64_FMT "u, '')", pl->getId(), place, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
 
         pl->setPracticingPlaceSlot(place << 16 | slot);
         addPractice(pl, pp, place, slot); // XXX: must be here after setPracticingPlaceSlot
@@ -304,8 +304,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             pd->fighters.clear();
             pd->cdend = TimeUtil::Now() + 10 * 60;
 
-            //DB1().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", pl->getId());
-            DB1().PushUpdateData("UPDATE `practice_data` SET place = %u, slot = 0, checktime = 0, cdend = %u where `id`= %"I64_FMT"u",
+            //DB1().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %" I64_FMT "u)", pl->getId());
+            DB1().PushUpdateData("UPDATE `practice_data` SET place = %u, slot = 0, checktime = 0, cdend = %u where `id`= %" I64_FMT "u",
                     PPLACE_MAX, pd->cdend, pl->getId());
 
             if(place == PPLACE_MAX || clan != pl->getClan())
@@ -466,7 +466,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                 fighters << ",";
         }
 
-        DB1().PushUpdateData("UPDATE `practice_data` SET `fighters` = '%s' WHERE `id` = %"I64_FMT"u",
+        DB1().PushUpdateData("UPDATE `practice_data` SET `fighters` = '%s' WHERE `id` = %" I64_FMT "u",
                 fighters.str().c_str(), id);
     }
 
@@ -632,7 +632,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         if (!proter)
             return false;
         data.protid = protid;
-        DB1().PushUpdateData("UPDATE `practice_place` SET `protid` = %"I64_FMT"u WHERE `id` = %u", protid, place);
+        DB1().PushUpdateData("UPDATE `practice_place` SET `protid` = %" I64_FMT "u WHERE `id` = %u", protid, place);
 
         // TODO: notify client
         return true;
@@ -957,7 +957,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         ++pd.place.openslot;
         pd.data.resize(pd.place.maxslot);
 
-        DB1().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u, `openslot` = %u WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.openslot, pd.place.ownerid);
+        DB1().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u, `openslot` = %u WHERE ownerid = %" I64_FMT "u", pd.place.maxslot, pd.place.openslot, pd.place.ownerid);
 
         // TODO: notify client
         Clan* clan = pl->getClan();
@@ -1014,7 +1014,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         pd.place.techslot += techslot;
         pd.data.resize(pd.place.maxslot);
 
-        DB1().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.ownerid);
+        DB1().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u WHERE ownerid = %" I64_FMT "u", pd.place.maxslot, pd.place.ownerid);
 
         UInt32 openPrice = 0;
         const std::vector<UInt32>& golds = GData::GDataManager::GetGoldOpenSlot();
@@ -1058,7 +1058,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         {
             if (!place)
             {
-                DB1().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", pl->getId());
+                DB1().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %" I64_FMT "u)", pl->getId());
                 return false;
             }
 
@@ -1229,7 +1229,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             if (oldclan)
                 oldclan->broadcastPracticePlaceInfo();
 
-            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %" I64_FMT "u, `maxslot` = %u WHERE id = %u",
                     pd.place.ownerid, pd.place.maxslot, place);
         }
         else
@@ -1245,7 +1245,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             pd.place.ownerid = newpl->getId();
             clan->broadcastPracticePlaceInfo();
 
-            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %" I64_FMT "u, `maxslot` = %u WHERE id = %u",
                     pd.place.ownerid, pd.place.maxslot, place);
         }
 
@@ -1283,7 +1283,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             oldpd.data.resize(oldpd.place.maxslot);
 
             oldpd.place.ownerid = 0;
-            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %" I64_FMT "u, `maxslot` = %u WHERE id = %u",
                     oldpd.place.ownerid, oldpd.place.maxslot, idx + 1);
         }
 
@@ -1301,7 +1301,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
 
         pd.place.ownerid = pl->getId();
 
-        DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+        DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %" I64_FMT "u, `maxslot` = %u WHERE id = %u",
                 pd.place.ownerid, pd.place.maxslot, place);
 
         clan->broadcastPracticePlaceInfo();

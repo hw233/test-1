@@ -33,7 +33,7 @@
 
 #define CCB_CITY_MOVE_CD             15
 
-#define  NEICE_VESION
+//#define  NEICE_VESION
 
 namespace GObject
 {
@@ -156,7 +156,7 @@ static int atkRout[7][3] = {
     {4, 5, 6}
 };
 
-static int deadcd[5] = {15, 30, 45, 60, 90};
+static int deadcd[11] = {10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60};
 
 static UInt32 npc_num[20][7] = {
     { 10,   0,   0,   0,   0,   0,  10},
@@ -182,8 +182,8 @@ static UInt32 npc_num[20][7] = {
 };
 
 static UInt32 npc_id[6] = {9005, 9006, 9007, 9008, 9009, 9010};
-static float npc_atk_factor[6] = {0.01, 0.05, 0.1, 0.3, 0.7, 1.0};
-static float npc_hp_factor[6] = {0.001, 0.005, 0.01, 0.01, 0.03, 0.05};
+static float npc_atk_factor[6] = {0.01, 0.03, 0.05, 0.1, 0.5, 1.0};
+static float npc_hp_factor[6] = {0.001, 0.003, 0.005, 0.005, 0.01, 0.02};
 
 static UInt32 spot_score[2][6] = {
     {  20,   10,   10,  5, 5,   5},
@@ -217,7 +217,7 @@ void CCBPlayer::writeToDB()
 {
     if(type != e_player)
         return;
-    DB1().PushUpdateData("REPLACE INTO `clancity_player` (`playerId`, `side`, `entered`, `win`, `dead`, `realive`, `score`, `realivecd`, `weary`) VALUES (%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u)", fgt.player->getId(), side, entered, win, dead, realive, score, realivecd, weary);
+    DB1().PushUpdateData("REPLACE INTO `clancity_player` (`playerId`, `side`, `entered`, `win`, `dead`, `realive`, `score`, `realivecd`, `weary`) VALUES (%" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u)", fgt.player->getId(), side, entered, win, dead, realive, score, realivecd, weary);
 }
 
 void CCBPlayer::sendInfo()
@@ -245,10 +245,23 @@ bool CCBPlayer::challenge(CCBPlayer* other, UInt32& bid)
 
     bid = 0;
     bool ret = false;
-    if(type == e_skill)
+
+    if(other->type == e_player && other->entered == 0)
+    {
+        ret = true;
+    }
+    else if(type == e_player && entered == 0)
+    {
+        ret = false;
+    }
+    else if(type == e_skill)
+    {
         ret = fgt.skill->doSkillEffect(other);
+    }
     else if(other->type == e_skill)
+    {
         ret = !(other->fgt.skill->doSkillEffect(this));
+    }
     else if(type == e_player)
     {
         if(other->type == e_player)
@@ -270,7 +283,8 @@ bool CCBPlayer::challenge(CCBPlayer* other, UInt32& bid)
         {
             win = 0;
             ++ other->dead;
-            other->fgt.player->autoRegenAll();
+            if(other->entered != 0)
+                other->fgt.player->autoRegenAll();
         }
     }
     else
@@ -281,7 +295,8 @@ bool CCBPlayer::challenge(CCBPlayer* other, UInt32& bid)
         {
             win = 0;
             ++ dead;
-            fgt.player->autoRegenAll();
+            if(entered != 0)
+                fgt.player->autoRegenAll();
         }
         weary = 0;
     }
@@ -289,12 +304,14 @@ bool CCBPlayer::challenge(CCBPlayer* other, UInt32& bid)
 
     if(type == e_player)
     {
-        fgt.player->clearHIAttr();
+        if(entered != 0)
+            fgt.player->clearHIAttr();
         writeToDB();
     }
     if(other->type == e_player)
     {
-        other->fgt.player->clearHIAttr();
+        if(other->entered != 0)
+            other->fgt.player->clearHIAttr();
         other->writeToDB();
     }
 
@@ -305,7 +322,6 @@ bool CCBPlayer::attackNpc(CCBPlayer* npc, UInt32& bid)
 {
     if(!npc)
         return true;
-
     GData::NpcGroups::iterator it = GData::npcGroups.find(npc->fgt.npcId);
     if(it == GData::npcGroups.end())
 		return true;
@@ -417,8 +433,8 @@ void CCBPlayer::addReAliveCD()
 {
     UInt8 idx = 0;
 
-    if(dead  > 4)
-        idx = 4;
+    if(dead  > 10)
+        idx = 10;
     else
         idx = dead - 1;
     realivecd = TimeUtil::Now() + deadcd[idx];
@@ -830,7 +846,6 @@ bool CCBSpot::playerLeave(CCBPlayer* pl)
         return false;
     UInt8 side = pl->side;
     bool res = erasePl(waiters[side], pl);
-
     if(pl->type == e_player && res)
     {
         Stream st(REP::CCB);
@@ -846,8 +861,32 @@ bool CCBSpot::playerLeave(CCBPlayer* pl)
     return res;
 }
 
+void CCBSpot::playerEscape(CCBPlayer* pl)
+{
+    if(!pl)
+        return;
+
+    UInt8 side = pl->side;
+    pl->entered = 0;
+    erasePl(dead[side], pl);
+    bool res = erasePl(waiters[side], pl);
+    if(pl->type == e_player && res)
+    {
+        Stream st(REP::CCB);
+        st << static_cast<UInt8>(0) << static_cast<UInt8>(10);
+        st << id << static_cast<UInt8>(0) << side;
+        st << pl->fgt.player->getId();
+        st << pl->fgt.player->getName();
+        st << pl->weary;
+        st << Stream::eos;
+        broadcast(st);
+    }
+}
+
 void CCBSpot::prepare()
 {
+    checkPlayers();
+
     if(hp == 0 || !canAtk)
         return;
 
@@ -879,9 +918,11 @@ void CCBSpot::prepare()
                 if(!pl->inReAliveCD())
                 {
                     waiters[0].push_back(pl);
-                    erasePl(dead[0], pl);
+                    dead[0].erase(dead[0].begin() + j);
                     -- cnt;
                     -- j;
+                    if(cnt == 0)
+                        break;
                 }
             }
         }
@@ -988,10 +1029,16 @@ void CCBSpot::handleBattle()
         {
             if(pl1 != NULL)
             {
-                skill_action[0].doSkillEffect(pl0);
-                skill_action[1].doSkillEffect(pl1);
-                clancity->doClanSkill(pl0);
-                clancity->doClanSkill(pl1);
+                if(pl0->entered != 0)
+                {
+                    skill_action[0].doSkillEffect(pl0);
+                    clancity->doClanSkill(pl0);
+                }
+                if(pl1->entered != 0)
+                {
+                    skill_action[1].doSkillEffect(pl1);
+                    clancity->doClanSkill(pl1);
+                }
                 UInt32 bid = 0;
 
                 if(pl0->challenge(pl1, bid))
@@ -1000,8 +1047,10 @@ void CCBSpot::handleBattle()
                     if(pl0->type == e_player)
                         weary = pl0->weary;
                     st << bid << static_cast<UInt8>(0) << static_cast<UInt32>(hp) << weary;
-                    dead[1].push_back(pl1);
-                    b0.push_back(pl0);
+                    if(pl1->entered != 0)
+                        dead[1].push_back(pl1);
+                    if(pl0->entered != 0)
+                        b0.push_back(pl0);
                     clancity->giveScore(pl0, pl0->getWinScore());
                     clancity->giveScore(pl1, pl1->getLostScore());
                 }
@@ -1011,9 +1060,13 @@ void CCBSpot::handleBattle()
                     if(pl1->type == e_player)
                         weary = pl1->weary;
                     st << bid << static_cast<UInt8>(1) << static_cast<UInt32>(hp) << weary;
-                    skill_dmg[1].doSkillEffect(*this);
-                    dead[0].push_back(pl0);
-                    b1.push_back(pl1);
+                    if(pl0->entered != 0)
+                        dead[0].push_back(pl0);
+                    if(pl1->entered != 0)
+                    {
+                        skill_dmg[1].doSkillEffect(*this);
+                        b1.push_back(pl1);
+                    }
                     clancity->giveScore(pl1, pl1->getWinScore());
                     clancity->giveScore(pl0, pl0->getLostScore());
                 }
@@ -1023,7 +1076,8 @@ void CCBSpot::handleBattle()
                 UInt32 weary = 0;
                 if(pl0->type == e_player)
                     weary = pl0->weary;
-                b0.push_back(pl0);
+                if(pl0->entered != 0)
+                    b0.push_back(pl0);
                 st << static_cast<UInt32>(0) << static_cast<UInt8>(0);
                 st << static_cast<UInt32>(hp) << weary;
                 break;
@@ -1032,7 +1086,11 @@ void CCBSpot::handleBattle()
         else if(pl1 != NULL)
         {
             makeDamage(10);
-            dead[1].push_back(pl1);
+            if(pl1->entered != 0)
+            {
+                dead[1].push_back(pl1);
+                clancity->giveScore(pl1, pl1->getWinScore());
+            }
             if(pl1->type == e_player)
             {
                 pl1->weary = 0;
@@ -1040,7 +1098,6 @@ void CCBSpot::handleBattle()
                 ++ pl1->dead;
                 pl1->fgt.player->autoRegenAll();
             }
-            clancity->giveScore(pl1, pl1->getWinScore());
             pl1->writeToDB();
             st << static_cast<UInt32>(0) << static_cast<UInt8>(0);
             st << static_cast<UInt32>(hp) << static_cast<UInt32>(0);
@@ -1096,6 +1153,8 @@ void CCBSpot::makeDamage(UInt16 dmg)
 
 void CCBSpot::end()
 {
+    checkPlayers();
+
     if(!canAtk)
     {
         if(hp > 0)
@@ -1149,6 +1208,34 @@ void CCBSpot::end()
 
     erasePl(waiters[0], &(bomb[0]));
     erasePl(waiters[1], &(bomb[1]));
+}
+
+void CCBSpot::checkLeavePlayer(CCBPlayerList& list)
+{
+    size_t cnt = list.size();
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        CCBPlayer* pl = list[i];
+        if(pl->type == e_player && pl->entered == 0)
+        {
+            list.erase(list.begin() + i);
+            -- i;
+            -- cnt;
+            if(cnt == 0)
+                break;
+        }
+    }
+}
+
+void CCBSpot::checkPlayers()
+{
+    for(int i = 0; i < 2; ++ i)
+    {
+        checkLeavePlayer(waiters[i]);
+        checkLeavePlayer(alive[i]);
+        checkLeavePlayer(battler[i]);
+        checkLeavePlayer(dead[i]);
+    }
 }
 
 UInt32 CCBSpot::getDefCount()
@@ -1423,12 +1510,27 @@ void ClanCity::start()
 void ClanCity::end()
 {
 	SYSMSG(title, 4920);
+    UInt32 leavescore[2] = {0, 0};
+    if(m_spots[0].hp == 0)
+    {
+        leavescore[0] = 50;
+        leavescore[1] = 100;
+        giveAllScore(0, 50);
+        giveAllScore(1, 100);
+    }
+    else
+    {
+        leavescore[0] = 100;
+        leavescore[1] = 50;
+        giveAllScore(0, 100);
+        giveAllScore(1, 50);
+    }
+
     for(CCBClanMap::iterator itc = m_clans.begin(); itc != m_clans.end(); ++ itc)
     {
         CCBClan* ccl = itc->second;
         Clan* cl = ccl->clan;
-        if(ccl->score > 0)
-            cl->addStatueExp(ccl->score*10);
+        cl->addStatueExp(ccl->score*10);
     }
 
     Clan* firstClan = NULL;
@@ -1447,9 +1549,6 @@ void ClanCity::end()
         player->setInClanCity(false);
         player->clearHIAttr();
         player->autoRegenAll();
-        if(pl->score == 0)
-            continue;
-
         player->getAchievement(pl->score*2);
 
         UInt32 clscore = 0;
@@ -1511,8 +1610,7 @@ void ClanCity::end()
         Player* player = pl->fgt.player;
         Clan* cl = player->getClan();
         player->setInClanCity(false);
-        if(pl->score == 0)
-            continue;
+        pl->score += leavescore[pl->side];
 
         player->getAchievement(pl->score*2);
 
@@ -1563,7 +1661,7 @@ void ClanCity::end()
             }
         }
 
-        SYSMSGV(content, 4920+m_type, winner, clanname, pl->score, pl->score*2, count, clscore, clscore, jointo, act);
+        SYSMSGV(content, 4920+m_type, winner, clanname, pl->score, pl->score*2, count, clscore, clscore*10, jointo, act);
         Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
@@ -1763,11 +1861,11 @@ bool ClanCity::playerLeave(Player * player)
     Clan* cl = player->getClan();
     CCBPlayer* pl = it->second;
     UInt8 pos = pl->pos;
-    if(m_spots[pos].playerLeave(pl))
+    m_spots[pos].playerEscape(pl);
+    //if(m_spots[pos].playerLeave(pl))
     {
         UInt32 curtime = TimeUtil::Now();
         UInt8 side = pl->side;
-        pl->entered = 0;
         m_players_leave[player] = pl;
         m_players.erase(player);
         CCBPlayerList& list = m_clanPlayers[side][cl];
@@ -2343,7 +2441,16 @@ void ClanCity::makeOpenStatusInfo(Stream& st)
     else
     {
         UInt32 curtime = TimeUtil::Now();
-        if(curtime >= m_startTime && curtime < m_endTime)
+        if(curtime < m_startTime)
+        {
+            if(m_type == CCB_CITY_TYPE_DEF)
+                st << static_cast<UInt8>(1);
+            else if(World::_wday == 6)
+                st << static_cast<UInt8>(3);
+            else
+                st << static_cast<UInt8>(2);
+        }
+        else if(curtime >= m_startTime && curtime < m_endTime)
         {
             if(m_spots[0].hp == 0 || (m_round == 20 && m_recycle_round == 0))
                 st << static_cast<UInt8>(3);

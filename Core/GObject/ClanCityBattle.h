@@ -101,9 +101,12 @@ namespace GObject
         CCBPlayerList npcs;
 
         CCBSpot();
+        void checkPlayers();
+        void checkLeavePlayer(CCBPlayerList& list);
         void Init();
         void playerEnter(CCBPlayer* pl);
         bool playerLeave(CCBPlayer* pl);
+        void playerEscape(CCBPlayer* pl);
         void prepare();
         void handleBattle();
         void end();

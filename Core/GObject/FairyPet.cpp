@@ -74,7 +74,7 @@ namespace GObject
     void FairyPet::UpdateToDB()
     {
         _overTime = _overTime ? _overTime : TimeUtil::SharpDayT(1);
-        DB2().PushUpdateData("REPLACE INTO `fairyPet` (`id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`, `evolve`, `equip1`, `equip2`, `equip3`) VALUES (%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", 
+        DB2().PushUpdateData("REPLACE INTO `fairyPet` (`id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`, `evolve`, `equip1`, `equip2`, `equip3`) VALUES (%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", 
                 getId(), _owner->getId(), _onBattle, _petLev, _petBone, _pinjieBless, _genguBless, _chong, _overTime, _xiaozhou, _dazhou,
                 _evolve, _equips[0] ? _equips[0]->getId() : 0, _equips[1] ? _equips[1]->getId() : 0, _equips[2] ? _equips[2]->getId() : 0);
     }
@@ -100,6 +100,7 @@ namespace GObject
         }
         pet->_owner = player;
         pet->_halo = NULL;
+        pet->_innateTrump = NULL;
         pet->_fashion = NULL;
         pet->_weapon = NULL;
         pet->_ring = NULL;
@@ -583,15 +584,10 @@ namespace GObject
                     }
                 }
             }
-            if(newskill == 0)
+            if(newskill == 0 || newskill != oldskill)
             {
                 skills = Itoa(oldskill);
                 delSkills(skills);
-            }
-            else if(newskill != oldskill)
-            {
-                skills = Itoa(newskill);
-                setSkills(skills, false);
             }
         }
         if (eq)

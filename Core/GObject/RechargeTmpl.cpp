@@ -170,7 +170,7 @@ namespace GObject
                 return 4;
             }
             //数量减1
-            DB1().PushUpdateData("REPLACE INTO `recharge_item` values(%"I64_FMT"u,%d,%d)", pl->getId(), itemId, n);
+            DB1().PushUpdateData("REPLACE INTO `recharge_item` values(%" I64_FMT "u,%d,%d)", pl->getId(), itemId, n);
         }
         //additem
         pl->GetPackage()->Add(itemId, 1, true); 

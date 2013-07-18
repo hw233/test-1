@@ -1269,6 +1269,7 @@ namespace GObject
 		void makeFormationInfo(Stream&);
         void makeFighterSSList(Stream& st);
         void makeFighterSSListWithNoSkill(Stream& st);
+        void sendFighterSSListWithNoSkill();
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
@@ -1950,7 +1951,7 @@ namespace GObject
         void tripodUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num = 1);
         void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
-        void transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1);
+        void transformUdpLog(UInt32 id, UInt32 type, UInt32 * moneys, UInt8 val1);
         void dreamerUdpLog(UInt32 id, UInt32 type, UInt32 num = 1);
         void blueDiamondAwardUdpLog(UInt8 type);
         void cFriendAwardUdpLog(UInt8 type);
@@ -2189,6 +2190,8 @@ namespace GObject
 
         // 所有将互斥法宝
         bool checkTrumpMutually(UInt32 trumpid);
+        //先天法宝遵循互斥规则
+        bool checkInnateTrumpMutually(UInt32 innateTrumpId);
 
     private:
         bool m_hasTripod;

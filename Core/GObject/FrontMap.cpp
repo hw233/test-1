@@ -31,7 +31,7 @@ void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 spot = 0)
     PopTimerEvent(pl, EVENT_AUTOFRONTMAP, pl->getId());
     pl->delFlag(Player::AutoFrontMap);
     pl->SetVar(VAR_ATOFM, 0);
-    DB3().PushUpdateData("DELETE FROM `auto_frontmap` WHERE playerId = %"I64_FMT"u", pl->getId());
+    DB3().PushUpdateData("DELETE FROM `auto_frontmap` WHERE playerId = %" I64_FMT "u", pl->getId());
 }
 
 void FrontMap::setFrontMapActiveCount(UInt8 c)
@@ -142,7 +142,7 @@ void FrontMap::sendFrontMap(Stream& st, Player* pl, UInt8 id, bool force)
 
     if (!tmp.size()) {
         tmp.resize(1);
-        DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`) VALUES(%"I64_FMT"u, %u, 0, 0, 0)",
+        DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`) VALUES(%" I64_FMT "u, %u, 0, 0, 0)",
                 pl->getId(), id);
     }
 
@@ -216,7 +216,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
         if (PLAYER_DATA(pl, frontFreeCnt) < getFreeCount()) {
             ++PLAYER_DATA(pl, frontFreeCnt);
             tmp.resize(1);
-            DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`) VALUES(%"I64_FMT"u, %u, 0, 0, 0)",
+            DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`) VALUES(%" I64_FMT "u, %u, 0, 0, 0)",
                     pl->getId(), id);
             ret = 0;
             pl->frontMapUdpLog(id, 1);
@@ -235,7 +235,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
             ++PLAYER_DATA(pl, frontGoldCnt);
             tmp.resize(1);
             tmp[0].lootlvl = PLAYER_DATA(pl, frontGoldCnt);
-            DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`, `lootlvl`) VALUES(%"I64_FMT"u, %u, 0, 0, 0, %u)",
+            DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`, `lootlvl`) VALUES(%" I64_FMT "u, %u, 0, 0, 0, %u)",
                     pl->getId(), id, PLAYER_DATA(pl, frontGoldCnt));
             ret = 0;
 
@@ -259,7 +259,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
         UInt8 count = getCount(pl);
 
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
-        DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = %u, `frontGoldCnt` = %u, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u",
+        DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = %u, `frontGoldCnt` = %u, `frontUpdate` = %u WHERE `id` = %" I64_FMT "u",
                 PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl,frontGoldCnt), TimeUtil::Now(), pl->getId());
 
         Stream st(REP::FORMATTON_INFO);
@@ -282,7 +282,7 @@ UInt8 FrontMap::getCount(Player* pl)
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
         PLAYER_DATA(pl, frontFreeCnt) = 0;
         PLAYER_DATA(pl, frontGoldCnt) = 0;
-        DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u",
+        DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %" I64_FMT "u",
                 PLAYER_DATA(pl, frontUpdate), pl->getId());
     }
 
@@ -324,7 +324,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
     if (spot >= tmp.size()) {
         tmp.resize(spot+1);
         tmp[spot].lootlvl = tmp[spot-1].lootlvl;
-        DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`, `lootlvl`) VALUES(%"I64_FMT"u, %u, %u, 0, 0, %u)",
+        DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`, `lootlvl`) VALUES(%" I64_FMT "u, %u, %u, 0, 0, %u)",
                 pl->getId(), id, spot, tmp[spot].lootlvl);
     }
 
@@ -451,7 +451,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
 
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
             pl->copyFrontWinAward(2);
-            DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
+            DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %" I64_FMT "u AND `id` = %u", pl->getId(), id);
             if (ato)
                 autoClear(pl, complate);
 
@@ -505,7 +505,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             GameAction()->onFrontMapFloorWin(pl, id, spot, tmp[spot].lootlvl);
         }
 
-        DB3().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `spot`=%u",
+        DB3().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %" I64_FMT "u AND `id` = %u AND `spot`=%u",
                 tmp[spot].count, tmp[spot].status, pl->getId(), id, spot);
     }
     else
@@ -564,8 +564,8 @@ void FrontMap::reset(Player* pl, UInt8 id)
     mark = CLR_BIT(mark, pos);
     pl->SetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, mark);
 
-    TRACE_LOG("%s: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, pl->getId(), id);
-    DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
+    TRACE_LOG("%s: %" I64_FMT "u, %u", __PRETTY_FUNCTION__, pl->getId(), id);
+    DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %" I64_FMT "u AND `id` = %u", pl->getId(), id);
 }
 
 void FrontMap::addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UInt8 status, UInt8 lootlvl)
@@ -670,7 +670,7 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
 
                 pl->addFlag(Player::AutoFrontMap);
                 pl->SetVar(VAR_ATOFM, id);
-                DB3().PushUpdateData("REPLACE INTO `auto_frontmap` (`playerId`, `id`) VALUES (%"I64_FMT"u, %u)", pl->getId(), id);
+                DB3().PushUpdateData("REPLACE INTO `auto_frontmap` (`playerId`, `id`) VALUES (%" I64_FMT "u, %u)", pl->getId(), id);
 
                 Stream st(REP::AUTO_FRONTMAP);
                 st << static_cast<UInt8>(0) << id << nspot << Stream::eos;

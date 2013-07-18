@@ -44,7 +44,7 @@ void PlayerEnter( GameMsgHdr& hdr, const void * data )
 			return;
 		}
 		//player->GetPackage()->AddItemFromDB(8942, 1, true);
-		//DB3().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(8942, 1, %"I64_FMT"u, 1)", player->getId());
+		//DB3().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(8942, 1, %" I64_FMT "u, 1)", player->getId());
 	}
 
 	UInt16 newLoc = ces->newLoc;
@@ -59,7 +59,7 @@ void PlayerEnter( GameMsgHdr& hdr, const void * data )
 
 	if(ces->notify)
 	{
-		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %" I64_FMT "u", PLAYER_DATA(player, inCity), PLAYER_DATA(player, location), player->getId());
+		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %"  I64_FMT  "u", PLAYER_DATA(player, inCity), PLAYER_DATA(player, location), player->getId());
 		GObject::Map * map = GObject::Map::FromSpot(newLoc);
 		if(map == NULL)
 			return;
@@ -101,7 +101,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 
 	struct in_addr ip;
 	ip.s_addr=htonl(player->getClientAddress());
-	DBLOG1().PushUpdateData("insert into login_states (server_id,player_id,login_time,login_ip) values(%u, %"I64_FMT"u, %u, '%s')", cfg.serverLogId, player->getId(), TimeUtil::Now(), inet_ntoa(ip));
+	DBLOG1().PushUpdateData("insert into login_states (server_id,player_id,login_time,login_ip) values(%u, %" I64_FMT "u, %u, '%s')", cfg.serverLogId, player->getId(), TimeUtil::Now(), inet_ntoa(ip));
     player->sendTripodInfo();
 }
 
@@ -594,8 +594,8 @@ void OnConfirmTradeNotify( GameMsgHdr& hdr, const void * data )
                     itemsStr1+="|";
 					if(notify->items[i]->getQuality() >= 4)
 					{
-						DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, notify->launcher->getId(), notify->items[i]->GetItemType().getId(), notify->items[i]->getId(), FromTrade, now);
-						DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, player->getId(), notify->items[i]->GetItemType().getId(), notify->items[i]->getId(), ToTrade, now);
+						DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, notify->launcher->getId(), notify->items[i]->GetItemType().getId(), notify->items[i]->getId(), FromTrade, now);
+						DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, player->getId(), notify->items[i]->GetItemType().getId(), notify->items[i]->getId(), ToTrade, now);
 					}
              }
                 else
@@ -608,7 +608,7 @@ void OnConfirmTradeNotify( GameMsgHdr& hdr, const void * data )
 					{
                         std::string tbn("item_courses");
                         DBLOG().GetMultiDBName(tbn);
-						DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, notify->launcher->getId(), notify->items[i]->getId(), notify->items[i]->Count(), FromTrade, now);
+						DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, notify->launcher->getId(), notify->items[i]->getId(), notify->items[i]->Count(), FromTrade, now);
 					}
               }
             }
@@ -625,8 +625,8 @@ void OnConfirmTradeNotify( GameMsgHdr& hdr, const void * data )
                 itemsStr2+="|";
 				if((*it)->getQuality() >= 4)
 				{
-					DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, player->getId(), (*it)->GetItemType().getId(), (*it)->getId(), FromTrade, now);
-					DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, notify->launcher->getId(), (*it)->GetItemType().getId(), (*it)->getId(), ToTrade, now);
+					DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, player->getId(), (*it)->GetItemType().getId(), (*it)->getId(), FromTrade, now);
+					DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, notify->launcher->getId(), (*it)->GetItemType().getId(), (*it)->getId(), ToTrade, now);
 				}
 		    }
             else
@@ -639,14 +639,14 @@ void OnConfirmTradeNotify( GameMsgHdr& hdr, const void * data )
 				{
                     std::string tbn("item_courses");
                     DBLOG().GetMultiDBName(tbn);
-					DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, player->getId(), (*it)->getId(), (*it)->Count(), FromTrade, now);
+					DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, player->getId(), (*it)->getId(), (*it)->Count(), FromTrade, now);
 				}
             }
         }
         if (trade==NULL)
             return;
 
-		DBLOG().PushUpdateData("insert into trade (server_id,initiator_id,initiator_coin,initiator_gold,initiator_items,receiver_id,receiver_coin,receiver_gold,receiver_items,trade_time) values(%u,%"I64_FMT"u,%u,%u,'%s',%"I64_FMT"u,%u,%u,'%s',%u)",
+		DBLOG().PushUpdateData("insert into trade (server_id,initiator_id,initiator_coin,initiator_gold,initiator_items,receiver_id,receiver_coin,receiver_gold,receiver_items,trade_time) values(%u,%" I64_FMT "u,%u,%u,'%s',%" I64_FMT "u,%u,%u,'%s',%u)",
 			cfg.serverLogId, notify->launcher->getId(), notify->coin, notify->gold, itemsStr1.c_str(), player->getId(), trade->_coin, trade->_gold, itemsStr2.c_str(), TimeUtil::Now());
     }
 	player->GetTrade()->recvConfirmTrade(notify->id, notify->coin, notify->gold, notify->items, 12);
@@ -938,7 +938,7 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         IncommingInfo ii(InFromRecharge, 0, 0);
         player->getGold(recharge->gold, &ii);
         player->addTotalRecharge(recharge->gold);
-        DB8().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE no = '%s' AND playerId = %"I64_FMT"u",
+        DB8().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE no = '%s' AND playerId = %" I64_FMT "u",
                 recharge->no, player->getId());
         char gold[32] = {0};
         char nno[256] = {0};
@@ -971,7 +971,7 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         player->addTotalRecharge(recharge->gold);
 
         // XXX: 把创建银角色前的所有订单号置成成功
-        DB8().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE playerId = %"I64_FMT"u", player->getId());
+        DB8().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE playerId = %" I64_FMT "u", player->getId());
     }
 }
 

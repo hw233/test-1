@@ -46,6 +46,8 @@ enum
     /*20*/ SKILL_ONBEMAGDMG,
     /*21*/ SKILL_ONHP10P,    // 生命剩余1/3
     /*22*/ SKILL_DEAD_FAKE,  // 复活
+    /*23*/ SKILL_ABNORMAL_TYPE_DMG,  // 异常类状态伤害
+    /*24*/ SKILL_BLEED_TYPE_DMG,  // 流血类状态伤害
     SKILL_PASSIVES
 };
 
@@ -108,6 +110,8 @@ enum
     e_eft_lingyou_magdef = 36,           // 灵佑（法防)
     e_eft_criticaldmgreduce = 37,           //减敌方暴击伤害
     e_eft_soul_out = 38,           //元神出窍
+    e_eft_abnormal_type_dmg = 39,           //异常类伤害
+    e_eft_bleed_type_dmg = 40,           //流血类伤害
 
     e_eft_max
 };
