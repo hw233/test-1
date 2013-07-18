@@ -8288,6 +8288,8 @@ function onFirstRecharge(player, index)
 
     end
 
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_137)
+
     return true
 end
 
