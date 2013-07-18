@@ -7903,6 +7903,40 @@ function ItemNormal_00010179(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010180(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (2+(2*num*2)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    player:getCoupon(800*num)
+    package:Add(8521, num*2, true, false, 2);
+    package:Add(9178, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010181(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (5+(5*num*2)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(9390, num*2, true, false, 2);
+    package:Add(509, num*2, true, false, 2);
+    package:Add(507, num*2, true, false, 2);
+    package:Add(134, num*2, true, false, 2);
+    package:Add(1126, num*2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -9006,7 +9040,6 @@ function ItemNormal_00009382(iid, num, bind, param)
                for n=2,5 do
                     card_chance_[n] = card_chance_[n-1]+card_chance_[n]
                end
-
                --card_chance_max = 25 - card_chance_max;
                if card_chance_max > 0 then
                    card_rand = math.random(1,card_chance_max);
@@ -10988,6 +11021,8 @@ local ItemNormal_Table = {
     [10177] = ItemNormal_00010176,
     [10178] = ItemNormal_00010178,
     [10179] = ItemNormal_00010179,
+    [10180] = ItemNormal_00010180,
+    [10181] = ItemNormal_00010181,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

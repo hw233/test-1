@@ -8288,7 +8288,9 @@ function onFirstRecharge(player, index)
 
     end
 
-    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_137)
+    if index <= 2 then
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_137)
+    end
 
     return true
 end

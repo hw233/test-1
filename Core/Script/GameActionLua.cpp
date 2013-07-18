@@ -317,6 +317,7 @@ namespace Script
 		CLASS_DEF(Player, updateCuilianTimes);
         CLASS_DEF(Player, AddZRYJCount);
         CLASS_DEF(Player, AddHYYJCount);
+        CLASS_DEF(Player, in7DayFromCreated);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -583,6 +584,7 @@ namespace Script
 
 		UInt8 color = 0;
 		UInt8 token = player->GetTaskMgr()->GetDayTaskFlushColor(dayTaskId, color) ? 1 : 0;
+        
 		task.set("dayTask", token);
 		task.set("color", color);
 

@@ -1093,8 +1093,10 @@ namespace GObject
         void sendVipPrivilegeMail(UInt8 lv);
         bool SetVipPrivilege_1();
         bool SetVipPrivilege_2();
-        bool SetNewRcVip(UInt8 op);
+        bool SetNewRcVip_1();
+        bool SetNewRcVip_2();
         bool AddNewRcVip();
+        bool SetNewRcVip_migic(UInt32 type);
         void sendDirectPurInfo();
 
     private:
@@ -1638,7 +1640,6 @@ namespace GObject
         void sendRechargeMails(UInt8, UInt8, UInt8);
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
-        bool in7DayFromCreated();
 
     private:
         bool _isJumpingMap;
@@ -1649,6 +1650,7 @@ namespace GObject
     public:
         inline bool isJumpingMap() { return _isJumpingMap; }
         inline void setJumpingMap(bool v) { _isJumpingMap = v; }
+        bool in7DayFromCreated();
 
         void loadQixiInfoFromDB(Player* pl, UInt8 bind, UInt8 pos, UInt8 event, UInt32 score)
         {
