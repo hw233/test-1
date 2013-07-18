@@ -136,8 +136,13 @@ namespace GObject
             return MaxICCount[5];
 		UInt8 maxCount = MaxICCount[vipLevel];
         // 限时vip特权
-        if(maxCount < 16 && inVipPrivilegeTime())
+        UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+        if( in7DayFromCreated() && VipType >4 )
+            VipType -= 2 ;
+        if(maxCount < 16 && inVipPrivilegeTime() &&( VipType ==1||VipType==3 ) )
             maxCount = 16;
+        if(maxCount < 24 && inVipPrivilegeTime() &&( VipType % 2 ==0 ) )
+            maxCount = 24;
 		return maxCount;
 	}
 
@@ -201,7 +206,10 @@ namespace GObject
 
         UInt32 extraExp = 0;
         // 限时vip特权
-        if(m_Player->inVipPrivilegeTime())
+         UInt32 VipType = m_Player->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+        if(m_Player-> in7DayFromCreated() && VipType >4 )
+            VipType -= 2 ;
+         if(m_Player->inVipPrivilegeTime()  &&( VipType < 5 ))
         {
             factor += 1.0f;
             extraExp = static_cast<UInt32>(exp * 1.0f);
@@ -498,9 +506,15 @@ namespace GObject
 	void EventPlayerTripod::Process(UInt32 leftCount)
     {
         TripodData& data = m_Player->getTripodData();
-        if(m_Player->getVipLevel() > 4)
-            data.soul += POINT_PERMIN * 2;
-        else
+         UInt32 VipType =m_Player-> GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+         UInt32 viplevel = m_Player->getVipLevel();
+        if( m_Player->in7DayFromCreated() && VipType >4 )
+            VipType -= 2 ;
+         if(viplevel > 4 ||( m_Player->inVipPrivilegeTime()&& VipType == 5))
+         {
+             data.soul += POINT_PERMIN * 2; //九疑鼎速度
+         }
+             else
             data.soul += POINT_PERMIN;
 
         if (data.soul > MAX_TRIPOD_SOUL)
@@ -3821,9 +3835,10 @@ namespace GObject
         if (!World::getNewYear() || GetLev() < 45)
         {
             UInt32 viplvl = getVipLevel();
-            if(viplvl >= 4 && viplvl <= 7)
+            UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+            if((viplvl >= 4 && viplvl <= 7) || ( inVipPrivilegeTime() && VipType % 2==1 ))
                 count += 60 * 8;
-            else if (viplvl > 7 && viplvl <= 15)
+            else if (( viplvl > 7 && viplvl <= 15) ||(inVipPrivilegeTime() &&( VipType %2 ==0)))
                 count += 60 * 16;
         }
         else
@@ -6182,7 +6197,8 @@ namespace GObject
                 if (_playerData.fshimen[i] == taskid) {
                     if (!World::getNewYear())
                     {
-                        if (getVipLevel() < 3) {
+                        if (getVipLevel() < 3 && (!inVipPrivilegeTime())) 
+                        {
                             sendMsgCode(0, 1003);
                             return false;
                         }
@@ -6225,7 +6241,7 @@ namespace GObject
                 if (_playerData.fyamen[i] == taskid) {
                     if (!World::getNewYear())
                     {
-                        if (getVipLevel() < 3) {
+                        if (getVipLevel() < 3 && (!inVipPrivilegeTime())) {
                             sendMsgCode(0, 1003);
                             return false;
                         }
@@ -6685,21 +6701,32 @@ namespace GObject
                         UInt32 rd = rnd(100);
                         for (int j = 0; j < 5; ++j) {
                             if (rd <= rfac[j]) {
+                                 UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE); 
                                 if (ttype == 0) {
                                     _playerData.fshimen[n] = task[*i];
                                     _playerData.fsmcolor[n] = j+1;
-                                    if (getVipLevel() >= 3) {
+                                    if (getVipLevel() >= 3  ) {
                                         static UInt8 viptaskcolor[16] = {0,0,0,3,3,3,4,4,4,4,4,4,4,4,4,4};
                                         if (_playerData.fsmcolor[n] < viptaskcolor[getVipLevel()])
                                             _playerData.fsmcolor[n] = viptaskcolor[getVipLevel()];
                                     }
+                                    if((inVipPrivilegeTime() && VipType%2 == 0))
+                                    {
+                                        if(_playerData.fsmcolor[n] < 4 )
+                                            _playerData.fsmcolor[n] = 4;
+                                    }
                                 } else {
                                     _playerData.fyamen[n] = task[*i];
                                     _playerData.fymcolor[n] = j+1;
-                                    if (getVipLevel() >= 2) {
+                                    if (getVipLevel() >= 2 ) {
                                         static UInt8 viptaskcolor[16] = {0,0,3,3,3,4,4,4,4,4,4,4,4,4,4,4};
                                         if (_playerData.fymcolor[n] < viptaskcolor[getVipLevel()])
                                             _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
+                                    }
+                                    if((inVipPrivilegeTime() && VipType%2 == 0))
+                                    {
+                                        if(_playerData.fymcolor[n] < 4 )
+                                            _playerData.fymcolor[n] = 4;
                                     }
                                 }
 
@@ -10025,8 +10052,8 @@ namespace GObject
         }
 #endif
         // 限时vip特权
-        if(inVipPrivilegeTime())
-            factor += 1.0f;
+    //    if(inVipPrivilegeTime())
+     //       factor += 1.0f;
 
         return factor;
     }
@@ -10173,7 +10200,8 @@ namespace GObject
                 {
                     UInt32 extraPExp = 0;
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
-                    if(inVipPrivilegeTime())
+                     UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);  
+                    if(inVipPrivilegeTime()&& VipType==0)
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
@@ -10230,7 +10258,8 @@ namespace GObject
                 {
                     UInt32 extraPExp = 0;
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
-                    if(inVipPrivilegeTime())
+                     UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);  
+                    if(inVipPrivilegeTime() && VipType==0)
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
@@ -20280,6 +20309,8 @@ bool Player::inVipPrivilegeTime()
     bool ret = true;
     if(validate <= now)
     {
+//        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, 0);
+        SetVar(VAR_VIP_PRIVILEGE_BREAK_LAST, 0);
         ret = false;
     }
 
@@ -20310,7 +20341,7 @@ bool Player::SetVipPrivilege()
 
 bool Player::SetVipPrivilege_1()
 {
-    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME); 
     bool ret = false;
     if(validate == 0)
     {
@@ -20333,22 +20364,54 @@ bool Player::SetVipPrivilege_1()
     return ret;
 }
 
-bool Player::SetNewRcVip(UInt8  op)
+bool Player::SetNewRcVip_1()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
     if(!in7DayFromCreated()) 
         return false;
-    UInt32 vipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
-   if (vipType != 0 )
-       return false;
+    UInt32 now = TimeUtil::Now();
     bool ret = false;
-    UInt32 vipCharge= 30;
-    if(op == 2 )
-        vipCharge = 200;
-    if(validate == 0)
-    {
-        UInt32 now = TimeUtil::Now();
-        UInt32 validate = now + 2*86400;
+    UInt32 vipCharge;
+    UInt32 uplevel;
+    UInt32 days;
+    vipCharge = 30;
+    uplevel = 1;
+    days = 2;
+    if (getGold() < vipCharge)
+        return false;
+    validate = now + days*86400;
+    // 保持最低位为0
+    if(validate & 0x1)
+        validate = validate + 1;
+    // 保持第2位为0, 
+    // validate&0x2 为false表示限时vip为2天
+    // validate&0x2 为true表示限时vip为7天
+    if(validate & 0x2 )
+        validate = validate + 0x2;
+    SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+    SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, uplevel);
+    ret = true;
+    ConsumeInfo ci(VipPrivilege, 0, 0);
+    useGold(vipCharge, &ci);
+    return ret;
+}
+
+bool Player::SetNewRcVip_2()
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    if(!in7DayFromCreated()) 
+        return false;
+    UInt32 now = TimeUtil::Now();
+    bool ret = false;
+    UInt32 vipCharge;
+    UInt32 uplevel;
+    UInt32 days;
+     vipCharge = 200;
+     uplevel = 2;
+     days = 2;
+    if (getGold() < vipCharge)
+            return false;
+        validate = now + days*86400;
         // 保持最低位为0
         if(validate & 0x1)
             validate = validate + 1;
@@ -20358,11 +20421,11 @@ bool Player::SetNewRcVip(UInt8  op)
         if(validate & 0x2)
             validate = validate + 0x2;
         SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
-        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, op);
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, uplevel);
         ret = true;
         ConsumeInfo ci(VipPrivilege, 0, 0);
         useGold(vipCharge, &ci);
-    }
+
 
     return ret;
 }
@@ -20370,14 +20433,22 @@ bool Player::SetVipPrivilege_2()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
     bool ret = false;
+    UInt32 charge = 70;
+    UInt32 type =GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE); 
+    if(type == 2)
+        charge = 450;
+    if (getGold() < charge)
+        return false;
     if(validate > 0 && (0 == (validate & 0x2)))
     {
         UInt32 now = TimeUtil::Now();
         if(validate > now)
             validate += 5*86400;
         else
+        {
+            SetVar(VAR_VIP_PRIVILEGE_BREAK_LAST, 1);
             validate = now + 5*86400;
-
+        }
         // 保持最低位为0
         if(validate & 0x1)
             validate = validate + 1;
@@ -20386,9 +20457,10 @@ bool Player::SetVipPrivilege_2()
         // validate&0x2 为true表示限时vip为7天
         validate |= 0x2;
         SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, type+2);
         ret = true;
         ConsumeInfo ci(VipPrivilege, 0, 0);
-        useGold(70, &ci);
+        useGold(charge, &ci);
     }
 
     return ret;
@@ -20398,41 +20470,43 @@ bool Player::AddNewRcVip()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
     bool ret = false;
-    UInt32 vipCharge ;
-    UInt32 vipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
-    UInt32 addVipDay = 7;
-    switch(vipType)
+    UInt32 vipCharge;
+    UInt32 uplevel;
+    UInt32 vipType =GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE); 
+    if(vipType == 6)
     {
-        case 1:
-            vipCharge =70;
-            addVipDay = 5;
-            break;
-        case 2:
-            vipCharge = 450;
-            addVipDay = 5;
-            break;
-        case 3:
-            vipCharge = 150;
-            break;
-        case 4:
-            vipCharge = 700;
-            break;
-        case 5:
-            vipCharge = 200;
-            break;
-        case 6:
-            vipCharge = 1000;
-            break;
+        vipCharge = 1000;
+        uplevel = 6;
+        validate |= 0x2;
     }
-     if (getGold() < vipCharge )
-         return false;
-    if(validate > 0 && (0 == (validate & 0x2)))
+    else if(vipType == 5)
+    {
+        vipCharge = 200;  
+        uplevel = 5;
+        validate |= 0x2;
+    }
+    else  if(vipType == 3 )
+    {
+        vipCharge = 150;
+        uplevel = 5;
+        validate |= 0x2;
+    }
+    else if(vipType == 4)
+    {
+        vipCharge = 700;
+        uplevel = 6;
+        validate |= 0x2;
+    }
+    else return false;
+        if (getGold() < vipCharge )
+            return false;
+    if(validate > 0 )
     {
         UInt32 now = TimeUtil::Now();
         if(validate > now)
-            validate += addVipDay*86400;
+            validate += 7*86400;
         else
-            validate = now + addVipDay*86400;
+            validate = now + 7*86400;
 
         // 保持最低位为0
         if(validate & 0x1)
@@ -20442,9 +20516,8 @@ bool Player::AddNewRcVip()
         // validate&0x2 为true表示限时vip为7天
         validate |= 0x2;
         SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
-        if(vipType < 5)
-            vipType+=2;
-        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, vipType);
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, uplevel);
+        SetVar(VAR_VIP_PRIVILEGE_BREAK_LAST, 0);
         ret = true;
         ConsumeInfo ci(VipPrivilege, 0, 0);
         useGold(vipCharge, &ci);
@@ -20495,52 +20568,64 @@ void Player::doVipPrivilege(UInt8 idx)
     case 5:
         if(!in7DayFromCreated())
             return;
-
         if (getGold() < 30)
             return;
         SetVipPrivilege_1();
-      // SetNewRcVip(1);
+           // SetNewRcVip_1();
+       // SetNewRcVip_2();
         break;
     case 6:
         if(!in7DayFromCreated())
             return;
-        if (getGold() < 70)
-            return;
         SetVipPrivilege_2();
         break;
     case 8:
-        AddNewRcVip();
+        if(!in7DayFromCreated())
+            return;
+        if (getGold() < 30)
+            return;
+        SetNewRcVip_1();
         break;
     case 9:
         if(!in7DayFromCreated())
             return;
         if (getGold() < 200)
             return;
-        SetNewRcVip(2);
+        SetNewRcVip_2();
+        break;
+    case 10:
+        AddNewRcVip();
         break;
     }
 
-    if(idx > 0 && idx < 5)
+    if(idx > 0 && idx < 5)     
     {
         if(inVipPrivilegeTime())
         {
             UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
             UInt32 now = TimeUtil::Now();
             UInt8 dayth = 0;
+            UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
             if(VIP_PRIVILEGE_7DAY(validate))
-                dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
+                dayth =7 -(static_cast<int>( (TimeUtil::SharpDayT(0,validate)-TimeUtil::SharpDayT(0,now) )/86400 ) -1 )%7;
             else
                 dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
-            if(!GameAction()->RunVipPrivilegeAward(this, idx, dayth))
-                return;
-            SetVar(VAR_VIP_PRIVILEGE_DATA, data);
+            //    dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
+            if(TimeUtil::SharpDayT(0,validate) ==  TimeUtil::SharpDayT(0,now) &&(VipType == 3 ||VipType == 4) )
+                dayth =8 ;
+        UInt32 breakLast = GetVar(VAR_VIP_PRIVILEGE_BREAK_LAST);
+        if(breakLast == 1)
+            dayth +=1;
+        std::cout<<"AwardDayth dayth:"<<dayth<<std::endl;
+        if(!GameAction()->RunVipPrivilegeAward(this, idx, dayth))
+            return;
+        SetVar(VAR_VIP_PRIVILEGE_DATA, data);
         }
         else
         {
             return;
         }
     }
-
     sendVipPrivilege();
 }
 
@@ -20572,16 +20657,25 @@ void Player::sendVipPrivilege(bool isLStar)
     UInt32 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
     UInt32 now = TimeUtil::Now();
     UInt8 dayth = 0;
-    if(VIP_PRIVILEGE_7DAY(validate))
-        dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400;
-    else
-        dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400;
-    if(dayth > 7)
-        dayth = 7;
     UInt32 timeLeft = 0;
     UInt8 extra = 0;
+    UInt32 dayth_0;
     if(validate > now)
+    {
         timeLeft = validate - now;
+        UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+        if(VIP_PRIVILEGE_7DAY(validate))
+            dayth =7 -(static_cast<int>( (TimeUtil::SharpDayT(0,validate)-TimeUtil::SharpDayT(0,now) )/86400 ) -1 )%7;
+        else
+            dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
+            //dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400;
+        if(TimeUtil::SharpDayT(0,validate) ==  TimeUtil::SharpDayT(0,now) &&(VipType == 3 ||VipType == 4) )
+            dayth =8 ;
+    }
+    UInt32 breakLast = GetVar(VAR_VIP_PRIVILEGE_BREAK_LAST);
+    if(breakLast == 1)
+        dayth +=1;
+    dayth_0 = static_cast<UInt32>(dayth) ;
     if(validate != 0)
     {
         SET_VIP_PRIVILEGE_OPEN(data, 1);
@@ -20602,10 +20696,24 @@ void Player::sendVipPrivilege(bool isLStar)
 
     if(isLStar)
         extra |= 0x4;
+    UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+    UInt32  Days = (VipType+1)/2;
+    if( in7DayFromCreated() && VipType >4 ) 
+        VipType -= 2 ;
+    UInt32 SevenOrTen;
+    if(VipType==0 )
+        SevenOrTen =0;
+    else if(VipType%2==0)
+        SevenOrTen =2;
+    else SevenOrTen =1;
     SET_VIP_PRIVILEGE_DAYTH(data, dayth);
     Stream st(REP::RC7DAY);
     st << static_cast<UInt8>(10) << timeLeft << static_cast<UInt8>(data) << extra;
-    st << Stream::eos;
+    st<<static_cast<UInt8>(SevenOrTen)<<static_cast<UInt8>( (VipType+1)/2 )<<static_cast<UInt8>(Days);
+    st <<dayth<<Stream::eos;
+    std::cout<<"PlayerID::"<<getId()<<"  "<<"break :"<<breakLast<<" "<<"VIPLEVEL:"<<VipType<<std::endl;
+    std::cout<<timeLeft<<" "<<data<<"  "<<extra<<" SevenOrTen:"<<SevenOrTen<<"  Days"<<Days<<std::endl;
+    std::cout<<"S->C dayth:"<<dayth_0<<std::endl;
     send(st);
 }
 

@@ -1023,8 +1023,8 @@ void GMHandler::OnRename( GObject::Player * player, std::vector<std::string>& ar
 	player->rebuildBattleName();
 	fgt->setName(args[0]);
 	GObject::globalNamedPlayers.add(args[0], player);
-	DB1().PushUpdateData("UPDATE `player` SET `name` = '%s' WHERE id = %"I64_FMT"u", nameTmp.c_str(), player->getId());
-	DBLOG1().PushUpdateData("update `register_states` set `player_name` = '%s' where `server_id` = %u and `player_id` = %"I64_FMT"u", nameTmp.c_str(), cfg.serverLogId, player->getId());
+	DB1().PushUpdateData("UPDATE `player` SET `name` = '%s' WHERE id = %" I64_FMT "u", nameTmp.c_str(), player->getId());
+	DBLOG1().PushUpdateData("update `register_states` set `player_name` = '%s' where `server_id` = %u and `player_id` = %" I64_FMT "u", nameTmp.c_str(), cfg.serverLogId, player->getId());
 }
 
 void GMHandler::OnPlayerInfo( GObject::Player * player, std::vector<std::string>& args )
@@ -1466,7 +1466,7 @@ void GMHandler::OnPlayerWallow( GObject::Player * player, std::vector<std::strin
 	if(PLAYER_DATA(player, wallow) != type)
 	{
 		PLAYER_DATA(player, wallow) = type;
-		DB1().PushUpdateData("UPDATE `player` SET `wallow`=%u WHERE `id`=%"I64_FMT"u", type, player->getId());
+		DB1().PushUpdateData("UPDATE `player` SET `wallow`=%u WHERE `id`=%" I64_FMT "u", type, player->getId());
 		player->sendWallow();
 	}
 }
@@ -2553,7 +2553,7 @@ void GMHandler::OnLock(GObject::Player *player, std::vector<std::string>& args)
     if(pl->getLockExpireTime() == static_cast<UInt32>(0))
     {
         pl->setLockExpireTime(static_cast<UInt32>(expireTime));
-        DB1().PushUpdateData("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
+        DB1().PushUpdateData("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%" I64_FMT "u, %u)", playerId, expireTime);
         if(pl->isOnline())
         {
             TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
@@ -2581,7 +2581,7 @@ void GMHandler::OnUnLock(GObject::Player *player, std::vector<std::string>& args
     if(pl->getLockExpireTime() != static_cast<UInt32>(0))
     {
         pl->setLockExpireTime(0);
-        DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pl->getId());
+        DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %" I64_FMT "u", pl->getId());
     }
 }
 
@@ -3092,9 +3092,9 @@ void GMHandler::OnClearCFT(GObject::Player* player, std::vector<std::string>& ar
     PLAYER_DATA(player, frontFreeCnt) = 0;
     PLAYER_DATA(player, frontGoldCnt) = 0;
     PLAYER_DATA(player, dungeonCnt) = 0;
-    DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), player->getId());
-    DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), player->getId());
-	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = 0 where `id` = %"I64_FMT"u", player->getId());
+    DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
+    DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
+	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = 0 where `id` = %" I64_FMT "u", player->getId());
     player->sendDailyInfo();
 }
 
@@ -3258,14 +3258,14 @@ void GMHandler::OnNewPlayerAuto(GObject::Player* player, std::vector<std::string
             lup.fighter = fgt;
             lup.updateId();
 
-            DB1().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u')", pl->getId(), newname.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2);
+            DB1().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`) VALUES (%"  I64_FMT  "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u')", pl->getId(), newname.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2);
 
             GObject::globalPlayers.add(pl);
             GObject::newPlayers.add(pl);
             GObject::globalNamedPlayers.add(newname, pl);
             pl->SetVar(GObject::VAR_VIPFIRST, 1); // XXX: fix old servers
 
-            DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), 0, TimeUtil::Now());
+            DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%" I64_FMT "u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), 0, TimeUtil::Now());
 
             CountryEnterStruct ces(false, 1, loc);
             GameMsgHdr imh(0x1F0, country, pl, sizeof(CountryEnterStruct));
@@ -3395,7 +3395,7 @@ void GMHandler::OnBigLock(GObject::Player *player, std::vector<std::string>& arg
 /*    std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     if (execu.get() != NULL && execu->isConnected())
     {
-        execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
+        execu->Execute2("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%" I64_FMT "u, %u)", playerId, expireTime);
     }
     */
 }
@@ -3411,7 +3411,7 @@ void GMHandler::OnBigUnLock(GObject::Player *player, std::vector<std::string>& a
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     if (execu.get() != NULL && execu->isConnected())
     {
-        execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", playerId);
+        execu->Execute2("DELETE FROM `locked_player` WHERE `player_id` = %" I64_FMT "u", playerId);
     }
     */
 }
@@ -3465,7 +3465,10 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
     if (args.size() < 1)
         return;
     UInt64 playerId = atoll(args[0].c_str());
-    setForbidSaleValue(playerId, true);
+    UInt64 tm = 9999999;
+    if (args.size() >=2 )
+        tm = atoll(args[1].c_str());
+    setForbidSaleValue(playerId, true, tm);
 //    UInt32 fTime = atol(args[1].c_str());
 //    setForbidSaleValue(playerId, true,fTime);
 
@@ -3480,7 +3483,7 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     if (execu.get() != NULL && execu->isConnected())
     {
-        execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,1)", playerId, TimeUtil::Now());
+        execu->Execute2("REPLACE into `fsale_player` values(%" I64_FMT "u,%d,1)", playerId, TimeUtil::Now());
     }
 }
 
@@ -3497,7 +3500,7 @@ void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     if (execu.get() != NULL && execu->isConnected())
     {
-        execu->Execute2("REPLACE into `fsale_player` values(%"I64_FMT"u,%d,0)", playerId, TimeUtil::Now());
+        execu->Execute2("REPLACE into `fsale_player` values(%" I64_FMT "u,%d,0)", playerId, TimeUtil::Now());
     }
 }
 

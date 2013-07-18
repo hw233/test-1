@@ -8902,8 +8902,6 @@ function ItemNormal_00009382(iid, num, bind, param)
                for n=2,5 do
                     card_chance_[n] = card_chance_[n-1]+card_chance_[n]
                end
-
-               card_chance_max = 25 - card_chance_max;
                if card_chance_max > 0 then
                    card_rand = math.random(1,card_chance_max);
                    for i = 1, #card_chance_ do

@@ -788,13 +788,24 @@ function RunVipPrivilegeAward(player, idx, dayth)
     if player == nil then
         return false;
     end
-
-    if idx == 0 or idx > 4 or dayth == 0 or dayth > 8 then
+    print("AwardDayth:"..dayth)
+    if idx == 0 or idx > 4 or dayth == 0 or dayth > 9 then
         return false;
     end
-
     local package = player:GetPackage();
-    local dayliawards = {{499,20},{49, 1}, {50, 1}} -- 每日登陆奖励
+    local VipType = player:GetVar(540);
+    if player:in7DayFromCreated()== true and VipType >4 then
+            VipType = VipType-2;
+    end
+    local dayliawards ={
+       [0]= {{499,20},{49, 1 }, {50, 1}},
+       [1]= {{499,20},{502,30}, {508,1}},
+       [2]= {{499,20},{503,5 }, {509,1}},
+       [3]= {{499,20},{502,30}, {508,1}},
+       [4]= {{499,20},{503,5 }, {509,1}},
+       [5]= {{499,20},{514,5 }, {508,1}},
+       [6]= {{499,20},{9371,5 },{509,1}},
+    }-- 每日登陆奖励
     local limitbuy = {
         [1] = { -- 第一天
             {514, 2, 10}, -- 限购1
@@ -804,7 +815,7 @@ function RunVipPrivilegeAward(player, idx, dayth)
         [2] = { -- 第二天
             {514, 4, 20}, -- 限购1
             {503, 3, 42}, -- 限购2
-            {5115, 1, 160}, -- 限购3
+            {5105, 1, 160}, -- 限购3
         },
         [3] = { -- 第三天
             {514, 6, 30}, -- 限购1
@@ -814,7 +825,7 @@ function RunVipPrivilegeAward(player, idx, dayth)
         [4] = { -- 第四天
             {514, 8, 40}, -- 限购1
             {503, 5, 70}, -- 限购2
-            {5105, 1, 160}, -- 限购3
+            {5115, 1, 160}, -- 限购3
         },
         [5] = { -- 第五天
             {514, 10, 50}, -- 限购1
@@ -836,6 +847,11 @@ function RunVipPrivilegeAward(player, idx, dayth)
             {503, 9, 126}, -- 限购2
             {5025, 2, 160}, -- 限购3
         },
+		[9] = { -- 第八天
+            {514, 18, 80}, -- 限购1
+            {503, 10, 126}, -- 限购2
+            {5055, 2, 160}, -- 限购3
+        },
     };
 
     local num = 1;
@@ -848,11 +864,11 @@ function RunVipPrivilegeAward(player, idx, dayth)
     end
 
     if idx == 1 then
-        for count = 1, #dayliawards do
-            if dayliawards[count][1] == 499 then
-                player:getCoupon(dayliawards[count][2])
+        for count = 1,3--[[ #dayliawards]] do
+            if dayliawards[VipType][count][1] == 499 then
+                player:getCoupon(dayliawards[VipType][count][2])
             else
-                package:Add(dayliawards[count][1], dayliawards[count][2], true, 0, 41);
+                package:Add(dayliawards[VipType][count][1], dayliawards[VipType][count][2], true, 0, 41);
             end
         end
     else
