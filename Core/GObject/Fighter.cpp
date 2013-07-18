@@ -64,7 +64,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0),  _pexpAddTmp(0) , _pexpMax(0), _potential(1.0f),
     _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _halo(NULL), _fashion(NULL), _weapon(NULL),
     _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false), _skillBPDirty(false),
-    _expFlush(false), _expMods(0), _expEnd(0), _pexpMods(0), _forceWrite(false), _battlePoint(0.0f), _skillBP(0.0f), _praadd(0),
+    _expMods(0), _expEnd(0), _pexpMods(0), _forceWrite(false), _battlePoint(0.0f), _skillBP(0.0f), _praadd(0),
     _attrType1(0), _attrValue1(0), _attrType2(0), _attrValue2(0), _attrType3(0), _attrValue3(0),
     favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
@@ -378,7 +378,12 @@ UInt32 Fighter::getRingId()
 	return _ring ? _ring->getId() : 0;
 }
 
-bool Fighter::addExp( UInt64 e, UInt32 extraExp )
+void Fighter::flushExp()
+{
+    updateToDB(3, _exp);
+}
+
+bool Fighter::addExp( UInt64 e, UInt32 extraExp, bool writedb )
 {
 	if(e == 0 || _level >= LEVEL_MAX)
 		return false;
@@ -427,7 +432,7 @@ bool Fighter::addExp( UInt64 e, UInt32 extraExp )
 		_hp = 0;
 		UInt8 t[3] = {1, 2, 3};
 		UInt64 v[3] = {0, _level, _exp};
-		sendModification(3, t, v);
+		sendModification(3, t, v, writedb);
 		SYSMSG_SENDV(1001, _owner, _color, getName().c_str(), _level);
 		if (_owner != NULL && isMain)
 		{
@@ -436,12 +441,10 @@ bool Fighter::addExp( UInt64 e, UInt32 extraExp )
         }
         worldBoss.setLevel(_level);
         _owner->sendLevelPack(_level);
-        _expFlush = true;
 	}
 	else
 	{
-		sendModification(3, _exp);
-        _expFlush = false;
+		sendModification2(3, _exp, writedb);
 	}
 	return r;
 }
@@ -591,19 +594,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 2: field = "level"; break;
 	case 3:
         {
-#if 0
-            UInt32 now = time(NULL);
-            ++_expMods;
-            if (_expFlush || _expMods >= 10 || now > _expEnd) // XXX: 等级变化，10次变化，10分钟
-            {
-#endif
-                DB2().PushUpdateData("UPDATE `fighter` SET `experience` = %" I64_FMT "u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", v, _id, _owner->getId());
-#if 0
-                _expFlush = false;
-                _expMods = 0;
-                _expEnd = now + 10*60;
-            }
-#endif
+            DB2().PushUpdateData("UPDATE `fighter` SET `experience` = %" I64_FMT "u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", v, _id, _owner->getId());
         }
 		return;
 
@@ -726,6 +717,11 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 void Fighter::sendModification( UInt8 t, UInt64 v )
 {
 	sendModification(1, &t, &v);
+}
+
+void Fighter::sendModification2( UInt8 t, UInt64 v, bool writedb )
+{
+	sendModification(1, &t, &v, writedb);
 }
 
 void Fighter::sendModificationAcupoints( UInt8 t, int idx, bool writedb )

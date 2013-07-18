@@ -283,8 +283,11 @@ namespace GObject
 	{
 	public:
 		EventAutoBattle(Player * player, UInt32 interval, UInt32 count, GData::NpcGroup * ng, UInt32 final)
-			: EventBase(player, interval, count), _npcGroup(ng), _finalEnd(final)
+			: EventBase(player, interval, count), _npcGroup(ng), _finalEnd(final), _writedb(true)
 		{}
+
+        ~EventAutoBattle();
+
 		virtual UInt32 GetID() const { return EVENT_AUTOBATTLE; }
 		void Process(UInt32);
 		void notify();
@@ -299,6 +302,7 @@ namespace GObject
 	private:
 		GData::NpcGroup * _npcGroup;
 		UInt32 _finalEnd;
+        bool _writedb;
 	};
 
 	class EventFighterTrain : public EventBase
@@ -1068,8 +1072,9 @@ namespace GObject
         UInt8 GetColor() const;
         UInt8 getPortraitAndColor() const;
 		UInt64 GetExp() const;
-		void AddExp(UInt64, UInt8 mlvl = 0, UInt32 extraExp = 0);
+		void AddExp(UInt64, UInt8 mlvl = 0, UInt32 extraExp = 0, bool writedb = true);
 		void AddPExp(UInt32);
+        void flushExp();
 		void AddPExpBy(Player*,UInt32);
 		void AddItemBy(Player*,UInt16,UInt16,bool);
 		void pendExp(UInt32, bool = false);

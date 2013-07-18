@@ -316,6 +316,9 @@ void WorldServer::Shutdown()
 {
 	int worker;
 
+    // XXX: erase all event
+    GObject::eventWrapper.clear();
+
     Down();
 
 	//关闭网络线程

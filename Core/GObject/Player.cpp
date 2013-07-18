@@ -141,6 +141,13 @@ namespace GObject
 		return maxCount;
 	}
 
+    EventAutoBattle::~EventAutoBattle()
+    {
+        if (m_Player) m_Player->flushExp();
+        _writedb = true;
+        updateDB(false);
+    }
+
 	float EventAutoBattle::calcExpEach(UInt32 now)
 	{
 #if 0
@@ -206,13 +213,21 @@ namespace GObject
             factor += 1.0f;
             extraExp = static_cast<UInt32>(exp * 1.0f);
         }
+
+		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
+        fprintf(stderr, "cnt: %u\n", cnt);
+        if (cnt % 10)
+            _writedb = false;
+        else
+            _writedb = true;
+
 #if 0
 		_npcGroup->monsterKilled(m_Player);
 #endif
         if (cfg.rpServer && m_Player->GetLev() < 70)
             exp *= 2;
 		if(m_Player->isOnline())
-			m_Player->AddExp(static_cast<UInt32>(exp * factor), 0, extraExp);
+			m_Player->AddExp(static_cast<UInt32>(exp * factor), 0, extraExp, _writedb);
 		else
 			m_Player->pendExp(static_cast<UInt32>(exp * factor));
 #if 0
@@ -281,6 +296,8 @@ namespace GObject
 		GLOBAL().PushMsg(hdr, &ecs);
 		_finalEnd -= ecs.duration;
 		notify();
+
+        _writedb = true;
 		updateDB(false);
 		return newCnt == 0;
 	}
@@ -293,7 +310,10 @@ namespace GObject
 			if(isNew)
 				DB3().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%" I64_FMT "u, %u, %u, %u)", m_Player->getId(), /*_npcGroup->getId()*/0, count, m_Timer.GetInterval());
 			else
-				DB3().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %" I64_FMT "u", count, m_Player->getId());
+            {
+                if (_writedb)
+                    DB3().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %" I64_FMT "u", count, m_Player->getId());
+            }
 		}
 		else
 			DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %" I64_FMT "u", m_Player->getId());
@@ -5802,7 +5822,7 @@ namespace GObject
             m_Package->AddItem(item, num, bind, true);
     }
 
-	void Player::AddExp(UInt64 exp, UInt8 mlvl, UInt32 extraExp)
+	void Player::AddExp(UInt64 exp, UInt8 mlvl, UInt32 extraExp, bool writedb)
     {
     	if(exp == 0)
 			return;
@@ -5834,7 +5854,7 @@ namespace GObject
 		{
 			GObject::Fighter * fgt = getLineup(i).fighter;
 			if(fgt != NULL)
-				fgt->addExp(exp, extraExp);
+				fgt->addExp(exp, extraExp, writedb);
 		}
         //是否开启天劫
         GObject::Tianjie::instance().isOpenTj(this);
@@ -5842,6 +5862,16 @@ namespace GObject
         if (cfg.rpServer && GetLev()>=70)
             setBuffData(PLAYER_BUFF_EXPDOUBLE,0);
 	}
+
+    void Player::flushExp()
+    {
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Fighter * fgt = getLineup(i).fighter;
+			if(fgt != NULL)
+				fgt->flushExp();
+		}
+    }
 
     void Player::addHIAttr(const GData::AttrExtra& attr)
     {
