@@ -3465,7 +3465,10 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
     if (args.size() < 1)
         return;
     UInt64 playerId = atoll(args[0].c_str());
-    setForbidSaleValue(playerId, true);
+    UInt64 tm = 9999999;
+    if (args.size() >=2 )
+        tm = atoll(args[1].c_str());
+    setForbidSaleValue(playerId, true, tm);
 //    UInt32 fTime = atol(args[1].c_str());
 //    setForbidSaleValue(playerId, true,fTime);
 

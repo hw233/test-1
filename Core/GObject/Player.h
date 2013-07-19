@@ -1088,8 +1088,10 @@ namespace GObject
         void sendVipPrivilegeMail(UInt8 lv);
         bool SetVipPrivilege_1();
         bool SetVipPrivilege_2();
-        bool SetNewRcVip(UInt8 op);
+        bool SetNewRcVip_1();
+        bool SetNewRcVip_2();
         bool AddNewRcVip();
+        bool SetNewRcVip_migic(UInt32 type);
         void sendDirectPurInfo();
 
     private:
@@ -1633,7 +1635,6 @@ namespace GObject
         void sendRechargeMails(UInt8, UInt8, UInt8);
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
-        bool in7DayFromCreated();
 
     private:
         bool _isJumpingMap;
@@ -1644,6 +1645,7 @@ namespace GObject
     public:
         inline bool isJumpingMap() { return _isJumpingMap; }
         inline void setJumpingMap(bool v) { _isJumpingMap = v; }
+        bool in7DayFromCreated();
 
         void loadQixiInfoFromDB(Player* pl, UInt8 bind, UInt8 pos, UInt8 event, UInt32 score)
         {
@@ -1949,7 +1951,7 @@ namespace GObject
         void tripodUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num = 1);
         void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
-        void transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1);
+        void transformUdpLog(UInt32 id, UInt32 type, UInt32 * moneys, UInt8 val1);
         void dreamerUdpLog(UInt32 id, UInt32 type, UInt32 num = 1);
         void blueDiamondAwardUdpLog(UInt8 type);
         void cFriendAwardUdpLog(UInt8 type);
