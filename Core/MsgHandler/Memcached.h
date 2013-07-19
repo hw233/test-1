@@ -158,7 +158,7 @@ static bool checkForbidSale(const UInt64 playerId, std::string& fsale, std::stri
     {
         t = &(value[1]);
     }
-//    return value[0] == '1';
+    return value[0] == '1';
     
     if(value[0]=='0' || value[0] == 0 )
     {
