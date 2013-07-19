@@ -289,6 +289,19 @@ namespace GObject
     private:
         ItemPetEqAttr m_peAttr;
     };
+
+    class ItemJiguan : public ItemBase
+    {
+    public:
+		ItemJiguan(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemJiguanAttr& jgAttr)
+		    : ItemJiguan(id, itemEquipType), m_jgAttr(jgAttr)
+		{}
+
+        ItemJiguanAttr & getJiguanAttr() { return m_jgAttr; }
+
+    private:
+        ItemJiguanAttr m_jgAttr;
+    }
 }
 
 #endif
