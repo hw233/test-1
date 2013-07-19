@@ -154,22 +154,19 @@ static bool checkForbidSale(const UInt64 playerId, std::string& fsale, std::stri
 
     if (memcinited)
         MemcachedGet(key, len, value, sizeof(value));
-    if (len > 1)
-    {
+    if (strlen(value) > 1)
         t = &(value[1]);
-    }
-//    return value[0] == '1';
-    
+
     if(value[0]=='0' || value[0] == 0 )
     {
         over = "0";
         return false;
     }
     StringTokenizer tk(t, "_");
-    if( tk.count() != 2)
+    if( tk.count() < 2)
     {
-        fsale=tk[0];
-       over = "1577808000";    //2020年1月1号
+        fsale=t;
+        over = "1577808000";    //2020年1月1号
         return true;
     }
     fsale =tk[0];

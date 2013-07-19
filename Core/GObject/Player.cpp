@@ -20768,8 +20768,6 @@ void Player::sendVipPrivilege(bool isLStar)
         VipType =1;
         if(VIP_PRIVILEGE_7DAY(validate))
             VipType =3;
-        else 
-            VipType =1;
         SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, VipType);
     }
     UInt32  Days = (VipType+1)/2;
