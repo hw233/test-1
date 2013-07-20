@@ -7251,6 +7251,17 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             if(!static_cast<BattleFighter*>(bo)->isSoulOut())
                 bIfDead = true;
         }
+
+        if(!bIfDead)
+        {
+            _winner = testWinner();
+            if(_winner != 0)
+                return true;
+            else
+            {
+                doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
+            }
+        }
     }
 
     if(bIfDead)
