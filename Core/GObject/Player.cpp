@@ -2973,6 +2973,7 @@ namespace GObject
             m_Package->EquipTo(0, fgt, 0x1f, equip, true);
             for(UInt8 t = 0; t < 3; ++ t)
 				m_Package->EquipTo(0, fgt, t+0x60, equip, true);
+		    m_Package->EquipTo(0, fgt, 0x70, equip, true);
 
 			_fighters.erase(it);
 			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %" I64_FMT "u", id, getId());
