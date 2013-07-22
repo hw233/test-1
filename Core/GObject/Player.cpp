@@ -1039,7 +1039,7 @@ namespace GObject
         continuousLogin(curtime);
         continuousLoginRF(curtime);
         //SetMemCach();
-        continuousLoginSummerFlow();
+        //continuousLoginSummerFlow();
         sendYearRPInfo();
         sendSummerFlowInfo();
 
