@@ -290,11 +290,11 @@ namespace GObject
         ItemPetEqAttr m_peAttr;
     };
 
-    class ItemJiguan : public ItemBase
+    class ItemJiguan : public ItemEquip
     {
     public:
-		ItemJiguan(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemJiguanAttr& jgAttr)
-		    : ItemJiguan(id, itemEquipType), m_jgAttr(jgAttr)
+		ItemJiguan(UInt32 id, const GData::ItemBaseType* itemEquipType,ItemEquipData& itemEquipData, ItemJiguanAttr& jgAttr)
+		    : ItemEquip(id, itemEquipType, itemEquipData), m_jgAttr(jgAttr)
 		{}
 
         ItemJiguanAttr & getJiguanAttr() { return m_jgAttr; }
