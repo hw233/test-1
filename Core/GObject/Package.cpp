@@ -4859,7 +4859,7 @@ namespace GObject
                 return 18;
             }
 
-            if(m_Owner->getVipLevel() < 4)
+            if(cfg.serverNum != 34 && m_Owner->getVipLevel() < 4)
             {
                 return 17;   //御剑等级小于4级
             }
