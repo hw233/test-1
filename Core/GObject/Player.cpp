@@ -310,6 +310,8 @@ namespace GObject
 		GLOBAL().PushMsg(hdr, &ecs);
 		_finalEnd -= ecs.duration;
 		notify();
+        if (m_Player)
+            m_Player->SetVar(VAR_LEFTTIMES, newCnt);
 
         _writedb = true;
 		updateDB(false);
