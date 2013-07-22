@@ -792,6 +792,8 @@ namespace GObject
         void sendOpenAct(UInt32);
         void continuousLogin(UInt32 now);
         void continuousLoginRF(UInt32 now);
+        void continuousLoginSummerFlow();
+        void SetMemCach();
         void getContinuousReward(UInt8 type, UInt8 idx = 0);
         void getContinuousRewardRF(UInt8 type, UInt8 idx = 0);
         void turnOnRC7Day();
@@ -803,6 +805,7 @@ namespace GObject
         void setContinuousRFAward(UInt32 no);
         void sendFourCopAct();
         void sendLuckybagInfo();
+        void sendSummerFlowInfo();
 		void Reconnect();
 
 		void Logout(bool = false);	//???????߲???
@@ -2071,9 +2074,9 @@ namespace GObject
         void getAward();
         void genAward(Stream& st);
         bool genAward();
-
         void getAward(UInt8 type, UInt8 opt);
         void getSSDTAward(UInt8 opt);
+        void getAwardFromSurmmeFlowr();
         void sendSSDTInfo();
         void getHappyAward(UInt8 opt);
         void sendHappyInfo(UInt16 itemId = 0);

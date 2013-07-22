@@ -1530,7 +1530,7 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     UInt16 serverNo = 0;
     if(cfg.merged)
         br >> serverNo;
-    std::cout<<" playerIds  "<<playerIds<<std::endl;
+ //   std::cout<<" playerIds  "<<playerIds<<std::endl;
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());

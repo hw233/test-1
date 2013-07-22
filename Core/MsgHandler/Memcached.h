@@ -121,7 +121,7 @@ static void setForbidSaleValue(const UInt64 playerId, bool isForbid, UInt32 fTim
 {
     (void)setForbidSaleValue;
     initMemcache();
-    if(fTime > 9999999 ||fTime < 0)
+    if(fTime > 99999999 ||fTime < 0)
         return ;
     if (memcinited)
     {
@@ -148,7 +148,7 @@ static bool checkForbidSale(const UInt64 playerId, std::string& fsale, std::stri
 {
     (void)checkForbidSale;
     initMemcache();
-    std::string t;
+    std::string t="0";
     char value[32] = {0};
     char key[MEMCACHED_MAX_KEY] = {0};
     UInt64 pid = playerId & 0xFFFFFFFFFF;

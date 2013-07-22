@@ -3473,7 +3473,6 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
 //
 //开启起封交易客户平台测试
 //#define TEST_TABLE
-
 #ifdef TEST_TABLE
     //测试平台 begin
 #pragma pack(1)
@@ -3493,17 +3492,15 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
     _test.tm =tm;
     strncpy (_test.msg, args[0].c_str(), strlen(args[0].c_str()));
   //  _test.msg = args[0].c_str();
- LoginMsgHdr hdr1(0x135, WORKER_THREAD_LOGIN, 0, 0, sizeof(_test));
-  GLOBAL().PushMsg(hdr1, &_test);
+    LoginMsgHdr hdr1(0x135, WORKER_THREAD_LOGIN, 0, 0, sizeof(_test));
+    GLOBAL().PushMsg(hdr1, &_test);
   //查询消息
-  struct testRep _testRep;
-  _testRep.playerId =playerId;
- LoginMsgHdr hdr2(0x137, WORKER_THREAD_LOGIN, 0, 0, sizeof(_testRep));
-  GLOBAL().PushMsg(hdr2, &_testRep);
-
+    struct testRep _testRep;
+    _testRep.playerId =playerId;
+    LoginMsgHdr hdr2(0x137, WORKER_THREAD_LOGIN, 0, 0, sizeof(_testRep));
+    GLOBAL().PushMsg(hdr2, &_testRep);
     //测试平台end
- return ;   
- 
+    return ;   
 #endif
 #undef TEST_TABLE
     setForbidSaleValue(playerId, true, tm);

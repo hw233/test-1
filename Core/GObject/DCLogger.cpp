@@ -991,6 +991,10 @@ UInt8 DCLogger::checkRPOpenid(char* openid)
 {
     return DC().CheckRPOpenid(openid);
 }
+UInt8 DCLogger::checkGRPOpenid(char* openid)
+{
+    return DC().CheckGRPOpenid(openid);
+}
 DCLogger dclogger;
 
 } // namespace GObject
