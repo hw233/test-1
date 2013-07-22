@@ -1510,10 +1510,27 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     br >> tm;
     br>>playerIds;
 
+//开启起封交易客户平台测试
+//#define TEST_TABLE
+#ifdef TEST_TABLE
+#pragma pack(1) 
+    struct test
+    {
+        UInt8 blamk[36];
+        UInt32 tm;
+        char msg[1024];
+    };
+#pragma pack()
+    test * _test = reinterpret_cast< test*>(const_cast<void *>(data));
+    tm = _test->tm;
+    playerIds = _test->msg;
+#endif
+#undef TEST_TABLE 
+
     UInt16 serverNo = 0;
     if(cfg.merged)
         br >> serverNo;
-
+ //   std::cout<<" playerIds  "<<playerIds<<std::endl;
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
@@ -1608,6 +1625,7 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
     Stream st(SPEP::QUERYLOCKUSER);
 //    st << isLockLogin << isForbidSale << fsaleTime << Stream::eos;
     st << isLockLogin << isForbidSale << fsaleTime<< foverTime << Stream::eos;
+    std::cout<<(bool)isLockLogin<< "  " <<(bool)isForbidSale<< "  "<<fsaleTime<<"  "<<foverTime<<std::endl;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 

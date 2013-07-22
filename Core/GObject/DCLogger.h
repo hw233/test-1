@@ -96,6 +96,7 @@ public:
         memcpy(buf, m_onlineNum_domain, sizeof(m_onlineNum_domain));
     }
     UInt8 checkRPOpenid(char* openid);
+    UInt8 checkGRPOpenid(char* openid);
 
 private:
     UInt32 version;
