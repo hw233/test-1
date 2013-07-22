@@ -167,7 +167,7 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 				package->MoveEquipFromPack(static_cast<ItemEquip *>(saleItems[j]));
 			else
 			{
-				package->DelItem2(saleItems[j], sales[j].count);
+				package->DelItem2(saleItems[j], sales[j].count, ToSale);
 				saleItems[j] = Package::BuildItem(sales[j].id, sales[j].count);
 			}
 			salePuts[j].item = saleItems[j];

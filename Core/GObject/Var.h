@@ -277,9 +277,10 @@ namespace GObject
         VAR_TOTALRECHARGEACT = 217, // 活动期间充值总额
         VAR_DIRECTPUROPEN = 218, // 幸运星活动直购是否开启
         VAR_DIRECTPURCNT = 219, // 幸运星活动直购次数
+        VAR_LEFTTIMES = 220, // 剩余挂机时间
 
         /*
-         * 【注:此段var(220--239)貌似未被占用】
+         * 【注:此段var(221--239)貌似未被占用】
          */
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
@@ -736,6 +737,7 @@ namespace GObject
             REGISTER_VAR(VAR_TOTALRECHARGEACT, CYCLE_NONE);
             REGISTER_VAR(VAR_DIRECTPUROPEN, CYCLE_NONE);
             REGISTER_VAR(VAR_DIRECTPURCNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_LEFTTIMES, CYCLE_NONE);
             REGISTER_VAR(VAR_USETAEL_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USECOUPON_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USEGOLD_CNT, CYCLE_DAY);

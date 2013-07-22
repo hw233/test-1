@@ -148,7 +148,13 @@ namespace GObject
 
     EventAutoBattle::~EventAutoBattle()
     {
-        if (m_Player) m_Player->flushExp();
+        fprintf(stderr, "%s: %p\n", __PRETTY_FUNCTION__, this);
+        if (m_Player)
+        {
+            m_Player->flushExp();
+            m_Player->flushLastExp();
+            m_Player->setLeftTimes(m_Timer.GetLeftTimes());
+        }
         _writedb = true;
         updateDB(false);
     }
@@ -223,7 +229,7 @@ namespace GObject
         }
 
 		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
-        fprintf(stderr, "cnt: %u\n", cnt);
+        fprintf(stderr, "id: %lu => cnt: %u\n", m_Player->getId(), cnt);
         if (cnt % 10)
             _writedb = false;
         else
@@ -237,7 +243,7 @@ namespace GObject
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp * factor), 0, extraExp, _writedb);
 		else
-			m_Player->pendExp(static_cast<UInt32>(exp * factor));
+			m_Player->pendExp(static_cast<UInt32>(exp * factor), false, _writedb);
 #if 0
 		_npcGroup->getLoots(m_Player);
 #else
@@ -312,6 +318,9 @@ namespace GObject
 
 	void EventAutoBattle::updateDB(bool isNew)
 	{
+        if (m_Player->GetVar(VAR_LEFTTIMES))
+            return;
+
 		UInt32 count = m_Timer.GetLeftTimes();
 		if(count > 0)
 		{
@@ -1080,6 +1089,7 @@ namespace GObject
 
 		lockSecondPWD();
 
+        offlineAutoExp(curtime);
 		checkLastBattled();
 		GameAction()->onLogin(this);
         if (World::getChristmas())
@@ -2158,6 +2168,10 @@ namespace GObject
             LoginMsgHdr hdr1(0x301, WORKER_THREAD_LOGIN, 0, this->GetSessionID(), sizeof(crackValue));
             GLOBAL().PushMsg(hdr1, &crackValue);
         }
+
+        SetVar(VAR_OFFLINE, curtime);
+        PopTimerEvent(this, EVENT_AUTOBATTLE, 0);
+        delFlag(Training);
 	}
 
 	void Player::Logout(bool nobroadcast)
@@ -2283,6 +2297,9 @@ namespace GObject
         }
         //愚公移山活动
         setLogoutInFoolsDay();
+
+        PopTimerEvent(this, EVENT_AUTOBATTLE, 0);
+        delFlag(Training);
 	}
 
 	void Player::checkLastBattled()
@@ -3926,11 +3943,18 @@ namespace GObject
 		PushTimerEvent(event);
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 0);
         GameAction()->doStrong(this, SthTaskHook, 0,0);
+        SetVar(VAR_LEFTTIMES, count);
 		return true;
 	}
 
 	void Player::pushAutoBattle(UInt32 npcId, UInt16 count, UInt16 interval)
 	{
+        if (GetVar(VAR_LEFTTIMES))
+        {
+            DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %" I64_FMT "u", _id);
+            return;
+        }
+
 		if(/*npcId == 0 || */count == 0 || interval == 0)
 			return;
         if (count > 1440 && GetLev() < 45) // XXX: 45级以下不允许挂机240小时
@@ -5888,6 +5912,12 @@ namespace GObject
 			if(fgt != NULL)
 				fgt->flushExp();
 		}
+    }
+
+    void Player::flushLastExp()
+    {
+        if (_playerData.lastExp)
+            DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastExp, _id);
     }
 
     void Player::addHIAttr(const GData::AttrExtra& attr)
@@ -8785,13 +8815,16 @@ namespace GObject
 		}
 	}
 
-	void Player::pendExp( UInt32 exp, bool leaveCity )
+	void Player::pendExp( UInt32 exp, bool leaveCity, bool writedb )
 	{
         isDoubleExp(exp);
 		_playerData.lastExp += exp;
 		if(leaveCity)
 			_playerData.lastExp |= 0x80000000;
-		DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastExp, _id);
+
+        fprintf(stderr, "%s: %s\n", __PRETTY_FUNCTION__, writedb?"true":"false");
+        if (writedb)
+            DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastExp, _id);
 	}
 
 	void Player::pendTael( UInt32 t )
@@ -13559,6 +13592,46 @@ namespace GObject
             DB3().PushUpdateData("REPLACE INTO `cfriend_awards` (`playerId`, `invitedId`, `awards`) VALUES (%" I64_FMT "u, %" I64_FMT "u, '')", _id, id);
             GetCFriend()->setCFriendSafe(CF_INVITED);
         }
+    }
+
+    void Player::offlineAutoExp(UInt32 now)
+    {
+        UInt32 lastOffline = GetVar(VAR_OFFLINE);
+        if (!lastOffline)
+            return;
+        if (now < lastOffline)
+            return;
+        UInt32 left = getLeftTimes();
+        if (!left)
+            return;
+        UInt32 passed = (now-lastOffline)/60;
+
+        UInt32 count = left;
+        UInt32 l = passed > left ? 0 : left - passed;
+        UInt32 n = passed > left ? left : passed;
+        UInt32 interval = 60;
+		UInt32 final = now + interval * l;
+
+		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, interval, count, /*ng*/NULL, final);
+		if (event == NULL) return;
+        for (UInt32 i = 0; i < n; ++i)
+        {
+            event->Process(0);
+            event->Next();
+        }
+
+        if (l)
+        {
+            PushTimerEvent(event);
+            addFlag(Training);
+        }
+        else
+        {
+            delete event;
+            event = NULL;
+        }
+
+        //setLeftTimes(0);
     }
 
     void Player::offlineExp(UInt32 now)

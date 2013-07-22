@@ -146,7 +146,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	}
 
 	worker = WORKER_THREAD_LOGIN;
-	m_AllWorker[WORKER_THREAD_LOGIN] = new WorkerThread<Login::LoginWorker>(new Login::LoginWorker());
+	m_AllWorker[worker] = new WorkerThread<Login::LoginWorker>(new Login::LoginWorker());
 
 	worker = WORKER_THREAD_SORT;
 	m_AllWorker[worker] = new WorkerThread<GObject::SortWorker>(new GObject::SortWorker(0, WORKER_THREAD_SORT));
@@ -316,9 +316,6 @@ void WorldServer::Shutdown()
 {
 	int worker;
 
-    // XXX: erase all event
-    GObject::eventWrapper.clear();
-
     Down();
 
 	//关闭网络线程
@@ -337,6 +334,9 @@ void WorldServer::Shutdown()
 			m_AllWorker[worker]->Shutdown();
 	}
 
+	Thread::sleep(3000);
+    // XXX: erase all event
+    GObject::eventWrapper.clear();
 	Thread::sleep(2000);
 	m_AllWorker[WORKER_THREAD_DB]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB1]->Shutdown();

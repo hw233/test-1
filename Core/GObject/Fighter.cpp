@@ -589,8 +589,8 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
     }
 
 	switch(t)
-	{
-	case 1: field = "hp"; break;
+	{ // 不保存hp, 每次重启都满血
+	//case 1: field = "hp"; break;
 	case 2: field = "level"; break;
 	case 3:
         {
@@ -864,6 +864,9 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 
 ItemEquip * Fighter::setFashion( ItemFashion* r, bool writedb )
 {
+    if (r && r->getClass() != Item_Fashion)
+        return NULL;
+
 	ItemEquip * rr = _fashion;
 	_fashion = r;
 	if(writedb)
@@ -882,6 +885,9 @@ ItemEquip * Fighter::setFashion( ItemFashion* r, bool writedb )
 
 ItemEquip * Fighter::setHalo( ItemHalo* r, bool writedb )
 {
+    if (r && r->getClass() != Item_Halo)
+        return NULL;
+
 	ItemEquip * rr = _halo;
 	_halo = r;
 
@@ -916,6 +922,9 @@ ItemEquip * Fighter::setHalo( ItemHalo* r, bool writedb )
 
 ItemEquip * Fighter::setInnateTrump(ItemInnateTrump* r, bool writedb)
 {
+    if (r && r->getClass() != Item_InnateTrump)
+        return NULL;
+
 	ItemEquip * rr = _innateTrump;
 	_innateTrump = r;
 
@@ -971,6 +980,9 @@ UInt16 Fighter::getInnateSkill()
 
 ItemWeapon * Fighter::setWeapon( ItemWeapon * w, bool writedb )
 {
+    if (w && w->getClass() != Item_Weapon)
+        return NULL;
+
 	ItemWeapon * r = _weapon;
 	_weapon = w;
 	if(writedb)
@@ -990,6 +1002,14 @@ ItemWeapon * Fighter::setWeapon( ItemWeapon * w, bool writedb )
 
 ItemArmor * Fighter::setArmor( int idx, ItemArmor * a, bool writedb )
 {
+    if (a && ((idx == 0 && a->getClass() != Item_Armor1) ||
+                (idx == 1 && a->getClass() != Item_Armor2) ||
+                (idx == 2 && a->getClass() != Item_Armor3) ||
+                (idx == 3 && a->getClass() != Item_Armor4) ||
+                (idx == 4 && a->getClass() != Item_Armor5)
+                ))
+        return NULL;
+
 	ItemArmor * r = _armor[idx];
 	_armor[idx] = a;
 	if(writedb)
@@ -1008,6 +1028,9 @@ ItemArmor * Fighter::setArmor( int idx, ItemArmor * a, bool writedb )
 
 ItemEquip * Fighter::setAmulet( ItemEquip * a, bool writedb )
 {
+    if (a && a->getClass() != Item_Amulet)
+        return NULL;
+
 	ItemEquip * r = _amulet;
 	_amulet = a;
 	if(writedb)
@@ -1025,6 +1048,9 @@ ItemEquip * Fighter::setAmulet( ItemEquip * a, bool writedb )
 
 ItemEquip * Fighter::setRing( ItemEquip * r, bool writedb )
 {
+    if (r && r->getClass() != Item_Ring)
+        return NULL;
+
 	ItemEquip * rr = _ring;
 	_ring = r;
 	if(writedb)
@@ -1142,6 +1168,9 @@ inline bool checkTrumpMutually(Player* _owner, UInt32 trumpid)
 
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
+    if (trump && trump->getClass() != Item_Trump)
+        return NULL;
+
     ItemEquip* t = 0;
     if (trump && (trump->getClass() == Item_Halo || trump->getClass() == Item_InnateTrump))
     {

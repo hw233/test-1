@@ -4,7 +4,7 @@
 template <typename Type>
 std::string Itoa(Type n, int dec = 10)
 {
-	char buffer[256];
+	char buffer[256] = {0};
 	char* p = buffer;
 
 	do
