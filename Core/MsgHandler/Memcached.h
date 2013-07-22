@@ -121,6 +121,8 @@ static void setForbidSaleValue(const UInt64 playerId, bool isForbid, UInt32 fTim
 {
     (void)setForbidSaleValue;
     initMemcache();
+    if(fTime > 9999999 ||fTime < 0)
+        return ;
     if (memcinited)
     {
         char value[32] = {'0'};
@@ -130,9 +132,9 @@ static void setForbidSaleValue(const UInt64 playerId, bool isForbid, UInt32 fTim
         sprintf(&value[1],"%d", TimeUtil::Now());
         {
             if(fTime != 9999999)
-            sprintf(&value[1],"%d_%d", TimeUtil::Now(),TimeUtil::Now()+fTime);
+                sprintf(&value[1],"%d_%d", TimeUtil::Now(),TimeUtil::Now()+fTime);
             else
-            sprintf(&value[1],"%d", TimeUtil::Now());
+                sprintf(&value[1],"%d", TimeUtil::Now());
         }
         
         size_t vlen = strlen(value);
@@ -156,9 +158,14 @@ static bool checkForbidSale(const UInt64 playerId, std::string& fsale, std::stri
         MemcachedGet(key, len, value, sizeof(value));
     if (strlen(value) > 1)
         t = &(value[1]);
-
+    
+    
+//    return value[0] == '1';
+    
+    
     if(value[0]=='0' || value[0] == 0 )
     {
+        fsale = '0';
         over = "0";
         return false;
     }
@@ -173,6 +180,8 @@ static bool checkForbidSale(const UInt64 playerId, std::string& fsale, std::stri
     over = tk[1];
     if(TimeUtil::Now() > static_cast<UInt32>(atoi( over.c_str() ) ) )
     {
+        fsale = '0';
+        over = "0";
         setForbidSaleValue(playerId,false);
         return false;
     }
