@@ -3951,11 +3951,11 @@ namespace GObject
 
 	void Player::pushAutoBattle(UInt32 npcId, UInt16 count, UInt16 interval)
 	{
-        if (GetVar(VAR_LEFTTIMES))
-        {
-            DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %" I64_FMT "u", _id);
+        DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %" I64_FMT "u", _id);
+        if (!GetVar(VAR_LEFTTIMES))
+            SetVar(VAR_LEFTTIMES, count);
+        else
             return;
-        }
 
 		if(/*npcId == 0 || */count == 0 || interval == 0)
 			return;
@@ -13633,7 +13633,7 @@ namespace GObject
             event = NULL;
         }
 
-        //setLeftTimes(0);
+        setLeftTimes(l);
     }
 
     void Player::offlineExp(UInt32 now)
