@@ -11773,7 +11773,7 @@ namespace GObject
             SetVar(VAR_SUMMERFLOW_TYPE,0);
         }
         char str[16] = {0};
-        sprintf(str, "F_130722_%d", type-1);
+        sprintf(str, "F_130722_%d", type);
         udpLog("shuqihuiliu", str, "", "", "", "", "act");
     } 
     void Player::getAwardGiftCard()
