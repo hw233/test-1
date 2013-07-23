@@ -11762,6 +11762,8 @@ namespace GObject
     }
     void Player::getAwardFromSurmmeFlowr()
     {
+        if (!World::getSummerFlow())
+            return;
         UInt32 type = GetVar(VAR_SUMMERFLOW_TYPE);
         UInt32 Award = GetVar(VAR_SUMMERFLOW_AWARD);
         if(type == 0||Award==1)
@@ -13949,6 +13951,8 @@ namespace GObject
         UInt32 last_sharp = TimeUtil::SharpDay(0, lastOffline);
      *
      */
+        if (!World::getSummerFlow())
+            return;
         UInt32 SummerAward = GetVar(VAR_SUMMERFLOW_AWARD);
         UInt32 SummerType  = GetVar(VAR_SUMMERFLOW_TYPE);
         if(SummerAward != 0 || SummerType!=0)
