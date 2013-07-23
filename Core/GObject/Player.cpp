@@ -13648,15 +13648,15 @@ namespace GObject
         UInt32 left = getLeftTimes();
         if (!left)
             return;
-        UInt32 passed = (now-lastOffline)/60;
 
+        UInt32 interval = 60;
+        UInt32 passed = (now-lastOffline)/60;
         UInt32 maxcount = getAutoBattleCount();
         UInt32 count = left;
         UInt32 rleft = passed > left ? 0 : left - passed;
         UInt32 rcount = passed > left ? left : passed;
         if (rcount > maxcount)
             rcount = maxcount;
-        UInt32 interval = 60;
 		UInt32 final = now + interval * rleft;
 
 		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, interval, count, /*ng*/NULL, final);
