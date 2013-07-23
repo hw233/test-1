@@ -124,7 +124,7 @@ const char* MCached::get(const char* key, size_t key_size, char* value, size_t s
         }
         else
         {
-            Thread::sleep(500);
+            Thread::usleep(500);
         }
     }
     return value;
