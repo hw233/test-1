@@ -1039,7 +1039,7 @@ namespace GObject
         continuousLogin(curtime);
         continuousLoginRF(curtime);
         //SetMemCach();
-        continuousLoginSummerFlow();
+        // continuousLoginSummerFlow();
         sendYearRPInfo();
         sendSummerFlowInfo();
 
@@ -11771,6 +11771,8 @@ namespace GObject
             SetVar(VAR_SUMMERFLOW_AWARD, 1);
             SetVar(VAR_SUMMERFLOW_TYPE,0);
         }
+    udpLog("shuqihuiliu", shuqihuiliu[type-1], "", "", "", "", "act");
+
     } 
     void Player::getAwardGiftCard()
     {
@@ -14018,6 +14020,9 @@ namespace GObject
     }
     void Player::sendSummerFlowInfo()
     {
+        if (!World::getSummerFlow())
+            return;
+       
         UInt32 SummerFlowType = GetVar(VAR_SUMMERFLOW_TYPE);
         UInt32 SummerFlowAward = GetVar(VAR_SUMMERFLOW_AWARD);
         Stream st(REP::GETAWARD);
@@ -22189,7 +22194,12 @@ static const char* ryhb_udplog[15] = {
     "F_130603_14",
     "F_130603_15",
 };
-
+static const char* shuqihuiliu[4] = {
+    "F_130722_1",
+    "F_130722_2",
+    "F_130722_3",
+    "F_130722_4",
+}
 void Player::AddZRYJCount(UInt32 v)
 {
     if(!World::inActive_opTime_20130531() && !World::getRYHBActivity())

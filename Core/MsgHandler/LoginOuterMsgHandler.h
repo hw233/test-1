@@ -193,6 +193,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	}
 	else
 	{
+
 		if(player->getLockExpireTime() > 0)
 		{
 			if(player->getLockExpireTime() <= TimeUtil::Now())
@@ -241,6 +242,8 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
+    player->continuousLoginSummerFlow();
+    player->sendSummerFlowInfo();
 
     std::string fsaleTime;
 //    player->setForbidSale(checkForbidSale(player->getId(), fsaleTime));

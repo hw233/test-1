@@ -180,6 +180,7 @@ bool World::_opentest;
 bool World::_consumeactive;
 bool World::_consume918 = false;
 bool World::_consumeawardact = false;
+bool World::_summerFlow = false;
 RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 RCSortType World::popularitySort;
