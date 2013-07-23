@@ -11771,10 +11771,10 @@ namespace GObject
         {
             SetVar(VAR_SUMMERFLOW_AWARD, 1);
             SetVar(VAR_SUMMERFLOW_TYPE,0);
+            char str[16] = {0};
+            sprintf(str, "F_130722_%d", type);
+            udpLog("shuqihuiliu", str, "", "", "", "", "act");
         }
-        char str[16] = {0};
-        sprintf(str, "F_130722_%d", type);
-        udpLog("shuqihuiliu", str, "", "", "", "", "act");
     } 
     void Player::getAwardGiftCard()
     {
