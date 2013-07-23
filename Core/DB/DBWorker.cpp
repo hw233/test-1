@@ -130,7 +130,7 @@ void DBWorker::OnTimer()
             --size;
             bool r = DoDBQuery(*query);
             TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, *query, r ? 1 : 0);
-            FreeMemBlock(*query);
+            free(*query);
             ++query;
             if (!*query)
                 continue;
@@ -232,7 +232,7 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 	/* Guess we need no more than 256 bytes. */
 	int size = 240;
 
-	char *p = (char*)AllocMemBlock(size);
+	char *p = (char*)malloc(size);
 	if (p == NULL)
 		return;
 
@@ -250,8 +250,8 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 			size = n+1; /* precisely what is needed */
 		else           /* glibc 2.0 */
 			size *= 2;  /* twice the old size */
-        FreeMemBlock(p);
-		if ((p = (char*)AllocMemBlock(size)) == NULL) {
+        free(p);
+		if ((p = (char*)malloc(size)) == NULL) {
 			return;
 		}
 	}
@@ -275,7 +275,7 @@ void DBWorker::PushUpdateDataL(const char * fmt, ...)
 	/* Guess we need no more than 256 bytes. */
 	int size = 240;
 
-	char *p = (char*)AllocMemBlock(size);
+	char *p = (char*)malloc(size);
 	if (p == NULL)
 		return;
 
@@ -293,8 +293,8 @@ void DBWorker::PushUpdateDataL(const char * fmt, ...)
 			size = n+1; /* precisely what is needed */
 		else           /* glibc 2.0 */
 			size *= 2;  /* twice the old size */
-        FreeMemBlock(p);
-		if ((p = (char*)AllocMemBlock(size)) == NULL) {
+        free(p);
+		if ((p = (char*)malloc(size)) == NULL) {
 			return;
 		}
 	}
@@ -314,7 +314,7 @@ void DBWorker::PushUpdateDataF(const char * fmt, ...)
 	/* Guess we need no more than 256 bytes. */
 	int size = 240;
 
-	char *p = (char*)AllocMemBlock(size);
+	char *p = (char*)malloc(size);
 	if (p == NULL)
 		return;
 
@@ -332,8 +332,8 @@ void DBWorker::PushUpdateDataF(const char * fmt, ...)
 			size = n+1; /* precisely what is needed */
 		else           /* glibc 2.0 */
 			size *= 2;  /* twice the old size */
-        FreeMemBlock(p);
-		if ((p = (char*)AllocMemBlock(size)) == NULL) {
+        free(p);
+		if ((p = (char*)malloc(size)) == NULL) {
 			return;
 		}
 	}

@@ -59,6 +59,8 @@ public:
 	inline void Shutdown()	//由所在线程启动和关闭此服务
 	{
 		SetActive( false );
+        if (m_MsgHandler)
+            m_MsgHandler->setRunnerShutdown(true);
 	}
 
 	inline Log* GetLog()
@@ -112,7 +114,9 @@ protected:
 			}
 		}
 		else
-			ProcessMsg();
+        {
+            ProcessMsg();
+        }
 	}
 	inline void DoProcessTimer()
 	{
@@ -127,7 +131,9 @@ protected:
 			}
 		}
 		else
-			OnTimer();
+        {
+            OnTimer();
+        }
 	}
 
 public:

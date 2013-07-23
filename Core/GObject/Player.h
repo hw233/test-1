@@ -1078,15 +1078,20 @@ namespace GObject
 		void AddExp(UInt64, UInt8 mlvl = 0, UInt32 extraExp = 0, bool writedb = true);
 		void AddPExp(UInt32);
         void flushExp();
+        void flushLastExp();
 		void AddPExpBy(Player*,UInt32);
 		void AddItemBy(Player*,UInt16,UInt16,bool);
-		void pendExp(UInt32, bool = false);
+		void pendExp(UInt32, bool = false, bool = true);
 		void setLevelAndExp(UInt8, UInt64);
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
         UInt8 allHpP();
         UInt32 getBattleMaxHp();
         UInt32 getBattleCurrentHp(); 
+
+        void setLeftTimes(UInt32 c) { SetVar(VAR_LEFTTIMES, c); }
+        UInt32 getLeftTimes() { return GetVar(VAR_LEFTTIMES); }
+        void offlineAutoExp(UInt32 now);
 
         bool isCopyPassed(UInt8 copyid);
         bool inVipPrivilegeTime();
@@ -2077,8 +2082,8 @@ namespace GObject
         void makeFire(UInt32 id1, UInt32 id2);
 
         void getAward();
-        void genAward(Stream& st);
-        bool genAward();
+        int genAward(Stream& st);
+        int genAward();
         void getAward(UInt8 type, UInt8 opt);
         void getSSDTAward(UInt8 opt);
         void getAwardFromSurmmeFlowr();

@@ -15,7 +15,7 @@ namespace GObject
 class MsgHandler
 {
 public:
-	MsgHandler(UInt8 worker = 0xFF) : m_Worker(worker)
+	MsgHandler(UInt8 worker = 0xFF) : m_Worker(worker), m_RunnerShutdown(false)
 	 {
 		 for (int i = 0; i < MAX_MSG_NUM; i++)
 		 {
@@ -60,6 +60,9 @@ public:
 		 m_HandlerList[msgId] = handler;
 	 }
 
+     inline void setRunnerShutdown(bool v) { m_RunnerShutdown = v; }
+     inline bool isRunnerShutdown() const { return m_RunnerShutdown; }
+
 protected:
 	 template <typename HdrType, typename MsgType>
 	 static bool HandlerWrapper(char* func, const MsgHdr* hdr)
@@ -91,6 +94,7 @@ private:
 
 	 Handler* m_HandlerList[MAX_MSG_NUM];
 	 UInt8	 m_Worker;
+     bool m_RunnerShutdown;
 };
 
 #define MSG_HANDLER_DEFINE(cls) \

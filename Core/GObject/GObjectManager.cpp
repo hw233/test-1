@@ -4822,7 +4822,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Tripod Data");
 		DBTripod t;
-		if(execu->Prepare("SELECT `id`, `soul`, `fire`, `quality`, `awdst`, `itemId`, `num` FROM `tripod`", t)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num` FROM `tripod`", t)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -4833,6 +4833,7 @@ namespace GObject
             td.fire = t.fire;
             td.quality = t.quality;
             td.awdst = t.awdst;
+            td.needgen = t.regen;
             td.itemId = t.itemId;
             td.num = t.num;
 
