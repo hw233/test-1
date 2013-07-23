@@ -186,6 +186,7 @@ void WorldScript::init()
 	def("setConsume918", GObject::World::setConsume918);
 	def("getConsume918", GObject::World::getConsume918);
 	def("setConsumeAwardAct", GObject::World::setConsumeAwardAct);
+	def("setSummerFlow", GObject::World::setSummerFlow);
     def("getConsumeActive", GObject::World::getConsumeActive);
     def("setKillMonsterAct", GObject::World::setKillMonsterAct);
     def("getKillMonsterAct", GObject::World::getKillMonsterAct);

@@ -1059,7 +1059,8 @@ namespace GObject
         continuousLogin(curtime);
         continuousLoginRF(curtime);
         //SetMemCach();
-        //continuousLoginSummerFlow();
+       // continuousLoginSummerFlow();//修改
+
         sendYearRPInfo();
         sendSummerFlowInfo();
 
@@ -11791,6 +11792,8 @@ namespace GObject
     }
     void Player::getAwardFromSurmmeFlowr()
     {
+        if (!World::getSummerFlow())
+            return;
         UInt32 type = GetVar(VAR_SUMMERFLOW_TYPE);
         UInt32 Award = GetVar(VAR_SUMMERFLOW_AWARD);
         if(type == 0||Award==1)
@@ -11800,6 +11803,9 @@ namespace GObject
         {
             SetVar(VAR_SUMMERFLOW_AWARD, 1);
             SetVar(VAR_SUMMERFLOW_TYPE,0);
+            char str[16] = {0};
+            sprintf(str, "F_130722_%d", type);
+            udpLog("shuqihuiliu", str, "", "", "", "", "act");
         }
     } 
     void Player::getAwardGiftCard()
@@ -13959,7 +13965,7 @@ namespace GObject
         initMemcache();
         char key[MEMCACHED_MAX_KEY] = {0};
         char value[4][32] ={"07","14","30","90"};
-        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_01");
+        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_23336");
         size_t vlen = strlen(value[0]);
         MemcachedSet(key, len, value[0], vlen, 0);
     }
@@ -13975,8 +13981,11 @@ namespace GObject
         UInt32 last_sharp = TimeUtil::SharpDay(0, lastOffline);
      *
      */
+        if (!World::getSummerFlow())
+            return;
         UInt32 SummerAward = GetVar(VAR_SUMMERFLOW_AWARD);
-        if(SummerAward != 0)
+        UInt32 SummerType  = GetVar(VAR_SUMMERFLOW_TYPE);
+        if(SummerAward != 0 || SummerType!=0)
             return ;
 /*
         initMemcache();
@@ -14048,6 +14057,9 @@ namespace GObject
     }
     void Player::sendSummerFlowInfo()
     {
+        if (!World::getSummerFlow())
+            return;
+       
         UInt32 SummerFlowType = GetVar(VAR_SUMMERFLOW_TYPE);
         UInt32 SummerFlowAward = GetVar(VAR_SUMMERFLOW_AWARD);
         Stream st(REP::GETAWARD);
@@ -22219,7 +22231,6 @@ static const char* ryhb_udplog[15] = {
     "F_130603_14",
     "F_130603_15",
 };
-
 void Player::AddZRYJCount(UInt32 v)
 {
     if(!World::inActive_opTime_20130531() && !World::getRYHBActivity())

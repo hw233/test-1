@@ -883,6 +883,13 @@ function onActivityCheck(tm)
       else
           setConsumeAwardAct(false)
       end
+
+      if tm >= actTime248 and tm < actTime248_1 then
+          setSummerFlow(true)
+      else
+          setSummerFlow(false)
+      end
+
       if tm >= actTime551 and tm < actTime551_1 then
           setCompassAct(true)
       else
@@ -1387,6 +1394,9 @@ function initActTime(y, m, d)
   --消费抽奖活动
   local  SerStartTm247= { ['year'] = 2013, ['month'] = 5, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  local  SerStartTm248= { ['year'] = 2013, ['month'] = 7, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm248_1= { ['year'] = 2013, ['month'] = 7, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+--暑假回流
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1818,6 +1828,9 @@ function initActTime(y, m, d)
 
   actTime247_0= os.time(SerStartTm247)
   actTime247_1= os.time(SerStartTm247) + 7*86400;
+
+  actTime248= os.time(SerStartTm248)
+  actTime248_1= os.time(SerStartTm248_1);
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

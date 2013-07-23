@@ -471,7 +471,10 @@ public:
     { _consumeawardact = v; }
     inline static bool getConsumeAwardAct()
     { return _consumeawardact; }
- 
+    inline static void  setSummerFlow(bool v)
+    {   _summerFlow=v; } 
+    inline static bool getSummerFlow()
+    {  return _summerFlow; } 
     inline static void setNeedRechargeRank(bool v)
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()
@@ -904,6 +907,7 @@ public:
     static bool _consumeactive;
     static bool _consume918;
     static bool _consumeawardact;
+    static bool _summerFlow;
     static bool _needrechargerank;
     static bool _needconsumerank;
     static bool _killMonsteract;
