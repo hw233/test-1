@@ -483,6 +483,8 @@ namespace GObject
        
        VAR_VIP_PRIVILEGE_DATA_TYPE = 540 ,     //新手御剑奖励类型(0-未开通，1-七大豪享特权一阶段，2-十大至尊特权一阶段，3-七大豪享特权二阶段，4-十大至尊特权二阶段，5-七大梦幻特权，6-十大梦幻特权)
       VAR_VIP_PRIVILEGE_BREAK_LAST = 541 ,
+      VAR_SUMMERFLOW_TYPE = 542 ,
+      VAR_SUMMERFLOW_AWARD = 543,   //是否领取暑期回流礼包
         VAR_MAX,
     };
 
@@ -766,6 +768,8 @@ namespace GObject
             REGISTER_VAR(VAR_VIP_PRIVILEGE_DATA, CYCLE_DAY);
             REGISTER_VAR(VAR_VIP_PRIVILEGE_DATA_TYPE, CYCLE_NONE);
             REGISTER_VAR(VAR_VIP_PRIVILEGE_BREAK_LAST, CYCLE_NONE);
+            REGISTER_VAR(VAR_SUMMERFLOW_TYPE, CYCLE_NONE);
+            REGISTER_VAR(VAR_SUMMERFLOW_AWARD, CYCLE_NONE);
             
             REGISTER_VAR(VAR_TUIGUAN_AWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_PET_CUILIAN_DAILY_CNT_DATE, CYCLE_NONE);

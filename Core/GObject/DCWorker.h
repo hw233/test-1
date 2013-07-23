@@ -28,6 +28,7 @@ public:
     void Push(const char* msg, size_t len, const char logType = LT_NORMAL);
     void PushCheckOpenId(UInt64 playerId, const char* openId, UInt32 len);
     UInt8 CheckRPOpenid(char* openid);
+    UInt8 CheckGRPOpenid(char* openid);
 
 protected:
 	bool Init();

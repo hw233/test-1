@@ -1332,6 +1332,11 @@ namespace Script
 		return Call<UInt8>("RunNewRegisterAwardAD_RF", player, idx);
     }
 
+    UInt8 GameActionLua::RunSummerFlowAward(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunSummerFlowAward", player, idx);
+    }
     UInt8 GameActionLua::RunBirthdayAward(Player* player)
     {
 		assert(player != NULL);

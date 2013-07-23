@@ -1069,7 +1069,10 @@ namespace GObject
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
+        //SetMemCach();
+        //continuousLoginSummerFlow();
         sendYearRPInfo();
+        sendSummerFlowInfo();
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
@@ -3009,6 +3012,7 @@ namespace GObject
             m_Package->EquipTo(0, fgt, 0x1f, equip, true);
             for(UInt8 t = 0; t < 3; ++ t)
 				m_Package->EquipTo(0, fgt, t+0x60, equip, true);
+		    m_Package->EquipTo(0, fgt, 0x70, equip, true);
 
 			_fighters.erase(it);
 			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %" I64_FMT "u", id, getId());
@@ -11242,6 +11246,11 @@ namespace GObject
             //QQ秀合作
             getQQXiuAward(opt);
             break;
+        case 27:
+            if(opt ==1)
+                getAwardFromSurmmeFlowr();
+            sendSummerFlowInfo();
+            break;
         }
     }
     
@@ -11815,7 +11824,19 @@ namespace GObject
         st << succ << Stream::eos;
         send(st);
     }
-
+    void Player::getAwardFromSurmmeFlowr()
+    {
+        UInt32 type = GetVar(VAR_SUMMERFLOW_TYPE);
+        UInt32 Award = GetVar(VAR_SUMMERFLOW_AWARD);
+        if(type == 0||Award==1)
+            return ;
+        UInt8 succ = GameAction()->RunSummerFlowAward(this, type);
+        if(succ)
+        {
+            SetVar(VAR_SUMMERFLOW_AWARD, 1);
+            SetVar(VAR_SUMMERFLOW_TYPE,0);
+        }
+    } 
     void Player::getAwardGiftCard()
     {
         if(GetVar(VAR_AWARD_NEWREGISTER))
@@ -14008,6 +14029,51 @@ namespace GObject
         ctslanding |= (1<<off);
         SetVar(VAR_CTSLANDINGRF, ctslanding);
     }
+    void Player::SetMemCach()
+    {
+        initMemcache();
+        char key[MEMCACHED_MAX_KEY] = {0};
+        char value[4][32] ={"07","14","30","90"};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_01");
+        size_t vlen = strlen(value[0]);
+        MemcachedSet(key, len, value[0], vlen, 0);
+    }
+    void Player::continuousLoginSummerFlow()
+    {
+    /*    UInt32 SummerFlowType = GetVar(VAR_SUMMERFLOW_TYPE);
+        if(SummerFlowType!= 0)
+            return ;
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 lastOffline = GetVar(VAR_OFFLINE);
+        if (!lastOffline)
+            return;
+        UInt32 last_sharp = TimeUtil::SharpDay(0, lastOffline);
+     *
+     */
+        UInt32 SummerAward = GetVar(VAR_SUMMERFLOW_AWARD);
+        if(SummerAward != 0)
+            return ;
+/*
+        initMemcache();
+        char key[MEMCACHED_MAX_KEY] = {0};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_01");
+        char value[32]={0};
+        if (memcinited)
+            MemcachedGet(key, len, value, sizeof(value));
+        UInt8 days = atoi(value);
+*/
+        std::string  openid = getOpenId();
+        UInt8  days = GObject::dclogger.checkGRPOpenid((char*)openid.c_str());
+        if(days == 7)
+            SetVar(VAR_SUMMERFLOW_TYPE, 1);
+        else if(days == 14 )
+            SetVar(VAR_SUMMERFLOW_TYPE, 2);
+        else if(days == 30 )
+            SetVar(VAR_SUMMERFLOW_TYPE, 3);
+        else if(days == 90 )
+            SetVar(VAR_SUMMERFLOW_TYPE, 4);
+        return;  
+    }
     UInt8 Player::getRPLoginDay()
     {
         UInt32 now = TimeUtil::Now();
@@ -14055,6 +14121,18 @@ namespace GObject
             send(st);
         }
     }
+    void Player::sendSummerFlowInfo()
+    {
+        UInt32 SummerFlowType = GetVar(VAR_SUMMERFLOW_TYPE);
+        UInt32 SummerFlowAward = GetVar(VAR_SUMMERFLOW_AWARD);
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(27);
+        st << static_cast<UInt8>(SummerFlowAward);
+        st << static_cast<UInt8>(SummerFlowType);
+        st << Stream::eos;
+        send(st);
+    }
+    
     void Player::sendRC7DayInfo(UInt32 now)
     {
         if (!World::getRC7Day())
@@ -20873,8 +20951,6 @@ void Player::sendVipPrivilege(bool isLStar)
         VipType =1;
         if(VIP_PRIVILEGE_7DAY(validate))
             VipType =3;
-        else 
-            VipType =1;
         SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, VipType);
     }
     UInt32  Days = (VipType+1)/2;
