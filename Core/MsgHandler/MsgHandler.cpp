@@ -27,6 +27,13 @@ void MsgHandler::DeregisterAllMsg()
 
 bool MsgHandler::ProcessMsg()
 {
+    // RunnerWorker.Shutdown()后只允许DB再处理未处理完的消息
+    if (isRunnerShutdown() && (m_Worker < WORKER_THREAD_DB || m_Worker == WORKER_THREAD_LOAD))
+    {
+        fprintf(stderr, "%s: RunnerWorker(%d).Shutdown()后只允许DB再处理未处理完的消息.\n", __PRETTY_FUNCTION__, m_Worker);
+        return false;
+    }
+
 	Handler* handler = NULL;
 	MsgQueue tmp;
 	MsgQueue msgQueue;

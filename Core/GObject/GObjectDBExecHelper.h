@@ -987,6 +987,7 @@ struct DBTripod
 	UInt8 fire;
 	UInt8 quality;
 	UInt8 awdst;
+    UInt8 regen;
     UInt16 itemId;
     UInt8 num;
 };
@@ -2423,13 +2424,14 @@ SPECIALDEF(7)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBTripod)
-SPECIALDEF(7)
+SPECIALDEF(8)
 (
     UInt64, id,
     UInt32, soul,
     UInt8, fire,
     UInt8, quality,
     UInt8, awdst,
+    UInt8, regen,
     UInt16, itemId,
     UInt8, num
 )
