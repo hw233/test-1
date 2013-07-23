@@ -2082,8 +2082,8 @@ namespace GObject
         void makeFire(UInt32 id1, UInt32 id2);
 
         void getAward();
-        void genAward(Stream& st);
-        bool genAward();
+        int genAward(Stream& st);
+        int genAward();
         void getAward(UInt8 type, UInt8 opt);
         void getSSDTAward(UInt8 opt);
         void getAwardFromSurmmeFlowr();

@@ -334,8 +334,8 @@ void WorldServer::Shutdown()
 			m_AllWorker[worker]->Shutdown();
 	}
 
-	Thread::sleep(3000);
     // XXX: erase all event
+	Thread::sleep(2000);
     GObject::eventWrapper.clear();
 	Thread::sleep(2000);
 	m_AllWorker[WORKER_THREAD_DB]->Shutdown();

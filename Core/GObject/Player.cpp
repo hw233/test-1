@@ -553,9 +553,12 @@ namespace GObject
 
         if (!leftCount || data.soul >= MAX_TRIPOD_SOUL - POINT_PERMIN/2) {
             PopTimerEvent(m_Player, EVENT_PLAYERPRTRIPOD, m_Player->getId());
-            data.awdst = 1;
             data.soul = MAX_TRIPOD_SOUL;
-            DB().PushUpdateData("UPDATE `tripod` SET `awdst` = %u WHERE `id` = %" I64_FMT "u", data.awdst, m_Player->getId());
+            if (!data.awdst)
+            {
+                data.awdst = 1;
+                DB().PushUpdateData("UPDATE `tripod` SET `awdst` = %u WHERE `id` = %" I64_FMT "u", data.awdst, m_Player->getId());
+            }
             return;
         }
 
@@ -10891,15 +10894,15 @@ namespace GObject
         st << m_td.fire;
         st << m_td.quality;
 
-        genAward(st);
-        DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `quality` = %u, `itemId` = %u, `num` = %u WHERE `id` = %" I64_FMT "u",
-                m_td.needgen, m_td.quality, m_td.itemId, m_td.num, getId());
+        int ret = genAward(st);
+        if (ret == 2)
+            DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `fire` = %u, `quality` = %u, `awdst` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %" I64_FMT "u", m_td.soul, m_td.fire, m_td.quality, m_td.awdst, m_td.needgen, m_td.itemId, m_td.num, getId());
 
         st << static_cast<UInt32>(MAX_TRIPOD_SOUL) << m_td.soul << Stream::eos;
         send(st);
     }
 
-    bool Player::genAward()
+    int Player::genAward()
     {
         if (m_td.needgen) {
             UInt32 loot = GData::GDataManager::GetTripodAward(m_td.fire, 5-m_td.quality); // 0-橙,1-紫,2-蓝,3-绿
@@ -10913,24 +10916,25 @@ namespace GObject
                     m_td.itemId = lr[0].id;
                     m_td.num = lr[0].count;
                     m_td.needgen = 0;
-                    return true;
+                    return 2;
                 }
             }
-            return false;
+            return 0;
         }
-        return true;
+        return 1;
     }
 
-    void Player::genAward(Stream& st)
+    int Player::genAward(Stream& st)
     {
-        if (genAward()) {
+        int ret = genAward();
+        if (ret) {
             st << m_td.num;
             st << m_td.itemId;
         } else {
             st << static_cast<UInt8>(0);
             st << static_cast<UInt32>(0);
         }
-        return;
+        return ret;
     }
 
     static UInt8 tripod_factor[4][4] =
