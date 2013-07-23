@@ -3862,6 +3862,31 @@ namespace GObject
 		return res;
 	}
 
+    UInt32 Player::getAutoBattleCount()
+    {
+		UInt32 count = 60 * 8;
+        if (!World::getNewYear() || GetLev() < 45)
+        {
+            UInt32 viplvl = getVipLevel();
+            UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+            if(in7DayFromCreated() && VipType >4 )
+                 VipType -= 2 ;
+            if((viplvl >= 4 && viplvl <= 7) || ( inVipPrivilegeTime() && VipType == 5 ))
+                  count = 60 * 16;
+            if(( viplvl > 7 && viplvl <= 15)||(inVipPrivilegeTime() &&( VipType %2 ==0)))
+                count = 60 * 24;
+        }
+        else
+        {
+            count = 60 * 240;
+        }
+        if (World::getAutoBattleAct())
+            count = 60*216;
+
+        return count;
+    }
+
+
 	bool Player::autoBattle( UInt32 npcId, UInt8 type)
 	{
         if(type > 3)
@@ -3891,25 +3916,7 @@ namespace GObject
             return false;
         }
 		const UInt32 eachBattle = 60;
-		UInt32 count = 60 * 8;
-
-        if (!World::getNewYear() || GetLev() < 45)
-        {
-            UInt32 viplvl = getVipLevel();
-            UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
-            if(in7DayFromCreated() && VipType >4 )
-                 VipType -= 2 ;
-            if((viplvl >= 4 && viplvl <= 7) || ( inVipPrivilegeTime() && VipType == 5 ))
-                  count = 60 * 16;
-            if(( viplvl > 7 && viplvl <= 15)||(inVipPrivilegeTime() &&( VipType %2 ==0)))
-                count = 60 * 24;
-        }
-        else
-        {
-            count = 60 * 240;
-        }
-        if (World::getAutoBattleAct())
-            count = 60*216;
+        UInt32 count = getAutoBattleCount();
 
 		UInt32 timeDur = count * eachBattle;
 		UInt32 final = TimeUtil::Now() + timeDur;
@@ -13629,6 +13636,10 @@ namespace GObject
 
     void Player::offlineAutoExp(UInt32 now)
     {
+        SpotData * spotData = GetMapSpot();
+        if (!worldBoss.needAutoBattle(_playerData.location) || !spotData || spotData->m_Type != 9)
+            return;
+
         UInt32 lastOffline = GetVar(VAR_OFFLINE);
         if (!lastOffline)
             return;
@@ -13639,21 +13650,24 @@ namespace GObject
             return;
         UInt32 passed = (now-lastOffline)/60;
 
+        UInt32 maxcount = getAutoBattleCount();
         UInt32 count = left;
-        UInt32 l = passed > left ? 0 : left - passed;
-        UInt32 n = passed > left ? left : passed;
+        UInt32 rleft = passed > left ? 0 : left - passed;
+        UInt32 rcount = passed > left ? left : passed;
+        if (rcount > maxcount)
+            rcount = maxcount;
         UInt32 interval = 60;
-		UInt32 final = now + interval * l;
+		UInt32 final = now + interval * rleft;
 
 		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, interval, count, /*ng*/NULL, final);
 		if (event == NULL) return;
-        for (UInt32 i = 0; i < n; ++i)
+        for (UInt32 i = 0; i < rcount; ++i)
         {
             event->Process(0);
             event->Next();
         }
 
-        if (l)
+        if (rleft)
         {
             PushTimerEvent(event);
             addFlag(Training);
@@ -13664,7 +13678,7 @@ namespace GObject
             event = NULL;
         }
 
-        setLeftTimes(l);
+        setLeftTimes(rleft);
     }
 
     void Player::offlineExp(UInt32 now)

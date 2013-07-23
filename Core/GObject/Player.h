@@ -845,6 +845,7 @@ namespace GObject
         //void resetThanksgiving();
         void offlineExp(UInt32);
         void getOfflineExp();
+        UInt32 getAutoBattleCount();
 
         void sendShusanLoveTitleCard(int);
         void sendMayDayTitleCard(int);
