@@ -242,8 +242,6 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
-    player->continuousLoginSummerFlow();
-    player->sendSummerFlowInfo();
 
     std::string fsaleTime;
 //    player->setForbidSale(checkForbidSale(player->getId(), fsaleTime));
@@ -411,6 +409,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setPfKey(pfkey);
             player->setXinYue(atoi(xinyue.c_str()));
             player->setJinQuan(jinquan);
+            player->continuousLoginSummerFlow();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -745,6 +744,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setVia(nu._via);
             pl->setXinYue(atoi(xinyue.c_str()));
             pl->setJinQuan(jinquan);
+            pl->continuousLoginSummerFlow();
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -3402,6 +3402,5 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
     st << type << begin << end << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
-
 #endif // _LOGINOUTERMSGHANDLER_H_
 

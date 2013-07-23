@@ -1039,7 +1039,8 @@ namespace GObject
         continuousLogin(curtime);
         continuousLoginRF(curtime);
         //SetMemCach();
-        // continuousLoginSummerFlow();
+       // continuousLoginSummerFlow();//修改
+
         sendYearRPInfo();
         sendSummerFlowInfo();
 
@@ -11771,8 +11772,9 @@ namespace GObject
             SetVar(VAR_SUMMERFLOW_AWARD, 1);
             SetVar(VAR_SUMMERFLOW_TYPE,0);
         }
-    udpLog("shuqihuiliu", shuqihuiliu[type-1], "", "", "", "", "act");
-
+        char str[16] = {0};
+        sprintf(str, "F_130722_%d", type-1);
+        udpLog("shuqihuiliu", str, "", "", "", "", "act");
     } 
     void Player::getAwardGiftCard()
     {
@@ -13931,7 +13933,7 @@ namespace GObject
         initMemcache();
         char key[MEMCACHED_MAX_KEY] = {0};
         char value[4][32] ={"07","14","30","90"};
-        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_01");
+        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_23336");
         size_t vlen = strlen(value[0]);
         MemcachedSet(key, len, value[0], vlen, 0);
     }
@@ -13948,7 +13950,8 @@ namespace GObject
      *
      */
         UInt32 SummerAward = GetVar(VAR_SUMMERFLOW_AWARD);
-        if(SummerAward != 0)
+        UInt32 SummerType  = GetVar(VAR_SUMMERFLOW_TYPE);
+        if(SummerAward != 0 || SummerType!=0)
             return ;
 /*
         initMemcache();
@@ -22194,12 +22197,6 @@ static const char* ryhb_udplog[15] = {
     "F_130603_14",
     "F_130603_15",
 };
-static const char* shuqihuiliu[4] = {
-    "F_130722_1",
-    "F_130722_2",
-    "F_130722_3",
-    "F_130722_4",
-}
 void Player::AddZRYJCount(UInt32 v)
 {
     if(!World::inActive_opTime_20130531() && !World::getRYHBActivity())
