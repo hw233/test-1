@@ -1168,10 +1168,7 @@ inline bool checkTrumpMutually(Player* _owner, UInt32 trumpid)
 
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
-    if (trump && trump->getClass() != Item_Trump)
-        return NULL;
-
-    ItemEquip* t = 0;
+   ItemEquip* t = 0;
     if (trump && (trump->getClass() == Item_Halo || trump->getClass() == Item_InnateTrump))
     {
         //return setHalo((ItemHalo*)trump, writedb);
@@ -1179,6 +1176,10 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
         GObjectManager::pushEquipment(trump);
         return NULL;
     }
+
+    if (trump && trump->getClass() != Item_Trump)
+        return NULL;
+ 
     if (!trump || (canSetTrump(idx, trump->getId()) && !checkTrumpMutually(_owner, trump->GetItemType().getId())))
     {
         if
