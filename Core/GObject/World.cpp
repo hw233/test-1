@@ -2960,7 +2960,7 @@ void World::udpLog(const char* str1, const char* str2, const char* str3, const c
     const char* str5, const char* str6, const char* type)
 {
     if (!ulog && cfg.udplog)
-        ulog = _analyzer.GetInstance("world");
+        ulog = _analyzer.GetInstance("1");
     if (ulog && cfg.udplog)
     {
         ulog->LogMsg(str1, str2, str3, str4, str5, str6, type);
