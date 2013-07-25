@@ -124,6 +124,7 @@ enum PurchaseType
     ZCJBRoolAward               = 113, //招财进宝抽奖
     CCBSkillUP                  = 114, //墨守成规升级技能
     CCBReAlive                  = 115, //墨守成规复活
+    RetrieveItem                = 117, //物品回收消费
     //繁体私有占150～200
 };
 
@@ -252,6 +253,7 @@ enum ItemFrom
     FromRYHBAward = 56, //日月合璧
     FromVipLevelAward = 57, //御剑等级回馈
     FromQQXiu = 58,
+    FromRetrieveItem = 59, //回购物品
     //80 ~ 100，繁体占用
 };
 
@@ -290,6 +292,7 @@ enum ItemTo
     ToSetGem = 158, //多彩宝石镶嵌
     TodismantleGem = 159, //多彩宝石拆卸
     ToExchangXCValue = 160, //阵旗转换星辰值
+    ToDelRetrieveItem = 161, //删除回购物品
 };
 
 struct IncommingInfo
