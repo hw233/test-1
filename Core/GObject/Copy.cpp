@@ -22,10 +22,10 @@
 namespace GObject
 {
 #define PRIVILEGE_COUNT 1
-#define MAX_COPY_ID 8
+#define MAX_COPY_ID 9
 
 UInt8 PlayerCopy::_activeCount = 0;
-static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707};
+static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a};
 
 static UInt8 GetCopyIdBySpots(UInt16 currentSpot)
 {
@@ -85,7 +85,10 @@ UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
 UInt32 PlayerCopy::getEnterGold(Player* pl)
 {
     UInt8 vipl = pl->getVipLevel();
-    if(vipl > 3)
+    UInt32 VipType =pl-> GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+    if(pl->in7DayFromCreated() && VipType >4)
+         VipType -= 2;
+    if(vipl > 3 ||(pl->inVipPrivilegeTime() && !( (VipType==0||VipType ==1 ||VipType ==3 ) ) ))
         vipl = 3;
     UInt32 extraVipGold[4][3] = {
         {20, 20, 20},
@@ -189,7 +192,7 @@ bool copyCheckLevel(Player* pl, UInt8 id)
     if (!id)
         return false;
 
-    static UInt8 lvls[] = {30, 45, 60, 70, 80, 90, 100, 110};
+    static UInt8 lvls[] = {30, 45, 60, 70, 80, 90, 100, 110, 120};
     //static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512};
 
     if (id > sizeof(lvls)/sizeof(UInt8))
@@ -771,7 +774,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                         // XXX: moneyNeed must greater than 1000
                         UInt32 pref = 0;
                         UInt8 div = 1;
-                        if (pl->getVipLevel() >= 4)
+                        if (pl->getVipLevel() >= 4 || pl->inVipPrivilegeTime())
                             pref = 1000;
                         if (World::_wday == 6)
                             div = 2;

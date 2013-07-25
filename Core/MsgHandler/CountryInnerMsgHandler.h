@@ -772,8 +772,10 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
     UInt32 curHookIndex = player->GetVar(VAR_EXP_HOOK_INDEX);
     UInt32 p;
     UInt32 extraExp = 0;
-
-    if(player->inVipPrivilegeTime())
+    UInt32 VipType = player->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+     if( player->in7DayFromCreated() && VipType >4 ) 
+          VipType -= 2 ;
+    if( VipType < 5 && player->inVipPrivilegeTime())
     {
         extraFactor = 1.0f;
         extraExp = static_cast<UInt32>(exp * 1.0f);

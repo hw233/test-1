@@ -102,7 +102,7 @@ const char* MCached::get(const char* key, char* value, size_t size)
 
 const char* MCached::get(const char* key, size_t key_size, char* value, size_t size)
 {
-    if (!key || !key_size || !value || !size)
+    if (!key || !key_size || !value || !size || !_hosts.size())
         return 0;
 
     size_t tlen = 0;
@@ -124,7 +124,7 @@ const char* MCached::get(const char* key, size_t key_size, char* value, size_t s
         }
         else
         {
-            Thread::sleep(500);
+            usleep(500);
         }
     }
     return value;
@@ -139,7 +139,7 @@ bool MCached::set(const char* key, const char* value, int timeout)
 
 bool MCached::set(const char* key, size_t key_size, const char* value, size_t size, int timeout)
 {
-    if (!key || !key_size || !value || !size)
+    if (!key || !key_size || !value || !size || !_hosts.size())
         return false;
 
     memcached_return_t rc = memcached_set(&_memsvr, key, key_size, value, size, timeout, 0);
@@ -153,6 +153,21 @@ bool MCached::set(const char* key, size_t key_size, const char* value, size_t si
 
     return rc == MEMCACHED_SUCCESS;
 }
+
+bool MCached::del(const char* key)
+{
+    if (!key || !strlen(key))
+        return false;
+    return del(key, strlen(key));
+}
+
+bool MCached::del(const char* key, size_t key_size)
+{
+    if (!key || !key_size)
+        return false;
+    return MEMCACHED_SUCCESS == memcached_delete(&_memsvr, key, key_size, 0);
+}
+
 #endif
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

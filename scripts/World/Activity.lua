@@ -829,7 +829,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+97*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+111*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -883,6 +883,13 @@ function onActivityCheck(tm)
       else
           setConsumeAwardAct(false)
       end
+
+      if tm >= actTime248 and tm < actTime248_1 then
+          setSummerFlow(true)
+      else
+          setSummerFlow(false)
+      end
+
       if tm >= actTime551 and tm < actTime551_1 then
           setCompassAct(true)
       else
@@ -1108,7 +1115,7 @@ function onActivityCheck(tm)
       setGoldSnakeAct(false)
   end
 
-  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 63*86400) then
+  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 77*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1374,8 +1381,8 @@ function initActTime(y, m, d)
   local  SerStartTm241 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm241_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --特殊古籍活动
-  local  SerStartTm242 = { ['year'] = 2013, ['month'] = 6, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242 = { ['year'] = 2013, ['month'] = 7, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 7, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --大厅累积在线奖励
   local  SerStartTm243 = { ['year'] = 2013, ['month'] = 6, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --空间黄钻、大厅蓝钻礼包
@@ -1386,6 +1393,10 @@ function initActTime(y, m, d)
   local  SerStartTm246 = { ['year'] = 2013, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --消费抽奖活动
   local  SerStartTm247= { ['year'] = 2013, ['month'] = 5, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+--暑假回流
+  local  SerStartTm248= { ['year'] = 2013, ['month'] = 7, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm248_1= { ['year'] = 2013, ['month'] = 7, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1818,6 +1829,9 @@ function initActTime(y, m, d)
 
   actTime247_0= os.time(SerStartTm247)
   actTime247_1= os.time(SerStartTm247) + 7*86400;
+
+  actTime248= os.time(SerStartTm248)
+  actTime248_1= os.time(SerStartTm248_1);
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

@@ -317,6 +317,7 @@ namespace Script
 		CLASS_DEF(Player, updateCuilianTimes);
         CLASS_DEF(Player, AddZRYJCount);
         CLASS_DEF(Player, AddHYYJCount);
+        CLASS_DEF(Player, in7DayFromCreated);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -583,6 +584,7 @@ namespace Script
 
 		UInt8 color = 0;
 		UInt8 token = player->GetTaskMgr()->GetDayTaskFlushColor(dayTaskId, color) ? 1 : 0;
+        
 		task.set("dayTask", token);
 		task.set("color", color);
 
@@ -1330,6 +1332,11 @@ namespace Script
 		return Call<UInt8>("RunNewRegisterAwardAD_RF", player, idx);
     }
 
+    UInt8 GameActionLua::RunSummerFlowAward(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunSummerFlowAward", player, idx);
+    }
     UInt8 GameActionLua::RunBirthdayAward(Player* player)
     {
 		assert(player != NULL);
@@ -1346,6 +1353,12 @@ namespace Script
     {
         assert(player != NULL);
         return Call<bool>("RunNewRC7DayLoginAward2", player, val);
+    }
+
+    bool GameActionLua::RunQQBoardInstantLoginAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunQQBoardInstantLoginAward", player, val);
     }
 
     bool GameActionLua::RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge)

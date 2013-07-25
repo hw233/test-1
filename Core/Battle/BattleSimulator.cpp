@@ -327,6 +327,48 @@ UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
             }
         }
 
+        size_t idx = 0;
+        for(idx = 0; idx < _onTherapy.size(); ++ idx)
+        {
+            if(_onTherapy[idx]->getSide() == side)
+            {
+                _onTherapy.erase(_onTherapy.begin() + idx);
+                break;
+            }
+        }
+        for(idx = 0; idx < _onSkillDmg.size(); ++ idx)
+        {
+            if(_onSkillDmg[idx]->getSide() == side)
+            {
+                _onSkillDmg.erase(_onSkillDmg.begin() + idx);
+                break;
+            }
+        }
+        for(idx = 0; idx < _onOtherDead.size(); ++ idx)
+        {
+            if(_onOtherDead[idx]->getSide() == side)
+            {
+                _onOtherDead.erase(_onOtherDead.begin() + idx);
+                break;
+            }
+        }
+        for(idx = 0; idx < _onPetProtect.size(); ++ idx)
+        {
+            if(_onPetProtect[idx]->getSide() == side)
+            {
+                _onPetProtect.erase(_onPetProtect.begin() + idx);
+                break;
+            }
+        }
+        for(idx = 0; idx < _onPetAtk.size(); ++ idx)
+        {
+            if(_onPetAtk[idx]->getSide() == side)
+            {
+                _onPetAtk.erase(_onPetAtk.begin() + idx);
+                break;
+            }
+        }
+
         for(int i = 0; i < 25; ++ i)
         {
             if(getObject(side, i) && !_isBody[side][i])
@@ -2847,7 +2889,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
                 if(!bo)  // 雪人
                     continue;
 
-                if(bo->getAura() > 99 || bo->getId() == 5679 || bo->isPet())
+                if(bo->getAura() > 99 || bo->getId() == 5679 || bo->isPet() || bo->isSoulOut())
                 {
                     excepts[exceptCnt] = i;
                     ++ exceptCnt;
@@ -2903,7 +2945,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679)
+            if(bo->getId() == 5679 || bo->isSoulOut())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -2932,7 +2974,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679)
+            if(bo->getId() == 5679 || bo->isSoulOut())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -2962,7 +3004,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679)
+            if(bo->getId() == 5679 || bo->isSoulOut())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -2992,7 +3034,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679)
+            if(bo->getId() == 5679 || bo->isSoulOut())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -3022,7 +3064,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679)
+            if(bo->getId() == 5679 || bo->isSoulOut())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -7143,15 +7185,6 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             {
                 if(static_cast<BattleFighter*>(bo)->isSoulOut())
                     bIfDead = true;
-
-                _winner = testWinner();
-                if(_winner != 0)
-                    return true;
-                else if(bIfDead)
-                {
-                    doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
-                }
-
                 fFakeDead = true;
             }
             else
@@ -7219,6 +7252,20 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
                 bIfDead = true;
         }
 
+        if(!bIfDead)
+        {
+            _winner = testWinner();
+            if(_winner != 0)
+                return true;
+            else
+            {
+                doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
+            }
+        }
+    }
+
+    if(bIfDead)
+    {
         _winner = testWinner();
         if(_winner != 0)
             return true;
@@ -7226,10 +7273,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
         {
             doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
         }
-    }
 
-    if(bIfDead)
-    {
         // 五彩石
         for(size_t i = 0; i < _onOtherDead.size(); ++ i)
         {
@@ -10777,6 +10821,12 @@ bool BattleSimulator::doDarkVigorAttack(BattleFighter* bf, float darkVigor)
 
 void BattleSimulator::appendDefStatus(StateType type, UInt32 value, BattleFighter* bf, DamageType damageType /* = e_damageNone */)
 {
+    if(bf->isSoulOut())
+    {
+        if(type == e_Bleed1 || type == e_Bleed2 || type == e_Bleed3 || type == e_Bleed4 || type == e_BleedMo || type == e_selfBleed || type == e_lingShiBleed)
+            return;
+    }
+
     DefStatus defList;
     defList.damType = type;
     defList.damageType = damageType;

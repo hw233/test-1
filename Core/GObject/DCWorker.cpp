@@ -338,5 +338,15 @@ namespace GObject
         value[1] = 0;
         return atoi(value);
     }
+    UInt8 DCWorker::CheckGRPOpenid(char* openid)
+    {
+        if (!m_inited || NULL == openid)
+            return false;
+        char value[32] = {0};
+        char key[64] = {0};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_%s", openid); 
+        m_MCached.get(key, len, value, sizeof(value));
+        return atoi(value);
+    }
 }
 

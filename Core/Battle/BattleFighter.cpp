@@ -673,6 +673,8 @@ void BattleFighter::initStats(bool checkEnh)
 
 UInt32 BattleFighter::regenHP( UInt32 u, bool weak /* = false */, float hppec /* = 0 */, float maxRhp /* = 0 */)
 {
+    if(isSoulOut())
+        return 0;
     if(_weakRound > 0 && weak)
         u /= 2;
     UInt32 tmp = getMaxHP() * hppec;

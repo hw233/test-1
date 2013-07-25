@@ -137,10 +137,28 @@ namespace GObject
             return MaxICCount[5];
 		UInt8 maxCount = MaxICCount[vipLevel];
         // 限时vip特权
-        if(maxCount < 16 && inVipPrivilegeTime())
+        UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+        if( in7DayFromCreated() && VipType >4 )
+            VipType -= 2 ;
+        if(maxCount < 16 && inVipPrivilegeTime() &&( VipType ==1||VipType==3||VipType ==0 ) )
             maxCount = 16;
+        if(maxCount < 24 && inVipPrivilegeTime() &&( VipType % 2 ==0 ) )
+            maxCount = 24;
 		return maxCount;
 	}
+
+    EventAutoBattle::~EventAutoBattle()
+    {
+        fprintf(stderr, "%s: %p\n", __PRETTY_FUNCTION__, this);
+        if (m_Player)
+        {
+            m_Player->flushExp();
+            m_Player->flushLastExp();
+            m_Player->setLeftTimes(m_Timer.GetLeftTimes());
+        }
+        _writedb = true;
+        updateDB(false);
+    }
 
 	float EventAutoBattle::calcExpEach(UInt32 now)
 	{
@@ -202,20 +220,31 @@ namespace GObject
 
         UInt32 extraExp = 0;
         // 限时vip特权
-        if(m_Player->inVipPrivilegeTime())
+         UInt32 VipType = m_Player->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+        if(m_Player-> in7DayFromCreated() && VipType >4 )
+            VipType -= 2 ;
+         if(m_Player->inVipPrivilegeTime()  &&( VipType < 5 ))
         {
             factor += 1.0f;
             extraExp = static_cast<UInt32>(exp * 1.0f);
         }
+
+		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
+        fprintf(stderr, "id: %lu => cnt: %u\n", m_Player->getId(), cnt);
+        if (cnt % 10)
+            _writedb = false;
+        else
+            _writedb = true;
+
 #if 0
 		_npcGroup->monsterKilled(m_Player);
 #endif
         if (cfg.rpServer && m_Player->GetLev() < 70)
             exp *= 2;
 		if(m_Player->isOnline())
-			m_Player->AddExp(static_cast<UInt32>(exp * factor), 0, extraExp);
+			m_Player->AddExp(static_cast<UInt32>(exp * factor), 0, extraExp, _writedb);
 		else
-			m_Player->pendExp(static_cast<UInt32>(exp * factor));
+			m_Player->pendExp(static_cast<UInt32>(exp * factor), false, _writedb);
 #if 0
 		_npcGroup->getLoots(m_Player);
 #else
@@ -282,19 +311,29 @@ namespace GObject
 		GLOBAL().PushMsg(hdr, &ecs);
 		_finalEnd -= ecs.duration;
 		notify();
+        if (m_Player)
+            m_Player->SetVar(VAR_LEFTTIMES, newCnt);
+
+        _writedb = true;
 		updateDB(false);
 		return newCnt == 0;
 	}
 
 	void EventAutoBattle::updateDB(bool isNew)
 	{
+        if (m_Player->GetVar(VAR_LEFTTIMES))
+            return;
+
 		UInt32 count = m_Timer.GetLeftTimes();
 		if(count > 0)
 		{
 			if(isNew)
 				DB3().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%" I64_FMT "u, %u, %u, %u)", m_Player->getId(), /*_npcGroup->getId()*/0, count, m_Timer.GetInterval());
 			else
-				DB3().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %" I64_FMT "u", count, m_Player->getId());
+            {
+                if (_writedb)
+                    DB3().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %" I64_FMT "u", count, m_Player->getId());
+            }
 		}
 		else
 			DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %" I64_FMT "u", m_Player->getId());
@@ -499,9 +538,15 @@ namespace GObject
 	void EventPlayerTripod::Process(UInt32 leftCount)
     {
         TripodData& data = m_Player->getTripodData();
-        if(m_Player->getVipLevel() > 4)
-            data.soul += POINT_PERMIN * 2;
-        else
+         UInt32 VipType =m_Player-> GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+         UInt32 viplevel = m_Player->getVipLevel();
+        if( m_Player->in7DayFromCreated() && VipType >4 )
+            VipType -= 2 ;
+         if(viplevel > 4 ||( m_Player->inVipPrivilegeTime()&& VipType == 5))
+         {
+             data.soul += POINT_PERMIN * 2; //九疑鼎速度
+         }
+             else
             data.soul += POINT_PERMIN;
 
         if (data.soul > MAX_TRIPOD_SOUL)
@@ -509,9 +554,12 @@ namespace GObject
 
         if (!leftCount || data.soul >= MAX_TRIPOD_SOUL - POINT_PERMIN/2) {
             PopTimerEvent(m_Player, EVENT_PLAYERPRTRIPOD, m_Player->getId());
-            data.awdst = 1;
             data.soul = MAX_TRIPOD_SOUL;
-            DB().PushUpdateData("UPDATE `tripod` SET `awdst` = %u WHERE `id` = %" I64_FMT "u", data.awdst, m_Player->getId());
+            if (!data.awdst)
+            {
+                data.awdst = 1;
+                DB().PushUpdateData("UPDATE `tripod` SET `awdst` = %u WHERE `id` = %" I64_FMT "u", data.awdst, m_Player->getId());
+            }
             return;
         }
 
@@ -1025,7 +1073,11 @@ namespace GObject
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
+        //SetMemCach();
+       // continuousLoginSummerFlow();//修改
+
         sendYearRPInfo();
+        sendSummerFlowInfo();
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
@@ -1047,6 +1099,7 @@ namespace GObject
 
 		lockSecondPWD();
 
+        offlineAutoExp(curtime);
 		checkLastBattled();
 		GameAction()->onLogin(this);
         if (World::getChristmas())
@@ -2128,6 +2181,10 @@ namespace GObject
             LoginMsgHdr hdr1(0x301, WORKER_THREAD_LOGIN, 0, this->GetSessionID(), sizeof(crackValue));
             GLOBAL().PushMsg(hdr1, &crackValue);
         }
+
+        SetVar(VAR_OFFLINE, curtime);
+        PopTimerEvent(this, EVENT_AUTOBATTLE, 0);
+        delFlag(Training);
 	}
 
 	void Player::Logout(bool nobroadcast)
@@ -2254,6 +2311,9 @@ namespace GObject
         }
         //愚公移山活动
         setLogoutInFoolsDay();
+
+        PopTimerEvent(this, EVENT_AUTOBATTLE, 0);
+        delFlag(Training);
 	}
 
 	void Player::checkLastBattled()
@@ -2961,6 +3021,7 @@ namespace GObject
             m_Package->EquipTo(0, fgt, 0x1f, equip, true);
             for(UInt8 t = 0; t < 3; ++ t)
 				m_Package->EquipTo(0, fgt, t+0x60, equip, true);
+		    m_Package->EquipTo(0, fgt, 0x70, equip, true);
 
 			_fighters.erase(it);
 			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %" I64_FMT "u", id, getId());
@@ -3810,6 +3871,31 @@ namespace GObject
 		return res;
 	}
 
+    UInt32 Player::getAutoBattleCount()
+    {
+		UInt32 count = 60 * 8;
+        if (!World::getNewYear() || GetLev() < 45)
+        {
+            UInt32 viplvl = getVipLevel();
+            UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+            if(in7DayFromCreated() && VipType >4 )
+                 VipType -= 2 ;
+            if((viplvl >= 4 && viplvl <= 7) || ( inVipPrivilegeTime() && VipType == 5 ))
+                  count = 60 * 16;
+            if(( viplvl > 7 && viplvl <= 15)||(inVipPrivilegeTime() &&( VipType %2 ==0)))
+                count = 60 * 24;
+        }
+        else
+        {
+            count = 60 * 240;
+        }
+        if (World::getAutoBattleAct())
+            count = 60*216;
+
+        return count;
+    }
+
+
 	bool Player::autoBattle( UInt32 npcId, UInt8 type)
 	{
         if(type > 3)
@@ -3839,22 +3925,7 @@ namespace GObject
             return false;
         }
 		const UInt32 eachBattle = 60;
-		UInt32 count = 60 * 8;
-
-        if (!World::getNewYear() || GetLev() < 45)
-        {
-            UInt32 viplvl = getVipLevel();
-            if(viplvl >= 4 && viplvl <= 7)
-                count += 60 * 8;
-            else if (viplvl > 7 && viplvl <= 15)
-                count += 60 * 16;
-        }
-        else
-        {
-            count = 60 * 240;
-        }
-        if (World::getAutoBattleAct())
-            count = 60*216;
+        UInt32 count = getAutoBattleCount();
 
 		UInt32 timeDur = count * eachBattle;
 		UInt32 final = TimeUtil::Now() + timeDur;
@@ -3898,11 +3969,18 @@ namespace GObject
 		PushTimerEvent(event);
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 0);
         GameAction()->doStrong(this, SthTaskHook, 0,0);
+        SetVar(VAR_LEFTTIMES, count);
 		return true;
 	}
 
 	void Player::pushAutoBattle(UInt32 npcId, UInt16 count, UInt16 interval)
 	{
+        DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %" I64_FMT "u", _id);
+        if (!GetVar(VAR_LEFTTIMES))
+            SetVar(VAR_LEFTTIMES, count);
+        else
+            return;
+
 		if(/*npcId == 0 || */count == 0 || interval == 0)
 			return;
         if (count > 1440 && GetLev() < 45) // XXX: 45级以下不允许挂机240小时
@@ -5811,7 +5889,7 @@ namespace GObject
             m_Package->AddItem(item, num, bind, true);
     }
 
-	void Player::AddExp(UInt64 exp, UInt8 mlvl, UInt32 extraExp)
+	void Player::AddExp(UInt64 exp, UInt8 mlvl, UInt32 extraExp, bool writedb)
     {
     	if(exp == 0)
 			return;
@@ -5843,7 +5921,7 @@ namespace GObject
 		{
 			GObject::Fighter * fgt = getLineup(i).fighter;
 			if(fgt != NULL)
-				fgt->addExp(exp, extraExp);
+				fgt->addExp(exp, extraExp, writedb);
 		}
         //是否开启天劫
         GObject::Tianjie::instance().isOpenTj(this);
@@ -5851,6 +5929,22 @@ namespace GObject
         if (cfg.rpServer && GetLev()>=70)
             setBuffData(PLAYER_BUFF_EXPDOUBLE,0);
 	}
+
+    void Player::flushExp()
+    {
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Fighter * fgt = getLineup(i).fighter;
+			if(fgt != NULL)
+				fgt->flushExp();
+		}
+    }
+
+    void Player::flushLastExp()
+    {
+        if (_playerData.lastExp)
+            DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastExp, _id);
+    }
 
     void Player::addHIAttr(const GData::AttrExtra& attr)
     {
@@ -6206,7 +6300,11 @@ namespace GObject
                 if (_playerData.fshimen[i] == taskid) {
                     if (!World::getNewYear())
                     {
-                        if (getVipLevel() < 3) {
+                        UInt32 VipType =GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+                        if(in7DayFromCreated() && VipType >4 )
+                            VipType -= 2 ;
+                        if (getVipLevel() < 3 && !((inVipPrivilegeTime()&&!(VipType==0||VipType ==1 ||VipType ==3)))) 
+                        {
                             sendMsgCode(0, 1003);
                             return false;
                         }
@@ -6249,8 +6347,10 @@ namespace GObject
                 if (_playerData.fyamen[i] == taskid) {
                     if (!World::getNewYear())
                     {
-                        if (getVipLevel() < 3) {
-                            sendMsgCode(0, 1003);
+                        UInt32 VipType =GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+                        if(in7DayFromCreated() && VipType >4 )
+                            VipType -= 2 ;
+                        if (getVipLevel() < 3 && !(inVipPrivilegeTime()&& !( VipType==0||VipType ==1 ||VipType ==3 )) ) { sendMsgCode(0, 1003);
                             return false;
                         }
                     }
@@ -6709,21 +6809,32 @@ namespace GObject
                         UInt32 rd = rnd(100);
                         for (int j = 0; j < 5; ++j) {
                             if (rd <= rfac[j]) {
+                                 UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE); 
                                 if (ttype == 0) {
                                     _playerData.fshimen[n] = task[*i];
                                     _playerData.fsmcolor[n] = j+1;
-                                    if (getVipLevel() >= 3) {
+                                    if (getVipLevel() >= 3  ) {
                                         static UInt8 viptaskcolor[16] = {0,0,0,3,3,3,4,4,4,4,4,4,4,4,4,4};
                                         if (_playerData.fsmcolor[n] < viptaskcolor[getVipLevel()])
                                             _playerData.fsmcolor[n] = viptaskcolor[getVipLevel()];
                                     }
+                                    if((inVipPrivilegeTime() && VipType%2 == 0))
+                                    {
+                                        if(_playerData.fsmcolor[n] < 4 )
+                                            _playerData.fsmcolor[n] = 4;
+                                    }
                                 } else {
                                     _playerData.fyamen[n] = task[*i];
                                     _playerData.fymcolor[n] = j+1;
-                                    if (getVipLevel() >= 2) {
+                                    if (getVipLevel() >= 2 ) {
                                         static UInt8 viptaskcolor[16] = {0,0,3,3,3,4,4,4,4,4,4,4,4,4,4,4};
                                         if (_playerData.fymcolor[n] < viptaskcolor[getVipLevel()])
                                             _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
+                                    }
+                                    if((inVipPrivilegeTime() && VipType%2 == 0))
+                                    {
+                                        if(_playerData.fymcolor[n] < 4 )
+                                            _playerData.fymcolor[n] = 4;
                                     }
                                 }
 
@@ -8732,13 +8843,16 @@ namespace GObject
 		}
 	}
 
-	void Player::pendExp( UInt32 exp, bool leaveCity )
+	void Player::pendExp( UInt32 exp, bool leaveCity, bool writedb )
 	{
         isDoubleExp(exp);
 		_playerData.lastExp += exp;
 		if(leaveCity)
 			_playerData.lastExp |= 0x80000000;
-		DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastExp, _id);
+
+        fprintf(stderr, "%s: %s\n", __PRETTY_FUNCTION__, writedb?"true":"false");
+        if (writedb)
+            DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastExp, _id);
 	}
 
 	void Player::pendTael( UInt32 t )
@@ -10050,7 +10164,10 @@ namespace GObject
         }
 #endif
         // 限时vip特权
-        if(inVipPrivilegeTime())
+       UInt32 VipType =GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+       if(in7DayFromCreated() && VipType >4 )
+           VipType -= 2 ;
+        if(inVipPrivilegeTime()&&(VipType==0||VipType ==1 ||VipType ==3 ))
             factor += 1.0f;
 
         return factor;
@@ -10198,7 +10315,10 @@ namespace GObject
                 {
                     UInt32 extraPExp = 0;
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
-                    if(inVipPrivilegeTime())
+                    UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);  
+                    if(in7DayFromCreated() && VipType >4 )
+                         VipType -= 2 ;
+                    if(inVipPrivilegeTime()&&(VipType==0||VipType ==1 ||VipType ==3 ) )
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
@@ -10255,7 +10375,10 @@ namespace GObject
                 {
                     UInt32 extraPExp = 0;
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
-                    if(inVipPrivilegeTime())
+                    UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);  
+                    if( in7DayFromCreated() && VipType >4 )
+                        VipType -= 2 ;
+                    if(inVipPrivilegeTime() && ( VipType==0||VipType ==1 ||VipType ==3 ) )
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
@@ -10790,15 +10913,15 @@ namespace GObject
         st << m_td.fire;
         st << m_td.quality;
 
-        genAward(st);
-        DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `quality` = %u, `itemId` = %u, `num` = %u WHERE `id` = %" I64_FMT "u",
-                m_td.needgen, m_td.quality, m_td.itemId, m_td.num, getId());
+        int ret = genAward(st);
+        if (ret == 2)
+            DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `fire` = %u, `quality` = %u, `awdst` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %" I64_FMT "u", m_td.soul, m_td.fire, m_td.quality, m_td.awdst, m_td.needgen, m_td.itemId, m_td.num, getId());
 
         st << static_cast<UInt32>(MAX_TRIPOD_SOUL) << m_td.soul << Stream::eos;
         send(st);
     }
 
-    bool Player::genAward()
+    int Player::genAward()
     {
         if (m_td.needgen) {
             UInt32 loot = GData::GDataManager::GetTripodAward(m_td.fire, 5-m_td.quality); // 0-橙,1-紫,2-蓝,3-绿
@@ -10812,24 +10935,25 @@ namespace GObject
                     m_td.itemId = lr[0].id;
                     m_td.num = lr[0].count;
                     m_td.needgen = 0;
-                    return true;
+                    return 2;
                 }
             }
-            return false;
+            return 0;
         }
-        return true;
+        return 1;
     }
 
-    void Player::genAward(Stream& st)
+    int Player::genAward(Stream& st)
     {
-        if (genAward()) {
+        int ret = genAward();
+        if (ret) {
             st << m_td.num;
             st << m_td.itemId;
         } else {
             st << static_cast<UInt8>(0);
             st << static_cast<UInt32>(0);
         }
-        return;
+        return ret;
     }
 
     static UInt8 tripod_factor[4][4] =
@@ -11144,6 +11268,11 @@ namespace GObject
         case 26:
             //QQ秀合作
             getQQXiuAward(opt);
+            break;
+        case 27:
+            if(opt ==1)
+                getAwardFromSurmmeFlowr();
+            sendSummerFlowInfo();
             break;
         }
     }
@@ -11718,7 +11847,24 @@ namespace GObject
         st << succ << Stream::eos;
         send(st);
     }
-
+    void Player::getAwardFromSurmmeFlowr()
+    {
+        if (!World::getSummerFlow())
+            return;
+        UInt32 type = GetVar(VAR_SUMMERFLOW_TYPE);
+        UInt32 Award = GetVar(VAR_SUMMERFLOW_AWARD);
+        if(type == 0||Award==1)
+            return ;
+        UInt8 succ = GameAction()->RunSummerFlowAward(this, type);
+        if(succ)
+        {
+            SetVar(VAR_SUMMERFLOW_AWARD, 1);
+            SetVar(VAR_SUMMERFLOW_TYPE,0);
+            char str[16] = {0};
+            sprintf(str, "F_130722_%d", type);
+            udpLog("shuqihuiliu", str, "", "", "", "", "act");
+        }
+    } 
     void Player::getAwardGiftCard()
     {
         if(GetVar(VAR_AWARD_NEWREGISTER))
@@ -12578,6 +12724,42 @@ namespace GObject
         send(st);
     }
 
+    void Player::SetQQBoardValue()
+    {
+        UInt32 begin = 1374768000;
+        UInt32 now = TimeUtil::Now();
+        UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
+        if(now < begin)
+            return ;
+        if( off > 15)
+            return ;
+        UInt32 QQBoard = GetVar(VAR_QQBOARD);
+        QQBoard |= 1 << (off - 1);
+        SetVar(VAR_QQBOARD, QQBoard);
+    }
+    void Player::sendQQBoardLoginInfo()
+    {
+        Stream st(REP::RC7DAY);  //协议
+        UInt32 QQBoard = GetVar(VAR_QQBOARD);
+        UInt32 QQBoardAward = GetVar(VAR_QQBOARD_AWARD);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(QQBoard & (1 << i++ ))
+                ++count;
+            else count = 0;
+            if(count > max)
+                max = count ;
+        }
+        st << static_cast<UInt8>(15);
+        st << static_cast<UInt8>(max);   //连续登陆天数
+        st <<QQBoardAward;   //领取的奖励号
+        st << Stream::eos;
+        send(st);
+    }
+
     void Player::getNewRC7DayLoginAward(UInt8 val, UInt8 off)
     {
         // 申请领取新注册七天登录奖励 (包括补签和累计登录）
@@ -12664,6 +12846,34 @@ namespace GObject
             }
         }
     }
+    void Player::getQQBoardInstantLoginAward(UInt8 val)
+    {
+        // 申请领取新注册七天登录奖励 (包括补签和累计登录）
+        UInt32 QQBoard = GetVar(VAR_QQBOARD);
+        UInt32 ctslandingAward = GetVar(VAR_QQBOARD_AWARD);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(QQBoard & (1 << i++ ))
+                ++count;
+            else count = 0;
+            if(count > max)
+                max = count ;
+        }
+        if (val == 0 || val > max)
+            return;
+        // 正常签到登录奖励
+        if(ctslandingAward & (1<<((val-1)/2)))
+            return ;
+        if (!GameAction()->RunQQBoardInstantLoginAward(this, val))
+            return;
+        ctslandingAward |= (1<<((val - 1)/2));
+        SetVar(VAR_QQBOARD_AWARD, ctslandingAward);
+       sendQQBoardLoginInfo();
+    }
+
 
     void Player::getNewRC7DayRechargeAward(UInt8 val)
     {
@@ -13499,6 +13709,53 @@ namespace GObject
         }
     }
 
+    void Player::offlineAutoExp(UInt32 now)
+    {
+        SpotData * spotData = GetMapSpot();
+        if (!worldBoss.needAutoBattle(_playerData.location) || !spotData || spotData->m_Type != 9)
+            return;
+
+        UInt32 lastOffline = GetVar(VAR_OFFLINE);
+        if (!lastOffline)
+            return;
+        if (now < lastOffline)
+            return;
+        UInt32 left = getLeftTimes();
+        if (!left)
+            return;
+
+        UInt32 interval = 60;
+        UInt32 passed = (now-lastOffline)/60;
+        UInt32 maxcount = getAutoBattleCount();
+        UInt32 count = left;
+        UInt32 rleft = passed > left ? 0 : left - passed;
+        UInt32 rcount = passed > left ? left : passed;
+        if (rcount > maxcount)
+            rcount = maxcount;
+		UInt32 final = now + interval * rleft;
+
+		EventAutoBattle* event = new(std::nothrow) EventAutoBattle(this, interval, count, /*ng*/NULL, final);
+		if (event == NULL) return;
+        for (UInt32 i = 0; i < rcount; ++i)
+        {
+            event->Process(0);
+            event->Next();
+        }
+
+        if (rleft)
+        {
+            PushTimerEvent(event);
+            addFlag(Training);
+        }
+        else
+        {
+            delete event;
+            event = NULL;
+        }
+
+        setLeftTimes(rleft);
+    }
+
     void Player::offlineExp(UInt32 now)
     {
         if (GetLev() <= 30)
@@ -13871,6 +14128,54 @@ namespace GObject
         ctslanding |= (1<<off);
         SetVar(VAR_CTSLANDINGRF, ctslanding);
     }
+    void Player::SetMemCach()
+    {
+        initMemcache();
+        char key[MEMCACHED_MAX_KEY] = {0};
+        char value[4][32] ={"07","14","30","90"};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_23336");
+        size_t vlen = strlen(value[0]);
+        MemcachedSet(key, len, value[0], vlen, 0);
+    }
+    void Player::continuousLoginSummerFlow()
+    {
+    /*    UInt32 SummerFlowType = GetVar(VAR_SUMMERFLOW_TYPE);
+        if(SummerFlowType!= 0)
+            return ;
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 lastOffline = GetVar(VAR_OFFLINE);
+        if (!lastOffline)
+            return;
+        UInt32 last_sharp = TimeUtil::SharpDay(0, lastOffline);
+     *
+     */
+        if (!World::getSummerFlow())
+            return;
+        UInt32 SummerAward = GetVar(VAR_SUMMERFLOW_AWARD);
+        UInt32 SummerType  = GetVar(VAR_SUMMERFLOW_TYPE);
+        if(SummerAward != 0 || SummerType!=0)
+            return ;
+/*
+        initMemcache();
+        char key[MEMCACHED_MAX_KEY] = {0};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_01");
+        char value[32]={0};
+        if (memcinited)
+            MemcachedGet(key, len, value, sizeof(value));
+        UInt8 days = atoi(value);
+*/
+        std::string  openid = getOpenId();
+        UInt8  days = GObject::dclogger.checkGRPOpenid((char*)openid.c_str());
+        if(days == 7)
+            SetVar(VAR_SUMMERFLOW_TYPE, 1);
+        else if(days == 14 )
+            SetVar(VAR_SUMMERFLOW_TYPE, 2);
+        else if(days == 30 )
+            SetVar(VAR_SUMMERFLOW_TYPE, 3);
+        else if(days == 90 )
+            SetVar(VAR_SUMMERFLOW_TYPE, 4);
+        return;  
+    }
     UInt8 Player::getRPLoginDay()
     {
         UInt32 now = TimeUtil::Now();
@@ -13918,6 +14223,21 @@ namespace GObject
             send(st);
         }
     }
+    void Player::sendSummerFlowInfo()
+    {
+        if (!World::getSummerFlow())
+            return;
+       
+        UInt32 SummerFlowType = GetVar(VAR_SUMMERFLOW_TYPE);
+        UInt32 SummerFlowAward = GetVar(VAR_SUMMERFLOW_AWARD);
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(27);
+        st << static_cast<UInt8>(SummerFlowAward);
+        st << static_cast<UInt8>(SummerFlowType);
+        st << Stream::eos;
+        send(st);
+    }
+    
     void Player::sendRC7DayInfo(UInt32 now)
     {
         if (!World::getRC7Day())
@@ -20342,6 +20662,8 @@ bool Player::inVipPrivilegeTime()
     bool ret = true;
     if(validate <= now)
     {
+//        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, 0);
+        SetVar(VAR_VIP_PRIVILEGE_BREAK_LAST, 0);
         ret = false;
     }
 
@@ -20372,7 +20694,7 @@ bool Player::SetVipPrivilege()
 
 bool Player::SetVipPrivilege_1()
 {
-    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME); 
     bool ret = false;
     if(validate == 0)
     {
@@ -20395,22 +20717,54 @@ bool Player::SetVipPrivilege_1()
     return ret;
 }
 
-bool Player::SetNewRcVip(UInt8  op)
+bool Player::SetNewRcVip_1()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
     if(!in7DayFromCreated()) 
         return false;
-    UInt32 vipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
-   if (vipType != 0 )
-       return false;
+    UInt32 now = TimeUtil::Now();
     bool ret = false;
-    UInt32 vipCharge= 30;
-    if(op == 2 )
-        vipCharge = 200;
-    if(validate == 0)
-    {
-        UInt32 now = TimeUtil::Now();
-        UInt32 validate = now + 2*86400;
+    UInt32 vipCharge;
+    UInt32 uplevel;
+    UInt32 days;
+    vipCharge = 30;
+    uplevel = 1;
+    days = 2;
+    if (getGold() < vipCharge)
+        return false;
+    validate = now + days*86400;
+    // 保持最低位为0
+    if(validate & 0x1)
+        validate = validate + 1;
+    // 保持第2位为0, 
+    // validate&0x2 为false表示限时vip为2天
+    // validate&0x2 为true表示限时vip为7天
+    if(validate & 0x2 )
+        validate = validate + 0x2;
+    SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+    SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, uplevel);
+    ret = true;
+    ConsumeInfo ci(VipPrivilege, 0, 0);
+    useGold(vipCharge, &ci);
+    return ret;
+}
+
+bool Player::SetNewRcVip_2()
+{
+    UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
+    if(!in7DayFromCreated()) 
+        return false;
+    UInt32 now = TimeUtil::Now();
+    bool ret = false;
+    UInt32 vipCharge;
+    UInt32 uplevel;
+    UInt32 days;
+     vipCharge = 200;
+     uplevel = 2;
+     days = 2;
+    if (getGold() < vipCharge)
+            return false;
+        validate = now + days*86400;
         // 保持最低位为0
         if(validate & 0x1)
             validate = validate + 1;
@@ -20420,11 +20774,11 @@ bool Player::SetNewRcVip(UInt8  op)
         if(validate & 0x2)
             validate = validate + 0x2;
         SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
-        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, op);
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, uplevel);
         ret = true;
         ConsumeInfo ci(VipPrivilege, 0, 0);
         useGold(vipCharge, &ci);
-    }
+
 
     return ret;
 }
@@ -20432,14 +20786,23 @@ bool Player::SetVipPrivilege_2()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
     bool ret = false;
+    UInt32 charge = 70;
+    UInt32 type =GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE); 
+    if(type == 2)
+        charge = 450;
+    if (getGold() < charge)
+        return false;
     if(validate > 0 && (0 == (validate & 0x2)))
     {
         UInt32 now = TimeUtil::Now();
         if(validate > now)
             validate += 5*86400;
         else
+        {
+            if( TimeUtil::SharpDayT(0,now) > TimeUtil::SharpDayT(0,validate) )
+                  SetVar(VAR_VIP_PRIVILEGE_BREAK_LAST,1);
             validate = now + 5*86400;
-
+        }
         // 保持最低位为0
         if(validate & 0x1)
             validate = validate + 1;
@@ -20448,9 +20811,10 @@ bool Player::SetVipPrivilege_2()
         // validate&0x2 为true表示限时vip为7天
         validate |= 0x2;
         SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, type+2);
         ret = true;
         ConsumeInfo ci(VipPrivilege, 0, 0);
-        useGold(70, &ci);
+        useGold(charge, &ci);
     }
 
     return ret;
@@ -20460,41 +20824,43 @@ bool Player::AddNewRcVip()
 {
     UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
     bool ret = false;
-    UInt32 vipCharge ;
-    UInt32 vipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
-    UInt32 addVipDay = 7;
-    switch(vipType)
+    UInt32 vipCharge;
+    UInt32 uplevel;
+    UInt32 vipType =GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE); 
+    if(vipType == 6)
     {
-        case 1:
-            vipCharge =70;
-            addVipDay = 5;
-            break;
-        case 2:
-            vipCharge = 450;
-            addVipDay = 5;
-            break;
-        case 3:
-            vipCharge = 150;
-            break;
-        case 4:
-            vipCharge = 700;
-            break;
-        case 5:
-            vipCharge = 200;
-            break;
-        case 6:
-            vipCharge = 1000;
-            break;
+        vipCharge = 1000;
+        uplevel = 6;
+        validate |= 0x2;
     }
-     if (getGold() < vipCharge )
-         return false;
-    if(validate > 0 && (0 == (validate & 0x2)))
+    else if(vipType == 5)
+    {
+        vipCharge = 200;  
+        uplevel = 5;
+        validate |= 0x2;
+    }
+    else  if(vipType == 3 )
+    {
+        vipCharge = 150;
+        uplevel = 5;
+        validate |= 0x2;
+    }
+    else if(vipType == 4)
+    {
+        vipCharge = 700;
+        uplevel = 6;
+        validate |= 0x2;
+    }
+    else return false;
+        if (getGold() < vipCharge )
+            return false;
+    if(validate > 0 )
     {
         UInt32 now = TimeUtil::Now();
         if(validate > now)
-            validate += addVipDay*86400;
+            validate += 7*86400;
         else
-            validate = now + addVipDay*86400;
+            validate = now + 7*86400;
 
         // 保持最低位为0
         if(validate & 0x1)
@@ -20504,9 +20870,8 @@ bool Player::AddNewRcVip()
         // validate&0x2 为true表示限时vip为7天
         validate |= 0x2;
         SetVar(VAR_VIP_PRIVILEGE_TIME, validate);
-        if(vipType < 5)
-            vipType+=2;
-        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, vipType);
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, uplevel);
+        SetVar(VAR_VIP_PRIVILEGE_BREAK_LAST, 0);
         ret = true;
         ConsumeInfo ci(VipPrivilege, 0, 0);
         useGold(vipCharge, &ci);
@@ -20557,52 +20922,64 @@ void Player::doVipPrivilege(UInt8 idx)
     case 5:
         if(!in7DayFromCreated())
             return;
-
         if (getGold() < 30)
             return;
         SetVipPrivilege_1();
-      // SetNewRcVip(1);
+           // SetNewRcVip_1();
+       // SetNewRcVip_2();
         break;
     case 6:
         if(!in7DayFromCreated())
             return;
-        if (getGold() < 70)
-            return;
         SetVipPrivilege_2();
         break;
     case 8:
-        AddNewRcVip();
+        if(!in7DayFromCreated())
+            return;
+        if (getGold() < 30)
+            return;
+        SetNewRcVip_1();
         break;
     case 9:
         if(!in7DayFromCreated())
             return;
         if (getGold() < 200)
             return;
-        SetNewRcVip(2);
+        SetNewRcVip_2();
+        break;
+    case 10:
+        AddNewRcVip();
         break;
     }
 
-    if(idx > 0 && idx < 5)
+    if(idx > 0 && idx < 5)     
     {
         if(inVipPrivilegeTime())
         {
             UInt32 validate = GetVar(VAR_VIP_PRIVILEGE_TIME);
             UInt32 now = TimeUtil::Now();
             UInt8 dayth = 0;
+            UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
             if(VIP_PRIVILEGE_7DAY(validate))
-                dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
+                dayth =7 -((TimeUtil::SharpDayT(0,validate)-TimeUtil::SharpDayT(0,now) )/86400 +6 )%7;
             else
                 dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
-            if(!GameAction()->RunVipPrivilegeAward(this, idx, dayth))
-                return;
-            SetVar(VAR_VIP_PRIVILEGE_DATA, data);
+            //    dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
+            if(TimeUtil::SharpDayT(0,validate) ==  TimeUtil::SharpDayT(0,now) &&(VipType == 3 ||VipType == 4) )
+                dayth =8 ;
+        UInt32 breakLast = GetVar(VAR_VIP_PRIVILEGE_BREAK_LAST);
+        if(breakLast == 1)
+            dayth +=1;
+      //  std::cout<<"AwardDayth dayth:"<<dayth<<std::endl;
+        if(!GameAction()->RunVipPrivilegeAward(this, idx, dayth))
+            return;
+        SetVar(VAR_VIP_PRIVILEGE_DATA, data);
         }
         else
         {
             return;
         }
     }
-
     sendVipPrivilege();
 }
 
@@ -20634,16 +21011,25 @@ void Player::sendVipPrivilege(bool isLStar)
     UInt32 data = GetVar(VAR_VIP_PRIVILEGE_DATA);
     UInt32 now = TimeUtil::Now();
     UInt8 dayth = 0;
-    if(VIP_PRIVILEGE_7DAY(validate))
-        dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400;
-    else
-        dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400;
-    if(dayth > 7)
-        dayth = 7;
     UInt32 timeLeft = 0;
     UInt8 extra = 0;
+    UInt32 dayth_0;
     if(validate > now)
+    {
         timeLeft = validate - now;
+        UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+        if(VIP_PRIVILEGE_7DAY(validate))
+            dayth =7 -( (TimeUtil::SharpDayT(0,validate)-TimeUtil::SharpDayT(0,now) )/86400 +6 )%7;
+        else
+            dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
+            //dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400;
+        if(TimeUtil::SharpDayT(0,validate) ==  TimeUtil::SharpDayT(0,now) &&(VipType == 3 ||VipType == 4) )
+            dayth =8 ;
+    }
+    UInt32 breakLast = GetVar(VAR_VIP_PRIVILEGE_BREAK_LAST);
+    if(breakLast == 1)
+        dayth +=1;
+    dayth_0 = static_cast<UInt32>(dayth) ;
     if(validate != 0)
     {
         SET_VIP_PRIVILEGE_OPEN(data, 1);
@@ -20664,10 +21050,31 @@ void Player::sendVipPrivilege(bool isLStar)
 
     if(isLStar)
         extra |= 0x4;
+    UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+    if(inVipPrivilegeTime()&&VipType == 0)
+    {
+        VipType =1;
+        if(VIP_PRIVILEGE_7DAY(validate))
+            VipType =3;
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, VipType);
+    }
+    UInt32  Days = (VipType+1)/2;
+    if( in7DayFromCreated() && VipType >4 ) 
+        VipType -= 2 ;
+    UInt32 SevenOrTen;
+    if(VipType==0 )
+        SevenOrTen =0;
+    else if(VipType%2==0)
+        SevenOrTen =2;
+    else SevenOrTen =1;
     SET_VIP_PRIVILEGE_DAYTH(data, dayth);
     Stream st(REP::RC7DAY);
     st << static_cast<UInt8>(10) << timeLeft << static_cast<UInt8>(data) << extra;
-    st << Stream::eos;
+    st<<static_cast<UInt8>(SevenOrTen)<<static_cast<UInt8>( (VipType+1)/2 )<<static_cast<UInt8>(Days);
+    st <<dayth<<Stream::eos;
+   // std::cout<<"PlayerID::"<<getId()<<"  "<<"break :"<<breakLast<<" "<<"VIPLEVEL:"<<VipType<<std::endl;
+   // std::cout<<timeLeft<<" "<<data<<"  "<<extra<<" SevenOrTen:"<<SevenOrTen<<"  Days"<<Days<<std::endl;
+   // std::cout<<"S->C dayth:"<<dayth_0<<std::endl;
     send(st);
 }
 
@@ -21155,8 +21562,11 @@ void Player::setNuwaSignet(UInt8 idx)
     //不能使用World::_wday,有30秒误差
 	time_t curtime = time(NULL);
 	struct tm *local = localtime(&curtime);
-    if(c <= 0 && local->tm_wday != 6 && local->tm_wday != 0)
+    if(c < 3 && local->tm_wday != 6 && local->tm_wday != 0)
+    {
+        sendMsgCode(0, 1152);
         return;
+    }
     UInt8 cnt = GET_BIT_3(signet, 0);
     if(cnt >= 1) return;
     /*
@@ -21992,7 +22402,6 @@ static const char* ryhb_udplog[15] = {
     "F_130603_14",
     "F_130603_15",
 };
-
 void Player::AddZRYJCount(UInt32 v)
 {
     if(!World::inActive_opTime_20130531() && !World::getRYHBActivity())

@@ -25,6 +25,11 @@ void EventBase::Destroy()
 
 EventWrapper::~EventWrapper()
 {
+    clear();
+}
+
+void EventWrapper::clear()
+{
 	for(EventSet::iterator it = m_Events.begin(); it != m_Events.end(); ++ it)
 	{
 		EventBase * ev = it->second;

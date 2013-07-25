@@ -18,7 +18,7 @@ release_jit:
 	cd luajit && make && mkdir -p ../bin/Release/ && cp src/libluajit.a ../bin/Release/libServer.lua.jit.a
 	if [ ! -d build ]; then\
 		premake4 --os=linux --platform=x64 --file=premake4jit.lua gmake; fi\
-		&& cd build && config=release $(MAKE) -j4 -f Makefile
+		&& cd build && config=release $(MAKE) -j16 -f Makefile
 	@objcopy --only-keep-debug bin/Release/Server.ASSS bin/Release/Server.ASSS.symbol
 	@objcopy --strip-debug bin/Release/Server.ASSS
 
