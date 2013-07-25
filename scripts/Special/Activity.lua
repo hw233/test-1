@@ -4762,26 +4762,6 @@ function sendRechargeMails(player, ototal, ntotal)
         end
     end
     
-    local t = { ['year'] = 2013, ['month'] = 7, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local n = os.time() + 11
-
-    if n >= s and n < (s + 1*86400) then
-        sendRechargeMails_2013_05_18(player, ototal, ntotal)
-    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
-        sendRechargeMails_2013_05_19(player, ototal, ntotal)
-    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
-        sendRechargeMails_2013_05_20(player, ototal, ntotal)
-    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
-        sendRechargeMails_2013_05_21(player, ototal, ntotal)
-    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
-        sendRechargeMails_2013_05_22(player, ototal, ntotal)
-    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
-        sendRechargeMails_2013_05_23(player, ototal, ntotal)
-    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
-        sendRechargeMails_2013_05_24(player, ototal, ntotal)
-    end
- 
     local t = { ['year'] = 2013, ['month'] = 7, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
@@ -4802,7 +4782,25 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_05_24(player, ototal, ntotal)
     end
 
+    local t = { ['year'] = 2013, ['month'] = 7, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time() + 11
 
+    if n >= s and n < (s + 1*86400) then
+        sendRechargeMails_2013_05_18(player, ototal, ntotal)
+    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
+        sendRechargeMails_2013_05_19(player, ototal, ntotal)
+    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
+        sendRechargeMails_2013_05_20(player, ototal, ntotal)
+    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
+        sendRechargeMails_2013_05_21(player, ototal, ntotal)
+    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
+        sendRechargeMails_2013_05_22(player, ototal, ntotal)
+    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
+        sendRechargeMails_2013_05_23(player, ototal, ntotal)
+    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
+        sendRechargeMails_2013_05_24(player, ototal, ntotal)
+    end
 
 end
 
@@ -7346,7 +7344,7 @@ function sendRechargeRankAward(player, pos)
         end
     end
      
-    local t = { ['year'] = 2013, ['month'] = 7, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 7, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
@@ -7366,7 +7364,7 @@ function sendRechargeRankAward(player, pos)
         sendRechargeRankAward_2013_04_08(player, pos)
     end
 
-    local t = { ['year'] = 2013, ['month'] = 7, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 7, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
@@ -9100,7 +9098,6 @@ end
 
 
 
-
 function onRecharge(player, r)
     if getAccRecharge() then
         local cond = 100
@@ -9108,14 +9105,6 @@ function onRecharge(player, r)
             player:AddVar(174, 1);
             player:SetVar(173, 1)
          
-            local t = { ['year'] = 2013, ['month'] = 7, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-            local s = os.time(t)
-            local n = os.time() + 11
-
-            if n >= s and n < (s + 7*86400) then
-                onAccRecharge_2013_07_06(player)
-            end
-
             local t = { ['year'] = 2013, ['month'] = 7, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
             local s = os.time(t)
             local n = os.time() + 11
@@ -9124,7 +9113,13 @@ function onRecharge(player, r)
                 onAccRecharge_2013_07_20(player)
             end
 
+            local t = { ['year'] = 2013, ['month'] = 7, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+            local s = os.time(t)
+            local n = os.time() + 11
 
+            if n >= s and n < (s + 7*86400) then
+                onAccRecharge_2013_06_15(player)
+            end
 
         end
     end

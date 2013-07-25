@@ -432,7 +432,7 @@ bool Fighter::addExp( UInt64 e, UInt32 extraExp, bool writedb )
 		_hp = 0;
 		UInt8 t[3] = {1, 2, 3};
 		UInt64 v[3] = {0, _level, _exp};
-		sendModification(3, t, v, writedb);
+		sendModification(3, t, v);
 		SYSMSG_SENDV(1001, _owner, _color, getName().c_str(), _level);
 		if (_owner != NULL && isMain)
 		{
