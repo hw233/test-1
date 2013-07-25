@@ -28,6 +28,9 @@ public:
     bool set(const char* key, const char* value, int timeout = 0);
     bool set(const char* key, size_t key_size, const char* value, size_t size, int timeout = 0);
 
+    bool del(const char* key);
+    bool del(const char* key, size_t key_size);
+
     const std::vector<std::string>& getHosts() const { return _hosts; }
 
 protected:

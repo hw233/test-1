@@ -283,6 +283,12 @@ public:
 
 };
 
+Mail * MailBox::newMail2( UInt32 id, const std::string& sender, UInt32 recvTime, UInt8 type, const std::string& title, const std::string& content, UInt32 additional /*= 0*/ )
+{
+	Mutex::ScopedLock lk(_owner->getMutex());
+    return newMail(id, sender, recvTime, type, title, content, additional);
+}
+
 Mail * MailBox::newMail( UInt32 id, const std::string& sender, UInt32 recvTime, UInt8 type, const std::string& title, const std::string& content, UInt32 additional /*= 0*/ )
 {
     if(_mailBox.size() > 0)

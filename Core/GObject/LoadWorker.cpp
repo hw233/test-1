@@ -117,7 +117,7 @@ namespace GObject
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
-            pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
+            pl->GetMailBox()->newMail2(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
         }
         lc.finalize();
 

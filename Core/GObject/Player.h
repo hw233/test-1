@@ -283,8 +283,11 @@ namespace GObject
 	{
 	public:
 		EventAutoBattle(Player * player, UInt32 interval, UInt32 count, GData::NpcGroup * ng, UInt32 final)
-			: EventBase(player, interval, count), _npcGroup(ng), _finalEnd(final)
+			: EventBase(player, interval, count), _npcGroup(ng), _finalEnd(final), _writedb(true)
 		{}
+
+        ~EventAutoBattle();
+
 		virtual UInt32 GetID() const { return EVENT_AUTOBATTLE; }
 		void Process(UInt32);
 		void notify();
@@ -299,6 +302,7 @@ namespace GObject
 	private:
 		GData::NpcGroup * _npcGroup;
 		UInt32 _finalEnd;
+        bool _writedb;
 	};
 
 	class EventFighterTrain : public EventBase
@@ -792,6 +796,8 @@ namespace GObject
         void sendOpenAct(UInt32);
         void continuousLogin(UInt32 now);
         void continuousLoginRF(UInt32 now);
+        void continuousLoginSummerFlow();
+        void SetMemCach();
         void getContinuousReward(UInt8 type, UInt8 idx = 0);
         void getContinuousRewardRF(UInt8 type, UInt8 idx = 0);
         void turnOnRC7Day();
@@ -803,6 +809,7 @@ namespace GObject
         void setContinuousRFAward(UInt32 no);
         void sendFourCopAct();
         void sendLuckybagInfo();
+        void sendSummerFlowInfo();
 		void Reconnect();
 
 		void Logout(bool = false);	//???????߲???
@@ -838,6 +845,7 @@ namespace GObject
         //void resetThanksgiving();
         void offlineExp(UInt32);
         void getOfflineExp();
+        UInt32 getAutoBattleCount();
 
         void sendShusanLoveTitleCard(int);
         void sendMayDayTitleCard(int);
@@ -1068,17 +1076,23 @@ namespace GObject
         UInt8 GetColor() const;
         UInt8 getPortraitAndColor() const;
 		UInt64 GetExp() const;
-		void AddExp(UInt64, UInt8 mlvl = 0, UInt32 extraExp = 0);
+		void AddExp(UInt64, UInt8 mlvl = 0, UInt32 extraExp = 0, bool writedb = true);
 		void AddPExp(UInt32);
+        void flushExp();
+        void flushLastExp();
 		void AddPExpBy(Player*,UInt32);
 		void AddItemBy(Player*,UInt16,UInt16,bool);
-		void pendExp(UInt32, bool = false);
+		void pendExp(UInt32, bool = false, bool = true);
 		void setLevelAndExp(UInt8, UInt64);
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
         UInt8 allHpP();
         UInt32 getBattleMaxHp();
         UInt32 getBattleCurrentHp(); 
+
+        void setLeftTimes(UInt32 c) { SetVar(VAR_LEFTTIMES, c); }
+        UInt32 getLeftTimes() { return GetVar(VAR_LEFTTIMES); }
+        void offlineAutoExp(UInt32 now);
 
         bool isCopyPassed(UInt8 copyid);
         bool inVipPrivilegeTime();
@@ -1088,8 +1102,10 @@ namespace GObject
         void sendVipPrivilegeMail(UInt8 lv);
         bool SetVipPrivilege_1();
         bool SetVipPrivilege_2();
-        bool SetNewRcVip(UInt8 op);
+        bool SetNewRcVip_1();
+        bool SetNewRcVip_2();
         bool AddNewRcVip();
+        bool SetNewRcVip_migic(UInt32 type);
         void sendDirectPurInfo();
 
     private:
@@ -1633,7 +1649,6 @@ namespace GObject
         void sendRechargeMails(UInt8, UInt8, UInt8);
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
-        bool in7DayFromCreated();
 
     private:
         bool _isJumpingMap;
@@ -1644,6 +1659,7 @@ namespace GObject
     public:
         inline bool isJumpingMap() { return _isJumpingMap; }
         inline void setJumpingMap(bool v) { _isJumpingMap = v; }
+        bool in7DayFromCreated();
 
         void loadQixiInfoFromDB(Player* pl, UInt8 bind, UInt8 pos, UInt8 event, UInt32 score)
         {
@@ -1949,7 +1965,7 @@ namespace GObject
         void tripodUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void storeUdpLog(UInt32 id, UInt32 type, UInt32 itemId, UInt32 num = 1);
         void newRC7DayUdpLog(UInt32 id, UInt32 type = 0, UInt32 num  = 1);
-        void transformUdpLog(UInt32 id, UInt32 type, UInt32 money1, UInt32 money2, UInt32 money3, UInt32 money4, UInt8 val1);
+        void transformUdpLog(UInt32 id, UInt32 type, UInt32 * moneys, UInt8 val1);
         void dreamerUdpLog(UInt32 id, UInt32 type, UInt32 num = 1);
         void blueDiamondAwardUdpLog(UInt8 type);
         void cFriendAwardUdpLog(UInt8 type);
@@ -2067,11 +2083,11 @@ namespace GObject
         void makeFire(UInt32 id1, UInt32 id2);
 
         void getAward();
-        void genAward(Stream& st);
-        bool genAward();
-
+        int genAward(Stream& st);
+        int genAward();
         void getAward(UInt8 type, UInt8 opt);
         void getSSDTAward(UInt8 opt);
+        void getAwardFromSurmmeFlowr();
         void sendSSDTInfo();
         void getHappyAward(UInt8 opt);
         void sendHappyInfo(UInt16 itemId = 0);

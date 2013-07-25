@@ -76,6 +76,8 @@ public:
 	inline iterator end() { return m_Events.end(); }
 	inline const_iterator end() const { return m_Events.end(); }
 
+    void clear();
+
 private:
 	static void Event_CB(EventBase *);
 

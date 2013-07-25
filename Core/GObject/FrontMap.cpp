@@ -65,7 +65,8 @@ UInt8 FrontMap::getGoldCount(UInt8 vipl)
 UInt32 FrontMap::getEnterGold(Player* pl)
 {
     UInt8 vipl = pl->getVipLevel();
-    if(vipl > 3)
+     UInt32 VipType = pl->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+    if(vipl > 3  ||( pl->inVipPrivilegeTime()&& VipType % 2 ==0 ))
         vipl = 3;
     UInt32 extraVipGold[4][3] = {
         {20, 20, 20},
@@ -615,11 +616,11 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                     {
                         UInt32 pref = 0;
                         UInt8 div = 1;
-                        if (pl->getVipLevel() >= 5)
+                        UInt32 VipType = pl->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+                        if (pl->getVipLevel() >= 5 ||( pl->inVipPrivilegeTime()&& VipType%2== 0 ) )
                             pref = 1000;
                         if (World::_wday == 7)
                             div = 2;
-
                         if (mtype == 1)
                         {
                             if (GData::moneyNeed[GData::FRONTMAP_AUTO].gold/div > pl->getGoldOrCoupon()) {
@@ -702,7 +703,8 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                 if (!World::getAutoBattleAct() && !World::getNewYear() && !pl->isYD() && !pl->isBD() && !pl->isQQVIP())
                 {
                     // 限时vip特权
-                    if (pl->getVipLevel() < 7 && !pl->inVipPrivilegeTime())
+                    UInt32 VipType = pl->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+                    if (pl->getVipLevel() < 7 && !(pl->inVipPrivilegeTime() &&( VipType %2 == 0)))
                         return;
                 }
 

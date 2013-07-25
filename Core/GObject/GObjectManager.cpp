@@ -1935,7 +1935,7 @@ namespace GObject
                 }
             }
 
-            if(specfgtobj.fighterId != 0 && specfgtobj.level >= 60)
+            if(specfgtobj.fighterId != 0/* && specfgtobj.level >= 60*/)
             {
                 SecondSoul* secondSoul = new SecondSoul(fgt2, specfgtobj.cls, specfgtobj.practiceLevel, specfgtobj.stateExp, specfgtobj.stateLevel, specfgtobj.xinxiu);
                 StringTokenizer tokenizer(specfgtobj.skills_2nd, ",");
@@ -4827,7 +4827,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Tripod Data");
 		DBTripod t;
-		if(execu->Prepare("SELECT `id`, `soul`, `fire`, `quality`, `awdst`, `itemId`, `num` FROM `tripod`", t)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num` FROM `tripod`", t)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -4838,6 +4838,7 @@ namespace GObject
             td.fire = t.fire;
             td.quality = t.quality;
             td.awdst = t.awdst;
+            td.needgen = t.regen;
             td.itemId = t.itemId;
             td.num = t.num;
 
@@ -5184,7 +5185,7 @@ namespace GObject
 			if(pl == NULL)
 				continue;
 			Fighter * fgt = pl->findFighter(dbss.fighterId);
-			if(fgt == NULL || fgt->getLevel() < 60)
+			if(fgt == NULL/* || fgt->getLevel() < 60*/)
             {
                 continue;
             }
@@ -5228,7 +5229,7 @@ namespace GObject
 			if(pl == NULL)
 				continue;
 			Fighter * fgt = pl->findFighter(dbxc.fighterId);
-			if(fgt == NULL || fgt->getLevel() < 55)
+			if(fgt == NULL)
             {
                 continue;
             }
