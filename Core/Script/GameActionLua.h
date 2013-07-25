@@ -260,6 +260,7 @@ namespace Script
         UInt8 RunBirthdayAward(Player* player);
         bool  RunNewRC7DayLoginAward(Player* player, UInt8 val);
         bool  RunNewRC7DayLoginAward2(Player* player, UInt8 val);
+        bool  RunQQBoardInstantLoginAward(Player* player, UInt8 val);
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         UInt8 RunNewRC7DayTargetAward(Player* player);
         UInt8 RunBlueDiamondAward(Player* player, UInt8 opt);

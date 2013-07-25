@@ -252,6 +252,7 @@ enum ItemFrom
     FromRYHBAward = 56, //日月合璧
     FromVipLevelAward = 57, //御剑等级回馈
     FromQQXiu = 58,
+    FromQQBoard = 59 ,
     //80 ~ 100，繁体占用
 };
 

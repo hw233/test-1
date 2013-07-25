@@ -243,6 +243,8 @@ GMHandler::GMHandler()
     Reg(3, "unfsale", &GMHandler::OnUnForbidSale);
     Reg(3, "loginlimit", &GMHandler::OnSetLoginLimit);
 
+    Reg(3, "InsLogin", &GMHandler::OnInstantLogin);
+
     Reg(3, "sysup", &GMHandler::OnSysUpdate);
     Reg(2, "cfriend", &GMHandler::OnCFriend);
     Reg(2, "shuo", &GMHandler::OnShuoShuo);
@@ -3536,6 +3538,20 @@ void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>
     }
 }
 
+void GMHandler::OnInstantLogin(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt64 playerId = atoll(args[0].c_str());
+
+    GObject::Player * pl = GObject::globalPlayers[playerId];
+    if (NULL != pl)
+    {
+        UInt32 days = atol(args[1].c_str());
+        pl->SetVar(VAR_QQBOARD,days);
+       pl->sendQQBoardLoginInfo();
+    }
+}
 void GMHandler::OnSetLoginLimit(GObject::Player *player, std::vector<std::string>& args)
 {
     if (args.size() < 2)

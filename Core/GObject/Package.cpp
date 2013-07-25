@@ -65,7 +65,7 @@ namespace GObject
 
     UInt16 getRandOEquip(UInt8 lvl)
     {
-        static const UInt16* equips[] = {OEquip50, OEquip60, OEquip70, OEquip80, OEquip90, OEquip100, OEquip110};
+        static const UInt16* equips[] = {OEquip50, OEquip60, OEquip70, OEquip80, OEquip90, OEquip100, OEquip110, OEquip120};
 
         UInt16 equipid = 0;
 
