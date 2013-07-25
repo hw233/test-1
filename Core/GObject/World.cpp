@@ -28,6 +28,7 @@
 #include "PracticePlace.h"
 #include "WBossMgr.h"
 #include "HeroIsland.h"
+#include "NewHeroIsland.h"
 #include "MsgID.h"
 #ifndef _FB
 #ifndef _VT
@@ -1716,7 +1717,8 @@ void World::World_Midnight_Check( World * world )
     worldBoss.resetBossSt();
     globalCountryBattle.setStatus(0);
     ClanRankBattleMgr::Instance().setStatus(0);
-    heroIsland.setStatus(0);
+    //heroIsland.setStatus(0);
+    newHeroIsland.setStatus(0);
 }
 void World::World_CreateNewDB_Check()
 {

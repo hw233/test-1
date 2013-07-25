@@ -34,7 +34,7 @@ struct Mail
 class MailPackage
 {
 public:
-	enum {Coin = 0x8000, Tael = 0x9000, Coupon = 0xA000, Gold = 0xB000, Achievement = 0xC000};
+	enum {Coin = 0x8000, Tael = 0x9000, Coupon = 0xA000, Gold = 0xB000, Achievement = 0xC000, Prestige = 0xD000};
 	struct MailItem
 	{
 		UInt16 id;

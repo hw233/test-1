@@ -43,6 +43,7 @@
 #include "GData/Money.h"
 #include "GObject/WBossMgr.h"
 #include "GObject/HeroIsland.h"
+#include "GObject/NewHeroIsland.h"
 #include "GObject/Var.h"
 #include "GObject/ClanRankBattle.h"
 
@@ -1314,6 +1315,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetFairySpar()->sendAllInfo();
     pl->sendDirectPurInfo();
     pl->getQQTenpayAward(0);
+    newHeroIsland.playerInfo(pl);
     if(gClanCity)
         gClanCity->sendOpenStatus(pl);
    // pl->xingchenInfo();
@@ -4527,6 +4529,46 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
                 UInt8 onoff = 0;
                 brd >> onoff;
                 GObject::heroIsland.setAto(player, onoff);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void OnNewHeroIslandReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+
+    if (PLAYER_DATA(player,location) != 8977)
+        return;
+
+    switch (type)
+    {
+        case 0:
+            GObject::newHeroIsland.playerInfo(player);
+            break;
+        case 1:
+            GObject::newHeroIsland.playerEnter(player);
+            break;
+        case 2:
+            GObject::newHeroIsland.playerLeave(player);
+            break;
+        case 3:
+            {
+                UInt8 spot = 0;
+                brd >> spot;
+                GObject::newHeroIsland.moveTo(player, spot);
+            }
+            break;
+        case 4:
+            {
+                UInt8 skillid = 0, useGold = 0;
+                brd >> skillid >> useGold;
+                GObject::newHeroIsland.useSkill(player, skillid, useGold);
             }
             break;
         default:

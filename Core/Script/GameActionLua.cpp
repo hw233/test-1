@@ -1692,5 +1692,11 @@ namespace Script
 		assert(player != NULL);
 		return Call<bool>("onFishUserPackage", player, idx);
     }
+
+    Table GameActionLua::GetNewHeroIslandBuffs()
+    {
+        return Run<Table>(NULL, "getNewHeroIslandBuffs");
+    }
+
 }
 

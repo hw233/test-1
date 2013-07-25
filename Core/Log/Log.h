@@ -191,6 +191,7 @@ enum MailItemType
     TreasureAct,
     ClanBossAct,
 	DismissXingchen,
+    NewHeroIslandAward,
 };
 enum ItemFrom
 {

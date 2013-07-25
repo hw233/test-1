@@ -90,6 +90,9 @@ bool MailPackage::takeIt( Player * player, bool gm )
 			case Achievement:
 				player->getAchievement(it->second + ((it->first & 0x0FFF)<< 16));
 				break;
+			case Prestige:
+				player->getPrestige(it->second + ((it->first & 0x0FFF)<< 16));
+				break;
 			}
 		}
 		else
@@ -129,6 +132,8 @@ void MailPackage::makeInfo(Stream& st)
 				st.data<UInt32>(off + sizeof(UInt32) * 3) = ((it->first & 0x0FFF) << 16) + it->second;
 				break;
 			case Achievement:
+				break;
+			case Prestige:
 				break;
 			default:
 				break;
