@@ -147,6 +147,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_lingyou_magdef] = &BattleSimulator::doSkillEffectExtra_LingYouMagDef;
         skillEffectExtraTable[GData::e_eft_lingshi_bleed] = &BattleSimulator::doSkillEffectExtra_LingShiBleed2;
         skillEffectExtraTable[GData::e_eft_criticaldmgreduce] = &BattleSimulator::doSkillEffectExtra_CriticalDmgReduce;
+        skillEffectExtraTable[GData::e_eft_buddha_light] = &BattleSimulator::doSkillEffectExtra_BuddhaLight;
     }
 }
 
@@ -259,6 +260,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_lingyou_magdef] = &BattleSimulator::doSkillEffectExtra_LingYouMagDef;
         skillEffectExtraTable[GData::e_eft_lingshi_bleed] = &BattleSimulator::doSkillEffectExtra_LingShiBleed2;
         skillEffectExtraTable[GData::e_eft_criticaldmgreduce] = &BattleSimulator::doSkillEffectExtra_CriticalDmgReduce;
+        skillEffectExtraTable[GData::e_eft_buddha_light] = &BattleSimulator::doSkillEffectExtra_BuddhaLight;
     }
 }
 
@@ -1234,6 +1236,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
         if(skill && skill->cond == GData::SKILL_PEERLESS)
         {
             aura_factor = 1 + static_cast<float>(bf->getAura()-100) * 0.0025;
+            if(aura_factor < 1)
+                aura_factor = 1;
             if(bf->isHide() || area_target->isMarkMo())
                 aura_factor += 0.1f;
         }
@@ -4279,9 +4283,26 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
     if (skill && skill->cond == GData::SKILL_PEERLESS)
     {
-        int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
-        //setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, false);
-        setStatusChange_Aura2(bf, bf->getSide(), bf->getPos(), NULL, nChangeAuraNum, 0, false);
+        UInt8 last = bf->getBuddhaLightLast();
+        if(last > 0)
+        {
+            float rate = bf->getBuddhaLightRate();
+            AtkList atklist;
+            getAtkList(bf, skill, atklist);
+            UInt8 cnt = atklist.size();
+            for(size_t j = 0; j < cnt; ++ j)
+            {
+                BattleFighter* bo = atklist[j].bf;
+                bo->setBuddhaLight(rate, 0);
+                setStatusChange_Aura2(bf, bf->getSide(), bf->getPos(), NULL, bo->getBuddhaLightAura(), 0, false);
+            }
+        }
+        else
+        {
+            int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
+            //setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, false);
+            setStatusChange_Aura2(bf, bf->getSide(), bf->getPos(), NULL, nChangeAuraNum, 0, false);
+        }
         if (launchPeerLess)
             *launchPeerLess = 1;
     }
@@ -12427,6 +12448,41 @@ void BattleSimulator::doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, in
     {
         BattleFighter* bo = atklist[i].bf;
         bo->setCriticalDmgReduce(efv[eftIdx]);
+    }
+}
+
+void BattleSimulator::doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(bf->getBuddhaLightRate() > 0) //作为标志（使用过后概率也不为0）
+        return;
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+
+    size_t cnt = eft.size();
+    if(cnt != efl.size() || efv.size() != cnt)
+        return;
+
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+        const GData::SkillStrengthenEffect* ef = NULL;
+        if(ss)
+            ef = ss->getEffect(GData::ON_BUDDHA_LIGHT, GData::TYPE_AURA_GET);
+
+        AtkList atklist;
+        getAtkList(bf, skill, atklist);
+        UInt8 cnt = atklist.size();
+        for(size_t j = 0; j < cnt; ++ j)
+        {
+            BattleFighter* bo = atklist[j].bf;
+            bo->setBuddhaLight(efv[i], efl[i]);
+
+            bo->setBuddhaLightAura(ef->valueExt1);
+        }
+        return;
     }
 }
 

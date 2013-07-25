@@ -38,6 +38,7 @@ enum
     ON_BLEED = 21,     // 流血时
     ON_CONFUSE = 22,   // 混乱时
     ON_HITE = 23,      // 命中时
+    ON_BUDDHA_LIGHT = 24,      // 佛光效果触发后
 };
 
 enum

@@ -1126,6 +1126,15 @@ private:
     void setBleedTypeSkill(const GData::SkillBase* skill) { _bleedTypeSkill = skill; }
     const GData::SkillBase* getBleedTypeSkill() { return _bleedTypeSkill; }
 
+    float auralRate;
+    UInt8 auralLast;
+    UInt8 auraValue;
+    inline void setBuddhaLight(float v, UInt8 l) { auralRate = v; auralLast = l; }
+    inline UInt8 getBuddhaLightLast() { return auralLast; }
+    inline float getBuddhaLightRate() { return auralRate; }
+    inline void setBuddhaLightAura(UInt8 value) { auraValue = value; }
+    inline UInt8 getBuddhaLightAura() { return auraValue; }
+
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
     std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg100;
