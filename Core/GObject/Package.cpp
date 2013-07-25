@@ -71,8 +71,8 @@ namespace GObject
 
         if (lvl < 50)
             lvl = 50;
-        if (lvl > 120)
-            lvl = 120;
+        if (lvl > 110)
+            lvl = 110;
 
         lvl -= 50;
         lvl /= 10;
