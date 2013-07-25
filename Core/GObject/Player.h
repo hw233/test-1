@@ -2174,7 +2174,10 @@ namespace GObject
         void sendNewRC7DayLogin();
         void sendNewRC7DayRecharge();
         void sendNewRC7DayTarget(UInt8 idx = 0);
+        void sendQQBoardLoginInfo();
+        void SetQQBoardValue();
         void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
+        void getQQBoardInstantLoginAward(UInt8 val);
         void getNewRC7DayRechargeAward(UInt8 val);
         void getNewRC7DayTargetAward(UInt8 val);
         void get11DailyAward(UInt8 opt);
