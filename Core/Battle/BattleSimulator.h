@@ -313,6 +313,8 @@ private:
         e_unAbnormalType = 98,    // 异常类状态消失
         e_bleedType = 99,    // 流血类状态
         e_unBleedType = 100,    // 流血类状态消失
+        e_buddhaLight = 101,    // 佛光效果
+        e_unBuddhaLight = 102,    // 佛光效果消失
 
         e_MAX_STATE,
     };
