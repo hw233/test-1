@@ -829,7 +829,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+104*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+111*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -1115,7 +1115,7 @@ function onActivityCheck(tm)
       setGoldSnakeAct(false)
   end
 
-  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 70*86400) then
+  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 77*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)

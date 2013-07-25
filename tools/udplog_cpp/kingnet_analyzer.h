@@ -31,6 +31,7 @@ public:
 		m_bForbidden= false;
 		m_szUserIP[0]='\0';
 		m_nTime		= (int32_t)time(NULL);
+        m_szUserMsg[0]='\0';
 		m_nSendCount= 0;
 		m_szLogBuffer[0] = '\0';
 

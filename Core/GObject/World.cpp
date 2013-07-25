@@ -644,7 +644,13 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 25)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 26)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 27)
-
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 3)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -675,7 +681,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 20)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 27)
-
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 3)
         ))
     {
 #if 0
@@ -1635,7 +1641,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 25)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 26)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 27)
-         
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 3)
          
          )
         bRechargeEnd = true;
@@ -2960,7 +2972,7 @@ void World::udpLog(const char* str1, const char* str2, const char* str3, const c
     const char* str5, const char* str6, const char* type)
 {
     if (!ulog && cfg.udplog)
-        ulog = _analyzer.GetInstance("world");
+        ulog = _analyzer.GetInstance("1");
     if (ulog && cfg.udplog)
     {
         ulog->LogMsg(str1, str2, str3, str4, str5, str6, type);
