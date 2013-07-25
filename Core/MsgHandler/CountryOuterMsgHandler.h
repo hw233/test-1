@@ -5673,7 +5673,14 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
         case 18:
             player->getFishUserPackage(idx);
             break;
-
+        case 20:
+            player->SetQQBoardValue();
+            player->sendQQBoardLoginInfo();
+            break;
+        case 21:
+            player->getQQBoardInstantLoginAward(2*idx - 1);
+            player->sendQQBoardLoginInfo();
+            break;
         default:
             break;
     }
@@ -5752,6 +5759,7 @@ void OnNewRC7Day(GameMsgHdr& hdr, const void* data )
                 UInt8 val = 0;
                 br >> val;
                 player->getNewRC7DayLoginAward(val, off);
+
             }
             break;
         case 2:
