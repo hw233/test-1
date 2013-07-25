@@ -733,10 +733,9 @@ void NewHeroIsland::handleBattle()
             Player * player2 = pd2->player;
             if (player1 == NULL || player2 == NULL)
                 continue;
-            int turns = 0;
             player1->setHiAttrFlag(true);
             player2->setHiAttrFlag(true);
-            bool res = player1->challenge(player2, NULL, &turns, false, 0, true, Battle::BS_COPY5, 0x01);
+            bool res = player1->challenge(player2, NULL, NULL, false, 0, true, Battle::BS_NEWCOUNTRYBATTLE);
             player1->setHiAttrFlag(false);
             player2->setHiAttrFlag(false);
             if (res)
@@ -1055,7 +1054,7 @@ void NewHeroIsland::calcNext(UInt32 now)
     {
         _prepareTime = now + 30;
         _startTime = _prepareTime + 60;
-        _endTime = _startTime + 17 * 60;
+        _endTime = _startTime + 8 * 60;
     }
 }
 
@@ -1134,7 +1133,7 @@ void NewHeroIsland::rankReward()
             GameAction()->doStrong((*i)->player, SthHeroIsland, 0 ,0);
         }
         Stream st(REP::NEWHERO_ISLAND);
-        st << static_cast<UInt8>(0x10);
+        st << static_cast<UInt8>(0x0A);
         st << Stream::eos;
         if ((*i)->status != NEWHERO_ISLAND_ESCAPE)
             (*i)->player->send(st);

@@ -4428,6 +4428,7 @@ void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
 
 void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
 {
+    return;     //取消此功能
 	MSG_QUERY_PLAYER(player);
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
