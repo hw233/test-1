@@ -4287,6 +4287,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         bool needConsume = true;
         if(bf->getBuddhaLightLast() > 0)
         {
+            printf("enter: %u\n", bf->getBuddhaLightLast());
             appendDefStatus(e_unBuddhaLight, 0, bf);
             occurFlag = true;
             if(uRand(10000) < bf->getBuddhaLightRate() * 1000)
@@ -12472,7 +12473,6 @@ void BattleSimulator::doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int targ
     if(cnt != efl.size() || efv.size() != cnt)
         return;
 
-    float curMax = 0;
     for(size_t i = 0; i < cnt; ++ i)
     {
         GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
@@ -12483,14 +12483,11 @@ void BattleSimulator::doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int targ
         AtkList atklist;
         getAtkList(bf, skill, atklist);
         UInt8 cnt = atklist.size();
-        printf("rate: %f, last: %u\n", efv[i], efl[i]);
-        if(efv[i] < curMax)
-            continue;
-        curMax = efv[i];
+        printf("rate: %f, last: %u\n", skill->prob, efl[i]);
         for(size_t j = 0; j < cnt; ++ j)
         {
             BattleFighter* bo = atklist[j].bf;
-            bo->setBuddhaLight(efv[i], efl[i]);
+            bo->setBuddhaLight(skill->prob, efl[i]);
             if(ef)
                 bo->setBuddhaLightAura(ef->valueExt1);
         }
