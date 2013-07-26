@@ -2893,7 +2893,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
                 if(!bo)  // 雪人
                     continue;
 
-                if(bo->getAura() > 99 || bo->getId() == 5679 || bo->isPet())
+                if(bo->getAura() > 99 || bo->getId() == 5679 || bo->isPet() || bo->isSoulOut())
                 {
                     excepts[exceptCnt] = i;
                     ++ exceptCnt;
@@ -2949,7 +2949,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679)
+            if(bo->getId() == 5679 || bo->isSoulOut())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -2978,7 +2978,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679)
+            if(bo->getId() == 5679 || bo->isSoulOut())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -3008,7 +3008,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679)
+            if(bo->getId() == 5679 || bo->isSoulOut())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -3038,7 +3038,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679)
+            if(bo->getId() == 5679 || bo->isSoulOut())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -3068,7 +3068,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679)
+            if(bo->getId() == 5679 || bo->isSoulOut())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;

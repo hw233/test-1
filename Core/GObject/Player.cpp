@@ -12713,6 +12713,42 @@ namespace GObject
         send(st);
     }
 
+    void Player::SetQQBoardValue()
+    {
+        UInt32 begin = 1374768000;
+        UInt32 now = TimeUtil::Now();
+        UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
+        if(now < begin)
+            return ;
+        if( off > 15)
+            return ;
+        UInt32 QQBoard = GetVar(VAR_QQBOARD);
+        QQBoard |= 1 << (off - 1);
+        SetVar(VAR_QQBOARD, QQBoard);
+    }
+    void Player::sendQQBoardLoginInfo()
+    {
+        Stream st(REP::RC7DAY);  //协议
+        UInt32 QQBoard = GetVar(VAR_QQBOARD);
+        UInt32 QQBoardAward = GetVar(VAR_QQBOARD_AWARD);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(QQBoard & (1 << i++ ))
+                ++count;
+            else count = 0;
+            if(count > max)
+                max = count ;
+        }
+        st << static_cast<UInt8>(15);
+        st << static_cast<UInt8>(max);   //连续登陆天数
+        st <<QQBoardAward;   //领取的奖励号
+        st << Stream::eos;
+        send(st);
+    }
+
     void Player::getNewRC7DayLoginAward(UInt8 val, UInt8 off)
     {
         // 申请领取新注册七天登录奖励 (包括补签和累计登录）
@@ -12799,6 +12835,34 @@ namespace GObject
             }
         }
     }
+    void Player::getQQBoardInstantLoginAward(UInt8 val)
+    {
+        // 申请领取新注册七天登录奖励 (包括补签和累计登录）
+        UInt32 QQBoard = GetVar(VAR_QQBOARD);
+        UInt32 ctslandingAward = GetVar(VAR_QQBOARD_AWARD);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(QQBoard & (1 << i++ ))
+                ++count;
+            else count = 0;
+            if(count > max)
+                max = count ;
+        }
+        if (val == 0 || val > max)
+            return;
+        // 正常签到登录奖励
+        if(ctslandingAward & (1<<((val-1)/2)))
+            return ;
+        if (!GameAction()->RunQQBoardInstantLoginAward(this, val))
+            return;
+        ctslandingAward |= (1<<((val - 1)/2));
+        SetVar(VAR_QQBOARD_AWARD, ctslandingAward);
+       sendQQBoardLoginInfo();
+    }
+
 
     void Player::getNewRC7DayRechargeAward(UInt8 val)
     {
@@ -18201,7 +18265,7 @@ void Player::sendCopyFrontAllAward()
 
 UInt8 Player::getCopyId()
 {
-    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707};
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a};
 
     UInt16 currentSpot = PLAYER_DATA(this, location);
     for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)

@@ -492,6 +492,11 @@ function loadStore()
         store:addExchange(8,531,530,10)
         store:addExchange(8,532,531,10)
 
+        --store:addExchange(8,519,552,1)
+        --store:addExchange(8,520,553,1)
+        --store:addExchange(8,552,532,10)
+        --store:addExchange(8,553,552,10)
+
         -- 龙魂元神
         store:add(11,9232,9000)
         store:add(11,9233,9000)
