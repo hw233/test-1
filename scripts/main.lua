@@ -6,6 +6,7 @@ else
 require("actmsg")
 end
 require("World/Attain")
+require("World/HeroIsland")
 require("Task/Task_All")
 require("Explore/Explore_All")
 require("Collect/Collect_All")

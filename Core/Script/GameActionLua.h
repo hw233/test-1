@@ -377,6 +377,7 @@ namespace Script
         Table GetFairySparElement(UInt8 flag);
         UInt8 onVipLevelAward(Player* player, UInt8 opt);
         bool onFishUserPackage(Player* player, UInt8 idx);
+        Table GetNewHeroIslandBuffs();
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

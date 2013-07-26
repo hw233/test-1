@@ -45,6 +45,7 @@
 #include "Copy.h"
 #include "FrontMap.h"
 #include "HeroIsland.h"
+#include "NewHeroIsland.h"
 #include "GObject/AthleticsRank.h"
 #ifndef _FB
 #ifndef _VT
@@ -1658,11 +1659,14 @@ namespace GObject
         udpLog("countryBattle", action, "", "", "", "", "act");
     }
 
-    void Player::heroIslandUdpLog(UInt32 id, UInt8 type)
+    void Player::heroIslandUdpLog(UInt32 id, UInt8 type, UInt16 value)
     {
         // 英雄岛相关日志
         char action[16] = "";
-        snprintf (action, 16, "F_%d_%d", id, type);
+        if (value)
+            snprintf (action, 16, "F_%d_%d_%d", id, type, value);
+        else
+            snprintf (action, 16, "F_%d_%d", id, type);
         udpLog("heroIsland", action, "", "", "", "", "act");
     }
 
@@ -2284,7 +2288,8 @@ namespace GObject
         PopTimerEvent(this, EVENT_REFRESHOPENKEY, getId());
 #endif
 #endif // _WIN32
-        heroIsland.playerOffline(this);
+        //heroIsland.playerOffline(this);
+        newHeroIsland.playerLeave(this);
 		removeStatus(SGPunish);
         char online[32] = {0,};
         snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
@@ -3468,6 +3473,7 @@ namespace GObject
         {
             send(st);
         }
+        /*
         else if (scene != Battle::BS_CLANBOSSBATTLE)
         {
             if (res)
@@ -3479,12 +3485,14 @@ namespace GObject
                 SYSMSG_SENDV(2143, this, other->getCountry(), other->getName().c_str());
             }
         }
+        */
 
         if (report & 0x02)
         {
             st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
             other->send(st);
         }
+        /*
         else if (scene != Battle::BS_CLANBOSSBATTLE)
         {
             if (res)
@@ -3496,6 +3504,7 @@ namespace GObject
                 SYSMSG_SENDV(2140, other, getCountry(), getName().c_str());
             }
         }
+        */
 
 		if(turns != NULL)
 			*turns = bsim.getTurns();
@@ -6017,7 +6026,8 @@ namespace GObject
 
         if (_playerData.location == 8977)
         {
-            heroIsland.playerLeave(this);
+            //heroIsland.playerLeave(this);
+            newHeroIsland.playerLeave(this);
             delFlag(Player::InHeroIsland);
         }
         SpotData * spotData = GetMapSpot();
@@ -8519,7 +8529,8 @@ namespace GObject
 		send((st));
 
         worldBoss.sendDaily(this);
-        heroIsland.sendDaily(this);
+        //heroIsland.sendDaily(this);
+        newHeroIsland.sendDaily(this);
         globalCountryBattle.sendDaily(this);
         teamCopyManager->sendDaily(this, 7);
         teamCopyManager->sendDaily(this, 11);
