@@ -185,7 +185,7 @@ public:
     void checkAddExp(UInt32 now);
     void checkSkillTime();
     bool checkSettleAccounts(UInt32 now);
-    void sendOccupySpotAward(NHIPlayerData * pd, UInt8 spot);
+    void sendOccupySpotAward(NHIPlayerData * pd, UInt8 spot, bool& hasBroad);
     void randomEvent();
     void end(UInt32 now);
     void reset();
