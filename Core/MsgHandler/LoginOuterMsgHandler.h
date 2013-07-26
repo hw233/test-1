@@ -410,7 +410,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setXinYue(atoi(xinyue.c_str()));
             player->setJinQuan(jinquan);
             player->continuousLoginSummerFlow();
-            player->sendQQBoardLoginInfo();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -746,7 +745,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setXinYue(atoi(xinyue.c_str()));
             pl->setJinQuan(jinquan);
             pl->continuousLoginSummerFlow();
-            pl->sendQQBoardLoginInfo();
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
