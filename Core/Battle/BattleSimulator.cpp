@@ -53,6 +53,11 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
     memset(_cur_round_except, 0, sizeof(_cur_round_except));
     _except_count = 0;
     _hit_cnt = 0;
+    _auralRate = 0;
+    _auralLast = 0;
+    _auraValue = 0;
+    if(player)
+        player->setBuddhaLightLast(_auralLast);
 
     for(int i = 0; i < 2; ++i)
     {
@@ -4283,15 +4288,17 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
     if (skill && skill->cond == GData::SKILL_PEERLESS)
     {
-        bool occurFlag = false;;
         bool needConsume = true;
-        if(bf->getBuddhaLightLast() > 0)
+        bool occur = false;
+        if(_auralLast > 0)
         {
-            printf("enter: %u\n", bf->getBuddhaLightLast());
+            occur = true;
             appendDefStatus(e_unBuddhaLight, 0, bf);
-            occurFlag = true;
-            if(uRand(10000) < bf->getBuddhaLightRate() * 1000)
+            if(uRand(10000) < _auralRate * 1000)
                 needConsume = false;
+            _auralLast = 0;
+            if(bf->getSide() < 2 && _player[bf->getSide()])
+                _player[bf->getSide()]->setBuddhaLightLast(_auralLast);
         }
 
         if(needConsume)
@@ -4303,7 +4310,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         if (launchPeerLess)
             *launchPeerLess = 1;
 
-        if(occurFlag)
+        if(occur && _auraValue > 0)
         {
             Int32 target_side = bf->getSide();
             for(UInt8 i = 0; i < 25; i++)
@@ -4311,8 +4318,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, i));
                 if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                     continue;
-                bo->setBuddhaLight(0, 0);
-                setStatusChange_Aura2(bo, bo->getSide(), bo->getPos(), NULL, bo->getBuddhaLightAura(), 0, false);
+                setStatusChange_Aura2(bo, bo->getSide(), bo->getPos(), NULL, _auraValue, 0, false);
             }
         }
     }
@@ -12463,6 +12469,8 @@ void BattleSimulator::doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, in
 
 void BattleSimulator::doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
+    if(_auralRate > 0)
+        return;
     if(!skill || !skill->effect)
         return;
     const std::vector<float>& efv = skill->effect->efv;
@@ -12480,19 +12488,12 @@ void BattleSimulator::doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int targ
         if(ss)
             ef = ss->getEffect(GData::ON_BUDDHA_LIGHT, GData::TYPE_AURA_GET);
 
-        AtkList atklist;
-        getAtkList(bf, skill, atklist);
-        UInt8 cnt = atklist.size();
-        printf("rate: %f, last: %u\n", skill->prob, efl[i]);
-        for(size_t j = 0; j < cnt; ++ j)
-        {
-            BattleFighter* bo = atklist[j].bf;
-            bo->setBuddhaLight(skill->prob, efl[i]);
-            if(ef)
-                bo->setBuddhaLightAura(ef->valueExt1);
-        }
+        _auralRate = skill->prob;
+        _auralLast = efl[i];
+        if(ef)
+            _auraValue = ef->valueExt1;
+        return;
     }
-    appendDefStatus(e_buddhaLight, 0, bf);
 }
 
 bool BattleSimulator::doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, UInt32 dmg)

@@ -699,6 +699,9 @@ private:
 private:
     // 记录每回合命中次数
     UInt8 _hit_cnt;
+    float _auralRate;
+    UInt8 _auralLast;
+    float _auraValue;
     void doSkillStrenghtenHitConfuse(BattleFighter* bf, const GData::SkillBase* skill, GData::SkillStrengthenBase* ss, int target_side, int target_pos);
     bool isFireDefend(const GData::SkillBase* skill);
 

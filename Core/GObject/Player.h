@@ -2473,6 +2473,12 @@ namespace GObject
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);
+
+    private:
+        UInt8 _aura_last;
+    public:
+        void setBuddhaLightLast(UInt8 last) { _aura_last = last; }
+        UInt8 getBuddhaLightLast() { return _aura_last; }
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
