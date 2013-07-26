@@ -1043,14 +1043,14 @@ void NewHeroIsland::calcNext(UInt32 now)
 {
     if (cfg.GMCheck)
     {
-        /*
         _prepareTime = TimeUtil::SharpDayT(0,now) + 11 * 60 * 60 + 50 * 60;
 
         if(_prepareTime + 75 * 60 < now)
             _prepareTime += 24 * 60 * 60;
-        */
+        /*
         _prepareTime = now + 300;
         _startTime = _prepareTime + 10 * 60;
+        */
         _endTime = _startTime + NHEROISLAND_STAGE_TIME * 3 - 60;
     }
     else
