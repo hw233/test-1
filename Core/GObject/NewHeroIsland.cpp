@@ -553,7 +553,6 @@ bool NewHeroIsland::checkSettleAccounts(UInt32 now)
         _noOwned.clear();
         for (UInt8 i = 0; i < NEWHERO_ISLAND_SPOTS-1; ++ i)
             _noOwned.push_back(i);
-        broadcastRank();
         for(UInt8 i = 0; i < NEWHERO_ISLAND_SPOTS; ++ i)
         {
             for (NHISort::iterator iter = _players[i].begin(); iter != _players[i].end(); ++ iter)
@@ -562,7 +561,6 @@ bool NewHeroIsland::checkSettleAccounts(UInt32 now)
                     continue;
                 getIdentity((*iter)->player);
                 (*iter)->type = (*iter)->player->getHIType();
-                //(*iter)->stage = _stage;
                 if ((*iter)->spot == NEWHERO_ISLAND_SPOTS - 1)
                 {
                     UInt8 spot = _noOwned[uRand(_noOwned.size())];
@@ -574,7 +572,8 @@ bool NewHeroIsland::checkSettleAccounts(UInt32 now)
             }
         }
         _players[NEWHERO_ISLAND_SPOTS-1].clear();
-        updateSpotPlayers(NEWHERO_ISLAND_SPOTS - 1);
+        memset(_nplayers[NEWHERO_ISLAND_SPOTS-1], 0, sizeof(_nplayers[NEWHERO_ISLAND_SPOTS-1]));
+        broadcastRank();
         return true;
     }
     return false;
