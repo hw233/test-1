@@ -13,9 +13,6 @@
 namespace GObject
 {
 
-#define NHEROISLAND_BATTLE_TIME 30
-#define NHEROISLAND_STAGE_TIME (cfg.GMCheck ? 21*60 : 3*60)
-
 #define CHECK_MONEY() \
 {\
     UInt32 goldUse = GData::moneyNeed[GData::HISKILL].gold; \
@@ -189,6 +186,7 @@ void NewHeroIsland::playerEnter(Player* player)
                 spot = NEWHERO_ISLAND_SPOTS - 1;
             pd->spot = spot;
         }
+        pd->player = player;
         pd->player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
         pd->type = player->getHIType();
         pd->status = NEWHERO_ISLAND_JOIN;
@@ -230,8 +228,7 @@ void NewHeroIsland::playerEnter(Player* player)
 
     playerInfo(player);
     broadcastRank(player);
-    if(now <= _startTime ||
-            (now >= _stage * NHEROISLAND_STAGE_TIME + _startTime - 60 && now < _stage * NHEROISLAND_STAGE_TIME + _startTime))
+    if (isPrepare(now))
     {
         _players[spot].insert(pd);
         sendPairPlayerInfo(pd, NULL);
@@ -270,7 +267,7 @@ void NewHeroIsland::enterPairPlayer(NHIPlayerData * pd)
             pnhipd.nhipd2 = pd;
             sendPairPlayerInfo(pnhipd.nhipd1, pnhipd.nhipd2);
         }
-        else
+        else if (pnhipd.nhipd1 && pnhipd.nhipd2 && pnhipd.nhipd1 != pd && pnhipd.nhipd2 != pd)
         {
             pairsNHIPlayerData pnhipd0;
             pnhipd0.nhipd1 = pd;
@@ -333,9 +330,7 @@ void NewHeroIsland::playerLeave(Player* player)
     }
     else if (now < _startTime)
     {
-        NHISort::iterator iter = _players[pd->spot].find(pd);
-        if (iter != _players[pd->spot].end())
-            _players[pd->spot].erase(iter);
+        _players[pd->spot].erase(pd);
     }
     if (_nplayers[pd->spot][pd->type-1])
     {
@@ -414,8 +409,7 @@ bool NewHeroIsland::moveTo(Player* player, UInt8 to, bool movecd, bool force)
         cd = false;
     if (enter(pd, to, cd))
     {
-        if(now <= _startTime ||
-                (now >= _stage * NHEROISLAND_STAGE_TIME + _startTime - 60 && now < _stage * NHEROISLAND_STAGE_TIME + _startTime))
+        if (isPrepare(now))
         {
             _players[to].insert(pd);
             sendPairPlayerInfo(pd, NULL);
@@ -568,7 +562,7 @@ bool NewHeroIsland::checkSettleAccounts(UInt32 now)
                     continue;
                 getIdentity((*iter)->player);
                 (*iter)->type = (*iter)->player->getHIType();
-                (*iter)->stage = _stage;
+                //(*iter)->stage = _stage;
                 if ((*iter)->spot == NEWHERO_ISLAND_SPOTS - 1)
                 {
                     UInt8 spot = _noOwned[uRand(_noOwned.size())];
@@ -580,6 +574,7 @@ bool NewHeroIsland::checkSettleAccounts(UInt32 now)
             }
         }
         _players[NEWHERO_ISLAND_SPOTS-1].clear();
+        updateSpotPlayers(NEWHERO_ISLAND_SPOTS - 1);
         return true;
     }
     return false;
@@ -1062,7 +1057,7 @@ void NewHeroIsland::calcNext(UInt32 now)
     else
     {
         _prepareTime = now + 30;
-        _startTime = _prepareTime + 60;
+        _startTime = _prepareTime + 2 * 60;
         _endTime = _startTime + NHEROISLAND_STAGE_TIME * 3 - 60;
     }
 }
@@ -1417,7 +1412,7 @@ void NewHeroIsland::sendPairPlayerInfo(NHIPlayerData * pd1, NHIPlayerData * pd2)
     UInt32 curtime = TimeUtil::Now();
     if(_tickTime)
     {
-        if(curtime >= _stage * NHEROISLAND_STAGE_TIME + _startTime - 60 && curtime < _stage * NHEROISLAND_STAGE_TIME + _startTime)
+        if (isPrepare(curtime))
             timeLeft = _stage * NHEROISLAND_STAGE_TIME + _startTime - curtime;
         else
             timeLeft = _tickTime - curtime;
@@ -1466,14 +1461,14 @@ void NewHeroIsland::sendPairPlayerInfo(NHIPlayerData * pd1, NHIPlayerData * pd2)
     if (pd1 && pd1->status != NEWHERO_ISLAND_ESCAPE)
     {
         allScore = pd1->score[0] + pd1->score[1] + pd1->score[2];
-        st.data<UInt8>(pos) = allScore;
+        st.data<UInt32>(pos) = allScore;
         st << Stream::eos;
         pd1->player->send(st);
     }
     if (pd2 && pd2->status != NEWHERO_ISLAND_ESCAPE)
     {
         allScore = pd2->score[0] + pd2->score[1] + pd2->score[2];
-        st.data<UInt8>(pos) = allScore;
+        st.data<UInt32>(pos) = allScore;
         st << Stream::eos;
         pd2->player->send(st);
     }

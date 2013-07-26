@@ -11,6 +11,9 @@
 namespace GObject
 {
 
+#define NHEROISLAND_BATTLE_TIME 30
+#define NHEROISLAND_STAGE_TIME (cfg.GMCheck ? 21*60 : 6*60)
+
 #define NEWHERO_ISLAND_SPOTS 5
 #define DEFAULT_BUFID (static_cast<UInt8>(-1))
 #define NEWHERO_ISLAND_JOIN   0
@@ -90,7 +93,13 @@ struct hI_score
 {
     bool operator()(const NHIPlayerData* const & pd1, const NHIPlayerData* const & pd2) const
     {
-        return pd1->score[pd1->stage==0 ? 0 : pd1->stage-1] > pd2->score[pd2->stage==0 ? 0 : pd2->stage-1];
+        UInt8 idx = pd1->stage==0 ? 0 : pd1->stage-1;
+        if(pd1->score[idx] == pd2->score[idx])
+        {
+            return pd1->player->getId() > pd2->player->getId();
+        }
+
+        return pd1->score[idx] > pd2->score[idx];
     }
 };
 struct hI_scoreAll
@@ -115,7 +124,7 @@ struct pairsNHIPlayerData
     NHIPlayerData * nhipd2;
 };
 
-typedef std::multiset<NHIPlayerData*, hI_score> NHISort;
+typedef std::set<NHIPlayerData*, hI_score> NHISort;
 typedef std::multiset<NHIPlayerData*, hI_scoreAll> NHISortAll;
 
 class NewHeroIsland
@@ -164,6 +173,12 @@ public:
     {
         _status = status;
         sendDaily(NULL);
+    }
+    inline bool isPrepare(UInt32 now = TimeUtil::Now())
+    {
+        return now <= _startTime ||
+                (now >= _stage * NHEROISLAND_STAGE_TIME + _startTime - 60
+                 && now < _stage * NHEROISLAND_STAGE_TIME + _startTime);
     }
     static void Init();
     void useSkill(Player * player, UInt8 skillid, UInt8 useGold);
