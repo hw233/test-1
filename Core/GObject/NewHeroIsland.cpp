@@ -27,8 +27,7 @@ namespace GObject
 
 NewHeroIsland_Skill NewHeroIsland::_skills[5];
 static float factor[5] = {1.0, 1.5, 2.0, 2.5, 3.0};
-//static UInt32 maxScore[5] = {5000, 20000, 40000, 80000, 0xFFFFFFFF};
-static UInt32 maxScore[5] = {100, 400, 800, 1600, 160000};
+static UInt32 maxScore[5] = {5000, 20000, 40000, 80000, 0xFFFFFFFF};
 
 inline UInt32 calcExp(UInt8 lvl)
 {
@@ -566,6 +565,7 @@ bool NewHeroIsland::checkSettleAccounts(UInt32 now)
                     UInt8 spot = _noOwned[uRand(_noOwned.size())];
                     enter(*iter, spot, false);
                     _players[spot].insert(*iter);
+                    ++_nplayers[spot][(*iter)->type-1];
                 }
                 playerInfo((*iter)->player);
                 sendPairPlayerInfo(*iter, NULL);

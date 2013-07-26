@@ -146,7 +146,6 @@ public:
 
 private:
     NHISortAll _sorts;
-    //std::vector<NHIPlayerData *> _players[NEWHERO_ISLAND_SPOTS];
     NHISort _players[NEWHERO_ISLAND_SPOTS];
     std::map<Player *, NHIPlayerData *> _allPlayer;
     std::vector<pairsNHIPlayerData> _pairPlayer[NEWHERO_ISLAND_SPOTS];
