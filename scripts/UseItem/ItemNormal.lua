@@ -9293,40 +9293,13 @@ function ItemNormal_00009408(iid, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return false
     end
-    local items = { 15, 499, 51, 500, 506, 508 }
-    local chance = { 2608, 4782, 6521, 8260, 9130, 10000 }
-    for i = 1, num do
-        local rnd = math.random(1, 10000)
-        local itemId = 0
-        for k = 1, #chance do
-            if rnd <= chance[k] then
-                itemId = items[k]
-                break
-            end
-        end
-        if itemId == 499 then
-            player:getCoupon(10)
-        else
-            package:Add(itemId, 1, true, false, 2)
-        end
-    end
-
-    package:DelItemSendMsg(iid, player)
-    return num;
-end
-
-function ItemNormal_00009409(iid, num, bind, param)
-    local player = GetPlayer()
-    local package = player:GetPackage()
-    if package:GetRestPackageSize() < (1+(1*num*1)/99) then
-        player:sendMsgCode(2, 1011, 0);
-        return false
-    end
     local items = {
-        [9409] = { {15, 2}, {499, 30}, {48, 1}, {1412, 1}, {500, 1}, {506, 1}, {508, 1} },
-        [9410] = { {15, 4}, {499, 50}, {49, 1}, {1411, 1}, {500, 1}, {506, 1}, {508, 1} },
+        [9408] = { {35, 1}, {499, 5}, {51, 1}, {500, 1}, {1328, 1} },
+        [9409] = { {35, 5}, {499, 10}, {48, 1}, {500, 1}, {1327, 1} },
+        [9410] = { {15, 1}, {499, 20}, {49, 1}, {500, 1}, {1326, 1} },
+        [9411] = { {15, 1}, {499, 20}, {29, 20}, {133, 1}, {1327, 1} },
     }
-    local chance = { 2223, 4075, 5556, 7037, 8518, 9259, 10000 }
+    local chance = { 4000, 4500, 5500, 6000, 10000 }
     for i = 1, num do
         local rnd = math.random(1, 10000)
         local itemId = 0
@@ -9335,37 +9308,6 @@ function ItemNormal_00009409(iid, num, bind, param)
             if rnd <= chance[k] then
                 itemId = items[iid][k][1]
                 count = items[iid][k][2]
-                break
-            end
-        end
-        if itemId == 499 then
-            player:getCoupon(count)
-        else
-            package:Add(itemId, count, true, false, 2)
-        end
-    end
-
-    package:DelItemSendMsg(iid, player)
-    return num;
-end
-
-function ItemNormal_00009411(iid, num, bind, param)
-    local player = GetPlayer()
-    local package = player:GetPackage()
-    if package:GetRestPackageSize() < (1+(1*num*1)/99) then
-        player:sendMsgCode(2, 1011, 0);
-        return false
-    end
-    local items = { {15, 5}, {499, 80}, {1325, 1}, {133, 1}, {30, 1}, {507, 1}, {509, 1} }
-    local chance = { 2692, 4999, 5384, 8076, 8461, 8846, 10000 }
-    for i = 1, num do
-        local rnd = math.random(1, 10000)
-        local itemId = 0
-        local count = 0
-        for k = 1, #chance do
-            if rnd <= chance[k] then
-                itemId = items[k][1]
-                count = items[k][2]
                 break
             end
         end
@@ -11112,9 +11054,9 @@ local ItemNormal_Table = {
     [9388] = ItemNormal_00009388,
     [9390] = ItemNormal_00009390,
     [9408] = ItemNormal_00009408,
-    [9409] = ItemNormal_00009409,
-    [9410] = ItemNormal_00009409,
-    [9411] = ItemNormal_00009411,
+    [9409] = ItemNormal_00009408,
+    [9410] = ItemNormal_00009408,
+    [9411] = ItemNormal_00009408,
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,
     [9902] = ItemNormal_NameCard,
