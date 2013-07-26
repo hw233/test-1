@@ -5670,7 +5670,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
     if (op  < 6 )
         return;
-    if(op != 10 && !player->hasChecked())
+    if((op != 10 && op!= 20 ) && !player->hasChecked())
          return;
 
     switch(op)
