@@ -1193,9 +1193,9 @@ void NewHeroIsland::rankReward1()
             cnt2 = 1;
             cnt3 = 1;
         }
-        SYSMSGV(content, 2319, _stage, (*it)->score[_stage-1], prestige, cnt1, cnt2, cnt3);
         //MailPackage::MailItem item[] = {{MailPackage::Prestige, prestige*count}, {9408, cnt1*count}, {9409, cnt2*count}, {9410, cnt3*count},};
         MailPackage::MailItem item[] = {{9408, cnt1*count}, {9409, cnt2*count}, {9410, cnt3*count},};
+        SYSMSGV(content, 2319, _stage, (*it)->score[_stage-1], prestige, item[0].count, item[1].count, item[2].count);
         MailItemsInfo itemsInfo(item, NewHeroIslandAward, 3);
         Mail * mail = (*it)->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
