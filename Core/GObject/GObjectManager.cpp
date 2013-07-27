@@ -1983,8 +1983,17 @@ namespace GObject
 
 			fgt2->setPotential(specfgtobj.potential, false);
             fgt2->setCapacity(specfgtobj.capacity, false);
-			fgt2->setLevel(specfgtobj.level, true);
 			fgt2->setExp(specfgtobj.experience);
+            if (!fgt2->isPet())
+            {
+                UInt8 rlvl = GData::expTable.exp2level(specfgtobj.experience);
+#ifdef _DEBUG
+                fprintf(stderr, "dblvl: %u, explvl: %u, exp: %lu\n", specfgtobj.level, rlvl, specfgtobj.experience);
+#endif
+                if (specfgtobj.level != rlvl)
+                    specfgtobj.level = rlvl;
+            }
+            fgt2->setLevel(specfgtobj.level, true);
 			fgt2->setPExp(specfgtobj.practiceExp);
 			fgt2->setCurrentHP(specfgtobj.hp, false);
             fgt2->setAcupoints(specfgtobj.acupoints, false);
