@@ -610,6 +610,34 @@ function RunNewRegisterAwardAD_RF(player, idx)
     end
     return 1
 end
+function RunSummerFlowAward(player, idx)
+    if nil == player or nil == idx then
+        return 0
+    end
+    if 1 ~= idx and 2 ~= idx and 3 ~= idx and 4 ~= idx then
+        return 0
+    end
+    local item = {
+        [1] = {{499,100},{9371,10},{15,5},{9141,5},{9144,5}},
+        [2] = {{499,188},{9371,20},{15,10},{9141,8},{9144,8}},
+        [3] = {{499,288},{9371,20},{15,10},{9141,8},{9144,8},{503,20},{500,20}},
+        [4] = {{499,365},{9371,20},{15,10},{9141,8},{9144,8},{503,20},{500,20}},
+    };
+    local award = item[idx]
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #award then
+        player:sendMsgCode(2, 1011, 0)
+        return 0
+    end
+    for _, val in pairs(award) do 
+        if val[1] == 499 then
+            player:getCoupon(val[2])
+        else
+            package:Add(val[1], val[2], true, false, 31)
+        end
+    end
+    return 1
+end
 
 function Run11ActAward(player, opt)
     if player == nil or opt < 1 or opt > 2 then

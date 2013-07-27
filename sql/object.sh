@@ -178,6 +178,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130712_1.sql #fighter表里面添加 innateTrump 字段
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130721_1.sql
 
     #. clearshiyamen.sh
 }

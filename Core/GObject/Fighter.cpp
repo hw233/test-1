@@ -64,7 +64,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0),  _pexpAddTmp(0) , _pexpMax(0), _potential(1.0f),
     _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _halo(NULL), _fashion(NULL), _weapon(NULL),
     _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false), _skillBPDirty(false),
-    _expFlush(false), _expMods(0), _expEnd(0), _pexpMods(0), _forceWrite(false), _battlePoint(0.0f), _skillBP(0.0f), _praadd(0),
+    _expMods(0), _expEnd(0), _pexpMods(0), _forceWrite(false), _battlePoint(0.0f), _skillBP(0.0f), _praadd(0),
     _attrType1(0), _attrValue1(0), _attrType2(0), _attrValue2(0), _attrType3(0), _attrValue3(0),
     favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
@@ -378,7 +378,12 @@ UInt32 Fighter::getRingId()
 	return _ring ? _ring->getId() : 0;
 }
 
-bool Fighter::addExp( UInt64 e, UInt32 extraExp )
+void Fighter::flushExp()
+{
+    updateToDB(3, _exp);
+}
+
+bool Fighter::addExp( UInt64 e, UInt32 extraExp, bool writedb )
 {
 	if(e == 0 || _level >= LEVEL_MAX)
 		return false;
@@ -436,12 +441,10 @@ bool Fighter::addExp( UInt64 e, UInt32 extraExp )
         }
         worldBoss.setLevel(_level);
         _owner->sendLevelPack(_level);
-        _expFlush = true;
 	}
 	else
 	{
-		sendModification(3, _exp);
-        _expFlush = false;
+		sendModification2(3, _exp, writedb);
 	}
 	return r;
 }
@@ -586,24 +589,12 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
     }
 
 	switch(t)
-	{
-	case 1: field = "hp"; break;
+	{ // 不保存hp, 每次重启都满血
+	//case 1: field = "hp"; break;
 	case 2: field = "level"; break;
 	case 3:
         {
-#if 0
-            UInt32 now = time(NULL);
-            ++_expMods;
-            if (_expFlush || _expMods >= 10 || now > _expEnd) // XXX: 等级变化，10次变化，10分钟
-            {
-#endif
-                DB2().PushUpdateData("UPDATE `fighter` SET `experience` = %" I64_FMT "u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", v, _id, _owner->getId());
-#if 0
-                _expFlush = false;
-                _expMods = 0;
-                _expEnd = now + 10*60;
-            }
-#endif
+            DB2().PushUpdateData("UPDATE `fighter` SET `experience` = %" I64_FMT "u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", v, _id, _owner->getId());
         }
 		return;
 
@@ -726,6 +717,11 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 void Fighter::sendModification( UInt8 t, UInt64 v )
 {
 	sendModification(1, &t, &v);
+}
+
+void Fighter::sendModification2( UInt8 t, UInt64 v, bool writedb )
+{
+	sendModification(1, &t, &v, writedb);
 }
 
 void Fighter::sendModificationAcupoints( UInt8 t, int idx, bool writedb )
@@ -868,6 +864,9 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 
 ItemEquip * Fighter::setFashion( ItemFashion* r, bool writedb )
 {
+    if (r && r->getClass() != Item_Fashion)
+        return NULL;
+
 	ItemEquip * rr = _fashion;
 	_fashion = r;
 	if(writedb)
@@ -886,6 +885,9 @@ ItemEquip * Fighter::setFashion( ItemFashion* r, bool writedb )
 
 ItemEquip * Fighter::setHalo( ItemHalo* r, bool writedb )
 {
+    if (r && r->getClass() != Item_Halo)
+        return NULL;
+
 	ItemEquip * rr = _halo;
 	_halo = r;
 
@@ -920,6 +922,9 @@ ItemEquip * Fighter::setHalo( ItemHalo* r, bool writedb )
 
 ItemEquip * Fighter::setInnateTrump(ItemInnateTrump* r, bool writedb)
 {
+    if (r && r->getClass() != Item_InnateTrump)
+        return NULL;
+
 	ItemEquip * rr = _innateTrump;
 	_innateTrump = r;
 
@@ -975,6 +980,9 @@ UInt16 Fighter::getInnateSkill()
 
 ItemWeapon * Fighter::setWeapon( ItemWeapon * w, bool writedb )
 {
+    if (w && w->getClass() != Item_Weapon)
+        return NULL;
+
 	ItemWeapon * r = _weapon;
 	_weapon = w;
 	if(writedb)
@@ -994,6 +1002,14 @@ ItemWeapon * Fighter::setWeapon( ItemWeapon * w, bool writedb )
 
 ItemArmor * Fighter::setArmor( int idx, ItemArmor * a, bool writedb )
 {
+    if (a && ((idx == 0 && a->getClass() != Item_Armor1) ||
+                (idx == 1 && a->getClass() != Item_Armor2) ||
+                (idx == 2 && a->getClass() != Item_Armor3) ||
+                (idx == 3 && a->getClass() != Item_Armor4) ||
+                (idx == 4 && a->getClass() != Item_Armor5)
+                ))
+        return NULL;
+
 	ItemArmor * r = _armor[idx];
 	_armor[idx] = a;
 	if(writedb)
@@ -1012,6 +1028,9 @@ ItemArmor * Fighter::setArmor( int idx, ItemArmor * a, bool writedb )
 
 ItemEquip * Fighter::setAmulet( ItemEquip * a, bool writedb )
 {
+    if (a && a->getClass() != Item_Amulet)
+        return NULL;
+
 	ItemEquip * r = _amulet;
 	_amulet = a;
 	if(writedb)
@@ -1029,6 +1048,9 @@ ItemEquip * Fighter::setAmulet( ItemEquip * a, bool writedb )
 
 ItemEquip * Fighter::setRing( ItemEquip * r, bool writedb )
 {
+    if (r && r->getClass() != Item_Ring)
+        return NULL;
+
 	ItemEquip * rr = _ring;
 	_ring = r;
 	if(writedb)
@@ -1146,7 +1168,7 @@ inline bool checkTrumpMutually(Player* _owner, UInt32 trumpid)
 
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
-    ItemEquip* t = 0;
+   ItemEquip* t = 0;
     if (trump && (trump->getClass() == Item_Halo || trump->getClass() == Item_InnateTrump))
     {
         //return setHalo((ItemHalo*)trump, writedb);
@@ -1154,6 +1176,10 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
         GObjectManager::pushEquipment(trump);
         return NULL;
     }
+
+    if (trump && trump->getClass() != Item_Trump)
+        return NULL;
+ 
     if (!trump || (canSetTrump(idx, trump->getId()) && !checkTrumpMutually(_owner, trump->GetItemType().getId())))
     {
         if
