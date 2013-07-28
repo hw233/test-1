@@ -85,7 +85,10 @@ UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
 UInt32 PlayerCopy::getEnterGold(Player* pl)
 {
     UInt8 vipl = pl->getVipLevel();
-    if(vipl > 3 ||(pl->inVipPrivilegeTime()))
+    UInt32 VipType =pl-> GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+    if(pl->in7DayFromCreated() && VipType >4)
+         VipType -= 2;
+    if(vipl > 3 ||(pl->inVipPrivilegeTime() && !( (VipType==0||VipType ==1 ||VipType ==3 ) ) ))
         vipl = 3;
     UInt32 extraVipGold[4][3] = {
         {20, 20, 20},

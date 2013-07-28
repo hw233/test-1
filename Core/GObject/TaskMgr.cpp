@@ -1126,7 +1126,8 @@ namespace GObject
 		if (count <= 0) return false;
 		//是否有免费刷新的机会
 		UInt32 now = TimeUtil::Now();
-		if(viplvl >= 4 || m_PlayerOwner->inVipPrivilegeTime())
+        UInt32 VipType = m_PlayerOwner->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+		if(viplvl >= 4 || ( m_PlayerOwner->inVipPrivilegeTime()&&(VipType !=1 &&VipType!=3) ))
 		{
 			if (dayTaskData->m_PreFlushTime == 0 || TimeUtil::SharpFourtyMin(0, dayTaskData->m_PreFlushTime) != TimeUtil::SharpFourtyMin(0, now))
 			{

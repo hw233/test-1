@@ -3850,7 +3850,9 @@ namespace GObject
         {
             UInt32 viplvl = getVipLevel();
             UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
-            if((viplvl >= 4 && viplvl <= 7) || ( inVipPrivilegeTime() && VipType % 2==1 ))
+            if(in7DayFromCreated() && VipType >4 )
+                 VipType -= 2 ;
+            if((viplvl >= 4 && viplvl <= 7) || ( inVipPrivilegeTime() && VipType == 5 ))
                   count = 60 * 16;
             if(( viplvl > 7 && viplvl <= 15)||(inVipPrivilegeTime() &&( VipType %2 ==0)))
                 count = 60 * 24;
@@ -6211,7 +6213,10 @@ namespace GObject
                 if (_playerData.fshimen[i] == taskid) {
                     if (!World::getNewYear())
                     {
-                        if (getVipLevel() < 3 && (!inVipPrivilegeTime())) 
+                        UInt32 VipType =GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+                        if(in7DayFromCreated() && VipType >4 )
+                            VipType -= 2 ;
+                        if (getVipLevel() < 3 && !((inVipPrivilegeTime()&&!(VipType==0||VipType ==1 ||VipType ==3)))) 
                         {
                             sendMsgCode(0, 1003);
                             return false;
@@ -6255,8 +6260,10 @@ namespace GObject
                 if (_playerData.fyamen[i] == taskid) {
                     if (!World::getNewYear())
                     {
-                        if (getVipLevel() < 3 && (!inVipPrivilegeTime())) {
-                            sendMsgCode(0, 1003);
+                        UInt32 VipType =GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+                        if(in7DayFromCreated() && VipType >4 )
+                            VipType -= 2 ;
+                        if (getVipLevel() < 3 && !(inVipPrivilegeTime()&& !( VipType==0||VipType ==1 ||VipType ==3 )) ) { sendMsgCode(0, 1003);
                             return false;
                         }
                     }
@@ -10066,8 +10073,11 @@ namespace GObject
         }
 #endif
         // 限时vip特权
-    //    if(inVipPrivilegeTime())
-     //       factor += 1.0f;
+       UInt32 VipType =GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+       if(in7DayFromCreated() && VipType >4 )
+           VipType -= 2 ;
+        if(inVipPrivilegeTime()&&(VipType==0||VipType ==1 ||VipType ==3 ))
+            factor += 1.0f;
 
         return factor;
     }
@@ -10214,8 +10224,10 @@ namespace GObject
                 {
                     UInt32 extraPExp = 0;
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
-                     UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);  
-                    if(inVipPrivilegeTime()&& VipType==0)
+                    UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);  
+                    if(in7DayFromCreated() && VipType >4 )
+                         VipType -= 2 ;
+                    if(inVipPrivilegeTime()&&(VipType==0||VipType ==1 ||VipType ==3 ) )
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
@@ -10272,8 +10284,10 @@ namespace GObject
                 {
                     UInt32 extraPExp = 0;
                     UInt32 pExp = fgt->getPracticeInc() * pfexp->counts[i];
-                     UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);  
-                    if(inVipPrivilegeTime() && VipType==0)
+                    UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);  
+                    if( in7DayFromCreated() && VipType >4 )
+                        VipType -= 2 ;
+                    if(inVipPrivilegeTime() && ( VipType==0||VipType ==1 ||VipType ==3 ) )
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
                     fgt->addPExp(pExp, true, false, extraPExp);
@@ -20749,6 +20763,15 @@ void Player::sendVipPrivilege(bool isLStar)
     if(isLStar)
         extra |= 0x4;
     UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+    if(inVipPrivilegeTime()&&VipType == 0)
+    {
+        VipType =1;
+        if(VIP_PRIVILEGE_7DAY(validate))
+            VipType =3;
+        else 
+            VipType =1;
+        SetVar(VAR_VIP_PRIVILEGE_DATA_TYPE, VipType);
+    }
     UInt32  Days = (VipType+1)/2;
     if( in7DayFromCreated() && VipType >4 ) 
         VipType -= 2 ;
