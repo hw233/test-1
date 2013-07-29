@@ -1526,6 +1526,7 @@ void ClanCity::end()
         giveAllScore(1, 50);
     }
 
+    Player* udpLogPlayer = NULL;
     for(CCBClanMap::iterator itc = m_clans.begin(); itc != m_clans.end(); ++ itc)
     {
         CCBClan* ccl = itc->second;
@@ -1545,6 +1546,8 @@ void ClanCity::end()
         CCBPlayer* pl = itp->second;
         Player* player = pl->fgt.player;
         Clan* cl = player->getClan();
+        if(!udpLogPlayer)
+            udpLogPlayer = player;
 
         player->setInClanCity(false);
         player->clearHIAttr();
@@ -1611,6 +1614,8 @@ void ClanCity::end()
         Clan* cl = player->getClan();
         player->setInClanCity(false);
         pl->score += leavescore[pl->side];
+        if(!udpLogPlayer)
+            udpLogPlayer = player;
 
         player->getAchievement(pl->score*2);
 
@@ -1665,6 +1670,32 @@ void ClanCity::end()
         Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
+    }
+
+    if(udpLogPlayer != NULL)
+    {
+        if(m_spots[0].hp == 0)
+        {
+            if(m_type == CCB_CITY_TYPE_DEF)
+            {
+                udpLogPlayer->udpLog("moshouchenggui", "F_130723_2", "", "", "", "", "act");
+            }
+            else
+            {
+                udpLogPlayer->udpLog("moshouchenggui", "F_130723_4", "", "", "", "", "act");
+            }
+        }
+        else
+        {
+            if(m_type == CCB_CITY_TYPE_DEF)
+            {
+                udpLogPlayer->udpLog("moshouchenggui", "F_130723_3", "", "", "", "", "act");
+            }
+            else
+            {
+                udpLogPlayer->udpLog("moshouchenggui", "F_130723_5", "", "", "", "", "act");
+            }
+        }
     }
 
     Stream st(REP::CCB);
@@ -1773,7 +1804,7 @@ bool ClanCity::playerEnter(Player * player)
 		player->sendMsgCode(0, 2300);
 		return false;
 	}
- player->getSurnameLegendAward(e_sla_cb);
+    player->getSurnameLegendAward(e_sla_cb);
 	player->setInClanCity(true);
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
@@ -1787,6 +1818,7 @@ bool ClanCity::playerEnter(Player * player)
         CCBPlayer* pl = NULL;
         if(it == m_players_leave.end())
         {
+            player->udpLog("moshouchenggui", "F_130723_1", "", "", "", "", "act");
             pl = new CCBPlayer(e_player);
             pl->fgt.player = player;
             pl->side = side;

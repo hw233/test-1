@@ -100,8 +100,7 @@ namespace GObject
         VAR_ATYITEM_5 = 64, //活跃度星期五奖励
         VAR_ATYITEM_6 = 65, //活跃度星期六奖励
         VAR_ATYITEM_7 = 66, //活跃度星期天奖励
-
-        VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
+VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_FIGHTER1_3_6_8 = 68, // 繁体版主将潜力值达到1.3，资质达到6.8活动是否达成
 
         VAR_CFRIEND_1 = 70, //密友等级相应个数 1级
@@ -277,9 +276,10 @@ namespace GObject
         VAR_TOTALRECHARGEACT = 217, // 活动期间充值总额
         VAR_DIRECTPUROPEN = 218, // 幸运星活动直购是否开启
         VAR_DIRECTPURCNT = 219, // 幸运星活动直购次数
+        VAR_LEFTTIMES = 220, // 剩余挂机时间
 
         /*
-         * 【注:此段var(220--239)貌似未被占用】
+         * 【注:此段var(221--239)貌似未被占用】
          */
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
@@ -482,6 +482,10 @@ namespace GObject
        
        VAR_VIP_PRIVILEGE_DATA_TYPE = 540 ,     //新手御剑奖励类型(0-未开通，1-七大豪享特权一阶段，2-十大至尊特权一阶段，3-七大豪享特权二阶段，4-十大至尊特权二阶段，5-七大梦幻特权，6-十大梦幻特权)
       VAR_VIP_PRIVILEGE_BREAK_LAST = 541 ,
+      VAR_SUMMERFLOW_TYPE = 542 ,
+      VAR_SUMMERFLOW_AWARD = 543,   //是否领取暑期回流礼包
+      VAR_QQBOARD = 544 ,
+      VAR_QQBOARD_AWARD = 545,
         VAR_MAX,
     };
 
@@ -736,6 +740,7 @@ namespace GObject
             REGISTER_VAR(VAR_TOTALRECHARGEACT, CYCLE_NONE);
             REGISTER_VAR(VAR_DIRECTPUROPEN, CYCLE_NONE);
             REGISTER_VAR(VAR_DIRECTPURCNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_LEFTTIMES, CYCLE_NONE);
             REGISTER_VAR(VAR_USETAEL_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USECOUPON_CNT, CYCLE_DAY);
             REGISTER_VAR(VAR_USEGOLD_CNT, CYCLE_DAY);
@@ -764,6 +769,10 @@ namespace GObject
             REGISTER_VAR(VAR_VIP_PRIVILEGE_DATA, CYCLE_DAY);
             REGISTER_VAR(VAR_VIP_PRIVILEGE_DATA_TYPE, CYCLE_NONE);
             REGISTER_VAR(VAR_VIP_PRIVILEGE_BREAK_LAST, CYCLE_NONE);
+            REGISTER_VAR(VAR_SUMMERFLOW_TYPE, CYCLE_NONE);
+            REGISTER_VAR(VAR_SUMMERFLOW_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_QQBOARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_QQBOARD_AWARD, CYCLE_NONE);
             
             REGISTER_VAR(VAR_TUIGUAN_AWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_PET_CUILIAN_DAILY_CNT_DATE, CYCLE_NONE);

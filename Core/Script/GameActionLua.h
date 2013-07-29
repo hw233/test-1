@@ -256,9 +256,11 @@ namespace Script
         UInt16 RunTargetAwardRF(Player* player);
         UInt8 RunNewRegisterAward(Player* player);
         UInt8 RunNewRegisterAwardAD_RF(Player* player, UInt8 idx);
+        UInt8 RunSummerFlowAward(Player* player, UInt8 idx);
         UInt8 RunBirthdayAward(Player* player);
         bool  RunNewRC7DayLoginAward(Player* player, UInt8 val);
         bool  RunNewRC7DayLoginAward2(Player* player, UInt8 val);
+        bool  RunQQBoardInstantLoginAward(Player* player, UInt8 val);
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         UInt8 RunNewRC7DayTargetAward(Player* player);
         UInt8 RunBlueDiamondAward(Player* player, UInt8 opt);
@@ -375,6 +377,7 @@ namespace Script
         Table GetFairySparElement(UInt8 flag);
         UInt8 onVipLevelAward(Player* player, UInt8 opt);
         bool onFishUserPackage(Player* player, UInt8 idx);
+        Table GetNewHeroIslandBuffs();
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

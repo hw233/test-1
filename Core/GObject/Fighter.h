@@ -485,10 +485,12 @@ public:
 	UInt32 getMaxHP();
 
 	UInt32 regenHP(UInt32);
-	bool addExp(UInt64, UInt32 = 0);
+	bool addExp(UInt64, UInt32 = 0, bool = true);
 	bool addPExp(Int32, bool = true, bool = false, UInt32 = 0);
+    void flushExp();
 
 	void sendModification(UInt8 t, UInt64 v);
+	void sendModification2(UInt8 t, UInt64 v, bool = true);
 	void sendMaxSoul();
 	void sendModification(UInt8 n, UInt8 * t, UInt64 * v, bool = true);
 	void sendModification(UInt8 t, ItemEquip * v, bool = true);
@@ -827,7 +829,6 @@ protected:
 	UInt32 _maxHP;
 	bool _bPDirty;
 	bool _skillBPDirty;
-    bool _expFlush;
     UInt16 _expMods;
     UInt32 _expEnd;
     UInt16 _pexpMods;

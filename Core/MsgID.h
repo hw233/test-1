@@ -293,6 +293,7 @@ namespace REQ
     const UInt8 SALE_OP             = 0x87;// 0xC7
     /**英雄岛 */
     const UInt8 HERO_ISLAND         = 0x97;
+    const UInt8 NEWHERO_ISLAND      = 0xA6;
     /**设置密码 */
     const UInt8 OP_PWD              = 0xCD;
     /** */
@@ -571,6 +572,7 @@ namespace REP
     const UInt8 FARIY_SPAR =          0x6E;
 
     const UInt8 HERO_ISLAND         = 0x97;
+    const UInt8 NEWHERO_ISLAND      = 0xA6;
     const UInt8 CLANREWARD          = 0x9C;
     const UInt8 GET_CLANREWARD      = 0x9D;
     const UInt8 ALLOCATECLANREWARD  = 0x9E;

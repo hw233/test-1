@@ -82,8 +82,8 @@ namespace GObject
 #define PLAYER_BUFF_ONLINE          0x22	//?ۻ?????ʱ??
 #define PLAYER_BUFF_HIFIGHT         0x23    //Ӣ?۵???????ȴ
 #define PLAYER_BUFF_HIWEAK          0x24
-#define PLAYER_BUFF_HIMASTER_SOUL   0x25
-#define PLAYER_BUFF_HIMOVE          0x26
+#define PLAYER_BUFF_HIMS            0x25    //妙手回春
+#define PLAYER_BUFF_HIMOVE          0x26    //英雄岛移动
 
 #define PLAYER_BUFF_HIRA1           0x27    //  5489
 #define PLAYER_BUFF_HIRA2           0x28    //  5490
@@ -106,11 +106,11 @@ namespace GObject
 #define PLAYER_BUFF_HIRA19          0x39    //  5507
 #define PLAYER_BUFF_HIRA20          0x3A    //  5508
 
-#define PLAYER_BUFF_HIPG            0x3B    // ?̹?֮f
-#define PLAYER_BUFF_HIBT            0x3C    // ???篿?
-#define PLAYER_BUFF_HILN            0x3D    // ??Ԫ??ŭ
-#define PLAYER_BUFF_HIJZ            0x3E    // ???н???
-#define PLAYER_BUFF_HIESCAPE        0x3F    // Ӣ?۵?????
+#define PLAYER_BUFF_HIPG            0x3B    // 盘古之力
+#define PLAYER_BUFF_HIBT            0x3C    // 玲珑宝塔
+#define PLAYER_BUFF_HILN            0x3D    // 混元灵怒
+#define PLAYER_BUFF_HIJZ            0x3E    // 五行禁阵
+#define PLAYER_BUFF_HIESCAPE        0x3F    // 英雄岛逃亡
 
 #define PLAYER_BUFF_AMARTIAL_WIN    0x40    // ??????wʤ??????
 #define PLAYER_BUFF_YBUF            0x41
@@ -283,8 +283,11 @@ namespace GObject
 	{
 	public:
 		EventAutoBattle(Player * player, UInt32 interval, UInt32 count, GData::NpcGroup * ng, UInt32 final)
-			: EventBase(player, interval, count), _npcGroup(ng), _finalEnd(final)
+			: EventBase(player, interval, count), _npcGroup(ng), _finalEnd(final), _writedb(true)
 		{}
+
+        ~EventAutoBattle();
+
 		virtual UInt32 GetID() const { return EVENT_AUTOBATTLE; }
 		void Process(UInt32);
 		void notify();
@@ -299,6 +302,7 @@ namespace GObject
 	private:
 		GData::NpcGroup * _npcGroup;
 		UInt32 _finalEnd;
+        bool _writedb;
 	};
 
 	class EventFighterTrain : public EventBase
@@ -792,6 +796,8 @@ namespace GObject
         void sendOpenAct(UInt32);
         void continuousLogin(UInt32 now);
         void continuousLoginRF(UInt32 now);
+        void continuousLoginSummerFlow();
+        void SetMemCach();
         void getContinuousReward(UInt8 type, UInt8 idx = 0);
         void getContinuousRewardRF(UInt8 type, UInt8 idx = 0);
         void turnOnRC7Day();
@@ -803,6 +809,7 @@ namespace GObject
         void setContinuousRFAward(UInt32 no);
         void sendFourCopAct();
         void sendLuckybagInfo();
+        void sendSummerFlowInfo();
 		void Reconnect();
 
 		void Logout(bool = false);	//???????߲???
@@ -838,6 +845,7 @@ namespace GObject
         //void resetThanksgiving();
         void offlineExp(UInt32);
         void getOfflineExp();
+        UInt32 getAutoBattleCount();
 
         void sendShusanLoveTitleCard(int);
         void sendMayDayTitleCard(int);
@@ -1068,17 +1076,23 @@ namespace GObject
         UInt8 GetColor() const;
         UInt8 getPortraitAndColor() const;
 		UInt64 GetExp() const;
-		void AddExp(UInt64, UInt8 mlvl = 0, UInt32 extraExp = 0);
+		void AddExp(UInt64, UInt8 mlvl = 0, UInt32 extraExp = 0, bool writedb = true);
 		void AddPExp(UInt32);
+        void flushExp();
+        void flushLastExp();
 		void AddPExpBy(Player*,UInt32);
 		void AddItemBy(Player*,UInt16,UInt16,bool);
-		void pendExp(UInt32, bool = false);
+		void pendExp(UInt32, bool = false, bool = true);
 		void setLevelAndExp(UInt8, UInt64);
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
         UInt8 allHpP();
         UInt32 getBattleMaxHp();
         UInt32 getBattleCurrentHp(); 
+
+        void setLeftTimes(UInt32 c) { SetVar(VAR_LEFTTIMES, c); }
+        UInt32 getLeftTimes() { return GetVar(VAR_LEFTTIMES); }
+        void offlineAutoExp(UInt32 now);
 
         bool isCopyPassed(UInt8 copyid);
         bool inVipPrivilegeTime();
@@ -1944,7 +1958,7 @@ namespace GObject
         void qixiUdpLog(UInt32 id);
         void clanUdpLog(UInt32 id);
         void countryBattleUdpLog(UInt32 id, UInt8 country, std::string str = "");
-        void heroIslandUdpLog(UInt32 id, UInt8 type);
+        void heroIslandUdpLog(UInt32 id, UInt8 type, UInt16 value = 0);
         void secondSoulUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void wBossUdpLog(UInt32 id);
         void clanCopyUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
@@ -2069,11 +2083,11 @@ namespace GObject
         void makeFire(UInt32 id1, UInt32 id2);
 
         void getAward();
-        void genAward(Stream& st);
-        bool genAward();
-
+        int genAward(Stream& st);
+        int genAward();
         void getAward(UInt8 type, UInt8 opt);
         void getSSDTAward(UInt8 opt);
+        void getAwardFromSurmmeFlowr();
         void sendSSDTInfo();
         void getHappyAward(UInt8 opt);
         void sendHappyInfo(UInt16 itemId = 0);
@@ -2160,7 +2174,10 @@ namespace GObject
         void sendNewRC7DayLogin();
         void sendNewRC7DayRecharge();
         void sendNewRC7DayTarget(UInt8 idx = 0);
+        void sendQQBoardLoginInfo();
+        void SetQQBoardValue();
         void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
+        void getQQBoardInstantLoginAward(UInt8 val);
         void getNewRC7DayRechargeAward(UInt8 val);
         void getNewRC7DayTargetAward(UInt8 val);
         void get11DailyAward(UInt8 opt);

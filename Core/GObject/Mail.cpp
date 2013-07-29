@@ -90,6 +90,9 @@ bool MailPackage::takeIt( Player * player, bool gm )
 			case Achievement:
 				player->getAchievement(it->second + ((it->first & 0x0FFF)<< 16));
 				break;
+			case Prestige:
+				player->getPrestige(it->second + ((it->first & 0x0FFF)<< 16));
+				break;
 			}
 		}
 		else
@@ -129,6 +132,8 @@ void MailPackage::makeInfo(Stream& st)
 				st.data<UInt32>(off + sizeof(UInt32) * 3) = ((it->first & 0x0FFF) << 16) + it->second;
 				break;
 			case Achievement:
+				break;
+			case Prestige:
 				break;
 			default:
 				break;
@@ -282,6 +287,12 @@ public:
 	}
 
 };
+
+Mail * MailBox::newMail2( UInt32 id, const std::string& sender, UInt32 recvTime, UInt8 type, const std::string& title, const std::string& content, UInt32 additional /*= 0*/ )
+{
+	Mutex::ScopedLock lk(_owner->getMutex());
+    return newMail(id, sender, recvTime, type, title, content, additional);
+}
 
 Mail * MailBox::newMail( UInt32 id, const std::string& sender, UInt32 recvTime, UInt8 type, const std::string& title, const std::string& content, UInt32 additional /*= 0*/ )
 {

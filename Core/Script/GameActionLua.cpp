@@ -1332,6 +1332,11 @@ namespace Script
 		return Call<UInt8>("RunNewRegisterAwardAD_RF", player, idx);
     }
 
+    UInt8 GameActionLua::RunSummerFlowAward(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunSummerFlowAward", player, idx);
+    }
     UInt8 GameActionLua::RunBirthdayAward(Player* player)
     {
 		assert(player != NULL);
@@ -1348,6 +1353,12 @@ namespace Script
     {
         assert(player != NULL);
         return Call<bool>("RunNewRC7DayLoginAward2", player, val);
+    }
+
+    bool GameActionLua::RunQQBoardInstantLoginAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunQQBoardInstantLoginAward", player, val);
     }
 
     bool GameActionLua::RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge)
@@ -1694,5 +1705,11 @@ namespace Script
 		assert(player != NULL);
 		return Call<bool>("onFishUserPackage", player, idx);
     }
+
+    Table GameActionLua::GetNewHeroIslandBuffs()
+    {
+        return Run<Table>(NULL, "getNewHeroIslandBuffs");
+    }
+
 }
 
