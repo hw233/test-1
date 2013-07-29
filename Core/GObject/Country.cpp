@@ -9,6 +9,7 @@
 #include "Boss.h"
 #include "CountryBattle.h"
 #include "HeroIsland.h"
+#include "NewHeroIsland.h"
 #include "Log/Log.h"
 #include "Common/TimeUtil.h"
 #include "Common/Itoa.h"
@@ -48,7 +49,8 @@ void Country::Country_Battle_Check(void *)
 
 void Country::Hero_Island_Check(void *)
 {
-    heroIsland.process(TimeUtil::Now());
+    //heroIsland.process(TimeUtil::Now());
+    newHeroIsland.process(TimeUtil::Now());
 }
 
 void Country::ClanRankBattleCheck(void *)
@@ -124,6 +126,7 @@ bool Country::Init()
 		bossManager.process(now);
         ClanRankBattleMgr::Instance().Init();
         NewCountryBattle::Init();
+        NewHeroIsland::Init();
 		AddTimer(30000, Country_Boss_Check);
         //AddTimer(5000, Country_Battle_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
         AddTimer(1000, Country_Battle_Check);

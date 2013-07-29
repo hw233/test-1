@@ -41,4 +41,16 @@ UInt64 ExpTable::getLevelMin( UInt8 lvl )
 	return _exp[lvl - 1];
 }
 
+UInt8 ExpTable::exp2level(UInt64 exp)
+{
+    if (exp >= _exp[LEVEL_MAX-1])
+        return LEVEL_MAX;
+    for (UInt8 l = 0; l < LEVEL_MAX; ++l)
+    {
+        if (_exp[l] > exp)
+            return l;
+    }
+    return 1;
+}
+
 }

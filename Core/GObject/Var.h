@@ -100,8 +100,7 @@ namespace GObject
         VAR_ATYITEM_5 = 64, //活跃度星期五奖励
         VAR_ATYITEM_6 = 65, //活跃度星期六奖励
         VAR_ATYITEM_7 = 66, //活跃度星期天奖励
-
-        VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
+VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_FIGHTER1_3_6_8 = 68, // 繁体版主将潜力值达到1.3，资质达到6.8活动是否达成
 
         VAR_CFRIEND_1 = 70, //密友等级相应个数 1级
@@ -486,6 +485,8 @@ namespace GObject
       VAR_VIP_PRIVILEGE_BREAK_LAST = 541 ,
       VAR_SUMMERFLOW_TYPE = 542 ,
       VAR_SUMMERFLOW_AWARD = 543,   //是否领取暑期回流礼包
+      VAR_QQBOARD = 544 ,
+      VAR_QQBOARD_AWARD = 545,
         VAR_MAX,
     };
 
@@ -771,6 +772,8 @@ namespace GObject
             REGISTER_VAR(VAR_VIP_PRIVILEGE_BREAK_LAST, CYCLE_NONE);
             REGISTER_VAR(VAR_SUMMERFLOW_TYPE, CYCLE_NONE);
             REGISTER_VAR(VAR_SUMMERFLOW_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_QQBOARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_QQBOARD_AWARD, CYCLE_NONE);
             
             REGISTER_VAR(VAR_TUIGUAN_AWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_PET_CUILIAN_DAILY_CNT_DATE, CYCLE_NONE);

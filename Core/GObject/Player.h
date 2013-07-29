@@ -82,8 +82,8 @@ namespace GObject
 #define PLAYER_BUFF_ONLINE          0x22	//?ۻ?????ʱ??
 #define PLAYER_BUFF_HIFIGHT         0x23    //Ӣ?۵???????ȴ
 #define PLAYER_BUFF_HIWEAK          0x24
-#define PLAYER_BUFF_HIMASTER_SOUL   0x25
-#define PLAYER_BUFF_HIMOVE          0x26
+#define PLAYER_BUFF_HIMS            0x25    //妙手回春
+#define PLAYER_BUFF_HIMOVE          0x26    //英雄岛移动
 
 #define PLAYER_BUFF_HIRA1           0x27    //  5489
 #define PLAYER_BUFF_HIRA2           0x28    //  5490
@@ -106,11 +106,11 @@ namespace GObject
 #define PLAYER_BUFF_HIRA19          0x39    //  5507
 #define PLAYER_BUFF_HIRA20          0x3A    //  5508
 
-#define PLAYER_BUFF_HIPG            0x3B    // ?̹?֮f
-#define PLAYER_BUFF_HIBT            0x3C    // ???篿?
-#define PLAYER_BUFF_HILN            0x3D    // ??Ԫ??ŭ
-#define PLAYER_BUFF_HIJZ            0x3E    // ???н???
-#define PLAYER_BUFF_HIESCAPE        0x3F    // Ӣ?۵?????
+#define PLAYER_BUFF_HIPG            0x3B    // 盘古之力
+#define PLAYER_BUFF_HIBT            0x3C    // 玲珑宝塔
+#define PLAYER_BUFF_HILN            0x3D    // 混元灵怒
+#define PLAYER_BUFF_HIJZ            0x3E    // 五行禁阵
+#define PLAYER_BUFF_HIESCAPE        0x3F    // 英雄岛逃亡
 
 #define PLAYER_BUFF_AMARTIAL_WIN    0x40    // ??????wʤ??????
 #define PLAYER_BUFF_YBUF            0x41
@@ -1958,7 +1958,7 @@ namespace GObject
         void qixiUdpLog(UInt32 id);
         void clanUdpLog(UInt32 id);
         void countryBattleUdpLog(UInt32 id, UInt8 country, std::string str = "");
-        void heroIslandUdpLog(UInt32 id, UInt8 type);
+        void heroIslandUdpLog(UInt32 id, UInt8 type, UInt16 value = 0);
         void secondSoulUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
         void wBossUdpLog(UInt32 id);
         void clanCopyUdpLog(UInt32 id, UInt32 val = 0, UInt32 num = 1);
@@ -2174,7 +2174,10 @@ namespace GObject
         void sendNewRC7DayLogin();
         void sendNewRC7DayRecharge();
         void sendNewRC7DayTarget(UInt8 idx = 0);
+        void sendQQBoardLoginInfo();
+        void SetQQBoardValue();
         void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
+        void getQQBoardInstantLoginAward(UInt8 val);
         void getNewRC7DayRechargeAward(UInt8 val);
         void getNewRC7DayTargetAward(UInt8 val);
         void get11DailyAward(UInt8 opt);

@@ -358,6 +358,38 @@ function RunNewRC7DayTargetAward(player)
     return j;
 end
 
+function RunQQBoardInstantLoginAward(player, cts)
+    -- 领取QQ面板连续登陆登录奖励
+    local item = {
+        [1] = {{56,1},{57, 1}, {15, 1}},
+        [3] = {{56,2},{57, 2}, {15, 2}},
+        [5] = {{30,1},{56,3},{57, 3}, {15, 3}},
+        [7] = {{30,1},{56,3},{57, 3}, {15, 2},{134,1}},
+        [9] = {{30,1},{56,3},{57, 3}, {15, 3},{134,1},{1325,1}},
+        [11] = {{30,1},{56,3},{57, 3}, {15, 3},{134,1},{9390,1}},
+        [13] = {{30,1},{56,3},{57, 3}, {15, 3},{134,1},{9390,1},{1126,1}},
+        [15] = {{30,1},{56,3},{57, 2}, {15, 3},{134,1},{9390,1},{1126,1},{8555,1}},
+    };
+    local package = player:GetPackage();
+
+    if cts == 0 then
+        return false
+    end
+    if cts > 16 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+    end
+    return true
+end
 function RunBirthdayAward(player)
     if player == nil then
         return 0;
