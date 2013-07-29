@@ -1016,6 +1016,8 @@ void NewHeroIsland::reset()
 {
     for (std::map<Player *, NHIPlayerData *>::iterator iter = _allPlayer.begin(); iter != _allPlayer.end(); ++ iter)
     {
+        Player* player = iter->first;
+        player->delFlag(Player::InHeroIsland);
         delete iter->second;
     }
     for (UInt8 i = 0; i < NEWHERO_ISLAND_SPOTS; ++i)
