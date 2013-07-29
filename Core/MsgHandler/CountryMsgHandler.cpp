@@ -29,6 +29,7 @@ MSG_REG(GameMsgHdr, OnFighterTrainReq);
 //MSG_REG(GameMsgHdr, OnFighterTrain2Req);
 MSG_REG_2(GameMsgHdr, REQ::TRAIN_FIGHTER_OP, OnFighterTrainOpReq);
 MSG_REG_2(GameMsgHdr, REQ::HERO_ISLAND, OnHeroIslandReq);
+MSG_REG_2(GameMsgHdr, REQ::NEWHERO_ISLAND, OnNewHeroIslandReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_RANKBATTLE_REQINIT, OnClanRankBattleReqInit);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_RANKBATTLE_REQ, OnClanRankBattleReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_RANKBATTLE_SORTLIST, OnClanRankBattleSortList);

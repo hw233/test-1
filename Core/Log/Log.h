@@ -192,6 +192,7 @@ enum MailItemType
     TreasureAct,
     ClanBossAct,
 	DismissXingchen,
+    NewHeroIslandAward,
 };
 enum ItemFrom
 {
@@ -253,7 +254,8 @@ enum ItemFrom
     FromRYHBAward = 56, //日月合璧
     FromVipLevelAward = 57, //御剑等级回馈
     FromQQXiu = 58,
-    FromRetrieveItem = 59, //回购物品
+    FromQQBoard = 59 ,
+    FromRetrieveItem = 60, //回购物品
     //80 ~ 100，繁体占用
 };
 

@@ -43,6 +43,7 @@
 #include "GData/Money.h"
 #include "GObject/WBossMgr.h"
 #include "GObject/HeroIsland.h"
+#include "GObject/NewHeroIsland.h"
 #include "GObject/Var.h"
 #include "GObject/ClanRankBattle.h"
 
@@ -1317,6 +1318,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetFairySpar()->sendAllInfo();
     pl->sendDirectPurInfo();
     pl->getQQTenpayAward(0);
+    newHeroIsland.playerInfo(pl);
     if(gClanCity)
         gClanCity->sendOpenStatus(pl);
    // pl->xingchenInfo();
@@ -1330,6 +1332,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->GetTaskMgr()->CompletedTask(201);
    if(pl->getFighterCount() >= 5)
         pl->GetTaskMgr()->CompletedTask(202);
+    pl->sendQQBoardLoginInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -4429,6 +4432,7 @@ void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
 
 void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
 {
+    return;     //取消此功能
 	MSG_QUERY_PLAYER(player);
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
@@ -4530,6 +4534,46 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
                 UInt8 onoff = 0;
                 brd >> onoff;
                 GObject::heroIsland.setAto(player, onoff);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void OnNewHeroIslandReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+
+    if (PLAYER_DATA(player,location) != 8977)
+        return;
+
+    switch (type)
+    {
+        case 0:
+            GObject::newHeroIsland.playerInfo(player);
+            break;
+        case 1:
+            GObject::newHeroIsland.playerEnter(player);
+            break;
+        case 2:
+            GObject::newHeroIsland.playerLeave(player);
+            break;
+        case 3:
+            {
+                UInt8 spot = 0;
+                brd >> spot;
+                GObject::newHeroIsland.moveTo(player, spot);
+            }
+            break;
+        case 4:
+            {
+                UInt8 skillid = 0, useGold = 0;
+                brd >> skillid >> useGold;
+                GObject::newHeroIsland.useSkill(player, skillid, useGold);
             }
             break;
         default:
@@ -5630,7 +5674,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
     if (op  < 6 )
         return;
-    if(op != 10 && !player->hasChecked())
+    if((op != 10 && op!= 20 ) && !player->hasChecked())
          return;
 
     switch(op)
@@ -5676,7 +5720,14 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
         case 18:
             player->getFishUserPackage(idx);
             break;
-
+        case 20:
+            player->SetQQBoardValue();
+            player->sendQQBoardLoginInfo();
+            break;
+        case 21:
+            player->getQQBoardInstantLoginAward(2*idx - 1);
+            player->sendQQBoardLoginInfo();
+            break;
         default:
             break;
     }
@@ -5755,6 +5806,7 @@ void OnNewRC7Day(GameMsgHdr& hdr, const void* data )
                 UInt8 val = 0;
                 br >> val;
                 player->getNewRC7DayLoginAward(val, off);
+
             }
             break;
         case 2:

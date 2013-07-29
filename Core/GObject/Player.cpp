@@ -45,6 +45,7 @@
 #include "Copy.h"
 #include "FrontMap.h"
 #include "HeroIsland.h"
+#include "NewHeroIsland.h"
 #include "GObject/AthleticsRank.h"
 #ifndef _FB
 #ifndef _VT
@@ -1658,11 +1659,14 @@ namespace GObject
         udpLog("countryBattle", action, "", "", "", "", "act");
     }
 
-    void Player::heroIslandUdpLog(UInt32 id, UInt8 type)
+    void Player::heroIslandUdpLog(UInt32 id, UInt8 type, UInt16 value)
     {
         // 英雄岛相关日志
         char action[16] = "";
-        snprintf (action, 16, "F_%d_%d", id, type);
+        if (value)
+            snprintf (action, 16, "F_%d_%d_%d", id, type, value);
+        else
+            snprintf (action, 16, "F_%d_%d", id, type);
         udpLog("heroIsland", action, "", "", "", "", "act");
     }
 
@@ -2284,7 +2288,8 @@ namespace GObject
         PopTimerEvent(this, EVENT_REFRESHOPENKEY, getId());
 #endif
 #endif // _WIN32
-        heroIsland.playerOffline(this);
+        //heroIsland.playerOffline(this);
+        newHeroIsland.playerLeave(this);
 		removeStatus(SGPunish);
         char online[32] = {0,};
         snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
@@ -3468,6 +3473,7 @@ namespace GObject
         {
             send(st);
         }
+        /*
         else if (scene != Battle::BS_CLANBOSSBATTLE)
         {
             if (res)
@@ -3479,12 +3485,14 @@ namespace GObject
                 SYSMSG_SENDV(2143, this, other->getCountry(), other->getName().c_str());
             }
         }
+        */
 
         if (report & 0x02)
         {
             st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
             other->send(st);
         }
+        /*
         else if (scene != Battle::BS_CLANBOSSBATTLE)
         {
             if (res)
@@ -3496,6 +3504,7 @@ namespace GObject
                 SYSMSG_SENDV(2140, other, getCountry(), getName().c_str());
             }
         }
+        */
 
 		if(turns != NULL)
 			*turns = bsim.getTurns();
@@ -6017,7 +6026,8 @@ namespace GObject
 
         if (_playerData.location == 8977)
         {
-            heroIsland.playerLeave(this);
+            //heroIsland.playerLeave(this);
+            newHeroIsland.playerLeave(this);
             delFlag(Player::InHeroIsland);
         }
         SpotData * spotData = GetMapSpot();
@@ -8519,7 +8529,8 @@ namespace GObject
 		send((st));
 
         worldBoss.sendDaily(this);
-        heroIsland.sendDaily(this);
+        //heroIsland.sendDaily(this);
+        newHeroIsland.sendDaily(this);
         globalCountryBattle.sendDaily(this);
         teamCopyManager->sendDaily(this, 7);
         teamCopyManager->sendDaily(this, 11);
@@ -12713,6 +12724,42 @@ namespace GObject
         send(st);
     }
 
+    void Player::SetQQBoardValue()
+    {
+        UInt32 begin = 1374768000;
+        UInt32 now = TimeUtil::Now();
+        UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
+        if(now < begin)
+            return ;
+        if( off > 15)
+            return ;
+        UInt32 QQBoard = GetVar(VAR_QQBOARD);
+        QQBoard |= 1 << (off - 1);
+        SetVar(VAR_QQBOARD, QQBoard);
+    }
+    void Player::sendQQBoardLoginInfo()
+    {
+        Stream st(REP::RC7DAY);  //协议
+        UInt32 QQBoard = GetVar(VAR_QQBOARD);
+        UInt32 QQBoardAward = GetVar(VAR_QQBOARD_AWARD);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(QQBoard & (1 << i++ ))
+                ++count;
+            else count = 0;
+            if(count > max)
+                max = count ;
+        }
+        st << static_cast<UInt8>(15);
+        st << static_cast<UInt8>(max);   //连续登陆天数
+        st <<QQBoardAward;   //领取的奖励号
+        st << Stream::eos;
+        send(st);
+    }
+
     void Player::getNewRC7DayLoginAward(UInt8 val, UInt8 off)
     {
         // 申请领取新注册七天登录奖励 (包括补签和累计登录）
@@ -12799,6 +12846,34 @@ namespace GObject
             }
         }
     }
+    void Player::getQQBoardInstantLoginAward(UInt8 val)
+    {
+        // 申请领取新注册七天登录奖励 (包括补签和累计登录）
+        UInt32 QQBoard = GetVar(VAR_QQBOARD);
+        UInt32 ctslandingAward = GetVar(VAR_QQBOARD_AWARD);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(QQBoard & (1 << i++ ))
+                ++count;
+            else count = 0;
+            if(count > max)
+                max = count ;
+        }
+        if (val == 0 || val > max)
+            return;
+        // 正常签到登录奖励
+        if(ctslandingAward & (1<<((val-1)/2)))
+            return ;
+        if (!GameAction()->RunQQBoardInstantLoginAward(this, val))
+            return;
+        ctslandingAward |= (1<<((val - 1)/2));
+        SetVar(VAR_QQBOARD_AWARD, ctslandingAward);
+       sendQQBoardLoginInfo();
+    }
+
 
     void Player::getNewRC7DayRechargeAward(UInt8 val)
     {
@@ -18201,7 +18276,7 @@ void Player::sendCopyFrontAllAward()
 
 UInt8 Player::getCopyId()
 {
-    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707};
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a};
 
     UInt16 currentSpot = PLAYER_DATA(this, location);
     for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
