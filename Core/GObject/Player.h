@@ -27,6 +27,7 @@
 #include "Dreamer.h"
 #include "FairyPet.h"
 #include "FairySpar.h"
+#include "MoFang.h"
 
 
 namespace Battle
@@ -2473,6 +2474,8 @@ namespace GObject
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);
+    private:
+        MoFang* m_moFang;
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

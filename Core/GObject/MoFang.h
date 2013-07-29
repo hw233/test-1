@@ -25,12 +25,13 @@ namespace GObject
         void makeJiguan(UInt8 paperId);                // 制作机关
         void learnPaper(UInt8 paperId, UInt8 value);   // 学习图纸进度
         void addAttr(GData::AttrExtra& ae);            // 属性
-        UInt16 getSkill();                             // 技能
+        inline UInt16 getSkill() { return m_skill; }   // 技能
     private:
         std::vector<UInt8> m_papers_learned;      // 已学会<图纸id>
         std::map<UInt8, UInt8> m_papers_learning; // 未学会<图纸id, 学习进度>
 
         ItemJiguan* m_jg[2];                      // 机关装备位
+        UInt16 m_skill;
         Player* m_owner;
     };
 }
