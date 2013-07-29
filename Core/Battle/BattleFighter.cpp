@@ -72,6 +72,11 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
+    auralRate = 0;
+    auraValue = 0;
+    auralLast = 0;
+    auralStep = e_buddhal_light_none;
+    launcher = NULL;
 	setFighter(f);
 }
 
@@ -817,7 +822,7 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool no
     GData::SkillItem* resSkillItem = NULL;
     if(NULL != _peerlessSkill.base)
     {
-        if((((_fighter->getOwner() && _fighter->getOwner()->getBuddhaLightLast() > 0) || _aura >= 100) && _peerlessSkill.base->effect != NULL) && (!noPossibleTarget || _peerlessSkill.base->target != GData::e_battle_target_otherside))
+        if(((_aura >= 100 || getBuddhaLightStep() == e_buddhal_light_just_get) && _peerlessSkill.base->effect != NULL) && (!noPossibleTarget || _peerlessSkill.base->target != GData::e_battle_target_otherside))
         {
             // peerless skill first
             if (_fighter->getOwner())
@@ -845,6 +850,8 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool no
         idx = (idx0 + i) % cnt;
         if(NULL != _activeSkill[idx].base && _activeSkill[idx].cd == 0)
         {
+            if(SKILL_ID(_activeSkill[idx].base->getId()) == 73 && (getBuddhaLightStep() == e_buddhal_light_just_get || getBuddhaLightStep() == e_buddhal_light_already_occur))
+                continue;
             if(_activeSkill[idx].base->effect == NULL)
                 continue;
             if(!resSkillItem && (!noPossibleTarget || _activeSkill[idx].base->target != GData::e_battle_target_otherside))
