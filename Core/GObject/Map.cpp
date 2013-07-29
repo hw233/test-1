@@ -171,7 +171,7 @@ void Map::AddSpot( UInt16 id, const std::string& name, UInt8 type, UInt8 country
 			globalCountryBattle.setCountryBattle(sd.m_CountryBattle);
 			globalCountryBattle.setNewCountryBattle(sd.m_NewCountryBattle);
 		}
-        if(type == 12 && !gClanCity)
+        if(type == 13 && !gClanCity)
         {
             gClanCity = new ClanCity(id);
         }
