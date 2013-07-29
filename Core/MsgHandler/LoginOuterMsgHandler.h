@@ -2178,7 +2178,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 	UInt8 bindType = 1;
     CHKKEY();
 	br>>pf>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
-	std::string result="";
+	//std::string result="";
 	GObject::MailPackage::MailItem *item = new(std::nothrow) GObject::MailPackage::MailItem[nums + 5];
 	if(item == NULL)
 		return;
@@ -2211,7 +2211,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 		GObject::Player *player=it->second;
 		if(player==NULL || (serverNo != 0 && serverNo != (static_cast<UInt16>(player->getId()>>48))))
 		{
-			result+="1 ";
+			//result+="1 ";
 		}
 		else
 		{
@@ -2222,18 +2222,19 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
                 if(pmail != NULL)
                 {
                     GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
-                    result +="0 ";
+                    //result +="0 ";
                     player->moneyLog(2, money[2], money[1], money[0], money[3]);
                 }
                 else
                 {
-                    result +="2 ";
+                    //result +="2 ";
                 }
             }
 		}
 	}
-	result=result.substr(0,result.length()-1);
-	st<<result;
+	//result=result.substr(0,result.length()-1);
+	//st<<result;
+    st << static_cast<UInt8>(1);
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 
