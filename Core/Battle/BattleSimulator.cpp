@@ -10777,6 +10777,12 @@ bool BattleSimulator::doDarkVigorAttack(BattleFighter* bf, float darkVigor)
 
 void BattleSimulator::appendDefStatus(StateType type, UInt32 value, BattleFighter* bf, DamageType damageType /* = e_damageNone */)
 {
+    if(bf->isSoulOut())
+    {
+        if(type == e_Bleed1 || type == e_Bleed2 || type == e_Bleed3 || type == e_Bleed4 || type == e_BleedMo || type == e_selfBleed || type == e_lingShiBleed)
+            return;
+    }
+
     DefStatus defList;
     defList.damType = type;
     defList.damageType = damageType;
