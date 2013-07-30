@@ -6169,7 +6169,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         _activeFgt = NULL;
     }
 
-    if(bf->getAbnormalTypeCnt() >= 3)
+    if(bf->getHP() > 0 && bf->getAbnormalTypeCnt() >= 3)
     {
         const GData::SkillBase* passiveSkill = NULL;
         if(NULL != (passiveSkill = bf->getAbnormalTypeSkill()))
@@ -6186,7 +6186,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             _activeFgt = NULL;
         }
     }
-    if(bf->getBleedTypeCnt() >= 3)
+    if(bf->getHP() > 0 && bf->getBleedTypeCnt() >= 3)
     {
         const GData::SkillBase* passiveSkill = NULL;
         if(NULL != (passiveSkill = bf->getBleedTypeSkill()))
