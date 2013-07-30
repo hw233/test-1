@@ -3851,9 +3851,9 @@ namespace GObject
             UInt32 viplvl = getVipLevel();
             UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
             if((viplvl >= 4 && viplvl <= 7) || ( inVipPrivilegeTime() && VipType % 2==1 ))
-                count += 60 * 8;
-            else if (( viplvl > 7 && viplvl <= 15) ||(inVipPrivilegeTime() &&( VipType %2 ==0)))
-                count += 60 * 16;
+                count = 60 * 16;
+            if (( viplvl > 7 && viplvl <= 15) ||(inVipPrivilegeTime() &&( VipType %2 ==0)))
+                count = 60 * 24;
         }
         else
         {
