@@ -226,7 +226,6 @@ void NewHeroIsland::playerEnter(Player* player)
     insertNHIPlayerData(pd);
 
     playerInfo(player);
-    broadcastRank(player);
     if (isPrepare(now))
     {
         _players[spot].insert(pd);
@@ -236,7 +235,8 @@ void NewHeroIsland::playerEnter(Player* player)
         enterPairPlayer(pd);
 
     ++ _nplayers[spot][pd->type-1];
-    updateSpotPlayers(spot);
+    broadcastRank(player);
+    //updateSpotPlayers(spot);
     sendSkillInfo(pd);
     player->getSurnameLegendAward(e_sla_hi);
     player->OnHeroMemo(MC_ATHLETICS, MD_MASTER, 0, 0);
@@ -1523,6 +1523,27 @@ void NewHeroIsland::playerInfo(Player * player)
     }
     st << Stream::eos;
     player->send(st);
+
+    //玩家刷新or离线后再次进入游戏
+    if (pd && pd->status != NEWHERO_ISLAND_ESCAPE)
+    {
+        broadcastRank(player);
+        if (isPrepare(now))
+            sendPairPlayerInfo(pd, NULL);
+        else
+        {
+            std::vector<pairsNHIPlayerData>::iterator iter = _pairPlayer[pd->spot].begin();
+            for(; iter != _pairPlayer[pd->spot].end(); ++ iter)
+            {
+                if ((*iter).nhipd1 == pd || (*iter).nhipd2 == pd)
+                {
+                    sendPairPlayerInfo((*iter).nhipd1, (*iter).nhipd2);
+                    break;
+                }
+            }
+        }
+        sendSkillInfo(pd);
+    }
 }
 
 void NewHeroIsland::updatePlayerInfo(UInt32 now)
@@ -1579,6 +1600,7 @@ void NewHeroIsland::sendWinerInfo(Player * player1, Player * player2, UInt16 sco
             iter->first->send(st);
     }
 }
+
 NewHeroIsland newHeroIsland;
 
 }
