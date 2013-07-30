@@ -97,6 +97,7 @@ public:
     }
     UInt8 checkRPOpenid(char* openid);
     UInt8 checkGRPOpenid(char* openid);
+    UInt8 checkActiveOpenid(char * key1,char* openid);
 
 private:
     UInt32 version;

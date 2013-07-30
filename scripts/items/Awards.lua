@@ -390,6 +390,111 @@ function RunQQBoardInstantLoginAward(player, cts)
     end
     return true
 end
+function RunLuckyMeetInstantLoginAward(player, cts)
+    -- 领取QQ面板连续登陆登录奖励
+    local item = {
+        [1] = {{1326,1},{133, 1}, {499, 10}},
+        [2] = {{1326,2},{133, 2}, {499, 20}},
+        [3] = {{1326,3},{133, 3}, {499, 30}},
+        [4] = {{1326,4},{133, 4}, {499, 40}},
+        [5] = {{1326,5},{133, 5}, {499, 50}},
+        [6] = {{1326,6},{133, 6}, {499, 60}},
+        [7] = {{1326,7},{133, 7}, {499, 70}},
+    };
+    local package = player:GetPackage();
+
+    if cts == 0 then
+        return false
+    end
+    if cts > 16 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < (num-1)  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        if item[cts][count][1] == 499 then
+            player:getCoupon([cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
+    end
+    return true
+end
+function RunLuckyMeetRechargeAward(player, cts)
+    -- 领取蜀山奇遇充值奖励
+    local item = {
+        [1] = {{549,1}, {551, 2}},
+        [2] = {{8000,6},{513, 2}},
+        [3] = {{5065,1}},
+        [4] = {{1705,1}},
+        [5] = {{549,1}, {551, 2}},
+        [6] = {{8000,8},{513, 2}},
+        [7] = {{5065,1}},
+        [8] = {{1354,1}},
+        [9] = {{503,5}, {500, 5},{1325,1}},
+        [10] = {{1126,15},{507, 3}},
+        [11] = {{9076,6},{509,6}},
+        [12] = {{515,10},{134,10},{9371,50}},
+    };
+    local package = player:GetPackage();
+    local level = player:GetVar(550);
+    local lv = 0;
+    if level >3 then
+        lv = 1;
+    else 
+        lv =2;
+    end
+    local cts2 = lv*4+cts;
+    if cts2 == 0 then
+        return false
+    end
+    if cts2 > 12  then
+        return false
+    end
+
+    num = #item[cts2]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts2] do
+        package:Add(item[cts2][count][1], item[cts2][count][2], true, 0, 59);
+    end
+    return true
+end
+function RunLuckyMeetStrengthAward(player, cts)
+    -- 领取蜀山奇遇变强奖励
+    local item = {
+        [1] = {{509,1}, {503, 2},{5123,2},{5103,2}},
+        [2] = {{507,1}, {514, 3},{5063,3},{5073,3}},
+        [3] = {{515,1}, {5133, 3},{5113,3},{513,3}},
+        [4] = {{516,1}, {5023, 3},{5003,3},{9076,2}},
+    }
+    local package = player:GetPackage();
+    if cts == 0 then
+        return false
+    end
+    if cts > 4  then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+    end
+    return true
+end
 function RunBirthdayAward(player)
     if player == nil then
         return 0;

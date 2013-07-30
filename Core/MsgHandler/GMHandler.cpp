@@ -4063,6 +4063,19 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_SURNAMELEGEND_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
+        case 3:
+            GVAR.SetVar(GVAR_LUCKYMEET_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_LUCKYMEET_END, TimeUtil::Now() + 86400*7);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            player->LuckyBagRank();
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 4:
+            GVAR.SetVar(GVAR_LUCKYMEET_BEGIN, 0);
+            GVAR.SetVar(GVAR_LUCKYMEET_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+
     }
 }
 

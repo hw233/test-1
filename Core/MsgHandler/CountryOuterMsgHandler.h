@@ -5725,6 +5725,14 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             player->getQQBoardInstantLoginAward(2*idx - 1);
             player->sendQQBoardLoginInfo();
             break;
+        case 22:
+            player->sendLuckyMeetLoginInfo();
+            break;
+        case 23:
+            UInt8 index ;
+            br >> index ;
+            player->getLuckyMeetAward(idx,index);
+            break;
         default:
             break;
     }
