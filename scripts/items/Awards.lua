@@ -788,7 +788,8 @@ function RunVipPrivilegeAward(player, idx, dayth)
     if player == nil then
         return false;
     end
-    print("AwardDayth:"..dayth)
+    --print("AwardDayth:"..dayth)
+
     if idx == 0 or idx > 4 or dayth == 0 or dayth > 9 then
         return false;
     end

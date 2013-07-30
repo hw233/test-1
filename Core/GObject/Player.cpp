@@ -139,7 +139,7 @@ namespace GObject
         UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
         if( in7DayFromCreated() && VipType >4 )
             VipType -= 2 ;
-        if(maxCount < 16 && inVipPrivilegeTime() &&( VipType ==1||VipType==3 ) )
+        if(maxCount < 16 && inVipPrivilegeTime() &&( VipType ==1||VipType==3||VipType ==0 ) )
             maxCount = 16;
         if(maxCount < 24 && inVipPrivilegeTime() &&( VipType % 2 ==0 ) )
             maxCount = 24;
@@ -20497,7 +20497,8 @@ bool Player::SetVipPrivilege_2()
             validate += 5*86400;
         else
         {
-            SetVar(VAR_VIP_PRIVILEGE_BREAK_LAST, 1);
+            if( TimeUtil::SharpDayT(0,now) > TimeUtil::SharpDayT(0,validate) )
+                  SetVar(VAR_VIP_PRIVILEGE_BREAK_LAST,1);
             validate = now + 5*86400;
         }
         // 保持最低位为0
@@ -20658,7 +20659,7 @@ void Player::doVipPrivilege(UInt8 idx)
             UInt8 dayth = 0;
             UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
             if(VIP_PRIVILEGE_7DAY(validate))
-                dayth =7 -(static_cast<int>( (TimeUtil::SharpDayT(0,validate)-TimeUtil::SharpDayT(0,now) )/86400 ) -1 )%7;
+                dayth =7 -((TimeUtil::SharpDayT(0,validate)-TimeUtil::SharpDayT(0,now) )/86400 +6 )%7;
             else
                 dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
             //    dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
@@ -20667,7 +20668,7 @@ void Player::doVipPrivilege(UInt8 idx)
         UInt32 breakLast = GetVar(VAR_VIP_PRIVILEGE_BREAK_LAST);
         if(breakLast == 1)
             dayth +=1;
-        std::cout<<"AwardDayth dayth:"<<dayth<<std::endl;
+      //  std::cout<<"AwardDayth dayth:"<<dayth<<std::endl;
         if(!GameAction()->RunVipPrivilegeAward(this, idx, dayth))
             return;
         SetVar(VAR_VIP_PRIVILEGE_DATA, data);
@@ -20716,7 +20717,7 @@ void Player::sendVipPrivilege(bool isLStar)
         timeLeft = validate - now;
         UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
         if(VIP_PRIVILEGE_7DAY(validate))
-            dayth =7 -(static_cast<int>( (TimeUtil::SharpDayT(0,validate)-TimeUtil::SharpDayT(0,now) )/86400 ) -1 )%7;
+            dayth =7 -( (TimeUtil::SharpDayT(0,validate)-TimeUtil::SharpDayT(0,now) )/86400 +6 )%7;
         else
             dayth = (TimeUtil::SharpDayT(0, now) + 2*86400 - TimeUtil::SharpDayT(0, validate))/86400 + 1;
             //dayth = (TimeUtil::SharpDayT(0, now) + 7*86400 - TimeUtil::SharpDayT(0, validate))/86400;
@@ -20762,9 +20763,9 @@ void Player::sendVipPrivilege(bool isLStar)
     st << static_cast<UInt8>(10) << timeLeft << static_cast<UInt8>(data) << extra;
     st<<static_cast<UInt8>(SevenOrTen)<<static_cast<UInt8>( (VipType+1)/2 )<<static_cast<UInt8>(Days);
     st <<dayth<<Stream::eos;
-    std::cout<<"PlayerID::"<<getId()<<"  "<<"break :"<<breakLast<<" "<<"VIPLEVEL:"<<VipType<<std::endl;
-    std::cout<<timeLeft<<" "<<data<<"  "<<extra<<" SevenOrTen:"<<SevenOrTen<<"  Days"<<Days<<std::endl;
-    std::cout<<"S->C dayth:"<<dayth_0<<std::endl;
+   // std::cout<<"PlayerID::"<<getId()<<"  "<<"break :"<<breakLast<<" "<<"VIPLEVEL:"<<VipType<<std::endl;
+   // std::cout<<timeLeft<<" "<<data<<"  "<<extra<<" SevenOrTen:"<<SevenOrTen<<"  Days"<<Days<<std::endl;
+   // std::cout<<"S->C dayth:"<<dayth_0<<std::endl;
     send(st);
 }
 

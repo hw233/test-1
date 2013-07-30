@@ -384,6 +384,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
          UInt32 VipType = pl->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE); 
          if( pl->in7DayFromCreated() && VipType >4 ) 
              VipType -= 2 ;
+         if(nCount < 6  && pl->inVipPrivilegeTime() && VipType == 0 )
+             nCount =  6 ;
          if(nCount </* 6*/ 7 && pl->inVipPrivilegeTime() && VipType ==6 )
              nCount = /* 6*/ 7;
         if (data->fighters.size() >= nCount)
