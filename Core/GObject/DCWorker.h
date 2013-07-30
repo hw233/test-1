@@ -30,6 +30,7 @@ public:
     UInt8 CheckRPOpenid(char* openid);
     UInt8 CheckGRPOpenid(char* openid);
     UInt8 CheckActiveOpenid(char * key1,char * openid);
+    UInt8 CheckYBCorrect();
 protected:
 	bool Init();
 	void UnInit();

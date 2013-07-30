@@ -168,7 +168,7 @@ namespace GObject
                 char* msg = openIdLog[i].openId;
                 UInt64 playerId = openIdLog[i].playerId;
                 bool r = false;
-                GObject::Player * pl = GObject::globalPlayers[playerId];
+                GObject::Player * pl = GObject::globalPlayers[playerId];   //取player
                 if (!pl)
                 {
                     delete[] msg;
@@ -357,7 +357,10 @@ namespace GObject
         size_t len = snprintf(key, sizeof(key), "%s_%s", key1,openid); 
         m_MCached.get(key, len, value, sizeof(value));
         return atoi(value);
-        
+    }
+    UInt8 DCWorker::CheckYBCorrect()
+    {
+            return false; 
     }
 }
 

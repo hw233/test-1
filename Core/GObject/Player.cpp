@@ -12790,6 +12790,8 @@ namespace GObject
         UInt32 max = 0 ;
         UInt32 i=0;
         UInt32 count=0 ;
+        if(!LuckyMeet)
+            return ;
         while(i<16)
         {
             if(LuckyMeet & (1 << i++ ))
@@ -12800,11 +12802,11 @@ namespace GObject
         }
         st << static_cast<UInt8>(16);
         st << static_cast<UInt8>(max);   //连续登陆天数
-        st << LuckyMeetVip;
+        st <<static_cast<UInt8>(LuckyMeetVip);
         st << LuckyMeetRecharge;
-        st << LuckyMeetAward;   //领取的奖励号
-        st << LuckyMeetStrenthAward;  
-        st << LuckyMeetRechargeAward;
+        st <<static_cast<UInt8>(LuckyMeetAward);   //领取的奖励号
+        st <<static_cast<UInt8>(LuckyMeetStrenthAward);  
+        st <<static_cast<UInt8>(LuckyMeetRechargeAward);
         st << Stream::eos;
         send(st);
     }

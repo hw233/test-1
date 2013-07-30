@@ -1330,6 +1330,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
    if(pl->getFighterCount() >= 5)
         pl->GetTaskMgr()->CompletedTask(202);
     pl->sendQQBoardLoginInfo();
+    pl->sendLuckyMeetLoginInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

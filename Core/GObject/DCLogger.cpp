@@ -999,6 +999,10 @@ UInt8 DCLogger::checkActiveOpenid(char * key1,char* openid)
 {
     return DC().CheckActiveOpenid(key1,openid);
 }
+UInt8 DCLogger::checkYBCorrect()
+{
+    return DC().CheckYBCorrect();
+}
 DCLogger dclogger;
 
 } // namespace GObject
