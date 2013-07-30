@@ -2205,6 +2205,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
     {
         br>>serverNo;
     }
+    INFO_LOG("GM[%s]: %u", __PRETTY_FUNCTION__, serverNo);
 
     for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(), end = GObject::globalPlayers.end(); it != end; ++it)
 	{
