@@ -560,6 +560,8 @@ private:
     void calcAbnormalTypeCnt(BattleObject* bo);
     void calcBleedTypeCnt(BattleObject* bo);
 
+    void initBuddhaLight(BattleFighter* bf, bool auralAdd);
+
 private:
 	int _id, _winner, _turns;
 	UInt8 _position;

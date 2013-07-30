@@ -36,12 +36,6 @@ namespace Battle
         e_sneak_atk = 2
     };
 
-    enum BuddhaLightStatus
-    {
-        e_buddhal_light_none = 0,
-        e_buddhal_light_just_get = 1,
-        e_buddhal_light_already_occur = 2
-    };
 
 
 class BattleFighter:
@@ -1135,15 +1129,12 @@ private:
     float auralRate;
     float auraValue;
     UInt8 auralLast;
-    BuddhaLightStatus auralStep;
     BattleFighter* launcher;
     inline void setBuddhaLight(float v, UInt8 l) { auralRate = v; auralLast = l; }
     inline UInt8 getBuddhaLightLast() { return auralLast; }
     inline float getBuddhaLightRate() { return auralRate; }
     inline void setBuddhaLightValue(float value) { auraValue = value; }
     inline float getBuddhaLightValue() { return auraValue; }
-    inline void setBuddhaLightStep(BuddhaLightStatus flag) { auralStep = flag; }
-    inline BuddhaLightStatus getBuddhaLightStep() { return auralStep; }
     inline void setBuddhaLightLauncher(BattleFighter* f) { launcher = f; }
     inline BattleFighter* getBuddhaLightLauncher() { return launcher; }
 

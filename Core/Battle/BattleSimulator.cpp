@@ -4284,31 +4284,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     if (skill && skill->cond == GData::SKILL_PEERLESS)
     {
         UInt8 last = bf->getBuddhaLightLast();
-        bool isValid = false;
-        bool needConsume = true;
-        Int32 target_side = bf->getSide();
-        if(last > 0)
-        {
-            for(UInt8 i = 0; i < 25; i++)
-            {
-                BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, i));
-                if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
-                    continue;
-                //发起者还活着
-                if(bo == bo->getBuddhaLightLauncher())
-                {
-                    isValid = true;
-                    break;
-                }
-            }
-        }
-
-        if(isValid)
-        {
-            if(uRand(10000) < bf->getBuddhaLightRate() * 1000)
-                needConsume = false;
-        }
-        if(needConsume)
+        if(last == 0)
         {
             int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
             //setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, false);
@@ -4317,22 +4293,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         if (launchPeerLess)
             *launchPeerLess = 1;
 
-        if(isValid)
+        if(last > 0)
         {
             printf("end\n");
-            --last;
-            for(UInt8 i = 0; i < 25; i++)
-            {
-                BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, i));
-                if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
-                    continue;
-                bo->setBuddhaLight(bo->getBuddhaLightRate(), last);
-                bo->setBuddhaLightStep(e_buddhal_light_already_occur);
-                if(bo == bo->getBuddhaLightLauncher() && last == 0)
-                    appendDefStatus(e_unBuddhaLight, 0, bo);
-                if(bo->getBuddhaLightValue() > 0.001)
-                    setStatusChange_Aura2(bo, bo->getSide(), bo->getPos(), NULL, bo->getBuddhaLightValue(), 0, false);
-            }
+            initBuddhaLight(bf, true);
         }
     }
 
@@ -5559,6 +5523,8 @@ UInt32 BattleSimulator::doAttack( int pos )
             // do active skill
             BattleFighter* therapy_bf = getTherapyTarget(bf);
             skill = bf->getActiveSkill(therapy_bf!= NULL, noPossibleTarget);
+            if(bf->getBuddhaLightLast() == 0xFF)
+                initBuddhaLight(bf, false);
             bool canNormal = true;
             bool extraNormal = false;
             if(NULL != skill)
@@ -7312,6 +7278,8 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
                 doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
             }
         }
+
+        initBuddhaLight(toremove, false);
     }
 
     if(bIfDead)
@@ -12482,8 +12450,6 @@ void BattleSimulator::doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, in
 
 void BattleSimulator::doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
-    if(bf->getBuddhaLightStep() == e_buddhal_light_just_get || bf->getBuddhaLightStep() == e_buddhal_light_already_occur)
-        return;
     if(!skill || !skill->effect)
         return;
     const std::vector<float>& efv = skill->effect->efv;
@@ -12510,7 +12476,6 @@ void BattleSimulator::doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int targ
             bo->setBuddhaLight(skill->prob, efl[i]);
             if(ef)
                 bo->setBuddhaLightValue(ef->valueExt1);
-            bo->setBuddhaLightStep(e_buddhal_light_just_get);
             bo->setBuddhaLightLauncher(bf);
         }
         appendDefStatus(e_buddhaLight, 0, bf);
@@ -12993,4 +12958,22 @@ void BattleSimulator::calcBleedTypeCnt(BattleObject* bo)
     }
 }
 
+void BattleSimulator::initBuddhaLight(BattleFighter* bf, bool auralAdd)
+{
+    for(UInt8 i = 0; i < 25; i++)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(bf->getSide(), i));
+        if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+            continue;
+        bo->setBuddhaLight(0, 0);
+        if(bo == bo->getBuddhaLightLauncher())
+            appendDefStatus(e_unBuddhaLight, 0, bo);
+        bo->setBuddhaLightLauncher(NULL);
+        if(auralAdd && bo->getBuddhaLightValue() > 0.001)
+            setStatusChange_Aura2(bo, bo->getSide(), bo->getPos(), NULL, bo->getBuddhaLightValue(), 0, false);
+        bo->setBuddhaLightValue(0);
+    }
 }
+
+}
+
