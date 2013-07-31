@@ -112,6 +112,7 @@ enum
     e_eft_soul_out = 38,           //元神出窍
     e_eft_abnormal_type_dmg = 39,           //异常类伤害
     e_eft_bleed_type_dmg = 40,           //流血类伤害
+    e_eft_buddha_light = 41,           //佛光效果
 
     e_eft_max
 };
