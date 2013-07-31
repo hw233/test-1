@@ -225,7 +225,7 @@ void NewHeroIsland::playerEnter(Player* player)
     player->addFlag(Player::InHeroIsland);
     insertNHIPlayerData(pd);
 
-    playerInfo(player);
+    playerInfo(player, false);
     if (isPrepare(now))
     {
         _players[spot].insert(pd);
@@ -510,24 +510,30 @@ void NewHeroIsland::process(UInt32 now)
             sendAllPlayerInfo();
             _tickTime = _startTime + (corr + 1) * NHEROISLAND_BATTLE_TIME;
         }
-        bool isSettle = checkSettleAccounts(now);
+        _stage = (now - _startTime) / NHEROISLAND_STAGE_TIME + 1;
+        _stage = _stage > 3 ? 3 : _stage;
         updatePlayerInfo(now);
         if (now < _tickTime)
             return;
         _tickTime += NHEROISLAND_BATTLE_TIME;
-        if (!isSettle)
+
+        UInt64 tick = TimeUtil::GetTick();
+        handleBattle();
+        TRACE_LOG("NewHeroIsland=>>所有战斗开始结束时间差:[%" I64_FMT "u]", TimeUtil::GetTick() - tick);
+        tick = TimeUtil::GetTick();
+        checkOccupySpot();
+        broadcastRank();
+        if(now < _stage * NHEROISLAND_STAGE_TIME + _startTime - 60
+                || (now >= _stage * NHEROISLAND_STAGE_TIME + _startTime && _stage != 3))
         {
-            handleBattle();
-            checkOccupySpot();
-            broadcastRank();
-            if(now < _stage * NHEROISLAND_STAGE_TIME + _startTime - 60
-                    || (now >= _stage * NHEROISLAND_STAGE_TIME + _startTime && _stage != 3))
-            {
-                makePairPlayers();
-                randomEvent();
-                sendAllPlayerInfo();
-            }
+            makePairPlayers();
+            randomEvent();
+            sendAllPlayerInfo();
         }
+        else
+            checkSettleAccounts(now);
+        TRACE_LOG("NewHeroIsland=>>配对所有玩家开始结束时间差:[%" I64_FMT "u]", TimeUtil::GetTick() - tick);
+
         if (now >= _endTime)
             end(now);
         checkSkillTime();
@@ -538,9 +544,7 @@ void NewHeroIsland::process(UInt32 now)
 //每阶段结束时结算
 bool NewHeroIsland::checkSettleAccounts(UInt32 now)
 {
-    _stage = (now - _startTime) / NHEROISLAND_STAGE_TIME + 1;
-    _stage = _stage > 3 ? 3 : _stage;
-    if(now > _stage * NHEROISLAND_STAGE_TIME + _startTime - 60 && now < _stage * NHEROISLAND_STAGE_TIME + _startTime)
+    if(now >= _stage * NHEROISLAND_STAGE_TIME + _startTime - 60 && now < _stage * NHEROISLAND_STAGE_TIME + _startTime)
     {
         if(_isAward[_stage-1])
             return true;
@@ -562,12 +566,12 @@ bool NewHeroIsland::checkSettleAccounts(UInt32 now)
                 (*iter)->type = (*iter)->player->getHIType();
                 if ((*iter)->spot == NEWHERO_ISLAND_SPOTS - 1)
                 {
-                    UInt8 spot = _noOwned[uRand(_noOwned.size())];
+                    UInt8 spot = uRand(NEWHERO_ISLAND_SPOTS-1);
                     enter(*iter, spot, false);
                     _players[spot].insert(*iter);
                     ++_nplayers[spot][(*iter)->type-1];
                 }
-                playerInfo((*iter)->player);
+                playerInfo((*iter)->player, false);
                 sendPairPlayerInfo(*iter, NULL);
             }
         }
@@ -1003,7 +1007,6 @@ bool NewHeroIsland::checkSpecialWin(NHIPlayerData * pd1, NHIPlayerData * pd2)
 
 void NewHeroIsland::end(UInt32 now)
 {
-    checkSettleAccounts(now+5);
     rankReward();
     _prepareStep = 0;
     SYSMSG_BROADCASTV(2116);
@@ -1488,7 +1491,7 @@ void NewHeroIsland::updateSpotPlayers(UInt8 spot)
     broadcast(st);
 }
 
-void NewHeroIsland::playerInfo(Player * player)
+void NewHeroIsland::playerInfo(Player * player, bool isLogin)
 {
     UInt32 now = TimeUtil::Now();
     if (!player || now < _prepareTime || now >= _endTime)
@@ -1511,13 +1514,13 @@ void NewHeroIsland::playerInfo(Player * player)
         st << static_cast<UInt8>(0);
         st << static_cast<UInt16>(_startTime - now);
     }
-    else if (now >= _startTime && now <= _stage * NHEROISLAND_STAGE_TIME + _startTime - 60)
+    else if (now >= _startTime && now < _stage * NHEROISLAND_STAGE_TIME + _startTime - 60)
     {
         st << static_cast<UInt8>(1);
         st << _stage;
         st << static_cast<UInt16>(_stage * NHEROISLAND_STAGE_TIME + _startTime - 60 - now);
     }
-    else if (now > _stage * NHEROISLAND_STAGE_TIME + _startTime - 60)
+    else if (now >= _stage * NHEROISLAND_STAGE_TIME + _startTime - 60)
     {
         st << static_cast<UInt8>(2);
         st << static_cast<UInt8>(_stage+1);
@@ -1527,7 +1530,7 @@ void NewHeroIsland::playerInfo(Player * player)
     player->send(st);
 
     //玩家刷新or离线后再次进入游戏
-    if (pd && pd->status != NEWHERO_ISLAND_ESCAPE)
+    if (isLogin && pd && pd->status != NEWHERO_ISLAND_ESCAPE)
     {
         broadcastRank(player);
         if (isPrepare(now))
@@ -1555,7 +1558,7 @@ void NewHeroIsland::updatePlayerInfo(UInt32 now)
         for (NHISortAll::iterator it = _sorts.begin(); it != _sorts.end(); ++it)
         {
             if (*it && (*it)->player && (*it)->status != NEWHERO_ISLAND_ESCAPE)
-                playerInfo((*it)->player);
+                playerInfo((*it)->player, false);
         }
     }
 }
