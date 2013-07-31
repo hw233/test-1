@@ -12742,19 +12742,15 @@ namespace GObject
         Stream st(REP::RC7DAY);  //协议
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         UInt32 QQBoardAward = GetVar(VAR_QQBOARD_AWARD);
-        UInt32 max = 0 ;
         UInt32 i=0;
         UInt32 count=0 ;
         while(i<16)
         {
             if(QQBoard & (1 << i++ ))
                 ++count;
-            else count = 0;
-            if(count > max)
-                max = count ;
         }
         st << static_cast<UInt8>(15);
-        st << static_cast<UInt8>(max);   //连续登陆天数
+        st << static_cast<UInt8>(count);   //连续登陆天数
         st <<QQBoardAward;   //领取的奖励号
         st << Stream::eos;
         send(st);
@@ -12851,18 +12847,14 @@ namespace GObject
         // 申请领取新注册七天登录奖励 (包括补签和累计登录）
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         UInt32 ctslandingAward = GetVar(VAR_QQBOARD_AWARD);
-        UInt32 max = 0 ;
         UInt32 i=0;
         UInt32 count=0 ;
         while(i<16)
         {
             if(QQBoard & (1 << i++ ))
                 ++count;
-            else count = 0;
-            if(count > max)
-                max = count ;
         }
-        if (val == 0 || val > max)
+        if (val == 0 || val > count)
             return;
         // 正常签到登录奖励
         if(ctslandingAward & (1<<((val-1)/2)))
