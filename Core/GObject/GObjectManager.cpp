@@ -1990,7 +1990,7 @@ namespace GObject
 #ifdef _DEBUG
                 //fprintf(stderr, "dblvl: %u, explvl: %u, exp: %lu\n", specfgtobj.level, rlvl, specfgtobj.experience);
 #endif
-                if (specfgtobj.level != rlvl)
+                if (specfgtobj.level < rlvl)
                     specfgtobj.level = rlvl;
             }
             fgt2->setLevel(specfgtobj.level, true);
