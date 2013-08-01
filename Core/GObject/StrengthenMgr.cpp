@@ -85,7 +85,7 @@ void StrengthenMgr::LoadFromDB(DBStrengthenData& data)
 UInt8 StrengthenMgr::GetSouls()
 { 
     UInt32 now = TimeUtil::Now();
-    CheckTimeOver(now)
+    CheckTimeOver(now);
     return _item.souls;
 }
 bool StrengthenMgr::CheckTimeOver(UInt32 now)
