@@ -6174,10 +6174,6 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
 void OnQueryTempItemReq( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-	if(!player->hasChecked())
-    {
-		return;
-    }
 
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 opt = 0;
@@ -6192,6 +6188,11 @@ void OnQueryTempItemReq( GameMsgHdr & hdr, const void * data )
         break;
     case 1:
         {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+
             UInt32 itemId = 0;
             UInt16 itemNum = 0;
             UInt8  bind = 0;

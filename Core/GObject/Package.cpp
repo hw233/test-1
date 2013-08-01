@@ -7031,7 +7031,7 @@ namespace GObject
             return 0;
 
         UInt32 count = item->Count();
-        if(sellCount > count)
+        if(sellCount <= 0 || sellCount > count)
             return 0;
 
 		UInt32 price = item->getPrice();
@@ -7162,7 +7162,7 @@ namespace GObject
             return false;
 
         UInt32 count = iterTemp->second->Count();
-        if(RTICount > count)
+        if(RTICount <= 0 || RTICount > count)
             return false;
 
 		UInt32 price = iterTemp->second->getPrice();
