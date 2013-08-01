@@ -71,8 +71,8 @@ namespace GObject
 
         if (lvl < 50)
             lvl = 50;
-        if (lvl > 110)
-            lvl = 110;
+        if (lvl > 120)
+            lvl = 120;
 
         lvl -= 50;
         lvl /= 10;
@@ -2003,12 +2003,18 @@ namespace GObject
                 for(UInt32 i = 0; i < sizeof(guaji) / sizeof(guaji[0]); ++i)
                 {
                     if(guaji[i] == id)
+                    {
                         GameAction()->doStrong(m_Owner, SthHookUse, 0, 0);
+                        break;
+                    }
                 }
                 for(UInt32 i = 0; i < sizeof(xiuwei) / sizeof(xiuwei[0]); ++i)
                 {
                     if(xiuwei[i] == id)
+                    {
                         GameAction()->doStrong(m_Owner, SthPUse, 0, 0);
+                        break;
+                    }
                 }
             }
             UInt32 thisDay = TimeUtil::SharpDay();

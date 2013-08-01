@@ -81,6 +81,8 @@ namespace GObject
         GVAR_ZCJB_ACTIVITY_BEGIN = 45, // 招财进宝活动开始时间
         GVAR_ZCJB_ACTIVITY_END = 46, // 招财进宝活动结束时间
 
+        GVAR_LUCKYMEET_BEGIN = 47,
+        GVAR_LUCKYMEET_END  = 48,
         GVAR_MAX,
     };
 
@@ -149,6 +151,8 @@ namespace GObject
             GREGISTER_VAR(GVAR_RYHB_ACTIVITY_END, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_ZCJB_ACTIVITY_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_ZCJB_ACTIVITY_END, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_LUCKYMEET_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_LUCKYMEET_END, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
