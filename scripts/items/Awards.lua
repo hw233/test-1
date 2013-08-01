@@ -405,7 +405,7 @@ function RunLuckyMeetInstantLoginAward(player, cts)
     if cts == 0 then
         return false
     end
-    if cts > 8 then
+    if cts > 7 then
         return false
     end
 
