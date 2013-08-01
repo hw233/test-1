@@ -12733,11 +12733,7 @@ namespace GObject
         UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
         if(now < begin)
             return ;
-<<<<<<< HEAD
-        if( off > 1)
-=======
         if( off > 16)
->>>>>>> fab2aca66da1bf633e390e6890de32ac89a9a955
             return ;
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         QQBoard |= 1 << (off - 1);
