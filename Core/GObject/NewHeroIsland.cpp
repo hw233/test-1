@@ -893,7 +893,8 @@ void NewHeroIsland::sendOccupySpotAward(NHIPlayerData * pd, UInt8 spot, bool& ha
         typeName = "地";
     else
         typeName = "人";
-    MailPackage::MailItem item[] = { {9411, 1}, };
+    UInt16 count = (World::_wday == 6 || World::_wday == 7) ? 2 : 1;
+    MailPackage::MailItem item[] = { {9411, count}, };
     SYSMSG(title, 2328);
     SYSMSGV(content, 2329, _stage, spotName.c_str(), item[0].count);
     MailItemsInfo itemsInfo(item, NewHeroIslandAward, 1);
@@ -1045,15 +1046,16 @@ void NewHeroIsland::calcNext(UInt32 now)
     {
         _prepareTime = TimeUtil::SharpDayT(0,now) + 11 * 60 * 60 + 50 * 60;
 
-        if(_prepareTime + 75 * 60 < now)
+        if(_prepareTime + 70 * 60 <= now)
             _prepareTime += 24 * 60 * 60;
         _startTime = _prepareTime + 10 * 60;
         _endTime = _startTime + NHEROISLAND_STAGE_TIME * 3 - 60;
+        TRACE_LOG("NewHeroIsland=>>开始时间:[%u],结束时间:[%u]", _startTime, _endTime);
     }
     else
     {
         _prepareTime = now + 30;
-        _startTime = _prepareTime + 2 * 60;
+        _startTime = _prepareTime + 60;
         _endTime = _startTime + NHEROISLAND_STAGE_TIME * 3 - 60;
     }
 }
@@ -1071,10 +1073,10 @@ void NewHeroIsland::rankReward()
         if (!(*i) || !(*i)->player)
             continue;
 
+        UInt16 count = (World::_wday == 6 || World::_wday == 7) ? 2 : 1;
         UInt16 prestige = 0;
         if (n < 5)
         {
-            UInt16 count = (World::_wday == 6 || World::_wday == 7)?2:1;
             MailPackage::MailItem item[2] = {};
             if (n == 0)
             {
@@ -1140,7 +1142,7 @@ void NewHeroIsland::rankReward()
             (*i)->player->send(st);
         //udpLog
         for(UInt8 id = 0; id < 3; ++ id)
-            prestige += (*i)->score[id] / 8;
+            prestige += count * ((*i)->score[id] / 8);
         (*i)->player->heroIslandUdpLog(1165, 3, prestige);
     }
 }
@@ -1170,7 +1172,8 @@ void NewHeroIsland::rankReward1()
     {
         if (!(*it) || !(*it)->player)
             continue;
-        UInt16 prestige = (*it)->score[_stage-1] / 8;
+        UInt16 count = (World::_wday == 6 || World::_wday == 7) ? 2 : 1;
+        UInt16 prestige = count * ((*it)->score[_stage-1] / 8);
         UInt16 cnt1 = 0, cnt2 = 0, cnt3 = 0;
         if (sort[2] + 1 == (*it)->type)
         {
@@ -1190,10 +1193,9 @@ void NewHeroIsland::rankReward1()
             cnt2 = 1;
             cnt3 = 1;
         }
-        SYSMSGV(content, 2319, _stage, (*it)->score[_stage-1], prestige, cnt1, cnt2, cnt3);
-        UInt16 count = (World::_wday == 6 || World::_wday == 7)?2:1;
         //MailPackage::MailItem item[] = {{MailPackage::Prestige, prestige*count}, {9408, cnt1*count}, {9409, cnt2*count}, {9410, cnt3*count},};
         MailPackage::MailItem item[] = {{9408, cnt1*count}, {9409, cnt2*count}, {9410, cnt3*count},};
+        SYSMSGV(content, 2319, _stage, (*it)->score[_stage-1], prestige, item[0].count, item[1].count, item[2].count);
         MailItemsInfo itemsInfo(item, NewHeroIslandAward, 3);
         Mail * mail = (*it)->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
@@ -1227,7 +1229,7 @@ void NewHeroIsland::checkAddExp(UInt32 now)
 {
     if(_expTime > now)
         return;
-    UInt8 factor = (World::_wday == 6 || World::_wday == 7)?2:1;
+    UInt8 factor = (World::_wday == 6 || World::_wday == 7) ? 2 : 1;
     for (NHISortAll::iterator it = _sorts.begin(); it != _sorts.end(); ++it)
     {
         if (*it && (*it)->player && (*it)->status != NEWHERO_ISLAND_ESCAPE)
