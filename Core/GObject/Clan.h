@@ -178,6 +178,7 @@ struct ClanMember
 	UInt8  enterCount;
     UInt32 signupRankBattleTime;
     UInt32 rankBattleField;
+    UInt32 activepoint;
 	std::map<UInt8, ClanPlayerPet> clanPet;
 };
 
@@ -212,6 +213,22 @@ struct MemberDonate
 	}
 };
 typedef std::multiset<MemberDonate> MemberDonates;
+
+
+struct ClanSpiritTree
+{
+    UInt32 m_exp;
+    UInt8 m_level;
+    UInt32 m_endTime;
+    UInt8 m_refreshTimes;
+    UInt8 m_color[3];
+
+    ClanSpiritTree(): m_exp(0), m_level(0), m_endTime(0), m_refreshTimes(0)
+    {
+        memset(m_color, 0, sizeof(m_color));
+    }
+};
+
 
 class Clan:
 	public GObjectBaseT<Clan>
@@ -295,6 +312,7 @@ public:
     void addConstruction(UInt64 cons, bool = true);
 	bool alterLeader();
 	UInt32 getDonateAchievement(Player *);
+    UInt32 getMemberProffer(Player * player);
 	void setFounder(UInt64);
 	UInt8 getCountry();
 	bool accept(Player *, UInt64);
@@ -711,6 +729,14 @@ private:
     UInt32 _xianyun;
     UInt32 _gongxian;
     UInt8 _urge[3];
+
+    ClanSpiritTree m_spiritTree;
+public:
+    void raiseSpiritTree(Player* pl, UInt8 type);   // 培养 type(甘露:0 冰晶:1)
+    void refreshColorAward();
+    void getSpiritTreeAward(Player* pl, UInt8 idx); // 全部领取:idx=0xFF
+    void sendSpiritTreeInfo(Player* pl);
+    void checkSpiritTree();
 };
 
 typedef GGlobalObjectManagerT<Clan, UInt32> GlobalClans;

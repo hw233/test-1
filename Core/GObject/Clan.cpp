@@ -1276,7 +1276,7 @@ void Clan::listMembers( Player * player )
 		ClanMember * mem = *offset;
         if (!mem || !mem->player)
             continue;
-		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << mem->proffer << mem->player->getLastOnline() << mem->player->getPF();
+		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << mem->activepoint << mem->player->getLastOnline() << mem->player->getPF();
 	}
 	st << Stream::eos;
 	player->send(st);
@@ -1336,7 +1336,7 @@ void Clan::sendInfo( Player * player )
         <<  static_cast<UInt8>((pd.ctFinishCount << 4) | player->getClanTaskMax()) << static_cast<UInt32>(getConstruction())
         << getClanFunds() << member->proffer << static_cast<UInt8>(place-1)
         << _name << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
-        << _contact << _announce << _purpose << static_cast<UInt32>(getId());
+        << _contact << _announce << _purpose << static_cast<UInt32>(getId()) << m_spiritTree.m_level;
 	st << Stream::eos;
 	player->send(st);
 }
@@ -2166,6 +2166,19 @@ bool Clan::alterLeader()
 }
 
 UInt32 Clan::getDonateAchievement(Player * player)
+{
+	Mutex::ScopedLock lk(_mutex);
+	Members::iterator offset = _members.begin();
+	for (; offset != _members.end(); ++ offset)
+	{
+		if ((*offset)->player == player)
+			return (*offset)->proffer;
+	}
+
+	return 0;
+}
+
+UInt32 Clan::getMemberProffer(Player * player)
 {
 	Mutex::ScopedLock lk(_mutex);
 	Members::iterator offset = _members.begin();
@@ -4274,5 +4287,133 @@ void Clan::broadcastClanBattle(Player *caller)
 // 帮派副本
 //////////////////////////////////////////
 
+#define MAX_CLANSPTR_LEVEL  9
+static UInt32 clansptr_exptable[9] = {0, 100, 1000, 2000, 4000, 8000, 12000, 20000, 30000};
+static UInt32 clansptr_water_teal[3] = {0, 500, 1000};
+
+void Clan::raiseSpiritTree(Player* pl, UInt8 type)
+{
+    checkSpiritTree();
+
+    UInt8 res = 0;
+    // _mutex生命周期
+    {
+        Mutex::ScopedLock lk(_mutex);
+        if(type == 0)
+        {
+            UInt8 idx = pl->GetVar(VAR_CLAN_SPTR_WATER);
+            if(idx > 2)
+                return;
+            UInt32 needTeal = clansptr_water_teal[idx];
+            if(m_spiritTree.m_level >= MAX_CLANSPTR_LEVEL)
+            {
+                res = 1;
+            }
+            else if(pl->getTael() < needTeal)
+            {
+                res = 2;
+            }
+            else
+            {
+                pl->AddVar(VAR_CLAN_SPTR_WATER, 1);
+                ConsumeInfo ci(ClanSptr,0,0);
+                pl->useTael(needTeal, &ci);
+                m_spiritTree.m_exp += 100;
+                while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level])
+                    ++ m_spiritTree.m_level;
+            }
+        }
+        else
+        {
+            if(m_spiritTree.m_color[2] != 0)
+            {
+                res = 3;
+            }
+            else if(pl->getGold() < 10)
+            {
+                res = 4;
+            }
+            else
+            {
+                ConsumeInfo ci(ClanSptr,0,0);
+                pl->useGold(10, &ci);
+                m_spiritTree.m_exp += 200;
+                while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level])
+                    ++ m_spiritTree.m_level;
+                refreshColorAward();
+            }
+        }
+    }
+
+    if(res == 0)
+    {
+        sendSpiritTreeInfo(pl);
+    }
+    else
+    {
+    }
+}
+
+void Clan::refreshColorAward()
+{
+    const UInt8 level_limit[3] = {3, 6, 9};
+    const UInt16 rates[3][5] = {
+        // 初始次数，小于初始次数的概率， 大于初始次数之后的递增次数， 大于于初始次数的初始概率, 大于初始次数递增后的递增概率
+        {5, 1, 1, 3000, 2000},
+        {9, 1, 1, 3000, 2000},
+        {25, 2, 5, 2002, 2000}
+    };
+
+    for(int i = 0; i < 3; ++ i)
+    {
+        if(m_spiritTree.m_level < level_limit[i])
+            break;
+        if(m_spiritTree.m_color[0] == 0)
+        {
+            UInt16 rate = 0;
+            if(m_spiritTree.m_refreshTimes < rates[0])
+                rate = rates[1];
+            else
+                rate = rates[3] + (m_spiritTree - rates[0]) * rates[4];
+            m_spiritTree.m_color[0] = (uRand(10000) < rate ? 1 : 0);
+            ++ m_spiritTree.m_refreshTimes;
+            break;
+        }
+    }
+}
+
+void Clan::getSpiritTreeAward(Player* pl, UInt8 idx)
+{
+    checkSpiritTree();
+    if(idx != 0xFF && idx > 12 || idx == 0)
+        return;
+
+    Mutex::ScopedLock lk(_mutex);
+    UInt32 awardFlag = pl->GetVar(VAR_CLAN_SPTR_AWARD);
+    if(idx != 0xFF)
+    {
+        if(m_spiritTree.m_level >= idx)
+        {
+        }
+    }
+}
+
+void Clan::sendSpiritTreeInfo(Player* pl)
+{
+    checkSpiritTree();
+    Mutex::ScopedLock lk(_mutex);
+}
+
+void Clan::checkSpiritTree()
+{
+    Mutex::ScopedLock lk(_mutex);
+    UInt32 now = TimeUtil::Now();
+    if(now > m_endTime)
+    {
+        m_exp = 0;
+        m_level = 1;
+        m_endTime = TimeUtil::SharpWeek(1, now);
+    }
+}
 
 }
