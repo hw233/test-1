@@ -84,6 +84,9 @@ namespace GObject
         GVAR_NewUser_Cur = 47, 
         GVAR_NewUser_Max = 48, 
 
+        GVAR_LUCKYMEET_BEGIN = 49,
+        GVAR_LUCKYMEET_END  = 50,
+
         GVAR_MAX,
     };
 
@@ -156,6 +159,8 @@ namespace GObject
             GREGISTER_VAR(GVAR_NewUser_Max, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_NewUser_Cur, GCYCLE_DAY);
 
+            GREGISTER_VAR(GVAR_LUCKYMEET_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_LUCKYMEET_END, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

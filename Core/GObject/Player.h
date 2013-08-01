@@ -804,8 +804,12 @@ namespace GObject
         void turnOnRF7Day();
         void addRC7DayRecharge(UInt32 r);
         void addRF7DayRecharge(UInt32 r);
+        void addLuckyMeetRecharge(UInt32 r);
         void sendRC7DayInfo(UInt32 now = TimeUtil::Now());
         void sendRF7DayInfo(UInt32 now = TimeUtil::Now());
+        void sendLuckyMeetInfo();
+        void getLuckyMeetRechargeAward(UInt8 val);
+        void getLuckyMeetStrenthAward(UInt8 val);
         void setContinuousRFAward(UInt32 no);
         void sendFourCopAct();
         void sendLuckybagInfo();
@@ -902,6 +906,7 @@ namespace GObject
 
         inline void setQQVipl(UInt8 lvl)
         {
+
             _playerData.qqvipl = lvl;
             if(lvl > 8 && lvl < 10)
                 _playerData.qqvipl = 8;
@@ -2176,8 +2181,12 @@ namespace GObject
         void sendNewRC7DayTarget(UInt8 idx = 0);
         void sendQQBoardLoginInfo();
         void SetQQBoardValue();
+        void sendLuckyMeetLoginInfo();
+        void SetLuckyMeetValue();
         void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
         void getQQBoardInstantLoginAward(UInt8 val);
+        void getLuckyMeetInstantLoginAward(UInt8 val);
+        void getLuckyMeetAward(UInt8 idx,UInt8 index);
         void getNewRC7DayRechargeAward(UInt8 val);
         void getNewRC7DayTargetAward(UInt8 val);
         void get11DailyAward(UInt8 opt);
