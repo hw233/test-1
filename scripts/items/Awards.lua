@@ -391,7 +391,6 @@ function RunQQBoardInstantLoginAward(player, cts)
     return true
 end
 function RunLuckyMeetInstantLoginAward(player, cts)
-    -- 领取QQ面板连续登陆登录奖励
     local item = {
         [1] = {{1326,1},{133, 1}, {499, 10}},
         [2] = {{1326,2},{133, 2}, {499, 20}},
@@ -406,7 +405,7 @@ function RunLuckyMeetInstantLoginAward(player, cts)
     if cts == 0 then
         return false
     end
-    if cts > 16 then
+    if cts > 8 then
         return false
     end
 
@@ -415,10 +414,9 @@ function RunLuckyMeetInstantLoginAward(player, cts)
         player:sendMsgCode(2, 1011, 0);
         return false
     end
-
     for count = 1, #item[cts] do
         if item[cts][count][1] == 499 then
-            player:getCoupon([cts][count][2])
+            player:getCoupon(item[cts][count][2])
         else
             package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
         end
@@ -444,10 +442,11 @@ function RunLuckyMeetRechargeAward(player, cts)
     local package = player:GetPackage();
     local level = player:GetVar(550);
     local lv = 0;
-    if level >3 then
-        lv = 1;
-    else 
-        lv =2;
+    if level > 0 and level<5 then
+        lv =1
+    end
+    if level >4 then 
+        lv =2 
     end
     local cts2 = lv*4+cts;
     if cts2 == 0 then
@@ -474,7 +473,7 @@ function RunLuckyMeetStrengthAward(player, cts)
         [1] = {{509,1}, {503, 2},{5123,2},{5103,2}},
         [2] = {{507,1}, {514, 3},{5063,3},{5073,3}},
         [3] = {{515,1}, {5133, 3},{5113,3},{513,3}},
-        [4] = {{516,1}, {5023, 3},{5003,3},{9076,2}},
+        [4] = {{516,3}, {5023, 3},{5003,3},{9076,2}},
     }
     local package = player:GetPackage();
     if cts == 0 then

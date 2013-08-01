@@ -1078,6 +1078,7 @@ namespace GObject
 
         sendYearRPInfo();
         sendSummerFlowInfo();
+       sendLuckyMeetLoginInfo();
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
@@ -2289,7 +2290,7 @@ namespace GObject
 #endif
 #endif // _WIN32
         //heroIsland.playerOffline(this);
-        newHeroIsland.playerLeave(this);
+        //newHeroIsland.playerLeave(this);
 		removeStatus(SGPunish);
         char online[32] = {0,};
         snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
@@ -12732,7 +12733,7 @@ namespace GObject
         UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
         if(now < begin)
             return ;
-        if( off > 15)
+        if( off > 16)
             return ;
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         QQBoard |= 1 << (off - 1);
@@ -12740,19 +12741,21 @@ namespace GObject
     }
     void Player::SetLuckyMeetValue()
     {
-       // if(!World::getLuckyMeet())
-         //   return ;
+        if(!World::getLuckyMeet())
+            return ;
         UInt32 LuckyMeet = GetVar(VAR_LUCKYMEET);
-        std::string  openid = getOpenId();
-        char  key1[16] = "uid_asss_act";
-        if(!LuckyMeet &&! GObject::dclogger.checkActiveOpenid(key1,(char*)openid.c_str()))
-            return;
+        //std::string  openid = getOpenId();
+        //char  key1[16] = "uid_asss_act";
+    //    if(!LuckyMeet &&! GObject::dclogger.checkActiveOpenid(key1,(char*)openid.c_str()))
+      //      return;
         UInt32 begin =GVAR.GetVar(GVAR_LUCKYMEET_BEGIN) ;
         UInt32 end =GVAR.GetVar(GVAR_LUCKYMEET_END) ;
         UInt32 now = TimeUtil::Now();
         UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
         if(now < begin || now >end )
             return ;
+        if(off!= 1 && !(LuckyMeet&(1<<(off-1))))
+          SetVar(VAR_LUCKYMEET_AWARD , 0); 
         LuckyMeet |= 1 << (off - 1);
         SetVar(VAR_LUCKYMEET, LuckyMeet);
     }
@@ -12761,19 +12764,15 @@ namespace GObject
         Stream st(REP::RC7DAY);  //协议
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         UInt32 QQBoardAward = GetVar(VAR_QQBOARD_AWARD);
-        UInt32 max = 0 ;
         UInt32 i=0;
         UInt32 count=0 ;
         while(i<16)
         {
             if(QQBoard & (1 << i++ ))
                 ++count;
-            else count = 0;
-            if(count > max)
-                max = count ;
         }
         st << static_cast<UInt8>(15);
-        st << static_cast<UInt8>(max);   //连续登陆天数
+        st << static_cast<UInt8>(count);   //连续登陆天数
         st <<QQBoardAward;   //领取的奖励号
         st << Stream::eos;
         send(st);
@@ -12796,16 +12795,21 @@ namespace GObject
         {
             if(LuckyMeet & (1 << i++ ))
                 ++count;
-            else count = 0;
-            if(count > max)
-                max = count ;
+            else 
+            {
+                if(count != 0)
+                 {
+                     max = count ;
+                     count =0;
+                 }
+            }
         }
         st << static_cast<UInt8>(16);
         st << static_cast<UInt8>(max);   //连续登陆天数
-        st <<static_cast<UInt8>(LuckyMeetVip);
-        st << LuckyMeetRecharge;
-        st <<static_cast<UInt8>(LuckyMeetAward);   //领取的奖励号
-        st <<static_cast<UInt8>(LuckyMeetStrenthAward);  
+        st << static_cast<UInt8>(LuckyMeetVip);
+        st << (LuckyMeetRecharge);
+        st << static_cast<UInt8>(LuckyMeetAward);   //领取的奖励号
+        st << static_cast<UInt8>(LuckyMeetStrenthAward);  
         st <<static_cast<UInt8>(LuckyMeetRechargeAward);
         st << Stream::eos;
         send(st);
@@ -12901,18 +12905,14 @@ namespace GObject
         // 申请领取新注册七天登录奖励 (包括补签和累计登录）
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         UInt32 ctslandingAward = GetVar(VAR_QQBOARD_AWARD);
-        UInt32 max = 0 ;
         UInt32 i=0;
         UInt32 count=0 ;
         while(i<16)
         {
             if(QQBoard & (1 << i++ ))
                 ++count;
-            else count = 0;
-            if(count > max)
-                max = count ;
         }
-        if (val == 0 || val > max)
+        if (val == 0 || val > count)
             return;
         // 正常签到登录奖励
         if(ctslandingAward & (1<<((val-1)/2)))
@@ -12925,18 +12925,21 @@ namespace GObject
     }
     void Player::getLuckyMeetAward(UInt8 idx,UInt8 index)
     {
+        if(!World::getLuckyMeet())
+            return ;
         switch(idx)
         {
             case 1:
                 getLuckyMeetInstantLoginAward(index);
                 break;
-            case 2:
+            case 3:
                 getLuckyMeetRechargeAward(index);
                 break;
-            case 3:
+            case 2:
                 getLuckyMeetStrenthAward(index);
                 break;
         }
+        sendLuckyMeetLoginInfo();
     }
     //蜀山奇遇连续登录奖励
     void Player::getLuckyMeetInstantLoginAward(UInt8 val)
@@ -12950,44 +12953,60 @@ namespace GObject
         {
             if(LuckyMeet & (1 << i++ ))
                 ++count;
-            else count = 0;
-            if(count > max)
-                max = count ;
+            else 
+            {
+                if(count != 0)
+                 {
+                     max = count ;
+                     count =0;
+                 }
+            }
         }
         if (val == 0 || val != max)
             return;
         // 正常签到登录奖励
         if(ctslandingAward & (1<<(val-1)))
             return ;
-        if (!GameAction()->RunLuckyMeetInstantLoginAward(this, val))
+        if(!GameAction()->RunLuckyMeetInstantLoginAward(this, val))
+        {
             return;
+        }
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_LUCKYMEET_AWARD, ctslandingAward);
-       sendLuckyMeetLoginInfo();
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d",4+val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
     //蜀山奇遇充值奖励
     void Player::getLuckyMeetRechargeAward(UInt8 val)
     {
-        UInt32 ctslandingAward = GetVar(VAR_LUCKYMEET_AWARD);
+        UInt32 ctslandingAward = GetVar(VAR_LUCKYMEET_RECHARGE_AWARD);
         if(ctslandingAward & (1<<(val-1)))
             return ;
         if (!GameAction()->RunLuckyMeetRechargeAward(this, val))
             return;
         ctslandingAward |= (1<<(val - 1));
-        SetVar(VAR_LUCKYMEET_AWARD, ctslandingAward);
-       sendLuckyMeetLoginInfo();
+        SetVar(VAR_LUCKYMEET_RECHARGE_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d", val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
 
     void Player::getLuckyMeetStrenthAward(UInt8 val)
     {
+        UInt32 souls = GetStrengthenMgr()->GetSouls();
+        if(val*25 > souls)
+            return ;
         UInt32 ctslandingAward = GetVar(VAR_LUCKYMEET_STRENTH_AWARD);
         if(ctslandingAward & (1<<(val-1)))
             return ;
-        if (!GameAction()->RunLuckyMeetRechargeAward(this, val))
+        if (!GameAction()->RunLuckyMeetStrengthAward(this, val))
             return;
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_LUCKYMEET_STRENTH_AWARD, ctslandingAward);
-       sendLuckyMeetLoginInfo();
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d", 11+val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
 
     void Player::getNewRC7DayRechargeAward(UInt8 val)
@@ -22500,8 +22519,9 @@ static UInt32 ryhb_items_1[15][4] = {
 static UInt32 ryhb_items_2[15][4] = {
     {8, 8, 78, 9},          // 升级优惠礼包
     {28, 28, 79, 9},        // 炼器优惠礼包
-    {8, 15, 80, 9},         // 九疑鼎优惠礼包
-    {333, 288, 5136, 3},    // 六级身法石
+    {15, 8, 80, 9},         // 九疑鼎优惠礼包
+    {88, 88, 5135, 3},      // 五级身法石
+    {2, 4, 1126, 99},       // 橙色星辰旗
     {2, 5, 1325, 99},       // 技能符文熔炼诀
     {2, 5, 134, 99},        // 法灵精金
     {2, 5, 547, 99},        // 天赋保护符
@@ -22509,7 +22529,6 @@ static UInt32 ryhb_items_2[15][4] = {
     {1, 3, 503, 99},        // 太乙精金
     {4, 8, 515, 99},        // 五行精金
     {1, 5, 509, 99},        // 凝神易筋丹
-    {1, 3, 9371, 99},       // 仙缘石
     {99, 99, 1717, 5},      // 女仆头饰
     {99, 99, 1719, 5},      // 兔耳朵
     {88, 88, 8555, 64},      // 天劫术

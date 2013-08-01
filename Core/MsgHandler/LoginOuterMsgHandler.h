@@ -410,7 +410,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setXinYue(atoi(xinyue.c_str()));
             player->setJinQuan(jinquan);
             player->continuousLoginSummerFlow();
-            player->SetLuckyMeetValue();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -746,7 +745,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setXinYue(atoi(xinyue.c_str()));
             pl->setJinQuan(jinquan);
             pl->continuousLoginSummerFlow();
-            pl->SetLuckyMeetValue();
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -1030,12 +1028,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                500,    5,
                 515,    2,
                 509,    2,
+                15,     8,
                 549,    2,
-                134,    5,
-                15,     8
+                503,    5,
+                500,    5
             };
 
             UInt8 idx = 0;
@@ -1065,7 +1063,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 5)
+                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 10)
                         purchase.code = 2;
 
                     purchase.id = id;
@@ -2180,7 +2178,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 	UInt8 bindType = 1;
     CHKKEY();
 	br>>pf>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
-	std::string result="";
+	//std::string result="";
 	GObject::MailPackage::MailItem *item = new(std::nothrow) GObject::MailPackage::MailItem[nums + 5];
 	if(item == NULL)
 		return;
@@ -2207,13 +2205,14 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
     {
         br>>serverNo;
     }
+    INFO_LOG("GM[%s]: %u", __PRETTY_FUNCTION__, serverNo);
 
     for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(), end = GObject::globalPlayers.end(); it != end; ++it)
 	{
 		GObject::Player *player=it->second;
 		if(player==NULL || (serverNo != 0 && serverNo != (static_cast<UInt16>(player->getId()>>48))))
 		{
-			result+="1 ";
+			//result+="1 ";
 		}
 		else
 		{
@@ -2224,18 +2223,19 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
                 if(pmail != NULL)
                 {
                     GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
-                    result +="0 ";
+                    //result +="0 ";
                     player->moneyLog(2, money[2], money[1], money[0], money[3]);
                 }
                 else
                 {
-                    result +="2 ";
+                    //result +="2 ";
                 }
             }
 		}
 	}
-	result=result.substr(0,result.length()-1);
-	st<<result;
+	//result=result.substr(0,result.length()-1);
+	//st<<result;
+    st << static_cast<UInt8>(1);
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 
@@ -3015,8 +3015,8 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_LUCKYMEET, 0);
                 pl->SetVar(GObject::VAR_LUCKYMEET_AWARD, 0);
                 pl->SetVar(GObject::VAR_LUCKYMEET_VIP,pl->getVipLevel());
+                pl->SetVar(GObject::VAR_LUCKYMEET_RECHARGE_AWARD,0);
             //    pl->checLuckyMeet();
-            
             }
             break;
         default:

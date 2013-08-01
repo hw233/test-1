@@ -82,6 +82,12 @@ void StrengthenMgr::LoadFromDB(DBStrengthenData& data)
     }
 }
 
+UInt8 StrengthenMgr::GetSouls()
+{ 
+    UInt32 now = TimeUtil::Now();
+    CheckTimeOver(now);
+    return _item.souls;
+}
 bool StrengthenMgr::CheckTimeOver(UInt32 now)
 {
     //UInt32 now = TimeUtil::Now();
@@ -389,7 +395,6 @@ void StrengthenMgr::EveryDayRoar()
     st << Stream::eos;
     _owner->send(st);
 }
-
 void StrengthenMgr::SendStrengthenRank()
 {
     Stream st(REP::STRENGTHEN_LIST);
