@@ -822,9 +822,9 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool no
     if(NULL != _peerlessSkill.base)
     {
         bool isValid = false;
-        if(getBuddhaLightLast() > 0)
+        if(getBuddhaLightLast() > 0 && getBlind() < 0.001f)
         {
-            if(uRand(10000) < getBuddhaLightRate() * 1000)
+            if(uRand(10000) < getBuddhaLightRate() * 100)
             {
                 isValid = true;
             }
@@ -840,6 +840,14 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool no
             if (_fighter->getOwner())
                 _fighter->getOwner()->OnHeroMemo(GObject::MC_SKILL, GObject::MD_ADVANCED, 0, 2);
             return _peerlessSkill.base;
+        }
+    }
+    else
+    {
+        if(getBuddhaLightLast() > 0 && getBlind() < 0.001f)
+        {
+            printf("end3\n");
+            setBuddhaLight(0, 0xFF);
         }
     }
 

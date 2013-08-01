@@ -4284,7 +4284,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     if (skill && skill->cond == GData::SKILL_PEERLESS)
     {
         UInt8 last = bf->getBuddhaLightLast();
-        if(last == 0)
+        if(last == 0 || (last > 0 && bf->getBlind() > 0.001f))
         {
             int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
             //setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, false);
@@ -4293,10 +4293,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         if (launchPeerLess)
             *launchPeerLess = 1;
 
-        if(last > 0)
+        if(last > 0 && skill && bf->getBlind() < 0.001f)
         {
             printf("end\n");
-            initBuddhaLight(bf, true);
+            initBuddhaLight(bf, true, false);
         }
     }
 
@@ -5524,7 +5524,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             BattleFighter* therapy_bf = getTherapyTarget(bf);
             skill = bf->getActiveSkill(therapy_bf!= NULL, noPossibleTarget);
             if(bf->getBuddhaLightLast() == 0xFF)
-                initBuddhaLight(bf, false);
+                initBuddhaLight(bf, false, false);
             bool canNormal = true;
             bool extraNormal = false;
             if(NULL != skill)
@@ -7279,7 +7279,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             }
         }
 
-        initBuddhaLight(toremove, false);
+        initBuddhaLight(toremove, false, true);
     }
 
     if(bIfDead)
@@ -12473,9 +12473,13 @@ void BattleSimulator::doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int targ
         for(size_t j = 0; j < cnt2; ++ j)
         {
             BattleFighter* bo = atklist[j].bf;
+            printf("rate: %f\n", skill->prob);
             bo->setBuddhaLight(skill->prob, efl[i]);
             if(ef)
-                bo->setBuddhaLightValue(ef->valueExt1);
+            {
+                printf("rate: %f\n", ef->value);
+                bo->setBuddhaLightValue(ef->value);
+            }
             bo->setBuddhaLightLauncher(bf);
         }
         appendDefStatus(e_buddhaLight, 0, bf);
@@ -12958,17 +12962,20 @@ void BattleSimulator::calcBleedTypeCnt(BattleObject* bo)
     }
 }
 
-void BattleSimulator::initBuddhaLight(BattleFighter* bf, bool auralAdd)
+void BattleSimulator::initBuddhaLight(BattleFighter* bf, bool auralAdd, bool dead)
 {
     for(UInt8 i = 0; i < 25; i++)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(bf->getSide(), i));
         if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
             continue;
+        if(dead && bf != bo->getBuddhaLightLauncher())
+            return;
         bo->setBuddhaLight(0, 0);
         if(bo == bo->getBuddhaLightLauncher())
             appendDefStatus(e_unBuddhaLight, 0, bo);
         bo->setBuddhaLightLauncher(NULL);
+        printf("value: %f\n", bo->getBuddhaLightValue());
         if(auralAdd && bo->getBuddhaLightValue() > 0.001)
             setStatusChange_Aura2(bo, bo->getSide(), bo->getPos(), NULL, bo->getBuddhaLightValue(), 0, false);
         bo->setBuddhaLightValue(0);
