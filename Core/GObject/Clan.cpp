@@ -1338,7 +1338,7 @@ void Clan::sendInfo( Player * player )
     if (cfg.merged != true)
     {
         server_id = (unsigned long long)cfg.serverNo;
-        uid = (server_id << 48 ) + getLeaderId()&0xffffffffffff;
+        uid = (server_id << 48 ) + (getLeaderId()&0xffffffffffff);
     }
     else
         uid = getLeaderId();
