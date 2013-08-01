@@ -236,7 +236,7 @@ void NewHeroIsland::playerEnter(Player* player)
 
     ++ _nplayers[spot][pd->type-1];
     broadcastRank(player);
-    //updateSpotPlayers(spot);
+    updateSpotPlayers(spot);
     sendSkillInfo(pd);
     player->getSurnameLegendAward(e_sla_hi);
     player->OnHeroMemo(MC_ATHLETICS, MD_MASTER, 0, 0);
