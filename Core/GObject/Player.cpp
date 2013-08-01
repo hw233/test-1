@@ -1078,6 +1078,7 @@ namespace GObject
 
         sendYearRPInfo();
         sendSummerFlowInfo();
+       sendLuckyMeetLoginInfo();
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
@@ -7930,6 +7931,7 @@ namespace GObject
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
+        addLuckyMeetRecharge(r);
         addRechargeNextRet(r);
         {
             GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, this, sizeof(_playerData.totalRecharge));
@@ -12731,11 +12733,35 @@ namespace GObject
         UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
         if(now < begin)
             return ;
+<<<<<<< HEAD
+        if( off > 1)
+=======
         if( off > 16)
+>>>>>>> fab2aca66da1bf633e390e6890de32ac89a9a955
             return ;
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         QQBoard |= 1 << (off - 1);
         SetVar(VAR_QQBOARD, QQBoard);
+    }
+    void Player::SetLuckyMeetValue()
+    {
+        if(!World::getLuckyMeet())
+            return ;
+        UInt32 LuckyMeet = GetVar(VAR_LUCKYMEET);
+        //std::string  openid = getOpenId();
+        //char  key1[16] = "uid_asss_act";
+    //    if(!LuckyMeet &&! GObject::dclogger.checkActiveOpenid(key1,(char*)openid.c_str()))
+      //      return;
+        UInt32 begin =GVAR.GetVar(GVAR_LUCKYMEET_BEGIN) ;
+        UInt32 end =GVAR.GetVar(GVAR_LUCKYMEET_END) ;
+        UInt32 now = TimeUtil::Now();
+        UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
+        if(now < begin || now >end )
+            return ;
+        if(off!= 1 && !(LuckyMeet&(1<<(off-1))))
+          SetVar(VAR_LUCKYMEET_AWARD , 0); 
+        LuckyMeet |= 1 << (off - 1);
+        SetVar(VAR_LUCKYMEET, LuckyMeet);
     }
     void Player::sendQQBoardLoginInfo()
     {
@@ -12755,7 +12781,41 @@ namespace GObject
         st << Stream::eos;
         send(st);
     }
-
+    void Player::sendLuckyMeetLoginInfo()
+    {
+        Stream st(REP::RC7DAY);  //协议
+        UInt32 LuckyMeet = GetVar(VAR_LUCKYMEET);
+        UInt32 LuckyMeetRechargeAward = GetVar(VAR_LUCKYMEET_RECHARGE_AWARD);
+        UInt32 LuckyMeetAward = GetVar(VAR_LUCKYMEET_AWARD);   //登录奖励
+        UInt32 LuckyMeetRecharge = GetVar(VAR_LUCKYMEET_RECHARGE);
+        UInt32 LuckyMeetVip = GetVar(VAR_LUCKYMEET_VIP);
+        UInt32 LuckyMeetStrenthAward = GetVar(VAR_LUCKYMEET_STRENTH_AWARD);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(LuckyMeet & (1 << i++ ))
+                ++count;
+            else 
+            {
+                if(count != 0)
+                 {
+                     max = count ;
+                     count =0;
+                 }
+            }
+        }
+        st << static_cast<UInt8>(16);
+        st << static_cast<UInt8>(max);   //连续登陆天数
+        st << static_cast<UInt8>(LuckyMeetVip);
+        st << (LuckyMeetRecharge);
+        st << static_cast<UInt8>(LuckyMeetAward);   //领取的奖励号
+        st << static_cast<UInt8>(LuckyMeetStrenthAward);  
+        st <<static_cast<UInt8>(LuckyMeetRechargeAward);
+        st << Stream::eos;
+        send(st);
+    }
     void Player::getNewRC7DayLoginAward(UInt8 val, UInt8 off)
     {
         // 申请领取新注册七天登录奖励 (包括补签和累计登录）
@@ -12865,7 +12925,91 @@ namespace GObject
         SetVar(VAR_QQBOARD_AWARD, ctslandingAward);
        sendQQBoardLoginInfo();
     }
+    void Player::getLuckyMeetAward(UInt8 idx,UInt8 index)
+    {
+        if(!World::getLuckyMeet())
+            return ;
+        switch(idx)
+        {
+            case 1:
+                getLuckyMeetInstantLoginAward(index);
+                break;
+            case 3:
+                getLuckyMeetRechargeAward(index);
+                break;
+            case 2:
+                getLuckyMeetStrenthAward(index);
+                break;
+        }
+        sendLuckyMeetLoginInfo();
+    }
+    //蜀山奇遇连续登录奖励
+    void Player::getLuckyMeetInstantLoginAward(UInt8 val)
+    {
+        UInt32 LuckyMeet = GetVar(VAR_LUCKYMEET);
+        UInt32 ctslandingAward = GetVar(VAR_LUCKYMEET_AWARD);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(LuckyMeet & (1 << i++ ))
+                ++count;
+            else 
+            {
+                if(count != 0)
+                 {
+                     max = count ;
+                     count =0;
+                 }
+            }
+        }
+        if (val == 0 || val != max)
+            return;
+        // 正常签到登录奖励
+        if(ctslandingAward & (1<<(val-1)))
+            return ;
+        if(!GameAction()->RunLuckyMeetInstantLoginAward(this, val))
+        {
+            return;
+        }
+        ctslandingAward |= (1<<(val - 1));
+        SetVar(VAR_LUCKYMEET_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d",4+val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
+    }
+    //蜀山奇遇充值奖励
+    void Player::getLuckyMeetRechargeAward(UInt8 val)
+    {
+        UInt32 ctslandingAward = GetVar(VAR_LUCKYMEET_RECHARGE_AWARD);
+        if(ctslandingAward & (1<<(val-1)))
+            return ;
+        if (!GameAction()->RunLuckyMeetRechargeAward(this, val))
+            return;
+        ctslandingAward |= (1<<(val - 1));
+        SetVar(VAR_LUCKYMEET_RECHARGE_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d", val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
+    }
 
+    void Player::getLuckyMeetStrenthAward(UInt8 val)
+    {
+        UInt32 souls = GetStrengthenMgr()->GetSouls();
+        if(val*25 > souls)
+            return ;
+        UInt32 ctslandingAward = GetVar(VAR_LUCKYMEET_STRENTH_AWARD);
+        if(ctslandingAward & (1<<(val-1)))
+            return ;
+        if (!GameAction()->RunLuckyMeetStrengthAward(this, val))
+            return;
+        ctslandingAward |= (1<<(val - 1));
+        SetVar(VAR_LUCKYMEET_STRENTH_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d", 11+val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
+    }
 
     void Player::getNewRC7DayRechargeAward(UInt8 val)
     {
@@ -14125,7 +14269,7 @@ namespace GObject
         initMemcache();
         char key[MEMCACHED_MAX_KEY] = {0};
         char value[4][32] ={"07","14","30","90"};
-        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_23336");
+        size_t len = snprintf(key, sizeof(key), "uid_asss_act_9545942");
         size_t vlen = strlen(value[0]);
         MemcachedSet(key, len, value[0], vlen, 0);
     }
@@ -15091,6 +15235,21 @@ namespace GObject
         AddVar(VAR_RF7DAYRECHARGE, r);
 
         Stream st(REP::RF7DAY);
+        st << static_cast<UInt8>(5) << GetVar(VAR_RF7DAYRECHARGE);
+        st << Stream::eos;
+        send(st);
+    }
+    void Player::addLuckyMeetRecharge(UInt32 r)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 rf =GVAR.GetVar(GVAR_LUCKYMEET_BEGIN);
+        UInt32 rf2 = GVAR.GetVar(GVAR_LUCKYMEET_END);
+        if (!rf || now < rf ||rf > rf2)
+            return;
+
+        AddVar(VAR_LUCKYMEET_RECHARGE, r);
+
+        Stream st(REP::RF7DAY);         //蜀山奇遇:w
         st << static_cast<UInt8>(5) << GetVar(VAR_RF7DAYRECHARGE);
         st << Stream::eos;
         send(st);
