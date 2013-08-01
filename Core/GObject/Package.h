@@ -277,7 +277,24 @@ namespace GObject
         void FinishLBSmelt();
         bool FinishLBSmeltSpecial(const GData::ItemBaseType * itype, ItemLingbaoAttr& lbattr, UInt8& attrNum);
         void testLingbao(UInt32 itemId, UInt32* colorNums, UInt8 size, UInt32* skills, UInt8 size2);
-
+    public:
+        ItemBase * AddRetItemToPackage(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 FromWhere);
+        ItemBase * AddTempItemFromDB(TempItemData &);
+        ItemBase * AddTempEquipFromDB(TempItemData &);
+        UInt32 AddTemporaryItem(UInt32 itemId, UInt32 sellCount, bool bind);
+        bool RetrieveTemporaryItem(UInt32 itemId, UInt32 sellCount, bool bind);
+        bool CheckTemporaryItem();
+        bool DelTempEquip(ItemEquip * equip, UInt8 toWhere, bool sendMark = false);
+        bool DelTempItem(ItemBase* item, UInt32 num, UInt8 toWhere, bool sendMark = false);
+        bool TryAddTempItem(ItemBase * item, UInt32 num);
+        bool TryDelTempItem(ItemBase * item, UInt32 num);
+        bool TryBuySoulItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
+        void SendTempItemInfo();
+        void SendSingleTempEquipData(ItemEquip * equip);
+        void SendTempItemData(ItemBase * item);
+        void SendDelTempEquipData(ItemEquip * equip);
+        static void AppendTempItemData(Stream& st, ItemBase * item);
+        static void AppendTempEquipData(Stream& st, ItemEquip * equip, bool hascount = true);
     protected:
 		typedef std::map<ItemKey, ItemBase *> ItemCont;
 		typedef ItemCont::iterator item_elem_iter;
@@ -288,8 +305,10 @@ namespace GObject
 
 		ItemCont m_Items;
 		ItemCont m_ItemsSoul;
+        ItemCont m_ItemsTemporary; //临时物品
 		UInt16 m_Size;		//already used grids
 		UInt16 m_SizeSoul;  //already used soul grids
+        UInt16 m_TempItemSize;
 		UInt8 _lastActivateLv;
 		UInt8 _lastActivateQ;
 		UInt8 _lastActivateCount;

@@ -71,6 +71,7 @@ private:
     static void ClanCopyResetEnd(void *);
 
     static void ClanBoss_Refresh(void*);
+    
 private:
 	UInt8		m_ThreadID;					//?????߳?
 
