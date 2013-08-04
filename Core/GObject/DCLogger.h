@@ -98,7 +98,7 @@ public:
     UInt8 checkRPOpenid(char* openid);
     UInt8 checkGRPOpenid(char* openid);
     UInt8 checkActiveOpenid(char * key1,char* openid);
-
+    UInt8 checkYBLevel(UInt64 playerId ,UInt32 viplev);
 private:
     UInt32 version;
     UInt32 appid;

@@ -359,5 +359,12 @@ namespace GObject
         return atoi(value);
         
     }
+    UInt8 DCWorker::CheckYBLevel(UInt64 playerId ,UInt32 viplev)
+    {
+        GObject::Player * pl = GObject::globalPlayers[playerId];
+        if(pl!=NULL)
+            return true;
+        return false;
+    }
 }
 

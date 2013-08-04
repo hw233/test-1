@@ -389,7 +389,13 @@ void StrengthenMgr::EveryDayRoar()
     st << Stream::eos;
     _owner->send(st);
 }
-
+UInt8 StrengthenMgr::GetSouls()
+{ 
+    UInt32 now = TimeUtil::Now();
+    if(CheckTimeOver(now))
+        return 0;
+    return _item.souls;
+}
 void StrengthenMgr::SendStrengthenRank()
 {
     Stream st(REP::STRENGTHEN_LIST);

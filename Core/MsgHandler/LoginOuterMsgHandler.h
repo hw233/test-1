@@ -410,7 +410,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setXinYue(atoi(xinyue.c_str()));
             player->setJinQuan(jinquan);
             player->continuousLoginSummerFlow();
-            player->SetLuckyMeetValue();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -746,7 +745,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setXinYue(atoi(xinyue.c_str()));
             pl->setJinQuan(jinquan);
             pl->continuousLoginSummerFlow();
-            pl->SetLuckyMeetValue();
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -3015,6 +3013,7 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_LUCKYMEET, 0);
                 pl->SetVar(GObject::VAR_LUCKYMEET_AWARD, 0);
                 pl->SetVar(GObject::VAR_LUCKYMEET_VIP,pl->getVipLevel());
+                pl->SetVar(GObject::VAR_LUCKYMEET_RECHARGE_AWARD,0);
             //    pl->checLuckyMeet();
             
             }
@@ -3368,7 +3367,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     {
         if(GObject::GVAR.GetVar(GObject::GVAR_LUCKYMEET_BEGIN) > TimeUtil::Now()
                 || GObject::GVAR.GetVar(GObject::GVAR_LUCKYMEET_END) < TimeUtil::Now())
-            GObject::globalPlayers.enumerate(player_enum_2, 6);
+            ;GObject::globalPlayers.enumerate(player_enum_2, 6);
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYMEET_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYMEET_END, end);
         ret = 1;

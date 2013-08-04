@@ -5726,6 +5726,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             player->sendQQBoardLoginInfo();
             break;
         case 22:
+            player->SetLuckyMeetValue();
             player->sendLuckyMeetLoginInfo();
             break;
         case 23:
