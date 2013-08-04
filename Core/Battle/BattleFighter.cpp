@@ -825,14 +825,9 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool no
         if(getBuddhaLightLast() > 0 && getBlind() < 0.001f)
         {
             if(uRand(10000) < getBuddhaLightRate() * 100)
-            {
                 isValid = true;
-            }
             else
-            {
-                printf("end2\n");
                 setBuddhaLight(0, 0xFF);
-            }
         }
         if(((_aura >= 100 || isValid == true) && _peerlessSkill.base->effect != NULL) && (!noPossibleTarget || _peerlessSkill.base->target != GData::e_battle_target_otherside))
         {
@@ -845,10 +840,7 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool no
     else
     {
         if(getBuddhaLightLast() > 0 && getBlind() < 0.001f)
-        {
-            printf("end3\n");
             setBuddhaLight(0, 0xFF);
-        }
     }
 
     if(need_therapy)

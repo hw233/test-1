@@ -4293,11 +4293,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         if (launchPeerLess)
             *launchPeerLess = 1;
 
-        if(last > 0 && skill && bf->getBlind() < 0.001f)
-        {
-            printf("end\n");
+        if(last > 0 && bf->getBlind() < 0.001f)
             initBuddhaLight(bf, true, false);
-        }
     }
 
     if(ss && bf->getHP() != 0)
@@ -12473,17 +12470,12 @@ void BattleSimulator::doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int targ
         for(size_t j = 0; j < cnt2; ++ j)
         {
             BattleFighter* bo = atklist[j].bf;
-            printf("rate: %f\n", skill->prob);
             bo->setBuddhaLight(skill->prob, efl[i]);
             if(ef)
-            {
-                printf("rate: %f\n", ef->value);
                 bo->setBuddhaLightValue(ef->value);
-            }
             bo->setBuddhaLightLauncher(bf);
         }
         appendDefStatus(e_buddhaLight, 0, bf);
-        printf("start\n");
         return;
     }
 }
@@ -12975,7 +12967,6 @@ void BattleSimulator::initBuddhaLight(BattleFighter* bf, bool auralAdd, bool dea
         if(bo == bo->getBuddhaLightLauncher())
             appendDefStatus(e_unBuddhaLight, 0, bo);
         bo->setBuddhaLightLauncher(NULL);
-        printf("value: %f\n", bo->getBuddhaLightValue());
         if(auralAdd && bo->getBuddhaLightValue() > 0.001)
             setStatusChange_Aura2(bo, bo->getSide(), bo->getPos(), NULL, bo->getBuddhaLightValue(), 0, false);
         bo->setBuddhaLightValue(0);
