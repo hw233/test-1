@@ -81,10 +81,12 @@ struct NHIPlayerData
         }
 
         movecd = 0;
+        /*
         for (UInt8 i = 0; i < 5; ++i)
         {
             skills[i].reset();
         }
+        */
     }
 
 };
