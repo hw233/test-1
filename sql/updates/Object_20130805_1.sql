@@ -1,1 +1,1 @@
-alter table `tempItem` add KEY(`id`);
+alter table `tempItem` add index id(`id`);
