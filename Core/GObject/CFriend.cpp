@@ -35,14 +35,24 @@ void CFriend::loadFromDB(const char* cf)
     if (!m_owner->GetVar(VAR_INVITES))
     {
         for (UInt8 i = CF_INV3; i <= CF_INV30; ++i)
-            m_cf[i] = 0;
-        toDB = true;
+        {
+            if (m_cf[i] != 0)
+            {
+                m_cf[i] = 0;
+                toDB = true;
+            }
+        }
     }
     if (!m_owner->GetVar(VAR_INVITEDSUCCESS))
     {
         for (UInt8 i = CF_INVITED2; i <= CF_INVITED20; ++i)
-            m_cf[i] = 0;
-        toDB = true;
+        {
+            if (m_cf[i] != 0)
+            {
+                m_cf[i] = 0;
+                toDB = true;
+            }
+        }
     }
     if (toDB)
         updateToDB();

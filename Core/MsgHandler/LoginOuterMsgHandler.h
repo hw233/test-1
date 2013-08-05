@@ -193,6 +193,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	}
 	else
 	{
+
 		if(player->getLockExpireTime() > 0)
 		{
 			if(player->getLockExpireTime() <= TimeUtil::Now())
@@ -408,6 +409,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setPfKey(pfkey);
             player->setXinYue(atoi(xinyue.c_str()));
             player->setJinQuan(jinquan);
+            player->continuousLoginSummerFlow();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -742,6 +744,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setVia(nu._via);
             pl->setXinYue(atoi(xinyue.c_str()));
             pl->setJinQuan(jinquan);
+            pl->continuousLoginSummerFlow();
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -1527,18 +1530,13 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
 #endif
 #undef TEST_TABLE 
 
-    UInt16 serverNo = 0;
-    if(cfg.merged)
-        br >> serverNo;
- //   std::cout<<" playerIds  "<<playerIds<<std::endl;
     UInt8 ret = 1;
-    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), tm);
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
         UInt64 pid = atoll(playerId.c_str());
-        pid = pid & 0xFFFFFFFFFF;
         string str;
         string overTime;
         if (!checkForbidSale(pid,str,overTime))
@@ -1546,8 +1544,6 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
             //setForbidSaleValue(pid, true);
             setForbidSaleValue(pid, true,tm);
 
-            if(cfg.merged)
-                pid += (static_cast<UInt64>(serverNo) << 48);
     	    GObject::Player * pl = GObject::globalPlayers[pid];
             if (NULL != pl)
             {
@@ -1573,9 +1569,6 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
     std::string playerIds;
     CHKKEY();
     br>>playerIds;
-    UInt16 serverNo = 0;
-    if(cfg.merged)
-        br >> serverNo;
  
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
@@ -1584,11 +1577,8 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
     while (!playerId.empty())
     {
         UInt64 pid = atoll(playerId.c_str());
-        pid = pid & 0xFFFFFFFFFF;
         setForbidSaleValue(pid, false);
 
-        if(cfg.merged)
-            pid += (static_cast<UInt64>(serverNo) << 48);
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->setForbidSale(false);
@@ -1617,7 +1607,6 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
     CHKKEY();
     br>>pid;
 
-    pid = pid & 0xFFFFFFFFFF;
     UInt8 isLockLogin = IsBigLock(pid);
 //    UInt8 isForbidSale = checkForbidSale(pid, fsaleTime);
     UInt8 isForbidSale = checkForbidSale(pid, fsaleTime,foverTime);
@@ -3399,6 +3388,5 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
     st << type << begin << end << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
-
 #endif // _LOGINOUTERMSGHANDLER_H_
 
