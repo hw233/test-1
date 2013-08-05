@@ -21352,8 +21352,11 @@ void Player::setNuwaSignet(UInt8 idx)
     //不能使用World::_wday,有30秒误差
 	time_t curtime = time(NULL);
 	struct tm *local = localtime(&curtime);
-    if(c <= 0 && local->tm_wday != 6 && local->tm_wday != 0)
+    if(c < 3 && local->tm_wday != 6 && local->tm_wday != 0)
+    {
+        sendMsgCode(0, 1152);
         return;
+    }
     UInt8 cnt = GET_BIT_3(signet, 0);
     if(cnt >= 1) return;
     /*
