@@ -255,6 +255,7 @@ enum ItemFrom
     FromVipLevelAward = 57, //御剑等级回馈
     FromQQXiu = 58,
     FromQQBoard = 59 ,
+    FromClanSptr = 60, // 神魔之树
     //80 ~ 100，繁体占用
 };
 

@@ -490,6 +490,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         // 550-570 for zhgc
         VAR_CLAN_SPTR_WATER = 550,       // 每日神魔之树浇水数
         VAR_CLAN_SPTR_AWARD = 551,       // 每日神魔之树奖励领取标识
+        VAR_CLAN_ACTPT_MONTH = 552,      // 每月帮派活跃度
+        VAR_CLAN_ACTPT_FLAG = 553,      // 活跃度领取标识
 
         VAR_MAX,
     };
@@ -934,6 +936,11 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_RYHB_ITEM_CNT_13, CYCLE_NONE);
             REGISTER_VAR(VAR_RYHB_ITEM_CNT_14, CYCLE_NONE);
             REGISTER_VAR(VAR_RYHB_ITEM_CNT_15, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_CLAN_SPTR_WATER, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAN_SPTR_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAN_ACTPT_MONTH, CYCLE_MONTH);
+            REGISTER_VAR(VAR_CLAN_ACTPT_FLAG, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

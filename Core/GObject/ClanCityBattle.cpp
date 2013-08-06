@@ -1805,6 +1805,7 @@ bool ClanCity::playerEnter(Player * player)
 		return false;
 	}
     player->getSurnameLegendAward(e_sla_cb);
+    cl->addMemberActivePoint(player, 15, e_clan_actpt_clan_city);
 	player->setInClanCity(true);
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())

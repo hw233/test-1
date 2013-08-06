@@ -3266,7 +3266,7 @@ namespace GObject
         // ??????Ա
 		lc.prepare("Loading clan players:");
 		DBClanPlayer cp;
-		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankBattleField`,`inQQGroup` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `activepoint`, `last_actpt`, `actpt_endtime`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankBattleField`,`inQQGroup` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
 			return false;
 		UInt32 lastId = 0xFFFFFFFF;
 		lc.reset(1000);
@@ -3308,6 +3308,9 @@ namespace GObject
 			}
 			cm->joinTime = cp.joinTime;
             cm->proffer = cp.proffer;
+            cm->activepoint = cp.activepoint;
+            cm->last_actpt = cp.last_actpt;
+            cm->actpt_endtime = cp.actpt_endtime;
 			if (thisDay != cp.thisDay)
 			{
 				DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `thisDay` = %u WHERE `playerId` = %" I64_FMT "u", thisDay, pl->getId());
@@ -3436,7 +3439,7 @@ namespace GObject
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
 		DBClanDonateRecord ddr;
-		if (execu->Prepare("SELECT `clanId`, `donateName`, `techId`, `donateCount`, `donateTime` FROM `clan_donate_record` ORDER BY `clanId`, `donateTime`", ddr) != DB::DB_OK)
+		if (execu->Prepare("SELECT `clanId`, `donateName`, `donateTo`, `donateType`, `donateCount`, `donateTime` FROM `clan_donate_record` ORDER BY `clanId`, `donateTime`", ddr) != DB::DB_OK)
 			return false;
 		lc.reset(200);
 		while (execu->Next() == DB::DB_OK)
@@ -3449,7 +3452,7 @@ namespace GObject
 				DB5().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u", ddr.clanId);
 				continue;
 			}
-			clan->addClanDonateRecordFromDB(ddr.doanteName, ddr.techId, ddr.donateCount, ddr.donateTime);
+			clan->addClanDonateRecordFromDB(ddr.doanteName, ddr.donateTo, ddr.donateType, ddr.donateCount, ddr.donateTime);
 		}
 		lc.finalize();
 
@@ -3697,6 +3700,27 @@ namespace GObject
             }
             if (clan == NULL) continue;
             clan->LoadCopyLog(ccl.logTime, ccl.logType, ccl.playerName, ccl.logVal);
+        }
+        lc.finalize();
+
+        // 读取帮派神魔之树
+        lc.prepare("Loading clan spirit tree:");
+        DBClanSptr csptr;
+        if (execu->Prepare("SELECT `clanId`, `exp`, `level`, `refreshTimes`, `color`, `endTime` FROM `clan_sptr` ORDER BY `clanid` ASC", csptr) != DB::DB_OK)
+            return false;
+        clan = NULL;
+        lc.reset(1000);
+        lastId = 0xFFFFFFFF;
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if (csptr.clanId != lastId)
+            {
+                lastId = csptr.clanId;
+                clan = globalClans[csptr.clanId];
+            }
+            if (clan == NULL) continue;
+            clan->loadSptrFromDB(csptr.exp, csptr.level, csptr.refreshTimes, csptr.color, csptr.endTime);
         }
         lc.finalize();
 

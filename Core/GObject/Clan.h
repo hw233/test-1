@@ -165,6 +165,9 @@ struct ClanMember
 		proffer = 0;
         signupRankBattleTime = 0;
         rankBattleField = 0;
+        activepoint = 0;
+        actpt_endtime = 0;
+        last_actpt = 0;
 	}
 
 
@@ -179,6 +182,8 @@ struct ClanMember
     UInt32 signupRankBattleTime;
     UInt32 rankBattleField;
     UInt32 activepoint;
+    UInt32 actpt_endtime;
+    UInt32 last_actpt;
 	std::map<UInt8, ClanPlayerPet> clanPet;
 };
 
@@ -202,17 +207,14 @@ struct ClanPendingMember
 struct MemberDonate
 {
 	std::string donateName;
-	UInt16 donateCount;
-	UInt32 donateTime;
+    UInt8 donateTo;
+    UInt8 donateType;
+	UInt32 donateCount;
 
 	MemberDonate() {}
-	MemberDonate(const std::string& dn, UInt16 dc, UInt32 dt) : donateName(dn), donateCount(dc), donateTime(dt) {}
-	bool operator<(const MemberDonate& md) const
-	{
-		return donateTime < md.donateTime;
-	}
+	MemberDonate(const std::string& dn, UInt8 dto, UInt8 dtype, UInt32 dc) : donateName(dn), donateTo(dto), donateType(dtype), donateCount(dc) {}
 };
-typedef std::multiset<MemberDonate> MemberDonates;
+typedef std::multimap<UInt32, MemberDonate> MemberDonates;
 
 
 struct ClanSpiritTree
@@ -221,14 +223,30 @@ struct ClanSpiritTree
     UInt8 m_level;
     UInt32 m_endTime;
     UInt8 m_refreshTimes;
-    UInt8 m_color[3];
+    UInt8 m_color;
 
-    ClanSpiritTree(): m_exp(0), m_level(0), m_endTime(0), m_refreshTimes(0)
-    {
-        memset(m_color, 0, sizeof(m_color));
-    }
+    ClanSpiritTree(): m_exp(0), m_level(1), m_endTime(0), m_refreshTimes(0), m_color(0) {}
 };
 
+enum CLAN_ACTPT_FLAG
+{
+    e_clan_actpt_none = 0,
+    e_clan_actpt_rank_battle = 1,
+    e_clan_actpt_copy = 2,
+    e_clan_actpt_clan_city = 3,
+};
+
+enum CLAN_DONATE_TO
+{
+    e_donate_to_build = 1,
+    e_donate_to_tree = 2,
+};
+
+enum CLAN_DONATE_TYPE
+{
+    e_donate_type_tael = 1,
+    e_donate_type_gold = 2,
+};
 
 class Clan:
 	public GObjectBaseT<Clan>
@@ -429,6 +447,7 @@ public:
     void SendItemHistory(Player* player, UInt16 start, UInt8 count);
     void SendSelfItemList(Player* player);
     void ClearDueItemHistory();
+    void SendDonateHistory(Player* player, UInt16 startIdx, UInt8 count);
 
     /**
      *@brief 分配奖励
@@ -488,8 +507,9 @@ private:
 	void delAllyClan(Clan *);
 
 public:
-	void addClanDonateRecordFromDB(const std::string&, UInt8, UInt16, UInt32);
-	void addClanDonateRecord(const std::string&, UInt8, UInt16, UInt32);
+    void addClanDonateRecordFromDB(const std::string& dn, UInt8 dto, UInt8 dtype, UInt32 dc, UInt32 dt);
+    void addClanDonateRecord(const std::string& dn, UInt8 dto, UInt8 dtype, UInt32 dc, UInt32 dt);
+    void checkClanDonateRecord();
 
     // 帮派资金
     void setClanFunds(UInt32 funds) { _funds = funds; }
@@ -573,7 +593,7 @@ public:
 	void appendListInfo(Stream&);
 
 	void listTechs(Player *);
-	void listTechDonators(Player *, UInt8);
+	void listDonators(Player *);
 
 	void broadcastMemberInfo(ClanMember &, UInt8);
 	void broadcastMemberInfo(Player *);
@@ -696,7 +716,8 @@ private:
 	std::vector<Clan *> _enemyClan;
 	std::vector<UInt32> _enemyClanId;
 
-	std::map<UInt8, MemberDonates> _memberDonates;
+	//std::map<UInt8, MemberDonates> _memberDonates;
+	MemberDonates _memberDonates;
 
 	std::map<UInt32, UInt8> _repoNum;
 	std::multimap<UInt32, AllocRecord> _allocRecords;
@@ -735,8 +756,15 @@ public:
     void raiseSpiritTree(Player* pl, UInt8 type);   // 培养 type(甘露:0 冰晶:1)
     void refreshColorAward();
     void getSpiritTreeAward(Player* pl, UInt8 idx); // 全部领取:idx=0xFF
-    void sendSpiritTreeInfo(Player* pl);
+    void sendSpiritTreeInfo(Player* pl, bool bc=false);
     void checkSpiritTree();
+    void writeSptrToDB();
+    void loadSptrFromDB(UInt32 exp, UInt8 lvl, UInt32 endtime, UInt8 times, UInt8 color);
+
+    void addMemberActivePoint(Player* pl, UInt32 actpt, CLAN_ACTPT_FLAG f);
+    UInt32 getMemberActivePoint(Player* pl);
+    void checkMemberActivePoint(ClanMember* mem);
+    void listMembersActivePoint( Player * player );
 };
 
 typedef GGlobalObjectManagerT<Clan, UInt32> GlobalClans;
