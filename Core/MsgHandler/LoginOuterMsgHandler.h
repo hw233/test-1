@@ -1762,7 +1762,7 @@ void OnSetMaxCreate(LoginMsgHdr &hdr, const void* data)
     UInt32 MaxNewUser = 0;
     UInt8 ret = 1;
     br >> MaxNewUser; 
-    if (!MaxNewUser)
+    if (MaxNewUser)
     {
         GObject::GVAR.SetVar(GObject::GVAR_NewUser_Max , MaxNewUser); 
         ret = 0;
