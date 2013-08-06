@@ -3706,7 +3706,7 @@ namespace GObject
         // 读取帮派神魔之树
         lc.prepare("Loading clan spirit tree:");
         DBClanSptr csptr;
-        if (execu->Prepare("SELECT `clanId`, `exp`, `level`, `refreshTimes`, `color`, `endTime` FROM `clan_sptr` ORDER BY `clanid` ASC", csptr) != DB::DB_OK)
+        if (execu->Prepare("SELECT `clanId`, `exp`, `level`, `refreshTimes`, `color`, `endTime` FROM `clan_sptr` ORDER BY `clanId` ASC", csptr) != DB::DB_OK)
             return false;
         clan = NULL;
         lc.reset(1000);
@@ -3720,7 +3720,7 @@ namespace GObject
                 clan = globalClans[csptr.clanId];
             }
             if (clan == NULL) continue;
-            clan->loadSptrFromDB(csptr.exp, csptr.level, csptr.refreshTimes, csptr.color, csptr.endTime);
+            clan->loadSptrFromDB(csptr.exp, csptr.level, csptr.endTime, csptr.refreshTimes, csptr.color);
         }
         lc.finalize();
 

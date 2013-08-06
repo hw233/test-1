@@ -4368,7 +4368,8 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                 pl->AddVar(VAR_CLAN_SPTR_WATER, 1);
                 ConsumeInfo ci(ClanSptr,0,0);
                 pl->useTael(needTeal, &ci);
-                addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_tael, needTeal, now);
+                if(needTeal > 0)
+                    addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_tael, needTeal, now);
                 m_spiritTree.m_exp += 100;
                 addMemberActivePoint(pl, 1, e_clan_actpt_none);
                 while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level])
@@ -4482,14 +4483,19 @@ void Clan::getSpiritTreeAward(Player* pl, UInt8 idx)
         }
         else if(idx >= MAX_CLANSPTR_LEVEL-1)
         {
-            if(m_spiritTree.m_color <= idx-MAX_CLANSPTR_LEVEL-1)
+            if(m_spiritTree.m_color <= idx-(MAX_CLANSPTR_LEVEL-1))
                 return;
             if(awardFlag & (1 << idx))
                 return;
             newAwardFlag |= (1 << idx);
         }
+        else
+        {
+            return;
+        }
+
         if(awards[idx][0] == 0xFFFF)
-            addMemberProffer(pl, awards[idx][1]);
+            pl->getClanProffer(awards[idx][1], NULL);
         else if(awards[idx][0] == 5001)
             pkg->Add(getRandGem(1), awards[idx][1], true, false, FromClanSptr);
         else
@@ -4513,7 +4519,7 @@ void Clan::getSpiritTreeAward(Player* pl, UInt8 idx)
             }
             else if(idx >= MAX_CLANSPTR_LEVEL-1)
             {
-                if(m_spiritTree.m_color <= idx-MAX_CLANSPTR_LEVEL-1)
+                if(m_spiritTree.m_color <= idx-(MAX_CLANSPTR_LEVEL-1))
                     break;
                 if(awardFlag & (1 << idx))
                     continue;
@@ -4524,7 +4530,7 @@ void Clan::getSpiritTreeAward(Player* pl, UInt8 idx)
                 continue;
             }
             if(awards[idx][0] == 0xFFFF)
-                addMemberProffer(pl, awards[idx][1]);
+                pl->getClanProffer(awards[idx][1], NULL);
             else if(awards[idx][0] == 5001)
                 pkg->Add(getRandGem(1), awards[idx][1], true, false, FromClanSptr);
             else
