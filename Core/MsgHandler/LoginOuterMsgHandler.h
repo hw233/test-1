@@ -3098,7 +3098,7 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
                 UInt32 endTime = 0;
                 UInt32 flag = 0;
                 br >> endTime >> flag;
-                //大闹龙宫的flag暂时只为1,2,3,4,5,6
+                //大闹龙宫的flag暂时只为1,2,3,4,5,6,7,8,9,11
                 //10:聚宝盆
                 if(endTime < val || flag >= GObject::DRAGONKING_MAX)
                     result = 1;

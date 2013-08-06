@@ -18478,55 +18478,63 @@ void Player::sendGoodVoiceInfo()
 
 void Player::get3366GiftAward(UInt8 type)
 {
-    if(type == 1 && GetVar(VAR_3366GIFT) < 99)
+    if (getPlatform() != 11)
+        return;
+    if (GetVar(VAR_3366GIFT) >= 9)
+        return;
+    if (GetFreePackageSize() < 6)
     {
-        if(GetFreePackageSize() < 6)
-        {
-            sendMsgCode(0, 1011);
-            return;
-        }
-        if(getGold() < 79/*368*/)
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if(type == 1)
+    {
+        if (getGold() < 19)
         {
             sendMsgCode(0, 1104);
             return;
         }
-		ConsumeInfo ci(Enum3366Gift,0,0);
-		useGold(79/*368*/,&ci);
+        ConsumeInfo ci(Enum3366Gift,0,0);
+        useGold(19, &ci);
         AddVar(VAR_3366GIFT, 1);
-        /*
-        m_Package->Add(500, 2, true);
-        m_Package->Add(501, 2, true);
-        m_Package->Add(1325, 2, true);
-        m_Package->Add(516, 2, true);
-        m_Package->Add(134, 2, true);
-        m_Package->Add(515, 2, true);
-        */
-        static UInt32 itemId[] = {9371, 9338, 9141, 503, 500, 501};
+        static UInt32 itemId[] = {548, 9082, 9371, 8000, 500, 9390};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
         {
             GetPackage()->Add(itemId[i], 1, true);
         }
-        send3366GiftInfo();
     }
+    else if(type == 2)
+    {
+        if (getGold() < 66)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(Enum3366Gift,0,0);
+        useGold(66, &ci);
+        AddVar(VAR_3366GIFT, 1);
+        static UInt32 itemId[] = {9390, 1126, 134, 9141, 551, 513};
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
+        {
+            GetPackage()->Add(itemId[i], 1, true);
+        }
+    }
+    send3366GiftInfo();
 }
 
 void Player::send3366GiftInfo()
 {
     if(getPlatform() != 11)
         return;
+    /*
     if(!isBD())
         return;
+    */
     if(!World::get3366GiftAct())
         return;
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(6);
     UInt8 opt = GetVar(VAR_3366GIFT);
-    /*
-    if(GetVar(VAR_3366GIFT) < 9)
-        opt = 0;
-    else
-        opt = 1;
-    */
     st << opt;
     st << Stream::eos;
     send(st);
@@ -19175,10 +19183,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0x17 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 9412 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 140 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -22668,6 +22676,25 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 GetPackage()->AddItem(9407, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
+            }
+        }
+    }
+    if (WORLD().getQixi())
+    {
+        if (flag == e_sla_hi || flag == e_sla_mr)
+            return;
+        if(flag == e_sla_none)
+        {
+            //GameAction()->onDropAwardAct(this, 0);
+        }
+        else
+        {
+            UInt32 status = GetVar(VAR_QIXI_DROP_STATUS);
+            if(!(status & flag))
+            {
+                status |= flag;
+                SetVar(VAR_QIXI_DROP_STATUS, status);
+                GameAction()->onDropAwardAct(this, 0);
             }
         }
     }

@@ -3,6 +3,8 @@
 #include "ClanCityBattle.h"
 #include "Clan.h"
 #include "Player.h"
+#include "Script/GameActionLua.h"
+#include "Country.h"
 #include "Common/URandom.h"
 #include "DB/DBConnectionMgr.h"
 #include "DB/DBExecutor.h"

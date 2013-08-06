@@ -416,6 +416,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_RP7_SIGN=437,              //注册签到
         VAR_RP7_SIGN_PACKAGE=438,      //连续签到礼包
         VAR_RP7_RECHARGE=439,      //开服7天充值金额
+        VAR_QIXI_DROP_STATUS = 440, //七夕掉落活动状态
 
         // 441-442 for JLT
         VAR_HAS_VOTE = 441,                 // 本日是否投票过
@@ -877,6 +878,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_RP7_SIGN, CYCLE_NONE);
             REGISTER_VAR(VAR_RP7_SIGN_PACKAGE, CYCLE_NONE);
             REGISTER_VAR(VAR_RP7_RECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_QIXI_DROP_STATUS, CYCLE_DAY);
 
             REGISTER_VAR(VAR_CALLSNAKEEGG, CYCLE_NONE);
             REGISTER_VAR(VAR_SNAKEEGG_AWARD, CYCLE_NONE);
