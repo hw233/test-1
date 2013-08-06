@@ -1333,6 +1333,7 @@ namespace GObject
         dclogger.login(this);
         dclogger.login_sec(this);
         dclogger.checkOpenId(this);
+        dclogger.checkYB(this);   //LB添加
 
         EventAutoRefreshOpenKey* event = new(std::nothrow) EventAutoRefreshOpenKey(this, 60 * 110, 24);
         if (event)

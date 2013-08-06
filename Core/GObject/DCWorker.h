@@ -15,6 +15,7 @@ namespace GObject
 {
 
 const char UNION_DC_TYPE = 100;
+const char OPENID_TYPE = 101;
 
 class DCWorker
     : public WorkerRunner<>
@@ -30,7 +31,7 @@ public:
     UInt8 CheckRPOpenid(char* openid);
     UInt8 CheckGRPOpenid(char* openid);
     UInt8 CheckActiveOpenid(char * key1,char * openid);
-    UInt8 CheckYBLevel(UInt64 playerId ,UInt32 viplev);
+    UInt8 CheckYBLevel(UInt64 playerId ,char * message);
 protected:
 	bool Init();
 	void UnInit();
@@ -41,6 +42,7 @@ protected:
 
 private:
     UInt32 UnionLoggerResultParse(char* result, char* msg, size_t size);
+    UInt32 CheckYBResultParse(char* result, char* msg, size_t size);
     //bool CheckOpenId(UInt64 playerId, char * openId);
 
 private:
@@ -61,7 +63,7 @@ private:
     AtomicVal<UInt32> m_Limit;
 	std::vector<LogMsg> m_DCLog;
     std::vector<LogMsg> m_UnionLog;
-    //std::vector<OpenIdMsg> m_Openid;
+    std::vector<OpenIdMsg> m_Openid;
     CLogger* m_logger;
     bool m_inited;
 
