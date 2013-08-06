@@ -1948,6 +1948,8 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
     size_t actCnt = atkAct->size();
     for(size_t idx = 0; idx < actCnt; idx++)
     {
+        if(_winner != 0)
+            break;
         BattleFighter * bf = (*atkAct)[idx].bf;
         if(!bf || bf->getHP() == 0)
             continue;
@@ -2105,7 +2107,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             if(NULL == bo)
                 continue;
 
-            if(bf->getHP() > 0 && bo->getHP() > 0)
+            if(bf->getHP() > 0 && _winner == 0 && bo->getHP() > 0)
             {
                 UInt32 fdmg = 0;
                 UInt32 inj2hp = 0;
@@ -2835,7 +2837,7 @@ bool BattleSimulator::doStateMagRes2(BattleFighter* bf, BattleFighter* target_bo
 
 bool BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct, float factor /* = 1 */, bool canProtect /* = false */)
 {
-    if(bf == NULL || bf->getHP() == 0 || target_pos < 0)
+    if(bf == NULL || bf->getHP() == 0 || target_pos < 0 || _winner != 0)
         return false;
 
     BattleObject* target_object = getObject(otherside, target_pos);
@@ -3101,7 +3103,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     if(skill->effect == NULL)
         return false;
 
-    if(bf->getHP() == 0)
+    if(bf->getHP() == 0 || _winner != 0)
     {
         return false;
     }
@@ -3827,7 +3829,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             dmg1 = attackOnce(bf, first, cs, pr, skill, bo, 1, 0, NULL, atkAct, canProtect);
             canProtect = false;
             dmg += dmg1;
-            if (bf->getHP() > 0)
+            if (bf->getHP() > 0 && _winner == 0)
             {
                 dmg2 = attackOnce(bf, first, cs, pr, skill, bo, 1, -1, NULL, atkAct, canProtect);
                 dmg += dmg2;
@@ -5372,7 +5374,7 @@ UInt32 BattleSimulator::doAttack( int pos )
     BattleFighter* mainTarget = NULL;
     do {
         rcnt += doDeBufAttack(bf);
-        if(bf->getHP() == 0)
+        if(bf->getHP() == 0 || _winner != 0)
             break;
 
         UInt32 stun = bf->getStunRound();
@@ -5625,7 +5627,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 atkAct.clear();
 
                 // 普通攻击后的被动技能
-                if(bf->getHP() > 0)
+                if(bf->getHP() > 0 && _winner == 0)
                 {
                     size_t idx = 0;
                     const GData::SkillBase* passiveSkill = NULL;
@@ -5681,7 +5683,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
 
         // 攻击后的被动技能
-        if(bf->getHP() > 0)
+        if(bf->getHP() > 0 && _winner == 0)
         {
             size_t idx = 0;
             const GData::SkillBase* passiveSkill = NULL;
@@ -6146,7 +6148,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         {
             bool cs = false;
             bool pr = false;
-            if(bf->getHP() == 0)
+            if(bf->getHP() == 0 || _winner != 0)
                 break;
             BattleFighter* sneaker = _sneak_atker[i];
             _activeFgt = sneaker;
@@ -6166,7 +6168,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         _activeFgt = NULL;
     }
 
-    if(bf->getHP() > 0 && bf->getAbnormalTypeCnt() >= 3)
+    if(bf->getHP() > 0 && _winner == 0 && bf->getAbnormalTypeCnt() >= 3)
     {
         const GData::SkillBase* passiveSkill = NULL;
         if(NULL != (passiveSkill = bf->getAbnormalTypeSkill()))
@@ -6183,7 +6185,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             _activeFgt = NULL;
         }
     }
-    if(bf->getHP() > 0 && bf->getBleedTypeCnt() >= 3)
+    if(bf->getHP() > 0 && _winner == 0 && bf->getBleedTypeCnt() >= 3)
     {
         const GData::SkillBase* passiveSkill = NULL;
         if(NULL != (passiveSkill = bf->getBleedTypeSkill()))

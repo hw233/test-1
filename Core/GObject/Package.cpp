@@ -7129,7 +7129,7 @@ namespace GObject
 
             UInt32 tempItemNum = m_ItemsTemporary[ItemKey(itemId, bind)]->Count();
           
-            DB4().PushUpdateData("REPLACE INTO `tempItem` VALUES(%u, %u, %" I64_FMT "u, %u, %u)",m_Owner->getId(), itemId, tempItemNum, bind ? 1 : 0, sellTime);
+            DB4().PushUpdateData("REPLACE INTO `tempItem` VALUES(%" I64_FMT "u, %u, %u, %u, %u)",m_Owner->getId(), itemId, tempItemNum, bind ? 1 : 0, sellTime);
 
             if(IsEquipId(itemId))
             {
