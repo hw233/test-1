@@ -108,6 +108,26 @@ int read_jason_rep(int fd, char* buf)
 
 }
 
+void clear_read_buffer(int fd)
+{
+    for(;;)
+    {
+        struct timeval stWait;
+        fd_set stFdSet;
+        int IRet;
+        char tmp[2];
+
+        stWait.tv_sec = 0;
+        stWait.tv_usec = 0;
+        FD_ZERO(&stFdSet);
+        FD_SET(fd, &stFdSet);
+        IRet = select(FD_SETSIZE, &stFdSet, NULL, NULL, &stWait);
+        if(IRet == 0)
+            break;
+        recv(fd, tmp, 1, 0);
+    }
+}
+
 int main()
 {
     cfg.load();
@@ -140,6 +160,8 @@ int main()
             if(!flag)
                 g_log->OutTrace("connect to asss server.\n");
             flag = true;
+            // 清空接收缓存
+            clear_read_buffer(asss_conn);
         }
 
         //如果建立连接，将产生一个全新的套接字
