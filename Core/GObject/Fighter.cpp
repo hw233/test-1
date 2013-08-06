@@ -2012,7 +2012,10 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
     bool aMark = false;
     bool bMark = false;
     bool cMark = false;
+    bool dMark = false;
+    bool eMark = false;
 
+    UInt8  viplvl = getOwner()->getVipLevel();
     for(int i=0; i<8; i++)
     {
         if(equip[i])
@@ -2029,6 +2032,8 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
                 aMark = false;
                 bMark = false;
                 cMark = false;
+                dMark = false;
+                eMark = false;
                 break;
             }
 
@@ -2043,9 +2048,10 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
             {
                 bMark = false;
                 cMark = false;
+                dMark = false;
+                eMark = false;
                 continue;
             }
-
             if(equip[i]->getItemEquipData().enchant >= 10)
             {
                 if((0 == i) || (i>0 && cMark))
@@ -2056,6 +2062,33 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
             else
             {
                 cMark = false;
+                dMark = false;
+                eMark = false;
+                continue;
+            }
+
+            if(equip[i]->getItemEquipData().enchant >= 11 && viplvl >= 11 )
+            {
+                if((0 == i) || (i>0 && cMark))
+                {
+                    dMark = true;
+                }
+            }
+            else
+            {
+                dMark = false;
+                eMark = false;
+            }
+            if(equip[i]->getItemEquipData().enchant >= 12 && viplvl >= 12)
+            {
+                if((0 == i) || (i>0 && cMark))
+                {
+                    eMark = true;
+                }
+            }
+            else
+            {
+                eMark = false;
             }
         }
         else
@@ -2063,6 +2096,8 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
             aMark = false;
             bMark = false;
             cMark = false;
+            dMark = false;
+            eMark = false;
             break;
         }
     }
@@ -2090,7 +2125,19 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
 
         value += 0.5;
     }
+    if(dMark)
+    {
+        _attrExtraEquip.hitrate += 100;
+
+        value += 0.75;
+    }
     
+    if(eMark)
+    {
+        _attrExtraEquip.evade += 100;
+
+        value += 1;
+    }
 	for(int i=0; i<8; ++i)
 	{
 		if(setId[i] == 0)
