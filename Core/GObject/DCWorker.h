@@ -15,7 +15,6 @@ namespace GObject
 {
 
 const char UNION_DC_TYPE = 100;
-const char OPENID_TYPE = 101;
 
 class DCWorker
     : public WorkerRunner<>
