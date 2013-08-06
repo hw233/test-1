@@ -276,6 +276,9 @@ GMHandler::GMHandler()
     Reg(2, "eqexp", &GMHandler::OnAddPetEquipExp);
     Reg(2, "task", &GMHandler::OnHandleTask);
     Reg(2, "task0", &GMHandler::OnCompletedManyTask);
+    Reg(2, "getmc", &GMHandler::OnGetMax);
+    Reg(2, "setmc", &GMHandler::OnSetMax);
+
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -4045,9 +4048,9 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
                 UInt32 end;
             }_msg;
 #pragma pack()
-            _msg.type = 2;
+            _msg.type = 5;
             _msg.begin = TimeUtil::Now();
-            _msg.end = TimeUtil::Now() + 300;
+            _msg.end = TimeUtil::Now() + 86400*15;
             LoginMsgHdr hdr1(SPEQ::ACTIVITYONOFF, WORKER_THREAD_LOGIN, 0,0, sizeof(mas));
     switch(type)
     {
@@ -4063,6 +4066,19 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_SURNAMELEGEND_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
+        case 3:
+            GVAR.SetVar(GVAR_LUCKYMEET_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_LUCKYMEET_END, TimeUtil::Now() + 86400*15);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            player->LuckyBagRank();
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 4:
+            GVAR.SetVar(GVAR_LUCKYMEET_BEGIN, 0);
+            GVAR.SetVar(GVAR_LUCKYMEET_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+
     }
 }
 
@@ -4315,6 +4331,20 @@ void GMHandler::OnCompletedManyTask(GObject::Player* player, std::vector<std::st
         mgr->CompletedTask(id);
         mgr->SubmitTask(id);
     }
+}
+
+void GMHandler::OnSetMax(GObject::Player* player, std::vector<std::string>& args)
+{
+    GVAR.SetVar(GObject::GVAR_NewUser_Max , 2);
+    UInt32 tmp;
+    tmp = GVAR.GetVar(GObject::GVAR_NewUser_Max);
+}
+
+void GMHandler::OnGetMax(GObject::Player* player, std::vector<std::string>& args)
+{
+    UInt32 tmp;
+    tmp = GVAR.GetVar(GObject::GVAR_NewUser_Max);
+    tmp++;
 }
 
 
