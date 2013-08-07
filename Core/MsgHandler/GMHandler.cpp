@@ -274,6 +274,9 @@ GMHandler::GMHandler()
     Reg(2, "eqexp", &GMHandler::OnAddPetEquipExp);
     Reg(2, "task", &GMHandler::OnHandleTask);
     Reg(2, "task0", &GMHandler::OnCompletedManyTask);
+    Reg(2, "getmc", &GMHandler::OnGetMax);
+    Reg(2, "setmc", &GMHandler::OnSetMax);
+
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -4299,6 +4302,20 @@ void GMHandler::OnCompletedManyTask(GObject::Player* player, std::vector<std::st
         mgr->CompletedTask(id);
         mgr->SubmitTask(id);
     }
+}
+
+void GMHandler::OnSetMax(GObject::Player* player, std::vector<std::string>& args)
+{
+    GVAR.SetVar(GObject::GVAR_NewUser_Max , 2);
+    UInt32 tmp;
+    tmp = GVAR.GetVar(GObject::GVAR_NewUser_Max);
+}
+
+void GMHandler::OnGetMax(GObject::Player* player, std::vector<std::string>& args)
+{
+    UInt32 tmp;
+    tmp = GVAR.GetVar(GObject::GVAR_NewUser_Max);
+    tmp++;
 }
 
 
