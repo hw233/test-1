@@ -105,6 +105,7 @@ private:
     void OnBigUnLock(GObject::Player *player, std::vector<std::string>&);
     void OnForbidSale(GObject::Player *player, std::vector<std::string>&);
     void OnUnForbidSale(GObject::Player *player, std::vector<std::string>&);
+    void OnInstantLogin(GObject::Player *player, std::vector<std::string>&);
     void OnSetLoginLimit(GObject::Player *player, std::vector<std::string>&);
     void OnSysUpdate(GObject::Player *player, std::vector<std::string>&);
 
