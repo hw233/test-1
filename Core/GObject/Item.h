@@ -301,7 +301,7 @@ namespace GObject
 
     private:
         ItemJiguanAttr m_jgAttr;
-    }
+    };
 }
 
 #endif

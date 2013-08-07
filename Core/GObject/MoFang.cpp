@@ -44,9 +44,4 @@ void MoFang::addAttr(GData::AttrExtra& ae)
 {
 }
 
-UInt16 MoFang::getSkill()
-{
-    return 0;
-}
-
 }
