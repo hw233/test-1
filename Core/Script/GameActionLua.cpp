@@ -1116,6 +1116,11 @@ namespace Script
 		Call<void>("onFrontMapWin", player, id, spot, lootlvl);
     }
 
+	void GameActionLua::onDropAwardAct( Player* player, UInt32 param)
+	{
+		Call<void>("onDropAwardAct", player, param);
+    }
+
 	bool GameActionLua::onOnlineAward(Player* player, UInt32 itemId, UInt8 count)
 	{
 		return Call<bool>("onOnlineAward", player, itemId, count);

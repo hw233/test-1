@@ -3,6 +3,8 @@
 #include "ClanCityBattle.h"
 #include "Clan.h"
 #include "Player.h"
+#include "Script/GameActionLua.h"
+#include "Country.h"
 #include "Common/URandom.h"
 #include "DB/DBConnectionMgr.h"
 #include "DB/DBExecutor.h"
@@ -1805,6 +1807,7 @@ bool ClanCity::playerEnter(Player * player)
 		return false;
 	}
     player->getSurnameLegendAward(e_sla_cb);
+    cl->addMemberActivePoint(player, 15, e_clan_actpt_clan_city);
 	player->setInClanCity(true);
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())

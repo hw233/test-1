@@ -219,7 +219,10 @@ namespace GObject
         JIUYOU      = 7,    //九幽秘典
         JIUJIE      = 8,    //九戒困龙珠
         YUANSHEN    = 9,    //元神出窍
+
         TREASURE    = 10,   //聚宝盆
+
+        XIANGMO     = 11,   //降魔禅杖
 
         DRAGONKING_MAX,
     };
