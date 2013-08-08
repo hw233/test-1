@@ -1174,7 +1174,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 				broadcast(st);
 			}
 			//setProffer(getProffer()+count);
-			addClanDonateRecord(player->getName(), techId, count, now);
+			addClanDonateRecord(player->getName(), e_donate_to_build, e_donate_type_tael, count, now);
 			DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %" I64_FMT "u", mem->proffer, player->getId());
 			//player->GetTaskMgr()->DoAcceptedTask(62207);
 		}
@@ -1276,7 +1276,7 @@ void Clan::listMembers( Player * player )
 		ClanMember * mem = *offset;
         if (!mem || !mem->player)
             continue;
-		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << mem->proffer << mem->player->getLastOnline() << mem->player->getPF();
+		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << getMemberActivePoint(mem) << mem->player->getLastOnline() << mem->player->getPF() << mem->last_actpt << mem->player->GetVar(VAR_CLAN_ACTPT_MONTH);
 	}
 	st << Stream::eos;
 	player->send(st);
@@ -1347,7 +1347,7 @@ void Clan::sendInfo( Player * player )
         <<  static_cast<UInt8>((pd.ctFinishCount << 4) | player->getClanTaskMax()) << static_cast<UInt32>(getConstruction())
         << getClanFunds() << member->proffer << static_cast<UInt8>(place-1)
         << _name << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
-        << _contact << _announce << _purpose << static_cast<UInt32>(getId())<<static_cast<UInt64>(uid);
+        << _contact << _announce << _purpose << static_cast<UInt32>(getId()) <<static_cast<UInt64>(uid) << m_spiritTree.m_exp;
 	st << Stream::eos;
 	player->send(st);
 }
@@ -1396,15 +1396,17 @@ void Clan::listTechs(Player * player)
 	player->send(st);
 }
 
-void Clan::listTechDonators(Player * player, UInt8 techId)
+void Clan::listDonators(Player * player)
 {
 	Mutex::ScopedLock lk(_mutex);
-	MemberDonates& mds = _memberDonates[techId];
+
+    checkClanDonateRecord();
 	Stream st(REP::CLAN_SKILL);
-	st << static_cast<UInt8>(1) << techId << static_cast<UInt8>(mds.size());
-	for (MemberDonates::iterator offset = mds.begin(); offset != mds.end(); ++ offset)
+	st << static_cast<UInt8>(1) << static_cast<UInt16>(_memberDonates.size());
+	for (MemberDonates::iterator it = _memberDonates.begin(); it != _memberDonates.end(); ++ it)
 	{
-		st << (*offset).donateName << static_cast<UInt32>((*offset).donateCount) << (*offset).donateTime;
+        MemberDonate& md = it->second;
+		st << md.donateName << md.donateTo << md.donateType << md.donateCount << it->first;
 	}
 	st << Stream::eos;
 	player->send(st);
@@ -1467,7 +1469,7 @@ void Clan::broadcastMemberInfo( ClanMember& cmem, UInt8 t )
 	if(t == 0)
 		st << cmem.cls << cmem.player->getName() << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << cmem.player->getLastOnline() << cmem.player->getPF() << Stream::eos;
 	else
-		st << cmem.cls << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << cmem.proffer << cmem.player->getLastOnline() << Stream::eos;
+		st << cmem.cls << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << getMemberActivePoint(&cmem) << cmem.player->getLastOnline() << Stream::eos;
 	broadcast(st);
     //broadcastCopyInfo();
 
@@ -1877,29 +1879,35 @@ void Clan::updateEnemyClandb()
 	}
 }
 
-void Clan::addClanDonateRecordFromDB(const std::string& dn, UInt8 si, UInt16 dc, UInt32 dt)
+void Clan::checkClanDonateRecord()
 {
-	MemberDonates& mds = _memberDonates[si];
-	if (mds.size() >= 30)
-		DB5().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u AND `techId` = %u AND `donateTime` = %u", _id, si, dt);
-	else
-		mds.insert(MemberDonate(dn, dc, dt));
+    UInt32 now = TimeUtil::Now();
+    bool timeout = false;
+    MemberDonates::iterator itUp = _memberDonates.upper_bound(now-30*86400);
+    for (MemberDonates::iterator it = _memberDonates.begin(); it != itUp;)
+    {
+        timeout = true;
+        _memberDonates.erase(it++);
+    }
+
+    if(timeout)
+        DB5().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `donateTime` <= %u", now - 30*86400);
 }
 
-void Clan::addClanDonateRecord(const std::string& dn, UInt8 si, UInt16 dc, UInt32 dt)
+void Clan::addClanDonateRecordFromDB(const std::string& dn, UInt8 dto, UInt8 dtype, UInt32 dc, UInt32 dt)
 {
-	MemberDonates& mds = _memberDonates[si];
-	if (mds.size() >= 30)
-	{
-		const MemberDonate& md = *(mds.begin());
-		DB5().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u AND `techId` = %u AND `donateTime` = %u", _id, si, md.donateTime);
-		mds.erase(mds.begin());
-	}
-	mds.insert(MemberDonate(dn, dc, dt));
+    UInt32 now = TimeUtil::Now();
+	if (now < 30*86400 + dt)
+		_memberDonates.insert(std::make_pair(dt, MemberDonate(dn, dto, dtype, dc)));
+}
+
+void Clan::addClanDonateRecord(const std::string& dn, UInt8 dto, UInt8 dtype, UInt32 dc, UInt32 dt)
+{
+    _memberDonates.insert(std::make_pair(dt, MemberDonate(dn, dto, dtype, dc)));
 	Stream st(REP::CLAN_SKILL);
-	st << static_cast<UInt8>(4) << si << dn << static_cast<UInt32>(dc) << dt << Stream::eos;
+	st << static_cast<UInt8>(4) << dto << dn << dtype << dc << dt << Stream::eos;
 	broadcast(st);
-	DB5().PushUpdateData("REPLACE INTO `clan_donate_record`(`clanId`, `donateName`, `techId`, `donateCount`, `donateTime`) VALUES(%u, '%s', %u, %u, %u)", _id, dn.c_str(), si, dc, dt);
+	DB5().PushUpdateData("REPLACE INTO `clan_donate_record`(`clanId`, `donateName`, `donateTo`, `donateType`, `donateCount`, `donateTime`) VALUES(%u, '%s', %u, %u, %u, %u)", _id, dn.c_str(), dto, dtype, dc, dt);
 }
 
 void Clan::sendClanDynamicMsg(Player * player, UInt8 type, UInt16 start, UInt16 count)
@@ -2177,6 +2185,19 @@ bool Clan::alterLeader()
 }
 
 UInt32 Clan::getDonateAchievement(Player * player)
+{
+	Mutex::ScopedLock lk(_mutex);
+	Members::iterator offset = _members.begin();
+	for (; offset != _members.end(); ++ offset)
+	{
+		if ((*offset)->player == player)
+			return (*offset)->proffer;
+	}
+
+	return 0;
+}
+
+UInt32 Clan::getMemberProffer(Player * player)
 {
 	Mutex::ScopedLock lk(_mutex);
 	Members::iterator offset = _members.begin();
@@ -3367,6 +3388,7 @@ void Clan::SendItemHistory(Player* player, UInt16 startIndex, UInt8 count)
     UInt16 recordNum = UInt16(_itemHistories.size());
 
     Stream stream(REP::CLAN_PACKAGE_RECORD);
+    stream << static_cast<UInt8>(0);
     stream << recordNum;
 
     UInt16 index = 0;
@@ -3394,6 +3416,36 @@ void Clan::SendItemHistory(Player* player, UInt16 startIndex, UInt8 count)
     }
     stream << Stream::eos;
     player->send(stream);
+}
+
+void Clan::SendDonateHistory(Player* player, UInt16 startIdx, UInt8 count)
+{
+	Mutex::ScopedLock lk(_mutex);
+
+    checkClanDonateRecord();
+    Stream st(REP::CLAN_PACKAGE_RECORD);
+    UInt16 total = _memberDonates.size();
+	st << static_cast<UInt8>(1) << total;
+
+    UInt16 index = 0;
+    MemberDonates::reverse_iterator it = _memberDonates.rbegin();
+    while( index < startIdx && it != _memberDonates.rend())
+    {
+        ++index;
+        ++it;
+    }
+
+    count = UInt8((total > index + count) ? count : (total - index));
+    st << index;
+    st << count;
+    while(count --)
+	{
+        MemberDonate& md = it->second;
+		st << md.donateName << md.donateTo << md.donateType << md.donateCount << it->first;
+        ++ it;
+	}
+	st << Stream::eos;
+	player->send(st);
 }
 
 void Clan::ClearDueItemHistory()
@@ -4284,6 +4336,386 @@ void Clan::broadcastClanBattle(Player *caller)
 }
 // 帮派副本
 //////////////////////////////////////////
+
+#define MAX_CLANSPTR_LEVEL  10
+static UInt32 clansptr_exptable[10] = {0, 100, 1000, 2000, 4000, 7000, 10000, 14000, 20000, 30000};
+static UInt32 clansptr_water_teal[3] = {0, 500, 1000};
+
+void Clan::raiseSpiritTree(Player* pl, UInt8 type)
+{
+    checkSpiritTree();
+
+    UInt8 res = 0;
+    // _mutex生命周期
+    {
+        Mutex::ScopedLock lk(_mutex);
+        ClanMember* mem = getClanMember(pl);
+        if (mem == NULL)
+            return;
+
+        UInt32 now = TimeUtil::Now();
+        if (cfg.GMCheck && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
+        {
+            pl->sendMsgCode(0, 1322);
+            return;
+        }
+
+        if(type == 0)
+        {
+            UInt8 idx = pl->GetVar(VAR_CLAN_SPTR_WATER);
+            if(idx > 2)
+                return;
+            UInt32 needTeal = clansptr_water_teal[idx];
+            if(m_spiritTree.m_level >= MAX_CLANSPTR_LEVEL)
+            {
+                res = 1;
+            }
+            else if(pl->getTael() < needTeal)
+            {
+                res = 2;
+            }
+            else
+            {
+                pl->AddVar(VAR_CLAN_SPTR_WATER, 1);
+                ConsumeInfo ci(ClanSptr,0,0);
+                pl->useTael(needTeal, &ci);
+                if(needTeal > 0)
+                    addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_tael, needTeal, now);
+                m_spiritTree.m_exp += 100;
+                addMemberActivePoint(pl, 1, e_clan_actpt_none);
+                while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
+                    ++ m_spiritTree.m_level;
+                writeSptrToDB();
+            }
+        }
+        else
+        {
+            if(m_spiritTree.m_level >= MAX_CLANSPTR_LEVEL && m_spiritTree.m_color > 2)
+            {
+                res = 3;
+            }
+            else if(pl->getGold() < 10)
+            {
+                res = 4;
+            }
+            else
+            {
+                ConsumeInfo ci(ClanSptr,0,0);
+                pl->useGold(10, &ci);
+                addMemberActivePoint(pl, 5, e_clan_actpt_none);
+                addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_gold, 10, now);
+                if(m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
+                {
+                    m_spiritTree.m_exp += 200;
+                    while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
+                        ++ m_spiritTree.m_level;
+                    writeSptrToDB();
+                }
+                refreshColorAward();
+            }
+        }
+    }
+
+    if(res == 0)
+    {
+        sendSpiritTreeInfo(pl, true);
+    }
+    else
+    {
+        Stream st(REP::CLAN_SPIRIT_TREE);
+        st << static_cast<UInt8>(1) << res;
+        st << Stream::eos;
+        pl->send(st);
+    }
+}
+
+void Clan::refreshColorAward()
+{
+    const UInt8 level_limit[3] = {3, 6, 9};
+    const UInt16 rates[3][5] = {
+        // 初始次数，小于初始次数的概率， 大于初始次数之后的递增次数， 大于于初始次数的初始概率, 大于初始次数递增后的递增概率
+        {5, 1, 1, 3000, 2000},
+        {9, 1, 1, 3000, 2000},
+        {25, 2, 5, 2002, 2000}
+    };
+
+    if(m_spiritTree.m_color >= 3)
+        return;
+
+    if(m_spiritTree.m_level < level_limit[m_spiritTree.m_color])
+        return;
+
+    UInt16 rate = 0;
+    if(m_spiritTree.m_refreshTimes < rates[m_spiritTree.m_color][0])
+        rate = rates[m_spiritTree.m_color][1];
+    else
+        rate = rates[m_spiritTree.m_color][3] + (m_spiritTree.m_refreshTimes - rates[m_spiritTree.m_color][0]) * rates[m_spiritTree.m_color][4];
+    m_spiritTree.m_color += (uRand(10000) < rate ? 1 : 0);
+    ++ m_spiritTree.m_refreshTimes;
+    writeSptrToDB();
+}
+
+void Clan::getSpiritTreeAward(Player* pl, UInt8 idx)
+{
+    checkSpiritTree();
+    if(idx != 0xFF && idx > 11)
+        return;
+
+    Mutex::ScopedLock lk(_mutex);
+    ClanMember* mem = getClanMember(pl);
+	if (mem == NULL)
+		return;
+
+	UInt32 now = TimeUtil::Now();
+    if (cfg.GMCheck && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
+    {
+		pl->sendMsgCode(0, 1322);
+		return;
+    }
+
+    const UInt16 awards[12][2] = {{0xFFFF, 300}, {5001, 1},{400, 1}, {51, 1}, {15, 1}, {56, 1}, {133, 1}, {500, 1}, {1126, 1}, {1326, 1}, {501, 1}, {516, 1}};
+    UInt32 awardFlag = pl->GetVar(VAR_CLAN_SPTR_AWARD);
+    UInt32 newAwardFlag = awardFlag;
+    Package* pkg = pl->GetPackage();
+    if(!pkg)
+        return;
+    if(idx != 0xFF)
+    {
+        if(pl->GetFreePackageSize() < 1)
+        {
+            pl->sendMsgCode(0, 1011);
+            return;
+        }
+        if(m_spiritTree.m_level-1 > idx)
+        {
+            if(awardFlag & (1 << idx))
+                return;
+            newAwardFlag |= (1 << idx);
+        }
+        else if(idx >= MAX_CLANSPTR_LEVEL-1)
+        {
+            if(m_spiritTree.m_color <= idx-(MAX_CLANSPTR_LEVEL-1))
+                return;
+            if(awardFlag & (1 << idx))
+                return;
+            newAwardFlag |= (1 << idx);
+        }
+        else
+        {
+            return;
+        }
+
+        if(awards[idx][0] == 0xFFFF)
+            pl->getClanProffer(awards[idx][1], NULL);
+        else if(awards[idx][0] == 5001)
+            pkg->Add(getRandGem(1), awards[idx][1], true, false, FromClanSptr);
+        else
+            pkg->Add(awards[idx][0], awards[idx][1], true, false, FromClanSptr);
+    }
+    else
+    {
+        for(UInt8 idx = 0; idx < 12; ++ idx)
+        {
+            if(pl->GetFreePackageSize() < 1)
+            {
+                pl->sendMsgCode(0, 1011);
+                break;
+            }
+
+            if(m_spiritTree.m_level-1 > idx)
+            {
+                if(awardFlag & (1 << idx))
+                    continue;
+                newAwardFlag |= (1 << idx);
+            }
+            else if(idx >= MAX_CLANSPTR_LEVEL-1)
+            {
+                if(m_spiritTree.m_color <= idx-(MAX_CLANSPTR_LEVEL-1))
+                    break;
+                if(awardFlag & (1 << idx))
+                    continue;
+                newAwardFlag |= (1 << idx);
+            }
+            else
+            {
+                continue;
+            }
+            if(awards[idx][0] == 0xFFFF)
+                pl->getClanProffer(awards[idx][1], NULL);
+            else if(awards[idx][0] == 5001)
+                pkg->Add(getRandGem(1), awards[idx][1], true, false, FromClanSptr);
+            else
+                pkg->Add(awards[idx][0], awards[idx][1], true, false, FromClanSptr);
+        }
+    }
+
+    if(newAwardFlag != awardFlag)
+    {
+        pl->SetVar(VAR_CLAN_SPTR_AWARD, newAwardFlag);
+        sendSpiritTreeInfo(pl);
+    }
+}
+
+void Clan::sendSpiritTreeInfo(Player* pl, bool bc)
+{
+    checkSpiritTree();
+    Mutex::ScopedLock lk(_mutex);
+
+    if(bc)
+    {
+        Stream st(REP::CLAN_SPIRIT_TREE);
+        st << static_cast<UInt8>(0);
+        st << m_spiritTree.m_exp;
+        st << m_spiritTree.m_color;
+        st << static_cast<UInt8>(0);
+        st << Stream::eos;
+        broadcast(st);
+    }
+
+    if(pl != NULL)
+    {
+        Stream st(REP::CLAN_SPIRIT_TREE);
+        st << static_cast<UInt8>(0);
+        st << m_spiritTree.m_exp;
+        st << m_spiritTree.m_color;
+        st << static_cast<UInt8>(1);
+
+        UInt32 awardFlag = pl->GetVar(VAR_CLAN_SPTR_AWARD);
+        UInt8 times = pl->GetVar(VAR_CLAN_SPTR_WATER);
+        st << times;
+        UInt8 i = 0;
+        for(; i < m_spiritTree.m_level-1; ++ i)
+        {
+            if(awardFlag & (1 << i))
+                st << static_cast<UInt8>(2);
+            else
+                st << static_cast<UInt8>(1);
+        }
+        for(; i < MAX_CLANSPTR_LEVEL-1; ++ i)
+        {
+            st << static_cast<UInt8>(0);
+        }
+        UInt8 c = 0;
+        for(; c < m_spiritTree.m_color && i < 12; ++ c, ++ i)
+        {
+            if(awardFlag & (1 << i))
+                st << static_cast<UInt8>(2);
+            else
+                st << static_cast<UInt8>(1);
+        }
+        for(; c < 3 && i < 12; ++ c, ++ i)
+        {
+            st << static_cast<UInt8>(0);
+        }
+        st << Stream::eos;
+        pl->send(st);
+    }
+}
+
+void Clan::checkSpiritTree()
+{
+    Mutex::ScopedLock lk(_mutex);
+    UInt32 now = TimeUtil::Now();
+    if(now > m_spiritTree.m_endTime)
+    {
+        m_spiritTree.m_endTime = TimeUtil::SharpDayT(1, now);
+        m_spiritTree.m_exp = 0;
+        m_spiritTree.m_level = 1;
+        m_spiritTree.m_refreshTimes = 0;
+        m_spiritTree.m_color = 0;
+        writeSptrToDB();
+    }
+}
+
+void Clan::loadSptrFromDB(UInt32 exp, UInt8 lvl, UInt32 endtime, UInt8 times, UInt8 color)
+{
+    m_spiritTree.m_endTime = endtime;
+    m_spiritTree.m_exp = exp;
+    m_spiritTree.m_level = lvl;
+    m_spiritTree.m_refreshTimes = times;
+    m_spiritTree.m_color = color;
+}
+
+void Clan::writeSptrToDB()
+{
+    DB5().PushUpdateData("REPLACE INTO `clan_sptr` (`clanId`, `exp`, `level`, `refreshTimes`, `color`, `endTime`) VALUES (%u, %u, %u, %u, %u, %u)", _id, m_spiritTree.m_exp, m_spiritTree.m_level, m_spiritTree.m_refreshTimes, m_spiritTree.m_color, m_spiritTree.m_endTime);
+}
+
+void Clan::addMemberActivePoint(Player* pl, UInt32 actpt, CLAN_ACTPT_FLAG f)
+{
+    if(f != 0)
+    {
+        UInt32 flag = pl->GetVar(VAR_CLAN_ACTPT_FLAG);
+        if(f & flag)
+            return;
+        flag |= f;
+        pl->SetVar(VAR_CLAN_ACTPT_FLAG, flag);
+    }
+	Mutex::ScopedLock lk(_mutex);
+    ClanMember* mem = getClanMember(pl);
+    if(mem)
+    {
+        checkMemberActivePoint(mem);
+        mem->activepoint += actpt;
+        {
+            Stream st(REP::CLAN_INFO_UPDATE);
+            st << static_cast<UInt8>(11) << pl->getId() << mem->activepoint << Stream::eos;
+            broadcast(st);
+        }
+        DB5().PushUpdateData("UPDATE `clan_player` SET `activepoint` = %u WHERE `playerId` = %" I64_FMT "u", mem->activepoint, mem->player->getId());
+        pl->AddVar(VAR_CLAN_ACTPT_MONTH, actpt);
+    }
+}
+
+UInt32 Clan::getMemberActivePoint(Player* pl)
+{
+	Mutex::ScopedLock lk(_mutex);
+    ClanMember* mem = getClanMember(pl);
+    if(mem)
+    {
+        checkMemberActivePoint(mem);
+        return mem->activepoint;
+    }
+
+    return 0;
+}
+
+UInt32 Clan::getMemberActivePoint(ClanMember* mem)
+{
+    checkMemberActivePoint(mem);
+    return mem->activepoint;
+}
+
+void Clan::checkMemberActivePoint(ClanMember* mem)
+{
+    UInt32 now = TimeUtil::Now();
+    if(now > mem->actpt_endtime)
+    {
+        mem->last_actpt = mem->activepoint;
+        mem->activepoint = 0;
+        mem->actpt_endtime = TimeUtil::SharpWeek(1, now);
+        DB5().PushUpdateData("UPDATE `clan_player` SET `activepoint` = %u, `last_actpt` = %u, `actpt_endtime` = %u WHERE `playerId` = %" I64_FMT "u", mem->activepoint, mem->last_actpt, mem->actpt_endtime, mem->player->getId());
+    }
+}
+
+void Clan::listMembersActivePoint( Player * player )
+{
+	Mutex::ScopedLock lk(_mutex);
+	Stream st;
+	st.init(REP::CLAN_MEMBER_LIST);
+	UInt8 c = _members.size();
+	st << static_cast<UInt8>(2) << c;
+	Members::iterator offset = _members.begin();
+	for (; offset != _members.end(); ++ offset)
+	{
+		ClanMember * mem = *offset;
+        if (!mem || !mem->player)
+            continue;
+		st << mem->player->getName() << mem->cls << getMemberActivePoint(mem) << mem->last_actpt << mem->player->GetVar(VAR_CLAN_ACTPT_MONTH);
+	}
+	st << Stream::eos;
+	player->send(st);
+}
 
 
 }

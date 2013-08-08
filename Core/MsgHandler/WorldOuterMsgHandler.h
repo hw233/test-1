@@ -110,9 +110,10 @@ struct ClanQuery2Req
 
 struct ClanItemHistoryReq
 {
+    UInt8 _type;
     UInt16 _startId;
     UInt8 _count;
-    MESSAGE_DEF2(REQ::CLAN_PACKAGE_RECORD, UInt16, _startId, UInt8, _count);
+    MESSAGE_DEF3(REQ::CLAN_PACKAGE_RECORD, UInt8, _type, UInt16, _startId, UInt8, _count);
 };
 
 #if 0
@@ -551,10 +552,18 @@ void OnClanQuery2Req( GameMsgHdr& hdr, ClanQuery2Req& cqr )
 	if(clan == NULL)
 		return;
 
-	if(cqr._type == 0)
+    switch(cqr._type)
+    {
+    case 0:
 		clan->listMembers(player);
-	else
+        break;
+    case 1:
 		clan->listPending(player);
+        break;
+    case 2:
+        clan->listMembersActivePoint(player);
+        break;
+    }
 }
 
 void OnClanBattleReportReq( GameMsgHdr& hdr, ClanBattleReportReq& req )
@@ -707,9 +716,7 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 			break;
 		case 1:
 			{
-				UInt8 techId;
-				brd >> techId;
-				clan->listTechDonators(player, techId);
+				clan->listDonators(player);
 			}
 			break;
 		case 2:
@@ -858,7 +865,15 @@ void OnItemHistoryReq( GameMsgHdr& hdr, ClanItemHistoryReq& req)
     GObject::Clan* clan = player->getClan();
     if(clan == NULL) return;
 
-    clan->SendItemHistory(player, req._startId, req._count);
+    switch(req._type)
+    {
+    case 0:
+        clan->SendItemHistory(player, req._startId, req._count);
+        break;
+    case 1:
+        clan->SendDonateHistory(player, req._startId, req._count);
+        break;
+    }
 }
 
 

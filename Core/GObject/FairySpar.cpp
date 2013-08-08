@@ -14,6 +14,7 @@ namespace GObject
 #define PHY_MAX       3
 
     const Int32 statusLevel[7] = {0,3,6,9,12,15,18};
+    const Int32 clanLevel[7] = {0, 2, 3, 4, 5, 6, 7};
     const Int32 atkMax[7] = {100,160,240,340,460,600,800};
     const Int32 magAtkMax[7] = {100,160,240,340,460,600,800};
     const Int32 phyMax[7] = {1000,1600,2400,3400,4600,6000,8000};
@@ -154,10 +155,12 @@ namespace GObject
             m_owner->sendMsgCode(0, 1361);
             return;
         }
-        UInt16 level = m_owner->getClan()->getStatueLevel();
-        if(level < statusLevel[m_breakoutCnt + 1])
+        //UInt16 level = m_owner->getClan()->getStatueLevel();
+        UInt16 level = m_owner->getClan()->getLev();
+        //if(level < statusLevel[m_breakoutCnt + 1])
+        if(level < clanLevel[m_breakoutCnt + 1])
         {
-            m_owner->sendMsgCode(0, 1359);
+            m_owner->sendMsgCode(0, 1369);
             return;
         }
         UInt32 proffer = (getFusePercent() / 10 + 1) * 50 * (m_breakoutCnt + 1);
