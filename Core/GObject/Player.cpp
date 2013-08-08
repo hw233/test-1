@@ -5087,16 +5087,17 @@ namespace GObject
         if(!member)
             return 0;
         if(c == 0)
-			return member->proffer;
-		member->proffer += c;
+			return clan->getMemberProffer(this);
+        clan->addMemberProffer(this, c);
+		//member->proffer += c;
+        UInt32 proffer = clan->getMemberProffer(this);
 		SYSMSG_SENDV(166, this, c);
 		SYSMSG_SENDV(1066, this, c);
         {
             Stream st(REP::CLAN_INFO_UPDATE);
-            st << static_cast<UInt8>(5) << member->proffer << Stream::eos;
+            st << static_cast<UInt8>(5) << proffer << Stream::eos;
             send(st);
         }
-        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %" I64_FMT "u", member->proffer, this->getId());
 
         if(ii && ii->incommingType != 0)
         {
@@ -5104,7 +5105,7 @@ namespace GObject
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
-		return member->proffer;
+		return proffer;
 	}
 
 	UInt32 Player::useClanProffer( UInt32 a,ConsumeInfo * ci )
@@ -5115,11 +5116,13 @@ namespace GObject
         ClanMember* member = clan->getClanMember(this);
         if(!member)
             return 0;
-        if(member->proffer < a)
-            member->proffer = 0;
+        UInt32 proffer = clan->getMemberProffer(this);
+        if(proffer < a)
+            clan->addMemberProffer(this, -proffer);
         else
         {
-            member->proffer -= a;
+            clan->addMemberProffer(this, -a);
+            //member->proffer -= a;
             if(ci!=NULL)
             {
                 DBLOG1().PushUpdateData("insert into consume_clan_proffer (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
@@ -5130,12 +5133,11 @@ namespace GObject
         SYSMSG_SENDV(1065, this, a);
         {
             Stream st(REP::CLAN_INFO_UPDATE);
-            st << static_cast<UInt8>(5) << member->proffer << Stream::eos;
+            st << static_cast<UInt8>(5) << proffer << Stream::eos;
             send(st);
         }
-        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %" I64_FMT "u", member->proffer, this->getId());
 
-        return member->proffer;
+        return proffer;
     }
 
     UInt32 Player::getCoin( UInt32 c )
