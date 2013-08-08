@@ -12744,8 +12744,8 @@ namespace GObject
         if(!World::getLuckyMeet())
             return ;
         UInt32 LuckyMeet = GetVar(VAR_LUCKYMEET);
-        std::string  openid = getOpenId();
-        char  key1[16] = "uid_asss_act";
+        //std::string  openid = getOpenId();
+        //char  key1[16] = "uid_asss_act";
     //    if(!LuckyMeet &&! GObject::dclogger.checkActiveOpenid(key1,(char*)openid.c_str()))
       //      return;
         UInt32 begin =GVAR.GetVar(GVAR_LUCKYMEET_BEGIN) ;
@@ -12923,6 +12923,8 @@ namespace GObject
     }
     void Player::getLuckyMeetAward(UInt8 idx,UInt8 index)
     {
+        if(!World::getLuckyMeet())
+            return ;
         switch(idx)
         {
             case 1:
@@ -12969,6 +12971,9 @@ namespace GObject
         }
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_LUCKYMEET_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d",4+val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
     //蜀山奇遇充值奖励
     void Player::getLuckyMeetRechargeAward(UInt8 val)
@@ -12980,6 +12985,9 @@ namespace GObject
             return;
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_LUCKYMEET_RECHARGE_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d", val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
 
     void Player::getLuckyMeetStrenthAward(UInt8 val)
@@ -12994,6 +13002,9 @@ namespace GObject
             return;
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_LUCKYMEET_STRENTH_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d", 11+val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
 
     void Player::getNewRC7DayRechargeAward(UInt8 val)
