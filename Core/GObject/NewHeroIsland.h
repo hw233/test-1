@@ -81,10 +81,12 @@ struct NHIPlayerData
         }
 
         movecd = 0;
+        /*
         for (UInt8 i = 0; i < 5; ++i)
         {
             skills[i].reset();
         }
+        */
     }
 
 };
@@ -214,7 +216,7 @@ public:
     void sendAllPlayerInfo();
     void sendPairPlayerInfo(NHIPlayerData *, NHIPlayerData *);
     void updateSpotPlayers(UInt8 spot);
-    void playerInfo(Player *);
+    void playerInfo(Player *, bool = true);
     void updatePlayerInfo(UInt32 now);
     void sendSkillInfo(NHIPlayerData *);
     void sendWinerInfo(Player * player1, Player * player2, UInt16 score, UInt8 spot);

@@ -829,7 +829,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+111*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+118*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -1115,7 +1115,7 @@ function onActivityCheck(tm)
       setGoldSnakeAct(false)
   end
 
-  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 77*86400) then
+  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 84*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1396,7 +1396,7 @@ function initActTime(y, m, d)
 
 --暑假回流
   local  SerStartTm248= { ['year'] = 2013, ['month'] = 7, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm248_1= { ['year'] = 2013, ['month'] = 8, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm248_1= { ['year'] = 2013, ['month'] = 8, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
