@@ -4593,7 +4593,10 @@ void Clan::sendSpiritTreeInfo(Player* pl, bool bc)
         }
         for(; i < MAX_CLANSPTR_LEVEL-1; ++ i)
         {
-            st << static_cast<UInt8>(0);
+            if(awardFlag & (1 << i))
+                st << static_cast<UInt8>(2);
+            else
+                st << static_cast<UInt8>(0);
         }
         UInt8 c = 0;
         for(; c < m_spiritTree.m_color && i < 12; ++ c, ++ i)
@@ -4605,7 +4608,10 @@ void Clan::sendSpiritTreeInfo(Player* pl, bool bc)
         }
         for(; c < 3 && i < 12; ++ c, ++ i)
         {
-            st << static_cast<UInt8>(0);
+            if(awardFlag & (1 << i))
+                st << static_cast<UInt8>(2);
+            else
+                st << static_cast<UInt8>(0);
         }
         st << Stream::eos;
         pl->send(st);

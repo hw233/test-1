@@ -768,6 +768,9 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 	if(price > 0)
 	{
         pl->getTael(price);
+        char str[32] = {0};
+        sprintf(str, "F_130808_1_%u", price);
+        pl->udpLog("wupinhuigou", str, "", "", "", "", "act");
 	}
     if(canDestroyNum > 0)
     {
