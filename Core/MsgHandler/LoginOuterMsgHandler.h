@@ -193,7 +193,6 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	}
 	else
 	{
-
 		if(player->getLockExpireTime() > 0)
 		{
 			if(player->getLockExpireTime() <= TimeUtil::Now())
@@ -409,7 +408,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setPfKey(pfkey);
             player->setXinYue(atoi(xinyue.c_str()));
             player->setJinQuan(jinquan);
-            player->continuousLoginSummerFlow();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -532,6 +530,21 @@ void trimName(std::string& str)
 
 void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 {
+
+    UInt32 max = 0;
+    UInt32 cur = 0;
+    max = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max);
+    cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur);
+    if( max && max<cur)
+        return;
+    else
+    {
+        UInt32 Cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur); 
+        Cur++;
+        GObject::GVAR.SetVar(GObject::GVAR_NewUser_Cur, Cur);
+
+    }
+    
     UserStruct us;
 	us._name	 = nu._name;
 	us._class	 = nu._class;
@@ -744,7 +757,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setVia(nu._via);
             pl->setXinYue(atoi(xinyue.c_str()));
             pl->setJinQuan(jinquan);
-            pl->continuousLoginSummerFlow();
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -1513,30 +1525,18 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     br >> tm;
     br>>playerIds;
 
-//开启起封交易客户平台测试
-//#define TEST_TABLE
-#ifdef TEST_TABLE
-#pragma pack(1) 
-    struct test
-    {
-        UInt8 blamk[36];
-        UInt32 tm;
-        char msg[1024];
-    };
-#pragma pack()
-    test * _test = reinterpret_cast< test*>(const_cast<void *>(data));
-    tm = _test->tm;
-    playerIds = _test->msg;
-#endif
-#undef TEST_TABLE 
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+        br >> serverNo;
 
     UInt8 ret = 1;
-    INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), tm);
+    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
         UInt64 pid = atoll(playerId.c_str());
+        pid = pid & 0xFFFFFFFFFF;
         string str;
         string overTime;
         if (!checkForbidSale(pid,str,overTime))
@@ -1544,6 +1544,8 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
             //setForbidSaleValue(pid, true);
             setForbidSaleValue(pid, true,tm);
 
+            if(cfg.merged)
+                pid += (static_cast<UInt64>(serverNo) << 48);
     	    GObject::Player * pl = GObject::globalPlayers[pid];
             if (NULL != pl)
             {
@@ -1569,6 +1571,9 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
     std::string playerIds;
     CHKKEY();
     br>>playerIds;
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+        br >> serverNo;
  
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
@@ -1577,8 +1582,11 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
     while (!playerId.empty())
     {
         UInt64 pid = atoll(playerId.c_str());
+        pid = pid & 0xFFFFFFFFFF;
         setForbidSaleValue(pid, false);
 
+        if(cfg.merged)
+            pid += (static_cast<UInt64>(serverNo) << 48);
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->setForbidSale(false);
@@ -1607,6 +1615,7 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
     CHKKEY();
     br>>pid;
 
+    pid = pid & 0xFFFFFFFFFF;
     UInt8 isLockLogin = IsBigLock(pid);
 //    UInt8 isForbidSale = checkForbidSale(pid, fsaleTime);
     UInt8 isForbidSale = checkForbidSale(pid, fsaleTime,foverTime);
@@ -1614,7 +1623,6 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
     Stream st(SPEP::QUERYLOCKUSER);
 //    st << isLockLogin << isForbidSale << fsaleTime << Stream::eos;
     st << isLockLogin << isForbidSale << fsaleTime<< foverTime << Stream::eos;
-    std::cout<<(bool)isLockLogin<< "  " <<(bool)isForbidSale<< "  "<<fsaleTime<<"  "<<foverTime<<std::endl;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
@@ -1738,6 +1746,41 @@ void OnTotalRechargeAct(LoginMsgHdr &hdr, const void* data)
 
     Stream st(SPEP::TOTALRECHARGEACT);
     st << total << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void OnSetMaxCreate(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt32 MaxNewUser = 0;
+    UInt8 ret = 1;
+    br >> MaxNewUser; 
+    if (!MaxNewUser)
+    {
+        GObject::GVAR.SetVar(GObject::GVAR_NewUser_Max , MaxNewUser); 
+        ret = 0;
+    }
+
+    Stream st(SPEP::SETMAXNEWUSER);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void OnGetMaxCreate(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt32 MaxNewUser = 0;
+    if ( GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max) )
+    {
+        MaxNewUser = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max); 
+    }
+
+    Stream st(SPEP::GETMAXNEWUSER);
+    st << MaxNewUser << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
@@ -3409,5 +3452,6 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
     st << type << begin << end << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
+
 #endif // _LOGINOUTERMSGHANDLER_H_
 
