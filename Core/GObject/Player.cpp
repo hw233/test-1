@@ -8793,6 +8793,27 @@ namespace GObject
         return _playerData.nameNoSuffix.c_str();
     }
 
+    std::string& Player::getOriginName(std::string& name)
+    {
+        if(cfg.merged)
+		{
+			name = _playerData.name;
+            size_t idx = name.size() - 1;
+            for(; idx > 0; -- idx)
+            {
+                if(static_cast<UInt8>(name[idx]) >= 32)
+                    break;
+            }
+            name.resize(idx+1);
+        }
+        else
+        {
+            name = _playerData.name;
+        }
+
+        return name;
+    }
+
 	void Player::sendYDVIPMails( UInt8 l, UInt8 h )
 	{
 		if(l < 1)

@@ -186,18 +186,21 @@ void Leaderboard::buildPacketForLingbao(Stream& st, UInt8 t, bool merge /* = tru
 	st << t << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(c);
 	//for(UInt8 i = 0; i < c; ++ i)
     UInt32 i = 0;
-    for (LingbaoInfoSet::iterator it = _lingbaoInfoSet.begin(); it != _lingbaoInfoSet.end() && i < c; ++ it)
+    for (LingbaoInfoSet::iterator it = _lingbaoInfoSet.begin(); it != _lingbaoInfoSet.end(); ++ it)
 	{
 		const LingbaoInfoList& item = *it;
         if ((_lingbaoRank[item.id] == 0) || (_lingbaoRank[item.id] > static_cast<int>(i+1)))
             _lingbaoRank[item.id] = i+1;
 
-        st << item.name << item.pf << item.country << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbColor;
-        for (UInt8 j = 0; j < 4; ++j)
+        if(i < c)
         {
-            st << item.type[j] << item.value[j];
+            st << item.name << item.pf << item.country << item.battlePoint << static_cast<UInt16>(item.itemId) << item.tongling << item.lbColor;
+            for (UInt8 j = 0; j < 4; ++j)
+            {
+                st << item.type[j] << item.value[j];
+            }
+            st << item.skill[0] << item.factor[0] << item.skill[1] << item.factor[1];
         }
-        st << item.skill[0] << item.factor[0] << item.skill[1] << item.factor[1];
         ++ i;
 	}
 	st << Stream::eos;

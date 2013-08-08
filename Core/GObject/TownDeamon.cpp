@@ -545,6 +545,7 @@ void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt32 spirit, 
 			bf->setHP(0);
 		}
 	}
+    atker->PutPets(bsim, 0);
 	defer->PutFighters( bsim, 1, true );
     //DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
     //UInt32 spirit = deferDpd->calcSpirit();
