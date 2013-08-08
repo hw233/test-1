@@ -48,6 +48,7 @@ enum
     /*22*/ SKILL_DEAD_FAKE,  // 复活
     /*23*/ SKILL_ABNORMAL_TYPE_DMG,  // 异常类状态伤害
     /*24*/ SKILL_BLEED_TYPE_DMG,  // 流血类状态伤害
+    /*25*/ SKILL_XMCZ,  //降魔禅杖
     SKILL_PASSIVES
 };
 

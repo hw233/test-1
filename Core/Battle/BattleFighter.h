@@ -945,10 +945,10 @@ public:
     void releaseLBSkillCD();
 
     float& getHpShieldSelf() { return _hpShieldSelf; }
-    void setHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; }
-    void addHpShieldSelf(float v, UInt8 l) { _hpShieldSelf += v; _hpShieldSelf_last = l; }
+    void setHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; printf("setlast:%u", _hpShieldSelf_last);}
+    void addHpShieldSelf(float v, UInt8 l) { _hpShieldSelf += v; _hpShieldSelf_last = l; printf("addlast:%u", _hpShieldSelf_last);}
     bool releaseHpSieldSelf();
-    inline UInt8& getHpShieldSelfLast(){ return _hpShieldSelf_last; }
+    //inline UInt8& getHpShieldSelfLast(){ return _hpShieldSelf_last; }
     const GData::SkillBase* _xiangMoChanZhangSkill;
     const GData::SkillBase* getXiangMoChanZhangSkill(){ return _xiangMoChanZhangSkill; }
 
@@ -1147,12 +1147,14 @@ private:
     std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;
+    std::vector<GData::SkillItem> _passiveSkillXMCZ100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAbnormalTypeDmg100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBleedTypeDmg100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBleedTypeDmg(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillXMCZ100(size_t& idx, bool noPossibleTarget = false);
 
 public:
 	enum StatusFlag

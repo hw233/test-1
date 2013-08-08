@@ -5762,6 +5762,20 @@ UInt32 BattleSimulator::doAttack( int pos )
             }
         }
 
+        const GData::SkillBase *skill = bf->getXiangMoChanZhangSkill();
+        if(skill && skill->effect)
+        {
+            const std::vector<UInt16>& eft = skill->effect->eft;
+            const std::vector<UInt8>& efl = skill->effect->efl;
+            const std::vector<float>& efv = skill->effect->efv;
+
+            size_t cnt = eft.size();
+            if(cnt == efl.size() && cnt == efv.size())
+            {
+                for(size_t i = 0; i < cnt; ++ i)
+                    doSkillEffectExtra_HpShield(bf, bf->getSide(), bf->getPos(), skill, i);
+            }
+        }
 #if 0
         if(target_object != NULL)
         {
@@ -10011,7 +10025,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         if(bf->getHP() == 0)
             break;
         const GData::SkillBase *skill = bf->getXiangMoChanZhangSkill();
-        if(skill != NULL && bf->getHpShieldSelfLast() != 0)
+        if(skill != NULL && bf->getHpShieldSelf() > 0.001f)
         {
             bf->setHpShieldSelf(0, 0);
             appendDefStatus(e_unHpShieldSelf, 0, bf);
@@ -11478,7 +11492,7 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
     if(!bf)
         return;
     float& shieldHp = bf->getHpShieldSelf();
-    if(shieldHp > 0)
+    if(shieldHp > 0.001f)
     {
         if(u > shieldHp)
         {
@@ -11503,7 +11517,7 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
     }
 
     float petShieldHp = bf->getPetShieldHP();
-    if (petShieldHp > 0)
+    if (petShieldHp > 0.001f)
     {
         if (u > petShieldHp)
         {
@@ -13042,14 +13056,14 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
                 bool isPhysic = false;
                 if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
                 {
-                    atk = efv[i] * calcAttack(bf, cs2, target, NULL);
+                    atk = skill->effect->crrdamP * calcAttack(bf, cs2, target, NULL);
                     def = getBFDefend(target);
                     reduce = getBFAtkReduce(target);
                     isPhysic = true;
                 }
                 else
                 {
-                    atk = efv[i] * calcMagAttack(bf, cs2, target, NULL);
+                    atk = skill->effect->crrdamP * calcMagAttack(bf, cs2, target, NULL);
                     def = getBFMagDefend(target);
                     reduce = getBFMagAtkReduce(target);
                     isPhysic = false;
