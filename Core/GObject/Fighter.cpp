@@ -2007,6 +2007,8 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
 {
     if(fgt == NULL)
         fgt = this;
+    if(!getOwner())
+        return;
 	ItemEquip * equip[8] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
         fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(), fgt->getRing()};
     bool aMark = false;
@@ -3850,6 +3852,7 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_DEAD_FAKE ||
                         s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
                         s->cond == GData::SKILL_BLEED_TYPE_DMG ||
+                        s->cond == GData::SKILL_XMCZ ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
@@ -3900,6 +3903,7 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_DEAD_FAKE ||
                         s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
                         s->cond == GData::SKILL_BLEED_TYPE_DMG ||
+                        s->cond == GData::SKILL_XMCZ ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||

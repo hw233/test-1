@@ -48,6 +48,7 @@ enum
     /*22*/ SKILL_DEAD_FAKE,  // 复活
     /*23*/ SKILL_ABNORMAL_TYPE_DMG,  // 异常类状态伤害
     /*24*/ SKILL_BLEED_TYPE_DMG,  // 流血类状态伤害
+    /*25*/ SKILL_XMCZ,  //降魔禅杖
     SKILL_PASSIVES
 };
 
@@ -113,6 +114,7 @@ enum
     e_eft_abnormal_type_dmg = 39,           //异常类伤害
     e_eft_bleed_type_dmg = 40,           //流血类伤害
     e_eft_buddha_light = 41,           //佛光效果
+    e_eft_no_use = 42,           //未使用
 
     e_eft_max
 };

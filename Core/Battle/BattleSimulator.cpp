@@ -5762,6 +5762,20 @@ UInt32 BattleSimulator::doAttack( int pos )
             }
         }
 
+        const GData::SkillBase *skill = bf->getXiangMoChanZhangSkill();
+        if(skill && skill->effect)
+        {
+            const std::vector<UInt16>& eft = skill->effect->eft;
+            const std::vector<UInt8>& efl = skill->effect->efl;
+            const std::vector<float>& efv = skill->effect->efv;
+
+            size_t cnt = eft.size();
+            if(cnt == efl.size() && cnt == efv.size())
+            {
+                for(size_t i = 0; i < cnt; ++ i)
+                    doSkillEffectExtra_HpShield(bf, bf->getSide(), bf->getPos(), skill, i);
+            }
+        }
 #if 0
         if(target_object != NULL)
         {
@@ -10007,6 +10021,18 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                 }
             }
         }
+
+        if(bf->getHP() == 0)
+            break;
+        const GData::SkillBase *skill = bf->getXiangMoChanZhangSkill();
+        if(skill != NULL && bf->getHpShieldSelf() > 0.001f)
+        {
+            bf->setHpShieldSelf(0, 0);
+            appendDefStatus(e_unHpShieldSelf, 0, bf);
+
+            doSkillAttackByCareer(bf, skill);
+        }
+
     }while(false);
 
     if(_defList.size() > 0 || _scList.size() > 0)
@@ -11466,7 +11492,7 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
     if(!bf)
         return;
     float& shieldHp = bf->getHpShieldSelf();
-    if(shieldHp > 0)
+    if(shieldHp > 0.001f)
     {
         if(u > shieldHp)
         {
@@ -11491,7 +11517,7 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
     }
 
     float petShieldHp = bf->getPetShieldHP();
-    if (petShieldHp > 0)
+    if (petShieldHp > 0.001f)
     {
         if (u > petShieldHp)
         {
@@ -12972,6 +12998,108 @@ void BattleSimulator::initBuddhaLight(BattleFighter* bf, bool auralAdd, bool dea
         if(auralAdd && bo->getBuddhaLightValue() > 0.001)
             setStatusChange_Aura2(bo, bo->getSide(), bo->getPos(), NULL, bo->getBuddhaLightValue(), 0, false);
         bo->setBuddhaLightValue(0);
+    }
+}
+
+void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::SkillBase *skill)
+{
+    if(!skill)
+        return;
+    if(!skill->effect)
+        return;
+
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+
+    size_t cnt = eft.size();
+    if(cnt != efl.size() || efv.size() != cnt)
+        return;
+    appendDefStatus(e_skill, skill->getId(), bf);
+    bool first = true;
+    bool cs = false;
+    bool pr = false;
+
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        AtkList atklist;
+        getAtkList(bf, skill, atklist);
+        UInt8 cnt2 = atklist.size();
+        for(size_t j = 0; j < cnt2; ++ j)
+        {
+            BattleFighter* target = static_cast<BattleFighter *>(atklist[j].bf);
+            UInt8 target_stun = target->getStunRound();
+            bool enterEvade = target->getEvad100();
+            bool defend100 = target->getDefend100();
+
+            if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(target, NULL))))
+            {
+                bool pr2 = bf->calcPierce(target);
+                float cf = 0.0f;
+                bool cs2 = false;
+                if(cs2)
+                {
+                    UInt8 s = bf->getSide();
+                    if(s < 2)
+                        _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
+                }
+                if(first)
+                {
+                    cs = cs2;
+                    pr = pr2;
+                    first = false;
+                }
+
+                float atk = 0;
+                float def = 0;
+                float reduce = 0;
+                bool isPhysic = false;
+                if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
+                {
+                    atk = skill->effect->crrdamP * calcAttack(bf, cs2, target, NULL);
+                    def = getBFDefend(target);
+                    reduce = getBFAtkReduce(target);
+                    isPhysic = true;
+                }
+                else
+                {
+                    atk = skill->effect->crrdamP * calcMagAttack(bf, cs2, target, NULL);
+                    def = getBFMagDefend(target);
+                    reduce = getBFMagAtkReduce(target);
+                    isPhysic = false;
+                }
+
+                float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
+                float factor = atklist[j].factor;
+                float dmg = _formula->calcDamage(atk * factor, def, bf->getLevel(), toughFactor, reduce);
+                dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+                dmg = dmg > 0 ? dmg : 1;
+
+                UInt32 curDmg = dmg;
+                makeDamage(target, curDmg);
+                appendDefStatus(e_damNormal, dmg, target, isPhysic ? e_damagePhysic : e_damageMagic);
+                if(target->getHP() == 0)
+                    onDead(false, target);
+                else if(_winner == 0)
+                    onDamage(target, true, NULL);
+            }
+            else if(!defend100 && !enterEvade)
+                appendDefStatus(e_damEvade, 0, target);
+            else
+            {
+                if(!defend100)
+                {
+                    appendDefStatus(e_damEvade, 0, target);
+                    target->setEvad100(false);
+                }
+                else
+                {
+                    appendDefStatus(e_damOut, 0, target);
+                    target->setDefend100(false);
+                }
+            }
+        }
+        return;
     }
 }
 
