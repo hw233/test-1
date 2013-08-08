@@ -358,9 +358,12 @@ namespace GObject
         m_MCached.get(key, len, value, sizeof(value));
         return atoi(value);
     }
-    UInt8 DCWorker::CheckYBCorrect()
+    UInt8 DCWorker::CheckYBLevel(UInt64 playerId ,UInt32 viplev)
     {
-            return false; 
+        GObject::Player * pl = GObject::globalPlayers[playerId];
+        if(pl!=NULL)
+            return true;
+        return false;
     }
 }
 

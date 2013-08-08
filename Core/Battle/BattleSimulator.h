@@ -313,6 +313,8 @@ private:
         e_unAbnormalType = 98,    // 异常类状态消失
         e_bleedType = 99,    // 流血类状态
         e_unBleedType = 100,    // 流血类状态消失
+        e_buddhaLight = 101,    // 佛光效果
+        e_unBuddhaLight = 102,    // 佛光效果消失
 
         e_MAX_STATE,
     };
@@ -529,6 +531,7 @@ private:
     void doSkillEffectExtra_LingYouMagDef(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_LingShiBleed2(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
     bool doSkillEffectExtra_Dead(BattleFighter* bf, const GData::SkillBase* skill);
     void doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, const GData::SkillBase* skill, bool& cs, bool& pr);
@@ -556,6 +559,8 @@ private:
 
     void calcAbnormalTypeCnt(BattleObject* bo);
     void calcBleedTypeCnt(BattleObject* bo);
+
+    void initBuddhaLight(BattleFighter* bf, bool auralAdd, bool dead);
 
 private:
 	int _id, _winner, _turns;
