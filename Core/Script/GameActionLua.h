@@ -257,12 +257,14 @@ namespace Script
         UInt8 RunNewRegisterAward(Player* player);
         UInt8 RunNewRegisterAwardAD_RF(Player* player, UInt8 idx);
         UInt8 RunSummerFlowAward(Player* player, UInt8 idx);
+        UInt8 RunSummerMeetAward(Player* player, UInt8 idx);
         UInt8 RunBirthdayAward(Player* player);
         bool  RunNewRC7DayLoginAward(Player* player, UInt8 val);
         bool  RunNewRC7DayLoginAward2(Player* player, UInt8 val);
         bool  RunQQBoardInstantLoginAward(Player* player, UInt8 val);
         bool  RunLuckyMeetInstantLoginAward(Player* player, UInt8 val);
         bool  RunLuckyMeetRechargeAward(Player* player, UInt8 val);
+        bool  RunSummerMeetRechargeAward(Player* player, UInt8 val);
         bool  RunLuckyMeetStrengthAward(Player* player, UInt8 val);
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         UInt8 RunNewRC7DayTargetAward(Player* player);

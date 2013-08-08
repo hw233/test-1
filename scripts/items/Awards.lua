@@ -494,6 +494,36 @@ function RunLuckyMeetStrengthAward(player, cts)
     end
     return true
 end
+function RunSummerMeetRechargeAward(player, cts)
+    -- 领取蜀山奇遇充值奖励
+    local item = {
+        [1] = {{549,1}, {551, 2}},
+        [2] = {{8000,8},{513, 2}},
+        [3] = {{5065,1}},
+        [4] = {{1126,15},{8250, 2}},
+        [5] = {{1705,1},{134,8}},
+        [6] = {{1354,1}},
+        [7] = {{1540,1},{515,10}},
+    };
+    local package = player:GetPackage();
+    if cts == 0 then
+        return false
+    end
+    if cts > 7  then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts2] do
+        package:Add(item[cts2][count][1], item[cts2][count][2], true, 0, 59);
+    end
+    return true
+end
 function RunBirthdayAward(player)
     if player == nil then
         return 0;
@@ -754,6 +784,33 @@ function RunSummerFlowAward(player, idx)
         [2] = {{499,188},{9371,20},{15,10},{9141,8},{9144,8}},
         [3] = {{499,288},{9371,20},{15,10},{9141,8},{9144,8},{503,20},{500,20}},
         [4] = {{499,365},{9371,20},{15,10},{9141,8},{9144,8},{503,20},{500,20}},
+    };
+    local award = item[idx]
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #award then
+        player:sendMsgCode(2, 1011, 0)
+        return 0
+    end
+    for _, val in pairs(award) do 
+        if val[1] == 499 then
+            player:getCoupon(val[2])
+        else
+            package:Add(val[1], val[2], true, false, 31)
+        end
+    end
+    return 1
+end
+function RunSummerMeetAward(player, idx)
+    if nil == player or nil == idx then
+        return 0
+    end
+    if 1 ~= idx and 2 ~= idx and 3 ~= idx then
+        return 0
+    end
+    local item = {
+        [1] = {{499,100},{503, 8},{9390,8},{9141,5},{9144,5}},
+        [2] = {{499,188},{503,66},{9390,22},{9141,8},{9144,8}},
+        [3] = {{499,365},{503,100},{9390,33},{9141,8},{9144,8}},
     };
     local award = item[idx]
     local package = player:GetPackage()

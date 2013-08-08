@@ -704,6 +704,16 @@ public:
         else
             return false;
     } 
+    inline static bool getSummerMeetTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_SUMMER_MEET_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_SUMMER_MEET_END);
+        UInt32 now = TimeUtil::Now() + time;
+         if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
 
     inline static void setRYHBActivity(bool v)
     {

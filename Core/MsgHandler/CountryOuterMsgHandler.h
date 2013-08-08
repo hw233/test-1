@@ -5669,7 +5669,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
     //return; // XXX: 不使用老版本新注册七日活动
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
-    UInt8 op = 0, idx = 0;
+    UInt8 op = 0, idx = 0,index=0;
     br >> op >> idx;
 
     if (op  < 6 )
@@ -5733,10 +5733,14 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             player->sendLuckyMeetLoginInfo();
             break;
         case 23:
-            UInt8 index ;
             br >> index ;
             player->getLuckyMeetAward(idx,index);
             break;
+        case 24:
+            br >> index ;
+            player->getSummerMeetAward(idx,index);
+            break;
+
         default:
             break;
     }

@@ -1337,6 +1337,11 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt8>("RunSummerFlowAward", player, idx);
     }
+    UInt8 GameActionLua::RunSummerMeetAward(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunSummerMeetAward", player, idx);
+    }
     UInt8 GameActionLua::RunBirthdayAward(Player* player)
     {
 		assert(player != NULL);
@@ -1369,6 +1374,11 @@ namespace Script
     {
         assert(player != NULL);
         return Call<bool>("RunLuckyMeetRechargeAward", player, val);
+    }
+    bool GameActionLua::RunSummerMeetRechargeAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunSummerMeetRechargeAward", player, val);
     }
     bool GameActionLua::RunLuckyMeetStrengthAward(Player* player, UInt8 val)
     {

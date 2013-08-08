@@ -409,6 +409,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setXinYue(atoi(xinyue.c_str()));
             player->setJinQuan(jinquan);
             player->continuousLoginSummerFlow();
+            player->SetSummerMeetValue();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -759,6 +760,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setXinYue(atoi(xinyue.c_str()));
             pl->setJinQuan(jinquan);
             pl->continuousLoginSummerFlow();
+            pl->SetSummerMeetValue();
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -3067,6 +3069,17 @@ inline bool player_enum_2(GObject::Player* pl, int type)
             //    pl->checLuckyMeet();
             }
             break;
+        case 7:
+            {
+                pl->SetVar(GObject::VAR_SUMMER_MEET_RECHARGE, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_RECHARGE_AWARD, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN_AWARD, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
+            //    pl->checLuckyMeet();
+            }
+            break;
         default:
             return false;
     }
@@ -3419,6 +3432,15 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
             GObject::globalPlayers.enumerate(player_enum_2, 6);
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYMEET_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYMEET_END, end);
+        ret = 1;
+    }
+    else if (type == 6 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_SUMMER_MEET_BEGIN) > TimeUtil::Now()
+                || GObject::GVAR.GetVar(GObject::GVAR_SUMMER_MEET_END) < TimeUtil::Now())
+            GObject::globalPlayers.enumerate(player_enum_2, 7);
+        GObject::GVAR.SetVar(GObject::GVAR_SUMMER_MEET_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_SUMMER_MEET_END, end);
         ret = 1;
     }
 
