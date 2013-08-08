@@ -205,6 +205,7 @@ public:
 	void GetBoxSourceReq(Player *owner);
 
 	UInt8 getChallengeNum(Player *);
+    UInt32 getAthleticsRankLocal(Player*); //获取本服斗剑排名
     UInt32 getAthleticsRank(Player*);
     UInt8 getAthleticsWinStreak(Player*);
     UInt8 getAthleticsBeWinStreak(Player*);

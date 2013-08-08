@@ -7317,9 +7317,9 @@ namespace GObject
         static UInt8 cf_AthRank_nums[] = {1, 2, 5, 10};
         for (std::set<Player *>::iterator it = _friends[3].begin(); it != _friends[3].end(); ++it)
         {
-            if (gAthleticsRank.getAthleticsRank(*it) <= 200)
+            if (gAthleticsRank.getAthleticsRankLocal(*it) <= 200)
                 ++cf_AthRank[1];
-            if (gAthleticsRank.getAthleticsRank(*it) <= 500)
+            if (gAthleticsRank.getAthleticsRankLocal(*it) <= 500)
                 ++cf_AthRank[0];
         }
 

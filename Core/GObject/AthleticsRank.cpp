@@ -1472,9 +1472,6 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
                 }
             }
 		}
-        if(atkerRankPos <= 500)
-            atker->OnCFriendAthleticsRank();
-
 		++ data->winstreak;
         ++ deferdata->befailstreak;
 
@@ -1543,6 +1540,9 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 
 	GameMsgHdr hdr2(0x217, deferdata->ranker->getThreadId(), deferdata->ranker, sizeof(AthleticsAward));
 	GLOBAL().PushMsg(hdr2, &deferAthleticsAward);
+    //判断本服密友斗剑排名
+    if((!cfg.merged || atker->isNewRank()) && atkerRankPos <= 500)
+        atker->OnCFriendAthleticsRank();
 }
 
 void AthleticsRank::notifyAthletcisBoxFlushTime(Player * player)
@@ -2138,6 +2138,22 @@ UInt8 AthleticsRank::getChallengeNum( Player * player )
 	if (found == _ranks[row].end())
 		return 0;
 	return (*found->second)->challengenum;
+}
+
+UInt32 AthleticsRank::getAthleticsRankLocal(Player* player)
+{
+    UInt8 row = getRankRow(player->GetLev());
+	if (row == 0xFF)
+		return 0;
+    if(!cfg.merged)
+    {
+        RankList::iterator found = _ranks[row].find(player);
+        if (found == _ranks[row].end())
+            return 0;
+        return (*found->second)->rank;
+    }
+    else
+        return getRankPosL(row, player);
 }
 
 UInt32 AthleticsRank::getAthleticsRank(Player* player)
