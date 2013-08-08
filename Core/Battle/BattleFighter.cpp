@@ -192,6 +192,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
             break;
         }
     }
+
+    updatePassiveSkillPrvAtk100Status();
 }
 
 void BattleFighter::updateAllAttr()
@@ -2657,6 +2659,22 @@ void BattleFighter::updatePassiveSkill(std::vector<UInt16>& passiveSkillId, std:
         passiveSkill.insert(passiveSkill.end(), skillItem);
 
         updateSkillStrengthen(passiveSkillId[idx]);
+    }
+}
+
+void BattleFighter::updatePassiveSkillPrvAtk100Status()
+{
+    _xiangMoChanZhangSkill = NULL;
+    const GData::SkillBase* skill = NULL;
+    size_t skillIdx = 0;
+    while(NULL != (skill = getPassiveSkillPrvAtk100(skillIdx)))
+    {
+        if(skill->cond != GData::SKILL_PREATK)
+            continue;
+        if(SKILL_ID(skill->getId()) != 999)
+            continue;
+        _xiangMoChanZhangSkill = skill;
+        break;
     }
 }
 

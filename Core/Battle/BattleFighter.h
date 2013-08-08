@@ -322,6 +322,7 @@ public:
     void updatePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
 
     void updateSoulSkillDead(UInt16 skillId);
+    void updatePassiveSkillPrvAtk100Status();
 
     const GData::SkillBase* getPassiveSkillOnTherapy();
     const GData::SkillBase* getPassiveSkillOnSkillDmg();
@@ -945,8 +946,11 @@ public:
 
     float& getHpShieldSelf() { return _hpShieldSelf; }
     void setHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; }
-    void addHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; }
+    void addHpShieldSelf(float v, UInt8 l) { _hpShieldSelf += v; _hpShieldSelf_last = l; }
     bool releaseHpSieldSelf();
+    inline UInt8& getHpShieldSelfLast(){ return _hpShieldSelf_last; }
+    const GData::SkillBase* _xiangMoChanZhangSkill;
+    const GData::SkillBase* getXiangMoChanZhangSkill(){ return _xiangMoChanZhangSkill; }
 
     inline float& getPetShieldHP() { return _petShieldHP; }
     inline void setPetShieldHP(float value) { _petShieldHP = value; }

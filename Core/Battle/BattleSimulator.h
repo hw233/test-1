@@ -561,6 +561,7 @@ private:
     void calcBleedTypeCnt(BattleObject* bo);
 
     void initBuddhaLight(BattleFighter* bf, bool auralAdd, bool dead);
+    void doSkillAttackByCareer(BattleFighter *bf, const GData::SkillBase *skill);
 
 private:
 	int _id, _winner, _turns;
