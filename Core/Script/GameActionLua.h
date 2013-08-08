@@ -221,6 +221,7 @@ namespace Script
         void onCopyWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl);
         void onFrontMapFloorWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
         void onFrontMapWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
+	    void onDropAwardAct( Player* player, UInt32 param);
 		void onEnchant(Player* player, UInt8 level);
 		void onEnchantAct(Player* player, UInt8 level, UInt8 quality = 0, UInt8 type = 0);
 		void onEnchantGt11(Player* player, UInt16 id, UInt8 level, UInt8 type);

@@ -2088,6 +2088,9 @@ void ClanBoss::reward()
                     member->player->sendMailItem(4224, 4225, item, 1);
                 }
  
+                Clan* clan = member->player->getClan();
+                if(clan)
+                    clan->addMemberActivePoint(member->player, 15, e_clan_actpt_clanboss);
                 return true;
             }
         private:
