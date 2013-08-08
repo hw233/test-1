@@ -12806,10 +12806,10 @@ namespace GObject
         }
         st << static_cast<UInt8>(16);
         st << static_cast<UInt8>(max);   //连续登陆天数
-        st <<static_cast<UInt8>(LuckyMeetVip);
-        st << LuckyMeetRecharge;
-        st <<static_cast<UInt8>(LuckyMeetAward);   //领取的奖励号
-        st <<static_cast<UInt8>(LuckyMeetStrenthAward);  
+        st << static_cast<UInt8>(LuckyMeetVip);
+        st << (LuckyMeetRecharge);
+        st << static_cast<UInt8>(LuckyMeetAward);   //领取的奖励号
+        st << static_cast<UInt8>(LuckyMeetStrenthAward);  
         st <<static_cast<UInt8>(LuckyMeetRechargeAward);
         st << Stream::eos;
         send(st);
