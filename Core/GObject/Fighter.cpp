@@ -2069,7 +2069,7 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
 
             if(equip[i]->getItemEquipData().enchant >= 11 && viplvl >= 11 )
             {
-                if((0 == i) || (i>0 && cMark))
+                if((0 == i) || (i>0 && dMark))
                 {
                     dMark = true;
                 }
@@ -2082,7 +2082,7 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
             }
             if(equip[i]->getItemEquipData().enchant >= 12 && viplvl >= 12)
             {
-                if((0 == i) || (i>0 && cMark))
+                if((0 == i) || (i>0 && eMark))
                 {
                     eMark = true;
                 }
