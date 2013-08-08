@@ -194,7 +194,6 @@ void BattleFighter::setFighter( GObject::Fighter * f )
             break;
         }
     }
-
 }
 
 void BattleFighter::updateAllAttr()

@@ -945,10 +945,9 @@ public:
     void releaseLBSkillCD();
 
     float& getHpShieldSelf() { return _hpShieldSelf; }
-    void setHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; printf("setlast:%u", _hpShieldSelf_last);}
-    void addHpShieldSelf(float v, UInt8 l) { _hpShieldSelf += v; _hpShieldSelf_last = l; printf("addlast:%u", _hpShieldSelf_last);}
+    void setHpShieldSelf(float v, UInt8 l) { _hpShieldSelf = v; _hpShieldSelf_last = l; }
+    void addHpShieldSelf(float v, UInt8 l) { _hpShieldSelf += v; _hpShieldSelf_last = l; }
     bool releaseHpSieldSelf();
-    //inline UInt8& getHpShieldSelfLast(){ return _hpShieldSelf_last; }
     const GData::SkillBase* _xiangMoChanZhangSkill;
     const GData::SkillBase* getXiangMoChanZhangSkill(){ return _xiangMoChanZhangSkill; }
 
