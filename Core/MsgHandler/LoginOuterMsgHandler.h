@@ -1527,7 +1527,7 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     br >> tm;
     br>>playerIds;
 //开启起封交易客户平台测试
-#define TEST_TABLE
+//#define TEST_TABLE
 #ifdef TEST_TABLE
 #pragma pack(1) 
     struct test
