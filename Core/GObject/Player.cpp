@@ -1079,7 +1079,7 @@ namespace GObject
         sendYearRPInfo();
         sendSummerFlowInfo();
         sendLuckyMeetLoginInfo();
-        sendSummerMeetInfo();
+        //sendSummerMeetInfo();
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
         else
@@ -11870,7 +11870,7 @@ namespace GObject
             udpLog("shuqihuiliu", str, "", "", "", "", "act");
         }
     } 
-    void Player::getAwardFromSummerMeet()   //暑期回流
+    void Player::getAwardFromSummerMeet()   //暑期，奇遇
     {
         if (!World::getSummerMeetTime())
             return;
@@ -11881,12 +11881,13 @@ namespace GObject
         UInt8 succ = GameAction()->RunSummerMeetAward(this, type);
         if(succ)
         {
-            SetVar(VAR_SUMMERFLOW_AWARD, 1);
-            SetVar(VAR_SUMMERFLOW_TYPE,0);
+            SetVar(VAR_SUMMER_MEET_TYPE_AWARD, 1);
+            SetVar(VAR_SUMMER_MEET_TYPE,0);
             char str[16] = {0};
-            sprintf(str, "F_130722_%d", type);
+            sprintf(str, "F_130722_%d", type+4);
             udpLog("shuqihuiliu", str, "", "", "", "", "act");
         }
+        sendSummerMeetInfo();
     } 
     void Player::getAwardGiftCard()
     {
@@ -12792,7 +12793,10 @@ namespace GObject
             char  key1[32] = "uid_asss_summermeet_";
             UInt32 type = GObject::dclogger.checkActiveOpenid(key1,(char*)openid.c_str());
             if(type>0 && type < 4)
+            {
                 SetVar(VAR_SUMMER_MEET_TYPE,type);
+                SetVar(VAR_SUMMERFLOW_AWARD,1);
+            }
             else 
                 return ;
         }
@@ -13129,7 +13133,7 @@ namespace GObject
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_SUMMER_MEET_RECHARGE_AWARD, ctslandingAward);
         char str[16] = {0};
-        sprintf(str, "F_130801_%d", val);
+        sprintf(str, "F_130801_%d", val+15);
         udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
 
@@ -14517,10 +14521,8 @@ namespace GObject
     {
         if (!World::getSummerMeetTime())
             return;
-        UInt32 SummerMeetType = GetVar(VAR_SUMMER_MEET_TYPE);
-        if(!SummerMeetType)
+        if( SummerMeetType==0 && SummerMeetTypeAward !=1 )
             return ;
-        UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
         UInt32 SummerMeetLogin = GetVar(VAR_SUMMER_MEET_LOGIN);
         UInt32 SummerMeetRechargeAward = GetVar(VAR_SUMMER_MEET_RECHARGE_AWARD);
         UInt32 SummerMeetLoginAward = GetVar(VAR_SUMMER_MEET_LOGIN_AWARD);   //登录奖励
@@ -14543,7 +14545,7 @@ namespace GObject
             }
         }
         Stream st(REP::RC7DAY);  //协议
-        st << static_cast<UInt8>(17);
+        st << static_cast<UInt8>(18);
         st << static_cast<UInt8>(SummerMeetType);
         st << static_cast<UInt8>(SummerMeetTypeAward);
         st << static_cast<UInt8>(max);   //连续登陆天数
@@ -14553,6 +14555,18 @@ namespace GObject
         st <<static_cast<UInt8>(SummerMeetRechargeAward);
         st << Stream::eos;
         send(st);
+    }
+    void Player::sendSummerMeetRechargeInfo()
+    {
+        UInt32 SummerMeetType = GetVar(VAR_SUMMER_MEET_TYPE);
+        UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
+        Stream st(REP::RC7DAY);  //协议
+        st << static_cast<UInt8>(17);
+        st << static_cast<UInt8>(SummerMeetType);
+        st << static_cast<UInt8>(SummerMeetTypeAward);
+        st << Stream::eos;
+        send(st);
+        
     }
     
     void Player::sendRC7DayInfo(UInt32 now)

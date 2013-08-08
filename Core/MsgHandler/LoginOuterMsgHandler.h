@@ -408,8 +408,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setPfKey(pfkey);
             player->setXinYue(atoi(xinyue.c_str()));
             player->setJinQuan(jinquan);
-            player->continuousLoginSummerFlow();
             player->SetSummerMeetValue();
+            player->continuousLoginSummerFlow();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -759,8 +759,8 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setVia(nu._via);
             pl->setXinYue(atoi(xinyue.c_str()));
             pl->setJinQuan(jinquan);
-            pl->continuousLoginSummerFlow();
             pl->SetSummerMeetValue();
+            pl->continuousLoginSummerFlow();
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());

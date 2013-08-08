@@ -519,8 +519,8 @@ function RunSummerMeetRechargeAward(player, cts)
         return false
     end
 
-    for count = 1, #item[cts2] do
-        package:Add(item[cts2][count][1], item[cts2][count][2], true, 0, 59);
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
     end
     return true
 end

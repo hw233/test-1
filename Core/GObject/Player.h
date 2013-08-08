@@ -821,6 +821,7 @@ namespace GObject
         void sendLuckybagInfo();
         void sendSummerFlowInfo();
         void sendSummerMeetInfo();
+        void sendSummerMeetRechargeInfo();
 		void Reconnect();
 
 		void Logout(bool = false);	//???????߲???
