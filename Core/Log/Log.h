@@ -124,6 +124,7 @@ enum PurchaseType
     ZCJBRoolAward               = 113, //招财进宝抽奖
     CCBSkillUP                  = 114, //墨守成规升级技能
     CCBReAlive                  = 115, //墨守成规复活
+    ClanSptr                    = 116, //神魔之树
     RetrieveItem                = 117, //物品回收消费
     //繁体私有占150～200
 };
@@ -256,6 +257,7 @@ enum ItemFrom
     FromQQXiu = 58,
     FromQQBoard = 59 ,
     FromRetrieveItem = 60, //回购物品
+    FromClanSptr = 61, // 神魔之树
     //80 ~ 100，繁体占用
 };
 

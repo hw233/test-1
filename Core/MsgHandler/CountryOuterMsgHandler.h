@@ -6802,5 +6802,41 @@ void OnCCBReq( GameMsgHdr& hdr, const void* data )
     }
 }
 
+void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    Clan* clan = player->getClan();
+    if(!clan)
+        return;
+
+    UInt8 opt = 0;
+    brd >> opt;
+    switch(opt)
+    {
+    case 0:
+        clan->sendSpiritTreeInfo(player);
+        break;
+    case 1:
+        {
+            if(!player->hasChecked())
+                return;
+            UInt8 type = 0;
+            brd >> type;
+            clan->raiseSpiritTree(player, type);
+        }
+        break;
+    case 2:
+        {
+            UInt8 idx = 0;
+            brd >> idx;
+            clan->getSpiritTreeAward(player, idx);
+        }
+        break;
+    }
+}
+
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

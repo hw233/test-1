@@ -1086,27 +1086,32 @@ void NewHeroIsland::rankReward()
             if (n == 0)
             {
                 prestige = 500*count;
-                item = {{10, count}, {MailPackage::Coupon, 250*count},};
+                item[0] = {10, count};
+                item[1] = {MailPackage::Coupon, 250*count};
             }
             else if (n == 1)
             {
                 prestige = 400*count;
-                item = {{10, count}, {MailPackage::Coupon, 200*count},};
+                item[0] = {10, count};
+                item[1] = {MailPackage::Coupon, 200*count};
             }
             else if (n == 2)
             {
                 prestige = 300*count;
-                item = {{10, count}, {MailPackage::Coupon, 150*count},};
+                item[0] = {10, count};
+                item[1] = {MailPackage::Coupon, 150*count};
             }
             else if (n == 3)
             {
                 prestige = 200*count;
-                item = {{10, count}, {MailPackage::Coupon, 100*count},};
+                item[0] = {10, count};
+                item[1] = {MailPackage::Coupon, 100*count};
             }
             else if (n == 4)
             {
                 prestige = 100*count;
-                item = {{10, count}, {MailPackage::Coupon, 50*count},};
+                item[0] = {10, count};
+                item[1] = {MailPackage::Coupon, 50*count};
             }
             UInt32 allScore = (*i)->score[0] + (*i)->score[1] + (*i)->score[2];
             SYSMSG(title, 2316);

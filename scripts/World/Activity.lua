@@ -829,7 +829,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+118*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+125*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -1115,7 +1115,7 @@ function onActivityCheck(tm)
       setGoldSnakeAct(false)
   end
 
-  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 84*86400) then
+  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 91*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1256,7 +1256,7 @@ function initActTime(y, m, d)
   -- 蜀山好声音合作
   local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 3366合作礼包
-  local  SerStartTm536= { ['year'] = 2013, ['month'] = 4, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm536= { ['year'] = 2013, ['month'] = 8, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm537= { ['year'] = 2012, ['month'] = 12, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 商城消耗返利
   local  SerStartTm538= { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1299,7 +1299,7 @@ function initActTime(y, m, d)
   local  SerStartTm201= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 七夕
-  local  SerStartTm202= { ['year'] = 2012, ['month'] = 8, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm202= { ['year'] = 2013, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --商城消费大酬宾(9/18-9/24)
   local  SerStartTm210= { ['year'] = 2012, ['month'] = 9, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 中秋国庆

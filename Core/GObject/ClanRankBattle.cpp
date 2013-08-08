@@ -1408,6 +1408,7 @@ namespace GObject
         stream << UInt8(1) << UInt8(0) << Stream::eos;
         player->clanUdpLog(1088);
         player->send(stream);
+        clan->addMemberActivePoint(player, 10, e_clan_actpt_rank_battle);
     }
 
     void ClanRankBattleMgr::Signout(Player* player)
