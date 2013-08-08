@@ -5118,7 +5118,7 @@ namespace GObject
             }
 
             //每孔10仙石
-            money += fIed.sockets * 10;
+            money += fIed.sockets * 5;
         }
         
         //注灵每等级1仙石
@@ -7190,6 +7190,10 @@ namespace GObject
         ConsumeInfo ci(RetrieveItem, 0, 0);
         m_Owner->useTael(money, &ci);
 
+        char str[32] = {0};
+        sprintf(str, "F_130808_2_%u", money);
+        m_Owner->udpLog("wupinhuigou", str, "", "", "", "", "act");
+
         UInt32 tempItemNum = 0;
         if(IsEquipId(itemId))
         {
@@ -7390,6 +7394,9 @@ namespace GObject
 				count++;
 				AppendTempItemData(st, item);
 			}
+
+            if(count >= 500)
+                break;
 		}
 
 		st.data<UInt16>(4) = count;
