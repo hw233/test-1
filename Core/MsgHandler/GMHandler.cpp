@@ -3477,7 +3477,7 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
 //    setForbidSaleValue(playerId, true,fTime);
 //
 //开启起封交易客户平台测试
-//#define TEST_TABLE
+#define TEST_TABLE
 #ifdef TEST_TABLE
     //测试平台 begin
 #pragma pack(1)
