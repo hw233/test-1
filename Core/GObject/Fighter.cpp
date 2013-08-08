@@ -2007,6 +2007,8 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
 {
     if(fgt == NULL)
         fgt = this;
+    if(!getOwner())
+        return;
 	ItemEquip * equip[8] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
         fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(), fgt->getRing()};
     bool aMark = false;
