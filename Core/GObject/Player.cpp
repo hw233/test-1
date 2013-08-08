@@ -12960,15 +12960,18 @@ namespace GObject
                  }
             }
         }
-        if (val == 0 || val != max)
+        if (val == 0 || (val != max && max < 8))
             return;
         // 正常签到登录奖励
-        if(ctslandingAward & (1<<(val-1)))
+        if( max>7 )
+            val =7; 
+        if(ctslandingAward & (1<<(max-1)))
             return ;
         if(!GameAction()->RunLuckyMeetInstantLoginAward(this, val))
         {
             return;
         }
+        ctslandingAward |= (1<<(max - 1));
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_LUCKYMEET_AWARD, ctslandingAward);
         char str[16] = {0};
@@ -13001,6 +13004,7 @@ namespace GObject
         if (!GameAction()->RunLuckyMeetStrengthAward(this, val))
             return;
         ctslandingAward |= (1<<(val - 1));
+
         SetVar(VAR_LUCKYMEET_STRENTH_AWARD, ctslandingAward);
         char str[16] = {0};
         sprintf(str, "F_130801_%d", 11+val);

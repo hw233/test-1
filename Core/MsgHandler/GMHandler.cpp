@@ -4047,7 +4047,7 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 #pragma pack()
             _msg.type = 5;
             _msg.begin = TimeUtil::Now();
-            _msg.end = TimeUtil::Now() + 86400*7;
+            _msg.end = TimeUtil::Now() + 86400*15;
             LoginMsgHdr hdr1(SPEQ::ACTIVITYONOFF, WORKER_THREAD_LOGIN, 0,0, sizeof(mas));
     switch(type)
     {
@@ -4065,7 +4065,7 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             break;
         case 3:
             GVAR.SetVar(GVAR_LUCKYMEET_BEGIN, TimeUtil::Now());
-            GVAR.SetVar(GVAR_LUCKYMEET_END, TimeUtil::Now() + 86400*7);
+            GVAR.SetVar(GVAR_LUCKYMEET_END, TimeUtil::Now() + 86400*15);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             player->LuckyBagRank();
             GLOBAL().PushMsg(hdr1, &_msg);
