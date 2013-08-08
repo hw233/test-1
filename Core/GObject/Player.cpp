@@ -18497,10 +18497,10 @@ void Player::get3366GiftAward(UInt8 type)
         ConsumeInfo ci(Enum3366Gift,0,0);
         useGold(19, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {548, 9082, 9371, 8000, 500, 9390};
-        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
+        static UInt32 itemId[] = {548, 3, 9082, 3, 9371, 1, 8000, 1, 500, 1, 9390, 1};
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
-            GetPackage()->Add(itemId[i], 1, true);
+            GetPackage()->Add(itemId[i], itemId[i+1], true);
         }
     }
     else if(type == 2)
@@ -19183,10 +19183,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0x17 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 9412 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 140 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
