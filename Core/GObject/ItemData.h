@@ -22,6 +22,20 @@ namespace GObject
 		}
 	};
 
+	struct TempItemData
+	{
+		UInt32	id;
+		UInt64	ownerId;
+		UInt16	itemNum;
+		UInt8   bind;
+        UInt32  sellTime;
+
+		bool operator < (const TempItemData& item) const
+		{
+			return ownerId < item.ownerId;
+		}
+	};
+
 	struct ItemEquipAttr2
 	{
 		ItemEquipAttr2(): type1(0), type2(0), type3(0), value1(0), value2(0), value3(0)  { }

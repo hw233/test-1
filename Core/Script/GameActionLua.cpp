@@ -1360,7 +1360,21 @@ namespace Script
         assert(player != NULL);
         return Call<bool>("RunQQBoardInstantLoginAward", player, val);
     }
-
+    bool GameActionLua::RunLuckyMeetInstantLoginAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunLuckyMeetInstantLoginAward", player, val);
+    }
+    bool GameActionLua::RunLuckyMeetRechargeAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunLuckyMeetRechargeAward", player, val);
+    }
+    bool GameActionLua::RunLuckyMeetStrengthAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunLuckyMeetStrengthAward", player, val);
+    }
     bool GameActionLua::RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge)
     {
         assert(player != NULL);

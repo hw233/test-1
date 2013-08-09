@@ -995,6 +995,14 @@ UInt8 DCLogger::checkGRPOpenid(char* openid)
 {
     return DC().CheckGRPOpenid(openid);
 }
+UInt8 DCLogger::checkActiveOpenid(char * key1,char* openid)
+{
+    return DC().CheckActiveOpenid(key1,openid);
+}
+UInt8 DCLogger::checkYBLevel(UInt64 playerId ,UInt32 viplev)
+{
+    return DC().CheckYBLevel(playerId,viplev);
+}
 DCLogger dclogger;
 
 } // namespace GObject
