@@ -178,38 +178,6 @@ namespace GObject
             st.data<UInt8>(pos) = count;
         }
      };
-
-    struct ItemJiguanAttr 
-    {
-        UInt8 color;
-        UInt8 type[4];
-        UInt16 value[4];
-        UInt8 sktype;
-
-        ItemJiguanAttr() : color(0), sktype(0)
-        {
-            memset(type, 0, sizeof(type));
-            memset(value, 0, sizeof(value));
-        }
-
-		inline void appendAttrToStream(Stream& st)
-        {
-        }
-
-        UInt16 getType(UInt8 i)
-        {
-            if (i >= 0 && i <4)
-                return type[i];
-            return 0;
-        }
-        UInt16 getValue(UInt8 i)
-        {
-            if (i >= 0 && i <4)
-                return value[i];
-            return 0;
-        }
-
-    };
 }
 
 #endif

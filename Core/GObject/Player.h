@@ -1460,7 +1460,7 @@ namespace GObject
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
-
+        MoFang * GetMoFang()        { return m_moFang; }
 	// ????ϵͳ
 	public:
 

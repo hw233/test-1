@@ -292,6 +292,25 @@ namespace GObject
             fprintf(stderr, "load Fighter xingchen error!\n");
             std::abort();
         }
+
+		if(!loadjiguanshu())
+        {
+            fprintf(stderr, "load jiguanshu error!\n");
+            std::abort();
+        }
+
+		if(!loadjiguanyu())
+        {
+            fprintf(stderr, "load jiguanyu error!\n");
+            std::abort();
+        }
+
+		if(!loadtuzhi())
+        {
+            fprintf(stderr, "load tuzhi error!\n");
+            std::abort();
+        }
+
 		if(!loadAllAthletics())
         {
             fprintf(stderr, "loadAllAthletics error!\n");

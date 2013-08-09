@@ -9,39 +9,52 @@ namespace GObject
 MoFang::MoFang(Player* pl)
 {
     m_owner = pl;
-    memset(m_jg, 0, sizeof(m_jg));
+
+    memset(m_grids, 0, sizeof(m_grids));
 }
 
 void MoFang::Init()
 {
 }
 
-void MoFang::addLearnedPaper(UInt8 paperId)
+void makejiguan(UInt32 itemId, UInt8 type, UInt8 mark)
 {
+
 }
 
-void MoFang::addLearningPaper(UInt8 paperId, UInt8 value)
+void upgradeJGS()
 {
+
 }
 
-void MoFang::EquipJg(ItemJiguan* jg, UInt8 idx)
+void equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
 {
+
 }
 
-void MoFang::analysisItem(std::vector<UInt32>& items)
+void dismantleJG(UInt8 pos, UInt8 mark)
 {
+
 }
 
-void MoFang::makeJiguan(UInt8 paperId)
+void addJGYAttr(GData::AttrExtra& ae)
 {
+
 }
 
-void MoFang::learnPaper(UInt8 paperId, UInt8 value)
+UInt16 useJGQskill()
 {
+    return 0;
 }
 
-void MoFang::addAttr(GData::AttrExtra& ae)
+void sendMoFangInfo(UInt8 mark)
 {
+
+}
+
+bool checkEquip(UInt32 jgId)
+{
+    return true;
 }
 
 }
