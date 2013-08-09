@@ -292,7 +292,6 @@ namespace GObject
             fprintf(stderr, "load Fighter xingchen error!\n");
             std::abort();
         }
-<<<<<<< HEAD
 
 		if(!loadjiguanshu())
         {
@@ -312,13 +311,12 @@ namespace GObject
             std::abort();
         }
 
-=======
 		if(!loadTempItem())
         {
             fprintf(stderr, "load TempItem error!\n");
             std::abort();
         }
->>>>>>> 1c4935a73cf713eb7402b7b528f43b6226948f7d
+
 		if(!loadAllAthletics())
         {
             fprintf(stderr, "loadAllAthletics error!\n");
