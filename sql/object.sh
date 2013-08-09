@@ -179,10 +179,10 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130721_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_tempItem.sql #创建临时物品表
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130805_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_qixi.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130802_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_set_gvar51_52.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_qixi.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130802_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_set_gvar51_52.sql
     #. clearshiyamen.sh
 }
 
