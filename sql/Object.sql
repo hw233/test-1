@@ -2037,6 +2037,16 @@ CREATE TABLE IF NOT EXISTS `clancity_player` (
     PRIMARY KEY(`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `tempItem`;
+CREATE TABLE IF NOT EXISTS `tempItem` (
+    `ownerId` bigint(20) unsigned NOT NULL,
+    `id` int(10) unsigned NOT NULL DEFAULT '0',
+    `itemNum` int(10) unsigned NOT NULL DEFAULT '0',
+    `bind` smallint(5) unsigned NOT NULL DEFAULT '0',
+    `sellTime` int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`ownerId`, `id`, `bind`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `jiguanshu`;
 CREATE TABLE IF NOT EXISTS `jiguanshu` (
     `playerId` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2045,7 +2055,6 @@ CREATE TABLE IF NOT EXISTS `jiguanshu` (
     PRIMARY KEY(`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-<<<<<<< HEAD
 DROP TABLE IF EXISTS `player_jiguanyu`;
 CREATE TABLE IF NOT EXISTS `player_jiguanyu` (
     `playerId` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2060,14 +2069,5 @@ CREATE TABLE IF NOT EXISTS `player_tuzhi` (
     `tuzhiId` int(10) unsigned NOT NULL DEFAULT '0',
     `curProficient` tinyint(3) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY(`playerId`, `tuzhiId`)
-=======
-DROP TABLE IF EXISTS `tempItem`;
-CREATE TABLE IF NOT EXISTS `tempItem` (
-    `ownerId` bigint(20) unsigned NOT NULL,
-    `id` int(10) unsigned NOT NULL DEFAULT '0',
-    `itemNum` int(10) unsigned NOT NULL DEFAULT '0',
-    `bind` smallint(5) unsigned NOT NULL DEFAULT '0',
-    `sellTime` int(10) unsigned NOT NULL DEFAULT '0',
-    PRIMARY KEY(`ownerId`, `id`, `bind`)
->>>>>>> 1c4935a73cf713eb7402b7b528f43b6226948f7d
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
