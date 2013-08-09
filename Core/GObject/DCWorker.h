@@ -29,7 +29,8 @@ public:
     void PushCheckOpenId(UInt64 playerId, const char* openId, UInt32 len);
     UInt8 CheckRPOpenid(char* openid);
     UInt8 CheckGRPOpenid(char* openid);
-
+    UInt8 CheckActiveOpenid(char * key1,char * openid);
+    UInt8 CheckYBLevel(UInt64 playerId ,UInt32 viplev);
 protected:
 	bool Init();
 	void UnInit();

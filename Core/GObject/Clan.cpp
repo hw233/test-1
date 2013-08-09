@@ -1331,12 +1331,23 @@ void Clan::sendInfo( Player * player )
         pd.ctFinishCount = 0;
         player->writeClanTask();
     }
+    
+    unsigned long long server_id;
+    unsigned long long uid;//unique clan qq id! 
+
+    if (cfg.merged != true)
+    {
+        server_id = (unsigned long long)cfg.serverNo;
+        uid = (server_id << 48 ) + (getLeaderId()&0xffffffffffff);
+    }
+    else
+        uid = getLeaderId();
 
     st << static_cast<UInt8>(0) << member->cls << static_cast<UInt8>(getCount()) << static_cast<UInt8>(getMaxMemberCount())
         <<  static_cast<UInt8>((pd.ctFinishCount << 4) | player->getClanTaskMax()) << static_cast<UInt32>(getConstruction())
         << getClanFunds() << member->proffer << static_cast<UInt8>(place-1)
         << _name << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
-        << _contact << _announce << _purpose << static_cast<UInt32>(getId());
+        << _contact << _announce << _purpose << static_cast<UInt32>(getId())<<static_cast<UInt64>(uid);
 	st << Stream::eos;
 	player->send(st);
 }

@@ -292,6 +292,7 @@ namespace GObject
             fprintf(stderr, "load Fighter xingchen error!\n");
             std::abort();
         }
+<<<<<<< HEAD
 
 		if(!loadjiguanshu())
         {
@@ -311,6 +312,13 @@ namespace GObject
             std::abort();
         }
 
+=======
+		if(!loadTempItem())
+        {
+            fprintf(stderr, "load TempItem error!\n");
+            std::abort();
+        }
+>>>>>>> 1c4935a73cf713eb7402b7b528f43b6226948f7d
 		if(!loadAllAthletics())
         {
             fprintf(stderr, "loadAllAthletics error!\n");
@@ -2007,9 +2015,9 @@ namespace GObject
             {
                 UInt8 rlvl = GData::expTable.exp2level(specfgtobj.experience);
 #ifdef _DEBUG
-                fprintf(stderr, "dblvl: %u, explvl: %u, exp: %lu\n", specfgtobj.level, rlvl, specfgtobj.experience);
+                //fprintf(stderr, "dblvl: %u, explvl: %u, exp: %lu\n", specfgtobj.level, rlvl, specfgtobj.experience);
 #endif
-                if (specfgtobj.level != rlvl)
+                if (specfgtobj.level < rlvl)
                     specfgtobj.level = rlvl;
             }
             fgt2->setLevel(specfgtobj.level, true);
@@ -2150,12 +2158,12 @@ namespace GObject
 			if(pl == NULL)
 				continue;
 #if 1
-			if (IsPetItem(idata.id))
+            if (IsPetItem(idata.id))
 				pl->GetPetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
             else if (!IsEquipId(idata.id))
 				pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
 #else
-			if (IsPetItem(idata.id))
+            if (IsPetItem(idata.id))
 				pl->GetPetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
             else if (!IsEquipId(idata.id))
             {
@@ -5258,6 +5266,45 @@ namespace GObject
             }
 
             fgt->setXingchenFromDB(dbxc);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadTempItem()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading TempItem:");
+		TempItemData idata;
+        Player* pl = NULL;
+
+		if(execu->Prepare("SELECT `id`, `ownerId`, `itemNum`, `bind`, `sellTime` FROM `tempItem` ORDER BY `ownerId`", idata) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(idata.ownerId != last_id)
+			{
+				last_id = idata.ownerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            if(!IsEquipId(idata.id))
+            {
+                pl->GetPackage()->AddTempItemFromDB(idata);
+            }
+            else
+            {
+                pl->GetPackage()->AddTempEquipFromDB(idata);
+            }
 		}
 		lc.finalize();
 

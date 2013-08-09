@@ -193,7 +193,6 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	}
 	else
 	{
-
 		if(player->getLockExpireTime() > 0)
 		{
 			if(player->getLockExpireTime() <= TimeUtil::Now())
@@ -532,6 +531,21 @@ void trimName(std::string& str)
 
 void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 {
+
+    UInt32 max = 0;
+    UInt32 cur = 0;
+    max = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max);
+    cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur);
+    if( max && max<cur)
+        return;
+    else
+    {
+        UInt32 Cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur); 
+        Cur++;
+        GObject::GVAR.SetVar(GObject::GVAR_NewUser_Cur, Cur);
+
+    }
+    
     UserStruct us;
 	us._name	 = nu._name;
 	us._class	 = nu._class;
@@ -1028,12 +1042,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                500,    5,
                 515,    2,
                 509,    2,
+                15,     8,
                 549,    2,
-                134,    5,
-                15,     8
+                503,    5,
+                500,    5
             };
 
             UInt8 idx = 0;
@@ -1063,7 +1077,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 5)
+                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 10)
                         purchase.code = 2;
 
                     purchase.id = id;
@@ -1512,7 +1526,6 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     CHKKEY();
     br >> tm;
     br>>playerIds;
-
 //开启起封交易客户平台测试
 //#define TEST_TABLE
 #ifdef TEST_TABLE
@@ -1529,9 +1542,8 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     playerIds = _test->msg;
 #endif
 #undef TEST_TABLE 
-
     UInt8 ret = 1;
-    INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), tm);
+    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
@@ -1569,6 +1581,7 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
     std::string playerIds;
     CHKKEY();
     br>>playerIds;
+    UInt16 serverNo = 0;
  
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
@@ -1579,6 +1592,8 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
         UInt64 pid = atoll(playerId.c_str());
         setForbidSaleValue(pid, false);
 
+        if(cfg.merged)
+            pid += (static_cast<UInt64>(serverNo) << 48);
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->setForbidSale(false);
@@ -1614,7 +1629,7 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
     Stream st(SPEP::QUERYLOCKUSER);
 //    st << isLockLogin << isForbidSale << fsaleTime << Stream::eos;
     st << isLockLogin << isForbidSale << fsaleTime<< foverTime << Stream::eos;
-    std::cout<<(bool)isLockLogin<< "  " <<(bool)isForbidSale<< "  "<<fsaleTime<<"  "<<foverTime<<std::endl;
+     //std::cout<<(bool)isLockLogin<< "  " <<(bool)isForbidSale<< "  "<<fsaleTime<<"  "<<foverTime<<std::endl;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
@@ -1738,6 +1753,41 @@ void OnTotalRechargeAct(LoginMsgHdr &hdr, const void* data)
 
     Stream st(SPEP::TOTALRECHARGEACT);
     st << total << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void OnSetMaxCreate(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt32 MaxNewUser = 0;
+    UInt8 ret = 1;
+    br >> MaxNewUser; 
+    if (!MaxNewUser)
+    {
+        GObject::GVAR.SetVar(GObject::GVAR_NewUser_Max , MaxNewUser); 
+        ret = 0;
+    }
+
+    Stream st(SPEP::SETMAXNEWUSER);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void OnGetMaxCreate(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    UInt32 MaxNewUser = 0;
+    if ( GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max) )
+    {
+        MaxNewUser = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max); 
+    }
+
+    Stream st(SPEP::GETMAXNEWUSER);
+    st << MaxNewUser << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
@@ -2178,7 +2228,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 	UInt8 bindType = 1;
     CHKKEY();
 	br>>pf>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
-	std::string result="";
+	//std::string result="";
 	GObject::MailPackage::MailItem *item = new(std::nothrow) GObject::MailPackage::MailItem[nums + 5];
 	if(item == NULL)
 		return;
@@ -2205,13 +2255,14 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
     {
         br>>serverNo;
     }
+    INFO_LOG("GM[%s]: %u", __PRETTY_FUNCTION__, serverNo);
 
     for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(), end = GObject::globalPlayers.end(); it != end; ++it)
 	{
 		GObject::Player *player=it->second;
 		if(player==NULL || (serverNo != 0 && serverNo != (static_cast<UInt16>(player->getId()>>48))))
 		{
-			result+="1 ";
+			//result+="1 ";
 		}
 		else
 		{
@@ -2222,18 +2273,19 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
                 if(pmail != NULL)
                 {
                     GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
-                    result +="0 ";
+                    //result +="0 ";
                     player->moneyLog(2, money[2], money[1], money[0], money[3]);
                 }
                 else
                 {
-                    result +="2 ";
+                    //result +="2 ";
                 }
             }
 		}
 	}
-	result=result.substr(0,result.length()-1);
-	st<<result;
+	//result=result.substr(0,result.length()-1);
+	//st<<result;
+    st << static_cast<UInt8>(1);
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 
@@ -3007,6 +3059,16 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->checkZCJB();
             }
             break;
+        case 6:
+            {
+                pl->SetVar(GObject::VAR_LUCKYMEET_RECHARGE, 0);
+                pl->SetVar(GObject::VAR_LUCKYMEET, 0);
+                pl->SetVar(GObject::VAR_LUCKYMEET_AWARD, 0);
+                pl->SetVar(GObject::VAR_LUCKYMEET_VIP,pl->getVipLevel());
+                pl->SetVar(GObject::VAR_LUCKYMEET_RECHARGE_AWARD,0);
+            //    pl->checLuckyMeet();
+            }
+            break;
         default:
             return false;
     }
@@ -3352,6 +3414,15 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_ZCJB_ACTIVITY_END, end);
         ret = 1;
     }
+    else if (type == 5 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_LUCKYMEET_BEGIN) > TimeUtil::Now()
+                || GObject::GVAR.GetVar(GObject::GVAR_LUCKYMEET_END) < TimeUtil::Now())
+            GObject::globalPlayers.enumerate(player_enum_2, 6);
+        GObject::GVAR.SetVar(GObject::GVAR_LUCKYMEET_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_LUCKYMEET_END, end);
+        ret = 1;
+    }
 
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
@@ -3388,5 +3459,6 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
     st << type << begin << end << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
+
 #endif // _LOGINOUTERMSGHANDLER_H_
 

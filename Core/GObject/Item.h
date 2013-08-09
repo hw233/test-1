@@ -15,7 +15,7 @@ namespace GObject
 	{
 	public:
 		ItemBase(UInt32 id, const GData::ItemBaseType* itemType)
-			: GObjectBaseT<ItemBase>(id), _itemBaseType(itemType), m_BindStatus(false), m_TotalCount(0)
+			: GObjectBaseT<ItemBase>(id), _itemBaseType(itemType), m_BindStatus(false), m_TotalCount(0), m_SellTime(0)
 		{
 		}
 		virtual ~ItemBase() {};
@@ -49,6 +49,7 @@ namespace GObject
 		inline bool SetItem(UInt16 num) { m_TotalCount = num; return true; } //FIXME: Write to DB !!!
 		inline bool IncItem(UInt16 num) { m_TotalCount += num; return true; }
 		inline bool DecItem(UInt16 num) { if(num > m_TotalCount) return false; m_TotalCount -= num; return true; }
+		inline UInt32 SetSellTime(UInt32 sellTime)  { m_SellTime = sellTime; return true; }
 		inline UInt16 Size() const
 		{
 			if(_itemBaseType->subClass == Item_Task)
@@ -68,12 +69,13 @@ namespace GObject
 		inline UInt16 Count() const		{ return IsEquip(_itemBaseType->subClass) ? 1 : m_TotalCount; }
 		inline UInt16 GetLeftNum() const { return m_TotalCount % _itemBaseType->maxQuantity; }
 		inline UInt16 GetOverlayNum() const { return _itemBaseType->maxQuantity; }
-
+		inline UInt32 GetSellTime() const { return m_SellTime; }
 	protected:
 		const GData::ItemBaseType* _itemBaseType;
 
 		bool	m_BindStatus;
 		UInt16	m_TotalCount;
+        UInt32  m_SellTime;  //出售物品时间
 	};
 
 	//装备

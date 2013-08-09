@@ -168,7 +168,7 @@ namespace GObject
                 char* msg = openIdLog[i].openId;
                 UInt64 playerId = openIdLog[i].playerId;
                 bool r = false;
-                GObject::Player * pl = GObject::globalPlayers[playerId];
+                GObject::Player * pl = GObject::globalPlayers[playerId];   //取player
                 if (!pl)
                 {
                     delete[] msg;
@@ -347,6 +347,23 @@ namespace GObject
         size_t len = snprintf(key, sizeof(key), "uid_asss_grp_%s", openid); 
         m_MCached.get(key, len, value, sizeof(value));
         return atoi(value);
+    }
+    UInt8 DCWorker::CheckActiveOpenid(char * key1,char * openid)
+    {
+        if (!m_inited || NULL == openid)
+            return false;
+        char value[32] = {0};
+        char key[64] = {0};
+        size_t len = snprintf(key, sizeof(key), "%s_%s", key1,openid); 
+        m_MCached.get(key, len, value, sizeof(value));
+        return atoi(value);
+    }
+    UInt8 DCWorker::CheckYBLevel(UInt64 playerId ,UInt32 viplev)
+    {
+        GObject::Player * pl = GObject::globalPlayers[playerId];
+        if(pl!=NULL)
+            return true;
+        return false;
     }
 }
 
