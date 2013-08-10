@@ -71,6 +71,8 @@ MSG_REG_2(LoginMsgHdr,SPEQ::SYSUPDATE, SysUpdate);
 MSG_REG_2(LoginMsgHdr,SPEQ::OPENCB,OpenCb);
 MSG_REG_2(LoginMsgHdr,SPEQ::TOTALRECHARGEACT, OnTotalRechargeAct);
 MSG_REG_2(LoginMsgHdr,SPEQ::SETTOTALRECHARGEACT, OnSetTotalRechargeAct);
+MSG_REG_2(LoginMsgHdr,SPEQ::SETMAXNEWUSER, OnSetMaxCreate);
+MSG_REG_2(LoginMsgHdr,SPEQ::GETMAXNEWUSER, OnGetMaxCreate);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 MSG_REG_2(LoginMsgHdr, 0x301, OnSetCrackValue);

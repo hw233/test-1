@@ -160,7 +160,7 @@ namespace GObject
         //if(level < statusLevel[m_breakoutCnt + 1])
         if(level < clanLevel[m_breakoutCnt + 1])
         {
-            m_owner->sendMsgCode(0, 1359);
+            m_owner->sendMsgCode(0, 1369);
             return;
         }
         UInt32 proffer = (getFusePercent() / 10 + 1) * 50 * (m_breakoutCnt + 1);

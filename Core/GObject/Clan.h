@@ -232,7 +232,7 @@ enum CLAN_ACTPT_FLAG
 {
     e_clan_actpt_none = 0,
     e_clan_actpt_rank_battle = 1,
-    e_clan_actpt_copy = 2,
+    e_clan_actpt_clanboss = 2,
     e_clan_actpt_clan_city = 3,
 };
 
@@ -765,6 +765,7 @@ public:
     UInt32 getMemberActivePoint(Player* pl);
     void checkMemberActivePoint(ClanMember* mem);
     void listMembersActivePoint( Player * player );
+    UInt32 getMemberActivePoint(ClanMember* mem);
 };
 
 typedef GGlobalObjectManagerT<Clan, UInt32> GlobalClans;

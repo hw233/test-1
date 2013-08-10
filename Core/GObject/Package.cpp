@@ -2003,12 +2003,18 @@ namespace GObject
                 for(UInt32 i = 0; i < sizeof(guaji) / sizeof(guaji[0]); ++i)
                 {
                     if(guaji[i] == id)
+                    {
                         GameAction()->doStrong(m_Owner, SthHookUse, 0, 0);
+                        break;
+                    }
                 }
                 for(UInt32 i = 0; i < sizeof(xiuwei) / sizeof(xiuwei[0]); ++i)
                 {
                     if(xiuwei[i] == id)
+                    {
                         GameAction()->doStrong(m_Owner, SthPUse, 0, 0);
+                        break;
+                    }
                 }
             }
             UInt32 thisDay = TimeUtil::SharpDay();
@@ -6924,4 +6930,619 @@ namespace GObject
         }
     }
 
+    ItemBase* Package::AddTempItemFromDB(TempItemData & idata)
+    {
+		assert(!IsEquipId(idata.id));
+
+		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[idata.id];
+		if(itemType == NULL) 
+            return NULL;
+
+		ItemBase * item = new(std::nothrow) ItemBase(idata.id, itemType);
+		if(item == NULL) 
+            return NULL;
+
+		ITEM_BIND_CHECK(itemType->bindType,idata.bind);
+		item->SetBindStatus(idata.bind);
+
+        item->IncItem(idata.itemNum);
+
+        ++ m_TempItemSize;
+        item->SetSellTime(idata.sellTime);
+        m_ItemsTemporary[ItemKey(idata.id, idata.bind)] = item;
+
+		return item;
+    }
+
+	ItemBase* Package::AddTempEquipFromDB(TempItemData & idata)
+	{
+		ItemEquip * equip = GObjectManager::fetchEquipment(idata.id, false);
+		if(equip == NULL)
+            return NULL;
+
+		ITEM_BIND_CHECK(equip->getBindType(),idata.bind);
+		equip->SetBindStatus(idata.bind);
+
+        if(IsPetEquipTypeId(equip->GetTypeId()))
+        {
+            m_Owner->GetPetPackage()->AddExistEquip(static_cast<ItemPetEq *>(equip), true);
+        }
+        else
+        {
+            ItemBase *& e = m_ItemsTemporary[ItemKey(idata.id)];
+            if(e == NULL)
+                ++ m_TempItemSize;
+
+            equip->SetSellTime(idata.sellTime);
+            e = equip;
+        }
+
+		return equip;
+	}
+
+    UInt32 Package::AddTemporaryItem(UInt32 itemId, UInt32 sellCount, bool bind)
+    {
+        CheckTemporaryItem();
+
+       /* bool findMark = false;
+        if(!IsEquipId(itemId))
+        {
+            item_elem_iter itertp = m_ItemsTemporary.find(ItemKey(itemId, bind));
+            if(itertp != m_ItemsTemporary.end())
+                findMark = true;
+        }
+        
+        if(!findMark && m_TempItemSize >= 9)
+        {
+            UInt32 sellTime = 0;
+            bool delMark = false;
+            ItemBase * tempItem = NULL;
+            item_elem_iter iter = m_ItemsTemporary.begin();
+            for (; iter != m_ItemsTemporary.end(); ++iter)
+            {
+                if(NULL == iter->second)
+                    continue;
+
+                if(!delMark)
+                {
+                    sellTime = iter->second->GetSellTime();
+                    tempItem = iter->second;
+
+                    delMark = true;
+                    continue;
+                }
+
+                if(iter->second->GetSellTime() < sellTime)
+                {
+                    sellTime = iter->second->GetSellTime();
+                    tempItem = iter->second;
+                }
+            }
+            
+            if(tempItem != NULL)
+            {
+                if(IsEquipId(tempItem->getId()))
+                {
+                    DelTempEquip(static_cast<ItemEquip *>(tempItem), ToDelRetrieveItem, true);
+                }
+                else
+                {
+                    DelTempItem(tempItem, tempItem->Count(), ToDelRetrieveItem, true);
+                }
+            }
+        }*/
+
+		ItemBase * item = FindItem(itemId, bind);
+        if(NULL == item)
+            return 0;
+
+        UInt32 count = item->Count();
+        if(sellCount <= 0 || sellCount > count)
+            return 0;
+
+		UInt32 price = item->getPrice();
+		if(price == 0) 
+            return 0;
+
+        UInt32 money = price * sellCount;
+        if(money <= 0)
+            return 0;
+
+        UInt32 sellTime = TimeUtil::Now();
+        UInt32 itemNum = 0;
+        bool mark = false;
+
+        if(IsEquipId(itemId))
+        {
+            ItemEquip * equip = static_cast<ItemEquip *>(item);
+            if(equip == NULL)
+                return false;
+
+            ItemBase *& TempEquip = m_ItemsTemporary[ItemKey(itemId)];
+            if(TempEquip == NULL)
+                ++ m_TempItemSize;
+
+            equip->SetSellTime(sellTime);
+            TempEquip = equip;
+            -- m_Size;
+        }
+        else
+        {
+            bool res = TryDelItem(item, sellCount);
+            if(res)
+            {
+                item_elem_iter iterTemp = m_ItemsTemporary.find(ItemKey(itemId, bind));
+                itemNum = item->Count();
+
+                if(iterTemp == m_ItemsTemporary.end())
+                {
+                    if(0 == itemNum)
+                    {
+                        mark = true;
+                        m_ItemsTemporary[ItemKey(itemId, bind)] = item;
+
+                        ++ m_TempItemSize;
+                    }
+                    else
+                    {
+                        TempItemData tItemData;
+                        tItemData.id = itemId;
+                        tItemData.itemNum = sellCount;
+                        tItemData.bind = bind;
+                        tItemData.sellTime = sellTime;
+                        AddTempItemFromDB(tItemData);
+                    }
+                }
+                else
+                {
+                    TryAddTempItem(iterTemp->second, sellCount);
+                    iterTemp->second->SetSellTime(sellTime);
+                }
+            }
+        }
+
+        if(0 == itemNum)
+        {
+            DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %" I64_FMT "u", itemId, bind ? 1 : 0, m_Owner->getId());
+        }
+        else
+        {
+            DB4().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %" I64_FMT "u", itemNum, itemId, bind ? 1 : 0, m_Owner->getId());
+        }
+        
+        if(IsEquipId(itemId))
+        {
+            SendDelEquipData(static_cast<ItemEquip *>(item));
+        }
+        else
+        {
+            SendItemData(item);
+        }
+        
+        if(m_ItemsTemporary[ItemKey(itemId, bind)])
+        {
+            if(mark)
+            {
+                m_ItemsTemporary[ItemKey(itemId, bind)]->SetSellTime(sellTime);
+                TryAddTempItem(m_ItemsTemporary[ItemKey(itemId, bind)], sellCount);
+            }
+
+            UInt32 tempItemNum = m_ItemsTemporary[ItemKey(itemId, bind)]->Count();
+          
+            DB4().PushUpdateData("REPLACE INTO `tempItem` VALUES(%" I64_FMT "u, %u, %u, %u, %u)",m_Owner->getId(), itemId, tempItemNum, bind ? 1 : 0, sellTime);
+
+            if(IsEquipId(itemId))
+            {
+                SendSingleTempEquipData(static_cast<ItemEquip *>(m_ItemsTemporary[ItemKey(itemId)]));
+            }
+            else
+            {
+                SendTempItemData(m_ItemsTemporary[ItemKey(itemId, bind)]);
+            }
+        }
+
+        if(0 == itemNum)
+        {
+            if(GetItemSubClass(itemId) == Item_Soul)
+            {
+                m_ItemsSoul.erase(ItemKey(itemId, bind));
+            }
+            else
+            {
+                m_Items.erase(ItemKey(itemId, bind));
+            }
+        }
+
+        return money;
+    }
+
+    bool Package::RetrieveTemporaryItem(UInt32 itemId, UInt32 RTICount, bool bind)
+    {
+        CheckTemporaryItem();
+
+        item_elem_iter iterTemp = m_ItemsTemporary.find(ItemKey(itemId, bind));
+        if(iterTemp == m_ItemsTemporary.end())
+            return false;
+
+        if(NULL == iterTemp->second)
+            return false;
+
+        UInt32 count = iterTemp->second->Count();
+        if(RTICount <= 0 || RTICount > count)
+            return false;
+
+		UInt32 price = iterTemp->second->getPrice();
+		if(price == 0) 
+            return false;
+
+        UInt32 money = price * RTICount;
+        money += 1000;
+
+        if (m_Owner->getTael() < money)
+        {
+            m_Owner->sendMsgCode(0, 1100);
+            return false;
+        }
+        
+        if(NULL == AddRetItemToPackage(itemId, RTICount, bind, true, FromRetrieveItem))
+            return false;
+
+        ConsumeInfo ci(RetrieveItem, 0, 0);
+        m_Owner->useTael(money, &ci);
+
+        UInt32 tempItemNum = 0;
+        if(IsEquipId(itemId))
+        {
+            ItemEquip * TempEquip = static_cast<ItemEquip *>(iterTemp->second);
+            if(TempEquip == NULL)
+                return false;
+
+            ItemBase *& equip = m_Items[ItemKey(itemId)];
+            if(equip == NULL)
+                ++ m_Size;
+
+            TempEquip->SetSellTime(0);
+            equip = TempEquip;
+        }
+        else
+        {
+            bool res = TryDelTempItem(iterTemp->second, RTICount);
+            if(res)
+            {
+                tempItemNum = iterTemp->second->Count();
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        if(IsEquipId(itemId))
+        {
+            SendDelTempEquipData(static_cast<ItemEquip *>(iterTemp->second));
+        }
+        else
+        {
+            SendTempItemData(iterTemp->second);
+        }
+
+        if(0 == tempItemNum)
+        {
+            DB4().PushUpdateData("DELETE FROM `tempItem` WHERE `id` = %u AND `bind` = %u AND `ownerId` = %" I64_FMT "u", itemId, bind ? 1 : 0, m_Owner->getId());
+            
+            if(!IsEquipId(itemId))
+            {
+                SAFE_DELETE(iterTemp->second);
+            }
+            m_TempItemSize --;
+            m_ItemsTemporary.erase(iterTemp);
+        }
+        else
+        {
+            DB4().PushUpdateData("UPDATE `tempItem` SET `itemNum` = %u WHERE `id` = %u AND `bind` = %u AND `ownerId` = %" I64_FMT "u", tempItemNum, itemId, bind ? 1 : 0, m_Owner->getId());
+        }
+
+        return true;
+    }
+
+    bool Package::CheckTemporaryItem()
+    {
+		item_elem_iter iter = m_ItemsTemporary.begin();
+		item_elem_iter iter2;
+		for (; iter != m_ItemsTemporary.end();)
+        {
+            ItemBase * item = iter->second;
+            iter2 = ++iter;
+
+            if(NULL == item)
+                continue;
+
+            if(TimeUtil::Now() >= (item->GetSellTime() + 86400))
+            {
+                if(IsEquipId(item->getId()))
+                {
+                    DelTempEquip(static_cast<ItemEquip *>(item), ToDelRetrieveItem);
+                }
+                else
+                {
+                    DelTempItem(item, item->Count(), ToDelRetrieveItem);
+                }
+            }
+            iter = iter2;
+        }
+
+        return true;
+    }
+
+	bool Package::DelTempEquip(ItemEquip * equip, UInt8 toWhere, bool sendMark)
+	{
+        if(NULL == equip)
+            return false;
+
+		item_elem_iter iter = m_ItemsTemporary.find(equip->getId());
+		if(iter == m_ItemsTemporary.end())
+			return false;
+
+        m_ItemsTemporary.erase(iter);
+        m_TempItemSize --;
+
+		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
+		DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
+        DB4().PushUpdateData("DELETE FROM `tempItem` WHERE `id` = %u" , equip->getId());
+
+		if(toWhere != 0 && equip->getQuality() >= 4)
+		{
+			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetItemType().getId(), equip->getId(), toWhere, TimeUtil::Now());
+		}
+
+        if(Item_LBling <= equip->GetItemType().subClass || Item_LBxin >= equip->GetItemType().subClass)
+        {
+            DB4().PushUpdateData("DELETE FROM `lingbaoattr` WHERE `id`=%u", equip->getId());
+        }
+
+        if(sendMark)
+            SendDelTempEquipData(equip);
+
+		SAFE_DELETE(equip);
+		return true;
+	}
+
+	bool Package::DelTempItem(ItemBase* item, UInt32 num, UInt8 toWhere, bool sendMark)
+	{
+		if(num == 0 || item == NULL || IsEquipId(item->getId()))
+			return false;
+
+        if(!toWhere)
+            toWhere = ToDelRetrieveItem;
+
+        UInt32 id = item->getId();
+        bool bind = item->GetBindStatus();
+
+		item_elem_iter iterTemp = m_ItemsTemporary.find(ItemKey(id, bind));
+		if(iterTemp == m_ItemsTemporary.end())
+			return false;
+
+		bool ret = TryDelTempItem(item, num);
+		if(ret)
+		{
+			UInt32 tempItemNum = item->Count();
+
+			if(0 == tempItemNum)
+			{
+                DB4().PushUpdateData("DELETE FROM `tempItem` WHERE `id` = %u AND `bind` = %u AND `ownerId` = %" I64_FMT "u", id, bind ? 1 : 0, m_Owner->getId());
+
+                m_TempItemSize --;
+
+                if(sendMark)
+                    SendTempItemData(item);
+
+                m_ItemsTemporary.erase(iterTemp);
+                SAFE_DELETE(item);
+			}
+        }
+        
+		return true;
+    }
+
+	bool Package::TryDelTempItem(ItemBase * item, UInt32 num)
+	{
+        if(item == NULL)
+            return false;
+
+		if(item->Count() < num)
+			return false;
+
+		if(!item->DecItem(num))
+			return false;
+
+		return true;
+	}
+
+	bool Package::TryAddTempItem(ItemBase * item, UInt32 num)
+	{
+        if(item == NULL)
+            return false;
+
+		if(!item->IncItem(num))
+			return false;
+
+		return true;
+	}
+
+	void Package::SendTempItemInfo()
+	{
+        CheckTemporaryItem();
+		item_elem_iter iter = m_ItemsTemporary.begin();
+		Stream st(REP::TEMPITEM_INFO);
+		st << static_cast<UInt16>(0);
+		UInt16 count = 0;
+		for (; iter != m_ItemsTemporary.end(); ++iter)
+		{
+			ItemBase * item = iter->second;
+			if(IsEquip(item->getClass()))
+			{
+				count ++;
+				ItemEquip * equip = static_cast<ItemEquip *>(item);
+				AppendTempEquipData(st, equip);
+			}
+			else
+			{
+				count++;
+				AppendTempItemData(st, item);
+			}
+		}
+
+		st.data<UInt16>(4) = count;
+		st << Stream::eos;
+		m_Owner->send(st);
+	}
+
+	void Package::SendSingleTempEquipData(ItemEquip * equip)
+	{
+		Stream st(REP::TEMPITEM_INFO);
+		st << static_cast<UInt16>(1);
+		AppendTempEquipData(st, equip);
+		st << Stream::eos;
+		m_Owner->send(st);
+	}
+
+	void Package::SendDelTempEquipData(ItemEquip * equip)
+	{
+		Stream st(REP::TEMPITEM_INFO);
+
+		st << static_cast<UInt16>(1) << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << Stream::eos;
+		m_Owner->send(st);
+	}
+
+	void Package::SendTempItemData(ItemBase * item)
+	{
+		Stream st(REP::TEMPITEM_INFO);
+		st << static_cast<UInt16>(1);
+		AppendTempItemData(st, item);
+		st << Stream::eos;
+		m_Owner->send(st);
+	}
+
+	void Package::AppendTempEquipData(Stream& st, ItemEquip * equip, bool hascount)
+	{
+		st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0);
+		if(hascount)
+			st << equip->Count();
+        int sellTime = equip->GetSellTime() + 86400 - TimeUtil::Now();
+        st << static_cast<UInt32>(sellTime > 0 ? sellTime : 0);
+		st << static_cast<UInt16>(equip->GetItemType().getId()) << equip->getItemEquipData().enchant;
+		ItemEquipData& ied = equip->getItemEquipData();
+		st << ied.sockets;
+		for(UInt8 z = 0; z < ied.sockets; ++ z)
+		{
+			st << ied.gems[z];
+		}
+		ItemEquipAttr2& ea2 = equip->getEquipAttr2();
+		ea2.appendAttrToStream(st);
+
+        UInt8 itemClass = equip->getClass();
+        UInt8 q = equip->getQuality();
+		if(itemClass >= Item_Weapon && itemClass <= Item_Ring && q == 5)
+        {
+            ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
+            esa.appendAttrToStream(st);
+        }
+        else if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion ||
+                equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+        {
+            st << ied.maxTRank << ied.trumpExp;
+        }
+        else if(equip->getClass() == Item_LBling || equip->getClass() == Item_LBwu || equip->getClass() == Item_LBxin)
+        {
+            ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
+            lba.appendAttrToStream(st);
+        }
+	}
+
+	void Package::AppendTempItemData(Stream& st, ItemBase * item)
+	{
+        int sellTime = item->GetSellTime() + 86400 - TimeUtil::Now();
+        if(0 == item->Count())
+        {
+            sellTime = 0;
+        }
+		st << item->getId() << static_cast<UInt8>(item->GetBindStatus() ? 1 : 0) << item->Count() << static_cast<UInt32>(sellTime > 0 ? sellTime : 0);
+    }
+
+    ItemBase* Package::AddRetItemToPackage(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 FromWhere)
+    {
+        if(IsEquipId(typeId))
+        {
+            if(!(TryBuyEquip(typeId, num, bind)))
+            {
+                m_Owner->sendMsgCode(0, 1011);
+                return NULL;
+            }
+
+            item_elem_iter iterTemp = m_ItemsTemporary.find(ItemKey(typeId, bind));
+            if(iterTemp == m_ItemsTemporary.end())
+                return NULL;
+
+            if(NULL == iterTemp->second)
+                return NULL;
+
+            ItemBase * item = iterTemp->second;
+
+            DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %" I64_FMT "u, %u)", typeId, m_Owner->getId(), bind ? 1 : 0);
+          
+            SendSingleEquipData(static_cast<ItemEquip *>(item));
+
+            return item;
+        }
+        else
+        {
+            if(GetItemSubClass(typeId) == Item_Soul)
+            {
+                if(!(TryBuySoulItem(typeId, num, bind)))
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return NULL;
+                }
+            }
+            else
+            {
+                if(!(TryBuyItem(typeId, num, bind)))
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return NULL;
+                }
+            }
+            return AddItem(typeId, num, bind, silence, FromWhere);
+        }
+    }
+
+    bool Package::TryBuySoulItem(UInt32 typeId, UInt32 num, bool bind /*= false */)
+    {      
+        if(0 == typeId || 0 == num) 
+            return false;
+
+		if(IsEquipTypeId(typeId)) 
+            return false;
+
+		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
+		if(itemType == NULL) 
+            return false;
+
+		ITEM_BIND_CHECK(itemType->bindType,bind);
+		ItemBase * item = FindItem(typeId, bind);
+        if(item)
+        {
+            UInt16 cur = m_SizeSoul;
+            UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
+            cur = cur - oldq + newq;
+            if(cur > m_Owner->getPacksize(1))
+                return false;
+        }
+        else if(itemType->Size(num) > GetRestPackageSize(1))
+        {
+            return false;
+        }
+
+		return true;
+    }
 }

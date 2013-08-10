@@ -814,6 +814,8 @@ struct DBDayTaskData
 
 typedef ItemData DBItemData;
 
+typedef TempItemData DBTempItemData;
+
 struct DBDungeonPlayer
 {
 	UInt32 id;
@@ -2145,6 +2147,17 @@ SPECIALDEF(4)
 	UInt64,	ownerId,
 	UInt16,	itemNum,
 	UInt8,  bindType
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTempItemData)
+SPECIALDEF(5)
+(
+	UInt32,	id,
+	UInt64,	ownerId,
+	UInt16,	itemNum,
+	UInt8,  bind,
+    UInt32, sellTime
 )
 SPECIALEND()
 

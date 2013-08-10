@@ -1734,8 +1734,6 @@ void ClanCopyMgr::playerEnter(Player * player, bool needNotify /* = true */)
             it->second->addObserver(player);
         }
     }
-
-    clan->addMemberActivePoint(player, 15, e_clan_actpt_copy);
 }
 
 void ClanCopyMgr::playerLeave(Player * player)

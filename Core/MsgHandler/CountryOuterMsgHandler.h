@@ -751,14 +751,17 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 		bool  bindType = *reinterpret_cast<const bool*>(data+offset+4);
 		UInt16 itemNum = *reinterpret_cast<const UInt16*>(data+offset+5);
 		offset += 7;
-		if (IsEquipId(itemId))
+		/*if (IsEquipId(itemId))
 		{
 			price += pl->GetPackage()->SellEquip(itemId);
 		}
 		else
 		{
 			price += pl->GetPackage()->SellItem(itemId, itemNum, bindType);
-		}
+		}*/
+
+        price += pl->GetPackage()->AddTemporaryItem(itemId, itemNum, bindType);
+
         if(World::canDestory(itemId))
             ++canDestroyNum;
 	}
@@ -5671,7 +5674,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
     if (op  < 6 )
         return;
-    if((op != 10 && op!= 20 ) && !player->hasChecked())
+    if((op != 10 && op!= 20 &&op!=22 ) && !player->hasChecked())
          return;
 
     switch(op)
@@ -5724,6 +5727,15 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
         case 21:
             player->getQQBoardInstantLoginAward(2*idx - 1);
             player->sendQQBoardLoginInfo();
+            break;
+        case 22:
+            player->SetLuckyMeetValue();
+            player->sendLuckyMeetLoginInfo();
+            break;
+        case 23:
+            UInt8 index ;
+            br >> index ;
+            player->getLuckyMeetAward(idx,index);
             break;
         default:
             break;
@@ -6168,6 +6180,38 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
     }
 }
 
+void OnQueryTempItemReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+
+    switch(opt)
+    {
+    case 0:
+        {
+            player->GetPackage()->SendTempItemInfo();               
+        }
+        break;
+    case 1:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+
+            UInt32 itemId = 0;
+            UInt16 itemNum = 0;
+            UInt8  bind = 0;
+
+            br >> itemId >> itemNum >> bind;
+            player->GetPackage()->RetrieveTemporaryItem(itemId, itemNum, bind);
+        }
+        break;
+    }
+}
 
 void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
 {
@@ -6773,6 +6817,8 @@ void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
         break;
     case 1:
         {
+            if(!player->hasChecked())
+                return;
             UInt8 type = 0;
             brd >> type;
             clan->raiseSpiritTree(player, type);

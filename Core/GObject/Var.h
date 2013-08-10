@@ -479,19 +479,25 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_RYHB_ITEM_CNT_13 = 537,      // 日月合璧购买物品13个数
         VAR_RYHB_ITEM_CNT_14 = 538,      // 日月合璧购买物品14个数
         VAR_RYHB_ITEM_CNT_15 = 539,      // 日月合璧购买物品15个数
-       
+
         VAR_VIP_PRIVILEGE_DATA_TYPE = 540 ,     //新手御剑奖励类型(0-未开通，1-七大豪享特权一阶段，2-十大至尊特权一阶段，3-七大豪享特权二阶段，4-十大至尊特权二阶段，5-七大梦幻特权，6-十大梦幻特权)
         VAR_VIP_PRIVILEGE_BREAK_LAST = 541 ,
         VAR_SUMMERFLOW_TYPE = 542 ,
         VAR_SUMMERFLOW_AWARD = 543,   //是否领取暑期回流礼包
         VAR_QQBOARD = 544 ,
         VAR_QQBOARD_AWARD = 545,
+        VAR_LUCKYMEET = 546,
+        VAR_LUCKYMEET_AWARD = 547,
+        VAR_LUCKYMEET_RECHARGE = 548,
+        VAR_LUCKYMEET_RECHARGE_AWARD = 549 ,
+        VAR_LUCKYMEET_VIP = 550 ,
+        VAR_LUCKYMEET_STRENTH_AWARD = 551,
 
-        // 550-570 for zhgc
-        VAR_CLAN_SPTR_WATER = 550,       // 每日神魔之树浇水数
-        VAR_CLAN_SPTR_AWARD = 551,       // 每日神魔之树奖励领取标识
-        VAR_CLAN_ACTPT_MONTH = 552,      // 每月帮派活跃度
-        VAR_CLAN_ACTPT_FLAG = 553,      // 活跃度领取标识
+        // 560-580 for zhgc
+        VAR_CLAN_SPTR_WATER = 560,       // 每日神魔之树浇水数
+        VAR_CLAN_SPTR_AWARD = 561,       // 每日神魔之树奖励领取标识
+        VAR_CLAN_ACTPT_MONTH = 562,      // 每月帮派活跃度
+        VAR_CLAN_ACTPT_FLAG = 563,      // 活跃度领取标识
 
         VAR_MAX,
     };
@@ -780,6 +786,12 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_SUMMERFLOW_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_QQBOARD, CYCLE_NONE);
             REGISTER_VAR(VAR_QQBOARD_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYMEET, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYMEET_VIP, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYMEET_STRENTH_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_LUCKYMEET_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYMEET_RECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYMEET_RECHARGE_AWARD, CYCLE_NONE);
             
             REGISTER_VAR(VAR_TUIGUAN_AWARD_GOT, CYCLE_DAY);
             REGISTER_VAR(VAR_PET_CUILIAN_DAILY_CNT_DATE, CYCLE_NONE);

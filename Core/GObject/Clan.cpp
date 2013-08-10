@@ -1276,7 +1276,7 @@ void Clan::listMembers( Player * player )
 		ClanMember * mem = *offset;
         if (!mem || !mem->player)
             continue;
-		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << mem->activepoint << mem->player->getLastOnline() << mem->player->getPF() << mem->last_actpt << mem->player->GetVar(VAR_CLAN_ACTPT_MONTH);
+		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << getMemberActivePoint(mem) << mem->player->getLastOnline() << mem->player->getPF() << mem->last_actpt << mem->player->GetVar(VAR_CLAN_ACTPT_MONTH);
 	}
 	st << Stream::eos;
 	player->send(st);
@@ -1331,12 +1331,23 @@ void Clan::sendInfo( Player * player )
         pd.ctFinishCount = 0;
         player->writeClanTask();
     }
+    
+    unsigned long long server_id;
+    unsigned long long uid;//unique clan qq id! 
+
+    if (cfg.merged != true)
+    {
+        server_id = (unsigned long long)cfg.serverNo;
+        uid = (server_id << 48 ) + (getLeaderId()&0xffffffffffff);
+    }
+    else
+        uid = getLeaderId();
 
     st << static_cast<UInt8>(0) << member->cls << static_cast<UInt8>(getCount()) << static_cast<UInt8>(getMaxMemberCount())
         <<  static_cast<UInt8>((pd.ctFinishCount << 4) | player->getClanTaskMax()) << static_cast<UInt32>(getConstruction())
         << getClanFunds() << member->proffer << static_cast<UInt8>(place-1)
         << _name << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
-        << _contact << _announce << _purpose << static_cast<UInt32>(getId()) << m_spiritTree.m_exp;
+        << _contact << _announce << _purpose << static_cast<UInt32>(getId()) <<static_cast<UInt64>(uid) << m_spiritTree.m_exp;
 	st << Stream::eos;
 	player->send(st);
 }
@@ -1458,7 +1469,7 @@ void Clan::broadcastMemberInfo( ClanMember& cmem, UInt8 t )
 	if(t == 0)
 		st << cmem.cls << cmem.player->getName() << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << cmem.player->getLastOnline() << cmem.player->getPF() << Stream::eos;
 	else
-		st << cmem.cls << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << cmem.proffer << cmem.player->getLastOnline() << Stream::eos;
+		st << cmem.cls << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << getMemberActivePoint(&cmem) << cmem.player->getLastOnline() << Stream::eos;
 	broadcast(st);
     //broadcastCopyInfo();
 
@@ -4372,7 +4383,7 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                     addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_tael, needTeal, now);
                 m_spiritTree.m_exp += 100;
                 addMemberActivePoint(pl, 1, e_clan_actpt_none);
-                while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level])
+                while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
                     ++ m_spiritTree.m_level;
                 writeSptrToDB();
             }
@@ -4396,7 +4407,7 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                 if(m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
                 {
                     m_spiritTree.m_exp += 200;
-                    while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level])
+                    while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
                         ++ m_spiritTree.m_level;
                     writeSptrToDB();
                 }
@@ -4637,6 +4648,8 @@ void Clan::addMemberActivePoint(Player* pl, UInt32 actpt, CLAN_ACTPT_FLAG f)
         UInt32 flag = pl->GetVar(VAR_CLAN_ACTPT_FLAG);
         if(f & flag)
             return;
+        flag |= f;
+        pl->SetVar(VAR_CLAN_ACTPT_FLAG, flag);
     }
 	Mutex::ScopedLock lk(_mutex);
     ClanMember* mem = getClanMember(pl);
@@ -4646,8 +4659,8 @@ void Clan::addMemberActivePoint(Player* pl, UInt32 actpt, CLAN_ACTPT_FLAG f)
         mem->activepoint += actpt;
         {
             Stream st(REP::CLAN_INFO_UPDATE);
-            st << static_cast<UInt8>(11) << mem->activepoint << Stream::eos;
-            pl->send(st);
+            st << static_cast<UInt8>(11) << pl->getId() << mem->activepoint << Stream::eos;
+            broadcast(st);
         }
         DB5().PushUpdateData("UPDATE `clan_player` SET `activepoint` = %u WHERE `playerId` = %" I64_FMT "u", mem->activepoint, mem->player->getId());
         pl->AddVar(VAR_CLAN_ACTPT_MONTH, actpt);
@@ -4665,6 +4678,12 @@ UInt32 Clan::getMemberActivePoint(Player* pl)
     }
 
     return 0;
+}
+
+UInt32 Clan::getMemberActivePoint(ClanMember* mem)
+{
+    checkMemberActivePoint(mem);
+    return mem->activepoint;
 }
 
 void Clan::checkMemberActivePoint(ClanMember* mem)
@@ -4692,7 +4711,7 @@ void Clan::listMembersActivePoint( Player * player )
 		ClanMember * mem = *offset;
         if (!mem || !mem->player)
             continue;
-		st << mem->player->getName() << mem->cls << mem->activepoint << mem->last_actpt << mem->player->GetVar(VAR_CLAN_ACTPT_MONTH);
+		st << mem->player->getName() << mem->cls << getMemberActivePoint(mem) << mem->last_actpt << mem->player->GetVar(VAR_CLAN_ACTPT_MONTH);
 	}
 	st << Stream::eos;
 	player->send(st);

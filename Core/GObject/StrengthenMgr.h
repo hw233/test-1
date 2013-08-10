@@ -82,7 +82,7 @@ namespace GObject
             StrengthenMgr(Player* player);
             ~StrengthenMgr();
             UInt8 GetFlag(UInt8 idx); 
-            UInt8 GetSouls(){return _item.souls;}
+            UInt8 GetSouls();
             UInt8 GetSoulId(){return _item.soulId;}
             void SetSoulId(UInt8 id = 0){_item.soulId = id;}
             void AddSouls(UInt8 v);
