@@ -1073,7 +1073,7 @@ namespace GObject
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-        SetMemCach();
+        //SetMemCach();
        // continuousLoginSummerFlow();//修改
 
         sendYearRPInfo();
@@ -11887,7 +11887,7 @@ namespace GObject
             sprintf(str, "F_130722_%d", type+4);
             udpLog("shuqihuiliu", str, "", "", "", "", "act");
         }
-        sendSummerMeetInfo();
+        sendSummerMeetRechargeInfo();
     } 
     void Player::getAwardGiftCard()
     {
@@ -13033,6 +13033,18 @@ namespace GObject
     //蜀山奇遇充值奖励
     void Player::getLuckyMeetRechargeAward(UInt8 val)
     {
+        UInt32 Recharge[][4]={{10,30,60,100},{10,50,100,200},{100,500,1000,2000}};
+        UInt32 viplev = getVipLevel();
+        UInt32 index = 0;
+        if(viplev >=1 )
+            index = 1;
+        if(viplev > 4)
+            index =2;
+        UInt32 recharge = GetVar(VAR_SUMMER_MEET_RECHARGE);
+        if(val<1||val>4)
+            return ;
+        if(recharge < Recharge[index][val-1])
+            return ;
         UInt32 ctslandingAward = GetVar(VAR_LUCKYMEET_RECHARGE_AWARD);
         if(ctslandingAward & (1<<(val-1)))
             return ;
@@ -13125,6 +13137,12 @@ namespace GObject
     //蜀山奇遇充值奖励
     void Player::getSummerMeetRechargeAward(UInt8 val)
     {
+        UInt32 Recharge[]={10,50,100,300,600,1000,2000};
+        UInt32 recharge = GetVar(VAR_SUMMER_MEET_RECHARGE);
+        if(val<1||val>7)
+            return ;
+        if(recharge < Recharge[val-1])
+            return ;
         UInt32 ctslandingAward = GetVar(VAR_SUMMER_MEET_RECHARGE_AWARD);
         if(ctslandingAward & (1<<(val-1)))
             return ;
@@ -14414,8 +14432,8 @@ namespace GObject
         char key[MEMCACHED_MAX_KEY] = {0};
         char value[][32] ={"07","14","30","90","01","02","03"};
         size_t len = snprintf(key, sizeof(key), "uid_asss_summermeet_9545942");
-        size_t vlen = strlen(value[4]);
-        MemcachedSet(key, len, value[4], vlen, 0);
+        size_t vlen = strlen(value[6]);
+        MemcachedSet(key, len, value[6], vlen, 0);
     }
     void Player::continuousLoginSummerFlow()
     {
@@ -14521,8 +14539,6 @@ namespace GObject
     {
         if (!World::getSummerMeetTime())
             return;
-        if( SummerMeetType==0 && SummerMeetTypeAward !=1 )
-            return ;
         UInt32 SummerMeetLogin = GetVar(VAR_SUMMER_MEET_LOGIN);
         UInt32 SummerMeetRechargeAward = GetVar(VAR_SUMMER_MEET_RECHARGE_AWARD);
         UInt32 SummerMeetLoginAward = GetVar(VAR_SUMMER_MEET_LOGIN_AWARD);   //登录奖励
@@ -14546,8 +14562,6 @@ namespace GObject
         }
         Stream st(REP::RC7DAY);  //协议
         st << static_cast<UInt8>(18);
-        st << static_cast<UInt8>(SummerMeetType);
-        st << static_cast<UInt8>(SummerMeetTypeAward);
         st << static_cast<UInt8>(max);   //连续登陆天数
         st << (SummerMeetRecharge);
         st << static_cast<UInt16>(SummerMeetLoginAward);   //领取的奖励号
@@ -14558,6 +14572,8 @@ namespace GObject
     }
     void Player::sendSummerMeetRechargeInfo()
     {
+        if (!World::getSummerMeetTime())
+              return;
         UInt32 SummerMeetType = GetVar(VAR_SUMMER_MEET_TYPE);
         UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
         Stream st(REP::RC7DAY);  //协议
@@ -15451,6 +15467,7 @@ namespace GObject
         if (!rf || now < rf ||rf > rf2)
             return;
         AddVar(VAR_SUMMER_MEET_RECHARGE, r);
+        sendSummerMeetInfo();
     }
 
     void Player::recvYBBuf(UInt8 type)
