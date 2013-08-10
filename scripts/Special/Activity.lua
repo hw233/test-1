@@ -1087,6 +1087,10 @@ function onFrontMapWin(player, id, spot, lootlvl)
     player:AddHYYJCount(20); -- 皓月印记
 end
 
+function onDropAwardAct(player, param)
+    Qixi(player, 0);
+end
+
 local vippack = {
     [1] = {{511,2},{505,2},{500,2},{15,1},{502,5},{47,1},{48,2},{49,1},{50,1},{51,1},{513,2},{5033,3},{9,5},{56,10}},
     [2] = {{56,2},{51,1},{15,1},{511,1}},
