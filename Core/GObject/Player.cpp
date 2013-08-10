@@ -14539,6 +14539,10 @@ namespace GObject
     {
         if (!World::getSummerMeetTime())
             return;
+        UInt32 SummerMeetType = GetVar(VAR_SUMMER_MEET_TYPE);
+        UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
+        if(SummerMeetType==0 || SummerMeetTypeAward ==0)
+            return ;
         UInt32 SummerMeetLogin = GetVar(VAR_SUMMER_MEET_LOGIN);
         UInt32 SummerMeetRechargeAward = GetVar(VAR_SUMMER_MEET_RECHARGE_AWARD);
         UInt32 SummerMeetLoginAward = GetVar(VAR_SUMMER_MEET_LOGIN_AWARD);   //登录奖励
@@ -14575,6 +14579,8 @@ namespace GObject
         if (!World::getSummerMeetTime())
               return;
         UInt32 SummerMeetType = GetVar(VAR_SUMMER_MEET_TYPE);
+        if(SummerMeetType < 1 ||SummerMeetType > 3 )
+            return ;
         UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
         Stream st(REP::RC7DAY);  //协议
         st << static_cast<UInt8>(17);
