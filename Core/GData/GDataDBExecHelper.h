@@ -572,6 +572,34 @@ struct DBXingchenConfig
     UInt32 payBack;
 };
 
+struct DBJiguanyuConfig
+{
+    std::string name;
+    UInt32 jiguanyuId;
+    UInt8 mark;
+    UInt8 quality;
+    UInt8 attrType;
+    UInt8 element;
+    UInt32 attrValue;
+    std::string molding;
+    UInt16 skillId;
+};
+
+struct DBJiguanshuConfig
+{
+    UInt8 jgshuLvl;
+    UInt32 needExp;
+};
+
+struct DBTuzhiConfig
+{
+    std::string name;
+    UInt32 tuzhiId;
+    UInt8 quality;
+    UInt8 needjgsLvl;
+    UInt32 jiguanyuId;
+};
+
 }
 
 namespace DB {
@@ -1232,6 +1260,40 @@ SPECIALDEF(9)
     float, rate3,
     UInt32, payBack
 	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBJiguanyuConfig)
+SPECIALDEF(9)
+    (
+    std::string, name,
+    UInt32, jiguanyuId,
+    UInt8, mark,
+    UInt8, quality,
+    UInt8, attrType,
+    UInt8, element,
+    UInt32, attrValue,
+    std::string, molding,
+    UInt16, skillId
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBJiguanshuConfig)
+SPECIALDEF(2)
+    (
+    UInt8, jgshuLvl,
+    UInt32, needExp
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBTuzhiConfig)
+SPECIALDEF(5)
+    (
+    std::string, name,
+    UInt32, tuzhiId,
+    UInt8, quality,
+    UInt8, needjgsLvl,
+    UInt32, jiguanyuId
+    )
 SPECIALEND()
 
 }

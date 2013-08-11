@@ -295,6 +295,7 @@ enum ItemTo
     TodismantleGem = 159, //多彩宝石拆卸
     ToExchangXCValue = 160, //阵旗转换星辰值
     ToDelRetrieveItem = 161, //删除回购物品
+    ToMakeJGY = 162, //制造机关玉所消耗的道具
 };
 
 struct IncommingInfo

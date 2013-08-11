@@ -2047,8 +2047,8 @@ CREATE TABLE IF NOT EXISTS `tempItem` (
     PRIMARY KEY(`ownerId`, `id`, `bind`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `jiguanshu`;
-CREATE TABLE IF NOT EXISTS `jiguanshu` (
+DROP TABLE IF EXISTS `player_jiguanshu`;
+CREATE TABLE IF NOT EXISTS `player_jiguanshu` (
     `playerId` int(10) unsigned NOT NULL DEFAULT '0',
     `curLvl` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `curExp` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2068,6 +2068,5 @@ CREATE TABLE IF NOT EXISTS `player_tuzhi` (
     `playerId` int(10) unsigned NOT NULL DEFAULT '0',
     `tuzhiId` int(10) unsigned NOT NULL DEFAULT '0',
     `curProficient` tinyint(3) unsigned NOT NULL DEFAULT '0',
-    PRIMARY KEY(`playerId`, `tuzhiId`)
+   PRIMARY KEY(`playerId`, `tuzhiId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-

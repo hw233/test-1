@@ -6214,6 +6214,55 @@ void OnQueryTempItemReq( GameMsgHdr & hdr, const void * data )
     }
 }
 
+void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+
+    if(0 == opt && !player->hasChecked())
+    {
+        return;
+    }
+
+    switch(opt)
+    {
+    case 0:
+        {
+            player->GetMoFang()->sendMoFangInfo(opt);               
+        }
+        break;
+    case 1:
+        {
+            UInt32 tuzhiId = 0;
+            UInt8 type = 0;
+
+            br >> tuzhiId >> type;
+            player->GetMoFang()->makejiguan(tuzhiId, type, opt);
+        }
+        break;
+    case 2:
+        {
+            UInt32 jgId = 0;
+            UInt8 pos = 0;
+
+            br >> jgId >> pos;
+            player->GetMoFang()->equipJG(jgId, pos, opt);               
+        }
+        break;
+    case 3:
+        {
+            UInt8 pos = 0;
+
+            br >> pos;
+            player->GetMoFang()->equipJG(0, pos, opt);               
+        }
+        break;
+    }
+}
+
 void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

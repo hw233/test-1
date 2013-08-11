@@ -11,9 +11,38 @@ namespace GData
 
 namespace GObject
 {
+    enum
+    {
+        TUZHI_GREEN = 1,     //绿色
+        TUZHI_BLUE,          //蓝色
+        TUZHI_PURPLE,        //紫色
+        TUZHI_YELLOW         //橙色
+    };
+
+    enum
+    {
+        NOOCCUPY_MOFANG = 0, // 没有占用墨方方格
+        OCCUPY_MOFANG        // 占用墨方方格
+    };
+
+    enum
+    {
+        EQUIP_JG = 2,        // 装备机关
+        DISMANT_JG = 3,      // 拆除机关
+    };
+
+    enum
+    {
+        JIGUANYU = 0,       // 机关玉
+        JIGUANQI            // 机关器 
+    };
+
     class Player;
     class JiguanData;
 
+    struct DBJiguanshu;
+    struct DBJiguanyu;
+    struct DBTuzhi;
     struct Jiguanshu
     {
         Jiguanshu() : curLvl(0), curExp(0){}
@@ -28,28 +57,35 @@ namespace GObject
         MoFang(Player* pl);
 
         void Init();
-        void makejiguan(UInt32 itemId, UInt8 type, UInt8 mark);   // 制造机关
-        void upgradeJGS();                                        // 机关术升级
-        void equipJG(UInt32 jgId, UInt8 pos, UInt8 mark);         // 装备机关
-        void dismantleJG(UInt8 pos, UInt8 mark);                  // 拆除机关
-        bool checkEquip(UInt32 jgId);                             // 检测是否能够装备
-        void addJGYAttr(GData::AttrExtra& ae);                    // 添加机关玉属性
-        UInt16 useJGQskill();                                     // 使用机关器技能
+
+        void AddJGSFromDB(DBJiguanshu &);
+        void AddJGYFromDB(DBJiguanyu &);
+        void AddTuzhiFromDB(DBTuzhi &);
+
+        void addTuzhi(UInt32 tuzhiId);
+        void makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark);                         // 制造机关
+        void equipJG(UInt32 jgId, UInt8 pos, UInt8 mark);                               // 装备机关
+        bool checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &);      // 检测是否能够装备
+        void addJGYAttr(GData::AttrExtra& ae);                                          // 添加机关玉属性
+        UInt16 useJGQskill();                                                           // 使用机关器技能
+        void upgradeJGS();                                                              // 机关术升级
         void sendMoFangInfo(UInt8 mark = 0 /*0:获取墨方信息；1：制作机关玉；2：装备机关；3：拆卸机关 */);
+        inline UInt32 findEquipJG(UInt8 pos);
+        inline bool findNoEquipJG(UInt32 jgId);
     private:
 
-        map<UInt32 jgId, UInt8 pos> m_equipJG;              /*pos:1~49：表示装备在相应的格子*/
+        std::map<UInt8, UInt32> m_equipJG;  // 记录墨方坐标点所装备的机关
 
-        map<UInt32 tuzhiId, UInt32 curProficient> m_tuzhi;  //记录图纸所对应的熟练度
+        std::map<UInt32, UInt8> m_tuzhi;   // 记录图纸所对应的熟练度
 
-        vector<UInt32 jgId> m_jg;                           //记录未装备机关
+        std::vector<UInt32> m_jg;           // 记录未装备机关
 
-        UInt16 m_grids[49];                                 // 记录网格占用情况
+        UInt16 m_grids[49];                 // 记录网格占用情况
 
         Jiguanshu m_jiguanshu;
 
         Player* m_owner;
-    }；
+    };
 }
 
 #endif
