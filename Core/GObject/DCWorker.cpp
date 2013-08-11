@@ -354,7 +354,7 @@ namespace GObject
             return false;
         char value[32] = {0};
         char key[64] = {0};
-        size_t len = snprintf(key, sizeof(key), "%s_%s", key1,openid); 
+        size_t len = snprintf(key, sizeof(key), "%s%s", key1,openid); 
         m_MCached.get(key, len, value, sizeof(value));
         return atoi(value);
         

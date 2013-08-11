@@ -270,7 +270,8 @@ DROP TABLE IF EXISTS `clan_donate_record`;
 CREATE TABLE `clan_donate_record` (
   `clanId` int(10) unsigned NOT NULL,
   `donateName` varchar(255) NOT NULL DEFAULT '',
-  `techId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `donateTo` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `donateType` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `donateCount` int(10) unsigned NOT NULL DEFAULT '0',
   `donateTime` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -336,6 +337,9 @@ CREATE TABLE `clan_player` (
   `playerId` bigint(20) unsigned NOT NULL,
   `joinTime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '成员 - 加入时间    待审核 - 申请时间',
   `proffer` int(10) unsigned NOT NULL,
+  `activepoint` int(10) unsigned NOT NULL,
+  `last_actpt` int(10) unsigned NOT NULL,
+  `actpt_endtime` int(10) unsigned NOT NULL,
   `cls` int(10) unsigned NOT NULL COMMENT '帮派职位',
   `enterCount` tinyint(3) unsigned NOT NULL,
   `thisDay` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2037,6 +2041,24 @@ CREATE TABLE IF NOT EXISTS `clancity_player` (
     PRIMARY KEY(`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Table structure for table `clan_sptr`
+--
+
+DROP TABLE IF EXISTS `clan_sptr`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `clan_sptr` (
+  `clanId` int(10) unsigned NOT NULL,
+  `exp` int(10) unsigned NOT NULL DEFAULT '0',
+  `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `refreshTimes` int(10) unsigned NOT NULL DEFAULT '0',
+  `color` int(10) unsigned NOT NULL DEFAULT '0',
+  `endTime` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY(`clanId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 DROP TABLE IF EXISTS `tempItem`;
 CREATE TABLE IF NOT EXISTS `tempItem` (
@@ -2045,5 +2067,6 @@ CREATE TABLE IF NOT EXISTS `tempItem` (
     `itemNum` int(10) unsigned NOT NULL DEFAULT '0',
     `bind` smallint(5) unsigned NOT NULL DEFAULT '0',
     `sellTime` int(10) unsigned NOT NULL DEFAULT '0',
-    PRIMARY KEY(`ownerId`, `id`, `bind`)
+    PRIMARY KEY(`ownerId`, `id`, `bind`),
+    KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

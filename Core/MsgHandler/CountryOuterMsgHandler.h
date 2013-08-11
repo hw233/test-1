@@ -768,6 +768,9 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 	if(price > 0)
 	{
         pl->getTael(price);
+        char str[32] = {0};
+        sprintf(str, "F_130808_1_%u", price);
+        pl->udpLog("wupinhuigou", str, "", "", "", "", "act");
 	}
     if(canDestroyNum > 0)
     {
@@ -1333,6 +1336,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
    if(pl->getFighterCount() >= 5)
         pl->GetTaskMgr()->CompletedTask(202);
     pl->sendQQBoardLoginInfo();
+
+    pl->sendSummerMeetInfo();
+    pl->sendSummerMeetRechargeInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -5669,7 +5675,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
     //return; // XXX: 不使用老版本新注册七日活动
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
-    UInt8 op = 0, idx = 0;
+    UInt8 op = 0, idx = 0,index=0;
     br >> op >> idx;
 
     if (op  < 6 )
@@ -5733,10 +5739,14 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             player->sendLuckyMeetLoginInfo();
             break;
         case 23:
-            UInt8 index ;
             br >> index ;
             player->getLuckyMeetAward(idx,index);
             break;
+        case 24:
+            br >> index ;
+            player->getSummerMeetAward(idx,index);
+            break;
+
         default:
             break;
     }
@@ -6798,6 +6808,42 @@ void OnCCBReq( GameMsgHdr& hdr, const void* data )
         }
     }
 }
+
+void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    Clan* clan = player->getClan();
+    if(!clan)
+        return;
+
+    UInt8 opt = 0;
+    brd >> opt;
+    switch(opt)
+    {
+    case 0:
+        clan->sendSpiritTreeInfo(player);
+        break;
+    case 1:
+        {
+            if(!player->hasChecked())
+                return;
+            UInt8 type = 0;
+            brd >> type;
+            clan->raiseSpiritTree(player, type);
+        }
+        break;
+    case 2:
+        {
+            UInt8 idx = 0;
+            brd >> idx;
+            clan->getSpiritTreeAward(player, idx);
+        }
+        break;
+    }
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

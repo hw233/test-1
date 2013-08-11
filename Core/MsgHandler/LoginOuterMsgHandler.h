@@ -408,6 +408,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setPfKey(pfkey);
             player->setXinYue(atoi(xinyue.c_str()));
             player->setJinQuan(jinquan);
+            player->SetSummerMeetValue();
             player->continuousLoginSummerFlow();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
@@ -758,6 +759,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setVia(nu._via);
             pl->setXinYue(atoi(xinyue.c_str()));
             pl->setJinQuan(jinquan);
+            pl->SetSummerMeetValue();
             pl->continuousLoginSummerFlow();
             if(cfg.merged)
             {
@@ -1762,7 +1764,7 @@ void OnSetMaxCreate(LoginMsgHdr &hdr, const void* data)
     UInt32 MaxNewUser = 0;
     UInt8 ret = 1;
     br >> MaxNewUser; 
-    if (!MaxNewUser)
+    if (MaxNewUser)
     {
         GObject::GVAR.SetVar(GObject::GVAR_NewUser_Max , MaxNewUser); 
         ret = 0;
@@ -3067,6 +3069,17 @@ inline bool player_enum_2(GObject::Player* pl, int type)
             //    pl->checLuckyMeet();
             }
             break;
+        case 7:
+            {
+                pl->SetVar(GObject::VAR_SUMMER_MEET_RECHARGE, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_RECHARGE_AWARD, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN_AWARD, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
+            //    pl->checLuckyMeet();
+            }
+            break;
         default:
             return false;
     }
@@ -3098,7 +3111,7 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
                 UInt32 endTime = 0;
                 UInt32 flag = 0;
                 br >> endTime >> flag;
-                //大闹龙宫的flag暂时只为1,2,3,4,5,6
+                //大闹龙宫的flag暂时只为1,2,3,4,5,6,7,8,9,11
                 //10:聚宝盆
                 if(endTime < val || flag >= GObject::DRAGONKING_MAX)
                     result = 1;
@@ -3419,6 +3432,15 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
             GObject::globalPlayers.enumerate(player_enum_2, 6);
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYMEET_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYMEET_END, end);
+        ret = 1;
+    }
+    else if (type == 6 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_SUMMER_MEET_BEGIN) > TimeUtil::Now()
+                || GObject::GVAR.GetVar(GObject::GVAR_SUMMER_MEET_END) < TimeUtil::Now())
+            GObject::globalPlayers.enumerate(player_enum_2, 7);
+        GObject::GVAR.SetVar(GObject::GVAR_SUMMER_MEET_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_SUMMER_MEET_END, end);
         ret = 1;
     }
 
