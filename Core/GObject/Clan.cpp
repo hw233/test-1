@@ -4356,7 +4356,7 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
         UInt32 now = TimeUtil::Now();
         if (cfg.GMCheck && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
         {
-            pl->sendMsgCode(0, 1322);
+            pl->sendMsgCode(0, 1370);
             return;
         }
 
@@ -4469,7 +4469,7 @@ void Clan::getSpiritTreeAward(Player* pl, UInt8 idx)
 	UInt32 now = TimeUtil::Now();
     if (cfg.GMCheck && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
     {
-		pl->sendMsgCode(0, 1322);
+		pl->sendMsgCode(0, 1370);
 		return;
     }
 
