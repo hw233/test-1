@@ -1073,7 +1073,7 @@ namespace GObject
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-        //SetMemCach();
+       // SetMemCach();
        // continuousLoginSummerFlow();//修改
 
         sendYearRPInfo();
@@ -12810,6 +12810,7 @@ namespace GObject
           SetVar(VAR_SUMMER_MEET_LOGIN_AWARD , 0); 
         SummerMeetLogin |= 1 << (off - 1);
         SetVar(VAR_SUMMER_MEET_LOGIN, SummerMeetLogin);
+        sendSummerMeetInfo();
     }
     void Player::sendQQBoardLoginInfo()
     {
