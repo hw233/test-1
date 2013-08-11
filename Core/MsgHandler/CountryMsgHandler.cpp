@@ -193,6 +193,8 @@ MSG_REG_2(GameMsgHdr, REQ::RP_SERVER, OnRPServerReq);
 
 MSG_REG_2(GameMsgHdr, REQ::CCB, OnCCBReq);
 
+MSG_REG_2(GameMsgHdr, REQ::CLAN_SPIRIT_TREE, OnClanSpiritTree);
+
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 

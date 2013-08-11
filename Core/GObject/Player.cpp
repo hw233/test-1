@@ -1073,13 +1073,13 @@ namespace GObject
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-        //SetMemCach();
+       // SetMemCach();
        // continuousLoginSummerFlow();//修改
 
         sendYearRPInfo();
         sendSummerFlowInfo();
-       sendLuckyMeetLoginInfo();
-
+        sendLuckyMeetLoginInfo();
+        //sendSummerMeetInfo();
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
         else
@@ -5087,16 +5087,17 @@ namespace GObject
         if(!member)
             return 0;
         if(c == 0)
-			return member->proffer;
-		member->proffer += c;
+			return clan->getMemberProffer(this);
+        clan->addMemberProffer(this, c);
+		//member->proffer += c;
+        UInt32 proffer = clan->getMemberProffer(this);
 		SYSMSG_SENDV(166, this, c);
 		SYSMSG_SENDV(1066, this, c);
         {
             Stream st(REP::CLAN_INFO_UPDATE);
-            st << static_cast<UInt8>(5) << member->proffer << Stream::eos;
+            st << static_cast<UInt8>(5) << proffer << Stream::eos;
             send(st);
         }
-        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %" I64_FMT "u", member->proffer, this->getId());
 
         if(ii && ii->incommingType != 0)
         {
@@ -5104,7 +5105,7 @@ namespace GObject
                 cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
         }
 
-		return member->proffer;
+		return proffer;
 	}
 
 	UInt32 Player::useClanProffer( UInt32 a,ConsumeInfo * ci )
@@ -5115,11 +5116,13 @@ namespace GObject
         ClanMember* member = clan->getClanMember(this);
         if(!member)
             return 0;
-        if(member->proffer < a)
-            member->proffer = 0;
+        UInt32 proffer = clan->getMemberProffer(this);
+        if(proffer < a)
+            clan->addMemberProffer(this, -proffer);
         else
         {
-            member->proffer -= a;
+            clan->addMemberProffer(this, -a);
+            //member->proffer -= a;
             if(ci!=NULL)
             {
                 DBLOG1().PushUpdateData("insert into consume_clan_proffer (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
@@ -5130,12 +5133,11 @@ namespace GObject
         SYSMSG_SENDV(1065, this, a);
         {
             Stream st(REP::CLAN_INFO_UPDATE);
-            st << static_cast<UInt8>(5) << member->proffer << Stream::eos;
+            st << static_cast<UInt8>(5) << proffer << Stream::eos;
             send(st);
         }
-        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %" I64_FMT "u", member->proffer, this->getId());
 
-        return member->proffer;
+        return proffer;
     }
 
     UInt32 Player::getCoin( UInt32 c )
@@ -7932,6 +7934,7 @@ namespace GObject
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
         addLuckyMeetRecharge(r);
+        addSummerMeetRecharge(r);
         addRechargeNextRet(r);
         {
             GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, this, sizeof(_playerData.totalRecharge));
@@ -11491,8 +11494,10 @@ namespace GObject
     void Player::getQQTenpayAward(UInt8 opt)
     {
         UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
+        UInt8 state1 = GetVar(VAR_QQTENPAY_LOTTERY);
+        int idx = -1;
 
-        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
+        if (GetPackage()->GetRestPackageSize() < 6 && (opt == 1 || opt == 2))
         {
             sendMsgCode(0, 1011);
 
@@ -11511,10 +11516,19 @@ namespace GObject
             state = 1;
             udpLog("huodong", "F_130620_1", "", "", "", "", "act");
         }
+        else if(opt == 2 && state1 == 0)
+        {
+            idx = GameAction()->RunBlueDiamondAward(this, 6);
+            if(idx <= 0)
+                return;
+            SetVar(VAR_QQTENPAY_LOTTERY, 1);
+            state1 = 1;
+        }
             
+        UInt8 states = state | (state1 << 1);
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(22);
-        st << state << Stream::eos;
+        st << states << idx << Stream::eos;
         send(st);
     }
 
@@ -11849,7 +11863,7 @@ namespace GObject
         st << succ << Stream::eos;
         send(st);
     }
-    void Player::getAwardFromSurmmeFlowr()
+    void Player::getAwardFromSurmmeFlowr()   //暑期回流
     {
         if (!World::getSummerFlow())
             return;
@@ -11866,6 +11880,25 @@ namespace GObject
             sprintf(str, "F_130722_%d", type);
             udpLog("shuqihuiliu", str, "", "", "", "", "act");
         }
+    } 
+    void Player::getAwardFromSummerMeet()   //暑期，奇遇
+    {
+        if (!World::getSummerMeetTime())
+            return;
+        UInt32 type = GetVar(VAR_SUMMER_MEET_TYPE);
+        UInt32 Award = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
+        if(type == 0||Award==1)
+            return ;
+        UInt8 succ = GameAction()->RunSummerMeetAward(this, type);
+        if(succ)
+        {
+            SetVar(VAR_SUMMER_MEET_TYPE_AWARD, 1);
+            SetVar(VAR_SUMMER_MEET_TYPE,0);
+            char str[16] = {0};
+            sprintf(str, "F_130722_%d", type+4);
+            udpLog("shuqihuiliu", str, "", "", "", "", "act");
+        }
+        sendSummerMeetRechargeInfo();
     } 
     void Player::getAwardGiftCard()
     {
@@ -12759,6 +12792,37 @@ namespace GObject
         LuckyMeet |= 1 << (off - 1);
         SetVar(VAR_LUCKYMEET, LuckyMeet);
     }
+    void Player::SetSummerMeetValue()
+    {
+        if(!World::getSummerMeetTime())
+            return ;
+        UInt32 SummerMeetLogin = GetVar(VAR_SUMMER_MEET_LOGIN);
+        UInt32 SummerMeetType  = GetVar(VAR_SUMMER_MEET_TYPE);
+        if(!SummerMeetType)
+        {
+            std::string  openid = getOpenId();
+            char  key1[32] = "uid_asss_summermeet_";
+            UInt32 type = GObject::dclogger.checkActiveOpenid(key1,(char*)openid.c_str());
+            if(type>0 && type < 4)
+            {
+                SetVar(VAR_SUMMER_MEET_TYPE,type);
+                SetVar(VAR_SUMMERFLOW_AWARD,1);
+            }
+            else 
+                return ;
+        }
+        UInt32 begin =GVAR.GetVar(GVAR_SUMMER_MEET_BEGIN) ;
+        UInt32 end =GVAR.GetVar(GVAR_SUMMER_MEET_END) ;
+        UInt32 now = TimeUtil::Now();
+        UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
+        if(now < begin || now >end )
+            return ;
+        if(off!= 1 && !(SummerMeetLogin&(1<<(off-1))))
+          SetVar(VAR_SUMMER_MEET_LOGIN_AWARD , 0); 
+        SummerMeetLogin |= 1 << (off - 1);
+        SetVar(VAR_SUMMER_MEET_LOGIN, SummerMeetLogin);
+        sendSummerMeetInfo();
+    }
     void Player::sendQQBoardLoginInfo()
     {
         Stream st(REP::RC7DAY);  //协议
@@ -12983,6 +13047,18 @@ namespace GObject
     //蜀山奇遇充值奖励
     void Player::getLuckyMeetRechargeAward(UInt8 val)
     {
+        UInt32 Recharge[][4]={{10,30,60,100},{10,50,100,200},{100,500,1000,2000}};
+        UInt32 viplev = getVipLevel();
+        UInt32 index = 0;
+        if(viplev >=1 )
+            index = 1;
+        if(viplev > 4)
+            index =2;
+        UInt32 recharge = GetVar(VAR_SUMMER_MEET_RECHARGE);
+        if(val<1||val>4)
+            return ;
+        if(recharge < Recharge[index][val-1])
+            return ;
         UInt32 ctslandingAward = GetVar(VAR_LUCKYMEET_RECHARGE_AWARD);
         if(ctslandingAward & (1<<(val-1)))
             return ;
@@ -13008,6 +13084,104 @@ namespace GObject
         ctslandingAward |= (1<<(val - 1));
 
         SetVar(VAR_LUCKYMEET_STRENTH_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d", 11+val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
+    }
+    void Player::getSummerMeetAward(UInt8 idx,UInt8 index)
+    {
+        if(!World::getSummerMeetTime())
+            return ;
+        switch(idx)
+        {
+            case 1:
+                getSummerMeetInstantLoginAward(index);
+                break;
+            case 2:
+                getSummerMeetStrenthAward(index);
+                break;
+            case 3:
+                getSummerMeetRechargeAward(index);
+                break;
+            case 4:
+                getAwardFromSummerMeet();
+                break;
+        }
+        sendSummerMeetInfo();
+    }
+    //蜀山奇遇连续登录奖励
+    void Player::getSummerMeetInstantLoginAward(UInt8 val)
+    {
+        UInt32 LuckyMeet = GetVar(VAR_SUMMER_MEET_LOGIN);
+        UInt32 ctslandingAward = GetVar(VAR_SUMMER_MEET_LOGIN_AWARD);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(LuckyMeet & (1 << i++ ))
+                ++count;
+            else 
+            {
+                if(count != 0)
+                 {
+                     max = count ;
+                     count =0;
+                 }
+            }
+        }
+        if (val == 0 || (val != max && max < 8))
+            return;
+        // 正常签到登录奖励
+        if( max>7 )
+            val =7; 
+        if(ctslandingAward & (1<<(max-1)))
+            return ;
+        if(!GameAction()->RunLuckyMeetInstantLoginAward(this, val))
+        {
+            return;
+        }
+        ctslandingAward |= (1<<(max - 1));
+        ctslandingAward |= (1<<(val - 1));
+        SetVar(VAR_SUMMER_MEET_LOGIN_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d",4+val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
+    }
+    //蜀山奇遇充值奖励
+    void Player::getSummerMeetRechargeAward(UInt8 val)
+    {
+        UInt32 Recharge[]={10,50,100,300,600,1000,2000};
+        UInt32 recharge = GetVar(VAR_SUMMER_MEET_RECHARGE);
+        if(val<1||val>7)
+            return ;
+        if(recharge < Recharge[val-1])
+            return ;
+        UInt32 ctslandingAward = GetVar(VAR_SUMMER_MEET_RECHARGE_AWARD);
+        if(ctslandingAward & (1<<(val-1)))
+            return ;
+        if (!GameAction()->RunSummerMeetRechargeAward(this, val))
+            return;
+        ctslandingAward |= (1<<(val - 1));
+        SetVar(VAR_SUMMER_MEET_RECHARGE_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d", val+15);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
+    }
+
+    void Player::getSummerMeetStrenthAward(UInt8 val)
+    {
+        UInt32 souls = GetStrengthenMgr()->GetSouls();
+        if(val*25 > souls)
+            return ;
+        UInt32 ctslandingAward = GetVar(VAR_SUMMER_MEET_STRENTH_AWARD);
+        if(ctslandingAward & (1<<(val-1)))
+            return ;
+        if (!GameAction()->RunLuckyMeetStrengthAward(this, val))
+            return;
+        ctslandingAward |= (1<<(val - 1));
+
+        SetVar(VAR_SUMMER_MEET_STRENTH_AWARD, ctslandingAward);
         char str[16] = {0};
         sprintf(str, "F_130801_%d", 11+val);
         udpLog("shushanqiyu", str, "", "", "", "", "act");
@@ -14270,10 +14444,10 @@ namespace GObject
     {
         initMemcache();
         char key[MEMCACHED_MAX_KEY] = {0};
-        char value[4][32] ={"07","14","30","90"};
-        size_t len = snprintf(key, sizeof(key), "uid_asss_act_9545942");
-        size_t vlen = strlen(value[0]);
-        MemcachedSet(key, len, value[0], vlen, 0);
+        char value[][32] ={"07","14","30","90","01","02","03"};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_summermeet_9545942");
+        size_t vlen = strlen(value[6]);
+        MemcachedSet(key, len, value[6], vlen, 0);
     }
     void Player::continuousLoginSummerFlow()
     {
@@ -14374,6 +14548,61 @@ namespace GObject
         st << static_cast<UInt8>(SummerFlowType);
         st << Stream::eos;
         send(st);
+    }
+    void Player::sendSummerMeetInfo()
+    {
+        if (!World::getSummerMeetTime())
+            return;
+        UInt32 SummerMeetType = GetVar(VAR_SUMMER_MEET_TYPE);
+        UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
+        if(SummerMeetType==0 || SummerMeetTypeAward ==0)
+            return ;
+        UInt32 SummerMeetLogin = GetVar(VAR_SUMMER_MEET_LOGIN);
+        UInt32 SummerMeetRechargeAward = GetVar(VAR_SUMMER_MEET_RECHARGE_AWARD);
+        UInt32 SummerMeetLoginAward = GetVar(VAR_SUMMER_MEET_LOGIN_AWARD);   //登录奖励
+        UInt32 SummerMeetRecharge = GetVar(VAR_SUMMER_MEET_RECHARGE);
+        UInt32 SummerMeetStrenthAward = GetVar(VAR_SUMMER_MEET_STRENTH_AWARD);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(SummerMeetLogin & (1 << i++ ))
+                ++count;
+            else 
+            {
+                if(count != 0)
+                 {
+                     max = count ;
+                     count =0;
+                 }
+            }
+        }
+        Stream st(REP::RC7DAY);  //协议
+        st << static_cast<UInt8>(18);
+        st << static_cast<UInt8>(max);   //连续登陆天数
+        st << (SummerMeetRecharge);
+        st << static_cast<UInt16>(SummerMeetLoginAward);   //领取的奖励号
+        st << static_cast<UInt8>(SummerMeetStrenthAward);  
+        st <<static_cast<UInt8>(SummerMeetRechargeAward);
+        st << Stream::eos;
+        send(st);
+    }
+    void Player::sendSummerMeetRechargeInfo()
+    {
+        if (!World::getSummerMeetTime())
+              return;
+        UInt32 SummerMeetType = GetVar(VAR_SUMMER_MEET_TYPE);
+        if(SummerMeetType < 1 ||SummerMeetType > 3 )
+            return ;
+        UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
+        Stream st(REP::RC7DAY);  //协议
+        st << static_cast<UInt8>(17);
+        st << static_cast<UInt8>(SummerMeetType);
+        st << static_cast<UInt8>(SummerMeetTypeAward);
+        st << Stream::eos;
+        send(st);
+        
     }
     
     void Player::sendRC7DayInfo(UInt32 now)
@@ -15248,13 +15477,17 @@ namespace GObject
         UInt32 rf2 = GVAR.GetVar(GVAR_LUCKYMEET_END);
         if (!rf || now < rf ||rf > rf2)
             return;
-
         AddVar(VAR_LUCKYMEET_RECHARGE, r);
-
-        Stream st(REP::RF7DAY);         //蜀山奇遇:w
-        st << static_cast<UInt8>(5) << GetVar(VAR_RF7DAYRECHARGE);
-        st << Stream::eos;
-        send(st);
+    }
+    void Player::addSummerMeetRecharge(UInt32 r)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 rf =GVAR.GetVar(GVAR_SUMMER_MEET_BEGIN);
+        UInt32 rf2 = GVAR.GetVar(GVAR_SUMMER_MEET_END);
+        if (!rf || now < rf ||rf > rf2)
+            return;
+        AddVar(VAR_SUMMER_MEET_RECHARGE, r);
+        sendSummerMeetInfo();
     }
 
     void Player::recvYBBuf(UInt8 type)
@@ -18480,55 +18713,63 @@ void Player::sendGoodVoiceInfo()
 
 void Player::get3366GiftAward(UInt8 type)
 {
-    if(type == 1 && GetVar(VAR_3366GIFT) < 99)
+    if (getPlatform() != 11)
+        return;
+    if (GetVar(VAR_3366GIFT) >= 9)
+        return;
+    if (GetFreePackageSize() < 6)
     {
-        if(GetFreePackageSize() < 6)
-        {
-            sendMsgCode(0, 1011);
-            return;
-        }
-        if(getGold() < 79/*368*/)
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if(type == 1)
+    {
+        if (getGold() < 19)
         {
             sendMsgCode(0, 1104);
             return;
         }
-		ConsumeInfo ci(Enum3366Gift,0,0);
-		useGold(79/*368*/,&ci);
+        ConsumeInfo ci(Enum3366Gift,0,0);
+        useGold(19, &ci);
         AddVar(VAR_3366GIFT, 1);
-        /*
-        m_Package->Add(500, 2, true);
-        m_Package->Add(501, 2, true);
-        m_Package->Add(1325, 2, true);
-        m_Package->Add(516, 2, true);
-        m_Package->Add(134, 2, true);
-        m_Package->Add(515, 2, true);
-        */
-        static UInt32 itemId[] = {9371, 9338, 9141, 503, 500, 501};
+        static UInt32 itemId[] = {548, 3, 9082, 3, 9371, 1, 8000, 1, 500, 1, 9390, 1};
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
+        {
+            GetPackage()->Add(itemId[i], itemId[i+1], true);
+        }
+    }
+    else if(type == 2)
+    {
+        if (getGold() < 66)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(Enum3366Gift,0,0);
+        useGold(66, &ci);
+        AddVar(VAR_3366GIFT, 1);
+        static UInt32 itemId[] = {9390, 1126, 134, 9141, 551, 513};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
         {
             GetPackage()->Add(itemId[i], 1, true);
         }
-        send3366GiftInfo();
     }
+    send3366GiftInfo();
 }
 
 void Player::send3366GiftInfo()
 {
     if(getPlatform() != 11)
         return;
+    /*
     if(!isBD())
         return;
+    */
     if(!World::get3366GiftAct())
         return;
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(6);
     UInt8 opt = GetVar(VAR_3366GIFT);
-    /*
-    if(GetVar(VAR_3366GIFT) < 9)
-        opt = 0;
-    else
-        opt = 1;
-    */
     st << opt;
     st << Stream::eos;
     send(st);
@@ -19177,10 +19418,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -22670,6 +22911,25 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 GetPackage()->AddItem(9407, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
+            }
+        }
+    }
+    if (WORLD().getQixi())
+    {
+        if (flag == e_sla_hi || flag == e_sla_mr)
+            return;
+        if(flag == e_sla_none)
+        {
+            //GameAction()->onDropAwardAct(this, 0);
+        }
+        else
+        {
+            UInt32 status = GetVar(VAR_QIXI_DROP_STATUS);
+            if(!(status & flag))
+            {
+                status |= flag;
+                SetVar(VAR_QIXI_DROP_STATUS, status);
+                GameAction()->onDropAwardAct(this, 0);
             }
         }
     }

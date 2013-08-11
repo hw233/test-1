@@ -51,12 +51,12 @@ bool MsgHandler::ProcessMsg()
             {
                 if(ihdr->player->isJumpingMap())
                 {
-                    delete[] (char *)hdr;
+                    GLOBAL().FreeMsgBlock((char *)hdr);
                     continue;
                 }
                 else if(ihdr->player->getThreadId() != m_Worker)
                 {
-                    delete[] (char *)hdr;
+                    GLOBAL().FreeMsgBlock((char *)hdr);
                     continue;
                 }
             }
@@ -71,7 +71,7 @@ bool MsgHandler::ProcessMsg()
 				{
 					ihdr->msgHdr.desWorkerID = tid;
 					GLOBAL().PushMsg(*ihdr, ihdr + 1);
-                    delete[] (char *)hdr;
+                    GLOBAL().FreeMsgBlock((char *)hdr);
 					continue;
 				}
 			}
@@ -122,7 +122,7 @@ bool MsgHandler::ProcessMsg()
 		{
 			//Error
 		}
-        delete[] (char *)hdr;
+        GLOBAL().FreeMsgBlock((char *)hdr);
 	}
 	while (!msgQueue.Empty());
 	return true;

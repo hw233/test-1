@@ -54,25 +54,25 @@ qixitmpl:addLBAwards(99, 1325, 5)
 
 
 -- 蜀山之恋
-qixitmpl:setQixiItem(9355)
+qixitmpl:setQixiItem(9122)
 -- 称号卡
-qixitmpl:setTitleItem(9347)
+qixitmpl:setTitleItem(9915)
 -- 分手提示信息编码
 qixitmpl:setDivorceMsgCode(1035)
-qixitmpl:setRoamingFunc("onRoamingQingRen")
+qixitmpl:setRoamingFunc("onRoamingQueqiao")
 
 qixitmpl:setScoreTitle(4066)
 qixitmpl:setScoreContent(4067)
 qixitmpl:setMinAwardScore(50)
--- 1000分：五行精金(515)x7，法灵精金(134)x7，技能符文熔炼诀(1325)x7
+-- 1000分：五行精金(515)x7，凝神易筋丹(509)x7，补髓益元丹(507)x7
 qixitmpl:addScoreAwards(1000, 515, 7)
-qixitmpl:addScoreAwards(1000, 134, 7)
-qixitmpl:addScoreAwards(1000, 1325, 7)
--- 800分：太乙精金(503)x7，五行真金(514)x7,高级打孔石(512)x7
-qixitmpl:addScoreAwards(800, 503, 7)
-qixitmpl:addScoreAwards(800, 514, 7)
+qixitmpl:addScoreAwards(1000, 509, 7)
+qixitmpl:addScoreAwards(1000, 507, 7)
+-- 800分：橙色星辰旗(1126)x7，仙缘石(9371)x7,高级打孔石(512)x7
+qixitmpl:addScoreAwards(800, 1126, 7)
+qixitmpl:addScoreAwards(800, 9371, 7)
 qixitmpl:addScoreAwards(800, 512, 7)
--- 600分：洗炼符(500)x7，中级打孔石(511)x7，法灵结晶(1523)x7
+-- 600分：洗炼符(500)x7，中级打孔石(511)x7，法灵结晶(133)x7
 qixitmpl:addScoreAwards(600, 500, 7)
 qixitmpl:addScoreAwards(600, 511, 7)
 qixitmpl:addScoreAwards(600, 133, 7)
@@ -80,10 +80,10 @@ qixitmpl:addScoreAwards(600, 133, 7)
 qixitmpl:addScoreAwards(200, 56, 7)
 qixitmpl:addScoreAwards(200, 57, 7)
 qixitmpl:addScoreAwards(200, 15, 7)
--- 50分：太乙真金(502)x7，初级打孔石(510)x7，粗制拆卸石(504)x7
-qixitmpl:addScoreAwards(50, 502, 14)
+-- 50分：太乙真金(502)x7，初级打孔石(510)x7，蓝色符文熔炼诀(1327)x7
+qixitmpl:addScoreAwards(50, 502, 7)
 qixitmpl:addScoreAwards(50, 510, 7)
---qixitmpl:addScoreAwards(50, 504, 7)
+qixitmpl:addScoreAwards(50, 1327, 7)
 
 qixitmpl:setPartnerTitle(4058)
 qixitmpl:setPartnerContent(4059)
@@ -93,8 +93,8 @@ qixitmpl:addPartnerAwards(1325, 7)
 qixitmpl:setLBTitle(4056)
 qixitmpl:setLBContent(4057)
 qixitmpl:setMaxLBAwardPos(99)
--- 第1名：对应性别称号卡（男：罗密欧，女：朱丽叶），技能符文熔炼诀(1325)x30
-qixitmpl:addLBAwards(1, 9347, 1)
+-- 第1名：对应性别称号卡（男：迢迢牵牛星，女：皎皎河汉女），技能符文熔炼诀(1325)x30
+qixitmpl:addLBAwards(1, 9915, 1)
 qixitmpl:addLBAwards(1, 1325, 30)
 -- 第2名：技能符文熔炼诀(1325)x25
 qixitmpl:addLBAwards(2, 1325, 25)

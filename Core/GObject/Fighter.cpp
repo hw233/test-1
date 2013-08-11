@@ -2008,12 +2008,17 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
 {
     if(fgt == NULL)
         fgt = this;
+    if(!getOwner())
+        return;
 	ItemEquip * equip[8] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
         fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(), fgt->getRing()};
     bool aMark = false;
     bool bMark = false;
     bool cMark = false;
+    bool dMark = false;
+    bool eMark = false;
 
+    UInt8  viplvl = getOwner()->getVipLevel();
     for(int i=0; i<8; i++)
     {
         if(equip[i])
@@ -2030,6 +2035,8 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
                 aMark = false;
                 bMark = false;
                 cMark = false;
+                dMark = false;
+                eMark = false;
                 break;
             }
 
@@ -2044,9 +2051,10 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
             {
                 bMark = false;
                 cMark = false;
+                dMark = false;
+                eMark = false;
                 continue;
             }
-
             if(equip[i]->getItemEquipData().enchant >= 10)
             {
                 if((0 == i) || (i>0 && cMark))
@@ -2057,6 +2065,34 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
             else
             {
                 cMark = false;
+                dMark = false;
+                eMark = false;
+                continue;
+            }
+
+            if(equip[i]->getItemEquipData().enchant >= 11 && viplvl >= 11 )
+            {
+                if((0 == i) || (i>0 && dMark))
+                {
+                    dMark = true;
+                }
+            }
+            else
+            {
+                dMark = false;
+                eMark = false;
+                continue;
+            }
+            if(equip[i]->getItemEquipData().enchant >= 12 && viplvl >= 12)
+            {
+                if((0 == i) || (i>0 && eMark))
+                {
+                    eMark = true;
+                }
+            }
+            else
+            {
+                eMark = false;
             }
         }
         else
@@ -2064,7 +2100,9 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
             aMark = false;
             bMark = false;
             cMark = false;
-            break;
+            dMark = false;
+            eMark = false;
+            continue;
         }
     }
 
@@ -2091,7 +2129,19 @@ void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt
 
         value += 0.5;
     }
+    if(dMark)
+    {
+        _attrExtraEquip.hitrlvl += 100;
+
+        value += 0.75;
+    }
     
+    if(eMark)
+    {
+        _attrExtraEquip.evdlvl += 100;
+
+        value += 1;
+    }
 	for(int i=0; i<8; ++i)
 	{
 		if(setId[i] == 0)
@@ -3803,6 +3853,7 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_DEAD_FAKE ||
                         s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
                         s->cond == GData::SKILL_BLEED_TYPE_DMG ||
+                        s->cond == GData::SKILL_XMCZ ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
@@ -3853,6 +3904,7 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_DEAD_FAKE ||
                         s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
                         s->cond == GData::SKILL_BLEED_TYPE_DMG ||
+                        s->cond == GData::SKILL_XMCZ ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||

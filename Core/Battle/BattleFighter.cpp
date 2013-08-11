@@ -136,6 +136,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillDeadFake100(), _passiveSkillDeadFake100);
     updatePassiveSkill100(_fighter->getPassiveSkillAbnormalTypeDmg100(), _passiveSkillAbnormalTypeDmg100);
     updatePassiveSkill100(_fighter->getPassiveSkillBleedTypeDmg100(), _passiveSkillBleedTypeDmg100);
+    updatePassiveSkill100(_fighter->getPassiveSkillXMCZ100(), _passiveSkillXMCZ100);
 
     updatePassiveSkill(_fighter->getPassiveSkillPreAtk(), _passiveSkillPreAtk);
     updatePassiveSkill(_fighter->getPassiveSkillAftAtk(), _passiveSkillAftAtk);
@@ -157,6 +158,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 
     updateSoulSkillDead(_fighter->getSoulSkillSoulOut());
     updatePassiveSkill(_fighter->getPassiveSkillBleedTypeDmg(), _passiveSkillBleedTypeDmg);
+    updatePassiveSkillPrvAtk100Status();
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
     cnt = lbSkills.size();
@@ -1047,6 +1049,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillAbnormalTypeDmg100(size_t&
 const GData::SkillBase* BattleFighter::getPassiveSkillBleedTypeDmg100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillBleedTypeDmg100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillXMCZ100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillXMCZ100, idx, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
@@ -2621,6 +2628,18 @@ void BattleFighter::updateSoulSkillDead(UInt16 skillId)
         else
             skillItem.rateExtent = skillItem.base->prob * 100;
         _passiveSkillDead.insert(_passiveSkillDead.end(), skillItem);
+    }
+}
+
+void BattleFighter::updatePassiveSkillPrvAtk100Status()
+{
+    _xiangMoChanZhangSkill = NULL;
+    const GData::SkillBase* passiveSkill = NULL;
+    size_t skillIdx = 0;
+    while(NULL != (passiveSkill = getPassiveSkillXMCZ100(skillIdx)))
+    {
+        _xiangMoChanZhangSkill = passiveSkill;
+        break;
     }
 }
 

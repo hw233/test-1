@@ -473,6 +473,8 @@ public:
     { return _consumeawardact; }
     inline static void  setSummerFlow(bool v)
     {   _summerFlow=v; } 
+    inline static void  setSummerMeet(bool v)
+    {   _summerMeet=v; } 
     inline static bool getSummerFlow()
     {  return _summerFlow; } 
     inline static void setNeedRechargeRank(bool v)
@@ -704,6 +706,18 @@ public:
         else
             return false;
     } 
+    inline static bool getSummerMeetTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_SUMMER_MEET_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_SUMMER_MEET_END);
+        UInt32 now = TimeUtil::Now() + time;
+        if(begin == 0 && end == 0)
+            return _summerMeet;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
 
     inline static void setRYHBActivity(bool v)
     {
@@ -918,6 +932,7 @@ public:
     static bool _consume918;
     static bool _consumeawardact;
     static bool _summerFlow;
+    static bool _summerMeet;
     static bool _needrechargerank;
     static bool _needconsumerank;
     static bool _killMonsteract;

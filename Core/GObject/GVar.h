@@ -87,6 +87,8 @@ namespace GObject
         GVAR_LUCKYMEET_BEGIN = 49,
         GVAR_LUCKYMEET_END  = 50,
 
+        GVAR_SUMMER_MEET_BEGIN = 51,
+        GVAR_SUMMER_MEET_END = 52,
         GVAR_MAX,
     };
 
@@ -161,6 +163,9 @@ namespace GObject
 
             GREGISTER_VAR(GVAR_LUCKYMEET_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_LUCKYMEET_END, GCYCLE_NONE);
+            
+            GREGISTER_VAR(GVAR_SUMMER_MEET_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_SUMMER_MEET_END, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
