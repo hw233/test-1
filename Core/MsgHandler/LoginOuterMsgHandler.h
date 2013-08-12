@@ -3473,6 +3473,16 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
         begin = GObject::GVAR.GetVar(GObject::GVAR_RYHB_ACTIVITY_BEGIN);
         end = GObject::GVAR.GetVar(GObject::GVAR_RYHB_ACTIVITY_END);
     }
+    else if (type == 5)
+    {
+        begin = GObject::GVAR.GetVar(GObject::GVAR_LUCKYMEET_BEGIN);
+        end = GObject::GVAR.GetVar(GObject::GVAR_LUCKYMEET_END);
+    }
+    else if (type == 6)
+    {
+        begin = GObject::GVAR.GetVar(GObject::GVAR_SUMMER_MEET_BEGIN);
+        end = GObject::GVAR.GetVar(GObject::GVAR_SUMMER_MEET_END);
+    }
 
 
     Stream st(SPEP::QUERYACTIVITYONOFF);
