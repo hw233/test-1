@@ -1527,6 +1527,7 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     br >> tm;
     br>>playerIds;
 //开启起封交易客户平台测试
+    //开启起封交易客户平台测试
 //#define TEST_TABLE
 #ifdef TEST_TABLE
 #pragma pack(1) 
@@ -1542,6 +1543,10 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     playerIds = _test->msg;
 #endif
 #undef TEST_TABLE 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
@@ -1581,7 +1586,10 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
     std::string playerIds;
     CHKKEY();
     br>>playerIds;
+<<<<<<< HEAD
     UInt16 serverNo = 0;
+=======
+>>>>>>> master
  
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
@@ -1592,8 +1600,6 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
         UInt64 pid = atoll(playerId.c_str());
         setForbidSaleValue(pid, false);
 
-        if(cfg.merged)
-            pid += (static_cast<UInt64>(serverNo) << 48);
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
             pl->setForbidSale(false);
@@ -1604,8 +1610,6 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
         {
             execu->Execute2("REPLACE into `fsale_player` values(%" I64_FMT "u,%d,0)", pid, TimeUtil::Now());
         }
- 
-
     }
     ret = 0;
     Stream st(SPEP::UNFORBIDSALE);
@@ -1629,7 +1633,11 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
     Stream st(SPEP::QUERYLOCKUSER);
 //    st << isLockLogin << isForbidSale << fsaleTime << Stream::eos;
     st << isLockLogin << isForbidSale << fsaleTime<< foverTime << Stream::eos;
+<<<<<<< HEAD
      //std::cout<<(bool)isLockLogin<< "  " <<(bool)isForbidSale<< "  "<<fsaleTime<<"  "<<foverTime<<std::endl;
+=======
+    //std::cout<<(bool)isLockLogin<< "  " <<(bool)isForbidSale<< "  "<<fsaleTime<<"  "<<foverTime<<std::endl;
+>>>>>>> master
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
