@@ -4340,6 +4340,29 @@ void Clan::broadcastClanBattle(Player *caller)
 #define MAX_CLANSPTR_LEVEL  10
 static UInt32 clansptr_exptable[10] = {0, 100, 1000, 2000, 4000, 7000, 10000, 14000, 20000, 30000};
 static UInt32 clansptr_water_teal[3] = {0, 500, 1000};
+static const char* clansptr_udp_tael[3] = {
+    "F_130813_1",
+    "F_130813_2",
+    "F_130813_3"
+};
+
+static const char* clansptr_udp_level[9] = {
+    "F_130813_5",
+    "F_130813_6",
+    "F_130813_7",
+    "F_130813_8",
+    "F_130813_9",
+    "F_130813_10",
+    "F_130813_11",
+    "F_130813_12",
+    "F_130813_13"
+};
+
+static const char* clansptr_udp_color[3] = {
+    "F_130813_14",
+    "F_130813_15",
+    "F_130813_16"
+};
 
 void Clan::raiseSpiritTree(Player* pl, UInt8 type)
 {
@@ -4384,8 +4407,14 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                 m_spiritTree.m_exp += 100;
                 addMemberActivePoint(pl, 1, e_clan_actpt_none);
                 while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
+                {
+                    Player* leader = getLeader();
+                    if(leader)
+                        leader->udpLog("shenmozhishu", clansptr_udp_level[m_spiritTree.m_level-1], "", "", "", "", "act");
                     ++ m_spiritTree.m_level;
+                }
                 writeSptrToDB();
+                pl->udpLog("shenmozhishu", clansptr_udp_tael[idx], "", "", "", "", "act");
             }
         }
         else
@@ -4408,10 +4437,16 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                 {
                     m_spiritTree.m_exp += 200;
                     while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
+                    {
+                        Player* leader = getLeader();
+                        if(leader)
+                            leader->udpLog("shenmozhishu", clansptr_udp_level[m_spiritTree.m_level-1], "", "", "", "", "act");
                         ++ m_spiritTree.m_level;
+                    }
                     writeSptrToDB();
                 }
                 refreshColorAward();
+                pl->udpLog("shenmozhishu", "F_130813_4", "", "", "", "", "act");
             }
         }
     }
@@ -4450,7 +4485,15 @@ void Clan::refreshColorAward()
         rate = rates[m_spiritTree.m_color][1];
     else
         rate = rates[m_spiritTree.m_color][3] + (m_spiritTree.m_refreshTimes - rates[m_spiritTree.m_color][0]) * rates[m_spiritTree.m_color][4];
-    m_spiritTree.m_color += (uRand(10000) < rate ? 1 : 0);
+
+    if(uRand(10000) < rate)
+    {
+        Player* leader = getLeader();
+        if(leader)
+            leader->udpLog("shenmozhishu", clansptr_udp_color[m_spiritTree.m_color], "", "", "", "", "act");
+        ++ m_spiritTree.m_color;
+    }
+
     ++ m_spiritTree.m_refreshTimes;
     writeSptrToDB();
 }

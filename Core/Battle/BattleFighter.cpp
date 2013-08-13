@@ -1888,7 +1888,7 @@ BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
 
     bf->setSummonFactor(aura, factor, last);
     setSelfSummon(bf);
-
+    bf->setXiangMoChanZhangSkill(NULL);
     return bf;
 }
 
@@ -1916,6 +1916,7 @@ void BattleFighter::clearSkill()
     _passiveSkillDeadFake100.clear();
     _passiveSkillAbnormalTypeDmg100.clear();
     _passiveSkillBleedTypeDmg100.clear();
+    _passiveSkillXMCZ100.clear();
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();
