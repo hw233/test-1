@@ -6978,7 +6978,7 @@ namespace GObject
     {
         CheckTemporaryItem();
 
-        bool findMark = false;
+       /* bool findMark = false;
         if(!IsEquipId(itemId))
         {
             item_elem_iter itertp = m_ItemsTemporary.find(ItemKey(itemId, bind));
@@ -7024,10 +7024,14 @@ namespace GObject
                     DelTempItem(tempItem, tempItem->Count(), ToDelRetrieveItem, true);
                 }
             }
-        }
+        }*/
 
 		ItemBase * item = FindItem(itemId, bind);
         if(NULL == item)
+            return 0;
+
+        UInt32 count = item->Count();
+        if(sellCount > count)
             return 0;
 
 		UInt32 price = item->getPrice();
@@ -7157,11 +7161,16 @@ namespace GObject
         if(NULL == iterTemp->second)
             return false;
 
+        UInt32 count = iterTemp->second->Count();
+        if(RTICount > count)
+            return false;
+
 		UInt32 price = iterTemp->second->getPrice();
 		if(price == 0) 
             return false;
 
         UInt32 money = price * RTICount;
+        money += 1000;
 
         if (m_Owner->getTael() < money)
         {
