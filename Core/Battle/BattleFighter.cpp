@@ -72,6 +72,10 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
+    auralRate = 0;
+    auraValue = 0;
+    auralLast = 0;
+    launcher = NULL;
 	setFighter(f);
 }
 
@@ -817,13 +821,26 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool no
     GData::SkillItem* resSkillItem = NULL;
     if(NULL != _peerlessSkill.base)
     {
-        if((_aura >= 100 && _peerlessSkill.base->effect != NULL) && (!noPossibleTarget || _peerlessSkill.base->target != GData::e_battle_target_otherside))
+        bool isValid = false;
+        if(getBuddhaLightLast() > 0 && getBlind() < 0.001f)
+        {
+            if(uRand(10000) < getBuddhaLightRate() * 100)
+                isValid = true;
+            else
+                setBuddhaLight(0, 0xFF);
+        }
+        if(((_aura >= 100 || isValid == true) && _peerlessSkill.base->effect != NULL) && (!noPossibleTarget || _peerlessSkill.base->target != GData::e_battle_target_otherside))
         {
             // peerless skill first
             if (_fighter->getOwner())
                 _fighter->getOwner()->OnHeroMemo(GObject::MC_SKILL, GObject::MD_ADVANCED, 0, 2);
             return _peerlessSkill.base;
         }
+    }
+    else
+    {
+        if(getBuddhaLightLast() > 0 && getBlind() < 0.001f)
+            setBuddhaLight(0, 0xFF);
     }
 
     if(need_therapy)

@@ -2289,7 +2289,7 @@ namespace GObject
 #endif
 #endif // _WIN32
         //heroIsland.playerOffline(this);
-        newHeroIsland.playerLeave(this);
+        //newHeroIsland.playerLeave(this);
 		removeStatus(SGPunish);
         char online[32] = {0,};
         snprintf(online, sizeof(online), "%u", TimeUtil::Now() - _playerData.lastOnline);
@@ -12731,7 +12731,7 @@ namespace GObject
         UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
         if(now < begin)
             return ;
-        if( off > 15)
+        if( off > 16)
             return ;
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         QQBoard |= 1 << (off - 1);
@@ -12742,19 +12742,15 @@ namespace GObject
         Stream st(REP::RC7DAY);  //协议
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         UInt32 QQBoardAward = GetVar(VAR_QQBOARD_AWARD);
-        UInt32 max = 0 ;
         UInt32 i=0;
         UInt32 count=0 ;
         while(i<16)
         {
             if(QQBoard & (1 << i++ ))
                 ++count;
-            else count = 0;
-            if(count > max)
-                max = count ;
         }
         st << static_cast<UInt8>(15);
-        st << static_cast<UInt8>(max);   //连续登陆天数
+        st << static_cast<UInt8>(count);   //连续登陆天数
         st <<QQBoardAward;   //领取的奖励号
         st << Stream::eos;
         send(st);
@@ -12851,18 +12847,14 @@ namespace GObject
         // 申请领取新注册七天登录奖励 (包括补签和累计登录）
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         UInt32 ctslandingAward = GetVar(VAR_QQBOARD_AWARD);
-        UInt32 max = 0 ;
         UInt32 i=0;
         UInt32 count=0 ;
         while(i<16)
         {
             if(QQBoard & (1 << i++ ))
                 ++count;
-            else count = 0;
-            if(count > max)
-                max = count ;
         }
-        if (val == 0 || val > max)
+        if (val == 0 || val > count)
             return;
         // 正常签到登录奖励
         if(ctslandingAward & (1<<((val-1)/2)))
@@ -22370,8 +22362,9 @@ static UInt32 ryhb_items_1[15][4] = {
 static UInt32 ryhb_items_2[15][4] = {
     {8, 8, 78, 9},          // 升级优惠礼包
     {28, 28, 79, 9},        // 炼器优惠礼包
-    {8, 15, 80, 9},         // 九疑鼎优惠礼包
-    {333, 288, 5136, 3},    // 六级身法石
+    {15, 8, 80, 9},         // 九疑鼎优惠礼包
+    {88, 88, 5135, 3},      // 五级身法石
+    {2, 4, 1126, 99},       // 橙色星辰旗
     {2, 5, 1325, 99},       // 技能符文熔炼诀
     {2, 5, 134, 99},        // 法灵精金
     {2, 5, 547, 99},        // 天赋保护符
@@ -22379,7 +22372,6 @@ static UInt32 ryhb_items_2[15][4] = {
     {1, 3, 503, 99},        // 太乙精金
     {4, 8, 515, 99},        // 五行精金
     {1, 5, 509, 99},        // 凝神易筋丹
-    {1, 3, 9371, 99},       // 仙缘石
     {99, 99, 1717, 5},      // 女仆头饰
     {99, 99, 1719, 5},      // 兔耳朵
     {88, 88, 8555, 64},      // 天劫术

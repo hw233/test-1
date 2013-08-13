@@ -1993,7 +1993,7 @@ namespace GObject
             {
                 UInt8 rlvl = GData::expTable.exp2level(specfgtobj.experience);
 #ifdef _DEBUG
-                fprintf(stderr, "dblvl: %u, explvl: %u, exp: %lu\n", specfgtobj.level, rlvl, specfgtobj.experience);
+                //fprintf(stderr, "dblvl: %u, explvl: %u, exp: %lu\n", specfgtobj.level, rlvl, specfgtobj.experience);
 #endif
                 if (specfgtobj.level != rlvl)
                     specfgtobj.level = rlvl;
