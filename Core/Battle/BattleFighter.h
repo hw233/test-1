@@ -950,6 +950,7 @@ public:
     bool releaseHpSieldSelf();
     const GData::SkillBase* _xiangMoChanZhangSkill;
     const GData::SkillBase* getXiangMoChanZhangSkill(){ return _xiangMoChanZhangSkill; }
+    const void setXiangMoChanZhangSkill(GData::SkillBase* skill){ _xiangMoChanZhangSkill = skill; }
 
     inline float& getPetShieldHP() { return _petShieldHP; }
     inline void setPetShieldHP(float value) { _petShieldHP = value; }
