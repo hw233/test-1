@@ -550,6 +550,8 @@ bool NewHeroIsland::checkSettleAccounts(UInt32 now)
             return true;
         rankReward1();
         _isAward[_stage-1] = true;
+        if (_stage == 3)  //活动已经结束
+            return true;
         memset(_scores, 0, sizeof(_scores));
         memset(_types, 0, sizeof(_types));
         _wasOwned.clear();
@@ -1082,37 +1084,33 @@ void NewHeroIsland::rankReward()
         UInt16 prestige = 0;
         if (n < 5)
         {
-            MailPackage::MailItem item[2] = {};
+            UInt32 coupon = 0;
             if (n == 0)
             {
                 prestige = 500*count;
-                item[0] = {10, count};
-                item[1] = {MailPackage::Coupon, 250*count};
+                coupon = 250*count;
             }
             else if (n == 1)
             {
                 prestige = 400*count;
-                item[0] = {10, count};
-                item[1] = {MailPackage::Coupon, 200*count};
+                coupon = 200*count;
             }
             else if (n == 2)
             {
                 prestige = 300*count;
-                item[0] = {10, count};
-                item[1] = {MailPackage::Coupon, 150*count};
+                coupon = 150*count;
             }
             else if (n == 3)
             {
                 prestige = 200*count;
-                item[0] = {10, count};
-                item[1] = {MailPackage::Coupon, 100*count};
+                coupon = 100*count;
             }
             else if (n == 4)
             {
                 prestige = 100*count;
-                item[0] = {10, count};
-                item[1] = {MailPackage::Coupon, 50*count};
+                coupon = 50*count;
             }
+            MailPackage::MailItem item[2] = { {10, count}, {MailPackage::Coupon, coupon} };
             UInt32 allScore = (*i)->score[0] + (*i)->score[1] + (*i)->score[2];
             SYSMSG(title, 2316);
             SYSMSGV(content, 2317, allScore, n+1, count, prestige, item[1].count);
