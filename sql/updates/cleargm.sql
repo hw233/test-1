@@ -1,1 +1,1 @@
-update player set gmLevel = 0 where id&0xffffffffff != 5;
+update player set gmLevel = 0 where gmLevel != 0;

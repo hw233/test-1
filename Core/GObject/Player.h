@@ -220,7 +220,10 @@ namespace GObject
         JIUYOU      = 7,    //九幽秘典
         JIUJIE      = 8,    //九戒困龙珠
         YUANSHEN    = 9,    //元神出窍
+
         TREASURE    = 10,   //聚宝盆
+
+        XIANGMO     = 11,   //降魔禅杖
 
         DRAGONKING_MAX,
     };
@@ -806,15 +809,20 @@ namespace GObject
         void addRC7DayRecharge(UInt32 r);
         void addRF7DayRecharge(UInt32 r);
         void addLuckyMeetRecharge(UInt32 r);
+        void addSummerMeetRecharge(UInt32 r);
         void sendRC7DayInfo(UInt32 now = TimeUtil::Now());
         void sendRF7DayInfo(UInt32 now = TimeUtil::Now());
         void sendLuckyMeetInfo();
         void getLuckyMeetRechargeAward(UInt8 val);
         void getLuckyMeetStrenthAward(UInt8 val);
+        void getSummerMeetRechargeAward(UInt8 val);
+        void getSummerMeetStrenthAward(UInt8 val);
         void setContinuousRFAward(UInt32 no);
         void sendFourCopAct();
         void sendLuckybagInfo();
         void sendSummerFlowInfo();
+        void sendSummerMeetInfo();
+        void sendSummerMeetRechargeInfo();
 		void Reconnect();
 
 		void Logout(bool = false);	//???????߲???
@@ -2094,6 +2102,7 @@ namespace GObject
         void getAward(UInt8 type, UInt8 opt);
         void getSSDTAward(UInt8 opt);
         void getAwardFromSurmmeFlowr();
+        void getAwardFromSummerMeet();
         void sendSSDTInfo();
         void getHappyAward(UInt8 opt);
         void sendHappyInfo(UInt16 itemId = 0);
@@ -2184,10 +2193,13 @@ namespace GObject
         void SetQQBoardValue();
         void sendLuckyMeetLoginInfo();
         void SetLuckyMeetValue();
+        void SetSummerMeetValue();
         void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
         void getQQBoardInstantLoginAward(UInt8 val);
         void getLuckyMeetInstantLoginAward(UInt8 val);
         void getLuckyMeetAward(UInt8 idx,UInt8 index);
+        void getSummerMeetInstantLoginAward(UInt8 val);
+        void getSummerMeetAward(UInt8 idx,UInt8 index);
         void getNewRC7DayRechargeAward(UInt8 val);
         void getNewRC7DayTargetAward(UInt8 val);
         void get11DailyAward(UInt8 opt);

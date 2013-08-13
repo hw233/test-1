@@ -22,8 +22,7 @@ void GlobalObject::UnInit()
 		FastMutex::ScopedLock lock(m_MsgQueueCs[i]);
 		while (!m_MsgQueue[i].Empty())
         {
-            MsgHdr* msg = m_MsgQueue[i].Pop();
-            delete[] (char*)msg;
+            FreeMsgBlock(m_MsgQueue[i].Pop());
 		}
 		m_MsgQueue[i].Clear();
 	}

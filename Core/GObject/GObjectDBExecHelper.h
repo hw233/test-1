@@ -619,6 +619,9 @@ struct DBClanPlayer
 	UInt64 playerId;
 	UInt32 joinTime;
     UInt32 proffer;
+    UInt32 activepoint;
+    UInt32 last_actpt;
+    UInt32 actpt_endtime;
 	UInt8  cls;
 	UInt8  enterCount;
 	UInt32 thisDay;
@@ -675,8 +678,9 @@ struct DBClanDonateRecord
 {
 	UInt32 clanId;
 	std::string doanteName;
-	UInt8 techId;
-	UInt16 donateCount;
+	UInt8 donateTo;
+    UInt8 donateType;
+	UInt32 donateCount;
 	UInt32 donateTime;
 };
 
@@ -761,6 +765,16 @@ struct DBClanCopyLog
     UInt8  logType;
     std::string playerName;
     UInt32 logVal;
+};
+
+struct DBClanSptr 
+{
+    UInt32 clanId;
+    UInt32 exp;
+    UInt8 level;
+    UInt32 refreshTimes;
+    UInt8 color;
+    UInt32 endTime;
 };
 
 struct DBTaskData
@@ -1918,24 +1932,28 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GObject::DBClanDonateRecord)
-SPECIALDEF(5)
+SPECIALDEF(6)
 (
 	UInt32, clanId,
 	std::string, doanteName,
-	UInt8, techId,
-	UInt16, donateCount,
+	UInt8, donateTo,
+    UInt8, donateType,
+	UInt32, donateCount,
 	UInt32, donateTime
 )
 SPECIALEND()
 
 
 SPECIALBEGIN(GObject::DBClanPlayer)
-SPECIALDEF(22)
+SPECIALDEF(25)
 (
 	UInt32, id,
 	UInt64, playerId,
 	UInt32, joinTime,
     UInt32, proffer,
+    UInt32, activepoint,
+    UInt32, last_actpt,
+    UInt32, actpt_endtime,
 	UInt8,  cls,
 	UInt8,  enterCount,
 	UInt32, thisDay,
@@ -2056,6 +2074,18 @@ SPECIALDEF(5)
     UInt8,  logType,
     std::string, playerName,
     UInt32, logVal
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanSptr)
+SPECIALDEF(6)
+(
+    UInt32, clanId,
+    UInt32, exp,
+    UInt8, level,
+    UInt32, refreshTimes,
+    UInt8, color,
+    UInt32, endTime
 )
 SPECIALEND()
 
