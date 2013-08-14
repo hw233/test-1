@@ -2032,6 +2032,47 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 0x0E:
+        {
+            if(!World::getCollectCardAct())
+                return;
+            UInt8 type = 0;
+            br >> type;
+            if(type == 0)
+                player->sendAllCollectCard();
+            else if(type == 1)
+            {
+                UInt8 fighterIndex = 0;
+                br >> fighterIndex;
+                player->useCollectCard(fighterIndex);
+            }
+            else if(type == 2)
+            {
+                UInt32 cardNum = 0;
+                br >> cardNum;
+                player->autoUseCollectCard(cardNum);
+            }
+            else if(type == 3)
+            {
+                UInt8 fighterIndex = 0;
+                UInt8 partPos = 0;
+                UInt16 partCnt = 0;
+                br >> fighterIndex;
+                br >> partPos;
+                br >> partCnt;
+                player->putCollectCardPool(fighterIndex, partPos, partCnt);
+            }
+            else if(type == 4)
+                player->convertCollectCard();
+            else if(type == 5)
+            {
+                UInt8 fighterIndex = 0;
+                br >> fighterIndex;
+                player->getCollectCardAward(fighterIndex);
+            }
+        }
+        break;
+
         case 10:
         {
             UInt8 type;

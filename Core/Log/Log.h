@@ -258,6 +258,7 @@ enum ItemFrom
     FromQQBoard = 59 ,
     FromRetrieveItem = 60, //回购物品
     FromClanSptr = 61, // 神魔之树
+    FromCollectCard = 62, //卡片转化池
     //80 ~ 100，繁体占用
 };
 

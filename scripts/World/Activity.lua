@@ -1135,6 +1135,12 @@ function onActivityCheck(tm)
   end
   --]]
 
+  --if tm >= actTime250 and tm < actTime250_1 then
+      setCollectCardAct(true)
+  --else
+  --    setCollectCardAct(false)
+  --end
+
   setRC7Day(true)
   setCFriend(true);
 
@@ -1413,6 +1419,9 @@ function initActTime(y, m, d)
     --日月合璧活动
   local  SerStartTmRYHB= { ['year'] = 2013, ['month'] = 6, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTmRYHB_1= { ['year'] = 2013, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  --卡片碎片集齐
+  local  SerStartTm250= { ['year'] = 2013, ['month'] = 8, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1844,6 +1853,9 @@ function initActTime(y, m, d)
 
   actTime249= os.time(SerStartTm249)
   actTime249_1= os.time(SerStartTm249_1);
+
+  actTime250= os.time(SerStartTm250)
+  actTime250_1= os.time(SerStartTm250) + 30*86400;
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

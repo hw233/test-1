@@ -111,6 +111,8 @@
 #define QQ_GAME_START_TIME  21*3600
 #define QQ_GAME_END_TIME    (21*3600+1800)
 
+#define CARD_ITEM_ID 9415
+
 namespace GObject
 {
     UInt32 Player::_recruit_cost = 20;
@@ -782,6 +784,9 @@ namespace GObject
         _inQQGroup = false;
 
         _loadMark = false;
+        memset(_partCnt, 0, sizeof(_partCnt));
+        memset(_alreadyCnt, 0, sizeof(_alreadyCnt));
+        memset(_alreadyload, 0, sizeof(_alreadyload));
 	}
 
 
@@ -22930,6 +22935,180 @@ void Player::setSysUpDateDlg(UInt32 v)
 UInt32 Player::getSysUpDateDlg()
 {
     return GetVar(VAR_SYS_UPDATE_DLG);
+}
+
+void Player::sendCollectCard(UInt8 fighterIndex)
+{
+    if(fighterIndex == 0 || fighterIndex > 8)
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x0E);
+    st << GetVar(VAR_POOL_CNT);
+    st << fighterIndex;
+    for(UInt8 i = 0; i < 9; i++)
+        st << _partCnt[fighterIndex - 1][i];
+    st << _alreadyCnt[fighterIndex - 1];
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::sendAllCollectCard()
+{
+    for(UInt8 i = 1; i <= 8; i++)
+        sendCollectCard(i);
+}
+
+void Player::useCollectCard(UInt8 fighterIndex)
+{
+    if(fighterIndex == 0 || fighterIndex > 8)
+        return;
+    if(GetPackage()->GetItemAnyNum(CARD_ITEM_ID) < 1)
+        return;
+    GetPackage()->DelItemAny(CARD_ITEM_ID, 1);
+    UInt8 pos = uRand(9);
+    _partCnt[fighterIndex - 1][pos] += 1;
+
+    char columnName[64];
+    sprintf(columnName, "partCnt%u", pos + 1);
+    insertCollectCardDB(fighterIndex);
+    DB5().PushUpdateData("UPDATE `collect_card` SET `%s` = %u WHERE `playerId` = %" I64_FMT "u AND `id` = %u", columnName, _partCnt[fighterIndex - 1][pos], getId(), fighterIndex);
+
+    sendCollectCard(fighterIndex);
+}
+
+void Player::putCollectCardPool(UInt8 fighterIndex, UInt8 partPos, UInt16 partCnt)
+{
+    if(fighterIndex == 0 || fighterIndex > 8)
+        return;
+    if(partPos == 0 || partPos > 9)
+        return;
+    if(_partCnt[fighterIndex - 1][partPos - 1] > partCnt)
+        return;
+    _partCnt[fighterIndex - 1][partPos - 1] -= partCnt;
+    AddVar(VAR_POOL_CNT, partCnt);
+
+    char columnName[64];
+    sprintf(columnName, "partCnt%u", partPos);
+    insertCollectCardDB(fighterIndex);
+    DB5().PushUpdateData("UPDATE `collect_card` SET `%s` = %u WHERE `playerId` = %" I64_FMT "u AND `id` = %u", columnName, _partCnt[fighterIndex - 1][partPos - 1], getId(), fighterIndex);
+
+    sendCollectCard(fighterIndex);
+}
+
+void Player::convertCollectCard()
+{
+    UInt32 poolCnt = GetVar(VAR_POOL_CNT);
+    if(poolCnt < 2)
+        return;
+    UInt32 itemCnt = poolCnt / 2;
+    poolCnt -= itemCnt * 2;
+    SetVar(VAR_POOL_CNT, poolCnt);
+    GetPackage()->AddItem(CARD_ITEM_ID, itemCnt, true, false, FromCollectCard);
+}
+
+void Player::autoUseCollectCard(UInt32 cardNum)
+{
+    if(GetPackage()->GetItemAnyNum(CARD_ITEM_ID) < cardNum)
+        return;
+    UInt8 fighterIndex = 1;
+    UInt16 minValue = 0;
+    for(UInt8 i = 0; i < 8; i++)
+    {
+        if(_alreadyCnt[i] > minValue)
+        {
+            minValue = _alreadyCnt[i];
+            fighterIndex = i + 1;
+        }
+    }
+
+    UInt32 count = 0;
+    for(; count < cardNum; count++)
+    {
+        useCollectCard(fighterIndex);
+        bool bFull = true;
+        for(UInt8 i = 0; i < 9; i++)
+        {
+            if(_partCnt[i] == 0)
+            {
+                bFull = false;
+                break;
+            }
+        }
+        if(bFull)
+            break;
+    }
+    GetPackage()->DelItemAny(CARD_ITEM_ID, count);
+    sendCollectCard(fighterIndex);
+}
+
+void Player::getCollectCardAward(UInt8 id)
+{
+    if(id == 0 || id > 8)
+        return;
+    UInt8 k = id - 1;
+    for(UInt8 i = 0; i < 8; i++)
+    {
+        if(_partCnt[k][i] == 0)
+            return;
+    }
+    bool bRet;
+    if(_alreadyCnt[k] == 0)
+        bRet = GameAction()->onCollectCardAct(this, 1);
+    else
+        bRet = GameAction()->onCollectCardAct(this, 2);
+    if(!bRet)
+        return;
+
+    UInt8 alreadyFighterNum1 = 0;
+    for(UInt8 i = 0; i < 8; i++)
+    {
+        if(_alreadyCnt[i] > 0)
+            ++alreadyFighterNum1;
+    }
+
+    for(UInt8 i = 0; i < 9; i++)
+        _partCnt[k][i] -= 1;
+    _alreadyCnt[k] += 1;
+    insertCollectCardDB(id);
+    DB5().PushUpdateData("UPDATE `collect_card` SET `partCnt1` = %u, `partCnt2` = %u, `partCnt3` = %u, `partCnt4` = %u, `partCnt5` = %u, `partCnt6` = %u, `partCnt7` = %u, `partCnt8` = %u, `partCnt9` = %u, `alreadyCnt` = %u WHERE `playerId` = %" I64_FMT "u AND `id` = %u", _partCnt[k][0], _partCnt[k][1], _partCnt[k][2], _partCnt[k][3], _partCnt[k][4], _partCnt[k][5], _partCnt[k][6], _partCnt[k][7], _partCnt[k][8],  _alreadyCnt[k], getId(), id);
+
+    sendCollectCard(id);
+
+    UInt8 alreadyFighterNum2 = 0;
+    for(UInt8 i = 0; i < 8; i++)
+    {
+        if(_alreadyCnt[i] > 0)
+            ++alreadyFighterNum2;
+    }
+
+    if(alreadyFighterNum1 < 3 && alreadyFighterNum2 == 3)
+        GameAction()->onCollectCardAct(this, 3);
+    else if(alreadyFighterNum1 < 8 && alreadyFighterNum2 == 8)
+        GameAction()->onCollectCardAct(this, 8);
+}
+
+void Player::loadCollectCard(UInt8 id, UInt16 partCnt1, UInt16 partCnt2, UInt16 partCnt3, UInt16 partCnt4, UInt16 partCnt5, UInt16 partCnt6, UInt16 partCnt7, UInt16 partCnt8, UInt16 partCnt9, UInt16 alreadyCnt)
+{
+    UInt8 index = id - 1;
+    _partCnt[index][0] = partCnt1;
+    _partCnt[index][1] = partCnt2;
+    _partCnt[index][2] = partCnt3;
+    _partCnt[index][3] = partCnt4;
+    _partCnt[index][4] = partCnt5;
+    _partCnt[index][5] = partCnt6;
+    _partCnt[index][6] = partCnt7;
+    _partCnt[index][7] = partCnt8;
+    _partCnt[index][8] = partCnt9;
+    _alreadyCnt[index] = alreadyCnt;
+    _alreadyload[index] = 1;
+}
+
+void Player::insertCollectCardDB(UInt8 id)
+{
+    if(id == 0 || id > 8)
+        return;
+    if(_alreadyload[id - 1] > 0)
+        DB5().PushUpdateData("INSERT INTO `collect_card` (`playerId`, `id`, `partCnt1`, `partCnt2`, `partCnt3`, `partCnt4`, `partCnt5`, `partCnt6`, `partCnt7`, `partCnt8`, `partCnt9`, `alreadyCnt`) VALUES(%" I64_FMT "u, %u, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)", getId(), id);
 }
 
 } // namespace GObject

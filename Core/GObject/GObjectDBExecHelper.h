@@ -1106,6 +1106,14 @@ struct DBFairySpar
     UInt8 breakoutCnt;
 };
 
+struct DBCollectCard
+{
+    UInt64 playerId;
+    UInt8 id;
+    UInt16 partCnt[9];
+    UInt16 alreadyCnt;
+};
+
 struct DBRNR
 {
     UInt64 id;
@@ -2621,6 +2629,24 @@ SPECIALDEF(12)
     UInt8, complexPercent,
     UInt8, curMark,
     UInt8, breakoutCnt
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBCollectCard)
+SPECIALDEF(12)
+(
+    UInt64, playerId,
+    UInt8, id,
+    UInt16, partCnt[0],
+    UInt16, partCnt[1],
+    UInt16, partCnt[2],
+    UInt16, partCnt[3],
+    UInt16, partCnt[4],
+    UInt16, partCnt[5],
+    UInt16, partCnt[6],
+    UInt16, partCnt[7],
+    UInt16, partCnt[8],
+    UInt16, alreadyCnt
 )
 SPECIALEND()
 

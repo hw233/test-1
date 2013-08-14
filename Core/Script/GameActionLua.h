@@ -384,6 +384,7 @@ namespace Script
         UInt8 onVipLevelAward(Player* player, UInt8 opt);
         bool onFishUserPackage(Player* player, UInt8 idx);
         Table GetNewHeroIslandBuffs();
+        bool onCollectCardAct(Player* player, UInt8 idx);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

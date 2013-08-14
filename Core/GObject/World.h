@@ -366,6 +366,10 @@ public:
     { _goldSnakeAct= v; }
     inline static bool getGoldSnakeAct()
     { return _goldSnakeAct; }
+    inline static void setCollectCardAct(bool v)
+    { _collectCardAct= v; }
+    inline static bool getCollectCardAct()
+    { return _collectCardAct; }
     inline static void setHeroIslandAct(bool v)
     { _heroIslandAct= v; }
     inline static bool getHeroIslandAct()
@@ -904,6 +908,7 @@ public:
     static bool _ssToolbarAct;
     static bool _snowAct;
     static bool _goldSnakeAct;
+    static bool _collectCardAct;
     static bool _heroIslandAct;
     static bool _dragonKingAct;
     static bool _saveGoldAct;

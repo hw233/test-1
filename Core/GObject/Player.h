@@ -2494,6 +2494,21 @@ namespace GObject
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);
+
+    public:
+        void sendCollectCard(UInt8 fighterIndex);
+        void sendAllCollectCard();
+        void useCollectCard(UInt8 fighterIndex);
+        void putCollectCardPool(UInt8 fighterIndex, UInt8 partPos, UInt16 partCnt);
+        void convertCollectCard();
+        void autoUseCollectCard(UInt32 cardNum);
+        void getCollectCardAward(UInt8 id);
+        void loadCollectCard(UInt8 id, UInt16 partCnt1, UInt16 partCnt2, UInt16 partCnt3, UInt16 partCnt4, UInt16 partCnt5, UInt16 partCnt6, UInt16 partCnt7, UInt16 partCnt8, UInt16 partCnt9, UInt16 alreadyCnt);
+        void insertCollectCardDB(UInt8 id);
+    private:
+        UInt16 _partCnt[8][9];
+        UInt16 _alreadyCnt[8];
+        UInt8 _alreadyload[8];
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

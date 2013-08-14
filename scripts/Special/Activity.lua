@@ -172,6 +172,13 @@ function _snowAct(player, _type)
 end
 
 
+function _collectCardAct(player, _type)
+    if not getCollectCardAct() then
+        return
+    end
+    package:Add(9415, 1, true)
+end
+
 function onLogin(player)
 	local stage = getActivityStage();
     checkExpire2(player, stage);
@@ -276,6 +283,7 @@ function onDungeonWin(player, id, count, free)
     end
     _9215Act(player, count);
     _snowAct(player, count);
+    _collectCardAct(player, count);
 end
 
 function onClanBattleAttend(player)
@@ -1046,6 +1054,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
     player:AddZRYJCount(20); -- 逐日印记
+    _collectCardAct(player, lootlvl);
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -1085,6 +1094,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
     player:AddHYYJCount(20); -- 皓月印记
+    _collectCardAct(player, lootlvl);
 end
 
 function onDropAwardAct(player, param)
@@ -9224,3 +9234,40 @@ function onFishUserPackage(player, idx)
     end
     return true
 end
+
+function onCollectCardAct(player, idx)
+    if player == nil then
+        return false
+    end
+    local fashionId = {1700,1701,1702,1703,1704,1705,1706,1707,1709,1710,1711,1712}
+    local items = {
+        [1] = { {503, 4}, {515, 2}, {1325, 2}, {509, 2}, {31,1} },
+        [2] = { {503, 2}, {515, 2}, {1325, 1}, {509, 2}, {31,1} },
+        [3] = { {9088, 2}, {134, 2}, {509, 2}, {507, 2} },
+        [4] = { {515, 5}, {1325, 10}, {9076, 5}, {507, 5}, {fashionId[math.random(1,#fashionId)],1} },
+    }
+    local item = items[idx]
+    if item == nil then
+        return false
+    end
+    local package = player:GetPackage()
+    local reqGrids
+    if idx == 4 then
+        reqGrids = 1
+    else
+        reqGrids = #item
+    end
+    if package:GetRestPackageSize() < reqGrids then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+    if idx == 4 then
+        local cur = math.random(1,#item)
+        package:Add(cur[1], cur[2], true)
+    else
+    end
+    for _, val in pairs(item) do
+        package:Add(val[1], val[2], true)
+    end
+end
+
