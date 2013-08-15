@@ -172,6 +172,14 @@ function _snowAct(player, _type)
 end
 
 
+function _collectCardAct(player, _type)
+    if not getCollectCardAct() then
+        return
+    end
+    local package = player:GetPackage();
+    package:Add(9415, 1, true)
+end
+
 function onLogin(player)
 	local stage = getActivityStage();
     checkExpire2(player, stage);
@@ -276,6 +284,7 @@ function onDungeonWin(player, id, count, free)
     end
     _9215Act(player, count);
     _snowAct(player, count);
+    _collectCardAct(player, count);
 end
 
 function onClanBattleAttend(player)
@@ -1046,6 +1055,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
     player:AddZRYJCount(20); -- 逐日印记
+    _collectCardAct(player, lootlvl);
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -1085,6 +1095,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
     player:AddHYYJCount(20); -- 皓月印记
+    _collectCardAct(player, lootlvl);
 end
 
 function onDropAwardAct(player, param)
@@ -4766,7 +4777,7 @@ function sendRechargeMails(player, ototal, ntotal)
         end
     end
     
-    local t = { ['year'] = 2013, ['month'] = 8, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
 
@@ -4786,7 +4797,7 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_05_24(player, ototal, ntotal)
     end
 
-    local t = { ['year'] = 2013, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 8, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
 
@@ -7388,7 +7399,7 @@ function sendRechargeRankAward(player, pos)
         end
     end
      
-    local t = { ['year'] = 2013, ['month'] = 8, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
@@ -7399,16 +7410,16 @@ function sendRechargeRankAward(player, pos)
     elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
         sendRechargeRankAward_2013_03_29(player, pos)
     elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
-        sendRechargeRankAward_2013_07_16(player, pos)
+        sendRechargeRankAward_2013_08_13(player, pos)
     elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
         sendRechargeRankAward_2013_04_18(player, pos)
     elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
         sendRechargeRankAward_2013_04_19(player, pos)
     elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
-        sendRechargeRankAward_2013_04_08(player, pos)
+        sendRechargeRankAward_2013_08_16(player, pos)
     end
 
-    local t = { ['year'] = 2013, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 8, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
 
@@ -9160,6 +9171,15 @@ function onAccRecharge_2013_08_03(player)
     sendAccRechargeAwards(player, awards)
 end
 
+function onAccRecharge_2013_08_17(player)
+    local awards = {
+        [1] = {0xA000,100,1},
+        [3] = {514,5,1, 501,3,1, 5005,1,1},
+        [5] = {9371,5,1, 5065,1,1, 0xA000,150,1},
+        [7] = {515,2,1, 5026,1,1},
+    }
+    sendAccRechargeAwards(player, awards)
+end
 
 function onRecharge(player, r)
     if getAccRecharge() then
@@ -9168,14 +9188,6 @@ function onRecharge(player, r)
             player:AddVar(174, 1);
             player:SetVar(173, 1)
          
-            local t = { ['year'] = 2013, ['month'] = 8, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-            local s = os.time(t)
-            local n = os.time() + 11
-
-            if n >= s and n < (s + 7*86400) then
-                onAccRecharge_2013_08_03(player)
-            end
-
             local t = { ['year'] = 2013, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
             local s = os.time(t)
             local n = os.time() + 11
@@ -9183,6 +9195,15 @@ function onRecharge(player, r)
             if n >= s and n < (s + 7*86400) then
                 onAccRecharge_2013_08_03(player)
             end
+
+            local t = { ['year'] = 2013, ['month'] = 8, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+            local s = os.time(t)
+            local n = os.time() + 11
+
+            if n >= s and n < (s + 7*86400) then
+                onAccRecharge_2013_08_17(player)
+            end
+
 
         end
     end
@@ -9228,3 +9249,52 @@ function onFishUserPackage(player, idx)
     end
     return true
 end
+
+function onCollectCardAct(player, idx)
+    if player == nil then
+        return false
+    end
+    local fashionId = {1700,1701,1702,1703,1704,1705,1706,1707,1709,1710,1711,1712}
+    local items = {
+        [1] = { {503, 4}, {515, 2}, {1325, 2}, {509, 2}, {9416,1} },
+        [2] = { {503, 2}, {515, 2}, {1325, 1}, {509, 1}, {9416,1} },
+        [3] = { {9088, 2}, {134, 2}, {509, 2}, {507, 2} },
+        [4] = { {515, 5}, {1325, 10}, {9076, 5}, {507, 5}, {fashionId[math.random(1,#fashionId)],1} },
+    }
+    local item = items[idx]
+    if item == nil then
+        return false
+    end
+    local package = player:GetPackage()
+    local reqGrids
+    if idx == 4 then
+        reqGrids = 1
+    else
+        reqGrids = #item
+    end
+    if package:GetRestPackageSize() < reqGrids then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+    if idx == 4 then
+        local cur = math.random(1,#item)
+        package:Add(item[cur][1], item[cur][2], true)
+    else
+        for _, val in pairs(item) do
+            package:Add(val[1], val[2], true)
+        end
+    end
+
+    if idx == 1 then
+        player:luaUdpLog("huodong", "F_130815_1", "act")
+    elseif idx == 2 then
+        player:luaUdpLog("huodong", "F_130815_4", "act")
+    elseif idx == 3 then
+        player:luaUdpLog("huodong", "F_130815_2", "act")
+    else
+        player:luaUdpLog("huodong", "F_130815_3", "act")
+    end
+
+    return true
+end
+

@@ -160,10 +160,12 @@ void WorldScript::init()
     def("getSnowAct", GObject::World::getSnowAct);
     def("setGoldSnakeAct", GObject::World::setGoldSnakeAct);
     def("getGoldSnakeAct", GObject::World::getGoldSnakeAct);
+    def("getCollectCardAct", GObject::World::getCollectCardAct);
     def("setHeroIslandAct", GObject::World::setHeroIslandAct);
     def("setDragonKingAct", GObject::World::setDragonKingAct);
     def("getDragonKingAct", GObject::World::getDragonKingAct);
     def("setSaveGoldAct", GObject::World::setSaveGoldAct);
+    def("setCollectCardAct", GObject::World::setCollectCardAct);
     
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);
@@ -236,6 +238,8 @@ void WorldScript::init()
 	def("setSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
     def("setFoolBao",GObject::World::setFoolBao);
     def("getFoolBao",GObject::World::getFoolBao);
+    def("setSummerFlow3Time",GObject::World::setSummerFlow3Time);
+    def("getSummerFlow3Time",GObject::World::getSummerFlow3Time);
     def("setHalfGold",GObject::World::setHalfGold);
     def("getHalfGold",GObject::World::getHalfGold);
 

@@ -184,6 +184,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_set_gvar51_52.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_friendkey.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_collect_card.sql
     #. clearshiyamen.sh
 }
 

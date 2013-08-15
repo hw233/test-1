@@ -408,6 +408,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setPfKey(pfkey);
             player->setXinYue(atoi(xinyue.c_str()));
             player->setJinQuan(jinquan);
+            player->SetSummerFlow3Value();
             player->SetSummerMeetValue();
             player->continuousLoginSummerFlow();
 #ifdef _FB
@@ -759,6 +760,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setVia(nu._via);
             pl->setXinYue(atoi(xinyue.c_str()));
             pl->setJinQuan(jinquan);
+            pl->SetSummerFlow3Value();
             pl->SetSummerMeetValue();
             pl->continuousLoginSummerFlow();
             if(cfg.merged)

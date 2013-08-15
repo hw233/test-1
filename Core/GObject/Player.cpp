@@ -111,6 +111,8 @@
 #define QQ_GAME_START_TIME  21*3600
 #define QQ_GAME_END_TIME    (21*3600+1800)
 
+#define CARD_ITEM_ID 9415
+
 namespace GObject
 {
     UInt32 Player::_recruit_cost = 20;
@@ -782,6 +784,9 @@ namespace GObject
         _inQQGroup = false;
 
         _loadMark = false;
+        memset(_partCnt, 0, sizeof(_partCnt));
+        memset(_alreadyCnt, 0, sizeof(_alreadyCnt));
+        memset(_alreadyload, 0, sizeof(_alreadyload));
 	}
 
 
@@ -1073,7 +1078,7 @@ namespace GObject
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-       // SetMemCach();
+        //SetMemCach();
        // continuousLoginSummerFlow();//修改
 
         sendYearRPInfo();
@@ -2197,7 +2202,6 @@ namespace GObject
 
 		UInt32 curtime = TimeUtil::Now();
         SetVar(VAR_OFFLINE, curtime);
-
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
 
@@ -6527,6 +6531,7 @@ namespace GObject
             return false;
 
         ++ _playerData.ctFinishCount;
+        getClan()->addMemberActivePoint(this, 1, e_clan_actpt_none);
         if(getClanTaskMax() > _playerData.ctFinishCount) {
             getClanTask();
         } else {
@@ -11265,9 +11270,24 @@ namespace GObject
             getQQXiuAward(opt);
             break;
         case 27:
-            if(opt ==1)
-                getAwardFromSurmmeFlowr();
-            sendSummerFlowInfo();
+            if (World::getSummerFlow())
+            { 
+                if(opt ==1)
+                    getAwardFromSurmmeFlowr();
+                sendSummerFlowInfo();
+            }
+            if(World::getSummerFlow3Time())
+            {
+                if(opt ==1 )
+                    getAwardFromSummerFlow3();
+                sendSummerFlow3LoginInfo();
+            } 
+        
+            break;
+        case 28:
+            if(opt)
+                getSummerFlow3OnlineAward(opt);
+            sendSummerFlow3TimeInfo();
             break;
         }
     }
@@ -11855,6 +11875,23 @@ namespace GObject
         {
             SetVar(VAR_SUMMERFLOW_AWARD, 1);
             SetVar(VAR_SUMMERFLOW_TYPE,0);
+            char str[16] = {0};
+            sprintf(str, "F_130722_%d", type);
+            udpLog("shuqihuiliu", str, "", "", "", "", "act");
+        }
+    } 
+    void Player::getAwardFromSummerFlow3()   //暑期回流3
+    {
+        if (!World::getSummerFlow3Time())
+            return;
+        UInt32 type = GetVar(VAR_SUMMERFLOW3_TYPE);
+        UInt32 Award = GetVar(VAR_SUMMERFLOW3_TYPE_AWARD);
+        if(type == 0||Award==1)
+            return ;
+        UInt8 succ = GameAction()->RunSummerFlowAward(this, type);
+        if(succ)
+        {
+            SetVar(VAR_SUMMERFLOW3_TYPE_AWARD, 1);
             char str[16] = {0};
             sprintf(str, "F_130722_%d", type);
             udpLog("shuqihuiliu", str, "", "", "", "", "act");
@@ -12802,6 +12839,25 @@ namespace GObject
         SetVar(VAR_SUMMER_MEET_LOGIN, SummerMeetLogin);
         sendSummerMeetInfo();
     }
+    void Player::SetSummerFlow3Value()
+    {
+        if(!World::getSummerFlow3Time())
+            return ;
+        UInt32 SummerMeetType  = GetVar(VAR_SUMMERFLOW3_TYPE);
+        if(!SummerMeetType)
+        {
+            std::string  openid = getOpenId();
+            char  key1[32] = "uid_asss_summerflow3_";
+            UInt32 type = GObject::dclogger.checkActiveOpenid(key1,(char*)openid.c_str());
+            if(type>0 && type < 5)
+            {
+                SetVar(VAR_SUMMERFLOW3_TYPE,type);
+            }
+            else 
+                return ;
+        }
+   
+    }
     void Player::sendQQBoardLoginInfo()
     {
         Stream st(REP::RC7DAY);  //协议
@@ -13163,7 +13219,29 @@ namespace GObject
         sprintf(str, "F_130801_%d", 11+val);
         udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
-
+    void Player::getSummerFlow3OnlineAward(UInt8 val)
+    {
+        if(!World::getSummerFlow3Time())
+            return ;
+        if(val<1 ||val > 4)
+            return;
+        UInt32 time[]={10*60,30*60,60*60,150*60};
+        UInt32 OnlineTime  = GetOnlineTimeToday();
+        if(OnlineTime < time[val-1])
+            return ;
+        UInt32 ctslandingAward = GetVar(VAR_SUMMERFLOW3_TIME_AWARD);
+        if(ctslandingAward & (1<<(val-1)))
+            return ;
+        if(!GameAction()->RunSummerFlow3OnlineAward(this, val))
+        {
+            return;
+        }
+        ctslandingAward |= (1<<(val - 1));
+        SetVar(VAR_SUMMERFLOW3_TIME_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130722_%d",10+val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
+    }
     void Player::getNewRC7DayRechargeAward(UInt8 val)
     {
         // 申请领取新注册七天充值奖励 (神龙许愿)
@@ -14421,8 +14499,8 @@ namespace GObject
     {
         initMemcache();
         char key[MEMCACHED_MAX_KEY] = {0};
-        char value[][32] ={"07","14","30","90","01","02","03"};
-        size_t len = snprintf(key, sizeof(key), "uid_asss_summermeet_9545942");
+        char value[][32] ={"07","14","30","90","01","02","03","04"};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_summerflow3_9545942");
         size_t vlen = strlen(value[6]);
         MemcachedSet(key, len, value[6], vlen, 0);
     }
@@ -14579,7 +14657,39 @@ namespace GObject
         st << static_cast<UInt8>(SummerMeetTypeAward);
         st << Stream::eos;
         send(st);
-        
+    
+    }
+    void Player::sendSummerFlow3TimeInfo()
+    {
+        if (!World::getSummerFlow3Time())
+              return;
+        UInt32 SummerMeetType = GetVar(VAR_SUMMERFLOW3_TYPE);
+        if(SummerMeetType < 1 ||SummerMeetType > 4 )
+            return ;
+        UInt32 SummerFlow3Time = GetOnlineTimeToday();
+        //std::cout<<SummerFlow3Time<<std::endl;
+        UInt32 SummerFlow3TimeAward = GetVar(VAR_SUMMERFLOW3_TIME_AWARD);
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(28);
+        st << SummerFlow3Time;
+        st << static_cast<UInt8>(SummerFlow3TimeAward);
+        st << Stream::eos;
+        send(st);
+    }
+    void Player::sendSummerFlow3LoginInfo()
+    {
+        if (!World::getSummerFlow3Time())
+              return;
+        UInt32 SummerMeetType = GetVar(VAR_SUMMERFLOW3_TYPE);
+        if(SummerMeetType < 1 ||SummerMeetType > 4 )
+            return ;
+        UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMERFLOW3_TYPE_AWARD);
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(27);
+        st << static_cast<UInt8>(SummerMeetTypeAward);
+        st << static_cast<UInt8>(SummerMeetType);
+        st << Stream::eos;
+        send(st);
     }
     
     void Player::sendRC7DayInfo(UInt32 now)
@@ -22925,6 +23035,189 @@ void Player::setSysUpDateDlg(UInt32 v)
 UInt32 Player::getSysUpDateDlg()
 {
     return GetVar(VAR_SYS_UPDATE_DLG);
+}
+
+void Player::sendCollectCard(UInt8 fighterIndex)
+{
+    if(fighterIndex == 0 || fighterIndex > 8)
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x0E);
+    st << GetVar(VAR_POOL_CNT);
+    st << fighterIndex;
+    for(UInt8 i = 0; i < 9; i++)
+        st << _partCnt[fighterIndex - 1][i];
+    st << _alreadyCnt[fighterIndex - 1];
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::sendAllCollectCard()
+{
+    for(UInt8 i = 1; i <= 8; i++)
+        sendCollectCard(i);
+}
+
+void Player::useCollectCard(UInt8 fighterIndex)
+{
+    if(fighterIndex == 0 || fighterIndex > 8)
+        return;
+    if(GetPackage()->GetItemAnyNum(CARD_ITEM_ID) < 1)
+        return;
+    GetPackage()->DelItemAny(CARD_ITEM_ID, 1);
+    UInt8 pos = uRand(9);
+    _partCnt[fighterIndex - 1][pos] += 1;
+
+    char columnName[64];
+    sprintf(columnName, "partCnt%u", pos + 1);
+    insertCollectCardDB(fighterIndex);
+    DB5().PushUpdateData("UPDATE `collect_card` SET `%s` = %u WHERE `playerId` = %" I64_FMT "u AND `id` = %u", columnName, _partCnt[fighterIndex - 1][pos], getId(), fighterIndex);
+
+    sendCollectCard(fighterIndex);
+}
+
+void Player::putCollectCardPool(UInt8 fighterIndex, UInt8 partPos, UInt16 partCnt)
+{
+    if(fighterIndex == 0 || fighterIndex > 8)
+        return;
+    if(partPos == 0 || partPos > 9)
+        return;
+    if(_partCnt[fighterIndex - 1][partPos - 1] < partCnt)
+        return;
+    _partCnt[fighterIndex - 1][partPos - 1] -= partCnt;
+    AddVar(VAR_POOL_CNT, partCnt);
+
+    char columnName[64];
+    sprintf(columnName, "partCnt%u", partPos);
+    insertCollectCardDB(fighterIndex);
+    DB5().PushUpdateData("UPDATE `collect_card` SET `%s` = %u WHERE `playerId` = %" I64_FMT "u AND `id` = %u", columnName, _partCnt[fighterIndex - 1][partPos - 1], getId(), fighterIndex);
+
+    sendCollectCard(fighterIndex);
+}
+
+void Player::convertCollectCard()
+{
+    UInt32 poolCnt = GetVar(VAR_POOL_CNT);
+    if(poolCnt < 2)
+        return;
+    UInt32 itemCnt = poolCnt / 2;
+    poolCnt -= itemCnt * 2;
+    SetVar(VAR_POOL_CNT, poolCnt);
+    GetPackage()->AddItem(CARD_ITEM_ID, itemCnt, true, false, FromCollectCard);
+}
+
+void Player::autoUseCollectCard(UInt32 cardNum)
+{
+    if(GetPackage()->GetItemAnyNum(CARD_ITEM_ID) < cardNum)
+        return;
+    UInt8 fighterIndex = 1;
+    UInt16 minValue = 0xFFFF;
+    for(UInt8 i = 0; i < 8; i++)
+    {
+        if(_alreadyCnt[i] < minValue)
+        {
+            minValue = _alreadyCnt[i];
+            fighterIndex = i + 1;
+        }
+    }
+
+    UInt32 count = 0;
+    for(; count < cardNum; count++)
+    {
+        bool bFull = true;
+        for(UInt8 i = 0; i < 9; i++)
+        {
+            if(_partCnt[fighterIndex - 1][i] == 0)
+            {
+                bFull = false;
+                break;
+            }
+        }
+        if(bFull)
+            break;
+        useCollectCard(fighterIndex);
+    }
+    //GetPackage()->DelItemAny(CARD_ITEM_ID, count);
+    //sendCollectCard(fighterIndex);
+}
+
+void Player::getCollectCardAward(UInt8 id)
+{
+    if(id == 0 || id > 8)
+        return;
+    UInt8 k = id - 1;
+    for(UInt8 i = 0; i < 9; i++)
+    {
+        if(_partCnt[k][i] == 0)
+            return;
+    }
+    bool bRet;
+    if(_alreadyCnt[k] == 0)
+        bRet = GameAction()->onCollectCardAct(this, 1);
+    else
+        bRet = GameAction()->onCollectCardAct(this, 2);
+    if(!bRet)
+        return;
+
+    UInt8 alreadyFighterCnt = 1;
+    if(_alreadyCnt[k] == 0)
+    {
+        for(UInt8 i = 0; i < 8; i++)
+        {
+            if(_alreadyCnt[i] > 0)
+                ++alreadyFighterCnt;
+        }
+    }
+
+    for(UInt8 i = 0; i < 9; i++)
+        _partCnt[k][i] -= 1;
+    _alreadyCnt[k] += 1;
+
+    insertCollectCardDB(id);
+    DB5().PushUpdateData("UPDATE `collect_card` SET `partCnt1` = %u, `partCnt2` = %u, `partCnt3` = %u, `partCnt4` = %u, `partCnt5` = %u, `partCnt6` = %u, `partCnt7` = %u, `partCnt8` = %u, `partCnt9` = %u, `alreadyCnt` = %u WHERE `playerId` = %" I64_FMT "u AND `id` = %u", _partCnt[k][0], _partCnt[k][1], _partCnt[k][2], _partCnt[k][3], _partCnt[k][4], _partCnt[k][5], _partCnt[k][6], _partCnt[k][7], _partCnt[k][8],  _alreadyCnt[k], getId(), id);
+
+    sendCollectCard(id);
+
+    if(alreadyFighterCnt == 3)
+        GameAction()->onCollectCardAct(this, 3);
+    else if(alreadyFighterCnt == 8)
+        GameAction()->onCollectCardAct(this, 4);
+}
+
+void Player::loadCollectCard(UInt8 id, UInt16 partCnt1, UInt16 partCnt2, UInt16 partCnt3, UInt16 partCnt4, UInt16 partCnt5, UInt16 partCnt6, UInt16 partCnt7, UInt16 partCnt8, UInt16 partCnt9, UInt16 alreadyCnt)
+{
+    UInt8 index = id - 1;
+    _partCnt[index][0] = partCnt1;
+    _partCnt[index][1] = partCnt2;
+    _partCnt[index][2] = partCnt3;
+    _partCnt[index][3] = partCnt4;
+    _partCnt[index][4] = partCnt5;
+    _partCnt[index][5] = partCnt6;
+    _partCnt[index][6] = partCnt7;
+    _partCnt[index][7] = partCnt8;
+    _partCnt[index][8] = partCnt9;
+    _alreadyCnt[index] = alreadyCnt;
+    _alreadyload[index] = 1;
+}
+
+void Player::insertCollectCardDB(UInt8 id)
+{
+    if(id == 0 || id > 8)
+        return;
+    if(_alreadyload[id - 1] == 0)
+    {
+        DB5().PushUpdateData("INSERT INTO `collect_card` (`playerId`, `id`, `partCnt1`, `partCnt2`, `partCnt3`, `partCnt4`, `partCnt5`, `partCnt6`, `partCnt7`, `partCnt8`, `partCnt9`, `alreadyCnt`) VALUES(%" I64_FMT "u, %u, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)", getId(), id);
+        _alreadyload[id - 1] = 1;
+    }
+}
+
+void Player::addCardFromClanBattle()
+{
+    if(GetVar(VAR_CARD_FROM_CLAN) == 0)
+    {
+        SetVar(VAR_CARD_FROM_CLAN, 1);
+        GetPackage()->AddItem(CARD_ITEM_ID, 1, true, false, 0);
+    }
 }
 
 } // namespace GObject

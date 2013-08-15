@@ -800,6 +800,34 @@ function RunSummerFlowAward(player, idx)
     end
     return 1
 end
+function RunSummerFlow3OnlineAward(player, idx)
+    if nil == player or nil == idx then
+        return 0
+    end
+    if 1 ~= idx and 2 ~= idx and 3 ~= idx and 4 ~= idx then
+        return 0
+    end
+    local item = {
+        [1] = {{499,20}},
+        [2] = {{503,3 }},
+        [3] = {{8000,5}},
+        [4] = {{1126,5}},
+    };
+    local award = item[idx]
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #award then
+        player:sendMsgCode(2, 1011, 0)
+        return 0
+    end
+    for _, val in pairs(award) do 
+        if val[1] == 499 then
+            player:getCoupon(val[2])
+        else
+            package:Add(val[1], val[2], true, false, 31)
+        end
+    end
+    return 1
+end
 function RunSummerMeetAward(player, idx)
     if nil == player or nil == idx then
         return 0

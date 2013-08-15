@@ -267,6 +267,7 @@ namespace Script
         bool  RunLuckyMeetRechargeAward(Player* player, UInt8 val);
         bool  RunSummerMeetRechargeAward(Player* player, UInt8 val);
         bool  RunLuckyMeetStrengthAward(Player* player, UInt8 val);
+        bool  RunSummerFlow3OnlineAward(Player* player, UInt8 val);
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         UInt8 RunNewRC7DayTargetAward(Player* player);
         UInt8 RunBlueDiamondAward(Player* player, UInt8 opt);
@@ -384,6 +385,7 @@ namespace Script
         UInt8 onVipLevelAward(Player* player, UInt8 opt);
         bool onFishUserPackage(Player* player, UInt8 idx);
         Table GetNewHeroIslandBuffs();
+        bool onCollectCardAct(Player* player, UInt8 idx);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

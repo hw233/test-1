@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "Common/Stream.h"
 #include "ClanCityBattle.h"
+#include "CountryBattle.h"
 #include "Clan.h"
 #include "Player.h"
 #include "Script/GameActionLua.h"
@@ -1442,6 +1443,9 @@ void ClanCity::prepare()
 {
     if(!isOpen())
         return;
+
+	if(globalCountryBattle.getPrepareTime() != 0)
+        globalCountryBattle.end();
 
     UInt32 now = TimeUtil::Now();
     m_expTime = 0;

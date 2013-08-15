@@ -829,7 +829,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+125*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+132*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -896,6 +896,12 @@ function onActivityCheck(tm)
           setSummerMeet(false)
       end
 
+      if tm >= actTime250 and tm < actTime250_1 then
+         setSummerFlow3Time(true)
+      else
+         setSummerFlow3Time(false)
+      end
+
       if tm >= actTime551 and tm < actTime551_1 then
           setCompassAct(true)
       else
@@ -908,6 +914,7 @@ function onActivityCheck(tm)
           setFoolBao(false)
       end
       
+
       if tm >= actTime555 and tm < actTime555_1 then
           setHalfGold(true)
       else
@@ -1121,7 +1128,7 @@ function onActivityCheck(tm)
       setGoldSnakeAct(false)
   end
 
-  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 91*86400) then
+  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 98*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1134,6 +1141,12 @@ function onActivityCheck(tm)
       setHeroIslandAct(false)
   end
   --]]
+
+  if tm >= actTime250 and tm < actTime250_1 then
+      setCollectCardAct(true)
+  else
+      setCollectCardAct(false)
+  end
 
   setRC7Day(true)
   setCFriend(true);
@@ -1407,12 +1420,18 @@ function initActTime(y, m, d)
   local  SerStartTm249= { ['year'] = 2013, ['month'] = 8, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm249_1= { ['year'] = 2013, ['month'] = 8, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  local  SerStartTm251= { ['year'] = 2013, ['month'] = 8, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm251_1= { ['year'] = 2013, ['month'] = 8, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
     --日月合璧活动
   local  SerStartTmRYHB= { ['year'] = 2013, ['month'] = 6, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTmRYHB_1= { ['year'] = 2013, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  --卡片碎片集齐
+  local  SerStartTm250= { ['year'] = 2013, ['month'] = 8, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1844,6 +1863,11 @@ function initActTime(y, m, d)
 
   actTime249= os.time(SerStartTm249)
   actTime249_1= os.time(SerStartTm249_1);
+
+  actTime250= os.time(SerStartTm250)
+  actTime250_1= os.time(SerStartTm250) + 30*86400;
+  actTime251= os.time(SerStartTm251)
+  actTime251_1= os.time(SerStartTm251_1);
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);
