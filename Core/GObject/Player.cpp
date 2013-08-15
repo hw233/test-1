@@ -6532,6 +6532,7 @@ namespace GObject
             return false;
 
         ++ _playerData.ctFinishCount;
+        getClan()->addMemberActivePoint(this, 1, e_clan_actpt_none);
         if(getClanTaskMax() > _playerData.ctFinishCount) {
             getClanTask();
         } else {
