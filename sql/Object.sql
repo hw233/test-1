@@ -2072,8 +2072,8 @@ CREATE TABLE IF NOT EXISTS `tempItem` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `collect_card`;
-CREATE TABLE `collect_card` (                       
-    `playerId` bigint(20) unsigned NOT NULL,  
+CREATE TABLE `collect_card` (
+    `playerId` bigint(20) unsigned NOT NULL,
     `id` tinyint(3) unsigned NOT NULL,
     `partCnt1` smallint(6) unsigned NOT NULL,
     `partCnt2` smallint(6) unsigned NOT NULL,

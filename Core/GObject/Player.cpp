@@ -23014,7 +23014,6 @@ void Player::autoUseCollectCard(UInt32 cardNum)
     UInt32 count = 0;
     for(; count < cardNum; count++)
     {
-        useCollectCard(fighterIndex);
         bool bFull = true;
         for(UInt8 i = 0; i < 9; i++)
         {
@@ -23026,6 +23025,7 @@ void Player::autoUseCollectCard(UInt32 cardNum)
         }
         if(bFull)
             break;
+        useCollectCard(fighterIndex);
     }
     //GetPackage()->DelItemAny(CARD_ITEM_ID, count);
     //sendCollectCard(fighterIndex);
@@ -23095,7 +23095,19 @@ void Player::insertCollectCardDB(UInt8 id)
     if(id == 0 || id > 8)
         return;
     if(_alreadyload[id - 1] == 0)
+    {
         DB5().PushUpdateData("INSERT INTO `collect_card` (`playerId`, `id`, `partCnt1`, `partCnt2`, `partCnt3`, `partCnt4`, `partCnt5`, `partCnt6`, `partCnt7`, `partCnt8`, `partCnt9`, `alreadyCnt`) VALUES(%" I64_FMT "u, %u, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)", getId(), id);
+        _alreadyload[id - 1] = 1;
+    }
+}
+
+void Player::addCardFromClanBattle()
+{
+    if(GetVar(VAR_CARD_FROM_CLAN) == 0)
+    {
+        SetVar(VAR_CARD_FROM_CLAN, 1);
+        GetPackage()->AddItem(CARD_ITEM_ID, 1, true, false, 0);
+    }
 }
 
 } // namespace GObject

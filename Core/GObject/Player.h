@@ -2505,6 +2505,7 @@ namespace GObject
         void getCollectCardAward(UInt8 id);
         void loadCollectCard(UInt8 id, UInt16 partCnt1, UInt16 partCnt2, UInt16 partCnt3, UInt16 partCnt4, UInt16 partCnt5, UInt16 partCnt6, UInt16 partCnt7, UInt16 partCnt8, UInt16 partCnt9, UInt16 alreadyCnt);
         void insertCollectCardDB(UInt8 id);
+        void addCardFromClanBattle();
     private:
         UInt16 _partCnt[8][9];
         UInt16 _alreadyCnt[8];

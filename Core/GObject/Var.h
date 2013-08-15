@@ -400,7 +400,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_LAST_HOOK_TYPE = 411, //最后挂机类型
         VAR_SPREAD_FLAG = 413, //低第1bit表示是否使用落英秘典,低第2bit表示是否已领取
         VAR_SKILL_UP_FLAG = 414, //FB占用
-        VAR_POOL_CNT = 414, //卡片碎片池数
+        VAR_POOL_CNT = 415, //卡片碎片池数
+        VAR_CARD_FROM_CLAN = 416, //是否领取来自帮派战的卡片
         //421-430 for suntao
         VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对)
         VAR_FOOLS_DAY_TIME  = 422,  //愚公移山答题开始时间
@@ -928,6 +929,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_SPREAD_FLAG, CYCLE_DAY);
             REGISTER_VAR(VAR_SKILL_UP_FLAG, CYCLE_NONE);
             REGISTER_VAR(VAR_POOL_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_CARD_FROM_CLAN, CYCLE_DAY);
 
             REGISTER_VAR(VAR_FOOLS_DAY_INFO, CYCLE_DAY);
             REGISTER_VAR(VAR_FOOLS_DAY_TIME, CYCLE_DAY);
