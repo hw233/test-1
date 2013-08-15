@@ -22973,7 +22973,7 @@ void Player::putCollectCardPool(UInt8 fighterIndex, UInt8 partPos, UInt16 partCn
         return;
     if(partPos == 0 || partPos > 9)
         return;
-    if(_partCnt[fighterIndex - 1][partPos - 1] > partCnt)
+    if(_partCnt[fighterIndex - 1][partPos - 1] < partCnt)
         return;
     _partCnt[fighterIndex - 1][partPos - 1] -= partCnt;
     AddVar(VAR_POOL_CNT, partCnt);

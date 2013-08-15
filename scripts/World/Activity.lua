@@ -1135,11 +1135,11 @@ function onActivityCheck(tm)
   end
   --]]
 
-  --if tm >= actTime250 and tm < actTime250_1 then
+  if tm >= actTime250 and tm < actTime250_1 then
       setCollectCardAct(true)
-  --else
-  --    setCollectCardAct(false)
-  --end
+  else
+      setCollectCardAct(false)
+  end
 
   setRC7Day(true)
   setCFriend(true);
