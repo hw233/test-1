@@ -1075,7 +1075,7 @@ namespace GObject
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-       // SetMemCach();
+        SetMemCach();
        // continuousLoginSummerFlow();//修改
 
         sendYearRPInfo();
@@ -1335,6 +1335,7 @@ namespace GObject
         dclogger.login(this);
         dclogger.login_sec(this);
         dclogger.checkOpenId(this);
+        dclogger.checkYB(this);   //LB添加
 
         EventAutoRefreshOpenKey* event = new(std::nothrow) EventAutoRefreshOpenKey(this, 60 * 110, 24);
         if (event)
@@ -12798,7 +12799,7 @@ namespace GObject
             if(type>0 && type < 4)
             {
                 SetVar(VAR_SUMMER_MEET_TYPE,type);
-                SetVar(VAR_SUMMERFLOW_AWARD,1);
+    //            SetVar(VAR_SUMMERFLOW_AWARD,1);
             }
             else 
                 return ;
@@ -14436,10 +14437,10 @@ namespace GObject
     {
         initMemcache();
         char key[MEMCACHED_MAX_KEY] = {0};
-        char value[][32] ={"07","14","30","90","01","02","03"};
-        size_t len = snprintf(key, sizeof(key), "uid_asss_summermeet_9545942");
-        size_t vlen = strlen(value[6]);
-        MemcachedSet(key, len, value[6], vlen, 0);
+        char value[][32] ={"07","14","30","90","01","02","03","79857760"};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_9545942");
+        size_t vlen = strlen(value[7]);
+        MemcachedSet(key, len, value[7], vlen, 0);
     }
     void Player::continuousLoginSummerFlow()
     {

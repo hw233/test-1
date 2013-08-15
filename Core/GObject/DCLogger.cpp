@@ -914,6 +914,21 @@ bool DCLogger::d3d6(Player* player)
 #endif
     return true;
 }
+bool DCLogger::checkYB(Player* player)
+{
+    if (!cfg.dclog)
+        return true;
+    std::ostringstream msg;
+    msg<<player->getOpenId();
+#ifndef _FB
+#ifndef _VT
+#ifndef _WIN32
+    DC().PushCheckOpenId(player->getId(), msg.str().c_str(), msg.str().length());
+#endif
+#endif
+#endif
+    return true;
+}
 
 UInt8 DCLogger::getDomain_sec(Player* player)
 {
@@ -998,10 +1013,6 @@ UInt8 DCLogger::checkGRPOpenid(char* openid)
 UInt8 DCLogger::checkActiveOpenid(char * key1,char* openid)
 {
     return DC().CheckActiveOpenid(key1,openid);
-}
-UInt8 DCLogger::checkYBLevel(UInt64 playerId ,UInt32 viplev)
-{
-    return DC().CheckYBLevel(playerId,viplev);
 }
 DCLogger dclogger;
 
