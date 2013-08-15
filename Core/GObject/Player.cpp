@@ -1073,7 +1073,7 @@ namespace GObject
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-       // SetMemCach();
+        //SetMemCach();
        // continuousLoginSummerFlow();//修改
 
         sendYearRPInfo();
@@ -2197,11 +2197,6 @@ namespace GObject
 
 		UInt32 curtime = TimeUtil::Now();
         SetVar(VAR_OFFLINE, curtime);
-
-        if(World::getSummerFlow3Time() && GetVar(VAR_SUMMERFLOW3_TYPE))
-        {
-            AddVar(VAR_SUMMERFLOW3_TIME,curtime - _playerData.lastOnline);
-        }
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
 
@@ -11269,9 +11264,24 @@ namespace GObject
             getQQXiuAward(opt);
             break;
         case 27:
-            if(opt ==1)
-                getAwardFromSurmmeFlowr();
-            sendSummerFlowInfo();
+            if (World::getSummerFlow())
+            { 
+                if(opt ==1)
+                    getAwardFromSurmmeFlowr();
+                sendSummerFlowInfo();
+            }
+            if(World::getSummerFlow3Time())
+            {
+                if(opt ==1 )
+                    getAwardFromSummerFlow3();
+                sendSummerFlow3LoginInfo();
+            } 
+        
+            break;
+        case 28:
+            if(opt)
+                getSummerFlow3OnlineAward(opt);
+            sendSummerFlow3TimeInfo();
             break;
         }
     }
@@ -11864,7 +11874,7 @@ namespace GObject
             udpLog("shuqihuiliu", str, "", "", "", "", "act");
         }
     } 
-    void Player::getAwardFromSurmmeFlow3()   //暑期回流3
+    void Player::getAwardFromSummerFlow3()   //暑期回流3
     {
         if (!World::getSummerFlow3Time())
             return;
@@ -13207,9 +13217,15 @@ namespace GObject
     {
         if(!World::getSummerFlow3Time())
             return ;
-        UInt32 ctslandingAward = GetVar(VAR_SUMMERFLOW3_TIME_AWARD);
-        if (val == 0 ||val >4 )
+        if(val<1 ||val > 4)
             return;
+        UInt32 time[]={10*60,30*60,60*60,150*60};
+        UInt32 OnlineTime  = GetOnlineTimeToday();
+        if(OnlineTime < time[val-1])
+            return ;
+        UInt32 ctslandingAward = GetVar(VAR_SUMMERFLOW3_TIME_AWARD);
+        if(ctslandingAward & (1<<(val-1)))
+            return ;
         if(!GameAction()->RunSummerFlow3OnlineAward(this, val))
         {
             return;
@@ -13217,10 +13233,9 @@ namespace GObject
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_SUMMERFLOW3_TIME_AWARD, ctslandingAward);
         char str[16] = {0};
-        sprintf(str, "F_130801_%d",4+val);
+        sprintf(str, "F_130722_%d",10+val);
         udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
-
     void Player::getNewRC7DayRechargeAward(UInt8 val)
     {
         // 申请领取新注册七天充值奖励 (神龙许愿)
@@ -14645,10 +14660,11 @@ namespace GObject
         UInt32 SummerMeetType = GetVar(VAR_SUMMERFLOW3_TYPE);
         if(SummerMeetType < 1 ||SummerMeetType > 4 )
             return ;
-        UInt32 SummerFlow3Time = GetVar(VAR_SUMMERFLOW3_TIME) + now - _playerData.lastOnline;
+        UInt32 SummerFlow3Time = GetOnlineTimeToday();
+        //std::cout<<SummerFlow3Time<<std::endl;
         UInt32 SummerFlow3TimeAward = GetVar(VAR_SUMMERFLOW3_TIME_AWARD);
-        Stream st(REP::RC7DAY);  //协议
-        st << static_cast<UInt8>(20);
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(28);
         st << SummerFlow3Time;
         st << static_cast<UInt8>(SummerFlow3TimeAward);
         st << Stream::eos;
@@ -14662,10 +14678,10 @@ namespace GObject
         if(SummerMeetType < 1 ||SummerMeetType > 4 )
             return ;
         UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMERFLOW3_TYPE_AWARD);
-        Stream st(REP::RC7DAY);  //协议
-        st << static_cast<UInt8>(19);
-        st << static_cast<UInt8>(SummerMeetType);
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(27);
         st << static_cast<UInt8>(SummerMeetTypeAward);
+        st << static_cast<UInt8>(SummerMeetType);
         st << Stream::eos;
         send(st);
     }

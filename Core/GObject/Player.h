@@ -2103,7 +2103,7 @@ namespace GObject
         void getAward(UInt8 type, UInt8 opt);
         void getSSDTAward(UInt8 opt);
         void getAwardFromSurmmeFlowr();
-        void getAwardFromSurmmeFlow3();
+        void getAwardFromSummerFlow3();
         void getAwardFromSummerMeet();
         void sendSSDTInfo();
         void getHappyAward(UInt8 opt);

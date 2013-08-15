@@ -674,7 +674,9 @@ public:
     inline static void setSummerFlow3Time(bool v)
     { _summerFlow3 = v; }
     inline static bool getSummerFlow3Time()
-    { return _summerFlow3; } 
+    {
+        return _summerFlow3;
+    } 
 
     inline static void setSurnameLegend(bool v)
     {
