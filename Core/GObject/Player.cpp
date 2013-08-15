@@ -5095,11 +5095,6 @@ namespace GObject
         UInt32 proffer = clan->getMemberProffer(this);
 		SYSMSG_SENDV(166, this, c);
 		SYSMSG_SENDV(1066, this, c);
-        {
-            Stream st(REP::CLAN_INFO_UPDATE);
-            st << static_cast<UInt8>(5) << proffer << Stream::eos;
-            send(st);
-        }
 
         if(ii && ii->incommingType != 0)
         {
@@ -5133,11 +5128,6 @@ namespace GObject
         }
         SYSMSG_SENDV(165, this, a);
         SYSMSG_SENDV(1065, this, a);
-        {
-            Stream st(REP::CLAN_INFO_UPDATE);
-            st << static_cast<UInt8>(5) << proffer << Stream::eos;
-            send(st);
-        }
 
         return proffer;
     }

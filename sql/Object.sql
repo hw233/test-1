@@ -733,8 +733,8 @@ CREATE TABLE `friend` (
   `id` bigint(20) unsigned NOT NULL,
   `type` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `friendId` bigint(20) unsigned NOT NULL,
-  UNIQUE KEY `id_friendId` (`id`,`friendId`),
-  KEY `id` (`id`)
+  UNIQUE KEY `id_type_friendId` (`id`,`type`,`friendId`),
+  KEY `id` (`id`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
