@@ -225,7 +225,7 @@ struct ClanSpiritTree
     UInt8 m_refreshTimes;
     UInt8 m_color;
 
-    ClanSpiritTree(): m_exp(0), m_level(1), m_endTime(0), m_refreshTimes(0), m_color(0) {}
+    ClanSpiritTree(): m_exp(0), m_level(0), m_endTime(0), m_refreshTimes(0), m_color(0) {}
 };
 
 enum CLAN_ACTPT_FLAG
@@ -761,6 +761,7 @@ public:
     void writeSptrToDB();
     void loadSptrFromDB(UInt32 exp, UInt8 lvl, UInt32 endtime, UInt8 times, UInt8 color);
 
+    void addMemberActivePoint_nolock(Player* pl, UInt32 actpt, CLAN_ACTPT_FLAG f);
     void addMemberActivePoint(Player* pl, UInt32 actpt, CLAN_ACTPT_FLAG f);
     UInt32 getMemberActivePoint(Player* pl);
     void checkMemberActivePoint(ClanMember* mem);
