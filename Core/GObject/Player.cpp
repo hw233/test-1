@@ -23001,10 +23001,10 @@ void Player::autoUseCollectCard(UInt32 cardNum)
     if(GetPackage()->GetItemAnyNum(CARD_ITEM_ID) < cardNum)
         return;
     UInt8 fighterIndex = 1;
-    UInt16 minValue = 0;
+    UInt16 minValue = 0xFFFF;
     for(UInt8 i = 0; i < 8; i++)
     {
-        if(_alreadyCnt[i] > minValue)
+        if(_alreadyCnt[i] < minValue)
         {
             minValue = _alreadyCnt[i];
             fighterIndex = i + 1;
@@ -23018,7 +23018,7 @@ void Player::autoUseCollectCard(UInt32 cardNum)
         bool bFull = true;
         for(UInt8 i = 0; i < 9; i++)
         {
-            if(_partCnt[i] == 0)
+            if(_partCnt[fighterIndex - 1][i] == 0)
             {
                 bFull = false;
                 break;
