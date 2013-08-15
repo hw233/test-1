@@ -128,6 +128,10 @@ void MoFang::addTuzhi(UInt32 tuzhiId)
     if(!m_owner)
         return;
 
+    GData::JiguanData::tuzhiInfo * tzInfo = GData::jiguanData.getTuzhiInfo(tuzhiId);
+    if(!tzInfo)
+        return;
+
     UInt32 tempId= 0;
     std::map<UInt32, UInt8>::iterator iter = m_tuzhi.begin();
     for(; iter != m_tuzhi.end(); iter++)
@@ -152,6 +156,13 @@ void MoFang::addTuzhi(UInt32 tuzhiId)
     st << tuzhiId;
     st << Stream::eos;
     m_owner->send(st);
+}
+
+void MoFang::addJGSExp(UInt32 exp)
+{
+    m_jiguanshu.curExp += exp;
+
+    upgradeJGS();
 }
 
 void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)

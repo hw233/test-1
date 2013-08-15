@@ -279,6 +279,7 @@ GMHandler::GMHandler()
     Reg(2, "getmc", &GMHandler::OnGetMax);
     Reg(2, "setmc", &GMHandler::OnSetMax);
     Reg(2, "addtz", &GMHandler::OnAddtz);
+    Reg(2, "addJGSExp", &GMHandler::OnAddJGSExp);
 
 }
 
@@ -371,6 +372,21 @@ void GMHandler::OnAddtz(GObject::Player * player, std::vector<std::string>& args
             return;
 
         player->GetMoFang()->addTuzhi(tuzhiId);
+	}
+}
+
+void GMHandler::OnAddJGSExp(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	if(args.size() == 1)
+	{
+		UInt32 exp = atoi(args[0].c_str());
+
+        if(exp == 0)
+            return;
+
+        player->GetMoFang()->addJGSExp(exp);
 	}
 }
 

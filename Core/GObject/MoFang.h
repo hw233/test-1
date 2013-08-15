@@ -62,8 +62,9 @@ namespace GObject
         void AddJGYFromDB(DBJiguanyu &);
         void AddTuzhiFromDB(DBTuzhi &);
 
+        void addJGSExp(UInt32 exp);
         void addTuzhi(UInt32 tuzhiId);
-        void makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark);                         // 制造机关
+        void makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark);                        // 制造机关
         void equipJG(UInt32 jgId, UInt8 pos, UInt8 mark);                               // 装备机关
         bool checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &);      // 检测是否能够装备
         void addJGYAttr(GData::AttrExtra& ae);                                          // 添加机关玉属性
