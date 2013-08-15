@@ -4474,7 +4474,7 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
 
 void Clan::refreshColorAward()
 {
-    const UInt8 level_limit[3] = {3, 6, 9};
+    const UInt8 level_limit[3] = {2, 5, 8};
     const UInt16 rates[3][5] = {
         // 初始次数，小于初始次数的概率， 大于初始次数之后的递增次数， 大于于初始次数的初始概率, 大于初始次数递增后的递增概率
         {5, 1, 1, 3000, 2000},
