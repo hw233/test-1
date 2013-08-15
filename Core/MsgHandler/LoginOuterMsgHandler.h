@@ -408,6 +408,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setPfKey(pfkey);
             player->setXinYue(atoi(xinyue.c_str()));
             player->setJinQuan(jinquan);
+            player->SetSummerFlow3Value();
             player->SetSummerMeetValue();
             player->continuousLoginSummerFlow();
 #ifdef _FB
@@ -759,6 +760,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setVia(nu._via);
             pl->setXinYue(atoi(xinyue.c_str()));
             pl->setJinQuan(jinquan);
+            pl->SetSummerFlow3Value();
             pl->SetSummerMeetValue();
             pl->continuousLoginSummerFlow();
             if(cfg.merged)
@@ -1047,9 +1049,9 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 515,    2,
                 509,    2,
                 15,     8,
-                549,    2,
-                503,    5,
-                500,    5
+                1126,   5,
+                1325,   5,
+                134,    5
             };
 
             UInt8 idx = 0;
@@ -1079,7 +1081,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 10)
+                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 5)
                         purchase.code = 2;
 
                     purchase.id = id;

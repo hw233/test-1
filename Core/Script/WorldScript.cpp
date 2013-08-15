@@ -238,6 +238,8 @@ void WorldScript::init()
 	def("setSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
     def("setFoolBao",GObject::World::setFoolBao);
     def("getFoolBao",GObject::World::getFoolBao);
+    def("setSummerFlow3Time",GObject::World::setSummerFlow3Time);
+    def("getSummerFlow3Time",GObject::World::getSummerFlow3Time);
     def("setHalfGold",GObject::World::setHalfGold);
     def("getHalfGold",GObject::World::getHalfGold);
 

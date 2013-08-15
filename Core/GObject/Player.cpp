@@ -1078,7 +1078,7 @@ namespace GObject
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-       // SetMemCach();
+        //SetMemCach();
        // continuousLoginSummerFlow();//修改
 
         sendYearRPInfo();
@@ -2202,7 +2202,6 @@ namespace GObject
 
 		UInt32 curtime = TimeUtil::Now();
         SetVar(VAR_OFFLINE, curtime);
-
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
 
@@ -11271,9 +11270,24 @@ namespace GObject
             getQQXiuAward(opt);
             break;
         case 27:
-            if(opt ==1)
-                getAwardFromSurmmeFlowr();
-            sendSummerFlowInfo();
+            if (World::getSummerFlow())
+            { 
+                if(opt ==1)
+                    getAwardFromSurmmeFlowr();
+                sendSummerFlowInfo();
+            }
+            if(World::getSummerFlow3Time())
+            {
+                if(opt ==1 )
+                    getAwardFromSummerFlow3();
+                sendSummerFlow3LoginInfo();
+            } 
+        
+            break;
+        case 28:
+            if(opt)
+                getSummerFlow3OnlineAward(opt);
+            sendSummerFlow3TimeInfo();
             break;
         }
     }
@@ -11861,6 +11875,23 @@ namespace GObject
         {
             SetVar(VAR_SUMMERFLOW_AWARD, 1);
             SetVar(VAR_SUMMERFLOW_TYPE,0);
+            char str[16] = {0};
+            sprintf(str, "F_130722_%d", type);
+            udpLog("shuqihuiliu", str, "", "", "", "", "act");
+        }
+    } 
+    void Player::getAwardFromSummerFlow3()   //暑期回流3
+    {
+        if (!World::getSummerFlow3Time())
+            return;
+        UInt32 type = GetVar(VAR_SUMMERFLOW3_TYPE);
+        UInt32 Award = GetVar(VAR_SUMMERFLOW3_TYPE_AWARD);
+        if(type == 0||Award==1)
+            return ;
+        UInt8 succ = GameAction()->RunSummerFlowAward(this, type);
+        if(succ)
+        {
+            SetVar(VAR_SUMMERFLOW3_TYPE_AWARD, 1);
             char str[16] = {0};
             sprintf(str, "F_130722_%d", type);
             udpLog("shuqihuiliu", str, "", "", "", "", "act");
@@ -12808,6 +12839,25 @@ namespace GObject
         SetVar(VAR_SUMMER_MEET_LOGIN, SummerMeetLogin);
         sendSummerMeetInfo();
     }
+    void Player::SetSummerFlow3Value()
+    {
+        if(!World::getSummerFlow3Time())
+            return ;
+        UInt32 SummerMeetType  = GetVar(VAR_SUMMERFLOW3_TYPE);
+        if(!SummerMeetType)
+        {
+            std::string  openid = getOpenId();
+            char  key1[32] = "uid_asss_summerflow3_";
+            UInt32 type = GObject::dclogger.checkActiveOpenid(key1,(char*)openid.c_str());
+            if(type>0 && type < 5)
+            {
+                SetVar(VAR_SUMMERFLOW3_TYPE,type);
+            }
+            else 
+                return ;
+        }
+   
+    }
     void Player::sendQQBoardLoginInfo()
     {
         Stream st(REP::RC7DAY);  //协议
@@ -13169,7 +13219,29 @@ namespace GObject
         sprintf(str, "F_130801_%d", 11+val);
         udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
-
+    void Player::getSummerFlow3OnlineAward(UInt8 val)
+    {
+        if(!World::getSummerFlow3Time())
+            return ;
+        if(val<1 ||val > 4)
+            return;
+        UInt32 time[]={10*60,30*60,60*60,150*60};
+        UInt32 OnlineTime  = GetOnlineTimeToday();
+        if(OnlineTime < time[val-1])
+            return ;
+        UInt32 ctslandingAward = GetVar(VAR_SUMMERFLOW3_TIME_AWARD);
+        if(ctslandingAward & (1<<(val-1)))
+            return ;
+        if(!GameAction()->RunSummerFlow3OnlineAward(this, val))
+        {
+            return;
+        }
+        ctslandingAward |= (1<<(val - 1));
+        SetVar(VAR_SUMMERFLOW3_TIME_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130722_%d",10+val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
+    }
     void Player::getNewRC7DayRechargeAward(UInt8 val)
     {
         // 申请领取新注册七天充值奖励 (神龙许愿)
@@ -14427,8 +14499,8 @@ namespace GObject
     {
         initMemcache();
         char key[MEMCACHED_MAX_KEY] = {0};
-        char value[][32] ={"07","14","30","90","01","02","03"};
-        size_t len = snprintf(key, sizeof(key), "uid_asss_summermeet_9545942");
+        char value[][32] ={"07","14","30","90","01","02","03","04"};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_summerflow3_9545942");
         size_t vlen = strlen(value[6]);
         MemcachedSet(key, len, value[6], vlen, 0);
     }
@@ -14585,7 +14657,39 @@ namespace GObject
         st << static_cast<UInt8>(SummerMeetTypeAward);
         st << Stream::eos;
         send(st);
-        
+    
+    }
+    void Player::sendSummerFlow3TimeInfo()
+    {
+        if (!World::getSummerFlow3Time())
+              return;
+        UInt32 SummerMeetType = GetVar(VAR_SUMMERFLOW3_TYPE);
+        if(SummerMeetType < 1 ||SummerMeetType > 4 )
+            return ;
+        UInt32 SummerFlow3Time = GetOnlineTimeToday();
+        //std::cout<<SummerFlow3Time<<std::endl;
+        UInt32 SummerFlow3TimeAward = GetVar(VAR_SUMMERFLOW3_TIME_AWARD);
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(28);
+        st << SummerFlow3Time;
+        st << static_cast<UInt8>(SummerFlow3TimeAward);
+        st << Stream::eos;
+        send(st);
+    }
+    void Player::sendSummerFlow3LoginInfo()
+    {
+        if (!World::getSummerFlow3Time())
+              return;
+        UInt32 SummerMeetType = GetVar(VAR_SUMMERFLOW3_TYPE);
+        if(SummerMeetType < 1 ||SummerMeetType > 4 )
+            return ;
+        UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMERFLOW3_TYPE_AWARD);
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(27);
+        st << static_cast<UInt8>(SummerMeetTypeAward);
+        st << static_cast<UInt8>(SummerMeetType);
+        st << Stream::eos;
+        send(st);
     }
     
     void Player::sendRC7DayInfo(UInt32 now)
@@ -19401,10 +19505,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -21473,7 +21577,7 @@ bool Player::in7DayFromCreated()
     return true;
 }
 
-#define QUESTIONID_MAX 30
+#define QUESTIONID_MAX 20
 /*#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))*/
@@ -21531,14 +21635,19 @@ void Player::sendFoolsDayInfo(UInt8 answer)
         qtime = TimeUtil::Now();
         SetVar(VAR_FOOLS_DAY_TIME, qtime);
         if(right == 0)
-            foolsDayUdpLog(7);
+        {
+            if (GetLev() < 70)
+                SetVar(VAR_FOOLS_DAY_INFO, SET_BIT(info, 31));
+            if (GetLev() >= 45)
+                foolsDayUdpLog(7);
+        }
     }
     Stream st(REP::ACTIVE);
     st << static_cast<UInt8>(0x10) << static_cast<UInt8>(0x01);
     st << right << static_cast<UInt8>(GET_BIT_8(value, 1));
     st << static_cast<UInt8>(GET_BIT_8(value, 2));
     st << static_cast<UInt8>(isFail ? 1 : 0) << qid << qtime;
-    st << answer;
+    st << answer << static_cast<UInt8>(GET_BIT(info, 31));
     st << Stream::eos;
     send(st);
 }
@@ -21563,7 +21672,7 @@ void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
         isRight = false;
     if(isRight)
     {
-        UInt8 ans = GameAction()->getAnswerInFoolsDay(id);
+        UInt8 ans = GameAction()->getAnswerInFoolsDay(id, GET_BIT(info, 31));
         isRight = ans == answer;
     }
     value = CLR_BIT_8(value, 3);    //清除离线标志
@@ -21602,17 +21711,17 @@ void Player::getAwardInFoolsDay()
         if(info & (1<<i))
             ++ right;
     }
-    if(right < 5)
+    if(right < 4)
         return;
-    if (GetPackage()->GetRestPackageSize() < right / 5)
+    if (GetPackage()->GetRestPackageSize() < right / 4)
     {
         sendMsgCode(2, 1011, 0);
         return;
     }
-    GameAction()->getAwardInFoolsDay(this, right / 5);
-    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/5 * 5));
+    GameAction()->getAwardInFoolsDay(this, right / 4);
+    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/4 * 4));
     sendFoolsDayInfo();
-    foolsDayUdpLog(right / 5);
+    foolsDayUdpLog(right / 4);
 }
 
 void Player::buyResurrectionCard()
@@ -21643,7 +21752,7 @@ void Player::buyResurrectionCard()
     //SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 0));
     value = SET_BIT_8(value, 3, 1);    //类似有离线标志
     SetVar(VAR_FOOLS_DAY, value);
-    UInt8 answer = GameAction()->getAnswerInFoolsDay(qid);
+    UInt8 answer = GameAction()->getAnswerInFoolsDay(qid, GET_BIT(info, 31));
     sendFoolsDayInfo(answer);
     if(cnt == 1)
         foolsDayUdpLog(8);

@@ -403,7 +403,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_POOL_CNT = 415, //卡片碎片池数
         VAR_CARD_FROM_CLAN = 416, //是否领取来自帮派战的卡片
         //421-430 for suntao
-        VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对)
+        VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对,31位表示等级限制[0:70级以上 1:70级以下])
         VAR_FOOLS_DAY_TIME  = 422,  //愚公移山答题开始时间
         VAR_INVITEDSUCCESS = 423, //邀请成功的好友人数
         VAR_CFRIENDTICKETS = 424, //好友邀请的抽奖券
@@ -504,12 +504,19 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_SUMMER_MEET_RECHARGE = 556,
         VAR_SUMMER_MEET_RECHARGE_AWARD = 557 ,
         VAR_SUMMER_MEET_STRENTH_AWARD = 558,
+
+        VAR_SUMMER_FLOW_LOGIN_AWARD = 559,
         // 560-580 for zhgc
         VAR_CLAN_SPTR_WATER = 560,       // 每日神魔之树浇水数
         VAR_CLAN_SPTR_AWARD = 561,       // 每日神魔之树奖励领取标识
         VAR_CLAN_ACTPT_MONTH = 562,      // 每月帮派活跃度
         VAR_CLAN_ACTPT_FLAG = 563,      // 活跃度领取标识
         //581-600 for qiwy
+
+        //581-600 for lb 
+        VAR_SUMMERFLOW3_TYPE = 581 ,
+        VAR_SUMMERFLOW3_TYPE_AWARD = 582 ,
+        VAR_SUMMERFLOW3_TIME_AWARD = 583,
 
         VAR_MAX,
     };
@@ -977,6 +984,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_CLAN_SPTR_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_ACTPT_MONTH, CYCLE_MONTH);
             REGISTER_VAR(VAR_CLAN_ACTPT_FLAG, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_SUMMERFLOW3_TYPE, CYCLE_NONE);
+            REGISTER_VAR(VAR_SUMMERFLOW3_TYPE_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_SUMMERFLOW3_TIME_AWARD, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

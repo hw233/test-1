@@ -1343,6 +1343,11 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt8>("RunSummerFlowAward", player, idx);
     }
+    bool GameActionLua::RunSummerFlow3OnlineAward(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunSummerFlow3OnlineAward", player, idx);
+    }
     UInt8 GameActionLua::RunSummerMeetAward(Player* player, UInt8 idx)
     {
 		assert(player != NULL);
@@ -1680,9 +1685,9 @@ namespace Script
 		Call<void>("onRecharge", player, r);
     }
 
-    UInt8 GameActionLua::getAnswerInFoolsDay(UInt8 qid)
+    UInt8 GameActionLua::getAnswerInFoolsDay(UInt8 qid, UInt8 type)
     {
-		return Call<UInt8>("getAnswerInFoolsDay", qid);
+		return Call<UInt8>("getAnswerInFoolsDay", qid, type);
     }
 
     void GameActionLua::getAwardInFoolsDay(Player* player, UInt8 idx)

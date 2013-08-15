@@ -1151,6 +1151,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendAthlBufInfo();
     pl->sendConsumeAwardInfo(0);
     pl->sendWeiboAwardInfo();
+    pl->sendSummerFlow3LoginInfo();
+    pl->sendSummerFlow3TimeInfo();
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
