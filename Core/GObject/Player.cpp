@@ -5098,11 +5098,6 @@ namespace GObject
         UInt32 proffer = clan->getMemberProffer(this);
 		SYSMSG_SENDV(166, this, c);
 		SYSMSG_SENDV(1066, this, c);
-        {
-            Stream st(REP::CLAN_INFO_UPDATE);
-            st << static_cast<UInt8>(5) << proffer << Stream::eos;
-            send(st);
-        }
 
         if(ii && ii->incommingType != 0)
         {
@@ -5136,11 +5131,6 @@ namespace GObject
         }
         SYSMSG_SENDV(165, this, a);
         SYSMSG_SENDV(1065, this, a);
-        {
-            Stream st(REP::CLAN_INFO_UPDATE);
-            st << static_cast<UInt8>(5) << proffer << Stream::eos;
-            send(st);
-        }
 
         return proffer;
     }
@@ -23037,8 +23027,8 @@ void Player::autoUseCollectCard(UInt32 cardNum)
         if(bFull)
             break;
     }
-    GetPackage()->DelItemAny(CARD_ITEM_ID, count);
-    sendCollectCard(fighterIndex);
+    //GetPackage()->DelItemAny(CARD_ITEM_ID, count);
+    //sendCollectCard(fighterIndex);
 }
 
 void Player::getCollectCardAward(UInt8 id)
@@ -23046,7 +23036,7 @@ void Player::getCollectCardAward(UInt8 id)
     if(id == 0 || id > 8)
         return;
     UInt8 k = id - 1;
-    for(UInt8 i = 0; i < 8; i++)
+    for(UInt8 i = 0; i < 9; i++)
     {
         if(_partCnt[k][i] == 0)
             return;
@@ -23059,32 +23049,29 @@ void Player::getCollectCardAward(UInt8 id)
     if(!bRet)
         return;
 
-    UInt8 alreadyFighterNum1 = 0;
-    for(UInt8 i = 0; i < 8; i++)
+    UInt8 alreadyFighterCnt = 1;
+    if(_alreadyCnt[k] == 0)
     {
-        if(_alreadyCnt[i] > 0)
-            ++alreadyFighterNum1;
+        for(UInt8 i = 0; i < 8; i++)
+        {
+            if(_alreadyCnt[i] > 0)
+                ++alreadyFighterCnt;
+        }
     }
 
     for(UInt8 i = 0; i < 9; i++)
         _partCnt[k][i] -= 1;
     _alreadyCnt[k] += 1;
+
     insertCollectCardDB(id);
     DB5().PushUpdateData("UPDATE `collect_card` SET `partCnt1` = %u, `partCnt2` = %u, `partCnt3` = %u, `partCnt4` = %u, `partCnt5` = %u, `partCnt6` = %u, `partCnt7` = %u, `partCnt8` = %u, `partCnt9` = %u, `alreadyCnt` = %u WHERE `playerId` = %" I64_FMT "u AND `id` = %u", _partCnt[k][0], _partCnt[k][1], _partCnt[k][2], _partCnt[k][3], _partCnt[k][4], _partCnt[k][5], _partCnt[k][6], _partCnt[k][7], _partCnt[k][8],  _alreadyCnt[k], getId(), id);
 
     sendCollectCard(id);
 
-    UInt8 alreadyFighterNum2 = 0;
-    for(UInt8 i = 0; i < 8; i++)
-    {
-        if(_alreadyCnt[i] > 0)
-            ++alreadyFighterNum2;
-    }
-
-    if(alreadyFighterNum1 < 3 && alreadyFighterNum2 == 3)
+    if(alreadyFighterCnt == 3)
         GameAction()->onCollectCardAct(this, 3);
-    else if(alreadyFighterNum1 < 8 && alreadyFighterNum2 == 8)
-        GameAction()->onCollectCardAct(this, 8);
+    else if(alreadyFighterCnt == 8)
+        GameAction()->onCollectCardAct(this, 4);
 }
 
 void Player::loadCollectCard(UInt8 id, UInt16 partCnt1, UInt16 partCnt2, UInt16 partCnt3, UInt16 partCnt4, UInt16 partCnt5, UInt16 partCnt6, UInt16 partCnt7, UInt16 partCnt8, UInt16 partCnt9, UInt16 alreadyCnt)
@@ -23107,7 +23094,7 @@ void Player::insertCollectCardDB(UInt8 id)
 {
     if(id == 0 || id > 8)
         return;
-    if(_alreadyload[id - 1] > 0)
+    if(_alreadyload[id - 1] == 0)
         DB5().PushUpdateData("INSERT INTO `collect_card` (`playerId`, `id`, `partCnt1`, `partCnt2`, `partCnt3`, `partCnt4`, `partCnt5`, `partCnt6`, `partCnt7`, `partCnt8`, `partCnt9`, `alreadyCnt`) VALUES(%" I64_FMT "u, %u, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)", getId(), id);
 }
 

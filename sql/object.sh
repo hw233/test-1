@@ -183,6 +183,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130802_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_set_gvar51_52.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_friendkey.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_collect_card.sql
     #. clearshiyamen.sh
 }

@@ -508,6 +508,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_CLAN_SPTR_AWARD = 561,       // 每日神魔之树奖励领取标识
         VAR_CLAN_ACTPT_MONTH = 562,      // 每月帮派活跃度
         VAR_CLAN_ACTPT_FLAG = 563,      // 活跃度领取标识
+        //581-600 for qiwy
 
         VAR_MAX,
     };
