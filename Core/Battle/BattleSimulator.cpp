@@ -7430,7 +7430,7 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
     if(auraCD > 0)
     {
         -- auraCD;
-        if(auraCD == 0)
+        if(auraCD == 0 && bo2->getColorStock() == 0)
         {
             doAuraPresent(bo2);
             setStatusChange_Aura(NULL, bo2->getSide(), bo2->getPos(), NULL, -100, 0, true);
@@ -7448,7 +7448,7 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
         {
             -- confuceCD;
         }
-        if(confuceCD == 0)
+        if(confuceCD == 0 && bo2->getColorStock() == 0)
         {
             if(!doConfusePresent(bo2))
             {
@@ -7471,7 +7471,7 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
         {
             -- stunCD;
         }
-        if(stunCD == 0)
+        if(stunCD == 0 && bo2->getColorStock() == 0)
         {
             if(!doStunPresent(bo2))
             {
@@ -7494,7 +7494,7 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
         {
             -- blindCD;
         }
-        if(blindCD == 0)
+        if(blindCD == 0 && bo2->getColorStock() == 0)
         {
             if(!doBlindPresent(bo2))
             {
