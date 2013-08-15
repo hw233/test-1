@@ -143,6 +143,7 @@ bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
 bool World::_foolbao = false;
+bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
 bool World::_surnamelegend = false;
 bool World::_ryhbActivity = false;

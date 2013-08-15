@@ -2198,6 +2198,10 @@ namespace GObject
 		UInt32 curtime = TimeUtil::Now();
         SetVar(VAR_OFFLINE, curtime);
 
+        if(World::getSummerFlow3Time() && GetVar(VAR_SUMMERFLOW3_TYPE))
+        {
+            AddVar(VAR_SUMMERFLOW3_TIME,curtime - _playerData.lastOnline);
+        }
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
 
@@ -11860,6 +11864,23 @@ namespace GObject
             udpLog("shuqihuiliu", str, "", "", "", "", "act");
         }
     } 
+    void Player::getAwardFromSurmmeFlow3()   //暑期回流3
+    {
+        if (!World::getSummerFlow3Time())
+            return;
+        UInt32 type = GetVar(VAR_SUMMERFLOW3_TYPE);
+        UInt32 Award = GetVar(VAR_SUMMERFLOW3_TYPE_AWARD);
+        if(type == 0||Award==1)
+            return ;
+        UInt8 succ = GameAction()->RunSummerFlowAward(this, type);
+        if(succ)
+        {
+            SetVar(VAR_SUMMERFLOW3_TYPE_AWARD, 1);
+            char str[16] = {0};
+            sprintf(str, "F_130722_%d", type);
+            udpLog("shuqihuiliu", str, "", "", "", "", "act");
+        }
+    } 
     void Player::getAwardFromSummerMeet()   //暑期，奇遇
     {
         if (!World::getSummerMeetTime())
@@ -12802,6 +12823,25 @@ namespace GObject
         SetVar(VAR_SUMMER_MEET_LOGIN, SummerMeetLogin);
         sendSummerMeetInfo();
     }
+    void Player::SetSummerFlow3Value()
+    {
+        if(!World::getSummerFlow3Time())
+            return ;
+        UInt32 SummerMeetType  = GetVar(VAR_SUMMERFLOW3_TYPE);
+        if(!SummerMeetType)
+        {
+            std::string  openid = getOpenId();
+            char  key1[32] = "uid_asss_summerflow3_";
+            UInt32 type = GObject::dclogger.checkActiveOpenid(key1,(char*)openid.c_str());
+            if(type>0 && type < 5)
+            {
+                SetVar(VAR_SUMMERFLOW3_TYPE,type);
+            }
+            else 
+                return ;
+        }
+   
+    }
     void Player::sendQQBoardLoginInfo()
     {
         Stream st(REP::RC7DAY);  //协议
@@ -13161,6 +13201,23 @@ namespace GObject
         SetVar(VAR_SUMMER_MEET_STRENTH_AWARD, ctslandingAward);
         char str[16] = {0};
         sprintf(str, "F_130801_%d", 11+val);
+        udpLog("shushanqiyu", str, "", "", "", "", "act");
+    }
+    void Player::getSummerFlow3OnlineAward(UInt8 val)
+    {
+        if(!World::getSummerFlow3Time())
+            return ;
+        UInt32 ctslandingAward = GetVar(VAR_SUMMERFLOW3_TIME_AWARD);
+        if (val == 0 ||val >4 )
+            return;
+        if(!GameAction()->RunSummerFlow3OnlineAward(this, val))
+        {
+            return;
+        }
+        ctslandingAward |= (1<<(val - 1));
+        SetVar(VAR_SUMMERFLOW3_TIME_AWARD, ctslandingAward);
+        char str[16] = {0};
+        sprintf(str, "F_130801_%d",4+val);
         udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
 
@@ -14421,8 +14478,8 @@ namespace GObject
     {
         initMemcache();
         char key[MEMCACHED_MAX_KEY] = {0};
-        char value[][32] ={"07","14","30","90","01","02","03"};
-        size_t len = snprintf(key, sizeof(key), "uid_asss_summermeet_9545942");
+        char value[][32] ={"07","14","30","90","01","02","03","04"};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_summerflow3_9545942");
         size_t vlen = strlen(value[6]);
         MemcachedSet(key, len, value[6], vlen, 0);
     }
@@ -14579,7 +14636,38 @@ namespace GObject
         st << static_cast<UInt8>(SummerMeetTypeAward);
         st << Stream::eos;
         send(st);
-        
+    
+    }
+    void Player::sendSummerFlow3TimeInfo()
+    {
+        if (!World::getSummerFlow3Time())
+              return;
+        UInt32 SummerMeetType = GetVar(VAR_SUMMERFLOW3_TYPE);
+        if(SummerMeetType < 1 ||SummerMeetType > 4 )
+            return ;
+        UInt32 SummerFlow3Time = GetVar(VAR_SUMMERFLOW3_TIME) + now - _playerData.lastOnline;
+        UInt32 SummerFlow3TimeAward = GetVar(VAR_SUMMERFLOW3_TIME_AWARD);
+        Stream st(REP::RC7DAY);  //协议
+        st << static_cast<UInt8>(20);
+        st << SummerFlow3Time;
+        st << static_cast<UInt8>(SummerFlow3TimeAward);
+        st << Stream::eos;
+        send(st);
+    }
+    void Player::sendSummerFlow3LoginInfo()
+    {
+        if (!World::getSummerFlow3Time())
+              return;
+        UInt32 SummerMeetType = GetVar(VAR_SUMMERFLOW3_TYPE);
+        if(SummerMeetType < 1 ||SummerMeetType > 4 )
+            return ;
+        UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMERFLOW3_TYPE_AWARD);
+        Stream st(REP::RC7DAY);  //协议
+        st << static_cast<UInt8>(19);
+        st << static_cast<UInt8>(SummerMeetType);
+        st << static_cast<UInt8>(SummerMeetTypeAward);
+        st << Stream::eos;
+        send(st);
     }
     
     void Player::sendRC7DayInfo(UInt32 now)
