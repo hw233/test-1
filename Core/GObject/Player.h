@@ -188,7 +188,7 @@ namespace GObject
 #define SPREAD_ALREADY_GET        0x02
 
 #define SET_BIT(X,Y)     (X | (1<<Y))
-#define GET_BIT(X,Y)     (X & (1<<Y))
+#define GET_BIT(X,Y)     ((X & (1<<Y)) >> Y)
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))
 #define GET_BIT_MARK(X,Y)     ((X>>Y) & 1)
 
@@ -223,6 +223,7 @@ namespace GObject
         TREASURE    = 10,   //聚宝盆
 
         XIANGMO     = 11,   //降魔禅杖
+        WANJIE      = 12,   //万劫不灭
 
         DRAGONKING_MAX,
     };

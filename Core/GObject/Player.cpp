@@ -19395,10 +19395,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -21467,7 +21467,7 @@ bool Player::in7DayFromCreated()
     return true;
 }
 
-#define QUESTIONID_MAX 30
+#define QUESTIONID_MAX 20
 /*#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))*/
@@ -21525,14 +21525,19 @@ void Player::sendFoolsDayInfo(UInt8 answer)
         qtime = TimeUtil::Now();
         SetVar(VAR_FOOLS_DAY_TIME, qtime);
         if(right == 0)
-            foolsDayUdpLog(7);
+        {
+            if (GetLev() < 70)
+                SetVar(VAR_FOOLS_DAY_INFO, SET_BIT(info, 31));
+            if (GetLev() >= 45)
+                foolsDayUdpLog(7);
+        }
     }
     Stream st(REP::ACTIVE);
     st << static_cast<UInt8>(0x10) << static_cast<UInt8>(0x01);
     st << right << static_cast<UInt8>(GET_BIT_8(value, 1));
     st << static_cast<UInt8>(GET_BIT_8(value, 2));
     st << static_cast<UInt8>(isFail ? 1 : 0) << qid << qtime;
-    st << answer;
+    st << answer << static_cast<UInt8>(GET_BIT(info, 31));
     st << Stream::eos;
     send(st);
 }
@@ -21557,7 +21562,7 @@ void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
         isRight = false;
     if(isRight)
     {
-        UInt8 ans = GameAction()->getAnswerInFoolsDay(id);
+        UInt8 ans = GameAction()->getAnswerInFoolsDay(id, GET_BIT(info, 31));
         isRight = ans == answer;
     }
     value = CLR_BIT_8(value, 3);    //清除离线标志
@@ -21596,17 +21601,17 @@ void Player::getAwardInFoolsDay()
         if(info & (1<<i))
             ++ right;
     }
-    if(right < 5)
+    if(right < 4)
         return;
-    if (GetPackage()->GetRestPackageSize() < right / 5)
+    if (GetPackage()->GetRestPackageSize() < right / 4)
     {
         sendMsgCode(2, 1011, 0);
         return;
     }
-    GameAction()->getAwardInFoolsDay(this, right / 5);
-    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/5 * 5));
+    GameAction()->getAwardInFoolsDay(this, right / 4);
+    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/4 * 4));
     sendFoolsDayInfo();
-    foolsDayUdpLog(right / 5);
+    foolsDayUdpLog(right / 4);
 }
 
 void Player::buyResurrectionCard()
@@ -21637,7 +21642,7 @@ void Player::buyResurrectionCard()
     //SetVar(VAR_FOOLS_DAY, CLR_BIT_8(value, 0));
     value = SET_BIT_8(value, 3, 1);    //类似有离线标志
     SetVar(VAR_FOOLS_DAY, value);
-    UInt8 answer = GameAction()->getAnswerInFoolsDay(qid);
+    UInt8 answer = GameAction()->getAnswerInFoolsDay(qid, GET_BIT(info, 31));
     sendFoolsDayInfo(answer);
     if(cnt == 1)
         foolsDayUdpLog(8);

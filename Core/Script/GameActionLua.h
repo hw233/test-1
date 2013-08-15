@@ -373,7 +373,7 @@ namespace Script
 	    UInt32 exchangPurplePet( Player* player );
 	    UInt32 getYellowPetId(UInt32 petId);
 
-        UInt8 getAnswerInFoolsDay(UInt8 qid);
+        UInt8 getAnswerInFoolsDay(UInt8 qid, UInt8 type);
         void getAwardInFoolsDay(Player* player, UInt8 idx);
         bool getLuckyStarAward(Player* player, UInt8 idx);
         void GetLuckyBagAward(Player * player);

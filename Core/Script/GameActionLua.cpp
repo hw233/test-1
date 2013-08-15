@@ -1679,9 +1679,9 @@ namespace Script
 		Call<void>("onRecharge", player, r);
     }
 
-    UInt8 GameActionLua::getAnswerInFoolsDay(UInt8 qid)
+    UInt8 GameActionLua::getAnswerInFoolsDay(UInt8 qid, UInt8 type)
     {
-		return Call<UInt8>("getAnswerInFoolsDay", qid);
+		return Call<UInt8>("getAnswerInFoolsDay", qid, type);
     }
 
     void GameActionLua::getAwardInFoolsDay(Player* player, UInt8 idx)

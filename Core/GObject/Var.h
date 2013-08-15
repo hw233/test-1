@@ -401,7 +401,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_SPREAD_FLAG = 413, //低第1bit表示是否使用落英秘典,低第2bit表示是否已领取
 
         //421-430 for suntao
-        VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对)
+        VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对,31位表示等级限制[0:70级以上 1:70级以下])
         VAR_FOOLS_DAY_TIME  = 422,  //愚公移山答题开始时间
         VAR_INVITEDSUCCESS = 423, //邀请成功的好友人数
         VAR_CFRIENDTICKETS = 424, //好友邀请的抽奖券
