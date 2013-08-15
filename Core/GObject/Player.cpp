@@ -81,6 +81,7 @@
 #include "Version.h"
 #include "GObject/ClanBoss.h"
 #include "ClanCityBattle.h"
+#include "MoFang.h"
 
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -750,6 +751,7 @@ namespace GObject
         m_tcpInfo = new TeamCopyPlayerInfo(this);
         m_hf = new HoneyFall(this);
         m_dpData = new DeamonPlayerData();
+		m_moFang = new MoFang(this);
         m_csFlag = 0;
         m_spreadInterval = 0;
         _mditem = 0;

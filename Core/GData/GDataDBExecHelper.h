@@ -574,13 +574,13 @@ struct DBXingchenConfig
 
 struct DBJiguanyuConfig
 {
-    std::string name;
     UInt32 jiguanyuId;
     UInt8 mark;
+    std::string name;
     UInt8 quality;
     UInt8 attrType;
-    UInt8 element;
     UInt32 attrValue;
+    UInt8 element;
     std::string molding;
     UInt16 skillId;
 };
@@ -588,13 +588,14 @@ struct DBJiguanyuConfig
 struct DBJiguanshuConfig
 {
     UInt8 jgshuLvl;
+    UInt32 totalNeedExp;
     UInt32 needExp;
 };
 
 struct DBTuzhiConfig
 {
-    std::string name;
     UInt32 tuzhiId;
+    std::string name;
     UInt8 quality;
     UInt8 needjgsLvl;
     UInt32 jiguanyuId;
@@ -1265,9 +1266,9 @@ SPECIALEND()
 SPECIALBEGIN(GData::DBJiguanyuConfig)
 SPECIALDEF(9)
     (
-    std::string, name,
     UInt32, jiguanyuId,
     UInt8, mark,
+    std::string, name,
     UInt8, quality,
     UInt8, attrType,
     UInt8, element,
@@ -1278,9 +1279,10 @@ SPECIALDEF(9)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBJiguanshuConfig)
-SPECIALDEF(2)
+SPECIALDEF(3)
     (
     UInt8, jgshuLvl,
+    UInt32, totalNeedExp,
     UInt32, needExp
     )
 SPECIALEND()
@@ -1288,8 +1290,8 @@ SPECIALEND()
 SPECIALBEGIN(GData::DBTuzhiConfig)
 SPECIALDEF(5)
     (
-    std::string, name,
     UInt32, tuzhiId,
+    std::string, name,
     UInt8, quality,
     UInt8, needjgsLvl,
     UInt32, jiguanyuId

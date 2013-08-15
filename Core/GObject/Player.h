@@ -264,6 +264,7 @@ namespace GObject
     struct DeamonPlayerData;
     class JobHunter;
     class Dreamer;
+    class MoFang;
 
     struct TripodData
     {

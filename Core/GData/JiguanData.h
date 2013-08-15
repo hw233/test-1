@@ -15,7 +15,7 @@ class JiguanData
         {
             std::string name;   // 机关玉名字
             UInt32 jiguanyuId;  // 机关玉Id
-            UInt8 mark;         // 表示机关玉还是机关器
+            UInt8 mark;         // 类型
             UInt8 quality;      // 品质 
             UInt8 attrType;     // 属性类型(机关玉)
             UInt8 element;      // 元素
@@ -23,7 +23,7 @@ class JiguanData
             UInt32 molding[9];  // 造型
             UInt16 skillId;     // 技能(机关器)
 
-            jiguanyuInfo(): name(""), jiguanyuId(0), mark(0), quality(0), attrType(0), element(0), attrValue(0), skillId(0) { memset(molding, 0, sizeof(molding)); }
+            jiguanyuInfo(): name(""), jiguanyuId(0), quality(0), attrType(0), element(0), attrValue(0), skillId(0) { memset(molding, 0, sizeof(molding)); }
         };
 
         struct jiguanshuInfo
@@ -46,9 +46,9 @@ class JiguanData
         };
 
     private:
-        std::map<UInt8, jiguanyuInfo> _jiguanyuInfo;
+        std::map<UInt32, jiguanyuInfo> _jiguanyuInfo;
         std::map<UInt8, jiguanshuInfo> _jiguanshuInfo;
-        std::map<UInt8, tuzhiInfo> _tuzhiInfo;
+        std::map<UInt32, tuzhiInfo> _tuzhiInfo;
     public:
         void setJiguanyuInfo(DBJiguanyuConfig &);
 

@@ -18,7 +18,6 @@ namespace GData
 
         info.jiguanyuId = jgyData.jiguanyuId;
         info.name = jgyData.name;
-        info.mark = jgyData.mark;
         info.quality = jgyData.quality;
         info.attrType = jgyData.attrType;
         info.element = jgyData.element;
@@ -33,7 +32,7 @@ namespace GData
         jiguanshuInfo info;
         
         info.jgshuLvl = jgsData.jgshuLvl;
-        info.needExp = jgsData.needExp;
+        info.needExp = jgsData.totalNeedExp;
 
         _jiguanshuInfo.insert(std::make_pair(info.jgshuLvl, info));
     }
@@ -53,7 +52,7 @@ namespace GData
 
     JiguanData::jiguanyuInfo * JiguanData::getJiguanyuInfo(UInt32 jgyuId)
     {
-        std::map<UInt8, jiguanyuInfo>::iterator iter = _jiguanyuInfo.find(jgyuId);
+        std::map<UInt32, jiguanyuInfo>::iterator iter = _jiguanyuInfo.find(jgyuId);
         if(iter != _jiguanyuInfo.end())
             return &(iter->second);
 
@@ -71,7 +70,7 @@ namespace GData
     
     JiguanData::tuzhiInfo * JiguanData::getTuzhiInfo(UInt32 tuzhiId)
     {
-        std::map<UInt8, tuzhiInfo>::iterator iter = _tuzhiInfo.find(tuzhiId);
+        std::map<UInt32, tuzhiInfo>::iterator iter = _tuzhiInfo.find(tuzhiId);
         if(iter != _tuzhiInfo.end())
             return &(iter->second);
 

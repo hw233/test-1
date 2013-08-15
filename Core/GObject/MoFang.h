@@ -13,7 +13,7 @@ namespace GObject
 {
     enum
     {
-        TUZHI_GREEN = 1,     //绿色
+        TUZHI_GREEN = 2,     //绿色
         TUZHI_BLUE,          //蓝色
         TUZHI_PURPLE,        //紫色
         TUZHI_YELLOW         //橙色
@@ -80,7 +80,7 @@ namespace GObject
 
         std::vector<UInt32> m_jg;           // 记录未装备机关
 
-        UInt16 m_grids[49];                 // 记录网格占用情况
+        int m_grids[49];                 // 记录网格占用情况
 
         Jiguanshu m_jiguanshu;
 

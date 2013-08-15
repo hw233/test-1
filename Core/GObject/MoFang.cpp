@@ -14,7 +14,15 @@ MoFang::MoFang(Player* pl)
 {
     m_owner = pl;
 
-    memset(m_grids, 0, sizeof(m_grids));
+    memset(m_grids, -1, sizeof(m_grids));
+
+    UInt8 mofangInit[9] = {17, 18, 19, 24, 25, 26, 31, 32, 33};
+    for(UInt8 i=0; i<9; i++)
+    {
+        UInt8 index = mofangInit[i];
+        if(index > 0 && index <= 49)
+            m_grids[index-1] = 0;
+    }
 }
 
 void MoFang::Init()
@@ -25,6 +33,23 @@ void MoFang::AddJGSFromDB(DBJiguanshu & dbData)
 {
     m_jiguanshu.curLvl = dbData.curLvl;
     m_jiguanshu.curExp = dbData.curExp;
+    
+    UInt8 count = m_jiguanshu.curLvl / 2;
+    
+    if(count > 0 && count <= 40)
+    {
+        for(UInt8 i=0; i<count; i++)
+        {
+            UInt8 temp[40] = {10, 11, 12, 13, 20, 27, 34, 41, 40, 39, 
+                            38, 37, 30, 23, 16, 9, 2, 3, 4, 5,
+                            6, 7, 14, 21, 28, 35, 42, 49, 48, 47,
+                            46, 45, 44, 43, 36, 29, 22, 15, 8, 1};
+
+            UInt8 index = temp[i];
+            if(index > 0 && index <= 49)
+                m_grids[index-1] = 0;
+        }
+    }
 }
 
 void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
@@ -32,11 +57,65 @@ void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
     if(dbData.pos > 0 && dbData.pos <= 49)
     {
         m_equipJG.insert(std::make_pair(dbData.pos, dbData.jiguanId));
+        UInt8 pos = dbData.pos;
+        GData::JiguanData::jiguanyuInfo * jgyInfo = GData::jiguanData.getJiguanyuInfo(dbData.jiguanId);
+        if(!jgyInfo)
+            return;
+
+        UInt8 k = 0;
+        UInt8 i = 0;
+        UInt8 mark = false;
+        for(; i<3; i++)
+        {
+            if(mark)
+                i = 0;
+
+            if(k >= 9 || (pos+i) < 0 || (pos+i) >= 49)
+                return;
+
+            if(0 != jgyInfo->molding[k])
+            {
+                if(-1 == m_grids[pos+i-1])
+                {
+                    return;
+                }
+                else if(0 == m_grids[pos+i-1])
+                {
+                    m_grids[pos+i-1] = 1;
+
+                    if(8 == k)
+                        break;
+
+                    if((i%3) == 2)
+                    {
+                        mark = true;
+                        pos = pos + 7;
+                    }
+
+                    k++;
+                }
+                else
+                    return; 
+            }
+            else
+            {
+                if(8 == k)
+                    break;
+
+                if((i%3) == 2)
+                {
+                    mark = true;
+                    pos = pos + 7;
+                }
+
+                k++;
+            }
+        }
     }
-
-    if(0 == dbData.pos)
+    else if(0 == dbData.pos)
+    {
        m_jg.push_back(dbData.jiguanId); 
-
+    }
 }
 
 void MoFang::AddTuzhiFromDB(DBTuzhi & dbData)
@@ -53,13 +132,13 @@ void MoFang::addTuzhi(UInt32 tuzhiId)
     std::map<UInt32, UInt8>::iterator iter = m_tuzhi.begin();
     for(; iter != m_tuzhi.end(); iter++)
     {
-        if(iter->first > tempId && iter->first >= 10000)
+        if(iter->first > tempId && iter->first >= 20000)
         {
             tempId = iter->first;
         }
     }
 
-    if(tempId >= 10000) //特殊图纸
+    if(tempId >= 20000) //特殊图纸
     {
         tuzhiId = tempId + 1;
     }
@@ -67,6 +146,12 @@ void MoFang::addTuzhi(UInt32 tuzhiId)
     m_tuzhi.insert(std::make_pair(tuzhiId, 0));
 
     DB4().PushUpdateData("REPLACE INTO `player_tuzhi` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), tuzhiId, 0);
+    
+    Stream st(REP::MOFANG_INFO);
+    st << static_cast<UInt8>(4);
+    st << tuzhiId;
+    st << Stream::eos;
+    m_owner->send(st);
 }
 
 void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
@@ -80,17 +165,17 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
 
     UInt32 toolId = 0;
     if(1 == type)
-        toolId = 9314;
+        toolId = 9414;
     else
-        toolId = 9313;
+        toolId = 9413;
 
     ItemBase * item = m_owner->GetPackage()->FindItem(toolId);
     if(NULL == item)
         return;
 
     UInt32 id = 0;
-    if(tuzhiId > 10000) //特殊图纸，读取图纸ID为10000的配置 
-        id = 10000;
+    if(tuzhiId > 20000) //特殊图纸，读取图纸ID为20000的配置 
+        id = 20000;
     else
         id = tuzhiId;
 
@@ -110,52 +195,46 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
     switch(tzQuality)
     {
         case TUZHI_GREEN:
-            addExp = 10;
-            successRate = 30;
+            addExp = 80;
+            successRate = 1;
             if(curProficient>=1 && curProficient<=25)
                 successRate += curProficient;
-            else if(curProficient>=26 && curProficient<=50)
-                successRate += curProficient * 2;
-            else if(curProficient>=51 && curProficient<=75)
-                successRate += curProficient * 3;
-            else if(curProficient>=76 && curProficient<=100)
-                successRate += curProficient * 4;
+            else if(curProficient>=26 && curProficient<=100)
+                successRate += curProficient * 3 / 100;
             break;
         case TUZHI_BLUE:
-            addExp = 20;
-            successRate = 20;
+            addExp = 150;
+            successRate = 0.5;
             if(curProficient>=1 && curProficient<=25)
-                successRate += curProficient * 0.5;
+                successRate += curProficient * 0.02 / 100;
             else if(curProficient>=26 && curProficient<=50)
-                successRate += curProficient * 1;
-            else if(curProficient>=51 && curProficient<=75)
-                successRate += curProficient * 2;
-            else if(curProficient>=76 && curProficient<=100)
-                successRate += curProficient * 3;
+                successRate += curProficient * 2 / 100;
+            else if(curProficient>=51 && curProficient<=100)
+                successRate += curProficient * 3 / 100;
             break;
         case TUZHI_PURPLE:
-            addExp = 30;
-            successRate = 10;
+            addExp = 300;
+            successRate = 0.2;
             if(curProficient>=1 && curProficient<=25)
-                successRate += curProficient * 0.1;
+                successRate += curProficient * 0.01 / 100;
             else if(curProficient>=26 && curProficient<=50)
-                successRate += curProficient * 0.5;
+                successRate += curProficient * 0.02 / 100;
             else if(curProficient>=51 && curProficient<=75)
-                successRate += curProficient;
+                successRate += curProficient * 2 / 100;
             else if(curProficient>=76 && curProficient<=100)
-                successRate += curProficient * 2;
+                successRate += curProficient * 3 / 100;
             break;
         case TUZHI_YELLOW:
-            addExp = 40;
-            successRate = 5;
+            addExp = 750;
+            successRate = 0.1;
             if(curProficient>=1 && curProficient<=25)
-                successRate += curProficient * 0.01;
+                successRate += curProficient * 0.01 / 100;
             else if(curProficient>=26 && curProficient<=50)
-                successRate += curProficient * 0.1;
+                successRate += curProficient * 0.02 /100;
             else if(curProficient>=51 && curProficient<=75)
-                successRate += curProficient * 0.5;
+                successRate += curProficient * 0.03 / 100;
             else if(curProficient>=76 && curProficient<=100)
-                successRate += curProficient;
+                successRate += curProficient * 2.5 / 100;
             break;
     }
 
@@ -166,16 +245,6 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
     if(successRate >= 100)
     {
         m_jiguanshu.curExp += addExp;
-        m_tuzhi.erase(iter);
-        result = 1;
-
-        if(tuzhiId < 10000) //训练图纸，制造后只增加机关术经验，不获得机关玉
-        {
-            m_jg.push_back(tzInfo->jiguanyuId); 
-            DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), tzInfo->jiguanyuId, 0);
-        }
-
-        DB4().PushUpdateData("DELETE FROM `player_tuzhi` WHERE `tuzhiId` = %u AND `playerId` = %" I64_FMT "u", tuzhiId, m_owner->getId());
     }
     else
     {
@@ -186,25 +255,25 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
         switch(tzQuality)
         {
             case TUZHI_GREEN:
-                randB = uRand(20);
-                if(randB < 10)
-                    curProficient += randB + 10;
+                randB = uRand(7);
+                if(randB < 4)
+                    curProficient += 5;
                 else
                     curProficient += randB;
                 break; 
             case TUZHI_BLUE:
-                randB = uRand(10);
+                randB = uRand(6);
                 if(randA >= 0 && randA < 80)
                 {
-                    if(randB < 5)
-                        curProficient += randB + 5;
+                    if(randB < 3)
+                        curProficient += randB + 3;
                     else
                         curProficient += randB;
                 }
                 else if(randA >= 80 && randA < 90 && 0 == type)
                 {
-                    if(randB < 5)
-                        curProficient -= randB + 5;
+                    if(randB < 3)
+                        curProficient -= randB + 3;
                     else
                         curProficient -= randB;
                 }
@@ -227,7 +296,7 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
                 }
                 break;
             case TUZHI_YELLOW:
-                randB = uRand(2);
+                randB = uRand(4);
                 if(randA >= 0 && randA < 30)
                 {
                     if(randB == 0)
@@ -247,11 +316,25 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
         }
 
         iter->second = curProficient;
-
-        DB4().PushUpdateData("REPLACE INTO `player_tuzhi` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), tuzhiId,  curProficient);
     }
 
-    if(10 == m_jiguanshu.curLvl)
+    if(curProficient >= 100 || successRate >= 100)
+    {
+        m_tuzhi.erase(iter);
+        result = 1;
+
+        if(tuzhiId < 20000) //训练图纸，制造后只增加机关术经验，不获得机关玉
+        {
+            m_jg.push_back(tzInfo->jiguanyuId); 
+            DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), tzInfo->jiguanyuId, 0);
+        }
+
+        DB4().PushUpdateData("DELETE FROM `player_tuzhi` WHERE `tuzhiId` = %u AND `playerId` = %" I64_FMT "u", tuzhiId, m_owner->getId());
+    }
+    else
+        DB4().PushUpdateData("REPLACE INTO `player_tuzhi` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), tuzhiId,  curProficient);
+
+    if(100 == m_jiguanshu.curLvl)
     {
 
         DB4().PushUpdateData("UPDATE `player_jiguanshu` SET `curExp` = %u WHERE `playerId` = %" I64_FMT "u", m_jiguanshu.curExp, m_owner->getId());
@@ -261,9 +344,9 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
 
     Stream st(REP::MOFANG_INFO);
     st << mark;
-    st << tuzhiId << type << result << m_jiguanshu.curExp;
+    st << tuzhiId << type << result << static_cast<UInt16>(m_jiguanshu.curExp);
     if(0 == result)
-        st << curProficient; 
+        st << static_cast<UInt8>(curProficient); 
     st << Stream::eos;
     m_owner->send(st);
 }
@@ -273,7 +356,7 @@ void MoFang::upgradeJGS()
     if(!m_owner)
         return;
 
-    if(m_jiguanshu.curLvl >= 10)
+    if(m_jiguanshu.curLvl >= 100)
         return;
 
     GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getJiguanshuInfo(m_jiguanshu.curLvl);
@@ -286,6 +369,22 @@ void MoFang::upgradeJGS()
     }
 
     DB4().PushUpdateData("REPLACE INTO `player_jiguanshu` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), m_jiguanshu.curLvl, m_jiguanshu.curExp);
+
+    if(0 == m_jiguanshu.curLvl % 2)
+    {
+        UInt8 temp[40] = {10, 11, 12, 13, 20, 27, 34, 41, 40, 39, 
+                        38, 37, 30, 23, 16, 9, 2, 3, 4, 5,
+                        6, 7, 14, 21, 28, 35, 42, 49, 48, 47,
+                        46, 45, 44, 43, 36, 29, 22, 15, 8, 1};
+
+        UInt8 lvlMark = m_jiguanshu.curLvl / 2;
+        if(lvlMark > 0 && lvlMark <= 40)
+        {
+            UInt8 index = temp[lvlMark-1];
+            if(index > 0 && index <= 49)
+                m_grids[index-1] = 0;
+        }
+    }
 }
 
 void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
@@ -306,27 +405,34 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
             UInt8 occupyMark = 0;
             if(EQUIP_JG == mark)
             {
-                m_equipJG.insert(std::make_pair(pos, jgId));
+                m_equipJG.insert(std::make_pair(pos+1, jgId));
 
                 std::vector<UInt32>::iterator iter = m_jg.begin();
                 for(; iter != m_jg.end(); iter++)
                 {
                     if(jgId == *iter)
+                    {
                         m_jg.erase(iter);
+                        break;
+                    }
                 }
 
                 occupyMark = 1;
-                posMark = pos;
+                posMark = pos + 1;
 
                 st << jgId << pos;
             }
             else
             {
-                std::map<UInt8, UInt32>::iterator iter = m_equipJG.find(pos);
+                std::map<UInt8, UInt32>::iterator iter = m_equipJG.find(pos+1);
                 if (iter != m_equipJG.end())
                 {
                     if(iter->second > 0)
+                    {
                         m_jg.push_back(iter->second);
+                        jgId = iter->second;
+                    }
+
                     m_equipJG.erase(iter);
                 }
                 
@@ -335,7 +441,7 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
 
             for(UInt8 i=0; i<values.size(); i++)
             {
-                m_grids[values[i]] = occupyMark;
+                m_grids[values[i]-1] = occupyMark;
             }
 
             DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), jgId, posMark);
@@ -360,37 +466,40 @@ void MoFang::addJGYAttr(GData::AttrExtra& ae)
 
         switch(jgyInfo->attrType)
         {
-            case 0:
+            case 1:
                 ae.attack += jgyInfo->attrValue;
                 break;
-            case 1:
-                ae.defend += jgyInfo->attrValue;
-                break;
             case 2:
-                ae.magdef += jgyInfo->attrValue;
+                ae.magatk += jgyInfo->attrValue;
                 break;
             case 3:
-                ae.hitrlvl += jgyInfo->attrValue;
+                ae.defend += jgyInfo->attrValue;
                 break;
             case 4:
-                ae.evdlvl += jgyInfo->attrValue;
+                ae.magdef += jgyInfo->attrValue;
                 break;
             case 5:
-                ae.pierce += jgyInfo->attrValue;
+                ae.hitrlvl += jgyInfo->attrValue;
                 break;
             case 6:
-                ae.critical += jgyInfo->attrValue;
+                ae.evdlvl += jgyInfo->attrValue;
                 break;
             case 7:
-                ae.action += jgyInfo->attrValue;
+                ae.pierce += jgyInfo->attrValue;
                 break;
             case 8:
-                ae.magres += jgyInfo->attrValue;
+                ae.critical += jgyInfo->attrValue;
                 break;
             case 9:
-                ae.tough += jgyInfo->attrValue;
+                ae.action += jgyInfo->attrValue;
                 break;
             case 10:
+                ae.magres += jgyInfo->attrValue;
+                break;
+            case 11:
+                ae.tough += jgyInfo->attrValue;
+                break;
+            case 12:
                 ae.counter += jgyInfo->attrValue;
                 break;
         }
@@ -419,22 +528,28 @@ void MoFang::sendMoFangInfo(UInt8 mark)
 
     Stream st(REP::MOFANG_INFO);
     st << mark;
-    st << m_jiguanshu.curExp;
+    st << static_cast<UInt16>(m_jiguanshu.curExp);
 
     UInt8 countA = 0;
     UInt8 countB = 0;
+    UInt16 offsetA = 0;
+    UInt16 offsetB = 0;
 
+    offsetA = st.size();
+    st << countA;
     std::map<UInt8, UInt32>::iterator iter = m_equipJG.begin();
     for(; iter != m_equipJG.end(); iter++)
     {
-        st << iter->second << iter->first;
+        st << iter->second << static_cast<UInt8>(iter->first - 1);
         countA++;    
     }
 
+    offsetB = st.size();
+    st << countB;
     std::vector<UInt32>::iterator iterA = m_jg.begin();
     for(; iterA != m_jg.end(); iterA++)
     {
-        st << *iterA;
+        st << static_cast<UInt32>(*iterA);
         countB++;
     }
 
@@ -444,6 +559,9 @@ void MoFang::sendMoFangInfo(UInt8 mark)
         st << iterB->first << iterB->second;
         countB++;    
     }
+
+    st.data<UInt8>(offsetA) = countA;
+    st.data<UInt8>(offsetB) = countB;
 
     st << Stream::eos;
     m_owner->send(st);
@@ -455,7 +573,8 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
     UInt8 k = 0;
     UInt8 markA = 0;
     UInt8 markB = 0;
-    UInt32 jiguanId = findEquipJG(pos);
+    bool markC = false;
+    UInt32 jiguanId = findEquipJG(pos+1);
 
     if(EQUIP_JG == mark)
     {
@@ -496,25 +615,28 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
 
     for(; i<3; i++)
     {
-        if(k >= 9 || (pos+i) < 0 || (pos+i) >= 49 || (pos+i) >= (m_jiguanshu.curLvl * 7))
+        if(markC)
+            i = 0;
+
+        if(k >= 9 || (pos+i) < 0 || (pos+i) >= 49)
             return false;
 
         if(0 != jgyInfo->molding[k])
         {
-            if(markA == m_grids[pos+i])
+            if(markA == m_grids[pos+i] || -1 == m_grids[pos+i])
             {
                 return false;
             }
             else if(markB == m_grids[pos+i])
             {
-                values.push_back(pos+i);
+                values.push_back(pos+i+1);
 
                 if(8 == k)
                     break;
 
                 if((i%3) == 2)
                 {
-                    i = 0;
+                    markC = true;
                     pos = pos + 7;
                 }
 
@@ -530,7 +652,7 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
 
             if((i%3) == 2)
             {
-                i = 0;
+                markC = true;
                 pos = pos + 7;
             }
 

@@ -1999,7 +1999,9 @@ void Fighter::rebuildEquipAttr()
             addAttrExtraGem(_attrExtraEquip, igt);
         }
     }
-    _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
+
+    if(_owner)
+        _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }

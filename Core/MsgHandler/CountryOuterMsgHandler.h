@@ -1338,6 +1338,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendQQBoardLoginInfo();
     pl->sendSummerMeetInfo();
     pl->sendSummerMeetRechargeInfo();
+    pl->GetMoFang()->sendMoFangInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -6229,12 +6230,7 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 opt = 0;
     br >> opt;
-
-    if(0 == opt && !player->hasChecked())
-    {
-        return;
-    }
-
+    
     switch(opt)
     {
     case 0:
@@ -6244,6 +6240,10 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 1:
         {
+            if(!player->hasChecked())
+            {
+                return;
+            }
             UInt32 tuzhiId = 0;
             UInt8 type = 0;
 
@@ -6253,6 +6253,10 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 2:
         {
+            if(!player->hasChecked())
+            {
+                return;
+            }
             UInt32 jgId = 0;
             UInt8 pos = 0;
 
@@ -6262,6 +6266,10 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 3:
         {
+            if(!player->hasChecked())
+            {
+                return;
+            }
             UInt8 pos = 0;
 
             br >> pos;

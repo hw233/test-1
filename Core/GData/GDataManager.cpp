@@ -2111,7 +2111,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBJiguanshuConfig dbjgs;
-		if(execu->Prepare("SELECT `jgshuLvl`, `needExp` FROM `jiguanshu`", dbjgs) != DB::DB_OK)
+		if(execu->Prepare("SELECT `jgshuLvl`, `totalNeedExp` FROM `jiguanshu`", dbjgs) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
@@ -2145,7 +2145,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBTuzhiConfig dbtz;
-		if(execu->Prepare("SELECT `name`, `tuzhiId`, `quality`, `needjgsLvl`, `jiguanyuId` FROM `tuzhi`", dbtz) != DB::DB_OK)
+		if(execu->Prepare("SELECT `tuzhiId`, `name`, `quality`, `needjgsLvl`, `jiguanyuId` FROM `tuzhi`", dbtz) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
