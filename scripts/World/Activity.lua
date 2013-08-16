@@ -896,7 +896,7 @@ function onActivityCheck(tm)
           setSummerMeet(false)
       end
 
-      if tm >= actTime250 and tm < actTime250_1 then
+      if tm >= actTime251 and tm < actTime251_1 then
          setSummerFlow3Time(true)
       else
          setSummerFlow3Time(false)
