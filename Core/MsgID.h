@@ -239,6 +239,8 @@ namespace REQ
     const UInt8 CLAN_QQ =             0x6D;
     /** 仙蕴晶石 **/
     const UInt8 FARIY_SPAR =          0x6E;
+    /** 神魔之树 **/
+    const UInt8 CLAN_SPIRIT_TREE    = 0x6F;
     /**请求宗族奖励物品 */
     const UInt8 CLANREWARD          = 0x9C;
     /**领取宗族奖励 */
@@ -573,6 +575,8 @@ namespace REP
     const UInt8 CLAN_QQ =             0x6D;
     /** 仙蕴晶石 **/
     const UInt8 FARIY_SPAR =          0x6E;
+    /** 神魔之树 **/
+    const UInt8 CLAN_SPIRIT_TREE    = 0x6F;
 
     const UInt8 HERO_ISLAND         = 0x97;
     const UInt8 NEWHERO_ISLAND      = 0xA6;
