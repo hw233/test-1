@@ -1409,6 +1409,7 @@ namespace GObject
         player->clanUdpLog(1088);
         player->send(stream);
         clan->addMemberActivePoint(player, 10, e_clan_actpt_rank_battle);
+        player->addCardFromClanBattle();
     }
 
     void ClanRankBattleMgr::Signout(Player* player)

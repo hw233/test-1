@@ -366,6 +366,10 @@ public:
     { _goldSnakeAct= v; }
     inline static bool getGoldSnakeAct()
     { return _goldSnakeAct; }
+    inline static void setCollectCardAct(bool v)
+    { _collectCardAct= v; }
+    inline static bool getCollectCardAct()
+    { return _collectCardAct; }
     inline static void setHeroIslandAct(bool v)
     { _heroIslandAct= v; }
     inline static bool getHeroIslandAct()
@@ -671,6 +675,13 @@ public:
     inline static bool getFoolBao()
     { return _foolbao; } 
     
+    inline static void setSummerFlow3Time(bool v)
+    { _summerFlow3 = v; }
+    inline static bool getSummerFlow3Time()
+    {
+        return _summerFlow3;
+    } 
+
     inline static void setSurnameLegend(bool v)
     {
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
@@ -904,6 +915,7 @@ public:
     static bool _ssToolbarAct;
     static bool _snowAct;
     static bool _goldSnakeAct;
+    static bool _collectCardAct;
     static bool _heroIslandAct;
     static bool _dragonKingAct;
     static bool _saveGoldAct;
@@ -952,6 +964,7 @@ public:
     static stArenaExtra stArena;
     static bool _compassact;
     static bool _foolbao;
+    static bool _summerFlow3;
     static bool _surnamelegend;
     static bool _ryhbActivity;
     static bool _zcjbActivity;

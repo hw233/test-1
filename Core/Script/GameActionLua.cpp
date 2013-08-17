@@ -145,6 +145,7 @@ namespace Script
         lua_tinker::def(_L, "getTgcEvent", GObject::World::getTgcEvent);
         lua_tinker::def(_L, "get9215Act", GObject::World::get9215Act);
         lua_tinker::def(_L, "getSnowAct", GObject::World::getSnowAct);
+        lua_tinker::def(_L, "getCollectCardAct", GObject::World::getCollectCardAct);
 		lua_tinker::def(_L, "getCompassAct", GObject::World::getCompassAct);
 		lua_tinker::def(_L, "getItem9344Act", GObject::World::getItem9344Act);
 		lua_tinker::def(_L, "getItem9343Act", GObject::World::getItem9343Act);
@@ -1342,6 +1343,11 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt8>("RunSummerFlowAward", player, idx);
     }
+    bool GameActionLua::RunSummerFlow3OnlineAward(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunSummerFlow3OnlineAward", player, idx);
+    }
     UInt8 GameActionLua::RunSummerMeetAward(Player* player, UInt8 idx)
     {
 		assert(player != NULL);
@@ -1679,9 +1685,9 @@ namespace Script
 		Call<void>("onRecharge", player, r);
     }
 
-    UInt8 GameActionLua::getAnswerInFoolsDay(UInt8 qid)
+    UInt8 GameActionLua::getAnswerInFoolsDay(UInt8 qid, UInt8 type)
     {
-		return Call<UInt8>("getAnswerInFoolsDay", qid);
+		return Call<UInt8>("getAnswerInFoolsDay", qid, type);
     }
 
     void GameActionLua::getAwardInFoolsDay(Player* player, UInt8 idx)
@@ -1738,6 +1744,12 @@ namespace Script
     Table GameActionLua::GetNewHeroIslandBuffs()
     {
         return Run<Table>(NULL, "getNewHeroIslandBuffs");
+    }
+
+    bool GameActionLua::onCollectCardAct(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<bool>("onCollectCardAct", player, idx);
     }
 
 }

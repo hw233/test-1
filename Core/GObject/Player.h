@@ -188,7 +188,7 @@ namespace GObject
 #define SPREAD_ALREADY_GET        0x02
 
 #define SET_BIT(X,Y)     (X | (1<<Y))
-#define GET_BIT(X,Y)     (X & (1<<Y))
+#define GET_BIT(X,Y)     ((X & (1<<Y)) >> Y)
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))
 #define GET_BIT_MARK(X,Y)     ((X>>Y) & 1)
 
@@ -223,6 +223,7 @@ namespace GObject
         TREASURE    = 10,   //聚宝盆
 
         XIANGMO     = 11,   //降魔禅杖
+        WANJIE      = 12,   //万劫不灭
 
         DRAGONKING_MAX,
     };
@@ -822,6 +823,8 @@ namespace GObject
         void sendSummerFlowInfo();
         void sendSummerMeetInfo();
         void sendSummerMeetRechargeInfo();
+        void sendSummerFlow3TimeInfo();
+        void sendSummerFlow3LoginInfo();
 		void Reconnect();
 
 		void Logout(bool = false);	//???????߲???
@@ -2101,6 +2104,7 @@ namespace GObject
         void getAward(UInt8 type, UInt8 opt);
         void getSSDTAward(UInt8 opt);
         void getAwardFromSurmmeFlowr();
+        void getAwardFromSummerFlow3();
         void getAwardFromSummerMeet();
         void sendSSDTInfo();
         void getHappyAward(UInt8 opt);
@@ -2193,11 +2197,13 @@ namespace GObject
         void sendLuckyMeetLoginInfo();
         void SetLuckyMeetValue();
         void SetSummerMeetValue();
+        void SetSummerFlow3Value();
         void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
         void getQQBoardInstantLoginAward(UInt8 val);
         void getLuckyMeetInstantLoginAward(UInt8 val);
         void getLuckyMeetAward(UInt8 idx,UInt8 index);
         void getSummerMeetInstantLoginAward(UInt8 val);
+        void getSummerFlow3OnlineAward(UInt8 val);
         void getSummerMeetAward(UInt8 idx,UInt8 index);
         void getNewRC7DayRechargeAward(UInt8 val);
         void getNewRC7DayTargetAward(UInt8 val);
@@ -2494,6 +2500,22 @@ namespace GObject
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);
+
+    public:
+        void sendCollectCard(UInt8 fighterIndex);
+        void sendAllCollectCard();
+        void useCollectCard(UInt8 fighterIndex);
+        void putCollectCardPool(UInt8 fighterIndex, UInt8 partPos, UInt16 partCnt);
+        void convertCollectCard();
+        void autoUseCollectCard(UInt32 cardNum);
+        void getCollectCardAward(UInt8 id);
+        void loadCollectCard(UInt8 id, UInt16 partCnt1, UInt16 partCnt2, UInt16 partCnt3, UInt16 partCnt4, UInt16 partCnt5, UInt16 partCnt6, UInt16 partCnt7, UInt16 partCnt8, UInt16 partCnt9, UInt16 alreadyCnt);
+        void insertCollectCardDB(UInt8 id);
+        void addCardFromClanBattle();
+    private:
+        UInt16 _partCnt[8][9];
+        UInt16 _alreadyCnt[8];
+        UInt8 _alreadyload[8];
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

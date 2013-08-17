@@ -338,6 +338,7 @@ namespace GObject
         static bool fixItem9383Leader();
         static bool loadPetEquipAttr();
         static bool loadFairySpar();
+        static bool loadCollectCard();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);
