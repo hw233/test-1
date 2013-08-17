@@ -279,7 +279,7 @@ GMHandler::GMHandler()
     Reg(2, "getmc", &GMHandler::OnGetMax);
     Reg(2, "setmc", &GMHandler::OnSetMax);
     Reg(2, "addtz", &GMHandler::OnAddtz);
-    Reg(2, "addJGSExp", &GMHandler::OnAddJGSExp);
+    Reg(2, "addshu", &GMHandler::OnAddJGSExp);
 
 }
 

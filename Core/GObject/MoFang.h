@@ -37,7 +37,12 @@ namespace GObject
         JIGUANQI            // 机关器 
     };
 
+    #define NORMAL_TUZHI   100000
+    #define SPECIAL_TUZHI  200000
+    #define JGS_MAXEXP     1313000
+
     class Player;
+	class Fighter;
     class JiguanData;
 
     struct DBJiguanshu;
@@ -62,8 +67,9 @@ namespace GObject
         void AddJGYFromDB(DBJiguanyu &);
         void AddTuzhiFromDB(DBTuzhi &);
 
+        void randTuzhi(UInt8 num);
         void addJGSExp(UInt32 exp);
-        void addTuzhi(UInt32 tuzhiId);
+        UInt32 addTuzhi(UInt32 tuzhiId, bool mark = false);
         void makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark);                        // 制造机关
         void equipJG(UInt32 jgId, UInt8 pos, UInt8 mark);                               // 装备机关
         bool checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &);      // 检测是否能够装备

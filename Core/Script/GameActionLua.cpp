@@ -318,6 +318,10 @@ namespace Script
         CLASS_DEF(Player, AddZRYJCount);
         CLASS_DEF(Player, AddHYYJCount);
         CLASS_DEF(Player, in7DayFromCreated);
+        CLASS_DEF(Player, GetMoFang);
+
+        CLASS_ADD(MoFang);
+        CLASS_DEF(MoFang, randTuzhi);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

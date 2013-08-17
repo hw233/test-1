@@ -1,5 +1,6 @@
 #include "JiguanData.h"
 #include "Common/StringTokenizer.h"
+#include "Common/URandom.h"
 
 namespace GData
 {
@@ -48,6 +49,16 @@ namespace GData
         info.jiguanyuId = tuzhiData.jiguanyuId;
 
         _tuzhiInfo.insert(std::make_pair(info.tuzhiId, info));
+        
+        std::map<UInt8, std::vector<UInt32>>::iterator iter = _lvltuzhiInfo.find(info.needjgsLvl);
+        if(iter == _lvltuzhiInfo.end())
+        {
+            std::vector<UInt32> _tuzhiId;
+            _tuzhiId.push_back(info.tuzhiId);
+            _lvltuzhiInfo.insert(std::make_pair(info.needjgsLvl, _tuzhiId));
+        }
+        else
+            iter->second.push_back(info.tuzhiId);
     }
 
     JiguanData::jiguanyuInfo * JiguanData::getJiguanyuInfo(UInt32 jgyuId)
@@ -67,6 +78,20 @@ namespace GData
 
         return NULL;
     }
+
+    JiguanData::jiguanshuInfo * JiguanData::getUpgradeInfo(UInt32 curExp)
+    {
+        std::map<UInt8, jiguanshuInfo>::iterator iter = _jiguanshuInfo.begin();
+        for(; iter!=_jiguanshuInfo.end(); iter++)
+        {
+            if((iter->second.jgshuLvl >= 100) || (iter->second.needExp >= curExp))
+            {
+                return &(iter->second);
+            }
+        }
+
+        return NULL;
+    }
     
     JiguanData::tuzhiInfo * JiguanData::getTuzhiInfo(UInt32 tuzhiId)
     {
@@ -75,5 +100,19 @@ namespace GData
             return &(iter->second);
 
         return NULL;
+    }
+
+    UInt32 JiguanData::getTuzhiId(UInt8 lvl)
+    {
+        std::map<UInt8, std::vector<UInt32>>::iterator iter = _lvltuzhiInfo.find(lvl);
+        if(iter != _lvltuzhiInfo.end())
+        {
+            UInt8 count = iter->second.size();
+            UInt8 index = uRand(count);
+            
+            return iter->second[index];
+        }
+
+        return 0;
     }
 }

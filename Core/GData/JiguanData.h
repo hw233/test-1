@@ -49,6 +49,7 @@ class JiguanData
         std::map<UInt32, jiguanyuInfo> _jiguanyuInfo;
         std::map<UInt8, jiguanshuInfo> _jiguanshuInfo;
         std::map<UInt32, tuzhiInfo> _tuzhiInfo;
+        std::map<UInt8, std::vector<UInt32>> _lvltuzhiInfo;
     public:
         void setJiguanyuInfo(DBJiguanyuConfig &);
 
@@ -56,11 +57,15 @@ class JiguanData
 
         void settuzhiInfo(DBTuzhiConfig &);
 
+        UInt32 getTuzhiId(UInt8 lvl);
+
         jiguanyuInfo * getJiguanyuInfo(UInt32 jgyuId);
 
         jiguanshuInfo * getJiguanshuInfo(UInt8 lvl);
 
         tuzhiInfo * getTuzhiInfo(UInt32 tuzhiId);
+
+        jiguanshuInfo * getUpgradeInfo(UInt32 curExp);
 };
 
 extern JiguanData jiguanData;
