@@ -29,6 +29,7 @@ private:
 	void OnSetVip(GObject::Player *, std::vector<std::string>&);
 	void OnBanChat(std::vector<std::string>&);
 	void OnAddExp(GObject::Player *, std::vector<std::string>&);
+	void OnAddOnlineTime(GObject::Player *, std::vector<std::string>&);
 	void OnAddItem(GObject::Player *, std::vector<std::string>&);
 	void OnAddItemB(GObject::Player *, std::vector<std::string>&);
 	void OnAddItemSet(GObject::Player *, std::vector<std::string>&);

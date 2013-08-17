@@ -474,6 +474,11 @@ namespace GObject
         }
         if(gClanCity)
             gClanCity->loadFromDB();
+        if(!loadCollectCard())
+        {
+            fprintf(stderr, "loadCollectCard error!\n");
+            std::abort();
+        }
 
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -6113,6 +6118,29 @@ namespace GObject
             if(!pl)
             continue;
                 pl->GetFairySpar()->loadFairySparFromDB(t.atk, t.magAtk, t.phy, t.element[0], t.element[1], t.element[2], t.element[3], t.element[4], t.complexPercent, t.curMark, t.breakoutCnt);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadCollectCard()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if(execu.get() == NULL || !execu->isConnected())
+            return false;
+        LoadingCounter lc("Loading Collect Card");
+        DBCollectCard t;
+        if(execu->Prepare("SELECT `playerId`, `id`, `partCnt1`, `partCnt2`, `partCnt3`, `partCnt4`, `partCnt5`, `partCnt6`, `partCnt7`, `partCnt8`, `partCnt9`, `alreadyCnt` FROM `collect_card` ORDER BY `playerId`", t)!= DB::DB_OK)
+            return false;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            Player* pl = globalPlayers[t.playerId];
+            if(!pl)
+                continue;
+            if(t.id >= 1 and t.id <= 8)
+                pl->loadCollectCard(t.id, t.partCnt[0], t.partCnt[1], t.partCnt[2], t.partCnt[3], t.partCnt[4], t.partCnt[5], t.partCnt[6], t.partCnt[7], t.partCnt[8], t.alreadyCnt);
         }
         lc.finalize();
         return true;

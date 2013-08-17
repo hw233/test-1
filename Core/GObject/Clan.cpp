@@ -1174,6 +1174,8 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 				broadcast(st);
 			}
 			//setProffer(getProffer()+count);
+            if(count >= 2000)
+                addMemberActivePoint_nolock(player, count/2000, e_clan_actpt_none);
 			addClanDonateRecord(player->getName(), e_donate_to_build, e_donate_type_tael, count, now);
 			DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %" I64_FMT "u", mem->proffer, player->getId());
 			//player->GetTaskMgr()->DoAcceptedTask(62207);
@@ -2984,8 +2986,6 @@ void Clan::useClanFunds(UInt32 funds)
 
 bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
 {
-	Mutex::ScopedLock lk(_mutex);
-
     if(inviteeId == _leader || pl->getId() == inviteeId)
         return false;
     Player* clan_pl = globalPlayers[inviteeId];
@@ -2994,6 +2994,8 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
 
     ClanMember * mem1 = getClanMember(pl);
     ClanMember * mem2 = getClanMember(clan_pl);
+	Mutex::ScopedLock lk(_mutex);
+
     if(!mem1 || !mem2)
         return false;
 
@@ -3035,8 +3037,8 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
 
 UInt8 Clan::getClanRank(Player* pl)
 {
-	Mutex::ScopedLock lk(_mutex);
     ClanMember * mem = getClanMember(pl);
+	Mutex::ScopedLock lk(_mutex);
     if(mem != NULL)
     {
         return mem->cls;
@@ -3069,8 +3071,8 @@ UInt8 Clan::getClanRankCount(UInt8 cls)
 
 void Clan::addMemberProffer(Player*pl, UInt32 proffer)
 {
-	Mutex::ScopedLock lk(_mutex);
     ClanMember* mem = getClanMember(pl);
+	Mutex::ScopedLock lk(_mutex);
     if(mem)
     {
         mem->proffer += proffer;
@@ -3087,8 +3089,8 @@ UInt32 Clan::GetRankBattleField(Player* player, UInt32 now)
 {
     UInt32 dayBegin = TimeUtil::SharpDayT(0, now);
 
-    Mutex::ScopedLock lk(_mutex);
     ClanMember* mem = getClanMember(player);
+    Mutex::ScopedLock lk(_mutex);
     if(mem == NULL) return UInt32(-1);
 
     if(TimeUtil::SharpDayT(0, mem->signupRankBattleTime) == dayBegin)
@@ -3102,8 +3104,8 @@ bool Clan::SignupRankBattle(Player* player, UInt32 field, UInt32 now)
 {
     UInt32 dayBegin = TimeUtil::SharpDayT(0, now);
 
-    Mutex::ScopedLock lk(_mutex);
     ClanMember* mem = getClanMember(player);
+    Mutex::ScopedLock lk(_mutex);
     if(mem == NULL) return false;
 
     //已报过名了
@@ -3137,8 +3139,8 @@ bool Clan::SignoutRankBattle(Player* player, UInt32 now)
 {
     UInt32 dayBegin = TimeUtil::SharpDayT(0, now);
 
-    Mutex::ScopedLock lk(_mutex);
     ClanMember* mem = getClanMember(player);
+    Mutex::ScopedLock lk(_mutex);
     if(mem == NULL) return false;
 
     //还没报名
@@ -3171,8 +3173,8 @@ UInt32 Clan::AdjustRankBattleField(Player* player, UInt32 field, UInt32 now)
 {
     UInt32 dayBegin = TimeUtil::SharpDayT(0, now);
 
-    Mutex::ScopedLock lk(_mutex);
     ClanMember* mem = getClanMember(player);
+    Mutex::ScopedLock lk(_mutex);
     if(mem == NULL) return UInt32(-1);
 
     //还没报名
@@ -3367,9 +3369,9 @@ void Clan::SendSelfItemList(Player* player)
 {
     if(player == NULL) return;
 
+    ClanMember* member = getClanMember(player);
     Mutex::ScopedLock lk(_mutex);
 
-    ClanMember* member = getClanMember(player);
     if(member == NULL) return;
 
     Stream stream(REP::CLAN_PACKAGE);
@@ -3526,9 +3528,9 @@ void Clan::GetWeal(Player* player)
 {
     if(player == NULL) return;
 
+    ClanMember* member = getClanMember(player);
     Mutex::ScopedLock lk(_mutex);
 
-    ClanMember* member = getClanMember(player);
     if(member == NULL) return;
 
     if(player->GetVar(VAR_CLAN_WEAL) != 0) return; //今天已经领过
@@ -3548,9 +3550,9 @@ void Clan::GetItems(Player* player)
 {
     if(player == NULL) return;
 
+    ClanMember* member = getClanMember(player);
     Mutex::ScopedLock lk(_mutex);
 
-    ClanMember* member = getClanMember(player);
     if(member == NULL) return;
 
     member->itemPkg.GetItems(player);
@@ -4045,7 +4047,7 @@ void   Clan::sendClanCopyInfo(Player * player, UInt8 val)
 
     st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_STATUE));     // 神像科技等级
 //    st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_LEVEL)); // 副本科技等级
-    st << static_cast<UInt16>(getXianyun()); //仙蕴精华 
+    st << static_cast<UInt32>(getXianyun()); //仙蕴精华
     //st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_ROB));    // 掠夺科技等级
     st << static_cast<UInt16>(_techs->getLev(CLAN_TECH_COPY_LEVEL)); // 副本科技等级
 
@@ -4337,8 +4339,8 @@ void Clan::broadcastClanBattle(Player *caller)
 // 帮派副本
 //////////////////////////////////////////
 
-#define MAX_CLANSPTR_LEVEL  10
-static UInt32 clansptr_exptable[10] = {0, 100, 1000, 2000, 4000, 7000, 10000, 14000, 20000, 30000};
+#define MAX_CLANSPTR_LEVEL  9
+static UInt32 clansptr_exptable[9] = {100, 1000, 2000, 4000, 6000, 9000, 13000, 18000, 25000};
 static UInt32 clansptr_water_teal[3] = {0, 500, 1000};
 static const char* clansptr_udp_tael[3] = {
     "F_130813_1",
@@ -4371,8 +4373,8 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
     UInt8 res = 0;
     // _mutex生命周期
     {
-        Mutex::ScopedLock lk(_mutex);
         ClanMember* mem = getClanMember(pl);
+        Mutex::ScopedLock lk(_mutex);
         if (mem == NULL)
             return;
 
@@ -4405,13 +4407,19 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                 if(needTeal > 0)
                     addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_tael, needTeal, now);
                 m_spiritTree.m_exp += 100;
-                addMemberActivePoint(pl, 1, e_clan_actpt_none);
+                addMemberActivePoint_nolock(pl, 1, e_clan_actpt_none);
                 while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
                 {
                     Player* leader = getLeader();
                     if(leader)
-                        leader->udpLog("shenmozhishu", clansptr_udp_level[m_spiritTree.m_level-1], "", "", "", "", "act");
+                        leader->udpLog("shenmozhishu", clansptr_udp_level[m_spiritTree.m_level], "", "", "", "", "act");
                     ++ m_spiritTree.m_level;
+                    if(m_spiritTree.m_level == MAX_CLANSPTR_LEVEL)
+                        SYSMSG_BROADCASTV(4930, _name.c_str());
+
+                    Stream st;
+                    SYSMSGVP(st, 4931, m_spiritTree.m_level);
+                    broadcast(st);
                 }
                 writeSptrToDB();
                 pl->udpLog("shenmozhishu", clansptr_udp_tael[idx], "", "", "", "", "act");
@@ -4431,7 +4439,7 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
             {
                 ConsumeInfo ci(ClanSptr,0,0);
                 pl->useGold(10, &ci);
-                addMemberActivePoint(pl, 5, e_clan_actpt_none);
+                addMemberActivePoint_nolock(pl, 5, e_clan_actpt_none);
                 addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_gold, 10, now);
                 if(m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
                 {
@@ -4440,8 +4448,13 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                     {
                         Player* leader = getLeader();
                         if(leader)
-                            leader->udpLog("shenmozhishu", clansptr_udp_level[m_spiritTree.m_level-1], "", "", "", "", "act");
+                            leader->udpLog("shenmozhishu", clansptr_udp_level[m_spiritTree.m_level], "", "", "", "", "act");
                         ++ m_spiritTree.m_level;
+                        if(m_spiritTree.m_level == MAX_CLANSPTR_LEVEL)
+                            SYSMSG_BROADCASTV(4930, _name.c_str());
+                        Stream st;
+                        SYSMSGVP(st, 4931, m_spiritTree.m_level);
+                        broadcast(st);
                     }
                     writeSptrToDB();
                 }
@@ -4466,12 +4479,12 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
 
 void Clan::refreshColorAward()
 {
-    const UInt8 level_limit[3] = {3, 6, 9};
+    const UInt8 level_limit[3] = {2, 5, 8};
     const UInt16 rates[3][5] = {
         // 初始次数，小于初始次数的概率， 大于初始次数之后的递增次数， 大于于初始次数的初始概率, 大于初始次数递增后的递增概率
         {5, 1, 1, 3000, 2000},
-        {9, 1, 1, 3000, 2000},
-        {25, 2, 5, 2002, 2000}
+        {11,1, 1, 3000, 2000},
+        {10,1, 5, 2000, 2000}
     };
 
     if(m_spiritTree.m_color >= 3)
@@ -4491,10 +4504,18 @@ void Clan::refreshColorAward()
         Player* leader = getLeader();
         if(leader)
             leader->udpLog("shenmozhishu", clansptr_udp_color[m_spiritTree.m_color], "", "", "", "", "act");
-        ++ m_spiritTree.m_color;
-    }
 
-    ++ m_spiritTree.m_refreshTimes;
+        Stream st;
+        SYSMSGVP(st, 4932+m_spiritTree.m_color);
+        broadcast(st);
+
+        ++ m_spiritTree.m_color;
+        m_spiritTree.m_refreshTimes = 0;
+    }
+    else
+    {
+        ++ m_spiritTree.m_refreshTimes;
+    }
     writeSptrToDB();
 }
 
@@ -4504,8 +4525,8 @@ void Clan::getSpiritTreeAward(Player* pl, UInt8 idx)
     if(idx != 0xFF && idx > 11)
         return;
 
-    Mutex::ScopedLock lk(_mutex);
     ClanMember* mem = getClanMember(pl);
+    Mutex::ScopedLock lk(_mutex);
 	if (mem == NULL)
 		return;
 
@@ -4516,7 +4537,7 @@ void Clan::getSpiritTreeAward(Player* pl, UInt8 idx)
 		return;
     }
 
-    const UInt16 awards[12][2] = {{0xFFFF, 300}, {5001, 1},{400, 1}, {51, 1}, {15, 1}, {56, 1}, {133, 1}, {500, 1}, {1126, 1}, {1326, 1}, {501, 1}, {516, 1}};
+    const UInt16 awards[12][2] = {{0xFFFF, 300}, {5001, 1},{400, 1}, {51, 1}, {15, 1}, {56, 1}, {133, 1}, {500, 1}, {1126, 1}, {503, 1}, {134, 1}, {516, 1}};
     UInt32 awardFlag = pl->GetVar(VAR_CLAN_SPTR_AWARD);
     UInt32 newAwardFlag = awardFlag;
     Package* pkg = pl->GetPackage();
@@ -4529,15 +4550,15 @@ void Clan::getSpiritTreeAward(Player* pl, UInt8 idx)
             pl->sendMsgCode(0, 1011);
             return;
         }
-        if(m_spiritTree.m_level-1 > idx)
+        if(m_spiritTree.m_level > idx)
         {
             if(awardFlag & (1 << idx))
                 return;
             newAwardFlag |= (1 << idx);
         }
-        else if(idx >= MAX_CLANSPTR_LEVEL-1)
+        else if(idx >= MAX_CLANSPTR_LEVEL)
         {
-            if(m_spiritTree.m_color <= idx-(MAX_CLANSPTR_LEVEL-1))
+            if(m_spiritTree.m_color <= idx-MAX_CLANSPTR_LEVEL)
                 return;
             if(awardFlag & (1 << idx))
                 return;
@@ -4565,15 +4586,15 @@ void Clan::getSpiritTreeAward(Player* pl, UInt8 idx)
                 break;
             }
 
-            if(m_spiritTree.m_level-1 > idx)
+            if(m_spiritTree.m_level > idx)
             {
                 if(awardFlag & (1 << idx))
                     continue;
                 newAwardFlag |= (1 << idx);
             }
-            else if(idx >= MAX_CLANSPTR_LEVEL-1)
+            else if(idx >= MAX_CLANSPTR_LEVEL)
             {
-                if(m_spiritTree.m_color <= idx-(MAX_CLANSPTR_LEVEL-1))
+                if(m_spiritTree.m_color <= idx-MAX_CLANSPTR_LEVEL)
                     break;
                 if(awardFlag & (1 << idx))
                     continue;
@@ -4627,14 +4648,14 @@ void Clan::sendSpiritTreeInfo(Player* pl, bool bc)
         UInt8 times = pl->GetVar(VAR_CLAN_SPTR_WATER);
         st << times;
         UInt8 i = 0;
-        for(; i < m_spiritTree.m_level-1; ++ i)
+        for(; i < m_spiritTree.m_level; ++ i)
         {
             if(awardFlag & (1 << i))
                 st << static_cast<UInt8>(2);
             else
                 st << static_cast<UInt8>(1);
         }
-        for(; i < MAX_CLANSPTR_LEVEL-1; ++ i)
+        for(; i < MAX_CLANSPTR_LEVEL; ++ i)
         {
             if(awardFlag & (1 << i))
                 st << static_cast<UInt8>(2);
@@ -4669,7 +4690,7 @@ void Clan::checkSpiritTree()
     {
         m_spiritTree.m_endTime = TimeUtil::SharpDayT(1, now);
         m_spiritTree.m_exp = 0;
-        m_spiritTree.m_level = 1;
+        m_spiritTree.m_level = 0;
         m_spiritTree.m_refreshTimes = 0;
         m_spiritTree.m_color = 0;
         writeSptrToDB();
@@ -4700,7 +4721,32 @@ void Clan::addMemberActivePoint(Player* pl, UInt32 actpt, CLAN_ACTPT_FLAG f)
         flag |= f;
         pl->SetVar(VAR_CLAN_ACTPT_FLAG, flag);
     }
+    ClanMember* mem = getClanMember(pl);
 	Mutex::ScopedLock lk(_mutex);
+    if(mem)
+    {
+        checkMemberActivePoint(mem);
+        mem->activepoint += actpt;
+        {
+            Stream st(REP::CLAN_INFO_UPDATE);
+            st << static_cast<UInt8>(11) << pl->getId() << mem->activepoint << Stream::eos;
+            broadcast(st);
+        }
+        DB5().PushUpdateData("UPDATE `clan_player` SET `activepoint` = %u WHERE `playerId` = %" I64_FMT "u", mem->activepoint, mem->player->getId());
+        pl->AddVar(VAR_CLAN_ACTPT_MONTH, actpt);
+    }
+}
+
+void Clan::addMemberActivePoint_nolock(Player* pl, UInt32 actpt, CLAN_ACTPT_FLAG f)
+{
+    if(f != 0)
+    {
+        UInt32 flag = pl->GetVar(VAR_CLAN_ACTPT_FLAG);
+        if(f & flag)
+            return;
+        flag |= f;
+        pl->SetVar(VAR_CLAN_ACTPT_FLAG, flag);
+    }
     ClanMember* mem = getClanMember(pl);
     if(mem)
     {
@@ -4716,10 +4762,11 @@ void Clan::addMemberActivePoint(Player* pl, UInt32 actpt, CLAN_ACTPT_FLAG f)
     }
 }
 
+
 UInt32 Clan::getMemberActivePoint(Player* pl)
 {
-	Mutex::ScopedLock lk(_mutex);
     ClanMember* mem = getClanMember(pl);
+	Mutex::ScopedLock lk(_mutex);
     if(mem)
     {
         checkMemberActivePoint(mem);

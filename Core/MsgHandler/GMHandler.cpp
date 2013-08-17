@@ -76,6 +76,7 @@ GMHandler::GMHandler()
 	Reg(3, "banchat", &GMHandler::OnBanChat);
 	Reg(3, "addexp", &GMHandler::OnAddExp);
 	Reg(2, "exp", &GMHandler::OnAddExp);
+	Reg(2, "addOT", &GMHandler::OnAddOnlineTime);
 	Reg(2, "pexp", &GMHandler::OnAddPExp);
 	Reg(3, "addpexp", &GMHandler::OnAddPExp);
 	Reg(3, "additem", &GMHandler::OnAddItem);
@@ -551,7 +552,7 @@ void GMHandler::OnAddExp( GObject::Player * player, std::vector<std::string>& ar
 	{
 		UInt32 exp = atoi(args[1].c_str());
 		if(exp == 0)
-			return;
+			return ;
 		char * endptr;
 		UInt64 playerId = strtoull(args[0].c_str(), &endptr, 10);
 		if(playerId == 0)
@@ -562,6 +563,19 @@ void GMHandler::OnAddExp( GObject::Player * player, std::vector<std::string>& ar
 		pl->AddExp(exp);
 	}
 }
+void GMHandler::OnAddOnlineTime( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+    if(args.size() == 1)
+	{
+		UInt32 time = atoi(args[0].c_str());
+		if(time == 0)
+			return;
+		player->AddVarNow(VAR_TODAY_ONLINE,time,TimeUtil::Now());
+	}
+}
+
 
 void GMHandler::OnAddPExp( GObject::Player * player, std::vector<std::string>& args )
 {

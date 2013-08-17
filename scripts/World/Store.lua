@@ -115,6 +115,10 @@ function loadStore()
 
         discount(store)
 
+    if getCollectCardAct() then
+        store:add(2, 9415,10)
+    end
+
         store:add(2, 1126, 20)
         store:add(2, 9388, 100)
         store:add(2, 9371, 10)

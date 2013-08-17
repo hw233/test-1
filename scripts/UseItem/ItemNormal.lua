@@ -8160,6 +8160,41 @@ function ItemNormal_00010193(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010195(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (4+(4*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(56, num*3, true, false, 2);
+    package:Add(57, num*3, true, false, 2);
+    package:Add(548, num*30, true, false, 2);
+    package:Add(50, num*3, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010196(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (5+(5*num*6)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(503, num*6, true, false, 2);
+    package:Add(515, num*6, true, false, 2);
+    package:Add(1126, num*6, true, false, 2);
+    package:Add(513, num*6, true, false, 2);
+    package:Add(548, num*50, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -9362,6 +9397,29 @@ function ItemNormal_00009408(iid, num, bind, param)
 
     package:DelItemSendMsg(iid, player)
     return num;
+end
+
+function ItemNormal_00009419(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+
+    local item = { {515, 5}, {1325, 10}, {9076, 5}, {507, 5} }
+
+    local used = 0
+    for i = 1, num do
+        if package:GetRestPackageSize() < 1 then
+            player:sendMsgCode(2, 1011, 0);
+            break;
+        end
+        local cur = math.random(1,#item)
+        package:Add(item[cur][1], item[cur][2], true)
+        used = i;
+    end
+
+    if used > 0 then
+        package:DelItemSendMsg(iid, player)
+    end
+    return used;
 end
 
 local ItemNormal_Table = {
@@ -11100,6 +11158,7 @@ local ItemNormal_Table = {
     [9410] = ItemNormal_00009408,
     [9411] = ItemNormal_00009408,
     [9418] = ItemNormal_tuzhi,
+    [9419] = ItemNormal_00009419,
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,
     [9902] = ItemNormal_NameCard,
@@ -11311,6 +11370,8 @@ local ItemNormal_Table = {
     [10192] = ItemNormal_00010192,
     [10193] = ItemNormal_00010193,
     [10194] = ItemNormal_00010193,
+    [10195] = ItemNormal_00010195,
+    [10196] = ItemNormal_00010196,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

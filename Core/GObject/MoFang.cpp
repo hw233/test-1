@@ -208,9 +208,13 @@ void MoFang::randTuzhi(UInt8 num)
         UInt8 lvl = 0;
         UInt8 markA = uRand(100);
 
-        if(m_jiguanshu.curLvl >= 0 && m_jiguanshu.curLvl < 3)
+        if(m_jiguanshu.curLvl == 0)
         {
             lvl = 0;
+        }
+        else if(m_jiguanshu.curLvl == 1)
+        {
+            lvl = 1;
         }
         else if(m_jiguanshu.curLvl > 19)
         {
@@ -238,6 +242,33 @@ void MoFang::randTuzhi(UInt8 num)
         UInt32 tuzhiId = addTuzhi(id, true);
 
         st << tuzhiId;
+
+        if(tuzhiId > SPECIAL_TUZHI) //特殊图纸，读取图纸ID为200000的配置 
+            tuzhiId = SPECIAL_TUZHI;
+
+        GData::JiguanData::tuzhiInfo * tzInfo = GData::jiguanData.getTuzhiInfo(tuzhiId);
+        if(!tzInfo)
+            return;
+
+        UInt8 tzQuality = tzInfo->quality;
+
+        switch(tzQuality)
+        {
+            case TUZHI_GREEN:
+                m_owner->udpLog("feigong", "F_130817_2", "", "", "", "", "act");
+                break;
+            case TUZHI_BLUE:
+                m_owner->udpLog("feigong", "F_130817_3", "", "", "", "", "act");
+                break;
+            case TUZHI_PURPLE:
+                m_owner->udpLog("feigong", "F_130817_4", "", "", "", "", "act");
+                break;
+            case TUZHI_YELLOW:
+                m_owner->udpLog("feigong", "F_130817_5", "", "", "", "", "act");
+                break;
+        }
+
+        m_owner->udpLog("feigong", "F_130817_1", "", "", "", "", "act");
     }
     st << Stream::eos;
     m_owner->send(st);
@@ -278,7 +309,7 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
 
     UInt8 tzQuality = tzInfo->quality; 
     UInt8 curProficient = iter->second;
-    UInt8 successRate = 0;
+    float successRate = 0;
     UInt32 addExp = 0;
 
     switch(tzQuality)
@@ -289,11 +320,24 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
             if(curProficient<=25)
                 successRate += curProficient;
             else if(curProficient<=50)
+            {
+                successRate += curProficient;
                 successRate += (curProficient - 25) * 3;
+            }
             else if(curProficient<=75)
+            {
+                successRate += curProficient;
+                successRate += (curProficient - 25) * 3;
                 successRate += (curProficient - 50) * 3;
+            }
             else if(curProficient<=100)
+            {
+                successRate += curProficient;
+                successRate += (curProficient - 25) * 3;
+                successRate += (curProficient - 50) * 3;
                 successRate += (curProficient - 75) * 3;
+            }
+            m_owner->udpLog("feigong", "F_130817_7", "", "", "", "", "act");
             break;
         case TUZHI_BLUE:
             addExp = 150;
@@ -301,11 +345,24 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
             if(curProficient<=25)
                 successRate += curProficient * 0.02;
             else if(curProficient<=50)
+            {
+                successRate += curProficient * 0.02;
                 successRate += (curProficient - 25) * 2;
+            }
             else if(curProficient<=75)
+            {
+                successRate += curProficient * 0.02;
+                successRate += (curProficient - 25) * 2;
                 successRate += (curProficient - 50) * 3;
+            }
             else if(curProficient<=100)
+            {
+                successRate += curProficient * 0.02;
+                successRate += (curProficient - 25) * 2;
+                successRate += (curProficient - 50) * 3;
                 successRate += (curProficient - 75) * 3;
+            }
+            m_owner->udpLog("feigong", "F_130817_8", "", "", "", "", "act");
             break;
         case TUZHI_PURPLE:
             addExp = 300;
@@ -313,11 +370,24 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
             if(curProficient<=25)
                 successRate += curProficient * 0.01;
             else if(curProficient<=50)
+            {
+                successRate += curProficient * 0.01;
                 successRate += (curProficient - 25) * 0.02;
+            }
             else if(curProficient<=75)
+            {
+                successRate += curProficient * 0.01;
+                successRate += (curProficient - 25) * 0.02;
                 successRate += (curProficient - 50) * 2;
+            }
             else if(curProficient<=100)
+            {
+                successRate += curProficient * 0.01;
+                successRate += (curProficient - 25) * 0.02;
+                successRate += (curProficient - 50) * 2;
                 successRate += (curProficient - 75) * 3;
+            }
+            m_owner->udpLog("feigong", "F_130817_9", "", "", "", "", "act");
             break;
         case TUZHI_YELLOW:
             addExp = 750;
@@ -325,18 +395,71 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
             if(curProficient<=25)
                 successRate += curProficient * 0.01;
             else if(curProficient<=50)
+            {
+                successRate += curProficient * 0.01;
                 successRate += (curProficient - 25) * 0.02;
+            }
             else if(curProficient<=75)
+            {
+                successRate += curProficient * 0.01;
+                successRate += (curProficient - 25) * 0.02;
                 successRate += (curProficient - 50) * 0.03;
+            }
             else if(curProficient<=100)
+            {
+                successRate += curProficient * 0.01;
+                successRate += (curProficient - 25) * 0.02;
+                successRate += (curProficient - 50) * 0.03;
                 successRate += (curProficient - 75) * 2.5;
+            }
+            m_owner->udpLog("feigong", "F_130817_10", "", "", "", "", "act");
             break;
     }
 
     if(!m_owner->GetPackage()->DelItem(toolId, 1, false, ToMakeJGY))
         return;
 
-    if(successRate < 100)
+    UInt8 result = 0;
+    if(curProficient >= 100 || uRand(10000) < successRate*100)
+    {
+        if(m_jiguanshu.curLvl < 100)
+        {
+            m_jiguanshu.curExp += addExp;
+            if(m_jiguanshu.curExp > JGS_MAXEXP)
+                m_jiguanshu.curExp = JGS_MAXEXP;
+        }
+
+        if(tuzhiId < SPECIAL_TUZHI) //训练图纸，制造后只增加机关术经验，不获得机关玉
+        {
+            m_jg.push_back(tzInfo->jiguanyuId);
+
+            DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), tzInfo->jiguanyuId, 0);
+        }
+
+        DB4().PushUpdateData("DELETE FROM `player_tuzhi` WHERE `tuzhiId` = %u AND `playerId` = %" I64_FMT "u", tuzhiId, m_owner->getId());
+
+        m_tuzhi.erase(iter);
+        result = 1;
+
+        switch(tzQuality)
+        {
+            case TUZHI_GREEN:
+                m_owner->udpLog("feigong", "F_130817_12", "", "", "", "", "act");
+                break;
+            case TUZHI_BLUE:
+                m_owner->udpLog("feigong", "F_130817_13", "", "", "", "", "act");
+                break;
+            case TUZHI_PURPLE:
+                m_owner->udpLog("feigong", "F_130817_14", "", "", "", "", "act");
+                break;
+            case TUZHI_YELLOW:
+                m_owner->udpLog("feigong", "F_130817_15", "", "", "", "", "act");
+                break;
+        }
+
+        m_owner->udpLog("feigong", "F_130817_11", "", "", "", "", "act");
+    }
+    else
     {
         UInt8 randA = uRand(100);
         UInt8 randB = 0;
@@ -398,38 +521,12 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
                         curProficient -= randB + 1;
                     else
                         curProficient -= randB;
-
                 }
                 break;
         }
 
         iter->second = curProficient;
-    }
 
-    UInt8 result = 0;
-    if(curProficient >= 100 || successRate >= 100)
-    {
-        if(m_jiguanshu.curLvl < 100)
-        {
-            m_jiguanshu.curExp += addExp;
-            if(m_jiguanshu.curExp > JGS_MAXEXP)
-                m_jiguanshu.curExp = JGS_MAXEXP;
-        }
-
-        if(tuzhiId < SPECIAL_TUZHI) //训练图纸，制造后只增加机关术经验，不获得机关玉
-        {
-            m_jg.push_back(tzInfo->jiguanyuId);
-
-            DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), tzInfo->jiguanyuId, 0);
-        }
-
-        DB4().PushUpdateData("DELETE FROM `player_tuzhi` WHERE `tuzhiId` = %u AND `playerId` = %" I64_FMT "u", tuzhiId, m_owner->getId());
-
-        m_tuzhi.erase(iter);
-        result = 1;
-    }
-    else
-    {
         if(m_jiguanshu.curLvl < 100)
         {
             m_jiguanshu.curExp += 10;
@@ -441,6 +538,8 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
     }
 
     upgradeJGS();
+
+    m_owner->udpLog("feigong", "F_130817_6", "", "", "", "", "act");
 
     Stream st(REP::MOFANG_INFO);
     st << mark;
@@ -463,7 +562,7 @@ void MoFang::upgradeJGS()
     if(!jgsInfo)
         return;
 
-    m_jiguanshu.curLvl = jgsInfo->jgshuLvl;
+    m_jiguanshu.curLvl = jgsInfo->jgshuLvl + 1;
 
     DB4().PushUpdateData("REPLACE INTO `player_jiguanshu` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), m_jiguanshu.curLvl, m_jiguanshu.curExp);
 

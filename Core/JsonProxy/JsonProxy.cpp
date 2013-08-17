@@ -188,7 +188,7 @@ int main()
         do {
             // 清空接收缓存
             clear_read_buffer(asss_conn);
-            char buf[160000] = {0}; // XXX: 16K
+            char buf[16*1024] = {0}; // XXX: 16K
             int len = 0;
             if((len = read_jason_req(new_fd, buf)) == 0)
             {

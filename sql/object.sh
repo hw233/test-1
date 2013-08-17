@@ -175,7 +175,6 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearbluediamond.sql  #蓝钻活动需要打开
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130704_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130712_1.sql #fighter表里面添加 innateTrump 字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130721_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_tempItem.sql #创建临时物品表
@@ -186,6 +185,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_set_gvar51_52.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_jiguan.sql #机关兽创建player_jiguanshu、player_jiguanyu和player_tuzhi
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_friendkey.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_friendkey.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_collect_card.sql
     #. clearshiyamen.sh
 }
 
