@@ -5171,6 +5171,21 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
                     rcnt = 1;
             }
         }
+
+        const GData::SkillBase *skill = bf->getXiangMoChanZhangSkill();
+        if(skill && skill->effect)
+        {
+            const std::vector<UInt16>& eft = skill->effect->eft;
+            const std::vector<UInt8>& efl = skill->effect->efl;
+            const std::vector<float>& efv = skill->effect->efv;
+
+            size_t cnt = eft.size();
+            if(cnt == efl.size() && cnt == efv.size())
+            {
+                for(size_t i = 0; i < cnt; ++ i)
+                    doSkillEffectExtra_HpShield(bf, bf->getSide(), bf->getPos(), skill, i);
+            }
+        }
     }
 
     //if(rcnt != 0)
