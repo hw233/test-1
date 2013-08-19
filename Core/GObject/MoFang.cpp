@@ -241,6 +241,8 @@ void MoFang::randTuzhi(UInt8 num)
 
         UInt32 tuzhiId = addTuzhi(id, true);
 
+        std::cout << "tuzhiId : " << tuzhiId << std::endl;
+
         st << tuzhiId;
 
         if(tuzhiId > SPECIAL_TUZHI) //特殊图纸，读取图纸ID为200000的配置 
@@ -289,8 +291,8 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
     else
         toolId = 9413;
 
-    ItemBase * item = m_owner->GetPackage()->FindItem(toolId);
-    if(NULL == item)
+    UInt16 toolCount = m_owner->GetPackage()->GetItemAnyNum(toolId);
+    if(0 == toolCount)
         return;
 
     UInt32 id = 0;
@@ -321,20 +323,17 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
                 successRate += curProficient;
             else if(curProficient<=50)
             {
-                successRate += curProficient;
+                successRate += 25;
                 successRate += (curProficient - 25) * 3;
             }
             else if(curProficient<=75)
             {
-                successRate += curProficient;
-                successRate += (curProficient - 25) * 3;
+                successRate += 25 * 4;
                 successRate += (curProficient - 50) * 3;
             }
             else if(curProficient<=100)
             {
-                successRate += curProficient;
-                successRate += (curProficient - 25) * 3;
-                successRate += (curProficient - 50) * 3;
+                successRate += 25 * 7;
                 successRate += (curProficient - 75) * 3;
             }
             m_owner->udpLog("feigong", "F_130817_7", "", "", "", "", "act");
@@ -346,20 +345,17 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
                 successRate += curProficient * 0.02;
             else if(curProficient<=50)
             {
-                successRate += curProficient * 0.02;
+                successRate += 25 * 0.02;
                 successRate += (curProficient - 25) * 2;
             }
             else if(curProficient<=75)
             {
-                successRate += curProficient * 0.02;
-                successRate += (curProficient - 25) * 2;
+                successRate += 25 * 2.02;
                 successRate += (curProficient - 50) * 3;
             }
             else if(curProficient<=100)
             {
-                successRate += curProficient * 0.02;
-                successRate += (curProficient - 25) * 2;
-                successRate += (curProficient - 50) * 3;
+                successRate += 25 * 5.02;
                 successRate += (curProficient - 75) * 3;
             }
             m_owner->udpLog("feigong", "F_130817_8", "", "", "", "", "act");
@@ -371,20 +367,17 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
                 successRate += curProficient * 0.01;
             else if(curProficient<=50)
             {
-                successRate += curProficient * 0.01;
+                successRate += 25 * 0.01;
                 successRate += (curProficient - 25) * 0.02;
             }
             else if(curProficient<=75)
             {
-                successRate += curProficient * 0.01;
-                successRate += (curProficient - 25) * 0.02;
+                successRate += 25 * 0.03;
                 successRate += (curProficient - 50) * 2;
             }
             else if(curProficient<=100)
             {
-                successRate += curProficient * 0.01;
-                successRate += (curProficient - 25) * 0.02;
-                successRate += (curProficient - 50) * 2;
+                successRate += 25 * 2.03;
                 successRate += (curProficient - 75) * 3;
             }
             m_owner->udpLog("feigong", "F_130817_9", "", "", "", "", "act");
@@ -393,35 +386,33 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
             addExp = 750;
             successRate = 0.1;
             if(curProficient<=25)
-                successRate += curProficient * 0.01;
+                successRate += curProficient * 0.001;
             else if(curProficient<=50)
             {
-                successRate += curProficient * 0.01;
-                successRate += (curProficient - 25) * 0.02;
+                successRate += 25 * 0.001;
+                successRate += (curProficient - 25) * 0.005;
             }
             else if(curProficient<=75)
             {
-                successRate += curProficient * 0.01;
-                successRate += (curProficient - 25) * 0.02;
-                successRate += (curProficient - 50) * 0.03;
+                successRate += 25 * 0.006;
+                successRate += (curProficient - 50) * 0.01;
             }
             else if(curProficient<=100)
             {
-                successRate += curProficient * 0.01;
-                successRate += (curProficient - 25) * 0.02;
-                successRate += (curProficient - 50) * 0.03;
+                successRate += 25 * 0.016;
                 successRate += (curProficient - 75) * 2.5;
             }
             m_owner->udpLog("feigong", "F_130817_10", "", "", "", "", "act");
             break;
     }
 
-    if(!m_owner->GetPackage()->DelItem(toolId, 1, false, ToMakeJGY))
+    bool bind = true;
+    if(!m_owner->GetPackage()->DelItemAny(toolId, 1, &bind, ToMakeJGY))
         return;
 
     UInt8 result = 0;
-    UInt8 randValue = uRand(10000);
-    if(curProficient >= 100 || randValue < successRate*100)
+    UInt32 randValue = uRand(100000);
+    if(curProficient >= 100 || randValue < successRate*1000)
     {
         if(m_jiguanshu.curLvl < 100)
         {
@@ -470,12 +461,12 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
                     curProficient += randB + 4;
                 break; 
             case TUZHI_BLUE:
-                randB = randB + 3;
-                if(randA >= 0 && randA < 80)
+                randB += 3;
+                if(randA < 85 || 1 == type)
                 {
                     curProficient += randB;
                 }
-                else if(randA >= 80 && randA < 90 && 0 == type)
+                else if(randA >= 85 && randA < 100 && 0 == type)
                 {
                     if(randB < curProficient)
                         curProficient -= randB;
@@ -484,12 +475,12 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
                 }
                 break;
             case TUZHI_PURPLE:
-                randB = randB + 2;
-                if(randA >= 0 && randA < 60)
+                randB += 2;
+                if(randA < 70 || 1 == type)
                 {
                     curProficient += randB;
                 }
-                else if(randA >=60 && randA < 80 && 0 == type)
+                else if(randA >=70 && randA < 100 && 0 == type)
                 {
                     if(randB < curProficient)
                         curProficient -= randB;
@@ -498,12 +489,12 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
                 }
                 break;
             case TUZHI_YELLOW:
-                randB = randB + 1;
-                if(randA >= 0 && randA < 30)
+                randB += 1;
+                if(randA < 50 || 1 == type)
                 {
                     curProficient += randB;
                 }
-                else if(randA >= 30 && randA < 60 && 0 == type)
+                else if(randA >= 50 && randA < 100 && 0 == type)
                 {
                     if(randB < curProficient)
                         curProficient -= randB;
