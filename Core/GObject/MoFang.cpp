@@ -420,7 +420,8 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
         return;
 
     UInt8 result = 0;
-    if(curProficient >= 100 || uRand(10000) < successRate*100)
+    UInt8 randValue = uRand(10000);
+    if(curProficient >= 100 || randValue < successRate*100)
     {
         if(m_jiguanshu.curLvl < 100)
         {
@@ -462,68 +463,58 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
     else
     {
         UInt8 randA = uRand(100);
-        UInt8 randB = 0;
+        UInt8 randB = uRand(3);
         switch(tzQuality)
         {
             case TUZHI_GREEN:
-                randB = uRand(7);
-                if(randB < 4)
-                    curProficient += 5;
-                else
-                    curProficient += randB;
+                    curProficient += randB + 4;
                 break; 
             case TUZHI_BLUE:
-                randB = uRand(6);
+                randB = randB + 3;
                 if(randA >= 0 && randA < 80)
                 {
-                    if(randB < 3)
-                        curProficient += randB + 3;
-                    else
-                        curProficient += randB;
+                    curProficient += randB;
                 }
                 else if(randA >= 80 && randA < 90 && 0 == type)
                 {
-                    if(randB < 3)
-                        curProficient -= randB + 3;
-                    else
+                    if(randB < curProficient)
                         curProficient -= randB;
+                    else
+                        curProficient = 0;
                 }
                 break;
             case TUZHI_PURPLE:
-                randB = uRand(5);
+                randB = randB + 2;
                 if(randA >= 0 && randA < 60)
                 {
-                    if(randB < 2)
-                        curProficient += randB + 2;
-                    else
-                        curProficient += randB;
+                    curProficient += randB;
                 }
                 else if(randA >=60 && randA < 80 && 0 == type)
                 {
-                    if(randB < 2)
-                        curProficient -= randB + 2;
-                    else
+                    if(randB < curProficient)
                         curProficient -= randB;
+                    else
+                        curProficient = 0;
                 }
                 break;
             case TUZHI_YELLOW:
-                randB = uRand(4);
+                randB = randB + 1;
                 if(randA >= 0 && randA < 30)
                 {
-                    if(randB == 0)
-                        curProficient += randB + 1;
-                    else
-                        curProficient += randB;
+                    curProficient += randB;
                 }
                 else if(randA >= 30 && randA < 60 && 0 == type)
                 {
-                    if(randB == 0)
-                        curProficient -= randB + 1;
-                    else
+                    if(randB < curProficient)
                         curProficient -= randB;
+                    else
+                        curProficient = 0;
                 }
                 break;
         }
+
+        if(curProficient > 100)
+            curProficient = 100;
 
         iter->second = curProficient;
 
@@ -561,8 +552,13 @@ void MoFang::upgradeJGS()
     GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getUpgradeInfo(m_jiguanshu.curExp);
     if(!jgsInfo)
         return;
-
-    m_jiguanshu.curLvl = jgsInfo->jgshuLvl + 1;
+    
+    if(m_jiguanshu.curExp == jgsInfo->needExp)
+    {
+        m_jiguanshu.curLvl = jgsInfo->jgshuLvl + 1;
+    }
+    else
+        m_jiguanshu.curLvl = jgsInfo->jgshuLvl;
 
     DB4().PushUpdateData("REPLACE INTO `player_jiguanshu` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), m_jiguanshu.curLvl, m_jiguanshu.curExp);
 

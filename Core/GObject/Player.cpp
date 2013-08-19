@@ -1080,7 +1080,6 @@ namespace GObject
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-        SetMemCach();
         //SetMemCach();
        // continuousLoginSummerFlow();//修改
 
