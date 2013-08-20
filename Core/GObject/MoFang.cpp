@@ -6,6 +6,7 @@
 #include "GData/AttrExtra.h"
 #include "GData/JiguanData.h"
 #include "GObjectDBExecHelper.h"
+#include "Server/SysMsg.h"
 
 namespace GObject
 {
@@ -33,8 +34,26 @@ void MoFang::AddJGSFromDB(DBJiguanshu & dbData)
 {
     m_jiguanshu.curLvl = dbData.curLvl;
     m_jiguanshu.curExp = dbData.curExp;
+
+    UInt8 temp[20][2] = {{10, 11}, {12, 13}, {20, 27}, {34, 41}, {40, 39}, 
+                {38, 37}, {30, 23}, {16, 9}, {2, 3}, {4, 5},
+                {6, 7}, {14, 21}, {28, 35}, {42, 49}, {48, 47},
+                {46, 45}, {44, 43}, {36, 29}, {22, 15}, {8, 1}};
+
+    UInt8 lvlMark = m_jiguanshu.curLvl;
+    UInt8 index = 0;
+
+    for(UInt8 i=0; i<lvlMark; i++)
+    {
+        for(UInt8 k=0; k<2; k++)
+        {
+           index = temp[i][k]; 
+           if(index > 0 && index <= 49 && (m_grids[index-1] == -1))
+               m_grids[index-1] = 0;
+        }
+    }
     
-    UInt8 temp[40] = {10, 11, 12, 13, 20, 27, 34, 41, 40, 39, 
+    /*UInt8 temp[40] = {10, 11, 12, 13, 20, 27, 34, 41, 40, 39, 
                     38, 37, 30, 23, 16, 9, 2, 3, 4, 5,
                     6, 7, 14, 21, 28, 35, 42, 49, 48, 47,
                     46, 45, 44, 43, 36, 29, 22, 15, 8, 1};
@@ -49,7 +68,7 @@ void MoFang::AddJGSFromDB(DBJiguanshu & dbData)
         UInt8 index = temp[i];
         if(index > 0 && index <= 49)
             m_grids[index-1] = 0;
-    }
+    }*/
 }
 
 void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
@@ -70,7 +89,7 @@ void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
             if(mark)
                 i = 0;
 
-            if(k >= 9 || (pos+i) < 0 || (pos+i) >= 49)
+            if((k >= 9 || (pos+i) < 0 || (pos+i) >= 49) && (0 != jgyInfo->molding[k]))
                 return;
 
             if(0 != jgyInfo->molding[k])
@@ -132,25 +151,37 @@ UInt32 MoFang::addTuzhi(UInt32 tuzhiId, bool mark)
     if(!tzInfo)
         return 0;
 
-    if(tuzhiId > NORMAL_TUZHI && tuzhiId < SPECIAL_TUZHI)
+    if(tuzhiId > NORMAL_TUZHI && tuzhiId <= SPECIAL_TUZHI)
     {
         std::map<UInt8, UInt32>::iterator iter = m_equipJG.begin();
         for(; iter != m_equipJG.end(); iter++)
         {
             if(iter->second == (tuzhiId - NORMAL_TUZHI))
-                tuzhiId = SPECIAL_TUZHI;
+            {
+                m_jiguanshu.curExp += 30;
+                return 0;
+            }
+               // tuzhiId = SPECIAL_TUZHI;
         }
 
         bool findRes = findNoEquipJG(tuzhiId - NORMAL_TUZHI);
         if(findRes)
-            tuzhiId = SPECIAL_TUZHI;
+        {
+            m_jiguanshu.curExp += 30;
+            return 0;
+        }
+            //tuzhiId = SPECIAL_TUZHI;
 
         std::map<UInt32, UInt8>::iterator iterA = m_tuzhi.find(tuzhiId);
         if(iterA != m_tuzhi.end())
-            tuzhiId = SPECIAL_TUZHI;
+        {
+            m_jiguanshu.curExp += 30;
+            return 0;
+        }
+            //tuzhiId = SPECIAL_TUZHI;
     }
 
-    if(tuzhiId >= SPECIAL_TUZHI)
+    /*if(tuzhiId >= SPECIAL_TUZHI)
     {
         UInt32 tempId= 0;
         std::map<UInt32, UInt8>::iterator iterB = m_tuzhi.begin();
@@ -166,7 +197,7 @@ UInt32 MoFang::addTuzhi(UInt32 tuzhiId, bool mark)
         {
             tuzhiId = tempId + 1;
         }
-    }
+    }*/
 
     m_tuzhi.insert(std::make_pair(tuzhiId, 0));
 
@@ -190,20 +221,30 @@ void MoFang::addJGSExp(UInt32 exp)
 
     upgradeJGS();
 
+    UInt32 sendExp = 0;
+    if(m_jiguanshu.curExp > JGS_MAXEXP)
+        sendExp = JGS_MAXEXP;
+    else
+        sendExp = m_jiguanshu.curExp;
+
     Stream st(REP::MOFANG_INFO);
     st << static_cast<UInt8>(5);
-    st << static_cast<UInt32>(m_jiguanshu.curExp);
+    st << static_cast<UInt32>(sendExp);
     st << Stream::eos;
     m_owner->send(st);
 }
 
-void MoFang::randTuzhi(UInt8 num)
+void MoFang::randTuzhi(UInt16 num)
 {
+    UInt16 count = 0;
+    UInt32 exp = m_jiguanshu.curExp;
     Stream st(REP::MOFANG_INFO);
     st << static_cast<UInt8>(6);
-    st << num;
+    UInt16 offsetA = 0;
+    offsetA = st.size();
+    st << count;
 
-    for(UInt8 i=0; i<num; i++)
+    for(UInt16 i=0; i<num; i++)
     {
         UInt8 lvl = 0;
         UInt8 markA = uRand(100);
@@ -240,38 +281,54 @@ void MoFang::randTuzhi(UInt8 num)
         UInt32 id = GData::jiguanData.getTuzhiId(lvl);
 
         UInt32 tuzhiId = addTuzhi(id, true);
-
-        std::cout << "tuzhiId : " << tuzhiId << std::endl;
-
-        st << tuzhiId;
-
-        if(tuzhiId > SPECIAL_TUZHI) //特殊图纸，读取图纸ID为200000的配置 
-            tuzhiId = SPECIAL_TUZHI;
-
-        GData::JiguanData::tuzhiInfo * tzInfo = GData::jiguanData.getTuzhiInfo(tuzhiId);
-        if(!tzInfo)
-            return;
-
-        UInt8 tzQuality = tzInfo->quality;
-
-        switch(tzQuality)
+        if(tuzhiId > 0)
         {
-            case TUZHI_GREEN:
-                m_owner->udpLog("feigong", "F_130817_2", "", "", "", "", "act");
-                break;
-            case TUZHI_BLUE:
-                m_owner->udpLog("feigong", "F_130817_3", "", "", "", "", "act");
-                break;
-            case TUZHI_PURPLE:
-                m_owner->udpLog("feigong", "F_130817_4", "", "", "", "", "act");
-                break;
-            case TUZHI_YELLOW:
-                m_owner->udpLog("feigong", "F_130817_5", "", "", "", "", "act");
-                break;
-        }
+            std::cout << "tuzhiId : " << tuzhiId << std::endl;
+            st << tuzhiId;
+            count ++;
 
-        m_owner->udpLog("feigong", "F_130817_1", "", "", "", "", "act");
+            GData::JiguanData::tuzhiInfo * tzInfo = GData::jiguanData.getTuzhiInfo(tuzhiId);
+            if(!tzInfo)
+                return;
+
+            UInt8 tzQuality = tzInfo->quality;
+
+            switch(tzQuality)
+            {
+                case TUZHI_GREEN:
+                    m_owner->udpLog("feigong", "F_130817_2", "", "", "", "", "act");
+                    break;
+                case TUZHI_BLUE:
+                    m_owner->udpLog("feigong", "F_130817_3", "", "", "", "", "act");
+                    break;
+                case TUZHI_PURPLE:
+                    m_owner->udpLog("feigong", "F_130817_4", "", "", "", "", "act");
+                    break;
+                case TUZHI_YELLOW:
+                    m_owner->udpLog("feigong", "F_130817_5", "", "", "", "", "act");
+                    break;
+            }
+
+            m_owner->udpLog("feigong", "F_130817_1", "", "", "", "", "act");
+        }
     }
+
+    upgradeJGS();
+
+    exp = m_jiguanshu.curExp - exp;
+    if(exp > 0)
+    {
+        SYSMSG_SENDV(4935, m_owner, exp);
+    }
+
+    UInt32 sendExp = 0;
+    if(m_jiguanshu.curExp > JGS_MAXEXP)
+        sendExp = JGS_MAXEXP;
+    else
+        sendExp = m_jiguanshu.curExp;
+
+    st.data<UInt16>(offsetA) = count;
+    st << static_cast<UInt32>(sendExp); 
     st << Stream::eos;
     m_owner->send(st);
 }
@@ -295,13 +352,13 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
     if(0 == toolCount)
         return;
 
-    UInt32 id = 0;
+   /* UInt32 id = 0;
     if(tuzhiId > SPECIAL_TUZHI) //特殊图纸，读取图纸ID为200000的配置 
         id = SPECIAL_TUZHI;
     else
-        id = tuzhiId;
+        id = tuzhiId;*/
 
-    GData::JiguanData::tuzhiInfo * tzInfo = GData::jiguanData.getTuzhiInfo(id);
+    GData::JiguanData::tuzhiInfo * tzInfo = GData::jiguanData.getTuzhiInfo(tuzhiId);
     if(!tzInfo)
         return;
 
@@ -406,20 +463,21 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
             break;
     }
 
-    bool bind = true;
-    if(!m_owner->GetPackage()->DelItemAny(toolId, 1, &bind, ToMakeJGY))
+    if(!m_owner->GetPackage()->DelItemAny(toolId, 1, NULL, ToMakeJGY))
         return;
 
     UInt8 result = 0;
     UInt32 randValue = uRand(100000);
     if(curProficient >= 100 || randValue < successRate*1000)
     {
-        if(m_jiguanshu.curLvl < 100)
+        m_jiguanshu.curExp += addExp;
+
+        /*if(m_jiguanshu.curLvl < JGS_MAXLVL)
         {
             m_jiguanshu.curExp += addExp;
             if(m_jiguanshu.curExp > JGS_MAXEXP)
                 m_jiguanshu.curExp = JGS_MAXEXP;
-        }
+        }*/
 
         if(tuzhiId < SPECIAL_TUZHI) //训练图纸，制造后只增加机关术经验，不获得机关玉
         {
@@ -509,12 +567,14 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
 
         iter->second = curProficient;
 
-        if(m_jiguanshu.curLvl < 100)
+        m_jiguanshu.curExp += 10;
+
+        /*if(m_jiguanshu.curLvl < JGS_MAXLVL)
         {
             m_jiguanshu.curExp += 10;
             if(m_jiguanshu.curExp > JGS_MAXEXP)
                 m_jiguanshu.curExp = JGS_MAXEXP;
-        }
+        }*/
 
         DB4().PushUpdateData("REPLACE INTO `player_tuzhi` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), tuzhiId,  curProficient);
     }
@@ -523,9 +583,15 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
 
     m_owner->udpLog("feigong", "F_130817_6", "", "", "", "", "act");
 
+    UInt32 sendExp = 0;
+    if(m_jiguanshu.curExp > JGS_MAXEXP)
+        sendExp = JGS_MAXEXP;
+    else
+        sendExp = m_jiguanshu.curExp;
+
     Stream st(REP::MOFANG_INFO);
     st << mark;
-    st << tuzhiId << type << result << static_cast<UInt32>(m_jiguanshu.curExp);
+    st << tuzhiId << type << result << static_cast<UInt32>(sendExp);
     if(0 == result)
         st << static_cast<UInt8>(curProficient); 
     st << Stream::eos;
@@ -537,7 +603,7 @@ void MoFang::upgradeJGS()
     if(!m_owner)
         return;
 
-    if(m_jiguanshu.curLvl >= 100)
+    if(m_jiguanshu.curLvl >= JGS_MAXLVL)
         return;
 
     GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getUpgradeInfo(m_jiguanshu.curExp);
@@ -553,7 +619,25 @@ void MoFang::upgradeJGS()
 
     DB4().PushUpdateData("REPLACE INTO `player_jiguanshu` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), m_jiguanshu.curLvl, m_jiguanshu.curExp);
 
-    UInt8 temp[40] = {10, 11, 12, 13, 20, 27, 34, 41, 40, 39, 
+    UInt8 temp[20][2] = {{10, 11}, {12, 13}, {20, 27}, {34, 41}, {40, 39}, 
+                {38, 37}, {30, 23}, {16, 9}, {2, 3}, {4, 5},
+                {6, 7}, {14, 21}, {28, 35}, {42, 49}, {48, 47},
+                {46, 45}, {44, 43}, {36, 29}, {22, 15}, {8, 1}};
+
+    UInt8 lvlMark = m_jiguanshu.curLvl;
+    UInt8 index = 0;
+
+    for(UInt8 i=0; i<lvlMark; i++)
+    {
+        for(UInt8 k=0; k<2; k++)
+        {
+           index = temp[i][k]; 
+           if(index > 0 && index <= 49 && (m_grids[index-1] == -1))
+               m_grids[index-1] = 0;
+        }
+    }
+
+    /*UInt8 temp[40] = {10, 11, 12, 13, 20, 27, 34, 41, 40, 39, 
                     38, 37, 30, 23, 16, 9, 2, 3, 4, 5,
                     6, 7, 14, 21, 28, 35, 42, 49, 48, 47,
                     46, 45, 44, 43, 36, 29, 22, 15, 8, 1};
@@ -568,7 +652,7 @@ void MoFang::upgradeJGS()
         UInt8 index = temp[i];
         if(index > 0 && index <= 49 && (m_grids[index-1] == -1))
             m_grids[index-1] = 0;
-    }
+    }*/
 }
 
 void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
@@ -672,7 +756,7 @@ void MoFang::addJGYAttr(GData::AttrExtra& ae)
                 ae.hp += jgyInfo->attrValue;
                 break;
             case 6:
-                ae.tough += jgyInfo->attrValue;
+                ae.toughlvl += jgyInfo->attrValue;
                 break;
             case 7:
                 ae.action += jgyInfo->attrValue;
@@ -684,13 +768,13 @@ void MoFang::addJGYAttr(GData::AttrExtra& ae)
                 ae.evdlvl += jgyInfo->attrValue;
                 break;
             case 10:
-                ae.critical += jgyInfo->attrValue;
+                ae.crilvl += jgyInfo->attrValue;
                 break;
             case 11:
-                ae.pierce += jgyInfo->attrValue;
+                ae.pirlvl += jgyInfo->attrValue;
                 break;
             case 12:
-                ae.counter += jgyInfo->attrValue;
+                ae.counterlvl += jgyInfo->attrValue;
                 break;
         }
     }
@@ -716,12 +800,18 @@ void MoFang::sendMoFangInfo(UInt8 mark)
     if(!m_owner)
         return;
 
+    UInt32 sendExp = 0;
+    if(m_jiguanshu.curExp > JGS_MAXEXP)
+        sendExp = JGS_MAXEXP;
+    else
+        sendExp = m_jiguanshu.curExp;
+
     Stream st(REP::MOFANG_INFO);
     st << mark;
-    st << static_cast<UInt32>(m_jiguanshu.curExp);
+    st << static_cast<UInt32>(sendExp);
 
-    UInt8 countA = 0;
-    UInt8 countB = 0;
+    UInt16 countA = 0;
+    UInt16 countB = 0;
     UInt16 offsetA = 0;
     UInt16 offsetB = 0;
 
@@ -750,8 +840,8 @@ void MoFang::sendMoFangInfo(UInt8 mark)
         countB++;    
     }
 
-    st.data<UInt8>(offsetA) = countA;
-    st.data<UInt8>(offsetB) = countB;
+    st.data<UInt16>(offsetA) = countA;
+    st.data<UInt16>(offsetB) = countB;
 
     st << Stream::eos;
     m_owner->send(st);
@@ -808,7 +898,7 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
         if(markC)
             i = 0;
 
-        if(k >= 9 || (pos+i) < 0 || (pos+i) >= 49)
+        if((k >= 9 || (pos+i) < 0 || (pos+i) >= 49) && (0 != jgyInfo->molding[k]))
             return false;
 
         if(0 != jgyInfo->molding[k])

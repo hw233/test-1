@@ -39,7 +39,8 @@ namespace GObject
 
     #define NORMAL_TUZHI   100000
     #define SPECIAL_TUZHI  200000
-    #define JGS_MAXEXP     1313000
+    #define JGS_MAXEXP     168500
+    #define JGS_MAXLVL     20
 
     class Player;
 	class Fighter;
@@ -67,7 +68,7 @@ namespace GObject
         void AddJGYFromDB(DBJiguanyu &);
         void AddTuzhiFromDB(DBTuzhi &);
 
-        void randTuzhi(UInt8 num);
+        void randTuzhi(UInt16 num);
         void addJGSExp(UInt32 exp);
         UInt32 addTuzhi(UInt32 tuzhiId, bool mark = false);
         void makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark);                        // 制造机关

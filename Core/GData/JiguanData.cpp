@@ -84,7 +84,7 @@ namespace GData
         std::map<UInt8, jiguanshuInfo>::iterator iter = _jiguanshuInfo.begin();
         for(; iter!=_jiguanshuInfo.end(); iter++)
         {
-            if((iter->second.jgshuLvl >= 100) || (iter->second.needExp >= curExp))
+            if((iter->second.jgshuLvl >= 19) || (iter->second.needExp >= curExp))
             {
                 return &(iter->second);
             }
@@ -107,10 +107,37 @@ namespace GData
         std::map<UInt8, std::vector<UInt32>>::iterator iter = _lvltuzhiInfo.find(lvl);
         if(iter != _lvltuzhiInfo.end())
         {
+            //UInt8 count = iter->second.size();
+            //UInt8 index = uRand(count);
+
+            UInt8 color = 0;
+            UInt8 randColor = uRand(100);
+
+            if(randColor < 20)
+            {
+                color = 0;
+            }
+            else if(randColor < 70)
+            {
+                color = 1;
+            }
+            else if(randColor < 95)
+            {
+                color = 2;
+            }
+            else
+            {
+                color = 3;
+            }
+
+            UInt8 index = uRand(3);
+            index = 4 * index + color;
             UInt8 count = iter->second.size();
-            UInt8 index = uRand(count);
             
-            return iter->second[index];
+            if(index < count)
+                return iter->second[index];
+            else
+                return 0;
         }
 
         return 0;
