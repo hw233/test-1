@@ -675,6 +675,13 @@ public:
     inline static bool getFoolBao()
     { return _foolbao; } 
     
+    inline static void setSummerFlow3Time(bool v)
+    { _summerFlow3 = v; }
+    inline static bool getSummerFlow3Time()
+    {
+        return _summerFlow3;
+    } 
+
     inline static void setSurnameLegend(bool v)
     {
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
@@ -957,6 +964,7 @@ public:
     static stArenaExtra stArena;
     static bool _compassact;
     static bool _foolbao;
+    static bool _summerFlow3;
     static bool _surnamelegend;
     static bool _ryhbActivity;
     static bool _zcjbActivity;

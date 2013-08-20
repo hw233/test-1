@@ -896,6 +896,12 @@ function onActivityCheck(tm)
           setSummerMeet(false)
       end
 
+      if tm >= actTime250 and tm < actTime250_1 then
+         setSummerFlow3Time(true)
+      else
+         setSummerFlow3Time(false)
+      end
+
       if tm >= actTime551 and tm < actTime551_1 then
           setCompassAct(true)
       else
@@ -908,6 +914,7 @@ function onActivityCheck(tm)
           setFoolBao(false)
       end
       
+
       if tm >= actTime555 and tm < actTime555_1 then
           setHalfGold(true)
       else
@@ -1413,6 +1420,9 @@ function initActTime(y, m, d)
   local  SerStartTm249= { ['year'] = 2013, ['month'] = 8, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm249_1= { ['year'] = 2013, ['month'] = 8, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  local  SerStartTm251= { ['year'] = 2013, ['month'] = 8, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm251_1= { ['year'] = 2013, ['month'] = 8, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1856,6 +1866,8 @@ function initActTime(y, m, d)
 
   actTime250= os.time(SerStartTm250)
   actTime250_1= os.time(SerStartTm250) + 30*86400;
+  actTime251= os.time(SerStartTm251)
+  actTime251_1= os.time(SerStartTm251_1);
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

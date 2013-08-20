@@ -504,12 +504,19 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_SUMMER_MEET_RECHARGE = 556,
         VAR_SUMMER_MEET_RECHARGE_AWARD = 557 ,
         VAR_SUMMER_MEET_STRENTH_AWARD = 558,
+
+        VAR_SUMMER_FLOW_LOGIN_AWARD = 559,
         // 560-580 for zhgc
         VAR_CLAN_SPTR_WATER = 560,       // 每日神魔之树浇水数
         VAR_CLAN_SPTR_AWARD = 561,       // 每日神魔之树奖励领取标识
         VAR_CLAN_ACTPT_MONTH = 562,      // 每月帮派活跃度
         VAR_CLAN_ACTPT_FLAG = 563,      // 活跃度领取标识
         //581-600 for qiwy
+
+        //581-600 for lb 
+        VAR_SUMMERFLOW3_TYPE = 581 ,
+        VAR_SUMMERFLOW3_TYPE_AWARD = 582 ,
+        VAR_SUMMERFLOW3_TIME_AWARD = 583,
 
         VAR_MAX,
     };
@@ -977,6 +984,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_CLAN_SPTR_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_ACTPT_MONTH, CYCLE_MONTH);
             REGISTER_VAR(VAR_CLAN_ACTPT_FLAG, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_SUMMERFLOW3_TYPE, CYCLE_NONE);
+            REGISTER_VAR(VAR_SUMMERFLOW3_TYPE_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_SUMMERFLOW3_TIME_AWARD, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

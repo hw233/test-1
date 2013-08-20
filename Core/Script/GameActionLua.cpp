@@ -1343,6 +1343,11 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt8>("RunSummerFlowAward", player, idx);
     }
+    bool GameActionLua::RunSummerFlow3OnlineAward(Player* player, UInt8 idx)
+    {
+		assert(player != NULL);
+		return Call<UInt8>("RunSummerFlow3OnlineAward", player, idx);
+    }
     UInt8 GameActionLua::RunSummerMeetAward(Player* player, UInt8 idx)
     {
 		assert(player != NULL);
