@@ -319,6 +319,7 @@ void MoFang::randTuzhi(UInt16 num)
     if(exp > 0)
     {
         SYSMSG_SENDV(4935, m_owner, exp);
+        SYSMSG_SENDV(4936, m_owner, exp);
     }
 
     UInt32 sendExp = 0;
@@ -374,7 +375,7 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
     switch(tzQuality)
     {
         case TUZHI_GREEN:
-            addExp = 80;
+            addExp = 20;
             successRate = 1;
             if(curProficient<=25)
                 successRate += curProficient;
@@ -396,7 +397,7 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
             m_owner->udpLog("feigong", "F_130817_7", "", "", "", "", "act");
             break;
         case TUZHI_BLUE:
-            addExp = 150;
+            addExp = 50;
             successRate = 0.5;
             if(curProficient<=25)
                 successRate += curProficient * 0.02;
@@ -418,7 +419,7 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
             m_owner->udpLog("feigong", "F_130817_8", "", "", "", "", "act");
             break;
         case TUZHI_PURPLE:
-            addExp = 300;
+            addExp = 400;
             successRate = 0.2;
             if(curProficient<=25)
                 successRate += curProficient * 0.01;
@@ -440,7 +441,7 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
             m_owner->udpLog("feigong", "F_130817_9", "", "", "", "", "act");
             break;
         case TUZHI_YELLOW:
-            addExp = 750;
+            addExp = 2250;
             successRate = 0.1;
             if(curProficient<=25)
                 successRate += curProficient * 0.001;
@@ -504,6 +505,12 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
                 break;
             case TUZHI_YELLOW:
                 m_owner->udpLog("feigong", "F_130817_15", "", "", "", "", "act");
+                
+                GData::JiguanData::jiguanyuInfo * jgyInfo = GData::jiguanData.getJiguanyuInfo(tzInfo->jiguanyuId);
+                if(!jgyInfo)
+                    return;
+
+                SYSMSG_BROADCASTV(4937, m_owner->getCountry(), m_owner->getName().c_str(), jgyInfo->quality, (jgyInfo->name).c_str());
                 break;
         }
 
@@ -567,7 +574,7 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
 
         iter->second = curProficient;
 
-        m_jiguanshu.curExp += 10;
+        m_jiguanshu.curExp += 5;
 
         /*if(m_jiguanshu.curLvl < JGS_MAXLVL)
         {
@@ -606,11 +613,17 @@ void MoFang::upgradeJGS()
     if(m_jiguanshu.curLvl >= JGS_MAXLVL)
         return;
 
-    GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getUpgradeInfo(m_jiguanshu.curExp);
+    UInt32 exp = 0;
+    if(m_jiguanshu.curExp > JGS_MAXEXP && m_jiguanshu.curLvl < JGS_MAXLVL)
+        exp = JGS_MAXEXP;
+    else
+        exp = m_jiguanshu.curExp;
+
+    GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getUpgradeInfo(exp);
     if(!jgsInfo)
         return;
     
-    if(m_jiguanshu.curExp == jgsInfo->needExp)
+    if(m_jiguanshu.curExp == jgsInfo->needExp || m_jiguanshu.curExp >= JGS_MAXEXP)
     {
         m_jiguanshu.curLvl = jgsInfo->jgshuLvl + 1;
     }

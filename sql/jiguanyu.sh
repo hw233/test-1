@@ -22,7 +22,7 @@ function jiguanyu()
         BEGIN {
             print "INSERT INTO `jiguanyu` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d,%d,%d,%d,%d,\x27%s\x27,\x27%s\x27,%d)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10);
+            printf("(%d,%d,\x27%s\x27,%d,%d,%d,%d,\x27%s\x27,\x27%s\x27,%d)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
@@ -35,7 +35,7 @@ function jiguanyu()
     sed -i s/\\r//g $d
     if [ $? -eq 0 ]
     then
-        iconv2utf8 $d
+        #iconv2utf8 $d
         echo "OK"
     else
         echo "ERROR"
