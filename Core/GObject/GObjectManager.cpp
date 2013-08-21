@@ -317,6 +317,11 @@ namespace GObject
             fprintf(stderr, "loadAllFriends error!\n");
             std::abort();
         }
+		if(!loadAllPrayInfo())
+        {
+            fprintf(stderr, "loadAllPrayInfo error!\n");
+            std::abort();
+        }
 		if(!LoadDungeon())
         {
             fprintf(stderr, "LoadDungeon error!\n");
@@ -2900,6 +2905,38 @@ namespace GObject
                 pl->addCFriendFromDB(toadd);
                 break;
 			}
+		}
+		lc.finalize();
+		return true;
+	}
+	bool GObjectManager::loadAllPrayInfo()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading friends:");
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		PrayRelation dbfr;
+		if(execu->Prepare("SELECT `id`,`friendId`,`pray`,`time` FROM `pray_relation` ORDER BY `id`", dbfr) != DB::DB_OK)
+			return false;
+		lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbfr.id != last_id)
+			{
+				last_id = dbfr.id;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Player * toadd = globalPlayers[dbfr.friendId];
+			if(toadd == NULL)
+				continue;
+            if(!dbfr.pray)
+                continue ;
+            pl->addPrayFriendFromDB(dbfr.friendId,dbfr.time);
 		}
 		lc.finalize();
 		return true;

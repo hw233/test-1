@@ -825,6 +825,9 @@ namespace GObject
         void sendSummerMeetRechargeInfo();
         void sendSummerFlow3TimeInfo();
         void sendSummerFlow3LoginInfo();
+        void sendPrayInfo();
+        void selectPray(UInt8 index);
+        void getPrayAward();
 		void Reconnect();
 
 		void Logout(bool = false);	//???????߲???
@@ -1525,6 +1528,10 @@ namespace GObject
         void vote(Player *other);
         void beVoted();
 
+        void prayForOther(Player *other);
+        void SendOtherInfoForPray(Player *other);
+        void bePrayed();
+        
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
         void PutPets (Battle::BattleSimulator&, int side, bool init = true);
 
@@ -1712,6 +1719,10 @@ namespace GObject
             m_snow.bind = bind;
             m_snow.score = score;
         }
+        void addPrayFriendFromDB(UInt64 PlayerId,UInt32 time)
+        {
+           _prayFriend[PlayerId]=time; 
+        }
         SnowInfo& getSnowInfo() {return m_snow;};
         void resetSnow();
         void sendSnowInfo();
@@ -1752,6 +1763,7 @@ namespace GObject
 
 		std::set<Player *> _friends[4];
 		std::vector<FriendActStruct *> _friendActs;
+        std::map<UInt64,UInt32 >_prayFriend; 
 
 		TaskMgr* m_TaskMgr;
 		Trade* m_Trade;

@@ -298,6 +298,7 @@ namespace GObject
 		static bool loadAllAthleticsEvent();
 		static bool delayLoad();
 		static bool loadAllFriends();
+		static bool loadAllPrayInfo();
 		static bool loadAllClans();
 		static bool loadEquipments();
 		static bool loadEquipmentsSpirit();
