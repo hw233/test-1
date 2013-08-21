@@ -234,7 +234,7 @@ local specialItem = {
 }
 
 function getRandomNormalMonster(id)
-    if id >= 1 and id <= 4 then
+    if id >= 1 and id <= #normalMonster then
         return normalMonster[id][math.random(1, #(normalMonster[id]))]
     else
         return 0
@@ -242,7 +242,7 @@ function getRandomNormalMonster(id)
 end
 
 function getBossMonster(id)
-    if id >= 1 and id <= 4 then
+    if id >= 1 and id <= #bossMonster then
         return bossMonster[id][math.random(1, #(bossMonster[id]))]
     else
         return 0
@@ -250,11 +250,12 @@ function getBossMonster(id)
 end
 
 function getLengendMonster(id, val)
-    if id > 4 and id == 0 then
-        return 0
-    end
     val = val % 10
     if val > 10 then
+        return 0
+    end
+
+    if id > #(lengendMonster[val]) and id == 0 then
         return 0
     end
     return lengendMonster[val][id]
