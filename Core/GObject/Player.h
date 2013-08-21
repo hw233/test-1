@@ -27,6 +27,7 @@
 #include "Dreamer.h"
 #include "FairyPet.h"
 #include "FairySpar.h"
+#include "MoFang.h"
 
 
 namespace Battle
@@ -264,6 +265,7 @@ namespace GObject
     struct DeamonPlayerData;
     class JobHunter;
     class Dreamer;
+    class MoFang;
 
     struct TripodData
     {
@@ -1478,7 +1480,7 @@ namespace GObject
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
-
+        MoFang * GetMoFang()        { return m_moFang; }
 	// ????ϵͳ
 	public:
 
@@ -2512,6 +2514,8 @@ namespace GObject
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);
+    private:
+        MoFang* m_moFang;
 
     public:
         void sendCollectCard(UInt8 fighterIndex);

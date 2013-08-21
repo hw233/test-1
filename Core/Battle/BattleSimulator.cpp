@@ -3734,11 +3734,25 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         //道、万剑诀
         else if(SKILL_ID(skill->getId()) == 27 || SKILL_ID(skill->getId()) == 498)
         {
+            UInt8 excepts[25] = {0};
+            UInt8 exceptCnt = 0;
+            for(int i = 0; i < 25; i++)
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, i));
+                if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+                    continue;
+                if(bo->isSoulOut())
+                {
+                    excepts[exceptCnt] = bo->getPos();
+                    ++exceptCnt;
+                }
+            }
+
             UInt8 dmgCount[25] = {0};
             int cnt = 8;
             for(int i = 0; i < cnt; ++ i)
             {
-                BattleFighter* rnd_bf = getRandomFighter(target_side, NULL, 0);
+                BattleFighter* rnd_bf = getRandomFighter(target_side, excepts, exceptCnt);
                 dmg += attackOnce(bf, first, cs, pr, skill, rnd_bf, 1);
                 if(rnd_bf)
                     ++ dmgCount[rnd_bf->getPos()];
@@ -5169,6 +5183,21 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
                 UInt32 res = doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
                 if(rcnt == 0 && res != 0)
                     rcnt = 1;
+            }
+        }
+
+        const GData::SkillBase *skill = bf->getXiangMoChanZhangSkill();
+        if(skill && skill->effect)
+        {
+            const std::vector<UInt16>& eft = skill->effect->eft;
+            const std::vector<UInt8>& efl = skill->effect->efl;
+            const std::vector<float>& efv = skill->effect->efv;
+
+            size_t cnt = eft.size();
+            if(cnt == efl.size() && cnt == efv.size())
+            {
+                for(size_t i = 0; i < cnt; ++ i)
+                    doSkillEffectExtra_HpShield(bf, bf->getSide(), bf->getPos(), skill, i);
             }
         }
     }
@@ -7430,10 +7459,18 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
     if(auraCD > 0)
     {
         -- auraCD;
-        if(auraCD == 0 && bo2->getColorStock() == 0)
+        if(auraCD == 0 && bo2->getColorStock() == 0 && !bo2->isSoulOut() && !bo2->isLingQu())
         {
-            doAuraPresent(bo2);
-            setStatusChange_Aura(NULL, bo2->getSide(), bo2->getPos(), NULL, -100, 0, true);
+            if(bo2->getImmune2() > 0)
+            {
+                bo2->setImmune2(0);
+                appendDefStatus(e_unImmune2, 0, bo2);
+            }
+            else
+            {
+                doAuraPresent(bo2);
+                setStatusChange_Aura(NULL, bo2->getSide(), bo2->getPos(), NULL, -100, 0, true);
+            }
         }
     }
     UInt8& confuceCD = bo2->getConfuceCD();
@@ -7448,14 +7485,22 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
         {
             -- confuceCD;
         }
-        if(confuceCD == 0 && bo2->getColorStock() == 0)
+        if(confuceCD == 0 && bo2->getColorStock() == 0 && !bo2->isSoulOut() && !bo2->isLingQu())
         {
-            if(!doConfusePresent(bo2))
+            if(bo2->getImmune2() > 0)
             {
-                bo2->setConfuseLevel(9);
-                bo2->setConfuseRound(1);
-                appendDefStatus(e_Confuse, 0, bo2);
-                calcAbnormalTypeCnt(bo);
+                bo2->setImmune2(0);
+                appendDefStatus(e_unImmune2, 0, bo2);
+            }
+            else
+            {
+                if(!doConfusePresent(bo2))
+                {
+                    bo2->setConfuseLevel(9);
+                    bo2->setConfuseRound(1);
+                    appendDefStatus(e_Confuse, 0, bo2);
+                    calcAbnormalTypeCnt(bo);
+                }
             }
         }
     }
@@ -7471,14 +7516,22 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
         {
             -- stunCD;
         }
-        if(stunCD == 0 && bo2->getColorStock() == 0)
+        if(stunCD == 0 && bo2->getColorStock() == 0 && !bo2->isSoulOut() && !bo2->isLingQu())
         {
-            if(!doStunPresent(bo2))
+            if(bo2->getImmune2() > 0)
             {
-                bo2->setStunLevel(9);
-                bo2->setStunRound(1);
-                appendDefStatus(e_Stun, 0, bo2);
-                calcAbnormalTypeCnt(bo);
+                bo2->setImmune2(0);
+                appendDefStatus(e_unImmune2, 0, bo2);
+            }
+            else
+            {
+                if(!doStunPresent(bo2))
+                {
+                    bo2->setStunLevel(9);
+                    bo2->setStunRound(1);
+                    appendDefStatus(e_Stun, 0, bo2);
+                    calcAbnormalTypeCnt(bo);
+                }
             }
         }
     }
@@ -7494,13 +7547,21 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
         {
             -- blindCD;
         }
-        if(blindCD == 0 && bo2->getColorStock() == 0)
+        if(blindCD == 0 && bo2->getColorStock() == 0 && !bo2->isSoulOut() && !bo2->isLingQu())
         {
-            if(!doBlindPresent(bo2))
+            if(bo2->getImmune2() > 0)
             {
-                bo2->setBlind(0.75f, 1);
-                appendDefStatus(e_blind, 0, bo2);
-                calcAbnormalTypeCnt(bo);
+                bo2->setImmune2(0);
+                appendDefStatus(e_unImmune2, 0, bo2);
+            }
+            else
+            {
+                if(!doBlindPresent(bo2))
+                {
+                    bo2->setBlind(0.75f, 1);
+                    appendDefStatus(e_blind, 0, bo2);
+                    calcAbnormalTypeCnt(bo);
+                }
             }
         }
     }

@@ -1531,7 +1531,7 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     br >> tm;
     br>>playerIds;
    
-    //开启起封交易客户平台测试
+//开启起封交易客户平台测试
     
 //#define TEST_TABLE
 #ifdef TEST_TABLE
@@ -1631,6 +1631,7 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
     Stream st(SPEP::QUERYLOCKUSER);
 //    st << isLockLogin << isForbidSale << fsaleTime << Stream::eos;
     st << isLockLogin << isForbidSale << fsaleTime<< foverTime << Stream::eos;
+     //std::cout<<(bool)isLockLogin<< "  " <<(bool)isForbidSale<< "  "<<fsaleTime<<"  "<<foverTime<<std::endl;
     //std::cout<<(bool)isLockLogin<< "  " <<(bool)isForbidSale<< "  "<<fsaleTime<<"  "<<foverTime<<std::endl;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }

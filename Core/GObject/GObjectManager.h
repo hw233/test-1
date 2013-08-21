@@ -324,6 +324,9 @@ namespace GObject
         static bool loadSecondSoul();
         static bool loadFighterXingchen();
         static bool loadTempItem();
+        static bool loadJiguanshu();
+        static bool loadJiguanyu();
+        static bool loadTuzhi();
         static bool LoadLuckyLog();
         static bool loadRealItemAward();
         static bool loadNewRelation();

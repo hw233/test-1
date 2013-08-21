@@ -8743,6 +8743,15 @@ function ItemNormal_00009274(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_tuzhi(iid, num, bind, param)
+    local player = GetPlayer()
+    local moFang = player:GetMoFang();
+    local package = player:GetPackage();
+    moFang:randTuzhi(num);
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_00009311(iid, num, bind, param)
     if iid < 9311 or iid > 9312 then
         return 0
@@ -9388,6 +9397,29 @@ function ItemNormal_00009408(iid, num, bind, param)
 
     package:DelItemSendMsg(iid, player)
     return num;
+end
+
+function ItemNormal_00009419(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+
+    local item = { {515, 5}, {1325, 10}, {9076, 5}, {507, 5} }
+
+    local used = 0
+    for i = 1, num do
+        if package:GetRestPackageSize() < 1 then
+            player:sendMsgCode(2, 1011, 0);
+            break;
+        end
+        local cur = math.random(1,#item)
+        package:Add(item[cur][1], item[cur][2], true)
+        used = i;
+    end
+
+    if used > 0 then
+        package:DelItemSendMsg(iid, player)
+    end
+    return used;
 end
 
 local ItemNormal_Table = {
@@ -11125,6 +11157,8 @@ local ItemNormal_Table = {
     [9409] = ItemNormal_00009408,
     [9410] = ItemNormal_00009408,
     [9411] = ItemNormal_00009408,
+    [9418] = ItemNormal_tuzhi,
+    [9419] = ItemNormal_00009419,
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,
     [9902] = ItemNormal_NameCard,

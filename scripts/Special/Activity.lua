@@ -9254,12 +9254,13 @@ function onCollectCardAct(player, idx)
     if player == nil then
         return false
     end
-    local fashionId = {1700,1701,1702,1703,1704,1705,1706,1707,1709,1710,1711,1712}
+    --local fashionId = {1700,1701,1702,1703,1704,1705,1706,1707,1709,1710,1711,1712}
     local items = {
-        [1] = { {503, 4}, {515, 2}, {1325, 2}, {509, 2}, {9416,1} },
-        [2] = { {503, 2}, {515, 2}, {1325, 1}, {509, 1}, {9416,1} },
+        [1] = { {503, 4}, {515, 2}, {1325, 2}, {509, 2}, {1126,1} },
+        [2] = { {503, 2}, {515, 2}, {1325, 1}, {509, 1}, {1126,1} },
         [3] = { {9088, 2}, {134, 2}, {509, 2}, {507, 2} },
-        [4] = { {515, 5}, {1325, 10}, {9076, 5}, {507, 5}, {fashionId[math.random(1,#fashionId)],1} },
+        --[4] = { {515, 5}, {1325, 10}, {9076, 5}, {507, 5}, {fashionId[math.random(1,#fashionId)],1} },
+        [4] = { {9419, 1} },
     }
     local item = items[idx]
     if item == nil then
@@ -9277,8 +9278,8 @@ function onCollectCardAct(player, idx)
         return false
     end
     if idx == 4 then
-        local cur = math.random(1,#item)
-        package:Add(item[cur][1], item[cur][2], true)
+        --local cur = math.random(1,#item)
+        package:Add(item[1][1], item[1][2], true)
     else
         for _, val in pairs(item) do
             package:Add(val[1], val[2], true)

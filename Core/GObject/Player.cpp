@@ -81,6 +81,7 @@
 #include "Version.h"
 #include "GObject/ClanBoss.h"
 #include "ClanCityBattle.h"
+#include "MoFang.h"
 
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -752,6 +753,7 @@ namespace GObject
         m_tcpInfo = new TeamCopyPlayerInfo(this);
         m_hf = new HoneyFall(this);
         m_dpData = new DeamonPlayerData();
+		m_moFang = new MoFang(this);
         m_csFlag = 0;
         m_spreadInterval = 0;
         _mditem = 0;
@@ -1338,6 +1340,7 @@ namespace GObject
         dclogger.login(this);
         dclogger.login_sec(this);
         dclogger.checkOpenId(this);
+        dclogger.checkYB(this);   //LB添加
 
         EventAutoRefreshOpenKey* event = new(std::nothrow) EventAutoRefreshOpenKey(this, 60 * 110, 24);
         if (event)
@@ -4596,16 +4599,11 @@ namespace GObject
     }
     void Player::prayForOther(Player* other)
     {
-        //if (GetVar(VAR_HAS_VOTE))
-        //{
-        //    return;
-       // }
-       // SetVar(VAR_HAS_VOTE, 1);
         std::map<UInt64,UInt32>::iterator it =_prayFriend.find(other->getId());
         UInt32 now = TimeUtil::Now();
         if(it!=_prayFriend.end())
         {
-          if(  TimeUtil::SharpDay(0, now) <= TimeUtil::SharpDay(1, it->second) )
+          if(TimeUtil::SharpDay(0, now) <= TimeUtil::SharpDay(0, it->second) )
               return ; 
         }
         UInt32 prayType = other->GetVar(VAR_PRAY_TYPE);
@@ -4635,8 +4633,14 @@ namespace GObject
     {
         UInt32 prayType = other->GetVar(VAR_PRAY_TYPE);
         UInt32 prayValue = other->GetVar(VAR_PRAY_VALUE);
+        UInt32 now = TimeUtil::Now();
         Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x0A) << other->getId() << other->getName() <<other->getPF() << static_cast<UInt8>(other->IsMale() ? 0 : 1) << other->getCountry() << other->GetLev() << other->GetClass() << other->getClanName() << other->GetNewRelation()->getMood() << other->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(other) << static_cast<UInt8>(other->isOnline())<<static_cast<UInt8>(prayType)<< static_cast<UInt8>(prayValue)  << Stream::eos;
+
+        std::map<UInt64,UInt32 >::iterator it = _prayFriend.find(other->getId());
+        if(it!=_prayFriend.end() &&TimeUtil::SharpDay(0, now) == TimeUtil::SharpDay(1, it->second) )
+            st<<static_cast<UInt8>(1);
+        else st<<static_cast<UInt8>(0);
         send(st);
     }
     void Player::bePrayed()
@@ -11633,8 +11637,10 @@ namespace GObject
     void Player::getQQTenpayAward(UInt8 opt)
     {
         UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
+        UInt8 state1 = GetVar(VAR_QQTENPAY_LOTTERY);
+        int idx = -1;
 
-        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
+        if (GetPackage()->GetRestPackageSize() < 6 && (opt == 1 || opt == 2))
         {
             sendMsgCode(0, 1011);
 
@@ -11653,10 +11659,19 @@ namespace GObject
             state = 1;
             udpLog("huodong", "F_130620_1", "", "", "", "", "act");
         }
+        else if(opt == 2 && state1 == 0)
+        {
+            idx = GameAction()->RunBlueDiamondAward(this, 6);
+            if(idx <= 0)
+                return;
+            SetVar(VAR_QQTENPAY_LOTTERY, 1);
+            state1 = 1;
+        }
             
+        UInt8 states = state | (state1 << 1);
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(22);
-        st << state << Stream::eos;
+        st << states << idx << Stream::eos;
         send(st);
     }
 
@@ -12951,7 +12966,7 @@ namespace GObject
             if(type>0 && type < 4)
             {
                 SetVar(VAR_SUMMER_MEET_TYPE,type);
-                SetVar(VAR_SUMMERFLOW_AWARD,1);
+    //            SetVar(VAR_SUMMERFLOW_AWARD,1);
             }
             else 
                 return ;
@@ -13017,6 +13032,8 @@ namespace GObject
         UInt32 max = 0 ;
         UInt32 i=0;
         UInt32 count=0 ;
+        if(!LuckyMeet)
+            return ;
         while(i<16)
         {
             if(LuckyMeet & (1 << i++ ))

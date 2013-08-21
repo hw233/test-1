@@ -279,6 +279,8 @@ GMHandler::GMHandler()
     Reg(2, "task0", &GMHandler::OnCompletedManyTask);
     Reg(2, "getmc", &GMHandler::OnGetMax);
     Reg(2, "setmc", &GMHandler::OnSetMax);
+    Reg(2, "addtz", &GMHandler::OnAddtz);
+    Reg(2, "addshu", &GMHandler::OnAddJGSExp);
 
 }
 
@@ -359,9 +361,38 @@ bool GMHandler::Handle( const std::string& txt, GObject::Player * player, bool i
 #define strtoull _strtoui64
 #endif
 
+void GMHandler::OnAddtz(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	if(args.size() == 1)
+	{
+		UInt32 tuzhiId = atoi(args[0].c_str());
+
+        if(tuzhiId <= 10000)
+            return;
+
+        player->GetMoFang()->addTuzhi(tuzhiId);
+	}
+}
+
+void GMHandler::OnAddJGSExp(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	if(args.size() == 1)
+	{
+		UInt32 exp = atoi(args[0].c_str());
+
+        if(exp == 0)
+            return;
+
+        player->GetMoFang()->addJGSExp(exp);
+	}
+}
+
 void GMHandler::OnSetXZLvl(GObject::Player * player, std::vector<std::string>& args)
 {
-    
 	if(args.empty())
 		return;
 	if(args.size() == 2)
@@ -380,7 +411,6 @@ void GMHandler::OnSetXZLvl(GObject::Player * player, std::vector<std::string>& a
 
 void GMHandler::OnSetXCValue(GObject::Player * player, std::vector<std::string>& args)
 {
-
 	if(args.empty())
 		return;
 	if(args.size() == 2)

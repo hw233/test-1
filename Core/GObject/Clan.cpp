@@ -4417,7 +4417,10 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                     ++ m_spiritTree.m_level;
                     if(m_spiritTree.m_level == MAX_CLANSPTR_LEVEL)
                         SYSMSG_BROADCASTV(4930, _name.c_str());
-                    SYSMSG_BROADCASTV(4931, m_spiritTree.m_level);
+
+                    Stream st;
+                    SYSMSGVP(st, 4931, m_spiritTree.m_level);
+                    broadcast(st);
                 }
                 writeSptrToDB();
                 pl->udpLog("shenmozhishu", clansptr_udp_tael[idx], "", "", "", "", "act");
@@ -4450,7 +4453,9 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                         ++ m_spiritTree.m_level;
                         if(m_spiritTree.m_level == MAX_CLANSPTR_LEVEL)
                             SYSMSG_BROADCASTV(4930, _name.c_str());
-                        SYSMSG_BROADCASTV(4931, m_spiritTree.m_level);
+                        Stream st;
+                        SYSMSGVP(st, 4931, m_spiritTree.m_level);
+                        broadcast(st);
                     }
                     writeSptrToDB();
                 }
@@ -4500,7 +4505,11 @@ void Clan::refreshColorAward()
         Player* leader = getLeader();
         if(leader)
             leader->udpLog("shenmozhishu", clansptr_udp_color[m_spiritTree.m_color], "", "", "", "", "act");
-        SYSMSG_BROADCAST(4932+m_spiritTree.m_color);
+
+        Stream st;
+        SYSMSGVP(st, 4932+m_spiritTree.m_color);
+        broadcast(st);
+
         ++ m_spiritTree.m_color;
         m_spiritTree.m_refreshTimes = 0;
     }

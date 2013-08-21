@@ -1339,9 +1339,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
    if(pl->getFighterCount() >= 5)
         pl->GetTaskMgr()->CompletedTask(202);
     pl->sendQQBoardLoginInfo();
-
     pl->sendSummerMeetInfo();
     pl->sendSummerMeetRechargeInfo();
+    pl->GetMoFang()->sendMoFangInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -5391,7 +5391,9 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
 
     Stream st(REP::NEWRELATION);
     if(type < 6)
+    {
         st << type;
+    }
     /** 关系 **/
     switch(type)
     {
@@ -5443,12 +5445,8 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
         default:
             break;
     }
-
-    if(type < 6)
-    {
-        st << Stream::eos;
-        pl->send(st);
-    }
+    st << Stream::eos;
+    pl->send(st);
 }
 
 #if 0
@@ -6292,6 +6290,62 @@ void OnQueryTempItemReq( GameMsgHdr & hdr, const void * data )
 
             br >> itemId >> itemNum >> bind;
             player->GetPackage()->RetrieveTemporaryItem(itemId, itemNum, bind);
+        }
+        break;
+    }
+}
+
+void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+    
+    switch(opt)
+    {
+    case 0:
+        {
+            player->GetMoFang()->sendMoFangInfo(opt);               
+        }
+        break;
+    case 1:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt32 tuzhiId = 0;
+            UInt8 type = 0;
+
+            br >> tuzhiId >> type;
+            player->GetMoFang()->makejiguan(tuzhiId, type, opt);
+        }
+        break;
+    case 2:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt32 jgId = 0;
+            UInt8 pos = 0;
+
+            br >> jgId >> pos;
+            player->GetMoFang()->equipJG(jgId, pos, opt);               
+        }
+        break;
+    case 3:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt8 pos = 0;
+
+            br >> pos;
+            player->GetMoFang()->equipJG(0, pos, opt);               
         }
         break;
     }

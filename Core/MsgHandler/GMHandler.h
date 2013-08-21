@@ -209,6 +209,8 @@ private:
     void OnCompletedManyTask(GObject::Player* player, std::vector<std::string>& args);
     void OnGetMax(GObject::Player* player, std::vector<std::string>& args);
     void OnSetMax(GObject::Player* player, std::vector<std::string>& args);
+    void OnAddtz(GObject::Player* player, std::vector<std::string>& args);
+    void OnAddJGSExp(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

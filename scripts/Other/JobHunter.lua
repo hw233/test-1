@@ -18,26 +18,26 @@ local bossMonster = {
 }
 
 local stepAward = {
-    {{1325, 1, 1}},
-    {{1326, 4, 1}},
-    {{1326, 4, 1}},
-    {{1326, 2, 1}},
-    {{1326, 2, 1}},
-    {{1326, 1, 1}},
-    {{1326, 1, 1}},
-    {{1326, 1, 1}},
-    {{1326, 1, 1}},
-    {{1326, 1, 1}},
-    {{1327, 2, 1}},
-    {{1327, 2, 1}},
-    {{1327, 2, 1}},
-    {{1327, 2, 1}},
-    {{1327, 2, 1}},
-    {{1327, 2, 1}},
-    {{1327, 2, 1}},
-    {{1327, 2, 1}},
-    {{1327, 2, 1}},
-    {{1327, 2, 1}},
+    {{1325, 1, 1},{9418,2,1},{9414,5,1},{9413,1,1}},
+    {{1326, 4, 1},{9418,2,1},{9414,4,1},{9413,1,1}},
+    {{1326, 4, 1},{9418,2,1},{9414,4,1},{9413,1,1}},
+    {{1326, 2, 1},{9418,2,1},{9413,3,1}},
+    {{1326, 2, 1},{9418,2,1},{9413,3,1}},
+    {{1326, 1, 1},{9418,2,1},{9413,2,1}},
+    {{1326, 1, 1},{9418,2,1},{9413,2,1}},
+    {{1326, 1, 1},{9418,2,1},{9413,2,1}},
+    {{1326, 1, 1},{9418,2,1},{9413,2,1}},
+    {{1326, 1, 1},{9418,2,1},{9413,2,1}},
+    {{1327, 2, 1},{9418,1,1},{9413,1,1}},
+    {{1327, 2, 1},{9418,1,1},{9413,1,1}},
+    {{1327, 2, 1},{9418,1,1},{9413,1,1}},
+    {{1327, 2, 1},{9418,1,1},{9413,1,1}},
+    {{1327, 2, 1},{9418,1,1},{9413,1,1}},
+    {{1327, 2, 1},{9418,1,1},{9413,1,1}},
+    {{1327, 2, 1},{9418,1,1},{9413,1,1}},
+    {{1327, 2, 1},{9418,1,1},{9413,1,1}},
+    {{1327, 2, 1},{9418,1,1},{9413,1,1}},
+    {{1327, 2, 1},{9418,1,1},{9413,1,1}},
 }
 
 local treasure1 = {
@@ -198,7 +198,7 @@ local treasure = {
     [2] = treasure2,
     [3] = treasure3,
     [4] = treasure4,
-	[5] = treasure5,
+	[5] = treasure4,
 }
 
 local chance = {
@@ -234,7 +234,7 @@ local specialItem = {
 }
 
 function getRandomNormalMonster(id)
-    if id >= 1 and id <= 5 then
+    if id >= 1 and id <= #normalMonster then
         return normalMonster[id][math.random(1, #(normalMonster[id]))]
     else
         return 0
@@ -242,7 +242,7 @@ function getRandomNormalMonster(id)
 end
 
 function getBossMonster(id)
-    if id >= 1 and id <= 5 then
+    if id >= 1 and id <= #bossMonster then
         return bossMonster[id][math.random(1, #(bossMonster[id]))]
     else
         return 0
@@ -250,11 +250,12 @@ function getBossMonster(id)
 end
 
 function getLengendMonster(id, val)
-    if nil == id or id > 5 or id <= 0 then
-        return 0
-    end
     val = val % 10
     if val > 10 then
+        return 0
+    end
+
+    if id > #(lengendMonster[val]) and id == 0 then
         return 0
     end
     return lengendMonster[val][id]

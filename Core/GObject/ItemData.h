@@ -192,7 +192,6 @@ namespace GObject
             st.data<UInt8>(pos) = count;
         }
      };
-
 }
 
 #endif

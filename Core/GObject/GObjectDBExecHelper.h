@@ -1272,6 +1272,26 @@ struct DBXingchen
     UInt16 gem3;
 };
 
+struct DBJiguanshu
+{
+    UInt64 playerId;
+    UInt8  curLvl;
+    UInt32 curExp;
+};
+
+struct DBJiguanyu
+{
+    UInt64 playerId;
+    UInt32 jiguanId;
+    UInt8  pos;
+};
+
+struct DBTuzhi
+{
+    UInt64 playerId;
+    UInt32 tuzhiId;
+    UInt8 curProficient;
+};
 }
 
 namespace DB {
@@ -2890,6 +2910,33 @@ SPECIALDEF(7)
     UInt16, gem2,
     UInt16, gem3
 )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBJiguanshu)
+SPECIALDEF(3)
+    (
+    UInt64, playerId,
+    UInt8,  curLvl,
+    UInt32, curExp
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBJiguanyu)
+SPECIALDEF(3)
+    (
+    UInt64, playerId,
+    UInt32, jiguanId,
+    UInt8,  pos
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTuzhi)
+SPECIALDEF(3)
+    (
+    UInt64, playerId,
+    UInt32, tuzhiId,
+    UInt8, curProficient
+    )
 SPECIALEND()
 
 }
