@@ -1481,6 +1481,11 @@ namespace GObject
 			UInt64 id = dbpd.id;
 			Player * pl = new Player(id);
 
+            if(0 == dbpd.pdata.country)
+                g_eMeiCount++;
+            else if(1 == dbpd.pdata.country)
+                g_kunLunCount++;
+
 			if(dbpd.pdata.gold > 0x7FFFFFFF)
 			{
 				dbpd.pdata.gold = 10;

@@ -133,6 +133,8 @@ namespace GObject
 	ChallengeCheck challengeCheck;
     GlobalLevelsPlayers globalLevelsPlayers;
     static TripodData nulltd;
+    AtomicVal<UInt32> g_eMeiCount = (AtomicVal<UInt32>)(0);
+    AtomicVal<UInt32> g_kunLunCount = (AtomicVal<UInt32>)(0);
 
 	UInt8 Player::getMaxIcCount(UInt8 vipLevel)
 	{
@@ -11292,9 +11294,45 @@ namespace GObject
                 getSummerFlow3OnlineAward(opt);
             sendSummerFlow3TimeInfo();
             break;
+        case 29:
+            //QQ秀合作
+            checkZhenying();
+            break;
         }
     }
     
+    void Player::checkZhenying()
+    {
+        UInt8 zyState = 0;
+
+        if(g_eMeiCount >= g_kunLunCount)
+           zyState = 1;
+        
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(29);
+        st << zyState << Stream::eos;
+        send(st);
+    }
+
+    void Player::changeZYAward(UInt8 countryType)
+    {
+        UInt16 mark = 0;
+        if(0 == countryType)
+            mark = 4939;
+        else
+            mark = 4940;
+
+        SYSMSG(title, 4938);
+        SYSMSGV(content, mark);
+
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,30}, {503, 2}};
+            mailPackageManager.push(mail->id, mitem, 2, true);
+        }
+    }
+
     void Player::getQQXiuAward(UInt8 opt)
     {
         UInt8 state = GetVar(VAR_QQXIU_AWARD);

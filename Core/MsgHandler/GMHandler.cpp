@@ -363,8 +363,12 @@ bool GMHandler::Handle( const std::string& txt, GObject::Player * player, bool i
 
 void GMHandler::OnAddtz(GObject::Player * player, std::vector<std::string>& args)
 {
+    if(player->GetLev() < 70)
+        return;
+
 	if(args.empty())
 		return;
+
 	if(args.size() == 1)
 	{
 		UInt32 tuzhiId = atoi(args[0].c_str());
@@ -378,8 +382,12 @@ void GMHandler::OnAddtz(GObject::Player * player, std::vector<std::string>& args
 
 void GMHandler::OnAddJGSExp(GObject::Player * player, std::vector<std::string>& args)
 {
+    if(player->GetLev() < 70)
+        return;
+
 	if(args.empty())
 		return;
+
 	if(args.size() == 1)
 	{
 		UInt32 exp = atoi(args[0].c_str());

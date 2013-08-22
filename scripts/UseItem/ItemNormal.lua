@@ -8745,6 +8745,9 @@ end
 
 function ItemNormal_tuzhi(iid, num, bind, param)
     local player = GetPlayer()
+    if player:GetLev() < 70 then
+        return 0
+    end
     local moFang = player:GetMoFang();
     local package = player:GetPackage();
     moFang:randTuzhi(num);
