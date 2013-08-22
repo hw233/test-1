@@ -11295,7 +11295,7 @@ namespace GObject
             sendSummerFlow3TimeInfo();
             break;
         case 29:
-            //QQ秀合作
+            //阵营检索
             checkZhenying();
             break;
         }
