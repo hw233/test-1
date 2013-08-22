@@ -2072,7 +2072,7 @@ CREATE TABLE IF NOT EXISTS `tempItem` (
 
 DROP TABLE IF EXISTS `player_jiguanshu`;
 CREATE TABLE IF NOT EXISTS `player_jiguanshu` (
-    `playerId` int(10) unsigned NOT NULL DEFAULT '0',
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `curLvl` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `curExp` int(10) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY(`playerId`)
@@ -2080,7 +2080,7 @@ CREATE TABLE IF NOT EXISTS `player_jiguanshu` (
 
 DROP TABLE IF EXISTS `player_jiguanyu`;
 CREATE TABLE IF NOT EXISTS `player_jiguanyu` (
-    `playerId` int(10) unsigned NOT NULL DEFAULT '0',
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `jiguanId` int(10) unsigned NOT NULL DEFAULT '0',
     `pos` tinyint(3) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY(`playerId`, `jiguanId`)
@@ -2088,7 +2088,7 @@ CREATE TABLE IF NOT EXISTS `player_jiguanyu` (
 
 DROP TABLE IF EXISTS `player_tuzhi`;
 CREATE TABLE IF NOT EXISTS `player_tuzhi` (
-    `playerId` int(10) unsigned NOT NULL DEFAULT '0',
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `tuzhiId` int(10) unsigned NOT NULL DEFAULT '0',
     `curProficient` tinyint(3) unsigned NOT NULL DEFAULT '0',
    PRIMARY KEY(`playerId`, `tuzhiId`)
