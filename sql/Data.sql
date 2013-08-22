@@ -958,7 +958,7 @@ CREATE TABLE `tuzhi` (
     `quality` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `needjgsLvl` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `jiguanyuId` int(10) unsigned NOT NULL DEFAULT 0,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`tuzhiId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Dump completed

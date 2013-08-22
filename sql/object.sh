@@ -189,6 +189,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_friendkey.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_collect_card.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clean_mofang.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguan.sql
     #. clearshiyamen.sh
 }
 

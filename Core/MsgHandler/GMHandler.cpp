@@ -4397,7 +4397,10 @@ void GMHandler::OnCompletedManyTask(GObject::Player* player, std::vector<std::st
 
 void GMHandler::OnSetMax(GObject::Player* player, std::vector<std::string>& args)
 {
-    GVAR.SetVar(GObject::GVAR_NewUser_Max , 2);
+    if(args.size() < 1)
+        return;
+    int max = atoi(args[0].c_str());
+    GVAR.SetVar(GObject::GVAR_NewUser_Max , max);
     UInt32 tmp;
     tmp = GVAR.GetVar(GObject::GVAR_NewUser_Max);
 }

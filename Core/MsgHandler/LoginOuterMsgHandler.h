@@ -536,7 +536,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
     UInt32 max = 0;
     UInt32 cur = 0;
-    max = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max);
+    max = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max)/24;
     cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur);
     if( max && max<cur)
         return;
