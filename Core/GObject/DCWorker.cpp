@@ -11,7 +11,7 @@ extern "C" {
 
 namespace GObject
 {
-#undef  _DEBUG
+//#undef  _DEBUG
 #ifndef _DEBUG
     static int recvret(char* data, size_t size, size_t nmemb, char* buf)
     {
@@ -66,6 +66,7 @@ namespace GObject
         }
         curl = curl_easy_init();
 #endif
+        //m_Openid.clear();
         m_inited = true;
         return true;
     }
@@ -79,14 +80,14 @@ namespace GObject
     {
         std::vector<LogMsg> log;
         std::vector<LogMsg> unionLog;
-        std::vector<OpenIdMsg> openIdLog;
+        //std::vector<OpenIdMsg> openIdLog;
         {
             FastMutex::ScopedLock lk(m_Mutex);
             log.swap(m_DCLog);
 
             unionLog.swap(m_UnionLog);
 
-            openIdLog.swap(m_Openid);
+            //openIdLog.swap(m_Openid);
         }
         if (!log.empty())
         {
@@ -159,7 +160,7 @@ namespace GObject
                 ++i;
             }
         }
-        
+        /*
         if (!openIdLog.empty())
         {
             size_t size = openIdLog.size();
@@ -199,7 +200,7 @@ namespace GObject
                 ++i;
             }
         }
-        
+        */
     }
 
     void DCWorker::OnPause()
@@ -240,10 +241,10 @@ namespace GObject
 
     void DCWorker::PushCheckOpenId(UInt64 playerId, const char * openId, UInt32 len)
     {
-        
+       /* 
         if (!openId)
             return;
-
+        return ;
         char *p = new(std::nothrow) char[len+1];
         if (p == NULL)
             return;
@@ -260,7 +261,7 @@ namespace GObject
             FastMutex::ScopedLock lk(m_Mutex);
             m_Openid.push_back(openMsg);
         }
-       
+       */
     }
 
     /*
@@ -360,12 +361,12 @@ namespace GObject
     }
     UInt8 DCWorker::CheckYBLevel(UInt64 playerId ,char *messag )
     {
-        GObject::Player * pl = GObject::globalPlayers[playerId];
         Int32 ret = 0;
+#ifndef _DEBUG
+        GObject::Player * pl = GObject::globalPlayers[playerId];
         const static char host[] = "s66.app27036.qqopenapp.com?";
         char res[MAX_RET_LEN] = "";
         char message[MAX_RET_LEN] = "";
-#ifndef _DEBUG
            sprintf (message, "a=get_info&openkey=%s&openid=%s&pf=%s", pl->getOpenKey(),pl->getOpenId(),pl->getSource().c_str());
             snprintf (res, MAX_RET_LEN, "%s%s", host, message);
             // curl调用上报

@@ -1170,6 +1170,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendWeiboAwardInfo();
     pl->sendSummerFlow3LoginInfo();
     pl->sendSummerFlow3TimeInfo();
+    pl->sendPrayInfo();
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -4321,6 +4322,13 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
         break;
     case 9:
         player->vote(pl);
+        break;
+    case 10:
+        player->SendOtherInfoForPray(pl);
+        break;
+    case 11:
+        player->prayForOther(pl);
+        break;
 	}
 }
 
@@ -5396,11 +5404,14 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
     std::string status;
     br >> type;
 
-    if(type > 5)
+    if( type > 6 )
         return;
 
     Stream st(REP::NEWRELATION);
-    st << type;
+    if(type < 6)
+    {
+        st << type;
+    }
     /** 关系 **/
     switch(type)
     {
@@ -5429,10 +5440,32 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
             br >> mood;
             pl->GetNewRelation()->challengeRespond(pl, status, mood);
             return;//isn't break
+        case 6:
+            br>>mood;
+            if( mood < 0 || mood > 3 )
+                return ;
+            UInt8 index;
+            switch(mood)
+            {
+                case 1:
+                    br>>index;
+                    pl->selectPray(index);
+                    break;
+                case 2:
+                    if(pl->GetVar(VAR_PRAY_TYPE_TODAY))
+                        break;
+                    pl->prayForOther(pl);
+                    pl->SetVar(VAR_PRAY_TYPE_TODAY,1);
+                    break;
+                case 3:
+                    pl->getPrayAward();
+                    break;
+            }
+           pl->sendPrayInfo();    
+            break;
         default:
             break;
     }
-
     st << Stream::eos;
     pl->send(st);
 }

@@ -538,8 +538,14 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     UInt32 cur = 0;
     max = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max)/24;
     cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur);
-    if( max && max<cur)
+    if((hdr.playerID&0xFFFFFFFFFF) != 39090008 && (hdr.playerID&0xFFFFFFFFFF) != 1779780 && (hdr.playerID&0xFFFFFFFFFF) != 13392659 && max && max<cur)
+    {
+		NewUserRepStruct rep;
+		rep._result = 3;
+		TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
+        NETWORK()->SendMsgToClient(conn.get(), rep);
         return;
+    }
     else
     {
         UInt32 Cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur); 
