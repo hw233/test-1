@@ -62,7 +62,7 @@ private:
     AtomicVal<UInt32> m_Limit;
 	std::vector<LogMsg> m_DCLog;
     std::vector<LogMsg> m_UnionLog;
-    std::vector<OpenIdMsg> m_Openid;
+    //std::vector<OpenIdMsg> m_Openid;
     CLogger* m_logger;
     bool m_inited;
 
