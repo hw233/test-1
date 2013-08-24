@@ -188,12 +188,12 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_friendkey.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_collect_card.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clean_mofang.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguan.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     #mysql -h$H -u$U -p$P -P$PT $DBO < player_tuzhi.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < player_jiguanshu.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < player_jiguanyu.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_pray_relation.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguan.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_pray_relation.sql
     #. clearshiyamen.sh
 }
 
