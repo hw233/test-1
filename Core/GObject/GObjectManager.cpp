@@ -2962,6 +2962,8 @@ namespace GObject
             if(!dbfr.pray)
                 continue ;
             pl->addPrayFriendFromDB(dbfr.friendId,dbfr.time);
+            if(dbfr.praynum!=0)
+            toadd->addPrayFriendFromDB(pl->getId(),dbfr.time,dbfr.praynum);
 		}
 		lc.finalize();
 		return true;

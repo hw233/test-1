@@ -4636,16 +4636,16 @@ namespace GObject
         
         if(other->getThreadId() == getThreadId())
         {
-            other->bePrayed();
+            other->bePrayed(getId());
         }
         else
         {
-            GameMsgHdr hdr(0x362, other->getThreadId(), other, 0);
-            GLOBAL().PushMsg(hdr, NULL);
+            UInt64 id = getId();
+            GameMsgHdr hdr(0x362, other->getThreadId(), other, sizeof(id));
+            GLOBAL().PushMsg(hdr, &id);
         }
         ++prayValue;
         _prayFriend[other->getId()]=now;
-		DB1().PushUpdateData("REPLACE INTO `pray_relation` (`id`, `friendId`, `pray`, `time`) VALUES( %" I64_FMT "u, %" I64_FMT "u,1,%u)", getId(),other->getId(),now);
         SendOtherInfoForPray(other,prayValue);
     }
     void Player::SendOtherInfoForPray(Player* other,UInt32 op)
@@ -4664,16 +4664,27 @@ namespace GObject
         st<< Stream::eos;
         send(st);
     }
-    void Player::bePrayed()
+    void Player::bePrayed(UInt64 id)
     {
         UInt32  prayValue = GetVar(VAR_PRAY_VALUE); 
+        UInt32 now = TimeUtil::Now();
         if(prayValue < 0 || prayValue >= 10)
             return ;
         ++prayValue;
         if(prayValue == 10 )
             SetVar(VAR_PRAY_SUCTIME,TimeUtil::Now());
+        UInt32 num ;
         SetVar(VAR_PRAY_VALUE ,prayValue);
+        std::map<UInt64,StuPrayValue >::iterator it = _bePrayed.find(id);
+        if(it == _bePrayed.end())
+        {
+            _bePrayed[id]=StuPrayValue(now,1);
+            num = 1;
+        }
+        else
+            num =++(it->second.praynum);    //map  待定 
         sendPrayInfo();
+		DB1().PushUpdateData("REPLACE INTO `pray_relation` (`id`, `friendId`, `pray`, `time`,`praynum`) VALUES( %" I64_FMT "u, %" I64_FMT "u,1,%u,%u)", id , getId(),now,num);
     }
     void Player::sendPrayInfo()
     {
@@ -4699,6 +4710,21 @@ namespace GObject
         st << static_cast<UInt8>(prayCount);
         st << static_cast<UInt8>(prayToday);
         st << static_cast<UInt8>(prayValue);
+        size_t offset = sizeof(st);
+        UInt32 time = GetVar(VAR_PRAY_TIME);
+        std::map<UInt64,StuPrayValue >::iterator it =_bePrayed.begin();
+        UInt32 Count = 0;
+        st<<Count;
+        for(;it!=_bePrayed.end();++it)
+        {
+            if(it->second.time > time)
+             {
+                Player* player = globalPlayers[it->first];
+                st<<player->getName();
+                ++Count;
+             }
+        }
+        st.data<UInt32>(offset)=Count;
         if(prayValue == 10)
             st <<timeValue;
         st << Stream::eos;

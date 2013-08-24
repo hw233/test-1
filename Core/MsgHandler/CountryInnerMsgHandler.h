@@ -2117,7 +2117,8 @@ void OnBeVoted( GameMsgHdr &hdr, const void * data)
 void OnBePrayed( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
-    player->bePrayed();
+    UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
+    player->bePrayed(id);
 }
 
 void OnSendPopularityAward(GameMsgHdr &hdr, const void * data)
