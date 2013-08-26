@@ -4568,7 +4568,8 @@ namespace GObject
                 if(CheckFriendPray(pl->getId()))
                   st<<static_cast<UInt8>(1);
                 else st<<static_cast<UInt8>(0);
-               // std::cout <<pl->getId()<<"@!@# "<<pl->GetVar(VAR_PRAY_TYPE)<<"!!@!"<<pl->GetVar(VAR_PRAY_VALUE)<<std::endl;
+                st<<getBePrayednum(pl->getId());
+                // std::cout <<pl->getId()<<"@!@# "<<pl->GetVar(VAR_PRAY_TYPE)<<"!!@!"<<pl->GetVar(VAR_PRAY_VALUE)<<std::endl;
                 ++it;
             }
         }
@@ -4636,16 +4637,16 @@ namespace GObject
         
         if(other->getThreadId() == getThreadId())
         {
-            other->bePrayed();
+            other->bePrayed(getId());
         }
         else
         {
-            GameMsgHdr hdr(0x362, other->getThreadId(), other, 0);
-            GLOBAL().PushMsg(hdr, NULL);
+            UInt64 id = getId();
+            GameMsgHdr hdr(0x362, other->getThreadId(), other, sizeof(id));
+            GLOBAL().PushMsg(hdr, &id);
         }
         ++prayValue;
         _prayFriend[other->getId()]=now;
-		DB1().PushUpdateData("REPLACE INTO `pray_relation` (`id`, `friendId`, `pray`, `time`) VALUES( %" I64_FMT "u, %" I64_FMT "u,1,%u)", getId(),other->getId(),now);
         SendOtherInfoForPray(other,prayValue);
     }
     void Player::SendOtherInfoForPray(Player* other,UInt32 op)
@@ -4661,19 +4662,31 @@ namespace GObject
         if(CheckFriendPray(other->getId()))
             st<<static_cast<UInt8>(1);
         else st<<static_cast<UInt8>(0);
+        st<<getBePrayednum(other->getId());
         st<< Stream::eos;
         send(st);
     }
-    void Player::bePrayed()
+    void Player::bePrayed(UInt64 id)
     {
         UInt32  prayValue = GetVar(VAR_PRAY_VALUE); 
+        UInt32 now = TimeUtil::Now();
         if(prayValue < 0 || prayValue >= 10)
             return ;
         ++prayValue;
         if(prayValue == 10 )
             SetVar(VAR_PRAY_SUCTIME,TimeUtil::Now());
+        UInt32 num ;
         SetVar(VAR_PRAY_VALUE ,prayValue);
+        std::map<UInt64,StuPrayValue >::iterator it = _bePrayed.find(id);
+        if(it == _bePrayed.end())
+        {
+            _bePrayed[id]=StuPrayValue(now,1);
+            num = 1;
+        }
+        else
+            num =++(it->second.praynum);    //map  待定 
         sendPrayInfo();
+		DB1().PushUpdateData("REPLACE INTO `pray_relation` (`id`, `friendId`, `pray`, `time`,`praynum`) VALUES( %" I64_FMT "u, %" I64_FMT "u,1,%u,%u)", id , getId(),now,num);
     }
     void Player::sendPrayInfo()
     {
@@ -4699,8 +4712,23 @@ namespace GObject
         st << static_cast<UInt8>(prayCount);
         st << static_cast<UInt8>(prayToday);
         st << static_cast<UInt8>(prayValue);
-        if(prayValue == 10)
+        if(prayValue >= 10)
             st <<timeValue;
+        size_t offset = st.size();
+        UInt32 time = GetVar(VAR_PRAY_TIME);
+        std::map<UInt64,StuPrayValue >::iterator it =_bePrayed.begin();
+        UInt8 Count = 0;
+        st<<Count;
+        for(;it!=_bePrayed.end();++it)
+        {
+            if(it->second.time > time && time != 0 )
+             {
+                Player* player = globalPlayers[it->first];
+                st<<player->getName();
+                ++Count;
+             }
+        }
+        st.data<UInt8>(offset)=Count;
         st << Stream::eos;
         send(st);
 //        std::cout<<"type:"<<prayType<<" count:"<<prayCount<<" value:"<<prayValue<< " suctime"<<praySucTime<<std::endl;
@@ -4709,6 +4737,7 @@ namespace GObject
     {
         UInt8 prayCount = GetVar(VAR_PRAY_COUNT);
         UInt8 maxCount = 2 ;
+        UInt32 now = TimeUtil::Now();
         if(getVipLevel())
         {
                maxCount = 3 ;
@@ -4718,6 +4747,7 @@ namespace GObject
         SetVar(VAR_PRAY_TYPE,index);
         SetVar(VAR_PRAY_COUNT,prayCount+1);
         SetVar(VAR_PRAY_TYPE_TODAY,1);
+        SetVar(VAR_PRAY_TIME,now);
        // Stream st;
        // SYSMSGVP(st, 430, getName().c_str(), 0);
        // broadcastFriend(st);
@@ -4734,7 +4764,7 @@ namespace GObject
         UInt32 now = TimeUtil::Now();
         if((86400+praySucTime)>now)
             return ;
-        if(prayValue != 10)
+        if(prayValue < 10)
             return ;
         if(type == 1)
         {
@@ -4760,6 +4790,7 @@ namespace GObject
         SetVar(VAR_PRAY_TYPE , 0 );
         SetVar(VAR_PRAY_VALUE , 0);
         SetVar(VAR_PRAY_TYPE_TODAY,0);
+        SetVar(VAR_PRAY_TIME,0);
         sendPrayInfo();
         char str[16] = {0};
         sprintf(str, "F_130822_%d", 1+type);
@@ -23487,6 +23518,14 @@ void Player::broadcastFriend(Stream& st)
     _clan->broadcast(st);
 }
 
+UInt32 Player::getBePrayednum(UInt64 id)
+{
+    std::map<UInt64,StuPrayValue >::iterator it = _bePrayed.find(id);
+    if(it != _bePrayed.end())
+        return it->second.praynum;
+    else
+        return 0 ;    
+}
 } // namespace GObject
 
 

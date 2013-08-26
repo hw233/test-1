@@ -524,6 +524,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_PRAY_COUNT = 586,
         VAR_PRAY_SUCTIME = 587,
         VAR_PRAY_TYPE_TODAY = 588 ,
+        VAR_PRAY_TIME = 589 ,
 
         VAR_MAX,
     };
@@ -1002,6 +1003,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_PRAY_COUNT, CYCLE_WEEK);
             REGISTER_VAR(VAR_PRAY_SUCTIME, CYCLE_NONE);
             REGISTER_VAR(VAR_PRAY_TYPE_TODAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_PRAY_TIME, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

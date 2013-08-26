@@ -192,8 +192,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < player_tuzhi.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < player_jiguanshu.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < player_jiguanyu.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguan.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_pray_relation.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_pray_relation.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_correct_pray_relation.sql
     #. clearshiyamen.sh
 }
 
