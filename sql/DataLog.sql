@@ -70,7 +70,8 @@ CREATE TABLE IF NOT EXISTS `mailitem_histories` (
   `status` tinyint(3) unsigned NOT NULL,
   `delete_time` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`server_id`, `player_id`, `mail_id`),
-  INDEX up_mail_status (`server_id`, `mail_id`, `status`)
+  INDEX up_mail_status (`server_id`, `mail_id`, `status`),
+  INDEX mail_bs (`player_id`, `receive_time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
