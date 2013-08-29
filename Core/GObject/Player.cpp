@@ -4771,11 +4771,9 @@ namespace GObject
                 ++count;
             else 
             {
-                if(count != 0)
-                 {
-                     max = count ;
-                     count =0;
-                 }
+                if(count != 0 && max<count)
+                    max = count ;
+                count =0;
             }
         }
         if(max>=3)
