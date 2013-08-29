@@ -1039,7 +1039,7 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
 
     bool pr2 = false;
     bool cs2 = false;
-    if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(bo, NULL))))
+    if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(bo, NULL) && !bo->getMoEvade100())))
     {
         pr2 = bf->calcPierce(bo);
         float rate = bf->getCritical(bo);
@@ -12238,7 +12238,7 @@ void BattleSimulator::doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& 
     bool enterEvade = bo->getEvad100();
     bool defend100 = bo->getDefend100();
 
-    if(!defend100 && (bo_stun > 0 || (!enterEvade && bf->calcHit(bo, NULL))))
+    if(!defend100 && (bo_stun > 0 || (!enterEvade && bf->calcHit(bo, NULL) && !bo->getMoEvade100())))
     {
         pr = bf->calcPierce(bo);
         float atk = 0;

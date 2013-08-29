@@ -225,10 +225,12 @@ namespace GObject
 
         UInt32 extraExp = 0;
         // 限时vip特权
-         UInt32 VipType = m_Player->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+        if(m_Player->getBuffData(PLAYER_BUFF_CLANTREE1))
+            factor+=0.2f;
+        UInt32 VipType = m_Player->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
         if(m_Player-> in7DayFromCreated() && VipType >4 )
             VipType -= 2 ;
-         if(m_Player->inVipPrivilegeTime()  &&( VipType < 5 ))
+        if(m_Player->inVipPrivilegeTime()  &&( VipType < 5 ))
         {
             factor += 1.0f;
             extraExp = static_cast<UInt32>(exp * 1.0f);
@@ -312,13 +314,14 @@ namespace GObject
 		ecs.ng = NULL;//_npcGroup;
         if (cfg.rpServer && m_Player->GetLev() < 70)
             ecs.exp *= 2;
+        if(m_Player->getBuffData(PLAYER_BUFF_CLANTREE1))
+            ecs.exp *= 1.2f;
 		GameMsgHdr hdr(0x274, m_Player->getThreadId(), m_Player, sizeof(ExpGainInstantCompleteStruct));
 		GLOBAL().PushMsg(hdr, &ecs);
 		_finalEnd -= ecs.duration;
 		notify();
         if (m_Player)
             m_Player->SetVar(VAR_LEFTTIMES, newCnt);
-
         _writedb = true;
 		updateDB(false);
 		return newCnt == 0;
@@ -1341,7 +1344,7 @@ namespace GObject
 #ifndef _VT
         dclogger.login(this);
         dclogger.login_sec(this);
-        dclogger.checkOpenId(this);
+        //dclogger.checkOpenId(this);
         //dclogger.checkYB(this);   //LB添加
 
         EventAutoRefreshOpenKey* event = new(std::nothrow) EventAutoRefreshOpenKey(this, 60 * 110, 24);
@@ -4568,7 +4571,8 @@ namespace GObject
                 if(CheckFriendPray(pl->getId()))
                   st<<static_cast<UInt8>(1);
                 else st<<static_cast<UInt8>(0);
-               // std::cout <<pl->getId()<<"@!@# "<<pl->GetVar(VAR_PRAY_TYPE)<<"!!@!"<<pl->GetVar(VAR_PRAY_VALUE)<<std::endl;
+                st<<getBePrayednum(pl->getId());
+                // std::cout <<pl->getId()<<"@!@# "<<pl->GetVar(VAR_PRAY_TYPE)<<"!!@!"<<pl->GetVar(VAR_PRAY_VALUE)<<std::endl;
                 ++it;
             }
         }
@@ -4636,16 +4640,16 @@ namespace GObject
         
         if(other->getThreadId() == getThreadId())
         {
-            other->bePrayed();
+            other->bePrayed(getId());
         }
         else
         {
-            GameMsgHdr hdr(0x362, other->getThreadId(), other, 0);
-            GLOBAL().PushMsg(hdr, NULL);
+            UInt64 id = getId();
+            GameMsgHdr hdr(0x362, other->getThreadId(), other, sizeof(id));
+            GLOBAL().PushMsg(hdr, &id);
         }
         ++prayValue;
         _prayFriend[other->getId()]=now;
-		DB1().PushUpdateData("REPLACE INTO `pray_relation` (`id`, `friendId`, `pray`, `time`) VALUES( %" I64_FMT "u, %" I64_FMT "u,1,%u)", getId(),other->getId(),now);
         SendOtherInfoForPray(other,prayValue);
     }
     void Player::SendOtherInfoForPray(Player* other,UInt32 op)
@@ -4658,22 +4662,34 @@ namespace GObject
             st<< static_cast<UInt8>(prayValue) ;
         else 
             st<< static_cast<UInt8>(op) ;
-        if(CheckFriendPray(other->getId()))
+        if( op || CheckFriendPray(other->getId()))
             st<<static_cast<UInt8>(1);
         else st<<static_cast<UInt8>(0);
+        st<<getBePrayednum(other->getId());
         st<< Stream::eos;
         send(st);
     }
-    void Player::bePrayed()
+    void Player::bePrayed(UInt64 id)
     {
         UInt32  prayValue = GetVar(VAR_PRAY_VALUE); 
+        UInt32 now = TimeUtil::Now();
         if(prayValue < 0 || prayValue >= 10)
             return ;
         ++prayValue;
         if(prayValue == 10 )
             SetVar(VAR_PRAY_SUCTIME,TimeUtil::Now());
+        UInt32 num ;
         SetVar(VAR_PRAY_VALUE ,prayValue);
+        std::map<UInt64,StuPrayValue >::iterator it = _bePrayed.find(id);
+        if(it == _bePrayed.end())
+        {
+            _bePrayed[id]=StuPrayValue(now,1);
+            num = 1;
+        }
+        else
+            num =++(it->second.praynum);    //map  待定 
         sendPrayInfo();
+		DB1().PushUpdateData("REPLACE INTO `pray_relation` (`id`, `friendId`, `pray`, `time`,`praynum`) VALUES( %" I64_FMT "u, %" I64_FMT "u,1,%u,%u)", id , getId(),now,num);
     }
     void Player::sendPrayInfo()
     {
@@ -4699,8 +4715,23 @@ namespace GObject
         st << static_cast<UInt8>(prayCount);
         st << static_cast<UInt8>(prayToday);
         st << static_cast<UInt8>(prayValue);
-        if(prayValue == 10)
+        if(prayValue >= 10)
             st <<timeValue;
+        size_t offset = st.size();
+        UInt32 time = GetVar(VAR_PRAY_TIME);
+        std::map<UInt64,StuPrayValue >::iterator it =_bePrayed.begin();
+        UInt8 Count = 0;
+        st<<Count;
+        for(;it!=_bePrayed.end();++it)
+        {
+            if(it->second.time > time && time != 0 )
+             {
+                Player* player = globalPlayers[it->first];
+                st<<player->getName();
+                ++Count;
+             }
+        }
+        st.data<UInt8>(offset)=Count;
         st << Stream::eos;
         send(st);
 //        std::cout<<"type:"<<prayType<<" count:"<<prayCount<<" value:"<<prayValue<< " suctime"<<praySucTime<<std::endl;
@@ -4709,6 +4740,7 @@ namespace GObject
     {
         UInt8 prayCount = GetVar(VAR_PRAY_COUNT);
         UInt8 maxCount = 2 ;
+        UInt32 now = TimeUtil::Now();
         if(getVipLevel())
         {
                maxCount = 3 ;
@@ -4718,6 +4750,7 @@ namespace GObject
         SetVar(VAR_PRAY_TYPE,index);
         SetVar(VAR_PRAY_COUNT,prayCount+1);
         SetVar(VAR_PRAY_TYPE_TODAY,1);
+        SetVar(VAR_PRAY_TIME,now);
        // Stream st;
        // SYSMSGVP(st, 430, getName().c_str(), 0);
        // broadcastFriend(st);
@@ -4734,7 +4767,7 @@ namespace GObject
         UInt32 now = TimeUtil::Now();
         if((86400+praySucTime)>now)
             return ;
-        if(prayValue != 10)
+        if(prayValue < 10)
             return ;
         if(type == 1)
         {
@@ -4760,6 +4793,7 @@ namespace GObject
         SetVar(VAR_PRAY_TYPE , 0 );
         SetVar(VAR_PRAY_VALUE , 0);
         SetVar(VAR_PRAY_TYPE_TODAY,0);
+        SetVar(VAR_PRAY_TIME,0);
         sendPrayInfo();
         char str[16] = {0};
         sprintf(str, "F_130822_%d", 1+type);
@@ -7885,6 +7919,8 @@ namespace GObject
             SetVar(VAR_TOWER_LEVEL, 1);
         }
 
+        sendFeastLoginAct();
+
         if(_clan != NULL)
         {
 			_clan->broadcastMemberInfo(this);
@@ -10358,6 +10394,8 @@ namespace GObject
         if(inVipPrivilegeTime()&&(VipType==0||VipType ==1 ||VipType ==3 ))
             factor += 1.0f;
 
+        if(getBuffData(PLAYER_BUFF_CLANTREE3))
+            factor += 0.1f;
         return factor;
     }
 
@@ -19040,6 +19078,70 @@ void Player::sendGoodVoiceInfo()
     send(st);
 }
 
+void Player::getQzongPYGiftAward(UInt8 type)
+{
+    if (getPlatform() != 1 && getPlatform() != 2)
+        return;
+    if (GetVar(VAR_QZONGPYGIFT) >= 33)
+        return;
+    if (GetFreePackageSize() < 6)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if(type == 1)
+    {
+        if (getGold() < 19)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(EnumQzongPYGift,0,0);
+        useGold(19, &ci);
+        AddVar(VAR_QZONGPYGIFT, 1);
+        static UInt32 itemId[] = {548, 3, 9082, 3, 9371, 1, 8000, 1, 500, 1, 9390, 1};
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
+        {
+            GetPackage()->Add(itemId[i], itemId[i+1], true);
+        }
+    }
+    else if(type == 2)
+    {
+        if (getGold() < 77)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(EnumQzongPYGift,0,0);
+        useGold(77, &ci);
+        AddVar(VAR_QZONGPYGIFT, 1);
+        static UInt32 itemId[] = {1126, 1325, 134, 9141, 551, 517};
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
+        {
+            GetPackage()->Add(itemId[i], 1, true);
+        }
+    }
+    sendQzongPYGiftInfo();
+}
+
+void Player::sendQzongPYGiftInfo()
+{
+    if (getPlatform() != 1 && getPlatform() != 2)
+        return;
+    /*
+    if(!isBD())
+        return;
+    */
+    if(!World::getQzongPYGiftAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(6);
+    UInt8 opt = GetVar(VAR_QZONGPYGIFT);
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
 void Player::get3366GiftAward(UInt8 type)
 {
     if (getPlatform() != 11)
@@ -19129,17 +19231,20 @@ void Player::sendQQGameGift1218()
 
 void Player::sendFeastLoginAct()
 {
-    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || !World::getMayDayLoginAct()) /*!World::getFeastLoginAct()*/
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || /*!World::getMayDayLoginAct()*/ !World::getFeastLoginAct())
         return;
     //SYSMSGV(title, 4102);
     //SYSMSGV(content, 4103);
-    SYSMSGV(title, 4098);
-    SYSMSGV(content, 4099);
+    //SYSMSGV(title, 4098);
+    //SYSMSGV(content, 4099);
+    SYSMSGV(title, 4108);
+    SYSMSGV(content, 4109);
     Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
     if(mail)
     {
         //MailPackage::MailItem mitem = {1759,1};
-        MailPackage::MailItem mitem = {1763,1};
+        //MailPackage::MailItem mitem = {1763,1};
+        MailPackage::MailItem mitem = {1760,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     SetVar(VAR_FEAST_LOGIN, 1);
@@ -23485,6 +23590,21 @@ void Player::broadcastFriend(Stream& st)
         pfriend->send(st);
     }
     _clan->broadcast(st);
+}
+
+UInt32 Player::getBePrayednum(UInt64 id)
+{
+    std::map<UInt64,StuPrayValue >::iterator it = _bePrayed.find(id);
+    if(it != _bePrayed.end())
+        return it->second.praynum;
+    else
+        return 0 ;    
+}
+void Player::setClanSpiritTreeBuff(UInt8 id,UInt32 time)
+{
+    if( id < 0 || id > 2 )
+        return ;
+    addBuffData(id+PLAYER_BUFF_CLANTREE1,time);
 }
 
 } // namespace GObject

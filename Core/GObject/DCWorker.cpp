@@ -66,6 +66,7 @@ namespace GObject
         }
         curl = curl_easy_init();
 #endif
+        //m_Openid.clear();
         m_inited = true;
         return true;
     }
@@ -79,14 +80,14 @@ namespace GObject
     {
         std::vector<LogMsg> log;
         std::vector<LogMsg> unionLog;
-        std::vector<OpenIdMsg> openIdLog;
+        //std::vector<OpenIdMsg> openIdLog;
         {
             FastMutex::ScopedLock lk(m_Mutex);
             log.swap(m_DCLog);
 
             unionLog.swap(m_UnionLog);
 
-            openIdLog.swap(m_Openid);
+            //openIdLog.swap(m_Openid);
         }
         if (!log.empty())
         {
@@ -159,7 +160,7 @@ namespace GObject
                 ++i;
             }
         }
-        
+        /*
         if (!openIdLog.empty())
         {
             size_t size = openIdLog.size();
@@ -199,7 +200,7 @@ namespace GObject
                 ++i;
             }
         }
-        
+        */
     }
 
     void DCWorker::OnPause()
@@ -240,7 +241,7 @@ namespace GObject
 
     void DCWorker::PushCheckOpenId(UInt64 playerId, const char * openId, UInt32 len)
     {
-        
+       /* 
         if (!openId)
             return;
         return ;
@@ -260,7 +261,7 @@ namespace GObject
             FastMutex::ScopedLock lk(m_Mutex);
             m_Openid.push_back(openMsg);
         }
-       
+       */
     }
 
     /*

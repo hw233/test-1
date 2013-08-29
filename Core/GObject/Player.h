@@ -139,8 +139,12 @@ namespace GObject
 #define PLAYER_BUFF_EXPDOUBLE       0x5C    //回流服务器 经验双倍
 #define PLAYER_BUFF_CLANBOSS_CD     0x5D
 
-#define PLAYER_BUFF_DISPLAY_MAX		0x5F
-#define PLAYER_BUFF_COUNT			0x5F
+#define PLAYER_BUFF_CLANTREE1       0x60
+#define PLAYER_BUFF_CLANTREE2       0x61
+#define PLAYER_BUFF_CLANTREE3       0x62
+
+#define PLAYER_BUFF_DISPLAY_MAX		0x63
+#define PLAYER_BUFF_COUNT			0x63
 #define PLAYER_BUFF_START           0x80
 
 #define CLAN_TASK_MAXCOUNT          5       // ????ÿ????????????
@@ -236,6 +240,14 @@ namespace GObject
         e_pf_shenma = 6,
         e_pf_konglong = 7,
         e_pf_xiaoyu = 8
+    };
+
+    enum LOGIN_PLATFORM
+    {
+        e_lpf_qzong = 1,
+        e_lpf_pengyou = 2,
+        e_lpf_qgame = 10,
+        e_lpf_3366 = 11,
     };
 
 	class Map;
@@ -726,14 +738,16 @@ namespace GObject
 			AutoCB = 0x40000,
 		};
 
-		struct FriendActStruct {
-			Player * player;
+		struct FriendActStruct
+        {
+            Player * player;
 			UInt8 type;
 			union {
 				Player * target;
 				char str[16];
 				UInt64 num;
 			};
+           
 			inline void assignFriendAct(Player * arg)
 			{
 				target = arg;
@@ -748,7 +762,21 @@ namespace GObject
 				num = arg;
 			}
 		};
-
+        struct StuPrayValue
+        {
+            UInt32 time ;
+            UInt32 praynum;
+            StuPrayValue(UInt32 _time,UInt32 _praynum)
+            {
+                time =_time;
+                praynum = _praynum;
+            }
+            StuPrayValue()
+            {
+                time = 0 ;
+                praynum= 0 ;
+            }
+        };
 	public:
 		Player(UInt64);
 		~Player();
@@ -1135,12 +1163,15 @@ namespace GObject
     private:
         GData::AttrExtra _hiattr;
         bool _hiattrFlag;
+        bool _clanRankBuffFlag;
         bool _cbHPflag;
         //GData::AttrExtra _hiaf;
         //bool _hiafFlag;
     public:
         inline void setHiAttrFlag(bool v) { _hiattrFlag = v; }
         inline bool hasHiAttrFlag() { return _hiattrFlag; }
+        inline void setClanRankBuffFlag(bool v) { _clanRankBuffFlag = v; }
+        inline bool hasClanRankBuffFlag() { return _clanRankBuffFlag; }
         void addHIAttr(const GData::AttrExtra&);
         void clearHIAttr();
         inline const GData::AttrExtra* getHIAttr() const { return &_hiattr; }
@@ -1524,7 +1555,7 @@ namespace GObject
 		bool CheckFriendPray(UInt64 playerId);
         bool testCanAddFriend(Player *);
         void broadcastFriend(Stream& st);
-        
+        UInt32 getBePrayednum(UInt64 id); 
 		bool testCanAddCFriend(Player *);
         void tellCFriendLvlUp(UInt8);
         void OnCFriendLvlUp(Player*, UInt8);
@@ -1538,7 +1569,7 @@ namespace GObject
 
         void prayForOther(Player *other);
         void SendOtherInfoForPray(Player *other,UInt32 op=0);
-        void bePrayed();
+        void bePrayed(UInt64 id);
         
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
         void PutPets (Battle::BattleSimulator&, int side, bool init = true);
@@ -1727,9 +1758,17 @@ namespace GObject
             m_snow.bind = bind;
             m_snow.score = score;
         }
-        void addPrayFriendFromDB(UInt64 PlayerId,UInt32 time)
+        void addPrayFriendFromDB(UInt64 PlayerId,UInt32 time,UInt32 num = 0)
         {
-           _prayFriend[PlayerId]=time; 
+            if(num ==0)
+               _prayFriend[PlayerId]=time; 
+            else 
+            {
+                StuPrayValue v;
+                v.time =time;
+                v.praynum = num;
+                _bePrayed[PlayerId] = v;
+            }
         }
         SnowInfo& getSnowInfo() {return m_snow;};
         void resetSnow();
@@ -1772,6 +1811,7 @@ namespace GObject
 		std::set<Player *> _friends[4];
 		std::vector<FriendActStruct *> _friendActs;
         std::map<UInt64,UInt32 >_prayFriend; 
+        std::map<UInt64,StuPrayValue >_bePrayed; 
 
 		TaskMgr* m_TaskMgr;
 		Trade* m_Trade;
@@ -2426,6 +2466,9 @@ namespace GObject
         void calcNewYearQzoneContinueDay(UInt32 time);
         void transferExpBuffer2Var();
 
+        void getQzongPYGiftAward(UInt8 type);
+        void sendQzongPYGiftInfo();
+
         inline bool relateExpHook(UInt8 id) { return id == PLAYER_BUFF_TRAINP1 || id == PLAYER_BUFF_TRAINP2 || id == PLAYER_BUFF_TRAINP3/* || id == PLAYER_BUFF_TRAINP4 || id == PLAYER_BUFF_ADVANCED_HOOK*/; }
 
     private:    //仙宠
@@ -2528,6 +2571,7 @@ namespace GObject
     public:
         void sendCollectCard(UInt8 fighterIndex);
         void sendAllCollectCard();
+        void setClanSpiritTreeBuff(UInt8,UInt32);
         void useCollectCard(UInt8 fighterIndex);
         void putCollectCardPool(UInt8 fighterIndex, UInt8 partPos, UInt16 partCnt);
         void convertCollectCard();

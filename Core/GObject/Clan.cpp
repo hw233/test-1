@@ -3667,6 +3667,7 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
             if(player->CheckFriendPray(pl->getId()))
                 st<<static_cast<UInt8>(1);
             else st<<static_cast<UInt8>(0);
+            st<<player->getBePrayednum(pl->getId());
             ++it;
         }
     }
@@ -4516,6 +4517,7 @@ void Clan::refreshColorAward()
         broadcast(st);
 
         ++ m_spiritTree.m_color;
+        setClanSpiritTreeBuff(m_spiritTree.m_color);
         m_spiritTree.m_refreshTimes = 0;
     }
     else
@@ -4817,6 +4819,25 @@ void Clan::listMembersActivePoint( Player * player )
 	}
 	st << Stream::eos;
 	player->send(st);
+}
+
+void Clan::setClanSpiritTreeBuff(UInt8 color)
+{
+    if(color < 1 || color >3 )
+        return ;
+	Mutex::ScopedLock lk(_mutex);
+	ClanMember * mem = NULL;
+	Members::iterator offset;
+	for(offset = _members.begin(); offset != _members.end(); ++ offset)
+	{
+		mem = *offset;
+        if (!mem)
+            continue;
+        if (!mem->player)
+            continue;
+        mem->player->setClanSpiritTreeBuff(color-1, 86400);
+	}
+
 }
 
 

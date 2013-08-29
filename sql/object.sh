@@ -161,7 +161,6 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130422_1.sql   #末日之战帮派增加xianyun和gongxian
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130425_1.sql   #末日之战帮派增加urge
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装人人拿(var294)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130510_1.sql   #清除消费抽奖(var142/348)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_fairy_spar.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearaccrecharge.sql   #清除累积充值记录
@@ -188,12 +187,13 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_friendkey.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_collect_card.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clean_mofang.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguan.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     #mysql -h$H -u$U -p$P -P$PT $DBO < player_tuzhi.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < player_jiguanshu.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < player_jiguanyu.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_pray_relation.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_correct_pray_relation.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_2013_08_29_1.sql  #清除QQ秀合作记录
     #. clearshiyamen.sh
 }

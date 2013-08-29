@@ -236,6 +236,9 @@ void MoFang::addJGSExp(UInt32 exp)
     else
         sendExp = m_jiguanshu.curExp;
 
+    SYSMSG_SENDV(4935, m_owner, 9421, exp);
+    SYSMSG_SENDV(4936, m_owner, 9421, exp);
+
     Stream st(REP::MOFANG_INFO);
     st << static_cast<UInt8>(5);
     st << static_cast<UInt32>(sendExp);
@@ -327,8 +330,8 @@ void MoFang::randTuzhi(UInt16 num)
     exp = m_jiguanshu.curExp - exp;
     if(exp > 0)
     {
-        SYSMSG_SENDV(4935, m_owner, exp);
-        SYSMSG_SENDV(4936, m_owner, exp);
+        SYSMSG_SENDV(4935, m_owner, 9418, exp);
+        SYSMSG_SENDV(4936, m_owner, 9418, exp);
     }
 
     UInt32 sendExp = 0;

@@ -2111,3 +2111,14 @@ CREATE TABLE `collect_card` (
     PRIMARY KEY (`playerId`, `id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+ DROP TABLE IF EXISTS `pray_relation`;                                                                                      
+ CREATE TABLE `pray_relation` (
+   `id` bigint(20) unsigned NOT NULL,
+   `friendId` bigint(20) unsigned NOT NULL,
+   `pray` tinyint(1) unsigned NOT NULL DEFAULT '0',
+   `time` int(10) unsigned NOT NULL,
+   `praynum` int(10) unsigned NOT NULL DEFAULT '0',
+    UNIQUE KEY `id_friendId` (`id`,`friendId`),
+    KEY `id` (`id`)
+ ) 
+ ENGINE=InnoDB DEFAULT CHARSET=utf8;

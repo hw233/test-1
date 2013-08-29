@@ -533,17 +533,24 @@ void trimName(std::string& str)
 
 void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 {
-
     UInt32 max = 0;
     UInt32 cur = 0;
     max = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max)/24;
     cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur);
-    if((hdr.playerID&0xFFFFFFFFFF) != 39090008 && (hdr.playerID&0xFFFFFFFFFF) != 1779780 && (hdr.playerID&0xFFFFFFFFFF) != 13392659 && max && max<cur)
+    if((hdr.playerID&0xFFFFFFFFFF) != 39090008 &&
+            (hdr.playerID&0xFFFFFFFFFF) != 1779780 &&
+            (hdr.playerID&0xFFFFFFFFFF) != 5 &&
+            (hdr.playerID&0xFFFFFFFFFF) != 13392659 &&
+            max && max<cur)
     {
 		NewUserRepStruct rep;
 		rep._result = 3;
 		TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
-        NETWORK()->SendMsgToClient(conn.get(), rep);
+        if (conn.get() != NULL)
+        {
+            NETWORK()->SendMsgToClient(conn.get(), rep);
+            conn->pendClose();
+        }
         return;
     }
     else
@@ -1052,12 +1059,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                515,    2,
+                503,    4,
                 509,    2,
-                1126,   5,
-                516,    5,
-                517,    5,
-                551,    5
+                56,     2,
+                466,    3,
+                549,    2,
+                50,     3
             };
 
             UInt8 idx = 0;

@@ -1,7 +1,4 @@
-DROP TABLE IF EXISTS `pray_relation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pray_relation` (
+CREATE TABLE IF NOT EXISTS `pray_relation` (                       
     `id` bigint(20) unsigned NOT NULL,
     `friendId` bigint(20) unsigned NOT NULL,
     `pray` tinyint(1) unsigned NOT NULL DEFAULT '0',

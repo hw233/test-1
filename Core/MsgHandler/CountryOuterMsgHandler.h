@@ -1307,6 +1307,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendCopyFrontAllAward();
     pl->sendGoodVoiceInfo();
     pl->send3366GiftInfo();
+    pl->sendQzongPYGiftInfo();
     pl->sendFeastGiftAct();
     pl->sendNewYearQQGameAct();
     pl->calcNewYearQzoneContinueDay(now);
@@ -1972,10 +1973,16 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             if(!player->hasChecked())
                 return;
             UInt8 type;
-            if(!World::get3366GiftAct())
-                return;
             br >> type;
-            player->get3366GiftAward(type);
+            if(World::get3366GiftAct())
+            {
+                player->get3366GiftAward(type);
+            }
+            if(World::getQzongPYGiftAct())
+            {
+                player->getQzongPYGiftAward(type);
+            }
+            return;
         }
         break;
 

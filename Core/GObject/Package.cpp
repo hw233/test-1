@@ -1563,7 +1563,7 @@ namespace GObject
 		-- m_Size;
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", id);
 		DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", id);
-		if(toWhere != 0 && item->getQuality() >= 4)
+		if((toWhere != 0 && item->getQuality() >= 4) || (Item_LBling <= item->GetItemType().subClass && Item_LBxin >= item->GetItemType().subClass && (static_cast<ItemLingbao*>(item))->getLbColor()>=4))
 		{
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), item->getId(), toWhere, TimeUtil::Now());
 		}
@@ -1586,7 +1586,7 @@ namespace GObject
 		-- m_Size;
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
 		DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
-		if(toWhere != 0 && equip->getQuality() >= 4)
+		if((toWhere != 0 && equip->getQuality() >= 4) || (Item_LBling <= equip->GetItemType().subClass && Item_LBxin >= equip->GetItemType().subClass && (static_cast<ItemLingbao*>(equip))->getLbColor()>=4))
 		{
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetItemType().getId(), equip->getId(), toWhere, TimeUtil::Now());
 		}
