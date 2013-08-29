@@ -7919,6 +7919,8 @@ namespace GObject
             SetVar(VAR_TOWER_LEVEL, 1);
         }
 
+        sendFeastLoginAct();
+
         if(_clan != NULL)
         {
 			_clan->broadcastMemberInfo(this);
@@ -19229,17 +19231,20 @@ void Player::sendQQGameGift1218()
 
 void Player::sendFeastLoginAct()
 {
-    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || !World::getMayDayLoginAct()) /*!World::getFeastLoginAct()*/
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || /*!World::getMayDayLoginAct()*/ !World::getFeastLoginAct())
         return;
     //SYSMSGV(title, 4102);
     //SYSMSGV(content, 4103);
-    SYSMSGV(title, 4098);
-    SYSMSGV(content, 4099);
+    //SYSMSGV(title, 4098);
+    //SYSMSGV(content, 4099);
+    SYSMSGV(title, 4108);
+    SYSMSGV(content, 4109);
     Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
     if(mail)
     {
         //MailPackage::MailItem mitem = {1759,1};
-        MailPackage::MailItem mitem = {1763,1};
+        //MailPackage::MailItem mitem = {1763,1};
+        MailPackage::MailItem mitem = {1760,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     SetVar(VAR_FEAST_LOGIN, 1);
