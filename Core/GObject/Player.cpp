@@ -11534,11 +11534,11 @@ namespace GObject
 
         if(opt == 1 && state == 0)
         {
-            GetPackage()->AddItem(9371, 2, true, false, FromQQXiu);
+            getCoupon(20);
             GetPackage()->AddItem(503, 2, true, false, FromQQXiu);
-            GetPackage()->AddItem(515, 2, true, false, FromQQXiu);
-            GetPackage()->AddItem(548, 5, true, false, FromQQXiu);
-            GetPackage()->AddItem(8520, 1, true, false, FromQQXiu);
+            GetPackage()->AddItem(1126, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(49, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(50, 2, true, false, FromQQXiu);
 
             SetVar(VAR_QQXIU_AWARD, 1);
             state = 1;

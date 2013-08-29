@@ -6363,12 +6363,26 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
             {
                 return;
             }
+            UInt32 jgId = 0;
             UInt8 pos = 0;
 
-            br >> pos;
-            player->GetMoFang()->equipJG(0, pos, opt);               
+            br >> jgId >> pos;
+            player->GetMoFang()->equipJG(jgId, pos, opt);               
         }
         break;
+    case 7:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt32 tuzhiId = 0;
+
+            br >> tuzhiId;
+            player->GetMoFang()->quickMakejiguan(tuzhiId, opt);               
+        }
+        break;
+
     }
 }
 

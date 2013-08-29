@@ -7253,6 +7253,8 @@ namespace GObject
     {
 		item_elem_iter iter = m_ItemsTemporary.begin();
 		item_elem_iter iter2;
+        UInt32 time = 0;
+
 		for (; iter != m_ItemsTemporary.end();)
         {
             ItemBase * item = iter->second;
@@ -7261,7 +7263,12 @@ namespace GObject
             if(NULL == item)
                 continue;
 
-            if(TimeUtil::Now() >= (item->GetSellTime() + 86400))
+            if(m_Owner->getVipLevel() > 0)
+                time = item->GetSellTime() + 86400 * 3;
+            else
+                time = item->GetSellTime() + 86400;
+            
+            if(TimeUtil::Now() >= time)
             {
                 if(IsEquipId(item->getId()))
                 {
@@ -7377,31 +7384,41 @@ namespace GObject
 	{
         CheckTemporaryItem();
 		item_elem_iter iter = m_ItemsTemporary.begin();
-		Stream st(REP::TEMPITEM_INFO);
-		st << static_cast<UInt16>(0);
-		UInt16 count = 0;
-		for (; iter != m_ItemsTemporary.end(); ++iter)
-		{
-			ItemBase * item = iter->second;
-			if(IsEquip(item->getClass()))
-			{
-				count ++;
-				ItemEquip * equip = static_cast<ItemEquip *>(item);
-				AppendTempEquipData(st, equip);
-			}
-			else
-			{
-				count++;
-				AppendTempItemData(st, item);
-			}
+        int num = m_ItemsTemporary.size();
+        std::cout << "num = " << num << std::endl; 
+        while(num > 0)
+        {
+            Stream st(REP::TEMPITEM_INFO);
+            st << static_cast<UInt16>(0);
+            UInt16 count = 0;
+            for (; iter != m_ItemsTemporary.end(); ++iter)
+            {
+                ItemBase * item = iter->second;
+                if(IsEquip(item->getClass()))
+                {
+                    count++;
+                    ItemEquip * equip = static_cast<ItemEquip *>(item);
+                    AppendTempEquipData(st, equip);
+                }
+                else
+                {
+                    count++;
+                    AppendTempItemData(st, item);
+                }
 
-            if(count >= 500)
-                break;
-		}
+                if(count >= 500)
+                {
+                    ++iter;
+                    break;
+                }
+            }
 
-		st.data<UInt16>(4) = count;
-		st << Stream::eos;
-		m_Owner->send(st);
+            st.data<UInt16>(4) = count;
+            std::cout << "count = " << count << std::endl; 
+            st << Stream::eos;
+            m_Owner->send(st);
+            num -= count;
+        }
 	}
 
 	void Package::SendSingleTempEquipData(ItemEquip * equip)
@@ -7435,7 +7452,13 @@ namespace GObject
 		st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0);
 		if(hascount)
 			st << equip->Count();
-        int sellTime = equip->GetSellTime() + 86400 - TimeUtil::Now();
+
+        int sellTime = 0;
+        if(m_Owner->getVipLevel() > 0)
+            sellTime = equip->GetSellTime() + 86400 * 3 - TimeUtil::Now();
+        else
+            sellTime = equip->GetSellTime() + 86400 - TimeUtil::Now();
+
         st << static_cast<UInt32>(sellTime > 0 ? sellTime : 0);
 		st << static_cast<UInt16>(equip->GetItemType().getId()) << equip->getItemEquipData().enchant;
 		ItemEquipData& ied = equip->getItemEquipData();
@@ -7468,7 +7491,12 @@ namespace GObject
 
 	void Package::AppendTempItemData(Stream& st, ItemBase * item)
 	{
-        int sellTime = item->GetSellTime() + 86400 - TimeUtil::Now();
+        int sellTime = 0;
+        if(m_Owner->getVipLevel() > 0)
+            sellTime = item->GetSellTime() + 86400 * 3 - TimeUtil::Now();
+        else
+            sellTime = item->GetSellTime() + 86400 - TimeUtil::Now();
+
         if(0 == item->Count())
         {
             sellTime = 0;

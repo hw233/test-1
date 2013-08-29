@@ -33,7 +33,7 @@ namespace GObject
 
     enum
     {
-        JIGUANYU = 0,       // 机关玉
+        JIGUANYU = 1,       // 机关玉
         JIGUANQI            // 机关器 
     };
 
@@ -78,17 +78,19 @@ namespace GObject
         UInt16 useJGQskill();                                                           // 使用机关器技能
         void upgradeJGS();                                                              // 机关术升级
         void sendMoFangInfo(UInt8 mark = 0 /*0:获取墨方信息；1：制作机关玉；2：装备机关；3：拆卸机关 */);
-        inline UInt32 findEquipJG(UInt8 pos);
+        void quickMakejiguan(UInt32 tuzhiId, UInt8 mark);
+        inline bool findEquipJG(UInt32 jgId);
         inline bool findNoEquipJG(UInt32 jgId);
     private:
 
-        std::map<UInt8, UInt32> m_equipJG;  // 记录墨方坐标点所装备的机关
+        //std::map<UInt8, UInt32> m_equipJG;  // 记录墨方坐标点所装备的机关
+        std::map<UInt32, UInt8> m_equipJG;  // 装备的机关
 
-        std::map<UInt32, UInt8> m_tuzhi;   // 记录图纸所对应的熟练度
+        std::map<UInt32, UInt8> m_tuzhi;    // 记录图纸所对应的熟练度
 
         std::vector<UInt32> m_jg;           // 记录未装备机关
 
-        int m_grids[49];                 // 记录网格占用情况
+        int m_grids[49];                    // 记录网格占用情况
 
         Jiguanshu m_jiguanshu;
 
