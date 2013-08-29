@@ -2572,6 +2572,7 @@ namespace GObject
         void sendCollectCard(UInt8 fighterIndex);
         void sendAllCollectCard();
         void setClanSpiritTreeBuff(UInt8,UInt32);
+        void setPrayLoginInWeek();
         void useCollectCard(UInt8 fighterIndex);
         void putCollectCardPool(UInt8 fighterIndex, UInt8 partPos, UInt16 partCnt);
         void convertCollectCard();

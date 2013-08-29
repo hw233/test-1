@@ -4702,16 +4702,32 @@ namespace GObject
         UInt32 prayValue = GetVar(VAR_PRAY_VALUE);
         UInt32 praySucTime = GetVar(VAR_PRAY_SUCTIME);
         UInt32 prayToday = GetVar(VAR_PRAY_TYPE_TODAY);
+        UInt32 prayLogin = GetVar(VAR_PRAY_LOGIN);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(prayLogin & (1 << i++ ))
+                ++count;
+            else 
+            {
+                if(count != 0 && max<count)
+                    max = count ;
+                count =0;
+            }
+        }
         UInt32 now = TimeUtil::Now();
         UInt32 timeValue ;
-        if((86400+praySucTime)>now)
-            timeValue = 86400+praySucTime-now;   
+        if((43200+praySucTime)>now)
+            timeValue = 43200+praySucTime-now;   
         else 
             timeValue =0;
         Stream st(REP::NEWRELATION);
         st << static_cast<UInt8>(6);
         st << pexp;
         st << static_cast<UInt8>(prayType);
+        st << static_cast<UInt8>(max);
         st << static_cast<UInt8>(prayCount);
         st << static_cast<UInt8>(prayToday);
         st << static_cast<UInt8>(prayValue);
@@ -4745,6 +4761,25 @@ namespace GObject
         {
                maxCount = 3 ;
         }
+        UInt32 prayLogin = GetVar(VAR_PRAY_LOGIN);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(prayLogin & (1 << i++ ))
+                ++count;
+            else 
+            {
+                if(count != 0)
+                 {
+                     max = count ;
+                     count =0;
+                 }
+            }
+        }
+        if(max>=3)
+            maxCount++;
         if(prayCount >= maxCount)
             return ;
         SetVar(VAR_PRAY_TYPE,index);
@@ -4765,7 +4800,7 @@ namespace GObject
         UInt32 prayValue = GetVar(VAR_PRAY_VALUE);
         UInt32 praySucTime = GetVar(VAR_PRAY_SUCTIME);
         UInt32 now = TimeUtil::Now();
-        if((86400+praySucTime)>now)
+        if((43200+praySucTime)>now)
             return ;
         if(prayValue < 10)
             return ;
@@ -23600,6 +23635,15 @@ void Player::setClanSpiritTreeBuff(UInt8 id,UInt32 time)
     if( id < 0 || id > 2 )
         return ;
     addBuffData(id+PLAYER_BUFF_CLANTREE1,time);
+}
+
+void Player::setPrayLoginInWeek()
+{
+    UInt32 PrayLogin = GetVar(VAR_PRAY_LOGIN);
+    UInt32 now = TimeUtil::Now();
+    UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpWeek(0, now))/86400 +1;
+    PrayLogin |= ( 1 << (off - 1));
+    SetVar(VAR_PRAY_LOGIN, PrayLogin);
 }
 
 } // namespace GObject

@@ -78,6 +78,7 @@ GMHandler::GMHandler()
 	Reg(2, "exp", &GMHandler::OnAddExp);
 	Reg(2, "addOT", &GMHandler::OnAddOnlineTime);
 	Reg(3, "addvar", &GMHandler::OnAddVar);
+	Reg(3, "varset", &GMHandler::OnSetVar);
 	Reg(2, "pexp", &GMHandler::OnAddPExp);
 	Reg(3, "addpexp", &GMHandler::OnAddPExp);
 	Reg(3, "additem", &GMHandler::OnAddItem);
@@ -595,6 +596,17 @@ void GMHandler::OnAddVar( GObject::Player * player, std::vector<std::string>& ar
 		UInt32 value = atoi(args[1].c_str());
         UInt32 num = player->GetVar(var);
 		player->SetVar(var,num+value);
+	}
+}
+void GMHandler::OnSetVar( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+    if(args.size() == 2)
+	{
+		UInt32 var = atoi(args[0].c_str());
+		UInt32 value = atoi(args[1].c_str());
+		player->SetVar(var,value);
 	}
 }
 
