@@ -7954,6 +7954,8 @@ namespace GObject
             SetVar(VAR_TOWER_LEVEL, 1);
         }
 
+        sendFeastLoginAct();
+
         if(_clan != NULL)
         {
 			_clan->broadcastMemberInfo(this);
@@ -11605,11 +11607,11 @@ namespace GObject
 
         if(opt == 1 && state == 0)
         {
-            GetPackage()->AddItem(9371, 2, true, false, FromQQXiu);
+            getCoupon(20);
             GetPackage()->AddItem(503, 2, true, false, FromQQXiu);
-            GetPackage()->AddItem(515, 2, true, false, FromQQXiu);
-            GetPackage()->AddItem(548, 5, true, false, FromQQXiu);
-            GetPackage()->AddItem(8520, 1, true, false, FromQQXiu);
+            GetPackage()->AddItem(1126, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(49, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(50, 2, true, false, FromQQXiu);
 
             SetVar(VAR_QQXIU_AWARD, 1);
             state = 1;
@@ -19264,17 +19266,20 @@ void Player::sendQQGameGift1218()
 
 void Player::sendFeastLoginAct()
 {
-    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || !World::getMayDayLoginAct()) /*!World::getFeastLoginAct()*/
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || /*!World::getMayDayLoginAct()*/ !World::getFeastLoginAct())
         return;
     //SYSMSGV(title, 4102);
     //SYSMSGV(content, 4103);
-    SYSMSGV(title, 4098);
-    SYSMSGV(content, 4099);
+    //SYSMSGV(title, 4098);
+    //SYSMSGV(content, 4099);
+    SYSMSGV(title, 4108);
+    SYSMSGV(content, 4109);
     Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
     if(mail)
     {
         //MailPackage::MailItem mitem = {1759,1};
-        MailPackage::MailItem mitem = {1763,1};
+        //MailPackage::MailItem mitem = {1763,1};
+        MailPackage::MailItem mitem = {1760,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     SetVar(VAR_FEAST_LOGIN, 1);

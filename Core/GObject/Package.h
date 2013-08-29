@@ -293,8 +293,8 @@ namespace GObject
         void SendSingleTempEquipData(ItemEquip * equip);
         void SendTempItemData(ItemBase * item);
         void SendDelTempEquipData(ItemEquip * equip);
-        static void AppendTempItemData(Stream& st, ItemBase * item);
-        static void AppendTempEquipData(Stream& st, ItemEquip * equip, bool hascount = true);
+        void AppendTempItemData(Stream& st, ItemBase * item);
+        void AppendTempEquipData(Stream& st, ItemEquip * equip, bool hascount = true);
     protected:
 		typedef std::map<ItemKey, ItemBase *> ItemCont;
 		typedef ItemCont::iterator item_elem_iter;
