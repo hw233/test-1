@@ -189,7 +189,7 @@ void TownDeamon::showLevelTown(Player* pl, UInt16 level)
     st << static_cast<UInt8>(0x01);
     if(!pl2)
     {
-        st << level << "" << static_cast<UInt8>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0);
+        st << level << "" << static_cast<UInt8>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(3) << "" << static_cast<UInt32>(0);
     }
     else
     {
@@ -205,6 +205,7 @@ void TownDeamon::showLevelTown(Player* pl, UInt16 level)
         st << leftTime;
         st << dpd->calcAwards();
         st << dpd->calcSpirit();
+        st << pl2->getCountry() << pl2->getClanName() << pl2->getBattlePoint() * dpd->calcSpirit() / 100;
     }
 
     st << Stream::eos;

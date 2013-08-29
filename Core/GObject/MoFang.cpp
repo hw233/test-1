@@ -86,9 +86,6 @@ void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
         UInt8 mark = false;
         for(; i<3; i++)
         {
-            if(mark)
-                i = 0;
-
             if((k >= 9 || (pos+i) < 0 || (pos+i) >= 49) && (0 != jgyInfo->molding[k]))
                 return;
 
@@ -129,6 +126,9 @@ void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
 
                 k++;
             }
+
+            if(mark)
+                i = 0;
         }
     }
     else if(0 == dbData.pos)
@@ -914,9 +914,6 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
 
     for(; i<3; i++)
     {
-        if(markC)
-            i = 0;
-
         if((k >= 9 || (pos+i) < 0 || (pos+i) >= 49) && (0 != jgyInfo->molding[k]))
             return false;
 
@@ -957,6 +954,9 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
 
             k++;
         }
+
+        if(markC)
+            i = 0;
     }
 
     return true;

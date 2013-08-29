@@ -200,6 +200,8 @@ private:
     void OnClanBossSetEm(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBossOpen(GObject::Player *player, std::vector<std::string>& args);
 
+    void OnOpenclb(GObject::Player *player, std::vector<std::string>& args);
+
     void OnSetTownDeamonMaxLevel(GObject::Player *player, std::vector<std::string>& args);
     void OnFairySpar(GObject::Player *player, std::vector<std::string>& args);
     void OnAddPetEquipExp(GObject::Player *player, std::vector<std::string>& args);
