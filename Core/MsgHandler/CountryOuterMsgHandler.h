@@ -296,7 +296,8 @@ struct DungeonInfoReq
 {
 	UInt8 op;
 	UInt8 type;
-	MESSAGE_DEF2(REQ::BABEL_UPDATE, UInt8, op, UInt8, type);
+    UInt8 difficulty;
+	MESSAGE_DEF3(REQ::BABEL_UPDATE, UInt8, op, UInt8, type, UInt8, difficulty);
 };
 
 struct DungeonBattleReq
@@ -310,7 +311,8 @@ struct DungeonAutoReq
 {
 	UInt8 type;
     UInt8 mtype;
-	MESSAGE_DEF2(REQ::BABEL_AUTO_START, UInt8, type, UInt8, mtype);
+    UInt8 difficulty;
+	MESSAGE_DEF3(REQ::BABEL_AUTO_START, UInt8, type, UInt8, mtype, UInt8, difficulty);
 };
 
 struct DungeonCompleteAutoReq
@@ -2437,16 +2439,16 @@ void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
 	switch(dor.op)
 	{
 	case 0:
-		result = dg->playerEnter(pl);
+		result = dg->playerEnter(pl,1);
 		break;
 	case 1:
-		result = dg->playerLeave(pl);
+		result = dg->playerLeave(pl,1);
 		break;
 	case 2:
-		result = dg->playerContinue(pl);
+		result = dg->playerContinue(pl,0);
 		break;
 	case 3:
-		result = dg->playerBreak(pl);
+		result = dg->playerBreak(pl,1);
 		break;
 	default:
 		break;
@@ -2465,21 +2467,40 @@ void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 	GObject::Dungeon * dg = GObject::dungeonManager[dir.type];
 	if(dg == NULL)
 		return;
-
+    UInt8 result = 0;
+    Stream st(REP::COPY_DATA_UPDATE);
 	switch(dir.op)
 	{
 	case 0:
-		dg->sendDungeonInfo(pl);
+		dg->sendDungeonInfo(pl,dir.difficulty);
 		break;
-	case 1:
-		dg->sendMyLootInfo(pl);
-		break;
-	case 2:
-		break;
+    case 1:
+        result = dg->playerEnter(pl,dir.difficulty);
+	    st << dir.op << dir.type << dir.difficulty << result << Stream::eos;
+    	pl->send(st);
+        break;
+    case 2:
+        result = dg->playerLeave(pl,dir.difficulty);
+    	st << dir.op << dir.type << dir.difficulty << result << Stream::eos;
+    	pl->send(st);
+        break;
     case 3:
+        result = dg->playerContinue(pl,dir.difficulty);
+    	st << dir.op << dir.type << dir.difficulty << result << Stream::eos;
+    	pl->send(st);
+        break;
+    case 4 :
+        result = dg->playerBreak(pl,dir.difficulty);
+	    st << dir.op << dir.type << dir.difficulty << result << Stream::eos;
+	    pl->send(st);
+        break;
+    case 5:
         dg->doJusticeRoar(pl);
         break;
+    case 6:
+        dg->startChallenge(pl,dir.difficulty);        
 	default:
+        result = 4;
 		break;
 	}
 }
@@ -2499,7 +2520,7 @@ void OnDungeonBattleReq( GameMsgHdr& hdr, DungeonBattleReq& dbr )
 	if(dg == NULL)
 		return;
 
-	dg->startChallenge(pl);
+	dg->startChallenge(pl,0);
 }
 
 void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
@@ -2523,7 +2544,7 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 	GObject::Dungeon * dg = GObject::dungeonManager[dar.type];
 	if(dg == NULL)
 		return;
-	dg->autoChallenge(pl, dar.mtype);
+	dg->autoChallenge(pl, dar.mtype, dar.difficulty);
     pl->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 1);
 }
 
