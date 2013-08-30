@@ -923,6 +923,7 @@ CREATE TABLE `player` (
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `openid` varchar(1024) NOT NULL DEFAULT '',
   `canHirePet` varchar(255) NOT NULL DEFAULT '',
+  `dungeonCnt1` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
   KEY `mainFighter` (`mainFighter`)
