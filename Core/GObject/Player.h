@@ -139,8 +139,12 @@ namespace GObject
 #define PLAYER_BUFF_EXPDOUBLE       0x5C    //回流服务器 经验双倍
 #define PLAYER_BUFF_CLANBOSS_CD     0x5D
 
-#define PLAYER_BUFF_DISPLAY_MAX		0x5F
-#define PLAYER_BUFF_COUNT			0x5F
+#define PLAYER_BUFF_CLANTREE1       0x60
+#define PLAYER_BUFF_CLANTREE2       0x61
+#define PLAYER_BUFF_CLANTREE3       0x62
+
+#define PLAYER_BUFF_DISPLAY_MAX		0x63
+#define PLAYER_BUFF_COUNT			0x63
 #define PLAYER_BUFF_START           0x80
 
 #define CLAN_TASK_MAXCOUNT          5       // ????ÿ????????????
@@ -1160,12 +1164,15 @@ namespace GObject
     private:
         GData::AttrExtra _hiattr;
         bool _hiattrFlag;
+        bool _clanRankBuffFlag;
         bool _cbHPflag;
         //GData::AttrExtra _hiaf;
         //bool _hiafFlag;
     public:
         inline void setHiAttrFlag(bool v) { _hiattrFlag = v; }
         inline bool hasHiAttrFlag() { return _hiattrFlag; }
+        inline void setClanRankBuffFlag(bool v) { _clanRankBuffFlag = v; }
+        inline bool hasClanRankBuffFlag() { return _clanRankBuffFlag; }
         void addHIAttr(const GData::AttrExtra&);
         void clearHIAttr();
         inline const GData::AttrExtra* getHIAttr() const { return &_hiattr; }
@@ -2566,6 +2573,8 @@ namespace GObject
     public:
         void sendCollectCard(UInt8 fighterIndex);
         void sendAllCollectCard();
+        void setClanSpiritTreeBuff(UInt8,UInt32);
+        void setPrayLoginInWeek();
         void useCollectCard(UInt8 fighterIndex);
         void putCollectCardPool(UInt8 fighterIndex, UInt8 partPos, UInt16 partCnt);
         void convertCollectCard();

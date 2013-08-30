@@ -225,10 +225,12 @@ namespace GObject
 
         UInt32 extraExp = 0;
         // 限时vip特权
-         UInt32 VipType = m_Player->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+        if(m_Player->getBuffData(PLAYER_BUFF_CLANTREE1))
+            factor+=0.2f;
+        UInt32 VipType = m_Player->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
         if(m_Player-> in7DayFromCreated() && VipType >4 )
             VipType -= 2 ;
-         if(m_Player->inVipPrivilegeTime()  &&( VipType < 5 ))
+        if(m_Player->inVipPrivilegeTime()  &&( VipType < 5 ))
         {
             factor += 1.0f;
             extraExp = static_cast<UInt32>(exp * 1.0f);
@@ -312,13 +314,14 @@ namespace GObject
 		ecs.ng = NULL;//_npcGroup;
         if (cfg.rpServer && m_Player->GetLev() < 70)
             ecs.exp *= 2;
+        if(m_Player->getBuffData(PLAYER_BUFF_CLANTREE1))
+            ecs.exp *= 1.2f;
 		GameMsgHdr hdr(0x274, m_Player->getThreadId(), m_Player, sizeof(ExpGainInstantCompleteStruct));
 		GLOBAL().PushMsg(hdr, &ecs);
 		_finalEnd -= ecs.duration;
 		notify();
         if (m_Player)
             m_Player->SetVar(VAR_LEFTTIMES, newCnt);
-
         _writedb = true;
 		updateDB(false);
 		return newCnt == 0;
@@ -4660,7 +4663,7 @@ namespace GObject
             st<< static_cast<UInt8>(prayValue) ;
         else 
             st<< static_cast<UInt8>(op) ;
-        if(CheckFriendPray(other->getId()))
+        if( op || CheckFriendPray(other->getId()))
             st<<static_cast<UInt8>(1);
         else st<<static_cast<UInt8>(0);
         st<<getBePrayednum(other->getId());
@@ -4700,16 +4703,32 @@ namespace GObject
         UInt32 prayValue = GetVar(VAR_PRAY_VALUE);
         UInt32 praySucTime = GetVar(VAR_PRAY_SUCTIME);
         UInt32 prayToday = GetVar(VAR_PRAY_TYPE_TODAY);
+        UInt32 prayLogin = GetVar(VAR_PRAY_LOGIN);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(prayLogin & (1 << i++ ))
+                ++count;
+            else 
+            {
+                if(count != 0 && max<count)
+                    max = count ;
+                count =0;
+            }
+        }
         UInt32 now = TimeUtil::Now();
         UInt32 timeValue ;
-        if((86400+praySucTime)>now)
-            timeValue = 86400+praySucTime-now;   
+        if((43200+praySucTime)>now)
+            timeValue = 43200+praySucTime-now;   
         else 
             timeValue =0;
         Stream st(REP::NEWRELATION);
         st << static_cast<UInt8>(6);
         st << pexp;
         st << static_cast<UInt8>(prayType);
+        st << static_cast<UInt8>(max);
         st << static_cast<UInt8>(prayCount);
         st << static_cast<UInt8>(prayToday);
         st << static_cast<UInt8>(prayValue);
@@ -4743,6 +4762,23 @@ namespace GObject
         {
                maxCount = 3 ;
         }
+        UInt32 prayLogin = GetVar(VAR_PRAY_LOGIN);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(prayLogin & (1 << i++ ))
+                ++count;
+            else 
+            {
+                if(count != 0 && max<count)
+                    max = count ;
+                count =0;
+            }
+        }
+        if(max>=3)
+            maxCount++;
         if(prayCount >= maxCount)
             return ;
         SetVar(VAR_PRAY_TYPE,index);
@@ -4763,7 +4799,7 @@ namespace GObject
         UInt32 prayValue = GetVar(VAR_PRAY_VALUE);
         UInt32 praySucTime = GetVar(VAR_PRAY_SUCTIME);
         UInt32 now = TimeUtil::Now();
-        if((86400+praySucTime)>now)
+        if((43200+praySucTime)>now)
             return ;
         if(prayValue < 10)
             return ;
@@ -7917,6 +7953,8 @@ namespace GObject
             SetVar(VAR_TOWER_LEVEL, 1);
         }
 
+        sendFeastLoginAct();
+
         if(_clan != NULL)
         {
 			_clan->broadcastMemberInfo(this);
@@ -10390,6 +10428,8 @@ namespace GObject
         if(inVipPrivilegeTime()&&(VipType==0||VipType ==1 ||VipType ==3 ))
             factor += 1.0f;
 
+        if(getBuffData(PLAYER_BUFF_CLANTREE3))
+            factor += 0.1f;
         return factor;
     }
 
@@ -11566,11 +11606,11 @@ namespace GObject
 
         if(opt == 1 && state == 0)
         {
-            GetPackage()->AddItem(9371, 2, true, false, FromQQXiu);
+            getCoupon(20);
             GetPackage()->AddItem(503, 2, true, false, FromQQXiu);
-            GetPackage()->AddItem(515, 2, true, false, FromQQXiu);
-            GetPackage()->AddItem(548, 5, true, false, FromQQXiu);
-            GetPackage()->AddItem(8520, 1, true, false, FromQQXiu);
+            GetPackage()->AddItem(1126, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(49, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(50, 2, true, false, FromQQXiu);
 
             SetVar(VAR_QQXIU_AWARD, 1);
             state = 1;
@@ -19225,17 +19265,20 @@ void Player::sendQQGameGift1218()
 
 void Player::sendFeastLoginAct()
 {
-    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || !World::getMayDayLoginAct()) /*!World::getFeastLoginAct()*/
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || /*!World::getMayDayLoginAct()*/ !World::getFeastLoginAct())
         return;
     //SYSMSGV(title, 4102);
     //SYSMSGV(content, 4103);
-    SYSMSGV(title, 4098);
-    SYSMSGV(content, 4099);
+    //SYSMSGV(title, 4098);
+    //SYSMSGV(content, 4099);
+    SYSMSGV(title, 4108);
+    SYSMSGV(content, 4109);
     Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
     if(mail)
     {
         //MailPackage::MailItem mitem = {1759,1};
-        MailPackage::MailItem mitem = {1763,1};
+        //MailPackage::MailItem mitem = {1763,1};
+        MailPackage::MailItem mitem = {1760,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     SetVar(VAR_FEAST_LOGIN, 1);
@@ -23612,6 +23655,22 @@ UInt32 Player::getBePrayednum(UInt64 id)
     else
         return 0 ;    
 }
+void Player::setClanSpiritTreeBuff(UInt8 id,UInt32 time)
+{
+    if( id < 0 || id > 2 )
+        return ;
+    addBuffData(id+PLAYER_BUFF_CLANTREE1,time);
+}
+
+void Player::setPrayLoginInWeek()
+{
+    UInt32 PrayLogin = GetVar(VAR_PRAY_LOGIN);
+    UInt32 now = TimeUtil::Now();
+    UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpWeek(0, now))/86400 +1;
+    PrayLogin |= ( 1 << (off - 1));
+    SetVar(VAR_PRAY_LOGIN, PrayLogin);
+}
+
 } // namespace GObject
 
 

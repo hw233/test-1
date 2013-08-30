@@ -78,6 +78,7 @@ GMHandler::GMHandler()
 	Reg(2, "exp", &GMHandler::OnAddExp);
 	Reg(2, "addOT", &GMHandler::OnAddOnlineTime);
 	Reg(3, "addvar", &GMHandler::OnAddVar);
+	Reg(3, "varset", &GMHandler::OnSetVar);
 	Reg(2, "pexp", &GMHandler::OnAddPExp);
 	Reg(3, "addpexp", &GMHandler::OnAddPExp);
 	Reg(3, "additem", &GMHandler::OnAddItem);
@@ -262,6 +263,7 @@ GMHandler::GMHandler()
     Reg(2, "fool", &GMHandler::OnFoolsDayGM);
     Reg(2, "star", &GMHandler::OnLuckyStarGM);
     Reg(2, "acttm", &GMHandler::OnSurnameleg);
+    Reg(2, "openclb", &GMHandler::OnOpenclb);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -594,6 +596,17 @@ void GMHandler::OnAddVar( GObject::Player * player, std::vector<std::string>& ar
 		UInt32 value = atoi(args[1].c_str());
         UInt32 num = player->GetVar(var);
 		player->SetVar(var,num+value);
+	}
+}
+void GMHandler::OnSetVar( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+    if(args.size() == 2)
+	{
+		UInt32 var = atoi(args[0].c_str());
+		UInt32 value = atoi(args[1].c_str());
+		player->SetVar(var,value);
 	}
 }
 
@@ -4200,7 +4213,16 @@ void GMHandler::OnClanBossOpen(GObject::Player *player, std::vector<std::string>
     GObject::ClanBoss::instance().setCanOpened(true);
     GObject::ClanBoss::instance().start();
 }
-
+void GMHandler::OnOpenclb(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int index = atoi(args[0].c_str());
+    if(index == 1)
+        player->setClanRankBuffFlag(true);
+    if(index == 2)
+        player->setClanRankBuffFlag(false);
+}
 void GMHandler::OnClanBoss(GObject::Player *player, std::vector<std::string>& args)
 {
 	if(args.size() < 1)

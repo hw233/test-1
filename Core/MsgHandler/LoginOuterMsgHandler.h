@@ -410,6 +410,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setJinQuan(jinquan);
             player->SetSummerFlow3Value();
             player->SetSummerMeetValue();
+            player->setPrayLoginInWeek();
             player->continuousLoginSummerFlow();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
@@ -775,6 +776,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setJinQuan(jinquan);
             pl->SetSummerFlow3Value();
             pl->SetSummerMeetValue();
+            pl->setPrayLoginInWeek();
             pl->continuousLoginSummerFlow();
             if(cfg.merged)
             {
@@ -1059,12 +1061,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                515,    2,
+                503,    4,
                 509,    2,
-                1126,   5,
-                516,    5,
-                517,    5,
-                551,    5
+                56,     2,
+                466,    3,
+                549,    2,
+                50,     3
             };
 
             UInt8 idx = 0;

@@ -18,6 +18,7 @@ namespace GData
         }
 
         info.jiguanyuId = jgyData.jiguanyuId;
+        info.mark = jgyData.mark;
         info.name = jgyData.name;
         info.quality = jgyData.quality;
         info.attrType = jgyData.attrType;
