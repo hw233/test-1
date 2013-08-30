@@ -72,6 +72,8 @@ void Dungeon::playerJump( Player * player, UInt8 difficulty , UInt8 level )
 
 UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
 {
+	if(player->hasFlag(Player::AutoDungeon))
+        return 2;
     
     if(difficulty >= Max_Difficulty)
     {
@@ -91,7 +93,7 @@ UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
 		PLAYER_DATA(player, dungeonEnd) = TimeUtil::SharpDay(1);
         ++ PLAYER_DATA1(player, difficulty);
         dpi->difficulty = difficulty;
-		sendDungeonInfo(player, *dpi);
+		sendDungeonInfo(player, *dpi, difficulty);
         player->dungeonUdpLog(_dungeon->levelReq, 1);
 	}
 	else
@@ -103,7 +105,7 @@ UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
 
 		checkForTimeout(player, *dpi, false);
 
-		if(difficulty == dpi->difficulty &&  dpi->level[dpi->difficulty] != 0xFF)
+		if(difficulty == dpi->difficulty &&  dpi->level[dpi->difficulty] != 0xFF && dpi->level[dpi->difficulty] != 0)
             return 2;
 
 		leaveLevel(player, it->second.level[difficulty],it->second.difficulty);
@@ -139,7 +141,7 @@ UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
         ++ PLAYER_DATA1(player, difficulty); 
         dpi->level[difficulty] = 1;
         dpi->difficulty = difficulty;
-        sendDungeonInfo(player, *dpi);
+        sendDungeonInfo(player, *dpi, difficulty);
 	}
 
 	sendDungeonLevelData(player, *dpi);
@@ -171,6 +173,7 @@ UInt8 Dungeon::playerLeave( Player * player,UInt8 difficulty )
     UInt8 pos = _id - 1; 
     mark = CLR_BIT(mark, pos);
     player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
+    sendDungeonInfo(player, it->second, difficulty);
 
 	return 0;
 }

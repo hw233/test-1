@@ -9425,6 +9425,34 @@ function ItemNormal_00009419(iid, num, bind, param)
     return used;
 end
 
+function ItemNormal_00009420(iid, num, bind, param)
+    local player = GetPlayer()
+	local fgt = player:findFighter(param);
+    local package = player:GetPackage();
+    if fgt == nil then
+		return false;
+	end
+
+    if fgt:isExpFull() then
+        player:sendMsgCode(2, 1070, 0);
+        return false
+    end
+
+    local exp = fgt:getExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        exp = exp + 500000
+        if exp >= fgt:getExpMax() then
+            break
+        end
+    end
+
+	fgt:addExp(500000*n);
+    package:DelItemSendMsg(iid, player);
+    return n
+end
+
 function ItemNormal_jgsexp(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 70 then
@@ -11174,6 +11202,7 @@ local ItemNormal_Table = {
     [9411] = ItemNormal_00009408,
     [9418] = ItemNormal_tuzhi,
     [9419] = ItemNormal_00009419,
+    [9420] = ItemNormal_00009420,
     [9421] = ItemNormal_jgsexp,
 
     [9900] = ItemNormal_NameCard,

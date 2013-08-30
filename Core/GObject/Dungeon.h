@@ -121,7 +121,7 @@ private:
 	void takeLoot(Player *, DungeonPlayerInfo&, UInt32&);
 	bool doChallenge(Player *, DungeonPlayerInfo&, bool = true, UInt32 * = NULL);
 	bool advanceLevel(Player *, DungeonPlayerInfo&, bool = false, UInt32 * = NULL, UInt32 = 0);
-	void sendDungeonInfo(Player *, DungeonPlayerInfo&, UInt8 difficulty = 0xFF);
+	void sendDungeonInfo(Player *, DungeonPlayerInfo&, UInt8 difficulty);
 	void sendDungeonLevelData(Player *, DungeonPlayerInfo&);
 	void enterLevel(Player *, UInt8, UInt8);
 	void leaveLevel(Player *, UInt8, UInt8);
