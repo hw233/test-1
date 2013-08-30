@@ -186,6 +186,8 @@ MSG_REG_2(GameMsgHdr, REQ::EQ_DELUEGEM, OnDelueGemReq);
 
 MSG_REG_2(GameMsgHdr, REQ::TEMPITEM_INFO, OnQueryTempItemReq);
 
+MSG_REG_2(GameMsgHdr, REQ::MOFANG_INFO, OnMoFangInfo);
+
 MSG_REG_2(GameMsgHdr, REQ::RP_SERVER, OnRPServerReq);
 
 
@@ -386,6 +388,7 @@ MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
 MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
+MSG_REG_2(GameMsgHdr, 0x362, OnBePrayed);
 
 //0x365-380繁体占用
 

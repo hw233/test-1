@@ -123,6 +123,10 @@ function loadStore()
         store:add(2, 9388, 100)
         store:add(2, 9371, 10)
 
+        store:add(2, 9413, 10)
+        store:add(2, 9414, 30)
+        store:add(2, 9418, 20)
+
         if getSpecialBookAct() then  --特殊古籍活动
             store:add(2, 11113, 50)
             store:add(2, 11114, 60)

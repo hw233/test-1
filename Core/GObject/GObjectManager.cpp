@@ -292,11 +292,31 @@ namespace GObject
             fprintf(stderr, "load Fighter xingchen error!\n");
             std::abort();
         }
+
+		if(!loadJiguanshu())
+        {
+            fprintf(stderr, "load jiguanshu error!\n");
+            std::abort();
+        }
+
+		if(!loadJiguanyu())
+        {
+            fprintf(stderr, "load jiguanyu error!\n");
+            std::abort();
+        }
+
+		if(!loadTuzhi())
+        {
+            fprintf(stderr, "load tuzhi error!\n");
+            std::abort();
+        }
+
 		if(!loadTempItem())
         {
             fprintf(stderr, "load TempItem error!\n");
             std::abort();
         }
+
 		if(!loadAllAthletics())
         {
             fprintf(stderr, "loadAllAthletics error!\n");
@@ -315,6 +335,11 @@ namespace GObject
 		if(!loadAllFriends())
         {
             fprintf(stderr, "loadAllFriends error!\n");
+            std::abort();
+        }
+		if(!loadAllPrayInfo())
+        {
+            fprintf(stderr, "loadAllPrayInfo error!\n");
             std::abort();
         }
 		if(!LoadDungeon())
@@ -1460,6 +1485,11 @@ namespace GObject
 			LOAD_LINEUP(dbpd.lineup, dbpd.pdata.lineup);
 			UInt64 id = dbpd.id;
 			Player * pl = new Player(id);
+
+            if(0 == dbpd.pdata.country)
+                g_eMeiCount++;
+            else if(1 == dbpd.pdata.country)
+                g_kunLunCount++;
 
 			if(dbpd.pdata.gold > 0x7FFFFFFF)
 			{
@@ -2900,6 +2930,40 @@ namespace GObject
                 pl->addCFriendFromDB(toadd);
                 break;
 			}
+		}
+		lc.finalize();
+		return true;
+	}
+	bool GObjectManager::loadAllPrayInfo()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading friends:");
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		PrayRelation dbfr;
+		if(execu->Prepare("SELECT `id`,`friendId`,`pray`,`time`,`praynum` FROM `pray_relation` ORDER BY `id`", dbfr) != DB::DB_OK)
+			return false;
+		lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbfr.id != last_id)
+			{
+				last_id = dbfr.id;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Player * toadd = globalPlayers[dbfr.friendId];
+			if(toadd == NULL)
+				continue;
+            if(!dbfr.pray)
+                continue ;
+            pl->addPrayFriendFromDB(dbfr.friendId,dbfr.time);
+            if(dbfr.praynum!=0)
+            toadd->addPrayFriendFromDB(pl->getId(),dbfr.time,dbfr.praynum);
 		}
 		lc.finalize();
 		return true;
@@ -5322,6 +5386,101 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadJiguanshu()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Jiguanshu:");
+		DBJiguanshu idata;
+        Player* pl = NULL;
+
+		if(execu->Prepare("SELECT `playerId`, `curLvl`, `curExp`  FROM `player_jiguanshu` ORDER BY `playerId`", idata) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(idata.playerId != last_id)
+			{
+				last_id = idata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->GetMoFang()->AddJGSFromDB(idata);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadJiguanyu()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Jiguanyu:");
+		DBJiguanyu idata;
+        Player* pl = NULL;
+
+		if(execu->Prepare("SELECT `playerId`, `jiguanId`, `pos`  FROM `player_jiguanyu` ORDER BY `playerId`", idata) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(idata.playerId != last_id)
+			{
+				last_id = idata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->GetMoFang()->AddJGYFromDB(idata);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadTuzhi()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Tuzhi:");
+		DBTuzhi idata;
+        Player* pl = NULL;
+
+		if(execu->Prepare("SELECT `playerId`, `tuzhiId`, `curProficient`  FROM `player_tuzhi` ORDER BY `playerId`", idata) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(idata.playerId != last_id)
+			{
+				last_id = idata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->GetMoFang()->AddTuzhiFromDB(idata);
+		}
+		lc.finalize();
+
+        return true;
+    }
     bool GObjectManager::LoadSoulItemChance()
     {
         lua_State* L = lua_open();

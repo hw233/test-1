@@ -1004,6 +1004,23 @@ void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )
         player->OnSelectCountry();
         CURRENT_COUNTRY().PlayerLeave(player);
         player->setCountry(country);
+        
+        if(0 == country)
+        {
+            g_eMeiCount++;
+
+            if(g_eMeiCount < g_kunLunCount)
+                player->changeZYAward(country);
+        }
+        
+        if(1 == country)
+        {
+            g_kunLunCount++;
+
+            if(g_eMeiCount >= g_kunLunCount)
+                player->changeZYAward(country);
+        }
+
         Stream st(REP::CAMP_SELECT);
         st << country << Stream::eos;
         player->send(st);
@@ -1155,6 +1172,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendWeiboAwardInfo();
     pl->sendSummerFlow3LoginInfo();
     pl->sendSummerFlow3TimeInfo();
+    pl->sendPrayInfo();
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -1291,6 +1309,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendCopyFrontAllAward();
     pl->sendGoodVoiceInfo();
     pl->send3366GiftInfo();
+    pl->sendQzongPYGiftInfo();
     pl->sendFeastGiftAct();
     pl->sendNewYearQQGameAct();
     pl->calcNewYearQzoneContinueDay(now);
@@ -1340,9 +1359,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
    if(pl->getFighterCount() >= 5)
         pl->GetTaskMgr()->CompletedTask(202);
     pl->sendQQBoardLoginInfo();
-
     pl->sendSummerMeetInfo();
     pl->sendSummerMeetRechargeInfo();
+    pl->GetMoFang()->sendMoFangInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1956,10 +1975,16 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             if(!player->hasChecked())
                 return;
             UInt8 type;
-            if(!World::get3366GiftAct())
-                return;
             br >> type;
-            player->get3366GiftAward(type);
+            if(World::get3366GiftAct())
+            {
+                player->get3366GiftAward(type);
+            }
+            if(World::getQzongPYGiftAct())
+            {
+                player->getQzongPYGiftAward(type);
+            }
+            return;
         }
         break;
 
@@ -4325,6 +4350,13 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
         break;
     case 9:
         player->vote(pl);
+        break;
+    case 10:
+        player->SendOtherInfoForPray(pl);
+        break;
+    case 11:
+        player->prayForOther(pl);
+        break;
 	}
 }
 
@@ -5400,11 +5432,14 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
     std::string status;
     br >> type;
 
-    if(type > 5)
+    if( type > 6 )
         return;
 
     Stream st(REP::NEWRELATION);
-    st << type;
+    if(type < 6)
+    {
+        st << type;
+    }
     /** 关系 **/
     switch(type)
     {
@@ -5433,10 +5468,32 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
             br >> mood;
             pl->GetNewRelation()->challengeRespond(pl, status, mood);
             return;//isn't break
+        case 6:
+            br>>mood;
+            if( mood < 0 || mood > 3 )
+                return ;
+            UInt8 index;
+            switch(mood)
+            {
+                case 1:
+                    br>>index;
+                    pl->selectPray(index);
+                    break;
+                case 2:
+                    if(pl->GetVar(VAR_PRAY_TYPE_TODAY))
+                        break;
+                    pl->prayForOther(pl);
+                    pl->SetVar(VAR_PRAY_TYPE_TODAY,1);
+                    break;
+                case 3:
+                    pl->getPrayAward();
+                    break;
+            }
+           pl->sendPrayInfo();    
+            break;
         default:
             break;
     }
-
     st << Stream::eos;
     pl->send(st);
 }
@@ -6284,6 +6341,76 @@ void OnQueryTempItemReq( GameMsgHdr & hdr, const void * data )
             player->GetPackage()->RetrieveTemporaryItem(itemId, itemNum, bind);
         }
         break;
+    }
+}
+
+void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+    
+    switch(opt)
+    {
+    case 0:
+        {
+            player->GetMoFang()->sendMoFangInfo(opt);               
+        }
+        break;
+    case 1:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt32 tuzhiId = 0;
+            UInt8 type = 0;
+
+            br >> tuzhiId >> type;
+            player->GetMoFang()->makejiguan(tuzhiId, type, opt);
+        }
+        break;
+    case 2:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt32 jgId = 0;
+            UInt8 pos = 0;
+
+            br >> jgId >> pos;
+            player->GetMoFang()->equipJG(jgId, pos, opt);               
+        }
+        break;
+    case 3:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt32 jgId = 0;
+            UInt8 pos = 0;
+
+            br >> jgId >> pos;
+            player->GetMoFang()->equipJG(jgId, pos, opt);               
+        }
+        break;
+    case 7:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt32 tuzhiId = 0;
+
+            br >> tuzhiId;
+            player->GetMoFang()->quickMakejiguan(tuzhiId, opt);               
+        }
+        break;
+
     }
 }
 

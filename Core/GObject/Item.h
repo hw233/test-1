@@ -291,6 +291,7 @@ namespace GObject
     private:
         ItemPetEqAttr m_peAttr;
     };
+
 }
 
 #endif

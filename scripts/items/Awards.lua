@@ -423,6 +423,35 @@ function RunLuckyMeetInstantLoginAward(player, cts)
     end
     return true
 end
+function RunPrayAward(player, cts)
+    local item = {
+        [4] = {{503, 1}},
+        [5] = {{134, 1}},
+        [6] = {{1325,1}},
+    };
+    local package = player:GetPackage();
+
+    if cts < 4 then
+        return false
+    end
+    if cts > 6 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < (num)  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for count = 1, #item[cts] do
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
+    end
+    return true
+end
 function RunLuckyMeetRechargeAward(player, cts)
     -- 领取蜀山奇遇充值奖励
     local item = {
@@ -600,31 +629,35 @@ function RunBlueDiamondAward(player, opt)
     local date_0 = os.time(date_9190_0);
     local date_1 = os.time(date_9190_1);
 
-    --1:蓝钻 2:黄钻 3:QQ会员 4:红钻 5:好莱坞
+    --1:蓝钻 2:黄钻 3:QQ会员 4:红钻 5:好莱坞 6:财付通
     local chance = {
         [1] = {1180, 2630, 4080, 5930, 7780, 8520, 9500, 10000},
         [2] = {1180, 2630, 4080, 5930, 7780, 8520, 9500, 10000},
         [3] = {785,2833,4881,5823,7202,7987,9366,10000},
         [4] = {1050, 2265, 3480, 4695, 6220, 7745, 9270, 10000},
-        [5] = {785,2833,4881,5823,7202,7987,9366,10000 }
+        [5] = {785,2833,4881,5823,7202,7987,9366,10000},
+        [6] = {1180,2630,4080,6030,7980,9100,9400,10000}
     };
     local item = {
         [1] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{9022,1},{1717,1},{5137,1}},
         [2] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{9022,1},{1717,1},{5137,1}},
         [3] = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}},
         [4] = {{515,3},{9338,4},{134,4},{1325,4},{507,2},{509,2},{47,3},{5006,1}},
-        [5] = {{515,6},{507,4},{509,4},{503,20},{1325,8},{47,6},{134,8},{5026,2}}
+        [5] = {{515,6},{507,4},{509,4},{503,20},{1325,8},{47,6},{134,8},{5026,2}},
+        [6] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{503,5},{1719,1},{5135,1}}
     };
     local item_id = {9190, 9191, 9217, 9284,10119};
     
     local items = item[opt];
     local itemId = item_id[opt];
     local ch = chance[opt];
-
-    if  not package:DelItem(itemId, 1, true) then
-        if  not package:DelItem(itemId, 1, false) then
-            player:sendMsgCode(2, 1110, 0);
-            return 0;
+    
+    if opt ~= 6 then
+        if  not package:DelItem(itemId, 1, true) then
+            if  not package:DelItem(itemId, 1, false) then
+                player:sendMsgCode(2, 1110, 0);
+                return 0;
+            end
         end
     end
 

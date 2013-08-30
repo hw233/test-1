@@ -126,6 +126,7 @@ enum PurchaseType
     CCBReAlive                  = 115, //墨守成规复活
     ClanSptr                    = 116, //神魔之树
     RetrieveItem                = 117, //物品回收消费
+    EnumQzongPYGift             = 118, //Qzong,PY礼包
     //繁体私有占150～200
 };
 
@@ -298,6 +299,7 @@ enum ItemTo
     TodismantleGem = 159, //多彩宝石拆卸
     ToExchangXCValue = 160, //阵旗转换星辰值
     ToDelRetrieveItem = 161, //删除回购物品
+    ToMakeJGY = 162, //制造机关玉所消耗的道具
 };
 
 struct IncommingInfo

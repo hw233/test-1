@@ -3661,6 +3661,13 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
             st << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
                 << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << gAthleticsRank.getAthleticsRank(pl);
             st << static_cast<UInt8>(pl->isOnline());
+            st << static_cast<UInt8>(pl->GetVar(VAR_PRAY_TYPE))<< static_cast<UInt8>(pl->GetVar(VAR_PRAY_VALUE));
+           // std::map<UInt64,UInt32 >::iterator it_pray =player->_prayFriend.find(pl->getId());
+          //  if(it_pray!=player->_prayFriend.end() &&TimeUtil::SharpDay(0, now) == TimeUtil::SharpDay(0, it_pray->second) )
+            if(player->CheckFriendPray(pl->getId()))
+                st<<static_cast<UInt8>(1);
+            else st<<static_cast<UInt8>(0);
+            st<<player->getBePrayednum(pl->getId());
             ++it;
         }
     }
@@ -4510,6 +4517,7 @@ void Clan::refreshColorAward()
         broadcast(st);
 
         ++ m_spiritTree.m_color;
+        setClanSpiritTreeBuff(m_spiritTree.m_color);
         m_spiritTree.m_refreshTimes = 0;
     }
     else
@@ -4811,6 +4819,25 @@ void Clan::listMembersActivePoint( Player * player )
 	}
 	st << Stream::eos;
 	player->send(st);
+}
+
+void Clan::setClanSpiritTreeBuff(UInt8 color)
+{
+    if(color < 1 || color >3 )
+        return ;
+	Mutex::ScopedLock lk(_mutex);
+	ClanMember * mem = NULL;
+	Members::iterator offset;
+	for(offset = _members.begin(); offset != _members.end(); ++ offset)
+	{
+		mem = *offset;
+        if (!mem)
+            continue;
+        if (!mem->player)
+            continue;
+        mem->player->setClanSpiritTreeBuff(color-1, 86400);
+	}
+
 }
 
 

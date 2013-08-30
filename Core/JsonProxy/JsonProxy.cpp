@@ -87,6 +87,8 @@ int read_jason_req(int fd, char* buf)
     if(read_len1 != 5)
         return 0;
     int len = *(short*)buf;
+    if(len <= 0)
+        return 0;
     int read_len2 = recv( fd, buf+5, len, 0 );
     if(read_len2 != len)
         return 0;
@@ -100,6 +102,8 @@ int read_jason_rep(int fd, char* buf)
     if(read_len1 != 4)
         return 0;
     int len = *(short*)buf;
+    if(len <= 0)
+        return 0;
     int read_len2 = recv( fd, buf+4, len, 0 );
     if(read_len2 != len)
         return 0;
@@ -124,7 +128,9 @@ void clear_read_buffer(int fd)
         IRet = select(FD_SETSIZE, &stFdSet, NULL, NULL, &stWait);
         if(IRet == 0)
             break;
-        recv(fd, tmp, 1, 0);
+        int len = recv(fd, tmp, 1, 0);
+        if(len <= 0)
+            break;
     }
 }
 

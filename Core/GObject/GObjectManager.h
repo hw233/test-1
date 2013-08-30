@@ -298,6 +298,7 @@ namespace GObject
 		static bool loadAllAthleticsEvent();
 		static bool delayLoad();
 		static bool loadAllFriends();
+		static bool loadAllPrayInfo();
 		static bool loadAllClans();
 		static bool loadEquipments();
 		static bool loadEquipmentsSpirit();
@@ -323,6 +324,9 @@ namespace GObject
         static bool loadSecondSoul();
         static bool loadFighterXingchen();
         static bool loadTempItem();
+        static bool loadJiguanshu();
+        static bool loadJiguanyu();
+        static bool loadTuzhi();
         static bool LoadLuckyLog();
         static bool loadRealItemAward();
         static bool loadNewRelation();

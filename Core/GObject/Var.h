@@ -461,6 +461,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_VIPLEVEL_AWARD = 511, // 御剑等级回馈
         VAR_DROP_OUT_ITEM_MARK = 512,// 反工作室限制方案
         VAR_QQXIU_AWARD = 513, // QQ秀合作
+        VAR_QQTENPAY_LOTTERY = 514, //QQ财付通抽奖 
 
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
@@ -511,12 +512,21 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_CLAN_SPTR_AWARD = 561,       // 每日神魔之树奖励领取标识
         VAR_CLAN_ACTPT_MONTH = 562,      // 每月帮派活跃度
         VAR_CLAN_ACTPT_FLAG = 563,      // 活跃度领取标识
+        VAR_QZONGPYGIFT = 564, //Qzong,PY合作礼包
         //581-600 for qiwy
 
         //581-600 for lb 
         VAR_SUMMERFLOW3_TYPE = 581 ,
         VAR_SUMMERFLOW3_TYPE_AWARD = 582 ,
         VAR_SUMMERFLOW3_TIME_AWARD = 583,
+
+        VAR_PRAY_TYPE = 584 ,
+        VAR_PRAY_VALUE = 585,
+        VAR_PRAY_COUNT = 586,
+        VAR_PRAY_SUCTIME = 587,
+        VAR_PRAY_TYPE_TODAY = 588 ,
+        VAR_PRAY_TIME = 589 ,
+        VAR_PRAY_LOGIN = 590,
 
         VAR_MAX,
     };
@@ -834,6 +844,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
 
             REGISTER_VAR(VAR_QQMUSIC_DAY_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_QQTENPAY_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_QQTENPAY_LOTTERY, CYCLE_NONE);
             REGISTER_VAR(VAR_QQIM_QUICK_LOGIN_AWARD, CYCLE_NONE);
 
             REGISTER_VAR(VAR_EQUIP_MOVE_AWARD, CYCLE_NONE);
@@ -988,6 +999,14 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_SUMMERFLOW3_TYPE, CYCLE_NONE);
             REGISTER_VAR(VAR_SUMMERFLOW3_TYPE_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_SUMMERFLOW3_TIME_AWARD, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_PRAY_TYPE, CYCLE_NONE);
+            REGISTER_VAR(VAR_PRAY_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_PRAY_COUNT, CYCLE_WEEK);
+            REGISTER_VAR(VAR_PRAY_LOGIN, CYCLE_WEEK);
+            REGISTER_VAR(VAR_PRAY_SUCTIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_PRAY_TYPE_TODAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_PRAY_TIME, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

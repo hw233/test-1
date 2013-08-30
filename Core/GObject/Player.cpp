@@ -81,6 +81,7 @@
 #include "Version.h"
 #include "GObject/ClanBoss.h"
 #include "ClanCityBattle.h"
+#include "MoFang.h"
 
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -132,6 +133,8 @@ namespace GObject
 	ChallengeCheck challengeCheck;
     GlobalLevelsPlayers globalLevelsPlayers;
     static TripodData nulltd;
+    AtomicVal<UInt32> g_eMeiCount = (AtomicVal<UInt32>)(0);
+    AtomicVal<UInt32> g_kunLunCount = (AtomicVal<UInt32>)(0);
 
 	UInt8 Player::getMaxIcCount(UInt8 vipLevel)
 	{
@@ -222,10 +225,12 @@ namespace GObject
 
         UInt32 extraExp = 0;
         // 限时vip特权
-         UInt32 VipType = m_Player->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+        if(m_Player->getBuffData(PLAYER_BUFF_CLANTREE1))
+            factor+=0.2f;
+        UInt32 VipType = m_Player->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
         if(m_Player-> in7DayFromCreated() && VipType >4 )
             VipType -= 2 ;
-         if(m_Player->inVipPrivilegeTime()  &&( VipType < 5 ))
+        if(m_Player->inVipPrivilegeTime()  &&( VipType < 5 ))
         {
             factor += 1.0f;
             extraExp = static_cast<UInt32>(exp * 1.0f);
@@ -309,13 +314,14 @@ namespace GObject
 		ecs.ng = NULL;//_npcGroup;
         if (cfg.rpServer && m_Player->GetLev() < 70)
             ecs.exp *= 2;
+        if(m_Player->getBuffData(PLAYER_BUFF_CLANTREE1))
+            ecs.exp *= 1.2f;
 		GameMsgHdr hdr(0x274, m_Player->getThreadId(), m_Player, sizeof(ExpGainInstantCompleteStruct));
 		GLOBAL().PushMsg(hdr, &ecs);
 		_finalEnd -= ecs.duration;
 		notify();
         if (m_Player)
             m_Player->SetVar(VAR_LEFTTIMES, newCnt);
-
         _writedb = true;
 		updateDB(false);
 		return newCnt == 0;
@@ -752,6 +758,7 @@ namespace GObject
         m_tcpInfo = new TeamCopyPlayerInfo(this);
         m_hf = new HoneyFall(this);
         m_dpData = new DeamonPlayerData();
+		m_moFang = new MoFang(this);
         m_csFlag = 0;
         m_spreadInterval = 0;
         _mditem = 0;
@@ -1337,7 +1344,8 @@ namespace GObject
 #ifndef _VT
         dclogger.login(this);
         dclogger.login_sec(this);
-        dclogger.checkOpenId(this);
+        //dclogger.checkOpenId(this);
+        //dclogger.checkYB(this);   //LB添加
 
         EventAutoRefreshOpenKey* event = new(std::nothrow) EventAutoRefreshOpenKey(this, 60 * 110, 24);
         if (event)
@@ -1432,7 +1440,7 @@ namespace GObject
             udpLog(op, _type, _id, _price, "", "", "props", num);
         }
     }
-
+   
     void Player::luaUdpLog(const char* str1, const char* str2, const char* type)
     {
         udpLog(str1, str2, "", "", "", "", type);
@@ -4311,9 +4319,16 @@ namespace GObject
 	{
 		if(notify)
 		{
+            UInt32 prayType = pl->GetVar(VAR_PRAY_TYPE);
+            UInt32 prayValue = pl->GetVar(VAR_PRAY_VALUE);
 			notifyFriendAct(1, pl);
 			Stream st(REP::FRIEND_ACTION);
-			st << static_cast<UInt8>(0x01) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl) << static_cast<UInt8>(pl->isOnline()) << Stream::eos;
+			st << static_cast<UInt8>(0x01) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl) << static_cast<UInt8>(pl->isOnline()) ;
+            st<<static_cast<UInt8>(prayType)<< static_cast<UInt8>(prayValue) ;
+            if(CheckFriendPray(pl->getId()))
+                st<<static_cast<UInt8>(1);
+            else st<<static_cast<UInt8>(0);
+            st<<Stream::eos;
 			send(st);
 			SYSMSG_SEND(132, this);
 			SYSMSG_SENDV(1032, this, pl->getCountry(), pl->getName().c_str());
@@ -4339,12 +4354,18 @@ namespace GObject
 		{
 			//notifyFriendAct(1, pl);
 			Stream st(REP::FRIEND_ACTION);
-			st << static_cast<UInt8>(0x07) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl) << static_cast<UInt8>(pl->isOnline()) << Stream::eos;
-			send(st);
-			SYSMSG_SEND(2341, this);
-			SYSMSG_SENDV(2342, this, pl->getCountry(), pl->getName().c_str());
-			if(writedb)
-				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 3, %" I64_FMT "u)", getId(), pl->getId());
+        st <<static_cast<UInt8>(0x07) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()<< pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl);
+        st << static_cast<UInt8>(pl->isOnline());
+        st << static_cast<UInt8>(pl->GetVar(VAR_PRAY_TYPE))<<static_cast<UInt8>(pl->GetVar(VAR_PRAY_VALUE));
+        if(CheckFriendPray(pl->getId()))
+            st<<static_cast<UInt8>(1);
+        else st<<static_cast<UInt8>(0);
+        st<<Stream::eos;
+		send(st);
+        SYSMSG_SEND(2341, this);
+        SYSMSG_SENDV(2342, this, pl->getCountry(), pl->getName().c_str());
+        if(writedb)
+            DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 3, %" I64_FMT "u)", getId(), pl->getId());
 		}
 		_friends[3].insert(pl);
         //更新密友信息
@@ -4434,7 +4455,14 @@ namespace GObject
 
 		notifyFriendAct(4, pl);
 		Stream st(REP::FRIEND_ACTION);
-		st << static_cast<UInt8>(0x03) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
+        
+        st <<static_cast<UInt8>(0x03) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()<< pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl);
+        st << static_cast<UInt8>(pl->isOnline());
+        st << static_cast<UInt8>(pl->GetVar(VAR_PRAY_TYPE))<<static_cast<UInt8>(pl->GetVar(VAR_PRAY_VALUE));
+        if(CheckFriendPray(pl->getId()))
+            st<<static_cast<UInt8>(1);
+        else st<<static_cast<UInt8>(0);
+        st<<Stream::eos;
 		send(st);
 		DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 1, %" I64_FMT "u)", getId(), pl->getId());
 		SYSMSG_SEND(135, this);
@@ -4485,7 +4513,7 @@ namespace GObject
 		//SYSMSG_SENDV(1057, this, pl->getCountry(), pl->getName().c_str());
 
 		if(_friends[2].size() >= MAX_FRIENDS)
-		{
+	{
 			std::set<Player *>::iterator it = _friends[2].begin();
 			Stream st(REP::FRIEND_ACTION);
 			st << static_cast<UInt8>(0x06) << (*it)->getName() << Stream::eos;
@@ -4539,6 +4567,12 @@ namespace GObject
                 st << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
                     << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl);
                 st << static_cast<UInt8>(pl->isOnline());
+                st << static_cast<UInt8>(pl->GetVar(VAR_PRAY_TYPE))<<static_cast<UInt8>(pl->GetVar(VAR_PRAY_VALUE));
+                if(CheckFriendPray(pl->getId()))
+                  st<<static_cast<UInt8>(1);
+                else st<<static_cast<UInt8>(0);
+                st<<getBePrayednum(pl->getId());
+                // std::cout <<pl->getId()<<"@!@# "<<pl->GetVar(VAR_PRAY_TYPE)<<"!!@!"<<pl->GetVar(VAR_PRAY_VALUE)<<std::endl;
                 ++it;
             }
         }
@@ -4577,6 +4611,7 @@ namespace GObject
         Stream st(REP::FRIEND_ACTION);
         st << static_cast<UInt8>(0x09) << static_cast<UInt8>(1) << Stream::eos;
         send(st);
+
     }
 
     void Player::beVoted()
@@ -4586,7 +4621,218 @@ namespace GObject
         GameMsgHdr hdr(0x1C7, WORKER_THREAD_WORLD, this, sizeof(total));
         GLOBAL().PushMsg(hdr, &total);
     }
+    void Player::prayForOther(Player* other)
+    {
+        std::map<UInt64,UInt32>::iterator it =_prayFriend.find(other->getId());
+        UInt32 now = TimeUtil::Now();
+        if(CheckFriendPray(other->getId()))
+        {
+              return ; 
+        }
+        UInt32 prayType = other->GetVar(VAR_PRAY_TYPE);
+        if(!prayType)
+            return ;
+        UInt32 prayValue = other->GetVar(VAR_PRAY_VALUE);
+        if(prayValue <0 ||prayValue >= 10)
+        {
+             return ; 
+        }
+        
+        if(other->getThreadId() == getThreadId())
+        {
+            other->bePrayed(getId());
+        }
+        else
+        {
+            UInt64 id = getId();
+            GameMsgHdr hdr(0x362, other->getThreadId(), other, sizeof(id));
+            GLOBAL().PushMsg(hdr, &id);
+        }
+        ++prayValue;
+        _prayFriend[other->getId()]=now;
+        SendOtherInfoForPray(other,prayValue);
+    }
+    void Player::SendOtherInfoForPray(Player* other,UInt32 op)
+    {
+        UInt32 prayType = other->GetVar(VAR_PRAY_TYPE);
+        UInt32 prayValue = other->GetVar(VAR_PRAY_VALUE);
+        Stream st(REP::FRIEND_ACTION);
+		st << static_cast<UInt8>(0x0A) << other->getId() << other->getName() <<other->getPF() << static_cast<UInt8>(other->IsMale() ? 0 : 1) << other->getCountry() << other->GetLev() << other->GetClass() << other->getClanName() << other->GetNewRelation()->getMood() << other->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(other) << static_cast<UInt8>(other->isOnline())<<static_cast<UInt8>(prayType);
+        if(op == 0 )
+            st<< static_cast<UInt8>(prayValue) ;
+        else 
+            st<< static_cast<UInt8>(op) ;
+        if( op || CheckFriendPray(other->getId()))
+            st<<static_cast<UInt8>(1);
+        else st<<static_cast<UInt8>(0);
+        st<<getBePrayednum(other->getId());
+        st<< Stream::eos;
+        send(st);
+    }
+    void Player::bePrayed(UInt64 id)
+    {
+        UInt32  prayValue = GetVar(VAR_PRAY_VALUE); 
+        UInt32 now = TimeUtil::Now();
+        if(prayValue < 0 || prayValue >= 10)
+            return ;
+        ++prayValue;
+        if(prayValue == 10 )
+            SetVar(VAR_PRAY_SUCTIME,TimeUtil::Now());
+        UInt32 num ;
+        SetVar(VAR_PRAY_VALUE ,prayValue);
+        std::map<UInt64,StuPrayValue >::iterator it = _bePrayed.find(id);
+        if(it == _bePrayed.end())
+        {
+            _bePrayed[id]=StuPrayValue(now,1);
+            num = 1;
+        }
+        else
+            num =++(it->second.praynum);    //map  待定 
+        sendPrayInfo();
+		DB1().PushUpdateData("REPLACE INTO `pray_relation` (`id`, `friendId`, `pray`, `time`,`praynum`) VALUES( %" I64_FMT "u, %" I64_FMT "u,1,%u,%u)", id , getId(),now,num);
+    }
+    void Player::sendPrayInfo()
+    {
+        Fighter * ft = getMainFighter();
+        if(!ft)
+            return;
+        UInt32 pexp = (5+ft->getAcuPraAdd()+ft->getSoulPracticeAddOn())*(1+(ft->getCapacity()-5)*0.16)*60*3;
+        UInt32 prayType = GetVar(VAR_PRAY_TYPE);
+        UInt32 prayCount = GetVar(VAR_PRAY_COUNT);
+        UInt32 prayValue = GetVar(VAR_PRAY_VALUE);
+        UInt32 praySucTime = GetVar(VAR_PRAY_SUCTIME);
+        UInt32 prayToday = GetVar(VAR_PRAY_TYPE_TODAY);
+        UInt32 prayLogin = GetVar(VAR_PRAY_LOGIN);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(prayLogin & (1 << i++ ))
+                ++count;
+            else 
+            {
+                if(count != 0 && max<count)
+                    max = count ;
+                count =0;
+            }
+        }
+        UInt32 now = TimeUtil::Now();
+        UInt32 timeValue ;
+        if((43200+praySucTime)>now)
+            timeValue = 43200+praySucTime-now;   
+        else 
+            timeValue =0;
+        Stream st(REP::NEWRELATION);
+        st << static_cast<UInt8>(6);
+        st << pexp;
+        st << static_cast<UInt8>(prayType);
+        st << static_cast<UInt8>(max);
+        st << static_cast<UInt8>(prayCount);
+        st << static_cast<UInt8>(prayToday);
+        st << static_cast<UInt8>(prayValue);
+        if(prayValue >= 10)
+            st <<timeValue;
+        size_t offset = st.size();
+        UInt32 time = GetVar(VAR_PRAY_TIME);
+        std::map<UInt64,StuPrayValue >::iterator it =_bePrayed.begin();
+        UInt8 Count = 0;
+        st<<Count;
+        for(;it!=_bePrayed.end();++it)
+        {
+            if(it->second.time > time && time != 0 )
+             {
+                Player* player = globalPlayers[it->first];
+                st<<player->getName();
+                ++Count;
+             }
+        }
+        st.data<UInt8>(offset)=Count;
+        st << Stream::eos;
+        send(st);
+//        std::cout<<"type:"<<prayType<<" count:"<<prayCount<<" value:"<<prayValue<< " suctime"<<praySucTime<<std::endl;
+    }
+    void Player::selectPray(UInt8 index)
+    {
+        UInt8 prayCount = GetVar(VAR_PRAY_COUNT);
+        UInt8 maxCount = 2 ;
+        UInt32 now = TimeUtil::Now();
+        if(getVipLevel())
+        {
+               maxCount = 3 ;
+        }
+        UInt32 prayLogin = GetVar(VAR_PRAY_LOGIN);
+        UInt32 max = 0 ;
+        UInt32 i=0;
+        UInt32 count=0 ;
+        while(i<16)
+        {
+            if(prayLogin & (1 << i++ ))
+                ++count;
+            else 
+            {
+                if(count != 0 && max<count)
+                    max = count ;
+                count =0;
+            }
+        }
+        if(max>=3)
+            maxCount++;
+        if(prayCount >= maxCount)
+            return ;
+        SetVar(VAR_PRAY_TYPE,index);
+        SetVar(VAR_PRAY_COUNT,prayCount+1);
+        SetVar(VAR_PRAY_TYPE_TODAY,1);
+        SetVar(VAR_PRAY_TIME,now);
+       // Stream st;
+       // SYSMSGVP(st, 430, getName().c_str(), 0);
+       // broadcastFriend(st);
+        char str[16] = {0};
+        sprintf(str, "F_130822_1");
+        udpLog("xuyuanshu", str, "", "", "", "", "act");
+    }
+     
+    void Player::getPrayAward()
+    {
+        UInt32 type = GetVar(VAR_PRAY_TYPE);
+        UInt32 prayValue = GetVar(VAR_PRAY_VALUE);
+        UInt32 praySucTime = GetVar(VAR_PRAY_SUCTIME);
+        UInt32 now = TimeUtil::Now();
+        if((43200+praySucTime)>now)
+            return ;
+        if(prayValue < 10)
+            return ;
+        if(type == 1)
+        {
+           getTael(10000); 
+        }
+        else if(type == 2)
+        {
+            UInt8 plvl = GetLev();
+            UInt64 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
+            UInt32 exp_ = static_cast<float>(exp)*6*60;
+            AddExp(exp_);
+        }
+        else if(type == 3)
+        {
+            Fighter * ft = getMainFighter();
+            if(!ft)
+                return;
+            UInt32 pexp = (5+ft->getAcuPraAdd()+ft->getSoulPracticeAddOn())*(1+(ft->getCapacity()-5)*0.16)*60*3;
+            AddPExp(pexp);
+        }
+        else if(!GameAction()->RunPrayAward(this, type))
+              return ;
+        SetVar(VAR_PRAY_TYPE , 0 );
+        SetVar(VAR_PRAY_VALUE , 0);
+        SetVar(VAR_PRAY_TYPE_TODAY,0);
+        SetVar(VAR_PRAY_TIME,0);
+        sendPrayInfo();
+        char str[16] = {0};
+        sprintf(str, "F_130822_%d", 1+type);
+        udpLog("xuyuanshu", str, "", "", "", "", "act");
 
+    }
 	void Player::sendModification( UInt8 t, UInt32 v, bool updateToDB )
 	{
 		if(_isOnline)
@@ -7706,6 +7952,8 @@ namespace GObject
             SetVar(VAR_TOWER_LEVEL, 1);
         }
 
+        sendFeastLoginAct();
+
         if(_clan != NULL)
         {
 			_clan->broadcastMemberInfo(this);
@@ -8995,7 +9243,16 @@ namespace GObject
 	}
 #endif
 
-	bool Player::testCanAddFriend( Player * pl )
+	bool Player::CheckFriendPray(UInt64 playerId)
+    {
+        UInt32 now = TimeUtil::Now();
+        std::map<UInt64,UInt32 >::iterator it_pray =_prayFriend.find(playerId);
+        if(it_pray!=_prayFriend.end() && TimeUtil::SharpDay(0, now) == TimeUtil::SharpDay(0, it_pray->second) )
+            return true;
+        return false;
+    }
+
+    bool Player::testCanAddFriend( Player * pl )
 	{
 		Mutex::ScopedLock lk(_mutex);
 		Mutex::ScopedLock lk2(pl->getMutex());
@@ -10172,6 +10429,8 @@ namespace GObject
         if(inVipPrivilegeTime()&&(VipType==0||VipType ==1 ||VipType ==3 ))
             factor += 1.0f;
 
+        if(getBuffData(PLAYER_BUFF_CLANTREE3))
+            factor += 0.1f;
         return factor;
     }
 
@@ -10239,6 +10498,11 @@ namespace GObject
     }
     void Player::setCountry(UInt8 cny)
     {
+        if(0 == cny)
+            udpLog("zhenying", "F_130822_1", "", "", "", "", "act");
+        else if(1 == cny)
+            udpLog("zhenying", "F_130822_2", "", "", "", "", "act");
+
         _playerData.country = cny;
 		DB1().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %" I64_FMT "u", cny, getId());
 
@@ -11291,9 +11555,45 @@ namespace GObject
                 getSummerFlow3OnlineAward(opt);
             sendSummerFlow3TimeInfo();
             break;
+        case 29:
+            //阵营检索
+            checkZhenying();
+            break;
         }
     }
     
+    void Player::checkZhenying()
+    {
+        UInt8 zyState = 0;
+
+        if(g_eMeiCount >= g_kunLunCount)
+           zyState = 1;
+        
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(29);
+        st << zyState << Stream::eos;
+        send(st);
+    }
+
+    void Player::changeZYAward(UInt8 countryType)
+    {
+        UInt16 mark = 0;
+        if(0 == countryType)
+            mark = 4939;
+        else
+            mark = 4940;
+
+        SYSMSG(title, 4938);
+        SYSMSGV(content, mark);
+
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,30}, {503, 2}};
+            mailPackageManager.push(mail->id, mitem, 2, true);
+        }
+    }
+
     void Player::getQQXiuAward(UInt8 opt)
     {
         UInt8 state = GetVar(VAR_QQXIU_AWARD);
@@ -11307,11 +11607,11 @@ namespace GObject
 
         if(opt == 1 && state == 0)
         {
-            GetPackage()->AddItem(9371, 2, true, false, FromQQXiu);
+            getCoupon(20);
             GetPackage()->AddItem(503, 2, true, false, FromQQXiu);
-            GetPackage()->AddItem(515, 2, true, false, FromQQXiu);
-            GetPackage()->AddItem(548, 5, true, false, FromQQXiu);
-            GetPackage()->AddItem(8520, 1, true, false, FromQQXiu);
+            GetPackage()->AddItem(1126, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(49, 2, true, false, FromQQXiu);
+            GetPackage()->AddItem(50, 2, true, false, FromQQXiu);
 
             SetVar(VAR_QQXIU_AWARD, 1);
             state = 1;
@@ -11506,8 +11806,10 @@ namespace GObject
     void Player::getQQTenpayAward(UInt8 opt)
     {
         UInt8 state = GetVar(VAR_QQTENPAY_AWARD);
+        UInt8 state1 = GetVar(VAR_QQTENPAY_LOTTERY);
+        int idx = -1;
 
-        if (GetPackage()->GetRestPackageSize() < 6 && opt == 1)
+        if (GetPackage()->GetRestPackageSize() < 6 && (opt == 1 || opt == 2))
         {
             sendMsgCode(0, 1011);
 
@@ -11526,10 +11828,19 @@ namespace GObject
             state = 1;
             udpLog("huodong", "F_130620_1", "", "", "", "", "act");
         }
+        else if(opt == 2 && state1 == 0)
+        {
+            idx = GameAction()->RunBlueDiamondAward(this, 6);
+            if(idx <= 0)
+                return;
+            SetVar(VAR_QQTENPAY_LOTTERY, 1);
+            state1 = 1;
+        }
             
+        UInt8 states = state | (state1 << 1);
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(22);
-        st << state << Stream::eos;
+        st << states << idx << Stream::eos;
         send(st);
     }
 
@@ -12890,6 +13201,8 @@ namespace GObject
         UInt32 max = 0 ;
         UInt32 i=0;
         UInt32 count=0 ;
+        if(!LuckyMeet)
+            return ;
         while(i<16)
         {
             if(LuckyMeet & (1 << i++ ))
@@ -18800,6 +19113,70 @@ void Player::sendGoodVoiceInfo()
     send(st);
 }
 
+void Player::getQzongPYGiftAward(UInt8 type)
+{
+    if (getPlatform() != 1 && getPlatform() != 2)
+        return;
+    if (GetVar(VAR_QZONGPYGIFT) >= 33)
+        return;
+    if (GetFreePackageSize() < 6)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if(type == 1)
+    {
+        if (getGold() < 19)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(EnumQzongPYGift,0,0);
+        useGold(19, &ci);
+        AddVar(VAR_QZONGPYGIFT, 1);
+        static UInt32 itemId[] = {548, 3, 9082, 3, 9371, 1, 8000, 1, 500, 1, 9390, 1};
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
+        {
+            GetPackage()->Add(itemId[i], itemId[i+1], true);
+        }
+    }
+    else if(type == 2)
+    {
+        if (getGold() < 77)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(EnumQzongPYGift,0,0);
+        useGold(77, &ci);
+        AddVar(VAR_QZONGPYGIFT, 1);
+        static UInt32 itemId[] = {1126, 1325, 134, 9141, 551, 517};
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
+        {
+            GetPackage()->Add(itemId[i], 1, true);
+        }
+    }
+    sendQzongPYGiftInfo();
+}
+
+void Player::sendQzongPYGiftInfo()
+{
+    if (getPlatform() != 1 && getPlatform() != 2)
+        return;
+    /*
+    if(!isBD())
+        return;
+    */
+    if(!World::getQzongPYGiftAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(6);
+    UInt8 opt = GetVar(VAR_QZONGPYGIFT);
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
 void Player::get3366GiftAward(UInt8 type)
 {
     if (getPlatform() != 11)
@@ -18889,17 +19266,20 @@ void Player::sendQQGameGift1218()
 
 void Player::sendFeastLoginAct()
 {
-    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || !World::getMayDayLoginAct()) /*!World::getFeastLoginAct()*/
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || /*!World::getMayDayLoginAct()*/ !World::getFeastLoginAct())
         return;
     //SYSMSGV(title, 4102);
     //SYSMSGV(content, 4103);
-    SYSMSGV(title, 4098);
-    SYSMSGV(content, 4099);
+    //SYSMSGV(title, 4098);
+    //SYSMSGV(content, 4099);
+    SYSMSGV(title, 4108);
+    SYSMSGV(content, 4109);
     Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
     if(mail)
     {
         //MailPackage::MailItem mitem = {1759,1};
-        MailPackage::MailItem mitem = {1763,1};
+        //MailPackage::MailItem mitem = {1763,1};
+        MailPackage::MailItem mitem = {1760,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     SetVar(VAR_FEAST_LOGIN, 1);
@@ -23220,6 +23600,55 @@ void Player::addCardFromClanBattle()
         SetVar(VAR_CARD_FROM_CLAN, 1);
         GetPackage()->AddItem(CARD_ITEM_ID, 1, true, false, 0);
     }
+}
+
+void Player::broadcastFriend(Stream& st)
+{
+    
+    Player* pfriend =NULL ;
+    std::set<Player *> _set = _friends[3];
+    std::set<Player *>::iterator offset;
+    for (offset = _set.begin(); offset != _set.end(); ++ offset)
+    {
+        pfriend = *offset;
+        if(!pfriend)
+            continue;
+        pfriend->send(st);
+    }
+    _set = _friends[0];
+    std::set<Player *>::iterator _offset;
+    for (_offset = _set.begin(); _offset != _set.end(); ++ _offset)
+    {
+        pfriend = *_offset;
+        if(!pfriend)
+            continue;
+        pfriend->send(st);
+    }
+    _clan->broadcast(st);
+}
+
+UInt32 Player::getBePrayednum(UInt64 id)
+{
+    std::map<UInt64,StuPrayValue >::iterator it = _bePrayed.find(id);
+    if(it != _bePrayed.end())
+        return it->second.praynum;
+    else
+        return 0 ;    
+}
+void Player::setClanSpiritTreeBuff(UInt8 id,UInt32 time)
+{
+    if( id < 0 || id > 2 )
+        return ;
+    addBuffData(id+PLAYER_BUFF_CLANTREE1,time);
+}
+
+void Player::setPrayLoginInWeek()
+{
+    UInt32 PrayLogin = GetVar(VAR_PRAY_LOGIN);
+    UInt32 now = TimeUtil::Now();
+    UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpWeek(0, now))/86400 +1;
+    PrayLogin |= ( 1 << (off - 1));
+    SetVar(VAR_PRAY_LOGIN, PrayLogin);
 }
 
 } // namespace GObject

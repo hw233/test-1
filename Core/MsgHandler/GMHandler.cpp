@@ -77,6 +77,8 @@ GMHandler::GMHandler()
 	Reg(3, "addexp", &GMHandler::OnAddExp);
 	Reg(2, "exp", &GMHandler::OnAddExp);
 	Reg(2, "addOT", &GMHandler::OnAddOnlineTime);
+	Reg(3, "addvar", &GMHandler::OnAddVar);
+	Reg(3, "varset", &GMHandler::OnSetVar);
 	Reg(2, "pexp", &GMHandler::OnAddPExp);
 	Reg(3, "addpexp", &GMHandler::OnAddPExp);
 	Reg(3, "additem", &GMHandler::OnAddItem);
@@ -261,6 +263,7 @@ GMHandler::GMHandler()
     Reg(2, "fool", &GMHandler::OnFoolsDayGM);
     Reg(2, "star", &GMHandler::OnLuckyStarGM);
     Reg(2, "acttm", &GMHandler::OnSurnameleg);
+    Reg(2, "openclb", &GMHandler::OnOpenclb);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -279,6 +282,8 @@ GMHandler::GMHandler()
     Reg(2, "task0", &GMHandler::OnCompletedManyTask);
     Reg(2, "getmc", &GMHandler::OnGetMax);
     Reg(2, "setmc", &GMHandler::OnSetMax);
+    Reg(2, "addtz", &GMHandler::OnAddtz);
+    Reg(2, "addshu", &GMHandler::OnAddJGSExp);
 
 }
 
@@ -359,9 +364,46 @@ bool GMHandler::Handle( const std::string& txt, GObject::Player * player, bool i
 #define strtoull _strtoui64
 #endif
 
+void GMHandler::OnAddtz(GObject::Player * player, std::vector<std::string>& args)
+{
+    if(player->GetLev() < 70)
+        return;
+
+	if(args.empty())
+		return;
+
+	if(args.size() == 1)
+	{
+		UInt32 tuzhiId = atoi(args[0].c_str());
+
+        if(tuzhiId <= 10000)
+            return;
+
+        player->GetMoFang()->addTuzhi(tuzhiId);
+	}
+}
+
+void GMHandler::OnAddJGSExp(GObject::Player * player, std::vector<std::string>& args)
+{
+    if(player->GetLev() < 70)
+        return;
+
+	if(args.empty())
+		return;
+
+	if(args.size() == 1)
+	{
+		UInt32 exp = atoi(args[0].c_str());
+
+        if(exp == 0)
+            return;
+
+        player->GetMoFang()->addJGSExp(exp);
+	}
+}
+
 void GMHandler::OnSetXZLvl(GObject::Player * player, std::vector<std::string>& args)
 {
-    
 	if(args.empty())
 		return;
 	if(args.size() == 2)
@@ -380,7 +422,6 @@ void GMHandler::OnSetXZLvl(GObject::Player * player, std::vector<std::string>& a
 
 void GMHandler::OnSetXCValue(GObject::Player * player, std::vector<std::string>& args)
 {
-
 	if(args.empty())
 		return;
 	if(args.size() == 2)
@@ -543,6 +584,29 @@ void GMHandler::OnAddOnlineTime( GObject::Player * player, std::vector<std::stri
 		if(time == 0)
 			return;
 		player->AddVarNow(VAR_TODAY_ONLINE,time,TimeUtil::Now());
+	}
+}
+void GMHandler::OnAddVar( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+    if(args.size() == 2)
+	{
+		UInt32 var = atoi(args[0].c_str());
+		UInt32 value = atoi(args[1].c_str());
+        UInt32 num = player->GetVar(var);
+		player->SetVar(var,num+value);
+	}
+}
+void GMHandler::OnSetVar( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+    if(args.size() == 2)
+	{
+		UInt32 var = atoi(args[0].c_str());
+		UInt32 value = atoi(args[1].c_str());
+		player->SetVar(var,value);
 	}
 }
 
@@ -4157,7 +4221,16 @@ void GMHandler::OnClanBossOpen(GObject::Player *player, std::vector<std::string>
     GObject::ClanBoss::instance().setCanOpened(true);
     GObject::ClanBoss::instance().start();
 }
-
+void GMHandler::OnOpenclb(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int index = atoi(args[0].c_str());
+    if(index == 1)
+        player->setClanRankBuffFlag(true);
+    if(index == 2)
+        player->setClanRankBuffFlag(false);
+}
 void GMHandler::OnClanBoss(GObject::Player *player, std::vector<std::string>& args)
 {
 	if(args.size() < 1)
@@ -4367,7 +4440,10 @@ void GMHandler::OnCompletedManyTask(GObject::Player* player, std::vector<std::st
 
 void GMHandler::OnSetMax(GObject::Player* player, std::vector<std::string>& args)
 {
-    GVAR.SetVar(GObject::GVAR_NewUser_Max , 2);
+     if(args.size() < 1)
+         return;
+    int max = atoi(args[0].c_str());
+    GVAR.SetVar(GObject::GVAR_NewUser_Max , max);
     UInt32 tmp;
     tmp = GVAR.GetVar(GObject::GVAR_NewUser_Max);
 }
@@ -4375,8 +4451,10 @@ void GMHandler::OnSetMax(GObject::Player* player, std::vector<std::string>& args
 void GMHandler::OnGetMax(GObject::Player* player, std::vector<std::string>& args)
 {
     UInt32 tmp;
+    UInt32 tmp1;
     tmp = GVAR.GetVar(GObject::GVAR_NewUser_Max);
-    tmp++;
+    tmp1 = GVAR.GetVar(GObject::GVAR_NewUser_Cur); 
+    tmp ++;
 }
 
 

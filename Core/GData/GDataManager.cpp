@@ -35,6 +35,7 @@
 #include "DreamerTable.h"
 #include "FairyPetTable.h"
 #include "XingchenData.h"
+#include "JiguanData.h"
 
 namespace GData
 {
@@ -331,6 +332,23 @@ namespace GData
             std::abort();
         }
 
+        if (!LoadJiguanshuConfig())
+        {
+            fprintf (stderr, "Load LoadJiguanshuConfig Error !\n");
+            std::abort();
+        }
+
+        if (!LoadJiguanyuConfig())
+        {
+            fprintf (stderr, "Load LoadJiguanyuConfig Error !\n");
+            std::abort();
+        }
+
+        if (!LoadTuzhiConfig())
+        {
+            fprintf (stderr, "Load LoadTuzhiConfig Error !\n");
+            std::abort();
+        }
 		return true;
 	}
 
@@ -2084,6 +2102,57 @@ namespace GData
             stxc.payBack = dbxcc.payBack;
             xingchenData.setXingchenTable(stxc);
         }
+        return true;
+    }
+    
+    bool GDataManager::LoadJiguanshuConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBJiguanshuConfig dbjgs;
+		if(execu->Prepare("SELECT `jgshuLvl`, `totalNeedExp` FROM `jiguanshu`", dbjgs) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            jiguanData.setJiguanshuInfo(dbjgs);
+        }
+
+        return true;
+    }
+
+    bool GDataManager::LoadJiguanyuConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBJiguanyuConfig dbjgy;
+		if(execu->Prepare("SELECT `jiguanyuId`, `mark`, `name`, `quality`, `attrType`, `element`, `attrValue`, `molding`, `skillId` FROM `jiguanyu`", dbjgy) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            jiguanData.setJiguanyuInfo(dbjgy);
+        }
+
+        return true;
+    }
+
+    bool GDataManager::LoadTuzhiConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBTuzhiConfig dbtz;
+		if(execu->Prepare("SELECT `tuzhiId`, `name`, `quality`, `needjgsLvl`, `jiguanyuId` FROM `tuzhi`", dbtz) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            jiguanData.settuzhiInfo(dbtz);
+        }
+
         return true;
     }
 

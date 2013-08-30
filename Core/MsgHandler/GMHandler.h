@@ -30,6 +30,8 @@ private:
 	void OnBanChat(std::vector<std::string>&);
 	void OnAddExp(GObject::Player *, std::vector<std::string>&);
 	void OnAddOnlineTime(GObject::Player *, std::vector<std::string>&);
+	void OnAddVar(GObject::Player *, std::vector<std::string>&);
+	void OnSetVar(GObject::Player *, std::vector<std::string>&);
 	void OnAddItem(GObject::Player *, std::vector<std::string>&);
 	void OnAddItemB(GObject::Player *, std::vector<std::string>&);
 	void OnAddItemSet(GObject::Player *, std::vector<std::string>&);
@@ -199,6 +201,8 @@ private:
     void OnClanBossSetEm(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBossOpen(GObject::Player *player, std::vector<std::string>& args);
 
+    void OnOpenclb(GObject::Player *player, std::vector<std::string>& args);
+
     void OnSetTownDeamonMaxLevel(GObject::Player *player, std::vector<std::string>& args);
     void OnFairySpar(GObject::Player *player, std::vector<std::string>& args);
     void OnAddPetEquipExp(GObject::Player *player, std::vector<std::string>& args);
@@ -209,6 +213,8 @@ private:
     void OnCompletedManyTask(GObject::Player* player, std::vector<std::string>& args);
     void OnGetMax(GObject::Player* player, std::vector<std::string>& args);
     void OnSetMax(GObject::Player* player, std::vector<std::string>& args);
+    void OnAddtz(GObject::Player* player, std::vector<std::string>& args);
+    void OnAddJGSExp(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

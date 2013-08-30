@@ -570,6 +570,14 @@ struct DBFriend
 	UInt64 friendId;
 };
 
+struct PrayRelation
+{
+    UInt64 id;
+    UInt64 friendId;
+    UInt8 pray;
+    UInt32 time;
+    UInt32 praynum;
+};
 struct DBClan
 {
 	UInt32 id;
@@ -1267,6 +1275,26 @@ struct DBXingchen
     UInt16 gem3;
 };
 
+struct DBJiguanshu
+{
+    UInt64 playerId;
+    UInt8  curLvl;
+    UInt32 curExp;
+};
+
+struct DBJiguanyu
+{
+    UInt64 playerId;
+    UInt32 jiguanId;
+    UInt8  pos;
+};
+
+struct DBTuzhi
+{
+    UInt64 playerId;
+    UInt32 tuzhiId;
+    UInt8 curProficient;
+};
 }
 
 namespace DB {
@@ -1890,6 +1918,17 @@ SPECIALDEF(3)
 	UInt64, id,
 	UInt8, type,
 	UInt64, friendId
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::PrayRelation)
+SPECIALDEF(5)
+(
+	UInt64, id,
+	UInt64, friendId,
+    UInt8 , pray,
+    UInt32,  time,
+    UInt32, praynum
 )
 SPECIALEND()
 
@@ -2878,6 +2917,33 @@ SPECIALDEF(7)
     UInt16, gem2,
     UInt16, gem3
 )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBJiguanshu)
+SPECIALDEF(3)
+    (
+    UInt64, playerId,
+    UInt8,  curLvl,
+    UInt32, curExp
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBJiguanyu)
+SPECIALDEF(3)
+    (
+    UInt64, playerId,
+    UInt32, jiguanId,
+    UInt8,  pos
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTuzhi)
+SPECIALDEF(3)
+    (
+    UInt64, playerId,
+    UInt32, tuzhiId,
+    UInt8, curProficient
+    )
 SPECIALEND()
 
 }

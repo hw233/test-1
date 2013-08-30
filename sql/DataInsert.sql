@@ -206,3 +206,27 @@ LOCK TABLES `pet_pressure` WRITE;
 source pet_pressure
 UNLOCK TABLES;
 
+LOCK TABLES `pet_levelup` WRITE;
+source pet_levelup;
+UNLOCK TABLES;
+
+LOCK TABLES `pet_neidan` WRITE;
+source pet_neidan;
+UNLOCK TABLES;
+
+LOCK TABLES `xingchen` WRITE;
+source xingchen;
+UNLOCK TABLES;
+
+LOCK TABLES `jiguanshu` WRITE;
+source jiguanshu;
+UNLOCK TABLES;
+
+LOCK TABLES `jiguanyu` WRITE;
+source jiguanyu;
+UNLOCK TABLES;
+
+LOCK TABLES `tuzhi` WRITE;
+source tuzhi;
+UNLOCK TABLES;
+

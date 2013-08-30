@@ -410,6 +410,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setJinQuan(jinquan);
             player->SetSummerFlow3Value();
             player->SetSummerMeetValue();
+            player->setPrayLoginInWeek();
             player->continuousLoginSummerFlow();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
@@ -533,13 +534,26 @@ void trimName(std::string& str)
 
 void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 {
-
     UInt32 max = 0;
     UInt32 cur = 0;
-    max = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max);
+    max = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max)/24;
     cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur);
-    if( max && max<cur)
+    if((hdr.playerID&0xFFFFFFFFFF) != 39090008 &&
+            (hdr.playerID&0xFFFFFFFFFF) != 1779780 &&
+            (hdr.playerID&0xFFFFFFFFFF) != 5 &&
+            (hdr.playerID&0xFFFFFFFFFF) != 13392659 &&
+            max && max<cur)
+    {
+		NewUserRepStruct rep;
+		rep._result = 3;
+		TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
+        if (conn.get() != NULL)
+        {
+            NETWORK()->SendMsgToClient(conn.get(), rep);
+            conn->pendClose();
+        }
         return;
+    }
     else
     {
         UInt32 Cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur); 
@@ -762,6 +776,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setJinQuan(jinquan);
             pl->SetSummerFlow3Value();
             pl->SetSummerMeetValue();
+            pl->setPrayLoginInWeek();
             pl->continuousLoginSummerFlow();
             if(cfg.merged)
             {
@@ -1046,12 +1061,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                515,    2,
+                503,    4,
                 509,    2,
-                15,     8,
-                1126,   5,
-                1325,   5,
-                134,    5
+                56,     2,
+                466,    3,
+                549,    2,
+                50,     3
             };
 
             UInt8 idx = 0;
@@ -1531,7 +1546,7 @@ void ForbidSale(LoginMsgHdr& hdr,const void * data)
     br >> tm;
     br>>playerIds;
    
-    //开启起封交易客户平台测试
+//开启起封交易客户平台测试
     
 //#define TEST_TABLE
 #ifdef TEST_TABLE
@@ -1631,6 +1646,7 @@ void QueryLockUser(LoginMsgHdr& hdr,const void * data)
     Stream st(SPEP::QUERYLOCKUSER);
 //    st << isLockLogin << isForbidSale << fsaleTime << Stream::eos;
     st << isLockLogin << isForbidSale << fsaleTime<< foverTime << Stream::eos;
+     //std::cout<<(bool)isLockLogin<< "  " <<(bool)isForbidSale<< "  "<<fsaleTime<<"  "<<foverTime<<std::endl;
     //std::cout<<(bool)isLockLogin<< "  " <<(bool)isForbidSale<< "  "<<fsaleTime<<"  "<<foverTime<<std::endl;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }

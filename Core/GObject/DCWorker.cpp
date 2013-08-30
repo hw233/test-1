@@ -11,6 +11,7 @@ extern "C" {
 
 namespace GObject
 {
+//#undef  _DEBUG
 #ifndef _DEBUG
     static int recvret(char* data, size_t size, size_t nmemb, char* buf)
     {
@@ -65,6 +66,7 @@ namespace GObject
         }
         curl = curl_easy_init();
 #endif
+        //m_Openid.clear();
         m_inited = true;
         return true;
     }
@@ -168,7 +170,7 @@ namespace GObject
                 char* msg = openIdLog[i].openId;
                 UInt64 playerId = openIdLog[i].playerId;
                 bool r = false;
-                GObject::Player * pl = GObject::globalPlayers[playerId];
+                GObject::Player * pl = GObject::globalPlayers[playerId];   //取player
                 if (!pl)
                 {
                     delete[] msg;
@@ -179,7 +181,7 @@ namespace GObject
                 if (msg)
                 {
                     std::string data = msg;
-                    if (CheckOpenId(playerId, msg))
+                    if (CheckYBLevel(playerId, msg))
                     {
                         r = true;
                     }
@@ -224,7 +226,6 @@ namespace GObject
         LogMsg logMsg;
         logMsg.logString = p;
         logMsg.logType = logType;
-
         ++m_Limit;
 
         FastMutex::ScopedLock lk(m_Mutex);
@@ -240,10 +241,10 @@ namespace GObject
 
     void DCWorker::PushCheckOpenId(UInt64 playerId, const char * openId, UInt32 len)
     {
-        /*
+       /* 
         if (!openId)
             return;
-
+        return ;
         char *p = new(std::nothrow) char[len+1];
         if (p == NULL)
             return;
@@ -260,7 +261,7 @@ namespace GObject
             FastMutex::ScopedLock lk(m_Mutex);
             m_Openid.push_back(openMsg);
         }
-        */
+       */
     }
 
     /*
@@ -357,14 +358,72 @@ namespace GObject
         size_t len = snprintf(key, sizeof(key), "%s%s", key1,openid); 
         m_MCached.get(key, len, value, sizeof(value));
         return atoi(value);
-        
     }
-    UInt8 DCWorker::CheckYBLevel(UInt64 playerId ,UInt32 viplev)
+    UInt8 DCWorker::CheckYBLevel(UInt64 playerId ,char *messag )
     {
+        Int32 ret = 0;
+#ifndef _DEBUG
         GObject::Player * pl = GObject::globalPlayers[playerId];
-        if(pl!=NULL)
-            return true;
-        return false;
+        const static char host[] = "s66.app27036.qqopenapp.com?";
+        char res[MAX_RET_LEN] = "";
+        char message[MAX_RET_LEN] = "";
+           sprintf (message, "a=get_info&openkey=%s&openid=%s&pf=%s", pl->getOpenKey(),pl->getOpenId(),pl->getSource().c_str());
+            snprintf (res, MAX_RET_LEN, "%s%s", host, message);
+            // curl调用上报
+            char buffer[MAX_RET_LEN] = {0};
+            curl_easy_setopt(curl, CURLOPT_URL, res);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,GObject::recvret);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
+            curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+            CURLcode curlRes = curl_easy_perform(curl);
+            if (CURLE_OK == curlRes)
+            {
+                char msg[MAX_RET_LEN] = "";
+                ret = CheckYBResultParse(buffer, msg, sizeof(msg)-1);
+            }
+#endif
+        return ret;
+    }
+    UInt32 DCWorker::CheckYBResultParse(char* result, char* msg, size_t size)
+    {
+        // 上报结果解析
+        #define JSON_ERR_CUSTOM -9527
+        #define JSON_ERR_CUSTOM2 -9528
+        #define JSON_ERR_CUSTOM3 -9529
+        #define JSON_ERR_CUSTOM4 -9530
+
+        TRACE_LOG("JSON RESULT: %s", result);
+        json_t* obj = NULL;
+
+
+        enum json_error jerr;
+        if ((jerr = json_parse_document(&obj, result)) != JSON_OK)
+            return JSON_ERR_CUSTOM;
+
+        json_t* hdr = json_find_first_label(obj, "iRet");
+        if (!hdr || !hdr->child || !hdr->text)
+            return JSON_ERR_CUSTOM2;
+
+        Int32 ret = atoi(hdr->child->text);
+        if (ret)
+            return ret;
+
+        hdr =  json_find_first_label(obj, "iMsg");
+        if (!hdr || !hdr->child || !hdr->text)
+            return JSON_ERR_CUSTOM3;
+        ret = atoi(hdr->child->text);
+        UInt32 len = strlen(hdr->child->text);
+        len = len > size ? size : len;
+        strncpy (msg, hdr->child->text, len);
+        msg[len] = '\0';
+        return 0;
+        #undef JSON_ERR_CUSTOM
+        #undef JSON_ERR_CUSTOM2
+        #undef JSON_ERR_CUSTOM3
+        #undef JSON_ERR_CUSTOM4
     }
 }
+
+
 

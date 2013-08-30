@@ -95,6 +95,8 @@ namespace REQ
     const UInt8 PACK_INFO           = 0xC0;// 0x30
     /**临时物品信息 */
     const UInt8 TEMPITEM_INFO       = 0xFA;
+    /**墨方信息*/
+    const UInt8 MOFANG_INFO         = 0xFB;
     /**背包添加到九疑鼎 */
     const UInt8 PACK_TRIPOD         = 0xC1;// 0x31
     /**背包卖出 */
@@ -476,6 +478,7 @@ namespace REP
     const UInt8 TRAIN_FIGHTER_OP    = 0x37;
 
     const UInt8 PACK_INFO           = 0xC0;// 0x30
+    const UInt8 MOFANG_INFO         = 0xFB;
     const UInt8 TEMPITEM_INFO       = 0xFA;
     const UInt8 PACK_USE            = 0xC3;// 0x33
     const UInt8 PACK_EXTEND         = 0xC4;// 0x34

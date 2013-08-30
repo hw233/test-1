@@ -2000,6 +2000,9 @@ void Fighter::rebuildEquipAttr()
         }
     }
 
+    if(_owner)
+        _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
+
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 
@@ -3300,6 +3303,8 @@ bool Fighter::testMutual( UInt16 skill )
         20,24, // 破甲术，无形剑
         21,25, // 大道剑，大道无常剑
         30,31, // 暗影步法，幽冥步法
+        12,73, // 回灵术，大衍佛光
+        16,73, // 韦驮正气，大衍佛光
     };
 
     UInt16 j = 0;

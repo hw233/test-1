@@ -378,6 +378,7 @@ public:
     UInt8 getPracticeSlot();
     void sendPracticePlaceInfo(Player* pl);
     void broadcastPracticePlaceInfo();
+    void setClanSpiritTreeBuff(UInt8 );
 
     // 帮派职位
     bool setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls);
