@@ -210,7 +210,6 @@ void FrontMap::enter(Player* pl, UInt8 id)
     FastMutex::ScopedLock lk(_mutex);
 
     UInt8 ret = 1;
-    UInt32 cf_bind_flag = pl->GetVar(VAR_CF_BIND);
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
     if (!tmp.size()) {
         if (PLAYER_DATA(pl, frontFreeCnt) < getFreeCount()) {
@@ -220,8 +219,6 @@ void FrontMap::enter(Player* pl, UInt8 id)
                     pl->getId(), id);
             ret = 0;
             pl->frontMapUdpLog(id, 1);
-            cf_bind_flag &= 0xF5;
-            pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         } else if (PLAYER_DATA(pl, frontGoldCnt) < getGoldCount(pl->getVipLevel())) {
             UInt32 gold = getEnterGold(pl);
             if (pl->getGold() < gold) {
@@ -242,9 +239,6 @@ void FrontMap::enter(Player* pl, UInt8 id)
             ConsumeInfo ci(EnterFrontMap,0,0);
             pl->useGold(gold, &ci);
             pl->frontMapUdpLog(id, 3);
-            cf_bind_flag &= 0xF5;
-            cf_bind_flag |= 0x02;
-            pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         } else {
             // XXX:
             return;
@@ -450,7 +444,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             pl->SetVar(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, mark);
 
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
-            pl->copyFrontWinAward(2);
+            pl->copyFrontWinAward(2, tmp[spot].lootlvl > 0);
             DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %" I64_FMT "u AND `id` = %u", pl->getId(), id);
             if (ato)
                 autoClear(pl, complate);

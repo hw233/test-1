@@ -3010,7 +3010,7 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
             responderName = args[1];
         player->GetNewRelation()->challengeRequest(player, responderName);
         */
-        player->copyFrontWinAward(1);
+        player->copyFrontWinAward(1, false);
     }
     else if(type == 6)
     {
@@ -3023,7 +3023,7 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
             accept = atoi(args[2].c_str());
         player->GetNewRelation()->challengeRespond(player, senderName, accept);
         */
-        player->copyFrontWinAward(2);
+        player->copyFrontWinAward(2, false);
     }
     else if(type == 7)
     {

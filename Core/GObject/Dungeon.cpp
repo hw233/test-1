@@ -94,7 +94,6 @@ UInt8 Dungeon::playerEnter( Player * player )
                 return 2;
             }
 
-            UInt32 cf_bind_flag = player->GetVar(VAR_CF_BIND);
 			if(PLAYER_DATA(player, dungeonCnt) >= getMaxCount())
 			{
 				UInt32 price = _price[PLAYER_DATA(player, dungeonCnt)];
@@ -108,15 +107,11 @@ UInt8 Dungeon::playerEnter( Player * player )
 					player->useGold(price, &ci);
                     player->dungeonUdpLog(_dungeon->levelReq, 3);
 				}
-                cf_bind_flag &= 0xF3;
-                cf_bind_flag |= 0x04;
 			}
             else
             {
                     player->dungeonUdpLog(_dungeon->levelReq, 1);
-                    cf_bind_flag &= 0xF3;
             }
-            player->SetVar(VAR_CF_BIND, cf_bind_flag);
 
 		}
 
@@ -574,6 +569,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
         player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
 
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount, free);
+        player->copyFrontWinAward(3, free == false);
         if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
         {
             player->dungeonUdpLog(_dungeon->levelReq, 4);
@@ -582,7 +578,6 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
         {
             player->dungeonUdpLog(_dungeon->levelReq, 2);
         }
-        player->copyFrontWinAward(3);
 	}
 
 	if(noreport)

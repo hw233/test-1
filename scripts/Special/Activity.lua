@@ -8507,7 +8507,7 @@ local item = {}
 
 local dungeonAward1 = {
     --level 30
-    [785] = {{1201,20},{1214,20},{1213,20},},
+    [772] = {{1201,20},{1214,20},{1213,20},},
     --level 45
     [2050] = {{1226,20},{1222,20},{1223,20},{1306,20},},
     --level 60
@@ -8519,7 +8519,7 @@ local dungeonAward1 = {
 }
 local dungeonAward2 = {{50,25},{49,20},{48,20},{135,20},{1411,20},}
 local dungeonAward3 = {{507,1},{509,1},{9283,60},{47,5},{9420,10},}
-local dungeonAward1_common = {{135,30},{1411,30},{1602,20},{1500,30},{1501,30},{9283,60}}
+local dungeonAward1_common = {{135,30},{1411,30},{500,20},{56,30},{57,30},{9283,60}}
 
 function getDungeonAward(step, localtion)
     local order
@@ -8563,11 +8563,12 @@ function getDungeonAward(step, localtion)
 end
 
 function getCopyFrontmapAward(step, localtion, cf)
+    if cf == 3 then
+        return getDungeonAward(step, localtion)
+    end
+
     if step > 2 then
         return {}
-    end
-    if cf == 2 then
-        return getDungeonAward(step, localtion)
     end
 
     local order
