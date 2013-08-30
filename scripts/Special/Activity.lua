@@ -8505,10 +8505,72 @@ local extra1 = {{50,20},{49,20},{135,20},{1411,20},{507,1},{509,1},}
 local extra_2 = {{50,20},{49,20},{135,20},{1411,20},}
 local item = {}
 
+local dungeonAward1 = {
+    --level 30
+    [772] = {{1201,20},{1214,20},{1213,20},},
+    --level 45
+    [2050] = {{1226,20},{1222,20},{1223,20},{1306,20},},
+    --level 60
+    [5123] = {{1230,20},{1227,20},{1234,20},{1307,20},},
+    --level 75
+    [8194] = {{1236,20},{1237,20},},
+    --level 90
+    [10001] = {{1454,20},{1455,20},{1456,20},{1457,20},{1458,20},{1459,20},{1460,20},{1461,20},{1462,20},{1463,20},{1464,20},{1465,20},{1466,20},{1467,20},},
+}
+local dungeonAward2 = {{50,25},{49,20},{48,20},{135,20},{1411,20},}
+local dungeonAward3 = {{507,1},{509,1},{9283,60},{47,5},{9420,10},}
+local dungeonAward1_common = {{135,30},{1411,30},{500,20},{56,30},{57,30},{9283,60}}
+
+function getDungeonAward(step, localtion)
+    local order
+    if step == 1 then
+        local items = dungeonAward1[localtion];
+        if items == nil then
+            return {}
+        end
+        local cnt1 = #items
+        local cnt1_common = #dungeonAward1_common
+        order = math.random(1, cnt1 + cnt1_common)
+        if order <= cnt1 then
+            item = items[order]
+        else
+            item = dungeonAward1_common[order - cnt1]
+        end
+    elseif step == 2 then
+        order = math.random(1, #dungeonAward2)
+        item = dungeonAward2[order]
+    else
+        local items = dungeonAward1[localtion];
+        if items == nil then
+            return {}
+        end
+        local cnt1 = #items
+        local cnt1_common = #dungeonAward1_common
+        local cnt2 = #dungeonAward2
+        local cnt3 = #dungeonAward3
+        order = math.random(1, cnt1 + cnt1_common + cnt2 + cnt3)
+        if order <= cnt1 then
+            item = items[order]
+        elseif order <= cnt1 + cnt1_common then
+            item = dungeonAward1_common[order - cnt1]
+        elseif order <= cnt1 + cnt1_common + cnt2 then
+            item = dungeonAward2[order - cnt1 - cnt1_common]
+        else
+            item = dungeonAward3[order - cnt1 - cnt1_common - cnt2]
+        end
+    end
+    return item;
+end
+
 function getCopyFrontmapAward(step, localtion, cf)
+    if cf == 3 then
+        return getDungeonAward(step, localtion)
+    end
+
     if step > 2 then
         return {}
     end
+
     local order
     if step == 1 then
         if true then

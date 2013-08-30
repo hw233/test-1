@@ -612,6 +612,8 @@ player->GetPackage()->Add(9343, 2, true, false);
         player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
 
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount[dpi.difficulty], free);
+        if(dpi.difficulty > 0)
+            player->copyFrontWinAward(3, free == false);
         if(PLAYER_DATA1(player, dpi.difficulty) > getMaxCount(dpi.difficulty))
         {
             player->dungeonUdpLog(_dungeon->levelReq, 4);

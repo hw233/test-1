@@ -2414,7 +2414,7 @@ namespace GObject
         bool hasFighterWithClass(UInt8 cls);
 
     public:
-        void copyFrontWinAward(UInt8 index);
+        void copyFrontWinAward(UInt8 index, bool unBind);
         void loadCopyFrontWinFromDB(UInt8 posOrig, UInt8 posPut, UInt32 itemId, UInt16 ratio);
         void getCopyFrontCurrentAward(UInt8 index);
         void getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 indexPut);
@@ -2424,6 +2424,7 @@ namespace GObject
         void sendCopyFrontAllAward();
         UInt8 getCopyId();
         UInt8 getFrontmapId();
+        UInt8 getDungeonId();
 
         void getDragonKingInfo();
         void postDragonKing(UInt8 count);
