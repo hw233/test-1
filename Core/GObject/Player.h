@@ -569,7 +569,7 @@ namespace GObject
 			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0), tavernOrangeCount(0),
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
-			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonEnd(0),
+			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonCnt1(0), dungeonEnd(0),
             copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0)
 #ifdef _ARENA_SERVER
             , entered(0)
@@ -666,6 +666,7 @@ namespace GObject
 		UInt8 wallow;               //
 		UInt32 battlecdtm;          //
         UInt8 dungeonCnt;           // ͨ??????ǰ????
+        UInt8 dungeonCnt1;           // ͨ??????ǰ????
         UInt32 dungeonEnd;          // ͨ????????????ʱ??
         UInt8 copyFreeCnt;          // ???????Ѵ???
         UInt8 copyGoldCnt;          // ?????շѴ???
@@ -1633,7 +1634,7 @@ namespace GObject
 		UInt8 trainFighter(UInt32 id, UInt8 type);
 
 		inline UInt32 getVipLevel() { return _vipLevel; }
-		bool isDungeonPassed(UInt8 id);
+		bool isDungeonPassed(UInt8 id, UInt8 difficulty);
 
 		template<typename T>
 		inline void notifyFriendAct(UInt8 type, T arg)
@@ -2589,6 +2590,13 @@ namespace GObject
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
+    inline UInt8& PLAYER_DATA1(Player* pl, UInt8 type)
+    {
+        if(type == 0)
+            return PLAYER_DATA(pl, dungeonCnt);
+        else
+            return PLAYER_DATA(pl, dungeonCnt1);
+    }
 
 	typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;
 	extern GlobalPlayers globalPlayers;

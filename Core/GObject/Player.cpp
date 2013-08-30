@@ -8668,6 +8668,7 @@ namespace GObject
         if(now >= _playerData.dungeonEnd)
         {
             _playerData.dungeonCnt = 0;
+            _playerData.dungeonCnt1 = 0;
         }
         dung = _playerData.dungeonCnt;
         dungMax = GObject::Dungeon::getMaxCount() + GObject::Dungeon::getExtraCount(vipLevel);
@@ -8752,7 +8753,8 @@ namespace GObject
         }
 
         cnt = dungeonManager.size();
-        st << cnt << _playerData.dungeonCnt << GObject::Dungeon::getMaxCount() << GObject::Dungeon::getExtraCount(vipLevel);
+        st << cnt << _playerData.dungeonCnt << GObject::Dungeon::getMaxCount(0) << GObject::Dungeon::getExtraCount(vipLevel,0);
+        st << _playerData.dungeonCnt1 << GObject::Dungeon::getMaxCount(1) << GObject::Dungeon::getExtraCount(vipLevel,1);
         if(cnt)
         {
             Dungeon_Enum de = {this, st};
@@ -9173,12 +9175,12 @@ namespace GObject
 		DB1().PushUpdateData("UPDATE `player` SET `nextExtraReward` = %u WHERE `id` = %" I64_FMT "u", _playerData.nextExtraReward, _id);
 	}
 
-	bool Player::isDungeonPassed( UInt8 id )
+	bool Player::isDungeonPassed( UInt8 id ,UInt8 difficulty)
 	{
 		Dungeon * dg = dungeonManager[id];
 		if(dg == NULL)
 			return false;
-		return dg->getFirstPass(this) > 0;
+		return dg->getFirstPass(this,difficulty) > 0;
 	}
 
 #if 0

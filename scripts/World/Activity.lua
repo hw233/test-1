@@ -143,6 +143,8 @@ end
 
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
+  print(osmax)
+  print(serverNum)
   if osmax ~= nil and serverNum <= osmax then
     local freeEnter = false
     if serverName == 'kingxin' then
@@ -157,13 +159,13 @@ function onActivityCheck(tm)
       setDungeonPrice(1, 0)
       setDungeonPrice(2, 0)
     else
-      setDungeonPrice(1, 10)
-      setDungeonPrice(2, 10)
+      setDungeonPrice(1, 20)
+      setDungeonPrice(2, 20)
     end
-  else
-    setDungeonPrice(0, 0)
-    setDungeonPrice(1, 50)
-    setDungeonPrice(2, 50)
+ -- else
+    --setDungeonPrice(0, 0)
+    --setDungeonPrice(1, 20)
+    --setDungeonPrice(2, 20)
   end
   setDungeonCount(1)
   setTavernInterval(1 * 3600)
