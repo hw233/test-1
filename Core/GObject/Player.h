@@ -2423,6 +2423,7 @@ namespace GObject
         void sendCopyFrontAllAward();
         UInt8 getCopyId();
         UInt8 getFrontmapId();
+        UInt8 getDungeonId();
 
         void getDragonKingInfo();
         void postDragonKing(UInt8 count);

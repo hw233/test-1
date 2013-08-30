@@ -18823,6 +18823,8 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
         bind = 0;
     else if(GetVar(VAR_CF_FLAG) == 2 && (cf_bind_flag&0x20))
         bind = 0;
+    else if(GetVar(VAR_CF_FLAG) == 3 && (cf_bind_flag&0x40))
+        bind = 0;
     else
         bind = 1;
     UInt32 itemTmp = cf_itemId[curId];
@@ -18846,6 +18848,8 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
             order += 5;
         if(GetVar(VAR_CF_FLAG) == 2)
             order += 11;
+        else if(GetVar(VAR_CF_FLAG) == 3)
+            order += 21;
         sprintf(tag, "F_10000_1212_%u", order);
         udpLog("CopyFrontWin", tag, "", "", "", "", "act");
     }
@@ -18912,7 +18916,7 @@ void Player::resetCopyFrontWinAward(bool fresh)
             step = 1;
         else if(i == tmp2)
         {
-            if(GetVar(VAR_CF_FLAG) == 1)
+            if(GetVar(VAR_CF_FLAG) == 1 || GetVar(VAR_CF_FLAG) == 3)
                 step = 2;
             else
                 step = 0;
@@ -18995,18 +18999,25 @@ void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
 
 void Player::sendCopyFrontAllAward()
 {
-    if(GetVar(VAR_CF_FLAG) == 0)
+    UInt32 flag = GetVar(VAR_CF_FLAG);
+    if(flag == 0)
         return;
 
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x04);
     st << static_cast<UInt8>(0x01);
-    st << static_cast<UInt8>(GetVar(VAR_CF_FLAG) - 1);
+    st << static_cast<UInt8>(flag - 1);
 
-    if(GetVar(VAR_CF_FLAG) == 1)
+    if(flag == 1)
     {
         if(GetVar(VAR_CF_INDEX) == 0)
             SetVar(VAR_CF_INDEX, getCopyId());
+        st << static_cast<UInt8>(GetVar(VAR_CF_INDEX));
+    }
+    else if(flag == 3)
+    {
+        if(GetVar(VAR_CF_INDEX) == 0)
+            SetVar(VAR_CF_INDEX, getDungeonId());
         st << static_cast<UInt8>(GetVar(VAR_CF_INDEX));
     }
     else
@@ -19076,6 +19087,18 @@ UInt8 Player::getCopyId()
 UInt8 Player::getFrontmapId()
 {
     static UInt16 spots[] = {1284, 2053, 4360, 4611, 5893, 5637, 8195, 6153, 9222, 9481, 10244, 5129};
+    UInt16 currentSpot = PLAYER_DATA(this, location);
+    for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
+    {
+        if(spots[i] == currentSpot)
+            return (i+1);
+    }
+    return 0;
+}
+
+UInt8 Player::getDungeonId()
+{
+    static UInt16 spots[] = {785, 2050, 5123, 8194, 10001};
     UInt16 currentSpot = PLAYER_DATA(this, location);
     for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
     {

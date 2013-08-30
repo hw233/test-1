@@ -229,7 +229,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
             if(pl->GetVar(VAR_DIAMOND_BLUE) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_BLUE, 1);
                 pl->copyUdpLog(id, 5);
-                cf_bind_flag &= 0xF2;
+                cf_bind_flag &= 0xF6;
                 pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
@@ -237,7 +237,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
             if(pl->GetVar(VAR_DIAMOND_YELLOW) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_YELLOW, 1);
                 pl->copyUdpLog(id, 6);
-                cf_bind_flag &= 0xF2;
+                cf_bind_flag &= 0xF6;
                 pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
@@ -250,7 +250,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         if(pl->isQQVIP() && World::getQQVipAct()){
             if(pl->GetVar(VAR_QQVIP_CNT) < PRIVILEGE_COUNT){
                 pl->AddVar(VAR_QQVIP_CNT, 1);
-                cf_bind_flag &= 0xF2;
+                cf_bind_flag &= 0xF6;
                 pl->SetVar(VAR_CF_BIND, cf_bind_flag);
                 return 0;
             }
@@ -264,7 +264,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %" I64_FMT "u",
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         pl->copyUdpLog(id, 1);
-        cf_bind_flag &= 0xF2;
+        cf_bind_flag &= 0xF6;
         pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         return 0;
     } else if (PLAYER_DATA(pl, copyGoldCnt) < getGoldCount(pl->getVipLevel())) {
@@ -282,7 +282,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         lootlvl = PLAYER_DATA(pl, copyGoldCnt);
         pl->copyUdpLog(id, 3);
-        cf_bind_flag &= 0xF2;
+        cf_bind_flag &= 0xF6;
         cf_bind_flag |= 0x01;
         pl->SetVar(VAR_CF_BIND, cf_bind_flag);
         return 0;
