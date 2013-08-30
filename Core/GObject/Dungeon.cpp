@@ -240,7 +240,7 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
 	}
 	if(!cloots.empty())
 	{
-		UInt16 sz = cloots.size();
+		//UInt16 sz = cloots.size();
 	/*	Stream stp(REP::COPY_DATA_UPDATE);
 		Stream stb(REP::COPY_DATA_UPDATE);
 		stp << static_cast<UInt8>(4) << _id << sz;
