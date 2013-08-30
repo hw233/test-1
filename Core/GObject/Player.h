@@ -182,11 +182,12 @@ namespace GObject
 
 #define SPREAD_START_WEEK         6
 #define SPREAD_END_WEEK           7
-#define SPREAD_START_TIME         11*3600
+#define SPREAD_START_TIME         10*3600
 #define SPREAD_END_TIME           22*3600
 #define SPREAD_INTERVA_TIME       150
 #define SPREAD_ALREADY_USE        0x01
 #define SPREAD_ALREADY_GET        0x02
+#define SPREAD_COOL_TIME          1800
 
 #define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     ((X & (1<<Y)) >> Y)
@@ -2304,6 +2305,7 @@ namespace GObject
         UInt8 m_csFlag;
     private:
         UInt32 m_spreadInterval;
+        UInt32 m_spreadCoolTime;
 
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
