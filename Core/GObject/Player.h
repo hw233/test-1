@@ -1540,7 +1540,7 @@ namespace GObject
 		bool CheckFriendPray(UInt64 playerId);
         bool testCanAddFriend(Player *);
         void broadcastFriend(Stream& st);
-        
+        UInt32 getBePrayednum(UInt64 id); 
 		bool testCanAddCFriend(Player *);
         void tellCFriendLvlUp(UInt8);
         void OnCFriendLvlUp(Player*, UInt8);

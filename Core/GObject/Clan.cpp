@@ -3667,6 +3667,7 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
             if(player->CheckFriendPray(pl->getId()))
                 st<<static_cast<UInt8>(1);
             else st<<static_cast<UInt8>(0);
+            st<<player->getBePrayednum(pl->getId());
             ++it;
         }
     }
