@@ -19076,6 +19076,70 @@ void Player::sendGoodVoiceInfo()
     send(st);
 }
 
+void Player::getQzongPYGiftAward(UInt8 type)
+{
+    if (getPlatform() != 1 && getPlatform() != 2)
+        return;
+    if (GetVar(VAR_QZONGPYGIFT) >= 33)
+        return;
+    if (GetFreePackageSize() < 6)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if(type == 1)
+    {
+        if (getGold() < 19)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(EnumQzongPYGift,0,0);
+        useGold(19, &ci);
+        AddVar(VAR_QZONGPYGIFT, 1);
+        static UInt32 itemId[] = {548, 3, 9082, 3, 9371, 1, 8000, 1, 500, 1, 9390, 1};
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
+        {
+            GetPackage()->Add(itemId[i], itemId[i+1], true);
+        }
+    }
+    else if(type == 2)
+    {
+        if (getGold() < 77)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(EnumQzongPYGift,0,0);
+        useGold(77, &ci);
+        AddVar(VAR_QZONGPYGIFT, 1);
+        static UInt32 itemId[] = {1126, 1325, 134, 9141, 551, 517};
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
+        {
+            GetPackage()->Add(itemId[i], 1, true);
+        }
+    }
+    sendQzongPYGiftInfo();
+}
+
+void Player::sendQzongPYGiftInfo()
+{
+    if (getPlatform() != 1 && getPlatform() != 2)
+        return;
+    /*
+    if(!isBD())
+        return;
+    */
+    if(!World::getQzongPYGiftAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(6);
+    UInt8 opt = GetVar(VAR_QZONGPYGIFT);
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
+
 void Player::get3366GiftAward(UInt8 type)
 {
     if (getPlatform() != 11)

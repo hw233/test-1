@@ -86,9 +86,6 @@ void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
         UInt8 mark = false;
         for(; i<3; i++)
         {
-            if(mark)
-                i = 0;
-
             if((k >= 9 || (pos+i) < 0 || (pos+i) >= 49) && (0 != jgyInfo->molding[k]))
                 return;
 
@@ -129,6 +126,9 @@ void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
 
                 k++;
             }
+
+            if(mark)
+                i = 0;
         }
     }
     else if(0 == dbData.pos)
@@ -227,6 +227,9 @@ void MoFang::addJGSExp(UInt32 exp)
     else
         sendExp = m_jiguanshu.curExp;
 
+    SYSMSG_SENDV(4935, m_owner, 9421, exp);
+    SYSMSG_SENDV(4936, m_owner, 9421, exp);
+
     Stream st(REP::MOFANG_INFO);
     st << static_cast<UInt8>(5);
     st << static_cast<UInt32>(sendExp);
@@ -318,8 +321,8 @@ void MoFang::randTuzhi(UInt16 num)
     exp = m_jiguanshu.curExp - exp;
     if(exp > 0)
     {
-        SYSMSG_SENDV(4935, m_owner, exp);
-        SYSMSG_SENDV(4936, m_owner, exp);
+        SYSMSG_SENDV(4935, m_owner, 9418, exp);
+        SYSMSG_SENDV(4936, m_owner, 9418, exp);
     }
 
     UInt32 sendExp = 0;
@@ -911,9 +914,6 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
 
     for(; i<3; i++)
     {
-        if(markC)
-            i = 0;
-
         if((k >= 9 || (pos+i) < 0 || (pos+i) >= 49) && (0 != jgyInfo->molding[k]))
             return false;
 
@@ -954,6 +954,9 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
 
             k++;
         }
+
+        if(markC)
+            i = 0;
     }
 
     return true;

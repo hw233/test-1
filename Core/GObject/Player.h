@@ -242,6 +242,14 @@ namespace GObject
         e_pf_xiaoyu = 8
     };
 
+    enum LOGIN_PLATFORM
+    {
+        e_lpf_qzong = 1,
+        e_lpf_pengyou = 2,
+        e_lpf_qgame = 10,
+        e_lpf_3366 = 11,
+    };
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -2457,6 +2465,9 @@ namespace GObject
         void sendNewYearQzoneContinueAct();
         void calcNewYearQzoneContinueDay(UInt32 time);
         void transferExpBuffer2Var();
+
+        void getQzongPYGiftAward(UInt8 type);
+        void sendQzongPYGiftInfo();
 
         inline bool relateExpHook(UInt8 id) { return id == PLAYER_BUFF_TRAINP1 || id == PLAYER_BUFF_TRAINP2 || id == PLAYER_BUFF_TRAINP3/* || id == PLAYER_BUFF_TRAINP4 || id == PLAYER_BUFF_ADVANCED_HOOK*/; }
 
