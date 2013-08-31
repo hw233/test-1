@@ -512,6 +512,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_CLAN_SPTR_AWARD = 561,       // 每日神魔之树奖励领取标识
         VAR_CLAN_ACTPT_MONTH = 562,      // 每月帮派活跃度
         VAR_CLAN_ACTPT_FLAG = 563,      // 活跃度领取标识
+        VAR_QZONGPYGIFT = 564, //Qzong,PY合作礼包
         //581-600 for qiwy
 
         //581-600 for lb 
@@ -524,6 +525,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_PRAY_COUNT = 586,
         VAR_PRAY_SUCTIME = 587,
         VAR_PRAY_TYPE_TODAY = 588 ,
+        VAR_PRAY_TIME = 589 ,
 
         VAR_MAX,
     };
@@ -1002,6 +1004,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_PRAY_COUNT, CYCLE_WEEK);
             REGISTER_VAR(VAR_PRAY_SUCTIME, CYCLE_NONE);
             REGISTER_VAR(VAR_PRAY_TYPE_TODAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_PRAY_TIME, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

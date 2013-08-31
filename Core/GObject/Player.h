@@ -238,6 +238,14 @@ namespace GObject
         e_pf_xiaoyu = 8
     };
 
+    enum LOGIN_PLATFORM
+    {
+        e_lpf_qzong = 1,
+        e_lpf_pengyou = 2,
+        e_lpf_qgame = 10,
+        e_lpf_3366 = 11,
+    };
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -726,14 +734,16 @@ namespace GObject
 			AutoCB = 0x40000,
 		};
 
-		struct FriendActStruct {
-			Player * player;
+		struct FriendActStruct
+        {
+            Player * player;
 			UInt8 type;
 			union {
 				Player * target;
 				char str[16];
 				UInt64 num;
 			};
+           
 			inline void assignFriendAct(Player * arg)
 			{
 				target = arg;
@@ -748,7 +758,21 @@ namespace GObject
 				num = arg;
 			}
 		};
-
+        struct StuPrayValue
+        {
+            UInt32 time ;
+            UInt32 praynum;
+            StuPrayValue(UInt32 _time,UInt32 _praynum)
+            {
+                time =_time;
+                praynum = _praynum;
+            }
+            StuPrayValue()
+            {
+                time = 0 ;
+                praynum= 0 ;
+            }
+        };
 	public:
 		Player(UInt64);
 		~Player();
@@ -1524,7 +1548,7 @@ namespace GObject
 		bool CheckFriendPray(UInt64 playerId);
         bool testCanAddFriend(Player *);
         void broadcastFriend(Stream& st);
-        
+        UInt32 getBePrayednum(UInt64 id); 
 		bool testCanAddCFriend(Player *);
         void tellCFriendLvlUp(UInt8);
         void OnCFriendLvlUp(Player*, UInt8);
@@ -1538,7 +1562,7 @@ namespace GObject
 
         void prayForOther(Player *other);
         void SendOtherInfoForPray(Player *other,UInt32 op=0);
-        void bePrayed();
+        void bePrayed(UInt64 id);
         
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
         void PutPets (Battle::BattleSimulator&, int side, bool init = true);
@@ -1727,9 +1751,17 @@ namespace GObject
             m_snow.bind = bind;
             m_snow.score = score;
         }
-        void addPrayFriendFromDB(UInt64 PlayerId,UInt32 time)
+        void addPrayFriendFromDB(UInt64 PlayerId,UInt32 time,UInt32 num = 0)
         {
-           _prayFriend[PlayerId]=time; 
+            if(num ==0)
+               _prayFriend[PlayerId]=time; 
+            else 
+            {
+                StuPrayValue v;
+                v.time =time;
+                v.praynum = num;
+                _bePrayed[PlayerId] = v;
+            }
         }
         SnowInfo& getSnowInfo() {return m_snow;};
         void resetSnow();
@@ -1772,6 +1804,7 @@ namespace GObject
 		std::set<Player *> _friends[4];
 		std::vector<FriendActStruct *> _friendActs;
         std::map<UInt64,UInt32 >_prayFriend; 
+        std::map<UInt64,StuPrayValue >_bePrayed; 
 
 		TaskMgr* m_TaskMgr;
 		Trade* m_Trade;
@@ -2425,6 +2458,9 @@ namespace GObject
         void sendNewYearQzoneContinueAct();
         void calcNewYearQzoneContinueDay(UInt32 time);
         void transferExpBuffer2Var();
+
+        void getQzongPYGiftAward(UInt8 type);
+        void sendQzongPYGiftInfo();
 
         inline bool relateExpHook(UInt8 id) { return id == PLAYER_BUFF_TRAINP1 || id == PLAYER_BUFF_TRAINP2 || id == PLAYER_BUFF_TRAINP3/* || id == PLAYER_BUFF_TRAINP4 || id == PLAYER_BUFF_ADVANCED_HOOK*/; }
 
