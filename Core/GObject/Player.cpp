@@ -225,10 +225,12 @@ namespace GObject
 
         UInt32 extraExp = 0;
         // 限时vip特权
-         UInt32 VipType = m_Player->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+        if(m_Player->getBuffData(PLAYER_BUFF_CLANTREE1))
+            factor+=0.2f;
+        UInt32 VipType = m_Player->GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
         if(m_Player-> in7DayFromCreated() && VipType >4 )
             VipType -= 2 ;
-         if(m_Player->inVipPrivilegeTime()  &&( VipType < 5 ))
+        if(m_Player->inVipPrivilegeTime()  &&( VipType < 5 ))
         {
             factor += 1.0f;
             extraExp = static_cast<UInt32>(exp * 1.0f);
@@ -312,13 +314,14 @@ namespace GObject
 		ecs.ng = NULL;//_npcGroup;
         if (cfg.rpServer && m_Player->GetLev() < 70)
             ecs.exp *= 2;
+        if(m_Player->getBuffData(PLAYER_BUFF_CLANTREE1))
+            ecs.exp *= 1.2f;
 		GameMsgHdr hdr(0x274, m_Player->getThreadId(), m_Player, sizeof(ExpGainInstantCompleteStruct));
 		GLOBAL().PushMsg(hdr, &ecs);
 		_finalEnd -= ecs.duration;
 		notify();
         if (m_Player)
             m_Player->SetVar(VAR_LEFTTIMES, newCnt);
-
         _writedb = true;
 		updateDB(false);
 		return newCnt == 0;
@@ -4659,7 +4662,7 @@ namespace GObject
             st<< static_cast<UInt8>(prayValue) ;
         else 
             st<< static_cast<UInt8>(op) ;
-        if(CheckFriendPray(other->getId()))
+        if( op || CheckFriendPray(other->getId()))
             st<<static_cast<UInt8>(1);
         else st<<static_cast<UInt8>(0);
         st<<getBePrayednum(other->getId());
@@ -10389,6 +10392,8 @@ namespace GObject
         if(inVipPrivilegeTime()&&(VipType==0||VipType ==1 ||VipType ==3 ))
             factor += 1.0f;
 
+        if(getBuffData(PLAYER_BUFF_CLANTREE3))
+            factor += 0.1f;
         return factor;
     }
 
@@ -23526,6 +23531,13 @@ UInt32 Player::getBePrayednum(UInt64 id)
     else
         return 0 ;    
 }
+void Player::setClanSpiritTreeBuff(UInt8 id,UInt32 time)
+{
+    if( id < 0 || id > 2 )
+        return ;
+    addBuffData(id+PLAYER_BUFF_CLANTREE1,time);
+}
+
 } // namespace GObject
 
 

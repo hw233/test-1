@@ -310,6 +310,21 @@ void BattleFighter::updateBuffExtras()
         if (ae)
             addAttrExtra(_attrExtra, ae);
     }
+    if(_fighter && _fighter->getOwner() && _fighter->getOwner()->hasClanRankBuffFlag())
+    {
+     if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLANTREE2))
+        {
+            _attrExtra.attack *= 1.1f;
+            _attrExtra.magatk *= 1.1f ;
+            _attrExtra.defend *= 1.1f;
+            _attrExtra.magdef *= 1.1f;
+            _attrExtra.action *= 1.1f;
+            _attrExtra.tough  *= 1.1f;
+            _attrExtra.evade  *= 1.1f;
+            _attrExtra.hitrate  *= 1.1f;
+            _attrExtra.hp  *= 1.1f;
+        }
+    }       
 /*    if(_fighter && _fighter->getOwner() && _fighter->getOwner()->hasHiAfFlag())
     {
         const GObject::AttrExtra* af = _fighter->getOwner()->getHIAf();

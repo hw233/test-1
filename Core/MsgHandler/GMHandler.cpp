@@ -262,6 +262,7 @@ GMHandler::GMHandler()
     Reg(2, "fool", &GMHandler::OnFoolsDayGM);
     Reg(2, "star", &GMHandler::OnLuckyStarGM);
     Reg(2, "acttm", &GMHandler::OnSurnameleg);
+    Reg(2, "openclb", &GMHandler::OnOpenclb);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -4200,7 +4201,16 @@ void GMHandler::OnClanBossOpen(GObject::Player *player, std::vector<std::string>
     GObject::ClanBoss::instance().setCanOpened(true);
     GObject::ClanBoss::instance().start();
 }
-
+void GMHandler::OnOpenclb(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    int index = atoi(args[0].c_str());
+    if(index == 1)
+        player->setClanRankBuffFlag(true);
+    if(index == 2)
+        player->setClanRankBuffFlag(false);
+}
 void GMHandler::OnClanBoss(GObject::Player *player, std::vector<std::string>& args)
 {
 	if(args.size() < 1)
