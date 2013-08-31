@@ -9425,6 +9425,18 @@ function ItemNormal_00009419(iid, num, bind, param)
     return used;
 end
 
+function ItemNormal_jgsexp(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:GetLev() < 70 then
+        return 0
+    end
+    local moFang = player:GetMoFang();
+    local package = player:GetPackage();
+    moFang:addJGSExp(num*100);
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 local ItemNormal_Table = {
     [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -11162,6 +11174,8 @@ local ItemNormal_Table = {
     [9411] = ItemNormal_00009408,
     [9418] = ItemNormal_tuzhi,
     [9419] = ItemNormal_00009419,
+    [9421] = ItemNormal_jgsexp,
+
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,
     [9902] = ItemNormal_NameCard,
