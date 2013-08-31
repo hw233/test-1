@@ -850,6 +850,11 @@ function onActivityCheck(tm)
       else
           set3366GiftAct(false)
       end
+      if tm >= actTime564 and tm < actTime564_1 then
+          setQzongPYGiftAct(true)
+      else
+          setQzongPYGiftAct(false)
+      end
 
       if tm >= actTime537 and tm < actTime537_1 then
           setConsumeActive(true)
@@ -1276,6 +1281,8 @@ function initActTime(y, m, d)
   local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 3366合作礼包
   local  SerStartTm536= { ['year'] = 2013, ['month'] = 8, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- Qzong,pengyou合作礼包
+  local  SerStartTm564= { ['year'] = 2013, ['month'] = 8, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm537= { ['year'] = 2012, ['month'] = 12, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 商城消耗返利
   local  SerStartTm538= { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1734,6 +1741,9 @@ function initActTime(y, m, d)
 
   actTime563 = os.time(SerStartTm563);
   actTime563_1 = os.time(SerStartTm563) + (29+8+8) * 86400;
+
+  actTime564 = os.time(SerStartTm564);
+  actTime564_1 = os.time(SerStartTm564) + 5 * 86400;
   -- 繁体版
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
