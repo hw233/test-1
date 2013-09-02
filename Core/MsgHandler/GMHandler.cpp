@@ -1190,7 +1190,8 @@ void GMHandler::OnSetDL( GObject::Player * player, std::vector<std::string>& arg
 	if(dg == NULL)
 		return;
 	UInt32 level = atoi(args[1].c_str()) - 1;
-	dg->playerJump(player, level);
+    UInt32 difficulty = atoi(args[2].c_str());
+    dg->playerJump(player, difficulty, level);
 }
 
 void makeItemSuper( GObject::Package * package, GObject::ItemEquip * equip, UInt8 type, UInt8 enchant = 8, UInt8 level = 10, bool flushAttr = true )
@@ -1762,12 +1763,16 @@ void GMHandler::OnSetTitle( std::vector<std::string>& args )
 
 void GMHandler::OnAttack( GObject::Player * player, std::vector<std::string>& args )
 {
-	if(args.size() < 1)
+	if(args.size() < 2)
 		return;
 	UInt32 npcId = atoi(args[0].c_str());
 	int npcCount = 1;
-	if(args.size() > 1)
-		npcCount = atoi(args[1].c_str());
+    UInt8 difficulty = 0;
+	if(args.size() > 2)
+    {
+        npcCount = atoi(args[1].c_str());
+        difficulty = atoi(args[2].c_str());
+    }
 	player->regenAll();
 	int win = 0;
 	if(npcId < 4096)
@@ -1780,7 +1785,7 @@ void GMHandler::OnAttack( GObject::Player * player, std::vector<std::string>& ar
 			return;
 		for(int i = 0; i < npcCount; ++ i)
 		{
-			if(dg->doAttack(player, dungeonLevel))
+			if(dg->doAttack(player,difficulty,dungeonLevel))
 				++ win;
 		}
         // TODO:
@@ -3010,7 +3015,7 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
             responderName = args[1];
         player->GetNewRelation()->challengeRequest(player, responderName);
         */
-        player->copyFrontWinAward(1);
+        player->copyFrontWinAward(1, false);
     }
     else if(type == 6)
     {
@@ -3023,7 +3028,7 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
             accept = atoi(args[2].c_str());
         player->GetNewRelation()->challengeRespond(player, senderName, accept);
         */
-        player->copyFrontWinAward(2);
+        player->copyFrontWinAward(2, false);
     }
     else if(type == 7)
     {
@@ -3175,9 +3180,12 @@ void GMHandler::OnClearCFT(GObject::Player* player, std::vector<std::string>& ar
     PLAYER_DATA(player, frontFreeCnt) = 0;
     PLAYER_DATA(player, frontGoldCnt) = 0;
     PLAYER_DATA(player, dungeonCnt) = 0;
+    PLAYER_DATA(player, dungeonCnt1) = 0;
+    
     DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
     DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
 	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = 0 where `id` = %" I64_FMT "u", player->getId());
+	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt1` = 0 where `id` = %" I64_FMT "u", player->getId());
     player->sendDailyInfo();
 }
 

@@ -22,7 +22,7 @@ function dungeonlevel()
         BEGIN {
             print "INSERT INTO `dungeon_level` VALUES";
         } {
-            printf("(%d,%d,%d,\x27%s\x27)",$1,$2,$3,$4);
+            printf("(%d,%d,%d,\x27%s\x27,%d)",$1,$2,$3,$4,$5);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

@@ -113,7 +113,7 @@
 #define QQ_GAME_END_TIME    (21*3600+1800)
 
 #define CARD_ITEM_ID 9415
-
+#define CFD_INDEX_MAX 3
 namespace GObject
 {
     UInt32 Player::_recruit_cost = 20;
@@ -8669,6 +8669,7 @@ namespace GObject
         if(now >= _playerData.dungeonEnd)
         {
             _playerData.dungeonCnt = 0;
+            _playerData.dungeonCnt1 = 0;
         }
         dung = _playerData.dungeonCnt;
         dungMax = GObject::Dungeon::getMaxCount() + GObject::Dungeon::getExtraCount(vipLevel);
@@ -8753,7 +8754,8 @@ namespace GObject
         }
 
         cnt = dungeonManager.size();
-        st << cnt << _playerData.dungeonCnt << GObject::Dungeon::getMaxCount() << GObject::Dungeon::getExtraCount(vipLevel);
+        st << cnt << _playerData.dungeonCnt << GObject::Dungeon::getMaxCount(0) << GObject::Dungeon::getExtraCount(vipLevel,0);
+        st << _playerData.dungeonCnt1 << GObject::Dungeon::getMaxCount(1) << GObject::Dungeon::getExtraCount(vipLevel,1);
         if(cnt)
         {
             Dungeon_Enum de = {this, st};
@@ -9174,12 +9176,12 @@ namespace GObject
 		DB1().PushUpdateData("UPDATE `player` SET `nextExtraReward` = %u WHERE `id` = %" I64_FMT "u", _playerData.nextExtraReward, _id);
 	}
 
-	bool Player::isDungeonPassed( UInt8 id )
+	bool Player::isDungeonPassed( UInt8 id ,UInt8 difficulty)
 	{
 		Dungeon * dg = dungeonManager[id];
 		if(dg == NULL)
 			return false;
-		return dg->getFirstPass(this) > 0;
+		return dg->getFirstPass(this,difficulty) > 0;
 	}
 
 #if 0
@@ -18726,13 +18728,16 @@ void EventTlzAuto::notify(bool isBeginAuto)
         send(st);
     }
 
-void Player::copyFrontWinAward(UInt8 index)
+void Player::copyFrontWinAward(UInt8 index, bool unBind)
 {
     if(!World::getCopyFrontWinSwitch())
         return;
-    UInt32 tmp = (GetVar(VAR_CF_BIND)&0x0F);
-    UInt32 cf_tmp = ((tmp << 4) | tmp);
-    SetVar(VAR_CF_BIND, cf_tmp);
+    UInt32 unBindFlag;
+    if(unBind)
+        unBindFlag = 1;
+    else
+        unBindFlag = 0;
+    SetVar(VAR_CF_UNBIND, unBindFlag);
     SetVar(VAR_CF_FLAG, index);
     resetCopyFrontWinAward();
     sendCopyFrontAllAward();
@@ -18818,14 +18823,11 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
     st << Stream::eos;
     send(st);
 
-    UInt32 cf_bind_flag = GetVar(VAR_CF_BIND);
     bool bind;
-    if(GetVar(VAR_CF_FLAG) == 1 && (cf_bind_flag&0x10))
-        bind = 0;
-    else if(GetVar(VAR_CF_FLAG) == 2 && (cf_bind_flag&0x20))
-        bind = 0;
+    if(GetVar(VAR_CF_UNBIND) == 0)
+        bind = true;
     else
-        bind = 1;
+        bind = false;
     UInt32 itemTmp = cf_itemId[curId];
     if(bind)
     {
@@ -18847,6 +18849,8 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
             order += 5;
         if(GetVar(VAR_CF_FLAG) == 2)
             order += 11;
+        else if(GetVar(VAR_CF_FLAG) == 3)
+            order += 21;
         sprintf(tag, "F_10000_1212_%u", order);
         udpLog("CopyFrontWin", tag, "", "", "", "", "act");
     }
@@ -18857,8 +18861,6 @@ void Player::getCopyFrontCurrentAward(UInt8 index)
 
 void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 indexPut)
 {
-    if(copy_or_front > 1)
-        return;
     if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
         return;
 #if 0
@@ -18895,7 +18897,7 @@ void Player::resetCopyFrontWinAward(bool fresh)
     UInt8 tmp1;
     UInt8 tmp2;
 
-    if(index == 0 || index > 2)
+    if(index == 0 || index > CFD_INDEX_MAX)
         return;
 
     tmp1 = uRand(5);
@@ -18913,7 +18915,7 @@ void Player::resetCopyFrontWinAward(bool fresh)
             step = 1;
         else if(i == tmp2)
         {
-            if(GetVar(VAR_CF_FLAG) == 1)
+            if(GetVar(VAR_CF_FLAG) == 1 || GetVar(VAR_CF_FLAG) == 3)
                 step = 2;
             else
                 step = 0;
@@ -18940,8 +18942,6 @@ void Player::resetCopyFrontWinAward(bool fresh)
 
 void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
 {
-    if(copy_or_front > 1)
-        return;
     if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
         return;
 #if 0
@@ -18973,14 +18973,13 @@ void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
 
 void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
 {
-    if(copy_or_front > 1)
-        return;
     if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
         return;
 #if 0
     if(index !=  PLAYER_DATA(this, location))
         return;
 #endif
+    SetVar(VAR_CF_UNBIND, 0);
     SetVar(VAR_CF_FLAG, 0);
     SetVar(VAR_CF_INDEX, 0);
     SetVar(VAR_CF_LOCATION, 0);
@@ -18996,18 +18995,25 @@ void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
 
 void Player::sendCopyFrontAllAward()
 {
-    if(GetVar(VAR_CF_FLAG) == 0)
+    UInt32 flag = GetVar(VAR_CF_FLAG);
+    if(flag == 0)
         return;
 
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x04);
     st << static_cast<UInt8>(0x01);
-    st << static_cast<UInt8>(GetVar(VAR_CF_FLAG) - 1);
+    st << static_cast<UInt8>(flag - 1);
 
-    if(GetVar(VAR_CF_FLAG) == 1)
+    if(flag == 1)
     {
         if(GetVar(VAR_CF_INDEX) == 0)
             SetVar(VAR_CF_INDEX, getCopyId());
+        st << static_cast<UInt8>(GetVar(VAR_CF_INDEX));
+    }
+    else if(flag == 3)
+    {
+        if(GetVar(VAR_CF_INDEX) == 0)
+            SetVar(VAR_CF_INDEX, getDungeonId());
         st << static_cast<UInt8>(GetVar(VAR_CF_INDEX));
     }
     else
@@ -19077,6 +19083,18 @@ UInt8 Player::getCopyId()
 UInt8 Player::getFrontmapId()
 {
     static UInt16 spots[] = {1284, 2053, 4360, 4611, 5893, 5637, 8195, 6153, 9222, 9481, 10244, 5129};
+    UInt16 currentSpot = PLAYER_DATA(this, location);
+    for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
+    {
+        if(spots[i] == currentSpot)
+            return (i+1);
+    }
+    return 0;
+}
+
+UInt8 Player::getDungeonId()
+{
+    static UInt16 spots[] = {772, 2050, 5123, 8194, 10001};
     UInt16 currentSpot = PLAYER_DATA(this, location);
     for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
     {

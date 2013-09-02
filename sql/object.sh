@@ -192,9 +192,11 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < player_jiguanyu.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_pray_relation.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_correct_pray_relation.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_2013_08_29_1.sql  #清除QQ秀合作记录
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_2013_08_29_1.sql  #清除QQ秀合作记录
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar289.sql        #清除副本阵图额外掉落绑定情况
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_2013_08_30_1.sql
     #. clearshiyamen.sh
 }
 

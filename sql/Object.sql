@@ -519,6 +519,7 @@ DROP TABLE IF EXISTS `dungeon_player`;
 CREATE TABLE `dungeon_player` (
   `id` int(10) unsigned NOT NULL,
   `playerId` bigint(20) unsigned NOT NULL,
+  `difficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `count` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `totalCount` int(10) unsigned NOT NULL DEFAULT '0',
@@ -526,7 +527,7 @@ CREATE TABLE `dungeon_player` (
   `counterEnd` int(10) unsigned NOT NULL DEFAULT '0',
   `justice` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `justice_roar` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  UNIQUE KEY `id_playerId` (`id`,`playerId`),
+  UNIQUE KEY `id_difficulty` (`id`,`playerId`,`difficulty`),
   KEY `id` (`id`),
   KEY `playerId` (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -922,6 +923,7 @@ CREATE TABLE `player` (
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `openid` varchar(1024) NOT NULL DEFAULT '',
   `canHirePet` varchar(255) NOT NULL DEFAULT '',
+  `dungeonCnt1` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
   KEY `mainFighter` (`mainFighter`)

@@ -178,7 +178,8 @@ CREATE TABLE `dungeon_level` (
   `level` int(10) unsigned NOT NULL,
   `monsterSet` int(10) unsigned NOT NULL,
   `lootSet` varchar(4095) NOT NULL,
-  UNIQUE KEY `id_level` (`id`,`level`),
+  `difficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  UNIQUE KEY `id_difficulty` (`id`,`level`,`difficulty`),
   KEY `id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
