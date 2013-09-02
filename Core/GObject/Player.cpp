@@ -22137,7 +22137,7 @@ void Player::buyResurrectionCard()
     cnt = cnt > 6 ? 6 : cnt;
     if(cnt > 1)
     {
-        if((cnt - 1) * 10 > getGold())
+        if((static_cast<UInt32>(cnt) - 1) * 10 > getGold())
         {
             sendMsgCode(0, 1104);
             return;
@@ -22698,7 +22698,7 @@ void Player::spreadToOther(UInt8 type, std::string name)
             sendMsgCode(0, 2215);
             return;
         }
-        if(m_spreadCoolTime > now)
+        if(pl->m_spreadCoolTime > now)
         {
             sendMsgCode(0, 2231);
             return;
@@ -22714,7 +22714,7 @@ void Player::spreadToOther(UInt8 type, std::string name)
         if(World::spreadKeeper)
         {
             sendMsgCode(0, 3501);
-            m_spreadCoolTime = now + SPREAD_COOL_TIME;
+            World::spreadKeeper->m_spreadCoolTime = now + SPREAD_COOL_TIME;
         }
     }
 
@@ -22745,16 +22745,16 @@ void Player::spreadToSelf()
         return;
     }
 	UInt32 now = TimeUtil::Now();
+    if(m_spreadCoolTime > now)
+    {
+        sendMsgCode(0, 2232);
+        return;
+    }
     if(now < World::spreadBuff)
     {
         if(now < m_spreadInterval)
         {
             sendMsgCode(0, 2216);
-            return;
-        }
-        if(m_spreadCoolTime > now)
-        {
-            sendMsgCode(0, 2232);
             return;
         }
         Player *pl = World::getSpreadKeeper();
