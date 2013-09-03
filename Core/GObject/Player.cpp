@@ -4688,7 +4688,10 @@ namespace GObject
             num = 1;
         }
         else
+        {
+            it->second.time = now;
             num =++(it->second.praynum);    //map  待定 
+        }
         sendPrayInfo();
 		DB1().PushUpdateData("REPLACE INTO `pray_relation` (`id`, `friendId`, `pray`, `time`,`praynum`) VALUES( %" I64_FMT "u, %" I64_FMT "u,1,%u,%u)", id , getId(),now,num);
     }
