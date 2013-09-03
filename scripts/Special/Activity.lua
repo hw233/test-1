@@ -8938,7 +8938,7 @@ local answers = {
              },
     },
     ["0920"] = {
-        [0] = {  1, 3, 4, 2, 1, 2, 1, 1, 1, 2,    --70级以上题库
+        [0] = {  1, 3, 4, 4, 2, 2, 1, 1, 1, 2,    --70级以上题库
                  2, 2, 2, 4, 4, 3, 3, 4, 3, 4,
                  2, 1, 4, 1, 2, 3, 2, 4, 1, 3,
               },
@@ -8953,7 +8953,7 @@ local answers = {
                  1, 1, 2, 1, 1, 3, 1, 3, 3, 2,
               },
         [1] = {  1, 4, 3, 4, 1, 1, 1, 2, 3, 3,    --70级以下题库
-                 2, 4, 3, 3, 3, 1, 4, 1, 3, 1,
+                 2, 4, 1, 1, 1, 1, 4, 1, 3, 1,
                  1, 1, 2, 1, 1, 3, 1, 3, 3, 2,
              },
     },
@@ -9220,8 +9220,7 @@ local serverNoSpreadCount = {
     [9990] = 2900,
 }
 function GetSpreadCountForAward(serverNo)
-    return 5
-    --return 200
+    return 200
     --[[local spreadCount = 5000
     if serverNo ~= 9990 and serverNo ~= 501 and serverNo > 358 then
         serverNo = 358
