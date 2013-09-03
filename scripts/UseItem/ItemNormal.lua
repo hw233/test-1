@@ -9453,6 +9453,16 @@ function ItemNormal_00009420(iid, num, bind, param)
     return n
 end
 
+function ItemNormal_00009423(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    local n = player:addClanProfferFromItem(num, 100)
+    if n > 0 then
+        package:DelItemSendMsg(iid, player);
+    end
+    return n
+end
+
 function ItemNormal_jgsexp(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 70 then
@@ -11203,6 +11213,7 @@ local ItemNormal_Table = {
     [9418] = ItemNormal_tuzhi,
     [9419] = ItemNormal_00009419,
     [9420] = ItemNormal_00009420,
+    [9423] = ItemNormal_00009423,
     [9421] = ItemNormal_jgsexp,
 
     [9900] = ItemNormal_NameCard,

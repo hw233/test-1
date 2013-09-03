@@ -1222,6 +1222,7 @@ namespace GObject
 
         UInt32 useClanProffer(UInt32 c, ConsumeInfo *ci = NULL);
         UInt32 getClanProffer(UInt32 c = 0, IncommingInfo *ii = NULL);
+	    UInt16 addClanProfferFromItem(UInt16 num, UInt16 unit);
 
 		UInt32 getCoin(UInt32 c = 0);
 		UInt32 useCoin(UInt32 c, ConsumeInfo * ci=NULL, bool notify = true);

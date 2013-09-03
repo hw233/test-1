@@ -5384,6 +5384,18 @@ namespace GObject
         return proffer;
     }
 
+	UInt16 Player::addClanProfferFromItem(UInt16 num, UInt16 unit)
+	{
+        IncommingInfo ii(ProfferFromUseItem, 0, 0);
+        UInt32 proffer = getClanProffer(num * unit, &ii);
+        UInt16 iRet;
+        if(proffer > 0)
+            iRet = num;
+        else
+            iRet = 0;
+		return iRet;
+	}
+
     UInt32 Player::getCoin( UInt32 c )
 	{
         return 0; // XXX: no useful

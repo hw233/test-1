@@ -149,6 +149,7 @@ enum IncomingType
     InFromTopUp                 = 142, //topup
     InFromMoney2All             = 143, //money2all
     InFromSuper                 = 144, //super
+    ProfferFromUseItem         = 145, //使用物品帮贡
 };
 
 enum MoneyType

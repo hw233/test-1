@@ -320,6 +320,7 @@ namespace Script
         CLASS_DEF(Player, AddHYYJCount);
         CLASS_DEF(Player, in7DayFromCreated);
         CLASS_DEF(Player, GetMoFang);
+        CLASS_DEF(Player, addClanProfferFromItem);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);
@@ -1760,6 +1761,12 @@ namespace Script
     {
 		assert(player != NULL);
 		return Call<bool>("onCollectCardAct", player, idx);
+    }
+
+    UInt16 GameActionLua::addClanProfferFromItem(Player* player, UInt16 num, UInt16 unit)
+    {
+		assert(player != NULL);
+		return Call<UInt16>("addClanProfferFromItem", player, num, unit);
     }
 
 }
