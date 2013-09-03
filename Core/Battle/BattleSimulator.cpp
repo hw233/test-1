@@ -10816,6 +10816,19 @@ float BattleSimulator::getSkillEffectExtraHideAura(BattleFighter* bf, BattleFigh
 
 void BattleSimulator::doShieldHPAttack(BattleFighter* bo, UInt32& dmg)
 {
+    UInt8& colorStockTimes = bo->getColorStockTimes();
+    if(colorStockTimes > 0)
+    {
+        dmg = 0;
+        --colorStockTimes;
+        return;
+    }
+    if(bo->isSoulOut())
+    {
+        dmg = 0;
+        return;
+    }
+
     if(bo->makeShieldDamage(dmg))
     {
         appendDefStatus(e_damHPShield, 0, bo);
@@ -13137,12 +13150,16 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
                 dmg = dmg > 0 ? dmg : 1;
 
                 UInt32 curDmg = dmg;
-                makeDamage(target, curDmg);
-                appendDefStatus(e_damNormal, dmg, target, isPhysic ? e_damagePhysic : e_damageMagic);
-                if(target->getHP() == 0)
-                    onDead(false, target);
-                else if(_winner == 0)
-                    onDamage(target, true, NULL);
+                doShieldHPAttack(target, curDmg);
+                if(curDmg > 0)
+                {
+                    makeDamage(target, curDmg);
+                    appendDefStatus(e_damNormal, dmg, target, isPhysic ? e_damagePhysic : e_damageMagic);
+                    if(target->getHP() == 0)
+                        onDead(false, target);
+                    else if(_winner == 0)
+                        onDamage(target, true, NULL);
+                }
             }
             else if(!defend100 && !enterEvade)
                 appendDefStatus(e_damEvade, 0, target);
