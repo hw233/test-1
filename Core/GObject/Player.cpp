@@ -761,6 +761,7 @@ namespace GObject
 		m_moFang = new MoFang(this);
         m_csFlag = 0;
         m_spreadInterval = 0;
+        m_spreadCoolTime = 0;
         _mditem = 0;
         _qixiBinding = false;
 
@@ -21978,7 +21979,7 @@ bool Player::in7DayFromCreated()
     return true;
 }
 
-#define QUESTIONID_MAX 20
+#define QUESTIONID_MAX 30
 /*#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))*/
@@ -22112,17 +22113,17 @@ void Player::getAwardInFoolsDay()
         if(info & (1<<i))
             ++ right;
     }
-    if(right < 4)
+    if(right < 5)
         return;
-    if (GetPackage()->GetRestPackageSize() < right / 4)
+    if (GetPackage()->GetRestPackageSize() < right / 5)
     {
         sendMsgCode(2, 1011, 0);
         return;
     }
-    GameAction()->getAwardInFoolsDay(this, right / 4);
-    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/4 * 4));
+    GameAction()->getAwardInFoolsDay(this, right / 5);
+    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/5 * 5));
     sendFoolsDayInfo();
-    foolsDayUdpLog(right / 4);
+    foolsDayUdpLog(right / 5);
 }
 
 void Player::buyResurrectionCard()
@@ -22136,14 +22137,17 @@ void Player::buyResurrectionCard()
     if(qid == 0)
         return;
     UInt8 cnt = GET_BIT_8(value, 2) + 1;
-    cnt = cnt > 5 ? 5 : cnt;
-    if(cnt * 10 > getGold())
+    cnt = cnt > 6 ? 6 : cnt;
+    if(cnt > 1)
     {
-        sendMsgCode(0, 1104);
-        return;
+        if((static_cast<UInt32>(cnt) - 1) * 10 > getGold())
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(FoolsDayAnswerAct, 0, 0);
+        useGold((cnt - 1)*10, &ci);
     }
-    ConsumeInfo ci(FoolsDayAnswerAct, 0, 0);
-    useGold(cnt*10, &ci);
 
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
     //info = SET_BIT(info, GET_BIT_8(value, 0));
@@ -22697,16 +22701,24 @@ void Player::spreadToOther(UInt8 type, std::string name)
             sendMsgCode(0, 2215);
             return;
         }
+        if(pl->m_spreadCoolTime > now)
+        {
+            sendMsgCode(0, 2231);
+            return;
+        }
         SetVar(VAR_SPREAD_FLAG, tmp | SPREAD_ALREADY_USE);
         GVAR.AddVar(GVAR_SPREAD_CONDITION, 1 << 8);
-        UInt32 pexp = 50000;
+        UInt32 pexp = 10000;
         GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
         GLOBAL().PushMsg(hdr2, &pexp);
     }
     else
     {
         if(World::spreadKeeper)
+        {
             sendMsgCode(0, 3501);
+            World::spreadKeeper->m_spreadCoolTime = now + SPREAD_COOL_TIME;
+        }
     }
 
     World::spreadKeeper = pl;
@@ -22736,6 +22748,11 @@ void Player::spreadToSelf()
         return;
     }
 	UInt32 now = TimeUtil::Now();
+    if(m_spreadCoolTime > now)
+    {
+        sendMsgCode(0, 2232);
+        return;
+    }
     if(now < World::spreadBuff)
     {
         if(now < m_spreadInterval)
@@ -22766,6 +22783,11 @@ void Player::spreadGetAward()
     //    return;
     if(tmp & SPREAD_ALREADY_GET)
         return;
+    if(GetLev() < 45)
+    {
+        sendMsgCode(0, 1010);
+        return;
+    }
     UInt32 spreadCount = World::getSpreadCount();
     GameMsgHdr h(0x349, getThreadId(), this, sizeof(spreadCount));
     GLOBAL().PushMsg(h, &spreadCount);
