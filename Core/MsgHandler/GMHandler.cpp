@@ -363,8 +363,12 @@ bool GMHandler::Handle( const std::string& txt, GObject::Player * player, bool i
 
 void GMHandler::OnAddtz(GObject::Player * player, std::vector<std::string>& args)
 {
+    if(player->GetLev() < 70)
+        return;
+
 	if(args.empty())
 		return;
+
 	if(args.size() == 1)
 	{
 		UInt32 tuzhiId = atoi(args[0].c_str());
@@ -378,8 +382,12 @@ void GMHandler::OnAddtz(GObject::Player * player, std::vector<std::string>& args
 
 void GMHandler::OnAddJGSExp(GObject::Player * player, std::vector<std::string>& args)
 {
+    if(player->GetLev() < 70)
+        return;
+
 	if(args.empty())
 		return;
+
 	if(args.size() == 1)
 	{
 		UInt32 exp = atoi(args[0].c_str());
@@ -4389,7 +4397,10 @@ void GMHandler::OnCompletedManyTask(GObject::Player* player, std::vector<std::st
 
 void GMHandler::OnSetMax(GObject::Player* player, std::vector<std::string>& args)
 {
-    GVAR.SetVar(GObject::GVAR_NewUser_Max , 2);
+    if(args.size() < 1)
+        return;
+    int max = atoi(args[0].c_str());
+    GVAR.SetVar(GObject::GVAR_NewUser_Max , max);
     UInt32 tmp;
     tmp = GVAR.GetVar(GObject::GVAR_NewUser_Max);
 }
@@ -4397,8 +4408,10 @@ void GMHandler::OnSetMax(GObject::Player* player, std::vector<std::string>& args
 void GMHandler::OnGetMax(GObject::Player* player, std::vector<std::string>& args)
 {
     UInt32 tmp;
+    UInt32 tmp1;
     tmp = GVAR.GetVar(GObject::GVAR_NewUser_Max);
-    tmp++;
+    tmp1 = GVAR.GetVar(GObject::GVAR_NewUser_Cur); 
+    tmp ++;
 }
 
 

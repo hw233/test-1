@@ -673,6 +673,9 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
     if(!m_owner)
         return;
 
+    if((EQUIP_JG == mark) && m_owner->GetLev() < 70)
+        return;
+
     if(EQUIP_JG == mark || DISMANT_JG == mark)
     {
         std::vector<UInt8> values;

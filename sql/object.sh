@@ -3,7 +3,7 @@ source conf.sh
 function update_object()
 {
     echo "update_object"
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/ClearQQTenpayAward.sql  # XXX: 清除QQ财付通奖励
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/ClearQQTenpayAward.sql  # XXX: 清除QQ财付通奖励
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/cleargm.sql  # XXX: 清除所有GM权限，请一直保留
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/sysupdlg.sql # XXX: 更新公告弹窗，请一直保留
     #mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110918_1.sql
@@ -186,13 +186,18 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_pray_relation.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_jiguan.sql #机关兽创建player_jiguanshu、player_jiguanyu和player_tuzhi
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_friendkey.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_friendkey.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_collect_card.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clean_mofang.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguan.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
+    mysql -h$H -u$U -p$P -P$PT $DBO < player_tuzhi.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < player_jiguanshu.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < player_jiguanyu.sql
     #. clearshiyamen.sh
 }
 
+sh player_jiguan.sh
 update_object
 #selectAction $DBO
 #if [ $? -eq 1 ]; then
