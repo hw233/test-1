@@ -1003,16 +1003,20 @@ void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )
         CURRENT_COUNTRY().PlayerLeave(player);
         player->setCountry(country);
         
-        if(0 == country && g_eMeiCount < g_kunLunCount)
+        if(0 == country)
         {
             g_eMeiCount++;
-            player->changeZYAward(country);
+
+            if(g_eMeiCount < g_kunLunCount)
+                player->changeZYAward(country);
         }
         
-        if(1 == country && g_eMeiCount >= g_kunLunCount)
+        if(1 == country)
         {
             g_kunLunCount++;
-            player->changeZYAward(country);
+
+            if(g_eMeiCount >= g_kunLunCount)
+                player->changeZYAward(country);
         }
 
         Stream st(REP::CAMP_SELECT);

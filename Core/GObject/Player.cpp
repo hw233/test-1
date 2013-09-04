@@ -10242,6 +10242,11 @@ namespace GObject
     }
     void Player::setCountry(UInt8 cny)
     {
+        if(0 == cny)
+            udpLog("zhenying", "F_130822_1", "", "", "", "", "act");
+        else if(1 == cny)
+            udpLog("zhenying", "F_130822_2", "", "", "", "", "act");
+
         _playerData.country = cny;
 		DB1().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %" I64_FMT "u", cny, getId());
 
