@@ -4325,6 +4325,7 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
         break;
     case 10:
         player->SendOtherInfoForPray(pl);
+        break;
     case 11:
         player->prayForOther(pl);
         break;
@@ -5451,7 +5452,10 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
                     pl->selectPray(index);
                     break;
                 case 2:
+                    if(pl->GetVar(VAR_PRAY_TYPE_TODAY))
+                        break;
                     pl->prayForOther(pl);
+                    pl->SetVar(VAR_PRAY_TYPE_TODAY,1);
                     break;
                 case 3:
                     pl->getPrayAward();

@@ -77,6 +77,7 @@ GMHandler::GMHandler()
 	Reg(3, "addexp", &GMHandler::OnAddExp);
 	Reg(2, "exp", &GMHandler::OnAddExp);
 	Reg(2, "addOT", &GMHandler::OnAddOnlineTime);
+	Reg(3, "addvar", &GMHandler::OnAddVar);
 	Reg(2, "pexp", &GMHandler::OnAddPExp);
 	Reg(3, "addpexp", &GMHandler::OnAddPExp);
 	Reg(3, "additem", &GMHandler::OnAddItem);
@@ -581,6 +582,18 @@ void GMHandler::OnAddOnlineTime( GObject::Player * player, std::vector<std::stri
 		if(time == 0)
 			return;
 		player->AddVarNow(VAR_TODAY_ONLINE,time,TimeUtil::Now());
+	}
+}
+void GMHandler::OnAddVar( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+    if(args.size() == 2)
+	{
+		UInt32 var = atoi(args[0].c_str());
+		UInt32 value = atoi(args[1].c_str());
+        UInt32 num = player->GetVar(var);
+		player->SetVar(var,num+value);
 	}
 }
 
@@ -4397,8 +4410,8 @@ void GMHandler::OnCompletedManyTask(GObject::Player* player, std::vector<std::st
 
 void GMHandler::OnSetMax(GObject::Player* player, std::vector<std::string>& args)
 {
-    if(args.size() < 1)
-        return;
+     if(args.size() < 1)
+         return;
     int max = atoi(args[0].c_str());
     GVAR.SetVar(GObject::GVAR_NewUser_Max , max);
     UInt32 tmp;

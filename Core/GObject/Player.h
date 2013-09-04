@@ -1521,7 +1521,10 @@ namespace GObject
         inline bool isCFriendFull() { return _friends[3].size() >= MAX_CFRIENDS; }
         inline UInt32 getFrendsNum() const { return _friends[0].size(); }
         inline UInt32 getCFrendsNum() const { return _friends[3].size(); }
-		bool testCanAddFriend(Player *);
+		bool CheckFriendPray(UInt64 playerId);
+        bool testCanAddFriend(Player *);
+        void broadcastFriend(Stream& st);
+        
 		bool testCanAddCFriend(Player *);
         void tellCFriendLvlUp(UInt8);
         void OnCFriendLvlUp(Player*, UInt8);
@@ -1534,7 +1537,7 @@ namespace GObject
         void beVoted();
 
         void prayForOther(Player *other);
-        void SendOtherInfoForPray(Player *other);
+        void SendOtherInfoForPray(Player *other,UInt32 op=0);
         void bePrayed();
         
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);

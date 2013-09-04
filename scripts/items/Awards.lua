@@ -422,6 +422,7 @@ function RunLuckyMeetInstantLoginAward(player, cts)
         end
     end
     return true
+end
 function RunPrayAward(player, cts)
     local item = {
         [4] = {{503, 1}},
@@ -438,7 +439,7 @@ function RunPrayAward(player, cts)
     end
 
     num = #item[cts]
-    if package:GetRestPackageSize() < (num-1)  then
+    if package:GetRestPackageSize() < (num)  then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
