@@ -6410,6 +6410,40 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
             player->GetMoFang()->quickMakejiguan(tuzhiId, opt);               
         }
         break;
+    case 8:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt8 keyinId = 0;
+
+            br >> keyinId;
+            player->GetMoFang()->upgradeKY(keyinId, opt);               
+        }
+        break;
+    case 9:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt8 keyinId = 0;
+
+            br >> keyinId;
+            player->GetMoFang()->quickUpgradeKY(keyinId, opt);               
+        }
+        break;
+    case 10:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+
+            player->GetMoFang()->changeMoney(opt);               
+        }
+        break;
 
     }
 }

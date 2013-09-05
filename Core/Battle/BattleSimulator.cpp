@@ -11574,6 +11574,11 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
     {
         u = 0;
         bf->minusEvadeCnt(3);
+        UInt8 evadeCnt = bf->getEvadeCnt();
+        if(evadeCnt == 0)
+            appendDefStatus(e_unBiLanTianYi, evadeCnt, bf);
+        else
+            appendDefStatus(e_biLanTianYi, evadeCnt, bf);
         const std::vector<UInt16>& eft = skill->effect->eft;
         const std::vector<UInt8>& efl = skill->effect->efl;
         const std::vector<float>& efv = skill->effect->efv;
@@ -13223,7 +13228,7 @@ void BattleSimulator::addSelfSideEvadeCnt(BattleFighter* bf)
         if(!skill)
             continue;
         bo->addEvadeCnt(1);
-        appendDefStatus(e_skill, skill->getId(), bo);
+        appendDefStatus(e_biLanTianYi, bo->getEvadeCnt(), bo);
     }
 }
 

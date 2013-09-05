@@ -327,6 +327,7 @@ namespace GObject
         static bool loadJiguanshu();
         static bool loadJiguanyu();
         static bool loadTuzhi();
+        static bool loadKeyin();
         static bool LoadLuckyLog();
         static bool loadRealItemAward();
         static bool loadNewRelation();
