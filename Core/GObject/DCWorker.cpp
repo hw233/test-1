@@ -11,7 +11,7 @@ extern "C" {
 
 namespace GObject
 {
-#undef  _DEBUG
+//#undef  _DEBUG
 #ifndef _DEBUG
     static int recvret(char* data, size_t size, size_t nmemb, char* buf)
     {
@@ -243,7 +243,7 @@ namespace GObject
         
         if (!openId)
             return;
-
+        return ;
         char *p = new(std::nothrow) char[len+1];
         if (p == NULL)
             return;
@@ -360,12 +360,12 @@ namespace GObject
     }
     UInt8 DCWorker::CheckYBLevel(UInt64 playerId ,char *messag )
     {
-        GObject::Player * pl = GObject::globalPlayers[playerId];
         Int32 ret = 0;
+#ifndef _DEBUG
+        GObject::Player * pl = GObject::globalPlayers[playerId];
         const static char host[] = "s66.app27036.qqopenapp.com?";
         char res[MAX_RET_LEN] = "";
         char message[MAX_RET_LEN] = "";
-#ifndef _DEBUG
            sprintf (message, "a=get_info&openkey=%s&openid=%s&pf=%s", pl->getOpenKey(),pl->getOpenId(),pl->getSource().c_str());
             snprintf (res, MAX_RET_LEN, "%s%s", host, message);
             // curl调用上报
