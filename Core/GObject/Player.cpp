@@ -16189,6 +16189,11 @@ namespace GObject
             }
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
+
+        if (itemId == 10197 || itemId == 10198 || itemId == 10199)
+        {
+            udpLog("huodong", Itoa(itemId).c_str(), "", "", "", "", "act");
+        }
     }
 
     int Player::IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind)
