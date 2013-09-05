@@ -954,7 +954,7 @@ public:
     const void setXiangMoChanZhangSkill(GData::SkillBase* skill){ _xiangMoChanZhangSkill = skill; }
 
     const GData::SkillBase* _biLanTianYiSkill;
-    const GData::SkillBase* getBiLanTianYiSkill(){ printf("_biLanTianYiSkill = %p\n", _biLanTianYiSkill); return _biLanTianYiSkill; }
+    const GData::SkillBase* getBiLanTianYiSkill(){ return _biLanTianYiSkill; }
     const void setBiLanTianYiSkill(GData::SkillBase* skill){ _biLanTianYiSkill = skill; }
 
     inline float& getPetShieldHP() { return _petShieldHP; }
@@ -1148,8 +1148,8 @@ private:
     inline BattleFighter* getBuddhaLightLauncher() { return launcher; }
 
     UInt8 _evadeCnt;
-    UInt8 getEvadeCnt() { printf("_evadeCnt: %u\n", _evadeCnt); return _evadeCnt; }
-    void addEvadeCnt(UInt8 cnt) { if(_evadeCnt + cnt <= 5) _evadeCnt += cnt; else _evadeCnt = 5; printf("_evadeCnt: %u\n", _evadeCnt); }
+    UInt8 getEvadeCnt() { return _evadeCnt; }
+    void addEvadeCnt(UInt8 cnt) { if(_evadeCnt + cnt <= 5) _evadeCnt += cnt; else _evadeCnt = 5; }
     void minusEvadeCnt(UInt8 cnt) { if(_evadeCnt >= cnt) _evadeCnt -= cnt; else _evadeCnt = 0; }
 
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;

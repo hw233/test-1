@@ -11584,7 +11584,6 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
             {
                 if(eft[i] == GData::e_eft_bi_lan_tian_yi)
                 {
-                    printf("value: %f, last:%d\n", skill->effect->efv[i], skill->effect->efl[i]);
                     float hp = bf->getMaxHP() * (skill->effect->efv[i]);
                     if (hp < 1.0f)
                         break;
@@ -13215,11 +13214,6 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
 
 void BattleSimulator::addSelfSideEvadeCnt(BattleFighter* bf)
 {
-    //const GData::SkillBase* skill = bf->getBiLanTianYiSkill();
-    //printf("skill = %p\n", skill);
-    //if(!skill || !skill->effect)
-    //    return;
-    //appendDefStatus(e_skill, /*skill->getId()*/221, bf);
     for(UInt8 i = 0; i < 25; i++)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(bf->getSide(), i));
@@ -13229,8 +13223,7 @@ void BattleSimulator::addSelfSideEvadeCnt(BattleFighter* bf)
         if(!skill)
             continue;
         bo->addEvadeCnt(1);
-        appendDefStatus(e_skill, /*skill->getId()*/221, bo);
-        printf("skill = %p\n", skill);
+        appendDefStatus(e_skill, skill->getId(), bo);
     }
 }
 
