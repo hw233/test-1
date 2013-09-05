@@ -17682,12 +17682,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {1651, 1654},
             {1652, 1655},
             {1541, 1541},
-            {1542, 1542}
+            {1542, 1542},
+            {1544, 1544}
         };
 
         if ((innateTrumpid >= 1529 && innateTrumpid <= 1534) ||
             (innateTrumpid >= 1650 && innateTrumpid <= 1655)
-         || (innateTrumpid >= 1541 && innateTrumpid <= 1542))
+         || (innateTrumpid >= 1541 && innateTrumpid <= 1542)
+         || (innateTrumpid >= 1544 && innateTrumpid <= 1544)
+         )
         {
             size_t i = 0;
             for (; i < sizeof(muttrumps)/(sizeof(UInt32)*2); ++i)

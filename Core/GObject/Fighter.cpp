@@ -2431,10 +2431,13 @@ Fighter * Fighter::cloneWithOutDirty(Player * player)
         if(!trump)
             continue;
         const GData::AttrExtra* attr = trump->getAttrExtra();
-        if(attr->skills.size() > 0)
+        if(attr)
         {
-            if(attr->skills[0])
-                fgt->_trumpSkill[i] = attr->skills[0]->getId();
+            if(attr->skills.size() > 0)
+            {
+                if(attr->skills[0])
+                    fgt->_trumpSkill[i] = attr->skills[0]->getId();
+            }
         }
     }
     memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
@@ -3858,6 +3861,7 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
                         s->cond == GData::SKILL_BLEED_TYPE_DMG ||
                         s->cond == GData::SKILL_XMCZ ||
+                        s->cond == GData::SKILL_BLTY ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
@@ -3909,6 +3913,7 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
                         s->cond == GData::SKILL_BLEED_TYPE_DMG ||
                         s->cond == GData::SKILL_XMCZ ||
+                        s->cond == GData::SKILL_BLTY ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||

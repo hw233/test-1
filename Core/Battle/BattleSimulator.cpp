@@ -10944,6 +10944,9 @@ void BattleSimulator::appendDefStatus(StateType type, UInt32 value, BattleFighte
             return;
     }
 
+    if(type == e_damEvade)
+        addSelfSideEvadeCnt(bf);
+
     DefStatus defList;
     defList.damType = type;
     defList.damageType = damageType;
@@ -11565,6 +11568,35 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
 {
     if(!bf)
         return;
+
+    const GData::SkillBase* skill = bf->getBiLanTianYiSkill();
+    if(skill && skill->effect && bf->getEvadeCnt() > 2)
+    {
+        u = 0;
+        bf->minusEvadeCnt(3);
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        const std::vector<float>& efv = skill->effect->efv;
+        size_t cnt = eft.size();
+        if(cnt == efl.size() && cnt == efv.size())
+        {
+            for(size_t i = 0; i < cnt; ++ i)
+            {
+                if(eft[i] == GData::e_eft_bi_lan_tian_yi)
+                {
+                    printf("value: %f, last:%d\n", skill->effect->efv[i], skill->effect->efl[i]);
+                    float hp = bf->getMaxHP() * (skill->effect->efv[i]);
+                    if (hp < 1.0f)
+                        break;
+                    bf->addHpShieldSelf(hp, skill->effect->efl[i]);
+                    appendDefStatus(e_hpShieldSelf, hp, bf);
+                    break;
+                }
+            }
+        }
+        return;
+    }
+
     float& shieldHp = bf->getHpShieldSelf();
     if(shieldHp > 0.001f)
     {
@@ -13178,6 +13210,27 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
             }
         }
         return;
+    }
+}
+
+void BattleSimulator::addSelfSideEvadeCnt(BattleFighter* bf)
+{
+    //const GData::SkillBase* skill = bf->getBiLanTianYiSkill();
+    //printf("skill = %p\n", skill);
+    //if(!skill || !skill->effect)
+    //    return;
+    //appendDefStatus(e_skill, /*skill->getId()*/221, bf);
+    for(UInt8 i = 0; i < 25; i++)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(bf->getSide(), i));
+        if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+            continue;
+        const GData::SkillBase* skill = bo->getBiLanTianYiSkill();
+        if(!skill)
+            continue;
+        bo->addEvadeCnt(1);
+        appendDefStatus(e_skill, /*skill->getId()*/221, bo);
+        printf("skill = %p\n", skill);
     }
 }
 
