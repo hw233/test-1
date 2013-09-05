@@ -325,6 +325,7 @@ namespace Script
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);
         CLASS_DEF(MoFang, addJGSExp);
+        CLASS_DEF(MoFang, addMoney);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

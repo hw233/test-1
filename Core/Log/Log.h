@@ -261,6 +261,7 @@ enum ItemFrom
     FromRetrieveItem = 60, //回购物品
     FromClanSptr = 61, // 神魔之树
     FromCollectCard = 62, //卡片转化池
+    Fromkeyin = 63, //壁凰墨转化磐龙墨
     //80 ~ 100，繁体占用
 };
 
@@ -301,6 +302,8 @@ enum ItemTo
     ToExchangXCValue = 160, //阵旗转换星辰值
     ToDelRetrieveItem = 161, //删除回购物品
     ToMakeJGY = 162, //制造机关玉所消耗的道具
+    ToUpgradeKY = 163, //刻印升级所消耗的道具
+    ToChangeMoShi = 164, //转换墨石
 };
 
 struct IncommingInfo
