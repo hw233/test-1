@@ -315,6 +315,8 @@ private:
         e_unBleedType = 100,    // 流血类状态消失
         e_buddhaLight = 101,    // 佛光效果
         e_unBuddhaLight = 102,    // 佛光效果消失
+        e_biLanTianYi = 103,    // 碧岚效果
+        e_unBiLanTianYi = 104,    // 碧岚效果消失
 
         e_MAX_STATE,
     };
