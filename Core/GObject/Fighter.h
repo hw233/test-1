@@ -1017,6 +1017,7 @@ public:
     void dismissXingchen();
     bool quickUpGrade(UInt8 type);
     void xingchenInfo(Stream & st);
+    float getCriticalDmgImmune();
 };
 
 class GlobalFighters

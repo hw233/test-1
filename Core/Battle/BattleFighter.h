@@ -408,6 +408,7 @@ public:
     inline float getToughAdd2() { return _toughAdd2;}
     inline float getAtkReduce2() { return _atkreduce2; }
     inline float getMagAtkReduce2() { return _magatkreduce2; }
+    inline float getCriticalDmgImmune() { return _fighter->getCriticalDmgImmune(); }
 
 	inline void setAttackAdd2(float v) {_attackAdd2 = v;}
 	inline void setMagAttackAdd2(float v) {_magAtkAdd2 = v;}

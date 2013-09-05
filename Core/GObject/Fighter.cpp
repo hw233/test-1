@@ -6867,6 +6867,11 @@ UInt32 Fighter::calcFormBattlePoint()
     const GData::Formation* form = GData::formationManager[_owner->getFormation()];
     return form ? form->getBattlePoint() : 0;
 }
+
+float Fighter::getCriticalDmgImmune()
+{
+    return 0.0;
+}
 /*
  *end分别计算散仙的战斗力
 */
