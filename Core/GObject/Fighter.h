@@ -1017,7 +1017,12 @@ public:
     void dismissXingchen();
     bool quickUpGrade(UInt8 type);
     void xingchenInfo(Stream & st);
-    float getCriticalDmgImmune();
+
+public:
+    void setCriticalDmgImmune(float immmune) { _critcalDmgImmune = immmune; }
+    float getCriticalDmgImmune() { return _critcalDmgImmune; }
+private:
+    float _critcalDmgImmune;
 };
 
 class GlobalFighters
