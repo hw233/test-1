@@ -8195,6 +8195,84 @@ function ItemNormal_00010196(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010197(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (3+(3*num*5)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    player:getCoupon(50*num)
+    package:Add(9371, num*5, true, false, 2);
+    package:Add(1325, num*1, true, false, 2);
+    package:Add(134, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010198(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (5+(5*num*6)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(503, num*6, true, false, 2);
+    package:Add(515, num*6, true, false, 2);
+    package:Add(1126, num*6, true, false, 2);
+    package:Add(513, num*6, true, false, 2);
+    package:Add(548, num*50, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010199(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (7+(7*num*8)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    player:getCoupon(365*num)
+    package:Add(8520, num*2, true, false, 2);
+    package:Add(549, num*2, true, false, 2);
+    package:Add(9390, num*4, true, false, 2);
+    package:Add(9141, num*8, true, false, 2);
+    package:Add(9144, num*8, true, false, 2);
+    package:Add(509, num*8, true, false, 2);
+    package:Add(507, num*8, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010200(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (9+(9*num*5)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(57, num*5, true, false, 2);
+    package:Add(56, num*5, true, false, 2);
+    package:Add(15, num*5, true, false, 2);
+    package:Add(500, num*10, true, false, 2);
+    package:Add(503, num*10, true, false, 2);
+    package:Add(1126, num*5, true, false, 2);
+    package:Add(1325, num*3, true, false, 2);
+    package:Add(134, num*3, true, false, 2);
+    package:Add(9338, num*3, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -11463,6 +11541,10 @@ local ItemNormal_Table = {
     [10194] = ItemNormal_00010193,
     [10195] = ItemNormal_00010195,
     [10196] = ItemNormal_00010196,
+    [10197] = ItemNormal_00010197,
+    [10198] = ItemNormal_00010198,
+    [10199] = ItemNormal_00010199,
+    [10200] = ItemNormal_00010200,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)
