@@ -563,6 +563,8 @@ private:
     void initBuddhaLight(BattleFighter* bf, bool auralAdd, bool dead);
     void doSkillAttackByCareer(BattleFighter *bf, const GData::SkillBase *skill);
 
+    void addSelfSideEvadeCnt(BattleFighter* bf);
+
 private:
 	int _id, _winner, _turns;
 	UInt8 _position;
