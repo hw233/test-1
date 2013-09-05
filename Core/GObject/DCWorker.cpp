@@ -243,7 +243,7 @@ namespace GObject
         
         if (!openId)
             return;
-
+        return ;
         char *p = new(std::nothrow) char[len+1];
         if (p == NULL)
             return;
