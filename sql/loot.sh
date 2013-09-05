@@ -23,9 +23,9 @@ function loot()
             print "INSERT INTO `loot` VALUES";
         } {
             printf("(%d,\x27%s\x27,%d,%d)",$1,$2,$3,$4);
-            if (NR <= ENVIRON["lines"]-1)
+            if (NR <= ENVIRON["lines"])
                 printf(",");
-            else if (NR >= ENVIRON["lines"])
+            else if (NR > ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }

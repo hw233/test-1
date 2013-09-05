@@ -24,9 +24,9 @@ function signet()
             print "INSERT INTO `signet` VALUES";
         } {
             printf("(%d,%d,\x27%s\x27,%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6,$7,$8,$9);
-            if (NR <= ENVIRON["lines"]-1)
+            if (NR <= ENVIRON["lines"])
                 printf(",");
-            else if (NR >= ENVIRON["lines"])
+            else if (NR > ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }
