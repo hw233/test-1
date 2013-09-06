@@ -261,7 +261,7 @@ namespace GObject
             ElixirAttr& attr = _elixirattr;
             DB1().PushUpdateData("REPLACE INTO `sh_fighter_attr2`(`fighterId`, `playerId`, `type`, `soulExtraAura`, `soulAuraLeft`, `soulSkillSoulOut`, `elixir_strength`, `elixir_physique`, `elixir_agility`,"
                     " `elixir_intelligence`, `elixir_will`, `elixir_soul`, `elixir_attack`, `elixir_defend`, `elixir_critical`, `elixir_pierce`, `elixir_evade`, `elixir_counter`,"
-                    " `elixir_tough`, `elixir_action`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _player->getId(), _type,
+                    " `elixir_tough`, `elixir_action`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _player->getId(), _type,
                     _soulExtraAura, _soulAuraLeft, _soulSkillSoulOut, attr.strength, attr.physique, attr.agility, attr.intelligence, attr.will, attr.soul, attr.attack, attr.defend, attr.critical,
                     attr.pierce, attr.evade, attr.counter, attr.tough, attr.action);
         }
