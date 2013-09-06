@@ -1173,6 +1173,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3LoginInfo();
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
+    pl->sendQQBoardLogin();
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -4290,10 +4291,14 @@ void OnMailClickReq( GameMsgHdr& hdr, MailClickReq& mcr )
 
 void OnFriendListReq( GameMsgHdr& hdr, FriendListReq& flr )
 {
-	if(flr._type > 4)
+	if(flr._type > 5)
 		return;
 	MSG_QUERY_PLAYER(player);
-    if(flr._type == 4)
+    if(flr._type == 5)
+    {
+        player->sendRandFriend();
+    }
+    else if(flr._type == 4)
     {
         struct ClanMemberListReq
         {
@@ -4312,6 +4317,11 @@ void OnFriendListReq( GameMsgHdr& hdr, FriendListReq& flr )
 void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
 {
 	MSG_QUERY_PLAYER(player);
+    if(fr._op == 12)
+    {
+        player->SetVar(VAR_RANDfRIEND,1);
+        return ;
+    }
     player->patchDeleteDotS(fr._name);
     GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(fr._name)];
     if(pl == NULL || pl == player)
@@ -5806,7 +5816,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
     if (op  < 6 )
         return;
-    if((op != 10 && op!= 20 &&op!=22 ) && !player->hasChecked())
+    if((op != 10 && op!= 20 &&op!=22 &&op!=25) && !player->hasChecked())
          return;
 
     switch(op)
@@ -5872,7 +5882,13 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             br >> index ;
             player->getSummerMeetAward(idx,index);
             break;
-
+        case 25:
+            if(idx == 2 )
+            {
+                br >>index;
+                player->GetQQBoardAward(index);
+            }
+            player->sendQQBoardLogin();
         default:
             break;
     }
@@ -6413,6 +6429,40 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
 
             br >> tuzhiId;
             player->GetMoFang()->quickMakejiguan(tuzhiId, opt);               
+        }
+        break;
+    case 8:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt8 keyinId = 0;
+
+            br >> keyinId;
+            player->GetMoFang()->upgradeKY(keyinId, opt);               
+        }
+        break;
+    case 9:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+            UInt8 keyinId = 0;
+
+            br >> keyinId;
+            player->GetMoFang()->quickUpgradeKY(keyinId, opt);               
+        }
+        break;
+    case 10:
+        {
+            if(!player->hasChecked())
+            {
+                return;
+            }
+
+            player->GetMoFang()->changeMoney(opt);               
         }
         break;
 

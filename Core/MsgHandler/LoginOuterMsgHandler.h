@@ -412,6 +412,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->SetSummerMeetValue();
             player->setPrayLoginInWeek();
             player->continuousLoginSummerFlow();
+            GObject::globalOnlinePlayers.add(player->getId(),player);
+            player->SetQQBoardLogin();
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -729,6 +731,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 		PLAYER_DATA(pl, created) = TimeUtil::Now();
         pl->addNewFormation(FORMATION_1);
         pl->addNewFormation(FORMATION_2);
+        GObject::globalOnlinePlayers.add(pl->getId(),pl);
 
 		UInt32 fgtId = nu._class + 1;
 		// PLAYER_DATA(pl, newGuild) = (0x3FFFFFFFull << NEWGUILDSTEP_MAX);
@@ -778,6 +781,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->SetSummerMeetValue();
             pl->setPrayLoginInWeek();
             pl->continuousLoginSummerFlow();
+            pl->SetQQBoardLogin();
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -1061,12 +1065,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                503,    4,
+                507,    2,
                 509,    2,
                 56,     2,
-                466,    3,
-                549,    2,
-                50,     3
+                1126,   3,
+                9367,   5,
+                9369,   5
             };
 
             UInt8 idx = 0;
@@ -3098,6 +3102,12 @@ inline bool player_enum_2(GObject::Player* pl, int type)
             //    pl->checLuckyMeet();
             }
             break;
+        case 8:
+            {
+                pl->SetVar(GObject::VAR_SUMMERFLOW_TYPE, 0);
+                pl->SetVar(GObject::VAR_SUMMERFLOW_AWARD, 0);
+            }
+            break;
         default:
             return false;
     }
@@ -3459,6 +3469,15 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
             GObject::globalPlayers.enumerate(player_enum_2, 7);
         GObject::GVAR.SetVar(GObject::GVAR_SUMMER_MEET_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_SUMMER_MEET_END, end);
+        ret = 1;
+    }
+    else if (type == 7 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_SUMMER_FLOW_BEGIN) > TimeUtil::Now()
+                || GObject::GVAR.GetVar(GObject::GVAR_SUMMER_FLOW_END) < TimeUtil::Now())
+            GObject::globalPlayers.enumerate(player_enum_2, 8);
+        GObject::GVAR.SetVar(GObject::GVAR_SUMMER_FLOW_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_SUMMER_FLOW_END, end);
         ret = 1;
     }
 

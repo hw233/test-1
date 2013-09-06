@@ -484,7 +484,17 @@ public:
     inline static void  setSummerMeet(bool v)
     {   _summerMeet=v; } 
     inline static bool getSummerFlow()
-    {  return _summerFlow; } 
+    { 
+        UInt32 begin = GVAR.GetVar(GVAR_SUMMER_FLOW_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_SUMMER_FLOW_END);
+        UInt32 now = TimeUtil::Now() ;
+        if(begin == 0 && end == 0)
+            return _summerFlow;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
     inline static void setNeedRechargeRank(bool v)
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()
@@ -798,6 +808,11 @@ public:
     inline static bool getHalfGold()
     { return _halfgold; } 
 
+    inline static void setQQBoardLoginTime(bool v)
+    { _qqBoardLogin = v; }
+    inline static bool getQQBoardLoginTime()
+    { return _qqBoardLogin; } 
+
     inline static void setCallSnakeEggAct(UInt8 v)
     { _callsnakeeggact = v; }
     inline static UInt8 getCallSnakeEggAct()
@@ -974,6 +989,7 @@ public:
     static bool _ryhbActivity;
     static bool _zcjbActivity;
     static bool _halfgold;
+    static bool _qqBoardLogin;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
     static bool _item9344act;

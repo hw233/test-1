@@ -462,6 +462,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_DROP_OUT_ITEM_MARK = 512,// 反工作室限制方案
         VAR_QQXIU_AWARD = 513, // QQ秀合作
         VAR_QQTENPAY_LOTTERY = 514, //QQ财付通抽奖 
+        VAR_KEYIN_MONEY_A = 515, //刻印钱币A 
+        VAR_KEYIN_MONEY_B = 516, //刻印钱币B 
 
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
@@ -513,7 +515,6 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_CLAN_ACTPT_MONTH = 562,      // 每月帮派活跃度
         VAR_CLAN_ACTPT_FLAG = 563,      // 活跃度领取标识
         VAR_QZONGPYGIFT = 564, //Qzong,PY合作礼包
-        //581-600 for qiwy
 
         //581-600 for lb 
         VAR_SUMMERFLOW3_TYPE = 581 ,
@@ -527,6 +528,13 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_PRAY_TYPE_TODAY = 588 ,
         VAR_PRAY_TIME = 589 ,
         VAR_PRAY_LOGIN = 590,
+        
+        VAR_QQBOARD_ONLINE = 591,
+        VAR_QQBOARD_LOGIN_AWARD = 592,
+        VAR_QQBOARD_ONLINE_AWARD = 593,
+
+        VAR_RANDfRIEND = 594 ,
+        //600-620 for qiwy  ^_^
 
         VAR_MAX,
     };
@@ -846,6 +854,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_QQTENPAY_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_QQTENPAY_LOTTERY, CYCLE_NONE);
             REGISTER_VAR(VAR_QQIM_QUICK_LOGIN_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYIN_MONEY_A, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYIN_MONEY_B, CYCLE_NONE);
 
             REGISTER_VAR(VAR_EQUIP_MOVE_AWARD, CYCLE_NONE);
 
@@ -1007,6 +1017,11 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_PRAY_SUCTIME, CYCLE_NONE);
             REGISTER_VAR(VAR_PRAY_TYPE_TODAY, CYCLE_DAY);
             REGISTER_VAR(VAR_PRAY_TIME, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_QQBOARD_ONLINE, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQBOARD_LOGIN_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_QQBOARD_ONLINE_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_RANDfRIEND, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

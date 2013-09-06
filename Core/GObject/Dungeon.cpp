@@ -155,15 +155,12 @@ UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
 UInt8 Dungeon::playerLeave( Player * player,UInt8 difficulty )
 {
     if(difficulty >= Max_Difficulty)
-    {
-        return 0;
-    } 
-
+        return 1;
     std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return 1;
 
-	if(it->second.level == 0)
+	if(it->second.level[difficulty] == 0)
 		return 0;
     
     it->second.difficulty = difficulty;	
@@ -187,7 +184,7 @@ UInt8 Dungeon::playerContinue( Player * player ,UInt8 difficulty)
 {
     if(difficulty >= Max_Difficulty)
     {
-        return 0;
+        return 1;
     } 
 
     std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
@@ -195,7 +192,7 @@ UInt8 Dungeon::playerContinue( Player * player ,UInt8 difficulty)
     if(it == _players.end())
 		return 1;
 
-    if(it->second.level == 0)
+    if(it->second.level[difficulty] == 0)
         return 1;
 
     enterLevel(player, it->second.level[it->second.difficulty],it->second.difficulty);
@@ -671,6 +668,8 @@ player->GetPackage()->Add(9343, 2, true, false);
 
 void Dungeon::startChallenge( Player * player ,UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
     it->second.difficulty = difficulty;
     if(it == _players.end())
@@ -885,6 +884,8 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 
 void Dungeon::autoChallenge( Player * player, UInt8 mtype, UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
     std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
     it->second.difficulty = difficulty;
     if(player->hasFlag(Player::AutoDungeon))
@@ -933,6 +934,8 @@ void Dungeon::pushPlayer( Player * player, UInt8 difficulty, UInt8 level, UInt8 
 
 void Dungeon::sendDungeonInfo(Player * player,UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 	{
@@ -951,6 +954,8 @@ void Dungeon::sendDungeonInfo(Player * player,UInt8 difficulty)
 
 void Dungeon::sendDungeonInfo(Player * player, DungeonPlayerInfo& dpi, UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	Stream st(REP::COPY_DATA_UPDATE);
 	UInt8 enterCount = (_extraCount[difficulty][player->getVipLevel()] << 4) | getEnterCount();
 
@@ -1118,6 +1123,8 @@ void Dungeon::sendMyLootInfo( Player * player )
 
 void Dungeon::broadcast( Stream& st, UInt8 difficulty, Player * player )
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	std::vector<DungeonLevel>& dll = _levels[difficulty];
 	if(player == NULL)
 	{
@@ -1156,11 +1163,15 @@ UInt32 Dungeon::getFirstPass( Player * player ,UInt8 difficulty)
 
 void Dungeon::setMaxCount(UInt32 cnt, UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	_maxCount[difficulty] = cnt;
 }
 
 void Dungeon::setPrice( UInt32 idx, UInt16 price ,UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	_price[difficulty][idx] = price;
 	if(idx >= _priceCount)
 		_priceCount = idx + 1;
@@ -1168,12 +1179,16 @@ void Dungeon::setPrice( UInt32 idx, UInt16 price ,UInt8 difficulty)
 
 UInt16 * Dungeon::getPrice( size_t& size ,UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return 0;
 	size = _priceCount;
 	return _price[difficulty];
 }
 
 void Dungeon::setExtraCount( UInt32 idx, UInt8 count ,UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	_extraCount[difficulty][idx] = count;
 }
 

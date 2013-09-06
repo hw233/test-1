@@ -142,32 +142,8 @@ function is2013_0201_0228()
 end
 
 function onActivityCheck(tm)
-  local osmax = oldServersMax[serverName]
-  print(osmax)
-  print(serverNum)
-  if osmax ~= nil and serverNum <= osmax then
-    local freeEnter = false
-    if serverName == 'kingxin' then
-      local freeStartTime = os.time({ ['year'] = 2011, ['month'] = 1, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 });
-      local freeEndTime = os.time({ ['year'] = 2011, ['month'] = 1, ['day'] = 26, ['hour'] = 23, ['min'] = 50, ['sec'] = 0 });
-      setDungeonPrice(0, 0)
-      if tm >= freeStartTime and tm < freeEndTime then
-        freeEnter = true
-      end
-    end
-    if freeEnter then
-      setDungeonPrice(1, 0)
-      setDungeonPrice(2, 0)
-    else
-      setDungeonPrice(1, 20)
-      setDungeonPrice(2, 20)
-    end
- -- else
-    --setDungeonPrice(0, 0)
-    --setDungeonPrice(1, 20)
-    --setDungeonPrice(2, 20)
-  end
-  setDungeonCount(1)
+  setDungeonCount(1, 0)
+  setDungeonCount(1, 1)
   setTavernInterval(1 * 3600)
   setTavernRate(100)
   
@@ -831,7 +807,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+146*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+153*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -907,6 +883,12 @@ function onActivityCheck(tm)
          setSummerFlow3Time(true)
       else
          setSummerFlow3Time(false)
+      end
+      
+      if tm >= actTime252 and tm < actTime252_1 then
+         setQQBoardLoginTime(true)
+      else
+         setQQBoardLoginTime(false)
       end
 
       if tm >= actTime551 and tm < actTime551_1 then
@@ -1135,7 +1117,7 @@ function onActivityCheck(tm)
       setGoldSnakeAct(false)
   end
 
-  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 112*86400) then
+  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 119*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1184,7 +1166,7 @@ function initActTime(y, m, d)
   -- 充值返利（3/23-3/31）
   local  SerStartTm13= { ['year'] = 2012, ['month'] = 3, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 愚人节活动（2012 3/29-4/1,2013 3/30-4/1）
-  local  SerStartTm14= { ['year'] = 2013, ['month'] = 8, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm14= { ['year'] = 2013, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 清明节
   local  SerStartTm15= { ['year'] = 2013, ['month'] = 4, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm16= { ['year'] = 2012, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1412,13 +1394,13 @@ function initActTime(y, m, d)
   local  SerStartTm242 = { ['year'] = 2013, ['month'] = 7, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm242_1 = { ['year'] = 2013, ['month'] = 7, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --大厅累积在线奖励
-  local  SerStartTm243 = { ['year'] = 2013, ['month'] = 6, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm243 = { ['year'] = 2013, ['month'] = 9, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --空间黄钻、大厅蓝钻礼包
   local  SerStartTm244 = { ['year'] = 2013, ['month'] = 8, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 五一活动(节日套装)
   local  SerStartTm245 = { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --落英秘典
-  local  SerStartTm246 = { ['year'] = 2013, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm246 = { ['year'] = 2013, ['month'] = 9, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --消费抽奖活动
   local  SerStartTm247= { ['year'] = 2013, ['month'] = 5, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1431,6 +1413,9 @@ function initActTime(y, m, d)
 
   local  SerStartTm251= { ['year'] = 2013, ['month'] = 8, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm251_1= { ['year'] = 2013, ['month'] = 8, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  
+  local  SerStartTm252= { ['year'] = 2013, ['month'] = 9, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm252_1= { ['year'] = 2013, ['month'] = 9, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1486,7 +1471,7 @@ function initActTime(y, m, d)
   actTime26 = os.time(SerStartTm13) + 9 * 86400;
 
   actTime27 = os.time(SerStartTm14);
-  actTime28 = os.time(SerStartTm14) + 2 * 86400;
+  actTime28 = os.time(SerStartTm14) + 7 * 86400;
 
   actTime29 = os.time(SerStartTm15);
   actTime30 = os.time(SerStartTm15) + 3 * 86400;
@@ -1865,7 +1850,7 @@ function initActTime(y, m, d)
   actTime245_1= os.time(SerStartTm245) + 7*86400;
 
   actTime246_0= os.time(SerStartTm246)
-  actTime246_1= os.time(SerStartTm246) + 2*86400;
+  actTime246_1= os.time(SerStartTm246) + 1*86400;
 
   actTime247_0= os.time(SerStartTm247)
   actTime247_1= os.time(SerStartTm247) + 7*86400;
@@ -1880,6 +1865,8 @@ function initActTime(y, m, d)
   actTime250_1= os.time(SerStartTm250) + 30*86400;
   actTime251= os.time(SerStartTm251)
   actTime251_1= os.time(SerStartTm251_1);
+  actTime252= os.time(SerStartTm252)
+  actTime252_1= os.time(SerStartTm252_1);
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

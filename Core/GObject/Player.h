@@ -186,11 +186,12 @@ namespace GObject
 
 #define SPREAD_START_WEEK         6
 #define SPREAD_END_WEEK           7
-#define SPREAD_START_TIME         11*3600
+#define SPREAD_START_TIME         10*3600
 #define SPREAD_END_TIME           22*3600
 #define SPREAD_INTERVA_TIME       150
 #define SPREAD_ALREADY_USE        0x01
 #define SPREAD_ALREADY_GET        0x02
+#define SPREAD_COOL_TIME          1800
 
 #define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     ((X & (1<<Y)) >> Y)
@@ -229,6 +230,7 @@ namespace GObject
 
         XIANGMO     = 11,   //降魔禅杖
         WANJIE      = 12,   //万劫不灭
+        BILAN       = 13,   //碧岚天衣
 
         DRAGONKING_MAX,
     };
@@ -1221,6 +1223,7 @@ namespace GObject
 
         UInt32 useClanProffer(UInt32 c, ConsumeInfo *ci = NULL);
         UInt32 getClanProffer(UInt32 c = 0, IncommingInfo *ii = NULL);
+	    UInt16 addClanProfferFromItem(UInt16 num, UInt16 unit);
 
 		UInt32 getCoin(UInt32 c = 0);
 		UInt32 useCoin(UInt32 c, ConsumeInfo * ci=NULL, bool notify = true);
@@ -2254,6 +2257,7 @@ namespace GObject
         void sendNewRC7DayRecharge();
         void sendNewRC7DayTarget(UInt8 idx = 0);
         void sendQQBoardLoginInfo();
+        void SetQQBoardLogin();
         void SetQQBoardValue();
         void sendLuckyMeetLoginInfo();
         void SetLuckyMeetValue();
@@ -2312,6 +2316,7 @@ namespace GObject
         UInt8 m_csFlag;
     private:
         UInt32 m_spreadInterval;
+        UInt32 m_spreadCoolTime;
 
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
@@ -2575,6 +2580,10 @@ namespace GObject
         void sendAllCollectCard();
         void setClanSpiritTreeBuff(UInt8,UInt32);
         void setPrayLoginInWeek();
+        void sendRandFriend();
+        void GetQQBoardAward(UInt8 type);
+        void sendQQBoardOnlineTime();
+        void sendQQBoardLogin();
         void useCollectCard(UInt8 fighterIndex);
         void putCollectCardPool(UInt8 fighterIndex, UInt8 partPos, UInt16 partCnt);
         void convertCollectCard();
@@ -2607,6 +2616,7 @@ namespace GObject
     typedef std::map<UInt8, LevelPlayers*> GlobalLevelsPlayers;
     typedef GlobalLevelsPlayers::iterator GlobalLevelsPlayersIterator;
     extern GlobalLevelsPlayers globalLevelsPlayers;
+    extern GlobalPlayers globalOnlinePlayers; 
 
 	class ChallengeCheck
 	{

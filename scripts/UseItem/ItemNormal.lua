@@ -8195,6 +8195,84 @@ function ItemNormal_00010196(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010197(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (3+(3*num*5)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    player:getCoupon(50*num)
+    package:Add(9371, num*5, true, false, 2);
+    package:Add(1325, num*1, true, false, 2);
+    package:Add(134, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010198(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (5+(5*num*6)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(503, num*6, true, false, 2);
+    package:Add(515, num*6, true, false, 2);
+    package:Add(1126, num*6, true, false, 2);
+    package:Add(513, num*6, true, false, 2);
+    package:Add(548, num*50, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010199(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (7+(7*num*8)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    player:getCoupon(365*num)
+    package:Add(8520, num*2, true, false, 2);
+    package:Add(549, num*2, true, false, 2);
+    package:Add(9390, num*4, true, false, 2);
+    package:Add(9141, num*8, true, false, 2);
+    package:Add(9144, num*8, true, false, 2);
+    package:Add(509, num*8, true, false, 2);
+    package:Add(507, num*8, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010200(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (9+(9*num*5)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(57, num*5, true, false, 2);
+    package:Add(56, num*5, true, false, 2);
+    package:Add(15, num*5, true, false, 2);
+    package:Add(500, num*10, true, false, 2);
+    package:Add(503, num*10, true, false, 2);
+    package:Add(1126, num*5, true, false, 2);
+    package:Add(1325, num*3, true, false, 2);
+    package:Add(134, num*3, true, false, 2);
+    package:Add(9338, num*3, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -8753,6 +8831,17 @@ function ItemNormal_tuzhi(iid, num, bind, param)
     moFang:randTuzhi(num);
     package:DelItemSendMsg(iid, player);
     return num;
+end
+
+function ItemNormal_keyin(iid, num, bind, param)
+    if iid == 9424 or iid == 9425 then
+        local player = GetPlayer()
+        local moFang = player:GetMoFang();
+        local package = player:GetPackage();
+        moFang:addMoney(iid, num);
+        package:DelItemSendMsg(iid, player);
+        return num;
+    end
 end
 
 function ItemNormal_00009311(iid, num, bind, param)
@@ -9450,6 +9539,16 @@ function ItemNormal_00009420(iid, num, bind, param)
 
 	fgt:addExp(500000*n);
     package:DelItemSendMsg(iid, player);
+    return n
+end
+
+function ItemNormal_00009423(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    local n = player:addClanProfferFromItem(num, 100)
+    if n > 0 then
+        package:DelItemSendMsg(iid, player);
+    end
     return n
 end
 
@@ -11203,7 +11302,10 @@ local ItemNormal_Table = {
     [9418] = ItemNormal_tuzhi,
     [9419] = ItemNormal_00009419,
     [9420] = ItemNormal_00009420,
+    [9423] = ItemNormal_00009423,
     [9421] = ItemNormal_jgsexp,
+    [9424] = ItemNormal_keyin,
+    [9425] = ItemNormal_keyin,
 
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,
@@ -11218,10 +11320,44 @@ local ItemNormal_Table = {
     [9910] = ItemNormal_NameCard,
     [9911] = ItemNormal_NameCard,
     [9913] = ItemNormal_NameCard,
-
     [9914] = ItemNormal_NameCard,
     [9915] = ItemNormal_NameCard,
     [9916] = ItemNormal_NameCard,
+    [9917] = ItemNormal_NameCard,
+    [9918] = ItemNormal_NameCard,
+    [9919] = ItemNormal_NameCard,
+    [9920] = ItemNormal_NameCard,
+    [9921] = ItemNormal_NameCard,
+    [9922] = ItemNormal_NameCard,
+    [9923] = ItemNormal_NameCard,
+    [9924] = ItemNormal_NameCard,
+    [9925] = ItemNormal_NameCard,
+    [9926] = ItemNormal_NameCard,
+    [9927] = ItemNormal_NameCard,
+    [9928] = ItemNormal_NameCard,
+    [9929] = ItemNormal_NameCard,
+    [9930] = ItemNormal_NameCard,
+    [9931] = ItemNormal_NameCard,
+    [9932] = ItemNormal_NameCard,
+    [9933] = ItemNormal_NameCard,
+    [9934] = ItemNormal_NameCard,
+    [9935] = ItemNormal_NameCard,
+    [9936] = ItemNormal_NameCard,
+    [9937] = ItemNormal_NameCard,
+    [9938] = ItemNormal_NameCard,
+    [9939] = ItemNormal_NameCard,
+    [9940] = ItemNormal_NameCard,
+    [9941] = ItemNormal_NameCard,
+    [9942] = ItemNormal_NameCard,
+    [9943] = ItemNormal_NameCard,
+    [9944] = ItemNormal_NameCard,
+    [9945] = ItemNormal_NameCard,
+    [9946] = ItemNormal_NameCard,
+    [9947] = ItemNormal_NameCard,
+    [9948] = ItemNormal_NameCard,
+    [9949] = ItemNormal_NameCard,
+    [9950] = ItemNormal_NameCard,
+
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
     [10002] = ItemNormal_00010002,
@@ -11418,6 +11554,10 @@ local ItemNormal_Table = {
     [10194] = ItemNormal_00010193,
     [10195] = ItemNormal_00010195,
     [10196] = ItemNormal_00010196,
+    [10197] = ItemNormal_00010197,
+    [10198] = ItemNormal_00010198,
+    [10199] = ItemNormal_00010199,
+    [10200] = ItemNormal_00010200,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

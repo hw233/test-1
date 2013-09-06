@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS `consume_demon` (
 -- Table structure for table `consume_achievement`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `consume_achievement` (
   `server_id` int(10) unsigned NOT NULL,
@@ -246,6 +246,7 @@ CREATE TABLE IF NOT EXISTS `item_courses` (
   `from_to` tinyint(3) unsigned NOT NULL,
   `happened_time` int(10) unsigned NOT NULL,
   INDEX server_player (`server_id`, `player_id`),
+  INDEX server_player_time (`server_id`, `player_id`, `happened_time`),
   INDEX server_player_item (`server_id`, `player_id`, `item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -280,6 +281,7 @@ CREATE TABLE IF NOT EXISTS `item_histories` (
   `item_num` int(10) unsigned NOT NULL,
   `use_time` int(10) unsigned NOT NULL,
   INDEX server_player (`server_id`, `player_id`),
+  INDEX server_player_time (`server_id`, `player_id`, `use_time`),
   INDEX server_player_item (`server_id`, `player_id`, `item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -480,5 +482,16 @@ CREATE TABLE IF NOT EXISTS `pet_histories` (
   INDEX server_player_type (`server_id`, `player_id`, `delete_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+CREATE TABLE IF NOT EXISTS `make_jiguanyu` (
+  `server_id` int(10) unsigned NOT NULL,
+  `player_id` bigint(20) unsigned NOT NULL,
+  `jiguanyu_id` int(10) unsigned NOT NULL,
+  `jiguanyu_name` varchar(255) NOT NULL,
+  `jiguanyu_quality` smallint(6) NOT NULL,
+  `make_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`),
+  INDEX server_player_jiguanyu (`server_id`, `player_id`, `jiguanyu_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Dump completed

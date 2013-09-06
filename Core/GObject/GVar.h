@@ -84,11 +84,16 @@ namespace GObject
         GVAR_NewUser_Cur = 47, 
         GVAR_NewUser_Max = 48, 
 
+
         GVAR_LUCKYMEET_BEGIN = 49,
         GVAR_LUCKYMEET_END  = 50,
 
         GVAR_SUMMER_MEET_BEGIN = 51,
         GVAR_SUMMER_MEET_END = 52,
+
+        GVAR_SUMMER_FLOW_BEGIN = 53,
+        GVAR_SUMMER_FLOW_END = 54,
+
         GVAR_MAX,
     };
 

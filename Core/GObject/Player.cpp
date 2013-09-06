@@ -132,6 +132,7 @@ namespace GObject
 	GlobalNamedPlayers globalNamedPlayers;
 	ChallengeCheck challengeCheck;
     GlobalLevelsPlayers globalLevelsPlayers;
+    GlobalPlayers globalOnlinePlayers;
     static TripodData nulltd;
     AtomicVal<UInt32> g_eMeiCount = (AtomicVal<UInt32>)(0);
     AtomicVal<UInt32> g_kunLunCount = (AtomicVal<UInt32>)(0);
@@ -761,6 +762,7 @@ namespace GObject
 		m_moFang = new MoFang(this);
         m_csFlag = 0;
         m_spreadInterval = 0;
+        m_spreadCoolTime = 0;
         _mditem = 0;
         _qixiBinding = false;
 
@@ -1368,6 +1370,9 @@ namespace GObject
             LOAD().Push(getId(), 0);
             _loadMark = true;
         }
+
+        // XXX: 上线时暂设上次下线时间为当前时间，以防宕机时引起的挂机经验计算问题
+        SetVar(VAR_OFFLINE, curtime);
 	}
 
 #define WEBDOWNLOAD 255
@@ -2324,9 +2329,10 @@ namespace GObject
         }
         //愚公移山活动
         setLogoutInFoolsDay();
-
+        globalOnlinePlayers.remove(getId()); //从全局在线玩家容器中删除
         PopTimerEvent(this, EVENT_AUTOBATTLE, 0);
         delFlag(Training);
+        sendQQBoardOnlineTime();  
 	}
 
 	void Player::checkLastBattled()
@@ -4687,7 +4693,10 @@ namespace GObject
             num = 1;
         }
         else
+        {
+            it->second.time = now;
             num =++(it->second.praynum);    //map  待定 
+        }
         sendPrayInfo();
 		DB1().PushUpdateData("REPLACE INTO `pray_relation` (`id`, `friendId`, `pray`, `time`,`praynum`) VALUES( %" I64_FMT "u, %" I64_FMT "u,1,%u,%u)", id , getId(),now,num);
     }
@@ -5379,6 +5388,18 @@ namespace GObject
 
         return proffer;
     }
+
+	UInt16 Player::addClanProfferFromItem(UInt16 num, UInt16 unit)
+	{
+        IncommingInfo ii(ProfferFromUseItem, 0, 0);
+        UInt32 proffer = getClanProffer(num * unit, &ii);
+        UInt16 iRet;
+        if(proffer > 0)
+            iRet = num;
+        else
+            iRet = 0;
+		return iRet;
+	}
 
     UInt32 Player::getCoin( UInt32 c )
 	{
@@ -13333,7 +13354,7 @@ namespace GObject
             return;
         ctslandingAward |= (1<<((val - 1)/2));
         SetVar(VAR_QQBOARD_AWARD, ctslandingAward);
-       sendQQBoardLoginInfo();
+        sendQQBoardLoginInfo();
     }
     void Player::getLuckyMeetAward(UInt8 idx,UInt8 index)
     {
@@ -16173,6 +16194,11 @@ namespace GObject
             }
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
+
+        if (itemId == 10197 || itemId == 10198 || itemId == 10199)
+        {
+            udpLog("huodong", Itoa(itemId).c_str(), "", "", "", "", "act");
+        }
     }
 
     int Player::IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind)
@@ -17666,12 +17692,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {1651, 1654},
             {1652, 1655},
             {1541, 1541},
-            {1542, 1542}
+            {1542, 1542},
+            {1544, 1544}
         };
 
         if ((innateTrumpid >= 1529 && innateTrumpid <= 1534) ||
             (innateTrumpid >= 1650 && innateTrumpid <= 1655)
-         || (innateTrumpid >= 1541 && innateTrumpid <= 1542))
+         || (innateTrumpid >= 1541 && innateTrumpid <= 1542)
+         || (innateTrumpid >= 1544 && innateTrumpid <= 1544)
+         )
         {
             size_t i = 0;
             for (; i < sizeof(muttrumps)/(sizeof(UInt32)*2); ++i)
@@ -19903,10 +19932,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -21147,7 +21176,7 @@ void Player::getQQGameOnlineAward()
     SetVar(VAR_ONLINE_AWARD, 1);
     GetPackage()->Add(134, 1, true, false);
     GetPackage()->Add(1325, 1, true, false);
-    GetPackage()->Add(15, 1, true, false);
+    GetPackage()->Add(551, 1, true, false);
     GetPackage()->Add(500, 1, true, false);
     sendQQGameOnlineAward();
 }
@@ -21975,7 +22004,7 @@ bool Player::in7DayFromCreated()
     return true;
 }
 
-#define QUESTIONID_MAX 20
+#define QUESTIONID_MAX 30
 /*#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))*/
@@ -22109,17 +22138,17 @@ void Player::getAwardInFoolsDay()
         if(info & (1<<i))
             ++ right;
     }
-    if(right < 4)
+    if(right < 5)
         return;
-    if (GetPackage()->GetRestPackageSize() < right / 4)
+    if (GetPackage()->GetRestPackageSize() < right / 5)
     {
         sendMsgCode(2, 1011, 0);
         return;
     }
-    GameAction()->getAwardInFoolsDay(this, right / 4);
-    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/4 * 4));
+    GameAction()->getAwardInFoolsDay(this, right / 5);
+    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/5 * 5));
     sendFoolsDayInfo();
-    foolsDayUdpLog(right / 4);
+    foolsDayUdpLog(right / 5);
 }
 
 void Player::buyResurrectionCard()
@@ -22133,14 +22162,17 @@ void Player::buyResurrectionCard()
     if(qid == 0)
         return;
     UInt8 cnt = GET_BIT_8(value, 2) + 1;
-    cnt = cnt > 5 ? 5 : cnt;
-    if(cnt * 10 > getGold())
+    cnt = cnt > 6 ? 6 : cnt;
+    if(cnt > 1)
     {
-        sendMsgCode(0, 1104);
-        return;
+        if((static_cast<UInt32>(cnt) - 1) * 10 > getGold())
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(FoolsDayAnswerAct, 0, 0);
+        useGold((cnt - 1)*10, &ci);
     }
-    ConsumeInfo ci(FoolsDayAnswerAct, 0, 0);
-    useGold(cnt*10, &ci);
 
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
     //info = SET_BIT(info, GET_BIT_8(value, 0));
@@ -22694,16 +22726,24 @@ void Player::spreadToOther(UInt8 type, std::string name)
             sendMsgCode(0, 2215);
             return;
         }
+        if(pl->m_spreadCoolTime > now)
+        {
+            sendMsgCode(0, 2231);
+            return;
+        }
         SetVar(VAR_SPREAD_FLAG, tmp | SPREAD_ALREADY_USE);
         GVAR.AddVar(GVAR_SPREAD_CONDITION, 1 << 8);
-        UInt32 pexp = 50000;
+        UInt32 pexp = 10000;
         GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
         GLOBAL().PushMsg(hdr2, &pexp);
     }
     else
     {
         if(World::spreadKeeper)
+        {
             sendMsgCode(0, 3501);
+            World::spreadKeeper->m_spreadCoolTime = now + SPREAD_COOL_TIME;
+        }
     }
 
     World::spreadKeeper = pl;
@@ -22733,6 +22773,11 @@ void Player::spreadToSelf()
         return;
     }
 	UInt32 now = TimeUtil::Now();
+    if(m_spreadCoolTime > now)
+    {
+        sendMsgCode(0, 2232);
+        return;
+    }
     if(now < World::spreadBuff)
     {
         if(now < m_spreadInterval)
@@ -22763,6 +22808,11 @@ void Player::spreadGetAward()
     //    return;
     if(tmp & SPREAD_ALREADY_GET)
         return;
+    if(GetLev() < 45)
+    {
+        sendMsgCode(0, 1010);
+        return;
+    }
     UInt32 spreadCount = World::getSpreadCount();
     GameMsgHdr h(0x349, getThreadId(), this, sizeof(spreadCount));
     GLOBAL().PushMsg(h, &spreadCount);
@@ -23667,6 +23717,163 @@ void Player::setPrayLoginInWeek()
     SetVar(VAR_PRAY_LOGIN, PrayLogin);
 }
 
+void Player::sendRandFriend()
+{
+    if(GetLev()<30)
+        return ;
+    UInt32 size = globalOnlinePlayers.size()-1;
+    UInt32 flag = GetVar(VAR_RANDfRIEND);
+    Stream st(REP::FRIEND_LIST);
+    st<<static_cast<UInt8>(5);
+    size_t offset = st.size();
+    UInt8 Count = 0;
+    st<<static_cast<UInt8>(0);
+    if(size < 10 )
+    { 
+        if(flag == 0 )
+        {    
+            for(GlobalPlayers::iterator it = globalOnlinePlayers.begin(); it!= globalOnlinePlayers.end();++it)
+            {
+                Player* pl = it->second;
+                if(pl == NULL || pl == this ||_hasFriend(0,pl)||_hasFriend(3,pl)||pl->GetLev() < 30)
+                    continue;
+                st<<pl->getName()<<static_cast<UInt8>(pl->GetLev())<<static_cast<UInt8>(pl->GetClassAndSex());
+                Count++;
+            }
+        }
+    }
+    else 
+    {
+        if(!flag)
+        {
+            UInt32 div = size /10 ;
+            for(UInt32 i= 0 ; i < 10 ; ++i )
+            {   
+                GlobalPlayers::iterator it = globalOnlinePlayers.begin();
+                UInt32 rand = uRand(div);
+                std::advance(it,rand+i*div);
+                Player* pl = it->second;
+                if(pl == NULL || pl == this ||_hasFriend(0,pl)||_hasFriend(3,pl)||pl->GetLev() < 30)
+                    continue;
+                st<<pl->getName()<<static_cast<UInt8>(pl->GetLev())<<static_cast<UInt8>(pl->GetClassAndSex());
+                Count++;
+            }
+        }
+
+    }
+    UInt32 count_rand = 0;
+    while(Count<10 &&( !flag )&& count_rand++< 20 )
+    {
+        UInt32 rand =uRand( globalPlayers.size());
+        GlobalPlayers::iterator it = globalPlayers.begin();
+        std::advance(it,rand);
+        Player* pl = it->second;
+        if(pl == NULL || pl == this ||_hasFriend(0,pl)||_hasFriend(3,pl)||pl->GetLev() < 30 || pl->isOnline())
+            continue;
+        st<<pl->getName()<<static_cast<UInt8>(pl->GetLev())<<static_cast<UInt8>(pl->GetClassAndSex());
+        Count++; 
+    }
+    st.data<UInt8>(offset)=static_cast<UInt8>(Count);
+    st<<Stream::eos;
+    send(st);
+}
+
+void Player::GetQQBoardAward( UInt8 type)
+{
+    
+    if(!World::getQQBoardLoginTime())
+        return ;
+    if(type < 0 ||type >3 )
+        return ;
+    sendQQBoardOnlineTime(); 
+    UInt32 LoginGetAward = GetVar(VAR_QQBOARD_LOGIN_AWARD); 
+    if(type == 0 )
+    {
+        return ;
+        if(GetVar(VAR_QQBOARD_ONLINE_AWARD))
+            return ;
+        if(GetVar(VAR_QQBOARD_ONLINE) < 1200 )
+            return ;
+    }
+    else 
+    {
+        if((LoginGetAward &(1<<(type+7)))||!(LoginGetAward&(1<<(type-1))))
+            return ;
+    }
+    if(!GameAction()->RunQQBoardOnlineAward(this, type))
+        return;
+    if(type)
+    {
+        LoginGetAward |=(1<<(type+7)); 
+        SetVar(VAR_QQBOARD_LOGIN_AWARD,LoginGetAward);
+    }
+    else 
+    {
+       SetVar(VAR_QQBOARD_ONLINE_AWARD,1);
+    }
+}
+void Player::sendQQBoardOnlineTime()
+{
+    return ;
+    if(!World::getQQBoardLoginTime())
+        return ;
+    UInt32 LoginTime = _playerData.lastOnline; 
+    UInt32 OnlineAward = GetVar(VAR_QQBOARD_ONLINE_AWARD);
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = 0 ;
+    UInt32 Time21 = TimeUtil::SharpDayT( 0 , now) + 21 * 3600;
+    if(now<Time21 || now > (Time21 +1800 ))
+        return ;
+    if(LoginTime < Time21)
+        time = now-Time21;
+    else 
+    {
+        time = GetVar(VAR_QQBOARD_ONLINE)+ now - LoginTime;
+    }
+    if(time > 20*60)
+    {
+        time = 20*60;
+    }
+    SetVar(VAR_QQBOARD_ONLINE,time);
+    Stream st(REP::RC7DAY);  //协议
+    st<<static_cast<UInt8>(20);
+    st<<static_cast<UInt8>(OnlineAward);
+    st<<static_cast<UInt32>(20*60 - time)<<Stream::eos;
+    send(st);
+}
+void Player::sendQQBoardLogin()
+{
+//    if( this->getPlatform()!= 10)
+ //       return ;
+    if(!World::getQQBoardLoginTime())
+        return ;
+    UInt32 LoginAward = GetVar(VAR_QQBOARD_LOGIN_AWARD);
+    UInt32 timeBegin = TimeUtil::MkTime(2013,9,9);
+    UInt32 now = TimeUtil::Now();
+    if(now < timeBegin )
+        return ;
+    Stream st(REP::RC7DAY);  //协议
+    st<<static_cast<UInt8>(19);
+    st<<static_cast<UInt16>(LoginAward);
+    st<<Stream::eos;
+    send(st);
+
+}
+void Player::SetQQBoardLogin()
+{
+   // if( this->getPlatform()!= 10)
+    //    return ;
+    UInt32 now = TimeUtil::Now();
+    if(now<(TimeUtil::SharpDayT( 0 , now) + 20 * 3600) || now > (TimeUtil::SharpDayT( 0 , now) + 22 * 3600) ) 
+        return ;
+    UInt32 timeBegin = TimeUtil::MkTime(2013,9,9);
+    if(now < timeBegin )
+        return ;
+    UInt32 cts = static_cast<UInt8>((TimeUtil::SharpDayT( 0 , now) - timeBegin)/86400);
+    UInt32 LoginCanAward = GetVar(VAR_QQBOARD_LOGIN_AWARD); 
+    LoginCanAward |= (1<<cts);
+    SetVar(VAR_QQBOARD_LOGIN_AWARD,LoginCanAward);
+}
 } // namespace GObject
 
 

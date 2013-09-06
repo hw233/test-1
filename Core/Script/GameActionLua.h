@@ -263,6 +263,7 @@ namespace Script
         bool  RunNewRC7DayLoginAward(Player* player, UInt8 val);
         bool  RunNewRC7DayLoginAward2(Player* player, UInt8 val);
         bool  RunQQBoardInstantLoginAward(Player* player, UInt8 val);
+        bool  RunQQBoardOnlineAward(Player* player, UInt8 val);
         bool  RunLuckyMeetInstantLoginAward(Player* player, UInt8 val);
         bool  RunLuckyMeetRechargeAward(Player* player, UInt8 val);
         bool  RunSummerMeetRechargeAward(Player* player, UInt8 val);
@@ -387,6 +388,7 @@ namespace Script
         bool onFishUserPackage(Player* player, UInt8 idx);
         Table GetNewHeroIslandBuffs();
         bool onCollectCardAct(Player* player, UInt8 idx);
+        UInt16 addClanProfferFromItem(Player* player, UInt16 num, UInt16 unit);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

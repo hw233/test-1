@@ -148,8 +148,8 @@ static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
                                        //59, 69,  79,  89,  99,  109, 119, 129, 139, 149, 999
-static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1533,1534,1535,1355};
-static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,9161,9162,9163,9900};
+static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1533,1534,1535,1368};
+static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,9161,9162,9163,9920};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
@@ -1518,7 +1518,7 @@ bool Tianjie::isFinish()
         if (3 == m_currTjRate) msgId = m_currOpenedTjLevel==999 ? 5077:5032;
         if (msgId == 5022)
         {
-            SYSMSG_BROADCASTV(msgId, m_tjTypeId, m_currTjRate, m_tjTypeId, m_currTjRate);
+            SYSMSG_BROADCASTV(msgId);
         }
         else if (msgId == 5070)
         {
@@ -1716,7 +1716,7 @@ void Tianjie::close2()
         }
         else
         {
-            SYSMSG_BROADCASTV(5023, m_tjTypeId, m_currTjRate);
+            SYSMSG_BROADCASTV(5023);
         }
     }
 }

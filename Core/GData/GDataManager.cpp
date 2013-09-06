@@ -349,6 +349,12 @@ namespace GData
             fprintf (stderr, "Load LoadTuzhiConfig Error !\n");
             std::abort();
         }
+
+        if (!LoadKeyinConfig())
+        {
+            fprintf (stderr, "Load LoadKeyinConfig Error !\n");
+            std::abort();
+        }
 		return true;
 	}
 
@@ -570,6 +576,7 @@ namespace GData
             aextra->_extra.counter *= 100;
 			SetValOrPercent(aextra->_extra.mreslvl, aextra->_extra.magres, ae.magres);
             aextra->_extra.magres *= 100;
+            aextra->_extra.criticaldmgimmune = 0;
 
             StringTokenizer tk(ae.skill, ",");
             if (tk.count())
@@ -1420,6 +1427,7 @@ namespace GData
             cft->counter *= 100;
 			SetValOrPercent(cft->mreslvl, cft->magres, cf.magres);
             cft->magres *= 100;
+            cft->criticaldmgimmune = 0;
 
             StringTokenizer tk(cf.skill, ",");
             if (tk.count())
@@ -2151,6 +2159,24 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
 		{
             jiguanData.settuzhiInfo(dbtz);
+        }
+
+        return true;
+    }
+
+    bool GDataManager::LoadKeyinConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBKeyinConfig dbky;
+
+		if(execu->Prepare("SELECT `keyinId`, `lvl`, `name`, `quality`, `attrType`, `attrValue`, `materialA`, `materialB`, `maxValue` FROM `signet`", dbky) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            jiguanData.setkeyinInfo(dbky);
         }
 
         return true;
