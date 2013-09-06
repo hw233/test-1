@@ -2486,7 +2486,10 @@ void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
 
 void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 {
-	MSG_QUERY_PLAYER(pl);
+	if(dir.difficulty >= 2)
+        return;
+    
+    MSG_QUERY_PLAYER(pl);
 	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
 		return;
 	GObject::Dungeon * dg = GObject::dungeonManager[dir.type];
@@ -2550,6 +2553,8 @@ void OnDungeonBattleReq( GameMsgHdr& hdr, DungeonBattleReq& dbr )
 
 void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 {
+    if(dar.difficulty >= 2)
+        return;
 	MSG_QUERY_PLAYER(pl);
 	if(!pl->hasChecked())
 		return;
