@@ -142,32 +142,8 @@ function is2013_0201_0228()
 end
 
 function onActivityCheck(tm)
-  local osmax = oldServersMax[serverName]
-  print(osmax)
-  print(serverNum)
-  if osmax ~= nil and serverNum <= osmax then
-    local freeEnter = false
-    if serverName == 'kingxin' then
-      local freeStartTime = os.time({ ['year'] = 2011, ['month'] = 1, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 });
-      local freeEndTime = os.time({ ['year'] = 2011, ['month'] = 1, ['day'] = 26, ['hour'] = 23, ['min'] = 50, ['sec'] = 0 });
-      setDungeonPrice(0, 0)
-      if tm >= freeStartTime and tm < freeEndTime then
-        freeEnter = true
-      end
-    end
-    if freeEnter then
-      setDungeonPrice(1, 0)
-      setDungeonPrice(2, 0)
-    else
-      setDungeonPrice(1, 20)
-      setDungeonPrice(2, 20)
-    end
- -- else
-    --setDungeonPrice(0, 0)
-    --setDungeonPrice(1, 20)
-    --setDungeonPrice(2, 20)
-  end
-  setDungeonCount(1)
+  setDungeonCount(1, 0)
+  setDungeonCount(1, 1)
   setTavernInterval(1 * 3600)
   setTavernRate(100)
   
