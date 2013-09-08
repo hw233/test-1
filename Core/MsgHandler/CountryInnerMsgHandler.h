@@ -166,14 +166,17 @@ void OnCompleteDungeonAutoNotifyReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
 
-	if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
-		return;
 
 	GObject::EventBase * ev = *reinterpret_cast<GObject::EventBase * const *>(data);
 	if(ev == NULL)
 		return;
 	GObject::EventDungeonAuto * event = static_cast<GObject::EventDungeonAuto *>(ev);
-	event->Complete();
+
+	if(player->getThreadId() == WORKER_THREAD_NEUTRAL)
+        event->Complete();
+    else
+        player->delFlag(Player::AutoDungeon);
+
 	ev->release();
 }
 
