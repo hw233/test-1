@@ -115,6 +115,10 @@ function loadStore()
 
         discount(store)
 
+    if getKillMonsterAct() then
+        store:add(2, 9416, 10)
+    end
+
     if getCollectCardAct() then
         store:add(2, 9415,10)
     end

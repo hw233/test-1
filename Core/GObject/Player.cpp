@@ -14246,12 +14246,12 @@ namespace GObject
     {
         if (index > 3 || !pos || pos > 1)
             return;
-        MailPackage::MailItem item[5][1] =
+        MailPackage::MailItem item[4][1] =
         {
-            {{1329, 1},},
-            {{1330, 1},},
-            {{1331, 1},},
-            {{1332, 1},},
+            {{1369, 1},},
+            {{1370, 1},},
+            {{1371, 1},},
+            {{1372, 1},},
         };
         sendMailItem(2372, 2373, &item[index][0], 1, false);
     }
@@ -16462,11 +16462,11 @@ namespace GObject
             sendMsgCode(0, 1011);
             return;
         }
-        if(GetPackage()->GetItemAnyNum(9163) < 1)
+        if(GetPackage()->GetItemAnyNum(9416) < 1)
         {
             return;
         }
-        GetPackage()->DelItemAny(9163, 1);
+        GetPackage()->DelItemAny(9416, 1);
         GameAction()->onGetKillMonsterReward(this);
         udpLog("916", "F_1099", "", "", "", "", "act");
     }
