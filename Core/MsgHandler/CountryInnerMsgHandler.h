@@ -165,6 +165,10 @@ void OnCancelDungeonAutoNotifyReq(GameMsgHdr& hdr, const void * data)
 void OnCompleteDungeonAutoNotifyReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
+
+	if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+		return;
+
 	GObject::EventBase * ev = *reinterpret_cast<GObject::EventBase * const *>(data);
 	if(ev == NULL)
 		return;

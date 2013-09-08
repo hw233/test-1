@@ -2584,6 +2584,9 @@ void OnDungeonCompleteAutoReq( GameMsgHdr& hdr, DungeonCompleteAutoReq& )
 	MSG_QUERY_PLAYER(pl);
     if (!pl->hasChecked())
         return;
+
+	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
+		return;
 	GameMsgHdr hdr2(0x181, WORKER_THREAD_WORLD, pl, 0);
 	GLOBAL().PushMsg(hdr2, NULL);
 }
