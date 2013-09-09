@@ -539,7 +539,13 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     max = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Max)/24;
     cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur);
     if( max && max<cur)
+    {
+		NewUserRepStruct rep;
+		rep._result = 3;
+		TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
+        NETWORK()->SendMsgToClient(conn.get(), rep);
         return;
+    }
     else
     {
         UInt32 Cur = GObject::GVAR.GetVar(GObject::GVAR_NewUser_Cur); 

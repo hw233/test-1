@@ -4400,8 +4400,10 @@ void GMHandler::OnSetMax(GObject::Player* player, std::vector<std::string>& args
 void GMHandler::OnGetMax(GObject::Player* player, std::vector<std::string>& args)
 {
     UInt32 tmp;
+    UInt32 tmp1;
     tmp = GVAR.GetVar(GObject::GVAR_NewUser_Max);
-    tmp++;
+    tmp1 = GVAR.GetVar(GObject::GVAR_NewUser_Cur); 
+    tmp ++;
 }
 
 
