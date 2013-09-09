@@ -1054,10 +1054,10 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             {
                 515,    2,
                 509,    2,
-                15,     8,
                 1126,   5,
-                1325,   5,
-                134,    5
+                516,    5,
+                517,    5,
+                551,    5
             };
 
             UInt8 idx = 0;

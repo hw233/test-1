@@ -285,6 +285,9 @@ namespace GObject
         UInt8 num;
     };
 
+    extern AtomicVal <UInt32> g_eMeiCount;
+    extern AtomicVal <UInt32> g_kunLunCount;
+
 	class EventAutoBattle : public EventBase
 	{
 	public:
@@ -2222,6 +2225,8 @@ namespace GObject
         void getVipLevelAward(UInt8 opt);
         void getQQXiuAward(UInt8 opt);                                                                                       
         UInt32 getFighterEquipAward();
+        void checkZhenying();
+        void changeZYAward(UInt8 country); 
 
         // 帮派神像
         float getClanStatueHPEffect();
