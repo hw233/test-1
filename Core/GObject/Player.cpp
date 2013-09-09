@@ -10986,7 +10986,7 @@ namespace GObject
             UInt8 flag = 0;
             if ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0)
             {
-                if (World::getQQVipAct() && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                if (/*World::getQQVipAct() && */_playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
                 {
                     qqvipl = _playerData.qqvipl1;
                     flag = 8*((_playerData.qqvipl1-20) / 10);
