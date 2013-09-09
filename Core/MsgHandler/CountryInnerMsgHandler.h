@@ -2114,6 +2114,11 @@ void OnBeVoted( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     player->beVoted();
 }
+void OnBePrayed( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->bePrayed();
+}
 
 void OnSendPopularityAward(GameMsgHdr &hdr, const void * data)
 {

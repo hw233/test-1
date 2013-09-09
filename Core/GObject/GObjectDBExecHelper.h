@@ -569,6 +569,13 @@ struct DBFriend
 	UInt64 friendId;
 };
 
+struct PrayRelation
+{
+    UInt64 id;
+    UInt64 friendId;
+    UInt8 pray;
+    UInt32 time;
+};
 struct DBClan
 {
 	UInt32 id;
@@ -1906,6 +1913,16 @@ SPECIALDEF(3)
 	UInt64, id,
 	UInt8, type,
 	UInt64, friendId
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::PrayRelation)
+SPECIALDEF(4)
+(
+	UInt64, id,
+	UInt64, friendId,
+    UInt8 , pray,
+    UInt32,  time
 )
 SPECIALEND()
 
