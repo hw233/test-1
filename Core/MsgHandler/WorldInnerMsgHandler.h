@@ -466,6 +466,10 @@ void OnCompleteDungeonAutoReq( GameMsgHdr& hdr, const void * data )
         player->sendMsgCode(0, 1011);
         return;
     }
+
+	if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+		return;
+
 	GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(player, EVENT_DUNGEONAUTO, 0);
 	if(ev == NULL)
 		return;

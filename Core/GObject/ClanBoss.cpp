@@ -46,6 +46,7 @@ const UInt16 g_bossSpot = 12806;
 
 ClanBoss::ClanBoss()
 {
+    _canOpened = false;
     clear();
 }
 void ClanBoss::clear()
@@ -62,7 +63,7 @@ void ClanBoss::clear()
     _pickPlayer.clear();
     _pickPlayers = 0;
     _statusChanged = false;
-    _canOpened = false;
+    //_canOpened = false; //多次开启的bug
     _isBossDead = false;
     _needRestart = false;
     _lastHp = 0;
@@ -253,6 +254,8 @@ void ClanBoss::refresh()
         start();
         return;
     }
+    if (_canOpened == false)
+        return;
     process(TimeUtil::Now());
     if (!m_isOpening)
         return;
