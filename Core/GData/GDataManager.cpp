@@ -349,6 +349,12 @@ namespace GData
             fprintf (stderr, "Load LoadTuzhiConfig Error !\n");
             std::abort();
         }
+
+        if (!LoadKeyinConfig())
+        {
+            fprintf (stderr, "Load LoadKeyinConfig Error !\n");
+            std::abort();
+        }
 		return true;
 	}
 
@@ -2153,6 +2159,24 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
 		{
             jiguanData.settuzhiInfo(dbtz);
+        }
+
+        return true;
+    }
+
+    bool GDataManager::LoadKeyinConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBKeyinConfig dbky;
+
+		if(execu->Prepare("SELECT `keyinId`, `lvl`, `name`, `quality`, `attrType`, `attrValue`, `materialA`, `materialB`, `maxValue` FROM `signet`", dbky) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            jiguanData.setkeyinInfo(dbky);
         }
 
         return true;

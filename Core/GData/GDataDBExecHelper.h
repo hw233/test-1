@@ -601,8 +601,19 @@ struct DBTuzhiConfig
     UInt32 jiguanyuId;
 };
 
+struct DBKeyinConfig
+{
+    UInt8 keyinId;
+    UInt8 keyinLvl;
+    std::string name;
+    UInt8 quality;
+    UInt8 attrType;
+    UInt32 attrValue;
+    UInt32 materialA;
+    UInt32 materialB;
+    UInt32 maxValue;
+};
 }
-
 namespace DB {
 
 SPECIALBEGIN(GData::DBAreaDef)
@@ -1298,6 +1309,20 @@ SPECIALDEF(5)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GData::DBKeyinConfig)
+SPECIALDEF(9)
+    (
+    UInt8, keyinId,
+    UInt8, keyinLvl,
+    std::string, name,
+    UInt8, quality,
+    UInt8, attrType,
+    UInt32, attrValue,
+    UInt32, materialA,
+    UInt32, materialB,
+    UInt32, maxValue
+    )
+SPECIALEND()
 }
 
 #endif // _GDATADBEXECHELPER_H_

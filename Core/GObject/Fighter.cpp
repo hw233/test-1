@@ -2001,7 +2001,10 @@ void Fighter::rebuildEquipAttr()
     }
 
     if(_owner)
+    {
         _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
+        _owner->GetMoFang()->addKYAttr(_attrExtraEquip);
+    }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
