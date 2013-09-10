@@ -45,6 +45,7 @@ struct DBDungeonLevel
 	UInt8 level;
 	UInt32 monsterSet;
 	std::string lootSet;
+    UInt8 difficulty;
 };
 
 struct DBDungeonMonster
@@ -835,6 +836,7 @@ struct DBDungeonPlayer
 	UInt32 counterEnd;
     UInt8 justice;
     UInt8 justice_roar;
+    UInt8 difficulty;
 };
 
 
@@ -1375,7 +1377,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(59)
+SPECIALDEF(60)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1435,7 +1437,8 @@ SPECIALDEF(59)
 	UInt32, pdata.created,
 	UInt32, pdata.lockExpireTime,
     std::string, openid,
-    std::string, canHirePet
+    std::string, canHirePet,
+    UInt8,  pdata.dungeonCnt1
     )
 SPECIALEND()
 
@@ -1887,12 +1890,13 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBDungeonLevel)
-SPECIALDEF(4)
+SPECIALDEF(5)
 	(
 	UInt32, id,
 	UInt8, level,
 	UInt32, monsterSet,
-	std::string, lootSet
+	std::string, lootSet,
+    UInt8, difficulty
 	)
 SPECIALEND()
 
@@ -2257,7 +2261,7 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBDungeonPlayer)
-SPECIALDEF(9)
+SPECIALDEF(10)
 (
 	UInt32, id,
 	UInt64, playerId,
@@ -2267,7 +2271,8 @@ SPECIALDEF(9)
 	UInt32, firstPass,
 	UInt32, counterEnd,
 	UInt8, justice,
-    UInt8, justice_roar
+    UInt8, justice_roar,
+    UInt8, difficulty
 )
 SPECIALEND()
 

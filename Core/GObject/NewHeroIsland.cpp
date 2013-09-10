@@ -176,7 +176,7 @@ void NewHeroIsland::playerEnter(Player* player)
         if (pd->status != NEWHERO_ISLAND_ESCAPE)
             return;
         std::map<UInt8, UInt8>::iterator it = _wasOwned.find(pd->spot);
-        if (it != _wasOwned.end())
+        if (pd->spot == NEWHERO_ISLAND_SPOTS-1 || it != _wasOwned.end())
         {
             UInt8 size = _noOwned.size();
             if (size > 0)

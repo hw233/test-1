@@ -319,8 +319,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         // 首充礼包
         VAR_FIRST_RECHARGE_VALUE = 286, //充值数
         VAR_FIRST_RECHARGE_STEP = 287, //已领阶段
-        VAR_CF_FLAG = 288, //是副本，还是阵图
-        VAR_CF_BIND = 289, //是否绑定，低1位表示副本，低2位表示阵图，数字1表示非绑定，数字0表示绑定，低5，6位为1，2的备份
+        VAR_CF_FLAG = 288, //是副本(1)，还是阵图(2)，还是决战之地(3)
+        VAR_CF_UNBIND = 289, //是否未绑定,1-未绑定,0-绑定
         VAR_GOOD_VOICE = 290, //是否领取蜀山好声音
         VAR_3366GIFT = 291, //3366合作礼包
         VAR_CF_INDEX = 292, //副本、阵图通关索引，从1开始
@@ -868,7 +868,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_FIRST_RECHARGE_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_FIRST_RECHARGE_STEP, CYCLE_NONE);
             REGISTER_VAR(VAR_CF_FLAG, CYCLE_NONE);
-            REGISTER_VAR(VAR_CF_BIND, CYCLE_NONE);
+            REGISTER_VAR(VAR_CF_UNBIND, CYCLE_NONE);
             REGISTER_VAR(VAR_GOOD_VOICE, CYCLE_NONE);
             REGISTER_VAR(VAR_3366GIFT, CYCLE_NONE);
             REGISTER_VAR(VAR_CF_INDEX, CYCLE_NONE);

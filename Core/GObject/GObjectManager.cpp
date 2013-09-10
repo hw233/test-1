@@ -1463,7 +1463,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -3077,7 +3077,7 @@ namespace GObject
         // ͨ??????????
 		lc.prepare("Loading dungeon level templates:");
 		GData::DBDungeonLevel dlvl;
-		if(execu->Prepare("SELECT `id`, `level`, `monsterSet`, `lootSet` FROM `dungeon_level`", dlvl) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `level`, `monsterSet`, `lootSet`,`difficulty` FROM `dungeon_level`", dlvl) != DB::DB_OK)
 			return false;
 		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
@@ -3091,10 +3091,14 @@ namespace GObject
 			{
 				dl->loots.push_back(GData::lootTable[atoi(tk[i].c_str())]);
 			}
-            std::vector<const GData::DungeonLevel *>& ddl = dd->monsters;
-            if(ddl.size() <= static_cast<size_t>(dlvl.level))
-                ddl.resize(dlvl.level + 1);
-            ddl[dlvl.level] = dl;
+            std::vector<const GData::DungeonLevel *>* ddl = &(dd->monsters[0]);
+            if(dlvl.difficulty == 0)
+                ddl = &(dd->monsters[0]);
+            else
+                ddl = &(dd->monsters[1]);
+            if(ddl->size() <= static_cast<size_t>(dlvl.level))
+                ddl->resize(dlvl.level + 1);
+            ddl->operator[](dlvl.level) = dl;
 		}
 		lc.finalize();
 
@@ -3106,7 +3110,7 @@ namespace GObject
 		Player * pl = NULL;
 		execu.reset(DB::gObjectDBConnectionMgr->GetExecutor());
 		DBDungeonPlayer dp;
-		if(execu->Prepare("SELECT `id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`, `justice`, `justice_roar` FROM `dungeon_player` ORDER BY `playerId`", dp) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`, `justice`, `justice_roar`, `difficulty` FROM `dungeon_player` ORDER BY `playerId`", dp) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -3122,7 +3126,7 @@ namespace GObject
 			Dungeon * dg = dungeonManager[dp.id];
 			if(dg == NULL)
 				continue;
-			dg->pushPlayer(pl, dp.level, dp.count, dp.totalCount, dp.firstPass, dp.counterEnd, dp.justice, dp.justice_roar);
+			dg->pushPlayer(pl, dp.difficulty, dp.level, dp.count, dp.totalCount, dp.firstPass, dp.counterEnd, dp.justice, dp.justice_roar);
 		}
 		lc.finalize();
 		return true;

@@ -43,7 +43,7 @@ struct DungeonData: public ObjectBaseT<>
 	UInt16 location;
 	UInt8 type;
 	UInt8 levelReq;
-	std::vector<const DungeonLevel *> monsters;
+	std::vector<const DungeonLevel *> monsters[2];
 };
 
 extern ObjectListT<DungeonMonster> dungeonMonsters;

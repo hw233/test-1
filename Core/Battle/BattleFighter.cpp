@@ -68,7 +68,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0),
     _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0), _counter_spirit_skill_cd(0), _pet_coatk(0), _fire_defend(0), _fire_defend_last(0), _fire_fake_dead_rate(0), _fire_fake_dead_rate_last(0), _sneak_atk(0), _sneak_atk_status(0), _sneak_atk_last(0), _sneak_atk_recover_rate(0),
     _selfSummon(NULL), _dec_wave_dmg(0), _lingqu_last(0), _lingqu_times(0), _lingqu(false), _soulout_last(0), _soulout(false),  _lingshi_bleed(0), _lingshi_bleed_last(0),
-    _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0), _abnormalTypeCnt(0), _bleedTypeCnt(0)
+    _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0), _abnormalTypeCnt(0), _bleedTypeCnt(0),_evadeCnt(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -137,6 +137,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillAbnormalTypeDmg100(), _passiveSkillAbnormalTypeDmg100);
     updatePassiveSkill100(_fighter->getPassiveSkillBleedTypeDmg100(), _passiveSkillBleedTypeDmg100);
     updatePassiveSkill100(_fighter->getPassiveSkillXMCZ100(), _passiveSkillXMCZ100);
+    updatePassiveSkill100(_fighter->getPassiveSkillBLTY100(), _passiveSkillBLTY100);
 
     updatePassiveSkill(_fighter->getPassiveSkillPreAtk(), _passiveSkillPreAtk);
     updatePassiveSkill(_fighter->getPassiveSkillAftAtk(), _passiveSkillAftAtk);
@@ -159,6 +160,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updateSoulSkillDead(_fighter->getSoulSkillSoulOut());
     updatePassiveSkill(_fighter->getPassiveSkillBleedTypeDmg(), _passiveSkillBleedTypeDmg);
     updatePassiveSkillPrvAtk100Status();
+    updatePassiveSkillBLTY100Status();
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
     cnt = lbSkills.size();
@@ -1071,6 +1073,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillXMCZ100(size_t& idx, bool 
     return getPassiveSkill100(_passiveSkillXMCZ100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillBLTY100, idx, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
 {
     size_t cnt = passiveSkill.size();
@@ -1904,6 +1911,7 @@ BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
     bf->setSummonFactor(aura, factor, last);
     setSelfSummon(bf);
     bf->setXiangMoChanZhangSkill(NULL);
+    bf->setBiLanTianYiSkill(NULL);
     return bf;
 }
 
@@ -1932,6 +1940,7 @@ void BattleFighter::clearSkill()
     _passiveSkillAbnormalTypeDmg100.clear();
     _passiveSkillBleedTypeDmg100.clear();
     _passiveSkillXMCZ100.clear();
+    _passiveSkillBLTY100.clear();
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();
@@ -2655,6 +2664,18 @@ void BattleFighter::updatePassiveSkillPrvAtk100Status()
     while(NULL != (passiveSkill = getPassiveSkillXMCZ100(skillIdx)))
     {
         _xiangMoChanZhangSkill = passiveSkill;
+        break;
+    }
+}
+
+void BattleFighter::updatePassiveSkillBLTY100Status()
+{
+    _biLanTianYiSkill = NULL;
+    const GData::SkillBase* passiveSkill = NULL;
+    size_t skillIdx = 0;
+    while(NULL != (passiveSkill = getPassiveSkillBLTY100(skillIdx)))
+    {
+        _biLanTianYiSkill = passiveSkill;
         break;
     }
 }

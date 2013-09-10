@@ -108,10 +108,14 @@ void DungeonLevel::getLoot( GObject::Player * player, UInt32 specialItem, UInt8 
 
 DungeonData::~DungeonData()
 {
-    for(size_t i = 0; i < monsters.size(); ++ i)
+    for(size_t j = 0; j < 2; ++j)
     {
-        delete monsters[i];
+         for(size_t i = 0; i < monsters[j].size(); ++ i)
+         {
+             delete monsters[j][i];
+         }
     }
+
 }
 
 }
