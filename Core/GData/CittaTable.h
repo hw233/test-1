@@ -76,6 +76,7 @@ struct CittaEffect : public ObjectBaseNT<UInt16>
     float counterlvl;
     float mreslvl;
     float toughlvl;
+    float criticaldmgimmune;
 
     std::vector<const SkillBase*> skill;  // 带出技能
 };

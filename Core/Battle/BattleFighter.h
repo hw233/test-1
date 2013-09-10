@@ -101,6 +101,7 @@ public:
     inline float getExtraCounterLevel() { return _attrExtra.counterlvl; }
     inline float getExtraToughLevel() { return _attrExtra.toughlvl; }
     inline float getExtraMagResLevel() { return _attrExtra.mreslvl; }
+    inline float getExtraCriticalDmgImmune() { return _attrExtra.criticaldmgimmune; }
 
 	inline GObject::Fighter * getFighter() {return _fighter;}
 

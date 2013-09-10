@@ -599,6 +599,7 @@ function calcBattlePoint(fgt)
     bp = bp + (fgt:getBasePierce() + fgt:getExtraPierce())/100 * bp_factor_pir
     bp = bp + (fgt:getBaseCounter() + fgt:getExtraCounter())/100 * bp_factor_counter
     bp = bp + (fgt:getBaseMagRes() + fgt:getExtraMagRes())/100 * bp_factor_magres
+    bp = bp + fgt:getCriticalDmgImmune() * bp_factor_crtdmg
 
     --printBattlePoint(fgt)
     return bp;

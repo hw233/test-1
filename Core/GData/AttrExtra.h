@@ -19,7 +19,7 @@ struct AttrExtra
     agilityP(0), intelligenceP(0), willP(0), soulP(0), auraP(0), auraMaxP(0),
     attackP(0), magatkP(0), defendP(0), magdefP(0), hpP(0), toughP(0),
     actionP(0), hitrateP(0), evadeP(0), criticalP(0), criticaldmgP(0), pierceP(0), counterP(0), magresP(0),
-    hitrlvl(0), evdlvl(0), crilvl(0), pirlvl(0), counterlvl(0), mreslvl(0), toughlvl(0)
+    hitrlvl(0), evdlvl(0), crilvl(0), pirlvl(0), counterlvl(0), mreslvl(0), toughlvl(0), criticaldmgimmune(0)
 	{}
 	AttrExtra& operator +=(const AttrExtra& other)
 	{
@@ -79,6 +79,7 @@ struct AttrExtra
         counterlvl += other.counterlvl;
         mreslvl += other.mreslvl;
         toughlvl += other.toughlvl;
+        criticaldmgimmune += other.criticaldmgimmune;
 
 		return *this;
 	}
@@ -132,6 +133,7 @@ struct AttrExtra
         counterlvl *= af.counter;
         mreslvl *= af.magres;
         toughlvl *= af.tough;
+        criticaldmgimmune *= af.criticaldmgimmune;
 
 		return *this;
 	}
@@ -195,6 +197,7 @@ struct AttrExtra
         counterlvl += other.counterlvl;
         mreslvl += other.mreslvl;
         toughlvl += other.toughlvl;
+        criticaldmgimmune += other.criticaldmgimmune;
 
 		return *this;
 	}
@@ -249,6 +252,7 @@ struct AttrExtra
         aet.counterlvl *= rate;
         aet.mreslvl *= rate;
         aet.toughlvl *= rate;
+        aet.criticaldmgimmune *= rate;
         return aet;
 	}
 
@@ -307,6 +311,7 @@ struct AttrExtra
         counterlvl = 0;
         mreslvl = 0;
         toughlvl = 0;
+        criticaldmgimmune = 0;
     }
 
 	float strength;
@@ -362,6 +367,7 @@ struct AttrExtra
     float counterlvl;
     float mreslvl;
     float toughlvl;
+    float criticaldmgimmune;
 
     std::vector<const SkillBase*> skills;
 };

@@ -570,6 +570,7 @@ namespace GData
             aextra->_extra.counter *= 100;
 			SetValOrPercent(aextra->_extra.mreslvl, aextra->_extra.magres, ae.magres);
             aextra->_extra.magres *= 100;
+            aextra->_extra.criticaldmgimmune = 0;
 
             StringTokenizer tk(ae.skill, ",");
             if (tk.count())
@@ -1420,6 +1421,7 @@ namespace GData
             cft->counter *= 100;
 			SetValOrPercent(cft->mreslvl, cft->magres, cf.magres);
             cft->magres *= 100;
+            cft->criticaldmgimmune = 0;
 
             StringTokenizer tk(cf.skill, ",");
             if (tk.count())
