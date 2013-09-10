@@ -9118,6 +9118,7 @@ function GetLuckyBagAward(player)
     end
     player:sendLuckyBagInfo();
     Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_136)
+    player:luaUdpLog("huodong", "F_130910_1", "act")
     return true
 end
 
