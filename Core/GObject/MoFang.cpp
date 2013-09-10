@@ -1473,7 +1473,7 @@ void MoFang::addKYAttr(GData::AttrExtra& ae)
                     ae.action += kyInfo->attrValue;
                     break;
                 case 5:
-                    ae.criticaldmg += kyInfo->attrValue;
+                    ae.criticaldmgimmune += (static_cast<float>(kyInfo->attrValue)) / 100.0f;
                     break;
             }
         }
