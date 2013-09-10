@@ -133,7 +133,6 @@ struct AttrExtra
         counterlvl *= af.counter;
         mreslvl *= af.magres;
         toughlvl *= af.tough;
-        criticaldmgimmune *= af.criticaldmgimmune;
 
 		return *this;
 	}

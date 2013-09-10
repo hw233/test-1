@@ -154,6 +154,7 @@ public:
 	float getCounter(BattleFighter* defgt, const GData::SkillBase* skil = NULL);
 	float getMagRes(BattleFighter* defgt);
 	float getTough(BattleFighter* defgt);
+    float getCriticalDmgImmune() { return _attrExtra.criticaldmgimmune; }
 	inline UInt32 getMaxHP() {Int64 ret = _maxhp + _maxhpAdd + _maxhpAdd2; return (ret > 0 ? ret : 0);}
 	inline Int32 getAction() {Int32 ret = _maxAction + _maxActionAdd + _maxActionAdd2; return (ret > 0 ? ret : 0);}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
@@ -409,7 +410,6 @@ public:
     inline float getToughAdd2() { return _toughAdd2;}
     inline float getAtkReduce2() { return _atkreduce2; }
     inline float getMagAtkReduce2() { return _magatkreduce2; }
-    inline float getCriticalDmgImmune() { return _fighter->getCriticalDmgImmune(); }
 
 	inline void setAttackAdd2(float v) {_attackAdd2 = v;}
 	inline void setMagAttackAdd2(float v) {_magAtkAdd2 = v;}

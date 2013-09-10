@@ -69,7 +69,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
     attack(0), defend(0), maxhp(0), action(0), peerless(0), talent(0),
-    hitrate(0), evade(0), critical(0), criticaldmg(0), pierce(0), counter(0), magres(0), _critcalDmgImmune(0.0f)
+    hitrate(0), evade(0), critical(0), criticaldmg(0), pierce(0), counter(0), magres(0)
 {
     memset(_acupoints, 0, sizeof(_acupoints));
     memset(_skill, 0, sizeof(_skill));

@@ -115,7 +115,7 @@ void BattleFormula::init()
 
 	class_def<GObject::Fighter>("getSoulPracticeAddOn", &GObject::Fighter::getSoulPracticeAddOn);
 	class_def<GObject::Fighter>("getSoulPracticeFactor", &GObject::Fighter::getSoulPracticeFactor);
-	class_def<GObject::Fighter>("getCriticalDmgImmune", &GObject::Fighter::getCriticalDmgImmune);
+	class_def<GObject::Fighter>("getExtraCriticalDmgImmune", &GObject::Fighter::getExtraCriticalDmgImmune);
 
 	class_add<Battle::BattleFighter>("BattleFighter");
 	class_def<Battle::BattleFighter>("getId", &Battle::BattleFighter::getId);
