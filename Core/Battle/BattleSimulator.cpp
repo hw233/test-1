@@ -11575,6 +11575,7 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
         u = 0;
         bf->minusEvadeCnt(3);
         UInt8 evadeCnt = bf->getEvadeCnt();
+        appendDefStatus(e_skill, skill->getId(), bf);
         if(evadeCnt == 0)
             appendDefStatus(e_unBiLanTianYi, evadeCnt, bf);
         else
@@ -13228,6 +13229,7 @@ void BattleSimulator::addSelfSideEvadeCnt(BattleFighter* bf)
         if(!skill)
             continue;
         bo->addEvadeCnt(1);
+        appendDefStatus(e_skill, skill->getId(), bo);
         appendDefStatus(e_biLanTianYi, bo->getEvadeCnt(), bo);
     }
 }
