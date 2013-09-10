@@ -1293,6 +1293,14 @@ struct DBTuzhi
     UInt32 tuzhiId;
     UInt8 curProficient;
 };
+
+struct DBKeyin
+{
+    UInt64 playerId;
+    UInt8 keyinId;
+    UInt8  curLvl;
+    UInt32 curExp;
+};
 }
 
 namespace DB {
@@ -2938,6 +2946,16 @@ SPECIALDEF(3)
     UInt64, playerId,
     UInt32, tuzhiId,
     UInt8, curProficient
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBKeyin)
+SPECIALDEF(4)
+    (
+    UInt64, playerId,
+    UInt8, keyinId,
+    UInt8,  curLvl,
+    UInt32, curExp
     )
 SPECIALEND()
 

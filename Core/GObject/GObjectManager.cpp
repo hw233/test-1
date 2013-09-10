@@ -311,6 +311,12 @@ namespace GObject
             std::abort();
         }
 
+		if(!loadKeyin())
+        {
+            fprintf(stderr, "load keyin error!\n");
+            std::abort();
+        }
+
 		if(!loadTempItem())
         {
             fprintf(stderr, "load TempItem error!\n");
@@ -5477,6 +5483,39 @@ namespace GObject
 
         return true;
     }
+
+    bool GObjectManager::loadKeyin()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Keyin:");
+		DBKeyin idata;
+        Player* pl = NULL;
+
+		if(execu->Prepare("SELECT `playerId`, keyinId, `curLvl`, `curValue`  FROM `player_keyin` ORDER BY `playerId`", idata) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(idata.playerId != last_id)
+			{
+				last_id = idata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->GetMoFang()->AddKeyinFromDB(idata);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
     bool GObjectManager::LoadSoulItemChance()
     {
         lua_State* L = lua_open();

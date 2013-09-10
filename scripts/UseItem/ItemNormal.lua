@@ -8755,6 +8755,17 @@ function ItemNormal_tuzhi(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_keyin(iid, num, bind, param)
+    if iid == 9424 or iid == 9425 then
+        local player = GetPlayer()
+        local moFang = player:GetMoFang();
+        local package = player:GetPackage();
+        moFang:addMoney(iid, num);
+        package:DelItemSendMsg(iid, player);
+        return num;
+    end
+end
+
 function ItemNormal_00009311(iid, num, bind, param)
     if iid < 9311 or iid > 9312 then
         return 0
@@ -11175,6 +11186,8 @@ local ItemNormal_Table = {
     [9418] = ItemNormal_tuzhi,
     [9419] = ItemNormal_00009419,
     [9421] = ItemNormal_jgsexp,
+    [9424] = ItemNormal_keyin,
+    [9425] = ItemNormal_keyin,
 
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,

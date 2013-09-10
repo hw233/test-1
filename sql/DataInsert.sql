@@ -230,3 +230,6 @@ LOCK TABLES `tuzhi` WRITE;
 source tuzhi;
 UNLOCK TABLES;
 
+LOCK TABLES `signet` WRITE;
+source signet;
+UNLOCK TABLES;

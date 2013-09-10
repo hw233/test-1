@@ -62,6 +62,44 @@ namespace GData
             iter->second.push_back(info.tuzhiId);
     }
 
+    void JiguanData::setkeyinInfo(DBKeyinConfig & keyinData)
+    {
+        keyinInfo info;
+
+        info.keyinId = keyinData.keyinId;
+        info.keyinLvl = keyinData.keyinLvl;
+        info.name = keyinData.name;
+        info.quality = keyinData.quality;
+        info.attrType = keyinData.attrType;
+        info.attrValue = keyinData.attrValue;
+        info.materialA = keyinData.materialA;
+        info.materialB = keyinData.materialB;
+        info.maxValue = keyinData.maxValue;
+
+        std::map<UInt8, std::map<UInt8, keyinInfo>>::iterator iter = _keyinInfo.find(info.keyinId);
+        if(iter == _keyinInfo.end())
+        {
+            std::map<UInt8, keyinInfo> _lvlkeyinInfo;
+            _lvlkeyinInfo.insert(std::make_pair(info.keyinLvl, info));
+            _keyinInfo.insert(std::make_pair(info.keyinId, _lvlkeyinInfo));
+        }
+        else
+            iter->second.insert(std::make_pair(info.keyinLvl, info));
+    }
+
+    JiguanData::keyinInfo * JiguanData::getKeyinInfo(UInt8 keyinId, UInt8 keyinLvl)
+    {
+        std::map<UInt8, std::map<UInt8, keyinInfo>>::iterator iter = _keyinInfo.find(keyinId);
+        if(iter != _keyinInfo.end())
+        {
+            std::map<UInt8, keyinInfo>::iterator iterA = iter->second.find(keyinLvl);
+            if(iterA != iter->second.end())
+                return &(iterA->second);
+        }
+
+        return NULL;
+    }
+
     JiguanData::jiguanyuInfo * JiguanData::getJiguanyuInfo(UInt32 jgyuId)
     {
         std::map<UInt32, jiguanyuInfo>::iterator iter = _jiguanyuInfo.find(jgyuId);
