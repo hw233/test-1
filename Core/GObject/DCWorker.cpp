@@ -345,7 +345,7 @@ namespace GObject
             return false;
         char value[32] = {0};
         char key[64] = {0};
-        size_t len = snprintf(key, sizeof(key), "uid_asss_grp_%s", openid); 
+        size_t len = snprintf(key, sizeof(key), "uid_asss_summerflow_%s", openid); 
         m_MCached.get(key, len, value, sizeof(value));
         return atoi(value);
     }

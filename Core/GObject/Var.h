@@ -513,7 +513,6 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_CLAN_ACTPT_MONTH = 562,      // 每月帮派活跃度
         VAR_CLAN_ACTPT_FLAG = 563,      // 活跃度领取标识
         VAR_QZONGPYGIFT = 564, //Qzong,PY合作礼包
-        //581-600 for qiwy
 
         //581-600 for lb 
         VAR_SUMMERFLOW3_TYPE = 581 ,
@@ -527,6 +526,13 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_PRAY_TYPE_TODAY = 588 ,
         VAR_PRAY_TIME = 589 ,
         VAR_PRAY_LOGIN = 590,
+        
+        VAR_QQBOARD_ONLINE = 591,
+        VAR_QQBOARD_LOGIN_AWARD = 592,
+        VAR_QQBOARD_ONLINE_AWARD = 593,
+
+        VAR_RANDfRIEND = 594 ,
+        //600-620 for qiwy  ^_^
 
         VAR_MAX,
     };
@@ -1007,6 +1013,11 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_PRAY_SUCTIME, CYCLE_NONE);
             REGISTER_VAR(VAR_PRAY_TYPE_TODAY, CYCLE_DAY);
             REGISTER_VAR(VAR_PRAY_TIME, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_QQBOARD_ONLINE, CYCLE_DAY);
+            REGISTER_VAR(VAR_QQBOARD_LOGIN_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_QQBOARD_ONLINE_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_RANDfRIEND, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

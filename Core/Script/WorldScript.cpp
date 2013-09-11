@@ -243,6 +243,8 @@ void WorldScript::init()
     def("getSummerFlow3Time",GObject::World::getSummerFlow3Time);
     def("setHalfGold",GObject::World::setHalfGold);
     def("getHalfGold",GObject::World::getHalfGold);
+    def("setQQBoardLoginTime",GObject::World::setQQBoardLoginTime);
+    def("getQQBoardLoginTime",GObject::World::getQQBoardLoginTime);
 
     def("setSurnameLegend",GObject::World::setSurnameLegend);
     def("getSurnameLegend",GObject::World::getSurnameLegend);

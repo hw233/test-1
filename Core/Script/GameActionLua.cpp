@@ -1381,6 +1381,11 @@ namespace Script
         assert(player != NULL);
         return Call<bool>("RunQQBoardInstantLoginAward", player, val);
     }
+    bool GameActionLua::RunQQBoardOnlineAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunQQBoardOnlineAward", player, val);
+    }
     bool GameActionLua::RunLuckyMeetInstantLoginAward(Player* player, UInt8 val)
     {
         assert(player != NULL);

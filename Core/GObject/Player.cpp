@@ -132,6 +132,7 @@ namespace GObject
 	GlobalNamedPlayers globalNamedPlayers;
 	ChallengeCheck challengeCheck;
     GlobalLevelsPlayers globalLevelsPlayers;
+    GlobalPlayers globalOnlinePlayers;
     static TripodData nulltd;
     AtomicVal<UInt32> g_eMeiCount = (AtomicVal<UInt32>)(0);
     AtomicVal<UInt32> g_kunLunCount = (AtomicVal<UInt32>)(0);
@@ -2324,9 +2325,10 @@ namespace GObject
         }
         //愚公移山活动
         setLogoutInFoolsDay();
-
+        globalOnlinePlayers.remove(getId()); //从全局在线玩家容器中删除
         PopTimerEvent(this, EVENT_AUTOBATTLE, 0);
         delFlag(Training);
+        sendQQBoardOnlineTime();  
 	}
 
 	void Player::checkLastBattled()
@@ -13336,7 +13338,7 @@ namespace GObject
             return;
         ctslandingAward |= (1<<((val - 1)/2));
         SetVar(VAR_QQBOARD_AWARD, ctslandingAward);
-       sendQQBoardLoginInfo();
+        sendQQBoardLoginInfo();
     }
     void Player::getLuckyMeetAward(UInt8 idx,UInt8 index)
     {
@@ -21150,7 +21152,7 @@ void Player::getQQGameOnlineAward()
     SetVar(VAR_ONLINE_AWARD, 1);
     GetPackage()->Add(134, 1, true, false);
     GetPackage()->Add(1325, 1, true, false);
-    GetPackage()->Add(15, 1, true, false);
+    GetPackage()->Add(551, 1, true, false);
     GetPackage()->Add(500, 1, true, false);
     sendQQGameOnlineAward();
 }
@@ -23670,6 +23672,163 @@ void Player::setPrayLoginInWeek()
     SetVar(VAR_PRAY_LOGIN, PrayLogin);
 }
 
+void Player::sendRandFriend()
+{
+    if(GetLev()<30)
+        return ;
+    UInt32 size = globalOnlinePlayers.size()-1;
+    UInt32 flag = GetVar(VAR_RANDfRIEND);
+    Stream st(REP::FRIEND_LIST);
+    st<<static_cast<UInt8>(5);
+    size_t offset = st.size();
+    UInt8 Count = 0;
+    st<<static_cast<UInt8>(0);
+    if(size < 10 )
+    { 
+        if(flag == 0 )
+        {    
+            for(GlobalPlayers::iterator it = globalOnlinePlayers.begin(); it!= globalOnlinePlayers.end();++it)
+            {
+                Player* pl = it->second;
+                if(pl == NULL || pl == this ||_hasFriend(0,pl)||_hasFriend(3,pl)||pl->GetLev() < 30)
+                    continue;
+                st<<pl->getName()<<static_cast<UInt8>(pl->GetLev())<<static_cast<UInt8>(pl->GetClassAndSex());
+                Count++;
+            }
+        }
+    }
+    else 
+    {
+        if(!flag)
+        {
+            UInt32 div = size /10 ;
+            for(UInt32 i= 0 ; i < 10 ; ++i )
+            {   
+                GlobalPlayers::iterator it = globalOnlinePlayers.begin();
+                UInt32 rand = uRand(div);
+                std::advance(it,rand+i*div);
+                Player* pl = it->second;
+                if(pl == NULL || pl == this ||_hasFriend(0,pl)||_hasFriend(3,pl)||pl->GetLev() < 30)
+                    continue;
+                st<<pl->getName()<<static_cast<UInt8>(pl->GetLev())<<static_cast<UInt8>(pl->GetClassAndSex());
+                Count++;
+            }
+        }
+
+    }
+    UInt32 count_rand = 0;
+    while(Count<10 &&( !flag )&& count_rand++< 20 )
+    {
+        UInt32 rand =uRand( globalPlayers.size());
+        GlobalPlayers::iterator it = globalPlayers.begin();
+        std::advance(it,rand);
+        Player* pl = it->second;
+        if(pl == NULL || pl == this ||_hasFriend(0,pl)||_hasFriend(3,pl)||pl->GetLev() < 30 || pl->isOnline())
+            continue;
+        st<<pl->getName()<<static_cast<UInt8>(pl->GetLev())<<static_cast<UInt8>(pl->GetClassAndSex());
+        Count++; 
+    }
+    st.data<UInt8>(offset)=static_cast<UInt8>(Count);
+    st<<Stream::eos;
+    send(st);
+}
+
+void Player::GetQQBoardAward( UInt8 type)
+{
+    
+    if(!World::getQQBoardLoginTime())
+        return ;
+    if(type < 0 ||type >3 )
+        return ;
+    sendQQBoardOnlineTime(); 
+    UInt32 LoginGetAward = GetVar(VAR_QQBOARD_LOGIN_AWARD); 
+    if(type == 0 )
+    {
+        return ;
+        if(GetVar(VAR_QQBOARD_ONLINE_AWARD))
+            return ;
+        if(GetVar(VAR_QQBOARD_ONLINE) < 1200 )
+            return ;
+    }
+    else 
+    {
+        if((LoginGetAward &(1<<(type+7)))||!(LoginGetAward&(1<<(type-1))))
+            return ;
+    }
+    if(!GameAction()->RunQQBoardOnlineAward(this, type))
+        return;
+    if(type)
+    {
+        LoginGetAward |=(1<<(type+7)); 
+        SetVar(VAR_QQBOARD_LOGIN_AWARD,LoginGetAward);
+    }
+    else 
+    {
+       SetVar(VAR_QQBOARD_ONLINE_AWARD,1);
+    }
+}
+void Player::sendQQBoardOnlineTime()
+{
+    return ;
+    if(!World::getQQBoardLoginTime())
+        return ;
+    UInt32 LoginTime = _playerData.lastOnline; 
+    UInt32 OnlineAward = GetVar(VAR_QQBOARD_ONLINE_AWARD);
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = 0 ;
+    UInt32 Time21 = TimeUtil::SharpDayT( 0 , now) + 21 * 3600;
+    if(now<Time21 || now > (Time21 +1800 ))
+        return ;
+    if(LoginTime < Time21)
+        time = now-Time21;
+    else 
+    {
+        time = GetVar(VAR_QQBOARD_ONLINE)+ now - LoginTime;
+    }
+    if(time > 20*60)
+    {
+        time = 20*60;
+    }
+    SetVar(VAR_QQBOARD_ONLINE,time);
+    Stream st(REP::RC7DAY);  //协议
+    st<<static_cast<UInt8>(20);
+    st<<static_cast<UInt8>(OnlineAward);
+    st<<static_cast<UInt32>(20*60 - time)<<Stream::eos;
+    send(st);
+}
+void Player::sendQQBoardLogin()
+{
+//    if( this->getPlatform()!= 10)
+ //       return ;
+    if(!World::getQQBoardLoginTime())
+        return ;
+    UInt32 LoginAward = GetVar(VAR_QQBOARD_LOGIN_AWARD);
+    UInt32 timeBegin = TimeUtil::MkTime(2013,9,9);
+    UInt32 now = TimeUtil::Now();
+    if(now < timeBegin )
+        return ;
+    Stream st(REP::RC7DAY);  //协议
+    st<<static_cast<UInt8>(19);
+    st<<static_cast<UInt16>(LoginAward);
+    st<<Stream::eos;
+    send(st);
+
+}
+void Player::SetQQBoardLogin()
+{
+   // if( this->getPlatform()!= 10)
+    //    return ;
+    UInt32 now = TimeUtil::Now();
+    if(now<(TimeUtil::SharpDayT( 0 , now) + 20 * 3600) || now > (TimeUtil::SharpDayT( 0 , now) + 22 * 3600) ) 
+        return ;
+    UInt32 timeBegin = TimeUtil::MkTime(2013,9,9);
+    if(now < timeBegin )
+        return ;
+    UInt32 cts = static_cast<UInt8>((TimeUtil::SharpDayT( 0 , now) - timeBegin)/86400);
+    UInt32 LoginCanAward = GetVar(VAR_QQBOARD_LOGIN_AWARD); 
+    LoginCanAward |= (1<<cts);
+    SetVar(VAR_QQBOARD_LOGIN_AWARD,LoginCanAward);
+}
 } // namespace GObject
 
 
