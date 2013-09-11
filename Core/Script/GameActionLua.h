@@ -388,6 +388,7 @@ namespace Script
         bool onFishUserPackage(Player* player, UInt8 idx);
         Table GetNewHeroIslandBuffs();
         bool onCollectCardAct(Player* player, UInt8 idx);
+        UInt16 addClanProfferFromItem(Player* player, UInt16 num, UInt16 unit);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

@@ -762,6 +762,7 @@ namespace GObject
 		m_moFang = new MoFang(this);
         m_csFlag = 0;
         m_spreadInterval = 0;
+        m_spreadCoolTime = 0;
         _mditem = 0;
         _qixiBinding = false;
 
@@ -5384,6 +5385,18 @@ namespace GObject
 
         return proffer;
     }
+
+	UInt16 Player::addClanProfferFromItem(UInt16 num, UInt16 unit)
+	{
+        IncommingInfo ii(ProfferFromUseItem, 0, 0);
+        UInt32 proffer = getClanProffer(num * unit, &ii);
+        UInt16 iRet;
+        if(proffer > 0)
+            iRet = num;
+        else
+            iRet = 0;
+		return iRet;
+	}
 
     UInt32 Player::getCoin( UInt32 c )
 	{
@@ -16178,6 +16191,11 @@ namespace GObject
             }
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
+
+        if (itemId == 10197 || itemId == 10198 || itemId == 10199)
+        {
+            udpLog("huodong", Itoa(itemId).c_str(), "", "", "", "", "act");
+        }
     }
 
     int Player::IDIPBuy(UInt32 itemId, UInt32 num, UInt32 price, std::string& err, bool bind)
@@ -17671,12 +17689,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {1651, 1654},
             {1652, 1655},
             {1541, 1541},
-            {1542, 1542}
+            {1542, 1542},
+            {1544, 1544}
         };
 
         if ((innateTrumpid >= 1529 && innateTrumpid <= 1534) ||
             (innateTrumpid >= 1650 && innateTrumpid <= 1655)
-         || (innateTrumpid >= 1541 && innateTrumpid <= 1542))
+         || (innateTrumpid >= 1541 && innateTrumpid <= 1542)
+         || (innateTrumpid >= 1544 && innateTrumpid <= 1544)
+         )
         {
             size_t i = 0;
             for (; i < sizeof(muttrumps)/(sizeof(UInt32)*2); ++i)
@@ -19908,10 +19929,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -21980,7 +22001,7 @@ bool Player::in7DayFromCreated()
     return true;
 }
 
-#define QUESTIONID_MAX 20
+#define QUESTIONID_MAX 30
 /*#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))*/
@@ -22114,17 +22135,17 @@ void Player::getAwardInFoolsDay()
         if(info & (1<<i))
             ++ right;
     }
-    if(right < 4)
+    if(right < 5)
         return;
-    if (GetPackage()->GetRestPackageSize() < right / 4)
+    if (GetPackage()->GetRestPackageSize() < right / 5)
     {
         sendMsgCode(2, 1011, 0);
         return;
     }
-    GameAction()->getAwardInFoolsDay(this, right / 4);
-    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/4 * 4));
+    GameAction()->getAwardInFoolsDay(this, right / 5);
+    SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/5 * 5));
     sendFoolsDayInfo();
-    foolsDayUdpLog(right / 4);
+    foolsDayUdpLog(right / 5);
 }
 
 void Player::buyResurrectionCard()
@@ -22138,14 +22159,17 @@ void Player::buyResurrectionCard()
     if(qid == 0)
         return;
     UInt8 cnt = GET_BIT_8(value, 2) + 1;
-    cnt = cnt > 5 ? 5 : cnt;
-    if(cnt * 10 > getGold())
+    cnt = cnt > 6 ? 6 : cnt;
+    if(cnt > 1)
     {
-        sendMsgCode(0, 1104);
-        return;
+        if((static_cast<UInt32>(cnt) - 1) * 10 > getGold())
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        ConsumeInfo ci(FoolsDayAnswerAct, 0, 0);
+        useGold((cnt - 1)*10, &ci);
     }
-    ConsumeInfo ci(FoolsDayAnswerAct, 0, 0);
-    useGold(cnt*10, &ci);
 
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
     //info = SET_BIT(info, GET_BIT_8(value, 0));
@@ -22699,16 +22723,24 @@ void Player::spreadToOther(UInt8 type, std::string name)
             sendMsgCode(0, 2215);
             return;
         }
+        if(pl->m_spreadCoolTime > now)
+        {
+            sendMsgCode(0, 2231);
+            return;
+        }
         SetVar(VAR_SPREAD_FLAG, tmp | SPREAD_ALREADY_USE);
         GVAR.AddVar(GVAR_SPREAD_CONDITION, 1 << 8);
-        UInt32 pexp = 50000;
+        UInt32 pexp = 10000;
         GameMsgHdr hdr2(0x238, getThreadId(), this, sizeof(pexp));
         GLOBAL().PushMsg(hdr2, &pexp);
     }
     else
     {
         if(World::spreadKeeper)
+        {
             sendMsgCode(0, 3501);
+            World::spreadKeeper->m_spreadCoolTime = now + SPREAD_COOL_TIME;
+        }
     }
 
     World::spreadKeeper = pl;
@@ -22738,6 +22770,11 @@ void Player::spreadToSelf()
         return;
     }
 	UInt32 now = TimeUtil::Now();
+    if(m_spreadCoolTime > now)
+    {
+        sendMsgCode(0, 2232);
+        return;
+    }
     if(now < World::spreadBuff)
     {
         if(now < m_spreadInterval)
@@ -22768,6 +22805,11 @@ void Player::spreadGetAward()
     //    return;
     if(tmp & SPREAD_ALREADY_GET)
         return;
+    if(GetLev() < 45)
+    {
+        sendMsgCode(0, 1010);
+        return;
+    }
     UInt32 spreadCount = World::getSpreadCount();
     GameMsgHdr h(0x349, getThreadId(), this, sizeof(spreadCount));
     GLOBAL().PushMsg(h, &spreadCount);

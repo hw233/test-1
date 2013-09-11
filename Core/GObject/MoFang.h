@@ -49,6 +49,8 @@ namespace GObject
     struct DBJiguanshu;
     struct DBJiguanyu;
     struct DBTuzhi;
+    struct DBKeyin;
+
     struct Jiguanshu
     {
         Jiguanshu() : curLvl(0), curExp(0){}
@@ -67,6 +69,7 @@ namespace GObject
         void AddJGSFromDB(DBJiguanshu &);
         void AddJGYFromDB(DBJiguanyu &);
         void AddTuzhiFromDB(DBTuzhi &);
+        void AddKeyinFromDB(DBKeyin &);
 
         void randTuzhi(UInt16 num);
         void addJGSExp(UInt32 exp);
@@ -77,20 +80,30 @@ namespace GObject
         void addJGYAttr(GData::AttrExtra& ae);                                          // 添加机关玉属性
         UInt16 useJGQskill();                                                           // 使用机关器技能
         void upgradeJGS();                                                              // 机关术升级
-        void sendMoFangInfo(UInt8 mark = 0 /*0:获取墨方信息；1：制作机关玉；2：装备机关；3：拆卸机关 */);
-        void quickMakejiguan(UInt32 tuzhiId, UInt8 mark);
+        void sendMoFangInfo(UInt8 mark = 0);                                            // 墨方信息
+        void quickMakejiguan(UInt32 tuzhiId, UInt8 mark);                               // 一键制造机关玉
+        void upgradeKY(UInt8 keyinId, UInt8 mark);                                      // 刻篆
+        void quickUpgradeKY(UInt8 keyinId, UInt8 mark);                                 // 一键刻篆
+        void changeMoney(UInt8 mark);                                                   // 壁凤墨转换为磐龙墨
+        void addMoney(UInt32 toolId, UInt32 count);
+        void addKYAttr(GData::AttrExtra& ae);
         inline bool findEquipJG(UInt32 jgId);
         inline bool findNoEquipJG(UInt32 jgId);
     private:
 
-        //std::map<UInt8, UInt32> m_equipJG;  // 记录墨方坐标点所装备的机关
         std::map<UInt32, UInt8> m_equipJG;  // 装备的机关
 
         std::map<UInt32, UInt8> m_tuzhi;    // 记录图纸所对应的熟练度
 
+        std::map<UInt8, UInt8> m_kyLvl;     // 记录刻印当前等级
+
+        std::map<UInt8, UInt32> m_kyCurExp; // 记录刻印当前经验
+
         std::vector<UInt32> m_jg;           // 记录未装备机关
 
         int m_grids[49];                    // 记录网格占用情况
+
+        int m_kyQuality[4];                 // 刻印品质
 
         Jiguanshu m_jiguanshu;
 

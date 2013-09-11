@@ -385,6 +385,7 @@ public:
     inline std::vector<UInt16>& getPassiveSkillBleedTypeDmg() { return _rpasskl[GData::SKILL_BLEED_TYPE_DMG-GData::SKILL_PASSSTART]; }
 
     inline std::vector<UInt16>& getPassiveSkillXMCZ100() { return _passkl[GData::SKILL_XMCZ-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillBLTY100() { return _passkl[GData::SKILL_BLTY-GData::SKILL_PASSSTART]; }
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
@@ -622,6 +623,7 @@ public:
     inline float getExtraCounterLevel() { checkDirty(); return _attrExtraEquip.counterlvl; }
     inline float getExtraToughLevel() { checkDirty(); return _attrExtraEquip.toughlvl; }
     inline float getExtraMagResLevel() { checkDirty(); return _attrExtraEquip.mreslvl; }
+    inline float getExtraCriticalDmgImmune() { checkDirty(); return _attrExtraEquip.criticaldmgimmune; }
 
 public:
     inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }

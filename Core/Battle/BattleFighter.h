@@ -101,6 +101,7 @@ public:
     inline float getExtraCounterLevel() { return _attrExtra.counterlvl; }
     inline float getExtraToughLevel() { return _attrExtra.toughlvl; }
     inline float getExtraMagResLevel() { return _attrExtra.mreslvl; }
+    inline float getExtraCriticalDmgImmune() { return _attrExtra.criticaldmgimmune; }
 
 	inline GObject::Fighter * getFighter() {return _fighter;}
 
@@ -153,6 +154,7 @@ public:
 	float getCounter(BattleFighter* defgt, const GData::SkillBase* skil = NULL);
 	float getMagRes(BattleFighter* defgt);
 	float getTough(BattleFighter* defgt);
+    float getCriticalDmgImmune() { return _attrExtra.criticaldmgimmune; }
 	inline UInt32 getMaxHP() {Int64 ret = _maxhp + _maxhpAdd + _maxhpAdd2; return (ret > 0 ? ret : 0);}
 	inline Int32 getAction() {Int32 ret = _maxAction + _maxActionAdd + _maxActionAdd2; return (ret > 0 ? ret : 0);}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
@@ -323,6 +325,7 @@ public:
 
     void updateSoulSkillDead(UInt16 skillId);
     void updatePassiveSkillPrvAtk100Status();
+    void updatePassiveSkillBLTY100Status();
 
     const GData::SkillBase* getPassiveSkillOnTherapy();
     const GData::SkillBase* getPassiveSkillOnSkillDmg();
@@ -952,6 +955,10 @@ public:
     const GData::SkillBase* getXiangMoChanZhangSkill(){ return _xiangMoChanZhangSkill; }
     const void setXiangMoChanZhangSkill(GData::SkillBase* skill){ _xiangMoChanZhangSkill = skill; }
 
+    const GData::SkillBase* _biLanTianYiSkill;
+    const GData::SkillBase* getBiLanTianYiSkill(){ return _biLanTianYiSkill; }
+    const void setBiLanTianYiSkill(GData::SkillBase* skill){ _biLanTianYiSkill = skill; }
+
     inline float& getPetShieldHP() { return _petShieldHP; }
     inline void setPetShieldHP(float value) { _petShieldHP = value; }
 
@@ -1142,12 +1149,18 @@ private:
     inline void setBuddhaLightLauncher(BattleFighter* f) { launcher = f; }
     inline BattleFighter* getBuddhaLightLauncher() { return launcher; }
 
+    UInt8 _evadeCnt;
+    UInt8 getEvadeCnt() { return _evadeCnt; }
+    void addEvadeCnt(UInt8 cnt) { if(_evadeCnt + cnt <= 5) _evadeCnt += cnt; else _evadeCnt = 5; }
+    void minusEvadeCnt(UInt8 cnt) { if(_evadeCnt >= cnt) _evadeCnt -= cnt; else _evadeCnt = 0; }
+
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
     std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;
     std::vector<GData::SkillItem> _passiveSkillXMCZ100;
+    std::vector<GData::SkillItem> _passiveSkillBLTY100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1155,6 +1168,7 @@ private:
     const GData::SkillBase* getPassiveSkillBleedTypeDmg100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBleedTypeDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillXMCZ100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget = false);
 
 public:
 	enum StatusFlag

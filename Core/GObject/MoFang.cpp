@@ -14,7 +14,8 @@ namespace GObject
 MoFang::MoFang(Player* pl)
 {
     m_owner = pl;
-
+ 
+    memset(m_kyQuality, 0, sizeof(m_kyQuality));
     memset(m_grids, -1, sizeof(m_grids));
 
     UInt8 mofangInit[9] = {17, 18, 19, 24, 25, 26, 31, 32, 33};
@@ -52,30 +53,12 @@ void MoFang::AddJGSFromDB(DBJiguanshu & dbData)
                m_grids[index-1] = 0;
         }
     }
-    
-    /*UInt8 temp[40] = {10, 11, 12, 13, 20, 27, 34, 41, 40, 39, 
-                    38, 37, 30, 23, 16, 9, 2, 3, 4, 5,
-                    6, 7, 14, 21, 28, 35, 42, 49, 48, 47,
-                    46, 45, 44, 43, 36, 29, 22, 15, 8, 1};
-
-    UInt8 count = m_jiguanshu.curLvl / 2;
-   
-    if(count > 40)
-        count = 40;
-
-    for(UInt8 i=0; i<count; i++)
-    {
-        UInt8 index = temp[i];
-        if(index > 0 && index <= 49)
-            m_grids[index-1] = 0;
-    }*/
 }
 
 void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
 {
     if(dbData.pos > 0 && dbData.pos <= 49)
     {
-        //m_equipJG.insert(std::make_pair(dbData.pos, dbData.jiguanId));
         m_equipJG.insert(std::make_pair(dbData.jiguanId, dbData.pos));
         UInt8 pos = dbData.pos;
         GData::JiguanData::jiguanyuInfo * jgyInfo = GData::jiguanData.getJiguanyuInfo(dbData.jiguanId);
@@ -87,7 +70,10 @@ void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
         UInt8 mark = false;
         for(; i<3; i++)
         {
-            if((k >= 9 || (pos+i-1) < 0 || (pos+i-1) >= 49) && (0 != jgyInfo->molding[k]))
+            if(k >= 9)
+                return;
+
+            if(((pos+i-1) < 0 || (pos+i-1) >= 49) && (0 != jgyInfo->molding[k]))
                 return;
 
             if(0 != jgyInfo->molding[k])
@@ -103,7 +89,7 @@ void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
                     if(8 == k)
                         break;
 
-                    if((i%3) == 2)
+                    if(i == 2)
                     {
                         mark = true;
                         pos = pos + 7;
@@ -119,7 +105,7 @@ void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
                 if(8 == k)
                     break;
 
-                if((i%3) == 2)
+                if(i == 2)
                 {
                     mark = true;
                     pos = pos + 7;
@@ -141,6 +127,21 @@ void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
     }
 }
 
+void MoFang::AddKeyinFromDB(DBKeyin & dbData)
+{
+    m_kyLvl.insert(std::make_pair(dbData.keyinId, dbData.curLvl));
+    m_kyCurExp.insert(std::make_pair(dbData.keyinId, dbData.curExp));
+
+    if(dbData.keyinId >=1 && dbData.keyinId <=4)
+    {
+        GData::JiguanData::keyinInfo * kyInfo = GData::jiguanData.getKeyinInfo(dbData.keyinId, dbData.curLvl);
+        if(!kyInfo)
+            return;
+
+        m_kyQuality[dbData.keyinId - 1] = kyInfo->quality;
+    }
+}
+
 void MoFang::AddTuzhiFromDB(DBTuzhi & dbData)
 {
     m_tuzhi.insert(std::make_pair(dbData.tuzhiId, dbData.curProficient));
@@ -157,15 +158,6 @@ UInt32 MoFang::addTuzhi(UInt32 tuzhiId, bool mark)
 
     if(tuzhiId > NORMAL_TUZHI && tuzhiId <= SPECIAL_TUZHI)
     {
-        /*std::map<UInt8, UInt32>::iterator iter = m_equipJG.begin();
-        for(; iter != m_equipJG.end(); iter++)
-        {
-            if(iter->second == (tuzhiId - NORMAL_TUZHI))
-            {
-                m_jiguanshu.curExp += 30;
-                return 0;
-            }
-        }*/
         bool findRes = false;
 
         findRes = findEquipJG(tuzhiId - NORMAL_TUZHI);
@@ -189,24 +181,6 @@ UInt32 MoFang::addTuzhi(UInt32 tuzhiId, bool mark)
             return 0;
         }
     }
-
-    /*if(tuzhiId >= SPECIAL_TUZHI)
-    {
-        UInt32 tempId= 0;
-        std::map<UInt32, UInt8>::iterator iterB = m_tuzhi.begin();
-        for(; iterB != m_tuzhi.end(); iterB++)
-        {
-            if(iterB->first > tempId && iterB->first >= SPECIAL_TUZHI)
-            {
-                tempId = iterB->first;
-            }
-        }
-
-        if(tempId >= SPECIAL_TUZHI) //特殊图纸
-        {
-            tuzhiId = tempId + 1;
-        }
-    }*/
 
     m_tuzhi.insert(std::make_pair(tuzhiId, 0));
 
@@ -295,7 +269,7 @@ void MoFang::randTuzhi(UInt16 num)
         UInt32 tuzhiId = addTuzhi(id, true);
         if(tuzhiId > 0)
         {
-            std::cout << "tuzhiId : " << tuzhiId << std::endl;
+            //std::cout << "tuzhiId : " << tuzhiId << std::endl;
             st << tuzhiId;
             count ++;
 
@@ -364,12 +338,6 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
     UInt16 toolCount = m_owner->GetPackage()->GetItemAnyNum(toolId);
     if(0 == toolCount)
         return;
-
-   /* UInt32 id = 0;
-    if(tuzhiId > SPECIAL_TUZHI) //特殊图纸，读取图纸ID为200000的配置 
-        id = SPECIAL_TUZHI;
-    else
-        id = tuzhiId;*/
 
     GData::JiguanData::tuzhiInfo * tzInfo = GData::jiguanData.getTuzhiInfo(tuzhiId);
     if(!tzInfo)
@@ -485,18 +453,13 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
     {
         m_jiguanshu.curExp += addExp;
 
-        /*if(m_jiguanshu.curLvl < JGS_MAXLVL)
-        {
-            m_jiguanshu.curExp += addExp;
-            if(m_jiguanshu.curExp > JGS_MAXEXP)
-                m_jiguanshu.curExp = JGS_MAXEXP;
-        }*/
-
         if(tuzhiId < SPECIAL_TUZHI) //训练图纸，制造后只增加机关术经验，不获得机关玉
         {
             m_jg.push_back(tzInfo->jiguanyuId);
 
             DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), tzInfo->jiguanyuId, 0);
+            DBLOG1().PushUpdateData("insert into make_jiguanyu (server_id, player_id, jiguanyu_id, jiguanyu_name, jiguanyu_quality, make_time) values(%u,%" I64_FMT "u,%u,'%s',%u,%u)",
+                    cfg.serverLogId, m_owner->getId(), tzInfo->jiguanyuId, tzInfo->name.c_str(), tzInfo->quality, TimeUtil::Now());
         }
 
         DB4().PushUpdateData("DELETE FROM `player_tuzhi` WHERE `tuzhiId` = %u AND `playerId` = %" I64_FMT "u", tuzhiId, m_owner->getId());
@@ -588,13 +551,6 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
 
         m_jiguanshu.curExp += 5;
 
-        /*if(m_jiguanshu.curLvl < JGS_MAXLVL)
-        {
-            m_jiguanshu.curExp += 10;
-            if(m_jiguanshu.curExp > JGS_MAXEXP)
-                m_jiguanshu.curExp = JGS_MAXEXP;
-        }*/
-
         DB4().PushUpdateData("REPLACE INTO `player_tuzhi` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), tuzhiId,  curProficient);
     }
 
@@ -661,23 +617,6 @@ void MoFang::upgradeJGS()
                m_grids[index-1] = 0;
         }
     }
-
-    /*UInt8 temp[40] = {10, 11, 12, 13, 20, 27, 34, 41, 40, 39, 
-                    38, 37, 30, 23, 16, 9, 2, 3, 4, 5,
-                    6, 7, 14, 21, 28, 35, 42, 49, 48, 47,
-                    46, 45, 44, 43, 36, 29, 22, 15, 8, 1};
-
-    UInt8 lvlMark = m_jiguanshu.curLvl / 2;
-
-    if(lvlMark > 40)
-        lvlMark = 40;
-
-    for(UInt8 i=0; i<lvlMark; i++)
-    {
-        UInt8 index = temp[i];
-        if(index > 0 && index <= 49 && (m_grids[index-1] == -1))
-            m_grids[index-1] = 0;
-    }*/
 }
 
 void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
@@ -715,36 +654,20 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
 
                 occupyMark = 1;
                 posMark = pos + 1;
-
-                //st << jgId << pos;
             }
             else
             {
-                /*std::map<UInt8, UInt32>::iterator iter = m_equipJG.find(pos+1);
-                if (iter != m_equipJG.end())
-                {
-                    if(iter->second > 0)
-                    {
-                        m_jg.push_back(iter->second);
-                        jgId = iter->second;
-                    }
-
-                    m_equipJG.erase(iter);
-                }*/
-
                 std::map<UInt32, UInt8>::iterator iter = m_equipJG.find(jgId);
                 if (iter != m_equipJG.end())
                 {
                     m_jg.push_back(jgId);
                     m_equipJG.erase(iter);
                 }
-                
-                //st << pos;
             }
 
             for(UInt8 i=0; i<values.size(); i++)
             {
-                m_grids[values[i]-1] = occupyMark;
+                m_grids[values[i]] = occupyMark;
             }
 
             DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), jgId, posMark);
@@ -754,7 +677,7 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
             m_owner->send(st);
 
             std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
-            for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++ it)
+            for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
             {
                 it->second->setDirty();
             }
@@ -767,7 +690,6 @@ void MoFang::addJGYAttr(GData::AttrExtra& ae)
     std::map<UInt32, UInt8>::iterator iter = m_equipJG.begin();
     for(; iter != m_equipJG.end(); iter++)
     {
-        //GData::JiguanData::jiguanyuInfo * jgyInfo = GData::jiguanData.getJiguanyuInfo(iter->second);
         GData::JiguanData::jiguanyuInfo * jgyInfo = GData::jiguanData.getJiguanyuInfo(iter->first);
         if(!jgyInfo)
             continue;
@@ -843,21 +765,25 @@ void MoFang::sendMoFangInfo(UInt8 mark)
     else
         sendExp = m_jiguanshu.curExp;
 
+    UInt32 moneyA = m_owner->GetVar(VAR_KEYIN_MONEY_A);
+    UInt32 moneyB = m_owner->GetVar(VAR_KEYIN_MONEY_B);
+
     Stream st(REP::MOFANG_INFO);
     st << mark;
-    st << static_cast<UInt32>(sendExp);
+    st << static_cast<UInt32>(sendExp) << moneyA << moneyB;
 
     UInt16 countA = 0;
     UInt16 countB = 0;
+    UInt8 countC = 0;
     UInt16 offsetA = 0;
     UInt16 offsetB = 0;
+    UInt16 offsetC = 0;
 
     offsetA = st.size();
     st << countA;
     std::map<UInt32, UInt8>::iterator iter = m_equipJG.begin();
     for(; iter != m_equipJG.end(); iter++)
     {
-        //st << iter->second << static_cast<UInt8>(iter->first - 1);
         st << iter->first << static_cast<UInt8>(iter->second - 1);
         countA++;    
     }
@@ -878,8 +804,18 @@ void MoFang::sendMoFangInfo(UInt8 mark)
         countB++;    
     }
 
+    offsetC = st.size();
+    st << countC;
+    std::map<UInt8, UInt32>::iterator iterC = m_kyCurExp.begin();
+    for(; iterC != m_kyCurExp.end(); iterC++)
+    {
+        st << iterC->first << iterC->second;
+        countC++;
+    }
+
     st.data<UInt16>(offsetA) = countA;
     st.data<UInt16>(offsetB) = countB;
+    st.data<UInt8>(offsetC) = countC;
 
     st << Stream::eos;
     m_owner->send(st);
@@ -892,18 +828,12 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
     UInt8 markA = 0;
     UInt8 markB = 0;
     bool markC = false;
-    //UInt32 jiguanId = findEquipJG(pos+1);
 
     bool findResA = findEquipJG(jgId);
     bool findResB = findNoEquipJG(jgId);
 
     if(EQUIP_JG == mark)
     {
-        /*if(jiguanId > 0)
-            return false;*/
-
-        //bool findRes = findNoEquipJG(jgId);
-        
         if(findResA)
             return false;
 
@@ -926,16 +856,12 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
     }
     else
     {
-        /*if(0 == jiguanId)
-            return false;*/
-
         if(!findResA)
             return false;
 
         if(findResB)
             return false;
 
-        //jgId = jiguanId;
         markA = NOOCCUPY_MOFANG;
         markB = OCCUPY_MOFANG;
     }
@@ -946,7 +872,10 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
 
     for(; i<3; i++)
     {
-        if((k >= 9 || (pos+i) < 0 || (pos+i) >= 49) && (0 != jgyInfo->molding[k]))
+       if(k >= 9)
+           return false;
+
+       if(((pos+i) < 0 || (pos+i) >= 49) && (0 != jgyInfo->molding[k]))
             return false;
 
         if(0 != jgyInfo->molding[k])
@@ -957,12 +886,12 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
             }
             else if(markB == m_grids[pos+i])
             {
-                values.push_back(pos+i+1);
+                values.push_back(pos+i);
 
                 if(8 == k)
                     break;
 
-                if((i%3) == 2)
+                if(i == 2)
                 {
                     markC = true;
                     pos = pos + 7;
@@ -978,7 +907,7 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
             if(8 == k)
                 break;
 
-            if((i%3) == 2)
+            if(i == 2)
             {
                 markC = true;
                 pos = pos + 7;
@@ -996,15 +925,6 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &
 
     return true;
 }
-
-/*UInt32 MoFang::findEquipJG(UInt8 pos)
-{
-    std::map<UInt8, UInt32>::iterator iter = m_equipJG.find(pos);
-    if(iter == m_equipJG.end())
-        return 0;
-
-    return iter->second;
-}*/
 
 bool MoFang::findEquipJG(UInt32 jgId)
 {
@@ -1232,6 +1152,9 @@ void MoFang::quickMakejiguan(UInt32 tuzhiId, UInt8 mark)
 
         DB4().PushUpdateData("DELETE FROM `player_tuzhi` WHERE `tuzhiId` = %u AND `playerId` = %" I64_FMT "u", tuzhiId, m_owner->getId());
 
+        DBLOG1().PushUpdateData("insert into make_jiguanyu (server_id, player_id, jiguanyu_id, jiguanyu_name, jiguanyu_quality, make_time) values(%u,%" I64_FMT "u,%u,'%s',%u,%u)",
+                    cfg.serverLogId, m_owner->getId(), tzInfo->jiguanyuId, tzInfo->name.c_str(), tzInfo->quality, TimeUtil::Now());
+
         m_tuzhi.erase(iter);
         result = 1;
     }
@@ -1264,6 +1187,297 @@ void MoFang::quickMakejiguan(UInt32 tuzhiId, UInt8 mark)
         st << static_cast<UInt8>(curProficient); 
     st << Stream::eos;
     m_owner->send(st);
+}
+
+void MoFang::upgradeKY(UInt8 keyinId, UInt8 mark)
+{
+    if(!m_owner)
+        return;
+     
+    UInt8 keyinLvl = 0;
+    UInt32 keyinCurExp = 0;
+
+    std::map<UInt8, UInt8>::iterator iter = m_kyLvl.find(keyinId);
+    if(iter == m_kyLvl.end())
+    {
+        m_kyLvl.insert(std::make_pair(keyinId, keyinLvl));
+        m_kyCurExp.insert(std::make_pair(keyinId, keyinCurExp));
+    }
+    else
+    {
+        keyinLvl = iter->second;
+    }
+
+    if(keyinLvl >= 20)
+        return;
+    
+    GData::JiguanData::keyinInfo * kyInfo = GData::jiguanData.getKeyinInfo(keyinId, keyinLvl+1);
+    if(!kyInfo)
+        return;
+
+    if(5 == keyinId) //特殊的拂晓刻印升级，需要其他4个刻印的品质达到一定的条件
+    {
+        for(UInt8 i=0; i<4; i++)
+        {
+            if(kyInfo->quality > m_kyQuality[i])
+                return;
+        }
+    }
+
+    std::map<UInt8, UInt32>::iterator iterA = m_kyCurExp.find(keyinId);
+    if(iterA != m_kyCurExp.end())
+        keyinCurExp = iterA->second;
+    else
+        return;
+    
+    UInt32 money = 0;
+    UInt32 consumeValue = 0;
+
+    if(kyInfo->materialA == 0)
+    {
+        money = m_owner->GetVar(VAR_KEYIN_MONEY_B);
+        consumeValue = kyInfo->materialB;
+        if(money < consumeValue)
+            return;
+
+        m_owner->SetVar(VAR_KEYIN_MONEY_B, money-consumeValue);
+    }
+    else
+    {
+        money = m_owner->GetVar(VAR_KEYIN_MONEY_A);
+        consumeValue = kyInfo->materialA;
+        if(money < consumeValue)
+            return;
+
+        m_owner->SetVar(VAR_KEYIN_MONEY_A, money-consumeValue);
+    }
+
+    UInt8 addKYExp = uRand(9) + 1;
+    keyinCurExp += addKYExp;
+
+    if(keyinCurExp >= kyInfo->maxValue)
+    {
+        keyinLvl++;
+        iter->second = keyinLvl;
+
+        if(keyinId >= 1 && keyinId <= 4)
+            m_kyQuality[keyinId-1] = kyInfo->quality;
+
+        std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
+        for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
+        {
+            it->second->setDirty();
+        }
+    }
+    iterA->second = keyinCurExp;
+
+    DB4().PushUpdateData("REPLACE INTO `player_keyin` VALUES(%" I64_FMT "u, %u, %u, %u)", m_owner->getId(), keyinId, keyinLvl, keyinCurExp);
+
+    Stream st(REP::MOFANG_INFO);
+    st << mark;
+    st << keyinId << addKYExp;
+    st << Stream::eos;
+    m_owner->send(st);
+}
+
+void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 mark)
+{
+    if(!m_owner)
+        return;
+
+    UInt8 keyinLvl = 0;
+    UInt32 keyinCurExp = 0;
+
+    std::map<UInt8, UInt8>::iterator iter = m_kyLvl.find(keyinId);
+    if(iter == m_kyLvl.end())
+    {
+        m_kyLvl.insert(std::make_pair(keyinId, keyinLvl));
+        m_kyCurExp.insert(std::make_pair(keyinId, keyinCurExp));
+    }
+    else
+        keyinLvl = iter->second;
+
+    if(keyinLvl >= 20)
+        return;
+    
+    GData::JiguanData::keyinInfo * kyInfo = GData::jiguanData.getKeyinInfo(keyinId, keyinLvl+1);
+    if(!kyInfo)
+        return;
+
+    if(5 == keyinId) //特殊的拂晓刻印升级，需要其他4个刻印的品质达到一定的条件
+    {
+        for(UInt8 i=0; i<4; i++)
+        {
+            if(kyInfo->quality > m_kyQuality[i])
+                return;
+        }
+    }
+
+    std::map<UInt8, UInt32>::iterator iterA = m_kyCurExp.find(keyinId);
+    if(iterA != m_kyCurExp.end())
+        keyinCurExp = iterA->second;
+    else
+        return;
+
+    UInt32 money = 0;
+    if(kyInfo->materialA == 0)
+    {
+        money = m_owner->GetVar(VAR_KEYIN_MONEY_B);
+        if(money < kyInfo->materialB)
+            return;
+    }
+    else
+    {
+        money = m_owner->GetVar(VAR_KEYIN_MONEY_A);
+        if(money < kyInfo->materialA)
+            return;
+    }
+
+    UInt32 consumeValue = 0;
+    UInt32 addTotalExp = 0;
+    UInt16 count = 0;
+    for( ; keyinCurExp < kyInfo->maxValue; )
+    {
+        if(kyInfo->materialA == 0)
+        {
+            consumeValue += kyInfo->materialB;
+            if(money < consumeValue)
+            {
+                consumeValue -= kyInfo->materialB;
+                break;
+            }
+        }
+        else
+        {
+            consumeValue += kyInfo->materialA;
+            if(money < consumeValue)
+            {
+                consumeValue -= kyInfo->materialA;
+                break;
+            }
+        }
+
+        UInt8 addKYExp = uRand(9) + 1;
+        keyinCurExp += addKYExp;
+        addTotalExp += addKYExp;
+        count++;
+    }
+    
+    if(money >= consumeValue)
+    {
+        if(kyInfo->materialA == 0)
+            m_owner->SetVar(VAR_KEYIN_MONEY_B, money-consumeValue);
+        else
+            m_owner->SetVar(VAR_KEYIN_MONEY_A, money-consumeValue);
+    }
+
+    if(keyinCurExp >= kyInfo->maxValue)
+    {
+        keyinLvl++;
+        iter->second = keyinLvl;
+
+        if(keyinId >= 1 && keyinId <= 4)
+            m_kyQuality[keyinId-1] = kyInfo->quality;
+
+        std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
+        for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
+        {
+            it->second->setDirty();
+        }
+    }
+    iterA->second = keyinCurExp;
+
+    DB4().PushUpdateData("REPLACE INTO `player_keyin` VALUES(%" I64_FMT "u, %u, %u, %u)", m_owner->getId(), keyinId, keyinLvl, keyinCurExp);
+
+    Stream st(REP::MOFANG_INFO);
+    st << mark;
+    st << keyinId << count << addTotalExp;
+    st << Stream::eos;
+    m_owner->send(st);
+       
+}
+      
+void MoFang::changeMoney(UInt8 mark)
+{
+    UInt8 res = 0;
+    UInt32 money = m_owner->GetVar(VAR_KEYIN_MONEY_A);
+    if(money >= 100)
+    {
+        m_owner->SetVar(VAR_KEYIN_MONEY_A, money-100);
+        m_owner->AddVar(VAR_KEYIN_MONEY_B, 10);
+
+        res = 1;
+    }
+
+    Stream st(REP::MOFANG_INFO);
+    st << mark << res;
+    st << Stream::eos;
+    m_owner->send(st);
+}
+
+void MoFang::addMoney(UInt32 toolId, UInt32 count)
+{
+    UInt32 money = 0;
+    UInt8 mark = 0;
+    if(9424 == toolId)
+    {
+        money = m_owner->GetVar(VAR_KEYIN_MONEY_A);
+        m_owner->AddVar(VAR_KEYIN_MONEY_A, count*100);
+        mark = 1;
+		SYSMSG_SENDV(4941, m_owner, count*100);
+		SYSMSG_SENDV(4942, m_owner, count*100);
+    }
+    else
+    {
+        money = m_owner->GetVar(VAR_KEYIN_MONEY_B);
+        m_owner->AddVar(VAR_KEYIN_MONEY_B, count*100);
+        mark = 2;
+		SYSMSG_SENDV(4943, m_owner, count*100);
+		SYSMSG_SENDV(4944, m_owner, count*100);
+    }
+
+    money += count*100;
+
+    Stream st(REP::MOFANG_INFO);
+    st << static_cast<UInt8>(11) << mark << static_cast<UInt32>(money);
+    st << Stream::eos;
+    m_owner->send(st);
+}
+
+void MoFang::addKYAttr(GData::AttrExtra& ae)
+{
+    if(!m_owner)
+        return;
+
+    std::map<UInt8, UInt8>::iterator iter = m_kyLvl.begin();
+    for(; iter != m_kyLvl.end(); iter++)
+    {
+        GData::JiguanData::keyinInfo * kyInfo = GData::jiguanData.getKeyinInfo(iter->first, iter->second);
+        if(!kyInfo)
+            continue;
+
+        if(kyInfo->keyinLvl > 0 && kyInfo->keyinLvl <= 20)
+        {
+            switch(kyInfo->attrType)
+            {
+                case 1:
+                    ae.hp += kyInfo->attrValue;
+                    break;
+                case 2:
+                    ae.attack += kyInfo->attrValue;
+                    break;
+                case 3:
+                    ae.magatk += kyInfo->attrValue;
+                    break;
+                case 4:
+                    ae.action += kyInfo->attrValue;
+                    break;
+                case 5:
+                    ae.criticaldmgimmune += (static_cast<float>(kyInfo->attrValue)) / 100.0f;
+                    break;
+            }
+        }
+    }
 }
 
 }

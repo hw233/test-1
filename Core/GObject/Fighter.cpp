@@ -2001,7 +2001,10 @@ void Fighter::rebuildEquipAttr()
     }
 
     if(_owner)
+    {
         _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
+        _owner->GetMoFang()->addKYAttr(_attrExtraEquip);
+    }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
@@ -2431,10 +2434,13 @@ Fighter * Fighter::cloneWithOutDirty(Player * player)
         if(!trump)
             continue;
         const GData::AttrExtra* attr = trump->getAttrExtra();
-        if(attr->skills.size() > 0)
+        if(attr)
         {
-            if(attr->skills[0])
-                fgt->_trumpSkill[i] = attr->skills[0]->getId();
+            if(attr->skills.size() > 0)
+            {
+                if(attr->skills[0])
+                    fgt->_trumpSkill[i] = attr->skills[0]->getId();
+            }
         }
     }
     memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
@@ -3858,6 +3864,7 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
                         s->cond == GData::SKILL_BLEED_TYPE_DMG ||
                         s->cond == GData::SKILL_XMCZ ||
+                        s->cond == GData::SKILL_BLTY ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
@@ -3909,6 +3916,7 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
                         s->cond == GData::SKILL_BLEED_TYPE_DMG ||
                         s->cond == GData::SKILL_XMCZ ||
+                        s->cond == GData::SKILL_BLTY ||
                         s->cond == GData::SKILL_ENTER ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
@@ -5240,7 +5248,7 @@ void Fighter::getAttrExtraEquip(Stream& st)
     st << attr.auraMaxP << attr.attackP << attr.magatkP << attr.defendP << attr.magdefP << attr.hpP << attr.toughP << attr.actionP;
 	st << attr.hitrateP << attr.evadeP << attr.criticalP << attr.criticaldmgP << attr.pierceP << attr.counterP << attr.magresP;
 
-    st << attr.hitrlvl << attr.evdlvl << attr.crilvl << attr.pirlvl << attr.counterlvl << attr.mreslvl << attr.toughlvl;
+    st << attr.hitrlvl << attr.evdlvl << attr.crilvl << attr.pirlvl << attr.counterlvl << attr.mreslvl << attr.toughlvl << attr.criticaldmgimmune;
 }
 
 bool Fighter::changeSecondSoulXinxiu(UInt8 xinxiu)

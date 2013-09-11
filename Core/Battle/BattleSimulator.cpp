@@ -1045,9 +1045,9 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
         float rate = bf->getCritical(bo);
         if(uRand(10000) < (rate > 0 ? rate : 0) * 100)
         {
-            float factor = bf->getCriticalDmg() - bo->getTough(bf);
-            if(factor < 1)
-                factor = 1;
+            float factor = bf->getCriticalDmg() - bo->getCriticalDmgImmune() - bo->getTough(bf);
+            if(factor < 1.25)
+                factor = 1.25;
             atk = atk * factor;
             cs2 = true;
         }
@@ -10816,6 +10816,19 @@ float BattleSimulator::getSkillEffectExtraHideAura(BattleFighter* bf, BattleFigh
 
 void BattleSimulator::doShieldHPAttack(BattleFighter* bo, UInt32& dmg)
 {
+    UInt8& colorStockTimes = bo->getColorStockTimes();
+    if(colorStockTimes > 0)
+    {
+        dmg = 0;
+        --colorStockTimes;
+        return;
+    }
+    if(bo->isSoulOut())
+    {
+        dmg = 0;
+        return;
+    }
+
     if(bo->makeShieldDamage(dmg))
     {
         appendDefStatus(e_damHPShield, 0, bo);
@@ -10930,6 +10943,9 @@ void BattleSimulator::appendDefStatus(StateType type, UInt32 value, BattleFighte
         if(type == e_Bleed1 || type == e_Bleed2 || type == e_Bleed3 || type == e_Bleed4 || type == e_BleedMo || type == e_selfBleed || type == e_lingShiBleed)
             return;
     }
+
+    if(type == e_damEvade)
+        addSelfSideEvadeCnt(bf);
 
     DefStatus defList;
     defList.damType = type;
@@ -11552,6 +11568,40 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
 {
     if(!bf)
         return;
+
+    const GData::SkillBase* skill = bf->getBiLanTianYiSkill();
+    if(skill && skill->effect && bf->getEvadeCnt() > 2)
+    {
+        u = 0;
+        bf->minusEvadeCnt(3);
+        UInt8 evadeCnt = bf->getEvadeCnt();
+        appendDefStatus(e_skill, skill->getId(), bf);
+        if(evadeCnt == 0)
+            appendDefStatus(e_unBiLanTianYi, evadeCnt, bf);
+        else
+            appendDefStatus(e_biLanTianYi, evadeCnt, bf);
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        const std::vector<float>& efv = skill->effect->efv;
+        size_t cnt = eft.size();
+        if(cnt == efl.size() && cnt == efv.size())
+        {
+            for(size_t i = 0; i < cnt; ++ i)
+            {
+                if(eft[i] == GData::e_eft_bi_lan_tian_yi)
+                {
+                    float hp = bf->getMaxHP() * (skill->effect->efv[i]);
+                    if (hp < 1.0f)
+                        break;
+                    bf->addHpShieldSelf(hp, skill->effect->efl[i]);
+                    appendDefStatus(e_hpShieldSelf, hp, bf);
+                    break;
+                }
+            }
+        }
+        return;
+    }
+
     float& shieldHp = bf->getHpShieldSelf();
     if(shieldHp > 0.001f)
     {
@@ -12792,9 +12842,9 @@ void BattleSimulator::calcSkillAttack(BattleFighter* bf, bool& isCritical, Battl
     magatk = getBFMagAtk(bf);
 	atk = getBFAttack(bf);
 
-    float factor = bf->getCriticalDmg() - defender->getTough(bf);
-    if(factor < 1)
-        factor = 1;
+    float factor = bf->getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(bf);
+    if(factor < 1.25)
+        factor = 1.25;
 
     if(isCritical)
     {
@@ -12813,9 +12863,9 @@ float BattleSimulator::calcAttack(BattleFighter* bf, bool& isCritical, BattleFig
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
 
 	float atk = getBFAttack(bf);
-    float factor = bf->getCriticalDmg() - defender->getTough(bf);
-    if(factor < 1)
-        factor = 1;
+    float factor = bf->getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(bf);
+    if(factor < 1.25)
+        factor = 1.25;
 
 	if(isCritical)
 	{
@@ -12833,9 +12883,9 @@ float BattleSimulator::calcMagAttack(BattleFighter* bf, bool& isCritical, Battle
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
     float magatk = getBFMagAtk(bf);
 
-    float factor = bf->getCriticalDmg() - defender->getTough(bf);
-    if(factor < 1)
-        factor = 1;
+    float factor = bf->getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(bf);
+    if(factor < 1.25)
+        factor = 1.25;
 
     if(isCritical)
     {
@@ -12906,13 +12956,13 @@ float BattleSimulator::calcPoison(BattleFighter* bf, const GData::SkillBase* ski
     float magatk = getBFMagAtk(bf);
     float atk = getBFAttack(bf);
 
-    float factor = bf->getCriticalDmg() - defender->getTough(bf);
-    if(factor < 1)
-        factor = 1;
+    float factor = bf->getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(bf);
+    if(factor < 1.25)
+        factor = 1.25;
 
     if(!cs)
     {
-        factor = 1;
+        factor = 1.25;
     }
 
     if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
@@ -13137,12 +13187,16 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
                 dmg = dmg > 0 ? dmg : 1;
 
                 UInt32 curDmg = dmg;
-                makeDamage(target, curDmg);
-                appendDefStatus(e_damNormal, dmg, target, isPhysic ? e_damagePhysic : e_damageMagic);
-                if(target->getHP() == 0)
-                    onDead(false, target);
-                else if(_winner == 0)
-                    onDamage(target, true, NULL);
+                doShieldHPAttack(target, curDmg);
+                if(curDmg > 0)
+                {
+                    makeDamage(target, curDmg);
+                    appendDefStatus(e_damNormal, dmg, target, isPhysic ? e_damagePhysic : e_damageMagic);
+                    if(target->getHP() == 0)
+                        onDead(false, target);
+                    else if(_winner == 0)
+                        onDamage(target, true, NULL);
+                }
             }
             else if(!defend100 && !enterEvade)
                 appendDefStatus(e_damEvade, 0, target);
@@ -13161,6 +13215,22 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
             }
         }
         return;
+    }
+}
+
+void BattleSimulator::addSelfSideEvadeCnt(BattleFighter* bf)
+{
+    for(UInt8 i = 0; i < 25; i++)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(bf->getSide(), i));
+        if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+            continue;
+        const GData::SkillBase* skill = bo->getBiLanTianYiSkill();
+        if(!skill)
+            continue;
+        bo->addEvadeCnt(1);
+        appendDefStatus(e_skill, skill->getId(), bo);
+        appendDefStatus(e_biLanTianYi, bo->getEvadeCnt(), bo);
     }
 }
 

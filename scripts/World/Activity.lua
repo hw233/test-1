@@ -831,7 +831,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+146*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+153*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -1141,7 +1141,7 @@ function onActivityCheck(tm)
       setGoldSnakeAct(false)
   end
 
-  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 112*86400) then
+  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 119*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1190,7 +1190,7 @@ function initActTime(y, m, d)
   -- 充值返利（3/23-3/31）
   local  SerStartTm13= { ['year'] = 2012, ['month'] = 3, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 愚人节活动（2012 3/29-4/1,2013 3/30-4/1）
-  local  SerStartTm14= { ['year'] = 2013, ['month'] = 8, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm14= { ['year'] = 2013, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 清明节
   local  SerStartTm15= { ['year'] = 2013, ['month'] = 4, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm16= { ['year'] = 2012, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1424,7 +1424,7 @@ function initActTime(y, m, d)
   -- 五一活动(节日套装)
   local  SerStartTm245 = { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --落英秘典
-  local  SerStartTm246 = { ['year'] = 2013, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm246 = { ['year'] = 2013, ['month'] = 9, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --消费抽奖活动
   local  SerStartTm247= { ['year'] = 2013, ['month'] = 5, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1495,7 +1495,7 @@ function initActTime(y, m, d)
   actTime26 = os.time(SerStartTm13) + 9 * 86400;
 
   actTime27 = os.time(SerStartTm14);
-  actTime28 = os.time(SerStartTm14) + 2 * 86400;
+  actTime28 = os.time(SerStartTm14) + 7 * 86400;
 
   actTime29 = os.time(SerStartTm15);
   actTime30 = os.time(SerStartTm15) + 3 * 86400;
@@ -1874,7 +1874,7 @@ function initActTime(y, m, d)
   actTime245_1= os.time(SerStartTm245) + 7*86400;
 
   actTime246_0= os.time(SerStartTm246)
-  actTime246_1= os.time(SerStartTm246) + 2*86400;
+  actTime246_1= os.time(SerStartTm246) + 1*86400;
 
   actTime247_0= os.time(SerStartTm247)
   actTime247_1= os.time(SerStartTm247) + 7*86400;
