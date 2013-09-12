@@ -154,6 +154,8 @@ UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
 
 UInt8 Dungeon::playerLeave( Player * player,UInt8 difficulty )
 {
+    if(difficulty >= Max_Difficulty)
+        return;
     std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return 1;
