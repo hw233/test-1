@@ -10482,11 +10482,6 @@ void BattleSimulator::doSkillEffectExtra_HpShield(BattleFighter* bf, int target_
         return;
     if (!bo->isChar())
         return;
-
-    // 宠物乌龟技能——天地守护改为不会向分身施放
-    if((bo->isSummon() || bo->hasFlag(BattleFighter::IsMirror)) && skill->getId() == 51)
-        return;
-
     float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx]);
     if (hp < 1.0f)
         return;
