@@ -853,6 +853,14 @@ public:
     {return cfg.rpServer;}
     inline static bool getGMCheck()
     {return cfg.GMCheck;}
+    inline static bool inActive_new()
+    {
+        UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+        UInt32 actTime_new1 = TimeUtil::MkTime(2013, 9, 8);
+        UInt32 actTime_new2 = TimeUtil::MkTime(2013, 9, 13);
+
+        return !(opTime >= actTime_new1 && opTime <= actTime_new2);
+    }
  
 public:
 	inline static UInt8 getWeekDay()

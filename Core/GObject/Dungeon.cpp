@@ -108,7 +108,7 @@ UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
 		if(difficulty == dpi->difficulty &&  dpi->level[dpi->difficulty] != 0xFF && dpi->level[dpi->difficulty] != 0)
             return 2;
 
-		leaveLevel(player, it->second.level[difficulty],it->second.difficulty);
+		leaveLevel(player, it->second.level[it->second.difficulty],it->second.difficulty);
 		//if(it->second.level > 0)
 		{
             if(/*cfg.GMCheck && */PLAYER_DATA1(player, difficulty) >= getMaxCount(difficulty) + extraCount)// fix gold less?
@@ -154,17 +154,19 @@ UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
 
 UInt8 Dungeon::playerLeave( Player * player,UInt8 difficulty )
 {
+	if(player->hasFlag(Player::AutoDungeon))
+        return 2;
     if(difficulty >= Max_Difficulty)
         return 1;
     std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return 1;
 
-	if(it->second.level == 0)
+	if(it->second.level[difficulty] == 0)
 		return 0;
     
-    it->second.difficulty = difficulty;	
 	cancelAutoChallengeNotify(player, 0);
+	it->second.difficulty = difficulty;
 
 	leaveLevel(player, it->second.level[it->second.difficulty],it->second.difficulty);
 	it->second.level[it->second.difficulty] = 0;
@@ -172,7 +174,7 @@ UInt8 Dungeon::playerLeave( Player * player,UInt8 difficulty )
 	//it->second.difficulty = 0xFF;
 
     UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
-    UInt8 pos = _id - 1; 
+    UInt8 pos = _id - 1 + difficulty * 16;
     mark = CLR_BIT(mark, pos);
     player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
     sendDungeonInfo(player, it->second, difficulty);
@@ -182,12 +184,19 @@ UInt8 Dungeon::playerLeave( Player * player,UInt8 difficulty )
 
 UInt8 Dungeon::playerContinue( Player * player ,UInt8 difficulty)
 {
-	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
-    it->second.difficulty = difficulty;	
+	if(player->hasFlag(Player::AutoDungeon))
+        return 2;
+    if(difficulty >= Max_Difficulty)
+    {
+        return 1;
+    } 
+
+    std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
     if(it == _players.end())
 		return 1;
+    it->second.difficulty = difficulty;	
 
-    if(it->second.level == 0)
+    if(it->second.level[difficulty] == 0)
         return 1;
 
     enterLevel(player, it->second.level[it->second.difficulty],it->second.difficulty);
@@ -197,7 +206,13 @@ UInt8 Dungeon::playerContinue( Player * player ,UInt8 difficulty)
 
 UInt8 Dungeon::playerBreak( Player * player ,UInt8 difficulty)
 {
-	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
+	if(player->hasFlag(Player::AutoDungeon))
+        return 2;
+    if(difficulty >= Max_Difficulty)
+    {
+        return 0;
+    } 
+    std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return 1;
 
@@ -609,7 +624,7 @@ player->GetPackage()->Add(9343, 2, true, false);
         bool free = (PLAYER_DATA1(player, dpi.difficulty) <= getMaxCount(dpi.difficulty));
 
         UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
-        UInt8 pos = _id - 1; 
+        UInt8 pos = _id - 1 + dpi.difficulty * 16;
         mark = CLR_BIT(mark, pos);
         player->SetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, mark);
 
@@ -659,16 +674,19 @@ player->GetPackage()->Add(9343, 2, true, false);
 
 void Dungeon::startChallenge( Player * player ,UInt8 difficulty)
 {
-	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
-    it->second.difficulty = difficulty;
-    if(it == _players.end())
-		return;
-
+    if(difficulty >= Max_Difficulty)
+        return;
 	if(player->hasFlag(Player::AutoDungeon))
 	{
 		player->sendMsgCode(0, 1407);
 		return;
 	}
+
+	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
+    if(it == _players.end())
+		return;
+
+    it->second.difficulty = difficulty;
 
 	UInt32 now = TimeUtil::Now();
 	UInt32 buffLeft = player->getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -706,7 +724,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 		return;
     
     UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
-    UInt8 pos = _id - 1; 
+    UInt8 pos = _id - 1 + it->second.difficulty * 16;
 	switch(type)
 	{
 	case 0:
@@ -873,10 +891,14 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 
 void Dungeon::autoChallenge( Player * player, UInt8 mtype, UInt8 difficulty)
 {
-    std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
-    it->second.difficulty = difficulty;
+    if(difficulty >= Max_Difficulty)
+        return;
     if(player->hasFlag(Player::AutoDungeon))
 		return;
+    std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
+    if (it == _players.end())
+        return;
+    it->second.difficulty = difficulty;
 	UInt32 now = TimeUtil::Now();
 	UInt32 buffLeft = player->getBuffData(PLAYER_BUFF_ATTACKING, now);
 	if(buffLeft > 0)
@@ -904,6 +926,10 @@ void Dungeon::pushPlayer( Player * player, UInt8 difficulty, UInt8 level, UInt8 
 {
     if(difficulty >= Max_Difficulty)
         return;
+
+	if(level >= _levels[difficulty].size() && level != 0xFF)
+        level = 0xFF;
+
 	DungeonPlayerInfo& dpi = _players[player];
     dpi.difficulty = difficulty;
 	dpi.level[difficulty] = level;
@@ -913,6 +939,7 @@ void Dungeon::pushPlayer( Player * player, UInt8 difficulty, UInt8 level, UInt8 
 	dpi.counterEnd = counterEnd;
 	dpi.justice[difficulty] = justice;
     dpi.justice_roar[difficulty] = justice_roar;
+
 	if(level >= _levels[difficulty].size())
 		return;
 	DungeonLevel& dl = _levels[difficulty][level];
@@ -921,13 +948,15 @@ void Dungeon::pushPlayer( Player * player, UInt8 difficulty, UInt8 level, UInt8 
 
 void Dungeon::sendDungeonInfo(Player * player,UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 	{
 		Stream st(REP::COPY_DATA_UPDATE);
 		UInt8 enterCount = (_extraCount[difficulty][player->getVipLevel()] << 4) | getEnterCount();
         UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
-        UInt8 pos = _id - 1;
+        UInt8 pos = _id - 1 + difficulty * 16;
         pos = static_cast<UInt8>(GET_BIT_MARK(mark, pos));
 		st << static_cast<UInt8>(0) << _id << difficulty<< static_cast<UInt8>(0) << PLAYER_DATA1(player, difficulty) << enterCount << static_cast<UInt16>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(0) << pos << Stream::eos;
 		player->send(st);
@@ -939,11 +968,13 @@ void Dungeon::sendDungeonInfo(Player * player,UInt8 difficulty)
 
 void Dungeon::sendDungeonInfo(Player * player, DungeonPlayerInfo& dpi, UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	Stream st(REP::COPY_DATA_UPDATE);
 	UInt8 enterCount = (_extraCount[difficulty][player->getVipLevel()] << 4) | getEnterCount();
 
     UInt32 mark = player->GetVar(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK);
-    UInt8 pos = _id - 1;
+    UInt8 pos = _id - 1 + difficulty * 16;
     pos = static_cast<UInt8>(GET_BIT_MARK(mark, pos));
     if(difficulty == 0xFF)
         return;//difficulty = dpi.difficulty;
@@ -1106,6 +1137,8 @@ void Dungeon::sendMyLootInfo( Player * player )
 
 void Dungeon::broadcast( Stream& st, UInt8 difficulty, Player * player )
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	std::vector<DungeonLevel>& dll = _levels[difficulty];
 	if(player == NULL)
 	{
@@ -1144,11 +1177,15 @@ UInt32 Dungeon::getFirstPass( Player * player ,UInt8 difficulty)
 
 void Dungeon::setMaxCount(UInt32 cnt, UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	_maxCount[difficulty] = cnt;
 }
 
 void Dungeon::setPrice( UInt32 idx, UInt16 price ,UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	_price[difficulty][idx] = price;
 	if(idx >= _priceCount)
 		_priceCount = idx + 1;
@@ -1156,12 +1193,16 @@ void Dungeon::setPrice( UInt32 idx, UInt16 price ,UInt8 difficulty)
 
 UInt16 * Dungeon::getPrice( size_t& size ,UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return 0;
 	size = _priceCount;
 	return _price[difficulty];
 }
 
 void Dungeon::setExtraCount( UInt32 idx, UInt8 count ,UInt8 difficulty)
 {
+    if(difficulty >= Max_Difficulty)
+        return;
 	_extraCount[difficulty][idx] = count;
 }
 

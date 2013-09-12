@@ -956,7 +956,7 @@ namespace GData
 			{
 				lua_tinker::table tael_train_elem = tael_train.get<lua_tinker::table>(i+1);
 				UInt32 elem_sz = tael_train_elem.size();
-				m_TaelTrainList.resize(121);
+				m_TaelTrainList.resize(151);
 				for (UInt32 j = 0; j < elem_sz; ++ j)
 				{
 					UInt8 lowLev, highLev;
@@ -972,7 +972,7 @@ namespace GData
 			//GoldTrain
 			lua_tinker::table gold_train = lua_tinker::call<lua_tinker::table>(L, "GetGoldTrain");
 			UInt32 sz2 = gold_train.size();
-			m_GoldTrainList.resize(121);
+			m_GoldTrainList.resize(151);
 			for (UInt32 i = 0; i < sz2; ++ i)
 			{
 				lua_tinker::table gold_train_elem = gold_train.get<lua_tinker::table>(i+1);
@@ -992,7 +992,7 @@ namespace GData
 			//LevelTrainExp
 			lua_tinker::table exp_train = lua_tinker::call<lua_tinker::table>(L, "GetLevelTrainExp");
 			UInt32 sz3 = exp_train.size();
-			m_LevelTrainExp.resize(121);
+			m_LevelTrainExp.resize(151);
 			for (UInt32 i = 0; i < sz3; ++ i)
 			{
 				lua_tinker::table exp_train_elem = exp_train.get<lua_tinker::table>(i+1);

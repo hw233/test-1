@@ -2451,7 +2451,7 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 	pl->moveTo(ctr._locid, true);
 }
 
-void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
+/*void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
 {
 	MSG_QUERY_PLAYER(pl);
 	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
@@ -2483,11 +2483,14 @@ void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
         return;
 	st << result << dor.type << Stream::eos;
 	pl->send(st);
-}
+}*/
 
 void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 {
-	MSG_QUERY_PLAYER(pl);
+	if(dir.difficulty >= Max_Difficulty)
+        return;
+    
+    MSG_QUERY_PLAYER(pl);
 	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
 		return;
 	GObject::Dungeon * dg = GObject::dungeonManager[dir.type];
@@ -2531,7 +2534,7 @@ void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 	}
 }
 
-void OnDungeonBattleReq( GameMsgHdr& hdr, DungeonBattleReq& dbr )
+/*void OnDungeonBattleReq( GameMsgHdr& hdr, DungeonBattleReq& dbr )
 {
 	MSG_QUERY_PLAYER(pl);
 	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
@@ -2547,10 +2550,12 @@ void OnDungeonBattleReq( GameMsgHdr& hdr, DungeonBattleReq& dbr )
 		return;
 
 	dg->startChallenge(pl,0);
-}
+}*/
 
 void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 {
+    if(dar.difficulty >= 2)
+        return;
 	MSG_QUERY_PLAYER(pl);
 	if(!pl->hasChecked())
 		return;
@@ -2579,6 +2584,9 @@ void OnDungeonCompleteAutoReq( GameMsgHdr& hdr, DungeonCompleteAutoReq& )
 	MSG_QUERY_PLAYER(pl);
     if (!pl->hasChecked())
         return;
+
+	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
+		return;
 	GameMsgHdr hdr2(0x181, WORKER_THREAD_WORLD, pl, 0);
 	GLOBAL().PushMsg(hdr2, NULL);
 }

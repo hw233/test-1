@@ -699,6 +699,13 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 12)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 13)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 21)
 
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
@@ -737,6 +744,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 31)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 7)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 14)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 21)
         ))
     {
 #if 0
@@ -1319,7 +1327,7 @@ void World::SendSurnameLegendAward()
                 //{9907, 1}
                 //{9911, 1}
                // {9913, 1}
-                {9914, 1}
+                {9921, 1}
             };
             player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         }
@@ -1745,6 +1753,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 12)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 13)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 21)
          
          )
         bRechargeEnd = true;

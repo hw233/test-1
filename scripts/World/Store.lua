@@ -115,6 +115,10 @@ function loadStore()
 
         discount(store)
 
+    if getKillMonsterAct() then
+        store:add(2, 9416, 10)
+    end
+
     if getCollectCardAct() then
         store:add(2, 9415,10)
     end
@@ -158,7 +162,7 @@ function loadStore()
             --store:add(2 ,9383 , 20)
             --store:add(2 ,9397, 20)
             --store:add(2 ,9401, 20)
-            store:add(2 ,9407, 20)
+            store:add(2 ,9422, 20)
         end
 
         if is2013_0201_0228() then

@@ -142,32 +142,8 @@ function is2013_0201_0228()
 end
 
 function onActivityCheck(tm)
-  local osmax = oldServersMax[serverName]
-  print(osmax)
-  print(serverNum)
-  if osmax ~= nil and serverNum <= osmax then
-    local freeEnter = false
-    if serverName == 'kingxin' then
-      local freeStartTime = os.time({ ['year'] = 2011, ['month'] = 1, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 });
-      local freeEndTime = os.time({ ['year'] = 2011, ['month'] = 1, ['day'] = 26, ['hour'] = 23, ['min'] = 50, ['sec'] = 0 });
-      setDungeonPrice(0, 0)
-      if tm >= freeStartTime and tm < freeEndTime then
-        freeEnter = true
-      end
-    end
-    if freeEnter then
-      setDungeonPrice(1, 0)
-      setDungeonPrice(2, 0)
-    else
-      setDungeonPrice(1, 20)
-      setDungeonPrice(2, 20)
-    end
- -- else
-    --setDungeonPrice(0, 0)
-    --setDungeonPrice(1, 20)
-    --setDungeonPrice(2, 20)
-  end
-  setDungeonCount(1)
+  setDungeonCount(1, 0)
+  setDungeonCount(1, 1)
   setTavernInterval(1 * 3600)
   setTavernRate(100)
   
@@ -831,7 +807,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+153*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+160*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -1141,7 +1117,7 @@ function onActivityCheck(tm)
       setGoldSnakeAct(false)
   end
 
-  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 119*86400) then
+  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 126*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1247,7 +1223,7 @@ function initActTime(y, m, d)
   local  SerStartTm501= { ['year'] = 2012, ['month'] = 8, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm502= { ['year'] = 2012, ['month'] = 9, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 斩妖
-  local  SerStartTm505= { ['year'] = 2012, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm505= { ['year'] = 2013, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 周岁红包送不停
   local  SerStartTm506= { ['year'] = 2012, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- Qgame大厅礼包
@@ -1616,7 +1592,7 @@ function initActTime(y, m, d)
   actTime502_1 = os.time(SerStartTm502) + 4 * 86400;
 
   actTime505 = os.time(SerStartTm505);
-  actTime505_1 = os.time(SerStartTm505) + 8 * 86400;
+  actTime505_1 = os.time(SerStartTm505) + 3 * 86400;
 
   actTime506 = os.time(SerStartTm506);
   actTime506_1 = os.time(SerStartTm506) + 18 * 86400;
