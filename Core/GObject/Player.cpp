@@ -3261,6 +3261,7 @@ namespace GObject
         st << GetVar(VAR_MONEY_ARENA);
         st << getClanProffer();
         bool fchange = makeTitleAllInfo(st);
+        st << static_cast<UInt8>(GetVar(VAR_MAP_INDEX));
         st << Stream::eos;
 
         if(fchange)
@@ -23951,6 +23952,18 @@ void Player::SetQQBoardLogin()
     LoginCanAward |= (1<<cts);
     SetVar(VAR_QQBOARD_LOGIN_AWARD,LoginCanAward);
 }
+
+void Player::setMapId(UInt8 mapId)
+{
+    UInt8 curMapId = GetVar(VAR_MAP_INDEX);
+    if(mapId == curMapId)
+        return;
+    SetVar(VAR_MAP_INDEX, mapId);
+    Stream st(REP::USER_INFO_CHANGE);
+    st << static_cast<UInt8>(0x1A) << static_cast<UInt32>(mapId) << Stream::eos;
+    send(st);
+}
+
 } // namespace GObject
 
 

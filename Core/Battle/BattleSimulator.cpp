@@ -5024,6 +5024,8 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
 {
     UInt8 side = bf->getSide();
     BattleFighter* pet = NULL;
+    BattleFighter* minBloodBo = NULL;
+
     for(UInt8 i = 0; i < 25; ++ i)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
@@ -5037,11 +5039,17 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
                 continue;
             }
 
-            return bo;
+            if(!minBloodBo)
+                minBloodBo = bo;
+            else if(minBloodBo->getHP() > bo->getHP())
+                minBloodBo = bo;
         }
     }
 
-    return pet;
+    if(minBloodBo)
+        return minBloodBo;
+    else
+        return pet;
 }
 
 BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount, bool isFirst /* = false */)
@@ -5052,6 +5060,7 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
     BattleFighter* boSummon = NULL;
     UInt32 maxHpLost = 0;
     UInt8 pos = 0;
+    BattleFighter* minBloodBo = NULL;
     for(UInt8 i = 0; i < 25; ++ i)
     {
         bo = static_cast<BattleFighter*>(getObject(side, i));
@@ -5079,7 +5088,10 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
         UInt32 maxHp = bo->getMaxHP();
         if(hp < (maxHp >> 1))
         {
-            return bo;
+            if(!minBloodBo)
+                minBloodBo = bo;
+            else if(minBloodBo->getHP() > hp)
+                minBloodBo = bo;
         }
 
         if(maxHp - hp > maxHpLost)
@@ -5089,7 +5101,9 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
         }
     }
 
-    if(maxHpLost != 0)
+    if(minBloodBo)
+        return minBloodBo;
+    else if(maxHpLost != 0)
         retbo = static_cast<BattleFighter*>(getObject(side, pos));
     else if(boSummon && boSummon->getHP() < boSummon->getMaxHP())
         retbo = boSummon;
@@ -10482,6 +10496,11 @@ void BattleSimulator::doSkillEffectExtra_HpShield(BattleFighter* bf, int target_
         return;
     if (!bo->isChar())
         return;
+
+    // 宠物乌龟技能——天地守护改为不会向分身施放
+    if((bo->isSummon() || bo->hasFlag(BattleFighter::IsMirror)) && skill->getId() == 51)
+        return;
+
     float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx]);
     if (hp < 1.0f)
         return;

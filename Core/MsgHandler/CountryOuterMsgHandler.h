@@ -1394,6 +1394,13 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 player->setNewGuildTaskStep(step);
             }
             break;
+        case 0x1A:
+            {
+                UInt8 mapId = 0;
+                br >> mapId;
+                player->setMapId(mapId);
+            }
+            break;
         default:
             return;
 	}

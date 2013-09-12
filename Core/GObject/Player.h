@@ -2596,6 +2596,8 @@ namespace GObject
         UInt16 _partCnt[8][9];
         UInt16 _alreadyCnt[8];
         UInt8 _alreadyload[8];
+    public:
+        void setMapId(UInt8 mapId);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
