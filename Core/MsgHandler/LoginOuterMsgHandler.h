@@ -412,6 +412,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->SetSummerMeetValue();
             player->setPrayLoginInWeek();
             player->continuousLoginSummerFlow();
+            player->setPresentLogin();
             GObject::globalOnlinePlayers.add(player->getId(),player);
             player->SetQQBoardLogin();
 #ifdef _FB
@@ -782,6 +783,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setPrayLoginInWeek();
             pl->continuousLoginSummerFlow();
             pl->SetQQBoardLogin();
+            pl->setPresentLogin();
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -1065,12 +1067,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                507,    2,
-                509,    2,
-                56,     2,
+                515,    2,
+                1325,   2,
+                9360,   2,
+                517,    4,
+                501,    4,
                 1126,   3,
-                9367,   5,
-                9369,   5
             };
 
             UInt8 idx = 0;

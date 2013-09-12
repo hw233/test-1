@@ -13,8 +13,20 @@ class Stream;
 namespace GObject
 {
 
+enum
+{
+    MINGHUN = 1,       // 命魂
+    TIANHUN,           // 天魂
+    DIHUN              // 地魂
+};
+
+#define SANHUN_MAXLVL   100
+
 class Player;
+class HunPoData;
+
 struct DBFairyPetData;
+struct DBSanHun;
 
 // 仙宠
 class FairyPet:public Fighter
@@ -56,6 +68,17 @@ public:
     ItemPetEq * findEquip(UInt32 id, UInt8& pos);
     ItemPetEq * setEquip(ItemPetEq * eq, UInt8& pos, bool writedb = true);
     void rebuildEquipAttr();
+
+    void AddSHFromDB(DBSanHun &);                               // 加载三魂数据
+
+    void upgradeSH(UInt32 petId, UInt8 sanhunId, UInt8 mark);   // 三魂升级
+    void addSHAttr(GData::AttrExtra& ae);                       // 增加属性
+    void GMSHUpLvl(UInt32 petId, UInt8 sanhunId, UInt8 lvl);
+    bool checkSanHunUp(UInt8 sanhunId, UInt8 sanhunLvl);        // 三魂升级检测函数
+    void sendHunPoInfo(Stream & st);                            // 魂魄信息
+    void setSHLvl(UInt8 sanhunId, UInt8 lvl);                   // 设置三魂等级
+    UInt8 findSHLvl(UInt8 sanhunId);                            // 查看三魂等级
+    inline void delSanHun() { m_SanHunLvl.clear(); }            // 删除三魂
 
     inline bool isOnBattle()            { return _onBattle; }
     inline void setOnBattle(bool flag)  { _onBattle = flag; }
@@ -107,6 +130,8 @@ private:
     void reset(UInt8 type);
 public:
     void upgradeEquipSkill(ItemPetEq * eq);
+private:
+    std::map<UInt8, UInt8> m_SanHunLvl;                     // 记录三魂当前等级
 };
 
 }

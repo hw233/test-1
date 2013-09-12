@@ -317,6 +317,12 @@ namespace GObject
             std::abort();
         }
 
+		/*if(!loadSanHun())
+        {
+            fprintf(stderr, "load sanhun error!\n");
+            std::abort();
+        }*/
+
 		if(!loadTempItem())
         {
             fprintf(stderr, "load TempItem error!\n");
@@ -346,6 +352,11 @@ namespace GObject
 		if(!loadAllPrayInfo())
         {
             fprintf(stderr, "loadAllPrayInfo error!\n");
+            std::abort();
+        }
+		if(!loadAllPresentBoxInfo())
+        {
+            fprintf(stderr, "loadAllPresentBoxInfo error!\n");
             std::abort();
         }
 		if(!LoadDungeon())
@@ -2154,6 +2165,33 @@ namespace GObject
 		}
 		lc.finalize();
 
+		lc.prepare("Loading fairyPet_sanhun data:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+		pl = NULL;
+		DBSanHun shdata;
+		if(execu->Prepare("SELECT `fairyPetId`, `playerId`, sanhunId, `curLvl`  FROM `fairyPet_sanhun` ORDER BY `playerId`", shdata) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(shdata.playerId != last_id)
+			{
+				last_id = shdata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+			FairyPet * pet = static_cast<FairyPet *>(pl->findFairyPet(shdata.fairyPetId));
+			if(pet != NULL)
+            {
+                pet->AddSHFromDB(shdata);
+            }
+		}
+		lc.finalize();
+
 		//load all items
 		lc.prepare("Loading items:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -2970,6 +3008,48 @@ namespace GObject
             pl->addPrayFriendFromDB(dbfr.friendId,dbfr.time);
             if(dbfr.praynum!=0)
             toadd->addPrayFriendFromDB(pl->getId(),dbfr.time,dbfr.praynum);
+		}
+		lc.finalize();
+		return true;
+	}
+	bool GObjectManager::loadAllPresentBoxInfo()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading presentbox:");
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		PresentBox dbfr;
+		if(execu->Prepare("SELECT `id`,`awardId`,`playerId2`,`sendtime`,`get`  FROM `player_presentbox` ", dbfr) != DB::DB_OK)
+			return false;
+		lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbfr.id != last_id)
+			{
+				last_id = dbfr.id;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+            if(dbfr.get == 1)
+                continue ;
+            if(dbfr.playerId2 == 0)
+            {
+                if(dbfr.awardId == 0 || dbfr.sendtime == 0 ||dbfr.get==1)
+                    continue;
+                pl->addPresentBox(dbfr.awardId,0,dbfr.sendtime,0,0);
+            }
+			Player * toadd = globalPlayers[dbfr.playerId2];
+			if(toadd == NULL)
+                    continue;
+            else 
+            {
+                pl->addPresentBox(dbfr.awardId,dbfr.playerId2,dbfr.sendtime,dbfr.get,0);
+                toadd->addPresentBox(dbfr.awardId,pl->getId(),dbfr.sendtime,dbfr.get,1); 
+            }
 		}
 		lc.finalize();
 		return true;
@@ -5519,6 +5599,38 @@ namespace GObject
 
         return true;
     }
+
+    /*bool GObjectManager::loadSanHun()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading sanhun:");
+		DBSanHun shdata;
+        Player* pl = NULL;
+
+		if(execu->Prepare("SELECT `playerId`, sanhunId, `curLvl`  FROM `player_sanhun` ORDER BY `playerId`", shdata) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(shdata.playerId != last_id)
+			{
+				last_id = shdata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->GetHunPo()->AddSHFromDB(shdata);
+		}
+		lc.finalize();
+
+        return true;
+    }*/
 
     bool GObjectManager::LoadSoulItemChance()
     {

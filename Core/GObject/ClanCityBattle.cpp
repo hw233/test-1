@@ -1864,7 +1864,7 @@ bool ClanCity::playerEnter(Player * player)
         UInt8 pos = pl->pos;
         m_spots[pos].sendAliveInfo(pl);
     }
-
+    //GameAction()->doStrong(player, SthMSCG, 0, 0);  
     return true;
 }
 

@@ -578,6 +578,14 @@ struct PrayRelation
     UInt32 time;
     UInt32 praynum;
 };
+struct PresentBox
+{
+    UInt64 id;         //礼物接受者
+    UInt32 awardId;    
+    UInt64 playerId2;  //礼物发送者
+    UInt32 sendtime;
+    UInt8 get;
+};
 struct DBClan
 {
 	UInt32 id;
@@ -1303,6 +1311,14 @@ struct DBKeyin
     UInt8  curLvl;
     UInt32 curExp;
 };
+
+struct DBSanHun
+{
+    UInt32 fairyPetId;
+    UInt64 playerId;
+    UInt8 sanhunId;
+    UInt8 curLvl;
+};
 }
 
 namespace DB {
@@ -1937,6 +1953,17 @@ SPECIALDEF(5)
     UInt8 , pray,
     UInt32,  time,
     UInt32, praynum
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::PresentBox)
+SPECIALDEF(5)
+(
+    UInt64, id,
+    UInt32, awardId,
+    UInt64, playerId2,
+    UInt32, sendtime,
+    UInt8 , get
 )
 SPECIALEND()
 
@@ -2964,6 +2991,15 @@ SPECIALDEF(4)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBSanHun)
+SPECIALDEF(4)
+    (
+    UInt32, fairyPetId,
+    UInt64, playerId,
+    UInt8, sanhunId,
+    UInt8, curLvl
+    )
+SPECIALEND()
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

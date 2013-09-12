@@ -299,6 +299,7 @@ namespace GObject
 		static bool delayLoad();
 		static bool loadAllFriends();
 		static bool loadAllPrayInfo();
+		static bool loadAllPresentBoxInfo();
 		static bool loadAllClans();
 		static bool loadEquipments();
 		static bool loadEquipmentsSpirit();
@@ -344,6 +345,7 @@ namespace GObject
         static bool loadPetEquipAttr();
         static bool loadFairySpar();
         static bool loadCollectCard();
+        //static bool loadSanHun();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);
