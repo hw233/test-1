@@ -2129,6 +2129,7 @@ void OnBePrayed( GameMsgHdr &hdr, const void * data)
 }
 void OnBePresented( GameMsgHdr &hdr, const void * data)
 {
+	UInt32 now = TimeUtil::Now();
     struct idAndType
     {
         UInt64 id;
@@ -2136,7 +2137,7 @@ void OnBePresented( GameMsgHdr &hdr, const void * data)
     };
     MSG_QUERY_PLAYER(player);
     idAndType ms = *reinterpret_cast<const idAndType *>(data); 
-    player->addPresentBox(ms.type,ms.id,0);
+    player->addPresentBox(ms.type,ms.id,now,0,0);
 }
 
 void OnSendPopularityAward(GameMsgHdr &hdr, const void * data)

@@ -787,7 +787,7 @@ namespace GObject
             UInt8 get;
             StuPresentBox(UInt32 _awardId,UInt32 _sendtime,UInt8 _get)
             {
-                awardId = awardId;
+                awardId = _awardId;
                 sendtime = _sendtime;
                 get = _get;
             }

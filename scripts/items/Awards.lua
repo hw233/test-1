@@ -482,22 +482,24 @@ function RunPrayAward(player, cts)
 end
 function RunPresentAward(player, cts)
     local item = {
-        [1] = {{503, 1}},
-        [2] = {{134, 1}},
-        [3] = {{1325,1}},
-        [4] = {{503, 1}},
-        [5] = {{134, 1}},
-        [6] = {{1325,1}},
-        [7] = {{503, 1}},
-        [8] = {{134, 1}},
-        [9] = {{1325,1}},
+        [1] = {{502, 2}},
+        [2] = {{15, 1}},
+        [3] = {{508,1}},
+        [4] = {{506, 1}},
+        [5] = {{51, 1}},
+        [6] = {{500,1}},
+        [7] = {{514, 1}},
+        [8] = {{133, 1}},
+        [9] = {{516,1}},
+        [10] ={{9428,1}},
     };
+    
     local package = player:GetPackage();
 
     if cts < 1 then
         return false
     end
-    if cts > 9 then
+    if cts > 10 then
         return false
     end
 

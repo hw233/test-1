@@ -3005,17 +3005,17 @@ namespace GObject
                 continue ;
             if(dbfr.playerId2 == 0)
             {
-                if(dbfr.awardId == 0 || dbfr.sendtime == 0 )
+                if(dbfr.awardId == 0 || dbfr.sendtime == 0 ||dbfr.get==1)
                     continue;
-                pl->addPresentBox(dbfr.awardId,0,dbfr.sendtime,0);
+                pl->addPresentBox(dbfr.awardId,0,dbfr.sendtime,0,0);
             }
 			Player * toadd = globalPlayers[dbfr.playerId2];
 			if(toadd == NULL)
                     continue;
             else 
             {
-                pl->addPresentBox(dbfr.awardId,dbfr.playerId2,dbfr.sendtime,0);
-                toadd->addPresentBox(dbfr.awardId,pl->getId(),dbfr.sendtime,1); 
+                pl->addPresentBox(dbfr.awardId,dbfr.playerId2,dbfr.sendtime,dbfr.get,0);
+                toadd->addPresentBox(dbfr.awardId,pl->getId(),dbfr.sendtime,dbfr.get,1); 
             }
 		}
 		lc.finalize();

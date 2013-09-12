@@ -537,6 +537,7 @@ void JobHunter::OnCommand(UInt8 command, UInt8 val, UInt8 val2, bool isAuto /* =
     }
     else
         SaveMapInfo();
+    //GameAction()->doStrong(_owner, SthSerachMo, 0, 0);
 }
 
 void JobHunter::OnAutoCommand(UInt8 type)

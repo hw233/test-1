@@ -6814,7 +6814,7 @@ namespace GObject
 
         OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
         writeClanTask();
-        GameAction()->doStrong(this, SthClanTask, 0 ,0 );
+        //GameAction()->doStrong(this, SthClanTask, 0 ,0 );
         return true;
     }
 
@@ -11005,7 +11005,7 @@ namespace GObject
             UInt8 flag = 0;
             if ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0)
             {
-                if (World::getQQVipAct() && _playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
+                if (/*World::getQQVipAct() && */_playerData.qqvipl1 >= 40 && _playerData.qqvipl1 <= 49)
                 {
                     qqvipl = _playerData.qqvipl1;
                     flag = 8*((_playerData.qqvipl1-20) / 10);
@@ -14265,12 +14265,12 @@ namespace GObject
     {
         if (index > 3 || !pos || pos > 1)
             return;
-        MailPackage::MailItem item[5][1] =
+        MailPackage::MailItem item[4][1] =
         {
-            {{1329, 1},},
-            {{1330, 1},},
-            {{1331, 1},},
-            {{1332, 1},},
+            {{1369, 1},},
+            {{1370, 1},},
+            {{1371, 1},},
+            {{1372, 1},},
         };
         sendMailItem(2372, 2373, &item[index][0], 1, false);
     }
@@ -16481,11 +16481,11 @@ namespace GObject
             sendMsgCode(0, 1011);
             return;
         }
-        if(GetPackage()->GetItemAnyNum(9163) < 1)
+        if(GetPackage()->GetItemAnyNum(9416) < 1)
         {
             return;
         }
-        GetPackage()->DelItemAny(9163, 1);
+        GetPackage()->DelItemAny(9416, 1);
         GameAction()->onGetKillMonsterReward(this);
         udpLog("916", "F_1099", "", "", "", "", "act");
     }
@@ -23183,6 +23183,12 @@ void Player::sendRPZCJBInfo()
     st << gold_got << static_cast<UInt32>(0);
     st << GetVar(VAR_ZCJB_RECHARGE_GOLD);
     st << beginTime << endTime;
+    UInt8 newFlag;
+    if(World::inActive_new())
+        newFlag = 1;
+    else
+        newFlag = 0;
+    st << newFlag;
     st << Stream::eos;
     send(st);
 }
@@ -23200,8 +23206,30 @@ static UInt32 zcjb_award[16][3] = {
     {8480, 8960, 13000}, {16000, 16500, 23000}, {32100, 33300, 50000}, {64200, 66600, 90000},
     {106000, 109000, 160000}, {216000, 222000, 350000}, {432000, 444000, 680000}, {880000, 896000, 999999}
 };
+static UInt32 zcjb_gold_new[34] = {
+    100, 200, 400, 600,
+    800, 1200, 2000, 3000,
+    4000, 6000, 8000, 10000,
+    12500, 15000, 20000, 25000,
+    30000, 40000, 50000, 60000,
+    70000, 80000, 100000, 120000,
+    150000, 180000, 230000, 280000,
+    330000, 380000, 450000, 550000,
+    650000, 800000
+};
+static UInt32 zcjb_award_new[34][3] = {
+    {110, 113, 150}, {210, 213, 300}, {420, 462, 600}, {620, 626, 800},
+    {820, 826, 1100}, {1240, 1252, 1600}, {2080, 2104, 2800}, {3100, 3130, 4000},
+    {4100, 4130, 5000}, {6200, 6260, 8000}, {8200, 8260, 10000}, {10200, 10260, 12000},
+    {12750, 12825, 15000}, {15250, 15325, 17500}, {20500, 20650, 25000}, {25500, 25650, 30000},
+    {30500, 30650, 35000}, {41000, 41300, 50000}, {51000, 51300, 60000}, {61000, 61300, 70000},
+    {71000, 71300, 80000}, {81000, 81300, 90000}, {102000, 102600, 120000}, {122000, 122600, 140000},
+    {153000, 153900, 180000}, {183000, 183900, 210000}, {235000, 236500, 280000}, {285000, 286500, 330000},
+    {335000, 336500, 380000}, {385000, 386500, 430000}, {457000, 459100, 520000}, {560000, 563000, 650000},
+    {660000, 663000, 750000}, {815000, 819500, 950000}
+};
 
-static const char* zcjb_udplog[15] = {
+static const char* zcjb_udplog[33] = {
     "F_130613_1",
     "F_130613_2",
     "F_130613_3",
@@ -23217,6 +23245,24 @@ static const char* zcjb_udplog[15] = {
     "F_130613_13",
     "F_130613_14",
     "F_130613_15",
+    "F_130613_16",
+    "F_130613_17",
+    "F_130613_18",
+    "F_130613_19",
+    "F_130613_20",
+    "F_130613_21",
+    "F_130613_22",
+    "F_130613_23",
+    "F_130613_24",
+    "F_130613_25",
+    "F_130613_26",
+    "F_130613_27",
+    "F_130613_28",
+    "F_130613_29",
+    "F_130613_30",
+    "F_130613_31",
+    "F_130613_32",
+    "F_130613_33",
 };
 
 bool Player::getRPZCJBAward()
@@ -23231,7 +23277,12 @@ bool Player::getRPZCJBAward()
     if(left == 0 || left > total)
         return false;
     UInt8 awardIdx = total - left;
-    if(getGold() < zcjb_gold[awardIdx])
+    UInt32 cur_gold;
+    if(World::inActive_new())
+        cur_gold = zcjb_gold_new[awardIdx];
+    else
+        cur_gold = zcjb_gold[awardIdx];
+    if(getGold() < cur_gold)
     {
         sendMsgCode(0, 1104);
         return false;
@@ -23243,9 +23294,13 @@ bool Player::getRPZCJBAward()
         roolIdx = 0;
 
     ConsumeInfo ci(ZCJBRoolAward,0,0);
-    useGold(zcjb_gold[awardIdx], &ci);
+    useGold(cur_gold, &ci);
 
-    UInt32 awardGold = zcjb_award[awardIdx][roolIdx] + uRand((zcjb_award[awardIdx][roolIdx+1] - zcjb_award[awardIdx][roolIdx]));
+    UInt32 awardGold;
+    if(World::inActive_new())
+        awardGold = zcjb_award_new[awardIdx][roolIdx] + uRand((zcjb_award_new[awardIdx][roolIdx+1] - zcjb_award_new[awardIdx][roolIdx]));
+    else
+        awardGold = zcjb_award[awardIdx][roolIdx] + uRand((zcjb_award[awardIdx][roolIdx+1] - zcjb_award[awardIdx][roolIdx]));
     IncommingInfo ii(InZCJBRoolAward, 0, 0);
     getGold(awardGold, &ii);
 
@@ -23272,9 +23327,21 @@ bool Player::getRPZCJBAward()
     st << gold_got << awardGold;
     st << GetVar(VAR_ZCJB_RECHARGE_GOLD);
     st << beginTime << endTime;
+    UInt8 newFlag;
+    if(World::inActive_new())
+        newFlag = 1;
+    else
+        newFlag = 0;
+    st << newFlag;
     st << Stream::eos;
     send(st);
     udpLog("xschoujiang", zcjb_udplog[awardIdx], "", "", "", "", "act");
+
+    if(awardGold > cur_gold)
+    {
+        UInt32 saveGoldPercent = awardGold * 100 / cur_gold;
+        SYSMSG_BROADCASTV(4945, getCountry(), getPName(), saveGoldPercent);
+    }
     return true;
 }
 
@@ -23287,11 +23354,21 @@ void Player::checkZCJB(UInt32 recharge)
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
     UInt8 left = ZCJB_LEFT(zcjb);
     UInt8 total = ZCJB_TOTAL(zcjb);
+    UInt8 totalMax;
+    UInt32 cur_gold;
+    if(World::inActive_new())
+        totalMax = 34;
+    else
+        totalMax = 16;
 
     UInt8 oldTotal = total;
-    for(; total < 16; ++ total)
+    for(; total < totalMax; ++ total)
     {
-        if(GetVar(VAR_ZCJB_RECHARGE_GOLD) < zcjb_gold[total])
+        if(World::inActive_new())
+            cur_gold = zcjb_gold_new[total];
+        else
+            cur_gold = zcjb_gold[total];
+        if(GetVar(VAR_ZCJB_RECHARGE_GOLD) < cur_gold)
             break;
     }
 
@@ -23321,21 +23398,21 @@ static UInt32 ryhb_items_1[15][4] = {
 };
 
 static UInt32 ryhb_items_2[15][4] = {
-    {8, 8, 78, 9},          // 升级优惠礼包
+    {8, 5, 78, 9},          // 升级优惠礼包
     {28, 28, 79, 9},        // 炼器优惠礼包
-    {15, 8, 80, 9},         // 九疑鼎优惠礼包
-    {88, 88, 5135, 3},      // 五级身法石
-    {2, 4, 1126, 99},       // 橙色星辰旗
-    {2, 5, 1325, 99},       // 技能符文熔炼诀
-    {2, 5, 134, 99},        // 法灵精金
-    {2, 5, 547, 99},        // 天赋保护符
-    {2, 5, 501, 99},        // 洗练保护符
-    {1, 3, 503, 99},        // 太乙精金
-    {4, 8, 515, 99},        // 五行精金
-    {1, 5, 509, 99},        // 凝神易筋丹
-    {99, 99, 1717, 5},      // 女仆头饰
-    {99, 99, 1719, 5},      // 兔耳朵
-    {88, 88, 8555, 64},      // 天劫术
+    {99, 99, 5136, 9},         // 六级身法石
+    {99, 99, 1719, 2},       // 变身法宝
+    {88, 88, 8555, 64},        //
+    {1, 3, 9371, 99},        //
+    {2, 6, 1126, 99},        //
+    {2, 6, 9418, 99},        //
+    {2, 5, 547, 99},        //
+    {2, 5, 501, 99},        //
+    {5, 3, 503, 99},       //
+    {5, 13, 515, 99},      //
+    {3, 8, 1325, 99},    //
+    {3, 8, 9338, 99},    //
+    {3, 8, 134, 99},    //
 };
 
 static const char* ryhb_udplog[15] = {
@@ -23458,7 +23535,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
         {
             //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9407, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9422, 1, true, false, FromNpc);
         }
         else
         {
@@ -23467,7 +23544,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             {
                 //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9407, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9422, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
@@ -23896,20 +23973,24 @@ void Player::SetQQBoardLogin()
         
 void Player::addPresentBox(UInt32 awardId ,UInt64 playerId2 ,UInt32 sendtime,UInt8 get, UInt32 flag)
 {
+    if(get == 1)
+        return ;
     UInt32 now = TimeUtil::Now();
     if(now > World::getOpenTime() + 15 * 86400 )
         return ;
     if(now > sendtime + 3 * 86400)
         return ;
-    if(_bePresent.size() > 30 )
+    if( getPresentBoxRest() >= 30 )
         return ;
     if(flag == 1)     //表示送出
     {
-        _present[playerId2].push_back(StuPresentBox(awardId,sendtime,get));
+        StuPresentBox sp(awardId,sendtime,get);
+        _present[playerId2].push_back(sp);
     }
     else     //表示接受
     {
-        _bePresent[playerId2].push_back(StuPresentBox(awardId,sendtime,get));
+        StuPresentBox sp(awardId,sendtime,get);
+        _bePresent[playerId2].push_back(sp);
     }
 }
 void Player::sendPresentForOther( UInt64 playerId , UInt32 type)
@@ -23917,14 +23998,24 @@ void Player::sendPresentForOther( UInt64 playerId , UInt32 type)
     Player* other = globalPlayers[playerId];
     if(other==NULL)
         return;
+    if( type < 1 || type>9)
+        return ;
     UInt32 now = TimeUtil::Now();
     if(now > World::getOpenTime() + 15 * 86400 )
         return ;
     if(CheckPresentToday(other->getId()))
+    {
+        sendMsgCode(1, 4007);
         return ; 
+    }
     UInt32 level = GetLev();
     if(level < 40)
         return ;
+    if(other->GetLev() < 40)
+    {
+        sendMsgCode(1, 4009);
+        return ;
+    }
     UInt32 presentValue = GetVar(VAR_SENDPRESENT_VALUE);
     if(presentValue >= getPresentCount())
     {
@@ -23932,10 +24023,24 @@ void Player::sendPresentForOther( UInt64 playerId , UInt32 type)
     }
     UInt32 rest = other->getPresentBoxRest();
     if(rest >= 30 )
+    {
+        sendMsgCode(1, 4006);
+        return ;
+    }
+    UInt32 days[]={1,2,3,4,5,7,9,12,15};
+    UInt32 PresentLogin = GetVar(VAR_PRESENT_LOGIN);
+    UInt32 i=0;
+    UInt32 count=0 ;
+    while(i<16)
+    {
+        if(PresentLogin & (1 << i++ ))
+            ++count;
+    }
+    if( count < days[type-1] )
         return ;
     if(other->getThreadId() == getThreadId())
     {
-        other->addPresentBox(type,now,getId(),0);
+        other->addPresentBox(type,getId(),now,0,0);
     }
     else
     {
@@ -23960,14 +24065,26 @@ void Player::sendPresentForOther( UInt64 playerId , UInt32 type)
     _present[other->getId()].push_back(StuPresentBox(type,now,0));
     SetVar(VAR_SENDPRESENT_VALUE,presentValue);
     DB1().PushUpdateData("REPLACE INTO `player_presentbox` (`id`, `awardid`, `playerId2`, `sendtime`,`get`) VALUES( %" I64_FMT "u,%u ,%" I64_FMT "u,%u,0)", other->getId(),type, getId(),now,0);
+    sendMsgCode(1,4008);
 }
 UInt32 Player::getPresentBoxRest()
 {
     UInt32 count=0;
+    UInt32 now = TimeUtil::Now();
     std::map<UInt64,std::vector<StuPresentBox> >::iterator it =_bePresent.begin();
     for(;it!=_bePresent.end();++it)
     {
-        count+=it->second.size();
+        if(it->first == 0 )
+            continue ;
+        std::vector<StuPresentBox> presents = it->second;
+        std::vector<StuPresentBox>::iterator it2 = presents.begin();
+        for(;it2 != presents.end();++it2)
+        {   
+            if(it2->sendtime + 3*86400 > now  && it2->get == 0 )
+            {
+                ++count;
+            }
+        }
     }
     return count;
 }
@@ -23980,6 +24097,8 @@ UInt32 Player::getPresentCount()
     if(souls >= 50 )
         count++;
     if(souls >= 75 )
+        count++;
+    if(souls >= 100 )
         count++;
     if(GetShuoShuo()->getShuoShuoCount())
         count++;
@@ -23997,6 +24116,7 @@ void Player::setPresentLogin()
     if(presentLogin & (1<<(ct)))
         return ;
     presentLogin |= (1<<ct);
+    SetVar(VAR_PRESENT_LOGIN,presentLogin);
 }
 void Player::sendPresentInfo()
 {
@@ -24013,43 +24133,47 @@ void Player::sendPresentInfo()
         if(PresentLogin & (1 << i++ ))
             ++count;
     }
-        Stream st(REP::NEWRELATION);
-        st << static_cast<UInt8>(6);
-        st << static_cast<UInt8>(count);
-        st <<static_cast<UInt8> (sendPresentValue);
-        st <<static_cast<UInt8> (getPresentValue);
-        st <<static_cast<UInt8> (GetShuoShuo()->getShuoShuoCount());
-        st <<static_cast<UInt8> (getPresentCount());
-        size_t offset = st.size();
-        std::map<UInt64,std::vector<StuPresentBox> >::iterator it =_bePresent.begin();
-        UInt8 Count = 0;
-        st<<Count;
-        for(;it!=_bePresent.end();++it)
-        {
-            std::vector<StuPresentBox> presents = it->second;
-            std::vector<StuPresentBox>::iterator it2 = presents.begin();
-            Player* player = globalPlayers[it->first];
-            for(;it2 != presents.end();++it2)
-            {    
-                if(it2->sendtime + 3*86400 > now  && it2->get == 0 )
-                {
-                    if(it->first == 0 )
-                        st<<static_cast<UInt64>(0);
-                    else if(player!=NULL)
-                        st<<static_cast<UInt64>(player->getId());
-                    else return ;
-                    st<<static_cast<UInt8>(it2->awardId);
-                    st<<static_cast<UInt32>(it2->sendtime);
-                    ++Count;
-                }
-                else 
-                    it->second.erase(it2);
+    //UInt32 days[]={1,2,3,4,5,7,9,12,15};
+    //UInt32 type = 0;
+   // for(UInt32 i = 0 ; i< 9 ;++i)
+     //   if(count >= days[i])
+       //     type = i+1;
+    Stream st(REP::NEWRELATION);
+    st << static_cast<UInt8>(7);
+    st << static_cast<UInt8>(count);
+    st <<static_cast<UInt8> (sendPresentValue);
+    st <<static_cast<UInt8> (getPresentValue);
+    st <<static_cast<UInt8> (GetShuoShuo()->getShuoShuoCount());
+    st <<static_cast<UInt8> (GetStrengthenMgr()->GetSouls());
+    st <<static_cast<UInt8> (getPresentCount());
+    size_t offset = st.size();
+    std::map<UInt64,std::vector<StuPresentBox> >::iterator it =_bePresent.begin();
+    UInt8 Count = 0;
+    st<<Count;
+    for(;it!=_bePresent.end();++it)
+    {
+        std::vector<StuPresentBox> presents = it->second;
+        std::vector<StuPresentBox>::iterator it2 = presents.begin();
+        Player* player = globalPlayers[it->first];
+        for(;it2 != presents.end();++it2)
+        {   
+            if(it2->sendtime + 3*86400 > now  && it2->get == 0 )
+            {
+                if(it->first == 0 )
+                    st<<static_cast<UInt64>(0);
+                else if(player!=NULL)
+                    st<<static_cast<UInt64>(player->getId());
+                else return ;
+                st<<static_cast<UInt8>(it2->awardId);
+                st<<static_cast<UInt32>(it2->sendtime);
+                ++Count;
             }
         }
-        st.data<UInt8>(offset)=Count;
-        st << Stream::eos;
-        send(st);
-//        std::cout<<"type:"<<prayType<<" count:"<<prayCount<<" value:"<<prayValue<< " suctime"<<praySucTime<<std::endl;
+    }
+    st.data<UInt8>(offset)=Count;
+    st << Stream::eos;
+    send(st);
+//  std::cout<<"type:"<<prayType<<" count:"<<prayCount<<" value:"<<prayValue<< " suctime"<<praySucTime<<std::endl;
 }
 
 void Player::getPresentFrombox(UInt64 playerId,UInt32 type,UInt32 sendtime)
@@ -24060,13 +24184,15 @@ void Player::getPresentFrombox(UInt64 playerId,UInt32 type,UInt32 sendtime)
         return ;
     if(now >( World::getOpenTime() + 15 * 86400) )
         return ;
+    if( now > sendtime + 3* 86400)
+        return ;
     std::map<UInt64,std::vector<StuPresentBox> >::iterator it = _bePresent.find(playerId);
     std::vector<StuPresentBox>::iterator it2= it->second.begin();
     for( ; it2 != it->second.end() ; ++it2 )
     {
         if( it2->awardId != type ||it2->sendtime !=sendtime ||it2->get==1)
             continue ;
-        if(!GameAction()->RunPresentAward(this, type))
+        if(!GameAction()->RunPresentAward(this,static_cast<UInt8>( type )))
             return ;
         it2->get=1;
         it->second.erase(it2);
@@ -24089,6 +24215,7 @@ void Player::deletePresent(UInt64 playerId,UInt32 type,UInt32 sendtime)
             continue ;
         it->second.erase(it2);
         DB1().PushUpdateData("REPLACE INTO `player_presentbox` (`id`, `awardid`, `playerId2`, `sendtime`,`get`) VALUES( %" I64_FMT "u,%u ,%" I64_FMT "u,0,%u)", getId(),type, playerId,it2->get);
+        break;
     }
 }
 } // namespace GObject

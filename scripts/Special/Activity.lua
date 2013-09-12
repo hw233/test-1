@@ -270,7 +270,7 @@ function onDungeonWin(player, id, count, free)
     end
     if getKillMonsterAct() then
         local package = player:GetPackage();
-        package:Add(9163, 1, true)
+        package:Add(9416, 1, true)
     end
     local lootlvl = 1;
     if  free then
@@ -1045,7 +1045,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     end
     if getKillMonsterAct() then
         local package = player:GetPackage();
-        package:Add(9163, 1, true)
+        package:Add(9416, 1, true)
     end
     sendWinReward(player, lootlvl, 1);
     TgcEvent(player, 1)
@@ -1085,7 +1085,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     end
     if getKillMonsterAct() then
         local package = player:GetPackage();
-        package:Add(9163, 1, true)
+        package:Add(9416, 1, true)
     end
     sendWinReward(player, lootlvl, 2);
     TgcEvent(player, 2)
@@ -8186,7 +8186,7 @@ function SurnameLegendLoot(player,lootlvl)
     --package:AddItem(9383, itemNum[lootlvl], true,0,10);
     --package:AddItem(9397, itemNum[lootlvl], true,0,10);
     --package:AddItem(9401, itemNum[lootlvl], true,0,10);
-    package:AddItem(9407, itemNum[lootlvl], true,0,10);
+    package:AddItem(9422, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -8269,22 +8269,22 @@ function onGetKillMonsterReward(player)
 
     local eventItem = {
         --{物品ID，物品数，剑侠（或柔情、或财富、或传奇），剑侠个数}
-        {{502,  1, 1, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
-        {{56,   1, 0, 0}, {57,  1, 0, 0}, {133, 1, 1, 1}},
-        {{502,  1, 1, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
-        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 3, 1}},
-        {{56,   1, 0, 0}, {57,  1, 0, 0}, {133, 1, 3, 1}},
-        {{502,  1, 2, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
-        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
-        {{502,  1, 3, 1}, {55,  1, 0, 0}, {510,  1, 0, 0}},
-        {{503,  1, 4, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
-        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 3, 1}},
-        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
-        {{503,  1, 4, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
-        {{503,  1, 3, 1}, {33,  1, 0, 0}, {508,  1, 0, 0}},
-        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
-        {{1326, 1, 0, 0}, {466, 1, 0, 0}, {8000, 1, 2, 1}},
-        {{9076, 1, 4, 1}, {9076,1, 4, 1}, {9076, 1, 4, 1}},
+        {{505,  1, 1, 1}, {1327,  1, 0, 0}, {133,  1, 0, 0}},
+        {{9390, 1, 0, 0}, {57,    1, 0, 0}, {133,  1, 1, 1}},
+        {{56,   1, 1, 1}, {1327,  1, 0, 0}, {133,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {9371,  1, 0, 0}, {9371, 1, 3, 1}},
+        {{56,   1, 0, 0}, {57,    1, 0, 0}, {133, 1, 3, 1}},
+        {{57,   1, 2, 1}, {1327,  1, 0, 0}, {133,  1, 0, 0}},
+        {{9390, 1, 0, 0}, {517,   1, 0, 0}, {8000, 1, 2, 1}},
+        {{511,  1, 3, 1}, {133,   1, 0, 0}, {501,  1, 0, 0}},
+        {{500,  1, 4, 1}, {33,    1, 0, 0}, {503,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {500,   1, 0, 0}, {551,  1, 3, 1}},
+        {{1326, 1, 0, 0}, {466,   1, 0, 0}, {8000, 1, 2, 1}},
+        {{503,  1, 4, 1}, {514,   1, 0, 0}, {511,  1, 0, 0}},
+        {{503,  1, 3, 1}, {33,    1, 0, 0}, {508,  1, 0, 0}},
+        {{1326, 1, 0, 0}, {466,   1, 0, 0}, {1126, 1, 2, 1}},
+        {{134,  1, 0, 0}, {503,  1, 0, 0}, {1325, 1, 2, 1}},
+        {{9076, 1, 4, 1}, {9076,  1, 4, 1}, {9076, 1, 4, 1}},
     }
 
     local pos = player:GetVar(182)
@@ -8310,21 +8310,21 @@ function onGetKillMonsterReward(player)
         local curType = eventItem[i][j][3]
         local extAward = 0
         if curType == 1 and player:GetVar(183) == (1-1) then
-            extAward = 1757
+            extAward = 1759
         elseif curType == 2 and player:GetVar(184) == (1-1) then
-            extAward = 1751
+            extAward = 1761
         elseif curType == 3 and player:GetVar(185) == (1-1) then
-            extAward = 1750
+            extAward = 1762
         elseif curType == 4 and player:GetVar(186) == (1-1) then
-            extAward = 1752
+            extAward = 1763
         elseif curType == 1 and player:GetVar(183) == (5-1) then
-            extAward = 1753
+            extAward = 1764
         elseif curType == 2 and player:GetVar(184) == (3-1) then
-            extAward = 1754
+            extAward = 1765
         elseif curType == 3 and player:GetVar(185) == (4-1) then
-            extAward = 1755
+            extAward = 1760
         elseif curType == 4 and player:GetVar(186) == (2-1) then
-            extAward = 1756
+            extAward = 1758
         end
 
         if extAward ~= 0 then
@@ -9100,8 +9100,8 @@ end
 
 function GetLuckyBagAward(player)
     local items = {
-       { 9367,5} , {9369,5},{ 503,5},{515,1},{134,1},{1325,2}
-    } 
+       { 9371,5} , {1325,2},{ 503,5},{515,2},{1126,2},{134,2}
+    }
     for i = 1 , 5  do
         local num = player:GetVar(452+i);
         if num < 1 then
@@ -9118,6 +9118,7 @@ function GetLuckyBagAward(player)
     end
     player:sendLuckyBagInfo();
     Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_136)
+    player:luaUdpLog("huodong", "F_130910_1", "act")
     return true
 end
 
