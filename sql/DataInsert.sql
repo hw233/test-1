@@ -233,3 +233,7 @@ UNLOCK TABLES;
 LOCK TABLES `signet` WRITE;
 source signet;
 UNLOCK TABLES;
+
+LOCK TABLES `pet_sanhun` WRITE;
+source pet_sanhun;
+UNLOCK TABLES;

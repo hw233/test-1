@@ -446,24 +446,25 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         //繁体版占用470-499
 
         //500-520 for lijr
-        VAR_QQNAVIGATION_DAY_AWARD = 500, // QQ导航每天奖励是否领取
-        VAR_QQNAVIGATION_WEEK_AWARD = 501, // QQ导航每周奖励是否领取
-        VAR_QQNAVIGATION_FIRST_LOGIN_AWARD = 502, // QQ导航首次登录奖励是否领取
+        VAR_QQNAVIGATION_DAY_AWARD = 500,                   // QQ导航每天奖励是否领取
+        VAR_QQNAVIGATION_WEEK_AWARD = 501,                  // QQ导航每周奖励是否领取
+        VAR_QQNAVIGATION_FIRST_LOGIN_AWARD = 502,           // QQ导航首次登录奖励是否领取
 
-        VAR_QQMUSIC_DAY_AWARD = 503, // QQ音乐每天奖励是否领取
-        VAR_QQTENPAY_AWARD = 504, // QQ财付通奖励是否领取
-        VAR_QQIM_QUICK_LOGIN_AWARD = 505, // QQIM快捷登录奖励是否领取
-        VAR_EQUIP_MOVE_AWARD = 506, // 装备继承奖励
-        VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK = 507, // 副本自动战斗使用金钱情况
-        VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 508, // 阵图自动战斗使用金钱情况
-        VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK = 509, // 决战之地自动战斗使用金钱情况
-        VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK = 510, // 寻墨自动战斗使用金钱情况
-        VAR_VIPLEVEL_AWARD = 511, // 御剑等级回馈
-        VAR_DROP_OUT_ITEM_MARK = 512,// 反工作室限制方案
-        VAR_QQXIU_AWARD = 513, // QQ秀合作
-        VAR_QQTENPAY_LOTTERY = 514, //QQ财付通抽奖 
-        VAR_KEYIN_MONEY_A = 515, //刻印钱币A 
-        VAR_KEYIN_MONEY_B = 516, //刻印钱币B 
+        VAR_QQMUSIC_DAY_AWARD = 503,                        // QQ音乐每天奖励是否领取
+        VAR_QQTENPAY_AWARD = 504,                           // QQ财付通奖励是否领取
+        VAR_QQIM_QUICK_LOGIN_AWARD = 505,                   // QQIM快捷登录奖励是否领取
+        VAR_EQUIP_MOVE_AWARD = 506,                         // 装备继承奖励
+        VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK = 507,           // 副本自动战斗使用金钱情况
+        VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 508,       // 阵图自动战斗使用金钱情况
+        VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK = 509,        // 决战之地自动战斗使用金钱情况
+        VAR_JOBHUNT_AUTO_FIGHT_USE_MONEY_MARK = 510,        // 寻墨自动战斗使用金钱情况
+        VAR_VIPLEVEL_AWARD = 511,                           // 御剑等级回馈
+        VAR_DROP_OUT_ITEM_MARK = 512,                       // 反工作室限制方案
+        VAR_QQXIU_AWARD = 513,                              // QQ秀合作
+        VAR_QQTENPAY_LOTTERY = 514,                         // QQ财付通抽奖 
+        VAR_KEYIN_MONEY_A = 515,                            // 刻印钱币A 
+        VAR_KEYIN_MONEY_B = 516,                            // 刻印钱币B 
+        VAR_FAIRYPET_SHOUHUN = 517,                         // 仙宠兽魂
 
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
@@ -856,7 +857,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_QQIM_QUICK_LOGIN_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_KEYIN_MONEY_A, CYCLE_NONE);
             REGISTER_VAR(VAR_KEYIN_MONEY_B, CYCLE_NONE);
-
+            REGISTER_VAR(VAR_FAIRYPET_SHOUHUN, CYCLE_NONE);
             REGISTER_VAR(VAR_EQUIP_MOVE_AWARD, CYCLE_NONE);
 
             REGISTER_VAR(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);

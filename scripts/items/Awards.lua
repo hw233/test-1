@@ -200,6 +200,17 @@ function RunNewRC7DayLoginAward(player, cts)
         [6] = {{499,40},{509, 1}, {507, 1},{514,5},{515,2}},
         [7] = {{499,50},{509, 1}, {507, 1},{517,5},{134,2},{15,5}},
     };
+
+    local item1 = {
+        [1] = {{499,10},{56, 1}, {57, 1}},
+        [2] = {{499,20},{502, 3}, {503, 1},{15,2}},
+        [3] = {{499,30},{500, 3}, {501, 1},{15,2}},
+        [4] = {{499,30},{508, 3}, {506, 3},{511,3}},
+        [5] = {{499,30},{508, 3}, {506, 3},{5024,1},{512,2}},
+        [6] = {{499,40},{509, 1}, {507, 1},{514,3},{515,1}},
+        [7] = {{499,50},{509, 1}, {507, 1},{517,3},{134,1},{15,3}},
+    };
+    
     local package = player:GetPackage();
 
     if cts == 0 then
@@ -208,20 +219,40 @@ function RunNewRC7DayLoginAward(player, cts)
     if cts > 7 then
         return false
     end
+    
+    local t = { ['year'] = 2013, ['month'] = 9, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
 
-    num = #item[cts]
-    if package:GetRestPackageSize() < ((num - 1) +((num - 1)*num*4/99)) then
-        player:sendMsgCode(2, 1011, 0);
-        return false
-    end
+    if getOpenTime() < s then 
+        num = #item[cts]
+        if package:GetRestPackageSize() < ((num - 1) +((num - 1)*num*4/99)) then
+            player:sendMsgCode(2, 1011, 0);
+            return false
+        end
 
-    for count = 1, #item[cts] do
-        if item[cts][count][1] == 499 then
-            player:getCoupon(item[cts][count][2])
-        else
-            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 34);
+        for count = 1, #item[cts] do
+            if item[cts][count][1] == 499 then
+                player:getCoupon(item[cts][count][2])
+            else
+                package:Add(item[cts][count][1], item[cts][count][2], true, 0, 34);
+            end
+        end
+    else
+        num = #item1[cts]
+        if package:GetRestPackageSize() < ((num - 1) +((num - 1)*num*4/99)) then
+            player:sendMsgCode(2, 1011, 0);
+            return false
+        end
+
+        for count = 1, #item1[cts] do
+            if item1[cts][count][1] == 499 then
+                player:getCoupon(item1[cts][count][2])
+            else
+                package:Add(item1[cts][count][1], item1[cts][count][2], true, 0, 34);
+            end
         end
     end
+
     return true
 end
 

@@ -317,6 +317,12 @@ namespace GObject
             std::abort();
         }
 
+		/*if(!loadSanHun())
+        {
+            fprintf(stderr, "load sanhun error!\n");
+            std::abort();
+        }*/
+
 		if(!loadTempItem())
         {
             fprintf(stderr, "load TempItem error!\n");
@@ -2150,6 +2156,33 @@ namespace GObject
                 pet->LoadFromDB(fpetdb);
                 if(fpetdb.onBattle)
                     pl->setFairypetBattle(pet, false);
+            }
+		}
+		lc.finalize();
+
+		lc.prepare("Loading fairyPet_sanhun data:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+		pl = NULL;
+		DBSanHun shdata;
+		if(execu->Prepare("SELECT `fairyPetId`, `playerId`, sanhunId, `curLvl`  FROM `fairyPet_sanhun` ORDER BY `playerId`", shdata) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(shdata.playerId != last_id)
+			{
+				last_id = shdata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+			FairyPet * pet = static_cast<FairyPet *>(pl->findFairyPet(shdata.fairyPetId));
+			if(pet != NULL)
+            {
+                pet->AddSHFromDB(shdata);
             }
 		}
 		lc.finalize();
@@ -5519,6 +5552,38 @@ namespace GObject
 
         return true;
     }
+
+    /*bool GObjectManager::loadSanHun()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading sanhun:");
+		DBSanHun shdata;
+        Player* pl = NULL;
+
+		if(execu->Prepare("SELECT `playerId`, sanhunId, `curLvl`  FROM `player_sanhun` ORDER BY `playerId`", shdata) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(shdata.playerId != last_id)
+			{
+				last_id = shdata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->GetHunPo()->AddSHFromDB(shdata);
+		}
+		lc.finalize();
+
+        return true;
+    }*/
 
     bool GObjectManager::LoadSoulItemChance()
     {

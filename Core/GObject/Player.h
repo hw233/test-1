@@ -29,7 +29,6 @@
 #include "FairySpar.h"
 #include "MoFang.h"
 
-
 namespace Battle
 {
 	class BattleSimulator;
@@ -2513,9 +2512,11 @@ namespace GObject
         UInt32 getXianyuan( UInt32 c, IncommingInfo* ii = NULL);
         UInt32 getFengsui( UInt32 c, IncommingInfo* ii);
         UInt32 getLongyuan( UInt32 c, IncommingInfo* ii);
+        UInt32 getShouHun( UInt32 c, IncommingInfo* ii);
 	    UInt32 useXianyuan( UInt32 a, ConsumeInfo * ci );
 	    UInt32 useFengsui( UInt32 a, ConsumeInfo * ci );
 	    UInt32 useLongyuan( UInt32 a, ConsumeInfo * ci );
+	    //UInt32 useShouHun( UInt32 a, ConsumeInfo * ci );
 
     public:     //活动相关
         void checkAnswerActInFoolsDay();

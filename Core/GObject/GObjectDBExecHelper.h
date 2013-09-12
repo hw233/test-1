@@ -1303,6 +1303,14 @@ struct DBKeyin
     UInt8  curLvl;
     UInt32 curExp;
 };
+
+struct DBSanHun
+{
+    UInt32 fairyPetId;
+    UInt64 playerId;
+    UInt8 sanhunId;
+    UInt8 curLvl;
+};
 }
 
 namespace DB {
@@ -2964,6 +2972,15 @@ SPECIALDEF(4)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBSanHun)
+SPECIALDEF(4)
+    (
+    UInt32, fairyPetId,
+    UInt64, playerId,
+    UInt8, sanhunId,
+    UInt8, curLvl
+    )
+SPECIALEND()
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

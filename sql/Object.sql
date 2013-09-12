@@ -2125,7 +2125,6 @@ CREATE TABLE `collect_card` (
  ) 
  ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 DROP TABLE IF EXISTS `player_keyin`;
 CREATE TABLE IF NOT EXISTS `player_keyin` (
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -2133,4 +2132,15 @@ CREATE TABLE IF NOT EXISTS `player_keyin` (
     `curLvl` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `curValue` int(10) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY(`playerId`, `keyinId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `fairyPet_sanhun`;
+CREATE TABLE IF NOT EXISTS `fairyPet_sanhun` (
+    `fairyPetId` int(10) unsigned NOT NULL DEFAULT '0',
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `sanhunId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `curLvl` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`playerId`,`fairyPetId`, `sanhunId`),
+    KEY `fairyPetId` (`fairyPetId`),
+    KEY `playerId` (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -215,6 +215,7 @@ private:
     void OnSetMax(GObject::Player* player, std::vector<std::string>& args);
     void OnAddtz(GObject::Player* player, std::vector<std::string>& args);
     void OnAddJGSExp(GObject::Player* player, std::vector<std::string>& args);
+    void OnAddSHLvl(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

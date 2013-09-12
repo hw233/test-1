@@ -127,6 +127,7 @@ enum PurchaseType
     ClanSptr                    = 116, //神魔之树
     RetrieveItem                = 117, //物品回收消费
     EnumQzongPYGift             = 118, //Qzong,PY礼包
+    SanHunUpForPet              = 119, //三魂升级
     //繁体私有占150～200
 };
 
@@ -149,7 +150,8 @@ enum IncomingType
     InFromTopUp                 = 142, //topup
     InFromMoney2All             = 143, //money2all
     InFromSuper                 = 144, //super
-    ProfferFromUseItem         = 145, //使用物品帮贡
+    ProfferFromUseItem          = 145, //使用物品帮贡
+    ShouHunFromYouli            = 146, //游历获得兽魂
 };
 
 enum MoneyType
@@ -304,6 +306,7 @@ enum ItemTo
     ToMakeJGY = 162, //制造机关玉所消耗的道具
     ToUpgradeKY = 163, //刻印升级所消耗的道具
     ToChangeMoShi = 164, //转换墨石
+    ToSanHunUp = 164, //三魂升级
 };
 
 struct IncommingInfo

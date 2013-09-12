@@ -1189,24 +1189,20 @@ void MoFang::quickMakejiguan(UInt32 tuzhiId, UInt8 mark)
     m_owner->send(st);
 }
 
-void MoFang::upgradeKY(UInt8 keyinId, UInt8 mark)
+void MoFang::upgradeKY(UInt8 keyinId, UInt8 opt)
 {
     if(!m_owner)
         return;
      
     UInt8 keyinLvl = 0;
     UInt32 keyinCurExp = 0;
+    bool mark = false;
 
     std::map<UInt8, UInt8>::iterator iter = m_kyLvl.find(keyinId);
     if(iter == m_kyLvl.end())
-    {
-        m_kyLvl.insert(std::make_pair(keyinId, keyinLvl));
-        m_kyCurExp.insert(std::make_pair(keyinId, keyinCurExp));
-    }
+        mark = true;
     else
-    {
         keyinLvl = iter->second;
-    }
 
     if(keyinLvl >= 20)
         return;
@@ -1227,8 +1223,6 @@ void MoFang::upgradeKY(UInt8 keyinId, UInt8 mark)
     std::map<UInt8, UInt32>::iterator iterA = m_kyCurExp.find(keyinId);
     if(iterA != m_kyCurExp.end())
         keyinCurExp = iterA->second;
-    else
-        return;
     
     UInt32 money = 0;
     UInt32 consumeValue = 0;
@@ -1258,7 +1252,10 @@ void MoFang::upgradeKY(UInt8 keyinId, UInt8 mark)
     if(keyinCurExp >= kyInfo->maxValue)
     {
         keyinLvl++;
-        iter->second = keyinLvl;
+        if(mark)
+            m_kyLvl.insert(std::make_pair(keyinId, keyinLvl));
+        else
+            iter->second = keyinLvl;
 
         if(keyinId >= 1 && keyinId <= 4)
             m_kyQuality[keyinId-1] = kyInfo->quality;
@@ -1269,31 +1266,33 @@ void MoFang::upgradeKY(UInt8 keyinId, UInt8 mark)
             it->second->setDirty();
         }
     }
-    iterA->second = keyinCurExp;
+
+    if(mark)
+        m_kyCurExp.insert(std::make_pair(keyinId, keyinCurExp));
+    else
+        iterA->second = keyinCurExp;
 
     DB4().PushUpdateData("REPLACE INTO `player_keyin` VALUES(%" I64_FMT "u, %u, %u, %u)", m_owner->getId(), keyinId, keyinLvl, keyinCurExp);
 
     Stream st(REP::MOFANG_INFO);
-    st << mark;
+    st << opt;
     st << keyinId << addKYExp;
     st << Stream::eos;
     m_owner->send(st);
 }
 
-void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 mark)
+void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 opt)
 {
     if(!m_owner)
         return;
 
     UInt8 keyinLvl = 0;
     UInt32 keyinCurExp = 0;
+    bool mark = false;
 
     std::map<UInt8, UInt8>::iterator iter = m_kyLvl.find(keyinId);
     if(iter == m_kyLvl.end())
-    {
-        m_kyLvl.insert(std::make_pair(keyinId, keyinLvl));
-        m_kyCurExp.insert(std::make_pair(keyinId, keyinCurExp));
-    }
+        mark = true;
     else
         keyinLvl = iter->second;
 
@@ -1316,8 +1315,6 @@ void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 mark)
     std::map<UInt8, UInt32>::iterator iterA = m_kyCurExp.find(keyinId);
     if(iterA != m_kyCurExp.end())
         keyinCurExp = iterA->second;
-    else
-        return;
 
     UInt32 money = 0;
     if(kyInfo->materialA == 0)
@@ -1374,7 +1371,11 @@ void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 mark)
     if(keyinCurExp >= kyInfo->maxValue)
     {
         keyinLvl++;
-        iter->second = keyinLvl;
+        
+        if(mark)
+            m_kyLvl.insert(std::make_pair(keyinId, keyinLvl));
+        else
+            iter->second = keyinLvl;
 
         if(keyinId >= 1 && keyinId <= 4)
             m_kyQuality[keyinId-1] = kyInfo->quality;
@@ -1385,12 +1386,16 @@ void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 mark)
             it->second->setDirty();
         }
     }
-    iterA->second = keyinCurExp;
+
+    if(mark)
+        m_kyCurExp.insert(std::make_pair(keyinId, keyinCurExp));
+    else
+        iterA->second = keyinCurExp;
 
     DB4().PushUpdateData("REPLACE INTO `player_keyin` VALUES(%" I64_FMT "u, %u, %u, %u)", m_owner->getId(), keyinId, keyinLvl, keyinCurExp);
 
     Stream st(REP::MOFANG_INFO);
-    st << mark;
+    st << opt;
     st << keyinId << count << addTotalExp;
     st << Stream::eos;
     m_owner->send(st);
@@ -1399,6 +1404,9 @@ void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 mark)
       
 void MoFang::changeMoney(UInt8 mark)
 {
+    if(!m_owner)
+        return;
+
     UInt8 res = 0;
     UInt32 money = m_owner->GetVar(VAR_KEYIN_MONEY_A);
     if(money >= 100)
@@ -1417,6 +1425,9 @@ void MoFang::changeMoney(UInt8 mark)
 
 void MoFang::addMoney(UInt32 toolId, UInt32 count)
 {
+    if(!m_owner)
+        return;
+
     UInt32 money = 0;
     UInt8 mark = 0;
     if(9424 == toolId)

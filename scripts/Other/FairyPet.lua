@@ -96,6 +96,7 @@ function onSeekFairypetAwardAndSucceed(step, isConvert)
     {
         ["longyuan"] = 0,   --龙元数
         ["fengsui"] = 0,    --凤髓数
+        ["shouhun"] = 0,    --兽魂
         ["greenId"] = 0,    --绿色仙宠id
         ["blueId"] = 0,     --蓝色仙宠id
         ["like"] = 0,       --好感度(绿色)
@@ -137,6 +138,9 @@ function onSeekFairypetAwardAndSucceed(step, isConvert)
     end
     if 5 == step and r <= petProb[step] then
         result.like = 1
+    end
+    if 5 == step then
+        result.shouhun = math.random(50, 60)
     end
     --是否成功晋级下一游历池
     local prob = {7500, 6666, 5000, 5000, 10000}
