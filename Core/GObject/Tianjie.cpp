@@ -2401,6 +2401,7 @@ bool Tianjie::addNpc(UInt32 npcid)
             };
 
             TianjieSpotNpc tjNpc = { npcid, spot };
+            m_loc = spot;
 
             GameMsgHdr hdr(0x326, spot_cny, NULL, sizeof(TianjieSpotNpc));
             GLOBAL().PushMsg( hdr, &tjNpc);

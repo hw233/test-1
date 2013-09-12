@@ -5039,10 +5039,13 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
                 continue;
             }
 
-            if(!minBloodBo)
-                minBloodBo = bo;
-            else if(minBloodBo->getHP() > bo->getHP())
-                minBloodBo = bo;
+            if(!bo->isSummon() && !bo->hasFlag(BattleFighter::IsMirror))
+            {
+                if(!minBloodBo)
+                    minBloodBo = bo;
+                else if(minBloodBo->getHP() > bo->getHP())
+                    minBloodBo = bo;
+            }
         }
     }
 
@@ -5088,10 +5091,13 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
         UInt32 maxHp = bo->getMaxHP();
         if(hp < (maxHp >> 1))
         {
-            if(!minBloodBo)
-                minBloodBo = bo;
-            else if(minBloodBo->getHP() > hp)
-                minBloodBo = bo;
+            if(!bo->isSummon() && !bo->hasFlag(BattleFighter::IsMirror))
+            {
+                if(!minBloodBo)
+                    minBloodBo = bo;
+                else if(minBloodBo->getHP() > hp)
+                    minBloodBo = bo;
+            }
         }
 
         if(maxHp - hp > maxHpLost)
