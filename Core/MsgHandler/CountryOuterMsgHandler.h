@@ -2487,7 +2487,7 @@ void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
 
 void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 {
-	if(dir.difficulty >= 2)
+	if(dir.difficulty >= Max_Difficulty)
         return;
     
     MSG_QUERY_PLAYER(pl);
