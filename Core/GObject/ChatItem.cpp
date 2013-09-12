@@ -239,6 +239,7 @@ UInt32 ChatItem::addFairyPet( Player * player, UInt32 id )
         << player->getCountry() << player->getName();
     cid.st << id << pet->getPetLev() << pet->getPetBone();
     pet->AppendEquipData(cid.st);
+    pet->sendHunPoInfo(cid.st);
 	cid.st << Stream::eos;
 	cid.lastAccess = TimeUtil::Now();
 

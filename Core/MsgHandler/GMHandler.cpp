@@ -284,6 +284,7 @@ GMHandler::GMHandler()
     Reg(2, "setmc", &GMHandler::OnSetMax);
     Reg(2, "addtz", &GMHandler::OnAddtz);
     Reg(2, "addshu", &GMHandler::OnAddJGSExp);
+    Reg(3, "addshlvl", &GMHandler::OnAddSHLvl);
 
 }
 
@@ -399,6 +400,32 @@ void GMHandler::OnAddJGSExp(GObject::Player * player, std::vector<std::string>& 
             return;
 
         player->GetMoFang()->addJGSExp(exp);
+	}
+}
+
+void GMHandler::OnAddSHLvl(GObject::Player * player, std::vector<std::string>& args)
+{
+    if(player->GetLev() < 70)
+        return;
+
+	if(args.empty())
+		return;
+
+	if(args.size() == 3)
+	{
+        UInt32 petId = atoi(args[0].c_str());
+		UInt8 sanhunId = atoi(args[1].c_str());
+		UInt8 lvl = atoi(args[2].c_str());
+
+        FairyPet * pet = player->findFairyPet(petId);
+        if(!pet) 
+            return;
+
+        if(lvl > 100)
+            return;
+
+        if(sanhunId > 0 && sanhunId <= 3)
+            pet->GMSHUpLvl(petId, sanhunId, lvl);
 	}
 }
 
@@ -4099,6 +4126,7 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
         case 2:
             player->AddVar(VAR_FAIRYPET_LONGYUAN, val);
             player->AddVar(VAR_FAIRYPET_FENGSUI, val);
+            player->AddVar(VAR_FAIRYPET_SHOUHUN, val);
             player->AddVar(VAR_FAIRYPET_XIANYUAN, val);
             player->AddVar(VAR_FAIRYPET_LIKEABILITY, 1);
             player->sendFairyPetResource();

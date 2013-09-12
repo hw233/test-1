@@ -20487,10 +20487,12 @@ UInt8 Player::toQQGroup(bool isJoin)
         DBLOG1().PushUpdateData("insert into pet_histories (server_id,player_id,pet_id,pet_name,delete_type,pet_pinjie,pet_gengu,delete_time) values(%u,%" I64_FMT "u,%u,'%s',%u,%u,%u,%u)",
             cfg.serverLogId, getId(), id, it->second->getName().c_str(), delete_type, it->second->getPetLev(), it->second->getPetBone(), TimeUtil::Now());
 
+        it->second->delSanHun();
         SAFE_DELETE(it->second);
         _fairyPets.erase(it);
-        DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE id = %u AND `playerId` = %" I64_FMT "u", id, getId());
+        DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE `id` = %u AND `playerId` = %" I64_FMT "u", id, getId());
 	    DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %" I64_FMT "u", id, getId());
+        DB2().PushUpdateData("DELETE FROM `fairyPet_sanhun` WHERE `fairyPetId` = %u AND `playerId` = %" I64_FMT "u", id, getId());
     }
 
 	void Player::writeCanHiretPet()
@@ -20659,6 +20661,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             st << it->second->getChongNum();
             st << it->second->getPetEvolve();
             it->second->AppendEquipData(st);
+            it->second->sendHunPoInfo(st);
             ++ it;
         }
         st << Stream::eos;
@@ -20689,6 +20692,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         st << GetVar(VAR_FAIRYPET_FENGSUI);
         st << GetVar(VAR_FAIRYPET_XIANYUAN);
         st << static_cast<UInt16>(GetVar(VAR_FAIRYPET_LIKEABILITY));
+        st << GetVar(VAR_FAIRYPET_SHOUHUN);
         st << Stream::eos;
         send(st);
     }
@@ -20704,7 +20708,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         UInt8 step = GetVar(VAR_FAIRYPET_STEP);
         if(step < 1 || step > 5)
             step = 1;
-        UInt32 longYuan = 0, fengSui = 0;
+        UInt32 longYuan = 0, fengSui = 0, shouhun = 0;
         UInt32 greenId = 0, blueId = 0;
         UInt8 like = 0;
         UInt32 convert1 = 0, convert2 = 0;
@@ -20725,6 +20729,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             Table values = GameAction()->onSeekFairypetAwardAndSucceed(step, isConvert);
             longYuan += values.get<UInt32>("longyuan");
             fengSui += values.get<UInt32>("fengsui");
+            shouhun += values.get<UInt32>("shouhun");
             like += values.get<UInt8>("like");
             greenId = values.get<UInt32>("greenId");
             if(greenId)
@@ -20757,7 +20762,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         }
         if(num == 0)
             return;
-        st << longYuan << fengSui << like;
+        st << longYuan << fengSui << shouhun << like;
         st << static_cast<UInt32>(xianYuan - used) << isConvert;
         st << petStr.c_str();
 		st.data<UInt8>(pos) = num;
@@ -20768,6 +20773,8 @@ UInt8 Player::toQQGroup(bool isJoin)
         getLongyuan(longYuan, &ii1);
         IncommingInfo ii2(FengsuiFromYouli, 0, 0);
         getFengsui(fengSui, &ii2);
+        IncommingInfo ii3(ShouHunFromYouli, 0, 0);
+        getShouHun(shouhun, &ii3);
         if(isConvert)   //放生仙宠
         {
             IncommingInfo ii1(LongyuanFromConvert, 0, 0);
@@ -20897,6 +20904,11 @@ UInt8 Player::toQQGroup(bool isJoin)
             xiaozhou = std::max(pet1->getXiaozhou(), pet2->getXiaozhou());
             chong    = std::max(pet1->getChongNum(), pet2->getChongNum());
         }
+        
+        UInt8 minghunLvl = std::max(pet1->findSHLvl(1), pet2->findSHLvl(1));
+        UInt8 tianhunLvl = std::max(pet1->findSHLvl(2), pet2->findSHLvl(2));
+        UInt8 dihunLvl = std::max(pet1->findSHLvl(3), pet2->findSHLvl(3));
+         
         UInt8 evolve = std::max(pet1->getPetEvolve(), pet2->getPetEvolve());
         if(pet1->getColor() == 3 && pet2->getColor() == 2)
         {   //橙宠转紫宠
@@ -20930,6 +20942,15 @@ UInt8 Player::toQQGroup(bool isJoin)
         pet2->setXiaozhou(xiaozhou);
         pet2->setChongNum(chong);
         pet2->setPetEvolve(evolve);
+        if(minghunLvl > 0)
+            pet2->setSHLvl(1, minghunLvl);
+
+        if(tianhunLvl > 0)
+            pet2->setSHLvl(2, tianhunLvl);
+
+        if(dihunLvl > 0)
+            pet2->setSHLvl(3, dihunLvl);
+
         pet2->UpdateToDB();
         pet2->setPotential(GData::pet.getPetPotential(bone));
         pet2->setLevel(lev);
@@ -20974,11 +20995,24 @@ UInt8 Player::toQQGroup(bool isJoin)
         npet2->setDazhou(pet->getDazhou());
         npet2->setXiaozhou(pet->getXiaozhou());
         npet2->setChongNum(pet->getChongNum());
+        UInt8 minghunLvl = pet->findSHLvl(1);
+        if(minghunLvl > 0)
+            npet2->setSHLvl(1, minghunLvl);
+
+        UInt8 tianhunLvl = pet->findSHLvl(2);
+        if(tianhunLvl > 0)
+            npet2->setSHLvl(2, tianhunLvl);
+
+        UInt8 dihunLvl = pet->findSHLvl(3);
+        if(dihunLvl > 0)
+            npet2->setSHLvl(3, dihunLvl);
+        
         if(pet->isOnBattle())
         {
             setFairypetBattle(npet2, false);
             npet2->setOnBattle(true);
         }
+
         UInt8 pos = 0;
         ItemPetEq * equip = pet->findEquip(pos);
         if(equip)
@@ -21157,6 +21191,48 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         return fengsui;
     }
+
+    UInt32 Player::getShouHun( UInt32 c, IncommingInfo* ii)
+    {
+        UInt32 shouhun = GetVar(VAR_FAIRYPET_SHOUHUN);
+		if(c == 0)
+			return shouhun;
+		shouhun += c;
+		SYSMSG_SENDV(4945, this, c);
+		SYSMSG_SENDV(4946, this, c);
+        SetVar(VAR_FAIRYPET_SHOUHUN, shouhun);
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
+
+        return shouhun;
+	}
+
+	/*UInt32 Player::useShouHun( UInt32 a, ConsumeInfo * ci )
+	{
+        UInt32 shouhun = GetVar(VAR_FAIRYPET_SHOUHUN);
+        if(a == 0 || shouhun == 0)
+            return shouhun;
+        if(shouhun < a)
+            shouhun = 0;
+        else
+        {
+            shouhun -= a;
+            if(ci != NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(4947, this, a);
+        SYSMSG_SENDV(4948, this, a);
+        SetVar(VAR_FAIRYPET_SHOUHUN, shouhun);
+
+        return shouhun;
+    }*/
 
 void Player::getQQGameOnlineAward()
 {

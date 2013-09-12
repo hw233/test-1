@@ -36,6 +36,7 @@
 #include "FairyPetTable.h"
 #include "XingchenData.h"
 #include "JiguanData.h"
+#include "HunPoData.h"
 
 namespace GData
 {
@@ -355,6 +356,13 @@ namespace GData
             fprintf (stderr, "Load LoadKeyinConfig Error !\n");
             std::abort();
         }
+
+        if (!LoadSanHunConfig())
+        {
+            fprintf (stderr, "Load LoadSanHunConfig Error !\n");
+            std::abort();
+        }
+
 		return true;
 	}
 
@@ -2177,6 +2185,23 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
 		{
             jiguanData.setkeyinInfo(dbky);
+        }
+
+        return true;
+    }
+
+    bool GDataManager::LoadSanHunConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBSanHunConfig dbsh;
+		if(execu->Prepare("SELECT `lvl`, `attr1`, `attr2`, `attr3`, `attr4`, `attr5`, `attr6`, `attr7`, `attr8`, `attr9`, `money1`, `money2` FROM `pet_sanhun`", dbsh) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            hunpoData.setSanHunInfo(dbsh);
         }
 
         return true;

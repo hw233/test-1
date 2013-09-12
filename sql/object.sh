@@ -199,6 +199,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_2013_08_29_1.sql  #清除QQ秀合作记录
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130902_1.sql  #机关兽创建player_keyin
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130913_1.sql  #三魂创建fairyPet_sanhun
     #. clearshiyamen.sh
 }
 

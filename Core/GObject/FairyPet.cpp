@@ -13,6 +13,9 @@
 #include "FairyPet.h"
 #include "Script/GameActionLua.h"
 #include "GObject/Country.h"
+#include "GData/HunPoData.h"
+#include "Package.h"
+#include "Item.h"
 
 
 namespace GObject
@@ -59,7 +62,6 @@ namespace GObject
 
     }
 
-
     void FairyPet::LoadInitSkills(std::string& skills)
     {
         StringTokenizer tk(skills, ",");
@@ -69,6 +71,11 @@ namespace GObject
         {
             _initskl[i] = atoi(tk[i].c_str());
         }
+    }
+
+    void FairyPet::AddSHFromDB(DBSanHun & shData)
+    {
+        m_SanHunLvl.insert(std::make_pair(shData.sanhunId, shData.curLvl));
     }
 
     void FairyPet::UpdateToDB()
@@ -724,7 +731,303 @@ namespace GObject
             }
         }
 	    _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
+        
+        addSHAttr(_attrExtraEquip);
     }
 
+    void FairyPet::GMSHUpLvl(UInt32 petId, UInt8 sanhunId, UInt8 lvl)
+    {
+        if(!_owner)
+            return;
+
+        UInt8 sanhunLvl = 0;
+        bool mark = false;
+
+        std::map<UInt8, UInt8>::iterator iter = m_SanHunLvl.find(sanhunId);
+        if(iter == m_SanHunLvl.end())
+            mark = true;
+        else
+            sanhunLvl = iter->second;
+
+        UInt16 count = 0;
+        UInt32 money = 0;
+        for(UInt8 i=0; i<lvl; i++)
+        {
+            bool res = checkSanHunUp(sanhunId, sanhunLvl);
+            if(!res)
+                return;
+
+            GData::HunPoData::sanhunInfo * shInfo = GData::hunpoData.getSanHunInfo(sanhunLvl+1);
+            if(!shInfo)
+                return;
+
+            if(shInfo->money2 > 0)
+            {
+                count += shInfo->money2;
+            }
+
+            if(shInfo->money1 > 0)
+            {
+                money += shInfo->money1;
+            }
+                
+            sanhunLvl++;
+        }
+
+        UInt16 toolCount = _owner->GetPackage()->GetItemAnyNum(9427);
+        if(toolCount >= count)
+        {
+            if(count > 0)
+            {
+                if(!_owner->GetPackage()->DelItemAny(9427, count, NULL, ToSanHunUp))
+                    return;
+            }
+        }
+        else
+            return;
+
+        UInt32 shouhun = _owner->GetVar(VAR_FAIRYPET_SHOUHUN);
+        if(shouhun >= money)
+        {
+            if(money > 0)
+            {
+                _owner->SetVar(VAR_FAIRYPET_SHOUHUN, shouhun - money);
+                SYSMSG_SENDV(4947, _owner, money);
+                SYSMSG_SENDV(4948, _owner, money);
+            }
+        }
+        else
+            return;
+
+        if(mark)
+            m_SanHunLvl.insert(std::make_pair(sanhunId, sanhunLvl));
+        else
+            iter->second = sanhunLvl;
+
+        DB4().PushUpdateData("REPLACE INTO `fairyPet_sanhun` VALUES(%u, %" I64_FMT "u, %u, %u)", getId(), _owner->getId(), sanhunId, sanhunLvl);
+
+        setDirty();
+
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x07);
+        st << static_cast<UInt8>(1);
+        st << petId << sanhunId << sanhunLvl << static_cast<UInt32>(shouhun - money);
+        st << Stream::eos;
+        _owner->send(st);
+    }
+
+    void FairyPet::upgradeSH(UInt32 petId, UInt8 sanhunId, UInt8 opt)
+    {
+        if(!_owner)
+            return;
+
+        UInt8 sanhunLvl = 0;
+        bool mark = false;
+
+        std::map<UInt8, UInt8>::iterator iter = m_SanHunLvl.find(sanhunId);
+        if(iter == m_SanHunLvl.end())
+            mark = true;
+        else
+            sanhunLvl = iter->second;
+
+        bool res = checkSanHunUp(sanhunId, sanhunLvl);
+        if(!res)
+            return;
+
+        GData::HunPoData::sanhunInfo * shInfo = GData::hunpoData.getSanHunInfo(sanhunLvl+1);
+        if(!shInfo)
+            return;
+
+        if(shInfo->money2 > 0)
+        {
+            if(!_owner->GetPackage()->DelItemAny(9427, shInfo->money2, NULL, ToSanHunUp))
+                return;
+        }
+        
+        UInt32 curShouHun = 0;
+        if(shInfo->money1 > 0)
+        {
+            UInt32 shouhun = _owner->GetVar(VAR_FAIRYPET_SHOUHUN);
+            UInt32 money = shInfo->money1;
+            curShouHun =  shouhun - money;
+
+            _owner->SetVar(VAR_FAIRYPET_SHOUHUN, curShouHun);
+            SYSMSG_SENDV(4947, _owner, money);
+            SYSMSG_SENDV(4948, _owner, money);
+
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, _owner->getId(), SanHunUpForPet, 0, 0, money, TimeUtil::Now());
+        }
+
+        sanhunLvl++;
+
+        if(mark)
+            m_SanHunLvl.insert(std::make_pair(sanhunId, sanhunLvl));
+        else
+            iter->second = sanhunLvl;
+
+        DB4().PushUpdateData("REPLACE INTO `fairyPet_sanhun` VALUES(%u, %" I64_FMT "u, %u, %u)",getId(), _owner->getId(), sanhunId, sanhunLvl);
+
+        setDirty();
+
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x07);
+        st << opt;
+        st << petId <<sanhunId << sanhunLvl << curShouHun;
+        st << Stream::eos;
+        _owner->send(st);
+    }
+
+    bool FairyPet::checkSanHunUp(UInt8 sanhunId, UInt8 sanhunLvl)
+    {
+        if(!_owner)
+            return false;
+        
+        if(_owner->GetLev() < 70)
+            return false;
+
+        if(sanhunLvl >= SANHUN_MAXLVL)
+            return false;
+
+        GData::HunPoData::sanhunInfo * shInfo = GData::hunpoData.getSanHunInfo(sanhunLvl+1);
+        if(!shInfo)
+            return false;
+
+        if(shInfo->money1 > 0)
+        {
+            UInt32 shouhun = _owner->GetVar(VAR_FAIRYPET_SHOUHUN);
+            UInt32 money = shInfo->money1;
+            if(shouhun < money)
+                return false;
+        }
+
+        if(shInfo->money2 > 0)
+        {
+            UInt16 toolCount = _owner->GetPackage()->GetItemAnyNum(9427);
+            UInt16 count = shInfo->money2;
+            if(toolCount < count)
+                return false;
+        }
+
+        UInt8 tempLvlA = 0;
+        UInt8 tempLvlB = 0;
+        switch(sanhunId)
+        {
+            case MINGHUN:
+                tempLvlA = findSHLvl(TIANHUN);
+                tempLvlB = findSHLvl(DIHUN);
+                break;
+            case TIANHUN:
+                tempLvlA = findSHLvl(MINGHUN);
+                tempLvlB = findSHLvl(DIHUN);
+                break;
+            case DIHUN:
+                tempLvlA = findSHLvl(TIANHUN);
+                tempLvlB = findSHLvl(MINGHUN);
+                break;
+        }
+
+        if((sanhunLvl+1) <= 20)
+        {
+            return true;
+        }
+        else if((sanhunLvl+1) <= 40)
+        {
+            if(tempLvlA < 20 || tempLvlB < 20)
+                return false;
+        }
+        else if((sanhunLvl+1) <= 60)
+        {
+            if(tempLvlA < 40 || tempLvlB < 40)
+                return false;
+        }
+        else if((sanhunLvl+1) <= 80)
+        {
+            if(tempLvlA < 60 || tempLvlB < 60)
+                return false;
+        }
+        else if((sanhunLvl+1) <= 100)
+        {
+            if(tempLvlA < 80 || tempLvlB < 80)
+                return false;
+        }
+
+        return true;
+    }
+
+    UInt8 FairyPet::findSHLvl(UInt8 sanhunId)
+    {
+        std::map<UInt8, UInt8>::iterator iter = m_SanHunLvl.find(sanhunId);
+        if(iter != m_SanHunLvl.end())
+            return iter->second;
+
+        return 0;
+    }
+
+    void FairyPet::setSHLvl(UInt8 sanhunId, UInt8 lvl)
+    {
+        std::map<UInt8, UInt8>::iterator iter = m_SanHunLvl.find(sanhunId);
+        if(iter != m_SanHunLvl.end())
+             iter->second = lvl;
+        else
+            m_SanHunLvl.insert(std::make_pair(sanhunId, lvl));
+
+        DB4().PushUpdateData("REPLACE INTO `fairyPet_sanhun` VALUES(%u, %" I64_FMT "u, %u, %u)",getId(), _owner->getId(), sanhunId, lvl);
+    }
+
+    void FairyPet::addSHAttr(GData::AttrExtra& ae)
+    {
+        if(!_owner)
+            return;
+
+        std::map<UInt8, UInt8>::iterator iter = m_SanHunLvl.begin();
+        for(; iter != m_SanHunLvl.end(); iter++)
+        {
+            GData::HunPoData::sanhunInfo * shInfo = GData::hunpoData.getSanHunInfo(iter->second);
+            if(!shInfo)
+                continue;
+
+            if(shInfo->sanhunLvl > 0 && shInfo->sanhunLvl <= 100)
+            {
+                switch(iter->first)
+                {
+                    case MINGHUN:
+                        ae.hp += shInfo->attr1;
+                        ae.attack += shInfo->attr2;
+                        ae.defend += shInfo->attr3;
+                        ae.magatk += shInfo->attr2;
+                        ae.magdef += shInfo->attr3;
+                        break;
+                    case TIANHUN:
+                        ae.crilvl += shInfo->attr4;
+                        ae.pirlvl += shInfo->attr5;
+                        ae.hitrlvl += shInfo->attr6;
+                        break;
+                    case DIHUN:
+                        ae.evdlvl += shInfo->attr7;
+                        ae.counterlvl += shInfo->attr8;
+                        ae.toughlvl += shInfo->attr9;
+                        break;
+                }
+            }
+        }
+    }
+
+    void FairyPet::sendHunPoInfo(Stream & st)
+    {
+        UInt8 count = 0;
+        UInt16 offset = 0;
+
+        offset = st.size();
+        st << count;
+        std::map<UInt8, UInt8>::iterator iter = m_SanHunLvl.begin();
+        for(; iter != m_SanHunLvl.end(); iter++)
+        {
+            st << iter->first << iter->second;
+            count++;
+        }
+
+        st.data<UInt8>(offset) = count;
+    }
 }
 

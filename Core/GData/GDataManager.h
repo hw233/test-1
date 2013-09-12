@@ -72,6 +72,7 @@ namespace GData
         static bool LoadJiguanyuConfig();
         static bool LoadTuzhiConfig();
         static bool LoadKeyinConfig();
+        static bool LoadSanHunConfig();
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);
         static bool isInUdpItem(UInt32 id);

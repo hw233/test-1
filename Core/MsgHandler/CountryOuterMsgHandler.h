@@ -6817,6 +6817,17 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                     break;
             }
             break;
+        case 0x07:  //三魂
+            {
+                UInt32 petId = 0;
+                UInt8 sanhunId = 0;
+                brd >> petId >> sanhunId;
+                FairyPet * pet = player->findFairyPet(petId);
+                if(!pet) 
+                    return;
+                pet->upgradeSH(petId, sanhunId, opt);
+            }
+            break;
         default:
             break;
     }

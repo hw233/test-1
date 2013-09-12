@@ -613,6 +613,23 @@ struct DBKeyinConfig
     UInt32 materialB;
     UInt32 maxValue;
 };
+
+struct DBSanHunConfig
+{
+    UInt8 sanhunLvl;
+    float attr1;
+    float attr2;
+    float attr3;
+    float attr4;
+    float attr5;
+    float attr6;
+    float attr7;
+    float attr8;
+    float attr9;
+    UInt32 money1;
+    UInt32 money2;
+};
+
 }
 namespace DB {
 
@@ -1321,6 +1338,24 @@ SPECIALDEF(9)
     UInt32, materialA,
     UInt32, materialB,
     UInt32, maxValue
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBSanHunConfig)
+SPECIALDEF(12)
+    (
+    UInt8, sanhunLvl,
+    float, attr1,
+    float, attr2,
+    float, attr3,
+    float, attr4,
+    float, attr5,
+    float, attr6,
+    float, attr7,
+    float, attr8,
+    float, attr9,
+    UInt32, money1,
+    UInt32, money2
     )
 SPECIALEND()
 }
