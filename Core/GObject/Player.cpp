@@ -1369,6 +1369,9 @@ namespace GObject
             LOAD().Push(getId(), 0);
             _loadMark = true;
         }
+
+        // XXX: 上线时暂设上次下线时间为当前时间，以防宕机时引起的挂机经验计算问题
+        SetVar(VAR_OFFLINE, curtime);
 	}
 
 #define WEBDOWNLOAD 255
