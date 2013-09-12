@@ -160,7 +160,7 @@ UInt8 Dungeon::playerLeave( Player * player,UInt8 difficulty )
 	if(it == _players.end())
 		return 1;
 
-	if(it->second.level == 0)
+	if(it->second.level[it->second.difficulty] == 0)
 		return 0;
     
     it->second.difficulty = difficulty;	
@@ -189,7 +189,7 @@ UInt8 Dungeon::playerContinue( Player * player ,UInt8 difficulty)
     if(it == _players.end())
 		return 1;
 
-    if(it->second.level == 0)
+    if(it->second.level[it->second.difficulty] == 0)
         return 1;
 
     enterLevel(player, it->second.level[it->second.difficulty],it->second.difficulty);
