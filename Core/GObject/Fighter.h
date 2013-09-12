@@ -623,6 +623,7 @@ public:
     inline float getExtraCounterLevel() { checkDirty(); return _attrExtraEquip.counterlvl; }
     inline float getExtraToughLevel() { checkDirty(); return _attrExtraEquip.toughlvl; }
     inline float getExtraMagResLevel() { checkDirty(); return _attrExtraEquip.mreslvl; }
+    inline float getExtraCriticalDmgImmune() { checkDirty(); return _attrExtraEquip.criticaldmgimmune; }
 
 public:
     inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }

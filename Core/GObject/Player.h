@@ -2257,6 +2257,7 @@ namespace GObject
         void sendNewRC7DayRecharge();
         void sendNewRC7DayTarget(UInt8 idx = 0);
         void sendQQBoardLoginInfo();
+        void SetQQBoardLogin();
         void SetQQBoardValue();
         void sendLuckyMeetLoginInfo();
         void SetLuckyMeetValue();
@@ -2579,6 +2580,10 @@ namespace GObject
         void sendAllCollectCard();
         void setClanSpiritTreeBuff(UInt8,UInt32);
         void setPrayLoginInWeek();
+        void sendRandFriend();
+        void GetQQBoardAward(UInt8 type);
+        void sendQQBoardOnlineTime();
+        void sendQQBoardLogin();
         void useCollectCard(UInt8 fighterIndex);
         void putCollectCardPool(UInt8 fighterIndex, UInt8 partPos, UInt16 partCnt);
         void convertCollectCard();
@@ -2611,6 +2616,7 @@ namespace GObject
     typedef std::map<UInt8, LevelPlayers*> GlobalLevelsPlayers;
     typedef GlobalLevelsPlayers::iterator GlobalLevelsPlayersIterator;
     extern GlobalLevelsPlayers globalLevelsPlayers;
+    extern GlobalPlayers globalOnlinePlayers; 
 
 	class ChallengeCheck
 	{

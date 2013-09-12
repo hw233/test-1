@@ -101,6 +101,7 @@ public:
     inline float getExtraCounterLevel() { return _attrExtra.counterlvl; }
     inline float getExtraToughLevel() { return _attrExtra.toughlvl; }
     inline float getExtraMagResLevel() { return _attrExtra.mreslvl; }
+    inline float getExtraCriticalDmgImmune() { return _attrExtra.criticaldmgimmune; }
 
 	inline GObject::Fighter * getFighter() {return _fighter;}
 
@@ -153,6 +154,7 @@ public:
 	float getCounter(BattleFighter* defgt, const GData::SkillBase* skil = NULL);
 	float getMagRes(BattleFighter* defgt);
 	float getTough(BattleFighter* defgt);
+    float getCriticalDmgImmune() { return _attrExtra.criticaldmgimmune; }
 	inline UInt32 getMaxHP() {Int64 ret = _maxhp + _maxhpAdd + _maxhpAdd2; return (ret > 0 ? ret : 0);}
 	inline Int32 getAction() {Int32 ret = _maxAction + _maxActionAdd + _maxActionAdd2; return (ret > 0 ? ret : 0);}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}

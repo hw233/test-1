@@ -390,6 +390,34 @@ function RunQQBoardInstantLoginAward(player, cts)
     end
     return true
 end
+function RunQQBoardOnlineAward(player, cts)
+    local item = {
+        [0] = {{1325 ,1},{134, 1},{551, 1},{500,1}},
+        [1] = {{500,2},{56, 2}, {9371, 3},{30,1}},
+        [2] = {{503,2},{8000,2},{508, 2}, {57, 2}},
+        [3] = {{499, 20},{501,2},{512,2},{506, 2}},
+    };
+    local package = player:GetPackage();
+
+    if cts > 3 or cts < 0 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
+    end
+    return true
+end
 function RunLuckyMeetInstantLoginAward(player, cts)
     local item = {
         [1] = {{1326,1},{133, 1}, {499, 10}},

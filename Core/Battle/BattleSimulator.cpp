@@ -1045,9 +1045,9 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
         float rate = bf->getCritical(bo);
         if(uRand(10000) < (rate > 0 ? rate : 0) * 100)
         {
-            float factor = bf->getCriticalDmg() - bo->getTough(bf);
-            if(factor < 1)
-                factor = 1;
+            float factor = bf->getCriticalDmg() - bo->getCriticalDmgImmune() - bo->getTough(bf);
+            if(factor < 1.25)
+                factor = 1.25;
             atk = atk * factor;
             cs2 = true;
         }
@@ -12842,9 +12842,9 @@ void BattleSimulator::calcSkillAttack(BattleFighter* bf, bool& isCritical, Battl
     magatk = getBFMagAtk(bf);
 	atk = getBFAttack(bf);
 
-    float factor = bf->getCriticalDmg() - defender->getTough(bf);
-    if(factor < 1)
-        factor = 1;
+    float factor = bf->getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(bf);
+    if(factor < 1.25)
+        factor = 1.25;
 
     if(isCritical)
     {
@@ -12863,9 +12863,9 @@ float BattleSimulator::calcAttack(BattleFighter* bf, bool& isCritical, BattleFig
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
 
 	float atk = getBFAttack(bf);
-    float factor = bf->getCriticalDmg() - defender->getTough(bf);
-    if(factor < 1)
-        factor = 1;
+    float factor = bf->getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(bf);
+    if(factor < 1.25)
+        factor = 1.25;
 
 	if(isCritical)
 	{
@@ -12883,9 +12883,9 @@ float BattleSimulator::calcMagAttack(BattleFighter* bf, bool& isCritical, Battle
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
     float magatk = getBFMagAtk(bf);
 
-    float factor = bf->getCriticalDmg() - defender->getTough(bf);
-    if(factor < 1)
-        factor = 1;
+    float factor = bf->getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(bf);
+    if(factor < 1.25)
+        factor = 1.25;
 
     if(isCritical)
     {
@@ -12956,13 +12956,13 @@ float BattleSimulator::calcPoison(BattleFighter* bf, const GData::SkillBase* ski
     float magatk = getBFMagAtk(bf);
     float atk = getBFAttack(bf);
 
-    float factor = bf->getCriticalDmg() - defender->getTough(bf);
-    if(factor < 1)
-        factor = 1;
+    float factor = bf->getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(bf);
+    if(factor < 1.25)
+        factor = 1.25;
 
     if(!cs)
     {
-        factor = 1;
+        factor = 1.25;
     }
 
     if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)

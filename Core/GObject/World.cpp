@@ -146,6 +146,7 @@ bool World::_qixi= false;
 bool World::_foolbao = false;
 bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
+bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
 bool World::_ryhbActivity = false;
 bool World::_zcjbActivity = false;

@@ -2893,6 +2893,8 @@ namespace GObject
 
                 flag_suc = true;
                 ++ ied.enchant;
+                if(ied.enchant>=8)
+                    equip->DoEquipBind(true);
                 if ((equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
                     && ied.enchant == 1)
             {
@@ -2924,7 +2926,8 @@ namespace GObject
                     ++success;
                     flag_suc = true;
                     ++ ied.enchant;
-
+                    if(ied.enchant>=8)
+                        equip->DoEquipBind(true);
                     if(ied.enchant > 3)
                     {
                         updateHft = true;

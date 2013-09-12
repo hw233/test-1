@@ -467,9 +467,9 @@ float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender, floa
 	int extra = (uRand(9)) - 4;
 	*/
 
-    float factor = getCriticalDmg() - defender->getTough(this);
-    if(factor < 1)
-        factor = 1;
+    float factor = getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(this);
+    if(factor < 1.25)
+        factor = 1.25;
 
 	// Èç¹û±©»÷
 	if(isCritical)
@@ -488,9 +488,9 @@ float BattleFighter::calcMagAttack(bool& isCritical, BattleFighter* defender , f
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
     float magatk = getMagAttack();
 
-    float factor = getCriticalDmg() - defender->getTough(this);
-    if(factor < 1)
-        factor = 1;
+    float factor = getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(this);
+    if(factor < 1.25)
+        factor = 1.25;
 
     if(isCritical)
     {
@@ -510,9 +510,9 @@ void BattleFighter::calcSkillAttack(bool& isCritical, BattleFighter* defender, f
     magatk = getMagAttack();
 	atk = getAttack();
 
-    float factor = getCriticalDmg() - defender->getTough(this);
-    if(factor < 1)
-        factor = 1;
+    float factor = getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(this);
+    if(factor < 1.25)
+        factor = 1.25;
 
     if(isCritical)
     {
@@ -587,13 +587,13 @@ float BattleFighter::calcPoison(const GData::SkillBase* skill, BattleFighter* de
     float magatk = getMagAttack();
     float atk = getAttack();
 
-    float factor = getCriticalDmg() - defender->getTough(this);
-    if(factor < 1)
-        factor = 1;
+    float factor = getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(this);
+    if(factor < 1.25)
+        factor = 1.25;
 
     if(!cs)
     {
-        factor = 1;
+        factor = 1.25;
     }
 
     // µÀ
@@ -1456,9 +1456,9 @@ float BattleFighter::getMagRes(BattleFighter* defgt)
 
 float BattleFighter::calcCriticalDmg(BattleFighter* defender)
 {
-    float factor = getCriticalDmg() - defender->getTough(this);
-    if(factor < 1)
-        factor = 1;
+    float factor = getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(this);
+    if(factor < 1.25)
+        factor = 1.25;
 
     return factor;
 }
