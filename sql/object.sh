@@ -200,6 +200,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_2013_08_29_1.sql  #清除QQ秀合作记录
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130902_1.sql  #机关兽创建player_keyin
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130913_1.sql  #三魂创建fairyPet_sanhun
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_2013_09_02_presentbox.sql  #创建礼品箱
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar182_187.sql        #清除仗剑江湖蜀山路
     #. clearshiyamen.sh
 }

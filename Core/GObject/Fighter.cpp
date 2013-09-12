@@ -5708,6 +5708,7 @@ void Fighter::SSOpen(UInt16 id)
             _owner->sendMsgCode(0, 1024);
         }
     }
+    //GameAction()->doStrong(_owner,SthFuwenJIe, 0, 0);
 }
 
 UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
@@ -5813,6 +5814,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
 
     SSUpdate2DB(id, ss);
     _owner->sendMsgCode(0, 1025);
+     //GameAction()->doStrong(_owner, SthFuwenRong, 0, 0);  
     return ret;
 }
 

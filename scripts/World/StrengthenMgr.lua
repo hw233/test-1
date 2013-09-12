@@ -41,6 +41,28 @@ local checkFlag = {
     [37] = 1, --SthCHTownDeamon,   --镇守锁妖塔
     [38] = 1, --SthActSignIn,   --活跃度签到
     [39] = 1, --SthActSignIn,   --切磋斗剑
+--[[    [40] = 1,--   SthMSCG ,     //墨守成规
+    [41] = 5,--   SthClanTask,  //帮派任务
+    [42] = 1,--  SthLastDay，  //末日之战
+    [43] = 1,--    SthClanSpirit, //神魔之树
+    [44] = 1,--    SthPrayTree ,  //许愿树
+    [45] = 1,--    SthSerachMo ,    //寻墨 
+    [46] = 1,--  SthFuwenJIe ,   //符文解封
+    [47] = 1,--    SthFuwenRong,  //符文熔炼
+    [48] = 1,--   SthSkillUp ,   //个人技能提升
+    [49] = 1,--    SthStoreFix , //晶石融合
+    [50] = 1,--   SthXingchen , //星辰描绘
+    [51] = 1,--    SthPinJieUp , //品阶进阶
+    [52] = 1,--    SthGenguUp , //根骨提升
+    [53] = 1,--    SthSpiritEat , //元神吞噬
+    [54] = 1,--    SthSpiritUp , //元神升级
+    [55] = 1,--    SthNeiDanUp, //内丹升级
+    [56] = 1,--   SthJingPoFix,//精魄合成
+    [57] = 1,--   SthEquipLH ， //装备炼化
+    [58] = 1,--    SthEquipSpirit , //装备注灵
+    [59] = 1,--   SthGuJiSpirit , //古籍唤灵
+    [60] = 1,--    SthBaoJuSpirit , //宝具通灵
+--]]
 }
 
 --增加的变强之魂
@@ -85,6 +107,28 @@ local addSouls = {
     [37] = 1, --SthCHTownDeamon,   --镇守锁妖塔
     [38] = 1, --SthActSignIn,   --活跃度签到
     [39] = 1, --SthActSignIn,   --切磋斗剑
+--[[    [40] = 5,--   SthMSCG ,     //墨守成规
+    [41] = 1,--   SthClanTask,  //帮派任务
+    [42] = 5,--  SthLastDay，  //末日之战
+    [43] = 1,--    SthClanSpirit, //神魔之树
+    [44] = 1,--    SthPrayTree ,  //许愿树
+    [45] = 1,--    SthSerachMo ,    //寻墨 
+    [46] = 1,--  SthFuwenJIe ,   //符文解封
+    [47] = 1,--    SthFuwenRong,  //符文熔炼
+    [48] = 1,--   SthSkillUp ,   //个人技能提升
+    [49] = 1,--    SthStoreFix , //晶石融合
+    [50] = 1,--   SthXingchen , //星辰描绘
+    [51] = 1,--    SthPinJieUp , //品阶进阶
+    [52] = 1,--    SthGenguUp , //根骨提升
+    [53] = 1,--    SthSpiritEat , //元神吞噬
+    [54] = 1,--    SthSpiritUp , //元神升级
+    [55] = 1,--    SthNeiDanUp, //内丹升级
+    [56] = 1,--   SthJingPoFix,//精魄合成
+    [57] = 1,--   SthEquipLH ， //装备炼化
+    [58] = 1,--    SthEquipSpirit , //装备注灵
+    [59] = 1,--   SthGuJiSpirit , //古籍唤灵
+    [60] = 1,--    SthBaoJuSpirit , //宝具通灵
+--]]
 }
 
 --某一项的最大值

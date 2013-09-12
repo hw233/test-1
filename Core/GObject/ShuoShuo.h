@@ -76,6 +76,7 @@ public:
     void setShuoSafe(UInt8 idx, UInt8 status = 1);
     void setShuoShuo(UInt8 idx, UInt8 status);
     UInt8 getShuoShuo(UInt8 idx);
+    UInt32 getShuoShuoCount();
 
     void getAward(UInt8 idx);
     void updateShuoShuo(UInt8 idx);
