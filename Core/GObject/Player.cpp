@@ -24147,13 +24147,15 @@ void Player::sendPresentForOther( UInt64 playerId , UInt32 type)
     {
         _bePresent[0].push_back(StuPresentBox(10,now,0));
         DB1().PushUpdateData("REPLACE INTO `player_presentbox` (`id`, `awardid`, `playerId2`, `sendtime`,`get`) VALUES( %" I64_FMT "u , 10 , 0 , %u , 0 )", getId(),now);
-        
     }
     ++presentValue;
     _present[other->getId()].push_back(StuPresentBox(type,now,0));
     SetVar(VAR_SENDPRESENT_VALUE,presentValue);
     DB1().PushUpdateData("REPLACE INTO `player_presentbox` (`id`, `awardid`, `playerId2`, `sendtime`,`get`) VALUES( %" I64_FMT "u,%u ,%" I64_FMT "u,%u,0)", other->getId(),type, getId(),now,0);
     sendMsgCode(1,4008);
+    char str[16] = {0};
+    sprintf(str, "F_130912_%d",2+type);
+    udpLog("haoyouzengsong", str, "", "", "", "", "act");
 }
 UInt32 Player::getPresentBoxRest()
 {
@@ -24285,7 +24287,18 @@ void Player::getPresentFrombox(UInt64 playerId,UInt32 type,UInt32 sendtime)
         it2->get=1;
         it->second.erase(it2);
         if(playerId != 0)
+        {
             AddVar(VAR_GETPRESENT_VALUE,1);
+            char str[16] = {0};
+            sprintf(str, "F_130912_1");
+            udpLog("haoyouzengsong", str, "", "", "", "", "act");
+        }
+        else
+        {
+            char str[16] = {0};
+            sprintf(str, "F_130912_2");
+            udpLog("haoyouzengsong", str, "", "", "", "", "act");
+        }
         DB1().PushUpdateData("REPLACE INTO `player_presentbox` (`id`, `awardid`, `playerId2`, `sendtime`,`get`) VALUES( %" I64_FMT "u ,%u, %" I64_FMT "u, %u , 1 )", getId(),type,playerId,sendtime);
         break;
     }
