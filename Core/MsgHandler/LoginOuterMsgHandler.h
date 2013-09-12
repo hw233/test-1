@@ -1065,12 +1065,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                507,    2,
-                509,    2,
-                56,     2,
+                515,    2,
+                1325,   2,
+                9360,   2,
+                517,    4,
+                501,    4,
                 1126,   3,
-                9367,   5,
-                9369,   5
             };
 
             UInt8 idx = 0;
