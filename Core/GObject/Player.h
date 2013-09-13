@@ -779,6 +779,24 @@ namespace GObject
                 praynum= 0 ;
             }
         };
+        struct StuPresentBox
+        {
+            UInt32 awardId;
+            UInt32 sendtime;
+            UInt8 get;
+            StuPresentBox(UInt32 _awardId,UInt32 _sendtime,UInt8 _get)
+            {
+                awardId = _awardId;
+                sendtime = _sendtime;
+                get = _get;
+            }
+            StuPresentBox()
+            {
+                awardId = 0;
+                sendtime = 0;
+                get = 0;
+            }
+        };
 	public:
 		Player(UInt64);
 		~Player();
@@ -1556,6 +1574,7 @@ namespace GObject
         inline UInt32 getFrendsNum() const { return _friends[0].size(); }
         inline UInt32 getCFrendsNum() const { return _friends[3].size(); }
 		bool CheckFriendPray(UInt64 playerId);
+		bool CheckPresentToday(UInt64 playerId);
         bool testCanAddFriend(Player *);
         void broadcastFriend(Stream& st);
         UInt32 getBePrayednum(UInt64 id); 
@@ -1571,6 +1590,13 @@ namespace GObject
         void beVoted();
 
         void prayForOther(Player *other);
+        void sendPresentForOther(UInt64 playerId,UInt32 type);
+        UInt32 getPresentBoxRest();
+        UInt32 getPresentCount();
+        void setPresentLogin();
+        void sendPresentInfo();
+        void getPresentFrombox(UInt64 playerId,UInt32 type,UInt32 sendtime);
+        void deletePresent(UInt64 playerId,UInt32 type,UInt32 sendtime);
         void SendOtherInfoForPray(Player *other,UInt32 op=0);
         void bePrayed(UInt64 id);
         
@@ -1761,6 +1787,7 @@ namespace GObject
             m_snow.bind = bind;
             m_snow.score = score;
         }
+        void addPresentBox(UInt32 awardId,UInt64 playerId2 ,UInt32 sendtime,UInt8 get = 0,UInt32 flag = 0);
         void addPrayFriendFromDB(UInt64 PlayerId,UInt32 time,UInt32 num = 0)
         {
             if(num ==0)
@@ -1815,6 +1842,8 @@ namespace GObject
 		std::vector<FriendActStruct *> _friendActs;
         std::map<UInt64,UInt32 >_prayFriend; 
         std::map<UInt64,StuPrayValue >_bePrayed; 
+        std::map<UInt64,std::vector<StuPresentBox> > _present; 
+        std::map<UInt64,std::vector<StuPresentBox> >_bePresent; 
 
 		TaskMgr* m_TaskMgr;
 		Trade* m_Trade;
@@ -2597,6 +2626,8 @@ namespace GObject
         UInt16 _partCnt[8][9];
         UInt16 _alreadyCnt[8];
         UInt8 _alreadyload[8];
+    public:
+        void setMapId(UInt8 mapId);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

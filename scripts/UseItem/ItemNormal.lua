@@ -9556,6 +9556,38 @@ function ItemNormal_00009423(iid, num, bind, param)
     return n
 end
 
+function ItemNormal_00009428(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < num then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    local items = {
+        [1] = { {502, 2} },
+        [2] = { {15, 1} },
+        [3] = { {508, 1} },
+        [4] = { {506, 1} },
+        [5] = { {51, 1} },
+        [6] = { {500, 1} },
+        [7] = { {514, 1} },
+        [8] = { {133, 1} },
+        [9] = { {516, 1} },
+        [10] = { {499, 10} },
+    }
+    for k = 1, num do
+        local rnd = math.random(1, 10)
+        local item = items[rnd]
+        if item[1][1] == 499 then
+            player:getCoupon(item[1][2])
+        else
+            package:Add(item[1][1], item[1][2], true, false, 2)
+        end
+    end
+
+    package:DelItemSendMsg(iid, player)
+    return num;
+end
 function ItemNormal_jgsexp(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 70 then
@@ -11311,6 +11343,7 @@ local ItemNormal_Table = {
     [9421] = ItemNormal_jgsexp,
     [9424] = ItemNormal_keyin,
     [9425] = ItemNormal_keyin,
+    [9428] = ItemNormal_00009428,
 
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,

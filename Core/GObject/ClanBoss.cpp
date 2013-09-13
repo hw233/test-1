@@ -7,6 +7,7 @@
 #include "DB/DBConnectionMgr.h"
 #include "Server/SysMsg.h"
 #include "GData/GDataDBExecHelper.h"
+#include "Script/GameActionLua.h"
 #include "GObject/Package.h"
 #include "GData/NpcGroup.h"
 #include "MsgID.h"
@@ -1139,7 +1140,7 @@ bool ClanBoss::attack(Player* pl)
     st << Stream::eos;
     pl->send(st);
     bsim.applyFighterHP(0, pl);
-
+    //GameAction()->doStrong(pl, SthLastDay, 0, 0);
     return res;
 
 }

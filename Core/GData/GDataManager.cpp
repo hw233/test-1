@@ -396,10 +396,10 @@ namespace GData
 			expTable.setTable(dbexp.lvl, dbexp.exp);
 		}
 #ifdef _DEBUG
-        fprintf(stderr, "lvl: %u\n", expTable.exp2level(22159159243-1 ));
-        fprintf(stderr, "lvl: %u\n", expTable.exp2level(21501576053-1 ));
-        fprintf(stderr, "lvl: %u\n", expTable.exp2level(20856473348-1 ));
-        fprintf(stderr, "lvl: %u\n", expTable.exp2level(14551108403-1 ));
+        //fprintf(stderr, "lvl: %u\n", expTable.exp2level(22159159243-1 ));
+        //fprintf(stderr, "lvl: %u\n", expTable.exp2level(21501576053-1 ));
+        //fprintf(stderr, "lvl: %u\n", expTable.exp2level(20856473348-1 ));
+        //fprintf(stderr, "lvl: %u\n", expTable.exp2level(14551108403-1 ));
 #endif
 		return true;
 	}

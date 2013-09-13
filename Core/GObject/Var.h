@@ -402,6 +402,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_SKILL_UP_FLAG = 414, //FB占用
         VAR_POOL_CNT = 415, //卡片碎片池数
         VAR_CARD_FROM_CLAN = 416, //是否领取来自帮派战的卡片
+        VAR_MAP_INDEX = 417, //地图索引
         //421-430 for suntao
         VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对,31位表示等级限制[0:70级以上 1:70级以下])
         VAR_FOOLS_DAY_TIME  = 422,  //愚公移山答题开始时间
@@ -533,8 +534,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_QQBOARD_ONLINE = 591,
         VAR_QQBOARD_LOGIN_AWARD = 592,
         VAR_QQBOARD_ONLINE_AWARD = 593,
-
         VAR_RANDfRIEND = 594 ,
+        VAR_SENDPRESENT_VALUE = 595,
+        VAR_GETPRESENT_VALUE = 596,
+        VAR_PRESENT_LOGIN = 597 ,
         //600-620 for qiwy  ^_^
 
         VAR_MAX,
@@ -959,6 +962,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_SKILL_UP_FLAG, CYCLE_NONE);
             REGISTER_VAR(VAR_POOL_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_CARD_FROM_CLAN, CYCLE_DAY);
+            REGISTER_VAR(VAR_MAP_INDEX, CYCLE_NONE);
 
             REGISTER_VAR(VAR_FOOLS_DAY_INFO, CYCLE_DAY);
             REGISTER_VAR(VAR_FOOLS_DAY_TIME, CYCLE_DAY);
@@ -1023,6 +1027,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_QQBOARD_LOGIN_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_QQBOARD_ONLINE_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_RANDfRIEND, CYCLE_DAY);
+            REGISTER_VAR(VAR_SENDPRESENT_VALUE, CYCLE_DAY);
+            REGISTER_VAR(VAR_GETPRESENT_VALUE, CYCLE_DAY);
+            REGISTER_VAR(VAR_PRESENT_LOGIN, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
