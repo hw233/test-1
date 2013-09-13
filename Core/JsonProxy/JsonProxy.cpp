@@ -126,7 +126,7 @@ void clear_read_buffer(int fd)
         FD_ZERO(&stFdSet);
         FD_SET(fd, &stFdSet);
         IRet = select(FD_SETSIZE, &stFdSet, NULL, NULL, &stWait);
-        if(IRet == 0 || IRet == EINTR || IRet == EBADF || IRet == EINVAL || IRet == ENOMEM)
+        if(IRet <= 0)
             break;
         int len = recv(fd, tmp, 1, 0);
         if(len <= 0)
