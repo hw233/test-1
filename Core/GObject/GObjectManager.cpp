@@ -2943,7 +2943,7 @@ namespace GObject
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		PrayRelation dbfr;
-		if(execu->Prepare("SELECT `id`,`friendId`,`pray`,`time` FROM `pray_relation` ORDER BY `id`", dbfr) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`,`friendId`,`pray`,`time`,`praynum` FROM `pray_relation` ORDER BY `id`", dbfr) != DB::DB_OK)
 			return false;
 		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
