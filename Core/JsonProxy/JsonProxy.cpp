@@ -128,7 +128,9 @@ void clear_read_buffer(int fd)
         IRet = select(FD_SETSIZE, &stFdSet, NULL, NULL, &stWait);
         if(IRet == 0)
             break;
-        recv(fd, tmp, 1, 0);
+        int len = recv(fd, tmp, 1, 0);
+        if(len <= 0)
+            break;
     }
 }
 
