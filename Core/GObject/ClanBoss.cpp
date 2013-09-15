@@ -2030,7 +2030,7 @@ void ClanBoss::sendClanBossMsg(char* str, Player* pl, Clan* cl)
         NETWORK()->Broadcast(st); 
 }
 
-const UInt8 g_rankRewardSize = 3;
+const UInt32 g_rankRewardSize = 3;
 void ClanBoss::reward()
 {
     static MailPackage::MailItem s_rankItems[g_rankRewardSize] = {{134,150},{134,80},{134,50}};
@@ -2106,7 +2106,7 @@ void ClanBoss::reward()
  
     string names[g_rankRewardSize];
     TSortMap::iterator it = _gxSort.begin();
-    UInt8 rankCount = 0;
+    UInt32 rankCount = 0;
     UInt32 maxScore = 0;
     for (; it != _gxSort.end(); ++it)
     {
