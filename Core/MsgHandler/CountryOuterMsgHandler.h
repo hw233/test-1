@@ -1394,6 +1394,13 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 player->setNewGuildTaskStep(step);
             }
             break;
+        case 0x1A:
+            {
+                UInt8 mapId = 0;
+                br >> mapId;
+                player->setMapId(mapId);
+            }
+            break;
         default:
             return;
 	}
@@ -2186,8 +2193,8 @@ void OnDetachGemReq( GameMsgHdr& hdr, DetachGemReq& dgr )
 	Stream st(REP::EQ_UN_EMBED);
 	st << result << dgr._fighterId << dgr._itemid << dgr._pos << Stream::eos;
 	player->send(st);
-    if(result != 2)
-        GameAction()->doStrong(player, SthDetachGem, 0, 0);
+ //   if(result != 2)
+   //     GameAction()->doStrong(player, SthDetachGem, 0, 0);
 }
 
 #if 0
@@ -5451,7 +5458,7 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
     std::string status;
     br >> type;
 
-    if( type > 6 )
+    if( type > 7 )
         return;
 
     Stream st(REP::NEWRELATION);
@@ -5509,6 +5516,34 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
                     break;
             }
            pl->sendPrayInfo();    
+            break;
+        case 7:
+            br>>mood;
+            if( mood < 0 || mood > 3 )
+                return ;
+            if(mood == 0)
+            {
+                pl->sendPresentInfo();
+                break;
+            }  
+            UInt8 index_;
+            UInt32 time;
+            UInt64 playerId;
+            br>>playerId;
+            br>>index_;
+            if(mood ==1)
+            {    
+            br>>time;
+            pl->getPresentFrombox(playerId,static_cast<UInt32>(index_),time);
+            }
+            else if(mood == 2 )
+            {
+                br>>time;    
+                pl->deletePresent(playerId,static_cast<UInt32>(index_),time);
+            }
+            else if(mood == 3)
+                pl->sendPresentForOther(playerId,static_cast<UInt32>(index_));
+            pl->sendPresentInfo();
             break;
         default:
             break;

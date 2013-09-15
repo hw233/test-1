@@ -171,7 +171,20 @@ void ShuoShuo::reset(bool online)
     }
     updateToDB();
 }
-
+UInt32 ShuoShuo::getShuoShuoCount()
+{
+    UInt32 count= 0;
+    for(UInt32 i = 0; i<MIN_ITEM ;++i)
+    {
+        if(m_ss[i])
+            count++;
+    }
+   if(m_ss[SS_PUBTST_PKG]) 
+       count++;
+   if( m_ss[SS_SLLP] )
+       count++;
+    return count;
+}
 } // namespace GObject
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

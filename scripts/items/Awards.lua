@@ -511,6 +511,43 @@ function RunPrayAward(player, cts)
     end
     return true
 end
+function RunPresentAward(player, cts)
+    local item = {
+        [1] = {{502, 2}},
+        [2] = {{15, 1}},
+        [3] = {{508,1}},
+        [4] = {{506, 1}},
+        [5] = {{51, 1}},
+        [6] = {{500,1}},
+        [7] = {{514, 1}},
+        [8] = {{133, 1}},
+        [9] = {{516,1}},
+        [10] ={{9428,1}},
+    };
+    
+    local package = player:GetPackage();
+
+    if cts < 1 then
+        return false
+    end
+    if cts > 10 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < (num)  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for count = 1, #item[cts] do
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
+    end
+    return true
+end
 function RunLuckyMeetRechargeAward(player, cts)
     -- 领取蜀山奇遇充值奖励
     local item = {
@@ -1340,6 +1377,16 @@ local LevelAwards = {
     [138] = {{515 ,8},{134, 8},{8000, 8},{43,5}},
     [139] = {{515 ,8},{1325, 8},{8000, 8},{43,5}},
     [140] = {{515 ,8},{9338, 8},{8000, 8},{43,5}},
+    [141] = {{503 ,8},{9338, 8},{8000, 8},{43,5}},
+    [142] = {{515 ,8},{134, 8},{8000, 8},{43,5}},
+    [143] = {{515 ,8},{1325, 8},{8000, 8},{43,5}},
+    [144] = {{515 ,8},{9338, 8},{8000, 8},{43,5}},
+    [145] = {{503 ,8},{134, 8},{8000, 8},{43,5}},
+    [146] = {{503 ,8},{1325, 8},{8000, 8},{43,5}},
+    [147] = {{503 ,8},{9338, 8},{8000, 8},{43,5}},
+    [148] = {{515 ,8},{134, 8},{8000, 8},{43,5}},
+    [149] = {{515 ,8},{1325, 8},{8000, 8},{43,5}},
+    [150] = {{515 ,8},{9338, 8},{8000, 8},{43,5}},
 }
 local Level_gold = {
     5,5,5,5,5,          8,8,5,5,5,
@@ -1354,6 +1401,7 @@ local Level_gold = {
     99,99,150,150,150,  99,99,99,150,150,
     150,99,99,99,150,   150,150,99,99,99,
     150,150,150,
+    99,150,150,150,99,99,99,150,150,150,
 }
 function RunLevelAward(player, opt)
     if player == nil then
