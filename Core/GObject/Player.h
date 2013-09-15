@@ -2532,6 +2532,8 @@ namespace GObject
         void sendLuckyStarInfo(UInt8);
         void getLuckyStarItem(UInt8);
         void LuckyStarActUdpLog(UInt8);
+        void checkSendRandFriend();
+        void checkSelectPray();
 
         //女娲石盘
         void sendNuwaInfo();

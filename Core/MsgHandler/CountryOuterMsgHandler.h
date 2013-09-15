@@ -4323,6 +4323,7 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
     if(fr._op == 12)
     {
         player->SetVar(VAR_RANDfRIEND,1);
+        player->checkSendRandFriend(); 
         return ;
     }
     player->patchDeleteDotS(fr._name);

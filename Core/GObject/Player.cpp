@@ -4793,6 +4793,7 @@ namespace GObject
         SetVar(VAR_PRAY_COUNT,prayCount+1);
         SetVar(VAR_PRAY_TYPE_TODAY,1);
         SetVar(VAR_PRAY_TIME,now);
+        checkSelectPray();
        // Stream st;
        // SYSMSGVP(st, 430, getName().c_str(), 0);
        // broadcastFriend(st);
@@ -24027,6 +24028,42 @@ void Player::SetQQBoardLogin()
     LoginCanAward |= (1<<cts);
     SetVar(VAR_QQBOARD_LOGIN_AWARD,LoginCanAward);
 }
-} // namespace GObject
 
+void Player::checkSendRandFriend()
+{
+    UInt32 thisDay = TimeUtil::SharpDay();
+    UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+    if(thisDay <= endDay)
+    {
+        UInt32 targetVal = GetVar(VAR_CLAWARD2);
+        if (!(targetVal & TARGET_SENDRANDFRIEND))
+        {
+            targetVal |= TARGET_SENDRANDFRIEND;
+            AddVar(VAR_CTS_TARGET_COUNT, 1);
+            SetVar(VAR_CLAWARD2, targetVal);
+            sendNewRC7DayTarget();
+            newRC7DayUdpLog(1152, 12);
+        }
+    }
+}
+
+void Player::checkSelectPray()
+{
+    UInt32 thisDay = TimeUtil::SharpDay();
+    UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+    if(thisDay <= endDay)
+    {
+        UInt32 targetVal = GetVar(VAR_CLAWARD2);
+        if (!(targetVal & TARGET_SELECTPRAY))
+        {
+            targetVal |= TARGET_SELECTPRAY;
+            AddVar(VAR_CTS_TARGET_COUNT, 1);
+            SetVar(VAR_CLAWARD2, targetVal);
+            sendNewRC7DayTarget();
+            newRC7DayUdpLog(1152, 13);
+        }
+    }
+}
+
+} // namespace GObject
 
