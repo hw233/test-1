@@ -554,6 +554,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
 #define TARGET_ENHANCE            0x0100
 #define TARGET_TRUMP_UPGRADE      0x0200
 #define TARGET_RECHARGE_PACKGE    0x0400
+#define TARGET_SENDRANDFRIEND     0x0800
+#define TARGET_SELECTPRAY         0x1000
 
 
 #define REGISTER_VAR(Var, Type) \
