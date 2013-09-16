@@ -2253,7 +2253,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                         player->sendQixiInfo();
                     else if(form == 2)
                         WORLD().sendQixiPlayers(player);
-                }
+               }
                 break;
             case 0x02:
                 {

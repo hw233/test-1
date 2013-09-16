@@ -46,6 +46,7 @@ const UInt16 g_bossSpot = 12806;
 
 ClanBoss::ClanBoss()
 {
+    _canOpened = false;
     clear();
 }
 void ClanBoss::clear()
@@ -62,7 +63,7 @@ void ClanBoss::clear()
     _pickPlayer.clear();
     _pickPlayers = 0;
     _statusChanged = false;
-    _canOpened = false;
+    //_canOpened = false; //多次开启的bug
     _isBossDead = false;
     _needRestart = false;
     _lastHp = 0;
@@ -253,6 +254,8 @@ void ClanBoss::refresh()
         start();
         return;
     }
+    if (_canOpened == false)
+        return;
     process(TimeUtil::Now());
     if (!m_isOpening)
         return;
@@ -2027,7 +2030,7 @@ void ClanBoss::sendClanBossMsg(char* str, Player* pl, Clan* cl)
         NETWORK()->Broadcast(st); 
 }
 
-const UInt8 g_rankRewardSize = 3;
+const UInt32 g_rankRewardSize = 3;
 void ClanBoss::reward()
 {
     static MailPackage::MailItem s_rankItems[g_rankRewardSize] = {{134,150},{134,80},{134,50}};
@@ -2103,7 +2106,7 @@ void ClanBoss::reward()
  
     string names[g_rankRewardSize];
     TSortMap::iterator it = _gxSort.begin();
-    UInt8 rankCount = 0;
+    UInt32 rankCount = 0;
     UInt32 maxScore = 0;
     for (; it != _gxSort.end(); ++it)
     {

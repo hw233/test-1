@@ -9350,7 +9350,7 @@ function ItemNormal_00009375(iid, num, bind, param)
 end
 
 function ItemNormal_00009382(iid, num, bind, param)
-    local itmeId = 9407;
+    local itmeId = 9422;
     local player = GetPlayer()
     local package = player:GetPackage()
     local items = { 15, 9088, 512, 33, 9371, 551, 501, 513, 503, 1325, 134, 507, 509, 515 }
@@ -9371,7 +9371,11 @@ function ItemNormal_00009382(iid, num, bind, param)
                 break
             end
         end
-        package:Add(items[g], 1, true, false, 2)
+        if iid == itmeId and g == 11 then
+            package:Add(1126, 1, true, false, 2)
+        else
+            package:Add(items[g], 1, true, false, 2)
+        end
         --if iid == 9397 and getSurnameLegend() then
         if iid == itmeId and getSurnameLegend() then
             local rand_card = math.random(1,10000);
@@ -11292,6 +11296,7 @@ local ItemNormal_Table = {
     [9397] = ItemNormal_00009382,
     [9401] = ItemNormal_00009382,
     [9407] = ItemNormal_00009382,
+    [9422] = ItemNormal_00009382,
 
     [9388] = ItemNormal_00009388,
     [9390] = ItemNormal_00009390,
