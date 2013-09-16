@@ -2127,6 +2127,17 @@ void OnBePrayed( GameMsgHdr &hdr, const void * data)
     UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
     player->bePrayed(id);
 }
+void OnBePresented( GameMsgHdr &hdr, const void * data)
+{
+    struct idAndType
+    {
+        UInt64 id;
+        UInt32 type;
+    };
+    MSG_QUERY_PLAYER(player);
+    idAndType ms = *reinterpret_cast<const idAndType *>(data); 
+    player->addPresentBox(ms.type,ms.id,0);
+}
 
 void OnSendPopularityAward(GameMsgHdr &hdr, const void * data)
 {

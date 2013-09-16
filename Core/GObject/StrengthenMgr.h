@@ -47,6 +47,27 @@ namespace GObject
         SthCHTownDeamon, //镇守聚魂阵
         SthActSignIn,    //活跃度签到
         SthChallenge,    //切磋
+        SthMSCG = 40,   //墨守成规
+        SthClanTask,  //帮派任务
+        SthLastDay,  //末日之战
+        SthClanSpirit, //神魔之树
+        SthPrayTree,  //许愿树
+        SthSerachMo,    //寻墨 
+        SthFuwenJIe,   //符文解封
+        SthFuwenRong,  //符文熔炼
+        SthSkillUp,   //个人技能提升
+        SthStoreFix, //晶石融合
+        SthXingchen, //星辰描绘
+        SthPinJieUp, //品阶进阶
+        SthGenguUp, //根骨提升
+        SthSpiritEat, //元神吞噬
+        SthSpiritUp, //元神升级
+        SthNeiDanUp, //内丹升级
+        SthJingPoFix,//精魄合成
+        SthEquipLH, //装备炼化
+        SthEquipSpirit,//装备注灵
+        SthGuJiSpirit, //古籍唤灵
+        SthBaoJuSpirit, //宝具通灵
         SthMaxFlag,      //标志记录的个数
     };
 #define STRONGTYPE_CNT 2

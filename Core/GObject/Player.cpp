@@ -283,6 +283,7 @@ namespace GObject
 #endif
 			UInt32 t = TimeUtil::Now();
 			if(t > _finalEnd) t = 0; else t = _finalEnd - t;
+
 			st << /*_npcGroup->getId()*/static_cast<UInt32>(0) << static_cast<UInt8>(1) << cnt << t << iccnt << curType << Stream::eos;
 		}
 		else
@@ -4657,6 +4658,9 @@ namespace GObject
         ++prayValue;
         _prayFriend[other->getId()]=now;
         SendOtherInfoForPray(other,prayValue);
+        char str[16] = {0};
+        sprintf(str, "F_130822_8");
+        udpLog("xuyuanshu", str, "", "", "", "", "act");
     }
     void Player::SendOtherInfoForPray(Player* other,UInt32 op)
     {
@@ -6810,6 +6814,7 @@ namespace GObject
 
         OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
         writeClanTask();
+        GameAction()->doStrong(this, SthClanTask, 0 ,0 );
         return true;
     }
 
@@ -9272,6 +9277,20 @@ namespace GObject
             return true;
         return false;
     }
+	bool Player::CheckPresentToday(UInt64 playerId)
+    {
+        UInt32 now = TimeUtil::Now();
+        std::map<UInt64,std::vector<StuPresentBox> >::iterator it_present =_present.find(playerId);
+        if(it_present!=_present.end())
+        {
+            std::vector<StuPresentBox> presents = it_present->second;
+            for(UInt32 i =0 ;i<presents.size();++i)
+                if( TimeUtil::SharpDay(0, now) == TimeUtil::SharpDay(0, presents.at(i).sendtime) )
+                    return true;
+        }
+        return false;
+    }
+
 
     bool Player::testCanAddFriend( Player * pl )
 	{
@@ -23873,6 +23892,204 @@ void Player::SetQQBoardLogin()
     UInt32 LoginCanAward = GetVar(VAR_QQBOARD_LOGIN_AWARD); 
     LoginCanAward |= (1<<cts);
     SetVar(VAR_QQBOARD_LOGIN_AWARD,LoginCanAward);
+}
+        
+void Player::addPresentBox(UInt32 awardId ,UInt64 playerId2 ,UInt32 sendtime,UInt8 get, UInt32 flag)
+{
+    UInt32 now = TimeUtil::Now();
+    if(now > World::getOpenTime() + 15 * 86400 )
+        return ;
+    if(now > sendtime + 3 * 86400)
+        return ;
+    if(_bePresent.size() > 30 )
+        return ;
+    if(flag == 1)     //表示送出
+    {
+        _present[playerId2].push_back(StuPresentBox(awardId,sendtime,get));
+    }
+    else     //表示接受
+    {
+        _bePresent[playerId2].push_back(StuPresentBox(awardId,sendtime,get));
+    }
+}
+void Player::sendPresentForOther( UInt64 playerId , UInt32 type)
+{
+    Player* other = globalPlayers[playerId];
+    if(other==NULL)
+        return;
+    UInt32 now = TimeUtil::Now();
+    if(now > World::getOpenTime() + 15 * 86400 )
+        return ;
+    if(CheckPresentToday(other->getId()))
+        return ; 
+    UInt32 level = GetLev();
+    if(level < 40)
+        return ;
+    UInt32 presentValue = GetVar(VAR_SENDPRESENT_VALUE);
+    if(presentValue >= getPresentCount())
+    {
+        return ; 
+    }
+    UInt32 rest = other->getPresentBoxRest();
+    if(rest >= 30 )
+        return ;
+    if(other->getThreadId() == getThreadId())
+    {
+        other->addPresentBox(type,now,getId(),0);
+    }
+    else
+    {
+        struct idAndType
+        {
+            UInt64 id ;
+            UInt32 type;
+        };
+        idAndType ms;
+        ms.id = getId();
+        ms.type = type;
+        GameMsgHdr hdr(0x363, other->getThreadId(), other, sizeof(ms));
+        GLOBAL().PushMsg(hdr, &ms);
+    }
+    if(presentValue ==0)
+    {
+        _bePresent[0].push_back(StuPresentBox(10,now,0));
+        DB1().PushUpdateData("REPLACE INTO `player_presentbox` (`id`, `awardid`, `playerId2`, `sendtime`,`get`) VALUES( %" I64_FMT "u , 10 , 0 , %u , 0 )", getId(),now);
+        
+    }
+    ++presentValue;
+    _present[other->getId()].push_back(StuPresentBox(type,now,0));
+    SetVar(VAR_SENDPRESENT_VALUE,presentValue);
+    DB1().PushUpdateData("REPLACE INTO `player_presentbox` (`id`, `awardid`, `playerId2`, `sendtime`,`get`) VALUES( %" I64_FMT "u,%u ,%" I64_FMT "u,%u,0)", other->getId(),type, getId(),now,0);
+}
+UInt32 Player::getPresentBoxRest()
+{
+    UInt32 count=0;
+    std::map<UInt64,std::vector<StuPresentBox> >::iterator it =_bePresent.begin();
+    for(;it!=_bePresent.end();++it)
+    {
+        count+=it->second.size();
+    }
+    return count;
+}
+UInt32 Player::getPresentCount()
+{
+    UInt32 count = 1; 
+    UInt32 souls = GetStrengthenMgr()->GetSouls();
+    if(souls >= 25 )
+        count++;
+    if(souls >= 50 )
+        count++;
+    if(souls >= 75 )
+        count++;
+    if(GetShuoShuo()->getShuoShuoCount())
+        count++;
+    if(GetVar(VAR_INVITES)>=3)
+        count++;
+    return count;
+}
+void Player::setPresentLogin()
+{
+    UInt32 now = TimeUtil::Now();
+    if(now > World::getOpenTime() + 15 * 86400 )
+        return ;
+    UInt32 ct = (TimeUtil::SharpDayT( 0 , now) - TimeUtil::SharpDayT( 0 ,World::getOpenTime()))/86400;
+    UInt32 presentLogin = GetVar(VAR_PRESENT_LOGIN);   
+    if(presentLogin & (1<<(ct)))
+        return ;
+    presentLogin |= (1<<ct);
+}
+void Player::sendPresentInfo()
+{
+    UInt32 now = TimeUtil::Now();
+    if(now > World::getOpenTime() + 15 * 86400 )
+        return ;
+    UInt32 sendPresentValue = GetVar(VAR_SENDPRESENT_VALUE);
+    UInt32 getPresentValue = GetVar(VAR_GETPRESENT_VALUE);
+    UInt32 PresentLogin = GetVar(VAR_PRESENT_LOGIN);
+    UInt32 i=0;
+    UInt32 count=0 ;
+    while(i<16)
+    {
+        if(PresentLogin & (1 << i++ ))
+            ++count;
+    }
+        Stream st(REP::NEWRELATION);
+        st << static_cast<UInt8>(6);
+        st << static_cast<UInt8>(count);
+        st <<static_cast<UInt8> (sendPresentValue);
+        st <<static_cast<UInt8> (getPresentValue);
+        st <<static_cast<UInt8> (GetShuoShuo()->getShuoShuoCount());
+        st <<static_cast<UInt8> (getPresentCount());
+        size_t offset = st.size();
+        std::map<UInt64,std::vector<StuPresentBox> >::iterator it =_bePresent.begin();
+        UInt8 Count = 0;
+        st<<Count;
+        for(;it!=_bePresent.end();++it)
+        {
+            std::vector<StuPresentBox> presents = it->second;
+            std::vector<StuPresentBox>::iterator it2 = presents.begin();
+            Player* player = globalPlayers[it->first];
+            for(;it2 != presents.end();++it2)
+            {    
+                if(it2->sendtime + 3*86400 > now  && it2->get == 0 )
+                {
+                    if(it->first == 0 )
+                        st<<static_cast<UInt64>(0);
+                    else if(player!=NULL)
+                        st<<static_cast<UInt64>(player->getId());
+                    else return ;
+                    st<<static_cast<UInt8>(it2->awardId);
+                    st<<static_cast<UInt32>(it2->sendtime);
+                    ++Count;
+                }
+                else 
+                    it->second.erase(it2);
+            }
+        }
+        st.data<UInt8>(offset)=Count;
+        st << Stream::eos;
+        send(st);
+//        std::cout<<"type:"<<prayType<<" count:"<<prayCount<<" value:"<<prayValue<< " suctime"<<praySucTime<<std::endl;
+}
+
+void Player::getPresentFrombox(UInt64 playerId,UInt32 type,UInt32 sendtime)
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 getPresent = GetVar(VAR_GETPRESENT_VALUE);
+    if(getPresent >=6)
+        return ;
+    if(now >( World::getOpenTime() + 15 * 86400) )
+        return ;
+    std::map<UInt64,std::vector<StuPresentBox> >::iterator it = _bePresent.find(playerId);
+    std::vector<StuPresentBox>::iterator it2= it->second.begin();
+    for( ; it2 != it->second.end() ; ++it2 )
+    {
+        if( it2->awardId != type ||it2->sendtime !=sendtime ||it2->get==1)
+            continue ;
+        if(!GameAction()->RunPresentAward(this, type))
+            return ;
+        it2->get=1;
+        it->second.erase(it2);
+        if(playerId != 0)
+            AddVar(VAR_GETPRESENT_VALUE,1);
+        DB1().PushUpdateData("REPLACE INTO `player_presentbox` (`id`, `awardid`, `playerId2`, `sendtime`,`get`) VALUES( %" I64_FMT "u ,%u, %" I64_FMT "u, %u , 1 )", getId(),type,playerId,sendtime);
+        break;
+    }
+}
+void Player::deletePresent(UInt64 playerId,UInt32 type,UInt32 sendtime)
+{
+    UInt32 now = TimeUtil::Now();
+    if(now >( World::getOpenTime() + 15 * 86400) )
+        return ;
+    std::map<UInt64,std::vector<StuPresentBox> >::iterator it = _bePresent.find(playerId);
+    std::vector<StuPresentBox>::iterator it2= it->second.begin();
+    for( ; it2 != it->second.end() ; ++it2 )
+    {
+        if( it2->awardId != type ||it2->sendtime !=sendtime)
+            continue ;
+        it->second.erase(it2);
+        DB1().PushUpdateData("REPLACE INTO `player_presentbox` (`id`, `awardid`, `playerId2`, `sendtime`,`get`) VALUES( %" I64_FMT "u,%u ,%" I64_FMT "u,0,%u)", getId(),type, playerId,it2->get);
+    }
 }
 } // namespace GObject
 

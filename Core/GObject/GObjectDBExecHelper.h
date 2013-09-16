@@ -578,6 +578,14 @@ struct PrayRelation
     UInt32 time;
     UInt32 praynum;
 };
+struct PresentBox
+{
+    UInt64 id;         //礼物接受者
+    UInt32 awardId;    
+    UInt64 playerId2;  //礼物发送者
+    UInt32 sendtime;
+    UInt8 get;
+};
 struct DBClan
 {
 	UInt32 id;
@@ -1937,6 +1945,17 @@ SPECIALDEF(5)
     UInt8 , pray,
     UInt32,  time,
     UInt32, praynum
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::PresentBox)
+SPECIALDEF(5)
+(
+    UInt64, id,
+    UInt32, awardId,
+    UInt64, playerId2,
+    UInt32, sendtime,
+    UInt8 , get
 )
 SPECIALEND()
 

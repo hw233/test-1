@@ -480,6 +480,41 @@ function RunPrayAward(player, cts)
     end
     return true
 end
+function RunPresentAward(player, cts)
+    local item = {
+        [1] = {{503, 1}},
+        [2] = {{134, 1}},
+        [3] = {{1325,1}},
+        [4] = {{503, 1}},
+        [5] = {{134, 1}},
+        [6] = {{1325,1}},
+        [7] = {{503, 1}},
+        [8] = {{134, 1}},
+        [9] = {{1325,1}},
+    };
+    local package = player:GetPackage();
+
+    if cts < 1 then
+        return false
+    end
+    if cts > 9 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < (num)  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for count = 1, #item[cts] do
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
+    end
+    return true
+end
 function RunLuckyMeetRechargeAward(player, cts)
     -- 领取蜀山奇遇充值奖励
     local item = {
