@@ -7324,7 +7324,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             _winner = testWinner();
             if(_winner != 0)
                 return true;
-            else
+            else if(bIfDead)
             {
                 doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
             }
