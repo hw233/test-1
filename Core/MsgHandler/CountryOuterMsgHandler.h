@@ -1394,6 +1394,13 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 player->setNewGuildTaskStep(step);
             }
             break;
+        case 0x1A:
+            {
+                UInt8 mapId = 0;
+                br >> mapId;
+                player->setMapId(mapId);
+            }
+            break;
         default:
             return;
 	}
@@ -4323,6 +4330,7 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
     if(fr._op == 12)
     {
         player->SetVar(VAR_RANDfRIEND,1);
+        player->checkSendRandFriend(); 
         return ;
     }
     player->patchDeleteDotS(fr._name);

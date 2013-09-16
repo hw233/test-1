@@ -3262,6 +3262,7 @@ namespace GObject
         st << GetVar(VAR_MONEY_ARENA);
         st << getClanProffer();
         bool fchange = makeTitleAllInfo(st);
+        st << static_cast<UInt8>(GetVar(VAR_MAP_INDEX));
         st << Stream::eos;
 
         if(fchange)
@@ -4797,6 +4798,7 @@ namespace GObject
         SetVar(VAR_PRAY_COUNT,prayCount+1);
         SetVar(VAR_PRAY_TYPE_TODAY,1);
         SetVar(VAR_PRAY_TIME,now);
+        checkSelectPray();
        // Stream st;
        // SYSMSGVP(st, 430, getName().c_str(), 0);
        // broadcastFriend(st);
@@ -24046,6 +24048,17 @@ void Player::SetQQBoardLogin()
     LoginCanAward |= (1<<cts);
     SetVar(VAR_QQBOARD_LOGIN_AWARD,LoginCanAward);
 }
+
+void Player::setMapId(UInt8 mapId)
+{
+    UInt8 curMapId = GetVar(VAR_MAP_INDEX);
+    if(mapId == curMapId)
+        return;
+    SetVar(VAR_MAP_INDEX, mapId);
+    Stream st(REP::USER_INFO_CHANGE);
+    st << static_cast<UInt8>(0x1A) << static_cast<UInt32>(mapId) << Stream::eos;
+    send(st);
+}
         
 void Player::addPresentBox(UInt32 awardId ,UInt64 playerId2 ,UInt32 sendtime,UInt8 get, UInt32 flag)
 {
@@ -24307,6 +24320,42 @@ void Player::deletePresent(UInt64 playerId,UInt32 type,UInt32 sendtime)
         break;
     }
 }
-} // namespace GObject
 
+void Player::checkSendRandFriend()
+{
+    UInt32 thisDay = TimeUtil::SharpDay();
+    UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+    if(thisDay <= endDay)
+    {
+        UInt32 targetVal = GetVar(VAR_CLAWARD2);
+        if (!(targetVal & TARGET_SENDRANDFRIEND))
+        {
+            targetVal |= TARGET_SENDRANDFRIEND;
+            AddVar(VAR_CTS_TARGET_COUNT, 1);
+            SetVar(VAR_CLAWARD2, targetVal);
+            sendNewRC7DayTarget();
+            newRC7DayUdpLog(1152, 12);
+        }
+    }
+}
+
+void Player::checkSelectPray()
+{
+    UInt32 thisDay = TimeUtil::SharpDay();
+    UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+    if(thisDay <= endDay)
+    {
+        UInt32 targetVal = GetVar(VAR_CLAWARD2);
+        if (!(targetVal & TARGET_SELECTPRAY))
+        {
+            targetVal |= TARGET_SELECTPRAY;
+            AddVar(VAR_CTS_TARGET_COUNT, 1);
+            SetVar(VAR_CLAWARD2, targetVal);
+            sendNewRC7DayTarget();
+            newRC7DayUdpLog(1152, 13);
+        }
+    }
+}
+
+} // namespace GObject
 
