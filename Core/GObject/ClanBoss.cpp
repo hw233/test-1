@@ -1140,7 +1140,7 @@ bool ClanBoss::attack(Player* pl)
     st << Stream::eos;
     pl->send(st);
     bsim.applyFighterHP(0, pl);
-    //GameAction()->doStrong(pl, SthLastDay, 0, 0);
+    GameAction()->doStrong(pl, SthLastDay, 0, 0);
     return res;
 
 }

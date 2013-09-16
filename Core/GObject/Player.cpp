@@ -6814,7 +6814,7 @@ namespace GObject
 
         OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
         writeClanTask();
-        //GameAction()->doStrong(this, SthClanTask, 0 ,0 );
+        GameAction()->doStrong(this, SthClanTask, 0 ,0 );
         return true;
     }
 

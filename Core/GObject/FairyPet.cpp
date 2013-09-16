@@ -250,6 +250,7 @@ namespace GObject
             updateToDB(2, getLevel());
             if(GET_REMAINDER(getPetLev()))
                 _owner->sendMsgCode(0, 4000);
+            GameAction()->doStrong(_owner, SthPinJieUp, 0, 0); 
         }
         else
         { //失败
@@ -291,6 +292,7 @@ namespace GObject
                 updateToDB(2, getLevel());
                 isSucc = 1;
                 break;
+                GameAction()->doStrong(_owner, SthPinJieUp, 0, 0); 
             }
             else
             {   //失败
@@ -323,6 +325,7 @@ namespace GObject
             reset(2);
             reset(3);
             boneUp();
+            GameAction()->doStrong(_owner, SthGenguUp, 0, 0); 
             //_owner->sendMsgCode(0, 4002);
             if(GET_REMAINDER(getPetBone()) == 2 && getColor() > 1)
                 SYSMSG_BROADCASTV(4135, _owner->getCountry(), _owner->getName().c_str(), getColor(), getName().c_str(), getPetBone());

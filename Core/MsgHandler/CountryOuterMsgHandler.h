@@ -5009,7 +5009,10 @@ void OnEquipUpgrade( GameMsgHdr& hdr, EquipUpgradeReq& req)
 
     Stream st(REP::EQ_UPGRADE);
     if(res == 0)
+    {
         st << res << fid << newId << Stream::eos;
+         GameAction()->doStrong(player, SthEquipLH, 0, 0);   
+    }
     else
         st << res << fid << req._itemId << Stream::eos;
 
@@ -5765,6 +5768,7 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
             }
             st << Stream::eos;
             player->send(st);
+            GameAction()->doStrong(player, SthSpiritEat, 0, 0);
         }
         break;
     case 0x04:
@@ -6786,6 +6790,7 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                         st << player->GetPetPackage()->equipUpgrade(petId, equipId, idStr);
                         st << Stream::eos;
                         player->send(st);
+                        GameAction()->doStrong(player,SthNeiDanUp, 0, 0);
                     }
                     break;
                 case 0x06:
@@ -6797,6 +6802,7 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                         st << player->GetPetPackage()->MergePetGem(gemId1, gemId2, ogid);
                         st << ogid << Stream::eos;
                         player->send(st);
+                        GameAction()->doStrong(player,SthJingPoFix, 0, 0);
                     }
                     break;
                 case 0x07:
