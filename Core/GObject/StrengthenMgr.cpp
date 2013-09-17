@@ -694,5 +694,18 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
         UpdateToDB();
     }
 }
-
+void StrengthenMgr::SendStrengthLevelInfo()
+{
+    UInt32 levelInfo = _owner->GetVar(VAR_STRENGTH_LEVEL);
+    Stream st(REP::STRENGTHEN_LIST);
+    st<<static_cast<UInt8>(6);
+    st<<static_cast<UInt8>(levelInfo);
+    _owner->send(st);
+}
+void StrengthenMgr::SetStrengthLevelInfo(UInt8 type)
+{
+    UInt32 levelInfo = _owner->GetVar(VAR_STRENGTH_LEVEL);
+    levelInfo|=1<<(type-1);
+    _owner->SetVar(VAR_STRENGTH_LEVEL,levelInfo);
+}
 }

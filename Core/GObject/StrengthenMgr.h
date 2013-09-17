@@ -112,7 +112,9 @@ namespace GObject
             void UpdateFlag(UInt8 idx, UInt8 v);
             bool CheckTimeOver(UInt32 now = TimeUtil::Now());
             void SendStrengthenInfo();
+            void SendStrengthLevelInfo();
             void SendStrengthenRank();
+            void SetStrengthLevelInfo(UInt8 type);
             void SendOpenChestsInfo(UInt8 boxId, UInt8 index);
             void EveryDayRoar();
             bool CanOpenGreenBox(UInt8 type, UInt32 onlineTime);
