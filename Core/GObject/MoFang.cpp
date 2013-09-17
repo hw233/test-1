@@ -1252,10 +1252,10 @@ void MoFang::upgradeKY(UInt8 keyinId, UInt8 opt)
     if(keyinCurExp >= kyInfo->maxValue)
     {
         keyinLvl++;
-        if(mark)
+        /*if(mark)
             m_kyLvl.insert(std::make_pair(keyinId, keyinLvl));
         else
-            iter->second = keyinLvl;
+            iter->second = keyinLvl;*/
 
         if(keyinId >= 1 && keyinId <= 4)
             m_kyQuality[keyinId-1] = kyInfo->quality;
@@ -1268,9 +1268,15 @@ void MoFang::upgradeKY(UInt8 keyinId, UInt8 opt)
     }
 
     if(mark)
+    {
+        m_kyLvl.insert(std::make_pair(keyinId, keyinLvl));
         m_kyCurExp.insert(std::make_pair(keyinId, keyinCurExp));
+    }
     else
+    {
+        iter->second = keyinLvl;
         iterA->second = keyinCurExp;
+    }
 
     DB4().PushUpdateData("REPLACE INTO `player_keyin` VALUES(%" I64_FMT "u, %u, %u, %u)", m_owner->getId(), keyinId, keyinLvl, keyinCurExp);
 
@@ -1372,10 +1378,10 @@ void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 opt)
     {
         keyinLvl++;
         
-        if(mark)
+        /*if(mark)
             m_kyLvl.insert(std::make_pair(keyinId, keyinLvl));
         else
-            iter->second = keyinLvl;
+            iter->second = keyinLvl;*/
 
         if(keyinId >= 1 && keyinId <= 4)
             m_kyQuality[keyinId-1] = kyInfo->quality;
@@ -1388,9 +1394,15 @@ void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 opt)
     }
 
     if(mark)
+    {
+        m_kyLvl.insert(std::make_pair(keyinId, keyinLvl));
         m_kyCurExp.insert(std::make_pair(keyinId, keyinCurExp));
+    }
     else
+    {
+        iter->second = keyinLvl;
         iterA->second = keyinCurExp;
+    }
 
     DB4().PushUpdateData("REPLACE INTO `player_keyin` VALUES(%" I64_FMT "u, %u, %u, %u)", m_owner->getId(), keyinId, keyinLvl, keyinCurExp);
 

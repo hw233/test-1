@@ -2561,6 +2561,8 @@ namespace GObject
         void sendLuckyStarInfo(UInt8);
         void getLuckyStarItem(UInt8);
         void LuckyStarActUdpLog(UInt8);
+        void checkSendRandFriend();
+        void checkSelectPray();
 
         //女娲石盘
         void sendNuwaInfo();
@@ -2626,6 +2628,8 @@ namespace GObject
         UInt16 _partCnt[8][9];
         UInt16 _alreadyCnt[8];
         UInt8 _alreadyload[8];
+    public:
+        void setMapId(UInt8 mapId);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
