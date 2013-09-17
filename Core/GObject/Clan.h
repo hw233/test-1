@@ -521,6 +521,7 @@ public:
     UInt8 skillLevelUp(Player* pl, UInt8 skillId);
 public:
 	inline UInt8 getLev() { return _level; }
+
 	ClanTech * getClanTech() { return _techs; }
 	ClanBattle * getClanBattle() { return _clanBattle; }
 	ClanDynamicMsg * getClanDynamicMsg() { return _clanDynamicMsg; }
@@ -689,6 +690,7 @@ private:
 	std::vector<ClanPendingMember *> _pending;
 	UInt8 _rank;
 	UInt8 _level;
+    UInt32  AirBookGrade;
 
     ClanItemPkg _itemPkg;
     ItemHistoryList _itemHistories;

@@ -886,6 +886,26 @@ void SendLuckyBagRank(Stream& st)
     }
     st << Stream::eos;
 }
+void Send11PlayerGradeRank(Stream& st)
+{
+    using namespace GObject;
+    st.init(REP::ACT);    //lib待定
+    UInt32 cnt = World::PlayerGradeSort.size();
+    if (cnt > CNT)
+        cnt = CNT;
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
+    {
+        st << i->player->getName();
+        st << i->total;
+        st << static_cast<UInt8>(i->player->getCountry()<<4|(i->player->IsMale()?0:1));
+        ++c;
+        if (c >= CNT)
+            break;
+    }
+    st << Stream::eos;
+}
 
 void OnRechargeRank ( GameMsgHdr& hdr,  const void* data )
 {
@@ -983,6 +1003,60 @@ void OnLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
         ++rank;
 
         Stream st(REP::ACT);
+        st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(2);
+        st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+        i->player->send(st);
+    }
+
+    if (oldrank <= CNT || (!inrank && myrank <= CNT))
+    {
+        Stream st;
+        SendLuckyBagRank(st);
+        NETWORK()->Broadcast(st);
+    }
+}
+void On11PlayerGradeRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= CNT)
+                inrank = true;
+            World::PlayerGradeSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::PlayerGradeSort.insert(s);
+
+    UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
+    for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
+    {
+       if (!stop)
+            ++myrank;
+
+        if (i->player == player)
+            stop = true;
+
+        ++rank;
+
+        Stream st(REP::ACT);  //lib待定
         st << static_cast<UInt8>(2) << static_cast<UInt8>(4) << static_cast<UInt8>(2);
         st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
         i->player->send(st);
@@ -1121,6 +1195,10 @@ void OnSendLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
 void OnClearLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
 {
     World::LuckyBagSort.clear();
+}
+void OnClearPlayerGradeSortRank ( GameMsgHdr& hdr,  const void* data )
+{
+    World::PlayerGradeSort.clear();
 }
 
 void OnSendConsumeRank ( GameMsgHdr& hdr,  const void* data )

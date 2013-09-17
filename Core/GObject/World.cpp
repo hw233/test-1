@@ -148,6 +148,7 @@ bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
 bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
+bool World::_11time = false;
 bool World::_ryhbActivity = false;
 bool World::_zcjbActivity = false;
 bool World::_wansheng= false;
@@ -191,6 +192,8 @@ RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 RCSortType World::popularitySort;
 RCSortType World::LuckyBagSort;
+RCSortType World::PlayerGradeSort;
+ClanGradeSort World::clanGradeSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
 bool World::_killMonsteract = 0;
@@ -299,6 +302,7 @@ bool bXiaoyaoEnd = false;
 bool bFoolBaoEnd =  false;
 bool bHalfGoldEnd = false;
 bool bSurnameLegendEnd = false;
+bool b11TimeEnd = false;
 bool bSnowEnd = false;
 bool bGoldSnakeEnd = false;
 bool bItem9344End = false;
@@ -1397,6 +1401,7 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bfoolbao = getFoolBao();
     bool bsurnamelegend = getSurnameLegend();
+    bool b11time = get11Time();
     bool bhalfgold = getHalfGold();
     bool bJune = getJune();
     bool bQixi = getQixi();
@@ -1437,6 +1442,7 @@ void World::World_Midnight_Check( World * world )
     bHalfGoldEnd = bhalfgold && !getHalfGold();
     //蜀山传奇掉落活动是否结束
     bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
+    b11TimeEnd = b11time && !get11Time(300);
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
@@ -1830,6 +1836,8 @@ void World::World_Midnight_Check( World * world )
         world->SendFoolBaoAward();
     if(bSurnameLegendEnd)
         world->SendSurnameLegendAward();
+    if(b11TimeEnd)
+        world->Send11AirBookAward();
     if (bSnowEnd)
         world->SendSnowAward();
     if (bGoldSnakeEnd)
@@ -3143,6 +3151,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::LuckyBagSort.insert(s);
         }
     }
+    if (World::get11Time())
+    {
+        UInt32 used = p->GetVar(VAR_11AIRBOOK_GRADE);
+        if (used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::PlayerGradeSort.insert(s);
+        }
+    }
     return true;
 }
 inline bool player_enum_rp7rc(GObject::Player * p, int)
@@ -3583,6 +3602,12 @@ UInt32 World::getSpreadCount()
 {
     return (GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 8);
 }
+void World::Send11AirBookAward()    //lib待定
+{
+        
+
+}
+
 
 }
 

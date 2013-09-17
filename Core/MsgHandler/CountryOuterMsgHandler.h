@@ -6168,6 +6168,13 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
                 mgr->EveryDayRoar();
             }
             break;
+        case 0x06:
+            {
+                UInt8 index = 0;
+                brd >> index;
+                mgr->SetStrengthLevelInfo(index);
+            }
+            break;
         default:
             return;
             break;

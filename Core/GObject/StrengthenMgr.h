@@ -13,7 +13,7 @@ namespace GObject
         SthHookSpeed,  //挂机加速
         SthDungeon,   //决战之地
         SthBoss,      //世界BOSS
-        SthCountryWar,//阵营战
+        SthCountryWar,//阵营战and蜀山论剑
         SthPractice,  //修炼
         SthPUse,    //使用修炼加速符
         SthPSpeed,    //修炼加速
@@ -112,6 +112,8 @@ namespace GObject
             void UpdateFlag(UInt8 idx, UInt8 v);
             bool CheckTimeOver(UInt32 now = TimeUtil::Now());
             void SendStrengthenInfo();
+            void SendStrengthLevelInfo();
+            void SetStrengthLevelInfo(UInt8 type);
             void SendStrengthenRank();
             void SendOpenChestsInfo(UInt8 boxId, UInt8 index);
             void EveryDayRoar();

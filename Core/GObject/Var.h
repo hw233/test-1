@@ -538,6 +538,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_SENDPRESENT_VALUE = 595,
         VAR_GETPRESENT_VALUE = 596,
         VAR_PRESENT_LOGIN = 597 ,
+        VAR_STRENGTH_LEVEL = 598,  //10· 1 活动积分
+        VAR_11AIRBOOK_GRADE = 599,  //10· 1 活动积分
         //600-620 for qiwy  ^_^
 
         VAR_MAX,
@@ -1032,6 +1034,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_SENDPRESENT_VALUE, CYCLE_DAY);
             REGISTER_VAR(VAR_GETPRESENT_VALUE, CYCLE_DAY);
             REGISTER_VAR(VAR_PRESENT_LOGIN, CYCLE_NONE);
+            REGISTER_VAR(VAR_11AIRBOOK_GRADE, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
