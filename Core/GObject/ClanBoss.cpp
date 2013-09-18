@@ -2143,7 +2143,7 @@ void ClanBoss::reward()
                 break;
             }
         }
-        if(score >= 1000)
+        if(score >= 100)
         {
             for (UInt8 i = 0; i < sizeof(s_score3)/sizeof(s_score3[0]) && rankCount > 0; ++i)
             {
