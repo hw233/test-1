@@ -24326,8 +24326,8 @@ void Player::deletePresent(UInt64 playerId,UInt32 type,UInt32 sendtime)
 
 void Player::checkSendRandFriend()
 {
-    UInt32 thisDay = TimeUtil::SharpDay();
-    UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+    UInt32 thisDay = TimeUtil::SharpDayT();
+    UInt32 endDay = TimeUtil::SharpDayT(6, PLAYER_DATA(this, created));
     if(thisDay <= endDay)
     {
         UInt32 targetVal = GetVar(VAR_CLAWARD2);
@@ -24344,8 +24344,8 @@ void Player::checkSendRandFriend()
 
 void Player::checkSelectPray()
 {
-    UInt32 thisDay = TimeUtil::SharpDay();
-    UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+    UInt32 thisDay = TimeUtil::SharpDayT();
+    UInt32 endDay = TimeUtil::SharpDayT(6, PLAYER_DATA(this, created));
     if(thisDay <= endDay)
     {
         UInt32 targetVal = GetVar(VAR_CLAWARD2);
