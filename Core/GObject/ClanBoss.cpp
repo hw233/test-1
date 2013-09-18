@@ -2143,19 +2143,22 @@ void ClanBoss::reward()
                 break;
             }
         }
-        for (UInt8 i = 0; i < sizeof(s_score3)/sizeof(s_score3[0]) && rankCount > 0; ++i)
+        if(score >= 1000)
         {
-            if (maxScore-score <= s_score3[i])
+            for (UInt8 i = 0; i < sizeof(s_score3)/sizeof(s_score3[0]) && rankCount > 0; ++i)
             {
-                it->second->AddItem(s_items3[i].id, s_items3[i].count);
-                it->second->AddItem(s_items3_2[i].id, s_items3_2[i].count);
-                std::ostringstream itemstream;
-                itemstream << s_items3[i].id << "," << s_items3[i].count << ";";
-                it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream.str());
-                std::ostringstream itemstream2;
-                itemstream2 << s_items3_2[i].id << "," << s_items3_2[i].count << ";";
-                it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream2.str());
-                break;
+                if (maxScore-score <= s_score3[i])
+                {
+                    it->second->AddItem(s_items3[i].id, s_items3[i].count);
+                    it->second->AddItem(s_items3_2[i].id, s_items3_2[i].count);
+                    std::ostringstream itemstream;
+                    itemstream << s_items3[i].id << "," << s_items3[i].count << ";";
+                    it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream.str());
+                    std::ostringstream itemstream2;
+                    itemstream2 << s_items3_2[i].id << "," << s_items3_2[i].count << ";";
+                    it->second->AddItemHistory(ClanItemHistory::CLANBOSS, TimeUtil::Now(), 0, itemstream2.str());
+                    break;
+                }
             }
         }
         rankCount++;
