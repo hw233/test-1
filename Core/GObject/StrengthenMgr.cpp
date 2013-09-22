@@ -347,9 +347,13 @@ void StrengthenMgr::SendStrengthenInfo()
             if(idx == SthCopy) //副本
                 maxFlag = m1;
             if(idx == SthDungeon) //决战之地
+            {
                 maxFlag = m2;
+                maxFlag*= 2 ;
+            }
             if(idx == SthFormation) //阵图
                 maxFlag = m3;
+
         }
         if(idx == SthGroupCopy)
         {
@@ -378,7 +382,7 @@ void StrengthenMgr::SendStrengthenInfo()
     }
     st << Stream::eos;
     _owner->send(st);
-    SendStrengthenInfo();
+    SendStrengthLevelInfo();
 }
 
 void StrengthenMgr::EveryDayRoar()
@@ -709,5 +713,6 @@ void StrengthenMgr::SetStrengthLevelInfo(UInt8 type)
 {
     UInt32 levelInfo = _owner->GetVar(VAR_STRENGTH_LEVEL);
     levelInfo |= 1<<(type-1);
+    _owner->SetVar(VAR_STRENGTH_LEVEL,levelInfo);
 } 
 }

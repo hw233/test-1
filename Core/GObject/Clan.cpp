@@ -3626,7 +3626,6 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
 
     if(res != 0)
     {
-        GameAction()->doStrong(pl, SthSkillUp, 0, 0);
         Stream st(REP::CLAN_SKILL);
         st << static_cast<UInt8>(8) << skillId;
 
@@ -3636,7 +3635,6 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
 
         pl->setClanSkillFlag(0);
     }
-
     return res;
 }
 
@@ -4415,7 +4413,8 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                 if(needTeal > 0)
                     addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_tael, needTeal, now);
                 m_spiritTree.m_exp += 100;
-                GameAction()->doStrong(pl, SthClanSpirit, 0, 0);
+                GameMsgHdr hdr1(0x364, pl->getThreadId(), pl,0);
+                GLOBAL().PushMsg(hdr1,NULL );
                 addMemberActivePoint_nolock(pl, 1, e_clan_actpt_none);
                 while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
                 {

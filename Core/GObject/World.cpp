@@ -3607,6 +3607,28 @@ void World::Send11AirBookAward()    //lib待定
         
 
 }
+void World::Send11PlayerAward()
+{
+    World::initRCRank();
+    int pos = 0;
+    for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
+    {
+        ++pos;
+        if(pos > 1) break;
+        Player* player = i->player;
+        if (!player)
+            continue;
+        MailPackage::MailItem items[] =
+        {
+            //{9907, 1}
+            //{9911, 1}
+            // {9913, 1}
+            {9921, 1}
+        };
+        player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+    }
+    World::LuckyBagSort.clear();
+}
 
 
 }

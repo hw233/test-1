@@ -1089,6 +1089,7 @@ public:
     void SendFoolBaoAward();
     void SendSurnameLegendAward();
     void Send11AirBookAward();
+    void Send11PlayerAward();
     void UpdateSnowScore(Player* pl, Player* lover);
     void sendSnowPlayers(Player* pl);
     void DivorceSnowPair(Player* pl);

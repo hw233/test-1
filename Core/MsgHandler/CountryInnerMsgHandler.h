@@ -1349,6 +1349,12 @@ void OnClanSkillLevel( GameMsgHdr& hdr, const void* data )
     player->clanSkillLevelUp(skillId);
     player->setFightersDirty(true);
 }
+void OnWaterSpiritTree( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    //UInt8 skillId = *(UInt8*)(data);
+    player->doStrongInWorld(43);
+}
 
 void OnClanSkillList( GameMsgHdr& hdr, const void* data )
 {

@@ -2563,7 +2563,7 @@ namespace GObject
         void LuckyStarActUdpLog(UInt8);
         void checkSendRandFriend();
         void checkSelectPray();
-
+        void doStrongInWorld(UInt8 type);
         //女娲石盘
         void sendNuwaInfo();
         void setNuwaSignet(UInt8);
