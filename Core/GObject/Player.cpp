@@ -23838,6 +23838,8 @@ void Player::insertCollectCardDB(UInt8 id)
 
 void Player::addCardFromClanBattle()
 {
+    if(!World::getCollectCardAct())
+        return;
     if(GetVar(VAR_CARD_FROM_CLAN) == 0)
     {
         SetVar(VAR_CARD_FROM_CLAN, 1);
