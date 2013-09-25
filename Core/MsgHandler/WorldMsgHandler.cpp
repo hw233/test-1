@@ -65,17 +65,28 @@ MSG_REG_2(GameMsgHdr, REQ::CLAN_QQ, OnClanQQ);
 MSG_REG_2(ArenaMsgHdr, 0x101, OnArenaConnected);
 MSG_REG_2(ArenaMsgHdr, 0x102, OnPlayerEntered);
 MSG_REG_2(ArenaMsgHdr, 0x103, OnLineupCommited);
-MSG_REG_2(ArenaMsgHdr, 0x104, OnArenaPriliminary);
-MSG_REG_2(ArenaMsgHdr, 0x105, OnPriliminaryInfo);
+MSG_REG_2(ArenaMsgHdr, 0x104, OnArenaPreliminary);
+MSG_REG_2(ArenaMsgHdr, 0x105, OnPreliminaryInfo);
 MSG_REG_2(ArenaMsgHdr, 0x106, OnArenaBattleReport);
 MSG_REG_2(ArenaMsgHdr, 0x107, OnArenaSupport);
 MSG_REG_2(ArenaMsgHdr, 0x108, OnArenaBattlePoint);
 MSG_REG_2(ArenaMsgHdr, 0x109, OnArenaLeaderBoard);
 
+MSG_REG_2(ArenaMsgHdr, 0x110, OnTeamArenaEntered);
+MSG_REG_2(ArenaMsgHdr, 0x111, OnTeamArenaConnected);
+MSG_REG_2(ArenaMsgHdr, 0x112, OnTeamArenaPreliminary);
+MSG_REG_2(ArenaMsgHdr, 0x113, OnTeamArenaBattlePoint);
+MSG_REG_2(ArenaMsgHdr, 0x114, OnTeamArenaLeaderBoard);
+MSG_REG_2(ArenaMsgHdr, 0x115, OnTeamArenaInspireLevel);
+MSG_REG_2(ArenaMsgHdr, 0x116, OnTeamArenaLastRank);
+
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 
+MSG_REG_2(GameMsgHdr, 0x169, OnTeamArenaApply);
+MSG_REG_2(GameMsgHdr, 0x170, OnTeamArenaApply1);
 MSG_REG_2(GameMsgHdr, 0x171, OnClanTakeRewardResultReq);
+MSG_REG_2(GameMsgHdr, 0x172, OnTeamArenaAddMember);
 MSG_REG_2(GameMsgHdr, 0x173, OnClanMailInviteClick);
 MSG_REG_2(GameMsgHdr, 0x174, OnClanMailClick);
 MSG_REG_2(GameMsgHdr, 0x175, OnClanTechDonateCheckResp);
@@ -120,6 +131,8 @@ MSG_REG_2(GameMsgHdr, 0x1A9, OnSHReset);
 MSG_REG_2(GameMsgHdr, 0x1AA, OnSHEnter);
 MSG_REG_2(GameMsgHdr, 0x1AB, OnEnterArena);
 MSG_REG_2(GameMsgHdr, 0x1AC, OnSHStageOnOff);
+MSG_REG_2(GameMsgHdr, 0x1AD, OnCreateTeamArena);
+MSG_REG_2(GameMsgHdr, 0x1AE, OnAddeamArenaScore);
 
 MSG_REG_2(GameMsgHdr, 0x1B1, OnSearchSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B2, OnPutSaleNotify);

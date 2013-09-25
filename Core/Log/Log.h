@@ -126,6 +126,7 @@ enum PurchaseType
     CCBReAlive                  = 115, //墨守成规复活
     ClanSptr                    = 116, //神魔之树
     RetrieveItem                = 117, //物品回收消费
+    ArenaTeamConsume            = 118, //跨服战消费
     //繁体私有占150～200
 };
 
@@ -148,6 +149,7 @@ enum IncomingType
     InFromTopUp                 = 142, //topup
     InFromMoney2All             = 143, //money2all
     InFromSuper                 = 144, //super
+    LongHunFromTeamArena        = 145, //龙魂获得 组队跨服战
 };
 
 enum MoneyType
@@ -194,6 +196,7 @@ enum MailItemType
     ClanBossAct,
 	DismissXingchen,
     NewHeroIslandAward,
+    ArenaAward,
 };
 enum ItemFrom
 {

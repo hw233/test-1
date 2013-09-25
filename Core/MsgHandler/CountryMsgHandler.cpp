@@ -380,6 +380,13 @@ MSG_REG_2(GameMsgHdr, 0x331, OnForbidSaleQueryFail);
 MSG_REG_2(GameMsgHdr, 0x332, OnOpenIdInvalid);
 MSG_REG_2(GameMsgHdr, 0x333, OnOpenAPIFailed);
 
+MSG_REG_2(GameMsgHdr, 0x334, OnTeamArenaEnter);
+MSG_REG_2(GameMsgHdr, 0x335, OnTeamArenaLineup);
+MSG_REG_2(GameMsgHdr, 0x336, OnTeamArenaUseTael);
+MSG_REG_2(GameMsgHdr, 0x337, OnTeamArenaUseGold);
+MSG_REG_2(GameMsgHdr, 0x338, OnGetTeamArenaMoney);
+MSG_REG_2(GameMsgHdr, 0x339, OnTeamArenaInspire);
+
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 
 MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);

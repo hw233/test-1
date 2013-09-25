@@ -81,6 +81,8 @@ private:
 	void OnAutoCB(GObject::Player *, std::vector<std::string>&);
 	void OnAutoFB(GObject::Player *, std::vector<std::string>&);
 	void OnEnterArena(GObject::Player *, std::vector<std::string>&);
+	void OnCreateTeamArena(GObject::Player *, std::vector<std::string>&);
+    void OnAddTeamArenaScore(GObject::Player* player, std::vector<std::string>& args);
 	void OnNextArena(GObject::Player *, std::vector<std::string>&);
 	void OnEnterClan(GObject::Player *, std::vector<std::string>&);
     void OnPay4Pra(GObject::Player * player, std::vector<std::string>&);

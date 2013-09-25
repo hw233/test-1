@@ -68,6 +68,8 @@ namespace GData
         static bool LoadPetEquipExp();
         static bool LoadPetEqAttreffect();
         static bool LoadXingchenConfig();
+        static bool LoadTeamArenaSkillConfig();
+        static bool LoadTeamArenaInspireConfig();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);

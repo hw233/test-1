@@ -3603,7 +3603,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
         case PURCHASE3+4:// 龙魂灵宝
             {
                 UInt32 arena = player->GetVar(VAR_MONEY_ARENA);
-                if (arena < price)
+                if (arena < price || !player->checkCanBuyItem(lr._itemId, lr._type))
                 {
                     st << static_cast<UInt8>(1);
                 }

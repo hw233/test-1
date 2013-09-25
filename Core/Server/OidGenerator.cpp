@@ -15,4 +15,5 @@ namespace IDGenerator
 	AthleticsRecordOidGenerator gAthleticsRecordOidGenerator;
 	ClanBatterRecordIDGenerator gClanBatterRecordIDGenerator;
 	AthleticsEventOidGenerator gAthleticsEventOidGenerator;
+	TeamArenaOidGenerator gTeamArenaOidGenerator;
 }

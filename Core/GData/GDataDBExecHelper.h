@@ -572,6 +572,31 @@ struct DBXingchenConfig
     UInt32 payBack;
 };
 
+struct DBTeamArenaSkillConfig
+{
+    UInt8 id;
+    UInt8 level;
+    UInt32 needs;
+    UInt8 teamLev;
+    float attack;
+    float hp;
+    float defend;
+    float magdef;
+    float action;
+    float magresP;
+};
+
+struct DBTeamArenaInspireConfig
+{
+    UInt8 level;
+    UInt32 consume;
+    UInt32 rate;
+    float attackP;
+    float defendP;
+    float hpP;
+    float actionP;
+};
+
 }
 
 namespace DB {
@@ -1231,6 +1256,35 @@ SPECIALDEF(9)
     float, rate2,
     float, rate3,
     UInt32, payBack
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBTeamArenaSkillConfig)
+SPECIALDEF(10)
+	(
+    UInt8, id,
+    UInt8, level,
+    UInt32, needs,
+    UInt8, teamLev,
+    float, attack,
+    float, hp,
+    float, defend,
+    float, magdef,
+    float, action,
+    float, magresP
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBTeamArenaInspireConfig)
+SPECIALDEF(7)
+	(
+    UInt8, level,
+    UInt32, consume,
+    UInt32, rate,
+    float, attackP,
+    float, defendP,
+    float, hpP,
+    float, actionP
 	)
 SPECIALEND()
 

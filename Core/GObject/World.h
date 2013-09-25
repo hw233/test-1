@@ -126,6 +126,8 @@ public:
 	~World();
 
 public:
+    inline static UInt8 getArenaState() { return _arenaState; }
+    inline static void setArenaState(UInt8 as) { if(as > 2) as = 2; _arenaState = as; }
 	inline UInt32 ThisDay() { return _today; }
 	inline UInt32 Now() { return _now; }
 	inline bool isNewCountryBattle() { return !(_wday % 2); }
@@ -978,6 +980,7 @@ public:
     static UInt8 m_sysDailogPlatform;
     static Player* spreadKeeper;
     static UInt32 spreadBuff;
+    static UInt8 _arenaState;      //0:无 1:仙界第一 2:仙界至尊
 public:
     static RCSortType rechargeSort;
     static RCSortType consumeSort;

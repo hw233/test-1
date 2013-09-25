@@ -123,6 +123,12 @@ function loadStore()
         store:add(2, 9388, 100)
         store:add(2, 9371, 10)
 
+        store:add(2, 9413, 10)
+        store:add(2, 9414, 30)
+        store:add(2, 9418, 20)
+        store:add(2, 9424, 10)
+        store:add(2, 9425, 80)
+
         if getSpecialBookAct() then  --特殊古籍活动
             store:add(2, 11113, 50)
             store:add(2, 11114, 60)
@@ -544,6 +550,7 @@ function loadStore()
         -- 龙魂奇珍
         store:add(14,507,2000)
         store:add(14,509,2000)
+		store:add(14,9427,1500,2)
         -- 龙魂灵宝
         store:add(15,11588,7000)
         store:add(15,11589,7000)
