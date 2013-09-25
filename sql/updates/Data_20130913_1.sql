@@ -14,3 +14,4 @@ CREATE TABLE `pet_sanhun` (
     `money2` int(10) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`lvl`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+

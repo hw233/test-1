@@ -73,6 +73,9 @@ namespace GData
         static bool LoadTuzhiConfig();
         static bool LoadKeyinConfig();
         static bool LoadSanHunConfig();
+        static bool LoadTeamArenaSkillConfig();
+        static bool LoadTeamArenaInspireConfig();
+
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);
         static bool isInUdpItem(UInt32 id);

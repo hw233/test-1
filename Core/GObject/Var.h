@@ -410,6 +410,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_INVITEDSUCCESS = 423, //邀请成功的好友人数
         VAR_CFRIENDTICKETS = 424, //好友邀请的抽奖券
 
+        VAR_TEAMARENA_CREATE  = 425, //组队跨服战创建战队限制次数
+        VAR_TEAMARENA_WORSHIP = 426, //组队跨服战每日崇拜冠军
+        VAR_TEAMARENA_INSPIRE = 427, //组队跨服战鼓舞等级失败保护次数
+
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
         VAR_RP7_TREASURE = 432,  //回流服务器聚宝盆, 1-8位:是否购买的标志为 9-16,17-24,25-32位第1-3个聚宝盆的已领取次数
@@ -899,6 +903,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
 
             REGISTER_VAR(VAR_INVITEDSUCCESS, CYCLE_MONTH);
             REGISTER_VAR(VAR_CFRIENDTICKETS, CYCLE_NONE);
+            REGISTER_VAR(VAR_TEAMARENA_CREATE, CYCLE_DAY);
+            REGISTER_VAR(VAR_TEAMARENA_WORSHIP, CYCLE_DAY);
+            REGISTER_VAR(VAR_TEAMARENA_INSPIRE, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);

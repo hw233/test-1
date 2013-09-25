@@ -128,6 +128,7 @@ enum PurchaseType
     RetrieveItem                = 117, //物品回收消费
     EnumQzongPYGift             = 118, //Qzong,PY礼包
     SanHunUpForPet              = 119, //三魂升级
+    ArenaTeamConsume            = 120, //跨服战消费
     //繁体私有占150～200
 };
 
@@ -152,6 +153,7 @@ enum IncomingType
     InFromSuper                 = 144, //super
     ProfferFromUseItem          = 145, //使用物品帮贡
     ShouHunFromYouli            = 146, //游历获得兽魂
+    LongHunFromTeamArena        = 147, //龙魂获得 组队跨服战
 };
 
 enum MoneyType
@@ -198,6 +200,7 @@ enum MailItemType
     ClanBossAct,
 	DismissXingchen,
     NewHeroIslandAward,
+    ArenaAward,
 };
 enum ItemFrom
 {

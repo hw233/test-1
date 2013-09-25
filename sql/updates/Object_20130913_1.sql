@@ -7,3 +7,4 @@ CREATE TABLE IF NOT EXISTS `fairyPet_sanhun` (
     KEY `fairyPetId` (`fairyPetId`),
     KEY `playerId` (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

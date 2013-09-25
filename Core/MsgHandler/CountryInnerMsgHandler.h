@@ -1659,6 +1659,144 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         NETWORK()->SendToArena(st);
     }
 }
+
+void OnTeamArenaEnter( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct TeamEnterData {
+        Stream st;
+        TeamArenaData* tad; 
+        UInt8 memidx;
+    };
+
+	TeamEnterData * ted = *reinterpret_cast<TeamEnterData**>(const_cast<void *>(data));
+    if(!ted)
+        return;
+    if(!ted->tad || !ted->tad->isFull())
+    {
+        delete ted;
+        return;
+    }
+    TeamArenaData* tad = ted->tad;
+
+    Stream& st = ted->st;
+    //战队成员
+    while(ted->memidx <= 2)
+    {
+        UInt8 memidx = ted->memidx;
+        if(tad->members[memidx])
+        {
+            st << tad->stamps[memidx];
+            st << tad->members[memidx]->getId() << tad->members[memidx]->getName();
+            st << tad->members[memidx]->getTitle();
+            tad->members[memidx]->appendLineup2(st);
+            tad->members[memidx]->appendPetOnBattle(st);
+        }
+        else
+        {
+            delete ted;
+            break;
+        }
+
+        if(memidx >= 2)
+        {
+            //战队技能
+            st << static_cast<UInt8>(tad->teamskills.size());
+            GObject::TeamSkills::iterator it = tad->teamskills.begin();
+            for(; it != tad->teamskills.end(); ++ it)
+            {
+                st << it->first << it->second.level;
+            }
+            st << Stream::eos;
+            NETWORK()->SendToArena(st);
+
+            delete ted;
+            break;
+        }
+        else
+        {
+            ++ ted->memidx;
+            Player* mem = tad->members[ted->memidx];
+            if(!mem)
+            {
+                delete ted;
+                break;
+            }
+            if(mem->getThreadId() != CURRENT_THREAD_ID())
+            {
+                GameMsgHdr hdr(0x334, mem->getThreadId(), mem, sizeof(TeamEnterData*));
+                GLOBAL().PushMsg(hdr, &ted);
+                break;
+            }
+        }
+    }
+}
+
+void OnTeamArenaLineup( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	TeamArenaData* tad = *reinterpret_cast<TeamArenaData **>(const_cast<void *>(data));
+    if(!tad || !tad->isFull())
+        return;
+    Stream st(ARENAREQ::TEAMARENA_LINEUP, 0xEF);
+    st << tad->getId() << tad->count;
+    st << tad->leader->getId() << tad->level << tad->inspireLvl;
+    //战队成员
+    for(UInt8 i = 0; i < tad->count; ++ i)
+    {
+        if(tad->members[i])
+        {
+            st << tad->stamps[i];
+            st << tad->members[i]->getId();
+        }
+    }
+    //战队技能
+    st << static_cast<UInt8>(tad->teamskills.size());
+    GObject::TeamSkills::iterator it = tad->teamskills.begin();
+    for(; it != tad->teamskills.end(); ++ it)
+    {
+        st << it->first << it->second.level;
+    }
+    st << Stream::eos;
+    NETWORK()->SendToArena(st);
+}
+
+void OnTeamArenaInspire( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	TeamArenaData* tad = *reinterpret_cast<TeamArenaData **>(const_cast<void *>(data));
+    if(!tad || !tad->isFull() || !tad->isInArena())
+        return;
+    Stream st(ARENAREQ::TEAMARENA_INSPIRE, 0xEF);
+    st << tad->getId() << tad->GetLev() << tad->inspireLvl;
+    st << Stream::eos;
+    NETWORK()->SendToArena(st);
+}
+
+void OnTeamArenaUseTael( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt32 money = *reinterpret_cast<const UInt32 *>(data);
+	ConsumeInfo ci(ArenaTeamConsume, 0, 0);
+	player->useTael(money, &ci);
+}
+
+void OnTeamArenaUseGold( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt32 money = *reinterpret_cast<const UInt32 *>(data);
+	ConsumeInfo ci(ArenaTeamConsume, 0, 0);
+	player->useGold(money, &ci);
+}
+
+void OnGetTeamArenaMoney( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt32 money = *reinterpret_cast<const UInt32 *>(data);
+    IncommingInfo ii(LongHunFromTeamArena,0,0);
+    player->getMoneyArena(money, &ii);
+}
+
 void OnSendPExpCard( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);

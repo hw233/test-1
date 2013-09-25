@@ -33,6 +33,7 @@
 #include "GObject/DaysRank.h"
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
+#include "GObject/ArenaTeam.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -85,9 +86,7 @@ void OnSearchEvents( GameMsgHdr& hdr, const void * data )
 			GLOBAL().PushMsg(hdr1, &dg);
 		}
 	}
-	Stream st(REP::SERVER_ARENA_OP);
-	st << static_cast<UInt8>(0) << static_cast<UInt8>(GObject::arena.active() ? 1 : 0) << Stream::eos;
-	player->send(st);
+    //GObject::arena.sendActive(player);
 }
 
 void OnAthleticsOver( GameMsgHdr& hdr, const void * data )
@@ -1380,10 +1379,91 @@ inline bool enterArena(GObject::Player* p, UInt32* cnt)
     return true;
 }
 
+inline bool enterTeamArena(GObject::Player* p, UInt32* cnt)
+{
+    if(!p)
+        return true;
+    /*
+    if(*cnt > 100)
+        return false;
+    */
+
+    ++(*cnt);
+    GObject::teamArenaMgr.enterArena(p);
+    return true;
+}
+
 void OnEnterArena( GameMsgHdr& hdr, const void* data )
 {
+	UInt8 type = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
     UInt32 cnt = 0;
-    GObject::globalPlayers.enumerate(enterArena, &cnt);
+    if(type)
+        GObject::globalPlayers.enumerate(enterTeamArena, &cnt);
+    else
+        GObject::globalPlayers.enumerate(enterArena, &cnt);
+}
+
+struct teamInfo
+{
+    teamInfo() : teamNum(0), cnt(0), tad(NULL) {}
+
+    UInt16 teamNum;
+    UInt16 cnt;
+    GObject::TeamArenaData * tad;
+};
+
+inline bool createTeamArena(GObject::Player* pl, void* data)
+{
+    if(!pl || !data)
+        return true;
+
+	teamInfo* ti = reinterpret_cast<teamInfo*>(const_cast<void *>(data));
+    if(ti->cnt >= ti->teamNum)
+        return false;
+
+    if(pl->getTeamData() && pl->getTeamArena()->leader == pl && !pl->getTeamArena()->isFull() && !ti->tad)
+        ti->tad = pl->getTeamArena();
+    if(!pl->getTeamData() && !ti->tad)
+    {
+        std::string name = Itoa(ti->cnt+uRand(100000));
+        bool res = GObject::teamArenaMgr.createTeam(pl, name);
+        if(res)
+        {
+            ++ ti->cnt;
+            ti->tad = pl->getTeamArena();
+        }
+        return true;
+    }
+    else if(!pl->getTeamData() && ti->tad)
+    {
+        if(ti->tad && !ti->tad->isFull())
+            GObject::teamArenaMgr.addTeamMember(ti->tad->leader, pl);
+        if(ti->tad && ti->tad->isFull())
+            ti->tad = NULL;
+        return true;
+    }
+    return false;
+}
+
+void OnCreateTeamArena( GameMsgHdr& hdr, const void* data )
+{
+	UInt16 num = *reinterpret_cast<UInt16 *>(const_cast<void *>(data));
+    if(num > globalPlayers.size() / 3)
+        num = globalPlayers.size() / 3;
+
+    teamInfo ti;
+    ti.teamNum = num;
+    GObject::globalPlayers.enumerate(createTeamArena, &ti);
+}
+
+void OnAddeamArenaScore( GameMsgHdr& hdr, const void* data )
+{
+	Player * player = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    if(!player) return;
+    TeamArenaData * tad = player->getTeamArena();
+    if(!tad) return;
+    GObject::teamArenaMgr.addTeamScore(tad, 5, 1);
+    GObject::teamArenaMgr.sendTeamInfo(tad);
 }
 
 void OnSHStageOnOff( GameMsgHdr& hdr, const void* data )
@@ -1511,6 +1591,40 @@ void OnSaleItemCancle( GameMsgHdr& hdr, const void * data )
 
     for(int i = 0; i < saleCancelNotify->count; ++ i)
         GObject::gSaleMgr.cancelSale(player, saleCancelNotify->ids[i]);
+}
+
+void OnTeamArenaAddMember( GameMsgHdr& hdr, const void * data )
+{   //战队长邀请 接受
+	MSG_QUERY_PLAYER(player);
+
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    GObject::teamArenaMgr.addTeamMember(pl, player);
+}
+
+void OnTeamArenaApply( GameMsgHdr& hdr, const void * data )
+{   //成员申请 接受
+	MSG_QUERY_PLAYER(player);
+
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    bool hasAdd = GObject::teamArenaMgr.addTeamMember(player, pl);
+    if(hasAdd)
+    {
+        SYSMSG(title, 4218);
+        SYSMSGV(content, 4219, player->getTeamArena()->getName().c_str(), player->getCountry(), player->getName().c_str());
+        pl->GetMailBox()->newMail(player, 0x03, title, content);
+    }
+}
+
+void OnTeamArenaApply1( GameMsgHdr& hdr, const void * data )
+{   //成员申请 拒绝
+	MSG_QUERY_PLAYER(player);
+
+    if(!player->getTeamArena())
+        return;
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    SYSMSG(title, 4236);
+    SYSMSGV(content, 4237, player->getTeamArena()->getName().c_str(), player->getCountry(), player->getName().c_str());
+    pl->GetMailBox()->newMail(player, 0x03, title, content);
 }
 
 #endif // _WORLDINNERMSGHANDLER_H_

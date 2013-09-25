@@ -48,6 +48,7 @@
 #include "Common/Itoa.h"
 #include "Server/SysMsg.h"
 #include "Arena.h"
+#include "ArenaTeam.h"
 #include "Tianjie.h"
 #include "DaysRank.h"
 #include "TownDeamon.h"
@@ -225,6 +226,7 @@ RCSortType World::killMonsterSort[4];
 UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
 Player* World::spreadKeeper = NULL;
 UInt32 World::spreadBuff = 0;
+UInt8 World::_arenaState = 0;      //0:无 1:仙界第一 2:仙界至尊
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -887,6 +889,16 @@ bool enum_clan_midnight(void * ptr, void * data)
 
     clan->ClearDueItemHistory();
     clan->SetDailyBattleScore(0);
+	return true;
+}
+
+bool enum_teamArena_midnight(void * ptr, void * data)
+{
+	TeamArenaData * tad = static_cast<TeamArenaData *>(ptr);
+	if (tad == NULL)
+		return true;
+	UInt32 now = *reinterpret_cast<UInt32 *>(data);
+    tad->checkTimeOver(now);
 	return true;
 }
 
@@ -1858,6 +1870,7 @@ void World::World_Midnight_Check( World * world )
 	globalClans.enumerate(enum_clan_midnight, &curtime);
 	clanManager.reConfigClanBattle();
 	challengeCheck.clear();
+	globalTeamArena.enumerate(enum_teamArena_midnight, &curtime);
 
 	calWeekDay(world);
 	Stream st(REP::DAILY_DATA);

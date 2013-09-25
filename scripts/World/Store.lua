@@ -554,7 +554,7 @@ function loadStore()
         -- 龙魂奇珍
         store:add(14,507,2000)
         store:add(14,509,2000)
-        store:add(14,9427,1500)
+		store:add(14,9427,1500,2)
         -- 龙魂灵宝
         store:add(15,11588,7000)
         store:add(15,11589,7000)

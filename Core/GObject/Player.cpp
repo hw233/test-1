@@ -737,6 +737,7 @@ namespace GObject
         m_ClanBattleSkillFlag = 0;
         _invitedBy = 0;
         m_arenaCommitCD = 0;
+        m_arenaTeamCommitCD = 0;
         _inClanCity = false;
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
@@ -9373,6 +9374,51 @@ namespace GObject
 		return true;
 	}
 
+    bool Player::testCanAddTeamMember(Player * pl)
+    {
+        if(pl == NULL) return false;
+		Mutex::ScopedLock lk(_mutex);
+		Mutex::ScopedLock lk2(pl->getMutex());
+        if(pl->getTeamArena())
+		{
+			sendMsgCode(2, 1336);
+			return false;
+		}
+        if(!getTeamArena())
+		{
+			sendMsgCode(2, 1337);
+			return false;
+		}
+        if(getTeamArena()->leader != this)
+		{
+			sendMsgCode(2, 2009);
+			return false;
+		}
+        if(getTeamArena()->isFull())
+		{
+			sendMsgCode(2, 1335);
+			return false;
+		}
+        if(getTeamArena()->isInArena())
+        {
+            sendMsgCode(0, 1339);
+            return false;
+        }
+        return true;
+    }
+
+    bool Player::checkCanBuyItem(UInt32 itemId, UInt8 type)
+    {
+        UInt8 limitLvl = GData::store.getItem2LimitLevel(itemId, type);
+        if(limitLvl == 0)
+            return true;
+        if(!getTeamArena())
+            return false;
+        if(getTeamArena()->getMemberLvl(this) >= limitLvl)
+            return true;
+        return false;
+    }
+
 	std::string& Player::fixName( std::string& name )
 	{
         if(cfg.merged && !name.empty())if(static_cast<UInt8>(*(name.end() - 1)) >= 32 && !_playerData.name.empty())
@@ -16352,6 +16398,16 @@ namespace GObject
             return true;
 
         m_arenaCommitCD = now + 60;
+        return false;
+    }
+
+    bool Player::inArenaTeamCommitCD()
+    {
+        UInt32 now = TimeUtil::Now();
+        if(now < m_arenaTeamCommitCD)
+            return true;
+
+        m_arenaTeamCommitCD = now + 60;
         return false;
     }
 

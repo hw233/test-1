@@ -868,6 +868,10 @@ namespace ARENAREQ
     const UInt8 COMMIT_LINEUP       = 0x03;
     const UInt8 BET                 = 0x07;
     const UInt8 BATTLE_REPORT       = 0x08;
+    const UInt8 TEAMARENA_ENTER     = 0x10;
+    const UInt8 TEAMARENA_LINEUP    = 0x11;
+    const UInt8 TEAMARENA_INSPIRE   = 0x12;
+    const UInt8 TEAMARENA_CLEAR     = 0x13;
 }
 
 enum CLAN_COPY

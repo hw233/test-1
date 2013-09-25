@@ -36,6 +36,7 @@
 #include "MapCollection.h"
 #include "CountryBattle.h"
 #include "Arena.h"
+#include "ArenaTeam.h"
 #include "GData/NpcGroup.h"
 #include "GData/LootTable.h"
 #include "GData/ExpTable.h"
@@ -185,6 +186,8 @@ namespace GObject
 		IDGenerator::gClanBatterRecordIDGenerator.Init(maxId);
 		execu->Extract("SELECT max(`id`) FROM `athletics_event`", maxId);
 		IDGenerator::gAthleticsEventOidGenerator.Init(maxId);
+		execu->Extract("SELECT max(`id`) FROM `arena_team`", maxId);
+		IDGenerator::gTeamArenaOidGenerator.Init(maxId);
 
 		return true;
 	}
@@ -501,6 +504,22 @@ namespace GObject
             fprintf(stderr, "loadCollectCard error!\n");
             std::abort();
         }
+        if(!loadTeamArenaData())
+        {
+            fprintf(stderr, "loadTeamArenaData error!\n");
+            std::abort();
+        }
+        if(!loadTeamArenaSkill())
+        {
+            fprintf(stderr, "loadTeamArenaSkill error!\n");
+            std::abort();
+        }
+		if(!LoadTeamArenaBets())
+        {
+            fprintf(stderr, "LoadTeamArenaBets error!\n");
+            std::abort();
+        }
+
 
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -6344,6 +6363,77 @@ namespace GObject
         lc.finalize();
         return true;
     }
+
+    bool GObjectManager::loadTeamArenaData()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if(execu.get() == NULL || !execu->isConnected())
+            return false;
+        LoadingCounter lc("Loading TeamArena data");
+        DBTeamArenaData dbtad;
+        if(execu->Prepare("SELECT `id`, `name`, `leader`, `score`, `members`, `stamps`, `memScore`, `maxRank`, `inspireLvl`, `overTime` FROM `arena_team` ORDER BY `id`", dbtad)!= DB::DB_OK)
+            return false;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if(dbtad.id > 0)
+                teamArenaMgr.loadFromDB(dbtad);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadTeamArenaSkill()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if(execu.get() == NULL || !execu->isConnected())
+            return false;
+        LoadingCounter lc("Loading TeamArena skill");
+        DBTeamArenaSkill dbtas;
+        if(execu->Prepare("SELECT `teamId`, `skillId`, `level`, `extra` FROM `arena_team_skill` ORDER BY `teamId`", dbtas)!= DB::DB_OK)
+            return false;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            TeamArenaData * tad = globalTeamArena[dbtas.teamId];
+            if(!tad)
+                continue;
+            if(dbtas.skillId > 0)
+                tad->loadSkillFromDB(dbtas);
+        }
+        lc.finalize();
+        return true;
+    }
+
+	bool GObjectManager::LoadTeamArenaBets()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Team Arena Bets");
+		DBTeamArenaBet ab;
+		if(execu->Prepare("SELECT `id`, `round`, `state`, `group`, `recieved`, `pos`, `tael` FROM `arena_team_bet` ORDER BY `id`", ab)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(ab.id != last_id)
+			{
+				last_id = ab.id;
+				pl = globalPlayers[last_id];
+			}
+			if (pl == NULL)
+				continue;
+			teamArenaMgr.pushBetFromDB(pl, ab.round, ab.state, ab.group, ab.recieved, ab.pos, ab.tael);
+		}
+		lc.finalize();
+
+		return true;
+	}
 
 }
 

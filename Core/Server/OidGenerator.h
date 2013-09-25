@@ -104,6 +104,13 @@ namespace IDGenerator
 		ClanBatterRecordIDGen(UInt32 maxid = 0) : IDGen(maxid) {}
 	};
 
+	class TeamArenaIDGen:
+		public IDGen
+	{
+	public:
+		TeamArenaIDGen(UInt32 maxid = 0) : IDGen(maxid) {}
+	};
+
 	class SeedIDGen:
 		public IDGen
 	{
@@ -139,6 +146,7 @@ namespace IDGenerator
 	typedef OidGenerator<AthleticsRecordIDGen> AthleticsRecordOidGenerator;
 	typedef OidGenerator<ClanBatterRecordIDGen> ClanBatterRecordIDGenerator;
 	typedef OidGenerator<AthleticsEventIDGen> AthleticsEventOidGenerator;
+	typedef OidGenerator<TeamArenaIDGen> TeamArenaOidGenerator;
 
 	extern ItemOidGenerator gItemOidGenerator;
 	extern ChatFgtOidGenerator gChatFgtOidGenerator;
@@ -152,6 +160,7 @@ namespace IDGenerator
 	extern AthleticsRecordOidGenerator gAthleticsRecordOidGenerator;
 	extern ClanBatterRecordIDGenerator gClanBatterRecordIDGenerator;
 	extern AthleticsEventOidGenerator gAthleticsEventOidGenerator;
+	extern TeamArenaOidGenerator gTeamArenaOidGenerator;
 }
 
 
