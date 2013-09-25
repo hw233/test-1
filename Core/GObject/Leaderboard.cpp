@@ -15,6 +15,7 @@
 #include "Common/Itoa.h"
 #include "DaysRank.h"
 #include "Common/StringTokenizer.h"
+#include "FairyPet.h"
 
 namespace GObject
 {
@@ -788,6 +789,7 @@ void Leaderboard::doUpdate()
 
     buildBattlePacket();
     buildPacketForLingbao(_lingbaoStream, 6);
+    buildPacketForPet();
 }
 
 bool Leaderboard::hasUpdate( UInt32 id )
@@ -829,6 +831,10 @@ bool Leaderboard::getPacket( UInt8 t, Stream& st, Player* pl)
     case 6:
         st << std::vector<UInt8>(_lingbaoStream) << Stream::eos;
         makeRankAndValueStream(&st, t, pl, pl->getMaxLingbaoBattlePoint());
+        break;
+    case 8:
+        st << std::vector<UInt8>(_petStream) << Stream::eos;
+        makeRankAndValueStream(&st, t, pl, pl->getMaxPetBattlePoint());
         break;
 	default:
 		return false;
@@ -1019,7 +1025,11 @@ int Leaderboard::getMyRank(Player* pl, UInt8 type , bool setLock)
             if (_lingbaoRank.end() != iter)
                 rank = iter->second;
             break;
-
+        case 8:
+            iter = _petRank.find(pl->getId());
+            if (_petRank.end() != iter)
+                rank = iter->second;
+            break;
       
         default:
             break;
@@ -1066,5 +1076,121 @@ void Leaderboard::eraseLingbaoInfo(LingbaoInfoList lingbaoInfo)
     */
     _lingbaoInfoSet.erase(lingbaoInfo);
 }
+
+void Leaderboard::buildPacketForPet()
+{
+    FastMutex::ScopedLock lk(_petMutex);
+    _petRank.clear();
+    Stream& st = _petStream;
+
+	UInt32 c = static_cast<UInt32>(_petInfoSet.size());
+    TRACE_LOG("_petInfoSet.size() : %u.", static_cast<UInt32>(c));
+	st.init(REP::SORT_LIST);
+    if(c > 100)
+        c = 100;
+	st << static_cast<UInt8>(8) << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(c);
+	//for(UInt8 i = 0; i < c; ++ i)
+    UInt32 i = 0;
+    for (PetInfoSet::iterator it = _petInfoSet.begin(); it != _petInfoSet.end(); ++ it)
+	{
+		const PetInfoList& item = *it;
+        if ((_petRank[item.id] == 0) || (_petRank[item.id] > static_cast<int>(i+1)))
+            _petRank[item.id] = i+1;
+
+        if(i < c)
+        {
+            st << item.name << item.pf << item.country << item.battlePoint << static_cast<UInt16>(item.petId) << item.petLev << item.gengu;
+            for (UInt8 j = 0; j < 3; ++j)
+            {
+                st << item.neidan[j].itemId << item.neidan[j].lv << item.neidan[j].skill;
+                for(UInt8 k = 0; k < 4; ++ k)
+                {
+                    st << item.neidan[j].gems[k];
+                }
+            }
+        }
+        ++ i;
+	}
+	st << Stream::eos;
+}
+
+void Leaderboard::pushPetInfo(FairyPet* pet)
+{
+    if(!pet)
+        return;
+
+    FastMutex::ScopedLock lk(_petMutex);
+    Player* pl = pet->getOwner();
+    if(!pl)
+        return;
+
+    PetInfoSetMap::iterator mapit = _petInfoSetMap.find(pl);
+    if(mapit != _petInfoSetMap.end())
+    {
+        for(; mapit->first == pl; ++ mapit)
+        {
+            PetInfoSetIt setit = mapit->second;
+            const PetInfoList& petInfo = *setit;
+            if(petInfo.petId == pet->getId())
+            {
+                _petInfoSet.erase(petInfo);
+                _petInfoSetMap.erase(mapit);
+            }
+        }
+    }
+
+    PetInfoList petInfo;
+    petInfo.id = pl->getId();
+    petInfo.name = pl->getName();
+    petInfo.pf = pl->getPF();
+    petInfo.country = pl->getCountry();
+    petInfo.battlePoint = pet->getBattlePoint();
+    petInfo.petId = pet->getId();
+    petInfo.petLev = pet->getPetLev();
+    petInfo.gengu = pet->getPetBone();
+    for(UInt8 i = 0; i < PET_EQUIP_UPMAX; ++ i)
+    {
+        ItemPetEq* neidan = pet->findEquip(i);
+        if(!neidan)
+            continue;
+        petInfo.neidan[i].itemId = neidan->GetItemType().getId();
+        petInfo.neidan[i].lv = neidan->getPetEqAttr().lv;
+        petInfo.neidan[i].skill = neidan->getPetEqAttr().skill;
+        for(int j = 0; j < 4; ++ j)
+        {
+            petInfo.neidan[i].gems[j] = neidan->getPetEqAttr().gems[j];
+        }
+    }
+
+    _petInfoSet.insert(petInfo);
+    _petInfoSetMap.insert(std::make_pair(pl, _petInfoSet.find(petInfo)));
+}
+
+void Leaderboard::erasePetInfo(FairyPet* pet)
+{
+    if(!pet)
+        return;
+
+    FastMutex::ScopedLock lk(_petMutex);
+    Player* pl = pet->getOwner();
+    if(!pl)
+        return;
+
+    PetInfoSetMap::iterator mapit = _petInfoSetMap.find(pl);
+    if(mapit != _petInfoSetMap.end())
+    {
+        for(; mapit->first == pl; ++ mapit)
+        {
+            PetInfoSetIt setit = mapit->second;
+            const PetInfoList& petInfo = *setit;
+            if(petInfo.petId == pet->getId())
+            {
+                _petInfoSet.erase(petInfo);
+                _petInfoSetMap.erase(mapit);
+            }
+        }
+    }
+}
+
 
 }
