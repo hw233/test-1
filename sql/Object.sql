@@ -2113,7 +2113,6 @@ CREATE TABLE `collect_card` (
     PRIMARY KEY (`playerId`, `id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-<<<<<<< HEAD
  DROP TABLE IF EXISTS `pray_relation`;                                                                                      
  CREATE TABLE `pray_relation` (
    `id` bigint(20) unsigned NOT NULL,
@@ -2199,3 +2198,15 @@ CREATE TABLE `team_pending_player` (
   `opTime` int(10) unsigned NOT NULL,
   PRIMARY KEY (`teamId`,`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `AirBookData`;
+CREATE TABLE `AirBookData` (
+   `playerId` bigint(20) unsigned NOT NULL,
+   `overTime` int(10) unsigned NOT NULL,
+   `grade`  int(10) unsigned NOT NULL,
+   `recharge`  int(10) unsigned NOT NULL,
+   `recharge`  int(10) unsigned NOT NULL,
+   `flags`  varchar(255) NOT NULL DEFAULT '',
+    PRIMARY KEY (`playerId`,`overTime`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+

@@ -807,7 +807,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+167*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+181*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
       else
@@ -889,6 +889,12 @@ function onActivityCheck(tm)
          setQQBoardLoginTime(true)
       else
          setQQBoardLoginTime(false)
+      end
+
+      if tm >= actTime253 and tm < actTime253_1 then
+         set11Time(true)
+      else
+         set11Time(false)
       end
 
       if tm >= actTime551 and tm < actTime551_1 then
@@ -1117,7 +1123,7 @@ function onActivityCheck(tm)
       setGoldSnakeAct(false)
   end
 
-  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 133*86400) then
+  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 147*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1264,7 +1270,7 @@ function initActTime(y, m, d)
   -- 蜀山好声音合作
   local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 3366合作礼包
-  local  SerStartTm536= { ['year'] = 2013, ['month'] = 8, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm536= { ['year'] = 2013, ['month'] = 9, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- Qzong,pengyou合作礼包
   local  SerStartTm564= { ['year'] = 2013, ['month'] = 8, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm537= { ['year'] = 2012, ['month'] = 12, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1358,7 +1364,7 @@ function initActTime(y, m, d)
   local  SerStartTm234 = { ['year'] = 2013, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm234_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 时装法宝
-  local  SerStartTm235 = { ['year'] = 2013, ['month'] = 6, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm235 = { ['year'] = 2013, ['month'] = 9, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --大闹龙宫活动
   local  SerStartTm236 = { ['year'] = 2013, ['month'] = 1, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm236_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1416,6 +1422,9 @@ function initActTime(y, m, d)
   
   local  SerStartTm252= { ['year'] = 2013, ['month'] = 9, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm252_1= { ['year'] = 2013, ['month'] = 9, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  local  SerStartTm253= { ['year'] = 2013, ['month'] = 9, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm253_1= { ['year'] = 2013, ['month'] = 10, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1817,7 +1826,7 @@ function initActTime(y, m, d)
   actTime234_1= os.time(SerStartTm234_1);
 
   actTime235_0= os.time(SerStartTm235);
-  actTime235_1= os.time(SerStartTm235) + 5 * 86400;
+  actTime235_1= os.time(SerStartTm235) + 14 * 86400;
 
   actTime236_0= os.time(SerStartTm236);
   actTime236_1= os.time(SerStartTm236_1);
@@ -1856,9 +1865,7 @@ function initActTime(y, m, d)
   actTime247_1= os.time(SerStartTm247) + 7*86400;
 
   actTime248= os.time(SerStartTm248)
-  actTime248_1= os.time(SerStartTm248_1);
-
-  actTime249= os.time(SerStartTm249)
+  actTime248_1= os.time(SerStartTm248_1); actTime249= os.time(SerStartTm249)
   actTime249_1= os.time(SerStartTm249_1);
 
   actTime250= os.time(SerStartTm250)
@@ -1867,6 +1874,9 @@ function initActTime(y, m, d)
   actTime251_1= os.time(SerStartTm251_1);
   actTime252= os.time(SerStartTm252)
   actTime252_1= os.time(SerStartTm252_1);
+
+  actTime253= os.time(SerStartTm253)
+  actTime253_1= os.time(SerStartTm253_1);
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

@@ -335,6 +335,8 @@ bool TeamArenaMgr::createTeam(Player * leader, std::string& name)
     sendTeamInfo(tad);
     leader->AddVar(VAR_TEAMARENA_CREATE, 1);
     sendReqInfo(leader, 10);
+    SYSMSG_SENDV(179, leader);
+    SYSMSG_SENDV(1079, leader, tad->getName().c_str());
 
     GameMsgHdr hdr(0x336, leader->getThreadId(), leader, sizeof(money));
     GLOBAL().PushMsg(hdr, &money);
@@ -358,6 +360,9 @@ void TeamArenaMgr::dismissTeam(Player * leader)
     DB1().PushUpdateData("DELETE FROM `arena_team` WHERE `id` = %" I64_FMT "u", tad->getId());
     DB1().PushUpdateData("DELETE FROM `arena_team_skill` WHERE `teamId` = %" I64_FMT "u", tad->getId());
     DB1().PushUpdateData("DELETE FROM `team_pending_player` WHERE `teamId` = %" I64_FMT "u", tad->getId());
+    SYSMSG_SENDV(154, leader);
+    SYSMSG_SENDV(1054, leader, tad->getName().c_str());
+
     delete tad;
     sendReqInfo(leader, 6);
 }
@@ -439,6 +444,11 @@ void TeamArenaMgr::fireTeamMember(Player * leader, UInt64 playerId)
         }
     }
     tad->updateToDB();
+    if(player->isOnline())
+    {
+        SYSMSG_SENDV(153, player);
+        SYSMSG_SENDV(1053, player, leader->getCountry(), leader->getName().c_str(), tad->getName().c_str());
+    }
 
     sendTeamInfo(tad);
     sendReqInfo(player, 6);
@@ -499,7 +509,7 @@ void TeamArenaMgr::setMemberPosition(Player * leader, UInt64 playerId1, UInt64 p
     }
     if(playerId1 == playerId2 || playerId1 == playerId3 || playerId2 == playerId3)
         return;
-    UInt8 tmpScore[TEAMARENA_MAXMEMCNT] = {0};
+    UInt32 tmpScore[TEAMARENA_MAXMEMCNT] = {0};
     Player * temPlayer[TEAMARENA_MAXMEMCNT] = {NULL};
     for(UInt8 i = 0; i < tad->count; ++ i)
     {
@@ -932,7 +942,7 @@ void TeamArenaMgr::addTeamScore(TeamArenaData * tad, UInt8 round, bool isWin)
     for(UInt8 i = 0; i < tad->count; ++ i)
     {
         tad->scores[i] += score;
-        if(tad->members[i])
+        if(tad->members[i] && tad->members[i]->isOnline())
         {
             SYSMSG_SENDV(131, tad->members[i], score);
             SYSMSG_SENDV(1031, tad->members[i], score);
@@ -1523,6 +1533,11 @@ void TeamArenaMgr::calcFinalBet(int i)
                             pos1 = pos1 >> 2;
                             pos2 = pos2 >> 2;
                         }
+                        else if(j > 1)
+                        {
+                            pos1 = pos1 >> 1;
+                            pos2 = pos2 >> 1;
+                        }
                         calcBet(_finals[i][nidx], pos1, j+1, i, true, p);
                         calcBet( _finals[i][_finalIdx[i][j-1][(k - starti) * 2 + 1]], pos2, j+1, i, false, p);
                         //_finals[i][nidx].calcBet(true, p);
@@ -1541,6 +1556,11 @@ void TeamArenaMgr::calcFinalBet(int i)
                         {
                             pos1 = pos1 >> 2;
                             pos2 = pos2 >> 2;
+                        }
+                        else if(j > 1)
+                        {
+                            pos1 = pos1 >> 1;
+                            pos2 = pos2 >> 1;
                         }
                         calcBet(_finals[i][nidx], pos1, j+1, i, true, p);
                         calcBet( _finals[i][_finalIdx[i][j-1][(k - starti) * 2]], pos2, j+1, i, false, p);

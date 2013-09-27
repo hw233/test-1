@@ -24,6 +24,7 @@ namespace Script
 
 namespace GObject
 {
+class Clan;
 struct MoneyIn
 {
     int gold;
@@ -56,12 +57,22 @@ struct RCSort
     UInt32 total;
 };
 
+struct ClanSort   //帮派积分（10· 1活动）
+{
+    GObject::Clan* clan;
+    UInt32 total;
+};   
 struct lt_rcsort
 {
     bool operator()(const RCSort& a, const RCSort& b) const { return a.total >= b.total; }
 };
+struct clan_sort
+{
+    bool operator()(const ClanSort& a, const ClanSort& b) const { return a.total >= b.total; }
+};
 
 typedef std::set<RCSort, lt_rcsort> RCSortType;
+typedef std::set<ClanSort,clan_sort> ClanGradeSort;
 
 struct supportSort
 {
@@ -460,7 +471,6 @@ public:
     { _pexpitems = v; }
     inline static bool getPExpItems()
     { return _pexpitems; }
-
     inline static void setSoSoMapBegin(UInt32 v)
     { _sosomapbegin = v; }
 
@@ -485,6 +495,22 @@ public:
     {   _summerFlow=v; } 
     inline static void  setSummerMeet(bool v)
     {   _summerMeet=v; } 
+    inline static void  set11Time(bool v)
+    {   _11time=v; } 
+    inline static bool  get11Time()
+    {   return false;
+        return _11time; } 
+    inline static UInt32 get11TimeNum(UInt32 time = 0)
+    {
+        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 13);
+        UInt32 now = TimeUtil::Now() ;
+        if(time !=0)
+            now = time;
+        if(now < _11timeBegin || now > _11timeEnd )
+            return -1;
+       return (TimeUtil::SharpDay(0, now) - _11timeBegin )/86400+1; 
+    }
     inline static bool getSummerFlow()
     { 
         UInt32 begin = GVAR.GetVar(GVAR_SUMMER_FLOW_BEGIN);
@@ -996,6 +1022,7 @@ public:
     static bool _foolbao;
     static bool _summerFlow3;
     static bool _surnamelegend;
+    static bool _11time;
     static bool _ryhbActivity;
     static bool _zcjbActivity;
     static bool _halfgold;
@@ -1015,6 +1042,8 @@ public:
     static RCSortType consumeSort;
     static RCSortType popularitySort;
     static RCSortType LuckyBagSort;
+    static RCSortType PlayerGradeSort; //十一活动
+    static ClanGradeSort clanGradeSort; // 十一活动
     static void initRCRank();
     static void initRP7RCRank();
 
@@ -1078,6 +1107,10 @@ public:
     void SendItem9343Award();
     void SendFoolBaoAward();
     void SendSurnameLegendAward();
+    void Send11AirBookAward();
+    void Send11CountryRankAward();
+    void Send11PlayerRankAward();
+    void Send11ClanRankAward();
     void UpdateSnowScore(Player* pl, Player* lover);
     void sendSnowPlayers(Player* pl);
     void DivorceSnowPair(Player* pl);

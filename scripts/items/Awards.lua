@@ -1448,3 +1448,72 @@ function RunLevelAward(player, opt)
     return true;
 end
 
+function RunAirBookOnlineAward(player, cts)
+    local item = {
+        [1] = {{503 ,1},{500, 1},{56, 1},{57,1}},
+        [2] = {{514 ,2},{511, 2},{505, 1},{33,1}},
+        [3] = {{134 ,1},{512, 1},{508, 3},{503,1}},
+        [4] = {{500 ,1},{56, 1},{501, 1},{15,3}},
+        [5] = {{503 ,1},{513, 1},{511, 2},{56,2}},
+        [6] = {{57 ,2},{517, 2},{8000, 1},{9371,3}},
+        [7] = {{9371 ,3},{551, 1},{33, 2},{30,1}},
+        [8] = {{134 ,1},{1325, 1},{30, 1},{514,2}},
+        [9] = {{8000 ,1},{503, 1},{509, 1},{15,3}},
+        [10] = {{515 ,1},{512, 1},{517, 1},{57,2}},
+        [11] = {{507 ,1},{509, 1},{57, 2},{551,1}},
+    };
+    local package = player:GetPackage();
+
+    if cts > 11  or cts <= 0 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
+    end
+    return true
+end
+function RunAirBookLoginAward(player, cts)
+    local item = {
+        [1] = {{56 ,3},{57 , 3},{30, 1}},
+        [2] = {{503 ,1},{56, 3},{57, 3},{9371,2}},
+        [3] = {{503 ,2},{514, 2},{500, 2},{9371,3}},
+        [4] = {{512 ,2},{501, 2},{517, 2},{8000,2}},
+        [5] = {{134 ,2},{509, 2},{1325, 2},{1126,2}},
+        [6] = {{9371 ,3},{500, 3},{134, 2}},
+        [7] = {{9371 ,3},{514, 3},{1325, 2}},
+        [8] = {{1126 ,2},{8000, 2},{501, 2},{51,1}},
+        [9] = {{515 ,2},{513, 2},{500, 2}},
+        [10] = {{551 ,2},{501, 2},{516 , 2}},
+    };
+    local package = player:GetPackage();
+
+    if cts > 10  or cts <= 0 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
+    end
+    return true
+end

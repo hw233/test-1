@@ -149,6 +149,7 @@ bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
 bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
+bool World::_11time = false;
 bool World::_ryhbActivity = false;
 bool World::_zcjbActivity = false;
 bool World::_wansheng= false;
@@ -192,6 +193,8 @@ RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 RCSortType World::popularitySort;
 RCSortType World::LuckyBagSort;
+RCSortType World::PlayerGradeSort;
+ClanGradeSort World::clanGradeSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
 bool World::_killMonsteract = 0;
@@ -301,6 +304,7 @@ bool bXiaoyaoEnd = false;
 bool bFoolBaoEnd =  false;
 bool bHalfGoldEnd = false;
 bool bSurnameLegendEnd = false;
+bool b11TimeEnd = false;
 bool bSnowEnd = false;
 bool bGoldSnakeEnd = false;
 bool bItem9344End = false;
@@ -715,6 +719,20 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 26)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 12)
 
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
@@ -755,6 +773,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 14)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 21)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 28)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 12)
         ))
     {
 #if 0
@@ -1417,6 +1437,7 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bfoolbao = getFoolBao();
     bool bsurnamelegend = getSurnameLegend();
+    bool b11time = get11Time();
     bool bhalfgold = getHalfGold();
     bool bJune = getJune();
     bool bQixi = getQixi();
@@ -1457,6 +1478,7 @@ void World::World_Midnight_Check( World * world )
     bHalfGoldEnd = bhalfgold && !getHalfGold();
     //蜀山传奇掉落活动是否结束
     bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
+    b11TimeEnd = b11time && !get11Time();
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
@@ -1787,6 +1809,20 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 26)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 12)
          
          )
         bRechargeEnd = true;
@@ -1857,6 +1893,8 @@ void World::World_Midnight_Check( World * world )
         world->SendFoolBaoAward();
     if(bSurnameLegendEnd)
         world->SendSurnameLegendAward();
+    if(b11TimeEnd)
+        world->Send11AirBookAward();
     if (bSnowEnd)
         world->SendSnowAward();
     if (bGoldSnakeEnd)
@@ -3173,6 +3211,34 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::LuckyBagSort.insert(s);
         }
     }
+    if (World::get11Time())
+    {
+        UInt32 used = p->GetVar(VAR_11AIRBOOK_GRADE);
+        if (used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::PlayerGradeSort.insert(s);
+        }
+    }
+    return true;
+}
+inline bool clan_enum_grade(GObject::Clan *clan,int)
+{
+    if (World::get11Time())
+    {
+        clan->updataClanGradeInAirBook();
+        UInt32 grade = clan->getGradeInAirBook();
+        if (grade)
+        {
+            ClanSort s;
+            s.clan = clan;
+            s.total = grade;
+            World::clanGradeSort.insert(s);
+        }
+    }
+
     return true;
 }
 inline bool player_enum_rp7rc(GObject::Player * p, int)
@@ -3203,6 +3269,7 @@ void World::initRCRank()
     if (init)
         return;
     GObject::globalPlayers.enumerate(player_enum_rc, 0);
+    GObject::globalClans.enumerate(clan_enum_grade, 0);
     init = true;
 }
 
@@ -3613,6 +3680,138 @@ UInt32 World::getSpreadCount()
 {
     return (GVAR.GetVar(GVAR_SPREAD_CONDITION) >> 8);
 }
+void World::Send11AirBookAward()    //lib待定
+{
+        
+    Send11PlayerRankAward();
+    Send11ClanRankAward();
+    Send11CountryRankAward();
+    World::PlayerGradeSort.clear();
+    World::clanGradeSort.clear();
+}
+void World::Send11PlayerRankAward()
+{
+    World::initRCRank();
+    int pos = 0;
+    static MailPackage::MailItem s_item[][4] = {
+        {{509,30},{515,30},{503,60},{134,30}},
+        {{509,25},{515,25},{503,50},{134,25}},
+        {{509,20},{515,20},{503,40},{134,20}},
+    };
+    static MailPackage::MailItem card = {9276,1};
+    SYSMSG(title, 4950);
+    for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
+    {
+        ++pos;
+        if(pos > 3) break;
+        Player* player = i->player;
+        if (!player)
+            continue;
+        SYSMSGV(content, 4951, pos+1);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, s_item[pos], 4, true);
+            if(pos ==0)
+                mailPackageManager.push(mail->id, &card, 1, true);
+        }
+    }
+}
 
+void World::Send11ClanRankAward()
+{
+    World::initRCRank();
+    int pos = 0;
+    UInt32 ClanAwardID[5] = {134,1325,503,1126,9389};
+    UInt32 ClanAwardNum[][5]={
+        {180,150,180,150,180},
+        {150,120,150,120,150},
+        {100,100,100,75,100},
+        {50,50,50,40,50},
+        {20,20,20,20,30}
+    };
+    ClanGradeSort::iterator i = World::clanGradeSort.begin();
+    for ( ;i != World::clanGradeSort.end(); ++i)
+    {
+        ++pos;
+        UInt32 type = pos ; 
+        Clan* clan = i->clan;
+        if (!clan)
+            continue;
+        if(pos > 3 && pos <8)
+            type = 3;
+        if(pos > 7 )
+        {
+            UInt32 ClanGrade = clan->getGradeInAirBook();
+            if(ClanGrade < 58000)
+                break;
+            else type = 4;
+        }
+    //    SYSMSGV(content, 4947, pos+1);
+      //  Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        //if(mail)
+        //{//
+          //  mailPackageManager.push(mail->id, s_item[pos], 4, true);
+           // if(pos ==0)
+            //    mailPackageManager.push(mail->id, &card, 1, true);
+       // }
+        if(type > 5 ||type<0)
+            continue;
+        for(UInt32 index =0 ; index < 5 ;++ index)
+        {
+            clan->AddItem(ClanAwardID[index],ClanAwardNum[type][index]);       
+        }
+    }
+    
+}
+
+void World::Send11CountryRankAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][5] ={
+         {{503,5},{515,3},{509,3},{134,3},{1325,3}},
+    };
+    ClanGradeSort::iterator i = World::clanGradeSort.begin();
+    UInt32 EM=0,KL=0;
+    UInt8 em=2,kl=0;
+    UInt8 win = 0;
+    for ( ;i != World::clanGradeSort.end()&&( em || kl ); ++i)
+    {
+        Clan* clan = i->clan;
+        if (!clan)
+            continue;
+       if(clan->getCountry() ==0)
+       {
+            UInt32 ClanGrade = clan->getGradeInAirBook();
+            em--;
+            EM += ClanGrade;
+       }
+       else if(clan->getCountry() ==1 )
+       {
+           UInt32 ClanGrade = clan->getGradeInAirBook();  
+           kl--;
+           KL += ClanGrade;
+       }
+    } 
+    if(EM < KL )
+        win = 1 ;
+    SYSMSG(title, 4952);
+    for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (!player)
+            continue;
+        if(player->getCountry() != win)
+            continue;
+        SYSMSGV(content, 4953);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+             mailPackageManager.push(mail->id, s_item[0], 5, true); 
+        }
+    }
+}
 }
 

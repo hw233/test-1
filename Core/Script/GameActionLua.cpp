@@ -159,6 +159,7 @@ namespace Script
 		lua_tinker::def(_L, "getAccRecharge", GObject::World::getAccRecharge);
 		lua_tinker::def(_L, "getGMCheck", GObject::World::getGMCheck);
 		lua_tinker::def(_L, "inActive_opTime_20130531", GObject::World::inActive_opTime_20130531);
+		lua_tinker::def(_L, "get11TimeNum", GObject::World::get11TimeNum);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -230,6 +231,7 @@ namespace Script
 		CLASS_DEF(Player, GetClass);
 		CLASS_DEF(Player, GetTaskMgr);
 		CLASS_DEF(Player, GetPackage);
+		CLASS_DEF(Player, Add11grade);
 		CLASS_DEF(Player, GetPetPackage);
 		CLASS_DEF(Player, GetMailBox);
 		CLASS_DEF(Player, GetFreePackageSize);
@@ -1413,6 +1415,16 @@ namespace Script
         assert(player != NULL);
         return Call<bool>("RunPresentAward", player, val);
     }
+    bool GameActionLua::RunAirBookOnlineAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunAirBookOnlineAward", player, val);
+    }
+    bool GameActionLua::RunAirBookLoginAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunAirBookLoginAward", player, val);
+    }
     bool GameActionLua::RunPrayAward(Player* player, UInt8 val)
     {
         assert(player != NULL);
@@ -1531,6 +1543,10 @@ namespace Script
     UInt8 GameActionLua::GetSthCheckFlag(UInt8 idx)
     {
         return Call<UInt8>("GetSthCheckFlag", idx);
+    }
+    UInt8 GameActionLua::GetGradeCheckFlag(UInt8 idx)
+    {
+        return Call<UInt8>("GetGradeCheckFlag", idx);
     }
     
     UInt8 GameActionLua::EveryDayRoarSoul()

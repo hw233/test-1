@@ -128,7 +128,8 @@ enum PurchaseType
     RetrieveItem                = 117, //物品回收消费
     EnumQzongPYGift             = 118, //Qzong,PY礼包
     SanHunUpForPet              = 119, //三魂升级
-    ArenaTeamConsume            = 120, //跨服战消费
+    TenOneLogin                 = 120,
+    ArenaTeamConsume            = 121, //跨服战消费
     //繁体私有占150～200
 };
 

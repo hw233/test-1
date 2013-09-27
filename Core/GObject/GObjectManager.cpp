@@ -2700,6 +2700,29 @@ namespace GObject
 		}
 
         lc.finalize();
+        // Load player airbook
+        {
+            lc.prepare("Loading player AribookData:");
+            last_id = 0xFFFFFFFFFFFFFFFFull;
+            pl = NULL;
+            DBAirBookData sthdata;
+            if(execu->Prepare("SELECT `playerId`, `overTime`, `grade`, `recharge`,`consume`, `flags` FROM `AirBookData` ORDER BY  `playerId`", sthdata) != DB::DB_OK)
+                return false;
+            lc.reset(1000);
+            while(execu->Next() == DB::DB_OK)
+            {
+                lc.advance();
+                if(sthdata.playerId != last_id)
+                {
+                    last_id = sthdata.playerId;
+                    pl = globalPlayers[last_id];
+                }
+                if(pl == NULL)
+                    continue;
+                pl->GetStrengthenMgr()->LoadOldFromDB(sthdata);
+            }
+            lc.finalize();
+        }
 		/*lc.prepare("Loading mail package:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		DBMailPackageData mpdata;

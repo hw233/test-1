@@ -3638,7 +3638,6 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
 
         pl->setClanSkillFlag(0);
     }
-
     return res;
 }
 
@@ -4849,5 +4848,45 @@ void Clan::setClanSpiritTreeBuff(UInt8 color)
 
 }
 
-
+void Clan::addClanGradeInAirBook(UInt32 grade)
+{
+    _gradeInAirbook += grade;
+}
+void Clan::updataClanGradeInAirBook()
+{
+	Mutex::ScopedLock lk(_mutex);
+    _gradeInAirbook = 0;
+	Members::iterator it = _members.begin();
+	for (; it != _members.end(); ++it)
+	{
+        Player * player = (*it)->player; 
+        if(player == NULL)
+            continue ; 
+        _gradeInAirbook += player->GetVar(VAR_11AIRBOOK_GRADE);
+	}
+	return ;
+}
+void Clan::SendClanMemberGrade(Player* player)
+{
+     Stream st(REP::ACT);
+     st<<static_cast<UInt8>(0x20);
+     st<<static_cast<UInt8>(0x04);
+     size_t offset = st.size();
+     UInt8 pos = 0;
+     st<<pos;
+	Mutex::ScopedLock lk(_mutex);
+    _gradeInAirbook = 0;
+	Members::iterator it = _members.begin();
+	for (; it != _members.end(); ++it)
+	{
+        ++pos;
+        Player * pl = (*it)->player; 
+        if(pl == NULL)
+            continue ; 
+        st<<pl->getName()<<pl->GetVar(VAR_11AIRBOOK_GRADE);
+	}
+    st.data<UInt8>(offset) = pos;
+    st<<Stream::eos;
+    player->send(st);
+}
 }

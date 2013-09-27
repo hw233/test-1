@@ -1349,6 +1349,12 @@ void OnClanSkillLevel( GameMsgHdr& hdr, const void* data )
     player->clanSkillLevelUp(skillId);
     player->setFightersDirty(true);
 }
+void OnWaterSpiritTree( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    //UInt8 skillId = *(UInt8*)(data);
+    player->doStrongInWorld(43);
+}
 
 void OnClanSkillList( GameMsgHdr& hdr, const void* data )
 {
@@ -2270,6 +2276,12 @@ void OnDoStrongInWorld( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     UInt8 id = *reinterpret_cast<const UInt64 *>(data); 
     player->doStrongInWorld(id);
+}
+void OnSend11GradeInfo( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 id = *reinterpret_cast<const UInt64 *>(data); 
+    player->OnSend11GradeInfo(id);
 }
 void OnBePresented( GameMsgHdr &hdr, const void * data)
 {
