@@ -496,7 +496,7 @@ public:
     inline static void  set11Time(bool v)
     {   _11time=v; } 
     inline static bool  get11Time()
-    {   //return false;
+    {   return false;
         return _11time; } 
     inline static UInt32 get11TimeNum(UInt32 time = 0)
     {
