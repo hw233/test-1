@@ -4663,6 +4663,7 @@ namespace GObject
         char str[16] = {0};
         sprintf(str, "F_130822_8");
         udpLog("xuyuanshu", str, "", "", "", "", "act");
+        GameAction()->doStrong(this, SthPrayTree, 0 ,0 );
     }
     void Player::SendOtherInfoForPray(Player* other,UInt32 op)
     {
@@ -4806,6 +4807,7 @@ namespace GObject
         char str[16] = {0};
         sprintf(str, "F_130822_1");
         udpLog("xuyuanshu", str, "", "", "", "", "act");
+        GameAction()->doStrong(this, SthPrayTree, 0 ,0 );
     }
      
     void Player::getPrayAward()
@@ -6817,7 +6819,7 @@ namespace GObject
 
         OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
         writeClanTask();
-        //GameAction()->doStrong(this, SthClanTask, 0 ,0 );
+        GameAction()->doStrong(this, SthClanTask, 0 ,0 );
         return true;
     }
 
@@ -7981,7 +7983,7 @@ namespace GObject
             SetVar(VAR_TOWER_LEVEL, 1);
         }
 
-        sendFeastLoginAct();
+        //sendFeastLoginAct();
 
         if(_clan != NULL)
         {
@@ -12259,13 +12261,13 @@ namespace GObject
             return;
         UInt32 type = GetVar(VAR_SUMMER_MEET_TYPE);
         UInt32 Award = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
-        if(type == 0||Award==1)
+        if(type == 0||Award==1 || type > 3)
             return ;
         UInt8 succ = GameAction()->RunSummerMeetAward(this, type);
         if(succ)
         {
             SetVar(VAR_SUMMER_MEET_TYPE_AWARD, 1);
-            SetVar(VAR_SUMMER_MEET_TYPE,0);
+            SetVar(VAR_SUMMER_MEET_TYPE,5);
             char str[16] = {0};
             sprintf(str, "F_130722_%d", type+4);
             udpLog("shuqihuiliu", str, "", "", "", "", "act");
@@ -14968,7 +14970,7 @@ namespace GObject
             return;
         UInt32 SummerMeetType = GetVar(VAR_SUMMER_MEET_TYPE);
         UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
-        if(SummerMeetType==0 || SummerMeetTypeAward ==0)
+        if(SummerMeetType==0 || SummerMeetTypeAward == 0 || SummerMeetType > 3)
             return ;
         UInt32 SummerMeetLogin = GetVar(VAR_SUMMER_MEET_LOGIN);
         UInt32 SummerMeetRechargeAward = GetVar(VAR_SUMMER_MEET_RECHARGE_AWARD);
@@ -19389,7 +19391,7 @@ void Player::sendQQGameGift1218()
 
 void Player::sendFeastLoginAct()
 {
-    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 || /*!World::getMayDayLoginAct()*/ !World::getFeastLoginAct())
+    if(/*GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0*/GetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY) > 0 || /*!World::getMayDayLoginAct()*/ !World::getFeastLoginAct())
         return;
     //SYSMSGV(title, 4102);
     //SYSMSGV(content, 4103);
@@ -19402,10 +19404,11 @@ void Player::sendFeastLoginAct()
     {
         //MailPackage::MailItem mitem = {1759,1};
         //MailPackage::MailItem mitem = {1763,1};
-        MailPackage::MailItem mitem = {1760,1};
+        //MailPackage::MailItem mitem = {1760,1};
+        MailPackage::MailItem mitem = {9422,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
-    SetVar(VAR_FEAST_LOGIN, 1);
+    SetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY, 1);
 }
 
 void Player::sendTowerLoginAct()
@@ -23892,6 +23895,8 @@ void Player::insertCollectCardDB(UInt8 id)
 
 void Player::addCardFromClanBattle()
 {
+    if(!World::getCollectCardAct())
+        return;
     if(GetVar(VAR_CARD_FROM_CLAN) == 0)
     {
         SetVar(VAR_CARD_FROM_CLAN, 1);
@@ -24380,8 +24385,8 @@ void Player::deletePresent(UInt64 playerId,UInt32 type,UInt32 sendtime)
 
 void Player::checkSendRandFriend()
 {
-    UInt32 thisDay = TimeUtil::SharpDay();
-    UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+    UInt32 thisDay = TimeUtil::SharpDayT();
+    UInt32 endDay = TimeUtil::SharpDayT(6, PLAYER_DATA(this, created));
     if(thisDay <= endDay)
     {
         UInt32 targetVal = GetVar(VAR_CLAWARD2);
@@ -24398,8 +24403,8 @@ void Player::checkSendRandFriend()
 
 void Player::checkSelectPray()
 {
-    UInt32 thisDay = TimeUtil::SharpDay();
-    UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+    UInt32 thisDay = TimeUtil::SharpDayT();
+    UInt32 endDay = TimeUtil::SharpDayT(6, PLAYER_DATA(this, created));
     if(thisDay <= endDay)
     {
         UInt32 targetVal = GetVar(VAR_CLAWARD2);
@@ -24412,6 +24417,10 @@ void Player::checkSelectPray()
             newRC7DayUdpLog(1152, 13);
         }
     }
+}
+void Player::doStrongInWorld(UInt8 type)
+{
+    GameAction()->doStrong(this, type, 0,0);
 }
 
 } // namespace GObject

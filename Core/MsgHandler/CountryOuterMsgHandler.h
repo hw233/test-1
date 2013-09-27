@@ -5017,7 +5017,10 @@ void OnEquipUpgrade( GameMsgHdr& hdr, EquipUpgradeReq& req)
 
     Stream st(REP::EQ_UPGRADE);
     if(res == 0)
+    {
         st << res << fid << newId << Stream::eos;
+         GameAction()->doStrong(player, SthEquipLH, 0, 0);   
+    }
     else
         st << res << fid << req._itemId << Stream::eos;
 
@@ -5773,6 +5776,7 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
             }
             st << Stream::eos;
             player->send(st);
+            GameAction()->doStrong(player, SthSpiritEat, 0, 0);
         }
         break;
     case 0x04:
@@ -6164,6 +6168,13 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
                 mgr->EveryDayRoar();
             }
             break;
+        case 0x06:
+            {
+                UInt8 index = 0;
+                brd >>index;
+                mgr->SetStrengthLevelInfo(index);
+            }
+            break;
         default:
             return;
             break;
@@ -6224,6 +6235,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 4:
                     case 5:
                         jobHunter->OnRequestStart(val);
+                        GameAction()->doStrong(player, SthSerachMo, 0, 0);
                         break;
                     case 10:
                         // 老虎机转盘转动
@@ -6794,6 +6806,7 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                         st << player->GetPetPackage()->equipUpgrade(petId, equipId, idStr);
                         st << Stream::eos;
                         player->send(st);
+                        GameAction()->doStrong(player,SthNeiDanUp, 0, 0);
                     }
                     break;
                 case 0x06:
@@ -6805,6 +6818,7 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                         st << player->GetPetPackage()->MergePetGem(gemId1, gemId2, ogid);
                         st << ogid << Stream::eos;
                         player->send(st);
+                        GameAction()->doStrong(player,SthJingPoFix, 0, 0);
                     }
                     break;
                 case 0x07:

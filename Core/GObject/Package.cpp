@@ -6307,6 +6307,7 @@ namespace GObject
                 ied_equip.spiritAttr.spForm[2] = uRand(4) + 1;
 
                 DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spLev%u` = %u, `spform1` = %u, `spform2` = %d, `spform3` = %u WHERE `id` = %u", form, ied_equip.spiritAttr.spLev[form - 1], ied_equip.spiritAttr.spForm[0], ied_equip.spiritAttr.spForm[1], ied_equip.spiritAttr.spForm[2], equip->getId());
+                GameAction()->doStrong(m_Owner, SthEquipSpirit, 0, 0);
             }
             break;
         case 1:
@@ -6466,6 +6467,7 @@ namespace GObject
 			equiplb->DoEquipBind();
         DB4().PushUpdateData("UPDATE `lingbaoattr` SET `values`='%s', `tongling`=1 WHERE `id`=%u", strValue.c_str(), equipId);
         SendSingleEquipData(equiplb);
+        GameAction()->doStrong(m_Owner, SthBaoJuSpirit, 0, 0);
         return 0;
     }
 
@@ -6527,7 +6529,7 @@ namespace GObject
         m_lbSmeltInfo.maxValue = 1000*gujiFactor[gujiIdx]*itemFactor[itemIdx]*lvFactor[lvIdx]*colorFactor[colorIdx];
 
         sendLingbaoSmeltInfo();
-
+        GameAction()->doStrong(m_Owner, SthGuJiSpirit, 0, 0); 
         DB4().PushUpdateData("INSERT INTO `lingbaosmelt`(`playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u)", m_Owner->getId(), m_lbSmeltInfo.gujiId, m_lbSmeltInfo.itemId, m_lbSmeltInfo.bind, m_lbSmeltInfo.value, m_lbSmeltInfo.maxValue);
 
         return 0;

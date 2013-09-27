@@ -1813,6 +1813,7 @@ bool ClanCity::playerEnter(Player * player)
     player->getSurnameLegendAward(e_sla_cb);
     cl->addMemberActivePoint(player, 15, e_clan_actpt_clan_city);
 	player->setInClanCity(true);
+    GameAction()->doStrong(player, SthMSCG, 0, 0);  
     CCBPlayerMap::iterator it = m_players.find(player);
     if(it == m_players.end())
     {
@@ -1864,7 +1865,6 @@ bool ClanCity::playerEnter(Player * player)
         UInt8 pos = pl->pos;
         m_spots[pos].sendAliveInfo(pl);
     }
-    //GameAction()->doStrong(player, SthMSCG, 0, 0);  
     return true;
 }
 

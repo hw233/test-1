@@ -250,6 +250,7 @@ namespace GObject
             updateToDB(2, getLevel());
             if(GET_REMAINDER(getPetLev()))
                 _owner->sendMsgCode(0, 4000);
+            GameAction()->doStrong(_owner, SthPinJieUp, 0, 0); 
         }
         else
         { //失败
@@ -260,6 +261,7 @@ namespace GObject
                 _owner->sendMsgCode(0, 4001);
             UInt8 value = GET_REMAINDER(getPetLev()) + 10;
             _owner->fairyPetUdpLog(10000, value > 10 ? value : 20);
+            GameAction()->doStrong(_owner, SthPinJieUp, 0, 0); 
         }
         sendPinjieInfo();
         UpdateToDB();
@@ -291,6 +293,7 @@ namespace GObject
                 updateToDB(2, getLevel());
                 isSucc = 1;
                 break;
+                GameAction()->doStrong(_owner, SthPinJieUp, 0, 0); 
             }
             else
             {   //失败
@@ -398,6 +401,7 @@ namespace GObject
             int num = getChongNum() + chong - ggd->limit;
             if(num > 0)
                 addGenguBless(num * 100);
+            GameAction()->doStrong(_owner, SthGenguUp, 0, 0); 
         }
         else
         {
@@ -425,6 +429,7 @@ namespace GObject
             int num = getChongNum() + chong - ggd->limit;
             if(num > 0)
                 addGenguBless(num * 100);
+            GameAction()->doStrong(_owner, SthGenguUp, 0, 0); 
         }
         addChongNum(chong);
         sendGenguInfo();

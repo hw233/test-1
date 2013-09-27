@@ -47,7 +47,7 @@ namespace GObject
         SthCHTownDeamon, //镇守聚魂阵
         SthActSignIn,    //活跃度签到
         SthChallenge,    //切磋
-/*        SthMSCG = 40,   //墨守成规
+        SthMSCG = 40,   //墨守成规
         SthClanTask,  //帮派任务
         SthLastDay,  //末日之战
         SthClanSpirit, //神魔之树
@@ -68,7 +68,7 @@ namespace GObject
         SthEquipSpirit,//装备注灵
         SthGuJiSpirit, //古籍唤灵
         SthBaoJuSpirit, //宝具通灵
- */       SthMaxFlag,      //标志记录的个数
+        SthMaxFlag,      //标志记录的个数
     };
 #define STRONGTYPE_CNT 2
 #define STRONGBOX_CNT 6
@@ -112,7 +112,9 @@ namespace GObject
             void UpdateFlag(UInt8 idx, UInt8 v);
             bool CheckTimeOver(UInt32 now = TimeUtil::Now());
             void SendStrengthenInfo();
+            void SendStrengthLevelInfo();
             void SendStrengthenRank();
+            void SetStrengthLevelInfo(UInt8 type);
             void SendOpenChestsInfo(UInt8 boxId, UInt8 index);
             void EveryDayRoar();
             bool CanOpenGreenBox(UInt8 type, UInt32 onlineTime);

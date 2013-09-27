@@ -1067,11 +1067,11 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                515,    2,
-                1325,   2,
-                9360,   2,
-                517,    4,
-                501,    4,
+                551,    3,
+                509,    2,
+                134,    2,
+                513,    4,
+                549,    1,
                 1126,   3,
             };
 
@@ -3099,8 +3099,8 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_SUMMER_MEET_RECHARGE_AWARD, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN_AWARD, 0);
-                pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE, 0);
-                pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
+                 //pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE, 0);
+                //pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
             //    pl->checLuckyMeet();
             }
             break;

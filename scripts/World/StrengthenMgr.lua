@@ -5,7 +5,7 @@ local checkFlag = {
     [1] = 1, --SthTaskHook,  //挂机
     [2] = 1, --SthHookUse,  //使用挂机加速符
     [3] = 24, --SthHookSpeed,  //挂机加速
-    [4] = 3, --SthDungeon,   //决战之地
+    [4] = 6, --SthDungeon,   //决战之地
     [5] = 2, --SthBoss,      //世界BOSS
     [6] = 1, --SthCountryWar,//阵营战
     [7] = 1, --SthPractice,  --修炼
@@ -41,7 +41,7 @@ local checkFlag = {
     [37] = 1, --SthCHTownDeamon,   --镇守锁妖塔
     [38] = 1, --SthActSignIn,   --活跃度签到
     [39] = 1, --SthActSignIn,   --切磋斗剑
---[[    [40] = 1,--   SthMSCG ,     //墨守成规
+    [40] = 1,--   SthMSCG ,     //墨守成规
     [41] = 5,--   SthClanTask,  //帮派任务
     [42] = 1,--  SthLastDay，  //末日之战
     [43] = 1,--    SthClanSpirit, //神魔之树
@@ -62,7 +62,6 @@ local checkFlag = {
     [58] = 1,--    SthEquipSpirit , //装备注灵
     [59] = 1,--   SthGuJiSpirit , //古籍唤灵
     [60] = 1,--    SthBaoJuSpirit , //宝具通灵
---]]
 }
 
 --增加的变强之魂
@@ -107,12 +106,12 @@ local addSouls = {
     [37] = 1, --SthCHTownDeamon,   --镇守锁妖塔
     [38] = 1, --SthActSignIn,   --活跃度签到
     [39] = 1, --SthActSignIn,   --切磋斗剑
---[[    [40] = 5,--   SthMSCG ,     //墨守成规
+    [40] = 5,--   SthMSCG ,     //墨守成规
     [41] = 1,--   SthClanTask,  //帮派任务
     [42] = 5,--  SthLastDay，  //末日之战
     [43] = 1,--    SthClanSpirit, //神魔之树
     [44] = 1,--    SthPrayTree ,  //许愿树
-    [45] = 1,--    SthSerachMo ,    //寻墨 
+    [45] = 3,--    SthSerachMo ,    //寻墨 
     [46] = 1,--  SthFuwenJIe ,   //符文解封
     [47] = 1,--    SthFuwenRong,  //符文熔炼
     [48] = 1,--   SthSkillUp ,   //个人技能提升
@@ -128,7 +127,6 @@ local addSouls = {
     [58] = 1,--    SthEquipSpirit , //装备注灵
     [59] = 1,--   SthGuJiSpirit , //古籍唤灵
     [60] = 1,--    SthBaoJuSpirit , //宝具通灵
---]]
 }
 
 --某一项的最大值

@@ -409,6 +409,7 @@ namespace GObject
         }
         if(isDirty)
         {
+            GameAction()->doStrong(m_owner, SthStoreFix, 0, 0);  
             m_owner->sendMsgCode(0, 1363);
             sendAtkPhyInfo();
             m_owner->setFightersDirty(true);

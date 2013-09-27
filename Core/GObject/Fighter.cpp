@@ -5083,6 +5083,7 @@ bool Fighter::practiceLevelUp()
     {
         sendModification(6, _pexp);
         st << static_cast<UInt8>(0) << m_2ndSoul->getPracticeLevel();
+        GameAction()->doStrong(_owner, SthSpiritUp, 0, 0);
     }
     else
         st << static_cast<UInt8>(1);
@@ -5090,6 +5091,7 @@ bool Fighter::practiceLevelUp()
     st << Stream::eos;
 
     _owner->send(st);
+       
     return true;
 }
 
@@ -5708,7 +5710,7 @@ void Fighter::SSOpen(UInt16 id)
             _owner->sendMsgCode(0, 1024);
         }
     }
-    //GameAction()->doStrong(_owner,SthFuwenJIe, 0, 0);
+    GameAction()->doStrong(_owner,SthFuwenJIe, 0, 0);
 }
 
 UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
@@ -5814,7 +5816,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
 
     SSUpdate2DB(id, ss);
     _owner->sendMsgCode(0, 1025);
-     //GameAction()->doStrong(_owner, SthFuwenRong, 0, 0);  
+    GameAction()->doStrong(_owner, SthFuwenRong, 0, 0);  
     return ret;
 }
 
@@ -6225,6 +6227,7 @@ bool Fighter::upgradeXingchen(UInt8 type)
     SYSMSG_SENDV(4918, _owner, stxc->consume);
     sendXingchenInfo(type);
     _owner->sendMsgCode(0, 4005);
+    GameAction()->doStrong(_owner, SthXingchen, 0, 0); 
     return true;
 }
 
@@ -6284,6 +6287,7 @@ bool Fighter::quickUpGrade(UInt8 type)
     }
 
     sendXingchenInfo(type);
+    GameAction()->doStrong(_owner, SthXingchen, 0, 0); 
 
     return true;
 }

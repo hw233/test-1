@@ -8,6 +8,7 @@
 #include "MsgID.h"
 #include <event2/buffer.h>
 #include "MsgHandler/JsonParser.h"
+#include "MsgHandler/GMHandler.h"
 
 namespace Network
 {
@@ -239,6 +240,12 @@ void GameClient::onRecv( int cmd, int len, void * buf )
             if (_chk != m_OldChk)
                 return;
         }
+    }
+
+    if(gmHandler._printMsgPlayer != 0 && pl == gmHandler._printMsgPlayer)
+    {
+        fprintf(stdout, "Recv::PlayerMsg_XXXXXXXX: cmd[%x], thrd[%u], len[%u]\n", cmd, thrd, len);
+        fflush(stdout);
     }
 
 	if(thrd == WORKER_THREAD_LOGIN)

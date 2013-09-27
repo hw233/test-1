@@ -447,7 +447,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 	bsim.start();
     player->setJusticeRoar(0);
     dpi.justice_roar[dpi.difficulty] = 0;
-    DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice_roar` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.justice_roar[dpi.difficulty], _id, player->getId());
+    DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice_roar` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u AND `difficulty` = %u", dpi.justice_roar[dpi.difficulty], _id, player->getId(), dpi.difficulty);
 
 	Stream& packet = bsim.getPacket();
 	if(packet.size() <= 8)
@@ -532,7 +532,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
     {
         dpi.justice_roar[dpi.difficulty] = 0;
         dpi.justice[dpi.difficulty] = 0;
-        DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u, `justice_roar` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.justice[dpi.difficulty], dpi.justice_roar[dpi.difficulty], _id, player->getId());
+        DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u, `justice_roar` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u AND `difficulty` = %u", dpi.justice[dpi.difficulty], dpi.justice_roar[dpi.difficulty], _id, player->getId(), dpi.difficulty);
 		return true;
     }
 	leaveLevel(player, level, dpi.difficulty);
@@ -540,7 +540,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
     if(dpi.justice[dpi.difficulty] < 100)
     {
         dpi.justice[dpi.difficulty] += 5;
-        DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.justice[dpi.difficulty], _id, player->getId());
+        DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u AND `difficulty` = %u", dpi.justice[dpi.difficulty], _id, player->getId(), dpi.difficulty);
     }
 
     // TODO:
@@ -571,13 +571,13 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 		if(dpi.firstPass[dpi.difficulty] == 0)
 		{
 			dpi.firstPass[dpi.difficulty] = TimeUtil::Now();
-			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u, `firstPass` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.level[dpi.difficulty], dpi.totalCount[dpi.difficulty], dpi.firstPass[dpi.difficulty], _id, player->getId());
+			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u, `firstPass` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u AND `difficulty` = %u", dpi.level[dpi.difficulty], dpi.totalCount[dpi.difficulty], dpi.firstPass[dpi.difficulty], _id, player->getId(), dpi.difficulty);
 
             //第一次通关给荣誉
             GameAction()->doAttainment(player, 10354, _id);
 		}
 		else
-			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.level[dpi.difficulty], dpi.totalCount[dpi.difficulty], _id, player->getId());
+			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u AND `difficulty` = %u", dpi.level[dpi.difficulty], dpi.totalCount[dpi.difficulty], _id, player->getId(), dpi.difficulty);
 		r = true;
 		DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %" I64_FMT "u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id, TimeUtil::SharpDay(0), TimeUtil::Now());
 
@@ -1079,6 +1079,7 @@ void Dungeon::leaveLevel( Player * player, UInt8 level,UInt8 difficulty )
 
 void Dungeon::updateToDB( Player * player, DungeonPlayerInfo& dpi )
 {
+    checkForTimeout( player, dpi, false);
 	DB3().PushUpdateData("REPLACE INTO `dungeon_player`(`id`, `playerId`, `difficulty`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u)", _id, player->getId(), dpi.difficulty, dpi.level[dpi.difficulty], dpi.count[dpi.difficulty], dpi.totalCount[dpi.difficulty], dpi.firstPass[dpi.difficulty], dpi.counterEnd);
 
 	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = %d, `dungeonCnt1` = %d, `dungeonEnd` = %u where `id` = %" I64_FMT "u", PLAYER_DATA(player, dungeonCnt),  PLAYER_DATA(player, dungeonCnt1), PLAYER_DATA(player, dungeonEnd), player->getId());
@@ -1246,7 +1247,7 @@ void Dungeon::doJusticeRoar(Player* pl)
         return;
     }
 
-    DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u, `justice_roar` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.justice[dpi.difficulty], dpi.justice_roar[dpi.difficulty], _id, pl->getId());
+    DB3().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u, `justice_roar` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u AND `difficulty` = %u", dpi.justice[dpi.difficulty], dpi.justice_roar[dpi.difficulty], _id, pl->getId(), dpi.difficulty);
     Stream st(REP::COPY_DATA_UPDATE);
     st << static_cast<UInt8>(7) << _id << dpi.difficulty << dpi.justice[dpi.difficulty] << Stream::eos;
     pl->send(st);

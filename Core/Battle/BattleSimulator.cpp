@@ -3430,7 +3430,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     }
                 }
 
-                bo = getTherapyTarget2(bf, excepts, exceptCnt, isFirst);
+                bo = getTherapyTarget3(bf, excepts, exceptCnt, isFirst);
                 isFirst = false;
 
             }while(--cnt);
@@ -3482,7 +3482,16 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         else if(0 == skill->area)
         {
             // 暂时假定只有单体技能能按照百分比回血
-            BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+            BattleFighter* bo;
+            // 回春术
+            if(SKILL_ID(skill->getId()) == 11)
+            {
+                UInt8 excepts[25] = {0};
+                size_t exceptCnt = 0;
+                bo = getTherapyTarget2(bf, excepts, exceptCnt);
+            }
+            else
+                bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
             if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                 return false;
 
@@ -5063,20 +5072,15 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
 {
     UInt8 side = bf->getSide();
     BattleFighter* bo = NULL;
-    BattleFighter* retbo = NULL;
-    BattleFighter* boSummon = NULL;
-    UInt32 maxHpLost = 0;
-    UInt8 pos = 0;
+    float maxHpLost = 0;
+    BattleFighter* minBloodBo = NULL;
+    float curHpLost;
+
     for(UInt8 i = 0; i < 25; ++ i)
     {
         bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu() || bo->isSoulOut() || (isFirst && bo->isPet()))
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu() || bo->isSoulOut() || (isFirst && bo->isPet()) || bo->isSummon())
             continue;
-        if(bo->isSummon())
-        {
-            boSummon = bo;
-            continue;
-        }
 
         bool except = false;
         for(size_t j = 0; j < exceptCount; ++ j)
@@ -5094,42 +5098,30 @@ BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * exc
         UInt32 maxHp = bo->getMaxHP();
         if(hp < (maxHp >> 1))
         {
-            return bo;
-        }
-
-        if(maxHp - hp > maxHpLost)
-        {
-            maxHpLost = maxHp - hp;
-            pos = i;
+            curHpLost = (static_cast<float>(maxHp - hp)) / maxHp;
+            if(curHpLost > maxHpLost)
+            {
+                maxHpLost = curHpLost;
+                minBloodBo = bo;
+            }
         }
     }
 
-    if(maxHpLost != 0)
-        retbo = static_cast<BattleFighter*>(getObject(side, pos));
-    else if(boSummon && boSummon->getHP() < boSummon->getMaxHP())
-        retbo = boSummon;
-
-    return retbo;
+    return minBloodBo;
 }
 
-BattleFighter* BattleSimulator::getTherapyTarget3(BattleFighter* bf, UInt8 * excepts, size_t exceptCount)
+BattleFighter* BattleSimulator::getTherapyTarget3(BattleFighter* bf, UInt8 * excepts, size_t exceptCount, bool isFirst)
 {
     UInt8 side = bf->getSide();
     BattleFighter* bo = NULL;
     BattleFighter* retbo = NULL;
-    BattleFighter* boSummon = NULL;
-    UInt32 maxHpLost = 0;
+    float maxHpLost = 0;
     UInt8 pos = 0;
     for(UInt8 i = 0; i < 25; ++ i)
     {
         bo = static_cast<BattleFighter*>(getObject(side, i));
-        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu() || bo->isSoulOut())
+        if(bo == NULL || bo->getHP() == 0 || bo->hasFlag(BattleFighter::IsMirror) || bo->isLingQu() || bo->isSoulOut() || (isFirst && bo->isPet()) || bo->isSummon())
             continue;
-        if(bo->isSummon())
-        {
-            boSummon = bo;
-            continue;
-        }
 
         bool except = false;
         for(size_t j = 0; j < exceptCount; ++ j)
@@ -5146,17 +5138,15 @@ BattleFighter* BattleSimulator::getTherapyTarget3(BattleFighter* bf, UInt8 * exc
         UInt32 hp = bo->getHP();
         UInt32 maxHp = bo->getMaxHP();
 
-        if(((float)(maxHp - hp))/maxHp > ((float)(maxHpLost))/maxHp)
+        if(((float)(maxHp - hp))/maxHp > maxHpLost)
         {
-            maxHpLost = maxHp - hp;
+            maxHpLost = ((float)(maxHp - hp))/maxHp;
             pos = i;
         }
     }
 
-    if(maxHpLost != 0)
+    if(maxHpLost > 0.001f)
         retbo = static_cast<BattleFighter*>(getObject(side, pos));
-    else if(boSummon && boSummon->getHP() < boSummon->getMaxHP())
-        retbo = boSummon;
 
     return retbo;
 }
@@ -5260,6 +5250,19 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             }
             else if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
             {
+                if(SKILL_ID(skill->getId()) == 45)
+                {
+                    if(bo->hasFlag(BattleFighter::IsMirror) || bo->isSummon())
+                    {
+                        UInt8 excepts[25] = {0};
+                        size_t exceptCnt = 0;
+                        bo = getTherapyTarget3(bf, excepts, exceptCnt);
+                        if(!bo)
+                            return rcnt;
+                        target_side = bo->getSide();
+                        target_pos = bo->getPos();
+                    }
+                }
                 if (doSkillAttack(bf, skill, target_side, target_pos, 1))
                 {
                     ++ rcnt;
@@ -5564,7 +5567,13 @@ UInt32 BattleSimulator::doAttack( int pos )
             }
 
             // do active skill
+#if 0
             BattleFighter* therapy_bf = getTherapyTarget(bf);
+#else
+            UInt8 excepts[25] = {0};
+            size_t exceptCnt = 0;
+            BattleFighter* therapy_bf = getTherapyTarget2(bf, excepts, exceptCnt);
+#endif
             skill = bf->getActiveSkill(therapy_bf!= NULL, noPossibleTarget);
             if(bf->getBuddhaLightLast() == 0xFF)
                 initBuddhaLight(bf, false, false);
@@ -7330,7 +7339,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             _winner = testWinner();
             if(_winner != 0)
                 return true;
-            else
+            else if(bIfDead)
             {
                 doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
             }
@@ -10492,7 +10501,15 @@ void BattleSimulator::doSkillEffectExtra_SelfSideBufAura(BattleFighter* bf, int 
 void BattleSimulator::doSkillEffectExtra_HpShield(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
     // 增加hp百分比的护盾
-    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+    BattleFighter* bo;
+    if(skill && SKILL_ID(skill->getId()) == 50)
+    {
+        UInt8 excepts[25] = {0};
+        size_t exceptCnt = 0;
+        bo = getTherapyTarget3(bf, excepts, exceptCnt);
+    }
+    else
+        bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
     if(!bo)
         return;
     if (!bo->isChar())
@@ -10519,8 +10536,11 @@ void BattleSimulator::doSkillEffectExtra_SelfBleed(BattleFighter* bf, int target
 void BattleSimulator::doSkillEffectExtra_RandomShield(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
     // 随机选择上护盾
-    UInt8 myPos = bf->getPos();
-    BattleFighter* bo = getRandomFighter(bf->getSide(), &myPos, 1);
+    //UInt8 myPos = bf->getPos();
+    //BattleFighter* bo = getRandomFighter(bf->getSide(), &myPos, 1);
+    UInt8 excepts[25] = {0};
+    size_t exceptCnt = 0;
+    BattleFighter* bo = getTherapyTarget3(bf, excepts, exceptCnt);
     if(!bo)
         return;
     if (!bo->isChar())
@@ -10617,8 +10637,16 @@ void BattleSimulator::doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int ta
 void BattleSimulator::doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
     // 为目标单位100%发动援护
-    BattleObject * bo = getObject(target_side, target_pos);
-    if (!bo->isChar())
+    BattleObject* bo;
+    if(skill && SKILL_ID(skill->getId()) == 51)
+    {
+        UInt8 excepts[25] = {0};
+        size_t exceptCnt = 0;
+        bo = getTherapyTarget3(bf, excepts, exceptCnt);
+    }
+    else
+        bo = getObject(target_side, target_pos);
+    if (!bo || !bo->isChar())
         return;
     BattleFighter * area_target = static_cast<BattleFighter *>(bo);
     //area_target->setPetProtect100(skill->effect->efv[eftIdx], skill->effect->efl[eftIdx]);
@@ -10841,6 +10869,39 @@ void BattleSimulator::doShieldHPAttack(BattleFighter* bo, UInt32& dmg)
     if(bo->isSoulOut())
     {
         dmg = 0;
+        return;
+    }
+
+    const GData::SkillBase* skill = bo->getBiLanTianYiSkill();
+    if(skill && skill->effect && bo->getEvadeCnt() > 2)
+    {
+        dmg = 0;
+        bo->minusEvadeCnt(3);
+        UInt8 evadeCnt = bo->getEvadeCnt();
+        appendDefStatus(e_skill, skill->getId(), bo);
+        if(evadeCnt == 0)
+            appendDefStatus(e_unBiLanTianYi, evadeCnt, bo);
+        else
+            appendDefStatus(e_biLanTianYi, evadeCnt, bo);
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        const std::vector<float>& efv = skill->effect->efv;
+        size_t cnt = eft.size();
+        if(cnt == efl.size() && cnt == efv.size())
+        {
+            for(size_t i = 0; i < cnt; ++ i)
+            {
+                if(eft[i] == GData::e_eft_bi_lan_tian_yi)
+                {
+                    float hp = bo->getMaxHP() * (skill->effect->efv[i]);
+                    if (hp < 1.0f)
+                        break;
+                    bo->addHpShieldSelf(hp, skill->effect->efl[i]);
+                    appendDefStatus(e_hpShieldSelf, hp, bo);
+                    break;
+                }
+            }
+        }
         return;
     }
 
@@ -11583,7 +11644,7 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
 {
     if(!bf)
         return;
-
+#if 0
     const GData::SkillBase* skill = bf->getBiLanTianYiSkill();
     if(skill && skill->effect && bf->getEvadeCnt() > 2)
     {
@@ -11616,7 +11677,7 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
         }
         return;
     }
-
+#endif
     float& shieldHp = bf->getHpShieldSelf();
     if(shieldHp > 0.001f)
     {
