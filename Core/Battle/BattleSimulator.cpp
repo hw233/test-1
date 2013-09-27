@@ -518,6 +518,21 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
                         flag2 |= BattleFighter::AthlEnh8;
                     if (_player[i]->getBuffData(PLAYER_BUFF_ATHL9, now) > 0)
                         flag2 |= BattleFighter::AthlEnh9;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL11, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh31;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL22, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh32;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL33, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh33;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL44, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh34;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL55, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh35;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL66, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh36;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL77, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh37;
+                    
                 }
                 flag2 |= _player[i]->getAthlRivalBuff();
             }

@@ -716,6 +716,7 @@ void Athletics::awardMartial(Player* defer, bool win)
         UInt8 index;
         UInt8 category;
         UInt32 bufFlag;
+        UInt32 bufFlag2;
         index = PlayerPInfo.eSelectIndex;
         if(index== 0 || index > 5)
             index = 1;
@@ -726,6 +727,9 @@ void Athletics::awardMartial(Player* defer, bool win)
                 category = 0;
             bufFlag = 1 << category;
             _owner->adjustAthlBuffData(bufFlag);
+
+            bufFlag2 = 1 << (16 + PlayerPInfo.eRivalType[i] - 1);
+            _owner->adjustAthlBuffData2(bufFlag2);
         }
 
         //la.prestige = 10 * (World::_wday == 3 ? 2 : 1);
@@ -1067,7 +1071,7 @@ void Athletics:: PayForKillCD(UInt8 type)
    GLOBAL().PushMsg(hdr, &msg);
 }
 
-UInt8 getRivalRandomDiffculty()
+/*UInt8 getRivalRandomDiffculty()
 {
     UInt16 rate;
     UInt8 rivalDiffculty;
@@ -1085,6 +1089,30 @@ UInt8 getRivalRandomDiffculty()
      else if(rate >= 976)
         rivalDiffculty = 2;
      else if(rate >= 972)
+        rivalDiffculty = 1;
+     else
+        rivalDiffculty = 0;
+    return rivalDiffculty;
+}*/
+
+UInt8 getRivalRandomDiffculty()
+{
+    UInt16 rate;
+    UInt8 rivalDiffculty;
+    rate = uRand(1000);
+    if(rate >= 970)
+        rivalDiffculty = 7;
+    else if(rate >= 940)
+        rivalDiffculty = 6;
+    else if(rate >= 910)
+        rivalDiffculty = 5;
+     else if(rate >= 880)
+        rivalDiffculty = 4;
+     else if(rate >= 850)
+        rivalDiffculty = 3;
+     else if(rate >= 820)
+        rivalDiffculty = 2;
+     else if(rate >= 790)
         rivalDiffculty = 1;
      else
         rivalDiffculty = 0;

@@ -142,8 +142,16 @@ namespace GObject
 #define PLAYER_BUFF_CLANTREE2       0x61
 #define PLAYER_BUFF_CLANTREE3       0x62
 
-#define PLAYER_BUFF_DISPLAY_MAX		0x63
-#define PLAYER_BUFF_COUNT			0x63
+#define PLAYER_BUFF_ATHL11          0x71 // 魔
+#define PLAYER_BUFF_ATHL22          0x72 // 神
+#define PLAYER_BUFF_ATHL33          0x73 // 虚
+#define PLAYER_BUFF_ATHL44          0x74 // 义
+#define PLAYER_BUFF_ATHL55          0x75 // 影
+#define PLAYER_BUFF_ATHL66          0x76 // 狂
+#define PLAYER_BUFF_ATHL77          0x77 // 侠
+
+#define PLAYER_BUFF_DISPLAY_MAX		0x78
+#define PLAYER_BUFF_COUNT			0x78
 #define PLAYER_BUFF_START           0x80
 
 #define CLAN_TASK_MAXCOUNT          5       // ????ÿ????????????
@@ -2360,6 +2368,7 @@ namespace GObject
         void recvYBBuf(UInt8 type);
         void sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf, UInt8 joy = 0);
         void adjustAthlBuffData(UInt32 type);
+        void adjustAthlBuffData2(UInt32 type);
         void sendAthlBufInfo();
 
         bool hasRealItemAward(UInt32 id);
