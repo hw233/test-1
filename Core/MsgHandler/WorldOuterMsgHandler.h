@@ -1977,6 +1977,20 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
             GObject::teamArenaMgr.searchTeam(player, name, 1);
         }
         break;
+    case 23:
+        GObject::teamArenaMgr.listTeamPending(player);
+        break;
+    case 24:
+        {
+            UInt8 opt = 0;
+            UInt64 inviteeId = 0;
+            brd >> opt >> inviteeId;
+            if(opt)
+                GObject::teamArenaMgr.declineApply(player, inviteeId);
+            else
+                GObject::teamArenaMgr.acceptApply(player, inviteeId);
+        }
+        break;
 	}
 }
 

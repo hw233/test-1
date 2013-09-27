@@ -772,29 +772,6 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			updateMail(mail);
 		}
 		break;
-	case 0x15:  //组队跨服战 成员申请
-		{
-			Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
-			if(pl == NULL)
-				return;
-			mail->flag = 0x85;
-			if(action == 0)
-			{
-                GameMsgHdr hdr(0x169, WORKER_THREAD_WORLD, _owner, sizeof(Player *));
-                GLOBAL().PushMsg(hdr, &pl);
-				SYSMSG(content, 214);
-				mail->content = content;
-			}
-			else
-			{
-                GameMsgHdr hdr(0x170, WORKER_THREAD_WORLD, _owner, sizeof(Player *));
-                GLOBAL().PushMsg(hdr, &pl);
-				SYSMSG(content, 215);
-				mail->content = content;
-			}
-			updateMail(mail);
-		}
-		break;
 	case 0x05:  // 交易
 		{
 			if (_owner->GetTrade()->addTradeMailItems(mail->additional))

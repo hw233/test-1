@@ -1601,30 +1601,4 @@ void OnTeamArenaAddMember( GameMsgHdr& hdr, const void * data )
     GObject::teamArenaMgr.addTeamMember(pl, player);
 }
 
-void OnTeamArenaApply( GameMsgHdr& hdr, const void * data )
-{   //成员申请 接受
-	MSG_QUERY_PLAYER(player);
-
-	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
-    bool hasAdd = GObject::teamArenaMgr.addTeamMember(player, pl);
-    if(hasAdd)
-    {
-        SYSMSG(title, 4218);
-        SYSMSGV(content, 4219, player->getTeamArena()->getName().c_str(), player->getCountry(), player->getName().c_str());
-        pl->GetMailBox()->newMail(player, 0x03, title, content);
-    }
-}
-
-void OnTeamArenaApply1( GameMsgHdr& hdr, const void * data )
-{   //成员申请 拒绝
-	MSG_QUERY_PLAYER(player);
-
-    if(!player->getTeamArena())
-        return;
-	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
-    SYSMSG(title, 4236);
-    SYSMSGV(content, 4237, player->getTeamArena()->getName().c_str(), player->getCountry(), player->getName().c_str());
-    pl->GetMailBox()->newMail(player, 0x03, title, content);
-}
-
 #endif // _WORLDINNERMSGHANDLER_H_

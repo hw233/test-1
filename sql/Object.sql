@@ -2192,3 +2192,10 @@ CREATE TABLE `arena_team_bet` (
   PRIMARY KEY (`id`,`state`,`round`,`group`,`pos`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `team_pending_player`;
+CREATE TABLE `team_pending_player` (
+  `teamId` int(10) unsigned NOT NULL,
+  `playerId` bigint(20) unsigned NOT NULL,
+  `opTime` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`teamId`,`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

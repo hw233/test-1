@@ -83,8 +83,6 @@ MSG_REG_2(ArenaMsgHdr, 0x116, OnTeamArenaLastRank);
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 
-MSG_REG_2(GameMsgHdr, 0x169, OnTeamArenaApply);
-MSG_REG_2(GameMsgHdr, 0x170, OnTeamArenaApply1);
 MSG_REG_2(GameMsgHdr, 0x171, OnClanTakeRewardResultReq);
 MSG_REG_2(GameMsgHdr, 0x172, OnTeamArenaAddMember);
 MSG_REG_2(GameMsgHdr, 0x173, OnClanMailInviteClick);

@@ -519,6 +519,11 @@ namespace GObject
             fprintf(stderr, "LoadTeamArenaBets error!\n");
             std::abort();
         }
+		if(!LoadTeamPendingPlayers())
+        {
+            fprintf(stderr, "LoadTeamPendingPlayers error!\n");
+            std::abort();
+        }
 
 
 		DB::gDataDBConnectionMgr->UnInit();
@@ -6434,6 +6439,35 @@ namespace GObject
 
 		return true;
 	}
+
+	bool GObjectManager::LoadTeamPendingPlayers()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading team pending players:");
+		DBTeamPendingPlayer dbtpp;
+		if(execu->Prepare("SELECT `teamId`, `playerId`, `opTime` FROM `team_pending_player` ORDER BY `teamId`", dbtpp) != DB::DB_OK)
+			return false;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+        TeamArenaData * tad = NULL;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbtpp.teamId != last_id)
+				tad = globalTeamArena[dbtpp.teamId];
+			if(tad == NULL)
+				continue;
+			Player * pl = globalPlayers[dbtpp.playerId];
+			if(pl == NULL)
+				continue;
+            TeamPendingMember tpm = TeamPendingMember(pl, dbtpp.opTime);
+            tad->pendingMap.insert(std::make_pair(dbtpp.playerId, tpm));
+		}
+		lc.finalize();
+		return true;
+	}
+
 
 }
 

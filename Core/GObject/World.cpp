@@ -2009,6 +2009,8 @@ void World::ArenaExtraActTimer(void *)
     UInt32 now = TimeUtil::Now();
     UInt32 week = TimeUtil::GetWeekDay(now);
 
+    if(GObject::arena.active())
+        return;
     if(week < ARENA_WEEK_START || week > ARENA_WEEK_END)
     {
         return;

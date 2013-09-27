@@ -1353,6 +1353,13 @@ struct DBTeamArenaBet
 	UInt8 tael;
 };
 
+struct DBTeamPendingPlayer
+{
+	UInt64 teamId;
+	UInt64 playerId;
+	UInt32 opTime;
+};
+
 }
 
 namespace DB {
@@ -3071,6 +3078,15 @@ SPECIALDEF(7)
 	UInt8, recieved,
 	UInt16, pos,
 	UInt8, tael
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTeamPendingPlayer)
+SPECIALDEF(3)
+(
+	UInt64, teamId,
+	UInt64, playerId,
+	UInt32, opTime
 )
 SPECIALEND()
 

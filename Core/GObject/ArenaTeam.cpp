@@ -126,6 +126,42 @@ void TeamArenaData::appendListInfo(Stream& st)
         st << "";
 }
 
+void TeamArenaData::broadcastTeam(Stream& st)
+{
+    for(UInt8 i = 0; i < count; ++ i)
+    {
+        if(members[i])
+            members[i]->send(st);
+    }
+}
+
+void TeamArenaData::purgePending()
+{
+	UInt32 thatTime = TimeUtil::Now() - 7 * 3600 * 24;
+	size_t i = 0;
+    std::map<UInt64, TeamPendingMember>::iterator it = pendingMap.begin();
+	while(i < pendingMap.size())
+	{
+        if((it->second).opTime < thatTime)
+        {
+		    DB1().PushUpdateData("DELETE FROM `team_pending_player` WHERE `teamId` = %" I64_FMT "u AND `playerId` = %" I64_FMT "u", getId(), (it->second).player->getId());
+            pendingMap.erase(it ++ );
+        }
+		++ i;
+	}
+}
+
+void TeamArenaData::broadcastPendingMemberInfo(TeamPendingMember& tpm)
+{
+	Stream st(REP::SERVER_ARENA_OP);
+	st << static_cast<UInt8>(18) << static_cast<UInt8>(1);
+	st << static_cast<UInt8>(1);
+    st << tpm.player->getId() << tpm.player->getName();
+    st << tpm.player->GetLev() << tpm.opTime << tpm.player->getPF();
+	st << Stream::eos;
+    broadcastTeam(st);
+}
+
 void TeamArenaData::updateSkillToDB(TeamSkillData * tsd)
 {
     if(!tsd)
@@ -321,6 +357,7 @@ void TeamArenaMgr::dismissTeam(Player * leader)
     globalNamedTeamArena.remove(tad->getName());
     DB1().PushUpdateData("DELETE FROM `arena_team` WHERE `id` = %" I64_FMT "u", tad->getId());
     DB1().PushUpdateData("DELETE FROM `arena_team_skill` WHERE `teamId` = %" I64_FMT "u", tad->getId());
+    DB1().PushUpdateData("DELETE FROM `team_pending_player` WHERE `teamId` = %" I64_FMT "u", tad->getId());
     delete tad;
     sendReqInfo(leader, 6);
 }
@@ -329,6 +366,11 @@ bool TeamArenaMgr::addTeamMember(Player * leader, Player * player)
 {
     if(!leader || !player || player->getTeamArena())
         return false;
+    if(player->GetLev() < LIMIT_LEVEL)
+    {
+        player->sendMsgCode(0, 2010, LIMIT_LEVEL);
+        return false;
+    }
     TeamArenaData * tad = leader->getTeamArena();
     if(!tad || tad->leader != leader)
         return false;
@@ -353,6 +395,12 @@ bool TeamArenaMgr::addTeamMember(Player * leader, Player * player)
     player->setTeamArena(tad);
     tad->updateToDB();
     sendTeamInfo(tad);
+
+    if(player->isOnline())
+    {
+        SYSMSG_SENDV(117, player, tad->getName().c_str());
+        SYSMSG_SENDV(1017, player, tad->getName().c_str());
+    }
     return true;
 }
 
@@ -431,7 +479,7 @@ void TeamArenaMgr::handoverLeader(Player * leader, UInt64 playerId)
     st << static_cast<UInt8>(7);
     st << playerId;
     st << Stream::eos;
-    broadcastTeam(tad, st);
+    tad->broadcastTeam(st);
 }
 
 void TeamArenaMgr::setMemberPosition(Player * leader, UInt64 playerId1, UInt64 playerId2, UInt64 playerId3, std::string& stampStr)
@@ -501,7 +549,10 @@ void TeamArenaMgr::setMemberPosition(Player * leader, UInt64 playerId1, UInt64 p
         }
     }
     st << Stream::eos;
-    broadcastTeam(tad, st);
+    tad->broadcastTeam(st);
+    //自动同步到跨服战
+	GameMsgHdr hdr(0x335, tad->leader->getThreadId(), tad->leader, sizeof(TeamArenaData *));
+	GLOBAL().PushMsg(hdr, &tad);
 }
 
 void TeamArenaMgr::leaveTeamArena(Player * player)
@@ -509,8 +560,13 @@ void TeamArenaMgr::leaveTeamArena(Player * player)
     if(!player)
         return;
     TeamArenaData * tad = player->getTeamArena();
-    if(!tad || tad->isInArena() || tad->leader == player)
+    if(!tad || tad->leader == player)
         return;
+    if(tad->isInArena())
+    {
+        player->sendMsgCode(0, 1339);
+        return;
+    }
     for(UInt8 i = 0; i < tad->count; ++ i)
     {
         if(tad->members[i] == player)
@@ -600,7 +656,7 @@ void TeamArenaMgr::upgradeTeamSkill(Player * player, UInt8 skillId, UInt32 tael)
     st << static_cast<UInt8>(8);
     st << tsd->skillId << tsd->level << tsd->extra;
     st << Stream::eos;
-    broadcastTeam(tad, st);
+    tad->broadcastTeam(st);
 }
 
 void TeamArenaMgr::inspireTeam(Player * player)
@@ -663,7 +719,7 @@ void TeamArenaMgr::inspireTeam(Player * player)
     st << static_cast<UInt8>(15);
     st << tad->getId() << tad->inspireLvl;
     st << Stream::eos;
-    broadcastTeam(tad, st);
+    tad->broadcastTeam(st);
 }
 
 void TeamArenaMgr::enterArena(Player * player)
@@ -710,7 +766,7 @@ void TeamArenaMgr::teamArenaEntered( TeamArenaData * tad, UInt8 group, const std
     Stream st(REP::SERVER_ARENA_OP);
     st << static_cast<UInt8>(13);
     st << tad->inArena << Stream::eos;
-    broadcastTeam(tad, st);
+    tad->broadcastTeam(st);
 }
 
 void TeamArenaMgr::commitLineup(Player * player)
@@ -739,13 +795,13 @@ void TeamArenaMgr::championWorship(Player* player, UInt8 opt)
         return;
     bool has = false;
     if(arena.active())
-        has = arena.hasLastLeaderBoard();
-    else
-    {
+    {   //相互交换
         std::map<UInt16, LeaderTeam>::iterator it = _leaderBoard.find(_session-1);
         if(it != _leaderBoard.end())
             has = true;
     }
+    else
+        has = arena.hasLastLeaderBoard();
     if(has == false)
         return;
     UInt32 arenaMoney = 0;
@@ -942,18 +998,7 @@ void TeamArenaMgr::sendTeamInfo(TeamArenaData * tad, Player * player)
         return;
     }
 
-    broadcastTeam(tad, st);
-}
-
-void TeamArenaMgr::broadcastTeam(TeamArenaData *tad, Stream& st)
-{
-    if(!tad)
-        return;
-    for(UInt8 i = 0; i < tad->count; ++ i)
-    {
-        if(tad->members[i])
-            tad->members[i]->send(st);
-    }
+    tad->broadcastTeam(st);
 }
 
 void TeamArenaMgr::sendReqInfo(Player * player, UInt8 type)
@@ -1112,7 +1157,7 @@ void TeamArenaMgr::pushPreliminary(BinaryReader& br)
         st << tad->getName() << tad->GetLev();
         ap.battles[ap.battles.size()-1].append(st);
         st << Stream::eos;
-        broadcastTeam(tad, st);
+        tad->broadcastTeam(st);
     }
 }
 
@@ -1249,7 +1294,6 @@ void TeamArenaMgr::readTeams(BinaryReader& brd, UInt8 sIdx)
             pp.tprd.playerId[i] = pid;
             brd >> pp.tprd.name[i] >> pp.tprd.heroId[i];
             brd >> pp.tprd.battlePoint[i] >> pp.tprd.stamps[i];
-
         }
         TeamPreliminaryPlayerListIterator it = _preliminaryPlayers_list.insert(_preliminaryPlayers_list.end(), pp);
         _preliminaryPlayers[tid] = it;
@@ -1640,6 +1684,9 @@ void TeamArenaMgr::calcFinalBet(int i)
                             UInt8 pos2 = bi.pos;
                             switch(bi.state)
                             {
+                            case 3:
+                                pos2 = _finalIdx[i][1][bi.pos];
+                                break;
                             case 4:
                             case 5:
                             case 6:
@@ -1677,6 +1724,9 @@ void TeamArenaMgr::calcFinalBet(int i)
                         UInt8 pos2 = bi.pos;
                         switch(bi.state)
                         {
+                        case 3:
+                            pos2 = _finalIdx[i][1][bi.pos];
+                            break;
                         case 4:
                         case 5:
                         case 6:
@@ -2360,12 +2410,12 @@ void TeamArenaMgr::sendElimination( Player * player, UInt8 type, UInt8 group )
             int i = _finalIdx[gIdx][progress][idx];
             st << _finals[gIdx][i].id << _finals[gIdx][i].name << _finals[gIdx][i].level << _finals[gIdx][i].leaderFid;
             st << _finals[gIdx][i].battlePoint << static_cast<UInt16>(_finals[gIdx][i].support) << _finals[gIdx][i].inspireLvl;
+            TeamPlayerReportData tprd;
+            _finals[gIdx][i].tprd.sortByBattlePoint(tprd);
             for(UInt8 j = 0; j < TEAMARENA_MAXMEMCNT; ++ j)
             {
-                st << _finals[gIdx][i].tprd.name[j];
-                st << _finals[gIdx][i].tprd.stamps[j];
-                st << _finals[gIdx][i].tprd.heroId[j];
-                st << _finals[gIdx][i].tprd.battlePoint[j];
+                st << tprd.name[j] << tprd.stamps[j];
+                st << tprd.heroId[j] << tprd.battlePoint[j];
             }
         }
 	}
@@ -2434,22 +2484,112 @@ void TeamArenaMgr::applyTeam(Player * player, std::string& name)
     if(player == NULL) return;
     UInt8 res = 0;
     TeamArenaData * tad = globalNamedTeamArena[player->fixName(name)];
-    if(player->getTeamArena())
+    if(player->GetLev() < LIMIT_LEVEL)
+        res = 6;
+    else if(player->getTeamArena())
         res = 1;
     else if(!tad || !tad->leader)
         res = 2;
     else if(tad->isFull())
         res = 3;
-    else
+    if(res == 0)
     {
-        SYSMSGV(title, 4216);
-        SYSMSGV(content, 4217, player->getCountry(), player->getName().c_str(), tad->getName().c_str());
-        tad->leader->GetMailBox()->newMail(player, 0x15, title, content);
+        UInt64 pid = player->getId();
+        std::map<UInt64, TeamPendingMember>::iterator it = tad->pendingMap.find(pid);
+        if(it != tad->pendingMap.end())
+            res = 4;
+        else if(tad->pendingMap.size() > 99)
+            res = 5;
+        if(res == 0)
+        {
+            TeamPendingMember tpm = TeamPendingMember(player, TimeUtil::Now());
+            tad->broadcastPendingMemberInfo(tpm);
+            tad->pendingMap.insert(std::make_pair(pid, tpm));
+
+            DB5().PushUpdateData("INSERT INTO `team_pending_player` (`teamId`, `playerId`, `optime`) VALUES (%" I64_FMT "u, %" I64_FMT "u, %u)", tad->getId(), pid, tpm.opTime);
+        }
     }
 
     Stream st(REP::SERVER_ARENA_OP);
     st << static_cast<UInt8>(16) << res;
     st << Stream::eos;
+    player->send(st);
+}
+
+void TeamArenaMgr::listTeamPending( Player * player )
+{
+    if(player == NULL) return;
+    TeamArenaData * tad = player->getTeamArena();
+    if(tad == NULL) return;
+	tad->purgePending();
+	Stream st(REP::SERVER_ARENA_OP);
+	st << static_cast<UInt8>(18) << static_cast<UInt8>(0);
+    size_t offset = st.size();
+	UInt8 cnt = 0;
+    st << cnt;
+    std::map<UInt64, TeamPendingMember>::iterator it = tad->pendingMap.begin();
+	while(it != tad->pendingMap.end())
+	{
+		TeamPendingMember tpm = it->second;
+		if(tpm.player->getTeamArena() != NULL)
+		{
+			DB1().PushUpdateData("DELETE FROM `team_pending_player` WHERE `teamId` = %" I64_FMT "u AND `playerId` = %" I64_FMT "u", tad->getId(), tpm.player->getId());
+			tad->pendingMap.erase(it ++ );
+		}
+        else
+        {
+            st << tpm.player->getId() << tpm.player->getName();
+            st << tpm.player->GetLev() << tpm.opTime;
+            ++ cnt;
+            ++ it;
+        }
+	}
+    st.data<UInt8>(offset) = cnt;
+	st << Stream::eos;
+	player->send(st);
+}
+
+void TeamArenaMgr::acceptApply( Player* player, UInt64 pid )
+{
+    if(player == NULL) return;
+    TeamArenaData * tad = player->getTeamArena();
+    if(!tad || tad->leader != player || tad->isFull())
+        return;
+    std::map<UInt64, TeamPendingMember>::iterator it = tad->pendingMap.find(pid);
+    if(it == tad->pendingMap.end())
+        return;
+    Player * applyer = globalPlayers[pid];
+    if(!applyer) return;
+
+    bool res = addTeamMember(player, applyer);
+	tad->pendingMap.erase(it);
+	DB1().PushUpdateData("DELETE FROM `team_pending_player` WHERE `teamId` = %" I64_FMT "u AND `playerId` = %" I64_FMT "u", tad->getId(), pid);
+
+    Stream st(REP::SERVER_ARENA_OP);
+    st << static_cast<UInt8>(19);
+    st << static_cast<UInt8>(0) << pid;
+    st << static_cast<UInt8>(res ? 0 : 1);
+    st << Stream::eos;
+    player->send(st);
+}
+
+void TeamArenaMgr::declineApply( Player* player, UInt64 pid )
+{
+    if(player == NULL) return;
+    TeamArenaData * tad = player->getTeamArena();
+    if(!tad || tad->leader != player)
+        return;
+    std::map<UInt64, TeamPendingMember>::iterator it = tad->pendingMap.find(pid);
+    if(it == tad->pendingMap.end())
+        return;
+	tad->pendingMap.erase(it);
+	DB1().PushUpdateData("DELETE FROM `team_pending_player` WHERE `teamId` = %" I64_FMT "u AND `playerId` = %" I64_FMT "u", tad->getId(), pid);
+
+    Stream st(REP::SERVER_ARENA_OP);
+    st << static_cast<UInt8>(19);
+    st << static_cast<UInt8>(1) << pid;
+    st << Stream::eos;
+    player->send(st);
 }
 
 struct EnumStruct

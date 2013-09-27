@@ -50,6 +50,14 @@ enum TEAM_STAGE_PROGRESS
     e_team_nextbegin = 10,
 };
 
+//战队申请
+struct TeamPendingMember
+{
+	TeamPendingMember(Player * pl = NULL, UInt32 ot = 0): player(pl), opTime(ot) {}
+	Player * player;
+	UInt32 opTime;
+};
+
 struct TeamSkillData
 {
 	TeamSkillData(UInt8 s = 0, UInt8 l = 0, UInt32 e = 0)
@@ -88,6 +96,7 @@ struct TeamArenaData
     UInt8 stamps[TEAMARENA_MAXMEMCNT];   //成员印记
     UInt32 scores[TEAMARENA_MAXMEMCNT];  //成员个人积分
 	TeamSkills teamskills;      //战队技能
+	std::map<UInt64, TeamPendingMember> pendingMap;
 
 	void loadSkillFromDB(DBTeamArenaSkill&);
     void buildTeamSkill();
@@ -96,6 +105,9 @@ struct TeamArenaData
     bool checkTimeOver(UInt32 now = TimeUtil::Now());
     void updateToDB();
     UInt8 getLastRank();
+    void broadcastTeam(Stream& st);
+    void purgePending();
+    void broadcastPendingMemberInfo(TeamPendingMember& tpm);
 
     inline UInt64 getId() { return id; }
     inline std::string& getName() { return name; }
@@ -172,6 +184,33 @@ struct TeamPlayerReportData
     UInt8 heroId[TEAMARENA_MAXMEMCNT];
     UInt8 stamps[TEAMARENA_MAXMEMCNT];
     UInt32 battlePoint[TEAMARENA_MAXMEMCNT];
+
+    inline void sortByBattlePoint(TeamPlayerReportData& tprd)
+    {
+        int i, j, k;
+        int sort[TEAMARENA_MAXMEMCNT] = {0};
+        for(i = k = 0; i < TEAMARENA_MAXMEMCNT; ++ i)
+        {
+            for(j = 0; j < TEAMARENA_MAXMEMCNT; ++ j)
+            {
+                if(battlePoint[j] < battlePoint[k])
+                    k = j;
+            }
+            battlePoint[k] += (1<<31);
+            sort[i] = k;
+        }
+        for(i = 0; i < TEAMARENA_MAXMEMCNT; ++ i)
+            battlePoint[i] -= (1<<31);
+        j = TEAMARENA_MAXMEMCNT - 1;
+        for(i = 0; i < TEAMARENA_MAXMEMCNT; ++ i, -- j)
+        {
+            tprd.playerId[i] = playerId[sort[j]];
+            tprd.name[i] = name[sort[j]];
+            tprd.heroId[i] = heroId[sort[j]];
+            tprd.stamps[i] = stamps[sort[j]];
+            tprd.battlePoint[i] = battlePoint[sort[j]];
+        }
+    }
 };
 
 struct TeamPlayerBattleReport
@@ -363,7 +402,6 @@ class TeamArenaMgr
         void getTeamInfo(Player *);
         void sendTeamInfo(TeamArenaData *, Player * = NULL);
         void sendReqInfo(Player *, UInt8);
-        void broadcastTeam(TeamArenaData *, Stream& st);
 
         void teamArenaEntered(TeamArenaData *, UInt8, const std::string&);
         void pushPreliminary(BinaryReader& br);
@@ -395,6 +433,9 @@ class TeamArenaMgr
         void updateSuport(UInt8 type, UInt8 flag, UInt16 pos);
 
         void applyTeam(Player *, std::string&);
+        void listTeamPending(Player *);
+        void acceptApply(Player *, UInt64);
+        void declineApply(Player *, UInt64);
         void listAllTeam(Player *, UInt16, UInt8);
         void searchTeam(Player *, std::string&, UInt8);
     private:

@@ -608,7 +608,7 @@ void NewHeroIsland::randomEvent()
             if(scores[j] < scores[k])
                 k = j;
         }
-        scores[k] += 1000000;
+        scores[k] += (1<<31);
         sort[i] = k;
     }
     static UInt32 events[] = {2, 4, 8, 10, 10, 10};
@@ -826,11 +826,11 @@ void NewHeroIsland::checkOccupySpot()
                     if(_scores[idx][j] < _scores[idx][k])
                         k = j;
                 }
-                _scores[idx][k] += 1000000;
+                _scores[idx][k] += (1<<31);
                 sort[idx][i] = k;
             }
             for(k = 0; k < 3; ++ k)
-                _scores[idx][k] %= 1000000;
+                _scores[idx][k] -= (1<<31);
         }
         for(UInt8 idx = 0; idx < NEWHERO_ISLAND_SPOTS-1; ++ idx)
         {
@@ -1172,7 +1172,7 @@ void NewHeroIsland::rankReward1()
             if(scores[j] < scores[k])
                 k = j;
         }
-        scores[k] += 1000000;
+        scores[k] += (1<<31);
         sort[i] = k;
     }
     SYSMSGV(title, 2318, _stage);
