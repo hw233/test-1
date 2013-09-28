@@ -34,7 +34,12 @@ namespace GData
         jiguanshuInfo info;
         
         info.jgshuLvl = jgsData.jgshuLvl;
-        info.needExp = jgsData.totalNeedExp;
+        info.totalExp = jgsData.totalNeedExp;
+        info.needExp = jgsData.needExp;
+        info.attrValue1 = jgsData.attrValue1;
+        info.attrValue2 = jgsData.attrValue2;
+        info.attrValue3 = jgsData.attrValue3;
+        info.attrValue4 = jgsData.attrValue4;
 
         _jiguanshuInfo.insert(std::make_pair(info.jgshuLvl, info));
     }
@@ -87,6 +92,29 @@ namespace GData
             iter->second.insert(std::make_pair(info.keyinLvl, info));
     }
 
+    void JiguanData::setZhenweiInfo(DBZhenweiConfig & zhenweiData)
+    {
+        if(zhenweiData.keyId > 0)
+        {
+            zhenweiInfo info;
+
+            info.keyId = zhenweiData.keyId;
+            info.name = zhenweiData.name;
+            info.type = zhenweiData.type;
+            info.collect1 = zhenweiData.collect1;
+            info.collect2 = zhenweiData.collect2;
+            info.collect3 = zhenweiData.collect3;
+            info.collect4 = zhenweiData.collect4;
+            info.collect5 = zhenweiData.collect5;
+            info.collect6 = zhenweiData.collect6;
+            info.collect7 = zhenweiData.collect7;
+            info.collect8 = zhenweiData.collect8;
+            info.award = zhenweiData.award;
+
+            _zhenweiInfo.insert(std::make_pair(info.keyId, info));
+        }
+    }
+
     JiguanData::keyinInfo * JiguanData::getKeyinInfo(UInt8 keyinId, UInt8 keyinLvl)
     {
         std::map<UInt8, std::map<UInt8, keyinInfo>>::iterator iter = _keyinInfo.find(keyinId);
@@ -123,7 +151,7 @@ namespace GData
         std::map<UInt8, jiguanshuInfo>::iterator iter = _jiguanshuInfo.begin();
         for(; iter!=_jiguanshuInfo.end(); iter++)
         {
-            if((iter->second.jgshuLvl >= 20) || (iter->second.needExp >= curExp))
+            if((iter->second.jgshuLvl == 50) || (iter->second.totalExp >= curExp))
             {
                 return &(iter->second);
             }
@@ -169,9 +197,9 @@ namespace GData
                 color = 3;
             }
 
-            UInt8 index = uRand(3);
-            index = 4 * index + color;
             UInt8 count = iter->second.size();
+            UInt8 index = uRand(count/4);
+            index = 4 * index + color;
             
             if(index < count)
                 return iter->second[index];
@@ -180,5 +208,14 @@ namespace GData
         }
 
         return 0;
+    }
+
+    JiguanData::zhenweiInfo * JiguanData::getZhenweiInfo(UInt16 keyId)
+    {
+        std::map<UInt16, zhenweiInfo>::iterator iter = _zhenweiInfo.find(keyId);
+        if(iter != _zhenweiInfo.end())
+            return &(iter->second);
+
+        return NULL;
     }
 }

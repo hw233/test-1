@@ -1369,6 +1369,13 @@ struct DBTeamPendingPlayer
 	UInt32 opTime;
 };
 
+struct DBZhenwei
+{
+    UInt64 playerId;
+    UInt16 keyId;
+    UInt8 mark;
+};
+
 }
 
 namespace DB {
@@ -3109,6 +3116,15 @@ SPECIALDEF(3)
 	UInt64, playerId,
 	UInt32, opTime
 )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBZhenwei)
+SPECIALDEF(3)
+    (
+    UInt64, playerId,
+    UInt16, keyId,
+    UInt8, mark
+    )
 SPECIALEND()
 
 }

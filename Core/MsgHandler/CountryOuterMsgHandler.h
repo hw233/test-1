@@ -1302,11 +1302,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1C9, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
-    if (World::getSurnameLegend())
+    if (World::get11Time())
     {
-        GameMsgHdr hdr(0x1CD, WORKER_THREAD_WORLD, pl, 0);
+        GameMsgHdr hdr(0x1D2, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
-        GameMsgHdr hdr1(0x1CE, WORKER_THREAD_WORLD, pl, 0);
+        GameMsgHdr hdr1(0x1D3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr1, NULL);
     }
     pl->sendYearRPInfo();
@@ -3788,6 +3788,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         UInt32 goldLeft = player->GetVar(VAR_AIRBOOK_CONSUME)%30;
                         player->AddVar(VAR_AIRBOOK_CONSUME,price);
                         player->Add11grade( (price+goldLeft)/30 *10);
+                        if(price>=1000 && player->getClan())
+                            SYSMSG_BROADCASTV(4956,player->getClan()->getName().c_str(),player->getCountry() ,player->getPName());
                     }
                     st << static_cast<UInt8>(0);
 
@@ -6437,6 +6439,9 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
     UInt8 opt = 0;
     br >> opt;
     
+    if((0 != opt) && (!player->hasChecked()))
+        return;
+
     switch(opt)
     {
     case 0:
@@ -6446,10 +6451,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 1:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt32 tuzhiId = 0;
             UInt8 type = 0;
 
@@ -6459,10 +6460,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 2:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt32 jgId = 0;
             UInt8 pos = 0;
 
@@ -6472,10 +6469,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 3:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt32 jgId = 0;
             UInt8 pos = 0;
 
@@ -6485,10 +6478,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 7:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt32 tuzhiId = 0;
 
             br >> tuzhiId;
@@ -6497,10 +6486,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 8:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt8 keyinId = 0;
 
             br >> keyinId;
@@ -6509,10 +6494,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 9:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt8 keyinId = 0;
 
             br >> keyinId;
@@ -6521,12 +6502,15 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 10:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
-
             player->GetMoFang()->changeMoney(opt);               
+        }
+        break;
+    case 12:
+        {
+            UInt16 keyId = 0;
+
+            br >> keyId;
+            player->GetMoFang()->checkKey(keyId, opt);               
         }
         break;
 

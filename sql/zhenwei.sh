@@ -1,17 +1,16 @@
 
 #!/bin/bash
 
-F=jiguanshu.txt
+F=zhenwei.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function jiguanshu()
+function zhenwei()
 {
     f=$1
-    d=jiguanshu
-    sed -i /level/d $f
+    d=zhenwei
     sed -i /ID/d $f
     sed -i /id/d $f
     sed -i /^$/d $f
@@ -21,12 +20,12 @@ function jiguanshu()
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `jiguanshu` VALUES";
+            print "INSERT INTO `zhenwei` VALUES";
         } {
-            printf("(%d,%d,%d,%f,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7);
-            if (NR <= ENVIRON["lines"]-1)
+            printf("(%d,\x27%s\x27,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12);
+            if (NR <= ENVIRON["lines"])
                 printf(",");
-            else if (NR >= ENVIRON["lines"])
+            else if (NR > ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }
@@ -36,7 +35,7 @@ function jiguanshu()
     sed -i s/\\r//g $d
     if [ $? -eq 0 ]
     then
-        iconv2utf8 $d
+        #iconv2utf8 $d
         echo "OK"
     else
         echo "ERROR"
@@ -52,7 +51,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    jiguanshu $F
+    zhenwei $F
 else
     echo "File $F is not exists"
 fi

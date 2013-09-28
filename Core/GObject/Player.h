@@ -2596,6 +2596,9 @@ namespace GObject
         void getAirBookOnlineAward();
         void getAirBookLoginAward(UInt8 type);
         void Add11grade(UInt32 grade);
+        void AirBookPriase(UInt8 type , UInt64 playerid);
+        void SendClanMemberGrade();
+        void Send11GradeAward(UInt8 type);
         void doStrongInWorld(UInt8 type);
         //女娲石盘
         void sendNuwaInfo();

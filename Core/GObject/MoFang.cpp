@@ -33,8 +33,21 @@ void MoFang::Init()
 
 void MoFang::AddJGSFromDB(DBJiguanshu & dbData)
 {
-    m_jiguanshu.curLvl = dbData.curLvl;
     m_jiguanshu.curExp = dbData.curExp;
+
+    GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getUpgradeInfo(dbData.curExp);
+    if(!jgsInfo)
+        return;
+    
+    if(m_jiguanshu.curExp == jgsInfo->totalExp)
+    {
+        m_jiguanshu.curLvl = jgsInfo->jgshuLvl + 1;
+    }
+    else
+        m_jiguanshu.curLvl = jgsInfo->jgshuLvl;
+
+    //m_jiguanshu.curLvl = dbData.curLvl;
+    //m_jiguanshu.curExp = dbData.curExp;
 
     UInt8 temp[20][2] = {{10, 11}, {12, 13}, {20, 27}, {34, 41}, {40, 39}, 
                 {38, 37}, {30, 23}, {16, 9}, {2, 3}, {4, 5},
@@ -147,6 +160,11 @@ void MoFang::AddTuzhiFromDB(DBTuzhi & dbData)
     m_tuzhi.insert(std::make_pair(dbData.tuzhiId, dbData.curProficient));
 }
 
+void MoFang::AddZhenweiFromDB(DBZhenwei &dbData)
+{
+    m_zhenwei.insert(std::make_pair(dbData.keyId, dbData.mark));
+}
+
 UInt32 MoFang::addTuzhi(UInt32 tuzhiId, bool mark)
 {
     if(!m_owner)
@@ -223,7 +241,15 @@ void MoFang::addJGSExp(UInt32 exp)
 void MoFang::randTuzhi(UInt16 num)
 {
     UInt16 count = 0;
+    UInt8 jgsLvl = 0;
+
+    if(m_jiguanshu.curLvl > 19) //机关术等级大于19，按照19等级的规则获取相关图纸
+        jgsLvl = 19;
+    else
+        jgsLvl = m_jiguanshu.curLvl;
+
     UInt32 exp = m_jiguanshu.curExp;
+
     Stream st(REP::MOFANG_INFO);
     st << static_cast<UInt8>(6);
     UInt16 offsetA = 0;
@@ -235,29 +261,25 @@ void MoFang::randTuzhi(UInt16 num)
         UInt8 lvl = 0;
         UInt8 markA = uRand(100);
 
-        if(m_jiguanshu.curLvl == 0)
+        if(jgsLvl == 0)
         {
             lvl = 0;
         }
-        else if(m_jiguanshu.curLvl == 1)
+        else if(jgsLvl == 1)
         {
             lvl = 1;
         }
-        else if(m_jiguanshu.curLvl > 19)
-        {
-            lvl = uRand(19);
-        }
         else if(markA < 30)
         {
-            lvl = m_jiguanshu.curLvl;
+            lvl = jgsLvl;
         }
         else if(markA < 60)
         {
-            lvl = m_jiguanshu.curLvl - 1;
+            lvl = jgsLvl - 1;
         }
         else if(markA < 100)
         {
-            lvl = m_jiguanshu.curLvl - 2;
+            lvl = uRand(jgsLvl - 1);
         }
         else
         {
@@ -453,14 +475,11 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
     {
         m_jiguanshu.curExp += addExp;
 
-        if(tuzhiId < SPECIAL_TUZHI) //训练图纸，制造后只增加机关术经验，不获得机关玉
-        {
-            m_jg.push_back(tzInfo->jiguanyuId);
+        m_jg.push_back(tzInfo->jiguanyuId);
 
-            DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), tzInfo->jiguanyuId, 0);
-            DBLOG1().PushUpdateData("insert into make_jiguanyu (server_id, player_id, jiguanyu_id, jiguanyu_name, jiguanyu_quality, make_time) values(%u,%" I64_FMT "u,%u,'%s',%u,%u)",
-                    cfg.serverLogId, m_owner->getId(), tzInfo->jiguanyuId, tzInfo->name.c_str(), tzInfo->quality, TimeUtil::Now());
-        }
+        DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), tzInfo->jiguanyuId, 0);
+        DBLOG1().PushUpdateData("insert into make_jiguanyu (server_id, player_id, jiguanyu_id, jiguanyu_name, jiguanyu_quality, make_time) values(%u,%" I64_FMT "u,%u,'%s',%u,%u)",
+                cfg.serverLogId, m_owner->getId(), tzInfo->jiguanyuId, tzInfo->name.c_str(), tzInfo->quality, TimeUtil::Now());
 
         DB4().PushUpdateData("DELETE FROM `player_tuzhi` WHERE `tuzhiId` = %u AND `playerId` = %" I64_FMT "u", tuzhiId, m_owner->getId());
 
@@ -579,42 +598,52 @@ void MoFang::upgradeJGS()
         return;
 
     if(m_jiguanshu.curLvl >= JGS_MAXLVL)
-        return;
-
-    UInt32 exp = 0;
-    if(m_jiguanshu.curExp > JGS_MAXEXP && m_jiguanshu.curLvl < JGS_MAXLVL)
-        exp = JGS_MAXEXP;
-    else
-        exp = m_jiguanshu.curExp;
-
-    GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getUpgradeInfo(exp);
-    if(!jgsInfo)
-        return;
-    
-    if(m_jiguanshu.curExp == jgsInfo->needExp || m_jiguanshu.curExp >= JGS_MAXEXP)
-    {
-        m_jiguanshu.curLvl = jgsInfo->jgshuLvl + 1;
+    {        
+        DB4().PushUpdateData("REPLACE INTO `player_jiguanshu` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), m_jiguanshu.curLvl, m_jiguanshu.curExp);
     }
     else
-        m_jiguanshu.curLvl = jgsInfo->jgshuLvl;
-
-    DB4().PushUpdateData("REPLACE INTO `player_jiguanshu` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), m_jiguanshu.curLvl, m_jiguanshu.curExp);
-
-    UInt8 temp[20][2] = {{10, 11}, {12, 13}, {20, 27}, {34, 41}, {40, 39}, 
-                {38, 37}, {30, 23}, {16, 9}, {2, 3}, {4, 5},
-                {6, 7}, {14, 21}, {28, 35}, {42, 49}, {48, 47},
-                {46, 45}, {44, 43}, {36, 29}, {22, 15}, {8, 1}};
-
-    UInt8 lvlMark = m_jiguanshu.curLvl;
-    UInt8 index = 0;
-
-    for(UInt8 i=0; i<lvlMark; i++)
     {
-        for(UInt8 k=0; k<2; k++)
+        UInt32 exp = 0;
+        if(m_jiguanshu.curExp > JGS_MAXEXP)
+            exp = JGS_MAXEXP;
+        else
+            exp = m_jiguanshu.curExp;
+
+        GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getUpgradeInfo(exp);
+        if(!jgsInfo)
+            return;
+        
+        if(m_jiguanshu.curExp == jgsInfo->totalExp)
         {
-           index = temp[i][k]; 
-           if(index > 0 && index <= 49 && (m_grids[index-1] == -1))
-               m_grids[index-1] = 0;
+            m_jiguanshu.curLvl = jgsInfo->jgshuLvl + 1;
+        }
+        else
+            m_jiguanshu.curLvl = jgsInfo->jgshuLvl;
+
+        DB4().PushUpdateData("REPLACE INTO `player_jiguanshu` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), m_jiguanshu.curLvl, m_jiguanshu.curExp);
+
+        UInt8 temp[20][2] = {{10, 11}, {12, 13}, {20, 27}, {34, 41}, {40, 39}, 
+                    {38, 37}, {30, 23}, {16, 9}, {2, 3}, {4, 5},
+                    {6, 7}, {14, 21}, {28, 35}, {42, 49}, {48, 47},
+                    {46, 45}, {44, 43}, {36, 29}, {22, 15}, {8, 1}};
+
+        UInt8 lvlMark = m_jiguanshu.curLvl;
+        UInt8 index = 0;
+
+        for(UInt8 i=0; i<lvlMark; i++)
+        {
+            for(UInt8 k=0; k<2; k++)
+            {
+               index = temp[i][k]; 
+               if(index > 0 && index <= 49 && (m_grids[index-1] == -1))
+                   m_grids[index-1] = 0;
+            }
+        }
+
+        std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
+        for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
+        {
+            it->second->setDirty();
         }
     }
 }
@@ -687,6 +716,12 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
 
 void MoFang::addJGYAttr(GData::AttrExtra& ae)
 {
+    GData::JiguanData::jiguanshuInfo * jgsInfo = NULL;
+    if((m_jiguanshu.curLvl>0) && (m_jiguanshu.curLvl<=JGS_MAXLVL))
+    {
+        jgsInfo = GData::jiguanData.getJiguanshuInfo(m_jiguanshu.curLvl);
+    }
+
     std::map<UInt32, UInt8>::iterator iter = m_equipJG.begin();
     for(; iter != m_equipJG.end(); iter++)
     {
@@ -697,43 +732,63 @@ void MoFang::addJGYAttr(GData::AttrExtra& ae)
         if(JIGUANQI == jgyInfo->mark)
             continue;
 
+        float addAttr = 0.00;
+        if(jgsInfo)
+        {
+            switch(jgyInfo->element)
+            {
+                case WIND_ELEMENT:
+                    addAttr = jgsInfo->attrValue1;
+                    break;
+                case FOREST_ELEMENT:
+                    addAttr = jgsInfo->attrValue2;
+                    break;
+                case FIRE_ELEMENT:
+                    addAttr = jgsInfo->attrValue3;
+                    break;
+                case MOUNTAIN_ELEMENT:
+                    addAttr = jgsInfo->attrValue4;
+                    break;
+            }
+        }
+        
         switch(jgyInfo->attrType)
         {
             case 1:
-                ae.attack += jgyInfo->attrValue;
+                ae.attack += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 2:
-                ae.magatk += jgyInfo->attrValue;
+                ae.magatk += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 3:
-                ae.defend += jgyInfo->attrValue;
+                ae.defend += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 4:
-                ae.magdef += jgyInfo->attrValue;
+                ae.magdef += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 5:
-                ae.hp += jgyInfo->attrValue;
+                ae.hp += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 6:
-                ae.toughlvl += jgyInfo->attrValue;
+                ae.toughlvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 7:
-                ae.action += jgyInfo->attrValue;
+                ae.action += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 8:
-                ae.hitrlvl += jgyInfo->attrValue;
+                ae.hitrlvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 9:
-                ae.evdlvl += jgyInfo->attrValue;
+                ae.evdlvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 10:
-                ae.crilvl += jgyInfo->attrValue;
+                ae.crilvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 11:
-                ae.pirlvl += jgyInfo->attrValue;
+                ae.pirlvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 12:
-                ae.counterlvl += jgyInfo->attrValue;
+                ae.counterlvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
         }
     }
@@ -813,12 +868,50 @@ void MoFang::sendMoFangInfo(UInt8 mark)
         countC++;
     }
 
+    zhenweiInfo(st);
+    
     st.data<UInt16>(offsetA) = countA;
     st.data<UInt16>(offsetB) = countB;
     st.data<UInt8>(offsetC) = countC;
 
     st << Stream::eos;
     m_owner->send(st);
+}
+
+void MoFang::zhenweiInfo(Stream& st)
+{
+    UInt16 keyCount = GData::jiguanData.getJGMYCount(); //震位拥有的机关密钥总个数
+    UInt16 count = 0;
+    if(0 == keyCount % 8)
+        count = keyCount / 8;
+    else
+        count = keyCount / 8 + 1;
+
+    UInt8 temp[count];
+    memset(temp, 0, sizeof(temp));
+    std::map<UInt16, UInt8>::iterator iter = m_zhenwei.begin(); //已经使用过的密钥
+    for(; iter != m_zhenwei.end(); iter++)
+    {
+        UInt16 index = 0;
+        UInt8 mark = 0;
+        if(0 == (iter->first) % 8)
+        {
+            index = ((iter->first) / 8) - 1;
+            mark = 7;
+        }
+        else
+        {
+            index = ((iter->first) / 8);
+            mark = ((iter->first) % 8) - 1;
+        }
+        temp[index] = SET_BIT(temp[index], mark);
+    }
+
+    st << keyCount;
+    for(UInt16 i=0; i<count; i++)
+    {
+        st << temp[i];
+    }
 }
 
 bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> & values)
@@ -945,6 +1038,15 @@ bool MoFang::findNoEquipJG(UInt32 jgId)
     }
 
     return false;
+}
+
+bool MoFang::findKey(UInt16 keyId)
+{
+    std::map<UInt16, UInt8>::iterator iter = m_zhenwei.find(keyId);
+    if(iter == m_zhenwei.end())
+        return false;
+
+    return true;
 }
 
 void MoFang::quickMakejiguan(UInt32 tuzhiId, UInt8 mark)
@@ -1100,7 +1202,7 @@ void MoFang::quickMakejiguan(UInt32 tuzhiId, UInt8 mark)
                     break;
                 case TUZHI_YELLOW:
                     randB += 1;
-                    if(randA < 50)
+                    if(randA < 50)                 
                     {
                         curProficient += randB;
                     }
@@ -1501,6 +1603,123 @@ void MoFang::addKYAttr(GData::AttrExtra& ae)
             }
         }
     }
+}
+
+void MoFang::checkKey(UInt16 keyId, UInt8 opt)
+{
+    GData::JiguanData::zhenweiInfo * zwInfo = GData::jiguanData.getZhenweiInfo(keyId);
+    if(!zwInfo)
+        return;
+
+    if(findKey(keyId))
+        return;
+
+    UInt32 jiguanyuId = 0; 
+    switch(zwInfo->type)
+    {
+        case 1:
+            //jiguanyuId = yizhiyue(keyId); // 暂不上
+            break;
+        case 2:
+            jiguanyuId = renzhiyue(keyId);
+            break;
+    }
+
+    if(jiguanyuId > 0)
+    {
+        GData::JiguanData::jiguanyuInfo * jgyInfo = GData::jiguanData.getJiguanyuInfo(jiguanyuId);
+        if(!jgyInfo)
+            return;
+
+        m_jg.push_back(jiguanyuId);
+        m_zhenwei.insert(std::make_pair(keyId, 1));
+
+        DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), jiguanyuId, 0);
+        DB4().PushUpdateData("REPLACE INTO `player_zhenwei` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), keyId, 1);
+        DBLOG1().PushUpdateData("insert into make_jiguanyu (server_id, player_id, jiguanyu_id, jiguanyu_name, jiguanyu_quality, make_time) values(%u,%" I64_FMT "u,%u,'%s',%u,%u)",
+                cfg.serverLogId, m_owner->getId(), jgyInfo->jiguanyuId, jgyInfo->name.c_str(), jgyInfo->quality, TimeUtil::Now());
+
+        Stream st(REP::MOFANG_INFO);
+        st << opt;
+        st << keyId;
+        st << Stream::eos;
+        m_owner->send(st);
+    }
+}
+
+UInt32 MoFang::yizhiyue(UInt16 keyId)
+{
+    GData::JiguanData::zhenweiInfo * zwInfo = GData::jiguanData.getZhenweiInfo(keyId);
+    if(!zwInfo)
+        return 0;
+
+    std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
+    std::map<UInt32, Fighter *>::iterator it1 = fighters.find(zwInfo->collect1);
+    std::map<UInt32, Fighter *>::iterator it2 = fighters.find(zwInfo->collect2);
+    std::map<UInt32, Fighter *>::iterator it3 = fighters.find(zwInfo->collect3);
+    std::map<UInt32, Fighter *>::iterator it4 = fighters.find(zwInfo->collect4);
+    std::map<UInt32, Fighter *>::iterator it5 = fighters.find(zwInfo->collect5);
+    std::map<UInt32, Fighter *>::iterator it6 = fighters.find(zwInfo->collect6);
+    std::map<UInt32, Fighter *>::iterator it7 = fighters.find(zwInfo->collect7);
+    std::map<UInt32, Fighter *>::iterator it8 = fighters.find(zwInfo->collect8);
+
+    if(it1 != fighters.end() 
+            && it2 != fighters.end() 
+            && it3 != fighters.end() 
+            && it4 != fighters.end()
+            && it5 != fighters.end() 
+            && it6 != fighters.end() 
+            && it7 != fighters.end()
+            && it8 != fighters.end())
+    {
+        return zwInfo->award;    
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+UInt32 MoFang::renzhiyue(UInt16 keyId)
+{
+    GData::JiguanData::zhenweiInfo * zwInfo = GData::jiguanData.getZhenweiInfo(keyId);
+    if(!zwInfo)
+        return 0;
+    
+    if((findEquipJG(zwInfo->collect1) || findNoEquipJG(zwInfo->collect1))
+                &&(findEquipJG(zwInfo->collect2) || findNoEquipJG(zwInfo->collect2))
+                &&(findEquipJG(zwInfo->collect3) || findNoEquipJG(zwInfo->collect3))
+                &&(findEquipJG(zwInfo->collect4) || findNoEquipJG(zwInfo->collect4))
+                &&(findEquipJG(zwInfo->collect5) || findNoEquipJG(zwInfo->collect5))
+                &&(findEquipJG(zwInfo->collect6) || findNoEquipJG(zwInfo->collect6))
+                &&(findEquipJG(zwInfo->collect7) || findNoEquipJG(zwInfo->collect7))
+                &&(findEquipJG(zwInfo->collect8) || findNoEquipJG(zwInfo->collect8)))
+    {
+        return zwInfo->award;    
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+void MoFang::addjiguanyu(UInt32 jiguanyuId)
+{
+    GData::JiguanData::jiguanyuInfo * jgyInfo = GData::jiguanData.getJiguanyuInfo(jiguanyuId);
+    if(!jgyInfo)
+        return;
+
+    if(findEquipJG(jiguanyuId))
+        return;
+
+    if(findNoEquipJG(jiguanyuId))
+        return;
+
+    m_jg.push_back(jiguanyuId);
+
+    DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), jiguanyuId, 0);
+
+    sendMoFangInfo();
 }
 
 }

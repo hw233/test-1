@@ -358,6 +358,12 @@ namespace GData
             std::abort();
         }
 
+        if (!LoadZhenweiConfig())
+        {
+            fprintf (stderr, "Load LoadZhenweiConfig Error !\n");
+            std::abort();
+        }
+
         if (!LoadSanHunConfig())
         {
             fprintf (stderr, "Load LoadSanHunConfig Error !\n");
@@ -2140,7 +2146,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBJiguanshuConfig dbjgs;
-		if(execu->Prepare("SELECT `jgshuLvl`, `totalNeedExp` FROM `jiguanshu`", dbjgs) != DB::DB_OK)
+		if(execu->Prepare("SELECT `jgshuLvl`, `totalNeedExp`, `needExp`, `attrValue1`, `attrValue2`, `attrValue3`, `attrValue4`  FROM `jiguanshu`", dbjgs) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
@@ -2198,6 +2204,24 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
 		{
             jiguanData.setkeyinInfo(dbky);
+        }
+
+        return true;
+    }
+
+    bool GDataManager::LoadZhenweiConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBZhenweiConfig dbzw;
+
+		if(execu->Prepare("SELECT `keyId`, `name`, `collectType`, `collect1`, `collect2`, `collect3`, `collect4`, `collect5`, `collect6`, `collect7`, `collect8`, `award` FROM `zhenwei`", dbzw) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            jiguanData.setZhenweiInfo(dbzw);
         }
 
         return true;

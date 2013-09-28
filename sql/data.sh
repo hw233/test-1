@@ -31,11 +31,14 @@ function update_data()
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130517_1.sql   #修改item_template字段subClass类型
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130524_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130609_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130813_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130620_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130902_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130823_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130913_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130620_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130813_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130823_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130902_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130913_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130922_2.sql    #修改jiguanyu表字段attrValue类型
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130922_3.sql    #修改jiguanshu表,添加字段element, attrValue1, attrValue2, attrValue3, attrValue4
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20130922_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20131001_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
@@ -92,6 +95,7 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from pet_sanhun; source pet_sanhun;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from team_arena_skill; source team_arena_skill;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from team_arena_inspire; source team_arena_inspire;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from zhenwei; source zhenwei;";
 }
 
 update_data

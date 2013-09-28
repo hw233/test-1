@@ -2737,30 +2737,29 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             brd>>index;
             switch(index)
            {
-               case 0x01:
-                    {
-                       player->On11PlayerGradeRank();
-                       break;
-                    }
-               case 0x03:
-                    {
-                        player->On11ClanGradeRank();
-                        player->On11CountryGradeRank();
-                        break; 
-                    }
-               case 0x04:   //帮派成员积分
-                    { 
-		                GameMsgHdr hdr(0x1D1, WORKER_THREAD_NEUTRAL, player, 0);
-		                GLOBAL().PushMsg(hdr, NULL);
-                        break;
-                    }
                case 0x05:
                     {
                         UInt8 type = 0;
                         brd >>type;
                         GameMsgHdr h(0x365,  player->getThreadId(), player, sizeof(UInt8));
                         GLOBAL().PushMsg(h, &type);
-                        break; 
+               //         break; 
+                    }
+               case 0x01:
+                    {
+                       player->On11PlayerGradeRank();
+                      // break;
+                    }
+               case 0x03:
+                    {
+                        player->On11ClanGradeRank();
+                        player->On11CountryGradeRank();
+                        break;
+                    }
+               case 0x04:   //帮派成员积分
+                    { 
+                        player->SendClanMemberGrade();
+                        break;
                     }
                case 0x02:
                     {
@@ -2777,6 +2776,15 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                         }
                     }
                     break;
+               case 0x06:
+                    {
+                        UInt8 type =0;
+                        UInt64 playerid = 0;
+                        brd >> type;
+                        brd >> playerid;
+                        player->AirBookPriase(type,playerid);
+                        break;
+                    } 
                 default:
                     break;
            }

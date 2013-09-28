@@ -285,6 +285,8 @@ GMHandler::GMHandler()
     Reg(2, "setmc", &GMHandler::OnSetMax);
     Reg(2, "addtz", &GMHandler::OnAddtz);
     Reg(2, "addshu", &GMHandler::OnAddJGSExp);
+    Reg(2, "addjgy", &GMHandler::OnAddjgy);
+    Reg(2, "getkey", &GMHandler::OnGetKey);
     Reg(3, "addshlvl", &GMHandler::OnAddSHLvl);
     Reg(3, "playermsg", &GMHandler::OnPlayerMsg);
 
@@ -403,6 +405,38 @@ void GMHandler::OnAddJGSExp(GObject::Player * player, std::vector<std::string>& 
             return;
 
         player->GetMoFang()->addJGSExp(exp);
+	}
+}
+
+void GMHandler::OnAddjgy(GObject::Player * player, std::vector<std::string>& args)
+{
+    if(player->GetLev() < 70)
+        return;
+
+	if(args.empty())
+		return;
+
+	if(args.size() == 1)
+	{
+		UInt32 jiguanyuId = atoi(args[0].c_str());
+
+        player->GetMoFang()->addjiguanyu(jiguanyuId);
+	}
+}
+
+void GMHandler::OnGetKey(GObject::Player * player, std::vector<std::string>& args)
+{
+    if(player->GetLev() < 70)
+        return;
+
+	if(args.empty())
+		return;
+
+	if(args.size() == 1)
+	{
+		UInt16 keyId = atoi(args[0].c_str());
+
+        player->GetMoFang()->checkKey(keyId, 12);
 	}
 }
 

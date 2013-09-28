@@ -933,6 +933,10 @@ CREATE TABLE `jiguanshu` (
     `jgshuLvl` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `totalNeedExp` int(10) unsigned NOT NULL DEFAULT 0,
     `needExp` int(10) unsigned NOT NULL DEFAULT 0,
+    `attrValue1` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
+    `attrValue2` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
+    `attrValue3` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
+    `attrValue4` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
     PRIMARY KEY (`jgshuLvl`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -943,7 +947,7 @@ CREATE TABLE `jiguanyu` (
     `name` varchar(255) NOT NULL DEFAULT '',
     `quality` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `attrType` tinyint(3) unsigned NOT NULL DEFAULT 0,
-    `attrValue` int(10) unsigned NOT NULL DEFAULT 0,
+    `attrValue` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
     `element` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `molding` varchar(255) NOT NULL DEFAULT '',
     `moldingType` varchar(255) NOT NULL DEFAULT '',
@@ -974,6 +978,23 @@ CREATE TABLE `signet` (
     `materialB` int(10) unsigned NOT NULL DEFAULT 0,
     `maxValue` int(10) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`keyinId`, `lvl`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `zhenwei`;
+CREATE TABLE `zhenwei` (
+    `keyId` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `collectType` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `collect1` int(10) unsigned NOT NULL DEFAULT 0,
+    `collect2` int(10) unsigned NOT NULL DEFAULT 0,
+    `collect3` int(10) unsigned NOT NULL DEFAULT 0,
+    `collect4` int(10) unsigned NOT NULL DEFAULT 0,
+    `collect5` int(10) unsigned NOT NULL DEFAULT 0,
+    `collect6` int(10) unsigned NOT NULL DEFAULT 0,
+    `collect7` int(10) unsigned NOT NULL DEFAULT 0,
+    `collect8` int(10) unsigned NOT NULL DEFAULT 0,
+    `award` int(10) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`keyId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `pet_sanhun`;
