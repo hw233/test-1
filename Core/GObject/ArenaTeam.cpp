@@ -252,7 +252,7 @@ void TeamArenaMgr::loadFromDB(DBTeamArenaData& dbtad)
     StringTokenizer tk2(dbtad.members, ",");
     for(UInt8 i = 0; i < tk2.count() && i < TEAMARENA_MAXMEMCNT; ++ i)
     {
-        player = globalPlayers[atoi(tk2[i].c_str())];
+        player = globalPlayers[atoll(tk2[i].c_str())];
         tad->members[i] = player;
         if(player)
         {

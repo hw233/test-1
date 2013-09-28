@@ -3349,16 +3349,22 @@ void GMHandler::OnNewPlayerAuto(GObject::Player* player, std::vector<std::string
 	if(arge.size() < 1)
 		return;
 
-    int cnt = atoi(arge[0].c_str()) + 1000;
+    UInt64 cnt = atoi(arge[0].c_str()) + 1000;
     std::string newname;
     newname.resize(10);
 
-    for(int playerID = 1000; playerID < cnt; ++ playerID)
+    for(UInt64 i = 1000; i < cnt; ++ i)
     {
+        UInt64 playerID = i;
+        UInt64 serverId = player->getId() >> 48;
+        if(cfg.merged)
+            playerID |= (serverId << 48);
+
         newname.clear();
-        char buf[10] = {0};
-        sprintf(buf, "%d", playerID);
+        char buf[16] = {0};
+        sprintf(buf, "%" I64_FMT "u", playerID);
         newname = buf;
+
 
         GObject::Player::patchMergedName(playerID, newname);
         GObject::Player * pl = GObject::globalNamedPlayers[newname];
@@ -3430,9 +3436,14 @@ void GMHandler::OnNewPlayerAutoSuper(GObject::Player* player, std::vector<std::s
 	if(arge.size() < 1)
 		return;
 
-    int cnt = atoi(arge[0].c_str()) + 1000;
-    for(int playerID = 1000; playerID < cnt; ++ playerID)
+    UInt64 cnt = atoi(arge[0].c_str()) + 1000;
+    for(UInt64 i = 1000; i < cnt; ++ i)
     {
+        UInt64 playerID = i;
+        UInt64 serverId = player->getId() >> 48;
+        if(cfg.merged)
+            playerID |= (serverId << 48);
+
         Player* pl = GObject::globalPlayers[playerID];
         if(!pl)
             continue;

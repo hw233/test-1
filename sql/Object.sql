@@ -2213,7 +2213,7 @@ CREATE TABLE `AirBookData` (
    `overTime` int(10) unsigned NOT NULL,
    `grade`  int(10) unsigned NOT NULL,
    `recharge`  int(10) unsigned NOT NULL,
-   `recharge`  int(10) unsigned NOT NULL,
+   `consume`  int(10) unsigned NOT NULL,
    `flags`  varchar(255) NOT NULL DEFAULT '',
     PRIMARY KEY (`playerId`,`overTime`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
