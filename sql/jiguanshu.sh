@@ -23,7 +23,7 @@ function jiguanshu()
         BEGIN {
             print "INSERT INTO `jiguanshu` VALUES";
         } {
-            printf("(%d,%d,%d)",$1,$2,$3);
+            printf("(%d,%d,%d,%f,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

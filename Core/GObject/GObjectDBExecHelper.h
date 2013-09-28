@@ -1319,6 +1319,13 @@ struct DBSanHun
     UInt8 sanhunId;
     UInt8 curLvl;
 };
+
+struct DBZhenwei
+{
+    UInt64 playerId;
+    UInt16 keyId;
+    UInt8 mark;
+};
 }
 
 namespace DB {
@@ -2998,6 +3005,15 @@ SPECIALDEF(4)
     UInt64, playerId,
     UInt8, sanhunId,
     UInt8, curLvl
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBZhenwei)
+SPECIALDEF(3)
+    (
+    UInt64, playerId,
+    UInt16, keyId,
+    UInt8, mark
     )
 SPECIALEND()
 }

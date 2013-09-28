@@ -6424,6 +6424,9 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
     UInt8 opt = 0;
     br >> opt;
     
+    if((0 != opt) && (!player->hasChecked()))
+        return;
+
     switch(opt)
     {
     case 0:
@@ -6433,10 +6436,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 1:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt32 tuzhiId = 0;
             UInt8 type = 0;
 
@@ -6446,10 +6445,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 2:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt32 jgId = 0;
             UInt8 pos = 0;
 
@@ -6459,10 +6454,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 3:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt32 jgId = 0;
             UInt8 pos = 0;
 
@@ -6472,10 +6463,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 7:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt32 tuzhiId = 0;
 
             br >> tuzhiId;
@@ -6484,10 +6471,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 8:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt8 keyinId = 0;
 
             br >> keyinId;
@@ -6496,10 +6479,6 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 9:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
             UInt8 keyinId = 0;
 
             br >> keyinId;
@@ -6508,12 +6487,15 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 10:
         {
-            if(!player->hasChecked())
-            {
-                return;
-            }
-
             player->GetMoFang()->changeMoney(opt);               
+        }
+        break;
+    case 12:
+        {
+            UInt16 keyId = 0;
+
+            br >> keyId;
+            player->GetMoFang()->checkKey(keyId, opt);               
         }
         break;
 

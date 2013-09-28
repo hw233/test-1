@@ -317,11 +317,11 @@ namespace GObject
             std::abort();
         }
 
-		/*if(!loadSanHun())
+		if(!loadZhenwei())
         {
-            fprintf(stderr, "load sanhun error!\n");
+            fprintf(stderr, "load zhenwei error!\n");
             std::abort();
-        }*/
+        }
 
 		if(!loadTempItem())
         {
@@ -5600,16 +5600,16 @@ namespace GObject
         return true;
     }
 
-    /*bool GObjectManager::loadSanHun()
+    bool GObjectManager::loadZhenwei()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
-        LoadingCounter lc("Loading sanhun:");
-		DBSanHun shdata;
+        LoadingCounter lc("Loading zhenwei:");
+		DBZhenwei zwdata;
         Player* pl = NULL;
 
-		if(execu->Prepare("SELECT `playerId`, sanhunId, `curLvl`  FROM `player_sanhun` ORDER BY `playerId`", shdata) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, keyId, `mark`  FROM `player_zhenwei` ORDER BY `playerId`", zwdata) != DB::DB_OK)
 			return false;
 
 		lc.reset(20);
@@ -5617,20 +5617,20 @@ namespace GObject
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
-			if(shdata.playerId != last_id)
+			if(zwdata.playerId != last_id)
 			{
-				last_id = shdata.playerId;
+				last_id = zwdata.playerId;
 				pl = globalPlayers[last_id];
 			}
 			if(pl == NULL)
 				continue;
 
-            pl->GetHunPo()->AddSHFromDB(shdata);
+            pl->GetMoFang()->AddZhenweiFromDB(zwdata);
 		}
 		lc.finalize();
 
         return true;
-    }*/
+    }
 
     bool GObjectManager::LoadSoulItemChance()
     {
