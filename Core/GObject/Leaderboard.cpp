@@ -1131,7 +1131,7 @@ void Leaderboard::pushPetInfo(FairyPet* pet)
     PetInfoSetMap::iterator mapit = _petInfoSetMap.find(pl);
     if(mapit != _petInfoSetMap.end())
     {
-        for(; mapit->first == pl; ++ mapit)
+        for(; mapit->first == pl && mapit != _petInfoSetMap.end(); ++ mapit)
         {
             PetInfoSetIt setit = mapit->second;
             const PetInfoList& petInfo = *setit;
@@ -1184,7 +1184,7 @@ void Leaderboard::erasePetInfo(FairyPet* pet)
     PetInfoSetMap::iterator mapit = _petInfoSetMap.find(pl);
     if(mapit != _petInfoSetMap.end())
     {
-        for(; mapit->first == pl; ++ mapit)
+        for(; mapit->first == pl && mapit != _petInfoSetMap.end(); ++ mapit)
         {
             PetInfoSetIt setit = mapit->second;
             const PetInfoList& petInfo = *setit;
