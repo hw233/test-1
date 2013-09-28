@@ -287,7 +287,9 @@ GMHandler::GMHandler()
     Reg(2, "addjgy", &GMHandler::OnAddjgy);
     Reg(2, "getkey", &GMHandler::OnGetKey);
     Reg(3, "addshlvl", &GMHandler::OnAddSHLvl);
+    Reg(3, "playermsg", &GMHandler::OnPlayerMsg);
 
+    _printMsgPlayer = NULL;
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -4184,6 +4186,8 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
 
 void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& args)
 {
+    if(sizeof(args)<1)
+        return ;
     UInt8 type = atoi(args[0].c_str());
      UInt16 reloadFlag = 0x00FF;
      GameMsgHdr hdr4(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(UInt16));
@@ -4517,6 +4521,22 @@ void GMHandler::OnGetMax(GObject::Player* player, std::vector<std::string>& args
     tmp = GVAR.GetVar(GObject::GVAR_NewUser_Max);
     tmp1 = GVAR.GetVar(GObject::GVAR_NewUser_Cur); 
     tmp ++;
+}
+
+void GMHandler::OnPlayerMsg(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	char * endptr;
+	UInt64 playerId = strtoull(args[0].c_str(), &endptr, 10);
+	if(playerId == 0)
+    {
+        _printMsgPlayer = NULL;
+		return;
+    }
+
+	GObject::Player * pl = GObject::globalPlayers[playerId];
+    _printMsgPlayer = pl;
 }
 
 

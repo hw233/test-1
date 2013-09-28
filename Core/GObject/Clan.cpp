@@ -3638,7 +3638,6 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
 
         pl->setClanSkillFlag(0);
     }
-
     return res;
 }
 
@@ -4703,8 +4702,11 @@ void Clan::checkSpiritTree()
     if(now > m_spiritTree.m_endTime)
     {
         m_spiritTree.m_endTime = TimeUtil::SharpDayT(1, now);
-        m_spiritTree.m_exp = 0;
+        m_spiritTree.m_exp = m_spiritTree.m_exp * 8 / 25;
+        m_spiritTree.m_exp -= m_spiritTree.m_exp % 100;
         m_spiritTree.m_level = 0;
+        while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
+            ++ m_spiritTree.m_level;
         m_spiritTree.m_refreshTimes = 0;
         m_spiritTree.m_color = 0;
         writeSptrToDB();
@@ -4846,5 +4848,45 @@ void Clan::setClanSpiritTreeBuff(UInt8 color)
 
 }
 
-
+void Clan::addClanGradeInAirBook(UInt32 grade)
+{
+    _gradeInAirbook += grade;
+}
+void Clan::updataClanGradeInAirBook()
+{
+	Mutex::ScopedLock lk(_mutex);
+    _gradeInAirbook = 0;
+	Members::iterator it = _members.begin();
+	for (; it != _members.end(); ++it)
+	{
+        Player * player = (*it)->player; 
+        if(player == NULL)
+            continue ; 
+        _gradeInAirbook += player->GetVar(VAR_11AIRBOOK_GRADE);
+	}
+	return ;
+}
+void Clan::SendClanMemberGrade(Player* player)
+{
+     Stream st(REP::ACT);
+     st<<static_cast<UInt8>(0x20);
+     st<<static_cast<UInt8>(0x04);
+     size_t offset = st.size();
+     UInt8 pos = 0;
+     st<<pos;
+	Mutex::ScopedLock lk(_mutex);
+    _gradeInAirbook = 0;
+	Members::iterator it = _members.begin();
+	for (; it != _members.end(); ++it)
+	{
+        ++pos;
+        Player * pl = (*it)->player; 
+        if(pl == NULL)
+            continue ; 
+        st<<pl->getName()<<pl->GetVar(VAR_11AIRBOOK_GRADE);
+	}
+    st.data<UInt8>(offset) = pos;
+    st<<Stream::eos;
+    player->send(st);
+}
 }

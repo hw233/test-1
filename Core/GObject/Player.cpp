@@ -82,6 +82,7 @@
 #include "GObject/ClanBoss.h"
 #include "ClanCityBattle.h"
 #include "MoFang.h"
+#include "Leaderboard.h"
 
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -105,6 +106,7 @@
 
 #define ATHL_BUFF_SECS        (10*60)
 #define ATHL_BUFF_SECS_MAX    (30*60)
+#define ATHL_BUFF_SECS_1      (30*60)
 
 #define QIXI_XIQUE 9122
 
@@ -238,7 +240,7 @@ namespace GObject
         }
 
 		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
-        fprintf(stderr, "id: %lu => cnt: %u\n", m_Player->getId(), cnt);
+        //fprintf(stderr, "id: %lu => cnt: %u\n", m_Player->getId(), cnt);
         if (cnt % 10)
             _writedb = false;
         else
@@ -3912,7 +3914,8 @@ namespace GObject
         }
         if (World::getAutoBattleAct())
             count = 60*216;
-
+        if(World::get11TimeNum()<=15)
+            count = 60 * 144 ;
         return count;
     }
 
@@ -4769,6 +4772,8 @@ namespace GObject
     }
     void Player::selectPray(UInt8 index)
     {
+        if(GetVar(VAR_PRAY_TYPE))
+            return ;
         UInt8 prayCount = GetVar(VAR_PRAY_COUNT);
         UInt8 maxCount = 2 ;
         UInt32 now = TimeUtil::Now();
@@ -8208,6 +8213,12 @@ namespace GObject
         addRF7DayRecharge(r);
         addLuckyMeetRecharge(r);
         addSummerMeetRecharge(r);
+        if(World::get11Time())
+        {
+            UInt32 goldLeft = GetVar(VAR_AIRBOOK_RECHARGE)%30;
+            AddVar(VAR_AIRBOOK_RECHARGE,r);
+            Add11grade((r+goldLeft)/30*10);
+        }
         addRechargeNextRet(r);
         {
             GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, this, sizeof(_playerData.totalRecharge));
@@ -9130,7 +9141,7 @@ namespace GObject
 		if(leaveCity)
 			_playerData.lastExp |= 0x80000000;
 
-        fprintf(stderr, "%s: %s\n", __PRETTY_FUNCTION__, writedb?"true":"false");
+        //fprintf(stderr, "%s: %s\n", __PRETTY_FUNCTION__, writedb?"true":"false");
         if (writedb)
             DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastExp, _id);
 	}
@@ -11602,7 +11613,12 @@ namespace GObject
         case 29:
             //阵营检索
             checkZhenying();
+        case 30:
+            getAirBookLoginAward(opt);
             break;
+        case 31:
+            getAirBookOnlineAward();
+                break;
         }
     }
     
@@ -12266,12 +12282,12 @@ namespace GObject
         if(succ)
         {
             SetVar(VAR_SUMMER_MEET_TYPE_AWARD, 1);
+            sendSummerMeetRechargeInfo();
             SetVar(VAR_SUMMER_MEET_TYPE,5);
             char str[16] = {0};
             sprintf(str, "F_130722_%d", type+4);
             udpLog("shuqihuiliu", str, "", "", "", "", "act");
         }
-        sendSummerMeetRechargeInfo();
     } 
     void Player::getAwardGiftCard()
     {
@@ -13190,8 +13206,8 @@ namespace GObject
         UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
         if(now < begin || now >end )
             return ;
-        if(off!= 1 && !(SummerMeetLogin&(1<<(off-1))))
-          SetVar(VAR_SUMMER_MEET_LOGIN_AWARD , 0); 
+        if(off!= 1 && !(SummerMeetLogin&(1<<(off-2))))
+            SetVar(VAR_SUMMER_MEET_LOGIN_AWARD , 0); 
         SummerMeetLogin |= 1 << (off - 1);
         SetVar(VAR_SUMMER_MEET_LOGIN, SummerMeetLogin);
         sendSummerMeetInfo();
@@ -13213,7 +13229,6 @@ namespace GObject
             else 
                 return ;
         }
-   
     }
     void Player::sendQQBoardLoginInfo()
     {
@@ -13934,6 +13949,7 @@ namespace GObject
 
         GameMsgHdr hdr1(0x1F3, WORKER_THREAD_WORLD, this, 0);
         GLOBAL().PushMsg(hdr1, NULL);
+        GameAction()->doStrong(this,SthSkillUp , 0, 0);
 
         return res;
     }
@@ -14969,7 +14985,7 @@ namespace GObject
             return;
         UInt32 SummerMeetType = GetVar(VAR_SUMMER_MEET_TYPE);
         UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
-        if(SummerMeetType==0 || SummerMeetTypeAward == 0 || SummerMeetType > 3)
+        if(SummerMeetType==0 || SummerMeetTypeAward == 0 )
             return ;
         UInt32 SummerMeetLogin = GetVar(VAR_SUMMER_MEET_LOGIN);
         UInt32 SummerMeetRechargeAward = GetVar(VAR_SUMMER_MEET_RECHARGE_AWARD);
@@ -15007,9 +15023,9 @@ namespace GObject
         if (!World::getSummerMeetTime())
               return;
         UInt32 SummerMeetType = GetVar(VAR_SUMMER_MEET_TYPE);
+        UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
         if(SummerMeetType < 1 ||SummerMeetType > 3 )
             return ;
-        UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
         Stream st(REP::RC7DAY);  //协议
         st << static_cast<UInt8>(17);
         st << static_cast<UInt8>(SummerMeetType);
@@ -16026,7 +16042,7 @@ namespace GObject
     void Player::adjustAthlBuffData(UInt32 type)
     {
         UInt32 now = TimeUtil::Now();
-        UInt32 leftTime;
+        UInt32 leftTime = 0;
         UInt32 flag = 0;
         UInt8 count = 0;
         UInt8 index;
@@ -16139,7 +16155,6 @@ namespace GObject
             flag = PLAYER_BUFF_ATHL9;
         }
 
-        //sendAthlBufInfo();
         if(flag == 0)
             return;
         count = 1;
@@ -16150,6 +16165,63 @@ namespace GObject
         st << index;
         leftTime = getBuffData(flag) - now;
         st << leftTime;
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::adjustAthlBuffData2(UInt32 type)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 time = ATHL_BUFF_SECS_1;
+        UInt32 flag = 0;
+        UInt8 index;
+
+        if(type & Battle::BattleFighter::AthlEnh31)
+        {
+            setBuffData(PLAYER_BUFF_ATHL11, now + time);
+            flag = PLAYER_BUFF_ATHL11;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh32)
+        {
+            setBuffData(PLAYER_BUFF_ATHL22, now + time);
+            flag = PLAYER_BUFF_ATHL22;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh33)
+        {
+            setBuffData(PLAYER_BUFF_ATHL33, now + time);
+            flag = PLAYER_BUFF_ATHL33;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh34)
+        {
+            setBuffData(PLAYER_BUFF_ATHL44, now + time);
+            flag = PLAYER_BUFF_ATHL44;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh35)
+        {
+            setBuffData(PLAYER_BUFF_ATHL55, now + time);
+            flag = PLAYER_BUFF_ATHL55;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh36)
+        {
+            setBuffData(PLAYER_BUFF_ATHL66, now + time);
+            flag = PLAYER_BUFF_ATHL66;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh37)
+        {
+            setBuffData(PLAYER_BUFF_ATHL77, now + time);
+            flag = PLAYER_BUFF_ATHL77;
+        }
+
+        if(flag == 0)
+            return;
+
+        index = flag - PLAYER_BUFF_ATHL11;
+        time = getBuffData(flag) - now;
+        Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+        st << static_cast<UInt8>(5);
+        st << 1;
+        st << index;
+        st << time;
         st << Stream::eos;
         send(st);
     }
@@ -17789,6 +17861,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             }
             if(_onBattlePet)
                 bp += _onBattlePet->getBattlePoint();
+
+            pushPetInfo2Leaderboard();
         }
         else
         {
@@ -19282,7 +19356,7 @@ void Player::get3366GiftAward(UInt8 type)
         ConsumeInfo ci(Enum3366Gift,0,0);
         useGold(66, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {9390, 1126, 134, 9141, 551, 513};
+        static UInt32 itemId[] = {9390, 1126, 1325, 9141, 517, 513};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
         {
             GetPackage()->Add(itemId[i], 1, true);
@@ -20511,6 +20585,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         DBLOG1().PushUpdateData("insert into pet_histories (server_id,player_id,pet_id,pet_name,delete_type,pet_pinjie,pet_gengu,delete_time) values(%u,%" I64_FMT "u,%u,'%s',%u,%u,%u,%u)",
             cfg.serverLogId, getId(), id, it->second->getName().c_str(), delete_type, it->second->getPetLev(), it->second->getPetBone(), TimeUtil::Now());
 
+        leaderboard.erasePetInfo(it->second);
         it->second->delSanHun();
         SAFE_DELETE(it->second);
         _fairyPets.erase(it);
@@ -22692,15 +22767,44 @@ void Player::setNuwaSignet(UInt8 idx)
     sendNuwaInfo();
 }
 
-    void Player::LuckyBagRank()
+void Player::LuckyBagRank()
+{
+    if(World::getSurnameLegend())
     {
-        if(World::getSurnameLegend())
-        {
-            UInt32 LuckbagNum = GetVar(VAR_SURNAMELEGEND_USED);
-            GameMsgHdr hdr(0x1C8, WORKER_THREAD_WORLD, this, sizeof(LuckbagNum));
-            GLOBAL().PushMsg(hdr, &LuckbagNum);
-        }
+        UInt32 LuckbagNum = GetVar(VAR_SURNAMELEGEND_USED);
+        GameMsgHdr hdr(0x1C8, WORKER_THREAD_WORLD, this, sizeof(LuckbagNum));
+        GLOBAL().PushMsg(hdr, &LuckbagNum);
     }
+}
+void Player::On11ClanGradeRank()
+{
+    if(World::get11Time())
+    {
+        UInt32 grade = GetVar(VAR_11AIRBOOK_GRADE);
+        GameMsgHdr hdr(0x1CE, WORKER_THREAD_WORLD, this, sizeof(grade));
+        GLOBAL().PushMsg(hdr, &grade);
+    }
+}
+void Player::On11CountryGradeRank()
+{
+    if(World::get11Time())
+    {
+        GameMsgHdr hdr(0x1CF, WORKER_THREAD_WORLD, this, 0 );
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+}
+void Player::On11PlayerGradeRank()
+{
+    if(World::get11Time())
+    {
+        Clan * clan =getClan();
+        if(clan == NULL)
+            return ;
+        UInt32 grade = clan->getGradeInAirBook(); 
+        GameMsgHdr hdr(0x1CD, WORKER_THREAD_WORLD, this, sizeof(grade));
+        GLOBAL().PushMsg(hdr, &grade);
+    }
+}
 
 bool spreadCompareTime(bool checkStartTime, bool checkEndTime)
 {
@@ -23838,6 +23942,8 @@ void Player::insertCollectCardDB(UInt8 id)
 
 void Player::addCardFromClanBattle()
 {
+    if(!World::getCollectCardAct())
+        return;
     if(GetVar(VAR_CARD_FROM_CLAN) == 0)
     {
         SetVar(VAR_CARD_FROM_CLAN, 1);
@@ -24361,8 +24467,205 @@ void Player::checkSelectPray()
 }
 void Player::doStrongInWorld(UInt8 type)
 {
-    GameAction()->doStrong(this, type, 0,0);
+    GameAction()->doStrong(this, type, 0, 0);
 }
 
+void Player::SetAirBookValue()
+{
+    if(!World::get11TimeNum() > 15)   //登录记录  到12号
+        return ;
+    UInt32 SummerMeetLogin = GetVar(VAR_AIRBOOK_LOGIN);
+    UInt32 off = World::get11TimeNum();
+    UInt32 airBookAward = GetVar(VAR_AIRBOOK_LOGIN_AWARD);
+    if(off == 0)
+        return ;
+    SummerMeetLogin |= 1 << (off - 1);
+    if(off!= 1 && !(SummerMeetLogin&(1<<(off-2))))
+    {
+        airBookAward &= (31<<5);
+        SetVar(VAR_AIRBOOK_LOGIN_AWARD ,airBookAward ); 
+    }
+    SetVar(VAR_AIRBOOK_LOGIN, SummerMeetLogin);
+    sendAirBookInfo();
+}
+void Player::sendAirBookInfo()
+{
+   if(World::get11TimeNum() > 15 )  //登录礼包到12号
+        return ;
+   UInt32 AirBookLogin = GetVar(VAR_AIRBOOK_LOGIN); 
+   UInt32 AirBookAward = GetVar(VAR_AIRBOOK_LOGIN_AWARD);
+   UInt8 count = 0;
+   UInt8 max = 0;
+   UInt32 i = 0;
+   while(i<16)
+   {
+       if(AirBookLogin & (1 << i++ ))
+           ++count;
+       else 
+       {
+           if(count!=0)
+           {
+               max = count;
+               count = 0;
+           }
+       }
+   }
+   Stream st(REP::ACT);
+   st <<static_cast<UInt8>(0x20);
+   st <<static_cast<UInt8>(0x02);
+   st <<static_cast<UInt8>(0x00);
+   st << static_cast<UInt8>(max);
+   st << static_cast<UInt16>(AirBookAward);
+   st<<Stream::eos; 
+   send(st);
+}
+
+void Player::sendAirBookOnlineInfo()
+{
+   if(World::get11TimeNum() > 11 )   //在线礼包 到8号
+        return ;
+   UInt32 AirBookOnlineTime = GetOnlineTimeToday(); 
+   UInt32 AirBookOnlineAward = GetVar(VAR_AIRBOOK_ONLINE_AWARD);
+   Stream st(REP::ACT);
+   st <<static_cast<UInt8>(0x20);
+   st <<static_cast<UInt8>(0x02);
+   st <<static_cast<UInt8>(0x01);
+   st << static_cast<UInt32>(AirBookOnlineTime);
+   st << static_cast<UInt8>(AirBookOnlineAward);
+   st<<Stream::eos; 
+   send(st);
+   
+}
+void Player::OnSend11GradeInfo(UInt8 type)
+{
+    if(m_StrengthenMgr==NULL)
+        return;
+    m_StrengthenMgr->CheckTimeOver();
+    m_StrengthenMgr->Send11GradeInfo(type);
+}
+void Player::getAirBookOnlineAward()
+{
+    UInt8 type = static_cast<UInt8>(World::get11TimeNum());
+    if(type > 11)
+        return ;
+    UInt32 AirBookOnlineTime = GetOnlineTimeToday(); 
+    if(AirBookOnlineTime < 90* 60)
+        return ;
+    UInt32 onlineAward = GetVar(VAR_AIRBOOK_ONLINE_AWARD);
+    if(onlineAward)
+        return ;
+    if(!GameAction()->RunAirBookOnlineAward(this, type))
+         return ;
+    SetVar(VAR_AIRBOOK_ONLINE_AWARD,1);
+    sendAirBookOnlineInfo();
+}
+void Player::getAirBookLoginAward(UInt8 type)
+{
+    UInt32 days[]={4,5,6,11,13};
+    if(type > 10 ||type < 1 )
+        return ;
+    UInt32 off = World::get11TimeNum();
+    UInt32 AirBookLogin = GetVar(VAR_AIRBOOK_LOGIN); 
+    UInt32 AirBookAward = GetVar(VAR_AIRBOOK_LOGIN_AWARD);
+    if(AirBookAward & (1<<(type-1)))
+        return ;
+    UInt8 count = 0;
+    UInt8 max = 0;
+    UInt32 i = 0;
+    while(i<16)
+    {
+        if(AirBookLogin & (1 << i++ ))
+            ++count;
+        else 
+        {
+            if(count != 0 )
+            max = count;
+            count = 0;
+        }
+    }
+    if(type < 6 && max < type *3)
+        return ;
+    if((type >5) &&off != days[type-6])
+    {
+		UInt32 gold = 10;
+		if (getGold() < gold)
+        {
+            sendMsgCode(0, 1104);
+			return ;
+        }
+        ConsumeInfo ci(TenOneLogin,0,0);
+		useGold(gold,&ci);
+    } 
+    if(!GameAction()->RunAirBookLoginAward(this, type))
+         return ;
+    AirBookAward |= (1<<(type-1));    
+    SetVar(VAR_AIRBOOK_LOGIN_AWARD,AirBookAward);
+    sendAirBookInfo();
+}
+
+UInt32 Player::getMaxPetBattlePoint()
+{
+    UInt32 maxbp = 0;
+    for(std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin(); it != _fairyPets.end(); ++ it)
+    {
+        FairyPet* pet = it->second;
+        if(!pet)
+            continue;
+        UInt32 bp = pet->getBattlePoint();
+        if(maxbp < bp)
+            maxbp = bp;
+    }
+
+    return maxbp;
+}
+
+void Player::pushPetInfo2Leaderboard()
+{
+    for(std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin(); it != _fairyPets.end(); ++ it)
+    {
+        FairyPet* pet = it->second;
+        if(!pet)
+            continue;
+        pet->pushPetInfo2Leaderboard();
+    }
+}
+
+void Player::Add11grade(UInt32 grade)
+{
+    if(!World::get11TimeNum() > 15)
+       return ;
+
+    UInt32 gradeAward[]={1200,2200,3200};
+    static MailPackage::MailItem s_item[][6] = {
+        {{500,6},{503,6},{501,4},{512,5},{516,4},{514,6}},
+        {{1325,3},{503,6},{509,5},{547,6},{134,3},{549,1}},
+        {{1717,1},{8555,4}},
+    };
+    SYSMSG(title, 4950);
+    UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
+    UInt8 type = 0;
+    for(UInt8 i =0 ; i< 3 ;i++)
+    {
+        if(airGrade < gradeAward[i] &&( airGrade + grade) >gradeAward[i])
+          type = i+1;  
+    }
+    AddVar(VAR_11AIRBOOK_GRADE,grade);
+    AddVar(VAR_11AIRBOOK_GRADE_DAY,grade);
+    OnSend11GradeInfo(World::get11TimeNum());
+    if(type)
+    {
+        SYSMSGV(content, 4951,gradeAward[type-1]);
+        Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+            if(type!=3)
+                mailPackageManager.push(mail->id, s_item[type-1], 6, true);
+            else 
+                mailPackageManager.push(mail->id, s_item[type-1], 2, true);
+        }
+    }
+}
 } // namespace GObject
+
 

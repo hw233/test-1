@@ -410,6 +410,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setJinQuan(jinquan);
             player->SetSummerFlow3Value();
             player->SetSummerMeetValue();
+            player->SetAirBookValue();
             player->setPrayLoginInWeek();
             player->continuousLoginSummerFlow();
             player->setPresentLogin();
@@ -780,6 +781,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setJinQuan(jinquan);
             pl->SetSummerFlow3Value();
             pl->SetSummerMeetValue();
+            pl->SetAirBookValue();
             pl->setPrayLoginInWeek();
             pl->continuousLoginSummerFlow();
             pl->SetQQBoardLogin();
@@ -1067,12 +1069,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                551,    3,
-                509,    2,
-                134,    2,
-                513,    4,
-                549,    1,
-                1126,   3,
+                78, 1,
+                9371, 4,
+                515, 2,
+                513, 4,
+                503, 3,
+                9338, 3,
             };
 
             UInt8 idx = 0;
@@ -1102,7 +1104,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 5)
+                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 10)
                         purchase.code = 2;
 
                     purchase.id = id;
@@ -3100,7 +3102,7 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN_AWARD, 0);
                  //pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE, 0);
-                //pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
             //    pl->checLuckyMeet();
             }
             break;

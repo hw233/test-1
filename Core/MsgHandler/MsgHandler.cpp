@@ -10,6 +10,7 @@
 #endif
 #endif
 #include "MsgID.h"
+#include "GMHandler.h"
 
 void MsgHandler::DeregisterAllMsg()
 {
@@ -58,6 +59,12 @@ bool MsgHandler::ProcessMsg()
                 {
                     GLOBAL().FreeMsgBlock((char *)hdr);
                     continue;
+                }
+
+                if(gmHandler._printMsgPlayer != 0 && ihdr->player == gmHandler._printMsgPlayer)
+                {
+                    fprintf(stdout, "Proc::PlayerMsg_XXXXXXXX: cmd[%x], thrd[%u]\n", hdr->cmdID, hdr->desWorkerID);
+                    fflush(stdout);
                 }
             }
         }

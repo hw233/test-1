@@ -142,8 +142,16 @@ namespace GObject
 #define PLAYER_BUFF_CLANTREE2       0x61
 #define PLAYER_BUFF_CLANTREE3       0x62
 
-#define PLAYER_BUFF_DISPLAY_MAX		0x63
-#define PLAYER_BUFF_COUNT			0x63
+#define PLAYER_BUFF_ATHL11          0x71 // 魔
+#define PLAYER_BUFF_ATHL22          0x72 // 神
+#define PLAYER_BUFF_ATHL33          0x73 // 虚
+#define PLAYER_BUFF_ATHL44          0x74 // 义
+#define PLAYER_BUFF_ATHL55          0x75 // 影
+#define PLAYER_BUFF_ATHL66          0x76 // 狂
+#define PLAYER_BUFF_ATHL77          0x77 // 侠
+
+#define PLAYER_BUFF_DISPLAY_MAX		0x78
+#define PLAYER_BUFF_COUNT			0x78
 #define PLAYER_BUFF_START           0x80
 
 #define CLAN_TASK_MAXCOUNT          5       // ????ÿ????????????
@@ -2360,6 +2368,7 @@ namespace GObject
         void recvYBBuf(UInt8 type);
         void sendYBBufInfo(UInt32 ybbuf, UInt32 qqvipbuf, UInt8 joy = 0);
         void adjustAthlBuffData(UInt32 type);
+        void adjustAthlBuffData2(UInt32 type);
         void sendAthlBufInfo();
 
         bool hasRealItemAward(UInt32 id);
@@ -2395,7 +2404,9 @@ namespace GObject
         void calcLingbaoBattlePoint();
         void setMaxLingbaoBattlePoint(UInt32 value);
         UInt32 getMaxLingbaoBattlePoint();
+        UInt32 getMaxPetBattlePoint();
         void verifyFighter();
+        void pushPetInfo2Leaderboard();
 
         //分别计算玩家的战斗力
         UInt32 getBaseBattlePoint();
@@ -2563,14 +2574,23 @@ namespace GObject
         void LuckyStarActUdpLog(UInt8);
         void checkSendRandFriend();
         void checkSelectPray();
+        void SetAirBookValue();
+        void sendAirBookInfo();
+        void sendAirBookOnlineInfo();
+        void OnSend11GradeInfo(UInt8 type=0);
+        void getAirBookOnlineAward();
+        void getAirBookLoginAward(UInt8 type);
+        void Add11grade(UInt32 grade);
         void doStrongInWorld(UInt8 type);
-
         //女娲石盘
         void sendNuwaInfo();
         void setNuwaSignet(UInt8);
 
         void LevelAwardActUdpLog(UInt8);
         void LuckyBagRank();
+        void On11ClanGradeRank();
+        void On11CountryGradeRank();
+        void On11PlayerGradeRank();
         void getQQGameOnlineAward();
         void sendQQGameOnlineAward();
         void setQQGameOnlineTotalTime();
@@ -2632,6 +2652,7 @@ namespace GObject
     public:
         void setMapId(UInt8 mapId);
 	};
+
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
     inline UInt8& PLAYER_DATA1(Player* pl, UInt8 type)

@@ -24,6 +24,9 @@ private:
 	void Reg(int, const std::string&, GMHPROCNP);
 	std::map<std::string, GMHP> _procMap[4];
 
+public:
+    GObject::Player* _printMsgPlayer;
+
 private:
 	void OnClanDonate(GObject::Player *, std::vector<std::string>&);
 	void OnSetVip(GObject::Player *, std::vector<std::string>&);
@@ -218,6 +221,8 @@ private:
     void OnAddjgy(GObject::Player* player, std::vector<std::string>& args);
     void OnGetKey(GObject::Player* player, std::vector<std::string>& args);
     void OnAddSHLvl(GObject::Player* player, std::vector<std::string>& args);
+
+    void OnPlayerMsg(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

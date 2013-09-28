@@ -518,9 +518,14 @@ public:
     void useClanFunds(UInt32 funds);
     UInt32 getClanFunds() { return _funds; }
 
+    void addClanGradeInAirBook(UInt32 grade);
+    void updataClanGradeInAirBook();
+    UInt32 getGradeInAirBook(){return  _gradeInAirbook;}
+    void SendClanMemberGrade(Player* player);
     UInt8 skillLevelUp(Player* pl, UInt8 skillId);
 public:
 	inline UInt8 getLev() { return _level; }
+
 	ClanTech * getClanTech() { return _techs; }
 	ClanBattle * getClanBattle() { return _clanBattle; }
 	ClanDynamicMsg * getClanDynamicMsg() { return _clanDynamicMsg; }
@@ -689,6 +694,7 @@ private:
 	std::vector<ClanPendingMember *> _pending;
 	UInt8 _rank;
 	UInt8 _level;
+    UInt32  AirBookGrade;
 
     ClanItemPkg _itemPkg;
     ItemHistoryList _itemHistories;
@@ -744,6 +750,7 @@ private:
     UInt32 _funds;          // 帮派资金
 	UInt64 _watchman;       // 帮派修炼地护法
 
+    UInt32 _gradeInAirbook; //天书奇缘帮派积分
     std::string m_qqOpenid;
 
 	Mutex _mutex;

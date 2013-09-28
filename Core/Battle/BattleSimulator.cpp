@@ -518,6 +518,21 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
                         flag2 |= BattleFighter::AthlEnh8;
                     if (_player[i]->getBuffData(PLAYER_BUFF_ATHL9, now) > 0)
                         flag2 |= BattleFighter::AthlEnh9;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL11, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh31;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL22, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh32;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL33, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh33;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL44, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh34;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL55, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh35;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL66, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh36;
+                    if (_player[i]->getBuffData(PLAYER_BUFF_ATHL77, now) > 0)
+                        flag2 |= BattleFighter::AthlEnh37;
+                    
                 }
                 flag2 |= _player[i]->getAthlRivalBuff();
             }
@@ -10857,6 +10872,39 @@ void BattleSimulator::doShieldHPAttack(BattleFighter* bo, UInt32& dmg)
         return;
     }
 
+    const GData::SkillBase* skill = bo->getBiLanTianYiSkill();
+    if(skill && skill->effect && bo->getEvadeCnt() > 2)
+    {
+        dmg = 0;
+        bo->minusEvadeCnt(3);
+        UInt8 evadeCnt = bo->getEvadeCnt();
+        appendDefStatus(e_skill, skill->getId(), bo);
+        if(evadeCnt == 0)
+            appendDefStatus(e_unBiLanTianYi, evadeCnt, bo);
+        else
+            appendDefStatus(e_biLanTianYi, evadeCnt, bo);
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        const std::vector<float>& efv = skill->effect->efv;
+        size_t cnt = eft.size();
+        if(cnt == efl.size() && cnt == efv.size())
+        {
+            for(size_t i = 0; i < cnt; ++ i)
+            {
+                if(eft[i] == GData::e_eft_bi_lan_tian_yi)
+                {
+                    float hp = bo->getMaxHP() * (skill->effect->efv[i]);
+                    if (hp < 1.0f)
+                        break;
+                    bo->addHpShieldSelf(hp, skill->effect->efl[i]);
+                    appendDefStatus(e_hpShieldSelf, hp, bo);
+                    break;
+                }
+            }
+        }
+        return;
+    }
+
     if(bo->makeShieldDamage(dmg))
     {
         appendDefStatus(e_damHPShield, 0, bo);
@@ -11596,7 +11644,7 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
 {
     if(!bf)
         return;
-
+#if 0
     const GData::SkillBase* skill = bf->getBiLanTianYiSkill();
     if(skill && skill->effect && bf->getEvadeCnt() > 2)
     {
@@ -11629,7 +11677,7 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
         }
         return;
     }
-
+#endif
     float& shieldHp = bf->getHpShieldSelf();
     if(shieldHp > 0.001f)
     {

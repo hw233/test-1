@@ -9,6 +9,7 @@ namespace GObject
 {
 
 class Player;
+class FairyPet;
 
 struct LeaderboardTowndown
 {
@@ -104,6 +105,32 @@ struct LingbaoInfoList
     }
 };
 
+struct PetNeidanAttr
+{
+    UInt16 itemId;
+    UInt8  lv;
+    UInt16 skill;
+    UInt16 gems[4]; //精魄附加属性
+};
+
+struct PetInfoList
+{
+    UInt64 id;
+    std::string  name;
+    UInt8 pf;
+    UInt8 country;
+    UInt32 battlePoint;
+    UInt16 petId;
+    UInt16 petLev;
+    UInt16 gengu;
+    PetNeidanAttr neidan[3];
+    std::map<UInt8, UInt8> sanhun;
+
+    PetInfoList() : id(0), pf(0), country(0), battlePoint(0), petId(0), petLev(0), gengu(0)
+    {
+        memset(neidan, 0, sizeof(neidan));
+    }
+};
 
 class Leaderboard
 {
@@ -126,6 +153,21 @@ public:
         }
     };
     typedef std::set<LingbaoInfoList, bpGreater> LingbaoInfoSet;
+
+    struct petGreater
+    {
+        bool operator() (const PetInfoList& first, const PetInfoList& second)
+        {
+            if (first.battlePoint != second.battlePoint)
+                return first.battlePoint > second.battlePoint;
+            return first.id < second.id;
+        }
+    };
+    typedef std::set<PetInfoList, petGreater> PetInfoSet;
+    typedef PetInfoSet::iterator PetInfoSetIt;
+    typedef std::multimap<Player*, PetInfoSetIt> PetInfoSetMap;
+
+
 
     std::vector<RankingInfoList>* getLevelList() {return &_level;};
     std::vector<RankingInfoList>* getAthleticsList() {return &_athletics;};
@@ -161,6 +203,12 @@ public:
 
     void pushLingbaoInfo(LingbaoInfoList lingbaoInfo);
     void eraseLingbaoInfo(LingbaoInfoList lingbaoInfo);
+
+    PetInfoSet& getPetSet() { return _petInfoSet; }
+    void pushPetInfo(FairyPet* pet);
+    void erasePetInfo(FairyPet* pet);
+    void buildPacketForPet();
+
 private:
 	void doUpdate();
     void makeRankStream(Stream* st, UInt8 type, Player* pl);
@@ -173,6 +221,7 @@ private:
 	Stream _clanCopyStream;
     Stream _lingbaoStream;
     Stream _battleStream;
+    Stream _petStream;
 	UInt32 _id;
 	UInt8 _maxLevel;
 
@@ -201,6 +250,8 @@ private:
     LingbaoInfoSet _lingbaoInfoSet;
     FastMutex _lbMutex;
     std::vector<RankingInfoList> _popularityList;
+    PetInfoSet _petInfoSet;
+    PetInfoSetMap _petInfoSetMap;
 
     AtomicVal<bool> m_sorting;
 
@@ -211,7 +262,9 @@ private:
     std::map<UInt64, int> _playerClanCopyRank;
     std::map<UInt64, int> _lingbaoRank;
     std::map<UInt64, int> _playerPopularityRank;
+    std::map<UInt64, int> _petRank;
     FastMutex _opMutex;
+    FastMutex _petMutex;
 };
 
 extern Leaderboard leaderboard;

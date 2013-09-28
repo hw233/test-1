@@ -79,6 +79,7 @@ public:
     void setSHLvl(UInt8 sanhunId, UInt8 lvl);                   // 设置三魂等级
     UInt8 findSHLvl(UInt8 sanhunId);                            // 查看三魂等级
     inline void delSanHun() { m_SanHunLvl.clear(); }            // 删除三魂
+    inline std::map<UInt8, UInt8>& getSanhun() { return m_SanHunLvl; }
 
     inline bool isOnBattle()            { return _onBattle; }
     inline void setOnBattle(bool flag)  { _onBattle = flag; }
