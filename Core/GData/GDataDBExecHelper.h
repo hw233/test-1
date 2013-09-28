@@ -579,7 +579,7 @@ struct DBJiguanyuConfig
     std::string name;
     UInt8 quality;
     UInt8 attrType;
-    UInt32 attrValue;
+    float attrValue;
     UInt8 element;
     std::string molding;
     UInt16 skillId;
@@ -590,6 +590,10 @@ struct DBJiguanshuConfig
     UInt8 jgshuLvl;
     UInt32 totalNeedExp;
     UInt32 needExp;
+    float attrValue1;
+    float attrValue2;
+    float attrValue3;
+    float attrValue4;
 };
 
 struct DBTuzhiConfig
@@ -612,6 +616,22 @@ struct DBKeyinConfig
     UInt32 materialA;
     UInt32 materialB;
     UInt32 maxValue;
+};
+
+struct DBZhenweiConfig
+{
+    UInt16 keyId;
+    std::string name;
+    UInt8 type;
+    UInt32 collect1;
+    UInt32 collect2;
+    UInt32 collect3;
+    UInt32 collect4;
+    UInt32 collect5;
+    UInt32 collect6;
+    UInt32 collect7;
+    UInt32 collect8;
+    UInt32 award;
 };
 
 struct DBSanHunConfig
@@ -1300,18 +1320,22 @@ SPECIALDEF(9)
     UInt8, quality,
     UInt8, attrType,
     UInt8, element,
-    UInt32, attrValue,
+    float, attrValue,
     std::string, molding,
     UInt16, skillId
     )
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBJiguanshuConfig)
-SPECIALDEF(3)
+SPECIALDEF(7)
     (
     UInt8, jgshuLvl,
     UInt32, totalNeedExp,
-    UInt32, needExp
+    UInt32, needExp,
+    float, attrValue1,
+    float, attrValue2,
+    float, attrValue3,
+    float, attrValue4
     )
 SPECIALEND()
 
@@ -1338,6 +1362,24 @@ SPECIALDEF(9)
     UInt32, materialA,
     UInt32, materialB,
     UInt32, maxValue
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBZhenweiConfig)
+SPECIALDEF(12)
+    (
+    UInt16, keyId,
+    std::string, name,
+    UInt8, type,
+    UInt32, collect1,
+    UInt32, collect2,
+    UInt32, collect3,
+    UInt32, collect4,
+    UInt32, collect5,
+    UInt32, collect6,
+    UInt32, collect7,
+    UInt32, collect8,
+    UInt32, award
     )
 SPECIALEND()
 

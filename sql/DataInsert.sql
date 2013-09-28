@@ -237,3 +237,7 @@ UNLOCK TABLES;
 LOCK TABLES `pet_sanhun` WRITE;
 source pet_sanhun;
 UNLOCK TABLES;
+
+LOCK TABLES `zhenwei` WRITE;
+source zhenwei;
+UNLOCK TABLES;

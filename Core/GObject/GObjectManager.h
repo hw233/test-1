@@ -345,7 +345,7 @@ namespace GObject
         static bool loadPetEquipAttr();
         static bool loadFairySpar();
         static bool loadCollectCard();
-        //static bool loadSanHun();
+        static bool loadZhenwei();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);
