@@ -150,7 +150,7 @@ namespace GData
         std::map<UInt8, jiguanshuInfo>::iterator iter = _jiguanshuInfo.begin();
         for(; iter!=_jiguanshuInfo.end(); iter++)
         {
-            if((iter->second.jgshuLvl >= 100) || (iter->second.needExp >= curExp))
+            if((iter->second.jgshuLvl == 50) || (iter->second.needExp >= curExp))
             {
                 return &(iter->second);
             }

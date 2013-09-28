@@ -585,49 +585,53 @@ void MoFang::upgradeJGS()
         return;
 
     if(m_jiguanshu.curLvl >= JGS_MAXLVL)
-        return;
-
-    UInt32 exp = 0;
-    if(m_jiguanshu.curExp > JGS_MAXEXP)
-        exp = JGS_MAXEXP;
-    else
-        exp = m_jiguanshu.curExp;
-
-    GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getUpgradeInfo(exp);
-    if(!jgsInfo)
-        return;
-    
-    if(m_jiguanshu.curExp == jgsInfo->needExp || m_jiguanshu.curExp >= JGS_MAXEXP)
-    {
-        m_jiguanshu.curLvl = jgsInfo->jgshuLvl + 1;
+    {        
+        DB4().PushUpdateData("REPLACE INTO `player_jiguanshu` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), m_jiguanshu.curLvl, m_jiguanshu.curExp);
     }
     else
-        m_jiguanshu.curLvl = jgsInfo->jgshuLvl;
-
-    DB4().PushUpdateData("REPLACE INTO `player_jiguanshu` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), m_jiguanshu.curLvl, m_jiguanshu.curExp);
-
-    UInt8 temp[20][2] = {{10, 11}, {12, 13}, {20, 27}, {34, 41}, {40, 39}, 
-                {38, 37}, {30, 23}, {16, 9}, {2, 3}, {4, 5},
-                {6, 7}, {14, 21}, {28, 35}, {42, 49}, {48, 47},
-                {46, 45}, {44, 43}, {36, 29}, {22, 15}, {8, 1}};
-
-    UInt8 lvlMark = m_jiguanshu.curLvl;
-    UInt8 index = 0;
-
-    for(UInt8 i=0; i<lvlMark; i++)
     {
-        for(UInt8 k=0; k<2; k++)
+        UInt32 exp = 0;
+        if(m_jiguanshu.curExp > JGS_MAXEXP)
+            exp = JGS_MAXEXP;
+        else
+            exp = m_jiguanshu.curExp;
+
+        GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getUpgradeInfo(exp);
+        if(!jgsInfo)
+            return;
+        
+        if(m_jiguanshu.curExp == jgsInfo->needExp)
         {
-           index = temp[i][k]; 
-           if(index > 0 && index <= 49 && (m_grids[index-1] == -1))
-               m_grids[index-1] = 0;
+            m_jiguanshu.curLvl = jgsInfo->jgshuLvl + 1;
         }
-    }
+        else
+            m_jiguanshu.curLvl = jgsInfo->jgshuLvl;
 
-    std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
-    for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
-    {
-        it->second->setDirty();
+        DB4().PushUpdateData("REPLACE INTO `player_jiguanshu` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), m_jiguanshu.curLvl, m_jiguanshu.curExp);
+
+        UInt8 temp[20][2] = {{10, 11}, {12, 13}, {20, 27}, {34, 41}, {40, 39}, 
+                    {38, 37}, {30, 23}, {16, 9}, {2, 3}, {4, 5},
+                    {6, 7}, {14, 21}, {28, 35}, {42, 49}, {48, 47},
+                    {46, 45}, {44, 43}, {36, 29}, {22, 15}, {8, 1}};
+
+        UInt8 lvlMark = m_jiguanshu.curLvl;
+        UInt8 index = 0;
+
+        for(UInt8 i=0; i<lvlMark; i++)
+        {
+            for(UInt8 k=0; k<2; k++)
+            {
+               index = temp[i][k]; 
+               if(index > 0 && index <= 49 && (m_grids[index-1] == -1))
+                   m_grids[index-1] = 0;
+            }
+        }
+
+        std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
+        for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
+        {
+            it->second->setDirty();
+        }
     }
 }
 
