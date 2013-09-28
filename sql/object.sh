@@ -1,4 +1,6 @@
 #!/bin/bash
+source conf.sh
+function update_object()
 {
     echo "update_object"
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/ClearQQTenpayAward.sql  # XXX: 清除QQ财付通奖励
