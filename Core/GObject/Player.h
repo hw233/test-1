@@ -207,6 +207,12 @@ namespace GObject
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))
 #define GET_BIT_MARK(X,Y)     ((X>>Y) & 1)
 
+#ifdef _FB
+#define LIMIT_LEVEL  60
+#else
+#define LIMIT_LEVEL  70
+#endif
+
     enum SurnameLegendAwardFlag
     {
         e_sla_none = 0x00,

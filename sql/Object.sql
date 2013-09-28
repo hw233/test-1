@@ -2193,7 +2193,7 @@ CREATE TABLE `arena_team_bet` (
 
 DROP TABLE IF EXISTS `team_pending_player`;
 CREATE TABLE `team_pending_player` (
-  `teamId` int(10) unsigned NOT NULL,
+  `teamId` bigint(20) unsigned NOT NULL,
   `playerId` bigint(20) unsigned NOT NULL,
   `opTime` int(10) unsigned NOT NULL,
   PRIMARY KEY (`teamId`,`playerId`)

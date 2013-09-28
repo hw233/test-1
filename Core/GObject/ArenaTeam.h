@@ -395,6 +395,7 @@ class TeamArenaMgr
         void upgradeTeamSkill(Player *, UInt8, UInt32);
         void inspireTeam(Player *);
         void enterArena(Player *);
+        void commitLineup1(Player *);
         void commitLineup(Player *);
         void championWorship(Player*, UInt8);
         void resetTeamState(TeamArenaData *);

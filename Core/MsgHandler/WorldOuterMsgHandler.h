@@ -1833,7 +1833,12 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
                 player->send(st);
             }
             else
-                GObject::arena.commitLineup(player);
+            {
+                if(arena.isOpen())
+                    GObject::arena.commitLineup(player);
+                else
+                    GObject::teamArenaMgr.commitLineup1(player);
+            }
         }
         break;
     case 5:

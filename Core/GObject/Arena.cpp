@@ -15,12 +15,6 @@ namespace GObject
 #define GET_ARENA_NAME(n) char n[1024]; if(_session & 0x8000) { SysMsgItem * mi = globalSysMsg[780]; if(mi != NULL) mi->get(n); else n[0] = 0; } else { strcpy(n, cfg.slugName.c_str()); }
 #define GET_PROGRESS_NAME(n, p) char n[1024]; { SysMsgItem * mi = globalSysMsg[781 + p]; if(mi != NULL) mi->get(n); else n[0] = 0; }
 
-#ifdef _FB
-#define LIMIT_LEVEL  60
-#else
-#define LIMIT_LEVEL  70
-#endif
-
 const static UInt8 progress_accept[7][13] = {
   // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12
     {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},   // 0
@@ -31,7 +25,6 @@ const static UInt8 progress_accept[7][13] = {
     {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},   // 5
     {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}    // 6
 };
-
 
 bool enum_send_status(void * ptr, void * data )
 {
@@ -117,7 +110,7 @@ Arena::Arena():
 
 void Arena::enterArena( Player * player )
 {
-    if(!active() || player->GetLev() < LIMIT_LEVEL)
+    if(!player || _progress != e_progress_sign || !isOpen() || player->GetLev() < LIMIT_LEVEL)
         return;
     std::map<Player *, ArenaPlayer>::iterator iter = _players.find(player);
     if( iter != _players.end() )
@@ -136,35 +129,35 @@ void Arena::commitLineup( Player * player )
     int idx = 0;
     switch(_progress)
     {
-    case 0:
+    case e_progress_sign:
         {
             std::map<Player*, ArenaPlayer>::iterator it = _players.find(player);
             if(it == _players.end())
                 return;
         }
         break;
-    case 1:
-    case 8:
+    case e_progress_ruwei:
+    case e_progress_sign_end:
         preliminary = true; idx = 0;
         break;
-    case 2:
-    case 9:
+    case e_progress_32:
+    case e_progress_ruwei_end:
         preliminary = true; idx = 1;
         break;
-    case 10:
-    case 3:
+    case e_progress_32_end:
+    case e_progress_16:
         final = true; endi = 32; round = 0;
         break;
-    case 4:
+    case e_progress_8:
         final = true; endi = 16; round = 1;
         break;
-    case 5:
+    case e_progress_4:
         final = true; endi = 8; round = 2;
         break;
-    case 6:
+    case e_progress_2:
         final = true; endi = 4; round = 3;
         break;
-    case 7:
+    case e_progress_1:
         final = true; endi = 2; round = 4;
         break;
     default:

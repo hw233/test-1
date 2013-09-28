@@ -9372,11 +9372,6 @@ namespace GObject
 
     bool Player::testCanAddTeamMember(Player * pl)
     {
-#ifdef _FB
-#define LIMIT_LEVEL  60
-#else
-#define LIMIT_LEVEL  70
-#endif
         if(pl == NULL) return false;
 		Mutex::ScopedLock lk(_mutex);
 		Mutex::ScopedLock lk2(pl->getMutex());

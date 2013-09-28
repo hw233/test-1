@@ -17,11 +17,6 @@ namespace GObject
 
 #define GET_PROGRESS_NAME(n, p) char n[1024]; { SysMsgItem * mi = globalSysMsg[781 + p]; if(mi != NULL) mi->get(n); else n[0] = 0; }
 
-#ifdef _FB
-#define LIMIT_LEVEL  60
-#else
-#define LIMIT_LEVEL  70
-#endif
 
 const static UInt8 progress_accept[6][11] = {
   // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10
@@ -481,9 +476,13 @@ void TeamArenaMgr::handoverLeader(Player * leader, UInt64 playerId)
     }
     if(!find)
         return;
-
+    member->setTeamArena(tad);
     tad->leader = member;
     tad->updateToDB();
+
+    SYSMSG_SENDV(1077, leader);
+    if(member->isOnline())
+        SYSMSG_SENDV(1078, member, tad->getName().c_str());
 
 	Stream st(REP::SERVER_ARENA_OP);
     st << static_cast<UInt8>(7);
@@ -596,6 +595,7 @@ void TeamArenaMgr::leaveTeamArena(Player * player)
             break;
         }
     }
+    SYSMSG_SENDV(1076, player, tad->getName().c_str());
     tad->updateToDB();
     sendTeamInfo(tad);
     sendReqInfo(player, 6);
@@ -734,7 +734,7 @@ void TeamArenaMgr::inspireTeam(Player * player)
 
 void TeamArenaMgr::enterArena(Player * player)
 {
-    if(!player || !active())
+    if(_progress != e_team_sign || !isOpen() || player->GetLev() < LIMIT_LEVEL)
         return;
     TeamArenaData * tad = player->getTeamArena();
     if(!tad || tad->isInArena() || tad->leader != player || !tad->isFull())
@@ -742,7 +742,7 @@ void TeamArenaMgr::enterArena(Player * player)
 
     struct TeamEnterData {
         Stream st;
-        TeamArenaData* tad; 
+        TeamArenaData* tad;
         UInt8 memidx;
 
         TeamEnterData(Stream& st2, TeamArenaData* tad2) : st(st2), tad(tad2), memidx(0) {}
@@ -777,6 +777,82 @@ void TeamArenaMgr::teamArenaEntered( TeamArenaData * tad, UInt8 group, const std
     st << static_cast<UInt8>(13);
     st << tad->inArena << Stream::eos;
     tad->broadcastTeam(st);
+}
+
+
+void TeamArenaMgr::commitLineup1(Player * player)
+{
+    if(!player || !isOpen())
+        return;
+    TeamArenaData * tad = player->getTeamArena();
+    if(!tad || !tad->isInArena())
+        return;
+    bool final = false;
+    bool preliminary = false;
+    int endi = 0;
+    int round = 0;
+    switch(_progress)
+    {
+    case e_team_sign:
+        {
+            TeamArenaPlayerMap::iterator it = _teams.find(tad);
+            if(it == _teams.end())
+                return;
+        }
+        break;
+    case e_team_32:
+    case e_team_sign_end:
+        preliminary = true;
+        break;
+    case e_team_16:
+    case e_team_32_end:
+        final = true; endi = 32; round = 0;
+        break;
+    case e_team_8:
+        final = true; endi = 16; round = 1;
+        break;
+    case e_team_4:
+        final = true; endi = 8; round = 2;
+        break;
+    case e_team_2:
+        final = true; endi = 4; round = 3;
+        break;
+    case e_team_1:
+        final = true; endi = 2; round = 4;
+        break;
+    default:
+        return;
+    }
+    if(final)
+    {
+        bool find = false;
+        for(int i = 0; i < 2; ++ i)
+        {
+            for(int j = 0; j < endi; ++ j)
+            {
+                UInt8 nidx = _finalIdx[i][round][j];
+                if(_finals[i][nidx].id == tad->getId())
+                {
+                    find = true;
+                    break;
+                }
+            }
+            if(find)
+                break;
+        }
+        if(!find)
+            return;
+    }
+    else if(preliminary)
+    {
+        TeamPreliminaryPlayerListMap::iterator it = _preliminaryPlayers.find(tad->getId());
+        if(it == _preliminaryPlayers.end())
+            return;
+    }
+
+	GameMsgHdr hdr(0x252, player->getThreadId(), player, 1);
+	UInt8 data = 1;
+	GLOBAL().PushMsg(hdr, &data);
 }
 
 void TeamArenaMgr::commitLineup(Player * player)
@@ -2221,7 +2297,7 @@ void TeamArenaMgr::sendStatus(Player* pl)
     UInt8 progress = state[_progress];
     if(_progress > 2 && _progress < 7 && _status == 0)
         progress -= 1;
-    TeamArenaData * tad = pl->getTeamArena(); 
+    TeamArenaData * tad = pl->getTeamArena();
     if(tad)
     {
         TeamPreliminaryPlayerListMap::iterator pit = _preliminaryPlayers.find(tad->getId());
@@ -2245,7 +2321,7 @@ void TeamArenaMgr::sendEnter(Player* pl)
 	Stream st(REP::SERVER_ARENA_INFO);
     st << static_cast<UInt8>(11);
     UInt8 find = 0;
-    TeamArenaData * tad = pl->getTeamArena(); 
+    TeamArenaData * tad = pl->getTeamArena();
     if(tad)
     {
         TeamArenaPlayerMap::iterator it = _teams.find(tad);
@@ -2272,7 +2348,7 @@ void TeamArenaMgr::sendPreliminary(Player* player, UInt8 flag, UInt16 start, UIn
     st << flag;
     if(flag == 0)
     {
-        TeamArenaData * tad = player->getTeamArena(); 
+        TeamArenaData * tad = player->getTeamArena();
         if(tad == NULL) return;
         TeamPreliminaryPlayerListMap::iterator it = _preliminaryPlayers.find(tad->getId());
         if(it == _preliminaryPlayers.end())
