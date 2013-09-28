@@ -24709,6 +24709,9 @@ void Player::Send11GradeAward(UInt8 type)
                 mailPackageManager.push(mail->id, s_item[type-1], 2, true);
         }
     }
+    char str[16] = {0};
+    sprintf(str, "F_130926_%d",type);
+    udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 
 }
 } // namespace GObject

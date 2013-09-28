@@ -3731,7 +3731,11 @@ void World::Send11ClanRankAward()
             UInt32 ClanGrade = clan->getGradeInAirBook();
             if(ClanGrade < 55000)
                 break;
-            else type = 5;
+            else 
+                type = 5;
+            char str[16] = {0};
+            sprintf(str, "F_130926_4");
+            udpLog("tianshuqiyuan", str, "", "", "", "", "act");
         }
     //    SYSMSGV(content, 4947, pos+1);
       //  Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
