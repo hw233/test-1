@@ -1129,18 +1129,19 @@ void Leaderboard::pushPetInfo(FairyPet* pet)
         return;
 
     PetInfoSetMap::iterator mapit = _petInfoSetMap.find(pl);
-    if(mapit != _petInfoSetMap.end())
+    while(mapit != _petInfoSetMap.end())
     {
-        for(; mapit->first == pl && mapit != _petInfoSetMap.end(); ++ mapit)
+        if(mapit->first != pl)
+            break;
+        PetInfoSetIt setit = mapit->second;
+        const PetInfoList& petInfo = *setit;
+        if(petInfo.petId == pet->getId())
         {
-            PetInfoSetIt setit = mapit->second;
-            const PetInfoList& petInfo = *setit;
-            if(petInfo.petId == pet->getId())
-            {
-                _petInfoSet.erase(petInfo);
-                _petInfoSetMap.erase(mapit);
-            }
+            _petInfoSet.erase(petInfo);
+            _petInfoSetMap.erase(mapit++);
+            break;
         }
+        ++ mapit;
     }
 
     PetInfoList petInfo;
@@ -1182,18 +1183,19 @@ void Leaderboard::erasePetInfo(FairyPet* pet)
         return;
 
     PetInfoSetMap::iterator mapit = _petInfoSetMap.find(pl);
-    if(mapit != _petInfoSetMap.end())
+    while(mapit != _petInfoSetMap.end())
     {
-        for(; mapit->first == pl && mapit != _petInfoSetMap.end(); ++ mapit)
+        if(mapit->first != pl)
+            break;
+        PetInfoSetIt setit = mapit->second;
+        const PetInfoList& petInfo = *setit;
+        if(petInfo.petId == pet->getId())
         {
-            PetInfoSetIt setit = mapit->second;
-            const PetInfoList& petInfo = *setit;
-            if(petInfo.petId == pet->getId())
-            {
-                _petInfoSet.erase(petInfo);
-                _petInfoSetMap.erase(mapit);
-            }
+            _petInfoSet.erase(petInfo);
+            _petInfoSetMap.erase(mapit++);
+            break;
         }
+        ++ mapit;
     }
 }
 

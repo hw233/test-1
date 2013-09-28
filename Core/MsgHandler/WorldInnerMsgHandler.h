@@ -855,14 +855,12 @@ void SendRechargeRank(Stream& st)
     for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
     {
         st << i->player->getName();
-        std::cout<<i->player->getName();
         st << i->total;
         st << static_cast<UInt8>(i->player->getCountry()<<4|(i->player->IsMale()?0:1));
         ++c;
         if (c >= CNT)
             break;
     }
-    std::cout<<std::endl;;
     st << Stream::eos;
 
     SyncToLogin4IDIP();
@@ -901,14 +899,12 @@ void Send11PlayerGradeRank(Stream& st)
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
         st << i->player->getName();
-        std::cout<<i->player->getName();
         st << i->total;
      //   st << static_cast<UInt8>(i->player->getCountry()<<4|(i->player->IsMale()?0:1));
         ++c;
         if (c >= CNT)
             break;
     }
-    std::cout<<std::endl;
     st << Stream::eos;
 
 }
