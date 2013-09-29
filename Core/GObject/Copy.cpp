@@ -18,6 +18,7 @@
 #include "LuckyDraw.h"
 #include "Package.h"
 #include "GObject/Tianjie.h"
+#include "GObject/Clan.h"
 #include "JobHunter.h"
 namespace GObject
 {
@@ -269,6 +270,10 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         pl->useGold(gold, &ci);
 
         ++PLAYER_DATA(pl, copyGoldCnt);
+         
+        if(PLAYER_DATA(pl, copyGoldCnt) == getGoldCount(pl->getVipLevel()) && World::get11Time() && pl->getClan()!=NULL)
+            SYSMSG_BROADCASTV(4957, pl->getClan()->getName().c_str(),pl->getCountry(), pl->getPName());
+       
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %" I64_FMT "u",
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         lootlvl = PLAYER_DATA(pl, copyGoldCnt);

@@ -1302,11 +1302,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1C9, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
-    if (World::getSurnameLegend())
+    if (World::get11Time())
     {
-        GameMsgHdr hdr(0x1CD, WORKER_THREAD_WORLD, pl, 0);
+        GameMsgHdr hdr(0x1D2, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
-        GameMsgHdr hdr1(0x1CE, WORKER_THREAD_WORLD, pl, 0);
+        GameMsgHdr hdr1(0x1D3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr1, NULL);
     }
     pl->sendYearRPInfo();
@@ -3788,6 +3788,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         UInt32 goldLeft = player->GetVar(VAR_AIRBOOK_CONSUME)%30;
                         player->AddVar(VAR_AIRBOOK_CONSUME,price);
                         player->Add11grade( (price+goldLeft)/30 *10);
+                        if(price>=1000 && player->getClan())
+                            SYSMSG_BROADCASTV(4956,player->getClan()->getName().c_str(),player->getCountry() ,player->getPName());
                     }
                     st << static_cast<UInt8>(0);
 

@@ -14,6 +14,8 @@
 #include "ShuoShuo.h"
 #include "Package.h"
 #include "GObject/Tianjie.h"
+#include "GObject/Clan.h"
+
 namespace GObject
 {
 
@@ -230,6 +232,9 @@ void FrontMap::enter(Player* pl, UInt8 id)
             }
 
             ++PLAYER_DATA(pl, frontGoldCnt);
+            if(PLAYER_DATA(pl, frontGoldCnt) == getGoldCount(pl->getVipLevel()) && World::get11Time() && pl->getClan()!=NULL)
+                SYSMSG_BROADCASTV(4958, pl->getClan()->getName().c_str(),pl->getCountry(), pl->getPName());
+
             tmp.resize(1);
             tmp[0].lootlvl = PLAYER_DATA(pl, frontGoldCnt);
             DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`, `lootlvl`) VALUES(%" I64_FMT "u, %u, 0, 0, 0, %u)",
@@ -578,6 +583,7 @@ void FrontMap::addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UIn
 
 void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool init)
 {
+    //阵图广播
     if (!pl || !id)
         return;
 

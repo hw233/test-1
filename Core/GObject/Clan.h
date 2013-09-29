@@ -519,7 +519,7 @@ public:
     UInt32 getClanFunds() { return _funds; }
 
     void addClanGradeInAirBook(UInt32 grade);
-    void updataClanGradeInAirBook();
+    void updataClanGradeInAirBook(Player * pl= NULL);
     UInt32 getGradeInAirBook(){return  _gradeInAirbook;}
     void SendClanMemberGrade(Player* player);
     UInt8 skillLevelUp(Player* pl, UInt8 skillId);
