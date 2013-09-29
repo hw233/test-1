@@ -12260,13 +12260,13 @@ namespace GObject
             return;
         UInt32 type = GetVar(VAR_SUMMER_MEET_TYPE);
         UInt32 Award = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
-        if(type == 0||Award==1)
+        if(type == 0||Award==1 || type > 3)
             return ;
         UInt8 succ = GameAction()->RunSummerMeetAward(this, type);
         if(succ)
         {
             SetVar(VAR_SUMMER_MEET_TYPE_AWARD, 1);
-            SetVar(VAR_SUMMER_MEET_TYPE,0);
+            SetVar(VAR_SUMMER_MEET_TYPE,5);
             char str[16] = {0};
             sprintf(str, "F_130722_%d", type+4);
             udpLog("shuqihuiliu", str, "", "", "", "", "act");
@@ -14969,7 +14969,7 @@ namespace GObject
             return;
         UInt32 SummerMeetType = GetVar(VAR_SUMMER_MEET_TYPE);
         UInt32 SummerMeetTypeAward = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
-        if(SummerMeetType==0 || SummerMeetTypeAward ==0)
+        if(SummerMeetType==0 || SummerMeetTypeAward == 0 || SummerMeetType > 3)
             return ;
         UInt32 SummerMeetLogin = GetVar(VAR_SUMMER_MEET_LOGIN);
         UInt32 SummerMeetRechargeAward = GetVar(VAR_SUMMER_MEET_RECHARGE_AWARD);
