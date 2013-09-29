@@ -1544,9 +1544,9 @@ namespace Script
     {
         return Call<UInt8>("GetSthCheckFlag", idx);
     }
-    UInt8 GameActionLua::GetGradeCheckFlag(UInt8 idx)
+    UInt8 GameActionLua::GetGradeCheckFlag(UInt8 idx,UInt8 type)
     {
-        return Call<UInt8>("GetGradeCheckFlag", idx);
+        return Call<UInt8>("GetGradeCheckFlag", idx,type);
     }
     
     UInt8 GameActionLua::EveryDayRoarSoul()

@@ -8216,6 +8216,8 @@ namespace GObject
             UInt32 goldLeft = GetVar(VAR_AIRBOOK_RECHARGE)%30;
             AddVar(VAR_AIRBOOK_RECHARGE,r);
             Add11grade((r+goldLeft)/30*10);
+            if(r>=1000 && getClan())
+               SYSMSG_BROADCASTV(4956, getClan()->getName().c_str(),getCountry(), getPName());
         }
         addRechargeNextRet(r);
         {
@@ -22719,7 +22721,17 @@ void Player::On11ClanGradeRank()
 {
     if(World::get11Time())
     {
-        UInt32 grade = GetVar(VAR_11AIRBOOK_GRADE);
+        Clan * clan =getClan();
+        if(clan == NULL)
+        {
+            Stream st(REP::ACT);  //lib待定  帮派排名
+            st << static_cast<UInt8>(0x20) << static_cast<UInt8>(3) << static_cast<UInt8>(2);
+            st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << Stream::eos;
+            send(st);
+            return ;
+        }
+        clan->updataClanGradeInAirBook();
+        UInt32 grade = clan->getGradeInAirBook(); 
         GameMsgHdr hdr(0x1CE, WORKER_THREAD_WORLD, this, sizeof(grade));
         GLOBAL().PushMsg(hdr, &grade);
     }
@@ -22736,10 +22748,7 @@ void Player::On11PlayerGradeRank()
 {
     if(World::get11Time())
     {
-        Clan * clan =getClan();
-        if(clan == NULL)
-            return ;
-        UInt32 grade = clan->getGradeInAirBook(); 
+        UInt32 grade = GetVar(VAR_11AIRBOOK_GRADE);
         GameMsgHdr hdr(0x1CD, WORKER_THREAD_WORLD, this, sizeof(grade));
         GLOBAL().PushMsg(hdr, &grade);
     }
@@ -24542,29 +24551,64 @@ void Player::getAirBookLoginAward(UInt8 type)
 
 void Player::Add11grade(UInt32 grade)
 {
-    if(!World::get11TimeNum() > 15)
+    if(!World::get11Time())
        return ;
 
+    UInt32 gradeAward[]={1200,2200,3200};
+    UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
+    for(UInt8 i =0 ; i< 3 ;i++)
+    {
+        if(airGrade < gradeAward[i] &&( airGrade + grade) >=gradeAward[i])
+            Send11GradeAward(i+1);
+    }
+    AddVar(VAR_11AIRBOOK_GRADE,grade);
+    AddVar(VAR_11AIRBOOK_GRADE_DAY,grade);
+    Clan * clan = getClan();
+    if(clan!=NULL)
+        clan->addClanGradeInAirBook(grade);
+    OnSend11GradeInfo(World::get11TimeNum());
+    On11ClanGradeRank();
+    On11CountryGradeRank();
+    On11PlayerGradeRank();
+}
+void Player::AirBookPriase(UInt8 type,UInt64 playerid)
+{
+    if(!World::get11Time())
+        return ;
+    Clan* clan = getClan();
+    if(clan==NULL)
+        return ;
+    Player* pl = globalPlayers[playerid];
+   if( pl == NULL )
+       return ;
+   if( pl == this )
+       return ;
+       Stream st;
+   if( type == 0 ) 
+   {
+       SYSMSGVP(st,4960,getCountry(), getName().c_str(),pl->getCountry(), pl->getName().c_str());
+   }
+   if(type == 1 )
+       SYSMSGVP(st,4961,getCountry(), getName().c_str(),pl->getCountry(), pl->getName().c_str());
+   clan->broadcast(st);
+}
+void Player::SendClanMemberGrade()
+{
+    GameMsgHdr hdr(0x1D1, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr, NULL);
+}
+void Player::Send11GradeAward(UInt8 type)
+{
     UInt32 gradeAward[]={1200,2200,3200};
     static MailPackage::MailItem s_item[][6] = {
         {{500,6},{503,6},{501,4},{512,5},{516,4},{514,6}},
         {{1325,3},{503,6},{509,5},{547,6},{134,3},{549,1}},
         {{1717,1},{8555,4}},
     };
-    SYSMSG(title, 4950);
-    UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
-    UInt8 type = 0;
-    for(UInt8 i =0 ; i< 3 ;i++)
-    {
-        if(airGrade < gradeAward[i] &&( airGrade + grade) >gradeAward[i])
-          type = i+1;  
-    }
-    AddVar(VAR_11AIRBOOK_GRADE,grade);
-    AddVar(VAR_11AIRBOOK_GRADE_DAY,grade);
-    OnSend11GradeInfo(World::get11TimeNum());
+    SYSMSG(title, 4954);
     if(type)
     {
-        SYSMSGV(content, 4951,gradeAward[type-1]);
+        SYSMSGV(content, 4955,gradeAward[type-1]);
         Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)
@@ -24575,6 +24619,7 @@ void Player::Add11grade(UInt32 grade)
                 mailPackageManager.push(mail->id, s_item[type-1], 2, true);
         }
     }
+
 }
 } // namespace GObject
 

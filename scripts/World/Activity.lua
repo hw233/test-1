@@ -1423,7 +1423,7 @@ function initActTime(y, m, d)
   local  SerStartTm252= { ['year'] = 2013, ['month'] = 9, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm252_1= { ['year'] = 2013, ['month'] = 9, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
-  local  SerStartTm253= { ['year'] = 2013, ['month'] = 9, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm253= { ['year'] = 2013, ['month'] = 9, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm253_1= { ['year'] = 2013, ['month'] = 10, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
