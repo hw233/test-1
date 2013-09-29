@@ -261,6 +261,7 @@ namespace GObject
                 _owner->sendMsgCode(0, 4001);
             UInt8 value = GET_REMAINDER(getPetLev()) + 10;
             _owner->fairyPetUdpLog(10000, value > 10 ? value : 20);
+            GameAction()->doStrong(_owner, SthPinJieUp, 0, 0); 
         }
         sendPinjieInfo();
         UpdateToDB();
@@ -325,7 +326,6 @@ namespace GObject
             reset(2);
             reset(3);
             boneUp();
-            GameAction()->doStrong(_owner, SthGenguUp, 0, 0); 
             //_owner->sendMsgCode(0, 4002);
             if(GET_REMAINDER(getPetBone()) == 2 && getColor() > 1)
                 SYSMSG_BROADCASTV(4135, _owner->getCountry(), _owner->getName().c_str(), getColor(), getName().c_str(), getPetBone());
@@ -401,6 +401,7 @@ namespace GObject
             int num = getChongNum() + chong - ggd->limit;
             if(num > 0)
                 addGenguBless(num * 100);
+            GameAction()->doStrong(_owner, SthGenguUp, 0, 0); 
         }
         else
         {
@@ -428,6 +429,7 @@ namespace GObject
             int num = getChongNum() + chong - ggd->limit;
             if(num > 0)
                 addGenguBless(num * 100);
+            GameAction()->doStrong(_owner, SthGenguUp, 0, 0); 
         }
         addChongNum(chong);
         sendGenguInfo();

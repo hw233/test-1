@@ -4662,6 +4662,7 @@ namespace GObject
         char str[16] = {0};
         sprintf(str, "F_130822_8");
         udpLog("xuyuanshu", str, "", "", "", "", "act");
+        GameAction()->doStrong(this, SthPrayTree, 0 ,0 );
     }
     void Player::SendOtherInfoForPray(Player* other,UInt32 op)
     {
@@ -4805,6 +4806,7 @@ namespace GObject
         char str[16] = {0};
         sprintf(str, "F_130822_1");
         udpLog("xuyuanshu", str, "", "", "", "", "act");
+        GameAction()->doStrong(this, SthPrayTree, 0 ,0 );
     }
      
     void Player::getPrayAward()
@@ -24355,6 +24357,10 @@ void Player::checkSelectPray()
             newRC7DayUdpLog(1152, 13);
         }
     }
+}
+void Player::doStrongInWorld(UInt8 type)
+{
+    GameAction()->doStrong(this, type, 0,0);
 }
 
 } // namespace GObject

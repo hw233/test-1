@@ -1140,7 +1140,6 @@ bool ClanBoss::attack(Player* pl)
     st << Stream::eos;
     pl->send(st);
     bsim.applyFighterHP(0, pl);
-    GameAction()->doStrong(pl, SthLastDay, 0, 0);
     return res;
 
 }
@@ -1181,6 +1180,7 @@ void ClanBoss::membersAction(Clan* cl, Player* pl, bool b, UInt8 t)
             temp.insert(pl);
             _membersClan[t][cl] = temp;
         }
+        GameAction()->doStrong(pl, SthLastDay, 0, 0);
     }
 }
 void ClanBoss::pickXianyun(Player* pl, UInt64 other)

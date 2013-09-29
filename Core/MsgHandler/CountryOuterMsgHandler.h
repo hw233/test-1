@@ -6235,6 +6235,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 4:
                     case 5:
                         jobHunter->OnRequestStart(val);
+                        GameAction()->doStrong(player, SthSerachMo, 0, 0);
                         break;
                     case 10:
                         // 老虎机转盘转动

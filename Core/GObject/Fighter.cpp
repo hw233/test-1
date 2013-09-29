@@ -5083,6 +5083,7 @@ bool Fighter::practiceLevelUp()
     {
         sendModification(6, _pexp);
         st << static_cast<UInt8>(0) << m_2ndSoul->getPracticeLevel();
+        GameAction()->doStrong(_owner, SthSpiritUp, 0, 0);
     }
     else
         st << static_cast<UInt8>(1);
@@ -5091,7 +5092,6 @@ bool Fighter::practiceLevelUp()
 
     _owner->send(st);
        
-    GameAction()->doStrong(_owner, SthSpiritUp, 0, 0);
     return true;
 }
 
