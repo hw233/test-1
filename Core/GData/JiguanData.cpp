@@ -34,7 +34,8 @@ namespace GData
         jiguanshuInfo info;
         
         info.jgshuLvl = jgsData.jgshuLvl;
-        info.needExp = jgsData.totalNeedExp;
+        info.totalExp = jgsData.totalNeedExp;
+        info.needExp = jgsData.needExp;
         info.attrValue1 = jgsData.attrValue1;
         info.attrValue2 = jgsData.attrValue2;
         info.attrValue3 = jgsData.attrValue3;

@@ -33,8 +33,21 @@ void MoFang::Init()
 
 void MoFang::AddJGSFromDB(DBJiguanshu & dbData)
 {
-    m_jiguanshu.curLvl = dbData.curLvl;
     m_jiguanshu.curExp = dbData.curExp;
+
+    GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getUpgradeInfo(dbData.curExp);
+    if(!jgsInfo)
+        return;
+    
+    if(m_jiguanshu.curExp == jgsInfo->totalExp)
+    {
+        m_jiguanshu.curLvl = jgsInfo->jgshuLvl + 1;
+    }
+    else
+        m_jiguanshu.curLvl = jgsInfo->jgshuLvl;
+
+    //m_jiguanshu.curLvl = dbData.curLvl;
+    //m_jiguanshu.curExp = dbData.curExp;
 
     UInt8 temp[20][2] = {{10, 11}, {12, 13}, {20, 27}, {34, 41}, {40, 39}, 
                 {38, 37}, {30, 23}, {16, 9}, {2, 3}, {4, 5},
@@ -600,7 +613,7 @@ void MoFang::upgradeJGS()
         if(!jgsInfo)
             return;
         
-        if(m_jiguanshu.curExp == jgsInfo->needExp)
+        if(m_jiguanshu.curExp == jgsInfo->totalExp)
         {
             m_jiguanshu.curLvl = jgsInfo->jgshuLvl + 1;
         }
@@ -742,52 +755,40 @@ void MoFang::addJGYAttr(GData::AttrExtra& ae)
         switch(jgyInfo->attrType)
         {
             case 1:
-                ae.attack += addAttr;
-                ae.attack += jgyInfo->attrValue;
+                ae.attack += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 2:
-                ae.magatk += addAttr;
-                ae.magatk += jgyInfo->attrValue;
+                ae.magatk += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 3:
-                ae.defend += addAttr;
-                ae.defend += jgyInfo->attrValue;
+                ae.defend += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 4:
-                ae.magdef += addAttr;
-                ae.magdef += jgyInfo->attrValue;
+                ae.magdef += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 5:
-                ae.hp += addAttr;
-                ae.hp += jgyInfo->attrValue;
+                ae.hp += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 6:
-                ae.toughlvl += addAttr;
-                ae.toughlvl += jgyInfo->attrValue;
+                ae.toughlvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 7:
-                ae.action += addAttr;
-                ae.action += jgyInfo->attrValue;
+                ae.action += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 8:
-                ae.hitrlvl += addAttr;
-                ae.hitrlvl += jgyInfo->attrValue;
+                ae.hitrlvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 9:
-                ae.evdlvl += addAttr;
-                ae.evdlvl += jgyInfo->attrValue;
+                ae.evdlvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 10:
-                ae.crilvl += addAttr;
-                ae.crilvl += jgyInfo->attrValue;
+                ae.crilvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 11:
-                ae.pirlvl += addAttr;
-                ae.pirlvl += jgyInfo->attrValue;
+                ae.pirlvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
             case 12:
-                ae.counterlvl += addAttr;
-                ae.counterlvl += jgyInfo->attrValue;
+                ae.counterlvl += jgyInfo->attrValue * (1 + addAttr);
                 break;
         }
     }

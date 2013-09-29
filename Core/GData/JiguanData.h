@@ -29,13 +29,14 @@ class JiguanData
         struct jiguanshuInfo
         {
             UInt8 jgshuLvl;     // 机关术等级
-            UInt32 needExp;     // 升到下个等级所需经验
+            UInt32 totalExp;    // 升到下个等级所需经验
+            UInt32 needExp;         
             float attrValue1;   // 风属性加成 
             float attrValue2;   // 林属性加成 
             float attrValue3;   // 火属性加成 
             float attrValue4;   // 山属性加成 
 
-            jiguanshuInfo(): jgshuLvl(0), needExp(0), attrValue1(0.00), attrValue2(0.00), attrValue3(0.00), attrValue4(0.00) {}
+            jiguanshuInfo(): jgshuLvl(0), totalExp(0), needExp(0), attrValue1(0.00), attrValue2(0.00), attrValue3(0.00), attrValue4(0.00) {}
         };
 
         struct tuzhiInfo
