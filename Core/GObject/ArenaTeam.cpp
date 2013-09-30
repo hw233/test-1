@@ -1681,16 +1681,22 @@ void TeamArenaMgr::calcFinalBet(int i)
                             if(ep1.id != 0)
                             {
                                 TeamArenaData * tad = globalTeamArena[ep1.id];
-                                SYSMSGV(content, 791, tad->getName().c_str(), _session, p, winCount, totalCount[_round-1] - winCount);
-                                sendTeamMail(tad, title, content);
-                                addTeamScore(tad, _round, true);
+                                if(tad)
+                                {
+                                    SYSMSGV(content, 791, tad->getName().c_str(), _session, p, winCount, totalCount[_round-1] - winCount);
+                                    sendTeamMail(tad, title, content);
+                                    addTeamScore(tad, _round, true);
+                                }
                             }
                             if(ep2.id != 0)
                             {
                                 TeamArenaData * tad = globalTeamArena[ep2.id];
-                                SYSMSGV(content, 793, tad->getName().c_str(), _session, p, totalCount[_round-1] - winCount, winCount);
-                                sendTeamMail(tad, title2, content);
-                                addTeamScore(tad, _round, false);
+                                if(tad)
+                                {
+                                    SYSMSGV(content, 793, tad->getName().c_str(), _session, p, totalCount[_round-1] - winCount, winCount);
+                                    sendTeamMail(tad, title2, content);
+                                    addTeamScore(tad, _round, false);
+                                }
                             }
                         }
                         else
@@ -1698,16 +1704,22 @@ void TeamArenaMgr::calcFinalBet(int i)
                             if(ep2.id != 0)
                             {
                                 TeamArenaData * tad = globalTeamArena[ep2.id];
-                                SYSMSGV(content, 791, tad->getName().c_str(), _session, p, totalCount[_round-1] - winCount, winCount);
-                                sendTeamMail(tad, title, content);
-                                addTeamScore(tad, _round, true);
+                                if(tad)
+                                {
+                                    SYSMSGV(content, 791, tad->getName().c_str(), _session, p, totalCount[_round-1] - winCount, winCount);
+                                    sendTeamMail(tad, title, content);
+                                    addTeamScore(tad, _round, true);
+                                }
                             }
                             if(ep1.id != 0)
                             {
                                 TeamArenaData * tad = globalTeamArena[ep1.id];
-                                SYSMSGV(content, 793, tad->getName().c_str(), _session, p, winCount, totalCount[_round-1] - winCount);
-                                sendTeamMail(tad, title2, content);
-                                addTeamScore(tad, _round, false);
+                                if(tad)
+                                {
+                                    SYSMSGV(content, 793, tad->getName().c_str(), _session, p, winCount, totalCount[_round-1] - winCount);
+                                    sendTeamMail(tad, title2, content);
+                                    addTeamScore(tad, _round, false);
+                                }
                             }
                         }
                     }
