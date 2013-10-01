@@ -6196,8 +6196,7 @@ namespace GObject
                     update = true;
                     lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * 1.15f + 0.99f;
                 }
-
-                if(lba.lbColor == 5)
+                else if(lba.lbColor == 5)
                 {
                     UInt16 value = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * _lbAttrConf.colorVal[3]/400;
                     if(lba.value[i] < value)
