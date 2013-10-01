@@ -34,7 +34,8 @@ namespace GData
         jiguanshuInfo info;
         
         info.jgshuLvl = jgsData.jgshuLvl;
-        info.needExp = jgsData.totalNeedExp;
+        info.totalExp = jgsData.totalNeedExp;
+        info.needExp = jgsData.needExp;
         info.attrValue1 = jgsData.attrValue1;
         info.attrValue2 = jgsData.attrValue2;
         info.attrValue3 = jgsData.attrValue3;
@@ -150,7 +151,7 @@ namespace GData
         std::map<UInt8, jiguanshuInfo>::iterator iter = _jiguanshuInfo.begin();
         for(; iter!=_jiguanshuInfo.end(); iter++)
         {
-            if((iter->second.jgshuLvl >= 100) || (iter->second.needExp >= curExp))
+            if((iter->second.jgshuLvl == 50) || (iter->second.totalExp >= curExp))
             {
                 return &(iter->second);
             }

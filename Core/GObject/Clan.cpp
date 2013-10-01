@@ -462,7 +462,10 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 	GameMsgHdr hdr(0x310, player->getThreadId(), player, sizeof(type));
 	GLOBAL().PushMsg(hdr, &type);
 
-    player->OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 0);
+    if(World::get11Time())
+    {
+        updataClanGradeInAirBook();
+    }player->OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 0);
 	return true;
 }
 
@@ -491,8 +494,11 @@ bool Clan::join(ClanMember * cm)
 	//updateRank(oldLeaderName);
 	_membersJoinTime.insert(cm->joinTime);
     player->setClan(this);
-
-	return true;
+    if(World::get11Time())
+    {
+        updataClanGradeInAirBook();
+    }
+    return true;
 }
 
 bool Clan::kick(Player * player, UInt64 pid)
@@ -574,7 +580,11 @@ bool Clan::kick(Player * player, UInt64 pid)
 
 	_members.erase(found);
 	delete member;
-	ClanBattle * battleClan = kicker->getClanBattle();
+    if(World::get11Time())
+    {
+        updataClanGradeInAirBook();
+    }
+    ClanBattle * battleClan = kicker->getClanBattle();
 	if (battleClan != NULL)
 		battleClan->kickClanBattler(kicker);
 
@@ -651,7 +661,13 @@ bool Clan::leave(Player * player)
 
 	_members.erase(found);
 	delete member;
-
+    if(World::get11Time())
+    {
+        updataClanGradeInAirBook(player);
+        UInt32 clanId = getId(); 
+        GameMsgHdr hdr(0x1D4, WORKER_THREAD_WORLD, player, sizeof(clanId));
+        GLOBAL().PushMsg(hdr, &clanId);
+    }
     ClanOpt co = {0};
     co.type = 2;
     co.clan = NULL;
@@ -1638,8 +1654,15 @@ void Clan::disband(Player * player)
 	//_techs = NULL;
 	_clanBattle->clearClanBattle();
 	_deleted = true;
-}
 
+    if(World::get11Time())
+    {
+        updataClanGradeInAirBook(player);
+        UInt32 clanId = getId(); 
+        GameMsgHdr hdr(0x1D4, WORKER_THREAD_WORLD, player, sizeof(clanId));
+        GLOBAL().PushMsg(hdr, &clanId);
+    }
+}
 float Clan::getAutoBattleSpeed()
 {
 	return _techs->getAtuobattleSpeed() / 100.0f + 1.0f;
@@ -4852,15 +4875,18 @@ void Clan::addClanGradeInAirBook(UInt32 grade)
 {
     _gradeInAirbook += grade;
 }
-void Clan::updataClanGradeInAirBook()
+void Clan::updataClanGradeInAirBook(Player* pl)
 {
 	Mutex::ScopedLock lk(_mutex);
+
     _gradeInAirbook = 0;
+    if(_deleted)
+        return ;
 	Members::iterator it = _members.begin();
 	for (; it != _members.end(); ++it)
 	{
         Player * player = (*it)->player; 
-        if(player == NULL)
+        if( player == NULL || ( pl != NULL && player == pl) )
             continue ; 
         _gradeInAirbook += player->GetVar(VAR_11AIRBOOK_GRADE);
 	}
@@ -4883,7 +4909,7 @@ void Clan::SendClanMemberGrade(Player* player)
         Player * pl = (*it)->player; 
         if(pl == NULL)
             continue ; 
-        st<<pl->getName()<<pl->GetVar(VAR_11AIRBOOK_GRADE);
+        st<<pl->getName()<<pl->getId()<<pl->GetVar(VAR_11AIRBOOK_GRADE)<<getClanRank(pl);
 	}
     st.data<UInt8>(offset) = pos;
     st<<Stream::eos;

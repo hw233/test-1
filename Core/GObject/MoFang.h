@@ -48,8 +48,8 @@ namespace GObject
 
     #define NORMAL_TUZHI   100000
     #define SPECIAL_TUZHI  200000
-    #define JGS_MAXEXP     4327850
-    #define JGS_MAXLVL     100
+    #define JGS_MAXEXP     1101600
+    #define JGS_MAXLVL     50
 
     class Player;
 	class Fighter;

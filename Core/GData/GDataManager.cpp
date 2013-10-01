@@ -2133,7 +2133,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBJiguanshuConfig dbjgs;
-		if(execu->Prepare("SELECT `jgshuLvl`, `totalNeedExp`, `attrValue1`, `attrValue2`, `attrValue3`, `attrValue4`  FROM `jiguanshu`", dbjgs) != DB::DB_OK)
+		if(execu->Prepare("SELECT `jgshuLvl`, `totalNeedExp`, `needExp`, `attrValue1`, `attrValue2`, `attrValue3`, `attrValue4`  FROM `jiguanshu`", dbjgs) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)

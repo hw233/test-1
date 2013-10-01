@@ -3683,22 +3683,22 @@ void World::Send11PlayerRankAward()
         {{509,25},{515,25},{503,50},{134,25}},
         {{509,20},{515,20},{503,40},{134,20}},
     };
-    static MailPackage::MailItem card = {9276,1};
+    static MailPackage::MailItem card = {9922,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
-        ++pos;
-        if(pos > 3) break;
         Player* player = i->player;
         if (!player)
             continue;
-        SYSMSGV(content, 4951, pos+1);
+        ++pos;
+        if(pos > 3) break;
+        SYSMSGV(content, 4951, pos);
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)
         {
-            mailPackageManager.push(mail->id, s_item[pos], 4, true);
-            if(pos ==0)
+            mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
+            if(pos ==1)
                 mailPackageManager.push(mail->id, &card, 1, true);
         }
     }
@@ -3719,19 +3719,19 @@ void World::Send11ClanRankAward()
     ClanGradeSort::iterator i = World::clanGradeSort.begin();
     for ( ;i != World::clanGradeSort.end(); ++i)
     {
-        ++pos;
-        UInt32 type = pos ; 
         Clan* clan = i->clan;
         if (!clan)
             continue;
+        ++pos;
+        UInt32 type = pos ; 
         if(pos > 3 && pos <8)
-            type = 3;
+            type = 4;
         if(pos > 7 )
         {
             UInt32 ClanGrade = clan->getGradeInAirBook();
-            if(ClanGrade < 58000)
+            if(ClanGrade < 55000)
                 break;
-            else type = 4;
+            else type = 5;
         }
     //    SYSMSGV(content, 4947, pos+1);
       //  Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
@@ -3742,11 +3742,11 @@ void World::Send11ClanRankAward()
            // if(pos ==0)
             //    mailPackageManager.push(mail->id, &card, 1, true);
        // }
-        if(type > 5 ||type<0)
+        if(type > 5 ||type<1)
             continue;
-        for(UInt32 index =0 ; index < 5 ;++ index)
+        for(UInt32 index =0 ; index < 5 ;++index)
         {
-            clan->AddItem(ClanAwardID[index],ClanAwardNum[type][index]);       
+            clan->AddItem(ClanAwardID[index],ClanAwardNum[type-1][index]);       
         }
     }
     
@@ -3760,28 +3760,40 @@ void World::Send11CountryRankAward()
     };
     ClanGradeSort::iterator i = World::clanGradeSort.begin();
     UInt32 EM=0,KL=0;
-    UInt8 em=2,kl=0;
+    UInt8 em=2,kl=2;
     UInt8 win = 0;
+    std::string emei[2];
+    std::string kunlun[2];
     for ( ;i != World::clanGradeSort.end()&&( em || kl ); ++i)
     {
         Clan* clan = i->clan;
         if (!clan)
             continue;
-       if(clan->getCountry() ==0)
+       if(clan->getCountry() ==0 && em != 0)
        {
             UInt32 ClanGrade = clan->getGradeInAirBook();
+            emei[2-em]=clan->getName();
             em--;
             EM += ClanGrade;
        }
-       else if(clan->getCountry() ==1 )
+       else if(clan->getCountry() ==1 && kl!=0)
        {
            UInt32 ClanGrade = clan->getGradeInAirBook();  
+           kunlun[2-kl]=clan->getName();
            kl--;
            KL += ClanGrade;
        }
     } 
     if(EM < KL )
         win = 1 ;
+    if(win == 0)
+    {
+        SYSMSG_BROADCASTV(4962,emei[0].c_str(),emei[1].c_str() );
+    }
+    else if(win == 1)
+    {
+        SYSMSG_BROADCASTV(4963,kunlun[0].c_str(),kunlun[1].c_str());
+    }
     SYSMSG(title, 4952);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {

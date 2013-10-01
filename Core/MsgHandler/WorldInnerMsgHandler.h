@@ -888,6 +888,7 @@ void SendLuckyBagRank(Stream& st)
 }
 void Send11PlayerGradeRank(Stream& st)
 {
+    World::initRCRank();
     using namespace GObject;
     st.init(REP::ACTIVE);    //lib待定
     UInt32 cnt = World::PlayerGradeSort.size();
@@ -905,6 +906,7 @@ void Send11PlayerGradeRank(Stream& st)
             break;
     }
     st << Stream::eos;
+
 }
 void Send11ClanGradeRank(Stream& st)
 {
@@ -917,6 +919,8 @@ void Send11ClanGradeRank(Stream& st)
     UInt32 c = 0;
     for (ClanGradeSort::iterator i = World::clanGradeSort.begin(), e = World::clanGradeSort.end(); i != e; ++i)
     {
+        if(i->clan == NULL)
+            continue ;
         st << i->clan->getName();
         st << i->total;
      //   st <<i->clan->getCountry();
@@ -926,6 +930,55 @@ void Send11ClanGradeRank(Stream& st)
             break;
     }
     st << Stream::eos;
+}
+void OnSend11ClanGradeRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+    Stream st;
+    Send11ClanGradeRank(st);
+    player->send(st);
+    Clan * clan = player->getClan();
+    if(clan == NULL)
+        return ;
+
+    UInt32 rank = 0;
+    for (ClanGradeSort::iterator i = World::clanGradeSort.begin(), e = World::clanGradeSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->clan == clan)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(0x20) << static_cast<UInt8>(3) << static_cast<UInt8>(2);
+            st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
+}
+void OnSend11PlayerGradeRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+    Stream st;
+    Send11PlayerGradeRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(0x20) << static_cast<UInt8>(1) << static_cast<UInt8>(2);
+            st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
 }
 
 void OnRechargeRank ( GameMsgHdr& hdr,  const void* data )
@@ -1096,6 +1149,10 @@ void On11ClanGradeRank ( GameMsgHdr& hdr,  const void* data )
     MSG_QUERY_PLAYER(player);
 
     Clan * clan = player->getClan();
+    if(clan == NULL)
+    {
+        return ;
+    }
     UInt32 total = *((UInt32*)data);
     if (!total)
         return;
@@ -1126,16 +1183,16 @@ void On11ClanGradeRank ( GameMsgHdr& hdr,  const void* data )
     {
        if (!stop)
             ++myrank;
-
-        if (i->clan == clan)
-            stop = true;
-
         ++rank;
-
-        Stream st(REP::ACT);  //lib待定  帮派排名
-        st << static_cast<UInt8>(0x20) << static_cast<UInt8>(3) << static_cast<UInt8>(2);
-        st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
-        player->send(st);
+        if (i->clan == clan)
+        {
+            stop = true;
+            Stream st(REP::ACT);  //lib待定  帮派排名
+            st << static_cast<UInt8>(0x20) << static_cast<UInt8>(3) << static_cast<UInt8>(2);
+            st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
     }
 
     if (oldrank <= CNT || (!inrank && myrank <= CNT))
@@ -1144,6 +1201,42 @@ void On11ClanGradeRank ( GameMsgHdr& hdr,  const void* data )
         Send11ClanGradeRank(st);
         NETWORK()->Broadcast(st);
     }
+}
+void Update11ClanRank(GameMsgHdr& hdr,const void* data)
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 clanId = *((UInt32*)data);
+
+    for (ClanGradeSort::iterator i = World::clanGradeSort.begin(), e = World::clanGradeSort.end(); i != e; ++i)
+    {
+        if (i->clan->getId() == clanId)
+        {
+            World::clanGradeSort.erase(i);
+            break;
+        }
+    }
+
+    Clan * clan = globalClans[clanId];
+    if(clan == NULL)
+    {
+        Stream st;
+        Send11ClanGradeRank(st);
+        NETWORK()->Broadcast(st);
+        return ;
+    }
+    UInt32 total = clan->getGradeInAirBook();
+    if (!total)
+        return;
+
+    ClanSort s;
+    s.clan = clan;
+    s.total = total;
+    World::clanGradeSort.insert(s);
+    Stream st;
+    Send11ClanGradeRank(st);
+    NETWORK()->Broadcast(st);
 }
 void On11CountryGradeRank ( GameMsgHdr& hdr,  const void* data )
 {
@@ -1186,7 +1279,7 @@ void On11CountryGradeRank ( GameMsgHdr& hdr,  const void* data )
         } 
     }
     st.data<UInt8>(pos) = ( 2 - kl );
-    st<<static_cast<UInt8>(Emei)<<static_cast<UInt8>(KunLun);
+    st<<static_cast<UInt32>(Emei)<<static_cast<UInt32>(KunLun);
     st<<Stream::eos;
     player->send(st);
 }
