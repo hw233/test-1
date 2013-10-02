@@ -183,7 +183,15 @@ end
 function doStrong(player, id, param1, param2)
     local num = get11TimeNum();
     if num > 0 and num < 12 then
+        -- XXX: 这是一个不应该出现的BUG
+        if id == 16 then
+            checkFlag[id] = 3
+        end
         do11Grade(player, id, num, param2);
+    else
+        if id == 16 then
+            checkFlag[id] = 1
+        end
     end
     local mgr = player:GetStrengthenMgr();
     local needflag = checkFlag[id];
