@@ -291,7 +291,7 @@ void MoFang::randTuzhi(UInt16 num)
         UInt32 tuzhiId = addTuzhi(id, true);
         if(tuzhiId > 0)
         {
-            std::cout << "tuzhiId : " << tuzhiId << std::endl;
+            //std::cout << "tuzhiId : " << tuzhiId << std::endl;
             st << tuzhiId;
             count ++;
 
