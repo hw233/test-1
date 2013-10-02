@@ -11,6 +11,8 @@
 #include "GData/Money.h"
 #include "HeroMemo.h"
 #include "GObject/Tianjie.h"
+#include "GObject/Clan.h"
+#include "Server/SysMsg.h"
 namespace GObject
 {
 
@@ -127,6 +129,8 @@ UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
 						return 3;
 					ConsumeInfo ci(VipEnterDungeon,0,0);
 					player->useGold(price, &ci);
+                    if(difficulty ==1 && World::get11Time() && player->getClan() != NULL)
+                    SYSMSG_BROADCASTV(4959, player->getClan()->getName().c_str(),player->getCountry(), player->getPName());
                     player->dungeonUdpLog(_dungeon->levelReq, 3);
 				}
 			}
@@ -138,7 +142,7 @@ UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
 		}
 
         ++ dpi->count[difficulty];
-        ++ PLAYER_DATA1(player, difficulty); 
+        ++ PLAYER_DATA1(player, difficulty);  //lb 
         dpi->level[difficulty] = 1;
         dpi->difficulty = difficulty;
         sendDungeonInfo(player, *dpi, difficulty);

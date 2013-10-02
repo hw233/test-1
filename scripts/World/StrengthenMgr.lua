@@ -129,17 +129,17 @@ local addSouls = {
     [60] = 1,--    SthBaoJuSpirit , //宝具通灵
 }
 local grade11 = {
-    [1] = {{10,7},{39 ,3},{ 17,5},{ 19,1},{ 42,1},{ 40,1}},
+    [1] = {{10,7},{14 ,3},{ 17,5},{ 19,1},{ 42,1},{ 40,1}},
     [2] = {{17,7},{ 5,2},{ 37,1},{ 13,10},{ 42,1},{ 40,1}},
     [3] = {{ 4,4},{ 20,6},{11,1},{ 6,1},{ 14,3},{ 10,5}},
-    [4] = {{10 ,5},{ 17,5},{ 4,4},{ 5,2},{ 6,1},{ 39,3}},
-    [5] = {{20 ,6},{ 39,3},{ 16,3},{ 19,1},{ 6,1},{ 13,10}},
+    [4] = {{10 ,5},{ 17,5},{ 4,4},{ 5,2},{ 6,1},{ 14,3}},
+    [5] = {{20 ,6},{ 14,3},{ 16,3},{ 19,1},{ 6,1},{ 13,10}},
     [6] = {{ 13,10},{ 37,1},{ 41,1},{ 11,1},{10 ,5},{ 4,4}},
     [7] = {{ 10,5},{ 13,10},{ 14,3},{ 4,6},{ 19,1},{ 17,5}},
     [8] = {{ 10,7},{ 5,2},{ 20,6},{ 4,4},{ 42,1},{ 40,1}},
     [9] = {{ 18,1},{ 12,1},{ 17,7},{ 42,1},{ 40,1},{ 11,1}},
-    [10] = {{ 39,3},{ 20,6},{ 37,2},{ 16,3},{ 13,10},{ 5,2}},
-    [11] = {{ 0,1},{ 39,3},{ 17,5},{ 10,5},{ 6,1},{ 20,6},{12,1}},
+    [10] = {{ 14,3},{ 20,6},{ 37,2},{ 16,3},{ 13,10},{ 5,2}},
+    [11] = {{ 14,3},{ 17,5},{ 10,5},{ 6,1},{ 20,6},{12,1}},
 }
 
 --某一项的最大值
@@ -151,11 +151,14 @@ function GetSthCheckFlag(idx)
         return flag;
     end
 end
-function GetGradeCheckFlag(idx)
-    local num = get11TimeNum();
-    local max = grade11[num];
+function GetGradeCheckFlag(idx,day)
+    --local num = get11TimeNum();
+    if day > 11 then 
+        return 
+    end
+    local max = grade11[day];   --lb
     for i = 1, #max do
-        if id == max[i][1] then
+        if idx == max[i][1] then
             return max[i][2]
         end
     end
@@ -178,9 +181,7 @@ end
 
 --增加变强之魂
 function doStrong(player, id, param1, param2)
-    print("#@#")
     local num = get11TimeNum();
-    print(num )
     if num > 0 and num < 12 then
         do11Grade(player, id, num, param2);
     end
@@ -330,26 +331,20 @@ function do11Grade(player, id, param1, param2)
     end
     local dayTask = grade11[param1];
     local as = addSouls[id];
-    print("id"..id)
     if as == nil then
         return;
     end
     mgr:CheckTimeOver();
     --判断标志位
     local curflag = mgr:GetFlag(id);
-    print("curflag"..curflag)
     if id == 0 or id == 12 then
        if curflag ~=4 then 
            return ;
        end
     end
-    print("add")
     for i = 1, #dayTask do
-        print("dayTaskid:"..dayTask[i][1])
-        print("dayTasknum"..dayTask[i][2])
         if id == dayTask[i][1]  and curflag < dayTask[i][2] then
             player:Add11grade(10);
-            print("addend")
             break
         end
     end

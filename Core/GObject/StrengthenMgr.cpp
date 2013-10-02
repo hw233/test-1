@@ -175,6 +175,7 @@ void StrengthenMgr::UpdateFlag(UInt8 idx,  UInt8 v)
         if(type <1||type>12 || idx >=SthMaxFlag )
             return ;
         _olditem[type-1].flag[idx] = v;
+        Send11GradeInfo(type);
     }
 }
 void StrengthenMgr::UpdateToDB()
@@ -440,24 +441,33 @@ void StrengthenMgr::SendStrengthenInfo()
 void StrengthenMgr::Send11GradeInfo(UInt8 type)
 {
     UpdateAirBookToDB();
-    if(!World::get11Time())
-        return ;
-    if(type > World::get11TimeNum())
-        return ;
-    if( type < 1 ||type >12)
+    if( type < 2 ||type >12)
         return;
     Stream st(REP::ACT);
     st <<static_cast<UInt8>(0x20);
     st <<static_cast<UInt8>(0x05);
     st<<static_cast<UInt32>(_owner->GetVar(VAR_11AIRBOOK_GRADE));//总积分
     st <<static_cast<UInt8>(type);
-    st<<static_cast<UInt32> (_owner->GetVar(VAR_11AIRBOOK_GRADE_DAY));   //当日积分
-    st<<static_cast<UInt32> (_owner->GetVar(VAR_AIRBOOK_RECHARGE)/30); //当日充值/30
-    st<<static_cast<UInt32> (_owner->GetVar(VAR_AIRBOOK_CONSUME)/30);  //当日消费/30
+    if(type == World::get11TimeNum())
+    {
+        st<<static_cast<UInt32> (_owner->GetVar(VAR_11AIRBOOK_GRADE_DAY));   //当日积分
+    }
+    else
+        st<<static_cast<UInt32> (_olditem[type-1].grade); //昔日充值/30
+    if(type == World::get11TimeNum())
+    {
+        st<<static_cast<UInt32> (_owner->GetVar(VAR_AIRBOOK_RECHARGE)/30); //当日充值/30
+        st<<static_cast<UInt32> (_owner->GetVar(VAR_AIRBOOK_CONSUME)/30);  //当日消费/30
+    }
+    else
+    {
+        st<<static_cast<UInt32> (_olditem[type-1].recharge/30); //昔日充值/30
+        st<<static_cast<UInt32> (_olditem[type-1].consume/30);  //昔日消费/30
+    }
     st << static_cast<UInt8>(SthMaxFlag);
     for(UInt8 idx = 0; idx < SthMaxFlag; ++idx)
     {
-        UInt8 maxFlag = GameAction()->GetGradeCheckFlag(idx);
+        UInt8 maxFlag = GameAction()->GetGradeCheckFlag(idx,type);
         UInt8 curnum = _olditem[type-1].flag[idx];
         if(curnum > maxFlag)
             curnum = maxFlag;
