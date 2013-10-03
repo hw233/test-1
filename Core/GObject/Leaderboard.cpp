@@ -1108,6 +1108,10 @@ void Leaderboard::buildPacketForPet()
                     st << item.neidan[j].gems[k];
                 }
             }
+            st << static_cast<UInt8>(item.sanhun.size());
+            std::map<UInt8, UInt8>::const_iterator iter = item.sanhun.begin();
+            for(; iter != item.sanhun.end(); ++iter)
+                st << iter->first << iter->second;
         }
         ++ i;
 	}
@@ -1161,6 +1165,7 @@ void Leaderboard::pushPetInfo(FairyPet* pet)
             petInfo.neidan[i].gems[j] = neidan->getPetEqAttr().gems[j];
         }
     }
+    petInfo.sanhun = pet->getSanhun();
 
     _petInfoSet.insert(petInfo);
     _petInfoSetMap.insert(std::make_pair(pl, _petInfoSet.find(petInfo)));

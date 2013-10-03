@@ -179,6 +179,7 @@ function loadStore()
             store:add(2, 1710, 599) --圣诞老人的包袱
             store:add(2, 1711, 599) --爆竹
             store:add(2, 1712, 599) --莲花灯
+            store:add(2, 1724, 599) --五毒天王
         end
         store:add(2, 1704, 599) --轩辕双剑
         store:add(2, 1705, 599) --伏羲古琴

@@ -124,6 +124,7 @@ struct PetInfoList
     UInt16 petLev;
     UInt16 gengu;
     PetNeidanAttr neidan[3];
+    std::map<UInt8, UInt8> sanhun;
 
     PetInfoList() : id(0), pf(0), country(0), battlePoint(0), petId(0), petLev(0), gengu(0)
     {
