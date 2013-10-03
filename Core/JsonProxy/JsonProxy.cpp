@@ -171,13 +171,13 @@ int mrecv(int fd, void* buf, int size, int flag)
 
 int read_jason_req(int fd, char* buf)
 {
-    int read_len1 = mrecv( fd, buf, 5, 0);
+    int read_len1 = recv( fd, buf, 5, 0);
     if(read_len1 != 5)
         return 0;
-    int len = *(short*)buf;
+    unsigned short len = *(unsigned short*)buf;
     if(len <= 0)
         return 0;
-    int read_len2 = mrecv( fd, buf+5, len, 0 );
+    int read_len2 = recv( fd, buf+5, len, 0 );
     if(read_len2 != len)
         return 0;
 
@@ -186,13 +186,13 @@ int read_jason_req(int fd, char* buf)
 
 int read_jason_rep(int fd, char* buf)
 {
-    int read_len1 = mrecv( fd, buf, 4, 0);
+    int read_len1 = recv( fd, buf, 4, 0);
     if(read_len1 != 4)
         return 0;
-    int len = *(short*)buf;
+    unsigned short len = *(unsigned short*)buf;
     if(len <= 0)
         return 0;
-    int read_len2 = mrecv( fd, buf+4, len, 0 );
+    int read_len2 = recv( fd, buf+4, len, 0 );
     if(read_len2 != len)
         return 0;
 
@@ -210,13 +210,13 @@ void clear_read_buffer(int fd)
         char tmp[2];
 
         stWait.tv_sec = 0;
-        stWait.tv_usec = 0;
+        stWait.tv_usec = 1000;
         FD_ZERO(&stFdSet);
         FD_SET(fd, &stFdSet);
         IRet = select(FD_SETSIZE, &stFdSet, NULL, NULL, &stWait);
         if(IRet <= 0)
             break;
-        int len = mrecv(fd, tmp, 1, 0);
+        int len = recv(fd, tmp, 1, 0);
         if(len <= 0)
             break;
     }
@@ -283,7 +283,7 @@ int main()
 
         do {
             // 清空接收缓存
-            //clear_read_buffer(asss_conn);
+            clear_read_buffer(asss_conn);
             char buf[16*1024] = {0}; // XXX: 16K
             int len = 0;
             if((len = read_jason_req(new_fd, buf)) == 0)
@@ -295,7 +295,7 @@ int main()
             g_log->OutTrace("RECV: %s\n", buf);
 
             int sd = 0;
-            if( (sd = msend( asss_conn, buf, len, 0 )) < 0)
+            if( (sd = send( asss_conn, buf, len, 0 )) < 0)
             {
                 CLOSE(new_fd);
                 CLOSE(asss_conn);
@@ -311,7 +311,7 @@ int main()
                 break;
             }
 
-            int cnt = msend( new_fd, buf, len, 0 );
+            int cnt = send( new_fd, buf, len, 0 );
             if( cnt <= 0 )
             {
                 CLOSE(new_fd);
