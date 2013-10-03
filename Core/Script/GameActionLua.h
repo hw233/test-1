@@ -269,6 +269,8 @@ namespace Script
         bool  RunSummerMeetRechargeAward(Player* player, UInt8 val);
         bool  RunLuckyMeetStrengthAward(Player* player, UInt8 val);
         bool  RunPresentAward(Player* player, UInt8 val);
+        bool  RunAirBookOnlineAward(Player* player, UInt8 val);
+        bool  RunAirBookLoginAward(Player* player, UInt8 val);
         bool  RunSummerFlow3OnlineAward(Player* player, UInt8 val);
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         bool  RunPrayAward(Player* player, UInt8 val);
@@ -354,6 +356,7 @@ namespace Script
         UInt32 GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed);
         void doStrong(Player* pl, UInt8 id, UInt32 param1, UInt32 param2);
         UInt8 GetSthCheckFlag(UInt8 idx);
+        UInt8 GetGradeCheckFlag(UInt8 idx);
         UInt8 EveryDayRoarSoul();
         lua_tinker::table openGreenBoxStrong();
         lua_tinker::table openBlueBoxStrong();

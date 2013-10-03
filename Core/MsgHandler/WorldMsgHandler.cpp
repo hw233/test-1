@@ -142,8 +142,12 @@ MSG_REG_2(GameMsgHdr, 0x1CC, OnClearLuckyBagRank);
 
 MSG_REG_2(GameMsgHdr, 0x1CA, OnRechargeRP7Rank);
 MSG_REG_2(GameMsgHdr, 0x1CB, SendRechargeRP7Rank);
+MSG_REG_2(GameMsgHdr, 0x1CD, On11PlayerGradeRank);
+MSG_REG_2(GameMsgHdr, 0x1CE, On11ClanGradeRank);
+MSG_REG_2(GameMsgHdr, 0x1CF, On11CountryGradeRank);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnSendClanMemberList);
+MSG_REG_2(GameMsgHdr, 0x1D1, OnSendClanMemberGrade);
 
 MSG_REG_2(GameMsgHdr, 0x1EC, OnDaysRankMsg);
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReloadLuaReq);

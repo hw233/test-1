@@ -3621,6 +3621,9 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
 
         GameMsgHdr hdr1(0x312, pl->getThreadId(), pl, sizeof(skillId));
         GLOBAL().PushMsg(hdr1, &skillId);
+        UInt8 strongId = SthSkillUp;
+        GameMsgHdr hdr2(0x364, pl->getThreadId(), pl, sizeof(strongId));
+        GLOBAL().PushMsg(hdr2, &strongId);
 
     } while(false);
 
@@ -4413,8 +4416,9 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                 if(needTeal > 0)
                     addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_tael, needTeal, now);
                 m_spiritTree.m_exp += 100;
-                GameMsgHdr hdr1(0x364, pl->getThreadId(), pl,0);
-                GLOBAL().PushMsg(hdr1,NULL );
+                UInt8 strongId = SthClanSpirit;
+                GameMsgHdr hdr1(0x364, pl->getThreadId(), pl, sizeof(strongId));
+                GLOBAL().PushMsg(hdr1, &strongId);
                 addMemberActivePoint_nolock(pl, 1, e_clan_actpt_none);
                 while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
                 {
@@ -4841,5 +4845,45 @@ void Clan::setClanSpiritTreeBuff(UInt8 color)
 
 }
 
-
+void Clan::addClanGradeInAirBook(UInt32 grade)
+{
+    _gradeInAirbook += grade;
+}
+void Clan::updataClanGradeInAirBook()
+{
+	Mutex::ScopedLock lk(_mutex);
+    _gradeInAirbook = 0;
+	Members::iterator it = _members.begin();
+	for (; it != _members.end(); ++it)
+	{
+        Player * player = (*it)->player; 
+        if(player == NULL)
+            continue ; 
+        _gradeInAirbook += player->GetVar(VAR_11AIRBOOK_GRADE);
+	}
+	return ;
+}
+void Clan::SendClanMemberGrade(Player* player)
+{
+     Stream st(REP::ACT);
+     st<<static_cast<UInt8>(0x20);
+     st<<static_cast<UInt8>(0x04);
+     size_t offset = st.size();
+     UInt8 pos = 0;
+     st<<pos;
+	Mutex::ScopedLock lk(_mutex);
+    _gradeInAirbook = 0;
+	Members::iterator it = _members.begin();
+	for (; it != _members.end(); ++it)
+	{
+        ++pos;
+        Player * pl = (*it)->player; 
+        if(pl == NULL)
+            continue ; 
+        st<<pl->getName()<<pl->GetVar(VAR_11AIRBOOK_GRADE);
+	}
+    st.data<UInt8>(offset) = pos;
+    st<<Stream::eos;
+    player->send(st);
+}
 }

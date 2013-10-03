@@ -2563,6 +2563,13 @@ namespace GObject
         void LuckyStarActUdpLog(UInt8);
         void checkSendRandFriend();
         void checkSelectPray();
+        void SetAirBookValue();
+        void sendAirBookInfo();
+        void sendAirBookOnlineInfo();
+        void OnSend11GradeInfo(UInt8 type=0);
+        void getAirBookOnlineAward();
+        void getAirBookLoginAward(UInt8 type);
+        void Add11grade(UInt32 grade);
         void doStrongInWorld(UInt8 type);
         //女娲石盘
         void sendNuwaInfo();
@@ -2570,6 +2577,9 @@ namespace GObject
 
         void LevelAwardActUdpLog(UInt8);
         void LuckyBagRank();
+        void On11ClanGradeRank();
+        void On11CountryGradeRank();
+        void On11PlayerGradeRank();
         void getQQGameOnlineAward();
         void sendQQGameOnlineAward();
         void setQQGameOnlineTotalTime();
@@ -2631,6 +2641,7 @@ namespace GObject
     public:
         void setMapId(UInt8 mapId);
 	};
+
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
     inline UInt8& PLAYER_DATA1(Player* pl, UInt8 type)

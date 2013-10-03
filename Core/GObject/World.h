@@ -66,9 +66,13 @@ struct lt_rcsort
 {
     bool operator()(const RCSort& a, const RCSort& b) const { return a.total >= b.total; }
 };
+struct clan_sort
+{
+    bool operator()(const ClanSort& a, const ClanSort& b) const { return a.total >= b.total; }
+};
 
 typedef std::set<RCSort, lt_rcsort> RCSortType;
-typedef std::set<ClanSort,lt_rcsort> ClanGradeSort;
+typedef std::set<ClanSort,clan_sort> ClanGradeSort;
 
 struct supportSort
 {
@@ -491,8 +495,20 @@ public:
     {   _summerMeet=v; } 
     inline static void  set11Time(bool v)
     {   _11time=v; } 
-    inline static bool  get11Time(UInt32 time = 0)
-    {   return _11time; } 
+    inline static bool  get11Time()
+    {   //return false;
+        return _11time; } 
+    inline static UInt32 get11TimeNum(UInt32 time = 0)
+    {
+        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 13);
+        UInt32 now = TimeUtil::Now() ;
+        if(time !=0)
+            now = time;
+        if(now < _11timeBegin || now > _11timeEnd )
+            return -1;
+       return (TimeUtil::SharpDay(0, now) - _11timeBegin )/86400+1; 
+    }
     inline static bool getSummerFlow()
     { 
         UInt32 begin = GVAR.GetVar(GVAR_SUMMER_FLOW_BEGIN);
@@ -1089,7 +1105,9 @@ public:
     void SendFoolBaoAward();
     void SendSurnameLegendAward();
     void Send11AirBookAward();
-    void Send11PlayerAward();
+    void Send11CountryRankAward();
+    void Send11PlayerRankAward();
+    void Send11ClanRankAward();
     void UpdateSnowScore(Player* pl, Player* lover);
     void sendSnowPlayers(Player* pl);
     void DivorceSnowPair(Player* pl);

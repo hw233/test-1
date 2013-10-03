@@ -250,6 +250,7 @@ void WorldScript::init()
 
     def("setSurnameLegend",GObject::World::setSurnameLegend);
     def("getSurnameLegend",GObject::World::getSurnameLegend);
+    def("get11TimeNum",GObject::World::get11TimeNum);
     def("setRYHBActivity",GObject::World::setRYHBActivity);
     def("getRYHBActivity",GObject::World::getRYHBActivity);
 

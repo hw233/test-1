@@ -93,12 +93,32 @@ namespace GObject
                 overTime = ot;
         }
     };
+    struct AirBookItem
+    {
+        UInt32 overTime; //天结束时间
+        UInt32 grade; 
+        UInt32 recharge;
+        UInt32 consume;
+        UInt8  flag[SthMaxFlag];
+        AirBookItem()
+        {
+            Reset();
+        }
+        void Reset(UInt32 ot = 0)
+        {
+            memset(this, 0, sizeof(AirBookItem));
+            if(ot)
+                overTime = ot;
+        }
+    };
     struct DBStrengthenData;
+    struct DBAirBookData;
     class StrengthenMgr 
     {
         private :
             Player*  _owner;
             StrongItem _item;
+            AirBookItem _olditem[12];
         public:
             StrengthenMgr(Player* player);
             ~StrengthenMgr();
@@ -108,13 +128,16 @@ namespace GObject
             void SetSoulId(UInt8 id = 0){_item.soulId = id;}
             void AddSouls(UInt8 v);
             void LoadFromDB(DBStrengthenData& data) ;
+            void LoadOldFromDB(DBAirBookData& data) ;
             void UpdateToDB();
+            void UpdateAirBookToDB();
             void UpdateFlag(UInt8 idx, UInt8 v);
             bool CheckTimeOver(UInt32 now = TimeUtil::Now());
             void SendStrengthenInfo();
+            void Send11GradeInfo(UInt8 type =0);
             void SendStrengthLevelInfo();
-            void SetStrengthLevelInfo(UInt8 type);
             void SendStrengthenRank();
+            void SetStrengthLevelInfo(UInt8 type);
             void SendOpenChestsInfo(UInt8 boxId, UInt8 index);
             void EveryDayRoar();
             bool CanOpenGreenBox(UInt8 type, UInt32 onlineTime);

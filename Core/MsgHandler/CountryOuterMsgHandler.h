@@ -1302,6 +1302,13 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1C9, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+    if (World::getSurnameLegend())
+    {
+        GameMsgHdr hdr(0x1CD, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+        GameMsgHdr hdr1(0x1CE, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
+    }
     pl->sendYearRPInfo();
     pl->sendFishUserInfo();
     //if(World::getYearActive())
@@ -3776,7 +3783,13 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					ConsumeInfo ci(Item,lr._itemId,lr._count);
                     player->useGold(price,&ci);
                     player->consumeGold(price);
-					st << static_cast<UInt8>(0);
+                    if(World::get11Time())
+                    {
+                        UInt32 goldLeft = player->GetVar(VAR_AIRBOOK_CONSUME)%30;
+                        player->AddVar(VAR_AIRBOOK_CONSUME,price);
+                        player->Add11grade( (price+goldLeft)/30 *10);
+                    }
+                    st << static_cast<UInt8>(0);
 
                     if (lr._type == PURCHASE1 + 1 )
                     {
@@ -6235,6 +6248,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 4:
                     case 5:
                         jobHunter->OnRequestStart(val);
+                        GameAction()->doStrong(player, SthSerachMo, 0, 0);
                         break;
                     case 10:
                         // 老虎机转盘转动

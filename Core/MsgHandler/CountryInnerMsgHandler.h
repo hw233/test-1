@@ -2133,6 +2133,18 @@ void OnBePrayed( GameMsgHdr &hdr, const void * data)
     UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
     player->bePrayed(id);
 }
+void OnDoStrongInWorld( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 id = *reinterpret_cast<const UInt64 *>(data); 
+    player->doStrongInWorld(id);
+}
+void OnSend11GradeInfo( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 id = *reinterpret_cast<const UInt64 *>(data); 
+    player->OnSend11GradeInfo(id);
+}
 void OnBePresented( GameMsgHdr &hdr, const void * data)
 {
 	UInt32 now = TimeUtil::Now();

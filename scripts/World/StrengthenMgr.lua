@@ -14,7 +14,7 @@ local checkFlag = {
     [10] = 7, --SthCopy, //副本
     [11] = 1, --SthClanWar,   //帮派战
     [12] = 5, --SthYamenTask, //衙门任务
-    [13] = 1, --SthAthletics1, //斗剑天梯
+    [13] = 10, --SthAthletics1, //斗剑天梯变强1次  天书奇缘10次
     [14] = 8, --SthAthletics2, //斗剑历练领取奖励
     [15] = 6, --SthOpenPurpleBox, //打开紫色变强秘宝
     [16] = 1, --SthTripodFire,--炉火
@@ -111,7 +111,7 @@ local addSouls = {
     [42] = 5,--  SthLastDay，  //末日之战
     [43] = 1,--    SthClanSpirit, //神魔之树
     [44] = 1,--    SthPrayTree ,  //许愿树
-    [45] = 1,--    SthSerachMo ,    //寻墨 
+    [45] = 3,--    SthSerachMo ,    //寻墨 
     [46] = 1,--  SthFuwenJIe ,   //符文解封
     [47] = 1,--    SthFuwenRong,  //符文熔炼
     [48] = 1,--   SthSkillUp ,   //个人技能提升
@@ -128,6 +128,19 @@ local addSouls = {
     [59] = 1,--   SthGuJiSpirit , //古籍唤灵
     [60] = 1,--    SthBaoJuSpirit , //宝具通灵
 }
+local grade11 = {
+    [1] = {{10,7},{39 ,3},{ 17,5},{ 19,1},{ 42,1},{ 40,1}},
+    [2] = {{17,7},{ 5,2},{ 37,1},{ 13,10},{ 42,1},{ 40,1}},
+    [3] = {{ 4,4},{ 20,6},{11,1},{ 6,1},{ 14,3},{ 10,5}},
+    [4] = {{10 ,5},{ 17,5},{ 4,4},{ 5,2},{ 6,1},{ 39,3}},
+    [5] = {{20 ,6},{ 39,3},{ 16,3},{ 19,1},{ 6,1},{ 13,10}},
+    [6] = {{ 13,10},{ 37,1},{ 41,1},{ 11,1},{10 ,5},{ 4,4}},
+    [7] = {{ 10,5},{ 13,10},{ 14,3},{ 4,6},{ 19,1},{ 17,5}},
+    [8] = {{ 10,7},{ 5,2},{ 20,6},{ 4,4},{ 42,1},{ 40,1}},
+    [9] = {{ 18,1},{ 12,1},{ 17,7},{ 42,1},{ 40,1},{ 11,1}},
+    [10] = {{ 39,3},{ 20,6},{ 37,2},{ 16,3},{ 13,10},{ 5,2}},
+    [11] = {{ 0,1},{ 39,3},{ 17,5},{ 10,5},{ 6,1},{ 20,6},{12,1}},
+}
 
 --某一项的最大值
 function GetSthCheckFlag(idx)
@@ -136,6 +149,15 @@ function GetSthCheckFlag(idx)
         return 0;
     else
         return flag;
+    end
+end
+function GetGradeCheckFlag(idx)
+    local num = get11TimeNum();
+    local max = grade11[num];
+    for i = 1, #max do
+        if id == max[i][1] then
+            return max[i][2]
+        end
     end
 end
 
@@ -156,6 +178,12 @@ end
 
 --增加变强之魂
 function doStrong(player, id, param1, param2)
+    print("#@#")
+    local num = get11TimeNum();
+    print(num )
+    if num > 0 and num < 12 then
+        do11Grade(player, id, num, param2);
+    end
     local mgr = player:GetStrengthenMgr();
     local needflag = checkFlag[id];
     local as = addSouls[id];
@@ -172,6 +200,10 @@ function doStrong(player, id, param1, param2)
          return;
     else
         mgr:UpdateFlag(id, curflag + 1);
+    end
+    if id ==13 and curflag > 1 then
+        mgr:UpdateToDB();
+        return ;
     end
     mgr:AddSouls(as);
     mgr:UpdateToDB();
@@ -291,3 +323,34 @@ function openOrangeBoxStrong()
 end
 
 
+function do11Grade(player, id, param1, param2)
+    local mgr = player:GetStrengthenMgr();
+    if param1 > 11 or param1==0 then 
+        return ;
+    end
+    local dayTask = grade11[param1];
+    local as = addSouls[id];
+    print("id"..id)
+    if as == nil then
+        return;
+    end
+    mgr:CheckTimeOver();
+    --判断标志位
+    local curflag = mgr:GetFlag(id);
+    print("curflag"..curflag)
+    if id == 0 or id == 12 then
+       if curflag ~=4 then 
+           return ;
+       end
+    end
+    print("add")
+    for i = 1, #dayTask do
+        print("dayTaskid:"..dayTask[i][1])
+        print("dayTasknum"..dayTask[i][2])
+        if id == dayTask[i][1]  and curflag < dayTask[i][2] then
+            player:Add11grade(10);
+            print("addend")
+            break
+        end
+    end
+end

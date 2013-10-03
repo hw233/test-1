@@ -2534,6 +2534,57 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             player->SetVar(VAR_DIRECTPUROPEN, flag?1:0);
         }
         break;
+        case 0x20:
+        {
+            UInt8 index =0;
+            brd>>index;
+            switch(index)
+           {
+               case 0x01:
+                    {
+                       player->On11PlayerGradeRank();
+                       break;
+                    }
+               case 0x03:
+                    {
+                        player->On11ClanGradeRank();
+                        player->On11CountryGradeRank();
+                        break; 
+                    }
+               case 0x04:   //帮派成员积分
+                    { 
+		                GameMsgHdr hdr(0x1D1, WORKER_THREAD_NEUTRAL, player, 0);
+		                GLOBAL().PushMsg(hdr, NULL);
+                        break;
+                    }
+               case 0x05:
+                    {
+                        UInt8 type = 0;
+                        brd >>type;
+                        GameMsgHdr h(0x365,  player->getThreadId(), player, sizeof(UInt8));
+                        GLOBAL().PushMsg(h, &type);
+                        break; 
+                    }
+               case 0x02:
+                    {
+                        UInt8 opt = 0;
+                        brd>>opt;
+                        switch(opt)
+                        {
+                            case 0:
+                                player->sendAirBookInfo();
+                                break;
+                            case 1:
+                                player->sendAirBookOnlineInfo();
+                                break;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+           }
+        }
+        break;
         default:
             break;
     }

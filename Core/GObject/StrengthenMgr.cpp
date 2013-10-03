@@ -30,6 +30,7 @@ StrengthenMgr::~StrengthenMgr()
 
 void StrengthenMgr::LoadFromDB(DBStrengthenData& data)
 {
+
     _item.overTime = data.overTime;
     _item.souls = data.souls;
     _item.soulId = data.soulId;
@@ -79,6 +80,23 @@ void StrengthenMgr::LoadFromDB(DBStrengthenData& data)
         {
             _item.orangeBox[idx][i] = atoi(tk[i].c_str());
         }
+    }
+}
+void StrengthenMgr::LoadOldFromDB(DBAirBookData& data)   //LoadAirBook
+{
+    UInt32 type = World::get11TimeNum(data.overTime)-1;    
+    if(type ==0 ||type > 12)
+        return ;
+    _olditem[type-1].overTime = data.overTime;
+    _olditem[type-1].grade = data.grade;
+    _olditem[type-1].recharge = data.recharge;
+    _olditem[type-1].consume = data.consume;
+    //解析flag
+    StringTokenizer ntk(data.flags, "|");
+    UInt32 size = std::min<UInt32>(ntk.count(), static_cast <UInt32>(SthMaxFlag));
+    for(UInt32 i = 0 ; i < size; i ++)
+    {
+        _olditem[type-1].flag[i] = atoi(ntk[i].c_str());
     }
 }
 
@@ -151,8 +169,14 @@ void StrengthenMgr::UpdateFlag(UInt8 idx,  UInt8 v)
     if(idx >= SthMaxFlag)
         return ;
     _item.flag[idx] = v;
+    if(World::get11Time())
+    {
+        UInt8 type = World::get11TimeNum();
+        if(type <1||type>12 || idx >=SthMaxFlag )
+            return ;
+        _olditem[type-1].flag[idx] = v;
+    }
 }
-
 void StrengthenMgr::UpdateToDB()
 {
     std::string strFlag;
@@ -213,6 +237,31 @@ void StrengthenMgr::UpdateToDB()
     }
     DB().PushUpdateData("REPLACE INTO `strengthenData` (`playerId`, `overTime`, `souls`, `soulId`, `flags`, `greenBox`, `blueBox`, `purpleBox`, `orangeBox`)VALUES (%" I64_FMT "u, %u, %u, %u, '%s', '%s', '%s', '%s', '%s')",
             this->_owner->getId(), _item.overTime, _item.souls, _item.soulId, strFlag.c_str(), green.c_str(), blue.c_str(), purple.c_str(), orange.c_str());
+        UpdateAirBookToDB();
+    
+}
+void StrengthenMgr::UpdateAirBookToDB()
+{
+    if(!World::get11Time())
+        return ;
+    UInt32 now = TimeUtil::Now();
+    UInt32 type = World::get11TimeNum();
+    if(_olditem[type-1].overTime < now)
+    {
+        UInt32 over = TimeUtil::SharpDayT(1 , now);
+        _olditem[World::get11TimeNum()-1].Reset(over);
+    }
+    if(type <1 ||type >12)
+        return ;
+    std::string strFlag;
+    for(UInt32 i = 0; i < SthMaxFlag; i ++)
+    {
+         strFlag += Itoa(_item.flag[i]);
+         if(i != SthMaxFlag - 1)
+             strFlag += "|";
+    }
+    DB().PushUpdateData("REPLACE INTO `AirBookData` (`playerId`, `overTime`, `grade`, `recharge`, `consume`, `flags`)VALUES (%" I64_FMT "u, %u, %u, %u,%u,'%s')",
+            this->_owner->getId(), _olditem[type-1].overTime, this->_owner->GetVar(VAR_11AIRBOOK_GRADE_DAY),this->_owner->GetVar(VAR_AIRBOOK_RECHARGE),this->_owner->GetVar(VAR_AIRBOOK_CONSUME) ,strFlag.c_str());
 }
 
 bool StrengthenMgr::CanOpenGreenBox(UInt8 type, UInt32 onlineTime)
@@ -349,7 +398,7 @@ void StrengthenMgr::SendStrengthenInfo()
             if(idx == SthDungeon) //决战之地
             {
                 maxFlag = m2;
-                maxFlag*= 2 ;
+                maxFlag*=2;
             }
             if(idx == SthFormation) //阵图
                 maxFlag = m3;
@@ -378,13 +427,45 @@ void StrengthenMgr::SendStrengthenInfo()
                     maxFlag = 14;
             }
         }
-        st << idx << _item.flag[idx] << maxFlag;
+        if(idx == 13)
+            st << idx << !!_item.flag[idx] << !!maxFlag;
+        else
+            st << idx << _item.flag[idx] << maxFlag;
     }
     st << Stream::eos;
     _owner->send(st);
     SendStrengthLevelInfo();
 }
 
+void StrengthenMgr::Send11GradeInfo(UInt8 type)
+{
+    UpdateAirBookToDB();
+    if(!World::get11Time())
+        return ;
+    if(type > World::get11TimeNum())
+        return ;
+    if( type < 1 ||type >12)
+        return;
+    Stream st(REP::ACT);
+    st <<static_cast<UInt8>(0x20);
+    st <<static_cast<UInt8>(0x05);
+    st<<static_cast<UInt32>(_owner->GetVar(VAR_11AIRBOOK_GRADE));//总积分
+    st <<static_cast<UInt8>(type);
+    st<<static_cast<UInt32> (_owner->GetVar(VAR_11AIRBOOK_GRADE_DAY));   //当日积分
+    st<<static_cast<UInt32> (_owner->GetVar(VAR_AIRBOOK_RECHARGE)/30); //当日充值/30
+    st<<static_cast<UInt32> (_owner->GetVar(VAR_AIRBOOK_CONSUME)/30);  //当日消费/30
+    st << static_cast<UInt8>(SthMaxFlag);
+    for(UInt8 idx = 0; idx < SthMaxFlag; ++idx)
+    {
+        UInt8 maxFlag = GameAction()->GetGradeCheckFlag(idx);
+        UInt8 curnum = _olditem[type-1].flag[idx];
+        if(curnum > maxFlag)
+            curnum = maxFlag;
+        st << idx << curnum << maxFlag;
+    }
+    st << Stream::eos;
+    _owner->send(st);
+}
 void StrengthenMgr::EveryDayRoar()
 {
     if(GetSoulId())
@@ -699,20 +780,19 @@ void StrengthenMgr::SendOpenChestsInfo(UInt8 boxId, UInt8 index)
         UpdateToDB();
     }
 }
-
 void StrengthenMgr::SendStrengthLevelInfo()
 {
     UInt32 levelInfo = _owner->GetVar(VAR_STRENGTH_LEVEL);
     Stream st(REP::STRENGTHEN_LIST);
-    st << static_cast<UInt8>(0x06);
-    st << static_cast<UInt8>(levelInfo);
-    st <<Stream::eos;
+    st<<static_cast<UInt8>(6);
+    st<<static_cast<UInt8>(levelInfo);
+    st<<Stream::eos;
     _owner->send(st);
 }
 void StrengthenMgr::SetStrengthLevelInfo(UInt8 type)
 {
     UInt32 levelInfo = _owner->GetVar(VAR_STRENGTH_LEVEL);
-    levelInfo |= 1<<(type-1);
+    levelInfo|=1<<(type-1);
     _owner->SetVar(VAR_STRENGTH_LEVEL,levelInfo);
-} 
+}
 }
