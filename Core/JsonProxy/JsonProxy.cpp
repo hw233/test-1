@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <netinet/tcp.h>
+#include <poll.h>
 
 #include "Config.h"
 #include "Log/Log.h"
@@ -81,15 +82,99 @@ int jason_listen( int port )
     return sockfd;
 }
 
+int wait4read(int fd)
+{
+    struct pollfd pfd;
+    pfd.fd = fd;
+    pfd.events = POLLIN | POLLERR | POLLPRI;
+    pfd.revents = 0;
+
+    int ret = TEMP_FAILURE_RETRY(::poll(&pfd, 1, 1000));
+    if (ret > 0 && !(pfd.revents & POLLIN))
+        return -1;
+
+    return ret;
+}
+
+int wait4send(int fd)
+{
+    struct pollfd pfd;
+    pfd.fd = fd;
+    pfd.events = POLLOUT | POLLERR | POLLPRI;
+    pfd.revents = 0;
+
+    int ret = TEMP_FAILURE_RETRY(::poll(&pfd, 1, 1000));
+    if (ret > 0 && !(pfd.revents & POLLOUT))
+        return -1;
+
+    return ret;
+}
+
+int msend(int fd, void* buf, int size, int flag)
+{
+    int off = 0;
+    int ret = 0;
+    const unsigned char* buffer = reinterpret_cast<const unsigned char*>(buf);
+
+    do
+    {
+        ret = TEMP_FAILURE_RETRY(::send(fd, buffer+off, size-off, MSG_NOSIGNAL));
+        if (!ret)
+            return -1;
+        if (ret < 0)
+        {
+            ret = 0;
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+            {
+                if (wait4send(fd) < 0)
+                    return -1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+        off += ret;
+    } while (off < size);
+
+    return off;
+}
+
+int mrecv(int fd, void* buf, int size, int flag)
+{
+    int ret = 0;
+    do
+    {
+        ret = TEMP_FAILURE_RETRY(::recv(fd, buf, size, MSG_NOSIGNAL));
+        if (!ret)
+            return -1;
+        if (ret < 0)
+        {
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+            {
+                if (wait4read(fd) < 0)
+                    return -1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+    } while (ret < 0);
+
+    return ret;
+}
+
 int read_jason_req(int fd, char* buf)
 {
-    int read_len1 = recv( fd, buf, 5, 0);
+    int read_len1 = mrecv( fd, buf, 5, 0);
     if(read_len1 != 5)
         return 0;
     int len = *(short*)buf;
     if(len <= 0)
         return 0;
-    int read_len2 = recv( fd, buf+5, len, 0 );
+    int read_len2 = mrecv( fd, buf+5, len, 0 );
     if(read_len2 != len)
         return 0;
 
@@ -98,13 +183,13 @@ int read_jason_req(int fd, char* buf)
 
 int read_jason_rep(int fd, char* buf)
 {
-    int read_len1 = recv( fd, buf, 4, 0);
+    int read_len1 = mrecv( fd, buf, 4, 0);
     if(read_len1 != 4)
         return 0;
     int len = *(short*)buf;
     if(len <= 0)
         return 0;
-    int read_len2 = recv( fd, buf+4, len, 0 );
+    int read_len2 = mrecv( fd, buf+4, len, 0 );
     if(read_len2 != len)
         return 0;
 
@@ -128,11 +213,13 @@ void clear_read_buffer(int fd)
         IRet = select(FD_SETSIZE, &stFdSet, NULL, NULL, &stWait);
         if(IRet <= 0)
             break;
-        int len = recv(fd, tmp, 1, 0);
+        int len = mrecv(fd, tmp, 1, 0);
         if(len <= 0)
             break;
     }
 }
+
+#define CLOSE(fb) do{close(fb);fb=-1}while(0)
 
 int main()
 {
@@ -193,57 +280,51 @@ int main()
 
         do {
             // 清空接收缓存
-            clear_read_buffer(asss_conn);
+            //clear_read_buffer(asss_conn);
             char buf[16*1024] = {0}; // XXX: 16K
             int len = 0;
             if((len = read_jason_req(new_fd, buf)) == 0)
             {
                 g_log->OutTrace("read_jason_req. connection close %s\n", inet_ntoa(their_addr.sin_addr));
-                close(new_fd);
-                new_fd = -1;
+                CLOSE(new_fd);
                 break;
             }
             g_log->OutTrace("RECV: %s\n", buf);
 
             int sd = 0;
-            if( (sd = send( asss_conn, buf, len, 0 )) < 0)
+            if( (sd = msend( asss_conn, buf, len, 0 )) < 0)
             {
-                close(new_fd);
-                new_fd = -1;
-                close( asss_conn );
-                asss_conn = -1;
+                CLOSE(new_fd);
+                CLOSE(asss_conn);
                 g_log->OutError("write_jason_req failed.\n");
                 break;
             }
 
             if((len = read_jason_rep(asss_conn, buf)) == 0)
             {
-                close(new_fd);
-                new_fd = -1;
-                close( asss_conn );
-                asss_conn = -1;
+                CLOSE(new_fd);
+                CLOSE(asss_conn);
                 g_log->OutError("read_jason_rep failed.\n");
                 break;
             }
 
-            int cnt = send( new_fd, buf, len, 0 );
-            if( -1 == cnt )
+            int cnt = msend( new_fd, buf, len, 0 );
+            if( cnt <= 0 )
             {
-                close(new_fd);
-                new_fd = -1;
+                CLOSE(new_fd);
                 g_log->OutError("write_jason_rep connection close %s\n", inet_ntoa(their_addr.sin_addr));
                 break;
             }
             g_log->OutTrace("[len recved: %d][len send: %d] SEND: %s\n", len, cnt, buf);
         }
-        while(false);
+        while(0);
 
         if(new_fd > 0)
-            close(new_fd);
+            CLOSE(new_fd);
     }
 
     if (asss_conn > 0)
-        close( asss_conn );
+        CLOSE(asss_conn);
 
     return 0;
 }
