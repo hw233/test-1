@@ -240,7 +240,7 @@ namespace GObject
         }
 
 		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
-        fprintf(stderr, "id: %lu => cnt: %u\n", m_Player->getId(), cnt);
+        //fprintf(stderr, "id: %lu => cnt: %u\n", m_Player->getId(), cnt);
         if (cnt % 10)
             _writedb = false;
         else
@@ -9141,7 +9141,7 @@ namespace GObject
 		if(leaveCity)
 			_playerData.lastExp |= 0x80000000;
 
-        fprintf(stderr, "%s: %s\n", __PRETTY_FUNCTION__, writedb?"true":"false");
+        //fprintf(stderr, "%s: %s\n", __PRETTY_FUNCTION__, writedb?"true":"false");
         if (writedb)
             DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = %u WHERE `id` = %" I64_FMT "u", _playerData.lastExp, _id);
 	}
