@@ -1188,6 +1188,15 @@ struct DBStrengthenData
     std::string purpleBox;
     std::string orangeBox;
 };
+struct DBAirBookData
+{
+    UInt64 playerId;
+    UInt32 overTime;
+    UInt32  grade;
+    UInt32  recharge;
+    UInt32  consume;
+    std::string flags;
+};
 
 struct DBLingbaoAttr
 {
@@ -2791,6 +2800,18 @@ SPECIALDEF(9)
     std::string, blueBox,
     std::string, purpleBox,
     std::string, orangeBox
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBAirBookData)
+SPECIALDEF(6)
+(
+    UInt64, playerId,
+    UInt32, overTime,
+    UInt32,  grade,
+    UInt32,  recharge,
+    UInt32,  consume,
+    std::string, flags
 )
 SPECIALEND()
 

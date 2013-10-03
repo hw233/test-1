@@ -410,6 +410,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setJinQuan(jinquan);
             player->SetSummerFlow3Value();
             player->SetSummerMeetValue();
+            player->SetAirBookValue();
             player->setPrayLoginInWeek();
             player->continuousLoginSummerFlow();
             player->setPresentLogin();
@@ -780,6 +781,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setJinQuan(jinquan);
             pl->SetSummerFlow3Value();
             pl->SetSummerMeetValue();
+            pl->SetAirBookValue();
             pl->setPrayLoginInWeek();
             pl->continuousLoginSummerFlow();
             pl->SetQQBoardLogin();
@@ -3100,7 +3102,7 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN_AWARD, 0);
                  //pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE, 0);
-                //pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
             //    pl->checLuckyMeet();
             }
             break;
