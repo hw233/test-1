@@ -20,7 +20,7 @@ void Store::process (UInt32 now)
     clearSpecialDiscount();
 }
 
-void Store::add( UInt8 type, UInt32 itemId, UInt32 price )
+void Store::add( UInt8 type, UInt32 itemId, UInt32 price, UInt8 limit )
 {
     if(cfg.arenaPort == 0 && (itemId == ARENA_BET_ITEM1 || itemId == ARENA_BET_ITEM2))
         return;
@@ -34,6 +34,7 @@ void Store::add( UInt8 type, UInt32 itemId, UInt32 price )
     {
         _items2[type - PURCHASE3].push_back(itemId + (price << 16));
         _itemPrices2[type - PURCHASE3][itemId] = price;
+        _itemsLimit2[type - PURCHASE3][itemId] = limit;
     }
 
     return;
@@ -340,7 +341,14 @@ void Store::makePacket()
 		_storePacket2[i] << static_cast<UInt8>(PURCHASE3 + i) << static_cast<UInt8>(items.size());
 		for(std::vector<UInt32>::iterator it = items.begin(); it != items.end(); ++ it)
 		{
-			_storePacket2[i] << *it;
+            UInt16 itemId = *it;
+            UInt8 limitLvl = 0;
+            std::map<UInt32, UInt8>::iterator iter = _itemsLimit2[i].find(static_cast<UInt32>(itemId));
+            if(iter != _itemsLimit2[i].end())
+                limitLvl = iter->second;
+            else
+                limitLvl = 0;
+			_storePacket2[i] << *it << limitLvl;
         }
 		_storePacket2[i] << Stream::eos;
 	}
@@ -596,6 +604,16 @@ UInt8 Store::getDiscountItemsCount(UInt8 type)
 {
     // TODO: 
     return 0;
+}
+
+UInt8 Store::getItem2LimitLevel(UInt32 itemId, UInt8 type)
+{
+    if(type < PURCHASE3 || type > PURCHASE4)
+        return 0;
+    std::map<UInt32, UInt8>::iterator it = _itemsLimit2[type - PURCHASE3].find(itemId);
+    if(it == _itemsLimit2[type - PURCHASE3].end())
+        return 0;
+    return it->second;
 }
 
 }

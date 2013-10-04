@@ -50,7 +50,7 @@ class Store
 {
 public:
     void process(UInt32 now);
-	void add(UInt8 type, UInt32 itemId, UInt32 price);
+	void add(UInt8 type, UInt32 itemId, UInt32 price, UInt8 = 0);
     void addDiscountFromDB( UInt16 itemID, UInt8 discountType, UInt8 exType, UInt32 exValue,
             UInt32 limitCount, UInt32 beginTime, UInt32 endTime, UInt16 priceOriginal, UInt16 priceDiscount);
 	void addExchange(UInt8 type, UInt32 itemId, UInt32 priceID, UInt32 priceNum);
@@ -81,6 +81,7 @@ public:
 
     const Discount* getDiscount(UInt8 type, UInt8 index);
     UInt8 getDiscountItemsCount(UInt8 type);
+    UInt8 getItem2LimitLevel(UInt32 itemId, UInt8 type);
 private:
 	std::vector<UInt32> _items[PURCHASE2-PURCHASE1+1];
 	std::map<UInt32, UInt32> _itemPrices[PURCHASE2-PURCHASE1+1];
@@ -89,6 +90,7 @@ private:
 	std::vector<UInt32> _items2[PURCHASE4-PURCHASE3+1];
 	std::map<UInt32, UInt32> _itemPrices2[PURCHASE4-PURCHASE3+1];
 	Stream _storePacket2[PURCHASE4-PURCHASE3+1];
+	std::map<UInt32, UInt8> _itemsLimit2[PURCHASE4-PURCHASE3+1];
 
 	std::vector<Exchange> _itemsExchange[EXCHANGEEND-EXCHANGE+1];
 	std::map<UInt32, UInt32> _itemPricesExchange[EXCHANGEEND-EXCHANGE+1];

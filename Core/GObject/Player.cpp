@@ -738,6 +738,7 @@ namespace GObject
         m_ClanBattleSkillFlag = 0;
         _invitedBy = 0;
         m_arenaCommitCD = 0;
+        m_arenaTeamCommitCD = 0;
         _inClanCity = false;
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
@@ -5441,16 +5442,6 @@ namespace GObject
 				SYSMSG_SENDV(183, this, c);
 				SYSMSG_SENDV(1083, this, c);
 			}
-			else
-			{
-				//SYSMSG_SENDV(153, this, c);
-				//SYSMSG_SENDV(1053, this, c);
-			}
-		}
-		else
-		{
-			//SYSMSG_SENDV(153, this, c);
-			//SYSMSG_SENDV(1053, this, c);
 		}
 
 		if(_playerData.coin >= 99999999)
@@ -5486,8 +5477,6 @@ namespace GObject
 		}
 		if(notify)
 		{
-			//SYSMSG_SENDV(154, this, c);
-			//SYSMSG_SENDV(1054, this, c);
 		}
 		sendModification(4, _playerData.coin);
 		return _playerData.coin;
@@ -5507,8 +5496,6 @@ namespace GObject
 		case 1:
 			{
 				sendModification(4, _playerData.coin);
-				//SYSMSG_SENDV(154, this, c);
-				//SYSMSG_SENDV(1054, this, c);
 			}
 			break;
 		case 2:
@@ -9384,6 +9371,56 @@ namespace GObject
 #endif
 		return true;
 	}
+
+    bool Player::testCanAddTeamMember(Player * pl)
+    {
+        if(pl == NULL) return false;
+		Mutex::ScopedLock lk(_mutex);
+		Mutex::ScopedLock lk2(pl->getMutex());
+        if(pl->GetLev() < LIMIT_LEVEL)
+		{
+			sendMsgCode(2, 2010, LIMIT_LEVEL);
+			return false;
+		}
+        if(pl->getTeamArena())
+		{
+			sendMsgCode(2, 1336);
+			return false;
+		}
+        if(!getTeamArena())
+		{
+			sendMsgCode(2, 1337);
+			return false;
+		}
+        if(getTeamArena()->leader != this)
+		{
+			sendMsgCode(2, 2009);
+			return false;
+		}
+        if(getTeamArena()->isFull())
+		{
+			sendMsgCode(2, 1335);
+			return false;
+		}
+        if(getTeamArena()->isInArena())
+        {
+            sendMsgCode(0, 1339);
+            return false;
+        }
+        return true;
+    }
+
+    bool Player::checkCanBuyItem(UInt32 itemId, UInt8 type)
+    {
+        UInt8 limitLvl = GData::store.getItem2LimitLevel(itemId, type);
+        if(limitLvl == 0)
+            return true;
+        if(!getTeamArena())
+            return false;
+        if(getTeamArena()->getMemberLvl(this) >= limitLvl)
+            return true;
+        return false;
+    }
 
 	std::string& Player::fixName( std::string& name )
 	{
@@ -16369,6 +16406,16 @@ namespace GObject
             return true;
 
         m_arenaCommitCD = now + 60;
+        return false;
+    }
+
+    bool Player::inArenaTeamCommitCD()
+    {
+        UInt32 now = TimeUtil::Now();
+        if(now < m_arenaTeamCommitCD)
+            return true;
+
+        m_arenaTeamCommitCD = now + 60;
         return false;
     }
 

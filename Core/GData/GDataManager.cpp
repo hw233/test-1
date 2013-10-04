@@ -37,6 +37,7 @@
 #include "XingchenData.h"
 #include "JiguanData.h"
 #include "HunPoData.h"
+#include "TeamArenaSkill.h"
 
 namespace GData
 {
@@ -366,6 +367,18 @@ namespace GData
         if (!LoadSanHunConfig())
         {
             fprintf (stderr, "Load LoadSanHunConfig Error !\n");
+            std::abort();
+        }
+
+        if (!LoadTeamArenaSkillConfig())
+        {
+            fprintf (stderr, "Load LoadTeamArenaSkillConfig Error !\n");
+            std::abort();
+        }
+
+        if (!LoadTeamArenaInspireConfig())
+        {
+            fprintf (stderr, "Load LoadTeamArenaInspireConfig Error !\n");
             std::abort();
         }
 
@@ -2566,6 +2579,41 @@ namespace GData
         }
         return true;
     }
+
+    bool GDataManager::LoadTeamArenaSkillConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBTeamArenaSkillConfig dbtasc;
+		if(execu->Prepare("SELECT `id`, `level`, `needs`, `teamLev`, `attack`, `hp`, `defend`, `magdef`, `action`, `magresP` FROM `team_arena_skill`", dbtasc) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbtasc.id > 0)
+                TeamArenaConfigMgr::LoadSkillFromDB(dbtasc);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadTeamArenaInspireConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBTeamArenaInspireConfig dbtaic;
+		if(execu->Prepare("SELECT `level`, `consume`, `rate`, `attackP`, `defendP`,`hpP`, `actionP` FROM `team_arena_inspire`", dbtaic) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbtaic.level > 0)
+                TeamArenaConfigMgr::LoadInspireFromDB(dbtaic);
+        }
+        return true;
+    }
+
     UInt32 GDataManager::getMaxStrengthenVal(UInt16 id, UInt8 clvl)
     {
         std::map<UInt16, std::vector<UInt32> >::iterator i = m_skillstrengthexp.find(id);

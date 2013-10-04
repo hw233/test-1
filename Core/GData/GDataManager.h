@@ -74,6 +74,9 @@ namespace GData
         static bool LoadKeyinConfig();
         static bool LoadZhenweiConfig();
         static bool LoadSanHunConfig();
+        static bool LoadTeamArenaSkillConfig();
+        static bool LoadTeamArenaInspireConfig();
+
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);
         static bool isInUdpItem(UInt32 id);

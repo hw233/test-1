@@ -279,7 +279,8 @@ struct ArenaInfoReq
 
 struct ArenaLeaderBoardReq
 {
-	MESSAGE_DEF(REQ::SERVER_ARENA_LB);
+	UInt8 type;
+	MESSAGE_DEF1(REQ::SERVER_ARENA_LB, UInt8, type);
 };
 
 void OnClanListReq( GameMsgHdr& hdr, ClanListReq& clr )
@@ -1470,6 +1471,7 @@ void OnArenaConnected( ArenaMsgHdr& hdr, const void * data )
 		NETWORK()->CloseArena();
 		return;
 	}
+    GObject::World::setArenaState(GObject::ARENA_XIANJIE_DIYI);
 	GObject::arena.readFrom(brd);
 }
 
@@ -1508,18 +1510,18 @@ void OnLineupCommited( ArenaMsgHdr& hdr, const void * data )
     player->send(st);
 }
 
-void OnArenaPriliminary( ArenaMsgHdr& hdr, const void * data )
+void OnArenaPreliminary( ArenaMsgHdr& hdr, const void * data )
 {
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
-    GObject::arena.pushPriliminary(br);
+    GObject::arena.pushPreliminary(br);
 }
 
-void OnPriliminaryInfo( ArenaMsgHdr& hdr, const void * data )
+void OnPreliminaryInfo( ArenaMsgHdr& hdr, const void * data )
 {
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
 	UInt32 r[3] = {0};
 	br >> r[0] >> r[1] >> r[2];
-	GObject::arena.pushPriliminaryCount(r);
+	GObject::arena.pushPreliminaryCount(r);
 }
 
 void OnArenaBattleReport( ArenaMsgHdr& hdr, const void * data )
@@ -1547,7 +1549,15 @@ void OnArenaSupport( ArenaMsgHdr& hdr, const void * data )
     UInt8 flag = 0;
     UInt16 pos = 0;
     br >> type >> flag >> pos;
-    GObject::arena.updateSuport(type, flag, pos);
+    switch(GObject::World::getArenaState())
+    {
+        case GObject::ARENA_XIANJIE_DIYI:
+            GObject::arena.updateSuport(type, flag, pos);
+            break;
+        case GObject::ARENA_XIANJIE_ZHIZUN:
+            GObject::teamArenaMgr.updateSuport(type, flag, pos);
+            break;
+    }
 }
 
 void OnArenaBattlePoint( ArenaMsgHdr& hdr, const void * data )
@@ -1583,6 +1593,22 @@ void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& air )
     case 7:
         GObject::arena.sendElimination(player, air.type-4, air.flag);
         break;
+    case 10:
+        GObject::teamArenaMgr.sendStatus(player);
+        break;
+    case 11:
+        GObject::teamArenaMgr.sendEnter(player);
+        break;
+    case 12:
+        GObject::teamArenaMgr.sendPreliminary(player, air.flag, air.start, air.len);
+        break;
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+        GObject::teamArenaMgr.sendElimination(player, air.type-13, air.flag);
+        break;
     }
 	//GObject::arena.sendInfo(player);
 }
@@ -1590,7 +1616,18 @@ void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& air )
 void OnArenaLeaderBoardReq( GameMsgHdr&hdr, ArenaLeaderBoardReq& aer )
 {
 	MSG_QUERY_PLAYER(player);
-	GObject::arena.sendLeaderBoard(player);
+    switch(aer.type)
+    {
+        case 1:
+	        GObject::arena.sendLeaderBoard(player);
+            break;
+        case 2:
+	        GObject::teamArenaMgr.sendLeaderBoard(player);
+            break;
+        case 3:
+	        GObject::arena.sendLastLeaderBoard(player);
+            break;
+    }
 }
 
 void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
@@ -1796,7 +1833,167 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
                 player->send(st);
             }
             else
-                GObject::arena.commitLineup(player);
+            {
+                if(arena.isOpen())
+                    GObject::arena.commitLineup(player);
+                else
+                    GObject::teamArenaMgr.commitLineup1(player);
+            }
+        }
+        break;
+    case 5:
+        {
+            std::string name;
+            brd >> name;
+            extern void trimName(std::string& str);
+            trimName(name);
+            GObject::teamArenaMgr.createTeam(player, name);
+        }
+        break;
+    case 6:
+        GObject::teamArenaMgr.dismissTeam(player);
+        break;
+    case 7:
+        {
+            std::string name;
+            brd >> name;
+	        GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
+			if(!pl || !player->testCanAddTeamMember(pl))
+				return;
+			SYSMSGV(title, 4214);
+			SYSMSGV(content, 4215, player->getCountry(), player->getName().c_str(), player->getTeamArena()->getName().c_str());
+            pl->GetMailBox()->newMail(player, 0x14, title, content);
+        }
+        break;
+    case 8:
+        {
+            UInt64 playerId = 0;
+            brd >> playerId;
+            GObject::teamArenaMgr.fireTeamMember(player, playerId);
+        }
+        break;
+    case 9:
+        {
+            UInt64 playerId = 0;
+            brd >> playerId;
+            GObject::teamArenaMgr.handoverLeader(player, playerId);
+        }
+        break;
+    case 10:
+        {
+            UInt8 skillId = 0;
+            UInt32 tael = 0;
+            brd >> skillId >> tael;
+            GObject::teamArenaMgr.upgradeTeamSkill(player, skillId, tael);
+        }
+        break;
+    case 11:
+        {
+            UInt64 playerId1, playerId2, playerId3;
+            std::string stampStr;
+            brd >> playerId1 >> playerId2 >> playerId3 >> stampStr;
+            GObject::teamArenaMgr.setMemberPosition(player, playerId1, playerId2, playerId3, stampStr);
+        }
+        break;
+    case 12:
+        GObject::teamArenaMgr.leaveTeamArena(player);
+        break;
+    case 13:
+        GObject::teamArenaMgr.enterArena(player);
+        break;
+    case 14:
+        GObject::teamArenaMgr.commitLineup(player);
+        break;
+    case 15:
+        GObject::teamArenaMgr.getTeamInfo(player);
+        break;
+    case 16:
+        {
+            UInt8 state = 0, group = 0, tael = 0;
+            UInt16 pos = 0;
+            UInt64 pid = 0;
+			brd >> state >> tael;
+            if(state > 5)
+                break;
+            if(state < 1)
+                brd >> pid;
+            else
+                brd >> pos;
+            brd >> group;
+            if(tael > 1)
+                break;
+            UInt8 r = 0;
+            if(player->GetPackage()->GetItemAnyNum(ARENA_BET_ITEM1) < 1 && tael == 1)
+                r = 3;
+            else if(player->GetPackage()->GetItemAnyNum(ARENA_BET_ITEM2) < 1 && tael == 0)
+                r = 4;
+            else if(state < 1)
+                r = GObject::teamArenaMgr.bet1(player, state, group, pid, tael);
+            else
+                r = GObject::teamArenaMgr.bet2(player, state, group, pos, tael);
+            if(r == 0xFF)
+                break;
+            Stream st(REP::SERVER_ARENA_OP);
+            st << static_cast<UInt8>(14) << r << state;
+            if(state < 1)
+                st << pid;
+            else
+                st << pos;
+            st << group << Stream::eos;
+            player->send(st);
+	    }
+        break;
+    case 17:
+        {   //每日崇拜冠军
+            UInt8 opt = 0;
+            brd >> opt;
+            GObject::teamArenaMgr.championWorship(player, opt);
+	    }
+        break;
+    case 18:    //鼓舞队伍
+        GObject::teamArenaMgr.inspireTeam(player);
+        break;
+    case 19:
+        {
+            std::string name = "";
+            brd >> name;
+            GObject::teamArenaMgr.applyTeam(player, name);
+        }
+        break;
+    case 20:
+        {
+            UInt16 idx = 0;
+            UInt8 cnt = 0;
+            brd >> idx >> cnt;
+            GObject::teamArenaMgr.listAllTeam(player, idx, cnt);
+        }
+        break;
+    case 21:
+        {
+            std::string name = "";
+            brd >> name;
+            GObject::teamArenaMgr.searchTeam(player, name, 0);
+        }
+        break;
+    case 22:
+        {
+            std::string name = "";
+            brd >> name;
+            GObject::teamArenaMgr.searchTeam(player, name, 1);
+        }
+        break;
+    case 23:
+        GObject::teamArenaMgr.listTeamPending(player);
+        break;
+    case 24:
+        {
+            UInt8 opt = 0;
+            UInt64 inviteeId = 0;
+            brd >> opt >> inviteeId;
+            if(opt)
+                GObject::teamArenaMgr.declineApply(player, inviteeId);
+            else
+                GObject::teamArenaMgr.acceptApply(player, inviteeId);
         }
         break;
 	}
@@ -2855,5 +3052,63 @@ void OnSingleHeroReq( GameMsgHdr& hdr, const void* data)
 
 }
 
+//组队跨服战
+void OnTeamArenaEntered( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+	UInt64 teamId;
+	UInt8 entered;
+	std::string rname;
+    br >> teamId >> entered >> rname;
+    TeamArenaData * tad = GObject::globalTeamArena[teamId];
+    if(!tad)
+        return;
+    GObject::teamArenaMgr.teamArenaEntered(tad, entered, rname);
+}
+
+void OnTeamArenaConnected( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	UInt8 r = 0;
+	brd >> r;
+	if(r == 1)
+	{
+		INFO_LOG("Failed to connect to team arena.");
+		NETWORK()->CloseArena();
+		return;
+	}
+    GObject::World::setArenaState(GObject::ARENA_XIANJIE_ZHIZUN);
+	GObject::teamArenaMgr.readFrom(brd);
+}
+
+void OnTeamArenaPreliminary( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    GObject::teamArenaMgr.pushPreliminary(br);
+}
+
+void OnTeamArenaBattlePoint( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    GObject::teamArenaMgr.updateBattlePoint(br);
+}
+
+void OnTeamArenaInspireLevel( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    GObject::teamArenaMgr.updateInspireLevel(br);
+}
+
+void OnTeamArenaLeaderBoard( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    GObject::teamArenaMgr.updateLeaderBoard(br);
+}
+
+void OnTeamArenaLastRank( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    GObject::teamArenaMgr.updateLastRank(br);
+}
 
 #endif // _WORLDOUTERMSGHANDLER_H_

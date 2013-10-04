@@ -629,7 +629,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 	bool delIt = false;
 	switch(mail->flag & 0x7F)
 	{
-	case 0x21:
+	case 0x21:      //AWARDS
 		{
 			UInt32 count = mail->additional >> 16;
 			if(count == 0xFFFF)
@@ -719,7 +719,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			delIt = true;
 		}
 		break;
-	case 0x31:
+	case 0x31:  //系统定时斗剑场额外奖励
 		{
 			UInt32 EquipId = mail->additional & 0xFFFF;
 			UInt8 rank =  static_cast<UInt8>(mail->additional >> 16);
@@ -731,7 +731,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 		}
 		break;
 
-	case 0x13:
+	case 0x13:  //FRIEND 好友
 		{
 			Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
 			if(pl == NULL)
@@ -751,7 +751,28 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			updateMail(mail);
 		}
 		break;
-	case 0x05:
+	case 0x14:  //组队跨服战 成员邀请
+		{
+			Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
+			if(pl == NULL)
+				return;
+			mail->flag = 0x84;
+			if(action == 0)
+			{
+                GameMsgHdr hdr(0x172, WORKER_THREAD_WORLD, _owner, sizeof(Player *));
+                GLOBAL().PushMsg(hdr, &pl);
+				SYSMSG(content, 212);
+				mail->content = content;
+			}
+			else
+			{
+				SYSMSG(content, 213);
+				mail->content = content;
+			}
+			updateMail(mail);
+		}
+		break;
+	case 0x05:  // 交易
 		{
 			if (_owner->GetTrade()->addTradeMailItems(mail->additional))
 			{
@@ -759,7 +780,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 				DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
 			}
 		}
-	case 0x06:
+	case 0x06:  //SALE
 		{
 			if (_owner->GetSale()->addSaleMailItems(mail->additional))
 			{
@@ -768,7 +789,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			}
 		}
 		break;
-    case 0x41:
+    case 0x41:  //帮派战每日奖励
         {
             if(ClanRankBattleMgr::Instance().AddDailyMailItems(_owner, mail->additional))
             {
@@ -777,7 +798,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
             }
         }
         break;
-    case 0x42:
+    case 0x42:  //帮派战每周奖励
         {
             if(ClanRankBattleMgr::Instance().AddWeeklyMailItems(_owner, mail->additional))
             {
@@ -786,7 +807,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
             }
         }
         break;
-	case 0x22:
+	case 0x22:  //CLAN_INVITE 帮派邀请
 		{
 			Player * p = GObject::globalNamedPlayers[_owner->fixName(mail->sender)];
 			if (p == NULL)
@@ -805,7 +826,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			GLOBAL().PushMsg(hdr, &cmcir);
 		}
 		break;
-	case 0x23:
+	case 0x23:  //CLAN_REQ 帮派申请
 		{
 			Player * p = GObject::globalNamedPlayers[_owner->fixName(mail->sender)];
 			if(p == NULL)
@@ -824,7 +845,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			GLOBAL().PushMsg(hdr, &cmcr);
 		}
 		break;
-	case 0x24:
+	case 0x24:  //CLAN_UNION 帮派结盟
 		{
 			struct ClanAllyClickReq
 			{
@@ -844,16 +865,16 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			delIt = true;
 		}
 		break;
-	case 0x25:
+	case 0x25:  //CLAN_UNION_RETURN 帮派结盟返回
 		{
 			//TODO:
 		}
 		break;
-	case 0x26:
+	case 0x26:  //CLAN_UNION 帮派解盟
 		{
 			//TODO:
 		}
-	case 0x27:
+	case 0x27:  //
 		{
 			_owner->GetPackage()->AddItem(mail->additional, 1);
 			delIt = true;
