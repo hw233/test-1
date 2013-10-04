@@ -13245,7 +13245,7 @@ namespace GObject
         UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
         if(now < begin || now >end )
             return ;
-        if(off!= 1 && !(SummerMeetLogin&(1<<(off-2))))
+        if(off!= 1 && !(SummerMeetLogin&(1<<(off-2))) && !(SummerMeetLogin&(1<<(off-1))))
             SetVar(VAR_SUMMER_MEET_LOGIN_AWARD , 0); 
         SummerMeetLogin |= 1 << (off - 1);
         SetVar(VAR_SUMMER_MEET_LOGIN, SummerMeetLogin);
