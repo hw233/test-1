@@ -247,8 +247,8 @@ void StrengthenMgr::UpdateAirBookToDB()
         return ;
     UInt32 now = TimeUtil::Now();
     UInt32 type = World::get11TimeNum();
-    if(_owner->GetVar(VAR_11AIRBOOK_GRADE)!= 0)
-        _olditem[type-1].grade = _owner->GetVar(VAR_11AIRBOOK_GRADE);
+    if(_owner->GetVar(VAR_11AIRBOOK_GRADE_DAY)!= 0)
+        _olditem[type-1].grade = _owner->GetVar(VAR_11AIRBOOK_GRADE_DAY);
     if(_owner->GetVar(VAR_AIRBOOK_RECHARGE)!= 0)
         _olditem[type-1].recharge = _owner->GetVar(VAR_AIRBOOK_RECHARGE);
     if(_owner->GetVar(VAR_AIRBOOK_CONSUME)!= 0)
