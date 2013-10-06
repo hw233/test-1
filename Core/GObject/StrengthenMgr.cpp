@@ -247,6 +247,12 @@ void StrengthenMgr::UpdateAirBookToDB()
         return ;
     UInt32 now = TimeUtil::Now();
     UInt32 type = World::get11TimeNum();
+    if(_owner->GetVar(VAR_11AIRBOOK_GRADE)!= 0)
+        _olditem[type-1].grade = _owner->GetVar(VAR_11AIRBOOK_GRADE);
+    if(_owner->GetVar(VAR_AIRBOOK_RECHARGE)!= 0)
+        _olditem[type-1].recharge = _owner->GetVar(VAR_AIRBOOK_RECHARGE);
+    if(_owner->GetVar(VAR_AIRBOOK_CONSUME)!= 0)
+        _olditem[type-1].consume = _owner->GetVar(VAR_AIRBOOK_CONSUME);
     if(_olditem[type-1].overTime < now)
     {
         UInt32 over = TimeUtil::SharpDayT(1 , now);
@@ -469,9 +475,15 @@ void StrengthenMgr::Send11GradeInfo(UInt8 type)
     {
         UInt8 maxFlag = GameAction()->GetGradeCheckFlag(idx,type);
         UInt8 curnum = _olditem[type-1].flag[idx];
-        if(curnum > maxFlag)
+        if(idx != 12 && curnum > maxFlag)
             curnum = maxFlag;
-        st << idx << curnum << maxFlag;
+        if(idx == 12)
+        {
+            curnum = curnum < 5?0:1;
+            st << idx << curnum <<maxFlag;
+        }
+        else
+            st << idx << curnum << maxFlag;
     }
     st << Stream::eos;
     _owner->send(st);
