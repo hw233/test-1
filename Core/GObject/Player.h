@@ -28,6 +28,8 @@
 #include "FairyPet.h"
 #include "FairySpar.h"
 #include "MoFang.h"
+#include "ArenaTeam.h"
+
 
 namespace Battle
 {
@@ -204,6 +206,12 @@ namespace GObject
 #define GET_BIT(X,Y)     ((X & (1<<Y)) >> Y)
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))
 #define GET_BIT_MARK(X,Y)     ((X>>Y) & 1)
+
+#ifdef _FB
+#define LIMIT_LEVEL  60
+#else
+#define LIMIT_LEVEL  70
+#endif
 
     enum SurnameLegendAwardFlag
     {
@@ -579,7 +587,7 @@ namespace GObject
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonCnt1(0), dungeonEnd(0),
-            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0)
+            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0), teamArena(NULL)
 #ifdef _ARENA_SERVER
             , entered(0)
 #endif
@@ -699,6 +707,7 @@ namespace GObject
         std::string nameNoSuffix;     //(合服)不带后缀的用户名
         std::map<UInt8, UInt32> titleAll;      //玩家所有的称号id
         std::vector<UInt32> canHirePet;     //玩家未招募的仙宠
+        TeamArenaData * teamArena;  //组队跨服战
     };
 
 	class Player:
@@ -844,6 +853,10 @@ namespace GObject
         inline bool isEntered() const { return _playerData.entered != 0xFF; }
         inline UInt8 getEntered() const { return _playerData.entered; }
 #endif
+        inline void setTeamArena(TeamArenaData * ta) { _playerData.teamArena = ta; }
+        inline TeamArenaData * getTeamArena() { return _playerData.teamArena; }
+        bool testCanAddTeamMember(Player *);
+        bool checkCanBuyItem(UInt32 itemId, UInt8 type);
 
 	public:
 		bool Load();
@@ -2389,11 +2402,13 @@ namespace GObject
         void sendRNR(UInt32 now);
         void sendRechargeNextRetInfo(UInt32 now);
         bool inArenaCommitCD();
+        bool inArenaTeamCommitCD();
         void appendLineup2( Stream& st);
         void appendPetOnBattle( Stream& st);
     private:
         std::vector<RNR> rechargs;
         UInt32 m_arenaCommitCD;
+        UInt32 m_arenaTeamCommitCD;
 
     public:
         void getSoSoMapAward();

@@ -62,7 +62,6 @@ GMHandler::GMHandler()
 
 	Reg(1, "pinfo", &GMHandler::OnPlayerInfo);
 	Reg(1, "cinfo", &GMHandler::OnCharInfo);
-//	Reg(1, "enterarena", &GMHandler::OnEnterArena);
 	Reg(1, "enterClan", &GMHandler::OnEnterClan);
 
 	Reg(2, "holy", &GMHandler::OnHoly);
@@ -236,6 +235,8 @@ GMHandler::GMHandler()
 
     Reg(3, "bp", &GMHandler::OnShowBattlePoint);
     Reg(3, "enterarena", &GMHandler::OnEnterArena);
+    Reg(3, "createteam", &GMHandler::OnCreateTeamArena);
+    Reg(3, "teamscore", &GMHandler::OnAddTeamArenaScore);
     Reg(3, "idipbuy", &GMHandler::OnIdipBuy);
 
     Reg(3, "biglock", &GMHandler::OnBigLock);
@@ -2390,13 +2391,6 @@ void GMHandler::OnAutoFB( GObject::Player * player, std::vector<std::string>& ar
     frontMap.autoBattle(player, id, type, false);
 }
 
-#if 0
-void GMHandler::OnEnterArena( GObject::Player * player, std::vector<std::string>& )
-{
-	GObject::arena.enterArena(player);
-}
-#endif
-
 void GMHandler::OnNextArena( GObject::Player * player, std::vector<std::string>& )
 {
 	Stream st(REP::NEXT_ARENA, 0x01);
@@ -3355,16 +3349,22 @@ void GMHandler::OnNewPlayerAuto(GObject::Player* player, std::vector<std::string
 	if(arge.size() < 1)
 		return;
 
-    int cnt = atoi(arge[0].c_str()) + 1000;
+    UInt64 cnt = atoi(arge[0].c_str()) + 1000;
     std::string newname;
     newname.resize(10);
 
-    for(int playerID = 1000; playerID < cnt; ++ playerID)
+    for(UInt64 i = 1000; i < cnt; ++ i)
     {
+        UInt64 playerID = i;
+        UInt64 serverId = player->getId() >> 48;
+        if(cfg.merged)
+            playerID |= (serverId << 48);
+
         newname.clear();
-        char buf[10] = {0};
-        sprintf(buf, "%d", playerID);
+        char buf[16] = {0};
+        sprintf(buf, "%" I64_FMT "u", playerID);
         newname = buf;
+
 
         GObject::Player::patchMergedName(playerID, newname);
         GObject::Player * pl = GObject::globalNamedPlayers[newname];
@@ -3436,9 +3436,14 @@ void GMHandler::OnNewPlayerAutoSuper(GObject::Player* player, std::vector<std::s
 	if(arge.size() < 1)
 		return;
 
-    int cnt = atoi(arge[0].c_str()) + 1000;
-    for(int playerID = 1000; playerID < cnt; ++ playerID)
+    UInt64 cnt = atoi(arge[0].c_str()) + 1000;
+    for(UInt64 i = 1000; i < cnt; ++ i)
     {
+        UInt64 playerID = i;
+        UInt64 serverId = player->getId() >> 48;
+        if(cfg.merged)
+            playerID |= (serverId << 48);
+
         Player* pl = GObject::globalPlayers[playerID];
         if(!pl)
             continue;
@@ -3524,10 +3529,28 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
     }
 }
 
-void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& arge)
+void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& args)
 {
-    GameMsgHdr imh(0x1AB, WORKER_THREAD_WORLD, NULL, 0);
-    GLOBAL().PushMsg(imh, NULL);
+    if (args.size() < 1)
+        return;
+    UInt8 type = atoi(args[0].c_str());
+    GameMsgHdr imh(0x1AB, WORKER_THREAD_WORLD, NULL, sizeof(type));
+    GLOBAL().PushMsg(imh, &type);
+}
+
+void GMHandler::OnCreateTeamArena(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt16 num = atoi(args[0].c_str());
+    GameMsgHdr imh(0x1AD, WORKER_THREAD_WORLD, NULL, sizeof(num));
+    GLOBAL().PushMsg(imh, &num);
+}
+
+void GMHandler::OnAddTeamArenaScore(GObject::Player* player, std::vector<std::string>& args)
+{
+    GameMsgHdr imh(0x1AE, WORKER_THREAD_WORLD, NULL, sizeof(Player*));
+    GLOBAL().PushMsg(imh, &player);
 }
 
 void GMHandler::OnIdipBuy(GObject::Player* player, std::vector<std::string>& arge)

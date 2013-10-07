@@ -345,6 +345,11 @@ namespace GObject
         static bool loadPetEquipAttr();
         static bool loadFairySpar();
         static bool loadCollectCard();
+        //static bool loadSanHun();
+        static bool loadTeamArenaData();
+        static bool loadTeamArenaSkill();
+	    static bool LoadTeamArenaBets();
+	    static bool LoadTeamPendingPlayers();
         static bool loadZhenwei();
 
         static bool addGM(UInt64 id, UInt8 lvl);

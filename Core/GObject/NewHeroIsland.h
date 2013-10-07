@@ -22,14 +22,6 @@ namespace GObject
 #define NEWHERO_ISLAND_MOVE   3
 #define NEWHERO_ISLAND_ESCAPE 4
 
-struct joinByePlayer
-{
-    joinByePlayer(): player(NULL), status(0xFF) {}
-
-    Player * player;
-    UInt8 status;
-};
-
 struct NewHeroIsland_Skill
 {
     NewHeroIsland_Skill() : id(0), cd(0), last(0), lastcd(0), bufid(DEFAULT_BUFID), attr(NULL) {}

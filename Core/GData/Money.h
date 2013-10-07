@@ -102,6 +102,8 @@ enum
    TEAMCOPYAWARD_ROLL,
 // 装备洗练属性解封
    ATTR_ACTIVATE,
+// 跨服战创建战队
+    ARENATEAM_CREATE,
 
     MONEY_MAX,
 };

@@ -1329,12 +1329,53 @@ struct DBSanHun
     UInt8 curLvl;
 };
 
+struct DBTeamArenaData
+{
+	UInt64 id;
+    std::string name;
+	UInt64 leader;
+	UInt32 score;
+    std::string members;
+    std::string stamps;
+    std::string memScore;
+	UInt8  maxRank;
+	UInt8  inspireLvl;
+	UInt32 overTime;
+};
+
+struct DBTeamArenaSkill
+{
+	UInt64 teamId;
+	UInt8  skillId;
+	UInt8  level;
+	UInt32 extra;
+};
+
+struct DBTeamArenaBet
+{
+	UInt64 id;
+	UInt8 round;
+	UInt8 state;
+	UInt8 group;
+	UInt8 recieved;
+	UInt16 pos;
+	UInt8 tael;
+};
+
+struct DBTeamPendingPlayer
+{
+	UInt64 teamId;
+	UInt64 playerId;
+	UInt32 opTime;
+};
+
 struct DBZhenwei
 {
     UInt64 playerId;
     UInt16 keyId;
     UInt8 mark;
 };
+
 }
 
 namespace DB {
@@ -3029,6 +3070,54 @@ SPECIALDEF(4)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBTeamArenaData)
+SPECIALDEF(10)
+(
+	UInt64, id,
+    std::string, name,
+	UInt64, leader,
+	UInt32, score,
+    std::string, members,
+    std::string, stamps,
+    std::string, memScore,
+	UInt8,  maxRank,
+	UInt8,  inspireLvl,
+	UInt32, overTime
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTeamArenaSkill)
+SPECIALDEF(4)
+(
+	UInt64, teamId,
+	UInt8,  skillId,
+	UInt8,  level,
+	UInt32, extra
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTeamArenaBet)
+SPECIALDEF(7)
+(
+	UInt64, id,
+	UInt8, round,
+	UInt8, state,
+	UInt8, group,
+	UInt8, recieved,
+	UInt16, pos,
+	UInt8, tael
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTeamPendingPlayer)
+SPECIALDEF(3)
+(
+	UInt64, teamId,
+	UInt64, playerId,
+	UInt32, opTime
+)
+SPECIALEND()
+
 SPECIALBEGIN(GObject::DBZhenwei)
 SPECIALDEF(3)
     (
@@ -3037,6 +3126,7 @@ SPECIALDEF(3)
     UInt8, mark
     )
 SPECIALEND()
+
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

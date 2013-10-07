@@ -15,12 +15,6 @@ namespace GObject
 #define GET_ARENA_NAME(n) char n[1024]; if(_session & 0x8000) { SysMsgItem * mi = globalSysMsg[780]; if(mi != NULL) mi->get(n); else n[0] = 0; } else { strcpy(n, cfg.slugName.c_str()); }
 #define GET_PROGRESS_NAME(n, p) char n[1024]; { SysMsgItem * mi = globalSysMsg[781 + p]; if(mi != NULL) mi->get(n); else n[0] = 0; }
 
-#ifdef _FB
-#define LIMIT_LEVEL  60
-#else
-#define LIMIT_LEVEL  70
-#endif
-
 const static UInt8 progress_accept[7][13] = {
   // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12
     {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},   // 0
@@ -31,7 +25,6 @@ const static UInt8 progress_accept[7][13] = {
     {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},   // 5
     {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}    // 6
 };
-
 
 bool enum_send_status(void * ptr, void * data )
 {
@@ -117,7 +110,7 @@ Arena::Arena():
 
 void Arena::enterArena( Player * player )
 {
-    if(_progress != 0 || player->GetLev() < LIMIT_LEVEL)
+    if(!player || _progress != e_progress_sign || !isOpen() || player->GetLev() < LIMIT_LEVEL)
         return;
     std::map<Player *, ArenaPlayer>::iterator iter = _players.find(player);
     if( iter != _players.end() )
@@ -136,35 +129,35 @@ void Arena::commitLineup( Player * player )
     int idx = 0;
     switch(_progress)
     {
-    case 0:
+    case e_progress_sign:
         {
             std::map<Player*, ArenaPlayer>::iterator it = _players.find(player);
             if(it == _players.end())
                 return;
         }
         break;
-    case 1:
-    case 8:
+    case e_progress_ruwei:
+    case e_progress_sign_end:
         preliminary = true; idx = 0;
         break;
-    case 2:
-    case 9:
+    case e_progress_32:
+    case e_progress_ruwei_end:
         preliminary = true; idx = 1;
         break;
-    case 10:
-    case 3:
+    case e_progress_32_end:
+    case e_progress_16:
         final = true; endi = 32; round = 0;
         break;
-    case 4:
+    case e_progress_8:
         final = true; endi = 16; round = 1;
         break;
-    case 5:
+    case e_progress_4:
         final = true; endi = 8; round = 2;
         break;
-    case 6:
+    case e_progress_2:
         final = true; endi = 4; round = 3;
         break;
-    case 7:
+    case e_progress_1:
         final = true; endi = 2; round = 4;
         break;
     default:
@@ -764,7 +757,9 @@ void Arena::readFrom( BinaryReader& brd )
 void Arena::readFrom( BinaryReader& brd )
 {
     UInt8 sIdx = 0;
-	brd >> sIdx >> _session;
+    UInt16 otherSession = 0;
+	brd >> sIdx >> _session >> otherSession;
+    teamArenaMgr.setSession(otherSession);
 	UInt8 progress;
 	UInt8 reg;
 	brd >> reg >> progress >> _nextTime;
@@ -778,7 +773,27 @@ void Arena::readFrom( BinaryReader& brd )
 
 	switch(_progress)
 	{
-	case 0:
+    case e_progress_nextbegin:
+		if(!_players.empty() && sIdx == 0)
+        {
+            DB1().PushUpdateData("DELETE FROM `arena_bet`");
+            _playerCount[0] = 0;
+			_players.clear();
+        }
+        if(!_preliminaryPlayers[0].empty() && sIdx == 0)
+        {
+            _preliminaryPlayers[0].clear();
+            _preliminaryPlayers_list[0].clear();
+            _preliminaryPlayers_list_set[0].clear();
+        }
+        if(!_preliminaryPlayers[1].empty() && sIdx == 0)
+        {
+            _preliminaryPlayers[1].clear();
+            _preliminaryPlayers_list[1].clear();
+            _preliminaryPlayers_list_set[1].clear();
+        }
+        break;
+	case e_progress_sign:
 		if(!_players.empty() && sIdx == 0)
         {
             DB1().PushUpdateData("DELETE FROM `arena_bet`");
@@ -799,33 +814,37 @@ void Arena::readFrom( BinaryReader& brd )
         }
         readPlayers(brd, sIdx);
         break;
-    case 8:
-	case 9:
+    case e_progress_sign_end:
+	case e_progress_ruwei_end:
         readPrePlayers(brd, sIdx);
         if(reg == 1)
             readHistories(brd);
 		break;
-	case 2:
-	case 1:
+	case e_progress_ruwei:
+	case e_progress_32:
         if(reg == 1)
             readPrePlayers(brd, sIdx);
         readHistories(brd);
 		break;
-    case 10:
-	case 3:
-	case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 11:
+    case e_progress_32_end:
+	case e_progress_16:
+	case e_progress_8:
+    case e_progress_4:
+    case e_progress_2:
+    case e_progress_1:
+    case e_progress_end:
         if(reg == 1)
         {
             readPrePlayers(brd, sIdx);
             readHistories(brd);
         }
 
+
+        bool oldstatus = (_status > 0);
         if(sIdx == 0)
             readElimination(brd);
+        if(oldstatus != (_status > 0))
+            fStatus = true;
         break;
 	}
     if(fStatus)
@@ -833,7 +852,7 @@ void Arena::readFrom( BinaryReader& brd )
         globalPlayers.enumerate(enum_send_status, static_cast<void *>(NULL));
     }
 
-	if(!_loaded)
+    if(!_loaded || _progress == e_progress_sign)
     {
 		_loaded = true;
         globalPlayers.enumerate(enum_send_active, static_cast<void *>(NULL));
@@ -1107,7 +1126,7 @@ void Arena::pushPriliminary( Player * player, UInt8 won, UInt8 type, const std::
 	}
 }
 #endif
-void Arena::pushPriliminary(BinaryReader& br)
+void Arena::pushPreliminary(BinaryReader& br)
 {
     UInt8 won = 0;
     UInt8 type = 0;
@@ -1257,7 +1276,7 @@ void Arena::pushBetFromDB( Player * player, UInt8 round, UInt8 state, UInt8 grou
 	_players[player].betList[state][i].push_back(binfo);
 }
 
-void Arena::pushPriliminaryCount( UInt32 * c )
+void Arena::pushPreliminaryCount( UInt32 * c )
 {
 	_playerCount[0] = c[0];
 	_playerCount[1] = c[1];
@@ -1431,6 +1450,15 @@ void Arena::readHistories(BinaryReader& brd)
         {
             UInt64 pid = 0;
             brd >> pid;
+            UInt16 bCount = 0;
+            brd >> bCount;
+            std::vector<PriliminaryBattle> pbs;
+            for(UInt16 p = 0; p < bCount; ++ p)
+            {
+                PriliminaryBattle pb;
+                brd >> pb.won >> pb.type >> pb.otherHeroId >> pb.otherName >> pb.battleTime >> pb.battleId;
+                pbs.push_back(pb);
+            }
 
             std::unordered_map<UInt64, Player *>::const_iterator it = pm.find(pid);
             if(it == pm.end())
@@ -1439,16 +1467,9 @@ void Arena::readHistories(BinaryReader& brd)
             if(pl == NULL)
                 continue;
             ArenaPlayer& ap = _players[pl];
-            UInt16 bCount = 0;
-            brd >> bCount;
             ap.battles[i].clear();
             ap.battles[i].resize(bCount);
-            for(UInt16 p = 0; p < bCount; ++ p)
-            {
-                PriliminaryBattle pb;
-                brd >> pb.won >> pb.type >> pb.otherHeroId >> pb.otherName >> pb.battleTime >> pb.battleId;
-                ap.battles[i][p] = pb;
-            }
+            ap.battles[i] = pbs;
         }
     }
 }
@@ -1799,12 +1820,21 @@ void Arena::calcFinalBet(int i)
 
 void Arena::sendActive(Player* pl)
 {
-    Stream st(REP::SERVER_ARENA_OP);
-    UInt8 flag = static_cast<UInt8>(active() ? 1 : 0);
-    if(_progress == 12)
-        flag |= 0x10;
-    st << static_cast<UInt8>(0) << flag << Stream::eos;
-    pl->send(st);
+    if(pl == NULL) return;
+    if(active())
+    {
+        Stream st(REP::SERVER_ARENA_OP);
+        UInt8 flag = ARENA_XIANJIE_DIYI;
+        if(_progress == 12)
+            flag |= 0x10;
+        st << static_cast<UInt8>(0) << flag << Stream::eos;
+        pl->send(st);
+    }
+    else if(teamArenaMgr.active())
+    {
+        teamArenaMgr.sendActive(pl);
+        return;
+    }
 }
 
 void Arena::sendStatus(Player* pl)
@@ -1818,10 +1848,10 @@ void Arena::sendStatus(Player* pl)
     // 2 - 入围赛战斗阶段
     // 3 - 32强投注阶段
     // 4 - 32强战斗阶段
-    // 5 - 8强投注阶段1
-    // 6 - 8强战斗阶段1
-    // 7 - 8强投注阶段2
-    // 8 - 8强战斗阶段2
+    // 5 - 16强投注阶段
+    // 6 - 16强战斗阶段
+    // 7 - 8强投注阶段
+    // 8 - 8强战斗阶段
     // 9 - 4强投注阶段
     // 10 - 4强战斗阶段
     // 11 - 半决赛投注阶段
@@ -1829,6 +1859,8 @@ void Arena::sendStatus(Player* pl)
     // 13 - 决赛阶段投注阶段
     // 14 - 决赛阶段战斗阶段
     // 15 - 决赛阶段结束（不可报名
+    // 16 - 无法战斗
+    //                     0  1  2  3  4  5   6   7   8  9  10  11 12
     const UInt8 state[] = {0, 2, 4, 6, 8, 10, 12, 14, 1, 3, 5, 15, 16};
     progress = state[_progress];
     if(_progress > 3 && _progress < 8 && _status == 0)
@@ -2210,21 +2242,70 @@ void Arena::updateLeaderBoard(BinaryReader& brd)
     for(int i = 0; i < cnt; ++ i)
     {
         UInt16 session = 0;
+        UInt8 num = 0;
         std::string name;
-        brd >> session >> name;
-        _leaderBoard[session] = name;
+        brd >> session >> num;
+        std::vector<LeaderPlayer> lpVec;
+        for(UInt8 k = 0; k < num; ++ k)
+        {
+            LeaderPlayer lp;
+            brd >> lp.name >> lp.level >> lp.battlePoint >> lp.heroId;
+            lpVec.push_back(lp);
+        }
+        _leaderBoard[session] = lpVec;
     }
 }
 
 void Arena::sendLeaderBoard(Player* pl)
 {
+    if(pl == NULL) return;
 	Stream st(REP::SERVER_ARENA_LB);
     UInt16 cnt = _leaderBoard.size();
-    st << cnt;
-    for(std::map<UInt16, std::string>::iterator it = _leaderBoard.begin(); it != _leaderBoard.end(); ++ it)
+    st << static_cast<UInt8>(1) << cnt;
+    for(std::map<UInt16, std::vector<LeaderPlayer>>::iterator it = _leaderBoard.begin(); it != _leaderBoard.end(); ++ it)
     {
-        st << it->first << it->second;
+        st << it->first << (it->second)[0].name;
     }
+    st << Stream::eos;
+
+    pl->send(st);
+}
+
+bool Arena::hasLastLeaderBoard()
+{
+    std::map<UInt16, std::vector<LeaderPlayer>>::iterator it = _leaderBoard.find(_session-1);
+    if(it != _leaderBoard.end())
+        return true;
+    return false;
+}
+
+void Arena::sendLastLeaderBoard(Player* pl)
+{
+    if(pl == NULL) return;
+    if(active())
+    {   //互换
+        teamArenaMgr.sendLastLeaderBoard(pl);
+        return;
+    }
+	Stream st(REP::SERVER_ARENA_LB);
+    st << static_cast<UInt8>(3);
+    std::map<UInt16, std::vector<LeaderPlayer>>::iterator it = _leaderBoard.find(_session-1);
+    UInt8 size = 0;
+    if(it != _leaderBoard.end())
+    {
+        size = (it->second).size();
+        st << size;
+        for(UInt8 m = 0; m < size; ++ m)
+        {
+            st << (it->second[m]).name;
+            st << (it->second[m]).level;
+            st << (it->second[m]).battlePoint;
+            st << (it->second[m]).heroId;
+        }
+        st << static_cast<UInt8>(pl->GetVar(VAR_TEAMARENA_WORSHIP));
+    }
+    else
+        st << size;
     st << Stream::eos;
 
     pl->send(st);

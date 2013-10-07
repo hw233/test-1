@@ -605,6 +605,31 @@ struct DBTuzhiConfig
     UInt32 jiguanyuId;
 };
 
+struct DBTeamArenaSkillConfig
+{
+    UInt8 id;
+    UInt8 level;
+    UInt32 needs;
+    UInt8 teamLev;
+    float attack;
+    float hp;
+    float defend;
+    float magdef;
+    float action;
+    float magresP;
+};
+
+struct DBTeamArenaInspireConfig
+{
+    UInt8 level;
+    UInt32 consume;
+    UInt32 rate;
+    float attackP;
+    float defendP;
+    float hpP;
+    float actionP;
+};
+
 struct DBKeyinConfig
 {
     UInt8 keyinId;
@@ -651,6 +676,7 @@ struct DBSanHunConfig
 };
 
 }
+
 namespace DB {
 
 SPECIALBEGIN(GData::DBAreaDef)
@@ -1400,6 +1426,36 @@ SPECIALDEF(12)
     UInt32, money2
     )
 SPECIALEND()
+
+SPECIALBEGIN(GData::DBTeamArenaSkillConfig)
+SPECIALDEF(10)
+	(
+    UInt8, id,
+    UInt8, level,
+    UInt32, needs,
+    UInt8, teamLev,
+    float, attack,
+    float, hp,
+    float, defend,
+    float, magdef,
+    float, action,
+    float, magresP
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBTeamArenaInspireConfig)
+SPECIALDEF(7)
+	(
+    UInt8, level,
+    UInt32, consume,
+    UInt32, rate,
+    float, attackP,
+    float, defendP,
+    float, hpP,
+    float, actionP
+	)
+SPECIALEND()
+
 }
 
 #endif // _GDATADBEXECHELPER_H_
