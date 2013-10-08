@@ -881,6 +881,10 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	NewUserRepStruct rep;
 	rep._result = res;
 	NETWORK()->SendMsgToClient(conn.get(), rep);
+
+    std::string fsaleTime;
+    std::string foverTime;
+    pl->setForbidSale(checkForbidSale(pl->getId(), fsaleTime,foverTime));
 }
 
 bool callOpenApi(const std::string& param)

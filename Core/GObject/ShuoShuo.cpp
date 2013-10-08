@@ -173,6 +173,12 @@ void ShuoShuo::reset(bool online)
 }
 UInt32 ShuoShuo::getShuoShuoCount()
 {
+    if (!World::getShuoShuo())
+        return 0;
+
+    if (m_ss.size() < SS_MAX)
+        m_ss.resize(SS_MAX, 0);
+
     UInt32 count= 0;
     for(UInt32 i = 0; i<MIN_ITEM ;++i)
     {
