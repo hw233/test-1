@@ -18592,6 +18592,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
         static UInt32 broadfreq;
         UInt8 curtype;
 
+        if(!GObject::arena.active())
+            return;
         if(week < ARENA_WEEK_START || week > ARENA_WEEK_END)
             return;
         if(now < t1)
