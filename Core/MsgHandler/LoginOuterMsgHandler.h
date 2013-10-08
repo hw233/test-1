@@ -2387,6 +2387,74 @@ void MailVIPFromBs(LoginMsgHdr &hdr,const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 	SAFE_DELETE(item);
 }
+void AddItemToAllFromBsByCountry(LoginMsgHdr &hdr,const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+	Stream st;
+	st.init(SPEP::ADDITEMFROMBSBYCOUNTRY,0x01);
+	std::string content;
+	std::string title;
+    UInt8 country = 0;
+	UInt32 money[4] = {0};
+	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
+	UInt16 nums = 0;
+	UInt8 bindType = 1;
+    CHKKEY();
+	br>>title>>content>>country>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
+	std::string result="";
+	GObject::MailPackage::MailItem *item = new(std::nothrow) GObject::MailPackage::MailItem[nums + 5];
+	if(item == NULL)
+		return;
+	UInt8 count = {0};
+	memset(item, 0, sizeof(GObject::MailPackage::MailItem) * (nums + 5));
+
+    INFO_LOG("GM[%s]: %u, %u, %u, %u", __PRETTY_FUNCTION__, money[0], money[1], money[2], money[3]);
+	for(UInt32 i = 0; i < nums; i ++)
+	{
+		br>>item[i].id>>count;
+		item[i].count = count;
+        INFO_LOG("GM[%s]: %u, %u", __PRETTY_FUNCTION__, item[i].id, count);
+	}
+	for(UInt32 i = 0; i < 4; i ++)
+	{
+		if(money[i] == 0)
+			continue;
+		item[nums].id = moneyType[i];
+		item[nums++].count = money[i];
+	}
+
+    for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(), end = GObject::globalPlayers.end(); it != end; ++it)
+	{
+		GObject::Player* player=it->second;
+		if(player==NULL)
+		{
+			result+="1 ";
+		}
+		else
+		{
+            if (player->getCountry()!=country)
+                continue;
+
+			GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
+            GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
+			if(pmail != NULL)
+			{
+				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
+				result +="0 ";
+                player->moneyLog(2, money[2], money[1], money[0], money[3]);
+			}
+			else
+			{
+				result +="2 ";
+			}
+		}
+	}
+	result=result.substr(0,result.length()-1);
+	st<<result;
+	st<<Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+	SAFE_DELETE(item);
+}
 
 void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
 {
