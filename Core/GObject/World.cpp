@@ -1295,21 +1295,54 @@ void SendRechargeRankAward()
     if(bRechargeEnd)
     {
         World::initRCRank();
-        int pos = 0;
+        int yapos = 0;
+
+        struct RCTotal
+        {
+            Player* player;
+            int total;
+        };
+        struct RCRank
+        {
+            int pos;
+            int total;
+            RCTotal f7[7];
+        } rcrank;
+
+        memset(&rcrank, 0x00, sizeof(rcrank));
+
         for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
         {
-            ++pos;
+            ++yapos;
 
-            if(pos > 7) break;
+            if (yapos > 7)
+                break;
 
             Player* player = i->player;
             if (!player)
                 continue;
 
-            GameMsgHdr hdr(0x257, player->getThreadId(), player, sizeof(pos));
-            GLOBAL().PushMsg(hdr, &pos);
+            rcrank.f7[yapos-1].player = player;
+            rcrank.f7[yapos-1].total = i->total;
+        }
 
-            SYSMSG_BROADCASTV(4033, pos, player->getCountry(), player->getPName(), i->total);
+        int pos = 0;
+        for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
+        {
+            ++pos;
+
+            Player* player = i->player;
+            if (!player)
+                continue;
+
+            rcrank.pos = pos;
+            rcrank.total = i->total;
+
+            GameMsgHdr hdr(0x257, player->getThreadId(), player, sizeof(rcrank));
+            GLOBAL().PushMsg(hdr, &rcrank);
+
+            if (pos <= 7)
+                SYSMSG_BROADCASTV(4033, pos, player->getCountry(), player->getPName(), i->total);
 
             char id[1024] = {0};
             char ctx[1024] = {0};

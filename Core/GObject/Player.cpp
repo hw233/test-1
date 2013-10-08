@@ -14261,9 +14261,9 @@ namespace GObject
         sendMailItem(3002, 3002, &item[pos-1], 1, false);
     }
 
-    void Player::sendRechargeRankAward(int pos)
+    void Player::sendRechargeRankAward(int pos, int total, std::map<int, std::pair<Player*, int> >& f7)
     {
-        if (!pos || pos > 7)
+        if (!pos/* || pos > 7*/ || !total)
             return;
 #if 0
         MailPackage::MailItem item[7][3] =
@@ -14296,7 +14296,20 @@ namespace GObject
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
         }
 #else
-        GameAction()->sendRechargeRankAward(this, pos);
+        lua_tinker::table yaf7 = GameAction()->getTable();
+        for (int i = 0; i < 7; ++i)
+        {
+            std::map<int, std::pair<Player*, int> >::iterator it = f7.find(i+1);
+            if (it == f7.end())
+                break;
+
+            lua_tinker::table tmp = GameAction()->getTable();
+            tmp.set(1, it->second.first);
+            tmp.set(2, it->second.second);
+
+            yaf7.set(i+1, tmp);
+        }
+        GameAction()->sendRechargeRankAward(this, pos, total, yaf7);
 #endif
     }
 

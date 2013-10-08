@@ -1899,8 +1899,33 @@ void OnAdvancedHookExp( GameMsgHdr& hdr, const void* data )
 void OnSendRechargeRankAward( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
-    player->sendRechargeRankAward(*(int*)data);
+    struct RCTotal
+    {
+        Player* player;
+        int total;
+    };
+    struct RCRank
+    {
+        int pos;
+        int total;
+        RCTotal f7[7];
+    };
+
+    RCRank* r = (RCRank*)(data);
+
+    std::map<int, std::pair<Player*, int> > f7;
+    for (int i = 0; i < 7; ++i)
+    {
+        if (r->f7[i].player && r->f7[i].total)
+        {
+            f7[i+1] = std::make_pair(r->f7[i].player, r->f7[i].total);
+        }
+        else
+            break;
+    }
+    player->sendRechargeRankAward(r->pos, r->total, f7);
 }
+
 void OnSendConsumeRankAward( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);

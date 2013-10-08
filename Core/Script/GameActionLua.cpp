@@ -464,6 +464,7 @@ namespace Script
 		CLASS_DEF(ItemBase, Count);
 
 		CLASS_ADD(MailBox);
+		CLASS_DEF(MailBox, normalMail);
 		CLASS_DEF(MailBox, newItemMail);
 		CLASS_DEF(MailBox, newItemPackageMail);
 
@@ -1460,9 +1461,9 @@ namespace Script
     {
 		return Call<void>("sendRechargeMails", player, ototal, ntotal);
     }
-    void GameActionLua::sendRechargeRankAward(Player* player, Int32 pos)
+    void GameActionLua::sendRechargeRankAward(Player* player, Int32 pos, Int32 total, lua_tinker::table f7)
     {
-		return Call<void>("sendRechargeRankAward", player, pos);
+		return Call<void>("sendRechargeRankAward", player, pos, total, f7);
     }
     void GameActionLua::sendConsumeRankAward(Player* player, Int32 pos)
     {
