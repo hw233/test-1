@@ -187,9 +187,15 @@ function doStrong(player, id, param1, param2)
         if id == 16 then
             checkFlag[id] = 3
         end
+        if id == 37 then
+            checkFlag[id] = 2
+        end
         do11Grade(player, id, num, param2);
     else
         if id == 16 then
+            checkFlag[id] = 1
+        end
+        if id == 37 then
             checkFlag[id] = 1
         end
     end
