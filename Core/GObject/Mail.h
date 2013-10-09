@@ -78,6 +78,7 @@ public:
 	Mail * newMail2(UInt32 id, const std::string& sender, UInt32 recvTime, UInt8 type, const std::string& title, const std::string& content, UInt32 additional);
 	Mail * newItemMail(UInt8 type, const char * title, const char * content, UInt32 itemId, UInt32 count);
 	Mail * newItemPackageMail(const char * title, const char * content, lua_tinker::table table_items);
+    Mail * normalMail(const char* title, const char* content);
 	bool delMail(UInt32 id, bool freeAdd);
 	void readMail(UInt32 id);
 	void clickMail(UInt32 id, UInt8 action);

@@ -943,7 +943,7 @@ namespace GObject
         void sendMayDayTitleCard(int);
         void sendJuneHappyTitleCard(int pos);
         void sendPExpCard(int pos);
-        void sendRechargeRankAward(int pos);
+        void sendRechargeRankAward(int pos, int total, std::map<int, std::pair<Player*, int> >& f7);
         void sendConsumeRankAward(int pos);
         void sendKillMonsterRankAward(UInt8 index, Int32 pos);
         void sendPopularityRandAward(int popularity);

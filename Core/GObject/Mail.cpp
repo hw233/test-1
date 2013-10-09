@@ -333,6 +333,13 @@ Mail * MailBox::newItemMail( UInt8 type, const char * title, const char * conten
 	return newMail(NULL, type, title, content, itemId + 0x10000 * count, true, &itemsInfo);
 }
 
+Mail * MailBox::normalMail(const char* title, const char* content)
+{
+    if (!title || !content)
+        return NULL;
+	return newMail(NULL, 0x12, title, content);
+}
+
 Mail * MailBox::newItemPackageMail(const char * title, const char * content, lua_tinker::table table_items)
 {
 	UInt32 size = table_items.size();

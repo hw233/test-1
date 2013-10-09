@@ -279,7 +279,7 @@ namespace Script
         UInt8 RunConsumeAward(Player* player, UInt8 opt);
         void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
         void sendRechargeMails(Player* player, UInt32 ototal, UInt32 ntotal);
-        void sendRechargeRankAward(Player* player, Int32 pos);
+        void sendRechargeRankAward(Player* player, Int32 pos, Int32 total, lua_tinker::table f7);
         void sendConsumeRankAward(Player* player, Int32 pos);
         void sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal);
         void onEquipForge(Player* player, UInt32 itemId, UInt32 onums);
