@@ -1632,6 +1632,8 @@ void OnArenaLeaderBoardReq( GameMsgHdr&hdr, ArenaLeaderBoardReq& aer )
 
 void OnArenaExtraActReq( GameMsgHdr& hdr, const void * data )
 {
+    if(!GObject::arena.active())
+        return;
 	MSG_QUERY_PLAYER(player);
     UInt8 week;
 	UInt8 type;
