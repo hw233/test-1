@@ -1715,6 +1715,10 @@ void MoFang::addjiguanyu(UInt32 jiguanyuId)
     if(findNoEquipJG(jiguanyuId))
         return;
 
+    std::map<UInt32, UInt8>::iterator iter = m_tuzhi.find(jiguanyuId + NORMAL_TUZHI);
+    if(iter != m_tuzhi.end())
+        return;
+
     m_jg.push_back(jiguanyuId);
 
     DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), jiguanyuId, 0);
