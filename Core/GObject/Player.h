@@ -246,6 +246,7 @@ namespace GObject
         XIANGMO     = 11,   //降魔禅杖
         WANJIE      = 12,   //万劫不灭
         BILAN       = 13,   //碧岚天衣
+        LIUGUANG    = 14,   //刹那流光
 
         DRAGONKING_MAX,
     };

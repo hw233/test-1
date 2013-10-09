@@ -119,6 +119,18 @@ void TeamArenaData::appendListInfo(Stream& st)
         st << leader->getName();
     else
         st << "";
+    /*
+    for(UInt8 i = 0; i < count; ++ i)
+    {
+        if(members[i])
+        {
+            st << static_cast<UInt8>(members[i]->getMainFighter()->getId());
+            st << members[i]->getName() << members[i]->getBattlePoint();
+        }
+        else
+            st << static_cast<UInt8>(0) << "" << static_cast<UInt32>(0);
+    }
+    */
 }
 
 void TeamArenaData::broadcastTeam(Stream& st)
