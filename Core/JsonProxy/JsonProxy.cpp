@@ -47,6 +47,9 @@ int connASSS(int port)
 #endif
     int flag = 1;
     setsockopt(clientSock, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag));
+    int size = 64*1024;
+    setsockopt(clientSock, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size));
+    setsockopt(clientSock, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size));
 
     return clientSock;
 }
@@ -219,7 +222,7 @@ void clear_read_buffer(int fd)
     }
 }
 
-#define CLOSE(fb) do{close(fb);fb=-1}while(0)
+#define CLOSE(fb) do{close(fb);fb=-1;}while(0)
 
 int main()
 {
