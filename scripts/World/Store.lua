@@ -174,7 +174,7 @@ function loadStore()
             store:add(2, 1701, 599) --折翼扇
             store:add(2, 1702, 599) --西方之焰
             store:add(2, 1703, 599) --玫瑰情缘
-            store:add(2,1706,599)
+            --store:add(2,1706,599) --QQ管家机器人
             store:add(2, 1709, 599) --圣诞萌萌的糖
             store:add(2, 1710, 599) --圣诞老人的包袱
             store:add(2, 1711, 599) --爆竹
