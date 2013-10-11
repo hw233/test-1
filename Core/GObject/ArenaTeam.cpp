@@ -125,10 +125,10 @@ void TeamArenaData::appendListInfo(Stream& st)
         if(members[i])
         {
             st << static_cast<UInt8>(members[i]->getMainFighter()->getId());
-            st << members[i]->getName() << members[i]->getBattlePoint();
+            st << members[i]->getName() << members[i]->getCountry() << members[i]->getBattlePoint();
         }
         else
-            st << static_cast<UInt8>(0) << "" << static_cast<UInt32>(0);
+            st << static_cast<UInt8>(0) << "" << static_cast<UInt8>(0) << static_cast<UInt32>(0);
     }
     */
 }
