@@ -421,38 +421,48 @@ void BattleFighter::updateBuffExtras()
 
     if (_flag2 & AthlEnh31)
     {
-        _attrExtra.pierce *= 1.1f;
+        /*_attrExtra.pierce *= 1.1f;
         _attrExtra.attack *= 1.1f;
-        _attrExtra.magatk *= 1.1f;
+        _attrExtra.magatk *= 1.1f;*/
+        _attrExtra.attack *= 1.05f;
+        _attrExtra.magatk *= 1.05f;
     }
     if (_flag2 & AthlEnh32)
     {
-        _attrExtra.criticaldmg *= 1.25f;
-        _attrExtra.critical += 1.1f;
+        /*_attrExtra.criticaldmg *= 1.25f;
+        _attrExtra.critical += 1.1f;*/
+        _attrExtra.physique *= 1.05f;
+
     }
     if (_flag2 & AthlEnh33)
     {
-        _attrExtra.magres *= 1.2f;
+        //_attrExtra.magres *= 1.2f;
+        _attrExtra.evade *= 1.05f;
     }
     if (_flag2 & AthlEnh34)
     {
-        _attrExtra.counter *= 1.1f;
-        _attrExtra.hitrate *= 1.1f;
+        /*_attrExtra.counter *= 1.1f;
+        _attrExtra.hitrate *= 1.1f;*/
+        _attrExtra.pierce *= 1.05f;
     }
     if (_flag2 & AthlEnh35)
     {
-        _attrExtra.evade *= 1.1f;
-        _attrExtra.action *= 1.1f;
+        /*_attrExtra.evade *= 1.1f;
+        _attrExtra.action *= 1.1f;*/
+        _attrExtra.counter *= 1.05f;
     }
     if (_flag2 & AthlEnh36)
     {
-        _attrExtra.physique *= 1.1f;
+        /*_attrExtra.physique *= 1.1f;
         _attrExtra.defend *= 1.1f;
-        _attrExtra.magdef *= 1.1f;
+        _attrExtra.magdef *= 1.1f;*/
+        _attrExtra.critical *= 1.05f;
     }
     if (_flag2 & AthlEnh37)
     {
-        _attrExtra.aura += 100;
+        /*_attrExtra.aura += 100;*/
+        _attrExtra.defend *= 1.05f;
+        _attrExtra.magdef *= 1.05f;
     }
 }
 

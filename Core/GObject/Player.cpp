@@ -106,6 +106,7 @@
 
 #define ATHL_BUFF_SECS        (10*60)
 #define ATHL_BUFF_SECS_MAX    (30*60)
+#define ATHL_BUFF_SECS_1      (30*60)
 
 #define QIXI_XIQUE 9122
 
@@ -16027,7 +16028,7 @@ namespace GObject
     void Player::adjustAthlBuffData(UInt32 type)
     {
         UInt32 now = TimeUtil::Now();
-        UInt32 leftTime;
+        UInt32 leftTime = 0;
         UInt32 flag = 0;
         UInt8 count = 0;
         UInt8 index;
@@ -16140,7 +16141,6 @@ namespace GObject
             flag = PLAYER_BUFF_ATHL9;
         }
 
-        //sendAthlBufInfo();
         if(flag == 0)
             return;
         count = 1;
@@ -16151,6 +16151,63 @@ namespace GObject
         st << index;
         leftTime = getBuffData(flag) - now;
         st << leftTime;
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::adjustAthlBuffData2(UInt32 type)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 time = ATHL_BUFF_SECS_1;
+        UInt32 flag = 0;
+        UInt8 index;
+
+        if(type & Battle::BattleFighter::AthlEnh31)
+        {
+            setBuffData(PLAYER_BUFF_ATHL11, now + time);
+            flag = PLAYER_BUFF_ATHL11;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh32)
+        {
+            setBuffData(PLAYER_BUFF_ATHL22, now + time);
+            flag = PLAYER_BUFF_ATHL22;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh33)
+        {
+            setBuffData(PLAYER_BUFF_ATHL33, now + time);
+            flag = PLAYER_BUFF_ATHL33;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh34)
+        {
+            setBuffData(PLAYER_BUFF_ATHL44, now + time);
+            flag = PLAYER_BUFF_ATHL44;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh35)
+        {
+            setBuffData(PLAYER_BUFF_ATHL55, now + time);
+            flag = PLAYER_BUFF_ATHL55;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh36)
+        {
+            setBuffData(PLAYER_BUFF_ATHL66, now + time);
+            flag = PLAYER_BUFF_ATHL66;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh37)
+        {
+            setBuffData(PLAYER_BUFF_ATHL77, now + time);
+            flag = PLAYER_BUFF_ATHL77;
+        }
+
+        if(flag == 0)
+            return;
+
+        index = flag - PLAYER_BUFF_ATHL11;
+        time = getBuffData(flag) - now;
+        Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+        st << static_cast<UInt8>(5);
+        st << 1;
+        st << index;
+        st << time;
         st << Stream::eos;
         send(st);
     }
