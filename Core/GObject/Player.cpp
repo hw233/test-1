@@ -82,6 +82,7 @@
 #include "GObject/ClanBoss.h"
 #include "ClanCityBattle.h"
 #include "MoFang.h"
+#include "Leaderboard.h"
 
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -17789,6 +17790,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             }
             if(_onBattlePet)
                 bp += _onBattlePet->getBattlePoint();
+
+            pushPetInfo2Leaderboard();
         }
         else
         {
@@ -20511,6 +20514,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         DBLOG1().PushUpdateData("insert into pet_histories (server_id,player_id,pet_id,pet_name,delete_type,pet_pinjie,pet_gengu,delete_time) values(%u,%" I64_FMT "u,%u,'%s',%u,%u,%u,%u)",
             cfg.serverLogId, getId(), id, it->second->getName().c_str(), delete_type, it->second->getPetLev(), it->second->getPetBone(), TimeUtil::Now());
 
+        leaderboard.erasePetInfo(it->second);
         it->second->delSanHun();
         SAFE_DELETE(it->second);
         _fairyPets.erase(it);
@@ -24365,6 +24369,35 @@ void Player::doStrongInWorld(UInt8 type)
 {
     GameAction()->doStrong(this, type, 0,0);
 }
+
+UInt32 Player::getMaxPetBattlePoint()
+{
+    UInt32 maxbp = 0;
+    for(std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin(); it != _fairyPets.end(); ++ it)
+    {
+        FairyPet* pet = it->second;
+        if(!pet)
+            continue;
+        UInt32 bp = pet->getBattlePoint();
+        if(maxbp < bp)
+            maxbp = bp;
+    }
+
+    return maxbp;
+}
+
+void Player::pushPetInfo2Leaderboard()
+{
+    for(std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin(); it != _fairyPets.end(); ++ it)
+    {
+        FairyPet* pet = it->second;
+        if(!pet)
+            continue;
+        pet->pushPetInfo2Leaderboard();
+    }
+}
+
+
 
 } // namespace GObject
 

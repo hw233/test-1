@@ -1018,6 +1018,8 @@ public:
     void dismissXingchen();
     bool quickUpGrade(UInt8 type);
     void xingchenInfo(Stream & st);
+
+    void pushPetInfo2Leaderboard();
 };
 
 class GlobalFighters

@@ -2395,7 +2395,9 @@ namespace GObject
         void calcLingbaoBattlePoint();
         void setMaxLingbaoBattlePoint(UInt32 value);
         UInt32 getMaxLingbaoBattlePoint();
+        UInt32 getMaxPetBattlePoint();
         void verifyFighter();
+        void pushPetInfo2Leaderboard();
 
         //分别计算玩家的战斗力
         UInt32 getBaseBattlePoint();

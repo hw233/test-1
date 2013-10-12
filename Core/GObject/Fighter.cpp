@@ -2377,6 +2377,10 @@ void Fighter::rebuildBattlePoint()
         }
         calcLingbaoBattlePoint();
     }
+    else
+    {
+        leaderboard.pushPetInfo(static_cast<FairyPet*>(this));
+    }
 }
 
 Fighter * Fighter::clone(Player * player)
@@ -6876,6 +6880,12 @@ UInt32 Fighter::calcFormBattlePoint()
     const GData::Formation* form = GData::formationManager[_owner->getFormation()];
     return form ? form->getBattlePoint() : 0;
 }
+
+void Fighter::pushPetInfo2Leaderboard()
+{
+    checkBPDirty();
+}
+
 /*
  *end分别计算散仙的战斗力
 */
