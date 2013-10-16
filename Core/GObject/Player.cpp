@@ -20863,11 +20863,13 @@ UInt8 Player::toQQGroup(bool isJoin)
     }
 
     //寻宠
-    void Player::seekFairyPet(UInt8 count, UInt8 isConvert)
+    void Player::seekFairyPet(UInt16 count, UInt8 isConvert)
     {
         if(count == 0) return;
         if(getCanHirePetNum())
             return;
+        if(count > 20)
+            count = 1000;
         static UInt32 cost[] = {0xFFFFFFFF, 16, 24, 48, 120, 360};  //游历消耗仙缘
         UInt32 xianYuan = GetVar(VAR_FAIRYPET_XIANYUAN);
         UInt8 step = GetVar(VAR_FAIRYPET_STEP);
@@ -20875,16 +20877,16 @@ UInt8 Player::toQQGroup(bool isJoin)
             step = 1;
         UInt32 longYuan = 0, fengSui = 0, shouhun = 0;
         UInt32 greenId = 0, blueId = 0;
-        UInt8 like = 0;
+        UInt16 like = 0;
         UInt32 convert1 = 0, convert2 = 0;
         UInt32 used = 0;
         std::string petStr = "";
         Stream st(REP::FAIRY_PET);
         st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x02);
 	    size_t pos = st.size();
-        UInt8 num = 0;
+        UInt16 num = 0;
         st << num;
-        for(UInt8 i = 0; i < count; ++ i)
+        for(UInt16 i = 0; i < count; ++ i)
         {
             if(xianYuan < cost[step] + used)
                 break;
@@ -20895,7 +20897,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             longYuan += values.get<UInt32>("longyuan");
             fengSui += values.get<UInt32>("fengsui");
             shouhun += values.get<UInt32>("shouhun");
-            like += values.get<UInt8>("like");
+            like += values.get<UInt16>("like");
             greenId = values.get<UInt32>("greenId");
             if(greenId)
             {
@@ -20930,7 +20932,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         st << longYuan << fengSui << shouhun << like;
         st << static_cast<UInt32>(xianYuan - used) << isConvert;
         st << petStr.c_str();
-		st.data<UInt8>(pos) = num;
+		st.data<UInt16>(pos) = num;
         st << Stream::eos;
         send(st);
 
