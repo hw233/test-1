@@ -804,6 +804,8 @@ namespace Script
 
 	bool GameActionLua::AcceptTask(Player* player, UInt32 taskId)
 	{
+        if(!TaskFuncExist(taskId))
+            return false;
 		char buffer[64];
 		snprintf(buffer, sizeof(buffer), "Task_%08d_accept", taskId);
 		return Run<bool>(player, buffer, taskId);
@@ -811,6 +813,8 @@ namespace Script
 
 	bool GameActionLua::SubmitTask(Player* player, UInt32 taskId, UInt32 itemId, UInt16 itemNum)
 	{
+        if(!TaskFuncExist(taskId))
+            return false;
 		char buffer[64];
 		snprintf(buffer, sizeof(buffer), "Task_%08d_submit", taskId);
 		return Run<bool>(player, buffer, itemId, itemNum);
@@ -818,6 +822,8 @@ namespace Script
 
 	bool GameActionLua::AbandonTask(Player* player, UInt32 taskId)
 	{
+        if(!TaskFuncExist(taskId))
+            return false;
 		char buffer[64];
 		snprintf(buffer, sizeof(buffer), "Task_%08d_abandon", taskId);
 		return Run<bool>(player, buffer);
@@ -1796,6 +1802,11 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt16>("addClanProfferFromItem", player, num, unit);
     }
+
+	bool GameActionLua::TaskFuncExist(UInt32 taskId)
+	{
+		return Call<bool>("TaskFuncExist", taskId);
+	}
 
 }
 

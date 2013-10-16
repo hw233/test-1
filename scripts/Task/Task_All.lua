@@ -4,6 +4,7 @@ else
 	require("scripts/taskmsg")
 end
 require("scripts/global")
+require("scripts/Task/Task_Func")
 require("scripts/Task/Task_00000016")
 require("scripts/Task/Task_00000017")
 require("scripts/Task/Task_00000018")

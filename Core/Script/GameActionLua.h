@@ -393,6 +393,7 @@ namespace Script
         Table GetNewHeroIslandBuffs();
         bool onCollectCardAct(Player* player, UInt8 idx);
         UInt16 addClanProfferFromItem(Player* player, UInt16 num, UInt16 unit);
+	    bool TaskFuncExist(UInt32 taskId);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
