@@ -950,6 +950,7 @@ function LuckyDrawBox(player, id)
         [6] = 9016,
         [7] = 9035,
         [8] = 9391,
+        [9] = 9430,
     }
 
     local item = items[id]
@@ -8746,6 +8747,7 @@ function getDragonKingAward(step, flag)
             [11] = {{140,1}},
             [12] = {{6193,1}},
             [13] = {{141,1}},
+            [14] = {{6194,1}},
         },
     }
     local chances = {

@@ -245,6 +245,7 @@ GMHandler::GMHandler()
    
     Reg(3, "fsale", &GMHandler::OnForbidSale);
     Reg(3, "unfsale", &GMHandler::OnUnForbidSale);
+    Reg(3, "sendByCountry", &GMHandler::OnSendByCountry);
     Reg(3, "loginlimit", &GMHandler::OnSetLoginLimit);
 
     Reg(3, "InsLogin", &GMHandler::OnInstantLogin);
@@ -3694,6 +3695,40 @@ void GMHandler::OnForbidSale(GObject::Player *player, std::vector<std::string>& 
     {
         execu->Execute2("REPLACE into `fsale_player` values(%" I64_FMT "u,%d,1)", playerId, TimeUtil::Now());
     }
+}
+void GMHandler::OnSendByCountry(GObject::Player *player, std::vector<std::string>& args)
+{
+#pragma pack(1)
+    struct test
+    {
+        UInt8 blank[36];
+        UInt16 len1;
+        char msg1[10];
+        UInt16 len2;
+        char msg2[10] ;
+        UInt8 country;
+        UInt32 money[4];
+        UInt16 nums;
+        UInt8 bindType;
+        UInt16 id ;
+        UInt32 count;
+    };
+#pragma pack()
+    struct test _test;
+    _test.len1 = 10;
+    _test.len2 = 10;
+    _test.country = 0;
+    _test.money[0] = 0; 
+    _test.money[1] = 0; 
+    _test.money[2] = 0; 
+    _test.money[3] = 0; 
+    _test.nums = 1;
+    _test.bindType = 1;
+    _test.id = 1717;
+    _test.count = 1;
+  //  _test.msg = args[0].c_str();
+    LoginMsgHdr hdr1(0x11F, WORKER_THREAD_LOGIN, 0, 0, sizeof(_test));
+    GLOBAL().PushMsg(hdr1, &_test);
 }
 
 void GMHandler::OnUnForbidSale(GObject::Player *player, std::vector<std::string>& args)
