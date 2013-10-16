@@ -2555,7 +2555,7 @@ namespace GObject
 	    void sendFairyPetList();
         void sendFairyPetResource();
         void addFairyPet(FairyPet *, bool = true);
-        void seekFairyPet(UInt8, UInt8);
+        void seekFairyPet(UInt16, UInt8);
         void getFariyPetSpaceInfo();
         void getPetByLevelUp(UInt8);
         UInt8 getPetByPetEgg(UInt32);
