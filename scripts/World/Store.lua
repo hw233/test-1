@@ -138,6 +138,8 @@ function loadStore()
             store:add(2, 11114, 60)
             store:add(2, 11115, 70)
             store:add(2, 11116, 80)
+            store:add(2, 11117, 90)
+            store:add(2, 11118, 100)
         end
 
         if getQingren() then    --蜀山之恋
