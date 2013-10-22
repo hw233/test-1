@@ -1122,8 +1122,6 @@ void TeamArenaMgr::pushPreliminary(BinaryReader& br)
     if(type < 2)
         return;
     GET_ORIGINID(tid, sid, cid);
-	TeamArenaData * tad = globalTeamArena[tid];
-    if(!tad) return;
 
     TeamPlayerBattleReport tpbr;
     tpbr.readReport(br);
@@ -1149,18 +1147,8 @@ void TeamArenaMgr::pushPreliminary(BinaryReader& br)
         }
     }
 
-    /*
-    if(bid != 0)
-    {
-        Stream st(REP::ARENAPRILIMINARY);
-
-        const UInt8 won_mod[] = {1, 0, 1, 0, 1};
-        UInt8 won2 = won_mod[won];
-        st << static_cast<UInt8>(type) << won2 << heroId << bid << name << Stream::eos;
-        player->send(st);
-    }
-    */
-
+	TeamArenaData * tad = globalTeamArena[tid];
+    if(!tad) return;
     TeamArenaPlayer& ap = _teams[tad];
     if(won == 3 || won == 4)
     {   //进32强
