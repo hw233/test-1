@@ -20361,7 +20361,7 @@ void Player::sendSaveGoldAct()
 }
 void Player::buyTownTjItem(const UInt32 itemId)
 {
-    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534};
+    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534,1661};
     int opt = -1;
     for (UInt8 i = 0; i < sizeof(s_items)/sizeof(s_items[0]); ++i)
     {
@@ -20384,6 +20384,13 @@ void Player::buyTownTjItem(const UInt32 itemId)
             sendMsgCode(0, 1044);
             return;
         }
+        GetPackage()->FindEquipByTypeIdFromItemTemp(items, itemId, true);
+        if (!items.empty()) 
+        {
+            sendMsgCode(0, 1044);
+            return;
+        }
+
         for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
         {
             fgtItems.clear();
@@ -20413,7 +20420,7 @@ void Player::buyTownTjItem(const UInt32 itemId)
 }
 void Player::sendTownTjItemInfo()
 {
-    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534};
+    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534,1661};
     UInt8 flag = GetVar(VAR_TJ_TOWN_ITEM_GOT);
     std::vector<ItemEquip*> items;
     std::vector<ItemEquip*> fgtItems;
@@ -20424,6 +20431,12 @@ void Player::sendTownTjItemInfo()
             items.clear();
             GetPackage()->FindEquipByTypeId(items,s_items[i], true);
             if (!items.empty())
+            {
+                flag &= ~(1<<i);
+                continue;
+            }
+            GetPackage()->FindEquipByTypeIdFromItemTemp(items, s_items[i], true);
+            if (!items.empty()) 
             {
                 flag &= ~(1<<i);
                 continue;

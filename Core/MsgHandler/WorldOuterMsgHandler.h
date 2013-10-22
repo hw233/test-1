@@ -2627,6 +2627,9 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         }
         case 0x0C:
         {
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            /*
             brd >> op;
             switch (op)
             {
@@ -2639,6 +2642,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     player->buyTownTjItem(itemId);
                     break;
             }
+            */
             break;
         }
         case 0x0E:

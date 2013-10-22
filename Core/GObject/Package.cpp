@@ -7143,6 +7143,23 @@ namespace GObject
         }
     }
 
+    void Package::FindEquipByTypeIdFromItemTemp(std::vector<ItemEquip*>& ret, UInt32 id, bool bind)
+    {
+        if (!m_Owner)
+            return;
+
+        CheckTemporaryItem();
+        for (item_elem_iter i = m_ItemsTemporary.begin(); i != m_ItemsTemporary.end(); ++i)
+        {
+            if (i->second && IsEquipId(i->second->getId()))
+            {
+                ItemEquip* item = (ItemEquip*)i->second;
+                if (item->GetItemType().getId() == id)
+                    ret.push_back(item);
+            }
+        }
+    }
+
     ItemBase* Package::AddTempItemFromDB(TempItemData & idata)
     {
 		assert(!IsEquipId(idata.id));
