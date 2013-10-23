@@ -1093,6 +1093,12 @@ function onActivityCheck(tm)
           end
       end
 
+      if tm >= actTime_2013_1 and tm < actTime_2013_1_1 then
+          setHalloweenAct(true)
+      else
+          setHalloweenAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -1435,6 +1441,8 @@ function initActTime(y, m, d)
 
   --卡片碎片集齐
   local  SerStartTm250= { ['year'] = 2013, ['month'] = 8, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --万圣节登陆有礼
+  local SerStartTm_2013_1= { ['year'] = 2013, ['month'] = 10, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1899,6 +1907,9 @@ function initActTime(y, m, d)
   actTime2013_04_09= os.time(SerStartTm2013_04_01)+86400*8;
   actTime2013_04_14= os.time(SerStartTm2013_04_14)
   actTime2013_05_18= os.time(SerStartTm2013_05_18)
+
+  actTime_2013_1 = os.time(SerStartTm_2013_1);
+  actTime_2013_1_1 = os.time(SerStartTm_2013_1) + 7*86400;
 
   onActivityCheck(os.time() + 30);
 

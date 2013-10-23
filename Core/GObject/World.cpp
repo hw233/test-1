@@ -160,6 +160,7 @@ bool World::_ssToolbarAct= false;
 bool World::_snowAct= false;
 bool World::_goldSnakeAct= false;
 bool World::_collectCardAct= false;
+bool World::_halloweenAct= false;
 bool World::_heroIslandAct= false;
 bool World::_dragonKingAct= false;
 bool World::_saveGoldAct= false;

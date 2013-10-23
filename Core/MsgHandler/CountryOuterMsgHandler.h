@@ -1366,6 +1366,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->GetTaskMgr()->CompletedTask(201);
    if(pl->getFighterCount() >= 5)
         pl->GetTaskMgr()->CompletedTask(202);
+    pl->SetQQBoardValue();
     pl->sendQQBoardLoginInfo();
     pl->sendSummerMeetInfo();
     pl->sendSummerMeetRechargeInfo();
@@ -5921,12 +5922,16 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             player->getFishUserPackage(idx);
             break;
         case 20:
-            player->SetQQBoardValue();
-            player->sendQQBoardLoginInfo();
+            //player->SetQQBoardValue();
+            //player->sendQQBoardLoginInfo();
             break;
         case 21:
+            if(!World::getHalloweenAct())
+                return;
+            if(idx < 1 || idx > 4)
+                break;
             player->getQQBoardInstantLoginAward(2*idx - 1);
-            player->sendQQBoardLoginInfo();
+            //player->sendQQBoardLoginInfo();
             break;
         case 22:
             player->SetLuckyMeetValue();

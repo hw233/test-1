@@ -2339,6 +2339,7 @@ namespace GObject
         PopTimerEvent(this, EVENT_AUTOBATTLE, 0);
         delFlag(Training);
         sendQQBoardOnlineTime();  
+        SetQQBoardValue();
 	}
 
 	void Player::checkLastBattled()
@@ -13191,12 +13192,14 @@ namespace GObject
 
     void Player::SetQQBoardValue()
     {
-        UInt32 begin = 1374768000;
+        if(!World::getHalloweenAct())
+            return;
+        UInt32 begin = TimeUtil::MkTime(2013, 10, 28);
         UInt32 now = TimeUtil::Now();
         UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
         if(now < begin)
             return ;
-        if( off > 16)
+        if(off > 7)
             return ;
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         QQBoard |= 1 << (off - 1);
@@ -13273,6 +13276,8 @@ namespace GObject
     }
     void Player::sendQQBoardLoginInfo()
     {
+        if(!World::getHalloweenAct())
+            return;
         Stream st(REP::RC7DAY);  //协议
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         UInt32 QQBoardAward = GetVar(VAR_QQBOARD_AWARD);
@@ -13419,7 +13424,7 @@ namespace GObject
         UInt32 ctslandingAward = GetVar(VAR_QQBOARD_AWARD);
         UInt32 i=0;
         UInt32 count=0 ;
-        while(i<16)
+        while(i < 7)
         {
             if(QQBoard & (1 << i++ ))
                 ++count;
@@ -24793,6 +24798,8 @@ void Player::Send11GradeAward(UInt8 type)
     udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 
 }
+
 } // namespace GObject
+
 
 
