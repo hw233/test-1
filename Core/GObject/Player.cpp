@@ -2339,6 +2339,7 @@ namespace GObject
         PopTimerEvent(this, EVENT_AUTOBATTLE, 0);
         delFlag(Training);
         sendQQBoardOnlineTime();  
+        SetQQBoardValue();
 	}
 
 	void Player::checkLastBattled()
@@ -7976,7 +7977,7 @@ namespace GObject
             SetVar(VAR_TOWER_LEVEL, 1);
         }
 
-        //sendFeastLoginAct();
+        sendFeastLoginAct();
 
         if(_clan != NULL)
         {
@@ -13191,12 +13192,14 @@ namespace GObject
 
     void Player::SetQQBoardValue()
     {
-        UInt32 begin = 1374768000;
+        if(!World::getHalloweenAct())
+            return;
+        UInt32 begin = TimeUtil::MkTime(2013, 10, 28);
         UInt32 now = TimeUtil::Now();
         UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
         if(now < begin)
             return ;
-        if( off > 16)
+        if(off > 7)
             return ;
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         QQBoard |= 1 << (off - 1);
@@ -13273,6 +13276,8 @@ namespace GObject
     }
     void Player::sendQQBoardLoginInfo()
     {
+        if(!World::getHalloweenAct())
+            return;
         Stream st(REP::RC7DAY);  //协议
         UInt32 QQBoard = GetVar(VAR_QQBOARD);
         UInt32 QQBoardAward = GetVar(VAR_QQBOARD_AWARD);
@@ -13419,7 +13424,7 @@ namespace GObject
         UInt32 ctslandingAward = GetVar(VAR_QQBOARD_AWARD);
         UInt32 i=0;
         UInt32 count=0 ;
-        while(i<16)
+        while(i < 7)
         {
             if(QQBoard & (1 << i++ ))
                 ++count;
@@ -19474,7 +19479,7 @@ void Player::sendQQGameGift1218()
 
 void Player::sendFeastLoginAct()
 {
-    if(/*GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0*/GetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY) > 0 || /*!World::getMayDayLoginAct()*/ !World::getFeastLoginAct())
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 /*GetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY) > 0*/ || /*!World::getMayDayLoginAct()*/ !World::getFeastLoginAct())
         return;
     //SYSMSGV(title, 4102);
     //SYSMSGV(content, 4103);
@@ -19488,10 +19493,12 @@ void Player::sendFeastLoginAct()
         //MailPackage::MailItem mitem = {1759,1};
         //MailPackage::MailItem mitem = {1763,1};
         //MailPackage::MailItem mitem = {1760,1};
-        MailPackage::MailItem mitem = {9422,1};
+        //MailPackage::MailItem mitem = {9422,1};
+        MailPackage::MailItem mitem = {1773,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
-    SetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY, 1);
+    //SetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY, 1);
+    SetVar(VAR_FEAST_LOGIN, 1);
 }
 
 void Player::sendTowerLoginAct()
@@ -23674,11 +23681,11 @@ static UInt32 ryhb_items_2[15][4] = {
     {8, 5, 78, 9},          // 升级优惠礼包
     {28, 28, 79, 9},        // 炼器优惠礼包
     {99, 99, 5136, 9},         // 六级身法石
-    {99, 99, 1719, 2},       // 变身法宝
+    {99, 99, 1717, 2},       // 变身法宝
     {88, 88, 8555, 64},        //
+    {4, 10, 9229, 64},        //
     {1, 3, 9371, 99},        //
     {2, 6, 1126, 99},        //
-    {2, 6, 9418, 99},        //
     {2, 5, 547, 99},        //
     {2, 5, 501, 99},        //
     {5, 3, 503, 99},       //
@@ -24806,5 +24813,6 @@ bool Player::checkClientIP()
 }
 
 } // namespace GObject
+
 
 
