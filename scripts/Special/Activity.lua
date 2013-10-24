@@ -9291,8 +9291,7 @@ local serverNoSpreadCount = {
     [9990] = 2900,
 }
 function GetSpreadCountForAward(serverNo)
-    return 5
-    --return 200
+    return 200
     --[[local spreadCount = 5000
     if serverNo ~= 9990 and serverNo ~= 501 and serverNo > 358 then
         serverNo = 358
