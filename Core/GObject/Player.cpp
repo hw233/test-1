@@ -24793,6 +24793,18 @@ void Player::Send11GradeAward(UInt8 type)
     udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 
 }
+
+bool Player::checkClientIP()
+{
+    if(getVipLevel() > 4)
+        return true;
+
+    if(strstr(m_clientIp, "0.0.0.0"))
+        return false;
+
+    return true;
+}
+
 } // namespace GObject
 
 

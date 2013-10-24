@@ -416,6 +416,10 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setPresentLogin();
             GObject::globalOnlinePlayers.add(player->getId(),player);
             player->SetQQBoardLogin();
+            if(!player->checkClientIP())
+            {
+                player->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
+            }
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif

@@ -2670,6 +2670,7 @@ namespace GObject
         UInt8 _alreadyload[8];
     public:
         void setMapId(UInt8 mapId);
+        bool checkClientIP();
 	};
 
 
