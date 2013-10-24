@@ -247,6 +247,8 @@ void WorldScript::init()
     def("getQQBoardLoginTime",GObject::World::getQQBoardLoginTime);
     def("set11Time",GObject::World::set11Time);
     def("get11Time",GObject::World::get11Time);
+    def("setGGTime",GObject::World::set11Time);
+    def("getGGTime",GObject::World::get11Time);
 
     def("setSurnameLegend",GObject::World::setSurnameLegend);
     def("getSurnameLegend",GObject::World::getSurnameLegend);

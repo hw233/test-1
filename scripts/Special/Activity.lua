@@ -8045,6 +8045,46 @@ function onRoamingQueqiao(player, pos)
 
     return pos2;
 end
+function onRoamingGuangGun(player, pos)
+    local roamPlace = {
+        1,3,10,12,1,2,1,5,4,8,
+        10,7,13,6,12,1,11,5,10,9,
+        4,13,1,8,9,6,1,8,4,7,
+        9,2,5,8,1,12,10,9,11,7,
+    }
+
+    local eventItem = {
+        [1]={3,2,2,3,2,5,3},
+        [2]={3,2,5},
+        [3]={1},
+        [4]={1,1,1,2},
+        [5]={1,1},
+        [6]={3,2},
+        [7]={5,2,2,3},
+        [8]={3},
+        [9]={2,3},
+        [10]={3},
+        [11]={1,1,2},
+        [12]={3},
+        [13]={1},
+    }
+
+    step = math.random(1, 6)
+    pos2 = pos + step
+    if pos2 > 40 then
+        pos2 = pos2 - 40
+    end
+
+    i = roamPlace[pos2]
+    j = math.random(1, #eventItem[i])
+    local tasknum ;
+    for k=1,i do
+        tasknum=tasknum+#eventItem[k];
+    end
+    tasknum=tasknum+j;
+    player:setGuangGunTask( tasknum, eventItem[i][j]);
+    return pos2;
+end
 
 -- 1:聊天 2:避开 3:遇险 4:糖果 5:奇观 6:击杀 7:补给站
 function onRoamingWansheng(player, pos)

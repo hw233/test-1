@@ -513,6 +513,11 @@ public:
     inline static bool  get11Time()
     {  // return false;
         return _11time; } 
+    inline static void  setGGTime(bool v)
+    {   _ggtime=v; } 
+    inline static bool  getGGTime()
+    {  // return false;
+        return _ggtime; } 
     inline static UInt32 get11TimeNum(UInt32 time = 0)
     {
         UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
@@ -1036,6 +1041,7 @@ public:
     static bool _summerFlow3;
     static bool _surnamelegend;
     static bool _11time;
+    static bool _ggtime;
     static bool _ryhbActivity;
     static bool _zcjbActivity;
     static bool _halfgold;
@@ -1057,6 +1063,7 @@ public:
     static RCSortType LuckyBagSort;
     static RCSortType PlayerGradeSort; //十一活动
     static ClanGradeSort clanGradeSort; // 十一活动
+    static RCSortType guangGunSort; //十一活动
     static void initRCRank();
     static void initRP7RCRank();
 
@@ -1108,6 +1115,7 @@ public:
 
 public:
     void UpdateQixiScore(Player* pl, Player* lover);
+    void sendGuangGunPlayers(Player* pl);
     void sendQixiPlayers(Player* pl);
     void DivorceQixiPair(Player* pl);
     void LoadQixiScore(Player* pl, Player* lover);
@@ -1134,6 +1142,7 @@ public:
     void killMonsterInit();
     void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);
 
+    void UpdateGuangGunScore(Player* pl);
     static void SendRechargeRP7RankAward();
 private:
 	void testUpdate();

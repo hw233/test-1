@@ -150,6 +150,7 @@ bool World::_halfgold = false;
 bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
 bool World::_11time = false;
+bool World::_ggtime = false;
 bool World::_ryhbActivity = false;
 bool World::_zcjbActivity = false;
 bool World::_wansheng= false;
@@ -194,6 +195,7 @@ RCSortType World::consumeSort;
 RCSortType World::popularitySort;
 RCSortType World::LuckyBagSort;
 RCSortType World::PlayerGradeSort;
+RCSortType World::guangGunSort;
 ClanGradeSort World::clanGradeSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
@@ -2305,6 +2307,72 @@ void World::SendQixiAward()
     }
 }
 
+void World::UpdateGuangGunScore(Player* pl)//GG
+{
+    Player* player=pl;
+    if(pl->getGGStatus()==2)
+        player = pl->getGGTimeCaptain();
+    UInt32 score = player->getGGTimeScore();
+    for (RCSortType::iterator i = guangGunSort.begin(), e = guangGunSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            guangGunSort.erase(i);
+            break;
+        }
+    }
+    RCSort s;
+    s.player = player;
+    s.total = score;
+    guangGunSort.insert(s);
+    sendGuangGunPlayers(pl); 
+}
+void World::sendGuangGunPlayers(Player* pl)
+{
+    Player* player=pl;     //player表示队长   pl是请求人
+    if(pl->getGGStatus()==2)
+        player = pl->getGGTimeCaptain();
+    UInt32 myPlace = 0;
+    UInt32 myScore = 0;
+    UInt8 rank;
+    for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);//GG
+            st << static_cast<UInt8>(0x20) << static_cast<UInt8>(1) << static_cast<UInt8>(2);
+            st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+            pl->send(st);
+            break;
+        }
+    }
+
+    Stream st(REP::ACTIVE);   //GG
+    st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x02);
+    st << myPlace << myScore;
+    size_t offset = st.size();
+    UInt8 i =0;
+    st << i;
+    for(RCSortType::iterator it = World::guangGunSort.begin(), e = World::guangGunSort.end(); it != e&&i<3; ++it,++i)
+    {
+        Player *p = it->player;
+        st << p ->getGGTimeCore();
+        st << p->getName();
+        if(!p->getGGPlayer1())
+            st <<p->getGGPlayer1()->getName();
+        else
+            st<<"";
+        if(!p->getGGPlayer2())
+            st <<p->getGGPlayer2()->getName();
+        else 
+            st<<"";
+    }
+    st.data<UInt8>(offset) = i;
+    st << Stream::eos;
+    pl->send(st);
+}
+
 void World::sendQixiScoreAward(Player* pl)
 {
     if(pl->queQiaoCheck())
@@ -2632,6 +2700,19 @@ inline bool player_enum_rc(GObject::Player * p, int)
             s.player = p;
             s.total = used;
             World::PlayerGradeSort.insert(s);
+        }
+    }
+    if (World::getGGTime())
+    {
+        if(p->getGGStatus()==2)
+            return false;
+        UInt32 used = p->getGGTimeScore();
+        if (used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::guangGunSort.insert(s);
         }
     }
     return true;
@@ -3241,5 +3322,6 @@ void World::Send11CountryRankAward()
         }
     }
 }
+
 }
 

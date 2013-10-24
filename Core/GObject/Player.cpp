@@ -24793,6 +24793,131 @@ void Player::Send11GradeAward(UInt8 type)
     udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 
 }
+void Player::setGGValue()
+{
+    if(!World::getGGTime())
+        return ;
+    if(GetVar(VAR_GUANGGUN_ADVANCE_NUM)==0)
+        SetVar(VAR_GUANGGUN_ADVANCE_NUM,11);
+}
+void Player::setGuangGunTask(UInt8 task,UInt8 taskmaxnum)
+{
+    m_gginfo.task =task;
+    m_gginfo.taskCom = taskmaxnum;
+    m_gginfo.tasknum = 0;
+}
+void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
+{
+    if(type == 0)
+    {
+        if( m_gginfo.task != task)
+            return;
+        if(m_gginfo.tasknum ==( m_gginfo.taskCom - 1))
+        {
+            m_gginfo.task =0;
+            m_gginfo.taskCom = 0;
+            m_gginfo.tasknum = 0;
+            m_gginfo.score += 10;
+        }
+        else m_gginfo.tasknum++;
+    }
+    else if(type == 1)
+    {
+        m_gginfo.task =0;
+        m_gginfo.taskCom = 0;
+        m_gginfo.tasknum = 0;
+        m_gginfo.score += 10;
+    }
+    else if (type == 2)
+    {
+        m_gginfo.task =0;
+        m_gginfo.taskCom = 0;
+        m_gginfo.tasknum = 0;
+    }
+}
+void Player::AddGuangGunScore()
+{
+    AddVar(VAR_GUANGGUN_TODAY_SCORE,10);
+    UInt32 todayScore = GetVar(VAR_GUANGGUN_TODAY_SCORE);
+    UInt32 todayNum = GetVar(VAR_GUANGGUN_GETROLL); 
+    if(todayScore >=(todayNum+1)*10 && todayNum < 3)
+    {
+        m_gginfo.counts ++;
+        AddVar(VAR_GUANGGUN_GETROLL,1);
+    }
+}
+
+void Player::roamingGuangGun(UInt8 pos)
+{
+//    udpLog("qixi", "I_9122_2", "", "", "", "", "act");
+    UInt8 pos2 = GameAction()->onRoamingGuangGun(this, pos);
+ //   qixiUdpLog(1083);
+    Stream st(REP::ACTIVE);   //GG
+    st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x03) << pos2;
+    st << Stream::eos;
+    send(st);
+}
+UInt32 Player::getGGTimeScore()
+{
+    Player * pl = this;
+    if(getGGStatus()==2)
+        pl = getGGTimeCaptain();
+    if(pl ==NULL)
+        retrun getGGScore();
+    UInt32 score = 0;
+    score +=pl->getGGScore();
+    if(pl->m_gginfo.player1!=NULL)
+        score +=pl-> m_gginfo.player1->getGGScore(); 
+    if(pl->m_gginfo.player2!=NULL)
+        score +=pl->m_gginfo.player2->getGGScore(); 
+    return score;
+}
+Player* Player::getGGTimeCaptain()
+{
+   if(getGGStatus()==0 || getGGStatus() == 1 )
+       return this;
+   if(m_gginfo.player1->getStatus()==1)
+       return m_gginfo.player1;
+   if(m_gginfo.player2->getStatus()==1)
+       return m_gginfo.player2;
+   return this;
+}
+void Player::sendGuangGunInfo()
+{
+    UInt32 times = GetVar(VAR_GUANGGUN_TIMES);
+    UInt32 getRoll = GetVar(VAR_GUANGGUN_GETROLL);
+    UInt32 advanceNum = GetVar(VAR_GUANGGUN_ADVANCE_NUM); // -1表示剩余次数
+    UInt32 todayScore = GetVar(VAR_GUANGGUN_TODAY_SCORE);
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01);
+        
+    st<<Stream::eos;
+    send(st);
+}
+bool Player::EnterGGTeam(Player* pl,UInt8 type)   //1表示邮件接受邀请， 2表示邮件被接受  3表示无条件加入队员
+{
+    if(getGGStatus()!=0 || m_gginfo.ggplayers.size() !=0 )
+        return false;
+    std::vector<Player* >vec = pl->getGGPlayers();
+    if(vec.size() > 1 )
+        return false;
+    if(!pl->EnterGGTeam(this,2))
+        return false;
+    m_gginfo.ggplayers = vec;
+    m_gginfo.ggplayers.push_back(pl);
+    m_gginfo.status = 2 ; 
+    if(pl->getThreadId() == getThreadId())
+    {
+        pl->bePrayed(getId());
+    }
+    else
+    {
+        GameMsgHdr hdr(0x362, pl->getThreadId(), pl, sizeof(Player*));
+        GLOBAL().PushMsg(hdr, this);
+    }
+}
+
+
 } // namespace GObject
 
 
