@@ -107,7 +107,7 @@ bool TeamArenaData::checkTimeOver(UInt32 now)
 
 UInt8 TeamArenaData::getLastRank()
 {
-    if(maxRank && !lastRank)
+    if(maxRank)
         teamArenaMgr.resetTeamLastRank(this);
     return lastRank;
 }
@@ -2238,6 +2238,13 @@ void TeamArenaMgr::sendLeaderBoard(Player* pl)
     for(std::map<UInt16, LeaderTeam>::iterator it = _leaderBoard.begin(); it != _leaderBoard.end(); ++ it)
     {
         st << it->first << it->second.teamName;
+        st << it->second.leaderName;
+        for(UInt8 j = 0; j < TEAMARENA_MAXMEMCNT; ++ j)
+        {
+            if(it->second.memberName[j] == it->second.leaderName)
+                continue;
+            st << it->second.memberName[j];
+        }
     }
     st << Stream::eos;
 
