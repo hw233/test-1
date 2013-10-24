@@ -7977,7 +7977,7 @@ namespace GObject
             SetVar(VAR_TOWER_LEVEL, 1);
         }
 
-        //sendFeastLoginAct();
+        sendFeastLoginAct();
 
         if(_clan != NULL)
         {
@@ -19479,7 +19479,7 @@ void Player::sendQQGameGift1218()
 
 void Player::sendFeastLoginAct()
 {
-    if(/*GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0*/GetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY) > 0 || /*!World::getMayDayLoginAct()*/ !World::getFeastLoginAct())
+    if(GetLev() < 40 || GetVar(VAR_FEAST_LOGIN) > 0 /*GetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY) > 0*/ || /*!World::getMayDayLoginAct()*/ !World::getFeastLoginAct())
         return;
     //SYSMSGV(title, 4102);
     //SYSMSGV(content, 4103);
@@ -19493,10 +19493,12 @@ void Player::sendFeastLoginAct()
         //MailPackage::MailItem mitem = {1759,1};
         //MailPackage::MailItem mitem = {1763,1};
         //MailPackage::MailItem mitem = {1760,1};
-        MailPackage::MailItem mitem = {9422,1};
+        //MailPackage::MailItem mitem = {9422,1};
+        MailPackage::MailItem mitem = {1773,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
-    SetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY, 1);
+    //SetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY, 1);
+    SetVar(VAR_FEAST_LOGIN, 1);
 }
 
 void Player::sendTowerLoginAct()
@@ -23679,11 +23681,11 @@ static UInt32 ryhb_items_2[15][4] = {
     {8, 5, 78, 9},          // 升级优惠礼包
     {28, 28, 79, 9},        // 炼器优惠礼包
     {99, 99, 5136, 9},         // 六级身法石
-    {99, 99, 1719, 2},       // 变身法宝
+    {99, 99, 1717, 2},       // 变身法宝
     {88, 88, 8555, 64},        //
+    {4, 10, 9229, 64},        //
     {1, 3, 9371, 99},        //
     {2, 6, 1126, 99},        //
-    {2, 6, 9418, 99},        //
     {2, 5, 547, 99},        //
     {2, 5, 501, 99},        //
     {5, 3, 503, 99},       //
