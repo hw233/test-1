@@ -846,10 +846,10 @@ void SendRechargeRank(Stream& st)
 {
     using namespace GObject;
     st.init(REP::ACT);
-    UInt8 cnt = World::rechargeSort.size();
+    UInt32 cnt = World::rechargeSort.size();
     if (cnt > CNT)
         cnt = CNT;
-    st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << cnt;
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
     UInt32 c = 0;
     for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
     {
@@ -1286,10 +1286,10 @@ void SendConsumeRank(Stream& st)
 {
     using namespace GObject;
     st.init(REP::ACT);
-    UInt8 cnt = World::consumeSort.size();
+    UInt32 cnt = World::consumeSort.size();
     if (cnt > CNT)
         cnt = CNT;
-    st << static_cast<UInt8>(2) << static_cast<UInt8>(2) << static_cast<UInt8>(0) << cnt;
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(2) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
     UInt32 c = 0;
     for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
     {
@@ -1851,7 +1851,7 @@ void SendRechargeRP7Rank(GameMsgHdr& hdr,  const void* data )
 
     MSG_QUERY_PLAYER(player);    
 
-    UInt8 cnt = World::rechargeRP7Sort.size();
+    UInt32 cnt = World::rechargeRP7Sort.size();
     if (cnt > CNT10)
         cnt = CNT10;
     UInt32 myRecharge = player->getTotalRecharge();
@@ -1869,7 +1869,7 @@ void SendRechargeRP7Rank(GameMsgHdr& hdr,  const void* data )
     }
     Stream st(REP::RP_SERVER);
     st << static_cast<UInt8>(1) << static_cast<UInt8>(1);
-    st << myRecharge << myrank << cnt;
+    st << myRecharge << myrank << static_cast<UInt8>(cnt);
 
     UInt32 c = 0;
     for (RCSortType::iterator i = World::rechargeRP7Sort.begin(), e = World::rechargeRP7Sort.end(); i != e; ++i)
