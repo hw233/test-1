@@ -24912,12 +24912,36 @@ bool Player::EnterGGTeam(Player* pl,UInt8 type)   //1表示邮件接受邀请，
     }
     else
     {
-        GameMsgHdr hdr(0x362, pl->getThreadId(), pl, sizeof(Player*));
-        GLOBAL().PushMsg(hdr, this);
+        UInt64 id = getId();
+        GameMsgHdr hdr(0x340, pl->getThreadId(), pl, sizeof(id));
+        GLOBAL().PushMsg(hdr, &id);
     }
 }
-
-
+void Player::LeaveGGTime()
+{
+    Player* pl = getGGTimeCaptain(); 
+    m_gginfo.status = 0; 
+    m_gginfo.player1 = NULL;
+    m_gginfo.player2 = NULL;
+}
+void Player::beGGTeam(UInt64 id)
+{
+    Player* player = globalPlayers[playerid];
+    if(player==NULL)
+        return ;
+    if(m_gginfo.player1!=NULL&&m_gginfo.player2!=NULL)
+        return ;
+    if(getGGStatus()==0)
+        m_gginfo.status = 1;
+    if(m_gginfo.player1 == NULL)
+        m_gginfo.player1 = player;
+    else if(m_gginfo.player2 == NULL)
+        m_gginfo.player2 = player;
+    else return ;
+    UInt32 GGTeamScore = GetGGTimeScore();
+    GameMsgHdr hdr(0x1CD, WORKER_THREAD_WORLD, this, sizeof(grade));
+    GLOBAL().PushMsg(hdr, &grade);
+}
 } // namespace GObject
 
 

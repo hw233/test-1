@@ -2289,6 +2289,12 @@ void OnBePrayed( GameMsgHdr &hdr, const void * data)
     UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
     player->bePrayed(id);
 }
+void OnGGBeTeam( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
+    player->beGGTeam(id);
+}
 void OnDoStrongInWorld( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);

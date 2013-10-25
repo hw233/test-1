@@ -2005,7 +2005,7 @@ void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
     if (oldrank <= CNT || (!inrank && myrank <= CNT))
     {
         Stream st;
-        Send11PlayerGradeRank(st);
+        SendGuangGunRank(st);
         NETWORK()->Broadcast(st);
     }
 }

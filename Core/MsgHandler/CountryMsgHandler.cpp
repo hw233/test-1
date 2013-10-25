@@ -389,6 +389,7 @@ MSG_REG_2(GameMsgHdr, 0x336, OnTeamArenaUseTael);
 MSG_REG_2(GameMsgHdr, 0x337, OnTeamArenaUseGold);
 MSG_REG_2(GameMsgHdr, 0x338, OnGetTeamArenaMoney);
 MSG_REG_2(GameMsgHdr, 0x339, OnTeamArenaInspire);
+MSG_REG_2(GameMsgHdr, 0x340, OnGGBeTeam);
 
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 
