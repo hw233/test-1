@@ -6517,7 +6517,7 @@ namespace GObject
 
         DelItem2(guji, 1, ToLingbao);
         DelItem2(item, 1, ToLingbao);
-        double gujiFactor[17] = {1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 10};
+        double gujiFactor[17] = {0.7, 0.7, 0.7, 0.7, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 10};
         double itemFactor[2] = {1, 1.5};
         double lvFactor[6] = {1, 1.2, 1.4, 1.6, 1.8, 2.0};
         double colorFactor[4] = {1, 1, 2, 3};
@@ -6583,41 +6583,31 @@ namespace GObject
         else
             AdjVal = m_lbSmeltInfo.orangeAdjVal;
 
-        UInt8 probability = uRand(100);
         switch(nums)
         {
             case 1:
-                if(probability < 70)
-                {
-                    if(PURPLEADJVAL_TYPE == mark)
-                        m_lbSmeltInfo.purpleAdjVal += 2;
-                    else
-                        m_lbSmeltInfo.orangeAdjVal += 2;
-                }
+                if(PURPLEADJVAL_TYPE == mark)
+                    m_lbSmeltInfo.purpleAdjVal += 2;
+                else
+                    m_lbSmeltInfo.orangeAdjVal += 2;
                 break;
             case 2:
-                if(probability < 80)
-                {
-                    if(PURPLEADJVAL_TYPE == mark)
-                        m_lbSmeltInfo.purpleAdjVal += 3;
-                    else
-                        m_lbSmeltInfo.orangeAdjVal += 3;
-                }
+                if(PURPLEADJVAL_TYPE == mark)
+                    m_lbSmeltInfo.purpleAdjVal += 3;
+                else
+                    m_lbSmeltInfo.orangeAdjVal += 3;
                 break;
             case 3:
-                if(probability < 90)
-                {
-                    if(PURPLEADJVAL_TYPE == mark)
-                        m_lbSmeltInfo.purpleAdjVal += 4;
-                    else
-                        m_lbSmeltInfo.orangeAdjVal += 4;
-                }
+                if(PURPLEADJVAL_TYPE == mark)
+                    m_lbSmeltInfo.purpleAdjVal += 4;
+                else
+                    m_lbSmeltInfo.orangeAdjVal += 4;
                 break;
             case 4:
-                    if(PURPLEADJVAL_TYPE == mark)
-                        m_lbSmeltInfo.purpleAdjVal += 10;
-                    else
-                        m_lbSmeltInfo.orangeAdjVal += 10;
+                if(PURPLEADJVAL_TYPE == mark)
+                    m_lbSmeltInfo.purpleAdjVal += 10;
+                else
+                    m_lbSmeltInfo.orangeAdjVal += 10;
                 break;
         }
 
