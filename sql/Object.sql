@@ -922,7 +922,7 @@ CREATE TABLE `player` (
   `newGuild` bigint(20) unsigned NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `openid` varchar(1024) NOT NULL DEFAULT '',
-  `canHirePet` varchar(255) NOT NULL DEFAULT '',
+  `canHirePet` varchar(2048) NOT NULL DEFAULT '',
   `dungeonCnt1` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `name` (`name`),

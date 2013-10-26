@@ -1097,13 +1097,25 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
         }
     }
     else if(!defend100 && !enterEvade)
+    {
         appendDefStatus(e_damEvade, 0, bo);
+        if(bo->getSneakStatus() == e_sneak_on)
+        {
+            _sneak_atker.push_back(bo);
+            bo->nextSneakStatus();
+        }
+    }
     else
     {
         if(!defend100)
         {
             appendDefStatus(e_damEvade, 0, bo);
             bo->setEvad100(false);
+            if(bo->getSneakStatus() == e_sneak_on)
+            {
+                _sneak_atker.push_back(bo);
+                bo->nextSneakStatus();
+            }
         }
         else
         {
@@ -6166,6 +6178,33 @@ UInt32 BattleSimulator::doAttack( int pos )
         ++ rcnt;
     }
 
+    size_t size = _sneak_atker.size();
+    if(size != 0)
+    {
+        for(size_t i = 0; i < size; ++ i)
+        {
+            bool cs = false;
+            bool pr = false;
+            if(bf->getHP() == 0 || _winner != 0)
+                break;
+            BattleFighter* sneaker = _sneak_atker[i];
+            _activeFgt = sneaker;
+            sneaker->nextSneakStatus();
+            if(!sneaker->recoverSneakAtk())
+                appendDefStatus(e_unSneakAtk, 0, static_cast<BattleFighter*>(sneaker));
+
+            doSneakAttack(sneaker, bf, pr, cs);
+
+            if(_defList.size() > 0 || _scList.size() > 0)
+            {
+                appendToPacket(sneaker->getSide(), sneaker->getPos(), 0, 2, 10001, cs, pr);
+                ++ rcnt;
+            }
+        }
+        _sneak_atker.clear();
+        _activeFgt = NULL;
+    }
+
     if(mainTarget)
     {
         mainTarget->setShieldObj(NULL);
@@ -6206,33 +6245,34 @@ UInt32 BattleSimulator::doAttack( int pos )
             }
             mainTarget->clearCounterSpiritSkill();
             _activeFgt = NULL;
-        }
-    }
-    size_t size = _sneak_atker.size();
-    if(size != 0)
-    {
-        for(size_t i = 0; i < size; ++ i)
-        {
-            bool cs = false;
-            bool pr = false;
-            if(bf->getHP() == 0 || _winner != 0)
-                break;
-            BattleFighter* sneaker = _sneak_atker[i];
-            _activeFgt = sneaker;
-            sneaker->nextSneakStatus();
-            if(!sneaker->recoverSneakAtk())
-                appendDefStatus(e_unSneakAtk, 0, static_cast<BattleFighter*>(sneaker));
 
-            doSneakAttack(sneaker, bf, pr, cs);
-
-            if(_defList.size() > 0 || _scList.size() > 0)
+            size = _sneak_atker.size();
+            if(size != 0)
             {
-                appendToPacket(sneaker->getSide(), sneaker->getPos(), 0, 2, 10001, cs, pr);
-                ++ rcnt;
+                for(size_t i = 0; i < size; ++ i)
+                {
+                    bool cs = false;
+                    bool pr = false;
+                    if(mainTarget->getHP() == 0 || _winner != 0)
+                        break;
+                    BattleFighter* sneaker = _sneak_atker[i];
+                    _activeFgt = sneaker;
+                    sneaker->nextSneakStatus();
+                    if(!sneaker->recoverSneakAtk())
+                        appendDefStatus(e_unSneakAtk, 0, static_cast<BattleFighter*>(sneaker));
+
+                    doSneakAttack(sneaker, mainTarget, pr, cs);
+
+                    if(_defList.size() > 0 || _scList.size() > 0)
+                    {
+                        appendToPacket(sneaker->getSide(), sneaker->getPos(), 0, 2, 10001, cs, pr);
+                        ++ rcnt;
+                    }
+                }
+                _sneak_atker.clear();
+                _activeFgt = NULL;
             }
         }
-        _sneak_atker.clear();
-        _activeFgt = NULL;
     }
 
     if(bf->getHP() > 0 && _winner == 0 && bf->getAbnormalTypeCnt() >= 3)
@@ -13275,13 +13315,25 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
                 }
             }
             else if(!defend100 && !enterEvade)
+            {
                 appendDefStatus(e_damEvade, 0, target);
+                if(target->getSneakStatus() == e_sneak_on)
+                {
+                    _sneak_atker.push_back(target);
+                    target->nextSneakStatus();
+                }
+            }
             else
             {
                 if(!defend100)
                 {
                     appendDefStatus(e_damEvade, 0, target);
                     target->setEvad100(false);
+                    if(target->getSneakStatus() == e_sneak_on)
+                    {
+                        _sneak_atker.push_back(target);
+                        target->nextSneakStatus();
+                    }
                 }
                 else
                 {
