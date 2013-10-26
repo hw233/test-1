@@ -6714,7 +6714,7 @@ namespace GObject
             m_lbSmeltInfo.value += value;
 
             UInt8 probability = uRand(100);
-            if(ORANGE_SMELTBAOJU == itemId && probability < 10)
+            if(ORANGE_SMELTBAOJU == itemId && probability < 25)
                 mark = true;
             else if(PURPLE_SMELTBAOJU == itemId && probability < 5)
                 mark = true;
