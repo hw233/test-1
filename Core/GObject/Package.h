@@ -30,6 +30,9 @@ namespace GObject
 #define ARENA_BET_ITEM1    9081
 #define ARENA_BET_ITEM2    9082
 
+#define PURPLEADJVAL_TYPE  1
+#define ORANGEADJVAL_TYPE  2
+
 	class Fighter;
 	class Player;
 
@@ -78,8 +81,11 @@ namespace GObject
         UInt32 value;
         UInt32 maxValue;
         UInt8 bind;
+        UInt8 counts;
+        UInt8 purpleAdjVal;
+        UInt8 orangeAdjVal;
 
-        LingbaoSmeltInfo() : gujiId(0), itemId(0), value(0), maxValue(0), bind(0) {}
+        LingbaoSmeltInfo() : gujiId(0), itemId(0), value(0), maxValue(0), bind(0), counts(0), purpleAdjVal(0), orangeAdjVal(0) {}
 
 		const LingbaoSmeltInfo& operator= (LingbaoSmeltInfo& info)
         {
@@ -88,6 +94,9 @@ namespace GObject
             value = info.value;
             maxValue = info.maxValue;
             bind = info.bind;
+            counts = info.counts;
+            purpleAdjVal = info.purpleAdjVal;
+            orangeAdjVal = info.orangeAdjVal;
 
             return *this;
         }
@@ -277,6 +286,8 @@ namespace GObject
         void FinishLBSmelt();
         bool FinishLBSmeltSpecial(const GData::ItemBaseType * itype, ItemLingbaoAttr& lbattr, UInt8& attrNum);
         void testLingbao(UInt32 itemId, UInt32* colorNums, UInt8 size, UInt32* skills, UInt8 size2);
+        void AddAdjVal(UInt8 AdjValMark, UInt8 nums);
+        void Probability(float & disFactor);
     public:
         ItemBase * AddRetItemToPackage(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 FromWhere);
         ItemBase * AddTempItemFromDB(TempItemData &);

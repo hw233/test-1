@@ -227,7 +227,7 @@ namespace GObject
         UInt16 getSmeltExp(UInt8 lv, UInt8 itemTypeIdx, UInt8* at, UInt16* av, UInt8 size, UInt8 skillNum)
         {
             float colorP = 0;
-            float lvFactor[8] = {1, 1.2, 1.4, 1.6, 0, 0, 0, 0};
+            float lvFactor[8] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 0, 0};
             UInt8 lvIdx = (lv-70)/10;
             UInt16 skillExp = 100;
             if(lvIdx > 3)
@@ -244,7 +244,7 @@ namespace GObject
 
         UInt16 getSmeltExp2(UInt8 lv, UInt8 itemTypeIdx, UInt8 color)
         {
-            float lvFactor[8] = {1, 1.2, 1.4, 1.6, 0, 0, 0, 0};
+            float lvFactor[8] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 0, 0};
             UInt8 lvIdx = (lv-70)/10;
             if(lvIdx > 3)
                 lvIdx = 3;

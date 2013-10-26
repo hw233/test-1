@@ -1904,6 +1904,9 @@ CREATE TABLE `lingbaosmelt` (
     `bind` tinyint(3) unsigned NOT NULL,      
     `value` int(10) unsigned NOT NULL,        
     `maxValue` int(10) unsigned NOT NULL,        
+    `counts` tinyint(3) unsigned NOT NULL DEFAULT '0',      
+    `purpleAdjVal` tinyint(3) unsigned NOT NULL DEFAULT '0',      
+    `orangeAdjVal` tinyint(3) unsigned NOT NULL DEFAULT '0',      
     PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

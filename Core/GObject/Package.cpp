@@ -6492,18 +6492,19 @@ namespace GObject
         if(gujiClass < Item_Guji || gujiClass > Item_Guji_Dossier)
             return 2;
 
-        UInt8 colorIdx = guji->getQuality() - 2;
+        UInt8 quality = guji->getQuality();
+        UInt8 colorIdx = quality - 2;
         UInt8 lvIdx = (guji->getReqLev() - 70)/10;
         UInt8 gujiIdx = gujiClass - Item_Guji;
         UInt8 itemIdx = item->getQuality() == 2 ? 0 : 1;
-        if(colorIdx > 3 || lvIdx > 3 || gujiIdx > 16 || itemIdx > 1)
+        if(colorIdx > 3 || lvIdx > 5 || gujiIdx > 16 || itemIdx > 1)
             return 2;
 
         DelItem2(guji, 1, ToLingbao);
         DelItem2(item, 1, ToLingbao);
         double gujiFactor[17] = {1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 10};
         double itemFactor[2] = {1, 1.5};
-        double lvFactor[4] = {1, 1.2, 1.4, 1.6};
+        double lvFactor[6] = {1, 1.2, 1.4, 1.6, 1.8, 2.0};
         double colorFactor[4] = {1, 1, 2, 3};
 
         m_Owner->udpLog("Tongling", "F_10000_15", "", "", "", "", "act");
@@ -6527,16 +6528,98 @@ namespace GObject
         m_lbSmeltInfo.bind = 1; //(bind1 != 0 || bind2 != 0) ? 1 : 0;
         m_lbSmeltInfo.value = 0;
         m_lbSmeltInfo.maxValue = 1000*gujiFactor[gujiIdx]*itemFactor[itemIdx]*lvFactor[lvIdx]*colorFactor[colorIdx];
+        m_lbSmeltInfo.counts = 1;
+
+        if(itemId == FULING_ITEM_PROTECT) //使用泰山石敢当
+        {
+            m_lbSmeltInfo.counts += 2;
+            m_lbSmeltInfo.orangeAdjVal += 25;
+        }
+
+        if(gujiId >= 11113 && gujiId <= 11118) //皇帝古籍
+        {            
+            m_lbSmeltInfo.counts += 2;
+            m_lbSmeltInfo.orangeAdjVal += 75;
+        }
+        else if(5 == quality) //使用橙色指定属性的古籍
+        {
+            m_lbSmeltInfo.orangeAdjVal += 25;
+        }
+
+        if(m_lbSmeltInfo.counts > 4)
+            m_lbSmeltInfo.counts = 4;
+
+        if(m_lbSmeltInfo.orangeAdjVal > m_lbSmeltInfo.counts * 25)
+            m_lbSmeltInfo.orangeAdjVal = m_lbSmeltInfo.counts * 25;
 
         sendLingbaoSmeltInfo();
         GameAction()->doStrong(m_Owner, SthGuJiSpirit, 0, 0); 
-        DB4().PushUpdateData("INSERT INTO `lingbaosmelt`(`playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u)", m_Owner->getId(), m_lbSmeltInfo.gujiId, m_lbSmeltInfo.itemId, m_lbSmeltInfo.bind, m_lbSmeltInfo.value, m_lbSmeltInfo.maxValue);
+        DB4().PushUpdateData("INSERT INTO `lingbaosmelt`(`playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue`, `counts`, `purpleAdjVal`, `orangeAdjVal`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u)", m_Owner->getId(), m_lbSmeltInfo.gujiId, m_lbSmeltInfo.itemId, m_lbSmeltInfo.bind, m_lbSmeltInfo.value, m_lbSmeltInfo.maxValue, m_lbSmeltInfo.counts, m_lbSmeltInfo.purpleAdjVal, m_lbSmeltInfo.orangeAdjVal);
 
         return 0;
     }
 
+    void Package::AddAdjVal(UInt8 mark, UInt8 nums)
+    {
+        UInt8 AdjVal = 0;
+
+        if(PURPLEADJVAL_TYPE == mark)
+            AdjVal = m_lbSmeltInfo.purpleAdjVal;
+        else
+            AdjVal = m_lbSmeltInfo.orangeAdjVal;
+
+        UInt8 probability = uRand(100);
+        switch(nums)
+        {
+            case 1:
+                if(probability < 70)
+                {
+                    if(PURPLEADJVAL_TYPE == mark)
+                        m_lbSmeltInfo.purpleAdjVal += 2;
+                    else
+                        m_lbSmeltInfo.orangeAdjVal += 2;
+                }
+                break;
+            case 2:
+                if(probability < 80)
+                {
+                    if(PURPLEADJVAL_TYPE == mark)
+                        m_lbSmeltInfo.purpleAdjVal += 3;
+                    else
+                        m_lbSmeltInfo.orangeAdjVal += 3;
+                }
+                break;
+            case 3:
+                if(probability < 90)
+                {
+                    if(PURPLEADJVAL_TYPE == mark)
+                        m_lbSmeltInfo.purpleAdjVal += 4;
+                    else
+                        m_lbSmeltInfo.orangeAdjVal += 4;
+                }
+                break;
+            case 4:
+                    if(PURPLEADJVAL_TYPE == mark)
+                        m_lbSmeltInfo.purpleAdjVal += 10;
+                    else
+                        m_lbSmeltInfo.orangeAdjVal += 10;
+                break;
+        }
+
+        UInt8 maxAdjVal = m_lbSmeltInfo.counts * 25;
+        if(m_lbSmeltInfo.purpleAdjVal > maxAdjVal)
+            m_lbSmeltInfo.purpleAdjVal = maxAdjVal;
+
+        if(m_lbSmeltInfo.orangeAdjVal > maxAdjVal)
+            m_lbSmeltInfo.orangeAdjVal = maxAdjVal;
+    }
+
     UInt8 Package::LingbaoSmelt(UInt32 itemId, UInt16 cnt)
     {
+#define ORANGE_SMELTBAOJU         9338
+#define PURPLE_SMELTBAOJU         9340
+#define BLUE_SMELTBAOJU           9341
+#define GREEN_SMELTBAOJU          9342
         if(m_lbSmeltInfo.value >= m_lbSmeltInfo.maxValue)
             return 2;
 
@@ -6562,6 +6645,7 @@ namespace GObject
 
         UInt8 res = 0;
         UInt16 useCnt = 0;
+        bool mark = false;
         for(; useCnt < cnt; ++ useCnt)
         {
             UInt32 value = 0;
@@ -6571,6 +6655,37 @@ namespace GObject
                 stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
                 ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(item))->getLingbaoAttr();
                 UInt8 lv = item->getValueLev();
+
+                if(lba.tongling)
+                {
+                    UInt8 purpleNum = 0;
+                    UInt8 orangeNum = 0;
+
+                    for(UInt8 i=0; i<4; i++)
+                    {
+                        if(lba.type[i] > 0)
+                        {
+                            float disFactor = lba.value[i] / lbAttrConf.getAttrMax(lv, subClass-Item_LBling, lba.type[i]-1);
+                            int a = disFactor * 100;
+
+                            if(a > 60 && a <= 80)
+                            {
+                                purpleNum++;
+                            }
+                            else if(a > 80)
+                            {
+                                orangeNum++;
+                            }
+                        }
+                    }
+
+                    if(purpleNum > 0)
+                        AddAdjVal(PURPLEADJVAL_TYPE, purpleNum);
+
+                    if(orangeNum > 0)
+                        AddAdjVal(ORANGEADJVAL_TYPE, orangeNum);
+                }
+
                 UInt8 skillNum = 0;
                 if(lba.skill[0])
                     ++ skillNum;
@@ -6583,6 +6698,16 @@ namespace GObject
             }
             m_lbSmeltInfo.value += value;
 
+            UInt8 probability = uRand(100);
+            if(ORANGE_SMELTBAOJU == itemId && probability < 10)
+                mark = true;
+            else if(PURPLE_SMELTBAOJU == itemId && probability < 5)
+                mark = true;
+            else if(BLUE_SMELTBAOJU == itemId && probability < 2)
+                mark = true;
+            else if(GREEN_SMELTBAOJU == itemId && probability < 1)
+                mark = true;
+
             if(m_lbSmeltInfo.value >= m_lbSmeltInfo.maxValue)
             {
                 ++ useCnt;
@@ -6590,12 +6715,18 @@ namespace GObject
             }
         }
 
+        if(mark)
+            m_lbSmeltInfo.counts += 1;
+
+        if(m_lbSmeltInfo.counts > 4)
+            m_lbSmeltInfo.counts = 4;
+
 		if (IsEquipId(itemId))
             DelEquip(item->getId(), ToLingbao);
         else
             DelItemAny(itemId, useCnt, NULL, ToLingbao);
 
-        DB4().PushUpdateData("UPDATE `lingbaosmelt` SET `value`=%u WHERE `playerId`=%" I64_FMT "u", m_lbSmeltInfo.value, m_Owner->getId());
+        DB4().PushUpdateData("UPDATE `lingbaosmelt` SET `value`=%u, `counts`=%u, `purpleAdjVal`=%u, `orangeAdjVal`=%u WHERE `playerId`=%" I64_FMT "u", m_lbSmeltInfo.value, m_lbSmeltInfo.counts, m_lbSmeltInfo.purpleAdjVal, m_lbSmeltInfo.orangeAdjVal, m_Owner->getId());
 
         return res;
     }
@@ -6603,7 +6734,7 @@ namespace GObject
     bool Package::FinishLBSmeltSpecial(const GData::ItemBaseType * itype, ItemLingbaoAttr &lbattr, UInt8& attrNum)
     {
         //黄帝卷宗（11113），炎帝卷宗（11114），神农卷宗（11115），女娲卷宗（11116）
-        UInt16 lbids[] = { 11113, 11114, 11115, 11116 };
+        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118};
         bool hasSpe = false;
         for(UInt8 i = 0; i < sizeof(lbids) / sizeof(lbids[0]); ++i)
         {
@@ -6615,19 +6746,68 @@ namespace GObject
         stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
         std::vector<UInt8> allAttrType = lbAttrConf.attrType;
         attrNum = m_lbSmeltInfo.itemId == FULING_ITEM_PROTECT ? 4 : 3;
+        UInt8 orangeAttrNum = attrNum;
+
+        if(orangeAttrNum < m_lbSmeltInfo.orangeAdjVal / 25)
+            orangeAttrNum = m_lbSmeltInfo.orangeAdjVal / 25;
+
+        if(attrNum < m_lbSmeltInfo.counts)
+            attrNum = m_lbSmeltInfo.counts;
+
         const GData::ItemBaseType* guji = GData::itemBaseTypeManager[m_lbSmeltInfo.gujiId];
+        UInt8 color = 0;
         for(int i = 0; i < attrNum; ++ i)
         {
+            if(orangeAttrNum > 0)
+            {
+                color = 5;
+                orangeAttrNum -= 1;
+            }
+            else
+                color = 2 + uRand(4);
+
             UInt8 size = allAttrType.size();
             UInt8 idx = uRand(size);
             lbattr.type[i] = allAttrType[idx];
             UInt16 chance = uRand(10000);
             float fChance = ((float)(uRand(10000)))/10000;
-            float disFactor = lbAttrConf.getDisFactor4(chance, fChance, 5);
+            float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color);
+            Probability(disFactor);
             lbattr.value[i] = lbAttrConf.getAttrMax(guji->reqLev, itype->subClass-Item_LBling, lbattr.type[i]-1) * disFactor + 0.9999f;
             allAttrType.erase(allAttrType.begin() + idx);
         }
         return true;
+    }
+
+    void Package::Probability(float & disFactor)
+    {
+        disFactor = disFactor * 100;
+        bool mark = false;
+        if(100 == m_lbSmeltInfo.purpleAdjVal)
+        {
+            if(disFactor >= 20 && disFactor <= 60)
+                mark = true;
+        }
+        else if(m_lbSmeltInfo.purpleAdjVal >= 75)
+        {
+            if(disFactor >= 20 && disFactor <= 50)
+                mark = true;
+        }
+        else if(m_lbSmeltInfo.purpleAdjVal >= 50)
+        {
+            if(disFactor >= 20 && disFactor <= 40)
+                mark = true;
+        }
+        else if(m_lbSmeltInfo.purpleAdjVal >= 25)
+        {
+            if(disFactor >= 20 && disFactor <= 30)
+                mark = true;
+        }
+
+        if(mark)
+            disFactor = ((float)(uRand(10) + 60));
+
+        disFactor = disFactor / 100;
     }
 
     void Package::FinishLBSmelt()
@@ -6642,16 +6822,17 @@ namespace GObject
 
         UInt8 lv = guji->vLev;
         UInt8 lvIdx = (lv - 70)/10;
-        if(lvIdx > 4) lvIdx = 4;
+        if(lvIdx > 6) lvIdx = 6;
 
         UInt16 gjIdx = guji->subClass - Item_Guji;
         UInt8 lbIdx[17] = {0xFF, 0, 1, 2, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 0xFF};
-        UInt16 lbids[5][3] = {
+        UInt16 lbids[6][3] = {
             {11500, 11501, 11502},
             {11503, 11504, 11505},
             {11506, 11507, 11508},
             {11509, 11510, 11511},
-            {11512, 11513, 11514}};
+            {11515, 11516, 11517},
+            {11518, 11519, 11520}};
 
         UInt8 itemIdx = lbIdx[gjIdx];
         if(lbIdx[gjIdx] == 0xFF)
@@ -6677,6 +6858,12 @@ namespace GObject
             UInt8 color = guji->quality;
             if(attrNum < minAttrNum)
                 attrNum = minAttrNum;
+
+            int orangeCnt = m_lbSmeltInfo.orangeAdjVal / 25;
+
+            if(attrNum < m_lbSmeltInfo.counts)
+                attrNum = m_lbSmeltInfo.counts;
+
             std::vector<UInt8> allAttrType = lbAttrConf.attrType;
             UInt8 itemTypeIdx = subClass - Item_LBling;
             // 古籍指定的属性
@@ -6702,21 +6889,34 @@ namespace GObject
                     idx = lbAttrIdx[gjIdx - 4];
                 }
 
+                if(5 == color)
+                    orangeCnt -= 1;
+
                 lbattr.type[0] = allAttrType[idx];
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color);
+                Probability(disFactor);
                 lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]-1) * disFactor + 0.9999f;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
             for(int i = 1; i < attrNum; ++ i)
             {
+                if(5 == color2)
+                    orangeCnt -= 1;
+                else if(orangeCnt > 0)
+                {
+                    color2 = 5;
+                    orangeCnt -= 1;
+                }
+
                 UInt8 size = allAttrType.size();
                 UInt8 idx = uRand(size);
                 lbattr.type[i] = allAttrType[idx];
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color2);
+                Probability(disFactor);
                 // item color only define one attr to it`s color
                 color2 = 2;
                 //float disFactor = lbAttrConf.getDisFactor3(uRand(10000), fChance);
@@ -6893,6 +7093,9 @@ namespace GObject
         st << m_lbSmeltInfo.maxValue;
         st << m_lbSmeltInfo.value;
         st << m_lbSmeltInfo.bind;
+        st << m_lbSmeltInfo.counts;
+        st << m_lbSmeltInfo.purpleAdjVal;
+        st << m_lbSmeltInfo.orangeAdjVal;
 
         st << Stream::eos;
 		m_Owner->send(st);

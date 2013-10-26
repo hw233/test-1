@@ -1218,6 +1218,9 @@ struct DBLingbaoSmelt
     UInt8  bind;
     UInt32 value;
     UInt32 maxValue;
+    UInt8 counts;
+    UInt8 purpleAdjVal;
+    UInt8 orangeAdjVal;
 };
 
 
@@ -2930,14 +2933,17 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBLingbaoSmelt)
-SPECIALDEF(6)
+SPECIALDEF(9)
 (
     UInt64, playerId,
     UInt16, gujiId,
     UInt16, itemId,
     UInt8,  bind,
     UInt32, value,
-    UInt32, maxValue
+    UInt32, maxValue,
+    UInt8, counts,
+    UInt8, purpleAdjVal,
+    UInt8, orangeAdjVal
 )
 SPECIALEND()
 

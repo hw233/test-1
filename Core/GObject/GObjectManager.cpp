@@ -6226,7 +6226,7 @@ namespace GObject
 
         LoadingCounter lc("Loading lingbao smelt:");
         DBLingbaoSmelt dblbs;
-        if(execu->Prepare("SELECT `playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue` FROM `lingbaosmelt`", dblbs) != DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue`, `counts`, `purpleAdjVal`, `orangeAdjVal` FROM `lingbaosmelt`", dblbs) != DB::DB_OK)
             return false;
 
         lc.reset(2000);
@@ -6243,6 +6243,9 @@ namespace GObject
             lbSmeltInfo.bind = dblbs.bind;
             lbSmeltInfo.value = dblbs.value;
             lbSmeltInfo.maxValue = dblbs.maxValue;
+            lbSmeltInfo.counts = dblbs.counts;
+            lbSmeltInfo.purpleAdjVal = dblbs.purpleAdjVal;
+            lbSmeltInfo.orangeAdjVal = dblbs.orangeAdjVal;
 
             Package* pkg = pl->GetPackage();
             pkg->loadLingbaoSmeltInfo(lbSmeltInfo);

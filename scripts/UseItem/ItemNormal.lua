@@ -9297,15 +9297,32 @@ function ItemNormal_Lingbao(iid, num, bind, param)
         {11500, 11501, 11502},
         {11503, 11504, 11505},
         {11506, 11507, 11508},
-        {11509, 11510, 11511}
+        {11509, 11510, 11511},
+        {11515, 11516, 11517},
+        {11518, 11519, 11520}
     }
 
     local idx = 1;
+    if 9350 == iid then
+        idx = 1;
+    elseif 9351 == iid then
+        idx = 2;
+    elseif 9352 == iid then
+        idx = 3;
+    elseif 9353 == iid then
+        idx = 4;
+    elseif 9387 == iid then
+        idx = 5;
+    elseif 9431 == iid then
+        idx = 6;
+    end
+
+    --[[local idx = 1;
     if iid <= 9353 then
         idx = iid - 9350 + 1;
     else
         idx = 4;
-    end
+    end--]]
     for n = 1,num do
         local i = math.random(1, #item[idx])
         package:Add(item[idx][i], 1, bind, 0, 2);
@@ -11435,6 +11452,7 @@ local ItemNormal_Table = {
     [9352] = ItemNormal_Lingbao,
     [9353] = ItemNormal_Lingbao,
     [9387] = ItemNormal_Lingbao,
+    [9431] = ItemNormal_Lingbao,
 
     [9360] = ItemNormal_00009360,
     [9361] = ItemNormal_00009361,
