@@ -18,7 +18,7 @@
 
 namespace GObject
 {
-#define LEVEL110_ADD_NUM 1
+#define LEVEL110_ADD_NUM 2
 void LuckyDraw::sendInfo(Player* player)
 {
     if (!player)

@@ -94,6 +94,8 @@ namespace GObject
         GVAR_SUMMER_FLOW_BEGIN = 53,
         GVAR_SUMMER_FLOW_END = 54,
 
+        GVAR_QZONEQQGAME_BEGIN = 55,
+        GVAR_QZONEQQGAME_END = 56,
         GVAR_MAX,
     };
 

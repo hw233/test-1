@@ -119,6 +119,16 @@ void TeamArenaData::appendListInfo(Stream& st)
         st << leader->getName();
     else
         st << "";
+    for(UInt8 i = 0; i < count; ++ i)
+    {
+        if(members[i])
+        {
+            st << static_cast<UInt8>(members[i]->getMainFighter()->getId());
+            st << members[i]->getName() << members[i]->getCountry() << members[i]->getBattlePoint();
+        }
+        else
+            st << static_cast<UInt8>(0) << "" << static_cast<UInt8>(0) << static_cast<UInt32>(0);
+    }
 }
 
 void TeamArenaData::broadcastTeam(Stream& st)
@@ -1696,6 +1706,7 @@ void TeamArenaMgr::calcFinalBet(int i)
                                     SYSMSGV(content, 793, tad->getName().c_str(), _session, p, totalCount[_round-1] - winCount, winCount);
                                     sendTeamMail(tad, title2, content);
                                     addTeamScore(tad, _round, false);
+                                    giveTeamLastAward(tad, i, _round, 0);
                                 }
                             }
                         }
@@ -1719,6 +1730,7 @@ void TeamArenaMgr::calcFinalBet(int i)
                                     SYSMSGV(content, 793, tad->getName().c_str(), _session, p, winCount, totalCount[_round-1] - winCount);
                                     sendTeamMail(tad, title2, content);
                                     addTeamScore(tad, _round, false);
+                                    giveTeamLastAward(tad, i, _round, 0);
                                 }
                             }
                         }
@@ -1750,9 +1762,11 @@ void TeamArenaMgr::calcFinalBet(int i)
                             }
                             TeamEliminationPlayer& ep = _finals[i][nidx];
                             TeamArenaData * tad = globalTeamArena[ep.id];
-                            giveTeamLastAward(tad, i, j, 0);
                             if(j == 5)
+                            {
+                                giveTeamLastAward(tad, i, j, 0);
                                 addTeamScore(tad, j, false);
+                            }
 
                             setTeamMaxRank(tad, j, i);
                             if(nidx2 != (UInt8)(0xFF))

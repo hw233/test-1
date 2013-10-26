@@ -339,7 +339,7 @@ void JobHunter::SendGameInfo(UInt8 type, bool isUpdeated /* = false */)
         TeamCopyPlayerInfo* tcp = _owner->getTeamCopyPlayerInfo();
         if (tcp)
         {
-            for (UInt8 i = 0; i < 5; ++i)
+            for (UInt8 i = 0; i < PROGRESS_MAX - 1; ++i)
             {
                 if (tcp->getPass(4 + i))
                 {

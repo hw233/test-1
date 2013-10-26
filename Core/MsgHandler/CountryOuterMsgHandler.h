@@ -6249,6 +6249,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 3:
                     case 4:
                     case 5:
+                    case 6:
                         jobHunter->OnRequestStart(val);
                         GameAction()->doStrong(player, SthSerachMo, 0, 0);
                         break;
@@ -6393,6 +6394,39 @@ void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
     case 6:
         {
             pkg->FinishLBSmelt();
+        }
+        break;
+    case 7:
+        {
+            UInt16 count = 0;
+            UInt16 rcount = 0;
+            UInt16 offset = st.size();
+            br >> count;
+            st << count;
+            for(UInt16 idx = 0; idx < count; ++ idx)
+            {
+                UInt32 equipId = 0;
+                UInt8 protect = 0;
+                UInt8 bind = 0;
+                std::vector<UInt16> values;
+                values.clear();
+                br >> equipId >> protect >> bind;
+                res = pkg->Tongling(equipId, protect, bind, values);
+                UInt8 cnt = values.size();
+                st << equipId;
+                st << res;
+                st << cnt;
+                ++ rcount;
+                if(res != 0)
+                    break;
+                for(UInt8 i = 0; i < cnt; ++ i)
+                {
+                    st << values[i];
+                }
+            }
+            st.data<UInt16>(offset) = rcount;
+            st << Stream::eos;
+            player->send(st);
         }
         break;
     }

@@ -1241,8 +1241,10 @@ namespace GObject
                     itemId = 9016;
                 else if(level < 110)
                     itemId = 9035;
-                else
+                else if(level < 120 )
                     itemId = 9391;
+                else 
+                    itemId = 9430;
                 MailPackage::MailItem mitem[1] = {{itemId, 1}};
                 MailItemsInfo itemsInfo(mitem, BlueDiamondCmd, 1);
                 mailPackageManager.push(mail->id, mitem, 1, true);
@@ -13215,7 +13217,7 @@ namespace GObject
         UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
         if(now < begin || now >end )
             return ;
-        if(off!= 1 && !(LuckyMeet&(1<<(off-1))) && !(LuckyMeet&(1<<(off-2))))
+        if(off!= 1 && !(LuckyMeet&(1<<(off-1)))&&!(LuckyMeet&(1<<(off-2))))
           SetVar(VAR_LUCKYMEET_AWARD , 0); 
         LuckyMeet |= 1 << (off - 1);
         SetVar(VAR_LUCKYMEET, LuckyMeet);
@@ -13245,7 +13247,7 @@ namespace GObject
         UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, begin))/86400 +1;
         if(now < begin || now >end )
             return ;
-        if(off!= 1 && !(SummerMeetLogin&(1<<(off-2))) && !(SummerMeetLogin&(1<<(off-1))))
+        if(off!= 1 && !(SummerMeetLogin&(1<<(off-1)))&&!(SummerMeetLogin&(1<<(off-2))))
             SetVar(VAR_SUMMER_MEET_LOGIN_AWARD , 0); 
         SummerMeetLogin |= 1 << (off - 1);
         SetVar(VAR_SUMMER_MEET_LOGIN, SummerMeetLogin);
@@ -20094,10 +20096,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -20861,11 +20863,13 @@ UInt8 Player::toQQGroup(bool isJoin)
     }
 
     //寻宠
-    void Player::seekFairyPet(UInt8 count, UInt8 isConvert)
+    void Player::seekFairyPet(UInt16 count, UInt8 isConvert)
     {
         if(count == 0) return;
         if(getCanHirePetNum())
             return;
+        if(count > 20)
+            count = 1000;
         static UInt32 cost[] = {0xFFFFFFFF, 16, 24, 48, 120, 360};  //游历消耗仙缘
         UInt32 xianYuan = GetVar(VAR_FAIRYPET_XIANYUAN);
         UInt8 step = GetVar(VAR_FAIRYPET_STEP);
@@ -20873,16 +20877,16 @@ UInt8 Player::toQQGroup(bool isJoin)
             step = 1;
         UInt32 longYuan = 0, fengSui = 0, shouhun = 0;
         UInt32 greenId = 0, blueId = 0;
-        UInt8 like = 0;
+        UInt16 like = 0;
         UInt32 convert1 = 0, convert2 = 0;
         UInt32 used = 0;
         std::string petStr = "";
         Stream st(REP::FAIRY_PET);
         st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x02);
 	    size_t pos = st.size();
-        UInt8 num = 0;
+        UInt16 num = 0;
         st << num;
-        for(UInt8 i = 0; i < count; ++ i)
+        for(UInt16 i = 0; i < count; ++ i)
         {
             if(xianYuan < cost[step] + used)
                 break;
@@ -20893,7 +20897,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             longYuan += values.get<UInt32>("longyuan");
             fengSui += values.get<UInt32>("fengsui");
             shouhun += values.get<UInt32>("shouhun");
-            like += values.get<UInt8>("like");
+            like += values.get<UInt16>("like");
             greenId = values.get<UInt32>("greenId");
             if(greenId)
             {
@@ -20928,7 +20932,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         st << longYuan << fengSui << shouhun << like;
         st << static_cast<UInt32>(xianYuan - used) << isConvert;
         st << petStr.c_str();
-		st.data<UInt8>(pos) = num;
+		st.data<UInt16>(pos) = num;
         st << Stream::eos;
         send(st);
 

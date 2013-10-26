@@ -6403,13 +6403,28 @@ namespace GObject
         std::string strValue;
         for(int i = 0; i < 4; ++ i)
         {
+            UInt32 value = uRand(30);
             if(protect)
             {
-                factor = ((float)(1060 + uRand(90)))/1000;
+                UInt32 r = uRand(40);
+                if(r<20)
+                    factor = ((float)(1060 + value))/1000;
+                else if(r < 30)
+                    factor = ((float)(1090 + value))/1000;
+                else 
+                    factor = ((float)(1120 + value))/1000;
             }
             else
             {
-                factor = ((float)(950 + uRand(170)))/1000;
+                UInt32 r = uRand(60);
+                if(r<15)
+                    factor = ((float)(1000 + value))/1000;
+                else if(r < 50)
+                    factor = ((float)(1030 + value))/1000;
+                else if(r < 55)
+                    factor = ((float)(1060 + value))/1000;
+                else 
+                    factor = ((float)(1090 + value))/1000;
             }
 
             UInt16 oldvalue = lba.value[i];
@@ -6427,7 +6442,7 @@ namespace GObject
         }
 
         float pFactor = totalFactor/totalCount;
-        if(pFactor < -0.02f)
+        if(pFactor < 0.03f)
         {
             if(protect)
                 m_Owner->udpLog("Tongling", "F_10000_10", "", "", "", "", "act");
