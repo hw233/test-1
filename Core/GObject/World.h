@@ -414,7 +414,20 @@ public:
     inline static void setQZoneQQGameAct(bool v)
     { _QZoneQQGameAct= v; }
     inline static bool getQZoneQQGameAct()
-    { return _QZoneQQGameAct; }
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_QZONEQQGAME_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_QZONEQQGAME_END);
+        UInt32 now = TimeUtil::Now();
+        if(begin == 0 && end == 0)
+        {
+            return _QZoneQQGameAct;
+        }
+        else if( now >= begin && now <= end)
+            _QZoneQQGameAct = true;
+        else
+            _QZoneQQGameAct = false;
+        return _QZoneQQGameAct; 
+    }
     inline static void setNewYearQzoneContinueAct(bool v)
     { _newYearQzoneContinueAct= v; }
     inline static bool getNewYearQzoneContinueAct()

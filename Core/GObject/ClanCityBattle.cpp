@@ -2469,7 +2469,7 @@ void ClanCity::setOpenTime()
 void ClanCity::makeOpenStatusInfo(Stream& st)
 {
     st << static_cast<UInt8>(0) << static_cast<UInt8>(7);
-    if(m_openTime == 0xFFFFFFFF)
+    if(m_openTime == 0xFFFFFFFF)   //
     {
         st << static_cast<UInt8>(0);
     }
