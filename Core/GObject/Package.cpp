@@ -6442,7 +6442,7 @@ namespace GObject
         }
 
         float pFactor = totalFactor/totalCount;
-        if(pFactor < -0.02f)
+        if(pFactor < 0.03f)
         {
             if(protect)
                 m_Owner->udpLog("Tongling", "F_10000_10", "", "", "", "", "act");
