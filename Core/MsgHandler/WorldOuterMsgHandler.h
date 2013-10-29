@@ -2797,6 +2797,94 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
            }
         }
         break;
+        case 0x22:  // 光棍节活动
+        {
+            if(!WORLD().getGGTime())
+                break;
+            brd >> op;
+            switch(op)
+            {
+            case 0x01:
+                {
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 1)
+                        player->sendQixiInfo();
+                    else if(form == 2)
+                    {
+                        UInt32 grade =  player->getGGTimeScore(); 
+                        GameMsgHdr hdr(0x1D5, WORKER_THREAD_WORLD, player, sizeof(grade));
+                        GLOBAL().PushMsg(hdr, &grade);
+                    }
+               }
+                break;
+            case 0x02:
+                {
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 0)
+                    {
+                        UInt64 pid = 0;
+                        brd >> pid;
+                        GObject::Player * pl = GObject::globalPlayers[pid];
+                        if(!pl)
+                            break;
+                        if(player->CheckGGCanInvit(pl))
+                            return;
+                        SYSMSGV(title, 214, player->getCountry(), player->getName().c_str());
+                        SYSMSGV(content, 215, player->getCountry(), player->getName().c_str());
+                        pl->GetMailBox()->newMail(player, 0x15, title, content);
+                    }
+                    else if(form == 1)
+                    {
+                        player->LeaveGGTime();
+                    }
+                }
+                break;
+            case 0x03:
+                {
+                    UInt8 pos = player->getGuangGunPos();
+                    GameMsgHdr hdr1(0x257, player->getThreadId(), player, sizeof(pos));
+                    GLOBAL().PushMsg(hdr1, &pos);
+                }
+            case 0x04:
+                {
+                    UInt8 op = 0;
+                    brd >> op;
+                    switch(op)
+                    {
+                        case 0:
+                            player->GuangGunCompleteTask(2);
+                            break;
+                        case 1:
+                            player->GuangGunCompleteTask(1);
+                            break;
+                        case 2:
+                            player->RunFriendlyCompass();
+                            break;
+                        case 3:
+                            {
+                                UInt64 id = 0;
+                                UInt32 gold =0 ;
+                                brd >> id >>gold;
+                                GObject::Player * pl = GObject::globalPlayers[id];
+                                if(!pl)
+                                    break;
+                                player -> AddGGTimes(pl,gold);
+                                break;
+                            }
+                        case 4:
+                            player->BuyGuangGunAdvance();
+                            break;
+                    }
+                }
+                break;
+                break;
+            default:
+                break;
+            }
+            break;
+        }
         default:
             break;
     }

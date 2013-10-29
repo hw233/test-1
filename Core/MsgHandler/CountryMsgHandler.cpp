@@ -352,6 +352,7 @@ MSG_REG_2(GameMsgHdr, 0x253, OnSendPExpCard);
 MSG_REG_2(GameMsgHdr, 0x254, OnRoamintQueqiao);
 MSG_REG_2(GameMsgHdr, 0x255, OnRoamintQueqiaoLastLoot);
 
+MSG_REG_2(GameMsgHdr, 0x257, OnRoamintGuangGun);
 MSG_REG_2(GameMsgHdr, 0x256, OnDelItemAny);
 MSG_REG_2(GameMsgHdr, 0x259, OnAddItem);
 MSG_REG_2(GameMsgHdr, 0x260, OnTownDeamonChallenge);
@@ -389,7 +390,9 @@ MSG_REG_2(GameMsgHdr, 0x336, OnTeamArenaUseTael);
 MSG_REG_2(GameMsgHdr, 0x337, OnTeamArenaUseGold);
 MSG_REG_2(GameMsgHdr, 0x338, OnGetTeamArenaMoney);
 MSG_REG_2(GameMsgHdr, 0x339, OnTeamArenaInspire);
-MSG_REG_2(GameMsgHdr, 0x340, OnGGBeTeam);
+
+MSG_REG_2(GameMsgHdr, 0x350, OnGGBeTeam);
+MSG_REG_2(GameMsgHdr, 0x351, OnGGTeamPlayerLeave);
 
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 

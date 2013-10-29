@@ -5856,7 +5856,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading GuangGun");
         DBGuangGun guanggun;
-        if(execu->Prepare("SELECT `playerId``status`,`playerId1`,`playerId2`, `pos`, `score`, `task`, `tasknum`, `taskCom`,`counts`  FROM `guanggun` ORDER BY `playerId`", guanggun) != DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`,`status`,`playerId1`,`playerId2`, `pos`, `score`, `task`, `tasknum`, `taskCom`,`counts`  FROM `guanggun` ORDER BY `playerId`", guanggun) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
         Player* pl = NULL;

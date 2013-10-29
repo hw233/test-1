@@ -637,6 +637,7 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                 pl->send(st);
             }
             msg.id = SthCHTownDeamon;
+            pl->GuangGunCompleteTask(0,17);
 
         }
         break;
@@ -946,6 +947,7 @@ void TownDeamon::addActivity(Player* pl)
     if (!pl->GetVar(VAR_TOWNDEAMON))
     {
         GameAction()->doStrong(pl, SthTownDeamon, 0, 0);
+        pl->GuangGunCompleteTask(0,16);
         pl->SetVar(VAR_TOWNDEAMON, 1);
     }
 }

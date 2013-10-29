@@ -3832,6 +3832,7 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
                 }
             }
             GameAction()->doStrong(_owner, SthCittaUpgrade, 0, 0);
+            _owner->GuangGunCompleteTask(0,8);
         }
         return re;
     }
@@ -5715,6 +5716,7 @@ void Fighter::SSOpen(UInt16 id)
         }
     }
     GameAction()->doStrong(_owner,SthFuwenJIe, 0, 0);
+    _owner->GuangGunCompleteTask(0,9);
 }
 
 UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
@@ -5821,6 +5823,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, UInt16 itemNum, bool bind)
     SSUpdate2DB(id, ss);
     _owner->sendMsgCode(0, 1025);
     GameAction()->doStrong(_owner, SthFuwenRong, 0, 0);  
+    _owner->GuangGunCompleteTask(0,10);
     return ret;
 }
 
@@ -6232,6 +6235,7 @@ bool Fighter::upgradeXingchen(UInt8 type)
     sendXingchenInfo(type);
     _owner->sendMsgCode(0, 4005);
     GameAction()->doStrong(_owner, SthXingchen, 0, 0); 
+    _owner->GuangGunCompleteTask(0,30);
     return true;
 }
 
@@ -6292,7 +6296,7 @@ bool Fighter::quickUpGrade(UInt8 type)
 
     sendXingchenInfo(type);
     GameAction()->doStrong(_owner, SthXingchen, 0, 0); 
-
+    _owner->GuangGunCompleteTask(0,30);
     return true;
 }
 

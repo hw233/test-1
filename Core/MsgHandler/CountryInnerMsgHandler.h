@@ -1485,6 +1485,7 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
     }
 
     GameAction()->doStrong(player, co->id, co->param1, co->param2);
+    GuangGunCompleteTask(0,static_cast<UInt8>(co->id));
 }
 void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
 {
@@ -1808,6 +1809,12 @@ void OnRoamintQueqiao( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     UInt8 pos = *(UInt8*)(data);
     player->roamingQueqiao(pos);
+}
+void OnRoamintGuanggun( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 pos = *(UInt8*)(data);
+    player->roamingGuangGun(pos);
 }
 
 void OnRoamintQueqiaoLastLoot( GameMsgHdr& hdr, const void* data )
@@ -2294,6 +2301,12 @@ void OnGGBeTeam( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
     player->beGGTeam(id);
+}
+void OnGGTeamPlayerLeave( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
+    player->GGTeamPlayerLeave(id);
 }
 void OnDoStrongInWorld( GameMsgHdr &hdr, const void * data)
 {

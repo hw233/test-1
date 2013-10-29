@@ -4299,14 +4299,14 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
         case 7:
-            GVAR.SetVar(GVAR_SUMMER_MEET_BEGIN, TimeUtil::Now());
-            GVAR.SetVar(GVAR_SUMMER_MEET_END, TimeUtil::Now() + 86400*15);
+            GVAR.SetVar(GVAR_SUMMER_FLOW_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_SUMMER_FLOW_END, TimeUtil::Now() + 86400*15);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
             break;
         case 8:
-            GVAR.SetVar(GVAR_SUMMER_MEET_BEGIN, 0);
-            GVAR.SetVar(GVAR_SUMMER_MEET_END, 0);
+            GVAR.SetVar(GVAR_SUMMER_FLOW_BEGIN, 0);
+            GVAR.SetVar(GVAR_SUMMER_FLOW_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
         case 9:

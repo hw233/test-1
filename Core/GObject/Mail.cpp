@@ -780,13 +780,14 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 		}
 		break;
     case 0x15:   //光棍节活动组队
+        {
 			Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
 			if(pl == NULL)
 				return;
 			mail->flag = 0x83;
 			if(action == 0)
 			{
-				_owner->addFriend(pl);
+				_owner->EnterGGTeam(pl);
 				SYSMSG(content, 212);
 				mail->content = content;
 			}
@@ -796,6 +797,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 				mail->content = content;
 			}
 			updateMail(mail);
+        }
         break;
 	case 0x05:  // 交易
 		{

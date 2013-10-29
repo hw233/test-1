@@ -1810,7 +1810,7 @@ namespace GObject
         }
         void roamingGuangGun(UInt8 pos) ;  
         void setGuangGunTask(UInt8 task,UInt8 taskmaxnum = 0);
-        void GuangGunCompleteTask(UInt8 type ,UInt8 task);
+        void GuangGunCompleteTask(UInt8 type ,UInt8 task = 0);
         void AddGuangGunScore();
         void sendQixiInfo();
         void divorceQixi();
@@ -1836,9 +1836,24 @@ namespace GObject
       //  std::vector<Player* > getGGPlayers(){return m_gginfo.ggplayer;}
         Player* getGGPlayer1() {return m_gginfo.player1;}
         Player* getGGPlayer2() {return m_gginfo.player2;}
+        inline UInt8 getGuangGunPos() { return m_gginfo.pos; }
         UInt32 getGGTimeScore();
         Player* getGGTimeCaptain();
+        UInt8 CheckGGCanInvit(Player * pl);
+        void UpdateGGInfo();
+        void sendGuangGunInfo();
+        bool EnterGGTeam(Player* pl);
+        void LeaveGGTime();
+        void beGGTeam(UInt64 id);
+        void GGTeamPlayerLeave(UInt64 id);
+        void RunFriendlyCompass(UInt8 type = 0);
+        void getGGTaskAward();
+        void giveGGTeamMemberInfo(Stream& st);
+        void BuyGuangGunAdvance();
+
+
         std::set<Player *>& getInviters() {return _friends[3];};
+
 
         //堆雪人start
         void loadSnowInfoFromDB(Player* pl, bool bind, UInt32 score)

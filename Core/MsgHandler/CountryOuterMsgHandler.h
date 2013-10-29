@@ -1844,9 +1844,15 @@ void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
     if(result != 2)
     {
         if(1 == ftr._type || 2 == ftr._type) //资质洗炼
+        {
             GameAction()->doStrong(player, SthCapacity, 0, 0);
+            player->GuangGunCompleteTask(0,1);
+        }
         if(3 == ftr._type || 4 == ftr._type) //潜力洗炼
+        {
             GameAction()->doStrong(player, SthPotential, 0, 0);
+            player->GuangGunCompleteTask(0,1);
+        }
     }
 }
 
@@ -2162,7 +2168,10 @@ void OnOpenSocketReq( GameMsgHdr& hdr, OpenSocketReq& osr )
 	st << result << osr._fighterId << osr._itemid << Stream::eos;
 	player->send(st);
     if(result != 2)
+    {
         GameAction()->doStrong(player, SthOpenSocket, 0, 0);
+        player->GuangGunCompleteTask(0,5);
+    }
 }
 
 #if 0
@@ -3791,6 +3800,18 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         if(price>=1000 && player->getClan())
                             SYSMSG_BROADCASTV(4956,player->getClan()->getName().c_str(),player->getCountry() ,player->getPName());
                     }
+                    if(World::getGGTime())
+                    {
+                        UInt32 advanceOther = player->GetVar(VAR_GUANGGUN_ADVANCE_OTHER);
+                        if(advanceOther>=24)
+                            return ;
+                        UInt32 goldLeft = GetVar(VAR_GUANGGUN_CONSUME)%100;
+                        player->AddVar(VAR_GUANGGUN_CONSUME,price);
+                        UInt32 counts = (price+goldLeft)/100; 
+                        counts =( counts > 24-advanceOther?24-advanceOther:counts);
+                        player->AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
+                        player->AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
+                    }
                     st << static_cast<UInt8>(0);
 
                     if (lr._type == PURCHASE1 + 1 )
@@ -4366,7 +4387,16 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
 			pl->GetMailBox()->newMail(player, 0x13, title, content);
 		}
 		break;
-	case 2:
+/*    case 12:
+        {
+            if(player->CheckGGCanInvit(pl))
+				return;
+			SYSMSGV(title, 214, player->getCountry(), player->getName().c_str());
+			SYSMSGV(content, 215, player->getCountry(), player->getName().c_str());
+			pl->GetMailBox()->newMail(player, 0x15, title, content);
+            break;
+        }
+*/	case 2:
 		player->delFriend(pl);
 		pl->delFriend(player);
 		break;

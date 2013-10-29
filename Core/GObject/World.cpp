@@ -2357,7 +2357,7 @@ void World::sendGuangGunPlayers(Player* pl)
     for(RCSortType::iterator it = World::guangGunSort.begin(), e = World::guangGunSort.end(); it != e&&i<3; ++it,++i)
     {
         Player *p = it->player;
-        st << p ->getGGTimeCore();
+        st << p ->getGGTimeScore();
         st << p->getName();
         if(!p->getGGPlayer1())
             st <<p->getGGPlayer1()->getName();

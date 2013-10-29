@@ -8047,10 +8047,8 @@ function onRoamingQueqiao(player, pos)
 end
 function onRoamingGuangGun(player, pos)
     local roamPlace = {
-        1,3,10,12,1,2,1,5,4,8,
-        10,7,13,6,12,1,11,5,10,9,
-        4,13,1,8,9,6,1,8,4,7,
-        9,2,5,8,1,12,10,9,11,7,
+        1,5,13,8,10,3,11,12,2,9,4,1,
+        3,2,7,9,10,1,6,4,9,7,     
     }
 
     local eventItem = {
@@ -8071,14 +8069,21 @@ function onRoamingGuangGun(player, pos)
 
     step = math.random(1, 6)
     pos2 = pos + step
-    if pos2 > 40 then
-        pos2 = pos2 - 40
+    if pos2 > #roamPlace then
+        pos2 = pos2 - #roamPlace;
     end
 
     i = roamPlace[pos2]
     j = math.random(1, #eventItem[i])
+    if (i == 4 or i == 7 )and player:GetLev() < 70 then
+        j = #eventItem[i]; 
+    end
+    if i == 6 and player:GetLev() < 50 then
+        j = #eventItem[i]; 
+    end
+
     local tasknum ;
-    for k=1,i do
+    for k=1,i-1 do
         tasknum=tasknum+#eventItem[k];
     end
     tasknum=tasknum+j;

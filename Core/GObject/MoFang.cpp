@@ -590,6 +590,8 @@ void MoFang::makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark)
         st << static_cast<UInt8>(curProficient); 
     st << Stream::eos;
     m_owner->send(st);
+    m_owner->GuangGunCompleteTask(0,21);
+
 }
 
 void MoFang::upgradeJGS()
@@ -1387,6 +1389,7 @@ void MoFang::upgradeKY(UInt8 keyinId, UInt8 opt)
     st << keyinId << addKYExp;
     st << Stream::eos;
     m_owner->send(st);
+    m_owner->GuangGunCompleteTask(0,3);
 }
 
 void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 opt)
