@@ -352,7 +352,6 @@ MSG_REG_2(GameMsgHdr, 0x253, OnSendPExpCard);
 MSG_REG_2(GameMsgHdr, 0x254, OnRoamintQueqiao);
 MSG_REG_2(GameMsgHdr, 0x255, OnRoamintQueqiaoLastLoot);
 
-MSG_REG_2(GameMsgHdr, 0x257, OnRoamintGuangGun);
 MSG_REG_2(GameMsgHdr, 0x256, OnDelItemAny);
 MSG_REG_2(GameMsgHdr, 0x259, OnAddItem);
 MSG_REG_2(GameMsgHdr, 0x260, OnTownDeamonChallenge);
@@ -405,6 +404,7 @@ MSG_REG_2(GameMsgHdr, 0x363, OnBePresented);
 MSG_REG_2(GameMsgHdr, 0x364, OnDoStrongInWorld);
 MSG_REG_2(GameMsgHdr, 0x365, OnSend11GradeInfo);
 
+MSG_REG_2(GameMsgHdr, 0x381, OnRoamintGuangGun);
 //0x365-380繁体占用
 
 MSG_HANDLER_END()

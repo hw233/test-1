@@ -2844,7 +2844,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             case 0x03:
                 {
                     UInt8 pos = player->getGuangGunPos();
-                    GameMsgHdr hdr1(0x257, player->getThreadId(), player, sizeof(pos));
+                    GameMsgHdr hdr1(0x381, player->getThreadId(), player, sizeof(pos));
                     GLOBAL().PushMsg(hdr1, &pos);
                 }
             case 0x04:

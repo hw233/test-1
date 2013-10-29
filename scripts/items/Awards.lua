@@ -768,6 +768,9 @@ function RunBlueDiamondAward(player, opt)
             break
         end
     end
+    if opt ==7 and (items[j][1] == 134 or items[j][1]==515 or items[j][1] == 1325 or items[j][1]==8520 or items[j][1] == 8555 or items[j][1] == 9178 or items[j][1] ==137)  then 
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:"..item[j][1].."]x1")
+   end
     local extraAward_9191 = {
         [2] = {9191,1,1},
         [6] = {549,2,1, 548,20,1},
