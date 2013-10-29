@@ -1137,6 +1137,7 @@ public:
     void DivorceSnowPair(Player* pl);
     void LoadSnowScore(Player* pl, Player* lover);
     void SendSnowAward();
+    void SendGuangGunAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

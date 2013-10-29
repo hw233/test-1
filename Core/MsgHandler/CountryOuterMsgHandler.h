@@ -3805,7 +3805,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         UInt32 advanceOther = player->GetVar(VAR_GUANGGUN_ADVANCE_OTHER);
                         if(advanceOther>=24)
                             return ;
-                        UInt32 goldLeft = GetVar(VAR_GUANGGUN_CONSUME)%100;
+                        UInt32 goldLeft =player->GetVar(VAR_GUANGGUN_CONSUME)%100;
                         player->AddVar(VAR_GUANGGUN_CONSUME,price);
                         UInt32 counts = (price+goldLeft)/100; 
                         counts =( counts > 24-advanceOther?24-advanceOther:counts);

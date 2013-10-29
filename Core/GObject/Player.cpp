@@ -24919,7 +24919,8 @@ Player* Player::getGGTimeCaptain()
        m_gginfo.status = 0 ;
        m_gginfo.player1 = NULL;
        m_gginfo.player2 = NULL;
-       GameMsgHdr hdr1(0x1D5, WORKER_THREAD_WORLD, this, sizeof(GetGGTimeScore()));
+       UInt32 GGMyScore = getGGTimeScore();
+       GameMsgHdr hdr1(0x1D5, WORKER_THREAD_WORLD, this, sizeof(GGMyScore));
        GLOBAL().PushMsg(hdr1, &GGMyScore);
    }
    return this;
@@ -25104,24 +25105,24 @@ void Player::giveGGTeamMemberInfo(Stream& st)
     if(cap == this )
     {
         if(NULL != ( pl = getGGPlayer1()) )
-            st<<pl->getName()<<static_cast<UINt8>(pl->GetVar(VAR_GUANGGUN_TIMES)/20)<<pl->GetVar(VAR_GUANGGUN_TODAY_TASK)<<pl->getGGScore();
+            st<<pl->getName()<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TIMES)/20)<<pl->GetVar(VAR_GUANGGUN_TODAY_TASK)<<pl->getGGScore();
         else 
             st<<""<<static_cast<UInt32>(0)<<static_cast<UInt32>(0);
         if(NULL != ( pl = getGGPlayer2()) )
-            st<<pl->getName()<<static_cast<UINt8>(pl->GetVar(VAR_GUANGGUN_TIMES)/20)<<pl->GetVar(VAR_GUANGGUN_TODAY_TASK)<<pl->getGGScore();
+            st<<pl->getName()<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TIMES)/20)<<pl->GetVar(VAR_GUANGGUN_TODAY_TASK)<<pl->getGGScore();
         else 
             st<<""<<static_cast<UInt32>(0)<<static_cast<UInt32>(0);
     }
     else 
     {
-        st<<cap->getName()<<static_cast<UINt8>(cap->GetVar(VAR_GUANGGUN_TIMES)/20)<<cap->GetVar(VAR_GUANGGUN_TODAY_TASK)<<cap->getGGScore();
+        st<<cap->getName()<<static_cast<UInt8>(cap->GetVar(VAR_GUANGGUN_TIMES)/20)<<cap->GetVar(VAR_GUANGGUN_TODAY_TASK)<<cap->getGGScore();
         if(cap->getGGPlayer1()!=NULL && cap->getGGPlayer1()!=this)
             pl = cap->getGGPlayer1();
         else if(cap->getGGPlayer2()!=NULL && cap->getGGPlayer2()!=this)
             pl = cap->getGGPlayer2();
         else
             st<<""<<static_cast<UInt8>(0)<<static_cast<UInt32>(0)<<static_cast<UInt32>(0);
-        st<<pl->getName()<<static_cast<UINt8>(pl->GetVar(VAR_GUANGGUN_TIMES)/20)<<pl->GetVar(VAR_GUANGGUN_TODAY_TASK)<<pl->getGGScore();
+        st<<pl->getName()<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TIMES)/20)<<pl->GetVar(VAR_GUANGGUN_TODAY_TASK)<<pl->getGGScore();
     }
 }
 void Player::BuyGuangGunAdvance()
@@ -25157,7 +25158,7 @@ void  Player::AddGGTimes(Player* pl,UInt8 type)
        return ;
    }
    ConsumeInfo ci(GuangGun,0,0);
-   useGold(gold,&ci[type]);
+   useGold(gold[type],&ci);
    if(this!=pl)
    {
        pl->AddGGTimes(pl,0);

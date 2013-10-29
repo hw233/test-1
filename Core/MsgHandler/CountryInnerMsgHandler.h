@@ -1485,7 +1485,7 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
     }
 
     GameAction()->doStrong(player, co->id, co->param1, co->param2);
-    GuangGunCompleteTask(0,static_cast<UInt8>(co->id));
+    player->GuangGunCompleteTask(0,static_cast<UInt8>(co->id));
 }
 void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
 {
@@ -1810,7 +1810,7 @@ void OnRoamintQueqiao( GameMsgHdr& hdr, const void* data )
     UInt8 pos = *(UInt8*)(data);
     player->roamingQueqiao(pos);
 }
-void OnRoamintGuanggun( GameMsgHdr& hdr, const void* data )
+void OnRoamintGuangGun( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
     UInt8 pos = *(UInt8*)(data);

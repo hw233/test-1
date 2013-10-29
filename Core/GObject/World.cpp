@@ -307,6 +307,7 @@ bool bFoolBaoEnd =  false;
 bool bHalfGoldEnd = false;
 bool bSurnameLegendEnd = false;
 bool b11TimeEnd = false;
+bool bGGTimeEnd = false;
 bool bSnowEnd = false;
 bool bGoldSnakeEnd = false;
 bool bItem9344End = false;
@@ -1157,6 +1158,7 @@ void World::World_Midnight_Check( World * world )
     bool bfoolbao = getFoolBao();
     bool bsurnamelegend = getSurnameLegend();
     bool b11time = get11Time();
+    bool bGGtime = get11Time();
     bool bhalfgold = getHalfGold();
     bool bJune = getJune();
     bool bQixi = getQixi();
@@ -1198,6 +1200,7 @@ void World::World_Midnight_Check( World * world )
     //蜀山传奇掉落活动是否结束
     bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
     b11TimeEnd = b11time && !get11Time();
+    bGGTimeEnd = bGGtime && !getGGTime();
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
@@ -1309,6 +1312,8 @@ void World::World_Midnight_Check( World * world )
         world->SendSurnameLegendAward();
     if(b11TimeEnd)
         world->Send11AirBookAward();
+    if(bGGTimeEnd)
+        world->SendGuangGunAward();
     if (bSnowEnd)
         world->SendSnowAward();
     if (bGoldSnakeEnd)
@@ -3321,6 +3326,63 @@ void World::Send11CountryRankAward()
              mailPackageManager.push(mail->id, s_item[0], 5, true); 
         }
     }
+}
+void World::SendGuangGunAward()    //待定
+{
+    World::initRCRank();
+    int pos = 0;
+    static MailPackage::MailItem s_item[][4] = {
+        {{509,30},{515,30},{503,60},{134,30}},
+        {{509,25},{515,25},{503,50},{134,25}},
+        {{509,20},{515,20},{503,40},{134,20}},
+    };
+    static MailPackage::MailItem card = {9922,1};
+    SYSMSG(title, 4950);
+    for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (!player)
+            continue;
+        ++pos;
+        if(pos > 3) break;
+        SYSMSGV(content, 4951, pos);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
+            if(pos ==1)
+                mailPackageManager.push(mail->id, &card, 1, true);
+        }
+
+        Player* player1 = player->getGGPlayer1();
+        if (player1)
+        {
+            SYSMSGV(content, 4951, pos);
+            Mail * mail1 = player1->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+            if(mail1)
+            {
+                mailPackageManager.push(mail1->id, s_item[pos-1], 4, true);
+                if(pos ==1)
+                    mailPackageManager.push(mail1->id, &card, 1, true);
+            }
+        }
+        Player* player2 = player->getGGPlayer1();
+        if (player2)
+        {
+            SYSMSGV(content, 4951, pos);
+            Mail * mail2 = player2->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+            if(mail2)
+            {
+                mailPackageManager.push(mail2->id, s_item[pos-1], 4, true);
+                if(pos ==1)
+                    mailPackageManager.push(mail2->id, &card, 1, true);
+            }
+        }
+    }
+
 }
 
 }

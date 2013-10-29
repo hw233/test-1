@@ -1833,6 +1833,7 @@ namespace GObject
 
         inline UInt8 getGGStatus(){return m_gginfo.status;}
         inline UInt32 getGGScore(){return m_gginfo.score;}
+        void AddGGTimes(Player* pl,UInt8 type);
       //  std::vector<Player* > getGGPlayers(){return m_gginfo.ggplayer;}
         Player* getGGPlayer1() {return m_gginfo.player1;}
         Player* getGGPlayer2() {return m_gginfo.player2;}
