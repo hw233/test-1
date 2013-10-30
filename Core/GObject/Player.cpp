@@ -24830,8 +24830,23 @@ void Player::sendNovLoginInfo()
         value |= (1<<1) ;
     if(novLoginAward & (1<< 31))
         value |= (1<<2) ;
+    UInt32 max = 0 ;
+    UInt32 i=0;
+    UInt32 count=0 ;
+    while(i <= off)
+    {
+        if(novLogin & (1 << i++ ))
+            ++count;
+        else 
+        {
+            if(count != 0 && max<count)
+                max = count ;
+            count =0;
+        }
+    }
     Stream st(REP::RC7DAY);
     st<<novLogin;
+    st<<static_cast<UInt8>(max);
     st<<static_cast<UInt8>(value);
     st<<Stream::eos;
     send(st);

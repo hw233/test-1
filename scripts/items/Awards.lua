@@ -520,9 +520,9 @@ function RunPrayAward(player, cts)
 end
 function RunNovLoginAward(player, cts)
     local item = {
-        [4] = {{503, 1}},
-        [5] = {{134, 1}},
-        [6] = {{1325,1}},
+        [1] = {{503, 1},{56,1},{133,1}},
+        [2] = {{134, 2},{1126,2},{9371,2}},
+        [3] = {{515,3},{549,2},{509,5}},
     };
     local package = player:GetPackage();
 
