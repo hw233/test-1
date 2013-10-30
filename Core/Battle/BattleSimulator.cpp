@@ -148,6 +148,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_lingshi_bleed] = &BattleSimulator::doSkillEffectExtra_LingShiBleed2;
         skillEffectExtraTable[GData::e_eft_criticaldmgreduce] = &BattleSimulator::doSkillEffectExtra_CriticalDmgReduce;
         skillEffectExtraTable[GData::e_eft_buddha_light] = &BattleSimulator::doSkillEffectExtra_BuddhaLight;
+        skillEffectExtraTable[GData::e_eft_zhu_tian_bao_jian] = &BattleSimulator::doSkillEffectExtra_OtherSidePeerlessDisable;
     }
 }
 
@@ -261,6 +262,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_lingshi_bleed] = &BattleSimulator::doSkillEffectExtra_LingShiBleed2;
         skillEffectExtraTable[GData::e_eft_criticaldmgreduce] = &BattleSimulator::doSkillEffectExtra_CriticalDmgReduce;
         skillEffectExtraTable[GData::e_eft_buddha_light] = &BattleSimulator::doSkillEffectExtra_BuddhaLight;
+        skillEffectExtraTable[GData::e_eft_zhu_tian_bao_jian] = &BattleSimulator::doSkillEffectExtra_OtherSidePeerlessDisable;
     }
 }
 
@@ -10158,6 +10160,51 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             doSkillAttackByCareer(bf, skill);
         }
 
+        if(bf->getHP() == 0)
+            break;
+        UInt8 peerlessDisableSSLast = bf->getPeerLessDisableSSLast();
+        if(peerlessDisableSSLast > 0)
+        {
+            --peerlessDisableSSLast;
+            bf->setPeerLessDisableSSLast(peerlessDisableSSLast);
+            const UInt8 peerlessDisableSSID = 162;
+            GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(peerlessDisableSSID);
+            const GData::SkillStrengthenEffect* ef = NULL;
+            if(ss)
+                ef = ss->getEffect(GData::ON_ZXBJ, GData::TYPE_ZXBJ_HP_ADD);
+            if(ef)
+            {
+                appendDefStatus(e_skill, /*skill->getId()*/5709, bf); //xxx
+                int i = 0;
+                int fsize = ef->factor.size();
+                UInt8 target_side = bf->getSide();
+                for(UInt8 pos = 0; pos < 25; ++ pos)
+                {
+                    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, pos));
+                    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+                        continue;
+
+                    if(bo->getLostHP() == 0)
+                        continue;
+
+                    float factor = 1;
+                    int idx = std::min(abs(fsize-1), i);
+                    if(fsize > 0)
+                        factor = ef->factor[idx];
+
+                    float deFactor = calcTherapyFactor(bo);
+                    UInt32 hpr = bo->regenHP(getBFMagAtk(bf) * factor * deFactor * ef->value, ef->cond == GData::SKILL_ACTIVE);
+                    ++i;
+                    if(hpr == 0)
+                        continue;
+
+                    appendDefStatus(e_damHpAdd, hpr, bo);
+                    if(ef->cond == GData::SKILL_ACTIVE)
+                        releaseWeak(bo);
+                }
+            }
+        }
+
     }while(false);
 
     if(_defList.size() > 0 || _scList.size() > 0)
@@ -10361,12 +10408,14 @@ void BattleSimulator::doSkillEffectExtraAttack(BattleFighter* bf, int target_sid
     const std::vector<UInt8>& efl = skill->effect->efl;
     const std::vector<float>& efv = skill->effect->efv;
 
+    printf("2:eft[0] = %u\n", eft[0]);
     size_t cnt = eft.size();
     if(cnt != efl.size() || cnt != efv.size())
         return;
 
     for(size_t i = 0; i < cnt; ++ i)
     {
+        printf("eft[%u] = %u\n", i, eft[i]);
         if((this->skillEffectExtraTable[eft[i]]) == NULL)
             continue;
         (this->*skillEffectExtraTable[eft[i]])(bf, target_side, target_pos, skill, i);
@@ -12731,6 +12780,51 @@ void BattleSimulator::doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int targ
             bo->setBuddhaLightLauncher(bf);
         }
         appendDefStatus(e_buddhaLight, 0, bf);
+        return;
+    }
+}
+
+void BattleSimulator::doSkillEffectExtra_OtherSidePeerlessDisable(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+
+    size_t cnt = eft.size();
+    if(cnt != efl.size() || efv.size() != cnt)
+        return;
+
+    appendDefStatus(e_skill, /*skill->getId()*/5709, bf);  //xxx
+    target_side = 1 - bf->getSide();
+    for(size_t count = 0; count < cnt; ++count)
+    {
+        for(UInt8 i = 0; i < 25; i++)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, i));
+            if(bo == NULL || bo->getHP() == 0 || bo->isLingQu() || bo->isSoulOut())
+                continue;
+
+            if(bo->getPeerLessDisableLast() == 0 && static_cast<float>(uRand(10000)) < skill->prob * 100)
+            {
+                if(static_cast<float>(uRand(10000) < bf->getMagRes(bo) * 100))
+                    appendDefStatus(e_Res, 0, bo);  //xxx
+                else
+                {
+                    bo->setPeerLessDisableLast(efl[count]);
+                    appendDefStatus(e_sneakAtk, 0, bo);  //xxx
+                }
+            }
+        }
+
+        GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+        const GData::SkillStrengthenEffect* ef = NULL;
+        if(ss)
+            ef = ss->getEffect(GData::ON_ZXBJ, GData::TYPE_ZXBJ_HP_ADD);
+        if(ef)
+            bf->setPeerLessDisableSSLast(ef->last);
+
         return;
     }
 }
