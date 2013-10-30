@@ -2644,6 +2644,10 @@ namespace GObject
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);
+
+        void Buy7DayFund(UInt8 type);
+        void send7DayFundInfo();
+        void get7DayFundAward(UInt8 type);
     private:
         MoFang* m_moFang;
 
