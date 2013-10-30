@@ -5955,13 +5955,15 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             player->sendQQBoardLogin();
         case 26:
             if(!player->in7DayFromCreated())
-            break;;
-            br >>idx ;
-            br >>index;
+                break;
             if(idx == 0 )
-                player->Buy7DayFund(index);
+                player->Buy7DayFund();
             else if(idx == 1)
+            {
+                br >>index;
                 player->get7DayFundAward(index);
+            }
+            player->send7DayFundInfo();
             break;
         default:
             break;
