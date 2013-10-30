@@ -3071,6 +3071,11 @@ void OnTeamArenaEntered( ArenaMsgHdr& hdr, const void * data )
     if(!tad)
         return;
     GObject::teamArenaMgr.teamArenaEntered(tad, entered, rname);
+    for(UInt8 i = 0; i < tad->count; ++ i)
+    {
+        if(tad->members[i])
+            tad->members[i]->arenaUdpLog(1001);
+    }
 }
 
 void OnTeamArenaConnected( ArenaMsgHdr& hdr, const void * data )
