@@ -24805,6 +24805,106 @@ void Player::Send11GradeAward(UInt8 type)
     udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 
 }
+void Player::SetNovLogin()
+{
+    UInt32 timeBegin = TimeUtil::MkTime(2013,10,31);
+    UInt32 now = TimeUtil::Now();
+    UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 +1;
+    if(now < timeBegin)
+        return ;
+    if(off > 30)
+        return ;
+    UInt32 novLogin = GetVar(VAR_NOV_LOGIN);
+    novLogin |= 1 << (off - 1);
+    SetVar(VAR_NOV_LOGIN, novLogin);
+}
+
+void Player::sendNovLoginInfo()
+{
+    UInt32 novLogin = GetVar(VAR_NOV_LOGIN);
+    UInt32 novLoginAward = GetVar(VAR_NOV_LOGIN_AWARD); 
+    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 now = TimeUtil::Now();
+    UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400;
+    if(now < timeBegin)
+        return ;
+    if(off > 29)
+        return ;
+    UInt8 value = 0;
+    if(novLoginAward & (1<<off))
+        value |= 1 ;
+    if(off >1 && !(novLogin&(1<<off)))
+        --off;
+    if(novLoginAward & (1<< 30))
+        value |= (1<<1) ;
+    if(novLoginAward & (1<< 31))
+        value |= (1<<2) ;
+    UInt32 max = 0 ;
+    UInt32 i=0;
+    while(i <=off)
+    {
+        if(novLogin & (1 << i++ ))
+            ++max;
+        else 
+        {
+            if(max >= 7 && !(novLogin&(1<<30)))
+            {
+                novLogin |= (1<<30);
+                SetVar(VAR_NOV_LOGIN,novLogin);
+            }
+            max =0;
+        }
+    }
+    Stream st(REP::RC7DAY);
+    st<<static_cast<UInt8>(27);
+    st<<novLogin;
+    st<<static_cast<UInt8>(max);
+    st<<static_cast<UInt8>(value);
+    st<<Stream::eos;
+    send(st);
+}
+void Player::getNovLoginAward(UInt8 type)
+{
+    if(type <1 ||type >3)
+        return ;
+    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 now = TimeUtil::Now();
+    UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 ;
+    if(now < timeBegin)
+        return ;
+    if(off > 29)
+        return ;
+    UInt32 novLogin = GetVar(VAR_NOV_LOGIN);
+    UInt32 novLoginAward = GetVar(VAR_NOV_LOGIN_AWARD); 
+    if(type == 1 &&( !(novLogin & (1<<off)) || (novLoginAward & (1<<off)) ) )
+        return ;
+    UInt32 max = 0 ;
+    UInt32 i=0;
+    UInt32 count;
+    while(i <= off)
+    {
+        if(novLogin & (1 << i++ ))
+            ++count;
+        else 
+        {
+            count = 0;
+        }
+        if( max <count)
+            max =count;
+    }
+   if(type==2 &&( max < 7|| (novLoginAward&(1<<30)) )) 
+       return ;
+   if(type==3 &&( max < 30|| (novLoginAward&(1<<31)) )) 
+       return ;
+   if(!GameAction()->RunNovLoginAward(this, type))
+       return ;
+   if(type == 2 )
+       off = 30 ;
+   if(type == 3)
+       off = 31; 
+   novLoginAward |= (1<<off); 
+   SetVar(VAR_NOV_LOGIN_AWARD,novLoginAward);
+}
 
 bool Player::checkClientIP()
 {

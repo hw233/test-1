@@ -518,6 +518,35 @@ function RunPrayAward(player, cts)
     end
     return true
 end
+function RunNovLoginAward(player, cts)
+    local item = {
+        [1] = {{503, 1},{56,1},{133,1}},
+        [2] = {{10217,1}},
+        [3] = {{10218,1}},
+    };
+    local package = player:GetPackage();
+
+    if cts < 1 then
+        return false
+    end
+    if cts > 3 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < (num)  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for count = 1, #item[cts] do
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
+    end
+    return true
+end
 function RunPresentAward(player, cts)
     local item = {
         [1] = {{502, 2}},

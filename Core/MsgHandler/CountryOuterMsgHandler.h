@@ -5875,7 +5875,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
     if (op  < 6 )
         return;
-    if((op != 10 && op!= 20 &&op!=22 &&op!=25) && !player->hasChecked())
+    if((op != 10 && op!= 20 &&op!=22 &&op!=25 && op!=27) && !player->hasChecked())
          return;
 
     switch(op)
@@ -5952,6 +5952,19 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
                 player->GetQQBoardAward(index);
             }
             player->sendQQBoardLogin();
+            break;
+        case 27:
+            {
+              if(idx == 0)
+                  player->SetNovLogin();
+              else if(idx == 1)
+              {
+                  br >>index ;
+                  player->getNovLoginAward(index);
+              }
+              player->sendNovLoginInfo();
+            }
+            break;
         default:
             break;
     }

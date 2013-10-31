@@ -2309,6 +2309,9 @@ namespace GObject
         void sendQQBoardLoginInfo();
         void SetQQBoardLogin();
         void SetQQBoardValue();
+        void SetNovLogin();
+        void sendNovLoginInfo();
+        void getNovLoginAward(UInt8 type =0);
         void sendLuckyMeetLoginInfo();
         void SetLuckyMeetValue();
         void SetSummerMeetValue();
