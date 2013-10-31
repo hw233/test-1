@@ -24800,7 +24800,7 @@ void Player::Send11GradeAward(UInt8 type)
 }
 void Player::SetNovLogin()
 {
-    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 timeBegin = TimeUtil::MkTime(2013,10,31);
     UInt32 now = TimeUtil::Now();
     UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 +1;
     if(now < timeBegin)
@@ -24818,33 +24818,38 @@ void Player::sendNovLoginInfo()
     UInt32 novLoginAward = GetVar(VAR_NOV_LOGIN_AWARD); 
     UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
     UInt32 now = TimeUtil::Now();
-    UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 +1;
+    UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400;
     if(now < timeBegin)
         return ;
-    if(off > 30)
+    if(off > 29)
         return ;
     UInt8 value = 0;
-    if(novLoginAward & (1<< (off-1)))
+    if(novLoginAward & (1<<off))
         value |= 1 ;
+    if(off >1 && !(novLogin&(1<<off)))
+        --off;
     if(novLoginAward & (1<< 30))
         value |= (1<<1) ;
     if(novLoginAward & (1<< 31))
         value |= (1<<2) ;
     UInt32 max = 0 ;
     UInt32 i=0;
-    UInt32 count=0 ;
-    while(i <= off)
+    while(i <=off)
     {
         if(novLogin & (1 << i++ ))
-            ++count;
+            ++max;
         else 
         {
-            if(count != 0 && max<count)
-                max = count ;
-            count =0;
+            if(max >= 7 && !(novLogin&(1<<30)))
+            {
+                novLogin |= (1<<30);
+                SetVar(VAR_NOV_LOGIN,novLogin);
+            }
+            max =0;
         }
     }
     Stream st(REP::RC7DAY);
+    st<<static_cast<UInt8>(27);
     st<<novLogin;
     st<<static_cast<UInt8>(max);
     st<<static_cast<UInt8>(value);
@@ -24860,7 +24865,7 @@ void Player::getNovLoginAward(UInt8 type)
     UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 ;
     if(now < timeBegin)
         return ;
-    if(off > 30)
+    if(off > 29)
         return ;
     UInt32 novLogin = GetVar(VAR_NOV_LOGIN);
     UInt32 novLoginAward = GetVar(VAR_NOV_LOGIN_AWARD); 
@@ -24868,17 +24873,17 @@ void Player::getNovLoginAward(UInt8 type)
         return ;
     UInt32 max = 0 ;
     UInt32 i=0;
-    UInt32 count=0 ;
+    UInt32 count;
     while(i <= off)
     {
         if(novLogin & (1 << i++ ))
             ++count;
         else 
         {
-            if(count != 0 && max<count)
-                max = count ;
-            count =0;
+            count = 0;
         }
+        if( max <count)
+            max =count;
     }
    if(type==2 &&( max < 7|| (novLoginAward&(1<<30)) )) 
        return ;

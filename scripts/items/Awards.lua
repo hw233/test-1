@@ -521,8 +521,8 @@ end
 function RunNovLoginAward(player, cts)
     local item = {
         [1] = {{503, 1},{56,1},{133,1}},
-        [2] = {{134, 2},{1126,2},{9371,2}},
-        [3] = {{515,3},{549,2},{509,5}},
+        [2] = {{10217,1}},
+        [3] = {{10218,1}},
     };
     local package = player:GetPackage();
 
