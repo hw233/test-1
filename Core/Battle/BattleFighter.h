@@ -1156,11 +1156,11 @@ private:
 
     UInt8 _peerlessDisableLast;
     inline void setPeerLessDisableLast(UInt8 l) { _peerlessDisableLast = l; }
-    inline UInt8 getPeerLessDisableLast() { printf("_peerlessDisableLast = %u\n", _peerlessDisableLast); return _peerlessDisableLast; }
+    inline UInt8 getPeerLessDisableLast() { return _peerlessDisableLast; }
 
     UInt8 _peerlessDisableSSLast;
     inline void setPeerLessDisableSSLast(UInt8 l) { _peerlessDisableSSLast = l; }
-    inline UInt8 getPeerLessDisableSSLast() { printf("_peerlessDisableSSLast = %u\n", _peerlessDisableSSLast); return _peerlessDisableSSLast; }
+    inline UInt8 getPeerLessDisableSSLast() { return _peerlessDisableSSLast; }
     const GData::SkillBase* _peerlessDisableSkill;
     inline void setPeerLessDisableSkill(const GData::SkillBase* skill) { _peerlessDisableSkill = skill; }
     inline const GData::SkillBase* getPeerLessDisableSkill() { return _peerlessDisableSkill; }
