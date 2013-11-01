@@ -3468,19 +3468,11 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             const GData::SkillStrengthenEffect* ef = NULL;
             if(ss)
                 ef = ss->getEffect(GData::ON_ZXBJ, GData::TYPE_ZXBJ_HP_ADD);
-            if(ef)
-            {
-                bf->setPeerLessDisableSSLast(ef->last);
-                bf->setPeerLessDisableSkill(skill);
-            }
 
             int i = 0;
             int fsize = skill->factor.size();
             for(UInt8 pos = 0; pos < 25; ++ pos)
             {
-                if(ef)
-                    bf->setPeerLessDisableSSHP(pos, 0);
-
                 BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, pos));
                 if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                     continue;
@@ -3506,7 +3498,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     releaseWeak(bo);
 
                 if(ef)
-                    bf->setPeerLessDisableSSHP(pos, hpr * ef->value / 100);
+                {
+                    bo->setPeerLessDisableSSLast(bf->getPos(), ef->last);
+                    bo->setPeerLessDisableSSHP(bf->getPos(), hpr * ef->value / 100);
+                }
             }
         }
         else if(0 == skill->area)
@@ -10181,28 +10176,17 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
 
         if(bf->getHP() == 0)
             break;
-        UInt8 peerlessDisableSSLast = bf->getPeerLessDisableSSLast();
-        if(peerlessDisableSSLast > 0 && (skill = bf->getPeerLessDisableSkill()) != NULL)
+        for(UInt8 i = 8; i < 25; i++)
         {
-            appendDefStatus(e_skill, skill->getId(), bf);
-            --peerlessDisableSSLast;
-            bf->setPeerLessDisableSSLast(peerlessDisableSSLast);
-
-            int target_side = bf->getSide();
-            for(UInt8 pos = 0; pos < 25; ++ pos)
+            UInt8 peerlessDisableSSLast = bf->getPeerLessDisableSSLast(i);
+            if(peerlessDisableSSLast > 0)
             {
-                BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, pos));
-                if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
-                    continue;
-                if(bo->getLostHP() == 0)
-                    continue;
-                UInt32 addHP = bf->getPeerLessDisableSSHP(pos);
-                if(addHP == 0)
-                    continue;
-                UInt32 hpr = bo->regenHP(addHP);
-                if(hpr == 0)
-                    continue;
-                appendDefStatus(e_damHpAdd, hpr, bo);
+                --peerlessDisableSSLast;
+                bf->setPeerLessDisableSSLast(i, peerlessDisableSSLast);
+                UInt32 addHP = bf->getPeerLessDisableSSHP(i);
+                UInt32 hpr = bf->regenHP(addHP);
+                if(hpr > 0)
+                    appendDefStatus(e_damHpAdd, hpr, bf);
             }
         }
 
