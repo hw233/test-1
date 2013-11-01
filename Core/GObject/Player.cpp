@@ -8222,6 +8222,7 @@ namespace GObject
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
             GameAction()->sendRechargeMails(this, total, total+r);
             SetVar(VAR_RECHARGE_TOTAL, total+r);
+            SetVar(VAR_RECHARGE_TIME, TimeUtil::Now());
             sendRechargeInfo(true);
         }
 
@@ -8230,6 +8231,7 @@ namespace GObject
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL3366);
             GameAction()->sendRechargeMails(this, total, total+r);
             SetVar(VAR_RECHARGE_TOTAL3366, total+r);
+            SetVar(VAR_RECHARGE_TIME, TimeUtil::Now());
             sendRechargeInfo(true);
         }
 
