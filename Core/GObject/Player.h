@@ -247,6 +247,7 @@ namespace GObject
         WANJIE      = 12,   //万劫不灭
         BILAN       = 13,   //碧岚天衣
         LIUGUANG    = 14,   //刹那流光
+        ZHUTIAN     = 15,   //诸天宝鉴
 
         DRAGONKING_MAX,
     };
