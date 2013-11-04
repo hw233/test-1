@@ -6130,6 +6130,8 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
 void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
 {
     MSG_QUERY_PLAYER(pl);
+	if(!pl->hasChecked())
+		return;
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     UInt32 fighterid = 0;
