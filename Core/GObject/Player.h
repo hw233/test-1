@@ -1868,7 +1868,7 @@ namespace GObject
         void CleanQiShiBan();
         UInt32 GetQQFriendScore(const char * openId);
         bool CheckReqDataTime();
-        void SetReqDataTime();
+        void SetReqDataTime(UInt8 mark=1);
 
         void SetQiShiBanScore(UInt32 score) { m_qishiban.score = score; }
         void AddQiShiBanScore(UInt32 score) { m_qishiban.score += score; }

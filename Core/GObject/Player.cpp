@@ -24821,7 +24821,7 @@ void Player::loadQiShiBanFromDB(UInt32 score, UInt32 step, UInt32 beginTime, UIn
 
     if(endTime > beginTime) //宕机特殊处理
     {
-        UInt32 tempTime = endTime - beginTime - 7;
+        UInt32 tempTime = endTime - beginTime - 10;
         m_qishiban.score += (100 + tempTime);
         m_qishiban.step += 1;
         m_qishiban.beginTime = 0;
@@ -24835,20 +24835,15 @@ void Player::MyQSBInfo()
         return;
 
     UInt8 mark = 0;
-    UInt32 time = 0;
-
     if(0 == GetQiShiBanBeginTime() && 0 == GetQiShiBanEndTime())
         mark = 1; // 未开始
     else if((GetQiShiBanEndTime() > _playerData.lastOnline) && (GetQiShiBanBeginTime() < GetQiShiBanEndTime()))
-    {
         mark = 2; // 继续（考虑玩家掉线可能）
-        time = GetQiShiBanEndTime() - _playerData.lastOnline;
-    }
     else if(GetQiShiBanBeginTime() == GetQiShiBanEndTime())
         mark = 3; // 重置
 
     Stream st(REP::ACT);
-    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x07) << static_cast<UInt16>(GetQiShiBanStep()) << GetQiShiBanScore() << mark << time << GetQiShiBanRestAllNum() << Stream::eos;
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x07) << static_cast<UInt16>(GetQiShiBanStep()) << GetQiShiBanScore() << mark << GetQiShiBanRestAllNum() << Stream::eos;
     send(st);
 }
 
@@ -24872,12 +24867,20 @@ void Player::ReqStartQSB()
     SetQiShiBanKey(uRand(100));
     int randValue = (GetQiShiBanKey() + 23) * 6 / 3 - 7;
 
+    UInt32 addTime = 0;
+    if(0 == GetQiShiBanStep())
+        addTime = 600;
+    else if(GetQiShiBanStep() < 10)
+        addTime = 300;
+    else
+        addTime = 120;
+
     SetQiShiBanBeginTime(TimeUtil::Now());
-    SetQiShiBanEndTime(GetQiShiBanBeginTime() + 120);
+    SetQiShiBanEndTime(GetQiShiBanBeginTime() + addTime);
 
     Update_QSB_DB();
     Stream st(REP::ACT);
-    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x02) << randValue << Stream::eos;
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x02) << randValue << addTime << Stream::eos;
     send(st);
 }
 
@@ -24899,7 +24902,7 @@ void Player::FinishCurStep(int randMark, UInt32 clintTime)
         if(clintTime < tempTime) // 服务器剩余时间和客户端剩余时间做比较，取少的
             tempTime = clintTime;
 
-        specialTime = GetQiShiBanEndTime() - GetQiShiBanBeginTime() - 7; //拼图最少使用7秒钟
+        specialTime = GetQiShiBanEndTime() - GetQiShiBanBeginTime() - 10; //拼图最少使用7秒钟
     }
     else
         return;
@@ -25069,13 +25072,21 @@ void Player::RestCurStep()
     SetQiShiBanKey(uRand(100));
     UInt32 randValue = (GetQiShiBanKey() + 23) * 6 / 3 - 7; 
 
+    UInt32 addTime = 0;
+    if(0 == GetQiShiBanStep())
+        addTime = 600;
+    else if(GetQiShiBanStep() < 10)
+        addTime = 300;
+    else
+        addTime = 120;
+
     SetQiShiBanBeginTime(TimeUtil::Now());
-    SetQiShiBanEndTime(GetQiShiBanBeginTime() + 120);
+    SetQiShiBanEndTime(GetQiShiBanBeginTime() + addTime);
     SetQiShiBanRestAllNum(GetQiShiBanRestAllNum() + 1);
     Update_QSB_DB();
 
     Stream st(REP::ACT);
-    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x05) << randValue << Stream::eos;
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x05) << randValue << addTime << Stream::eos;
     send(st);
 }
 
@@ -25089,15 +25100,15 @@ void Player::ContinueCurStep()
 
     SetQiShiBanBeginTime(TimeUtil::Now());
 
-    UInt32 time = 0;
+    UInt32 addTime = 0;
     if(GetQiShiBanEndTime() > _playerData.lastOnline)
-        time = GetQiShiBanEndTime() - _playerData.lastOnline; // 掉线前剩余时间
+        addTime = GetQiShiBanEndTime() - _playerData.lastOnline; // 掉线前剩余时间
 
-    SetQiShiBanEndTime(GetQiShiBanBeginTime() + time); // 重置结束时间
+    SetQiShiBanEndTime(GetQiShiBanBeginTime() + addTime); // 重置结束时间
     Update_QSB_DB();
 
     Stream st(REP::ACT);
-    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x08) << randValue << Stream::eos;
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x08) << randValue << addTime << Stream::eos;
     send(st);
 }
 
@@ -25133,9 +25144,12 @@ bool Player::CheckReqDataTime()
     return false;
 }
 
-void Player::SetReqDataTime()
+void Player::SetReqDataTime(UInt8 mark)
 {
-    m_checkTime =  TimeUtil::Now();
+    if(0 == mark)
+        m_checkTime = 0;
+    else
+        m_checkTime = TimeUtil::Now();
 }
 
 void Player::SetNovLogin()
