@@ -24866,6 +24866,9 @@ void Player::ReqStartQSB()
     if(!World::getQiShiBanTime())
         return;
 
+    if(GetQiShiBanStep() >= 999)
+        return;
+
     SetQiShiBanKey(uRand(100));
     int randValue = (GetQiShiBanKey() + 23) * 6 / 3 - 7;
 
