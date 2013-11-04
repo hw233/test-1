@@ -660,6 +660,9 @@ bool Clan::leave(Player * player)
     player->setFightersDirty(true);
 
 	_members.erase(found);
+    player->setBuffData(PLAYER_BUFF_CLANTREE1,0);
+    player->setBuffData(PLAYER_BUFF_CLANTREE1+1,0);
+    player->setBuffData(PLAYER_BUFF_CLANTREE1+2,0);
 	delete member;
     if(World::get11Time())
     {
