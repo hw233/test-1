@@ -210,9 +210,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131001_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131018_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131018_2.sql   #lingbaosmelt 表中添加 counts、 purpleAdjVal、orangeAdjVal 三个字段
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar544_545.sql        #清除累积登陆(开启万圣节登陆有礼)
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar544_545.sql        #清除累积登陆(开启万圣节登陆有礼)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开
     #. clearshiyamen.sh
 }
 

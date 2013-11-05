@@ -17182,6 +17182,7 @@ namespace GObject
        EventTlzAuto* event = new(std::nothrow) EventTlzAuto(this, s_tjTask3AutoTime, count);
        if (event == NULL) return;
        PushTimerEvent(event);
+       SetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME, TimeUtil::Now());
 
        event->notify(true);
 
@@ -17306,6 +17307,10 @@ void EventTlzAuto::Process(UInt32 leftCount)
     if (leftCount == 0)
     {
         PopTimerEvent(m_Player, EVENT_TLZAUTO,  m_Player->getId());
+        m_Player->delFlag(Player::AutoTlz);
+        UInt32 now = TimeUtil::Now();
+        if(TimeUtil::SharpDay(0, now) != TimeUtil::SharpDay(0, m_Player->GetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME)))
+            m_Player->SetVar(VAR_TJ_TASK3_COPYID, 0);
     }
 }
 

@@ -64,7 +64,7 @@ struct ClanSort   //帮派积分（10· 1活动）
 };   
 struct lt_rcsort
 {
-    bool operator()(const RCSort& a, const RCSort& b) const { return a.total >= b.total; }
+    bool operator()(const RCSort& a, const RCSort& b) const { return a.total > b.total; }
 };
 struct clan_sort
 {

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <netinet/tcp.h>
 #include <poll.h>
+#include <fcntl.h> // for fcntl
 
 #include "Config.h"
 #include "Log/Log.h"
@@ -92,7 +93,7 @@ int wait4read(int fd)
     pfd.events = POLLIN | POLLERR | POLLPRI;
     pfd.revents = 0;
 
-    int ret = TEMP_FAILURE_RETRY(::poll(&pfd, 1, 1000));
+    int ret = TEMP_FAILURE_RETRY(::poll(&pfd, 1, 1800));
     if (ret > 0 && !(pfd.revents & POLLIN))
         return -1;
 
@@ -106,7 +107,7 @@ int wait4send(int fd)
     pfd.events = POLLOUT | POLLERR | POLLPRI;
     pfd.revents = 0;
 
-    int ret = TEMP_FAILURE_RETRY(::poll(&pfd, 1, 1000));
+    int ret = TEMP_FAILURE_RETRY(::poll(&pfd, 1, 1800));
     if (ret > 0 && !(pfd.revents & POLLOUT))
         return -1;
 
@@ -138,7 +139,8 @@ int msend(int fd, void* buf, int size, int flag)
             }
         }
 
-        off += ret;
+        if (ret > 0)
+            off += ret;
     } while (off < size);
 
     return off;
@@ -146,10 +148,13 @@ int msend(int fd, void* buf, int size, int flag)
 
 int mrecv(int fd, void* buf, int size, int flag)
 {
+    int off = 0;
     int ret = 0;
+    unsigned char* buffer = reinterpret_cast<unsigned char*>(buf);
+
     do
     {
-        ret = TEMP_FAILURE_RETRY(::recv(fd, buf, size, MSG_NOSIGNAL));
+        ret = TEMP_FAILURE_RETRY(::recv(fd, buffer+off, size-off, MSG_NOSIGNAL));
         if (!ret)
             return -1;
         if (ret < 0)
@@ -164,20 +169,23 @@ int mrecv(int fd, void* buf, int size, int flag)
                 return -1;
             }
         }
+
+        if (ret > 0)
+            off += ret;
     } while (ret < 0);
 
-    return ret;
+    return off;
 }
 
 int read_jason_req(int fd, char* buf)
 {
-    int read_len1 = recv( fd, buf, 5, 0);
+    int read_len1 = mrecv( fd, buf, 5, 0);
     if(read_len1 != 5)
         return 0;
     unsigned short len = *(unsigned short*)buf;
     if(len <= 0)
         return 0;
-    int read_len2 = recv( fd, buf+5, len, 0 );
+    int read_len2 = mrecv( fd, buf+5, len, 0 );
     if(read_len2 != len)
         return 0;
 
@@ -186,13 +194,13 @@ int read_jason_req(int fd, char* buf)
 
 int read_jason_rep(int fd, char* buf)
 {
-    int read_len1 = recv( fd, buf, 4, 0);
+    int read_len1 = mrecv( fd, buf, 4, 0);
     if(read_len1 != 4)
         return 0;
     unsigned short len = *(unsigned short*)buf;
     if(len <= 0)
         return 0;
-    int read_len2 = recv( fd, buf+4, len, 0 );
+    int read_len2 = mrecv( fd, buf+4, len, 0 );
     if(read_len2 != len)
         return 0;
 
@@ -223,6 +231,16 @@ void clear_read_buffer(int fd)
 }
 
 #define CLOSE(fb) do{close(fb);fb=-1;}while(0)
+
+void setNonblock(int s)
+{
+    int flag = fcntl(s, F_GETFL, 0);
+    if (flag >= 0)
+    {
+        flag |= O_NONBLOCK;
+        ::fcntl(s, F_SETFL, flag);
+    }
+}
 
 int main()
 {
@@ -278,12 +296,14 @@ int main()
 #endif
             int flag = 1;
             setsockopt(new_fd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag));
+            setNonblock(new_fd);
+
             g_log->OutTrace("accept new connection %s\n", inet_ntoa(their_addr.sin_addr));
         }
 
         do {
             // 清空接收缓存
-            clear_read_buffer(asss_conn);
+            //clear_read_buffer(asss_conn);
             char buf[16*1024] = {0}; // XXX: 16K
             int len = 0;
             if((len = read_jason_req(new_fd, buf)) == 0)
@@ -295,7 +315,7 @@ int main()
             g_log->OutTrace("RECV: %s\n", buf);
 
             int sd = 0;
-            if( (sd = send( asss_conn, buf, len, 0 )) < 0)
+            if( (sd = msend( asss_conn, buf, len, 0 )) < 0)
             {
                 CLOSE(new_fd);
                 CLOSE(asss_conn);
@@ -311,7 +331,7 @@ int main()
                 break;
             }
 
-            int cnt = send( new_fd, buf, len, 0 );
+            int cnt = msend( new_fd, buf, len, 0 );
             if( cnt <= 0 )
             {
                 CLOSE(new_fd);

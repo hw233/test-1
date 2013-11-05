@@ -2390,6 +2390,11 @@ bool Tianjie::addNpc(UInt32 npcid)
         if (p_map->GetObject(npcid) != NULL)
             continue;
 
+        m_locNpcMap.insert(make_pair(spot, npcid));
+        m_loc = spot;
+        addNpcCount++ ;
+        printf("---------------------------------------addnpc, id:%d, loc:%d, count:%d\n", npcid, spot, addNpcCount);
+
         GObject::Country& cny = CURRENT_COUNTRY();
         UInt8 spot_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (spot_cny != cny.GetThreadID())
@@ -2425,15 +2430,7 @@ void Tianjie::addTianjieNpc(UInt32 npcId, UInt16 spot)
     mo.m_Type = 6;
     mo.m_ActionType = 0;
     if (pmap->AddObject(mo))
-    {
         pmap->Show(npcId, true, mo.m_Type);
-	
-        FastMutex::ScopedLock lk(_opMutex1);
-        m_locNpcMap.insert(make_pair(spot, npcId));
-        m_loc = spot;
-        addNpcCount++ ;
-        printf("---------------------------------------addnpc, id:%d, loc:%d, count:%d\n", npcId, spot, addNpcCount);
-    }
 }
 
 void Tianjie::deleteNpc(UInt32 npcid, UInt16 loc)
