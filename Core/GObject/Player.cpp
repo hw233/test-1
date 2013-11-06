@@ -16901,6 +16901,12 @@ namespace GObject
                 break;
             case 1: //前往破阵
                 {
+                    if(GetVar(VAR_TJ_TASK3_COPYID) == 0)
+                        SetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME, TimeUtil::Now());
+                    UInt32 now = TimeUtil::Now();
+                    if(TimeUtil::SharpDay(0, now) != TimeUtil::SharpDay(0, GetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME)))
+                        SetVar(VAR_TJ_TASK3_COPYID, 0);
+
                     if (GetVar(VAR_TJ_TASK3_COPYID) >= 51)
                     {
                         rcmd = 1;
@@ -17065,6 +17071,13 @@ namespace GObject
        if (copyid >= (s_tjTask3CopyCount+1)) //已完成
        {
            finish = 1;
+            UInt32 now = TimeUtil::Now();
+            if(TimeUtil::SharpDay(0, now) != TimeUtil::SharpDay(0, GetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME)))
+            {
+                SetVar(VAR_TJ_TASK3_COPYID, 0);
+                finish = 0;
+                copyid = 0;
+            }
        }
        if (copyid == 0) copyid = 1;
 
