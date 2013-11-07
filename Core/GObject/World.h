@@ -518,13 +518,11 @@ public:
     inline static void  set11Time(bool v)
     {   _11time=v; } 
     inline static bool  get11Time()
-    {   return true;
-        return _11time; } 
+    {return _11time; } 
     inline static void  setGGTime(bool v)
     {   _ggtime=v; } 
     inline static bool  getGGTime()
-    {  // return true;
-        return _ggtime; } 
+    {return _ggtime; } 
     inline static UInt32 get11TimeNum(UInt32 time = 0)
     {
         UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
