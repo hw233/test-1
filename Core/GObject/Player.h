@@ -2653,6 +2653,7 @@ namespace GObject
 
         void Buy7DayFund();
         void send7DayFundInfo();
+        void sendGameBoxAward();
         void get7DayFundAward(UInt8 type);
     private:
         MoFang* m_moFang;
@@ -2682,6 +2683,7 @@ namespace GObject
         void setMapId(UInt8 mapId);
         bool checkClientIP();
         void modifyPlayerName(UInt32 itemid,UInt8 binding,std::string modifyName);
+        void getGameBoxAward(UInt8 type);
 	};
 
 

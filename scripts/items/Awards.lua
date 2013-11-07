@@ -1555,3 +1555,29 @@ function RunAirBookLoginAward(player, cts)
     end
     return true
 end
+function RunGameBoxDailyActionAward(player, cts)
+    local item = {
+        [0] = {{503 ,1},{500 , 1},{50, 1},{49,1}},
+        [1] = {{15 ,1},{48 , 1}},
+    };
+    local package = player:GetPackage();
+
+    if cts > 1  or cts < 0 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
+    end
+    return true
+end

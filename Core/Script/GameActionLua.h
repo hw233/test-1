@@ -275,6 +275,7 @@ namespace Script
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         bool  RunPrayAward(Player* player, UInt8 val);
         bool  RunNovLoginAward(Player* player, UInt8 val);
+        bool  RunGameBoxDailyActionAward(Player* player, UInt8 val);
         UInt8 RunNewRC7DayTargetAward(Player* player);
         UInt8 RunBlueDiamondAward(Player* player, UInt8 opt);
         UInt8 RunConsumeAward(Player* player, UInt8 opt);
