@@ -24805,7 +24805,7 @@ void Player::pushPetInfo2Leaderboard()
     }
 }
 
-void Player::Add11grade(UInt32 grade)
+void Player::Add11g1rade(UInt32 grade)
 {
     if(!World::get11Time())
        return ;
@@ -24822,7 +24822,7 @@ void Player::Add11grade(UInt32 grade)
     Clan * clan = getClan();
     if(clan!=NULL)
         clan->addClanGradeInAirBook(grade);
-    OnSend11GradeInfo(World::get11TimeNum());
+    OnSend11GradeInfo(World::get11TimeAirNum());
     On11ClanGradeRank();
     On11CountryGradeRank();
     On11PlayerGradeRank();
@@ -24855,11 +24855,11 @@ void Player::SendClanMemberGrade()
 }
 void Player::Send11GradeAward(UInt8 type)
 {
-    UInt32 gradeAward[]={1200,2200,3200};
+    UInt32 gradeAward[]={500,1100,2000};
     static MailPackage::MailItem s_item[][6] = {
         {{500,6},{503,6},{501,4},{512,5},{516,4},{514,6}},
-        {{1325,3},{503,6},{509,5},{547,6},{134,3},{549,1}},
-        {{1717,1},{8555,4}},
+        {{1325,3},{503,6},{509,5},{547,6},{134,3},{9388,1}/*{549,1}*/},
+        {{1719,1},{8555,4}},
     };
     SYSMSG(title, 4954);
     if(type)

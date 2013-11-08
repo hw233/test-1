@@ -523,10 +523,23 @@ public:
     {   _ggtime=v; } 
     inline static bool  getGGTime()
     {return _ggtime; } 
+   
+    inline static UInt32 get11TimeAirNum(UInt32 time = 0)
+    {
+        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 11, 27);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 12, 2);
+        UInt32 now = TimeUtil::Now() ;
+        if(time !=0)
+            now = time;
+        if(now < (_11timeBegin) || now > _11timeEnd )
+            return -1;
+       return (TimeUtil::SharpDay(0, now) - _11timeBegin )/86400+1; 
+    }
     inline static UInt32 get11TimeNum(UInt32 time = 0)
     {
+        return -1;
         UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 13);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
         if(time !=0)
             now = time;
