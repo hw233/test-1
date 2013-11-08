@@ -7326,7 +7326,7 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
             }
         }
         break;
-    case 0x22:
+    case 0x22:  // 光棍节活动
         {
             brd >> op;
             switch(op)
@@ -7432,6 +7432,7 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
             }
 
         }
+        break;
     default:
         break;
     }
