@@ -64,6 +64,7 @@ bool Boss::attackBy( Player * player )
 		st << static_cast<UInt16>(0x0100);
 	st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
 	st.append(&packet[8], packet.size() - 8);
+    st<<static_cast<UInt64>(0);
 	st << Stream::eos;
 	player->send(st);
 	bsim.applyFighterHP(0, player);

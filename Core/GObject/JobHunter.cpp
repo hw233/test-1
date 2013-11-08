@@ -1082,6 +1082,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
             st << _owner->_lastLoot[i].id << _owner->_lastLoot[i].count;
         }
         st.append(&packet[8], packet.size() - 8);
+        st<<ng->getExp();    //LIB  EXP
         st << Stream::eos;
         _owner->send(st);
         SendGridInfo(POS_TO_INDEX(_posX, _posY));
@@ -1097,6 +1098,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
         {
             st << _owner->_lastLoot[i].id << _owner->_lastLoot[i].count;
         }
+        st<<ng->getExp();    //LIB  EXP
         st << Stream::eos;
         _owner->send(st);
         _owner->checkLastBattled();
@@ -1272,6 +1274,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
     st << ret << PLAYER_DATA(_owner, lastExp) << static_cast<UInt8>(0);
     st << static_cast<UInt8>(0);
     st.append(&packet[8], packet.size() - 8);
+    st << static_cast<UInt64>(0);
     st << Stream::eos;
 
     if (!isAuto)

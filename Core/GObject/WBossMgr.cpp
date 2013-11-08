@@ -135,6 +135,7 @@ static UInt32 getExp(UInt8 lvl)
 bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
 {
     static UInt32 sendflag = 7;
+    UInt64 exp = 0 ; //LIB   EXP
 
     ++sendflag;
 
@@ -218,7 +219,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             if(oldHP > newHP)
             {
                 UInt32 damage = oldHP - newHP;
-                UInt32 exp = ((float)damage / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
+                exp = ((float)damage / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
                 if (exp < 1000)
                     exp = 1000;
                pl->pendExp(exp);
@@ -289,7 +290,8 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         if (!final)
         {
             pl->_lastNg = _ng;
-            pl->pendExp(_ng->getExp()*expfactor);
+            exp = _ng->getExp()*expfactor; 
+            pl->pendExp(exp );
             _ng->getLoots(pl, pl->_lastLoot, 1, NULL);
         }
     }
@@ -303,6 +305,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         st << pl->_lastLoot[i].id << pl->_lastLoot[i].count;
     }
     st.append(&packet[8], packet.size() - 8);
+    st << static_cast<UInt64>(exp);
     st << Stream::eos;
     pl->send(st);
     bsim.applyFighterHP(0, pl);

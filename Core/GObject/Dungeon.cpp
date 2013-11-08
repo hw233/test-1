@@ -490,10 +490,10 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 	}
 	if(report)
 	{
+        UInt32 exp = 0;
 		if(res)
 		{
 			st << static_cast<UInt16>(0x0101);
-			UInt32 exp;
 			takeLoot(player, dpi, exp);
 		}
 		else
@@ -509,6 +509,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 		}
 		st.append(&packet[8], packet.size() - 8);
 		st << Stream::eos;
+        st << static_cast<UInt64>(exp);
 		player->send(st);
 		bsim.applyFighterHP(0, player);
 		player->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + turns_);

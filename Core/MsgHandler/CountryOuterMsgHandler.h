@@ -3036,7 +3036,7 @@ void OnRequestChallengeReq( GameMsgHdr& hdr, RequestChallengeReq& rcr)
 	int turns = bsim.getTurns();
 
 	Stream st1(REP::ATTACK_NPC);
-	st1 << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	st1 << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << static_cast<UInt64>(0) << Stream::eos;
 	player->send(st1);
 	st1.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
 	attacker->send(st1);

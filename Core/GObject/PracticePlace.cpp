@@ -860,6 +860,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                 st << static_cast<UInt16>(0x0100);
             st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
             st.append(&packet[8], packet.size() - 8);
+            st << static_cast<UInt64>(0) ;
             st << Stream::eos;
             pl->send(st);
         }

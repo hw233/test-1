@@ -72,7 +72,7 @@ void NewRelation::beAttack(Player * atker, UInt16 formation, UInt16 portrait, Li
 	bool res = bsim.getWinner() == 1;
 
 	Stream st(REP::ATTACK_NPC);
-	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << static_cast<UInt64>(0) << Stream::eos;
     if(atker->isOnline())
         atker->send(st);
     if(defer->isOnline())
@@ -110,7 +110,7 @@ void NewRelation::attack(Player *atker, Player *defer)
 		res = bsim.getWinner() == 1;
 
         Stream st(REP::ATTACK_NPC);
-        st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+        st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << static_cast<UInt64>(0) << Stream::eos;
         if(atker->isOnline())
             atker->send(st);
         if (defer->isOnline())
