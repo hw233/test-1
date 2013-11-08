@@ -36,7 +36,7 @@
 
 #define CCB_CITY_MOVE_CD             15
 
-//#define  NEICE_VESION
+#define  NEICE_VESION
 
 namespace GObject
 {
