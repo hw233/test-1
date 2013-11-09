@@ -8216,15 +8216,17 @@ namespace GObject
         if(World::getGGTime())
         {
             UInt32 advanceOther = GetVar(VAR_GUANGGUN_ADVANCE_OTHER);
-            if(advanceOther>=24)
-                return ;
-            UInt32 goldLeft = GetVar(VAR_GUANGGUN_RECHARGE)%100;
-            AddVar(VAR_GUANGGUN_RECHARGE,r);
-            UInt32 counts = (r+goldLeft)/100; 
-            counts = counts>24-advanceOther?24-advanceOther:counts;
-            AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
-            AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
-            sendGuangGunInfo();
+            if(advanceOther<24)
+            {
+                sendGuangGunInfo();
+                UInt32 goldLeft = GetVar(VAR_GUANGGUN_RECHARGE)%100;
+                AddVar(VAR_GUANGGUN_RECHARGE,r);
+                UInt32 counts = (r+goldLeft)/100; 
+                counts = counts>24-advanceOther?24-advanceOther:counts;
+                AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
+                AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
+                sendGuangGunInfo();
+            }
         }
         addRechargeNextRet(r);
         {
@@ -25174,9 +25176,9 @@ void Player::GGTeamPlayerLeave(UInt64 id)
         return ;
     if(getGGStatus() !=1 )
         return ;
-    if(m_gginfo.player1->getId() == id )
+    if(m_gginfo.player1 && m_gginfo.player1->getId() == id )
         m_gginfo.player1 = NULL;
-    else if(m_gginfo.player2->getId() == id )
+    else if(m_gginfo.player2 && m_gginfo.player2->getId() == id )
         m_gginfo.player2 = NULL;
     else return ;
     AddGuangGunScore(0);

@@ -1390,6 +1390,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->sendGameBoxAward();
 
     }
+    pl->sendGuangGunInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -3853,15 +3854,17 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     if(World::getGGTime())
                     {
                         UInt32 advanceOther = player->GetVar(VAR_GUANGGUN_ADVANCE_OTHER);
-                        if(advanceOther>=24)
-                            return ;
-                        UInt32 goldLeft =player->GetVar(VAR_GUANGGUN_CONSUME)%100;
-                        player->AddVar(VAR_GUANGGUN_CONSUME,price);
-                        UInt32 counts = (price+goldLeft)/100; 
-                        counts =( counts > 24-advanceOther?24-advanceOther:counts);
-                        player->AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
-                        player->AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
-                        player->sendGuangGunInfo();
+                        if(advanceOther<24)
+                        {
+                            player->sendGuangGunInfo();
+                            UInt32 goldLeft =player->GetVar(VAR_GUANGGUN_CONSUME)%100;
+                            player->AddVar(VAR_GUANGGUN_CONSUME,price);
+                            UInt32 counts = (price+goldLeft)/100; 
+                            counts =( counts > 24-advanceOther?24-advanceOther:counts);
+                            player->AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
+                            player->AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
+                            player->sendGuangGunInfo();
+                        }
                     }
                     st << static_cast<UInt8>(0);
 
