@@ -2228,7 +2228,11 @@ void ClanBoss::reward()
         SYSMSG(title1, 4968);
         SYSMSGV(content1, 4969, rankCount, it->first, str.c_str());
         if(it->second)
-            getLeader(it->second)->GetMailBox()->newMail(NULL, 0x01, title1, content1);
+        {
+            Player* leader = getLeader(it->second);
+            if(leader)
+                leader->GetMailBox()->newMail(NULL, 0x01, title1, content1);
+        }
 
         it->second->setGongxian(0, true);
         it->second->clearUrge();
