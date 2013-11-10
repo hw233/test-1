@@ -1390,6 +1390,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->sendGameBoxAward();
 
     }
+    pl->sendGuangGunInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -3853,15 +3854,17 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     if(World::getGGTime())
                     {
                         UInt32 advanceOther = player->GetVar(VAR_GUANGGUN_ADVANCE_OTHER);
-                        if(advanceOther>=24)
-                            return ;
-                        UInt32 goldLeft =player->GetVar(VAR_GUANGGUN_CONSUME)%100;
-                        player->AddVar(VAR_GUANGGUN_CONSUME,price);
-                        UInt32 counts = (price+goldLeft)/100; 
-                        counts =( counts > 24-advanceOther?24-advanceOther:counts);
-                        player->AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
-                        player->AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
-                        player->sendGuangGunInfo();
+                        if(advanceOther<24)
+                        {
+                            player->sendGuangGunInfo();
+                            UInt32 goldLeft =player->GetVar(VAR_GUANGGUN_CONSUME)%100;
+                            player->AddVar(VAR_GUANGGUN_CONSUME,price);
+                            UInt32 counts = (price+goldLeft)/100; 
+                            counts =( counts > 24-advanceOther?24-advanceOther:counts);
+                            player->AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
+                            player->AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
+                            player->sendGuangGunInfo();
+                        }
                     }
                     st << static_cast<UInt8>(0);
 
@@ -6430,11 +6433,12 @@ void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
 void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-	if(!player->hasChecked())
-		return;
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 opt = 0;
     br >> opt;
+
+	if((opt != 5) && (!player->hasChecked()))
+		return;
 
 	Package * pkg = player->GetPackage();
 
@@ -7323,6 +7327,113 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     player->buyTownTjItem(itemId);
                     break;
             }
+        }
+        break;
+    case 0x22:  // 光棍节活动
+        {
+            brd >> op;
+            switch(op)
+            {
+            case 0x01:
+                {
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 1)
+                        player->sendGuangGunInfo();
+                    else if(form == 2)
+                    {
+                        GObject::Player *  cap = player->getGGTimeCaptain();
+                        UInt32 grade =  cap->getGGTimeScore(); 
+                        GameMsgHdr hdr(0x1D6, WORKER_THREAD_WORLD, cap, sizeof(grade));
+                        GLOBAL().PushMsg(hdr, &grade);
+                    }
+               }
+                break;
+            case 0x02:
+                {
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 0)
+                    {
+                        std::string name;
+                        brd >> name;
+	                    GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
+                        GObject::Player *cap = player->getGGTimeCaptain();
+                        if(player == pl )
+                            return ;
+                        if(!pl)
+                            break;
+                        if(cap->CheckGGCanInvit(pl))
+                            return;
+                        SYSMSGV(title, 218, player->getCountry(), player->getName().c_str());
+                        SYSMSGV(content, 219, player->getCountry(), player->getName().c_str());
+                        pl->GetMailBox()->newMail(player, 0x15, title, content);
+                    }
+                    else if(form == 1)
+                    {
+                        player->LeaveGGTime();
+                    }
+                }
+                break;
+            case 0x03:
+                {
+                    UInt8 pos = player->getGuangGunPos();
+                    GameMsgHdr hdr1(0x381, player->getThreadId(), player, sizeof(pos));
+                    GLOBAL().PushMsg(hdr1, &pos);
+                }
+            case 0x04:
+                {
+                    UInt8 op = 0;
+                    brd >> op;
+                    switch(op)
+                    {
+                        case 0:
+                            player->GuangGunCompleteTask(2);
+                            break;
+                        case 1:
+                            player->GuangGunCompleteTask(1);
+                            break;
+                        case 2:
+                            {
+                                UInt8 type = 0 ;
+                                GameMsgHdr hdr2(0x366, player->getThreadId(), player, sizeof(type));
+                                GLOBAL().PushMsg(hdr2, &type);
+                            }
+                            break;
+                        case 3:
+                            {
+                                std::string name;
+                                brd >> name;
+                                GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
+                                UInt8 gold =0 ;
+                                brd >>gold;
+                                if(!pl)
+                                    break;
+                                player -> AddGGTimes(pl,gold);
+                                break;
+                            }
+                        case 4:
+                            player->BuyGuangGunAdvance();
+                            break;
+                        case 5:
+                            player->GuangGunCompleteTask(3);
+                            break;
+                        case 6:
+                            player->getCompassChance();
+                            break;
+                        case 7:
+                            UInt8 counts;
+                            brd >> counts;
+                            player->BuyCompassChance(counts);
+                            break;
+                    }
+                }
+                player->sendGuangGunInfo();
+                break;
+            default:
+                break;
+            }
+
         }
         break;
     default:
