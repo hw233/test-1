@@ -24807,7 +24807,6 @@ void Player::Send11GradeAward(UInt8 type)
     udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 
 }
-<<<<<<< HEAD
 void Player::SetNovLogin()
 {
     UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
@@ -24918,7 +24917,7 @@ bool Player::checkClientIP()
         return false;
 
     return true;
-=======
+}
 void Player::Buy7DayFund()
 {
    
@@ -24970,7 +24969,6 @@ void Player::get7DayFundAward(UInt8 type)
        getGold(Coupon[type-1]); 
    FundAward |=(1<<(type-1));
    SetVar(VAR_GROWUPFUND_AWARD,FundAward);
->>>>>>> lib3
 }
 
 } // namespace GObject
