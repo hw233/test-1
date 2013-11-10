@@ -76,7 +76,6 @@ struct clan_sort
 
 typedef std::multiset<RCSort, lt_rcsort> RCSortType;
 typedef std::set<ClanSort,clan_sort> ClanGradeSort;
-typedef std::multiset<RCSort, lt_rcsort> RCSortType2;
 
 struct supportSort
 {

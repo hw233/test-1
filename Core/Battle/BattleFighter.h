@@ -1158,12 +1158,9 @@ private:
     inline void setPeerLessDisableLast(UInt8 l) { _peerlessDisableLast = l; }
     inline UInt8 getPeerLessDisableLast() { return _peerlessDisableLast; }
 
-    UInt8 _peerlessDisableSSLast;
-    inline void setPeerLessDisableSSLast(UInt8 l) { _peerlessDisableSSLast = l; }
-    inline UInt8 getPeerLessDisableSSLast() { return _peerlessDisableSSLast; }
-    const GData::SkillBase* _peerlessDisableSkill;
-    inline void setPeerLessDisableSkill(const GData::SkillBase* skill) { _peerlessDisableSkill = skill; }
-    inline const GData::SkillBase* getPeerLessDisableSkill() { return _peerlessDisableSkill; }
+    UInt8 _peerlessDisableSSLast[25];
+    inline void setPeerLessDisableSSLast(UInt8 i, UInt8 l) { if(i < 25) _peerlessDisableSSLast[i] = l; }
+    inline UInt8 getPeerLessDisableSSLast(UInt8 i) { if(i < 25) return _peerlessDisableSSLast[i]; else return 0; }
     UInt32 _peerlessDisableSSHP[25];
     inline void setPeerLessDisableSSHP(UInt8 i, UInt32 hp) { if(i < 25) _peerlessDisableSSHP[i] = hp; }
     inline UInt32 getPeerLessDisableSSHP(UInt8 i) { if(i < 25) return _peerlessDisableSSHP[i]; else return 0; }
