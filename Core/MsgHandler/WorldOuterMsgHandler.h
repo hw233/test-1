@@ -2829,7 +2829,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     {
                         std::string name;
                         brd >> name;
-	                    GObject::Player * pl = GObject::globalNamedPlayers[name];
+	                    GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
                         GObject::Player *cap = player->getGGTimeCaptain();
                         if(player == pl )
                             return ;
@@ -2876,7 +2876,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                             {
                                 std::string name;
                                 brd >> name;
-                                GObject::Player * pl = GObject::globalNamedPlayers[name];
+                                GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
                                 UInt8 gold =0 ;
                                 brd >>gold;
                                 if(!pl)
