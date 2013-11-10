@@ -24807,6 +24807,7 @@ void Player::Send11GradeAward(UInt8 type)
     udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 
 }
+<<<<<<< HEAD
 void Player::SetNovLogin()
 {
     UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
@@ -24917,6 +24918,59 @@ bool Player::checkClientIP()
         return false;
 
     return true;
+=======
+void Player::Buy7DayFund()
+{
+   
+    if(!in7DayFromCreated())
+       return ;
+    UInt32 FundType = GetVar(VAR_GROWUPFUND_TYPE);
+    UInt32 gold = 188;
+    if(FundType != 0)
+        return ;
+    if (getGold() < gold)
+    {
+        sendMsgCode(0, 1101);
+        return ;
+    }
+    ConsumeInfo ci(Fund,0,0);
+    useGold(gold,&ci);
+    SetVar(VAR_GROWUPFUND_TYPE,1);
+}
+void Player::send7DayFundInfo()
+{
+            
+   UInt32 FundType = GetVar(VAR_GROWUPFUND_TYPE);
+   UInt32 FundAward = GetVar(VAR_GROWUPFUND_AWARD); 
+   if( !in7DayFromCreated() && !FundType)
+       return ;
+   Stream st(REP::RC7DAY);  //协议
+   st<<static_cast<UInt8>(26);
+   st<<static_cast<UInt8>(FundType);
+   st<<FundAward;
+   st<<Stream::eos;
+   send(st);
+}
+void Player::get7DayFundAward(UInt8 type)
+{
+   UInt32 Coupon[10]={20,30,50,50,100,120,150,180,120,120};
+   UInt32 FundType = GetVar(VAR_GROWUPFUND_TYPE);
+   UInt32 FundAward = GetVar(VAR_GROWUPFUND_AWARD); 
+   if(!FundType)
+       return ;
+   if(type <1 ||type >10)
+       return ;
+   if(GetLev() < 30 + type *5 )
+       return ;
+   if(FundAward &(1<<(type-1)))
+       return ;
+   if(type > 4 && type < 9)
+       getCoupon(Coupon[type-1]);
+   else 
+       getGold(Coupon[type-1]); 
+   FundAward |=(1<<(type-1));
+   SetVar(VAR_GROWUPFUND_AWARD,FundAward);
+>>>>>>> lib3
 }
 
 } // namespace GObject

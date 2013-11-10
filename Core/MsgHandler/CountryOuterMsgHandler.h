@@ -1368,7 +1368,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->GetTaskMgr()->CompletedTask(202);
     pl->SetQQBoardValue();
     pl->sendQQBoardLoginInfo();
-    pl->sendSummerMeetInfo();
+    pl->sendSummerMeetInfo();   //Fund
+    pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
 }
@@ -5964,6 +5965,16 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
               }
               player->sendNovLoginInfo();
             }
+            break;
+        case 26:
+            br >>index;
+            if(idx == 0 )
+                player->Buy7DayFund();
+            else if(idx == 1)
+            {
+                player->get7DayFundAward(index);
+            }
+            player->send7DayFundInfo();
             break;
         default:
             break;
