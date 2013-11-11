@@ -1091,7 +1091,7 @@ namespace GObject
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
-        SetMemCach();
+        //SetMemCach();
        // continuousLoginSummerFlow();//修改
 
         sendYearRPInfo();
@@ -13623,7 +13623,7 @@ namespace GObject
     //蜀山奇遇充值奖励
     void Player::getSummerMeetRechargeAward(UInt8 val)
     {
-        UInt32 Recharge[]={10,50,100,300,600,1000,3000};
+        UInt32 Recharge[]={10,50,100,300,600,1000,2000};
         UInt32 recharge = GetVar(VAR_SUMMER_MEET_RECHARGE);
         if(val<1||val>7)
             return ;
@@ -24922,6 +24922,10 @@ void Player::roamingGuangGun(UInt8 pos)
     send(st);
     UpdateGGInfo();
     sendGuangGunInfo();
+        
+    char str[16] = {0};
+    sprintf(str, "F_131109_1");
+    udpLog("qingyiluopan", str, "", "", "", "", "act");
 }
 UInt32 Player::getGGTimeScore()
 {
@@ -25172,6 +25176,9 @@ void Player::RunFriendlyCompass(UInt8 type)
    UpdateGGInfo();
    sendGuangGunInfo();
    AddGuangGunScore();
+   char str[16] = {0};
+   sprintf(str, "F_131109_5");
+   udpLog("qingyiluopan", str, "", "", "", "", "act");
 }
 void Player::getGGTaskAward()
 {
@@ -25237,6 +25244,9 @@ void Player::BuyGuangGunAdvance()
    AddVar(VAR_GUANGGUN_ADVANCE_BUY,1);
    AddVar(VAR_GUANGGUN_ADVANCE_NUM,1);
    AddVar(VAR_GUANGGUN_ADVANCE_OTHER,1);
+   char str[16] = {0};
+   sprintf(str, "F_131109_3");
+   udpLog("qingyiluopan", str, "", "", "", "", "act");
 }
 
 void  Player::AddGGTimes(Player* pl,UInt8 type,UInt8 flag)
@@ -25265,6 +25275,9 @@ void  Player::AddGGTimes(Player* pl,UInt8 type,UInt8 flag)
        return ;
    }
    SetVar(VAR_GUANGGUN_TIMES,time[type]);
+   char str[16] = {0};
+   sprintf(str, "F_131109_%d",6+type);
+   udpLog("qingyiluopan", str, "", "", "", "", "act");
 }
 void Player::getCompassChance()      //获取财富之星
 {
@@ -25276,6 +25289,9 @@ void Player::getCompassChance()      //获取财富之星
     m_gginfo.counts += 1;
     AddVar(VAR_GUANGGUN_GETROLL,1);
     UpdateGGInfo();
+    char str[16] = {0};
+    sprintf(str, "F_131109_2");
+    udpLog("qingyiluopan", str, "", "", "", "", "act");
 }
 void Player::BuyCompassChance(UInt8 counts)
 {
@@ -25286,6 +25302,9 @@ void Player::BuyCompassChance(UInt8 counts)
    useGold(gold,&ci);
    m_gginfo.counts+=counts ; 
    UpdateGGInfo();
+   char str[16] = {0};
+   sprintf(str, "F_131109_4");
+   udpLog("qingyiluopan", str, "", "", "", "", "act");
 }
 void Player::SetNovLogin()
 {
@@ -25415,6 +25434,10 @@ void Player::Buy7DayFund()
     ConsumeInfo ci(Fund,0,0);
     useGold(gold,&ci);
     SetVar(VAR_GROWUPFUND_TYPE,1);
+        
+    char str[16] = {0};
+    sprintf(str, "F_131106_1");
+    udpLog("chengzhangjijin", str, "", "", "", "", "act");
 }
 void Player::send7DayFundInfo()
 {
@@ -25449,6 +25472,10 @@ void Player::get7DayFundAward(UInt8 type)
        getGold(Coupon[type-1]); 
    FundAward |=(1<<(type-1));
    SetVar(VAR_GROWUPFUND_AWARD,FundAward);
+   char str[16] = {0};
+   sprintf(str, "F_131106_%d",1+type);
+   udpLog("chengzhangjijin", str, "", "", "", "", "act");
+
 }
 
 } // namespace GObject
