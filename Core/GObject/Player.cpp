@@ -25480,7 +25480,7 @@ void Player::Buy7DayFund()
         return ;
     if (getGold() < gold)
     {
-        sendMsgCode(0, 1101);
+        sendMsgCode(0, 1104);
         return ;
     }
     ConsumeInfo ci(Fund,0,0);
