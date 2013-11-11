@@ -208,6 +208,8 @@ namespace GObject
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))
 #define GET_BIT_MARK(X,Y)     ((X>>Y) & 1)
 
+#define GET_BIT_2(X,Y)   ((X >> (Y*2)) & 0x03)
+
 #ifdef _FB
 #define LIMIT_LEVEL  60
 #else
@@ -581,9 +583,11 @@ namespace GObject
         UInt32 step;
         UInt32 beginTime;
         UInt32 endTime;
-        UInt16 randKey;
         UInt8 restAllNum;
-        QiShiBanInfo() : score(0), step(0), beginTime(0), endTime(0), randKey(0), restAllNum(0) {}
+        UInt16 awardMark;
+        UInt16 randKey;
+        UInt8 addTimeNum;
+        QiShiBanInfo() : score(0), step(0), beginTime(0), endTime(0), restAllNum(0), awardMark(0), randKey(0), addTimeNum(0) {}
     };
 
 	struct PlayerData
@@ -1854,7 +1858,7 @@ namespace GObject
         
         //七石斗法 begin
           
-        void loadQiShiBanFromDB(UInt32 score, UInt32 step, UInt32 beginTime, UInt32 endTime, UInt8 restAllNum);
+        void loadQiShiBanFromDB(UInt32 score, UInt32 step, UInt32 beginTime, UInt32 endTime, UInt8 restAllNum, UInt16 awardMark);
        
         void MyQSBInfo();
         void OnQiShiBanRank();
@@ -1866,6 +1870,7 @@ namespace GObject
         void ContinueCurStep();
         void Update_QSB_DB();
         void CleanQiShiBan();
+        void GetPersonalAward(UInt8 opt);
         UInt32 GetQQFriendScore(const char * openId);
         bool CheckReqDataTime();
         void SetReqDataTime(UInt8 mark=1);
@@ -1889,8 +1894,13 @@ namespace GObject
         void SetQiShiBanRestAllNum(UInt8 num) { m_qishiban.restAllNum = num; }
         UInt8 GetQiShiBanRestAllNum() const { return m_qishiban.restAllNum; }
 
-        bool MemCachInit();
-        MCached m_MCached; // 注意：该m_MCached只用于世界线程；
+        void SetQiShiBanAwardMark(UInt16 mark) { m_qishiban.awardMark = mark; }
+        UInt16 GetQiShiBanAwardMark() const { return m_qishiban.awardMark; }
+
+        void SetQiShiBanAddTimeNum(UInt8 num) { m_qishiban.addTimeNum = num; }
+        void AddQiShiBanAddTimeNum() { m_qishiban.addTimeNum += 1; }
+        UInt32 GetQiShiBanAddTimeNum() const { return m_qishiban.addTimeNum; }
+
         UInt32  m_checkTime;
         //七石斗法 end
 

@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS `player_qishiban` (
     `beginTime` int(10) unsigned NOT NULL DEFAULT '0',
     `endTime` int(10) unsigned NOT NULL DEFAULT '0',
     `restAllNum` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `awardMark` tinyint(3) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY(`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

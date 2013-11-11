@@ -5922,7 +5922,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading QiShiBan");
         DBQiShiBan qishiban;
-        if(execu->Prepare("SELECT `playerId`, `guankaId`, `score`, `beginTime`, `endTime`, `restAllNum` FROM `player_qishiban` ORDER BY `score`", qishiban) != DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`, `guankaId`, `score`, `beginTime`, `endTime`, `restAllNum`, `awardMark` FROM `player_qishiban` ORDER BY `score`", qishiban) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
         Player* pl = NULL;
@@ -5938,7 +5938,7 @@ namespace GObject
 			if(pl == NULL)
 				continue;
 
-            pl->loadQiShiBanFromDB(qishiban.score, qishiban.step, qishiban.beginTime, qishiban.endTime, qishiban.restAllNum);
+            pl->loadQiShiBanFromDB(qishiban.score, qishiban.step, qishiban.beginTime, qishiban.endTime, qishiban.restAllNum, qishiban.awardMark);
         }
         lc.finalize();
         return true;

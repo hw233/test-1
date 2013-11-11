@@ -269,6 +269,7 @@ enum ItemFrom
     FromClanSptr = 61, // 神魔之树
     FromCollectCard = 62, //卡片转化池
     Fromkeyin = 63, //壁凰墨转化磐龙墨
+    FromQiShiBan = 64, //七石斗法
     //80 ~ 100，繁体占用
 };
 

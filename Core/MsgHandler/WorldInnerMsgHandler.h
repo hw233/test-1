@@ -896,11 +896,25 @@ void SendQiShiBanRank( GameMsgHdr& hdr,  const void* data )
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
 
+    UInt32 rank = 0;
+    UInt32 myRank = 0;
+    UInt32 myScore = 0;
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        rank++;
+        if (i->player == player)
+        {
+            myScore = i->total;
+            myRank = rank;
+            break;
+        }
+    }
+
     Stream st(REP::ACT);
     UInt32 cnt = World::qishibanScoreSort.size();
     if (cnt > 10)
         cnt = 10;
-    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << myRank << myScore << static_cast<UInt8>(cnt);
     UInt32 c = 0;
     for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
     {
