@@ -1901,5 +1901,134 @@ void OnTeamArenaAddMember( GameMsgHdr& hdr, const void * data )
 	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
     GObject::teamArenaMgr.addTeamMember(pl, player);
 }
+#define CNT_3 3
+void SendGuangGunRank(Stream& st)
+{
+    World::initRCRank();
+    using namespace GObject;
+    UInt32 cnt = World::guangGunSort.size();
+    if (cnt > CNT_3)
+        cnt = CNT_3;
+    st << static_cast<UInt8>(cnt);
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
+    {
+        if(i->player == NULL)
+            continue;
+        st << i->player->getName();
+        if(i->player->getGGPlayer1())
+            st <<i->player->getGGPlayer1()->getName();
+        else
+            st<<"";
+        if(i->player->getGGPlayer2())
+            st <<i->player->getGGPlayer2()->getName();
+        else 
+            st<<"";
+        st << i->total;
+        ++c;
+        if (c >= CNT_3)
+            break;
+    }
+
+}
+void OnSendGuangGunRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+    Player* pl = player->getGGTimeCaptain();
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == pl)
+        {
+            break;
+        }
+    }
+    if(!pl->getGGTimeScore())
+       rank = 0; 
+    Stream st(REP::ACT);//GG
+    st << static_cast<UInt8>(0x22) << static_cast<UInt8>(1) << static_cast<UInt8>(2);
+    st << static_cast<UInt8>(rank > 255 ? 255 : rank);
+    SendGuangGunRank(st);
+    st <<Stream::eos;
+    pl->send(st);
+    if(pl->getGGPlayer1())
+        pl->getGGPlayer1()->send(st);
+    if(pl->getGGPlayer2())
+        pl->getGGPlayer2()->send(st);
+}
+
+
+void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *((UInt32*)data);
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= CNT_3)
+                inrank = true;
+            World::guangGunSort.erase(i);
+            break;
+        }
+    }
+    if (!total)
+        return;
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::guangGunSort.insert(s);
+    GObject::Player *cap = player->getGGTimeCaptain();
+    cap ->sendGuangGunInfo();
+    if(cap->getGGPlayer1())
+        cap->getGGPlayer1()->sendGuangGunInfo();
+    if(cap->getGGPlayer2())
+        cap->getGGPlayer2()->sendGuangGunInfo();
+        
+/*    UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
+    for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
+    {
+       if (!stop)
+            ++myrank;
+
+        if (i->player == pl)
+            stop = true;
+
+        ++rank;
+        {
+            Stream st(REP::ACT);//GG
+            st << static_cast<UInt8>(0x22) << static_cast<UInt8>(1) << static_cast<UInt8>(2);
+            st << static_cast<UInt8>(rank > 255 ? 255 : rank);
+            st << i->player->getName();
+            if(i->player->getGGPlayer1())
+                st <<i->player->getGGPlayer1()->getName();
+            else
+                st<<"";
+            if(i->player->getGGPlayer2())
+                st <<i->player->getGGPlayer2()->getName();
+            else 
+                st<<"";
+            st << i->total;
+            st <<Stream::eos;
+            i->player->send(st);
+            if(i->player->getGGPlayer1())
+                i->player->getGGPlayer1()->send(st);
+            if(i->player->getGGPlayer2())
+                i->player->getGGPlayer2()->send(st);
+        }
+    }
+*/
+}
 
 #endif // _WORLDINNERMSGHANDLER_H_

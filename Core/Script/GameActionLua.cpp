@@ -298,6 +298,7 @@ namespace Script
 		CLASS_DEF(Player, getQQVipPrivilege);
 		CLASS_DEF(Player, setQQVipPrivilege);
 		CLASS_DEF(Player, postRoamResult);
+		CLASS_DEF(Player, setGuangGunTask);
 		CLASS_DEF(Player, postKillMonsterRoamResult);
         CLASS_DEF(Player, lastQueqiaoAwardPush);
         CLASS_DEF(Player, lastKillMonsterAwardPush);
@@ -1532,10 +1533,14 @@ namespace Script
 	{
 		return Call<UInt8>("onGetAthlRandomDiffculty");
 	}
-
     UInt8 GameActionLua::onRoamingQueqiao(Player* pl, UInt8 pos)
     {
-		return Call<UInt8 >(qixiTmpl._onRoamingFunc, pl, pos);
+        return Call<UInt8 >(qixiTmpl._onRoamingFunc, pl, pos);
+    }
+
+    UInt8 GameActionLua::onRoamingGuangGun(Player* pl, UInt8 pos)
+    {
+		return Call<UInt8 >("onRoamingGuangGun", pl, pos);
     }
     
     UInt32 GameActionLua::GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed)
