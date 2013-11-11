@@ -363,6 +363,13 @@ struct CountryBattleJoinStruct
 	MESSAGE_DEF1(REQ::CAMPS_WAR_JOIN, UInt8, _action);
 };
 
+struct CountryBattleInfo
+{
+	UInt8 _action;
+
+	MESSAGE_DEF1(REQ::CAMPS_WAR_INFO, UInt8, _action);
+};
+
 struct LanchChallengeReq
 {
 	std::string target;
@@ -1374,9 +1381,22 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->GetTaskMgr()->CompletedTask(202);
     pl->SetQQBoardValue();
     pl->sendQQBoardLoginInfo();
-    pl->sendSummerMeetInfo();
+    pl->sendSummerMeetInfo();   //Fund
+    pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
+    if(atoi(pl->getDomain()) == 6)
+    {
+        if(!pl)
+            return;
+        if(!pl->GetVar(GObject::VAR_GAMEBOX_DAILY))
+            pl->SetVar(GObject::VAR_GAMEBOX_DAILY,1);
+        if(!pl->GetVar(GObject::VAR_GAMEBOX_NEW))
+            pl->SetVar(GObject::VAR_GAMEBOX_NEW,1);
+        pl->sendGameBoxAward();
+
+    }
+    pl->sendGuangGunInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1415,6 +1435,14 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 player->setMapId(mapId);
             }
             break;
+        case 0x20:
+            {
+                UInt32 itemid;
+                UInt8 binding;
+                string name;
+                br >> itemid >> binding >> name;
+                player->modifyPlayerName(itemid,binding,name);
+            }
         default:
             return;
 	}
@@ -1851,9 +1879,15 @@ void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
     if(result != 2)
     {
         if(1 == ftr._type || 2 == ftr._type) //资质洗炼
+        {
             GameAction()->doStrong(player, SthCapacity, 0, 0);
+            player->GuangGunCompleteTask(0,28);
+        }
         if(3 == ftr._type || 4 == ftr._type) //潜力洗炼
+        {
             GameAction()->doStrong(player, SthPotential, 0, 0);
+            player->GuangGunCompleteTask(0,29);
+        }
     }
 }
 
@@ -2169,7 +2203,10 @@ void OnOpenSocketReq( GameMsgHdr& hdr, OpenSocketReq& osr )
 	st << result << osr._fighterId << osr._itemid << Stream::eos;
 	player->send(st);
     if(result != 2)
+    {
         GameAction()->doStrong(player, SthOpenSocket, 0, 0);
+        player->GuangGunCompleteTask(0,5);
+    }
 }
 
 #if 0
@@ -2862,6 +2899,28 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
     if(rep.result == 0)
         player->countryBattleUdpLog(1090, player->getCountry());
 	player->send(rep);
+}
+
+void CountryBattleInfoReq( GameMsgHdr& hdr, CountryBattleInfo& req )
+{
+	MSG_QUERY_PLAYER(player);
+    if(WORLD().isNewCountryBattle() || (gClanCity && gClanCity->isOpen()))
+		return;
+	if(!PLAYER_DATA(player, inCity))
+		return;
+	UInt16 loc = PLAYER_DATA(player, location);
+	GObject::SpotData * spot = GObject::Map::Spot(loc);
+	if(spot == NULL || !spot->m_CountryBattle)
+		return;
+
+	CountryBattleJoinReply rep;
+	CountryBattle * cb = spot->GetCountryBattle();
+    if(!cb) return;
+	if(req._action == 0)
+	{
+		rep.result = cb->playerEnter(player) ? 0 : 2;
+        cb->sendInfo(player);
+	}
 }
 
 void NewCountryBattleJoinReq( GameMsgHdr& hdr, const void * data )
@@ -3798,6 +3857,21 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         if(price>=1000 && player->getClan())
                             SYSMSG_BROADCASTV(4956,player->getClan()->getName().c_str(),player->getCountry() ,player->getPName());
                     }
+                    if(World::getGGTime())
+                    {
+                        UInt32 advanceOther = player->GetVar(VAR_GUANGGUN_ADVANCE_OTHER);
+                        if(advanceOther<24)
+                        {
+                            player->sendGuangGunInfo();
+                            UInt32 goldLeft =player->GetVar(VAR_GUANGGUN_CONSUME)%100;
+                            player->AddVar(VAR_GUANGGUN_CONSUME,price);
+                            UInt32 counts = (price+goldLeft)/100; 
+                            counts =( counts > 24-advanceOther?24-advanceOther:counts);
+                            player->AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
+                            player->AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
+                            player->sendGuangGunInfo();
+                        }
+                    }
                     st << static_cast<UInt8>(0);
 
                     if (lr._type == PURCHASE1 + 1 )
@@ -4373,7 +4447,16 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
 			pl->GetMailBox()->newMail(player, 0x13, title, content);
 		}
 		break;
-	case 2:
+/*    case 12:
+        {
+            if(player->CheckGGCanInvit(pl))
+				return;
+			SYSMSGV(title, 214, player->getCountry(), player->getName().c_str());
+			SYSMSGV(content, 215, player->getCountry(), player->getName().c_str());
+			pl->GetMailBox()->newMail(player, 0x15, title, content);
+            break;
+        }
+*/	case 2:
 		player->delFriend(pl);
 		pl->delFriend(player);
 		break;
@@ -5971,6 +6054,16 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
               player->sendNovLoginInfo();
             }
             break;
+        case 26:
+            br >>index;
+            if(idx == 0 )
+                player->Buy7DayFund();
+            else if(idx == 1)
+            {
+                player->get7DayFundAward(index);
+            }
+            player->send7DayFundInfo();
+            break;
         default:
             break;
     }
@@ -6346,11 +6439,12 @@ void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
 void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-	if(!player->hasChecked())
-		return;
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 opt = 0;
     br >> opt;
+
+	if((opt != 5) && (!player->hasChecked()))
+		return;
 
 	Package * pkg = player->GetPackage();
 
@@ -7239,6 +7333,113 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     player->buyTownTjItem(itemId);
                     break;
             }
+        }
+        break;
+    case 0x22:  // 光棍节活动
+        {
+            brd >> op;
+            switch(op)
+            {
+            case 0x01:
+                {
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 1)
+                        player->sendGuangGunInfo();
+                    else if(form == 2)
+                    {
+                        GObject::Player *  cap = player->getGGTimeCaptain();
+                        UInt32 grade =  cap->getGGTimeScore(); 
+                        GameMsgHdr hdr(0x1D6, WORKER_THREAD_WORLD, cap, sizeof(grade));
+                        GLOBAL().PushMsg(hdr, &grade);
+                    }
+               }
+                break;
+            case 0x02:
+                {
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 0)
+                    {
+                        std::string name;
+                        brd >> name;
+	                    GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
+                        GObject::Player *cap = player->getGGTimeCaptain();
+                        if(player == pl )
+                            return ;
+                        if(!pl)
+                            break;
+                        if(cap->CheckGGCanInvit(pl))
+                            return;
+                        SYSMSGV(title, 218, player->getCountry(), player->getName().c_str());
+                        SYSMSGV(content, 219, player->getCountry(), player->getName().c_str());
+                        pl->GetMailBox()->newMail(player, 0x15, title, content);
+                    }
+                    else if(form == 1)
+                    {
+                        player->LeaveGGTime();
+                    }
+                }
+                break;
+            case 0x03:
+                {
+                    UInt8 pos = player->getGuangGunPos();
+                    GameMsgHdr hdr1(0x381, player->getThreadId(), player, sizeof(pos));
+                    GLOBAL().PushMsg(hdr1, &pos);
+                }
+            case 0x04:
+                {
+                    UInt8 op = 0;
+                    brd >> op;
+                    switch(op)
+                    {
+                        case 0:
+                            player->GuangGunCompleteTask(2);
+                            break;
+                        case 1:
+                            player->GuangGunCompleteTask(1);
+                            break;
+                        case 2:
+                            {
+                                UInt8 type = 0 ;
+                                GameMsgHdr hdr2(0x366, player->getThreadId(), player, sizeof(type));
+                                GLOBAL().PushMsg(hdr2, &type);
+                            }
+                            break;
+                        case 3:
+                            {
+                                std::string name;
+                                brd >> name;
+                                GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
+                                UInt8 gold =0 ;
+                                brd >>gold;
+                                if(!pl)
+                                    break;
+                                player -> AddGGTimes(pl,gold);
+                                break;
+                            }
+                        case 4:
+                            player->BuyGuangGunAdvance();
+                            break;
+                        case 5:
+                            player->GuangGunCompleteTask(3);
+                            break;
+                        case 6:
+                            player->getCompassChance();
+                            break;
+                        case 7:
+                            UInt8 counts;
+                            brd >> counts;
+                            player->BuyCompassChance(counts);
+                            break;
+                    }
+                }
+                player->sendGuangGunInfo();
+                break;
+            default:
+                break;
+            }
+
         }
         break;
     default:

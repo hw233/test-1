@@ -2888,6 +2888,16 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
         }
         break;
+        case 0x22:  // 光棍节活动
+        {
+            
+            if( ! WORLD().getGGTime() )
+                break;
+
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            break;
+        }
         default:
             break;
     }

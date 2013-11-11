@@ -2974,10 +2974,18 @@ namespace GObject
             hf->updateHftValueToDB(hft);
         bless = hf->getHftValue(hft);
         if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+        {
             GameAction()->doStrong(this->m_Owner, SthTrumpEnchant, 0, 0);
+            m_Owner->GuangGunCompleteTask(0,2);
+            m_Owner->GuangGunCompleteTask(0,15);
+        }
         else
+        {
             GameAction()->doStrong(this->m_Owner, SthEnchant, 0, 0);
-		AddItemHistoriesLog(item_enchant_l + type, enc_times);
+            m_Owner->GuangGunCompleteTask(0,1);
+            m_Owner->GuangGunCompleteTask(0,23);
+        }
+        AddItemHistoriesLog(item_enchant_l + type, enc_times);
         //DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%" I64_FMT "u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), item_enchant_l + type, enc_times, TimeUtil::Now());
         ConsumeInfo ci(EnchantEquipment,0,0);
         m_Owner->useTael(amount * enc_times, &ci);
@@ -4259,6 +4267,7 @@ namespace GObject
 			DelItem(ITEM_GEM_PROTECT, protectUnbindUsed, false, ToGemMgerge);
 
         GameAction()->doStrong(this->m_Owner, SthMergeGem, 0, 0);
+        m_Owner->GuangGunCompleteTask(0,4);
 		return result;
     }
 
@@ -5622,6 +5631,8 @@ namespace GObject
         //装备洗练成就
         GameAction()->doAttainment(this->m_Owner, 10175, 0);
         GameAction()->doStrong(this->m_Owner, SthForge, 0, 0);
+        m_Owner->GuangGunCompleteTask(0,3);
+        m_Owner->GuangGunCompleteTask(0,19);
         m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 0, 0);
 		UInt8 lv = equip->getValueLev();
 		UInt8 q = equip->getQuality() - 3;
@@ -6179,6 +6190,7 @@ namespace GObject
             m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 1, 1);
 
         GameAction()->doStrong(m_Owner, SthTrumpUpgrade, 0, 0);
+        m_Owner->GuangGunCompleteTask(0,6);
         return 0;
     }
 
@@ -6316,6 +6328,7 @@ namespace GObject
 
                 DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spLev%u` = %u, `spform1` = %u, `spform2` = %d, `spform3` = %u WHERE `id` = %u", form, ied_equip.spiritAttr.spLev[form - 1], ied_equip.spiritAttr.spForm[0], ied_equip.spiritAttr.spForm[1], ied_equip.spiritAttr.spForm[2], equip->getId());
                 GameAction()->doStrong(m_Owner, SthEquipSpirit, 0, 0);
+                m_Owner->GuangGunCompleteTask(0,7);
                 m_Owner->udpLog("lianqi", "F_131024_4", "", "", "", "", "act");
             }
             break;
@@ -6579,7 +6592,6 @@ namespace GObject
         sendLingbaoSmeltInfo();
         GameAction()->doStrong(m_Owner, SthGuJiSpirit, 0, 0); 
         DB4().PushUpdateData("INSERT INTO `lingbaosmelt`(`playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue`, `counts`, `purpleAdjVal`, `orangeAdjVal`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u)", m_Owner->getId(), m_lbSmeltInfo.gujiId, m_lbSmeltInfo.itemId, m_lbSmeltInfo.bind, m_lbSmeltInfo.value, m_lbSmeltInfo.maxValue, m_lbSmeltInfo.counts, m_lbSmeltInfo.purpleAdjVal, m_lbSmeltInfo.orangeAdjVal);
-
         return 0;
     }
 
@@ -6741,6 +6753,7 @@ namespace GObject
             DelItemAny(itemId, useCnt, NULL, ToLingbao);
 
         DB4().PushUpdateData("UPDATE `lingbaosmelt` SET `value`=%u, `counts`=%u, `purpleAdjVal`=%u, `orangeAdjVal`=%u WHERE `playerId`=%" I64_FMT "u", m_lbSmeltInfo.value, m_lbSmeltInfo.counts, m_lbSmeltInfo.purpleAdjVal, m_lbSmeltInfo.orangeAdjVal, m_Owner->getId());
+       m_Owner->GuangGunCompleteTask(0,20);
 
         return res;
     }

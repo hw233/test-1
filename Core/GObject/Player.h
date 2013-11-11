@@ -570,6 +570,19 @@ namespace GObject
         UInt32 score;
         QixiInfo() : lover(NULL), bind(0), pos(0), event(0), score(0) {}
     };
+    struct GuangGunInfo
+    {
+        UInt8 status;  //0表示无组队 1表示队长 2表示队员
+        Player * player1 ;
+        Player * player2 ;
+        UInt8 pos;
+        UInt32 score;
+        UInt8 task;
+        UInt8 tasknum;
+        UInt8 taskCom;
+        UInt32 counts;
+        GuangGunInfo():status(0),player1(NULL),player2(NULL),pos(1),score(0),task(0),tasknum(0),taskCom(0),counts(0){}
+    };
     struct SnowInfo
     {
         Player* lover;
@@ -1165,6 +1178,7 @@ namespace GObject
         void SetVarOffset(UInt32 offset);
 
 		inline const std::string& getName() { return _playerData.name; }
+		inline void setName(std::string name) { _playerData.name = name; }
 		inline const char * getPName() { return _playerData.name.c_str(); }
 		inline const std::string& getBattleName() { if(_battleName.empty()) rebuildBattleName(); return _battleName; }
 		void rebuildBattleName();
@@ -1784,6 +1798,7 @@ namespace GObject
 
         QixiInfo m_qixi;
         SnowInfo m_snow;
+        GuangGunInfo m_gginfo;
         bool _qixiBinding;
         QiShiBanInfo m_qishiban;
     public:
@@ -1799,6 +1814,22 @@ namespace GObject
             m_qixi.event = event;
             m_qixi.score = score;
         }
+        void loadGuangGunInfoFromDB(Player* pl1,Player* pl2, UInt8 status, UInt8 pos, UInt32 score,UInt8 task,UInt8 tasknum,UInt8 taskCom,UInt32 counts)
+        {
+            m_gginfo.status = status;
+            m_gginfo.player1 = pl1;
+            m_gginfo.player2 = pl2;
+            m_gginfo.pos = pos;
+            m_gginfo.score = score;
+            m_gginfo.task = task;
+            m_gginfo.tasknum = tasknum;
+            m_gginfo.taskCom = taskCom;
+            m_gginfo.counts=counts;
+        }
+        void roamingGuangGun(UInt8 pos) ;  
+        void setGuangGunTask(UInt8 task,UInt8 taskmaxnum = 0);
+        void GuangGunCompleteTask(UInt8 type ,UInt8 task = 0);
+        void AddGuangGunScore(UInt8 score = 10);
         void sendQixiInfo();
         void divorceQixi();
         void postQixiEyes(Player* pl);
@@ -1817,7 +1848,33 @@ namespace GObject
         inline UInt8 getQueqiaoPos() { return m_qixi.pos; }
         inline Player* getLover() { return m_qixi.lover; }
         inline UInt32 getScore() { return m_qixi.score; }
+
+        inline UInt8 getGGStatus(){return m_gginfo.status;}
+        inline UInt32 getGGScore(){return m_gginfo.score;}
+        void AddGGTimes(Player* pl,UInt8 type,UInt8 flag = 0);
+      //  std::vector<Player* > getGGPlayers(){return m_gginfo.ggplayer;}
+        Player* getGGPlayer1() {return m_gginfo.player1;}
+        Player* getGGPlayer2() {return m_gginfo.player2;}
+        inline UInt8 getGuangGunPos() { return m_gginfo.pos; }
+        UInt32 getGGTimeScore();
+        UInt32 getGGTimeTodayScore();
+        void getCompassChance();
+        Player* getGGTimeCaptain(UInt64 captainId = 0);
+        UInt8 CheckGGCanInvit(Player * pl);
+        void UpdateGGInfo();
+        void sendGuangGunInfo();
+        bool EnterGGTeam(Player* pl);
+        void LeaveGGTime();
+        void beGGTeam(UInt64 id);
+        void GGTeamPlayerLeave(UInt64 id);
+        void getGGTaskAward();
+        void giveGGTeamMemberInfo(Stream& st);
+        void BuyGuangGunAdvance();
+        void BuyCompassChance(UInt8 counts = 1);
+
+
         std::set<Player *>& getInviters() {return _friends[3];};
+
 
         //堆雪人start
         void loadSnowInfoFromDB(Player* pl, bool bind, UInt32 score)
@@ -2486,6 +2543,7 @@ namespace GObject
 
         UInt32 getBattlePoint();
         void calcLingbaoBattlePoint();
+        void recalcLingbao();
         void setMaxLingbaoBattlePoint(UInt32 value);
         UInt32 getMaxLingbaoBattlePoint();
         UInt32 getMaxPetBattlePoint();
@@ -2662,6 +2720,7 @@ namespace GObject
         void sendAirBookInfo();
         void sendAirBookOnlineInfo();
         void OnSend11GradeInfo(UInt8 type=0);
+        void RunFriendlyCompass(UInt8 type=0);
         void getAirBookOnlineAward();
         void getAirBookLoginAward(UInt8 type);
         void Add11grade(UInt32 grade);
@@ -2669,6 +2728,7 @@ namespace GObject
         void SendClanMemberGrade();
         void Send11GradeAward(UInt8 type);
         void doStrongInWorld(UInt8 type);
+        void setGGValue()  ; //光棍节
         //女娲石盘
         void sendNuwaInfo();
         void setNuwaSignet(UInt8);
@@ -2712,6 +2772,11 @@ namespace GObject
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);
+
+        void Buy7DayFund();
+        void send7DayFundInfo();
+        void sendGameBoxAward();
+        void get7DayFundAward(UInt8 type);
     private:
         MoFang* m_moFang;
 
@@ -2739,6 +2804,8 @@ namespace GObject
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();
+        void modifyPlayerName(UInt32 itemid,UInt8 binding,std::string modifyName);
+        void getGameBoxAward(UInt8 type);
 	};
 
 

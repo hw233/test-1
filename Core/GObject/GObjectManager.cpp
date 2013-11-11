@@ -457,6 +457,11 @@ namespace GObject
             fprintf(stderr, "loadSkillStrengthen error!\n");
             std::abort();
         }
+        if(!loadGuangGun())
+        {
+            fprintf(stderr, "loadGuangGun error!\n");
+            std::abort();
+        }
         if(!loadQixi())
         {
             fprintf(stderr, "loadQixi error!\n");
@@ -530,8 +535,13 @@ namespace GObject
             std::abort();
         }
 
-
-		DB::gDataDBConnectionMgr->UnInit();
+        if(!LoadPlayerNamed())
+        {
+            fprintf(stderr, "LoadPlayerNamed error!\n");
+            std::abort();
+        }
+		
+        DB::gDataDBConnectionMgr->UnInit();
 	}
 
 	bool GObjectManager::InitGlobalObject()
@@ -5850,6 +5860,38 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadGuangGun()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading GuangGun");
+        DBGuangGun guanggun;
+        if(execu->Prepare("SELECT `playerId`,`status`,`playerId1`,`playerId2`, `pos`, `score`, `task`, `tasknum`, `taskCom`,`counts`  FROM `guanggun` ORDER BY `playerId`", guanggun) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+        Player* player1 = NULL;
+        Player* player2 = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+            player1 = NULL;
+			if(guanggun.playerId != last_id)
+			{
+				last_id = guanggun.playerId;
+				pl = globalPlayers[last_id];
+				player1 = globalPlayers[guanggun.playerId1];
+				player2 = globalPlayers[guanggun.playerId2];
+			}
+			if(pl == NULL)
+				continue;
+            pl->loadGuangGunInfoFromDB(player1 , player2 , guanggun.status , guanggun.pos , guanggun.score , guanggun.task , guanggun.tasknum , guanggun.taskCom , guanggun.counts);
+        }
+        lc.finalize();
+        return true;
+
+    }
     bool GObjectManager::loadQixi()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -6526,6 +6568,24 @@ namespace GObject
 		return true;
 	}
 
+    bool GObjectManager::LoadPlayerNamed()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading player_named:");
+		DBPlayerNamed dbpn;
+		if(execu->Prepare("SELECT `serverNo`, `playerid`, `name` FROM `player_named` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            GObject::Player::patchMergedName(dbpn.id,dbpn.name);
+            GObject::globalNamedPlayers.add(dbpn.name,globalPlayers[dbpn.id]);
+        }
+		lc.finalize();
+		return true;
+	}
 
 }
 

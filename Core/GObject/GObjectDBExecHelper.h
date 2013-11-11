@@ -252,6 +252,19 @@ struct DBQixi
     UInt8 event;
     UInt32 score;
 };
+struct DBGuangGun
+{
+    UInt64 playerId;
+    UInt8 status;
+    UInt64 playerId1;
+    UInt64 playerId2;
+    UInt8 pos;
+    UInt32 score;
+    UInt8 task;
+    UInt8 tasknum;
+    UInt8 taskCom;
+    UInt32 counts;
+};
 struct DBSnow
 {
     UInt64 playerId;
@@ -1390,6 +1403,13 @@ struct DBZhenwei
     UInt8 mark;
 };
 
+struct DBPlayerNamed 
+{
+    UInt16 serverNo;
+    UInt64 id;
+    std::string name;
+};
+
 }
 
 namespace DB {
@@ -1597,6 +1617,22 @@ SPECIALDEF(6)
     UInt8, pos,
     UInt8, event,
     UInt32, score
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBGuangGun)
+SPECIALDEF(10)
+    (
+    UInt64, playerId,
+    UInt8, status,
+    UInt64, playerId1,
+    UInt64, playerId2,
+    UInt8, pos,
+    UInt32, score,
+    UInt8, task,
+    UInt8, tasknum,
+    UInt8, taskCom,
+    UInt32, counts
     )
 SPECIALEND()
 
@@ -3157,6 +3193,14 @@ SPECIALDEF(3)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBPlayerNamed)
+SPECIALDEF(3)
+    (
+    UInt16, serverNo,
+    UInt64, id,
+    std::string,name 
+    )
+SPECIALEND()
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

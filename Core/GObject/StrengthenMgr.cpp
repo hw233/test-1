@@ -247,6 +247,8 @@ void StrengthenMgr::UpdateAirBookToDB()
         return ;
     UInt32 now = TimeUtil::Now();
     UInt32 type = World::get11TimeNum();
+    if(type <1 ||type >12)
+        return ;
     if(_owner->GetVar(VAR_11AIRBOOK_GRADE_DAY)!= 0)
         _olditem[type-1].grade = _owner->GetVar(VAR_11AIRBOOK_GRADE_DAY);
     if(_owner->GetVar(VAR_AIRBOOK_RECHARGE)!= 0)
@@ -258,8 +260,6 @@ void StrengthenMgr::UpdateAirBookToDB()
         UInt32 over = TimeUtil::SharpDayT(1 , now);
         _olditem[World::get11TimeNum()-1].Reset(over);
     }
-    if(type <1 ||type >12)
-        return ;
     std::string strFlag;
     for(UInt32 i = 0; i < SthMaxFlag; i ++)
     {

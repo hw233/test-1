@@ -335,6 +335,7 @@ namespace GObject
         static bool loadRNR();
         static bool loadSkillStrengthen();
         static bool loadQixi();
+        static bool loadGuangGun();
         static bool loadSnow();
         static bool loadArenaExtraBoard();
         static bool loadCopyFrontWin();
@@ -350,6 +351,7 @@ namespace GObject
         static bool loadTeamArenaSkill();
 	    static bool LoadTeamArenaBets();
 	    static bool LoadTeamPendingPlayers();
+	    static bool LoadPlayerNamed();
         static bool loadZhenwei();
         static bool loadQiShiBan();
 

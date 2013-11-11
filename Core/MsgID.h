@@ -155,6 +155,8 @@ namespace REQ
     //const UInt8 CHANGE_NAME         = 0x60;
     /**加入国战 */
     const UInt8 CAMPS_WAR_JOIN      = 0x90;// 0x62
+    /**请求国战信息 */
+    const UInt8 CAMPS_WAR_INFO      = 0x91;
     /**加入新国战 */
     const UInt8 NEW_CAMPS_WAR_JOIN  = 0x2B;
     /**副本数据 */

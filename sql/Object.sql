@@ -1549,6 +1549,21 @@ CREATE TABLE IF NOT EXISTS `qixi` (
     PRIMARY KEY(`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `guanggun`;
+CREATE TABLE IF NOT EXISTS `guanggun` (
+    `playerId` bigint(20) unsigned NOT NULL,
+    `status` tinyint(3) unsigned NOT NULL,
+    `playerId1` bigint(20) unsigned NOT NULL,
+    `playerId2` bigint(20) unsigned NOT NULL,
+    `pos` tinyint(3) unsigned NOT NULL DEFAULT '1' ,
+    `score` int(10) unsigned NOT NULL,
+    `task` tinyint(3) unsigned NOT NULL,
+    `tasknum` tinyint(3) unsigned NOT NULL,
+    `taskCom` tinyint(3) unsigned NOT NULL,
+    `counts` int(10) unsigned NOT NULL,
+    PRIMARY KEY(`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `clan_statue` (
     `clanId` bigint(20) unsigned NOT NULL,
     `level` int(10) unsigned NOT NULL,
@@ -2232,3 +2247,14 @@ CREATE TABLE IF NOT EXISTS `player_qishiban` (
     `awardMark` tinyint(3) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY(`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `player_named`;
+CREATE TABLE IF NOT EXISTS `player_named` (
+    `serverNo` int(10) unsigned NOT NULL DEFAULT '0',
+    `playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `name` varchar(255) NOT NULL,
+    unique KEY `serverNo_name`(serverNo,`name`),
+    INDEX (`name`),
+    INDEX (`playerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
