@@ -161,6 +161,7 @@ bool World::_ssToolbarAct= false;
 bool World::_snowAct= false;
 bool World::_goldSnakeAct= false;
 bool World::_collectCardAct= false;
+bool World::_halloweenAct= false;
 bool World::_heroIslandAct= false;
 bool World::_dragonKingAct= false;
 bool World::_saveGoldAct= false;
@@ -418,6 +419,20 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 24)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 25)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 9)
 
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
@@ -462,6 +477,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 12)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 19)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 26)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 2)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 9)
         ))
     {
 #if 0
@@ -1240,6 +1257,20 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 24)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 25)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 9)
          
          )
         bRechargeEnd = true;
@@ -2662,6 +2693,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             RCSort s;
             s.player = p;
             s.total = total;
+            s.time = p->GetVar(VAR_RECHARGE_TIME);
             World::rechargeSort.insert(s);
         }
     }
@@ -2709,15 +2741,16 @@ inline bool player_enum_rc(GObject::Player * p, int)
     }
     if (World::getGGTime())
     {
-        if(p->getGGStatus()==2)
-            return false;
-        UInt32 used = p->getGGTimeScore();
-        if (used)
+        if(p->getGGStatus()!=2)
         {
-            RCSort s;
-            s.player = p;
-            s.total = used;
-            World::guangGunSort.insert(s);
+            UInt32 used = p->getGGTimeScore();
+            if (used)
+            {
+                RCSort s;
+                s.player = p;
+                s.total = used;
+                World::guangGunSort.insert(s);
+            }
         }
     }
     return true;
@@ -3331,26 +3364,27 @@ void World::SendGuangGunAward()    //待定
 {
     World::initRCRank();
     int pos = 0;
-    static MailPackage::MailItem s_item[][4] = {
-        {{509,30},{515,30},{503,60},{134,30}},
-        {{509,25},{515,25},{503,50},{134,25}},
-        {{509,20},{515,20},{503,40},{134,20}},
+    static MailPackage::MailItem s_item[][5] = {
+        {{515,30},{503,40},{134,30},{1325,30},{9435,20}},
+        {{515,25},{503,30},{134,25},{1325,25},{9435,10}},
+        {{515,20},{503,25},{134,20},{1325,20},{9435,8}},
     };
-    static MailPackage::MailItem card = {9922,1};
-    SYSMSG(title, 4950);
+    static MailPackage::MailItem card = {9924,1};
+    SYSMSG(title, 4964);
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
-        Player* player = i->player;
-        if (!player)
+        Player* play = i->player;
+        if (!play)
             continue;
+        Player* player = play->getGGTimeCaptain();
         ++pos;
         if(pos > 3) break;
-        SYSMSGV(content, 4951, pos);
+        SYSMSGV(content, 4965, pos);
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)
         {
-            mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
+            mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
             if(pos ==1)
                 mailPackageManager.push(mail->id, &card, 1, true);
         }
@@ -3358,25 +3392,25 @@ void World::SendGuangGunAward()    //待定
         Player* player1 = player->getGGPlayer1();
         if (player1)
         {
-            SYSMSGV(content, 4951, pos);
+            SYSMSGV(content, 4965, pos);
             Mail * mail1 = player1->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
             if(mail1)
             {
-                mailPackageManager.push(mail1->id, s_item[pos-1], 4, true);
+                mailPackageManager.push(mail1->id, s_item[pos-1], 5, true);
                 if(pos ==1)
                     mailPackageManager.push(mail1->id, &card, 1, true);
             }
         }
-        Player* player2 = player->getGGPlayer1();
+        Player* player2 = player->getGGPlayer2();
         if (player2)
         {
-            SYSMSGV(content, 4951, pos);
+            SYSMSGV(content, 4965, pos);
             Mail * mail2 = player2->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
             if(mail2)
             {
-                mailPackageManager.push(mail2->id, s_item[pos-1], 4, true);
+                mailPackageManager.push(mail2->id, s_item[pos-1], 5, true);
                 if(pos ==1)
                     mailPackageManager.push(mail2->id, &card, 1, true);
             }

@@ -642,7 +642,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBItemType idt;
-		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `career`, `reqLev`, `vLev`, `coin`, `quality`, `maxQuantity`, `bindType`, `energy`, `trumpExp`, `data`, `enchant`, `attrId` FROM `item_template`", idt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `career`, `reqLev`, `vLev`, `coin`, `quality`, `maxQuantity`, `bindType`, `energy`, `trumpExp`, `data`, `enchant`, `attrId`, `salePriceUp` FROM `item_template`", idt) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -760,6 +760,7 @@ namespace GData
 			wt->trumpExp = idt.trumpExp;
 			wt->data = idt.data;
             wt->career = idt.career;
+            wt->salePriceUp = idt.salePriceUp;
 			itemBaseTypeManager.add(wt);
 			itemBaseTypeNameManager.add(wt->getName(), wt);
 		}

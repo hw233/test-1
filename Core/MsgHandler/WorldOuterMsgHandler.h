@@ -2569,6 +2569,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x18:
         case 0x19:
         case 0x21:
+        case 0x24:
         {
             brd >> op;
             switch(op)
@@ -2815,7 +2816,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     {
                         GObject::Player *  cap = player->getGGTimeCaptain();
                         UInt32 grade =  cap->getGGTimeScore(); 
-                        GameMsgHdr hdr(0x1D5, WORKER_THREAD_WORLD, cap, sizeof(grade));
+                        GameMsgHdr hdr(0x1D6, WORKER_THREAD_WORLD, cap, sizeof(grade));
                         GLOBAL().PushMsg(hdr, &grade);
                     }
                }
@@ -2830,13 +2831,15 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                         brd >> name;
 	                    GObject::Player * pl = GObject::globalNamedPlayers[name];
                         GObject::Player *cap = player->getGGTimeCaptain();
+                        if(player == pl )
+                            return ;
                         if(!pl)
                             break;
                         if(cap->CheckGGCanInvit(pl))
                             return;
                         SYSMSGV(title, 214, player->getCountry(), player->getName().c_str());
                         SYSMSGV(content, 215, player->getCountry(), player->getName().c_str());
-                        pl->GetMailBox()->newMail(cap, 0x15, title, content);
+                        pl->GetMailBox()->newMail(player, 0x15, title, content);
                     }
                     else if(form == 1)
                     {
@@ -2863,7 +2866,11 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                             player->GuangGunCompleteTask(1);
                             break;
                         case 2:
-                            player->RunFriendlyCompass();
+                            {
+                                UInt8 type = 0 ;
+                                GameMsgHdr hdr2(0x366, player->getThreadId(), player, sizeof(type));
+                                GLOBAL().PushMsg(hdr2, &type);
+                            }
                             break;
                         case 3:
                             {
@@ -2886,13 +2893,18 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                         case 6:
                             player->getCompassChance();
                             break;
+                        case 7:
+                            UInt8 counts;
+                            brd >> counts;
+                            player->BuyCompassChance(counts);
+                            break;
                     }
                 }
+                player->sendGuangGunInfo();
                 break;
             default:
                 break;
             }
-            player->sendGuangGunInfo();
             break;
         }
         default:
@@ -3169,6 +3181,11 @@ void OnTeamArenaEntered( ArenaMsgHdr& hdr, const void * data )
     if(!tad)
         return;
     GObject::teamArenaMgr.teamArenaEntered(tad, entered, rname);
+    for(UInt8 i = 0; i < tad->count; ++ i)
+    {
+        if(tad->members[i])
+            tad->members[i]->arenaUdpLog(1001);
+    }
 }
 
 void OnTeamArenaConnected( ArenaMsgHdr& hdr, const void * data )

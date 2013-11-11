@@ -254,6 +254,7 @@ void OnAthleticsReq( GameMsgHdr& hdr, const void * data )
 	GameAction()->RunOperationTaskAction0(player, 1);
 	GameAction()->RunOperationTaskAction0(player, 2);
     GameAction()->doStrong(player, SthAthletics1, 0,0);
+    player->GuangGunCompleteTask(0,26);
 }
 
 void OnAthleticsMartialReq( GameMsgHdr& hdr, const void * data )
@@ -1478,14 +1479,17 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
     const stActivityMsg* co = reinterpret_cast<const stActivityMsg*>(data);
     if(co->id == SthTownDeamon)
     {
+        player->GuangGunCompleteTask(0,16);
         if(player->GetVar(VAR_TOWNDEAMON))
             return;
         else
             player->SetVar(VAR_TOWNDEAMON, 1);
     }
-
+    if(co->id == SthAthletics1)
+        player->GuangGunCompleteTask(0,26);
+    else if(co->id == SthAthletics2)
+        player->GuangGunCompleteTask(0,25);
     GameAction()->doStrong(player, co->id, co->param1, co->param2);
-    player->GuangGunCompleteTask(0,static_cast<UInt8>(co->id));
 }
 void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
 {
@@ -2319,6 +2323,12 @@ void OnSend11GradeInfo( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     UInt8 id = *reinterpret_cast<const UInt64 *>(data); 
     player->OnSend11GradeInfo(id);
+}
+void OnRunFriendlyCompass( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 id = *reinterpret_cast<const UInt64 *>(data); 
+    player->RunFriendlyCompass(id);
 }
 void OnBePresented( GameMsgHdr &hdr, const void * data)
 {

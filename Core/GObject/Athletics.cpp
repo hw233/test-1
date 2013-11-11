@@ -235,7 +235,8 @@ void Athletics::adjustAthlDeferBuffData(Player *atker, Player *defer, bool reset
 
 void Athletics::attack(Player * defer)
 {
-    _owner->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
+    if(_owner->checkClientIP())
+        _owner->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
 	UInt8 tid = defer->getThreadId();
 	if(tid == _owner->getThreadId())
 	{
@@ -550,7 +551,8 @@ void Athletics::attackMartial(Player* defer)
         if(0 == PlayerPInfo.eCanAttack[idx])
             break;
 
-        _owner->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
+        if(_owner->checkClientIP())
+            _owner->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
         UInt8 tid = defer->getThreadId();
         if(_owner->getThreadId() != tid)
         {

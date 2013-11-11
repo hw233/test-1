@@ -247,6 +247,7 @@ namespace GObject
         WANJIE      = 12,   //万劫不灭
         BILAN       = 13,   //碧岚天衣
         LIUGUANG    = 14,   //刹那流光
+        ZHUTIAN     = 15,   //诸天宝鉴
 
         DRAGONKING_MAX,
     };
@@ -1811,7 +1812,7 @@ namespace GObject
         void roamingGuangGun(UInt8 pos) ;  
         void setGuangGunTask(UInt8 task,UInt8 taskmaxnum = 0);
         void GuangGunCompleteTask(UInt8 type ,UInt8 task = 0);
-        void AddGuangGunScore();
+        void AddGuangGunScore(UInt8 score = 10);
         void sendQixiInfo();
         void divorceQixi();
         void postQixiEyes(Player* pl);
@@ -1833,7 +1834,7 @@ namespace GObject
 
         inline UInt8 getGGStatus(){return m_gginfo.status;}
         inline UInt32 getGGScore(){return m_gginfo.score;}
-        void AddGGTimes(Player* pl,UInt8 type);
+        void AddGGTimes(Player* pl,UInt8 type,UInt8 flag = 0);
       //  std::vector<Player* > getGGPlayers(){return m_gginfo.ggplayer;}
         Player* getGGPlayer1() {return m_gginfo.player1;}
         Player* getGGPlayer2() {return m_gginfo.player2;}
@@ -1849,10 +1850,10 @@ namespace GObject
         void LeaveGGTime();
         void beGGTeam(UInt64 id);
         void GGTeamPlayerLeave(UInt64 id);
-        void RunFriendlyCompass(UInt8 type = 0);
         void getGGTaskAward();
         void giveGGTeamMemberInfo(Stream& st);
         void BuyGuangGunAdvance();
+        void BuyCompassChance(UInt8 counts = 1);
 
 
         std::set<Player *>& getInviters() {return _friends[3];};
@@ -2365,6 +2366,9 @@ namespace GObject
         void sendQQBoardLoginInfo();
         void SetQQBoardLogin();
         void SetQQBoardValue();
+        void SetNovLogin();
+        void sendNovLoginInfo();
+        void getNovLoginAward(UInt8 type =0);
         void sendLuckyMeetLoginInfo();
         void SetLuckyMeetValue();
         void SetSummerMeetValue();
@@ -2650,6 +2654,7 @@ namespace GObject
         void sendAirBookInfo();
         void sendAirBookOnlineInfo();
         void OnSend11GradeInfo(UInt8 type=0);
+        void RunFriendlyCompass(UInt8 type=0);
         void getAirBookOnlineAward();
         void getAirBookLoginAward(UInt8 type);
         void Add11grade(UInt32 grade);
@@ -2701,6 +2706,10 @@ namespace GObject
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);
+
+        void Buy7DayFund();
+        void send7DayFundInfo();
+        void get7DayFundAward(UInt8 type);
     private:
         MoFang* m_moFang;
 
@@ -2727,6 +2736,7 @@ namespace GObject
         UInt8 _alreadyload[8];
     public:
         void setMapId(UInt8 mapId);
+        bool checkClientIP();
 	};
 
 

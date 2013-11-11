@@ -1291,6 +1291,7 @@ void MoFang::quickMakejiguan(UInt32 tuzhiId, UInt8 mark)
         st << static_cast<UInt8>(curProficient); 
     st << Stream::eos;
     m_owner->send(st);
+    m_owner->GuangGunCompleteTask(0,21);
 }
 
 void MoFang::upgradeKY(UInt8 keyinId, UInt8 opt)
@@ -1389,7 +1390,7 @@ void MoFang::upgradeKY(UInt8 keyinId, UInt8 opt)
     st << keyinId << addKYExp;
     st << Stream::eos;
     m_owner->send(st);
-    m_owner->GuangGunCompleteTask(0,3);
+    m_owner->GuangGunCompleteTask(0,22);
 }
 
 void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 opt)
@@ -1469,6 +1470,7 @@ void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 opt)
         keyinCurExp += addKYExp;
         addTotalExp += addKYExp;
         count++;
+        m_owner->GuangGunCompleteTask(0,22);
     }
     
     if(money >= consumeValue)

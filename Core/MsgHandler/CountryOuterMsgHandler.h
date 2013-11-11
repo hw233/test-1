@@ -1366,8 +1366,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->GetTaskMgr()->CompletedTask(201);
    if(pl->getFighterCount() >= 5)
         pl->GetTaskMgr()->CompletedTask(202);
+    pl->SetQQBoardValue();
     pl->sendQQBoardLoginInfo();
-    pl->sendSummerMeetInfo();
+    pl->sendSummerMeetInfo();   //Fund
+    pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
 }
@@ -1846,12 +1848,12 @@ void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
         if(1 == ftr._type || 2 == ftr._type) //资质洗炼
         {
             GameAction()->doStrong(player, SthCapacity, 0, 0);
-            player->GuangGunCompleteTask(0,1);
+            player->GuangGunCompleteTask(0,28);
         }
         if(3 == ftr._type || 4 == ftr._type) //潜力洗炼
         {
             GameAction()->doStrong(player, SthPotential, 0, 0);
-            player->GuangGunCompleteTask(0,1);
+            player->GuangGunCompleteTask(0,29);
         }
     }
 }
@@ -3811,6 +3813,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         counts =( counts > 24-advanceOther?24-advanceOther:counts);
                         player->AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
                         player->AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
+                        player->sendGuangGunInfo();
                     }
                     st << static_cast<UInt8>(0);
 
@@ -5904,7 +5907,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
     if (op  < 6 )
         return;
-    if((op != 10 && op!= 20 &&op!=22 &&op!=25) && !player->hasChecked())
+    if((op != 10 && op!= 20 &&op!=22 &&op!=25 && op!=27) && !player->hasChecked())
          return;
 
     switch(op)
@@ -5951,12 +5954,16 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             player->getFishUserPackage(idx);
             break;
         case 20:
-            player->SetQQBoardValue();
-            player->sendQQBoardLoginInfo();
+            //player->SetQQBoardValue();
+            //player->sendQQBoardLoginInfo();
             break;
         case 21:
+            if(!World::getHalloweenAct())
+                return;
+            if(idx < 1 || idx > 4)
+                break;
             player->getQQBoardInstantLoginAward(2*idx - 1);
-            player->sendQQBoardLoginInfo();
+            //player->sendQQBoardLoginInfo();
             break;
         case 22:
             player->SetLuckyMeetValue();
@@ -5977,6 +5984,29 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
                 player->GetQQBoardAward(index);
             }
             player->sendQQBoardLogin();
+            break;
+        case 27:
+            {
+              if(idx == 0)
+                  player->SetNovLogin();
+              else if(idx == 1)
+              {
+                  br >>index ;
+                  player->getNovLoginAward(index);
+              }
+              player->sendNovLoginInfo();
+            }
+            break;
+        case 26:
+            br >>index;
+            if(idx == 0 )
+                player->Buy7DayFund();
+            else if(idx == 1)
+            {
+                player->get7DayFundAward(index);
+            }
+            player->send7DayFundInfo();
+            break;
         default:
             break;
     }
@@ -6142,6 +6172,8 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
 void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
 {
     MSG_QUERY_PLAYER(pl);
+	if(!pl->hasChecked())
+		return;
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     UInt32 fighterid = 0;

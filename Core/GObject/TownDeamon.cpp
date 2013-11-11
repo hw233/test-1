@@ -947,9 +947,9 @@ void TownDeamon::addActivity(Player* pl)
     if (!pl->GetVar(VAR_TOWNDEAMON))
     {
         GameAction()->doStrong(pl, SthTownDeamon, 0, 0);
-        pl->GuangGunCompleteTask(0,16);
         pl->SetVar(VAR_TOWNDEAMON, 1);
     }
+    pl->GuangGunCompleteTask(0,16);
 }
 void TownDeamon::getTjItem(Player* pl, UInt8 townLevel)
 {

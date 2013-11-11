@@ -846,10 +846,10 @@ void SendRechargeRank(Stream& st)
 {
     using namespace GObject;
     st.init(REP::ACT);
-    UInt8 cnt = World::rechargeSort.size();
+    UInt32 cnt = World::rechargeSort.size();
     if (cnt > CNT)
         cnt = CNT;
-    st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << cnt;
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
     UInt32 c = 0;
     for (RCSortType::iterator i = World::rechargeSort.begin(), e = World::rechargeSort.end(); i != e; ++i)
     {
@@ -1006,6 +1006,7 @@ void OnRechargeRank ( GameMsgHdr& hdr,  const void* data )
     RCSort s;
     s.player = player;
     s.total = total;
+    s.time = TimeUtil::Now();
     World::rechargeSort.insert(s);
 
     UInt32 rank = 0;
@@ -1286,10 +1287,10 @@ void SendConsumeRank(Stream& st)
 {
     using namespace GObject;
     st.init(REP::ACT);
-    UInt8 cnt = World::consumeSort.size();
+    UInt32 cnt = World::consumeSort.size();
     if (cnt > CNT)
         cnt = CNT;
-    st << static_cast<UInt8>(2) << static_cast<UInt8>(2) << static_cast<UInt8>(0) << cnt;
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(2) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
     UInt32 c = 0;
     for (RCSortType::iterator i = World::consumeSort.begin(), e = World::consumeSort.end(); i != e; ++i)
     {
@@ -1851,7 +1852,7 @@ void SendRechargeRP7Rank(GameMsgHdr& hdr,  const void* data )
 
     MSG_QUERY_PLAYER(player);    
 
-    UInt8 cnt = World::rechargeRP7Sort.size();
+    UInt32 cnt = World::rechargeRP7Sort.size();
     if (cnt > CNT10)
         cnt = CNT10;
     UInt32 myRecharge = player->getTotalRecharge();
@@ -1869,7 +1870,7 @@ void SendRechargeRP7Rank(GameMsgHdr& hdr,  const void* data )
     }
     Stream st(REP::RP_SERVER);
     st << static_cast<UInt8>(1) << static_cast<UInt8>(1);
-    st << myRecharge << myrank << cnt;
+    st << myRecharge << myrank << static_cast<UInt8>(cnt);
 
     UInt32 c = 0;
     for (RCSortType::iterator i = World::rechargeRP7Sort.begin(), e = World::rechargeRP7Sort.end(); i != e; ++i)
@@ -1900,35 +1901,34 @@ void OnTeamArenaAddMember( GameMsgHdr& hdr, const void * data )
 	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
     GObject::teamArenaMgr.addTeamMember(pl, player);
 }
+#define CNT_3 3
 void SendGuangGunRank(Stream& st)
 {
     World::initRCRank();
     using namespace GObject;
-    st.init(REP::ACTIVE);    //GG
     UInt32 cnt = World::guangGunSort.size();
-    if (cnt > CNT)
-        cnt = CNT;
-    st << static_cast<UInt8>(0x20) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
+    if (cnt > CNT_3)
+        cnt = CNT_3;
+    st << static_cast<UInt8>(cnt);
     UInt32 c = 0;
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
         if(i->player == NULL)
             continue;
         st << i->player->getName();
-        if(!i->player->getGGPlayer1())
+        if(i->player->getGGPlayer1())
             st <<i->player->getGGPlayer1()->getName();
         else
             st<<"";
-        if(!i->player->getGGPlayer2())
+        if(i->player->getGGPlayer2())
             st <<i->player->getGGPlayer2()->getName();
         else 
             st<<"";
         st << i->total;
         ++c;
-        if (c >= CNT)
+        if (c >= CNT_3)
             break;
     }
-    st << Stream::eos;
 
 }
 void OnSendGuangGunRank ( GameMsgHdr& hdr,  const void* data )
@@ -1936,10 +1936,6 @@ void OnSendGuangGunRank ( GameMsgHdr& hdr,  const void* data )
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
     World::initRCRank();
-    Stream st;
-    Send11PlayerGradeRank(st);
-    player->send(st);
-
     Player* pl = player->getGGTimeCaptain();
     UInt32 rank = 0;
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
@@ -1947,14 +1943,24 @@ void OnSendGuangGunRank ( GameMsgHdr& hdr,  const void* data )
         ++rank;
         if (i->player == pl)
         {
-            Stream st(REP::ACT);//GG
-            st << static_cast<UInt8>(0x20) << static_cast<UInt8>(1) << static_cast<UInt8>(2);
-            st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
-            player->send(st);
             break;
         }
     }
+    if(!pl->getGGTimeScore())
+       rank = 0; 
+    Stream st(REP::ACT);//GG
+    st << static_cast<UInt8>(0x22) << static_cast<UInt8>(1) << static_cast<UInt8>(2);
+    st << static_cast<UInt8>(rank > 255 ? 255 : rank);
+    SendGuangGunRank(st);
+    st <<Stream::eos;
+    pl->send(st);
+    if(pl->getGGPlayer1())
+        pl->getGGPlayer1()->send(st);
+    if(pl->getGGPlayer2())
+        pl->getGGPlayer2()->send(st);
 }
+
+
 void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
@@ -1969,7 +1975,7 @@ void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
         ++oldrank;
         if (i->player == player)
         {
-            if (oldrank <= CNT)
+            if (oldrank <= CNT_3)
                 inrank = true;
             World::guangGunSort.erase(i);
             break;
@@ -1981,8 +1987,14 @@ void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
     s.player = player;
     s.total = total;
     World::guangGunSort.insert(s);
-
-    UInt32 rank = 0;
+    GObject::Player *cap = player->getGGTimeCaptain();
+    cap ->sendGuangGunInfo();
+    if(cap->getGGPlayer1())
+        cap->getGGPlayer1()->sendGuangGunInfo();
+    if(cap->getGGPlayer2())
+        cap->getGGPlayer2()->sendGuangGunInfo();
+        
+/*    UInt32 rank = 0;
     UInt32 myrank = 0;
     bool stop = false;
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
@@ -1990,23 +2002,33 @@ void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
        if (!stop)
             ++myrank;
 
-        if (i->player == player)
+        if (i->player == pl)
             stop = true;
 
         ++rank;
-
-        Stream st(REP::ACT);  //GG
-        st << static_cast<UInt8>(0x20) << static_cast<UInt8>(1)<< static_cast<UInt8>(2);
-        st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
-        i->player->send(st);
+        {
+            Stream st(REP::ACT);//GG
+            st << static_cast<UInt8>(0x22) << static_cast<UInt8>(1) << static_cast<UInt8>(2);
+            st << static_cast<UInt8>(rank > 255 ? 255 : rank);
+            st << i->player->getName();
+            if(i->player->getGGPlayer1())
+                st <<i->player->getGGPlayer1()->getName();
+            else
+                st<<"";
+            if(i->player->getGGPlayer2())
+                st <<i->player->getGGPlayer2()->getName();
+            else 
+                st<<"";
+            st << i->total;
+            st <<Stream::eos;
+            i->player->send(st);
+            if(i->player->getGGPlayer1())
+                i->player->getGGPlayer1()->send(st);
+            if(i->player->getGGPlayer2())
+                i->player->getGGPlayer2()->send(st);
+        }
     }
-
-    if (oldrank <= CNT || (!inrank && myrank <= CNT))
-    {
-        Stream st;
-        SendGuangGunRank(st);
-        NETWORK()->Broadcast(st);
-    }
+*/
 }
 
 #endif // _WORLDINNERMSGHANDLER_H_

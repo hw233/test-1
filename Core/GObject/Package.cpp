@@ -2913,6 +2913,7 @@ namespace GObject
                 updateHft = true;
                 hf->incHftValue(hft);
             }
+            m_Owner->udpLog("lianqi", "F_131024_1", "", "", "", "", "act");
         }
         else if( 0 != count )
         {
@@ -2957,6 +2958,7 @@ namespace GObject
                 }
 
                 enchant = hf->getChanceFromHft(quality, ied.enchant, hft);
+                m_Owner->udpLog("lianqi", "F_131024_1", "", "", "", "", "act");
             }
         }
         if(!DelItemAny(item_enchant_l + type, enc_times, &isBound))
@@ -3493,6 +3495,7 @@ namespace GObject
 		}
 		else
 			SendSingleEquipData(equip);
+        m_Owner->udpLog("lianqi", "F_131024_5", "", "", "", "", "act");
 		return 0;
 	}
 
@@ -4132,6 +4135,7 @@ namespace GObject
                     bindCount -= 3;
                 }
             }
+            m_Owner->udpLog("lianqi", "F_131024_6", "", "", "", "", "act");
         }
 
         while(result == 0 && unbindCount >= 3)
@@ -4180,6 +4184,7 @@ namespace GObject
                     unbindCount -= 3;
                 }
             }
+            m_Owner->udpLog("lianqi", "F_131024_6", "", "", "", "", "act");
         }
 
         while(bindCount + unbindCount >= 3 && result == 0)
@@ -4231,6 +4236,7 @@ namespace GObject
                     bindCount = 0;
                 }
             }
+            m_Owner->udpLog("lianqi", "F_131024_6", "", "", "", "", "act");
         }
 
         if(bindUsed > 0)
@@ -4731,6 +4737,7 @@ namespace GObject
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
         if (oldEquipClass == Item_Weapon)
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
+        m_Owner->udpLog("lianqi", "F_131024_3", "", "", "", "", "act");
 
         return 0;
     }
@@ -5760,6 +5767,7 @@ namespace GObject
 		}
 		else
 			SendSingleEquipData(equip);
+        m_Owner->udpLog("lianqi", "F_131024_2", "", "", "", "", "act");
 		return 0;
 	}
 
@@ -6321,6 +6329,7 @@ namespace GObject
                 DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spLev%u` = %u, `spform1` = %u, `spform2` = %d, `spform3` = %u WHERE `id` = %u", form, ied_equip.spiritAttr.spLev[form - 1], ied_equip.spiritAttr.spForm[0], ied_equip.spiritAttr.spForm[1], ied_equip.spiritAttr.spForm[2], equip->getId());
                 GameAction()->doStrong(m_Owner, SthEquipSpirit, 0, 0);
                 m_Owner->GuangGunCompleteTask(0,7);
+                m_Owner->udpLog("lianqi", "F_131024_4", "", "", "", "", "act");
             }
             break;
         case 1:
@@ -6583,8 +6592,6 @@ namespace GObject
         sendLingbaoSmeltInfo();
         GameAction()->doStrong(m_Owner, SthGuJiSpirit, 0, 0); 
         DB4().PushUpdateData("INSERT INTO `lingbaosmelt`(`playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue`, `counts`, `purpleAdjVal`, `orangeAdjVal`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u)", m_Owner->getId(), m_lbSmeltInfo.gujiId, m_lbSmeltInfo.itemId, m_lbSmeltInfo.bind, m_lbSmeltInfo.value, m_lbSmeltInfo.maxValue, m_lbSmeltInfo.counts, m_lbSmeltInfo.purpleAdjVal, m_lbSmeltInfo.orangeAdjVal);
-       m_Owner->GuangGunCompleteTask(0,20);
-
         return 0;
     }
 
@@ -6746,6 +6753,7 @@ namespace GObject
             DelItemAny(itemId, useCnt, NULL, ToLingbao);
 
         DB4().PushUpdateData("UPDATE `lingbaosmelt` SET `value`=%u, `counts`=%u, `purpleAdjVal`=%u, `orangeAdjVal`=%u WHERE `playerId`=%" I64_FMT "u", m_lbSmeltInfo.value, m_lbSmeltInfo.counts, m_lbSmeltInfo.purpleAdjVal, m_lbSmeltInfo.orangeAdjVal, m_Owner->getId());
+       m_Owner->GuangGunCompleteTask(0,20);
 
         return res;
     }

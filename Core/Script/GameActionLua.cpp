@@ -1438,6 +1438,11 @@ namespace Script
         assert(player != NULL);
         return Call<bool>("RunPrayAward", player, val);
     }
+    bool GameActionLua::RunNovLoginAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunNovLoginAward", player, val);
+    }
     bool GameActionLua::RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge)
     {
         assert(player != NULL);

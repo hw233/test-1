@@ -403,6 +403,7 @@ MSG_REG_2(GameMsgHdr, 0x362, OnBePrayed);
 MSG_REG_2(GameMsgHdr, 0x363, OnBePresented);
 MSG_REG_2(GameMsgHdr, 0x364, OnDoStrongInWorld);
 MSG_REG_2(GameMsgHdr, 0x365, OnSend11GradeInfo);
+MSG_REG_2(GameMsgHdr, 0x366, OnRunFriendlyCompass);
 
 MSG_REG_2(GameMsgHdr, 0x381, OnRoamintGuangGun);
 //0x365-380繁体占用
