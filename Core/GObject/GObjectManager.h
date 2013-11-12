@@ -568,7 +568,7 @@ namespace GObject
 
         static UInt32 getChanceFromHft(UInt8 q, UInt8 lv, UInt16 v)
         {
-            if(q > 5)
+            if(q > 10)
                 q = 0;
             if(lv > 11)
                 lv = 0;
@@ -679,7 +679,7 @@ namespace GObject
         static std::vector<float> _trump_smelt[4];
 
         // 强化人品
-        static std::vector<stHftChance> _hft_chance[6][12];
+        static std::vector<stHftChance> _hft_chance[11][12];
 
        // static std::vector<stMergeStf>  _mergeStfs;
         typedef std::vector<stMergeStf>   vMergeStfs;
