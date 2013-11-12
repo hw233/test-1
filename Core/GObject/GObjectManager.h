@@ -224,36 +224,42 @@ namespace GObject
             return 0;
         }
 
-        UInt16 getSmeltExp(UInt8 lv, UInt8 itemTypeIdx, UInt8* at, UInt16* av, UInt8 size, UInt8 skillNum)
+        UInt16 getSmeltExp(UInt8 lv, UInt8 itemTypeIdx, UInt8* at, UInt16* av, UInt8 size, UInt8 skillNum, UInt8 color)
         {
             float colorP = 0;
             float lvFactor[8] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 0, 0};
             UInt8 lvIdx = (lv-70)/10;
             UInt16 skillExp = 100;
-            if(lvIdx > 3)
-                lvIdx = 3;
+            if(lvIdx > 5)
+                lvIdx = 5;
 
             for(int i = 0; i < size; ++ i)
             {
                 if(at[i] > 0)
                     colorP += ((float)(av[i])/getAttrMax(lv, itemTypeIdx, at[i]-1))*100;
             }
+            UInt8 colFactor = 1;//宝具颜色系数
+            if(color >= 5)
+                colFactor = 10;
 
-            return colorP*lvFactor[lvIdx] + skillExp * skillNum;
+            return colorP*lvFactor[lvIdx]*colFactor + skillExp * skillNum;
         }
 
         UInt16 getSmeltExp2(UInt8 lv, UInt8 itemTypeIdx, UInt8 color)
         {
             float lvFactor[8] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 0, 0};
             UInt8 lvIdx = (lv-70)/10;
-            if(lvIdx > 3)
-                lvIdx = 3;
+            if(lvIdx > 5)
+                lvIdx = 5;
 
             if(color < 2)
                 color = 2;
             if(color > 5)
                 color = 5;
-            return colorVal[color - 2]*lvFactor[lvIdx];
+            UInt8 colFactor = 1;//宝具颜色系数
+            if(color >= 5)
+                colFactor = 10;
+            return colorVal[color - 2]*lvFactor[lvIdx] * colFactor;
         }
 
         UInt8 attrNumChance[4];
