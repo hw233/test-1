@@ -279,7 +279,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_LEFTTIMES = 220, // 剩余挂机时间
 
         /*
-         * 【注:此段var(221--239)貌似未被占用】
+         * 【注:此段var(221--239) for dtc】
          */
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
@@ -555,6 +555,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_AIRBOOK_ONLINE_AWARD = 623,
         VAR_AIRBOOK_RECHARGE = 624,
         VAR_AIRBOOK_CONSUME = 625,
+        
+        VAR_MODIFY_NAME_CD = 626,//改名CD
         VAR_GROWUPFUND_TYPE = 634,
         VAR_GROWUPFUND_AWARD = 635,
         VAR_NOV_LOGIN = 636,
@@ -1066,6 +1068,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_AIRBOOK_ONLINE_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_AIRBOOK_RECHARGE, CYCLE_DAY);
             REGISTER_VAR(VAR_AIRBOOK_CONSUME, CYCLE_DAY);
+            REGISTER_VAR(VAR_MODIFY_NAME_CD, CYCLE_NONE);
             REGISTER_VAR(VAR_NOV_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_NOV_LOGIN_AWARD, CYCLE_NONE);
         }

@@ -945,6 +945,7 @@ public:
     UInt16 calcSkillBattlePoint(UInt16 skillId, UInt8 type);
 
     UInt32 calcLingbaoBattlePoint();
+    UInt32 recalcLingbao();
     void eraseLingbaoInfo(ItemEquip* eqiup);
     void pushLingbaoInfo(ItemEquip* equip);
 private:

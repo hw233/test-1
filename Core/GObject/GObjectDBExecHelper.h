@@ -1379,6 +1379,13 @@ struct DBZhenwei
     UInt8 mark;
 };
 
+struct DBPlayerNamed 
+{
+    UInt16 serverNo;
+    UInt64 id;
+    std::string name;
+};
+
 }
 
 namespace DB {
@@ -3133,6 +3140,14 @@ SPECIALDEF(3)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBPlayerNamed)
+SPECIALDEF(3)
+    (
+    UInt16, serverNo,
+    UInt64, id,
+    std::string,name 
+    )
+SPECIALEND()
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

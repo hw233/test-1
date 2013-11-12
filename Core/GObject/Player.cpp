@@ -16901,6 +16901,12 @@ namespace GObject
                 break;
             case 1: //前往破阵
                 {
+                    if(GetVar(VAR_TJ_TASK3_COPYID) == 0)
+                        SetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME, TimeUtil::Now());
+                    UInt32 now = TimeUtil::Now();
+                    if(TimeUtil::SharpDay(0, now) != TimeUtil::SharpDay(0, GetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME)))
+                        SetVar(VAR_TJ_TASK3_COPYID, 0);
+
                     if (GetVar(VAR_TJ_TASK3_COPYID) >= 51)
                     {
                         rcmd = 1;
@@ -17065,6 +17071,13 @@ namespace GObject
        if (copyid >= (s_tjTask3CopyCount+1)) //已完成
        {
            finish = 1;
+            UInt32 now = TimeUtil::Now();
+            if(TimeUtil::SharpDay(0, now) != TimeUtil::SharpDay(0, GetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME)))
+            {
+                SetVar(VAR_TJ_TASK3_COPYID, 0);
+                finish = 0;
+                copyid = 0;
+            }
        }
        if (copyid == 0) copyid = 1;
 
@@ -17982,6 +17995,25 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
     }
 
+    void Player::recalcLingbao()
+    {
+        if(CURRENT_THREAD_ID() == getThreadId())
+        {
+            UInt32 value = 0;
+            _maxLingbaoBattlePoint = 0;
+            for(int j = 0; j < 5; ++ j)
+            {
+                Fighter* fighter = _playerData.lineup[j].fighter;
+                if(fighter)
+                {
+                    value = fighter->recalcLingbao();
+                    _maxLingbaoBattlePoint = value > _maxLingbaoBattlePoint? value:_maxLingbaoBattlePoint;
+                }
+            }
+        }
+
+    }
+    
     void Player::setMaxLingbaoBattlePoint(UInt32 value)
     {
         _maxLingbaoBattlePoint = value;
@@ -24969,6 +25001,116 @@ void Player::get7DayFundAward(UInt8 type)
        getGold(Coupon[type-1]); 
    FundAward |=(1<<(type-1));
    SetVar(VAR_GROWUPFUND_AWARD,FundAward);
+}
+
+void Player::modifyPlayerName(UInt32 itemid,UInt8 binding,string modifyName)
+{
+    //string old_name = this->getName();
+    const char* old_name = getNameNoSuffix(getName());
+    //保存到另一张曾用名表
+    string strtmp = modifyName;//把带后缀的名字存到内存中
+    patchMergedName(this->getId(),strtmp);
+
+    Player *player = globalNamedPlayers[strtmp];
+    Stream st(REP::USER_INFO_CHANGE);
+    UInt8 return_id; 
+  
+    if(modifyName.length() > 20 || modifyName.length() < 4)
+        return;
+
+    if((GetVar(VAR_MODIFY_NAME_CD) + 7*86400 > TimeUtil::Now()) && GetVar(VAR_MODIFY_NAME_CD) != 0)
+    {
+         return_id = 3;
+         st << static_cast<UInt8>(0x20) << return_id << Stream::eos;
+         send(st);
+         return;
+    }
+    if(!player)
+    {
+         
+	    ItemBase* item = (this->GetPackage())->GetItem(itemid, binding> 0);
+        if(!item)
+            return;
+        (this->GetPackage())->DelItem2(item,1);
+		(this->GetPackage())->AddItemHistoriesLog(itemid, 1);
+
+        if(!cfg.merged)
+            DB1().PushUpdateData("insert into `player_named` (serverNo,playerid,name) values(%u,%" I64_FMT "u,'%s')",cfg.serverNo,getId(),old_name);
+        else
+            DB1().PushUpdateData("insert into `player_named` (serverNo,playerid,name) values(%u,%" I64_FMT "u,'%s')",cfg.serverNo,getId(),old_name);
+        //修改player表
+        DB1().PushUpdateData("UPDATE `player` SET `name` = '%s' WHERE `id` = %" I64_FMT "u",      modifyName.c_str(),getId());
+        SetVar(VAR_MODIFY_NAME_CD,TimeUtil::Now());
+
+        setName(strtmp);
+        _battleName = "";
+        globalNamedPlayers.remove(strtmp);
+        globalNamedPlayers.add(strtmp,this);
+
+        SYSMSG_BROADCASTV(214,getCountry(),old_name,getCountry(),this->getName().c_str());//滚服
+        if(this->getClan() != NULL)//帮派公告
+        {
+            Stream st1;
+            SYSMSGVP(st1, 215, getCountry(),old_name,getCountry(),this->getName().c_str());
+            (this->getClan())->broadcast(st1);
+        }
+
+        SYSMSGV(title, 217);//系统邮件公告
+        SYSMSGV(content, 216,getCountry(),old_name,getCountry(),this->getName().c_str());
+//        MailItemsInfo itemsInfo(NULL, Activity, 0);
+        //好友，密友发邮件 
+        for(UInt8 t = 0; t < 2;t++)
+        {
+            UInt8 m;
+            if(t == 1)
+                m = 3;
+            else
+                m = t;
+            UInt8 sz = static_cast<UInt8>(_friends[m].size());
+            if(sz)
+            {
+                std::set<Player *>::iterator it = _friends[m].begin();
+                for(UInt8 i = 0; i < sz; ++ i)
+                {
+                    Player * pl = *it;
+                    pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                    it++;
+                }
+            }
+        }
+        
+        return_id = 1;
+        st << static_cast<UInt8>(0x20) << return_id << this->getName()<< Stream::eos;
+        send(st);
+
+//		SERVER().GetCountry(GetCountryThread()).PlayerEnter(this, false);
+//		SERVER().GetCountry(GetCountryThread()).PlayerLeave(this);
+        Clan* clan = getClan();
+	    if(clan)
+        {
+            ClanMember* member = clan->getClanMember(this);
+	        clan->broadcastMemberInfo(*member, 0);
+
+		}
+
+        for(std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin(); it != _fairyPets.end(); ++ it)
+        {
+            FairyPet* pet = it->second;
+            if(!pet)
+                continue;
+            pet->setDirty();
+            pet->pushPetInfo2Leaderboard();
+        }
+        recalcLingbao();
+        GObject::leaderboard.update();
+            
+        return;
+     }
+     else
+        return_id = 2;
+     st << static_cast<UInt8>(0x20) << return_id << Stream::eos;
+     send(st);
+                    
 }
 
 } // namespace GObject

@@ -213,6 +213,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar544_545.sql        #清除累积登陆(开启万圣节登陆有礼)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_player_named.sql  #改名卡 加一张表
     #. clearshiyamen.sh
 }
 
