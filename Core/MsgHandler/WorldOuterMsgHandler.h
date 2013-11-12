@@ -1471,8 +1471,16 @@ void OnArenaConnected( ArenaMsgHdr& hdr, const void * data )
 		NETWORK()->CloseArena();
 		return;
 	}
-    GObject::World::setArenaState(GObject::ARENA_XIANJIE_DIYI);
-	GObject::arena.readFrom(brd);
+    UInt8 fhaslater = 0;
+    brd >> fhaslater;
+    GObject::arena._readbuf.append((UInt8*)(data) + brd.pos(), brd.size() - brd.pos());
+    if(!fhaslater)
+    {
+        BinaryReader brd2((UInt8*)(GObject::arena._readbuf), GObject::arena._readbuf.size());
+        GObject::World::setArenaState(GObject::ARENA_XIANJIE_DIYI);
+        GObject::arena.readFrom(brd2);
+        GObject::arena._readbuf.clear();
+    }
 }
 
 void OnPlayerEntered( ArenaMsgHdr& hdr, const void * data )
@@ -3100,8 +3108,16 @@ void OnTeamArenaConnected( ArenaMsgHdr& hdr, const void * data )
 		NETWORK()->CloseArena();
 		return;
 	}
-    GObject::World::setArenaState(GObject::ARENA_XIANJIE_ZHIZUN);
-	GObject::teamArenaMgr.readFrom(brd);
+    UInt8 fhaslater = 0;
+    brd >> fhaslater;
+    GObject::teamArenaMgr._readbuf.append((UInt8*)(data) + brd.pos(), brd.size() - brd.pos());
+    if(!fhaslater)
+    {
+        BinaryReader brd2((UInt8*)(GObject::teamArenaMgr._readbuf), GObject::teamArenaMgr._readbuf.size());
+        GObject::World::setArenaState(GObject::ARENA_XIANJIE_ZHIZUN);
+        GObject::teamArenaMgr.readFrom(brd2);
+        GObject::teamArenaMgr._readbuf.clear();
+    }
 }
 
 void OnTeamArenaPreliminary( ArenaMsgHdr& hdr, const void * data )

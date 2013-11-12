@@ -3939,6 +3939,7 @@ void GMHandler::OnLingbao(GObject::Player * player, std::vector<std::string>& ar
                     UInt8 lv = equip->getReqLev();
                     stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
                     std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+                    allAttrType.erase(allAttrType.begin() + 1);
                     UInt8 itemTypeIdx = ic - Item_LBling;
                     for(int i = 0; i < attrNum; ++ i)
                     {
@@ -4029,6 +4030,7 @@ void GMHandler::OnLingbaoSkill(GObject::Player * player, std::vector<std::string
                     UInt8 lv = equip->getReqLev();
                     stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
                     std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+                    allAttrType.erase(allAttrType.begin() + 1);
                     UInt8 itemTypeIdx = ic - Item_LBling;
                     for(int i = 0; i < attrNum; ++ i)
                     {

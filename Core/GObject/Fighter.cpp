@@ -1496,6 +1496,7 @@ inline void AddLingbaoAttr(GData::AttrExtra& ae, ItemLingbao* lb)
         {
         case 1:
             ae.attack += lbattr.value[i];
+            ae.magatk += lbattr.value[i];
             break;
         case 2:
             ae.magatk += lbattr.value[i];
