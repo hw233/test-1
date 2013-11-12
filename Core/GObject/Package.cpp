@@ -4875,6 +4875,7 @@ namespace GObject
         }
         else if(1 == mark)
         {
+#if 0
             if (fromEquip->GetCareer() != toEquip->GetCareer() &&
                 fromEquip->GetCareer() > 0 &&
                 toEquip->GetCareer() > 0)
@@ -4883,7 +4884,7 @@ namespace GObject
                   2.全职业装备可继承任何职业装备，或接受任何职业装备的继承;*/
                 return 18;
             }
-
+#endif
             if(cfg.serverNum != 34 && m_Owner->getVipLevel() < 4)
             {
                 return 17;   //御剑等级小于4级
@@ -5305,20 +5306,20 @@ namespace GObject
         tIed.extraAttr2.type1 = fIed.extraAttr2.type1;
         tIed.extraAttr2.type2 = fIed.extraAttr2.type2;
         tIed.extraAttr2.type3 = fIed.extraAttr2.type3;
-        tIed.extraAttr2.value1 = fIed.extraAttr2.value1 - fmaxV1 * 15;
         
+        tIed.extraAttr2.value1 = (fIed.extraAttr2.value1 - fmaxV1 * 15) * tmaxV1 / fmaxV1;
         if(float(tIed.extraAttr2.value1) < tmaxV1 * tfactor)
         {
             tIed.extraAttr2.value1 = tmaxV1*tfactor;
         }
 
-        tIed.extraAttr2.value2 = fIed.extraAttr2.value2 - fmaxV2 * 15;
+        tIed.extraAttr2.value2 = (fIed.extraAttr2.value2 - fmaxV2 * 15) * tmaxV2 / fmaxV2;
         if(float(tIed.extraAttr2.value2) < tmaxV2 * tfactor)
         {
             tIed.extraAttr2.value2 = tmaxV2 * tfactor;
         }
 
-        tIed.extraAttr2.value3 = fIed.extraAttr2.value3 - fmaxV3 * 15;
+        tIed.extraAttr2.value3 = (fIed.extraAttr2.value3 - fmaxV3 * 15) * tmaxV3 / fmaxV3;
         if(float(tIed.extraAttr2.value3) < tmaxV3 * tfactor)
         {
             tIed.extraAttr2.value3 = tmaxV3 * tfactor;
