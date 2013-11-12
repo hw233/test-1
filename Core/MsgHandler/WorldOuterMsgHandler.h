@@ -2799,7 +2799,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         break;
         case 0x22:  // 光棍节活动
         {
-            if(!WORLD().getGGTime())
+            
+            if( ! WORLD().getGGTime() )
                 break;
             brd >> op;
             switch(op)
@@ -2809,11 +2810,12 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     UInt8 form = 0;
                     brd >> form;
                     if(form == 1)
-                        player->sendQixiInfo();
+                        player->sendGuangGunInfo();
                     else if(form == 2)
                     {
-                        UInt32 grade =  player->getGGTimeScore(); 
-                        GameMsgHdr hdr(0x1D5, WORKER_THREAD_WORLD, player, sizeof(grade));
+                        GObject::Player *  cap = player->getGGTimeCaptain();
+                        UInt32 grade =  cap->getGGTimeScore(); 
+                        GameMsgHdr hdr(0x1D5, WORKER_THREAD_WORLD, cap, sizeof(grade));
                         GLOBAL().PushMsg(hdr, &grade);
                     }
                }
@@ -2824,16 +2826,17 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     brd >> form;
                     if(form == 0)
                     {
-                        UInt64 pid = 0;
-                        brd >> pid;
-                        GObject::Player * pl = GObject::globalPlayers[pid];
+                        std::string name;
+                        brd >> name;
+	                    GObject::Player * pl = GObject::globalNamedPlayers[name];
+                        GObject::Player *cap = player->getGGTimeCaptain();
                         if(!pl)
                             break;
-                        if(player->CheckGGCanInvit(pl))
+                        if(cap->CheckGGCanInvit(pl))
                             return;
                         SYSMSGV(title, 214, player->getCountry(), player->getName().c_str());
                         SYSMSGV(content, 215, player->getCountry(), player->getName().c_str());
-                        pl->GetMailBox()->newMail(player, 0x15, title, content);
+                        pl->GetMailBox()->newMail(cap, 0x15, title, content);
                     }
                     else if(form == 1)
                     {
@@ -2864,10 +2867,11 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                             break;
                         case 3:
                             {
-                                UInt64 id = 0;
-                                UInt32 gold =0 ;
-                                brd >> id >>gold;
-                                GObject::Player * pl = GObject::globalPlayers[id];
+                                std::string name;
+                                brd >> name;
+                                GObject::Player * pl = GObject::globalNamedPlayers[name];
+                                UInt8 gold =0 ;
+                                brd >>gold;
                                 if(!pl)
                                     break;
                                 player -> AddGGTimes(pl,gold);
@@ -2876,13 +2880,19 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                         case 4:
                             player->BuyGuangGunAdvance();
                             break;
+                        case 5:
+                            player->GuangGunCompleteTask(3);
+                            break;
+                        case 6:
+                            player->getCompassChance();
+                            break;
                     }
                 }
-                break;
                 break;
             default:
                 break;
             }
+            player->sendGuangGunInfo();
             break;
         }
         default:

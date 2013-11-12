@@ -1961,8 +1961,6 @@ void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
     MSG_QUERY_PLAYER(player);
 
     UInt32 total = *((UInt32*)data);
-    if (!total)
-        return;
 
     bool inrank = false;
     UInt32 oldrank = 0;
@@ -1977,7 +1975,8 @@ void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
             break;
         }
     }
-
+    if (!total)
+        return;
     RCSort s;
     s.player = player;
     s.total = total;

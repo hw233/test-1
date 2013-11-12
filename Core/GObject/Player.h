@@ -577,7 +577,7 @@ namespace GObject
         UInt8 tasknum;
         UInt8 taskCom;
         UInt32 counts;
-        GuangGunInfo():status(0),player1(NULL),player2(NULL),pos(0),score(0),task(0),tasknum(0),taskCom(0),counts(0){}
+        GuangGunInfo():status(0),player1(NULL),player2(NULL),pos(1),score(0),task(0),tasknum(0),taskCom(0),counts(0){}
     };
     struct SnowInfo
     {
@@ -1839,7 +1839,9 @@ namespace GObject
         Player* getGGPlayer2() {return m_gginfo.player2;}
         inline UInt8 getGuangGunPos() { return m_gginfo.pos; }
         UInt32 getGGTimeScore();
-        Player* getGGTimeCaptain();
+        UInt32 getGGTimeTodayScore();
+        void getCompassChance();
+        Player* getGGTimeCaptain(UInt64 captainId = 0);
         UInt8 CheckGGCanInvit(Player * pl);
         void UpdateGGInfo();
         void sendGuangGunInfo();

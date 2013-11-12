@@ -4879,7 +4879,7 @@ void Clan::updataClanGradeInAirBook(Player* pl)
 {
 	Mutex::ScopedLock lk(_mutex);
 
-    _gradeInAirbook = 0;
+    UInt32 gradeInAirbook = 0;
     if(_deleted)
         return ;
 	Members::iterator it = _members.begin();
@@ -4888,8 +4888,9 @@ void Clan::updataClanGradeInAirBook(Player* pl)
         Player * player = (*it)->player; 
         if( player == NULL || ( pl != NULL && player == pl) )
             continue ; 
-        _gradeInAirbook += player->GetVar(VAR_11AIRBOOK_GRADE);
+        gradeInAirbook += player->GetVar(VAR_11AIRBOOK_GRADE);
 	}
+    _gradeInAirbook = gradeInAirbook;
 	return ;
 }
 void Clan::SendClanMemberGrade(Player* player)

@@ -410,6 +410,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setJinQuan(jinquan);
             player->SetSummerFlow3Value();
             player->SetSummerMeetValue();
+            player->setGGValue();
             player->SetAirBookValue();
             player->setPrayLoginInWeek();
             player->continuousLoginSummerFlow();
@@ -781,6 +782,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setJinQuan(jinquan);
             pl->SetSummerFlow3Value();
             pl->SetSummerMeetValue();
+            pl->setGGValue();
             pl->SetAirBookValue();
             pl->setPrayLoginInWeek();
             pl->continuousLoginSummerFlow();
