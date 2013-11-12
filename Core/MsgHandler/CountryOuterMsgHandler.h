@@ -650,7 +650,8 @@ struct TrumpLOrderReq
 {
     UInt16 _fgtId;
     UInt32 _itemId;
-    MESSAGE_DEF2(REQ::EQ_TRUMP_L_ORDER, UInt16, _fgtId, UInt32, _itemId);
+    UInt8 _opt ;
+    MESSAGE_DEF3(REQ::EQ_TRUMP_L_ORDER, UInt16, _fgtId, UInt32, _itemId , UInt8 ,_opt);
 };
 struct EquipUpgradeReq
 {
@@ -5091,16 +5092,17 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
     }
 
 	Package * pkg = player->GetPackage();
-    res = pkg->TrumpLOrder(req._fgtId, req._itemId);
+    res = pkg->TrumpLOrder(req._fgtId, req._itemId ,req._opt);
     if(res != 2)
     {
         ConsumeInfo ci(TrumpLOrder,0,0);
         player->useTael(amount, &ci);
         GameAction()->doStrong(player, SthTrumpLOrder, 0, 0);
     }
-
+    if( res > 2 )
+        return ;
 	Stream st(REP::EQ_TRUMP_L_ORDER);
-	st << res << req._fgtId << req._itemId << Stream::eos;
+	st << res << req._fgtId << req._itemId<< Stream::eos;
 	player->send(st);
 }
 

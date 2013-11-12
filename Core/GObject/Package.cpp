@@ -2838,7 +2838,8 @@ namespace GObject
             return 2;
 
         HoneyFall* hf = m_Owner->getHoneyFall();
-
+        if(!hf)
+            return 2;
         HoneyFallType hft;
         if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
             hft = e_HFT_Trump_Enchant;
@@ -6194,10 +6195,21 @@ namespace GObject
         return 0;
     }
 
-    UInt8 Package::TrumpLOrder(UInt16 fighterId, UInt32 trumpId)
+    UInt8 Package::TrumpLOrder(UInt16 fighterId, UInt32 trumpId ,UInt8 opt)
     {
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
+        HoneyFall* hf = m_Owner->getHoneyFall();
+        if(!hf)
+            return 2;
+        HoneyFallType hft = e_HFT_Trump_SJ;
+        if(opt == 1)
+        {
+            Stream st(REP::EQ_TRUMP_L_ORDER);
+            st <<static_cast<UInt8>(3)<< static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
+            m_Owner->send(st);
+            return 4;
+        }
 		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
 		if(trump == NULL ||
            (trump->getClass() != Item_Trump &&
@@ -6221,11 +6233,23 @@ namespace GObject
             return 2;
         AddItemHistoriesLog(TRUMP_LORDER_ITEM, 1);
 
-        UInt32 chance = GObjectManager::getTrumpLOrderChance(q-2, l-1);
-        if(uRand(1000) >= chance)
+        UInt32 chance = hf->getChanceFromHft(q+4, l,hft);
+        if(uRand(10000) >= chance)
+        {
+            hf->incHftValue(hft);       //法宝升阶祝福
+            hf->updateHftValueToDB(hft);
+            Stream st(REP::EQ_TRUMP_L_ORDER);
+            st <<static_cast<UInt8>(3)<<static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
+            m_Owner->send(st);
             return 1;
-
+        }
         ++ ied_trump.maxTRank;
+
+        hf->setHftValue(hft, 0);  //法宝升阶祝福
+        hf->updateHftValueToDB(hft);
+        Stream st(REP::EQ_TRUMP_L_ORDER);
+        st <<static_cast<UInt8>(3)<<static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
+        m_Owner->send(st);
         DB4().PushUpdateData("UPDATE `equipment` SET `maxTRank` = %u WHERE `id` = %u", ied_trump.maxTRank, trump->getId());
         DBLOG().PushUpdateData("insert into lorder_histories (server_id, player_id, equip_id, template_id, equip_maxrank, upgrade_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), trump->getId(), trump->GetItemType().getId(), ied_trump.maxTRank, TimeUtil::Now());
 
