@@ -1012,7 +1012,12 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
         if(rptid == 0)
         {
             Stream st(REP::ATTACK_NPC);
-            st << r << id << static_cast<UInt64>(ng->getExp()) << Stream::eos;
+            UInt64 exp;
+            if(ng)
+                exp = ng->getExp();
+            else
+                exp = 0;
+            st << r << id << exp << Stream::eos;
             pl->send(st);
         }
     }
