@@ -6182,10 +6182,17 @@ namespace GObject
 
         std::vector<int> typeidx;
         std::vector<int> valueidx;
+        std::vector<UInt8> allAttrType = _lbAttrConf.attrType;
+
         for(int i = 0; i < 4; ++ i)
         {
             if(lba.type[i] == 1 || lba.type[i] == 2)
                 typeidx.push_back(i);
+            if(lba.type[i] != 0)
+            {
+                if(find(allAttrType.begin(),allAttrType.end(),2) != allAttrType.end())
+                    allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),lba.type[i]));
+            }
         }
 
         bool update = false;
@@ -6236,12 +6243,6 @@ namespace GObject
             int idx2 = typeidx[1];
 
             update = true;
-            std::vector<UInt8> allAttrType = _lbAttrConf.attrType;
-            for(int i = 0; i < 4; ++ i)
-            {
-                if(lba.type[i] != 0)
-                    allAttrType.erase(allAttrType.begin() + lba.type[i] - 1);
-            }
             UInt8 size = allAttrType.size();
             UInt8 type = allAttrType[GRND(size)];
 
@@ -6256,6 +6257,23 @@ namespace GObject
                 lba.type[idx2] = 1;
                 lba.type[idx1] = type;
                 lba.value[idx1] = lba.value[idx1] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[idx1] - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1);
+            }
+        }
+
+        for(int j = 0; j < 4; ++ j)
+        {
+            for(int i = j; i < 4; ++ i)
+            {
+                if(i == j || lba.type[i] == 0 || lba.type[j] == 0)
+                    continue;
+                if(lba.type[j] == lba.type[i])
+                {
+                    update = true;
+                    if(lba.value[j] > lba.value[i])
+                        lba.type[i] = allAttrType[GRND(allAttrType.size())];
+                    else
+                        lba.type[j] = allAttrType[GRND(allAttrType.size())];
+                }
             }
         }
 
