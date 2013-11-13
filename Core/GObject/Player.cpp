@@ -3316,8 +3316,8 @@ namespace GObject
         if(!hf)
            return ;
         HoneyFallType hft = e_HFT_Trump_JF;
-        Stream st1(REP::EQ_TRUMP_L_ORDER);
-        st1 <<static_cast<UInt8>(3)<< static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
+        Stream st1(REP::SKILLSTRENGTHEN);
+        st1 <<static_cast<UInt8>(3)<<static_cast<UInt8>(2)<<static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
         send(st1);
         
 	}
