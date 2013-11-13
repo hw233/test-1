@@ -6208,7 +6208,7 @@ namespace GObject
                     float colorP = ((float)(lba.value[i])/_lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i]-1))*400;
                     if(colorP < _lbAttrConf.colorVal[3])
                     {
-                        lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * _lbAttrConf.colorVal[3]/400;
+                        lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * _lbAttrConf.colorVal[3]/400 + 0.999;
                         update = true;
                         break;
                     }
@@ -6221,7 +6221,7 @@ namespace GObject
                     if(lba.type[i] != 0 && lba.value[i] == 0)
                     {
                         float factor = ((float)(lba.value[idx])) / _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[idx] - 1);
-                        lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * factor;
+                        lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * factor + 0.999;
                         update = true;
                         break;
                     }
