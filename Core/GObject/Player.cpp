@@ -24922,7 +24922,7 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
             return ;
         else m_gginfo.tasknum++;
     }
-    else if(type == 1)
+    else if(type == 1 && m_gginfo.task != 0)
     {
         UInt32 gold = 10; 
         if (getGold() < gold)
@@ -24947,7 +24947,7 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
     }
     else if(type == 3)
     {
-        if(m_gginfo.tasknum !=m_gginfo.taskCom)
+        if(m_gginfo.tasknum !=m_gginfo.taskCom || m_gginfo.task == 0)
             return ;
         {
             m_gginfo.task =0;
