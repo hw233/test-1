@@ -10,6 +10,8 @@
 #include "GObject/OpenAPIWorker.h"
 #include "LBNameTmpl.h"
 #include "SaleMgr.h" 
+#include "Country.h"
+#include "Script/GameActionLua.h"
 
 
 namespace GObject
@@ -152,8 +154,11 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 			else
 				revenue += revTael;
 
-            if(sales[i].price > (sales[i].count * saleItems[i]->GetItemType().salePriceUp + 0.001f))
-                return;
+            if(GameAction()->isSalePriceLimitServer())
+            {
+                if(sales[i].price > (sales[i].count * saleItems[i]->GetItemType().salePriceUp + 0.001f))
+                    return;
+            }
 		}
 		if (revenue > _owner->getTael())
         {

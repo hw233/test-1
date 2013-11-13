@@ -37,4 +37,5 @@ require("World/CFriend")
 require("World/StrengthenMgr")
 require("items/LuckyDraw")
 require("items/Awards")
+require("salePriceLimit")
 

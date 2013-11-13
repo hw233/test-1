@@ -1822,5 +1822,10 @@ namespace Script
 		return Call<bool>("TaskFuncExist", taskId);
 	}
 
+
+    bool GameActionLua::isSalePriceLimitServer()
+    {
+        return Call<bool>("isSalePriceLimitServer", cfg.serverNum);
+    }
 }
 

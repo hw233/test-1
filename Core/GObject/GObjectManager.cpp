@@ -6205,6 +6205,8 @@ namespace GObject
                 std::vector<int> valueidx;
                 for(int i = 0; i < 4; ++ i)
                 {
+                    if(lba.type[i] == 0)
+                        continue;
                     float colorP = ((float)(lba.value[i])/_lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i]-1))*400;
                     if(colorP < _lbAttrConf.colorVal[3])
                     {
