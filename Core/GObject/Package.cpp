@@ -417,6 +417,7 @@ namespace GObject
 
         std::vector<UInt8> allAttrType = lbAttrConf.attrType;
         UInt8 itemTypeIdx = subClass - Item_LBling;
+        allAttrType.erase(allAttrType.begin() + 1);
         for(int i = 0; i < attrNum; ++ i)
         {
             UInt8 size = allAttrType.size();
@@ -4875,6 +4876,7 @@ namespace GObject
         }
         else if(1 == mark)
         {
+#if 0
             if (fromEquip->GetCareer() != toEquip->GetCareer() &&
                 fromEquip->GetCareer() > 0 &&
                 toEquip->GetCareer() > 0)
@@ -4883,7 +4885,7 @@ namespace GObject
                   2.全职业装备可继承任何职业装备，或接受任何职业装备的继承;*/
                 return 18;
             }
-
+#endif
             if(cfg.serverNum != 34 && m_Owner->getVipLevel() < 4)
             {
                 return 17;   //御剑等级小于4级
@@ -5305,20 +5307,20 @@ namespace GObject
         tIed.extraAttr2.type1 = fIed.extraAttr2.type1;
         tIed.extraAttr2.type2 = fIed.extraAttr2.type2;
         tIed.extraAttr2.type3 = fIed.extraAttr2.type3;
-        tIed.extraAttr2.value1 = fIed.extraAttr2.value1 - fmaxV1 * 15;
         
+        tIed.extraAttr2.value1 = (fIed.extraAttr2.value1 - fmaxV1 * 15) * tmaxV1 / fmaxV1;
         if(float(tIed.extraAttr2.value1) < tmaxV1 * tfactor)
         {
             tIed.extraAttr2.value1 = tmaxV1*tfactor;
         }
 
-        tIed.extraAttr2.value2 = fIed.extraAttr2.value2 - fmaxV2 * 15;
+        tIed.extraAttr2.value2 = (fIed.extraAttr2.value2 - fmaxV2 * 15) * tmaxV2 / fmaxV2;
         if(float(tIed.extraAttr2.value2) < tmaxV2 * tfactor)
         {
             tIed.extraAttr2.value2 = tmaxV2 * tfactor;
         }
 
-        tIed.extraAttr2.value3 = fIed.extraAttr2.value3 - fmaxV3 * 15;
+        tIed.extraAttr2.value3 = (fIed.extraAttr2.value3 - fmaxV3 * 15) * tmaxV3 / fmaxV3;
         if(float(tIed.extraAttr2.value3) < tmaxV3 * tfactor)
         {
             tIed.extraAttr2.value3 = tmaxV3 * tfactor;
@@ -6718,7 +6720,7 @@ namespace GObject
                 if(lba.skill[1])
                     ++ skillNum;
                 if(lba.tongling)
-                    value += lbAttrConf.getSmeltExp(lv, subClass - Item_LBling, lba.type, lba.value, 4, skillNum);
+                    value += lbAttrConf.getSmeltExp(lv, subClass - Item_LBling, lba.type, lba.value, 4, skillNum,lba.lbColor);
                 else
                     value += lbAttrConf.getSmeltExp2(lv, subClass - Item_LBling, lba.lbColor);
             }
@@ -6772,6 +6774,7 @@ namespace GObject
             return false;
         stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
         std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+        allAttrType.erase(allAttrType.begin() + 1);
         attrNum = m_lbSmeltInfo.itemId == FULING_ITEM_PROTECT ? 4 : 3;
         UInt8 orangeAttrNum = attrNum;
 
@@ -6892,6 +6895,7 @@ namespace GObject
                 attrNum = m_lbSmeltInfo.counts;
 
             std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+            //allAttrType.erase(allAttrType.begin() + 1);
             UInt8 itemTypeIdx = subClass - Item_LBling;
             // 古籍指定的属性
             {
@@ -6902,14 +6906,6 @@ namespace GObject
                     UInt8 size = allAttrType.size();
                     idx = uRand(size);
                 }
-                else if(gjIdx < 4)
-                {
-                    UInt8 lbAttrIdx[3][4] =
-                    { {0, 1, 6, 11}, // 物功，法功，身法，反击
-                      {2, 3, 4, 5},  // 物防，法防，生命, 坚韧
-                      {7, 8, 9, 10}};// 命中，闪避，暴击，破击
-                    idx = lbAttrIdx[gjIdx - 1][uRand(4)];
-                }
                 else
                 {
                     UInt8 lbAttrIdx[12] = {0, 1, 11, 6, 2, 3, 5, 4, 9, 10, 8, 7};
@@ -6918,7 +6914,6 @@ namespace GObject
 
                 if(5 == color)
                     orangeCnt -= 1;
-
                 lbattr.type[0] = allAttrType[idx];
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
@@ -6927,6 +6922,8 @@ namespace GObject
                 lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]-1) * disFactor + 0.9999f;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
+            if(find(allAttrType.begin(),allAttrType.end(),2) != allAttrType.end())
+                allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),2));
             for(int i = 1; i < attrNum; ++ i)
             {
                 if(5 == color2)

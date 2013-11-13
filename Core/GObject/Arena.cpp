@@ -756,9 +756,8 @@ void Arena::readFrom( BinaryReader& brd )
 #endif
 void Arena::readFrom( BinaryReader& brd )
 {
-    UInt8 sIdx = 0;
     UInt16 otherSession = 0;
-	brd >> sIdx >> _session >> otherSession;
+	brd >> _session >> otherSession;
     teamArenaMgr.setSession(otherSession);
 	UInt8 progress;
 	UInt8 reg;
@@ -774,19 +773,19 @@ void Arena::readFrom( BinaryReader& brd )
 	switch(_progress)
 	{
     case e_progress_nextbegin:
-		if(!_players.empty() && sIdx == 0)
+		if(!_players.empty())
         {
             DB1().PushUpdateData("DELETE FROM `arena_bet`");
             _playerCount[0] = 0;
 			_players.clear();
         }
-        if(!_preliminaryPlayers[0].empty() && sIdx == 0)
+        if(!_preliminaryPlayers[0].empty())
         {
             _preliminaryPlayers[0].clear();
             _preliminaryPlayers_list[0].clear();
             _preliminaryPlayers_list_set[0].clear();
         }
-        if(!_preliminaryPlayers[1].empty() && sIdx == 0)
+        if(!_preliminaryPlayers[1].empty())
         {
             _preliminaryPlayers[1].clear();
             _preliminaryPlayers_list[1].clear();
@@ -794,36 +793,36 @@ void Arena::readFrom( BinaryReader& brd )
         }
         break;
 	case e_progress_sign:
-		if(!_players.empty() && sIdx == 0)
+		if(!_players.empty())
         {
             DB1().PushUpdateData("DELETE FROM `arena_bet`");
             _playerCount[0] = 0;
 			_players.clear();
         }
-        if(!_preliminaryPlayers[0].empty() && sIdx == 0)
+        if(!_preliminaryPlayers[0].empty())
         {
             _preliminaryPlayers[0].clear();
             _preliminaryPlayers_list[0].clear();
             _preliminaryPlayers_list_set[0].clear();
         }
-        if(!_preliminaryPlayers[1].empty() && sIdx == 0)
+        if(!_preliminaryPlayers[1].empty())
         {
             _preliminaryPlayers[1].clear();
             _preliminaryPlayers_list[1].clear();
             _preliminaryPlayers_list_set[1].clear();
         }
-        readPlayers(brd, sIdx);
+        readPlayers(brd);
         break;
     case e_progress_sign_end:
 	case e_progress_ruwei_end:
-        readPrePlayers(brd, sIdx);
+        readPrePlayers(brd);
         if(reg == 1)
             readHistories(brd);
 		break;
 	case e_progress_ruwei:
 	case e_progress_32:
         if(reg == 1)
-            readPrePlayers(brd, sIdx);
+            readPrePlayers(brd);
         readHistories(brd);
 		break;
     case e_progress_32_end:
@@ -835,14 +834,13 @@ void Arena::readFrom( BinaryReader& brd )
     case e_progress_end:
         if(reg == 1)
         {
-            readPrePlayers(brd, sIdx);
+            readPrePlayers(brd);
             readHistories(brd);
         }
 
 
         bool oldstatus = (_status > 0);
-        if(sIdx == 0)
-            readElimination(brd);
+        readElimination(brd);
         if(oldstatus != (_status > 0))
             fStatus = true;
         break;
@@ -1307,13 +1305,13 @@ void Arena::check()
 	}
 }
 
-void Arena::readPrePlayers(BinaryReader& brd, UInt8 sIdx)
+void Arena::readPrePlayers(BinaryReader& brd)
 {
     Mutex::ScopedLock lk(globalPlayers.getMutex());
     std::unordered_map<UInt64, Player *>& pm = globalPlayers.getMap();
     for(int i = 0; i < 2; ++ i)
     {
-        if(!_preliminaryPlayers[i].empty() && sIdx == 0)
+        if(!_preliminaryPlayers[i].empty())
         {
             _preliminaryPlayers[i].clear();
             _preliminaryPlayers_list[i].clear();
@@ -1386,9 +1384,9 @@ void Arena::readPrePlayers(BinaryReader& brd, UInt8 sIdx)
     }
 }
 
-void Arena::readPlayers(BinaryReader& brd, UInt8 sIdx)
+void Arena::readPlayers(BinaryReader& brd)
 {
-    if(!_players.empty() && sIdx == 0)
+    if(!_players.empty())
     {
         _playerCount[0] = 0;
         _players.clear();
