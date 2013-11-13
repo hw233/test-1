@@ -1006,6 +1006,7 @@ void OnRechargeRank ( GameMsgHdr& hdr,  const void* data )
     RCSort s;
     s.player = player;
     s.total = total;
+    s.time = TimeUtil::Now();
     World::rechargeSort.insert(s);
 
     UInt32 rank = 0;

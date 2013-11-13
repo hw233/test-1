@@ -8825,6 +8825,7 @@ function getDragonKingAward(step, flag)
             [12] = {{6193,1}},
             [13] = {{141,1}},
             [14] = {{6194,1}},
+            [15] = {{312,1}},
         },
     }
     local chances = {

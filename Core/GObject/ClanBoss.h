@@ -31,10 +31,25 @@ namespace GObject
         UInt32 buffEffect[g_clanSkillsNax];
         UInt32 buffCD[g_clanSkillsNax];
     };
+
+    struct PlayerScore
+    {
+        Player * player;
+        UInt32 score;
+        UInt32 time;
+        PlayerScore() : player(NULL), score(0), time(0) {}
+    };
+
+    struct lt_sort
+    {
+        bool operator() (const PlayerScore & a, const PlayerScore & b) const { return (a.score > b.score) || (a.score == b.score && a.time < b.time); }
+    };
  
     class ClanBoss 
     {
         typedef multimap<UInt32, Clan*, std::greater<int> > TSortMap;
+
+        typedef multiset<PlayerScore, lt_sort> PlayerScoreSort;
    public:
 		static ClanBoss& instance()
 		{

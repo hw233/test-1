@@ -247,6 +247,7 @@ namespace GObject
         WANJIE      = 12,   //万劫不灭
         BILAN       = 13,   //碧岚天衣
         LIUGUANG    = 14,   //刹那流光
+        ZHUTIAN     = 15,   //诸天宝鉴
 
         DRAGONKING_MAX,
     };
@@ -1149,6 +1150,7 @@ namespace GObject
         void SetVarOffset(UInt32 offset);
 
 		inline const std::string& getName() { return _playerData.name; }
+		inline void setName(std::string name) { _playerData.name = name; }
 		inline const char * getPName() { return _playerData.name.c_str(); }
 		inline const std::string& getBattleName() { if(_battleName.empty()) rebuildBattleName(); return _battleName; }
 		void rebuildBattleName();
@@ -2309,6 +2311,9 @@ namespace GObject
         void sendQQBoardLoginInfo();
         void SetQQBoardLogin();
         void SetQQBoardValue();
+        void SetNovLogin();
+        void sendNovLoginInfo();
+        void getNovLoginAward(UInt8 type =0);
         void sendLuckyMeetLoginInfo();
         void SetLuckyMeetValue();
         void SetSummerMeetValue();
@@ -2418,6 +2423,7 @@ namespace GObject
 
         UInt32 getBattlePoint();
         void calcLingbaoBattlePoint();
+        void recalcLingbao();
         void setMaxLingbaoBattlePoint(UInt32 value);
         UInt32 getMaxLingbaoBattlePoint();
         UInt32 getMaxPetBattlePoint();
@@ -2644,6 +2650,10 @@ namespace GObject
         void sendRYHBInfo();
         void getRYHBAward(UInt8 idx, UInt8 cnt);
         void getSurnameLegendAward(SurnameLegendAwardFlag flag);
+
+        void Buy7DayFund();
+        void send7DayFundInfo();
+        void get7DayFundAward(UInt8 type);
     private:
         MoFang* m_moFang;
 
@@ -2671,6 +2681,7 @@ namespace GObject
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();
+        void modifyPlayerName(UInt32 itemid,UInt8 binding,std::string modifyName);
 	};
 
 

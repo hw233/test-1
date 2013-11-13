@@ -55,7 +55,10 @@ struct RCSort
 {
     GObject::Player* player;
     UInt32 total;
+    UInt32 time;
+    RCSort():player(NULL),total(0),time(0){}
 };
+
 
 struct ClanSort   //帮派积分（10· 1活动）
 {
@@ -64,14 +67,14 @@ struct ClanSort   //帮派积分（10· 1活动）
 };   
 struct lt_rcsort
 {
-    bool operator()(const RCSort& a, const RCSort& b) const { return a.total > b.total; }
+    bool operator()(const RCSort& a, const RCSort& b) const { return a.total > b.total || (a.total==b.total && a.time < b.time); }
 };
 struct clan_sort
 {
     bool operator()(const ClanSort& a, const ClanSort& b) const { return a.total >= b.total; }
 };
 
-typedef std::set<RCSort, lt_rcsort> RCSortType;
+typedef std::multiset<RCSort, lt_rcsort> RCSortType;
 typedef std::set<ClanSort,clan_sort> ClanGradeSort;
 
 struct supportSort

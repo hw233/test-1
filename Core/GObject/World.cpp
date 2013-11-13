@@ -2635,6 +2635,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             RCSort s;
             s.player = p;
             s.total = total;
+            s.time = p->GetVar(VAR_RECHARGE_TIME);
             World::rechargeSort.insert(s);
         }
     }

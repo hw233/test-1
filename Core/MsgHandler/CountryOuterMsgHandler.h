@@ -363,6 +363,13 @@ struct CountryBattleJoinStruct
 	MESSAGE_DEF1(REQ::CAMPS_WAR_JOIN, UInt8, _action);
 };
 
+struct CountryBattleInfo
+{
+	UInt8 _action;
+
+	MESSAGE_DEF1(REQ::CAMPS_WAR_INFO, UInt8, _action);
+};
+
 struct LanchChallengeReq
 {
 	std::string target;
@@ -1368,7 +1375,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->GetTaskMgr()->CompletedTask(202);
     pl->SetQQBoardValue();
     pl->sendQQBoardLoginInfo();
-    pl->sendSummerMeetInfo();
+    pl->sendSummerMeetInfo();   //Fund
+    pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
 }
@@ -1409,6 +1417,14 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 player->setMapId(mapId);
             }
             break;
+        case 0x20:
+            {
+                UInt32 itemid;
+                UInt8 binding;
+                string name;
+                br >> itemid >> binding >> name;
+                player->modifyPlayerName(itemid,binding,name);
+            }
         default:
             return;
 	}
@@ -2856,6 +2872,28 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
     if(rep.result == 0)
         player->countryBattleUdpLog(1090, player->getCountry());
 	player->send(rep);
+}
+
+void CountryBattleInfoReq( GameMsgHdr& hdr, CountryBattleInfo& req )
+{
+	MSG_QUERY_PLAYER(player);
+    if(WORLD().isNewCountryBattle() || (gClanCity && gClanCity->isOpen()))
+		return;
+	if(!PLAYER_DATA(player, inCity))
+		return;
+	UInt16 loc = PLAYER_DATA(player, location);
+	GObject::SpotData * spot = GObject::Map::Spot(loc);
+	if(spot == NULL || !spot->m_CountryBattle)
+		return;
+
+	CountryBattleJoinReply rep;
+	CountryBattle * cb = spot->GetCountryBattle();
+    if(!cb) return;
+	if(req._action == 0)
+	{
+		rep.result = cb->playerEnter(player) ? 0 : 2;
+        cb->sendInfo(player);
+	}
 }
 
 void NewCountryBattleJoinReq( GameMsgHdr& hdr, const void * data )
@@ -5875,7 +5913,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
     if (op  < 6 )
         return;
-    if((op != 10 && op!= 20 &&op!=22 &&op!=25) && !player->hasChecked())
+    if((op != 10 && op!= 20 &&op!=22 &&op!=25 && op!=27) && !player->hasChecked())
          return;
 
     switch(op)
@@ -5952,6 +5990,29 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
                 player->GetQQBoardAward(index);
             }
             player->sendQQBoardLogin();
+            break;
+        case 27:
+            {
+              if(idx == 0)
+                  player->SetNovLogin();
+              else if(idx == 1)
+              {
+                  br >>index ;
+                  player->getNovLoginAward(index);
+              }
+              player->sendNovLoginInfo();
+            }
+            break;
+        case 26:
+            br >>index;
+            if(idx == 0 )
+                player->Buy7DayFund();
+            else if(idx == 1)
+            {
+                player->get7DayFundAward(index);
+            }
+            player->send7DayFundInfo();
+            break;
         default:
             break;
     }
@@ -6117,6 +6178,8 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
 void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
 {
     MSG_QUERY_PLAYER(pl);
+	if(!pl->hasChecked())
+		return;
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     UInt32 fighterid = 0;

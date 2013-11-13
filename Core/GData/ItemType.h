@@ -271,6 +271,7 @@ namespace GData
 		UInt32		trumpExp;
         UInt16      data;
         UInt8       career;
+        float       salePriceUp;
 
 		ItemBaseType(UInt32 id = 0, const std::string& name = "") : ObjectBaseT<>(id, name)	{}
 		virtual ~ItemBaseType() { }	//RTTI
