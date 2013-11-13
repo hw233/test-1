@@ -74,7 +74,6 @@ local serverTable = {
 
 function isSalePriceLimitServer(serverNum)
 
-    print("xxxx\n")
 	local limit = serverTable[serverNum];
 	if limit == nil then
 		return false;
