@@ -6170,6 +6170,108 @@ namespace GObject
         return true;
     }
 
+    void GObjectManager::checkLingbaoAttrType(ItemLingbao* lb)
+    {
+        if(!lb)
+            return;
+
+        ItemLingbaoAttr& lba = lb->getLingbaoAttr();
+        UInt8 lv = lb->getValueLev();
+        UInt8 subClass = lb->getClass();
+        UInt8 itemTypeIdx = subClass - Item_LBling;
+
+        std::vector<int> typeidx;
+        std::vector<int> valueidx;
+        for(int i = 0; i < 4; ++ i)
+        {
+            if(lba.type[i] == 1 || lba.type[i] == 2)
+                typeidx.push_back(i);
+        }
+
+        bool update = false;
+        size_t mdsize = typeidx.size();
+        if(mdsize == 0)
+            return;
+        if(mdsize == 1)
+        {
+            int idx = typeidx[0];
+            if(lba.type[idx] == 2)
+            {
+                update = true;
+                lba.type[idx] = 1;
+            }
+            else if(lba.lbColor == 5)
+            {
+                std::vector<int> valueidx;
+                for(int i = 0; i < 4; ++ i)
+                {
+                    float colorP = ((float)(lba.value[i])/_lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i]-1))*400;
+                    if(colorP < _lbAttrConf.colorVal[3])
+                    {
+                        lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * _lbAttrConf.colorVal[3]/400;
+                        update = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                for(int i = 0; i < 4; ++ i)
+                {
+                    if(lba.type[i] != 0 && lba.value[i] == 0)
+                    {
+                        float factor = ((float)(lba.value[idx])) / _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[idx] - 1);
+                        lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * factor;
+                        update = true;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            int idx1 = typeidx[0];
+            int idx2 = typeidx[1];
+
+            update = true;
+            std::vector<UInt8> allAttrType = _lbAttrConf.attrType;
+            allAttrType.erase(allAttrType.begin());
+            allAttrType.erase(allAttrType.begin());//排除物攻，法功
+            UInt8 size = allAttrType.size();
+            UInt8 type = allAttrType[GRND(size)];
+
+            if(lba.value[idx1] > lba.value[idx2])
+            {
+                lba.type[idx1] = 1;
+                lba.type[idx2] = type;
+                lba.value[idx2] = lba.value[idx2] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[idx2] - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1);
+            }
+            else
+            {
+                lba.type[idx2] = 1;
+                lba.type[idx1] = type;
+                lba.value[idx1] = lba.value[idx1] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[idx1] - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1);
+            }
+        }
+
+        if(update)
+        {
+            std::string strType;
+            std::string strValue;
+            for(int i = 0;i <4; ++i)
+            {
+                strType += Itoa(lba.type[i],10); 
+                strValue += Itoa(lba.value[i],10); 
+                if(i < 3)
+                {
+                    strType += ',';
+                    strValue += ',';
+                }
+            }
+            DB4().PushUpdateData("UPDATE `lingbaoattr` SET `types`='%s', `values`='%s' WHERE `id`=%u", strType.c_str(), strValue.c_str(), lb->getId());
+        }
+    }
+
 	bool GObjectManager::loadLingbaoAttr()
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -6251,9 +6353,7 @@ namespace GObject
                         }
                     }
 
-                    if(lba.lbColor == 5)
-                    {
-                    }
+                    checkLingbaoAttrType(lb);
 				}
 				break;
 			default:

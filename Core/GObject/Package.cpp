@@ -6939,6 +6939,8 @@ namespace GObject
                 if(5 == color)
                     orangeCnt -= 1;
                 lbattr.type[0] = allAttrType[idx];
+                if(lbattr.type[0] == 2)
+                    lbattr.type[0] = 1;
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color);

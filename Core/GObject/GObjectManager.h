@@ -15,6 +15,7 @@ namespace GObject
     class ItemInnateTrump;
 	class ItemWeapon;
 	class ItemArmor;
+    class ItemLingbao;
 #ifndef CHANCECOND
 #define CHANCECOND(a) ((0xFFFF0000 & a) >> 16)
 #endif
@@ -372,6 +373,7 @@ namespace GObject
 		static ItemFashion * fetchFashion(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemWeapon * fetchWeapon(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemArmor * fetchArmor(UInt32);      //获取盔甲,基于fetchEquipment函数实现
+        static void checkLingbaoAttrType(ItemLingbao* lb);
 
 		static bool InitGlobalObject();
 		static bool resetClanData(UInt32);
