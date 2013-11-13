@@ -6925,7 +6925,7 @@ namespace GObject
             {
                 UInt8 idx = 0;
 
-                if(gjIdx == 0)
+                if(gjIdx < 4)
                 {
                     UInt8 size = allAttrType.size();
                     idx = uRand(size);

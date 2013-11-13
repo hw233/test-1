@@ -6202,8 +6202,6 @@ namespace GObject
                     lba.tongling = dblba.tongling;
                     lba.lbColor = dblba.lbcolor;
                     lba.battlePoint = dblba.battlePoint;
-                    int idx1 = -1;
-                    int idx2 = -1;
                     {
                         StringTokenizer tk(dblba.types, ",");
                         if (tk.count())
@@ -6213,13 +6211,6 @@ namespace GObject
                                 if(i > 3)
                                     break;
                                 lba.type[i] = ::atoi(tk[i].c_str());
-                                if(lba.type[i] == 2 || lba.type[i] == 1)
-                                {
-                                    if(idx1 == -1)
-                                        idx1 = i;
-                                    else
-                                        idx2 = i;
-                                }
                             }
                         }
                     }
@@ -6259,56 +6250,10 @@ namespace GObject
                             }
                         }
                     }
-                    if(idx2 != -1)
-                    {
-                        //UInt8 attrNum = _lbAttrConf.getAttrNum(uRand(100));
-                        std::vector<UInt8> allAttrType = _lbAttrConf.attrType;
-                        allAttrType.erase(allAttrType.begin());
-                        allAttrType.erase(allAttrType.begin());//排除物攻，法功
-                        UInt8 size = allAttrType.size();
-                        UInt8 idx = allAttrType[GRND(size)];
-		                const GData::ItemBaseType * itype = GData::itemBaseTypeManager[dblba.itemId];
-				        UInt8 lv = itype->vLev;
-                        UInt8 subClass = itype->subClass;
-                        UInt8 itemTypeIdx = subClass - Item_LBling;
-                        _lbAttrConf.getAttrMax(lv,itemTypeIdx,idx);  
 
-                        if(lba.value[idx1] >= lba.value[idx2])
-                        {
-                            lba.type[idx1] = 1;
-                            lba.type[idx2] = idx;
-                            lba.value[idx2] = lba.value[idx2] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,idx2) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,idx);
-                        }
-                        else
-                        {
-                            lba.type[idx2] = 1;
-                            lba.type[idx1] = idx;
-                            lba.value[idx1] = lba.value[idx2] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,idx2) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,idx);
-                        }
-                                                
-
-                    }
-                    else if(idx1 != -1)
+                    if(lba.lbColor == 5)
                     {
-                        if(lba.type[idx1] == 2)
-                            lba.type[idx1] = 1;
                     }
-                    std::string strType;
-                    std::string strValue;
-                    for(int i = 0;i <4; ++i)
-                    {
-                        strType += Itoa(lba.type[i],10); 
-                        strValue += Itoa(lba.value[i],10); 
-                        if(i < 3)
-                        {
-                            strType += ',';
-                            strValue += ',';
-                        }
-                    }
-
-                    DB4().PushUpdateData("UPDATE `lingbaoattr` SET `types`='%s', `values`='%s' WHERE `id`=%u", strType.c_str(),strValue.c_str(), dblba.id);
-                    
-                    
 				}
 				break;
 			default:
