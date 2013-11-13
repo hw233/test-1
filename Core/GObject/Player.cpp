@@ -24805,7 +24805,7 @@ void Player::pushPetInfo2Leaderboard()
     }
 }
 
-void Player::Add11g1rade(UInt32 grade)
+void Player::Add11grade(UInt32 grade)
 {
     if(!World::get11Time())
        return ;
