@@ -2238,6 +2238,61 @@ UInt32 Fighter::calcLingbaoBattlePoint()
     return value;
 }
 
+UInt32 Fighter::recalcLingbao()
+{
+    if(!_owner)
+        return 0;
+
+    LingbaoInfoList lingbao;
+    lingbao.id = _owner->getId();
+    lingbao.name = _owner->getName();
+    lingbao.pf = _owner->getPF();
+    UInt32 value = 0;
+    for(int idx = 0; idx < getMaxLingbaos(); ++ idx)
+    {
+        UInt32 bp = 0;
+		ItemLingbao* lb = static_cast<ItemLingbao*>(getLingbao(idx));
+        if(!lb)
+            continue;
+        ItemLingbaoAttr& lbattr = lb->getLingbaoAttr();
+        bp = Script::BattleFormula::getCurrent()->calcLingbaoBattlePoint(&lbattr);
+        lingbao.equipId = lb->getId();
+        lingbao.itemId = lb->GetTypeId();
+        lingbao.tongling = lbattr.tongling;
+        lingbao.lbColor = lbattr.lbColor;
+        for (UInt8 i = 0; i < 4; ++i)
+        {
+            lingbao.type[i] = lbattr.type[i];
+            lingbao.value[i] = lbattr.value[i];
+        }
+        for (UInt8 i = 0; i < 2; ++i)
+        {
+            if (lbattr.skill[i])
+            {
+                const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
+                bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
+                lingbao.skill[i] = lbattr.skill[i];
+                lingbao.factor[i] = lbattr.factor[i];
+            }
+        }
+        if (bp != lbattr.battlePoint)
+        {
+            lbattr.battlePoint = bp;
+            DB4().PushUpdateData("UPDATE `lingbaoattr` SET `battlepoint`='%u' WHERE `id`=%u", bp, lb->getId());
+        }
+        lingbao.battlePoint = lbattr.battlePoint;
+        leaderboard.eraseLingbaoInfo(lingbao);
+        leaderboard.pushLingbaoInfo(lingbao);
+        value = value > bp ? value:bp;
+    }
+
+    UInt32 maxlbBp = _owner->getMaxLingbaoBattlePoint();
+    if(value > maxlbBp)
+        _owner->setMaxLingbaoBattlePoint(value);
+
+    return value;
+}
+
 void Fighter::pushLingbaoInfo(ItemEquip* equip)
 {
     if(!equip || !_owner)

@@ -525,8 +525,13 @@ namespace GObject
             std::abort();
         }
 
-
-		DB::gDataDBConnectionMgr->UnInit();
+        if(!LoadPlayerNamed())
+        {
+            fprintf(stderr, "LoadPlayerNamed error!\n");
+            std::abort();
+        }
+		
+        DB::gDataDBConnectionMgr->UnInit();
 	}
 
 	bool GObjectManager::InitGlobalObject()
@@ -6494,6 +6499,24 @@ namespace GObject
 		return true;
 	}
 
+    bool GObjectManager::LoadPlayerNamed()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading player_named:");
+		DBPlayerNamed dbpn;
+		if(execu->Prepare("SELECT `serverNo`, `playerid`, `name` FROM `player_named` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            GObject::Player::patchMergedName(dbpn.id,dbpn.name);
+            GObject::globalNamedPlayers.add(dbpn.name,globalPlayers[dbpn.id]);
+        }
+		lc.finalize();
+		return true;
+	}
 
 }
 

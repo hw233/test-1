@@ -1149,6 +1149,7 @@ namespace GObject
         void SetVarOffset(UInt32 offset);
 
 		inline const std::string& getName() { return _playerData.name; }
+		inline void setName(std::string name) { _playerData.name = name; }
 		inline const char * getPName() { return _playerData.name.c_str(); }
 		inline const std::string& getBattleName() { if(_battleName.empty()) rebuildBattleName(); return _battleName; }
 		void rebuildBattleName();
@@ -2418,6 +2419,7 @@ namespace GObject
 
         UInt32 getBattlePoint();
         void calcLingbaoBattlePoint();
+        void recalcLingbao();
         void setMaxLingbaoBattlePoint(UInt32 value);
         UInt32 getMaxLingbaoBattlePoint();
         UInt32 getMaxPetBattlePoint();
@@ -2671,6 +2673,7 @@ namespace GObject
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();
+        void modifyPlayerName(UInt32 itemid,UInt8 binding,std::string modifyName);
 	};
 
 

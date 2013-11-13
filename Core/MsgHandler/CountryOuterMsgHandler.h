@@ -363,6 +363,13 @@ struct CountryBattleJoinStruct
 	MESSAGE_DEF1(REQ::CAMPS_WAR_JOIN, UInt8, _action);
 };
 
+struct CountryBattleInfo
+{
+	UInt8 _action;
+
+	MESSAGE_DEF1(REQ::CAMPS_WAR_INFO, UInt8, _action);
+};
+
 struct LanchChallengeReq
 {
 	std::string target;
@@ -1409,6 +1416,14 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 player->setMapId(mapId);
             }
             break;
+        case 0x20:
+            {
+                UInt32 itemid;
+                UInt8 binding;
+                string name;
+                br >> itemid >> binding >> name;
+                player->modifyPlayerName(itemid,binding,name);
+            }
         default:
             return;
 	}
@@ -2856,6 +2871,28 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
     if(rep.result == 0)
         player->countryBattleUdpLog(1090, player->getCountry());
 	player->send(rep);
+}
+
+void CountryBattleInfoReq( GameMsgHdr& hdr, CountryBattleInfo& req )
+{
+	MSG_QUERY_PLAYER(player);
+    if(WORLD().isNewCountryBattle() || (gClanCity && gClanCity->isOpen()))
+		return;
+	if(!PLAYER_DATA(player, inCity))
+		return;
+	UInt16 loc = PLAYER_DATA(player, location);
+	GObject::SpotData * spot = GObject::Map::Spot(loc);
+	if(spot == NULL || !spot->m_CountryBattle)
+		return;
+
+	CountryBattleJoinReply rep;
+	CountryBattle * cb = spot->GetCountryBattle();
+    if(!cb) return;
+	if(req._action == 0)
+	{
+		rep.result = cb->playerEnter(player) ? 0 : 2;
+        cb->sendInfo(player);
+	}
 }
 
 void NewCountryBattleJoinReq( GameMsgHdr& hdr, const void * data )
