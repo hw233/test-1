@@ -6190,7 +6190,7 @@ namespace GObject
                 typeidx.push_back(i);
             if(lba.type[i] != 0)
             {
-                if(find(allAttrType.begin(),allAttrType.end(),2) != allAttrType.end())
+                if(find(allAttrType.begin(),allAttrType.end(),lba.type[i]) != allAttrType.end())
                     allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),lba.type[i]));
             }
         }
