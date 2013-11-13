@@ -8222,6 +8222,7 @@ namespace GObject
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
             GameAction()->sendRechargeMails(this, total, total+r);
             SetVar(VAR_RECHARGE_TOTAL, total+r);
+            SetVar(VAR_RECHARGE_TIME, TimeUtil::Now());
             sendRechargeInfo(true);
         }
 
@@ -8230,6 +8231,7 @@ namespace GObject
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL3366);
             GameAction()->sendRechargeMails(this, total, total+r);
             SetVar(VAR_RECHARGE_TOTAL3366, total+r);
+            SetVar(VAR_RECHARGE_TIME, TimeUtil::Now());
             sendRechargeInfo(true);
         }
 
@@ -16899,6 +16901,12 @@ namespace GObject
                 break;
             case 1: //前往破阵
                 {
+                    if(GetVar(VAR_TJ_TASK3_COPYID) == 0)
+                        SetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME, TimeUtil::Now());
+                    UInt32 now = TimeUtil::Now();
+                    if(TimeUtil::SharpDay(0, now) != TimeUtil::SharpDay(0, GetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME)))
+                        SetVar(VAR_TJ_TASK3_COPYID, 0);
+
                     if (GetVar(VAR_TJ_TASK3_COPYID) >= 51)
                     {
                         rcmd = 1;
@@ -17063,6 +17071,13 @@ namespace GObject
        if (copyid >= (s_tjTask3CopyCount+1)) //已完成
        {
            finish = 1;
+            UInt32 now = TimeUtil::Now();
+            if(TimeUtil::SharpDay(0, now) != TimeUtil::SharpDay(0, GetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME)))
+            {
+                SetVar(VAR_TJ_TASK3_COPYID, 0);
+                finish = 0;
+                copyid = 0;
+            }
        }
        if (copyid == 0) copyid = 1;
 
@@ -20127,10 +20142,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -24824,6 +24839,106 @@ void Player::Send11GradeAward(UInt8 type)
     udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 
 }
+void Player::SetNovLogin()
+{
+    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 now = TimeUtil::Now();
+    UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 +1;
+    if(now < timeBegin)
+        return ;
+    if(off > 30)
+        return ;
+    UInt32 novLogin = GetVar(VAR_NOV_LOGIN);
+    novLogin |= 1 << (off - 1);
+    SetVar(VAR_NOV_LOGIN, novLogin);
+}
+
+void Player::sendNovLoginInfo()
+{
+    UInt32 novLogin = GetVar(VAR_NOV_LOGIN);
+    UInt32 novLoginAward = GetVar(VAR_NOV_LOGIN_AWARD); 
+    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 now = TimeUtil::Now();
+    UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400;
+    if(now < timeBegin)
+        return ;
+    if(off > 29)
+        return ;
+    UInt8 value = 0;
+    if(novLoginAward & (1<<off))
+        value |= 1 ;
+    if(off >1 && !(novLogin&(1<<off)))
+        --off;
+    if(novLoginAward & (1<< 30))
+        value |= (1<<1) ;
+    if(novLoginAward & (1<< 31))
+        value |= (1<<2) ;
+    UInt32 max = 0 ;
+    UInt32 i=0;
+    while(i <=off)
+    {
+        if(novLogin & (1 << i++ ))
+            ++max;
+        else 
+        {
+            if(max >= 7 && !(novLogin&(1<<30)))
+            {
+                novLogin |= (1<<30);
+                SetVar(VAR_NOV_LOGIN,novLogin);
+            }
+            max =0;
+        }
+    }
+    Stream st(REP::RC7DAY);
+    st<<static_cast<UInt8>(27);
+    st<<novLogin;
+    st<<static_cast<UInt8>(max);
+    st<<static_cast<UInt8>(value);
+    st<<Stream::eos;
+    send(st);
+}
+void Player::getNovLoginAward(UInt8 type)
+{
+    if(type <1 ||type >3)
+        return ;
+    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 now = TimeUtil::Now();
+    UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 ;
+    if(now < timeBegin)
+        return ;
+    if(off > 29)
+        return ;
+    UInt32 novLogin = GetVar(VAR_NOV_LOGIN);
+    UInt32 novLoginAward = GetVar(VAR_NOV_LOGIN_AWARD); 
+    if(type == 1 &&( !(novLogin & (1<<off)) || (novLoginAward & (1<<off)) ) )
+        return ;
+    UInt32 max = 0 ;
+    UInt32 i=0;
+    UInt32 count;
+    while(i <= off)
+    {
+        if(novLogin & (1 << i++ ))
+            ++count;
+        else 
+        {
+            count = 0;
+        }
+        if( max <count)
+            max =count;
+    }
+   if(type==2 &&( max < 7|| (novLoginAward&(1<<30)) )) 
+       return ;
+   if(type==3 &&( max < 30|| (novLoginAward&(1<<31)) )) 
+       return ;
+   if(!GameAction()->RunNovLoginAward(this, type))
+       return ;
+   if(type == 2 )
+       off = 30 ;
+   if(type == 3)
+       off = 31; 
+   novLoginAward |= (1<<off); 
+   SetVar(VAR_NOV_LOGIN_AWARD,novLoginAward);
+}
 
 bool Player::checkClientIP()
 {
@@ -24834,6 +24949,58 @@ bool Player::checkClientIP()
         return false;
 
     return true;
+}
+void Player::Buy7DayFund()
+{
+   
+    if(!in7DayFromCreated())
+       return ;
+    UInt32 FundType = GetVar(VAR_GROWUPFUND_TYPE);
+    UInt32 gold = 188;
+    if(FundType != 0)
+        return ;
+    if (getGold() < gold)
+    {
+        sendMsgCode(0, 1101);
+        return ;
+    }
+    ConsumeInfo ci(Fund,0,0);
+    useGold(gold,&ci);
+    SetVar(VAR_GROWUPFUND_TYPE,1);
+}
+void Player::send7DayFundInfo()
+{
+            
+   UInt32 FundType = GetVar(VAR_GROWUPFUND_TYPE);
+   UInt32 FundAward = GetVar(VAR_GROWUPFUND_AWARD); 
+   if( !in7DayFromCreated() && !FundType)
+       return ;
+   Stream st(REP::RC7DAY);  //协议
+   st<<static_cast<UInt8>(26);
+   st<<static_cast<UInt8>(FundType);
+   st<<FundAward;
+   st<<Stream::eos;
+   send(st);
+}
+void Player::get7DayFundAward(UInt8 type)
+{
+   UInt32 Coupon[10]={20,30,50,50,100,120,150,180,120,120};
+   UInt32 FundType = GetVar(VAR_GROWUPFUND_TYPE);
+   UInt32 FundAward = GetVar(VAR_GROWUPFUND_AWARD); 
+   if(!FundType)
+       return ;
+   if(type <1 ||type >10)
+       return ;
+   if(GetLev() < 30 + type *5 )
+       return ;
+   if(FundAward &(1<<(type-1)))
+       return ;
+   if(type > 4 && type < 9)
+       getCoupon(Coupon[type-1]);
+   else 
+       getGold(Coupon[type-1]); 
+   FundAward |=(1<<(type-1));
+   SetVar(VAR_GROWUPFUND_AWARD,FundAward);
 }
 
 void Player::modifyPlayerName(UInt32 itemid,UInt8 binding,string modifyName)

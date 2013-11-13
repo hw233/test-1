@@ -40,6 +40,7 @@ struct DBItemType
 	UInt16		data;           // 可使用道具: 作用数值
     UInt16      enchant;        // 附魔类型
 	UInt32		attrExtra;      // 属性附加
+    float       salePriceUp;    // 交易价格上限
 };
 
 struct DBEquipSetType
@@ -700,7 +701,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBItemType)
-SPECIALDEF(15)
+SPECIALDEF(16)
 	(
 	UInt32,		typeId,
 	std::string,name,
@@ -716,7 +717,8 @@ SPECIALDEF(15)
     UInt16,     trumpExp,
 	UInt16,		data,
 	UInt16,		enchant,
-	UInt32,		attrExtra
+	UInt32,		attrExtra,
+    float,      salePriceUp
 	)
 SPECIALEND()
 
