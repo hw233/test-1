@@ -6237,8 +6237,11 @@ namespace GObject
 
             update = true;
             std::vector<UInt8> allAttrType = _lbAttrConf.attrType;
-            allAttrType.erase(allAttrType.begin());
-            allAttrType.erase(allAttrType.begin());//排除物攻，法功
+            for(int i = 0; i < 4; ++ i)
+            {
+                if(lba.type[i] != 0)
+                    allAttrType.erase(allAttrType.begin() + lba.type[i] - 1);
+            }
             UInt8 size = allAttrType.size();
             UInt8 type = allAttrType[GRND(size)];
 
