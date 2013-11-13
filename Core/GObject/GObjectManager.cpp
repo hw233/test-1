@@ -6250,13 +6250,13 @@ namespace GObject
             {
                 lba.type[idx1] = 1;
                 lba.type[idx2] = type;
-                lba.value[idx2] = lba.value[idx2] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[idx2] - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1);
+                lba.value[idx2] = lba.value[idx2] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[idx2] - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1) + 0.999f;
             }
             else
             {
                 lba.type[idx2] = 1;
                 lba.type[idx1] = type;
-                lba.value[idx1] = lba.value[idx1] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[idx1] - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1);
+                lba.value[idx1] = lba.value[idx1] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[idx1] - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1) + 0.999f;
             }
         }
 
@@ -6270,9 +6270,17 @@ namespace GObject
                 {
                     update = true;
                     if(lba.value[j] > lba.value[i])
+                    {
+                        UInt8 type = lba.type[i];
                         lba.type[i] = allAttrType[GRND(allAttrType.size())];
+                        lba.value[i] = lba.value[i] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[i] - 1) + 0.999f;
+                    }
                     else
+                    {
+                        UInt8 type = lba.type[j];
                         lba.type[j] = allAttrType[GRND(allAttrType.size())];
+                        lba.value[j] = lba.value[j] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[j] - 1) + 0.999f;
+                    }
                 }
             }
         }
