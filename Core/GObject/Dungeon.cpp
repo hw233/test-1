@@ -508,8 +508,8 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 			st << iter->id << iter->count;
 		}
 		st.append(&packet[8], packet.size() - 8);
-		st << Stream::eos;
         st << static_cast<UInt64>(exp);
+		st << Stream::eos;
 		player->send(st);
 		bsim.applyFighterHP(0, player);
 		player->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + turns_);
@@ -653,9 +653,12 @@ player->GetPackage()->Add(9343, 2, true, false);
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(level - 1) << dpi.difficulty;
 			if(r)
-				st << static_cast<UInt8>(4) << *totalExp;
-			else
-				st << static_cast<UInt8>(3);
+            {
+                //return false;
+                st << static_cast<UInt8>(4) << static_cast<UInt32>(exp);
+            }
+            else
+				st << static_cast<UInt8>(3) << static_cast<UInt32>(exp);
 			UInt8 size = player->_lastLoot.size();
 			st << size;
 			for(UInt8 i = 0; i < size; ++ i)

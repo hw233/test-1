@@ -974,6 +974,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
 {
     // 攻击怪物
     UInt32 npcId = 0;
+    UInt64 exp = 0;
     MapInfo::iterator it = _mapInfo.find(pos);
     if (it == _mapInfo.end())
         return false;
@@ -1015,7 +1016,8 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
         // 消灭怪物
         ret = 0x0101;
         _owner->_lastNg = ng;
-        _owner->pendExp(ng->getExp());
+        exp = ng->getExp();
+        _owner->pendExp(exp);
         ng->getLoots(_owner, _owner->_lastLoot, 0, NULL);
         (it->second).gridType |= CLEAR_FLAG;
 
@@ -1082,7 +1084,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
             st << _owner->_lastLoot[i].id << _owner->_lastLoot[i].count;
         }
         st.append(&packet[8], packet.size() - 8);
-        st<<ng->getExp();    //LIB  EXP
+        st<<static_cast<UInt64>(exp);    //LIB  EXP
         st << Stream::eos;
         _owner->send(st);
         SendGridInfo(POS_TO_INDEX(_posX, _posY));
@@ -1098,7 +1100,7 @@ bool JobHunter::OnAttackMonster(UInt16 pos, bool isAuto)
         {
             st << _owner->_lastLoot[i].id << _owner->_lastLoot[i].count;
         }
-        st<<ng->getExp();    //LIB  EXP
+        st<<static_cast<UInt64>(exp);    //LIB  EXP
         st << Stream::eos;
         _owner->send(st);
         _owner->checkLastBattled();
@@ -1214,6 +1216,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
     if(packet.size() <= 8)
         return false;
 
+    UInt64 exp  = 0 ;
     UInt16 ret = 0x0100;
     bool res = bsim.getWinner() == 1;
     if (res)
@@ -1222,7 +1225,8 @@ bool JobHunter::OnFoundCave(bool isAuto)
         (it->second).gridType |= CLEAR_FLAG;
         ret = 0x0101;
         _owner->_lastNg = ng;
-        _owner->pendExp(ng->getExp());
+        exp = ng->getExp();
+        _owner->pendExp(exp);
 
         npcId = GameAction()->getBossMonster(_gameProgress);
         npcIt = GData::npcGroups.find(npcId);
@@ -1274,7 +1278,6 @@ bool JobHunter::OnFoundCave(bool isAuto)
     st << ret << PLAYER_DATA(_owner, lastExp) << static_cast<UInt8>(0);
     st << static_cast<UInt8>(0);
     st.append(&packet[8], packet.size() - 8);
-    st << static_cast<UInt64>(0);
     st << Stream::eos;
 
     if (!isAuto)
@@ -1294,6 +1297,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
         st2 << static_cast<UInt8>(res?1:0);
         if (!res)
         {
+            st<<static_cast<UInt64>(exp);    //LIB  EXP
             st2 << Stream::eos;
             _owner->send(st2);
             return true;
@@ -1364,6 +1368,7 @@ bool JobHunter::OnFoundCave(bool isAuto)
     }
     else
         st2 << static_cast<UInt8>(0);
+    st2 << static_cast<UInt64>(exp);
     st2 << Stream::eos;
     if (res)
         _owner->send(st2);

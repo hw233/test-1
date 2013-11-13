@@ -3813,11 +3813,12 @@ namespace GObject
     bool Player::attackRareAnimal(UInt32 id)
     {
         bool isFull = false;
-        return attackCopyNpc(id, 1/*XXX:使用这个背景*/, 5, 1, isFull, 1, false, NULL, false);
+        UInt64 exp =0;
+        return attackCopyNpc(id, 1/*XXX:使用这个背景*/, 5, 1, isFull, exp, 1, false,NULL, false);
     }
 
 	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId,
-            UInt8 expfactor, bool& full, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
+            UInt8 expfactor, bool& full,UInt64 & pexp, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
 	{
         if (GetPackage()->GetRestPackageSize() == 0)
         {
@@ -3866,7 +3867,7 @@ namespace GObject
             if(getBuffData(PLAYER_BUFF_QI_TIAN_CHU_MO, now))
                 exp *= (18.f/10.f);
             pendExp(exp);
-
+            pexp = exp;
 			ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
             //战胜NPC 成就
             GameAction()->doAttainment(this, 10351, npcId);
@@ -3897,7 +3898,7 @@ namespace GObject
                 st << _lastLoot[i].id << _lastLoot[i].count;
             }
             st.append(&packet[8], packet.size() - 8);
-            st << static_cast<UInt64>(exp) ;
+            st << static_cast<UInt64>(exp);
             st << Stream::eos;
             send(st);
         }

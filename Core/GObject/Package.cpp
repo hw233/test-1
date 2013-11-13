@@ -7661,7 +7661,6 @@ namespace GObject
         CheckTemporaryItem();
 		item_elem_iter iter = m_ItemsTemporary.begin();
         int num = m_ItemsTemporary.size();
-        std::cout << "num = " << num << std::endl; 
         while(num > 0)
         {
             Stream st(REP::TEMPITEM_INFO);
@@ -7690,7 +7689,6 @@ namespace GObject
             }
 
             st.data<UInt16>(4) = count;
-            std::cout << "count = " << count << std::endl; 
             st << Stream::eos;
             m_Owner->send(st);
             num -= count;

@@ -344,7 +344,8 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
 
     std::vector<UInt16> loot;
     bool isFull = false;
-    if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, isFull, tmp[spot].lootlvl, ato, &loot)) {
+    UInt64 exp = 0;
+    if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, isFull,exp ,tmp[spot].lootlvl, ato, &loot)) {
         ret = true;
         if (ato)
             pl->checkLastBattled();
@@ -376,6 +377,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                     st << static_cast<UInt8>(4) << id << spot << static_cast<UInt8>(0);
                 }
 
+                st<<static_cast<UInt64>(exp);
                 st << Stream::eos;
                 pl->send(st);
             }
@@ -485,6 +487,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                     st << static_cast<UInt8>(3) << id << spot << static_cast<UInt8>(0);
                 }
 
+                st << static_cast<UInt64>(exp);
                 st << Stream::eos;
                 pl->send(st);
             }
