@@ -279,7 +279,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_LEFTTIMES = 220, // 剩余挂机时间
 
         /*
-         * 【注:此段var(221--239)貌似未被占用】
+         * 【注:此段var(221--239) for dtc】
          */
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
