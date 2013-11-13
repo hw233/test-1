@@ -120,7 +120,7 @@ namespace GObject
     std::map<UInt32, UInt32> GObjectManager::_team_om_chance[3];
     std::map<UInt32, UInt32> GObjectManager::_team_om_item;
 
-    std::vector<stHftChance> GObjectManager::_hft_chance[6][12];
+    std::vector<stHftChance> GObjectManager::_hft_chance[11][12];
 
     std::map<UInt8, stRingHpBase*> GObjectManager::_ringHpBase;
     float GObjectManager::_ringHpFactor[12];
@@ -4120,7 +4120,7 @@ namespace GObject
             }
 
             {
-                for(UInt8 q = 0; q < 6; q ++)
+                for(UInt8 q = 0; q < 11; q ++)
                 {
                     lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantChanceAdv", q + 1);
                     UInt32 size = table_temp.size();

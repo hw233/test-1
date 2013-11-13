@@ -1914,7 +1914,7 @@ void GMHandler::OnChallenge( GObject::Player * player, std::vector<std::string>&
 	bool res = bsim.getWinner() == 1;
 
 	Stream st(REP::ATTACK_NPC);
-	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << static_cast<UInt64>(0) << Stream::eos;
 	player->send(st);
 }
 

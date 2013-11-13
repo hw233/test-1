@@ -1568,8 +1568,7 @@ void Tianjie::randomTask1Data(int roleLev,short& npcId, UInt8& color, int& exp)
     else
         color = 3;
 
-    exp = TIANJIE_EXP(roleLev) * s_task1ColorMulti[color];
-}
+    exp = TIANJIE_EXP(roleLev) * s_task1ColorMulti[color]; }
 void Tianjie::start2()
 {
     m_eventMaxNumber = s_rate2DonateScoreMax;
@@ -1922,6 +1921,7 @@ bool Tianjie::attackTlz(Player* pl, UInt16 level)
         st << pl->_lastLoot[i].id << pl->_lastLoot[i].count;
     }
     st.append(&packet[8], packet.size() - 8);
+    st << static_cast<UInt64>(0);
     st << Stream::eos;
     pl->send(st);
 
@@ -2194,6 +2194,7 @@ bool Tianjie::attackBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
     bool res = bsim.getWinner() == 1;
 
     UInt32 oldHP = _hp;
+    UInt32 exp = 0;
     Battle::BattleObject * obj = bsim(1, nfdata.pos);
     if(obj != NULL && obj->isChar())
     {
@@ -2212,7 +2213,7 @@ bool Tianjie::attackBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
             if(oldHP > newHP)
             {
                 UInt32 damage = oldHP - newHP;
-                UInt32 exp = ((float)damage / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
+                 exp = ((float)damage / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
                 if (exp < 1000)
                     exp = 1000;
 
@@ -2300,6 +2301,7 @@ bool Tianjie::attackBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
         st << pl->_lastLoot[i].id << pl->_lastLoot[i].count;
     }
     st.append(&packet[8], packet.size() - 8);
+    st << static_cast<UInt64>(exp );
     st << Stream::eos;
     pl->send(st);
     bsim.applyFighterHP(0, pl);

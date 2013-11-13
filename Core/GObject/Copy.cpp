@@ -410,7 +410,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
     pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 0);
     std::vector<UInt16> loot;
     bool isFull = false;
-    if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, isFull, tcd.lootlvl, ato, &loot)) {
+    UInt64 exp = 0;
+    if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, isFull, exp,tcd.lootlvl, ato, &loot)) {
         if (ato)
             pl->checkLastBattled();
         bool nextfloor = false;
@@ -446,6 +447,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                     st << static_cast<UInt8>(4) << id << tcd.floor << tcd.spot << static_cast<UInt8>(0);
                 }
 
+                st << static_cast<UInt64>(exp);
                 st << Stream::eos;
                 pl->send(st);
 
@@ -569,6 +571,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                     st << static_cast<UInt8>(3) << id << tcd.floor << tcd.spot << static_cast<UInt8>(0);
                 }
 
+                st << static_cast<UInt64>(exp);
                 st << Stream::eos;
                 pl->send(st);
             } else {
