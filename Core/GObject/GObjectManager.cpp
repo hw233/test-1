@@ -6180,106 +6180,30 @@ namespace GObject
         UInt8 subClass = lb->getClass();
         UInt8 itemTypeIdx = subClass - Item_LBling;
 
-        std::vector<int> typeidx;
-        std::vector<int> valueidx;
-        std::vector<UInt8> allAttrType = _lbAttrConf.attrType;
-
+        bool update = false;
         for(int i = 0; i < 4; ++ i)
         {
-            if(lba.type[i] == 1 || lba.type[i] == 2)
-                typeidx.push_back(i);
-            if(lba.type[i] != 0)
-            {
-                if(find(allAttrType.begin(),allAttrType.end(),lba.type[i]) != allAttrType.end())
-                    allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),lba.type[i]));
-            }
-        }
-
-        bool update = false;
-        size_t mdsize = typeidx.size();
-        if(mdsize == 0)
-            return;
-        if(mdsize == 1)
-        {
-            int idx = typeidx[0];
-            if(lba.type[idx] == 2)
+            if(lba.type[i] != 0 && lba.value[i] == 0)
             {
                 update = true;
-                lba.type[idx] = 1;
-            }
-            else if(lba.lbColor == 5)
-            {
-                std::vector<int> valueidx;
-                for(int i = 0; i < 4; ++ i)
-                {
-                    if(lba.type[i] == 0)
-                        continue;
-                    float colorP = ((float)(lba.value[i])/_lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i]-1))*400;
-                    if(colorP < _lbAttrConf.colorVal[3])
-                    {
-                        lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * _lbAttrConf.colorVal[3]/400 + 0.999;
-                        update = true;
-                        break;
-                    }
-                }
+                lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * _lbAttrConf.colorVal[3]/400 + 0.99f;
             }
             else
             {
-                for(int i = 0; i < 4; ++ i)
-                {
-                    if(lba.type[i] != 0 && lba.value[i] == 0)
-                    {
-                        float factor = ((float)(lba.value[idx])) / _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[idx] - 1);
-                        lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * factor + 0.999;
-                        update = true;
-                        break;
-                    }
-                }
-            }
-        }
-        else
-        {
-            int idx1 = typeidx[0];
-            int idx2 = typeidx[1];
-
-            update = true;
-            UInt8 size = allAttrType.size();
-            UInt8 type = allAttrType[GRND(size)];
-
-            if(lba.value[idx1] > lba.value[idx2])
-            {
-                lba.type[idx1] = 1;
-                lba.type[idx2] = type;
-                lba.value[idx2] = lba.value[idx2] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[idx2] - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1) + 0.999f;
-            }
-            else
-            {
-                lba.type[idx2] = 1;
-                lba.type[idx1] = type;
-                lba.value[idx1] = lba.value[idx1] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[idx1] - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1) + 0.999f;
-            }
-        }
-
-        for(int j = 0; j < 4; ++ j)
-        {
-            for(int i = j; i < 4; ++ i)
-            {
-                if(i == j || lba.type[i] == 0 || lba.type[j] == 0)
-                    continue;
-                if(lba.type[j] == lba.type[i])
+                UInt16 value = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i]-1) * 1.15f + 0.999f;
+                if(lba.value[i] > value)
                 {
                     update = true;
-                    if(lba.value[j] > lba.value[i])
+                    lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * 1.15f + 0.99f;
+                }
+
+                if(lba.lbColor == 5)
+                {
+                    UInt16 value = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * _lbAttrConf.colorVal[3]/400;
+                    if(lba.value[i] < value)
                     {
-                        UInt8 type = lba.type[i];
-                        lba.type[i] = allAttrType[GRND(allAttrType.size())];
-                        lba.value[i] = lba.value[i] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[i] - 1) + 0.999f;
-                    }
-                    else
-                    {
-                        UInt8 type = lba.type[j];
-                        lba.type[j] = allAttrType[GRND(allAttrType.size())];
-                        lba.value[j] = lba.value[j] / _lbAttrConf.getAttrMax(lv,itemTypeIdx,type - 1) * _lbAttrConf.getAttrMax(lv,itemTypeIdx,lba.type[j] - 1) + 0.999f;
+                        update = true;
+                        lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * _lbAttrConf.colorVal[3]/400 + 0.99f;
                     }
                 }
             }
