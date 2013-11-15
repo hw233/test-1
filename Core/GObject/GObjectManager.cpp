@@ -6307,7 +6307,7 @@ namespace GObject
                         }
                     }
 
-                    checkLingbaoAttrType(lb);
+                    //checkLingbaoAttrType(lb);
 				}
 				break;
 			default:
