@@ -10176,7 +10176,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
 
         if(bf->getHP() == 0)
             break;
-        for(UInt8 i = 8; i < 25; i++)
+        for(UInt8 i = 0; i < 25; i++)
         {
             UInt8 peerlessDisableSSLast = bf->getPeerLessDisableSSLast(i);
             if(peerlessDisableSSLast > 0)
