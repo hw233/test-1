@@ -1183,7 +1183,7 @@ void World::World_Midnight_Check( World * world )
     bool bfoolbao = getFoolBao();
     bool bsurnamelegend = getSurnameLegend();
     bool b11time = get11Time();
-    bool bGGtime = get11Time();
+    bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
     bool bJune = getJune();
     bool bQixi = getQixi();
