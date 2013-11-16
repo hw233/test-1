@@ -1379,6 +1379,17 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
+    if(atoi(pl->getDomain()) == 6)
+    {
+        if(!pl)
+            return;
+        if(!pl->GetVar(GObject::VAR_GAMEBOX_DAILY))
+            pl->SetVar(GObject::VAR_GAMEBOX_DAILY,1);
+        if(!pl->GetVar(GObject::VAR_GAMEBOX_NEW))
+            pl->SetVar(GObject::VAR_GAMEBOX_NEW,1);
+        pl->sendGameBoxAward();
+
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

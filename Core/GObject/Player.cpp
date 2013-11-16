@@ -11663,6 +11663,10 @@ namespace GObject
         case 31:
             getAirBookOnlineAward();
                 break;
+        case 32:
+            getGameBoxAward(opt);
+                break;
+
         }
     }
     
@@ -12254,6 +12258,22 @@ namespace GObject
         send(st);
     }
 
+    void Player::sendGameBoxAward()
+    {
+        UInt8 daily_idx = 0;
+        UInt8 new_idx = 0;
+        if(GetVar(VAR_GAMEBOX_DAILY) == 2)
+            daily_idx = 1; 
+        if(GetVar(VAR_GAMEBOX_NEW) == 2)
+            new_idx = 1;    
+        UInt8 idx = (daily_idx<< 1) | new_idx;
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(32);
+        st << idx ;
+        st << Stream::eos;
+        send(st);
+    }
+    
     void Player::getAwardFromAD()
     {
         if(GetVar(VAR_AWARD_NEWREGISTER))
@@ -25113,6 +25133,30 @@ void Player::modifyPlayerName(UInt32 itemid,UInt8 binding,string modifyName)
                     
 }
 
+void Player::getGameBoxAward(UInt8 type)
+{
+    if(type!=0 && type !=1)
+       return;
+    if(type == 1)
+    {
+        if(GetVar(VAR_GAMEBOX_DAILY) == 1)
+        {
+            if(!GameAction()->RunGameBoxDailyActionAward(this,1))
+                return;
+            SetVar(VAR_GAMEBOX_DAILY,2);
+        }
+    }
+    if(type == 0)
+    {
+        if(GetVar(VAR_GAMEBOX_NEW) == 1)
+        {
+            if(!GameAction()->RunGameBoxDailyActionAward(this,0))
+                return;
+            SetVar(VAR_GAMEBOX_NEW,2);
+        }
+    }
+    sendGameBoxAward();
+}
 } // namespace GObject
 
 
