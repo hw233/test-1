@@ -6388,11 +6388,12 @@ void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
 void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-	if(!player->hasChecked())
-		return;
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 opt = 0;
     br >> opt;
+
+	if((opt != 5) && (!player->hasChecked()))
+		return;
 
 	Package * pkg = player->GetPackage();
 
