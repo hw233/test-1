@@ -391,6 +391,9 @@ MSG_REG_2(GameMsgHdr, 0x337, OnTeamArenaUseGold);
 MSG_REG_2(GameMsgHdr, 0x338, OnGetTeamArenaMoney);
 MSG_REG_2(GameMsgHdr, 0x339, OnTeamArenaInspire);
 
+MSG_REG_2(GameMsgHdr, 0x350, OnGGBeTeam);
+MSG_REG_2(GameMsgHdr, 0x351, OnGGTeamPlayerLeave);
+
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 
 MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
@@ -401,7 +404,9 @@ MSG_REG_2(GameMsgHdr, 0x362, OnBePrayed);
 MSG_REG_2(GameMsgHdr, 0x363, OnBePresented);
 MSG_REG_2(GameMsgHdr, 0x364, OnDoStrongInWorld);
 MSG_REG_2(GameMsgHdr, 0x365, OnSend11GradeInfo);
+MSG_REG_2(GameMsgHdr, 0x366, OnRunFriendlyCompass);
 
+MSG_REG_2(GameMsgHdr, 0x381, OnRoamintGuangGun);
 //0x365-380繁体占用
 
 MSG_HANDLER_END()

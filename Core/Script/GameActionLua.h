@@ -275,6 +275,7 @@ namespace Script
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         bool  RunPrayAward(Player* player, UInt8 val);
         bool  RunNovLoginAward(Player* player, UInt8 val);
+        bool  RunGameBoxDailyActionAward(Player* player, UInt8 val);
         UInt8 RunNewRC7DayTargetAward(Player* player);
         UInt8 RunBlueDiamondAward(Player* player, UInt8 opt);
         UInt8 RunConsumeAward(Player* player, UInt8 opt);
@@ -354,6 +355,7 @@ namespace Script
         UInt32 GetExchangePropsID();
         lua_tinker::table GetdayExtraAward(UInt32 month, UInt32 day);
         UInt8 onRoamingQueqiao(Player* pl, UInt8 pos);
+        UInt8 onRoamingGuangGun(Player* pl, UInt8 pos);
         UInt32 GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed);
         void doStrong(Player* pl, UInt8 id, UInt32 param1, UInt32 param2);
         UInt8 GetSthCheckFlag(UInt8 idx);

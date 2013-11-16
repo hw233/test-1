@@ -251,6 +251,7 @@ namespace GObject
             if(GET_REMAINDER(getPetLev()))
                 _owner->sendMsgCode(0, 4000);
             GameAction()->doStrong(_owner, SthPinJieUp, 0, 0); 
+            _owner->GuangGunCompleteTask(0,13);
         }
         else
         { //失败
@@ -402,6 +403,7 @@ namespace GObject
             if(num > 0)
                 addGenguBless(num * 100);
             GameAction()->doStrong(_owner, SthGenguUp, 0, 0); 
+            _owner->GuangGunCompleteTask(0,14);
         }
         else
         {
@@ -881,6 +883,7 @@ namespace GObject
         st << petId <<sanhunId << sanhunLvl << curShouHun;
         st << Stream::eos;
         _owner->send(st);
+        _owner->GuangGunCompleteTask(0,12);
     }
 
     bool FairyPet::checkSanHunUp(UInt8 sanhunId, UInt8 sanhunLvl)

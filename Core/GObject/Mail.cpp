@@ -779,6 +779,35 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			updateMail(mail);
 		}
 		break;
+    case 0x15:   //光棍节活动组队
+        {
+			Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
+			if(pl == NULL)
+				return;
+			mail->flag = 0x83;
+			if(action == 0)
+			{
+                Player *cap = pl->getGGTimeCaptain();
+                if(!cap->CheckGGCanInvit(_owner))
+                {
+                    _owner->EnterGGTeam(cap);
+                    SYSMSG(content, 212);
+                    mail->content = content;
+                }
+                else
+                {
+                    SYSMSG(content, 211);
+                    mail->content = content;
+                }
+			}
+			else
+			{
+				SYSMSG(content, 213);
+				mail->content = content;
+			}
+			updateMail(mail);
+        }
+        break;
 	case 0x05:  // 交易
 		{
 			if (_owner->GetTrade()->addTradeMailItems(mail->additional))
