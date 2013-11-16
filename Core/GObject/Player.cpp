@@ -25040,6 +25040,7 @@ void Player::modifyPlayerName(UInt32 itemid,UInt8 binding,string modifyName)
             DB1().PushUpdateData("insert into `player_named` (serverNo,playerid,name) values(%u,%" I64_FMT "u,'%s')",cfg.serverNo,getId(),old_name);
         //修改player表
         DB1().PushUpdateData("UPDATE `player` SET `name` = '%s' WHERE `id` = %" I64_FMT "u",      modifyName.c_str(),getId());
+        DBLOG1().PushUpdateData("insert into player_named(server_id, player_id, src_name, dst_name, modify_time) values(%u, %" I64_FMT "u, '%s', '%s', %u)", cfg.serverNo, getId(), old_name,modifyName.c_str(),TimeUtil::Now());
         SetVar(VAR_MODIFY_NAME_CD,TimeUtil::Now());
 
         setName(strtmp);
