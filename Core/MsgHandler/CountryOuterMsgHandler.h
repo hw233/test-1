@@ -730,7 +730,6 @@ struct CompareBattlePoint
 	MESSAGE_DEF1(REQ::COMPARE_BP, std::string, _name);
 };
 
-
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -1309,6 +1308,13 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr1(0x1D3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr1, NULL);
     }
+
+    /*if(World::getQiShiBanTime())
+    {
+        GameMsgHdr hdr(0x1D6, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }*/
+
     pl->sendYearRPInfo();
     pl->sendFishUserInfo();
     //if(World::getYearActive())

@@ -530,7 +530,10 @@ void TcpMasterServer::_ev_timer_event( int, short, void * param )
 void TcpMasterServer::onTimerCheck()
 {
 	if(_running)
+    {
 		_workers[0]->initConnection(1);
+		//_workers[0]->initConnection(2);
+    }
 	else
 		event_base_loopbreak(_ev_base);
 }

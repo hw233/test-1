@@ -524,6 +524,11 @@ namespace GObject
             fprintf(stderr, "LoadTeamPendingPlayers error!\n");
             std::abort();
         }
+		if(!loadQiShiBan())
+        {
+            fprintf(stderr, "loadQiShiBan error!\n");
+            std::abort();
+        }
 
 
 		DB::gDataDBConnectionMgr->UnInit();
@@ -5911,6 +5916,33 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadQiShiBan()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading QiShiBan");
+        DBQiShiBan qishiban;
+        if(execu->Prepare("SELECT `playerId`, `guankaId`, `score`, `beginTime`, `endTime`, `restAllNum` FROM `player_qishiban` ORDER BY `score`", qishiban) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+			if(qishiban.playerId != last_id)
+			{
+				last_id = qishiban.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->loadQiShiBanFromDB(qishiban.score, qishiban.step, qishiban.beginTime, qishiban.endTime, qishiban.restAllNum);
+        }
+        lc.finalize();
+        return true;
+    }
 
     bool GObjectManager::loadJobHunter()
     {

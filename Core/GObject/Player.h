@@ -13,6 +13,7 @@
 #include "Common/AtomicVal.h"
 #include "Common/Stream.h"
 #include "Common/TimeUtil.h"
+#include "Common/MCached.h"
 
 #include "Server/WorldServer.h"
 #include "Battle/BattleSimulator.h"
@@ -572,6 +573,16 @@ namespace GObject
         bool bind;
         UInt32 score;
         SnowInfo() :lover(NULL),bind(0),score(0) {}
+    };
+    struct QiShiBanInfo
+    {
+        UInt32 score;
+        UInt32 step;
+        UInt32 beginTime;
+        UInt32 endTime;
+        UInt16 randKey;
+        UInt8 restAllNum;
+        QiShiBanInfo() : score(0), step(0), beginTime(0), endTime(0), randKey(0), restAllNum(0) {}
     };
 
 	struct PlayerData
@@ -1769,6 +1780,7 @@ namespace GObject
         QixiInfo m_qixi;
         SnowInfo m_snow;
         bool _qixiBinding;
+        QiShiBanInfo m_qishiban;
     public:
         inline bool isJumpingMap() { return _isJumpingMap; }
         inline void setJumpingMap(bool v) { _isJumpingMap = v; }
@@ -1839,6 +1851,48 @@ namespace GObject
         
         //推雪人end
         
+        //七石斗法 begin
+          
+        void loadQiShiBanFromDB(UInt32 score, UInt32 step, UInt32 beginTime, UInt32 endTime, UInt8 restAllNum);
+       
+        void MyQSBInfo();
+        void OnQiShiBanRank();
+        void ReqStartQSB();
+        void FinishCurStep(int randMark, UInt32 time);
+        void Fail();
+        void AddTime();
+        void RestCurStep();
+        void ContinueCurStep();
+        void Update_QSB_DB();
+        void CleanQiShiBan();
+        UInt32 GetQQFriendScore(const char * openId);
+        bool CheckReqDataTime();
+        void SetReqDataTime();
+
+        void SetQiShiBanScore(UInt32 score) { m_qishiban.score = score; }
+        void AddQiShiBanScore(UInt32 score) { m_qishiban.score += score; }
+        UInt32 GetQiShiBanScore() const { return m_qishiban.score; }
+
+        void SetQiShiBanStep(UInt32 step) { m_qishiban.step = step; }
+        void AddQiShiBanStep() { m_qishiban.step += 1; }
+        UInt32 GetQiShiBanStep() const { return m_qishiban.step; }
+
+        void SetQiShiBanBeginTime(UInt32 time) { m_qishiban.beginTime = time; }
+        UInt32 GetQiShiBanBeginTime() const { return m_qishiban.beginTime; }
+        void SetQiShiBanEndTime(UInt32 time) { m_qishiban.endTime = time; }
+        UInt32 GetQiShiBanEndTime() const { return m_qishiban.endTime; }
+
+        void SetQiShiBanKey(UInt16 key) { m_qishiban.randKey = key; }
+        UInt16 GetQiShiBanKey() const { return m_qishiban.randKey; }
+
+        void SetQiShiBanRestAllNum(UInt8 num) { m_qishiban.restAllNum = num; }
+        UInt8 GetQiShiBanRestAllNum() const { return m_qishiban.restAllNum; }
+
+        bool MemCachInit();
+        MCached m_MCached; // 注意：该m_MCached只用于世界线程；
+        UInt32  m_checkTime;
+        //七石斗法 end
+
         void setForbidSale(bool b, bool isAuto = false);
         bool getForbidSale() {return _isForbidSale;}
 	private:
@@ -2670,6 +2724,7 @@ namespace GObject
         UInt8 _alreadyload[8];
     public:
         void setMapId(UInt8 mapId);
+
 	};
 
 

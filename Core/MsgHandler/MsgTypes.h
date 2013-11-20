@@ -60,6 +60,16 @@ struct ArenaMsgHdr
 	int	sessionID;
 };
 
+/*struct SocialMsgHdr
+{
+	SocialMsgHdr():
+		sessionID(0) { }
+	SocialMsgHdr(UInt32 id, UInt8 did, int sess, UInt32 blen):
+		msgHdr(id, did, blen), sessionID(sess) { }
+	MsgHdr	msgHdr;
+	int	sessionID;
+};*/
+
 typedef Queue<MsgHdr*>	MsgQueue;
 
 #endif // _MSGTYPES_H_

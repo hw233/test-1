@@ -6,6 +6,7 @@
 #include "Common/Stream.h"
 #include "Server/Cfg.h"
 #include "Common/TimeUtil.h"
+#include "Common/MCached.h"
 #include "GObject/GVar.h"
 #ifndef _WIN32
 #include "kingnet_analyzer.h"
@@ -783,6 +784,19 @@ public:
             return true;
         else
             return false;
+    }
+
+    inline static bool getQiShiBanTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_QISHIBANGAME_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_QISHIBANGAME_END);
+        UInt32 now = TimeUtil::Now() + time;
+        if(begin == 0 && end == 0)
+            return _qishiban;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
     } 
 
     inline static void setRYHBActivity(bool v)
@@ -1036,6 +1050,7 @@ public:
     static bool _summerFlow3;
     static bool _surnamelegend;
     static bool _11time;
+    static bool _qishiban;
     static bool _ryhbActivity;
     static bool _zcjbActivity;
     static bool _halfgold;
@@ -1050,7 +1065,9 @@ public:
     static Player* spreadKeeper;
     static UInt32 spreadBuff;
     static UInt8 _arenaState;      //0:无 1:仙界第一 2:仙界至尊
+    static bool _memcinited;
 public:
+    static RCSortType qishibanScoreSort;     //七石板积分排名
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
     static RCSortType popularitySort;
@@ -1107,6 +1124,9 @@ public:
 #endif
 
 public:
+    bool MemCachInit();
+    void SetMemCach_qishiban(UInt32 score, const char * openId);
+    UInt32 GetMemCach_qishiban(const char * openId);
     void UpdateQixiScore(Player* pl, Player* lover);
     void sendQixiPlayers(Player* pl);
     void DivorceQixiPair(Player* pl);
@@ -1129,6 +1149,7 @@ public:
     void DivorceSnowPair(Player* pl);
     void LoadSnowScore(Player* pl, Player* lover);
     void SendSnowAward();
+    void SendQiShiBanAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();
@@ -1150,6 +1171,7 @@ private:
     QixiPlayerSet _qixiPlayerSet;
     SnowScoreMap _snowScoreMap;
     SnowPlayerSet _snowPlayerSet;
+    MCached m_MCached; // 注意：该m_MCached只用于世界线程；
 };
 
     void CreateNewDB(UInt32 mon = 0, UInt32 year = 2011);

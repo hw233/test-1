@@ -260,6 +260,16 @@ struct DBSnow
     UInt32 score;
 };
 
+struct DBQiShiBan
+{
+    UInt64 playerId;
+    UInt32 step;
+    UInt32 score;
+    UInt32 beginTime;
+    UInt32 endTime;
+    UInt8 restAllNum;
+};
+
 struct DBArenaExtraBoard
 {
     UInt8 week;
@@ -1596,6 +1606,18 @@ SPECIALDEF(4)
     UInt64, lover,
     UInt8, bind,
     UInt32, score
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBQiShiBan)
+SPECIALDEF(6)
+    (
+    UInt64, playerId,
+    UInt32, step,
+    UInt32, score,
+    UInt32, beginTime,
+    UInt32, endTime,
+    UInt8, restAllNum
     )
 SPECIALEND()
 

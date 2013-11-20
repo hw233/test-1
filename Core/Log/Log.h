@@ -130,6 +130,7 @@ enum PurchaseType
     SanHunUpForPet              = 119, //三魂升级
     TenOneLogin                 = 120,
     ArenaTeamConsume            = 121, //仙界至尊消费
+    RestStep                    = 122, //七石板重置
     //繁体私有占150～200
 };
 
