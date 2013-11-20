@@ -151,6 +151,9 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 				//revenue += 1;
 			else
 				revenue += revTael;
+
+            //if(sales[i].price > (sales[i].count * saleItems[i]->GetItemType().salePriceUp + 0.001f))
+            //    return;
 		}
 		if (revenue > _owner->getTael())
         {

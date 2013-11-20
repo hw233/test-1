@@ -607,7 +607,8 @@ bool CountryBattle::playerEnter( Player * player )
         player->SetVar(VAR_CBWHITEPACK, 1);
     }
 
-    player->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
+    if(player->checkClientIP())
+        player->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     player->getSurnameLegendAward(e_sla_cb);
 
     player->countryBattleUdpLog(1090, 2);

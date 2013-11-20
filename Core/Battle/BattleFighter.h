@@ -1154,6 +1154,17 @@ private:
     void addEvadeCnt(UInt8 cnt) { if(_evadeCnt + cnt <= 5) _evadeCnt += cnt; else _evadeCnt = 5; }
     void minusEvadeCnt(UInt8 cnt) { if(_evadeCnt >= cnt) _evadeCnt -= cnt; else _evadeCnt = 0; }
 
+    UInt8 _peerlessDisableLast;
+    inline void setPeerLessDisableLast(UInt8 l) { _peerlessDisableLast = l; }
+    inline UInt8 getPeerLessDisableLast() { return _peerlessDisableLast; }
+
+    UInt8 _peerlessDisableSSLast[25];
+    inline void setPeerLessDisableSSLast(UInt8 i, UInt8 l) { if(i < 25) _peerlessDisableSSLast[i] = l; }
+    inline UInt8 getPeerLessDisableSSLast(UInt8 i) { if(i < 25) return _peerlessDisableSSLast[i]; else return 0; }
+    UInt32 _peerlessDisableSSHP[25];
+    inline void setPeerLessDisableSSHP(UInt8 i, UInt32 hp) { if(i < 25) _peerlessDisableSSHP[i] = hp; }
+    inline UInt32 getPeerLessDisableSSHP(UInt8 i) { if(i < 25) return _peerlessDisableSSHP[i]; else return 0; }
+
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
     std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg100;

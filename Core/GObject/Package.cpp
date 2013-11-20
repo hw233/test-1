@@ -2913,6 +2913,7 @@ namespace GObject
                 updateHft = true;
                 hf->incHftValue(hft);
             }
+            m_Owner->udpLog("lianqi", "F_131024_1", "", "", "", "", "act");
         }
         else if( 0 != count )
         {
@@ -2957,6 +2958,7 @@ namespace GObject
                 }
 
                 enchant = hf->getChanceFromHft(quality, ied.enchant, hft);
+                m_Owner->udpLog("lianqi", "F_131024_1", "", "", "", "", "act");
             }
         }
         if(!DelItemAny(item_enchant_l + type, enc_times, &isBound))
@@ -3485,6 +3487,7 @@ namespace GObject
 		}
 		else
 			SendSingleEquipData(equip);
+        m_Owner->udpLog("lianqi", "F_131024_5", "", "", "", "", "act");
 		return 0;
 	}
 
@@ -4124,6 +4127,7 @@ namespace GObject
                     bindCount -= 3;
                 }
             }
+            m_Owner->udpLog("lianqi", "F_131024_6", "", "", "", "", "act");
         }
 
         while(result == 0 && unbindCount >= 3)
@@ -4172,6 +4176,7 @@ namespace GObject
                     unbindCount -= 3;
                 }
             }
+            m_Owner->udpLog("lianqi", "F_131024_6", "", "", "", "", "act");
         }
 
         while(bindCount + unbindCount >= 3 && result == 0)
@@ -4223,6 +4228,7 @@ namespace GObject
                     bindCount = 0;
                 }
             }
+            m_Owner->udpLog("lianqi", "F_131024_6", "", "", "", "", "act");
         }
 
         if(bindUsed > 0)
@@ -4722,6 +4728,7 @@ namespace GObject
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
         if (oldEquipClass == Item_Weapon)
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
+        m_Owner->udpLog("lianqi", "F_131024_3", "", "", "", "", "act");
 
         return 0;
     }
@@ -5749,6 +5756,7 @@ namespace GObject
 		}
 		else
 			SendSingleEquipData(equip);
+        m_Owner->udpLog("lianqi", "F_131024_2", "", "", "", "", "act");
 		return 0;
 	}
 
@@ -6308,6 +6316,7 @@ namespace GObject
 
                 DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spLev%u` = %u, `spform1` = %u, `spform2` = %d, `spform3` = %u WHERE `id` = %u", form, ied_equip.spiritAttr.spLev[form - 1], ied_equip.spiritAttr.spForm[0], ied_equip.spiritAttr.spForm[1], ied_equip.spiritAttr.spForm[2], equip->getId());
                 GameAction()->doStrong(m_Owner, SthEquipSpirit, 0, 0);
+                m_Owner->udpLog("lianqi", "F_131024_4", "", "", "", "", "act");
             }
             break;
         case 1:
@@ -7140,6 +7149,23 @@ namespace GObject
             break;
         default:
             break;
+        }
+    }
+
+    void Package::FindEquipByTypeIdFromItemTemp(std::vector<ItemEquip*>& ret, UInt32 id, bool bind)
+    {
+        if (!m_Owner)
+            return;
+
+        CheckTemporaryItem();
+        for (item_elem_iter i = m_ItemsTemporary.begin(); i != m_ItemsTemporary.end(); ++i)
+        {
+            if (i->second && IsEquipId(i->second->getId()))
+            {
+                ItemEquip* item = (ItemEquip*)i->second;
+                if (item->GetItemType().getId() == id)
+                    ret.push_back(item);
+            }
         }
     }
 

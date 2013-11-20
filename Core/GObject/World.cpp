@@ -160,6 +160,7 @@ bool World::_ssToolbarAct= false;
 bool World::_snowAct= false;
 bool World::_goldSnakeAct= false;
 bool World::_collectCardAct= false;
+bool World::_halloweenAct= false;
 bool World::_heroIslandAct= false;
 bool World::_dragonKingAct= false;
 bool World::_saveGoldAct= false;
@@ -419,6 +420,20 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 24)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 25)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 9)
 
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
@@ -463,6 +478,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 12)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 19)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 26)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 2)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 9)
         ))
     {
 #if 0
@@ -1243,6 +1260,20 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 24)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 25)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 9)
          
          )
         bRechargeEnd = true;
@@ -2600,6 +2631,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             RCSort s;
             s.player = p;
             s.total = total;
+            s.time = p->GetVar(VAR_RECHARGE_TIME);
             World::rechargeSort.insert(s);
         }
     }

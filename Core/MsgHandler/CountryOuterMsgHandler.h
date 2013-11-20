@@ -1372,6 +1372,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->GetTaskMgr()->CompletedTask(201);
    if(pl->getFighterCount() >= 5)
         pl->GetTaskMgr()->CompletedTask(202);
+    pl->SetQQBoardValue();
     pl->sendQQBoardLoginInfo();
     pl->sendSummerMeetInfo();
     pl->sendSummerMeetRechargeInfo();
@@ -5880,7 +5881,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
     if (op  < 6 )
         return;
-    if((op != 10 && op!= 20 &&op!=22 &&op!=25) && !player->hasChecked())
+    if((op != 10 && op!= 20 &&op!=22 &&op!=25 && op!=27) && !player->hasChecked())
          return;
 
     switch(op)
@@ -5927,12 +5928,16 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             player->getFishUserPackage(idx);
             break;
         case 20:
-            player->SetQQBoardValue();
-            player->sendQQBoardLoginInfo();
+            //player->SetQQBoardValue();
+            //player->sendQQBoardLoginInfo();
             break;
         case 21:
+            if(!World::getHalloweenAct())
+                return;
+            if(idx < 1 || idx > 4)
+                break;
             player->getQQBoardInstantLoginAward(2*idx - 1);
-            player->sendQQBoardLoginInfo();
+            //player->sendQQBoardLoginInfo();
             break;
         case 22:
             player->SetLuckyMeetValue();
@@ -5953,6 +5958,19 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
                 player->GetQQBoardAward(index);
             }
             player->sendQQBoardLogin();
+            break;
+        case 27:
+            {
+              if(idx == 0)
+                  player->SetNovLogin();
+              else if(idx == 1)
+              {
+                  br >>index ;
+                  player->getNovLoginAward(index);
+              }
+              player->sendNovLoginInfo();
+            }
+            break;
         default:
             break;
     }
@@ -7187,6 +7205,41 @@ void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
             brd >> idx;
             clan->getSpiritTreeAward(player, idx);
         }
+        break;
+    }
+}
+
+void OnQixiReq2(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    /*
+	if(!player->hasChecked())
+		return;
+    */
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	UInt8 op = 0;
+    UInt8 type = 0;
+
+    brd >> type;
+    switch(type)
+    {
+    case 0x0C:
+        {
+            brd >> op;
+            switch (op)
+            {
+                case 0x01:
+                    player->sendTownTjItemInfo();
+                    break;
+                case 0x02:
+                    UInt32 itemId = 0;
+                    brd >> itemId;
+                    player->buyTownTjItem(itemId);
+                    break;
+            }
+        }
+        break;
+    default:
         break;
     }
 }

@@ -56,7 +56,10 @@ struct RCSort
 {
     GObject::Player* player;
     UInt32 total;
+    UInt32 time;
+    RCSort():player(NULL),total(0),time(0){}
 };
+
 
 struct ClanSort   //帮派积分（10· 1活动）
 {
@@ -65,14 +68,14 @@ struct ClanSort   //帮派积分（10· 1活动）
 };   
 struct lt_rcsort
 {
-    bool operator()(const RCSort& a, const RCSort& b) const { return a.total >= b.total; }
+    bool operator()(const RCSort& a, const RCSort& b) const { return a.total > b.total || (a.total==b.total && a.time < b.time); }
 };
 struct clan_sort
 {
     bool operator()(const ClanSort& a, const ClanSort& b) const { return a.total >= b.total; }
 };
 
-typedef std::set<RCSort, lt_rcsort> RCSortType;
+typedef std::multiset<RCSort, lt_rcsort> RCSortType;
 typedef std::set<ClanSort,clan_sort> ClanGradeSort;
 
 struct supportSort
@@ -388,6 +391,10 @@ public:
     { _collectCardAct= v; }
     inline static bool getCollectCardAct()
     { return _collectCardAct; }
+    inline static void setHalloweenAct(bool v)
+    { _halloweenAct= v; }
+    inline static bool getHalloweenAct()
+    { return _halloweenAct; }
     inline static void setHeroIslandAct(bool v)
     { _heroIslandAct= v; }
     inline static bool getHeroIslandAct()
@@ -999,6 +1006,7 @@ public:
     static bool _snowAct;
     static bool _goldSnakeAct;
     static bool _collectCardAct;
+    static bool _halloweenAct;
     static bool _heroIslandAct;
     static bool _dragonKingAct;
     static bool _saveGoldAct;

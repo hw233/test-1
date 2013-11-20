@@ -148,8 +148,8 @@ static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
                                        //59, 69,  79,  89,  99,  109, 119, 129, 139, 149, 999
-static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1533,1534,1535,1368};
-static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,9161,9162,9163,9920};
+static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1533,1534,1535,1374};
+static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,9161,9162,9163,9923};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
@@ -2390,6 +2390,11 @@ bool Tianjie::addNpc(UInt32 npcid)
         if (p_map->GetObject(npcid) != NULL)
             continue;
 
+        m_locNpcMap.insert(make_pair(spot, npcid));
+        m_loc = spot;
+        addNpcCount++ ;
+        printf("---------------------------------------addnpc, id:%d, loc:%d, count:%d\n", npcid, spot, addNpcCount);
+
         GObject::Country& cny = CURRENT_COUNTRY();
         UInt8 spot_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (spot_cny != cny.GetThreadID())
@@ -2425,15 +2430,7 @@ void Tianjie::addTianjieNpc(UInt32 npcId, UInt16 spot)
     mo.m_Type = 6;
     mo.m_ActionType = 0;
     if (pmap->AddObject(mo))
-    {
         pmap->Show(npcId, true, mo.m_Type);
-	
-        FastMutex::ScopedLock lk(_opMutex1);
-        m_locNpcMap.insert(make_pair(spot, npcId));
-        m_loc = spot;
-        addNpcCount++ ;
-        printf("---------------------------------------addnpc, id:%d, loc:%d, count:%d\n", npcId, spot, addNpcCount);
-    }
 }
 
 void Tianjie::deleteNpc(UInt32 npcid, UInt16 loc)

@@ -2569,6 +2569,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x18:
         case 0x19:
         case 0x21:
+        case 0x24:
         {
             brd >> op;
             switch(op)
@@ -2627,6 +2628,9 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         }
         case 0x0C:
         {
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            /*
             brd >> op;
             switch (op)
             {
@@ -2639,6 +2643,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     player->buyTownTjItem(itemId);
                     break;
             }
+            */
             break;
         }
         case 0x0E:
@@ -3157,6 +3162,11 @@ void OnTeamArenaEntered( ArenaMsgHdr& hdr, const void * data )
     if(!tad)
         return;
     GObject::teamArenaMgr.teamArenaEntered(tad, entered, rname);
+    for(UInt8 i = 0; i < tad->count; ++ i)
+    {
+        if(tad->members[i])
+            tad->members[i]->arenaUdpLog(1001);
+    }
 }
 
 void OnTeamArenaConnected( ArenaMsgHdr& hdr, const void * data )

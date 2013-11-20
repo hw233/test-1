@@ -107,7 +107,7 @@ bool TeamArenaData::checkTimeOver(UInt32 now)
 
 UInt8 TeamArenaData::getLastRank()
 {
-    if(maxRank && !lastRank)
+    if(maxRank)
         teamArenaMgr.resetTeamLastRank(this);
     return lastRank;
 }
@@ -1122,8 +1122,6 @@ void TeamArenaMgr::pushPreliminary(BinaryReader& br)
     if(type < 2)
         return;
     GET_ORIGINID(tid, sid, cid);
-	TeamArenaData * tad = globalTeamArena[tid];
-    if(!tad) return;
 
     TeamPlayerBattleReport tpbr;
     tpbr.readReport(br);
@@ -1149,18 +1147,8 @@ void TeamArenaMgr::pushPreliminary(BinaryReader& br)
         }
     }
 
-    /*
-    if(bid != 0)
-    {
-        Stream st(REP::ARENAPRILIMINARY);
-
-        const UInt8 won_mod[] = {1, 0, 1, 0, 1};
-        UInt8 won2 = won_mod[won];
-        st << static_cast<UInt8>(type) << won2 << heroId << bid << name << Stream::eos;
-        player->send(st);
-    }
-    */
-
+	TeamArenaData * tad = globalTeamArena[tid];
+    if(!tad) return;
     TeamArenaPlayer& ap = _teams[tad];
     if(won == 3 || won == 4)
     {   //进32强
@@ -2250,6 +2238,13 @@ void TeamArenaMgr::sendLeaderBoard(Player* pl)
     for(std::map<UInt16, LeaderTeam>::iterator it = _leaderBoard.begin(); it != _leaderBoard.end(); ++ it)
     {
         st << it->first << it->second.teamName;
+        st << it->second.leaderName;
+        for(UInt8 j = 0; j < TEAMARENA_MAXMEMCNT; ++ j)
+        {
+            if(it->second.memberName[j] == it->second.leaderName)
+                continue;
+            st << it->second.memberName[j];
+        }
     }
     st << Stream::eos;
 

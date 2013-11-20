@@ -248,6 +248,7 @@ namespace GObject
         WANJIE      = 12,   //万劫不灭
         BILAN       = 13,   //碧岚天衣
         LIUGUANG    = 14,   //刹那流光
+        ZHUTIAN     = 15,   //诸天宝鉴
 
         DRAGONKING_MAX,
     };
@@ -2363,6 +2364,9 @@ namespace GObject
         void sendQQBoardLoginInfo();
         void SetQQBoardLogin();
         void SetQQBoardValue();
+        void SetNovLogin();
+        void sendNovLoginInfo();
+        void getNovLoginAward(UInt8 type =0);
         void sendLuckyMeetLoginInfo();
         void SetLuckyMeetValue();
         void SetSummerMeetValue();
@@ -2724,7 +2728,7 @@ namespace GObject
         UInt8 _alreadyload[8];
     public:
         void setMapId(UInt8 mapId);
-
+        bool checkClientIP();
 	};
 
 

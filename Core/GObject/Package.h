@@ -210,6 +210,7 @@ namespace GObject
 		static const GData::ItemBaseType * GetItemBaseType(const std::string&);
         ItemEquip * FindEquip(Fighter *& fgt, UInt8& pos, UInt16 fgtId, UInt32 id);
         void FindEquipByTypeId(std::vector<ItemEquip*>& ret, UInt32 id, bool bind = true);
+        void FindEquipByTypeIdFromItemTemp(std::vector<ItemEquip*>& ret, UInt32 id, bool bind = true);
 
         ItemEquip* AddUpgradeEquip(UInt32 typeId, UInt32 oldEquipId, bool notify, bool bind , ItemEquipData& ed , float*);
         const GData::ItemBaseType*  CheckBeforeEquipUpgrade(UInt32 typeId);
