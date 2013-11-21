@@ -1379,7 +1379,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
-    if(atoi(pl->getDomain()) == 6)
+    if(atoi(pl->getDomain()) == 23)
     {
         if(!pl)
             return;
