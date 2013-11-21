@@ -6181,6 +6181,29 @@ namespace GObject
         UInt8 itemTypeIdx = subClass - Item_LBling;
 
         bool update = false;
+        stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
+        std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+        for(int j = 0; j < 3; ++ j)
+        {
+            if(lba.type[j] == 0)
+                continue;
+
+            if(find(allAttrType.begin(),allAttrType.end(),lba.type[j]) != allAttrType.end())
+                allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),lba.type[j]));
+
+            for(int i = j+1; i < 4; ++ i)
+            {
+                if(lba.type[i] == 0)
+                    continue;
+
+                if(lba.type[i] == lba.type[j])
+                {
+                    UInt8 size = allAttrType.size();
+                    lba.type[i] = allAttrType[GRND(size)];
+                }
+            }
+        }
+
         for(int i = 0; i < 4; ++ i)
         {
             if(lba.type[i] != 0 && lba.value[i] == 0)
@@ -6307,7 +6330,7 @@ namespace GObject
                         }
                     }
 
-                    //checkLingbaoAttrType(lb);
+                    checkLingbaoAttrType(lb);
 				}
 				break;
 			default:
