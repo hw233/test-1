@@ -1763,7 +1763,17 @@ namespace Script
     void GameActionLua::GetLuckyBagAward(Player * player)
     {
         assert(player != NULL);
-        Call<void>("GetLuckyBagAward",player);
+        Call<void>("GetLuckyBagAward", player);
+    }
+    void GameActionLua::UseToOther(Player * player, Player * other)
+    {
+        assert(player != NULL);
+        Call<void>("UseToOther", player, other);
+    }
+    void GameActionLua::UseToSystem(Player * player)
+    {
+        assert(player != NULL);
+        Call<void>("UseToSystem", player);
     }
 
     UInt32 GameActionLua::GetSpreadCountForAward()

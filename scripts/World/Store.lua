@@ -164,7 +164,8 @@ function loadStore()
             --store:add(2 ,9383 , 20)
             --store:add(2 ,9397, 20)
             --store:add(2 ,9401, 20)
-            store:add(2 ,9422, 20)
+            --store:add(2 ,9422, 20)
+            store:add(2 ,9437, 20)
         end
 
         if is2013_0201_0228() then

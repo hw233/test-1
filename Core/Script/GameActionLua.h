@@ -389,6 +389,8 @@ namespace Script
         void getAwardInFoolsDay(Player* player, UInt8 idx);
         bool getLuckyStarAward(Player* player, UInt8 idx);
         void GetLuckyBagAward(Player * player);
+        void UseToOther(Player * player, Player * other);
+        void UseToSystem(Player * player);
         UInt32 GetSpreadCountForAward();
         lua_tinker::table GetSpreadAward();
         UInt32 GetFairySparParaMax(UInt8 type, UInt8 count);
