@@ -20008,6 +20008,8 @@ void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
 {
     if(domainType == 1)
     {
+        if(!World::getQZoneQQGameActY())    //黄钻空间
+            return;
         if(atoi(m_domain) != 1 && atoi(m_domain) != 2 && atoi(m_domain) !=6)
             return;
         if(type == 0 || type > 2)
@@ -20043,6 +20045,8 @@ void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
     }
     else if(domainType == 2)
     {
+        if(!World::getQZoneQQGameAct())    //蓝钻空间
+                return;
         if(atoi(m_domain) != 10)
             return;
         if(type == 0 || type > 2)

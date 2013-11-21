@@ -3569,6 +3569,12 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAME_END, end);
         ret = 1;
     }
+    else if (type == 10 && begin <= end )
+    {
+        GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAMEY_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAMEY_END, end);
+        ret = 1;
+    }
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
