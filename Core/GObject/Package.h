@@ -196,7 +196,7 @@ namespace GObject
 		//UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId, UInt32 itemId2);
 		UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId);
         UInt8 TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId, UInt8 bind);
-		UInt8 TrumpLOrder(UInt16 fighterId, UInt32 trumpId);
+		UInt8 TrumpLOrder(UInt16 fighterId, UInt32 trumpId ,UInt8 opt = 0);
         UInt8 SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt32& exp);
 
 		void AutoRegen(Fighter *);

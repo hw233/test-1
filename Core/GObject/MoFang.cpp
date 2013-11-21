@@ -1181,7 +1181,7 @@ void MoFang::quickMakejiguan(UInt32 tuzhiId, UInt8 mark)
         else
         {
             addExp += 5;
-            UInt8 randA = uRand(100);
+            //UInt8 randA = uRand(100);
             UInt8 randB = uRand(3);
             switch(tzQuality)
             {
@@ -1190,21 +1190,21 @@ void MoFang::quickMakejiguan(UInt32 tuzhiId, UInt8 mark)
                     break; 
                 case TUZHI_BLUE:
                     randB += 3;
-                    if(randA < 85)
+                    //if(randA < 85)
                     {
                         curProficient += randB;
                     }
                     break;
                 case TUZHI_PURPLE:
                     randB += 2;
-                    if(randA < 70)
+                    //if(randA < 70)
                     {
                         curProficient += randB;
                     }
                     break;
                 case TUZHI_YELLOW:
                     randB += 1;
-                    if(randA < 50)                 
+                    //if(randA < 50)                 
                     {
                         curProficient += randB;
                     }

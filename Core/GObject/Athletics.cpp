@@ -261,7 +261,7 @@ void Athletics::attack(Player * defer)
         if (res)
            GameAction()->RunOperationTaskAction0(_owner, 4);
 		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
 		_owner->send(st);
 		UInt32 id = addAthleticsData(0, defer, res ? 0 : 1, reptid, time);
 		notifyAthleticsDeferData(0, defer, id, res ? 0 : 1, reptid, time);
@@ -316,7 +316,7 @@ void Athletics::beAttack(Player * atker, UInt16 formation, UInt16 portrait, Line
     atker->delFlag(GObject::Player::AthleticsBuff);
 
 	Stream st(REP::ATTACK_NPC);
-	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
 	atker->send(st);
 
 	struct AthleticsResult
@@ -585,7 +585,7 @@ void Athletics::attackMartial(Player* defer)
         reptid = bsim.getId();
 
         Stream st(REP::ATTACK_NPC);
-        st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+        st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
         _owner->send(st);
 
         awardMartial(defer, res);
@@ -634,7 +634,7 @@ void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrai
     atker->delFlag(GObject::Player::AthleticsBuff);
 
 	Stream st(REP::ATTACK_NPC);
-	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
 	atker->send(st);
 
 	struct AthleticsResult

@@ -1247,9 +1247,8 @@ void TeamArenaMgr::pushPreliminary(BinaryReader& br)
 
 void TeamArenaMgr::readFrom( BinaryReader& brd )
 {
-    UInt8 sIdx = 0;
     UInt16 otherSession = 0;
-	brd >> sIdx >> _session >> otherSession;
+	brd >> _session >> otherSession;
     arena.setSession(otherSession);
 	UInt8 progress;
 	UInt8 reg;
@@ -1265,14 +1264,14 @@ void TeamArenaMgr::readFrom( BinaryReader& brd )
 	switch(_progress)
 	{
     case e_team_nextbegin:
-		if(!_teams.empty() && sIdx == 0)
+		if(!_teams.empty())
         {
             DB1().PushUpdateData("DELETE FROM `arena_team_bet`");
             _teamsCount[0] = 0;
 			_teams.clear();
 			_playerBet.clear();
         }
-        if(!_preliminaryPlayers.empty() && sIdx == 0)
+        if(!_preliminaryPlayers.empty())
         {
             _preliminaryPlayers.clear();
             _preliminaryPlayers_list.clear();
@@ -1280,29 +1279,29 @@ void TeamArenaMgr::readFrom( BinaryReader& brd )
         }
         break;
 	case e_team_sign:
-		if(!_teams.empty() && sIdx == 0)
+		if(!_teams.empty())
         {
             DB1().PushUpdateData("DELETE FROM `arena_team_bet`");
             _teamsCount[0] = 0;
 			_teams.clear();
 			_playerBet.clear();
         }
-        if(!_preliminaryPlayers.empty() && sIdx == 0)
+        if(!_preliminaryPlayers.empty())
         {
             _preliminaryPlayers.clear();
             _preliminaryPlayers_list.clear();
             _preliminaryPlayers_list_set.clear();
         }
-        readTeams(brd, sIdx);
+        readTeams(brd);
         break;
     case e_team_sign_end:
-        readPreTeams(brd, sIdx);
+        readPreTeams(brd);
         if(reg == 1)
             readHistories(brd);
 		break;
 	case e_team_32:
         if(reg == 1)
-            readPreTeams(brd, sIdx);
+            readPreTeams(brd);
         readHistories(brd);
 		break;
 	case e_team_16:
@@ -1314,13 +1313,12 @@ void TeamArenaMgr::readFrom( BinaryReader& brd )
     case e_team_end:
         if(reg == 1)
         {
-            readPreTeams(brd, sIdx);
+            readPreTeams(brd);
             readHistories(brd);
         }
 
         bool oldstatus = (_status > 0);
-        if(sIdx == 0)
-            readElimination(brd);
+        readElimination(brd);
         if(oldstatus != (_status > 0))
             fStatus = true;
         break;
@@ -1337,9 +1335,9 @@ void TeamArenaMgr::readFrom( BinaryReader& brd )
     }
 }
 
-void TeamArenaMgr::readTeams(BinaryReader& brd, UInt8 sIdx)
+void TeamArenaMgr::readTeams(BinaryReader& brd)
 {
-    if(!_teams.empty() && sIdx == 0)
+    if(!_teams.empty())
     {
         _teamsCount[0] = 0;
         _teams.clear();
@@ -1397,11 +1395,11 @@ void TeamArenaMgr::readTeams(BinaryReader& brd, UInt8 sIdx)
     }
 }
 
-void TeamArenaMgr::readPreTeams(BinaryReader& brd, UInt8 sIdx)
+void TeamArenaMgr::readPreTeams(BinaryReader& brd)
 {
     Mutex::ScopedLock lk(globalPlayers.getMutex());
     std::unordered_map<UInt64, TeamArenaData *>& pm = globalTeamArena.getMap();
-    if(!_preliminaryPlayers.empty() && sIdx == 0)
+    if(!_preliminaryPlayers.empty())
     {
         _preliminaryPlayers.clear();
         _preliminaryPlayers_list.clear();

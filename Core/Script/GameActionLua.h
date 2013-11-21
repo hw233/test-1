@@ -128,6 +128,8 @@ namespace Script
 		bool RunOperationTaskAction2(Player *, UInt8, UInt32, UInt32);
 		bool RunOperationTaskAction3(Player *, UInt8, UInt32, UInt32, UInt32);
 
+        bool isSalePriceLimitServer();
+
 	public:
 		inline Table GetNpcRelationTask(UInt32 npcId);
 		inline const char* GetPlayerName(Player* player);

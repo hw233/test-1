@@ -1137,6 +1137,7 @@ bool ClanBoss::attack(Player* pl)
         st << pl->_lastLoot[i].id << pl->_lastLoot[i].count;
     }
     st.append(&packet[8], packet.size() - 8);
+    st <<static_cast<UInt64>(0);
     st << Stream::eos;
     pl->send(st);
     bsim.applyFighterHP(0, pl);

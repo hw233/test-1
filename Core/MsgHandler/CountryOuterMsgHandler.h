@@ -650,7 +650,8 @@ struct TrumpLOrderReq
 {
     UInt16 _fgtId;
     UInt32 _itemId;
-    MESSAGE_DEF2(REQ::EQ_TRUMP_L_ORDER, UInt16, _fgtId, UInt32, _itemId);
+    UInt8 _opt ;
+    MESSAGE_DEF3(REQ::EQ_TRUMP_L_ORDER, UInt16, _fgtId, UInt32, _itemId , UInt8 ,_opt);
 };
 struct EquipUpgradeReq
 {
@@ -1379,7 +1380,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
-    if(atoi(pl->getDomain()) == 6)
+    if(atoi(pl->getDomain()) == 23)
     {
         if(!pl)
             return;
@@ -3036,7 +3037,7 @@ void OnRequestChallengeReq( GameMsgHdr& hdr, RequestChallengeReq& rcr)
 	int turns = bsim.getTurns();
 
 	Stream st1(REP::ATTACK_NPC);
-	st1 << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	st1 << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << static_cast<UInt64>(0) << Stream::eos;
 	player->send(st1);
 	st1.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
 	attacker->send(st1);
@@ -5084,23 +5085,24 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
     UInt8 res = 0;
 
     UInt32 amount = GData::moneyNeed[GData::TRUMPLORDER].tael;
-    if(player->getTael() < amount)
+    if(player->getTael() < amount )
     {
         player->sendMsgCode(0, 1100);
         return;
     }
 
 	Package * pkg = player->GetPackage();
-    res = pkg->TrumpLOrder(req._fgtId, req._itemId);
-    if(res != 2)
+    res = pkg->TrumpLOrder(req._fgtId, req._itemId ,req._opt);
+    if(res != 2 && req._opt != 1)
     {
         ConsumeInfo ci(TrumpLOrder,0,0);
         player->useTael(amount, &ci);
         GameAction()->doStrong(player, SthTrumpLOrder, 0, 0);
     }
-
+    if( res > 2 )
+        return ;
 	Stream st(REP::EQ_TRUMP_L_ORDER);
-	st << res << req._fgtId << req._itemId << Stream::eos;
+	st << res << req._fgtId << req._itemId<< Stream::eos;
 	player->send(st);
 }
 

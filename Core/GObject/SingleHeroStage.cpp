@@ -2201,6 +2201,7 @@ namespace GObject
         Stream st(REP::ATTACK_NPC);
         st << static_cast<UInt8>(res) << static_cast<UInt8>(1) << static_cast<UInt32> (0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
         st.append(&packet[8], packet.size() - 8);
+        st << static_cast<UInt64>(0) ;
         st << Stream::eos;
         //fighter->getPlayer()->send(st);
 

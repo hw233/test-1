@@ -31,6 +31,7 @@
 #include "GData/LBSkillTable.h"
 #include "GObject/Leaderboard.h"
 #include "FairySpar.h"
+#include "HoneyFall.h" 
 
 namespace GObject
 {
@@ -1496,6 +1497,7 @@ inline void AddLingbaoAttr(GData::AttrExtra& ae, ItemLingbao* lb)
         {
         case 1:
             ae.attack += lbattr.value[i];
+            ae.magatk += lbattr.value[i];
             break;
         case 2:
             ae.magatk += lbattr.value[i];
@@ -5659,7 +5661,11 @@ void Fighter::SSOpen(UInt16 id)
 {
     if (!_owner)
         return;
-
+    HoneyFall* hf = _owner->getHoneyFall();
+    if(!hf)
+        return ;
+    HoneyFallType hft = e_HFT_Trump_JF; 
+    UInt8 res = 0;
     bool bIsPeerLess = (SKILL_ID(peerless) == SKILL_ID(id));
     int idx = -1;
     if(!bIsPeerLess)
@@ -5746,16 +5752,19 @@ void Fighter::SSOpen(UInt16 id)
             _owner->skillStrengthenLog(1, 1);
             _owner->sendMsgCode(0, 1023);
             _owner->sendFighterSSListWithNoSkill();
+            hf->setHftValue(hft, 0);
+            res = 1 ;
         }
         else
         {
             _owner->skillStrengthenLog(1, 0);
+            hf->incHftValue(hft);
         }
     }
 
     else
     {
-        UInt32 prob = GData::GDataManager::getSkillStrengthenProb(sid, i->second.maxLvl);
+        UInt32 prob =  hf->getChanceFromHft(10, i->second.maxLvl,hft);
         if (uRand(10000) <= prob)
         {
             ++i->second.maxLvl;
@@ -5763,13 +5772,21 @@ void Fighter::SSOpen(UInt16 id)
             SSUpdate2DB(id, i->second);
             _owner->skillStrengthenLog(1, 1);
             _owner->sendMsgCode(0, 1023);
+            hf->setHftValue(hft, 0);
+            res = 1 ;
         }
         else
         {
+            hf->incHftValue(hft);
             _owner->skillStrengthenLog(1, 0);
             _owner->sendMsgCode(0, 1024);
         }
+        hf->updateHftValueToDB(hft);
     }
+    Stream st(REP::SKILLSTRENGTHEN);
+    st << static_cast<UInt8>(3) << res<<static_cast<UInt8>(hf->getHftValue(hft));
+    st << Stream::eos;
+    _owner->send(st);
     GameAction()->doStrong(_owner,SthFuwenJIe, 0, 0);
     _owner->GuangGunCompleteTask(0,9);
 }
