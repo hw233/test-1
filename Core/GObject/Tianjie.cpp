@@ -148,8 +148,8 @@ static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
                                        //59, 69,  79,  89,  99,  109, 119, 129, 139, 149, 999
-static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1533,1534,1535,1374};
-static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,9161,9162,9163,9923};
+static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1533,1534,1535,1377};
+static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,9161,9162,9163,9925};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
@@ -2679,7 +2679,12 @@ void Tianjie::reward(TSortMap& m, UInt8 varId, UInt8 EventOrTotal)
                 if (i == 1)
                 {
                     if (m_isNetOk)
-                        SYSMSG_BROADCASTV(5041, iter->second->getCountry(), iter->second->getName().c_str(), iter->second->getCountry(), iter->second->getName().c_str());
+                    {
+                        if(m_currOpenedTjLevel == 999)
+                            SYSMSG_BROADCASTV(5074, iter->second->getCountry(), iter->second->getName().c_str(), iter->second->getCountry(), iter->second->getName().c_str())
+                        else
+                            SYSMSG_BROADCASTV(5041)
+                    }
                     MailPackage::MailItem nameCardItem;
                     nameCardItem.id = s_tjNameCardId[m_tjTypeId];
                     nameCardItem.count = 1;
