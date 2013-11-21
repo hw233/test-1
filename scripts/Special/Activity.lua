@@ -8353,7 +8353,8 @@ function SurnameLegendLoot(player,lootlvl)
     --package:AddItem(9383, itemNum[lootlvl], true,0,10);
     --package:AddItem(9397, itemNum[lootlvl], true,0,10);
     --package:AddItem(9401, itemNum[lootlvl], true,0,10);
-    package:AddItem(9422, itemNum[lootlvl], true,0,10);
+    --package:AddItem(9422, itemNum[lootlvl], true,0,10);
+    package:AddItem(9437, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -9268,8 +9269,12 @@ function getLuckyStarAward(player, idx)
 end
 
 function GetLuckyBagAward(player)
+    if nil == player then
+        return false;
+    end
+
     local items = {
-       { 9371,5} , {1325,2},{ 503,5},{515,2},{1126,2},{134,2}
+       { 9367,5} , {9369,5},{ 503,5},{515,1},{1525,1},{1325,2}
     }
     for i = 1 , 5  do
         local num = player:GetVar(452+i);
@@ -9287,6 +9292,77 @@ function GetLuckyBagAward(player)
     end
     player:sendLuckyBagInfo();
     Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_136)
+    player:luaUdpLog("huodong", "F_130910_1", "act")
+    return true
+end
+
+function UseToOther(player, other)
+    if nil == player or nil == other then
+        return false;
+    end
+
+    local counts = other:GetVar(518);
+    if(counts >= 5) then
+        return false;
+    end
+
+    local items = {
+       { 9367,5} , {9369,5},{ 503,5},{515,1},{1525,1},{1325,2}
+    }
+    for i = 1 , 5  do
+        local num = player:GetVar(452+i);
+        if num < 1 then
+            return false;
+        end
+    end
+    for i= 1, 5 do
+        local num = player:GetVar(452+i);
+        player:SetVar(452+i,num-1);
+    end
+    for i = 1,#items do
+        local item = items[i];
+        player:GetPackage():Add(item[1],item[2],true,false,32);
+    end
+
+    local title = string.format(msg_138);
+    local ctx = string.format(msg_139, player:getCountry(), player:getPName());
+    local toItems = { 9367,5,1, 9369,5,1, 503,5,1, 515,1,1, 1525,1,1, 1325,2,1};
+    other:GetMailBox():newItemPackageMail(title, ctx, toItems);
+
+    other:SetVar(518, counts+1);
+
+    player:sendLuckyBagInfo();
+    Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_140)
+    player:luaUdpLog("huodong", "F_130910_1", "act")
+    return true
+end
+
+function UseToSystem(player)
+    if nil == player then
+        return false;
+    end
+
+    local items = {{ 9367,5} , {9369,5},{ 503,5},{515,1},{1525,1},{1325,2}}
+
+    for i = 1 , 5  do
+        local num = player:GetVar(452+i);
+        if num < 1 then
+            return false;
+        end
+    end
+    for i= 1, 5 do
+        local num = player:GetVar(452+i);
+        player:SetVar(452+i,num-1);
+    end
+
+    for i = 1,#items do
+        local item = items[i];
+        player:GetPackage():Add(item[1],item[2],true,false,32);
+    end
+    
+    player:GetPackage():Add(15, 1, true, false, 32);
+    player:sendLuckyBagInfo();
+    Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_140)
     player:luaUdpLog("huodong", "F_130910_1", "act")
     return true
 end

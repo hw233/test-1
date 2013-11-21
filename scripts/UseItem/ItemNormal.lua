@@ -9695,10 +9695,10 @@ function ItemNormal_00009375(iid, num, bind, param)
 end
 
 function ItemNormal_00009382(iid, num, bind, param)
-    local itmeId = 9422;
+    local itmeId = 9437;
     local player = GetPlayer()
     local package = player:GetPackage()
-    local items = { 15, 9088, 512, 33, 9371, 551, 501, 513, 503, 1325, 134, 507, 509, 515 }
+    local items = { 15, 9088, 512, 33, 9371, 551, 501, 513, 503, 1325, 1525, 507, 509, 515 }
     local chance = { 1500,3000,3900,4800,5700,6600,7400,8200,8800,9100,9400,9600,9800,10000 }
     local card_num = 0;
     local used_num = player:GetVar(452);
@@ -9717,7 +9717,7 @@ function ItemNormal_00009382(iid, num, bind, param)
             end
         end
         if iid == itmeId and g == 11 then
-            package:Add(1126, 1, true, false, 2)
+            package:Add(1525, 1, true, false, 2)
         else
             package:Add(items[g], 1, true, false, 2)
         end
@@ -11675,6 +11675,7 @@ local ItemNormal_Table = {
     [9401] = ItemNormal_00009382,
     [9407] = ItemNormal_00009382,
     [9422] = ItemNormal_00009382,
+    [9437] = ItemNormal_00009382,
 
     [9388] = ItemNormal_00009388,
     [9390] = ItemNormal_00009390,
