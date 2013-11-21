@@ -2679,7 +2679,12 @@ void Tianjie::reward(TSortMap& m, UInt8 varId, UInt8 EventOrTotal)
                 if (i == 1)
                 {
                     if (m_isNetOk)
-                        SYSMSG_BROADCASTV(5041, iter->second->getCountry(), iter->second->getName().c_str(), iter->second->getCountry(), iter->second->getName().c_str());
+                    {
+                        if(m_currOpenedTjLevel == 999)
+                            SYSMSG_BROADCASTV(5074, iter->second->getCountry(), iter->second->getName().c_str(), iter->second->getCountry(), iter->second->getName().c_str())
+                        else
+                            SYSMSG_BROADCASTV(5041)
+                    }
                     MailPackage::MailItem nameCardItem;
                     nameCardItem.id = s_tjNameCardId[m_tjTypeId];
                     nameCardItem.count = 1;
