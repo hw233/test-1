@@ -3269,12 +3269,12 @@ void World::Send11PlayerRankAward()
 {
     World::initRCRank();
     int pos = 0;
-    static MailPackage::MailItem s_item[][4] = {
-        {{509,30},{515,30},{503,60},{134,30}},
-        {{509,25},{515,25},{503,50},{134,25}},
-        {{509,20},{515,20},{503,40},{134,20}},
+    static MailPackage::MailItem s_item[][5] = {
+        {{509,30},{515,30},{503,60},{134,30},{9022,50}},
+        {{509,25},{515,25},{503,50},{134,25},{9022,30}},
+        {{509,20},{515,20},{503,40},{134,20},{9022,20}},
     };
-    static MailPackage::MailItem card = {9922,1};
+   // static MailPackage::MailItem card = {9922,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -3288,9 +3288,9 @@ void World::Send11PlayerRankAward()
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)
         {
-            mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
-            if(pos ==1)
-                mailPackageManager.push(mail->id, &card, 1, true);
+            mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
+//            if(pos ==1)
+  //              mailPackageManager.push(mail->id, &card, 1, true);
         }
     }
 }
@@ -3320,7 +3320,7 @@ void World::Send11ClanRankAward()
         if(pos > 7 )
         {
             UInt32 ClanGrade = clan->getGradeInAirBook();
-            if(ClanGrade < 55000)
+            if(ClanGrade < 24000)
                 break;
             else 
                 type = 5;

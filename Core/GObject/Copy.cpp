@@ -599,7 +599,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
         {
             if (ato) {
                 Stream st(REP::AUTO_COPY);
-                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot <<static_cast<UInt64>(exp)<< Stream::eos;
                 pl->send(st);
                 autoClear(pl, complete, id, tcd.floor, tcd.spot);
             } else {
