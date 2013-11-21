@@ -447,7 +447,8 @@ void StrengthenMgr::SendStrengthenInfo()
 void StrengthenMgr::Send11GradeInfo(UInt8 type)
 {
     UpdateAirBookToDB();
-    if( type < 2 ||type >12)
+    type = World::get11TimeAirNum();
+    if( type < 1 ||type >12)
         return;
     Stream st(REP::ACT);
     st <<static_cast<UInt8>(0x20);

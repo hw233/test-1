@@ -24826,7 +24826,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={1200,2200,3200};
+    UInt32 gradeAward[]={500,1100,2000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 3 ;i++)
     {
@@ -24874,7 +24874,7 @@ void Player::Send11GradeAward(UInt8 type)
     UInt32 gradeAward[]={500,1100,2000};
     static MailPackage::MailItem s_item[][6] = {
         {{500,6},{503,6},{501,4},{512,5},{516,4},{514,6}},
-        {{1325,3},{503,6},{509,5},{547,6},{134,3},{9388,1}/*{549,1}*/},
+        {{1325,3},{503,6},{509,5},{547,6},{134,2},{9388,1}/*{549,1}*/},
         {{1719,1},{8555,4}},
     };
     SYSMSG(title, 4954);
