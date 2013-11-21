@@ -96,6 +96,9 @@ namespace GObject
 
         GVAR_QZONEQQGAME_BEGIN = 55,
         GVAR_QZONEQQGAME_END = 56,
+
+        GVAR_QZONEQQGAMEY_BEGIN = 59,
+        GVAR_QZONEQQGAMEY_END = 60,
         GVAR_MAX,
     };
 
