@@ -526,7 +526,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             if (ato)
             {
                 Stream st(REP::AUTO_FRONTMAP);
-                st << static_cast<UInt8>(2) << id << spot << Stream::eos;
+                st << static_cast<UInt8>(2) << id << spot<<static_cast<UInt64>(exp) << Stream::eos;
                 pl->send(st);
 
                 autoClear(pl, complate);
