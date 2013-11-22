@@ -2797,101 +2797,20 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     break;
            }
         }
-        case 0x23:
-        {
-            brd >> op;
-            switch (op)
-            {
-                case 0x01:
-                    {
-                        UInt8 index = 0;
-                        brd >> index;
-                        switch(index)
-                        {
-                            case 0:
-                                player->OnQiShiBanRank();
-                                break;
-                            case 1:
-                                {
-                                    if(!player->CheckReqDataTime())
-                                        return;
-
-                                    UInt16 count = 0;
-	                                std::string openId;
-                                    brd >> count;
-                                    
-                                    Stream st(REP::ACT);
-                                    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(1);
-                                    st << count;
-
-                                    for(UInt32 i=0; i<count; i++)
-                                    {
-                                        brd >> openId;
-                                        UInt32 score = player->GetQQFriendScore(openId.c_str());
-                                        st << score;
-                                    }
-                                    st << Stream::eos;
-                                    player->send(st);
-
-                                    player->SetReqDataTime();
-                                }
-                                break;
-                        }
-                        break;
-                    }
-                case 0x02:
-                    {
-                        player->ReqStartQSB();
-                        break;
-                    }
-                case 0x03:
-                    {
-                        int randMark = 0;
-                        UInt32 time = 0;
-                        brd >> randMark;
-                        brd >> time;
-                        player->FinishCurStep(randMark, time);
-                        break;
-                    }
-                case 0x04:
-                    {
-                        player->AddTime();
-                        break;
-                    }
-                case 0x05:
-                    {
-                        player->RestCurStep();
-                        break;
-                    }
-                case 0x06:
-                    {
-                        player->Fail(); //时间到，失败
-                        break;
-                    }
-                case 0x07:
-                    {
-                        player->MyQSBInfo();
-                        break;
-                    }
-                case 0x08:
-                    {
-                        player->ContinueCurStep();
-                        break;
-                    }
-                case 0x10:
-                    {
-                        player->Fail(); //主动放弃，失败
-                        break;
-                    }
-                default:
-                    break;
-            }
-        }
         break;
         case 0x22:  // 光棍节活动
         {
-            
             if( ! WORLD().getGGTime() )
+                break;
+
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            break;
+        }
+        break;
+        case 0x23:  // 七石斗法活动
+        {
+            if(!WORLD().getQiShiBanTime())
                 break;
 
             hdr.msgHdr.desWorkerID = player->getThreadId();

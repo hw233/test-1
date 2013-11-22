@@ -596,11 +596,10 @@ namespace GObject
         UInt32 step;
         UInt32 beginTime;
         UInt32 endTime;
-        UInt8 restAllNum;
         UInt16 awardMark;
         UInt16 randKey;
         UInt8 addTimeNum;
-        QiShiBanInfo() : score(0), step(0), beginTime(0), endTime(0), restAllNum(0), awardMark(0), randKey(0), addTimeNum(0) {}
+        QiShiBanInfo() : score(0), step(0), beginTime(0), endTime(0), awardMark(0), randKey(0), addTimeNum(0) {}
     };
 
 	struct PlayerData
@@ -1915,8 +1914,9 @@ namespace GObject
         
         //七石斗法 begin
           
-        void loadQiShiBanFromDB(UInt32 score, UInt32 step, UInt32 beginTime, UInt32 endTime, UInt8 restAllNum, UInt16 awardMark);
+        void loadQiShiBanFromDB(UInt32 score, UInt32 step, UInt32 beginTime, UInt32 endTime, UInt16 awardMark);
        
+        void QiShiBanState();
         void MyQSBInfo();
         void OnQiShiBanRank();
         void ReqStartQSB();
@@ -1947,9 +1947,6 @@ namespace GObject
 
         void SetQiShiBanKey(UInt16 key) { m_qishiban.randKey = key; }
         UInt16 GetQiShiBanKey() const { return m_qishiban.randKey; }
-
-        void SetQiShiBanRestAllNum(UInt8 num) { m_qishiban.restAllNum = num; }
-        UInt8 GetQiShiBanRestAllNum() const { return m_qishiban.restAllNum; }
 
         void SetQiShiBanAwardMark(UInt16 mark) { m_qishiban.awardMark = mark; }
         UInt16 GetQiShiBanAwardMark() const { return m_qishiban.awardMark; }

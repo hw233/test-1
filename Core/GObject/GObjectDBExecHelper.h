@@ -280,7 +280,6 @@ struct DBQiShiBan
     UInt32 score;
     UInt32 beginTime;
     UInt32 endTime;
-    UInt8 restAllNum;
     UInt16 awardMark;
 };
 
@@ -1647,14 +1646,13 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBQiShiBan)
-SPECIALDEF(7)
+SPECIALDEF(6)
     (
     UInt64, playerId,
     UInt32, step,
     UInt32, score,
     UInt32, beginTime,
     UInt32, endTime,
-    UInt8, restAllNum,
     UInt16, awardMark
     )
 SPECIALEND()
