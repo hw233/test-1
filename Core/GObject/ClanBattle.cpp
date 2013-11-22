@@ -1110,6 +1110,7 @@ bool ClanBattle::attackAssist(Player * atker, std::string& name, UInt32& turns, 
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt16>(r ? 0x101 : 0x100) << static_cast<UInt32>(0) << static_cast<UInt16>(0);
 		st.append(&packet[8], packet.size() - 8);
+        st<<static_cast<UInt64>(0);
 		st << Stream::eos;
 		atker->send(st);
 	}
@@ -1177,6 +1178,7 @@ bool ClanBattle::attackGuarder(Player * atker, std::string& name, UInt32& turns,
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt16>(r ? 0x101 : 0x100) << static_cast<UInt32>(0) << static_cast<UInt16>(0);
 		st.append(&packet[8], packet.size() - 8);
+        st<<static_cast<UInt64>(0);
 		st << Stream::eos;
 		atker->send(st);
 	}
@@ -1962,12 +1964,12 @@ bool ClanCityBattle::attackPlayer2(ClanBattlePlayer * cbAtker, ClanBattlePlayer 
 
 	{
 		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
 		cbAtker->player->send(st);
 	}
 	{
 		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 0 : 1) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		st << static_cast<UInt8>(res ? 0 : 1) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
 		cbDefer->player->send(st);
 	}
 
@@ -2060,12 +2062,12 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 
 	{
 		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() <<static_cast<UInt64>(0)<< Stream::eos;
 		atker->send(st);
 	}
 	{
 		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 0 : 1) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		st << static_cast<UInt8>(res ? 0 : 1) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
 		cbDefer->player->send(st);
 	}
 
@@ -3209,12 +3211,12 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 
 	{
 		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
 		atker->send(st);
 	}
 	{
 		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 0 : 1) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		st << static_cast<UInt8>(res ? 0 : 1) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
 		cbDefer->player->send(st);
 	}
 
@@ -3406,12 +3408,12 @@ bool ClanRobBattle::attackPlayer2(ClanBattlePlayer * cbAtker, ClanBattlePlayer *
 
 	{
 		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
 		cbAtker->player->send(st);
 	}
 	{
 		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 0 : 1) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		st << static_cast<UInt8>(res ? 0 : 1) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
 		cbDefer->player->send(st);
 	}
 
@@ -3690,6 +3692,7 @@ bool ClanRobBattle::attackMonster(Player * atker, std::string& name, UInt32& tur
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt16>(r ? 0x101 : 0x100) << static_cast<UInt32>(0) << static_cast<UInt16>(0);
 		st.append(&packet[8], packet.size() - 8);
+        st<<static_cast<UInt64>(0);
 		st << Stream::eos;
 		atker->send(st);
 	}

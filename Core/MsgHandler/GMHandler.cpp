@@ -1914,7 +1914,7 @@ void GMHandler::OnChallenge( GObject::Player * player, std::vector<std::string>&
 	bool res = bsim.getWinner() == 1;
 
 	Stream st(REP::ATTACK_NPC);
-	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << static_cast<UInt64>(0) << Stream::eos;
 	player->send(st);
 }
 
@@ -3939,6 +3939,7 @@ void GMHandler::OnLingbao(GObject::Player * player, std::vector<std::string>& ar
                     UInt8 lv = equip->getReqLev();
                     stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
                     std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+                    allAttrType.erase(allAttrType.begin() + 1);
                     UInt8 itemTypeIdx = ic - Item_LBling;
                     for(int i = 0; i < attrNum; ++ i)
                     {
@@ -4029,6 +4030,7 @@ void GMHandler::OnLingbaoSkill(GObject::Player * player, std::vector<std::string
                     UInt8 lv = equip->getReqLev();
                     stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
                     std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+                    allAttrType.erase(allAttrType.begin() + 1);
                     UInt8 itemTypeIdx = ic - Item_LBling;
                     for(int i = 0; i < attrNum; ++ i)
                     {
@@ -4269,11 +4271,14 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
     switch(type)
     {
         case 1:
-            GVAR.SetVar(GVAR_SURNAMELEGEND_BEGIN, TimeUtil::Now());
-            GVAR.SetVar(GVAR_SURNAMELEGEND_END, TimeUtil::Now() + 300);
-		    GLOBAL().PushMsg(hdr4, &reloadFlag);
-            player->LuckyBagRank();
-            GLOBAL().PushMsg(hdr1, &_msg);
+            {
+                UInt32 now = TimeUtil::Now();
+                GVAR.SetVar(GVAR_SURNAMELEGEND_BEGIN, TimeUtil::SharpDayT(0, now));
+                GVAR.SetVar(GVAR_SURNAMELEGEND_END, TimeUtil::SharpDayT(2, now));
+                GLOBAL().PushMsg(hdr4, &reloadFlag);
+                player->LuckyBagRank();
+                GLOBAL().PushMsg(hdr1, &_msg);
+            }
             break;
         case 2:
             GVAR.SetVar(GVAR_SURNAMELEGEND_BEGIN, 0);
@@ -4330,6 +4335,17 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_QISHIBANGAME_END, TimeUtil::SharpDayT( 5 , now));
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 13:
+            GVAR.SetVar(GVAR_QZONEQQGAMEY_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_QZONEQQGAMEY_END, TimeUtil::Now() + 86400*15);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 14:
+            GVAR.SetVar(GVAR_QZONEQQGAMEY_BEGIN, 0);
+            GVAR.SetVar(GVAR_QZONEQQGAMEY_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
     }
 }

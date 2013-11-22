@@ -13,6 +13,8 @@ namespace GObject
         e_HFT_None = 0,
         e_HFT_Equip_Enchant = 1,
         e_HFT_Trump_Enchant = 2,
+        e_HFT_Trump_SJ = 3,
+        e_HFT_Trump_JF = 4,
         e_HFT_Max,
     };
 

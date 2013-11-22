@@ -120,7 +120,7 @@ namespace GObject
     std::map<UInt32, UInt32> GObjectManager::_team_om_chance[3];
     std::map<UInt32, UInt32> GObjectManager::_team_om_item;
 
-    std::vector<stHftChance> GObjectManager::_hft_chance[6][12];
+    std::vector<stHftChance> GObjectManager::_hft_chance[11][12];
 
     std::map<UInt8, stRingHpBase*> GObjectManager::_ringHpBase;
     float GObjectManager::_ringHpFactor[12];
@@ -4125,7 +4125,7 @@ namespace GObject
             }
 
             {
-                for(UInt8 q = 0; q < 6; q ++)
+                for(UInt8 q = 0; q < 11; q ++)
                 {
                     lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantChanceAdv", q + 1);
                     UInt32 size = table_temp.size();
@@ -6202,6 +6202,85 @@ namespace GObject
         return true;
     }
 
+    void GObjectManager::checkLingbaoAttrType(ItemLingbao* lb)
+    {
+        if(!lb)
+            return;
+
+        ItemLingbaoAttr& lba = lb->getLingbaoAttr();
+        UInt8 lv = lb->getValueLev();
+        UInt8 subClass = lb->getClass();
+        UInt8 itemTypeIdx = subClass - Item_LBling;
+
+        bool update = false;
+        stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
+        std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+        for(int j = 0; j < 3; ++ j)
+        {
+            if(lba.type[j] == 0)
+                continue;
+
+            if(find(allAttrType.begin(),allAttrType.end(),lba.type[j]) != allAttrType.end())
+                allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),lba.type[j]));
+
+            for(int i = j+1; i < 4; ++ i)
+            {
+                if(lba.type[i] == 0)
+                    continue;
+
+                if(lba.type[i] == lba.type[j])
+                {
+                    UInt8 size = allAttrType.size();
+                    lba.type[i] = allAttrType[GRND(size)];
+                }
+            }
+        }
+
+        for(int i = 0; i < 4; ++ i)
+        {
+            if(lba.type[i] != 0 && lba.value[i] == 0)
+            {
+                update = true;
+                lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * _lbAttrConf.colorVal[3]/400 + 0.99f;
+            }
+            else
+            {
+                UInt16 value = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i]-1) * 1.15f + 0.999f;
+                if(lba.value[i] > value)
+                {
+                    update = true;
+                    lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * 1.15f + 0.99f;
+                }
+                else if(lba.lbColor == 5)
+                {
+                    UInt16 value = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * _lbAttrConf.colorVal[3]/400;
+                    if(lba.value[i] < value)
+                    {
+                        update = true;
+                        lba.value[i] = _lbAttrConf.getAttrMax(lv, itemTypeIdx, lba.type[i] - 1) * _lbAttrConf.colorVal[3]/400 + 0.99f;
+                    }
+                }
+            }
+        }
+
+        if(update)
+        {
+            std::string strType;
+            std::string strValue;
+            for(int i = 0;i <4; ++i)
+            {
+                strType += Itoa(lba.type[i],10); 
+                strValue += Itoa(lba.value[i],10); 
+                if(i < 3)
+                {
+                    strType += ',';
+                    strValue += ',';
+                }
+            }
+            DB4().PushUpdateData("UPDATE `lingbaoattr` SET `types`='%s', `values`='%s' WHERE `id`=%u", strType.c_str(), strValue.c_str(), lb->getId());
+        }
+    }
+
 	bool GObjectManager::loadLingbaoAttr()
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -6209,7 +6288,7 @@ namespace GObject
 
         LoadingCounter lc("Loading lingbao attr:");
         DBLingbaoAttr dblba;
-        if(execu->Prepare("SELECT `equipment`.`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint` FROM `lingbaoattr` LEFT JOIN `equipment` ON `equipment`.`id` = `lingbaoattr`.`id`", dblba) != DB::DB_OK)
+        if(execu->Prepare("SELECT `equipment`.`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint`,`itemId` FROM `lingbaoattr` LEFT JOIN `equipment` ON `equipment`.`id` = `lingbaoattr`.`id`", dblba) != DB::DB_OK)
             return false;
 
         lc.reset(2000);
@@ -6282,6 +6361,8 @@ namespace GObject
                             }
                         }
                     }
+
+                    checkLingbaoAttrType(lb);
 				}
 				break;
 			default:

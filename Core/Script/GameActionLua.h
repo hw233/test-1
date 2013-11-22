@@ -128,6 +128,8 @@ namespace Script
 		bool RunOperationTaskAction2(Player *, UInt8, UInt32, UInt32);
 		bool RunOperationTaskAction3(Player *, UInt8, UInt32, UInt32, UInt32);
 
+        bool isSalePriceLimitServer();
+
 	public:
 		inline Table GetNpcRelationTask(UInt32 npcId);
 		inline const char* GetPlayerName(Player* player);
@@ -387,6 +389,8 @@ namespace Script
         void getAwardInFoolsDay(Player* player, UInt8 idx);
         bool getLuckyStarAward(Player* player, UInt8 idx);
         void GetLuckyBagAward(Player * player);
+        void UseToOther(Player * player, Player * other);
+        void UseToSystem(Player * player);
         UInt32 GetSpreadCountForAward();
         lua_tinker::table GetSpreadAward();
         UInt32 GetFairySparParaMax(UInt8 type, UInt8 count);

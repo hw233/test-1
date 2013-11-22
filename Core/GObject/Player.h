@@ -1480,7 +1480,7 @@ namespace GObject
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackTianjieNpc(UInt32 npcId, UInt32 expMulti = 1, bool isEvent = false, bool isBoss = false);
         bool attackRareAnimal(UInt32 id);
-        bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, bool&, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
+        bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, bool&, UInt64 & exp, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
         bool attackWorldBoss(UInt32, UInt8, UInt8, UInt8, bool = false);
         void autoFrontMapFailed();
         void autoCopyFailed(UInt8);
@@ -2627,6 +2627,7 @@ namespace GObject
         void getLongyuanAct(UInt8 idx, UInt8 flag);
         void sendLongyuanActInfo();
         void sendLuckyBagInfo();
+        void useToOther();
     private:
         UInt8 cf_posPut[5];//范围1-5
         UInt32 cf_itemId[5];

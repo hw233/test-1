@@ -2262,16 +2262,53 @@ void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
     MSG_QUERY_PLAYER(player);
     if(player==NULL)
         return ;
-    UInt8 type = *(reinterpret_cast<UInt8 *>(const_cast<void *>(data)));
-   switch(type)
+
+    struct Data
+    {
+        UInt8 type;
+        char name[32];
+    };
+
+   Data * sdata = reinterpret_cast<Data*>(const_cast<void *>(data));
+   if(sdata)
    {
-    case 0x00:
-        player->sendLuckyBagInfo();
-        break;
-    case 0x03:
-          //player->GetLuckyBagAward();
-          GameAction()->GetLuckyBagAward(player);
-          break;
+       switch(sdata->type)
+       {
+        case 0x00:
+            player->sendLuckyBagInfo();
+            break;
+        /*case 0x03:
+              GameAction()->GetLuckyBagAward(player);
+              break;*/
+        case 0x04:
+              {
+                  std::string name = sdata->name;
+                  Player * other = GObject::globalNamedPlayers[player->fixName(name)];
+                  if(NULL == other)
+                  {
+                    player->sendMsgCode(0, 1506);
+                    return;
+                  }
+
+                  if(player == other)
+                  {
+                    player->sendMsgCode(0, 7001);
+                    return;
+                  }
+
+                  if(other->GetVar(VAR_GIVE_CARDAWARD_COUTS) >= 5)
+                  {
+                    player->sendMsgCode(0, 7002);
+                    return;
+                  }
+
+                  GameAction()->UseToOther(player, other);
+              }
+              break;
+        case 0x05:
+              GameAction()->UseToSystem(player);
+              break;
+       }
    }
     
 }

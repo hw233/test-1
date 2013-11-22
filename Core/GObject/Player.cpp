@@ -3314,6 +3314,14 @@ namespace GObject
             }
         }
 		st << Stream::eos;
+        HoneyFall* hf = getHoneyFall();
+        if(!hf)
+           return ;
+        HoneyFallType hft = e_HFT_Trump_JF;
+        Stream st1(REP::SKILLSTRENGTHEN);
+        st1 <<static_cast<UInt8>(3)<<static_cast<UInt8>(2)<<static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
+        send(st1);
+        
 	}
 
 
@@ -3497,7 +3505,7 @@ namespace GObject
 
 
 		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << static_cast<UInt64>(0) << Stream::eos;
         if (report & 0x01)
         {
             send(st);
@@ -3630,6 +3638,7 @@ namespace GObject
 		if(packet.size() <= 8)
 			return false;
 
+        UInt32 exp = 0;
 		Stream st(REP::ATTACK_NPC);
 
 		bool res = bsim.getWinner() == 1;
@@ -3640,7 +3649,6 @@ namespace GObject
 
             if (ng->getLevel() <= GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
             {
-                UInt32 exp = 0;
 #if 0
                 if(getBuffData(PLAYER_BUFF_TRAINP3, now))
                     exp = ng->getExp() * 18 / 10;
@@ -3701,6 +3709,7 @@ namespace GObject
 			st << _lastLoot[i].id << _lastLoot[i].count;
 		}
 		st.append(&packet[8], packet.size() - 8);
+        st << static_cast<UInt64>(exp);
 		st << Stream::eos;
 		send(st);
 		if(!regen)
@@ -3761,10 +3770,11 @@ namespace GObject
 			return false;
 
 		bool res = bsim.getWinner() == 1;
+        UInt32 exp =0 ;
 		if(res)
 		{
 			_lastNg = ng;
-            UInt32 exp = TIANJIE_EXP(GetLev()) * ng->getExp() * expMulti;
+            exp = TIANJIE_EXP(GetLev()) * ng->getExp() * expMulti;
             addExpOrTjScore(exp, 0, isEvent, true);
 		}
 
@@ -3780,6 +3790,7 @@ namespace GObject
             st << _lastLoot[i].id << _lastLoot[i].count;
         }
         st.append(&packet[8], packet.size() - 8);
+        st << static_cast<UInt64>(exp);
         st << Stream::eos;
         send(st);
 
@@ -3804,11 +3815,12 @@ namespace GObject
     bool Player::attackRareAnimal(UInt32 id)
     {
         bool isFull = false;
-        return attackCopyNpc(id, 1/*XXX:使用这个背景*/, 5, 1, isFull, 1, false, NULL, false);
+        UInt64 exp =0;
+        return attackCopyNpc(id, 1/*XXX:使用这个背景*/, 5, 1, isFull, exp, 1, false,NULL, false);
     }
 
 	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId,
-            UInt8 expfactor, bool& full, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
+            UInt8 expfactor, bool& full,UInt64 & pexp, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
 	{
         if (GetPackage()->GetRestPackageSize() == 0)
         {
@@ -3845,17 +3857,19 @@ namespace GObject
 
         UInt8 atoCnt = 0;
         UInt16 ret = 0x0100;
+        UInt32 exp =0;
 		bool res = bsim.getWinner() == 1;
 		if(res)
 		{
 			ret = 0x0101;
 			_lastNg = ng;
 
-            UInt32 exp = expfactor * ng->getExp();
+            exp = expfactor * ng->getExp();
+
             if(getBuffData(PLAYER_BUFF_QI_TIAN_CHU_MO, now))
                 exp *= (18.f/10.f);
             pendExp(exp);
-
+            pexp = exp;
 			ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
             //战胜NPC 成就
             GameAction()->doAttainment(this, 10351, npcId);
@@ -3886,6 +3900,7 @@ namespace GObject
                 st << _lastLoot[i].id << _lastLoot[i].count;
             }
             st.append(&packet[8], packet.size() - 8);
+            st << static_cast<UInt64>(exp);
             st << Stream::eos;
             send(st);
         }
@@ -10053,6 +10068,7 @@ namespace GObject
 		if(sz != 0)
 			st << lt.id << lt.count;
 		st.append(&packet[8], packet.size() - 8);
+        st << static_cast<UInt64>(0);
 		st << Stream::eos;
 		send(st);
 
@@ -19994,6 +20010,8 @@ void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
 {
     if(domainType == 1)
     {
+        if(!World::getQZoneQQGameActY())    //黄钻空间
+            return;
         if(atoi(m_domain) != 1 && atoi(m_domain) != 2 && atoi(m_domain) !=6)
             return;
         if(type == 0 || type > 2)
@@ -20029,6 +20047,8 @@ void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
     }
     else if(domainType == 2)
     {
+        if(!World::getQZoneQQGameAct())    //蓝钻空间
+                return;
         if(atoi(m_domain) != 10)
             return;
         if(type == 0 || type > 2)
@@ -23897,7 +23917,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
         {
             //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9422, 1, true, false, FromNpc);
+            //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9437, 1, true, false, FromNpc);
         }
         else
         {
@@ -23906,7 +23927,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             {
                 //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9422, 1, true, false, FromNpc);
+                //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9437, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
@@ -24812,7 +24834,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={1200,2200,3200};
+    UInt32 gradeAward[]={500,1100,2000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 3 ;i++)
     {
@@ -24824,7 +24846,7 @@ void Player::Add11grade(UInt32 grade)
     Clan * clan = getClan();
     if(clan!=NULL)
         clan->addClanGradeInAirBook(grade);
-    OnSend11GradeInfo(World::get11TimeNum());
+    OnSend11GradeInfo(World::get11TimeAirNum());
     On11ClanGradeRank();
     On11CountryGradeRank();
     On11PlayerGradeRank();
@@ -24857,11 +24879,11 @@ void Player::SendClanMemberGrade()
 }
 void Player::Send11GradeAward(UInt8 type)
 {
-    UInt32 gradeAward[]={1200,2200,3200};
+    UInt32 gradeAward[]={500,1100,2000};
     static MailPackage::MailItem s_item[][6] = {
         {{500,6},{503,6},{501,4},{512,5},{516,4},{514,6}},
-        {{1325,3},{503,6},{509,5},{547,6},{134,3},{549,1}},
-        {{1717,1},{8555,4}},
+        {{1325,3},{503,6},{509,5},{547,6},{134,2},{9388,1}/*{549,1}*/},
+        {{1719,1},{8555,4}},
     };
     SYSMSG(title, 4954);
     if(type)
@@ -25356,7 +25378,7 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
             return ;
         else m_gginfo.tasknum++;
     }
-    else if(type == 1)
+    else if(type == 1 && m_gginfo.task != 0)
     {
         UInt32 gold = 10; 
         if (getGold() < gold)
@@ -25381,7 +25403,7 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
     }
     else if(type == 3)
     {
-        if(m_gginfo.tasknum !=m_gginfo.taskCom)
+        if(m_gginfo.tasknum !=m_gginfo.taskCom || m_gginfo.task == 0)
             return ;
         {
             m_gginfo.task =0;
@@ -25521,7 +25543,7 @@ void Player::sendGuangGunInfo()
     Stream st(REP::ACTIVE);
     st << static_cast<UInt8>(0x22) << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01);
     st <<static_cast<UInt8>(m_gginfo.status);
-    st<<static_cast<UInt8>(times/20)<<static_cast<UInt8>(getRoll)<<static_cast<UInt8>(m_gginfo.counts)<<static_cast<UInt8>(advanceNum-1)<<static_cast<UInt8>(11 + advanceNumLeft - advanceNum)<<static_cast<UInt8>(advanceBuy)<<static_cast<UInt8>(advanceNumLeft)<< getGGTimeTodayScore()<<getGGTimeScore()<<todayScore<<m_gginfo.score<<m_gginfo.pos<<m_gginfo.task<<m_gginfo.tasknum<<m_gginfo.taskCom<<static_cast<UInt8>(todaytaskNum);    
+    st<<static_cast<UInt8>(times/20)<<static_cast<UInt8>(getRoll)<<(m_gginfo.counts)<<static_cast<UInt8>(advanceNum-1)<<static_cast<UInt8>(11 + advanceNumLeft - advanceNum)<<static_cast<UInt8>(advanceBuy)<<static_cast<UInt8>(advanceNumLeft)<< getGGTimeTodayScore()<<getGGTimeScore()<<todayScore<<m_gginfo.score<<m_gginfo.pos<<m_gginfo.task<<m_gginfo.tasknum<<m_gginfo.taskCom<<static_cast<UInt8>(todaytaskNum);    
     giveGGTeamMemberInfo(st);
     st<<Stream::eos;
     send(st);

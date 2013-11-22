@@ -159,7 +159,7 @@ namespace Script
 		lua_tinker::def(_L, "getAccRecharge", GObject::World::getAccRecharge);
 		lua_tinker::def(_L, "getGMCheck", GObject::World::getGMCheck);
 		lua_tinker::def(_L, "inActive_opTime_20130531", GObject::World::inActive_opTime_20130531);
-		lua_tinker::def(_L, "get11TimeNum", GObject::World::get11TimeNum);
+		lua_tinker::def(_L, "get11TimeNum", GObject::World::get11TimeAirNum);  //天书奇缘计算天书
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1763,7 +1763,17 @@ namespace Script
     void GameActionLua::GetLuckyBagAward(Player * player)
     {
         assert(player != NULL);
-        Call<void>("GetLuckyBagAward",player);
+        Call<void>("GetLuckyBagAward", player);
+    }
+    void GameActionLua::UseToOther(Player * player, Player * other)
+    {
+        assert(player != NULL);
+        Call<void>("UseToOther", player, other);
+    }
+    void GameActionLua::UseToSystem(Player * player)
+    {
+        assert(player != NULL);
+        Call<void>("UseToSystem", player);
     }
 
     UInt32 GameActionLua::GetSpreadCountForAward()
@@ -1822,5 +1832,10 @@ namespace Script
 		return Call<bool>("TaskFuncExist", taskId);
 	}
 
+
+    bool GameActionLua::isSalePriceLimitServer()
+    {
+        return Call<bool>("isSalePriceLimitServer", cfg.serverNum);
+    }
 }
 

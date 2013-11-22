@@ -99,6 +99,9 @@ namespace GObject
 
         GVAR_QISHIBANGAME_BEGIN = 57,  //七石斗法开始时间
         GVAR_QISHIBANGAME_END = 58,    //七石斗法结束时间
+
+        GVAR_QZONEQQGAMEY_BEGIN = 59,
+        GVAR_QZONEQQGAMEY_END = 60,
         GVAR_MAX,
     };
 

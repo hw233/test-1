@@ -417,6 +417,7 @@ namespace GObject
 
         std::vector<UInt8> allAttrType = lbAttrConf.attrType;
         UInt8 itemTypeIdx = subClass - Item_LBling;
+        allAttrType.erase(allAttrType.begin() + 1);
         for(int i = 0; i < attrNum; ++ i)
         {
             UInt8 size = allAttrType.size();
@@ -2838,7 +2839,8 @@ namespace GObject
             return 2;
 
         HoneyFall* hf = m_Owner->getHoneyFall();
-
+        if(!hf)
+            return 2;
         HoneyFallType hft;
         if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
             hft = e_HFT_Trump_Enchant;
@@ -4875,6 +4877,7 @@ namespace GObject
         }
         else if(1 == mark)
         {
+#if 0
             if (fromEquip->GetCareer() != toEquip->GetCareer() &&
                 fromEquip->GetCareer() > 0 &&
                 toEquip->GetCareer() > 0)
@@ -4883,7 +4886,7 @@ namespace GObject
                   2.全职业装备可继承任何职业装备，或接受任何职业装备的继承;*/
                 return 18;
             }
-
+#endif
             if(cfg.serverNum != 34 && m_Owner->getVipLevel() < 4)
             {
                 return 17;   //御剑等级小于4级
@@ -5305,20 +5308,20 @@ namespace GObject
         tIed.extraAttr2.type1 = fIed.extraAttr2.type1;
         tIed.extraAttr2.type2 = fIed.extraAttr2.type2;
         tIed.extraAttr2.type3 = fIed.extraAttr2.type3;
-        tIed.extraAttr2.value1 = fIed.extraAttr2.value1 - fmaxV1 * 15;
         
+        tIed.extraAttr2.value1 = (fIed.extraAttr2.value1 - fmaxV1 * 15) * tmaxV1 / fmaxV1;
         if(float(tIed.extraAttr2.value1) < tmaxV1 * tfactor)
         {
             tIed.extraAttr2.value1 = tmaxV1*tfactor;
         }
 
-        tIed.extraAttr2.value2 = fIed.extraAttr2.value2 - fmaxV2 * 15;
+        tIed.extraAttr2.value2 = (fIed.extraAttr2.value2 - fmaxV2 * 15) * tmaxV2 / fmaxV2;
         if(float(tIed.extraAttr2.value2) < tmaxV2 * tfactor)
         {
             tIed.extraAttr2.value2 = tmaxV2 * tfactor;
         }
 
-        tIed.extraAttr2.value3 = fIed.extraAttr2.value3 - fmaxV3 * 15;
+        tIed.extraAttr2.value3 = (fIed.extraAttr2.value3 - fmaxV3 * 15) * tmaxV3 / fmaxV3;
         if(float(tIed.extraAttr2.value3) < tmaxV3 * tfactor)
         {
             tIed.extraAttr2.value3 = tmaxV3 * tfactor;
@@ -6194,10 +6197,21 @@ namespace GObject
         return 0;
     }
 
-    UInt8 Package::TrumpLOrder(UInt16 fighterId, UInt32 trumpId)
+    UInt8 Package::TrumpLOrder(UInt16 fighterId, UInt32 trumpId ,UInt8 opt)
     {
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
+        HoneyFall* hf = m_Owner->getHoneyFall();
+        if(!hf)
+            return 2;
+        HoneyFallType hft = e_HFT_Trump_SJ;
+        if(opt == 1)
+        {
+            Stream st(REP::EQ_TRUMP_L_ORDER);
+            st <<static_cast<UInt8>(3)<< static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
+            m_Owner->send(st);
+            return 4;
+        }
 		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
 		if(trump == NULL ||
            (trump->getClass() != Item_Trump &&
@@ -6221,11 +6235,23 @@ namespace GObject
             return 2;
         AddItemHistoriesLog(TRUMP_LORDER_ITEM, 1);
 
-        UInt32 chance = GObjectManager::getTrumpLOrderChance(q-2, l-1);
-        if(uRand(1000) >= chance)
+        UInt32 chance = hf->getChanceFromHft(q+4, l,hft);
+        if(uRand(10000) >= chance)
+        {
+            hf->incHftValue(hft);       //法宝升阶祝福
+            hf->updateHftValueToDB(hft);
+            Stream st(REP::EQ_TRUMP_L_ORDER);
+            st <<static_cast<UInt8>(3)<<static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
+            m_Owner->send(st);
             return 1;
-
+        }
         ++ ied_trump.maxTRank;
+
+        hf->setHftValue(hft, 0);  //法宝升阶祝福
+        hf->updateHftValueToDB(hft);
+        Stream st(REP::EQ_TRUMP_L_ORDER);
+        st <<static_cast<UInt8>(3)<<static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
+        m_Owner->send(st);
         DB4().PushUpdateData("UPDATE `equipment` SET `maxTRank` = %u WHERE `id` = %u", ied_trump.maxTRank, trump->getId());
         DBLOG().PushUpdateData("insert into lorder_histories (server_id, player_id, equip_id, template_id, equip_maxrank, upgrade_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), trump->getId(), trump->GetItemType().getId(), ied_trump.maxTRank, TimeUtil::Now());
 
@@ -6718,7 +6744,7 @@ namespace GObject
                 if(lba.skill[1])
                     ++ skillNum;
                 if(lba.tongling)
-                    value += lbAttrConf.getSmeltExp(lv, subClass - Item_LBling, lba.type, lba.value, 4, skillNum);
+                    value += lbAttrConf.getSmeltExp(lv, subClass - Item_LBling, lba.type, lba.value, 4, skillNum,lba.lbColor);
                 else
                     value += lbAttrConf.getSmeltExp2(lv, subClass - Item_LBling, lba.lbColor);
             }
@@ -6772,6 +6798,7 @@ namespace GObject
             return false;
         stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
         std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+        allAttrType.erase(allAttrType.begin() + 1);
         attrNum = m_lbSmeltInfo.itemId == FULING_ITEM_PROTECT ? 4 : 3;
         UInt8 orangeAttrNum = attrNum;
 
@@ -6892,23 +6919,16 @@ namespace GObject
                 attrNum = m_lbSmeltInfo.counts;
 
             std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+            //allAttrType.erase(allAttrType.begin() + 1);
             UInt8 itemTypeIdx = subClass - Item_LBling;
             // 古籍指定的属性
             {
                 UInt8 idx = 0;
 
-                if(gjIdx == 0)
+                if(gjIdx < 4)
                 {
                     UInt8 size = allAttrType.size();
                     idx = uRand(size);
-                }
-                else if(gjIdx < 4)
-                {
-                    UInt8 lbAttrIdx[3][4] =
-                    { {0, 1, 6, 11}, // 物功，法功，身法，反击
-                      {2, 3, 4, 5},  // 物防，法防，生命, 坚韧
-                      {7, 8, 9, 10}};// 命中，闪避，暴击，破击
-                    idx = lbAttrIdx[gjIdx - 1][uRand(4)];
                 }
                 else
                 {
@@ -6918,8 +6938,9 @@ namespace GObject
 
                 if(5 == color)
                     orangeCnt -= 1;
-
                 lbattr.type[0] = allAttrType[idx];
+                if(lbattr.type[0] == 2)
+                    lbattr.type[0] = 1;
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color);
@@ -6927,6 +6948,8 @@ namespace GObject
                 lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]-1) * disFactor + 0.9999f;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
+            if(find(allAttrType.begin(),allAttrType.end(),2) != allAttrType.end())
+                allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),2));
             for(int i = 1; i < attrNum; ++ i)
             {
                 if(5 == color2)
@@ -7637,7 +7660,6 @@ namespace GObject
         CheckTemporaryItem();
 		item_elem_iter iter = m_ItemsTemporary.begin();
         int num = m_ItemsTemporary.size();
-        std::cout << "num = " << num << std::endl; 
         while(num > 0)
         {
             Stream st(REP::TEMPITEM_INFO);
@@ -7666,7 +7688,6 @@ namespace GObject
             }
 
             st.data<UInt16>(4) = count;
-            std::cout << "count = " << count << std::endl; 
             st << Stream::eos;
             m_Owner->send(st);
             num -= count;

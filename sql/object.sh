@@ -217,6 +217,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_player_named.sql  #改名卡 加一张表
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_GG_1111.sql 
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar630.sql        #清除可前进次数
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131112_1.sql     #修复168区玩家仙宠根骨异常问题(id:33569705)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearguanggun.sql     #修复光棍bug
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     #. clearshiyamen.sh
 }
 
