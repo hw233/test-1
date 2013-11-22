@@ -163,9 +163,10 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
                     if(sales[i].price > priceUp[c] + 0.001f)
                         return;
                 }
-
-                if(sales[i].price > (sales[i].count * saleItems[i]->GetItemType().salePriceUp + 0.001f))
+                else if(sales[i].price > (sales[i].count * saleItems[i]->GetItemType().salePriceUp + 0.001f))
+                {
                     return;
+                }
             }
 		}
 		if (revenue > _owner->getTael())

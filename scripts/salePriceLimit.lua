@@ -70,6 +70,7 @@ local serverTable = {
     [373] = 1,
     [376] = 1,
     [379] = 1,
+    [6666] = 1,
     }
 
 function isSalePriceLimitServer(serverNum)
