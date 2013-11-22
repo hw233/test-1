@@ -156,6 +156,14 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 
             if(GameAction()->isSalePriceLimitServer())
             {
+                if(saleItems[i]->getClass() == Item_LBling || saleItems[i]->getClass() == Item_LBwu || saleItems[i]->getClass() == Item_LBxin)
+                {
+                    UInt8 c = static_cast<ItemLingbao*>(saleItems[i])->getLbColor();
+                    UInt16 priceUp[6] = {0, 0, 10, 50, 100, 1000};
+                    if(sales[i].price > priceUp[c] + 0.001f)
+                        return;
+                }
+
                 if(sales[i].price > (sales[i].count * saleItems[i]->GetItemType().salePriceUp + 0.001f))
                     return;
             }
