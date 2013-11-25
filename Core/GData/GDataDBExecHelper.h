@@ -337,6 +337,14 @@ struct DBAcuPra
     UInt32 pramax;  // 修为上限
     UInt8 citslot;  // 心法装备加1
 };
+struct DBAcuPraGold
+{
+    UInt32 useReal;
+    UInt32 praadd;
+    UInt32 soulmax;
+    UInt8 attrNum;
+    float attrValue;
+};
 
 struct DBExp
 {
@@ -1048,6 +1056,16 @@ SPECIALDEF(7)
         UInt32, soulmax,
         UInt32, pramax,
         UInt8, citslot
+    )
+SPECIALEND()
+SPECIALBEGIN(GData::DBAcuPraGold)
+SPECIALDEF(5)
+    (
+     UInt32, useReal,
+     UInt32, praadd,
+     UInt32, soulmax,
+     UInt8,attrNum,
+     float, attrValue
     )
 SPECIALEND()
 

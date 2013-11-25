@@ -6961,6 +6961,84 @@ void Fighter::pushPetInfo2Leaderboard()
 {
     checkBPDirty();
 }
+void Fighter::setAcupointsGold( std::string& acupoints, bool writedb )
+{
+    if (!acupoints.length())
+        return;
+
+    StringTokenizer tk(acupoints, ",");
+    for (size_t i = 0; i < tk.count() && i < ACUPOINTS_MAX; ++i)
+    {
+        setAcupointsGold(i, ::atoi(tk[i].c_str()), writedb, true); // XXX: must be less then 255
+    }
+
+    for (UInt8 i = 0; i < ACUPOINTS_MAX; ++i)
+    {
+        if (_acupoints[i] && _acupoints[i] < 3)
+            _praadd += _acupoints[i];
+        else if (_acupoints[i] == 3)
+            _praadd += 2;
+    }
+}
+
+// XXX: 本命金丹 id (0-8) lvl [1-3]
+bool Fighter::setAcupointsGold( int idx, UInt8 v, bool writedb, bool init )
+{
+    UInt8 vMax =  getAcupointsCntMax();
+    if (idx >= 0  && idx < ACUPOINTS_MAX && v <= vMax)
+    {
+        if (_acupoints[idx] >= v)
+            return false;
+
+        const GData::AcuPra* pap = GData::acupraManager[idx<<8|v];
+        if (!pap)
+            return false;
+
+        if (!init)
+        {
+            if (pap->needlvl > getLevel())
+                return false;
+
+            if (pap->pra > getPExp())
+                return false;
+            addPExp(-static_cast<Int32>(pap->pra), writedb);
+
+            _acupoints[idx] = v;
+            if (_acupoints[idx] < 3)
+                ++_praadd; // 第3层不加
+
+            if (_owner && writedb)
+                _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 0);
+            if (_owner && writedb && idx == 1 && _acupoints[idx] == 3)
+                _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 1);
+            if (_owner && writedb && idx == 2 && _acupoints[idx] == 3)
+                _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 2);
+        }
+        else
+        {
+            _acupoints[idx] = v;
+        }
+
+        soulMax += pap->soulmax;
+
+        if(!init)
+        //增加元神力后 查看成就
+            GameAction()->doAttainment(this->_owner, Script::AddSoulMax , soulMax);
+        _pexpMax += pap->pramax;
+        _cittaslot += pap->citslot;
+
+        _attrDirty = true;
+        _bPDirty = true;
+        sendModificationAcupoints(0x29, idx, writedb);
+        sendModification(7, _pexpMax);
+        sendModification(9, getMaxSoul() );
+        sendModification(0x32, getUpCittasMax());
+        if(!init && v ==vMax )
+            GameAction()->doAttainment(this->_owner, Script::AddAcupoint, idx); //增加穴道的成就
+        return true;
+    }
+    return false;
+}
 
 /*
  *end分别计算散仙的战斗力

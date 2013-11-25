@@ -51,6 +51,7 @@ namespace GObject
 #define TRUMP_UPMAX 3
 #define TRUMP_INIT 1 // 法宝最初只能装1个,由VIP等级控制装备个数
 #define ACUPOINTS_MAX 15
+#define ACUPOINTSGOLD_MAX 9    //本命金丹最大值
 #define LINGBAO_UPMAX 3
 
 #define PEERLESS_UPMAX 1
@@ -230,11 +231,13 @@ public:
     inline UInt8 getAcupointsCntMax() { return 3; }
     UInt8 getAcupointCnt();
     bool setAcupoints(int idx, UInt8 v, bool = true, bool = false);
+    bool setAcupointsGold(int idx, UInt8 v, bool = true, bool = false);
     bool incAcupointsBit(int idx, bool = true);
 
     inline UInt8 getAcupointsBit(int idx) { return (idx >= 0 && idx < ACUPOINTS_MAX) ? _acupoints[idx] : static_cast<UInt8>(-1); }
     void getAllAcupointsBits(Stream& st);
     void setAcupoints(std::string& acupoints, bool = true);
+    void setAcupointsGold(std::string& acupoints, bool = true);
 
     bool setToAcupoints(int idx, bool writedb);
 
