@@ -3479,6 +3479,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
                 if(bo->getLostHP() == 0)
                     continue;
+                if(bo->isLingQu() || bo->isSoulOut())
+                    continue;
 
                 float factor = 1;
                 int idx = std::min(abs(fsize-1), i);
