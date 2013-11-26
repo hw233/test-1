@@ -6183,10 +6183,17 @@ namespace GObject
         bool update = false;
         stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
         std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+
+        if(find(allAttrType.begin(),allAttrType.end(),1) != allAttrType.end())
+            allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),1));
+        if(find(allAttrType.begin(),allAttrType.end(),2) != allAttrType.end())
+            allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),2));
         for(int j = 0; j < 3; ++ j)
         {
             if(lba.type[j] == 0)
                 continue;
+            if(lba.type[j] == 2)
+                lba.type[j] = 1;
 
             if(find(allAttrType.begin(),allAttrType.end(),lba.type[j]) != allAttrType.end())
                 allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),lba.type[j]));
@@ -6195,11 +6202,14 @@ namespace GObject
             {
                 if(lba.type[i] == 0)
                     continue;
+                if(lba.type[i] == 2)
+                    lba.type[i] = 1;
 
                 if(lba.type[i] == lba.type[j])
                 {
                     UInt8 size = allAttrType.size();
                     lba.type[i] = allAttrType[GRND(size)];
+                    update = true;
                 }
             }
         }
