@@ -78,6 +78,7 @@ namespace GObject
         else
             now += m_Offset;
 
+        FastMutex::ScopedLock lk(_mutex);
         if(now < m_OverTime[id]) return false;
 
         UInt32 oldtime = m_OverTime[id];
@@ -151,6 +152,14 @@ namespace GObject
         UpdateDB(id);
         return true;
     }
+
+    UInt32 GVarSystem::GetOverTime(UInt32 id)
+    {
+        if(id >= GVAR_MAX) 
+            return 0;
+        return m_OverTime[id];
+    }
+
 }
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

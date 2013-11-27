@@ -9,11 +9,11 @@
 #include "Common/Itoa.h"
 #include "Server/OidGenerator.h"
 #include "Server/SysMsg.h"
+#include "ArenaServerWar.h"
 
 namespace GObject
 {
 
-#define GET_ARENA_NAME(n) char n[1024]; if(_session & 0x8000) { SysMsgItem * mi = globalSysMsg[780]; if(mi != NULL) mi->get(n); else n[0] = 0; } else { strcpy(n, cfg.slugName.c_str()); }
 
 #define GET_PROGRESS_NAME(n, p) char n[1024]; { SysMsgItem * mi = globalSysMsg[781 + p]; if(mi != NULL) mi->get(n); else n[0] = 0; }
 
@@ -198,11 +198,6 @@ void TeamArenaData::updateToDB()
 }
 
 
-void TeamEliminationPlayer::resetBet()
-{
-	betMap.clear();
-}
-
 UInt8 TeamEliminationBattle::winner(UInt8 idx)
 {
 	UInt8 w = 0;
@@ -270,24 +265,44 @@ void TeamArenaMgr::loadFromDB(DBTeamArenaData& dbtad)
             player->setTeamArena(tad);
         }
     }
+    if(!tad->count)
+    {
+        DB1().PushUpdateData("DELETE FROM `arena_team` WHERE `id` = %" I64_FMT "u", tad->getId());
+        DB1().PushUpdateData("DELETE FROM `arena_team_skill` WHERE `teamId` = %" I64_FMT "u", tad->getId());
+        delete tad;
+        return;
+    }
+    if(!tad->leader)
+    {
+        for(UInt8 i = 0; i < tad->count; ++ i)
+        {
+            if(tad->members[i])
+            {
+                tad->leader = tad->members[i];
+                break;
+            }
+        }
+    }
 
     globalNamedTeamArena.add(dbtad.name, tad);
     globalTeamArena.add(tad);
 }
 
-void TeamArenaMgr::pushBetFromDB( Player * player, UInt8 round, UInt8 state, UInt8 group, UInt8 recieved, UInt16 pos, UInt8 type )
+void TeamArenaMgr::pushBetFromDB(Player * player, DBArenaBet& dbab)
 {
+    if(!player || dbab.state >= 7 || dbab.group > 2)
+        return;
 	BetInfo binfo;
-	binfo.state = state;
-	binfo.round = round;
-	binfo.group = group;
-	binfo.recieved = recieved;
-	binfo.pos = pos;
-	binfo.type = type;
+	binfo.state = dbab.state;
+	binfo.round = dbab.round;
+	binfo.group = dbab.group;
+	binfo.recieved = dbab.recieved;
+	binfo.pos = dbab.pos;
+	binfo.type = dbab.tael;
     int i = 0;
-    if(group > 0)
-        i = group - 1;
-	_playerBet[player].betList[state][i].push_back(binfo);
+    if(dbab.group > 0)
+        i = dbab.group - 1;
+	_playerBet[player].betList[dbab.state][i].push_back(binfo);
 }
 
 bool TeamArenaMgr::createTeam(Player * leader, std::string& name)
@@ -890,6 +905,7 @@ void TeamArenaMgr::championWorship(Player* player, UInt8 opt)
     if(player->GetVar(VAR_TEAMARENA_WORSHIP))
         return;
     bool has = false;
+    /*
     if(arena.active())
     {   //相互交换
         std::map<UInt16, LeaderTeam>::iterator it = _leaderBoard.find(_session-1);
@@ -898,6 +914,17 @@ void TeamArenaMgr::championWorship(Player* player, UInt8 opt)
     }
     else
         has = arena.hasLastLeaderBoard();
+    */
+    if(arena.active())  //仙界第一
+        has = serverWarMgr.hasLastLeaderBoard();
+    else if(active())  //仙界至尊
+        has = arena.hasLastLeaderBoard();
+    else    //仙界传奇
+    {   //相互交换
+        std::map<UInt16, LeaderTeam>::iterator it = _leaderBoard.find(_session-1);
+        if(it != _leaderBoard.end())
+            has = true;
+    }
     if(has == false)
         return;
     UInt32 arenaMoney = 0;
@@ -1666,7 +1693,6 @@ void TeamArenaMgr::calcFinalBet(int i)
         {
             if(_status == 0 && _round > 0)
             {
-                GET_ARENA_NAME(n);
                 GET_PROGRESS_NAME(p, _round + 1);
                 SYSMSGV(g, 710 + i);
                 SYSMSGV(title, 790, p, g);
@@ -2082,10 +2108,11 @@ void TeamArenaMgr::updateBattlePoint(BinaryReader& brd)
 {
     UInt32 cid = 0;
     UInt32 sid = 0;
-    UInt64 tid = 0;
-    UInt32 battlePoint = 0;
-    brd >> cid >> sid >> tid >> battlePoint;
+    UInt64 tid = 0, pid = 0;
+    UInt32 battlePoint = 0, battlePoint1 = 0;
+    brd >> cid >> sid >> tid >> battlePoint >> battlePoint1;
     GET_ORIGINID(tid, sid, cid);
+    GET_ORIGINID(tid, sid, pid);
 
     TeamPreliminaryPlayerListMap::iterator pit = _preliminaryPlayers.find(tid);
     if(pit != _preliminaryPlayers.end())
@@ -2094,8 +2121,17 @@ void TeamArenaMgr::updateBattlePoint(BinaryReader& brd)
         TeamPreliminaryPlayer& pp = *ppit;
         _preliminaryPlayers_list_set.erase(ppit);
         pp.battlePoint = battlePoint;
+        for(UInt8 i = 0; i < TEAMARENA_MAXMEMCNT; ++ i)
+        {
+            if(pp.tprd.playerId[i] == pid)
+            {
+                pp.tprd.battlePoint[i] = battlePoint1;
+                break;
+            }
+        }
         _preliminaryPlayers_list_set.insert(ppit);
     }
+    bool find = false;
     for(int i = 0; i < 2; ++ i)
     {
         for(int j = 0; j < 32; ++ j)
@@ -2103,8 +2139,19 @@ void TeamArenaMgr::updateBattlePoint(BinaryReader& brd)
             if(_finals[i][j].id == tid)
             {
                 _finals[i][j].battlePoint = battlePoint;
+                for(UInt8 m = 0; m < TEAMARENA_MAXMEMCNT; ++ m)
+                {
+                    if(_finals[i][j].tprd.playerId[m] == pid)
+                    {
+                        _finals[i][j].tprd.battlePoint[m] = battlePoint1;
+                        break;
+                    }
+                }
+                find = true;
+                break;
             }
         }
+        if(find) break;
     }
 }
 
@@ -2127,6 +2174,7 @@ void TeamArenaMgr::updateInspireLevel(BinaryReader& brd)
         pp.inspireLvl = inspireLvl;
         _preliminaryPlayers_list_set.insert(ppit);
     }
+    bool find = false;
     for(int i = 0; i < 2; ++ i)
     {
         for(int j = 0; j < 32; ++ j)
@@ -2135,8 +2183,11 @@ void TeamArenaMgr::updateInspireLevel(BinaryReader& brd)
             {
                 _finals[i][j].level = level;
                 _finals[i][j].inspireLvl = inspireLvl;
+                find = true;
+                break;
             }
         }
+        if(find) break;
     }
 }
 
@@ -2321,7 +2372,7 @@ void TeamArenaMgr::sendStatus(Player* pl)
     //                     0  1  2  3  4  5   6   7  8   9  10
     const UInt8 state[] = {0, 2, 4, 6, 8, 10, 12, 1, 3, 13, 14};
     UInt8 progress = state[_progress];
-    if(_progress > 2 && _progress < 7 && _status == 0)
+    if(_progress >= e_team_8 && _progress <= e_team_1 && _status == 0)
         progress -= 1;
     TeamArenaData * tad = pl->getTeamArena();
     if(tad)

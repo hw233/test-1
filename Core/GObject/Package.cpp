@@ -516,7 +516,7 @@ namespace GObject
 		return FindItem(id, bind);
 	}
 
-	ItemBase* Package::Add(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 FromWhere)
+	ItemBase* Package::Add(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere)
 	{
 		if(IsEquipTypeId(typeId))
 			return AddEquipN(typeId, num, bind, silence, FromWhere);
@@ -576,13 +576,13 @@ namespace GObject
 		return true;
 	}
 
-	ItemBase* Package::AddItem(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 fromWhere)
+	ItemBase* Package::AddItem(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 fromWhere)
 	{
 		return AddItem2(typeId, num, !silence, bind, fromWhere);
 	}
 
     //add log
-    void  Package::AddItemCoursesLog(UInt32 typeId, UInt32 num, UInt8 fromWhere)
+    void  Package::AddItemCoursesLog(UInt32 typeId, UInt32 num, UInt16 fromWhere)
     {
          std::string tbn("item_courses");
          DBLOG().GetMultiDBName(tbn);
@@ -597,7 +597,7 @@ namespace GObject
         DBLOG().PushUpdateData("insert into %s (server_id,player_id,item_id,item_num,use_time) values(%u,%" I64_FMT "u,%u,%u,%u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), itemId, num, TimeUtil::Now());
 
     }
-	ItemBase* Package::AddItem2(UInt32 typeId, UInt32 num, bool notify, bool bind, UInt8 fromWhere)
+	ItemBase* Package::AddItem2(UInt32 typeId, UInt32 num, bool notify, bool bind, UInt16 fromWhere)
 	{
         if (!typeId || !num) return NULL;
 		if (IsEquipTypeId(typeId) || IsPetEquipTypeId(typeId))
@@ -781,7 +781,7 @@ namespace GObject
 		}
 	}
 
-	ItemBase* Package::AddItem2(ItemBase* item, UInt8 fromWhere)
+	ItemBase* Package::AddItem2(ItemBase* item, UInt16 fromWhere)
 	{
 		UInt32 typeId = item->GetItemType().getId();
 		bool bind = item->GetBindStatus();
@@ -1001,12 +1001,12 @@ namespace GObject
 		return equip;
 	}
 
-	ItemBase* Package::AddEquip(UInt32 typeId, bool bind, bool silence, UInt8 FromWhere)
+	ItemBase* Package::AddEquip(UInt32 typeId, bool bind, bool silence, UInt16 FromWhere)
 	{
 		return AddEquip2(typeId, !silence, bind, FromWhere);
 	}
 
-	ItemBase* Package::AddEquip2(UInt32 typeId, bool notify, bool bind, UInt8 FromWhere)
+	ItemBase* Package::AddEquip2(UInt32 typeId, bool notify, bool bind, UInt16 FromWhere)
 	{
 		if (!IsEquipTypeId(typeId)) return NULL;
 		if(m_Size >= m_Owner->getPacksize() + 50)
@@ -1218,7 +1218,7 @@ namespace GObject
 		return NULL;
 	}
 
-    ItemBase*  Package::AddEquipEnchant(UInt32 typeId, UInt8 enchant, bool notify, bool bind/* = false*/, UInt8 FromWhere/* = 0*/)
+    ItemBase*  Package::AddEquipEnchant(UInt32 typeId, UInt8 enchant, bool notify, bool bind/* = false*/, UInt16 FromWhere/* = 0*/)
     {
 		ItemEquip* equip = static_cast<ItemEquip*>(AddEquip2(typeId, notify, bind, FromWhere));
         if(!equip)
@@ -1311,7 +1311,7 @@ namespace GObject
         // OnAddEquipAndCheckAttainment(itype, FromWhere);
          return equip;
     }
-    void  Package::OnAddEquipAndCheckAttainment(const GData::ItemBaseType * itype, UInt8 FromWhere)
+    void  Package::OnAddEquipAndCheckAttainment(const GData::ItemBaseType * itype, UInt16 FromWhere)
     {
         if(FromWhere == FromDungeon || FromWhere  == FromNpc)
         {
@@ -1338,7 +1338,7 @@ namespace GObject
         }
 
     }
-	ItemBase* Package::AddEquipN( UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 FromWhere )
+	ItemBase* Package::AddEquipN( UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere )
 	{
 		if((UInt32)(GetRestPackageSize()) + 50 < num)
 			return NULL;
@@ -1368,7 +1368,7 @@ namespace GObject
 		return equip;
 	}
 
-	ItemBase* Package::AddEquip2(ItemEquip * equip, UInt8 FromWhere)
+	ItemBase* Package::AddEquip2(ItemEquip * equip, UInt16 FromWhere)
 	{
 		ItemBase *& e = m_Items[ItemKey(equip->getId())];
 		if(e == NULL)
@@ -1416,7 +1416,7 @@ namespace GObject
 		return true;
 	}
 
-	bool Package::DelItem(UInt32 id, UInt16 num, bool bind, UInt8 toWhere)
+	bool Package::DelItem(UInt32 id, UInt16 num, bool bind, UInt16 toWhere)
 	{
 		if (num == 0 || IsEquipId(id))
 			return false;
@@ -1484,7 +1484,7 @@ namespace GObject
 		return ret;
 	}
 
-	bool Package::DelItem2(ItemBase* item, UInt16 num, UInt8 toWhere)
+	bool Package::DelItem2(ItemBase* item, UInt16 num, UInt16 toWhere)
 	{
 		if (num == 0 || item == NULL || IsEquipId(item->getId()))
 			return false;
@@ -1552,7 +1552,7 @@ namespace GObject
 		return ret;
 	}
 
-	bool Package::DelEquip(UInt32 id, UInt8 toWhere)
+	bool Package::DelEquip(UInt32 id, UInt16 toWhere)
 	{
 		if(!IsEquipId(id)) return false;
 		item_elem_iter iter = m_Items.find(ItemKey(id));
@@ -1577,7 +1577,7 @@ namespace GObject
 		return true;
 	}
 
-	bool Package::DelEquip2(ItemEquip * equip, UInt8 toWhere)
+	bool Package::DelEquip2(ItemEquip * equip, UInt16 toWhere)
 	{
 		item_elem_iter iter = m_Items.find(equip->getId());
 		if(iter == m_Items.end())
@@ -5864,7 +5864,7 @@ namespace GObject
 		GameAction()->RunAutoRegen(m_Owner, fighter);
 	}
 
-	bool Package::DelItemAny( UInt32 id, UInt16 num, bool * hasBind, UInt8 toWhere )
+	bool Package::DelItemAny( UInt32 id, UInt16 num, bool * hasBind, UInt16 toWhere )
 	{
 		if(num == 0)
 			return true;
@@ -7290,7 +7290,7 @@ namespace GObject
         return true;
     }
 
-	bool Package::DelTempEquip(ItemEquip * equip, UInt8 toWhere, bool sendMark)
+	bool Package::DelTempEquip(ItemEquip * equip, UInt16 toWhere, bool sendMark)
 	{
         if(NULL == equip)
             return false;
@@ -7323,7 +7323,7 @@ namespace GObject
 		return true;
 	}
 
-	bool Package::DelTempItem(ItemBase* item, UInt32 num, UInt8 toWhere, bool sendMark)
+	bool Package::DelTempItem(ItemBase* item, UInt32 num, UInt16 toWhere, bool sendMark)
 	{
 		if(num == 0 || item == NULL || IsEquipId(item->getId()))
 			return false;
@@ -7509,7 +7509,7 @@ namespace GObject
 		st << item->getId() << static_cast<UInt8>(item->GetBindStatus() ? 1 : 0) << item->Count() << static_cast<UInt32>(sellTime > 0 ? sellTime : 0);
     }
 
-    ItemBase* Package::AddRetItemToPackage(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 FromWhere)
+    ItemBase* Package::AddRetItemToPackage(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere)
     {
         if(IsEquipId(typeId))
         {

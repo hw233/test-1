@@ -1177,6 +1177,7 @@ void WBossMgr::fixBossName(UInt16 id, Fighter* fighter, UInt8 idx)
 
 void WBossMgr::appear(UInt32 now)
 {
+    return;
     UInt32 npcid = 0;
     UInt8 idx = 2*bossidx[World::_wday-1][m_idx];
     if (World::getOpenTest())

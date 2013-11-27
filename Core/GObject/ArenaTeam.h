@@ -14,6 +14,7 @@ namespace GObject
 class Player;
 struct DBTeamArenaData;
 struct DBTeamArenaSkill;
+struct DBArenaBet;
 
 /********** 组队跨服战 **********/
 #define TEAMARENA_MAXMEMCNT 3
@@ -316,19 +317,22 @@ struct TeamEliminationPlayer
     {
         betMap.clear();
     }
-	void calcBet(bool, const char *);
-	void resetBet();
+	inline void resetBet()
+    {
+        betMap.clear();
+    }
+
 };
 typedef TeamEliminationPlayer TeamPreliminaryPlayer;
 
 struct TeamEliminationBattle
 {
+	TeamEliminationBattle(): wonFlag(0) {}
     UInt8 wonFlag;
     std::vector<TeamPlayerBattleReport> battleId;
 	UInt8 winner(UInt8 idx);
 	UInt8 winCount(UInt8 idx);
 
-	TeamEliminationBattle() {}
 	inline void reset()
 	{
 		battleId.clear();
@@ -374,7 +378,6 @@ class TeamArenaMgr
             _loaded(false), _notified(0), _session(0), _progress(0), _status(0), _round(0), _nextTime(0)
         {
             memset(_teamsCount, 0, sizeof(_teamsCount));
-            memset(_winnerColor, 0, sizeof(_winnerColor));
             memset(_finalIdx, 0, sizeof(_finalIdx));
         }
         ~TeamArenaMgr() {}
@@ -384,7 +387,7 @@ class TeamArenaMgr
         inline bool isOpen() { return World::getArenaState() == ARENA_XIANJIE_ZHIZUN; }
         inline void setSession(UInt16 s) { _session = s; }
         void loadFromDB(DBTeamArenaData&);
-        void pushBetFromDB( Player * player, UInt8 round, UInt8 state, UInt8 group, UInt8 recieved, UInt16 pos, UInt8 type );
+        void pushBetFromDB(Player * player, DBArenaBet& dbab);
         bool createTeam(Player *, std::string&);
         void dismissTeam(Player *);
         bool addTeamMember(Player *, Player *);
@@ -443,8 +446,6 @@ class TeamArenaMgr
         bool _loaded;
         UInt8 _notified;
         UInt16 _session;
-        UInt8 _winnerColor[3];
-        std::string _winner[3];
         UInt8 _progress;
         UInt8 _status;
         UInt8 _round;

@@ -34,6 +34,7 @@
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
 #include "GObject/ArenaTeam.h"
+#include "GObject/ArenaServerWar.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -1610,6 +1611,18 @@ void OnReCalcWeekDayRemoveTimer( GameMsgHdr& hdr,  const void* data )
     WORLD()._recalcwd = NULL;
 }
 
+void OnServerWarBossTimer( GameMsgHdr& hdr,  const void* data )
+{
+    UInt8 type = *reinterpret_cast<UInt8*>(const_cast<void *>(data));
+    if(type)    //AddTimer
+        WORLD()._swBosstimer = WORLD().AddTimer(10000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
+    else        //RemoveTimer
+    {
+        WORLD().RemoveTimer(WORLD()._swBosstimer);
+        WORLD()._swBosstimer = NULL;
+    }
+}
+
 void OnTownDeamonResNotify( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -1678,9 +1691,9 @@ inline bool enterTeamArena(GObject::Player* p, UInt32* cnt)
     /*
     if(*cnt > 100)
         return false;
-    */
 
     ++(*cnt);
+    */
     GObject::teamArenaMgr.enterArena(p);
     return true;
 }

@@ -390,9 +390,9 @@ MSG_REG_2(GameMsgHdr, 0x338, OnGetTeamArenaMoney);
 MSG_REG_2(GameMsgHdr, 0x339, OnTeamArenaInspire);
 
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
-
 MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
 MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
+
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
 MSG_REG_2(GameMsgHdr, 0x362, OnBePrayed);
@@ -401,5 +401,11 @@ MSG_REG_2(GameMsgHdr, 0x364, OnDoStrongInWorld);
 MSG_REG_2(GameMsgHdr, 0x365, OnSend11GradeInfo);
 
 //0x365-380繁体占用
+
+//跨服服战(仙界传奇)
+MSG_REG_2(GameMsgHdr, 0x381, OnServerWarEnter);
+MSG_REG_2(GameMsgHdr, 0x382, OnServerWarLineup);
+MSG_REG_2(GameMsgHdr, 0x383, OnServerWarGetMoney);
+MSG_REG_2(GameMsgHdr, 0x384, OnServerWarUseGold);
 
 MSG_HANDLER_END()

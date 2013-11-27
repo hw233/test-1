@@ -130,6 +130,7 @@ enum PurchaseType
     SanHunUpForPet              = 119, //三魂升级
     TenOneLogin                 = 120,
     ArenaTeamConsume            = 121, //仙界至尊消费
+    ServerWarConsume            = 122, //仙界传奇消费
     //繁体私有占150～200
 };
 
@@ -155,6 +156,7 @@ enum IncomingType
     ProfferFromUseItem          = 145, //使用物品帮贡
     ShouHunFromYouli            = 146, //游历获得兽魂
     LongHunFromTeamArena        = 147, //仙界至尊龙魂获得
+    LongHunFromServerWar        = 148, //仙界传奇龙魂获得
 };
 
 enum MoneyType
@@ -268,6 +270,7 @@ enum ItemFrom
     FromClanSptr = 61, // 神魔之树
     FromCollectCard = 62, //卡片转化池
     Fromkeyin = 63, //壁凰墨转化磐龙墨
+    FromServerWarJijian = 64, //仙界传奇祭剑宝箱
     //80 ~ 100，繁体占用
 };
 
@@ -311,6 +314,7 @@ enum ItemTo
     ToUpgradeKY = 163, //刻印升级所消耗的道具
     ToChangeMoShi = 164, //转换墨石
     ToSanHunUp = 164, //三魂升级
+    ToServerWarJijian = 165, //仙界传奇祭剑
 };
 
 struct IncommingInfo

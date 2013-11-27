@@ -83,6 +83,7 @@
 #include "ClanCityBattle.h"
 #include "MoFang.h"
 #include "Leaderboard.h"
+#include "ArenaServerWar.h"
 
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -739,6 +740,8 @@ namespace GObject
         _invitedBy = 0;
         m_arenaCommitCD = 0;
         m_arenaTeamCommitCD = 0;
+        m_serverWarCommitCD = 0;
+        m_serverWarChallengeCD = 0;
         _inClanCity = false;
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
@@ -5860,7 +5863,7 @@ namespace GObject
 
     bool Player::isForeverTitle(UInt8 t)
     {   //38道尊 39释尊 40儒尊 201名震蜀山
-        if(t == 38 || t == 39 || t == 40 || t == 201)
+        if(t == 38 || t == 39 || t == 40 || (t >= 201 && t <= 206))
             return false;
         return true;
     }
@@ -6138,9 +6141,11 @@ namespace GObject
         {
             struct ItemAdd
             {
+                ItemAdd() : item(0), num(0), bind(false), fromWhere(0) {}
                 UInt16 item;
                 UInt16 num;
                 bool bind;
+                UInt16 fromWhere;
             };
 
             ItemAdd ia;
@@ -8811,6 +8816,7 @@ namespace GObject
 		send((st));
 
         worldBoss.sendDaily(this);
+        serverWarBoss.sendDaily(this);
         //heroIsland.sendDaily(this);
         newHeroIsland.sendDaily(this);
         globalCountryBattle.sendDaily(this);
@@ -10527,6 +10533,10 @@ namespace GObject
 
         if(getBuffData(PLAYER_BUFF_CLANTREE3))
             factor += 0.1f;
+        //仙界传奇(服战) 修为加成
+        float fuzhanRatio = (float)GVAR.GetVar(GVAR_SERVERWAR_XIUWEI) / 100;
+        factor += fuzhanRatio;
+
         return factor;
     }
 
@@ -16434,6 +16444,33 @@ namespace GObject
         return false;
     }
 
+    UInt16 Player::getServerWarChallengeCD()
+    {
+        UInt32 now = TimeUtil::Now();
+        if(now >= m_serverWarChallengeCD)
+            return 0;
+
+        return  m_serverWarChallengeCD - now;
+    }
+    bool Player::inServerWarChallengeCD()
+    {
+        UInt32 now = TimeUtil::Now();
+        if(now < m_serverWarChallengeCD)
+            return true;
+
+        m_serverWarChallengeCD = now + 30;
+        return false;
+    }
+    bool Player::inServerWarCommitCD()
+    {
+        UInt32 now = TimeUtil::Now();
+        if(now < m_serverWarCommitCD)
+            return true;
+
+        m_serverWarCommitCD = now + 60;
+        return false;
+    }
+
     void Player::appendLineup2( Stream& st)
     {
         st << getFormation();
@@ -22248,13 +22285,14 @@ bool Player::in7DayFromCreated()
 #define QUESTIONID_MAX 30
 /*#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
-#define CLR_BIT(X,Y)     (X & ~(1<<Y))*/
+#define CLR_BIT(X,Y)     (X & ~(1<<Y))
 #define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
 #define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
 #define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)
 #define CLR_BIT_3(X,Y)   (X & ~(0x07<<(Y*3)))
 #define SET_BIT_3(X,Y,V) (CLR_BIT_3(X,Y) | V<<(Y*3))
 #define GET_BIT_3(X,Y)   ((X >> (Y*3)) & 0x07)
+*/
 void Player::sendFoolsDayInfo(UInt8 answer)
 {
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
@@ -24778,6 +24816,7 @@ void Player::Send11GradeAward(UInt8 type)
     udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 
 }
+
 } // namespace GObject
 
 

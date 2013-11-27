@@ -67,6 +67,7 @@
 #include "GObject/RechargeTmpl.h"
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
+#include "GObject/ArenaServerWar.h"
 
 struct NullReq
 {
@@ -3143,6 +3144,8 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
         worldBoss.attack(player, loc, anr._npcId);
     else
         player->attackNpc(anr._npcId, 0xFFFFFFFF, player->GetLev() <= 20);
+    if(serverWarBoss.isServerWarBoss(anr._npcId))
+        serverWarBoss.attack(player, loc, anr._npcId);
 }
 
 void OnAutoBattleReq( GameMsgHdr& hdr, AutoBattleReq& abr )

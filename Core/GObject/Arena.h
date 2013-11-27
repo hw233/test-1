@@ -10,14 +10,7 @@ namespace GObject
 
 class Player;
 class ItemEquip;
-
-enum ARENA_STATE
-{
-    ARENA_XIANJIE_NONE   = 0,
-    ARENA_XIANJIE_DIYI   = 1,
-    ARENA_XIANJIE_ZHIZUN = 2,
-    ARENA_XIANJIE_MAX,
-};
+struct DBArenaBet;
 
 enum STAGE_PROGRESS
 {
@@ -142,7 +135,7 @@ public:
 	void sendElimination(Player * player, UInt8, UInt8);
 	void push(Player * player, UInt8, const std::string&);
 	void pushPreliminary(BinaryReader& br);
-    void pushBetFromDB( Player * player, UInt8 round, UInt8 state, UInt8 group, UInt8 recieved, UInt16 pos, UInt8 type );
+    void pushBetFromDB(Player * player, DBArenaBet& dbab);
 	void pushPreliminaryCount(UInt32 *);
 	void check();
 

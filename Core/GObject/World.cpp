@@ -49,6 +49,7 @@
 #include "Server/SysMsg.h"
 #include "Arena.h"
 #include "ArenaTeam.h"
+#include "ArenaServerWar.h"
 #include "Tianjie.h"
 #include "DaysRank.h"
 #include "TownDeamon.h"
@@ -140,6 +141,7 @@ bool World::_goodvoiceact = false;
 bool World::_3366giftact = false;
 bool World::_qzongpygiftact = false;
 void* World::_recalcwd = NULL;
+void* World::_swBosstimer = NULL;
 bool World::_june = false;
 bool World::_june1 = false;
 bool World::_july = false;
@@ -270,6 +272,10 @@ void World::ReCalcWeekDay( World * world )
     if(!world)
         return;
     calWeekDay(world);
+}
+void World::ServerWarBoss_Refresh( World * world )
+{
+    serverWarBoss.process(TimeUtil::Now());
 }
 
 typedef std::multimap<UInt32, Player*> ChopStickSortMap;
@@ -1824,6 +1830,11 @@ bool World::Init()
     AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
 	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
     
+    //开服战世界boss
+    UInt32 value = GVAR.GetVar(GVAR_SERVERWAR_XIUWEI);
+    UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
+    if(value == SERVERWAR_VALUE_XIUWEI4 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
+        WORLD()._swBosstimer = WORLD().AddTimer(10000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
     return true;
 }
 
