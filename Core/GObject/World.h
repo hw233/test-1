@@ -420,6 +420,18 @@ public:
     { return _newYearQQGameAct; }
     inline static void setQZoneQQGameAct(bool v)
     { _QZoneQQGameAct= v; }
+    inline static bool getQZoneQQGameActY()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_QZONEQQGAMEY_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_QZONEQQGAMEY_END);
+        UInt32 now = TimeUtil::Now();
+        bool QZoneQQGameAct = false ;
+        if( now >= begin && now <= end)
+            QZoneQQGameAct = true;
+        else
+            QZoneQQGameAct = false;
+        return QZoneQQGameAct; 
+    }
     inline static bool getQZoneQQGameAct()
     {
         UInt32 begin = GVAR.GetVar(GVAR_QZONEQQGAME_BEGIN);
