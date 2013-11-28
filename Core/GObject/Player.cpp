@@ -17375,10 +17375,16 @@ EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 
 void EventTlzAuto::Process(UInt32 leftCount)
 {
-    m_Player->AddVar(VAR_TJ_TASK3_COPYID, 1);
+    bool forceCancel = false;
+    if(GObject::Tianjie::instance().isFinish() || (GObject::Tianjie::instance().isTjExecute() && (4 == GObject::Tianjie::instance().getTjCurRate() || 5 == GObject::Tianjie::instance().getTjCurRate())))
+        forceCancel = true;
+    else
+    {
+        m_Player->AddVar(VAR_TJ_TASK3_COPYID, 1);
 
-    notify();
-    if (leftCount == 0)
+        notify();
+    }
+    if (leftCount == 0 || forceCancel)
     {
         PopTimerEvent(m_Player, EVENT_TLZAUTO,  m_Player->getId());
         m_Player->delFlag(Player::AutoTlz);
@@ -17388,6 +17394,8 @@ void EventTlzAuto::Process(UInt32 leftCount)
             m_Player->SetVar(VAR_TJ_TASK3_COPYID, 0);
             m_Player->SetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME, TimeUtil::Now());
         }
+        if(forceCancel)
+            notify();
     }
 }
 
