@@ -24956,8 +24956,15 @@ void Player::QiShiBanState()
 
         UInt32 time = GetQiShiBanEndTime() - _playerData.lastOnline;
 
+        UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
+        if(GetQiShiBanScore() > highestScore)
+        {
+            WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId());
+            highestScore = GetQiShiBanScore();
+        }
+
         st << mark << static_cast<UInt16>(GetQiShiBanStep()) << GetQiShiBanScore() << static_cast<UInt8>(restNum) 
-           << GetQiShiBanAwardMark() << time << WORLD().GetMemCach_qishiban(getOpenId()) << Stream::eos;
+           << GetQiShiBanAwardMark() << time << highestScore << Stream::eos;
     }
     else
         st << mark << Stream::eos;
@@ -24981,11 +24988,18 @@ void Player::MyQSBInfo()
         restNum = 0;
 
     UInt32 addTime = GetNextStepTime();
-    UInt32 lastFailHighestScore = GetVar(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE); 
+    UInt32 lastFailHighestScore = GetVar(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE);
+
+    UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
+    if(GetQiShiBanScore() > highestScore)
+    {
+        WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId());
+        highestScore = GetQiShiBanScore();
+    }
 
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x07) << static_cast<UInt16>(GetQiShiBanStep()) 
-        << GetQiShiBanScore() << static_cast<UInt8>(restNum) << addTime << GetQiShiBanAwardMark() << WORLD().GetMemCach_qishiban(getOpenId()) << lastFailHighestScore << Stream::eos;
+        << GetQiShiBanScore() << static_cast<UInt8>(restNum) << addTime << GetQiShiBanAwardMark() << highestScore << lastFailHighestScore << Stream::eos;
 
     send(st);
 }
@@ -25009,34 +25023,42 @@ void Player::ReqStartQSB()
         return;
 
     UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
-    if(restNum >= 3)
-    {
-        UInt8 useMoney = 10;
-        if(getCoupon() + getGold() >= useMoney)
-        {
-            ConsumeInfo ci(RestStep, 0, 0);
-            if(getCoupon() > 0)
-            {
-                if(getCoupon() < useMoney)
-                {
-                    useMoney -= getCoupon();
-                    useCoupon(getCoupon(), &ci);
-                }
-                else
-                {
-                    useCoupon(useMoney, &ci);
-                    useMoney = 0;
-                }
-            }
 
-            if(useMoney > 0)
-                useGold(useMoney, &ci);
-        }
-        else
+    if(GetQiShiBanBeginTime() == GetQiShiBanEndTime()
+            && 0 != GetQiShiBanBeginTime()
+            && 0 != GetQiShiBanEndTime())
+    {
+        if(restNum >= 3)
         {
-            sendMsgCode(0, 1101);
-            return;
+            UInt8 useMoney = 10;
+            if(getCoupon() + getGold() >= useMoney)
+            {
+                ConsumeInfo ci(RestStep, 0, 0);
+                if(getCoupon() > 0)
+                {
+                    if(getCoupon() < useMoney)
+                    {
+                        useMoney -= getCoupon();
+                        useCoupon(getCoupon(), &ci);
+                    }
+                    else
+                    {
+                        useCoupon(useMoney, &ci);
+                        useMoney = 0;
+                    }
+                }
+
+                if(useMoney > 0)
+                    useGold(useMoney, &ci);
+            }
+            else
+            {
+                sendMsgCode(0, 1101);
+                return;
+            }
         }
+        AddVar(VAR_QISHIDOUFA_REST_NUM, 1);
+        ++restNum;
     }
 
     SetQiShiBanKey(uRand(100));
@@ -25045,9 +25067,6 @@ void Player::ReqStartQSB()
     UInt32 addTime = GetNextStepTime();
     SetQiShiBanBeginTime(TimeUtil::Now());
     SetQiShiBanEndTime(GetQiShiBanBeginTime() + addTime);
-   
-    AddVar(VAR_QISHIDOUFA_REST_NUM, 1);
-    ++restNum;
 
     if(0 == restNum)
         restNum = 3;
@@ -25111,13 +25130,13 @@ void Player::FinishCurStep(int randMark, UInt32 clintTime)
     UInt8 mark = 0;
     if(GetQiShiBanScore() >= 100 && (GetQiShiBanScore() - score) < 100)
         mark = 1;
-    else if(GetQiShiBanScore() >= 900 && (GetQiShiBanScore() - score) < 900)
+    else if(GetQiShiBanScore() >= 1650 && (GetQiShiBanScore() - score) < 1650)
         mark = 2;
-    else if(GetQiShiBanScore() >= 2500 && (GetQiShiBanScore() - score) < 2500)
+    else if(GetQiShiBanScore() >= 3200 && (GetQiShiBanScore() - score) < 3200)
         mark = 3;
-    else if(GetQiShiBanScore() >= 4100 && (GetQiShiBanScore() - score) < 4100)
+    else if(GetQiShiBanScore() >= 4800 && (GetQiShiBanScore() - score) < 4800)
         mark = 4;
-    else if(GetQiShiBanScore() >= 7300 && (GetQiShiBanScore() - score) < 7300)
+    else if(GetQiShiBanScore() >= 8000 && (GetQiShiBanScore() - score) < 8000)
         mark = 5;
 
     if(mark > 0)

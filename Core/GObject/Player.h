@@ -1918,7 +1918,7 @@ namespace GObject
        
         void QiShiBanState();
         void MyQSBInfo();
-        void OnQiShiBanRank(UInt32 page);
+        void OnQiShiBanRank(UInt32 page=1);
         void ReqStartQSB();
         void FinishCurStep(int randMark, UInt32 time);
         void Fail();
