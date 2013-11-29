@@ -2809,6 +2809,10 @@ namespace GObject
         bool checkClientIP();
         void modifyPlayerName(UInt32 itemid,UInt8 binding,std::string modifyName);
         void getGameBoxAward(UInt8 type);
+        void getRealSpirit();
+        UInt8 getFighterGoldCnt();
+        void sendRealSpirit();
+        void AddRealSpirit(UInt32 real = 0);
 	};
 
 

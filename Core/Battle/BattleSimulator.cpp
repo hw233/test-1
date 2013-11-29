@@ -13330,49 +13330,63 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
 
             if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(target, NULL))))
             {
-                bool pr2 = bf->calcPierce(target);
-                float cf = 0.0f;
-                bool cs2 = false;
-                if(cs2)
+                float dmg;
+                UInt32 curDmg;
+                bool isPhysic;
+                if(target->hasFlag(BattleFighter::IsMirror))
                 {
-                    UInt8 s = bf->getSide();
-                    if(s < 2)
-                        _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
-                }
-                if(first)
-                {
-                    cs = cs2;
-                    pr = pr2;
-                    first = false;
-                }
-
-                float atk = 0;
-                float def = 0;
-                float reduce = 0;
-                bool isPhysic = false;
-                if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
-                {
-                    atk = skill->effect->crrdamP * calcAttack(bf, cs2, target, NULL);
-                    def = getBFDefend(target);
-                    reduce = getBFAtkReduce(target);
-                    isPhysic = true;
+                    curDmg = target->getHP();
+                    dmg = curDmg;
+                    if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
+                        isPhysic = true;
+                    else
+                        isPhysic = false;
                 }
                 else
                 {
-                    atk = skill->effect->crrdamP * calcMagAttack(bf, cs2, target, NULL);
-                    def = getBFMagDefend(target);
-                    reduce = getBFMagAtkReduce(target);
-                    isPhysic = false;
+                    bool pr2 = bf->calcPierce(target);
+                    float cf = 0.0f;
+                    bool cs2 = false;
+                    if(cs2)
+                    {
+                        UInt8 s = bf->getSide();
+                        if(s < 2)
+                            _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
+                    }
+                    if(first)
+                    {
+                        cs = cs2;
+                        pr = pr2;
+                        first = false;
+                    }
+
+                    float atk = 0;
+                    float def = 0;
+                    float reduce = 0;
+                    if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
+                    {
+                        atk = skill->effect->crrdamP * calcAttack(bf, cs2, target, NULL);
+                        def = getBFDefend(target);
+                        reduce = getBFAtkReduce(target);
+                        isPhysic = true;
+                    }
+                    else
+                    {
+                        atk = skill->effect->crrdamP * calcMagAttack(bf, cs2, target, NULL);
+                        def = getBFMagDefend(target);
+                        reduce = getBFMagAtkReduce(target);
+                        isPhysic = false;
+                    }
+
+                    float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
+                    float factor = atklist[j].factor;
+                    dmg = _formula->calcDamage(atk * factor, def, bf->getLevel(), toughFactor, reduce);
+                    dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+                    dmg = dmg > 0 ? dmg : 1;
+
+                    curDmg = dmg;
+                    doShieldHPAttack(target, curDmg);
                 }
-
-                float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
-                float factor = atklist[j].factor;
-                float dmg = _formula->calcDamage(atk * factor, def, bf->getLevel(), toughFactor, reduce);
-                dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
-                dmg = dmg > 0 ? dmg : 1;
-
-                UInt32 curDmg = dmg;
-                doShieldHPAttack(target, curDmg);
                 if(curDmg > 0)
                 {
                     makeDamage(target, curDmg);

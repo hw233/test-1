@@ -478,6 +478,7 @@ struct DBFighter2
     std::string trump;      // 法宝
     std::string lingbao;    // 灵宝
     std::string acupoints;  // 穴道,打通次数
+    std::string acupointsgold;  // 本命金丹,打通次数
     std::string skill;      // 装备的技能
     std::string citta;      // 装备的心法
     std::string skills;     // 学会的技能, ID1,ID2,...
@@ -1887,7 +1888,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(57)
+SPECIALDEF(58)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1913,6 +1914,7 @@ SPECIALDEF(57)
     std::string, trump,
     std::string, lingbao,
     std::string, acupoints,
+    std::string, acupointsgold,
     std::string, skill,
     std::string, citta,
     std::string, skills,

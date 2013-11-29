@@ -241,3 +241,7 @@ UNLOCK TABLES;
 LOCK TABLES `zhenwei` WRITE;
 source zhenwei;
 UNLOCK TABLES;
+
+LOCK TABLES `acupragold` WRITE;
+source acupragold
+UNLOCK TABLES;

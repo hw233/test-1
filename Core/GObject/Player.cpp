@@ -3419,6 +3419,7 @@ namespace GObject
             st << static_cast<UInt32>(fgt->getPortrait());
 
             fgt->xingchenInfo(st);
+            fgt->getAllAcupointsGoldBits(st);
 		}
 	}
 
@@ -17379,10 +17380,16 @@ EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 
 void EventTlzAuto::Process(UInt32 leftCount)
 {
-    m_Player->AddVar(VAR_TJ_TASK3_COPYID, 1);
+    bool forceCancel = false;
+    if(GObject::Tianjie::instance().isFinish() || (GObject::Tianjie::instance().isTjExecute() && (4 == GObject::Tianjie::instance().getTjCurRate() || 5 == GObject::Tianjie::instance().getTjCurRate())))
+        forceCancel = true;
+    else
+    {
+        m_Player->AddVar(VAR_TJ_TASK3_COPYID, 1);
 
-    notify();
-    if (leftCount == 0)
+        notify();
+    }
+    if (leftCount == 0 || forceCancel)
     {
         PopTimerEvent(m_Player, EVENT_TLZAUTO,  m_Player->getId());
         m_Player->delFlag(Player::AutoTlz);
@@ -17392,6 +17399,8 @@ void EventTlzAuto::Process(UInt32 leftCount)
             m_Player->SetVar(VAR_TJ_TASK3_COPYID, 0);
             m_Player->SetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME, TimeUtil::Now());
         }
+        if(forceCancel)
+            notify();
     }
 }
 
@@ -26229,6 +26238,51 @@ void Player::getGameBoxAward(UInt8 type)
     }
     sendGameBoxAward();
 }
+void Player::getRealSpirit()
+{
+    //UInt32 realSpirit[]={100,200,300,400,500,600,700,800,900}; 
+    UInt32 realget = GetVar(VAR_REAL_SPIRIT_GET);
+    UInt8 lev = GetLev();
+    if(lev < 80 )
+        return ;
+    if(realget)
+        return ;
+    AddRealSpirit(lev*getFighterGoldCnt());
+    SetVar(VAR_REAL_SPIRIT_GET,1);
+    sendRealSpirit();
+}
+UInt8 Player::getFighterGoldCnt()
+{
+    std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
+    UInt8 cnt = 0 ;
+    for (; it != _fighters.end(); ++it)
+    {
+        Fighter* fgt = it->second; // XXX: Fashion can not be enchanted
+        if(fgt->getAcupointsBit(ACUPOINTS_MAX-1) == 3)
+            ++cnt;
+    }
+    return cnt; 
+}
+void Player::AddRealSpirit(UInt32 real)
+{
+    AddVar(VAR_REAL_SPIRIT,real);
+    SYSMSG_SENDV(2020,this,real);
+    SYSMSG_SENDV(2021,this,real);
+    sendRealSpirit();
+}
+
+void Player::sendRealSpirit()
+{
+    UInt32 real = GetVar(VAR_REAL_SPIRIT);
+    UInt32 realget = GetVar(VAR_REAL_SPIRIT_GET);
+    Stream stream(REQ::STATE);
+    stream<<static_cast<UInt8>(0x21);
+    stream<<real;
+    stream<<static_cast<UInt8>(realget);
+    stream<<Stream::eos;
+    send(stream);
+}
+
 } // namespace GObject
 
 

@@ -85,6 +85,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getBaseAura", &GObject::Fighter::getBaseAura);
 	class_def<GObject::Fighter>("getBaseAuraMax", &GObject::Fighter::getBaseAuraMax);
 	class_def<GObject::Fighter>("getBaseTough", &GObject::Fighter::getBaseTough);
+	class_def<GObject::Fighter>("getAcupointsGoldAttr", &GObject::Fighter::getAcupointsGoldAttr);
 	class_def<GObject::Fighter>("getBaseAttack", &GObject::Fighter::getBaseAttack);
 	class_def<GObject::Fighter>("getBaseMagAttack", &GObject::Fighter::getBaseMagAttack);
 	class_def<GObject::Fighter>("getBaseDefend", &GObject::Fighter::getBaseDefend);
@@ -134,6 +135,7 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getExtraAuraMax", &Battle::BattleFighter::getExtraAuraMax);
 	class_def<Battle::BattleFighter>("getExtraTough", &Battle::BattleFighter::getExtraTough);
 	class_def<Battle::BattleFighter>("getExtraStrengthPercent", &Battle::BattleFighter::getExtraStrengthP);
+	class_def<Battle::BattleFighter>("getAcupointsGoldAttr", &Battle::BattleFighter::getAcupointsGoldAttr);
 	class_def<Battle::BattleFighter>("getExtraPhysiquePercent", &Battle::BattleFighter::getExtraPhysiqueP);
 	class_def<Battle::BattleFighter>("getExtraAgilityPercent", &Battle::BattleFighter::getExtraAgilityP);
 	class_def<Battle::BattleFighter>("getExtraIntelligencePercent", &Battle::BattleFighter::getExtraIntelligenceP);

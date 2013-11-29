@@ -1383,6 +1383,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->SetQQBoardValue();
     pl->sendQQBoardLoginInfo();
     pl->sendSummerMeetInfo();   //Fund
+    pl->sendRealSpirit();   //真元
     pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
@@ -1445,6 +1446,11 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 br >> itemid >> binding >> name;
                 player->modifyPlayerName(itemid,binding,name);
             }
+        case 0x21:
+            player->getRealSpirit();
+            player->sendRealSpirit();
+            break;
+
         default:
             return;
 	}
@@ -1681,6 +1687,14 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
             idx = (fer._equipId >> 16) & 0xFFFF;
             UInt8 v = fer._equipId & 0xFFFF;
             fgt->setAcupoints(idx, v, true, false);
+        }
+        break;
+    case 0x34:
+        {
+            idx = (fer._equipId >> 16) & 0xFFFF;
+            UInt8 v = fer._equipId & 0xFFFF;
+            fgt->setAcupointsGold(idx, v, true, false);
+            player->sendRealSpirit();
         }
         break;
     case 0x30:

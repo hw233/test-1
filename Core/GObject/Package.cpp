@@ -2877,7 +2877,7 @@ namespace GObject
         bool updateHft = false;
         UInt32 enc_times = 1;
 	    UInt8 oldEnchant = ied.enchant;
-        UInt8 oldHfValue = hf->getHftValue(hft);
+        UInt16 oldHfValue = hf->getHftValue(hft);
         if(type == 2)
         {
             bless = oldHfValue;

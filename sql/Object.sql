@@ -638,6 +638,7 @@ CREATE TABLE `fighter` (
   `trump` varchar(255) NOT NULL,
   `lingbao` varchar(255) NOT NULL DEFAULT '',
   `acupoints` varchar(255) NOT NULL,
+  `acupointsgold` varchar(255) NOT NULL,
   `skill` varchar(255) NOT NULL,
   `citta` varchar(255) NOT NULL,
   `skills` varchar(255) NOT NULL,
