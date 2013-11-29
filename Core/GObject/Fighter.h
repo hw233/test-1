@@ -232,10 +232,12 @@ public:
     UInt8 getAcupointCnt();
     bool setAcupoints(int idx, UInt8 v, bool = true, bool = false);
     bool setAcupointsGold(int idx, UInt8 v, bool = true, bool = false);
+    float getAcupointsGoldAttr(UInt8 attrId);
     bool incAcupointsBit(int idx, bool = true);
 
     inline UInt8 getAcupointsBit(int idx) { return (idx >= 0 && idx < ACUPOINTS_MAX) ? _acupoints[idx] : static_cast<UInt8>(-1); }
     void getAllAcupointsBits(Stream& st);
+    void getAllAcupointsGoldBits(Stream& st);
     void setAcupoints(std::string& acupoints, bool = true);
     void setAcupointsGold(std::string& acupoints, bool = true);
 
@@ -502,6 +504,7 @@ public:
 	void sendModification(UInt8 n, UInt8 * t, ItemEquip ** v, bool = true);
 
     void sendModificationAcupoints(UInt8 t, int idx, bool = true);
+    void sendModificationAcupointsGold(UInt8 t, int idx, bool = true);
 
 #if 1
     void sendModification(UInt8 t, UInt16 skill, int idx, bool = true);
@@ -805,6 +808,7 @@ protected:
 	UInt32 _hp;
 
     UInt8 _acupoints[ACUPOINTS_MAX];    // 穴道
+    UInt8 _acupointsGold[ACUPOINTSGOLD_MAX];    // 本命金丹
 
     UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid
     std::vector<UInt16> _skills;    // 可装备的技能 TODO: 如果所有技能都将是由心法带出,则数据表里不需要存这个字段

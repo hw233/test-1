@@ -339,8 +339,10 @@ struct DBAcuPra
 };
 struct DBAcuPraGold
 {
+    UInt8 id;       // 本命金丹等级
+    UInt8 lvl;      // 层级(1-3)
     UInt32 useReal;
-    UInt32 praadd;
+//    UInt32 praadd;
     UInt32 soulmax;
     UInt8 attrNum;
     float attrValue;
@@ -1059,12 +1061,13 @@ SPECIALDEF(7)
     )
 SPECIALEND()
 SPECIALBEGIN(GData::DBAcuPraGold)
-SPECIALDEF(5)
+SPECIALDEF(6)
     (
+     UInt8, id,       // 本命金丹等级
+     UInt8, lvl,      // 层级(1-3)
      UInt32, useReal,
-     UInt32, praadd,
      UInt32, soulmax,
-     UInt8,attrNum,
+     UInt8,  attrNum,
      float, attrValue
     )
 SPECIALEND()

@@ -552,7 +552,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_11AIRBOOK_GRADE_DAY = 600,  //10· 1 活动积分
         //600-620 for qiwy  ^_^
 
-        //621-640 for lib 
+        //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,
         VAR_AIRBOOK_LOGIN_AWARD = 622,
         VAR_AIRBOOK_ONLINE_AWARD = 623,
@@ -572,7 +572,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_NOV_LOGIN_AWARD = 637, 
         VAR_RECHARGE_TIME = 638, 
         VAR_GUANGGUN_TODAY_TASK = 639,   //今日完成任务数
+        VAR_REAL_SPIRIT = 640,           //真元
         VAR_MODIFY_NAME_CD = 641,//改名CD
+        VAR_REAL_SPIRIT_GET = 642,       //当日是否领取真元 
+
         VAR_MAX,
     };
 
@@ -1094,6 +1097,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_NOV_LOGIN_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_GAMEBOX_DAILY, CYCLE_DAY);
             REGISTER_VAR(VAR_GAMEBOX_NEW, CYCLE_NONE);
+            REGISTER_VAR(VAR_REAL_SPIRIT, CYCLE_NONE);
+            REGISTER_VAR(VAR_REAL_SPIRIT_GET, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

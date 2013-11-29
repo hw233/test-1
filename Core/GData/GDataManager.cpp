@@ -97,9 +97,9 @@ namespace GData
 			fprintf(stderr, "Load AcuPra Error !\n");
             std::abort();
 		}
-		if (!LoadAreaGoldData())
+		if (!LoadAcuPraGoldData())
 		{
-			fprintf(stderr, "Load AreaGoldData Error !\n");
+			fprintf(stderr, "Load AcuPraGoldData  Error !\n");
             std::abort();
 		}
 		if (!LoadWeaponDefData())
@@ -463,15 +463,15 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBAcuPraGold ap;
-		if(execu->Prepare("SELECT `id`, `lvl`,`usereal`,`paraadd`,`soulmax`,`attrNum`,`attrValue` FROM `acupra`", ap) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`,`lvl`,`usereal`,`soulmax`,`attrnum`,`attrvalue` FROM `acupragold`", ap) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
             GData::AcuPraGold* pap = new GData::AcuPraGold(ap.id << 8 | ap.lvl);
             if (!pap)
                 return false;
-            pap->usereal = ap.usereal;
-            pap->paraadd = ap.paraadd;
+            pap->useReal = ap.useReal;
+          //  pap->praadd = ap.praadd;
             pap->soulmax = ap.soulmax;
             pap->attrNum = ap.attrNum;
             pap->attrValue = ap.attrValue;

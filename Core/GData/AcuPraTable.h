@@ -24,16 +24,16 @@ typedef ObjectMapT<AcuPra, UInt16> AcuPraManager;
 
 struct AcuPraGold : public ObjectBaseNT<UInt16>
 {
-    AcuPra(const UInt16& id) : ObjectBaseNT<UInt16>(id) {}
+    AcuPraGold(const UInt16& id) : ObjectBaseNT<UInt16>(id) {}
 
     UInt32 useReal;
-    UInt32 praadd;
+//    UInt32 praadd;
     UInt32 soulmax;
     UInt8 attrNum;
     float attrValue;
 };
 
-typedef ObjectMapT<AcuPra, UInt16> AcuPraGoldManager;
+typedef ObjectMapT<AcuPraGold, UInt16> AcuPraGoldManager;
 #define acupraGoldManager AcuPraGoldManager::Instance()
 }
 
