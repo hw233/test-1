@@ -22,6 +22,7 @@ namespace GData
 		static bool LoadExpData();
         static bool LoadSoulExpData();
         static bool LoadAcuPraData();
+        static bool LoadAcuPraGoldData();
 		static bool LoadAreaData();
 		static bool LoadWeaponDefData();
 		static bool LoadItemTypeData();

@@ -9171,6 +9171,17 @@ function ItemNormal_keyin(iid, num, bind, param)
         return num;
     end
 end
+function ItemNormal_zhenyuan(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:getFighterGoldCnt() == 0 then
+        player:sendMsgCode(0, 1095,0);
+        return false
+    end
+    local package = player:GetPackage()
+    package:DelItemSendMsg(iid, player);
+    player:AddRealSpirit(100*num)
+    return num;
+end
 
 function ItemNormal_00009311(iid, num, bind, param)
     if iid < 9311 or iid > 9312 then
@@ -11692,6 +11703,7 @@ local ItemNormal_Table = {
     [9424] = ItemNormal_keyin,
     [9425] = ItemNormal_keyin,
     [9428] = ItemNormal_00009428,
+    [9438] = ItemNormal_zhenyuan,
 
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,

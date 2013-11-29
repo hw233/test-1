@@ -73,6 +73,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     hitrate(0), evade(0), critical(0), criticaldmg(0), pierce(0), counter(0), magres(0)
 {
     memset(_acupoints, 0, sizeof(_acupoints));
+    memset(_acupointsGold, 0, sizeof(_acupointsGold));
     memset(_skill, 0, sizeof(_skill));
     //_skills.resize(32); // 默认为32个
     memset(_citta, 0, sizeof(_citta));
@@ -641,6 +642,14 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             }
         }
         break;
+    case 0x34:
+        {
+            std::string str;
+            if (value2string(_acupointsGold, ACUPOINTSGOLD_MAX, str)) {
+                DB2().PushUpdateData("UPDATE `fighter` SET `acupointsgold` = '%s' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", str.c_str(), _id, _owner->getId());
+            }
+        }
+        break;
     case 0x31: // peerless
         break;
     case 0x32: // cittaslot
@@ -732,6 +741,20 @@ void Fighter::sendModificationAcupoints( UInt8 t, int idx, bool writedb )
 	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << _acupoints[idx] << getSoul() << getMaxSoul();
+    if (writedb)
+    {
+        updateToDB(t, 0);
+    }
+	st << Stream::eos;
+	_owner->send(st);
+}
+void Fighter::sendModificationAcupointsGold( UInt8 t, int idx, bool writedb )
+{
+	if(_owner == NULL)
+		return;
+	Stream st(REP::CHANGE_EQUIPMENT);
+	st << getId() << static_cast<UInt8>(1) << t;
+    st << static_cast<UInt8>(idx) << _acupointsGold[idx] << getSoul() << getMaxSoul();
     if (writedb)
     {
         updateToDB(t, 0);
@@ -3115,6 +3138,13 @@ void Fighter::getAllAcupointsBits( Stream& st )
     for (int i = 0; i < ACUPOINTS_MAX; ++i)
     {
         st << _acupoints[i];
+    }
+}
+void Fighter::getAllAcupointsGoldBits( Stream& st )
+{
+    for (int i = 0; i < ACUPOINTSGOLD_MAX; ++i)
+    {
+        st << _acupointsGold[i];
     }
 }
 
@@ -6961,7 +6991,97 @@ void Fighter::pushPetInfo2Leaderboard()
 {
     checkBPDirty();
 }
+void Fighter::setAcupointsGold( std::string& acupoints, bool writedb )
+{
+    if (!acupoints.length())
+        return;
 
+    StringTokenizer tk(acupoints, ",");
+    for (size_t i = 0; i < tk.count() && i < ACUPOINTSGOLD_MAX; ++i)
+    {
+        setAcupointsGold(i, ::atoi(tk[i].c_str()), writedb, true); // XXX: must be less then 255
+    }
+}
+
+// XXX: 本命金丹 id (0-8) lvl [1-3]
+bool Fighter::setAcupointsGold( int idx, UInt8 v, bool writedb, bool init )
+{
+    UInt8 vMax =  getAcupointsCntMax();
+    if (idx >= 0  && idx < ACUPOINTSGOLD_MAX && v <= vMax)
+    {
+        if (_acupointsGold[idx] >= v)
+            return false;
+
+        const GData::AcuPraGold* pap = GData::acupraGoldManager[idx<<8|v];
+        if (!pap)
+            return false;
+
+        if (!init)
+        {
+            if(_acupoints[14]!=3 )
+                return false;
+            if( ( v > 1 && _acupointsGold[idx]!=v-1 ))    //判断升阶
+                return false;
+            if( v==1 && idx >0 && _acupointsGold[idx-1]!=3)
+                return false;
+            UInt32 real = _owner->GetVar(VAR_REAL_SPIRIT);
+            if (pap->useReal > real)
+                return false;
+            _owner->SetVar(VAR_REAL_SPIRIT , real - pap->useReal);
+            SYSMSG_SENDV(2018, _owner, _color, getName().c_str(), pap->useReal);
+            SYSMSG_SENDV(2019, _owner, _color, getName().c_str(), pap->useReal);
+
+            _acupointsGold[idx] = v;
+
+/*            if (_owner && writedb)
+                _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 0);
+            if (_owner && writedb && idx == 1 && _acupoints[idx] == 3)
+                _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 1);
+            if (_owner && writedb && idx == 2 && _acupoints[idx] == 3)
+                _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 2);
+  */      }
+        else
+        {
+            _acupointsGold[idx] = v;
+        }
+
+        soulMax += pap->soulmax;
+        if(!init)
+        //增加元神力后 查看成就
+            GameAction()->doAttainment(this->_owner, Script::AddSoulMax , soulMax);
+
+        _attrDirty = true;
+        _bPDirty = true;
+        sendModificationAcupointsGold(0x34, idx, writedb);
+        sendModification(9, getMaxSoul() );
+        //if(!init && v ==vMax )
+          //  GameAction()->doAttainment(this->_owner, Script::AddAcupoint, idx); //增加穴道的成就
+        return true;
+    }
+    return false;
+}
+float Fighter::getAcupointsGoldAttr(UInt8 attrId)
+{
+    UInt8 idx =0,v=0;
+    for(UInt8 i = 0 ; i <ACUPOINTSGOLD_MAX ;++i)
+    {
+        if(!_acupointsGold[i])
+            break;
+        idx = i;
+        v = _acupointsGold[i];
+    }
+    if(!v)
+        return 0;
+    const GData::AcuPraGold* pap = GData::acupraGoldManager[idx<<8|v];
+    if(!pap)
+        return 0;
+    if(pap->attrValue != 0)
+        std::cout<<_owner->getName()<<"的"<<getName()<< "的暴击伤害减免:"<<pap->attrValue/100<<std::endl;
+    if(pap->attrNum != attrId)
+        return 0;
+    else 
+        return pap->attrValue/100;
+}
 /*
  *end分别计算散仙的战斗力
 */

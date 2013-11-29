@@ -310,6 +310,8 @@ namespace Script
         CLASS_DEF(Player, fighterFromItem);
         CLASS_DEF(Player, appendCompassItem);
         CLASS_DEF(Player, getXianyuanLua);
+        CLASS_DEF(Player, AddRealSpirit);
+        CLASS_DEF(Player, getFighterGoldCnt);
         CLASS_DEF(Player, getFengsuiLua);
         CLASS_DEF(Player, getLongyuanLua);
         CLASS_DEF(Player, getPetByPetEgg);
