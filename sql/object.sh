@@ -208,7 +208,18 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131001_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131101_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131018_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131018_2.sql   #lingbaosmelt 表中添加 counts、 purpleAdjVal、orangeAdjVal 三个字段
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar544_545.sql        #清除累积登陆(开启万圣节登陆有礼)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearyellowdiamond.sql  #黄钻活动需要打开
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_player_named.sql  #改名卡 加一张表
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_GG_1111.sql 
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar630.sql        #清除可前进次数
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131112_1.sql     #修复168区玩家仙宠根骨异常问题(id:33569705)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearguanggun.sql     #修复光棍bug
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131201_1.sql
     #. clearshiyamen.sh
 }
 

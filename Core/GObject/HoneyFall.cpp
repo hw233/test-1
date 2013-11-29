@@ -42,7 +42,7 @@ UInt32 HoneyFall::incHftValue(HoneyFallType hft, UInt32 inc)
 }
 
 void HoneyFall::updateHftValueToDB(HoneyFallType hft)
-{   //type 1:装备 2:法宝
+{   //type 1:装备 2:法宝 3:法宝升阶 4：技能解封
     DB3().PushUpdateData("REPLACE INTO `player_honeyfall` (`playerId`, `type`, `value`) VALUES (%" I64_FMT "u, %u, %u)", m_Owner->getId(), hft, m_hft_value[hft]);
 }
 

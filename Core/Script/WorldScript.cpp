@@ -167,6 +167,7 @@ void WorldScript::init()
     def("getDragonKingAct", GObject::World::getDragonKingAct);
     def("setSaveGoldAct", GObject::World::setSaveGoldAct);
     def("setCollectCardAct", GObject::World::setCollectCardAct);
+    def("setHalloweenAct", GObject::World::setHalloweenAct);
     
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);
@@ -247,10 +248,12 @@ void WorldScript::init()
     def("getQQBoardLoginTime",GObject::World::getQQBoardLoginTime);
     def("set11Time",GObject::World::set11Time);
     def("get11Time",GObject::World::get11Time);
+    def("setGGTime",GObject::World::setGGTime);
+    def("getGGTime",GObject::World::getGGTime);
 
     def("setSurnameLegend",GObject::World::setSurnameLegend);
     def("getSurnameLegend",GObject::World::getSurnameLegend);
-    def("get11TimeNum",GObject::World::get11TimeNum);
+    def("get11TimeNum",GObject::World::get11TimeAirNum);
     def("setRYHBActivity",GObject::World::setRYHBActivity);
     def("getRYHBActivity",GObject::World::getRYHBActivity);
 

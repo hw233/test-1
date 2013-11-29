@@ -392,21 +392,28 @@ end
 function RunQQBoardInstantLoginAward(player, cts)
     -- 领取QQ面板连续登陆登录奖励
     local item = {
-        [1] = {{56,1},{57, 1}, {15, 1}},
+        --[[[1] = {{56,1},{57, 1}, {15, 1}},
         [3] = {{56,2},{57, 2}, {15, 2}},
         [5] = {{30,1},{56,3},{57, 3}, {15, 3}},
         [7] = {{30,1},{56,3},{57, 3}, {15, 2},{134,1}},
         [9] = {{30,1},{56,3},{57, 3}, {15, 3},{134,1},{1325,1}},
         [11] = {{30,1},{56,3},{57, 3}, {15, 3},{134,1},{9390,1}},
         [13] = {{30,1},{56,3},{57, 3}, {15, 3},{134,1},{9390,1},{1126,1}},
-        [15] = {{30,1},{56,3},{57, 2}, {15, 3},{134,1},{9390,1},{1126,1},{8555,1}},
+        [15] = {{30,1},{56,3},{57, 2}, {15, 3},{134,1},{9390,1},{1126,1},{8555,1}},]]
+        [1] = {{56,1},{57, 1}, {15, 2}},
+        [3] = {{56,2},{57, 2}, {9371, 2}},
+        [5] = {{503,2},{514,2},{500, 2}, {9371, 2}},
+        [7] = {{509,1},{515,1},{134, 1}, {1325, 1}},
     };
     local package = player:GetPackage();
 
-    if cts == 0 then
+    --[[if cts == 0 then
         return false
     end
     if cts > 16 then
+        return false
+    end]]
+    if item[cts] == nil then
         return false
     end
 
@@ -494,6 +501,35 @@ function RunPrayAward(player, cts)
         return false
     end
     if cts > 6 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < (num)  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    for count = 1, #item[cts] do
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
+    end
+    return true
+end
+function RunNovLoginAward(player, cts)
+    local item = {
+        [1] = {{503, 1},{56,1},{133,1}},
+        [2] = {{10217,1}},
+        [3] = {{10218,1}},
+    };
+    local package = player:GetPackage();
+
+    if cts < 1 then
+        return false
+    end
+    if cts > 3 then
         return false
     end
 
@@ -732,7 +768,8 @@ function RunBlueDiamondAward(player, opt)
         [3] = {785,2833,4881,5823,7202,7987,9366,10000},
         [4] = {1050, 2265, 3480, 4695, 6220, 7745, 9270, 10000},
         [5] = {785,2833,4881,5823,7202,7987,9366,10000},
-        [6] = {1180,2630,4080,6030,7980,9100,9400,10000}
+        [6] = {1180,2630,4080,6030,7980,9100,9400,10000},
+        [7] = {2200,4150,5350,5850,5950,6450,6950,7050,7650,7700,9850,10000}
     };
     local item = {
         [1] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{9022,1},{1717,1},{5137,1}},
@@ -740,7 +777,8 @@ function RunBlueDiamondAward(player, opt)
         [3] = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}},
         [4] = {{515,3},{9338,4},{134,4},{1325,4},{507,2},{509,2},{47,3},{5006,1}},
         [5] = {{515,6},{507,4},{509,4},{503,20},{1325,8},{47,6},{134,8},{5026,2}},
-        [6] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{503,5},{1719,1},{5135,1}}
+        [6] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{503,5},{1719,1},{5135,1}},
+        [7] = {{503,1},{500,2},{517,1},{515,1},{9076,2},{1325,1},{516,1},{8555,1},{134,1},{5065,1},{56,2},{5005,1}}
     };
     local item_id = {9190, 9191, 9217, 9284,10119};
     
@@ -748,7 +786,7 @@ function RunBlueDiamondAward(player, opt)
     local itemId = item_id[opt];
     local ch = chance[opt];
     
-    if opt ~= 6 then
+    if opt < 6 then
         if  not package:DelItem(itemId, 1, true) then
             if  not package:DelItem(itemId, 1, false) then
                 player:sendMsgCode(2, 1110, 0);
@@ -766,6 +804,9 @@ function RunBlueDiamondAward(player, opt)
             break
         end
     end
+    if opt ==7 and (items[j][1] == 134 or items[j][1]==515 or items[j][1] == 1325 or items[j][1]==9076 or items[j][1] == 8555 or items[j][1] == 5065 or items[j][1] ==5005)  then 
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."通过财富罗盘获得了".."[4:"..items[j][1].."]x"..items[j][2])
+   end
     local extraAward_9191 = {
         [2] = {9191,1,1},
         [6] = {549,2,1, 548,20,1},
@@ -909,10 +950,10 @@ function RunSummerFlowAward(player, idx)
         return 0
     end
     local item = {
-        [1] = {{499,100},{9371,10},{15,5},{9141,5},{9144,5}},
-        [2] = {{499,188},{9371,20},{15,10},{9141,8},{9144,8}},
-        [3] = {{499,288},{9371,20},{15,10},{9141,8},{9144,8},{503,20},{500,20}},
-        [4] = {{499,365},{9371,20},{15,10},{9141,8},{9144,8},{503,20},{500,20}},
+        [1] = {{499,88},{9418,8},{49,3},{9141,3},{9144,3}},
+        [2] = {{499,188},{9418,8},{50,3},{9141,5},{9144,5}},
+        [3] = {{499,288},{15,10},{9418,10},{9141,8},{9144,8},{49,3},{50,3}},
+        [4] = {{499,288},{15,20},{9418,20},{9141,8},{9144,8},{49,3},{50,3}},
     };
     local award = item[idx]
     local package = player:GetPackage()
@@ -965,9 +1006,9 @@ function RunSummerMeetAward(player, idx)
         return 0
     end
     local item = {
-        [1] = {{499,100},{503, 8},{9390,8},{9141,5},{9144,5}},
-        [2] = {{499,188},{503,66},{9390,22},{9141,8},{9144,8}},
-        [3] = {{499,365},{503,100},{9390,33},{9141,8},{9144,8}},
+        [1] = {{499,100},{9418, 8},{9413,8},{9141,5},{9144,5}},
+        [2] = {{499,188},{9418,18},{9413,18},{9141,8},{9144,8}},
+        [3] = {{499,288},{9418,33},{9413,33},{9141,8},{9144,8}},
     };
     local award = item[idx]
     local package = player:GetPackage()
@@ -1116,8 +1157,10 @@ function onGetQZoneQQGameAward(player, type)
     local awards = {
         --[1] = {{48, 1},{1327, 1},{56, 1},{57, 1}},
         --[2] = {{50, 1},{1326, 1},{56, 1},{57, 1}}
-        [1] = {{51, 1},{1125, 1},{56, 1},{57, 1}, {133, 1}, {1327, 1}},
-        [2] = {{49, 1},{1126, 1},{56, 1},{57, 1}, {134, 1}, {1326, 1}}
+        --[1] = {{51, 1},{1125, 1},{56, 1},{57, 1}, {133, 1}, {1327, 1}},
+        --[2] = {{49, 1},{1126, 1},{56, 1},{57, 1}, {134, 1}, {1326, 1}}
+        [1] = {{51, 1},{1125, 1},{56, 1},{57, 1}, {439, 1}, {438, 1}},
+        [2] = {{48, 1},{1126, 1},{56, 1},{57, 1}, {439, 1}, {438, 1}}
     }
     local award = awards[type]
     local package = player:GetPackage()
@@ -1499,6 +1542,32 @@ function RunAirBookLoginAward(player, cts)
     local package = player:GetPackage();
 
     if cts > 10  or cts <= 0 then
+        return false
+    end
+
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
+    end
+    return true
+end
+function RunGameBoxDailyActionAward(player, cts)
+    local item = {
+        [0] = {{503 ,1},{500 , 1},{50, 1},{49,1}},
+        [1] = {{15 ,1},{48 , 1}},
+    };
+    local package = player:GetPackage();
+
+    if cts > 1  or cts < 0 then
         return false
     end
 

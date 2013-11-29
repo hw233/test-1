@@ -1377,10 +1377,10 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
 	GObject::Player * player = fgt->getOwner();
 	if(player == NULL)
 		return;
-	const UInt32 itemIdStart[3][5] = {
-        {2568, 2592, 2784, 2784, 2784},
-        {2576, 2600, 2792, 2792, 2792},
-        {2584, 2608, 2800, 2800, 2800}
+	const UInt32 itemIdStart[3][7] = {
+        {2568, 2592, 2784, 2784, 2784, 2968, 3032},
+        {2576, 2600, 2792, 2792, 2792, 2976, 3040},
+        {2584, 2608, 2800, 2800, 2800, 2984, 3048}
     };
     const UInt16 trump[] = {1608,1609,1610};
 	int idx = -1;
@@ -1394,6 +1394,10 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
 		idx = 3;
 	else if(equipLvl == 100)
 		idx = 4;
+	else if(equipLvl == 110)
+        idx = 5;
+	else if(equipLvl >= 120)
+        idx = 6;
 	else
 		return;
 	if(flushAttr) {
@@ -1588,7 +1592,7 @@ void addSuperClass( GObject::Player * player, UInt32 id )
         WARN_LOG("get fighter by id");
         return;
     }
-	UInt64 exp = GData::expTable.getLevelMin(100);
+	UInt64 exp = GData::expTable.getLevelMin(LEVEL_MAX);
 	fgt->addExp(exp);
 	makeSuper(fgt, fgt->getLevel());
 }
@@ -1635,8 +1639,8 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 	}
 	if(player->getFighterCount() > 1 || player->GetPackage()->GetRestPackageSize() < 40)
 		return;
-	player->AddExp(GData::expTable.getLevelMin(100));
-    player->AddPExp(100000);
+	player->AddExp(GData::expTable.getLevelMin(LEVEL_MAX));
+    player->AddPExp(0xFFFFFFFF);
     IncommingInfo ii(InFromSuper, 0, 0);
     player->getGold(10000000, &ii);
     {
@@ -1912,7 +1916,7 @@ void GMHandler::OnChallenge( GObject::Player * player, std::vector<std::string>&
 	bool res = bsim.getWinner() == 1;
 
 	Stream st(REP::ATTACK_NPC);
-	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << static_cast<UInt64>(0) << Stream::eos;
 	player->send(st);
 }
 
@@ -3937,6 +3941,7 @@ void GMHandler::OnLingbao(GObject::Player * player, std::vector<std::string>& ar
                     UInt8 lv = equip->getReqLev();
                     stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
                     std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+                    allAttrType.erase(allAttrType.begin() + 1);
                     UInt8 itemTypeIdx = ic - Item_LBling;
                     for(int i = 0; i < attrNum; ++ i)
                     {
@@ -4027,6 +4032,7 @@ void GMHandler::OnLingbaoSkill(GObject::Player * player, std::vector<std::string
                     UInt8 lv = equip->getReqLev();
                     stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
                     std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+                    allAttrType.erase(allAttrType.begin() + 1);
                     UInt8 itemTypeIdx = ic - Item_LBling;
                     for(int i = 0; i < attrNum; ++ i)
                     {
@@ -4260,16 +4266,16 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
                 UInt32 end;
             }_msg;
 #pragma pack()
-            _msg.type = 5;
+            _msg.type = 8;
             _msg.begin = TimeUtil::Now();
             _msg.end = TimeUtil::Now() + 86400*15;
             LoginMsgHdr hdr1(SPEQ::ACTIVITYONOFF, WORKER_THREAD_LOGIN, 0,0, sizeof(mas));
     switch(type)
     {
         case 1:
-            GVAR.SetVar(GVAR_SURNAMELEGEND_BEGIN, TimeUtil::Now());
-            GVAR.SetVar(GVAR_SURNAMELEGEND_END, TimeUtil::Now() + 300);
-		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GVAR.SetVar(GVAR_SURNAMELEGEND_BEGIN, TimeUtil::SharpDayT(0, TimeUtil::Now()));
+            GVAR.SetVar(GVAR_SURNAMELEGEND_END, TimeUtil::SharpDayT(2, TimeUtil::Now()));
+            GLOBAL().PushMsg(hdr4, &reloadFlag);
             player->LuckyBagRank();
             GLOBAL().PushMsg(hdr1, &_msg);
             break;
@@ -4298,6 +4304,39 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
         case 6:
             GVAR.SetVar(GVAR_SUMMER_MEET_BEGIN, 0);
             GVAR.SetVar(GVAR_SUMMER_MEET_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+        case 7:
+            GVAR.SetVar(GVAR_SUMMER_FLOW_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_SUMMER_FLOW_END, TimeUtil::Now() + 86400*15);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 8:
+            GVAR.SetVar(GVAR_SUMMER_FLOW_BEGIN, 0);
+            GVAR.SetVar(GVAR_SUMMER_FLOW_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+        case 9:
+            GVAR.SetVar(GVAR_QZONEQQGAME_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_QZONEQQGAME_END, TimeUtil::Now() + 86400*15);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 10:
+            GVAR.SetVar(GVAR_QZONEQQGAME_BEGIN, 0);
+            GVAR.SetVar(GVAR_QZONEQQGAME_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+        case 13:
+            GVAR.SetVar(GVAR_QZONEQQGAMEY_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_QZONEQQGAMEY_END, TimeUtil::Now() + 86400*15);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 14:
+            GVAR.SetVar(GVAR_QZONEQQGAMEY_BEGIN, 0);
+            GVAR.SetVar(GVAR_QZONEQQGAMEY_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
 
@@ -4663,6 +4702,11 @@ void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::stri
     case 4:
         GObject::serverWarBoss.setHP(atoi(args[1].c_str()));
         GObject::serverWarBoss.sendHp();
+        break;
+    case 5:
+        player->SetVar(VAR_SERVERWAR_JIJIANTAI, 0);
+        player->SetVar(VAR_SERVERWAR_JIJIANTAI1, 0);
+        GObject::serverWarMgr.sendjiJianTaiInfo(player);
         break;
     }
 

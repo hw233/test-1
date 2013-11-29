@@ -364,6 +364,13 @@ struct CountryBattleJoinStruct
 	MESSAGE_DEF1(REQ::CAMPS_WAR_JOIN, UInt8, _action);
 };
 
+struct CountryBattleInfo
+{
+	UInt8 _action;
+
+	MESSAGE_DEF1(REQ::CAMPS_WAR_INFO, UInt8, _action);
+};
+
 struct LanchChallengeReq
 {
 	std::string target;
@@ -644,7 +651,8 @@ struct TrumpLOrderReq
 {
     UInt16 _fgtId;
     UInt32 _itemId;
-    MESSAGE_DEF2(REQ::EQ_TRUMP_L_ORDER, UInt16, _fgtId, UInt32, _itemId);
+    UInt8 _opt ;
+    MESSAGE_DEF3(REQ::EQ_TRUMP_L_ORDER, UInt16, _fgtId, UInt32, _itemId , UInt8 ,_opt);
 };
 struct EquipUpgradeReq
 {
@@ -1367,10 +1375,24 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->GetTaskMgr()->CompletedTask(201);
    if(pl->getFighterCount() >= 5)
         pl->GetTaskMgr()->CompletedTask(202);
+    pl->SetQQBoardValue();
     pl->sendQQBoardLoginInfo();
-    pl->sendSummerMeetInfo();
+    pl->sendSummerMeetInfo();   //Fund
+    pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
+    if(atoi(pl->getDomain()) == 23)
+    {
+        if(!pl)
+            return;
+        if(!pl->GetVar(GObject::VAR_GAMEBOX_DAILY))
+            pl->SetVar(GObject::VAR_GAMEBOX_DAILY,1);
+        if(!pl->GetVar(GObject::VAR_GAMEBOX_NEW))
+            pl->SetVar(GObject::VAR_GAMEBOX_NEW,1);
+        pl->sendGameBoxAward();
+
+    }
+    pl->sendGuangGunInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1409,6 +1431,14 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 player->setMapId(mapId);
             }
             break;
+        case 0x20:
+            {
+                UInt32 itemid;
+                UInt8 binding;
+                string name;
+                br >> itemid >> binding >> name;
+                player->modifyPlayerName(itemid,binding,name);
+            }
         default:
             return;
 	}
@@ -1845,9 +1875,15 @@ void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
     if(result != 2)
     {
         if(1 == ftr._type || 2 == ftr._type) //资质洗炼
+        {
             GameAction()->doStrong(player, SthCapacity, 0, 0);
+            player->GuangGunCompleteTask(0,28);
+        }
         if(3 == ftr._type || 4 == ftr._type) //潜力洗炼
+        {
             GameAction()->doStrong(player, SthPotential, 0, 0);
+            player->GuangGunCompleteTask(0,29);
+        }
     }
 }
 
@@ -2052,8 +2088,6 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         case 0x0C:
         {
             //2013-06-05，现在仅仅是大厅
-            if(!World::getQZoneQQGameAct())
-                return;
             UInt8 domainType;
             UInt8 type;
             br >> domainType;
@@ -2163,7 +2197,10 @@ void OnOpenSocketReq( GameMsgHdr& hdr, OpenSocketReq& osr )
 	st << result << osr._fighterId << osr._itemid << Stream::eos;
 	player->send(st);
     if(result != 2)
+    {
         GameAction()->doStrong(player, SthOpenSocket, 0, 0);
+        player->GuangGunCompleteTask(0,5);
+    }
 }
 
 #if 0
@@ -2858,6 +2895,28 @@ void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
 	player->send(rep);
 }
 
+void CountryBattleInfoReq( GameMsgHdr& hdr, CountryBattleInfo& req )
+{
+	MSG_QUERY_PLAYER(player);
+    if(WORLD().isNewCountryBattle() || (gClanCity && gClanCity->isOpen()))
+		return;
+	if(!PLAYER_DATA(player, inCity))
+		return;
+	UInt16 loc = PLAYER_DATA(player, location);
+	GObject::SpotData * spot = GObject::Map::Spot(loc);
+	if(spot == NULL || !spot->m_CountryBattle)
+		return;
+
+	CountryBattleJoinReply rep;
+	CountryBattle * cb = spot->GetCountryBattle();
+    if(!cb) return;
+	if(req._action == 0)
+	{
+		rep.result = cb->playerEnter(player) ? 0 : 2;
+        cb->sendInfo(player);
+	}
+}
+
 void NewCountryBattleJoinReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -2977,7 +3036,7 @@ void OnRequestChallengeReq( GameMsgHdr& hdr, RequestChallengeReq& rcr)
 	int turns = bsim.getTurns();
 
 	Stream st1(REP::ATTACK_NPC);
-	st1 << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	st1 << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << static_cast<UInt64>(0) << Stream::eos;
 	player->send(st1);
 	st1.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
 	attacker->send(st1);
@@ -3142,10 +3201,10 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 
     if (WBossMgr::isWorldBoss(anr._npcId))
         worldBoss.attack(player, loc, anr._npcId);
+    else if(serverWarBoss.isServerWarBoss(anr._npcId))
+        serverWarBoss.attack(player, loc, anr._npcId);
     else
         player->attackNpc(anr._npcId, 0xFFFFFFFF, player->GetLev() <= 20);
-    if(serverWarBoss.isServerWarBoss(anr._npcId))
-        serverWarBoss.attack(player, loc, anr._npcId);
 }
 
 void OnAutoBattleReq( GameMsgHdr& hdr, AutoBattleReq& abr )
@@ -3794,6 +3853,21 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         if(price>=1000 && player->getClan())
                             SYSMSG_BROADCASTV(4956,player->getClan()->getName().c_str(),player->getCountry() ,player->getPName());
                     }
+                    if(World::getGGTime())
+                    {
+                        UInt32 advanceOther = player->GetVar(VAR_GUANGGUN_ADVANCE_OTHER);
+                        if(advanceOther<24)
+                        {
+                            player->sendGuangGunInfo();
+                            UInt32 goldLeft =player->GetVar(VAR_GUANGGUN_CONSUME)%100;
+                            player->AddVar(VAR_GUANGGUN_CONSUME,price);
+                            UInt32 counts = (price+goldLeft)/100; 
+                            counts =( counts > 24-advanceOther?24-advanceOther:counts);
+                            player->AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
+                            player->AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
+                            player->sendGuangGunInfo();
+                        }
+                    }
                     st << static_cast<UInt8>(0);
 
                     if (lr._type == PURCHASE1 + 1 )
@@ -4369,7 +4443,16 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
 			pl->GetMailBox()->newMail(player, 0x13, title, content);
 		}
 		break;
-	case 2:
+/*    case 12:
+        {
+            if(player->CheckGGCanInvit(pl))
+				return;
+			SYSMSGV(title, 214, player->getCountry(), player->getName().c_str());
+			SYSMSGV(content, 215, player->getCountry(), player->getName().c_str());
+			pl->GetMailBox()->newMail(player, 0x15, title, content);
+            break;
+        }
+*/	case 2:
 		player->delFriend(pl);
 		pl->delFriend(player);
 		break;
@@ -5003,23 +5086,24 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
     UInt8 res = 0;
 
     UInt32 amount = GData::moneyNeed[GData::TRUMPLORDER].tael;
-    if(player->getTael() < amount)
+    if(player->getTael() < amount )
     {
         player->sendMsgCode(0, 1100);
         return;
     }
 
 	Package * pkg = player->GetPackage();
-    res = pkg->TrumpLOrder(req._fgtId, req._itemId);
-    if(res != 2)
+    res = pkg->TrumpLOrder(req._fgtId, req._itemId ,req._opt);
+    if(res != 2 && req._opt != 1)
     {
         ConsumeInfo ci(TrumpLOrder,0,0);
         player->useTael(amount, &ci);
         GameAction()->doStrong(player, SthTrumpLOrder, 0, 0);
     }
-
+    if( res > 2 )
+        return ;
 	Stream st(REP::EQ_TRUMP_L_ORDER);
-	st << res << req._fgtId << req._itemId << Stream::eos;
+	st << res << req._fgtId << req._itemId<< Stream::eos;
 	player->send(st);
 }
 
@@ -5877,7 +5961,7 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
     if (op  < 6 )
         return;
-    if((op != 10 && op!= 20 &&op!=22 &&op!=25) && !player->hasChecked())
+    if((op != 10 && op!= 20 &&op!=22 &&op!=25 && op!=27) && !player->hasChecked())
          return;
 
     switch(op)
@@ -5924,12 +6008,16 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
             player->getFishUserPackage(idx);
             break;
         case 20:
-            player->SetQQBoardValue();
-            player->sendQQBoardLoginInfo();
+            //player->SetQQBoardValue();
+            //player->sendQQBoardLoginInfo();
             break;
         case 21:
+            if(!World::getHalloweenAct())
+                return;
+            if(idx < 1 || idx > 4)
+                break;
             player->getQQBoardInstantLoginAward(2*idx - 1);
-            player->sendQQBoardLoginInfo();
+            //player->sendQQBoardLoginInfo();
             break;
         case 22:
             player->SetLuckyMeetValue();
@@ -5950,6 +6038,29 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
                 player->GetQQBoardAward(index);
             }
             player->sendQQBoardLogin();
+            break;
+        case 27:
+            {
+              if(idx == 0)
+                  player->SetNovLogin();
+              else if(idx == 1)
+              {
+                  br >>index ;
+                  player->getNovLoginAward(index);
+              }
+              player->sendNovLoginInfo();
+            }
+            break;
+        case 26:
+            br >>index;
+            if(idx == 0 )
+                player->Buy7DayFund();
+            else if(idx == 1)
+            {
+                player->get7DayFundAward(index);
+            }
+            player->send7DayFundInfo();
+            break;
         default:
             break;
     }
@@ -6115,6 +6226,8 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
 void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
 {
     MSG_QUERY_PLAYER(pl);
+	if(!pl->hasChecked())
+		return;
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     UInt32 fighterid = 0;
@@ -6252,6 +6365,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 3:
                     case 4:
                     case 5:
+                    case 6:
                         jobHunter->OnRequestStart(val);
                         GameAction()->doStrong(player, SthSerachMo, 0, 0);
                         break;
@@ -6322,11 +6436,12 @@ void OnAutoJobHunter( GameMsgHdr & hdr, const void * data )
 void OnEquipLingbaoReq( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-	if(!player->hasChecked())
-		return;
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 opt = 0;
     br >> opt;
+
+	if((opt != 5) && (!player->hasChecked()))
+		return;
 
 	Package * pkg = player->GetPackage();
 
@@ -7183,6 +7298,148 @@ void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
             brd >> idx;
             clan->getSpiritTreeAward(player, idx);
         }
+        break;
+    }
+}
+
+void OnQixiReq2(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    /*
+	if(!player->hasChecked())
+		return;
+    */
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	UInt8 op = 0;
+    UInt8 type = 0;
+
+    brd >> type;
+    switch(type)
+    {
+    case 0x0C:
+        {
+            brd >> op;
+            switch (op)
+            {
+                case 0x01:
+                    player->sendTownTjItemInfo();
+                    break;
+                case 0x02:
+                    UInt32 itemId = 0;
+                    brd >> itemId;
+                    player->buyTownTjItem(itemId);
+                    break;
+            }
+        }
+        break;
+    case 0x22:  // 光棍节活动
+        {
+            brd >> op;
+            switch(op)
+            {
+            case 0x01:
+                {
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 1)
+                        player->sendGuangGunInfo();
+                    else if(form == 2)
+                    {
+                        GObject::Player *  cap = player->getGGTimeCaptain();
+                        UInt32 grade =  cap->getGGTimeScore(); 
+                        GameMsgHdr hdr(0x1D6, WORKER_THREAD_WORLD, cap, sizeof(grade));
+                        GLOBAL().PushMsg(hdr, &grade);
+                    }
+               }
+                break;
+            case 0x02:
+                {
+                    UInt8 form = 0;
+                    brd >> form;
+                    if(form == 0)
+                    {
+                        std::string name;
+                        brd >> name;
+	                    GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
+                        GObject::Player *cap = player->getGGTimeCaptain();
+                        if(player == pl )
+                            return ;
+                        if(!pl)
+                            break;
+                        if(cap->CheckGGCanInvit(pl))
+                            return;
+                        SYSMSGV(title, 218, player->getCountry(), player->getName().c_str());
+                        SYSMSGV(content, 219, player->getCountry(), player->getName().c_str());
+                        pl->GetMailBox()->newMail(player, 0x15, title, content);
+                    }
+                    else if(form == 1)
+                    {
+                        player->LeaveGGTime();
+                    }
+                }
+                break;
+            case 0x03:
+                {
+                    UInt8 pos = player->getGuangGunPos();
+                    GameMsgHdr hdr1(0x381, player->getThreadId(), player, sizeof(pos));
+                    GLOBAL().PushMsg(hdr1, &pos);
+                }
+            case 0x04:
+                {
+                    UInt8 op = 0;
+                    brd >> op;
+                    switch(op)
+                    {
+                        case 0:
+                            player->GuangGunCompleteTask(2);
+                            break;
+                        case 1:
+                            player->GuangGunCompleteTask(1);
+                            break;
+                        case 2:
+                            {
+                                UInt8 type = 0 ;
+                                GameMsgHdr hdr2(0x366, player->getThreadId(), player, sizeof(type));
+                                GLOBAL().PushMsg(hdr2, &type);
+                            }
+                            break;
+                        case 3:
+                            {
+                                std::string name;
+                                brd >> name;
+                                GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
+                                UInt8 gold =0 ;
+                                brd >>gold;
+                                if(!pl)
+                                    break;
+                                player -> AddGGTimes(pl,gold);
+                                break;
+                            }
+                        case 4:
+                            player->BuyGuangGunAdvance();
+                            break;
+                        case 5:
+                            player->GuangGunCompleteTask(3);
+                            break;
+                        case 6:
+                            player->getCompassChance();
+                            break;
+                        case 7:
+                            UInt8 counts;
+                            brd >> counts;
+                            player->BuyCompassChance(counts);
+                            break;
+                    }
+                }
+                player->sendGuangGunInfo();
+                break;
+            default:
+                break;
+            }
+
+        }
+        break;
+    default:
         break;
     }
 }

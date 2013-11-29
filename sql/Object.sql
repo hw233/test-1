@@ -922,7 +922,7 @@ CREATE TABLE `player` (
   `newGuild` bigint(20) unsigned NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `openid` varchar(1024) NOT NULL DEFAULT '',
-  `canHirePet` varchar(255) NOT NULL DEFAULT '',
+  `canHirePet` varchar(2048) NOT NULL DEFAULT '',
   `dungeonCnt1` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
@@ -1549,6 +1549,21 @@ CREATE TABLE IF NOT EXISTS `qixi` (
     PRIMARY KEY(`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `guanggun`;
+CREATE TABLE IF NOT EXISTS `guanggun` (
+    `playerId` bigint(20) unsigned NOT NULL,
+    `status` tinyint(3) unsigned NOT NULL,
+    `playerId1` bigint(20) unsigned NOT NULL,
+    `playerId2` bigint(20) unsigned NOT NULL,
+    `pos` tinyint(3) unsigned NOT NULL DEFAULT '1' ,
+    `score` int(10) unsigned NOT NULL,
+    `task` tinyint(3) unsigned NOT NULL,
+    `tasknum` tinyint(3) unsigned NOT NULL,
+    `taskCom` tinyint(3) unsigned NOT NULL,
+    `counts` int(10) unsigned NOT NULL,
+    PRIMARY KEY(`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `clan_statue` (
     `clanId` bigint(20) unsigned NOT NULL,
     `level` int(10) unsigned NOT NULL,
@@ -1904,6 +1919,9 @@ CREATE TABLE `lingbaosmelt` (
     `bind` tinyint(3) unsigned NOT NULL,      
     `value` int(10) unsigned NOT NULL,        
     `maxValue` int(10) unsigned NOT NULL,        
+    `counts` tinyint(3) unsigned NOT NULL DEFAULT '0',      
+    `purpleAdjVal` tinyint(3) unsigned NOT NULL DEFAULT '0',      
+    `orangeAdjVal` tinyint(3) unsigned NOT NULL DEFAULT '0',      
     PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2238,4 +2256,15 @@ CREATE TABLE `AirBookData` (
    `flags`  varchar(255) NOT NULL DEFAULT '',
     PRIMARY KEY (`playerId`,`overTime`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `player_named`;
+CREATE TABLE IF NOT EXISTS `player_named` (
+    `serverNo` int(10) unsigned NOT NULL DEFAULT '0',
+    `playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `name` varchar(255) NOT NULL,
+    unique KEY `serverNo_name`(serverNo,`name`),
+    INDEX (`name`),
+    INDEX (`playerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 

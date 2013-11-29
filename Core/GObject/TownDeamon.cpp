@@ -456,6 +456,7 @@ bool TownDeamon::attackNpc(Player* pl, UInt16 level)
         st << pl->_lastLoot[i].id << pl->_lastLoot[i].count;
     }
     st.append(&packet[8], packet.size() - 8);
+    st << static_cast<UInt64>(ng->getExp());
     st << Stream::eos;
     pl->send(st);
 
@@ -503,7 +504,7 @@ void TownDeamon::attackPlayer(Player* pl, Player* defer, UInt32 spirit)
         defer->setSpiritFactor(1.0f);
 
 		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << static_cast<UInt64>(0)  << Stream::eos;
 		pl->send(st);
 		
         //notifyChallengeResult(pl, defer, res);
@@ -557,7 +558,7 @@ void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt32 spirit, 
     defer->setSpiritFactor(1.0f);
 
 	Stream st(REP::ATTACK_NPC);
-	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() <<static_cast<UInt64>(0) << Stream::eos;
 	atker->send(st);
 
 	struct TDResNotify
@@ -637,6 +638,7 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                 pl->send(st);
             }
             msg.id = SthCHTownDeamon;
+            pl->GuangGunCompleteTask(0,17);
 
         }
         break;
@@ -948,6 +950,7 @@ void TownDeamon::addActivity(Player* pl)
         GameAction()->doStrong(pl, SthTownDeamon, 0, 0);
         pl->SetVar(VAR_TOWNDEAMON, 1);
     }
+    pl->GuangGunCompleteTask(0,16);
 }
 void TownDeamon::getTjItem(Player* pl, UInt8 townLevel)
 {

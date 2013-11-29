@@ -494,4 +494,15 @@ CREATE TABLE IF NOT EXISTS `make_jiguanyu` (
   INDEX server_player_jiguanyu (`server_id`, `player_id`, `jiguanyu_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `player_named` (
+  `server_id` int(10) unsigned NOT NULL,
+  `player_id` bigint(20) unsigned NOT NULL,
+  `src_name` varchar(255) NOT NULL,
+  `dst_name` varchar(255) NOT NULL,
+  `modify_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`),
+  INDEX server_src_named(`src_name`),
+  INDEX server_dst_named(`dst_name`),
+  INDEX player_time (`player_id`, `modify_time`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 -- Dump completed

@@ -255,6 +255,7 @@ void OnAthleticsReq( GameMsgHdr& hdr, const void * data )
 	GameAction()->RunOperationTaskAction0(player, 1);
 	GameAction()->RunOperationTaskAction0(player, 2);
     GameAction()->doStrong(player, SthAthletics1, 0,0);
+    player->GuangGunCompleteTask(0,26);
 }
 
 void OnAthleticsMartialReq( GameMsgHdr& hdr, const void * data )
@@ -1482,12 +1483,16 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
     const stActivityMsg* co = reinterpret_cast<const stActivityMsg*>(data);
     if(co->id == SthTownDeamon)
     {
+        player->GuangGunCompleteTask(0,16);
         if(player->GetVar(VAR_TOWNDEAMON))
             return;
         else
             player->SetVar(VAR_TOWNDEAMON, 1);
     }
-
+    if(co->id == SthAthletics1)
+        player->GuangGunCompleteTask(0,26);
+    else if(co->id == SthAthletics2)
+        player->GuangGunCompleteTask(0,25);
     GameAction()->doStrong(player, co->id, co->param1, co->param2);
 }
 void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
@@ -1813,6 +1818,12 @@ void OnRoamintQueqiao( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     UInt8 pos = *(UInt8*)(data);
     player->roamingQueqiao(pos);
+}
+void OnRoamintGuangGun( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 pos = *(UInt8*)(data);
+    player->roamingGuangGun(pos);
 }
 
 void OnRoamintQueqiaoLastLoot( GameMsgHdr& hdr, const void* data )
@@ -2256,16 +2267,53 @@ void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
     MSG_QUERY_PLAYER(player);
     if(player==NULL)
         return ;
-    UInt8 type = *(reinterpret_cast<UInt8 *>(const_cast<void *>(data)));
-   switch(type)
+
+    struct Data
+    {
+        UInt8 type;
+        char name[32];
+    };
+
+   Data * sdata = reinterpret_cast<Data*>(const_cast<void *>(data));
+   if(sdata)
    {
-    case 0x00:
-        player->sendLuckyBagInfo();
-        break;
-    case 0x03:
-          //player->GetLuckyBagAward();
-          GameAction()->GetLuckyBagAward(player);
-          break;
+       switch(sdata->type)
+       {
+        case 0x00:
+            player->sendLuckyBagInfo();
+            break;
+        /*case 0x03:
+              GameAction()->GetLuckyBagAward(player);
+              break;*/
+        case 0x04:
+              {
+                  std::string name = sdata->name;
+                  Player * other = GObject::globalNamedPlayers[player->fixName(name)];
+                  if(NULL == other)
+                  {
+                    player->sendMsgCode(0, 1506);
+                    return;
+                  }
+
+                  if(player == other)
+                  {
+                    player->sendMsgCode(0, 7001);
+                    return;
+                  }
+
+                  if(other->GetVar(VAR_GIVE_CARDAWARD_COUTS) >= 5)
+                  {
+                    player->sendMsgCode(0, 7002);
+                    return;
+                  }
+
+                  GameAction()->UseToOther(player, other);
+              }
+              break;
+        case 0x05:
+              GameAction()->UseToSystem(player);
+              break;
+       }
    }
     
 }
@@ -2294,6 +2342,18 @@ void OnBePrayed( GameMsgHdr &hdr, const void * data)
     UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
     player->bePrayed(id);
 }
+void OnGGBeTeam( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
+    player->beGGTeam(id);
+}
+void OnGGTeamPlayerLeave( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
+    player->GGTeamPlayerLeave(id);
+}
 void OnDoStrongInWorld( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
@@ -2305,6 +2365,12 @@ void OnSend11GradeInfo( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     UInt8 id = *reinterpret_cast<const UInt64 *>(data); 
     player->OnSend11GradeInfo(id);
+}
+void OnRunFriendlyCompass( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 id = *reinterpret_cast<const UInt64 *>(data); 
+    player->RunFriendlyCompass(id);
 }
 void OnBePresented( GameMsgHdr &hdr, const void * data)
 {
@@ -2405,7 +2471,7 @@ void OnServerWarEnter( GameMsgHdr& hdr, const void* data )
         }
         if(player->getThreadId() != CURRENT_THREAD_ID())
         {
-            GameMsgHdr hdr(0x381, player->getThreadId(), player, sizeof(SWarEnterData*));
+            GameMsgHdr hdr(0x382, player->getThreadId(), player, sizeof(SWarEnterData*));
             GLOBAL().PushMsg(hdr, &swed);
             return;
         }

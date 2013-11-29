@@ -138,6 +138,8 @@ function loadStore()
             store:add(2, 11114, 60)
             store:add(2, 11115, 70)
             store:add(2, 11116, 80)
+            store:add(2, 11117, 90)
+            store:add(2, 11118, 100)
         end
 
         if getQingren() then    --蜀山之恋
@@ -162,7 +164,8 @@ function loadStore()
             --store:add(2 ,9383 , 20)
             --store:add(2 ,9397, 20)
             --store:add(2 ,9401, 20)
-            store:add(2 ,9422, 20)
+            --store:add(2 ,9422, 20)
+            store:add(2 ,9437, 20)
         end
 
         if is2013_0201_0228() then
@@ -281,6 +284,7 @@ function loadStore()
         end
 
         -- 奇珍
+		--store:add(2,9433,500)
 		store:add(2,9338,50)
 		--store:add(2,9349,10)
 		store:add(2,9310,30)

@@ -95,9 +95,15 @@ namespace GObject
         GVAR_SUMMER_FLOW_BEGIN = 53,
         GVAR_SUMMER_FLOW_END = 54,
 
-        GVAR_SERVERWAR_ISENTER = 55,    //跨服服战是否报名
-        GVAR_SERVERWAR_JIJIANTAI = 56, //跨服服战祭剑台 所有人成功的祭剑总数
-        GVAR_SERVERWAR_XIUWEI = 57, //服战名次带来的修为加成 20表明服战第一名
+        GVAR_QZONEQQGAME_BEGIN = 55,
+        GVAR_QZONEQQGAME_END = 56,
+
+        GVAR_QZONEQQGAMEY_BEGIN = 59,
+        GVAR_QZONEQQGAMEY_END = 60,
+
+        GVAR_SERVERWAR_ISENTER = 61,    //跨服服战是否报名
+        GVAR_SERVERWAR_JIJIANTAI = 62, //跨服服战祭剑台 所有人成功的祭剑总数
+        GVAR_SERVERWAR_XIUWEI = 63, //服战名次带来的修为加成 20表明服战第一名
 
         GVAR_MAX,
     };

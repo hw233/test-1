@@ -19,6 +19,7 @@
 
 namespace GObject
 {
+#define ONLY_BATTLE_POINT_RANK true
 
 struct LeaderboardItem
 {
@@ -219,6 +220,16 @@ void Leaderboard::buildBattlePacket()
         if (NULL != pl)
         {
             UInt32 battlePoint = pl->getBattlePoint();
+#if ONLY_BATTLE_POINT_RANK
+            UInt32 battlePointOld = pl->GetVar(VAR_TOTAL_BATTLE_POINT);
+            if(battlePoint == 0)
+                battlePoint = battlePointOld;
+            else
+            {
+                if(battlePoint != battlePointOld)
+                    pl->SetVar(VAR_TOTAL_BATTLE_POINT, battlePoint);
+            }
+#endif
             _battleRankWorld.insert(std::make_pair(battlePoint, pl));
             _expRankWorld.insert(std::make_pair(pl->GetExp(), pl));
         }

@@ -255,6 +255,7 @@ CREATE TABLE `item_template` (
   `data` smallint(6) NOT NULL COMMENT '可使用道具: 作用数值',
   `enchant` smallint(6) NOT NULL COMMENT '附魔类型',
   `attrId` int(10) NOT NULL COMMENT '附加属性',
+  `salePriceUp` float(10,2) NOT NULL COMMENT '交易价格上限',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

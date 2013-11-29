@@ -39,6 +39,7 @@ enum
     ON_CONFUSE = 22,   // 混乱时
     ON_HITE = 23,      // 命中时
     ON_BUDDHA_LIGHT = 24,      // 佛光效果触发后
+    ON_ZXBJ = 25,  // 诸天宝鉴触发后
 };
 
 enum
@@ -82,6 +83,7 @@ enum
     TYPE_SHIELD_HP = 37,   // 生命护盾
     TYPE_FAKE_DEAD = 38,   // 概率不死
     TYPE_SNEAD_RECOVER = 39,  // 暗杀消失时概率恢复暗杀
+    TYPE_ZXBJ_HP_ADD = 40,  // 诸天宝鉴符文增加己方生命
     TYPE_MAX,
 };
 

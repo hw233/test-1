@@ -1137,6 +1137,7 @@ bool ClanBoss::attack(Player* pl)
         st << pl->_lastLoot[i].id << pl->_lastLoot[i].count;
     }
     st.append(&packet[8], packet.size() - 8);
+    st <<static_cast<UInt64>(0);
     st << Stream::eos;
     pl->send(st);
     bsim.applyFighterHP(0, pl);
@@ -2058,6 +2059,8 @@ void ClanBoss::reward()
                 _bossDead = bossDead;
             }
 
+            map<Clan*, PlayerScoreSort>& getMemberScore() { return _memberScore; }
+
             bool operator()(ClanMember* member)
             {
                 if (_rank > 0 && _rank <= g_rankRewardSize)
@@ -2095,6 +2098,27 @@ void ClanBoss::reward()
                 Clan* clan = member->player->getClan();
                 if(clan)
                     clan->addMemberActivePoint(member->player, 15, e_clan_actpt_clanboss);
+
+                map<Clan*, PlayerScoreSort>::iterator it = _memberScore.find(clan);
+                if (it == _memberScore.end())
+                {
+                    PlayerScoreSort _playerScoreSort;
+                    PlayerScore pd;
+                    pd.player = member->player;
+                    pd.score = score;
+                    pd.time = TimeUtil::Now(); 
+                    _playerScoreSort.insert(pd);
+                    _memberScore.insert(std::make_pair(clan, _playerScoreSort));
+                }
+                else
+                {
+                    PlayerScore pd;
+                    pd.player = member->player;
+                    pd.score = score;
+                    pd.time = TimeUtil::Now(); 
+                    it->second.insert(pd);   
+                }
+
                 return true;
             }
         private:
@@ -2103,6 +2127,7 @@ void ClanBoss::reward()
             string _title;
             string _content;
             bool _bossDead;
+            map<Clan*, PlayerScoreSort> _memberScore;
     };
  
     string names[g_rankRewardSize];
@@ -2161,12 +2186,55 @@ void ClanBoss::reward()
                 }
             }
         }
+
         rankCount++;
         SYSMSG(title, 4220);
         SYSMSGV(content, 4221, rankCount, it->first, maxScore-it->first);
         RewardVisitor visitor(it->first, rankCount, title, content, _isBossDead);
         it->second->VisitMembers(visitor);
+
+        map<Clan*, PlayerScoreSort>& memberScore = visitor.getMemberScore();
+        std::string str;
+        std::string str1 = ".";
+        std::string str2 = "  ";
+        UInt8 count = 0;
+        map<Clan*, PlayerScoreSort>::iterator it11 = memberScore.find(it->second);
+        if (it11 != memberScore.end())
+        {
+            UInt8 color = 0;
+            for(PlayerScoreSort::iterator iter = it11->second.begin(); iter != it11->second.end(); ++iter)
+            {
+               count++;
+               if(iter->score > 3000)
+                   color = 3;
+               else if(iter->score >= 1500 && iter->score < 3000)
+                   color = 2;
+               else
+                   color = 0;
+
+               if(0 == color)
+               {
+                   SYSMSGV(buf, 4971, count, iter->player->getName().c_str(), iter->score);
+                   str += buf;
+               }
+               else
+               {
+                   SYSMSGV(buf, 4970, color, count, color, str1.c_str(), color, iter->player->getName().c_str(), color, str2.c_str(), color, iter->score);
+                   str += buf;
+               }
+            }
+            str += "OpenStorage_MRZZ";
+        }
         
+        SYSMSG(title1, 4968);
+        SYSMSGV(content1, 4969, rankCount, it->first, str.c_str());
+        if(it->second)
+        {
+            Player* leader = getLeader(it->second);
+            if(leader)
+                leader->GetMailBox()->newMail(NULL, 0x01, title1, content1);
+        }
+
         it->second->setGongxian(0, true);
         it->second->clearUrge();
     }

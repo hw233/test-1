@@ -128,6 +128,8 @@ namespace Script
 		bool RunOperationTaskAction2(Player *, UInt8, UInt32, UInt32);
 		bool RunOperationTaskAction3(Player *, UInt8, UInt32, UInt32, UInt32);
 
+        bool isSalePriceLimitServer();
+
 	public:
 		inline Table GetNpcRelationTask(UInt32 npcId);
 		inline const char* GetPlayerName(Player* player);
@@ -274,6 +276,8 @@ namespace Script
         bool  RunSummerFlow3OnlineAward(Player* player, UInt8 val);
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         bool  RunPrayAward(Player* player, UInt8 val);
+        bool  RunNovLoginAward(Player* player, UInt8 val);
+        bool  RunGameBoxDailyActionAward(Player* player, UInt8 val);
         UInt8 RunNewRC7DayTargetAward(Player* player);
         UInt8 RunBlueDiamondAward(Player* player, UInt8 opt);
         UInt8 RunConsumeAward(Player* player, UInt8 opt);
@@ -353,6 +357,7 @@ namespace Script
         UInt32 GetExchangePropsID();
         lua_tinker::table GetdayExtraAward(UInt32 month, UInt32 day);
         UInt8 onRoamingQueqiao(Player* pl, UInt8 pos);
+        UInt8 onRoamingGuangGun(Player* pl, UInt8 pos);
         UInt32 GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed);
         void doStrong(Player* pl, UInt8 id, UInt32 param1, UInt32 param2);
         UInt8 GetSthCheckFlag(UInt8 idx);
@@ -384,6 +389,8 @@ namespace Script
         void getAwardInFoolsDay(Player* player, UInt8 idx);
         bool getLuckyStarAward(Player* player, UInt8 idx);
         void GetLuckyBagAward(Player * player);
+        void UseToOther(Player * player, Player * other);
+        void UseToSystem(Player * player);
         UInt32 GetSpreadCountForAward();
         lua_tinker::table GetSpreadAward();
         UInt32 GetFairySparParaMax(UInt8 type, UInt8 count);
@@ -393,6 +400,7 @@ namespace Script
         Table GetNewHeroIslandBuffs();
         bool onCollectCardAct(Player* player, UInt8 idx);
         UInt16 addClanProfferFromItem(Player* player, UInt16 num, UInt16 unit);
+	    bool TaskFuncExist(UInt32 taskId);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

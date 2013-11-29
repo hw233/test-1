@@ -130,7 +130,9 @@ enum PurchaseType
     SanHunUpForPet              = 119, //三魂升级
     TenOneLogin                 = 120,
     ArenaTeamConsume            = 121, //仙界至尊消费
-    ServerWarConsume            = 122, //仙界传奇消费
+    GuangGun                    = 122, //光棍
+    Fund                        = 123, //基金消费
+    ServerWarConsume            = 124, //仙界传奇消费
     //繁体私有占150～200
 };
 

@@ -12,12 +12,13 @@ namespace GObject
 #define ATK_MAX       1
 #define MAG_ATK_MAX   2
 #define PHY_MAX       3
+#define FAIRY_SPAR_MAX 8
 
-    const Int32 statusLevel[7] = {0,3,6,9,12,15,18};
-    const Int32 clanLevel[7] = {0, 2, 3, 4, 5, 6, 7};
-    const Int32 atkMax[7] = {100,160,240,340,460,600,800};
-    const Int32 magAtkMax[7] = {100,160,240,340,460,600,800};
-    const Int32 phyMax[7] = {1000,1600,2400,3400,4600,6000,8000};
+    const Int32 statusLevel[FAIRY_SPAR_MAX] = {0,3,6,9,12,15,18,21};
+    const Int32 clanLevel[FAIRY_SPAR_MAX] = {0, 2, 3, 4, 5, 6, 7, 8};
+    const Int32 atkMax[FAIRY_SPAR_MAX] = {100,160,240,340,460,600,800,1000};
+    const Int32 magAtkMax[FAIRY_SPAR_MAX] = {100,160,240,340,460,600,800,1000};
+    const Int32 phyMax[FAIRY_SPAR_MAX] = {1000,1600,2400,3400,4600,6000,8000,10000};
 
     FairySpar::FairySpar(Player* player) : m_owner(player), m_atk(0), m_magAtk(0), m_phy(0), m_complexPercent(0), m_curMark(0), m_breakoutCnt(0)
     {
@@ -50,7 +51,7 @@ namespace GObject
     //血之晶石
     void FairySpar::sendAtkPhyInfo()
     {
-        if(m_breakoutCnt > 6)
+        if(m_breakoutCnt > FAIRY_SPAR_MAX - 1)
             return;
 
         Stream st(REP::FARIY_SPAR);
@@ -150,7 +151,7 @@ namespace GObject
 
     void FairySpar::fuseBreakout()
     {
-        if(m_breakoutCnt >= 6)
+        if(m_breakoutCnt >= FAIRY_SPAR_MAX - 1)
         {
             m_owner->sendMsgCode(0, 1361);
             return;
@@ -262,7 +263,7 @@ namespace GObject
         if(getFusePercent() >= 100)
             return fuseBreakout();
 
-        if(m_breakoutCnt > 6)
+        if(m_breakoutCnt > FAIRY_SPAR_MAX - 1)
             return;
         UInt32 proffer = (getFusePercent() / 10 + 1) * 50 * (m_breakoutCnt + 1);
         if(m_owner->getClanProffer() < proffer)
@@ -527,7 +528,7 @@ namespace GObject
 
     UInt8 FairySpar::getFusePercent()
     {
-        if(m_breakoutCnt > 6)
+        if(m_breakoutCnt > FAIRY_SPAR_MAX - 1)
             return 0;
         Int32 phyAdd;
         Int32 atkAdd;
@@ -548,8 +549,8 @@ namespace GObject
         {
             //未突破
             UInt8 tmp = m_breakoutCnt + 1;
-            if(tmp > 6)
-                tmp = 6;
+            if(tmp > FAIRY_SPAR_MAX - 1)
+                tmp = FAIRY_SPAR_MAX - 1;
             if(m_phy >= phyMax[tmp] && m_atk >= atkMax[tmp] && m_magAtk >= magAtkMax[tmp])
                 return 100;
             UInt8 breakoutCnt = m_breakoutCnt - 1;

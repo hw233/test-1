@@ -139,8 +139,8 @@ public:
 	void pushPreliminaryCount(UInt32 *);
 	void check();
 
-    void readPlayers(BinaryReader& brd, UInt8 sIdx);
-    void readPrePlayers(BinaryReader& brd, UInt8 sIdx);
+    void readPlayers(BinaryReader& brd);
+    void readPrePlayers(BinaryReader& brd);
     void readHistories(BinaryReader& brd);
     void readElimination(BinaryReader& brd);
     void calcFinalBet(int i);
@@ -195,6 +195,9 @@ private:
     PreliminaryPlayerList _preliminaryPlayers_list[2];
     PreliminaryPlayersSet _preliminaryPlayers_list_set[2];
     std::map<UInt16, std::vector<LeaderPlayer>> _leaderBoard;
+
+public:
+    Stream _readbuf;
 };
 
 extern Arena arena;

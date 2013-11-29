@@ -410,8 +410,8 @@ class TeamArenaMgr
         void teamArenaEntered(TeamArenaData *, UInt8, const std::string&);
         void pushPreliminary(BinaryReader& br);
         void readFrom( BinaryReader& brd );
-        void readTeams(BinaryReader& brd, UInt8 sIdx);
-        void readPreTeams(BinaryReader& brd, UInt8 sIdx);
+        void readTeams(BinaryReader& brd);
+        void readPreTeams(BinaryReader& brd);
         void readHistories(BinaryReader& brd);
         void readElimination(BinaryReader& brd);
         void calcFinalBet(int i);
@@ -462,6 +462,9 @@ class TeamArenaMgr
         std::vector<UInt64> _lastRankTeam;
 
         std::map<Player *, PlayerBetInfo> _playerBet;
+
+public:
+    Stream _readbuf;
 };
 
 

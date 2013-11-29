@@ -84,7 +84,7 @@ void StrengthenMgr::LoadFromDB(DBStrengthenData& data)
 }
 void StrengthenMgr::LoadOldFromDB(DBAirBookData& data)   //LoadAirBook
 {
-    UInt32 type = World::get11TimeNum(data.overTime)-1;    
+    UInt32 type = World::get11TimeAirNum(data.overTime)-1;    
     if(type ==0 ||type > 12)
         return ;
     _olditem[type-1].overTime = data.overTime;
@@ -171,7 +171,7 @@ void StrengthenMgr::UpdateFlag(UInt8 idx,  UInt8 v)
     _item.flag[idx] = v;
     if(World::get11Time())
     {
-        UInt8 type = World::get11TimeNum();
+        UInt8 type = World::get11TimeAirNum();
         if(type <1||type>12 || idx >=SthMaxFlag )
             return ;
         _olditem[type-1].flag[idx] = v;
@@ -246,7 +246,9 @@ void StrengthenMgr::UpdateAirBookToDB()
     if(!World::get11Time())
         return ;
     UInt32 now = TimeUtil::Now();
-    UInt32 type = World::get11TimeNum();
+    UInt32 type = World::get11TimeAirNum();
+    if(type <1 ||type >12)
+        return ;
     if(_owner->GetVar(VAR_11AIRBOOK_GRADE_DAY)!= 0)
         _olditem[type-1].grade = _owner->GetVar(VAR_11AIRBOOK_GRADE_DAY);
     if(_owner->GetVar(VAR_AIRBOOK_RECHARGE)!= 0)
@@ -256,10 +258,8 @@ void StrengthenMgr::UpdateAirBookToDB()
     if(_olditem[type-1].overTime < now)
     {
         UInt32 over = TimeUtil::SharpDayT(1 , now);
-        _olditem[World::get11TimeNum()-1].Reset(over);
+        _olditem[World::get11TimeAirNum()-1].Reset(over);
     }
-    if(type <1 ||type >12)
-        return ;
     std::string strFlag;
     for(UInt32 i = 0; i < SthMaxFlag; i ++)
     {
@@ -447,7 +447,8 @@ void StrengthenMgr::SendStrengthenInfo()
 void StrengthenMgr::Send11GradeInfo(UInt8 type)
 {
     UpdateAirBookToDB();
-    if( type < 2 ||type >12)
+    type = World::get11TimeAirNum();
+    if( type < 1 ||type >12)
         return;
     Stream st(REP::ACT);
     st <<static_cast<UInt8>(0x20);

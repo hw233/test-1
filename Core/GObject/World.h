@@ -66,7 +66,10 @@ struct RCSort
 {
     GObject::Player* player;
     UInt32 total;
+    UInt32 time;
+    RCSort():player(NULL),total(0),time(0){}
 };
+
 
 struct ClanSort   //帮派积分（10· 1活动）
 {
@@ -75,14 +78,14 @@ struct ClanSort   //帮派积分（10· 1活动）
 };   
 struct lt_rcsort
 {
-    bool operator()(const RCSort& a, const RCSort& b) const { return a.total >= b.total; }
+    bool operator()(const RCSort& a, const RCSort& b) const { return a.total > b.total || (a.total==b.total && a.time < b.time); }
 };
 struct clan_sort
 {
     bool operator()(const ClanSort& a, const ClanSort& b) const { return a.total >= b.total; }
 };
 
-typedef std::set<RCSort, lt_rcsort> RCSortType;
+typedef std::multiset<RCSort, lt_rcsort> RCSortType;
 typedef std::set<ClanSort,clan_sort> ClanGradeSort;
 
 struct supportSort
@@ -399,6 +402,10 @@ public:
     { _collectCardAct= v; }
     inline static bool getCollectCardAct()
     { return _collectCardAct; }
+    inline static void setHalloweenAct(bool v)
+    { _halloweenAct= v; }
+    inline static bool getHalloweenAct()
+    { return _halloweenAct; }
     inline static void setHeroIslandAct(bool v)
     { _heroIslandAct= v; }
     inline static bool getHeroIslandAct()
@@ -425,8 +432,33 @@ public:
     { return _newYearQQGameAct; }
     inline static void setQZoneQQGameAct(bool v)
     { _QZoneQQGameAct= v; }
+    inline static bool getQZoneQQGameActY()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_QZONEQQGAMEY_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_QZONEQQGAMEY_END);
+        UInt32 now = TimeUtil::Now();
+        bool QZoneQQGameAct = false ;
+        if( now >= begin && now <= end)
+            QZoneQQGameAct = true;
+        else
+            QZoneQQGameAct = false;
+        return QZoneQQGameAct; 
+    }
     inline static bool getQZoneQQGameAct()
-    { return _QZoneQQGameAct; }
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_QZONEQQGAME_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_QZONEQQGAME_END);
+        UInt32 now = TimeUtil::Now();
+        if(begin == 0 && end == 0)
+        {
+            return _QZoneQQGameAct;
+        }
+        else if( now >= begin && now <= end)
+            _QZoneQQGameAct = true;
+        else
+            _QZoneQQGameAct = false;
+        return _QZoneQQGameAct; 
+    }
     inline static void setNewYearQzoneContinueAct(bool v)
     { _newYearQzoneContinueAct= v; }
     inline static bool getNewYearQzoneContinueAct()
@@ -510,12 +542,30 @@ public:
     inline static void  set11Time(bool v)
     {   _11time=v; } 
     inline static bool  get11Time()
-    {  // return false;
-        return _11time; } 
+    {return _11time; } 
+    inline static void  setGGTime(bool v)
+    {   _ggtime=v; } 
+    inline static bool  getGGTime()
+    {return _ggtime; } 
+   
+    inline static UInt32 get11TimeAirNum(UInt32 time = 0)
+    {
+        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 11, 27);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 12, 2);
+//        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
+//      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
+        UInt32 now = TimeUtil::Now() ;
+        if(time !=0)
+            now = time;
+        if(now < (_11timeBegin) || now > _11timeEnd )
+            return -1;
+       return (TimeUtil::SharpDay(0, now) - _11timeBegin )/86400+1; 
+    }
     inline static UInt32 get11TimeNum(UInt32 time = 0)
     {
+        return -1;
         UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 13);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
         if(time !=0)
             now = time;
@@ -985,6 +1035,7 @@ public:
     static bool _snowAct;
     static bool _goldSnakeAct;
     static bool _collectCardAct;
+    static bool _halloweenAct;
     static bool _heroIslandAct;
     static bool _dragonKingAct;
     static bool _saveGoldAct;
@@ -1036,6 +1087,7 @@ public:
     static bool _summerFlow3;
     static bool _surnamelegend;
     static bool _11time;
+    static bool _ggtime;
     static bool _ryhbActivity;
     static bool _zcjbActivity;
     static bool _halfgold;
@@ -1057,6 +1109,7 @@ public:
     static RCSortType LuckyBagSort;
     static RCSortType PlayerGradeSort; //十一活动
     static ClanGradeSort clanGradeSort; // 十一活动
+    static RCSortType guangGunSort; //十一活动
     static void initRCRank();
     static void initRP7RCRank();
 
@@ -1109,6 +1162,7 @@ public:
 
 public:
     void UpdateQixiScore(Player* pl, Player* lover);
+    void sendGuangGunPlayers(Player* pl);
     void sendQixiPlayers(Player* pl);
     void DivorceQixiPair(Player* pl);
     void LoadQixiScore(Player* pl, Player* lover);
@@ -1130,11 +1184,13 @@ public:
     void DivorceSnowPair(Player* pl);
     void LoadSnowScore(Player* pl, Player* lover);
     void SendSnowAward();
+    void SendGuangGunAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();
     void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);
 
+    void UpdateGuangGunScore(Player* pl);
     static void SendRechargeRP7RankAward();
 private:
 	void testUpdate();

@@ -88,6 +88,7 @@ class JobHunter
         PROGRESS_90,        //  90级副本寻墨
         PROGRESS_100,       // 100级副本寻墨
         PROGRESS_110,       // 110级副本寻墨
+        PROGRESS_120,       // 120级副本寻墨
         PROGRESS_MAX,
     };
 

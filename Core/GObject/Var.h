@@ -279,8 +279,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_LEFTTIMES = 220, // 剩余挂机时间
 
         /*
-         * 【注:此段var(221--239)貌似未被占用】
+         * 【注:此段var(221--239) for dtc】
          */
+        VAR_GAMEBOX_DAILY = 221,
+        VAR_GAMEBOX_NEW = 222,
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
@@ -404,6 +406,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_CARD_FROM_CLAN = 416, //是否领取来自帮派战的卡片
         VAR_MAP_INDEX = 417, //地图索引
         VAR_FEAST_LOGIN_AWARD_PER_DAY = 418, //中秋节登陆送月饼
+        VAR_TJ_AUTO_FRONTMAP_END_TIME = 419,
         //421-430 for suntao
         VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对,31位表示等级限制[0:70级以上 1:70级以下])
         VAR_FOOLS_DAY_TIME  = 422,  //愚公移山答题开始时间
@@ -415,7 +418,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_TEAMARENA_INSPIRE = 427, //组队跨服战鼓舞等级失败保护次数
 
         VAR_SERVERWAR_JIJIANTAI = 428,  //跨服服战祭剑台 1byte步数,2byte内外圈,3和4byte道具id
-        VAR_SERVERWAR_JIJIANTAI1 = 429,  //跨服服战祭剑台 1byte每人祭剑的次数,2byte成功完成的祭剑次数
+        VAR_SERVERWAR_JIJIANTAI1 = 429,  //跨服服战祭剑台 1byte每人祭剑的次数,2byte成功完成的祭剑次数 3byte宝箱开启情况
 
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
@@ -474,6 +477,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_KEYIN_MONEY_A = 515,                            // 刻印钱币A 
         VAR_KEYIN_MONEY_B = 516,                            // 刻印钱币B 
         VAR_FAIRYPET_SHOUHUN = 517,                         // 仙宠兽魂
+        VAR_GIVE_CARDAWARD_COUTS = 518,                     // 被赠送卡牌奖品次数
 
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
@@ -549,7 +553,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_STRENGTH_LEVEL = 598,  
         VAR_11AIRBOOK_GRADE = 599,  //10· 1 活动积分
         VAR_11AIRBOOK_GRADE_DAY = 600,  //10· 1 活动积分
-        //600-620 for qiwy  ^_^
+        //601-620 for qiwy  ^_^
+        VAR_TOTAL_BATTLE_POINT = 601,  //（排行）战斗力
 
         //621-640 for lib 
         VAR_AIRBOOK_LOGIN = 621,
@@ -557,6 +562,21 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_AIRBOOK_ONLINE_AWARD = 623,
         VAR_AIRBOOK_RECHARGE = 624,
         VAR_AIRBOOK_CONSUME = 625,
+        VAR_GUANGGUN_TIMES = 626,        //光棍节倍数（每天清零）
+        VAR_GUANGGUN_GETROLL = 627,     //每天积分获得的抽奖次数（最大为3，每天清零）
+        VAR_GUANGGUN_RECHARGE = 628,
+        VAR_GUANGGUN_CONSUME = 629,
+        VAR_GUANGGUN_ADVANCE_NUM = 630 ,    //可前进次数（每天初始化10）
+        VAR_GUANGGUN_ADVANCE_OTHER = 631,    //其他方式获得的前进次数
+        VAR_GUANGGUN_TODAY_SCORE = 632,
+        VAR_GUANGGUN_ADVANCE_BUY = 633,
+        VAR_GROWUPFUND_TYPE = 634,
+        VAR_GROWUPFUND_AWARD = 635,
+        VAR_NOV_LOGIN = 636,
+        VAR_NOV_LOGIN_AWARD = 637, 
+        VAR_RECHARGE_TIME = 638, 
+        VAR_GUANGGUN_TODAY_TASK = 639,   //今日完成任务数
+        VAR_MODIFY_NAME_CD = 641,//改名CD
         VAR_MAX,
     };
 
@@ -653,6 +673,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
 
             REGISTER_VAR(VAR_BLUE_ACTIVE_GET, CYCLE_DAY);
             REGISTER_VAR(VAR_RECHARGE_TOTAL, CYCLE_NONE);
+            REGISTER_VAR(VAR_RECHARGE_TIME, CYCLE_NONE);
 
             REGISTER_VAR(VAR_LOVER_RING, CYCLE_YEAR);
             REGISTER_VAR(VAR_SHUSAN_LOVE, CYCLE_YEAR);
@@ -766,7 +787,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_TJ_TASK2_COUPON, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_TASK2_TJYJ, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_TASK2_SCORE, CYCLE_DAY);
-            REGISTER_VAR(VAR_TJ_TASK3_COPYID, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_TASK3_COPYID, CYCLE_NONE);
             REGISTER_VAR(VAR_TJ_EVENT_PRESTIGE, CYCLE_NONE);
            
             REGISTER_VAR(VAR_RP_VALUE, CYCLE_NONE);
@@ -988,6 +1009,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_CARD_FROM_CLAN, CYCLE_DAY);
             REGISTER_VAR(VAR_MAP_INDEX, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_LOGIN_AWARD_PER_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_TJ_AUTO_FRONTMAP_END_TIME, CYCLE_NONE);
 
             REGISTER_VAR(VAR_FOOLS_DAY_INFO, CYCLE_DAY);
             REGISTER_VAR(VAR_FOOLS_DAY_TIME, CYCLE_DAY);
@@ -1057,12 +1079,28 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_PRESENT_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_11AIRBOOK_GRADE, CYCLE_NONE);
             REGISTER_VAR(VAR_11AIRBOOK_GRADE_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_TOTAL_BATTLE_POINT, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_ONLINE_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_AIRBOOK_RECHARGE, CYCLE_DAY);
             REGISTER_VAR(VAR_AIRBOOK_CONSUME, CYCLE_DAY);
+            REGISTER_VAR(VAR_MODIFY_NAME_CD, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_GUANGGUN_TIMES, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANGGUN_GETROLL, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANGGUN_RECHARGE, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANGGUN_CONSUME, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANGGUN_ADVANCE_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANGGUN_ADVANCE_OTHER, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANGGUN_TODAY_SCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANGGUN_ADVANCE_BUY, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANGGUN_TODAY_TASK, CYCLE_NONE);
+            REGISTER_VAR(VAR_NOV_LOGIN, CYCLE_NONE);
+            REGISTER_VAR(VAR_NOV_LOGIN_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_GAMEBOX_DAILY, CYCLE_DAY);
+            REGISTER_VAR(VAR_GAMEBOX_NEW, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

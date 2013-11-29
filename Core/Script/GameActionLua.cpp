@@ -159,7 +159,7 @@ namespace Script
 		lua_tinker::def(_L, "getAccRecharge", GObject::World::getAccRecharge);
 		lua_tinker::def(_L, "getGMCheck", GObject::World::getGMCheck);
 		lua_tinker::def(_L, "inActive_opTime_20130531", GObject::World::inActive_opTime_20130531);
-		lua_tinker::def(_L, "get11TimeNum", GObject::World::get11TimeNum);
+		lua_tinker::def(_L, "get11TimeNum", GObject::World::get11TimeAirNum);  //天书奇缘计算天书
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -298,6 +298,7 @@ namespace Script
 		CLASS_DEF(Player, getQQVipPrivilege);
 		CLASS_DEF(Player, setQQVipPrivilege);
 		CLASS_DEF(Player, postRoamResult);
+		CLASS_DEF(Player, setGuangGunTask);
 		CLASS_DEF(Player, postKillMonsterRoamResult);
         CLASS_DEF(Player, lastQueqiaoAwardPush);
         CLASS_DEF(Player, lastKillMonsterAwardPush);
@@ -804,6 +805,8 @@ namespace Script
 
 	bool GameActionLua::AcceptTask(Player* player, UInt32 taskId)
 	{
+        if(!TaskFuncExist(taskId))
+            return false;
 		char buffer[64];
 		snprintf(buffer, sizeof(buffer), "Task_%08d_accept", taskId);
 		return Run<bool>(player, buffer, taskId);
@@ -811,6 +814,8 @@ namespace Script
 
 	bool GameActionLua::SubmitTask(Player* player, UInt32 taskId, UInt32 itemId, UInt16 itemNum)
 	{
+        if(!TaskFuncExist(taskId))
+            return false;
 		char buffer[64];
 		snprintf(buffer, sizeof(buffer), "Task_%08d_submit", taskId);
 		return Run<bool>(player, buffer, itemId, itemNum);
@@ -818,6 +823,8 @@ namespace Script
 
 	bool GameActionLua::AbandonTask(Player* player, UInt32 taskId)
 	{
+        if(!TaskFuncExist(taskId))
+            return false;
 		char buffer[64];
 		snprintf(buffer, sizeof(buffer), "Task_%08d_abandon", taskId);
 		return Run<bool>(player, buffer);
@@ -1431,12 +1438,21 @@ namespace Script
         assert(player != NULL);
         return Call<bool>("RunPrayAward", player, val);
     }
+    bool GameActionLua::RunNovLoginAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunNovLoginAward", player, val);
+    }
     bool GameActionLua::RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge)
     {
         assert(player != NULL);
         return Call<bool>("RunNewRC7DayRechargeAward", player, val, totalRecharge);
     }
-
+    bool GameActionLua::RunGameBoxDailyActionAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunGameBoxDailyActionAward", player, val);
+    }
     UInt8 GameActionLua::RunNewRC7DayTargetAward(Player* player)
     {
         assert(player != NULL);
@@ -1517,10 +1533,14 @@ namespace Script
 	{
 		return Call<UInt8>("onGetAthlRandomDiffculty");
 	}
-
     UInt8 GameActionLua::onRoamingQueqiao(Player* pl, UInt8 pos)
     {
-		return Call<UInt8 >(qixiTmpl._onRoamingFunc, pl, pos);
+        return Call<UInt8 >(qixiTmpl._onRoamingFunc, pl, pos);
+    }
+
+    UInt8 GameActionLua::onRoamingGuangGun(Player* pl, UInt8 pos)
+    {
+		return Call<UInt8 >("onRoamingGuangGun", pl, pos);
     }
     
     UInt32 GameActionLua::GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed)
@@ -1743,7 +1763,17 @@ namespace Script
     void GameActionLua::GetLuckyBagAward(Player * player)
     {
         assert(player != NULL);
-        Call<void>("GetLuckyBagAward",player);
+        Call<void>("GetLuckyBagAward", player);
+    }
+    void GameActionLua::UseToOther(Player * player, Player * other)
+    {
+        assert(player != NULL);
+        Call<void>("UseToOther", player, other);
+    }
+    void GameActionLua::UseToSystem(Player * player)
+    {
+        assert(player != NULL);
+        Call<void>("UseToSystem", player);
     }
 
     UInt32 GameActionLua::GetSpreadCountForAward()
@@ -1797,5 +1827,15 @@ namespace Script
 		return Call<UInt16>("addClanProfferFromItem", player, num, unit);
     }
 
+	bool GameActionLua::TaskFuncExist(UInt32 taskId)
+	{
+		return Call<bool>("TaskFuncExist", taskId);
+	}
+
+
+    bool GameActionLua::isSalePriceLimitServer()
+    {
+        return Call<bool>("isSalePriceLimitServer", cfg.serverNum);
+    }
 }
 

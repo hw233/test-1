@@ -1472,8 +1472,16 @@ void OnArenaConnected( ArenaMsgHdr& hdr, const void * data )
 		NETWORK()->CloseArena();
 		return;
 	}
-    GObject::World::setArenaState(GObject::ARENA_XIANJIE_DIYI);
-	GObject::arena.readFrom(brd);
+    UInt8 fhaslater = 0;
+    brd >> fhaslater;
+    GObject::arena._readbuf.append((UInt8*)(data) + brd.pos(), brd.size() - brd.pos());
+    if(!fhaslater)
+    {
+        BinaryReader brd2((UInt8*)(GObject::arena._readbuf), GObject::arena._readbuf.size());
+        GObject::World::setArenaState(GObject::ARENA_XIANJIE_DIYI);
+        GObject::arena.readFrom(brd2);
+        GObject::arena._readbuf.clear();
+    }
 }
 
 void OnPlayerEntered( ArenaMsgHdr& hdr, const void * data )
@@ -1727,16 +1735,15 @@ void OnArenaWarOpReq( GameMsgHdr& hdr, const void * data )
                 GObject::serverWarMgr.jiJianTai_operate(player);
                 break;
             case 0x02:
-                {
-                    UInt8 flag = 0;
-                    brd >> flag;
-                    GObject::serverWarMgr.jiJianTai_complete(player, flag);
-                }
+                GObject::serverWarMgr.jiJianTai_complete(player, 1);
                 break;
             case 0x03:
-                GObject::serverWarMgr.jiJianTai_convert(player);
+                GObject::serverWarMgr.jiJianTai_complete(player, 0);
                 break;
             case 0x04:
+                GObject::serverWarMgr.jiJianTai_convert(player);
+                break;
+            case 0x05:
                 {
                     UInt8 idx = 0;
                     brd >> idx ;
@@ -2688,6 +2695,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x18:
         case 0x19:
         case 0x21:
+        case 0x24:
         {
             brd >> op;
             switch(op)
@@ -2746,6 +2754,9 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         }
         case 0x0C:
         {
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            /*
             brd >> op;
             switch (op)
             {
@@ -2758,6 +2769,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     player->buyTownTjItem(itemId);
                     break;
             }
+            */
             break;
         }
         case 0x0E:
@@ -2816,10 +2828,23 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         {
             if (!World::getSurnameLegend())
                 return;
-            brd >> op;
-            UInt8 type = op;
-            GameMsgHdr h(0x346,  player->getThreadId(), player, sizeof(type));
-            GLOBAL().PushMsg(h, &type);
+
+            struct Data
+            {
+                UInt8 type;
+                char name[32];
+            }data;
+
+            brd >> data.type;
+            if(0x04 == data.type)
+            {
+                std::string name;
+                brd >> name;
+                strncpy(data.name, name.c_str(), 31);
+            }
+
+            GameMsgHdr h(0x346,  player->getThreadId(), player, sizeof(data));
+            GLOBAL().PushMsg(h, &data);
             break;
         }
         case 0x41:
@@ -2912,6 +2937,16 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
            }
         }
         break;
+        case 0x22:  // 光棍节活动
+        {
+            
+            if( ! WORLD().getGGTime() )
+                break;
+
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            break;
+        }
         default:
             break;
     }
@@ -3186,6 +3221,11 @@ void OnTeamArenaEntered( ArenaMsgHdr& hdr, const void * data )
     if(!tad)
         return;
     GObject::teamArenaMgr.teamArenaEntered(tad, entered, rname);
+    for(UInt8 i = 0; i < tad->count; ++ i)
+    {
+        if(tad->members[i])
+            tad->members[i]->arenaUdpLog(1001);
+    }
 }
 
 void OnTeamArenaConnected( ArenaMsgHdr& hdr, const void * data )
@@ -3199,8 +3239,16 @@ void OnTeamArenaConnected( ArenaMsgHdr& hdr, const void * data )
 		NETWORK()->CloseArena();
 		return;
 	}
-    GObject::World::setArenaState(GObject::ARENA_XIANJIE_ZHIZUN);
-	GObject::teamArenaMgr.readFrom(brd);
+    UInt8 fhaslater = 0;
+    brd >> fhaslater;
+    GObject::teamArenaMgr._readbuf.append((UInt8*)(data) + brd.pos(), brd.size() - brd.pos());
+    if(!fhaslater)
+    {
+        BinaryReader brd2((UInt8*)(GObject::teamArenaMgr._readbuf), GObject::teamArenaMgr._readbuf.size());
+        GObject::World::setArenaState(GObject::ARENA_XIANJIE_ZHIZUN);
+        GObject::teamArenaMgr.readFrom(brd2);
+        GObject::teamArenaMgr._readbuf.clear();
+    }
 }
 
 void OnTeamArenaPreliminary( ArenaMsgHdr& hdr, const void * data )

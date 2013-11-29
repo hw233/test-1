@@ -71,6 +71,7 @@ MSG_REG(GameMsgHdr, OnCanAcceptTaskReq);
 MSG_REG(GameMsgHdr, OnTaskActionReq);
 MSG_REG(GameMsgHdr, OnTaskNpcActionReq);
 MSG_REG(GameMsgHdr, CountryBattleJoinReq);
+MSG_REG(GameMsgHdr, CountryBattleInfoReq);
 MSG_REG_2(GameMsgHdr, REQ::NEW_CAMPS_WAR_JOIN, NewCountryBattleJoinReq);
 //MSG_REG(GameMsgHdr, OnChallengePlayerReq);
 MSG_REG(GameMsgHdr, OnLanchChallengeReq);
@@ -195,6 +196,7 @@ MSG_REG_2(GameMsgHdr, REQ::CCB, OnCCBReq);
 
 MSG_REG_2(GameMsgHdr, REQ::CLAN_SPIRIT_TREE, OnClanSpiritTree);
 
+MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq2);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -389,6 +391,9 @@ MSG_REG_2(GameMsgHdr, 0x337, OnTeamArenaUseGold);
 MSG_REG_2(GameMsgHdr, 0x338, OnGetTeamArenaMoney);
 MSG_REG_2(GameMsgHdr, 0x339, OnTeamArenaInspire);
 
+MSG_REG_2(GameMsgHdr, 0x350, OnGGBeTeam);
+MSG_REG_2(GameMsgHdr, 0x351, OnGGTeamPlayerLeave);
+
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
 MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
@@ -399,13 +404,15 @@ MSG_REG_2(GameMsgHdr, 0x362, OnBePrayed);
 MSG_REG_2(GameMsgHdr, 0x363, OnBePresented);
 MSG_REG_2(GameMsgHdr, 0x364, OnDoStrongInWorld);
 MSG_REG_2(GameMsgHdr, 0x365, OnSend11GradeInfo);
+MSG_REG_2(GameMsgHdr, 0x366, OnRunFriendlyCompass);
 
 //0x365-380繁体占用
 
+MSG_REG_2(GameMsgHdr, 0x381, OnRoamintGuangGun);
 //跨服服战(仙界传奇)
-MSG_REG_2(GameMsgHdr, 0x381, OnServerWarEnter);
-MSG_REG_2(GameMsgHdr, 0x382, OnServerWarLineup);
-MSG_REG_2(GameMsgHdr, 0x383, OnServerWarGetMoney);
-MSG_REG_2(GameMsgHdr, 0x384, OnServerWarUseGold);
+MSG_REG_2(GameMsgHdr, 0x382, OnServerWarEnter);
+MSG_REG_2(GameMsgHdr, 0x383, OnServerWarLineup);
+MSG_REG_2(GameMsgHdr, 0x384, OnServerWarGetMoney);
+MSG_REG_2(GameMsgHdr, 0x385, OnServerWarUseGold);
 
 MSG_HANDLER_END()

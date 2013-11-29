@@ -417,6 +417,7 @@ namespace GObject
 
         std::vector<UInt8> allAttrType = lbAttrConf.attrType;
         UInt8 itemTypeIdx = subClass - Item_LBling;
+        allAttrType.erase(allAttrType.begin() + 1);
         for(int i = 0; i < attrNum; ++ i)
         {
             UInt8 size = allAttrType.size();
@@ -2838,7 +2839,8 @@ namespace GObject
             return 2;
 
         HoneyFall* hf = m_Owner->getHoneyFall();
-
+        if(!hf)
+            return 2;
         HoneyFallType hft;
         if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
             hft = e_HFT_Trump_Enchant;
@@ -2913,6 +2915,7 @@ namespace GObject
                 updateHft = true;
                 hf->incHftValue(hft);
             }
+            m_Owner->udpLog("lianqi", "F_131024_1", "", "", "", "", "act");
         }
         else if( 0 != count )
         {
@@ -2957,6 +2960,7 @@ namespace GObject
                 }
 
                 enchant = hf->getChanceFromHft(quality, ied.enchant, hft);
+                m_Owner->udpLog("lianqi", "F_131024_1", "", "", "", "", "act");
             }
         }
         if(!DelItemAny(item_enchant_l + type, enc_times, &isBound))
@@ -2972,10 +2976,18 @@ namespace GObject
             hf->updateHftValueToDB(hft);
         bless = hf->getHftValue(hft);
         if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+        {
             GameAction()->doStrong(this->m_Owner, SthTrumpEnchant, 0, 0);
+            m_Owner->GuangGunCompleteTask(0,2);
+            m_Owner->GuangGunCompleteTask(0,15);
+        }
         else
+        {
             GameAction()->doStrong(this->m_Owner, SthEnchant, 0, 0);
-		AddItemHistoriesLog(item_enchant_l + type, enc_times);
+            m_Owner->GuangGunCompleteTask(0,1);
+            m_Owner->GuangGunCompleteTask(0,23);
+        }
+        AddItemHistoriesLog(item_enchant_l + type, enc_times);
         //DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%" I64_FMT "u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), item_enchant_l + type, enc_times, TimeUtil::Now());
         ConsumeInfo ci(EnchantEquipment,0,0);
         m_Owner->useTael(amount * enc_times, &ci);
@@ -3485,6 +3497,7 @@ namespace GObject
 		}
 		else
 			SendSingleEquipData(equip);
+        m_Owner->udpLog("lianqi", "F_131024_5", "", "", "", "", "act");
 		return 0;
 	}
 
@@ -4124,6 +4137,7 @@ namespace GObject
                     bindCount -= 3;
                 }
             }
+            m_Owner->udpLog("lianqi", "F_131024_6", "", "", "", "", "act");
         }
 
         while(result == 0 && unbindCount >= 3)
@@ -4172,6 +4186,7 @@ namespace GObject
                     unbindCount -= 3;
                 }
             }
+            m_Owner->udpLog("lianqi", "F_131024_6", "", "", "", "", "act");
         }
 
         while(bindCount + unbindCount >= 3 && result == 0)
@@ -4223,6 +4238,7 @@ namespace GObject
                     bindCount = 0;
                 }
             }
+            m_Owner->udpLog("lianqi", "F_131024_6", "", "", "", "", "act");
         }
 
         if(bindUsed > 0)
@@ -4253,6 +4269,7 @@ namespace GObject
 			DelItem(ITEM_GEM_PROTECT, protectUnbindUsed, false, ToGemMgerge);
 
         GameAction()->doStrong(this->m_Owner, SthMergeGem, 0, 0);
+        m_Owner->GuangGunCompleteTask(0,4);
 		return result;
     }
 
@@ -4722,6 +4739,7 @@ namespace GObject
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
         if (oldEquipClass == Item_Weapon)
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
+        m_Owner->udpLog("lianqi", "F_131024_3", "", "", "", "", "act");
 
         return 0;
     }
@@ -4859,6 +4877,7 @@ namespace GObject
         }
         else if(1 == mark)
         {
+#if 0
             if (fromEquip->GetCareer() != toEquip->GetCareer() &&
                 fromEquip->GetCareer() > 0 &&
                 toEquip->GetCareer() > 0)
@@ -4867,7 +4886,7 @@ namespace GObject
                   2.全职业装备可继承任何职业装备，或接受任何职业装备的继承;*/
                 return 18;
             }
-
+#endif
             if(cfg.serverNum != 34 && m_Owner->getVipLevel() < 4)
             {
                 return 17;   //御剑等级小于4级
@@ -5289,20 +5308,20 @@ namespace GObject
         tIed.extraAttr2.type1 = fIed.extraAttr2.type1;
         tIed.extraAttr2.type2 = fIed.extraAttr2.type2;
         tIed.extraAttr2.type3 = fIed.extraAttr2.type3;
-        tIed.extraAttr2.value1 = fIed.extraAttr2.value1 - fmaxV1 * 15;
         
+        tIed.extraAttr2.value1 = (fIed.extraAttr2.value1 - fmaxV1 * 15) * tmaxV1 / fmaxV1;
         if(float(tIed.extraAttr2.value1) < tmaxV1 * tfactor)
         {
             tIed.extraAttr2.value1 = tmaxV1*tfactor;
         }
 
-        tIed.extraAttr2.value2 = fIed.extraAttr2.value2 - fmaxV2 * 15;
+        tIed.extraAttr2.value2 = (fIed.extraAttr2.value2 - fmaxV2 * 15) * tmaxV2 / fmaxV2;
         if(float(tIed.extraAttr2.value2) < tmaxV2 * tfactor)
         {
             tIed.extraAttr2.value2 = tmaxV2 * tfactor;
         }
 
-        tIed.extraAttr2.value3 = fIed.extraAttr2.value3 - fmaxV3 * 15;
+        tIed.extraAttr2.value3 = (fIed.extraAttr2.value3 - fmaxV3 * 15) * tmaxV3 / fmaxV3;
         if(float(tIed.extraAttr2.value3) < tmaxV3 * tfactor)
         {
             tIed.extraAttr2.value3 = tmaxV3 * tfactor;
@@ -5615,6 +5634,8 @@ namespace GObject
         //装备洗练成就
         GameAction()->doAttainment(this->m_Owner, 10175, 0);
         GameAction()->doStrong(this->m_Owner, SthForge, 0, 0);
+        m_Owner->GuangGunCompleteTask(0,3);
+        m_Owner->GuangGunCompleteTask(0,19);
         m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 0, 0);
 		UInt8 lv = equip->getValueLev();
 		UInt8 q = equip->getQuality() - 3;
@@ -5749,6 +5770,7 @@ namespace GObject
 		}
 		else
 			SendSingleEquipData(equip);
+        m_Owner->udpLog("lianqi", "F_131024_2", "", "", "", "", "act");
 		return 0;
 	}
 
@@ -6171,13 +6193,25 @@ namespace GObject
             m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 1, 1);
 
         GameAction()->doStrong(m_Owner, SthTrumpUpgrade, 0, 0);
+        m_Owner->GuangGunCompleteTask(0,6);
         return 0;
     }
 
-    UInt8 Package::TrumpLOrder(UInt16 fighterId, UInt32 trumpId)
+    UInt8 Package::TrumpLOrder(UInt16 fighterId, UInt32 trumpId ,UInt8 opt)
     {
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
+        HoneyFall* hf = m_Owner->getHoneyFall();
+        if(!hf)
+            return 2;
+        HoneyFallType hft = e_HFT_Trump_SJ;
+        if(opt == 1)
+        {
+            Stream st(REP::EQ_TRUMP_L_ORDER);
+            st <<static_cast<UInt8>(3)<< static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
+            m_Owner->send(st);
+            return 4;
+        }
 		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
 		if(trump == NULL ||
            (trump->getClass() != Item_Trump &&
@@ -6201,11 +6235,23 @@ namespace GObject
             return 2;
         AddItemHistoriesLog(TRUMP_LORDER_ITEM, 1);
 
-        UInt32 chance = GObjectManager::getTrumpLOrderChance(q-2, l-1);
-        if(uRand(1000) >= chance)
+        UInt32 chance = hf->getChanceFromHft(q+4, l,hft);
+        if(uRand(10000) >= chance)
+        {
+            hf->incHftValue(hft);       //法宝升阶祝福
+            hf->updateHftValueToDB(hft);
+            Stream st(REP::EQ_TRUMP_L_ORDER);
+            st <<static_cast<UInt8>(3)<<static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
+            m_Owner->send(st);
             return 1;
-
+        }
         ++ ied_trump.maxTRank;
+
+        hf->setHftValue(hft, 0);  //法宝升阶祝福
+        hf->updateHftValueToDB(hft);
+        Stream st(REP::EQ_TRUMP_L_ORDER);
+        st <<static_cast<UInt8>(3)<<static_cast<UInt8>(hf->getHftValue(hft))<< Stream::eos;
+        m_Owner->send(st);
         DB4().PushUpdateData("UPDATE `equipment` SET `maxTRank` = %u WHERE `id` = %u", ied_trump.maxTRank, trump->getId());
         DBLOG().PushUpdateData("insert into lorder_histories (server_id, player_id, equip_id, template_id, equip_maxrank, upgrade_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), trump->getId(), trump->GetItemType().getId(), ied_trump.maxTRank, TimeUtil::Now());
 
@@ -6308,6 +6354,8 @@ namespace GObject
 
                 DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spLev%u` = %u, `spform1` = %u, `spform2` = %d, `spform3` = %u WHERE `id` = %u", form, ied_equip.spiritAttr.spLev[form - 1], ied_equip.spiritAttr.spForm[0], ied_equip.spiritAttr.spForm[1], ied_equip.spiritAttr.spForm[2], equip->getId());
                 GameAction()->doStrong(m_Owner, SthEquipSpirit, 0, 0);
+                m_Owner->GuangGunCompleteTask(0,7);
+                m_Owner->udpLog("lianqi", "F_131024_4", "", "", "", "", "act");
             }
             break;
         case 1:
@@ -6403,13 +6451,28 @@ namespace GObject
         std::string strValue;
         for(int i = 0; i < 4; ++ i)
         {
+            UInt32 value = uRand(30);
             if(protect)
             {
-                factor = ((float)(1060 + uRand(90)))/1000;
+                UInt32 r = uRand(40);
+                if(r<20)
+                    factor = ((float)(1060 + value))/1000;
+                else if(r < 30)
+                    factor = ((float)(1090 + value))/1000;
+                else 
+                    factor = ((float)(1120 + value))/1000;
             }
             else
             {
-                factor = ((float)(950 + uRand(170)))/1000;
+                UInt32 r = uRand(60);
+                if(r<15)
+                    factor = ((float)(1000 + value))/1000;
+                else if(r < 50)
+                    factor = ((float)(1030 + value))/1000;
+                else if(r < 55)
+                    factor = ((float)(1060 + value))/1000;
+                else 
+                    factor = ((float)(1090 + value))/1000;
             }
 
             UInt16 oldvalue = lba.value[i];
@@ -6427,7 +6490,7 @@ namespace GObject
         }
 
         float pFactor = totalFactor/totalCount;
-        if(pFactor < -0.02f)
+        if(pFactor < 0.03f)
         {
             if(protect)
                 m_Owner->udpLog("Tongling", "F_10000_10", "", "", "", "", "act");
@@ -6492,18 +6555,19 @@ namespace GObject
         if(gujiClass < Item_Guji || gujiClass > Item_Guji_Dossier)
             return 2;
 
-        UInt8 colorIdx = guji->getQuality() - 2;
+        UInt8 quality = guji->getQuality();
+        UInt8 colorIdx = quality - 2;
         UInt8 lvIdx = (guji->getReqLev() - 70)/10;
         UInt8 gujiIdx = gujiClass - Item_Guji;
         UInt8 itemIdx = item->getQuality() == 2 ? 0 : 1;
-        if(colorIdx > 3 || lvIdx > 3 || gujiIdx > 16 || itemIdx > 1)
+        if(colorIdx > 3 || lvIdx > 5 || gujiIdx > 16 || itemIdx > 1)
             return 2;
 
         DelItem2(guji, 1, ToLingbao);
         DelItem2(item, 1, ToLingbao);
-        double gujiFactor[17] = {1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 10};
+        double gujiFactor[17] = {0.7, 0.7, 0.7, 0.7, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 10};
         double itemFactor[2] = {1, 1.5};
-        double lvFactor[4] = {1, 1.2, 1.4, 1.6};
+        double lvFactor[6] = {1, 1.2, 1.4, 1.6, 1.8, 2.0};
         double colorFactor[4] = {1, 1, 2, 3};
 
         m_Owner->udpLog("Tongling", "F_10000_15", "", "", "", "", "act");
@@ -6527,16 +6591,87 @@ namespace GObject
         m_lbSmeltInfo.bind = 1; //(bind1 != 0 || bind2 != 0) ? 1 : 0;
         m_lbSmeltInfo.value = 0;
         m_lbSmeltInfo.maxValue = 1000*gujiFactor[gujiIdx]*itemFactor[itemIdx]*lvFactor[lvIdx]*colorFactor[colorIdx];
+        m_lbSmeltInfo.counts = 1;
+
+        if(itemId == FULING_ITEM_PROTECT) //使用泰山石敢当
+        {
+            m_lbSmeltInfo.counts += 2;
+            m_lbSmeltInfo.orangeAdjVal += 25;
+        }
+
+        if(gujiId >= 11113 && gujiId <= 11118) //皇帝古籍
+        {            
+            m_lbSmeltInfo.counts += 2;
+            m_lbSmeltInfo.orangeAdjVal += 75;
+        }
+        else if(5 == quality) //使用橙色指定属性的古籍
+        {
+            m_lbSmeltInfo.orangeAdjVal += 25;
+        }
+
+        if(m_lbSmeltInfo.counts > 4)
+            m_lbSmeltInfo.counts = 4;
+
+        if(m_lbSmeltInfo.orangeAdjVal > m_lbSmeltInfo.counts * 25)
+            m_lbSmeltInfo.orangeAdjVal = m_lbSmeltInfo.counts * 25;
 
         sendLingbaoSmeltInfo();
         GameAction()->doStrong(m_Owner, SthGuJiSpirit, 0, 0); 
-        DB4().PushUpdateData("INSERT INTO `lingbaosmelt`(`playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u)", m_Owner->getId(), m_lbSmeltInfo.gujiId, m_lbSmeltInfo.itemId, m_lbSmeltInfo.bind, m_lbSmeltInfo.value, m_lbSmeltInfo.maxValue);
-
+        DB4().PushUpdateData("INSERT INTO `lingbaosmelt`(`playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue`, `counts`, `purpleAdjVal`, `orangeAdjVal`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u)", m_Owner->getId(), m_lbSmeltInfo.gujiId, m_lbSmeltInfo.itemId, m_lbSmeltInfo.bind, m_lbSmeltInfo.value, m_lbSmeltInfo.maxValue, m_lbSmeltInfo.counts, m_lbSmeltInfo.purpleAdjVal, m_lbSmeltInfo.orangeAdjVal);
         return 0;
+    }
+
+    void Package::AddAdjVal(UInt8 mark, UInt8 nums)
+    {
+        UInt8 AdjVal = 0;
+
+        if(PURPLEADJVAL_TYPE == mark)
+            AdjVal = m_lbSmeltInfo.purpleAdjVal;
+        else
+            AdjVal = m_lbSmeltInfo.orangeAdjVal;
+
+        switch(nums)
+        {
+            case 1:
+                if(PURPLEADJVAL_TYPE == mark)
+                    m_lbSmeltInfo.purpleAdjVal += 2;
+                else
+                    m_lbSmeltInfo.orangeAdjVal += 2;
+                break;
+            case 2:
+                if(PURPLEADJVAL_TYPE == mark)
+                    m_lbSmeltInfo.purpleAdjVal += 3;
+                else
+                    m_lbSmeltInfo.orangeAdjVal += 3;
+                break;
+            case 3:
+                if(PURPLEADJVAL_TYPE == mark)
+                    m_lbSmeltInfo.purpleAdjVal += 4;
+                else
+                    m_lbSmeltInfo.orangeAdjVal += 4;
+                break;
+            case 4:
+                if(PURPLEADJVAL_TYPE == mark)
+                    m_lbSmeltInfo.purpleAdjVal += 10;
+                else
+                    m_lbSmeltInfo.orangeAdjVal += 10;
+                break;
+        }
+
+        UInt8 maxAdjVal = m_lbSmeltInfo.counts * 25;
+        if(m_lbSmeltInfo.purpleAdjVal > maxAdjVal)
+            m_lbSmeltInfo.purpleAdjVal = maxAdjVal;
+
+        if(m_lbSmeltInfo.orangeAdjVal > maxAdjVal)
+            m_lbSmeltInfo.orangeAdjVal = maxAdjVal;
     }
 
     UInt8 Package::LingbaoSmelt(UInt32 itemId, UInt16 cnt)
     {
+#define ORANGE_SMELTBAOJU         9338
+#define PURPLE_SMELTBAOJU         9340
+#define BLUE_SMELTBAOJU           9341
+#define GREEN_SMELTBAOJU          9342
         if(m_lbSmeltInfo.value >= m_lbSmeltInfo.maxValue)
             return 2;
 
@@ -6562,6 +6697,7 @@ namespace GObject
 
         UInt8 res = 0;
         UInt16 useCnt = 0;
+        bool mark = false;
         for(; useCnt < cnt; ++ useCnt)
         {
             UInt32 value = 0;
@@ -6571,17 +6707,58 @@ namespace GObject
                 stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
                 ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(item))->getLingbaoAttr();
                 UInt8 lv = item->getValueLev();
+
+                if(lba.tongling)
+                {
+                    UInt8 purpleNum = 0;
+                    UInt8 orangeNum = 0;
+
+                    for(UInt8 i=0; i<4; i++)
+                    {
+                        if(lba.type[i] > 0)
+                        {
+                            float disFactor = lba.value[i] / lbAttrConf.getAttrMax(lv, subClass-Item_LBling, lba.type[i]-1);
+                            int a = disFactor * 100;
+
+                            if(a > 60 && a <= 80)
+                            {
+                                purpleNum++;
+                            }
+                            else if(a > 80)
+                            {
+                                orangeNum++;
+                            }
+                        }
+                    }
+
+                    if(purpleNum > 0)
+                        AddAdjVal(PURPLEADJVAL_TYPE, purpleNum);
+
+                    if(orangeNum > 0)
+                        AddAdjVal(ORANGEADJVAL_TYPE, orangeNum);
+                }
+
                 UInt8 skillNum = 0;
                 if(lba.skill[0])
                     ++ skillNum;
                 if(lba.skill[1])
                     ++ skillNum;
                 if(lba.tongling)
-                    value += lbAttrConf.getSmeltExp(lv, subClass - Item_LBling, lba.type, lba.value, 4, skillNum);
+                    value += lbAttrConf.getSmeltExp(lv, subClass - Item_LBling, lba.type, lba.value, 4, skillNum,lba.lbColor);
                 else
                     value += lbAttrConf.getSmeltExp2(lv, subClass - Item_LBling, lba.lbColor);
             }
             m_lbSmeltInfo.value += value;
+
+            UInt8 probability = uRand(100);
+            if(ORANGE_SMELTBAOJU == itemId && probability < 25)
+                mark = true;
+            else if(PURPLE_SMELTBAOJU == itemId && probability < 5)
+                mark = true;
+            else if(BLUE_SMELTBAOJU == itemId && probability < 2)
+                mark = true;
+            else if(GREEN_SMELTBAOJU == itemId && probability < 1)
+                mark = true;
 
             if(m_lbSmeltInfo.value >= m_lbSmeltInfo.maxValue)
             {
@@ -6590,12 +6767,19 @@ namespace GObject
             }
         }
 
+        if(mark)
+            m_lbSmeltInfo.counts += 1;
+
+        if(m_lbSmeltInfo.counts > 4)
+            m_lbSmeltInfo.counts = 4;
+
 		if (IsEquipId(itemId))
             DelEquip(item->getId(), ToLingbao);
         else
             DelItemAny(itemId, useCnt, NULL, ToLingbao);
 
-        DB4().PushUpdateData("UPDATE `lingbaosmelt` SET `value`=%u WHERE `playerId`=%" I64_FMT "u", m_lbSmeltInfo.value, m_Owner->getId());
+        DB4().PushUpdateData("UPDATE `lingbaosmelt` SET `value`=%u, `counts`=%u, `purpleAdjVal`=%u, `orangeAdjVal`=%u WHERE `playerId`=%" I64_FMT "u", m_lbSmeltInfo.value, m_lbSmeltInfo.counts, m_lbSmeltInfo.purpleAdjVal, m_lbSmeltInfo.orangeAdjVal, m_Owner->getId());
+       m_Owner->GuangGunCompleteTask(0,20);
 
         return res;
     }
@@ -6603,7 +6787,7 @@ namespace GObject
     bool Package::FinishLBSmeltSpecial(const GData::ItemBaseType * itype, ItemLingbaoAttr &lbattr, UInt8& attrNum)
     {
         //黄帝卷宗（11113），炎帝卷宗（11114），神农卷宗（11115），女娲卷宗（11116）
-        UInt16 lbids[] = { 11113, 11114, 11115, 11116 };
+        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118};
         bool hasSpe = false;
         for(UInt8 i = 0; i < sizeof(lbids) / sizeof(lbids[0]); ++i)
         {
@@ -6614,20 +6798,70 @@ namespace GObject
             return false;
         stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
         std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+        allAttrType.erase(allAttrType.begin() + 1);
         attrNum = m_lbSmeltInfo.itemId == FULING_ITEM_PROTECT ? 4 : 3;
+        UInt8 orangeAttrNum = attrNum;
+
+        if(orangeAttrNum < m_lbSmeltInfo.orangeAdjVal / 25)
+            orangeAttrNum = m_lbSmeltInfo.orangeAdjVal / 25;
+
+        if(attrNum < m_lbSmeltInfo.counts)
+            attrNum = m_lbSmeltInfo.counts;
+
         const GData::ItemBaseType* guji = GData::itemBaseTypeManager[m_lbSmeltInfo.gujiId];
+        UInt8 color = 0;
         for(int i = 0; i < attrNum; ++ i)
         {
+            if(orangeAttrNum > 0)
+            {
+                color = 5;
+                orangeAttrNum -= 1;
+            }
+            else
+                color = 2 + uRand(4);
+
             UInt8 size = allAttrType.size();
             UInt8 idx = uRand(size);
             lbattr.type[i] = allAttrType[idx];
             UInt16 chance = uRand(10000);
             float fChance = ((float)(uRand(10000)))/10000;
-            float disFactor = lbAttrConf.getDisFactor4(chance, fChance, 5);
+            float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color);
+            Probability(disFactor);
             lbattr.value[i] = lbAttrConf.getAttrMax(guji->reqLev, itype->subClass-Item_LBling, lbattr.type[i]-1) * disFactor + 0.9999f;
             allAttrType.erase(allAttrType.begin() + idx);
         }
         return true;
+    }
+
+    void Package::Probability(float & disFactor)
+    {
+        disFactor = disFactor * 100;
+        bool mark = false;
+        if(100 == m_lbSmeltInfo.purpleAdjVal)
+        {
+            if(disFactor >= 20 && disFactor <= 60)
+                mark = true;
+        }
+        else if(m_lbSmeltInfo.purpleAdjVal >= 75)
+        {
+            if(disFactor >= 20 && disFactor <= 50)
+                mark = true;
+        }
+        else if(m_lbSmeltInfo.purpleAdjVal >= 50)
+        {
+            if(disFactor >= 20 && disFactor <= 40)
+                mark = true;
+        }
+        else if(m_lbSmeltInfo.purpleAdjVal >= 25)
+        {
+            if(disFactor >= 20 && disFactor <= 30)
+                mark = true;
+        }
+
+        if(mark)
+            disFactor = ((float)(uRand(10) + 60));
+
+        disFactor = disFactor / 100;
     }
 
     void Package::FinishLBSmelt()
@@ -6642,16 +6876,17 @@ namespace GObject
 
         UInt8 lv = guji->vLev;
         UInt8 lvIdx = (lv - 70)/10;
-        if(lvIdx > 4) lvIdx = 4;
+        if(lvIdx > 6) lvIdx = 6;
 
         UInt16 gjIdx = guji->subClass - Item_Guji;
         UInt8 lbIdx[17] = {0xFF, 0, 1, 2, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 0xFF};
-        UInt16 lbids[5][3] = {
+        UInt16 lbids[6][3] = {
             {11500, 11501, 11502},
             {11503, 11504, 11505},
             {11506, 11507, 11508},
             {11509, 11510, 11511},
-            {11512, 11513, 11514}};
+            {11515, 11516, 11517},
+            {11518, 11519, 11520}};
 
         UInt8 itemIdx = lbIdx[gjIdx];
         if(lbIdx[gjIdx] == 0xFF)
@@ -6677,24 +6912,23 @@ namespace GObject
             UInt8 color = guji->quality;
             if(attrNum < minAttrNum)
                 attrNum = minAttrNum;
+
+            int orangeCnt = m_lbSmeltInfo.orangeAdjVal / 25;
+
+            if(attrNum < m_lbSmeltInfo.counts)
+                attrNum = m_lbSmeltInfo.counts;
+
             std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+            //allAttrType.erase(allAttrType.begin() + 1);
             UInt8 itemTypeIdx = subClass - Item_LBling;
             // 古籍指定的属性
             {
                 UInt8 idx = 0;
 
-                if(gjIdx == 0)
+                if(gjIdx < 4)
                 {
                     UInt8 size = allAttrType.size();
                     idx = uRand(size);
-                }
-                else if(gjIdx < 4)
-                {
-                    UInt8 lbAttrIdx[3][4] =
-                    { {0, 1, 6, 11}, // 物功，法功，身法，反击
-                      {2, 3, 4, 5},  // 物防，法防，生命, 坚韧
-                      {7, 8, 9, 10}};// 命中，闪避，暴击，破击
-                    idx = lbAttrIdx[gjIdx - 1][uRand(4)];
                 }
                 else
                 {
@@ -6702,21 +6936,37 @@ namespace GObject
                     idx = lbAttrIdx[gjIdx - 4];
                 }
 
+                if(5 == color)
+                    orangeCnt -= 1;
                 lbattr.type[0] = allAttrType[idx];
+                if(lbattr.type[0] == 2)
+                    lbattr.type[0] = 1;
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color);
+                Probability(disFactor);
                 lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]-1) * disFactor + 0.9999f;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
+            if(find(allAttrType.begin(),allAttrType.end(),2) != allAttrType.end())
+                allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),2));
             for(int i = 1; i < attrNum; ++ i)
             {
+                if(5 == color2)
+                    orangeCnt -= 1;
+                else if(orangeCnt > 0)
+                {
+                    color2 = 5;
+                    orangeCnt -= 1;
+                }
+
                 UInt8 size = allAttrType.size();
                 UInt8 idx = uRand(size);
                 lbattr.type[i] = allAttrType[idx];
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color2);
+                Probability(disFactor);
                 // item color only define one attr to it`s color
                 color2 = 2;
                 //float disFactor = lbAttrConf.getDisFactor3(uRand(10000), fChance);
@@ -6893,6 +7143,9 @@ namespace GObject
         st << m_lbSmeltInfo.maxValue;
         st << m_lbSmeltInfo.value;
         st << m_lbSmeltInfo.bind;
+        st << m_lbSmeltInfo.counts;
+        st << m_lbSmeltInfo.purpleAdjVal;
+        st << m_lbSmeltInfo.orangeAdjVal;
 
         st << Stream::eos;
 		m_Owner->send(st);
@@ -6932,6 +7185,23 @@ namespace GObject
             break;
         default:
             break;
+        }
+    }
+
+    void Package::FindEquipByTypeIdFromItemTemp(std::vector<ItemEquip*>& ret, UInt32 id, bool bind)
+    {
+        if (!m_Owner)
+            return;
+
+        CheckTemporaryItem();
+        for (item_elem_iter i = m_ItemsTemporary.begin(); i != m_ItemsTemporary.end(); ++i)
+        {
+            if (i->second && IsEquipId(i->second->getId()))
+            {
+                ItemEquip* item = (ItemEquip*)i->second;
+                if (item->GetItemType().getId() == id)
+                    ret.push_back(item);
+            }
         }
     }
 
@@ -7390,7 +7660,6 @@ namespace GObject
         CheckTemporaryItem();
 		item_elem_iter iter = m_ItemsTemporary.begin();
         int num = m_ItemsTemporary.size();
-        std::cout << "num = " << num << std::endl; 
         while(num > 0)
         {
             Stream st(REP::TEMPITEM_INFO);
@@ -7419,7 +7688,6 @@ namespace GObject
             }
 
             st.data<UInt16>(4) = count;
-            std::cout << "count = " << count << std::endl; 
             st << Stream::eos;
             m_Owner->send(st);
             num -= count;

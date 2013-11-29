@@ -214,7 +214,8 @@ bool NewCountryBattle::playerEnter( Player * player )
     player->countryBattleUdpLog(1090, player->getCountry());
     player->countryBattleUdpLog(1090, 2);
     //player->countryBattleUdpLog(1217, 0);
-    player->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
+    if(player->checkClientIP())
+        player->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     player->getSurnameLegendAward(e_sla_cb);
 
 	return true;

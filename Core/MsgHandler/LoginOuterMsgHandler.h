@@ -416,6 +416,10 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setPresentLogin();
             GObject::globalOnlinePlayers.add(player->getId(),player);
             player->SetQQBoardLogin();
+            if(!player->checkClientIP())
+            {
+                player->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
+            }
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -1613,11 +1617,13 @@ void UnForbidSale(LoginMsgHdr& hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     std::string playerIds;
+//    std::string operater;
     CHKKEY();
     br>>playerIds;
+  //  br>>operater;
  
     UInt8 ret = 1;
-    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    //TRACE_LOG("FORBIDSALE: %s, %u , %s", playerIds.c_str(), TimeUtil::Now(), operater.c_str());
     std::unique_ptr<DB::DBExecutor> execu(DB::gLockDBConnectionMgr->GetExecutor());
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
@@ -3557,6 +3563,18 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         ret = 1;
     }
 
+    else if (type == 8 && begin <= end )
+    {
+        GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAME_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAME_END, end);
+        ret = 1;
+    }
+    else if (type == 10 && begin <= end )
+    {
+        GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAMEY_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAMEY_END, end);
+        ret = 1;
+    }
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
