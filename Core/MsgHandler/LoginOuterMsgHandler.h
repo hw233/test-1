@@ -421,6 +421,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
                 player->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
             }
             player->SetReqDataTime(0);
+            //player->SetReqDataTime1(0);
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif

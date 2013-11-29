@@ -476,6 +476,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_FAIRYPET_SHOUHUN = 517,                         // 仙宠兽魂
         VAR_GIVE_CARDAWARD_COUTS = 518,                     // 被赠送卡牌奖品次数
         VAR_QISHIDOUFA_REST_NUM = 519,                      // 七石斗法每天3次免费重置机会
+        VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE = 520,         // 七石斗法上次失败历史最高分
 
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
@@ -900,7 +901,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_FAIRYPET_SHOUHUN, CYCLE_NONE);
             REGISTER_VAR(VAR_EQUIP_MOVE_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_QISHIDOUFA_REST_NUM, CYCLE_DAY);
-
+            REGISTER_VAR(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE, CYCLE_NONE);
+            
             REGISTER_VAR(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);

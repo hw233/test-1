@@ -4327,9 +4327,8 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
         case 11:
-            UInt32 now = TimeUtil::Now();
-            GVAR.SetVar(GVAR_QISHIBANGAME_BEGIN, TimeUtil::SharpDayT( 0 , now));
-            GVAR.SetVar(GVAR_QISHIBANGAME_END, TimeUtil::SharpDayT( 5 , now));
+            GVAR.SetVar(GVAR_QISHIBANGAME_BEGIN, TimeUtil::SharpDayT( 0 , TimeUtil::Now()));
+            GVAR.SetVar(GVAR_QISHIBANGAME_END, TimeUtil::SharpDayT( 5 , TimeUtil::Now()));
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
             break;

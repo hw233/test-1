@@ -133,6 +133,7 @@ enum PurchaseType
     GuangGun                    = 122, //光棍
     Fund                        = 123, //基金消费
     RestStep                    = 124, //七石板重置
+    QSBAddTime                  = 125, //七石板加时
     //繁体私有占150～200
 };
 

@@ -896,6 +896,10 @@ void SendQiShiBanRank( GameMsgHdr& hdr,  const void* data )
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
 
+    UInt32 curPage = *(UInt32*)data;
+    if (!curPage)
+        return;
+
     UInt32 rank = 0;
     UInt32 myRank = 0;
     UInt32 myScore = 0;
@@ -912,17 +916,43 @@ void SendQiShiBanRank( GameMsgHdr& hdr,  const void* data )
 
     Stream st(REP::ACT);
     UInt32 cnt = World::qishibanScoreSort.size();
-    if (cnt > 10)
-        cnt = 10;
-    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << myRank << myScore << static_cast<UInt8>(cnt);
+    UInt32 totalPage = 0;
+
+    if(0 == cnt)
+        totalPage = 0;
+    else if(0 == cnt % 12)
+        totalPage = cnt / 12;
+    else
+        totalPage = cnt / 12 + 1;
+
+    if(curPage < totalPage)
+        cnt = 12;
+    else if(curPage == totalPage)
+        cnt = cnt - (curPage - 1) * 12;
+    else
+        return;
+
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << myRank << myScore << totalPage << curPage << static_cast<UInt8>(cnt);
     UInt32 c = 0;
+    UInt32 c1 = 0;
     for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
     {
-        st << static_cast<UInt8>(c + 1);
+        /*st << static_cast<UInt8>(c + 1);
         st << i->player->getName();
         st << i->total;
         ++c;
         if (c >= 10)
+            break;*/
+
+        if((c>=(curPage-1)*12) && (c<=(curPage*12)))
+        {
+            st << static_cast<UInt32>(c + 1);
+            st << i->player->getName();
+            st << i->total;
+            ++c1;
+        }
+        ++c;
+        if(c1 >= 12)
             break;
     }
     st << Stream::eos;

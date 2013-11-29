@@ -1918,19 +1918,22 @@ namespace GObject
        
         void QiShiBanState();
         void MyQSBInfo();
-        void OnQiShiBanRank();
+        void OnQiShiBanRank(UInt32 page);
         void ReqStartQSB();
         void FinishCurStep(int randMark, UInt32 time);
         void Fail();
         void AddTime();
-        void RestCurStep();
+        //void RestCurStep();
         void ContinueCurStep();
         void Update_QSB_DB();
         void CleanQiShiBan();
         void GetPersonalAward(UInt8 opt);
+        UInt32 GetNextStepTime();
         UInt32 GetQQFriendScore(const char * openId);
         bool CheckReqDataTime();
         void SetReqDataTime(UInt8 mark=1);
+        //bool CheckReqDataTime1();
+        //void SetReqDataTime1(UInt8 mark=1);
 
         void SetQiShiBanScore(UInt32 score) { m_qishiban.score = score; }
         void AddQiShiBanScore(UInt32 score) { m_qishiban.score += score; }
@@ -1956,6 +1959,8 @@ namespace GObject
         UInt32 GetQiShiBanAddTimeNum() const { return m_qishiban.addTimeNum; }
 
         UInt32  m_checkTime;
+        //UInt32  m_checkTime1;
+        UInt32  m_curPage;
         //七石斗法 end
 
         void setForbidSale(bool b, bool isAuto = false);

@@ -770,6 +770,8 @@ namespace GObject
         _mditem = 0;
         _qixiBinding = false;
         m_checkTime = 0;
+        m_curPage = 0;
+        //m_checkTime1 = 0;
 
         memset (m_domain, 0, sizeof(m_domain));
         memset (m_openid, 0, sizeof(m_openid));
@@ -24945,11 +24947,13 @@ void Player::QiShiBanState()
         else
             restNum = 0;
 
+        UInt32 time = GetQiShiBanEndTime() - _playerData.lastOnline;
+
         st << mark << static_cast<UInt16>(GetQiShiBanStep()) << GetQiShiBanScore() << static_cast<UInt8>(restNum) 
-            << GetQiShiBanAwardMark() << WORLD().GetMemCach_qishiban(getOpenId()) << Stream::eos;
+           << GetQiShiBanAwardMark() << time << WORLD().GetMemCach_qishiban(getOpenId()) << Stream::eos;
     }
     else
-        st << mark;
+        st << mark << Stream::eos;
 
     send(st);
 }
@@ -24959,13 +24963,6 @@ void Player::MyQSBInfo()
     if(!World::getQiShiBanTime())
         return;
 
-    /*UInt8 mark = 0;
-    if(0 == GetQiShiBanBeginTime() && 0 == GetQiShiBanEndTime())
-        mark = 1; // 未开始
-    else if((GetQiShiBanEndTime() > _playerData.lastOnline) && (GetQiShiBanBeginTime() < GetQiShiBanEndTime()))
-        mark = 2; // 继续（考虑玩家掉线可能）
-    else if(GetQiShiBanBeginTime() == GetQiShiBanEndTime())
-        mark = 3; // 重置*/
     UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
     if(0 == restNum)
         restNum = 3;
@@ -24976,19 +24973,23 @@ void Player::MyQSBInfo()
     else
         restNum = 0;
 
+    UInt32 addTime = GetNextStepTime();
+    UInt32 lastFailHighestScore = GetVar(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE); 
+
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x07) << static_cast<UInt16>(GetQiShiBanStep()) 
-        << GetQiShiBanScore() << static_cast<UInt8>(restNum) << GetQiShiBanAwardMark() << WORLD().GetMemCach_qishiban(getOpenId()) << Stream::eos;
+        << GetQiShiBanScore() << static_cast<UInt8>(restNum) << addTime << GetQiShiBanAwardMark() << WORLD().GetMemCach_qishiban(getOpenId()) << lastFailHighestScore << Stream::eos;
 
     send(st);
 }
 
-void Player::OnQiShiBanRank()
+void Player::OnQiShiBanRank(UInt32 page)
 {
     if(World::getQiShiBanTime())
     {
-        GameMsgHdr hdr(0x1D8, WORKER_THREAD_WORLD, this, 0);
-        GLOBAL().PushMsg(hdr, NULL);
+        m_curPage = page;
+        GameMsgHdr hdr(0x1D8, WORKER_THREAD_WORLD, this, sizeof(page));
+        GLOBAL().PushMsg(hdr, &page);
     }
 }
 
@@ -25000,31 +25001,69 @@ void Player::ReqStartQSB()
     if(GetQiShiBanStep() >= 999)
         return;
 
+    UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
+    if(restNum >= 3)
+    {
+        UInt8 useMoney = 10;
+        if(getCoupon() + getGold() >= useMoney)
+        {
+            ConsumeInfo ci(RestStep, 0, 0);
+            if(getCoupon() > 0)
+            {
+                if(getCoupon() < useMoney)
+                {
+                    useMoney -= getCoupon();
+                    useCoupon(getCoupon(), &ci);
+                }
+                else
+                {
+                    useCoupon(useMoney, &ci);
+                    useMoney = 0;
+                }
+            }
+
+            if(useMoney > 0)
+                useGold(useMoney, &ci);
+        }
+        else
+        {
+            sendMsgCode(0, 1101);
+            return;
+        }
+    }
+
     SetQiShiBanKey(uRand(100));
     int randValue = (GetQiShiBanKey() + 23) * 6 / 3 - 7;
 
-    UInt32 addTime = 0;
-    if(0 == GetQiShiBanStep())
-        addTime = 600;
-    else if(GetQiShiBanStep() < 10)
-        addTime = 300;
-    else if(GetQiShiBanStep() < 50)
-        addTime = 120;
-    else
-        addTime = 60;
-
+    UInt32 addTime = GetNextStepTime();
     SetQiShiBanBeginTime(TimeUtil::Now());
     SetQiShiBanEndTime(GetQiShiBanBeginTime() + addTime);
+   
+    AddVar(VAR_QISHIDOUFA_REST_NUM, 1);
+    ++restNum;
+
+    if(0 == restNum)
+        restNum = 3;
+    else if(1 == restNum)
+        restNum = 2;
+    else if(2 == restNum)
+        restNum = 1;
+    else
+        restNum = 0;
 
     Update_QSB_DB();
+
     Stream st(REP::ACT);
-    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x02) << randValue << addTime << Stream::eos;
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x02) << randValue << addTime << static_cast<UInt8>(restNum) << Stream::eos;
     send(st);
 }
 
 void Player::FinishCurStep(int randMark, UInt32 clintTime)
 {
     if(!World::getQiShiBanTime())
+        return;
+
+    if(GetQiShiBanStep() >= 999)
         return;
 
     if(GetQiShiBanKey() != static_cast<UInt16>((randMark - 22) / 4 + 77))
@@ -25086,12 +25125,24 @@ void Player::FinishCurStep(int randMark, UInt32 clintTime)
         highestScore = GetQiShiBanScore();
     }
 
+    UInt32 addTime = GetNextStepTime();
+
+    UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
+    if(0 == restNum)
+        restNum = 3;
+    else if(1 == restNum)
+        restNum = 2;
+    else if(2 == restNum)
+        restNum = 1;
+    else
+        restNum = 0;
+
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x03) << static_cast<UInt16>(GetQiShiBanStep()) << GetQiShiBanScore() 
-        << GetQiShiBanAwardMark() << highestScore << Stream::eos;
+       << addTime << GetQiShiBanAwardMark() << highestScore << static_cast<UInt8>(restNum) << Stream::eos;
     send(st);
 
-    OnQiShiBanRank();
+    OnQiShiBanRank(m_curPage);
 }
 
 void Player::Fail()
@@ -25104,6 +25155,7 @@ void Player::Fail()
     
     Update_QSB_DB();
     MyQSBInfo();
+    SetVar(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE, WORLD().GetMemCach_qishiban(getOpenId()));
 }
 
 void Player::AddTime()
@@ -25121,17 +25173,7 @@ void Player::AddTime()
     if(GetQiShiBanAddTimeNum() >= 5)
         mark = 1;
 
-    if(getCoupon() >= 1)
-    {
-        ConsumeInfo ci(RestStep, 0, 0);
-        useCoupon(1, &ci);
-    }
-    else if(getGold() >= 1)
-    {
-        ConsumeInfo ci(RestStep, 0, 0);
-        useGold(1, &ci);
-    }
-    else
+    if(0 == getCoupon() && 0 == getGold())
     {
         sendMsgCode(0, 1101);
         mark = 1;
@@ -25139,6 +25181,17 @@ void Player::AddTime()
 
     if(0 == mark)
     {
+        if(getCoupon() >= 1)
+        {
+            ConsumeInfo ci(QSBAddTime, 0, 0);
+            useCoupon(1, &ci);
+        }
+        else if(getGold() >= 1)
+        {
+            ConsumeInfo ci(QSBAddTime, 0, 0);
+            useGold(1, &ci);
+        }
+
         AddQiShiBanAddTimeNum();
         SetQiShiBanEndTime(GetQiShiBanEndTime() + 30);
         tempTime += 30;
@@ -25150,11 +25203,8 @@ void Player::AddTime()
     send(st);
 }
 
-void Player::RestCurStep()
+/*void Player::RestCurStep()
 {
-    if(!World::getQiShiBanTime())
-        return;
-    
     UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
 
     if(restNum >= 3)
@@ -25187,39 +25237,8 @@ void Player::RestCurStep()
         }
     }
 
-    SetQiShiBanKey(uRand(100));
-    UInt32 randValue = (GetQiShiBanKey() + 23) * 6 / 3 - 7; 
-
-    UInt32 addTime = 0;
-    if(0 == GetQiShiBanStep())
-        addTime = 600;
-    else if(GetQiShiBanStep() < 10)
-        addTime = 300;
-    else if(GetQiShiBanStep() < 50)
-        addTime = 120;
-    else
-        addTime = 60;
-
-    SetQiShiBanBeginTime(TimeUtil::Now());
-    SetQiShiBanEndTime(GetQiShiBanBeginTime() + addTime);
     AddVar(VAR_QISHIDOUFA_REST_NUM, 1);
-
-    restNum += 1;
-    if(0 == restNum)
-        restNum = 3;
-    else if(1 == restNum)
-        restNum = 2;
-    else if(2 == restNum)
-        restNum = 1;
-    else
-        restNum = 0;
-
-    Update_QSB_DB();
-
-    Stream st(REP::ACT);
-    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x05) << randValue << addTime << static_cast<UInt8>(restNum) << Stream::eos;
-    send(st);
-}
+}*/
 
 void Player::ContinueCurStep()
 {
@@ -25248,8 +25267,8 @@ void Player::GetPersonalAward(UInt8 opt)
 {
     if(opt > 0)
     {
-        UInt8 state = GetQiShiBanAwardMark();
-        UInt8 mark = GET_BIT_2(state, opt-1);
+        UInt16 state = GetQiShiBanAwardMark();
+        UInt8 mark = GET_BIT_2(state, (opt-1));
 
         if(1 == mark)
         {
@@ -25259,6 +25278,8 @@ void Player::GetPersonalAward(UInt8 opt)
                 {
                     if(GetQiShiBanScore() >= 100)
                         GetPackage()->AddItem(5053, 1, true, false, FromQiShiBan);
+                    else
+                        return;
                 }
                 break;
             case 2:
@@ -25268,6 +25289,8 @@ void Player::GetPersonalAward(UInt8 opt)
                         GetPackage()->AddItem(5053, 1, true, false, FromQiShiBan);
                         GetPackage()->AddItem(5033, 1, true, false, FromQiShiBan);
                     }
+                    else
+                        return;
                 }
                 break;
             case 3:
@@ -25279,6 +25302,8 @@ void Player::GetPersonalAward(UInt8 opt)
                         GetPackage()->AddItem(5013, 1, true, false, FromQiShiBan);
                         GetPackage()->AddItem(5023, 1, true, false, FromQiShiBan);
                     }
+                    else
+                        return;
                 }
                 break;
             case 4:
@@ -25290,25 +25315,47 @@ void Player::GetPersonalAward(UInt8 opt)
                         GetPackage()->AddItem(5013, 1, true, false, FromQiShiBan);
                         GetPackage()->AddItem(5023, 1, true, false, FromQiShiBan);
                     }
+                    else
+                        return;
                 }
                 break;
             case 5:
                 {
                     if(GetQiShiBanScore() >= 7300)
-                        GetPackage()->AddItem(5055, 1, true, false, FromQiShiBan);
+                        GetPackage()->AddItem(5005, 1, true, false, FromQiShiBan);
+                    else
+                        return;
                 }
                 break;
             }
 
-            UInt16 state = GetQiShiBanAwardMark();
             state = CLR_BIT(state, ((opt - 1) * 2));
             state = SET_BIT(state, ((opt - 1) * 2 + 1));
             SetQiShiBanAwardMark(state);
+            Update_QSB_DB();
         }
+        else
+            return;
+
         Stream st(REP::ACT);
         st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x09) << GetQiShiBanAwardMark() << Stream::eos;
         send(st);
     }
+}
+
+UInt32 Player::GetNextStepTime()
+{
+    UInt32 addTime = 0;
+    if(0 == GetQiShiBanStep())
+        addTime = 600;
+    else if(GetQiShiBanStep() < 10)
+        addTime = 300;
+    else if(GetQiShiBanStep() < 50)
+        addTime = 120;
+    else
+        addTime = 60;
+
+    return addTime;
 }
 
 void Player::Update_QSB_DB()
@@ -25338,7 +25385,7 @@ UInt32 Player::GetQQFriendScore(const char * openId)
 bool Player::CheckReqDataTime()
 {
     int time = TimeUtil::Now() - m_checkTime;
-    if(0 == m_checkTime || time > 60)
+    if(0 == m_checkTime || time > 30)
         return true;
 
     return false;
@@ -25351,6 +25398,23 @@ void Player::SetReqDataTime(UInt8 mark)
     else
         m_checkTime = TimeUtil::Now();
 }
+
+/*bool Player::CheckReqDataTime1()
+{
+    int time = TimeUtil::Now() - m_checkTime1;
+    if(0 == m_checkTime1 || time > 30)
+        return true;
+
+    return false;
+}
+
+void Player::SetReqDataTime1(UInt8 mark)
+{
+    if(0 == mark)
+        m_checkTime1 = 0;
+    else
+        m_checkTime1 = TimeUtil::Now();
+}*/
 
 void Player::setGGValue()
 {

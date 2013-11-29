@@ -1386,6 +1386,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
+    pl->QiShiBanState();
     if(atoi(pl->getDomain()) == 23)
     {
         if(!pl)
@@ -7453,7 +7454,11 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                         switch(index)
                         {
                             case 0:
-                                player->OnQiShiBanRank();
+                                {
+                                    UInt32 page = 0;
+                                    brd >> page;
+                                    player->OnQiShiBanRank(page);
+                                }
                                 break;
                             case 1:
                                 {
@@ -7484,10 +7489,8 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                         break;
                     }
                 case 0x02:
-                    {
-                        player->ReqStartQSB();
-                        break;
-                    }
+                    player->ReqStartQSB();
+                    break;
                 case 0x03:
                     {
                         int randMark = 0;
@@ -7495,50 +7498,45 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                         brd >> randMark;
                         brd >> time;
                         player->FinishCurStep(randMark, time);
-                        break;
                     }
+                    break;
                 case 0x04:
-                    {
-                        player->AddTime();
-                        break;
-                    }
-                case 0x05:
-                    {
-                        player->RestCurStep();
-                        break;
-                    }
+                    player->AddTime();
+                    break;
                 case 0x06:
                     {
                         player->Fail(); //时间到，失败
-                        break;
+
+                        Stream st(REP::ACT);
+                        st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x06) << Stream::eos;
+                        player->send(st);
                     }
+                    break;
                 case 0x07:
-                    {
-                        player->MyQSBInfo();
-                        break;
-                    }
+                    player->MyQSBInfo();
+                    break;
                 case 0x08:
-                    {
-                        player->ContinueCurStep();
-                        break;
-                    }
+                    player->ContinueCurStep();
+                    break;
                 case 0x09:
                     {
                         UInt8 state = 0;
                         brd >> state;
                         player->GetPersonalAward(state);
-                        break;
                     }
+                    break;
                 case 0x10:
                     {
                         player->Fail(); //主动放弃，失败
+
+                        Stream st(REP::ACT);
+                        st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x10) << Stream::eos;
+                        player->send(st);
                         break;
                     }
                 case 0x11:
-                    {
-                        player->QiShiBanState();
-                        break;
-                    }
+                    player->QiShiBanState();
+                    break;
                 default:
                     break;
             }

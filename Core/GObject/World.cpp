@@ -3494,6 +3494,7 @@ void World::SetMemCach_qishiban(UInt32 score, const char * openId)
         size_t len = snprintf(key, sizeof(key), "qishiban_%s", openId);
         size_t vlen = snprintf(value, sizeof(value), "%d", score);
 
+        TRACE_LOG("setkey: %s, setvalue: %u", key, value);
         m_MCached.set(key, len, value, vlen, 0);
     }
 }
@@ -3507,6 +3508,7 @@ UInt32 World::GetMemCach_qishiban(const char * openId)
     if (_memcinited)
         m_MCached.get(key, sizeof(key), value, sizeof(value));
     UInt32 score = atoi(value);
+    TRACE_LOG("getkey: %s, getvalue: %u", key, value);
 
     return score;
 }
