@@ -720,7 +720,8 @@ void Tianjie::onTianjieReq( GameMsgHdr& hdr, const void* data)
         UInt8 id = 0;
         br >> cmd;
         br >> id;
-        pl->OnDoTianjieTask(type, cmd, id);
+        if(!(m_isTjExecute && 5 == m_currTjRate))
+            pl->OnDoTianjieTask(type, cmd, id);
     }
 }
 void Tianjie::notifyTianjieStatus(Player* pl)

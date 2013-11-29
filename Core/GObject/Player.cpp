@@ -16964,7 +16964,10 @@ namespace GObject
                         SetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME, TimeUtil::Now());
                     UInt32 now = TimeUtil::Now();
                     if(TimeUtil::SharpDay(0, now) != TimeUtil::SharpDay(0, GetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME)))
+                    {
                         SetVar(VAR_TJ_TASK3_COPYID, 0);
+                        SetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME, now);
+                    }
 
                     if (GetVar(VAR_TJ_TASK3_COPYID) >= 51)
                     {
@@ -17134,6 +17137,7 @@ namespace GObject
             if(TimeUtil::SharpDay(0, now) != TimeUtil::SharpDay(0, GetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME)))
             {
                 SetVar(VAR_TJ_TASK3_COPYID, 0);
+                SetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME, now);
                 finish = 0;
                 copyid = 0;
             }
@@ -17384,7 +17388,10 @@ void EventTlzAuto::Process(UInt32 leftCount)
         m_Player->delFlag(Player::AutoTlz);
         UInt32 now = TimeUtil::Now();
         if(TimeUtil::SharpDay(0, now) != TimeUtil::SharpDay(0, m_Player->GetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME)))
+        {
             m_Player->SetVar(VAR_TJ_TASK3_COPYID, 0);
+            m_Player->SetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME, TimeUtil::Now());
+        }
     }
 }
 
