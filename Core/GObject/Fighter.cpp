@@ -7075,7 +7075,7 @@ float Fighter::getAcupointsGoldAttr(UInt8 attrId)
     const GData::AcuPraGold* pap = GData::acupraGoldManager[idx<<8|v];
     if(!pap)
         return 0;
-    if(pap->attrValue != 0)
+    //if(pap->attrValue != 0)
         //std::cout<<_owner->getName()<<"的"<<getName()<< "的暴击伤害减免:"<<pap->attrValue/100<<std::endl;
     if(pap->attrNum != attrId)
         return 0;
