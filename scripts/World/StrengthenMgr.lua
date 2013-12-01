@@ -354,6 +354,9 @@ function do11Grade(player, id, param1, param2)
     if as == nil then
         return;
     end
+    if dayTask == nil then
+        return;
+    end
     mgr:CheckTimeOver();
     --判断标志位
     local curflag = mgr:GetFlag(id);
