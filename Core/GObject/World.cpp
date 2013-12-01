@@ -3274,7 +3274,7 @@ void World::Send11PlayerRankAward()
         {{509,25},{515,25},{503,50},{134,25},{9022,30}},
         {{509,20},{515,20},{503,40},{134,20},{9022,20}},
     };
-    static MailPackage::MailItem card = {9922,1};
+   // static MailPackage::MailItem card = {9922,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -3289,8 +3289,8 @@ void World::Send11PlayerRankAward()
         if(mail)
         {
             mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
-            if(pos ==1)
-                mailPackageManager.push(mail->id, &card, 1, true);
+//            if(pos ==1)
+  //              mailPackageManager.push(mail->id, &card, 1, true);
         }
     }
 }
