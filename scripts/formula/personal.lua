@@ -568,7 +568,7 @@ function calcTough( fgt, defgt )
     local cls = fgt:getClass(0)
     local tough = fgt:getBaseTough()
     local toughlvl = calcToughLevel(fgt)
-    return tough + fgt:getExtraTough()*100 + toughlvl/(toughlvl + toughlvl_factor*deflev + toughlvl_addon_factor)*100
+    return tough + fgt:getExtraTough() + toughlvl/(toughlvl + toughlvl_factor*deflev + toughlvl_addon_factor)*100
 end
 
 function calcBattlePoint(fgt)
