@@ -25006,9 +25006,17 @@ void Player::MyQSBInfo()
         highestScore = GetQiShiBanScore();
     }
 
+    UInt8 mark = 0;
+    if(GetQiShiBanBeginTime() == GetQiShiBanEndTime()
+            && 0 != GetQiShiBanBeginTime()
+            && 0 != GetQiShiBanEndTime())
+    {
+        mark = 1;
+    }
+
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x07) << static_cast<UInt16>(GetQiShiBanStep()) 
-        << GetQiShiBanScore() << static_cast<UInt8>(restNum) << addTime << GetQiShiBanAwardMark() << highestScore << lastFailHighestScore << Stream::eos;
+        << GetQiShiBanScore() << static_cast<UInt8>(restNum) << addTime << GetQiShiBanAwardMark() << highestScore << lastFailHighestScore << mark << Stream::eos;
 
     send(st);
 }
@@ -25031,45 +25039,6 @@ void Player::ReqStartQSB()
     if(GetQiShiBanStep() >= 999)
         return;
 
-    UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
-
-    if(GetQiShiBanBeginTime() == GetQiShiBanEndTime()
-            && 0 != GetQiShiBanBeginTime()
-            && 0 != GetQiShiBanEndTime())
-    {
-        if(restNum >= 3)
-        {
-            UInt8 useMoney = 10;
-            if(getCoupon() + getGold() >= useMoney)
-            {
-                ConsumeInfo ci(RestStep, 0, 0);
-                if(getCoupon() > 0)
-                {
-                    if(getCoupon() < useMoney)
-                    {
-                        useMoney -= getCoupon();
-                        useCoupon(getCoupon(), &ci);
-                    }
-                    else
-                    {
-                        useCoupon(useMoney, &ci);
-                        useMoney = 0;
-                    }
-                }
-
-                if(useMoney > 0)
-                    useGold(useMoney, &ci);
-            }
-            else
-            {
-                sendMsgCode(0, 1101);
-                return;
-            }
-        }
-        AddVar(VAR_QISHIDOUFA_REST_NUM, 1);
-        ++restNum;
-    }
-
     SetQiShiBanKey(uRand(100));
     int randValue = (GetQiShiBanKey() + 23) * 6 / 3 - 7;
 
@@ -25077,6 +25046,7 @@ void Player::ReqStartQSB()
     SetQiShiBanBeginTime(TimeUtil::Now());
     SetQiShiBanEndTime(GetQiShiBanBeginTime() + addTime);
 
+    UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
     if(0 == restNum)
         restNum = 3;
     else if(1 == restNum)
@@ -25198,6 +25168,9 @@ void Player::AddTime()
     if(!World::getQiShiBanTime())
         return;
 
+    if(!hasChecked())
+        return;
+
     UInt8 mark = 0;
     UInt32 tempTime = 0;
     if(GetQiShiBanEndTime() > TimeUtil::Now())
@@ -25238,42 +25211,58 @@ void Player::AddTime()
     send(st);
 }
 
-/*void Player::RestCurStep()
+void Player::RestCurStep()
 {
-    UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
+    if(!World::getQiShiBanTime())
+        return;
 
-    if(restNum >= 3)
+    if(GetQiShiBanStep() >= 999)
+        return;
+
+    if(GetQiShiBanBeginTime() == GetQiShiBanEndTime()
+            && 0 != GetQiShiBanBeginTime()
+            && 0 != GetQiShiBanEndTime())
     {
-        UInt8 useMoney = 10;
-        if(getCoupon() + getGold() >= useMoney)
+        UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
+
+        if(restNum >= 3)
         {
-            ConsumeInfo ci(RestStep, 0, 0);
-            if(getCoupon() > 0)
+            if(!hasChecked())
+                return;
+
+            UInt8 useMoney = 10;
+            if(getCoupon() + getGold() >= useMoney)
             {
-                if(getCoupon() < useMoney)
+                ConsumeInfo ci(RestStep, 0, 0);
+                if(getCoupon() > 0)
                 {
-                    useMoney -= getCoupon();
-                    useCoupon(getCoupon(), &ci);
+                    if(getCoupon() < useMoney)
+                    {
+                        useMoney -= getCoupon();
+                        useCoupon(getCoupon(), &ci);
+                    }
+                    else
+                    {
+                        useCoupon(useMoney, &ci);
+                        useMoney = 0;
+                    }
                 }
-                else
-                {
-                    useCoupon(useMoney, &ci);
-                    useMoney = 0;
-                }
+
+                if(useMoney > 0)
+                    useGold(useMoney, &ci);
             }
-
-            if(useMoney > 0)
-                useGold(useMoney, &ci);
+            else
+            {
+                sendMsgCode(0, 1101);
+                return;
+            }
         }
-        else
-        {
-            sendMsgCode(0, 1101);
-            return;
-        }
+        AddVar(VAR_QISHIDOUFA_REST_NUM, 1);
     }
-
-    AddVar(VAR_QISHIDOUFA_REST_NUM, 1);
-}*/
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x12) << Stream::eos;
+    send(st);
+}
 
 void Player::ContinueCurStep()
 {
@@ -25319,7 +25308,7 @@ void Player::GetPersonalAward(UInt8 opt)
                 break;
             case 2:
                 {
-                    if(GetQiShiBanScore() >= 900)
+                    if(GetQiShiBanScore() >= 1650)
                     {
                         GetPackage()->AddItem(5053, 1, true, false, FromQiShiBan);
                         GetPackage()->AddItem(5033, 1, true, false, FromQiShiBan);
@@ -25330,12 +25319,10 @@ void Player::GetPersonalAward(UInt8 opt)
                 break;
             case 3:
                 {
-                    if(GetQiShiBanScore() >= 2500)
+                    if(GetQiShiBanScore() >= 3200)
                     {
-                        GetPackage()->AddItem(5053, 1, true, false, FromQiShiBan);
-                        GetPackage()->AddItem(5003, 1, true, false, FromQiShiBan);
-                        GetPackage()->AddItem(5013, 1, true, false, FromQiShiBan);
-                        GetPackage()->AddItem(5023, 1, true, false, FromQiShiBan);
+                        GetPackage()->AddItem(5054, 1, true, false, FromQiShiBan);
+                        GetPackage()->AddItem(5014, 1, true, false, FromQiShiBan);
                     }
                     else
                         return;
@@ -25343,12 +25330,9 @@ void Player::GetPersonalAward(UInt8 opt)
                 break;
             case 4:
                 {
-                    if(GetQiShiBanScore() >= 4100)
+                    if(GetQiShiBanScore() >= 4800)
                     {
-                        GetPackage()->AddItem(5053, 1, true, false, FromQiShiBan);
-                        GetPackage()->AddItem(5003, 1, true, false, FromQiShiBan);
-                        GetPackage()->AddItem(5013, 1, true, false, FromQiShiBan);
-                        GetPackage()->AddItem(5023, 1, true, false, FromQiShiBan);
+                        GetPackage()->AddItem(5055, 1, true, false, FromQiShiBan);
                     }
                     else
                         return;
@@ -25356,8 +25340,8 @@ void Player::GetPersonalAward(UInt8 opt)
                 break;
             case 5:
                 {
-                    if(GetQiShiBanScore() >= 7300)
-                        GetPackage()->AddItem(5005, 1, true, false, FromQiShiBan);
+                    if(GetQiShiBanScore() >= 8000)
+                        GetPackage()->AddItem(5006, 1, true, false, FromQiShiBan);
                     else
                         return;
                 }

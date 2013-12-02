@@ -1923,7 +1923,7 @@ namespace GObject
         void FinishCurStep(int randMark, UInt32 time);
         void Fail();
         void AddTime();
-        //void RestCurStep();
+        void RestCurStep();
         void ContinueCurStep();
         void Update_QSB_DB();
         void CleanQiShiBan();

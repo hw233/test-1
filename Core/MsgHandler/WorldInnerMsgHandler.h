@@ -919,7 +919,7 @@ void SendQiShiBanRank( GameMsgHdr& hdr,  const void* data )
     UInt32 totalPage = 0;
 
     if(0 == cnt)
-        totalPage = 0;
+        totalPage = 1;
     else if(0 == cnt % 12)
         totalPage = cnt / 12;
     else
@@ -929,8 +929,6 @@ void SendQiShiBanRank( GameMsgHdr& hdr,  const void* data )
         cnt = 12;
     else if(curPage == totalPage)
         cnt = cnt - (curPage - 1) * 12;
-    else
-        return;
 
     st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << myRank << myScore << totalPage << curPage << static_cast<UInt8>(cnt);
     UInt32 c = 0;

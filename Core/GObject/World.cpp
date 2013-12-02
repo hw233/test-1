@@ -3337,19 +3337,18 @@ void World::SendQiShiBanAward()
 {
     World::initRCRank();
     int pos = 0;
-    UInt8 len = 0;
 
     static MailPackage::MailItem s_item[][3] = {
-        {{5065,1},{5105,1},{5085,1}},
-        {{5065,1},{5105,1},{5055,1}},
-        {{5065,1},{5105,1}},
-        {{5005,1},{5015,1},{5025,1}},
-        {{5005,1},{5015,1},{1325,1}},
-        {{1325,4}},
-        {{1325,3},{5063,1},{5053,1}},
-        {{1325,2},{5063,1}},
-        {{1325,2},{5053,1}},
-        {{1325,2}},
+        {{1325,10},{5057,1}},
+        {{1325,9},{5056,1}},
+        {{1325,8},{5055,1}},
+        {{1325,5},{5054,3}},
+        {{1325,5},{5054,2}},
+        {{1325,5},{5054,1}},
+        {{1325,4},{5053,3}},
+        {{1325,4},{5053,2}},
+        {{1325,4},{5053,1}},
+        {{1325,3},{5053,1}},
     };
 
     SYSMSG(title, 4972);
@@ -3364,14 +3363,7 @@ void World::SendQiShiBanAward()
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
         {
-            if(pos == 3 || pos == 8 || pos == 9)
-                len = 2;
-            else if(pos == 6 || pos == 10)
-                len = 1;
-            else
-                len = 3;
-
-            mailPackageManager.push(mail->id, s_item[pos-1], len, true);
+            mailPackageManager.push(mail->id, s_item[pos-1], 2, true);
         }
     }
 }

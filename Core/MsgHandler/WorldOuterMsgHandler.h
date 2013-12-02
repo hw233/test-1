@@ -2929,6 +2929,9 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     case 0x11:
                         player->QiShiBanState();
                         break;
+                    case 0x12:
+                        player->RestCurStep();
+                        break;
                     default:
                         break;
                 }
