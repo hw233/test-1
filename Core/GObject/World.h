@@ -546,7 +546,7 @@ public:
         UInt32 now = TimeUtil::Now() ;
         if(time !=0)
             now = time;
-        if(now < (_11timeBegin) || now > _11timeEnd )
+        if(now < (_11timeBegin) || now >= _11timeEnd )
             return -1;
        return (TimeUtil::SharpDay(0, now) - _11timeBegin )/86400+1; 
     }

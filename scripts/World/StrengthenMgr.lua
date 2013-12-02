@@ -188,7 +188,8 @@ end
 --增加变强之魂
 function doStrong(player, id, param1, param2)
     local num = get11TimeNum();
-    if num > 0 and num < 12 then
+    print(num)
+    if num > 0 and num < 6 then
         -- XXX: 这是一个不应该出现的BUG
         if id == 16 then
             checkFlag[id] = 3
@@ -346,7 +347,7 @@ end
 
 function do11Grade(player, id, param1, param2)
     local mgr = player:GetStrengthenMgr();
-    if param1 > 11 or param1==0 then 
+    if param1 > 5 or param1==0 then 
         return ;
     end
     local dayTask = grade11[param1];
