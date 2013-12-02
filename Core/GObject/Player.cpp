@@ -17381,7 +17381,8 @@ EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 void EventTlzAuto::Process(UInt32 leftCount)
 {
     bool forceCancel = false;
-    if(GObject::Tianjie::instance().isFinish() || (GObject::Tianjie::instance().isTjExecute() && (4 == GObject::Tianjie::instance().getTjCurRate() || 5 == GObject::Tianjie::instance().getTjCurRate())))
+    int curRate = GObject::Tianjie::instance().getTjCurRate();
+    if((GObject::Tianjie::instance().isFinish() && (5 == curRate || 0 == curRate)) || (GObject::Tianjie::instance().isTjExecute() && (4 == curRate || 5 == curRate)))
         forceCancel = true;
     else
     {
