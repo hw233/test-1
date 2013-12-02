@@ -25107,17 +25107,33 @@ void Player::FinishCurStep(int randMark, UInt32 clintTime)
     GameMsgHdr hdr(0x1D7, WORKER_THREAD_WORLD, this, sizeof(totalScore));
     GLOBAL().PushMsg(hdr, &totalScore);
 
+    udpLog("qishidoufa", "F_131203_1", "", "", "", "", "act");
     UInt8 mark = 0;
     if(GetQiShiBanScore() >= 100 && (GetQiShiBanScore() - score) < 100)
+    {
         mark = 1;
+        udpLog("qishidoufa", "F_131203_2", "", "", "", "", "act");
+    }
     else if(GetQiShiBanScore() >= 1650 && (GetQiShiBanScore() - score) < 1650)
+    {
         mark = 2;
+        udpLog("qishidoufa", "F_131203_3", "", "", "", "", "act");
+    }
     else if(GetQiShiBanScore() >= 3200 && (GetQiShiBanScore() - score) < 3200)
+    {
         mark = 3;
+        udpLog("qishidoufa", "F_131203_4", "", "", "", "", "act");
+    }
     else if(GetQiShiBanScore() >= 4800 && (GetQiShiBanScore() - score) < 4800)
+    {
         mark = 4;
+        udpLog("qishidoufa", "F_131203_5", "", "", "", "", "act");
+    }
     else if(GetQiShiBanScore() >= 8000 && (GetQiShiBanScore() - score) < 8000)
+    {
         mark = 5;
+        udpLog("qishidoufa", "F_131203_6", "", "", "", "", "act");
+    }
 
     if(mark > 0)
         SetQiShiBanAwardMark(SET_BIT(GetQiShiBanAwardMark(), (mark-1)*2));
@@ -25290,13 +25306,31 @@ void Player::ContinueCurStep()
 
 void Player::GetPersonalAward(UInt8 opt)
 {
-    if(opt > 0)
+    if(opt > 0 && opt <= 5)
     {
         UInt16 state = GetQiShiBanAwardMark();
         UInt8 mark = GET_BIT_2(state, (opt-1));
 
         if(1 == mark)
         {
+            bool res = 0;
+            if(2 == opt || 3 == opt)
+            {
+                if(GetPackage()->GetRestPackageSize() < 3)
+                    res = true;
+            }
+            else
+            {
+                if(GetPackage()->GetRestPackageSize() < 2)
+                    res = true;
+            }
+
+            if(res)
+            {
+                sendMsgCode(0, 1011);
+                return;
+            }
+
             switch(opt)
             {
             case 1:
