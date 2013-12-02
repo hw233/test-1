@@ -115,6 +115,14 @@ function loadStore()
 
         discount(store)
 
+    if getSurnameLegend(30) then
+        --store:add(2 ,9383 , 20)
+        --store:add(2 ,9397, 20)
+        --store:add(2 ,9401, 20)
+        --store:add(2 ,9422, 20)
+        store:add(2 ,9437, 20)
+    end
+
     if getKillMonsterAct() then
         store:add(2, 9416, 10)
     end
@@ -161,13 +169,13 @@ function loadStore()
             store:add(2 ,9375 ,20)
         end
         
-        if getSurnameLegend(30) then
+        --if getSurnameLegend(30) then
             --store:add(2 ,9383 , 20)
             --store:add(2 ,9397, 20)
             --store:add(2 ,9401, 20)
             --store:add(2 ,9422, 20)
-            store:add(2 ,9437, 20)
-        end
+            --store:add(2 ,9437, 20)
+        --end
 
         if is2013_0201_0228() then
             store:add(2, 1711, 599) --爆竹
