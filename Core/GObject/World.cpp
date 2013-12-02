@@ -3330,6 +3330,15 @@ void World::Send11PlayerRankAward()
 //            if(pos ==1)
   //              mailPackageManager.push(mail->id, &card, 1, true);
         }
+        std::string strItems;
+        for(int index = 0; index < 5; ++ index)
+        {
+            strItems += Itoa(s_item[pos-1][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[pos-1][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
     }
 }
 
@@ -3476,6 +3485,15 @@ void World::Send11CountryRankAward()
         {
              mailPackageManager.push(mail->id, s_item[0], 5, true); 
         }
+        std::string strItems;
+        for(int index = 0; index <5; ++ index)
+        {
+            strItems += Itoa(s_item[0][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[0][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
     }
 }
 
