@@ -97,6 +97,11 @@ namespace GData
 			fprintf(stderr, "Load AcuPra Error !\n");
             std::abort();
 		}
+		if (!LoadAreaData())
+		{
+			fprintf(stderr, "Load AreaData Error !\n");
+            std::abort();
+		}
 		if (!LoadAcuPraGoldData())
 		{
 			fprintf(stderr, "Load AcuPraGoldData  Error !\n");
