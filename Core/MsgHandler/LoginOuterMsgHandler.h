@@ -420,6 +420,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             {
                 player->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
             }
+            player->SetReqDataTime(0);
+            //player->SetReqDataTime1(0);
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -3190,6 +3192,11 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_SUMMERFLOW_AWARD, 0);
             }
             break;
+        case 9:
+            {
+                pl->CleanQiShiBan();
+            }
+            break;
         default:
             return false;
     }
@@ -3568,6 +3575,17 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAME_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAME_END, end);
         ret = 1;
+    }
+    else if (type == 9 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_QISHIBANGAME_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_QISHIBANGAME_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 9);
+        }
+
+        GObject::GVAR.SetVar(GObject::GVAR_QISHIBANGAME_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_QISHIBANGAME_END, end);
     }
     else if (type == 10 && begin <= end )
     {

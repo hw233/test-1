@@ -10,6 +10,7 @@
 #endif
 #include "ArenaConn.h"
 #include "ServerWarConn.h"
+//#include "SocialConn.h"
 #include "TcpServer.h"
 #include "Common/Stream.h"
 
@@ -55,6 +56,16 @@ namespace Network
                 if(sock < 0)
                     return NULL;
 				return new(std::nothrow) ServerWarConn(sock, s, id);
+            /*
+			case -3:
+				if(!SocialConn::enabled())
+					return NULL;
+                sock = socket( AF_INET, SOCK_STREAM, 0 );
+                printf("FD %s: %u\n", __PRETTY_FUNCTION__, sock);
+                if(sock < 0)
+                    return NULL;
+				return new(std::nothrow) SocialConn(sock, s, id);
+            */
 			default:
 				return NULL;
 			}
@@ -118,6 +129,12 @@ namespace Network
 				return;
 			m_TcpService->closeConn(-2);
 		}
+		/*inline void CloseSocial()
+		{
+			if(!m_Active)
+				return;
+			m_TcpService->closeConn(-3);
+		}*/
 
 		inline TcpConnection GetConn(int sessionID)
 		{
@@ -139,6 +156,7 @@ namespace Network
 
 		void SendToArena(Stream& st);
 		void SendToServerWar(Stream& st);
+		//void SendToSocial(Stream& st);
 
 		void Broadcast(const void *, int);
 		template <typename PredType>
@@ -244,6 +262,18 @@ namespace Network
 		}
 		conn->send(&st[0], st.size());
 	}
+	/*inline void TcpServerWrapper::SendToSocial(Stream& st)
+	{
+		if(!m_Active)
+			return;
+		if (st.size() <= 0) return ;
+		TcpConnection conn = m_TcpService->findConn(-3);
+		if(conn.get() == NULL)
+		{
+			return;
+		}
+		conn->send(&st[0], st.size());
+	}*/
 
 	inline void TcpServerWrapper::Broadcast( const void * buffer, int size )
 	{

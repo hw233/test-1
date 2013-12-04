@@ -103,7 +103,7 @@ UInt8 EliminationBattle::winCount(UInt8 idx)
 Arena arena;
 
 Arena::Arena():
-	_loaded(false), _notified(0), _session(0), _progress(0), _status(0), _round(0), _nextTime(0)
+	_loaded(false), _notified(0), _session(0), _progress(e_progress_nextbegin), _status(0), _round(0), _nextTime(0)
 {
 	memset(_playerCount, 0, sizeof(_playerCount));
 	memset(_winnerColor, 0, sizeof(_winnerColor));
@@ -771,6 +771,8 @@ void Arena::readFrom( BinaryReader& brd )
 		_notified = 0;
         fStatus = true;
 	}
+    if(_progress != e_progress_nextbegin)
+        GObject::World::setArenaState(GObject::ARENA_XIANJIE_DIYI);
 
 	switch(_progress)
 	{
@@ -839,7 +841,6 @@ void Arena::readFrom( BinaryReader& brd )
             readPrePlayers(brd);
             readHistories(brd);
         }
-
 
         bool oldstatus = (_status > 0);
         readElimination(brd);

@@ -1478,7 +1478,6 @@ void OnArenaConnected( ArenaMsgHdr& hdr, const void * data )
     if(!fhaslater)
     {
         BinaryReader brd2((UInt8*)(GObject::arena._readbuf), GObject::arena._readbuf.size());
-        GObject::World::setArenaState(GObject::ARENA_XIANJIE_DIYI);
         GObject::arena.readFrom(brd2);
         GObject::arena._readbuf.clear();
     }
@@ -2939,7 +2938,6 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         break;
         case 0x22:  // 光棍节活动
         {
-            
             if( ! WORLD().getGGTime() )
                 break;
 
@@ -2947,6 +2945,116 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             GLOBAL().PushMsg(hdr, (void*)data);
             break;
         }
+        break;
+        case 0x23:  // 七石斗法活动
+        {
+            if(!WORLD().getQiShiBanTime())
+                break;
+
+            brd >> op;
+            if(0x09 == op) //包裹相关国家线程处理
+            {
+                hdr.msgHdr.desWorkerID = player->getThreadId();
+                GLOBAL().PushMsg(hdr, (void*)data);
+                break;
+            }
+            else
+            {
+                switch (op)
+                {
+                    case 0x01:
+                        {
+                            UInt8 index = 0;
+                            brd >> index;
+                            switch(index)
+                            {
+                                case 0:
+                                    {
+                                        UInt32 page = 0;
+                                        brd >> page;
+                                        player->OnQiShiBanRank(page);
+                                    }
+                                    break;
+                                    case 1:
+                                    {
+                                        if(!player->CheckReqDataTime())
+                                            return;
+
+                                        UInt16 count = 0;
+                                        brd >> count;
+                                        
+                                        Stream st(REP::ACT);
+                                        st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(1);
+                                        st << count;
+
+                                        for(UInt32 i=0; i<count; i++)
+                                        {
+                                            std::string openId;
+                                            openId.clear();
+                                            brd >> openId;
+                                            UInt32 score = player->GetQQFriendScore(openId.c_str());
+                                            st << score;
+                                        }
+                                        st << Stream::eos;
+                                        player->send(st);
+
+                                        player->SetReqDataTime();
+                                    }
+                                    break;
+                            }
+                            break;
+                        }
+                    case 0x02:
+                        player->ReqStartQSB();
+                        break;
+                    case 0x03:
+                        {
+                            int randMark = 0;
+                            UInt32 time = 0;
+                            brd >> randMark;
+                            brd >> time;
+                            player->FinishCurStep(randMark, time);
+                        }
+                        break;
+                    case 0x04:
+                        player->AddTime();
+                        break;
+                    case 0x06:
+                        {
+                            player->Fail(); //时间到，失败
+
+                            Stream st(REP::ACT);
+                            st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x06) << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
+                    case 0x07:
+                        player->MyQSBInfo();
+                        break;
+                    case 0x08:
+                        player->ContinueCurStep();
+                        break;
+                    case 0x10:
+                        {
+                            player->Fail(); //主动放弃，失败
+
+                            Stream st(REP::ACT);
+                            st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x10) << Stream::eos;
+                            player->send(st);
+                            break;
+                        }
+                    case 0x11:
+                        player->QiShiBanState();
+                        break;
+                    case 0x12:
+                        player->RestCurStep();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        break;
         default:
             break;
     }
@@ -3245,7 +3353,6 @@ void OnTeamArenaConnected( ArenaMsgHdr& hdr, const void * data )
     if(!fhaslater)
     {
         BinaryReader brd2((UInt8*)(GObject::teamArenaMgr._readbuf), GObject::teamArenaMgr._readbuf.size());
-        GObject::World::setArenaState(GObject::ARENA_XIANJIE_ZHIZUN);
         GObject::teamArenaMgr.readFrom(brd2);
         GObject::teamArenaMgr._readbuf.clear();
     }
@@ -3310,7 +3417,6 @@ void OnServerWarConnected( ServerWarMsgHdr& hdr, const void * data )
     if(!fhaslater)
     {
         BinaryReader brd2((UInt8*)(GObject::serverWarMgr._readbuf), GObject::serverWarMgr._readbuf.size());
-        GObject::World::setArenaState(GObject::ARENA_XIANJIE_CHUANQI);
 	    GObject::serverWarMgr.readFrom(brd2);
         GObject::serverWarMgr._readbuf.clear();
     }

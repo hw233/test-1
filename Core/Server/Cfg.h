@@ -164,6 +164,7 @@ public:
     inline void setAutoForbid(bool v) { autoForbid = v; }
     inline void setAutoKick(bool v) { autoKick = v; }
 
+    inline bool isTestServer() { return isTestPlatform; }  //true为内测区
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {

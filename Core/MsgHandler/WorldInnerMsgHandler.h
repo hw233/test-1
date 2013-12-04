@@ -866,6 +866,98 @@ void SendRechargeRank(Stream& st)
     SyncToLogin4IDIP();
 }
 
+void SetQiShiBanRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *(UInt32*)data;
+    if (!total)
+        return;
+
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            World::qishibanScoreSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::qishibanScoreSort.insert(s);
+}
+
+void SendQiShiBanRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 curPage = *(UInt32*)data;
+    if (!curPage)
+        return;
+
+    UInt32 rank = 0;
+    UInt32 myRank = 0;
+    UInt32 myScore = 0;
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        rank++;
+        if (i->player == player)
+        {
+            myScore = i->total;
+            myRank = rank;
+            break;
+        }
+    }
+
+    Stream st(REP::ACT);
+    UInt32 cnt = World::qishibanScoreSort.size();
+    UInt32 totalPage = 0;
+
+    if(0 == cnt)
+        totalPage = 1;
+    else if(0 == cnt % 12)
+        totalPage = cnt / 12;
+    else
+        totalPage = cnt / 12 + 1;
+
+    if(curPage < totalPage)
+        cnt = 12;
+    else if(curPage == totalPage)
+        cnt = cnt - (curPage - 1) * 12;
+
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << myRank << myScore << totalPage << curPage << static_cast<UInt8>(cnt);
+    UInt32 c = 0;
+    UInt32 c1 = 0;
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        /*st << static_cast<UInt8>(c + 1);
+        st << i->player->getName();
+        st << i->total;
+        ++c;
+        if (c >= 10)
+            break;*/
+
+        if((c>=(curPage-1)*12) && (c<=(curPage*12)))
+        {
+            st << static_cast<UInt32>(c + 1);
+            st << i->player->getName();
+            st << i->total;
+            ++c1;
+        }
+        ++c;
+        if(c1 >= 12)
+            break;
+    }
+    st << Stream::eos;
+    player->send(st);
+}
+
 void SendLuckyBagRank(Stream& st)
 {
     using namespace GObject;
@@ -1035,6 +1127,60 @@ void OnRechargeRank ( GameMsgHdr& hdr,  const void* data )
         NETWORK()->Broadcast(st);
     }
 }
+
+/*void OnQiShiBanRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= 10)
+                inrank = true;
+            World::qishibanScoreSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::qishibanScoreSort.insert(s);
+
+    UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        if (!stop)
+            ++myrank;
+
+        if (i->player == player)
+            stop = true;
+
+        ++rank;
+
+        Stream st(REP::ACT);
+        st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+        i->player->send(st);
+    }
+
+    if (oldrank <= 10 || (!inrank && myrank <= 10))
+    {
+        Stream st;
+        SendQiShiBanRank(st);
+        NETWORK()->Broadcast(st);
+    }
+}*/
 
 void OnLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
 {
@@ -1381,6 +1527,29 @@ void OnSendRechargeRank ( GameMsgHdr& hdr,  const void* data )
         }
     }
 }
+
+/*void OnSendQiShiBanRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+    Stream st;
+    //SendQiShiBanRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
+}*/
 
 void OnSendLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
 {

@@ -533,6 +533,7 @@ void TcpMasterServer::onTimerCheck()
     {
 		_workers[0]->initConnection(1);
 		_workers[0]->initConnection(2);
+		//_workers[0]->initConnection(3);
     }
 	else
 		event_base_loopbreak(_ev_base);

@@ -2877,7 +2877,7 @@ namespace GObject
         bool updateHft = false;
         UInt32 enc_times = 1;
 	    UInt8 oldEnchant = ied.enchant;
-        UInt8 oldHfValue = hf->getHftValue(hft);
+        UInt16 oldHfValue = hf->getHftValue(hft);
         if(type == 2)
         {
             bless = oldHfValue;
@@ -5880,7 +5880,6 @@ namespace GObject
 	{
 		if(fighter->getCurrentHP() == 0)
 		{
-			//SYSMSG_SENDV(190, m_Owner);
 			return;
 		}
 		GameAction()->RunAutoRegen(m_Owner, fighter);

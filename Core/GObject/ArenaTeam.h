@@ -375,7 +375,7 @@ class TeamArenaMgr
 {
     public:
         TeamArenaMgr():
-            _loaded(false), _notified(0), _session(0), _progress(0), _status(0), _round(0), _nextTime(0)
+            _loaded(false), _notified(0), _session(0), _progress(e_team_nextbegin), _status(0), _round(0), _nextTime(0)
         {
             memset(_teamsCount, 0, sizeof(_teamsCount));
             memset(_finalIdx, 0, sizeof(_finalIdx));

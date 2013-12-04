@@ -96,6 +96,7 @@ private:
     void OnSetCountry(GObject::Player * player, std::vector<std::string>&);
     void OnAddPExp(GObject::Player * player, std::vector<std::string>&);
     void OnSetAcu(GObject::Player * player, std::vector<std::string>&);
+    void OnSetAcuGold(GObject::Player * player, std::vector<std::string>&);
     void OnUseItem(GObject::Player * player, std::vector<std::string>&);
     void OnUseItemOther(GObject::Player * player, std::vector<std::string>&);
 	void OnOcupyPlace(GObject::Player *, std::vector<std::string>&);

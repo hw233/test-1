@@ -132,7 +132,9 @@ enum PurchaseType
     ArenaTeamConsume            = 121, //仙界至尊消费
     GuangGun                    = 122, //光棍
     Fund                        = 123, //基金消费
-    ServerWarConsume            = 124, //仙界传奇消费
+    RestStep                    = 124, //七石板重置
+    QSBAddTime                  = 125, //七石板加时
+    ServerWarConsume            = 126, //仙界传奇消费
     //繁体私有占150～200
 };
 
@@ -272,7 +274,8 @@ enum ItemFrom
     FromClanSptr = 61, // 神魔之树
     FromCollectCard = 62, //卡片转化池
     Fromkeyin = 63, //壁凰墨转化磐龙墨
-    FromServerWarJijian = 64, //仙界传奇祭剑宝箱
+    FromQiShiBan = 64, //七石斗法
+    FromServerWarJijian = 65, //仙界传奇祭剑宝箱
     //80 ~ 100，繁体占用
 };
 

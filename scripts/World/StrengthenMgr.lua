@@ -357,14 +357,17 @@ function do11Grade(player, id, param1, param2)
     mgr:CheckTimeOver();
     --判断标志位
     local curflag = mgr:GetFlag(id);
-    if id == 0 or id == 12 then
-       if curflag ==4 then 
-           player:Add11grade(10);
-       end
-           return ;
-    end
     for i = 1, #dayTask do
-        if id == dayTask[i][1]  and curflag < dayTask[i][2] then
+        if id == dayTask[i][1]  then
+            if id == 0 or id == 12 then
+                if curflag ~=4 then 
+                    return ;
+                end
+            else
+                if curflag >= dayTask[i][2] then
+                    return ;
+                end
+            end
             player:Add11grade(10);
             break
         end

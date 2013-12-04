@@ -4906,7 +4906,6 @@ void Clan::SendClanMemberGrade(Player* player)
      UInt8 pos = 0;
      st<<pos;
 	Mutex::ScopedLock lk(_mutex);
-    _gradeInAirbook = 0;
 	Members::iterator it = _members.begin();
 	for (; it != _members.end(); ++it)
 	{

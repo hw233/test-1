@@ -193,6 +193,8 @@ bool World::_consume918 = false;
 bool World::_consumeawardact = false;
 bool World::_summerFlow = false;
 bool World::_summerMeet = false;
+bool World::_qishiban = false;
+RCSortType World::qishibanScoreSort;
 RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 RCSortType World::popularitySort;
@@ -235,6 +237,7 @@ UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
 Player* World::spreadKeeper = NULL;
 UInt32 World::spreadBuff = 0;
 UInt8 World::_arenaState = 0;      //0:无 1:仙界第一 2:仙界至尊
+bool World::_memcinited = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -319,6 +322,7 @@ bool bSnowEnd = false;
 bool bGoldSnakeEnd = false;
 bool bItem9344End = false;
 bool bItem9343End = false;
+bool bQiShiBanEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -460,6 +464,13 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 28)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 29)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
 
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
@@ -509,6 +520,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 16)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 23)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 30)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
         ))
     {
 #if 0
@@ -1222,6 +1234,8 @@ void World::World_Midnight_Check( World * world )
     bool bMonsterAct = getKillMonsterAct();
     bool bItem9344 = getItem9344Act();
     bool bItem9343 = getItem9343Act();
+    bool bQiShiBanTime = getQiShiBanTime();
+
 	world->_worldScript->onActivityCheck(curtime+300);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);
@@ -1248,6 +1262,8 @@ void World::World_Midnight_Check( World * world )
     //蜀山传奇掉落活动是否结束
     bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
     b11TimeEnd = b11time && !get11Time();
+    //七石斗法活动结束
+    bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
     bGGTimeEnd = bGGtime && !getGGTime();
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
@@ -1323,6 +1339,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 28)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 29)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
          
          )
         bRechargeEnd = true;
@@ -1405,6 +1428,8 @@ void World::World_Midnight_Check( World * world )
         world->SendItem9344Award();
      if (bItem9343End)
         world->SendItem9343Award();
+     if (bQiShiBanEnd)
+        world->SendQiShiBanAward();
  
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -1841,6 +1866,7 @@ void World::advancedHookTimer(void *para)
 #endif
 bool World::Init()
 {
+    MemCachInit();
     static UInt8 type = 0;
     static UInt8 type2 = 1;
 	GObject::Tianjie::instance().Init();
@@ -1932,7 +1958,7 @@ bool World::Init()
     //开服战世界boss
     UInt32 value = GVAR.GetVar(GVAR_SERVERWAR_XIUWEI);
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
-    if(value == SERVERWAR_VALUE_XIUWEI4 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
+    if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
     return true;
 }
@@ -2796,6 +2822,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::PlayerGradeSort.insert(s);
         }
     }
+    if (World::getQiShiBanTime())
+    {
+        UInt32 score = p->GetQiShiBanScore();
+        if (score)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = score;
+            World::qishibanScoreSort.insert(s);
+        }
+    }
     if (World::getGGTime())
     {
         if(p->getGGStatus()!=2)
@@ -3307,6 +3344,41 @@ void World::Send11PlayerRankAward()
     }
 }
 
+void World::SendQiShiBanAward()
+{
+    World::initRCRank();
+    int pos = 0;
+
+    static MailPackage::MailItem s_item[][3] = {
+        {{1325,10},{5057,1}},
+        {{1325,9},{5056,1}},
+        {{1325,8},{5055,1}},
+        {{1325,5},{5054,3}},
+        {{1325,5},{5054,2}},
+        {{1325,5},{5054,1}},
+        {{1325,4},{5053,3}},
+        {{1325,4},{5053,2}},
+        {{1325,4},{5053,1}},
+        {{1325,3},{5053,1}},
+    };
+
+    SYSMSG(title, 4972);
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (!player)
+            continue;
+        ++pos;
+        if(pos > 10) break;
+        SYSMSGV(content, 4973, pos);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, s_item[pos-1], 2, true);
+        }
+    }
+}
+
 void World::Send11ClanRankAward()
 {
     World::initRCRank();
@@ -3417,6 +3489,51 @@ void World::Send11CountryRankAward()
         }
     }
 }
+
+bool World::MemCachInit()
+{
+    size_t sz = cfg.IDQueryMemcached.size();
+    for (size_t i = 0; i < sz; ++i)
+    {
+        char buf[128];
+        snprintf(buf, 128, "%s:%d", cfg.IDQueryMemcached[i].ip.c_str(), cfg.IDQueryMemcached[i].port); 
+        m_MCached.pushHost(buf);
+        _memcinited = true;
+    }
+    return true;
+}
+
+void World::SetMemCach_qishiban(UInt32 score, const char * openId)
+{
+    if (_memcinited)
+    {
+        char value[32] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        size_t len = snprintf(key, sizeof(key), "qishiban_%s", openId);
+        size_t vlen = snprintf(value, sizeof(value), "%d", score);
+
+        bool res = m_MCached.set(key, len, value, vlen, 0);
+        TRACE_LOG("setKey: %s, setScore: %u, res:%u", key, score, res);
+    }
+}
+
+UInt32 World::GetMemCach_qishiban(const char * openId)
+{
+    char value[32]={0};
+    char key[MEMCACHED_MAX_KEY] = {0};
+    snprintf(key, MEMCACHED_MAX_KEY, "qishiban_%s", openId);
+
+    UInt32 score = 0;
+    if (_memcinited)
+    {
+        const char* res = m_MCached.get(key, value, sizeof(value));
+        score = atoi(value);
+        TRACE_LOG("getKey: %s, getScore: %u, res:%u", key, score, res);
+    }
+
+    return score;
+}
+
 void World::SendGuangGunAward()    //待定
 {
     World::initRCRank();
@@ -3473,7 +3590,6 @@ void World::SendGuangGunAward()    //待定
             }
         }
     }
-
 }
 
 }

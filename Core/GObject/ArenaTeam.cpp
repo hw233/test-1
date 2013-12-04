@@ -1287,16 +1287,21 @@ void TeamArenaMgr::readFrom( BinaryReader& brd )
 		_notified = 0;
         fStatus = true;
 	}
+    if(_progress != e_team_nextbegin)
+        GObject::World::setArenaState(GObject::ARENA_XIANJIE_ZHIZUN);
 
 	switch(_progress)
 	{
     case e_team_nextbegin:
+        if(!_playerBet.empty())
+        {
+			_playerBet.clear();
+            DB1().PushUpdateData("DELETE FROM `arena_team_bet`");
+        }
 		if(!_teams.empty())
         {
-            DB1().PushUpdateData("DELETE FROM `arena_team_bet`");
             _teamsCount[0] = 0;
 			_teams.clear();
-			_playerBet.clear();
         }
         if(!_preliminaryPlayers.empty())
         {
@@ -1306,12 +1311,15 @@ void TeamArenaMgr::readFrom( BinaryReader& brd )
         }
         break;
 	case e_team_sign:
+        if(!_playerBet.empty())
+        {
+			_playerBet.clear();
+            DB1().PushUpdateData("DELETE FROM `arena_team_bet`");
+        }
 		if(!_teams.empty())
         {
-            DB1().PushUpdateData("DELETE FROM `arena_team_bet`");
             _teamsCount[0] = 0;
 			_teams.clear();
-			_playerBet.clear();
         }
         if(!_preliminaryPlayers.empty())
         {
