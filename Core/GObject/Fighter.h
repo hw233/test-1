@@ -872,6 +872,7 @@ public:
     UInt8 getSoulExtraAura();
     UInt8 getSoulAuraLeft();
     UInt16 getSoulSkillSoulOut();
+    UInt16 getSoulSkillProtect();
 
     bool practiceLevelUp();
     bool changeSecondSoulClass(UInt8 cls);
@@ -922,12 +923,14 @@ public:
     inline void setSoulSkillSoulOut(Int32 v) { _soulSkillSoulOut = v; }
     inline void setUpCittasMax() { _cittaslot = CITTA_UPMAX; }
     bool upCittaWithOutCheck( UInt16 citta, int idx );
+    inline void setSoulSkillProtect(Int32 v) { _soulSkillProtect = v; }
     UInt16 getTrumpSkill(int i) { if(i >= TRUMP_UPMAX) return 0; else return _trumpSkill[i]; }
     Int32 _soulMax;
     UInt8 _soulExtraAura;
     UInt8 _soulAuraLeft;
     UInt16 _soulSkillSoulOut;
     UInt16 _trumpSkill[TRUMP_UPMAX];
+    UInt16 _soulSkillProtect;
 
     // 内丹系统
 public:
