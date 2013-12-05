@@ -802,6 +802,7 @@ namespace SPEQ
     const UInt16 SETMAXNEWUSER       = 0x148;// modify max create role
     const UInt16 GETMAXNEWUSER       = 0x149;
     const UInt16 SETRECHARGERANK     = 0x14A;// FB设置充值排行
+    const UInt16 OFFQQOPENID         = 0x14B;// 解除QQ群绑定 
 }
 
 namespace SPEP
@@ -866,6 +867,7 @@ namespace SPEP
     const UInt8 SETMAXNEWUSER       = 0x48;// modify max create role
     const UInt8 GETMAXNEWUSER       = 0x49;// get max create role
     const UInt8 SETRECHARGERANK     = 0x4A;// FB设置充值排行
+    const UInt8 OFFQQOPENID         = 0x4B;// 解除QQ群绑定 
 
 }
 

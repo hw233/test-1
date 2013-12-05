@@ -2156,6 +2156,23 @@ void OnSendGuangGunRank ( GameMsgHdr& hdr,  const void* data )
         pl->getGGPlayer2()->send(st);
 }
 
+void OnSendOffQQClan ( GameMsgHdr& hdr,  const void* data )
+{
+    struct OnOffQQData 
+	{
+		UInt64 pid;
+		UInt32 clanid;
+	};
+	OnOffQQData * onOffQQ = reinterpret_cast<OnOffQQData*>(const_cast<void *>(data));
+    
+    GObject::Clan *clan = GObject::globalClans[onOffQQ->clanid];
+	GObject::Player * player = GObject::globalPlayers[onOffQQ->pid];
+   
+    if (!clan || !player)
+        return;
+    clan->offQQOpenid(player);
+
+}
 
 void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
 {
