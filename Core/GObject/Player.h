@@ -263,6 +263,7 @@ namespace GObject
         BILAN       = 13,   //碧岚天衣
         LIUGUANG    = 14,   //刹那流光
         ZHUTIAN     = 15,   //诸天宝鉴
+        TIANYOU     = 16,   //天佑术
 
         DRAGONKING_MAX,
     };
@@ -2466,6 +2467,9 @@ namespace GObject
         void getLuckyMeetInstantLoginAward(UInt8 val);
         void getLuckyMeetAward(UInt8 idx,UInt8 index);
         void getSummerMeetInstantLoginAward(UInt8 val);
+        void getQZoneRechargeAward(UInt8 val);
+        void sendQZoneRechargeAwardInfo();
+        void AddQZoneRecharge(UInt32 r =0);
         void getSummerFlow3OnlineAward(UInt8 val);
         void getSummerMeetAward(UInt8 idx,UInt8 index);
         void getNewRC7DayRechargeAward(UInt8 val);

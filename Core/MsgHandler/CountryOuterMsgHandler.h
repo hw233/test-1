@@ -6774,6 +6774,18 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
             fgt->quickUpGrade(opt);
         }
         break;
+    case 6:
+        {
+            //吞噬星空
+            fgt->tunShiXingKong();
+        }
+        break;
+    case 7:
+        {
+            //突破界限
+            fgt->tuPoJieXian();
+        }
+        break;
     }
 }
 

@@ -2388,7 +2388,7 @@ void ServerWarBoss::startBoss()
     SYSMSG_BROADCASTV(553, _npcid);
 
     std::vector<GData::NpcFData>& nflist = _ng->getList();
-    printf("-----------------------------------bossBaseHp:%d, baseAttack:%d\n", _hp[0], nflist[0].fighter->getBaseAttack());
+    TRACE_LOG("-----------------------------------bossBaseHp:%d, baseAttack:%d\n", _hp[0], nflist[0].fighter->getBaseAttack());
 
     const Int32 WBOSS_MAX_ATK= 100000;
     const float WBOSS_BASE_TIME = 300.f;
@@ -2445,7 +2445,7 @@ void ServerWarBoss::startBoss()
     nflist[0].fighter->setExtraMagAttack(extmagatk);
 
     nflist[0].fighter->setDirty();
-    printf("-----------------------------------bossExtraHp:%d, extraAttack:%d\n", _hp[0], nflist[0].fighter->getExtraAttack());
+    TRACE_LOG("-----------------------------------bossExtraHp:%d, extraAttack:%d\n", _hp[0], nflist[0].fighter->getExtraAttack());
 }
 
 bool ServerWarBoss::attack(Player* pl, UInt16 loc, UInt32 npcId)

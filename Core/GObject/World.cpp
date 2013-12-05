@@ -153,6 +153,7 @@ bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
 bool World::_11time = false;
 bool World::_ggtime = false;
+bool World::_qzoneRechargetime = false;
 bool World::_ryhbActivity = false;
 bool World::_zcjbActivity = false;
 bool World::_wansheng= false;
@@ -1524,6 +1525,7 @@ void World::World_Boss_Refresh(void*)
 {
     worldBoss.process(TimeUtil::Now());
 }
+
 void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
@@ -1974,6 +1976,7 @@ bool World::Init()
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
+    
     return true;
 }
 
@@ -2467,7 +2470,7 @@ void World::sendGuangGunPlayers(Player* pl)
         player = pl->getGGTimeCaptain();
     UInt32 myPlace = 0;
     UInt32 myScore = 0;
-    UInt8 rank;
+    UInt8 rank = 0;
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
         ++rank;

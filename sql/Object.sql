@@ -2009,6 +2009,11 @@ CREATE TABLE IF NOT EXISTS `fighter_xingchen` (
     `gem1` smallint(6) unsigned NOT NULL DEFAULT 0,
     `gem2` smallint(6) unsigned NOT NULL DEFAULT 0,
     `gem3` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `gem4` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `gem5` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `gem6` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `xctCurVal` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `xctMaxVal` smallint(6) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY(`fighterId`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

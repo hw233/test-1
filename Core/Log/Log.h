@@ -134,7 +134,8 @@ enum PurchaseType
     Fund                        = 123, //基金消费
     RestStep                    = 124, //七石板重置
     QSBAddTime                  = 125, //七石板加时
-    ServerWarConsume            = 126, //仙界传奇消费
+    TuPoJieXian                 = 126, //星辰图突破界限
+    ServerWarConsume            = 127, //仙界传奇消费
     //繁体私有占150～200
 };
 
@@ -319,7 +320,8 @@ enum ItemTo
     ToUpgradeKY = 163, //刻印升级所消耗的道具
     ToChangeMoShi = 164, //转换墨石
     ToSanHunUp = 164, //三魂升级
-    ToServerWarJijian = 165, //仙界传奇祭剑
+    ToTunShiXingKong = 165, //吞噬星空
+    ToServerWarJijian = 166, //仙界传奇祭剑
 };
 
 struct IncommingInfo
