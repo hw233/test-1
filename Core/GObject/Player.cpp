@@ -16525,7 +16525,7 @@ namespace GObject
         if(now < m_serverWarChallengeCD)
             return true;
 
-        m_serverWarChallengeCD = now + 30;
+        m_serverWarChallengeCD = now + 300;
         return false;
     }
     bool Player::inServerWarCommitCD()

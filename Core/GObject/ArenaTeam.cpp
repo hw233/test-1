@@ -905,16 +905,6 @@ void TeamArenaMgr::championWorship(Player* player, UInt8 opt)
     if(player->GetVar(VAR_TEAMARENA_WORSHIP))
         return;
     bool has = false;
-    /*
-    if(arena.active())
-    {   //相互交换
-        std::map<UInt16, LeaderTeam>::iterator it = _leaderBoard.find(_session-1);
-        if(it != _leaderBoard.end())
-            has = true;
-    }
-    else
-        has = arena.hasLastLeaderBoard();
-    */
     if(arena.active())  //仙界第一
         has = serverWarMgr.hasLastLeaderBoard();
     else if(active())  //仙界至尊

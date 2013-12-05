@@ -289,7 +289,7 @@ void ServerWarMgr::notifyChallengeResult(Player* atker, Player* defer, bool win)
 {
     if(!atker || !defer) return;
     std::map<Player *, UInt8>::iterator it = _warSort.find(defer);
-    if (it != _warSort.end())
+    if (it == _warSort.end())
         return;
     Stream st(REP::SERVERWAR_ARENA_OP);
     st << static_cast<UInt8>(0x02) << static_cast<UInt8>(5);
@@ -318,6 +318,15 @@ void ServerWarMgr::notifyChallengeResult(Player* atker, Player* defer, bool win)
         st << Stream::eos;
         atker->send(st);
         defer->send(st);
+
+        if(cfg.isTestPlatform())
+        {
+            if(!findSWPlayerData(defer))
+            {
+                insertSWPlayerData(defer, false);
+                updateSignupToDB(defer);
+            }
+        }
     }
 }
 
@@ -1153,6 +1162,9 @@ void ServerWarMgr::pushPreliminary(BinaryReader& brd)
         return;
 
     ServerPreliminaryPlayer& spp = *(spit->second);
+    if(cfg.isTestPlatform() && spp.battlesVec.size() && spp.battlesVec.back().won == 2)
+        return;
+
     if(won == 3 || won == 4)
     {   //进16强
         UInt32 twon = 0, tloss = 0;
@@ -1416,19 +1428,19 @@ void ServerWarMgr::calcFinalBet(int i)
                                         giveTeamLastAward(i, j+1, 1);
                                         EnumMailStruct mailStruct = EnumMailStruct(i, j+1, _session, true);
                                         globalPlayers.enumerate(server_sendMail, &mailStruct);
-                                        if(i == 0)
-                                        {
-                                            UInt8 type = 1;
-                                            GameMsgHdr hdr(0x1EB, WORKER_THREAD_WORLD, NULL, sizeof(type));
-                                            GLOBAL().PushMsg(hdr, &type);
-                                        }
                                     }
                                 }
                                 else    //内测区
                                 {
-                                    giveTeamLastAward_neice(ep, i, j+1, 0);
+                                    giveTeamLastAward_neice(ep, i, j+1, 1);
                                     EnumMailStruct mailStruct = EnumMailStruct(i, j+1, _session);
                                     globalPlayers.enumerate(server_sendMail, &mailStruct);
+                                }
+                                if(i == 0)  //天榜第一刷仙界boss
+                                {
+                                    UInt8 type = 1;
+                                    GameMsgHdr hdr(0x1EB, WORKER_THREAD_WORLD, NULL, sizeof(type));
+                                    GLOBAL().PushMsg(hdr, &type);
                                 }
                             }
                         }
@@ -2261,15 +2273,9 @@ void ServerWarBoss::calcNext(UInt32 now)
 {
     if (cfg.GMCheck)
     {
-        _prepareTime = now + 30;
-        _appearTime = _prepareTime + 1 * 60;
-        _disappearTime = _appearTime + 30 * 60;
-        /*
         _prepareTime = TimeUtil::SharpWeek(0, now) + 6*86400 + 19 * 60 * 60 + 15 * 60;
         _appearTime = _prepareTime + 15 * 60;
         _disappearTime = _appearTime + 30 * 60;
-        */
-
     }
     else
     {

@@ -4748,12 +4748,7 @@ void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::stri
             GObject::serverWarMgr.sendjiJianTaiInfo(player);
         }
         break;
-    case 8:
-        GObject::serverWarMgr.enterArena();
-        break;
     }
-
-
 }
 
 

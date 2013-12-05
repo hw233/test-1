@@ -155,7 +155,7 @@ namespace GObject
 
     UInt32 GVarSystem::GetOverTime(UInt32 id)
     {
-        if(id >= GVAR_MAX) 
+        if(id >= GVAR_MAX)
             return 0;
         return m_OverTime[id];
     }

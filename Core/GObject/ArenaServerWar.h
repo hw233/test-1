@@ -360,7 +360,7 @@ class ServerWarMgr
             memset(_finalIdx, 0, sizeof(_finalIdx));
         }
         ~ServerWarMgr() {}
-        
+
 	    inline bool active() { return _loaded && (_session != 0x8001 || (_progress != 0)) && World::getArenaState() == ARENA_XIANJIE_CHUANQI; }
         inline bool isOpen() { return World::getArenaState() == ARENA_XIANJIE_CHUANQI; }
         inline UInt16 getSession() { return _session; }
