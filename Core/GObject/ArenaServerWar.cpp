@@ -280,6 +280,15 @@ void ServerWarMgr::challenge(Player * atker, std::string& name)
         atker->send(st);
         return;
     }
+    if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging))
+        return ;
+    if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
+    {
+        atker->sendMsgCode(0, 1413);
+        return ;
+    }
+	atker->addGlobalFlag(Player::Challenging);
+	defer->addGlobalFlag(Player::BeChallenging);
 
     GameMsgHdr hdr(0x386, defer->getThreadId(), defer, sizeof(Player *));
     GLOBAL().PushMsg(hdr, &atker);
@@ -295,6 +304,8 @@ void ServerWarMgr::notifyChallengeResult(Player* atker, Player* defer, bool win)
     st << static_cast<UInt8>(0x02) << static_cast<UInt8>(5);
 	st << static_cast<UInt8>(win ? 0 : 1) << atker->getServerWarChallengeCD() << Stream::eos;
 	atker->send(st);
+    atker->delGlobalFlag(Player::Challenging);
+	defer->delGlobalFlag(Player::BeChallenging);
 
     UInt8 pos = it->second;
     if (win)
@@ -2388,7 +2399,7 @@ void ServerWarBoss::startBoss()
     SYSMSG_BROADCASTV(553, _npcid);
 
     std::vector<GData::NpcFData>& nflist = _ng->getList();
-    TRACE_LOG("-----------------------------------bossBaseHp:%d, baseAttack:%d\n", _hp[0], nflist[0].fighter->getBaseAttack());
+    TRACE_LOG("ServerWarBoss-----------------------------bossBaseHp:%u, baseAttack:%u", _hp[0], nflist[0].fighter->getBaseAttack());
 
     const Int32 WBOSS_MAX_ATK= 100000;
     const float WBOSS_BASE_TIME = 300.f;
@@ -2445,7 +2456,7 @@ void ServerWarBoss::startBoss()
     nflist[0].fighter->setExtraMagAttack(extmagatk);
 
     nflist[0].fighter->setDirty();
-    TRACE_LOG("-----------------------------------bossExtraHp:%d, extraAttack:%d\n", _hp[0], nflist[0].fighter->getExtraAttack());
+    TRACE_LOG("ServerWarBoss----------------------------bossExtraHp:%u, extraAttack:%u", _hp[0], nflist[0].fighter->getExtraAttack());
 }
 
 bool ServerWarBoss::attack(Player* pl, UInt16 loc, UInt32 npcId)
