@@ -1842,16 +1842,22 @@ void OnoffQQOpenid(LoginMsgHdr &hdr, const void* data)
     
     br >> onOffQQ.pid >> onOffQQ.clanid;
     
-    GameMsgHdr imh(0x1D9, WORKER_THREAD_WORLD, NULL, sizeof(onOffQQ));
-    GLOBAL().PushMsg(imh, &onOffQQ);
-
+    
     GObject::Clan *clan = GObject::globalClans[onOffQQ.clanid];
 	GObject::Player * player = GObject::globalPlayers[onOffQQ.pid];
    
     UInt8 ret = 0;
     if (!clan || !player)
         ret = 1;
-    
+    else
+        if(player->getId() != clan->getLeaderId())
+            ret = 1;
+    if(ret == 0)
+    {
+        GameMsgHdr imh(0x1D9, WORKER_THREAD_WORLD, NULL, sizeof(onOffQQ));
+        GLOBAL().PushMsg(imh, &onOffQQ);
+    }
+
     Stream st(SPEP::OFFQQOPENID);
     st<< ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
