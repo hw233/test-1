@@ -414,5 +414,7 @@ MSG_REG_2(GameMsgHdr, 0x382, OnServerWarEnter);
 MSG_REG_2(GameMsgHdr, 0x383, OnServerWarLineup);
 MSG_REG_2(GameMsgHdr, 0x384, OnServerWarGetMoney);
 MSG_REG_2(GameMsgHdr, 0x385, OnServerWarUseGold);
+MSG_REG_2(GameMsgHdr, 0x386, OnServerWarAttack);
+MSG_REG_2(GameMsgHdr, 0x387, OnServerWarBeAttack);
 
 MSG_HANDLER_END()

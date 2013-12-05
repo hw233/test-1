@@ -79,7 +79,7 @@ public:
 	int channelNum;
 	int serverNum;
     int serverNo;
-    bool isTestPlatform;
+    bool testPlatform;
 
 	std::string arenaHost;
 	UInt16      arenaPort;
@@ -140,7 +140,7 @@ public:
 	inline void setMerged(bool m) { merged = m; }
 	inline void setSupportCompress(bool c) { supportCompress = c; }
 	inline void setGMCheck(bool c) { GMCheck = c; }
-    inline void setTestPlatform(bool c) { isTestPlatform = c; }
+    inline void setTestPlatform(bool c) { testPlatform = c; }
 	inline void setArenaServer(const char * h, UInt16 p) { arenaHost = h; arenaPort = p; }
 	inline void setServerWar(const char * h, UInt16 p) { serverWarHost = h; serverWarPort = p; }
 	inline void setMsgCenter(const char * h, UInt16 p) { msgCenterHost = h; msgCenterPort = p; }  //yij
@@ -164,7 +164,7 @@ public:
     inline void setAutoForbid(bool v) { autoForbid = v; }
     inline void setAutoKick(bool v) { autoKick = v; }
 
-    inline bool isTestServer() { return isTestPlatform; }  //true为内测区
+    inline bool isTestPlatform() { return testPlatform; }  //true为内测区
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {

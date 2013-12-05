@@ -128,7 +128,7 @@ namespace GObject
     UInt8 Player::_yaMenActiveCount = 0;
     UInt8 Player::_shiMenActiveCount = 0;
 	const UInt8 MaxICCount[] = {8, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24};
-	const UInt16 MAX_EXTEND_TIME	= 17;
+	const UInt16 MAX_EXTEND_TIME	= 20;
 	const UInt16 EACH_EXTEND_NUM	= 50;
 	GlobalPlayers globalPlayers;
 	GlobalPlayers newPlayers;
@@ -1398,7 +1398,7 @@ namespace GObject
         {
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            if (cfg.isTestPlatform)
+            if (cfg.isTestPlatform())
                 pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|1|",
                     cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
             else
@@ -17418,7 +17418,8 @@ EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 void EventTlzAuto::Process(UInt32 leftCount)
 {
     bool forceCancel = false;
-    if(GObject::Tianjie::instance().isFinish() || (GObject::Tianjie::instance().isTjExecute() && (4 == GObject::Tianjie::instance().getTjCurRate() || 5 == GObject::Tianjie::instance().getTjCurRate())))
+    int curRate = GObject::Tianjie::instance().getTjCurRate();
+    if((GObject::Tianjie::instance().isFinish() && (5 == curRate || 0 == curRate)) || (GObject::Tianjie::instance().isTjExecute() && (4 == curRate || 5 == curRate)))
         forceCancel = true;
     else
     {

@@ -1793,6 +1793,20 @@ void OnServerWarBossTimer( GameMsgHdr& hdr,  const void* data )
     }
 }
 
+void OnServerWarResNotify( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct SWResNotify
+    {
+        GObject::Player * peer;
+        bool win;
+    };
+    SWResNotify* notify = reinterpret_cast<SWResNotify*>(const_cast<void *>(data));
+    if(!notify) return;
+
+    GObject::serverWarMgr.notifyChallengeResult(player, notify->peer, notify->win);
+}
+
 void OnTownDeamonResNotify( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);

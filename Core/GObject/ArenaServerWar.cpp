@@ -259,55 +259,142 @@ void ServerWarMgr::challenge(Player * atker, std::string& name)
     if (!atker || _progress != e_war_challenge || atker->GetLev() < LIMIT_LEVEL)
         return;
     atker->fixName(name);
-    Player * player = globalNamedPlayers[name];
-    if (!player || atker == player)
+    Player * defer = globalNamedPlayers[name];
+    if (!defer || atker == defer)
         return;
     std::map<Player *, UInt8>::iterator it = _warSort.find(atker);
     if (it != _warSort.end())
         return;
-    it = _warSort.find(player);
+    it = _warSort.find(defer);
     if (it == _warSort.end())
     {
         atker->sendMsgCode(0, 1418);
         sendWarSortInfo(atker);
         return;
     }
-    UInt8 result = 1;
-    if(!atker->inServerWarChallengeCD())
+    if(atker->inServerWarChallengeCD())
     {
-        UInt8 pos = it->second;
-        bool res = atker->challenge(player, NULL, NULL, true, 0, false, Battle::BS_NEWCOUNTRYBATTLE, 0x01);
-        if (res)
-        {
-            _warSort.erase(it);
-            _warSort.insert(std::make_pair(atker, pos));
-
-            DB1().PushUpdateData("REPLACE INTO `arena_serverWar`(`playerId`, `type`, `pos`) VALUES(%" I64_FMT "u, 2, %u)", atker->getId(), pos);
-            DB1().PushUpdateData("DELETE FROM `arena_serverWar` WHERE `playerId` = %" I64_FMT "u AND `type` = 2", player->getId());
-            if(player->isOnline())
-            {
-                SYSMSG_SENDV(180, player, atker->getName().c_str());
-                SYSMSG_SENDV(1080, player, atker->getName().c_str());
-            }
-            result = 0;
-            Stream st(REP::SERVERWAR_ARENA_OP);
-            st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x08);
-            st << static_cast<UInt8>(0x02) << pos;
-            st << atker->getName() << atker->getCountry();
-            st << static_cast<UInt8>(atker->getMainFighter()->getId());
-            st << atker->GetLev() << atker->getBattlePoint();
-            st << Stream::eos;
-	        atker->send(st);
-	        player->send(st);
-        }
+        Stream st(REP::SERVERWAR_ARENA_OP);
+        st << static_cast<UInt8>(0x02) << static_cast<UInt8>(5);
+        st << static_cast<UInt8>(2) << atker->getServerWarChallengeCD() << Stream::eos;
+        atker->send(st);
+        return;
     }
-    else
-        result = 2;
 
+    GameMsgHdr hdr(0x386, defer->getThreadId(), defer, sizeof(Player *));
+    GLOBAL().PushMsg(hdr, &atker);
+}
+
+void ServerWarMgr::notifyChallengeResult(Player* atker, Player* defer, bool win)
+{
+    if(!atker || !defer) return;
+    std::map<Player *, UInt8>::iterator it = _warSort.find(defer);
+    if (it != _warSort.end())
+        return;
     Stream st(REP::SERVERWAR_ARENA_OP);
     st << static_cast<UInt8>(0x02) << static_cast<UInt8>(5);
-	st << result << atker->getServerWarChallengeCD() << Stream::eos;
+	st << static_cast<UInt8>(win ? 0 : 1) << atker->getServerWarChallengeCD() << Stream::eos;
 	atker->send(st);
+
+    UInt8 pos = it->second;
+    if (win)
+    {
+        _warSort.erase(it);
+        _warSort.insert(std::make_pair(atker, pos));
+
+        DB1().PushUpdateData("REPLACE INTO `arena_serverWar`(`playerId`, `type`, `pos`) VALUES(%" I64_FMT "u, 2, %u)", atker->getId(), pos);
+        DB1().PushUpdateData("DELETE FROM `arena_serverWar` WHERE `playerId` = %" I64_FMT "u AND `type` = 2", defer->getId());
+        if(defer->isOnline())
+        {
+            SYSMSG_SENDV(180, defer, atker->getName().c_str());
+            SYSMSG_SENDV(1080, defer, atker->getName().c_str());
+        }
+        Stream st(REP::SERVERWAR_ARENA_OP);
+        st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x08);
+        st << static_cast<UInt8>(0x02) << pos;
+        st << atker->getName() << atker->getCountry();
+        st << static_cast<UInt8>(atker->getMainFighter()->getId());
+        st << atker->GetLev() << atker->getBattlePoint();
+        st << Stream::eos;
+        atker->send(st);
+        defer->send(st);
+    }
+}
+
+void ServerWarMgr::attackPlayer(Player* atker, Player* defer)
+{
+    if(!atker || !defer) return;
+	UInt8 tid = defer->getThreadId();
+	if(tid == atker->getThreadId())
+	{
+		Battle::BattleSimulator bsim(Battle::BS_NEWCOUNTRYBATTLE, atker, defer);
+		atker->PutFighters( bsim, 0, true );
+		defer->PutFighters( bsim, 1, true );
+		bsim.start();
+		bool res = bsim.getWinner() == 1;
+
+		Stream st(REP::ATTACK_NPC);
+		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << static_cast<UInt64>(0)  << Stream::eos;
+		atker->send(st);
+
+        struct SWResNotify
+        {
+            Player * peer;
+            bool win;
+        };
+        SWResNotify notify = { defer, res };
+        GameMsgHdr hdr2(0x1EA, WORKER_THREAD_WORLD, atker, sizeof(SWResNotify));
+        GLOBAL().PushMsg(hdr2, &notify);
+
+		return;
+	}
+
+	struct SWBeAttackData
+	{
+		Player * attacker;
+		UInt16 formation;
+		UInt16 portrait;
+		Lineup lineup[5];
+	};
+	SWBeAttackData swbad = { atker, atker->getFormation(), static_cast<UInt16>(atker->getMainFighter() ? atker->getMainFighter()->getId() : 0) };
+	for(int i = 0; i < 5; ++ i)
+		swbad.lineup[i] = atker->getLineup(i);
+	GameMsgHdr hdr(0x387, tid, defer, sizeof(SWBeAttackData));
+	GLOBAL().PushMsg(hdr, &swbad);
+}
+
+void ServerWarMgr::beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
+{
+    if(!atker || !defer) return;
+	Battle::BattleSimulator bsim(Battle::BS_NEWCOUNTRYBATTLE, atker, defer);
+	bsim.setFormation( 0, formation );
+	bsim.setPortrait( 0, portrait );
+	for(int i = 0; i < 5; ++ i)
+	{
+		if(lineup[i].fighter != NULL)
+		{
+			Battle::BattleFighter * bf = bsim.newFighter(0, lineup[i].pos, lineup[i].fighter);
+			bf->setHP(0);
+		}
+	}
+    atker->PutPets(bsim, 0);
+	defer->PutFighters( bsim, 1, true );
+	bsim.start();
+	bool res = bsim.getWinner() == 1;
+
+	Stream st(REP::ATTACK_NPC);
+	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() <<static_cast<UInt64>(0) << Stream::eos;
+	atker->send(st);
+
+	struct SWResNotify
+	{
+		Player * peer;
+		bool win;
+	};
+
+	SWResNotify notify = { defer, res };
+	GameMsgHdr hdr(0x1EA, WORKER_THREAD_WORLD, atker, sizeof(SWResNotify));
+	GLOBAL().PushMsg(hdr, &notify);
 }
 
 void ServerWarMgr::sendWarSortInfo(Player * player)
@@ -409,7 +496,7 @@ const static UInt32 neiQuan[NEIQUAN_MAX][2] = {
 };
 void ServerWarMgr::jiJianTai_operate(Player * player)
 {
-    if(!player || player->GetLev() < 50/* || _progress != e_war_challenge*/)
+    if(!player || player->GetLev() < 50 || _progress != e_war_challenge)
         return;
     UInt32 value = player->GetVar(VAR_SERVERWAR_JIJIANTAI);
     UInt32 data = player->GetVar(VAR_SERVERWAR_JIJIANTAI1);
@@ -474,7 +561,7 @@ void ServerWarMgr::jiJianTai_operate(Player * player)
 
 void ServerWarMgr::jiJianTai_complete(Player * player, UInt8 type)
 {
-    if(!player || player->GetLev() < 50/* || _progress != e_war_challenge*/)
+    if(!player || player->GetLev() < 50 || _progress != e_war_challenge)
         return;
     UInt32 value = player->GetVar(VAR_SERVERWAR_JIJIANTAI);
     UInt32 data = player->GetVar(VAR_SERVERWAR_JIJIANTAI1);
@@ -566,7 +653,7 @@ void ServerWarMgr::jiJianTai_complete(Player * player, UInt8 type)
 
 void ServerWarMgr::jiJianTai_convert(Player * player)
 {
-    if(!player || player->GetLev() < 50/* || _progress != e_war_challenge*/)
+    if(!player || player->GetLev() < 50 || _progress != e_war_challenge)
         return;
 	if(!player->hasChecked())
 		return;
@@ -604,7 +691,7 @@ void ServerWarMgr::jiJianTai_convert(Player * player)
 
 void ServerWarMgr::jiJianTai_openBox(Player * player, UInt8 idx)
 {
-    if(!player || idx > 3 || player->GetLev() < 50/* || _progress != e_war_challenge*/)
+    if(!player || idx > 3 || player->GetLev() < 50 || _progress != e_war_challenge)
         return;
     UInt32 data = player->GetVar(VAR_SERVERWAR_JIJIANTAI1);
     UInt8 info = GET_BIT_8(data, 2);
@@ -676,7 +763,7 @@ void ServerWarMgr::sendjiJianTaiInfo(Player * player)
 static UInt32 MAX_CNT = 20000;
 void ServerWarMgr::enterArena()
 {
-    if(!isOpen() || _warSort.size() < SERVERWAR_MAX_MEMBER /*|| cfg.isTestServer()*/)
+    if(!isOpen() || _warSort.size() < SERVERWAR_MAX_MEMBER || cfg.isTestPlatform())
         return;
     struct SWarEnterData {
         Stream st;
@@ -706,7 +793,7 @@ void ServerWarMgr::enterArena()
 
 void ServerWarMgr::enterArena_neice()
 {
-    if(!isOpen() || !cfg.isTestServer())
+    if(!isOpen() || !cfg.isTestPlatform())
         return;
     UInt8 attr = 0;
     UInt32 jiJianCnt = GVAR.GetVar(GVAR_SERVERWAR_JIJIANTAI);
@@ -829,9 +916,8 @@ void ServerWarMgr::readFrom(BinaryReader& brd)
             DB1().PushUpdateData("DELETE FROM `arena_serverWar_bet`");
         }
         //TODO
-        if(cfg.isTestServer())
+        if(cfg.isTestPlatform())
         {
-            GVAR.SetVar(GVAR_SERVERWAR_JIJIANTAI, 0);
             globalPlayers.enumerate(clear_var_jiJian, static_cast<void *>(NULL));
         }
         break;
@@ -1060,34 +1146,33 @@ void ServerWarMgr::pushPreliminary(BinaryReader& brd)
         }
     }
 
-    if(!cfg.isTestServer() && (cid != cfg.channelNum || sid != cfg.serverNo))
+    if(!cfg.isTestPlatform() && (cid != cfg.channelNum || sid != cfg.serverNo))
         return;
     ServerPreliminaryPlayerListMap::iterator spit = _preliminaryServers[type-1].find(sid);
     if(spit == _preliminaryServers[type-1].end())
         return;
 
     ServerPreliminaryPlayer& spp = *(spit->second);
-    UInt32 twon = 0, tloss = 0;
-    for(std::vector<ServerPreliminaryBattle>::iterator it = spp.battlesVec.begin(); it != spp.battlesVec.end(); ++ it)
-    {
-        if(it->won == 1 || it->won == 3)
-            ++ twon;
-        else
-            ++ tloss;
-    }
-    const UInt32 score[] = { 25, 50 };
-    UInt32 award = score[0]*tloss + score[1]*twon;
-
     if(won == 3 || won == 4)
     {   //进16强
+        UInt32 twon = 0, tloss = 0;
+        for(std::vector<ServerPreliminaryBattle>::iterator it = spp.battlesVec.begin(); it != spp.battlesVec.end(); ++ it)
+        {
+            if(it->won == 1 || it->won == 3)
+                ++ twon;
+            else
+                ++ tloss;
+        }
+        const UInt32 score[] = { 25, 50 };
+        UInt32 award = score[0]*tloss + score[1]*twon;
 
         SYSMSGV(title, 810, g, p);
-        SYSMSGV(content, 811, _session, cfg.serverNo, p, twon, tloss, award, g);
-        if(cfg.isTestServer())
+        SYSMSGV(content, 811, _session, spp.serverId, p, twon, tloss, award, g);
+        if(cfg.isTestPlatform())
         {
             sendTeamMail_neice(spp, title, content);
 
-            SYSMSGV(content2, 812, _session, cfg.serverNo, g, twon, tloss, p, award);
+            SYSMSGV(content2, 812, _session, spp.serverId, g, twon, tloss, p, award);
             sendTeamMail_neiceJiJian(spp, title, content2);
         }
         else
@@ -1101,23 +1186,34 @@ void ServerWarMgr::pushPreliminary(BinaryReader& brd)
     {
         spp.battlesVec.push_back(spb);
 
-        UInt32 score[3] = { 25, 50, 25 };
-        if(cfg.isTestServer())
-            addLonghun_neice(spp, score[won]);
+        UInt32 score1[3] = { 25, 50, 25 };
+        if(cfg.isTestPlatform())
+            addLonghun_neice(spp, score1[won]);
         else
         {
-            addLonghun(score[won]);
-            globalPlayers.enumerate(server_addLonghun, &score[won]);
+            addLonghun(score1[won]);
+            globalPlayers.enumerate(server_addLonghun, &score1[won]);
         }
         if(won == 2)    //16强被淘汰
         {
+            UInt32 twon = 0, tloss = 0;
+            for(std::vector<ServerPreliminaryBattle>::iterator it = spp.battlesVec.begin(); it != spp.battlesVec.end(); ++ it)
+            {
+                if(it->won == 1 || it->won == 3)
+                    ++ twon;
+                else
+                    ++ tloss;
+            }
+            const UInt32 score[] = { 25, 50 };
+            UInt32 award = score[0]*tloss + score[1]*twon;
+
             SYSMSGV(title, 813, g, p);
-            SYSMSGV(content, 814, _session, cfg.serverNo, g, twon, tloss, award);
-            if(cfg.isTestServer())
+            SYSMSGV(content, 814, _session, spp.serverId, g, twon, tloss, award);
+            if(cfg.isTestPlatform())
             {
                 sendTeamMail_neice(spp, title, content);
 
-                SYSMSGV(content2, 815, _session, cfg.serverNo, g, twon, tloss, p, award);
+                SYSMSGV(content2, 815, _session, spp.serverId, g, twon, tloss, award);
                 sendTeamMail_neiceJiJian(spp, title, content2);
             }
             else
@@ -1132,6 +1228,8 @@ void ServerWarMgr::pushPreliminary(BinaryReader& brd)
             }
         }
 
+        if(cfg.isTestPlatform() && sid != cfg.serverNo)
+            return;
         //更新16强战报
         Stream st(REP::SERVERWAR_ARENA_OP);
         st << static_cast<UInt8>(0x03) << static_cast<UInt8>(1);
@@ -1142,16 +1240,16 @@ void ServerWarMgr::pushPreliminary(BinaryReader& brd)
     }
 }
 
-void ServerWarMgr::addLonghun(UInt32 value)
+void ServerWarMgr::addLonghun(UInt32 money)
 {
-    if(value == 0) return;
+    if(money == 0) return;
     std::map<Player *, UInt8>::iterator it = _warSort.begin();
     for(; it != _warSort.end(); ++ it)
     {
         if(!it->first)
             continue;
-        GameMsgHdr hdr(0x384, it->first->getThreadId(), it->first, sizeof(value));
-        GLOBAL().PushMsg(hdr, &value);
+        GameMsgHdr hdr(0x384, it->first->getThreadId(), it->first, sizeof(money));
+        GLOBAL().PushMsg(hdr, &money);
     }
 }
 
@@ -1222,7 +1320,7 @@ void ServerWarMgr::calcFinalBet(int i)
                         const UInt8 winCount_mod[4] = {1, 2, 2, 3};
                         if(winCount > winCount_mod[_round-1])
                         {
-                            if(!cfg.isTestServer())    //公测区
+                            if(!cfg.isTestPlatform())    //公测区
                             {
                                 if(ep1.serverId == cfg.serverNo)
                                 {
@@ -1246,7 +1344,7 @@ void ServerWarMgr::calcFinalBet(int i)
                         }
                         else
                         {
-                            if(!cfg.isTestServer())    //公测区
+                            if(!cfg.isTestPlatform())    //公测区
                             {
                                 if(ep2.serverId == cfg.serverNo)
                                 {
@@ -1264,7 +1362,7 @@ void ServerWarMgr::calcFinalBet(int i)
                                 SYSMSGV(content, 816, _session, ep2.serverId, pp, totalCount[_round-1] - winCount, winCount);
                                 sendTeamMail_neice(ep2, title, content);
 
-                                SYSMSGV(content, 817, _session, ep1.serverId, pp, winCount, totalCount[_round-1] - winCount);
+                                SYSMSGV(content2, 817, _session, ep1.serverId, pp, winCount, totalCount[_round-1] - winCount);
                                 sendTeamMail_neice(ep1, title2, content2);
                             }
                         }
@@ -1294,7 +1392,7 @@ void ServerWarMgr::calcFinalBet(int i)
                                     nidx2 = _finalIdx[i][j-1][(idx - starti) * 2 + 1];
                             }
                             ServerEliminationPlayer& ep = _finals[i][nidx];
-                            if(!cfg.isTestServer())    //公测区
+                            if(!cfg.isTestPlatform())    //公测区
                             {
                                 if(ep.serverId == cfg.serverNo)
                                 {
@@ -1311,7 +1409,7 @@ void ServerWarMgr::calcFinalBet(int i)
                             if(nidx2 != (UInt8)(0xFF))
                             {
                                 ServerEliminationPlayer& ep = _finals[i][nidx2];
-                                if(!cfg.isTestServer())    //公测区
+                                if(!cfg.isTestPlatform())    //公测区
                                 {
                                     if(ep.serverId == cfg.serverNo)
                                     {
@@ -1484,9 +1582,9 @@ void ServerWarMgr::sendTeamMail_neiceJiJian(ServerEliminationPlayer& sep, const 
     }
 }
 
-void ServerWarMgr::addLonghun_neice(ServerEliminationPlayer& sep, UInt32 value)
+void ServerWarMgr::addLonghun_neice(ServerEliminationPlayer& sep, UInt32 money)
 {
-    if(value == 0) return;
+    if(money == 0) return;
     PInfoSort::iterator it = sep.pInfoSet.begin();
     for(; it != sep.pInfoSet.end(); ++ it)
     {
@@ -1495,9 +1593,9 @@ void ServerWarMgr::addLonghun_neice(ServerEliminationPlayer& sep, UInt32 value)
         {
             UInt32 value = player->GetVar(VAR_SERVERWAR_JIJIANTAI1);
             if(GET_BIT_8(value, 1))     //祭剑获得
-                value *= 2;
-            GameMsgHdr hdr(0x384, player->getThreadId(), player, sizeof(value));
-            GLOBAL().PushMsg(hdr, &value);
+                money *= 2;
+            GameMsgHdr hdr(0x384, player->getThreadId(), player, sizeof(money));
+            GLOBAL().PushMsg(hdr, &money);
         }
     }
 }
@@ -1890,11 +1988,12 @@ void ServerWarMgr::updateSuport(UInt8 type, UInt8 flag, UInt16 pos)
     }
     else if(flag == 2)
     {
-        UInt8 fidx = pos >> _round;
-        if(type == 2)
-            ++ _finals[0][_finalIdx[0][_round][fidx]].support;
+        if(pos > 15)
+            return;
+        if(type == 1)
+            ++ _finals[0][pos].support;
         else
-            ++ _finals[1][_finalIdx[1][_round][fidx]].support;
+            ++ _finals[1][pos].support;
     }
 }
 
@@ -1961,13 +2060,13 @@ void ServerWarMgr::sendPreliminary(Player* player, UInt8 group, UInt8 flag, UInt
             ++ premNum;
             ++ i;
             ServerPreliminaryPlayerListIterator pit = *setIt;
-            ServerPreliminaryPlayer& pp = *pit;
+            ServerPreliminaryPlayer& spp = *pit;
             UInt8 fSupport = 0;
-            std::map<Player *, UInt8>::iterator it = pp.betMap.find(player);
-            if(it != pp.betMap.end())
+            std::map<Player *, UInt8>::iterator it = spp.betMap.find(player);
+            if(it != spp.betMap.end())
                 fSupport = it->second + 1;
-            st << pp.serverId << pp.serverName << pp.battlePoint;
-            st << static_cast<UInt16>(pp.support) << fSupport;
+            spp.appendServerData(st);
+            st << fSupport;
         }
         st.data<UInt8>(offset) = static_cast<UInt8>(premNum);
     }
@@ -2090,8 +2189,7 @@ void ServerWarMgr::sendLeaderBoard(Player* pl)
         st << iter->first << iter->second.serverName << static_cast<UInt8>(members.size());
         for(PInfoSort::iterator it = members.begin(); it != members.end(); ++ it)
         {
-            st << (*it).name << (*it).level;
-            st << (*it).battlePoint << (*it).mainFid;
+            (*it).appendInfo(st);
         }
     }
     st << Stream::eos;
@@ -2111,8 +2209,7 @@ void ServerWarMgr::sendLastLeaderBoard(Player* pl)
         st << iter->second.serverName << static_cast<UInt8>(members.size());
         for(PInfoSort::iterator it = members.begin(); it != members.end(); ++ it)
         {
-            st << (*it).name << (*it).level;
-            st << (*it).battlePoint << (*it).mainFid;
+            (*it).appendInfo(st);
         }
         st << static_cast<UInt8>(pl->GetVar(VAR_TEAMARENA_WORSHIP));
     }
@@ -2164,20 +2261,20 @@ void ServerWarBoss::calcNext(UInt32 now)
 {
     if (cfg.GMCheck)
     {
+        _prepareTime = now + 30;
+        _appearTime = _prepareTime + 1 * 60;
+        _disappearTime = _appearTime + 30 * 60;
+        /*
         _prepareTime = TimeUtil::SharpWeek(0, now) + 6*86400 + 19 * 60 * 60 + 15 * 60;
         _appearTime = _prepareTime + 15 * 60;
         _disappearTime = _appearTime + 30 * 60;
+        */
 
     }
     else
     {
-        /*
         _prepareTime = now + 30;
         _appearTime = _prepareTime + 1 * 60;
-        _disappearTime = _appearTime + 30 * 60;
-        */
-        _prepareTime = TimeUtil::SharpWeek(0, now) + 6*86400 + 19 * 60 * 60 + 15 * 60;
-        _appearTime = _prepareTime + 15 * 60;
         _disappearTime = _appearTime + 30 * 60;
     }
 }
@@ -2309,10 +2406,8 @@ void ServerWarBoss::startBoss()
     Int32 basematk = nflist[0].fighter->getBaseMagAttack();
     lastTime = worldBoss.getLastTime(0);
 
-    /*
     if (lastTime == 0)
         return;
-    */
 
     float hp_factor = (float)WBOSS_BASE_TIME / (float)lastTime;
     if(hp_factor > WBOSS_MAX_ASC_HP_FACTOR)

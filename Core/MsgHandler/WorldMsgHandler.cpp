@@ -179,6 +179,7 @@ MSG_REG_2(GameMsgHdr, 0x1D6, OnSendGuangGunRank);
 MSG_REG_2(GameMsgHdr, 0x1D0, OnSendClanMemberList);
 MSG_REG_2(GameMsgHdr, 0x1D1, OnSendClanMemberGrade);
 
+MSG_REG_2(GameMsgHdr, 0x1EA, OnServerWarResNotify);
 MSG_REG_2(GameMsgHdr, 0x1EB, OnServerWarBossTimer);
 
 MSG_REG_2(GameMsgHdr, 0x1EC, OnDaysRankMsg);

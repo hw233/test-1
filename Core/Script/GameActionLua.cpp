@@ -1781,7 +1781,7 @@ namespace Script
     UInt32 GameActionLua::GetSpreadCountForAward()
     {
         UInt32 serverNo = cfg.serverNo;
-        if(cfg.isTestPlatform)
+        if(cfg.isTestPlatform())
             serverNo = 9990;
         return Call<UInt32>("GetSpreadCountForAward", serverNo);
     }

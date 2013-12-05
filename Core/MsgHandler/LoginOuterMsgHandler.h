@@ -3109,7 +3109,7 @@ UInt8 SwitchSecDC(UInt32 val)
 {
     // 设置是否开启安全DCLogger，返回设置是否成功(0 成功，非0 失败)
     cfg.setSecDCLog(val? true:false);
-    if (cfg.isTestPlatform)
+    if (cfg.isTestPlatform())
         cfg.setSecDCLogTest(val? true:false);
     return 0;
 }

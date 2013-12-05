@@ -90,6 +90,10 @@ struct PlayerInfo
         brd >> playerId >> name >> level;
         brd >> mainFid >> battlePoint;
     }
+    inline void appendInfo(Stream& st) const
+    {
+        st << name << level << battlePoint << mainFid;
+    }
 };
 struct pd_battlePoint
 {
@@ -210,9 +214,7 @@ struct ServerPreliminaryBattle
         st << static_cast<UInt8>(otherAttrRatio/3) << size;
         for(UInt8 i = 0; i < size; ++ i)
         {
-            st << otherPInfoVec[i].name;
-            st << otherPInfoVec[i].mainFid;
-            st << otherPInfoVec[i].battlePoint;
+            otherPInfoVec[i].appendInfo(st);
         }
     }
     inline void readPreReport(BinaryReader& brd)
@@ -275,10 +277,10 @@ struct ServerEliminationPlayer
     {
         st << serverId << serverName << battlePoint << static_cast<UInt16>(support);
         st << static_cast<UInt8>(attrRatio/3) << static_cast<UInt8>(pInfoSet.size());
-        PInfoSort::iterator it = pInfoSet.begin();
-        for(; it != pInfoSet.end(); ++ it)
+
+        for(PInfoSort::iterator it = pInfoSet.begin(); it != pInfoSet.end(); ++ it)
         {
-            st << (*it).name << (*it).mainFid << (*it).battlePoint;
+            (*it).appendInfo(st);
         }
     }
 };
@@ -409,6 +411,9 @@ class ServerWarMgr
         void setWarSort();
         void signup(Player *);
         void challenge(Player *, std::string&);
+        void notifyChallengeResult(Player* atker, Player* defer, bool win);
+        void attackPlayer(Player* atker, Player* defer);
+        void beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup);
         void sendWarSortInfo(Player *);
         void commitLineup(Player *);
         void jiJianTai_operate(Player *);

@@ -2515,6 +2515,30 @@ void OnServerWarUseGold( GameMsgHdr& hdr, const void* data )
     player->useGold(money, &ci);
 }
 
+void OnServerWarAttack( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * atker = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    if(!atker) return;
+    serverWarMgr.attackPlayer(atker, player);
+}
+
+void OnServerWarBeAttack( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct SWBeAttackData
+	{
+		Player * attacker;
+		UInt16 formation;
+		UInt16 portrait;
+		Lineup lineup[5];
+	};
+	SWBeAttackData* swbad = reinterpret_cast<SWBeAttackData*>(const_cast<void *>(data));
+    if(!swbad) return;
+
+    serverWarMgr.beAttackByPlayer(player, swbad->attacker, swbad->formation, swbad->portrait, swbad->lineup);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 
