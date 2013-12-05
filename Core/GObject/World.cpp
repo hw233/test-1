@@ -151,6 +151,7 @@ bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
 bool World::_11time = false;
 bool World::_ggtime = false;
+bool World::_qzoneRechargetime = false;
 bool World::_ryhbActivity = false;
 bool World::_zcjbActivity = false;
 bool World::_wansheng= false;

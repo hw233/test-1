@@ -8364,10 +8364,10 @@ namespace GObject
         }
 
         AddVar(VAR_RECHARGE_TODAY, r);
+
         GameAction()->onRecharge(this, r);
         if(WORLD().getAccRecharge())
             sendTodayRechargeInfo();
-
         checkZCJB(r);
 
         AddZRYJCount(r);
@@ -11705,6 +11705,10 @@ namespace GObject
                 break;
         case 32:
             getGameBoxAward(opt);
+                break;
+        case 33:
+                if(opt>0)
+                    getQZoneRechargeAward(opt);
                 break;
 
         }
@@ -26268,6 +26272,50 @@ void Player::sendRealSpirit()
     send(stream);
 }
 
+void Player:getQZoneRechargeAward(UInt8 val)
+{
+    UInt32 Recharge[]={100,500,1000,2000,3000,5000};
+    UInt32 recharge = GetVar(VAR_QZONE_RECHARGE);
+    if(val<1||val>6)
+        return ;
+    if(recharge < Recharge[val-1])
+        return ;
+    UInt32 ctslandingAward = GetVar(VAR_QZONE_RECHARGE_AWARD);
+    if(ctslandingAward & (1<<(val-1)))
+        return ;
+    if(!GameAction()->RunQZoneRechargeAward(this, val))
+    {
+        return;
+    }
+    ctslandingAward |= (1<<(val - 1));
+    SetVar(VAR_QZONE_RECHARGE_AWARD, ctslandingAward);
+    
+}
+void Player::sendQZoneRechargeAwardInfo()
+{
+    if (!World::getQZoneRecharge())
+        return;
+    UInt32 QZoneRecharge = GetVar(VAR_QZONE_RECHARGE);
+    UInt32 QZoneRechargeAward = GetVar(VAR_QZONE_RECHARGE_AWARD);
+    Stream st(REP::GETAWARD);   //协议
+    st << static_cast<UInt8>(33);
+    st << static_cast<UInt32>(QZoneRecharge);
+    st << static_cast<UInt8>(QZoneRechargeAward);
+    st << Stream::eos;
+    send(st);
+    
+
+}
+void AddQZoneRecharge()
+{
+    if(getPlatform()!=1 || getPlatform() ! =2)
+        return ;
+    if(World::getQZoneRechargeTime())
+    {
+        AddVar(VAR_QZONE_RECHARGE,r);
+        sendQZoneRechargeAwardInfo();
+    }
+}
 } // namespace GObject
 
 

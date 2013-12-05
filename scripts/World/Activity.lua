@@ -902,6 +902,11 @@ function onActivityCheck(tm)
       else
          setGGTime(false)
       end
+      if tm >= actTime255 and tm < actTime255_1 then
+         setQZoneRechargeTime(true)
+      else
+         setQZoneRechargeTime(false)
+      end
 
       if tm >= actTime551 and tm < actTime551_1 then
           setCompassAct(true)
@@ -1441,6 +1446,9 @@ function initActTime(y, m, d)
   local  SerStartTm254= { ['year'] = 2013, ['month'] =11, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm254_1= { ['year'] = 2013, ['month'] = 11, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  local  SerStartTm255= { ['year'] = 2013, ['month'] =12, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm255_1= { ['year'] = 2013, ['month'] = 12, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1896,6 +1904,8 @@ function initActTime(y, m, d)
   actTime253_1= os.time(SerStartTm253_1);
   actTime254= os.time(SerStartTm254)
   actTime254_1= os.time(SerStartTm254_1);
+  actTime255= os.time(SerStartTm255)
+  actTime255_1= os.time(SerStartTm255_1);
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

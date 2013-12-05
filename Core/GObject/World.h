@@ -536,6 +536,20 @@ public:
     {   _ggtime=v; } 
     inline static bool  getGGTime()
     {return _ggtime; } 
+    inline static void  setQZoneRechargeTime(bool v)
+    {   _qzoneRechargetime=v; } 
+    inline static bool  getQZoneRechargeTime()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_QZONE_RECHARGE_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_QZONE_RECHARGE_END);
+        UInt32 now = TimeUtil::Now() ;
+        if(begin == 0 && end == 0)
+            return _qzoneRechargetime;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
@@ -1090,6 +1104,7 @@ public:
     static bool _11time;
     static bool _qishiban;
     static bool _ggtime;
+    static bool _qzoneRechargetime;
     static bool _ryhbActivity;
     static bool _zcjbActivity;
     static bool _halfgold;
