@@ -5451,6 +5451,18 @@ UInt32 BattleSimulator::doAttack( int pos )
         if(bf->getHP() == 0 || _winner != 0)
             break;
 
+        if(bf->getSoulProtectStatus())
+        {
+            bf->setSoulProtectStatus(false);
+            UInt8 soulProtestLast = bf->getSoulProtectLast();
+            if(soulProtestLast > 0)
+            {
+                bf->setSoulProtectLast(--soulProtestLast);
+                if(soulProtestLast == 0)
+                    appendDefStatus(e_unSoulProtect, 0, bf);
+            }
+        }
+
         UInt32 stun = bf->getStunRound();
         UInt32 confuse = bf->getConfuseRound();
         UInt32 forget = bf->getForgetRound();
@@ -11752,6 +11764,20 @@ void BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u)
         return;
     }
 #endif
+    if(bf->getHP() < static_cast<UInt32>(0.3f * bf->getMaxHP()))
+    {
+        const GData::SkillBase* skillBase = bf->getSkillSoulProtect();
+        if(skillBase && bf->getSoulProtectLast() > 0)
+        {
+            if(static_cast<UInt32>(skillBase->prob * 100) > uRand(10000))
+            {
+                u = u / 10 ;
+                appendDefStatus(e_soulProtect, 0, bf);
+            }
+            bf->setSoulProtectStatus(true);
+        }
+    }
+
     float& shieldHp = bf->getHpShieldSelf();
     if(shieldHp > 0.001f)
     {

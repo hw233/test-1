@@ -319,6 +319,8 @@ private:
         e_unBiLanTianYi = 104,    // 碧岚效果消失
         e_benevolent = 105,    // 慈悲效果
         e_unBenevolent = 106,    // 慈悲效果消失
+        e_soulProtect = 105,    // 天佑
+        e_unSoulProtect = 106,    // 天佑
 
         e_MAX_STATE,
     };
