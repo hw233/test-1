@@ -1829,6 +1829,34 @@ void OnGetMaxCreate(LoginMsgHdr &hdr, const void* data)
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void OnoffQQOpenid(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    
+    struct OnOffQQData
+    {
+        UInt64 pid;
+        UInt32 clanid;
+    } onOffQQ = {0};
+    
+    br >> onOffQQ.pid >> onOffQQ.clanid;
+    
+    GameMsgHdr imh(0x1D9, WORKER_THREAD_WORLD, NULL, sizeof(onOffQQ));
+    GLOBAL().PushMsg(imh, &onOffQQ);
+
+    GObject::Clan *clan = GObject::globalClans[onOffQQ.clanid];
+	GObject::Player * player = GObject::globalPlayers[onOffQQ.pid];
+   
+    UInt8 ret = 0;
+    if (!clan || !player)
+        ret = 1;
+    
+    Stream st(SPEP::OFFQQOPENID);
+    st<< ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 inline bool player_enum_cleartra(GObject::Player* p, int)
 {
     if (p->GetVar(GObject::VAR_TOTALRECHARGEACT))
