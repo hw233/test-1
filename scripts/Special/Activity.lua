@@ -8924,6 +8924,7 @@ function getDragonKingAward(step, flag)
             [13] = {{141,1}},
             [14] = {{6194,1}},
             [15] = {{312,1}},
+            [16] = {{8550,1}, {8551,1}, {8552,1}},
         },
     }
     local chances = {
@@ -8948,7 +8949,7 @@ function getDragonKingAward(step, flag)
     for i = 1, #chances[step] do
         if r <= chances[step][i] then
             if 5 == step then
-                if flag == 9 then  --大闹龙宫之元神出窍
+                if flag == 9 or flag == 16 then  --大闹龙宫之元神出窍 天佑术
                     local chance = { 1400, 8400, 10000 }
                     local rnd = math.random(1, 10000)
                     for j = 1, #chance do

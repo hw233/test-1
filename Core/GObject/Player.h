@@ -251,6 +251,7 @@ namespace GObject
         BILAN       = 13,   //碧岚天衣
         LIUGUANG    = 14,   //刹那流光
         ZHUTIAN     = 15,   //诸天宝鉴
+        TIANYOU     = 16,   //天佑术
 
         DRAGONKING_MAX,
     };
