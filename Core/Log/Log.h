@@ -134,6 +134,7 @@ enum PurchaseType
     Fund                        = 123, //基金消费
     RestStep                    = 124, //七石板重置
     QSBAddTime                  = 125, //七石板加时
+    TuPoJieXian                 = 126, //星辰图突破界限
     //繁体私有占150～200
 };
 
@@ -316,6 +317,7 @@ enum ItemTo
     ToUpgradeKY = 163, //刻印升级所消耗的道具
     ToChangeMoShi = 164, //转换墨石
     ToSanHunUp = 164, //三魂升级
+    ToTunShiXingKong = 165, //吞噬星空
 };
 
 struct IncommingInfo

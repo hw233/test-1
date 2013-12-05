@@ -685,6 +685,36 @@ function RunSummerMeetRechargeAward(player, cts)
     end
     return true
 end
+function RunQZoneRechargeAward(player, cts)
+    local item = {
+        [1] = {{517,2}},
+        [2] = {{551, 2}},
+        [3] = {{514,3},{503,3}},
+        [4] = {{9371,5},{9390, 5}},
+        [5] = {{509,3},{507,3}},
+        [6] = {{9076,5}},
+    };
+    local package = player:GetPackage();
+    if cts == 0 then
+        return false
+    end
+    if cts > 6  then
+        return false
+    end
+    if item[cts] == nil then
+        return false 
+    end
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+    end
+    return true
+end
 function RunBirthdayAward(player)
     if player == nil then
         return 0;

@@ -267,6 +267,7 @@ GMHandler::GMHandler()
     Reg(2, "star", &GMHandler::OnLuckyStarGM);
     Reg(2, "acttm", &GMHandler::OnSurnameleg);
     Reg(2, "openclb", &GMHandler::OnOpenclb);
+    Reg(2, "sendmsg", &GMHandler::OnSendMsg);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -278,6 +279,8 @@ GMHandler::GMHandler()
     Reg(3, "spar", &GMHandler::OnFairySpar);
     
     Reg(3, "setxzlvl", &GMHandler::OnSetXZLvl);
+    Reg(3, "setxctcurval", &GMHandler::OnSetXCTCurVal);
+    Reg(3, "setxctmaxval", &GMHandler::OnSetXCTMaxVal);
     Reg(3, "setxzvalue", &GMHandler::OnSetXCValue);
 
     Reg(2, "eqexp", &GMHandler::OnAddPetEquipExp);
@@ -474,15 +477,45 @@ void GMHandler::OnSetXZLvl(GObject::Player * player, std::vector<std::string>& a
 		return;
 	if(args.size() == 2)
 	{
-		UInt32 fighterId = atoi(args[0].c_str());
-		UInt32 xzLevel = atoi(args[1].c_str());
+		UInt16 fighterId = atoi(args[0].c_str());
+		UInt8 xzLevel = atoi(args[1].c_str());
 		GObject::Fighter * fgt = player->findFighter(fighterId);
 		if(fgt == NULL)
 			return;
-        fgt->getXingchen().lvl = xzLevel;
 
-        fgt->updateDBxingchen();
-        fgt->sendXingchenInfo(0);
+        fgt->GMSetXZLvl(xzLevel);
+	}
+}
+
+void GMHandler::OnSetXCTCurVal(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt16 fighterId = atoi(args[0].c_str());
+		UInt16 xctCurVal = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+
+        fgt->GMSetXCTCurVal(xctCurVal);
+	}
+}
+
+void GMHandler::OnSetXCTMaxVal(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt16 fighterId = atoi(args[0].c_str());
+		UInt16 xctMaxVal = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+
+        fgt->GMSetXCTMaxVal(xctMaxVal);
 	}
 }
 
@@ -4356,6 +4389,17 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_QZONEQQGAMEY_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
+        case 15:
+            GVAR.SetVar(GVAR_QZONE_RECHARGE_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_QZONE_RECHARGE_END, TimeUtil::Now() + 86400*15);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 16:
+            GVAR.SetVar(GVAR_QZONE_RECHARGE_BEGIN, 0);
+            GVAR.SetVar(GVAR_QZONE_RECHARGE_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
     }
 }
 
@@ -4374,6 +4418,21 @@ void GMHandler::OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& 
         player->SetVar(VAR_NUWA_SIGNET, 0);
         player->SetVar(VAR_NUWA_OPENTIME, 0);
     }
+}
+void GMHandler::OnSendMsg(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    UInt32 type = atoi(args[0].c_str());
+    UInt8 value[5] = {0,0,0,0,0};
+    if(args.size()>6)
+        return ;
+    for(UInt8 i=1;i<args.size();++i)
+    {
+        value[i-1] = atoi(args[i].c_str());
+    }
+	GameMsgHdr hdr(type, player->getThreadId(), player, sizeof(value));
+	GLOBAL().PushMsg(hdr, value);
 }
 
 void GMHandler::OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args)

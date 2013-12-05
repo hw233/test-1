@@ -1318,6 +1318,11 @@ struct DBXingchen
     UInt16 gem1;
     UInt16 gem2;
     UInt16 gem3;
+    UInt16 gem4;
+    UInt16 gem5;
+    UInt16 gem6;
+    UInt16 xctCurVal;
+    UInt16 xctMaxVal;
 };
 
 struct DBJiguanshu
@@ -3079,7 +3084,7 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBXingchen)
-SPECIALDEF(7)
+SPECIALDEF(12)
 (
 	UInt32, fighterId,
 	UInt64, playerId,
@@ -3087,7 +3092,12 @@ SPECIALDEF(7)
 	UInt32, curVal,
     UInt16, gem1,
     UInt16, gem2,
-    UInt16, gem3
+    UInt16, gem3,
+    UInt16, gem4,
+    UInt16, gem5,
+    UInt16, gem6,
+    UInt16, xctCurVal,
+    UInt16, xctMaxVal
 )
 SPECIALEND()
 

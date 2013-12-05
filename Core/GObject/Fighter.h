@@ -82,11 +82,13 @@ enum
 struct DBXingchen;
 struct Xingchenzhen
 {
-    Xingchenzhen() : lvl(0), curVal(0) { memset(gems, 0, sizeof(gems)); }
+    Xingchenzhen() : lvl(0), curVal(0), xctCurVal(0), xctMaxVal(0)  { memset(gems, 0, sizeof(gems)); }
 
-    UInt8 lvl;      // 星辰等级
-    UInt32 curVal;  // 当前星辰值
-    UInt16 gems[3]; //镶嵌的宝石id
+    UInt8 lvl;          // 星辰等级
+    UInt32 curVal;      // 当前星辰值
+    UInt16 gems[6];     // 镶嵌的宝石id
+    UInt16 xctCurVal;   // 星辰图当前值
+    UInt16 xctMaxVal;   // 星辰图最大值
 };
 
 struct SStrengthen
@@ -754,6 +756,7 @@ protected:
     void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext );
     void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce );
     void addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
+    void addAttrExtraXCGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
 	virtual void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	void rebuildSkillBattlePoint();
@@ -1029,6 +1032,11 @@ public:
     void dismissXingchen();
     bool quickUpGrade(UInt8 type);
     void xingchenInfo(Stream & st);
+    void tunShiXingKong();
+    void tuPoJieXian();
+    void GMSetXZLvl(UInt8 lvl);
+    void GMSetXCTCurVal(UInt16 value);
+    void GMSetXCTMaxVal(UInt16 value);
 
     void pushPetInfo2Leaderboard();
 };

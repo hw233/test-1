@@ -151,6 +151,7 @@ bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
 bool World::_11time = false;
 bool World::_ggtime = false;
+bool World::_qzoneRechargetime = false;
 bool World::_ryhbActivity = false;
 bool World::_zcjbActivity = false;
 bool World::_wansheng= false;
@@ -465,6 +466,13 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 6)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 14)
 
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
@@ -515,6 +523,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 23)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 30)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 14)
         ))
     {
 #if 0
@@ -1340,7 +1349,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 6)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
-         
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 14)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1504,6 +1519,7 @@ void World::World_Boss_Refresh(void*)
 {
     worldBoss.process(TimeUtil::Now());
 }
+
 void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
@@ -1948,7 +1964,7 @@ bool World::Init()
     UInt32 sweek = TimeUtil::SharpWeek(1);
     AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
 	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
-    
+
     return true;
 }
 
@@ -2442,7 +2458,7 @@ void World::sendGuangGunPlayers(Player* pl)
         player = pl->getGGTimeCaptain();
     UInt32 myPlace = 0;
     UInt32 myScore = 0;
-    UInt8 rank;
+    UInt8 rank = 0;
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
         ++rank;

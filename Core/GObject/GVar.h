@@ -102,6 +102,9 @@ namespace GObject
 
         GVAR_QZONEQQGAMEY_BEGIN = 59,
         GVAR_QZONEQQGAMEY_END = 60,
+
+        GVAR_QZONE_RECHARGE_BEGIN = 61,
+        GVAR_QZONE_RECHARGE_END = 62,
         GVAR_MAX,
     };
 
@@ -179,6 +182,9 @@ namespace GObject
             
             GREGISTER_VAR(GVAR_SUMMER_MEET_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_SUMMER_MEET_END, GCYCLE_NONE);
+
+            GREGISTER_VAR(GVAR_QZONE_RECHARGE_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_QZONE_RECHARGE_END, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
