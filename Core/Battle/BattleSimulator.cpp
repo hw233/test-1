@@ -11713,7 +11713,7 @@ void BattleSimulator::getAtkList(BattleFighter* bf, const GData::SkillBase* skil
     }
 }
 
-UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, bool bIgnore)
+UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, bool alreadyMinus)
 {
     UInt32 uShow = u;
     if(!bf)
@@ -11752,13 +11752,16 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, bool bIgnore)
         return;
     }
 #endif
-    if(u > 0 && bIgnore)
+    if(u > 0)
     {
         UInt8 count = bf->getSoulProtectCount();
         if(count > 0)
         {
-            u /= 10;
-            uShow = u;
+            if(!alreadyMinus)
+            {
+                u /= 10;
+                uShow = u;
+            }
             --count;
             bf->setSoulProtectCount(count);
             if(count == 0)
@@ -13488,10 +13491,6 @@ UInt32 BattleSimulator::doBufMakeDamage(BattleFighter* bf, UInt32& u)
         {
             u /= 10;
             uShow = u;
-            --count;
-            bf->setSoulProtectCount(count);
-            if(count == 0)
-                appendDefStatus(e_unSoulProtect, 0, bf);
         }
     }
     return uShow;
