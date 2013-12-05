@@ -1172,9 +1172,9 @@ private:
     UInt8 _soulProtectLast;
     inline void setSoulProtectLast(UInt8 l) { _soulProtectLast = l; }
     inline UInt8 getSoulProtectLast() { return _soulProtectLast; }
-    bool _soulProtectStatus;
-    inline void setSoulProtectStatus(bool status) { _soulProtectStatus = status; }
-    inline bool getSoulProtectStatus() { return _soulProtectStatus; }
+    UInt8 _soulProtectCount;
+    inline void setSoulProtectCount(UInt8 count) { _soulProtectCount = count; }
+    inline UInt8 getSoulProtectCount() { return _soulProtectCount; }
 
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
