@@ -89,6 +89,11 @@ UInt16 SecondSoul::getSkillSoulOut()
     return static_cast<UInt16>(getSoulSkillValue(SOUL_SKILL_SOULOUT));
 }
 
+UInt16 SecondSoul::getSkillProtect()
+{
+    return static_cast<UInt16>(getSoulSkillValue(SOUL_SKILL_PROTECT));
+}
+
 float SecondSoul::getSoulSkillValue(UInt8 id)
 {
     int size = m_skills.size();
