@@ -24377,6 +24377,8 @@ void Player::SetQQBoardLogin()
     if(now < timeBegin )
         return ;
     UInt32 cts = static_cast<UInt8>((TimeUtil::SharpDayT( 0 , now) - timeBegin)/86400);
+    if(cts > 2)
+        return ;
     UInt32 LoginCanAward = GetVar(VAR_QQBOARD_LOGIN_AWARD); 
     LoginCanAward |= (1<<cts);
     SetVar(VAR_QQBOARD_LOGIN_AWARD,LoginCanAward);
