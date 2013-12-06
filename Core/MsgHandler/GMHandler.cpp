@@ -4727,7 +4727,7 @@ void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::stri
             UInt8 i = 0, j = 0;
             for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
             {
-                if(j >= 100)
+                if(j > 100)
                     break;
                 GObject::Player * player = it->second;
                 if(player && player->GetLev() >= LIMIT_LEVEL)
@@ -4761,14 +4761,14 @@ void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::stri
             UInt32 i = 0;
             for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
             {
+                if(i > 100)
+                    break;
                 Player * player = it->second;
                 if(player && player->GetLev() >= LIMIT_LEVEL)
                 {
                     serverWarMgr.signup(player);
                     ++ i;
                 }
-                if(i >= 1280)
-                    break;
             }
         }
         break;
