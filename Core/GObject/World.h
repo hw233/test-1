@@ -25,6 +25,17 @@ namespace Script
 
 namespace GObject
 {
+
+//仙界相关
+enum ARENA_STATE
+{
+    ARENA_XIANJIE_NONE    = 0,
+    ARENA_XIANJIE_DIYI    = 1,
+    ARENA_XIANJIE_ZHIZUN  = 2,
+    ARENA_XIANJIE_CHUANQI = 3,
+    ARENA_XIANJIE_MAX,
+};
+
 class Clan;
 struct MoneyIn
 {
@@ -142,7 +153,8 @@ public:
 
 public:
     inline static UInt8 getArenaState() { return _arenaState; }
-    inline static void setArenaState(UInt8 as) { if(as > 2) as = 2; _arenaState = as; }
+    inline static void setArenaState(UInt8 as) { if(as >= ARENA_XIANJIE_MAX) as = ARENA_XIANJIE_MAX-1; _arenaState = as; }
+
 	inline UInt32 ThisDay() { return _today; }
 	inline UInt32 Now() { return _now; }
 	inline bool isNewCountryBattle() { return !(_wday % 2); }
@@ -543,8 +555,6 @@ public:
         UInt32 begin = GVAR.GetVar(GVAR_QZONE_RECHARGE_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_QZONE_RECHARGE_END);
         UInt32 now = TimeUtil::Now() ;
-        if(begin == 0 && end == 0)
-            return _qzoneRechargetime;
         if( now >= begin && now <= end)
             return true;
         else
@@ -1038,6 +1048,7 @@ public:
     static bool _3366giftact;
     static bool _qzongpygiftact;
     static void* _recalcwd;
+    static void* _swBosstimer;
     static bool _june;
     static bool _june1;
     static bool _july;
@@ -1118,7 +1129,7 @@ public:
     static UInt8 m_sysDailogPlatform;
     static Player* spreadKeeper;
     static UInt32 spreadBuff;
-    static UInt8 _arenaState;      //0:无 1:仙界第一 2:仙界至尊
+    static UInt8 _arenaState;      //0:无 1:仙界第一 2:仙界至尊 3:仙界传奇
     static bool _memcinited;
 public:
     static RCSortType qishibanScoreSort;     //七石板积分排名
@@ -1170,6 +1181,7 @@ private:
     //static void advancedHookTimer(void *para);
 public:
 	static void ReCalcWeekDay( World * );
+	static void ServerWarBoss_Refresh( World * );
 
 #ifndef _WIN32
 public:

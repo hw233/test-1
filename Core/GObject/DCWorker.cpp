@@ -111,7 +111,7 @@ namespace GObject
                     TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, i, size, msg, r ? 1 : 0);
                     TRACE_LOG("logType = %u", (UInt32)logType);
                 }
-                if (logType == LT_SECDATA && cfg.secdclogTest && cfg.isTestPlatform)
+                if (logType == LT_SECDATA && cfg.secdclogTest && cfg.isTestPlatform())
                 {
                     TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, i, size, msg, r ? 1 : 0);
                 }

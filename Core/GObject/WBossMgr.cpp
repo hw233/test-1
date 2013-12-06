@@ -386,7 +386,7 @@ void WBoss::reward(Player* player)
 
     UInt32 lucky1 = uRand(sz);
     UInt32 lucky2 = uRand(sz);
-    if (lucky1 == lucky2)
+    while (lucky1 == lucky2 && sz > 1)
         lucky2 = uRand(sz);
 
     std::set<UInt32> comp;

@@ -60,6 +60,15 @@ struct ArenaMsgHdr
 	int	sessionID;
 };
 
+struct ServerWarMsgHdr
+{
+	ServerWarMsgHdr():
+		sessionID(0) { }
+	ServerWarMsgHdr(UInt32 id, UInt8 did, int sess, UInt32 blen):
+		msgHdr(id, did, blen), sessionID(sess) { }
+	MsgHdr	msgHdr;
+	int	sessionID;
+};
 /*struct SocialMsgHdr
 {
 	SocialMsgHdr():

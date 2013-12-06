@@ -55,6 +55,7 @@
 #include "Memcached.h"
 #include "Version.h"
 #include "GObject/FairySpar.h"
+#include "GObject/ArenaServerWar.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -294,6 +295,7 @@ GMHandler::GMHandler()
     Reg(2, "getkey", &GMHandler::OnGetKey);
     Reg(3, "addshlvl", &GMHandler::OnAddSHLvl);
     Reg(3, "playermsg", &GMHandler::OnPlayerMsg);
+    Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
 
     _printMsgPlayer = NULL;
 }
@@ -4711,6 +4713,101 @@ void GMHandler::OnPlayerMsg(GObject::Player* player, std::vector<std::string>& a
 
 	GObject::Player * pl = GObject::globalPlayers[playerId];
     _printMsgPlayer = pl;
+}
+
+void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+        return;
+    switch(atoi(args[0].c_str()))
+    {
+    case 1:
+        {
+            std::map<Player *, UInt8> warSort;
+            UInt8 i = 0, j = 0;
+            for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+            {
+                if(j >= 200)
+                    break;
+                GObject::Player * player = it->second;
+                if(player && player->GetLev() >= LIMIT_LEVEL)
+                    warSort.insert(std::make_pair(player, i++));
+                if(warSort.size() == 10)
+                {
+                    struct SWarEnterData {
+                        Stream st;
+                        std::map<Player *, UInt8> warSort;
+
+                        SWarEnterData(Stream& st2, std::map<Player *, UInt8>& warSort2) : st(st2), warSort(warSort2) {}
+                    };
+
+                    Stream st(SERVERWARREQ::ENTER, 0xEE);
+                    st << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size());
+
+                    SWarEnterData * swed = new SWarEnterData(st, warSort);
+                    std::map<Player *, UInt8>::iterator it = warSort.begin();
+                    GameMsgHdr hdr(0x382, it->first->getThreadId(), it->first, sizeof(SWarEnterData*));
+                    GLOBAL().PushMsg(hdr, &swed);
+
+                    i = 0;
+                    j ++;
+                    warSort.clear();
+                }
+            }
+        }
+        break;
+    case 2:
+        {
+            UInt32 i = 0;
+            for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+            {
+                Player * player = it->second;
+                if(player && player->GetLev() >= LIMIT_LEVEL)
+                {
+                    serverWarMgr.signup(player);
+                    ++ i;
+                }
+                if(i >= 1280)
+                    break;
+            }
+        }
+        break;
+    case 3:
+        {
+            UInt8 type = 1;
+            GameMsgHdr hdr(0x1EB, WORKER_THREAD_WORLD, NULL, sizeof(type));
+            GLOBAL().PushMsg(hdr, &type);
+        }
+        break;
+    case 4:
+        GObject::serverWarBoss.setHP(atoi(args[1].c_str()));
+        GObject::serverWarBoss.sendHp();
+        break;
+    case 5:
+        player->SetVar(VAR_SERVERWAR_JIJIANTAI, 0);
+        player->SetVar(VAR_SERVERWAR_JIJIANTAI1, 0);
+        GObject::serverWarMgr.sendjiJianTaiInfo(player);
+        break;
+    case 6:
+        {
+            GVAR.SetVar(GVAR_SERVERWAR_JIJIANTAI, atoi(args[1].c_str()));
+            Stream st(REP::SERVERWAR_ARENA_OP);
+            st << static_cast<UInt8>(0x04) << static_cast<UInt8>(6);
+            st << GVAR.GetVar(GVAR_SERVERWAR_JIJIANTAI);
+            st << Stream::eos;
+            NETWORK()->Broadcast(st);
+        }
+        break;
+    case 7:
+        {
+            UInt32 data = 0;
+            data = SET_BIT_8(data, 0, 20);
+            data = SET_BIT_8(data, 1, 20);
+            player->SetVar(VAR_SERVERWAR_JIJIANTAI1, data);
+            GObject::serverWarMgr.sendjiJianTaiInfo(player);
+        }
+        break;
+    }
 }
 
 

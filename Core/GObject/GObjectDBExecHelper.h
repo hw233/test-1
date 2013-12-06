@@ -1384,22 +1384,19 @@ struct DBTeamArenaSkill
 	UInt32 extra;
 };
 
-struct DBTeamArenaBet
-{
-	UInt64 id;
-	UInt8 round;
-	UInt8 state;
-	UInt8 group;
-	UInt8 recieved;
-	UInt16 pos;
-	UInt8 tael;
-};
-
 struct DBTeamPendingPlayer
 {
 	UInt64 teamId;
 	UInt64 playerId;
 	UInt32 opTime;
+};
+
+struct DBArenaServerWar
+{
+    UInt64 playerId;
+    UInt8  type;
+    UInt32 pos;
+    UInt32 battlePoint;
 };
 
 struct DBZhenwei
@@ -3174,19 +3171,6 @@ SPECIALDEF(4)
 )
 SPECIALEND()
 
-SPECIALBEGIN(GObject::DBTeamArenaBet)
-SPECIALDEF(7)
-(
-	UInt64, id,
-	UInt8, round,
-	UInt8, state,
-	UInt8, group,
-	UInt8, recieved,
-	UInt16, pos,
-	UInt8, tael
-)
-SPECIALEND()
-
 SPECIALBEGIN(GObject::DBTeamPendingPlayer)
 SPECIALDEF(3)
 (
@@ -3194,6 +3178,16 @@ SPECIALDEF(3)
 	UInt64, playerId,
 	UInt32, opTime
 )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBArenaServerWar)
+SPECIALDEF(4)
+    (
+    UInt64, playerId,
+    UInt8,  type,
+    UInt32, pos,
+    UInt32, battlePoint
+    )
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBZhenwei)

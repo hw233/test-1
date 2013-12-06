@@ -1604,6 +1604,7 @@ function ItemNormal_00000482(iid, num, bind, param)
         [486] = {270},
         [487] = {298},
         [488] = {226,90,225,227,270,298},
+        [9432] = {6195},
     }
     local item = 0
 
@@ -1636,7 +1637,11 @@ function ItemNormal_00000482(iid, num, bind, param)
         end
 
         if item == 60000 then
-            package:AddItem(trumpfrag[iid][math.random(1,#trumpfrag[iid])], 1, 1, 0, 2)
+            bind = true
+            if iid == 9432 then
+                bind = false
+            end
+            package:AddItem(trumpfrag[iid][math.random(1,#trumpfrag[iid])], 1, bind, 0, 2)
         elseif item == 60001 then
             local trump = getRandTrump(player:GetLev())
             if trump == 0 then
@@ -10219,6 +10224,7 @@ local ItemNormal_Table = {
     [486] = ItemNormal_00000482,
     [487] = ItemNormal_00000482,
     [488] = ItemNormal_00000482,
+    [9432] = ItemNormal_00000482,
 
     [492] = ItemNormal_00000492,
     [493] = ItemNormal_00000493,

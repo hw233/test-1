@@ -243,7 +243,7 @@ CREATE TABLE IF NOT EXISTS `item_courses` (
   `player_id` bigint(20) unsigned NOT NULL,
   `item_id` int(10) unsigned NOT NULL,
   `item_num` int(10) unsigned NOT NULL,
-  `from_to` tinyint(3) unsigned NOT NULL,
+  `from_to` int(3) unsigned NOT NULL,
   `happened_time` int(10) unsigned NOT NULL,
   INDEX server_player (`server_id`, `player_id`),
   INDEX server_player_time (`server_id`, `player_id`, `happened_time`),
@@ -262,7 +262,7 @@ CREATE TABLE IF NOT EXISTS `equip_courses` (
   `player_id` bigint(20) unsigned NOT NULL,
   `template_id` int(10) unsigned NOT NULL,
   `equip_id` int(10) unsigned NOT NULL,
-  `from_to` tinyint(3) unsigned NOT NULL,
+  `from_to` int(3) unsigned NOT NULL,
   `happened_time` int(10) unsigned NOT NULL,
   INDEX server_player (`server_id`, `player_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

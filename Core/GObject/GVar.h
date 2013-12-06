@@ -4,6 +4,7 @@
 
 #include "Common/TimeUtil.h"
 #include "Common/Singleton.h"
+#include "Common/Mutex.h"
 
 namespace GObject
 {
@@ -103,8 +104,13 @@ namespace GObject
         GVAR_QZONEQQGAMEY_BEGIN = 59,
         GVAR_QZONEQQGAMEY_END = 60,
 
-        GVAR_QZONE_RECHARGE_BEGIN = 61,
-        GVAR_QZONE_RECHARGE_END = 62,
+        GVAR_SERVERWAR_ISENTER = 61,    //跨服服战是否报名
+        GVAR_SERVERWAR_JIJIANTAI = 62, //跨服服战祭剑台 所有人成功的祭剑总数
+        GVAR_SERVERWAR_XIUWEI = 63, //服战名次带来的修为加成 20表明服战第一名
+
+        GVAR_QZONE_RECHARGE_BEGIN = 64,
+        GVAR_QZONE_RECHARGE_END = 65,
+
         GVAR_MAX,
     };
 
@@ -183,6 +189,19 @@ namespace GObject
             GREGISTER_VAR(GVAR_SUMMER_MEET_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_SUMMER_MEET_END, GCYCLE_NONE);
 
+            GREGISTER_VAR(GVAR_SUMMER_FLOW_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_SUMMER_FLOW_END, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_QZONEQQGAME_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_QZONEQQGAME_END, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_QISHIBANGAME_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_QISHIBANGAME_END, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_QZONEQQGAMEY_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_QZONEQQGAMEY_END, GCYCLE_NONE);
+
+            GREGISTER_VAR(GVAR_SERVERWAR_ISENTER, GCYCLE_WEEK);
+            GREGISTER_VAR(GVAR_SERVERWAR_JIJIANTAI, GCYCLE_WEEK);
+            GREGISTER_VAR(GVAR_SERVERWAR_XIUWEI, GCYCLE_WEEK);
+
             GREGISTER_VAR(GVAR_QZONE_RECHARGE_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_QZONE_RECHARGE_END, GCYCLE_NONE);
         }
@@ -193,6 +212,7 @@ namespace GObject
         void LoadVar(UInt32 id, UInt32 data, UInt32 overTime);
         void SetOffset(UInt32 offset){ m_Offset = offset; }
         bool SetOverTime(UInt32 id, UInt32 overTime, bool force = false);
+        UInt32 GetOverTime(UInt32 id);
 
     private:
         UInt32 GetType(UInt32 id) const;
@@ -204,6 +224,7 @@ namespace GObject
         UInt32 m_Vars[GVAR_MAX];
         UInt32 m_OverTime[GVAR_MAX];
         UInt32 m_Offset;
+        FastMutex _mutex;
 
         static UInt32 m_VarTypes[GVAR_MAX];
     };
