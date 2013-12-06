@@ -2272,6 +2272,8 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
 
                     if(bo->getLostHP() == 0)
                         continue;
+                    if(bo->isLingQu() || bo->isSoulOut())
+                        continue;
 
                     float factor = 1;
                     int idx = std::min(abs(fsize-1), i);
