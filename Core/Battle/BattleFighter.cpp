@@ -2692,7 +2692,7 @@ void BattleFighter::updateSoulSkillProtect(UInt16 skillId)
     if(_passiveSkillSoulProtect.size() > 0)
         return;
     _passiveSkillSoulProtect.insert(_passiveSkillDead.end(), skillItem);
-    setSoulProtectLast(skillItem.base->last);
+    setSoulProtectLast(1);
 }
 
 void BattleFighter::updatePassiveSkillPrvAtk100Status()
