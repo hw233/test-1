@@ -16571,6 +16571,7 @@ namespace GObject
                 st << fgt->getSoulSkillSoulOut();
                 st << fgt->getPortrait();
                 fgt->appendElixirAttr2(st);
+                st << fgt->getSoulSkillProtect();
             }
         }
         st.data<UInt8>(offset) = c;
@@ -16595,6 +16596,7 @@ namespace GObject
             st << _onBattlePet->getSoulSkillSoulOut();
             st << _onBattlePet->getPortrait();
             _onBattlePet->appendElixirAttr2(st);
+            st << _onBattlePet->getSoulSkillProtect();
         }
         else
         {
