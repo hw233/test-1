@@ -6444,7 +6444,7 @@ void Fighter::tunShiXingKong()
     UInt8 useMoney = 100;
     if(_owner->getCoupon() + _owner->getGold() >= useMoney)
     {
-        ConsumeInfo ci(RestStep, 0, 0);
+        ConsumeInfo ci(TunShiXingkong, 0, 0);
         if(_owner->getCoupon() > 0)
         {
             if(_owner->getCoupon() < useMoney)
