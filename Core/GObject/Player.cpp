@@ -10575,7 +10575,17 @@ namespace GObject
         if(getBuffData(PLAYER_BUFF_CLANTREE3))
             factor += 0.1f;
         //仙界传奇(服战) 修为加成
-        float fuzhanRatio = (float)GVAR.GetVar(GVAR_SERVERWAR_XIUWEI) / 100;
+        float fuzhanRatio = 0.0f;
+        if(getBuffData(SERVERWAR_BUFF_XIUWEI1))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI1 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI2))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI2 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI3))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI3 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI4))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI4 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI5))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI5 / 100;
         factor += fuzhanRatio;
 
         return factor;

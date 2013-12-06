@@ -272,6 +272,13 @@ void ServerWarMgr::challenge(Player * atker, std::string& name)
         sendWarSortInfo(atker);
         return;
     }
+    if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging))
+        return ;
+    if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
+    {
+        atker->sendMsgCode(0, 1413);
+        return ;
+    }
     if(atker->inServerWarChallengeCD())
     {
         Stream st(REP::SERVERWAR_ARENA_OP);
@@ -279,13 +286,6 @@ void ServerWarMgr::challenge(Player * atker, std::string& name)
         st << static_cast<UInt8>(2) << atker->getServerWarChallengeCD() << Stream::eos;
         atker->send(st);
         return;
-    }
-    if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging))
-        return ;
-    if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
-    {
-        atker->sendMsgCode(0, 1413);
-        return ;
     }
 	atker->addGlobalFlag(Player::Challenging);
 	defer->addGlobalFlag(Player::BeChallenging);
@@ -783,7 +783,7 @@ void ServerWarMgr::sendjiJianTaiInfo(Player * player)
 static UInt32 MAX_CNT = 20000;
 void ServerWarMgr::enterArena()
 {
-    if(!isOpen() || _warSort.size() < SERVERWAR_MAX_MEMBER || cfg.isTestPlatform())
+    if(!isOpen() || _warSort.size() < SERVERWAR_MAX_MEMBER)
         return;
     struct SWarEnterData {
         Stream st;
@@ -813,7 +813,7 @@ void ServerWarMgr::enterArena()
 
 void ServerWarMgr::enterArena_neice()
 {
-    if(!isOpen() || !cfg.isTestPlatform())
+    if(!isOpen())
         return;
     UInt8 attr = 0;
     UInt32 jiJianCnt = GVAR.GetVar(GVAR_SERVERWAR_JIJIANTAI);
@@ -947,15 +947,19 @@ void ServerWarMgr::readFrom(BinaryReader& brd)
 	case e_war_challenge:
 		break;
 	case e_war_challenge_end:
-        enterArena();
-        enterArena_neice();
+        if(cfg.isTestPlatform())
+            enterArena_neice();
+        else
+            enterArena();
 		break;
     case e_war_group:
         if(!GVAR.GetVar(GVAR_SERVERWAR_ISENTER))
         {
             setWarSort();
-            enterArena();
-            enterArena_neice();
+            if(cfg.isTestPlatform())
+                enterArena_neice();
+            else
+                enterArena();
         }
         break;
     case e_war_group_end:
@@ -2383,7 +2387,7 @@ void ServerWarBoss::appear(UInt32 npcId)
         map->Show(mo.m_ID, true, mo.m_Type);
     }
 
-    printf("loc:%u, npcId:%u\n", _loc, _npcid);
+    TRACE_LOG("ServerWarBoss===============>>loc:%u, npcId:%u", _loc, _npcid);
     sendId();
     sendLoc();
     sendCount();
