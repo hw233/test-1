@@ -1003,13 +1003,13 @@ public:
     void RankLuckyDraw(Player* player, bool notify = true);
     void SendLuckyDrawList(Player* player);
     void SendLuckyDrawAward();
-    UInt32 FindTheOldMan(Player* pl); // 找到圣诞老人
 public:
 	static void calWeekDay( World * world );
     inline static void setSysDailogPlatform(UInt8 v) { m_sysDailogPlatform = v; }
     inline static UInt8 getSysDailogPlatform() { return m_sysDailogPlatform; }
     static Player* getSpreadKeeper();
     static UInt32 getSpreadCount();
+    static UInt32 FindTheOldMan(Player* pl); // 找到圣诞老人
 public:
     static UInt32 _moneyLogged;
     static MoneyIn _moneyIn[7][2];

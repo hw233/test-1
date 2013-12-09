@@ -7484,22 +7484,25 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
         break;
     case 0x26:
         {
+            if(!World::getOldManTime())
+                return ;
             brd >>op ;
             switch(op)
             {
                 case 1:
-                    player->sendOldManPos();
-                    break;
+                    {
+                        UInt8 idx = 0;
+                        brd >> idx ;
+                        if(idx == 0)
+                            player->sendOldManPos();
+                        player->sendOldManLeftTime();
+                        break;
+                    }
                 case 2:
                     UInt8 idx =0 ;
                     brd >> idx ;
                     switch(idx)
                     {
-                        case 0:
-                            {
-                                player->GetFindOldManAward();
-                            }
-                            break;
                         case 1:
                             {
                                 UInt8 index = 0 ;

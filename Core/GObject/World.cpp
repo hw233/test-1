@@ -1533,17 +1533,21 @@ void World::World_OldMan_Refresh(void *)
         return ;
     UInt32 now = TimeUtil::Now();
     UInt32 time = now - TimeUtil::SharpDay(0, now);
+  //  std::cout<<time-8*3600+300<<std::endl;
     if(time >= 8*3600 - 300 - 2 && time < 8*3600 - 300 +3 )
     {
+    //    std::cout<<"即将出现"<<std::endl;
         SYSMSG_BROADCASTV(571); 
     }
     else if ( time < 7 *3600 || time > 20 *3600 )
     {
+      //  std::cout<<"End"<<std::endl;
         return ;
     }
-    else if( (time%3600) < 3 && (time%3600)>= 3600 -2 )
+    else if( (time%3600) < 3 || (time%3600)>= 3600 -2 )
     {
         UInt16 spot = GetRandomSpot();
+        std::cout<<"ChangeTo:"<<spot<<std::endl;
         if(_oldMan._spot == 0)
         {
             SYSMSG_BROADCASTV(572,spot); 
@@ -1553,6 +1557,7 @@ void World::World_OldMan_Refresh(void *)
             SYSMSG_BROADCASTV(573,spot); 
         }
         _oldMan._spot = spot;
+        _oldMan._players.clear();
     }
 }
 void World::Tianjie_Refresh(void*)
@@ -2000,8 +2005,8 @@ bool World::Init()
     AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
 	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
     
-    AddTimer(5 * 1000, World_OldMan_Refresh, static_cast<void*>(NULL), 5 * 1000);
-   
+    if(now < GVAR.GetVar(GVAR_OLDMAN_END) )
+            AddTimer(5 * 1000, World_OldMan_Refresh, static_cast<void*>(NULL), 5 * 1000);
     //开服战世界boss
     UInt32 value = GVAR.GetVar(GVAR_SERVERWAR_XIUWEI);
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
@@ -2223,12 +2228,12 @@ void World::SendLuckyDrawAward()
 UInt32 World::FindTheOldMan(Player* pl)
 {
     UInt16 loc = pl->getLocation();
-    if(_oldMan._spot == loc)
+    if(_oldMan._spot != loc)
         return 0;
-    if(_oldMan._spot.find(pl->getId())!= _oldMan._spot.end())
+    if(_oldMan._players.find(pl->getId())!= _oldMan._players.end())
         return 0;
-    _oldMan._spot.insert(pl->getId());
-    return _oldMan._spot.size();
+    _oldMan._players.insert(pl->getId());
+    return _oldMan._players.size();
 }
 bool enum_openact(void * ptr, void * v)
 {
@@ -3611,10 +3616,24 @@ UInt32 World::GetMemCach_qishiban(const char * openId)
 }
 UInt16 World::GetRandomSpot()
 {
-    UInt32 size = mapList.size();
-    UInt32 rand = uRand(size);
-    Map *map = mapList.at(rand);
-    return map->GetRandomSpot();
+    GObject::MapList::iterator it;
+    UInt16 count = 0;
+    for (it = mapList.begin(); it != mapList.end(); ++ it)
+    {
+        if(*it)
+            ++ count;
+    }
+    UInt16 index = uRand(count);
+    count = 0;
+    for (it = mapList.begin(); it != mapList.end(); ++ it)
+    {
+        if(*it)
+        {
+            if (count ++ == index)
+                return (*it)->GetRandomSpot();
+        }
+    }
+    return 0;
 }
 
 void World::SendGuangGunAward()    //待定

@@ -3058,6 +3058,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         break;
         case 0x26:
             {
+                if(!World::getOldManTime())
+                    return ;
                 brd >> op;
                 switch(op)
                 {
@@ -3067,7 +3069,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                            brd >> index ;
                            if(index == 0)
                            {
-                               UInt32 type = World::FindTheOldMan(player);
+                               UInt32 type = GObject::World::FindTheOldMan(player);
                                if(type ==0 )
                                    break;
                                GameMsgHdr h(0x355,  player->getThreadId(), player, sizeof(UInt32));

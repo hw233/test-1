@@ -136,6 +136,7 @@ enum PurchaseType
     QSBAddTime                  = 125, //七石板加时
     TuPoJieXian                 = 126, //星辰图突破界限
     ServerWarConsume            = 127, //仙界传奇消费
+    SearchOldMan                = 128, //捉迷藏活动包打听
     //繁体私有占150～200
 };
 
