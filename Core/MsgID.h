@@ -275,6 +275,8 @@ namespace REQ
     const UInt8 ACTIVITY_SIGNIN     = 0x4C;
     /**变强之路*/
     const UInt8 STRENGTHEN_LIST     = 0x4D;
+    /**仙界传奇*/
+    const UInt8 SERVERWAR_ARENA_OP  = 0x4E;
     /**关系列表请求 */
     const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     /**关系列表操作 */
@@ -607,6 +609,8 @@ namespace REP
     const UInt8 ACTIVITY_SIGNIN     = 0x4C;
     /**变强之路*/
     const UInt8 STRENGTHEN_LIST     = 0x4D;
+    /**仙界传奇*/
+    const UInt8 SERVERWAR_ARENA_OP  = 0x4E;
 
     const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     const UInt8 FRIEND_ACTION       = 0xD9;// 0xA9
@@ -877,7 +881,17 @@ namespace ARENAREQ
     const UInt8 TEAMARENA_ENTER     = 0x10;
     const UInt8 TEAMARENA_LINEUP    = 0x11;
     const UInt8 TEAMARENA_INSPIRE   = 0x12;
-    const UInt8 TEAMARENA_CLEAR     = 0x13;
+}
+
+namespace SERVERWARREQ
+{
+    const UInt8 REG                 = 0x01;
+    const UInt8 ENTER               = 0x02;
+    const UInt8 COMMIT_LINEUP       = 0x03;
+    const UInt8 BET                 = 0x04;
+    const UInt8 BATTLE_REPORT       = 0x05;
+    
+    const UInt8 ARENA_TO_SERVERWAR  = 0x10;     //"仙界第一/仙界至尊"TCP连接"仙界传奇" 占用
 }
 
 enum CLAN_COPY

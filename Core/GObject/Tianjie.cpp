@@ -2126,6 +2126,7 @@ void Tianjie::startBoss()
 
         _hp = ohp;
         nflist[0].fighter->setBaseHP(ohp);
+        nflist[0].fighter->setWBoss(true);
 
         extatk = (WBOSS_BASE_TIME/(float)lastTime - 1.f) * WBOSS_ATK_FACTOR * (atk + baseatk);
         nflist[0].fighter->setExtraAttack(extatk + atk);

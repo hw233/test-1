@@ -417,6 +417,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_TEAMARENA_WORSHIP = 426, //组队跨服战每日崇拜冠军
         VAR_TEAMARENA_INSPIRE = 427, //组队跨服战鼓舞等级失败保护次数
 
+        VAR_SERVERWAR_JIJIANTAI = 428,  //跨服服战祭剑台 1byte步数,2byte内外圈,3和4byte道具id
+        VAR_SERVERWAR_JIJIANTAI1 = 429,  //跨服服战祭剑台 1byte每人祭剑的次数,2byte成功完成的祭剑次数 3byte宝箱开启情况
+
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
         VAR_RP7_TREASURE = 432,  //回流服务器聚宝盆, 1-8位:是否购买的标志为 9-16,17-24,25-32位第1-3个聚宝盆的已领取次数
@@ -578,6 +581,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_REAL_SPIRIT = 640,           //真元
         VAR_MODIFY_NAME_CD = 641,//改名CD
         VAR_REAL_SPIRIT_GET = 642,       //当日是否领取真元 
+        VAR_QZONE_RECHARGE = 643,       //空间充值 
+        VAR_QZONE_RECHARGE_AWARD = 644,       //空间充值奖励领取
 
         VAR_MAX,
     };
@@ -942,6 +947,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_TEAMARENA_CREATE, CYCLE_DAY);
             REGISTER_VAR(VAR_TEAMARENA_WORSHIP, CYCLE_DAY);
             REGISTER_VAR(VAR_TEAMARENA_INSPIRE, CYCLE_NONE);
+            REGISTER_VAR(VAR_SERVERWAR_JIJIANTAI, CYCLE_WEEK);
+            REGISTER_VAR(VAR_SERVERWAR_JIJIANTAI1, CYCLE_WEEK);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
@@ -1105,6 +1112,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_GAMEBOX_NEW, CYCLE_NONE);
             REGISTER_VAR(VAR_REAL_SPIRIT, CYCLE_NONE);
             REGISTER_VAR(VAR_REAL_SPIRIT_GET, CYCLE_DAY);
+            REGISTER_VAR(VAR_QZONE_RECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_QZONE_RECHARGE_AWARD, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

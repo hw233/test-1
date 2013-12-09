@@ -37,6 +37,7 @@
 #include "CountryBattle.h"
 #include "Arena.h"
 #include "ArenaTeam.h"
+#include "ArenaServerWar.h"
 #include "GData/NpcGroup.h"
 #include "GData/LootTable.h"
 #include "GData/ExpTable.h"
@@ -529,6 +530,18 @@ namespace GObject
             fprintf(stderr, "LoadTeamPendingPlayers error!\n");
             std::abort();
         }
+		if(!LoadArenaServerWar())
+        {
+            fprintf(stderr, "LoadArenaServerWar error!\n");
+            std::abort();
+        }
+		if(!LoadServerWarBets())
+        {
+            fprintf(stderr, "LoadServerWarBets error!\n");
+            std::abort();
+        }
+
+		DB::gDataDBConnectionMgr->UnInit();
 		if(!loadQiShiBan())
         {
             fprintf(stderr, "loadQiShiBan error!\n");
@@ -4821,7 +4834,7 @@ namespace GObject
 			}
 			if (pl == NULL)
 				continue;
-			arena.pushBetFromDB(pl, ab.round, ab.state, ab.group, ab.recieved, ab.pos, ab.tael);
+			arena.pushBetFromDB(pl, ab);
 		}
 		lc.finalize();
 
@@ -5469,7 +5482,7 @@ namespace GObject
         LoadingCounter lc("Loading Fighter xingchen:");
 		DBXingchen dbxc;
         Player* pl = NULL;
-		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3` FROM `fighter_xingchen`", dbxc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `xctCurVal`, `xctMaxVal` FROM `fighter_xingchen`", dbxc) != DB::DB_OK)
 			return false;
 		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -6609,7 +6622,7 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Team Arena Bets");
-		DBTeamArenaBet ab;
+		DBArenaBet ab;
 		if(execu->Prepare("SELECT `id`, `round`, `state`, `group`, `recieved`, `pos`, `tael` FROM `arena_team_bet` ORDER BY `id`", ab)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
@@ -6625,7 +6638,7 @@ namespace GObject
 			}
 			if (pl == NULL)
 				continue;
-			teamArenaMgr.pushBetFromDB(pl, ab.round, ab.state, ab.group, ab.recieved, ab.pos, ab.tael);
+			teamArenaMgr.pushBetFromDB(pl, ab);
 		}
 		lc.finalize();
 
@@ -6657,6 +6670,52 @@ namespace GObject
             tad->pendingMap.insert(std::make_pair(dbtpp.playerId, tpm));
 		}
 		lc.finalize();
+		return true;
+	}
+
+	bool GObjectManager::LoadArenaServerWar()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading serverWar players:");
+		DBArenaServerWar dbasw;
+		if(execu->Prepare("SELECT `playerId`, `type`, `pos`, `battlePoint` FROM `arena_serverWar` ORDER BY `playerId`", dbasw) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            serverWarMgr.loadFromDB(dbasw);
+		}
+		lc.finalize();
+		return true;
+	}
+
+	bool GObjectManager::LoadServerWarBets()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading server war Bets");
+		DBArenaBet ab;
+		if(execu->Prepare("SELECT `id`, `round`, `state`, `group`, `recieved`, `pos`, `tael` FROM `arena_serverWar_bet` ORDER BY `id`", ab)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(ab.id != last_id)
+			{
+				last_id = ab.id;
+				pl = globalPlayers[last_id];
+			}
+			if (pl == NULL)
+				continue;
+			serverWarMgr.pushBetFromDB(pl, ab);
+		}
+		lc.finalize();
+
 		return true;
 	}
 

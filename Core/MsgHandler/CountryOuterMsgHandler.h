@@ -67,6 +67,7 @@
 #include "GObject/RechargeTmpl.h"
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
+#include "GObject/ArenaServerWar.h"
 
 struct NullReq
 {
@@ -3221,6 +3222,8 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 
     if (WBossMgr::isWorldBoss(anr._npcId))
         worldBoss.attack(player, loc, anr._npcId);
+    else if(serverWarBoss.isServerWarBoss(anr._npcId))
+        serverWarBoss.attack(player, loc, anr._npcId);
     else
         player->attackNpc(anr._npcId, 0xFFFFFFFF, player->GetLev() <= 20);
 }
@@ -6769,6 +6772,18 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
         {
             //一键描绘星辰图
             fgt->quickUpGrade(opt);
+        }
+        break;
+    case 6:
+        {
+            //吞噬星空
+            fgt->tunShiXingKong();
+        }
+        break;
+    case 7:
+        {
+            //突破界限
+            fgt->tuPoJieXian();
         }
         break;
     }

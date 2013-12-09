@@ -93,6 +93,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _soulSkillSoulOut = 0;
     _hideFashion = 0;
     _innateTrump = NULL;
+    _soulSkillProtect = 0;
 }
 
 /*
@@ -1472,6 +1473,14 @@ void Fighter::addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt )
     }
 }
 
+void Fighter::addAttrExtraXCGem( GData::AttrExtra& ae, GData::ItemGemType * igt )
+{
+	if(igt == NULL)
+		return;
+
+    ae += *(igt->attrExtra) * ((m_xingchen.xctCurVal ? ((double)m_xingchen.xctCurVal/100.f) : 0));
+}
+
 inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value, UInt8 level )
 {
 	switch(type)
@@ -2022,6 +2031,7 @@ void Fighter::rebuildEquipAttr()
         {
             GData::ItemGemType * igt = GData::gemTypes[m_xingchen.gems[i] - LGEM_ID];
             addAttrExtraGem(_attrExtraEquip, igt);
+            addAttrExtraXCGem(_attrExtraEquip, igt);
         }
     }
 
@@ -5164,6 +5174,16 @@ UInt16 Fighter::getSoulSkillSoulOut()
     return m_2ndSoul->getSkillSoulOut();
 }
 
+UInt16 Fighter::getSoulSkillProtect()
+{
+    if(_soulSkillProtect)
+        return _soulSkillProtect;
+    if(!m_2ndSoul)
+        return 0;
+
+    return m_2ndSoul->getSkillProtect();
+}
+
 bool Fighter::practiceLevelUp()
 {
     if(!m_2ndSoul)
@@ -6310,13 +6330,21 @@ void Fighter::setXingchenFromDB(DBXingchen& dbxc)
     m_xingchen.gems[0] = dbxc.gem1;
     m_xingchen.gems[1] = dbxc.gem2;
     m_xingchen.gems[2] = dbxc.gem3;
+    m_xingchen.gems[3] = dbxc.gem4;
+    m_xingchen.gems[4] = dbxc.gem5;
+    m_xingchen.gems[5] = dbxc.gem6;
+    m_xingchen.xctCurVal = dbxc.xctCurVal;
+    m_xingchen.xctMaxVal = dbxc.xctMaxVal;
+
+    if(m_xingchen.lvl >= 20 && m_xingchen.xctMaxVal == 0)
+        m_xingchen.xctMaxVal = 100;
 }
 
 bool Fighter::upgradeXingchen(UInt8 type)
 {
     if (isPet() || !_owner)
         return false;
-    if (m_xingchen.lvl >= 25)
+    if (m_xingchen.lvl >= 30)
         return false;
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
     if(!stxc || getLevel() < stxc->limitLev)
@@ -6329,6 +6357,9 @@ bool Fighter::upgradeXingchen(UInt8 type)
     {
         ++m_xingchen.lvl;
         setDirty();
+
+        if(m_xingchen.lvl >= 20 && m_xingchen.xctMaxVal == 0)
+            m_xingchen.xctMaxVal = 100;
     }
 
     updateDBxingchen();
@@ -6344,20 +6375,14 @@ bool Fighter::upgradeXingchen(UInt8 type)
 bool Fighter::quickUpGrade(UInt8 type)
 {
     if(isPet() || !_owner)
-    {
         return false;
-    }
 
-    if(m_xingchen.lvl >= 25)
-    {
+    if(m_xingchen.lvl >= 30)
         return false;
-    }
 
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
     if(!stxc || getLevel() < stxc->limitLev)
-    {
         return false;
-    }
 
     UInt32 consumeValue = 0;
     UInt32 curValue = m_xingchen.curVal;
@@ -6381,6 +6406,9 @@ bool Fighter::quickUpGrade(UInt8 type)
         ++m_xingchen.lvl;
         setDirty();
         _owner->sendMsgCode(0, 4005);
+
+        if(m_xingchen.lvl >= 20 && m_xingchen.xctMaxVal == 0)
+            m_xingchen.xctMaxVal = 100;
     }
     
     if(m_xingchen.curVal > curValue)
@@ -6402,11 +6430,142 @@ bool Fighter::quickUpGrade(UInt8 type)
     return true;
 }
 
+void Fighter::tunShiXingKong()
+{
+    if (isPet() || !_owner)
+        return;
+
+    if(m_xingchen.lvl < 20)
+        return;
+
+    if(m_xingchen.xctCurVal >= m_xingchen.xctMaxVal)
+        return;
+
+    UInt8 useMoney = 100;
+    if(_owner->getCoupon() + _owner->getGold() >= useMoney)
+    {
+        ConsumeInfo ci(TunShiXingkong, 0, 0);
+        if(_owner->getCoupon() > 0)
+        {
+            if(_owner->getCoupon() < useMoney)
+            {
+                useMoney -= _owner->getCoupon();
+                _owner->useCoupon(_owner->getCoupon(), &ci);
+            }
+            else
+            {
+                _owner->useCoupon(useMoney, &ci);
+                useMoney = 0;
+            }
+        }
+
+        if(useMoney > 0)
+            _owner->useGold(useMoney, &ci);
+    }
+    else
+    {
+        _owner->sendMsgCode(0, 1101);
+        return;
+    }
+
+    m_xingchen.xctCurVal++;
+
+    setDirty();
+
+    updateDBxingchen();
+
+    _owner->sendMsgCode(0, 4010);
+
+    sendXingchenInfo(6);
+}
+    
+void Fighter::tuPoJieXian()
+{
+    if(isPet() || !_owner)
+        return;
+
+    if(m_xingchen.lvl < 20)
+        return;
+
+    if(m_xingchen.xctMaxVal >= 200)
+        return;
+
+    if(_owner->getGold() < 100)
+    {
+        _owner->sendMsgCode(0, 1104);
+        return ;
+    }
+
+    ConsumeInfo ci(TuPoJieXian, 0, 0);
+    _owner->useGold(100, &ci);
+
+    m_xingchen.xctMaxVal++;
+
+    updateDBxingchen();
+
+    _owner->sendMsgCode(0, 4011);
+
+    sendXingchenInfo(7);
+}
+
+void Fighter::GMSetXZLvl(UInt8 lvl)
+{
+    if(lvl > 30)
+        return;
+
+    m_xingchen.lvl = lvl;
+
+    GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
+    if(stxc)
+        m_xingchen.curVal = stxc->maxVal;
+
+    if(m_xingchen.lvl >= 20)
+        m_xingchen.xctMaxVal = 100;
+
+    setDirty();
+
+    updateDBxingchen();
+
+    sendXingchenInfo(0);
+}
+
+void Fighter::GMSetXCTCurVal(UInt16 value)
+{
+    if(m_xingchen.lvl < 20)
+        return;
+
+    if(value > m_xingchen.xctMaxVal)
+        return;
+
+    m_xingchen.xctCurVal = value;
+
+    setDirty();
+
+    updateDBxingchen();
+
+    sendXingchenInfo(6);
+}
+
+void Fighter::GMSetXCTMaxVal(UInt16 value)
+{
+    if(m_xingchen.lvl < 20)
+        return;
+
+    if(value > 200)
+        return;
+
+    m_xingchen.xctMaxVal = value;
+
+    updateDBxingchen();
+
+    sendXingchenInfo(7);
+}
+
 void Fighter::updateDBxingchen()
 {
-    DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`)\
-            VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
-            m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2]);
+    DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `xctCurVal`, `xctMaxVal`)\
+            VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
+            m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2], m_xingchen.gems[3], m_xingchen.gems[4], m_xingchen.gems[5], m_xingchen.xctCurVal, m_xingchen.xctMaxVal);
 }
 
 void Fighter::sendXingchenInfo(UInt8 type)
@@ -6414,9 +6573,7 @@ void Fighter::sendXingchenInfo(UInt8 type)
     GData::XingchenData::stXingchen * stxc = NULL;
 
     if(m_xingchen.lvl > 0)
-    {
         stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
-    }
 
     Stream st(REP::EQ_DELUEGEM);
     st << static_cast<UInt16>(getId());
@@ -6427,6 +6584,9 @@ void Fighter::sendXingchenInfo(UInt8 type)
     {
         st << m_xingchen.gems[i];
     }
+
+    st << m_xingchen.xctCurVal << m_xingchen.xctMaxVal;
+
     st << type;
     st << Stream::eos;
     _owner->send(st);
@@ -6437,9 +6597,7 @@ void Fighter::xingchenInfo(Stream & st)
     GData::XingchenData::stXingchen * stxc = NULL;
 
     if(m_xingchen.lvl > 0)
-    {
         stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl);
-    }
 
     st << _owner->GetVar(VAR_XINGCHENZHEN_VALUE);
     st << m_xingchen.lvl << static_cast<UInt32>(m_xingchen.curVal - (stxc ? stxc->maxVal : 0));
@@ -6448,37 +6606,28 @@ void Fighter::xingchenInfo(Stream & st)
     {
         st << m_xingchen.gems[i];
     }
+
+    st << m_xingchen.xctCurVal << m_xingchen.xctMaxVal;
 }
 
 void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos, UInt8 type)
 {
     if (isPet() || !_owner)
-    {
         return;
-    }
 
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
     if (stxc == NULL)
-    {
         return;
-    }
 
     if(getLevel() < stxc->limitLev)
-    {
         return;
-    }
 
     ItemBase * item = _owner->GetPackage()->FindItem(gemId, bind > 0);
-
     if(NULL == item) 
-    {
         return;
-    }
 
-    if(pos < 1 || pos > 3)
-    {
+    if(pos < 1 || pos > 6)
         return;
-    }
 
     UInt16 oldGemId = 0;
 
@@ -6494,36 +6643,13 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos, UInt8 type)
         oldGemId = m_xingchen.gems[pos-1];
     }
 
-    if(m_xingchen.lvl >= 5 && pos == 1)
-    {
-        if(IsCanSetGem(item, 2) && IsCanSetGem(item, 3))
-        {  
-            m_xingchen.gems[0] = gemId;
-        }
-    }
-    else if(m_xingchen.lvl >= 10 && pos == 2)
-    {
-        if(IsCanSetGem(item, 1) && IsCanSetGem(item, 3))
-        {
-            m_xingchen.gems[1] = gemId;
-        }
-    }
-    else if(m_xingchen.lvl >= 15 && pos == 3)
-    {
-        if(IsCanSetGem(item, 1) && IsCanSetGem(item, 2))
-        {
-            m_xingchen.gems[2] = gemId;
-        }
-    }
+    if(IsCanSetGem(item, pos) && m_xingchen.lvl >= pos*5)
+        m_xingchen.gems[pos-1] = gemId;
     else
-    {
         return;
-    }
-
+    
     if(oldGemId > 0)
-    {
         _owner->GetPackage()->AddItem(oldGemId, 1, true, false, TodismantleGem);
-    }
 
     _owner->GetPackage()->DelItem(gemId, 1, bind > 0, ToSetGem);
     
@@ -6534,20 +6660,24 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos, UInt8 type)
 
 bool Fighter::IsCanSetGem(ItemBase * item, UInt8 pos)
 {
-    if(pos < 1 || pos > 3)
-    {
+    if(pos < 1 || pos > 6)
         return false;
-    }
 
-    if(m_xingchen.gems[pos-1] > 0)
+    for(UInt8 i=1; i<=6; i++)
     {
-        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[m_xingchen.gems[pos-1]];
+        if(pos == i)
+            continue;
 
-        if(NULL == itemType) return false;
+        if(m_xingchen.gems[i-1] > 0)
+        {
+            const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[m_xingchen.gems[i-1]];
 
-        if(NULL == item) return false;
+            if(NULL == itemType) return false;
 
-        if(itemType->subClass == item->getClass()) return false;
+            if(NULL == item) return false;
+
+            if(itemType->subClass == item->getClass()) return false;
+        }
     }
     return true;
 }
@@ -6555,30 +6685,20 @@ bool Fighter::IsCanSetGem(ItemBase * item, UInt8 pos)
 void Fighter::dismantleGem(UInt8 pos, UInt8 type)
 {
     if (isPet() || !_owner)
-    {
         return;
-    }
 
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(1);
     if (stxc == NULL)
-    {
         return;
-    }
 
     if(getLevel() < stxc->limitLev)
-    {
         return;
-    }
 
-    if(pos < 1 || pos > 3)
-    {
+    if(pos < 1 || pos > 6)
         return;
-    }
 
     if(m_xingchen.gems[pos-1] == 0)
-    {
         return;
-    }
 
     if(_owner->GetPackage()->GetRestPackageSize() < 1)
     {
@@ -6588,23 +6708,8 @@ void Fighter::dismantleGem(UInt8 pos, UInt8 type)
 
     UInt16 gemId = m_xingchen.gems[pos-1];
 
-    if(m_xingchen.lvl >= 5 && pos == 1)
-    {
-        m_xingchen.gems[0] = 0;
-    }
-    else if(m_xingchen.lvl >= 10 && pos == 2)
-    {
-        m_xingchen.gems[1] = 0;
-    }
-    else if(m_xingchen.lvl >= 15 && pos == 3)
-    {
-        m_xingchen.gems[2] = 0;
-    }
-    else
-    {
-        return;
-    }
-
+    m_xingchen.gems[pos-1] = 0;
+    
     _owner->GetPackage()->AddItem(gemId, 1, true, false, TodismantleGem);
     
     setDirty();
@@ -6614,22 +6719,19 @@ void Fighter::dismantleGem(UInt8 pos, UInt8 type)
 
 UInt32 Fighter::exchangeXingchenValue(UInt16 zqId, UInt32 zqCount, UInt8 bind)
 {
+    if (isPet() || !_owner)
+        return 0;
+
     ItemBase * item = _owner->GetPackage()->FindItem(zqId, bind > 0);
     if(NULL == item)
-    {
         return 0;
-    }
 
     if(item->getClass() <= Item_Formula || item->getClass() > Item_Formula9)
-    {   
         return 0;
-    }
 
     UInt32 xcValue = 0;
     if(zqCount > item->Count())
-    {
         return 0;
-    }
     else
     {
         xcValue = (item->GetItemType().trumpExp) * zqCount;
@@ -6708,6 +6810,7 @@ UInt32 Fighter::calcBaseBattlePoint()
         {
             GData::ItemGemType * igt = GData::gemTypes[m_xingchen.gems[i] - LGEM_ID];
             addAttrExtraGem(attrExtra, igt);
+            addAttrExtraXCGem(attrExtra, igt);
         }
     }
 	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);

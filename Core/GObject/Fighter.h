@@ -82,11 +82,13 @@ enum
 struct DBXingchen;
 struct Xingchenzhen
 {
-    Xingchenzhen() : lvl(0), curVal(0) { memset(gems, 0, sizeof(gems)); }
+    Xingchenzhen() : lvl(0), curVal(0), xctCurVal(0), xctMaxVal(0)  { memset(gems, 0, sizeof(gems)); }
 
-    UInt8 lvl;      // 星辰等级
-    UInt32 curVal;  // 当前星辰值
-    UInt16 gems[3]; //镶嵌的宝石id
+    UInt8 lvl;          // 星辰等级
+    UInt32 curVal;      // 当前星辰值
+    UInt16 gems[6];     // 镶嵌的宝石id
+    UInt16 xctCurVal;   // 星辰图当前值
+    UInt16 xctMaxVal;   // 星辰图最大值
 };
 
 struct SStrengthen
@@ -754,6 +756,7 @@ protected:
     void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext );
     void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce );
     void addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
+    void addAttrExtraXCGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
 	virtual void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	void rebuildSkillBattlePoint();
@@ -872,6 +875,7 @@ public:
     UInt8 getSoulExtraAura();
     UInt8 getSoulAuraLeft();
     UInt16 getSoulSkillSoulOut();
+    UInt16 getSoulSkillProtect();
 
     bool practiceLevelUp();
     bool changeSecondSoulClass(UInt8 cls);
@@ -922,12 +926,14 @@ public:
     inline void setSoulSkillSoulOut(Int32 v) { _soulSkillSoulOut = v; }
     inline void setUpCittasMax() { _cittaslot = CITTA_UPMAX; }
     bool upCittaWithOutCheck( UInt16 citta, int idx );
+    inline void setSoulSkillProtect(Int32 v) { _soulSkillProtect = v; }
     UInt16 getTrumpSkill(int i) { if(i >= TRUMP_UPMAX) return 0; else return _trumpSkill[i]; }
     Int32 _soulMax;
     UInt8 _soulExtraAura;
     UInt8 _soulAuraLeft;
     UInt16 _soulSkillSoulOut;
     UInt16 _trumpSkill[TRUMP_UPMAX];
+    UInt16 _soulSkillProtect;
 
     // 内丹系统
 public:
@@ -1026,6 +1032,11 @@ public:
     void dismissXingchen();
     bool quickUpGrade(UInt8 type);
     void xingchenInfo(Stream & st);
+    void tunShiXingKong();
+    void tuPoJieXian();
+    void GMSetXZLvl(UInt8 lvl);
+    void GMSetXCTCurVal(UInt16 value);
+    void GMSetXCTMaxVal(UInt16 value);
 
     void pushPetInfo2Leaderboard();
 };

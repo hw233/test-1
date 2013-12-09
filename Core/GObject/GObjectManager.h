@@ -358,6 +358,8 @@ namespace GObject
         static bool loadTeamArenaSkill();
 	    static bool LoadTeamArenaBets();
 	    static bool LoadTeamPendingPlayers();
+	    static bool LoadArenaServerWar();
+	    static bool LoadServerWarBets();
 	    static bool LoadPlayerNamed();
         static bool loadZhenwei();
         static bool loadQiShiBan();

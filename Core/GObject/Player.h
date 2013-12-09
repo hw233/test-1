@@ -144,6 +144,12 @@ namespace GObject
 #define PLAYER_BUFF_CLANTREE1       0x60
 #define PLAYER_BUFF_CLANTREE2       0x61
 #define PLAYER_BUFF_CLANTREE3       0x62
+    
+#define SERVERWAR_BUFF_XIUWEI1       0x63  //仙界传奇(服战) 修为加成buff 5%
+#define SERVERWAR_BUFF_XIUWEI2       0x64  // 10%
+#define SERVERWAR_BUFF_XIUWEI3       0x65  // 15%
+#define SERVERWAR_BUFF_XIUWEI4       0x66  // 15%
+#define SERVERWAR_BUFF_XIUWEI5       0x67  // 20%
 
 #define PLAYER_BUFF_ATHL11          0x71 // 魔
 #define PLAYER_BUFF_ATHL22          0x72 // 神
@@ -207,6 +213,12 @@ namespace GObject
 #define GET_BIT(X,Y)     ((X & (1<<Y)) >> Y)
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))
 #define GET_BIT_MARK(X,Y)     ((X>>Y) & 1)
+#define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
+#define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
+#define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)
+#define CLR_BIT_3(X,Y)   (X & ~(0x07<<(Y*3)))
+#define SET_BIT_3(X,Y,V) (CLR_BIT_3(X,Y) | V<<(Y*3))
+#define GET_BIT_3(X,Y)   ((X >> (Y*3)) & 0x07)
 
 #define GET_BIT_2(X,Y)   ((X >> (Y*2)) & 0x03)
 
@@ -251,6 +263,7 @@ namespace GObject
         BILAN       = 13,   //碧岚天衣
         LIUGUANG    = 14,   //刹那流光
         ZHUTIAN     = 15,   //诸天宝鉴
+        TIANYOU     = 16,   //天佑术
 
         DRAGONKING_MAX,
     };
@@ -270,6 +283,15 @@ namespace GObject
         e_lpf_pengyou = 2,
         e_lpf_qgame = 10,
         e_lpf_3366 = 11,
+    };
+
+    enum SERVERWAR_XIUWEI_BUFF_VALUE
+    {
+        SERVERWAR_VALUE_XIUWEI1 = 5,
+        SERVERWAR_VALUE_XIUWEI2 = 10,
+        SERVERWAR_VALUE_XIUWEI3 = 10,
+        SERVERWAR_VALUE_XIUWEI4 = 15,
+        SERVERWAR_VALUE_XIUWEI5 = 20,
     };
 
 	class Map;
@@ -2445,6 +2467,9 @@ namespace GObject
         void getLuckyMeetInstantLoginAward(UInt8 val);
         void getLuckyMeetAward(UInt8 idx,UInt8 index);
         void getSummerMeetInstantLoginAward(UInt8 val);
+        void getQZoneRechargeAward(UInt8 val);
+        void sendQZoneRechargeAwardInfo();
+        void AddQZoneRecharge(UInt32 r =0);
         void getSummerFlow3OnlineAward(UInt8 val);
         void getSummerMeetAward(UInt8 idx,UInt8 index);
         void getNewRC7DayRechargeAward(UInt8 val);
@@ -2531,12 +2556,17 @@ namespace GObject
         void sendRechargeNextRetInfo(UInt32 now);
         bool inArenaCommitCD();
         bool inArenaTeamCommitCD();
+        UInt16 getServerWarChallengeCD();
+        bool inServerWarChallengeCD();
+        bool inServerWarCommitCD();
         void appendLineup2( Stream& st);
         void appendPetOnBattle( Stream& st);
     private:
         std::vector<RNR> rechargs;
         UInt32 m_arenaCommitCD;
         UInt32 m_arenaTeamCommitCD;
+        UInt32 m_serverWarCommitCD;
+        UInt32 m_serverWarChallengeCD;
 
     public:
         void getSoSoMapAward();

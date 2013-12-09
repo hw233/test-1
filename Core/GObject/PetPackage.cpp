@@ -118,7 +118,7 @@ namespace GObject
 		return static_cast<ItemPetEq *>(pet->findEquip(id, pos));
 	}
 
-	ItemBase* PetPackage::AddPetEquipN( UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 FromWhere )
+	ItemBase* PetPackage::AddPetEquipN( UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere )
 	{
 		if(GetPetEqPgRestSize() < num)
 			return NULL;
@@ -130,7 +130,7 @@ namespace GObject
 		return item;
 	}
 
-	ItemBase* PetPackage::AddPetEquip(ItemPetEq * equip, bool notify, UInt8 FromWhere)
+	ItemBase* PetPackage::AddPetEquip(ItemPetEq * equip, bool notify, UInt16 FromWhere)
 	{
 		if(equip == NULL || GetPetEqPgRestSize() < 1)
 			return NULL;
@@ -184,7 +184,7 @@ namespace GObject
 		return true;
 	}
 
-	bool PetPackage::DelPetItem(UInt32 id, UInt16 num, bool bind, UInt8 toWhere)
+	bool PetPackage::DelPetItem(UInt32 id, UInt16 num, bool bind, UInt16 toWhere)
 	{
 		if (num == 0 || !IsPetItem(id))
 			return false;
@@ -219,7 +219,7 @@ namespace GObject
 		return ret;
 	}
 
-    bool PetPackage::DelPetEquip(UInt32 id, UInt8 toWhere)
+    bool PetPackage::DelPetEquip(UInt32 id, UInt16 toWhere)
     {
         item_elem_iter iter = m_PetEquips.find(ItemKey(id));
         if(iter == m_PetEquips.end())
@@ -241,7 +241,7 @@ namespace GObject
         return true;
     }
 
-	ItemBase* PetPackage::AddPetItem(UInt32 typeId, UInt32 num, bool bind, bool notify, UInt8 FromWhere)
+	ItemBase* PetPackage::AddPetItem(UInt32 typeId, UInt32 num, bool bind, bool notify, UInt16 FromWhere)
 	{
         if (!typeId || !num) return NULL;
 		if (!IsPetItem(typeId)) return NULL;
@@ -589,7 +589,7 @@ namespace GObject
 		m_Owner->send(st);
 	}
 
-    ItemBase* PetPackage::AddRandomPetEq(UInt32 score, UInt32 typeId, int colorIdx, UInt8 FromWhere, bool notify)
+    ItemBase* PetPackage::AddRandomPetEq(UInt32 score, UInt32 typeId, int colorIdx, UInt16 FromWhere, bool notify)
     {
 		if(GetPetEqPgRestSize() < 1)
 		{
