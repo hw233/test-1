@@ -824,6 +824,16 @@ public:
             _surnamelegend = false;
         return _surnamelegend;
     } 
+    inline static bool getHappFire()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
+        UInt32 now = TimeUtil::Now();
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
     inline static bool getLuckyMeet(UInt32 time = 0)
     {
         UInt32 begin = GVAR.GetVar(GVAR_LUCKYMEET_BEGIN);
