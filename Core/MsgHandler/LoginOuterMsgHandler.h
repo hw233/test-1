@@ -1837,8 +1837,6 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
     br >> clanid;
     UInt64 pid;
     br >> pid;
-    UInt16 length;
-    br >> length;
     string talk_record;
     br >> talk_record; 
 	
@@ -1858,7 +1856,7 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
         Stream st(REP::CHAT);
         UInt8 office = player->getTitle(), guard = 0;
         guard = player->getPF();
-        st << 2 << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+        st << static_cast<UInt8>(2) << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
             << office << guard << talk_record << player->GetLev() << Stream::eos;
 
         GameMsgHdr hdr(0x160, WORKER_THREAD_WORLD, player, st.size());
