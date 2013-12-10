@@ -1270,7 +1270,7 @@ void World::World_Midnight_Check( World * world )
     bJuneEnd = bJune && !getJune();
     //愚公宝箱是否结束
     bFoolBaoEnd =  bfoolbao && !getFoolBao(); 
-   // 
+   // GVAR控制的时间记住加300秒结算
     bHalfGoldEnd = bhalfgold && !getHalfGold();
     //蜀山传奇掉落活动是否结束
     bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
