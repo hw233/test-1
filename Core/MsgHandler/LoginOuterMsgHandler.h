@@ -1827,6 +1827,46 @@ void OnGetMaxCreate(LoginMsgHdr &hdr, const void* data)
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt32 clanid;
+    br >> clanid;
+    UInt64 pid;
+    br >> pid;
+    UInt16 length;
+    br >> length;
+    string talk_record;
+    br >> talk_record; 
+	
+    if (cfg.merged)
+    {
+        UInt32 serverNo = cfg.serverNo;
+        pid |= (static_cast<UInt64>(serverNo) << 48);
+    }
+
+    GObject::Player * player = GObject::globalPlayers[pid];
+    GObject::Clan *clan = GObject::globalClans[clanid];
+    UInt8 ret = 0;
+    if(!player || !clan) 
+        ret = 1;
+    if(ret == 0)
+    {
+        Stream st(REP::CHAT);
+        UInt8 office = player->getTitle(), guard = 0;
+        guard = player->getPF();
+        st << 2 << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+            << office << guard << talk_record << player->GetLev() << Stream::eos;
+
+        GameMsgHdr hdr(0x160, WORKER_THREAD_WORLD, player, st.size());
+        GLOBAL().PushMsg(hdr, static_cast<UInt8 *>(st));
+    }
+    Stream st1(SPEP::GETQQCLANTALK);
+    st1 << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st1);
+}
+
 inline bool player_enum_cleartra(GObject::Player* p, int)
 {
     if (p->GetVar(GObject::VAR_TOTALRECHARGEACT))
