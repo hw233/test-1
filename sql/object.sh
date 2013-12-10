@@ -221,10 +221,14 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131101_1.sql    #七石斗法
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_add_acuGold_1125.sql     #武将添加本命金丹
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clan_battlescore.sql     #重置帮战积分
     #. clearshiyamen.sh
+    #mysql -h$H -u$U -p$P -P$PT $DBO < clanscore.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clan_battlescore.sql     #重置帮战积分
 }
 
 #sh player_jiguan.sh
+#sh clanscore.sh
 update_object
 #selectAction $DBO
 #if [ $? -eq 1 ]; then

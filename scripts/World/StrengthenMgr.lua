@@ -197,7 +197,6 @@ end
 --增加变强之魂
 function doStrong(player, id, param1, param2)
     local num = get11TimeNum();
-    print(num)
     if num > 0 and num < 6 then
         -- XXX: 这是一个不应该出现的BUG
         if id == 16 then
