@@ -11847,6 +11847,7 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, bool alreadyMin
             {
                 if(static_cast<UInt32>(skillBase->prob * 100) > uRand(10000))
                 {
+                    appendDefStatus(e_skill, skillBase->getId(), bf);
                     appendDefStatus(e_soulProtect, 0, bf);
                     bf->setSoulProtectCount(3);
                 }
