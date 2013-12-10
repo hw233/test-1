@@ -318,6 +318,8 @@ public:
     const GData::SkillBase* getPassiveSkillOnBeMagDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHP10P(bool noPossibleTarget = false);
 
+    const GData::SkillBase* getSkillSoulProtect();
+
     void releaseSkillCD(int cd);
     void releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd);
 
@@ -325,6 +327,7 @@ public:
     void updatePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
 
     void updateSoulSkillDead(UInt16 skillId);
+    void updateSoulSkillProtect(UInt16 skillId);
     void updatePassiveSkillPrvAtk100Status();
     void updatePassiveSkillBLTY100Status();
 
@@ -1166,8 +1169,16 @@ private:
     inline void setPeerLessDisableSSHP(UInt8 i, UInt32 hp) { if(i < 25) _peerlessDisableSSHP[i] = hp; }
     inline UInt32 getPeerLessDisableSSHP(UInt8 i) { if(i < 25) return _peerlessDisableSSHP[i]; else return 0; }
 
+    UInt8 _soulProtectLast;
+    inline void setSoulProtectLast(UInt8 l) { _soulProtectLast = l; }
+    inline UInt8 getSoulProtectLast() { return _soulProtectLast; }
+    UInt8 _soulProtectCount;
+    inline void setSoulProtectCount(UInt8 count) { _soulProtectCount = count; }
+    inline UInt8 getSoulProtectCount() { return _soulProtectCount; }
+
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
+    std::vector<GData::SkillItem> _passiveSkillSoulProtect;
     std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;

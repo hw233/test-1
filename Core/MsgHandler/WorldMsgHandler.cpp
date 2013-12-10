@@ -176,6 +176,7 @@ MSG_REG_2(GameMsgHdr, 0x1D8, SendQiShiBanRank);
 MSG_REG_2(GameMsgHdr, 0x1D5, OnGuangGunRank);
 MSG_REG_2(GameMsgHdr, 0x1D6, OnSendGuangGunRank);
 MSG_REG_2(GameMsgHdr, 0x1D9, OnSendOffQQClan);
+MSG_REG_2(GameMsgHdr, 0x1DC, SendQSBState);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnSendClanMemberList);
 MSG_REG_2(GameMsgHdr, 0x1D1, OnSendClanMemberGrade);

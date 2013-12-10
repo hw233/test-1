@@ -10575,7 +10575,17 @@ namespace GObject
         if(getBuffData(PLAYER_BUFF_CLANTREE3))
             factor += 0.1f;
         //仙界传奇(服战) 修为加成
-        float fuzhanRatio = (float)GVAR.GetVar(GVAR_SERVERWAR_XIUWEI) / 100;
+        float fuzhanRatio = 0.0f;
+        if(getBuffData(SERVERWAR_BUFF_XIUWEI1))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI1 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI2))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI2 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI3))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI3 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI4))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI4 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI5))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI5 / 100;
         factor += fuzhanRatio;
 
         return factor;
@@ -16571,6 +16581,7 @@ namespace GObject
                 st << fgt->getSoulSkillSoulOut();
                 st << fgt->getPortrait();
                 fgt->appendElixirAttr2(st);
+                st << fgt->getSoulSkillProtect();
             }
         }
         st.data<UInt8>(offset) = c;
@@ -16595,6 +16606,7 @@ namespace GObject
             st << _onBattlePet->getSoulSkillSoulOut();
             st << _onBattlePet->getPortrait();
             _onBattlePet->appendElixirAttr2(st);
+            st << _onBattlePet->getSoulSkillProtect();
         }
         else
         {
@@ -25437,7 +25449,7 @@ void Player::GetPersonalAward(UInt8 opt)
             case 5:
                 {
                     if(GetQiShiBanScore() >= 8000)
-                        GetPackage()->AddItem(5006, 1, true, false, FromQiShiBan);
+                        GetPackage()->AddItem(5056, 1, true, false, FromQiShiBan);
                     else
                         return;
                 }
