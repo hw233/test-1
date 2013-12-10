@@ -1839,7 +1839,8 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
     br >> pid;
     string talk_record;
     br >> talk_record; 
-	
+
+    TRACE_LOG("clanid is %u,pid is %u,talk_record is %s",clanid,pid,talk_record.c_str());
     if (cfg.merged)
     {
         UInt32 serverNo = cfg.serverNo;
@@ -1864,6 +1865,7 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
     }
     Stream st1(SPEP::GETQQCLANTALK);
     st1 << ret << Stream::eos;
+    TRACE_LOG(" ret is %u",ret);
     NETWORK()->SendMsgToClient(hdr.sessionID,st1);
 }
 
