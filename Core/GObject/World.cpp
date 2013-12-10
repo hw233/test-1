@@ -3660,7 +3660,7 @@ void World::SendHappyFireAward()
         {{515,20},{503,20},{509,15},{134,20}},
         {{515,10},{503,10},{509,10},{134,10}},
     };
-    static MailPackage::MailItem card = {9924,1};   //暂无白马王子
+    static MailPackage::MailItem card = {9929,1};   //暂无白马王子
     UInt8 mark = 0;
     std::string str = "";
     for(RCSortType::iterator iter = happyFireSort.begin(); iter != happyFireSort.end() && mark < 7; ++iter )
