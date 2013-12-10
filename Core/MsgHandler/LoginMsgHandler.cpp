@@ -75,6 +75,7 @@ MSG_REG_2(LoginMsgHdr,SPEQ::SETTOTALRECHARGEACT, OnSetTotalRechargeAct);
 MSG_REG_2(LoginMsgHdr,SPEQ::SETMAXNEWUSER, OnSetMaxCreate);
 MSG_REG_2(LoginMsgHdr,SPEQ::GETMAXNEWUSER, OnGetMaxCreate);
 MSG_REG_2(LoginMsgHdr,SPEQ::GETQQCLANTALK, OnGetQQClanTalk);
+MSG_REG_2(LoginMsgHdr,SPEQ::OFFQQOPENID, OnoffQQOpenid);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 MSG_REG_2(LoginMsgHdr, 0x301, OnSetCrackValue);

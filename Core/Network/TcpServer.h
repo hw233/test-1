@@ -14,7 +14,7 @@ struct event;
 namespace Network
 {
 	#define WORKERS 2
-	#define TCP_CONN_IDX_MAX 1
+	#define TCP_CONN_IDX_MAX 2
 
 	class TcpServer:
 		public Runnable

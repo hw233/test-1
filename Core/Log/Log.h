@@ -132,6 +132,11 @@ enum PurchaseType
     ArenaTeamConsume            = 121, //仙界至尊消费
     GuangGun                    = 122, //光棍
     Fund                        = 123, //基金消费
+    TunShiXingkong              = 124, //吞噬星空
+    QSBAddTime                  = 125, //七石板加时
+    TuPoJieXian                 = 126, //星辰图突破界限
+    ServerWarConsume            = 127, //仙界传奇消费
+    RestStep                    = 128, //七石板重置
     //繁体私有占150～200
 };
 
@@ -157,6 +162,7 @@ enum IncomingType
     ProfferFromUseItem          = 145, //使用物品帮贡
     ShouHunFromYouli            = 146, //游历获得兽魂
     LongHunFromTeamArena        = 147, //仙界至尊龙魂获得
+    LongHunFromServerWar        = 148, //仙界传奇龙魂获得
 };
 
 enum MoneyType
@@ -270,6 +276,8 @@ enum ItemFrom
     FromClanSptr = 61, // 神魔之树
     FromCollectCard = 62, //卡片转化池
     Fromkeyin = 63, //壁凰墨转化磐龙墨
+    FromQiShiBan = 64, //七石斗法
+    FromServerWarJijian = 65, //仙界传奇祭剑宝箱
     //80 ~ 100，繁体占用
 };
 
@@ -313,6 +321,8 @@ enum ItemTo
     ToUpgradeKY = 163, //刻印升级所消耗的道具
     ToChangeMoShi = 164, //转换墨石
     ToSanHunUp = 164, //三魂升级
+    ToTunShiXingKong = 165, //吞噬星空
+    ToServerWarJijian = 166, //仙界传奇祭剑
 };
 
 struct IncommingInfo

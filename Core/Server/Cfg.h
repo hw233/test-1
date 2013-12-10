@@ -79,10 +79,12 @@ public:
 	int channelNum;
 	int serverNum;
     int serverNo;
-    bool isTestPlatform;
+    bool testPlatform;
 
 	std::string arenaHost;
 	UInt16      arenaPort;
+	std::string serverWarHost;
+	UInt16      serverWarPort;
 
     //yij
     std::string msgCenterHost;
@@ -138,8 +140,9 @@ public:
 	inline void setMerged(bool m) { merged = m; }
 	inline void setSupportCompress(bool c) { supportCompress = c; }
 	inline void setGMCheck(bool c) { GMCheck = c; }
-    inline void setTestPlatform(bool c) { isTestPlatform = c; }
+    inline void setTestPlatform(bool c) { testPlatform = c; }
 	inline void setArenaServer(const char * h, UInt16 p) { arenaHost = h; arenaPort = p; }
+	inline void setServerWar(const char * h, UInt16 p) { serverWarHost = h; serverWarPort = p; }
 	inline void setMsgCenter(const char * h, UInt16 p) { msgCenterHost = h; msgCenterPort = p; }  //yij
     inline void setChannelInfo(const char * sn, int num) { slugName = sn; channelNum = num; }
 	inline void setLoginLimit(bool limit) { enableLoginLimit = limit; }
@@ -161,6 +164,7 @@ public:
     inline void setAutoForbid(bool v) { autoForbid = v; }
     inline void setAutoKick(bool v) { autoKick = v; }
 
+    inline bool isTestPlatform() { return testPlatform; }  //true为内测区
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {

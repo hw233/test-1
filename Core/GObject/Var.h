@@ -417,6 +417,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_TEAMARENA_WORSHIP = 426, //组队跨服战每日崇拜冠军
         VAR_TEAMARENA_INSPIRE = 427, //组队跨服战鼓舞等级失败保护次数
 
+        VAR_SERVERWAR_JIJIANTAI = 428,  //跨服服战祭剑台 1byte步数,2byte内外圈,3和4byte道具id
+        VAR_SERVERWAR_JIJIANTAI1 = 429,  //跨服服战祭剑台 1byte每人祭剑的次数,2byte成功完成的祭剑次数 3byte宝箱开启情况
+
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
         VAR_RP7_TREASURE = 432,  //回流服务器聚宝盆, 1-8位:是否购买的标志为 9-16,17-24,25-32位第1-3个聚宝盆的已领取次数
@@ -475,6 +478,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_KEYIN_MONEY_B = 516,                            // 刻印钱币B 
         VAR_FAIRYPET_SHOUHUN = 517,                         // 仙宠兽魂
         VAR_GIVE_CARDAWARD_COUTS = 518,                     // 被赠送卡牌奖品次数
+        VAR_QISHIDOUFA_REST_NUM = 519,                      // 七石斗法每天3次免费重置机会
+        VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE = 520,         // 七石斗法上次失败历史最高分
 
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
@@ -550,9 +555,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_STRENGTH_LEVEL = 598,  
         VAR_11AIRBOOK_GRADE = 599,  //10· 1 活动积分
         VAR_11AIRBOOK_GRADE_DAY = 600,  //10· 1 活动积分
-        //600-620 for qiwy  ^_^
+        //601-620 for qiwy  ^_^
+        VAR_TOTAL_BATTLE_POINT = 601,  //（排行）战斗力
 
-        //621-640 for lib 
+        //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,
         VAR_AIRBOOK_LOGIN_AWARD = 622,
         VAR_AIRBOOK_ONLINE_AWARD = 623,
@@ -572,7 +578,12 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_NOV_LOGIN_AWARD = 637, 
         VAR_RECHARGE_TIME = 638, 
         VAR_GUANGGUN_TODAY_TASK = 639,   //今日完成任务数
+        VAR_REAL_SPIRIT = 640,           //真元
         VAR_MODIFY_NAME_CD = 641,//改名CD
+        VAR_REAL_SPIRIT_GET = 642,       //当日是否领取真元 
+        VAR_QZONE_RECHARGE = 643,       //空间充值 
+        VAR_QZONE_RECHARGE_AWARD = 644,       //空间充值奖励领取
+
         VAR_MAX,
     };
 
@@ -898,7 +909,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_KEYIN_MONEY_B, CYCLE_NONE);
             REGISTER_VAR(VAR_FAIRYPET_SHOUHUN, CYCLE_NONE);
             REGISTER_VAR(VAR_EQUIP_MOVE_AWARD, CYCLE_NONE);
-
+            REGISTER_VAR(VAR_QISHIDOUFA_REST_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE, CYCLE_NONE);
+            
             REGISTER_VAR(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
@@ -934,6 +947,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_TEAMARENA_CREATE, CYCLE_DAY);
             REGISTER_VAR(VAR_TEAMARENA_WORSHIP, CYCLE_DAY);
             REGISTER_VAR(VAR_TEAMARENA_INSPIRE, CYCLE_NONE);
+            REGISTER_VAR(VAR_SERVERWAR_JIJIANTAI, CYCLE_WEEK);
+            REGISTER_VAR(VAR_SERVERWAR_JIJIANTAI1, CYCLE_WEEK);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
@@ -1073,6 +1088,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_PRESENT_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_11AIRBOOK_GRADE, CYCLE_NONE);
             REGISTER_VAR(VAR_11AIRBOOK_GRADE_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_TOTAL_BATTLE_POINT, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);
@@ -1094,6 +1110,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_NOV_LOGIN_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_GAMEBOX_DAILY, CYCLE_DAY);
             REGISTER_VAR(VAR_GAMEBOX_NEW, CYCLE_NONE);
+            REGISTER_VAR(VAR_REAL_SPIRIT, CYCLE_NONE);
+            REGISTER_VAR(VAR_REAL_SPIRIT_GET, CYCLE_DAY);
+            REGISTER_VAR(VAR_QZONE_RECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_QZONE_RECHARGE_AWARD, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

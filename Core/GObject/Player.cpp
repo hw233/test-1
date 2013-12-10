@@ -83,6 +83,7 @@
 #include "ClanCityBattle.h"
 #include "MoFang.h"
 #include "Leaderboard.h"
+#include "ArenaServerWar.h"
 
 
 #define NTD_ONLINE_TIME (4*60*60)
@@ -111,8 +112,8 @@
 #define QIXI_XIQUE 9122
 
 #define QQ_GAME_NEED_TIME  1200
-#define QQ_GAME_START_TIME  21*3600
-#define QQ_GAME_END_TIME    (21*3600+1800)
+#define QQ_GAME_START_TIME  20*3600
+#define QQ_GAME_END_TIME    (20*3600+1800)
 
 #define CARD_ITEM_ID 9415
 #define CFD_INDEX_MAX 3
@@ -127,7 +128,7 @@ namespace GObject
     UInt8 Player::_yaMenActiveCount = 0;
     UInt8 Player::_shiMenActiveCount = 0;
 	const UInt8 MaxICCount[] = {8, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24};
-	const UInt16 MAX_EXTEND_TIME	= 17;
+	const UInt16 MAX_EXTEND_TIME	= 20;
 	const UInt16 EACH_EXTEND_NUM	= 50;
 	GlobalPlayers globalPlayers;
 	GlobalPlayers newPlayers;
@@ -739,6 +740,8 @@ namespace GObject
         _invitedBy = 0;
         m_arenaCommitCD = 0;
         m_arenaTeamCommitCD = 0;
+        m_serverWarCommitCD = 0;
+        m_serverWarChallengeCD = 0;
         _inClanCity = false;
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
@@ -769,6 +772,9 @@ namespace GObject
         m_spreadCoolTime = 0;
         _mditem = 0;
         _qixiBinding = false;
+        m_checkTime = 0;
+        m_curPage = 0;
+        //m_checkTime1 = 0;
 
         memset (m_domain, 0, sizeof(m_domain));
         memset (m_openid, 0, sizeof(m_openid));
@@ -1012,6 +1018,7 @@ namespace GObject
         SAFE_DELETE(m_CFriend);
         SAFE_DELETE(m_relation);
 		SAFE_DELETE(m_FairySpar);
+		SAFE_DELETE(m_moFang);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -1391,7 +1398,7 @@ namespace GObject
         {
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            if (cfg.isTestPlatform)
+            if (cfg.isTestPlatform())
                 pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|1|",
                     cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
             else
@@ -3415,6 +3422,7 @@ namespace GObject
             st << static_cast<UInt32>(fgt->getPortrait());
 
             fgt->xingchenInfo(st);
+            fgt->getAllAcupointsGoldBits(st);
 		}
 	}
 
@@ -5878,7 +5886,7 @@ namespace GObject
 
     bool Player::isForeverTitle(UInt8 t)
     {   //38道尊 39释尊 40儒尊 201名震蜀山
-        if(t == 38 || t == 39 || t == 40 || t == 201)
+        if(t == 38 || t == 39 || t == 40 || (t >= 201 && t <= 206))
             return false;
         return true;
     }
@@ -6156,9 +6164,11 @@ namespace GObject
         {
             struct ItemAdd
             {
+                ItemAdd() : item(0), num(0), bind(false), fromWhere(0) {}
                 UInt16 item;
                 UInt16 num;
                 bool bind;
+                UInt16 fromWhere;
             };
 
             ItemAdd ia;
@@ -8359,14 +8369,14 @@ namespace GObject
         }
 
         AddVar(VAR_RECHARGE_TODAY, r);
+
         GameAction()->onRecharge(this, r);
         if(WORLD().getAccRecharge())
             sendTodayRechargeInfo();
-
         checkZCJB(r);
 
         AddZRYJCount(r);
-
+        AddQZoneRecharge(r);
         //SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     }
 
@@ -8846,6 +8856,7 @@ namespace GObject
 		send((st));
 
         worldBoss.sendDaily(this);
+        serverWarBoss.sendDaily(this);
         //heroIsland.sendDaily(this);
         newHeroIsland.sendDaily(this);
         globalCountryBattle.sendDaily(this);
@@ -10563,6 +10574,20 @@ namespace GObject
 
         if(getBuffData(PLAYER_BUFF_CLANTREE3))
             factor += 0.1f;
+        //仙界传奇(服战) 修为加成
+        float fuzhanRatio = 0.0f;
+        if(getBuffData(SERVERWAR_BUFF_XIUWEI1))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI1 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI2))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI2 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI3))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI3 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI4))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI4 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI5))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI5 / 100;
+        factor += fuzhanRatio;
+
         return factor;
     }
 
@@ -11701,7 +11726,11 @@ namespace GObject
         case 32:
             getGameBoxAward(opt);
                 break;
-
+        case 33:
+                if(opt>0)
+                    getQZoneRechargeAward(opt);
+                sendQZoneRechargeAwardInfo();
+                break;
         }
     }
     
@@ -16496,6 +16525,33 @@ namespace GObject
         return false;
     }
 
+    UInt16 Player::getServerWarChallengeCD()
+    {
+        UInt32 now = TimeUtil::Now();
+        if(now >= m_serverWarChallengeCD)
+            return 0;
+
+        return  m_serverWarChallengeCD - now;
+    }
+    bool Player::inServerWarChallengeCD()
+    {
+        UInt32 now = TimeUtil::Now();
+        if(now < m_serverWarChallengeCD)
+            return true;
+
+        m_serverWarChallengeCD = now + 300;
+        return false;
+    }
+    bool Player::inServerWarCommitCD()
+    {
+        UInt32 now = TimeUtil::Now();
+        if(now < m_serverWarCommitCD)
+            return true;
+
+        m_serverWarCommitCD = now + 60;
+        return false;
+    }
+
     void Player::appendLineup2( Stream& st)
     {
         st << getFormation();
@@ -16525,6 +16581,7 @@ namespace GObject
                 st << fgt->getSoulSkillSoulOut();
                 st << fgt->getPortrait();
                 fgt->appendElixirAttr2(st);
+                st << fgt->getSoulSkillProtect();
             }
         }
         st.data<UInt8>(offset) = c;
@@ -16549,6 +16606,7 @@ namespace GObject
             st << _onBattlePet->getSoulSkillSoulOut();
             st << _onBattlePet->getPortrait();
             _onBattlePet->appendElixirAttr2(st);
+            st << _onBattlePet->getSoulSkillProtect();
         }
         else
         {
@@ -17375,10 +17433,17 @@ EventTlzAuto::EventTlzAuto( Player * player, UInt32 interval, UInt32 count)
 
 void EventTlzAuto::Process(UInt32 leftCount)
 {
-    m_Player->AddVar(VAR_TJ_TASK3_COPYID, 1);
+    bool forceCancel = false;
+    int curRate = GObject::Tianjie::instance().getTjCurRate();
+    if((GObject::Tianjie::instance().isFinish() && (5 == curRate || 0 == curRate)) || (GObject::Tianjie::instance().isTjExecute() && (4 == curRate || 5 == curRate)))
+        forceCancel = true;
+    else
+    {
+        m_Player->AddVar(VAR_TJ_TASK3_COPYID, 1);
 
-    notify();
-    if (leftCount == 0)
+        notify();
+    }
+    if (leftCount == 0 || forceCancel)
     {
         PopTimerEvent(m_Player, EVENT_TLZAUTO,  m_Player->getId());
         m_Player->delFlag(Player::AutoTlz);
@@ -17388,6 +17453,8 @@ void EventTlzAuto::Process(UInt32 leftCount)
             m_Player->SetVar(VAR_TJ_TASK3_COPYID, 0);
             m_Player->SetVar(VAR_TJ_AUTO_FRONTMAP_END_TIME, TimeUtil::Now());
         }
+        if(forceCancel)
+            notify();
     }
 }
 
@@ -20208,10 +20275,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -20294,7 +20361,8 @@ void Player::postDragonKing(UInt8 count)
             st << itemId << award.get<UInt8>(j+1);
             GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
             if (itemId == Dragon_Broadcast[flag]
-                    || (flag == YUANSHEN && (itemId == Dragon_Broadcast[flag]+1 || itemId == Dragon_Broadcast[flag]+2)))
+                    || (flag == YUANSHEN && (itemId == Dragon_Broadcast[flag]+1 || itemId == Dragon_Broadcast[flag]+2))
+                    || (flag == TIANYOU && (itemId == Dragon_Broadcast[flag]+1 || itemId == Dragon_Broadcast[flag]+2)))
                 SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
         }
     }
@@ -21545,7 +21613,7 @@ void Player::getQQGameOnlineAward()
     SetVar(VAR_ONLINE_AWARD, 1);
     GetPackage()->Add(134, 1, true, false);
     GetPackage()->Add(1325, 1, true, false);
-    GetPackage()->Add(551, 1, true, false);
+    GetPackage()->Add(511, 1, true, false);
     GetPackage()->Add(500, 1, true, false);
     sendQQGameOnlineAward();
 }
@@ -21554,13 +21622,13 @@ void Player::sendQQGameOnlineAward()
 {
     if(!World::getQQGameOnlineAwardAct())
         return;
-    if(atoi(getDomain()) != 10)
+    if(atoi(getDomain())!= 10)
         return;
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x0B);
     st << static_cast<UInt8>(GetVar(VAR_ONLINE_AWARD));
     UInt16 totalTime = getQQGameOnlineTotalTime();
-    UInt16 leftTime;
+    UInt16 leftTime = 0;
     if(totalTime >= QQ_GAME_NEED_TIME)
         leftTime = 0;
     else
@@ -21585,9 +21653,9 @@ UInt32 Player::getQQGameOnlineTotalTime()
     UInt32 today = TimeUtil::SharpDayT( 0 , now);
     UInt32 lastOnline = _playerData.lastOnline; //考虑了是前几天登录的情况
     UInt32 curTime;
-    if(now <= today + QQ_GAME_START_TIME)
+    if( now <= (today + QQ_GAME_START_TIME))
         curTime = 0;
-    else if(now <= today + QQ_GAME_END_TIME)
+    else if(now <= (today + QQ_GAME_END_TIME))
     {
         if(lastOnline <= (today + QQ_GAME_START_TIME))
             curTime = now - (today + QQ_GAME_START_TIME);
@@ -22376,13 +22444,14 @@ bool Player::in7DayFromCreated()
 #define QUESTIONID_MAX 30
 /*#define SET_BIT(X,Y)     (X | (1<<Y))
 #define GET_BIT(X,Y)     (X & (1<<Y))
-#define CLR_BIT(X,Y)     (X & ~(1<<Y))*/
+#define CLR_BIT(X,Y)     (X & ~(1<<Y))
 #define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
 #define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
 #define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)
 #define CLR_BIT_3(X,Y)   (X & ~(0x07<<(Y*3)))
 #define SET_BIT_3(X,Y,V) (CLR_BIT_3(X,Y) | V<<(Y*3))
 #define GET_BIT_3(X,Y)   ((X >> (Y*3)) & 0x07)
+*/
 void Player::sendFoolsDayInfo(UInt8 answer)
 {
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
@@ -23284,6 +23353,8 @@ void Player::updateCuilianTimes()
 
 void Player::enhanceBaseScore()
 {
+    if(!hasChecked())
+        return;
     if(!checkBBFT())
         return;
     if(getGold() < 10)
@@ -23332,6 +23403,8 @@ const static UInt32 CuilianTimes_Limit[] = {30, 60, 90, 120, 150};
 const static UInt32 CuilianTimes_factor[] = {1, 2, 3, 4, 5};
 void Player::addCuilianTimes()
 {
+    if(!hasChecked())
+        return;
     if(!checkBBFT())
         return;
 
@@ -24335,10 +24408,10 @@ void Player::sendQQBoardLogin()
     if(!World::getQQBoardLoginTime())
         return ;
     UInt32 LoginAward = GetVar(VAR_QQBOARD_LOGIN_AWARD);
-    UInt32 timeBegin = TimeUtil::MkTime(2013,9,9);
-    UInt32 now = TimeUtil::Now();
-    if(now < timeBegin )
-        return ;
+//    UInt32 timeBegin = TimeUtil::MkTime(2013,12,11);
+  //  UInt32 now = TimeUtil::Now();
+    //if(now < timeBegin )
+      //  return ;
     Stream st(REP::RC7DAY);  //协议
     st<<static_cast<UInt8>(19);
     st<<static_cast<UInt16>(LoginAward);
@@ -24350,13 +24423,17 @@ void Player::SetQQBoardLogin()
 {
    // if( this->getPlatform()!= 10)
     //    return ;
-    UInt32 now = TimeUtil::Now();
-    if(now<(TimeUtil::SharpDayT( 0 , now) + 20 * 3600) || now > (TimeUtil::SharpDayT( 0 , now) + 22 * 3600) ) 
+    if(!World::getQQBoardLoginTime())
         return ;
-    UInt32 timeBegin = TimeUtil::MkTime(2013,9,9);
+    UInt32 now = TimeUtil::Now();
+    if(now<(TimeUtil::SharpDayT( 0 , now) + 19 * 3600+30*60) || now > (TimeUtil::SharpDayT( 0 , now) + 21 * 3600+30*60) ) 
+        return ;
+    UInt32 timeBegin = TimeUtil::MkTime(2013,12,11);
     if(now < timeBegin )
         return ;
     UInt32 cts = static_cast<UInt8>((TimeUtil::SharpDayT( 0 , now) - timeBegin)/86400);
+    if(cts > 2)
+        return ;
     UInt32 LoginCanAward = GetVar(VAR_QQBOARD_LOGIN_AWARD); 
     LoginCanAward |= (1<<cts);
     SetVar(VAR_QQBOARD_LOGIN_AWARD,LoginCanAward);
@@ -24909,6 +24986,553 @@ void Player::Send11GradeAward(UInt8 type)
     udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 
 }
+
+void Player::loadQiShiBanFromDB(UInt32 score, UInt32 step, UInt32 beginTime, UInt32 endTime, UInt16 awardMark)
+{
+    m_qishiban.score = score;
+    m_qishiban.step = step;
+    m_qishiban.beginTime = beginTime;
+    m_qishiban.endTime = endTime;
+    m_qishiban.awardMark = awardMark;
+
+    if(endTime > beginTime) //宕机特殊处理
+    {
+        UInt32 tempTime = endTime - beginTime - 10;
+        m_qishiban.score += (100 + tempTime);
+        m_qishiban.step += 1;
+        m_qishiban.beginTime = 0;
+        m_qishiban.endTime = 0;
+    }
+}
+
+void Player::QiShiBanState()
+{
+    if(!World::getQiShiBanTime())
+        return;
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x11);
+
+    UInt8 mark = 0;
+    if((GetQiShiBanEndTime() > _playerData.lastOnline) && (GetQiShiBanBeginTime() < GetQiShiBanEndTime())) // 继续（考虑玩家掉线可能）
+    {
+        mark = 1;
+        UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
+        if(0 == restNum)
+            restNum = 3;
+        else if(1 == restNum)
+            restNum = 2;
+        else if(2 == restNum)
+            restNum = 1;
+        else
+            restNum = 0;
+
+        UInt32 time = GetQiShiBanEndTime() - _playerData.lastOnline;
+
+        UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
+        if(GetQiShiBanScore() > highestScore)
+        {
+            WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId());
+            highestScore = GetQiShiBanScore();
+        }
+
+        st << mark << static_cast<UInt16>(GetQiShiBanStep()) << GetQiShiBanScore() << static_cast<UInt8>(restNum) 
+           << GetQiShiBanAwardMark() << time << highestScore << Stream::eos;
+    }
+    else
+        st << mark << Stream::eos;
+
+    send(st);
+}
+
+void Player::MyQSBInfo()
+{
+    if(!World::getQiShiBanTime())
+        return;
+
+    UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
+    if(0 == restNum)
+        restNum = 3;
+    else if(1 == restNum)
+        restNum = 2;
+    else if(2 == restNum)
+        restNum = 1;
+    else
+        restNum = 0;
+
+    UInt32 addTime = GetNextStepTime();
+    UInt32 lastFailHighestScore = GetVar(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE);
+
+    UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
+    if(GetQiShiBanScore() > highestScore)
+    {
+        WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId());
+        highestScore = GetQiShiBanScore();
+    }
+
+    UInt8 mark = 0;
+    if(GetQiShiBanBeginTime() == GetQiShiBanEndTime()
+            && 0 != GetQiShiBanBeginTime()
+            && 0 != GetQiShiBanEndTime())
+    {
+        mark = 1;
+    }
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x07) << static_cast<UInt16>(GetQiShiBanStep()) 
+        << GetQiShiBanScore() << static_cast<UInt8>(restNum) << addTime << GetQiShiBanAwardMark() << highestScore << lastFailHighestScore << mark << Stream::eos;
+
+    send(st);
+}
+
+void Player::OnQiShiBanRank(UInt32 page)
+{
+    if(World::getQiShiBanTime())
+    {
+        m_curPage = page;
+        GameMsgHdr hdr(0x1D8, WORKER_THREAD_WORLD, this, sizeof(page));
+        GLOBAL().PushMsg(hdr, &page);
+    }
+}
+
+void Player::ReqStartQSB()
+{
+    if(!World::getQiShiBanTime())
+        return;
+
+    if(GetQiShiBanStep() >= 999)
+        return;
+
+    SetQiShiBanKey(uRand(100));
+    int randValue = (GetQiShiBanKey() + 23) * 6 / 3 - 7;
+
+    UInt32 addTime = GetNextStepTime();
+    SetQiShiBanBeginTime(TimeUtil::Now());
+    SetQiShiBanEndTime(GetQiShiBanBeginTime() + addTime);
+
+    UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
+    if(0 == restNum)
+        restNum = 3;
+    else if(1 == restNum)
+        restNum = 2;
+    else if(2 == restNum)
+        restNum = 1;
+    else
+        restNum = 0;
+
+    Update_QSB_DB();
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x02) << randValue << addTime << static_cast<UInt8>(restNum) << Stream::eos;
+    send(st);
+}
+
+void Player::FinishCurStep(int randMark, UInt32 clintTime)
+{
+    if(!World::getQiShiBanTime())
+        return;
+
+    if(GetQiShiBanStep() >= 999)
+        return;
+
+    if(GetQiShiBanKey() != static_cast<UInt16>((randMark - 22) / 4 + 77))
+        return;
+
+    UInt32 tempTime = 0;
+    UInt32 specialTime = 0;
+    UInt32 time = 0;
+
+    if(m_qishiban.endTime >= TimeUtil::Now())
+    {
+        tempTime = GetQiShiBanEndTime() - TimeUtil::Now(); //服务器剩余时间
+        if(clintTime < tempTime) // 服务器剩余时间和客户端剩余时间做比较，取少的
+            tempTime = clintTime;
+
+        specialTime = GetQiShiBanEndTime() - GetQiShiBanBeginTime() - 10; //拼图最少使用10秒钟
+    }
+    else
+        return;
+
+    if(tempTime > specialTime)
+        time = specialTime;
+    else
+        time = tempTime;
+
+    UInt32 score = 100 + time; // 每关积分 = 100 + 剩余时间；
+
+    AddQiShiBanScore(score);
+    AddQiShiBanStep();
+    SetQiShiBanBeginTime(0);
+    SetQiShiBanEndTime(0);
+    SetQiShiBanAddTimeNum(0);
+
+    UInt32 totalScore = GetQiShiBanScore();
+    GameMsgHdr hdr(0x1D7, WORKER_THREAD_WORLD, this, sizeof(totalScore));
+    GLOBAL().PushMsg(hdr, &totalScore);
+
+    udpLog("qishidoufa", "F_131203_1", "", "", "", "", "act");
+    UInt8 mark = 0;
+    if(GetQiShiBanScore() >= 100 && (GetQiShiBanScore() - score) < 100)
+    {
+        mark = 1;
+        udpLog("qishidoufa", "F_131203_2", "", "", "", "", "act");
+    }
+    else if(GetQiShiBanScore() >= 1650 && (GetQiShiBanScore() - score) < 1650)
+    {
+        mark = 2;
+        udpLog("qishidoufa", "F_131203_3", "", "", "", "", "act");
+    }
+    else if(GetQiShiBanScore() >= 3200 && (GetQiShiBanScore() - score) < 3200)
+    {
+        mark = 3;
+        udpLog("qishidoufa", "F_131203_4", "", "", "", "", "act");
+    }
+    else if(GetQiShiBanScore() >= 4800 && (GetQiShiBanScore() - score) < 4800)
+    {
+        mark = 4;
+        udpLog("qishidoufa", "F_131203_5", "", "", "", "", "act");
+    }
+    else if(GetQiShiBanScore() >= 8000 && (GetQiShiBanScore() - score) < 8000)
+    {
+        mark = 5;
+        udpLog("qishidoufa", "F_131203_6", "", "", "", "", "act");
+    }
+
+    if(mark > 0)
+        SetQiShiBanAwardMark(SET_BIT(GetQiShiBanAwardMark(), (mark-1)*2));
+
+    Update_QSB_DB();
+
+    UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
+    if(GetQiShiBanScore() > highestScore)
+    {
+        WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId());
+        highestScore = GetQiShiBanScore();
+    }
+
+    UInt32 addTime = GetNextStepTime();
+
+    UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
+    if(0 == restNum)
+        restNum = 3;
+    else if(1 == restNum)
+        restNum = 2;
+    else if(2 == restNum)
+        restNum = 1;
+    else
+        restNum = 0;
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x03) << static_cast<UInt16>(GetQiShiBanStep()) << GetQiShiBanScore() 
+       << addTime << GetQiShiBanAwardMark() << highestScore << static_cast<UInt8>(restNum) << Stream::eos;
+    send(st);
+
+    OnQiShiBanRank(m_curPage);
+}
+
+void Player::Fail()
+{
+    if(!World::getQiShiBanTime())
+        return;
+
+    SetQiShiBanBeginTime(GetQiShiBanEndTime());
+    SetQiShiBanAddTimeNum(0);
+    
+    Update_QSB_DB();
+    MyQSBInfo();
+    SetVar(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE, WORLD().GetMemCach_qishiban(getOpenId()));
+}
+
+void Player::AddTime()
+{
+    if(!World::getQiShiBanTime())
+        return;
+
+    if(!hasChecked())
+        return;
+
+    UInt8 mark = 0;
+    UInt32 tempTime = 0;
+    if(GetQiShiBanEndTime() > TimeUtil::Now())
+        tempTime = GetQiShiBanEndTime() - TimeUtil::Now();
+    else
+        mark = 1;
+
+    if(GetQiShiBanAddTimeNum() >= 5)
+        mark = 1;
+
+    if(0 == getCoupon() && 0 == getGold())
+    {
+        sendMsgCode(0, 1101);
+        mark = 1;
+    }
+
+    if(0 == mark)
+    {
+        if(getCoupon() >= 1)
+        {
+            ConsumeInfo ci(QSBAddTime, 0, 0);
+            useCoupon(1, &ci);
+        }
+        else if(getGold() >= 1)
+        {
+            ConsumeInfo ci(QSBAddTime, 0, 0);
+            useGold(1, &ci);
+        }
+
+        AddQiShiBanAddTimeNum();
+        SetQiShiBanEndTime(GetQiShiBanEndTime() + 30);
+        tempTime += 30;
+        Update_QSB_DB();
+    }
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x04) << mark << tempTime << Stream::eos;
+    send(st);
+}
+
+void Player::RestCurStep()
+{
+    if(!World::getQiShiBanTime())
+        return;
+
+    if(GetQiShiBanStep() >= 999)
+        return;
+
+    if(GetQiShiBanBeginTime() == GetQiShiBanEndTime()
+            && 0 != GetQiShiBanBeginTime()
+            && 0 != GetQiShiBanEndTime())
+    {
+        UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
+
+        if(restNum >= 3)
+        {
+            if(!hasChecked())
+                return;
+
+            UInt8 useMoney = 10;
+            if(getCoupon() + getGold() >= useMoney)
+            {
+                ConsumeInfo ci(RestStep, 0, 0);
+                if(getCoupon() > 0)
+                {
+                    if(getCoupon() < useMoney)
+                    {
+                        useMoney -= getCoupon();
+                        useCoupon(getCoupon(), &ci);
+                    }
+                    else
+                    {
+                        useCoupon(useMoney, &ci);
+                        useMoney = 0;
+                    }
+                }
+
+                if(useMoney > 0)
+                    useGold(useMoney, &ci);
+            }
+            else
+            {
+                sendMsgCode(0, 1101);
+                return;
+            }
+        }
+        AddVar(VAR_QISHIDOUFA_REST_NUM, 1);
+    }
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x12) << Stream::eos;
+    send(st);
+}
+
+void Player::ContinueCurStep()
+{
+    if(!World::getQiShiBanTime())
+        return;
+
+    SetQiShiBanKey(uRand(100));
+    int randValue = (GetQiShiBanKey() + 23) * 6 / 3 - 7; 
+
+    SetQiShiBanBeginTime(TimeUtil::Now());
+
+    UInt32 addTime = 0;
+    if(GetQiShiBanEndTime() > _playerData.lastOnline)
+        addTime = GetQiShiBanEndTime() - _playerData.lastOnline; // 掉线前剩余时间
+
+    SetQiShiBanEndTime(GetQiShiBanBeginTime() + addTime); // 重置结束时间
+    Update_QSB_DB();
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x08) << randValue << addTime << Stream::eos;
+    send(st);
+}
+
+
+void Player::GetPersonalAward(UInt8 opt)
+{
+    if(opt > 0 && opt <= 5)
+    {
+        UInt16 state = GetQiShiBanAwardMark();
+        UInt8 mark = GET_BIT_2(state, (opt-1));
+
+        if(1 == mark)
+        {
+            bool res = 0;
+            if(2 == opt || 3 == opt)
+            {
+                if(GetPackage()->GetRestPackageSize() < 3)
+                    res = true;
+            }
+            else
+            {
+                if(GetPackage()->GetRestPackageSize() < 2)
+                    res = true;
+            }
+
+            if(res)
+            {
+                sendMsgCode(0, 1011);
+                return;
+            }
+
+            switch(opt)
+            {
+            case 1:
+                {
+                    if(GetQiShiBanScore() >= 100)
+                        GetPackage()->AddItem(5053, 1, true, false, FromQiShiBan);
+                    else
+                        return;
+                }
+                break;
+            case 2:
+                {
+                    if(GetQiShiBanScore() >= 1650)
+                    {
+                        GetPackage()->AddItem(5053, 1, true, false, FromQiShiBan);
+                        GetPackage()->AddItem(5033, 1, true, false, FromQiShiBan);
+                    }
+                    else
+                        return;
+                }
+                break;
+            case 3:
+                {
+                    if(GetQiShiBanScore() >= 3200)
+                    {
+                        GetPackage()->AddItem(5054, 1, true, false, FromQiShiBan);
+                        GetPackage()->AddItem(5014, 1, true, false, FromQiShiBan);
+                    }
+                    else
+                        return;
+                }
+                break;
+            case 4:
+                {
+                    if(GetQiShiBanScore() >= 4800)
+                    {
+                        GetPackage()->AddItem(5055, 1, true, false, FromQiShiBan);
+                    }
+                    else
+                        return;
+                }
+                break;
+            case 5:
+                {
+                    if(GetQiShiBanScore() >= 8000)
+                        GetPackage()->AddItem(5056, 1, true, false, FromQiShiBan);
+                    else
+                        return;
+                }
+                break;
+            }
+
+            state = CLR_BIT(state, ((opt - 1) * 2));
+            state = SET_BIT(state, ((opt - 1) * 2 + 1));
+            SetQiShiBanAwardMark(state);
+            Update_QSB_DB();
+        }
+        else
+            return;
+
+        Stream st(REP::ACT);
+        st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x09) << GetQiShiBanAwardMark() << Stream::eos;
+        send(st);
+    }
+}
+
+UInt32 Player::GetNextStepTime()
+{
+    UInt32 addTime = 0;
+    if(0 == GetQiShiBanStep())
+        addTime = 600;
+    else if(GetQiShiBanStep() < 10)
+        addTime = 300;
+    else if(GetQiShiBanStep() < 50)
+        addTime = 120;
+    else
+        addTime = 60;
+
+    return addTime;
+}
+
+void Player::Update_QSB_DB()
+{
+    DB1().PushUpdateData("REPLACE INTO `player_qishiban` VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u)", getId(), GetQiShiBanStep(), GetQiShiBanScore(), GetQiShiBanBeginTime(), GetQiShiBanEndTime(), GetQiShiBanAwardMark());
+}
+
+void Player::CleanQiShiBan()
+{
+    SetQiShiBanScore(0);
+    SetQiShiBanStep(0);
+    SetQiShiBanBeginTime(0);
+    SetQiShiBanEndTime(0);
+    SetQiShiBanKey(0);
+    SetQiShiBanAwardMark(0);
+    SetVar(VAR_QISHIDOUFA_REST_NUM, 0);
+
+    DB1().PushUpdateData("DELETE FROM `player_qishiban` WHERE `playerId` = %" I64_FMT "u", getId());
+}
+
+UInt32 Player::GetQQFriendScore(const char * openId)
+{
+    UInt32 score = WORLD().GetMemCach_qishiban(openId);
+    return score;
+}
+
+bool Player::CheckReqDataTime()
+{
+    int time = TimeUtil::Now() - m_checkTime;
+    if(0 == m_checkTime || time > 30)
+        return true;
+
+    return false;
+}
+
+void Player::SetReqDataTime(UInt8 mark)
+{
+    if(0 == mark)
+        m_checkTime = 0;
+    else
+        m_checkTime = TimeUtil::Now();
+}
+
+/*bool Player::CheckReqDataTime1()
+{
+    int time = TimeUtil::Now() - m_checkTime1;
+    if(0 == m_checkTime1 || time > 30)
+        return true;
+
+    return false;
+}
+
+void Player::SetReqDataTime1(UInt8 mark)
+{
+    if(0 == mark)
+        m_checkTime1 = 0;
+    else
+        m_checkTime1 = TimeUtil::Now();
+}*/
+
 void Player::setGGValue()
 {
     if(!World::getGGTime())
@@ -25695,6 +26319,100 @@ void Player::getGameBoxAward(UInt8 type)
         }
     }
     sendGameBoxAward();
+}
+
+void Player::getRealSpirit()
+{
+    //UInt32 realSpirit[]={100,200,300,400,500,600,700,800,900}; 
+    UInt32 realget = GetVar(VAR_REAL_SPIRIT_GET);
+    UInt8 lev = GetLev();
+    if(lev < 80 )
+        return ;
+    if(realget)
+        return ;
+    AddRealSpirit(lev*getFighterGoldCnt());
+    SetVar(VAR_REAL_SPIRIT_GET,1);
+    sendRealSpirit();
+}
+UInt8 Player::getFighterGoldCnt()
+{
+    std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
+    UInt8 cnt = 0 ;
+    for (; it != _fighters.end(); ++it)
+    {
+        Fighter* fgt = it->second; // XXX: Fashion can not be enchanted
+        if(fgt->getAcupointsBit(ACUPOINTS_MAX-1) == 3)
+            ++cnt;
+    }
+    return cnt; 
+}
+void Player::AddRealSpirit(UInt32 real)
+{
+    AddVar(VAR_REAL_SPIRIT,real);
+    SYSMSG_SENDV(2020,this,real);
+    SYSMSG_SENDV(2021,this,real);
+    sendRealSpirit();
+}
+
+void Player::sendRealSpirit()
+{
+    UInt32 real = GetVar(VAR_REAL_SPIRIT);
+    UInt32 realget = GetVar(VAR_REAL_SPIRIT_GET);
+    Stream stream(REQ::STATE);
+    stream<<static_cast<UInt8>(0x21);
+    stream<<real;
+    stream<<static_cast<UInt8>(realget);
+    stream<<Stream::eos;
+    send(stream);
+}
+
+void Player::getQZoneRechargeAward(UInt8 val)
+{
+    if(getPlatform()!=1 && getPlatform() !=2)
+        return ;
+    if (!World::getQZoneRechargeTime())
+        return;
+    UInt32 Recharge[]={100,500,1000,2000,3000,5000};
+    UInt32 recharge = GetVar(VAR_QZONE_RECHARGE);
+    if(val<1||val>6)
+        return ;
+    if(recharge < Recharge[val-1])
+        return ;
+    UInt32 ctslandingAward = GetVar(VAR_QZONE_RECHARGE_AWARD);
+    if(ctslandingAward & (1<<(val-1)))
+        return ;
+    if(!GameAction()->RunQZoneRechargeAward(this, val))
+    {
+        return;
+    }
+    ctslandingAward |= (1<<(val - 1));
+    SetVar(VAR_QZONE_RECHARGE_AWARD, ctslandingAward);
+    
+}
+void Player::sendQZoneRechargeAwardInfo()
+{
+    if (!World::getQZoneRechargeTime())
+        return;
+    UInt32 QZoneRecharge = GetVar(VAR_QZONE_RECHARGE);
+    UInt32 QZoneRechargeAward = GetVar(VAR_QZONE_RECHARGE_AWARD);
+    Stream st(REP::GETAWARD);   //协议
+    st << static_cast<UInt8>(33);
+    st << static_cast<UInt32>(QZoneRecharge);
+    st << static_cast<UInt8>(QZoneRechargeAward);
+    st << Stream::eos;
+    send(st);
+    
+
+}
+void Player::AddQZoneRecharge(UInt32 r)
+{
+    if(getPlatform()!=1 && getPlatform() !=2)
+        return ;
+    if(World::getQZoneRechargeTime())
+    {
+        AddVar(VAR_QZONE_RECHARGE,r);
+        sendQZoneRechargeAwardInfo();
+    }
 }
 } // namespace GObject
 

@@ -96,6 +96,7 @@ private:
     void OnSetCountry(GObject::Player * player, std::vector<std::string>&);
     void OnAddPExp(GObject::Player * player, std::vector<std::string>&);
     void OnSetAcu(GObject::Player * player, std::vector<std::string>&);
+    void OnSetAcuGold(GObject::Player * player, std::vector<std::string>&);
     void OnUseItem(GObject::Player * player, std::vector<std::string>&);
     void OnUseItemOther(GObject::Player * player, std::vector<std::string>&);
 	void OnOcupyPlace(GObject::Player *, std::vector<std::string>&);
@@ -200,6 +201,7 @@ private:
     void OnFairyPetGM(GObject::Player *player, std::vector<std::string>& args);
     void OnSurnameleg(GObject::Player *player, std::vector<std::string>& args);
     void OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& args);
+    void OnSendMsg(GObject::Player *player, std::vector<std::string>& args);
     void OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBoss(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBossPick(GObject::Player *player, std::vector<std::string>& args);
@@ -214,6 +216,8 @@ private:
     void OnAddPetEquipExp(GObject::Player *player, std::vector<std::string>& args);
     
     void OnSetXZLvl(GObject::Player *player, std::vector<std::string>& args);
+    void OnSetXCTCurVal(GObject::Player *player, std::vector<std::string>& args);
+    void OnSetXCTMaxVal(GObject::Player *player, std::vector<std::string>& args);
     void OnSetXCValue(GObject::Player *player, std::vector<std::string>& args);
     void OnHandleTask(GObject::Player * player, std::vector<std::string>& args);
     void OnCompletedManyTask(GObject::Player* player, std::vector<std::string>& args);
@@ -226,6 +230,7 @@ private:
     void OnAddSHLvl(GObject::Player* player, std::vector<std::string>& args);
 
     void OnPlayerMsg(GObject::Player* player, std::vector<std::string>& args);
+    void OnHandleServerWar(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

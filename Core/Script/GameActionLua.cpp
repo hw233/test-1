@@ -310,6 +310,8 @@ namespace Script
         CLASS_DEF(Player, fighterFromItem);
         CLASS_DEF(Player, appendCompassItem);
         CLASS_DEF(Player, getXianyuanLua);
+        CLASS_DEF(Player, AddRealSpirit);
+        CLASS_DEF(Player, getFighterGoldCnt);
         CLASS_DEF(Player, getFengsuiLua);
         CLASS_DEF(Player, getLongyuanLua);
         CLASS_DEF(Player, getPetByPetEgg);
@@ -1403,6 +1405,11 @@ namespace Script
         assert(player != NULL);
         return Call<bool>("RunLuckyMeetInstantLoginAward", player, val);
     }
+    bool GameActionLua::RunQZoneRechargeAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunQZoneRechargeAward", player, val);
+    }
     bool GameActionLua::RunLuckyMeetRechargeAward(Player* player, UInt8 val)
     {
         assert(player != NULL);
@@ -1779,7 +1786,7 @@ namespace Script
     UInt32 GameActionLua::GetSpreadCountForAward()
     {
         UInt32 serverNo = cfg.serverNo;
-        if(cfg.isTestPlatform)
+        if(cfg.isTestPlatform())
             serverNo = 9990;
         return Call<UInt32>("GetSpreadCountForAward", serverNo);
     }

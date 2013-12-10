@@ -319,6 +319,8 @@ private:
         e_unBiLanTianYi = 104,    // 碧岚效果消失
         e_benevolent = 105,    // 慈悲效果
         e_unBenevolent = 106,    // 慈悲效果消失
+        e_soulProtect = 107,    // 天佑
+        e_unSoulProtect = 108,    // 天佑
 
         e_MAX_STATE,
     };
@@ -569,6 +571,7 @@ private:
     void doSkillAttackByCareer(BattleFighter *bf, const GData::SkillBase *skill);
 
     void addSelfSideEvadeCnt(BattleFighter* bf);
+    UInt32 doBufMakeDamage(BattleFighter* bf, UInt32& u);
 
 private:
 	int _id, _winner, _turns;
@@ -676,7 +679,7 @@ private:
 
     void getAtkList(BattleFighter* bf, const GData::LBSkillBase* lbskill, AtkList& atkList);
     void getAtkList(BattleFighter* bf, const GData::SkillBase* skill, AtkList& atkList, Int8 offset = 0);
-    void makeDamage(BattleFighter* bo, UInt32& u);
+    UInt32 makeDamage(BattleFighter* bo, UInt32& u, bool alreadyMinus = false);
 
     bool doAuraPresent(BattleFighter* bf);
     bool doConfusePresent(BattleFighter* bf);

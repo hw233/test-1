@@ -420,6 +420,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             {
                 player->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
             }
+            player->SetReqDataTime(0);
+            //player->SetReqDataTime1(0);
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -1867,6 +1869,44 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
     NETWORK()->SendMsgToClient(hdr.sessionID,st1);
 }
 
+void OnoffQQOpenid(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    
+    struct OnOffQQData
+    {
+        UInt64 pid;
+        UInt32 clanid;
+    } onOffQQ = {0};
+    
+    br >> onOffQQ.pid >> onOffQQ.clanid;
+    
+    if (cfg.merged)
+    {
+        UInt32 serverNo = cfg.serverNo;
+        onOffQQ.pid |= (static_cast<UInt64>(serverNo) << 48);
+    }
+    GObject::Clan *clan = GObject::globalClans[onOffQQ.clanid];
+	GObject::Player * player = GObject::globalPlayers[onOffQQ.pid];
+   
+    UInt8 ret = 0;
+    if (!clan || !player)
+        ret = 1;
+    else
+        if(player->getId() != clan->getLeaderId())
+            ret = 1;
+    if(ret == 0)
+    {
+        GameMsgHdr imh(0x1D9, WORKER_THREAD_WORLD, NULL, sizeof(onOffQQ));
+        GLOBAL().PushMsg(imh, &onOffQQ);
+    }
+
+    Stream st(SPEP::OFFQQOPENID);
+    st<< ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 inline bool player_enum_cleartra(GObject::Player* p, int)
 {
     if (p->GetVar(GObject::VAR_TOTALRECHARGEACT))
@@ -3147,7 +3187,7 @@ UInt8 SwitchSecDC(UInt32 val)
 {
     // 设置是否开启安全DCLogger，返回设置是否成功(0 成功，非0 失败)
     cfg.setSecDCLog(val? true:false);
-    if (cfg.isTestPlatform)
+    if (cfg.isTestPlatform())
         cfg.setSecDCLogTest(val? true:false);
     return 0;
 }
@@ -3228,6 +3268,17 @@ inline bool player_enum_2(GObject::Player* pl, int type)
             {
                 pl->SetVar(GObject::VAR_SUMMERFLOW_TYPE, 0);
                 pl->SetVar(GObject::VAR_SUMMERFLOW_AWARD, 0);
+            }
+            break;
+        case 9:
+            {
+                pl->CleanQiShiBan();
+            }
+            break;
+        case 10:
+            {
+                pl->SetVar(GObject::VAR_QZONE_RECHARGE, 0);
+                pl->SetVar(GObject::VAR_QZONE_RECHARGE_AWARD, 0);
             }
             break;
         default:
@@ -3609,11 +3660,35 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAME_END, end);
         ret = 1;
     }
+    else if (type == 9 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_QISHIBANGAME_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_QISHIBANGAME_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 9);
+        }
+
+        GObject::GVAR.SetVar(GObject::GVAR_QISHIBANGAME_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_QISHIBANGAME_END, end);
+        ret = 1 ;
+    }
     else if (type == 10 && begin <= end )
     {
         GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAMEY_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAMEY_END, end);
         ret = 1;
+    }
+    else if (type == 11 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_QZONE_RECHARGE_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_QZONE_RECHARGE_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 10);
+        }
+
+        GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_END, end);
+        ret = 1 ;
     }
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;

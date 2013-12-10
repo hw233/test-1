@@ -273,6 +273,16 @@ struct DBSnow
     UInt32 score;
 };
 
+struct DBQiShiBan
+{
+    UInt64 playerId;
+    UInt32 step;
+    UInt32 score;
+    UInt32 beginTime;
+    UInt32 endTime;
+    UInt16 awardMark;
+};
+
 struct DBArenaExtraBoard
 {
     UInt8 week;
@@ -468,6 +478,7 @@ struct DBFighter2
     std::string trump;      // 法宝
     std::string lingbao;    // 灵宝
     std::string acupoints;  // 穴道,打通次数
+    std::string acupointsgold;  // 本命金丹,打通次数
     std::string skill;      // 装备的技能
     std::string citta;      // 装备的心法
     std::string skills;     // 学会的技能, ID1,ID2,...
@@ -1307,6 +1318,11 @@ struct DBXingchen
     UInt16 gem1;
     UInt16 gem2;
     UInt16 gem3;
+    UInt16 gem4;
+    UInt16 gem5;
+    UInt16 gem6;
+    UInt16 xctCurVal;
+    UInt16 xctMaxVal;
 };
 
 struct DBJiguanshu
@@ -1368,22 +1384,19 @@ struct DBTeamArenaSkill
 	UInt32 extra;
 };
 
-struct DBTeamArenaBet
-{
-	UInt64 id;
-	UInt8 round;
-	UInt8 state;
-	UInt8 group;
-	UInt8 recieved;
-	UInt16 pos;
-	UInt8 tael;
-};
-
 struct DBTeamPendingPlayer
 {
 	UInt64 teamId;
 	UInt64 playerId;
 	UInt32 opTime;
+};
+
+struct DBArenaServerWar
+{
+    UInt64 playerId;
+    UInt8  type;
+    UInt32 pos;
+    UInt32 battlePoint;
 };
 
 struct DBZhenwei
@@ -1636,6 +1649,18 @@ SPECIALDEF(4)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBQiShiBan)
+SPECIALDEF(6)
+    (
+    UInt64, playerId,
+    UInt32, step,
+    UInt32, score,
+    UInt32, beginTime,
+    UInt32, endTime,
+    UInt16, awardMark
+    )
+SPECIALEND()
+
 SPECIALBEGIN(GObject::DBArenaExtraBoard)
 SPECIALDEF(22)
     (
@@ -1865,7 +1890,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(57)
+SPECIALDEF(58)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1891,6 +1916,7 @@ SPECIALDEF(57)
     std::string, trump,
     std::string, lingbao,
     std::string, acupoints,
+    std::string, acupointsgold,
     std::string, skill,
     std::string, citta,
     std::string, skills,
@@ -3055,7 +3081,7 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBXingchen)
-SPECIALDEF(7)
+SPECIALDEF(12)
 (
 	UInt32, fighterId,
 	UInt64, playerId,
@@ -3063,7 +3089,12 @@ SPECIALDEF(7)
 	UInt32, curVal,
     UInt16, gem1,
     UInt16, gem2,
-    UInt16, gem3
+    UInt16, gem3,
+    UInt16, gem4,
+    UInt16, gem5,
+    UInt16, gem6,
+    UInt16, xctCurVal,
+    UInt16, xctMaxVal
 )
 SPECIALEND()
 
@@ -3140,19 +3171,6 @@ SPECIALDEF(4)
 )
 SPECIALEND()
 
-SPECIALBEGIN(GObject::DBTeamArenaBet)
-SPECIALDEF(7)
-(
-	UInt64, id,
-	UInt8, round,
-	UInt8, state,
-	UInt8, group,
-	UInt8, recieved,
-	UInt16, pos,
-	UInt8, tael
-)
-SPECIALEND()
-
 SPECIALBEGIN(GObject::DBTeamPendingPlayer)
 SPECIALDEF(3)
 (
@@ -3160,6 +3178,16 @@ SPECIALDEF(3)
 	UInt64, playerId,
 	UInt32, opTime
 )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBArenaServerWar)
+SPECIALDEF(4)
+    (
+    UInt64, playerId,
+    UInt8,  type,
+    UInt32, pos,
+    UInt32, battlePoint
+    )
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBZhenwei)

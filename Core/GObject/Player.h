@@ -13,6 +13,7 @@
 #include "Common/AtomicVal.h"
 #include "Common/Stream.h"
 #include "Common/TimeUtil.h"
+#include "Common/MCached.h"
 
 #include "Server/WorldServer.h"
 #include "Battle/BattleSimulator.h"
@@ -143,6 +144,12 @@ namespace GObject
 #define PLAYER_BUFF_CLANTREE1       0x60
 #define PLAYER_BUFF_CLANTREE2       0x61
 #define PLAYER_BUFF_CLANTREE3       0x62
+    
+#define SERVERWAR_BUFF_XIUWEI1       0x63  //仙界传奇(服战) 修为加成buff 5%
+#define SERVERWAR_BUFF_XIUWEI2       0x64  // 10%
+#define SERVERWAR_BUFF_XIUWEI3       0x65  // 15%
+#define SERVERWAR_BUFF_XIUWEI4       0x66  // 15%
+#define SERVERWAR_BUFF_XIUWEI5       0x67  // 20%
 
 #define PLAYER_BUFF_ATHL11          0x71 // 魔
 #define PLAYER_BUFF_ATHL22          0x72 // 神
@@ -206,6 +213,14 @@ namespace GObject
 #define GET_BIT(X,Y)     ((X & (1<<Y)) >> Y)
 #define CLR_BIT(X,Y)     (X & ~(1<<Y))
 #define GET_BIT_MARK(X,Y)     ((X>>Y) & 1)
+#define CLR_BIT_8(X,Y)   (X & ~(0xFF<<(Y*8)))
+#define SET_BIT_8(X,Y,V) (CLR_BIT_8(X,Y) | V<<(Y*8))
+#define GET_BIT_8(X,Y)   ((X >> (Y*8)) & 0xFF)
+#define CLR_BIT_3(X,Y)   (X & ~(0x07<<(Y*3)))
+#define SET_BIT_3(X,Y,V) (CLR_BIT_3(X,Y) | V<<(Y*3))
+#define GET_BIT_3(X,Y)   ((X >> (Y*3)) & 0x07)
+
+#define GET_BIT_2(X,Y)   ((X >> (Y*2)) & 0x03)
 
 #ifdef _FB
 #define LIMIT_LEVEL  60
@@ -248,6 +263,7 @@ namespace GObject
         BILAN       = 13,   //碧岚天衣
         LIUGUANG    = 14,   //刹那流光
         ZHUTIAN     = 15,   //诸天宝鉴
+        TIANYOU     = 16,   //天佑术
 
         DRAGONKING_MAX,
     };
@@ -267,6 +283,15 @@ namespace GObject
         e_lpf_pengyou = 2,
         e_lpf_qgame = 10,
         e_lpf_3366 = 11,
+    };
+
+    enum SERVERWAR_XIUWEI_BUFF_VALUE
+    {
+        SERVERWAR_VALUE_XIUWEI1 = 5,
+        SERVERWAR_VALUE_XIUWEI2 = 10,
+        SERVERWAR_VALUE_XIUWEI3 = 10,
+        SERVERWAR_VALUE_XIUWEI4 = 15,
+        SERVERWAR_VALUE_XIUWEI5 = 20,
     };
 
 	class Map;
@@ -586,6 +611,17 @@ namespace GObject
         bool bind;
         UInt32 score;
         SnowInfo() :lover(NULL),bind(0),score(0) {}
+    };
+    struct QiShiBanInfo
+    {
+        UInt32 score;
+        UInt32 step;
+        UInt32 beginTime;
+        UInt32 endTime;
+        UInt16 awardMark;
+        UInt16 randKey;
+        UInt8 addTimeNum;
+        QiShiBanInfo() : score(0), step(0), beginTime(0), endTime(0), awardMark(0), randKey(0), addTimeNum(0) {}
     };
 
 	struct PlayerData
@@ -1785,6 +1821,7 @@ namespace GObject
         SnowInfo m_snow;
         GuangGunInfo m_gginfo;
         bool _qixiBinding;
+        QiShiBanInfo m_qishiban;
     public:
         inline bool isJumpingMap() { return _isJumpingMap; }
         inline void setJumpingMap(bool v) { _isJumpingMap = v; }
@@ -1897,6 +1934,57 @@ namespace GObject
         
         //推雪人end
         
+        //七石斗法 begin
+          
+        void loadQiShiBanFromDB(UInt32 score, UInt32 step, UInt32 beginTime, UInt32 endTime, UInt16 awardMark);
+       
+        void QiShiBanState();
+        void MyQSBInfo();
+        void OnQiShiBanRank(UInt32 page=1);
+        void ReqStartQSB();
+        void FinishCurStep(int randMark, UInt32 time);
+        void Fail();
+        void AddTime();
+        void RestCurStep();
+        void ContinueCurStep();
+        void Update_QSB_DB();
+        void CleanQiShiBan();
+        void GetPersonalAward(UInt8 opt);
+        UInt32 GetNextStepTime();
+        UInt32 GetQQFriendScore(const char * openId);
+        bool CheckReqDataTime();
+        void SetReqDataTime(UInt8 mark=1);
+        //bool CheckReqDataTime1();
+        //void SetReqDataTime1(UInt8 mark=1);
+
+        void SetQiShiBanScore(UInt32 score) { m_qishiban.score = score; }
+        void AddQiShiBanScore(UInt32 score) { m_qishiban.score += score; }
+        UInt32 GetQiShiBanScore() const { return m_qishiban.score; }
+
+        void SetQiShiBanStep(UInt32 step) { m_qishiban.step = step; }
+        void AddQiShiBanStep() { m_qishiban.step += 1; }
+        UInt32 GetQiShiBanStep() const { return m_qishiban.step; }
+
+        void SetQiShiBanBeginTime(UInt32 time) { m_qishiban.beginTime = time; }
+        UInt32 GetQiShiBanBeginTime() const { return m_qishiban.beginTime; }
+        void SetQiShiBanEndTime(UInt32 time) { m_qishiban.endTime = time; }
+        UInt32 GetQiShiBanEndTime() const { return m_qishiban.endTime; }
+
+        void SetQiShiBanKey(UInt16 key) { m_qishiban.randKey = key; }
+        UInt16 GetQiShiBanKey() const { return m_qishiban.randKey; }
+
+        void SetQiShiBanAwardMark(UInt16 mark) { m_qishiban.awardMark = mark; }
+        UInt16 GetQiShiBanAwardMark() const { return m_qishiban.awardMark; }
+
+        void SetQiShiBanAddTimeNum(UInt8 num) { m_qishiban.addTimeNum = num; }
+        void AddQiShiBanAddTimeNum() { m_qishiban.addTimeNum += 1; }
+        UInt32 GetQiShiBanAddTimeNum() const { return m_qishiban.addTimeNum; }
+
+        UInt32  m_checkTime;
+        //UInt32  m_checkTime1;
+        UInt32  m_curPage;
+        //七石斗法 end
+
         void setForbidSale(bool b, bool isAuto = false);
         bool getForbidSale() {return _isForbidSale;}
 	private:
@@ -2379,6 +2467,9 @@ namespace GObject
         void getLuckyMeetInstantLoginAward(UInt8 val);
         void getLuckyMeetAward(UInt8 idx,UInt8 index);
         void getSummerMeetInstantLoginAward(UInt8 val);
+        void getQZoneRechargeAward(UInt8 val);
+        void sendQZoneRechargeAwardInfo();
+        void AddQZoneRecharge(UInt32 r =0);
         void getSummerFlow3OnlineAward(UInt8 val);
         void getSummerMeetAward(UInt8 idx,UInt8 index);
         void getNewRC7DayRechargeAward(UInt8 val);
@@ -2465,12 +2556,17 @@ namespace GObject
         void sendRechargeNextRetInfo(UInt32 now);
         bool inArenaCommitCD();
         bool inArenaTeamCommitCD();
+        UInt16 getServerWarChallengeCD();
+        bool inServerWarChallengeCD();
+        bool inServerWarCommitCD();
         void appendLineup2( Stream& st);
         void appendPetOnBattle( Stream& st);
     private:
         std::vector<RNR> rechargs;
         UInt32 m_arenaCommitCD;
         UInt32 m_arenaTeamCommitCD;
+        UInt32 m_serverWarCommitCD;
+        UInt32 m_serverWarChallengeCD;
 
     public:
         void getSoSoMapAward();
@@ -2743,6 +2839,10 @@ namespace GObject
         bool checkClientIP();
         void modifyPlayerName(UInt32 itemid,UInt8 binding,std::string modifyName);
         void getGameBoxAward(UInt8 type);
+        void getRealSpirit();
+        UInt8 getFighterGoldCnt();
+        void sendRealSpirit();
+        void AddRealSpirit(UInt32 real = 0);
 	};
 
 

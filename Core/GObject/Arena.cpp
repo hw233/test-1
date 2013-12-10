@@ -8,6 +8,8 @@
 #include "Server/SysMsg.h"
 #include "MsgID.h"
 #include "Common/Itoa.h"
+#include "GObjectDBExecHelper.h"
+#include "ArenaServerWar.h"
 
 namespace GObject
 {
@@ -101,7 +103,7 @@ UInt8 EliminationBattle::winCount(UInt8 idx)
 Arena arena;
 
 Arena::Arena():
-	_loaded(false), _notified(0), _session(0), _progress(0), _status(0), _round(0), _nextTime(0)
+	_loaded(false), _notified(0), _session(0), _progress(e_progress_nextbegin), _status(0), _round(0), _nextTime(0)
 {
 	memset(_playerCount, 0, sizeof(_playerCount));
 	memset(_winnerColor, 0, sizeof(_winnerColor));
@@ -769,6 +771,8 @@ void Arena::readFrom( BinaryReader& brd )
 		_notified = 0;
         fStatus = true;
 	}
+    if(_progress != e_progress_nextbegin)
+        GObject::World::setArenaState(GObject::ARENA_XIANJIE_DIYI);
 
 	switch(_progress)
 	{
@@ -837,7 +841,6 @@ void Arena::readFrom( BinaryReader& brd )
             readPrePlayers(brd);
             readHistories(brd);
         }
-
 
         bool oldstatus = (_status > 0);
         readElimination(brd);
@@ -1259,19 +1262,21 @@ void Arena::pushPreliminary(BinaryReader& br)
     }
 }
 
-void Arena::pushBetFromDB( Player * player, UInt8 round, UInt8 state, UInt8 group, UInt8 recieved, UInt16 pos, UInt8 type )
+void Arena::pushBetFromDB(Player * player, DBArenaBet& dbab)
 {
+    if(!player || dbab.state >= 7 || dbab.group > 2)
+        return;
 	BetInfo binfo;
-	binfo.state = state;
-	binfo.round = round;
-	binfo.group = group;
-	binfo.recieved = recieved;
-	binfo.pos = pos;
-	binfo.type = type;
+	binfo.state = dbab.state;
+	binfo.round = dbab.round;
+	binfo.group = dbab.group;
+	binfo.recieved = dbab.recieved;
+	binfo.pos = dbab.pos;
+	binfo.type = dbab.tael;
     int i = 0;
-    if(group > 0)
-        i = group - 1;
-	_players[player].betList[state][i].push_back(binfo);
+    if(dbab.group > 0)
+        i = dbab.group - 1;
+	_players[player].betList[dbab.state][i].push_back(binfo);
 }
 
 void Arena::pushPreliminaryCount( UInt32 * c )
@@ -1827,10 +1832,16 @@ void Arena::sendActive(Player* pl)
             flag |= 0x10;
         st << static_cast<UInt8>(0) << flag << Stream::eos;
         pl->send(st);
+        return;
     }
     else if(teamArenaMgr.active())
     {
         teamArenaMgr.sendActive(pl);
+        return;
+    }
+    else if(serverWarMgr.active())
+    {
+        serverWarMgr.sendActive(pl);
         return;
     }
 }
@@ -2282,6 +2293,12 @@ void Arena::sendLastLeaderBoard(Player* pl)
     if(pl == NULL) return;
     if(active())
     {   //互换
+        //teamArenaMgr.sendLastLeaderBoard(pl);
+        serverWarMgr.sendLastLeaderBoard(pl);
+        return;
+    }
+    else if(serverWarMgr.active())
+    {
         teamArenaMgr.sendLastLeaderBoard(pl);
         return;
     }

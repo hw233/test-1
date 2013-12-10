@@ -67,6 +67,7 @@
 #include "GObject/RechargeTmpl.h"
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
+#include "GObject/ArenaServerWar.h"
 
 struct NullReq
 {
@@ -738,7 +739,6 @@ struct CompareBattlePoint
 	MESSAGE_DEF1(REQ::COMPARE_BP, std::string, _name);
 };
 
-
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -1317,6 +1317,13 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr1(0x1D3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr1, NULL);
     }
+
+    /*if(World::getQiShiBanTime())
+    {
+        GameMsgHdr hdr(0x1D6, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }*/
+
     pl->sendYearRPInfo();
     pl->sendFishUserInfo();
     //if(World::getYearActive())
@@ -1377,9 +1384,16 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->SetQQBoardValue();
     pl->sendQQBoardLoginInfo();
     pl->sendSummerMeetInfo();   //Fund
+    pl->sendRealSpirit();   //真元
     pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
+    //pl->QiShiBanState();
+    {
+        GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+    
     if(atoi(pl->getDomain()) == 23)
     {
         if(!pl)
@@ -1438,6 +1452,11 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 br >> itemid >> binding >> name;
                 player->modifyPlayerName(itemid,binding,name);
             }
+        case 0x21:
+            player->getRealSpirit();
+            player->sendRealSpirit();
+            break;
+
         default:
             return;
 	}
@@ -1674,6 +1693,14 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
             idx = (fer._equipId >> 16) & 0xFFFF;
             UInt8 v = fer._equipId & 0xFFFF;
             fgt->setAcupoints(idx, v, true, false);
+        }
+        break;
+    case 0x34:
+        {
+            idx = (fer._equipId >> 16) & 0xFFFF;
+            UInt8 v = fer._equipId & 0xFFFF;
+            fgt->setAcupointsGold(idx, v, true, false);
+            player->sendRealSpirit();
         }
         break;
     case 0x30:
@@ -3200,6 +3227,8 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 
     if (WBossMgr::isWorldBoss(anr._npcId))
         worldBoss.attack(player, loc, anr._npcId);
+    else if(serverWarBoss.isServerWarBoss(anr._npcId))
+        serverWarBoss.attack(player, loc, anr._npcId);
     else
         player->attackNpc(anr._npcId, 0xFFFFFFFF, player->GetLev() <= 20);
 }
@@ -6750,6 +6779,18 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
             fgt->quickUpGrade(opt);
         }
         break;
+    case 6:
+        {
+            //吞噬星空
+            fgt->tunShiXingKong();
+        }
+        break;
+    case 7:
+        {
+            //突破界限
+            fgt->tuPoJieXian();
+        }
+        break;
     }
 }
 
@@ -7433,7 +7474,17 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
             default:
                 break;
             }
-
+        }
+        break;
+    case 0x23:
+        {
+            brd >> op;
+            if(op == 0x09)
+            {
+                UInt8 state = 0;
+                brd >> state;
+                player->GetPersonalAward(state);
+            }
         }
         break;
     default:

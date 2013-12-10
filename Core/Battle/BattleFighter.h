@@ -101,7 +101,7 @@ public:
     inline float getExtraCounterLevel() { return _attrExtra.counterlvl; }
     inline float getExtraToughLevel() { return _attrExtra.toughlvl; }
     inline float getExtraMagResLevel() { return _attrExtra.mreslvl; }
-    inline float getExtraCriticalDmgImmune() { return _attrExtra.criticaldmgimmune; }
+    inline float getExtraCriticalDmgImmune() { return _attrExtra.criticaldmgimmune+_fighter->getAcupointsGoldAttr(1); }
 
 	inline GObject::Fighter * getFighter() {return _fighter;}
 
@@ -119,6 +119,7 @@ public:
 	inline Int16 getBaseAura() { return _fighter->getBaseAura(); }
 	inline Int16 getBaseAuraMax() { return _fighter->getBaseAuraMax(); }
 	inline Int16 getBaseTough() { return _fighter->getBaseTough(); }
+	inline float getAcupointsGoldAttr(UInt8 attrId) { return _fighter->getAcupointsGoldAttr(attrId); }
 	inline Int32 getBaseAttack() {return _fighter->getBaseAttack();}
 	inline Int32 getBaseMagAttack() {return _fighter->getBaseMagAttack();}
 	inline Int32 getBaseDefend() {return _fighter->getBaseDefend();}
@@ -154,7 +155,7 @@ public:
 	float getCounter(BattleFighter* defgt, const GData::SkillBase* skil = NULL);
 	float getMagRes(BattleFighter* defgt);
 	float getTough(BattleFighter* defgt);
-    float getCriticalDmgImmune() { return _attrExtra.criticaldmgimmune; }
+    float getCriticalDmgImmune() { return _attrExtra.criticaldmgimmune+_fighter->getAcupointsGoldAttr(1); }
 	inline UInt32 getMaxHP() {Int64 ret = _maxhp + _maxhpAdd + _maxhpAdd2; return (ret > 0 ? ret : 0);}
 	inline Int32 getAction() {Int32 ret = _maxAction + _maxActionAdd + _maxActionAdd2; return (ret > 0 ? ret : 0);}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
@@ -317,6 +318,8 @@ public:
     const GData::SkillBase* getPassiveSkillOnBeMagDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHP10P(bool noPossibleTarget = false);
 
+    const GData::SkillBase* getSkillSoulProtect();
+
     void releaseSkillCD(int cd);
     void releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd);
 
@@ -324,6 +327,7 @@ public:
     void updatePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
 
     void updateSoulSkillDead(UInt16 skillId);
+    void updateSoulSkillProtect(UInt16 skillId);
     void updatePassiveSkillPrvAtk100Status();
     void updatePassiveSkillBLTY100Status();
 
@@ -1165,8 +1169,16 @@ private:
     inline void setPeerLessDisableSSHP(UInt8 i, UInt32 hp) { if(i < 25) _peerlessDisableSSHP[i] = hp; }
     inline UInt32 getPeerLessDisableSSHP(UInt8 i) { if(i < 25) return _peerlessDisableSSHP[i]; else return 0; }
 
+    UInt8 _soulProtectLast;
+    inline void setSoulProtectLast(UInt8 l) { _soulProtectLast = l; }
+    inline UInt8 getSoulProtectLast() { return _soulProtectLast; }
+    UInt8 _soulProtectCount;
+    inline void setSoulProtectCount(UInt8 count) { _soulProtectCount = count; }
+    inline UInt8 getSoulProtectCount() { return _soulProtectCount; }
+
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
+    std::vector<GData::SkillItem> _passiveSkillSoulProtect;
     std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;

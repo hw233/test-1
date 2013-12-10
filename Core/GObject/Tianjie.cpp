@@ -720,7 +720,10 @@ void Tianjie::onTianjieReq( GameMsgHdr& hdr, const void* data)
         UInt8 id = 0;
         br >> cmd;
         br >> id;
-        pl->OnDoTianjieTask(type, cmd, id);
+        if(m_isTjExecute && (4 == m_currTjRate || 5 == m_currTjRate))
+            pl->sendMsgCode(0, 1603);
+        else
+            pl->OnDoTianjieTask(type, cmd, id);
     }
 }
 void Tianjie::notifyTianjieStatus(Player* pl)
@@ -2123,6 +2126,7 @@ void Tianjie::startBoss()
 
         _hp = ohp;
         nflist[0].fighter->setBaseHP(ohp);
+        nflist[0].fighter->setWBoss(true);
 
         extatk = (WBOSS_BASE_TIME/(float)lastTime - 1.f) * WBOSS_ATK_FACTOR * (atk + baseatk);
         nflist[0].fighter->setExtraAttack(extatk + atk);
