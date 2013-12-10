@@ -391,10 +391,10 @@ public:
     inline static bool getSSToolbarAct()
     { return _ssToolbarAct; }
 
-    inline static void setSnowAct(bool v)
+    /*inline static void setSnowAct(bool v)
     { _snowAct= v; }
     inline static bool getSnowAct()
-    { return _snowAct; }
+    { return _snowAct; }*/
     inline static void setGoldSnakeAct(bool v)
     { _goldSnakeAct= v; }
     inline static bool getGoldSnakeAct()
@@ -823,7 +823,34 @@ public:
         else
             _surnamelegend = false;
         return _surnamelegend;
-    } 
+    }
+
+    inline static void setSnowAct(bool v)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_CHRISTMAS_PILESNOW_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_CHRISTMAS_PILESNOW_END);
+        UInt32 now = TimeUtil::Now();
+        if( now >= begin && now <= end)
+            return;
+        _snowAct = v;
+    }
+
+    inline static bool getSnowAct(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_CHRISTMAS_PILESNOW_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_CHRISTMAS_PILESNOW_END);
+        UInt32 now = TimeUtil::Now() + time;
+        if(begin == 0 && end == 0)
+            return _snowAct;
+
+        if(now >= begin && now <= end)
+            _snowAct = true;
+        else
+            _snowAct = false;
+
+        return _snowAct;
+    }
+
     inline static bool getLuckyMeet(UInt32 time = 0)
     {
         UInt32 begin = GVAR.GetVar(GVAR_LUCKYMEET_BEGIN);

@@ -115,6 +115,10 @@ function loadStore()
 
         discount(store)
 
+    if getSnowAct() then
+        store:add(2, 9275, 10)
+    end
+
     if getSurnameLegend(30) then
         --store:add(2 ,9383 , 20)
         --store:add(2 ,9397, 20)
@@ -203,9 +207,9 @@ function loadStore()
             store:add(2,9282,50)
         end
 
-        if getSnowAct() then
-            store:add(2, 9275, 10)
-        end
+        --if getSnowAct() then
+            --store:add(2, 9275, 10)
+        --end
         if getGoldSnakeAct() then
             store:add(2, 9314, 20)
         end

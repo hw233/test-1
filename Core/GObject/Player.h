@@ -1931,6 +1931,7 @@ namespace GObject
         UInt8 useSnowItem(UInt32 num);
         void sendSnowScoreAward();
         UInt8 getSnowAward(UInt16 type);
+        void cleanPileSnow();
         
         //推雪人end
         
