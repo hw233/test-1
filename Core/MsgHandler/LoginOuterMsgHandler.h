@@ -1842,7 +1842,11 @@ void OnoffQQOpenid(LoginMsgHdr &hdr, const void* data)
     
     br >> onOffQQ.pid >> onOffQQ.clanid;
     
-    
+    if (cfg.merged)
+    {
+        UInt32 serverNo = cfg.serverNo;
+        onOffQQ.pid |= (static_cast<UInt64>(serverNo) << 48);
+    }
     GObject::Clan *clan = GObject::globalClans[onOffQQ.clanid];
 	GObject::Player * player = GObject::globalPlayers[onOffQQ.pid];
    
