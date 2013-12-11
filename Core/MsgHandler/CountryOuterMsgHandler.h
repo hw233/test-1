@@ -1388,7 +1388,13 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
-    pl->QiShiBanState();
+    //pl->QiShiBanState();
+    {
+        GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+   
+    pl->MiLuZhiJiao();
     if(atoi(pl->getDomain()) == 23)
     {
         if(!pl)
