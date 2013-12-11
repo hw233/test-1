@@ -26427,6 +26427,7 @@ void Player::AddYearHappyValue(UInt32 val)
 {
     if(!World::getHappyFireTime())
         return ;
+    std::cout<<val<<std::endl;
     AddVar(VAR_YEARHAPPY_DAYVALUE,val);
     AddVar(VAR_YEARHAPPY_VALUE,val);
     UInt32 grade = GetVar(VAR_YEARHAPPY_VALUE);

@@ -3317,12 +3317,14 @@ function ItemNormal_00009027(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
     return rn;
 end
-function ItemNormal_0000XXXX(iid, num, bind, param)
+function ItemNormal_00009440(iid, num, bind, param)
     local player = GetPlayer()
+    local package = player:GetPackage();
     for n = 1, num do
-        player:AddYearHappyValue(math.random(1.5))
+        local val = math.random(1,5)
+        package:DelItemSendMsg(iid, player);
+        player:AddYearHappyValue(val)
     end
-    package:DelItemSendMsg(iid, player);
     return num
 end
 
@@ -11597,7 +11599,7 @@ local ItemNormal_Table = {
     [9075] = ItemNormal_00009017,
 
     [9027] = ItemNormal_00009027,
-    [9028] = ItemNormal_00009028,
+    [9440] = ItemNormal_00009440,
 
     [9067] = ItemNormal_00009067,
     [9076] = ItemNormal_00009076,

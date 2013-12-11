@@ -2253,8 +2253,10 @@ void SendHappyFireRank(Stream& st)
         cnt = CNT;
     st << static_cast<UInt8>(0x02) << static_cast<UInt8>(5) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
     UInt32 c = 0;
-    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSort.end(); i != e; ++i)
     {
+        if(i->player == NULL)
+            continue;
         st << i->player->getName();
         st << i->total;
      //   st << static_cast<UInt8>(i->player->getCountry()<<4|(i->player->IsMale()?0:1));
@@ -2330,7 +2332,7 @@ void OnSendHappyFireRank ( GameMsgHdr& hdr,  const void* data )
     player->send(st);
 
     UInt32 rank = 0;
-    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSort.end(); i != e; ++i)
     {
         ++rank;
         if (i->player == player)

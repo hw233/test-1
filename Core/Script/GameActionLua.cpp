@@ -327,6 +327,7 @@ namespace Script
         CLASS_DEF(Player, in7DayFromCreated);
         CLASS_DEF(Player, GetMoFang);
         CLASS_DEF(Player, addClanProfferFromItem);
+        CLASS_DEF(Player, AddYearHappyValue);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);
