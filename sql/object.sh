@@ -221,6 +221,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131101_1.sql    #七石斗法
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_add_acuGold_1125.sql     #武将添加本命金丹
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131203_1.sql   #fighter_xingchen 表中添加 gem4、gem5、gem6、xctCurVal、xctMaxVal 五个字段
     #. clearshiyamen.sh
 }
 
