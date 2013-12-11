@@ -1833,25 +1833,37 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
-    UInt32 clanid;
-    br >> clanid;
+    UInt64 clan_uid;
+    br >> clan_uid;
     UInt64 pid;
     br >> pid;
     string talk_record;
     br >> talk_record; 
 
-    TRACE_LOG("clanid is %u,pid is %u,talk_record is %s",clanid,pid,talk_record.c_str());
     if (cfg.merged)
     {
         UInt32 serverNo = cfg.serverNo;
         pid |= (static_cast<UInt64>(serverNo) << 48);
     }
+    else
+    {
+        clan_uid = clan_uid & 0xffffffffff;
 
+    }
+    TRACE_LOG("onlydtc clanid is %u,pid is %u,talk_record is %s",clan_uid,pid,talk_record.c_str());
     GObject::Player * player = GObject::globalPlayers[pid];
-    GObject::Clan *clan = GObject::globalClans[clanid];
+    GObject::Player * clan_leader = GObject::globalPlayers[clan_uid];
     UInt8 ret = 0;
-    if(!player || !clan) 
+    if(!player || !clan_leader) 
+    {
         ret = 1;
+    }
+    else
+    {
+        GObject::Clan *clan = clan_leader->getClan();
+        if(!clan)
+            ret = 1;
+    }
     if(ret == 0)
     {
         Stream st(REP::CHAT);
