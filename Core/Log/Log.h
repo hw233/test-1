@@ -136,7 +136,7 @@ enum PurchaseType
     QSBAddTime                  = 125, //七石板加时
     TuPoJieXian                 = 126, //星辰图突破界限
     ServerWarConsume            = 127, //仙界传奇消费
-    RestStep                    = 128, //七石板重置
+    RestStep                    = 1001, //七石板重置
     //繁体私有占150～200
 };
 

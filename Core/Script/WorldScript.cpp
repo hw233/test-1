@@ -168,6 +168,7 @@ void WorldScript::init()
     def("setSaveGoldAct", GObject::World::setSaveGoldAct);
     def("setCollectCardAct", GObject::World::setCollectCardAct);
     def("setHalloweenAct", GObject::World::setHalloweenAct);
+    def("setMiLuZhiJiaoAct", GObject::World::setMiLuZhiJiaoAct);
     
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);
