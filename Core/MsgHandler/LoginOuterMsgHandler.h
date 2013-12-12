@@ -1341,7 +1341,10 @@ inline bool player_enum_setvar(GObject::Player* p, void* msg)
     };
 
     Msg* _msg = (Msg*)msg;
-    p->SetVar(_msg->var,_msg->value);
+    if(_msg->value == 0)
+        p->DelVar(_msg->var);
+    else
+        p->SetVar(_msg->var,_msg->value);
     return true;
 }
 
@@ -1845,24 +1848,37 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
-    UInt32 clanid;
-    br >> clanid;
+    UInt64 clan_uid;
+    br >> clan_uid;
     UInt64 pid;
     br >> pid;
     string talk_record;
     br >> talk_record; 
-	
+
     if (cfg.merged)
     {
         UInt32 serverNo = cfg.serverNo;
         pid |= (static_cast<UInt64>(serverNo) << 48);
     }
+    else
+    {
+        clan_uid = clan_uid & 0xffffffffff;
 
+    }
+    TRACE_LOG("onlydtc clanid is %u,pid is %u,talk_record is %s",clan_uid,pid,talk_record.c_str());
     GObject::Player * player = GObject::globalPlayers[pid];
-    GObject::Clan *clan = GObject::globalClans[clanid];
+    GObject::Player * clan_leader = GObject::globalPlayers[clan_uid];
     UInt8 ret = 0;
-    if(!player || !clan) 
+    if(!player || !clan_leader) 
+    {
         ret = 1;
+    }
+    else
+    {
+        GObject::Clan *clan = clan_leader->getClan();
+        if(!clan)
+            ret = 1;
+    }
     if(ret == 0)
     {
         Stream st(REP::CHAT);
@@ -1876,6 +1892,7 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
     }
     Stream st1(SPEP::GETQQCLANTALK);
     st1 << ret << Stream::eos;
+    TRACE_LOG(" ret is %u",ret);
     NETWORK()->SendMsgToClient(hdr.sessionID,st1);
 }
 
@@ -3290,7 +3307,12 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_QZONE_RECHARGE, 0);
                 pl->SetVar(GObject::VAR_QZONE_RECHARGE_AWARD, 0);
             }
+         case 12:
+            {
+                pl->cleanPileSnow();
+            }
             break;
+   break;
         default:
             return false;
     }
@@ -3700,6 +3722,18 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_END, end);
         ret = 1 ;
     }
+    else if (type == 12 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_CHRISTMAS_PILESNOW_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_CHRISTMAS_PILESNOW_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 12);
+        }
+
+        GObject::GVAR.SetVar(GObject::GVAR_CHRISTMAS_PILESNOW_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_CHRISTMAS_PILESNOW_END, end);
+        ret = 1;
+    }
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
@@ -3758,7 +3792,7 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
    
 //开启起封交易客户平台测试
     
-//#define TEST_TABLE
+#define TEST_TABLE
 #ifdef TEST_TABLE
 #pragma pack(1) 
     struct test
@@ -3778,19 +3812,12 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
 
     UInt8 ret = 1;
     //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
-    std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
         UInt64 pid = atoll(playerId.c_str());
         if(pid == 0)
         {
-            if(value==0)
-            {
-                if (execu.get() != NULL && execu->isConnected())
-                    execu->Execute2("delete from `var` where `id` = %u ",var);
-                break;
-            }
             struct Msg
             {
                 UInt32 var;
@@ -3805,11 +3832,7 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
         if (NULL != pl)
         {
             if(value==0)
-            {
-                if (execu.get() != NULL && execu->isConnected())
-                    execu->Execute2("delete from `var` where `id` = %u and `playerId` = %" I64_FMT "u",var,pid);
-                break;
-            }
+                pl->DelVar(var);
             else
                 pl->SetVar(var,value);
         }

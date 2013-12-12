@@ -4381,6 +4381,11 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
             break;
+        case 12:
+            GVAR.SetVar(GObject::GVAR_QISHIBANGAME_BEGIN, 0);
+            GVAR.SetVar(GVAR_QISHIBANGAME_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
         case 13:
             GVAR.SetVar(GVAR_QZONEQQGAMEY_BEGIN, TimeUtil::Now());
             GVAR.SetVar(GVAR_QZONEQQGAMEY_END, TimeUtil::Now() + 86400*15);
@@ -4401,6 +4406,17 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
         case 16:
             GVAR.SetVar(GVAR_QZONE_RECHARGE_BEGIN, 0);
             GVAR.SetVar(GVAR_QZONE_RECHARGE_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+        case 17:
+            GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_BEGIN, TimeUtil::SharpDayT( 0 , TimeUtil::Now()));
+            GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_END, TimeUtil::SharpDayT( 5 , TimeUtil::Now()));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 18:
+            GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_BEGIN, 0);
+            GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
     }
@@ -4825,7 +4841,7 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
 //    setForbidSaleValue(playerId, true,fTime);
 //
 //开启起封交易客户平台测试
-//#define TEST_TABLE
+#define TEST_TABLE
 #ifdef TEST_TABLE
     //测试平台 begin
 #pragma pack(1)

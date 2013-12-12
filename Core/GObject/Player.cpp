@@ -2615,6 +2615,10 @@ namespace GObject
     {
         m_pVars->SetVar(id,val);
     }
+    void Player::DelVar(UInt32 id )
+    {
+        m_pVars->DelVar(id);
+    }
 
     void Player::AddVar(UInt32 id, UInt32 val)
     {
@@ -8056,6 +8060,9 @@ namespace GObject
         if (nLev == 40 || nLev == 50 || nLev == 60 || nLev == 70 || nLev == 80 || nLev == 90 || nLev == 100)
             OnShuoShuo(nLev/10-4 + SS_40);
 
+        if(nLev >= 40)
+            MiLuZhiJiao();
+
         sendVipPrivilegeMail(nLev);
         getLevelAwardInfo();
 	}
@@ -11717,6 +11724,7 @@ namespace GObject
         case 29:
             //阵营检索
             checkZhenying();
+            break;
         case 30:
             getAirBookLoginAward(opt);
             break;
@@ -11733,7 +11741,7 @@ namespace GObject
                 break;
         }
     }
-    
+   
     void Player::checkZhenying()
     {
         UInt8 zyState = 0;
@@ -12597,6 +12605,8 @@ namespace GObject
             return;
         UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
         if(opTime <= TimeUtil::MkTime(2013, 5, 3))
+            return;
+        if(opt && !hasChecked())
             return;
         if(!GameAction()->RunLevelAward(this, opt))
             return;
@@ -17758,7 +17768,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             UInt32 maxScore = num * 5;
             UInt32 score = minScore + uRand(maxScore-minScore);
             m_snow.score += score;
-            AddPExp(99*num);
+            AddPExp(199*num);
 
             //sendSnowScoreAward();
             //if (m_snow.bind && m_snow.lover != NULL)
@@ -17826,15 +17836,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
     }
     UInt8 Player::getSnowAward(UInt16 type)
     {
-        static  MailPackage::MailItem s_item1[4] = {{56,1},{502,1},{510,1},{548,1}};
-        static  MailPackage::MailItem s_item2[4] = {{514,1},{57,1},{500,1},{15,1}};
-        static  MailPackage::MailItem s_item3[4] = {{503,1},{512,1},{516,1},{513,1}};
-        static  MailPackage::MailItem s_item4[4] = {{1325,1},{134,1},{547,1},{551,1}};
-        static  MailPackage::MailItem s_item5[4] = {{401,3},{547,3},{511,3},{514,3}};
-        static  MailPackage::MailItem s_item6[4] = {{509,2},{507,2},{501,2},{513,2}};
-        static  MailPackage::MailItem s_item7[4] = {{503,8},{516,8},{500,8},{505,8}};
-        static  MailPackage::MailItem s_item8[4] = {{134,5},{1325,5},{9076,5},{507,5}};
-        static  MailPackage::MailItem s_item9[4] = {{1325,10},{134,10},{9076,10},{509,10}};
+        static  MailPackage::MailItem s_item1[4] = {{56,3},{57,3},{9371,3},{548,3}};
+        static  MailPackage::MailItem s_item2[4] = {{514,3},{9371,3},{500,3},{15,3}};
+        static  MailPackage::MailItem s_item3[4] = {{503,3},{512,3},{516,2},{513,3}};
+        static  MailPackage::MailItem s_item4[4] = {{1325,2},{134,2},{547,3},{551,3}};
+        static  MailPackage::MailItem s_item5[4] = {{401,5},{547,5},{512,5},{514,5}};
+        static  MailPackage::MailItem s_item6[4] = {{509,3},{507,3},{501,5},{513,5}};
+        static  MailPackage::MailItem s_item7[4] = {{503,5},{516,5},{501,5},{505,5}};
+        static  MailPackage::MailItem s_item8[4] = {{134,8},{1325,8},{9076,8},{507,8}};
+        static  MailPackage::MailItem s_item9[4] = {{1325,15},{134,15},{9076,10},{509,15}};
   
         if(GetPackage()->GetRestPackageSize() < 4)
         {
@@ -17904,6 +17914,16 @@ void EventTlzAuto::notify(bool isBeginAuto)
             SetVar(VAR_SNOW_AWARD, v);
         }
         return 0;
+    }
+
+    void Player::cleanPileSnow()
+    {
+        SetVar(VAR_SNOW_AWARD, 0);
+        m_snow.lover = NULL;
+        m_snow.bind = 0;
+        m_snow.score = 0;
+
+        DB1().PushUpdateData("DELETE FROM `snow` WHERE `playerId` = %" I64_FMT "u", getId());
     }
 
     void  Player::setForbidSale(bool b, bool isAuto /* = false */)
@@ -22480,7 +22500,7 @@ void Player::sendFoolsDayInfo(UInt8 answer)
         if(info & (1<<i))
             ++ right;
     }
-    if(!isFail && qid == 0 && right < QUESTIONID_MAX && GET_BIT_8(value, 1) == 0)
+    if(!isFail && qid == 0 && right < QUESTIONID_MAX && GET_BIT_8(value, 1) < QUESTIONID_MAX)
     {   //分配新题目
         UInt8 index = uRand(QUESTIONID_MAX-right);
         UInt8 j = 0;
@@ -22521,7 +22541,7 @@ void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
 {
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
     UInt32 value = GetVar(VAR_FOOLS_DAY);
-    if(GET_BIT_8(value, 1))
+    if(!id || GET_BIT_8(value, 1) >= QUESTIONID_MAX)
         return;
     UInt32 qtime = GetVar(VAR_FOOLS_DAY_TIME);
     if(info == 0 && value == 0 && qtime == 0)
@@ -22567,7 +22587,8 @@ void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
 void Player::getAwardInFoolsDay()
 {
     UInt32 value = GetVar(VAR_FOOLS_DAY);
-    if(GET_BIT_8(value, 1))
+    UInt8 award = GET_BIT_8(value, 1);
+    if(award >= QUESTIONID_MAX)
         return;
     UInt8 right = 0;
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
@@ -22576,14 +22597,14 @@ void Player::getAwardInFoolsDay()
         if(info & (1<<i))
             ++ right;
     }
-    if(right < 5)
+    if(right < 5 || right/5 <= award/5)
         return;
-    if (GetPackage()->GetRestPackageSize() < right / 5)
+    if (GetPackage()->GetRestPackageSize() < right/5 - award/5)
     {
         sendMsgCode(2, 1011, 0);
         return;
     }
-    GameAction()->getAwardInFoolsDay(this, right / 5);
+    GameAction()->getAwardInFoolsDay(this, GET_BIT_8(value, 1)/5 + 1, right / 5);
     SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/5 * 5));
     sendFoolsDayInfo();
     foolsDayUdpLog(right / 5);
@@ -22594,7 +22615,7 @@ void Player::buyResurrectionCard()
     if(!hasChecked())
         return;
     UInt32 value = GetVar(VAR_FOOLS_DAY);
-    if(GET_BIT_8(value, 1))
+    if(GET_BIT_8(value, 1) >= QUESTIONID_MAX)
         return;
     UInt8 qid = GET_BIT_8(value, 0);
     if(qid == 0)
@@ -22651,15 +22672,21 @@ void Player::checkAnswerActInFoolsDay()
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
     UInt32 value = GetVar(VAR_FOOLS_DAY);
     UInt8 type = 0, right = 0;
-    if(GET_BIT_8(value, 1))
-        type = 1;
+    UInt8 award = GET_BIT_8(value, 1);
+    for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
+    {
+        if(info & (1<<i))
+            ++ right;
+    }
+    if(award)
+    {
+        if(right == QUESTIONID_MAX && award == QUESTIONID_MAX)
+            type = 1;
+        else
+            type = 2;
+    }
     else
     {
-        for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
-        {
-            if(info & (1<<i))
-                ++ right;
-        }
         if(right == 0 && (info & (1<<0)) == 0)
             type = 3;
         else
@@ -26387,6 +26414,9 @@ void Player::getQZoneRechargeAward(UInt8 val)
     }
     ctslandingAward |= (1<<(val - 1));
     SetVar(VAR_QZONE_RECHARGE_AWARD, ctslandingAward);
+    char str[16] = {0};
+    sprintf(str, "F_131212_%d",val);
+    udpLog("chongzhihuodong", str, "", "", "", "", "act");
     
 }
 void Player::sendQZoneRechargeAwardInfo()
@@ -26414,6 +26444,28 @@ void Player::AddQZoneRecharge(UInt32 r)
         sendQZoneRechargeAwardInfo();
     }
 }
+
+void Player::MiLuZhiJiao()
+{       
+    if(!World::getMiLuZhiJiaoAct())
+        return;
+
+    if(GetLev() < 40)
+        return;
+    
+    if(0 == GetVar(VAR_CHRISTMAS_PRESENT))
+    {
+        SYSMSGV(title, 5114);
+        SYSMSGV(content, 5115);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, 1767, 1, true);
+            SetVar(VAR_CHRISTMAS_PRESENT, 1);
+        }
+    }
+}
+
 } // namespace GObject
 
 

@@ -4778,7 +4778,7 @@ function sendRechargeMails(player, ototal, ntotal)
         end
     end
     
-    local t = { ['year'] = 2013, ['month'] = 11, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
 
@@ -4798,7 +4798,7 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_05_24(player, ototal, ntotal)
     end
 
-    local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
 
@@ -7559,6 +7559,19 @@ function sendRechargeRankAward_2013_12_10(player, pos, total, f7)
     sendRCAward(player, pos, total, f7, items[pos])
 end
 
+function sendRechargeRankAward_2013_12_17(player, pos, total, f7)
+    local items = {
+        {5008, 1, 1},
+        {5007, 2, 1},
+        {5007, 1, 1},
+        {5006, 2, 1},
+        {5006, 2, 1},
+        {5006, 2, 1},
+        {5006, 2, 1},
+    }
+    sendRCAward(player, pos, total, f7, items[pos])
+end
+
 -- RANK
 function sendRechargeRankAward(player, pos, total, f7)
     if isRPServer() then
@@ -7584,26 +7597,6 @@ function sendRechargeRankAward(player, pos, total, f7)
         end
     end
      
-    local t = { ['year'] = 2013, ['month'] = 11, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local n = os.time()
-
-    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
-        sendRechargeRankAward_2013_11_02(player, pos, total, f7)
-    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
-        sendRechargeRankAward_2013_04_15(player, pos, total, f7)
-    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
-        sendRechargeRankAward_2013_03_29(player, pos, total, f7)
-    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
-        sendRechargeRankAward_2013_12_03(player, pos, total, f7)
-    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
-        sendRechargeRankAward_2013_04_18(player, pos, total, f7)
-    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
-        sendRechargeRankAward_2013_04_19(player, pos, total, f7)
-    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
-        sendRechargeRankAward_2013_09_06(player, pos, total, f7)
-    end
-
     local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
@@ -7616,6 +7609,26 @@ function sendRechargeRankAward(player, pos, total, f7)
         sendRechargeRankAward_2013_03_29(player, pos, total, f7)
     elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
         sendRechargeRankAward_2013_12_10(player, pos, total, f7)
+    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_18(player, pos, total, f7)
+    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_19(player, pos, total, f7)
+    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
+        sendRechargeRankAward_2013_09_06(player, pos, total, f7)
+    end
+
+    local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time()
+
+    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
+        sendRechargeRankAward_2013_11_02(player, pos, total, f7)
+    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_15(player, pos, total, f7)
+    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
+        sendRechargeRankAward_2013_03_29(player, pos, total, f7)
+    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
+        sendRechargeRankAward_2013_12_17(player, pos, total, f7)
     elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
         sendRechargeRankAward_2013_04_18(player, pos, total, f7)
     elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
@@ -9062,20 +9075,6 @@ function onGetNewYearGiveGiftAward(player, index, times)
 end
 
 local answers = {
-    --[[
-    ["0429"] = { 65, 65, 66, 65, 67, 67, 68, 67, 65, 65,
-                 66, 66, 66, 68, 66, 65, 65, 65, 65, 66,
-                 66, 65, 66, 67, 67, 67, 67, 68, 68, 66,
-    },
-    ["0430"] = { 66, 68, 68, 66, 65, 67, 65, 65, 66, 67,
-                 67, 66, 68, 68, 65, 65, 65, 65, 65, 66,
-                 66, 66, 67, 68, 68, 68, 68, 65, 68, 68,
-    },
-    ["0501"] = { 68, 65, 65, 65, 67, 67, 66, 67, 68, 67,
-                 67, 66, 65, 66, 65, 65, 65, 65, 65, 67,
-                 67, 67, 67, 68, 68, 68, 68, 65, 68, 66,
-    },
-    --]]
     --[[["0817"] = {
         [0] = {  68, 65, 67, 67, 68, 68, 67, 67, 67, 67,    --70级以上题库
                  65, 65, 68, 66, 67, 67, 68, 68, 68, 68,
@@ -9083,83 +9082,35 @@ local answers = {
         [1] = {  67, 68, 67, 65, 65, 68, 68, 65, 67, 67,    --70级以下题库
                  68, 68, 68, 68, 68, 67, 67, 67, 67, 67,
              },
-    },
-    ["0818"] = {
-        [0] = {  65, 66, 67, 68, 68, 65, 66, 65, 66, 67,    --70级以上题库
-                 67, 65, 67, 68, 68, 66, 66, 68, 67, 67,
-              },
-        [1] = {  65, 66, 67, 67, 68, 68, 67, 66, 68, 67,    --70级以下题库
-                 68, 65, 68, 68, 67, 65, 65, 65, 66, 67,
-              },
     },]]
-    ["1102"] = {
-        [0] = {  4, 1, 3, 3, 3, 4, 2, 2, 1, 1,    --70级以上题库
-                 3, 4, 2, 3, 3, 2, 3, 4, 1, 4,
-                 3, 1, 3, 1, 1, 2, 1, 2, 3, 2,
+    ["1221"] = {
+        [0] = {  1, 3, 1, 3, 1, 4, 2, 1, 1, 4,    --70级以上题库
+                 1, 4, 1, 1, 3, 2, 4, 3, 1, 3,
+                 2, 4, 2, 3, 4, 3, 2, 2, 3, 4,
               },
-        [1] = {  4, 1, 3, 3, 3, 4, 2, 2, 1, 1,    --70级以下题库
-                 3, 4, 2, 3, 3, 2, 3, 4, 1, 4,
-                 3, 1, 3, 1, 1, 2, 1, 2, 3, 2,
-              },
-    },
-    ["1103"] = {
-        [0] = {  3, 1, 3, 2, 1, 4, 3, 4, 2, 4,    --70级以上题库
-                 3, 1, 1, 1, 1, 4, 3, 3, 2, 1,
-                 1, 2, 3, 4, 3, 1, 1, 1, 4, 1,
-              },
-        [1] = {  3, 1, 3, 2, 1, 4, 3, 4, 2, 4,    --70级以下题库
-                 3, 1, 1, 1, 1, 4, 3, 3, 2, 1,
-                 1, 2, 3, 4, 3, 1, 1, 1, 4, 1,
+        [1] = {  1, 3, 1, 3, 1, 4, 2, 1, 1, 4,    --70级以下题库
+                 1, 4, 1, 1, 3, 2, 4, 3, 1, 3,
+                 2, 4, 2, 3, 4, 3, 2, 2, 3, 4,
               },
     },
-    ["1104"] = {
-        [0] = {  2, 3, 2, 1, 2, 4, 2, 4, 4, 4,    --70级以上题库
-                 3, 3, 1, 3, 1, 1, 2, 4, 1, 4,
-                 1, 1, 1, 1, 1, 3, 1, 4, 2, 3,
+    ["1222"] = {
+        [0] = {  4, 3, 1, 3, 3, 4, 4, 1, 1, 1,    --70级以上题库
+                 1, 1, 1, 3, 2, 3, 2, 2, 3, 2,
+                 2, 4, 2, 3, 1, 4, 3, 3, 1, 3,
               },
-        [1] = {  2, 3, 2, 1, 2, 4, 2, 4, 4, 4,    --70级以下题库
-                 3, 3, 1, 3, 1, 1, 2, 4, 1, 4,
-                 1, 1, 1, 1, 1, 3, 1, 4, 2, 3,
-              },
-    },
-    ["1105"] = {
-        [0] = {  4, 3, 2, 3, 3, 1, 1, 4, 3, 2,    --70级以上题库
-                 4, 3, 4, 2, 1, 3, 1, 4, 1, 2,
-                 1, 1, 1, 1, 2, 4, 1, 4, 2, 1,
-              },
-        [1] = {  4, 3, 2, 3, 3, 1, 1, 4, 3, 2,    --70级以下题库
-                 4, 3, 4, 2, 1, 3, 1, 4, 1, 2,
-                 1, 1, 1, 1, 2, 4, 1, 4, 2, 1,
+        [1] = {  4, 3, 1, 3, 3, 4, 4, 1, 1, 1,    --70级以下题库
+                 1, 1, 1, 3, 2, 3, 2, 2, 3, 2,
+                 2, 4, 2, 3, 1, 4, 3, 3, 1, 3,
               },
     },
-    ["1106"] = {
-        [0] = {  3, 2, 1, 4, 2, 3, 3, 1, 3, 3,    --70级以上题库
-                 4, 1, 4, 1, 2, 1, 4, 3, 4, 1,
-                 2, 3, 4, 1, 2, 4, 2, 4, 1, 1,
+    ["1223"] = {
+        [0] = {  1, 4, 1, 3, 1, 1, 4, 1, 2, 3,    --70级以上题库
+                 1, 1, 1, 1, 1, 1, 2, 4, 3, 2,
+                 2, 2, 4, 3, 2, 4, 3, 3, 4, 4,
               },
-        [1] = {  3, 2, 1, 4, 2, 3, 3, 1, 3, 3,    --70级以下题库
-                 4, 1, 4, 1, 2, 1, 4, 3, 4, 1,
-                 2, 3, 4, 1, 2, 4, 2, 4, 1, 1,
-              },
-    },
-    ["1107"] = {
-        [0] = {  2, 3, 1, 2, 4, 1, 3, 1, 4, 2,    --70级以上题库
-                 3, 1, 4, 2, 3, 1, 1, 2, 4, 1,
-                 4, 1, 3, 3, 2, 1, 1, 1, 1, 1,
-              },
-        [1] = {  2, 3, 1, 2, 4, 1, 3, 1, 4, 2,    --70级以下题库
-                 3, 1, 4, 2, 3, 1, 1, 2, 4, 1,
-                 4, 1, 3, 3, 2, 1, 1, 1, 1, 1,
-              },
-    },
-    ["1108"] = {
-        [0] = {  3, 2, 4, 4, 2, 1, 3, 2, 4, 3,    --70级以上题库
-                 1, 3, 1, 3, 2, 1, 4, 1, 1, 1,
-                 3, 2, 1, 4, 3, 4, 2, 4, 2, 4,
-              },
-        [1] = {  3, 2, 4, 4, 2, 1, 3, 2, 4, 3,    --70级以下题库
-                 1, 3, 1, 3, 2, 1, 4, 1, 1, 1,
-                 3, 2, 1, 4, 3, 4, 2, 4, 2, 4,
+        [1] = {  1, 4, 1, 3, 1, 1, 4, 1, 2, 3,    --70级以下题库
+                 1, 1, 1, 1, 1, 1, 2, 4, 3, 2,
+                 2, 2, 4, 3, 2, 4, 3, 3, 4, 4,
               },
     },
 }
@@ -9176,32 +9127,23 @@ function getAnswerInFoolsDay(qid, type)
 end
 
 local answerAwardItems = {
-    --[[
-    ["0429"] = { {500, 1}, {516, 1}, {503, 1}, {1325, 1}, {515, 1}, {507, 2} },
-    ["0430"] = { {508, 1}, {501, 1}, {503, 1}, {1325, 1}, {134, 1}, {515, 2} },
-    ["0501"] = { {506, 1}, {547, 1}, {503, 1}, {9338, 1}, {515, 1}, {509, 2} },
-    --]]
-    ["1102"] = { {500, 1}, {503, 1}, {516, 1}, {1325, 1}, {134, 1}, {515, 1} },
-    ["1103"] = { {514, 1}, {1126, 1}, {513, 1}, {134, 1}, {1325, 1}, {509, 1} },
-    ["1104"] = { {9371, 1}, {8000, 1}, {501, 1}, {9338, 1}, {1325, 1}, {515, 1} },
-    ["1105"] = { {511, 2}, {517, 1}, {547, 1}, {134, 1}, {9338, 1}, {509, 1} },
-    ["1106"] = { {33, 1}, {503, 1}, {9308, 1}, {1325, 1}, {9371, 6}, {549, 1} },
-    ["1107"] = { {56, 2}, {8000, 1}, {517, 1}, {551, 1}, {9338, 1}, {515, 1} },
-    ["1108"] = { {57, 2}, {517, 1}, {516, 1}, {547, 1}, {134, 1}, {509, 1} },
+    ["1221"] = { {500, 1}, {503, 2}, {501, 2}, {8000, 2}, {1126, 2}, {515, 1} },
+    ["1222"] = { {9371, 2}, {9418, 2}, {513, 2}, {9371, 6}, {551, 2}, {509, 1} },
+    ["1223"] = { {33, 2}, {514, 2}, {547, 2}, {516, 2}, {134, 1}, {549, 1} },
 }
 
-function getAwardInFoolsDay(player, idx)
-    if nil == player or nil == idx then
+function getAwardInFoolsDay(player, startId, endId)
+    if nil == player or nil == startId or nil == endId then
         return
     end
     local date = os.date("%m%d", os.time())
     if nil == answerAwardItems[date] then
         return
     end
-    if idx == 0 or idx > #answerAwardItems[date] then
+    if startId == 0 or startId > endId or startId > #answerAwardItems[date] then
         return
     end
-    for k = 1, idx do
+    for k = startId, endId do
         local item = answerAwardItems[date][k]
         player:GetPackage():Add(item[1], item[2], true, false, 32)
     end
@@ -9780,7 +9722,15 @@ function onAccRecharge_2013_12_07(player)
     sendAccRechargeAwards(player, awards)
 end
 
--- ACCRECHARGE
+function onAccRecharge_2013_12_14(player)
+    local awards = {
+        [1] = {0xA000,100,1},
+        [3] = {514,5,1, 501,3,1, 5035,1,1},
+        [5] = {9371,5,1, 5025,1,1, 5005,1,1, 0xA000,150,1},
+        [7] = {515,2,1, 5136,1,1},
+    }
+    sendAccRechargeAwards(player, awards)
+end
 
 -- ACCRECHARGE
 function onRecharge(player, r)
@@ -9790,20 +9740,20 @@ function onRecharge(player, r)
             player:AddVar(174, 1);
             player:SetVar(173, 1)
          
-            local t = { ['year'] = 2013, ['month'] = 11, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-            local s = os.time(t)
-            local n = os.time() + 11
-
-            if n >= s and n < (s + 7*86400) then
-                onAccRecharge_2013_11_30(player)
-            end
-
             local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
             local s = os.time(t)
             local n = os.time() + 11
 
             if n >= s and n < (s + 7*86400) then
                 onAccRecharge_2013_12_07(player)
+            end
+
+            local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+            local s = os.time(t)
+            local n = os.time() + 11
+
+            if n >= s and n < (s + 7*86400) then
+                onAccRecharge_2013_12_14(player)
             end
 
         end

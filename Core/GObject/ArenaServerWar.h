@@ -209,7 +209,7 @@ struct ServerPreliminaryBattle
         }
         //append ServerData
         st << otherServerId << otherServerName;
-        st << static_cast<UInt32>(0) << static_cast<UInt16>(0);
+        st << static_cast<UInt32>(0) << static_cast<UInt32>(0);
         size = otherPInfoVec.size();
         st << static_cast<UInt8>(otherAttrRatio/3) << size;
         for(UInt8 i = 0; i < size; ++ i)
@@ -275,7 +275,7 @@ struct ServerEliminationPlayer
     }
     inline void appendServerData(Stream& st)
     {
-        st << serverId << serverName << battlePoint << static_cast<UInt16>(support);
+        st << serverId << serverName << battlePoint << support;
         st << static_cast<UInt8>(attrRatio/3) << static_cast<UInt8>(pInfoSet.size());
 
         for(PInfoSort::iterator it = pInfoSet.begin(); it != pInfoSet.end(); ++ it)

@@ -1186,6 +1186,7 @@ namespace GObject
         Int32 GetVarS(Int32 id);
         void LoadVar(UInt32 id, UInt32 val, UInt32 overTime);
         void SetVar(UInt32 id, UInt32 val);
+        void DelVar(UInt32 id);
         void AddVar(UInt32 id, UInt32 val);
         void AddVarS(UInt32 id, Int32 val);
 
@@ -1931,6 +1932,7 @@ namespace GObject
         UInt8 useSnowItem(UInt32 num);
         void sendSnowScoreAward();
         UInt8 getSnowAward(UInt16 type);
+        void cleanPileSnow();
         
         //推雪人end
         
@@ -1985,6 +1987,7 @@ namespace GObject
         UInt32  m_curPage;
         //七石斗法 end
 
+        void MiLuZhiJiao();
         void setForbidSale(bool b, bool isAuto = false);
         bool getForbidSale() {return _isForbidSale;}
 	private:
