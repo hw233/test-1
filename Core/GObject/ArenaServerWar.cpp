@@ -511,8 +511,8 @@ const static UInt32 waiQuan[WAIQUAN_MAX][2] = {
 const static UInt32 neiQuan[NEIQUAN_MAX][2] = {
     {0xFFFFFFFF, 0xFFFFFFFF}, 
     {5041, 3}, {5011, 3}, {51, 2},
-    {5041, 2}, {0, 0}, {5011, 2},
-    {51, 2}, {5041, 2}
+    {5041, 2}, {51, 2}, {5011, 2},
+    {0, 0}, {5041, 2}
 };
 void ServerWarMgr::jiJianTai_operate(Player * player)
 {
@@ -592,6 +592,8 @@ void ServerWarMgr::jiJianTai_complete(Player * player, UInt8 type)
         return;
     if(!type && !itemId)    //放弃祭剑
         return;
+    UInt8 pos = GET_BIT_8(value, 0);
+    UInt8 flag = GET_BIT_8(value, 1);
     if(type)    //立刻完成
     {
         /*
@@ -601,8 +603,6 @@ void ServerWarMgr::jiJianTai_complete(Player * player, UInt8 type)
         */
 
         UInt32 itemNum = 0, jiJianCnt = 0;
-        UInt8 pos = GET_BIT_8(value, 0);
-        UInt8 flag = GET_BIT_8(value, 1);
         if(!flag)
         {
             if(!pos || pos >= WAIQUAN_MAX || itemId != waiQuan[pos][0])
@@ -669,6 +669,14 @@ void ServerWarMgr::jiJianTai_complete(Player * player, UInt8 type)
     st << times << succTimes;
     st << Stream::eos;
     player->send(st);
+    if(type == 0)    //放弃祭剑 udplog
+    {
+        if(flag)
+            pos += WAIQUAN_MAX-1;
+        char action[16] = "";
+        snprintf (action, 16, "F_131210_%d", pos);
+        player->udpLog("jijiantai", action, "", "", "", "", "act");
+    }
 }
 
 void ServerWarMgr::jiJianTai_convert(Player * player)
@@ -852,7 +860,7 @@ void ServerWarMgr::enterArena_neice()
     }
 
     size = signSortTmp.size();
-    while(size-- > 0)
+    while(size-- >= 0)
     {
         UInt32 rnd = uRand(signSortTmp.size());
         SWPDSort::iterator it = signSortTmp.begin();
@@ -1227,9 +1235,6 @@ void ServerWarMgr::pushPreliminary(BinaryReader& brd)
 
                 EnumMailStruct mailStruct = EnumMailStruct(type-1, 0, _session, false, twon, tloss, award);
                 globalPlayers.enumerate(server_sendMail, &mailStruct);
-
-                EnumMailStruct mailStruct1 = EnumMailStruct(type-1, 0, _session);
-                globalPlayers.enumerate(server_sendMail, &mailStruct1);
             }
         }
 

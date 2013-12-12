@@ -1756,10 +1756,10 @@ namespace Script
 		return Call<UInt8>("getAnswerInFoolsDay", qid, type);
     }
 
-    void GameActionLua::getAwardInFoolsDay(Player* player, UInt8 idx)
+    void GameActionLua::getAwardInFoolsDay(Player* player, UInt8 startId, UInt8 endId)
     {
 		assert(player != NULL);
-		Call<void>("getAwardInFoolsDay", player, idx);
+		Call<void>("getAwardInFoolsDay", player, startId, endId);
     }
 
     bool GameActionLua::getLuckyStarAward(Player* player, UInt8 idx)
