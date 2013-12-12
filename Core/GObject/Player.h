@@ -2492,6 +2492,8 @@ namespace GObject
         void checkZhenying();
         void changeZYAward(UInt8 country); 
         void getQTAward(UInt8 opt);
+        void setQTSign();
+        void setQTSpecialMark();
         // 帮派神像
         float getClanStatueHPEffect();
         float getClanStatueAtkEffect();

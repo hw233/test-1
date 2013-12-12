@@ -11738,9 +11738,39 @@ namespace GObject
         case 35:
             getQTAward(opt);
             break;
+        case 36:
+            setQTSign();
+            break;
         }
     }
-   
+
+    void Player::setQTSpecialMark()
+    {
+        UInt32 day = 0;
+        UInt32 mon = 0;
+        UInt32 year = 0;
+        TimeUtil::GetDMY(&day, &mon, &year);
+        if(year != 2013 || mon != 12 || day < 13 || day > 31)
+        {
+            UInt32 specialMark = GetVar(VAR_QT_SPECIAL_MARK);
+            if(0 == specialMark)
+            {
+                SetVar(VAR_QT_REGIST_NUM, 6);
+                SetVar(VAR_QT_SPECIAL_MARK, 1);
+            }
+        }
+    }
+
+    void Player::setQTSign()
+    {
+        UInt32 registSign = GetVar(VAR_QT_REGIST_SIGN);
+        if(0 == registSign)
+        {
+            AddVar(VAR_QT_REGIST_NUM, 1);
+            SetVar(VAR_QT_REGIST_SIGN, 1);
+        }
+    }
+
     void Player::getQTAward(UInt8 opt)
     {
         UInt32 state = GetVar(VAR_QT_AWARD_MARK);
@@ -11753,8 +11783,20 @@ namespace GObject
                 return;
             }
 
+            bool res = false;
+            UInt8 regNum = GetVar(VAR_QT_REGIST_NUM);
+            if(1 == opt)
+                if(regNum >= 1)
+                    res = true;
+            if(5 == opt)
+                if(regNum >= 25)
+                    res = true;
+            else
+                if(regNum >= ((opt - 1) * 5))
+                    res = true;
+
             UInt8 mark = GET_BIT(state, (opt-1));
-            if(mark == 0)
+            if(mark == 0 && res)
             {
                 switch(opt)
                 {

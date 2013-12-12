@@ -587,6 +587,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         //660-760 for lijr
         VAR_CHRISTMAS_PRESENT = 660,    //圣诞礼物——麋鹿之角
         VAR_QT_AWARD_MARK = 661,        //QT奖励领取
+        VAR_QT_REGIST_SIGN = 663,       //QT天签到标志
+        VAR_QT_REGIST_NUM = 664,        //QT月签到次数
+        VAR_QT_SPECIAL_MARK = 665,      //QT记录12月份默认加6天签到次数
 
         VAR_MAX,
     };
@@ -1120,6 +1123,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_QZONE_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_QZONE_RECHARGE_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_QT_AWARD_MARK, CYCLE_MONTH);
+            REGISTER_VAR(VAR_QT_REGIST_SIGN, CYCLE_DAY);
+            REGISTER_VAR(VAR_QT_REGIST_NUM, CYCLE_MONTH);
+            REGISTER_VAR(VAR_QT_SPECIAL_MARK, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
