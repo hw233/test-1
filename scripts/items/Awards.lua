@@ -829,9 +829,7 @@ function RunBlueDiamondAward(player, opt)
             end
         end
     end
-    if opt ==8 and not getHappyFireTime() then 
-        return 
-    else 
+    if opt ==8 then 
         local value = player:GetVar(648);
         if value <20 then 
             return 
