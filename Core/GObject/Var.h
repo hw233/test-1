@@ -585,7 +585,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_QZONE_RECHARGE_AWARD = 644,       //空间充值奖励领取
         
         //660-760 for lijr
-        VAR_CHRISTMAS_PRESENT = 660,    //圣诞礼物——麋鹿之角
+        VAR_CHRISTMAS_PRESENT = 660,                //圣诞礼物——麋鹿之角
+        VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE = 662,    //七石板每期最高积分
 
         VAR_MAX,
     };
