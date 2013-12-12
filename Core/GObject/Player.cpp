@@ -12602,6 +12602,8 @@ namespace GObject
         UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
         if(opTime <= TimeUtil::MkTime(2013, 5, 3))
             return;
+        if(opt && !hasChecked())
+            return;
         if(!GameAction()->RunLevelAward(this, opt))
             return;
         LevelAwardActUdpLog(opt);
@@ -22494,7 +22496,7 @@ void Player::sendFoolsDayInfo(UInt8 answer)
         if(info & (1<<i))
             ++ right;
     }
-    if(!isFail && qid == 0 && right < QUESTIONID_MAX && GET_BIT_8(value, 1) == 0)
+    if(!isFail && qid == 0 && right < QUESTIONID_MAX && GET_BIT_8(value, 1) < QUESTIONID_MAX)
     {   //分配新题目
         UInt8 index = uRand(QUESTIONID_MAX-right);
         UInt8 j = 0;
@@ -22535,7 +22537,7 @@ void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
 {
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
     UInt32 value = GetVar(VAR_FOOLS_DAY);
-    if(GET_BIT_8(value, 1))
+    if(!id || GET_BIT_8(value, 1) >= QUESTIONID_MAX)
         return;
     UInt32 qtime = GetVar(VAR_FOOLS_DAY_TIME);
     if(info == 0 && value == 0 && qtime == 0)
@@ -22581,7 +22583,8 @@ void Player::submitAnswerInFoolsDay(UInt8 id, char answer)
 void Player::getAwardInFoolsDay()
 {
     UInt32 value = GetVar(VAR_FOOLS_DAY);
-    if(GET_BIT_8(value, 1))
+    UInt8 award = GET_BIT_8(value, 1);
+    if(award >= QUESTIONID_MAX)
         return;
     UInt8 right = 0;
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
@@ -22590,14 +22593,14 @@ void Player::getAwardInFoolsDay()
         if(info & (1<<i))
             ++ right;
     }
-    if(right < 5)
+    if(right < 5 || right/5 <= award/5)
         return;
-    if (GetPackage()->GetRestPackageSize() < right / 5)
+    if (GetPackage()->GetRestPackageSize() < right/5 - award/5)
     {
         sendMsgCode(2, 1011, 0);
         return;
     }
-    GameAction()->getAwardInFoolsDay(this, right / 5);
+    GameAction()->getAwardInFoolsDay(this, GET_BIT_8(value, 1)/5 + 1, right / 5);
     SetVar(VAR_FOOLS_DAY, SET_BIT_8(value, 1, right/5 * 5));
     sendFoolsDayInfo();
     foolsDayUdpLog(right / 5);
@@ -22608,7 +22611,7 @@ void Player::buyResurrectionCard()
     if(!hasChecked())
         return;
     UInt32 value = GetVar(VAR_FOOLS_DAY);
-    if(GET_BIT_8(value, 1))
+    if(GET_BIT_8(value, 1) >= QUESTIONID_MAX)
         return;
     UInt8 qid = GET_BIT_8(value, 0);
     if(qid == 0)
@@ -22665,15 +22668,21 @@ void Player::checkAnswerActInFoolsDay()
     UInt32 info = GetVar(VAR_FOOLS_DAY_INFO);
     UInt32 value = GetVar(VAR_FOOLS_DAY);
     UInt8 type = 0, right = 0;
-    if(GET_BIT_8(value, 1))
-        type = 1;
+    UInt8 award = GET_BIT_8(value, 1);
+    for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
+    {
+        if(info & (1<<i))
+            ++ right;
+    }
+    if(award)
+    {
+        if(right == QUESTIONID_MAX && award == QUESTIONID_MAX)
+            type = 1;
+        else
+            type = 2;
+    }
     else
     {
-        for(UInt8 i = 1; i <= QUESTIONID_MAX; ++ i)
-        {
-            if(info & (1<<i))
-                ++ right;
-        }
         if(right == 0 && (info & (1<<0)) == 0)
             type = 3;
         else
