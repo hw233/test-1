@@ -1168,6 +1168,13 @@ void SendKillMonsterRankAward()
     }
 }
 
+inline bool player_enum_3(GObject::Player* pl, int)
+{
+    pl->CleanQiShiBan();
+
+    return true;
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -1356,6 +1363,9 @@ void World::World_Midnight_Check( World * world )
 	clanManager.reConfigClanBattle();
 	challengeCheck.clear();
 	globalTeamArena.enumerate(enum_teamArena_midnight, &curtime);
+    
+    if(World::getQiShiBanTime())
+        GObject::globalPlayers.enumerate(player_enum_3, 0);
 
 	calWeekDay(world);
 	Stream st(REP::DAILY_DATA);
@@ -2746,7 +2756,8 @@ inline bool player_enum_rc(GObject::Player * p, int)
     }
     if (World::getQiShiBanTime())
     {
-        UInt32 score = p->GetQiShiBanScore();
+        //UInt32 score = p->GetQiShiBanScore();
+        UInt32 score = p->GetVar(VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE);
         if (score)
         {
             RCSort s;

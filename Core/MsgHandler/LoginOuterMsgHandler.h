@@ -3300,6 +3300,8 @@ inline bool player_enum_2(GObject::Player* pl, int type)
         case 9:
             {
                 pl->CleanQiShiBan();
+                if(pl->GetVar(GObject::VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE) > 0)
+                    pl->SetVar(GObject::VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE, 0);
             }
             break;
         case 10:
@@ -3312,7 +3314,6 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->cleanPileSnow();
             }
             break;
-   break;
         default:
             return false;
     }

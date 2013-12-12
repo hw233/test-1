@@ -4297,6 +4297,15 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
     }
 }
 
+inline bool player_enum_1(GObject::Player* p, int)
+{
+    p->CleanQiShiBan();
+    if(p->GetVar(GObject::VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE) > 0)
+        p->SetVar(GObject::VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE, 0);
+
+    return true;
+}
+
 void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& args)
 {
     if(sizeof(args)<1)
@@ -4380,6 +4389,7 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_QISHIBANGAME_END, TimeUtil::SharpDayT( 5 , TimeUtil::Now()));
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
+            GObject::globalPlayers.enumerate(player_enum_1, 0);
             break;
         case 12:
             GVAR.SetVar(GObject::GVAR_QISHIBANGAME_BEGIN, 0);
