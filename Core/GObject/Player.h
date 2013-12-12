@@ -2447,6 +2447,7 @@ namespace GObject
         void getSummerMeetInstantLoginAward(UInt8 val);
         void getQZoneRechargeAward(UInt8 val);
         void sendQZoneRechargeAwardInfo();
+        void AddQZoneRecharge(UInt32 r =0);
         void getSummerFlow3OnlineAward(UInt8 val);
         void getSummerMeetAward(UInt8 idx,UInt8 index);
         void getNewRC7DayRechargeAward(UInt8 val);

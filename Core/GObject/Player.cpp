@@ -8371,7 +8371,7 @@ namespace GObject
         checkZCJB(r);
 
         AddZRYJCount(r);
-
+        AddQZoneRecharge(r);
         //SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     }
 
@@ -11709,8 +11709,8 @@ namespace GObject
         case 33:
                 if(opt>0)
                     getQZoneRechargeAward(opt);
+                sendQZoneRechargeAwardInfo();
                 break;
-
         }
     }
     
@@ -24353,10 +24353,10 @@ void Player::sendQQBoardLogin()
     if(!World::getQQBoardLoginTime())
         return ;
     UInt32 LoginAward = GetVar(VAR_QQBOARD_LOGIN_AWARD);
-    UInt32 timeBegin = TimeUtil::MkTime(2013,9,9);
-    UInt32 now = TimeUtil::Now();
-    if(now < timeBegin )
-        return ;
+//    UInt32 timeBegin = TimeUtil::MkTime(2013,12,11);
+  //  UInt32 now = TimeUtil::Now();
+    //if(now < timeBegin )
+      //  return ;
     Stream st(REP::RC7DAY);  //协议
     st<<static_cast<UInt8>(19);
     st<<static_cast<UInt16>(LoginAward);
@@ -24368,10 +24368,12 @@ void Player::SetQQBoardLogin()
 {
    // if( this->getPlatform()!= 10)
     //    return ;
-    UInt32 now = TimeUtil::Now();
-    if(now<(TimeUtil::SharpDayT( 0 , now) + 20 * 3600) || now > (TimeUtil::SharpDayT( 0 , now) + 22 * 3600) ) 
+    if(!World::getQQBoardLoginTime())
         return ;
-    UInt32 timeBegin = TimeUtil::MkTime(2013,9,9);
+    UInt32 now = TimeUtil::Now();
+    if(now<(TimeUtil::SharpDayT( 0 , now) + 19 * 3600+30*60) || now > (TimeUtil::SharpDayT( 0 , now) + 21 * 3600+30*60) ) 
+        return ;
+    UInt32 timeBegin = TimeUtil::MkTime(2013,12,11);
     if(now < timeBegin )
         return ;
     UInt32 cts = static_cast<UInt8>((TimeUtil::SharpDayT( 0 , now) - timeBegin)/86400);
@@ -26272,8 +26274,12 @@ void Player::sendRealSpirit()
     send(stream);
 }
 
-void Player:getQZoneRechargeAward(UInt8 val)
+void Player::getQZoneRechargeAward(UInt8 val)
 {
+    if(getPlatform()!=1 && getPlatform() !=2)
+        return ;
+    if (!World::getQZoneRechargeTime())
+        return;
     UInt32 Recharge[]={100,500,1000,2000,3000,5000};
     UInt32 recharge = GetVar(VAR_QZONE_RECHARGE);
     if(val<1||val>6)
@@ -26293,7 +26299,7 @@ void Player:getQZoneRechargeAward(UInt8 val)
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
-    if (!World::getQZoneRecharge())
+    if (!World::getQZoneRechargeTime())
         return;
     UInt32 QZoneRecharge = GetVar(VAR_QZONE_RECHARGE);
     UInt32 QZoneRechargeAward = GetVar(VAR_QZONE_RECHARGE_AWARD);
@@ -26306,9 +26312,9 @@ void Player::sendQZoneRechargeAwardInfo()
     
 
 }
-void AddQZoneRecharge()
+void Player::AddQZoneRecharge(UInt32 r)
 {
-    if(getPlatform()!=1 || getPlatform() ! =2)
+    if(getPlatform()!=1 && getPlatform() !=2)
         return ;
     if(World::getQZoneRechargeTime())
     {
