@@ -11727,9 +11727,18 @@ namespace GObject
             getGameBoxAward(opt);
                 break;
         case 33:
-                if(opt>0)
-                    getQZoneRechargeAward(opt);
-                sendQZoneRechargeAwardInfo();
+                { 
+                    if(opt>0)
+                        getQZoneRechargeAward(opt);
+                    sendQZoneRechargeAwardInfo();
+                }
+                break;
+        case 34:
+                {
+                    if(opt>0)
+                        getHappyValueAward(opt);
+                    sendHappyValueInfo();
+                }
                 break;
         }
     }
@@ -26416,15 +26425,50 @@ void Player::AddQZoneRecharge(UInt32 r)
 }
 void Player::AddYearHappyValue(UInt32 val)
 {
-    if(!getHappyFire())
+    if(!World::getHappyFireTime())
         return ;
     AddVar(VAR_YEARHAPPY_DAYVALUE,val);
     AddVar(VAR_YEARHAPPY_VALUE,val);
-    UInt32 value = GetVar(VAR_YEARHAPPY_VALUE);
+    UInt32 grade = GetVar(VAR_YEARHAPPY_VALUE);
     GameMsgHdr hdr1(0x1DB, WORKER_THREAD_WORLD, this, sizeof(grade));
     GLOBAL().PushMsg(hdr1, &grade);
     SYSMSG_SENDV(2022,this,val);
     SYSMSG_SENDV(2023,this,val);
+}
+void Player::sendHappyValueInfo()
+{
+    UInt32 DayValue = GetVar(VAR_YEARHAPPY_DAYVALUE);
+    UInt32 Value = GetVar(VAR_YEARHAPPY_VALUE);
+    UInt32 LeftValue = GetVar(VAR_YEARHAPPY_LEFTVALUE);
+    UInt32 DayValueAward = GetVar(VAR_YEARHAPPY_DAYVALUE_AWARD);
+    Stream st(REP::GETAWARD);   //协议
+    st << static_cast<UInt8>(34);
+    st << static_cast<UInt32>(Value);
+    st << static_cast<UInt32>(DayValue);
+    st << static_cast<UInt32>(LeftValue);
+    st << static_cast<UInt8>(DayValueAward);
+    st << Stream::eos;
+    send(st);
+}
+void Player::getHappyValueAward(UInt8 val)
+{
+    if (!World::getHappyFireTime())
+        return;
+    UInt32 score[]={20,40,60,80,100};
+    UInt32 value = GetVar(VAR_YEARHAPPY_DAYVALUE);
+    if(val<1||val>5)
+        return ;
+    if(value < score[val-1])
+        return ;
+    UInt32 ctslandingAward = GetVar(VAR_YEARHAPPY_DAYVALUE_AWARD);
+    if(ctslandingAward & (1<<(val-1)))
+        return ;
+    if(!GameAction()->RunHappyValueAward(this, val))
+    {
+        return;
+    }
+    ctslandingAward |= (1<<(val - 1));
+    SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
 }
 } // namespace GObject
 

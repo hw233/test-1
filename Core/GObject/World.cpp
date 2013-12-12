@@ -151,6 +151,7 @@ bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
 bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
+bool World::_happyFire = false;
 bool World::_11time = false;
 bool World::_ggtime = false;
 bool World::_qzoneRechargetime = false;
@@ -318,6 +319,7 @@ bool bXiaoyaoEnd = false;
 bool bFoolBaoEnd =  false;
 bool bHalfGoldEnd = false;
 bool bSurnameLegendEnd = false;
+bool bHappyFireEnd = false;
 bool b11TimeEnd = false;
 bool bGGTimeEnd = false;
 bool bSnowEnd = false;
@@ -1227,6 +1229,7 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bfoolbao = getFoolBao();
     bool bsurnamelegend = getSurnameLegend();
+    bool bhappyfirend = getHappyFireTime();
     bool b11time = get11Time();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
@@ -1271,6 +1274,8 @@ void World::World_Midnight_Check( World * world )
     bHalfGoldEnd = bhalfgold && !getHalfGold();
     //蜀山传奇掉落活动是否结束
     bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
+    //跨年大转盘
+    bHappyFireEnd = bhappyfirend && !getHappyFireTime(300);
     b11TimeEnd = b11time && !get11Time();
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
@@ -1446,6 +1451,11 @@ void World::World_Midnight_Check( World * world )
         world->SendItem9343Award();
      if (bQiShiBanEnd)
         world->SendQiShiBanAward();
+    if(bHappyFireEnd)
+        world->SendHappyFireAward();
+  //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
+  //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
+  //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
  
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -2865,6 +2875,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             }
         }
     }
+    if (World::getHappyFireTime())
+    {
+        UInt32 used = p->GetVar(VAR_YEARHAPPY_VALUE);
+        if (used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::happyFireSort.insert(s);
+        }
+    }
     return true;
 }
 inline bool clan_enum_grade(GObject::Clan *clan,int)
@@ -3628,5 +3649,62 @@ void World::SendGuangGunAward()    //待定
     }
 }
 
+void World::SendHappyFireAward()
+{
+    World::initRCRank();
+    int pos = 0;
+    UInt8 type =0;
+    static MailPackage::MailItem s_item[][4] = {
+        {{515,30},{503,30},{509,25},{134,30}},
+        {{515,25},{503,25},{509,20},{134,25}},
+        {{515,20},{503,20},{509,15},{134,20}},
+        {{515,10},{503,10},{509,10},{134,10}},
+    };
+    static MailPackage::MailItem card = {9924,1};   //暂无白马王子
+    UInt8 mark = 0;
+    std::string str = "";
+    for(RCSortType::iterator iter = happyFireSort.begin(); iter != happyFireSort.end() && mark < 7; ++iter )
+    {
+        Player* play = iter->player;
+        if (!play)
+            continue;
+        UInt32 totalScore = iter->total;
+        SYSMSGV(buf, 4181, mark+1,play->getCountry(),play->getName().c_str(), totalScore);
+        str += buf;
+        if(6 == mark || mark == (happyFireSort.size()-1) )
+        {
+            SYSMSGV(buf, 4182, str.c_str());
+            str = buf;
+            break;
+        }
+        ++mark;
+    }
+    SYSMSG(title, 4177);
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSort.end(); i != e; ++i)
+    {
+        Player* play = i->player;
+        if (!play)
+            continue;
+        ++pos;
+        UInt32 score = i->total;
+        type = pos;
+        if( pos >3 &&pos <8)
+            type = 4;
+        SYSMSGV(content1, 4180, score, pos, str.c_str());
+        play->GetMailBox()->newMail(NULL, 0x01, title, content1);
+        if(type <5)
+        {
+            SYSMSGV(content, 4178, pos ,pos);
+            Mail * mail = play->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+            if(mail)
+            {
+                mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
+                if(pos ==1)
+                    mailPackageManager.push(mail->id, &card, 1, true);
+            }
+        }
+    }
+}
 }
 

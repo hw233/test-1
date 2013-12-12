@@ -3344,7 +3344,7 @@ function ItemNormal_00009067(iid, num, bind, param)
         local item = 0
         if r >= 67 then
             item = _50[math.random(1,#_50)]
-           1package:Add(item, 1, true, 0, 2)
+            package:Add(item, 1, true, 0, 2)
             Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:9067]，"..msg_61.."[4:"..item.."]")
         else
             item = _40[math.random(1,#_40)]

@@ -824,15 +824,16 @@ public:
             _surnamelegend = false;
         return _surnamelegend;
     } 
-    inline static bool getHappyFire()
+    inline static bool getHappyFireTime(UInt32 time = 0)
     {
         UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
-        UInt32 now = TimeUtil::Now();
+        UInt32 now = TimeUtil::Now()+time;
         if( now >= begin && now <= end)
-            return true;
+            _happyFire = true;
         else
-            return false;
+            _happyFire = false;
+        return _happyFire;
     } 
     inline static bool getLuckyMeet(UInt32 time = 0)
     {
@@ -1122,6 +1123,7 @@ public:
     static bool _foolbao;
     static bool _summerFlow3;
     static bool _surnamelegend;
+    static bool _happyFire;
     static bool _11time;
     static bool _qishiban;
     static bool _ggtime;
@@ -1230,6 +1232,7 @@ public:
     void SendSnowAward();
     void SendQiShiBanAward();
     void SendGuangGunAward();
+    void SendHappyFireAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

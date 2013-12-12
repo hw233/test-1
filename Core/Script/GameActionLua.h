@@ -268,6 +268,7 @@ namespace Script
         bool  RunQQBoardOnlineAward(Player* player, UInt8 val);
         bool  RunLuckyMeetInstantLoginAward(Player* player, UInt8 val);
         bool  RunQZoneRechargeAward(Player* player, UInt8 val);
+        bool  RunHappyValueAward(Player* player, UInt8 val);
         bool  RunLuckyMeetRechargeAward(Player* player, UInt8 val);
         bool  RunSummerMeetRechargeAward(Player* player, UInt8 val);
         bool  RunLuckyMeetStrengthAward(Player* player, UInt8 val);

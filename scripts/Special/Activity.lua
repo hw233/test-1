@@ -8326,9 +8326,8 @@ function FoolBaoLoot(player,lootlvl)
 end
 --欢乐爆竹掉落
 function HappyFireLoot(player,lootlvl)
-   print("lootlvl")
-   if not getHappFire() then
-             return
+   if not getHappFireTime() then
+       return
    end
     if lootlvl > 3 then
         lootlvl = 0
