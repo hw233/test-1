@@ -11799,6 +11799,12 @@ namespace GObject
             state = SET_BIT(state, (day-1));
             SetVar(VAR_QT_REGIST_MARK, state);
             AddVar(VAR_QT_REGIST_NUM, 1);
+
+            UInt32 awardState = GetVar(VAR_QT_AWARD_MARK);
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(35);
+            st << static_cast<UInt8>(awardState) << state << Stream::eos;
+            send(st);
         }
     }
 
