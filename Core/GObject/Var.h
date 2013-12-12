@@ -578,8 +578,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_REAL_SPIRIT = 640,           //真元
         VAR_MODIFY_NAME_CD = 641,//改名CD
         VAR_REAL_SPIRIT_GET = 642,       //当日是否领取真元 
-        VAR_QZONE_RECHARGE = 643,       //当日是否领取真元 
-        VAR_QZONE_RECHARGE_AWARD = 644,       //当日是否领取真元 
+        VAR_QZONE_RECHARGE = 643,       //空间充值 
+        VAR_QZONE_RECHARGE_AWARD = 644,       //空间充值奖励领取
 
         VAR_MAX,
     };
