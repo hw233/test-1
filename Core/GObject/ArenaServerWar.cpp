@@ -860,7 +860,7 @@ void ServerWarMgr::enterArena_neice()
     }
 
     size = signSortTmp.size();
-    while(size-- >= 0)
+    for(int id = 0; id < size; ++ id)
     {
         UInt32 rnd = uRand(signSortTmp.size());
         SWPDSort::iterator it = signSortTmp.begin();
