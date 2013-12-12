@@ -25013,6 +25013,7 @@ void Player::loadQiShiBanFromDB(UInt32 score, UInt32 step, UInt32 beginTime, UIn
     {
         UInt32 tempTime = endTime - beginTime - 10;
         m_qishiban.score += (100 + tempTime);
+        AddVar(VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE, (100 + tempTime));
         m_qishiban.step += 1;
         m_qishiban.beginTime = 0;
         m_qishiban.endTime = 0;
@@ -25042,12 +25043,12 @@ void Player::QiShiBanState()
             restNum = 0;
 
         UInt32 time = GetQiShiBanEndTime() - _playerData.lastOnline;
-
+        UInt32 totalScore = GetVar(VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE);
         UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
-        if(GetQiShiBanScore() > highestScore)
+        if(totalScore > highestScore)
         {
-            WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId());
-            highestScore = GetQiShiBanScore();
+            WORLD().SetMemCach_qishiban(totalScore, getOpenId());
+            highestScore = totalScore;
         }
 
         st << mark << static_cast<UInt16>(GetQiShiBanStep()) << GetQiShiBanScore() << static_cast<UInt8>(restNum) 
@@ -25076,6 +25077,7 @@ void Player::MyQSBInfo()
 
     UInt32 addTime = GetNextStepTime();
     UInt32 lastFailHighestScore = GetVar(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE);
+    UInt32 cycleHighestScore = GetVar(VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE);
 
     UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
     if(GetQiShiBanScore() > highestScore)
@@ -25094,7 +25096,8 @@ void Player::MyQSBInfo()
 
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x07) << static_cast<UInt16>(GetQiShiBanStep()) 
-        << GetQiShiBanScore() << static_cast<UInt8>(restNum) << addTime << GetQiShiBanAwardMark() << highestScore << lastFailHighestScore << mark << Stream::eos;
+        << GetQiShiBanScore() << static_cast<UInt8>(restNum) << addTime << GetQiShiBanAwardMark() << highestScore 
+        << lastFailHighestScore << mark << cycleHighestScore << Stream::eos;
 
     send(st);
 }
@@ -25174,13 +25177,15 @@ void Player::FinishCurStep(int randMark, UInt32 clintTime)
 
     UInt32 score = 100 + time; // 每关积分 = 100 + 剩余时间；
 
+    AddVar(VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE, score);
     AddQiShiBanScore(score);
     AddQiShiBanStep();
     SetQiShiBanBeginTime(0);
     SetQiShiBanEndTime(0);
     SetQiShiBanAddTimeNum(0);
 
-    UInt32 totalScore = GetQiShiBanScore();
+    //UInt32 totalScore = GetQiShiBanScore();
+    UInt32 totalScore = GetVar(VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE);
     GameMsgHdr hdr(0x1D7, WORKER_THREAD_WORLD, this, sizeof(totalScore));
     GLOBAL().PushMsg(hdr, &totalScore);
 
@@ -25191,22 +25196,22 @@ void Player::FinishCurStep(int randMark, UInt32 clintTime)
         mark = 1;
         udpLog("qishidoufa", "F_131203_2", "", "", "", "", "act");
     }
-    else if(GetQiShiBanScore() >= 1650 && (GetQiShiBanScore() - score) < 1650)
+    else if(GetQiShiBanScore() >= 1000 && (GetQiShiBanScore() - score) < 1000)
     {
         mark = 2;
         udpLog("qishidoufa", "F_131203_3", "", "", "", "", "act");
     }
-    else if(GetQiShiBanScore() >= 3200 && (GetQiShiBanScore() - score) < 3200)
+    else if(GetQiShiBanScore() >= 1600 && (GetQiShiBanScore() - score) < 1600)
     {
         mark = 3;
         udpLog("qishidoufa", "F_131203_4", "", "", "", "", "act");
     }
-    else if(GetQiShiBanScore() >= 4800 && (GetQiShiBanScore() - score) < 4800)
+    else if(GetQiShiBanScore() >= 2000 && (GetQiShiBanScore() - score) < 2000)
     {
         mark = 4;
         udpLog("qishidoufa", "F_131203_5", "", "", "", "", "act");
     }
-    else if(GetQiShiBanScore() >= 8000 && (GetQiShiBanScore() - score) < 8000)
+    else if(GetQiShiBanScore() >= 2800 && (GetQiShiBanScore() - score) < 2800)
     {
         mark = 5;
         udpLog("qishidoufa", "F_131203_6", "", "", "", "", "act");
@@ -25218,11 +25223,17 @@ void Player::FinishCurStep(int randMark, UInt32 clintTime)
     Update_QSB_DB();
 
     UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
-    if(GetQiShiBanScore() > highestScore)
+    if(totalScore > highestScore)
+    {
+        WORLD().SetMemCach_qishiban(totalScore, getOpenId());
+        highestScore = totalScore;
+    }
+
+    /*if(GetQiShiBanScore() > highestScore)
     {
         WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId());
         highestScore = GetQiShiBanScore();
-    }
+    }*/
 
     UInt32 addTime = GetNextStepTime();
 
@@ -25238,7 +25249,7 @@ void Player::FinishCurStep(int randMark, UInt32 clintTime)
 
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x03) << static_cast<UInt16>(GetQiShiBanStep()) << GetQiShiBanScore() 
-       << addTime << GetQiShiBanAwardMark() << highestScore << static_cast<UInt8>(restNum) << Stream::eos;
+       << addTime << GetQiShiBanAwardMark() << highestScore << static_cast<UInt8>(restNum) << totalScore << Stream::eos;
     send(st);
 
     OnQiShiBanRank(m_curPage);
@@ -25420,10 +25431,9 @@ void Player::GetPersonalAward(UInt8 opt)
                 break;
             case 2:
                 {
-                    if(GetQiShiBanScore() >= 1650)
+                    if(GetQiShiBanScore() >= 1000)
                     {
                         GetPackage()->AddItem(5053, 1, true, false, FromQiShiBan);
-                        GetPackage()->AddItem(5033, 1, true, false, FromQiShiBan);
                     }
                     else
                         return;
@@ -25431,10 +25441,9 @@ void Player::GetPersonalAward(UInt8 opt)
                 break;
             case 3:
                 {
-                    if(GetQiShiBanScore() >= 3200)
+                    if(GetQiShiBanScore() >= 1600)
                     {
                         GetPackage()->AddItem(5054, 1, true, false, FromQiShiBan);
-                        GetPackage()->AddItem(5014, 1, true, false, FromQiShiBan);
                     }
                     else
                         return;
@@ -25442,9 +25451,9 @@ void Player::GetPersonalAward(UInt8 opt)
                 break;
             case 4:
                 {
-                    if(GetQiShiBanScore() >= 4800)
+                    if(GetQiShiBanScore() >= 2000)
                     {
-                        GetPackage()->AddItem(5055, 1, true, false, FromQiShiBan);
+                        GetPackage()->AddItem(5054, 2, true, false, FromQiShiBan);
                     }
                     else
                         return;
@@ -25452,8 +25461,8 @@ void Player::GetPersonalAward(UInt8 opt)
                 break;
             case 5:
                 {
-                    if(GetQiShiBanScore() >= 8000)
-                        GetPackage()->AddItem(5056, 1, true, false, FromQiShiBan);
+                    if(GetQiShiBanScore() >= 2800)
+                        GetPackage()->AddItem(5055, 1, true, false, FromQiShiBan);
                     else
                         return;
                 }
@@ -25479,12 +25488,14 @@ UInt32 Player::GetNextStepTime()
     UInt32 addTime = 0;
     if(0 == GetQiShiBanStep())
         addTime = 600;
-    else if(GetQiShiBanStep() < 10)
+    else if(GetQiShiBanStep() < 5)
         addTime = 300;
-    else if(GetQiShiBanStep() < 50)
+    else if(GetQiShiBanStep() < 10)
         addTime = 120;
+    else if(GetQiShiBanStep() < 20)
+        addTime = 20;
     else
-        addTime = 60;
+        addTime = 15;
 
     return addTime;
 }
@@ -25502,7 +25513,8 @@ void Player::CleanQiShiBan()
     SetQiShiBanEndTime(0);
     SetQiShiBanKey(0);
     SetQiShiBanAwardMark(0);
-    SetVar(VAR_QISHIDOUFA_REST_NUM, 0);
+    if(GetVar(VAR_QISHIDOUFA_REST_NUM) > 0)
+        SetVar(VAR_QISHIDOUFA_REST_NUM, 0);
 
     DB1().PushUpdateData("DELETE FROM `player_qishiban` WHERE `playerId` = %" I64_FMT "u", getId());
 }
