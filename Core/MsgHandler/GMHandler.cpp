@@ -4813,11 +4813,10 @@ void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::stri
 void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string>& args)
 {
     if (args.size() < 1)
-        return;
-    UInt64 playerId = atoll(args[0].c_str());
+        return ;
     UInt32 var = 0;   //修改
     UInt32 value = 0;   //修改
-    if (args.size() >=2 )
+    if(args.size() >=2 )
     {
         var = atoll(args[1].c_str());
         value = atoll(args[2].c_str());
