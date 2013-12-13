@@ -803,11 +803,11 @@ function onActivityCheck(tm)
           setGoodVoiceAct(false)
       end
 
-      if tm >= actTime536 and tm < actTime536_1 then
+      -- if tm >= actTime536 and tm < actTime536_1 then
           set3366GiftAct(true)
-      else
-          set3366GiftAct(false)
-      end
+      -- else
+      --    set3366GiftAct(false)
+      -- end
 
       if tm >= actTime537 and tm < actTime537_1 then
           setConsumeActive(true)
