@@ -131,6 +131,8 @@ bool CFriend::getAward(UInt8 idx)
         return false;
     if (m_cf[idx] != 1)
         return false;
+    if(!m_owner || !m_owner->hasChecked())
+         return false;
 
     if (GameAction()->onGetCFriendAward(m_owner, idx))
     {
@@ -267,6 +269,8 @@ void CFriend::useTickets(UInt8 type)
 {
     if(type == 0)
     {
+        if(!m_owner || !m_owner->hasChecked())
+             return;
         UInt8 id = GameAction()->onUseTickets(m_owner);
         if(id == 0)
             return;

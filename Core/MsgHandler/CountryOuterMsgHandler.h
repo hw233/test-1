@@ -5802,8 +5802,10 @@ void OnGetShuoShuoAward( GameMsgHdr& hdr, GetShuoShuoAward& req)
 void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
 {
     MSG_QUERY_PLAYER(player);
+    /*
     if(!player->hasChecked())
          return;
+    */
     CFriend * cFriend = player->GetCFriend();
     if(!cFriend) return;
     if (req._flag == 0)
