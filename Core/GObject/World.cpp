@@ -2444,7 +2444,7 @@ void World::sendGuangGunPlayers(Player* pl)
         player = pl->getGGTimeCaptain();
     UInt32 myPlace = 0;
     UInt32 myScore = 0;
-    UInt8 rank;
+    UInt8 rank = 0;
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
         ++rank;

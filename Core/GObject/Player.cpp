@@ -111,8 +111,8 @@
 #define QIXI_XIQUE 9122
 
 #define QQ_GAME_NEED_TIME  1200
-#define QQ_GAME_START_TIME  21*3600
-#define QQ_GAME_END_TIME    (21*3600+1800)
+#define QQ_GAME_START_TIME  20*3600
+#define QQ_GAME_END_TIME    (20*3600+1800)
 
 #define CARD_ITEM_ID 9415
 #define CFD_INDEX_MAX 3
@@ -21563,7 +21563,7 @@ void Player::getQQGameOnlineAward()
     SetVar(VAR_ONLINE_AWARD, 1);
     GetPackage()->Add(134, 1, true, false);
     GetPackage()->Add(1325, 1, true, false);
-    GetPackage()->Add(551, 1, true, false);
+    GetPackage()->Add(511, 1, true, false);
     GetPackage()->Add(500, 1, true, false);
     sendQQGameOnlineAward();
 }
@@ -21572,13 +21572,13 @@ void Player::sendQQGameOnlineAward()
 {
     if(!World::getQQGameOnlineAwardAct())
         return;
-    if(atoi(getDomain()) != 10)
+    if(atoi(getDomain())!= 10)
         return;
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x0B);
     st << static_cast<UInt8>(GetVar(VAR_ONLINE_AWARD));
     UInt16 totalTime = getQQGameOnlineTotalTime();
-    UInt16 leftTime;
+    UInt16 leftTime = 0;
     if(totalTime >= QQ_GAME_NEED_TIME)
         leftTime = 0;
     else
@@ -21603,9 +21603,9 @@ UInt32 Player::getQQGameOnlineTotalTime()
     UInt32 today = TimeUtil::SharpDayT( 0 , now);
     UInt32 lastOnline = _playerData.lastOnline; //考虑了是前几天登录的情况
     UInt32 curTime;
-    if(now <= today + QQ_GAME_START_TIME)
+    if( now <= (today + QQ_GAME_START_TIME))
         curTime = 0;
-    else if(now <= today + QQ_GAME_END_TIME)
+    else if(now <= (today + QQ_GAME_END_TIME))
     {
         if(lastOnline <= (today + QQ_GAME_START_TIME))
             curTime = now - (today + QQ_GAME_START_TIME);
