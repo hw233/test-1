@@ -137,6 +137,10 @@ public:
 	{ _autoHeal = v; }
 	inline static bool getAutoHeal()
 	{ return _autoHeal;}
+	inline static void setCopyFrontWinSwitch(bool v)
+	{ _copyfrontwin = v; }
+	inline static bool getCopyFrontWinSwitch()
+	{ return _copyfrontwin;}
 	inline static void setIsNewServer(bool aa)
 	{ _isNewServer = aa; }
 	inline static bool IsNewServer()
@@ -277,6 +281,14 @@ public:
     { _qzonepyprivilegeact = v; }
     inline static bool getQzonePYPrivilegeAct()
     { return _qzonepyprivilegeact; }
+    inline static void setGoodVoiceAct(bool v)
+    { _goodvoiceact = v; }
+    inline static bool getGoodVoiceAct()
+    { return _goodvoiceact; }
+    inline static void set3366GiftAct(bool v)
+    { _3366giftact = v; }
+    inline static bool get3366GiftAct()
+    { return _3366giftact; }
 
     inline static void setTrainFighter(bool v)
     { _trainfighter = v; }
@@ -515,9 +527,17 @@ public:
 
     inline static bool canDestory(UInt32 itemid)
     {
+        if(itemid == 9273)
+        {
+            if(World::getGoodVoiceAct())
+                return false;
+            else
+                return true;
+        }
+
         static UInt32 items[] =
         {
-            9184,9185,9186,9187,9188,9273,
+            9184,9185,9186,9187,9188,
         };
         if (World::getTgcEvent())
         {
@@ -552,6 +572,7 @@ public:
 	static bool _actAvailable1;//??????+7??
 	static UInt8 _wday;
     static bool _autoHeal;//disable autoheal
+    static bool _copyfrontwin;//disable copyfrontwin
 	static bool _isNewServer;
     static bool _nationalDay;
     static bool _halloween;
@@ -591,6 +612,8 @@ public:
     static bool _qqgameact;
     static bool _3366privilegeact;
     static bool _qzonepyprivilegeact;
+    static bool _goodvoiceact;
+    static bool _3366giftact;
     static void* _recalcwd;
     static bool _june;
     static bool _june1;

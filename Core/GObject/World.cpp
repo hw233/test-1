@@ -92,6 +92,7 @@ bool World::_actAvailable = false;
 bool World::_actAvailable1 = false;
 bool World::_isNewServer = false;
 bool World::_autoHeal = false;
+bool World::_copyfrontwin = false;
 bool World::_nationalDay = false;
 bool World::_halloween = false;
 bool World::_singleday = false;
@@ -130,6 +131,8 @@ bool World::_fallact = false;
 bool World::_qqgameact = false;
 bool World::_3366privilegeact = false;
 bool World::_qzonepyprivilegeact = false;
+bool World::_goodvoiceact = false;
+bool World::_3366giftact = false;
 void* World::_recalcwd = NULL;
 bool World::_june = false;
 bool World::_june1 = false;
@@ -186,7 +189,7 @@ World::~World()
 
 void World::World_testUpdate( World * world )
 {
-	world->testUpdate();
+	//world->testUpdate();
 }
 
 void World::World_Leaderboard_Update( void * )
@@ -202,7 +205,7 @@ void World::World_ChatItem_Purge( void * )
 void World::World_Multi_Check( World * world )
 {
 	UInt32 now = world->_now;
-	announce.process(now);
+	//announce.process(now);
 	gTradeCheck.update(now);
 	gSaleMgr.update(now);
 	clanManager.process(now, world->_today);
@@ -369,7 +372,15 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 11) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 12) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 13) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 14)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 14) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 15) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 16) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 17) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 18) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 19) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 20) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 21) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 22)
             ))
     {
         if (pl->isOnline())
@@ -842,6 +853,12 @@ void SendRechargeRankAward()
             GLOBAL().PushMsg(hdr, &pos);
 
             SYSMSG_BROADCASTV(4033, pos, player->getCountry(), player->getPName(), i->total);
+
+            char id[1024] = {0};
+            char ctx[1024] = {0};
+            snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
+            snprintf(ctx, sizeof(ctx), "%"I64_FMT"u_%s_%u", player->getId(), player->getPName(), i->total);
+            World::udpLog(id, ctx, "", "", "", "", "act");
         }
         World::rechargeSort.clear();
     }
@@ -867,6 +884,7 @@ void SendConsumeRankAward()
             GLOBAL().PushMsg(hdr, &pos);
 
             SYSMSG_BROADCASTV(4034, pos, player->getCountry(), player->getPName(), i->total);
+            //TRACE_LOG("CONSUME RANK: %s\t\t\t%"I64_FMT"u\t\t\t%s\t\t\t%u", pos, player->getId(), player->getPName(), i->total);
         }
         World::consumeSort.clear();
     }
@@ -974,7 +992,14 @@ void World::World_Midnight_Check( World * world )
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 12) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 13) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 14) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 15)
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 15) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 16) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 17) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 18) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 19) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 20) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 21) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 12, 22)
             )
         bRechargeEnd = true;
 

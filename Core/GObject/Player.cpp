@@ -615,6 +615,9 @@ namespace GObject
             _new_rank = true;
         else
             _new_rank = false;*/
+        memset(cf_posPut, 0, sizeof(cf_posPut));
+        memset(cf_itemId, 0, sizeof(cf_itemId));
+        memset(cf_ratio, 0 ,sizeof(cf_ratio));
 	}
 
 
@@ -15346,12 +15349,35 @@ void EventTlzAuto::notify(bool isBeginAuto)
         {
             if(goldNum > 0)
             {
-                ConsumeInfo ci(EnumFirstRecharge, 0, 0);
+                ConsumeInfo ci(EnumFirstRecharge1 + step - 1, 0, 0);
                 useGold(goldNum, &ci);
             }
+            else
+            {
+                char tag[32];
+                sprintf(tag, "F_10000_1212_%u", step);
+                udpLog("firstRecharge", tag, "", "", "", "", "act");
+            }
+
             curStep |= (1 << (step-1));
             SetVar(VAR_FIRST_RECHARGE_STEP, curStep);
             sendFirstRecharge();
+
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(this, created));
+            if(thisDay <= endDay)
+            {
+                // 新注册七日内开启首充礼包，完成每日目标
+                UInt32 targetVal = GetVar(VAR_CLAWARD2);
+                if (!(targetVal & TARGET_RECHARGE_PACKGE))
+                {
+                    targetVal |=TARGET_RECHARGE_PACKGE;
+                    AddVar(VAR_CTS_TARGET_COUNT, 1);
+                    SetVar(VAR_CLAWARD2, targetVal);
+                    sendNewRC7DayTarget();
+                    newRC7DayUdpLog(1152, 11);
+                }
+            }
         }
     }
 
@@ -15401,6 +15427,365 @@ void EventTlzAuto::notify(bool isBeginAuto)
         st << static_cast<UInt8>(0x03) << index << Stream::eos;
         send(st);
     }
+
+void Player::copyFrontWinAward(UInt8 index)
+{
+    if(!World::getCopyFrontWinSwitch())
+        return;
+    SetVar(VAR_CF_FLAG, index);
+    resetCopyFrontWinAward();
+    sendCopyFrontAllAward();
+}
+
+void Player::loadCopyFrontWinFromDB(UInt8 posOrig, UInt8 posPut, UInt32 itemId, UInt16 ratio)
+{
+    if(posOrig >= 5)
+        return;
+    cf_itemId[posOrig] = itemId;
+    cf_ratio[posOrig] = ratio;
+    if(posPut <= 5)
+        cf_posPut[posOrig] = posPut;
+}
+
+void Player::getCopyFrontCurrentAward(UInt8 index)
+{
+    UInt32 leftIndex[5];
+    UInt32 leftCnt = 0;
+    UInt8 i;
+    for(i = 0; i < 5; i++)
+    {
+        if(cf_posPut[i] == 0)
+            leftIndex[leftCnt++] = i;
+    }
+    if(leftCnt == 0)
+        return;
+    UInt16 totalRatio = 0;
+    for(i = 0; i < leftCnt; i++)
+        totalRatio += cf_ratio[leftIndex[i]];
+    UInt16 totalRatioTmp = 0;
+    UInt16 curRatio = uRand(totalRatio);
+    UInt8 curId = 5;
+    for(i = 0; i < leftCnt; i++)
+    {
+        totalRatioTmp += cf_ratio[leftIndex[i]];
+        if(curRatio < totalRatioTmp)
+        {
+            curId = leftIndex[i];
+            break;
+        }
+    }
+    if(curId >= 5)
+        return;
+    UInt8 order = 5 - leftCnt + 1;
+    if(order == 2)
+    {
+        if(getGoldOrCoupon() < 10)
+         {
+             sendMsgCode(0, 1101);
+             return;
+         }
+         ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
+         useGoldOrCoupon(10, &ci);
+    }
+    else if(order >= 3)
+    {
+        UInt32 needGold;
+        if(order ==  4)
+            needGold = 20;
+        else if(order >= 5)
+            needGold = 40;
+        else
+            needGold = 10;
+        if(getGold() < needGold)
+        {
+             sendMsgCode(0, 1104);
+             return;
+        }
+        ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
+        useGold(needGold, &ci);
+    }
+    cf_posPut[curId] = index;
+    DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u where `playerId` = %"I64_FMT"u and `posOrig` = %u", cf_posPut[curId], getId(), curId);
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x04);
+    st << static_cast<UInt8>(0x00);
+    st << cf_posPut[curId];
+    st << static_cast<UInt16>(cf_itemId[curId]);
+    UInt8 curCnt = 1;
+    st << curCnt;
+    st << Stream::eos;
+    send(st);
+
+    bool bind = GetVar(VAR_CF_BIND);
+    m_Package->Add(cf_itemId[curId], 1, bind);
+
+    if(leftCnt == 1)
+        closeCopyFrontAwardByIndex(GetVar(VAR_CF_FLAG) - 1, 0);
+}
+
+void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 indexPut)
+{
+    if(copy_or_front > 1)
+        return;
+    if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
+        return;
+#if 0
+    if(index !=  PLAYER_DATA(this, location))
+        return;
+#endif
+    if(indexPut == 0 || indexPut > 5)
+        return;
+    if(GetFreePackageSize() < 1)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+
+    UInt8 i;
+    bool isPut = false;;
+    for(i = 0; i < 5; i++)
+    {
+        if(cf_posPut[i] == indexPut)
+        {
+            isPut = true;
+            break;
+        }
+    }
+    if(isPut)
+        return;
+    getCopyFrontCurrentAward(indexPut);
+}
+
+void Player::resetCopyFrontWinAward(bool fresh)
+{
+    UInt8 index = GetVar(VAR_CF_FLAG);
+    UInt8 step;
+
+    if(index == 0 || index > 2)
+        return;
+
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        if(i == 0)
+            step = 1;
+        else if(i == 1)
+            step = 2;
+        else
+            step = 0;
+        Table award = GameAction()->getCopyFrontmapAward(step, PLAYER_DATA(this, location));
+        if (award.size() < 2)
+            continue;
+        cf_itemId[i] = award.get<UInt32>(1);
+        cf_ratio[i] = award.get<UInt32>(2);
+        cf_posPut[i] = 0;
+        if(fresh)
+            DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u AND `posOrig` = %u", cf_posPut[i], cf_itemId[i], cf_ratio[i], getId(), i);
+        else
+            DB1().PushUpdateData("REPLACE INTO `copy_front_win` (`playerId`, `posOrig`, `posPut`, `itemId`, `ratio`) VALUES(%"I64_FMT"u, %u, %u, %u, %u)", getId(), i, cf_posPut[i], cf_itemId[i], cf_ratio[i]);
+    }
+}
+
+void Player::freshCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
+{
+    if(copy_or_front > 1)
+        return;
+    if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
+        return;
+#if 0
+    if(index !=  PLAYER_DATA(this, location))
+        return;
+#endif
+    if(getTael() < 50)
+    {
+        sendMsgCode(0, 1100);
+        return;
+    }
+    ConsumeInfo ci(EnumCopyFrontWin, 0, 0);
+    useTael(50, &ci);
+
+    resetCopyFrontWinAward(true);
+    sendCopyFrontAllAward();
+}
+
+void Player::closeCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index)
+{
+    if(copy_or_front > 1)
+        return;
+    if(static_cast<UInt32>(copy_or_front + 1) != GetVar(VAR_CF_FLAG))
+        return;
+#if 0
+    if(index !=  PLAYER_DATA(this, location))
+        return;
+#endif
+    SetVar(VAR_CF_FLAG, 0);
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        cf_posPut[i] = 0;
+        cf_itemId[i] = 0;
+        cf_ratio[i] = 0;
+        //DB1().PushUpdateData("UPDATE `copy_front_win` SET `posPut` = %u, `itemId` = %u, `ratio` = %u WHERE `playerId` = %"I64_FMT"u AND `posOrig` = %u", cf_posPut[i], cf_itemId[i], cf_ratio[i], getId(), i);
+    }
+    DB1().PushUpdateData("DELETE FROM `copy_front_win` WHERE `playerId` = %"I64_FMT"u", getId());
+}
+
+void Player::sendCopyFrontAllAward()
+{
+    if(GetVar(VAR_CF_FLAG) == 0)
+        return;
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x04);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(GetVar(VAR_CF_FLAG) - 1);
+    if(GetVar(VAR_CF_FLAG) == 1)
+        st << getCopyId();
+    else
+        st << getFrontmapId();
+    st << static_cast<UInt8>(5);
+    bool isPut = false;
+    UInt8 index;
+    UInt8 i;
+    UInt16 itemId;
+    UInt8 itemCnt = 1;
+    for(index = 0; index < 5; index++)
+    {
+        if(cf_posPut[index] != 0)
+        {
+            isPut = true;
+            break;
+        }
+    }
+    if(!isPut)
+    {
+        for(index = 0; index < 5; index++)
+        {
+            itemId = cf_itemId[index];
+            st << itemId;
+            st << itemCnt;
+        }
+    }
+    else
+    {
+        for(index = 0; index < 5; index++)
+        {
+            for(i = 0; i < 5; i++)
+            {
+                if(cf_posPut[i] == index + 1)
+                    break;
+            }
+            if(i < 5)
+                itemId = cf_itemId[i];
+            else
+                itemId = 0;
+            st << itemId;
+            st << itemCnt;
+        }
+    }
+
+    st << Stream::eos;
+    send(st);
+}
+
+UInt8 Player::getCopyId()
+{
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411};
+
+    UInt16 currentSpot = PLAYER_DATA(this, location);
+    for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
+    {
+        if(spots[i] == currentSpot)
+            return (i+1);
+    }
+    return 0;
+}
+
+UInt8 Player::getFrontmapId()
+{
+    static UInt16 spots[] = {1284, 2053, 4360, 4611, 5893, 5637, 8195, 6153, 9222, 9481, 10244, 5129};
+    UInt16 currentSpot = PLAYER_DATA(this, location);
+    for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
+    {
+        if(spots[i] == currentSpot)
+            return (i+1);
+    }
+    return 0;
+}
+
+void Player::getGoodVoiceAward(UInt8 type)
+{
+    if(type == 1 && GetVar(VAR_GOOD_VOICE) == 0)
+    {
+        if(GetFreePackageSize() < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        SetVar(VAR_GOOD_VOICE, 1);
+        m_Package->Add(9273, 1, true);
+        sendGoodVoiceInfo();
+    }
+}
+
+void Player::sendGoodVoiceInfo()
+{
+    if(!World::getGoodVoiceAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(5);
+    st << static_cast<UInt8>(GetVar(VAR_GOOD_VOICE));
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::get3366GiftAward(UInt8 type)
+{
+    if(type == 1 && GetVar(VAR_3366GIFT) < 99)
+    {
+        if(GetFreePackageSize() < 6)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        if(getGold() < 368)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+		ConsumeInfo ci(Enum3366Gift,0,0);
+		useGold(368,&ci);
+        AddVar(VAR_3366GIFT, 1);
+        m_Package->Add(500, 2, true);
+        m_Package->Add(501, 2, true);
+        m_Package->Add(1325, 2, true);
+        m_Package->Add(516, 2, true);
+        m_Package->Add(134, 2, true);
+        m_Package->Add(515, 2, true);
+        send3366GiftInfo();
+    }
+}
+
+void Player::send3366GiftInfo()
+{
+    if(getPlatform() != 11)
+        return;
+    if(!isBD())
+        return;
+    if(!World::get3366GiftAct())
+        return;
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(6);
+    UInt8 opt = GetVar(VAR_3366GIFT);
+    /*
+    if(GetVar(VAR_3366GIFT) < 9)
+        opt = 0;
+    else
+        opt = 1;
+    */
+    st << opt;
+    st << Stream::eos;
+    send(st);
+}
 
 } // namespace GObject
 

@@ -89,8 +89,13 @@ enum PurchaseType
     FightTransform              = 78,
     AutoJobHunter               = 79,
     AutoJobHunterComplete       = 80,
-    EnumFirstRecharge           = 81,
-    BUYJOYBUFF                  = 82, //购买心悦buff
+    EnumFirstRecharge1          = 81,
+    EnumFirstRecharge2          = 82,
+    EnumFirstRecharge3          = 83,
+    EnumFirstRecharge4          = 84,
+    EnumCopyFrontWin            = 85,
+    Enum3366Gift                = 86,
+    BUYJOYBUFF                  = 87, //购买心悦buff
     //繁体私有占150～200
 };
 
