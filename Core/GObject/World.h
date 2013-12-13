@@ -543,8 +543,6 @@ public:
         UInt32 begin = GVAR.GetVar(GVAR_QZONE_RECHARGE_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_QZONE_RECHARGE_END);
         UInt32 now = TimeUtil::Now() ;
-        if(begin == 0 && end == 0)
-            return _qzoneRechargetime;
         if( now >= begin && now <= end)
             return true;
         else
