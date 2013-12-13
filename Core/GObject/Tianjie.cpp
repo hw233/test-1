@@ -1442,7 +1442,11 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
         setRatePercent();
         //增加积分
 		record1(pl, index);
-        broadEvent1();
+        if (m_eventCurrNumber % 10 == 0)
+        {
+            SYSMSG_BROADCASTV(5012, pl->getCountry(), pl->getName().c_str(), loc, npcid);
+            broadEvent1();
+        }
         broadEvent1(pl);
 
         //删除NPC
@@ -1458,7 +1462,6 @@ void Tianjie::attack1(Player* pl, UInt16 loc, UInt32 npcid)
 		    while (addNpc(npcid) == false && count > 0)
                 count--;
 		}
-        SYSMSG_BROADCASTV(5012, pl->getCountry(), pl->getName().c_str(), loc, npcid);
 	}
 }
 void Tianjie::record1(Player* pl, int npcIndex)
@@ -1642,7 +1645,7 @@ void Tianjie::donate2(Player* pl, UInt8 id)
 
         setRatePercent();
         s_count++;
-        if (s_count % 5 == 0)
+        if (s_count % 10 == 0)
             broadEvent2();
         broadEvent2(pl);
 
@@ -1810,8 +1813,6 @@ void Tianjie::attack3(Player* pl)
         int exp = TIANJIE_EXP(pl->GetLev()) * s_rate3ExpMulti;
         pl->addExpOrTjScore(exp, s_rate3NpcScore, true, true);
 
-        if (m_eventCurrNumber % 10 == 0)
-            SYSMSG_BROADCASTV(5034, pl->getCountry(), pl->getName().c_str(), m_tjTypeId, m_currTjRate, m_eventCurrNumber);
         //无限层数
         m_eventCurrNumber += 1;
         if (m_eventCurrNumber <= m_eventMaxNumber)
@@ -1821,8 +1822,12 @@ void Tianjie::attack3(Player* pl)
             DB1().PushUpdateData("update tianjie set r3_copyid=%d where level=%d", m_eventCurrNumber, m_currOpenedTjLevel);
         }
         isFinish();
-        broadEvent3();
         broadEvent3(pl);
+        if (m_eventCurrNumber % 10 == 0)
+        {
+            broadEvent3();
+            SYSMSG_BROADCASTV(5034,pl->getCountry(), pl->getName().c_str(), m_tjTypeId, m_currTjRate, m_eventCurrNumber);
+        }
     }
 }
 

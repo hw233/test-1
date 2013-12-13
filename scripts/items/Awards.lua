@@ -391,10 +391,10 @@ function RunBlueDiamondAward(player, opt)
 		player:sendMsgCode(2, 1011, 0);
 		return 0;
 	end
-    local date_9190_0 = { ['year'] = 2012, ['month'] = 11, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    local date_9190_1 = { ['year'] = 2012, ['month'] = 12, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    local date_9191_0 = { ['year'] = 2012, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
-    local date_9191_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9190_0 = { ['year'] = 2012, ['month'] = 12, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9190_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9191_0 = { ['year'] = 2012, ['month'] = 12, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    local date_9191_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9217_0 = { ['year'] = 2012, ['month'] = 11, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     local date_9217_1 = { ['year'] = 2012, ['month'] = 11, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     

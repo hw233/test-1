@@ -90,6 +90,7 @@ enum PurchaseType
     AutoJobHunter               = 79,
     AutoJobHunterComplete       = 80,
     EnumFirstRecharge           = 81,
+    BUYJOYBUFF                  = 82, //购买心悦buff
     //繁体私有占150～200
 };
 

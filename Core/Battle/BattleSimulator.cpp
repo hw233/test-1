@@ -400,6 +400,10 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
                     flag |= BattleFighter::Enh5;
                 if (_player[i]->getBuffData(PLAYER_BUFF_QQVIPBUF, now) > 0)
                     flag |= BattleFighter::Enh6;
+                if (_player[i]->getBuffData(PLAYER_BUFF_JOYBUFF, now) > 0)
+                {
+                    flag |= BattleFighter::Enh7;
+                }
                 /*if(_player[i]->hasFlag(GObject::Player::Copy)
                  || _player[i]->hasFlag(GObject::Player::AutoCopy)
                  || _player[i]->hasFlag(GObject::Player::InCopyTeam)
