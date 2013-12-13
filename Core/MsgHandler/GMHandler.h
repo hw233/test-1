@@ -215,6 +215,8 @@ private:
     void OnAddPetEquipExp(GObject::Player *player, std::vector<std::string>& args);
     
     void OnSetXZLvl(GObject::Player *player, std::vector<std::string>& args);
+    void OnSetXCTCurVal(GObject::Player *player, std::vector<std::string>& args);
+    void OnSetXCTMaxVal(GObject::Player *player, std::vector<std::string>& args);
     void OnSetXCValue(GObject::Player *player, std::vector<std::string>& args);
     void OnHandleTask(GObject::Player * player, std::vector<std::string>& args);
     void OnCompletedManyTask(GObject::Player* player, std::vector<std::string>& args);

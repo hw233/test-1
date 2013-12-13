@@ -278,6 +278,8 @@ GMHandler::GMHandler()
     Reg(3, "spar", &GMHandler::OnFairySpar);
     
     Reg(3, "setxzlvl", &GMHandler::OnSetXZLvl);
+    Reg(3, "setxctcurval", &GMHandler::OnSetXCTCurVal);
+    Reg(3, "setxctmaxval", &GMHandler::OnSetXCTMaxVal);
     Reg(3, "setxzvalue", &GMHandler::OnSetXCValue);
 
     Reg(2, "eqexp", &GMHandler::OnAddPetEquipExp);
@@ -474,15 +476,45 @@ void GMHandler::OnSetXZLvl(GObject::Player * player, std::vector<std::string>& a
 		return;
 	if(args.size() == 2)
 	{
-		UInt32 fighterId = atoi(args[0].c_str());
-		UInt32 xzLevel = atoi(args[1].c_str());
+		UInt16 fighterId = atoi(args[0].c_str());
+		UInt8 xzLevel = atoi(args[1].c_str());
 		GObject::Fighter * fgt = player->findFighter(fighterId);
 		if(fgt == NULL)
 			return;
-        fgt->getXingchen().lvl = xzLevel;
 
-        fgt->updateDBxingchen();
-        fgt->sendXingchenInfo(0);
+        fgt->GMSetXZLvl(xzLevel);
+	}
+}
+
+void GMHandler::OnSetXCTCurVal(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt16 fighterId = atoi(args[0].c_str());
+		UInt16 xctCurVal = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+
+        fgt->GMSetXCTCurVal(xctCurVal);
+	}
+}
+
+void GMHandler::OnSetXCTMaxVal(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt16 fighterId = atoi(args[0].c_str());
+		UInt16 xctMaxVal = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+
+        fgt->GMSetXCTMaxVal(xctMaxVal);
 	}
 }
 

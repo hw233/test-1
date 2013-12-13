@@ -20222,10 +20222,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25 };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -20308,7 +20308,8 @@ void Player::postDragonKing(UInt8 count)
             st << itemId << award.get<UInt8>(j+1);
             GetPackage()->Add(itemId, award.get<UInt32>(j+1), isBind, true, FromQixi);
             if (itemId == Dragon_Broadcast[flag]
-                    || (flag == YUANSHEN && (itemId == Dragon_Broadcast[flag]+1 || itemId == Dragon_Broadcast[flag]+2)))
+                    || (flag == YUANSHEN && (itemId == Dragon_Broadcast[flag]+1 || itemId == Dragon_Broadcast[flag]+2))
+                    || (flag == TIANYOU && (itemId == Dragon_Broadcast[flag]+1 || itemId == Dragon_Broadcast[flag]+2)))
                 SYSMSG_BROADCASTV(295, getCountry(), getName().c_str(), itemId);
         }
     }
@@ -25107,17 +25108,33 @@ void Player::FinishCurStep(int randMark, UInt32 clintTime)
     GameMsgHdr hdr(0x1D7, WORKER_THREAD_WORLD, this, sizeof(totalScore));
     GLOBAL().PushMsg(hdr, &totalScore);
 
+    udpLog("qishidoufa", "F_131203_1", "", "", "", "", "act");
     UInt8 mark = 0;
     if(GetQiShiBanScore() >= 100 && (GetQiShiBanScore() - score) < 100)
+    {
         mark = 1;
+        udpLog("qishidoufa", "F_131203_2", "", "", "", "", "act");
+    }
     else if(GetQiShiBanScore() >= 1650 && (GetQiShiBanScore() - score) < 1650)
+    {
         mark = 2;
+        udpLog("qishidoufa", "F_131203_3", "", "", "", "", "act");
+    }
     else if(GetQiShiBanScore() >= 3200 && (GetQiShiBanScore() - score) < 3200)
+    {
         mark = 3;
+        udpLog("qishidoufa", "F_131203_4", "", "", "", "", "act");
+    }
     else if(GetQiShiBanScore() >= 4800 && (GetQiShiBanScore() - score) < 4800)
+    {
         mark = 4;
+        udpLog("qishidoufa", "F_131203_5", "", "", "", "", "act");
+    }
     else if(GetQiShiBanScore() >= 8000 && (GetQiShiBanScore() - score) < 8000)
+    {
         mark = 5;
+        udpLog("qishidoufa", "F_131203_6", "", "", "", "", "act");
+    }
 
     if(mark > 0)
         SetQiShiBanAwardMark(SET_BIT(GetQiShiBanAwardMark(), (mark-1)*2));
@@ -25290,13 +25307,31 @@ void Player::ContinueCurStep()
 
 void Player::GetPersonalAward(UInt8 opt)
 {
-    if(opt > 0)
+    if(opt > 0 && opt <= 5)
     {
         UInt16 state = GetQiShiBanAwardMark();
         UInt8 mark = GET_BIT_2(state, (opt-1));
 
         if(1 == mark)
         {
+            bool res = 0;
+            if(2 == opt || 3 == opt)
+            {
+                if(GetPackage()->GetRestPackageSize() < 3)
+                    res = true;
+            }
+            else
+            {
+                if(GetPackage()->GetRestPackageSize() < 2)
+                    res = true;
+            }
+
+            if(res)
+            {
+                sendMsgCode(0, 1011);
+                return;
+            }
+
             switch(opt)
             {
             case 1:
