@@ -151,6 +151,7 @@ bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
 bool World::_11time = false;
 bool World::_ggtime = false;
+bool World::_qzoneRechargetime = false;
 bool World::_ryhbActivity = false;
 bool World::_zcjbActivity = false;
 bool World::_wansheng= false;
@@ -1518,6 +1519,7 @@ void World::World_Boss_Refresh(void*)
 {
     worldBoss.process(TimeUtil::Now());
 }
+
 void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
@@ -1962,7 +1964,7 @@ bool World::Init()
     UInt32 sweek = TimeUtil::SharpWeek(1);
     AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
 	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
-    
+
     return true;
 }
 
@@ -2456,7 +2458,7 @@ void World::sendGuangGunPlayers(Player* pl)
         player = pl->getGGTimeCaptain();
     UInt32 myPlace = 0;
     UInt32 myScore = 0;
-    UInt8 rank;
+    UInt8 rank = 0;
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
         ++rank;
