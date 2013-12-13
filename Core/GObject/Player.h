@@ -1736,7 +1736,7 @@ namespace GObject
         }
         inline void setClientIp(const std::string& clientIp) 
         { 
-            if (strncmp(clientIp.c_str(), "", 1) == 0)
+            if (inet_addr(clientIp.c_str()) == INADDR_NONE)
             {
                 strncpy(m_clientIp, "0.0.0.0", 16);
             }
