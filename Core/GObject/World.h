@@ -672,6 +672,11 @@ public:
     inline static bool getAccRecharge()
     { return _accrecharge; }
 
+    inline static void setMiLuZhiJiaoAct(bool v)
+    { _miluzhijiao = v; }
+    inline static bool getMiLuZhiJiaoAct()
+    { return _miluzhijiao; }
+
     inline static bool getLuckyStarAct()
     {
         UInt32 now = TimeUtil::Now();
@@ -1158,6 +1163,7 @@ public:
     static UInt32 spreadBuff;
     static UInt8 _arenaState;      //0:无 1:仙界第一 2:仙界至尊 3:仙界传奇
     static bool _memcinited;
+    static bool _miluzhijiao;
 public:
     static RCSortType qishibanScoreSort;     //七石板积分排名
     static RCSortType rechargeSort;

@@ -1986,6 +1986,7 @@ namespace GObject
         UInt32  m_curPage;
         //七石斗法 end
 
+        void MiLuZhiJiao();
         void setForbidSale(bool b, bool isAuto = false);
         bool getForbidSale() {return _isForbidSale;}
 	private:

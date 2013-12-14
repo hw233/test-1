@@ -8056,6 +8056,9 @@ namespace GObject
         if (nLev == 40 || nLev == 50 || nLev == 60 || nLev == 70 || nLev == 80 || nLev == 90 || nLev == 100)
             OnShuoShuo(nLev/10-4 + SS_40);
 
+        if(nLev >= 40)
+            MiLuZhiJiao();
+
         sendVipPrivilegeMail(nLev);
         getLevelAwardInfo();
 	}
@@ -11717,6 +11720,7 @@ namespace GObject
         case 29:
             //阵营检索
             checkZhenying();
+            break;
         case 30:
             getAirBookLoginAward(opt);
             break;
@@ -11733,7 +11737,7 @@ namespace GObject
                 break;
         }
     }
-    
+   
     void Player::checkZhenying()
     {
         UInt8 zyState = 0;
@@ -26424,6 +26428,28 @@ void Player::AddQZoneRecharge(UInt32 r)
         sendQZoneRechargeAwardInfo();
     }
 }
+
+void Player::MiLuZhiJiao()
+{       
+    if(!World::getMiLuZhiJiaoAct())
+        return;
+
+    if(GetLev() < 40)
+        return;
+    
+    if(0 == GetVar(VAR_CHRISTMAS_PRESENT))
+    {
+        SYSMSGV(title, 5114);
+        SYSMSGV(content, 5115);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, 1767, 1, true);
+            SetVar(VAR_CHRISTMAS_PRESENT, 1);
+        }
+    }
+}
+
 } // namespace GObject
 
 
