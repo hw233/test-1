@@ -26389,8 +26389,6 @@ void Player::sendQZoneRechargeAwardInfo()
     st << static_cast<UInt8>(QZoneRechargeAward);
     st << Stream::eos;
     send(st);
-    
-
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
@@ -26402,6 +26400,54 @@ void Player::AddQZoneRecharge(UInt32 r)
         sendQZoneRechargeAwardInfo();
     }
 }
+void Player::GetFindOldManAward(UInt32 type)
+{
+    if(!World::getOldManTime())
+        return ;
+    UInt8 num = 1 ;
+    if(type < 11)
+        num =2;
+    GetPackage()->AddItem(503, num, true, false);
+    AddVar(VAR_OLDMAN_DAYSCORE,num*10);
+    AddVar(VAR_OLDMAN_SCORE,num*10);
+}
+
+void Player::getInterestingAward(UInt8 type)
+{
+    UInt32 ScoreAward = 0;
+    UInt32 Score = 0;
+    if(type == 0 )
+    {
+        Score = GetVar(VAR_OLDMAN_DAYSCORE);
+        ScoreAward = GetVar(VAR_OLDMAN_DAYSCORE_AWARD);
+        if( DayScore < 50 || DayScoreAward == 1)
+            return ;
+    }
+    else
+    {
+        ScoreAward = GetVar(VAR_OLDMAN_SCORE_AWARD);
+        Score = GetVar(VAR_OLDMAN_SCORE);
+        if( Score < type * 100 || ScoreAward &(1 << (type-1)))
+            return ;
+    }
+    if(!GameAction()->RunInterestingAward(this, type))
+    {
+        return;
+    }
+    if(type ==0)
+        SetVar(VAR_OLDMAN_DAYSCORE_AWARD,1);
+    else
+        SetVar(VAR_OLDMAN_SCORE_AWARD,Score|(1<<(type-1)))
+}
+void Player::sendInterestingBag(Player* pl)
+{
+    if(!GameAction()->RunInterestingBag(this, 0))
+    {
+        return;
+    }
+    UInt64 id = getId();
+    GameMsgHdr hdr(0x356, pl->getThreadId(),pl,sizeof(id) );
+    GLOBAL().PushMsg(hdr, &id);
 } // namespace GObject
 
 

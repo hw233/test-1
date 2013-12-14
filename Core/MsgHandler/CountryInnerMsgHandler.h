@@ -2228,6 +2228,17 @@ void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     player->calcLingbaoBattlePoint();
 }
+void OnGetFindOldManAward( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt32 flag = *reinterpret_cast<const UInt32 *>(data);
+    player->calcLingbaoBattlePoint(flag);
+}
+void OnGetInteresingbag( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->getInteresingbag();
+}
 
 void OnSpreadWhisper(GameMsgHdr &hdr, const void* data)
 {

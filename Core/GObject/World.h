@@ -46,6 +46,12 @@ struct MoneyIn
     int prestige;
 };
 
+struct stOldMan
+{
+    UInt16 _spot;
+    std::set<UInt64> _players;
+    stOldMan():_spot(0){}
+};
 struct stArenaExtra
 {
     UInt8 week;
@@ -560,6 +566,16 @@ public:
         else
             return false;
     } 
+    inline static bool  getOldManTime()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        UInt32 now = TimeUtil::Now() ;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
@@ -987,6 +1003,7 @@ public:
     void RankLuckyDraw(Player* player, bool notify = true);
     void SendLuckyDrawList(Player* player);
     void SendLuckyDrawAward();
+    UInt32 FindTheOldMan(Player* pl); // 找到圣诞老人
 public:
 	static void calWeekDay( World * world );
     inline static void setSysDailogPlatform(UInt8 v) { m_sysDailogPlatform = v; }
@@ -996,6 +1013,7 @@ public:
 public:
     static UInt32 _moneyLogged;
     static MoneyIn _moneyIn[7][2];
+    static stOldMan _oldMan;
 
 	static int _activityStage;
 	static bool _actAvailable;//??????+6??
@@ -1166,6 +1184,7 @@ private:
 	static void World_Athletics_Check( void * );
     static void World_Boss_Refresh(void*);
     static void World_Boss_Prepare(void*);
+    static void World_OldMan_Refresh(void*);   //圣诞老人刷新
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
@@ -1219,6 +1238,7 @@ public:
     void SendSnowAward();
     void SendQiShiBanAward();
     void SendGuangGunAward();
+    static UInt16 GetRandomSpot();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

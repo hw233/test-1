@@ -7482,6 +7482,44 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
             }
         }
         break;
+    case 0x26:
+        {
+            brd >>op ;
+            switch(op)
+            {
+                case 1:
+                    player->sendOldManPos();
+                    break;
+                case 2:
+                    UInt8 idx =0 ;
+                    brd >> idx ;
+                    switch(idx)
+                    {
+                        case 0:
+                            {
+                                player->GetFindOldManAward();
+                            }
+                            break;
+                        case 1:
+                            {
+                                UInt8 index = 0 ;
+                                brd >> index ;
+                                player->getInterestingAward(index); 
+                            }
+                            break;
+                        case 2:
+                            string name =NULL;
+                            brd >>name ;
+                            GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
+                            if(pl==NULL)
+                                break;
+                            player->sendInterestingBag(pl);
+                            break ;
+                    }
+                    player->sendInteresingInfo();
+                    break;
+            }
+        }
     default:
         break;
     }

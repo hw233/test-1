@@ -2470,6 +2470,8 @@ namespace GObject
         void getQZoneRechargeAward(UInt8 val);
         void sendQZoneRechargeAwardInfo();
         void AddQZoneRecharge(UInt32 r =0);
+        void GetFindOldManAward(UInt32 type == 0 );
+        void getInterestingAward(UInt8 type);
         void getSummerFlow3OnlineAward(UInt8 val);
         void getSummerMeetAward(UInt8 idx,UInt8 index);
         void getNewRC7DayRechargeAward(UInt8 val);

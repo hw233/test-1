@@ -715,6 +715,33 @@ function RunQZoneRechargeAward(player, cts)
     end
     return true
 end
+function RunInterestingAward(player, cts)
+    local item = {
+        [0] = {{500,3},{56,3},{9371,3},{15,3}},
+        [1] = {{503,2},{514,2},{500,2},{516,2}},
+        [2] = {{501, 3},{547,3},{517,3},{513,3}},
+        [3] = {{134,3},{1325,3},{509,3},{515,2}},
+    };
+    local package = player:GetPackage();
+    package:DelItemSendMsg(9371, player)
+    if cts > 3  then
+        return false
+    end
+    if item[cts] == nil then
+        return false 
+    end
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+    end
+    return true
+end
+
 function RunBirthdayAward(player)
     if player == nil then
         return 0;

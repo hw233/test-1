@@ -111,6 +111,8 @@ namespace GObject
         GVAR_QZONE_RECHARGE_BEGIN = 64,
         GVAR_QZONE_RECHARGE_END = 65,
 
+        GVAR_OLDMAN_BEGIN = 66,
+        GVAR_OLDMAN_END = 67,
         GVAR_MAX,
     };
 

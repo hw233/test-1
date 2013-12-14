@@ -583,6 +583,11 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_REAL_SPIRIT_GET = 642,       //当日是否领取真元 
         VAR_QZONE_RECHARGE = 643,       //空间充值 
         VAR_QZONE_RECHARGE_AWARD = 644,       //空间充值奖励领取
+        VAR_OLDMAN_DAYSCORE = 645,       //捉迷藏活动每日积分
+        VAR_OLDMAN_SCORE = 646,       //捉迷藏活动累计积分
+        VAR_OLDMAN_PRESENT = 647,      //捉迷藏活动接受礼包数
+        VAR_OLDMAN_DAYSCORE_AWARD = 648,       //捉迷藏活动每日积分奖励
+        VAR_OLDMAN_SCORE_AWARD = 649,       //捉迷藏活动累计积分奖励
 
         VAR_MAX,
     };
@@ -1114,6 +1119,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_REAL_SPIRIT_GET, CYCLE_DAY);
             REGISTER_VAR(VAR_QZONE_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_QZONE_RECHARGE_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_OLDMAN_DAYSCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_OLDMAN_SCORE, CYCLE_NONE);
+            REGISTER_VAR(VAR_OLDMAN_PRESENT, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

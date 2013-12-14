@@ -3056,6 +3056,31 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
         }
         break;
+        case 0x26:
+            {
+                brd >> op;
+                switch(op)
+                {
+                    case 2:
+                        {
+                           UInt8 index =0 ;
+                           brd >> index ;
+                           if(index == 0)
+                           {
+                               UInt32 type = World::FindTheOldMan(player);
+                               if(type ==0 )
+                                   break;
+                               GameMsgHdr h(0x355,  player->getThreadId(), player, sizeof(UInt32));
+                               GLOBAL().PushMsg(h, &type);
+                           }
+                        }
+                        break;
+                    default:
+                        hdr.msgHdr.desWorkerID = player->getThreadId();
+                        GLOBAL().PushMsg(hdr, (void*)data);
+                }
+                break;
+            }
         default:
             break;
     }

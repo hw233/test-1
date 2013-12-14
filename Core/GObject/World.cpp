@@ -232,6 +232,7 @@ UInt8 World::_snakespringequipact = 0;
 /** 场外活动 **/
 stArenaExtra World::stArenaOld[2];
 stArenaExtra World::stArena;
+stOldMan World::_oldMan ;
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
@@ -1526,6 +1527,34 @@ void World::World_Boss_Refresh(void*)
     worldBoss.process(TimeUtil::Now());
 }
 
+void World::World_OldMan_Refresh(void *)
+{
+    if(!getOldManTime())
+        return ;
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = now - TimeUtil::SharpDay(0, now);
+    if(time >= 8*3600 - 300 - 2 && time < 8*3600 - 300 +3 )
+    {
+        SYSMSG_BROADCASTV(571); 
+    }
+    else if ( time < 7 *3600 || time > 20 *3600 )
+    {
+        return ;
+    }
+    else if( (time%3600) < 3 && (time%3600)>= 3600 -2 )
+    {
+        UInt16 spot = GetRandomSpot();
+        if(_oldMan._spot == 0)
+        {
+            SYSMSG_BROADCASTV(572,spot); 
+        }
+        else 
+        {
+            SYSMSG_BROADCASTV(573,spot); 
+        }
+        _oldMan._spot = spot;
+    }
+}
 void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
@@ -1971,6 +2000,8 @@ bool World::Init()
     AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
 	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
     
+    AddTimer(5 * 1000, World_OldMan_Refresh, static_cast<void*>(NULL), 5 * 1000);
+   
     //开服战世界boss
     UInt32 value = GVAR.GetVar(GVAR_SERVERWAR_XIUWEI);
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
@@ -2189,6 +2220,16 @@ void World::SendLuckyDrawAward()
     }
 }
 
+UInt32 World::FindTheOldMan(Player* pl)
+{
+    UInt16 loc = pl->getLocation();
+    if(_oldMan._spot == loc)
+        return 0;
+    if(_oldMan._spot.find(pl->getId())!= _oldMan._spot.end())
+        return 0;
+    _oldMan._spot.insert(pl->getId());
+    return _oldMan._spot.size();
+}
 bool enum_openact(void * ptr, void * v)
 {
 	Player * pl = static_cast<Player *>(ptr);
@@ -3567,6 +3608,13 @@ UInt32 World::GetMemCach_qishiban(const char * openId)
     }
 
     return score;
+}
+UInt16 World::GetRandomSpot()
+{
+    UInt32 size = mapList.size();
+    UInt32 rand = uRand(size);
+    Map *map = mapList.at(rand);
+    return map->GetRandomSpot();
 }
 
 void World::SendGuangGunAward()    //待定
