@@ -26515,8 +26515,9 @@ void Player::sendOldManPos()
     ConsumeInfo ci(SearchOldMan,0,0);
     useGold(gold,&ci);
     UInt16 pos = WORLD()._oldMan._spot;
+    UInt8 loc = WORLD()._oldMan._loc;
     Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x26) << static_cast<UInt8>(0x01) << pos<<Stream::eos;;
+    st << static_cast<UInt8>(0x26) << static_cast<UInt8>(0x01) << loc<< pos<<Stream::eos;;
     send(st); 
 }
 void Player::sendInteresingInfo()

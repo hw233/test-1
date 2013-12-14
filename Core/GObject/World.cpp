@@ -3630,7 +3630,10 @@ UInt16 World::GetRandomSpot()
         if(*it)
         {
             if (count ++ == index)
+            {
+                _oldMan._loc = (*it)->GetMapData().m_ID;
                 return (*it)->GetRandomSpot();
+            }
         }
     }
     return 0;
