@@ -4611,6 +4611,7 @@ namespace GObject
                   st<<static_cast<UInt8>(1);
                 else st<<static_cast<UInt8>(0);
                 st<<getBePrayednum(pl->getId());
+                st<<static_cast<UInt8>(pl->GetVar(VAR_OLDMAN_PRESENT));
                 // std::cout <<pl->getId()<<"@!@# "<<pl->GetVar(VAR_PRAY_TYPE)<<"!!@!"<<pl->GetVar(VAR_PRAY_VALUE)<<std::endl;
                 ++it;
             }
