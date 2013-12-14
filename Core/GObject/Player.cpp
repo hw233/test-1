@@ -26417,7 +26417,7 @@ void Player::GetFindOldManAward(UInt32 type)
         num =2;
         SYSMSG_BROADCASTV(574, getCountry(), getPName(), type );
     }
-    GetPackage()->AddItem(503/*9439*/, num, true, false);   //欢乐礼包
+    GetPackage()->AddItem(9439, num, true, false);   //欢乐礼包(9439)
     AddVar(VAR_OLDMAN_DAYSCORE,num*10);
     AddVar(VAR_OLDMAN_SCORE,num*10);
 }
