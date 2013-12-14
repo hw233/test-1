@@ -4402,6 +4402,17 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_QZONE_RECHARGE_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
+        case 21:
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_BEGIN,TimeUtil::SharpDayT(0, TimeUtil::Now()));
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_END,TimeUtil::SharpDayT(2, TimeUtil::Now()));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 22:
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_BEGIN, 0);
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
     }
 }
 
