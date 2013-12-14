@@ -1979,6 +1979,13 @@ void OnDaysRankMsg( GameMsgHdr& hdr, const void* data )
     GObject::DaysRank::instance().updateDaysValue(msg); 
 }
 
+void SendQSBState( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    player->QiShiBanState();
+}
+
 void OnSendClanMemberList( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
