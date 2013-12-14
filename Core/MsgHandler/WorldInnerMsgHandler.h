@@ -2243,5 +2243,107 @@ void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
     }
 */
 }
+void OnHappyFireRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    if(!World::getHappyFire())
+        return;
+ 
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSorppyFireSortt.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= CNT10)
+                inrank = true;
+            World::happyFireSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::happyFireSort.insert(s);
+
+    UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSort.end(); i != e; ++i)
+    {
+       if (!stop)
+            ++myrank;
+
+        if (i->player == player)
+            stop = true;
+
+        ++rank;
+
+        Stream st(REP::ACT);  //lib待定
+        st << static_cast<UInt8>(0x02) << static_cast<UInt8>(5)<< static_cast<UInt8>(2);
+        st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+        i->player->send(st);
+    }
+
+    if (oldrank <= CNT || (!inrank && myrank <= CNT))
+    {
+        Stream st;
+        SendHappyFireRank(st);
+        NETWORK()->Broadcast(st);
+    }
+}
+}
+void SendHappyFireRank(Stream& st)
+{
+    World::initRCRank();
+    using namespace GObject;
+    st.init(REP::ACTIVE);    //lib待定
+    UInt32 cnt = World::happyFireSort.size();
+    if (cnt > CNT)
+        cnt = CNT;
+    st << static_cast<UInt8>(0x02) << static_cast<UInt8>(5) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
+    {
+        st << i->player->getName();
+        st << i->total;
+     //   st << static_cast<UInt8>(i->player->getCountry()<<4|(i->player->IsMale()?0:1));
+        ++c;
+        if (c >= CNT)
+            break;
+    }
+    st << Stream::eos;
+
+}
+void OnSendHappyFireRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+    Stream st;
+    SendHappyFireRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(0x02) << static_cast<UInt8>(5) << static_cast<UInt8>(2);
+            st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
+}
 
 #endif // _WORLDINNERMSGHANDLER_H_

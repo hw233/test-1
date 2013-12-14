@@ -1317,6 +1317,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr1(0x1D3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr1, NULL);
     }
+    if (World::getHappyFire())
+    {
+        GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
 
     /*if(World::getQiShiBanTime())
     {

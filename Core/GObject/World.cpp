@@ -202,6 +202,7 @@ RCSortType World::popularitySort;
 RCSortType World::LuckyBagSort;
 RCSortType World::PlayerGradeSort;
 RCSortType World::guangGunSort;
+RCSortType World::happyFireSort;
 ClanGradeSort World::clanGradeSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;

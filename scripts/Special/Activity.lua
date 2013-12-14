@@ -265,7 +265,7 @@ function onDungeonWin(player, id, count, free)
         ChingMingDay(player, 0)
     else
         FoolBaoLoot(player,2);
-        HappyFireLoot(player,2);
+        HappyFireLoot(player,1);
         SurnameLegendLoot(player,0);
         FallActivity(player, 2)
         Guoqing(player, 3);
@@ -8340,7 +8340,7 @@ function HappyFireLoot(player,lootlvl)
             [3] = 4,
     };
     local package = player:GetPackage();
-    package:AddItem(9375, itemNum[lootlvl], true,0,10);  //欢乐礼包
+    package:AddItem(9375, itemNum[lootlvl], true,0,10); --欢乐礼包
 end
 
 --蜀山传奇掉落活动

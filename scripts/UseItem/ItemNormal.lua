@@ -3317,6 +3317,14 @@ function ItemNormal_00009027(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
     return rn;
 end
+function ItemNormal_0000XXXX(iid, num, bind, param)
+    local player = GetPlayer()
+    for n = 1, num do
+        player:AddYearHappyValue(math.random(1.5))
+    end
+    package:DelItemSendMsg(iid, player);
+    return num
+end
 
 function ItemNormal_00009067(iid, num, bind, param)
     local player = GetPlayer()
@@ -3336,7 +3344,7 @@ function ItemNormal_00009067(iid, num, bind, param)
         local item = 0
         if r >= 67 then
             item = _50[math.random(1,#_50)]
-            package:Add(item, 1, true, 0, 2)
+           1package:Add(item, 1, true, 0, 2)
             Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:9067]，"..msg_61.."[4:"..item.."]")
         else
             item = _40[math.random(1,#_40)]
@@ -11589,6 +11597,7 @@ local ItemNormal_Table = {
     [9075] = ItemNormal_00009017,
 
     [9027] = ItemNormal_00009027,
+    [9028] = ItemNormal_00009028,
 
     [9067] = ItemNormal_00009067,
     [9076] = ItemNormal_00009076,

@@ -824,7 +824,7 @@ public:
             _surnamelegend = false;
         return _surnamelegend;
     } 
-    inline static bool getHappFire()
+    inline static bool getHappyFire()
     {
         UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
@@ -1150,6 +1150,7 @@ public:
     static RCSortType PlayerGradeSort; //十一活动
     static ClanGradeSort clanGradeSort; // 十一活动
     static RCSortType guangGunSort; //十一活动
+    static RCSortType happyFireSort;     //七石板积分排名
     static void initRCRank();
     static void initRP7RCRank();
 

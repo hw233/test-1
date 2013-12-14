@@ -704,6 +704,8 @@ sysMsg:set(2018, 0x35, "[f:%u:%s]消耗真元值%u")
 sysMsg:set(2019, 1, "[f:%u:%s]消耗真元值%u")
 sysMsg:set(2020, 1, "获得真元值%u")
 sysMsg:set(2021, 0x35, "获得真元值%u")
+sysMsg:set(2022, 1, "获得欢乐值%u")
+sysMsg:set(2023, 0x35, "获得欢乐值%u")
 
 sysMsg:set(2100, 0, "阵法升级失败，该阵法不可升级")
 sysMsg:set(2101, 0, "阵法升级失败，物品 [%s] 不足")

@@ -26414,6 +26414,18 @@ void Player::AddQZoneRecharge(UInt32 r)
         sendQZoneRechargeAwardInfo();
     }
 }
+void Player::AddYearHappyValue(UInt32 val)
+{
+    if(!getHappyFire())
+        return ;
+    AddVar(VAR_YEARHAPPY_DAYVALUE,val);
+    AddVar(VAR_YEARHAPPY_VALUE,val);
+    UInt32 value = GetVar(VAR_YEARHAPPY_VALUE);
+    GameMsgHdr hdr1(0x1DB, WORKER_THREAD_WORLD, this, sizeof(grade));
+    GLOBAL().PushMsg(hdr1, &grade);
+    SYSMSG_SENDV(2022,this,val);
+    SYSMSG_SENDV(2023,this,val);
+}
 } // namespace GObject
 
 
