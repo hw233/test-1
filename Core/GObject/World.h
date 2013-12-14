@@ -48,7 +48,7 @@ struct MoneyIn
 
 struct stOldMan
 {
-    Uint8 _loc;
+    UInt8 _loc;
     UInt16 _spot;
     std::set<UInt64> _players;
     stOldMan():_loc(0),_spot(0){}
