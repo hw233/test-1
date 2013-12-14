@@ -17,7 +17,7 @@ namespace GObject
 {
 #define CITTA_BOOK_ID 1199
 
-    SingleHeroFighter::SingleHeroFighter(Player* pl, UInt8 type) : _player(pl), _fgt(NULL), _type(type), _level(0), _soulMax(0), _potential(0), _capacity(0), _soulExtraAura(0), _soulAuraLeft(0), _soulSkillSoulOut(0), _tLevel(0), _tTurns(0), _tLastTurns(0)
+    SingleHeroFighter::SingleHeroFighter(Player* pl, UInt8 type) : _player(pl), _fgt(NULL), _type(type), _level(0), _soulMax(0), _potential(0), _capacity(0), _soulExtraAura(0), _soulAuraLeft(0), _soulSkillSoulOut(0), _tLevel(0), _tTurns(0), _tLastTurns(0), _soulSkillProtect(0)
     {
         memset(_citta, 0, sizeof(_citta));
         memset(_trump, 0, sizeof(_trump));
@@ -74,11 +74,12 @@ namespace GObject
         _soulExtraAura = fgt->getSoulExtraAura();
         _soulAuraLeft = fgt->getSoulAuraLeft();
         _soulSkillSoulOut = fgt->getSoulSkillSoulOut();
+        _soulSkillProtect = fgt->getSoulSkillProtect();
         _fgt->setName(pl->getName());
         writeDB();
     }
 
-    SingleHeroFighter::SingleHeroFighter(Player* pl, UInt8 cls, UInt8 type) : _player(pl), _fgt(NULL), _type(type), _level(0), _soulMax(0), _potential(0), _capacity(0), _soulExtraAura(0), _soulAuraLeft(0), _soulSkillSoulOut(0), _tLevel(0), _tTurns(0), _tLastTurns(0)
+    SingleHeroFighter::SingleHeroFighter(Player* pl, UInt8 cls, UInt8 type) : _player(pl), _fgt(NULL), _type(type), _level(0), _soulMax(0), _potential(0), _capacity(0), _soulExtraAura(0), _soulAuraLeft(0), _soulSkillSoulOut(0), _tLevel(0), _tTurns(0), _tLastTurns(0), _soulSkillProtect(0)
     {
         memset(_citta, 0, sizeof(_citta));
         memset(_trump, 0, sizeof(_trump));
@@ -120,16 +121,18 @@ namespace GObject
         _fgt->setAttrExtraEquip(attr);
     }
 
-    void SingleHeroFighter::setAttr2(UInt8 soulExtraAura, UInt8 soulAuraLeft, UInt16 soulSkillSoulOut, ElixirAttr& attr)
+    void SingleHeroFighter::setAttr2(UInt8 soulExtraAura, UInt8 soulAuraLeft, UInt16 soulSkillSoulOut, UInt16 soulSkillProtect, ElixirAttr& attr)
     {
         _soulExtraAura = soulExtraAura;
         _soulAuraLeft = soulAuraLeft;
         _soulSkillSoulOut = soulSkillSoulOut;
+        _soulSkillProtect = soulSkillProtect;
         _elixirattr = attr;
         _fgt->setElixirAttr(attr);
         _fgt->setSoulAuraLeft(soulAuraLeft);
         _fgt->setSoulExtraAura(soulExtraAura);
         _fgt->setSoulSkillSoulOut(soulSkillSoulOut);
+        _fgt->setSoulSkillProtect(soulSkillProtect);
     }
 
     void SingleHeroFighter::setPotential(float potential)
@@ -261,9 +264,9 @@ namespace GObject
             ElixirAttr& attr = _elixirattr;
             DB1().PushUpdateData("REPLACE INTO `sh_fighter_attr2`(`fighterId`, `playerId`, `type`, `soulExtraAura`, `soulAuraLeft`, `soulSkillSoulOut`, `elixir_strength`, `elixir_physique`, `elixir_agility`,"
                     " `elixir_intelligence`, `elixir_will`, `elixir_soul`, `elixir_attack`, `elixir_defend`, `elixir_critical`, `elixir_pierce`, `elixir_evade`, `elixir_counter`,"
-                    " `elixir_tough`, `elixir_action`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _player->getId(), _type,
+                    " `elixir_tough`, `elixir_action`, `soulSkillProtect`) VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _player->getId(), _type,
                     _soulExtraAura, _soulAuraLeft, _soulSkillSoulOut, attr.strength, attr.physique, attr.agility, attr.intelligence, attr.will, attr.soul, attr.attack, attr.defend, attr.critical,
-                    attr.pierce, attr.evade, attr.counter, attr.tough, attr.action);
+                    attr.pierce, attr.evade, attr.counter, attr.tough, attr.action, _soulSkillProtect);
         }
     }
 

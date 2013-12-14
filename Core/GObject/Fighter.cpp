@@ -93,6 +93,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _soulSkillSoulOut = 0;
     _hideFashion = 0;
     _innateTrump = NULL;
+    _soulSkillProtect = 0;
 }
 
 /*
@@ -5171,6 +5172,16 @@ UInt16 Fighter::getSoulSkillSoulOut()
         return 0;
 
     return m_2ndSoul->getSkillSoulOut();
+}
+
+UInt16 Fighter::getSoulSkillProtect()
+{
+    if(_soulSkillProtect)
+        return _soulSkillProtect;
+    if(!m_2ndSoul)
+        return 0;
+
+    return m_2ndSoul->getSkillProtect();
 }
 
 bool Fighter::practiceLevelUp()
