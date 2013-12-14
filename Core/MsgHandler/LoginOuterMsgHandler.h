@@ -3626,6 +3626,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         GObject::GVAR.SetVar(GObject::GVAR_QISHIBANGAME_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_QISHIBANGAME_END, end);
+        ret = 1 ;
     }
     else if (type == 10 && begin <= end )
     {
@@ -3638,11 +3639,12 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         if(GObject::GVAR.GetVar(GObject::GVAR_QZONE_RECHARGE_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_QZONE_RECHARGE_END) < TimeUtil::Now())
         {
-            GObject::globalPlayers.enumerate(player_enum_2, 9);
+            GObject::globalPlayers.enumerate(player_enum_2, 10);
         }
 
         GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_END, end);
+        ret = 1 ;
     }
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
