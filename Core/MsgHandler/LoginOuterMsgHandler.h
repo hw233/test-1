@@ -3645,7 +3645,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_END, end);
         ret = 1 ;
     }
-    else if (type == 12 && begin <= end )
+    else if (type == 13 && begin <= end )
     {
         if(GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_END) < TimeUtil::Now())
