@@ -25439,7 +25439,7 @@ void Player::GetPersonalAward(UInt8 opt)
             case 5:
                 {
                     if(GetQiShiBanScore() >= 8000)
-                        GetPackage()->AddItem(5006, 1, true, false, FromQiShiBan);
+                        GetPackage()->AddItem(5056, 1, true, false, FromQiShiBan);
                     else
                         return;
                 }
