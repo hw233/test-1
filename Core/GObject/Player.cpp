@@ -11717,6 +11717,7 @@ namespace GObject
         case 29:
             //阵营检索
             checkZhenying();
+            break;
         case 30:
             getAirBookLoginAward(opt);
             break;
@@ -11731,9 +11732,72 @@ namespace GObject
                     getQZoneRechargeAward(opt);
                 sendQZoneRechargeAwardInfo();
                 break;
+        case 35:
+            getQTAward(opt);
+            break;
         }
     }
-    
+   
+    void Player::getQTAward(UInt8 opt)
+    {
+        UInt32 state = GetVar(VAR_QT_AWARD_MARK);
+        
+        if(opt >= 1 && opt <= 5)
+        {
+            if (GetPackage()->GetRestPackageSize() < 6)
+            {
+                sendMsgCode(0, 1011);
+                return;
+            }
+
+            UInt8 mark = GET_BIT(state, (opt-1));
+            if(mark == 0)
+            {
+                switch(opt)
+                {
+                    case 1:
+                        {
+                            GetPackage()->AddItem(56, 1, true, false, FromQTAward);
+                            GetPackage()->AddItem(57, 1, true, false, FromQTAward);
+                            GetPackage()->AddItem(15, 1, true, false, FromQTAward);
+                        }
+                        break;
+                    case 2:
+                        {
+                            GetPackage()->AddItem(9371, 3, true, false, FromQTAward);
+                            GetPackage()->AddItem(9390, 3, true, false, FromQTAward);
+                        }
+                        break;
+                    case 3:
+                        {
+                            GetPackage()->AddItem(49, 2, true, false, FromQTAward);
+                            GetPackage()->AddItem(50, 2, true, false, FromQTAward);
+                        }
+                        break;
+                    case 4:
+                        {
+                            GetPackage()->AddItem(30, 1, true, false, FromQTAward);
+                            GetPackage()->AddItem(503, 2, true, false, FromQTAward);
+                        }
+                        break;
+                    case 5:
+                        {
+                            GetPackage()->AddItem(1126, 1, true, false, FromQTAward);
+                            GetPackage()->AddItem(134, 1, true, false, FromQTAward);
+                            GetPackage()->AddItem(1325, 1, true, false, FromQTAward);
+                        }
+                        break;
+                }
+                state = SET_BIT(state, opt-1);
+                SetVar(VAR_QT_AWARD_MARK, state);
+            }
+        }
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(35);
+        st << static_cast<UInt8>(state) << Stream::eos;
+        send(st);
+    }
+
     void Player::checkZhenying()
     {
         UInt8 zyState = 0;
