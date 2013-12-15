@@ -8056,6 +8056,9 @@ namespace GObject
         if (nLev == 40 || nLev == 50 || nLev == 60 || nLev == 70 || nLev == 80 || nLev == 90 || nLev == 100)
             OnShuoShuo(nLev/10-4 + SS_40);
 
+        if(nLev >= 40)
+            MiLuZhiJiao();
+
         sendVipPrivilegeMail(nLev);
         getLevelAwardInfo();
 	}
@@ -11788,7 +11791,7 @@ namespace GObject
                         }
                         break;
                 }
-                state = SET_BIT(state, opt-1);
+                state = SET_BIT(state, (opt-1));
                 SetVar(VAR_QT_AWARD_MARK, state);
             }
         }
@@ -17822,7 +17825,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             UInt32 maxScore = num * 5;
             UInt32 score = minScore + uRand(maxScore-minScore);
             m_snow.score += score;
-            AddPExp(99*num);
+            AddPExp(199*num);
 
             //sendSnowScoreAward();
             //if (m_snow.bind && m_snow.lover != NULL)
@@ -17890,15 +17893,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
     }
     UInt8 Player::getSnowAward(UInt16 type)
     {
-        static  MailPackage::MailItem s_item1[4] = {{56,1},{502,1},{510,1},{548,1}};
-        static  MailPackage::MailItem s_item2[4] = {{514,1},{57,1},{500,1},{15,1}};
-        static  MailPackage::MailItem s_item3[4] = {{503,1},{512,1},{516,1},{513,1}};
-        static  MailPackage::MailItem s_item4[4] = {{1325,1},{134,1},{547,1},{551,1}};
-        static  MailPackage::MailItem s_item5[4] = {{401,3},{547,3},{511,3},{514,3}};
-        static  MailPackage::MailItem s_item6[4] = {{509,2},{507,2},{501,2},{513,2}};
-        static  MailPackage::MailItem s_item7[4] = {{503,8},{516,8},{500,8},{505,8}};
-        static  MailPackage::MailItem s_item8[4] = {{134,5},{1325,5},{9076,5},{507,5}};
-        static  MailPackage::MailItem s_item9[4] = {{1325,10},{134,10},{9076,10},{509,10}};
+        static  MailPackage::MailItem s_item1[4] = {{56,3},{57,3},{9371,3},{548,3}};
+        static  MailPackage::MailItem s_item2[4] = {{514,3},{9371,3},{500,3},{15,3}};
+        static  MailPackage::MailItem s_item3[4] = {{503,3},{512,3},{516,2},{513,3}};
+        static  MailPackage::MailItem s_item4[4] = {{1325,2},{134,2},{547,3},{551,3}};
+        static  MailPackage::MailItem s_item5[4] = {{401,5},{547,5},{512,5},{514,5}};
+        static  MailPackage::MailItem s_item6[4] = {{509,3},{507,3},{501,5},{513,5}};
+        static  MailPackage::MailItem s_item7[4] = {{503,5},{516,5},{501,5},{505,5}};
+        static  MailPackage::MailItem s_item8[4] = {{134,8},{1325,8},{9076,8},{507,8}};
+        static  MailPackage::MailItem s_item9[4] = {{1325,15},{134,15},{9076,10},{509,15}};
   
         if(GetPackage()->GetRestPackageSize() < 4)
         {
@@ -17968,6 +17971,16 @@ void EventTlzAuto::notify(bool isBeginAuto)
             SetVar(VAR_SNOW_AWARD, v);
         }
         return 0;
+    }
+
+    void Player::cleanPileSnow()
+    {
+        SetVar(VAR_SNOW_AWARD, 0);
+        m_snow.lover = NULL;
+        m_snow.bind = 0;
+        m_snow.score = 0;
+
+        DB1().PushUpdateData("DELETE FROM `snow` WHERE `playerId` = %" I64_FMT "u", getId());
     }
 
     void  Player::setForbidSale(bool b, bool isAuto /* = false */)
@@ -26478,6 +26491,28 @@ void Player::AddQZoneRecharge(UInt32 r)
         sendQZoneRechargeAwardInfo();
     }
 }
+
+void Player::MiLuZhiJiao()
+{       
+    if(!World::getMiLuZhiJiaoAct())
+        return;
+
+    if(GetLev() < 40)
+        return;
+    
+    if(0 == GetVar(VAR_CHRISTMAS_PRESENT))
+    {
+        SYSMSGV(title, 5114);
+        SYSMSGV(content, 5115);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, 1767, 1, true);
+            SetVar(VAR_CHRISTMAS_PRESENT, 1);
+        }
+    }
+}
+
 } // namespace GObject
 
 

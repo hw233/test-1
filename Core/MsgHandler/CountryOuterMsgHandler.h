@@ -1393,7 +1393,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
-    
+   
+    pl->MiLuZhiJiao();
     if(atoi(pl->getDomain()) == 23)
     {
         if(!pl)

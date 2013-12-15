@@ -239,6 +239,7 @@ Player* World::spreadKeeper = NULL;
 UInt32 World::spreadBuff = 0;
 UInt8 World::_arenaState = 0;      //0:无 1:仙界第一 2:仙界至尊
 bool World::_memcinited = false;
+bool World::_miluzhijiao = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -1281,7 +1282,7 @@ void World::World_Midnight_Check( World * world )
     bQingrenEnd = bQingren && !getQingren();
     bGuoqingEnd = bGuoqing && !getGuoqing();
     bXiaoyaoEnd = bXiaoyao && !get9215Act();
-    bSnowEnd = bSnowAct && !getSnowAct();
+    bSnowEnd = bSnowAct && !getSnowAct(300);
     bGoldSnakeEnd = bGoldSnakAct && !getGoldSnakeAct();
     bRechargeEnd = bRecharge && !(getRechargeActive()||getRechargeActive3366());
     bConsumeEnd = bConsume && !getConsumeActive();
@@ -3218,49 +3219,95 @@ void World::DivorceSnowPair(Player* pl)
 void World::SendSnowAward()
 {
     static MailPackage::MailItem s_item[][3] = {
+        {{515,30},{1325,30},{134,30}},
+        {{515,20},{1325,20},{134,20}},
+        {{515,15},{1325,15},{134,15}},
         {{515,10},{1325,10},{134,10}},
-        {{515,8},{1325,8},{134,8}},
-        {{515,5},{1325,5},{134,5}},
-        {{514,10},{1325,3},{134,3}},
-        {{500,3},{503,3}}
+        {{514,15},{1325,5},{134,5}},
+        {{500,10},{503,5}}
     };
-    static MailPackage::MailItem s_card[2] = {{9276,1},{9277,1}};
-    UInt32 pos = 0;
+    static MailPackage::MailItem s_card[2] = {{9927,1},{9928,1}};
 
   //  globalPlayers.enumerate(enum_snow_score, static_cast<void *>(NULL));
-    SYSMSG(title, 4114);
-    for(SnowPlayersIt qpIt = _snowPlayerSet.begin(); qpIt != _snowPlayerSet.end() && pos < 99; ++ qpIt, ++ pos)
-    {
-        if (pos >= 50)
+    
+    UInt8 mark = 0;
+    std::string str = ""; 
+    SYSMSG(title1, 5110);
+    for(SnowPlayersIt iter = _snowPlayerSet.begin(); iter != _snowPlayerSet.end() && mark < 3; ++iter, ++mark)
+    {   
+        UInt8 sex1 = 0;
+        UInt8 sex2 = 0;
+        UInt32 totalScore = 0;
+        SnowPair* sp = *(iter);
+        if(sp->p1.lover->IsMale())
+            sex1 = 0;
+        else
+            sex1 = 1;
+
+        if(sp->p2.lover->IsMale())
+            sex2 = 0;
+        else
+            sex2 = 1;
+
+        totalScore = sp->p1.score + sp->p2.score;
+        SYSMSGV(buf, 5112, mark+1, sex1, sp->p1.lover->getName().c_str(), sex2, sp->p2.lover->getName().c_str(), totalScore);
+        str += buf;
+
+        if(2 == mark || mark == _snowPlayerSet.size() - 1)
+        {
+            SYSMSGV(buf, 5113, str.c_str());
+            str = buf;
             break;
+        }
+    }
+
+    UInt32 pos = 0;
+    SYSMSG(title, 4114);
+    for(SnowPlayersIt qpIt = _snowPlayerSet.begin(); qpIt != _snowPlayerSet.end() /*&& pos < 99*/; ++ qpIt, ++ pos)
+    {
+        /*if (pos >= 50)
+            break;*/
         SnowPair* qp = *(qpIt);
         Player* player[2];
         player[0] = qp->p1.lover;
         player[1] = qp->p2.lover;
+        UInt32 score = qp->p1.score + qp->p2.score;
         for(int idx = 0; idx < 2; ++idx)
         {
             Player* pl = player[idx];
+            if(pl == NULL)
+                continue;
+            
             Player* lover = pl->getSnowLover();
-            SYSMSGV(content, 4115, lover->getName().c_str(), pos+1);
-            Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-            if(mail)
+            if(lover == NULL)
+                continue;
+
+            SYSMSGV(content1, 5111, score, pos+1, str.c_str());
+            pl->GetMailBox()->newMail(NULL, 0x01, title1, content1);
+
+            if(pos < 50)
             {
-                int i = pos;
-                int count = 3;
-                if (i >= 3 && i <= 9) i = 3;
-                if (i >= 10 && i <= 19) i = 4;
-                if (i >= 20 && i <= 49)
+                SYSMSGV(content, 4115, lover->getName().c_str(), pos+1);
+                Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail)
                 {
-                    i = 5;
-                    count = 2;
-                }
-                mailPackageManager.push(mail->id, s_item[i], count, true);
-                if (i == 0)
-                {
-                    if (pl->IsMale())
-                        mailPackageManager.push(mail->id, &s_card[0], 1, false);
-                    else
-                        mailPackageManager.push(mail->id, &s_card[1], 1, false);
+                    int i = pos;
+                    int count = 3;
+                    if (i >= 3 && i <= 9) i = 3;
+                    if (i >= 10 && i <= 19) i = 4;
+                    if (i >= 20 && i <= 49)
+                    {
+                        i = 5;
+                        count = 2;
+                    }
+                    mailPackageManager.push(mail->id, s_item[i], count, true);
+                    if (i == 0)
+                    {
+                        if (pl->IsMale())
+                            mailPackageManager.push(mail->id, &s_card[0], 1, false);
+                        else
+                            mailPackageManager.push(mail->id, &s_card[1], 1, false);
+                    }
                 }
             }
         }
