@@ -58,6 +58,7 @@ MSG_REG_2(LoginMsgHdr,SPEQ::SHSTAGEONOFF, SHStageOnOff);
 MSG_REG_2(LoginMsgHdr,SPEQ::QUERYSHSTAGEONOFF, QuerySHStageOnOff);
 MSG_REG_2(LoginMsgHdr,SPEQ::ACTIVITYONOFF, ControlActivityOnOff);
 MSG_REG_2(LoginMsgHdr,SPEQ::QUERYACTIVITYONOFF, QueryOneActivityOnOff);
+MSG_REG_2(LoginMsgHdr,SPEQ::SETVAR, SetPlayersVar);
 
 MSG_REG_2(LoginMsgHdr,SPEQ::BIGLOCKUSER,BigLockUser);
 MSG_REG_2(LoginMsgHdr,SPEQ::BIGUNLOCKUSER,BigUnlockUser);

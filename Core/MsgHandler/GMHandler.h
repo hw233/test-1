@@ -118,6 +118,7 @@ private:
     void OnInstantLogin(GObject::Player *player, std::vector<std::string>&);
     void OnSetLoginLimit(GObject::Player *player, std::vector<std::string>&);
     void OnSysUpdate(GObject::Player *player, std::vector<std::string>&);
+    void OnSetPlayersVar(GObject::Player *player, std::vector<std::string>&);
 
     void OnSetBosslevel(GObject::Player *player, std::vector<std::string>&);
     void OnQQVipKey(GObject::Player *player, std::vector<std::string>&);

@@ -26015,7 +26015,7 @@ void Player::BuyCompassChance(UInt8 counts)
 }
 void Player::SetNovLogin()
 {
-    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 timeBegin = TimeUtil::MkTime(2013,12,13);
     UInt32 now = TimeUtil::Now();
     UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 +1;
     if(now < timeBegin)
@@ -26031,7 +26031,7 @@ void Player::sendNovLoginInfo()
 {
     UInt32 novLogin = GetVar(VAR_NOV_LOGIN);
     UInt32 novLoginAward = GetVar(VAR_NOV_LOGIN_AWARD); 
-    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 timeBegin = TimeUtil::MkTime(2013,12,13);
     UInt32 now = TimeUtil::Now();
     UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400;
     if(now < timeBegin)
@@ -26075,7 +26075,7 @@ void Player::getNovLoginAward(UInt8 type)
 {
     if(type <1 ||type >3)
         return ;
-    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 timeBegin = TimeUtil::MkTime(2013,12,13);
     UInt32 now = TimeUtil::Now();
     UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 ;
     if(now < timeBegin)
