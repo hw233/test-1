@@ -1849,15 +1849,14 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
     UInt64 clan_uid;
-    br >> clan_uid;
     UInt64 pid;
-    br >> pid;
+    UInt16 serverNo;
     string talk_record;
-    br >> talk_record; 
+    br >> clan_uid >> pid >> talk_record >> serverNo; 
 
     if (cfg.merged)
     {
-        UInt32 serverNo = cfg.serverNo;
+        UInt32 serverNo = serverNo;
         pid |= (static_cast<UInt64>(serverNo) << 48);
     }
     else
@@ -1905,14 +1904,14 @@ void OnoffQQOpenid(LoginMsgHdr &hdr, const void* data)
     {
         UInt64 pid;
         UInt32 clanid;
+        UInt16 serverNo;
     } onOffQQ = {0};
     
-    br >> onOffQQ.pid >> onOffQQ.clanid;
+    br >> onOffQQ.pid >> onOffQQ.clanid >> onOffQQ.serverNo;
     
     if (cfg.merged)
     {
-        UInt32 serverNo = cfg.serverNo;
-        onOffQQ.pid |= (static_cast<UInt64>(serverNo) << 48);
+        onOffQQ.pid |= (static_cast<UInt64>(onOffQQ.serverNo) << 48);
     }
     GObject::Clan *clan = GObject::globalClans[onOffQQ.clanid];
 	GObject::Player * player = GObject::globalPlayers[onOffQQ.pid];
