@@ -1426,6 +1426,12 @@ void ServerWarMgr::calcFinalBet(int i)
                                         giveTeamLastAward(i, j+1, 1);
                                         EnumMailStruct mailStruct = EnumMailStruct(i, j+1, _session, true);
                                         globalPlayers.enumerate(server_sendMail, &mailStruct);
+                                        if(i == 0)  //天榜第一刷仙界boss
+                                        {
+                                            UInt8 type = 1;
+                                            GameMsgHdr hdr(0x1EB, WORKER_THREAD_WORLD, NULL, sizeof(type));
+                                            GLOBAL().PushMsg(hdr, &type);
+                                        }
                                     }
                                 }
                                 else    //内测区
@@ -1433,12 +1439,12 @@ void ServerWarMgr::calcFinalBet(int i)
                                     giveTeamLastAward_neice(ep, i, j+1, 1);
                                     EnumMailStruct mailStruct = EnumMailStruct(i, j+1, _session, true);
                                     globalPlayers.enumerate(server_sendMail, &mailStruct);
-                                }
-                                if(i == 0)  //天榜第一刷仙界boss
-                                {
-                                    UInt8 type = 1;
-                                    GameMsgHdr hdr(0x1EB, WORKER_THREAD_WORLD, NULL, sizeof(type));
-                                    GLOBAL().PushMsg(hdr, &type);
+                                    if(i == 0)  //天榜第一刷仙界boss
+                                    {
+                                        UInt8 type = 1;
+                                        GameMsgHdr hdr(0x1EB, WORKER_THREAD_WORLD, NULL, sizeof(type));
+                                        GLOBAL().PushMsg(hdr, &type);
+                                    }
                                 }
                             }
                         }
