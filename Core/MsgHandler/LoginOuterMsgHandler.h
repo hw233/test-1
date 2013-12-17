@@ -1848,15 +1848,14 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
-    UInt64 clan_uid;
-    UInt64 pid;
-    UInt16 serverNo;
+    UInt64 clan_uid = 0;
+    UInt64 pid = 0;
+    UInt16 serverNo = 0;
     string talk_record;
     br >> clan_uid >> pid >> talk_record >> serverNo; 
 
     if (cfg.merged)
     {
-        UInt32 serverNo = serverNo;
         pid |= (static_cast<UInt64>(serverNo) << 48);
     }
     else
