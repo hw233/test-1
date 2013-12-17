@@ -904,9 +904,11 @@ void ServerWarMgr::readFrom(BinaryReader& brd)
 		_progress = progress;
 		_notified = 0;
         fStatus = true;
+        if(_progress == e_war_nextbegin)
+            World::setArenaState(ARENA_XIANJIE_NONE);
 	}
     if(_progress != e_war_nextbegin)
-        GObject::World::setArenaState(GObject::ARENA_XIANJIE_CHUANQI);
+        World::setArenaState(ARENA_XIANJIE_CHUANQI);
 
 	switch(_progress)
 	{
