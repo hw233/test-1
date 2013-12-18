@@ -4371,6 +4371,10 @@ namespace GObject
             if(CheckFriendPray(pl->getId()))
                 st<<static_cast<UInt8>(1);
             else st<<static_cast<UInt8>(0);
+            st<<getBePrayednum(pl->getId());
+            
+            st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
+
             st<<Stream::eos;
 			send(st);
 			SYSMSG_SEND(132, this);
@@ -4403,6 +4407,8 @@ namespace GObject
         if(CheckFriendPray(pl->getId()))
             st<<static_cast<UInt8>(1);
         else st<<static_cast<UInt8>(0);
+        st<<getBePrayednum(pl->getId());
+        st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
         st<<Stream::eos;
 		send(st);
         SYSMSG_SEND(2341, this);
@@ -4505,6 +4511,8 @@ namespace GObject
         if(CheckFriendPray(pl->getId()))
             st<<static_cast<UInt8>(1);
         else st<<static_cast<UInt8>(0);
+        st<<getBePrayednum(pl->getId());
+        st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
         st<<Stream::eos;
 		send(st);
 		DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 1, %" I64_FMT "u)", getId(), pl->getId());
@@ -4615,6 +4623,7 @@ namespace GObject
                   st<<static_cast<UInt8>(1);
                 else st<<static_cast<UInt8>(0);
                 st<<getBePrayednum(pl->getId());
+                st<<static_cast<UInt8>(pl->GetVar(VAR_OLDMAN_PRESENT));
                 // std::cout <<pl->getId()<<"@!@# "<<pl->GetVar(VAR_PRAY_TYPE)<<"!!@!"<<pl->GetVar(VAR_PRAY_VALUE)<<std::endl;
                 ++it;
             }
@@ -4714,6 +4723,7 @@ namespace GObject
             st<<static_cast<UInt8>(1);
         else st<<static_cast<UInt8>(0);
         st<<getBePrayednum(other->getId());
+        st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
         st<< Stream::eos;
         send(st);
     }
@@ -11735,9 +11745,21 @@ namespace GObject
             getGameBoxAward(opt);
                 break;
         case 33:
-                if(opt>0)
-                    getQZoneRechargeAward(opt);
-                sendQZoneRechargeAwardInfo();
+                { 
+                    if(opt>0)
+                        getQZoneRechargeAward(opt);
+                    sendQZoneRechargeAwardInfo();
+                }
+                break;
+        case 34:
+                {
+                    if(opt>0)
+                        getHappyValueAward(opt);
+                    sendHappyValueInfo();
+                    UInt32 grade = GetVar(VAR_YEARHAPPY_VALUE);
+                    GameMsgHdr hdr1(0x1DA, WORKER_THREAD_WORLD, this, sizeof(grade));
+                    GLOBAL().PushMsg(hdr1, &grade);
+                }
                 break;
         case 35:
             getQTAward(opt);
@@ -26594,8 +26616,6 @@ void Player::sendQZoneRechargeAwardInfo()
     st << static_cast<UInt8>(QZoneRechargeAward);
     st << Stream::eos;
     send(st);
-    
-
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
@@ -26629,7 +26649,252 @@ void Player::MiLuZhiJiao()
     }
 }
 
-} // namespace GObject
+void Player::GetFindOldManAward(UInt32 type)
+{
+    if(!World::getOldManTime())
+        return ;
+    if(GetLev()<45)
+    {
+        SYSMSG_BROADCASTV(2109, GetLev(), 45 );
+        return ; 
+    }
+    if(type ==0)
+        return ;
+    UInt8 num = 1 ;
+    if(type < 11)
+    {
+        num =2;
+        SYSMSG_BROADCASTV(574, getCountry(), getPName(), type );
+    }
+    GetPackage()->AddItem(9439, num, true, false);   //欢乐礼包(9439)
+    AddVar(VAR_OLDMAN_DAYSCORE,num*10);
+    AddVar(VAR_OLDMAN_SCORE,num*10);
+    SYSMSG_SENDV(2024,this,num*10);
+    SYSMSG_SENDV(2025,this,num*10);
+}
 
+void Player::getInterestingAward(UInt8 type)
+{
+    if(!World::getOldManTime())
+        return ;
+    UInt32 ScoreAward = 0;
+    UInt32 Score = 0;
+    if(type == 0 )
+    {
+        Score = GetVar(VAR_OLDMAN_DAYSCORE);
+        ScoreAward = GetVar(VAR_OLDMAN_DAYSCORE_AWARD);
+        if( Score < 30 || ScoreAward == 1)
+            return ;
+    }
+    else
+    {
+        ScoreAward = GetVar(VAR_OLDMAN_SCORE_AWARD);
+        Score = GetVar(VAR_OLDMAN_SCORE);
+        if( Score < type * 100 || ScoreAward &(1 << (type-1)))
+            return ;
+    }
+    if(!GameAction()->RunInterestingAward(this, type))
+    {
+        return;
+    }
+    if(type ==0)
+        SetVar(VAR_OLDMAN_DAYSCORE_AWARD,1);
+    else
+    {
+        ScoreAward |= (1<<(type-1));
+        SetVar(VAR_OLDMAN_SCORE_AWARD,ScoreAward);
+    }
+}
+void Player::sendInterestingBag(Player* pl)
+{
+    if(!World::getOldManTime())
+        return ;
+    if(!pl->isOnline())
+    {
+        sendMsgCode(0, 2218);
+        return ;
+    }
+    ItemBase* item = GetPackage()->GetItem(9439, true);					
+    if(item ==NULL)
+        return ;
+    UInt16 count = item->Count();
+    if(count <1)
+        return; 
+    if(!GameAction()->RunInterestingBag(this, 0))
+    {
+        return;
+    }
+    GetPackage()->DelItem2(item, 1);
+    GetPackage()->AddItemHistoriesLog(9439, 1);
+    UInt64 id = getId();
+    GameMsgHdr hdr(0x356, pl->getThreadId(),pl,sizeof(id) );
+    GLOBAL().PushMsg(hdr, &id);
+    SYSMSG_SEND(190, this);
+}
+void Player::getInteresingBag(UInt64 pid)
+{
+    Player* player = globalOnlinePlayers[pid];
+    if(player==NULL)
+        return ;
+    if(!World::getOldManTime())
+        return ;
+    UInt32 counts = GetVar(VAR_OLDMAN_PRESENT);
+    SYSMSG(title, 4974);
+    if(counts <10)
+    {
+        SYSMSGV(content, 4975,player->getCountry(),player->getName().c_str());
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[] = {{56, 1},{57,1},{500,1},{9371,1},{511,1},{505,1},{503,1}};
+            UInt32 chance[] = {2500,5000,7000,8000,9000,9500,10000};
+            UInt32 rand = uRand(10000);
+            UInt8 k =0;
+            for(;k<7;++k)
+            {
+                if(rand < chance[k])
+                    break;
+            }
+            MailItemsInfo itemsInfo(mitem, Activity, 1);
+            mailPackageManager.push(mail->id, &mitem[k], 1, true);
+            std::string strItems;
+            for (int i = 0; i < 1; ++i)
+            {
+                strItems += Itoa(mitem[k].id);
+                strItems += ",";
+                strItems += Itoa(mitem[k].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+    else 
+    {
+        SYSMSGV(content, 4976,player->getCountry(),player->getName().c_str());
+        Mail * mail = m_MailBox->newMail(NULL, 0x01, title, content, 0xFFFE0000);
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, NULL, mail->recvTime);
+    }
+    AddVar(VAR_OLDMAN_PRESENT,1);
+}
+void Player::sendOldManPos(UInt8 type)
+{
+    if(!World::getOldManTime())
+        return ;
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = now- TimeUtil::SharpDay(0, now);
+    if(time < 7*3600 || time > 20*3600)
+        return ;
+    if(GetLev()<45)
+    {
+        SYSMSG_BROADCASTV(2109, GetLev(), 45 );
+        return ; 
+    }
+    UInt32 gold = 5;
+    if(type==0)
+    {
+        UInt32 flag = GetVar(VAR_OLDMAN_SCORE_AWARD);
+        if(flag & (1<<8))
+            return ;
+        if (getGold() < gold)
+        {
+            sendMsgCode(0, 1104);
+            return ;
+        }
+        SetVar(VAR_OLDMAN_SCORE_AWARD , flag |(1<<8));
+        ConsumeInfo ci(SearchOldMan,0,0);
+        useGold(gold,&ci);
+    }
+    UInt16 pos = WORLD()._oldMan._spot;
+    UInt8 loc = WORLD()._oldMan._loc;
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x26) << static_cast<UInt8>(0x01)<<static_cast<UInt8>(0) << loc<< pos<<Stream::eos;
+    send(st); 
+}
+void Player::sendInteresingInfo()
+{
+    UInt32 DayInteres = GetVar(VAR_OLDMAN_DAYSCORE);
+    UInt32 Interes = GetVar(VAR_OLDMAN_SCORE);
+    UInt32 DayAward = GetVar(VAR_OLDMAN_DAYSCORE_AWARD);
+    UInt32 Award = GetVar(VAR_OLDMAN_SCORE_AWARD);
+    UInt32 counts = GetVar(VAR_OLDMAN_PRESENT);
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x26) << static_cast<UInt8>(0x02);;
+    st<< DayInteres <<Interes ;
+    st<< static_cast<UInt8>(DayAward) <<static_cast<UInt8>(Award) ;
+    st << static_cast<UInt8>(counts);
+    st<<Stream::eos;
+    send(st); 
+}
+void Player::sendOldManLeftTime()
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = TimeUtil::Now()-TimeUtil::SharpDayT( 0 , now); 
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x26) << static_cast<UInt8>(0x01) <<static_cast<UInt8>(0x01);
+    if(time < 8*3600 )
+        st <<static_cast<UInt8>(0)<<static_cast<UInt32>( 8*3600 - time ); 
+    else if(time < 20*3600 )
+        st<< static_cast<UInt8>(1)<<static_cast<UInt32>(3600-time%3600);
+    else 
+        st<<static_cast<UInt8>(2)<<static_cast<UInt32>(0); 
+    st <<Stream::eos;
+    send(st);
+}
+void Player::AddYearHappyValue(UInt32 val,UInt8 flag)
+{
+    if(!World::getHappyFireTime())
+        return ;
+//    std::cout<<val<<std::endl;
+    if(flag !=0)
+    {
+        AddVar(VAR_YEARHAPPY_DAYVALUE,val);
+        AddVar(VAR_YEARHAPPY_VALUE,val);
+        AddVar(VAR_YEARHAPPY_LEFTVALUE,val);
+        UInt32 grade = GetVar(VAR_YEARHAPPY_VALUE);
+        GameMsgHdr hdr1(0x1DB, WORKER_THREAD_WORLD, this, sizeof(grade));
+        GLOBAL().PushMsg(hdr1, &grade);
+    }
+    else
+    {
+        SYSMSG_SENDV(2022,this,val);
+        SYSMSG_SENDV(2023,this,val);
+    }
+}
+void Player::sendHappyValueInfo()
+{
+    UInt32 DayValue = GetVar(VAR_YEARHAPPY_DAYVALUE);
+    UInt32 Value = GetVar(VAR_YEARHAPPY_VALUE);
+    UInt32 LeftValue = GetVar(VAR_YEARHAPPY_LEFTVALUE);
+    UInt32 DayValueAward = GetVar(VAR_YEARHAPPY_DAYVALUE_AWARD);
+    Stream st(REP::GETAWARD);   //协议
+    st << static_cast<UInt8>(34);
+    st << static_cast<UInt32>(Value);
+    st << static_cast<UInt32>(DayValue);
+    st << static_cast<UInt32>(LeftValue);
+    st << static_cast<UInt8>(DayValueAward);
+    st << Stream::eos;
+    send(st);
+}
+void Player::getHappyValueAward(UInt8 val)
+{
+    if (!World::getHappyFireTime())
+        return;
+    UInt32 score[]={20,40,60,80,100};
+    UInt32 value = GetVar(VAR_YEARHAPPY_DAYVALUE);
+    if(val<1||val>5)
+        return ;
+    if(value < score[val-1])
+        return ;
+    UInt32 ctslandingAward = GetVar(VAR_YEARHAPPY_DAYVALUE_AWARD);
+    if(ctslandingAward & (1<<(val-1)))
+        return ;
+    if(!GameAction()->RunHappyValueAward(this, val))
+    {
+        return;
+    }
+    ctslandingAward |= (1<<(val - 1));
+    SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
+}
+} // namespace GObject
 
 

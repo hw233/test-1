@@ -9,6 +9,7 @@
 #include "Fighter.h"
 #include "TaskMgr.h"
 #include "EventBase.h"
+#include "MapCollection.h"
 #include "ChatItem.h"
 #include "Announce.h"
 #include "Dungeon.h"
@@ -151,6 +152,7 @@ bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
 bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
+bool World::_happyFire = false;
 bool World::_11time = false;
 bool World::_ggtime = false;
 bool World::_qzoneRechargetime = false;
@@ -202,6 +204,7 @@ RCSortType World::popularitySort;
 RCSortType World::LuckyBagSort;
 RCSortType World::PlayerGradeSort;
 RCSortType World::guangGunSort;
+RCSortType World::happyFireSort;
 ClanGradeSort World::clanGradeSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
@@ -232,6 +235,7 @@ UInt8 World::_snakespringequipact = 0;
 /** 场外活动 **/
 stArenaExtra World::stArenaOld[2];
 stArenaExtra World::stArena;
+stOldMan World::_oldMan ;
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
@@ -318,6 +322,7 @@ bool bXiaoyaoEnd = false;
 bool bFoolBaoEnd =  false;
 bool bHalfGoldEnd = false;
 bool bSurnameLegendEnd = false;
+bool bHappyFireEnd = false;
 bool b11TimeEnd = false;
 bool bGGTimeEnd = false;
 bool bSnowEnd = false;
@@ -1187,6 +1192,7 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bfoolbao = getFoolBao();
     bool bsurnamelegend = getSurnameLegend();
+    bool bhappyfirend = getHappyFireTime();
     bool b11time = get11Time();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
@@ -1227,10 +1233,12 @@ void World::World_Midnight_Check( World * world )
     bJuneEnd = bJune && !getJune();
     //愚公宝箱是否结束
     bFoolBaoEnd =  bfoolbao && !getFoolBao(); 
-   // 
+   // GVAR控制的时间记住加300秒结算
     bHalfGoldEnd = bhalfgold && !getHalfGold();
     //蜀山传奇掉落活动是否结束
     bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
+    //跨年大转盘
+    bHappyFireEnd = bhappyfirend && !getHappyFireTime(300);
     b11TimeEnd = b11time && !get11Time();
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
@@ -1357,6 +1365,11 @@ void World::World_Midnight_Check( World * world )
         world->SendItem9343Award();
      if (bQiShiBanEnd)
         world->SendQiShiBanAward();
+    if(bHappyFireEnd)
+        world->SendHappyFireAward();
+  //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
+  //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
+  //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
  
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -1440,7 +1453,96 @@ void World::World_Boss_Refresh(void*)
 {
     worldBoss.process(TimeUtil::Now());
 }
+inline bool player_enum_AskOldMan(GObject::Player * p, int)
+{
+    UInt32 flag = p->GetVar(VAR_OLDMAN_SCORE_AWARD);
+    if(flag&(1<<8))
+    {
+        flag &= 255;
+        p->SetVar(VAR_OLDMAN_SCORE_AWARD,flag);
+    }
+    return true;
+}
 
+void World::World_OldMan_Refresh(void *)
+{
+    if(!getOldManTime())
+        return ;
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = now - TimeUtil::SharpDay(0, now);
+  //  std::cout<<time-8*3600+300<<std::endl;
+    if(time >= 8*3600 - 300 - 2 && time < 8*3600 - 300 +3 )
+    {
+    //    std::cout<<"即将出现"<<std::endl;
+        SYSMSG_BROADCASTV(571); 
+    }
+    else if ( time < 7 *3600  )
+    {
+      //  std::cout<<"End"<<std::endl;
+        return ;
+    }
+    else if(time > 20*3600 + 5)
+    {
+       if(!_oldMan._spot) 
+           return ;
+       UInt8 thrId = mapCollection.getCountryFromSpot(_oldMan._spot);
+       struct MapNpc
+       {
+           UInt16 loc;
+           UInt32 npcId;
+       };
+       MapNpc mapNpc = {_oldMan._spot, 4243};
+       GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
+       GLOBAL().PushMsg(hdr1, &mapNpc);
+       _oldMan._loc = 0;
+       _oldMan._spot = 0 ;
+    }
+    else if( (time%3600) < 3 || (time%3600)>= 3600 -2 )
+   // else if ((time%600) < 3 || (time%600)>= 600 -2)    //测试
+    {
+        UInt16 spot = GetRandomSpot();
+        std::cout<<"ChangeTo:"<<spot<<std::endl;
+        if(!spot)
+            return ;
+        if(_oldMan._spot == 0)
+        {
+            SYSMSG_BROADCASTV(572,spot); 
+        }
+        else 
+        {
+            SYSMSG_BROADCASTV(573,spot); 
+        }
+        UInt8 thrId = mapCollection.getCountryFromSpot(_oldMan._spot);
+        struct MapNpc
+        {
+            UInt16 loc;
+            UInt32 npcId;
+        };
+        MapNpc mapNpc = {_oldMan._spot, 4243};
+        GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
+        GLOBAL().PushMsg(hdr, &mapNpc);
+
+        _oldMan._spot = spot;
+        _oldMan._players.clear();
+        GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
+        GObject::MOData mo;
+        mo.m_ID = 4243;
+        mo.m_Hide = false;
+        mo.m_Spot = _oldMan._spot;
+        mo.m_Type = 100;
+        mo.m_ActionType = 0;
+        GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
+        GLOBAL().PushMsg(hdr1, &mo);
+    }
+    else if ((time%600) < 3 || (time%600)>= 600 -2)     
+   // else if ((time%180) < 3 || (time%180)>= 180 -2)         //测试
+    {
+        if(!_oldMan._spot)
+            return ;
+        SYSMSG_BROADCASTV(572,_oldMan._spot); 
+    }
+
+}
 void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
@@ -1886,6 +1988,8 @@ bool World::Init()
     AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
 	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
     
+    if(now < GVAR.GetVar(GVAR_OLDMAN_END) )
+            AddTimer(5 * 1000, World_OldMan_Refresh, static_cast<void*>(NULL), 5 * 1000);
     //开服战世界boss
     UInt32 value = GVAR.GetVar(GVAR_SERVERWAR_XIUWEI);
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
@@ -2104,6 +2208,16 @@ void World::SendLuckyDrawAward()
     }
 }
 
+UInt32 World::FindTheOldMan(Player* pl)
+{
+    UInt16 loc = pl->getLocation();
+    if(_oldMan._spot != loc)
+        return 0;
+    if(_oldMan._players.find(pl->getId())!= _oldMan._players.end())
+        return 0;
+    _oldMan._players.insert(pl->getId());
+    return _oldMan._players.size();
+}
 bool enum_openact(void * ptr, void * v)
 {
 	Player * pl = static_cast<Player *>(ptr);
@@ -2778,6 +2892,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
                 s.total = used;
                 World::guangGunSort.insert(s);
             }
+        }
+    }
+    if (World::getHappyFireTime())
+    {
+        UInt32 used = p->GetVar(VAR_YEARHAPPY_VALUE);
+        if (used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::happyFireSort.insert(s);
         }
     }
     return true;
@@ -3531,6 +3656,30 @@ UInt32 World::GetMemCach_qishiban(const char * openId)
 
     return score;
 }
+UInt16 World::GetRandomSpot()
+{
+    GObject::MapList::iterator it;
+    UInt16 count = 0;
+    for (it = mapList.begin(); it != mapList.end(); ++ it)
+    {
+        if(*it)
+            ++ count;
+    }
+    UInt16 index = uRand(count);
+    count = 0;
+    for (it = mapList.begin(); it != mapList.end(); ++ it)
+    {
+        if(*it)
+        {
+            if (count ++ == index)
+            {
+                _oldMan._loc = (*it)->GetMapData().m_ID;
+                return (*it)->GetRandomSpot(9);
+            }
+        }
+    }
+    return 0;
+}
 
 void World::SendGuangGunAward()    //待定
 {
@@ -3590,5 +3739,62 @@ void World::SendGuangGunAward()    //待定
     }
 }
 
+void World::SendHappyFireAward()
+{
+    World::initRCRank();
+    int pos = 0;
+    UInt8 type =0;
+    static MailPackage::MailItem s_item[][4] = {
+        {{515,30},{503,30},{509,25},{134,30}},
+        {{515,25},{503,25},{509,20},{134,25}},
+        {{515,20},{503,20},{509,15},{134,20}},
+        {{515,10},{503,10},{509,10},{134,10}},
+    };
+    static MailPackage::MailItem card = {9929,1};   //暂无白马王子
+    UInt8 mark = 0;
+    std::string str = "";
+    for(RCSortType::iterator iter = happyFireSort.begin(); iter != happyFireSort.end() && mark < 7; ++iter )
+    {
+        Player* play = iter->player;
+        if (!play)
+            continue;
+        UInt32 totalScore = iter->total;
+        SYSMSGV(buf, 4181, mark+1,play->getCountry(),play->getName().c_str(), totalScore);
+        str += buf;
+        if(6 == mark || mark == (happyFireSort.size()-1) )
+        {
+            SYSMSGV(buf, 4182, str.c_str());
+            str = buf;
+            break;
+        }
+        ++mark;
+    }
+    SYSMSG(title, 4177);
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSort.end(); i != e; ++i)
+    {
+        Player* play = i->player;
+        if (!play)
+            continue;
+        ++pos;
+        UInt32 score = i->total;
+        type = pos;
+        if( pos >3 &&pos <8)
+            type = 4;
+        SYSMSGV(content1, 4180, score, pos, str.c_str());
+        play->GetMailBox()->newMail(NULL, 0x01, title, content1);
+        if(type <5)
+        {
+            SYSMSGV(content, 4178, pos ,pos);
+            Mail * mail = play->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+            if(mail)
+            {
+                mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
+                if(pos ==1)
+                    mailPackageManager.push(mail->id, &card, 1, true);
+            }
+        }
+    }
+}
 }
 

@@ -227,7 +227,6 @@ function update_object()
     #. clearshiyamen.sh
     #mysql -h$H -u$U -p$P -P$PT $DBO < clanscore.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clan_battlescore.sql     #重置帮战积分
-
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
 }
 

@@ -4443,6 +4443,25 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_BEGIN, 0);
             GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+        case 19:
+            GVAR.SetVar(GVAR_OLDMAN_BEGIN, TimeUtil::SharpDayT(0, TimeUtil::Now()));
+            GVAR.SetVar(GVAR_OLDMAN_END, TimeUtil::SharpDayT(2, TimeUtil::Now()));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 20:
+            GVAR.SetVar(GVAR_OLDMAN_BEGIN, 0);
+            GVAR.SetVar(GVAR_OLDMAN_END, 0);
+        case 21:
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_BEGIN,TimeUtil::SharpDayT(0, TimeUtil::Now()));
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_END,TimeUtil::SharpDayT(2, TimeUtil::Now()));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 22:
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_BEGIN, 0);
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
     }
 }
@@ -4477,6 +4496,8 @@ void GMHandler::OnSendMsg(GObject::Player *player, std::vector<std::string>& arg
     }
 	GameMsgHdr hdr(type, player->getThreadId(), player, sizeof(value));
 	GLOBAL().PushMsg(hdr, value);
+	GameMsgHdr hdr1(type, WORKER_THREAD_WORLD, player, sizeof(value));
+	GLOBAL().PushMsg(hdr1, value);
 }
 
 void GMHandler::OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args)

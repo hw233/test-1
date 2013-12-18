@@ -46,6 +46,13 @@ struct MoneyIn
     int prestige;
 };
 
+struct stOldMan
+{
+    UInt8 _loc;
+    UInt16 _spot;
+    std::set<UInt64> _players;
+    stOldMan():_loc(0),_spot(0){}
+};
 struct stArenaExtra
 {
     UInt8 week;
@@ -560,6 +567,16 @@ public:
         else
             return false;
     } 
+    inline static bool  getOldManTime()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        UInt32 now = TimeUtil::Now() ;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
@@ -856,6 +873,17 @@ public:
         return _snowAct;
     }
 
+    inline static bool getHappyFireTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
+        UInt32 now = TimeUtil::Now()+time;
+        if( now >= begin && now <= end)
+            _happyFire = true;
+        else
+            _happyFire = false;
+        return _happyFire;
+    } 
     inline static bool getLuckyMeet(UInt32 time = 0)
     {
         UInt32 begin = GVAR.GetVar(GVAR_LUCKYMEET_BEGIN);
@@ -1025,9 +1053,11 @@ public:
     inline static UInt8 getSysDailogPlatform() { return m_sysDailogPlatform; }
     static Player* getSpreadKeeper();
     static UInt32 getSpreadCount();
+    static UInt32 FindTheOldMan(Player* pl); // 找到圣诞老人
 public:
     static UInt32 _moneyLogged;
     static MoneyIn _moneyIn[7][2];
+    static stOldMan _oldMan;
 
 	static int _activityStage;
 	static bool _actAvailable;//??????+6??
@@ -1144,6 +1174,7 @@ public:
     static bool _foolbao;
     static bool _summerFlow3;
     static bool _surnamelegend;
+    static bool _happyFire;
     static bool _11time;
     static bool _qishiban;
     static bool _ggtime;
@@ -1173,6 +1204,7 @@ public:
     static RCSortType PlayerGradeSort; //十一活动
     static ClanGradeSort clanGradeSort; // 十一活动
     static RCSortType guangGunSort; //十一活动
+    static RCSortType happyFireSort;     //七石板积分排名
     static void initRCRank();
     static void initRP7RCRank();
 
@@ -1199,6 +1231,7 @@ private:
 	static void World_Athletics_Check( void * );
     static void World_Boss_Refresh(void*);
     static void World_Boss_Prepare(void*);
+    static void World_OldMan_Refresh(void*);   //圣诞老人刷新
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
@@ -1252,6 +1285,8 @@ public:
     void SendSnowAward();
     void SendQiShiBanAward();
     void SendGuangGunAward();
+    static UInt16 GetRandomSpot();
+    void SendHappyFireAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();
