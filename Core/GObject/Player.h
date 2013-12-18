@@ -1949,7 +1949,7 @@ namespace GObject
         void RestCurStep();
         void ContinueCurStep();
         void Update_QSB_DB();
-        void CleanQiShiBan();
+        void CleanQiShiBan(UInt8 mark=0);
         void GetPersonalAward(UInt8 opt);
         UInt32 GetNextStepTime();
         UInt32 GetQQFriendScore(const char * openId);

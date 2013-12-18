@@ -4314,8 +4314,8 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
 inline bool player_enum_1(GObject::Player* p, int)
 {
     p->CleanQiShiBan();
-    if(p->GetVar(GObject::VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE) > 0)
-        p->SetVar(GObject::VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE, 0);
+    p->SetVar(GObject::VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE, 0);
+    GObject::World::qishibanScoreSort.clear();
 
     return true;
 }

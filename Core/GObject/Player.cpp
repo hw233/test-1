@@ -25212,10 +25212,10 @@ void Player::MyQSBInfo()
     UInt32 cycleHighestScore = GetVar(VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE);
 
     UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
-    if(GetQiShiBanScore() > highestScore)
+    if(cycleHighestScore > highestScore)
     {
-        WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId());
-        highestScore = GetQiShiBanScore();
+        WORLD().SetMemCach_qishiban(cycleHighestScore, getOpenId());
+        highestScore = cycleHighestScore;
     }
 
     UInt8 mark = 0;
@@ -25637,16 +25637,21 @@ void Player::Update_QSB_DB()
     DB1().PushUpdateData("REPLACE INTO `player_qishiban` VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u)", getId(), GetQiShiBanStep(), GetQiShiBanScore(), GetQiShiBanBeginTime(), GetQiShiBanEndTime(), GetQiShiBanAwardMark());
 }
 
-void Player::CleanQiShiBan()
+void Player::CleanQiShiBan(UInt8 mark)
 {
+    if(0 == mark)
+    {
+        SetQiShiBanBeginTime(0);
+        SetQiShiBanEndTime(0);
+        SetQiShiBanKey(0);
+    }
     SetQiShiBanScore(0);
     SetQiShiBanStep(0);
-    SetQiShiBanBeginTime(0);
+    /*SetQiShiBanBeginTime(0);
     SetQiShiBanEndTime(0);
-    SetQiShiBanKey(0);
+    SetQiShiBanKey(0);*/
     SetQiShiBanAwardMark(0);
-    if(GetVar(VAR_QISHIDOUFA_REST_NUM) > 0)
-        SetVar(VAR_QISHIDOUFA_REST_NUM, 0);
+    SetVar(VAR_QISHIDOUFA_REST_NUM, 0);
 
     DB1().PushUpdateData("DELETE FROM `player_qishiban` WHERE `playerId` = %" I64_FMT "u", getId());
 }

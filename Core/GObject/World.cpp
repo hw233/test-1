@@ -1170,7 +1170,7 @@ void SendKillMonsterRankAward()
 
 inline bool player_enum_3(GObject::Player* pl, int)
 {
-    pl->CleanQiShiBan();
+    pl->CleanQiShiBan(1);
 
     return true;
 }
