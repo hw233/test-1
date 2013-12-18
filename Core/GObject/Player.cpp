@@ -11739,9 +11739,132 @@ namespace GObject
                     getQZoneRechargeAward(opt);
                 sendQZoneRechargeAwardInfo();
                 break;
+        case 35:
+            getQTAward(opt);
+            break;
+        case 36:
+            setQTSign();
+            break;
         }
     }
-   
+
+    void Player::GMSetQTNUM(UInt8 num)
+    {
+        SetVar(VAR_QT_REGIST_NUM, num);
+        SetVar(VAR_QT_AWARD_MARK, 0);
+
+        UInt32 state = GetVar(VAR_QT_AWARD_MARK);
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(35);
+        st << static_cast<UInt8>(state) << Stream::eos;
+        send(st);
+        
+    }
+    void Player::setQTSpecialMark()
+    {
+        UInt32 day = 0;
+        UInt32 mon = 0;
+        UInt32 year = 0;
+        TimeUtil::GetDMY(&day, &mon, &year);
+        if(year != 2013 || mon != 12 || day < 13 || day > 31)
+        {
+            UInt32 specialMark = GetVar(VAR_QT_SPECIAL_MARK);
+            if(0 == specialMark)
+            {
+                SetVar(VAR_QT_REGIST_NUM, 6);
+                SetVar(VAR_QT_SPECIAL_MARK, 1);
+            }
+        }
+    }
+
+    void Player::setQTSign()
+    {
+        UInt32 registSign = GetVar(VAR_QT_REGIST_SIGN);
+        if(0 == registSign)
+        {
+            AddVar(VAR_QT_REGIST_NUM, 1);
+            SetVar(VAR_QT_REGIST_SIGN, 1);
+        }
+    }
+
+    void Player::getQTAward(UInt8 opt)
+    {
+        UInt32 state = GetVar(VAR_QT_AWARD_MARK);
+        
+        if(opt >= 1 && opt <= 5)
+        {
+            if (GetPackage()->GetRestPackageSize() < 6)
+            {
+                sendMsgCode(0, 1011);
+                return;
+            }
+
+            bool res = false;
+            UInt8 regNum = GetVar(VAR_QT_REGIST_NUM);
+            if(1 == opt)
+            {
+                if(regNum >= 1)
+                    res = true;
+            }
+            else if(5 == opt)
+            {
+                if(regNum >= 25)
+                    res = true;
+            }
+            else
+            {
+                if(regNum >= ((opt - 1) * 5))
+                    res = true;
+            }
+
+            UInt8 mark = GET_BIT(state, (opt-1));
+            if(mark == 0 && res)
+            {
+                switch(opt)
+                {
+                    case 1:
+                        {
+                            GetPackage()->AddItem(56, 1, true, false, FromQTAward);
+                            GetPackage()->AddItem(57, 1, true, false, FromQTAward);
+                            GetPackage()->AddItem(15, 1, true, false, FromQTAward);
+                        }
+                        break;
+                    case 2:
+                        {
+                            GetPackage()->AddItem(9371, 3, true, false, FromQTAward);
+                            GetPackage()->AddItem(9390, 3, true, false, FromQTAward);
+                        }
+                        break;
+                    case 3:
+                        {
+                            GetPackage()->AddItem(49, 2, true, false, FromQTAward);
+                            GetPackage()->AddItem(50, 2, true, false, FromQTAward);
+                        }
+                        break;
+                    case 4:
+                        {
+                            GetPackage()->AddItem(30, 1, true, false, FromQTAward);
+                            GetPackage()->AddItem(503, 2, true, false, FromQTAward);
+                        }
+                        break;
+                    case 5:
+                        {
+                            GetPackage()->AddItem(1126, 1, true, false, FromQTAward);
+                            GetPackage()->AddItem(134, 1, true, false, FromQTAward);
+                            GetPackage()->AddItem(1325, 1, true, false, FromQTAward);
+                        }
+                        break;
+                }
+                state = SET_BIT(state, (opt-1));
+                SetVar(VAR_QT_AWARD_MARK, state);
+            }
+        }
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(35);
+        st << static_cast<UInt8>(state) << Stream::eos;
+        send(st);
+    }
+
     void Player::checkZhenying()
     {
         UInt8 zyState = 0;

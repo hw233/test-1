@@ -284,6 +284,7 @@ GMHandler::GMHandler()
     Reg(3, "setxctcurval", &GMHandler::OnSetXCTCurVal);
     Reg(3, "setxctmaxval", &GMHandler::OnSetXCTMaxVal);
     Reg(3, "setxzvalue", &GMHandler::OnSetXCValue);
+    Reg(3, "setQT", &GMHandler::OnSetQTNum);
 
     Reg(2, "eqexp", &GMHandler::OnAddPetEquipExp);
     Reg(2, "task", &GMHandler::OnHandleTask);
@@ -536,6 +537,20 @@ void GMHandler::OnSetXCValue(GObject::Player * player, std::vector<std::string>&
         player->SetVar(VAR_XINGCHENZHEN_VALUE, xcValue);
         
         fgt->sendXingchenInfo(0);
+	}
+}
+
+void GMHandler::OnSetQTNum(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	if(args.size() == 1)
+	{
+		UInt8 num = atoi(args[0].c_str());
+        if(num > 31)
+            return;
+
+        player->GMSetQTNUM(num);
 	}
 }
 

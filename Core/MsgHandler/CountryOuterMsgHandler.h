@@ -1407,6 +1407,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     }
     pl->sendGuangGunInfo();
+    pl->setQTSpecialMark();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

@@ -220,6 +220,7 @@ private:
     void OnSetXCTCurVal(GObject::Player *player, std::vector<std::string>& args);
     void OnSetXCTMaxVal(GObject::Player *player, std::vector<std::string>& args);
     void OnSetXCValue(GObject::Player *player, std::vector<std::string>& args);
+    void OnSetQTNum(GObject::Player *player, std::vector<std::string>& args);
     void OnHandleTask(GObject::Player * player, std::vector<std::string>& args);
     void OnCompletedManyTask(GObject::Player* player, std::vector<std::string>& args);
     void OnGetMax(GObject::Player* player, std::vector<std::string>& args);

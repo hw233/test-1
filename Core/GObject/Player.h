@@ -2492,7 +2492,10 @@ namespace GObject
         UInt32 getFighterEquipAward();
         void checkZhenying();
         void changeZYAward(UInt8 country); 
-
+        void getQTAward(UInt8 opt);
+        void setQTSign();
+        void setQTSpecialMark();
+        void GMSetQTNUM(UInt8 num);
         // 帮派神像
         float getClanStatueHPEffect();
         float getClanStatueAtkEffect();
