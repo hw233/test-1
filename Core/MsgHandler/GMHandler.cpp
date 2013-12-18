@@ -269,6 +269,7 @@ GMHandler::GMHandler()
     Reg(2, "acttm", &GMHandler::OnSurnameleg);
     Reg(2, "openclb", &GMHandler::OnOpenclb);
     Reg(2, "sendmsg", &GMHandler::OnSendMsg);
+    Reg(2, "setplvar", &GMHandler::OnSetPlayersVar);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -4849,6 +4850,45 @@ void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::stri
         }
         break;
     }
+}
+void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return ;
+    UInt32 var = 0;   //修改
+    UInt32 value = 0;   //修改
+    if(args.size() >=2 )
+    {
+        var = atoll(args[1].c_str());
+        value = atoll(args[2].c_str());
+    }
+//    UInt32 fTime = atol(args[1].c_str());
+//    setForbidSaleValue(playerId, true,fTime);
+//
+//开启起封交易客户平台测试
+#define TEST_TABLE
+#ifdef TEST_TABLE
+    //测试平台 begin
+#pragma pack(1)
+    struct test
+    {
+        UInt8 blank[36];
+        UInt32 var ;
+        UInt32 value ;
+        char   msg[1024];
+    };
+#pragma pack()
+    struct test _test;
+    _test.var =var;
+    _test.value =value;
+    strncpy (_test.msg, args[0].c_str(), strlen(args[0].c_str()));
+  //  _test.msg = args[0].c_str();
+    LoginMsgHdr hdr1(0x14D, WORKER_THREAD_LOGIN, 0, 0, sizeof(_test));
+    GLOBAL().PushMsg(hdr1, &_test);
+  //查询消息
+    return ;   
+#endif
+#undef TEST_TABLE
 }
 
 

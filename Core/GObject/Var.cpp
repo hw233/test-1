@@ -52,6 +52,20 @@ namespace GObject
         bUpdateDB = bUpdateDB || (oldVal != m_Vars[id]);
         if(bUpdateDB) UpdateDB(id);
     }
+    void VarSystem::DelVar(UInt32 id)
+    {
+        if(id >= VAR_MAX) return;
+#ifdef NO_ATTAINMENT
+        if (id >=  VAR_FAIL_ENCH &&  id <= VAR_YELLOW_THRUMP_NUM)
+            return;
+#endif
+        UInt32 oldVal = m_Vars[id];
+        if(oldVal == 0 )
+            return ;
+        m_Vars[id] = 0;
+        DB7().PushUpdateData("delete from var where `playerId` = %" I64_FMT "u  and `id` = %u ",m_PlayerID, id);
+
+    }
 
     void VarSystem::AddVar(UInt32 id, UInt32 data, UInt32 now)
     {

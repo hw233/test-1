@@ -2615,6 +2615,10 @@ namespace GObject
     {
         m_pVars->SetVar(id,val);
     }
+    void Player::DelVar(UInt32 id )
+    {
+        m_pVars->DelVar(id);
+    }
 
     void Player::AddVar(UInt32 id, UInt32 val)
     {
@@ -26178,7 +26182,7 @@ void Player::BuyCompassChance(UInt8 counts)
 }
 void Player::SetNovLogin()
 {
-    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 timeBegin = TimeUtil::MkTime(2013,12,13);
     UInt32 now = TimeUtil::Now();
     UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 +1;
     if(now < timeBegin)
@@ -26194,7 +26198,7 @@ void Player::sendNovLoginInfo()
 {
     UInt32 novLogin = GetVar(VAR_NOV_LOGIN);
     UInt32 novLoginAward = GetVar(VAR_NOV_LOGIN_AWARD); 
-    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 timeBegin = TimeUtil::MkTime(2013,12,13);
     UInt32 now = TimeUtil::Now();
     UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400;
     if(now < timeBegin)
@@ -26238,7 +26242,7 @@ void Player::getNovLoginAward(UInt8 type)
 {
     if(type <1 ||type >3)
         return ;
-    UInt32 timeBegin = TimeUtil::MkTime(2013,11,1);
+    UInt32 timeBegin = TimeUtil::MkTime(2013,12,13);
     UInt32 now = TimeUtil::Now();
     UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 ;
     if(now < timeBegin)
@@ -26550,6 +26554,9 @@ void Player::getQZoneRechargeAward(UInt8 val)
     }
     ctslandingAward |= (1<<(val - 1));
     SetVar(VAR_QZONE_RECHARGE_AWARD, ctslandingAward);
+    char str[16] = {0};
+    sprintf(str, "F_131212_%d",val);
+    udpLog("chongzhihuodong", str, "", "", "", "", "act");
     
 }
 void Player::sendQZoneRechargeAwardInfo()

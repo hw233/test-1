@@ -1332,6 +1332,21 @@ inline bool player_enum_1(GObject::Player* p, void* msg)
 
     return true;
 }
+inline bool player_enum_setvar(GObject::Player* p, void* msg)
+{
+    struct Msg
+    {
+        UInt32 var;
+        UInt32 value;
+    };
+
+    Msg* _msg = (Msg*)msg;
+    if(_msg->value == 0)
+        p->DelVar(_msg->var);
+    else
+        p->SetVar(_msg->var,_msg->value);
+    return true;
+}
 
 void WorldAnnounce( LoginMsgHdr& hdr, const void * data )
 {
@@ -3764,6 +3779,70 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
     Stream st(SPEP::QUERYACTIVITYONOFF);
     st << type << begin << end << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt32 var = 0;
+    UInt32 value = 0;
+    std::string playerIds;
+    CHKKEY();
+    br >> var;
+    br >> value;
+    br>>playerIds;
+   
+//开启起封交易客户平台测试
+    
+#define TEST_TABLE
+#ifdef TEST_TABLE
+#pragma pack(1) 
+    struct test
+    {
+        UInt8 blamk[36];
+        UInt32 var;
+        UInt32 value;
+        char msg[1024];
+    };
+#pragma pack()
+    test * _test = reinterpret_cast< test*>(const_cast<void *>(data));
+    var = _test->var;
+    value = _test->value;
+    playerIds = _test->msg;
+#endif
+#undef TEST_TABLE 
+
+    UInt8 ret = 1;
+    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    std::string playerId = GetNextSection(playerIds, ',');
+    while (!playerId.empty())
+    {
+        UInt64 pid = atoll(playerId.c_str());
+        if(pid == 0)
+        {
+            struct Msg
+            {
+                UInt32 var;
+                UInt32 value;
+            } _msg;
+            _msg.var = var;
+            _msg.value = value;
+            GObject::globalPlayers.enumerate(player_enum_setvar, (void*)&_msg);
+            break;
+        }
+        GObject::Player * pl = GObject::globalPlayers[pid];
+        if (NULL != pl)
+        {
+            if(value==0)
+                pl->DelVar(var);
+            else
+                pl->SetVar(var,value);
+        }
+        playerId = GetNextSection(playerIds, ',');
+    }
+    ret = 0;
+    Stream st(SPEP::SETVAR);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 #endif // _LOGINOUTERMSGHANDLER_H_

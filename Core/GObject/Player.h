@@ -1186,6 +1186,7 @@ namespace GObject
         Int32 GetVarS(Int32 id);
         void LoadVar(UInt32 id, UInt32 val, UInt32 overTime);
         void SetVar(UInt32 id, UInt32 val);
+        void DelVar(UInt32 id);
         void AddVar(UInt32 id, UInt32 val);
         void AddVarS(UInt32 id, Int32 val);
 

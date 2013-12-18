@@ -1131,6 +1131,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
         void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
+        void DelVar(UInt32 id);
         void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);
         void LoadVar(UInt32 id, UInt32 data, UInt32 overTime);
         void SetOffset(UInt32 offset){ m_Offset = offset; }
