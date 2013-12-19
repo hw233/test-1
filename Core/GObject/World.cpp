@@ -2002,8 +2002,7 @@ bool World::Init()
     AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
 	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
     
-    if(now < GVAR.GetVar(GVAR_OLDMAN_END) )
-            AddTimer(5 * 1000, World_OldMan_Refresh, static_cast<void*>(NULL), 5 * 1000);
+    AddTimer(5 * 1000, World_OldMan_Refresh, static_cast<void*>(NULL), 5 * 1000);
     //开服战世界boss
     UInt32 value = GVAR.GetVar(GVAR_SERVERWAR_XIUWEI);
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
