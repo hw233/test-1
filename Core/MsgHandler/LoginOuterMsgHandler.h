@@ -3879,5 +3879,67 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void ViaPlayerInfoFromBs(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::VIAPLAYERINFO,0x1);
+    UInt8 type = 0;
+    CHKKEY();
+    br >> type;
+    UInt16 serverNo = 0;
+
+    UInt64 playerId = 0;
+    UInt8 todayLogin = 0;
+    UInt16 accDays = 0;
+    UInt8 level = 0;
+    UInt32 totalRecharge = 0;
+
+    GObject::Player* player = NULL;
+    if(type == 1)
+    {
+        UInt64 pid;
+        br >> pid;
+        if(cfg.merged)
+        {
+            br>>serverNo;
+            pid += (static_cast<UInt64>(serverNo) << 48);
+        }
+        player = GObject::globalPlayers[pid];
+    }
+    else if(type == 2)
+    {
+        std::string playerName;
+        br >> playerName;
+        if(cfg.merged)
+        {
+            br>>serverNo;
+            serverNameToGlobalName(playerName, serverNo);
+        }
+        player = GObject::globalNamedPlayers[playerName];
+    }
+
+    if (player)
+    {
+        playerId = player->getId() & 0xFFFFFFFFFF;
+        if(player->GetVar(GObject::VAR_RP_VALUE) > 0)
+        {
+            if(TimeUtil::SharpDay(0, TimeUtil::Now()) == TimeUtil::SharpDay(0, player->getLastOnline()))
+                todayLogin = 1;
+            accDays = player->GetVar(GObject::VAR_VIA_ACC_DAYS);
+            level = player->GetLev();
+            totalRecharge = player->getTotalRecharge();
+        }
+    }
+
+    st << playerId;
+    st << todayLogin;
+    st << accDays;
+    st << level;
+    st << totalRecharge;
+    st << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 #endif // _LOGINOUTERMSGHANDLER_H_
 
