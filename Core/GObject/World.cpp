@@ -1474,7 +1474,7 @@ void World::World_OldMan_Refresh(void *)
     if(time >= 8*3600 - 300 - 2 && time < 8*3600 - 300 +3 )
     {
     //    std::cout<<"即将出现"<<std::endl;
-        SYSMSG_BROADCASTV(571); 
+        SYSMSG_BROADCASTV(575); 
     }
     else if ( time < 7 *3600  )
     {
