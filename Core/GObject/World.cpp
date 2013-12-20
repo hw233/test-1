@@ -9,6 +9,7 @@
 #include "Fighter.h"
 #include "TaskMgr.h"
 #include "EventBase.h"
+#include "MapCollection.h"
 #include "ChatItem.h"
 #include "Announce.h"
 #include "Dungeon.h"
@@ -1560,10 +1561,26 @@ void World::World_OldMan_Refresh(void *)
     //    std::cout<<"即将出现"<<std::endl;
         SYSMSG_BROADCASTV(571); 
     }
-    else if ( time < 7 *3600 || time > 20 *3600 )
+    else if ( time < 7 *3600  )
     {
       //  std::cout<<"End"<<std::endl;
         return ;
+    }
+    else if(time > 20*3600 + 5)
+    {
+       if(!_oldMan._spot) 
+           return ;
+       UInt8 thrId = mapCollection.getCountryFromSpot(_oldMan._spot);
+       struct MapNpc
+       {
+           UInt16 loc;
+           UInt32 npcId;
+       };
+       MapNpc mapNpc = {_oldMan._spot, 4243};
+       GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
+       GLOBAL().PushMsg(hdr1, &mapNpc);
+       _oldMan._loc = 0;
+       _oldMan._spot = 0 ;
     }
     else if( (time%3600) < 3 || (time%3600)>= 3600 -2 )
     {
@@ -1577,26 +1594,33 @@ void World::World_OldMan_Refresh(void *)
         {
             SYSMSG_BROADCASTV(573,spot); 
         }
+        UInt8 thrId = mapCollection.getCountryFromSpot(_oldMan._spot);
+        struct MapNpc
+        {
+            UInt16 loc;
+            UInt32 npcId;
+        };
+        MapNpc mapNpc = {_oldMan._spot, 4243};
+        GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
+        GLOBAL().PushMsg(hdr, &mapNpc);
+
         _oldMan._spot = spot;
         _oldMan._players.clear();
         GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
-        Map * map = Map::FromSpot(_oldMan._spot);
         GObject::MOData mo;
         mo.m_ID = 4243;
         mo.m_Hide = false;
         mo.m_Spot = _oldMan._spot;
         mo.m_Type = 6;
         mo.m_ActionType = 0;
-        UInt8 thrId = mapCollection.getCountryFromSpot(m_loc);
         GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
         GLOBAL().PushMsg(hdr1, &mo);
     }
     else if ((time%600) < 3 || (time%600)>= 600 -2)
     {
-        UInt16 spot = GetRandomSpot();
-        if(!spot)
+        if(!_oldMan._spot)
             return ;
-        SYSMSG_BROADCASTV(572,spot); 
+        SYSMSG_BROADCASTV(572,_oldMan._spot); 
     }
 
 }
