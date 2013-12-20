@@ -5964,9 +5964,6 @@ namespace GObject
 				continue;
 
             pl->loadSnowInfoFromDB(lover, snow.bind, snow.score);
-            if (snow.bind && lover != NULL)
-                WORLD().UpdateSnowScore(pl, lover);
-
         }
         lc.finalize();
         return true;

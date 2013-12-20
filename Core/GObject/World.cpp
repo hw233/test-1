@@ -1969,6 +1969,8 @@ bool World::Init()
 #endif
     if(getQixi() || getWansheng() || getQingren())
         globalPlayers.enumerate(enum_qixi_rank_list, static_cast<void *>(NULL));
+    if(getSnowAct())
+        globalPlayers.enumerate(enum_snow_rank_list, static_cast<void *>(NULL));
 
 	UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10;
 	if(sday < now) sday += 86400;
