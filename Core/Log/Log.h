@@ -132,11 +132,12 @@ enum PurchaseType
     ArenaTeamConsume            = 121, //仙界至尊消费
     GuangGun                    = 122, //光棍
     Fund                        = 123, //基金消费
-    RestStep                    = 124, //七石板重置
+    TunShiXingkong              = 124, //吞噬星空
     QSBAddTime                  = 125, //七石板加时
     TuPoJieXian                 = 126, //星辰图突破界限
     ServerWarConsume            = 127, //仙界传奇消费
-    SearchOldMan                = 128, //捉迷藏活动包打听
+    RestStep                    = 128, //七石板重置
+    SearchOldMan                = 129, //捉迷藏活动包打听
     //繁体私有占150～200
 };
 

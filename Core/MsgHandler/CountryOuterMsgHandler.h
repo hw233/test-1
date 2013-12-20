@@ -1317,6 +1317,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr1(0x1D3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr1, NULL);
     }
+    if (World::getHappyFireTime())
+    {
+        GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
 
     /*if(World::getQiShiBanTime())
     {
@@ -1389,6 +1394,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
     pl->QiShiBanState();
+    UInt32 flag = pl->GetVar(VAR_OLDMAN_SCORE_AWARD);
+    if(flag & (1<<8))
+        pl->sendOldManPos(1);
+    pl->sendInteresingInfo();
     if(atoi(pl->getDomain()) == 23)
     {
         if(!pl)

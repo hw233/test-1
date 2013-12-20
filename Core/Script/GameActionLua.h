@@ -270,6 +270,7 @@ namespace Script
         bool  RunQZoneRechargeAward(Player* player, UInt8 val);
         bool  RunInterestingAward(Player* player, UInt8 val);
         bool  RunInterestingBag(Player* player, UInt8 val);
+        bool  RunHappyValueAward(Player* player, UInt8 val);
         bool  RunLuckyMeetRechargeAward(Player* player, UInt8 val);
         bool  RunSummerMeetRechargeAward(Player* player, UInt8 val);
         bool  RunLuckyMeetStrengthAward(Player* player, UInt8 val);

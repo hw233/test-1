@@ -122,6 +122,9 @@ function loadStore()
         --store:add(2 ,9422, 20)
         store:add(2 ,9437, 20)
     end
+    if getHappyFireTime() then
+        store:add(2, 9440, 10)
+    end
 
     if getKillMonsterAct() then
         store:add(2, 9416, 10)

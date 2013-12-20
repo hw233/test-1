@@ -3317,6 +3317,23 @@ function ItemNormal_00009027(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
     return rn;
 end
+function ItemNormal_00009440(iid, num, bind, param)
+    if not getHappyFireTime() then
+        return 
+    end
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    local value = 0;
+    for n = 1, num do
+        local val = math.random(1,5)
+        package:DelItemSendMsg(iid, player);
+        player:AddYearHappyValue(val)
+        value = value +val; 
+    end
+    player:AddYearHappyValue(value,1)
+    player:sendHappyValueInfo();
+    return num
+end
 
 function ItemNormal_00009067(iid, num, bind, param)
     local player = GetPlayer()
@@ -11589,6 +11606,7 @@ local ItemNormal_Table = {
     [9075] = ItemNormal_00009017,
 
     [9027] = ItemNormal_00009027,
+    [9440] = ItemNormal_00009440,
 
     [9067] = ItemNormal_00009067,
     [9076] = ItemNormal_00009076,

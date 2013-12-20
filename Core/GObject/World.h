@@ -841,6 +841,17 @@ public:
             _surnamelegend = false;
         return _surnamelegend;
     } 
+    inline static bool getHappyFireTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
+        UInt32 now = TimeUtil::Now()+time;
+        if( now >= begin && now <= end)
+            _happyFire = true;
+        else
+            _happyFire = false;
+        return _happyFire;
+    } 
     inline static bool getLuckyMeet(UInt32 time = 0)
     {
         UInt32 begin = GVAR.GetVar(GVAR_LUCKYMEET_BEGIN);
@@ -1131,6 +1142,7 @@ public:
     static bool _foolbao;
     static bool _summerFlow3;
     static bool _surnamelegend;
+    static bool _happyFire;
     static bool _11time;
     static bool _qishiban;
     static bool _ggtime;
@@ -1159,6 +1171,7 @@ public:
     static RCSortType PlayerGradeSort; //十一活动
     static ClanGradeSort clanGradeSort; // 十一活动
     static RCSortType guangGunSort; //十一活动
+    static RCSortType happyFireSort;     //七石板积分排名
     static void initRCRank();
     static void initRP7RCRank();
 
@@ -1240,6 +1253,7 @@ public:
     void SendQiShiBanAward();
     void SendGuangGunAward();
     static UInt16 GetRandomSpot();
+    void SendHappyFireAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

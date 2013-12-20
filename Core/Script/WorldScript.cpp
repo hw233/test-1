@@ -240,6 +240,7 @@ void WorldScript::init()
 	def("setSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
     def("setFoolBao",GObject::World::setFoolBao);
     def("getFoolBao",GObject::World::getFoolBao);
+    def("getHappyFireTime",GObject::World::getHappyFireTime);
     def("setSummerFlow3Time",GObject::World::setSummerFlow3Time);
     def("getSummerFlow3Time",GObject::World::getSummerFlow3Time);
     def("setHalfGold",GObject::World::setHalfGold);

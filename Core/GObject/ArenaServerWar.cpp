@@ -272,6 +272,13 @@ void ServerWarMgr::challenge(Player * atker, std::string& name)
         sendWarSortInfo(atker);
         return;
     }
+    if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging))
+        return ;
+    if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
+    {
+        atker->sendMsgCode(0, 1413);
+        return ;
+    }
     if(atker->inServerWarChallengeCD())
     {
         Stream st(REP::SERVERWAR_ARENA_OP);
@@ -279,13 +286,6 @@ void ServerWarMgr::challenge(Player * atker, std::string& name)
         st << static_cast<UInt8>(2) << atker->getServerWarChallengeCD() << Stream::eos;
         atker->send(st);
         return;
-    }
-    if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging))
-        return ;
-    if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
-    {
-        atker->sendMsgCode(0, 1413);
-        return ;
     }
 	atker->addGlobalFlag(Player::Challenging);
 	defer->addGlobalFlag(Player::BeChallenging);
@@ -332,10 +332,10 @@ void ServerWarMgr::notifyChallengeResult(Player* atker, Player* defer, bool win)
 
         if(cfg.isTestPlatform())
         {
-            if(!findSWPlayerData(defer))
+            if(!findSWPlayerData(atker))
             {
-                insertSWPlayerData(defer, false);
-                updateSignupToDB(defer);
+                insertSWPlayerData(atker, false);
+                updateSignupToDB(atker);
             }
         }
     }
@@ -783,7 +783,7 @@ void ServerWarMgr::sendjiJianTaiInfo(Player * player)
 static UInt32 MAX_CNT = 20000;
 void ServerWarMgr::enterArena()
 {
-    if(!isOpen() || _warSort.size() < SERVERWAR_MAX_MEMBER || cfg.isTestPlatform())
+    if(!isOpen() || _warSort.size() < SERVERWAR_MAX_MEMBER)
         return;
     struct SWarEnterData {
         Stream st;
@@ -813,7 +813,7 @@ void ServerWarMgr::enterArena()
 
 void ServerWarMgr::enterArena_neice()
 {
-    if(!isOpen() || !cfg.isTestPlatform())
+    if(!isOpen())
         return;
     UInt8 attr = 0;
     UInt32 jiJianCnt = GVAR.GetVar(GVAR_SERVERWAR_JIJIANTAI);
@@ -842,11 +842,17 @@ void ServerWarMgr::enterArena_neice()
         std::advance(it, rnd);
         if(it != globalPlayers.end() && it->second && it->second->GetLev() >= LIMIT_LEVEL)
         {
-            warSortTmp.insert(std::make_pair(it->second, i++));
-            tmpSize --;
+            if(!findSWPlayerData(it->second))
+            {
+                insertSWPlayerData(it->second, false);
+                updateSignupToDB(it->second);
+                tmpSize --;
+            }
         }
     }
-    for(int j = size%10; j > 0; -- j)
+
+    size = signSortTmp.size();
+    while(size-- > 0)
     {
         UInt32 rnd = uRand(signSortTmp.size());
         SWPDSort::iterator it = signSortTmp.begin();
@@ -856,11 +862,7 @@ void ServerWarMgr::enterArena_neice()
             warSortTmp.insert(std::make_pair((*it).player, i++));
             signSortTmp.erase(it);
         }
-    }
 
-    size = size / 10 * 10;
-    while(size-- > 0)
-    {
         if(warSortTmp.size() == 10)
         {
             struct SWarEnterData {
@@ -881,27 +883,7 @@ void ServerWarMgr::enterArena_neice()
             i = 0;
             warSortTmp.clear();
         }
-
-        UInt32 rnd = uRand(signSortTmp.size());
-        SWPDSort::iterator it = signSortTmp.begin();
-        std::advance(it, rnd);
-        if(it != signSortTmp.end() && (*it).player)
-        {
-            warSortTmp.insert(std::make_pair((*it).player, i++));
-            signSortTmp.erase(it);
-        }
     }
-}
-
-//TODO
-bool clear_var_jiJian(Player * player, void * data )
-{
-    if(player == NULL)
-        return true;
-
-    player->SetVar(VAR_SERVERWAR_JIJIANTAI, 0);
-    player->SetVar(VAR_SERVERWAR_JIJIANTAI1, 0);
-    return true;
 }
 
 void ServerWarMgr::readFrom(BinaryReader& brd)
@@ -935,11 +917,6 @@ void ServerWarMgr::readFrom(BinaryReader& brd)
 			_playerBet.clear();
             DB1().PushUpdateData("DELETE FROM `arena_serverWar_bet`");
         }
-        //TODO
-        if(cfg.isTestPlatform())
-        {
-            globalPlayers.enumerate(clear_var_jiJian, static_cast<void *>(NULL));
-        }
         break;
     case e_war_sign_end:
         setWarSort();
@@ -947,15 +924,20 @@ void ServerWarMgr::readFrom(BinaryReader& brd)
 	case e_war_challenge:
 		break;
 	case e_war_challenge_end:
-        enterArena();
-        enterArena_neice();
+        if(cfg.isTestPlatform())
+            enterArena_neice();
+        else
+            enterArena();
 		break;
     case e_war_group:
         if(!GVAR.GetVar(GVAR_SERVERWAR_ISENTER))
         {
-            setWarSort();
-            enterArena();
-            enterArena_neice();
+            if(_warSort.size() < 10)
+                setWarSort();
+            if(cfg.isTestPlatform())
+                enterArena_neice();
+            else
+                enterArena();
         }
         break;
     case e_war_group_end:
@@ -1444,7 +1426,7 @@ void ServerWarMgr::calcFinalBet(int i)
                                 else    //内测区
                                 {
                                     giveTeamLastAward_neice(ep, i, j+1, 1);
-                                    EnumMailStruct mailStruct = EnumMailStruct(i, j+1, _session);
+                                    EnumMailStruct mailStruct = EnumMailStruct(i, j+1, _session, true);
                                     globalPlayers.enumerate(server_sendMail, &mailStruct);
                                 }
                                 if(i == 0)  //天榜第一刷仙界boss
@@ -2383,7 +2365,7 @@ void ServerWarBoss::appear(UInt32 npcId)
         map->Show(mo.m_ID, true, mo.m_Type);
     }
 
-    printf("loc:%u, npcId:%u\n", _loc, _npcid);
+    TRACE_LOG("ServerWarBoss===============>>loc:%u, npcId:%u", _loc, _npcid);
     sendId();
     sendLoc();
     sendCount();
@@ -2437,6 +2419,7 @@ void ServerWarBoss::startBoss()
 
     _hp[0] = ohp;
     nflist[0].fighter->setBaseHP(ohp);
+    nflist[0].fighter->setWBoss(true);
 
     float atk_factor = (WBOSS_BASE_TIME/(float)lastTime - 1.f) * WBOSS_ATK_FACTOR;
     if(atk_factor > WBOSS_MAX_ASC_ATK_FACTOR)

@@ -589,6 +589,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_OLDMAN_DAYSCORE_AWARD = 648,       //捉迷藏活动每日积分奖励
         VAR_OLDMAN_SCORE_AWARD = 649,       //捉迷藏活动累计积分奖励
 
+        VAR_YEARHAPPY_DAYVALUE = 650,       //每日累计欢乐值 
+        VAR_YEARHAPPY_VALUE = 651,       //累计欢乐值
+        VAR_YEARHAPPY_DAYVALUE_AWARD = 652,       //每日欢乐值奖励 
+        VAR_YEARHAPPY_LEFTVALUE = 653,       //每日剩余欢乐值 
         VAR_MAX,
     };
 
@@ -1122,6 +1126,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_OLDMAN_DAYSCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_OLDMAN_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_OLDMAN_PRESENT, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEARHAPPY_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEARHAPPY_LEFTVALUE, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

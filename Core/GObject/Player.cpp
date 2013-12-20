@@ -4367,6 +4367,10 @@ namespace GObject
             if(CheckFriendPray(pl->getId()))
                 st<<static_cast<UInt8>(1);
             else st<<static_cast<UInt8>(0);
+            st<<getBePrayednum(pl->getId());
+            
+            st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
+
             st<<Stream::eos;
 			send(st);
 			SYSMSG_SEND(132, this);
@@ -4399,6 +4403,8 @@ namespace GObject
         if(CheckFriendPray(pl->getId()))
             st<<static_cast<UInt8>(1);
         else st<<static_cast<UInt8>(0);
+        st<<getBePrayednum(pl->getId());
+        st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
         st<<Stream::eos;
 		send(st);
         SYSMSG_SEND(2341, this);
@@ -4501,6 +4507,8 @@ namespace GObject
         if(CheckFriendPray(pl->getId()))
             st<<static_cast<UInt8>(1);
         else st<<static_cast<UInt8>(0);
+        st<<getBePrayednum(pl->getId());
+        st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
         st<<Stream::eos;
 		send(st);
 		DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 1, %" I64_FMT "u)", getId(), pl->getId());
@@ -4711,6 +4719,7 @@ namespace GObject
             st<<static_cast<UInt8>(1);
         else st<<static_cast<UInt8>(0);
         st<<getBePrayednum(other->getId());
+        st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
         st<< Stream::eos;
         send(st);
     }
@@ -10576,7 +10585,17 @@ namespace GObject
         if(getBuffData(PLAYER_BUFF_CLANTREE3))
             factor += 0.1f;
         //仙界传奇(服战) 修为加成
-        float fuzhanRatio = (float)GVAR.GetVar(GVAR_SERVERWAR_XIUWEI) / 100;
+        float fuzhanRatio = 0.0f;
+        if(getBuffData(SERVERWAR_BUFF_XIUWEI1))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI1 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI2))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI2 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI3))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI3 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI4))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI4 / 100;
+        else if(getBuffData(SERVERWAR_BUFF_XIUWEI5))
+            fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI5 / 100;
         factor += fuzhanRatio;
 
         return factor;
@@ -11718,9 +11737,21 @@ namespace GObject
             getGameBoxAward(opt);
                 break;
         case 33:
-                if(opt>0)
-                    getQZoneRechargeAward(opt);
-                sendQZoneRechargeAwardInfo();
+                { 
+                    if(opt>0)
+                        getQZoneRechargeAward(opt);
+                    sendQZoneRechargeAwardInfo();
+                }
+                break;
+        case 34:
+                {
+                    if(opt>0)
+                        getHappyValueAward(opt);
+                    sendHappyValueInfo();
+                    UInt32 grade = GetVar(VAR_YEARHAPPY_VALUE);
+                    GameMsgHdr hdr1(0x1DA, WORKER_THREAD_WORLD, this, sizeof(grade));
+                    GLOBAL().PushMsg(hdr1, &grade);
+                }
                 break;
         }
     }
@@ -16572,6 +16603,7 @@ namespace GObject
                 st << fgt->getSoulSkillSoulOut();
                 st << fgt->getPortrait();
                 fgt->appendElixirAttr2(st);
+                st << fgt->getSoulSkillProtect();
             }
         }
         st.data<UInt8>(offset) = c;
@@ -16596,6 +16628,7 @@ namespace GObject
             st << _onBattlePet->getSoulSkillSoulOut();
             st << _onBattlePet->getPortrait();
             _onBattlePet->appendElixirAttr2(st);
+            st << _onBattlePet->getSoulSkillProtect();
         }
         else
         {
@@ -26493,7 +26526,6 @@ void Player::getInteresingBag()
                 strItems += Itoa(mitem[k].count);
                 strItems += "|";
             }
-
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         }
     }
@@ -26504,16 +26536,23 @@ void Player::getInteresingBag()
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, NULL, mail->recvTime);
     }
 }
-void Player::sendOldManPos()
+void Player::sendOldManPos(UInt8 type)
 {
     UInt32 gold = 5;
-    if (getGold() < gold)
+    if(type==0)
     {
-        sendMsgCode(0, 1104);
-        return ;
+
+        UInt32 flag = GetVar(VAR_OLDMAN_SCORE_AWARD);
+        if(flag & (1<<8))
+            return ;
+        if (getGold() < gold)
+        {
+            sendMsgCode(0, 1104);
+            return ;
+        }
+        ConsumeInfo ci(SearchOldMan,0,0);
+        useGold(gold,&ci);
     }
-    ConsumeInfo ci(SearchOldMan,0,0);
-    useGold(gold,&ci);
     UInt16 pos = WORLD()._oldMan._spot;
     UInt8 loc = WORLD()._oldMan._loc;
     Stream st(REP::ACTIVE);
@@ -26526,18 +26565,18 @@ void Player::sendInteresingInfo()
     UInt32 Interes = GetVar(VAR_OLDMAN_SCORE);
     UInt32 DayAward = GetVar(VAR_OLDMAN_DAYSCORE_AWARD);
     UInt32 Award = GetVar(VAR_OLDMAN_SCORE_AWARD);
+    UInt32 counts = GetVar(VAR_OLDMAN_PRESENT);
     Stream st(REP::ACTIVE);
     st << static_cast<UInt8>(0x26) << static_cast<UInt8>(0x02);;
     st<< DayInteres <<Interes ;
     st<< static_cast<UInt8>(DayAward) <<static_cast<UInt8>(Award) ;
+    st << static_cast<UInt8>(counts);
     st<<Stream::eos;
     send(st); 
 }
 void Player::sendOldManLeftTime()
 {
     UInt32 now = TimeUtil::Now();
-    UInt32 today = TimeUtil::SharpDayT( 0 , now);
-    UInt32 tim = TimeUtil::SharpDay( 0 , now);
     UInt32 time = TimeUtil::Now()-TimeUtil::SharpDayT( 0 , now); 
     Stream st(REP::ACTIVE);
     st << static_cast<UInt8>(0x26) << static_cast<UInt8>(0x01) <<static_cast<UInt8>(0x01);
@@ -26549,6 +26588,61 @@ void Player::sendOldManLeftTime()
         st<<static_cast<UInt8>(2)<<static_cast<UInt32>(0); 
     st <<Stream::eos;
     send(st);
+}
+void Player::AddYearHappyValue(UInt32 val,UInt8 flag)
+{
+    if(!World::getHappyFireTime())
+        return ;
+//    std::cout<<val<<std::endl;
+    if(flag !=0)
+    {
+        AddVar(VAR_YEARHAPPY_DAYVALUE,val);
+        AddVar(VAR_YEARHAPPY_VALUE,val);
+        AddVar(VAR_YEARHAPPY_LEFTVALUE,val);
+        UInt32 grade = GetVar(VAR_YEARHAPPY_VALUE);
+        GameMsgHdr hdr1(0x1DB, WORKER_THREAD_WORLD, this, sizeof(grade));
+        GLOBAL().PushMsg(hdr1, &grade);
+    }
+    else
+    {
+        SYSMSG_SENDV(2022,this,val);
+        SYSMSG_SENDV(2023,this,val);
+    }
+}
+void Player::sendHappyValueInfo()
+{
+    UInt32 DayValue = GetVar(VAR_YEARHAPPY_DAYVALUE);
+    UInt32 Value = GetVar(VAR_YEARHAPPY_VALUE);
+    UInt32 LeftValue = GetVar(VAR_YEARHAPPY_LEFTVALUE);
+    UInt32 DayValueAward = GetVar(VAR_YEARHAPPY_DAYVALUE_AWARD);
+    Stream st(REP::GETAWARD);   //协议
+    st << static_cast<UInt8>(34);
+    st << static_cast<UInt32>(Value);
+    st << static_cast<UInt32>(DayValue);
+    st << static_cast<UInt32>(LeftValue);
+    st << static_cast<UInt8>(DayValueAward);
+    st << Stream::eos;
+    send(st);
+}
+void Player::getHappyValueAward(UInt8 val)
+{
+    if (!World::getHappyFireTime())
+        return;
+    UInt32 score[]={20,40,60,80,100};
+    UInt32 value = GetVar(VAR_YEARHAPPY_DAYVALUE);
+    if(val<1||val>5)
+        return ;
+    if(value < score[val-1])
+        return ;
+    UInt32 ctslandingAward = GetVar(VAR_YEARHAPPY_DAYVALUE_AWARD);
+    if(ctslandingAward & (1<<(val-1)))
+        return ;
+    if(!GameAction()->RunHappyValueAward(this, val))
+    {
+        return;
+    }
+    ctslandingAward |= (1<<(val - 1));
+    SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
 }
 } // namespace GObject
 
