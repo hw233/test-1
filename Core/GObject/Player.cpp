@@ -26468,7 +26468,7 @@ void Player::modifyPlayerName(UInt32 itemid,UInt8 binding,string modifyName)
                 for(UInt8 i = 0; i < sz; ++ i)
                 {
                     Player * pl = *it;
-                    pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                    pl->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000);
                     it++;
                 }
             }
