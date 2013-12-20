@@ -3237,6 +3237,13 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_QZONE_RECHARGE_AWARD, 0);
             }
             break;
+        case 11:
+            {
+                pl->SetVar(GObject::VAR_OLDMAN_SCORE, 0);
+                pl->SetVar(GObject::VAR_OLDMAN_SCORE_AWARD, 0);
+            
+            }
+            break;
         case 13:
             {
                 pl->SetVar(GObject::VAR_YEARHAPPY_VALUE, 0);

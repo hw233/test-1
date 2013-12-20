@@ -1583,9 +1583,12 @@ void World::World_OldMan_Refresh(void *)
        _oldMan._spot = 0 ;
     }
     else if( (time%3600) < 3 || (time%3600)>= 3600 -2 )
+   // else if ((time%600) < 3 || (time%600)>= 600 -2)    //测试
     {
         UInt16 spot = GetRandomSpot();
         std::cout<<"ChangeTo:"<<spot<<std::endl;
+        if(!spot)
+            return ;
         if(_oldMan._spot == 0)
         {
             SYSMSG_BROADCASTV(572,spot); 
@@ -1611,12 +1614,13 @@ void World::World_OldMan_Refresh(void *)
         mo.m_ID = 4243;
         mo.m_Hide = false;
         mo.m_Spot = _oldMan._spot;
-        mo.m_Type = 6;
+        mo.m_Type = 100;
         mo.m_ActionType = 0;
         GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
         GLOBAL().PushMsg(hdr1, &mo);
     }
-    else if ((time%600) < 3 || (time%600)>= 600 -2)
+    else if ((time%600) < 3 || (time%600)>= 600 -2)     
+   // else if ((time%180) < 3 || (time%180)>= 180 -2)         //测试
     {
         if(!_oldMan._spot)
             return ;
@@ -3707,7 +3711,7 @@ UInt16 World::GetRandomSpot()
             if (count ++ == index)
             {
                 _oldMan._loc = (*it)->GetMapData().m_ID;
-                return (*it)->GetRandomSpot();
+                return (*it)->GetRandomSpot(9);
             }
         }
     }

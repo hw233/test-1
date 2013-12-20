@@ -2237,7 +2237,8 @@ void OnGetFindOldManAward( GameMsgHdr &hdr, const void * data)
 void OnGetInteresingBag( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
-    player->getInteresingBag();
+    UInt64 playerId  = *reinterpret_cast<const UInt64 *>(data);
+    player->getInteresingBag(playerId);
 }
 
 void OnSpreadWhisper(GameMsgHdr &hdr, const void* data)

@@ -26440,7 +26440,7 @@ void Player::GetFindOldManAward(UInt32 type)
         return ;
     if(GetLev()<45)
     {
-        sendMsgCode(0, 1510);
+        SYSMSG_BROADCASTV(2109, GetLev(), 45 );
         return ; 
     }
     if(type ==0)
@@ -26454,6 +26454,8 @@ void Player::GetFindOldManAward(UInt32 type)
     GetPackage()->AddItem(9439, num, true, false);   //欢乐礼包(9439)
     AddVar(VAR_OLDMAN_DAYSCORE,num*10);
     AddVar(VAR_OLDMAN_SCORE,num*10);
+    SYSMSG_SENDV(2024,this,num*10);
+    SYSMSG_SENDV(2025,this,num*10);
 }
 
 void Player::getInterestingAward(UInt8 type)
@@ -26483,11 +26485,21 @@ void Player::getInterestingAward(UInt8 type)
     if(type ==0)
         SetVar(VAR_OLDMAN_DAYSCORE_AWARD,1);
     else
-        SetVar(VAR_OLDMAN_SCORE_AWARD,Score|(1<<(type-1)));
+    {
+        ScoreAward |= (1<<(type-1));
+        SetVar(VAR_OLDMAN_SCORE_AWARD,ScoreAward);
+    }
 }
 void Player::sendInterestingBag(Player* pl)
 {
-    ItemBase* item = GetPackage()->GetItem(9439, false);					
+    if(!World::getOldManTime())
+        return ;
+    if(!pl->isOnline())
+    {
+        sendMsgCode(0, 2218);
+        return ;
+    }
+    ItemBase* item = GetPackage()->GetItem(9439, true);					
     if(item ==NULL)
         return ;
     UInt16 count = item->Count();
@@ -26502,16 +26514,20 @@ void Player::sendInterestingBag(Player* pl)
     UInt64 id = getId();
     GameMsgHdr hdr(0x356, pl->getThreadId(),pl,sizeof(id) );
     GLOBAL().PushMsg(hdr, &id);
+    SYSMSG_SEND(190, this);
 }
-void Player::getInteresingBag()
+void Player::getInteresingBag(UInt64 pid)
 {
+    Player* player = globalOnlinePlayers[pid];
+    if(player==NULL)
+        return ;
     if(!World::getOldManTime())
         return ;
     UInt32 counts = GetVar(VAR_OLDMAN_PRESENT);
     SYSMSG(title, 4974);
-    if(counts <=10)
+    if(counts <10)
     {
-        SYSMSG(content, 4975);
+        SYSMSGV(content, 4975,player->getCountry(),player->getName().c_str());
         Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
         {
@@ -26539,13 +26555,25 @@ void Player::getInteresingBag()
     }
     else 
     {
-        SYSMSG(content, 4976); 
-        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        SYSMSGV(content, 4976,player->getCountry(),player->getName().c_str());
+        Mail * mail = m_MailBox->newMail(NULL, 0x01, title, content, 0xFFFE0000);
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, NULL, mail->recvTime);
     }
+    AddVar(VAR_OLDMAN_PRESENT,1);
 }
 void Player::sendOldManPos(UInt8 type)
 {
+    if(!World::getOldManTime())
+        return ;
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = now- TimeUtil::SharpDay(0, now);
+    if(time < 7*3600 || time > 20*3600)
+        return ;
+    if(GetLev()<45)
+    {
+        SYSMSG_BROADCASTV(2109, GetLev(), 45 );
+        return ; 
+    }
     UInt32 gold = 5;
     if(type==0)
     {
@@ -26558,13 +26586,14 @@ void Player::sendOldManPos(UInt8 type)
             sendMsgCode(0, 1104);
             return ;
         }
+        SetVar(VAR_OLDMAN_SCORE_AWARD , flag |(1<<8));
         ConsumeInfo ci(SearchOldMan,0,0);
         useGold(gold,&ci);
     }
     UInt16 pos = WORLD()._oldMan._spot;
     UInt8 loc = WORLD()._oldMan._loc;
     Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x26) << static_cast<UInt8>(0x01) << loc<< pos<<Stream::eos;;
+    st << static_cast<UInt8>(0x26) << static_cast<UInt8>(0x01)<<static_cast<UInt8>(0) << loc<< pos<<Stream::eos;
     send(st); 
 }
 void Player::sendInteresingInfo()

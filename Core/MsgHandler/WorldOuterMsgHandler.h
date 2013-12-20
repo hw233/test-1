@@ -3068,8 +3068,11 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     if(index == 0)
                     {
                         UInt32 type = GObject::World::FindTheOldMan(player);
-                        if(type ==0 )
+                        if( type ==0 )
+                        {
+                            player->sendMsgCode(0, 1910);
                             break;
+                        }
                         GameMsgHdr h(0x355,  player->getThreadId(), player, sizeof(UInt32));
                         GLOBAL().PushMsg(h, &type);
                         break;

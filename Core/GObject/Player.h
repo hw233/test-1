@@ -2473,7 +2473,7 @@ namespace GObject
         void GetFindOldManAward(UInt32 type = 0 );
         void getInterestingAward(UInt8 type);
         void sendInterestingBag(Player* pl);
-        void getInteresingBag();
+        void getInteresingBag(UInt64 pid);
         void sendInteresingInfo();
         void sendOldManLeftTime();
         void sendOldManPos(UInt8 type = 0);
