@@ -1095,6 +1095,8 @@ namespace GObject
             }
 		}
 
+        if(GetVar(VAR_RP_VALUE) > 0 && TimeUtil::SharpDay(0, TimeUtil::Now()) != TimeUtil::SharpDay(0, _playerData.lastOnline))
+            AddVar(VAR_VIA_ACC_DAYS, 1);
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
