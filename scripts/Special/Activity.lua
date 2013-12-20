@@ -255,14 +255,17 @@ function onDungeonWin(player, id, count, free)
     Wansheng(player, lootlvl);
     Qingren(player, 0);
     fairyPetLoot(player, 0);
+
     if free == true then
         FoolBaoLoot(player,0);
+        HappyFireLoot(player,0);
         SurnameLegendLoot(player,0);
         FallActivity(player, 1)
         Guoqing(player, 0);
         ChingMingDay(player, 0)
     else
         FoolBaoLoot(player,2);
+        HappyFireLoot(player,1);
         SurnameLegendLoot(player,0);
         FallActivity(player, 2)
         Guoqing(player, 3);
@@ -1030,6 +1033,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Qingren(player, lootlvl);
     fairyPetLoot(player, lootlvl);
     FoolBaoLoot(player,lootlvl);
+    HappyFireLoot(player,lootlvl);
     SurnameLegendLoot(player,lootlvl);
     Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
@@ -1078,6 +1082,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     Guoqing(player, lootlvl);
     fairyPetLoot(player, lootlvl);
     FoolBaoLoot(player,lootlvl);
+    HappyFireLoot(player,lootlvl);
     SurnameLegendLoot(player,0);
     if lootlvl == 0 then
         FallActivity(player, 1)
@@ -8331,6 +8336,23 @@ function FoolBaoLoot(player,lootlvl)
     };
     local package = player:GetPackage();
     package:AddItem(9375, itemNum[lootlvl], true,0,10);
+end
+--欢乐爆竹掉落
+function HappyFireLoot(player,lootlvl)
+   if not getHappyFireTime() then
+       return
+   end
+    if lootlvl > 3 then
+        lootlvl = 0
+    end
+    local itemNum = {
+            [0] = 1,
+            [1] = 2,
+            [2] = 3,
+            [3] = 4,
+    };
+    local package = player:GetPackage();
+    package:AddItem(9440, itemNum[lootlvl], true,0,10); --欢乐礼包
 end
 
 --蜀山传奇掉落活动

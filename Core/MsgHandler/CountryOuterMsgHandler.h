@@ -1317,6 +1317,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr1(0x1D3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr1, NULL);
     }
+    if (World::getHappyFireTime())
+    {
+        GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
 
     /*if(World::getQiShiBanTime())
     {
@@ -1395,6 +1400,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
    
     pl->MiLuZhiJiao();
+    pl->QiShiBanState();
+    UInt32 flag = pl->GetVar(VAR_OLDMAN_SCORE_AWARD);
+    if(flag & (1<<8))
+        pl->sendOldManPos(1);
+    pl->sendInteresingInfo();
     if(atoi(pl->getDomain()) == 23)
     {
         if(!pl)
@@ -7491,6 +7501,47 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
             }
         }
         break;
+    case 0x26:
+        {
+            if(!World::getOldManTime())
+                return ;
+            brd >>op ;
+            switch(op)
+            {
+                case 1:
+                    {
+                        UInt8 idx = 0;
+                        brd >> idx ;
+                        if(idx == 0)
+                            player->sendOldManPos();
+                        player->sendOldManLeftTime();
+                        break;
+                    }
+                case 2:
+                    UInt8 idx =0 ;
+                    brd >> idx ;
+                    switch(idx)
+                    {
+                        case 1:
+                            {
+                                UInt8 index = 0 ;
+                                brd >> index ;
+                                player->getInterestingAward(index); 
+                            }
+                            break;
+                        case 2:
+                            std::string name ;
+                            brd >>name ;
+                            GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
+                            if(pl==NULL)
+                                break;
+                            player->sendInterestingBag(pl);
+                            break ;
+                    }
+                    player->sendInteresingInfo();
+                    break;
+            }
+        }
     default:
         break;
     }

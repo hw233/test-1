@@ -584,6 +584,17 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_QZONE_RECHARGE = 643,       //空间充值 
         VAR_QZONE_RECHARGE_AWARD = 644,       //空间充值奖励领取
         
+
+        VAR_OLDMAN_DAYSCORE = 645,       //捉迷藏活动每日积分
+        VAR_OLDMAN_SCORE = 646,       //捉迷藏活动累计积分
+        VAR_OLDMAN_PRESENT = 647,      //捉迷藏活动接受礼包数
+        VAR_OLDMAN_DAYSCORE_AWARD = 648,       //捉迷藏活动每日积分奖励
+        VAR_OLDMAN_SCORE_AWARD = 649,       //捉迷藏活动累计积分奖励
+
+        VAR_YEARHAPPY_DAYVALUE = 650,       //每日累计欢乐值 
+        VAR_YEARHAPPY_VALUE = 651,       //累计欢乐值
+        VAR_YEARHAPPY_DAYVALUE_AWARD = 652,       //每日欢乐值奖励 
+        VAR_YEARHAPPY_LEFTVALUE = 653,       //每日剩余欢乐值 
         //660-760 for lijr
         VAR_CHRISTMAS_PRESENT = 660,    //圣诞礼物——麋鹿之角
         VAR_QT_AWARD_MARK = 661,        //QT奖励领取
@@ -592,7 +603,6 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_QT_REGIST_NUM = 664,        //QT月签到次数
         VAR_QT_SPECIAL_MARK = 665,      //QT记录12月份默认加6天签到次数
         VAR_QT_REGIST_MARK = 666,       //QT月签到标志
-
         VAR_MAX,
     };
 
@@ -1129,6 +1139,15 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_QT_REGIST_NUM, CYCLE_MONTH);
             REGISTER_VAR(VAR_QT_SPECIAL_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_QT_REGIST_MARK, CYCLE_MONTH);
+            REGISTER_VAR(VAR_OLDMAN_DAYSCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_OLDMAN_SCORE, CYCLE_NONE);
+            REGISTER_VAR(VAR_OLDMAN_PRESENT, CYCLE_DAY);
+            REGISTER_VAR(VAR_OLDMAN_DAYSCORE_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_OLDMAN_SCORE_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEARHAPPY_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEARHAPPY_LEFTVALUE, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

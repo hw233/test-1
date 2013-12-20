@@ -3501,7 +3501,7 @@ namespace GObject
 
 		UInt32 now = TimeUtil::Now();
 		UInt32 thisDay = TimeUtil::SharpDay(0, now);
-		resetClanData(now);
+		//resetClanData(now);
 
         // ??????Ա
 		lc.prepare("Loading clan players:");

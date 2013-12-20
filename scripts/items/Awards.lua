@@ -715,6 +715,56 @@ function RunQZoneRechargeAward(player, cts)
     end
     return true
 end
+function RunInterestingAward(player, cts)
+    local item = {
+        [0] = {{500,3},{56,3},{9371,3},{15,3}},
+        [1] = {{503,2},{514,2},{500,2},{516,2}},
+        [2] = {{501, 3},{547,3},{517,3},{513,3}},
+        [3] = {{134,3},{1325,3},{509,3},{515,2}},
+    };
+    local package = player:GetPackage();
+--    package:DelItemSendMsg(9371, player)
+    if cts > 3  then
+        return false
+    end
+    if item[cts] == nil then
+        return false 
+    end
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+    end
+    return true
+end
+function RunInterestingBag(player, cts)
+    local item = {
+        [0] = {{15,1},{30,1},{11,5}},
+    };
+    local package = player:GetPackage();
+    package:DelItemSendMsg(9439, player)
+    if cts > 1  then
+        return false
+    end
+    if item[cts] == nil then
+        return false 
+    end
+    num = #item[cts]
+    if package:GetRestPackageSize() < 3  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+    end
+    return true
+end
+
 function RunBirthdayAward(player)
     if player == nil then
         return 0;
@@ -791,7 +841,7 @@ function RunBlueDiamondAward(player, opt)
     local date_0 = os.time(date_9190_0);
     local date_1 = os.time(date_9190_1);
 
-    --1:蓝钻 2:黄钻 3:QQ会员 4:红钻 5:好莱坞 6:财付通
+    --1:蓝钻 2:黄钻 3:QQ会员 4:红钻 5:好莱坞 6:财付通 8: 跨年欢乐大转盘
     local chance = {
         [1] = {1180, 2630, 4080, 5930, 7780, 8520, 9500, 10000},
         [2] = {1180, 2630, 4080, 5930, 7780, 8520, 9500, 10000},
@@ -799,7 +849,8 @@ function RunBlueDiamondAward(player, opt)
         [4] = {1050, 2265, 3480, 4695, 6220, 7745, 9270, 10000},
         [5] = {785,2833,4881,5823,7202,7987,9366,10000},
         [6] = {1180,2630,4080,6030,7980,9100,9400,10000},
-        [7] = {2200,4150,5350,5850,5950,6450,6950,7050,7650,7700,9850,10000}
+        [7] = {2200,4150,5350,5850,5950,6450,6950,7050,7650,7700,9850,10000},
+        [8] = {100,2800,3000,5000,5200,7000,7200,10000}
     };
     local item = {
         [1] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{9022,1},{1717,1},{5137,1}},
@@ -808,7 +859,8 @@ function RunBlueDiamondAward(player, opt)
         [4] = {{515,3},{9338,4},{134,4},{1325,4},{507,2},{509,2},{47,3},{5006,1}},
         [5] = {{515,6},{507,4},{509,4},{503,20},{1325,8},{47,6},{134,8},{5026,2}},
         [6] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{503,5},{1719,1},{5135,1}},
-        [7] = {{503,1},{500,2},{517,1},{515,1},{9076,2},{1325,1},{516,1},{8555,1},{134,1},{5065,1},{56,2},{5005,1}}
+        [7] = {{503,1},{500,2},{517,1},{515,1},{9076,2},{1325,1},{516,1},{8555,1},{134,1},{5065,1},{56,2},{5005,1}},
+        [8] = {{9022,1},{56,1},{515,1},{503,1},{509,1},{514,1},{134,1},{15,1}}
     };
     local item_id = {9190, 9191, 9217, 9284,10119};
     
@@ -816,6 +868,9 @@ function RunBlueDiamondAward(player, opt)
     local itemId = item_id[opt];
     local ch = chance[opt];
     
+    if items == nil or ch ==nil then
+        return 
+    end
     if opt < 6 then
         if  not package:DelItem(itemId, 1, true) then
             if  not package:DelItem(itemId, 1, false) then
@@ -824,7 +879,15 @@ function RunBlueDiamondAward(player, opt)
             end
         end
     end
-
+    if opt ==8 then 
+        local value = player:GetVar(653);
+        if value <20 then 
+            return 
+        end 
+        player:SetVar(653,value - 20)
+        player:sendHappyValueInfo();
+    end
+    
     local j = 0; 
     local g = math.random(1, 10000)
     for i = 1, #ch do
@@ -837,6 +900,10 @@ function RunBlueDiamondAward(player, opt)
     if opt ==7 and (items[j][1] == 134 or items[j][1]==515 or items[j][1] == 1325 or items[j][1]==9076 or items[j][1] == 8555 or items[j][1] == 5065 or items[j][1] ==5005)  then 
         Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."通过财富罗盘获得了".."[4:"..items[j][1].."]x"..items[j][2])
    end
+   
+   if opt ==8 and j%2 ==1 then 
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."在跨年欢乐大转盘中幸运的获得了".."[4:"..items[j][1].."]x"..items[j][2])
+    end
     local extraAward_9191 = {
         [2] = {9191,1,1},
         [6] = {549,2,1, 548,20,1},
@@ -1613,6 +1680,40 @@ function RunGameBoxDailyActionAward(player, cts)
         else
             package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
         end
+    end
+    return true
+end
+function RunHappyValueAward(player, cts)
+    local item = {
+        [1] = {{56,2},{57,2},{15,2},{508,2},{506,2}},
+        [2] = {{500, 3},{511,3},{501,2},{517,3}},
+        [3] = {{514,1},{465,1}},
+        [4] = {{516,3},{503, 3},{551,3},{547,3}},
+        [5] = {{509,2},{134,2},{9076,1}},
+    };
+    local baoshi = {5005,5015,5025,5035,5045,5055,5065,5075,5085,5095,5105,5115,5125,5135,5145}
+    local package = player:GetPackage();
+    if cts == 0 then
+        return false
+    end
+    if cts > 5  then
+        return false
+    end
+    if item[cts] == nil then
+        return false 
+    end
+    num = #item[cts]
+    if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+    end
+    if cts == 3 then 
+        local index = math.random(1,#baoshi)
+        package:Add(baoshi[index], 1, true, 0, 59);
     end
     return true
 end
