@@ -723,7 +723,7 @@ function RunInterestingAward(player, cts)
         [3] = {{134,3},{1325,3},{509,3},{515,2}},
     };
     local package = player:GetPackage();
-    package:DelItemSendMsg(9371, player)
+--    package:DelItemSendMsg(9371, player)
     if cts > 3  then
         return false
     end
@@ -732,6 +732,29 @@ function RunInterestingAward(player, cts)
     end
     num = #item[cts]
     if package:GetRestPackageSize() < num  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+    end
+    return true
+end
+function RunInterestingBag(player, cts)
+    local item = {
+        [0] = {{15,1},{30,1},{11,5}},
+    };
+    local package = player:GetPackage();
+    package:DelItemSendMsg(9439, player)
+    if cts > 1  then
+        return false
+    end
+    if item[cts] == nil then
+        return false 
+    end
+    num = #item[cts]
+    if package:GetRestPackageSize() < 3  then
         player:sendMsgCode(2, 1011, 0);
         return false
     end

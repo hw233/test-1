@@ -7520,7 +7520,7 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                             }
                             break;
                         case 2:
-                            string name =NULL;
+                            std::string name ;
                             brd >>name ;
                             GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
                             if(pl==NULL)

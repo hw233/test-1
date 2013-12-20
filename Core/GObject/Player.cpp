@@ -26487,10 +26487,18 @@ void Player::getInterestingAward(UInt8 type)
 }
 void Player::sendInterestingBag(Player* pl)
 {
+    ItemBase* item = GetPackage()->GetItem(9439, false);					
+    if(item ==NULL)
+        return ;
+    UInt16 count = item->Count();
+    if(count <1)
+        return; 
     if(!GameAction()->RunInterestingBag(this, 0))
     {
         return;
     }
+    GetPackage()->DelItem2(item, 1);
+    GetPackage()->AddItemHistoriesLog(9439, 1);
     UInt64 id = getId();
     GameMsgHdr hdr(0x356, pl->getThreadId(),pl,sizeof(id) );
     GLOBAL().PushMsg(hdr, &id);
