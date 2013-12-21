@@ -115,7 +115,7 @@ function loadStore()
 
         discount(store)
 
-    if getSnowAct() then
+    if getSnowAct(300) then
         store:add(2, 9275, 10)
     end
 
