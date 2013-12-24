@@ -1135,6 +1135,27 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     GameMsgHdr hdr(0x2F2, player->getThreadId(), player, sizeof(purchase));
                     GLOBAL().PushMsg(hdr, &purchase);
 
+                    //为了统计
+                    struct Recharge
+                    {
+                        UInt8 type;
+                        UInt32 gold;
+                        char no[256];
+                        char uint[32];
+                        char money[32];
+                    } recharge;
+
+                    memset(&recharge, 0x00, sizeof(recharge));
+                    recharge.type = 0; // 有角色时充值
+                    recharge.gold = 0;
+                    memcpy(recharge.no, no.c_str(), no.length()>255?255:no.length());
+                    memcpy(recharge.uint, uint.c_str(), uint.length()>31?31:uint.length());
+                    memcpy(recharge.money, money.c_str(), money.length()>31?31:money.length());
+
+                    GameMsgHdr hdr2(0x2F0, player->getThreadId(), player, sizeof(recharge));
+                    GLOBAL().PushMsg(hdr2, &recharge);
+                    //结束
+
                     if (!purchase.code)
                         ret=0;
                     else
@@ -3885,6 +3906,68 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
     ret = 0;
     Stream st(SPEP::SETVAR);
     st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void ViaPlayerInfoFromBs(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::VIAPLAYERINFO,0x1);
+    UInt8 type = 0;
+    CHKKEY();
+    br >> type;
+    UInt16 serverNo = 0;
+
+    UInt64 playerId = 0;
+    UInt8 todayLogin = 0;
+    UInt16 accDays = 0;
+    UInt8 level = 0;
+    UInt32 totalRecharge = 0;
+
+    GObject::Player* player = NULL;
+    if(type == 1)
+    {
+        UInt64 pid;
+        br >> pid;
+        if(cfg.merged)
+        {
+            br>>serverNo;
+            pid += (static_cast<UInt64>(serverNo) << 48);
+        }
+        player = GObject::globalPlayers[pid];
+    }
+    else if(type == 2)
+    {
+        std::string playerName;
+        br >> playerName;
+        if(cfg.merged)
+        {
+            br>>serverNo;
+            serverNameToGlobalName(playerName, serverNo);
+        }
+        player = GObject::globalNamedPlayers[playerName];
+    }
+
+    if (player)
+    {
+        playerId = player->getId() & 0xFFFFFFFFFF;
+        if(player->GetVar(GObject::VAR_RP_VALUE) > 0)
+        {
+            if(TimeUtil::SharpDay(0, TimeUtil::Now()) == TimeUtil::SharpDay(0, player->getLastOnline()))
+                todayLogin = 1;
+            accDays = player->GetVar(GObject::VAR_VIA_ACC_DAYS);
+            level = player->GetLev();
+            totalRecharge = player->getTotalRecharge();
+        }
+    }
+
+    st << playerId;
+    st << todayLogin;
+    st << accDays;
+    st << level;
+    st << totalRecharge;
+    st << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 

@@ -1489,7 +1489,7 @@ void World::World_OldMan_Refresh(void *)
     if(time >= 8*3600 - 300 - 2 && time < 8*3600 - 300 +3 )
     {
     //    std::cout<<"即将出现"<<std::endl;
-        SYSMSG_BROADCASTV(571); 
+        SYSMSG_BROADCASTV(575); 
     }
     else if ( time < 7 *3600  )
     {
@@ -1970,6 +1970,8 @@ bool World::Init()
 #endif
     if(getQixi() || getWansheng() || getQingren())
         globalPlayers.enumerate(enum_qixi_rank_list, static_cast<void *>(NULL));
+    if(getSnowAct())
+        globalPlayers.enumerate(enum_snow_rank_list, static_cast<void *>(NULL));
 
 	UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10;
 	if(sday < now) sday += 86400;
@@ -2003,8 +2005,7 @@ bool World::Init()
     AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
 	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
     
-    if(now < GVAR.GetVar(GVAR_OLDMAN_END) )
-            AddTimer(5 * 1000, World_OldMan_Refresh, static_cast<void*>(NULL), 5 * 1000);
+    AddTimer(5 * 1000, World_OldMan_Refresh, static_cast<void*>(NULL), 5 * 1000);
     //开服战世界boss
     UInt32 value = GVAR.GetVar(GVAR_SERVERWAR_XIUWEI);
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);

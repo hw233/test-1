@@ -8361,9 +8361,9 @@ function HappyFireLoot(player,lootlvl)
     end
     local itemNum = {
             [0] = 1,
-            [1] = 2,
-            [2] = 3,
-            [3] = 4,
+            [1] = 1,
+            [2] = 1,
+            [3] = 1,
     };
     local package = player:GetPackage();
     package:AddItem(9440, itemNum[lootlvl], true,0,10); --欢乐礼包

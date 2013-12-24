@@ -1464,6 +1464,7 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 br >> itemid >> binding >> name;
                 player->modifyPlayerName(itemid,binding,name);
             }
+            break;
         case 0x21:
             player->getRealSpirit();
             player->sendRealSpirit();

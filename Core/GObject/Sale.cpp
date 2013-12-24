@@ -120,6 +120,7 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
                         continue;
                     }
                 }
+                sales[i].count = 1;
 			}
 			else
 			{

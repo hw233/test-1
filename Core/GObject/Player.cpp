@@ -1095,6 +1095,8 @@ namespace GObject
             }
 		}
 
+        if(GetVar(VAR_RP_VALUE) > 0 && TimeUtil::SharpDay(0, TimeUtil::Now()) != TimeUtil::SharpDay(0, _playerData.lastOnline))
+            AddVar(VAR_VIA_ACC_DAYS, 1);
         //calcNewYearQzoneContinueDay(curtime);
         continuousLogin(curtime);
         continuousLoginRF(curtime);
@@ -26468,7 +26470,7 @@ void Player::modifyPlayerName(UInt32 itemid,UInt8 binding,string modifyName)
                 for(UInt8 i = 0; i < sz; ++ i)
                 {
                     Player * pl = *it;
-                    pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                    pl->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000);
                     it++;
                 }
             }
