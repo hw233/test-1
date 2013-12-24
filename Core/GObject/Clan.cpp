@@ -648,7 +648,7 @@ bool Clan::leave(Player * player)
     }
 
 	UInt32 now = TimeUtil::Now();
-    if (cfg.GMCheck && player != getOwner() && now > member->joinTime && now - member->joinTime < 24 * 60 * 60)
+    if (cfg.GMCheck && now > member->joinTime && now - member->joinTime < 24 * 60 * 60)
     {
 		player->sendMsgCode(0, 1324);
 		return false;
