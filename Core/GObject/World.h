@@ -1283,6 +1283,7 @@ public:
     void DivorceSnowPair(Player* pl);
     void LoadSnowScore(Player* pl, Player* lover);
     void SendSnowAward();
+    void SnowClear();
     void SendQiShiBanAward();
     void SendGuangGunAward();
     static UInt16 GetRandomSpot();

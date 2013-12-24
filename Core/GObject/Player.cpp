@@ -18094,6 +18094,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
         m_snow.score = 0;
 
         DB1().PushUpdateData("DELETE FROM `snow` WHERE `playerId` = %" I64_FMT "u", getId());
+
+        WORLD().SnowClear();
     }
 
     void  Player::setForbidSale(bool b, bool isAuto /* = false */)
