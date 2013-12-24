@@ -5830,8 +5830,6 @@ void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
         cFriend->getLift();
     else if (req._flag == 5)
         cFriend->useTickets(req._idx);
-    else if (req._flag == 6)
-        cFriend->setCFriendSuccess(req._idx);
 }
 
 void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )

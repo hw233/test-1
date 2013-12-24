@@ -3919,7 +3919,16 @@ void GMHandler::OnCFriend(GObject::Player *player, std::vector<std::string>& arg
             if(idx > 3 && idx < 7)
                 cFriend->setCFriendNum(3);
             if(idx >= 39)
-                cFriend->setCFriendSuccess(3);
+            {
+                UInt64 userId = player->getId();
+                if(cfg.merged)
+                    userId &= 0x0000ffffffffffull;
+                for(int i = 0; i < 3; ++ i)
+                {
+                    GameMsgHdr hdr1(0x1DD, WORKER_THREAD_WORLD, player, sizeof(userId));
+                    GLOBAL().PushMsg(hdr1, &userId);
+                }
+            }
         }
         break;
     case 2:

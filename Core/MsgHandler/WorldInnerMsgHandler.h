@@ -1986,6 +1986,48 @@ void SendQSBState( GameMsgHdr& hdr, const void* data )
     player->QiShiBanState();
 }
 
+void OnSetCFriendInvited( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    UInt64 userId = *reinterpret_cast<UInt64 *>(const_cast<void *>(data));
+    WORLD().SetMemCach_CFriend_Invited(userId);
+}
+
+void OnDelCFriendInvited( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 userId = player->getId();
+    if(cfg.merged)
+        userId &= 0x0000ffffffffffull;
+
+    WORLD().DelMemCach_CFriend_Invited(userId);
+}
+
+void OnSendCFriendInvited( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 type = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
+
+    UInt64 userId = player->getId();
+    if(cfg.merged)
+        userId &= 0x0000ffffffffffull;
+
+    Stream st(REP::CFRIEND);
+    if(type)
+    {
+        st << static_cast<UInt8>(6);
+        st << WORLD().GetMemCach_CFriend_Invited(userId);
+    }
+    else
+    {
+        st << static_cast<UInt8>(5);
+        st << WORLD().GetMemCach_CFriend_InvitedAct(userId);
+    }
+    st << Stream::eos;
+    player->send(st);
+}
+
 void OnSendClanMemberList( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);

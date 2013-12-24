@@ -51,6 +51,12 @@ enum {
     CF_INVITED5 = 40,
     CF_INVITED10,
     CF_INVITED20,
+    CF_INVITED1_TMP,    //以下是临时活动
+    CF_INVITED3_TMP,
+    CF_INVITED5_TMP,
+    CF_INV5_TMP,      //邀请好友人数
+    CF_INV10_TMP,
+    CF_INV20_TMP,
     CF_MAX,
 };
 
@@ -79,7 +85,6 @@ public:
     void giveLift();
     void getLift();
     void useTickets(UInt8);
-    void setCFriendSuccess(UInt8);
 
     //For GM
     void clearAllForGM()

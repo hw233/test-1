@@ -29,12 +29,20 @@ void CFriend::loadFromDB(const char* cf)
     StringTokenizer cfriend(cf, ",");
     UInt32 count = cfriend.count();
     m_cf.resize(CF_MAX, 0);
-    for (UInt8 i = 0; i < count && i < CF_MAX; ++i)
+    for (UInt8 i = 0; i < count && i < CF_MAX; ++ i)
         m_cf[i] = atoi(cfriend[i].c_str());
     bool toDB = false;
     if (!m_owner->GetVar(VAR_INVITES))
     {
-        for (UInt8 i = CF_INV3; i <= CF_INV30; ++i)
+        for (UInt8 i = CF_INV3; i <= CF_INV30; ++ i)
+        {
+            if (m_cf[i] != 0)
+            {
+                m_cf[i] = 0;
+                toDB = true;
+            }
+        }
+        for (UInt8 i = CF_INV5_TMP; i <= CF_INV20_TMP; ++ i)
         {
             if (m_cf[i] != 0)
             {
@@ -43,9 +51,33 @@ void CFriend::loadFromDB(const char* cf)
             }
         }
     }
+    /*
     if (!m_owner->GetVar(VAR_INVITEDSUCCESS))
     {
         for (UInt8 i = CF_INVITED2; i <= CF_INVITED20; ++i)
+        {
+            if (m_cf[i] != 0)
+            {
+                m_cf[i] = 0;
+                toDB = true;
+            }
+        }
+    }
+    */
+    if(TimeUtil::SharpMonth(1, TimeUtil::Now()-3600) <= TimeUtil::Now())
+    {
+        for (UInt8 i = CF_INVITED2; i <= CF_INVITED20; ++i)
+        {
+            if (m_cf[i] != 0)
+            {
+                m_cf[i] = 0;
+                toDB = true;
+            }
+        }
+    }
+    if(!World::getCFriendAct())
+    {
+        for (UInt8 i = CF_INVITED1_TMP; i <= CF_INVITED5_TMP; ++i)
         {
             if (m_cf[i] != 0)
             {
@@ -169,6 +201,18 @@ void CFriend::sendCFriend()
     st << Stream::eos;
     m_owner->send(st);
     updateRecordData();
+
+    if(World::getCFriendAct())
+    {
+        UInt8 type = 0;
+        GameMsgHdr hdr(0x1DF, WORKER_THREAD_WORLD, m_owner, sizeof(type));
+        GLOBAL().PushMsg(hdr, &type);
+    }
+    else
+    {
+        GameMsgHdr hdr(0x1DE, WORKER_THREAD_WORLD, m_owner, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
 }
 
 void CFriend::updateRecordData()
@@ -176,11 +220,14 @@ void CFriend::updateRecordData()
     Stream st(REP::CFRIEND);
     st << static_cast<UInt8>(2);
     st << static_cast<UInt16>(m_owner->GetVar(VAR_INVITES));
-    st << static_cast<UInt16>(m_owner->GetVar(VAR_INVITEDSUCCESS));
     st << static_cast<UInt16>(m_owner->GetVar(VAR_CFRIENDTICKETS));
     st << static_cast<UInt16>(m_owner->getCFrendsNum());
     st << Stream::eos;
     m_owner->send(st);
+
+    UInt8 type = 1;
+    GameMsgHdr hdr(0x1DF, WORKER_THREAD_WORLD, m_owner, sizeof(type));
+    GLOBAL().PushMsg(hdr, &type);
 }
 
 void CFriend::setCFriendNum(UInt8 num)
@@ -194,6 +241,12 @@ void CFriend::setCFriendNum(UInt8 num)
         setCFriendSafe(CF_INV15);
     if(invited + num >= 3)
         setCFriendSafe(CF_INV3);
+    if(invited + num >= 20)
+        setCFriendSafe(CF_INV20_TMP);
+    if(invited + num >= 10)
+        setCFriendSafe(CF_INV10_TMP);
+    if(invited + num >= 5)
+        setCFriendSafe(CF_INV5_TMP);
     m_owner->AddVar(VAR_INVITES, num);
     updateRecordData();
 }
@@ -208,13 +261,41 @@ void CFriend::reset(bool online)
         if (online)
             updateCFriend(i);
     }
+    for (UInt8 i = CF_INV5_TMP; i <= CF_INV20_TMP; ++ i)
+    {
+        m_cf[i] = 0;
+        if (online)
+            updateCFriend(i);
+    }
+    /*
     if (!m_owner->GetVar(VAR_INVITEDSUCCESS))
+    {
+        for (UInt8 i = CF_INVITED2; i <= CF_INVITED20; ++ i)
+        {
+            m_cf[i] = 0;
+            if (online)
+                updateCFriend(i);
+        }
+    }
+    */
+    if(TimeUtil::SharpMonth(1, TimeUtil::Now()-3600) <= TimeUtil::Now())
     {
         for (UInt8 i = CF_INVITED2; i <= CF_INVITED20; ++i)
         {
             m_cf[i] = 0;
             if (online)
                 updateCFriend(i);
+        }
+    }
+    if(!World::getCFriendAct())
+    {
+        for (UInt8 i = CF_INVITED1_TMP; i <= CF_INVITED5_TMP; ++i)
+        {
+            m_cf[i] = 0;
+            /*
+            if (online)
+                updateCFriend(i);
+            */
         }
     }
     updateToDB();
@@ -288,23 +369,6 @@ void CFriend::useTickets(UInt8 type)
     else
         m_owner->checkLastCFTicketsAward();
 
-}
-
-void CFriend::setCFriendSuccess(UInt8 num)
-{
-    if(num == 0)
-        return;
-    UInt32 var = m_owner->GetVar(VAR_INVITEDSUCCESS);
-    if(var + num >= 20)
-        setCFriendSafe(CF_INVITED20);
-    if(var + num >= 10)
-        setCFriendSafe(CF_INVITED10);
-    if(var + num >= 5)
-        setCFriendSafe(CF_INVITED5);
-    if(var + num >= 2)
-        setCFriendSafe(CF_INVITED2);
-    m_owner->AddVar(VAR_INVITEDSUCCESS, num);
-    updateRecordData();
 }
 
 } // namespace GObject

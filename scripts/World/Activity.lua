@@ -909,6 +909,12 @@ function onActivityCheck(tm)
          setQZoneRechargeTime(false)
       end
 
+      if tm >= actTime256 and tm < actTime256_1 then
+         setCFriendAct(true)
+      else
+         setCFriendAct(false)
+      end
+
       if tm >= actTime551 and tm < actTime551_1 then
           setCompassAct(true)
       else
@@ -1472,6 +1478,9 @@ function initActTime(y, m, d)
   --万圣节登陆有礼
   local SerStartTm_2013_1= { ['year'] = 2013, ['month'] = 10, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  local  SerStartTm256= { ['year'] = 2013, ['month'] =12, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm256_1= { ['year'] = 2013, ['month'] = 12, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -1917,6 +1926,9 @@ function initActTime(y, m, d)
   actTime254_1= os.time(SerStartTm254_1);
   actTime255= os.time(SerStartTm255)
   actTime255_1= os.time(SerStartTm255_1);
+
+  actTime256= os.time(SerStartTm256)
+  actTime256_1= os.time(SerStartTm256_1);
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);

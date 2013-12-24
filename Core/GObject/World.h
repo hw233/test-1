@@ -278,6 +278,10 @@ public:
     { _cfriend = v; }
     inline static bool getCFriend()
     { return _cfriend; }
+    inline static void setCFriendAct(bool v)
+    { _cfriendAct = v; }
+    inline static bool getCFriendAct()
+    { return _cfriendAct; }
     inline static void setMayDay(bool v)
     { _mayday = v; }
     inline static bool getMayDay()
@@ -1091,6 +1095,7 @@ public:
     static bool _rc7day;
     static bool _shuoshuo;
     static bool _cfriend;
+    static bool _cfriendAct;
     static bool _mayday;
     static bool _mayday1;
     static bool _ydmdact;
@@ -1260,6 +1265,11 @@ public:
     bool MemCachInit();
     void SetMemCach_qishiban(UInt32 score, const char * openId);
     UInt32 GetMemCach_qishiban(const char * openId);
+    void SetMemCach_CFriend_Invited(UInt64);
+    UInt16 GetMemCach_CFriend_Invited(UInt64);
+    void DelMemCach_CFriend_Invited(UInt64);
+    void SetMemCach_CFriend_InvitedAct(UInt64);
+    UInt16 GetMemCach_CFriend_InvitedAct(UInt64);
     void UpdateQixiScore(Player* pl, Player* lover);
     void sendGuangGunPlayers(Player* pl);
     void sendQixiPlayers(Player* pl);
