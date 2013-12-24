@@ -1126,6 +1126,27 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     GameMsgHdr hdr(0x2F2, player->getThreadId(), player, sizeof(purchase));
                     GLOBAL().PushMsg(hdr, &purchase);
 
+                    //为了统计
+                    struct Recharge
+                    {
+                        UInt8 type;
+                        UInt32 gold;
+                        char no[256];
+                        char uint[32];
+                        char money[32];
+                    } recharge;
+
+                    memset(&recharge, 0x00, sizeof(recharge));
+                    recharge.type = 0; // 有角色时充值
+                    recharge.gold = 0;
+                    memcpy(recharge.no, no.c_str(), no.length()>255?255:no.length());
+                    memcpy(recharge.uint, uint.c_str(), uint.length()>31?31:uint.length());
+                    memcpy(recharge.money, money.c_str(), money.length()>31?31:money.length());
+
+                    GameMsgHdr hdr2(0x2F0, player->getThreadId(), player, sizeof(recharge));
+                    GLOBAL().PushMsg(hdr2, &recharge);
+                    //结束
+
                     if (!purchase.code)
                         ret=0;
                     else
