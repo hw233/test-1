@@ -51,8 +51,7 @@ void CFriend::loadFromDB(const char* cf)
             }
         }
     }
-    /*
-    if (!m_owner->GetVar(VAR_INVITEDSUCCESS))
+    if(TimeUtil::SharpMonth(1, TimeUtil::Now()-3600) <= TimeUtil::Now()+300)
     {
         for (UInt8 i = CF_INVITED2; i <= CF_INVITED20; ++i)
         {
@@ -62,29 +61,9 @@ void CFriend::loadFromDB(const char* cf)
                 toDB = true;
             }
         }
-    }
-    */
-    if(TimeUtil::SharpMonth(1, TimeUtil::Now()-3600) <= TimeUtil::Now())
-    {
-        for (UInt8 i = CF_INVITED2; i <= CF_INVITED20; ++i)
-        {
-            if (m_cf[i] != 0)
-            {
-                m_cf[i] = 0;
-                toDB = true;
-            }
-        }
-    }
-    if(!World::getCFriendAct())
-    {
-        for (UInt8 i = CF_INVITED1_TMP; i <= CF_INVITED5_TMP; ++i)
-        {
-            if (m_cf[i] != 0)
-            {
-                m_cf[i] = 0;
-                toDB = true;
-            }
-        }
+        UInt8 type = 1;
+        GameMsgHdr hdr(0x1DE, WORKER_THREAD_WORLD, m_owner, sizeof(type));
+        GLOBAL().PushMsg(hdr, &type);
     }
     if (toDB)
         updateToDB();
@@ -200,19 +179,8 @@ void CFriend::sendCFriend()
         st << m_cf[i];
     st << Stream::eos;
     m_owner->send(st);
-    updateRecordData();
 
-    if(World::getCFriendAct())
-    {
-        UInt8 type = 0;
-        GameMsgHdr hdr(0x1DF, WORKER_THREAD_WORLD, m_owner, sizeof(type));
-        GLOBAL().PushMsg(hdr, &type);
-    }
-    else
-    {
-        GameMsgHdr hdr(0x1DE, WORKER_THREAD_WORLD, m_owner, 0);
-        GLOBAL().PushMsg(hdr, NULL);
-    }
+    updateRecordData();
 }
 
 void CFriend::updateRecordData()
@@ -228,6 +196,12 @@ void CFriend::updateRecordData()
     UInt8 type = 1;
     GameMsgHdr hdr(0x1DF, WORKER_THREAD_WORLD, m_owner, sizeof(type));
     GLOBAL().PushMsg(hdr, &type);
+    if(World::getCFriendAct())
+    {
+        UInt8 type = 0;
+        GameMsgHdr hdr(0x1DF, WORKER_THREAD_WORLD, m_owner, sizeof(type));
+        GLOBAL().PushMsg(hdr, &type);
+    }
 }
 
 void CFriend::setCFriendNum(UInt8 num)
@@ -267,18 +241,7 @@ void CFriend::reset(bool online)
         if (online)
             updateCFriend(i);
     }
-    /*
-    if (!m_owner->GetVar(VAR_INVITEDSUCCESS))
-    {
-        for (UInt8 i = CF_INVITED2; i <= CF_INVITED20; ++ i)
-        {
-            m_cf[i] = 0;
-            if (online)
-                updateCFriend(i);
-        }
-    }
-    */
-    if(TimeUtil::SharpMonth(1, TimeUtil::Now()-3600) <= TimeUtil::Now())
+    if(TimeUtil::SharpMonth(1, TimeUtil::Now()-3600) <= TimeUtil::Now()+300)
     {
         for (UInt8 i = CF_INVITED2; i <= CF_INVITED20; ++i)
         {
@@ -286,17 +249,21 @@ void CFriend::reset(bool online)
             if (online)
                 updateCFriend(i);
         }
+        UInt8 type = 1;
+        GameMsgHdr hdr(0x1DE, WORKER_THREAD_WORLD, m_owner, sizeof(type));
+        GLOBAL().PushMsg(hdr, &type);
     }
     if(!World::getCFriendAct())
     {
         for (UInt8 i = CF_INVITED1_TMP; i <= CF_INVITED5_TMP; ++i)
         {
             m_cf[i] = 0;
-            /*
             if (online)
                 updateCFriend(i);
-            */
         }
+        UInt8 type = 0;
+        GameMsgHdr hdr(0x1DE, WORKER_THREAD_WORLD, m_owner, sizeof(type));
+        GLOBAL().PushMsg(hdr, &type);
     }
     updateToDB();
 }
@@ -369,6 +336,32 @@ void CFriend::useTickets(UInt8 type)
     else
         m_owner->checkLastCFTicketsAward();
 
+}
+
+void CFriend::setCFriendSuccess(UInt32 num)
+{
+    if(num == 0)
+        return;
+    if(num >= 20)
+        setCFriendSafe(CF_INVITED20);
+    if(num >= 10)
+        setCFriendSafe(CF_INVITED10);
+    if(num >= 5)
+        setCFriendSafe(CF_INVITED5);
+    if(num >= 2)
+        setCFriendSafe(CF_INVITED2);
+}
+
+void CFriend::setCFriendSuccess_TMP(UInt32 num)
+{
+    if(!num || !World::getCFriendAct())
+        return;
+    if(num >= 1)
+        setCFriendSafe(CF_INVITED1_TMP);
+    if(num >= 3)
+        setCFriendSafe(CF_INVITED3_TMP);
+    if(num >= 5)
+        setCFriendSafe(CF_INVITED5_TMP);
 }
 
 } // namespace GObject

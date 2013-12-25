@@ -3778,6 +3778,16 @@ void World::DelMemCach_CFriend_Invited(UInt64 userId)
     }
 }
 
+void World::DelMemCach_CFriend_InvitedAct(UInt64 userId)
+{
+    if (_memcinited || !userId)
+    {
+        char key[MEMCACHED_MAX_KEY] = {0};
+        snprintf(key, MEMCACHED_MAX_KEY, "CFriendAct_%lu", userId);
+        m_MCached.del(key);
+    }
+}
+
 UInt16 World::GetRandomSpot()
 {
     GObject::MapList::iterator it;

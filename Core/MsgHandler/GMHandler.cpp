@@ -3932,7 +3932,11 @@ void GMHandler::OnCFriend(GObject::Player *player, std::vector<std::string>& arg
         }
         break;
     case 2:
-        cFriend->clearAllForGM();
+        {
+            cFriend->clearAllForGM();
+            GameMsgHdr hdr(0x1DE, WORKER_THREAD_WORLD, player, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
         break;
     case 3:
         player->AddVar(VAR_CFRIENDTICKETS, atoi(args[1].c_str()));

@@ -1478,8 +1478,8 @@ function initActTime(y, m, d)
   --万圣节登陆有礼
   local SerStartTm_2013_1= { ['year'] = 2013, ['month'] = 10, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
-  local  SerStartTm256= { ['year'] = 2013, ['month'] =12, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm256_1= { ['year'] = 2013, ['month'] = 12, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm256= { ['year'] = 2013, ['month'] =12, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm256_1= { ['year'] = 2014, ['month'] = 1, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);

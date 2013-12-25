@@ -1268,6 +1268,7 @@ public:
     void SetMemCach_CFriend_Invited(UInt64);
     UInt16 GetMemCach_CFriend_Invited(UInt64);
     void DelMemCach_CFriend_Invited(UInt64);
+    void DelMemCach_CFriend_InvitedAct(UInt64);
     void SetMemCach_CFriend_InvitedAct(UInt64);
     UInt16 GetMemCach_CFriend_InvitedAct(UInt64);
     void UpdateQixiScore(Player* pl, Player* lover);

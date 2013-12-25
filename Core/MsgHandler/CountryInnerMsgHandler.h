@@ -2084,6 +2084,25 @@ void OnCFriendAthleticsRank( GameMsgHdr& hdr, const void * data)
     player->OnCFriendAthleticsRank();
 }
 
+void OnSetCFriendSuccess( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct CFInvited
+    {
+        UInt8 type;
+        UInt16 invited;
+    };
+
+    CFInvited * cfData = reinterpret_cast<CFInvited *>(const_cast<void *>(data));
+    if(!cfData) return;
+
+    if(cfData->type)
+        player->GetCFriend()->setCFriendSuccess(cfData->invited);
+    else
+        player->GetCFriend()->setCFriendSuccess_TMP(cfData->invited);
+}
+
 void OnForbidSaleQueryFail( GameMsgHdr &hdr, const void *data)
 {
     MSG_QUERY_PLAYER(player);

@@ -85,6 +85,8 @@ public:
     void giveLift();
     void getLift();
     void useTickets(UInt8);
+    void setCFriendSuccess(UInt32);
+    void setCFriendSuccess_TMP(UInt32);
 
     //For GM
     void clearAllForGM()

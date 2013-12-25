@@ -1997,35 +1997,55 @@ void OnSetCFriendInvited( GameMsgHdr& hdr, const void* data )
 void OnDelCFriendInvited( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
+    UInt8 opt = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
+
     UInt64 userId = player->getId();
     if(cfg.merged)
         userId &= 0x0000ffffffffffull;
 
-    WORLD().DelMemCach_CFriend_Invited(userId);
+    if(opt)
+        WORLD().DelMemCach_CFriend_Invited(userId);
+    else
+        WORLD().DelMemCach_CFriend_InvitedAct(userId);
 }
 
 void OnSendCFriendInvited( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
-    UInt8 type = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
+    UInt8 opt = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
 
     UInt64 userId = player->getId();
     if(cfg.merged)
         userId &= 0x0000ffffffffffull;
 
-    Stream st(REP::CFRIEND);
-    if(type)
+    struct CFInvited
     {
-        st << static_cast<UInt8>(6);
-        st << WORLD().GetMemCach_CFriend_Invited(userId);
+        UInt8 type;
+        UInt16 invited;
+    } cfData = {0};
+
+    Stream st(REP::CFRIEND);
+    if(opt)
+    {
+        UInt16 invited = WORLD().GetMemCach_CFriend_Invited(userId);
+        st << static_cast<UInt8>(6) << invited;
+
+        cfData.type = opt;
+        cfData.invited = invited;
     }
     else
     {
-        st << static_cast<UInt8>(5);
-        st << WORLD().GetMemCach_CFriend_InvitedAct(userId);
+        UInt16 invited = WORLD().GetMemCach_CFriend_InvitedAct(userId);
+        st << static_cast<UInt8>(5) << invited;
+
+        cfData.type = opt;
+        cfData.invited = invited;
     }
     st << Stream::eos;
     player->send(st);
+    //只能在发送的时候触发
+    GameMsgHdr hdr1(0x347, player->getThreadId(), player, sizeof(CFInvited));
+    GLOBAL().PushMsg(hdr1, &cfData);
 }
 
 void OnSendClanMemberList( GameMsgHdr& hdr, const void* data )
