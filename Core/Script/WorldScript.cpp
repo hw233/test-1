@@ -104,6 +104,8 @@ void WorldScript::init()
 	def("setShuoShuo", GObject::World::setShuoShuo);
 	def("getCFriend", GObject::World::getCFriend);
 	def("setCFriend", GObject::World::setCFriend);
+	def("getCFriendAct", GObject::World::getCFriendAct);
+	def("setCFriendAct", GObject::World::setCFriendAct);
 	def("getMayDay", GObject::World::getMayDay);
 	def("setMayDay", GObject::World::setMayDay);
 	def("getMayDay1", GObject::World::getMayDay1);

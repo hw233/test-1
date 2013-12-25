@@ -608,9 +608,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     std::string pfkey;
     std::string xinyue;
     std::string jinquan;
+    bool isNew_qq = false;
     StringTokenizer st(nu._para, ":");
     switch (st.count())
     {
+        case 6:
+            isNew_qq = atoi(st[5].c_str()) > 0;
         case 5:
             jinquan = st[4];
         case 4:
@@ -792,6 +795,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->continuousLoginSummerFlow();
             pl->SetQQBoardLogin();
             pl->setPresentLogin();
+            UInt64 userId = atoll(nu._invited.c_str());
+            if(isNew_qq && userId)     //设置邀请好友成功
+            {
+                GameMsgHdr hdr1(0x1DD, WORKER_THREAD_WORLD, pl, sizeof(userId));
+                GLOBAL().PushMsg(hdr1, &userId);
+            }
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
