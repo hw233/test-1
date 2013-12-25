@@ -3369,6 +3369,13 @@ void World::SendSnowAward()
         }
     }
 }
+
+void World::SnowClear()
+{
+    _snowPlayerSet.clear();
+    _snowScoreMap.clear();
+}
+
 void World::SendRechargeRP7RankAward()
 {
     static UInt32 s_couponCount[] = {2000,1000,500,200,200,200,200,200,200,200};
