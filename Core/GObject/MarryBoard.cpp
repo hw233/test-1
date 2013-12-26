@@ -23,7 +23,7 @@ namespace GObject
         MailItemsInfo itemsInfo(mitemall, Activity, 1);
         //仙缘石奖励
         {
-            MailPackage::MailItem mitem0[] = {{9375, 10},{9375,5}};
+            MailPackage::MailItem mitem0[] = {{9371, 10},{9371,5}};
             if(marryBoard->finder != NULL)
             {
                 if( p == marryBoard->finder)
@@ -143,8 +143,9 @@ namespace GObject
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId,p->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         return true;
     }
-    bool MarryBoard::CreateMarry(Player * man , Player * woman ,UInt8, UInt32 mTime)
+    bool MarryBoard::CreateMarry(Player * man , Player * woman ,UInt8 norms, UInt32 mTime)
     {
+        return false;
         UInt32 now = TimeUtil::Now();
         if( mTime < now + 1800 )
         {
@@ -161,6 +162,7 @@ namespace GObject
         _atTime = mTime;
         _man = man;
         _woman = woman;
+        _norms = norms;
         //_marryBoardTimer =WORLD().AddTimer(2 * 1000, MarryBoard_Timer, static_cast<void*>(NULL));
         return true;
     }
@@ -172,7 +174,7 @@ namespace GObject
      //      return ;
         if(now >= _atTime - 1800 && now < _atTime )
         {
-            if(_type == 0)
+            if(_type != 1)
             {
                 GObject::globalOnlinePlayers.enumerate(player_enum_myarryBoard,this,1);
                 _type =1 ;
@@ -180,7 +182,7 @@ namespace GObject
         }
         else if(now >= _atTime  && now < _atTime + OneTime )
         {
-            if(_type == 1)
+            if(_type != 2)
             {
                 SetQuestionOnMarryBoard();
                 _type =2 ;
@@ -201,7 +203,7 @@ namespace GObject
         }
         else if(now >= _atTime + OneTime && now < _atTime + 2* OneTime )
         {
-            if(_type == 2)
+            if(_type != 3)
             {
                 _type =3 ;
                 GObject::globalOnlinePlayers.enumerate(player_enum_myarryBoard,this,3);
@@ -209,9 +211,9 @@ namespace GObject
         }
         else if(now >= _atTime +2 * OneTime && now < _atTime + 3 * OneTime)
         {
-            if(_type == 3)
+            if(_type != 4)
             {
-                GObject::globalOnlinePlayers.enumerate(player_enum_myarryBoard,this,6);
+                GObject::globalPlayers.enumerate(player_enum_myarryBoard,this,6);
                 setDoorMax();
                 _type =4 ;
                 GObject::globalOnlinePlayers.enumerate(player_enum_myarryBoard,this,_type);
@@ -301,6 +303,7 @@ namespace GObject
                     if(_type != 3)
                         return false;
                     UInt32 MarryBoard3 = pl->GetVar(VAR_MARRYBOARD3);
+                    pl->SetVar(VAR_MARRYBOARD3_KEY,100 + uRand(10000));
                     st <<static_cast<UInt8>(0x41);
                     st << _man->getId();
                     st << _woman->getId();
@@ -315,10 +318,11 @@ namespace GObject
                     st <<static_cast<UInt8>(0x61);
                     st << _man->getId();
                     st << _woman->getId();
-                    st << (_type == 3 ? _atTime + 3 * OneTime -now : 0) ;
+                    st << (_type == 4 ? _atTime + 3 * OneTime -now : 0) ;
                     for(UInt8 i =0 ;i < 8 ;++i)
                         st<<_door[i];
                     st << doorMax ;
+                    UInt32 knock =pl->GetVar(VAR_MARRYBOARD4_TIME);
                     if(pl == _man || pl == _woman )
                     {
                         st << _rightDoor ;
@@ -328,7 +332,7 @@ namespace GObject
                             st << (_atTime + 2 * OneTime + 30 - now);
                     }
                     else 
-                       st <<( (_atTime + 3 * OneTime) > now ? _atTime + 3 * OneTime - now : 0); 
+                       st <<static_cast<UInt32>( (now - knock) > 15?0:(knock+15-now) );
                     pl->SetVar(VAR_MARRYBOARD4_TIME,now-15);
                 }
                 break;
@@ -402,15 +406,15 @@ namespace GObject
         else
         {
             if(_rightDoor == 0)
-                _rightDoor = uRand(7);  //暂时不清楚是否能取到0或者8
+                _rightDoor = uRand(7)+1;  //暂时不清楚是否能取到0或者8
             UInt32 knockTime = pl->GetVar(VAR_MARRYBOARD4_TIME);
-            if(now > _atTime + 2 * OneTime + 30 && now < _atTime + 3 * OneTime && now - knockTime > 15)
+            if(now > _atTime + 2 * OneTime  && now < _atTime + 3 * OneTime && now - knockTime > 15)
             {
-                if(_door[door] >= doorMax)
+                if(_door[door-1] >= doorMax)
                     return ;
-                if(_door[door] < doorMax)
-                    _door[door] ++ ; 
-                if(_door[door] == doorMax)
+                if(_door[door-1] < doorMax)
+                    _door[door-1] ++ ; 
+                if(_door[door-1] == doorMax && door == _rightDoor)
                     finder = pl;
             }
             pl->SetVar(VAR_MARRYBOARD4_TIME,now);
@@ -442,6 +446,7 @@ namespace GObject
         _YHlively = 0;
         _askNum = 0;
         doorMax = 0;
+        plNum = 0;
         for(UInt8 i =0; i < 4 ;++i )
             _support[i] = 0;
         for(UInt8 i =0 ; i < 8 ;++i )

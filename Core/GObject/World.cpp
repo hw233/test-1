@@ -49,6 +49,7 @@
 #include "Common/Itoa.h"
 #include "Server/SysMsg.h"
 #include "Arena.h"
+#include "MarryBoard.h"  //婚礼进行时
 #include "ArenaTeam.h"
 #include "ArenaServerWar.h"
 #include "Tianjie.h"
@@ -1515,7 +1516,7 @@ void World::World_OldMan_Refresh(void *)
    // else if ((time%600) < 3 || (time%600)>= 600 -2)    //测试
     {
         UInt16 spot = GetRandomSpot();
-    //        std::cout<<"ChangeTo:"<<spot<<std::endl;
+        //std::cout<<"ChangeTo:"<<spot<<std::endl;
         if(!spot)
             return ;
         if(_oldMan._spot == 0)
@@ -1560,6 +1561,20 @@ void World::World_OldMan_Refresh(void *)
 void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
+}
+void World::CreateMarryBoard(UInt64 man , UInt64 woman ,UInt8 type,UInt32 time )
+{
+    return ;
+    if(time == 0)
+        time = TimeUtil::Now()+ 1830 ;
+   Player * pman = GObject::globalPlayers[man]; 
+   Player * pwoman = GObject::globalPlayers[woman]; 
+   GObject::MarryBoard::instance().CreateMarry(pman,pwoman,type,time);
+   GObject::MarryBoard::instance()._marryBoardTimer = AddTimer(2 * 1000, World_MarryBoard_Refresh, static_cast<void*>(NULL));
+}
+void World::World_MarryBoard_Refresh(void *)
+{
+    GObject::MarryBoard::instance().MarryBoard_Timer(); 
 }
 void World::DaysRank_Refresh(void*)
 {

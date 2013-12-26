@@ -9896,3 +9896,15 @@ function onCollectCardAct(player, idx)
     return true
 end
 
+local answerInMarryBoard = {4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 
+}
+function getAnswerInMarryBoard(id)
+    if id > #answerInMarryBoard then
+        return 0;
+    end
+    if answerInMarryBoard[id] == nil then 
+        return 0;
+    end
+    return (answerInMarryBoard[id])
+end
+

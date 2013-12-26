@@ -390,6 +390,7 @@ namespace Script
 	    UInt32 getYellowPetId(UInt32 petId);
 
         UInt8 getAnswerInFoolsDay(UInt8 qid, UInt8 type);
+        UInt8 getAnswerInMarryBoard(UInt8 id);
         void getAwardInFoolsDay(Player* player, UInt8, UInt8);
         bool getLuckyStarAward(Player* player, UInt8 idx);
         void GetLuckyBagAward(Player * player);

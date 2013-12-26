@@ -3769,7 +3769,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_END, end);
         ret = 1 ;
     }
-    else if (type == 11 && begin <= end )
+    else if (type == 15 && begin <= end )
     {
         if(GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_END) < TimeUtil::Now())
