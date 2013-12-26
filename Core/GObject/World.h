@@ -1232,6 +1232,7 @@ private:
     static void World_Boss_Refresh(void*);
     static void World_Boss_Prepare(void*);
     static void World_OldMan_Refresh(void*);   //圣诞老人刷新
+    static void World_MarryBoard_Refresh(void*);   //圣诞老人刷新
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
@@ -1293,6 +1294,7 @@ public:
     void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);
 
     void UpdateGuangGunScore(Player* pl);
+    void CreateMarryBoard(UInt64 man , UInt64 woman ,UInt8 type, UInt32 time);
     static void SendRechargeRP7RankAward();
 private:
 	void testUpdate();

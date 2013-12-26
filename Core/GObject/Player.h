@@ -2499,6 +2499,8 @@ namespace GObject
         void getHappyValueAward(UInt8 val);
         void sendHappyValueInfo();
 
+        void getMarryBoard3Award(UInt8 type);
+
         UInt32 getFighterEquipAward();
         void checkZhenying();
         void changeZYAward(UInt8 country); 
@@ -2860,6 +2862,7 @@ namespace GObject
         void sendRealSpirit();
         void AddRealSpirit(UInt32 real = 0);
         void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
+        bool giveFlower(UInt8 type , UInt32 num = 0);
 	};
 
 

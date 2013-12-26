@@ -26903,6 +26903,77 @@ void Player::getHappyValueAward(UInt8 val)
     ctslandingAward |= (1<<(val - 1));
     SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
 }
+bool Player::giveFlower(UInt8 type ,UInt32 num)
+{
+    if(type > 1)
+        return false;
+  /*  if(type ==1)
+    {
+        UInt32 gold = 100;
+        if (getGold() < gold)
+        {
+            sendMsgCode(0, 1104);
+            return false;
+        }
+        ConsumeInfo ci(MarryYanHua,0,0);
+        useGold(gold,&ci);
+        AddVar(VAR_MARRYBOARD_YANHUA,100);
+    }
+    else
+    {
+        UInt32 price = 1000 * num;
+		if(_playerData.tael < price)
+		{
+			sendMsgCode(0, 1100);
+			return false;
+		}
+		ConsumeInfo ci(MarryBaiHe,0,0);
+		useTael(price,&ci);
+    }
+   */
+    ItemBase* item = GetPackage()->GetItem(9442+type, true);					
+    if(item ==NULL)
+        return false;
+    UInt16 count = item->Count();
+    if(count <1)
+        return false; 
+    GetPackage()->DelItem2(item, type ==0 ? 1:num );
+    GetPackage()->AddItemHistoriesLog(9442+type, type == 0 ? 1:num );
+    AddVar(VAR_MARRYBOARD_LIVELY,type * 500 + num * 50);
+    return true;
+}
+void Player::getMarryBoard3Award(UInt8 type)   //砸蛋
+{
+    UInt32 Award = GetVar(VAR_MARRYBOARD3);
+    if(Award >= 31 || Award < 9)
+        return ;
+    if(type > 3 ||type <1)
+        return; 
+    SYSMSG(title, 4974);
+    SYSMSGV(content, 4975,getCountry(),getName().c_str());
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem[][3] = {
+            {{56, 1},{57,1},{500,1}},
+            {{9371,1},{511,1},{505,1}},
+            {{503,1},{},{}}
+        };
+        MailItemsInfo itemsInfo(mitem[type], Activity, 1);
+        mailPackageManager.push(mail->id, mitem[type], 3, true);
+        std::string strItems;
+        for (int i = 0; i < 3; ++i)
+        {
+            strItems += Itoa(mitem[type][i].id);
+            strItems += ",";
+            strItems += Itoa(mitem[type][i].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+        SetVar(VAR_MARRYBOARD3,Award + 31);
+    }
+
+}
 } // namespace GObject
 
 

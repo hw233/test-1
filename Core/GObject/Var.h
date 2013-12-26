@@ -596,7 +596,14 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_YEARHAPPY_VALUE = 651,       //累计欢乐值
         VAR_YEARHAPPY_DAYVALUE_AWARD = 652,       //每日欢乐值奖励 
         VAR_YEARHAPPY_LEFTVALUE = 653,       //每日剩余欢乐值 
-        //660-760 for lijr
+        //婚礼进行系统
+        VAR_MARRYBOARD_LIVELY  = 654,       //个人热闹值
+        VAR_MARRYBOARD3  = 655,             //吃宴席的盘数 0表示未入席 1-10表示吃了 0-9盘
+        VAR_MARRYBOARD2_NUM  = 656,             // 表示答题号
+        VAR_MARRYBOARD2_ANS  = 657,             // 表示当前答案 
+        VAR_MARRYBOARD4_TIME = 658,             //表示婚礼第三阶段吃喜筵第四阶段驱赶时间
+        VAR_MARRYBOARD3_KEY  = 659,
+        //660-680 for lijr
         VAR_CHRISTMAS_PRESENT = 660,    //圣诞礼物——麋鹿之角
         VAR_QT_AWARD_MARK = 661,        //QT奖励领取
         VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE = 662,    //七石板每期最高积分
@@ -604,6 +611,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_QT_REGIST_NUM = 664,        //QT月签到次数
         VAR_QT_SPECIAL_MARK = 665,      //QT记录12月份默认加6天签到次数
         VAR_QT_REGIST_MARK = 666,       //QT月签到标志
+        //681 - 700 for lb
+        VAR_MARRYBOARD_YANHUA = 681,          //烟花积分
         VAR_MAX,
     };
 
@@ -1150,6 +1159,11 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_YEARHAPPY_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_YEARHAPPY_LEFTVALUE, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD_LIVELY, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD3, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD2_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD2_ANS, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD4_TIME, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

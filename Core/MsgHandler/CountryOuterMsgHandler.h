@@ -20,6 +20,7 @@
 #include "GObject/Map.h"
 #include "GObject/MapCollection.h"
 #include "GObject/MapObject.h"
+#include "GObject/MarryBoard.h"
 #include "GObject/MOAction.h"
 #include "GObject/Package.h"
 #include "GObject/PetPackage.h"
@@ -1182,6 +1183,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
+    GObject::MarryBoard::instance().sendMarryBoardInfo(pl,0);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {

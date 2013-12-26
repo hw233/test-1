@@ -32,6 +32,7 @@
 #include "GObject/TownDeamon.h"
 #include "GObject/ClanRankBattle.h"
 #include "GObject/SingleHeroStage.h"
+#include "GObject/MarryBoard.h"
 
 #ifdef _ARENA_SERVER
 #include "GObject/GameServer.h"
@@ -3527,6 +3528,133 @@ void OnServerWarLeaderBoard( ServerWarMsgHdr& hdr, const void * data )
 {
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     GObject::serverWarMgr.updateLeaderBoard(brd);
+}
+void OnMarryBard( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+    UInt8 mType = GObject::MarryBoard::instance()._type;
+    switch(op)
+    {
+        case 0x03:
+            {
+                if(!player->giveFlower(1))
+                    break; 
+                if(mType == 0)
+                    return;
+                GObject::MarryBoard::instance()._lively += 500;
+                GObject::MarryBoard::instance()._YHlively += 500;
+                player->AddVar(VAR_MARRYBOARD_YANHUA,100);
+                std::string text;
+                br >> text;
+                Stream st(REP::CHAT);
+                UInt8 office = player->getTitle();
+                UInt8 guard = player->getPF();
+                st << static_cast<UInt8>(8)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+                    << office << guard << text.c_str()<< player->GetLev() << Stream::eos;
+                NETWORK()->Broadcast(st);
+            }
+            break;
+        case 0x04:
+            {
+                if(mType == 0)
+                    return;
+                UInt8 num = 0;
+                br >>num ;
+                if(!player->giveFlower(0,num))
+                    break; 
+                GObject::MarryBoard::instance()._lively += 50;
+                SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
+ /*               std::string text;
+                br >> text;
+                Stream st(REP::CHAT);
+                UInt8 office = player->getTitle();
+                UInt8 guard = player->getPF();
+                st << static_cast<UInt8>(0)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+                    << office << guard << text.c_str()<< player->GetLev() << Stream::eos;
+                NETWORK()->Broadcast(st);
+   */         }
+            break;
+        case 0x23:
+        case 0x24:
+            {
+                if(mType != 2)
+                    return;
+                UInt8 ans = 0 ;
+                br >>ans;
+                GObject::MarryBoard::instance().answerTheQuestionOn2(player,ans);  
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(op);
+                st <<static_cast<UInt8>(ans);
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x42:
+            {
+                player->SetVar(VAR_MARRYBOARD3,1);
+                UInt32 rand = uRand(10000);
+                player->SetVar(VAR_MARRYBOARD3_KEY,rand);
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(0x42);
+                st << static_cast<UInt32>(GObject::MarryBoard::instance().wrapTheKey(player->GetVar(VAR_MARRYBOARD3_KEY)));
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x43:
+            {
+                UInt32 outKey = 0;
+                UInt8 flag = 0;
+                UInt32 now = TimeUtil::Now();
+                UInt32 var = player->GetVar(VAR_MARRYBOARD4_TIME);
+                br >> outKey ;
+                if(GObject::MarryBoard::instance().unWrapTheOutKey(outKey) == player->GetVar(VAR_MARRYBOARD3_KEY))
+                {
+                        if(now - var > 20)
+                        {
+                            flag = 1 ; 
+                            player->AddVar(VAR_MARRYBOARD3,1);
+                            player->SetVar(VAR_MARRYBOARD4_TIME , now);
+                            UInt32 rand = uRand(10000);
+                            player->SetVar(VAR_MARRYBOARD3_KEY,rand);
+                        }
+                }
+                else
+                    break ;
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(0x43);
+                st <<static_cast<UInt8>(flag);
+                if(flag)
+                    st << static_cast<UInt32>(GObject::MarryBoard::instance().wrapTheKey(player->GetVar(VAR_MARRYBOARD3_KEY)));
+                else 
+                    st <<static_cast<UInt32>(var + 20 -now );
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x44:
+                player->getMarryBoard3Award(GObject::MarryBoard::instance()._type);
+            break;
+        case 0x63:
+        case 0x64:
+            {
+                UInt8 door=0 ;
+                br >> door;
+                GObject::MarryBoard::instance().selectDoor(player,door);
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(op);
+                st << static_cast<UInt8>(door);
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        default:
+            return;
+    }
 }
 
 #endif // _WORLDOUTERMSGHANDLER_H_

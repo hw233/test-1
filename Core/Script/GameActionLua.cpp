@@ -1773,6 +1773,10 @@ namespace Script
     {
 		return Call<UInt8>("getAnswerInFoolsDay", qid, type);
     }
+    UInt8 GameActionLua::getAnswerInMarryBoard(UInt8 id)
+    {
+		return Call<UInt8>("getAnswerInMarryBoard", id);
+    }
 
     void GameActionLua::getAwardInFoolsDay(Player* player, UInt8 startId, UInt8 endId)
     {
