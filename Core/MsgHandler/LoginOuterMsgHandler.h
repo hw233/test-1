@@ -3769,6 +3769,17 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_END, end);
         ret = 1 ;
     }
+    else if (type == 11 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 10);
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_3366_RECHARGE_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_3366_RECHARGE_END, end);
+        ret = 1 ;
+    }
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);

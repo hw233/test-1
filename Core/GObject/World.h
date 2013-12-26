@@ -567,6 +567,16 @@ public:
         else
             return false;
     } 
+    inline static bool  get3366RechargeTime()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_3366_RECHARGE_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_3366_RECHARGE_END);
+        UInt32 now = TimeUtil::Now() ;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
     inline static bool  getOldManTime()
     {
         UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);

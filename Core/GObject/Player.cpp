@@ -26582,17 +26582,31 @@ void Player::sendRealSpirit()
 
 void Player::getQZoneRechargeAward(UInt8 val)
 {
-    if(getPlatform()!=1 && getPlatform() !=2)
-        return ;
-    if (!World::getQZoneRechargeTime())
+    if (!( World::getQZoneRechargeTime()&&(getPlatform()==1 || getPlatform() ==2) ))
         return;
+    if (!( World::get3366RechargeTime() && getPlatform()==11))
+        return;
+    UInt32 var = 0;
+    UInt32 award = 0;
+    if(getPlatform()==1 || getPlatform() ==2)
+    {
+        var = VAR_QZONE_RECHARGE;
+        award = VAR_QZONE_RECHARGE_AWARD ; 
+    }
+    else if( getPlatform()==11)
+    {
+        var = VAR_3366_RECHARGE;
+        award = VAR_3366_RECHARGE_AWARD ; 
+    }
+    else 
+        return ;
     UInt32 Recharge[]={100,500,1000,2000,3000,5000};
-    UInt32 recharge = GetVar(VAR_QZONE_RECHARGE);
+    UInt32 recharge = GetVar(var);
     if(val<1||val>6)
         return ;
     if(recharge < Recharge[val-1])
         return ;
-    UInt32 ctslandingAward = GetVar(VAR_QZONE_RECHARGE_AWARD);
+    UInt32 ctslandingAward = GetVar(award);
     if(ctslandingAward & (1<<(val-1)))
         return ;
     if(!GameAction()->RunQZoneRechargeAward(this, val))
@@ -26600,11 +26614,10 @@ void Player::getQZoneRechargeAward(UInt8 val)
         return;
     }
     ctslandingAward |= (1<<(val - 1));
-    SetVar(VAR_QZONE_RECHARGE_AWARD, ctslandingAward);
+    SetVar(award, ctslandingAward);
     char str[16] = {0};
     sprintf(str, "F_131212_%d",val);
     udpLog("chongzhihuodong", str, "", "", "", "", "act");
-    
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
@@ -26621,11 +26634,14 @@ void Player::sendQZoneRechargeAwardInfo()
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
-    if(getPlatform()!=1 && getPlatform() !=2)
-        return ;
-    if(World::getQZoneRechargeTime())
+    if(World::getQZoneRechargeTime() && ( getPlatform() ==1 || getPlatform() ==2))
     {
         AddVar(VAR_QZONE_RECHARGE,r);
+        sendQZoneRechargeAwardInfo();
+    }
+    if(World::get3366RechargeTime() &&  getPlatform() == 11 )
+    {
+        AddVar(VAR_3366_RECHARGE,r);
         sendQZoneRechargeAwardInfo();
     }
 }

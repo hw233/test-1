@@ -604,6 +604,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_QT_REGIST_NUM = 664,        //QT月签到次数
         VAR_QT_SPECIAL_MARK = 665,      //QT记录12月份默认加6天签到次数
         VAR_QT_REGIST_MARK = 666,       //QT月签到标志
+
+        VAR_3366_RECHARGE = 682,       //空间充值 
+        VAR_3366_RECHARGE_AWARD = 683,       //空间充值奖励领取
         VAR_MAX,
     };
 
