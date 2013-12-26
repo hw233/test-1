@@ -175,7 +175,7 @@ function loadStore()
         if  getFoolBao() then
             store:add(2 ,9375 ,20)
         end
-        store:add(2 ,9442 ,100)
+       --store:add(2 ,9442 ,100)
         
         --if getSurnameLegend(30) then
             --store:add(2 ,9383 , 20)
@@ -411,7 +411,7 @@ function loadStore()
         store:add(4,5143,20)
 
         -- 银币
-        store:add(5,9443,1000)
+        --store:add(5,9443,1000)
 		store:add(5,9307,200)
 		store:add(5,9309,500)
         store:add(5,550,1000)
