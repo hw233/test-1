@@ -1349,8 +1349,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->getClan()->sendQQOpenid(pl);
     }
-    pl->sendQZoneQQGameAct(1);
-    pl->sendQZoneQQGameAct(2);
+    //pl->sendQZoneQQGameAct(1);
+    //pl->sendQZoneQQGameAct(2);
+    pl->sendQZoneQQGameAct(3);
     pl->sendVipPrivilege();
     pl->svrSt(4);
     pl->sendRP7TreasureInfo(true);

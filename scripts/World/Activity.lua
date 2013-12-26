@@ -1300,7 +1300,7 @@ function initActTime(y, m, d)
   -- 蜀山好声音合作
   local  SerStartTm535= { ['year'] = 2012, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 3366合作礼包
-  local  SerStartTm536= { ['year'] = 2013, ['month'] = 9, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm536= { ['year'] = 2013, ['month'] = 12, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- Qzong,pengyou合作礼包
   local  SerStartTm564= { ['year'] = 2013, ['month'] = 8, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm537= { ['year'] = 2012, ['month'] = 12, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1432,7 +1432,7 @@ function initActTime(y, m, d)
   --大厅累积在线奖励
   local  SerStartTm243 = { ['year'] = 2013, ['month'] = 12, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --空间黄钻、大厅蓝钻礼包
-  local  SerStartTm244 = { ['year'] = 2013, ['month'] = 8, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm244 = { ['year'] = 2014, ['month'] = 1, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 五一活动(节日套装)
   local  SerStartTm245 = { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --落英秘典
@@ -1742,7 +1742,7 @@ function initActTime(y, m, d)
   actTime535_1 = os.time(SerStartTm535) + 4 * 86400;
 
   actTime536 = os.time(SerStartTm536);
-  actTime536_1 = os.time(SerStartTm536) + 7 * 86400;
+  actTime536_1 = os.time(SerStartTm536) + 8 * 86400;
 
   actTime537 = os.time(SerStartTm537);
   actTime537_1 = os.time(SerStartTm537) + 7 * 86400;
@@ -1898,7 +1898,7 @@ function initActTime(y, m, d)
   actTime243_1= os.time(SerStartTm243) + 3 * 86400;
 
   actTime244_0= os.time(SerStartTm244);
-  actTime244_1= os.time(SerStartTm244) + 4 * 86400;
+  actTime244_1= os.time(SerStartTm244) + 2 * 86400;
 
   actTime245_0= os.time(SerStartTm245)
   actTime245_1= os.time(SerStartTm245) + 7*86400;
