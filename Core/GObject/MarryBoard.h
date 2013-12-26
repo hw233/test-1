@@ -6,7 +6,7 @@
 namespace GObject
 {
 #define QuestionMax 48
-#define OneTime 600
+#define OneTime 300
 
     class MarryBoard
     {
