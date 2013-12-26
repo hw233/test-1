@@ -43,6 +43,12 @@ local items = {
     {},
     {},
     {},
+    {{499, 10,1}},  --以下是临时活动
+    {{499, 20,1}},
+    {{499, 50,1}},
+    {{56,3,1}, {57,3,1}},
+    {{8000,3,1}},
+    {{1126,5,1}},
 };
 
 local CFtickets = {
@@ -72,7 +78,11 @@ function onGetCFriendAward(player, idx)
     end  
 
     for k, v in pairs(items[idx]) do
-        package:Add(v[1], v[2], v[3], false, 40)
+        if v[1] == 499 then
+            player:getCoupon(v[2])
+        else
+            package:Add(v[1], v[2], v[3], false, 40)
+        end
     end  
     if CFtickets[idx] ~= nil and CFtickets[idx] ~= 0 then
         player:AddVar(424, CFtickets[idx])

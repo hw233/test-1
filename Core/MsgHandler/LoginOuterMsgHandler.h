@@ -608,9 +608,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     std::string pfkey;
     std::string xinyue;
     std::string jinquan;
+    bool isNew_qq = false;
     StringTokenizer st(nu._para, ":");
     switch (st.count())
     {
+        case 6:
+            isNew_qq = atoi(st[5].c_str()) > 0;
         case 5:
             jinquan = st[4];
         case 4:
@@ -792,6 +795,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->continuousLoginSummerFlow();
             pl->SetQQBoardLogin();
             pl->setPresentLogin();
+            UInt64 userId = atoll(nu._invited.c_str());
+            if(isNew_qq && userId)     //设置邀请好友成功
+            {
+                GameMsgHdr hdr1(0x1DD, WORKER_THREAD_WORLD, pl, sizeof(userId));
+                GLOBAL().PushMsg(hdr1, &userId);
+            }
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -1125,6 +1134,27 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     purchase.idx = idx;
                     GameMsgHdr hdr(0x2F2, player->getThreadId(), player, sizeof(purchase));
                     GLOBAL().PushMsg(hdr, &purchase);
+
+                    //为了统计
+                    struct Recharge
+                    {
+                        UInt8 type;
+                        UInt32 gold;
+                        char no[256];
+                        char uint[32];
+                        char money[32];
+                    } recharge;
+
+                    memset(&recharge, 0x00, sizeof(recharge));
+                    recharge.type = 0; // 有角色时充值
+                    recharge.gold = 0;
+                    memcpy(recharge.no, no.c_str(), no.length()>255?255:no.length());
+                    memcpy(recharge.uint, uint.c_str(), uint.length()>31?31:uint.length());
+                    memcpy(recharge.money, money.c_str(), money.length()>31?31:money.length());
+
+                    GameMsgHdr hdr2(0x2F0, player->getThreadId(), player, sizeof(recharge));
+                    GLOBAL().PushMsg(hdr2, &recharge);
+                    //结束
 
                     if (!purchase.code)
                         ret=0;

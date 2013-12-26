@@ -327,6 +327,7 @@ MSG_REG_2(GameMsgHdr, 0x343, OnSaveGoldAct);
 MSG_REG_2(GameMsgHdr, 0x344, OnFoolsDayAct);
 MSG_REG_2(GameMsgHdr, 0x345, OnLuckyStarAct);
 MSG_REG_2(GameMsgHdr, 0x346, OnSurnameLegendAct);
+MSG_REG_2(GameMsgHdr, 0x347, OnSetCFriendSuccess);
 
 MSG_REG_2(GameMsgHdr, 0x348, OnSendSpreadAwardInfo);
 MSG_REG_2(GameMsgHdr, 0x349, OnSpreadGetAward);
