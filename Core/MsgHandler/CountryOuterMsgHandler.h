@@ -20,6 +20,7 @@
 #include "GObject/Map.h"
 #include "GObject/MapCollection.h"
 #include "GObject/MapObject.h"
+#include "GObject/MarryBoard.h"
 #include "GObject/MOAction.h"
 #include "GObject/Package.h"
 #include "GObject/PetPackage.h"
@@ -1182,6 +1183,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
+    GObject::MarryBoard::instance().sendMarryBoardInfo(pl,0);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -1349,8 +1351,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->getClan()->sendQQOpenid(pl);
     }
-    pl->sendQZoneQQGameAct(1);
-    pl->sendQZoneQQGameAct(2);
+    //pl->sendQZoneQQGameAct(1);
+    //pl->sendQZoneQQGameAct(2);
+    pl->sendQZoneQQGameAct(3);
     pl->sendVipPrivilege();
     pl->svrSt(4);
     pl->sendRP7TreasureInfo(true);
@@ -6213,6 +6216,12 @@ void OnGetAward( GameMsgHdr& hdr, GetAward& req )
     MSG_QUERY_PLAYER(player);
     player->getAward(req._type, req._opt);
 }
+void OnGiveFlower( GameMsgHdr& hdr, void * data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8  type = *reinterpret_cast<const UInt8*>(data);
+    player->giveFlower(type);
+}
 
 void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )
 {
@@ -7545,7 +7554,53 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
         break;
     }
 }
+void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
+{
+    return ;
+	MSG_QUERY_PLAYER(player);
+    /*
+	if(!player->hasChecked())
+		return;
+    */
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
 
+    brd >> type;
+    UInt8 mType = GObject::MarryBoard::instance()._type;
+    switch(type)
+    {
+        case 0x03:
+            {
+                if(!player->giveFlower(0))
+                    break; 
+                if(mType == 0)
+                    return;
+                GObject::MarryBoard::instance()._lively += 500;
+                GObject::MarryBoard::instance()._YHlively += 500;
+                player->AddVar(VAR_MARRYBOARD_YANHUA,100);
+                std::string text;
+                brd >> text;
+                Stream st(REP::CHAT);
+                UInt8 office = player->getTitle();
+                UInt8 guard = player->getPF();
+                st << static_cast<UInt8>(8)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+                    << office << guard << text.c_str()<< player->GetLev() << Stream::eos;
+                NETWORK()->Broadcast(st);
+            }
+            break;
+        case 0x04:
+            {
+                if(mType == 0)
+                    return;
+                UInt8 num = 0;
+                brd >> num ;
+                if(!player->giveFlower(1,num))
+                    break; 
+                GObject::MarryBoard::instance()._lively += 50;
+                SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
+            }
+    }
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

@@ -181,6 +181,8 @@ namespace REQ
     const UInt8 LANCHCHALLENGE      = 0x72;
     /**回复切磋 */
     const UInt8 REQUESTCHALLENGE    = 0x73;
+    /**结婚面板*/
+    const UInt8 MARRYBOARD          = 0x74;
     /**战斗退出 */
     const UInt8 FIGHT_EXIT          = 0x9C;// 0x77
     /**帮派战 */
@@ -541,6 +543,7 @@ namespace REP
 
     const UInt8 LANCHCHALLENGE      = 0x72;
     const UInt8 REQUESTCHALLENGE    = 0x73;
+    const UInt8 MARRYBOARD          = 0x74;
     const UInt8 CLAN_TECH           = 0x78;
     const UInt8 CLAN_BATTLE         = 0x79;
     const UInt8 CLAN_OPEN           = 0x7A;
