@@ -1085,16 +1085,20 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
             dmg = dmg > 0 ? dmg : 1;
         }
 
-        UInt32 dmgShow = makeDamage(bo, dmg);
-        appendDefStatus(e_damNormal, dmgShow, bo, e_damagePhysic);
-        // killed the target fighter
-        if(bo->getHP() == 0)
+        doShieldHPAttack(bo, dmg);
+        if(dmg > 0)
         {
-            onDead(false, bo);
-        }
-        else if(_winner == 0)
-        {
-            onDamage(bo, true, NULL);
+            UInt32 dmgShow = makeDamage(bo, dmg);
+            appendDefStatus(e_damNormal, dmgShow, bo, e_damagePhysic);
+            // killed the target fighter
+            if(bo->getHP() == 0)
+            {
+                onDead(false, bo);
+            }
+            else if(_winner == 0)
+            {
+                onDamage(bo, true, NULL);
+            }
         }
     }
     else if(!defend100 && !enterEvade)
@@ -1171,16 +1175,20 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
 
         dmg = dmg > 0 ? dmg : 1;
 
-        UInt32 dmgShow = makeDamage(area_target, dmg);
-        appendDefStatus(e_damNormal, dmgShow, area_target, e_damagePhysic);
-        // killed the target fighter
-        if(area_target->getHP() == 0)
+        doShieldHPAttack(area_target, dmg);
+        if(dmg > 0)
         {
-            onDead(false, area_target);
-        }
-        else if(_winner == 0)
-        {
-            onDamage(area_target, true, NULL);
+            UInt32 dmgShow = makeDamage(area_target, dmg);
+            appendDefStatus(e_damNormal, dmgShow, area_target, e_damagePhysic);
+            // killed the target fighter
+            if(area_target->getHP() == 0)
+            {
+                onDead(false, area_target);
+            }
+            else if(_winner == 0)
+            {
+                onDamage(area_target, true, NULL);
+            }
         }
     }
     else if(!defend100 && !enterEvade)
@@ -3162,6 +3170,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         UInt8 cnt = 0;
         if(SKILL_ID(skill->getId()) == 137)
         {
+
             UInt8 level = SKILL_LEVEL(skill->getId());
             if(level > 9)
                 level = 9;
@@ -3224,6 +3233,9 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         setStatusChange_Aura2(bf, bf->getSide(), bf->getPos(), NULL, nChangeAuraNum, 0, false);
 
         appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false);
+
+        if(bf->getBuddhaLightLast() > 0)
+            initBuddhaLight(bf, true, false);
 
         return true;
     }

@@ -1349,8 +1349,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->getClan()->sendQQOpenid(pl);
     }
-    pl->sendQZoneQQGameAct(1);
-    pl->sendQZoneQQGameAct(2);
+    //pl->sendQZoneQQGameAct(1);
+    //pl->sendQZoneQQGameAct(2);
+    pl->sendQZoneQQGameAct(3);
     pl->sendVipPrivilege();
     pl->svrSt(4);
     pl->sendRP7TreasureInfo(true);
@@ -1464,6 +1465,7 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 br >> itemid >> binding >> name;
                 player->modifyPlayerName(itemid,binding,name);
             }
+            break;
         case 0x21:
             player->getRealSpirit();
             player->sendRealSpirit();
@@ -5830,8 +5832,6 @@ void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
         cFriend->getLift();
     else if (req._flag == 5)
         cFriend->useTickets(req._idx);
-    else if (req._flag == 6)
-        cFriend->setCFriendSuccess(req._idx);
 }
 
 void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )

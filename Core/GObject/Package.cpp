@@ -6935,8 +6935,12 @@ namespace GObject
                     idx = lbAttrIdx[gjIdx - 4];
                 }
 
+                if(4 == orangeCnt)
+                    color = 5;
+
                 if(5 == color)
                     orangeCnt -= 1;
+
                 lbattr.type[0] = allAttrType[idx];
                 if(lbattr.type[0] == 2)
                     lbattr.type[0] = 1;

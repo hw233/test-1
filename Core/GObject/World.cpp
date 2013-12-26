@@ -123,6 +123,7 @@ bool World::_carnival = false;
 bool World::_rc7day = false;
 bool World::_shuoshuo = false;
 bool World::_cfriend = false;
+bool World::_cfriendAct = false;
 bool World::_mayday = false;
 bool World::_mayday1 = false;
 bool World::_ydmdact = false;
@@ -1984,6 +1985,8 @@ bool World::Init()
 #endif
     if(getQixi() || getWansheng() || getQingren())
         globalPlayers.enumerate(enum_qixi_rank_list, static_cast<void *>(NULL));
+    if(getSnowAct())
+        globalPlayers.enumerate(enum_snow_rank_list, static_cast<void *>(NULL));
 
 	UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10;
 	if(sday < now) sday += 86400;
@@ -3381,6 +3384,13 @@ void World::SendSnowAward()
         }
     }
 }
+
+void World::SnowClear()
+{
+    _snowPlayerSet.clear();
+    _snowScoreMap.clear();
+}
+
 void World::SendRechargeRP7RankAward()
 {
     static UInt32 s_couponCount[] = {2000,1000,500,200,200,200,200,200,200,200};
@@ -3684,6 +3694,122 @@ UInt32 World::GetMemCach_qishiban(const char * openId)
 
     return score;
 }
+
+void World::SetMemCach_CFriend_Invited(UInt64 userId)
+{
+    if (_memcinited && userId)
+    {
+        char value[128] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        size_t len = snprintf(key, sizeof(key), "CFriend_%lu", userId);
+        const char* res = m_MCached.get(key, value, sizeof(value));
+        UInt32 info[2] = {0};
+        if(*res && *value)
+        {   //0:time 1:value
+            StringTokenizer tk(value, "_");
+            for(UInt8 i = 0; i < 2 && i < tk.count(); ++ i)
+                info[i] = atoi(tk[i].c_str());
+        }
+        if(info[0] && info[0] <= TimeUtil::Now())
+            info[1] = 1;
+        else
+            info[1] += 1;
+        info[0] = TimeUtil::SharpMonth(1);
+
+        memset(value, 0, sizeof(value));
+        size_t vlen = snprintf(value, sizeof(value), "%u_%u", info[0], info[1]);
+
+        bool result = m_MCached.set(key, len, value, vlen, 0);
+        TRACE_LOG("CFriend_Memcach::setKey: %s, setValue: %s, res:%u", key, value, result);
+
+        SetMemCach_CFriend_InvitedAct(userId);
+    }
+}
+
+UInt16 World::GetMemCach_CFriend_Invited(UInt64 userId)
+{
+    UInt16 invitedNum = 0;
+    if (_memcinited && userId)
+    {
+        char value[128]={0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        snprintf(key, MEMCACHED_MAX_KEY, "CFriend_%lu", userId);
+
+        const char* res = m_MCached.get(key, value, sizeof(value));
+        TRACE_LOG("CFriend_Memcach::getKey: %s, getValue: %s, res:%u", key, value, res);
+        UInt32 info[2] = {0};
+        if(*res && *value)
+        {   //0:time 1:value
+            StringTokenizer tk(value, "_");
+            for(UInt8 i = 0; i < 2 && i < tk.count(); ++ i)
+                info[i] = atoi(tk[i].c_str());
+            if(info[0] && info[0] <= TimeUtil::Now())
+            {
+                memset(info, 0, sizeof(info));
+                m_MCached.del(key);
+                TRACE_LOG("CFriend_Memcach:DELETE:getKey: %s, getValue: %s", key, value);
+            }
+        }
+        invitedNum = info[1];
+    }
+
+    return invitedNum;
+}
+
+void World::SetMemCach_CFriend_InvitedAct(UInt64 userId)
+{
+    if (getCFriendAct() && _memcinited && userId)
+    {
+        char value[128] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        size_t len = snprintf(key, sizeof(key), "CFriendAct_%lu", userId);
+        m_MCached.get(key, value, sizeof(value));
+
+        UInt32 newValue = atoi(value) + 1;
+        size_t vlen = snprintf(value, sizeof(value), "%u", newValue);
+
+        bool res = m_MCached.set(key, len, value, vlen, 0);
+        TRACE_LOG("CFriendAct_Memcach::setKey: %s, setValue: %s, res:%u", key, value, res);
+    }
+}
+
+UInt16 World::GetMemCach_CFriend_InvitedAct(UInt64 userId)
+{
+    UInt16 invitedNum = 0;
+    if (getCFriendAct() && _memcinited && userId)
+    {
+        char value[128]={0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        snprintf(key, MEMCACHED_MAX_KEY, "CFriendAct_%lu", userId);
+
+        const char* res = m_MCached.get(key, value, sizeof(value));
+        TRACE_LOG("CFriendAct_Memcach::getKey: %s, getValue: %s, res:%u", key, value, res);
+        invitedNum = atoi(value);
+    }
+
+    return invitedNum;
+}
+
+void World::DelMemCach_CFriend_Invited(UInt64 userId)
+{
+    if (_memcinited || !userId)
+    {
+        char key[MEMCACHED_MAX_KEY] = {0};
+        snprintf(key, MEMCACHED_MAX_KEY, "CFriend_%lu", userId);
+        m_MCached.del(key);
+    }
+}
+
+void World::DelMemCach_CFriend_InvitedAct(UInt64 userId)
+{
+    if (_memcinited || !userId)
+    {
+        char key[MEMCACHED_MAX_KEY] = {0};
+        snprintf(key, MEMCACHED_MAX_KEY, "CFriendAct_%lu", userId);
+        m_MCached.del(key);
+    }
+}
+
 UInt16 World::GetRandomSpot()
 {
     GObject::MapList::iterator it;

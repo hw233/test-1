@@ -943,7 +943,17 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
 
         Recharge* recharge = (Recharge*)(data);
         if(recharge->gold == 0)
+        {
+            //为了统计
+            char gold[32] = {0};
+            char nno[256] = {0};
+            const char* id = "29998";  //Q点直钩
+            snprintf(gold, 32, "%u", recharge->gold);
+            snprintf(nno, 256, "%s#%s", recharge->uint, recharge->no);
+            player->udpLog(nno, recharge->money, gold, id, "", "pay", "pay");
+            //结束
             return;
+        }
         IncommingInfo ii(InFromRecharge, 0, 0);
         player->getGold(recharge->gold, &ii);
         player->addTotalRecharge(recharge->gold);
@@ -2072,6 +2082,25 @@ void OnCFriendAthleticsRank( GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     player->OnCFriendAthleticsRank();
+}
+
+void OnSetCFriendSuccess( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct CFInvited
+    {
+        UInt8 type;
+        UInt16 invited;
+    };
+
+    CFInvited * cfData = reinterpret_cast<CFInvited *>(const_cast<void *>(data));
+    if(!cfData) return;
+
+    if(cfData->type)
+        player->GetCFriend()->setCFriendSuccess(cfData->invited);
+    else
+        player->GetCFriend()->setCFriendSuccess_TMP(cfData->invited);
 }
 
 void OnForbidSaleQueryFail( GameMsgHdr &hdr, const void *data)

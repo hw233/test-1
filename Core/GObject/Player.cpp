@@ -18094,6 +18094,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
         m_snow.score = 0;
 
         DB1().PushUpdateData("DELETE FROM `snow` WHERE `playerId` = %" I64_FMT "u", getId());
+
+        WORLD().SnowClear();
     }
 
     void  Player::setForbidSale(bool b, bool isAuto /* = false */)
@@ -19761,15 +19763,15 @@ void Player::get3366GiftAward(UInt8 type)
     }
     if(type == 1)
     {
-        if (getGold() < 19)
+        if (getGold() < 45)
         {
             sendMsgCode(0, 1104);
             return;
         }
         ConsumeInfo ci(Enum3366Gift,0,0);
-        useGold(19, &ci);
+        useGold(45, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {548, 3, 9082, 3, 9371, 1, 8000, 1, 500, 1, 9390, 1};
+        static UInt32 itemId[] = {505, 2, 512, 2, 513, 2, 9082, 2, 548, 2, 465, 2};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -19777,15 +19779,15 @@ void Player::get3366GiftAward(UInt8 type)
     }
     else if(type == 2)
     {
-        if (getGold() < 66)
+        if (getGold() < 88)
         {
             sendMsgCode(0, 1104);
             return;
         }
         ConsumeInfo ci(Enum3366Gift,0,0);
-        useGold(66, &ci);
+        useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {9390, 1126, 1325, 9141, 517, 513};
+        static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
         {
             GetPackage()->Add(itemId[i], 1, true);
@@ -20270,79 +20272,53 @@ void Player::getNewYearQQGameAward(UInt8 type)
 
 void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
 {
+    if(type == 0 || type > 2)
+        return;
+    UInt32 bit = 0;
     if(domainType == 1)
     {
         if(!World::getQZoneQQGameActY())    //黄钻空间
             return;
         if(atoi(m_domain) != 1 && atoi(m_domain) != 2 && atoi(m_domain) !=6)
             return;
-        if(type == 0 || type > 2)
-            return;
-        bool bRet;
-        UInt32 status = GetVar(VAR_QZONE_QQGAME_ACT);
         if(type == 1)
-        {
-            if(status & 0x01)
-                return;
-            bRet = GameAction()->onGetQZoneQQGameAward(this, 1);
-            if(bRet)
-            {
-                status |= 0x01;
-                SetVar(VAR_QZONE_QQGAME_ACT, status);
-                sendQZoneQQGameAct(domainType);
-            }
-        }
+            bit = 0x01;
         else
-        {
-            if(status & 0x02)
-                return;
-            if(!isYD())
-                return;
-            bRet = GameAction()->onGetQZoneQQGameAward(this, 2);
-            if(bRet)
-            {
-                status |= 0x02;
-                SetVar(VAR_QZONE_QQGAME_ACT, status);
-                sendQZoneQQGameAct(domainType);
-            }
-        }
+            bit = 0x02;
     }
     else if(domainType == 2)
     {
-        if(!World::getQZoneQQGameAct())    //蓝钻空间
+        if(!World::getQZoneQQGameAct())
                 return;
-        if(atoi(m_domain) != 10)
+        if(atoi(m_domain) != 10)    //QQ大厅蓝钻空间
             return;
-        if(type == 0 || type > 2)
-            return;
-        bool bRet;
-        UInt32 status = GetVar(VAR_QZONE_QQGAME_ACT);
         if(type == 1)
-        {
-            if(status & 0x04)
-                return;
-            bRet = GameAction()->onGetQZoneQQGameAward(this, 1);
-            if(bRet)
-            {
-                status |= 0x04;
-                SetVar(VAR_QZONE_QQGAME_ACT, status);
-                sendQZoneQQGameAct(domainType);
-            }
-        }
+            bit = 0x04;
         else
-        {
-            if(status & 0x08)
+            bit = 0x08;
+    }
+    else if(domainType == 3)
+    {
+        if(!World::getQZoneQQGameAct())
                 return;
-            if(!isBD())
-                return;
-            bRet = GameAction()->onGetQZoneQQGameAward(this, 2);
-            if(bRet)
-            {
-                status |= 0x08;
-                SetVar(VAR_QZONE_QQGAME_ACT, status);
-                sendQZoneQQGameAct(domainType);
-            }
-        }
+        if(atoi(m_domain) != 11)    //3366蓝钻空间
+            return;
+        if(type == 1)
+            bit = 0x10;
+        else
+            bit = 0x20;
+    }
+    else
+        return;
+    UInt32 status = GetVar(VAR_QZONE_QQGAME_ACT);
+    if(status & bit)
+        return;
+    bool bRet = GameAction()->onGetQZoneQQGameAward(this, type);
+    if(bRet)
+    {
+        status |= bit;
+        SetVar(VAR_QZONE_QQGAME_ACT, status);
+        sendQZoneQQGameAct(domainType);
     }
 }
 
@@ -20360,6 +20336,11 @@ void Player::sendQZoneQQGameAct(UInt8 domainType)
         if(atoi(m_domain) != 10)
             return;
     }
+    else if(domainType == 3)
+    {
+        if(atoi(m_domain) != 11)
+            return;
+    }
     else
         return;
     Stream st(REP::COUNTRY_ACT);
@@ -20367,9 +20348,11 @@ void Player::sendQZoneQQGameAct(UInt8 domainType)
     st << domainType;
     UInt8 opt = GetVar(VAR_QZONE_QQGAME_ACT);
     if(domainType == 1)
-        opt = opt & 0x3;
-    else
+        opt = opt & 0x03;
+    else if(domainType == 2)
         opt = (opt >> 2) & 0x03;
+    else
+        opt = (opt >> 4) & 0x03;
     st << opt;
     st << Stream::eos;
     send(st);
@@ -26470,7 +26453,7 @@ void Player::modifyPlayerName(UInt32 itemid,UInt8 binding,string modifyName)
                 for(UInt8 i = 0; i < sz; ++ i)
                 {
                     Player * pl = *it;
-                    pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                    pl->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000);
                     it++;
                 }
             }
