@@ -26974,6 +26974,7 @@ bool Player::giveFlower(UInt8 type ,UInt32 num)
 }
 void Player::getMarryBoard3Award(UInt8 type)   //砸蛋
 {
+    return ;
     UInt32 Award = GetVar(VAR_MARRYBOARD3);
     if(Award >= 31 || Award < 9)
         return ;

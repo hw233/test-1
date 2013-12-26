@@ -3326,6 +3326,12 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_YEARHAPPY_VALUE, 0);
             }
             break;
+        case 15:
+            {
+                pl->SetVar(GObject::VAR_3366_RECHARGE, 0);
+                pl->SetVar(GObject::VAR_3366_RECHARGE_AWARD, 0);
+            }
+            break;
         default:
             return false;
     }
@@ -3774,7 +3780,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         if(GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_END) < TimeUtil::Now())
         {
-            GObject::globalPlayers.enumerate(player_enum_2, 10);
+            GObject::globalPlayers.enumerate(player_enum_2, 15);
         }
         GObject::GVAR.SetVar(GObject::GVAR_3366_RECHARGE_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_3366_RECHARGE_END, end);

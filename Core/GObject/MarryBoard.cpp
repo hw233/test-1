@@ -14,6 +14,7 @@ namespace GObject
     }
     inline bool player_enum_marryBoardAward(GObject::Player * p , MarryBoard * marryBoard) //结束发奖励
     {
+        return false;
         UInt32 lively = p->GetVar(VAR_MARRYBOARD_LIVELY);
         SYSMSG(title, 4183);
         std::string strItems;
