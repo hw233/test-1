@@ -7556,7 +7556,6 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
 }
 void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
 {
-    return ;
 	MSG_QUERY_PLAYER(player);
     /*
 	if(!player->hasChecked())

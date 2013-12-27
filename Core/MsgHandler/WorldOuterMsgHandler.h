@@ -3531,7 +3531,6 @@ void OnServerWarLeaderBoard( ServerWarMsgHdr& hdr, const void * data )
 }
 void OnMarryBard( GameMsgHdr& hdr, const void* data)
 {
-    return ;
 	MSG_QUERY_PLAYER(player);
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);

@@ -1580,7 +1580,6 @@ void World::Tianjie_Refresh(void*)
 }
 void World::CreateMarryBoard(UInt64 man , UInt64 woman ,UInt8 type,UInt32 time )
 {
-    return ;
     if(time == 0)
         time = TimeUtil::Now()+ 1830 ;
    Player * pman = GObject::globalPlayers[man]; 

@@ -14,7 +14,6 @@ namespace GObject
     }
     inline bool player_enum_marryBoardAward(GObject::Player * p , MarryBoard * marryBoard) //结束发奖励
     {
-        return false;
         UInt32 lively = p->GetVar(VAR_MARRYBOARD_LIVELY);
         SYSMSG(title, 4183);
         std::string strItems;
@@ -146,7 +145,6 @@ namespace GObject
     }
     bool MarryBoard::CreateMarry(Player * man , Player * woman ,UInt8 norms, UInt32 mTime)
     {
-        return false;
         UInt32 now = TimeUtil::Now();
         if( mTime < now + 1800 )
         {
