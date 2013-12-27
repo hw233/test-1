@@ -1037,5 +1037,22 @@ namespace GObject
 
         st.data<UInt8>(offset) = count;
     }
+
+    UInt8 FairyPet::getSevenSoulPetType(UInt32 petId)
+    {
+        UInt8 petType;
+        if(petId == 501 || petId == 502 || petId == 503 || petId == 513)
+            petType = 1;
+        else if(petId == 504 || petId == 505 || petId == 506 || petId == 514)
+            petType = 2;
+        else if(petId == 507 || petId == 508 || petId == 509 || petId == 515)
+            petType = 3;
+        else if(petId == 510 || petId == 511 || petId == 512 || petId == 516)
+            petType = 4;
+        else
+            petType = 0;
+
+        return petType;
+    }
 }
 

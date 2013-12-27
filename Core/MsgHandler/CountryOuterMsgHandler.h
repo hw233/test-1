@@ -7086,6 +7086,34 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                 pet->upgradeSH(petId, sanhunId, opt);
             }
             break;
+        case 0x08:  //七魄
+            {
+                UInt8 subType = 0;
+                brd >> subType;
+                if(subType == 0)
+                {
+                    UInt32 petId = 0;
+                    brd >> petId;
+                    player->sendSevernSoul(petId);
+                }
+                else if(subType == 1)
+                {
+                    UInt32 petId = 0;
+                    UInt8 sevenSoulIndex = 0;
+                    brd >> petId;
+                    brd >> sevenSoulIndex;
+                    player->upgradeSevernSoul(petId, sevenSoulIndex);
+                }
+                else if(subType == 2)
+                {
+                    UInt32 petId = 0;
+                    UInt8 sevenSoulIndex = 0;
+                    brd >> petId;
+                    brd >> sevenSoulIndex;
+                    player->switchSevernSoulSkill(petId, sevenSoulIndex);
+                }
+            }
+            break;
         default:
             break;
     }

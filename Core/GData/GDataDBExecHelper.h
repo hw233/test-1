@@ -686,6 +686,21 @@ struct DBSanHunConfig
     UInt32 money2;
 };
 
+struct DBPetSevenSoulLevel
+{
+	UInt8 soullevel;
+	UInt32 needsoulnum;
+	UInt8 skilllevel;
+};
+
+struct DBPetSevenSoulUpgrade
+{
+	UInt8 pettype;
+	UInt8 soulid;
+    std::string skillstr;
+	UInt8 condionvalue;
+};
+
 }
 
 namespace DB {
@@ -1477,6 +1492,25 @@ SPECIALDEF(7)
     float, hpP,
     float, actionP
 	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBPetSevenSoulLevel)
+SPECIALDEF(3)
+    (
+	UInt8, soullevel,
+	UInt32, needsoulnum,
+	UInt8, skilllevel
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBPetSevenSoulUpgrade)
+SPECIALDEF(4)
+    (
+	UInt8, pettype,
+	UInt8, soulid,
+    std::string, skillstr,
+	UInt8, condionvalue
+    )
 SPECIALEND()
 
 }

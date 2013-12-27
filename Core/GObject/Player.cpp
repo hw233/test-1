@@ -26886,6 +26886,36 @@ void Player::getHappyValueAward(UInt8 val)
     ctslandingAward |= (1<<(val - 1));
     SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
 }
+
+
+void Player::sendSevernSoul(UInt32 petId)
+{
+    FairyPet * pet = findFairyPet(petId);
+    if(!pet)
+        return;
+
+}
+
+void Player::upgradeSevernSoul(UInt32 petId, UInt8 sevenSoulIndex)
+{
+    FairyPet * pet = findFairyPet(petId);
+    if(!pet)
+        return;
+    if(sevenSoulIndex == 0 || sevenSoulIndex > 7)
+        return;
+
+}
+
+void Player::switchSevernSoulSkill(UInt32 petId, UInt8 sevenSoulIndex)
+{
+    FairyPet * pet = findFairyPet(petId);
+    if(!pet)
+        return;
+    if(sevenSoulIndex == 0 || sevenSoulIndex > 7)
+        return;
+
+}
+
 } // namespace GObject
 
 

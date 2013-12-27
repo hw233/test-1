@@ -118,6 +118,8 @@ public:
         }
         return 0;
     }
+public:
+    UInt8 getSevenSoulPetType(UInt32 petId);
 
 private:
     UInt16 getPinjieBless();
