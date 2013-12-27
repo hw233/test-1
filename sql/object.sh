@@ -201,9 +201,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130913_1.sql  #三魂创建fairyPet_sanhun
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_2013_09_02_presentbox.sql  #创建礼品箱
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar182_187.sql        #清除仗剑江湖蜀山路
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130922_1.sql  #机关兽创建player_zhenwei
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130926_1.sql #创建天书奇缘记录表
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
@@ -229,8 +227,7 @@ function update_object()
     #. clearshiyamen.sh
     #mysql -h$H -u$U -p$P -P$PT $DBO < clanscore.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clan_battlescore.sql     #重置帮战积分
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131203_1.sql   #fighter_xingchen 表中添加 gem4、gem5、gem6、xctCurVal、xctMaxVal 五个字段
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearvar592_1211.sql   #fighter_xingchen 表中添加 gem4、gem5、gem6、xctCurVal、xctMaxVal 五个字段
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
 }
 
 #sh player_jiguan.sh
