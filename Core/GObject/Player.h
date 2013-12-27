@@ -2473,6 +2473,13 @@ namespace GObject
         void getQZoneRechargeAward(UInt8 val);
         void sendQZoneRechargeAwardInfo();
         void AddQZoneRecharge(UInt32 r =0);
+        void GetFindOldManAward(UInt32 type = 0 );
+        void getInterestingAward(UInt8 type);
+        void sendInterestingBag(Player* pl);
+        void getInteresingBag(UInt64 pid);
+        void sendInteresingInfo();
+        void sendOldManLeftTime();
+        void sendOldManPos(UInt8 type = 0);
         void getSummerFlow3OnlineAward(UInt8 val);
         void getSummerMeetAward(UInt8 idx,UInt8 index);
         void getNewRC7DayRechargeAward(UInt8 val);
@@ -2489,6 +2496,9 @@ namespace GObject
         void getEquipMoveAward(UInt8 opt);
         void getVipLevelAward(UInt8 opt);
         void getQQXiuAward(UInt8 opt);                                                                                       
+        void getHappyValueAward(UInt8 val);
+        void sendHappyValueInfo();
+
         UInt32 getFighterEquipAward();
         void checkZhenying();
         void changeZYAward(UInt8 country); 
@@ -2849,6 +2859,7 @@ namespace GObject
         UInt8 getFighterGoldCnt();
         void sendRealSpirit();
         void AddRealSpirit(UInt32 real = 0);
+        void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
 	};
 
 

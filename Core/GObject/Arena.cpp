@@ -770,9 +770,11 @@ void Arena::readFrom( BinaryReader& brd )
 		_progress = progress;
 		_notified = 0;
         fStatus = true;
+        if(_progress == e_progress_nextbegin)
+            World::setArenaState(ARENA_XIANJIE_NONE);
 	}
     if(_progress != e_progress_nextbegin)
-        GObject::World::setArenaState(GObject::ARENA_XIANJIE_DIYI);
+        World::setArenaState(ARENA_XIANJIE_DIYI);
 
 	switch(_progress)
 	{

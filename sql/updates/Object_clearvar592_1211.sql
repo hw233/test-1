@@ -1,1 +1,1 @@
- delete from var where id =592;
+delete from var where id =592;

@@ -1079,12 +1079,15 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                78, 1,
-                9371, 4,
-                515, 2,
-                513, 4,
-                503, 3,
-                9338, 3,
+                56,   2,
+                57,   2,
+                15,   2,
+                9371, 5,
+                1126, 5,
+                503,  5,
+                515,  3,
+                1325, 6,
+                134,  6,
             };
 
             UInt8 idx = 0;
@@ -3311,6 +3314,18 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->cleanPileSnow();
             }
             break;
+        case 11:
+            {
+                pl->SetVar(GObject::VAR_OLDMAN_SCORE, 0);
+                pl->SetVar(GObject::VAR_OLDMAN_SCORE_AWARD, 0);
+            
+            }
+            break;
+        case 13:
+            {
+                pl->SetVar(GObject::VAR_YEARHAPPY_VALUE, 0);
+            }
+            break;
         default:
             return false;
     }
@@ -3715,7 +3730,6 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         {
             GObject::globalPlayers.enumerate(player_enum_2, 10);
         }
-
         GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_END, end);
         ret = 1 ;
@@ -3731,6 +3745,29 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_CHRISTMAS_PILESNOW_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_CHRISTMAS_PILESNOW_END, end);
         ret = 1;
+    }
+    else if (type == 13 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 11);
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_OLDMAN_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_OLDMAN_END, end);
+        ret = 1;
+    }
+    else if (type == 14 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_YEARHAPPY_RANK_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_YEARHAPPY_RANK_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 13);
+        }
+
+        GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_END, end);
+        ret = 1 ;
     }
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
@@ -3839,6 +3876,68 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
     ret = 0;
     Stream st(SPEP::SETVAR);
     st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void ViaPlayerInfoFromBs(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::VIAPLAYERINFO,0x1);
+    UInt8 type = 0;
+    CHKKEY();
+    br >> type;
+    UInt16 serverNo = 0;
+
+    UInt64 playerId = 0;
+    UInt8 todayLogin = 0;
+    UInt16 accDays = 0;
+    UInt8 level = 0;
+    UInt32 totalRecharge = 0;
+
+    GObject::Player* player = NULL;
+    if(type == 1)
+    {
+        UInt64 pid;
+        br >> pid;
+        if(cfg.merged)
+        {
+            br>>serverNo;
+            pid += (static_cast<UInt64>(serverNo) << 48);
+        }
+        player = GObject::globalPlayers[pid];
+    }
+    else if(type == 2)
+    {
+        std::string playerName;
+        br >> playerName;
+        if(cfg.merged)
+        {
+            br>>serverNo;
+            serverNameToGlobalName(playerName, serverNo);
+        }
+        player = GObject::globalNamedPlayers[playerName];
+    }
+
+    if (player)
+    {
+        playerId = player->getId() & 0xFFFFFFFFFF;
+        if(player->GetVar(GObject::VAR_RP_VALUE) > 0)
+        {
+            if(TimeUtil::SharpDay(0, TimeUtil::Now()) == TimeUtil::SharpDay(0, player->getLastOnline()))
+                todayLogin = 1;
+            accDays = player->GetVar(GObject::VAR_VIA_ACC_DAYS);
+            level = player->GetLev();
+            totalRecharge = player->getTotalRecharge();
+        }
+    }
+
+    st << playerId;
+    st << todayLogin;
+    st << accDays;
+    st << level;
+    st << totalRecharge;
+    st << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
