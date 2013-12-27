@@ -8216,6 +8216,7 @@ namespace GObject
 	{
 		if(r == 0)
 			return;
+        joinAllServerRecharge(r);
         setLuckyStarCondition();
         if(getLuckyStarAct())
         {
@@ -26905,6 +26906,16 @@ void Player::getHappyValueAward(UInt8 val)
     ctslandingAward |= (1<<(val - 1));
     SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
 }
+
+void Player::joinAllServerRecharge(UInt32 num)
+{
+    if(num == 0) return;
+    Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
+    st << getId() << getName() << num << TimeUtil::Now();
+    st << Stream::eos;
+    NETWORK()->SendToServerWar(st);
+}
+
 } // namespace GObject
 
 

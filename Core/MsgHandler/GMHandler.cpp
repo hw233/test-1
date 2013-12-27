@@ -3989,8 +3989,21 @@ void GMHandler::OnSaveGoldAct(GObject::Player *player, std::vector<std::string>&
             player->SetVar(VAR_SAVEGOLD_SET_TIME, TimeUtil::Now() - 7*86400-10);
         }
         break;
+    case 4:
+        {
+            UInt32 value = atoi(args[1].c_str());
+            IncommingInfo ii(InFromTopUp, 0, 0);
+            for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+            {
+                UInt32 val = uRand(value) + 1;
+                it->second->getGold(val, &ii);
+                it->second->addTotalRecharge(val);
+            }
+        }
+        break;
     }
-    player->sendSaveGoldAct();
+    if(World::getSaveGoldAct())
+        player->sendSaveGoldAct();
 }
 
 void GMHandler::OnLingbao(GObject::Player * player, std::vector<std::string>& args)

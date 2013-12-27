@@ -85,16 +85,6 @@ bool server_addLonghun(Player * player, void * data)
     return true;
 }
 
-static void writeMailLog(Player * player, Mail * mail)
-{
-    if(!player || !mail)
-        return;
-    std::string strItems;
-    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text,\
-        content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(),
-        mail->id, ArenaAward, mail->title.c_str(), mail->content.c_str(), strItems.c_str(), mail->recvTime);
-}
-
 bool server_sendMail(Player * player, EnumMailStruct * ems)
 {
     if(!player || !ems)
@@ -111,14 +101,16 @@ bool server_sendMail(Player * player, EnumMailStruct * ems)
             SYSMSGV(title, 810, g, p);
             SYSMSGV(content, 812, ems->session, cfg.serverNo, g, ems->twon, ems->tloss, p, ems->longhun);
             Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title, content);
-            writeMailLog(player, mail);
+            if(mail)
+                mail->writeMailLog(player, ArenaAward);
         }
         else
         {
             SYSMSGV(title, 813, g, p);
             SYSMSGV(content, 815, ems->session, cfg.serverNo, g, ems->twon, ems->tloss, ems->longhun);
             Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title, content);
-            writeMailLog(player, mail);
+            if(mail)
+                mail->writeMailLog(player, ArenaAward);
         }
     }
     else
@@ -132,7 +124,8 @@ bool server_sendMail(Player * player, EnumMailStruct * ems)
         SYSMSGV(title, 818, g);
         SYSMSGV(content, 820, ems->session, cfg.serverNo, data);
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title, content);
-        writeMailLog(player, mail);
+        if(mail)
+            mail->writeMailLog(player, ArenaAward);
     }
     return true;
 }
@@ -1538,14 +1531,16 @@ void ServerWarMgr::calcBet(ServerPreliminaryPlayer& pp, UInt16 pos, UInt8 state,
 
             SYSMSGV(content, 822, _session, t, g, pp.serverId, rew);
             Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title, content);
-            writeMailLog(player, mail);
+            if(mail)
+                mail->writeMailLog(player, ArenaAward);
 		}
 		else
 		{
             SYSMSGV(title, 823, t, pp.serverId);
 			SYSMSGV(content, 824, _session, t, g, pp.serverId);
 			Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title, content);
-            writeMailLog(player, mail);
+            if(mail)
+                mail->writeMailLog(player, ArenaAward);
 		}
 	}
 }
@@ -1560,7 +1555,8 @@ void ServerWarMgr::sendTeamMail(const std::string& title, const std::string& con
         if(it->first)
         {
             Mail * mail = it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
-            writeMailLog(it->first, mail);
+            if(mail)
+                mail->writeMailLog(it->first, ArenaAward);
         }
     }
 }
@@ -1576,7 +1572,8 @@ void ServerWarMgr::sendTeamMail_neice(ServerEliminationPlayer& sep, const std::s
         if(player)
         {
             Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title, content);
-            writeMailLog(player, mail);
+            if(mail)
+                mail->writeMailLog(player, ArenaAward);
         }
     }
 }
@@ -1595,7 +1592,8 @@ void ServerWarMgr::sendTeamMail_neiceJiJian(ServerEliminationPlayer& sep, const 
             if(!GET_BIT_8(value, 1))
                 continue;
             Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title, content);
-            writeMailLog(player, mail);
+            if(mail)
+                mail->writeMailLog(player, ArenaAward);
         }
     }
 }
@@ -1638,7 +1636,7 @@ void ServerWarMgr::giveTeamLastAward(UInt8 group, UInt8 idx, UInt8 type)
         UInt16 itemId = ArenaLastAwards[group][idx+type-1][0];
         MailPackage::MailItem item[] = { {itemId, 1}, };
         MailItemsInfo itemsInfo(item, ArenaAward, 1);
-        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
              mailPackageManager.push(mail->id, item, 1, true);
 
@@ -1677,7 +1675,7 @@ void ServerWarMgr::giveTeamLastAward_neice(ServerEliminationPlayer& sep, UInt8 g
         UInt16 itemId = ArenaLastAwards[group][idx+type-1][0];
         MailPackage::MailItem item[] = { {itemId, 1}, };
         MailItemsInfo itemsInfo(item, ArenaAward, 1);
-        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
              mailPackageManager.push(mail->id, item, 1, true);
 

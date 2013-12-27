@@ -896,6 +896,7 @@ namespace SERVERWARREQ
     const UInt8 COMMIT_LINEUP       = 0x03;
     const UInt8 BET                 = 0x04;
     const UInt8 BATTLE_REPORT       = 0x05;
+    const UInt8 RECHARGE_ACTIVE     = 0x06;
     
     const UInt8 ARENA_TO_SERVERWAR  = 0x10;     //"仙界第一/仙界至尊"TCP连接"仙界传奇" 占用
 }

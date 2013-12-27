@@ -2860,6 +2860,7 @@ namespace GObject
         void sendRealSpirit();
         void AddRealSpirit(UInt32 real = 0);
         void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
+        void joinAllServerRecharge(UInt32);
 	};
 
 
