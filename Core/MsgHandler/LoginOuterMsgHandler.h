@@ -354,6 +354,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         StringTokenizer st(ul._para, ":");
         switch (st.count())
         {
+            case 6:
             case 5:
                 jinquan = st[4];
             case 4:
