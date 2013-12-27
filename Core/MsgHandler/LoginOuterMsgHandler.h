@@ -3763,7 +3763,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         }
 
         GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_BEGIN, begin);
-        GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_BEGIN, end);
+        GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_END, end);
         ret = 1 ;
     }
     Stream st(SPEP::ACTIVITYONOFF);

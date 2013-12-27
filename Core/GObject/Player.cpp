@@ -26671,6 +26671,9 @@ void Player::GetFindOldManAward(UInt32 type)
     AddVar(VAR_OLDMAN_SCORE,num*10);
     SYSMSG_SENDV(2024,this,num*10);
     SYSMSG_SENDV(2025,this,num*10);
+    char str[16] = {0};
+    sprintf(str, "F_131205_5");
+    udpLog("shengdanzhuomicang", str, "", "", "", "", "act");
 }
 
 void Player::getInterestingAward(UInt8 type)
@@ -26704,6 +26707,9 @@ void Player::getInterestingAward(UInt8 type)
         ScoreAward |= (1<<(type-1));
         SetVar(VAR_OLDMAN_SCORE_AWARD,ScoreAward);
     }
+    char str[16] = {0};
+    sprintf(str, "F_131205_%d",type+1);
+    udpLog("shengdanzhuomicang", str, "", "", "", "", "act");
 }
 void Player::sendInterestingBag(Player* pl)
 {

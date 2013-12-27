@@ -1501,7 +1501,7 @@ void World::World_OldMan_Refresh(void *)
    // else if ((time%600) < 3 || (time%600)>= 600 -2)    //测试
     {
         UInt16 spot = GetRandomSpot();
-        std::cout<<"ChangeTo:"<<spot<<std::endl;
+    //        std::cout<<"ChangeTo:"<<spot<<std::endl;
         if(!spot)
             return ;
         if(_oldMan._spot == 0)
