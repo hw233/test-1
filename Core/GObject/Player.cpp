@@ -26621,10 +26621,26 @@ void Player::getQZoneRechargeAward(UInt8 val)
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
-    if (!World::getQZoneRechargeTime())
+    if (!( World::getQZoneRechargeTime()&&(getPlatform()==1 || getPlatform() ==2) ))
         return;
-    UInt32 QZoneRecharge = GetVar(VAR_QZONE_RECHARGE);
-    UInt32 QZoneRechargeAward = GetVar(VAR_QZONE_RECHARGE_AWARD);
+    if (!( World::get3366RechargeTime() && getPlatform()==11))
+        return;
+    UInt32 var = 0;
+    UInt32 award = 0;
+    if(getPlatform()==1 || getPlatform() ==2)
+    {
+        var = VAR_QZONE_RECHARGE;
+        award = VAR_QZONE_RECHARGE_AWARD ; 
+    }
+    else if( getPlatform()==11)
+    {
+        var = VAR_3366_RECHARGE;
+        award = VAR_3366_RECHARGE_AWARD ; 
+    }
+    else 
+        return ;
+    UInt32 QZoneRecharge = GetVar(var);
+    UInt32 QZoneRechargeAward = GetVar(award);
     Stream st(REP::GETAWARD);   //协议
     st << static_cast<UInt8>(33);
     st << static_cast<UInt32>(QZoneRecharge);
