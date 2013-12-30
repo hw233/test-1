@@ -3,6 +3,7 @@
 
 #include "Common/Stream.h"
 #include "Common/Mutex.h"
+#include "Log/Log.h"
 
 namespace lua_tinker
 {
@@ -17,19 +18,6 @@ namespace GObject
 {
 
 class Player;
-
-struct Mail
-{
-	UInt32 id;
-	std::string sender;
-	UInt32 recvTime;
-	UInt8 flag;
-	std::string title;
-	std::string content;
-	UInt32 additional;
-
-	void packetTitle(Stream& st);
-};
 
 class MailPackage
 {
@@ -47,12 +35,27 @@ public:
 private:
 	std::map<UInt16, UInt16> _items;
 };
+
 struct MailItemsInfo
 {
 	MailPackage::MailItem *items;
 	UInt16 count;
 	UInt8 type;
 	MailItemsInfo(GObject::MailPackage::MailItem *items_ = NULL, UInt8 type_ = 0, UInt16 count_ = 0):items(items_),count(count_),type(type_){}
+};
+
+struct Mail
+{
+	UInt32 id;
+	std::string sender;
+	UInt32 recvTime;
+	UInt8 flag;
+	std::string title;
+	std::string content;
+	UInt32 additional;
+
+	void packetTitle(Stream& st);
+    void writeMailLog(Player *, MailItemType, MailItemsInfo * = NULL);
 };
 
 class MailPackageManager

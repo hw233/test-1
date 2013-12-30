@@ -165,6 +165,7 @@ public:
     inline void setAutoKick(bool v) { autoKick = v; }
 
     inline bool isTestPlatform() { return testPlatform; }  //true为内测区
+    inline bool enabledServerWar() { return arenaPort > 0 && serverWarPort > 0; }
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {

@@ -37,6 +37,29 @@ void Mail::packetTitle( Stream& st )
 	st << id << sender << recvTime << flag << title;
 }
 
+void Mail::writeMailLog(Player * player, MailItemType mailType, MailItemsInfo * itemsInfo)
+{
+    if(!player)
+        return;
+    std::string strItems;
+	if(itemsInfo != NULL)
+	{
+		std::string strItems = "";
+		for(UInt32 i = 0; i < itemsInfo->count; i ++)
+		{
+            if(!itemsInfo->items[i].id || !itemsInfo->items[i].count)
+                continue;
+			strItems += Itoa(itemsInfo->items[i].id);
+			strItems += ",";
+			strItems += Itoa(itemsInfo->items[i].count);
+			strItems += "|";
+		}
+    }
+    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text,\
+        content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(),
+        id, mailType, title.c_str(), content.c_str(), strItems.c_str(), recvTime);
+}
+
 bool MailPackage::takeIt( Player * player, bool gm )
 {
 	Package * package = player->GetPackage();
@@ -257,6 +280,8 @@ Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, 
 		std::string strItems = "";
 		for(UInt32 i = 0; i < itemsInfo->count; i ++)
 		{
+            if(!itemsInfo->items[i].id || !itemsInfo->items[i].count)
+                continue;
 			strItems += Itoa(itemsInfo->items[i].id);
 			strItems += ",";
 			strItems += Itoa(itemsInfo->items[i].count);

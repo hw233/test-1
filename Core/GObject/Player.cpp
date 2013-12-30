@@ -8216,6 +8216,7 @@ namespace GObject
 	{
 		if(r == 0)
 			return;
+        joinAllServerRecharge(r);
         setLuckyStarCondition();
         if(getLuckyStarAct())
         {
@@ -19625,7 +19626,7 @@ void Player::sendCopyFrontAllAward()
 
 UInt8 Player::getCopyId()
 {
-    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a};
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871};
 
     UInt16 currentSpot = PLAYER_DATA(this, location);
     for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
@@ -26934,6 +26935,16 @@ void Player::getHappyValueAward(UInt8 val)
     ctslandingAward |= (1<<(val - 1));
     SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
 }
+
+void Player::joinAllServerRecharge(UInt32 num)
+{
+    if(num == 0) return;
+    Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
+    st << getId() << getName() << num << TimeUtil::Now();
+    st << Stream::eos;
+    NETWORK()->SendToServerWar(st);
+}
+
 bool Player::giveFlower(UInt8 type ,UInt32 num)
 {
     if(type > 1)

@@ -2863,6 +2863,7 @@ namespace GObject
         void AddRealSpirit(UInt32 real = 0);
         void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
         bool giveFlower(UInt8 type , UInt32 num = 0);
+        void joinAllServerRecharge(UInt32);
 	};
 
 

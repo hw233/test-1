@@ -92,6 +92,7 @@ MSG_REG_2(ServerWarMsgHdr, 0x126, OnServerWarBattleReport);
 MSG_REG_2(ServerWarMsgHdr, 0x127, OnServerWarSupport);
 MSG_REG_2(ServerWarMsgHdr, 0x128, OnServerWarBattlePoint);
 MSG_REG_2(ServerWarMsgHdr, 0x129, OnServerWarLeaderBoard);
+MSG_REG_2(ServerWarMsgHdr, 0x130, OnServerRechargeRank);
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);

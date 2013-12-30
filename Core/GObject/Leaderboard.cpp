@@ -1210,5 +1210,192 @@ void Leaderboard::erasePetInfo(FairyPet* pet)
     }
 }
 
+void Leaderboard::readRechargeRank100(BinaryReader& brd)
+{
+    _rechargeRank100.clear();
+	UInt8 size = 0;
+    brd >> size;
+    for(UInt32 i = 0; i < size && i < 100; ++ i)
+    {
+        AllServersRecharge asrData;
+        UInt64 playerId = 0;
+        brd >> playerId >> asrData.name >> asrData.total;
+
+        Player * player = globalPlayers[playerId];
+        asrData.player = player;
+        asrData.rank = i+1;
+        _rechargeRank100.push_back(asrData);
+    }
+}
+
+void Leaderboard::readRechargeSelf(BinaryReader& brd)
+{
+    _rechargeSelf.clear();
+	UInt32 size = 0;
+    brd >> size;
+    for(UInt32 i = 0; i < size; ++ i)
+    {
+        AllServersRecharge asrData;
+        UInt64 playerId = 0;
+        brd >> playerId >> asrData.total >> asrData.rank;
+
+        Player * player = globalPlayers[playerId];
+        asrData.player = player;
+        asrData.name = player ? player->getName() : "";
+        _rechargeSelf.push_back(asrData);
+    }
+}
+
+void Leaderboard::giveRechargeRankAward()
+{
+    SYSMSGV(title, 835);
+    SYSMSGV(title1, 827);
+    SYSMSGV(title2, 829);
+    std::string name10[10];
+    UInt32 total10[10] = {0};
+    std::vector<AllServersRecharge>::iterator it;
+    for(it = _rechargeRank100.begin(); it != _rechargeRank100.end(); ++ it)
+    {
+        if((*it).rank && (*it).rank <= 10)
+        {
+            name10[(*it).rank-1] = (*it).name;
+            total10[(*it).rank-1] = (*it).total;
+        }
+
+        Player * player = (*it).player;
+        if(!player)
+            continue;
+
+        UInt16 count = 0;
+        UInt16 count1 = 0, count2 = 0, count3 = 0, count4 = 0;
+        if((*it).rank == 1)
+        {
+            count1 = 200; count2 = 200;
+            count3 = 100; count4 = 100;
+            count = 10;
+        }
+        else if((*it).rank == 2)
+        {
+            count1 = 180; count2 = 180;
+            count3 = 88; count4 = 88;
+            count = 9;
+        }
+        else if((*it).rank == 3)
+        {
+            count1 = 160; count2 = 160;
+            count3 = 66;  count4 = 66;
+            count = 8;
+        }
+        else if((*it).rank >= 4 && (*it).rank <= 10)
+        {
+            count1 = 140; count2 = 140;
+            count3 = 50;  count4 = 50;
+            count = 7;
+        }
+        else if((*it).rank >= 11 && (*it).rank <= 20)
+        {
+            count1 = 100; count2 = 100;
+            count3 = 40;  count4 = 40;
+            count = 6;
+        }
+        else if((*it).rank >= 21 && (*it).rank <= 40)
+        {
+            count1 = 80; count2 = 80;
+            count3 = 30; count4 = 30;
+            count = 5;
+        }
+        else if((*it).rank >= 41 && (*it).rank <= 60)
+        {
+            count1 = 60; count2 = 60;
+            count3 = 25; count4 = 25;
+            count = 4;
+        }
+        else if((*it).rank >= 61 && (*it).rank <= 80)
+        {
+            count1 = 50; count2 = 50;
+            count3 = 20; count4 = 20;
+            count = 3;
+        }
+        else if((*it).rank >= 81 && (*it).rank <= 100)
+        {
+            count1 = 25; count2 = 25;
+            count3 = 10; count4 = 10;
+            count = 2;
+        }
+        else
+            continue;
+        SYSMSGV(content, 836);
+        MailPackage::MailItem item[] = {{500, count}};
+        MailItemsInfo itemsInfo(item, Activity, 1);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(mail)
+             mailPackageManager.push(mail->id, item, 1, true);
+        /*
+        SYSMSGV(content2, 830, player->getCountry(), player->getName().c_str(), (*it).rank, (*it).total);
+        MailPackage::MailItem item[] = {{9418, count1}, {9438, count2}, {9022, count3}, {9075, count4},};
+        MailItemsInfo itemsInfo(item, Activity, 4);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title2, content2, 0xFFFE0000, true, &itemsInfo);
+        if(mail)
+             mailPackageManager.push(mail->id, item, 4, true);
+        if((*it).rank == 1)
+        {
+            SYSMSGV(title, 833);
+            SYSMSGV(content, 834, player->getCountry(), player->getName().c_str());
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title, content);
+            if(mail)
+                mail->writeMailLog(player, Activity);
+        }
+        */
+    }
+
+    /*
+    for(it = _rechargeSelf.begin(); it != _rechargeSelf.end(); ++ it)
+    {
+        Player * player = (*it).player;
+        if(!player)
+            continue;
+        SYSMSGV(content1, 828, player->getCountry(), player->getName().c_str(), (*it).total, (*it).rank, name10[0].c_str(), total10[0],
+                name10[1].c_str(), total10[1], name10[2].c_str(), total10[2], name10[3].c_str(), total10[3], name10[4].c_str(), total10[4],
+                name10[5].c_str(), total10[5], name10[6].c_str(), total10[6], name10[7].c_str(), total10[7], name10[8].c_str(), total10[8],
+                name10[9].c_str(), total10[9]);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title1, content1);
+        if(mail)
+            mail->writeMailLog(player, Activity);
+    }
+    */
+}
+
+void Leaderboard::sendGoldLvlAward(BinaryReader& brd)
+{
+    return;     //测试时没有
+    UInt64 playerId = 0;
+    UInt8 cnt = 0;
+    brd >> playerId >> cnt;
+    Player * player = globalPlayers[playerId];
+    if(!player || !cnt)
+        return;
+    static const UInt32 goldLvls[] = { 8888, 18888, 38888, 88888, 188888, 288888 };
+    static MailPackage::MailItem s_items[][4] = {
+        { {134, 5},   {9438, 5},  {0, 0},      {0, 0} },
+        { {1325, 10}, {134, 10},  {1126, 30},  {0, 0} },
+        { {515, 15},  {501, 15},  {9338, 15},  {503, 15} },
+        { {9076, 30}, {509, 30},  {1126, 30},  {9424, 30} },
+        { {9022, 30}, {9075, 30}, {9068, 30},  {1126, 30} },
+        { {9022, 40}, {9076, 30}, {9418, 100}, {8556, 10} },
+    };
+    SYSMSGV(title, 831);
+    for(UInt8 i = 0; i < cnt; ++ i)
+    {
+        UInt8 idx = 0xFF;
+        brd >> idx;
+        if(idx >= sizeof(goldLvls)/sizeof(goldLvls[0]))
+            continue;
+        SYSMSGV(content, 832, player->getCountry(), player->getName().c_str(), goldLvls[idx]);
+        MailItemsInfo itemsInfo(s_items[idx], Activity, 4);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(mail)
+             mailPackageManager.push(mail->id, s_items[idx], 4, true);
+    }
+}
 
 }

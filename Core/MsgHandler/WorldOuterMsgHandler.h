@@ -1645,6 +1645,8 @@ void OnArenaLeaderBoardReq( GameMsgHdr&hdr, ArenaLeaderBoardReq& aer )
 void OnArenaWarOpReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
+    if(!cfg.enabledServerWar())
+        return;
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
 	UInt8 type = 0, opt = 0;
 	brd >> type >> opt;
@@ -3431,6 +3433,8 @@ void OnUpdateArenaSession( ArenaMsgHdr& hdr, const void * data )
 void OnServerWarConnected( ServerWarMsgHdr& hdr, const void * data )
 {
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(!cfg.enabledServerWar())
+        return;
 	UInt8 r = 0;
 	brd >> r;
 	if(r == 1)
@@ -3481,6 +3485,8 @@ void OnServerWarLineupCommited( ServerWarMsgHdr& hdr, const void * data )
 
 void OnServerWarPreliminary( ServerWarMsgHdr& hdr, const void * data )
 {
+    if(!cfg.enabledServerWar())
+        return;
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     GObject::serverWarMgr.pushPreliminary(brd);
 }
@@ -3526,6 +3532,8 @@ void OnServerWarBattlePoint( ServerWarMsgHdr& hdr, const void * data )
 
 void OnServerWarLeaderBoard( ServerWarMsgHdr& hdr, const void * data )
 {
+    if(!cfg.enabledServerWar())
+        return;
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     GObject::serverWarMgr.updateLeaderBoard(brd);
 }
@@ -3639,6 +3647,21 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
         default:
             return;
     }
+}
+
+void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    if(type == 0)
+        GObject::leaderboard.giveRechargeRankAward();
+    else if(type == 1)
+        GObject::leaderboard.readRechargeRank100(brd);
+    else if(type == 2)
+        GObject::leaderboard.readRechargeSelf(brd);
+    else if(type == 3)
+        GObject::leaderboard.sendGoldLvlAward(brd);
 }
 
 #endif // _WORLDOUTERMSGHANDLER_H_
