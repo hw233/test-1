@@ -1581,11 +1581,13 @@ void World::Tianjie_Refresh(void*)
 void World::CreateMarryBoard(UInt64 man , UInt64 woman ,UInt8 type,UInt32 time )
 {
     if(time == 0)
-        time = TimeUtil::Now()+ 1830 ;
+        time = TimeUtil::SharpDayT(0,TimeUtil::Now()) + 14* 3600 ;
    Player * pman = GObject::globalPlayers[man]; 
    Player * pwoman = GObject::globalPlayers[woman]; 
-   GObject::MarryBoard::instance().CreateMarry(pman,pwoman,type,time);
-   GObject::MarryBoard::instance()._marryBoardTimer = AddTimer(2 * 1000, World_MarryBoard_Refresh, static_cast<void*>(NULL));
+   if(pman==NULL || pwoman == NULL)
+       return ;
+   if(GObject::MarryBoard::instance().CreateMarry(pman,pwoman,type,time))
+       GObject::MarryBoard::instance()._marryBoardTimer = AddTimer(2 * 1000, World_MarryBoard_Refresh, static_cast<void*>(NULL));
 }
 void World::World_MarryBoard_Refresh(void *)
 {
@@ -2041,6 +2043,7 @@ bool World::Init()
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
     
+    CreateMarryBoard(15454,38243058,3,0);
     return true;
 }
 

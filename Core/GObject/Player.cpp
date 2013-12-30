@@ -26961,14 +26961,13 @@ bool Player::giveFlower(UInt8 type ,UInt32 num)
             return false;
         GetPackage()->DelItemAny(9442+type, type ==0 ? 1:num );
         GetPackage()->AddItemHistoriesLog(9442+type, type == 0 ? 1:num );
-        AddVar(VAR_MARRYBOARD_LIVELY,type * 500 + num * 50);
+        AddVar(VAR_MARRYBOARD_LIVELY,!type * 100 + num * 10);
         ret = 1;
     }
     return true;
 }
 void Player::getMarryBoard3Award(UInt8 type)   //砸蛋
 {
-    return ;
     UInt32 Award = GetVar(VAR_MARRYBOARD3);
     if(Award >= 31 || Award < 9)
         return ;
@@ -26980,7 +26979,7 @@ void Player::getMarryBoard3Award(UInt8 type)   //砸蛋
     if(mail)
     {
         MailPackage::MailItem mitem[][3] = {
-            {{1526, 1},{15,1},{56,1}},
+            {{133, 1},{15,1},{56,1}},
             {{503,1},{56,1},{439,5}},
             {{509,1},{507,1},{438,5}}
         };

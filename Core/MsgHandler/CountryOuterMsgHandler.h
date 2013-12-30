@@ -1183,7 +1183,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
-    GObject::MarryBoard::instance().sendMarryBoardInfo(pl,0);
+    GObject::MarryBoard::instance().sendTodayMarryInfo(pl);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -1322,8 +1322,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 #if 0
     if (World::getHappyFireTime())
     {
-        GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, pl, 0);
-        GLOBAL().PushMsg(hdr, NULL);
+        //GameMsgHdr hdr(0x1DB, WORKER_THREAD_WORLD, pl, 0);
+        //GLOBAL().PushMsg(hdr, NULL);
     }
 #endif
     /*if(World::getQiShiBanTime())
@@ -6217,12 +6217,6 @@ void OnGetAward( GameMsgHdr& hdr, GetAward& req )
     MSG_QUERY_PLAYER(player);
     player->getAward(req._type, req._opt);
 }
-void OnGiveFlower( GameMsgHdr& hdr, void * data )
-{
-    MSG_QUERY_PLAYER(player);
-    UInt8  type = *reinterpret_cast<const UInt8*>(data);
-    player->giveFlower(type);
-}
 
 void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )
 {
@@ -7571,19 +7565,19 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
     {
         case 0x03:
             {
-                if(!player->giveFlower(0))
-                    break; 
                 if(mType == 0)
                     return;
-                GObject::MarryBoard::instance()._lively += 500;
-                GObject::MarryBoard::instance()._YHlively += 500;
+                if(!player->giveFlower(0))
+                    break; 
+                GObject::MarryBoard::instance()._lively += 100;
+                GObject::MarryBoard::instance()._YHlively += 100;
                 player->AddVar(VAR_MARRYBOARD_YANHUA,100);
                 std::string text;
                 brd >> text;
                 Stream st(REP::CHAT);
                 UInt8 office = player->getTitle();
                 UInt8 guard = player->getPF();
-                st << static_cast<UInt8>(8)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+                st << static_cast<UInt8>(11)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
                     << office << guard << text.c_str()<< player->GetLev() << Stream::eos;
                 NETWORK()->Broadcast(st);
             }
@@ -7596,7 +7590,7 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
                 brd >> num ;
                 if(!player->giveFlower(1,num))
                     break; 
-                GObject::MarryBoard::instance()._lively += 50;
+                GObject::MarryBoard::instance()._lively += 10*num;
                 SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
             }
     }
