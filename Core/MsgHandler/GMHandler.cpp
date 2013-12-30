@@ -16,6 +16,7 @@
 #include "GObject/Fighter.h"
 #include "GObject/Clan.h"
 #include "GObject/Country.h"
+#include "GObject/MarryBoard.h"
 #include "GObject/ClanManager.h"
 #include "GObject/ClanBattle.h"
 #include "GObject/ClanManager.h"
@@ -298,6 +299,7 @@ GMHandler::GMHandler()
     Reg(3, "addshlvl", &GMHandler::OnAddSHLvl);
     Reg(3, "playermsg", &GMHandler::OnPlayerMsg);
     Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
+    Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
 
     _printMsgPlayer = NULL;
 }
@@ -4489,6 +4491,17 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_YEARHAPPY_RANK_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
+        case 23:
+            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::Now() + 86400*15);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 24:
+            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, 0);
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
     }
 }
 
@@ -4938,4 +4951,15 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
 #undef TEST_TABLE
 }
 
-
+void GMHandler::OnCreateMarryBoard(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() !=3 )
+        return ;
+	char * endptr;
+	UInt64 playerId1 = strtoull(args[0].c_str(), &endptr, 10);
+	UInt64 playerId2 = strtoull(args[1].c_str(), &endptr, 10);
+    UInt8 type = atoi(args[2].c_str());
+    UInt32 now = TimeUtil::Now();
+    WORLD().CreateMarryBoard(playerId1,playerId2,type,now + 1810);
+    GObject::MarryBoard::instance().SetQuestionOnMarryBoard();
+}

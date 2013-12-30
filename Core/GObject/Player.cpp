@@ -19626,7 +19626,7 @@ void Player::sendCopyFrontAllAward()
 
 UInt8 Player::getCopyId()
 {
-    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a};
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871};
 
     UInt16 currentSpot = PLAYER_DATA(this, location);
     for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
@@ -19764,15 +19764,15 @@ void Player::get3366GiftAward(UInt8 type)
     }
     if(type == 1)
     {
-        if (getGold() < 19)
+        if (getGold() < 45)
         {
             sendMsgCode(0, 1104);
             return;
         }
         ConsumeInfo ci(Enum3366Gift,0,0);
-        useGold(19, &ci);
+        useGold(45, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {548, 3, 9082, 3, 9371, 1, 8000, 1, 500, 1, 9390, 1};
+        static UInt32 itemId[] = {505, 2, 512, 2, 513, 2, 9082, 2, 548, 2, 465, 2};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -19780,15 +19780,15 @@ void Player::get3366GiftAward(UInt8 type)
     }
     else if(type == 2)
     {
-        if (getGold() < 66)
+        if (getGold() < 88)
         {
             sendMsgCode(0, 1104);
             return;
         }
         ConsumeInfo ci(Enum3366Gift,0,0);
-        useGold(66, &ci);
+        useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {9390, 1126, 1325, 9141, 517, 513};
+        static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
         {
             GetPackage()->Add(itemId[i], 1, true);
@@ -20273,79 +20273,53 @@ void Player::getNewYearQQGameAward(UInt8 type)
 
 void Player::getQZoneQQGameAward(UInt8 domainType, UInt8 type)
 {
+    if(type == 0 || type > 2)
+        return;
+    UInt32 bit = 0;
     if(domainType == 1)
     {
         if(!World::getQZoneQQGameActY())    //黄钻空间
             return;
         if(atoi(m_domain) != 1 && atoi(m_domain) != 2 && atoi(m_domain) !=6)
             return;
-        if(type == 0 || type > 2)
-            return;
-        bool bRet;
-        UInt32 status = GetVar(VAR_QZONE_QQGAME_ACT);
         if(type == 1)
-        {
-            if(status & 0x01)
-                return;
-            bRet = GameAction()->onGetQZoneQQGameAward(this, 1);
-            if(bRet)
-            {
-                status |= 0x01;
-                SetVar(VAR_QZONE_QQGAME_ACT, status);
-                sendQZoneQQGameAct(domainType);
-            }
-        }
+            bit = 0x01;
         else
-        {
-            if(status & 0x02)
-                return;
-            if(!isYD())
-                return;
-            bRet = GameAction()->onGetQZoneQQGameAward(this, 2);
-            if(bRet)
-            {
-                status |= 0x02;
-                SetVar(VAR_QZONE_QQGAME_ACT, status);
-                sendQZoneQQGameAct(domainType);
-            }
-        }
+            bit = 0x02;
     }
     else if(domainType == 2)
     {
-        if(!World::getQZoneQQGameAct())    //蓝钻空间
+        if(!World::getQZoneQQGameAct())
                 return;
-        if(atoi(m_domain) != 10)
+        if(atoi(m_domain) != 10)    //QQ大厅蓝钻空间
             return;
-        if(type == 0 || type > 2)
-            return;
-        bool bRet;
-        UInt32 status = GetVar(VAR_QZONE_QQGAME_ACT);
         if(type == 1)
-        {
-            if(status & 0x04)
-                return;
-            bRet = GameAction()->onGetQZoneQQGameAward(this, 1);
-            if(bRet)
-            {
-                status |= 0x04;
-                SetVar(VAR_QZONE_QQGAME_ACT, status);
-                sendQZoneQQGameAct(domainType);
-            }
-        }
+            bit = 0x04;
         else
-        {
-            if(status & 0x08)
+            bit = 0x08;
+    }
+    else if(domainType == 3)
+    {
+        if(!World::getQZoneQQGameAct())
                 return;
-            if(!isBD())
-                return;
-            bRet = GameAction()->onGetQZoneQQGameAward(this, 2);
-            if(bRet)
-            {
-                status |= 0x08;
-                SetVar(VAR_QZONE_QQGAME_ACT, status);
-                sendQZoneQQGameAct(domainType);
-            }
-        }
+        if(atoi(m_domain) != 11)    //3366蓝钻空间
+            return;
+        if(type == 1)
+            bit = 0x10;
+        else
+            bit = 0x20;
+    }
+    else
+        return;
+    UInt32 status = GetVar(VAR_QZONE_QQGAME_ACT);
+    if(status & bit)
+        return;
+    bool bRet = GameAction()->onGetQZoneQQGameAward(this, type);
+    if(bRet)
+    {
+        status |= bit;
+        SetVar(VAR_QZONE_QQGAME_ACT, status);
+        sendQZoneQQGameAct(domainType);
     }
 }
 
@@ -20363,6 +20337,11 @@ void Player::sendQZoneQQGameAct(UInt8 domainType)
         if(atoi(m_domain) != 10)
             return;
     }
+    else if(domainType == 3)
+    {
+        if(atoi(m_domain) != 11)
+            return;
+    }
     else
         return;
     Stream st(REP::COUNTRY_ACT);
@@ -20370,9 +20349,11 @@ void Player::sendQZoneQQGameAct(UInt8 domainType)
     st << domainType;
     UInt8 opt = GetVar(VAR_QZONE_QQGAME_ACT);
     if(domainType == 1)
-        opt = opt & 0x3;
-    else
+        opt = opt & 0x03;
+    else if(domainType == 2)
         opt = (opt >> 2) & 0x03;
+    else
+        opt = (opt >> 4) & 0x03;
     st << opt;
     st << Stream::eos;
     send(st);
@@ -26585,17 +26566,39 @@ void Player::sendRealSpirit()
 
 void Player::getQZoneRechargeAward(UInt8 val)
 {
-    if(getPlatform()!=1 && getPlatform() !=2)
+    if ((getPlatform()==1 || getPlatform() ==2) )
+    {
+       if(!World::getQZoneRechargeTime())
+           return;
+    }
+    else if ( getPlatform()==11)
+    {
+        if(!World::get3366RechargeTime())
+            return;
+    }
+    else 
         return ;
-    if (!World::getQZoneRechargeTime())
-        return;
+    UInt32 var = 0;
+    UInt32 award = 0;
+    if(getPlatform()==1 || getPlatform() ==2)
+    {
+        var = VAR_QZONE_RECHARGE;
+        award = VAR_QZONE_RECHARGE_AWARD ; 
+    }
+    else if( getPlatform()==11)
+    {
+        var = VAR_3366_RECHARGE;
+        award = VAR_3366_RECHARGE_AWARD ; 
+    }
+    else 
+        return ;
     UInt32 Recharge[]={100,500,1000,2000,3000,5000};
-    UInt32 recharge = GetVar(VAR_QZONE_RECHARGE);
+    UInt32 recharge = GetVar(var);
     if(val<1||val>6)
         return ;
     if(recharge < Recharge[val-1])
         return ;
-    UInt32 ctslandingAward = GetVar(VAR_QZONE_RECHARGE_AWARD);
+    UInt32 ctslandingAward = GetVar(award);
     if(ctslandingAward & (1<<(val-1)))
         return ;
     if(!GameAction()->RunQZoneRechargeAward(this, val))
@@ -26603,18 +26606,41 @@ void Player::getQZoneRechargeAward(UInt8 val)
         return;
     }
     ctslandingAward |= (1<<(val - 1));
-    SetVar(VAR_QZONE_RECHARGE_AWARD, ctslandingAward);
+    SetVar(award, ctslandingAward);
     char str[16] = {0};
     sprintf(str, "F_131212_%d",val);
     udpLog("chongzhihuodong", str, "", "", "", "", "act");
-    
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
-    if (!World::getQZoneRechargeTime())
-        return;
-    UInt32 QZoneRecharge = GetVar(VAR_QZONE_RECHARGE);
-    UInt32 QZoneRechargeAward = GetVar(VAR_QZONE_RECHARGE_AWARD);
+    if ((getPlatform()==1 || getPlatform() ==2) )
+    {
+       if(!World::getQZoneRechargeTime())
+           return;
+    }
+    else if ( getPlatform()==11)
+    {
+        if(!World::get3366RechargeTime())
+            return;
+    }
+    else 
+        return ;
+    UInt32 var = 0;
+    UInt32 award = 0;
+    if(getPlatform()==1 || getPlatform() ==2)
+    {
+        var = VAR_QZONE_RECHARGE;
+        award = VAR_QZONE_RECHARGE_AWARD ; 
+    }
+    else if( getPlatform()==11)
+    {
+        var = VAR_3366_RECHARGE;
+        award = VAR_3366_RECHARGE_AWARD ; 
+    }
+    else 
+        return ;
+    UInt32 QZoneRecharge = GetVar(var);
+    UInt32 QZoneRechargeAward = GetVar(award);
     Stream st(REP::GETAWARD);   //协议
     st << static_cast<UInt8>(33);
     st << static_cast<UInt32>(QZoneRecharge);
@@ -26624,11 +26650,14 @@ void Player::sendQZoneRechargeAwardInfo()
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
-    if(getPlatform()!=1 && getPlatform() !=2)
-        return ;
-    if(World::getQZoneRechargeTime())
+    if(World::getQZoneRechargeTime() && ( getPlatform() ==1 || getPlatform() ==2))
     {
         AddVar(VAR_QZONE_RECHARGE,r);
+        sendQZoneRechargeAwardInfo();
+    }
+    if(World::get3366RechargeTime() &&  getPlatform() == 11 )
+    {
+        AddVar(VAR_3366_RECHARGE,r);
         sendQZoneRechargeAwardInfo();
     }
 }
@@ -26916,6 +26945,60 @@ void Player::joinAllServerRecharge(UInt32 num)
     NETWORK()->SendToServerWar(st);
 }
 
+bool Player::giveFlower(UInt8 type ,UInt32 num)
+{
+    if(type > 1)
+        return false;
+    UInt8 ret = 0;
+    {
+        UInt16 count = GetPackage()->GetItemAnyNum(9442+type) ;
+        ItemBase * item = GetPackage()->FindItem(9442+type, true);
+        if (!item)
+            item =GetPackage()->FindItem(9442+type, false);
+        if(item ==NULL)
+            return false;
+        if(num > count)
+            return false;
+        GetPackage()->DelItemAny(9442+type, type ==0 ? 1:num );
+        GetPackage()->AddItemHistoriesLog(9442+type, type == 0 ? 1:num );
+        AddVar(VAR_MARRYBOARD_LIVELY,type * 500 + num * 50);
+        ret = 1;
+    }
+    return true;
+}
+void Player::getMarryBoard3Award(UInt8 type)   //砸蛋
+{
+    return ;
+    UInt32 Award = GetVar(VAR_MARRYBOARD3);
+    if(Award >= 31 || Award < 9)
+        return ;
+    if(type > 3 ||type <1)
+        return; 
+    SYSMSG(title, 4191);
+    SYSMSGV(content, 4192,getCountry(),getName().c_str());
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem[][3] = {
+            {{1526, 1},{15,1},{56,1}},
+            {{503,1},{56,1},{439,5}},
+            {{509,1},{507,1},{438,5}}
+        };
+        MailItemsInfo itemsInfo(mitem[type-1], Activity, 1);
+        mailPackageManager.push(mail->id, mitem[type-1], 3, true);
+        std::string strItems;
+        for (int i = 0; i < 3; ++i)
+        {
+            strItems += Itoa(mitem[type][i].id);
+            strItems += ",";
+            strItems += Itoa(mitem[type][i].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+        SetVar(VAR_MARRYBOARD3,Award + 31);
+    }
+
+}
 } // namespace GObject
 
 
