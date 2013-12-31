@@ -132,7 +132,7 @@ namespace GObject
                 UpdateEnergy();
             }
             UInt32 getEnergy(){ return _energy;}
-            void AddBattlesInfo(struct ClanBuildBattleInfo cbbi);
+            void AddBattlesInfo(struct ClanBuildBattleInfo cbbi , UInt8 board = 0);
             void SendBattlesInfo(Stream & st);
             void CreateTeam(Player * leader , UInt8 leftId);
             void EnterTeam(Player * leader , Player * player);

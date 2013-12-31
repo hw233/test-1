@@ -1148,6 +1148,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendAutoTeamCopy();
     }
+    {
+        pl->sendPictureInfo();
+    }
     if(!pl->GetVar(VAR_ONCE_ONDAY))
     {
         pl->sendNovLoginInfo();
@@ -9495,6 +9498,193 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
     case 0x0D:
         {
            player->BeginDrink();
+        }
+        break;
+    case 0x10:   //发起伐木
+        {
+           UInt8 opt = 0;
+           br >> opt ;
+           if(opt ==1)
+           {
+               UInt8 type = 0;
+               br >>type ;
+               player->setCutType(type);
+           }
+           else
+           {
+               UInt32 now = TimeUtil::Now();
+               if(player->getCuttingInfo().time != 0 && player->getCuttingInfo().time + 35 < now)
+                   player->getCuttingInfo().reset();
+           }
+           player->sendTreesInfo();
+        }
+        break;
+    case 0x11:   //查询伐木信息
+        player->sendCutterInfo();
+        break;
+    case 0x12:  //升级伐木工具
+        {
+           UInt8 level = 0;
+           br >> level ;
+           UInt8 res = player->CutToolLevelUp(level);
+           Stream st(REP::BROTHER);
+           st << static_cast<UInt8>(0x12);
+           st <<static_cast<UInt8>(res);
+           st <<Stream::eos;
+           player->send(st);
+        } 
+        break;
+    case 0x13:   //购买伐木次数
+        {
+            player->BuyCutCount();
+        }
+        break;
+    case 0x14:   //邀请伐木
+        {
+            std::string name ;
+            br >> name ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(!friendOne)
+                return ;
+            player->InviteCutting(friendOne);
+
+        }
+        break;
+    case 0x15:   //回复伐木邀请
+        {
+            std::string name ;
+            br >> name ;
+            UInt8 res = 0;
+            br >> res ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            if(res == 1)
+                player->moveTo(9476,true);
+            struct st 
+            {
+                UInt64 playerId;
+                UInt8 res ;
+            };
+            st _st ;
+            _st.playerId = player->getId();
+            _st.res = res;
+            GameMsgHdr hdr(0x410, friendOne->getThreadId(), friendOne, sizeof(_st));
+            GLOBAL().PushMsg( hdr, &_st );
+        }
+        break;
+    case 0x16:   //开始伐木
+        {
+            player->beginCutting();  
+            std::cout << "开始伐木：" << static_cast<UInt32>(player->getId()&0xffffffffff) << std::endl;
+        }
+        break;
+    case 0x17:  //退出伐木
+        {
+            if(player->getCuttingInfo().time == 0)
+            {
+                if(player->getCuttingInfo().cutter)
+                {
+                    if(player->getCuttingInfo().shenfen)
+                    {
+                        player->getCuttingInfo().cutter->getCuttingInfo().reset();
+                    }
+                    else 
+                    {
+                        player->getCuttingInfo().cutter->setCutter(1,NULL);
+                        player->getCuttingInfo().cutter->sendMsgCode(2,4039);
+                    }
+                    player->getCuttingInfo().cutter->sendCutterInfo();
+                }
+                player->getCuttingInfo().reset();
+                player->sendCutterInfo();
+            }
+        }
+        break;
+    case 0x18:  //结束伐木
+        {
+            player->CutEnd();
+            std::cout << "结束伐木：" << static_cast<UInt32>(player->getId()&0xffffffffff) << std::endl;
+        }
+        break;
+    case 0x19:  //伐木
+        {
+            UInt8 type = 0;
+            br >>type ;
+            UInt8 res = 0;
+            switch(type)
+            {
+                case 0:
+                    {
+                        UInt8 num = 0;
+                        br >> num ;
+                        res =  player->CutForOnce(num);
+                        std::cout << "伐木：" << static_cast<UInt32>(player->getId()&0xffffffffff) << " num:"<<static_cast<UInt32>(num) << " res:" << static_cast<UInt32>(res) << std::endl;
+                    }
+                    break;
+                case 1:
+                case 2:
+                    {
+                        res = player->quicklyCut(type);
+                        player->sendTreesInfo();
+                    }
+                    break;
+            }
+            player->sendCutterInfo();
+            if(player->getCuttingInfo().cutter)
+                player->getCuttingInfo().cutter->sendCutterInfo();
+            if(res < 2)
+            {
+                Stream st(REP::BROTHER);
+                st << static_cast<UInt8>(0x19);
+                st << static_cast<UInt8>(type);
+                st << static_cast<UInt8>(res);
+                st <<Stream::eos;
+                player->send(st);
+            }
+            if(type)
+                player->getCuttingInfo().reset();
+        }
+        break;
+    case 0x20:
+        {
+            player->sendPictureInfo(); 
+        }
+        break;
+    case 0x21:
+        {
+            UInt8 floor = 0;
+            UInt8 index = 0;
+            UInt8 count = 0;
+            br >> floor >> index >> count;
+            UInt8 res = player->buyCubeInPicture(floor,index,count);
+            Stream st(REP::BROTHER) ;
+            st << static_cast<UInt8>(0x21);
+            st << static_cast<UInt8>(res);
+            st << Stream::eos;
+            player->send(st);
+            player->sendPictureInfo();
+        }
+        break;
+    case 0x22:
+        {
+            UInt8 floor = 0; 
+            UInt8 cubeCount = 0;
+            br >> floor >> cubeCount ;
+            std::map<UInt8 ,std::vector<UInt8> > map_vec;
+            for(UInt8 i = 0; i < cubeCount ; ++i)
+            {
+                UInt8 index = 0;
+                UInt8 cnt = 0;
+                br >> index >> cnt;
+                for(UInt8 j = 0 ; j < cnt ; ++j)
+                {
+                    UInt8 cubeIndex = 0;
+                    br >> cubeIndex;
+                    map_vec[index].push_back(cubeIndex);
+                }
+            }
+            player->setPictureInfo(floor,&map_vec);
         }
         break;
 	}

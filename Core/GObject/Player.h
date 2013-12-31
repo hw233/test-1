@@ -764,12 +764,84 @@ namespace GObject
            taskNum[5] = 0; 
         }
     };
+    struct invitTime
+    {
+        UInt32 drinkT;
+        invitTime():drinkT(0){}
+    };
+    struct invitTime1500
+    {
+        UInt32 cutT;
+        invitTime1500():cutT(0){}
+        invitTime1500(UInt32 time):cutT(time){}
 
+    };
+
+#define TREEMAX 10
+    struct CuttingInfo
+    {
+        Player * cutter;   //砍树对象
+        UInt32 time ;       //砍树时间
+        UInt8 type ;       // 竹林类型
+        UInt8 shenfen ;        //身份
+        UInt32 count ;      //本轮收集的木片数
+        UInt32 count2;      //欧冶精粹获得数
+        UInt32 countOther;      //好友帮忙获得的木片数
+        UInt32 oneTime ;   //伐木一次的时间
+        UInt8 tree[TREEMAX];
+        std::set<Player *> plset;
+        CuttingInfo() : cutter(NULL) , time(0) , type(0),shenfen(0) ,count(0),count2(0),oneTime(0)
+        {
+            plset.clear(); 
+            for(UInt8 i = 0 ;i < TREEMAX ;++i)
+                tree[i] =0;
+        }
+        void reset()
+        {
+            cutter = NULL ; 
+            time = 0 ; 
+            type = 0;
+            shenfen = 0 ;
+            count = 0; 
+            count2 = 0; 
+            countOther = 0;
+            oneTime = 0; 
+            plset.clear();
+            for(UInt8 i = 0 ;i < TREEMAX ;++i)
+                tree[i] =0;
+        }
+        UInt8 setTree(UInt8 num ,UInt8 shenfen = 0)
+        {
+            if(num >= TREEMAX )
+                return 3;
+            if(tree[num]%100 >= 2)
+                return 3;
+            if(shenfen > 1 )
+                return 3;
+            tree[num] = tree[num]%100+1;
+            if(tree[num] == 1)
+                tree[num] += shenfen * 100;
+            return tree[num];
+        }
+        UInt8 getTree(UInt8 num)
+        {
+            if(num >= TREEMAX) 
+                return 3;
+            return tree[num];
+        }
+    };
+    struct PictureInfo
+    {
+        UInt8 floor ; 
+        std::set<UInt8>  cubeHave;  //拥有的木块
+        std::map<UInt8,std::vector<UInt8> > cubeCover; 
+        PictureInfo():floor(1){} 
+    };
 
     struct MoBaoInfo
     {
-        UInt16 status;          // 卡牌状态
-        UInt32 item[9];        // 卡牌对应的物品
+        UInt16 status;           // 卡牌状态
+        UInt32 item[9];         // 卡牌对应的物品
         UInt16 buyNum;          // 购买翻牌的次数
         UInt8 openFLMSNum;      // 翻开翡龙墨石个数
         UInt8 openFLMYNum;      // 翻开翡龙墨玉个数
@@ -2358,7 +2430,8 @@ namespace GObject
         std::map<UInt64,std::vector<StuPresentBox> >_bePresent; 
 
         std::map<UInt64, struct FriendCount >_friendlyCount;   //友好度
-		std::map<UInt64 , UInt32> _brothers; // 结拜兄弟(不分男女) 第二参数为发起饮酒的时间
+		std::map<UInt64 , struct invitTime> _brothers; // 结拜兄弟(不分男女) 第二参数为发起饮酒的时间
+		std::map<UInt64 , struct invitTime1500> _friendCount1500; // 1500友好度
         std::map<UInt64, struct FriendYellowBird >_friendYB;   //黄色鸢尾赠送情况
         std::map<UInt64, struct FriendTaskNum >_friendTask;   //友好度任务
 
@@ -3290,6 +3363,8 @@ namespace GObject
         UInt32 _friendSum;
         //
         DrinkInfo drinkInfo ;
+        CuttingInfo cuttingInfo ;
+        PictureInfo pictureInfo ; 
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();
@@ -3359,6 +3434,35 @@ namespace GObject
         void AddClanFriend();
         //void AddFriendlyCount(Player * friender , UInt8 taskNum) ;
         //void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
+
+        //伐木
+        CuttingInfo& getCuttingInfo(){ return cuttingInfo;}
+        bool canInviteCutting(Player * pl);
+        UInt8 InviteCutting( Player * pl );   //需要抛消息
+        void beInviteCutting(Player * pl);
+        void beReplyForCutting(Player * pl ,UInt8 res);
+        UInt32 CutForOnce(UInt8 num = 0 ,UInt8 flag = 0);
+        UInt8 quicklyCut(UInt8 type);
+        void beginCutting();
+        void setCutter(UInt8 type ,Player * cutter){ cuttingInfo.shenfen =type; cuttingInfo.cutter = cutter;}
+        void setCutTime(UInt32 time){cuttingInfo.time = time ;}
+        void setCutType(UInt8 type);
+        void sendCutterInfo();
+        bool CutToolLevelUp(UInt8 level);
+        void BuyCutCount();
+        void getTreefromCutter(UInt8 count);
+        void CutEnd();
+        void sendTreesInfo();
+        bool subCuttingCount(UInt8 flag = 0);
+
+        PictureInfo& getPictureInfo(){ return pictureInfo;}
+        void setPictureInfo(UInt8 id , std::map<UInt8 ,std::vector<UInt8> > *map_vec);
+        void sendPictureInfo();
+        void loadPictureInfoFromDB();
+        void UpdatePictureToDB();
+        static UInt8 getCubeCountInSet(std::map<UInt8 , std::vector<UInt8> > map_vec);
+        void getPictureAttr(GData::AttrExtra& ae); 
+        UInt8 buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count);
 
         void makeFighterSGList(Stream& st);
         void sendFighterSGListWithNoSkill();

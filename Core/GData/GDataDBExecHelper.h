@@ -809,6 +809,33 @@ struct DBCardInfo
     UInt16 skillId;
     std::string name;
 };
+struct DBCubeAttr
+{
+    UInt8 id;
+    UInt32 hp;
+    float attack;
+    float action;
+};
+struct DBFloorAttr
+{
+    UInt8 id;
+    UInt32 hp;
+    float attack;
+    float action;
+};
+struct DBPicInfo
+{
+    UInt8 id;
+    UInt8 index;
+    UInt32 cost ;
+    UInt8 buffId;
+};
+struct DBCubeCount
+{
+    UInt8 id;
+    UInt8 index;
+    UInt8 cnt;
+};
 
 struct DBCardUpgrade
 {
@@ -1867,6 +1894,45 @@ SPECIALDEF(6)
     UInt8, lvLimit,
     UInt16, skillId,
     std::string, name 
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCubeAttr)
+SPECIALDEF(4)
+	(
+    UInt8, id,
+    UInt32, hp,
+    float, attack,
+    float, action
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBFloorAttr)
+SPECIALDEF(4)
+	(
+    UInt8, id,
+    UInt32, hp,
+    float, attack,
+    float, action
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBPicInfo)
+SPECIALDEF(4)
+	(
+    UInt8, id,
+    UInt8, index,
+    UInt32, cost,
+    UInt8, buffId
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCubeCount)
+SPECIALDEF(3)
+	(
+    UInt8, id,
+    UInt8, index,
+    UInt8, cnt
 	)
 SPECIALEND()
 

@@ -2132,6 +2132,12 @@ void Fighter::rebuildEquipAttr()
     }
     if(_owner)
     {
+        GData::AttrExtra ae ;
+        _owner->getPictureAttr(ae);
+        _attrExtraEquip += ae;
+    }
+    if(_owner)
+    {
         _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
         _owner->GetMoFang()->addKYAttr(_attrExtraEquip);
 

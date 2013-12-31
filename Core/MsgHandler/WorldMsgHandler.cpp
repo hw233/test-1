@@ -222,6 +222,10 @@ MSG_REG_2(GameMsgHdr, 0x1AF, OnSendDuoBaoBegin);
 MSG_REG_2(GameMsgHdr, 0x195, OnClearTYSS);
 MSG_REG_2(GameMsgHdr, 0x191, OnSendClanFriendsA);
 MSG_REG_2(GameMsgHdr, 0x192, OnSendClanFriendsB);
+//ID >= 0X200  消息将被强制抛到国家线程处理
+
+//MSG_REG_2(GameMsgHdr, 0x193, OnSendInactive);
+//MSG_REG_2(GameMsgHdr, 0x194, OnSendActive);
 MSG_REG_2(GameMsgHdr, 0x193, OnSendAnswerBegin);
 MSG_REG_2(GameMsgHdr, 0x194, SetAnswerRank);
 MSG_REG_2(GameMsgHdr, 0x196, SendAnswerRank);

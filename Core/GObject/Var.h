@@ -714,15 +714,24 @@ namespace GObject
         
         VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 729,//璇玑阵图自动战斗使用金钱标志
         VAR_ATOXJFM = 730,     //自动璇玑阵图id
+        // 731 - 750 for lib
 
-        // 731 - 740 for lib
         VAR_FRIEND_ACHIEVEMENT  = 731,  //友好度成就奖励领取情况
         VAR_CLAN_FRIEND = 732 ,    //帮派玩家是否增加过友好度(8位) , 玩家购买的剩余饮酒次数 
         VAR_DRINK_COUNT = 733 ,    //饮酒次数 主动发起(8位) ,被动接受(8位) ,玩家总购买的次数 
         VAR_DRINK_VALUE = 734 ,    //豪饮值
         VAR_FRIEND_VALUE_DAY = 735 ,    //每日友情值
+
         VAR_LINGSHI_PEIYANG_CNT = 736, //灵侍仙石培养次数
         VAR_LINGSHI_PEIYANG_LUCKY = 737, //灵侍培养出现暴击记录
+        VAR_TREE_VALUE = 738 ,    //木片数
+        VAR_TREE_TIME = 739,      //砍树时间
+        VAR_TREE_TOOL = 740,      //伐木工具
+        VAR_CUTTREE_BUY = 741 ,   //玩家购买的剩余伐木次数 
+        VAR_CUTTREE_COUNT = 742 ,    //伐木次数 主动发起(8位) ,玩家总购买的次数 
+        VAR_CUBE_COUNT = 743,      //当前积木消耗数  (每一层构造好的时候清零)
+        VAR_TREE_VALUE_DAY = 744 ,    //今日被邀请获得的木片数
+        VAR_TOOL_CNT = 745 ,    //当前欧耶精粹数量
 
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
@@ -1423,11 +1432,17 @@ namespace GObject
             REGISTER_VAR(VAR_CLAN_FRIEND, CYCLE_NONE);
             REGISTER_VAR(VAR_DRINK_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_FRIEND_VALUE_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_CUTTREE_BUY, CYCLE_NONE);
+            REGISTER_VAR(VAR_CUTTREE_COUNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_TREE_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_TREE_VALUE_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_TOOL_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
             REGISTER_VAR(VAR_FIRE_SACRIFICE_TIMES, CYCLE_DAY);
             REGISTER_VAR(VAR_FIRE_SACRIFICE_ADD_WOOD_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_FIRE_SACRIFICE_CALLING_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_DUOBAO_ACTIVE_POINT, CYCLE_DAY);
+            REGISTER_VAR(VAR_CUBE_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);

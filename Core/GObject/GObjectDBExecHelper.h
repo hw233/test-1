@@ -661,6 +661,13 @@ struct DBFriendlyCount
     UInt8 task5;
     UInt8 task6;
 };
+struct DBPictureInfo
+{
+	UInt64 playerId;
+	UInt8 floor;
+    std::string cubeHave;
+    std::string cubeCover;
+};
 
 struct PrayRelation
 {
@@ -3774,6 +3781,15 @@ SPECIALDEF(5)
     UInt32, exp,
 	UInt8, bindType
     )
+SPECIALEND()
+SPECIALBEGIN(GObject::DBPictureInfo)
+SPECIALDEF(4)
+(
+	UInt64, playerId,
+	UInt8, floor,
+    std::string, cubeHave,
+    std::string, cubeCover
+)
 SPECIALEND()
 
 }

@@ -94,6 +94,11 @@ namespace GData
         static bool LoadCardUpgrade();
         static bool LoadCardInfo();
         static bool LoadLingShiConfig();
+        static bool LoadCubeAttr();
+        static bool LoadFloorAttr();
+        static bool LoadPicInfo();
+        static bool LoadCubeCount();
+
         static bool LoadNewQuestionsConfig();
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);

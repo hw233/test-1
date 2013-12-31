@@ -1511,7 +1511,7 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
 
             pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 1);
 
-            if (pl->getVipLevel() < 4)
+            if(pl->getVipLevel()<4)
                 return;
            
             UInt8 m = 0;
@@ -1617,7 +1617,7 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
             if(!World::getAutoBattleAct() && !World::getNewYear() && !pl->isYD() && !pl->isBD() && !pl->isQQVIP())
             {
                 // 限时vip特权
-                if(pl->getVipLevel() < 6 && !pl->inVipPrivilegeTime())
+                if(pl->getVipLevel()<4 && !pl->inVipPrivilegeTime())
                     return;
             }
 

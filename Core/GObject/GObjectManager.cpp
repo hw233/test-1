@@ -748,6 +748,11 @@ namespace GObject
             fprintf(stderr, "loadFriendlyCount error!\n");
             std::abort();
         }
+		if(!loadPictureInfo())
+        {
+            fprintf(stderr, "loadPictureInfo error!\n");
+            std::abort();
+        }
 
         if(!loadSkillGrade())
         {
@@ -7843,6 +7848,60 @@ namespace GObject
             }
             if(dbfr.clearTime != 0)
                 pl->SetFriendTaskNum(friendOne ,dbfr.clearTime , dbfr.task1 , dbfr.task2, dbfr.task3, dbfr.task4, dbfr.task5, dbfr.task6);
+		}
+		lc.finalize();
+		return true;
+	}
+	bool GObjectManager::loadPictureInfo()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading PictureInfo:");
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		DBPictureInfo dbfr;
+		if(execu->Prepare("SELECT `playerId`, `floor`,`cubeHave`, `cubeCover`  FROM `pictureAttr` ORDER BY `playerId`", dbfr) != DB::DB_OK)
+			return false;
+		lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+            lc.advance();
+            if(dbfr.floor == 0)
+                continue;
+            if(dbfr.playerId != last_id)
+            {
+                last_id = dbfr.playerId;
+                pl = globalPlayers[last_id];
+            }
+            if(pl == NULL)
+                continue;
+            pl->getPictureInfo().floor = dbfr.floor;
+            if(dbfr.cubeHave != "")
+            {
+                StringTokenizer tokenizer(dbfr.cubeHave, ",");
+                for(size_t j = 0; j < tokenizer.count(); ++ j)
+                {
+                    pl->getPictureInfo().cubeHave.insert(atoi(tokenizer[j].c_str()));
+                }
+            }
+            if(dbfr.cubeCover != "")
+            {
+                std::map<UInt8 , std::vector<UInt8> > map_vec;
+                StringTokenizer tokenizer(dbfr.cubeCover, "|");
+                for(size_t j = 0; j < tokenizer.count(); ++ j)
+                {
+                    StringTokenizer tokenizer2(tokenizer[j], ",");
+                    if(tokenizer2.count() < 2)
+                        continue;
+                    for(UInt8 k = 1; k < tokenizer2.count(); ++k)
+                    {
+                       map_vec[atoi(tokenizer2[0].c_str())].push_back(atoi(tokenizer2[k].c_str()));
+                    }
+                }
+                if(map_vec.size())
+                    pl->setPictureInfo(dbfr.floor ,&map_vec );
+            }
 		}
 		lc.finalize();
 		return true;

@@ -4024,8 +4024,9 @@ void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
     std::string name ;
     UInt8 res = 0;
     UInt32 rpid = 0; 
-    UInt32 battleTime;
-    UInt32 energy;
+    UInt32 battleTime = 0;
+    UInt32 energy = 0;
+    UInt8 board = 0 ;
     brd >> clanId ;
     brd >> type ;
     brd >> leftId;
@@ -4034,6 +4035,7 @@ void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
     brd >> rpid;
     brd >> battleTime;
     brd >> energy;
+    brd >> board;
     Clan * clan = globalClans[clanId];
     if(!clan)
         return ;
@@ -4121,7 +4123,6 @@ void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
     //    item_vec.push_back(item);
     //    itemNum_vec.push(itemNum);
         clan->AddItem(item,itemNum);
-        Stream st;
     }
 }
 void OnServerLeftGetSpirit(ServerLeftMsgHdr& hdr, const void * data)
