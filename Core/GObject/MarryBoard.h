@@ -1,5 +1,3 @@
-#define MarryBoard 
-#ifdef MarryBoard
 #include "Config.h"
 #include "Common/Stream.h" 
 #include "Player.h"
@@ -58,4 +56,3 @@ namespace GObject
             UInt32 plNum;
     };
 }
-#endif
