@@ -264,6 +264,7 @@ namespace GObject
         LIUGUANG    = 14,   //刹那流光
         ZHUTIAN     = 15,   //诸天宝鉴
         TIANYOU     = 16,   //天佑术
+        FANTIAN     = 17,   //梵天宝卷
 
         DRAGONKING_MAX,
     };
