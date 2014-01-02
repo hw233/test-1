@@ -393,6 +393,9 @@ local stepAwardID =
 	[6] = {
         20042, 20043, 20044, 20045, 20046,
     },
+	[7] = {
+        20047, 20048, 20049, 20050, 20051,
+    },
 }
 
 function getStepAward(progress, step)

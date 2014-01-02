@@ -819,7 +819,7 @@ CREATE TABLE `lbskills` (
   `id` smallint(5) unsigned NOT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
   `lbtype` tinyint(3) NOT NULL DEFAULT '0',
-  `level` tinyint(3) NOT NULL DEFAULT '0',
+  `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `target` tinyint(3) NOT NULL DEFAULT '0',
   `prob` float(10,4) NOT NULL DEFAULT '0.0000',
   `cond` smallint(5) NOT NULL DEFAULT '0',
