@@ -241,13 +241,14 @@ void MoFang::addJGSExp(UInt32 exp)
 void MoFang::randTuzhi(UInt16 num)
 {
     UInt16 count = 0;
-    UInt8 jgsLvl = 0;
+    //UInt8 jgsLvl = 0;
 
-    if(m_jiguanshu.curLvl > 19) //机关术等级大于19，按照19等级的规则获取相关图纸
+    /*if(m_jiguanshu.curLvl > 19) //机关术等级大于19，按照19等级的规则获取相关图纸
         jgsLvl = 19;
     else
-        jgsLvl = m_jiguanshu.curLvl;
+        jgsLvl = m_jiguanshu.curLvl;*/
 
+    UInt8 jgsLvl = m_jiguanshu.curLvl;
     UInt32 exp = m_jiguanshu.curExp;
 
     Stream st(REP::MOFANG_INFO);
@@ -268,6 +269,10 @@ void MoFang::randTuzhi(UInt16 num)
         else if(jgsLvl == 1)
         {
             lvl = 1;
+        }
+        else if(jgsLvl > 19)
+        {
+            lvl = uRand(20);
         }
         else if(markA < 30)
         {
