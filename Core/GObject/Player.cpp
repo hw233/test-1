@@ -26961,7 +26961,7 @@ bool Player::giveFlower(UInt8 type ,UInt32 num)
             return false;
         GetPackage()->DelItemAny(9442+type, type ==0 ? 1:num );
         GetPackage()->AddItemHistoriesLog(9442+type, type == 0 ? 1:num );
-        AddVar(VAR_MARRYBOARD_LIVELY,!type * 100 + num * 10);
+        AddVar(VAR_MARRYBOARD_LIVELY,!type * 100 + num * 5);
         ret = 1;
     }
     return true;

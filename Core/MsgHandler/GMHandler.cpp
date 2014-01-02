@@ -715,6 +715,7 @@ void GMHandler::OnAddVar( GObject::Player * player, std::vector<std::string>& ar
 		UInt32 value = atoi(args[1].c_str());
         UInt32 num = player->GetVar(var);
 		player->SetVar(var,num+value);
+        GObject::MarryBoard::instance()._YHlively = value ; 
 	}
 }
 void GMHandler::OnSetVar( GObject::Player * player, std::vector<std::string>& args )

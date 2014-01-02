@@ -20,6 +20,7 @@
 #include "GObject/Mail.h"
 #include "GObject/Prepaid.h"
 #include "GObject/Player.h"
+#include "GObject/MarryBoard.h"
 #include "GObject/Fighter.h"
 #include "GObject/Package.h"
 #include "GObject/Clan.h"
@@ -3988,6 +3989,25 @@ void ViaPlayerInfoFromBs(LoginMsgHdr& hdr, const void* data)
     st << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
-
+void SetMarryBoard(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt64 manId = 0;
+    br >> manId;
+    UInt64 womanId = 0;
+    br >> womanId;
+    UInt8 type = 0 ;
+    br >> type ;
+    UInt32 time = 0;
+    br >> time;
+    if(type > 0 && type < 4)
+        WORLD().CreateMarryBoard(manId,womanId,type,time);
+    else 
+        GObject::MarryBoard::instance().resetData();
+    Stream st(SPEP::SETMARRYBOARD);
+    st << static_cast<UInt8>(1)<< Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
 #endif // _LOGINOUTERMSGHANDLER_H_
 

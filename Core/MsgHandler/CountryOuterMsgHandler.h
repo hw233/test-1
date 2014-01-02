@@ -7588,9 +7588,13 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
                     return;
                 UInt8 num = 0;
                 brd >> num ;
+                if(num == 0)
+                    break;
+                if(num > 99)
+                    num = 99;
                 if(!player->giveFlower(1,num))
                     break; 
-                GObject::MarryBoard::instance()._lively += 10*num;
+                GObject::MarryBoard::instance()._lively += 5*num;
                 SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
             }
     }

@@ -809,6 +809,7 @@ namespace SPEQ
     const UInt16 GETQQCLANTALK       = 0x14C;// 接收QQ群聊天记录
     const UInt16 SETVAR              = 0x14D;// 设置VAR
     const UInt16 VIAPLAYERINFO       = 0x14E;// 查询导入玩家信息
+    const UInt16 SETMARRYBOARD          = 0x14F;// 设置婚礼 
 }
 
 namespace SPEP
@@ -877,6 +878,7 @@ namespace SPEP
     const UInt8 GETQQCLANTALK       = 0x4C;// 接收QQ群聊天记录
     const UInt8 SETVAR              = 0x4D;//设置var
     const UInt16 VIAPLAYERINFO      = 0x4E;// 查询导入玩家信息
+    const UInt8 SETMARRYBOARD       = 0x4F;//设置婚礼
 
 }
 

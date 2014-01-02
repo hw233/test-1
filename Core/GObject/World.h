@@ -50,8 +50,9 @@ struct stOldMan
 {
     UInt8 _loc;
     UInt16 _spot;
+    UInt32 _time ;
     std::set<UInt64> _players;
-    stOldMan():_loc(0),_spot(0){}
+    stOldMan():_loc(0),_spot(0),_time(0){}
 };
 struct stArenaExtra
 {

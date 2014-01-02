@@ -114,8 +114,9 @@ namespace GObject
         UInt32 YanHua = marryBoard->_YHlively;
         if(YanHua / 1000)
         {
-            SYSMSGV(buf,4185,YanHua);
-            str += buf;
+            std::string str1 ;
+            SYSMSG(title1, 4196);
+            SYSMSGV(content1,4185,YanHua);
             MailPackage::MailItem mitem3[] = {{1325, 1},{503,1}};
             mitem3[0].count = YanHua/1000;
             mitem3[1].count = YanHua/1000;
@@ -127,18 +128,25 @@ namespace GObject
             strItems += ",";
             strItems += Itoa(mitem3[1].count);
             strItems += "|";
+            if(YanHua/1000 >= 255 )
             {
-                SYSMSGV(buf,4189,mitem3[0].id,mitem3[0].count);
-                str +=buf;
+                for(UInt8 i =0 ;i< YanHua/1000/255 ; ++i )
+                {
+                    mitem3[0].count  = 255 ;
+                    mitem3[1].count  = 255 ;
+                    Mail * mail1 = p->GetMailBox()->newMail(NULL, 0x21, title1, content1, 0xFFFE0000);
+                    if(mail1)
+                        mailPackageManager.push(mail1->id, mitem3, 2, true);
+                }
             }
+            if((YanHua/1000)%255 != 0)
             {
-                SYSMSGV(buf,4189,mitem3[1].id,mitem3[1].count);
-                str +=buf;
+                mitem3[0].count  = (YanHua/1000)%255;
+                mitem3[1].count  = (YanHua/1000)%255 ;
+                Mail * mail1 = p->GetMailBox()->newMail(NULL, 0x21, title1, content1, 0xFFFE0000);
+                if(mail1)
+                    mailPackageManager.push(mail1->id, mitem3, 2, true);
             }
-            mitemall[count].id = mitem3[0].id;
-            mitemall[count++].count = mitem3[0].count;
-            mitemall[count].id = mitem3[1].id;
-            mitemall[count++].count = mitem3[1].count;
         }
 
         //红包奖励
@@ -178,6 +186,11 @@ namespace GObject
     bool MarryBoard::CreateMarry(Player * man , Player * woman ,UInt8 norms, UInt32 mTime)
     {
         UInt32 now = TimeUtil::Now();
+        if(mTime == 0 )
+        {
+            resetData();
+            mTime = now + 1800 + 600;
+        }
         if( mTime < now + 1800 )
         {
             return false;
@@ -262,6 +275,7 @@ namespace GObject
                 GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
                 WORLD().RemoveTimer(_marryBoardTimer);
                 _marryBoardTimer = NULL;
+                WORLD().CreateMarryBoard(128641,39090008,3,0);
             }
             return ;
         }
@@ -486,13 +500,15 @@ namespace GObject
     }
     void MarryBoard::setDoorMax()
     {
-        doorMax = plNum * 8 * 20 / 7;
+        doorMax = plNum * 20 / 7;
     //    doorMax = 3;    //测试用例
     }
     void MarryBoard::resetData()
     {
         _man = NULL;
         _woman = NULL;
+        finder = NULL;
+        WORLD().RemoveTimer(_marryBoardTimer);
         _marryBoardTimer = NULL;
         _atTime = 0;
         _norms = 0;
@@ -500,7 +516,9 @@ namespace GObject
         _lively = 0;
         _YHlively = 0;
         _askNum = 0;
+        _mAnswer = 0;
         doorMax = 0;
+        _rightDoor= 0 ;
         plNum = 0;
         for(UInt8 i =0; i < 4 ;++i )
             _support[i] = 0;
@@ -510,7 +528,6 @@ namespace GObject
             _questionId[i] = 0;
         for(UInt8 i =0 ; i < 10 ;++i )
            _answers[i] = 0;
-        _rightDoor = 0;
     }
     void MarryBoard::SetQuestionOnMarryBoard()
     {
@@ -570,7 +587,7 @@ namespace GObject
     void MarryBoard::sendTodayMarryInfo(Player *pl)
     {
         UInt32 now = TimeUtil::Now();
-        if(_man==NULL || _woman==NULL ||_atTime==0 || _norms==0 ||_marryBoardTimer==NULL || now >( _atTime + 3*OneTime ))
+        if(_man==NULL || _woman==NULL ||_atTime==0 || _norms==0 || now >( _atTime + 3*OneTime ))
             return ;
         if(now > (_atTime - 1800)&& now < (_atTime + 3*OneTime))
         {
