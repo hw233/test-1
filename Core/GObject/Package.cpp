@@ -6598,7 +6598,7 @@ namespace GObject
             m_lbSmeltInfo.orangeAdjVal += 25;
         }
 
-        if(gujiId >= 11113 && gujiId <= 11118) //皇帝古籍
+        if((gujiId >= 11113 && gujiId <= 11118) || gujiId == 11203) //皇帝古籍
         {            
             m_lbSmeltInfo.counts += 2;
             m_lbSmeltInfo.orangeAdjVal += 75;
