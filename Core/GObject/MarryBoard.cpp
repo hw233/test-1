@@ -64,25 +64,22 @@ namespace GObject
         {
             MailPackage::MailItem mitemN[][3] ={ {{15,2},{133,2},{0,0}},{{15,3},{56,3},{33,3}},{{503,2},{134,2},{0,0}}};  //红包ID
             MailPackage::MailItem *mitemL = mitemN[marryBoard->_norms-1]; 
-            if(lively >=100)
+            SYSMSGV(buf,4193,marryBoard->_lively);
+            str += buf;
+            for(UInt8 k=0;k<3;++k)  
             {
-                SYSMSGV(buf,4193,marryBoard->_lively);
-                str += buf;
-                for(UInt8 k=0;k<3;++k)  
+                if(mitemL[k].id ==0)
+                    continue ; 
+                strItems += Itoa(mitemL[k].id);
+                strItems += ",";
+                strItems += Itoa(mitemL[k].count);
+                strItems += "|";
                 {
-                    if(mitemL[k].id ==0)
-                        continue ; 
-                    strItems += Itoa(mitemL[k].id);
-                    strItems += ",";
-                    strItems += Itoa(mitemL[k].count);
-                    strItems += "|";
-                    {
-                        SYSMSGV(buf,4189,mitemL[k].id,mitemL[k].count);
-                        str +=buf;
-                    }
-                    mitemall[count].id = mitemL[k].id;
-                    mitemall[count++].count = mitemL[k].count;
+                    SYSMSGV(buf,4189,mitemL[k].id,mitemL[k].count);
+                    str +=buf;
                 }
+                mitemall[count].id = mitemL[k].id;
+                mitemall[count++].count = mitemL[k].count;
             }
         }
         //个人积分奖励 
@@ -154,7 +151,9 @@ namespace GObject
         for(UInt8 i = 0 ; i < 8 ; i ++ )
         {
             if(marryBoard->_door[i] >= marryBoard->doorMax)
+            {
                 countR ++ ;
+            }
         }
         if(countR)
         {
@@ -452,6 +451,9 @@ namespace GObject
         answerNum |= (1 << _askNum );
         pl->SetVar(VAR_MARRYBOARD2_NUM,answerNum);
         pl->SetVar(VAR_MARRYBOARD2_ANS,ans);
+        char str[16] = {0};
+        sprintf(str, "F_140102_14");
+        pl->udpLog("jiehunjinxing", str, "", "", "", "", "act");
     }
     void MarryBoard::selectDoor(Player * pl ,UInt8 door)
     {
@@ -480,16 +482,26 @@ namespace GObject
                     return ;
                 if(_door[door-1] < doorMax)
                     _door[door-1] ++ ; 
-                if(_door[door-1] == doorMax && door == _rightDoor)
+
+                if(_door[door-1] == doorMax )
                 {
-                    finder = pl;
-                    _lively += 500;
-                    SYSMSG_BROADCASTV(577,pl->getCountry(),pl->getName().c_str(),doorName[door-1].c_str());
+                    if(door == _rightDoor)
+                    {
+                        finder = pl;
+                        _lively += 500;
+                        SYSMSG_BROADCASTV(577,pl->getCountry(),pl->getName().c_str(),doorName[door-1].c_str());
+                    }
+                    char str[16] = {0};
+                    sprintf(str, "F_140102_17");
+                    pl->udpLog("jiehunjinxing", str, "", "", "", "", "act");
                 }
             }
             pl->SetVar(VAR_MARRYBOARD4_TIME,now);
             pl->AddVar(VAR_MARRYBOARD_LIVELY,10);
             _lively += 1;
+            char str[16] = {0};
+            sprintf(str, "F_140102_16");
+            pl->udpLog("jiehunjinxing", str, "", "", "", "", "act");
         }
     }
     UInt32 MarryBoard::wrapTheKey(UInt32 plKey)

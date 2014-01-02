@@ -26963,6 +26963,9 @@ bool Player::giveFlower(UInt8 type ,UInt32 num)
         GetPackage()->AddItemHistoriesLog(9442+type, type == 0 ? 1:num );
         AddVar(VAR_MARRYBOARD_LIVELY,!type * 100 + num * 5);
         ret = 1;
+        char str[16] = {0};
+        sprintf(str, "F_140102_%d",type + 12);
+        udpLog("jiehunjinxing", str, "", "", "", "", "act");
     }
     return true;
 }

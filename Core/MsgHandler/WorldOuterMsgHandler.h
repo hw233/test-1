@@ -3603,6 +3603,9 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
                         player->SetVar(VAR_MARRYBOARD3_KEY,rand);
                         player->AddVar(VAR_MARRYBOARD_LIVELY,10);
                         GObject::MarryBoard::instance()._lively += 1;
+                        char str[16] = {0};
+                        sprintf(str, "F_140102_15");
+                        player->udpLog("jiehunjinxing", str, "", "", "", "", "act");
                     }
                 }
                 else
