@@ -17616,7 +17616,7 @@ void EventTlzAuto::Process(UInt32 leftCount)
 {
     bool forceCancel = false;
     int curRate = GObject::Tianjie::instance().getTjCurRate();
-    if((GObject::Tianjie::instance().isFinish() && (5 == curRate || 0 == curRate)) || (GObject::Tianjie::instance().isTjExecute() && (4 == curRate || 5 == curRate)))
+    if(((5 == curRate || 0 == curRate) && GObject::Tianjie::instance().isFinish()) || ((4 == curRate || 5 == curRate) && GObject::Tianjie::instance().isTjExecute()))
         forceCancel = true;
     else
     {

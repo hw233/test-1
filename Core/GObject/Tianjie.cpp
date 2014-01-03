@@ -1020,7 +1020,12 @@ void Tianjie::updateRankData(Player* pl)
 }
 void Tianjie::setRatePercent()
 {
-    UInt32 percent = m_eventCurrNumber * 100 / m_eventMaxNumber;
+    UInt32 percent;
+    if(m_eventMaxNumber != 0)
+        percent = m_eventCurrNumber * 100 / m_eventMaxNumber;
+    else
+        percent = 100;
+
     if (percent > 100)
         percent = 100;
     if (percent - m_oldBroadPercent >= 25)
@@ -1507,6 +1512,9 @@ void Tianjie::record1(Player* pl, int npcIndex)
 }
 bool Tianjie::isFinish()
 {
+    if(m_currTjRate == 4 && m_eventMaxNumber == 0)
+        return false;
+
     if (!m_isFinish && m_eventCurrNumber >= m_eventMaxNumber)
 	{
 	    m_isFinish = true;
