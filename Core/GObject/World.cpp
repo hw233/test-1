@@ -3879,7 +3879,7 @@ void World::SendHappyFireAward()
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
             if(mail)
             {
-                mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
+                mailPackageManager.push(mail->id, s_item[type-1], 4, true);
                 if(pos ==1)
                     mailPackageManager.push(mail->id, &card, 1, true);
             }
