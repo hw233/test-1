@@ -790,7 +790,7 @@ void ServerWarMgr::enterArena()
         Stream st;
         std::map<Player *, UInt8> warSort;
 
-        SWarEnterData(Stream& st2, std::map<Player *, UInt8>& warSort2) : st(st2), warSort(warSort2) {}
+        SWarEnterData(Stream& st2, std::map<Player *, UInt8> warSort2) : st(st2), warSort(warSort2) {}
     };
 
     UInt8 attr = 0;

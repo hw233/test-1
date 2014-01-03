@@ -139,8 +139,8 @@ namespace REQ
     const UInt8 MAP_LOCATE          = 0xA0;// 0x51
     /**地图传送 */
     const UInt8 MAP_TRANSPORT       = 0xA1;// 0x52
-    /**进入离开通天塔 */
-    const UInt8 BABEL_JOIN          = 0xAA;// 0x58
+    /**坐骑系统 */
+    const UInt8 MODIFY_MOUNT         = 0xAA;// 0x58
     /**请求通天塔信息 */
     const UInt8 BABEL_UPDATE        = 0xAB;// 0x59
     /**开始通天塔战斗 */
@@ -521,7 +521,7 @@ namespace REP
     const UInt8 MAP_TRANSPORT_UPDATE= 0xA2;// 0x53
     const UInt8 MAP_SAMPLEUSER      = 0xA3;// 0x54
     const UInt8 MAP_POINT_JOIN      = 0xA4;// 0x55
-    const UInt8 COPY_JOIN           = 0xAA;// 0x58
+    const UInt8 MODIFY_MOUNT        = 0xAA;// 0x58
     const UInt8 COPY_DATA_UPDATE    = 0xAB;// 0x59
     const UInt8 COPY_FIGHT_RESULT   = 0xAC;// 0x5A
     const UInt8 COPY_AUTO_FIGHT     = 0xAD;// 0x5B

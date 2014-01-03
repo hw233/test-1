@@ -64,6 +64,7 @@
 #include "GData/ClanStatueTable.h"
 #include "GData/ExpTable.h"
 #include "GData/FairyPetTable.h"
+#include "GData/RideConfig.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
 #include "ArenaBattle.h"
@@ -3495,16 +3496,6 @@ namespace GObject
         send(st);
     }
 
-    bool Player::setMounts(UInt8 mounts)
-    {
-        if (mounts != getMounts())
-        {
-            sendModification(9, mounts, false);
-            return true;
-        }
-        return false;
-    }
-
 	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen, bool noreghp, UInt32 scene, UInt8 report )
 	{
 		checkLastBattled();
@@ -4705,6 +4696,8 @@ namespace GObject
         ++prayValue;
         _prayFriend[other->getId()]=now;
         SendOtherInfoForPray(other,prayValue);
+        SYSMSG_SENDV(2026, this);
+
         char str[16] = {0};
         sprintf(str, "F_130822_8");
         udpLog("xuyuanshu", str, "", "", "", "", "act");
@@ -11408,23 +11401,25 @@ namespace GObject
         {0,     0,      30,     100}
     };
 
-    void Player::addItem(UInt32 itemid, UInt16 num, UInt8 bind)
+    bool Player::addItem(UInt32 itemid, UInt16 num, UInt8 bind)
     {
         if (!itemid || !num)
-            return;
+            return false;
 
         Package* pk = GetPackage();
-        if (!pk) return;
+        if (!pk) return false;
 
         if (!World::canDestory(itemid))
-            return;
+            return false;
 
         ItemBase* ib = NULL;
         ib = pk->FindItem(itemid, bind);
         if (ib)
         {
             if (ib->Count() < num)
-                return;
+                return false;
+            if (ib->getClass() == Item_Mount || ib->getClass() == Item_MountChip)
+                return false;
 
             m_td.soul += (ib->getEnergy() * num);
             UInt8 quality = ib->getQuality() > 1 ? ib->getQuality() - 2 : 0;
@@ -11491,6 +11486,7 @@ namespace GObject
 
         DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `quality` = %u, `awdst` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %" I64_FMT "u",
                 m_td.soul, m_td.quality, m_td.awdst, m_td.needgen, m_td.itemId, m_td.num, getId());
+        return true;
     }
 
     static UInt16 fire_begin = 47;
@@ -26999,6 +26995,152 @@ void Player::getMarryBoard3Award(UInt8 type)   //砸蛋
     }
 
 }
+
+bool Player::setMounts(UInt8 mounts)
+{
+    if (mounts != getMounts())
+    {
+        sendModification(9, mounts, true);
+        _playerData.mounts = mounts;
+        return true;
+    }
+    return false;
+}
+
+void Player::addMountFromItem(UInt32 itemId)
+{
+    UInt8 id = GData::ride.getModifyMountId(itemId);
+    if(id == 0)
+        return;
+    if(getOneMount(id))
+        return;
+    ModifyMount * mount = new ModifyMount(id, this);
+    if(mount == NULL)
+        return;
+    addModifyMount(mount);
+}
+
+void Player::addModifyMount(ModifyMount * mount, bool writedb)
+{
+    if(!mount) return;
+    _modifyMounts.insert(std::make_pair(mount->getId(), mount));
+
+    if(writedb)
+    {
+        mount->updateToDB();
+    }
+}
+
+bool Player::hasMountChip(UInt32 itemId)
+{
+    if(GetPackage()->ExistItem(itemId))
+        return true;
+    UInt8 id = GData::ride.getModifyMountId(itemId);
+    if(id == 0)
+        return false;
+    ModifyMount * mount = getOneMount(id);
+    if(mount == NULL)
+        return false;
+    return mount->hasChip(itemId);
+}
+
+bool Player::addMountChip(UInt32 itemId)
+{
+    UInt8 id = GData::ride.getModifyMountId(itemId);
+    ModifyMount * mount = getOneMount(id);
+    if(NULL == mount)
+        return false;
+    return mount->addChip(itemId);
+}
+
+void Player::sendMountInfo()
+{
+	Stream st(REP::MODIFY_MOUNT);
+    st << static_cast<UInt8>(0);
+    st << static_cast<UInt16>(GetVar(VAR_MOUNT_LEVEL));
+    st << GetVar(VAR_MOUNT_EXP);
+    size_t offset = st.size();
+    UInt8 count = 0;
+    st << count;
+    for(std::map<UInt8, ModifyMount *>::iterator it = _modifyMounts.begin(); it != _modifyMounts.end(); ++ it)
+    {
+        if(it->second)
+        {
+            it->second->appendMountInfo(st);
+            ++ count;
+        }
+    }
+    st.data<UInt8>(offset)= count;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::upgradeMount(bool isAuto)
+{
+#define MOUNT_COSTID 9500
+    UInt16 mountLvl = GetVar(VAR_MOUNT_LEVEL);
+    UInt32 mountExp = GetVar(VAR_MOUNT_EXP);
+    if(mountLvl >= 60)
+        return;
+    GData::Ride::RideUpgradeData * rud = GData::ride.getRideUpgTable(mountLvl);
+    if(!rud || GetLev() < rud->lvLimit)
+        return;
+    int itemNum = GetPackage()->GetItemAnyNum(MOUNT_COSTID);
+    if(GetPackage()->GetItemAnyNum(MOUNT_COSTID) < rud->singleCost)
+        return;
+    int costNum = 0;
+    UInt16 oldLvl = mountLvl;
+    if(isAuto)
+    {
+        while(itemNum >= (int)(rud->singleCost))
+        {
+            mountExp += uRand(19) + 1;
+            if(mountExp >= rud->lvExp)
+                mountLvl ++;
+            costNum += rud->singleCost;
+            itemNum -= rud->singleCost;
+            rud = GData::ride.getRideUpgTable(mountLvl);
+            if(!rud || GetLev() < rud->lvLimit || mountLvl >= 60)
+                break;
+        }
+    }
+    else
+    {
+        costNum = rud->singleCost;
+        mountExp += uRand(19) + 1;
+        if(mountExp >= rud->lvExp)
+            mountLvl ++;
+    }
+    GetPackage()->DelItemAny(MOUNT_COSTID, costNum, NULL, ToUse);
+    GetPackage()->DelItemSendMsg(MOUNT_COSTID, this);
+    SetVar(VAR_MOUNT_EXP, mountExp);
+    if(oldLvl != mountLvl)
+    {
+        SetVar(VAR_MOUNT_LEVEL, mountLvl);
+        setLineupDirty();
+    }
+
+	Stream st(REP::MODIFY_MOUNT);
+    st << static_cast<UInt8>(1);
+    st << mountLvl << mountExp;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::addMountAttrExtra(GData::AttrExtra& attr)
+{
+    GData::AttrExtra tmpAttr;
+    std::map<UInt8, ModifyMount *>::iterator it = _modifyMounts.begin();
+    for(; it != _modifyMounts.end(); ++ it)
+    {
+        it->second->addAttrExtra(tmpAttr);
+    }
+    UInt16 mountLvl = GetVar(VAR_MOUNT_LEVEL);
+    float rate = GData::ride.getMountRate(mountLvl);
+    tmpAttr = tmpAttr * (1.0 + rate);
+    attr += tmpAttr;
+}
+
 } // namespace GObject
 
 

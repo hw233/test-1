@@ -2039,6 +2039,9 @@ void Fighter::rebuildEquipAttr()
     {
         _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
         _owner->GetMoFang()->addKYAttr(_attrExtraEquip);
+
+        //坐骑加成
+        _owner->addMountAttrExtra(_attrExtraEquip);
     }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
@@ -6813,6 +6816,9 @@ UInt32 Fighter::calcBaseBattlePoint()
             addAttrExtraXCGem(attrExtra, igt);
         }
     }
+    //坐骑加成
+    _owner->addMountAttrExtra(attrExtra);
+
 	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
 	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);
     delete fgt;

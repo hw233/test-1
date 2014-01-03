@@ -147,6 +147,8 @@ function loadStore()
         store:add(2, 9415,10)
     end
 
+        store:add(2, 9603, 20)
+        store:add(2, 9604, 20)
         store:add(2, 1126, 20)
         store:add(2, 9388, 100)
         store:add(2, 9371, 10)
@@ -441,6 +443,7 @@ function loadStore()
         store:add(5,5141,500)
 
         -- 荣誉
+        store:add(6,9602,1300)
         store:add(6,9340,1000)
         store:add(6,1504,3000)
         store:add(6,1522,10000)
@@ -459,6 +462,7 @@ function loadStore()
         store:add(6,509,2000)
 
         -- 声望
+        store:add(7,9601,2000)
         store:add(7,9340,1000)
         store:add(7,1511,6000)
         store:add(7,1520,15000)
