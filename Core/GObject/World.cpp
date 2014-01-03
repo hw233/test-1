@@ -3833,7 +3833,7 @@ void World::SendHappyFireAward()
 {
     World::initRCRank();
     int pos = 0;
-    UInt8 type =0;
+    int type =0;
     static MailPackage::MailItem s_item[][4] = {
         {{515,30},{503,30},{509,25},{134,30}},
         {{515,25},{503,25},{509,20},{134,25}},
