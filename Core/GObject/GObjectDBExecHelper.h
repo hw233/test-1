@@ -1413,6 +1413,15 @@ struct DBPlayerNamed
     std::string name;
 };
 
+struct DBSevenSoul
+{
+    UInt64 playerId;
+    UInt32 petId;
+    UInt8 soulId;
+    UInt8 soulLevel;
+    UInt8 skillIndex;
+};
+
 }
 
 namespace DB {
@@ -3207,6 +3216,18 @@ SPECIALDEF(3)
     std::string,name 
     )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSevenSoul)
+SPECIALDEF(5)
+    (
+    UInt64, playerId,
+    UInt32, petId,
+    UInt8, soulId,
+    UInt8, soulLevel,
+    UInt8, skillIndex
+    )
+SPECIALEND()
+
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

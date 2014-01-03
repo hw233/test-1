@@ -118,8 +118,6 @@ public:
         }
         return 0;
     }
-public:
-    UInt8 getSevenSoulPetType(UInt32 petId);
 
 private:
     UInt16 getPinjieBless();
@@ -135,6 +133,17 @@ public:
     void upgradeEquipSkill(ItemPetEq * eq);
 private:
     std::map<UInt8, UInt8> m_SanHunLvl;                     // 记录三魂当前等级
+
+public:
+    UInt8 getSevenSoulPetType();
+    void checkSevenSoulLevel(UInt8 soulIndex);
+    void sendSevenSoul();
+    void upgradeSevenSoul(UInt8 sevenSoulIndex);
+    void switchSevenSoulSkill(UInt8 sevenSoulIndex, UInt8 skillIndex);
+    void loadPlayerSevenSoul(UInt8 soulId, UInt8 soulLevel, UInt8 skillIndex);
+private:
+    UInt8 _soulLevel[7];
+    UInt8 _skillIndex[7];
 };
 
 }

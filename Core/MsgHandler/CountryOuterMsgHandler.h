@@ -7088,29 +7088,33 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
             break;
         case 0x08:  //七魄
             {
+                if(player->GetLev() < 80)
+                    return;
                 UInt8 subType = 0;
                 brd >> subType;
+                if(subType > 2)
+                    return;
+                UInt32 petId = 0;
+                brd >> petId;
+                FairyPet *pet = player->findFairyPet(petId);
+                if(!pet)
+                    return;
+
                 if(subType == 0)
-                {
-                    UInt32 petId = 0;
-                    brd >> petId;
-                    player->sendSevernSoul(petId);
-                }
+                    pet->sendSevenSoul();
                 else if(subType == 1)
                 {
-                    UInt32 petId = 0;
                     UInt8 sevenSoulIndex = 0;
-                    brd >> petId;
                     brd >> sevenSoulIndex;
-                    player->upgradeSevernSoul(petId, sevenSoulIndex);
+                    pet->upgradeSevenSoul(sevenSoulIndex);
                 }
-                else if(subType == 2)
+                else
                 {
-                    UInt32 petId = 0;
                     UInt8 sevenSoulIndex = 0;
-                    brd >> petId;
+                    UInt8 skillIndex = 0;
                     brd >> sevenSoulIndex;
-                    player->switchSevernSoulSkill(petId, sevenSoulIndex);
+                    brd >> skillIndex;
+                    pet->switchSevenSoulSkill(sevenSoulIndex, skillIndex);
                 }
             }
             break;

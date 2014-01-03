@@ -2860,10 +2860,7 @@ namespace GObject
         void sendRealSpirit();
         void AddRealSpirit(UInt32 real = 0);
         void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
-    public:
-        void sendSevernSoul(UInt32 petId);
-        void upgradeSevernSoul(UInt32 petId, UInt8 sevenSoulIndex);
-        void switchSevernSoulSkill(UInt32 petId, UInt8 sevenSoulIndex);
+
 	};
 
 
@@ -2928,5 +2925,4 @@ namespace GObject
     typedef Visitor<Player> PlayerVisitor;
 
 }
-
 #endif // _PLAYER_H_
