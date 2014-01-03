@@ -84,7 +84,7 @@ namespace GObject
         }
         //个人积分奖励 
         {
-            MailPackage::MailItem mitem1[] = {{9371, 3},{1126,3},{500,10},{501,10},{549,1},{509,10},{134,10},{1325,10},{9076,20}};
+            MailPackage::MailItem mitem1[] = {{9371, 2},{1126,2},{500,10},{501,10},{549,1},{509,5},{134,12},{1325,12},{9076,15}};
             UInt32 Score[] = {100,300,600,600,600,1000,2000,2000,4000};
             if(lively >=100)
             {
@@ -114,35 +114,28 @@ namespace GObject
             std::string str1 ;
             SYSMSG(title1, 4196);
             SYSMSGV(content1,4185,YanHua);
-            MailPackage::MailItem mitem3[] = {{1325, 1},{503,1}};
+            MailPackage::MailItem mitem3[] = {{1325, 1}};
             mitem3[0].count = YanHua/1000;
-            mitem3[1].count = YanHua/1000;
             strItems += Itoa(mitem3[0].id);
             strItems += ",";
             strItems += Itoa(mitem3[0].count);
-            strItems += "|";
-            strItems += Itoa(mitem3[1].id);
-            strItems += ",";
-            strItems += Itoa(mitem3[1].count);
             strItems += "|";
             if(YanHua/1000 >= 255 )
             {
                 for(UInt8 i =0 ;i< YanHua/1000/255 ; ++i )
                 {
                     mitem3[0].count  = 255 ;
-                    mitem3[1].count  = 255 ;
                     Mail * mail1 = p->GetMailBox()->newMail(NULL, 0x21, title1, content1, 0xFFFE0000);
                     if(mail1)
-                        mailPackageManager.push(mail1->id, mitem3, 2, true);
+                        mailPackageManager.push(mail1->id, mitem3, 1, true);
                 }
             }
             if((YanHua/1000)%255 != 0)
             {
                 mitem3[0].count  = (YanHua/1000)%255;
-                mitem3[1].count  = (YanHua/1000)%255 ;
                 Mail * mail1 = p->GetMailBox()->newMail(NULL, 0x21, title1, content1, 0xFFFE0000);
                 if(mail1)
-                    mailPackageManager.push(mail1->id, mitem3, 2, true);
+                    mailPackageManager.push(mail1->id, mitem3, 1, true);
             }
         }
 

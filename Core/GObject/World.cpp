@@ -3839,7 +3839,7 @@ void World::SendHappyFireAward()
 {
     World::initRCRank();
     int pos = 0;
-    UInt8 type =0;
+    UInt32 type =0;
     static MailPackage::MailItem s_item[][4] = {
         {{515,30},{503,30},{509,25},{134,30}},
         {{515,25},{503,25},{509,20},{134,25}},
@@ -3885,7 +3885,7 @@ void World::SendHappyFireAward()
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
             if(mail)
             {
-                mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
+                mailPackageManager.push(mail->id, s_item[type-1], 4, true);
                 if(pos ==1)
                     mailPackageManager.push(mail->id, &card, 1, true);
             }
