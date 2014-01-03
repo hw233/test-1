@@ -287,13 +287,6 @@ struct CityTransportReq
 	MESSAGE_DEF2(REQ::MAP_TRANSPORT, UInt16, _locid, UInt8, flag);
 };
 
-struct DungeonOpReq
-{
-	UInt8 op;
-	UInt8 type;
-	MESSAGE_DEF2(REQ::BABEL_JOIN, UInt8, op, UInt8, type);
-};
-
 struct DungeonInfoReq
 {
 	UInt8 op;
@@ -783,7 +776,7 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
         sprintf(str, "F_130808_1_%u", price);
         pl->udpLog("wupinhuigou", str, "", "", "", "", "act");
 	}
-    if(canDestroyNum > 0)
+    if(price > 0 && canDestroyNum > 0)
     {
 		SYSMSG_SEND(116, pl);
 		SYSMSG_SEND(1016, pl);
@@ -817,8 +810,8 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 		bool  bindType = *reinterpret_cast<const bool*>(data+offset+4);
 		UInt16 itemNum = *reinterpret_cast<const UInt16*>(data+offset+4+1);
 		offset += 7;
-        pl->addItem(itemId, itemNum, bindType);
-        if(World::canDestory(itemId))
+        bool res = pl->addItem(itemId, itemNum, bindType);
+        if(res && World::canDestory(itemId))
             ++canDestroyNum;
 	}
     if(canDestroyNum > 0)
@@ -2545,40 +2538,6 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 
 	pl->moveTo(ctr._locid, true);
 }
-
-/*void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
-{
-	MSG_QUERY_PLAYER(pl);
-	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
-		return;
-	GObject::Dungeon * dg = GObject::dungeonManager[dor.type];
-	if(dg == NULL)
-		return;
-	Stream st(REP::COPY_JOIN);
-	st << dor.op;
-	UInt8 result = 0;
-	switch(dor.op)
-	{
-	case 0:
-		result = dg->playerEnter(pl,1);
-		break;
-	case 1:
-		result = dg->playerLeave(pl,1);
-		break;
-	case 2:
-		result = dg->playerContinue(pl,0);
-		break;
-	case 3:
-		result = dg->playerBreak(pl,1);
-		break;
-	default:
-		break;
-	}
-    if (result == 4)
-        return;
-	st << result << dor.type << Stream::eos;
-	pl->send(st);
-}*/
 
 void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 {
@@ -7360,6 +7319,29 @@ void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
             clan->getSpiritTreeAward(player, idx);
         }
         break;
+    }
+}
+
+void OnPlayerMountReq( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(player->GetLev() < 75)
+        return;
+
+    UInt8 type = 0;
+    brd >> type;
+    switch(type)
+    {
+        case 0x00:
+            player->sendMountInfo();
+            break;
+        case 0x01:
+            player->upgradeMount(false);
+            break;
+        case 0x02:
+            player->upgradeMount(true);
+            break;
     }
 }
 

@@ -407,6 +407,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_MAP_INDEX = 417, //地图索引
         VAR_FEAST_LOGIN_AWARD_PER_DAY = 418, //中秋节登陆送月饼
         VAR_TJ_AUTO_FRONTMAP_END_TIME = 419,
+
+        VAR_MOUNT_LEVEL = 420,  //铸剑等级
         //421-430 for suntao
         VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对,31位表示等级限制[0:70级以上 1:70级以下])
         VAR_FOOLS_DAY_TIME  = 422,  //愚公移山答题开始时间
@@ -419,6 +421,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
 
         VAR_SERVERWAR_JIJIANTAI = 428,  //跨服服战祭剑台 1byte步数,2byte内外圈,3和4byte道具id
         VAR_SERVERWAR_JIJIANTAI1 = 429,  //跨服服战祭剑台 1byte每人祭剑的次数,2byte成功完成的祭剑次数 3byte宝箱开启情况
+
+         VAR_MOUNT_EXP = 430,   //铸剑经验总值
 
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
@@ -982,6 +986,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_TEAMARENA_INSPIRE, CYCLE_NONE);
             REGISTER_VAR(VAR_SERVERWAR_JIJIANTAI, CYCLE_WEEK);
             REGISTER_VAR(VAR_SERVERWAR_JIJIANTAI1, CYCLE_WEEK);
+            REGISTER_VAR(VAR_MOUNT_EXP, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
@@ -1052,6 +1057,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_MAP_INDEX, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_LOGIN_AWARD_PER_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_AUTO_FRONTMAP_END_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_MOUNT_LEVEL, CYCLE_NONE);
 
             REGISTER_VAR(VAR_FOOLS_DAY_INFO, CYCLE_DAY);
             REGISTER_VAR(VAR_FOOLS_DAY_TIME, CYCLE_DAY);
