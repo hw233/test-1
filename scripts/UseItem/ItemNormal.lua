@@ -10227,6 +10227,9 @@ function ItemNormal_00009601(iid, num, bind, param)
         if true == res then
             package:Add(9500, replaceNum[rp], true, false, 2)
         else
+            if rp == 7 or rp == 8 then
+                Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]获得了".."[4:"..itemId.."]，仙运奇佳，战力又增！")
+            end
             package:Add(itemId, 1, true, false, 2)
         end
     end

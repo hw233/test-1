@@ -15,13 +15,14 @@ class Player;
 class ModifyMount
 {
 public:
-	ModifyMount(UInt8 id, Player * owner): _id(id), _owner(owner) 
+	ModifyMount(UInt8 id, Player * owner): _id(id), _owner(owner)
     { memset(_chips, 0, sizeof(_chips)); }
 	~ModifyMount() {}
 
     inline UInt8 getId() { return _id; }
     void updateToDB();
     bool hasChip(UInt32 itemId);
+    bool hasFullChips();
     bool addChip(UInt32 itemId);
     void setChipFromDB(UInt8, UInt32);
     void appendMountInfo(Stream& st);

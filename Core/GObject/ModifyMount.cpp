@@ -1,6 +1,7 @@
 ﻿#include "Config.h"
 #include "Common/StringTokenizer.h"
 #include "Common/Itoa.h"
+#include "Server/SysMsg.h"
 #include "GData/RideConfig.h"
 #include "GObjectDBExecHelper.h"
 #include "Player.h"
@@ -33,6 +34,17 @@ namespace GObject
         return false;
     }
 
+    bool ModifyMount::hasFullChips()
+    {
+        UInt8 cnt = 0;
+        for(UInt8 i = 0; i < MOUNTCHIP_MAX; ++ i)
+        {
+            if(_chips[i])
+                ++ cnt;
+        }
+        return cnt >= MOUNTCHIP_MAX;
+    }
+
     bool ModifyMount::addChip(UInt32 itemId)
     {
         if(!itemId || hasChip(itemId))
@@ -42,6 +54,13 @@ namespace GObject
             return false;
         _chips[pos] = itemId;
         updateToDB();
+        _owner->setLineupDirty();
+
+        if(hasFullChips())
+        {
+            UInt32 item_id = GData::ride.getMountItemId(getId());
+            SYSMSG_BROADCASTV(4158, _owner->getCountry(), _owner->getName().c_str(), item_id);
+        }
 
         Stream st(REP::MODIFY_MOUNT);
         st << static_cast<UInt8>(2);
