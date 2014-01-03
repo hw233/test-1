@@ -2563,6 +2563,22 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
     brd >> type;
     switch(type)
     {
+        case 0x02:  //排行活动
+        {
+            UInt8 flag = 0;
+            brd >> op >> flag;
+            if(op != 6)     //跨服充值排行活动
+                return;
+            if(0 == flag)
+            {
+                UInt8 idx = 0, cnt = 0;
+                brd >> idx >> cnt;
+                leaderboard.sendRechargeRank100(player, idx, cnt);
+            }
+            else if(1 == flag)
+                leaderboard.sendMyRechargeRank(player);
+            break;
+        }
         case 0x01:  // 七夕
         case 0x03:  // 万圣节
         case 0x09:  // 情人节浪漫之旅
@@ -2699,6 +2715,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x21:
         case 0x24:
         case 0x25:
+        case 0x27:
         {
             brd >> op;
             switch(op)

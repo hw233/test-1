@@ -5,8 +5,8 @@
 
 namespace GObject
 {
-#define MAX_SKILL_ID 232
-#define MAX_LEVELS   6
+#define MAX_SKILL_ID 281
+#define MAX_LEVELS   7
 #define MAX_COLORS   4
 #define MAX_LB_TYPES 3
 #define MAX_ATTR_ID  12
