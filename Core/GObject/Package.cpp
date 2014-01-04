@@ -5808,6 +5808,14 @@ namespace GObject
 		if (IsEquipTypeId(typeId)) return false;
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
 		if(itemType == NULL) return false;
+        if(itemType->subClass == Item_Mount || itemType->subClass == Item_MountChip)
+        {
+            if(m_Owner->GetLev() < 75)
+            {
+                m_Owner->sendMsgCode(0, 1096, 75);
+                return false;
+            }
+        }
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		ItemBase * item = FindItem(typeId, bind);
         if(item)

@@ -224,6 +224,8 @@ public:
     //全服充值排名活动
     void readRechargeRank100(BinaryReader&);
     void readRechargeSelf(BinaryReader&);
+    void sendMyRechargeRank(Player *);
+    void sendRechargeRank100(Player *, UInt8, UInt8);
     void giveRechargeRankAward();
     void sendGoldLvlAward(BinaryReader&);
 private:
@@ -283,7 +285,7 @@ private:
     FastMutex _opMutex;
     FastMutex _petMutex;
 
-    std::vector<AllServersRecharge> _rechargeSelf;
+    std::map<UInt64, AllServersRecharge> _rechargeSelf;
     std::vector<AllServersRecharge> _rechargeRank100;
 };
 

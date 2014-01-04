@@ -268,7 +268,7 @@ namespace GObject
                 GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
                 WORLD().RemoveTimer(_marryBoardTimer);
                 _marryBoardTimer = NULL;
-                WORLD().CreateMarryBoard(_man->getId(),_woman->getId(),_norms,0);
+    //          WORLD().CreateMarryBoard(_man->getId(),_woman->getId(),_norms,0);
             }
             return ;
         }
@@ -412,7 +412,7 @@ namespace GObject
                     st <<static_cast<UInt8>(0x71);
                 break;
             case 11 :
-                pl->SetVar(VAR_MARRYBOARD_LIVELY,0);   //内测区循环测试
+    //            pl->SetVar(VAR_MARRYBOARD_LIVELY,0);   //内测区循环测试
                 sendTodayMarryInfo(pl);
                 break;
         }

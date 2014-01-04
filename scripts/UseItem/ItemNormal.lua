@@ -10211,6 +10211,7 @@ end
 function ItemNormal_jgsexp(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 70 then
+        player:sendMsgCode(0, 1093, 70);
         return 0
     end
     local moFang = player:GetMoFang();
@@ -10218,6 +10219,73 @@ function ItemNormal_jgsexp(iid, num, bind, param)
     moFang:addJGSExp(num*100);
     package:DelItemSendMsg(iid, player);
     return num;
+end
+
+function ItemNormal_00009601(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:GetLev() < 75 then
+        player:sendMsgCode(0, 1093, 75);
+        return 0
+    end
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < num then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    local items = {
+        [9601] = { 9611, 9612, 9613, 9614, 9615, 9616, 9617, 9618, 9500 },
+        [9602] = { 9621, 9622, 9623, 9624, 9625, 9626, 9627, 9628, 9500 },
+        [9603] = { 9631, 9632, 9633, 9634, 9635, 9636, 9637, 9638, 9500 },
+        [9604] = { 9641, 9642, 9643, 9644, 9645, 9646, 9647, 9648, 9500 },
+    }
+    local chance = { 1500, 3000, 3500, 4000, 4150, 4300, 4350, 4400, 10000 }
+    local replaceNum = { 1, 1, 2, 2, 4, 4, 8, 8, 1 }
+    if items[iid] == nil then
+        return false
+    end
+    local rp = 0
+    for k = 1, num do
+        local itemId = 0
+        local rnd = math.random(10000)
+        for i = 1, #chance do
+            if rnd <= chance[i] then
+                itemId = items[iid][i]
+                rp = i
+                break
+            end
+        end
+        local res = false
+        if itemId ~= 9500 then
+            res = player:hasMountChip(itemId)
+        end
+        if true == res then
+            package:Add(9500, replaceNum[rp], true, false, 2)
+        else
+            if rp == 7 or rp == 8 then
+                Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]获得了".."[4:"..itemId.."]，仙运奇佳，战力又增！")
+            end
+            package:Add(itemId, 1, true, false, 2)
+        end
+    end
+
+    package:DelItemSendMsg(iid, player)
+    return num;
+end
+
+function ItemNormal_00009611(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:GetLev() < 75 then
+        player:sendMsgCode(0, 1093, 75);
+        return 0
+    end
+    player:addMountFromItem(iid)
+    if true == player:addMountChip(iid) then
+        local package = player:GetPackage()
+        package:DelItemSendMsg(iid, player)
+        return 1
+    else
+        return 0
+    end
 end
 
 local ItemNormal_Table = {
@@ -11974,6 +12042,44 @@ local ItemNormal_Table = {
     [9444] = ItemNormal_00009444,
     [9445] = ItemNormal_00009444,
     [9446] = ItemNormal_00009444,
+
+    --坐骑
+    [9601] = ItemNormal_00009601,
+    [9602] = ItemNormal_00009601,
+    [9603] = ItemNormal_00009601,
+    [9604] = ItemNormal_00009601,
+    [9611] = ItemNormal_00009611,
+    [9612] = ItemNormal_00009611,
+    [9613] = ItemNormal_00009611,
+    [9614] = ItemNormal_00009611,
+    [9615] = ItemNormal_00009611,
+    [9616] = ItemNormal_00009611,
+    [9617] = ItemNormal_00009611,
+    [9618] = ItemNormal_00009611,
+    [9621] = ItemNormal_00009611,
+    [9622] = ItemNormal_00009611,
+    [9623] = ItemNormal_00009611,
+    [9624] = ItemNormal_00009611,
+    [9625] = ItemNormal_00009611,
+    [9626] = ItemNormal_00009611,
+    [9627] = ItemNormal_00009611,
+    [9628] = ItemNormal_00009611,
+    [9631] = ItemNormal_00009611,
+    [9632] = ItemNormal_00009611,
+    [9633] = ItemNormal_00009611,
+    [9634] = ItemNormal_00009611,
+    [9635] = ItemNormal_00009611,
+    [9636] = ItemNormal_00009611,
+    [9637] = ItemNormal_00009611,
+    [9638] = ItemNormal_00009611,
+    [9641] = ItemNormal_00009611,
+    [9642] = ItemNormal_00009611,
+    [9643] = ItemNormal_00009611,
+    [9644] = ItemNormal_00009611,
+    [9645] = ItemNormal_00009611,
+    [9646] = ItemNormal_00009611,
+    [9647] = ItemNormal_00009611,
+    [9648] = ItemNormal_00009611,
 
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,
