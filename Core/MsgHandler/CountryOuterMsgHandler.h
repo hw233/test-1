@@ -7381,7 +7381,7 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                         sMarriage->eLove = static_cast<ELoveToken>(b_loverToken);
                         if(player->GetVar(VAR_MARRY_STATUS) == 1)
                         {
-                            result = GObject::gMarryMgr.CancelMarriage(player,1);
+                            result = GObject::gMarryMgr.CancelMarriage(player);
                             if(result != 0)
                             {
                                 ret = 1;
@@ -7398,7 +7398,7 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                             
                         break;
                     case 7:
-                        brd >> obj_playerid;
+                        obj_playerid = player->GetMarriageInfo()->lovers;
                         ret = GObject::gMarryMgr.CancelReplayMarriage(player,obj_playerid); 
                         if(ret == 2)
                         {

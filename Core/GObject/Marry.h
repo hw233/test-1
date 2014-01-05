@@ -62,9 +62,9 @@ namespace GObject
 #define TONGXINJIE 100
 #define YUPEI 500 
 #define JINZAN 1000
-#define BIYIQIFEI 199
-#define ZHULIANBIHE 599
-#define LONGFENGCHENGXIANG 999
+#define BIYIQIFEI 520
+#define ZHULIANBIHE 3344
+#define LONGFENGCHENGXIANG 9999
 #define ALONE_LIHUN 500
 #define TWO_LIHUN 250
 #define ZHENGHUN 50 
@@ -188,6 +188,8 @@ namespace GObject
             void sendyuyueList(Player* player,Player* obj_player);
     
             void sendMarriageTimeOut(Player* player,Player* obj_player);
+
+            void Process();
         private:
             Mutex _mutex;
             MoneyStruct sMoney; 
