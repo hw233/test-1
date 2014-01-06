@@ -38,6 +38,7 @@
 #include "JiguanData.h"
 #include "HunPoData.h"
 #include "TeamArenaSkill.h"
+#include "RideConfig.h"
 
 namespace GData
 {
@@ -46,6 +47,7 @@ namespace GData
 	ObjectMapT<GObject::ItemWeapon> npcWeapons;
 	std::vector<ItemGemType *> gemTypes(1000);
 	std::vector<ItemGemType *> petGemTypes(1000);
+	std::vector<ItemGemType *> mountTypes(400);
 	ItemEquipSetTypeManager	itemEquipSetTypeManager;
     std::map<UInt16, UInt16> skill2item;
 
@@ -100,6 +102,11 @@ namespace GData
 		if (!LoadAreaData())
 		{
 			fprintf(stderr, "Load AreaData Error !\n");
+            std::abort();
+		}
+		if (!LoadAcuPraGoldData())
+		{
+			fprintf(stderr, "Load AcuPraGoldData  Error !\n");
             std::abort();
 		}
 		if (!LoadWeaponDefData())
@@ -382,6 +389,17 @@ namespace GData
             std::abort();
         }
 
+        if (!LoadRideConfig())
+        {
+            fprintf (stderr, "Load LoadRideConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadRideUpgradeConfig())
+        {
+            fprintf (stderr, "Load LoadRideUpgradeConfig Error !\n");
+            std::abort();
+        }
+
 		return true;
 	}
 
@@ -455,6 +473,27 @@ namespace GData
             pap->pramax = ap.pramax;
             pap->citslot = ap.citslot;
             GData::acupraManager.add(pap);
+		}
+        return true;
+    }
+	bool GDataManager::LoadAcuPraGoldData()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBAcuPraGold ap;
+		if(execu->Prepare("SELECT `id`,`lvl`,`usereal`,`soulmax`,`attrnum`,`attrvalue` FROM `acupragold`", ap) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            GData::AcuPraGold* pap = new GData::AcuPraGold(ap.id << 8 | ap.lvl);
+            if (!pap)
+                return false;
+            pap->useReal = ap.useReal;
+          //  pap->praadd = ap.praadd;
+            pap->soulmax = ap.soulmax;
+            pap->attrNum = ap.attrNum;
+            pap->attrValue = ap.attrValue;
+            GData::acupraGoldManager.add(pap);
 		}
         return true;
     }
@@ -727,6 +766,14 @@ namespace GData
                     if(idt.reqLev > 0 && idt.reqLev <= 20)
                         m_petGems[idt.reqLev - 1].push_back(idt.typeId);
 				}
+				break;
+            case Item_Mount:
+            case Item_MountChip:
+				{
+					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
+					wt = igt;
+					mountTypes[wt->getId() - LMOUNT_ID] = igt;
+                }
 				break;
             case Item_PetEquip:
             case Item_PetEquip1:
@@ -2611,6 +2658,39 @@ namespace GData
 		{
             if(dbtaic.level > 0)
                 TeamArenaConfigMgr::LoadInspireFromDB(dbtaic);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadRideConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBRideConfig dbrc;
+		if(execu->Prepare("SELECT `id`, `name`, `itemId`, `chips`, `propId` FROM `ride`", dbrc) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbrc.id > 0)
+                ride.setRideTable(dbrc);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadRideUpgradeConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBRideUpgradeCfg dbruc;
+		if(execu->Prepare("SELECT `level`, `name`, `lvLimit`, `singleCost`, `lvExp`, `rate` FROM `ride_upgrade`", dbruc) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            ride.setRideUpgradeTable(dbruc);
         }
         return true;
     }

@@ -29,6 +29,7 @@
 #include "GObject/DCLogger.h"
 #endif
 #include "GObject/ShuoShuo.h"
+#include "GObject/ArenaServerWar.h"
 #include "Common/StringTokenizer.h"
 
 //Login thread -> Country thread
@@ -942,7 +943,17 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
 
         Recharge* recharge = (Recharge*)(data);
         if(recharge->gold == 0)
+        {
+            //为了统计
+            char gold[32] = {0};
+            char nno[256] = {0};
+            const char* id = "29998";  //Q点直钩
+            snprintf(gold, 32, "%u", recharge->gold);
+            snprintf(nno, 256, "%s#%s", recharge->uint, recharge->no);
+            player->udpLog(nno, recharge->money, gold, id, "", "pay", "pay");
+            //结束
             return;
+        }
         IncommingInfo ii(InFromRecharge, 0, 0);
         player->getGold(recharge->gold, &ii);
         player->addTotalRecharge(recharge->gold);
@@ -1217,6 +1228,9 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
     dclogger.reg_union(player);
 #endif
 #endif //_WIN32
+
+    //服战修为buff
+    server_addBuffData(player, static_cast<void *>(NULL));
 }
 
 void OnRunScriptReq( GameMsgHdr&, const void * data )
@@ -1532,10 +1546,11 @@ void OnAddItemBy( GameMsgHdr& hdr, const void* data )
         UInt16 item;
         UInt16 num;
         bool bind;
+        UInt16 fromWhere;
     };
 
     ItemAdd* ia = (ItemAdd*)(data);
-    player->GetPackage()->AddItem(ia->item, ia->num, ia->bind);
+    player->GetPackage()->AddItem(ia->item, ia->num, ia->bind, false, ia->fromWhere);
 }
 void OnPracticeAttack( GameMsgHdr& hdr, const void* data )
 {
@@ -1840,7 +1855,7 @@ void OnDelItemAny( GameMsgHdr& hdr, const void * data )
     {
         UInt32 id;
         UInt16 num;
-        UInt8 toWhere;
+        UInt16 toWhere;
     };
 
 	const DelItemInfo* item = reinterpret_cast<const DelItemInfo*>(data);
@@ -2069,6 +2084,25 @@ void OnCFriendAthleticsRank( GameMsgHdr& hdr, const void * data)
     player->OnCFriendAthleticsRank();
 }
 
+void OnSetCFriendSuccess( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct CFInvited
+    {
+        UInt8 type;
+        UInt16 invited;
+    };
+
+    CFInvited * cfData = reinterpret_cast<CFInvited *>(const_cast<void *>(data));
+    if(!cfData) return;
+
+    if(cfData->type)
+        player->GetCFriend()->setCFriendSuccess(cfData->invited);
+    else
+        player->GetCFriend()->setCFriendSuccess_TMP(cfData->invited);
+}
+
 void OnForbidSaleQueryFail( GameMsgHdr &hdr, const void *data)
 {
     MSG_QUERY_PLAYER(player);
@@ -2222,6 +2256,18 @@ void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     player->calcLingbaoBattlePoint();
+}
+void OnGetFindOldManAward( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt32 flag = *reinterpret_cast<const UInt32 *>(data);
+    player->GetFindOldManAward(flag);
+}
+void OnGetInteresingBag( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 playerId  = *reinterpret_cast<const UInt64 *>(data);
+    player->getInteresingBag(playerId);
 }
 
 void OnSpreadWhisper(GameMsgHdr &hdr, const void* data)
@@ -2442,6 +2488,96 @@ void OnCompareBP( GameMsgHdr& hdr, const void * data )
 	MSG_QUERY_PLAYER(player);
 	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
     player->sendCompareBP(pl);
+}
+
+void OnServerWarEnter( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct SWarEnterData {
+        Stream st;
+        std::map<Player *, UInt8> warSort;
+    };
+
+	SWarEnterData * swed = *reinterpret_cast<SWarEnterData**>(const_cast<void *>(data));
+    if(!swed)
+        return;
+    std::map<Player *, UInt8>::iterator it = swed->warSort.begin();
+    while(it != swed->warSort.end())
+    {
+        Player * player = it->first;
+        if(!player)
+        {
+            delete swed;
+            return;
+        }
+        if(player->getThreadId() != CURRENT_THREAD_ID())
+        {
+            GameMsgHdr hdr(0x382, player->getThreadId(), player, sizeof(SWarEnterData*));
+            GLOBAL().PushMsg(hdr, &swed);
+            return;
+        }
+        swed->st << player->getId() << player->getName() << player->getTitle();
+        player->appendLineup2(swed->st);
+        player->appendPetOnBattle(swed->st);
+        swed->warSort.erase(it ++);
+    }
+    swed->st << Stream::eos;
+    NETWORK()->SendToServerWar(swed->st);
+    delete swed;
+}
+
+void OnServerWarLineup( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    if(player->GetLev() < LIMIT_LEVEL)
+        return;
+
+    Stream st(SERVERWARREQ::COMMIT_LINEUP, 0xEE);
+    st << player->getId();
+    player->appendLineup2(st);
+    player->appendPetOnBattle(st);
+    st << Stream::eos;
+    NETWORK()->SendToServerWar(st);
+}
+
+void OnServerWarGetMoney( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt32 money = *reinterpret_cast<const UInt32 *>(data);
+    IncommingInfo ii(LongHunFromServerWar,0,0);
+    player->getMoneyArena(money, &ii);
+}
+
+void OnServerWarUseGold( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt32 money = *reinterpret_cast<const UInt32 *>(data);
+	ConsumeInfo ci(ServerWarConsume, 0, 0);
+    player->useGold(money, &ci);
+}
+
+void OnServerWarAttack( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * atker = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    if(!atker) return;
+    serverWarMgr.attackPlayer(atker, player);
+}
+
+void OnServerWarBeAttack( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct SWBeAttackData
+	{
+		Player * attacker;
+		UInt16 formation;
+		UInt16 portrait;
+		Lineup lineup[5];
+	};
+	SWBeAttackData* swbad = reinterpret_cast<SWBeAttackData*>(const_cast<void *>(data));
+    if(!swbad) return;
+
+    serverWarMgr.beAttackByPlayer(player, swbad->attacker, swbad->formation, swbad->portrait, swbad->lineup);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

@@ -27,6 +27,7 @@ MSG_REG(GameMsgHdr, OnFighterDismissReq);
 MSG_REG(GameMsgHdr, OnFighterRegenReq);
 MSG_REG(GameMsgHdr, OnFighterTrainReq);
 //MSG_REG(GameMsgHdr, OnFighterTrain2Req);
+MSG_REG_2(GameMsgHdr, REQ::MODIFY_MOUNT, OnPlayerMountReq);
 MSG_REG_2(GameMsgHdr, REQ::TRAIN_FIGHTER_OP, OnFighterTrainOpReq);
 MSG_REG_2(GameMsgHdr, REQ::HERO_ISLAND, OnHeroIslandReq);
 MSG_REG_2(GameMsgHdr, REQ::NEWHERO_ISLAND, OnNewHeroIslandReq);
@@ -199,6 +200,7 @@ MSG_REG_2(GameMsgHdr, REQ::MARRYMGR, OnMARRYMGRReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_SPIRIT_TREE, OnClanSpiritTree);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq2);
+MSG_REG_2(GameMsgHdr, REQ::MARRYBOARD, OnMarryBoard2);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -328,6 +330,7 @@ MSG_REG_2(GameMsgHdr, 0x343, OnSaveGoldAct);
 MSG_REG_2(GameMsgHdr, 0x344, OnFoolsDayAct);
 MSG_REG_2(GameMsgHdr, 0x345, OnLuckyStarAct);
 MSG_REG_2(GameMsgHdr, 0x346, OnSurnameLegendAct);
+MSG_REG_2(GameMsgHdr, 0x347, OnSetCFriendSuccess);
 
 MSG_REG_2(GameMsgHdr, 0x348, OnSendSpreadAwardInfo);
 MSG_REG_2(GameMsgHdr, 0x349, OnSpreadGetAward);
@@ -397,9 +400,11 @@ MSG_REG_2(GameMsgHdr, 0x350, OnGGBeTeam);
 MSG_REG_2(GameMsgHdr, 0x351, OnGGTeamPlayerLeave);
 
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
-
 MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
 MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
+MSG_REG_2(GameMsgHdr, 0x355, OnGetFindOldManAward);
+MSG_REG_2(GameMsgHdr, 0x356, OnGetInteresingBag);
+
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
 MSG_REG_2(GameMsgHdr, 0x362, OnBePrayed);
@@ -408,7 +413,15 @@ MSG_REG_2(GameMsgHdr, 0x364, OnDoStrongInWorld);
 MSG_REG_2(GameMsgHdr, 0x365, OnSend11GradeInfo);
 MSG_REG_2(GameMsgHdr, 0x366, OnRunFriendlyCompass);
 
-MSG_REG_2(GameMsgHdr, 0x381, OnRoamintGuangGun);
 //0x365-380繁体占用
+
+MSG_REG_2(GameMsgHdr, 0x381, OnRoamintGuangGun);
+//跨服服战(仙界传奇)
+MSG_REG_2(GameMsgHdr, 0x382, OnServerWarEnter);
+MSG_REG_2(GameMsgHdr, 0x383, OnServerWarLineup);
+MSG_REG_2(GameMsgHdr, 0x384, OnServerWarGetMoney);
+MSG_REG_2(GameMsgHdr, 0x385, OnServerWarUseGold);
+MSG_REG_2(GameMsgHdr, 0x386, OnServerWarAttack);
+MSG_REG_2(GameMsgHdr, 0x387, OnServerWarBeAttack);
 
 MSG_HANDLER_END()

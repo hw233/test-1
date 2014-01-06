@@ -20,6 +20,7 @@
 #include "GObject/Map.h"
 #include "GObject/MapCollection.h"
 #include "GObject/MapObject.h"
+#include "GObject/MarryBoard.h"
 #include "GObject/MOAction.h"
 #include "GObject/Package.h"
 #include "GObject/PetPackage.h"
@@ -69,6 +70,7 @@
 #include "GObject/ClanCityBattle.h"
 #include "GObject/Marry.h"
 #include "GObject/AthleticsRank.h"
+#include "GObject/ArenaServerWar.h"
 
 struct NullReq
 {
@@ -285,13 +287,6 @@ struct CityTransportReq
 	UInt8 flag;
 
 	MESSAGE_DEF2(REQ::MAP_TRANSPORT, UInt16, _locid, UInt8, flag);
-};
-
-struct DungeonOpReq
-{
-	UInt8 op;
-	UInt8 type;
-	MESSAGE_DEF2(REQ::BABEL_JOIN, UInt8, op, UInt8, type);
 };
 
 struct DungeonInfoReq
@@ -740,7 +735,6 @@ struct CompareBattlePoint
 	MESSAGE_DEF1(REQ::COMPARE_BP, std::string, _name);
 };
 
-
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -784,7 +778,7 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
         sprintf(str, "F_130808_1_%u", price);
         pl->udpLog("wupinhuigou", str, "", "", "", "", "act");
 	}
-    if(canDestroyNum > 0)
+    if(price > 0 && canDestroyNum > 0)
     {
 		SYSMSG_SEND(116, pl);
 		SYSMSG_SEND(1016, pl);
@@ -818,8 +812,8 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 		bool  bindType = *reinterpret_cast<const bool*>(data+offset+4);
 		UInt16 itemNum = *reinterpret_cast<const UInt16*>(data+offset+4+1);
 		offset += 7;
-        pl->addItem(itemId, itemNum, bindType);
-        if(World::canDestory(itemId))
+        bool res = pl->addItem(itemId, itemNum, bindType);
+        if(res && World::canDestory(itemId))
             ++canDestroyNum;
 	}
     if(canDestroyNum > 0)
@@ -1184,6 +1178,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
+    GObject::MarryBoard::instance().sendTodayMarryInfo(pl);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -1319,6 +1314,19 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr1(0x1D3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr1, NULL);
     }
+#if 0
+    if (World::getHappyFireTime())
+    {
+        //GameMsgHdr hdr(0x1DB, WORKER_THREAD_WORLD, pl, 0);
+        //GLOBAL().PushMsg(hdr, NULL);
+    }
+#endif
+    /*if(World::getQiShiBanTime())
+    {
+        GameMsgHdr hdr(0x1D6, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }*/
+
     pl->sendYearRPInfo();
     pl->sendFishUserInfo();
     //if(World::getYearActive())
@@ -1339,8 +1347,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->getClan()->sendQQOpenid(pl);
     }
-    pl->sendQZoneQQGameAct(1);
-    pl->sendQZoneQQGameAct(2);
+    //pl->sendQZoneQQGameAct(1);
+    //pl->sendQZoneQQGameAct(2);
+    pl->sendQZoneQQGameAct(3);
     pl->sendVipPrivilege();
     pl->svrSt(4);
     pl->sendRP7TreasureInfo(true);
@@ -1379,9 +1388,22 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->SetQQBoardValue();
     pl->sendQQBoardLoginInfo();
     pl->sendSummerMeetInfo();   //Fund
+    pl->sendRealSpirit();   //真元
     pl->send7DayFundInfo();
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
+    //pl->QiShiBanState();
+    {
+        GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+   
+    pl->MiLuZhiJiao();
+    pl->QiShiBanState();
+    UInt32 flag = pl->GetVar(VAR_OLDMAN_SCORE_AWARD);
+    if(flag & (1<<8))
+        pl->sendOldManPos(1);
+    pl->sendInteresingInfo();
     if(atoi(pl->getDomain()) == 23)
     {
         if(!pl)
@@ -1394,6 +1416,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     }
     pl->sendGuangGunInfo();
+    pl->setQTSpecialMark();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1440,6 +1463,12 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 br >> itemid >> binding >> name;
                 player->modifyPlayerName(itemid,binding,name);
             }
+            break;
+        case 0x21:
+            player->getRealSpirit();
+            player->sendRealSpirit();
+            break;
+
         default:
             return;
 	}
@@ -1676,6 +1705,14 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
             idx = (fer._equipId >> 16) & 0xFFFF;
             UInt8 v = fer._equipId & 0xFFFF;
             fgt->setAcupoints(idx, v, true, false);
+        }
+        break;
+    case 0x34:
+        {
+            idx = (fer._equipId >> 16) & 0xFFFF;
+            UInt8 v = fer._equipId & 0xFFFF;
+            fgt->setAcupointsGold(idx, v, true, false);
+            player->sendRealSpirit();
         }
         break;
     case 0x30:
@@ -2504,40 +2541,6 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 	pl->moveTo(ctr._locid, true);
 }
 
-/*void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
-{
-	MSG_QUERY_PLAYER(pl);
-	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
-		return;
-	GObject::Dungeon * dg = GObject::dungeonManager[dor.type];
-	if(dg == NULL)
-		return;
-	Stream st(REP::COPY_JOIN);
-	st << dor.op;
-	UInt8 result = 0;
-	switch(dor.op)
-	{
-	case 0:
-		result = dg->playerEnter(pl,1);
-		break;
-	case 1:
-		result = dg->playerLeave(pl,1);
-		break;
-	case 2:
-		result = dg->playerContinue(pl,0);
-		break;
-	case 3:
-		result = dg->playerBreak(pl,1);
-		break;
-	default:
-		break;
-	}
-    if (result == 4)
-        return;
-	st << result << dor.type << Stream::eos;
-	pl->send(st);
-}*/
-
 void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 {
 	if(dir.difficulty >= Max_Difficulty)
@@ -3202,6 +3205,8 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 
     if (WBossMgr::isWorldBoss(anr._npcId))
         worldBoss.attack(player, loc, anr._npcId);
+    else if(serverWarBoss.isServerWarBoss(anr._npcId))
+        serverWarBoss.attack(player, loc, anr._npcId);
     else
         player->attackNpc(anr._npcId, 0xFFFFFFFF, player->GetLev() <= 20);
 }
@@ -5773,8 +5778,10 @@ void OnGetShuoShuoAward( GameMsgHdr& hdr, GetShuoShuoAward& req)
 void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
 {
     MSG_QUERY_PLAYER(player);
+    /*
     if(!player->hasChecked())
          return;
+    */
     CFriend * cFriend = player->GetCFriend();
     if(!cFriend) return;
     if (req._flag == 0)
@@ -5789,8 +5796,6 @@ void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
         cFriend->getLift();
     else if (req._flag == 5)
         cFriend->useTickets(req._idx);
-    else if (req._flag == 6)
-        cFriend->setCFriendSuccess(req._idx);
 }
 
 void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )
@@ -6365,6 +6370,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 4:
                     case 5:
                     case 6:
+                    case 7:
                         jobHunter->OnRequestStart(val);
                         GameAction()->doStrong(player, SthSerachMo, 0, 0);
                         break;
@@ -6750,6 +6756,18 @@ void OnDelueGemReq( GameMsgHdr & hdr, const void * data )
         {
             //一键描绘星辰图
             fgt->quickUpGrade(opt);
+        }
+        break;
+    case 6:
+        {
+            //吞噬星空
+            fgt->tunShiXingKong();
+        }
+        break;
+    case 7:
+        {
+            //突破界限
+            fgt->tuPoJieXian();
         }
         break;
     }
@@ -7623,6 +7641,29 @@ void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
     }
 }
 
+void OnPlayerMountReq( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(player->GetLev() < 75)
+        return;
+
+    UInt8 type = 0;
+    brd >> type;
+    switch(type)
+    {
+        case 0x00:
+            player->sendMountInfo();
+            break;
+        case 0x01:
+            player->upgradeMount(false);
+            break;
+        case 0x02:
+            player->upgradeMount(true);
+            break;
+    }
+}
+
 void OnQixiReq2(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -7757,14 +7798,114 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
             default:
                 break;
             }
-
         }
         break;
+    case 0x23:
+        {
+            brd >> op;
+            if(op == 0x09)
+            {
+                UInt8 state = 0;
+                brd >> state;
+                player->GetPersonalAward(state);
+            }
+        }
+        break;
+    case 0x26:
+        {
+            if(!World::getOldManTime())
+                return ;
+            brd >>op ;
+            switch(op)
+            {
+                case 1:
+                    {
+                        UInt8 idx = 0;
+                        brd >> idx ;
+                        if(idx == 0)
+                            player->sendOldManPos();
+                        player->sendOldManLeftTime();
+                        break;
+                    }
+                case 2:
+                    UInt8 idx =0 ;
+                    brd >> idx ;
+                    switch(idx)
+                    {
+                        case 1:
+                            {
+                                UInt8 index = 0 ;
+                                brd >> index ;
+                                player->getInterestingAward(index); 
+                            }
+                            break;
+                        case 2:
+                            std::string name ;
+                            brd >>name ;
+                            GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
+                            if(pl==NULL)
+                                break;
+                            player->sendInterestingBag(pl);
+                            break ;
+                    }
+                    player->sendInteresingInfo();
+                    break;
+            }
+        }
     default:
         break;
     }
 }
+void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    /*
+	if(!player->hasChecked())
+		return;
+    */
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
 
+    brd >> type;
+    UInt8 mType = GObject::MarryBoard::instance()._type;
+    switch(type)
+    {
+        case 0x03:
+            {
+                if(mType == 0)
+                    return;
+                if(!player->giveFlower(0))
+                    break; 
+                GObject::MarryBoard::instance()._lively += 100;
+                GObject::MarryBoard::instance()._YHlively += 100;
+                player->AddVar(VAR_MARRYBOARD_YANHUA,100);
+                std::string text;
+                brd >> text;
+                Stream st(REP::CHAT);
+                UInt8 office = player->getTitle();
+                UInt8 guard = player->getPF();
+                st << static_cast<UInt8>(11)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+                    << office << guard << text.c_str()<< player->GetLev() << Stream::eos;
+                NETWORK()->Broadcast(st);
+            }
+            break;
+        case 0x04:
+            {
+                if(mType == 0)
+                    return;
+                UInt8 num = 0;
+                brd >> num ;
+                if(num == 0)
+                    break;
+                if(num > 99)
+                    num = 99;
+                if(!player->giveFlower(1,num))
+                    break; 
+                GObject::MarryBoard::instance()._lively += 5*num;
+                SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
+            }
+    }
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

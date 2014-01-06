@@ -400,7 +400,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_TRAINP3 = 407,
         VAR_ONLINE_TOTAL_TIME = 408, //累计在线时间
         VAR_ONLINE_AWARD = 409, //累计在线奖励是否领取
-        VAR_QZONE_QQGAME_ACT = 410, //空间黄钻(bit1表示普通，bit2表示会员)、大厅蓝钻礼包(bit3表示普通，bit4表示会员)
+        VAR_QZONE_QQGAME_ACT = 410, //空间黄钻(bit1表示普通，bit2表示会员)、大厅蓝钻礼包(bit3表示普通，bit4表示会员)、3366蓝钻礼包(bit5表示普通，bit6表示会员)
         VAR_LAST_HOOK_TYPE = 411, //最后挂机类型
         VAR_SPREAD_FLAG = 413, //低第1bit表示是否使用落英秘典,低第2bit表示是否已领取
         VAR_SKILL_UP_FLAG = 414, //FB占用
@@ -409,6 +409,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_MAP_INDEX = 417, //地图索引
         VAR_FEAST_LOGIN_AWARD_PER_DAY = 418, //中秋节登陆送月饼
         VAR_TJ_AUTO_FRONTMAP_END_TIME = 419,
+
+        VAR_MOUNT_LEVEL = 420,  //铸剑等级
         //421-430 for suntao
         VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对,31位表示等级限制[0:70级以上 1:70级以下])
         VAR_FOOLS_DAY_TIME  = 422,  //愚公移山答题开始时间
@@ -418,6 +420,11 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_TEAMARENA_CREATE  = 425, //组队跨服战创建战队限制次数
         VAR_TEAMARENA_WORSHIP = 426, //组队跨服战每日崇拜冠军
         VAR_TEAMARENA_INSPIRE = 427, //组队跨服战鼓舞等级失败保护次数
+
+        VAR_SERVERWAR_JIJIANTAI = 428,  //跨服服战祭剑台 1byte步数,2byte内外圈,3和4byte道具id
+        VAR_SERVERWAR_JIJIANTAI1 = 429,  //跨服服战祭剑台 1byte每人祭剑的次数,2byte成功完成的祭剑次数 3byte宝箱开启情况
+
+         VAR_MOUNT_EXP = 430,   //铸剑经验总值
 
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
@@ -477,6 +484,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_KEYIN_MONEY_B = 516,                            // 刻印钱币B 
         VAR_FAIRYPET_SHOUHUN = 517,                         // 仙宠兽魂
         VAR_GIVE_CARDAWARD_COUTS = 518,                     // 被赠送卡牌奖品次数
+        VAR_QISHIDOUFA_REST_NUM = 519,                      // 七石斗法每天3次免费重置机会
+        VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE = 520,         // 七石斗法上次失败历史最高分
 
         // 521-540 for zhgc
         VAR_ZCJB_TIMES = 521,      // 招财进宝
@@ -552,9 +561,11 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_STRENGTH_LEVEL = 598,  
         VAR_11AIRBOOK_GRADE = 599,  //10· 1 活动积分
         VAR_11AIRBOOK_GRADE_DAY = 600,  //10· 1 活动积分
-        //600-620 for qiwy  ^_^
+        //601-620 for qiwy  ^_^
+        VAR_TOTAL_BATTLE_POINT = 601,  //（排行）战斗力
+        VAR_VIA_ACC_DAYS = 602,  //（导入的玩家）累计登录天数
 
-        //621-640 for lib 
+        //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,
         VAR_AIRBOOK_LOGIN_AWARD = 622,
         VAR_AIRBOOK_ONLINE_AWARD = 623,
@@ -574,7 +585,43 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_NOV_LOGIN_AWARD = 637, 
         VAR_RECHARGE_TIME = 638, 
         VAR_GUANGGUN_TODAY_TASK = 639,   //今日完成任务数
+        VAR_REAL_SPIRIT = 640,           //真元
         VAR_MODIFY_NAME_CD = 641,//改名CD
+        VAR_REAL_SPIRIT_GET = 642,       //当日是否领取真元 
+        VAR_QZONE_RECHARGE = 643,       //空间充值 
+        VAR_QZONE_RECHARGE_AWARD = 644,       //空间充值奖励领取
+        
+
+        VAR_OLDMAN_DAYSCORE = 645,       //捉迷藏活动每日积分
+        VAR_OLDMAN_SCORE = 646,       //捉迷藏活动累计积分
+        VAR_OLDMAN_PRESENT = 647,      //捉迷藏活动接受礼包数
+        VAR_OLDMAN_DAYSCORE_AWARD = 648,       //捉迷藏活动每日积分奖励
+        VAR_OLDMAN_SCORE_AWARD = 649,       //捉迷藏活动累计积分奖励
+
+        VAR_YEARHAPPY_DAYVALUE = 650,       //每日累计欢乐值 
+        VAR_YEARHAPPY_VALUE = 651,       //累计欢乐值
+        VAR_YEARHAPPY_DAYVALUE_AWARD = 652,       //每日欢乐值奖励 
+        VAR_YEARHAPPY_LEFTVALUE = 653,       //每日剩余欢乐值 
+        //婚礼进行系统
+        VAR_MARRYBOARD_LIVELY  = 654,       //个人热闹值
+        VAR_MARRYBOARD3  = 655,             //吃宴席的盘数 0表示未入席 1-10表示吃了 0-9盘
+        VAR_MARRYBOARD2_NUM  = 656,             // 表示答题号
+        VAR_MARRYBOARD2_ANS  = 657,             // 表示当前答案 
+        VAR_MARRYBOARD4_TIME = 658,             //表示婚礼第三阶段吃喜筵第四阶段驱赶时间
+        VAR_MARRYBOARD3_KEY  = 659,
+        //660-680 for lijr
+        VAR_CHRISTMAS_PRESENT = 660,    //圣诞礼物——麋鹿之角
+        VAR_QT_AWARD_MARK = 661,        //QT奖励领取
+        VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE = 662,    //七石板每期最高积分
+        //VAR_QT_REGIST_SIGN = 663,       //QT天签到标志
+        VAR_QT_REGIST_NUM = 664,        //QT月签到次数
+        VAR_QT_SPECIAL_MARK = 665,      //QT记录12月份默认加6天签到次数
+        VAR_QT_REGIST_MARK = 666,       //QT月签到标志
+
+        //681 - 700 for lb
+        VAR_MARRYBOARD_YANHUA = 681,          //烟花积分
+        VAR_3366_RECHARGE = 682,       //空间充值 
+        VAR_3366_RECHARGE_AWARD = 683,       //空间充值奖励领取
         VAR_MAX,
     };
 
@@ -900,7 +947,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_KEYIN_MONEY_B, CYCLE_NONE);
             REGISTER_VAR(VAR_FAIRYPET_SHOUHUN, CYCLE_NONE);
             REGISTER_VAR(VAR_EQUIP_MOVE_AWARD, CYCLE_NONE);
-
+            REGISTER_VAR(VAR_QISHIDOUFA_REST_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE, CYCLE_NONE);
+            REGISTER_VAR(VAR_CHRISTMAS_PRESENT, CYCLE_NONE);
+            
             REGISTER_VAR(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_FRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_DUNGEON_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
@@ -936,6 +986,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_TEAMARENA_CREATE, CYCLE_DAY);
             REGISTER_VAR(VAR_TEAMARENA_WORSHIP, CYCLE_DAY);
             REGISTER_VAR(VAR_TEAMARENA_INSPIRE, CYCLE_NONE);
+            REGISTER_VAR(VAR_SERVERWAR_JIJIANTAI, CYCLE_WEEK);
+            REGISTER_VAR(VAR_SERVERWAR_JIJIANTAI1, CYCLE_WEEK);
+            REGISTER_VAR(VAR_MOUNT_EXP, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
@@ -1006,6 +1059,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_MAP_INDEX, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_LOGIN_AWARD_PER_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_AUTO_FRONTMAP_END_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_MOUNT_LEVEL, CYCLE_NONE);
 
             REGISTER_VAR(VAR_FOOLS_DAY_INFO, CYCLE_DAY);
             REGISTER_VAR(VAR_FOOLS_DAY_TIME, CYCLE_DAY);
@@ -1075,6 +1129,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_PRESENT_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_11AIRBOOK_GRADE, CYCLE_NONE);
             REGISTER_VAR(VAR_11AIRBOOK_GRADE_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_TOTAL_BATTLE_POINT, CYCLE_NONE);
+            REGISTER_VAR(VAR_VIA_ACC_DAYS, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);
@@ -1098,10 +1154,34 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_GAMEBOX_NEW, CYCLE_NONE);
             REGISTER_VAR(VAR_MARRY_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_CANCEL_APPOINTMENT, CYCLE_NONE);
+            REGISTER_VAR(VAR_REAL_SPIRIT, CYCLE_NONE);
+            REGISTER_VAR(VAR_REAL_SPIRIT_GET, CYCLE_DAY);
+            REGISTER_VAR(VAR_QZONE_RECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_QZONE_RECHARGE_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_QT_AWARD_MARK, CYCLE_MONTH);
+            //REGISTER_VAR(VAR_QT_REGIST_SIGN, CYCLE_DAY);
+            REGISTER_VAR(VAR_QT_REGIST_NUM, CYCLE_MONTH);
+            REGISTER_VAR(VAR_QT_SPECIAL_MARK, CYCLE_NONE);
+            REGISTER_VAR(VAR_QT_REGIST_MARK, CYCLE_MONTH);
+            REGISTER_VAR(VAR_OLDMAN_DAYSCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_OLDMAN_SCORE, CYCLE_NONE);
+            REGISTER_VAR(VAR_OLDMAN_PRESENT, CYCLE_DAY);
+            REGISTER_VAR(VAR_OLDMAN_DAYSCORE_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_OLDMAN_SCORE_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEARHAPPY_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEARHAPPY_LEFTVALUE, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD_LIVELY, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD3, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD2_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD2_ANS, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD4_TIME, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
         void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
+        void DelVar(UInt32 id);
         void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);
         void LoadVar(UInt32 id, UInt32 data, UInt32 overTime);
         void SetOffset(UInt32 offset){ m_Offset = offset; }

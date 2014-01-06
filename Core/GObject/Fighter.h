@@ -51,6 +51,7 @@ namespace GObject
 #define TRUMP_UPMAX 3
 #define TRUMP_INIT 1 // 法宝最初只能装1个,由VIP等级控制装备个数
 #define ACUPOINTS_MAX 15
+#define ACUPOINTSGOLD_MAX 9    //本命金丹最大值
 #define LINGBAO_UPMAX 3
 
 #define PEERLESS_UPMAX 1
@@ -81,11 +82,13 @@ enum
 struct DBXingchen;
 struct Xingchenzhen
 {
-    Xingchenzhen() : lvl(0), curVal(0) { memset(gems, 0, sizeof(gems)); }
+    Xingchenzhen() : lvl(0), curVal(0), xctCurVal(0), xctMaxVal(0)  { memset(gems, 0, sizeof(gems)); }
 
-    UInt8 lvl;      // 星辰等级
-    UInt32 curVal;  // 当前星辰值
-    UInt16 gems[3]; //镶嵌的宝石id
+    UInt8 lvl;          // 星辰等级
+    UInt32 curVal;      // 当前星辰值
+    UInt16 gems[6];     // 镶嵌的宝石id
+    UInt16 xctCurVal;   // 星辰图当前值
+    UInt16 xctMaxVal;   // 星辰图最大值
 };
 
 struct SStrengthen
@@ -230,11 +233,15 @@ public:
     inline UInt8 getAcupointsCntMax() { return 3; }
     UInt8 getAcupointCnt();
     bool setAcupoints(int idx, UInt8 v, bool = true, bool = false);
+    bool setAcupointsGold(int idx, UInt8 v, bool = true, bool = false);
+    float getAcupointsGoldAttr(UInt8 attrId);
     bool incAcupointsBit(int idx, bool = true);
 
     inline UInt8 getAcupointsBit(int idx) { return (idx >= 0 && idx < ACUPOINTS_MAX) ? _acupoints[idx] : static_cast<UInt8>(-1); }
     void getAllAcupointsBits(Stream& st);
+    void getAllAcupointsGoldBits(Stream& st);
     void setAcupoints(std::string& acupoints, bool = true);
+    void setAcupointsGold(std::string& acupoints, bool = true);
 
     bool setToAcupoints(int idx, bool writedb);
 
@@ -499,6 +506,7 @@ public:
 	void sendModification(UInt8 n, UInt8 * t, ItemEquip ** v, bool = true);
 
     void sendModificationAcupoints(UInt8 t, int idx, bool = true);
+    void sendModificationAcupointsGold(UInt8 t, int idx, bool = true);
 
 #if 1
     void sendModification(UInt8 t, UInt16 skill, int idx, bool = true);
@@ -748,6 +756,7 @@ protected:
     void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext );
     void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce );
     void addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
+    void addAttrExtraXCGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
 	virtual void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	void rebuildSkillBattlePoint();
@@ -802,6 +811,7 @@ protected:
 	UInt32 _hp;
 
     UInt8 _acupoints[ACUPOINTS_MAX];    // 穴道
+    UInt8 _acupointsGold[ACUPOINTSGOLD_MAX];    // 本命金丹
 
     UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid
     std::vector<UInt16> _skills;    // 可装备的技能 TODO: 如果所有技能都将是由心法带出,则数据表里不需要存这个字段
@@ -865,6 +875,7 @@ public:
     UInt8 getSoulExtraAura();
     UInt8 getSoulAuraLeft();
     UInt16 getSoulSkillSoulOut();
+    UInt16 getSoulSkillProtect();
 
     bool practiceLevelUp();
     bool changeSecondSoulClass(UInt8 cls);
@@ -915,12 +926,14 @@ public:
     inline void setSoulSkillSoulOut(Int32 v) { _soulSkillSoulOut = v; }
     inline void setUpCittasMax() { _cittaslot = CITTA_UPMAX; }
     bool upCittaWithOutCheck( UInt16 citta, int idx );
+    inline void setSoulSkillProtect(Int32 v) { _soulSkillProtect = v; }
     UInt16 getTrumpSkill(int i) { if(i >= TRUMP_UPMAX) return 0; else return _trumpSkill[i]; }
     Int32 _soulMax;
     UInt8 _soulExtraAura;
     UInt8 _soulAuraLeft;
     UInt16 _soulSkillSoulOut;
     UInt16 _trumpSkill[TRUMP_UPMAX];
+    UInt16 _soulSkillProtect;
 
     // 内丹系统
 public:
@@ -1019,6 +1032,11 @@ public:
     void dismissXingchen();
     bool quickUpGrade(UInt8 type);
     void xingchenInfo(Stream & st);
+    void tunShiXingKong();
+    void tuPoJieXian();
+    void GMSetXZLvl(UInt8 lvl);
+    void GMSetXCTCurVal(UInt16 value);
+    void GMSetXCTMaxVal(UInt16 value);
 
     void pushPetInfo2Leaderboard();
 };

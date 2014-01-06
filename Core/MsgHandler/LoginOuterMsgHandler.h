@@ -20,6 +20,7 @@
 #include "GObject/Mail.h"
 #include "GObject/Prepaid.h"
 #include "GObject/Player.h"
+#include "GObject/MarryBoard.h"
 #include "GObject/Fighter.h"
 #include "GObject/Package.h"
 #include "GObject/Clan.h"
@@ -354,6 +355,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         StringTokenizer st(ul._para, ":");
         switch (st.count())
         {
+            case 6:
             case 5:
                 jinquan = st[4];
             case 4:
@@ -420,6 +422,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             {
                 player->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
             }
+            player->SetReqDataTime(0);
+            //player->SetReqDataTime1(0);
 #ifdef _FB
             PLAYER_DATA(player, wallow) = 0;
 #endif
@@ -606,9 +610,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     std::string pfkey;
     std::string xinyue;
     std::string jinquan;
+    bool isNew_qq = false;
     StringTokenizer st(nu._para, ":");
     switch (st.count())
     {
+        case 6:
+            isNew_qq = atoi(st[5].c_str()) > 0;
         case 5:
             jinquan = st[4];
         case 4:
@@ -790,6 +797,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->continuousLoginSummerFlow();
             pl->SetQQBoardLogin();
             pl->setPresentLogin();
+            UInt64 userId = atoll(nu._invited.c_str());
+            if(isNew_qq && userId)     //设置邀请好友成功
+            {
+                GameMsgHdr hdr1(0x1DD, WORKER_THREAD_WORLD, pl, sizeof(userId));
+                GLOBAL().PushMsg(hdr1, &userId);
+            }
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
@@ -1077,12 +1090,15 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                78, 1,
-                9371, 4,
-                515, 2,
-                513, 4,
-                503, 3,
-                9338, 3,
+                56,   2,
+                57,   2,
+                15,   2,
+                9371, 5,
+                1126, 5,
+                503,  5,
+                515,  3,
+                1325, 6,
+                134,  6,
             };
 
             UInt8 idx = 0;
@@ -1120,6 +1136,27 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     purchase.idx = idx;
                     GameMsgHdr hdr(0x2F2, player->getThreadId(), player, sizeof(purchase));
                     GLOBAL().PushMsg(hdr, &purchase);
+
+                    //为了统计
+                    struct Recharge
+                    {
+                        UInt8 type;
+                        UInt32 gold;
+                        char no[256];
+                        char uint[32];
+                        char money[32];
+                    } recharge;
+
+                    memset(&recharge, 0x00, sizeof(recharge));
+                    recharge.type = 0; // 有角色时充值
+                    recharge.gold = 0;
+                    memcpy(recharge.no, no.c_str(), no.length()>255?255:no.length());
+                    memcpy(recharge.uint, uint.c_str(), uint.length()>31?31:uint.length());
+                    memcpy(recharge.money, money.c_str(), money.length()>31?31:money.length());
+
+                    GameMsgHdr hdr2(0x2F0, player->getThreadId(), player, sizeof(recharge));
+                    GLOBAL().PushMsg(hdr2, &recharge);
+                    //结束
 
                     if (!purchase.code)
                         ret=0;
@@ -1328,6 +1365,21 @@ inline bool player_enum_1(GObject::Player* p, void* msg)
     if (p->isOnline() && atoi(p->getDomain()) == _msg->pf)
         p->send(*_msg->msg);
 
+    return true;
+}
+inline bool player_enum_setvar(GObject::Player* p, void* msg)
+{
+    struct Msg
+    {
+        UInt32 var;
+        UInt32 value;
+    };
+
+    Msg* _msg = (Msg*)msg;
+    if(_msg->value == 0)
+        p->DelVar(_msg->var);
+    else
+        p->SetVar(_msg->var,_msg->value);
     return true;
 }
 
@@ -1824,6 +1876,94 @@ void OnGetMaxCreate(LoginMsgHdr &hdr, const void* data)
 
     Stream st(SPEP::GETMAXNEWUSER);
     st << MaxNewUser << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt64 clan_uid = 0;
+    UInt64 pid = 0;
+    UInt16 serverNo = 0;
+    string talk_record;
+    br >> clan_uid >> pid >> talk_record >> serverNo; 
+
+    if (cfg.merged)
+    {
+        pid |= (static_cast<UInt64>(serverNo) << 48);
+    }
+    else
+    {
+        clan_uid = clan_uid & 0xffffffffff;
+
+    }
+    TRACE_LOG("onlydtc clanid is %u,pid is %u,talk_record is %s",clan_uid,pid,talk_record.c_str());
+    GObject::Player * player = GObject::globalPlayers[pid];
+    GObject::Player * clan_leader = GObject::globalPlayers[clan_uid];
+    UInt8 ret = 0;
+    if(!player || !clan_leader) 
+    {
+        ret = 1;
+    }
+    else
+    {
+        GObject::Clan *clan = clan_leader->getClan();
+        if(!clan)
+            ret = 1;
+    }
+    if(ret == 0)
+    {
+        Stream st(REP::CHAT);
+        UInt8 office = player->getTitle(), guard = 0;
+        guard = player->getPF();
+        st << static_cast<UInt8>(2) << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+            << office << guard << talk_record << player->GetLev() << Stream::eos;
+
+        GameMsgHdr hdr(0x160, WORKER_THREAD_WORLD, player, st.size());
+        GLOBAL().PushMsg(hdr, static_cast<UInt8 *>(st));
+    }
+    Stream st1(SPEP::GETQQCLANTALK);
+    st1 << ret << Stream::eos;
+    TRACE_LOG(" ret is %u",ret);
+    NETWORK()->SendMsgToClient(hdr.sessionID,st1);
+}
+
+void OnoffQQOpenid(LoginMsgHdr &hdr, const void* data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    
+    struct OnOffQQData
+    {
+        UInt64 pid;
+        UInt32 clanid;
+        UInt16 serverNo;
+    } onOffQQ = {0};
+    
+    br >> onOffQQ.pid >> onOffQQ.clanid >> onOffQQ.serverNo;
+    
+    if (cfg.merged)
+    {
+        onOffQQ.pid |= (static_cast<UInt64>(onOffQQ.serverNo) << 48);
+    }
+    GObject::Clan *clan = GObject::globalClans[onOffQQ.clanid];
+	GObject::Player * player = GObject::globalPlayers[onOffQQ.pid];
+   
+    UInt8 ret = 0;
+    if (!clan || !player)
+        ret = 1;
+    else
+        if(player->getId() != clan->getLeaderId())
+            ret = 1;
+    if(ret == 0)
+    {
+        GameMsgHdr imh(0x1D9, WORKER_THREAD_WORLD, NULL, sizeof(onOffQQ));
+        GLOBAL().PushMsg(imh, &onOffQQ);
+    }
+
+    Stream st(SPEP::OFFQQOPENID);
+    st<< ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
@@ -3107,7 +3247,7 @@ UInt8 SwitchSecDC(UInt32 val)
 {
     // 设置是否开启安全DCLogger，返回设置是否成功(0 成功，非0 失败)
     cfg.setSecDCLog(val? true:false);
-    if (cfg.isTestPlatform)
+    if (cfg.isTestPlatform())
         cfg.setSecDCLogTest(val? true:false);
     return 0;
 }
@@ -3188,6 +3328,40 @@ inline bool player_enum_2(GObject::Player* pl, int type)
             {
                 pl->SetVar(GObject::VAR_SUMMERFLOW_TYPE, 0);
                 pl->SetVar(GObject::VAR_SUMMERFLOW_AWARD, 0);
+            }
+            break;
+        case 9:
+            {
+                pl->CleanQiShiBan();
+                pl->SetVar(GObject::VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE, 0);
+            }
+            break;
+        case 10:
+            {
+                pl->SetVar(GObject::VAR_QZONE_RECHARGE, 0);
+                pl->SetVar(GObject::VAR_QZONE_RECHARGE_AWARD, 0);
+            }
+         case 12:
+            {
+                pl->cleanPileSnow();
+            }
+            break;
+        case 11:
+            {
+                pl->SetVar(GObject::VAR_OLDMAN_SCORE, 0);
+                pl->SetVar(GObject::VAR_OLDMAN_SCORE_AWARD, 0);
+            
+            }
+            break;
+        case 13:
+            {
+                pl->SetVar(GObject::VAR_YEARHAPPY_VALUE, 0);
+            }
+            break;
+        case 15:
+            {
+                pl->SetVar(GObject::VAR_3366_RECHARGE, 0);
+                pl->SetVar(GObject::VAR_3366_RECHARGE_AWARD, 0);
             }
             break;
         default:
@@ -3569,11 +3743,80 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAME_END, end);
         ret = 1;
     }
+    else if (type == 9 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_QISHIBANGAME_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_QISHIBANGAME_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 9);
+        }
+
+        GObject::GVAR.SetVar(GObject::GVAR_QISHIBANGAME_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_QISHIBANGAME_END, end);
+        ret = 1 ;
+    }
     else if (type == 10 && begin <= end )
     {
         GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAMEY_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_QZONEQQGAMEY_END, end);
         ret = 1;
+    }
+    else if (type == 11 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_QZONE_RECHARGE_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_QZONE_RECHARGE_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 10);
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_END, end);
+        ret = 1 ;
+    }
+    else if (type == 12 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_CHRISTMAS_PILESNOW_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_CHRISTMAS_PILESNOW_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 12);
+        }
+
+        GObject::GVAR.SetVar(GObject::GVAR_CHRISTMAS_PILESNOW_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_CHRISTMAS_PILESNOW_END, end);
+        ret = 1;
+    }
+    else if (type == 13 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 11);
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_OLDMAN_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_OLDMAN_END, end);
+        ret = 1;
+    }
+    else if (type == 14 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_YEARHAPPY_RANK_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_YEARHAPPY_RANK_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 13);
+        }
+
+        GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_END, end);
+        ret = 1 ;
+    }
+    else if (type == 15 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 15);
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_3366_RECHARGE_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_3366_RECHARGE_END, end);
+        ret = 1 ;
     }
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
@@ -3620,6 +3863,151 @@ void QueryOneActivityOnOff(LoginMsgHdr& hdr, const void* data)
     st << type << begin << end << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
+void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt32 var = 0;
+    UInt32 value = 0;
+    std::string playerIds;
+    CHKKEY();
+    br >> var;
+    br >> value;
+    br>>playerIds;
+   
+//开启起封交易客户平台测试
+    
+#define TEST_TABLE
+#ifdef TEST_TABLE
+#pragma pack(1) 
+    struct test
+    {
+        UInt8 blamk[36];
+        UInt32 var;
+        UInt32 value;
+        char msg[1024];
+    };
+#pragma pack()
+    test * _test = reinterpret_cast< test*>(const_cast<void *>(data));
+    var = _test->var;
+    value = _test->value;
+    playerIds = _test->msg;
+#endif
+#undef TEST_TABLE 
 
+    UInt8 ret = 1;
+    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    std::string playerId = GetNextSection(playerIds, ',');
+    while (!playerId.empty())
+    {
+        UInt64 pid = atoll(playerId.c_str());
+        if(pid == 0)
+        {
+            struct Msg
+            {
+                UInt32 var;
+                UInt32 value;
+            } _msg;
+            _msg.var = var;
+            _msg.value = value;
+            GObject::globalPlayers.enumerate(player_enum_setvar, (void*)&_msg);
+            break;
+        }
+        GObject::Player * pl = GObject::globalPlayers[pid];
+        if (NULL != pl)
+        {
+            if(value==0)
+                pl->DelVar(var);
+            else
+                pl->SetVar(var,value);
+        }
+        playerId = GetNextSection(playerIds, ',');
+    }
+    ret = 0;
+    Stream st(SPEP::SETVAR);
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void ViaPlayerInfoFromBs(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::VIAPLAYERINFO,0x1);
+    UInt8 type = 0;
+    CHKKEY();
+    br >> type;
+    UInt16 serverNo = 0;
+
+    UInt64 playerId = 0;
+    UInt8 todayLogin = 0;
+    UInt16 accDays = 0;
+    UInt8 level = 0;
+    UInt32 totalRecharge = 0;
+
+    GObject::Player* player = NULL;
+    if(type == 1)
+    {
+        UInt64 pid;
+        br >> pid;
+        if(cfg.merged)
+        {
+            br>>serverNo;
+            pid += (static_cast<UInt64>(serverNo) << 48);
+        }
+        player = GObject::globalPlayers[pid];
+    }
+    else if(type == 2)
+    {
+        std::string playerName;
+        br >> playerName;
+        if(cfg.merged)
+        {
+            br>>serverNo;
+            serverNameToGlobalName(playerName, serverNo);
+        }
+        player = GObject::globalNamedPlayers[playerName];
+    }
+
+    if (player)
+    {
+        playerId = player->getId() & 0xFFFFFFFFFF;
+        if(player->GetVar(GObject::VAR_RP_VALUE) > 0)
+        {
+            if(TimeUtil::SharpDay(0, TimeUtil::Now()) == TimeUtil::SharpDay(0, player->getLastOnline()))
+                todayLogin = 1;
+            accDays = player->GetVar(GObject::VAR_VIA_ACC_DAYS);
+            level = player->GetLev();
+            totalRecharge = player->getTotalRecharge();
+        }
+    }
+
+    st << playerId;
+    st << todayLogin;
+    st << accDays;
+    st << level;
+    st << totalRecharge;
+    st << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+void SetMarryBoard(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt64 manId = 0;
+    br >> manId;
+    UInt64 womanId = 0;
+    br >> womanId;
+    UInt8 type = 0 ;
+    br >> type ;
+    UInt32 time = 0;
+    br >> time;
+    if(type > 0 && type < 4)
+        WORLD().CreateMarryBoard(manId,womanId,type,time);
+    else 
+        GObject::MarryBoard::instance().resetData();
+    Stream st(SPEP::SETMARRYBOARD);
+    st << static_cast<UInt8>(1)<< Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
 #endif // _LOGINOUTERMSGHANDLER_H_
 

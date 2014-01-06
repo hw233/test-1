@@ -252,7 +252,7 @@ void TownDeamon::useAccItem(Player* pl, UInt8 count)
             {
                 UInt32 id;
                 UInt16 num;
-                UInt8 toWhere;
+                UInt16 toWhere;
             };
             DelItemInfo item;
             item.id = ACC_ITEM;
@@ -336,7 +336,7 @@ void TownDeamon::useVitalityItem(Player* pl, UInt8 count)
             {
                 UInt32 id;
                 UInt16 num;
-                UInt8 toWhere;
+                UInt16 toWhere;
             };
             DelItemInfo item;
             item.id = VITALITY_ITEM;

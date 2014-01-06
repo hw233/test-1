@@ -18,6 +18,7 @@ namespace GObject
     static const UInt16 OEquip100[]= {2664,2665,2666,2667,2668,2669,2670,2671,2672,2673,2674,2675,2676,2677,2678,2679,2680,2681,2682,2683,2684,2685,2686,2687};
     static const UInt16 OEquip110[]= {2936,2937,2938,2939,2940,2941,2942,2943,2944,2945,2946,2947,2948,2949,2950,2951,2952,2953,2954,2955,2956,2957,2958,2959};
     static const UInt16 OEquip120[]= {3000,3001,3002,3003,3004,3005,3006,3007,3008,3009,3010,3011,3012,3013,3014,3015,3016,3017,3018,3019,3020,3021,3022,3023};
+    static const UInt16 OEquip130[]= {3064,3065,3066,3067,3068,3069,3070,3071,3072,3073,3074,3075,3076,3077,3078,3079,3080,3081,3082,3083,3084,3085,3086,3087};
 
     UInt16 getRandOEquip(UInt8 lvl);
     UInt16 getRandPEquip(UInt8 lvl);
@@ -113,26 +114,26 @@ namespace GObject
 		void UnInit();
 
 	public:
-		ItemBase*  AddItem(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt8 fromWhere = 0);
-		ItemBase*  AddItem2(ItemBase* item, UInt8 fromWhere = 0);
-		ItemBase*  AddItem2(UInt32 typeId, UInt32 num, bool notify, bool bind = false, UInt8 fromWhere = 0);
+		ItemBase*  AddItem(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt16 fromWhere = 0);
+		ItemBase*  AddItem2(ItemBase* item, UInt16 fromWhere = 0);
+		ItemBase*  AddItem2(UInt32 typeId, UInt32 num, bool notify, bool bind = false, UInt16 fromWhere = 0);
 		ItemBase*  AddItemFromDB(UInt32 id, UInt32 num, bool bind);
 		ItemBase * AddExistEquip(ItemEquip *);
-		ItemBase*  AddEquip(UInt32 typeId, bool bind = false, bool silence = false, UInt8 FromWhere = 0);
-		ItemBase*  AddEquip2(ItemEquip *, UInt8 FromWhere = 0);
-		ItemBase*  AddEquip2(UInt32 typeId, bool notify, bool bind = false, UInt8 FromWhere = 0);
-		ItemBase*  AddEquipN(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt8 FromWhere = 0);
-		ItemBase*  AddEquipEnchant(UInt32 typeId, UInt8 enchant, bool notify, bool bind = false, UInt8 FromWhere = 0);
+		ItemBase*  AddEquip(UInt32 typeId, bool bind = false, bool silence = false, UInt16 FromWhere = 0);
+		ItemBase*  AddEquip2(ItemEquip *, UInt16 FromWhere = 0);
+		ItemBase*  AddEquip2(UInt32 typeId, bool notify, bool bind = false, UInt16 FromWhere = 0);
+		ItemBase*  AddEquipN(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt16 FromWhere = 0);
+		ItemBase*  AddEquipEnchant(UInt32 typeId, UInt8 enchant, bool notify, bool bind = false, UInt16 FromWhere = 0);
 
 		ItemBase*  AddEquipFromDB(UInt32 id, bool bind);
-		ItemBase*  Add(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt8 FromWhere = 0);
+		ItemBase*  Add(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt16 FromWhere = 0);
 		ItemBase*  SetItem(UInt32 typeId, UInt32 num, bool bind = false);
 		bool   DelItemAll(UInt32 id, bool bind = false);
-		bool   DelItem(UInt32 id, UInt16 num, bool bind = false, UInt8 toWhere = 0);
-		bool   DelItem2(ItemBase* item, UInt16 num, UInt8 toWhere = 0);
-		bool   DelItemAny(UInt32 id, UInt16 num, bool * = NULL, UInt8 toWhere = 0);
-		bool   DelEquip(UInt32 id, UInt8 toWhere = 0);
-		bool   DelEquip2(ItemEquip *, UInt8 toWhere = 0);
+		bool   DelItem(UInt32 id, UInt16 num, bool bind = false, UInt16 toWhere = 0);
+		bool   DelItem2(ItemBase* item, UInt16 num, UInt16 toWhere = 0);
+		bool   DelItemAny(UInt32 id, UInt16 num, bool * = NULL, UInt16 toWhere = 0);
+		bool   DelEquip(UInt32 id, UInt16 toWhere = 0);
+		bool   DelEquip2(ItemEquip *, UInt16 toWhere = 0);
 		bool   DelEquip3(ItemEquip *);
         UInt8  GetPart(ItemEquip*);
 		bool   EquipTo(UInt32 id, Fighter * fgt, UInt8 part, ItemEquip *&, bool = false);
@@ -241,10 +242,10 @@ namespace GObject
 
     private:
 
-        void OnAddEquipAndCheckAttainment(const GData::ItemBaseType * itype, UInt8 FromWhere);
+        void OnAddEquipAndCheckAttainment(const GData::ItemBaseType * itype, UInt16 FromWhere);
 	public:
         void  AddItemHistoriesLog(UInt32 itemId, UInt32 num);
-        void  AddItemCoursesLog(UInt32 typeId, UInt32 num, UInt8 fromWhere);
+        void  AddItemCoursesLog(UInt32 typeId, UInt32 num, UInt16 fromWhere);
 
 		inline ItemBase * FindItem(UInt32 id, bool bind = false)
 		{
@@ -290,14 +291,14 @@ namespace GObject
         void AddAdjVal(UInt8 AdjValMark, UInt8 nums);
         void Probability(float & disFactor);
     public:
-        ItemBase * AddRetItemToPackage(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 FromWhere);
+        ItemBase * AddRetItemToPackage(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere);
         ItemBase * AddTempItemFromDB(TempItemData &);
         ItemBase * AddTempEquipFromDB(TempItemData &);
         UInt32 AddTemporaryItem(UInt32 itemId, UInt32 sellCount, bool bind);
         bool RetrieveTemporaryItem(UInt32 itemId, UInt32 sellCount, bool bind);
         bool CheckTemporaryItem();
-        bool DelTempEquip(ItemEquip * equip, UInt8 toWhere, bool sendMark = false);
-        bool DelTempItem(ItemBase* item, UInt32 num, UInt8 toWhere, bool sendMark = false);
+        bool DelTempEquip(ItemEquip * equip, UInt16 toWhere, bool sendMark = false);
+        bool DelTempItem(ItemBase* item, UInt32 num, UInt16 toWhere, bool sendMark = false);
         bool TryAddTempItem(ItemBase * item, UInt32 num);
         bool TryDelTempItem(ItemBase * item, UInt32 num);
         bool TryBuySoulItem(UInt32 typeId, UInt32 num, bool bind /*= false */);

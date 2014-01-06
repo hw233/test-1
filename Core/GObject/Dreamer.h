@@ -116,6 +116,7 @@ class Dreamer
         LEVEL_4,            // 水晶梦境第四层
         LEVEL_5,            // 水晶梦境第五层
         LEVEL_6,            // 水晶梦境第六层
+        LEVEL_7,            // 水晶梦境第七层
     };
 
     struct GridInfo

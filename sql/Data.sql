@@ -819,7 +819,7 @@ CREATE TABLE `lbskills` (
   `id` smallint(5) unsigned NOT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
   `lbtype` tinyint(3) NOT NULL DEFAULT '0',
-  `level` tinyint(3) NOT NULL DEFAULT '0',
+  `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `target` tinyint(3) NOT NULL DEFAULT '0',
   `prob` float(10,4) NOT NULL DEFAULT '0.0000',
   `cond` smallint(5) NOT NULL DEFAULT '0',
@@ -1042,5 +1042,36 @@ CREATE TABLE `team_arena_inspire` (
     PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `acupragold`;
+CREATE TABLE `acupragold` (
+  `id` tinyint(3) unsigned NOT NULL,
+  `lvl` tinyint(3) unsigned NOT NULL,
+  `usereal` int(10) unsigned NOT NULL,
+  `soulmax` int(10) unsigned NOT NULL,
+  `attrnum` tinyint(3) unsigned NOT NULL,
+  `attrvalue` float(10,4) NOT NULL DEFAULT '0.0000',
+  PRIMARY KEY (`id`, `lvl`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+
+DROP TABLE IF EXISTS `ride`;
+CREATE TABLE `ride` (
+    `id` tinyint(3) unsigned NOT NULL,
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `itemId` int(10) unsigned NOT NULL,
+    `chips` varchar(255) NOT NULL DEFAULT '',
+    `propId` int(10) unsigned NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+
+DROP TABLE IF EXISTS `ride_upgrade`;
+CREATE TABLE `ride_upgrade` (
+    `level` tinyint(3) unsigned NOT NULL,
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `lvLimit` int(10) unsigned NOT NULL,
+    `singleCost` int(10) unsigned NOT NULL,
+    `lvExp` int(10) unsigned NOT NULL,
+    `rate` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    PRIMARY KEY (`level`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 -- Dump completed
 

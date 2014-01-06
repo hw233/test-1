@@ -54,8 +54,10 @@ MSG_REG(GameMsgHdr, OnArenaInfoReq);
 MSG_REG(GameMsgHdr, OnArenaLeaderBoardReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_EXTRA_ACT, OnArenaExtraActReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_OP, OnArenaOpReq);
+MSG_REG_2(GameMsgHdr, REQ::SERVERWAR_ARENA_OP, OnArenaWarOpReq);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq);
+MSG_REG_2(GameMsgHdr, REQ::MARRYBOARD, OnMarryBard);
 
 MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);
 
@@ -79,6 +81,18 @@ MSG_REG_2(ArenaMsgHdr, 0x113, OnTeamArenaBattlePoint);
 MSG_REG_2(ArenaMsgHdr, 0x114, OnTeamArenaLeaderBoard);
 MSG_REG_2(ArenaMsgHdr, 0x115, OnTeamArenaInspireLevel);
 MSG_REG_2(ArenaMsgHdr, 0x116, OnTeamArenaLastRank);
+MSG_REG_2(ArenaMsgHdr, 0x117, OnUpdateArenaSession);
+
+MSG_REG_2(ServerWarMsgHdr, 0x121, OnServerWarConnected);
+MSG_REG_2(ServerWarMsgHdr, 0x122, OnServerWarPlayerEntered);
+MSG_REG_2(ServerWarMsgHdr, 0x123, OnServerWarLineupCommited);
+MSG_REG_2(ServerWarMsgHdr, 0x124, OnServerWarPreliminary);
+//MSG_REG_2(ServerWarMsgHdr, 0x125, OnServerWarPreliminaryInfo);
+MSG_REG_2(ServerWarMsgHdr, 0x126, OnServerWarBattleReport);
+MSG_REG_2(ServerWarMsgHdr, 0x127, OnServerWarSupport);
+MSG_REG_2(ServerWarMsgHdr, 0x128, OnServerWarBattlePoint);
+MSG_REG_2(ServerWarMsgHdr, 0x129, OnServerWarLeaderBoard);
+MSG_REG_2(ServerWarMsgHdr, 0x130, OnServerRechargeRank);
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
@@ -156,14 +170,25 @@ MSG_REG_2(GameMsgHdr, 0x1CB, SendRechargeRP7Rank);
 MSG_REG_2(GameMsgHdr, 0x1CD, On11PlayerGradeRank);
 MSG_REG_2(GameMsgHdr, 0x1CE, On11ClanGradeRank);
 MSG_REG_2(GameMsgHdr, 0x1CF, On11CountryGradeRank);
+MSG_REG_2(GameMsgHdr, 0x1D0, OnSendClanMemberList);
+MSG_REG_2(GameMsgHdr, 0x1D1, OnSendClanMemberGrade);
 MSG_REG_2(GameMsgHdr, 0x1D2, OnSend11PlayerGradeRank);
 MSG_REG_2(GameMsgHdr, 0x1D3, OnSend11ClanGradeRank);
 MSG_REG_2(GameMsgHdr, 0x1D4, Update11ClanRank);
+MSG_REG_2(GameMsgHdr, 0x1D7, SetQiShiBanRank);
+MSG_REG_2(GameMsgHdr, 0x1D8, SendQiShiBanRank);
 MSG_REG_2(GameMsgHdr, 0x1D5, OnGuangGunRank);
 MSG_REG_2(GameMsgHdr, 0x1D6, OnSendGuangGunRank);
+MSG_REG_2(GameMsgHdr, 0x1D9, OnSendOffQQClan);
+MSG_REG_2(GameMsgHdr, 0x1DA, OnSendHappyFireRank);
+MSG_REG_2(GameMsgHdr, 0x1DB, OnHappyFireRank);
+MSG_REG_2(GameMsgHdr, 0x1DC, SendQSBState);
+MSG_REG_2(GameMsgHdr, 0x1DD, OnSetCFriendInvited);
+MSG_REG_2(GameMsgHdr, 0x1DE, OnDelCFriendInvited);
+MSG_REG_2(GameMsgHdr, 0x1DF, OnSendCFriendInvited);
 
-MSG_REG_2(GameMsgHdr, 0x1D0, OnSendClanMemberList);
-MSG_REG_2(GameMsgHdr, 0x1D1, OnSendClanMemberGrade);
+MSG_REG_2(GameMsgHdr, 0x1EA, OnServerWarResNotify);
+MSG_REG_2(GameMsgHdr, 0x1EB, OnServerWarBossTimer);
 
 MSG_REG_2(GameMsgHdr, 0x1EC, OnDaysRankMsg);
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReloadLuaReq);

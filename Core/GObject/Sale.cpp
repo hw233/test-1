@@ -120,6 +120,7 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
                         continue;
                     }
                 }
+                sales[i].count = 1;
 			}
 			else
 			{
@@ -154,7 +155,7 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 			else
 				revenue += revTael;
 
-            if(GameAction()->isSalePriceLimitServer())
+            //if(GameAction()->isSalePriceLimitServer())
             {
                 if(saleItems[i]->getClass() == Item_LBling || saleItems[i]->getClass() == Item_LBwu || saleItems[i]->getClass() == Item_LBxin)
                 {

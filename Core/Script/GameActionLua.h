@@ -267,6 +267,10 @@ namespace Script
         bool  RunQQBoardInstantLoginAward(Player* player, UInt8 val);
         bool  RunQQBoardOnlineAward(Player* player, UInt8 val);
         bool  RunLuckyMeetInstantLoginAward(Player* player, UInt8 val);
+        bool  RunQZoneRechargeAward(Player* player, UInt8 val);
+        bool  RunInterestingAward(Player* player, UInt8 val);
+        bool  RunInterestingBag(Player* player, UInt8 val);
+        bool  RunHappyValueAward(Player* player, UInt8 val);
         bool  RunLuckyMeetRechargeAward(Player* player, UInt8 val);
         bool  RunSummerMeetRechargeAward(Player* player, UInt8 val);
         bool  RunLuckyMeetStrengthAward(Player* player, UInt8 val);
@@ -386,7 +390,8 @@ namespace Script
 	    UInt32 getYellowPetId(UInt32 petId);
 
         UInt8 getAnswerInFoolsDay(UInt8 qid, UInt8 type);
-        void getAwardInFoolsDay(Player* player, UInt8 idx);
+        UInt8 getAnswerInMarryBoard(UInt8 id);
+        void getAwardInFoolsDay(Player* player, UInt8, UInt8);
         bool getLuckyStarAward(Player* player, UInt8 idx);
         void GetLuckyBagAward(Player * player);
         void UseToOther(Player * player, Player * other);

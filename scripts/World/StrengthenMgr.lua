@@ -146,6 +146,12 @@ local grade11 = {
     [3] = {{17,5},{20,6},{4,6},{ 18,1 },{41,1},{6,1} },
     [4] = {{14,3},{10,7},{40,1},{17,5},{37,1},{42,1}},
     [5] = {{17,5},{40,1},{42,1},{10,5},{4,4},{13,10}},
+    [6] = {{ 13,10},{ 37,1},{ 41,1},{ 11,1},{10 ,5},{ 4,4}},
+    [7] = {{ 10,5},{ 13,10},{ 14,3},{ 4,6},{ 19,1},{ 17,5}},
+    [8] = {{ 10,7},{ 5,2},{ 20,6},{ 4,4},{ 42,1},{ 40,1}},
+    [9] = {{ 18,1},{ 12,1},{ 17,7},{ 42,1},{ 40,1},{ 11,1}},
+    [10] = {{ 14,3},{ 20,6},{ 37,1},{ 16,3},{ 13,10},{ 5,2}},
+    [11] = {{ 14,3},{ 17,5},{ 10,5},{ 6,1},{ 20,6},{12,1}},
 }
 
 --某一项的最大值
@@ -160,9 +166,12 @@ end
 function GetGradeCheckFlag(idx,day)
     --local num = get11TimeNum();
     if day > 11 then 
-        return 
+        return 0
     end
     local max = grade11[day];   --lb
+    if max == nil then
+        return 0
+    end
     for i = 1, #max do
         if idx == max[i][1] then
             return max[i][2]
@@ -188,7 +197,7 @@ end
 --增加变强之魂
 function doStrong(player, id, param1, param2)
     local num = get11TimeNum();
-    if num > 0 and num < 12 then
+    if num > 0 and num < 6 then
         -- XXX: 这是一个不应该出现的BUG
         if id == 16 then
             checkFlag[id] = 3
@@ -346,7 +355,7 @@ end
 
 function do11Grade(player, id, param1, param2)
     local mgr = player:GetStrengthenMgr();
-    if param1 > 11 or param1==0 then 
+    if param1 > 5 or param1==0 then 
         return ;
     end
     local dayTask = grade11[param1];
@@ -354,17 +363,23 @@ function do11Grade(player, id, param1, param2)
     if as == nil then
         return;
     end
+    if dayTask == nil then
+        return;
+    end
     mgr:CheckTimeOver();
     --判断标志位
     local curflag = mgr:GetFlag(id);
-    if id == 0 or id == 12 then
-       if curflag ==4 then 
-           player:Add11grade(10);
-       end
-           return ;
-    end
     for i = 1, #dayTask do
-        if id == dayTask[i][1]  and curflag < dayTask[i][2] then
+        if id == dayTask[i][1]  then
+            if id == 0 or id == 12 then
+                if curflag ~=4 then 
+                    return ;
+                end
+            else
+                if curflag >= dayTask[i][2] then
+                    return ;
+                end
+            end
             player:Add11grade(10);
             break
         end

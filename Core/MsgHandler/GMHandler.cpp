@@ -16,6 +16,7 @@
 #include "GObject/Fighter.h"
 #include "GObject/Clan.h"
 #include "GObject/Country.h"
+#include "GObject/MarryBoard.h"
 #include "GObject/ClanManager.h"
 #include "GObject/ClanBattle.h"
 #include "GObject/ClanManager.h"
@@ -56,6 +57,7 @@
 #include "Version.h"
 #include "GObject/FairySpar.h"
 #include "GObject/Marry.h"
+#include "GObject/ArenaServerWar.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -155,6 +157,7 @@ GMHandler::GMHandler()
 	Reg(3, "flushtask", &GMHandler::OnFlushTask);
 	Reg(3, "setcountry", &GMHandler::OnSetCountry);
 	Reg(3, "setacu", &GMHandler::OnSetAcu);
+	Reg(3, "setacugold", &GMHandler::OnSetAcuGold);
 	Reg(3, "useitem", &GMHandler::OnUseItem);
 	Reg(3, "uitem", &GMHandler::OnUseItem);
     Reg(3, "ocupyplace", &GMHandler::OnOcupyPlace);
@@ -267,6 +270,8 @@ GMHandler::GMHandler()
     Reg(2, "star", &GMHandler::OnLuckyStarGM);
     Reg(2, "acttm", &GMHandler::OnSurnameleg);
     Reg(2, "openclb", &GMHandler::OnOpenclb);
+    Reg(2, "sendmsg", &GMHandler::OnSendMsg);
+    Reg(2, "setplvar", &GMHandler::OnSetPlayersVar);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -278,7 +283,10 @@ GMHandler::GMHandler()
     Reg(3, "spar", &GMHandler::OnFairySpar);
     
     Reg(3, "setxzlvl", &GMHandler::OnSetXZLvl);
+    Reg(3, "setxctcurval", &GMHandler::OnSetXCTCurVal);
+    Reg(3, "setxctmaxval", &GMHandler::OnSetXCTMaxVal);
     Reg(3, "setxzvalue", &GMHandler::OnSetXCValue);
+    Reg(3, "setQT", &GMHandler::OnSetQTNum);
 
     Reg(2, "eqexp", &GMHandler::OnAddPetEquipExp);
     Reg(2, "task", &GMHandler::OnHandleTask);
@@ -294,6 +302,8 @@ GMHandler::GMHandler()
     Reg(3, "clmarry", &GMHandler::OnCleanMarry);
     Reg(3, "clmarrylist", &GMHandler::OnCleanMarryList);
     Reg(3, "setmarry", &GMHandler::OnSetMarryStatus);
+    Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
+    Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
 
     _printMsgPlayer = NULL;
 }
@@ -477,15 +487,45 @@ void GMHandler::OnSetXZLvl(GObject::Player * player, std::vector<std::string>& a
 		return;
 	if(args.size() == 2)
 	{
-		UInt32 fighterId = atoi(args[0].c_str());
-		UInt32 xzLevel = atoi(args[1].c_str());
+		UInt16 fighterId = atoi(args[0].c_str());
+		UInt8 xzLevel = atoi(args[1].c_str());
 		GObject::Fighter * fgt = player->findFighter(fighterId);
 		if(fgt == NULL)
 			return;
-        fgt->getXingchen().lvl = xzLevel;
 
-        fgt->updateDBxingchen();
-        fgt->sendXingchenInfo(0);
+        fgt->GMSetXZLvl(xzLevel);
+	}
+}
+
+void GMHandler::OnSetXCTCurVal(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt16 fighterId = atoi(args[0].c_str());
+		UInt16 xctCurVal = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+
+        fgt->GMSetXCTCurVal(xctCurVal);
+	}
+}
+
+void GMHandler::OnSetXCTMaxVal(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	if(args.size() == 2)
+	{
+		UInt16 fighterId = atoi(args[0].c_str());
+		UInt16 xctMaxVal = atoi(args[1].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+
+        fgt->GMSetXCTMaxVal(xctMaxVal);
 	}
 }
 
@@ -503,6 +543,20 @@ void GMHandler::OnSetXCValue(GObject::Player * player, std::vector<std::string>&
         player->SetVar(VAR_XINGCHENZHEN_VALUE, xcValue);
         
         fgt->sendXingchenInfo(0);
+	}
+}
+
+void GMHandler::OnSetQTNum(GObject::Player * player, std::vector<std::string>& args)
+{
+	if(args.empty())
+		return;
+	if(args.size() == 1)
+	{
+		UInt8 num = atoi(args[0].c_str());
+        if(num > 31)
+            return;
+
+        player->GMSetQTNUM(num);
 	}
 }
 
@@ -665,6 +719,7 @@ void GMHandler::OnAddVar( GObject::Player * player, std::vector<std::string>& ar
 		UInt32 value = atoi(args[1].c_str());
         UInt32 num = player->GetVar(var);
 		player->SetVar(var,num+value);
+        GObject::MarryBoard::instance()._YHlively = value ; 
 	}
 }
 void GMHandler::OnSetVar( GObject::Player * player, std::vector<std::string>& args )
@@ -2493,6 +2548,18 @@ void GMHandler::OnSetAcu( GObject::Player * player, std::vector<std::string>& ar
     UInt8 lvl = atoi(args[2].c_str());
     fgt->setAcupoints(idx, lvl);
 }
+void GMHandler::OnSetAcuGold( GObject::Player * player, std::vector<std::string>& args)
+{
+    if (!player || args.size() < 2)
+        return;
+    UInt32 id = atoi(args[0].c_str());
+	GObject::Fighter * fgt = player->findFighter(id);
+    if (!fgt)
+        return;
+    UInt8 idx = atoi(args[1].c_str());
+    UInt8 lvl = atoi(args[2].c_str());
+    fgt->setAcupointsGold(idx, lvl);
+}
 
 void GMHandler::OnUseItem( GObject::Player * player, std::vector<std::string>& args)
 {
@@ -3859,11 +3926,24 @@ void GMHandler::OnCFriend(GObject::Player *player, std::vector<std::string>& arg
             if(idx > 3 && idx < 7)
                 cFriend->setCFriendNum(3);
             if(idx >= 39)
-                cFriend->setCFriendSuccess(3);
+            {
+                UInt64 userId = player->getId();
+                if(cfg.merged)
+                    userId &= 0x0000ffffffffffull;
+                for(int i = 0; i < 3; ++ i)
+                {
+                    GameMsgHdr hdr1(0x1DD, WORKER_THREAD_WORLD, player, sizeof(userId));
+                    GLOBAL().PushMsg(hdr1, &userId);
+                }
+            }
         }
         break;
     case 2:
-        cFriend->clearAllForGM();
+        {
+            cFriend->clearAllForGM();
+            GameMsgHdr hdr(0x1DE, WORKER_THREAD_WORLD, player, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
         break;
     case 3:
         player->AddVar(VAR_CFRIENDTICKETS, atoi(args[1].c_str()));
@@ -3916,8 +3996,21 @@ void GMHandler::OnSaveGoldAct(GObject::Player *player, std::vector<std::string>&
             player->SetVar(VAR_SAVEGOLD_SET_TIME, TimeUtil::Now() - 7*86400-10);
         }
         break;
+    case 4:
+        {
+            UInt32 value = atoi(args[1].c_str());
+            IncommingInfo ii(InFromTopUp, 0, 0);
+            for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+            {
+                UInt32 val = uRand(value) + 1;
+                it->second->getGold(val, &ii);
+                it->second->addTotalRecharge(val);
+            }
+        }
+        break;
     }
-    player->sendSaveGoldAct();
+    if(World::getSaveGoldAct())
+        player->sendSaveGoldAct();
 }
 
 void GMHandler::OnLingbao(GObject::Player * player, std::vector<std::string>& args)
@@ -4252,6 +4345,15 @@ void GMHandler::OnFairyPetGM(GObject::Player *player, std::vector<std::string>& 
     }
 }
 
+inline bool player_enum_1(GObject::Player* p, int)
+{
+    p->CleanQiShiBan();
+    p->SetVar(GObject::VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE, 0);
+    GObject::World::qishibanScoreSort.clear();
+
+    return true;
+}
+
 void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& args)
 {
     if(sizeof(args)<1)
@@ -4330,6 +4432,18 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_QZONEQQGAME_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
+        case 11:
+            GVAR.SetVar(GVAR_QISHIBANGAME_BEGIN, TimeUtil::SharpDayT( 0 , TimeUtil::Now()));
+            GVAR.SetVar(GVAR_QISHIBANGAME_END, TimeUtil::SharpDayT( 5 , TimeUtil::Now()));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 12:
+            GVAR.SetVar(GObject::GVAR_QISHIBANGAME_BEGIN, 0);
+            GVAR.SetVar(GVAR_QISHIBANGAME_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GObject::globalPlayers.enumerate(player_enum_1, 0);
+            break;
         case 13:
             GVAR.SetVar(GVAR_QZONEQQGAMEY_BEGIN, TimeUtil::Now());
             GVAR.SetVar(GVAR_QZONEQQGAMEY_END, TimeUtil::Now() + 86400*15);
@@ -4341,7 +4455,58 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_QZONEQQGAMEY_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
-
+        case 15:
+            GVAR.SetVar(GVAR_QZONE_RECHARGE_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_QZONE_RECHARGE_END, TimeUtil::Now() + 86400*15);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 16:
+            GVAR.SetVar(GVAR_QZONE_RECHARGE_BEGIN, 0);
+            GVAR.SetVar(GVAR_QZONE_RECHARGE_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+        case 17:
+            GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_BEGIN, TimeUtil::SharpDayT( 0 , TimeUtil::Now()));
+            GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_END, TimeUtil::SharpDayT( 5 , TimeUtil::Now()));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 18:
+            GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_BEGIN, 0);
+            GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+        case 19:
+            GVAR.SetVar(GVAR_OLDMAN_BEGIN, TimeUtil::SharpDayT(0, TimeUtil::Now()));
+            GVAR.SetVar(GVAR_OLDMAN_END, TimeUtil::SharpDayT(2, TimeUtil::Now()));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 20:
+            GVAR.SetVar(GVAR_OLDMAN_BEGIN, 0);
+            GVAR.SetVar(GVAR_OLDMAN_END, 0);
+        case 21:
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_BEGIN,TimeUtil::SharpDayT(0, TimeUtil::Now()));
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_END,TimeUtil::SharpDayT(2, TimeUtil::Now()));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 22:
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_BEGIN, 0);
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+        case 23:
+            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::Now() + 86400*15);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 24:
+            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, 0);
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
     }
 }
 
@@ -4360,6 +4525,23 @@ void GMHandler::OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& 
         player->SetVar(VAR_NUWA_SIGNET, 0);
         player->SetVar(VAR_NUWA_OPENTIME, 0);
     }
+}
+void GMHandler::OnSendMsg(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+    UInt32 type = atoi(args[0].c_str());
+    UInt8 value[5] = {0,0,0,0,0};
+    if(args.size()>6)
+        return ;
+    for(UInt8 i=1;i<args.size();++i)
+    {
+        value[i-1] = atoi(args[i].c_str());
+    }
+	GameMsgHdr hdr(type, player->getThreadId(), player, sizeof(value));
+	GLOBAL().PushMsg(hdr, value);
+	GameMsgHdr hdr1(type, WORKER_THREAD_WORLD, player, sizeof(value));
+	GLOBAL().PushMsg(hdr1, value);
 }
 
 void GMHandler::OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args)
@@ -4661,4 +4843,154 @@ void GMHandler::OnSetMarryStatus(GObject::Player* player, std::vector<std::strin
 
 
 
+void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+        return;
+    switch(atoi(args[0].c_str()))
+    {
+    case 1:
+        {
+            std::map<Player *, UInt8> warSort;
+            UInt8 i = 0, j = 0;
+            for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+            {
+                if(j > 100)
+                    break;
+                GObject::Player * player = it->second;
+                if(player && player->GetLev() >= LIMIT_LEVEL)
+                    warSort.insert(std::make_pair(player, i++));
+                if(warSort.size() == 10)
+                {
+                    struct SWarEnterData {
+                        Stream st;
+                        std::map<Player *, UInt8> warSort;
 
+                        SWarEnterData(Stream& st2, std::map<Player *, UInt8>& warSort2) : st(st2), warSort(warSort2) {}
+                    };
+
+                    Stream st(SERVERWARREQ::ENTER, 0xEE);
+                    st << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size());
+
+                    SWarEnterData * swed = new SWarEnterData(st, warSort);
+                    std::map<Player *, UInt8>::iterator it = warSort.begin();
+                    GameMsgHdr hdr(0x382, it->first->getThreadId(), it->first, sizeof(SWarEnterData*));
+                    GLOBAL().PushMsg(hdr, &swed);
+
+                    i = 0;
+                    j ++;
+                    warSort.clear();
+                }
+            }
+        }
+        break;
+    case 2:
+        {
+            UInt32 i = 0;
+            for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+            {
+                if(i > 1280)
+                    break;
+                Player * player = it->second;
+                if(player && player->GetLev() >= LIMIT_LEVEL)
+                {
+                    serverWarMgr.signup(player);
+                    ++ i;
+                }
+            }
+        }
+        break;
+    case 3:
+        {
+            UInt8 type = 1;
+            GameMsgHdr hdr(0x1EB, WORKER_THREAD_WORLD, NULL, sizeof(type));
+            GLOBAL().PushMsg(hdr, &type);
+        }
+        break;
+    case 4:
+        GObject::serverWarBoss.setHP(atoi(args[1].c_str()));
+        GObject::serverWarBoss.sendHp();
+        break;
+    case 5:
+        player->SetVar(VAR_SERVERWAR_JIJIANTAI, 0);
+        player->SetVar(VAR_SERVERWAR_JIJIANTAI1, 0);
+        GObject::serverWarMgr.sendjiJianTaiInfo(player);
+        break;
+    case 6:
+        {
+            GVAR.SetVar(GVAR_SERVERWAR_JIJIANTAI, atoi(args[1].c_str()));
+            Stream st(REP::SERVERWAR_ARENA_OP);
+            st << static_cast<UInt8>(0x04) << static_cast<UInt8>(6);
+            st << GVAR.GetVar(GVAR_SERVERWAR_JIJIANTAI);
+            st << Stream::eos;
+            NETWORK()->Broadcast(st);
+        }
+        break;
+    case 7:
+        {
+            UInt32 data = 0;
+            data = SET_BIT_8(data, 0, 20);
+            data = SET_BIT_8(data, 1, 20);
+            player->SetVar(VAR_SERVERWAR_JIJIANTAI1, data);
+            GObject::serverWarMgr.sendjiJianTaiInfo(player);
+        }
+        break;
+    }
+}
+void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return ;
+    UInt32 var = 0;   //修改
+    UInt32 value = 0;   //修改
+    if(args.size() >=2 )
+    {
+        var = atoll(args[1].c_str());
+        value = atoll(args[2].c_str());
+    }
+//    UInt32 fTime = atol(args[1].c_str());
+//    setForbidSaleValue(playerId, true,fTime);
+//
+//开启起封交易客户平台测试
+#define TEST_TABLE
+#ifdef TEST_TABLE
+    //测试平台 begin
+#pragma pack(1)
+    struct test
+    {
+        UInt8 blank[36];
+        UInt32 var ;
+        UInt32 value ;
+        char   msg[1024];
+    };
+#pragma pack()
+    struct test _test;
+    _test.var =var;
+    _test.value =value;
+    strncpy (_test.msg, args[0].c_str(), strlen(args[0].c_str()));
+  //  _test.msg = args[0].c_str();
+    LoginMsgHdr hdr1(0x14D, WORKER_THREAD_LOGIN, 0, 0, sizeof(_test));
+    GLOBAL().PushMsg(hdr1, &_test);
+  //查询消息
+    return ;   
+#endif
+#undef TEST_TABLE
+}
+
+void GMHandler::OnCreateMarryBoard(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() !=3 )
+        return ;
+	char * endptr;
+	UInt64 playerId1 = strtoull(args[0].c_str(), &endptr, 10);
+	UInt64 playerId2 = strtoull(args[1].c_str(), &endptr, 10);
+    UInt8 type = atoi(args[2].c_str());
+    UInt32 now = TimeUtil::Now();
+    if(type > 1 && type < 4 )
+    {
+        WORLD().CreateMarryBoard(playerId1,playerId2,type,now + 1860);
+        GObject::MarryBoard::instance().SetQuestionOnMarryBoard();
+    }
+    else 
+        GObject::MarryBoard::instance().resetData();
+}

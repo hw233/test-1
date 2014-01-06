@@ -32,6 +32,7 @@
 #include "GObject/TownDeamon.h"
 #include "GObject/ClanRankBattle.h"
 #include "GObject/SingleHeroStage.h"
+#include "GObject/MarryBoard.h"
 
 #ifdef _ARENA_SERVER
 #include "GObject/GameServer.h"
@@ -40,6 +41,7 @@
 #include "Battle/BattleReport.h"
 #else
 #include "GObject/Arena.h"
+#include "GObject/ArenaServerWar.h"
 #endif
 
 #include <mysql.h>
@@ -1477,7 +1479,6 @@ void OnArenaConnected( ArenaMsgHdr& hdr, const void * data )
     if(!fhaslater)
     {
         BinaryReader brd2((UInt8*)(GObject::arena._readbuf), GObject::arena._readbuf.size());
-        GObject::World::setArenaState(GObject::ARENA_XIANJIE_DIYI);
         GObject::arena.readFrom(brd2);
         GObject::arena._readbuf.clear();
     }
@@ -1635,6 +1636,125 @@ void OnArenaLeaderBoardReq( GameMsgHdr&hdr, ArenaLeaderBoardReq& aer )
         case 3:
 	        GObject::arena.sendLastLeaderBoard(player);
             break;
+        case 4:
+	        GObject::serverWarMgr.sendLeaderBoard(player);
+            break;
+    }
+}
+
+void OnArenaWarOpReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    if(!cfg.enabledServerWar())
+        return;
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	UInt8 type = 0, opt = 0;
+	brd >> type >> opt;
+	switch(type)
+	{
+	case 0x01:  //服战信息
+        {
+            switch(opt)
+            {
+            case 0x00:  //请求服战当前状态
+                GObject::serverWarMgr.sendStatus(player);
+                break;
+            case 0x01:  // 请求服战报名信息
+                GObject::serverWarMgr.sendSignupInfo(player);
+                break;
+            case 0x02:  //请求服战祭剑赛信息
+                GObject::serverWarMgr.sendWarSortInfo(player);
+                break;
+            case 0x03:  //请求服战入围赛信息
+                {
+                    UInt8 group = 0, flag = 0, len = 0;
+                    UInt16 start = 0;
+                    brd >> flag >> group >> start >> len;
+                    GObject::serverWarMgr.sendPreliminary(player, group, flag, start, len);
+                }
+                break;
+            case 0x04:
+            case 0x05:
+            case 0x06:
+            case 0x07:
+                {
+                    UInt8 group = 0;
+                    brd >> group;
+                    GObject::serverWarMgr.sendElimination(player, opt, group);
+                }
+                break;
+	        }
+        }
+        break;
+	case 0x02:  //服战操作
+		{
+            switch(opt)
+            {
+            case 0x01:
+                GObject::serverWarMgr.signup(player);
+                break;
+            case 0x02:
+                GObject::serverWarMgr.bet(brd, player);
+                break;
+            case 0x03:
+                {
+                    UInt32 battleId = 0;
+                    brd >> battleId;
+                    Stream st(SERVERWARREQ::BATTLE_REPORT, 0xEE);
+                    st << player->getId() << battleId << Stream::eos;
+                    NETWORK()->SendToServerWar(st);
+                }
+                break;
+            case 0x04:
+                if(player->inServerWarCommitCD())
+                {
+                    Stream st(REP::SERVERWAR_ARENA_OP);
+                    st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x04);
+                    st << static_cast<UInt8>(2) << Stream::eos;
+                    player->send(st);
+                }
+                else
+                    GObject::serverWarMgr.commitLineup(player);
+                break;
+            case 0x05:
+                {
+                    std::string name;
+                    brd >> name;
+                    GObject::serverWarMgr.challenge(player, name);
+                }
+                break;
+            }
+        }
+		break;
+	case 0x04:  //祭剑台
+		{
+            switch(opt)
+            {
+            case 0x00:
+                GObject::serverWarMgr.sendjiJianTaiInfo(player);
+                break;
+            case 0x01:
+                GObject::serverWarMgr.jiJianTai_operate(player);
+                break;
+            case 0x02:
+                GObject::serverWarMgr.jiJianTai_complete(player, 1);
+                break;
+            case 0x03:
+                GObject::serverWarMgr.jiJianTai_complete(player, 0);
+                break;
+            case 0x04:
+                GObject::serverWarMgr.jiJianTai_convert(player);
+                break;
+            case 0x05:
+                {
+                    UInt8 idx = 0;
+                    brd >> idx ;
+                    GObject::serverWarMgr.jiJianTai_openBox(player, idx);
+                }
+                break;
+            }
+        }
+		break;
     }
 }
 
@@ -2443,6 +2563,22 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
     brd >> type;
     switch(type)
     {
+        case 0x02:  //排行活动
+        {
+            UInt8 flag = 0;
+            brd >> op >> flag;
+            if(op != 6)     //跨服充值排行活动
+                return;
+            if(0 == flag)
+            {
+                UInt8 idx = 0, cnt = 0;
+                brd >> idx >> cnt;
+                leaderboard.sendRechargeRank100(player, idx, cnt);
+            }
+            else if(1 == flag)
+                leaderboard.sendMyRechargeRank(player);
+            break;
+        }
         case 0x01:  // 七夕
         case 0x03:  // 万圣节
         case 0x09:  // 情人节浪漫之旅
@@ -2578,6 +2714,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x19:
         case 0x21:
         case 0x24:
+        case 0x25:
+        case 0x27:
         {
             brd >> op;
             switch(op)
@@ -2821,7 +2959,6 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         break;
         case 0x22:  // 光棍节活动
         {
-            
             if( ! WORLD().getGGTime() )
                 break;
 
@@ -2829,6 +2966,142 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             GLOBAL().PushMsg(hdr, (void*)data);
             break;
         }
+        break;
+        case 0x23:  // 七石斗法活动
+        {
+            if(!WORLD().getQiShiBanTime())
+                break;
+
+            brd >> op;
+            if(0x09 == op) //包裹相关国家线程处理
+            {
+                hdr.msgHdr.desWorkerID = player->getThreadId();
+                GLOBAL().PushMsg(hdr, (void*)data);
+                break;
+            }
+            else
+            {
+                switch (op)
+                {
+                    case 0x01:
+                        {
+                            UInt8 index = 0;
+                            brd >> index;
+                            switch(index)
+                            {
+                                case 0:
+                                    {
+                                        UInt32 page = 0;
+                                        brd >> page;
+                                        player->OnQiShiBanRank(page);
+                                    }
+                                    break;
+                                    case 1:
+                                    {
+                                        if(!player->CheckReqDataTime())
+                                            return;
+
+                                        UInt16 count = 0;
+                                        brd >> count;
+                                        
+                                        Stream st(REP::ACT);
+                                        st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(1);
+                                        st << count;
+
+                                        for(UInt32 i=0; i<count; i++)
+                                        {
+                                            std::string openId;
+                                            openId.clear();
+                                            brd >> openId;
+                                            UInt32 score = player->GetQQFriendScore(openId.c_str());
+                                            st << score;
+                                        }
+                                        st << Stream::eos;
+                                        player->send(st);
+
+                                        player->SetReqDataTime();
+                                    }
+                                    break;
+                            }
+                            break;
+                        }
+                    case 0x02:
+                        player->ReqStartQSB();
+                        break;
+                    case 0x03:
+                        {
+                            int randMark = 0;
+                            UInt32 time = 0;
+                            brd >> randMark;
+                            brd >> time;
+                            player->FinishCurStep(randMark, time);
+                        }
+                        break;
+                    case 0x04:
+                        player->AddTime();
+                        break;
+                    case 0x06:
+                        {
+                            player->Fail(); //时间到，失败
+
+                            Stream st(REP::ACT);
+                            st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x06) << Stream::eos;
+                            player->send(st);
+                        }
+                        break;
+                    case 0x07:
+                        player->MyQSBInfo();
+                        break;
+                    case 0x08:
+                        player->ContinueCurStep();
+                        break;
+                    case 0x10:
+                        {
+                            player->Fail(); //主动放弃，失败
+
+                            Stream st(REP::ACT);
+                            st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x10) << Stream::eos;
+                            player->send(st);
+                            break;
+                        }
+                    case 0x11:
+                        player->QiShiBanState();
+                        break;
+                    case 0x12:
+                        player->RestCurStep();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        break;
+        case 0x26:
+            {
+                if(!World::getOldManTime())
+                    return ;
+                brd >> op;
+                if(op ==2)
+                {
+                    UInt8 index =0 ;
+                    brd >> index ;
+                    if(index == 0)
+                    {
+                        UInt32 type = GObject::World::FindTheOldMan(player);
+                        if( type ==0 )
+                        {
+                            player->sendMsgCode(0, 1910);
+                            break;
+                        }
+                        GameMsgHdr h(0x355,  player->getThreadId(), player, sizeof(UInt32));
+                        GLOBAL().PushMsg(h, &type);
+                        break;
+                    }
+                }
+                hdr.msgHdr.desWorkerID = player->getThreadId();
+                GLOBAL().PushMsg(hdr, (void*)data);
+                break;
+            }
         default:
             break;
     }
@@ -3127,7 +3400,6 @@ void OnTeamArenaConnected( ArenaMsgHdr& hdr, const void * data )
     if(!fhaslater)
     {
         BinaryReader brd2((UInt8*)(GObject::teamArenaMgr._readbuf), GObject::teamArenaMgr._readbuf.size());
-        GObject::World::setArenaState(GObject::ARENA_XIANJIE_ZHIZUN);
         GObject::teamArenaMgr.readFrom(brd2);
         GObject::teamArenaMgr._readbuf.clear();
     }
@@ -3161,6 +3433,261 @@ void OnTeamArenaLastRank( ArenaMsgHdr& hdr, const void * data )
 {
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     GObject::teamArenaMgr.updateLastRank(br);
+}
+
+void OnUpdateArenaSession( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt16 session = 0, session1 = 0;
+    brd >> session >> session1;
+    if(!session || !session1)
+        return;
+    GObject::arena.setSession(session);
+    GObject::teamArenaMgr.setSession(session1);
+}
+
+//跨服服战
+void OnServerWarConnected( ServerWarMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(!cfg.enabledServerWar())
+        return;
+	UInt8 r = 0;
+	brd >> r;
+	if(r == 1)
+	{
+		INFO_LOG("Failed to connect to ServerWar arena.");
+		NETWORK()->CloseServerWar();
+		return;
+	}
+    UInt8 fhaslater = 0;
+    brd >> fhaslater;
+    GObject::serverWarMgr._readbuf.append((UInt8*)(data) + brd.pos(), brd.size() - brd.pos());
+    if(!fhaslater)
+    {
+        BinaryReader brd2((UInt8*)(GObject::serverWarMgr._readbuf), GObject::serverWarMgr._readbuf.size());
+	    GObject::serverWarMgr.readFrom(brd2);
+        GObject::serverWarMgr._readbuf.clear();
+    }
+}
+
+void OnServerWarPlayerEntered( ServerWarMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    int cid = 0, sid = 0;
+    brd >> cid >> sid;
+	if(sid != cfg.serverNo || cid != cfg.channelNum)
+		return;
+    GVAR.SetVar(GVAR_SERVERWAR_ISENTER, 1);
+
+    SYSMSGV(title, 825);
+    SYSMSGV(content, 826, GObject::serverWarMgr.getSession());
+    GObject::serverWarMgr.sendTeamMail(title, content);
+}
+
+void OnServerWarLineupCommited( ServerWarMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 r;
+	UInt64 playerId;
+    brd >> r >> playerId;
+	GObject::Player * player = GObject::globalPlayers[playerId];
+	if(player == NULL)
+		return;
+    Stream st(REP::SERVERWAR_ARENA_OP);
+    st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x04);
+    st << r << Stream::eos;
+    player->send(st);
+}
+
+void OnServerWarPreliminary( ServerWarMsgHdr& hdr, const void * data )
+{
+    if(!cfg.enabledServerWar())
+        return;
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    GObject::serverWarMgr.pushPreliminary(brd);
+}
+
+void OnServerWarBattleReport( ServerWarMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt64 pid = 0;
+    br >> pid;
+    Stream st;
+    std::vector<UInt8> buf;
+    buf.resize(br.size()-8);
+    br >> buf;
+    st << buf;
+    st << Stream::eos;
+
+	GObject::Player * player = GObject::globalPlayers[pid];
+    if(player == NULL)
+        return;
+	player->send(&(st[0]), st.size());
+}
+
+void OnServerWarSupport( ServerWarMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt8 flag = 0;
+    UInt16 pos = 0;
+    brd >> type >> flag >> pos;
+    switch(GObject::World::getArenaState())
+    {
+        case GObject::ARENA_XIANJIE_CHUANQI:
+            GObject::serverWarMgr.updateSuport(type, flag, pos);
+            break;
+    }
+}
+
+void OnServerWarBattlePoint( ServerWarMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    GObject::serverWarMgr.updateBattlePoint(brd);
+}
+
+void OnServerWarLeaderBoard( ServerWarMsgHdr& hdr, const void * data )
+{
+    if(!cfg.enabledServerWar())
+        return;
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    GObject::serverWarMgr.updateLeaderBoard(brd);
+}
+void OnMarryBard( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+    UInt8 mType = GObject::MarryBoard::instance()._type;
+    switch(op)
+    {
+        case 0x03:
+        case 0x04:
+            {
+                hdr.msgHdr.desWorkerID = player->getThreadId();
+                GLOBAL().PushMsg(hdr, (void*)data);
+            }
+            break;
+        case 0x23:
+        case 0x24:
+            {
+                if(mType != 2)
+                    return;
+                UInt8 ans = 0 ;
+                br >>ans;
+                GObject::MarryBoard::instance().answerTheQuestionOn2(player,ans);  
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(op);
+                st <<static_cast<UInt8>(ans);
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x42:
+            {
+                if(mType != 3)
+                    return;
+                player->SetVar(VAR_MARRYBOARD3,1);
+                UInt32 rand = uRand(10000);
+                player->SetVar(VAR_MARRYBOARD3_KEY,rand);
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(0x42);
+                st << static_cast<UInt32>(GObject::MarryBoard::instance().wrapTheKey(player->GetVar(VAR_MARRYBOARD3_KEY)));
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x43:
+            {
+                if(mType != 3)
+                    return;
+                UInt32 outKey = 0;
+                UInt8 flag = 0;
+                UInt32 now = TimeUtil::Now();
+                UInt32 var = player->GetVar(VAR_MARRYBOARD4_TIME);
+                br >> outKey ;
+                if(GObject::MarryBoard::instance().unWrapTheOutKey(outKey) == player->GetVar(VAR_MARRYBOARD3_KEY))
+                {
+                    if(now - var > 16)
+                    {
+                        flag = 1 ; 
+                        player->AddVar(VAR_MARRYBOARD3,1);
+                        player->SetVar(VAR_MARRYBOARD4_TIME , now);
+                        UInt32 rand = uRand(10000);
+                        player->SetVar(VAR_MARRYBOARD3_KEY,rand);
+                        player->AddVar(VAR_MARRYBOARD_LIVELY,10);
+                        GObject::MarryBoard::instance()._lively += 1;
+                        char str[16] = {0};
+                        sprintf(str, "F_140102_15");
+                        player->udpLog("jiehunjinxing", str, "", "", "", "", "act");
+                    }
+                }
+                else
+                    break ;
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(0x43);
+                st <<static_cast<UInt8>(flag);
+                if(flag)
+                    st << static_cast<UInt32>(GObject::MarryBoard::instance().wrapTheKey(player->GetVar(VAR_MARRYBOARD3_KEY)));
+                else 
+                    st <<static_cast<UInt32>(var + 16 -now );
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x44:
+            {
+                if(mType != 3)
+                    return;
+                player->getMarryBoard3Award(GObject::MarryBoard::instance()._norms);
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(0x44);
+                st <<Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x63:
+        case 0x64:
+            {
+                if(mType != 4)
+                    return;
+                UInt8 door=0 ;
+                br >> door;
+                GObject::MarryBoard::instance().selectDoor(player,door);
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(op);
+                st << static_cast<UInt8>(door);
+                st<<Stream::eos;
+                if(player == GObject::MarryBoard::instance()._man || player == GObject::MarryBoard::instance()._woman)
+                {
+                    GObject::MarryBoard::instance()._man ->send(st);
+                    GObject::MarryBoard::instance()._woman->send(st);
+                }
+                else
+                    player->send(st);
+            }
+            break;
+        default:
+            return;
+    }
+}
+
+void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    if(type == 0)
+        GObject::leaderboard.giveRechargeRankAward();
+    else if(type == 1)
+        GObject::leaderboard.readRechargeRank100(brd);
+    else if(type == 2)
+        GObject::leaderboard.readRechargeSelf(brd);
+    else if(type == 3)
+        GObject::leaderboard.sendGoldLvlAward(brd);
 }
 
 #endif // _WORLDOUTERMSGHANDLER_H_

@@ -228,11 +228,11 @@ namespace GObject
         UInt16 getSmeltExp(UInt8 lv, UInt8 itemTypeIdx, UInt8* at, UInt16* av, UInt8 size, UInt8 skillNum, UInt8 color)
         {
             float colorP = 0;
-            float lvFactor[8] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 0, 0};
+            float lvFactor[] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0};
             UInt8 lvIdx = (lv-70)/10;
             UInt16 skillExp = 100;
-            if(lvIdx > 5)
-                lvIdx = 5;
+            if(lvIdx > 6)
+                lvIdx = 6;
 
             for(int i = 0; i < size; ++ i)
             {
@@ -248,10 +248,10 @@ namespace GObject
 
         UInt16 getSmeltExp2(UInt8 lv, UInt8 itemTypeIdx, UInt8 color)
         {
-            float lvFactor[8] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 0, 0};
+            float lvFactor[] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0};
             UInt8 lvIdx = (lv-70)/10;
-            if(lvIdx > 5)
-                lvIdx = 5;
+            if(lvIdx > 6)
+                lvIdx = 6;
 
             if(color < 2)
                 color = 2;
@@ -358,11 +358,15 @@ namespace GObject
         static bool loadTeamArenaSkill();
 	    static bool LoadTeamArenaBets();
 	    static bool LoadTeamPendingPlayers();
+	    static bool LoadArenaServerWar();
+	    static bool LoadServerWarBets();
 	    static bool LoadPlayerNamed();
 	    static bool LoadMarriage();
 	    static bool LoadReplyMarriage();
 	    static bool LoadMarriedLog();
         static bool loadZhenwei();
+        static bool loadQiShiBan();
+        static bool LoadPlayerModifyMounts();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

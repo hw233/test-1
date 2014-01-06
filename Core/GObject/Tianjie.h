@@ -138,6 +138,7 @@ namespace GObject
 		bool isPlayerInTj(int playerLevel);
 		bool isOpenTj(Player* pl);
         bool isTjExecute() {return m_isTjExecute;};
+        int getTjCurRate() { return m_currTjRate; }
         bool isTjRateNpc(UInt32 npcid);
         bool isTjOpened() {return m_isTjOpened;};
 		bool isTjNpc(UInt32 npcid, UInt16 loc);

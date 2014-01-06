@@ -148,8 +148,8 @@ static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
                                        //59, 69,  79,  89,  99,  109, 119, 129, 139, 149, 999
-static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1533,1534,1535,1377};
-static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,9161,9162,9163,9925};
+static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1533,1534,1535,1378};
+static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,9161,9162,9163,9930};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
@@ -720,7 +720,10 @@ void Tianjie::onTianjieReq( GameMsgHdr& hdr, const void* data)
         UInt8 id = 0;
         br >> cmd;
         br >> id;
-        pl->OnDoTianjieTask(type, cmd, id);
+        if(m_isTjExecute && (4 == m_currTjRate || 5 == m_currTjRate))
+            pl->sendMsgCode(0, 1603);
+        else
+            pl->OnDoTianjieTask(type, cmd, id);
     }
 }
 void Tianjie::notifyTianjieStatus(Player* pl)
@@ -1017,7 +1020,12 @@ void Tianjie::updateRankData(Player* pl)
 }
 void Tianjie::setRatePercent()
 {
-    UInt32 percent = m_eventCurrNumber * 100 / m_eventMaxNumber;
+    UInt32 percent;
+    if(m_eventMaxNumber != 0)
+        percent = m_eventCurrNumber * 100 / m_eventMaxNumber;
+    else
+        percent = 100;
+
     if (percent > 100)
         percent = 100;
     if (percent - m_oldBroadPercent >= 25)
@@ -1504,6 +1512,9 @@ void Tianjie::record1(Player* pl, int npcIndex)
 }
 bool Tianjie::isFinish()
 {
+    if(m_currTjRate == 4 && m_eventMaxNumber == 0)
+        return false;
+
     if (!m_isFinish && m_eventCurrNumber >= m_eventMaxNumber)
 	{
 	    m_isFinish = true;
@@ -2123,6 +2134,7 @@ void Tianjie::startBoss()
 
         _hp = ohp;
         nflist[0].fighter->setBaseHP(ohp);
+        nflist[0].fighter->setWBoss(true);
 
         extatk = (WBOSS_BASE_TIME/(float)lastTime - 1.f) * WBOSS_ATK_FACTOR * (atk + baseatk);
         nflist[0].fighter->setExtraAttack(extatk + atk);

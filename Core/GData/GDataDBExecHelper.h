@@ -337,6 +337,16 @@ struct DBAcuPra
     UInt32 pramax;  // 修为上限
     UInt8 citslot;  // 心法装备加1
 };
+struct DBAcuPraGold
+{
+    UInt8 id;       // 本命金丹等级
+    UInt8 lvl;      // 层级(1-3)
+    UInt32 useReal;
+//    UInt32 praadd;
+    UInt32 soulmax;
+    UInt8 attrNum;
+    float attrValue;
+};
 
 struct DBExp
 {
@@ -629,6 +639,25 @@ struct DBTeamArenaInspireConfig
     float defendP;
     float hpP;
     float actionP;
+};
+
+struct DBRideConfig
+{
+    UInt8 id;
+    std::string name;
+    UInt32 itemId;
+    std::string chips;
+    UInt32 propId;
+};
+
+struct DBRideUpgradeCfg
+{
+    UInt16 level;
+    std::string name;
+    UInt8 lvLimit;
+    UInt32 singleCost;
+    UInt32 lvExp;
+    float rate;
 };
 
 struct DBKeyinConfig
@@ -1050,6 +1079,17 @@ SPECIALDEF(7)
         UInt8, citslot
     )
 SPECIALEND()
+SPECIALBEGIN(GData::DBAcuPraGold)
+SPECIALDEF(6)
+    (
+     UInt8, id,       // 本命金丹等级
+     UInt8, lvl,      // 层级(1-3)
+     UInt32, useReal,
+     UInt32, soulmax,
+     UInt8,  attrNum,
+     float, attrValue
+    )
+SPECIALEND()
 
 SPECIALBEGIN(GData::DBCitta)
 SPECIALDEF(6)
@@ -1455,6 +1495,29 @@ SPECIALDEF(7)
     float, defendP,
     float, hpP,
     float, actionP
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBRideConfig)
+SPECIALDEF(5)
+	(
+    UInt8, id,
+    std::string, name,
+    UInt32, itemId,
+    std::string, chips,
+    UInt32, propId
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBRideUpgradeCfg)
+SPECIALDEF(6)
+	(
+    UInt16, level,
+    std::string, name,
+    UInt8, lvLimit,
+    UInt32, singleCost,
+    UInt32, lvExp,
+    float, rate
 	)
 SPECIALEND()
 

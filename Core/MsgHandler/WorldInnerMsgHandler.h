@@ -34,6 +34,7 @@
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
 #include "GObject/ArenaTeam.h"
+#include "GObject/ArenaServerWar.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -865,6 +866,98 @@ void SendRechargeRank(Stream& st)
     SyncToLogin4IDIP();
 }
 
+void SetQiShiBanRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *(UInt32*)data;
+    if (!total)
+        return;
+
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            World::qishibanScoreSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::qishibanScoreSort.insert(s);
+}
+
+void SendQiShiBanRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 curPage = *(UInt32*)data;
+    if (!curPage)
+        return;
+
+    UInt32 rank = 0;
+    UInt32 myRank = 0;
+    UInt32 myScore = 0;
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        rank++;
+        if (i->player == player)
+        {
+            myScore = i->total;
+            myRank = rank;
+            break;
+        }
+    }
+
+    Stream st(REP::ACT);
+    UInt32 cnt = World::qishibanScoreSort.size();
+    UInt32 totalPage = 0;
+
+    if(0 == cnt)
+        totalPage = 1;
+    else if(0 == cnt % 12)
+        totalPage = cnt / 12;
+    else
+        totalPage = cnt / 12 + 1;
+
+    if(curPage < totalPage)
+        cnt = 12;
+    else if(curPage == totalPage)
+        cnt = cnt - (curPage - 1) * 12;
+
+    st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << myRank << myScore << totalPage << curPage << static_cast<UInt8>(cnt);
+    UInt32 c = 0;
+    UInt32 c1 = 0;
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        /*st << static_cast<UInt8>(c + 1);
+        st << i->player->getName();
+        st << i->total;
+        ++c;
+        if (c >= 10)
+            break;*/
+
+        if((c>=(curPage-1)*12) && (c<=(curPage*12)))
+        {
+            st << static_cast<UInt32>(c + 1);
+            st << i->player->getName();
+            st << i->total;
+            ++c1;
+        }
+        ++c;
+        if(c1 >= 12)
+            break;
+    }
+    st << Stream::eos;
+    player->send(st);
+}
+
 void SendLuckyBagRank(Stream& st)
 {
     using namespace GObject;
@@ -1034,6 +1127,60 @@ void OnRechargeRank ( GameMsgHdr& hdr,  const void* data )
         NETWORK()->Broadcast(st);
     }
 }
+
+/*void OnQiShiBanRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= 10)
+                inrank = true;
+            World::qishibanScoreSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::qishibanScoreSort.insert(s);
+
+    UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        if (!stop)
+            ++myrank;
+
+        if (i->player == player)
+            stop = true;
+
+        ++rank;
+
+        Stream st(REP::ACT);
+        st << static_cast<UInt8>(0x23) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+        i->player->send(st);
+    }
+
+    if (oldrank <= 10 || (!inrank && myrank <= 10))
+    {
+        Stream st;
+        SendQiShiBanRank(st);
+        NETWORK()->Broadcast(st);
+    }
+}*/
 
 void OnLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
 {
@@ -1381,6 +1528,29 @@ void OnSendRechargeRank ( GameMsgHdr& hdr,  const void* data )
     }
 }
 
+/*void OnSendQiShiBanRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+    Stream st;
+    //SendQiShiBanRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::qishibanScoreSort.begin(), e = World::qishibanScoreSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(2) << i->total << static_cast<UInt8>(rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
+}*/
+
 void OnSendLuckyBagRank ( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
@@ -1611,6 +1781,32 @@ void OnReCalcWeekDayRemoveTimer( GameMsgHdr& hdr,  const void* data )
     WORLD()._recalcwd = NULL;
 }
 
+void OnServerWarBossTimer( GameMsgHdr& hdr,  const void* data )
+{
+    UInt8 type = *reinterpret_cast<UInt8*>(const_cast<void *>(data));
+    if(type)    //AddTimer
+        WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
+    else        //RemoveTimer
+    {
+        WORLD().RemoveTimer(WORLD()._swBosstimer);
+        WORLD()._swBosstimer = NULL;
+    }
+}
+
+void OnServerWarResNotify( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct SWResNotify
+    {
+        GObject::Player * peer;
+        bool win;
+    };
+    SWResNotify* notify = reinterpret_cast<SWResNotify*>(const_cast<void *>(data));
+    if(!notify) return;
+
+    GObject::serverWarMgr.notifyChallengeResult(player, notify->peer, notify->win);
+}
+
 void OnTownDeamonResNotify( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -1679,9 +1875,9 @@ inline bool enterTeamArena(GObject::Player* p, UInt32* cnt)
     /*
     if(*cnt > 100)
         return false;
-    */
 
     ++(*cnt);
+    */
     GObject::teamArenaMgr.enterArena(p);
     return true;
 }
@@ -1781,6 +1977,75 @@ void OnDaysRankMsg( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     daysValueRankMsg* msg = reinterpret_cast<daysValueRankMsg*>(const_cast<void*>(data));
     GObject::DaysRank::instance().updateDaysValue(msg); 
+}
+
+void SendQSBState( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    player->QiShiBanState();
+}
+
+void OnSetCFriendInvited( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    UInt64 userId = *reinterpret_cast<UInt64 *>(const_cast<void *>(data));
+    WORLD().SetMemCach_CFriend_Invited(userId);
+}
+
+void OnDelCFriendInvited( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 opt = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
+
+    UInt64 userId = player->getId();
+    if(cfg.merged)
+        userId &= 0x0000ffffffffffull;
+
+    if(opt)
+        WORLD().DelMemCach_CFriend_Invited(userId);
+    else
+        WORLD().DelMemCach_CFriend_InvitedAct(userId);
+}
+
+void OnSendCFriendInvited( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 opt = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
+
+    UInt64 userId = player->getId();
+    if(cfg.merged)
+        userId &= 0x0000ffffffffffull;
+
+    struct CFInvited
+    {
+        UInt8 type;
+        UInt16 invited;
+    } cfData = {0};
+
+    Stream st(REP::CFRIEND);
+    if(opt)
+    {
+        UInt16 invited = WORLD().GetMemCach_CFriend_Invited(userId);
+        st << static_cast<UInt8>(6) << invited;
+
+        cfData.type = opt;
+        cfData.invited = invited;
+    }
+    else
+    {
+        UInt16 invited = WORLD().GetMemCach_CFriend_InvitedAct(userId);
+        st << static_cast<UInt8>(5) << invited;
+
+        cfData.type = opt;
+        cfData.invited = invited;
+    }
+    st << Stream::eos;
+    player->send(st);
+    //只能在发送的时候触发
+    GameMsgHdr hdr1(0x347, player->getThreadId(), player, sizeof(CFInvited));
+    GLOBAL().PushMsg(hdr1, &cfData);
 }
 
 void OnSendClanMemberList( GameMsgHdr& hdr, const void* data )
@@ -1960,6 +2225,23 @@ void OnSendGuangGunRank ( GameMsgHdr& hdr,  const void* data )
         pl->getGGPlayer2()->send(st);
 }
 
+void OnSendOffQQClan ( GameMsgHdr& hdr,  const void* data )
+{
+    struct OnOffQQData 
+	{
+		UInt64 pid;
+		UInt32 clanid;
+	};
+	OnOffQQData * onOffQQ = reinterpret_cast<OnOffQQData*>(const_cast<void *>(data));
+    
+    GObject::Clan *clan = GObject::globalClans[onOffQQ->clanid];
+	GObject::Player * player = GObject::globalPlayers[onOffQQ->pid];
+   
+    if (!clan || !player)
+        return;
+    clan->offQQOpenid(player);
+
+}
 
 void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
 {
@@ -2029,6 +2311,108 @@ void OnGuangGunRank ( GameMsgHdr& hdr,  const void* data )
         }
     }
 */
+}
+void SendHappyFireRank(Stream& st)
+{
+    World::initRCRank();
+    using namespace GObject;
+    st.init(REP::ACTIVE);    //lib待定
+    UInt32 cnt = World::happyFireSort.size();
+    if (cnt > CNT)
+        cnt = CNT;
+    st << static_cast<UInt8>(0x02) << static_cast<UInt8>(5) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSort.end(); i != e; ++i)
+    {
+        if(i->player == NULL)
+            continue;
+        st << i->player->getName();
+        st << i->total;
+        st << static_cast<UInt8>(i->player->getCountry()<<4|(i->player->IsMale()?0:1));
+        ++c;
+        if (c >= CNT)
+            break;
+    }
+    st << Stream::eos;
+}
+void OnHappyFireRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    if(!World::getHappyFireTime())
+        return;
+ 
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= CNT10)
+                inrank = true;
+            World::happyFireSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::happyFireSort.insert(s);
+
+    UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSort.end(); i != e; ++i)
+    {
+       if (!stop)
+            ++myrank;
+
+        if (i->player == player)
+            stop = true;
+
+        ++rank;
+
+        Stream st(REP::ACT);  //lib待定
+        st << static_cast<UInt8>(0x02) << static_cast<UInt8>(5)<< static_cast<UInt8>(2);
+        st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+        i->player->send(st);
+    }
+
+    if (oldrank <= CNT || (!inrank && myrank <= CNT))
+    {
+        Stream st;
+        SendHappyFireRank(st);
+        NETWORK()->Broadcast(st);
+    }
+}
+void OnSendHappyFireRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+    Stream st;
+    SendHappyFireRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(0x02) << static_cast<UInt8>(5) << static_cast<UInt8>(2);
+            st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
 }
 
 #endif // _WORLDINNERMSGHANDLER_H_

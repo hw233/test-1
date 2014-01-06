@@ -37,6 +37,7 @@
 #include "CountryBattle.h"
 #include "Arena.h"
 #include "ArenaTeam.h"
+#include "ArenaServerWar.h"
 #include "GData/NpcGroup.h"
 #include "GData/LootTable.h"
 #include "GData/ExpTable.h"
@@ -530,6 +531,23 @@ namespace GObject
             fprintf(stderr, "LoadTeamPendingPlayers error!\n");
             std::abort();
         }
+		if(!LoadArenaServerWar())
+        {
+            fprintf(stderr, "LoadArenaServerWar error!\n");
+            std::abort();
+        }
+		if(!LoadServerWarBets())
+        {
+            fprintf(stderr, "LoadServerWarBets error!\n");
+            std::abort();
+        }
+
+		DB::gDataDBConnectionMgr->UnInit();
+		if(!loadQiShiBan())
+        {
+            fprintf(stderr, "loadQiShiBan error!\n");
+            std::abort();
+        }
 
         if(!LoadPlayerNamed())
         {
@@ -554,7 +572,13 @@ namespace GObject
             fprintf(stderr, "LoadMarriedLog error!\n");
             std::abort();
         }
-        
+		
+        if(!LoadPlayerModifyMounts())
+        {
+            fprintf(stderr, "LoadPlayerModifyMounts error!\n");
+            std::abort();
+        }
+
         DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -1993,7 +2017,7 @@ namespace GObject
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
         //if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -2108,6 +2132,7 @@ namespace GObject
 			fgt2->setPExp(specfgtobj.practiceExp);
 			fgt2->setCurrentHP(specfgtobj.hp, false);
             fgt2->setAcupoints(specfgtobj.acupoints, false);
+            fgt2->setAcupointsGold(specfgtobj.acupointsgold, false);
 			fgt2->setHalo(fetchHalo(specfgtobj.halo), false);
 			fgt2->setInnateTrump(fetchInnateTrump(specfgtobj.innateTrump), false);
 			fgt2->setFashion(fetchFashion(specfgtobj.fashion), false);
@@ -3502,7 +3527,7 @@ namespace GObject
 
 		UInt32 now = TimeUtil::Now();
 		UInt32 thisDay = TimeUtil::SharpDay(0, now);
-		resetClanData(now);
+		//resetClanData(now);
 
         // ??????Ա
 		lc.prepare("Loading clan players:");
@@ -4835,7 +4860,7 @@ namespace GObject
 			}
 			if (pl == NULL)
 				continue;
-			arena.pushBetFromDB(pl, ab.round, ab.state, ab.group, ab.recieved, ab.pos, ab.tael);
+			arena.pushBetFromDB(pl, ab);
 		}
 		lc.finalize();
 
@@ -5483,7 +5508,7 @@ namespace GObject
         LoadingCounter lc("Loading Fighter xingchen:");
 		DBXingchen dbxc;
         Player* pl = NULL;
-		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3` FROM `fighter_xingchen`", dbxc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `xctCurVal`, `xctMaxVal` FROM `fighter_xingchen`", dbxc) != DB::DB_OK)
 			return false;
 		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -5965,14 +5990,38 @@ namespace GObject
 				continue;
 
             pl->loadSnowInfoFromDB(lover, snow.bind, snow.score);
-            if (snow.bind && lover != NULL)
-                WORLD().UpdateSnowScore(pl, lover);
-
         }
         lc.finalize();
         return true;
     }
 
+    bool GObjectManager::loadQiShiBan()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading QiShiBan");
+        DBQiShiBan qishiban;
+        if(execu->Prepare("SELECT `playerId`, `guankaId`, `score`, `beginTime`, `endTime`, `awardMark` FROM `player_qishiban` ORDER BY `score`", qishiban) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+			if(qishiban.playerId != last_id)
+			{
+				last_id = qishiban.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->loadQiShiBanFromDB(qishiban.score, qishiban.step, qishiban.beginTime, qishiban.endTime, qishiban.awardMark);
+        }
+        lc.finalize();
+        return true;
+    }
 
     bool GObjectManager::loadJobHunter()
     {
@@ -6203,10 +6252,17 @@ namespace GObject
         bool update = false;
         stLBAttrConf& lbAttrConf = GObjectManager::getLBAttrConf();
         std::vector<UInt8> allAttrType = lbAttrConf.attrType;
+
+        if(find(allAttrType.begin(),allAttrType.end(),1) != allAttrType.end())
+            allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),1));
+        if(find(allAttrType.begin(),allAttrType.end(),2) != allAttrType.end())
+            allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),2));
         for(int j = 0; j < 3; ++ j)
         {
             if(lba.type[j] == 0)
                 continue;
+            if(lba.type[j] == 2)
+                lba.type[j] = 1;
 
             if(find(allAttrType.begin(),allAttrType.end(),lba.type[j]) != allAttrType.end())
                 allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),lba.type[j]));
@@ -6215,11 +6271,14 @@ namespace GObject
             {
                 if(lba.type[i] == 0)
                     continue;
+                if(lba.type[i] == 2)
+                    lba.type[i] = 1;
 
                 if(lba.type[i] == lba.type[j])
                 {
                     UInt8 size = allAttrType.size();
                     lba.type[i] = allAttrType[GRND(size)];
+                    update = true;
                 }
             }
         }
@@ -6586,7 +6645,7 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Team Arena Bets");
-		DBTeamArenaBet ab;
+		DBArenaBet ab;
 		if(execu->Prepare("SELECT `id`, `round`, `state`, `group`, `recieved`, `pos`, `tael` FROM `arena_team_bet` ORDER BY `id`", ab)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
@@ -6602,7 +6661,7 @@ namespace GObject
 			}
 			if (pl == NULL)
 				continue;
-			teamArenaMgr.pushBetFromDB(pl, ab.round, ab.state, ab.group, ab.recieved, ab.pos, ab.tael);
+			teamArenaMgr.pushBetFromDB(pl, ab);
 		}
 		lc.finalize();
 
@@ -6637,6 +6696,52 @@ namespace GObject
 		return true;
 	}
 
+	bool GObjectManager::LoadArenaServerWar()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading serverWar players:");
+		DBArenaServerWar dbasw;
+		if(execu->Prepare("SELECT `playerId`, `type`, `pos`, `battlePoint` FROM `arena_serverWar` ORDER BY `playerId`", dbasw) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            serverWarMgr.loadFromDB(dbasw);
+		}
+		lc.finalize();
+		return true;
+	}
+
+	bool GObjectManager::LoadServerWarBets()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading server war Bets");
+		DBArenaBet ab;
+		if(execu->Prepare("SELECT `id`, `round`, `state`, `group`, `recieved`, `pos`, `tael` FROM `arena_serverWar_bet` ORDER BY `id`", ab)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(ab.id != last_id)
+			{
+				last_id = ab.id;
+				pl = globalPlayers[last_id];
+			}
+			if (pl == NULL)
+				continue;
+			serverWarMgr.pushBetFromDB(pl, ab);
+		}
+		lc.finalize();
+
+		return true;
+	}
+
     bool GObjectManager::LoadPlayerNamed()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -6656,6 +6761,7 @@ namespace GObject
 		return true;
 	}
 
+<<<<<<< HEAD
     bool GObjectManager::LoadMarriage()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -6663,11 +6769,21 @@ namespace GObject
 		LoadingCounter lc("Loading marriage:");
 		DBMarriage dbpn;
 		if(execu->Prepare("SELECT `playerid`, `marriage_time`, `prouncement`, `lover_item`, `status` FROM `marriage` ORDER BY `status`", dbpn) != DB::DB_OK)
+=======
+    bool GObjectManager::LoadPlayerModifyMounts()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading player ModifyMount:");
+		DBModifyMount dbmm;
+		if(execu->Prepare("SELECT `id`, `playerId`, `chips` FROM `modify_mount`", dbmm) != DB::DB_OK)
+>>>>>>> 3eede6e29021552e92a6817a4b99ec6d8983907e
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
+<<<<<<< HEAD
 			Player * player = globalPlayers[dbpn.playerid];
 			if(player == NULL)
 				continue;
@@ -6695,11 +6811,26 @@ namespace GObject
 			if(player == NULL)
 				continue;
             gMarryMgr.LoadReplyMarriage(player,obj_player,&dbpn); 
+=======
+            Player * player = globalPlayers[dbmm.playerId];
+            if(dbmm.id <= 0 || !player)
+                continue;
+            ModifyMount * mount = new ModifyMount(dbmm.id, player);
+            if(!mount)
+                continue;
+            StringTokenizer tk(dbmm.chips, ",");
+            for(UInt8 i = 0; i < tk.count() && i < MOUNTCHIP_MAX; ++ i)
+            {
+                mount->setChipFromDB(i, atoi(tk[i].c_str()));
+            }
+            player->addModifyMount(mount, false);
+>>>>>>> 3eede6e29021552e92a6817a4b99ec6d8983907e
         }
 		lc.finalize();
 		return true;
 	}
 
+<<<<<<< HEAD
     bool GObjectManager::LoadMarriedLog()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -6721,5 +6852,7 @@ namespace GObject
 		lc.finalize();
 		return true;
 	}
+=======
+>>>>>>> 3eede6e29021552e92a6817a4b99ec6d8983907e
 }
 

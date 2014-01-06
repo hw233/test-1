@@ -638,6 +638,7 @@ CREATE TABLE `fighter` (
   `trump` varchar(255) NOT NULL,
   `lingbao` varchar(255) NOT NULL DEFAULT '',
   `acupoints` varchar(255) NOT NULL,
+  `acupointsgold` varchar(255) NOT NULL,
   `skill` varchar(255) NOT NULL,
   `citta` varchar(255) NOT NULL,
   `skills` varchar(255) NOT NULL,
@@ -2008,6 +2009,11 @@ CREATE TABLE IF NOT EXISTS `fighter_xingchen` (
     `gem1` smallint(6) unsigned NOT NULL DEFAULT 0,
     `gem2` smallint(6) unsigned NOT NULL DEFAULT 0,
     `gem3` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `gem4` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `gem5` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `gem6` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `xctCurVal` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `xctMaxVal` smallint(6) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY(`fighterId`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2217,6 +2223,27 @@ CREATE TABLE `team_pending_player` (
   PRIMARY KEY (`teamId`,`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `arena_serverWar`;
+CREATE TABLE `arena_serverWar` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `pos` int(10) unsigned NOT NULL DEFAULT '0',
+  `battlepoint` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`playerId`, `type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `arena_serverWar_bet`;
+CREATE TABLE `arena_serverWar_bet` (
+  `id` bigint(20) unsigned NOT NULL,
+  `round` tinyint(3) unsigned NOT NULL,
+  `state` tinyint(3) unsigned NOT NULL,
+  `group` tinyint(3) unsigned NOT NULL,
+  `recieved` tinyint(3) unsigned NOT NULL,
+  `pos` smallint(4) unsigned NOT NULL,
+  `tael` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`id`,`state`,`round`,`group`,`pos`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `player_zhenwei`;
 CREATE TABLE IF NOT EXISTS `player_zhenwei` (
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -2236,6 +2263,17 @@ CREATE TABLE `AirBookData` (
     PRIMARY KEY (`playerId`,`overTime`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `player_qishiban`;
+CREATE TABLE IF NOT EXISTS `player_qishiban` (
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `guankaId` int(10) unsigned NOT NULL DEFAULT '0',
+    `score` int(10) unsigned NOT NULL DEFAULT '0',
+    `beginTime` int(10) unsigned NOT NULL DEFAULT '0',
+    `endTime` int(10) unsigned NOT NULL DEFAULT '0',
+    `awardMark` int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `player_named`;
 CREATE TABLE IF NOT EXISTS `player_named` (
     `serverNo` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2246,4 +2284,48 @@ CREATE TABLE IF NOT EXISTS `player_named` (
     INDEX (`playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `modify_mount`;
+CREATE TABLE IF NOT EXISTS `modify_mount` (
+    `id` int(10) unsigned NOT NULL DEFAULT '0',
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `chips` varchar(255) NOT NULL,
+    PRIMARY KEY (`id`, `playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `marriage` (
+    `playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `marriage_time` int(10) unsigned NOT NULL DEFAULT '0',
+    `prouncement` varchar(255) NOT NULL,
+    `lover_item` varchar(255) NOT NULL,
+    `status` bigint(20) NOT NULL,
+    PRIMARY KEY(`playerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `married_log` (
+    `jh_time` int(10) unsigned NOT NULL DEFAULT '0',
+    `man_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `woman_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `prouncement` varchar(255) NOT NULL,
+    `lover_item` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `marriage_time` int(10) unsigned NOT NULL DEFAULT '0',
+    `replymarriage_time` int(10) unsigned NOT NULL DEFAULT '0',
+    `jy_time` int(10) unsigned NOT NULL DEFAULT '0',
+    `wedding_type` tinyint(3) unsigned NOT NULL DEFAULT  '0',
+    PRIMARY KEY(`jh_time`),
+    unique KEY man_woman_playerid(`man_playerid`,`woman_playerid`),
+    INDEX (`man_playerid`),
+    INDEX (`woman_playerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `marry_log` (
+    `man_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `woman_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `prouncement` varchar(255) NOT NULL,
+    `lover_item` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `marriage_time` int(10) unsigned NOT NULL DEFAULT '0',
+    `replymarriage_time` int(10) unsigned NOT NULL DEFAULT '0',
+    `marriage_buyer` tinyint(3) unsigned NOT NULL DEFAULT  '0',
+    unique KEY man_woman_playerid(`man_playerid`,`woman_playerid`),
+    INDEX (`man_playerid`),
+    INDEX (`woman_playerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
