@@ -82,6 +82,7 @@
 #include "GObject/ClanBoss.h"
 #include "ClanCityBattle.h"
 #include "MoFang.h"
+#include "Marry.h"
 #include "Leaderboard.h"
 
 
@@ -764,6 +765,7 @@ namespace GObject
         m_hf = new HoneyFall(this);
         m_dpData = new DeamonPlayerData();
 		m_moFang = new MoFang(this);
+		m_marriageInfo = new MarriageInfo();
         m_csFlag = 0;
         m_spreadInterval = 0;
         m_spreadCoolTime = 0;

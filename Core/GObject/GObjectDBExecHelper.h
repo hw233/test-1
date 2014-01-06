@@ -1400,6 +1400,41 @@ struct DBPlayerNamed
     std::string name;
 };
 
+struct DBMarriage
+{
+    UInt64 playerid;
+    UInt32 marriage_time;
+    std::string pronouncement;
+    UInt8 lover_item;
+    UInt64 status;
+};
+
+struct DBReplyMarriage
+{
+    UInt64 man_playerid;
+    UInt64 woman_playerid;
+    UInt32 jy_time;
+    UInt32 jh_time;
+    UInt8 wedding_type;
+    UInt8 wedding_buyer;
+    UInt8 marriage_buyer;
+    std::string pronouncement;
+    UInt8 lover_item;
+};
+
+struct DBMarriedLog 
+{
+    UInt32 jh_time;
+    UInt64 man_playerid;
+    UInt64 woman_playerid;
+    std::string pronouncement;
+    UInt8 lover_item;
+    UInt32 marriage_time;
+    UInt32 replymarriage_time;
+    UInt32 jy_time;
+    UInt8 wedding_type;
+};
+
 }
 
 namespace DB {
@@ -3176,9 +3211,51 @@ SPECIALDEF(3)
     (
     UInt16, serverNo,
     UInt64, id,
-    std::string,name 
+    std::string, name 
     )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::DBMarriage)
+SPECIALDEF(5)
+    (
+    UInt64, playerid,
+    UInt32, marriage_time,
+    std::string, pronouncement,
+    UInt8, lover_item,
+    UInt64, status
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBReplyMarriage)
+SPECIALDEF(9)
+    (
+    UInt64, man_playerid,
+    UInt64, woman_playerid,
+    UInt32, jy_time,
+    UInt32, jh_time,
+    UInt8, wedding_type,
+    UInt8, wedding_buyer,
+    UInt8, marriage_buyer,
+    std::string, pronouncement,
+    UInt8, lover_item
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBMarriedLog)
+SPECIALDEF(9)
+    (
+    UInt32, jh_time,
+    UInt64, man_playerid,
+    UInt64, woman_playerid,
+    std::string, pronouncement,
+    UInt8, lover_item,
+    UInt32, marriage_time,
+    UInt32, replymarriage_time,
+    UInt32, jy_time,
+    UInt8, wedding_type
+    )
+SPECIALEND()
+
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

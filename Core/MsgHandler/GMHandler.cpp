@@ -55,6 +55,7 @@
 #include "Memcached.h"
 #include "Version.h"
 #include "GObject/FairySpar.h"
+#include "GObject/Marry.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -290,6 +291,9 @@ GMHandler::GMHandler()
     Reg(2, "getkey", &GMHandler::OnGetKey);
     Reg(3, "addshlvl", &GMHandler::OnAddSHLvl);
     Reg(3, "playermsg", &GMHandler::OnPlayerMsg);
+    Reg(3, "clmarry", &GMHandler::OnCleanMarry);
+    Reg(3, "clmarrylist", &GMHandler::OnCleanMarryList);
+    Reg(3, "setmarry", &GMHandler::OnSetMarryStatus);
 
     _printMsgPlayer = NULL;
 }
@@ -4635,5 +4639,26 @@ void GMHandler::OnPlayerMsg(GObject::Player* player, std::vector<std::string>& a
 	GObject::Player * pl = GObject::globalPlayers[playerId];
     _printMsgPlayer = pl;
 }
+
+void GMHandler::OnCleanMarry(GObject::Player* player, std::vector<std::string>& args)
+{
+    player->SetVar(VAR_MARRY_STATUS,0);
+    player->SetVar(VAR_CANCEL_APPOINTMENT,0);
+    GObject::gMarryMgr.cleanPlayerData(player); 
+}
+
+void GMHandler::OnCleanMarryList(GObject::Player* player, std::vector<std::string>& args)
+{
+    GObject::gMarryMgr.cleanMemmory(); 
+}
+
+void GMHandler::OnSetMarryStatus(GObject::Player* player, std::vector<std::string>& args)
+{
+    GObject::gMarryMgr.SetMarryStatus(player); 
+}
+
+
+
+
 
 

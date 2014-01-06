@@ -359,6 +359,9 @@ namespace GObject
 	    static bool LoadTeamArenaBets();
 	    static bool LoadTeamPendingPlayers();
 	    static bool LoadPlayerNamed();
+	    static bool LoadMarriage();
+	    static bool LoadReplyMarriage();
+	    static bool LoadMarriedLog();
         static bool loadZhenwei();
 
         static bool addGM(UInt64 id, UInt8 lvl);

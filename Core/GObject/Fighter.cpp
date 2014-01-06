@@ -2008,7 +2008,14 @@ void Fighter::rebuildEquipAttr()
         _owner->GetMoFang()->addKYAttr(_attrExtraEquip);
     }
 
-	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
+    if(_owner && !isPet())
+    {
+        //结婚加的buffer
+        if(_owner->GetVar(GObject::VAR_MARRY_STATUS) == 5 || _owner->GetVar(GObject::VAR_MARRY_STATUS) == 6)
+            GObject::gMarryMgr.addMarriedAttr(_owner,_attrExtraEquip);
+    }
+	
+    _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 
 void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt)

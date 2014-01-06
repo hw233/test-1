@@ -283,6 +283,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
          */
         VAR_GAMEBOX_DAILY = 221,
         VAR_GAMEBOX_NEW = 222,
+        VAR_MARRY_STATUS = 223,//结婚状态
+        VAR_CANCEL_APPOINTMENT = 223,//取消婚礼预约
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
@@ -1094,6 +1096,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_NOV_LOGIN_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_GAMEBOX_DAILY, CYCLE_DAY);
             REGISTER_VAR(VAR_GAMEBOX_NEW, CYCLE_NONE);
+            REGISTER_VAR(VAR_MARRY_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_CANCEL_APPOINTMENT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

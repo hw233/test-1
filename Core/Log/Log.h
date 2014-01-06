@@ -132,6 +132,9 @@ enum PurchaseType
     ArenaTeamConsume            = 121, //仙界至尊消费
     GuangGun                    = 122, //光棍
     Fund                        = 123, //基金消费
+    ZhengHun                    = 124, //征婚
+    JieHun                      = 125, //结婚 
+    LiHun                       = 126, //离婚 
     //繁体私有占150～200
 };
 
@@ -204,6 +207,7 @@ enum MailItemType
 	DismissXingchen,
     NewHeroIslandAward,
     ArenaAward,
+    BuChangMarry,
 };
 enum ItemFrom
 {
