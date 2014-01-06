@@ -554,13 +554,13 @@ namespace GObject
             fprintf(stderr, "LoadPlayerNamed error!\n");
             std::abort();
         }
-
+#if 0
         if(!LoadSevenSoul())
         {
             fprintf(stderr, "LoadSevenSoul error!\n");
             std::abort();
         }
-		
+#endif
         if(!LoadPlayerModifyMounts())
         {
             fprintf(stderr, "LoadPlayerModifyMounts error!\n");

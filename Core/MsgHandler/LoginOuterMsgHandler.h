@@ -1373,13 +1373,29 @@ inline bool player_enum_setvar(GObject::Player* p, void* msg)
     {
         UInt32 var;
         UInt32 value;
+        UInt8 type;
     };
 
     Msg* _msg = (Msg*)msg;
-    if(_msg->value == 0)
-        p->DelVar(_msg->var);
+    UInt32 var = _msg->var;
+    UInt32 value = _msg->value;
+    UInt8 type = _msg->type;
+    UInt32 v = p->GetVar(var); 
+    UInt32 value1 = 0 ;
+    if(type == 1 )
+        value1 = value ;
+    else if(type ==2)
+        value1 = value + v; 
+    else if(type == 3 )
+        value1 = value | v ;
+    else if(type == 4 )
+        value1 = value & v;
+    else if(type == 5)
+        value1 = ((v > value)?(v-value):0);
+    if(value1 == 0)
+        p->DelVar(var);
     else
-        p->SetVar(_msg->var,_msg->value);
+        p->SetVar(var,value1);
     return true;
 }
 
@@ -3868,15 +3884,17 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt32 var = 0;
     UInt32 value = 0;
+    UInt8 type = 0 ;
     std::string playerIds;
     CHKKEY();
     br >> var;
     br >> value;
+    br >> type;
     br>>playerIds;
    
 //开启起封交易客户平台测试
     
-#define TEST_TABLE
+//#define TEST_TABLE
 #ifdef TEST_TABLE
 #pragma pack(1) 
     struct test
@@ -3884,6 +3902,7 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
         UInt8 blamk[36];
         UInt32 var;
         UInt32 value;
+        UInt8 type ;
         char msg[1024];
     };
 #pragma pack()
@@ -3891,6 +3910,7 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
     var = _test->var;
     value = _test->value;
     playerIds = _test->msg;
+    type = _test->type;
 #endif
 #undef TEST_TABLE 
 
@@ -3899,6 +3919,7 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
+
         UInt64 pid = atoll(playerId.c_str());
         if(pid == 0)
         {
@@ -3906,19 +3927,33 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
             {
                 UInt32 var;
                 UInt32 value;
+                UInt8 type;
             } _msg;
             _msg.var = var;
             _msg.value = value;
+            _msg.type = type;
             GObject::globalPlayers.enumerate(player_enum_setvar, (void*)&_msg);
             break;
         }
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
         {
-            if(value==0)
+            UInt32 v = pl->GetVar(var); 
+            UInt32 value1 = 0 ;
+            if(type == 1 )
+                value1 = value ;
+            else if(type == 2)
+                value1 = value + v; 
+            else if(type == 3 )
+                value1 = value | v ;
+            else if(type == 4 )
+                value1 = value & v;
+            else if(type == 5)
+                value1 = ((v > value)?(v-value):0);
+            if(value1==0)
                 pl->DelVar(var);
             else
-                pl->SetVar(var,value);
+                pl->SetVar(var,value1);
         }
         playerId = GetNextSection(playerIds, ',');
     }
