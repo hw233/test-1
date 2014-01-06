@@ -137,6 +137,8 @@ enum PurchaseType
     TuPoJieXian                 = 126, //星辰图突破界限
     ServerWarConsume            = 127, //仙界传奇消费
     SearchOldMan                = 129, //捉迷藏活动包打听
+    MarryYanHua                 = 130, //结婚送烟花
+    MarryBaiHe                  = 131, //结婚送百合花
     RestStep                    = 1001, //七石板重置
     //繁体私有占150～200
 };

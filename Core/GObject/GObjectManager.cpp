@@ -560,6 +560,12 @@ namespace GObject
             fprintf(stderr, "LoadSevenSoul error!\n");
             std::abort();
         }
+		
+        if(!LoadPlayerModifyMounts())
+        {
+            fprintf(stderr, "LoadPlayerModifyMounts error!\n");
+            std::abort();
+        }
 
         DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -6767,6 +6773,35 @@ namespace GObject
             if(!pet)
                 pet->loadPlayerSevenSoul(dbvalue.soulId, dbvalue.soulLevel, dbvalue.skillIndex);
 		}
+		lc.finalize();
+		return true;
+    }
+
+    bool GObjectManager::LoadPlayerModifyMounts()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading player ModifyMount:");
+		DBModifyMount dbmm;
+		if(execu->Prepare("SELECT `id`, `playerId`, `chips` FROM `modify_mount`", dbmm) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            Player * player = globalPlayers[dbmm.playerId];
+            if(dbmm.id <= 0 || !player)
+                continue;
+            ModifyMount * mount = new ModifyMount(dbmm.id, player);
+            if(!mount)
+                continue;
+            StringTokenizer tk(dbmm.chips, ",");
+            for(UInt8 i = 0; i < tk.count() && i < MOUNTCHIP_MAX; ++ i)
+            {
+                mount->setChipFromDB(i, atoi(tk[i].c_str()));
+            }
+            player->addModifyMount(mount, false);
+        }
 		lc.finalize();
 		return true;
 	}

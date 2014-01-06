@@ -49,6 +49,7 @@
 #include "Common/Itoa.h"
 #include "Server/SysMsg.h"
 #include "Arena.h"
+#include "MarryBoard.h"  //婚礼进行时
 #include "ArenaTeam.h"
 #include "ArenaServerWar.h"
 #include "Tianjie.h"
@@ -416,42 +417,17 @@ bool enum_midnight(void * ptr, void* next)
         pl->sendRNR(nextday);
 
     if (pl->GetVar(VAR_RECHARGE_TOTAL) && (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 31)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 1)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 2)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 3)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -473,38 +449,8 @@ bool enum_midnight(void * ptr, void* next)
 
     if (pl->GetVar(VAR_RECHARGE_CONDCNT) &&
         (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 25)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 1)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 8)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 15)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 22)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 29)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 6)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 20)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 27)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 3)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 10)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 17)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 24)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 31)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 7)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 14)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 21)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 28)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 12)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 19)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 26)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 2)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 9)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 16)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 23)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 30)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 14)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 21)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 28)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
         ))
     {
 #if 0
@@ -1277,41 +1223,17 @@ void World::World_Midnight_Check( World * world )
     UInt32 nextday = curtime + 30;
 
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 31)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 1)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 2)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 3)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1500,18 +1422,20 @@ void World::World_OldMan_Refresh(void *)
         return ;
     UInt32 now = TimeUtil::Now();
     UInt32 time = now - TimeUtil::SharpDay(0, now);
+    if(_oldMan._time < 8*3600  ) 
+        _oldMan._time = 8*3600;
   //  std::cout<<time-8*3600+300<<std::endl;
     if(time >= 8*3600 - 300 - 2 && time < 8*3600 - 300 +3 )
     {
     //    std::cout<<"即将出现"<<std::endl;
         SYSMSG_BROADCASTV(575); 
     }
-    else if ( time < 7 *3600  )
+    else if ( time < (7 *3600 + 50 * 60 ) )
     {
       //  std::cout<<"End"<<std::endl;
         return ;
     }
-    else if(time > 20*3600 + 5)
+    else if(time > 20*3600 )
     {
        if(!_oldMan._spot) 
            return ;
@@ -1526,12 +1450,13 @@ void World::World_OldMan_Refresh(void *)
        GLOBAL().PushMsg(hdr1, &mapNpc);
        _oldMan._loc = 0;
        _oldMan._spot = 0 ;
+       _oldMan._time = 0;
     }
-    else if( (time%3600) < 3 || (time%3600)>= 3600 -2 )
+    else if( time > _oldMan._time )
    // else if ((time%600) < 3 || (time%600)>= 600 -2)    //测试
     {
         UInt16 spot = GetRandomSpot();
-    //        std::cout<<"ChangeTo:"<<spot<<std::endl;
+        //std::cout<<"ChangeTo:"<<spot<<std::endl;
         if(!spot)
             return ;
         if(_oldMan._spot == 0)
@@ -1563,6 +1488,7 @@ void World::World_OldMan_Refresh(void *)
         mo.m_ActionType = 0;
         GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
         GLOBAL().PushMsg(hdr1, &mo);
+        _oldMan._time = (time/3600+1)*3600; 
     }
     else if ((time%600) < 3 || (time%600)>= 600 -2)     
    // else if ((time%180) < 3 || (time%180)>= 180 -2)         //测试
@@ -1576,6 +1502,21 @@ void World::World_OldMan_Refresh(void *)
 void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
+}
+void World::CreateMarryBoard(UInt64 man , UInt64 woman ,UInt8 type,UInt32 time )
+{
+//   if(time == 0)
+  //      time = TimeUtil::SharpDayT(0,TimeUtil::Now()) + 14* 3600 ;
+   Player * pman = GObject::globalPlayers[man]; 
+   Player * pwoman = GObject::globalPlayers[woman]; 
+   if(pman==NULL || pwoman == NULL)
+       return ;
+   if(GObject::MarryBoard::instance().CreateMarry(pman,pwoman,type,time))
+       GObject::MarryBoard::instance()._marryBoardTimer = AddTimer(2 * 1000, World_MarryBoard_Refresh, static_cast<void*>(NULL));
+}
+void World::World_MarryBoard_Refresh(void *)
+{
+    GObject::MarryBoard::instance().MarryBoard_Timer(); 
 }
 void World::DaysRank_Refresh(void*)
 {
@@ -3897,7 +3838,7 @@ void World::SendHappyFireAward()
 {
     World::initRCRank();
     int pos = 0;
-    UInt8 type =0;
+    UInt32 type =0;
     static MailPackage::MailItem s_item[][4] = {
         {{515,30},{503,30},{509,25},{134,30}},
         {{515,25},{503,25},{509,20},{134,25}},
@@ -3943,7 +3884,7 @@ void World::SendHappyFireAward()
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
             if(mail)
             {
-                mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
+                mailPackageManager.push(mail->id, s_item[type-1], 4, true);
                 if(pos ==1)
                     mailPackageManager.push(mail->id, &card, 1, true);
             }

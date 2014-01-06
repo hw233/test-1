@@ -201,6 +201,7 @@ private:
     void OnDragonKingAct(GObject::Player *player, std::vector<std::string>& args);
     void OnFairyPetGM(GObject::Player *player, std::vector<std::string>& args);
     void OnSurnameleg(GObject::Player *player, std::vector<std::string>& args);
+    void OnCreateMarryBoard(GObject::Player *player, std::vector<std::string>& args);
     void OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& args);
     void OnSendMsg(GObject::Player *player, std::vector<std::string>& args);
     void OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args);

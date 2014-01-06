@@ -407,6 +407,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_MAP_INDEX = 417, //地图索引
         VAR_FEAST_LOGIN_AWARD_PER_DAY = 418, //中秋节登陆送月饼
         VAR_TJ_AUTO_FRONTMAP_END_TIME = 419,
+
+        VAR_MOUNT_LEVEL = 420,  //铸剑等级
         //421-430 for suntao
         VAR_FOOLS_DAY_INFO  = 421,  //愚公移山答题信息(0位表示失败,1-30位表示题目id及是否答对,31位表示等级限制[0:70级以上 1:70级以下])
         VAR_FOOLS_DAY_TIME  = 422,  //愚公移山答题开始时间
@@ -419,6 +421,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
 
         VAR_SERVERWAR_JIJIANTAI = 428,  //跨服服战祭剑台 1byte步数,2byte内外圈,3和4byte道具id
         VAR_SERVERWAR_JIJIANTAI1 = 429,  //跨服服战祭剑台 1byte每人祭剑的次数,2byte成功完成的祭剑次数 3byte宝箱开启情况
+
+         VAR_MOUNT_EXP = 430,   //铸剑经验总值
 
         //431-440 for yijian
         VAR_LONGYUAN_GOT = 431,  //龙元风髓领取标志
@@ -597,7 +601,14 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_YEARHAPPY_VALUE = 651,       //累计欢乐值
         VAR_YEARHAPPY_DAYVALUE_AWARD = 652,       //每日欢乐值奖励 
         VAR_YEARHAPPY_LEFTVALUE = 653,       //每日剩余欢乐值 
-        //660-760 for lijr
+        //婚礼进行系统
+        VAR_MARRYBOARD_LIVELY  = 654,       //个人热闹值
+        VAR_MARRYBOARD3  = 655,             //吃宴席的盘数 0表示未入席 1-10表示吃了 0-9盘
+        VAR_MARRYBOARD2_NUM  = 656,             // 表示答题号
+        VAR_MARRYBOARD2_ANS  = 657,             // 表示当前答案 
+        VAR_MARRYBOARD4_TIME = 658,             //表示婚礼第三阶段吃喜筵第四阶段驱赶时间
+        VAR_MARRYBOARD3_KEY  = 659,
+        //660-680 for lijr
         VAR_CHRISTMAS_PRESENT = 660,    //圣诞礼物——麋鹿之角
         VAR_QT_AWARD_MARK = 661,        //QT奖励领取
         VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE = 662,    //七石板每期最高积分
@@ -605,6 +616,11 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_QT_REGIST_NUM = 664,        //QT月签到次数
         VAR_QT_SPECIAL_MARK = 665,      //QT记录12月份默认加6天签到次数
         VAR_QT_REGIST_MARK = 666,       //QT月签到标志
+
+        //681 - 700 for lb
+        VAR_MARRYBOARD_YANHUA = 681,          //烟花积分
+        VAR_3366_RECHARGE = 682,       //空间充值 
+        VAR_3366_RECHARGE_AWARD = 683,       //空间充值奖励领取
         VAR_MAX,
     };
 
@@ -971,6 +987,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_TEAMARENA_INSPIRE, CYCLE_NONE);
             REGISTER_VAR(VAR_SERVERWAR_JIJIANTAI, CYCLE_WEEK);
             REGISTER_VAR(VAR_SERVERWAR_JIJIANTAI1, CYCLE_WEEK);
+            REGISTER_VAR(VAR_MOUNT_EXP, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TOWER_LOGIN, CYCLE_DAY);
             REGISTER_VAR(VAR_TOWER_LEVEL, CYCLE_NONE);
@@ -1041,6 +1058,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_MAP_INDEX, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_LOGIN_AWARD_PER_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_TJ_AUTO_FRONTMAP_END_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_MOUNT_LEVEL, CYCLE_NONE);
 
             REGISTER_VAR(VAR_FOOLS_DAY_INFO, CYCLE_DAY);
             REGISTER_VAR(VAR_FOOLS_DAY_TIME, CYCLE_DAY);
@@ -1152,6 +1170,11 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_YEARHAPPY_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_YEARHAPPY_LEFTVALUE, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD_LIVELY, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD3, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD2_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD2_ANS, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD4_TIME, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

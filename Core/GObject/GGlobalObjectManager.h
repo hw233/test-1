@@ -114,6 +114,17 @@ public:
 				return;
 		}
 	}
+	template<typename _CBT, typename _PT , typename _PT2>
+	void enumerate(_CBT cb, _PT param , _PT2 param2)
+	{
+		Mutex::ScopedLock lk(_objMutex);
+		typename std::unordered_map<_VK, _V * >::iterator it;
+		for(it = _objs.begin(); it != _objs.end(); ++ it)
+		{
+			if(!cb(it->second, param,param2))
+				return;
+		}
+	}
 
     void reset()
     {

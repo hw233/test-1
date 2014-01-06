@@ -2284,3 +2284,21 @@ CREATE TABLE IF NOT EXISTS `player_named` (
     INDEX (`playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `modify_mount`;
+CREATE TABLE IF NOT EXISTS `modify_mount` (
+    `id` int(10) unsigned NOT NULL DEFAULT '0',
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `chips` varchar(255) NOT NULL,
+    PRIMARY KEY (`id`, `playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `player_sevensoul`;
+CREATE TABLE IF NOT EXISTS `player_sevensoul` (
+    `playerId` bigint(20) unsigned NOT NULL,
+    `petId` int(10) unsigned NOT NULL,
+    `soulId` tinyint(3) unsigned NOT NULL,
+    `soulLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `skillIndex` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`playerId`, `petId`, `soulId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

@@ -329,6 +329,9 @@ namespace Script
         CLASS_DEF(Player, GetMoFang);
         CLASS_DEF(Player, addClanProfferFromItem);
         CLASS_DEF(Player, AddYearHappyValue);
+        CLASS_DEF(Player, hasMountChip);
+        CLASS_DEF(Player, addMountChip);
+        CLASS_DEF(Player, addMountFromItem);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);
@@ -1772,6 +1775,10 @@ namespace Script
     UInt8 GameActionLua::getAnswerInFoolsDay(UInt8 qid, UInt8 type)
     {
 		return Call<UInt8>("getAnswerInFoolsDay", qid, type);
+    }
+    UInt8 GameActionLua::getAnswerInMarryBoard(UInt8 id)
+    {
+		return Call<UInt8>("getAnswerInMarryBoard", id);
     }
 
     void GameActionLua::getAwardInFoolsDay(Player* player, UInt8 startId, UInt8 endId)

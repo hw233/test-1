@@ -57,6 +57,7 @@ MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_OP, OnArenaOpReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVERWAR_ARENA_OP, OnArenaWarOpReq);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq);
+MSG_REG_2(GameMsgHdr, REQ::MARRYBOARD, OnMarryBard);
 
 MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);
 
@@ -91,6 +92,7 @@ MSG_REG_2(ServerWarMsgHdr, 0x126, OnServerWarBattleReport);
 MSG_REG_2(ServerWarMsgHdr, 0x127, OnServerWarSupport);
 MSG_REG_2(ServerWarMsgHdr, 0x128, OnServerWarBattlePoint);
 MSG_REG_2(ServerWarMsgHdr, 0x129, OnServerWarLeaderBoard);
+MSG_REG_2(ServerWarMsgHdr, 0x130, OnServerRechargeRank);
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
@@ -184,6 +186,18 @@ MSG_REG_2(GameMsgHdr, 0x1DC, SendQSBState);
 MSG_REG_2(GameMsgHdr, 0x1DD, OnSetCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DE, OnDelCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DF, OnSendCFriendInvited);
+
+//FB占位(0x1E0~0x1E9),简体千万别使用
+//0x1E0
+//0x1E1
+//0x1E2
+//0x1E3
+//0x1E4
+//0x1E5
+//0x1E6
+//0x1E7
+//0x1E8
+//0x1E9
 
 MSG_REG_2(GameMsgHdr, 0x1EA, OnServerWarResNotify);
 MSG_REG_2(GameMsgHdr, 0x1EB, OnServerWarBossTimer);

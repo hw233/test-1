@@ -1422,6 +1422,13 @@ struct DBSevenSoul
     UInt8 skillIndex;
 };
 
+struct DBModifyMount
+{
+    UInt8 id;
+    UInt64 playerId;
+    std::string chips;
+};
+
 }
 
 namespace DB {
@@ -3225,6 +3232,15 @@ SPECIALDEF(5)
     UInt8, soulId,
     UInt8, soulLevel,
     UInt8, skillIndex
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBModifyMount)
+SPECIALDEF(3)
+    (
+    UInt8, id,
+    UInt64, playerId,
+    std::string, chips
     )
 SPECIALEND()
 

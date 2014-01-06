@@ -641,6 +641,25 @@ struct DBTeamArenaInspireConfig
     float actionP;
 };
 
+struct DBRideConfig
+{
+    UInt8 id;
+    std::string name;
+    UInt32 itemId;
+    std::string chips;
+    UInt32 propId;
+};
+
+struct DBRideUpgradeCfg
+{
+    UInt16 level;
+    std::string name;
+    UInt8 lvLimit;
+    UInt32 singleCost;
+    UInt32 lvExp;
+    float rate;
+};
+
 struct DBKeyinConfig
 {
     UInt8 keyinId;
@@ -1511,6 +1530,29 @@ SPECIALDEF(4)
     std::string, skillstr,
 	UInt8, condionvalue
     )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBRideConfig)
+SPECIALDEF(5)
+	(
+    UInt8, id,
+    std::string, name,
+    UInt32, itemId,
+    std::string, chips,
+    UInt32, propId
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBRideUpgradeCfg)
+SPECIALDEF(6)
+	(
+    UInt16, level,
+    std::string, name,
+    UInt8, lvLimit,
+    UInt32, singleCost,
+    UInt32, lvExp,
+    float, rate
+	)
 SPECIALEND()
 
 }

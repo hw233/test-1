@@ -16,6 +16,7 @@
 #include "GObject/Fighter.h"
 #include "GObject/Clan.h"
 #include "GObject/Country.h"
+#include "GObject/MarryBoard.h"
 #include "GObject/ClanManager.h"
 #include "GObject/ClanBattle.h"
 #include "GObject/ClanManager.h"
@@ -298,6 +299,7 @@ GMHandler::GMHandler()
     Reg(3, "addshlvl", &GMHandler::OnAddSHLvl);
     Reg(3, "playermsg", &GMHandler::OnPlayerMsg);
     Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
+    Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
 
     _printMsgPlayer = NULL;
 }
@@ -713,6 +715,7 @@ void GMHandler::OnAddVar( GObject::Player * player, std::vector<std::string>& ar
 		UInt32 value = atoi(args[1].c_str());
         UInt32 num = player->GetVar(var);
 		player->SetVar(var,num+value);
+        GObject::MarryBoard::instance()._YHlively = value ; 
 	}
 }
 void GMHandler::OnSetVar( GObject::Player * player, std::vector<std::string>& args )
@@ -3989,8 +3992,21 @@ void GMHandler::OnSaveGoldAct(GObject::Player *player, std::vector<std::string>&
             player->SetVar(VAR_SAVEGOLD_SET_TIME, TimeUtil::Now() - 7*86400-10);
         }
         break;
+    case 4:
+        {
+            UInt32 value = atoi(args[1].c_str());
+            IncommingInfo ii(InFromTopUp, 0, 0);
+            for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+            {
+                UInt32 val = uRand(value) + 1;
+                it->second->getGold(val, &ii);
+                it->second->addTotalRecharge(val);
+            }
+        }
+        break;
     }
-    player->sendSaveGoldAct();
+    if(World::getSaveGoldAct())
+        player->sendSaveGoldAct();
 }
 
 void GMHandler::OnLingbao(GObject::Player * player, std::vector<std::string>& args)
@@ -4476,6 +4492,17 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_YEARHAPPY_RANK_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
+        case 23:
+            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::Now() + 86400*15);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 24:
+            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, 0);
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
     }
 }
 
@@ -4925,4 +4952,20 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
 #undef TEST_TABLE
 }
 
-
+void GMHandler::OnCreateMarryBoard(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() !=3 )
+        return ;
+	char * endptr;
+	UInt64 playerId1 = strtoull(args[0].c_str(), &endptr, 10);
+	UInt64 playerId2 = strtoull(args[1].c_str(), &endptr, 10);
+    UInt8 type = atoi(args[2].c_str());
+    UInt32 now = TimeUtil::Now();
+    if(type > 1 && type < 4 )
+    {
+        WORLD().CreateMarryBoard(playerId1,playerId2,type,now + 1860);
+        GObject::MarryBoard::instance().SetQuestionOnMarryBoard();
+    }
+    else 
+        GObject::MarryBoard::instance().resetData();
+}

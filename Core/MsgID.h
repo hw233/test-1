@@ -139,8 +139,8 @@ namespace REQ
     const UInt8 MAP_LOCATE          = 0xA0;// 0x51
     /**地图传送 */
     const UInt8 MAP_TRANSPORT       = 0xA1;// 0x52
-    /**进入离开通天塔 */
-    const UInt8 BABEL_JOIN          = 0xAA;// 0x58
+    /**坐骑系统 */
+    const UInt8 MODIFY_MOUNT         = 0xAA;// 0x58
     /**请求通天塔信息 */
     const UInt8 BABEL_UPDATE        = 0xAB;// 0x59
     /**开始通天塔战斗 */
@@ -181,6 +181,8 @@ namespace REQ
     const UInt8 LANCHCHALLENGE      = 0x72;
     /**回复切磋 */
     const UInt8 REQUESTCHALLENGE    = 0x73;
+    /**结婚面板*/
+    const UInt8 MARRYBOARD          = 0x74;
     /**战斗退出 */
     const UInt8 FIGHT_EXIT          = 0x9C;// 0x77
     /**帮派战 */
@@ -519,7 +521,7 @@ namespace REP
     const UInt8 MAP_TRANSPORT_UPDATE= 0xA2;// 0x53
     const UInt8 MAP_SAMPLEUSER      = 0xA3;// 0x54
     const UInt8 MAP_POINT_JOIN      = 0xA4;// 0x55
-    const UInt8 COPY_JOIN           = 0xAA;// 0x58
+    const UInt8 MODIFY_MOUNT        = 0xAA;// 0x58
     const UInt8 COPY_DATA_UPDATE    = 0xAB;// 0x59
     const UInt8 COPY_FIGHT_RESULT   = 0xAC;// 0x5A
     const UInt8 COPY_AUTO_FIGHT     = 0xAD;// 0x5B
@@ -541,6 +543,7 @@ namespace REP
 
     const UInt8 LANCHCHALLENGE      = 0x72;
     const UInt8 REQUESTCHALLENGE    = 0x73;
+    const UInt8 MARRYBOARD          = 0x74;
     const UInt8 CLAN_TECH           = 0x78;
     const UInt8 CLAN_BATTLE         = 0x79;
     const UInt8 CLAN_OPEN           = 0x7A;
@@ -806,6 +809,7 @@ namespace SPEQ
     const UInt16 GETQQCLANTALK       = 0x14C;// 接收QQ群聊天记录
     const UInt16 SETVAR              = 0x14D;// 设置VAR
     const UInt16 VIAPLAYERINFO       = 0x14E;// 查询导入玩家信息
+    const UInt16 SETMARRYBOARD          = 0x14F;// 设置婚礼 
 }
 
 namespace SPEP
@@ -873,7 +877,8 @@ namespace SPEP
     const UInt8 OFFQQOPENID         = 0x4B;// 解除QQ群绑定 
     const UInt8 GETQQCLANTALK       = 0x4C;// 接收QQ群聊天记录
     const UInt8 SETVAR              = 0x4D;//设置var
-    const UInt16 VIAPLAYERINFO      = 0x4E;// 查询导入玩家信息
+    const UInt8 VIAPLAYERINFO       = 0x4E;// 查询导入玩家信息
+    const UInt8 SETMARRYBOARD       = 0x4F;//设置婚礼
 
 }
 
@@ -896,6 +901,7 @@ namespace SERVERWARREQ
     const UInt8 COMMIT_LINEUP       = 0x03;
     const UInt8 BET                 = 0x04;
     const UInt8 BATTLE_REPORT       = 0x05;
+    const UInt8 RECHARGE_ACTIVE     = 0x06;
     
     const UInt8 ARENA_TO_SERVERWAR  = 0x10;     //"仙界第一/仙界至尊"TCP连接"仙界传奇" 占用
 }

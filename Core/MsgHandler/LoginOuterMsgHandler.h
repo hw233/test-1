@@ -20,6 +20,7 @@
 #include "GObject/Mail.h"
 #include "GObject/Prepaid.h"
 #include "GObject/Player.h"
+#include "GObject/MarryBoard.h"
 #include "GObject/Fighter.h"
 #include "GObject/Package.h"
 #include "GObject/Clan.h"
@@ -354,6 +355,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         StringTokenizer st(ul._para, ":");
         switch (st.count())
         {
+            case 6:
             case 5:
                 jinquan = st[4];
             case 4:
@@ -3356,6 +3358,12 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_YEARHAPPY_VALUE, 0);
             }
             break;
+        case 15:
+            {
+                pl->SetVar(GObject::VAR_3366_RECHARGE, 0);
+                pl->SetVar(GObject::VAR_3366_RECHARGE_AWARD, 0);
+            }
+            break;
         default:
             return false;
     }
@@ -3799,6 +3807,17 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_END, end);
         ret = 1 ;
     }
+    else if (type == 15 && begin <= end )
+    {
+        if(GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 15);
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_3366_RECHARGE_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_3366_RECHARGE_END, end);
+        ret = 1 ;
+    }
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
@@ -3970,6 +3989,25 @@ void ViaPlayerInfoFromBs(LoginMsgHdr& hdr, const void* data)
     st << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
-
+void SetMarryBoard(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt64 manId = 0;
+    br >> manId;
+    UInt64 womanId = 0;
+    br >> womanId;
+    UInt8 type = 0 ;
+    br >> type ;
+    UInt32 time = 0;
+    br >> time;
+    if(type > 0 && type < 4)
+        WORLD().CreateMarryBoard(manId,womanId,type,time);
+    else 
+        GObject::MarryBoard::instance().resetData();
+    Stream st(SPEP::SETMARRYBOARD);
+    st << static_cast<UInt8>(1)<< Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
 #endif // _LOGINOUTERMSGHANDLER_H_
 

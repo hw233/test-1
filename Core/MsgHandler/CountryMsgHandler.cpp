@@ -27,6 +27,7 @@ MSG_REG(GameMsgHdr, OnFighterDismissReq);
 MSG_REG(GameMsgHdr, OnFighterRegenReq);
 MSG_REG(GameMsgHdr, OnFighterTrainReq);
 //MSG_REG(GameMsgHdr, OnFighterTrain2Req);
+MSG_REG_2(GameMsgHdr, REQ::MODIFY_MOUNT, OnPlayerMountReq);
 MSG_REG_2(GameMsgHdr, REQ::TRAIN_FIGHTER_OP, OnFighterTrainOpReq);
 MSG_REG_2(GameMsgHdr, REQ::HERO_ISLAND, OnHeroIslandReq);
 MSG_REG_2(GameMsgHdr, REQ::NEWHERO_ISLAND, OnNewHeroIslandReq);
@@ -197,6 +198,7 @@ MSG_REG_2(GameMsgHdr, REQ::CCB, OnCCBReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_SPIRIT_TREE, OnClanSpiritTree);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq2);
+MSG_REG_2(GameMsgHdr, REQ::MARRYBOARD, OnMarryBoard2);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 

@@ -4783,7 +4783,7 @@ function sendRechargeMails(player, ototal, ntotal)
         end
     end
     
-    local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
 
@@ -4803,7 +4803,7 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_05_24(player, ototal, ntotal)
     end
 
-    local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local t = { ['year'] = 2014, ['month'] = 1, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time() + 11
 
@@ -7604,6 +7604,19 @@ function sendRechargeRankAward_2013_12_31(player, pos, total, f7)
     sendRCAward(player, pos, total, f7, items[pos])
 end
 
+function sendRechargeRankAward_2014_01_07(player, pos, total, f7)
+    local items = {
+        {1126, 120, 1},
+        {1126, 100, 1},
+        {1126, 80, 1},
+        {1126, 60, 1},
+        {1126, 60, 1},
+        {1126, 60, 1},
+        {1126, 60, 1},
+    }
+    sendRCAward(player, pos, total, f7, items[pos])
+end
+
 -- RANK
 function sendRechargeRankAward(player, pos, total, f7)
     if isRPServer() then
@@ -7629,26 +7642,6 @@ function sendRechargeRankAward(player, pos, total, f7)
         end
     end
      
-    local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-    local s = os.time(t)
-    local n = os.time()
-
-    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
-        sendRechargeRankAward_2013_11_02(player, pos, total, f7)
-    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
-        sendRechargeRankAward_2013_04_15(player, pos, total, f7)
-    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
-        sendRechargeRankAward_2013_03_29(player, pos, total, f7)
-    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
-        sendRechargeRankAward_2013_12_24(player, pos, total, f7)
-    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
-        sendRechargeRankAward_2013_04_18(player, pos, total, f7)
-    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
-        sendRechargeRankAward_2013_04_19(player, pos, total, f7)
-    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
-        sendRechargeRankAward_2013_09_06(player, pos, total, f7)
-    end
-
     local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     local s = os.time(t)
     local n = os.time()
@@ -7661,6 +7654,26 @@ function sendRechargeRankAward(player, pos, total, f7)
         sendRechargeRankAward_2013_03_29(player, pos, total, f7)
     elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
         sendRechargeRankAward_2013_12_31(player, pos, total, f7)
+    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_18(player, pos, total, f7)
+    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_19(player, pos, total, f7)
+    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
+        sendRechargeRankAward_2013_09_06(player, pos, total, f7)
+    end
+
+    local t = { ['year'] = 2014, ['month'] = 1, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time()
+
+    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
+        sendRechargeRankAward_2013_11_02(player, pos, total, f7)
+    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_15(player, pos, total, f7)
+    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
+        sendRechargeRankAward_2013_03_29(player, pos, total, f7)
+    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
+        sendRechargeRankAward_2014_01_07(player, pos, total, f7)
     elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
         sendRechargeRankAward_2013_04_18(player, pos, total, f7)
     elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
@@ -8688,6 +8701,11 @@ local equipTrump1 = {
         [1] = {{3000,30},{3001,30},{3002,30},{3003,30},{3004,30},{3005,30},{3006,30},{3007,30},{3008,30},{3009,30},{3010,30},{3011,30},{3012,30},{3013,30},{3014,30},{3015,30},{3016,30},{3017,30},{3018,30},{3019,30},{3020,30},{3021,30},{3022,30},{3023,30},},
         [2] = {{6170,10},{6171,10},{6172,10},{6173,10},{6174,10},{6175,10},{6176,10},{6177,10},{6178,10},{6179,10},{6180,10},{6181,10},{6182,10},{6183,10},{6184,10},{6185,10},{6186,10},{6187,10},{6188,10},{6189,10},{6190,10},{6191,10},{6192,10},},
     },
+    -- level 130
+    [4871] = {
+        [1] = {{3064,30},{3065,30},{3066,30},{3067,30},{3068,30},{3069,30},{3070,30},{3071,30},{3072,30},{3073,30},{3074,30},{3075,30},{3076,30},{3077,30},{3078,30},{3079,30},{3080,30},{3081,30},{3082,30},{3083,30},{3084,30},{3085,30},{3086,30},{3087,30},},
+        [2] = {{6196,10},{6197,10},{6198,10},{6199,10},{6200,10},{6201,10},{6202,10},{6203,10},{6204,10},{6205,10},{6206,10},{6207,10},{6208,10},{6209,10},{6211,10},{6212,10},{6213,10},{6214,10},{6215,10},{6216,10},{6217,10},{6218,10},{6219,10},},
+    },
 
     -- 阵图
     -- level 35
@@ -8987,6 +9005,7 @@ function getDragonKingAward(step, flag)
             [14] = {{6194,1}},
             [15] = {{312,1}},
             [16] = {{8550,1}, {8551,1}, {8552,1}},
+            [17] = {{6210,1}},
         },
     }
     local chances = {
@@ -9801,6 +9820,16 @@ function onAccRecharge_2013_12_28(player)
     sendAccRechargeAwards(player, awards)
 end
 
+function onAccRecharge_2014_01_04(player)
+    local awards = {
+        [1] = {0xA000,100,1},
+        [3] = {514,5,1, 501,3,1, 5025,1,1},
+        [5] = {9371,5,1, 5085,1,1, 0xA000,150,1},
+        [7] = {515,2,1, 5026,1,1},
+    }
+    sendAccRechargeAwards(player, awards)
+end
+
 -- ACCRECHARGE
 function onRecharge(player, r)
     if getAccRecharge() then
@@ -9809,20 +9838,20 @@ function onRecharge(player, r)
             player:AddVar(174, 1);
             player:SetVar(173, 1)
          
-            local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-            local s = os.time(t)
-            local n = os.time() + 11
-
-            if n >= s and n < (s + 7*86400) then
-                onAccRecharge_2013_12_21(player)
-            end
-
             local t = { ['year'] = 2013, ['month'] = 12, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
             local s = os.time(t)
             local n = os.time() + 11
 
             if n >= s and n < (s + 7*86400) then
                 onAccRecharge_2013_12_28(player)
+            end
+
+            local t = { ['year'] = 2014, ['month'] = 1, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+            local s = os.time(t)
+            local n = os.time() + 11
+
+            if n >= s and n < (s + 7*86400) then
+                onAccRecharge_2014_01_04(player)
             end
 
         end
@@ -9917,5 +9946,17 @@ function onCollectCardAct(player, idx)
     end
 
     return true
+end
+
+local answerInMarryBoard = {4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 
+}
+function getAnswerInMarryBoard(id)
+    if id > #answerInMarryBoard then
+        return 0;
+    end
+    if answerInMarryBoard[id] == nil then 
+        return 0;
+    end
+    return (answerInMarryBoard[id])
 end
 

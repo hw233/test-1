@@ -25,6 +25,8 @@
 #define LSL_ID          8000
 #define RSL_ID          8999
 #define LNORMAL1_ID     9000
+#define LMOUNT_ID       9500
+#define RMOUNT_ID       9899
 #define RNORMAL1_ID     10999
 #define LBMIN_ID        11500
 #define LBMAX_ID        11999
@@ -73,6 +75,8 @@ enum ItemClass
     Item_LBxin,         // 灵宝-信 15
     Item_InnateTrump,   // 先天法宝 16
 	Item_Normal = 20,	//普通物品 20~29
+    Item_Mount = 25,    //坐骑
+    Item_MountChip = 26, //坐骑碎片
     Item_Normal27 = 27,
     Item_Normal28 = 28,
     Item_Normal29 = 29,
@@ -359,6 +363,7 @@ namespace GData
 	extern ItemBaseTypeNameManager itemBaseTypeNameManager;
 	extern std::vector<ItemGemType *> gemTypes;
 	extern std::vector<ItemGemType *> petGemTypes;
+	extern std::vector<ItemGemType *> mountTypes;
 	typedef ObjectListT<ItemEquipSetType> ItemEquipSetTypeManager;
 	extern ItemEquipSetTypeManager itemEquipSetTypeManager;
 
