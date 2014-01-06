@@ -136,7 +136,7 @@ private:
 
 public:
     UInt8 getSevenSoulPetType();
-    void checkSevenSoulLevel(UInt8 soulIndex);
+    bool checkSevenSoulLevel(UInt8 soulIndex);
     void sendSevenSoul();
     void upgradeSevenSoul(UInt8 sevenSoulIndex);
     void switchSevenSoulSkill(UInt8 sevenSoulIndex, UInt8 skillIndex);

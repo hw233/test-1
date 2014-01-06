@@ -102,6 +102,8 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from team_arena_inspire; source team_arena_inspire;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from zhenwei; source zhenwei;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from acupragold; source acupragold;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from pet_sevensoullevel; source pet_qipo_level;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from pet_sevensoulupgrade; source pet_qipo_skill;";
 }
 
 update_data

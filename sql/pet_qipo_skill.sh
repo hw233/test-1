@@ -21,7 +21,7 @@ function pet_qipo_skill()
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `sevensoulupgrade` VALUES";
+            print "INSERT INTO `pet_sevensoulupgrade` VALUES";
         } {
             printf("(%d,%d,\x27%s\x27,%d)",$1,$2,$3,$4);
             if (NR <= ENVIRON["lines"]-1)

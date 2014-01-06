@@ -78,7 +78,7 @@ UInt32 SevenSoul::getConditonValue(UInt8 soulId)
 {
     if(soulId == 0)
         return 0;
-    else if(soulId < SOUL_ID_MAX)
+    else if(soulId <= SOUL_ID_MAX)
         return _condtionValue[soulId - 1];
     else
         return 0xFFFFFFFF;

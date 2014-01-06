@@ -7090,9 +7090,7 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
             {
                 if(player->GetLev() < 80)
                     return;
-                UInt8 subType = 0;
-                brd >> subType;
-                if(subType > 2)
+                if(opt > 2)
                     return;
                 UInt32 petId = 0;
                 brd >> petId;
@@ -7100,9 +7098,9 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                 if(!pet)
                     return;
 
-                if(subType == 0)
+                if(opt == 0)
                     pet->sendSevenSoul();
-                else if(subType == 1)
+                else if(opt == 1)
                 {
                     UInt8 sevenSoulIndex = 0;
                     brd >> sevenSoulIndex;

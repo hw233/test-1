@@ -2693,7 +2693,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBPetSevenSoulUpgrade dbvalue;
-		if(execu->Prepare("SELECT `pettype`, `soulid`, `skillstr`, `condionvalue` FROM `sevensoulupgrade`", dbvalue) != DB::DB_OK)
+		if(execu->Prepare("SELECT `pettype`, `soulid`, `skillstr`, `condionvalue` FROM `pet_sevensoulupgrade`", dbvalue) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
             sevenSoul.loadSevenSoulUpgrade(dbvalue.pettype, dbvalue.soulid, dbvalue.skillstr, dbvalue.condionvalue);
