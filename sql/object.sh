@@ -228,7 +228,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140103_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140103_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140103_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_setVar636.sql    #qq浏览器补签1月3 4 5 号
 }
 
