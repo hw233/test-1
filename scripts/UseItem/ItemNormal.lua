@@ -3334,6 +3334,40 @@ function ItemNormal_00009440(iid, num, bind, param)
     player:sendHappyValueInfo();
     return num
 end
+function ItemNormal_00009444(iid, num, bind, param)
+    local Award ={
+    [9444] = {{15,1},{400,1},{133,1}},
+    [9445] = {{15,1},{134,1},{56,1},{9088,1}},
+    [9446] = {{9088,1},{515,1},{134,1}}
+    } 
+    local chance = {
+    [9444] = {50,80,100},
+    [9445] = {35,45,80,100},
+    [9446] = {40,50,100}
+    }
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    local chanceR = chance[iid]
+    local AwardR = Award[iid];
+    if chanceR == nil or AwardR ==nil then
+        return ;
+    end
+    if #AwardR ~= #chanceR then
+        return ;
+    end
+    local used = 0;
+    for n = 1, num do
+        local rand = math.random(1,100)
+        for i = 1, #chanceR do
+            if rand <= chanceR[i] then
+                package:Add(AwardR[i][1], AwardR[i][2], true, false, 2)
+                break
+            end
+        end
+        used = used + 1
+    end
+    return used;
+end
 
 function ItemNormal_00009067(iid, num, bind, param)
     local player = GetPlayer()
@@ -12005,6 +12039,9 @@ local ItemNormal_Table = {
     [9425] = ItemNormal_keyin,
     [9428] = ItemNormal_00009428,
     [9438] = ItemNormal_zhenyuan,
+    [9444] = ItemNormal_00009444,
+    [9445] = ItemNormal_00009444,
+    [9446] = ItemNormal_00009444,
 
     --坐骑
     [9601] = ItemNormal_00009601,
