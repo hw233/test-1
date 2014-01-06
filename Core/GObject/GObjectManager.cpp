@@ -6770,7 +6770,7 @@ namespace GObject
 			if (pl == NULL)
 				continue;
 			FairyPet *pet = pl->findFairyPet(dbvalue.petId);
-            if(!pet)
+            if(pet)
                 pet->loadPlayerSevenSoul(dbvalue.soulId, dbvalue.soulLevel, dbvalue.skillIndex);
 		}
 		lc.finalize();
