@@ -85,7 +85,7 @@
 #include "MoFang.h"
 #include "Leaderboard.h"
 #include "ArenaServerWar.h"
-
+#include "GData/SevenSoul.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
