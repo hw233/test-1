@@ -7049,6 +7049,7 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                 pet->upgradeSH(petId, sanhunId, opt);
             }
             break;
+#if 0
         case 0x08:  //七魄
             {
                 if(player->GetLev() < 80)
@@ -7079,6 +7080,7 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                 }
             }
             break;
+#endif
         default:
             break;
     }
