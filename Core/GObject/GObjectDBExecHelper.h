@@ -1413,6 +1413,15 @@ struct DBPlayerNamed
     std::string name;
 };
 
+struct DBSevenSoul
+{
+    UInt64 playerId;
+    UInt32 petId;
+    UInt8 soulId;
+    UInt8 soulLevel;
+    UInt8 skillIndex;
+};
+
 struct DBModifyMount
 {
     UInt8 id;
@@ -3212,6 +3221,17 @@ SPECIALDEF(3)
     UInt16, serverNo,
     UInt64, id,
     std::string,name 
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSevenSoul)
+SPECIALDEF(5)
+    (
+    UInt64, playerId,
+    UInt32, petId,
+    UInt8, soulId,
+    UInt8, soulLevel,
+    UInt8, skillIndex
     )
 SPECIALEND()
 

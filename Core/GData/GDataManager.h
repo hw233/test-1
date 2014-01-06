@@ -77,6 +77,8 @@ namespace GData
         static bool LoadSanHunConfig();
         static bool LoadTeamArenaSkillConfig();
         static bool LoadTeamArenaInspireConfig();
+        static bool LoadPetSevenSoulLevel();
+        static bool LoadPetSevenSoulUpgrade();
         static bool LoadRideConfig();
         static bool LoadRideUpgradeConfig();
 

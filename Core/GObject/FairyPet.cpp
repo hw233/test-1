@@ -16,6 +16,7 @@
 #include "GData/HunPoData.h"
 #include "Package.h"
 #include "Item.h"
+#include "GData/SevenSoul.h"
 
 
 namespace GObject
@@ -36,6 +37,9 @@ namespace GObject
         _evolve = 0;
         memset(_initskl, 0, sizeof(_initskl));
         memset(_equips, 0, PET_EQUIP_UPMAX * sizeof(ItemPetEq *));
+
+        memset(_soulLevel, 0, sizeof(_soulLevel));
+        memset(_skillIndex, 0, sizeof(_skillIndex));
     }
 
     void FairyPet::LoadFromDB(DBFairyPetData& data)
@@ -1037,5 +1041,140 @@ namespace GObject
 
         st.data<UInt8>(offset) = count;
     }
+
+    UInt8 FairyPet::getSevenSoulPetType()
+    {
+        UInt32 petId = getId();
+        UInt8 petType;
+        if((petId >= 501 && petId <= 503) || petId == 513)
+            petType = 1;
+        else if((petId >= 504 && petId <= 506) || petId == 514)
+            petType = 2;
+        else if((petId >= 507 && petId <= 509) || petId == 515)
+            petType = 3;
+        else if((petId >= 510 && petId >= 512) || petId == 516)
+            petType = 4;
+        else
+            petType = 0;
+        return petType;
+    }
+
+    bool FairyPet::checkSevenSoulLevel(UInt8 soulIndex)
+    {
+        if(!_owner)
+            return false;
+        if(soulIndex == 0 || soulIndex > 7)
+            return false;
+
+        if(_soulLevel[soulIndex - 1] == 0)
+        {
+            _soulLevel[soulIndex - 1] = 1;
+            DB4().PushUpdateData("REPLACE INTO `player_sevensoul` VALUES(%" I64_FMT "u, %u, %u, %u, 0)", _owner->getId(), getId(), soulIndex, _soulLevel[soulIndex - 1]);
+            return true;
+        }
+        return false;
+    }
+
+    void FairyPet::sendSevenSoul()
+    {
+        if(!_owner)
+            return;
+
+        checkSevenSoulLevel(1);
+
+        const UInt8 type = 0;
+        const UInt8 count = 7;
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x08) << type << getId() << _owner->GetVar(VAR_SEVEN_SOUL_NUM) << count;
+        for(UInt8 i = 0; i < count; i++)
+        {
+            st << _soulLevel[i];
+            st << _skillIndex[i];
+        }
+        st << Stream::eos;
+        _owner->send(st);
+    }
+
+    void FairyPet::upgradeSevenSoul(UInt8 sevenSoulIndex)
+    {
+        if(sevenSoulIndex >= 7)
+            return;
+        if(!_owner)
+            return;
+        UInt8 soulLevel = _soulLevel[sevenSoulIndex];
+        if(soulLevel == 0 || soulLevel >= 25)
+            return;
+
+        UInt32 needNum = GData::sevenSoul.getNeedSoulNum(soulLevel);
+        UInt32 curNum = _owner->GetVar(VAR_SEVEN_SOUL_NUM);
+        UInt8 ret;
+        if(curNum >= needNum)
+        {
+            _owner->SetVar(VAR_SEVEN_SOUL_NUM, curNum - needNum);
+            ++_soulLevel[sevenSoulIndex];
+            DB4().PushUpdateData("UPDATE `player_sevensoul` SET `soulLevel` = %u WHERE `playerId` = %" I64_FMT "u AND petId = %u AND soulId = %u", _soulLevel[sevenSoulIndex], _owner->getId(), getId(), sevenSoulIndex + 1);
+
+            if(sevenSoulIndex < 6 && (_soulLevel[sevenSoulIndex] >= GData::sevenSoul.getConditonValue(sevenSoulIndex + 2)))
+            {
+#if 0
+                bool bRet = checkSevenSoulLevel(sevenSoulIndex + 2);
+                if(bRet)
+                    sendSevenSoul();
+#else
+                checkSevenSoulLevel(sevenSoulIndex + 2);
+#endif
+            }
+
+            ret = 0;
+        }
+        else
+            ret = 1;
+
+        UInt8 type = 1;
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x08) << type << getId() << sevenSoulIndex << ret << Stream::eos;
+        _owner->send(st);
+    }
+
+    void FairyPet::switchSevenSoulSkill(UInt8 sevenSoulIndex, UInt8 skillIndex)
+    {
+        if(sevenSoulIndex >= 7)
+            return;
+        if(skillIndex >= 2)
+            return;
+        if(!_owner)
+            return;
+
+        UInt8 aimSkillIndex;
+        if(_skillIndex[sevenSoulIndex] == 0)
+            aimSkillIndex = 1;
+        else
+            aimSkillIndex = 0;
+
+        UInt8 ret;
+        if(aimSkillIndex == skillIndex)
+        {
+            ret = 0;
+            _skillIndex[sevenSoulIndex] = skillIndex;
+            DB4().PushUpdateData("UPDATE `player_sevensoul` SET `skillIndex` = %u WHERE `playerId` = %" I64_FMT "u AND petId = %u AND soulId = %u", skillIndex, _owner->getId(), getId(), sevenSoulIndex + 1);
+        }
+        else
+            ret = 1;
+
+        const UInt8 type = 2;
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x08) << type << getId() << sevenSoulIndex << ret << Stream::eos;
+        _owner->send(st);
+    }
+
+    void FairyPet::loadPlayerSevenSoul(UInt8 soulId, UInt8 soulLevel, UInt8 skillIndex)
+    {
+        if(soulId >= 1 && soulId <= 7)
+        {
+            _soulLevel[soulId - 1] = soulLevel;
+            _skillIndex[soulId - 1] = skillIndex;
+        }
+    }
+
 }
 
