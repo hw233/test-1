@@ -1074,5 +1074,22 @@ CREATE TABLE `ride_upgrade` (
     PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
+DROP TABLE IF EXISTS `pet_sevensoullevel`;
+CREATE TABLE IF NOT EXISTS `pet_sevensoullevel` (
+  `soullevel` tinyint(3) unsigned NOT NULL,
+  `needsoulnum` int(10) unsigned NOT NULL,
+  `skilllevel` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`soullevel`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `pet_sevensoulupgrade`;
+CREATE TABLE IF NOT EXISTS `pet_sevensoulupgrade` (
+  `pettype` tinyint(3) unsigned NOT NULL,
+  `soulid` tinyint(3) unsigned NOT NULL,
+  `skillstr` varchar(255) NOT NULL,
+  `condionvalue` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`pettype`, `soulid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 -- Dump completed
 
