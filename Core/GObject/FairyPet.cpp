@@ -1174,6 +1174,7 @@ namespace GObject
             _soulLevel[soulId - 1] = soulLevel;
             _skillIndex[soulId - 1] = skillIndex;
         }
+        return;
     }
 
 }
