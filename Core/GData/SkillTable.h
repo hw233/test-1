@@ -50,6 +50,7 @@ enum
     /*24*/ SKILL_BLEED_TYPE_DMG,  // 流血类状态伤害
     /*25*/ SKILL_XMCZ,  //降魔禅杖
     /*26*/ SKILL_BLTY,  //碧岚天衣
+    /*27*/ SKILL_AFTACTION,      // 行动后触发（包括被眩晕）
     SKILL_PASSIVES
 };
 

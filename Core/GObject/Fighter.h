@@ -319,6 +319,8 @@ public:
     inline std::vector<UInt16>& getPassiveSkillPreAtk100() { return _passkl[GData::SKILL_PREATK-GData::SKILL_PASSSTART]; }
     // 取得攻击后被动100%触发技能
     inline std::vector<UInt16>& getPassiveSkillAftAtk100() { return _passkl[GData::SKILL_AFTATK-GData::SKILL_PASSSTART]; }
+    // 取得行动后被动100%触发技能（包括被眩晕）
+    inline std::vector<UInt16>& getPassiveSkillAftAction100() { return _passkl[GData::SKILL_AFTACTION-GData::SKILL_PASSSTART]; }
     // 取得普通攻击后被动100%触发技能
     inline std::vector<UInt16>& getPassiveSkillAftNAtk100() { return _passkl[GData::SKILL_AFTNATK-GData::SKILL_PASSSTART]; }
     // 取得被攻击后被动100%触发技能
@@ -342,6 +344,8 @@ public:
     inline std::vector<UInt16>& getPassiveSkillPreAtk() { return _rpasskl[GData::SKILL_PREATK-GData::SKILL_PASSSTART]; }
     // 取得攻击后被动概率触发技能
     inline std::vector<UInt16>& getPassiveSkillAftAtk() { return _rpasskl[GData::SKILL_AFTATK-GData::SKILL_PASSSTART]; }
+    // 取得行动后被动概率触发技能（包括被眩晕）
+    inline std::vector<UInt16>& getPassiveSkillAftAction() { return _rpasskl[GData::SKILL_AFTACTION-GData::SKILL_PASSSTART]; }
     // 取得普通攻击后被动概率触发技能
     inline std::vector<UInt16>& getPassiveSkillAftNAtk() { return _rpasskl[GData::SKILL_AFTNATK-GData::SKILL_PASSSTART]; }
     // 取得被攻击后被动概率触发技能

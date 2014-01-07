@@ -22,7 +22,7 @@ namespace Battle
 
 const int MAX_REIATSU = 100;
 
-enum ReiatsuType
+enum ReiatsuType    // 灵压值增加值类型
 {
     e_reiatsu_normal_attack = 1,
     e_reiatsu_skill_attack = 2,

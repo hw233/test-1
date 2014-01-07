@@ -142,10 +142,31 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return (_aura > 0 ? _aura : 0); }
 	inline float getAuraMax() { return (_auraMax > 0 ? _auraMax : 0); }
-	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0) + _counter_spirit_atk_add + _pet_coatk; return  ret;}
-	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd + _petMagAtkAdd + _counter_spirit_magatk_add + _pet_coatk; return ret;}
-	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2 + _counter_spirit_def_add; return (ret > 0 ? ret : 0);}
-	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2 + _counter_spirit_magdef_add + _fire_defend; return (ret > 0 ? ret : 0);}
+
+	inline float getAttack() 
+    {
+        float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial 
+            + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0) + _counter_spirit_atk_add + _pet_coatk; 
+        return  ret;
+    }
+	inline float getMagAttack() 
+    {
+        float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial 
+            + _moMagAtkAdd + _petMagAtkAdd + _counter_spirit_magatk_add + _pet_coatk; 
+        return ret;
+    }
+
+	inline float getDefend() 
+    {
+        float ret = _defend + _defAdd + _defAdd2 + _counter_spirit_def_add; 
+        return (ret > 0 ? ret : 0);
+    }
+	inline float getMagDefend() 
+    {
+        float ret = _magdef + _magDefAdd + _magDefAdd2 + _counter_spirit_magdef_add + _fire_defend; 
+        return (ret > 0 ? ret : 0);
+    }
+
 	float getHitrate(BattleFighter* defgt);
 	float getEvade(BattleFighter* defgt);
 	float getCritical(BattleFighter* defgt);
@@ -286,6 +307,7 @@ public:
     const GData::SkillBase* getActiveSkill(bool need_therapy = false, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillAftAction100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBeAtk100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftEvd100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftRes100(size_t& idx, bool noPossibleTarget = false);
@@ -301,6 +323,7 @@ public:
 
     const GData::SkillBase* getPassiveSkillPreAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillAftAction(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBeAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftEvd(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftRes(bool noPossibleTarget = false);
@@ -482,6 +505,7 @@ private:
     std::vector<GData::SkillItem> _therapySkill;
     std::vector<GData::SkillItem> _passiveSkillPrvAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftAtk100;
+    std::vector<GData::SkillItem> _passiveSkillAftAction100;
     std::vector<GData::SkillItem> _passiveSkillBeAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftEvd100;
     std::vector<GData::SkillItem> _passiveSkillAftRes100;
@@ -492,6 +516,7 @@ private:
 
     std::vector<GData::SkillItem> _passiveSkillPreAtk;
     std::vector<GData::SkillItem> _passiveSkillAftAtk;
+    std::vector<GData::SkillItem> _passiveSkillAftAction;
     std::vector<GData::SkillItem> _passiveSkillBeAtk;
     std::vector<GData::SkillItem> _passiveSkillAftEvd;
     std::vector<GData::SkillItem> _passiveSkillAftRes;
@@ -597,6 +622,12 @@ private:
     float _petExAtk;
     bool  _petExAtkEnable;
     UInt16 _petExAtkId;
+
+    float _petHPAtkReduce, _petHPMagAtkReduce;      // 根据损失HP增加的伤害减免
+    UInt8 _petHPAtkReduceCD, _petHPMagAtkReduceCD;  // 根据损失HP增加的伤害减免CD
+
+    float _petHPAtkAdd, _petHPMagAtkAdd;      // 根据损失HP增加的伤害提升
+    UInt8 _petHPAtkAddCD, _petHPMagAtkAddCD;  // 根据损失HP增加的伤害提升CD
 
     float _bleedMo;
     UInt8 _bleedMoLast;
@@ -855,6 +886,9 @@ public:
     inline void setPetMagAtkAdd(float value, UInt8 last) { if(last == 0) return; _petMagAtkAdd = value; _petMagAtkAddCD = last; }
     inline void setPetAtkReduce(float value, UInt8 last) { if(last == 0) return; _petAtkReduce = value; _petAtkReduceCD = last; }
     inline void setPetMagAtkReduce(float value, UInt8 last) { if(last == 0) return; _petMagAtkReduce = value; _petMagAtkReduceCD = last; }
+
+    inline void setPetMagHPAtkReduce(float value, UInt8 last) { if(last == 0) return; _petMagAtkReduce = value; _petMagAtkReduceCD = last; }
+    inline void setPetMagHPMagAtkReduce(float value, UInt8 last) { if(last == 0) return; _petMagAtkReduce = value; _petMagAtkReduceCD = last; }
 
     inline void resetPetAttackAdd() { _petAttackAdd = 0; _petAttackAddCD = 0; }
     inline void resetPetMagAtkAdd() { _petMagAtkAdd = 0; _petMagAtkAddCD = 0; }

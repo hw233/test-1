@@ -117,6 +117,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 
     updatePassiveSkill100(_fighter->getPassiveSkillPreAtk100(), _passiveSkillPrvAtk100);
     updatePassiveSkill100(_fighter->getPassiveSkillAftAtk100(), _passiveSkillAftAtk100);
+    updatePassiveSkill100(_fighter->getPassiveSkillAftAction100(), _passiveSkillAftAction100);
     updatePassiveSkill100(_fighter->getPassiveSkillBeAtk100(), _passiveSkillBeAtk100);
     updatePassiveSkill100(_fighter->getPassiveSkillAftEvd100(), _passiveSkillAftEvd100);
     updatePassiveSkill100(_fighter->getPassiveSkillAftRes100(), _passiveSkillAftRes100);
@@ -142,6 +143,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 
     updatePassiveSkill(_fighter->getPassiveSkillPreAtk(), _passiveSkillPreAtk);
     updatePassiveSkill(_fighter->getPassiveSkillAftAtk(), _passiveSkillAftAtk);
+    updatePassiveSkill(_fighter->getPassiveSkillAftAction(), _passiveSkillAftAction);
     updatePassiveSkill(_fighter->getPassiveSkillBeAtk(), _passiveSkillBeAtk);
     updatePassiveSkill(_fighter->getPassiveSkillAftEvd(), _passiveSkillAftEvd);
     updatePassiveSkill(_fighter->getPassiveSkillAftRes(), _passiveSkillAftRes);
@@ -989,6 +991,12 @@ const GData::SkillBase* BattleFighter::getPassiveSkillAftAtk100(size_t& idx, boo
     return getPassiveSkill100(_passiveSkillAftAtk100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillAftAction100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillAftAction100, idx, noPossibleTarget);
+}
+
+
 const GData::SkillBase* BattleFighter::getPassiveSkillBeAtk100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillBeAtk100, idx, noPossibleTarget);
@@ -1158,6 +1166,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillAftAtk(bool noPossibleTarg
     return getPassiveSkill(_passiveSkillAftAtk, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillAftAction(bool noPossibleTarget)
+{
+    return getPassiveSkill(_passiveSkillAftAction, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkillBeAtk(bool noPossibleTarget)
 {
     return getPassiveSkill(_passiveSkillBeAtk, noPossibleTarget);
@@ -1282,6 +1295,7 @@ void BattleFighter::releaseSkillCD(int cd)
 
     releaseSkillCD(_passiveSkillPrvAtk100, cd);
     releaseSkillCD(_passiveSkillAftAtk100, cd);
+    releaseSkillCD(_passiveSkillAftAction100, cd);
     releaseSkillCD(_passiveSkillBeAtk100, cd);
     releaseSkillCD(_passiveSkillAftEvd100, cd);
     releaseSkillCD(_passiveSkillAftRes100, cd);
@@ -1301,6 +1315,7 @@ void BattleFighter::releaseSkillCD(int cd)
 
     releaseSkillCD(_passiveSkillPreAtk, cd);
     releaseSkillCD(_passiveSkillAftAtk, cd);
+    releaseSkillCD(_passiveSkillAftAction, cd);
     releaseSkillCD(_passiveSkillBeAtk, cd);
     releaseSkillCD(_passiveSkillAftEvd, cd);
     releaseSkillCD(_passiveSkillAftRes, cd);
@@ -1946,6 +1961,7 @@ void BattleFighter::clearSkill()
     _therapySkill.clear();
     _passiveSkillPrvAtk100.clear();
     _passiveSkillAftAtk100.clear();
+    _passiveSkillAftAction100.clear();
     _passiveSkillBeAtk100.clear();
     _passiveSkillAftEvd100.clear();
     _passiveSkillAftRes100.clear();
@@ -1968,6 +1984,7 @@ void BattleFighter::clearSkill()
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();
+    _passiveSkillAftAction.clear();
     _passiveSkillBeAtk.clear();
     _passiveSkillAftEvd.clear();
     _passiveSkillAftRes.clear();
