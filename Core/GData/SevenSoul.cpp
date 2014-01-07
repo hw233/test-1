@@ -48,7 +48,7 @@ UInt32 SevenSoul::getNeedSoulNum(UInt8 level)
 {
     if(level == 0)
         return 0;
-    else if(level < SEVEN_SOUL_LEVEL_MAX)
+    else if(level <= SEVEN_SOUL_LEVEL_MAX)
         return _needSoulNum[level - 1];
     else
         return 0xFFFFFFFF;
