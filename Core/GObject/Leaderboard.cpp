@@ -1219,7 +1219,7 @@ void Leaderboard::readRechargeRank100(BinaryReader& brd)
     {
         AllServersRecharge asrData;
         UInt64 playerId = 0;
-        brd >> playerId >> asrData.name >> asrData.total;
+        brd >> playerId >> asrData.name >> asrData.total >> asrData.country;
 
         Player * player = globalPlayers[playerId];
         asrData.player = player;
@@ -1280,11 +1280,11 @@ void Leaderboard::sendRechargeRank100(Player * player, UInt8 idx, UInt8 cnt)
 	}
 	st << size << idx << cnt;
 
-    std::vector<AllServersRecharge>::iterator it = _rechargeRank100.begin();
     for(UInt8 i = 0; i < cnt; ++ i)
     {
+        std::vector<AllServersRecharge>::iterator it = _rechargeRank100.begin();
         std::advance(it, idx+i);
-        st << (*it).name << (*it).total << (*it).rank;
+        st << (*it).name << (*it).total << (*it).country;
     }
     st << Stream::eos;
     player->send(st);
@@ -1312,22 +1312,22 @@ void Leaderboard::giveRechargeRankAward()
         UInt16 count1 = 0, count2 = 0, count3 = 0, count4 = 0;
         if((*it).rank == 1)
         {
-            count1 = 200; count2 = 200;
+            count1 = 180; count2 = 180;
             count3 = 100; count4 = 100;
         }
         else if((*it).rank == 2)
         {
-            count1 = 180; count2 = 180;
+            count1 = 160; count2 = 160;
             count3 = 88; count4 = 88;
         }
         else if((*it).rank == 3)
         {
-            count1 = 160; count2 = 160;
+            count1 = 140; count2 = 140;
             count3 = 66;  count4 = 66;
         }
         else if((*it).rank >= 4 && (*it).rank <= 10)
         {
-            count1 = 140; count2 = 140;
+            count1 = 120; count2 = 120;
             count3 = 50;  count4 = 50;
         }
         else if((*it).rank >= 11 && (*it).rank <= 20)
@@ -1347,12 +1347,12 @@ void Leaderboard::giveRechargeRankAward()
         }
         else if((*it).rank >= 61 && (*it).rank <= 80)
         {
-            count1 = 50; count2 = 50;
+            count1 = 40; count2 = 40;
             count3 = 20; count4 = 20;
         }
         else if((*it).rank >= 81 && (*it).rank <= 100)
         {
-            count1 = 25; count2 = 25;
+            count1 = 20; count2 = 20;
             count3 = 10; count4 = 10;
         }
         else
@@ -1394,7 +1394,6 @@ void Leaderboard::giveRechargeRankAward()
 
 void Leaderboard::sendGoldLvlAward(BinaryReader& brd)
 {
-    return;     //测试时没有
     UInt64 playerId = 0;
     UInt8 cnt = 0;
     brd >> playerId >> cnt;

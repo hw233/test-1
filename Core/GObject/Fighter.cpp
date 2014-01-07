@@ -2466,7 +2466,8 @@ void Fighter::rebuildBattlePoint()
         for(UInt8 i = 0; i < cnt; ++ i)
         {
             const GData::LBSkillBase* lbskill = GData::lbSkillManager[_lbSkill[i].skillid];
-            _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
+            if(lbskill)
+                _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
         }
         calcLingbaoBattlePoint();
     }
