@@ -3937,6 +3937,7 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
             _msg.value = value;
             _msg.type = type;
             GObject::globalPlayers.enumerate(player_enum_setvar, (void*)&_msg);
+            ret = 0;
             break;
         }
         if(cfg.merged)
@@ -3962,10 +3963,10 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
                 pl->DelVar(var);
             else
                 pl->SetVar(var,value1);
+            ret = 0;
         }
         playerId = GetNextSection(playerIds, ',');
     }
-    ret = 0;
     Stream st(SPEP::SETVAR);
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
