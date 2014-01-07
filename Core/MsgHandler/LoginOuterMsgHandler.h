@@ -3885,12 +3885,14 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
     UInt32 var = 0;
     UInt32 value = 0;
     UInt8 type = 0 ;
+    UInt16 serverNo = 0;
     std::string playerIds;
     CHKKEY();
     br >> var;
     br >> value;
     br >> type;
-    br>>playerIds;
+    br >> playerIds;
+    br >> serverNo; 
    
 //开启起封交易客户平台测试
     
@@ -3903,6 +3905,7 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
         UInt32 var;
         UInt32 value;
         UInt8 type ;
+        UInt16 serverNo;
         char msg[1024];
     };
 #pragma pack()
@@ -3911,11 +3914,12 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
     value = _test->value;
     playerIds = _test->msg;
     type = _test->type;
+    serverNo = _test->serverNo;
 #endif
 #undef TEST_TABLE 
 
     UInt8 ret = 1;
-    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    INFO_LOG("SetVar: %s, var:%u value:%u type:%u serverNo:%u", playerIds.c_str(), var ,value ,static_cast<UInt32>(type),static_cast<UInt32>(serverNo));
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
@@ -3934,6 +3938,10 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
             _msg.type = type;
             GObject::globalPlayers.enumerate(player_enum_setvar, (void*)&_msg);
             break;
+        }
+        if(cfg.merged)
+        {
+            pid += (static_cast<UInt64>(serverNo) << 48);
         }
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
