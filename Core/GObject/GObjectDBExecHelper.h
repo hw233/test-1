@@ -1454,7 +1454,7 @@ struct DBModifyMount
     UInt64 playerId;
     std::string chips;
 };
-
+}
 
 namespace DB {
 
@@ -3249,7 +3249,6 @@ SPECIALDEF(3)
     )
 SPECIALEND()
 
-<<<<<<< HEAD
 SPECIALBEGIN(GObject::DBMarriage)
 SPECIALDEF(5)
     (
@@ -3288,14 +3287,15 @@ SPECIALDEF(9)
     UInt32, replymarriage_time,
     UInt32, jy_time,
     UInt8, wedding_type
-=======
+    )
+SPECIALEND()
+    
 SPECIALBEGIN(GObject::DBModifyMount)
 SPECIALDEF(3)
     (
     UInt8, id,
     UInt64, playerId,
     std::string, chips
->>>>>>> 3eede6e29021552e92a6817a4b99ec6d8983907e
     )
 SPECIALEND()
 

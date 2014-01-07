@@ -6761,15 +6761,6 @@ namespace GObject
 		return true;
 	}
 
-<<<<<<< HEAD
-    bool GObjectManager::LoadMarriage()
-	{
-		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-		if (execu.get() == NULL || !execu->isConnected()) return false;
-		LoadingCounter lc("Loading marriage:");
-		DBMarriage dbpn;
-		if(execu->Prepare("SELECT `playerid`, `marriage_time`, `prouncement`, `lover_item`, `status` FROM `marriage` ORDER BY `status`", dbpn) != DB::DB_OK)
-=======
     bool GObjectManager::LoadPlayerModifyMounts()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -6777,13 +6768,40 @@ namespace GObject
 		LoadingCounter lc("Loading player ModifyMount:");
 		DBModifyMount dbmm;
 		if(execu->Prepare("SELECT `id`, `playerId`, `chips` FROM `modify_mount`", dbmm) != DB::DB_OK)
->>>>>>> 3eede6e29021552e92a6817a4b99ec6d8983907e
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
-<<<<<<< HEAD
+            Player * player = globalPlayers[dbmm.playerId];
+            if(dbmm.id <= 0 || !player)
+                continue;
+            ModifyMount * mount = new ModifyMount(dbmm.id, player);
+            if(!mount)
+                continue;
+            StringTokenizer tk(dbmm.chips, ",");
+            for(UInt8 i = 0; i < tk.count() && i < MOUNTCHIP_MAX; ++ i)
+            {
+                mount->setChipFromDB(i, atoi(tk[i].c_str()));
+            }
+            player->addModifyMount(mount, false);
+        }
+		lc.finalize();
+		return true;
+	}
+
+    bool GObjectManager::LoadMarriage()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading marriage:");
+		DBMarriage dbpn;
+		if(execu->Prepare("SELECT `playerid`, `marriage_time`, `prouncement`, `lover_item`, `status` FROM `marriage` ORDER BY `status`", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
 			Player * player = globalPlayers[dbpn.playerid];
 			if(player == NULL)
 				continue;
@@ -6811,26 +6829,11 @@ namespace GObject
 			if(player == NULL)
 				continue;
             gMarryMgr.LoadReplyMarriage(player,obj_player,&dbpn); 
-=======
-            Player * player = globalPlayers[dbmm.playerId];
-            if(dbmm.id <= 0 || !player)
-                continue;
-            ModifyMount * mount = new ModifyMount(dbmm.id, player);
-            if(!mount)
-                continue;
-            StringTokenizer tk(dbmm.chips, ",");
-            for(UInt8 i = 0; i < tk.count() && i < MOUNTCHIP_MAX; ++ i)
-            {
-                mount->setChipFromDB(i, atoi(tk[i].c_str()));
-            }
-            player->addModifyMount(mount, false);
->>>>>>> 3eede6e29021552e92a6817a4b99ec6d8983907e
         }
 		lc.finalize();
 		return true;
 	}
 
-<<<<<<< HEAD
     bool GObjectManager::LoadMarriedLog()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -6852,7 +6855,5 @@ namespace GObject
 		lc.finalize();
 		return true;
 	}
-=======
->>>>>>> 3eede6e29021552e92a6817a4b99ec6d8983907e
 }
 

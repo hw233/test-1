@@ -1820,5 +1820,16 @@ namespace GObject
         }
     }
 
+/*    void MarryMgr::Process()
+    {
+        if(!GetVar(GVAR_CREATMARRY_TIMES))//是否创建婚礼
+        {
+                         
+
+        }
+
+
+    }*/
+
 
 }
