@@ -732,6 +732,7 @@ CREATE TABLE `skillstrengthen_skill` (
   `id` smallint(6) unsigned NOT NULL DEFAULT 0,
   `name` varchar(255) NOT NULL,
   `effect` varchar(255) NOT NULL,
+  `effect2` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

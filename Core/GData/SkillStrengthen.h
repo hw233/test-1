@@ -111,7 +111,9 @@ struct SkillStrengthenBase : public ObjectBaseT<UInt16>
         : ObjectBaseT<UInt16>(id, name) {}
     ~SkillStrengthenBase() { effect.clear(); }
 
-    std::vector<const SkillStrengthenEffect*> effect;
+    std::vector<const SkillStrengthenEffect*> effect;  //所有的技能符文
+    std::vector<const SkillStrengthenEffect*> effect1; //第1个技能符文
+    std::vector<const SkillStrengthenEffect*> effect2; //第2个技能符文
     const SkillStrengthenEffect* getEffect(UInt16 cond, Int16 type);
 };
 
