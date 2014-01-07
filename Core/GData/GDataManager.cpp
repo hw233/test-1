@@ -1347,7 +1347,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkillStrengthen dbnd;
-        if(execu->Prepare("SELECT `id`, `name`, `effect`, `effect2` FROM  `skillstrengthen_skill`", dbnd) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`, `name`, `effect` FROM  `skillstrengthen_skill`", dbnd) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
@@ -1361,17 +1361,6 @@ namespace GData
                 for (size_t i = 0; i < tk.count(); ++i)
                 {
                     skillstrengthen->effect.push_back(skillStrengthenEffectManager[::atoi(tk[i].c_str())]);
-                    skillstrengthen->effect1.push_back(skillStrengthenEffectManager[::atoi(tk[i].c_str())]);
-                }
-            }
-
-            StringTokenizer tk2(dbnd.effect2, ",");
-            if (tk2.count())
-            {
-                for (size_t i = 0; i < tk2.count(); ++i)
-                {
-                    skillstrengthen->effect.push_back(skillStrengthenEffectManager[::atoi(tk2[i].c_str())]);
-                    skillstrengthen->effect2.push_back(skillStrengthenEffectManager[::atoi(tk2[i].c_str())]);
                 }
             }
 

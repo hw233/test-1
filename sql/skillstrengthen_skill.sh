@@ -23,7 +23,7 @@ function skillstrengthen_skill()
         BEGIN {
             print "INSERT INTO `skillstrengthen_skill` VALUES";
         } {
-            printf("(%d,\x27%s\x27,\x27%s\x27,\x27%s\x27)",$1,$2,$3,$4);
+            printf("(%d,\x27%s\x27,\x27%s\x27)",$1,$2,$3);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

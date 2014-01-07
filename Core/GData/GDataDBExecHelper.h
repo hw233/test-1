@@ -101,7 +101,6 @@ struct DBSkillStrengthen
     UInt16 id;
     std::string name;
     std::string effect;
-    std::string effect2;
 };
 
 struct DBSkillStrengthenEffect
@@ -963,12 +962,11 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSkillStrengthen)
-SPECIALDEF(4)
+SPECIALDEF(3)
     (
     UInt16, id,
     std::string, name,
-    std::string, effect,
-    std::string, effect2
+    std::string, effect
     )
 SPECIALEND()
 
