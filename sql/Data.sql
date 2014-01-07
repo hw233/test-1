@@ -1073,5 +1073,6 @@ CREATE TABLE `ride_upgrade` (
     `rate` float(5,2) unsigned NOT NULL DEFAULT '0.00',
     PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+
 -- Dump completed
 

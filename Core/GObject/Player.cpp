@@ -85,7 +85,7 @@
 #include "MoFang.h"
 #include "Leaderboard.h"
 #include "ArenaServerWar.h"
-
+#include "GData/SevenSoul.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -26683,9 +26683,9 @@ void Player::GetFindOldManAward(UInt32 type)
 {
     if(!World::getOldManTime())
         return ;
-    if(GetLev()<45)
+    if(GetLev()<30)
     {
-        SYSMSG_BROADCASTV(2109, GetLev(), 45 );
+        SYSMSG_BROADCASTV(2109, GetLev(), 30 );
         return ; 
     }
     if(type ==0)

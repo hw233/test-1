@@ -226,8 +226,8 @@ lbnametmpl:setLBName(120, 2, "图腾")
 lbnametmpl:setLBName(120, 3, "铃")
 
 lbnametmpl:setLBName(130, 1, "剑匣")
-lbnametmpl:setLBName(130, 2, "图腾")
-lbnametmpl:setLBName(130, 3, "铃")
+lbnametmpl:setLBName(130, 2, "笛")
+lbnametmpl:setLBName(130, 3, "印")
 
 lbnametmpl:setSkillPrevfix(1, "赤尊·达摩老祖之")
 lbnametmpl:setSkillPrevfix(2, "地尊·达摩老祖之")

@@ -4918,10 +4918,12 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
         return ;
     UInt32 var = 0;   //修改
     UInt32 value = 0;   //修改
+    UInt8 type =0 ;
     if(args.size() >=2 )
     {
         var = atoll(args[1].c_str());
         value = atoll(args[2].c_str());
+        type = atoi(args[3].c_str());
     }
 //    UInt32 fTime = atol(args[1].c_str());
 //    setForbidSaleValue(playerId, true,fTime);
@@ -4936,12 +4938,14 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
         UInt8 blank[36];
         UInt32 var ;
         UInt32 value ;
+        UInt8 type ;
         char   msg[1024];
     };
 #pragma pack()
     struct test _test;
     _test.var =var;
     _test.value =value;
+    _test.type = type;
     strncpy (_test.msg, args[0].c_str(), strlen(args[0].c_str()));
   //  _test.msg = args[0].c_str();
     LoginMsgHdr hdr1(0x14D, WORKER_THREAD_LOGIN, 0, 0, sizeof(_test));
