@@ -140,8 +140,9 @@ struct AllServersRecharge
     std::string name;
     UInt32 total;
     UInt32 rank;
+    UInt8 country;
 
-    AllServersRecharge() : player(NULL), total(0), rank(0) {}
+    AllServersRecharge() : player(NULL), total(0), rank(0), country(0) {}
 };
 
 class Leaderboard
