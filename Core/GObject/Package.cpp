@@ -6794,7 +6794,7 @@ namespace GObject
     bool Package::FinishLBSmeltSpecial(const GData::ItemBaseType * itype, ItemLingbaoAttr &lbattr, UInt8& attrNum)
     {
         //黄帝卷宗（11113），炎帝卷宗（11114），神农卷宗（11115），女娲卷宗（11116）
-        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118};
+        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118, 11203 };
         bool hasSpe = false;
         for(UInt8 i = 0; i < sizeof(lbids) / sizeof(lbids[0]); ++i)
         {
