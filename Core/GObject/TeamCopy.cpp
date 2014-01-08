@@ -836,7 +836,7 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
 
         member->PutFighters( bsim, 0 );
         if(memIdx != 0)
-            bsim.switchPlayer( member, 0 );
+            bsim.switchPlayer( member, 0 );     
 
         for(UInt8 mIdx = memIdx + 1; mIdx < td->count; ++mIdx)
         {

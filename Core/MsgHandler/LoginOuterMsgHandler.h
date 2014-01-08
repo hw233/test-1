@@ -4037,14 +4037,23 @@ void SetMarryBoard(LoginMsgHdr& hdr,const void * data)
 {
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     CHKKEY();
+    UInt16 manServerId = 0;
+    UInt16 womanServerId = 0;
     UInt64 manId = 0;
+    br >> manServerId ;
     br >> manId;
-    UInt64 womanId = 0;
+    UInt64 womanId = 0 ;
+    br >> womanServerId ;
     br >> womanId;
     UInt8 type = 0 ;
     br >> type ;
     UInt32 time = 0;
     br >> time;
+    if( cfg.merged )
+    {
+       manId += ( static_cast<UInt64>(manServerId)<<48 ); 
+       womanId += ( static_cast<UInt64>(womanServerId)<<48 ); 
+    }
     if(type > 0 && type < 4)
         WORLD().CreateMarryBoard(manId,womanId,type,time);
     else 

@@ -535,6 +535,7 @@ namespace GObject
             _questionId[i] = 0;
         for(UInt8 i =0 ; i < 10 ;++i )
            _answers[i] = 0;
+        GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
     }
     void MarryBoard::SetQuestionOnMarryBoard()
     {
