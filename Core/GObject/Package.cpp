@@ -6799,7 +6799,10 @@ namespace GObject
         for(UInt8 i = 0; i < sizeof(lbids) / sizeof(lbids[0]); ++i)
         {
             if(m_lbSmeltInfo.gujiId == lbids[i])
+            {
                 hasSpe = true;
+                break;
+            }
         }
         if(!hasSpe)
             return false;
@@ -6913,7 +6916,7 @@ namespace GObject
         UInt16 subClass = itype->subClass;
         bool fSpecial = true;
         if(!FinishLBSmeltSpecial(itype, lbattr, attrNum))
-        {
+        {   //非皇帝卷宗才进来！！
             fSpecial = false;
             UInt8 minAttrNum = item->quality > 3 ? 3 : 1;
             UInt8 color2 = item->quality;

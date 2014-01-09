@@ -4,6 +4,7 @@
 #include "Common/URandom.h"
 #include "Server/SysMsg.h"
 #include "Common/Itoa.h"
+#include "Marry.h"
 namespace GObject
 {
     void* MarryBoard::_marryBoardTimer = NULL;
@@ -200,7 +201,7 @@ namespace GObject
         _woman = woman;
         _norms = norms;
         //_marryBoardTimer =WORLD().AddTimer(2 * 1000, MarryBoard_Timer, static_cast<void*>(NULL));
-        SendPreMarryPresent(man,woman,norms);
+        //SendPreMarryPresent(man,woman,norms);
         //GObject::globalOnlinePlayers.enumerate(player_enum_marryBoard,this,11);
         GObject::globalPlayers.enumerate(player_enum_marryBoard,this,11);
         return true;
@@ -266,6 +267,7 @@ namespace GObject
                 GObject::globalPlayers.enumerate(player_enum_marryBoardAward,this);
                 _type = 0;
                 GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
+                gMarryMgr.FinishMarry(_man->getId(),_woman->getId());
                 WORLD().RemoveTimer(_marryBoardTimer);
                 _marryBoardTimer = NULL;
     //          WORLD().CreateMarryBoard(_man->getId(),_woman->getId(),_norms,0);

@@ -1518,6 +1518,12 @@ void World::World_MarryBoard_Refresh(void *)
 {
     GObject::MarryBoard::instance().MarryBoard_Timer(); 
 }
+
+void World::World_Marry_Process(void *)
+{
+    gMarryMgr.DoProcess(); 
+}
+
 void World::DaysRank_Refresh(void*)
 {
 	GObject::DaysRank::instance().process();
@@ -1967,6 +1973,8 @@ bool World::Init()
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
+    
+    AddTimer(86400 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
     
     return true;
 }
