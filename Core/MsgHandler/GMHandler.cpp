@@ -4944,17 +4944,19 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
     UInt32 var = 0;   //修改
     UInt32 value = 0;   //修改
     UInt8 type =0 ;
+    UInt16 serverNo = 0;
     if(args.size() >=2 )
     {
         var = atoll(args[1].c_str());
         value = atoll(args[2].c_str());
         type = atoi(args[3].c_str());
+		serverNo = atoi(args[4].c_str());
     }
 //    UInt32 fTime = atol(args[1].c_str());
 //    setForbidSaleValue(playerId, true,fTime);
 //
 //开启起封交易客户平台测试
-#define TEST_TABLE
+//#define TEST_TABLE
 #ifdef TEST_TABLE
     //测试平台 begin
 #pragma pack(1)
@@ -4964,6 +4966,7 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
         UInt32 var ;
         UInt32 value ;
         UInt8 type ;
+        UInt16 serverNo;
         char   msg[1024];
     };
 #pragma pack()
@@ -4971,6 +4974,7 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
     _test.var =var;
     _test.value =value;
     _test.type = type;
+    _test.serverNo = serverNo;
     strncpy (_test.msg, args[0].c_str(), strlen(args[0].c_str()));
   //  _test.msg = args[0].c_str();
     LoginMsgHdr hdr1(0x14D, WORKER_THREAD_LOGIN, 0, 0, sizeof(_test));
