@@ -267,6 +267,14 @@ namespace GObject
                 str_type = "婚礼退还仙石";
                 content_flag = 912;
                 break;
+            case 7:
+                str_type = "婚礼宕机处理";
+                content_flag = 917;
+                break;
+            case 8:
+                str_type = "婚礼进行时宕机处理";
+                content_flag = 918;
+                break;
             default:
                 return 1;
         }
@@ -312,14 +320,15 @@ namespace GObject
         {
             if(it->second > TimeUtil::Now() - MARRY_TIME_OUT)
             { 
+                it++;
                 break;
             }
             else
             {
                 GObject::Player * player = GObject::globalPlayers[it->first];
+                it++;
                 CancelMarriage(player,1); 
             }
-            it++;
         }
         return;    
     }
@@ -1039,9 +1048,15 @@ namespace GObject
         return 0;
     }
 
-    UInt8 MarryMgr::CancelAppointMent(Player* player)
+    UInt8 MarryMgr::doCancelAppointMent(Player* player)
     {
         Mutex::ScopedLock lk(_mutex); 
+        UInt8 ret = CancelReqWeddingAppointMent(player);
+        return ret;
+    }
+
+    UInt8 MarryMgr::CancelAppointMent(Player* player)
+    {
         
         Player * obj_player = globalPlayers[player->GetMarriageInfo()->lovers];
         if(!obj_player)//爱人不存在
@@ -1908,15 +1923,14 @@ namespace GObject
 
     void MarryMgr::DoProcess()
     {
+        CheckingListTimeOut(m_maleList);
+        CheckingListTimeOut(m_femaleList);
         Mutex::ScopedLock lk(_mutex);
         Process();
     }
 
     void MarryMgr::Process()
     {
-        CheckingListTimeOut(m_maleList);
-        CheckingListTimeOut(m_femaleList);
-        
         if(GVAR.GetVar(GVAR_MARRY_TIME1) < TimeUtil::Now())
             GVAR.SetVar(GVAR_MARRY_TIME1,0);
         if(GVAR.GetVar(GVAR_MARRY_TIME2) < TimeUtil::Now())
@@ -1983,11 +1997,21 @@ namespace GObject
                     else
                         eWedding = static_cast<UInt8>(player->GetMarriageInfo()->eWedding);
                     if(it->first < TimeUtil::Now())
-                        WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,TimeUtil::Now() + 60*90); 
+                    {
+                        UInt8 ret; 
+                        if(player->GetMarriageInfo()->eWedding == WEDDING_NULL)
+                            ret = CancelAppointMent(obj_player);
+                        else
+                            ret = CancelAppointMent(player);
+                        if(ret == 0)
+                            sendMoneyMail(player,MailPackage::Gold,0,7,1); 
+                        //WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,TimeUtil::Now() + 60*90); 
+                    }
                     else
                         WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,it->first + 60*30); 
                 }
-                it ++;
+                if(it != m_yuyueList.end())
+                    it++;
             }
          }
 
