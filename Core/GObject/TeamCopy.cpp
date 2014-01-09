@@ -873,7 +873,7 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
                 bsim.start(res);
 
             turns += bsim.getTurns();
-            res = bsim.getWinner();
+            res = bsim.getWinner();    // 1表示攻防胜利(右下角)，2表示守方胜利(左上角)
             if( 2 == res )
             {
                 break;
