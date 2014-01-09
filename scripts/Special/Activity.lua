@@ -7724,9 +7724,9 @@ function sendRechargeRankAward(player, pos, total, f7)
     elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
         sendRechargeRankAward_2013_04_15(player, pos, total, f7)
     elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
-        sendRechargeRankAward_2014_01_14(player, pos, total, f7)
+        sendRechargeRankAward_2013_03_29(player, pos, total, f7)
     elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
-        sendRechargeRankAward_2013_06_25(player, pos, total, f7)
+        sendRechargeRankAward_2014_01_14(player, pos, total, f7)
     elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
         sendRechargeRankAward_2013_04_18(player, pos, total, f7)
     elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
