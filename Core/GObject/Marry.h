@@ -144,6 +144,8 @@ namespace GObject
             
             UInt8 JieYuan(Player* ,UInt64);//结缘                
             
+            UInt8 doCancelAppointMent(Player*);//取消婚礼预约 加锁 发通知 
+            
             UInt8 CancelAppointMent(Player*);//取消婚礼预约 0--取消预约申请 1-- 取消确定的预约
             
             UInt8 DivorceMarry(Player* ,UInt8);//离婚 0--放弃结缘 1-- 单独离婚 2--共同离婚
@@ -201,6 +203,8 @@ namespace GObject
             void Process();
             
             void SetDirty(Player*,Player*);
+            
+            void MarryingCrush();
         private:
             Mutex _mutex;
             MoneyStruct sMoney; 

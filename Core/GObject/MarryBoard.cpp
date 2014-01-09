@@ -205,6 +205,7 @@ namespace GObject
         //SendPreMarryPresent(man,woman,norms);
         //GObject::globalOnlinePlayers.enumerate(player_enum_marryBoard,this,11);
         GObject::globalPlayers.enumerate(player_enum_marryBoard,this,11);
+
         return true;
     }
     void MarryBoard::MarryBoard_Timer()
@@ -218,6 +219,7 @@ namespace GObject
             if(_type != 1)
             {
                 GObject::globalOnlinePlayers.enumerate(player_enum_marryBoard,this,1);
+                SendPreMarryPresent(_man,_woman,_norms);
                 _type =1 ;
             }
         }
@@ -265,14 +267,9 @@ namespace GObject
         {
             if(_type ==4 )
             {
-                GObject::globalPlayers.enumerate(player_enum_marryBoardAward,this);
-                _type = 0;
-                GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
-                gMarryMgr.FinishMarry(_man->getId(),_woman->getId());
-                GVAR.SetVar(GVAR_CREATMARRY_TIMES,1);
-                WORLD().RemoveTimer(_marryBoardTimer);
-                _marryBoardTimer = NULL;
     //          WORLD().CreateMarryBoard(_man->getId(),_woman->getId(),_norms,0);
+                sendAward();
+                gMarryMgr.FinishMarry(_man->getId(),_woman->getId());
             }
             return ;
         }
@@ -413,14 +410,27 @@ namespace GObject
                 }
                 break;
             case 10:
+                {
                     st <<static_cast<UInt8>(0x71);
+                    pl->SetVar(VAR_MARRYBOARD_LIVELY,0);
+                    pl->SetVar(VAR_MARRYBOARD_YANHUA,0);
+                }
                 break;
             case 11 :
-    //            pl->SetVar(VAR_MARRYBOARD_LIVELY,0);   //内测区循环测试
-                sendTodayMarryInfo(pl);
+                {
+                    sendTodayMarryInfo(pl);
+                    pl->SetVar(VAR_MARRYBOARD_LIVELY,0);
+                    pl->SetVar(VAR_MARRYBOARD_YANHUA,0);
+                }
+                break;
+            case 12:
+                {
+                    _lively += pl->GetVar(VAR_MARRYBOARD_LIVELY);
+                    _YHlively += pl->GetVar(VAR_MARRYBOARD_YANHUA);
+                }
                 break;
         }
-        if(type == 6 || type ==11)
+        if(type == 6 || type >=11)
             return true;
         st <<Stream::eos;
         pl->send(st); 
@@ -539,7 +549,6 @@ namespace GObject
             _questionId[i] = 0;
         for(UInt8 i =0 ; i < 10 ;++i )
            _answers[i] = 0;
-        GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
     }
     void MarryBoard::SetQuestionOnMarryBoard()
     {
@@ -633,6 +642,24 @@ namespace GObject
         _mAnswer = 0;
         if(_askNum > 9)
             _askNum = 9;
+    }
+    bool MarryBoard::sendAward()
+    {
+        bool flag = false ;
+        if(_type == 0 )
+        {
+            GObject::globalPlayers.enumerate(player_enum_marryBoard,this,12);
+            if(!_lively)
+                return false;
+            _lively = 0 ;
+            flag = true;
+        }
+        GObject::globalPlayers.enumerate(player_enum_marryBoardAward,this);
+        _type = 0;
+        GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
+        WORLD().RemoveTimer(_marryBoardTimer);
+        _marryBoardTimer = NULL;
+        return flag;
     }
 }
 

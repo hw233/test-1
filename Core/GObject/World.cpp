@@ -1992,7 +1992,10 @@ bool World::Init()
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
     
     AddTimer(60 * 60 * 3 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
-    
+    if( GObject::MarryBoard::instance().sendAward())
+    {
+        gMarryMgr.MarryingCrush();
+    }
     return true;
 }
 
