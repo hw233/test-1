@@ -7574,7 +7574,7 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                         }
                     case 2:
                         {
-                            ret = GObject::gMarryMgr.CancelAppointMent(player);
+                            ret = GObject::gMarryMgr.doCancelAppointMent(player);
                             break; 
                         }
                     case 3:
