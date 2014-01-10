@@ -3774,6 +3774,9 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 dmg += dmg2;
                 if (dmg1 && dmg2)
                 {
+                    bo->setStunRound(1);
+                    appendDefStatus(e_Stun, 0, bo);
+                    calcAbnormalTypeCnt(bo);
                     const GData::SkillStrengthenEffect* ef = NULL;
                     if(ss)
                         ef = ss->getEffect(GData::ON_STUN, GData::TYPE_DAMAG_A);
@@ -3787,13 +3790,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
                         bo->setDeepStunDmgExtra(ef->value/100, ef->last);
                         appendDefStatus(e_deepStun, 0, bo);
+                        calcAbnormalTypeCnt(bo);
                     }
-                    else
-                    {
-                        bo->setStunRound(1);
-                        appendDefStatus(e_Stun, 0, bo);
-                    }
-                    calcAbnormalTypeCnt(bo);
                 }
             }
         }
@@ -10472,9 +10470,15 @@ void BattleSimulator::doSkillEffectExtra_RandomShield(BattleFighter* bf, int tar
         return;
     if (!bo->isChar())
         return;
-    float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx]);
+
+    float ssfactor = 0.0f;
+    ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 增加减防效果
+    float factor = 1 + ssfactor;
+
+    float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx]) * factor;
     if (hp < 1.0f)
         return;
+
     bo->addHpShieldSelf(hp, skill->effect->efl[eftIdx]);
     appendDefStatus(e_hpShieldSelf, hp, bo);
 }
@@ -11948,13 +11952,22 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
     size_t cnt = eft.size();
     if(cnt != efv.size())
         return false;
+
+    bool dmgreduce = false;
     for(size_t i = 0; i < cnt; ++ i)
     {
         if(eft[i] == GData::e_eft_pet_protect_reduce)
         {
             factor *= (1 - efv[i]);
+            if(!dmgreduce)
+                dmgreduce = true;
         }
     }
+
+    float ssfactor = 0.0f;
+    ModifySingleAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);  // 增加减防效果
+    factor *= ( 1 + ssfactor );
+
     {
     const GData::SkillBase* pskill = pet->getPassiveSkillOnPetProtectForce();
     if(!pskill || !pskill->effect)
@@ -11968,7 +11981,7 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
 
     appendDefStatus(e_skill, pskill->getId(), pet);
     }
-    return protectDamage(bf, pet, phyAtk, magAtk, factor);
+    return protectDamage(bf, pet, phyAtk, magAtk, factor, dmgreduce);
 }
 
 bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor)
@@ -12006,24 +12019,39 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
             return false;
 
         appendDefStatus(e_skill, pskill->getId(), pet);
+        bool dmgreduce = false;
         for(size_t i = 0; i < cnt; ++ i)
         {
             if(eft[i] == GData::e_eft_pet_protect_reduce)
             {
                 factor *= (1.0f - efv[i]);
+                if(!dmgreduce)
+                    dmgreduce = true;
             }
         }
-        return protectDamage(bf, pet, phyAtk, magAtk, factor);
+
+        float ssfactor = 0.0f;
+        ModifySingleAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);  // 增加减防效果
+        factor *= ( 1 + ssfactor );
+
+        return protectDamage(bf, pet, phyAtk, magAtk, factor, dmgreduce);
     }
     return false;
 }
 
-bool BattleSimulator::protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor)
+bool BattleSimulator::protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor, bool dmgreduce)
 {
     // 吸收一半伤害给仙宠
-    
-    phyAtk /= 2;
-    magAtk /= 2;
+    if(!dmgreduce)
+    {
+        phyAtk /= 2;
+        magAtk /= 2;
+    }
+    else
+    {
+        phyAtk *= 0.3;
+        magAtk *= 0.3;
+    }
     UInt32 dmg = 0;
     UInt32 magdmg = 0;
     bool dmgFlag = false;
