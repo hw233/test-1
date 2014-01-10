@@ -40,6 +40,8 @@ enum
     ON_HITE = 23,      // 命中时
     ON_BUDDHA_LIGHT = 24,      // 佛光效果触发后
     ON_ZXBJ = 25,  // 诸天宝鉴触发后
+    ON_HPCHANGE = 26,  // HP改变时触发
+    ON_GET_SKILL_PROB = 27, // 概率选择技能时触发（目前只会改变技能概率）
 };
 
 enum
@@ -89,6 +91,8 @@ enum
     TYPE_APPEND_SELF_ATTACK = 43,        // 附加自己百分比攻击力
     TYPE_DMG_DEEP = 44,        // 重伤
     TYPE_NINGSHI = 45,        // 凝视
+    TYPE_LINGYAN = 46,         // 灵焱 (宠物造成的流血和每回合概率减灵气)
+    TYPE_PROB_ADD = 47,         //  概率增加
 
     TYPE_MAX,
 };

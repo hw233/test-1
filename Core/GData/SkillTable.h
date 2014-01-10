@@ -20,7 +20,7 @@ namespace GData
 #define CITTA_TO_ITEMID(x) ((UInt16)(x) / CITTA_LEVEL_MAX + LCITTA_ID - 1)
 #define ITEMID_TO_CITTA(x,l) (((UInt16)(x) - LCITTA_ID + 1)*100 + ((UInt16)(l > 9 ? 9 : l)))
 
-enum
+enum    // 技能触发方式
 {
     /*0*/ SKILL_ACTIVE = 0,
     /*1*/ SKILL_PEERLESS,
@@ -40,8 +40,8 @@ enum
     /*14*/ SKILL_ONATKBLEED,
     /*15*/ SKILL_ONATKDMG,
     /*16*/ SKILL_ONPETPROTECT,
-    /*17*/ SKILL_ONGETDMG,
-    /*18*/ SKILL_ONBEDMG,
+    /*17*/ SKILL_ONGETDMG,      // 受到任何伤害触发
+    /*18*/ SKILL_ONBEDMG,       // 被其他人攻击触发
     /*19*/ SKILL_ONBEPHYDMG,
     /*20*/ SKILL_ONBEMAGDMG,
     /*21*/ SKILL_ONHP10P,    // 生命剩余1/3
@@ -50,6 +50,8 @@ enum
     /*24*/ SKILL_BLEED_TYPE_DMG,  // 流血类状态伤害
     /*25*/ SKILL_XMCZ,  //降魔禅杖
     /*26*/ SKILL_BLTY,  //碧岚天衣
+    /*27*/ SKILL_AFTACTION,      // 行动后触发（包括被眩晕）
+    /*28*/ SKILL_ONHPCHANGE,       // HP改变时触发
     SKILL_PASSIVES
 };
 

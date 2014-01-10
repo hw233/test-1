@@ -291,7 +291,7 @@ private:
         e_unPetShield = 75,     // 解除仙宠的护盾
         e_selfBleed = 76,       // 自己流血 （自焚）
         e_unSelfBleed = 77,     // 自己流血结束 （自焚烧完了）
-        e_petAppear = 78,
+        e_petAppear = 78,       // 仙宠入场
         e_petMark = 79,         // 神兽印记
         e_unPetMark = 80,         // 神兽印记
         e_petProtect100 = 81,   // 100%援护标志
@@ -326,6 +326,24 @@ private:
         e_unDmgDeep = 110,    // 解除重伤
         e_dmgNingShi = 109,    // 凝视
         e_unDmgNingShi = 110,    // 解除凝视
+
+        /*
+        e_petZhongShu = 109,        // 中枢1（每回合行动后恢复10%生命）
+        e_unPetZhongShu = 110,      // 中枢1消失
+        e_petWeiJing = 111,         // 为精1（每损失5%的生命值获得额外2%的伤害减免）
+        e_unPetWeiJing = 112,       // 为精1消失
+        e_petWeiYing = 113,         // 为英 （每损失5%的生命值获得额外2%的伤害提升）
+        e_unPetWeiYing = 114,       // 为英1消失
+        e_petZhongShu2 = 115,       // 中枢2（生命低于30%时恢复30%生命，一场战斗只能触发一次）
+        e_unPetZhongShu2 = 116,     // 中枢2消失
+        e_petWeiJing2 = 117,        // 为精2 （生命低于30%时获得额外50%的伤害减免，一场战斗只能触发一次）
+        e_unPetWeiJing2 = 118,      // 为精2消失
+        e_petWeiYing2 = 119,        // 为英2（生命低于30%时获得额外50%的伤害提升，一场战斗只能触发一次）
+        e_unPetWeiYing2 = 120,      // 为英2消失
+        */
+
+        e_lingYan = 121,            // 灵焱效果
+        e_unLingYan = 122,          // 灵焱效果消失
 
         e_MAX_STATE,
     };
@@ -375,6 +393,7 @@ private:
 	void setStatusChange(UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, UInt32 value, bool active);
 	void setStatusChange(BattleFighter * bf, UInt8 side, UInt8 pos, int cnt, const GData::SkillBase* skill, UInt8 type, float value, UInt16 last, bool active);
 	void setStatusChange2(BattleFighter* bf, UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, UInt16 last, bool active);
+    void onHPChanged(BattleObject* bo);
 	void onDamage(BattleObject * bo, bool active, UInt32 dmg);
 	BattleFighter * getRandomFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMaxHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
