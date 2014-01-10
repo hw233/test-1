@@ -113,6 +113,9 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillStrengthenTable[GData::TYPE_SHIELD_HP] = &BattleSimulator::doSkillStrengthen_ShieldHP;
         skillStrengthenTable[GData::TYPE_FAKE_DEAD] = &BattleSimulator::doSkillStrengthen_FireFakeDead;
         skillStrengthenTable[GData::TYPE_SNEAD_RECOVER] = &BattleSimulator::doSkillStrengthen_SneakRecover;
+        skillStrengthenTable[GData::TYPE_APPEND_SELF_ATTACK] = &BattleSimulator::doSkillStrengthen_SelfAttack;
+        skillStrengthenTable[GData::TYPE_DMG_DEEP] = &BattleSimulator::doSkillStrengthen_DmgDeep;
+        skillStrengthenTable[GData::TYPE_NINGSHI] = &BattleSimulator::doSkillStrengthen_NingShi;
     }
     {
         for(int i = 0; i < GData::e_eft_max; ++ i)
@@ -227,6 +230,9 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillStrengthenTable[GData::TYPE_SHIELD_HP] = &BattleSimulator::doSkillStrengthen_ShieldHP;
         skillStrengthenTable[GData::TYPE_FAKE_DEAD] = &BattleSimulator::doSkillStrengthen_FireFakeDead;
         skillStrengthenTable[GData::TYPE_SNEAD_RECOVER] = &BattleSimulator::doSkillStrengthen_SneakRecover;
+        skillStrengthenTable[GData::TYPE_APPEND_SELF_ATTACK] = &BattleSimulator::doSkillStrengthen_SelfAttack;
+        skillStrengthenTable[GData::TYPE_DMG_DEEP] = &BattleSimulator::doSkillStrengthen_DmgDeep;
+        skillStrengthenTable[GData::TYPE_NINGSHI] = &BattleSimulator::doSkillStrengthen_NingShi;
     }
     {
         for(int i = 0; i < GData::e_eft_max; ++ i)
@@ -1088,17 +1094,7 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
         doShieldHPAttack(bo, dmg);
         if(dmg > 0)
         {
-            UInt32 dmgShow = makeDamage(bo, dmg);
-            appendDefStatus(e_damNormal, dmgShow, bo, e_damagePhysic);
-            // killed the target fighter
-            if(bo->getHP() == 0)
-            {
-                onDead(false, bo);
-            }
-            else if(_winner == 0)
-            {
-                onDamage(bo, true, NULL);
-            }
+            makeDamage(bo, dmg, e_damNormal, e_damagePhysic);
         }
     }
     else if(!defend100 && !enterEvade)
@@ -1178,17 +1174,7 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
         doShieldHPAttack(area_target, dmg);
         if(dmg > 0)
         {
-            UInt32 dmgShow = makeDamage(area_target, dmg);
-            appendDefStatus(e_damNormal, dmgShow, area_target, e_damagePhysic);
-            // killed the target fighter
-            if(area_target->getHP() == 0)
-            {
-                onDead(false, area_target);
-            }
-            else if(_winner == 0)
-            {
-                onDamage(area_target, true, NULL);
-            }
+            makeDamage(area_target, dmg, e_damNormal, e_damagePhysic);
         }
     }
     else if(!defend100 && !enterEvade)
@@ -1338,7 +1324,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         if (area_target->isPetMark() && bf->isPet()  && passiveSkill->effect)
                         {
                             appendDefStatus(e_skill, passiveSkill->getId(), bf);
-                            factor += passiveSkill->effect->atkP;
+                            float ssfactor = 0.0f;
+                            ModifySingleAttackValue_SkillStrengthen(bf, passiveSkill, ssfactor, true);
+                            factor += passiveSkill->effect->atkP * (1 + ssfactor);
                         }
                     }
                 }
@@ -1412,6 +1400,16 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         atk += aura_factor * itemSkill->ef_value * (cs2 ? bf->calcCriticalDmg(area_target) : 1);
                     else
                         magatk += aura_factor * itemSkill->ef_value * (cs2 ? bf->calcCriticalDmg(area_target) : 1);
+                }
+
+                // 伤害提升
+                const GData::SkillStrengthenEffect* ef = NULL;
+                if(ss)
+                    ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_DMG_STRENGHTHEN);
+                if (ef)
+                {
+                    atk *= (ef->value + 1);
+                    magatk *= (ef->value + 1);
                 }
             }
             else
@@ -1513,11 +1511,10 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             doShieldHPAttack(area_target, dmg3);
             if(dmg3 > 0)
             {
-                makeDamage(area_target, dmg3, true);
                 if (magdmgFlag)
-                    appendDefStatus(e_damNormal, magdmg, area_target, e_damageMagic);
+                    makeDamage(area_target, magdmg, e_damNormal, e_damageMagic);
                 if (dmgFlag)
-                    appendDefStatus(e_damNormal, dmg, area_target, e_damagePhysic);
+                    makeDamage(area_target, dmg, e_damNormal, e_damagePhysic);
             }
             //appendDefStatus(e_damNormal, dmg3, area_target);
             //printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
@@ -1546,19 +1543,12 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 }
                 if (exDmg > 0)
                 {
-                    UInt32 exDmgShow = makeDamage(area_target, exDmg);
-                    appendDefStatus(e_damNormal, exDmgShow, area_target, e_damageTrue);
+                    makeDamage(area_target, exDmg, e_damNormal, e_damageTrue);
                 }
             }
 
-            if(area_target->getHP() == 0)
+            if(area_target->getHP() != 0)
             {
-                onDead((side == bf->getSide()), area_target);
-            }
-            else if(_winner == 0)
-            {
-                onDamage(area_target, !(side == bf->getSide()));
-
                 if(NULL != skill && skill->effect != NULL && skill->effect->state & GData::e_state_poison)
                 {
                     float rate = skill->prob * 100;
@@ -1568,10 +1558,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         poison = true;
                     }
                 }
-            }
 
-            if(area_target->getHP() != 0)
-            {
                 const GData::SkillStrengthenEffect* ef = NULL;
                 if(cs2 && ss)
                     ef = ss->getEffect(GData::ON_CRITICAL, GData::TYPE_BLEED);
@@ -1766,7 +1753,16 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     dmg2 *= static_cast<float>(950 + _rnd(100)) / 1000;
 
                     dmg2 = dmg2 > 0 ? dmg2 : 1;
-                    UInt32 dmg2Show = makeDamage(bf, dmg2);
+
+                    appendDefStatus(e_damNormal, 0, target_fighter);
+                    size_t idx = _defList.size() - 1;
+                    _defList[idx].damType2 |= 0x80;
+                    if(cs2)
+                        _defList[idx].damType2 |= 0x40;
+                    if(pr2)
+                        _defList[idx].damType2 |= 0x20;
+
+                    makeDamage(bf, dmg2, e_damCounter, e_damagePhysic);
                     if(bf->getMagAtkReduce3Last() > 0)
                     {
                         bf->setMagAtkReduce3(0, 0);
@@ -1780,25 +1776,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         UInt32 value = static_cast<UInt32>(bf->getAtkReduce()*100);
                         appendStatusChange(e_stAtkReduce, value, 0, bf);
                     }
-
-                    appendDefStatus(e_damNormal, 0, target_fighter);
-                    size_t idx = _defList.size() - 1;
-                    _defList[idx].damType2 |= 0x80;
-                    if(cs2)
-                        _defList[idx].damType2 |= 0x40;
-                    if(pr2)
-                        _defList[idx].damType2 |= 0x20;
-                    _defList[idx].counterDmg = dmg2Show;
-                    // killed the fighter
-                    if(bf->getHP() == 0)
-                    {
-                        onDead(true, bf);
-                    }
-                    else if(_winner == 0)
-                    {
-                        onDamage(bf, false);
-                    }
-                    _defList[idx].counterLeft = bf->getHP();
                 }
 #if 0
                 else
@@ -1816,8 +1793,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
     {
         float atk = calcAttack(bf, cs2, 0, NULL);
         dmg = static_cast<int>(factor * atk) * (950 + _rnd(100)) / 1000;
-        UInt32 dmgShow = makeDamage(static_cast<BattleFighter*>(area_target_obj), dmg);
-        appendDefStatus(e_damNormal, dmgShow, static_cast<BattleFighter*>(area_target_obj), e_damagePhysic);
+        makeDamage(static_cast<BattleFighter*>(area_target_obj), dmg, e_damNormal, e_damagePhysic);
         //printf("%u:%u %s ground object, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", dmg, area_target_obj->getHP());
     }
 
@@ -2034,43 +2010,11 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                 {
                     UInt32 dmg = abs(calcPoison(bo, boSkill, bo, false));
                     UInt32 dmg3 = dmg*0.5;
-                    UInt32 dmg3Show = makeDamage(bo, dmg3);
-                    appendDefStatus(e_Poison, dmg3Show, bo, e_damagePoison);
-                    if(bo->getHP() == 0)
-                    {
-                        if(onDead(!activeFlag, bo))
-                            break;
-                    }
-                    else if(_winner == 0)
-                    {
-                        onDamage(bo, activeFlag);
-                    }
-
+                    makeDamage(bo, dmg3, e_Poison, e_damagePoison);
                     dmg3 = dmg;
-                    dmg3Show = makeDamage(bo, dmg3);
-                    appendDefStatus(e_Poison, dmg3Show, bo, e_damagePoison);
-                    if(bo->getHP() == 0)
-                    {
-                        if(onDead(!activeFlag, bo))
-                            break;
-                    }
-                    else if(_winner == 0)
-                    {
-                        onDamage(bo, activeFlag);
-                    }
-
+                    makeDamage(bo, dmg3, e_Poison, e_damagePoison);
                     dmg3 = dmg*1.5;
-                    dmg3Show = makeDamage(bo, dmg3);
-                    appendDefStatus(e_UnPoison, dmg3Show, bo, e_damagePoison);
-                    if(bo->getHP() == 0)
-                    {
-                        onDead(!activeFlag, bo);
-                    }
-                    else if(_winner == 0)
-                    {
-                        onDamage(bo, activeFlag);
-                    }
-
+                    makeDamage(bo, dmg3, e_UnPoison, e_damagePoison);
                 }
                 break;
             case GData::e_state_confuse:
@@ -2171,16 +2115,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     }
                     else
                     {
-                        UInt32 fdmgShow = makeDamage(bo, fdmg);
-                        appendDefStatus(e_damBack, fdmgShow, bo, e_damageTrue);
-                        if(bo->getHP() == 0)
-                        {
-                            onDead(!activeFlag, bo);
-                        }
-                        else if(_winner == 0)
-                        {
-                            onDamage(bo, activeFlag);
-                        }
+                        makeDamage(bo, fdmg, e_damBack, e_damageTrue);
                     }
 
                     continue;
@@ -2351,17 +2286,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                         if(fsize > 0)
                             dmg *= skill->factor[idx];
                         ++i;
-                        UInt32 dmgShow = makeDamage(bo, dmg);
-                        appendDefStatus(e_damNormal, dmgShow, bo, e_damagePoison);
-
-                        if(bo->getHP() == 0)
-                        {
-                            onDead(!activeFlag, bo);
-                        }
-                        else if(_winner == 0)
-                        {
-                            onDamage(bo, activeFlag);
-                        }
+                        makeDamage(bo, dmg, e_damNormal, e_damagePoison);
                     }
                 }
                 else if(0 == skill->area)
@@ -2370,17 +2295,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     if(bo != NULL && bo->getHP() != 0 && bo->isChar())
                     {
                         UInt32 dmg = abs(calcPoison(bf, skill, bo, false));
-                        UInt32 dmgShow = makeDamage(bo, dmg);
-                        appendDefStatus(e_damNormal, dmgShow, bo, e_damagePoison);
-
-                        if(bo->getHP() == 0)
-                        {
-                            onDead(activeFlag, bo);
-                        }
-                        else if(_winner == 0)
-                        {
-                            onDamage(bo, !activeFlag);
-                        }
+                        makeDamage(bo, dmg, e_damNormal, e_damagePoison);
                     }
                 }
                 else
@@ -2392,17 +2307,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                         UInt32 dmg = abs(calcPoison(bf, skill, bo, false));
                         if(fsize > 0)
                             dmg *= skill->factor[0];
-                        UInt32 dmgShow = makeDamage(bo, dmg);
-                        appendDefStatus(e_damNormal, dmgShow, bo, e_damagePoison);
-
-                        if(bo->getHP() == 0)
-                        {
-                            onDead(activeFlag, bo);
-                        }
-                        else if(_winner == 0)
-                        {
-                            onDamage(bo, !activeFlag);
-                        }
+                        makeDamage(bo, dmg, e_damNormal, e_damagePoison);
                     }
 
                     for(int i = 0; i < apcnt; ++ i)
@@ -2412,17 +2317,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                             continue;
 
                         UInt32 dmg = abs(calcPoison(bf, skill, bo, false)) * ap[i].factor;
-                        UInt32 dmgShow = makeDamage(bo, dmg);
-                        appendDefStatus(e_damNormal, dmgShow, bo, e_damagePoison);
-
-                        if(bo->getHP() == 0)
-                        {
-                            onDead(activeFlag, bo);
-                        }
-                        else if(_winner == 0)
-                        {
-                            onDamage(bo, !activeFlag);
-                        }
+                        makeDamage(bo, dmg, e_damNormal, e_damagePoison);
                     }
                 }
             }
@@ -2630,20 +2525,10 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
             doShieldHPAttack(target_bo, dmg);
             if(dmg > 0)
             {
-                UInt32 dmgShow = makeDamage(target_bo, dmg);
                 if(poisonTimes == 3)
-                    appendDefStatus(e_UnPoison, dmgShow, target_bo, e_damagePoison);
+                    makeDamage(target_bo, dmg, e_UnPoison, e_damagePoison);
                 else
-                    appendDefStatus(e_Poison, dmgShow, target_bo, e_damagePoison);
-            }
-
-            if(target_bo->getHP() == 0)
-            {
-                onDead(false, target_bo);
-            }
-            else if(_winner == 0)
-            {
-                onDamage(target_bo, true);
+                    makeDamage(target_bo, dmg, e_Poison, e_damagePoison);
             }
         }
     }
@@ -3632,17 +3517,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     if(fsize > 0)
                         dmg *= skill->factor[idx];
                     ++i;
-                    UInt32 dmgShow = makeDamage(bo, dmg);
-                    appendDefStatus(e_damNormal, dmgShow, bo, e_damagePoison);
-
-                    if(bo->getHP() == 0)
-                    {
-                        onDead(false, bo);
-                    }
-                    else if(_winner == 0)
-                    {
-                        onDamage(bo, true);
-                    }
+                    makeDamage(bo, dmg, e_damNormal, e_damagePoison);
                 }
             }
             else if(0 == skill->area)
@@ -3651,17 +3526,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 if(bo != NULL && bo->getHP() != 0 && bo->isChar())
                 {
                     UInt32 dmg = abs(calcPoison(bf, skill, bo, false));
-                    UInt32 dmgShow = makeDamage(bo, dmg);
-                    appendDefStatus(e_damNormal, dmgShow, bo, e_damagePoison);
-
-                    if(bo->getHP() == 0)
-                    {
-                        onDead(false, bo);
-                    }
-                    else if(_winner == 0)
-                    {
-                        onDamage(bo, true);
-                    }
+                    makeDamage(bo, dmg, e_damNormal, e_damagePoison);
                 }
             }
             else
@@ -3673,17 +3538,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     UInt32 dmg = abs(calcPoison(bf, skill, bo, false));
                     if(fsize > 0)
                         dmg *= skill->factor[0];
-                    UInt32 dmgShow = makeDamage(bo, dmg);
-                    appendDefStatus(e_damNormal, dmgShow, bo, e_damagePoison);
-
-                    if(bo->getHP() == 0)
-                    {
-                        onDead(false, bo);
-                    }
-                    else if(_winner == 0)
-                    {
-                        onDamage(bo, true);
-                    }
+                    makeDamage(bo, dmg, e_damNormal, e_damagePoison);
                 }
 
                 for(int i = 0; i < apcnt; ++ i)
@@ -3693,17 +3548,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                         continue;
 
                     UInt32 dmg = abs(calcPoison(bf, skill, bo, false)) * ap[i].factor;
-                    UInt32 dmgShow = makeDamage(bo, dmg);
-                    appendDefStatus(e_damNormal, dmgShow, bo, e_damagePoison);
-
-                    if(bo->getHP() == 0)
-                    {
-                        onDead(false, bo);
-                    }
-                    else if(_winner == 0)
-                    {
-                        onDamage(bo, true);
-                    }
+                    makeDamage(bo, dmg, e_damNormal, e_damagePoison);
                 }
             }
         }
@@ -3890,13 +3735,29 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 tmpDmg = attackOnce(bf, first, cs, pr, skill, bo, factor, -1, NULL, atkAct);
                 if(tmpDmg && hitList.find(bo) != hitList.end())
                 {
-                    bo->setConfuseRound(1);
-                    appendDefStatus(e_Confuse, 0, bo);
+                    const GData::SkillStrengthenEffect* ef = NULL;
+                    if(ss)
+                        ef = ss->getEffect(GData::ON_CONFUSE, GData::TYPE_DAMAG_A);
+                    if(ef)
+                    {
+                        bo->setConfuseLevel(SKILL_LEVEL(skill->getId()));
+                        if(skill->cond == GData::SKILL_BEATKED)
+                            bo->setConfuseRound(skill->last + 1);
+                        else
+                            bo->setConfuseRound(skill->last);
+
+                        bo->setDeepConfuseDmgExtra(ef->value/100, ef->last);
+                        appendDefStatus(e_deepConfuse, 0, bo);
+                    }
+                    else
+                    {
+                        bo->setConfuseRound(1);
+                        appendDefStatus(e_Confuse, 0, bo);
+                    }
                     calcAbnormalTypeCnt(bo);
                 }
                 dmg += tmpDmg;
             }
-
         }
         //仙宠、两次单体攻击，两次伤害则眩晕 (天崩地裂)
         else if(SKILL_ID(skill->getId()) == 48 || SKILL_ID(skill->getId()) == 67)
@@ -3913,8 +3774,25 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 dmg += dmg2;
                 if (dmg1 && dmg2)
                 {
-                    bo->setStunRound(1);
-                    appendDefStatus(e_Stun, 0, bo);
+                    const GData::SkillStrengthenEffect* ef = NULL;
+                    if(ss)
+                        ef = ss->getEffect(GData::ON_STUN, GData::TYPE_DAMAG_A);
+                    if(ef)
+                    {
+                        bo->setStunLevel(SKILL_LEVEL(skill->getId()));
+                        if(skill->cond == GData::SKILL_BEATKED)
+                            bo->setStunRound(skill->last + 1);
+                        else
+                            bo->setStunRound(skill->last);
+
+                        bo->setDeepStunDmgExtra(ef->value/100, ef->last);
+                        appendDefStatus(e_deepStun, 0, bo);
+                    }
+                    else
+                    {
+                        bo->setStunRound(1);
+                        appendDefStatus(e_Stun, 0, bo);
+                    }
                     calcAbnormalTypeCnt(bo);
                 }
             }
@@ -4385,9 +4263,39 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         {
             ef = efs[i];
             if(ef->target == GData::e_battle_target_self)
+            {
                 doSkillStrengthenAttack(bf, skill, ef, bf->getSide(), bf->getPos(), true);
+            }
+            else if(ef->target == GData::e_battle_target_selfside_atk_2nd) // 攻击力第二高的目标
+            {
+                UInt8 excepts[25] = {0};
+                size_t exceptCnt = 1;
+                excepts[0] = bf->getPos();
+                UInt8 side = bf->getSide();
+                for (int i = 0; i < 25; ++i)
+                {
+                    BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+                    if(!bo)  // 雪人
+                        continue;
+
+                    if(bo->getId() == 5679 || bo->isSoulOut())
+                    {
+                        excepts[exceptCnt] = i;
+                        ++ exceptCnt;
+                    }
+                }
+                BattleFighter* bo = get2ndAtkFighter(bf->getSide(), excepts, exceptCnt);
+                if(bo)
+                {
+                    int target_side = bo->getSide();
+                    int target_pos = bo->getPos();
+                    doSkillStrengthenAttack(bf, skill, ef, target_side, target_pos, true);
+                }
+            }
             else
+            {
                 doSkillStrengthenAttack(bf, skill, ef, target_side, target_pos, true);
+            }
         }
 
         ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_RANDOM_BLEED);
@@ -4703,6 +4611,11 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
                 if(!self)
                 {
                     float value = bf->_aura * skill->effect->auraP + skill->effect->aura;
+
+                    float ssfactor = 0.0f;
+                    ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加灵气效果
+                    if (ssfactor != 0)
+                        value *= (1 + ssfactor);
                     setStatusChange(bf, bf->getSide(), bf->getPos(), 1, skill, e_stAura, value, skill->last, !activeFlag);
                     tmpself = true;
                 }
@@ -4740,6 +4653,13 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
                         }
                     }
                 }
+                else
+                {
+                    float ssfactor = 0.0f;
+                    ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加灵气效果
+                    if (ssfactor != 0)
+                        value *= (1 + ssfactor);
+                }
 
                 setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stAura, value, skill->last, activeFlag);
             }
@@ -4758,12 +4678,20 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
             if(!self)
             {
                 float value = bf->_attack * skill->effect->atkP + skill->effect->atk;
+                float ssfactor = 0.0f;
+                ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
+                if (ssfactor != 0)
+                    value *= (1 + ssfactor);
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, skill, e_stAtk, value, skill->last, !activeFlag);
                 tmpself = true;
             }
         }
         else
         {
+            float ssfactor = 0.0f;
+            ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
+            if (ssfactor != 0)
+                value *= (1 + ssfactor);
             setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stAtk, value, skill->last, activeFlag);
         }
     }
@@ -4807,12 +4735,22 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
             if(!self)
             {
                 float value = bf->_magatk * skill->effect->magatkP + skill->effect->magatk;
+                float ssfactor = 0.0f;
+                ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
+                if (ssfactor != 0)
+                    value *= (1 + ssfactor);
+
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, skill, e_stMagAtk, value, skill->last, !activeFlag);
                 tmpself = true;
             }
         }
         else
         {
+            float ssfactor = 0.0f;
+            ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
+            if (ssfactor != 0)
+                value *= (1 + ssfactor);
+
             setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stMagAtk, value, skill->last, activeFlag);
         }
     }
@@ -7523,7 +7461,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
     return true;
 }
 
-void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<AttackAct>* atkAct)
+void BattleSimulator::onDamage( BattleObject * bo, bool active, UInt32 dmg)
 {
     if(!bo)
         return;
@@ -7659,6 +7597,12 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
                 }
             }
         }
+    }
+    if(bo2->isDmgDeep())
+    {
+        UInt32 value = dmg * bo2->getDmgDeep();
+        bo2->makeDamage(value);
+        appendDefStatus(e_damNormal, value, bo2);
     }
 #if 0
     if(bo->isChar() && bo->getHP() > 0)
@@ -7823,6 +7767,19 @@ BattleFighter * BattleSimulator::getMaxAtkFighter( UInt8 side, UInt8 * excepts, 
     return static_cast<BattleFighter *>(getObject(side, posList[_rnd(posList.size())]));
 }
 
+BattleFighter * BattleSimulator::get2ndAtkFighter( UInt8 side, UInt8 * excepts, size_t exceptCount )
+{
+    BattleFighter* bo = getMaxAtkFighter(side, excepts, exceptCount);
+    if(!bo)
+        return NULL;
+
+    excepts[exceptCount] = bo->getPos();
+    ++ exceptCount;
+
+    bo = getMaxAtkFighter(side, excepts, exceptCount);
+    return bo;
+}
+
 BattleFighter * BattleSimulator::getMinAtkFighter( UInt8 side, UInt8 * excepts, size_t exceptCount )
 {
     // 获取攻击力最低的散仙
@@ -7874,9 +7831,26 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
     do
     {
+        std::vector<BattleFighter*> vbo = bf->getBeiNingShiZhe();
+        for(std::vector<BattleFighter*>::iterator it = vbo.begin(); it != vbo.end(); ++ it)
+        {
+            BattleFighter* bo = *it;
+            UInt32 value = bo->getDmgNingShi();
+            makeDamage(bo, value, e_damNormal, e_damageTrue);
+        }
+
         bf->releasePetCoAtk();
         bf->releaseSkillCD(1);
         bf->releaseMoEvade100();
+
+        if(bf->releaseDmgDeep())
+        {
+            appendDefStatus(e_unDmgDeep, 0, bf);
+        }
+        if(bf->releaseDmgNingShi())
+        {
+            appendDefStatus(e_unDmgNingShi, 0, bf);
+        }
 
         if(bf->releaseLingQu())
         {
@@ -9024,20 +8998,11 @@ bool BattleSimulator::doSkillStrengthen_AttackFriend(BattleFighter* bf, const GD
             return false;
 
         dmg *= ef->value/100;
-        appendDefStatus(eType, dmg, fighter, e_damagePhysic); // 这里应该都是普通物理攻击吧
         if (eType == e_damNormal)
         {
             // 这个加进去，可以看到人跑到友人那边攻击一次？
             appendDefStatus(e_xinmo, 0, bf);
-            makeDamage(fighter, dmg);
-            if(fighter->getHP() == 0)
-            {
-                onDead(false, fighter);
-            }
-            else if(_winner == 0)
-            {
-                onDamage(fighter, true, NULL);
-            }
+            makeDamage(fighter, dmg, eType, e_damagePhysic); // 这里应该都是普通物理攻击吧
         }
     }
     return true;
@@ -9341,17 +9306,7 @@ bool BattleSimulator::AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* p
         return false;
 
     UInt32 nRealDamage = ef->value/100 * nDamage;  // 伤害值
-    UInt32 nRealDamageShow = makeDamage(pTarget, nRealDamage);
-    appendDefStatus(e_damNormal, nRealDamageShow, pTarget, e_damageTrue);
-
-    if(pTarget->getHP() == 0)
-    {
-        onDead(false, pTarget);
-    }
-    else if(_winner == 0)
-    {
-        onDamage(pTarget, true, NULL);
-    }
+    makeDamage(pTarget, nRealDamage, e_damNormal, e_damageTrue);
 
     return true;
 }
@@ -9705,21 +9660,11 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             else
             {
                 UInt32 dmg = lsBleed * factor;
-                UInt32 dmgShow = makeDamage(bf, dmg);
                 calcBleedTypeCnt(bf);
                 if(bf->releaseLingShiBleed())
-                    appendDefStatus(e_unLingShiBleed, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, e_unLingShiBleed, e_damageTrue);
                 else
-                    appendDefStatus(e_lingShiBleed, dmgShow, bf, e_damageTrue);
-
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
-                }
+                    makeDamage(bf, dmg, e_lingShiBleed, e_damageTrue);
             }
         }
         if(bf->getHP() == 0)
@@ -9739,21 +9684,11 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             else
             {
                 UInt32 dmg = bleedMo * factor;
-                UInt32 dmgShow = makeDamage(bf, dmg);
                 calcBleedTypeCnt(bf);
                 if(bf->releaseBleedMo())
-                    appendDefStatus(e_unBleedMo, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, e_unBleedMo, e_damageTrue);
                 else
-                    appendDefStatus(e_BleedMo, dmgShow, bf, e_damageTrue);
-
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
-                }
+                    makeDamage(bf, dmg, e_BleedMo, e_damageTrue);
             }
         }
         if(bf->getHP() == 0)
@@ -9773,22 +9708,12 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             else
             {
                 UInt32 dmg = static_cast<UInt32>(bf->getBleed1()) * factor;
-                UInt32 dmgShow = makeDamage(bf, dmg);
                 calcBleedTypeCnt(bf);
                 -- last1;
                 if(last1 == 0)
-                    appendDefStatus(e_unBleed1, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, e_unBleed1, e_damageTrue);
                 else
-                    appendDefStatus(e_Bleed1, dmgShow, bf, e_damageTrue);
-
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
-                }
+                    makeDamage(bf, dmg, e_Bleed1, e_damageTrue);
 
                 if(last1 == 0)
                     bf->setBleed1(0, 0);
@@ -9811,23 +9736,12 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             else
             {
                 UInt32 dmg = static_cast<UInt32>(bf->getBleed2()) * factor;
-                UInt32 dmgShow = makeDamage(bf, dmg);
                 calcBleedTypeCnt(bf);
                 -- last2;
                 if(last2 == 0)
-                    appendDefStatus(e_unBleed2, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, e_unBleed2, e_damageTrue);
                 else
-                    appendDefStatus(e_Bleed2, dmgShow, bf, e_damageTrue);
-
-
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
-                }
+                    makeDamage(bf, dmg, e_Bleed2, e_damageTrue);
                 if(last2 == 0)
                     bf->setBleed2(0, 0);
             }
@@ -9849,22 +9763,12 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             else
             {
                 UInt32 dmg = static_cast<UInt32>(bf->getBleed3()) * factor;
-                UInt32 dmgShow = makeDamage(bf, dmg);
                 calcBleedTypeCnt(bf);
                 -- last3;
                 if(last3 == 0)
-                    appendDefStatus(e_unBleed3, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, e_unBleed3, e_damageTrue);
                 else
-                    appendDefStatus(e_Bleed3, dmgShow, bf, e_damageTrue);
-
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
-                }
+                    makeDamage(bf, dmg, e_Bleed3, e_damageTrue);
                 if(last3 == 0)
                     bf->setBleed3(0, 0);
             }
@@ -9877,22 +9781,12 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         if(selflast != 0)
         {
             UInt32 dmg = static_cast<UInt32>(bf->getMaxHP()) * 0.01;
-            UInt32 dmgShow = makeDamage(bf, dmg);
             calcBleedTypeCnt(bf);
             -- selflast;
             if(selflast == 0)
-                appendDefStatus(e_unSelfBleed, dmgShow, bf, e_damageTrue);
+                makeDamage(bf, dmg, e_unSelfBleed, e_damageTrue);
             else
-                appendDefStatus(e_selfBleed, dmgShow, bf, e_damageTrue);
-
-            if(bf->getHP() == 0)
-            {
-                onDead(true, bf);
-            }
-            else if(_winner == 0)
-            {
-                onDamage(bf, false);
-            }
+                makeDamage(bf, dmg, e_selfBleed, e_damageTrue);
             if(selflast == 0)
                 bf->setSelfBleed(0, 0);
         }
@@ -9912,22 +9806,12 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             else
             {
                 UInt32 dmg = static_cast<UInt32>(bf->getAuraBleed()) * factor;
-                UInt32 dmgShow = makeDamage(bf, dmg);
                 calcBleedTypeCnt(bf);
                 -- ablast;
                 if(ablast == 0)
-                    appendDefStatus(e_unBleed1, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, e_unBleed1, e_damageTrue);
                 else
-                    appendDefStatus(e_Bleed1, dmgShow, bf, e_damageTrue);
-
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
-                }
+                    makeDamage(bf, dmg, e_Bleed1, e_damageTrue);
                 if(ablast == 0)
                 {
                     bf->setAuraBleed(0, 0, 0);
@@ -9953,22 +9837,12 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             else
             {
                 UInt32 dmg = static_cast<UInt32>(bf->getConfuceBleed()) * factor;
-                UInt32 dmgShow = makeDamage(bf, dmg);
                 calcBleedTypeCnt(bf);
                 -- cblast;
                 if(cblast == 0)
-                    appendDefStatus(e_unBleed4, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, e_unBleed4, e_damageTrue);
                 else
-                    appendDefStatus(e_Bleed4, dmgShow, bf, e_damageTrue);
-
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
-                }
+                    makeDamage(bf, dmg, e_Bleed4, e_damageTrue);
                 if(cblast == 0)
                 {
                     bf->setConfuceBleed(0, 0, 0);
@@ -9994,22 +9868,13 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             else
             {
                 UInt32 dmg = static_cast<UInt32>(bf->getStunBleed()) * factor;
-                UInt32 dmgShow = makeDamage(bf, dmg);
                 calcBleedTypeCnt(bf);
                 -- sblast;
                 if(sblast == 0)
-                    appendDefStatus(e_unBleed3, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, e_unBleed3, e_damageTrue);
                 else
-                    appendDefStatus(e_Bleed3, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, e_Bleed3, e_damageTrue);
 
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
-                }
                 if(sblast == 0)
                 {
                     bf->setStunBleed(0, 0, 0);
@@ -10035,22 +9900,13 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             else
             {
                 UInt32 dmg = static_cast<UInt32>(bf->getBlindBleed()) * factor;
-                UInt32 dmgShow = makeDamage(bf, dmg);
                 calcBleedTypeCnt(bf);
                 -- bblast;
                 if(bblast == 0)
-                    appendDefStatus(e_unBleedMo, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, e_unBleedMo, e_damageTrue);
                 else
-                    appendDefStatus(e_BleedMo, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, e_BleedMo, e_damageTrue);
 
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
-                }
                 if(bblast == 0)
                 {
                     bf->setBlindBleed(0, 0, 0);
@@ -10099,25 +9955,16 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             {
                 UInt32 dmg = bf->getBleedRandom() * factor;
                 dmg *= static_cast<float>(950 + _rnd(100))/1000;
-                UInt32 dmgShow = makeDamage(bf, dmg);
                 calcBleedTypeCnt(bf);
                 -- nrandomlast;
                 if(nrandomlast == 0)
                 {
                     bf->setBleedRandom(0, 0);
-                    appendDefStatus(eUnType, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, eUnType, e_damageTrue);
                 }
                 else
                 {
-                    appendDefStatus(eType, dmgShow, bf, e_damageTrue);
-                }
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
+                    makeDamage(bf, dmg, eType, e_damageTrue);
                 }
             }
         }
@@ -10154,26 +10001,17 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             {
                 UInt32 dmg = bf->getBleedBySkill() * factor;
                 dmg *= static_cast<float>(950 + _rnd(100))/1000;
-                UInt32 dmgShow = makeDamage(bf, dmg);
                 calcBleedTypeCnt(bf);
                 -- nbySkilllast;
 
                 if(nbySkilllast == 0)
                 {
                     bf->setBleedBySkill(0, 0);
-                    appendDefStatus(eUnType, dmgShow, bf, e_damageTrue);
+                    makeDamage(bf, dmg, eUnType, e_damageTrue);
                 }
                 else
                 {
-                    appendDefStatus(eType, dmgShow, bf, e_damageTrue);
-                }
-                if(bf->getHP() == 0)
-                {
-                    onDead(true, bf);
-                }
-                else if(_winner == 0)
-                {
-                    onDamage(bf, false);
+                    makeDamage(bf, dmg, eType, e_damageTrue);
                 }
             }
         }
@@ -10373,8 +10211,10 @@ UInt32 BattleSimulator::getSkillEffectExtraHitCnt(BattleFighter* bf, BattleFight
                 appendDefStatus(e_unMarkMo, 0, bo);
             }
         }
+        /*
         else if (eft[i] == GData::e_eft_atk_pet_mark_extra_dmg && bo->isPetMark())
             hitCnt += efv[i];
+            */
     }
 
     return hitCnt;
@@ -10711,10 +10551,7 @@ void BattleSimulator::doSkillEffectExtra_AtkPetMarkAura(BattleFighter* bf, int t
 
 void BattleSimulator::doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
-    // Nothing to do.
-    /*
     // 造成额外伤害
-
     BattleObject * bo = getObject(target_side, target_pos);
     if (!bo->isChar())
         return;
@@ -10723,8 +10560,11 @@ void BattleSimulator::doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int ta
     bool first = false;
     bool cs    = false;
     bool pr    = false;
-    attackOnce(bf, first, cs, pr, NULL, area_target, skill->effect->efv[eftIdx], 1);
-    */
+
+    float ssfactor = 0.0f;
+    ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 增加额外伤害效果
+    float value = skill->effect->efv[eftIdx] * (1 + ssfactor);
+    attackOnce(bf, first, cs, pr, NULL, area_target, value, 1);
 }
 
 void BattleSimulator::doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
@@ -11052,18 +10892,7 @@ bool BattleSimulator::doDarkVigorAttack(BattleFighter* bf, float darkVigor)
 {
     bool bfDead = false;
     UInt32 dmg = darkVigor;
-    UInt32 dmgShow = makeDamage(bf, dmg);
-    appendDefStatus(e_damNormal, dmgShow, bf, e_damageTrue);
-
-    if(bf->getHP() == 0)
-    {
-        bfDead = true;
-        onDead(false, bf);
-    }
-    else if(_winner == 0)
-    {
-        onDamage(bf, true, NULL);
-    }
+    makeDamage(bf, dmg, e_damNormal, e_damageTrue);
  
     struct OffsetPos
     {
@@ -11088,17 +10917,7 @@ bool BattleSimulator::doDarkVigorAttack(BattleFighter* bf, float darkVigor)
             if(!bo || bo->getHP() == 0)
                 continue;
             UInt32 dmg2 = dmg * factor[i];
-            UInt32 dmg2Show = makeDamage(bo, dmg2);
-            appendDefStatus(e_damNormal, dmg2Show, bo, e_damageTrue);
-
-            if(bo->getHP() == 0)
-            {
-                onDead(false, bo);
-            }
-            else if(_winner == 0)
-            {
-                onDamage(bo, true, NULL);
-            }
+            makeDamage(bo, dmg2, e_damNormal, e_damageTrue);
         }
     }
 
@@ -11335,17 +11154,7 @@ void BattleSimulator::doItemWu_Dmg(BattleFighter* bf, BattleFighter* bo, float v
     }
 
     UInt32 dmg = _formula->calcDamage(atk, def, bf->getLevel(), 1.0f, reduce);
-    UInt32 dmgShow = makeDamage(bo, dmg);
-    appendDefStatus(e_damNormal, dmgShow, bo, isPhysic?e_damagePhysic:e_damageMagic);
-
-    if(bo->getHP() == 0)
-    {
-        onDead(false, bo);
-    }
-    else if(_winner == 0)
-    {
-        onDamage(bo, true, NULL);
-    }
+    makeDamage(bo, dmg, e_damNormal, isPhysic?e_damagePhysic:e_damageMagic);
 }
 
 void BattleSimulator::doItemWu_HPShield(BattleFighter* bf, BattleFighter* bo, float value, UInt8 last)
@@ -11733,11 +11542,14 @@ void BattleSimulator::getAtkList(BattleFighter* bf, const GData::SkillBase* skil
     }
 }
 
-UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, bool alreadyMinus)
+UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type, DamageType damageType)
 {
     UInt32 uShow = u;
     if(!bf)
         return uShow;
+
+
+    size_t idx = _defList.size() - 1;
 #if 0
     const GData::SkillBase* skill = bf->getBiLanTianYiSkill();
     if(skill && skill->effect && bf->getEvadeCnt() > 2)
@@ -11777,11 +11589,8 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, bool alreadyMin
         UInt8 count = bf->getSoulProtectCount();
         if(count > 0)
         {
-            if(!alreadyMinus)
-            {
-                u /= 10;
-                uShow = u;
-            }
+            u /= 10;
+            uShow = u;
             --count;
             bf->setSoulProtectCount(count);
             if(count == 0)
@@ -11872,6 +11681,26 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, bool alreadyMin
                 bf->setSoulProtectLast(--last);
             }
         }
+    }
+
+
+    if(type == e_damCounter)
+    {
+        _defList[idx].counterDmg = uShow;
+        _defList[idx].counterLeft = bf->getHP();
+    }
+    else
+    {
+        appendDefStatus(type, uShow, bf, damageType);
+    }
+
+    if(bf->getHP() == 0)
+    {
+        onDead(false, bf);
+    }
+    else if(_winner == 0 && u > 0)
+    {
+        onDamage(bf, true, u);
     }
 
     return uShow;
@@ -12163,8 +11992,27 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
     for(size_t i = 0; i < _onPetProtect.size(); ++ i)
     {
         const GData::SkillBase* pskill = pet->getPassiveSkillOnPetProtect();
-        if(!pskill || !pskill->effect)
+        if(!pskill)
+        {
+            pet->get2ndProtectSkill();
+            if(!pskill)
+                return false;
+            else
+                pet->set2ndProtectSkill(0, NULL);
+        }
+        else
+        {
+            GData::SkillStrengthenBase* ss = pet->getSkillStrengthen(SKILL_ID(pskill->getId()));
+            if(ss)
+            {
+                const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_2ND_HAPPEND);
+                pet->set2ndProtectSkill(ef->value*100, pskill);
+            }
+        }
+
+        if(!pskill->effect)
             return false;
+
         const std::vector<UInt16>& eft = pskill->effect->eft;
         const std::vector<float>& efv = pskill->effect->efv;
 
@@ -12244,19 +12092,10 @@ bool BattleSimulator::protectDamage(BattleFighter* bf, BattleFighter* pet, float
     doShieldHPAttack(pet, dmg3);
     if(dmg3 > 0)
     {
-        makeDamage(pet, dmg3, true);
         if (magdmgFlag)
-            appendDefStatus(e_damNormal, magdmg, pet, e_damageMagic);
+            makeDamage(pet, magdmg, e_damNormal, e_damageMagic);
         if (dmgFlag)
-            appendDefStatus(e_damNormal, dmg, pet, e_damagePhysic);
-        if(pet->getHP() == 0)
-        {
-            onDead(false, pet);
-        }
-        else if(_winner == 0)
-        {
-            onDamage(pet, true, NULL);
-        }
+            makeDamage(pet, dmg, e_damNormal, e_damagePhysic);
     }
 
     return true;
@@ -12359,7 +12198,22 @@ bool BattleSimulator::doAttackWithPet(BattleFighter* bf, BattleFighter* pet)
 
         const GData::SkillBase* pskill = pet->getPassiveSkillOnAtkDmg();
         if(!pskill)
-            return false;
+        {
+            pet->get2ndCoAtkSkill();
+            if(!pskill)
+                return false;
+            else
+                pet->set2ndCoAtkSkill(0, NULL);
+        }
+        else
+        {
+            GData::SkillStrengthenBase* ss = pet->getSkillStrengthen(SKILL_ID(pskill->getId()));
+            if(ss)
+            {
+                const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_2ND_HAPPEND);
+                pet->set2ndCoAtkSkill(ef->value*100, pskill);
+            }
+        }
 
         float atk = getBFMagAtk(pet) * pskill->effect->magatkP;
         bf->setPetCoAtk(atk);
@@ -12508,6 +12362,69 @@ bool BattleSimulator::doSkillStrengthen_SneakRecover(BattleFighter* bf, const GD
     return true;
 }
 
+bool BattleSimulator::doSkillStrengthen_SelfAttack(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active)
+{
+    if(!bf || !skill || !ef)
+        return false;
+
+    // 附加自己百分比的攻击力到指定人身上
+    UInt16 last = ef->last;
+    float atkadd = (bf->_magatk) * (ef->value);
+    BattleObject * bo = getObject(target_side, target_pos);
+    if (!bo || !bo->isChar())
+        return false;
+    BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
+    //if (bf2->getClass() == e_cls_dao || bf2->getClass() == e_cls_mo)
+    {
+        bf2->setPetAttackAdd(atkadd, last);
+        UInt16 skillId = skill != NULL ? skill->getId() : 0;
+        UInt32 value = static_cast<UInt32>(bf2->getAttack());
+        appendStatusChange(e_stAtk, value, skillId, bf2);
+    }
+    //else
+    {
+        bf2->setPetMagAtkAdd(atkadd, last);
+        UInt16 skillId = skill != NULL ? skill->getId() : 0;
+        UInt32 value = static_cast<UInt32>(bf2->getMagAttack());
+        appendStatusChange(e_stMagAtk, value, skillId, bf2);
+    }
+    return true;
+}
+
+bool BattleSimulator::doSkillStrengthen_DmgDeep(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active)
+{
+    if(!bf || !skill || !ef)
+        return false;
+
+    BattleObject * bo = getObject(target_side, target_pos);
+    if (!bo || !bo->isChar())
+        return false;
+    BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
+
+    bf2->setDmgDeep(ef->last, ef->value);
+    appendDefStatus(e_dmgDeep, 0, bf2);
+
+    return true;
+}
+
+bool BattleSimulator::doSkillStrengthen_NingShi(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active)
+{
+    if(!bf || !skill || !ef)
+        return false;
+
+    int side = 1 - bf->getSide();
+    BattleFighter* bo = getRandomFighter(side, NULL, 1);
+    if (!bo || !bo->isChar())
+        return false;
+    BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
+
+    bf2->setDmgNingShi(bf, ef->last, ef->value * getBFAttack(bf));
+    appendDefStatus(e_dmgNingShi, 0, bf2);
+
+    return true;
+}
+
+
 void BattleSimulator::doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& pr, bool& cs)
 {
     if(!bf || !bo)
@@ -12542,16 +12459,10 @@ void BattleSimulator::doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& 
         dmg = _formula->calcDamage(atk * sneak_atk, def, bf->getLevel(), toughFactor, atkreduce);
         dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
         dmg = dmg > 0 ? dmg : 1;
-        UInt32 dmgShow = makeDamage(bo, dmg);
-        appendDefStatus(e_damNormal, dmgShow, bo, e_damagePhysic);
+        makeDamage(bo, dmg, e_damNormal, e_damagePhysic);
         UInt32 rhp = (dmg >> 1);
         bf->regenHP(rhp);
         appendDefStatus(e_damAbsorb, rhp, bf);
-
-        if(bo->getHP() == 0)
-            onDead(false, bo);
-        else if(_winner == 0)
-            onDamage(bo, true, NULL);
     }
     else if(!defend100 && !enterEvade)
         appendDefStatus(e_damEvade, 0, bo);
@@ -12716,12 +12627,7 @@ void BattleSimulator::doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, cons
                     dmg = dmg > 0 ? dmg : 1;
 
                     UInt32 curDmg = dmg;
-                    UInt32 curDmgShow = makeDamage(target, curDmg);
-                    appendDefStatus(e_damNormal, curDmgShow, target, isPhysic ? e_damagePhysic : e_damageMagic);
-                    if(target->getHP() == 0)
-                        onDead(false, target);
-                    else if(_winner == 0)
-                        onDamage(target, true, NULL);
+                    makeDamage(target, curDmg, e_damNormal, isPhysic ? e_damagePhysic : e_damageMagic);
                 }
                 else if(!defend100 && !enterEvade)
                     appendDefStatus(e_damEvade, 0, target);
@@ -12957,12 +12863,7 @@ void BattleSimulator::doPassiveSkillBePHYDmg(BattleFighter* bf, BattleFighter* b
     UInt32 dmg2 = _formula->calcDamage(atk, def, bo->getLevel(), 1, atkreduce);
     dmg2 *= static_cast<float>(950 + _rnd(100)) / 1000;
     dmg2 = dmg2 > 0 ? dmg2 : 1;
-    UInt32 dmg2Show = makeDamage(bf, dmg2);
-    appendDefStatus(e_damNormal, dmg2Show, bf, e_damagePhysic);
-    if(bf->getHP() == 0)
-        onDead(false, bf);
-    else if(_winner == 0)
-        onDamage(bf, true, NULL);
+    makeDamage(bf, dmg2, e_damNormal, e_damagePhysic);
 }
 
 void BattleSimulator::doPassiveSkillBeMagDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg)
@@ -12995,12 +12896,7 @@ void BattleSimulator::doPassiveSkillBeMagDmg(BattleFighter* bf, BattleFighter* b
     UInt32 dmg2 = _formula->calcDamage(atk, def, bo->getLevel(), 1, atkreduce);
     dmg2 *= static_cast<float>(950 + _rnd(100)) / 1000;
     dmg2 = dmg2 > 0 ? dmg2 : 1;
-    UInt32 dmg2Show = makeDamage(bf, dmg2);
-    appendDefStatus(e_damNormal, dmg2Show, bf, e_damageMagic);
-    if(bf->getHP() == 0)
-        onDead(false, bf);
-    else if(_winner == 0)
-        onDamage(bf, true, NULL);
+    makeDamage(bf, dmg2, e_damNormal, e_damageMagic);
 }
 
 void BattleSimulator::doPassiveSkillBegDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg)
@@ -13258,17 +13154,17 @@ bool BattleSimulator::doSkillDmg(BattleFighter* bf, const GData::SkillBase* skil
            continue;
 
        float factor = atklist[i].factor;
+       UInt32 dmg2 = 0;
        if(atk > 0)
        {
            atk *= factor;
            atk *= (1 - bo->getDecWaveDmg());
            float def = getBFDefend(bo);
            float atkreduce = getBFAtkReduce(bo);
-           UInt32 dmg2 = _formula->calcDamage(atk, def, bf->getLevel(), 1, atkreduce);
+           dmg2 = _formula->calcDamage(atk, def, bf->getLevel(), 1, atkreduce);
            dmg2 *= static_cast<float>(950 + _rnd(100)) / 1000;
            dmg2 = dmg2 > 0 ? dmg2 : 1;
-           UInt32 dmg2Show = makeDamage(bo, dmg2);
-           appendDefStatus(e_damNormal, dmg2Show, bo, e_damagePhysic);
+           makeDamage(bo, dmg2, e_damNormal, e_damagePhysic);
        }
        else if(magatk > 0)
        {
@@ -13276,17 +13172,11 @@ bool BattleSimulator::doSkillDmg(BattleFighter* bf, const GData::SkillBase* skil
            magatk *= (1 - bo->getDecWaveDmg());
            float magdef = getBFMagDefend(bo);
            float magatkreduce = getBFMagAtkReduce(bo);
-           UInt32 dmg2 = _formula->calcDamage(magatk, magdef, bf->getLevel(), 1, magatkreduce);
+           dmg2 = _formula->calcDamage(magatk, magdef, bf->getLevel(), 1, magatkreduce);
            dmg2 *= static_cast<float>(950 + _rnd(100)) / 1000;
            dmg2 = dmg2 > 0 ? dmg2 : 1;
-           UInt32 dmg2Show = makeDamage(bo, dmg2);
-           appendDefStatus(e_damNormal, dmg2Show, bo, e_damageMagic);
+           makeDamage(bo, dmg2, e_damNormal, e_damageMagic);
        }
-
-       if(bo->getHP() == 0)
-           onDead(false, bo);
-       else if(_winner == 0)
-           onDamage(bo, true, NULL);
    }
 
    return true;
@@ -13468,12 +13358,7 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
                 }
                 if(curDmg > 0)
                 {
-                    UInt32 curDmgShow = makeDamage(target, curDmg);
-                    appendDefStatus(e_damNormal, curDmgShow, target, isPhysic ? e_damagePhysic : e_damageMagic);
-                    if(target->getHP() == 0)
-                        onDead(false, target);
-                    else if(_winner == 0)
-                        onDamage(target, true, NULL);
+                    makeDamage(target, curDmg, e_damNormal, isPhysic ? e_damagePhysic : e_damageMagic);
                 }
             }
             else if(!defend100 && !enterEvade)

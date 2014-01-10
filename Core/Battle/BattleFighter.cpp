@@ -68,7 +68,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0),
     _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0), _counter_spirit_skill_cd(0), _pet_coatk(0), _fire_defend(0), _fire_defend_last(0), _fire_fake_dead_rate(0), _fire_fake_dead_rate_last(0), _sneak_atk(0), _sneak_atk_status(0), _sneak_atk_last(0), _sneak_atk_recover_rate(0),
     _selfSummon(NULL), _dec_wave_dmg(0), _lingqu_last(0), _lingqu_times(0), _lingqu(false), _soulout_last(0), _soulout(false),  _lingshi_bleed(0), _lingshi_bleed_last(0),
-    _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0), _abnormalTypeCnt(0), _bleedTypeCnt(0),_evadeCnt(0), _peerlessDisableLast(0), _soulProtectLast(0), _soulProtectCount(0)
+    _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0), _abnormalTypeCnt(0), _bleedTypeCnt(0),_evadeCnt(0), _peerlessDisableLast(0), _soulProtectLast(0), _soulProtectCount(0), _2ndRateCoAtk(0), _2ndCoAtkSkill(NULL), _2ndRateProtect(0), _2ndProtectSkill(NULL), _dmg_deep(0), _dmg_deep_last(0), _dmg_ningshi(0), _dmg_ningshi_last(0), _ningshizhe(NULL)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -2792,6 +2792,99 @@ bool BattleFighter::releaseSoulOut()
     if(_soulout_last == 0)
     {
         _hp = 0;
+        return true;
+    }
+
+    return false;
+}
+
+const GData::SkillBase* BattleFighter::get2ndCoAtkSkill()
+{
+    if(!_2ndCoAtkSkill)
+        return NULL;
+
+    if(_2ndRateCoAtk > uRand(10000))
+        return _2ndCoAtkSkill;
+}
+
+void BattleFighter::set2ndCoAtkSkill(float rate, const GData::SkillBase* pskill)
+{
+    _2ndRateCoAtk = rate;
+    _2ndCoAtkSkill = pskill;
+}
+
+const GData::SkillBase* BattleFighter::get2ndProtectSkill()
+{
+    if(!_2ndProtectSkill)
+        return NULL;
+
+    if(_2ndRateProtect > uRand(10000))
+        return _2ndProtectSkill;
+}
+
+void BattleFighter::set2ndProtectSkill(float rate, const GData::SkillBase* pskill)
+{
+    _2ndRateProtect = rate;
+    _2ndProtectSkill = pskill;
+}
+
+bool BattleFighter::releaseDmgDeep()
+{
+    if(_dmg_deep_last == 0)
+        return false;
+    -- _dmg_deep_last;
+    if(_dmg_deep_last == 0)
+    {
+        _dmg_deep = 0;
+        return true;
+    }
+
+    return false;
+}
+
+void BattleFighter::pushBeiNingShiZhe(BattleFighter* bo)
+{
+    if(!bo)
+        return;
+
+    if(std::find(_beiningshizhe.begin(),_beiningshizhe.end(),bo) == _beiningshizhe.end())
+        _beiningshizhe.push_back(bo);
+}
+
+void BattleFighter::popBeiNingShiZhe(BattleFighter* bo)
+{
+    if(!bo)
+        return;
+
+    std::vector<BattleFighter*>::iterator it = std::find(_beiningshizhe.begin(),_beiningshizhe.end(),bo);
+    if(it != _beiningshizhe.end())
+        _beiningshizhe.erase(it);
+}
+
+bool BattleFighter::setDmgNingShi(BattleFighter* bf, float value, UInt8 last)
+{
+    if(!_ningshizhe)
+    {
+        _ningshizhe = bf;
+        _ningshizhe->pushBeiNingShiZhe(this);
+        _dmg_ningshi = value;
+        _dmg_ningshi_last = last;
+        return true;
+    }
+
+    return false;
+}
+
+bool BattleFighter::releaseDmgNingShi()
+{
+    if(_dmg_ningshi_last == 0)
+        return false;
+    -- _dmg_ningshi_last;
+    if(_dmg_ningshi_last == 0)
+    {
+        _ningshizhe->popBeiNingShiZhe(this);
+        _ningshizhe = NULL;
+        _dmg_ningshi= 0;
         return true;
     }
 
