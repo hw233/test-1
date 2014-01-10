@@ -235,7 +235,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_married_log.sql     #创建结婚log表
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140109_1.sql     #修复仙界8强之前押注未结算的问题
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_married_couple.sql     #创建结婚log表
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_married_couple.sql     #创建结婚log表
 }
 
 #sh player_jiguan.sh
