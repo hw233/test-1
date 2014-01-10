@@ -214,6 +214,7 @@ private:
     enum StateType
     {
         e_damNormal = 0,
+        e_damCounter = 1,
         e_damEvade = 2,
         e_damHpAdd = 3,
         e_damRevival = 4,
@@ -321,6 +322,10 @@ private:
         e_unBenevolent = 106,    // 慈悲效果消失
         e_soulProtect = 107,    // 天佑
         e_unSoulProtect = 108,    // 天佑
+        e_dmgDeep = 109,    // 重伤
+        e_unDmgDeep = 110,    // 解除重伤
+        e_dmgNingShi = 109,    // 凝视
+        e_unDmgNingShi = 110,    // 解除凝视
 
         /*
         e_petZhongShu = 109,        // 中枢1（每回合行动后恢复10%生命）
@@ -394,13 +399,15 @@ private:
 	void setStatusChange(UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, UInt32 value, bool active);
 	void setStatusChange(BattleFighter * bf, UInt8 side, UInt8 pos, int cnt, const GData::SkillBase* skill, UInt8 type, float value, UInt16 last, bool active);
 	void setStatusChange2(BattleFighter* bf, UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, UInt16 last, bool active);
-	void onDamage(BattleObject * bo, bool active, std::vector<AttackAct>* atkAct = NULL);
     void onHPChanged(BattleObject* bo);
+	void onDamage(BattleObject * bo, bool active, UInt32 dmg);
 	BattleFighter * getRandomFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMaxHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMinHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMaxAtkFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMinAtkFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
+    BattleFighter * get2ndAtkFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
+
     bool doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct = NULL, float factor = 1, bool canProtect = false);
     bool doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0, UInt8* launchPeerLess = NULL, bool canProtect = false);
     BattleFighter* getTherapyTarget(BattleFighter* bf);
@@ -475,6 +482,9 @@ private:
 
     typedef bool (Battle::BattleSimulator::*doSkillStrengthenFunc)(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
+    bool doSkillStrengthen_NingShi(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
+    bool doSkillStrengthen_DmgDeep(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
+    bool doSkillStrengthen_SelfAttack(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
     bool doSkillStrengthen_FireFakeDead(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
     bool doSkillStrengthen_disperse(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
@@ -704,7 +714,7 @@ private:
 
     void getAtkList(BattleFighter* bf, const GData::LBSkillBase* lbskill, AtkList& atkList);
     void getAtkList(BattleFighter* bf, const GData::SkillBase* skill, AtkList& atkList, Int8 offset = 0);
-    UInt32 makeDamage(BattleFighter* bo, UInt32& u, bool alreadyMinus = false);
+    UInt32 makeDamage(BattleFighter* bo, UInt32& u, StateType type, DamageType damageType = e_damageNone);
 
     bool doAuraPresent(BattleFighter* bf);
     bool doConfusePresent(BattleFighter* bf);

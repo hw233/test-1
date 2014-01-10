@@ -70,6 +70,7 @@ enum
     e_battle_target_selfside_max = 5,
     e_battle_target_selfside_min = 6,
     e_battle_target_selfside_atk_max = 7,
+    e_battle_target_selfside_atk_2nd = 8,
 };
 
 

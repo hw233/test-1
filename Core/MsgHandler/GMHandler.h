@@ -233,6 +233,9 @@ private:
     void OnAddSHLvl(GObject::Player* player, std::vector<std::string>& args);
 
     void OnPlayerMsg(GObject::Player* player, std::vector<std::string>& args);
+    void OnCleanMarry(GObject::Player* player, std::vector<std::string>& args);
+    void OnCleanMarryList(GObject::Player* player, std::vector<std::string>& args);
+    void OnSetMarryStatus(GObject::Player* player, std::vector<std::string>& args);
     void OnHandleServerWar(GObject::Player* player, std::vector<std::string>& args);
 };
 
