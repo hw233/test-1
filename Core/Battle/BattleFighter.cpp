@@ -2805,6 +2805,8 @@ const GData::SkillBase* BattleFighter::get2ndCoAtkSkill()
 
     if(_2ndRateCoAtk > uRand(10000))
         return _2ndCoAtkSkill;
+
+    return NULL;
 }
 
 void BattleFighter::set2ndCoAtkSkill(float rate, const GData::SkillBase* pskill)
@@ -2820,6 +2822,8 @@ const GData::SkillBase* BattleFighter::get2ndProtectSkill()
 
     if(_2ndRateProtect > uRand(10000))
         return _2ndProtectSkill;
+
+    return NULL;
 }
 
 void BattleFighter::set2ndProtectSkill(float rate, const GData::SkillBase* pskill)

@@ -574,13 +574,12 @@ namespace GObject
             std::abort();
         }
 		
-#if 0
         if(!LoadSevenSoul())
         {
             fprintf(stderr, "LoadSevenSoul error!\n");
             std::abort();
         }
-#endif
+
         if(!LoadPlayerModifyMounts())
         {
             fprintf(stderr, "LoadPlayerModifyMounts error!\n");
@@ -6773,9 +6772,9 @@ namespace GObject
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
-		LoadingCounter lc("Loading player_sevensoul:");
+		LoadingCounter lc("Loading pet_sevensoul:");
 		DBSevenSoul dbvalue;
-		if(execu->Prepare("SELECT `playerId`, `petId`, `soulId`, `soulLevel`, `skillIndex` FROM `player_sevensoul` ", dbvalue) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `petId`, `soulId`, `soulLevel`, `skillIndex` FROM `pet_sevensoul` ", dbvalue) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;

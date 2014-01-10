@@ -64,14 +64,14 @@ UInt8 SevenSoul::getSkillLevel(UInt8 level)
 
 UInt16 SevenSoul::getSkillId(UInt32 petType, UInt8 soulId, UInt8 order)
 {
-    if(petType == 0 || petType > 4)
+    if(petType == 0 || petType > PET_TYPE_MAX)
         return 0;
-    if(soulId == 0 || soulId > 7)
+    if(soulId == 0 || soulId > SOUL_ID_MAX)
         return 0;
-    if(order == 0 || order > 2)
+    if(order >= SKILL_MAX_PER_SOUL)
         return 0;
     UInt32 index = (petType - 1) * SOUL_ID_MAX + soulId - 1;
-    return _skillId[index][order - 1];
+    return _skillId[index][order];
 }
 
 UInt32 SevenSoul::getConditonValue(UInt8 soulId)

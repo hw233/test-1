@@ -2292,6 +2292,16 @@ CREATE TABLE IF NOT EXISTS `modify_mount` (
     PRIMARY KEY (`id`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `pet_sevensoul`;
+CREATE TABLE IF NOT EXISTS `pet_sevensoul` (
+    `playerId` bigint(20) unsigned NOT NULL,
+    `petId` int(10) unsigned NOT NULL,
+    `soulId` tinyint(3) unsigned NOT NULL,
+    `soulLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `skillIndex` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`playerId`, `petId`, `soulId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `marriage` (
     `playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
     `marriage_time` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2344,3 +2354,4 @@ CREATE TABLE IF NOT EXISTS `married_log` (
     INDEX (`man_playerid`),
     INDEX (`woman_playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

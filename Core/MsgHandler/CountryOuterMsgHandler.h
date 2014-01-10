@@ -7051,7 +7051,6 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                 pet->upgradeSH(petId, sanhunId, opt);
             }
             break;
-#if 0
         case 0x08:  //七魄
             {
                 if(player->GetLev() < 80)
@@ -7082,7 +7081,6 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                 }
             }
             break;
-#endif
         default:
             break;
     }
@@ -7574,7 +7572,7 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                         }
                     case 2:
                         {
-                            ret = GObject::gMarryMgr.CancelAppointMent(player);
+                            ret = GObject::gMarryMgr.doCancelAppointMent(player);
                             break; 
                         }
                     case 3:
