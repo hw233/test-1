@@ -1689,10 +1689,18 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             rhp += (dmg + magdmg) * ef->value/100;
         }
 
+        if (ss)
+            ef = ss->getEffect(GData::ON_DAMAGE, GData::TYPE_AURA_GET);
+        if (ef)
+        {
+            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, skill, e_stAura, ef->value, 0, false);
+        }
+
         if(rhp > 0)
         {
             bf->regenHP(rhp);
             appendDefStatus(e_damAbsorb, rhp, bf);
+            onHPChanged(bf);
         }
 
         // 一次有效的物理攻击，减少上次吸收的物理伤害和被减掉的伤害
@@ -2159,6 +2167,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                 {
                     bf->regenHP(inj2hp);
                     appendDefStatus(e_damInj, inj2hp, bf);
+                    onHPChanged(bf);
                     continue;
                 }
                 else if(fdmg > 0 && bf->getSide() != target_side)
@@ -2265,7 +2274,10 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             {
                 UInt32 hpr = bf->regenHP(rhp);
                 if(hpr != 0)
+                {
                     appendDefStatus(e_damHpAdd, hpr, bf);
+                    onHPChanged(bf);
+                }
             }
             else if(1 == skill->area)
             {
@@ -2293,6 +2305,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                         continue;
 
                     appendDefStatus(e_damHpAdd, hpr, bo);
+                    onHPChanged(bo);
                 }
             }
             else if(0 == skill->area)
@@ -2303,7 +2316,10 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
 
                 UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp);
                 if(hpr != 0)
+                {
                     appendDefStatus(e_damHpAdd, hpr, bo);
+                    onHPChanged(bo);
+                }
             }
             else
             {
@@ -2316,7 +2332,10 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                         factor = skill->factor[0];
                     UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp * factor);
                     if(hpr != 0)
+                    {
                         appendDefStatus(e_damHpAdd, hpr, bo);
+                        onHPChanged(bo);
+                    }
                 }
 
                 for(int i = 0; i < apcnt; ++ i)
@@ -2327,7 +2346,10 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
 
                     UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp * ap[i].factor, skill->cond == GData::SKILL_ACTIVE);
                     if(hpr != 0)
+                    {
                         appendDefStatus(e_damHpAdd, hpr, bo);
+                        onHPChanged(bo);
+                    }
                 }
             }
         }
@@ -3276,6 +3298,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             else
                 ap[apcnt ++].factor = 1;
         }
+
+        // 检查是否有改变技能范围的符文
         if(ss != NULL)
         {
             apcnt2 = apcnt;
@@ -3459,6 +3483,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                         appendDefStatus(e_damHpAdd, hpr, bo);
                         if(skill->cond == GData::SKILL_ACTIVE)
                             releaseWeak(bo);
+                        onHPChanged(bo);
                     }
                 }
 
@@ -3478,6 +3503,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 appendDefStatus(e_damHpAdd, hpr, bf);
                 if(skill->cond == GData::SKILL_ACTIVE)
                     releaseWeak(bf);
+                onHPChanged(bf);
             }
         }
         else if(1 == skill->area)
@@ -3514,6 +3540,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     hpr_first = hpr;
 
                 appendDefStatus(e_damHpAdd, hpr, bo);
+                onHPChanged(bo);
                 if(skill->cond == GData::SKILL_ACTIVE)
                     releaseWeak(bo);
 
@@ -3526,7 +3553,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         }
         else if(0 == skill->area)
         {
-            // 暂时假定只有单体技能能按照百分比回血
+            // 暂时假定只有单体技能能按照百分比回血 && 暂时假定只有单体技能能有加强治疗效果的技能符文
             BattleFighter* bo;
             // 回春术
             if(SKILL_ID(skill->getId()) == 11)
@@ -3541,6 +3568,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 return false;
 
             float deFactor = calcTherapyFactor(bo);
+
+            // 技能符文对治疗效果的加成
+            ModifySingleAttackValue_SkillStrengthen(bo, skill, deFactor, true);
+
             UInt32 hpr = bo->regenHP(rhp * deFactor, skill->cond == GData::SKILL_ACTIVE, skill->effect->hppec, maxRhp);
             if(hpr != 0)
             {
@@ -3548,7 +3579,17 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 appendDefStatus(e_damHpAdd, hpr, bo);
                 if(skill->cond == GData::SKILL_ACTIVE)
                     releaseWeak(bo);
+                onHPChanged(bo);
             }
+
+            // 技能符文在回血时同时回灵
+            GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+            const GData::SkillStrengthenEffect* ef = NULL;
+            if(ss)
+                ef = ss->getEffect(GData::ON_THERAPY, GData::TYPE_AURA_GET);
+            if (ef)
+                setStatusChange(bo, bo->getSide(), bo->getPos(), 1, skill, e_stAura, ef->value, 0, false);
+
         }
         else
         {
@@ -3567,6 +3608,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     appendDefStatus(e_damHpAdd, hpr, bo);
                     if(skill->cond == GData::SKILL_ACTIVE)
                         releaseWeak(bo);
+                    onHPChanged(bo);
                 }
             }
 
@@ -3583,6 +3625,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     appendDefStatus(e_damHpAdd, hpr, bo);
                     if(skill->cond == GData::SKILL_ACTIVE)
                         releaseWeak(bo);
+                    onHPChanged(bo);
                 }
             }
         }
@@ -3604,6 +3647,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     {
                         appendDefStatus(e_skill, pskill->getId(), bo);
                         appendDefStatus(e_damHpAdd, hpr, bo);
+                        onHPChanged(bo);
                     }
                 }
             }
@@ -4462,6 +4506,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
 bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt)
 {
+    // 入场buff类技能
     if(NULL == skill || bf == NULL || target_pos < 0)
         return false;
 
@@ -4680,7 +4725,6 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
     return true;
 }
 
-
 bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, bool& self, bool ifDecAura)
 {
     if(NULL == skill || bf == NULL || target_pos < 0)
@@ -4708,6 +4752,9 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
                 if(!self)
                 {
                     float value = bf->_aura * skill->effect->auraP + skill->effect->aura;
+                    float factor = 1.0f;
+                    ModifySingleAttackValue_SkillStrengthen(bf, skill, factor, true);
+                    value *= factor;
                     setStatusChange(bf, bf->getSide(), bf->getPos(), 1, skill, e_stAura, value, skill->last, !activeFlag);
                     tmpself = true;
                 }
@@ -5024,6 +5071,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
     GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
     if(ss)
     {
+        // 存在技能符文
         const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_ATK_RETURN);
         if(ef)
         {
@@ -6078,6 +6126,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                                             defList[defCount].pos = getSidePos(bf);
                                             bf->regenHP(rhp);
                                             defList[defCount].leftHP = bf->getHP();
+                                            onHPChanged(bf);
                                             ++ defCount;
                                             skillid = myskillid;
                                         }
@@ -6192,12 +6241,12 @@ UInt32 BattleSimulator::doAttack( int pos )
             } while(false);
         }
 
+        // 每回合行动后自动释放技能 （眩晕也可以触发的）（目前只有回血恢复技能）
         if (bf->getHP() && !_winner)
         {
             const GData::SkillBase *skill = NULL;
             while(NULL != (skill = bf->getPassiveSkillAftAction()))
             {
-                // TODO: 每回合行动后自动释放技能
                 int cnt = 0;
                 getSkillTarget(bf, skill, otherside, target_pos, cnt);
                 std::vector<AttackAct> atkAct;
@@ -6601,6 +6650,7 @@ UInt32 BattleSimulator::tryDelayUseSkill( BattleFighter * bf, BattleObject * tar
                 UInt32 hpr = static_cast<BattleFighter *>(bo)->regenHP(rhp);
                 if(hpr == 0)
                     continue;
+                onHPChanged(bo);
                 defList[defCount].pos = getSidePos(bo);
                 defList[defCount].damType = e_damHpAdd;
                 defList[defCount].damage = hpr;
@@ -7328,6 +7378,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
                         if(rhp == 0)
                             rhp = 1;
                         (static_cast<BattleFighter*>(bo))->regenHP(rhp);
+                        onHPChanged(bo);
                     }
                 }
                 break;
@@ -7550,6 +7601,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
 
 void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<AttackAct>* atkAct)
 {
+    // 受到伤害且没有死亡时候触发的各种状态技能
     if(!bo)
         return;
     BattleFighter* bo2 = static_cast<BattleFighter*>(bo);
@@ -7574,7 +7626,6 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
             doSkillEffectExtraAttack(bo2, bo2->getSide(), bo2->getPos(), passiveSkill);
         }
     }
-
     UInt8& auraCD = bo2->getAuraDecCD();
     if(auraCD > 0)
     {
@@ -7597,7 +7648,7 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
     if(confuceCD > 0)
     {
         float rate = bo2->getMagRes(NULL) * 100;
-        if(confuceCD == 1 && rate > _rnd(10000))
+        if(confuceCD == 1 && rate > _rnd(10000)) // 免疫混乱
         {
             appendDefStatus(e_Res, 0, bo2);
         }
@@ -7630,7 +7681,7 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
         float rate = bo2->getMagRes(NULL) * 100;
         if(stunCD == 1 && rate > _rnd(10000))
         {
-            appendDefStatus(e_Res, 0, bo2);
+            appendDefStatus(e_Res, 0, bo2); // 免疫眩晕
         }
         else
         {
@@ -7685,6 +7736,38 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
             }
         }
     }
+
+    const GData::SkillBase* passiveSkill = NULL;
+    size_t idx = 0;
+    while(NULL != (passiveSkill = bo2->getPassiveSkillOnGetDmg100(idx)))
+    {
+        // XXX: 写死是被动增益技能
+        if (_getDamageSkillCount[bo2->getSide()] >= 3)
+            break;
+        ++_getDamageSkillCount[bo2->getSide()];
+        int target_side, target_pos, cnt;
+        getSkillTarget(bo2, passiveSkill, target_side, target_pos, cnt);
+        appendDefStatus(e_skill, passiveSkill->getId(), bo2);
+        bool self = false;
+        bool ifDecAura = isImmuneDecAura(passiveSkill, target_side, target_pos);
+        doSkillStatus(false, bo2, passiveSkill, target_side, target_pos, cnt, self, ifDecAura);
+    }
+    while(NULL != (passiveSkill = bo2->getPassiveSkillOnGetDmg()))
+    {
+        // XXX: 写死是被动增益技能
+        if (_getDamageSkillCount[bo2->getSide()] >= 3)
+            break;
+        ++_getDamageSkillCount[bo2->getSide()];
+        int target_side, target_pos, cnt;
+        getSkillTarget(bo2, passiveSkill, target_side, target_pos, cnt);
+        appendDefStatus(e_skill, passiveSkill->getId(), bo2);
+        bool self = false;
+        bool ifDecAura = isImmuneDecAura(passiveSkill, target_side, target_pos);
+        doSkillStatus(false, bo2, passiveSkill, target_side, target_pos, cnt, self, ifDecAura);
+    }
+
+    onHPChanged(bo2);
+
 #if 0
     if(bo->isChar() && bo->getHP() > 0)
     {
@@ -7709,6 +7792,51 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, std::vector<Atta
         }
     }
 #endif
+}
+
+void BattleSimulator::onHPChanged(BattleObject * bo)
+{
+    // 战斗单位在HP变化时触发的技能效果
+    if (bo->isChar())
+    {
+        BattleFighter * bf = static_cast<BattleFighter *>(bo);
+        if (!bf->getHP()) // 已经死了，不做处理
+            return;
+
+        size_t idx = 0;
+        const GData::SkillBase* passiveSkill = NULL;
+        while(NULL != (passiveSkill = bf->getPassiveSkillOnHPChange100(idx)))
+        {
+            if(passiveSkill->effect == NULL)
+                continue;
+        }
+
+        if (!passiveSkill || !passiveSkill->effect)
+            passiveSkill = bf->getPassiveSkillOnHPChange100(idx);
+        if (passiveSkill && passiveSkill->effect)
+        {
+            int target_side, target_pos, cnt;
+            getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
+            GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+            if(ss)
+            {
+                const GData::SkillStrengthenEffect* ef = NULL;
+
+                // HP减少伤害增加
+                ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_ATKADD);
+                if (ef && bf->updateHPPAttackAdd(ef->value, ef->valueExt1, ef->valueExt2))
+                        appendDefStatus(e_skill, passiveSkill->getId(), bf);
+
+                ef = NULL;
+                // HP减少减伤增加
+                ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_DAMAG_REDUCE);
+                if (ef && bf->updateHPPAttackReduce(ef->value, ef->valueExt1, ef->valueExt2))
+                        appendDefStatus(e_skill, passiveSkill->getId(), bf);
+
+            }
+        }
+    }
+
 }
 
 BattleFighter * BattleSimulator::getRandomFighter( UInt8 side, UInt8 * excepts, size_t exceptCount )
@@ -9009,10 +9137,15 @@ bool BattleSimulator::doSkillStrengthen_BleedBySkill(BattleFighter* bf, const GD
             bo->setBleed2(nBleed, ef->last);
             appendDefStatus(e_Bleed2, 0, bo);
         }
-        else
+        else if (nClass == e_cls_dao)
         {
             bo->setBleed3(nBleed, ef->last);
             appendDefStatus(e_Bleed3, 0, bo);
+        }
+        else
+        {
+            bo->setBleedMo(nBleed, ef->last);
+            appendDefStatus(e_BleedMo, 0, bo);
         }
     }
     return true;
@@ -10226,7 +10359,10 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                 UInt32 addHP = bf->getPeerLessDisableSSHP(i);
                 UInt32 hpr = bf->regenHP(addHP);
                 if(hpr > 0)
+                {
                     appendDefStatus(e_damHpAdd, hpr, bf);
+                    onHPChanged(bf);
+                }
             }
         }
 
@@ -10804,6 +10940,7 @@ void BattleSimulator::doSkillEffectExtraAbsorb(BattleFighter* bf, UInt32 dmg, co
             if(hpr != 0)
             {
                 appendDefStatus(e_damHpAdd, hpr, bo);
+                onHPChanged(bo);
             }
         }
     }
@@ -10830,6 +10967,7 @@ void BattleSimulator::doSkillStrenghtenTherapyAnotherMore(BattleFighter* bf, UIn
         if(hpr != 0)
         {
             appendDefStatus(e_damHpAdd, hpr, bo);
+            onHPChanged(bo);
         }
     }
 }
@@ -11834,7 +11972,7 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, bool alreadyMin
     }
 
     float petShieldHp = bf->getPetShieldHP();
-    if (petShieldHp > 0.001f)
+    if (petShieldHp > 0.001f) // 存在仙宠上的护盾
     {
         if (u > petShieldHp)
         {
@@ -11857,23 +11995,10 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, bool alreadyMin
 
     if(u > 0)
     {
-        const GData::SkillBase* passiveSkill = NULL;
-        while(NULL != (passiveSkill = bf->getPassiveSkillOnGetDmg()))
-        {
-            // XXX: 写死是被动增益技能
-            if (_getDamageSkillCount[bf->getSide()] >= 3)
-                break;
-            ++_getDamageSkillCount[bf->getSide()];
-            int target_side, target_pos, cnt;
-            getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-            //doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, NULL);
-            appendDefStatus(e_skill, passiveSkill->getId(), bf);
-            doSkillStatus2(bf, passiveSkill, target_side, target_pos, cnt);
-
-        }
         bf->makeDamage(u);
     }
 
+    // 天佑技能
     if(u > 0 && bf->getHP() < static_cast<UInt32>(0.3f * bf->getMaxHP()))
     {
         const GData::SkillBase* skillBase = bf->getSkillSoulProtect();
@@ -12542,6 +12667,7 @@ void BattleSimulator::doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& 
         UInt32 rhp = (dmg >> 1);
         bf->regenHP(rhp);
         appendDefStatus(e_damAbsorb, rhp, bf);
+        onHPChanged(bf);
 
         if(bo->getHP() == 0)
             onDead(false, bo);
@@ -12771,6 +12897,7 @@ void BattleSimulator::doSkillEffectExtra_BleedTypeDmg(BattleFighter* bf, const G
             if(hpr == 0)
                 continue;
             appendDefStatus(e_damHpAdd, hpr, bf);
+            onHPChanged(bf);
             return;
         }
     }
@@ -13536,5 +13663,5 @@ UInt32 BattleSimulator::doBufMakeDamage(BattleFighter* bf, UInt32& u)
     return uShow;
 }
 
-}
+} // namespace Battle
 

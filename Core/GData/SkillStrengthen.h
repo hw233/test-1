@@ -40,6 +40,7 @@ enum
     ON_HITE = 23,      // 命中时
     ON_BUDDHA_LIGHT = 24,      // 佛光效果触发后
     ON_ZXBJ = 25,  // 诸天宝鉴触发后
+    ON_HPCHANGE = 26,  // HP改变时触发
 };
 
 enum

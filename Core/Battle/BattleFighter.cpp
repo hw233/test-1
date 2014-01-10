@@ -40,6 +40,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     //_therapy_dec(0), _therapy_dec_last(0),_therapy_add(0),_therapy_add_last(0),
     _therapy_buff(0), _therapy_buff_last(0),
     _aura_dec(0), _aura_dec_last(0),
+    _bleedFlag(0),
     _bleed1(0), _bleed2(0), _bleed3(0), _self_bleed(0),
     _bleed1_last(0), _bleed2_last(0), _bleed3_last(0), _self_bleed_last(0),
     _immune2(0), _def_dec(0), _def_dec_last(0), _def_dec_times(0),
@@ -56,8 +57,11 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_petAttackAdd(0), _petMagAtkAdd(0), _petAtkReduce(0), _petMagAtkReduce(0),
 	_petAttackAddCD(0), _petMagAtkAddCD(0), _petAtkReduceCD(0), _petMagAtkReduceCD(0),
     _petExAtk(0), _petExAtkEnable(false), _petExAtkId(0),
+    _hpAtkAdd(0), _hpMagAtkAdd(0), _hpAtkAddCount(0),
+    _hpAtkReduce(0), _hpMagAtkReduce(0), _hpAtkReduceCount(0),
     _bleedMo(0), _bleedMoLast(0), _blind_bleed(0), _blind_present(0), _blind_present_cd(0),
     _blind_cd(0), _blind_bleed_last(0), _summoner(NULL), _unSummonAura(0), 
+    _bleedLingYan(0), _bleedLingYanLast(0), _bleedLingYanAuraDec(0), _bleedLingYanAuraDecProb(0),
     _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
     _petProtect100(false), _petProtect100Last(0), _petAtk100(0), _petAtk100Last(0), _petMark(false),
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
@@ -140,6 +144,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillBleedTypeDmg100(), _passiveSkillBleedTypeDmg100);
     updatePassiveSkill100(_fighter->getPassiveSkillXMCZ100(), _passiveSkillXMCZ100);
     updatePassiveSkill100(_fighter->getPassiveSkillBLTY100(), _passiveSkillBLTY100);
+    updatePassiveSkill100(_fighter->getPassiveSkillOnHPChange100(), _passiveSkillOnHPChange100);
 
     updatePassiveSkill(_fighter->getPassiveSkillPreAtk(), _passiveSkillPreAtk);
     updatePassiveSkill(_fighter->getPassiveSkillAftAtk(), _passiveSkillAftAtk);
@@ -159,6 +164,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill(_fighter->getPassiveSkillOnBeMagDmg(), _passiveSkillOnBeMagDmg);
     updatePassiveSkill(_fighter->getPassiveSkillOnHP10P(), _passiveSkillOnHP10P);
     updatePassiveSkill(_fighter->getPassiveSkillDeadFake(), _passiveSkillDeadFake);
+    updatePassiveSkill(_fighter->getPassiveSkillOnHPChange(), _passiveSkillOnHPChange);
 
     updateSoulSkillDead(_fighter->getSoulSkillSoulOut());
     updateSoulSkillProtect(_fighter->getSoulSkillProtect());
@@ -1103,6 +1109,12 @@ const GData::SkillBase* BattleFighter::getPassiveSkillBLTY100(size_t& idx, bool 
     return getPassiveSkill100(_passiveSkillBLTY100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnHPChange100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnHPChange100, idx, noPossibleTarget);
+}
+
+
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
 {
     size_t cnt = passiveSkill.size();
@@ -1267,6 +1279,12 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnBeDmg(bool noPossibleTar
     return getPassiveSkill( _passiveSkillOnBeDmg, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnHPChange(bool noPossibleTarget)
+{
+    return getPassiveSkill(_passiveSkillOnHPChange, noPossibleTarget);
+}
+
+
 const GData::SkillBase* BattleFighter::getSkillSoulProtect()
 {
     const GData::SkillBase* skillBase = NULL;
@@ -1312,6 +1330,7 @@ void BattleFighter::releaseSkillCD(int cd)
     releaseSkillCD(_passiveSkillOnBeMagDmg100, cd);
     releaseSkillCD(_passiveSkillOnHP10P100, cd);
     releaseSkillCD(_passiveSkillDeadFake100, cd);
+    releaseSkillCD(_passiveSkillOnHPChange100, cd);
 
     releaseSkillCD(_passiveSkillPreAtk, cd);
     releaseSkillCD(_passiveSkillAftAtk, cd);
@@ -1334,6 +1353,7 @@ void BattleFighter::releaseSkillCD(int cd)
     releaseSkillCD(_passiveSkillOnHP10P, cd);
     releaseSkillCD(_passiveSkillDeadFake, cd);
     releaseSkillCD(_passiveSkillSoulProtect, cd);
+    releaseSkillCD(_passiveSkillOnHPChange, cd);
 
     releaseLBSkillCD();
 }
@@ -1871,6 +1891,51 @@ void BattleFighter::setPuduDebuf(float v, UInt16 last)
         _pudu_debuf_last = last;
     }
 }
+
+bool BattleFighter::updateHPPAttackAdd(float addP, float hpLostp, float maxCount)
+{
+    if (maxCount >= 1.0f) // 是否存在触发上限次数
+    {
+        UInt32 count = (UInt32) maxCount;
+        if (count > 0 && _hpAtkAddCount >= count) // 是否已经超过触发上限次数
+            return false;
+    }
+
+    UInt32 lostHP = 0;
+    if (_hp < _maxhp)
+        lostHP = _maxhp - _hp;
+    float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount = (UInt32)(lostP / hpLostp);
+    if (lostCount)
+    {
+        _hpAtkAdd = hpLostp * lostCount;
+        ++_hpAtkAddCount;
+        return true;
+    }
+    return false;
+}
+
+bool BattleFighter::updateHPPAttackReduce(float reduceP, float hpLostp, float maxCount)
+{
+    if (maxCount >= 1.0f) // 是否存在触发上限次数
+    {
+        UInt32 count = (UInt32) maxCount;
+        if (count > 0 && _hpAtkReduceCount >= count) // 是否已经超过触发上限次数
+            return false;
+    }
+    UInt32 lostHP = 0;
+    if (_hp < _maxhp)
+        lostHP = _maxhp - _hp;
+    float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount = (UInt32)(lostP / hpLostp);
+    if (lostCount)
+    {
+        _hpAtkReduce = hpLostp * lostCount;
+        ++_hpAtkReduceCount;
+        return true;
+    }
+    return false;
+}
  
 
 void BattleFighter::makeDamage( UInt32& u )
@@ -1981,6 +2046,7 @@ void BattleFighter::clearSkill()
     _passiveSkillBleedTypeDmg100.clear();
     _passiveSkillXMCZ100.clear();
     _passiveSkillBLTY100.clear();
+    _passiveSkillOnHPChange100.clear();
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();
@@ -2000,6 +2066,7 @@ void BattleFighter::clearSkill()
     _passiveSkillOnHP10P.clear();
     _passiveSkillDeadFake.clear();
     _passiveSkillBleedTypeDmg.clear();
+    _passiveSkillOnHPChange.clear();
 
     _passiveSkillOnTherapy.clear();
     _passiveSkillOnSkillDmg.clear();

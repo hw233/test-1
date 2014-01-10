@@ -322,6 +322,24 @@ private:
         e_soulProtect = 107,    // 天佑
         e_unSoulProtect = 108,    // 天佑
 
+        /*
+        e_petZhongShu = 109,        // 中枢1（每回合行动后恢复10%生命）
+        e_unPetZhongShu = 110,      // 中枢1消失
+        e_petWeiJing = 111,         // 为精1（每损失5%的生命值获得额外2%的伤害减免）
+        e_unPetWeiJing = 112,       // 为精1消失
+        e_petWeiYing = 113,         // 为英 （每损失5%的生命值获得额外2%的伤害提升）
+        e_unPetWeiYing = 114,       // 为英1消失
+        e_petZhongShu2 = 115,       // 中枢2（生命低于30%时恢复30%生命，一场战斗只能触发一次）
+        e_unPetZhongShu2 = 116,     // 中枢2消失
+        e_petWeiJing2 = 117,        // 为精2 （生命低于30%时获得额外50%的伤害减免，一场战斗只能触发一次）
+        e_unPetWeiJing2 = 118,      // 为精2消失
+        e_petWeiYing2 = 119,        // 为英2（生命低于30%时获得额外50%的伤害提升，一场战斗只能触发一次）
+        e_unPetWeiYing2 = 120,      // 为英2消失
+        */
+
+        e_lingYan = 121,            // 灵焱效果
+        e_unLingYan = 122,          // 灵焱效果消失
+
         e_MAX_STATE,
     };
 
@@ -343,6 +361,12 @@ private:
         e_ss_DecMagAtk,
         MAX_SPECIAL_STATUS,
     };
+#define BLEED_TYPE_FLAG_NONE            0x0000      // 没人
+#define BLEED_TYPE_FLAG_1               0x0001
+#define BLEED_TYPE_FLAG_2               0x0002
+#define BLEED_TYPE_FLAG_3               0x0004
+#define BLEED_TYPE_FLAG_MO              0x0008
+#define BLEED_TYPE_FLAG_PET             0x0010
 
 private:
     int getSideStartPos(int side);
@@ -371,6 +395,7 @@ private:
 	void setStatusChange(BattleFighter * bf, UInt8 side, UInt8 pos, int cnt, const GData::SkillBase* skill, UInt8 type, float value, UInt16 last, bool active);
 	void setStatusChange2(BattleFighter* bf, UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, UInt16 last, bool active);
 	void onDamage(BattleObject * bo, bool active, std::vector<AttackAct>* atkAct = NULL);
+    void onHPChanged(BattleObject* bo);
 	BattleFighter * getRandomFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMaxHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMinHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
