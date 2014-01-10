@@ -56,6 +56,7 @@
 #include "Memcached.h"
 #include "Version.h"
 #include "GObject/FairySpar.h"
+#include "GObject/Marry.h"
 #include "GObject/ArenaServerWar.h"
 GMHandler gmHandler;
 
@@ -298,6 +299,9 @@ GMHandler::GMHandler()
     Reg(2, "getkey", &GMHandler::OnGetKey);
     Reg(3, "addshlvl", &GMHandler::OnAddSHLvl);
     Reg(3, "playermsg", &GMHandler::OnPlayerMsg);
+    Reg(3, "clmarry", &GMHandler::OnCleanMarry);
+    Reg(3, "clmarrylist", &GMHandler::OnCleanMarryList);
+    Reg(3, "setmarry", &GMHandler::OnSetMarryStatus);
     Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
 
@@ -4818,6 +4822,27 @@ void GMHandler::OnPlayerMsg(GObject::Player* player, std::vector<std::string>& a
     _printMsgPlayer = pl;
 }
 
+void GMHandler::OnCleanMarry(GObject::Player* player, std::vector<std::string>& args)
+{
+    player->SetVar(VAR_MARRY_STATUS,0);
+    player->SetVar(VAR_CANCEL_APPOINTMENT,0);
+    GObject::gMarryMgr.cleanPlayerData(player); 
+}
+
+void GMHandler::OnCleanMarryList(GObject::Player* player, std::vector<std::string>& args)
+{
+    GObject::gMarryMgr.cleanMemmory(); 
+}
+
+void GMHandler::OnSetMarryStatus(GObject::Player* player, std::vector<std::string>& args)
+{
+    GObject::gMarryMgr.SetMarryStatus(player); 
+}
+
+
+
+
+
 void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::string>& args)
 {
 	if(args.size() < 1)
@@ -4919,17 +4944,19 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
     UInt32 var = 0;   //修改
     UInt32 value = 0;   //修改
     UInt8 type =0 ;
+    UInt16 serverNo = 0;
     if(args.size() >=2 )
     {
         var = atoll(args[1].c_str());
         value = atoll(args[2].c_str());
         type = atoi(args[3].c_str());
+		serverNo = atoi(args[4].c_str());
     }
 //    UInt32 fTime = atol(args[1].c_str());
 //    setForbidSaleValue(playerId, true,fTime);
 //
 //开启起封交易客户平台测试
-#define TEST_TABLE
+//#define TEST_TABLE
 #ifdef TEST_TABLE
     //测试平台 begin
 #pragma pack(1)
@@ -4939,6 +4966,7 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
         UInt32 var ;
         UInt32 value ;
         UInt8 type ;
+        UInt16 serverNo;
         char   msg[1024];
     };
 #pragma pack()
@@ -4946,6 +4974,7 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
     _test.var =var;
     _test.value =value;
     _test.type = type;
+    _test.serverNo = serverNo;
     strncpy (_test.msg, args[0].c_str(), strlen(args[0].c_str()));
   //  _test.msg = args[0].c_str();
     LoginMsgHdr hdr1(0x14D, WORKER_THREAD_LOGIN, 0, 0, sizeof(_test));

@@ -1249,6 +1249,7 @@ private:
     static void World_Boss_Prepare(void*);
     static void World_OldMan_Refresh(void*);   //圣诞老人刷新
     static void World_MarryBoard_Refresh(void*);   //圣诞老人刷新
+    static void World_Marry_Process(void*);   //婚礼执行
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
