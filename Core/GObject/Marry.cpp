@@ -174,10 +174,13 @@ namespace GObject
                 player->sendMsgCode(0, 6006);
                 return 3;
         }
-        if(player->getGold() < sMoney.price_num)
+        if(isUseMoney)
         {
-            player->sendMsgCode(0, 1101);
-            return 2;
+            if(player->getGold() < sMoney.price_num)
+            {
+                player->sendMsgCode(0, 1101);
+                return 2;
+            }
         }
         return 0;
     }
