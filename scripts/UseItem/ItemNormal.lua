@@ -3343,8 +3343,11 @@ function ItemNormal_00009435(iid ,num,bind,param)
         return false;
     end
     for n = 1, num do
-        local rand = math.random(2,4)
-        package:Add(9443, rand, true, false, 2)
+        local rand = math.random(1,10000)
+        package:Add(9443, 1, true, false, 2)
+        if rand <= 10 then
+            package:Add(9442, 1, true, false, 2)
+        end
         used = used +1 
     end
     return used

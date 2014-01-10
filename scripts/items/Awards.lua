@@ -720,7 +720,7 @@ function RunInterestingAward(player, cts)
         [0] = {{500,3},{56,3},{9371,3},{15,3}},
         [1] = {{503,2},{514,2},{500,2},{516,2}},
         [2] = {{501, 3},{547,3},{517,3},{513,3}},
-        [3] = {{134,3},{1325,3},{509,3},{515,2}},
+        [3] = {{134,3},{1325,3},{509,3},{515,3}},
     };
     local package = player:GetPackage();
 --    package:DelItemSendMsg(9371, player)
@@ -743,10 +743,10 @@ function RunInterestingAward(player, cts)
 end
 function RunInterestingBag(player, cts)
     local item = {
-        [0] = {{15,1},{30,1},{11,5}},
+        [0] = {{15,1},{9371,1},{500,1}},
     };
     local package = player:GetPackage();
-    package:DelItemSendMsg(9439, player)
+    package:DelItemSendMsg(9451, player)   --需要修改
     if cts > 1  then
         return false
     end

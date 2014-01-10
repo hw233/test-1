@@ -111,20 +111,20 @@ namespace GObject
         }
         //烟花积分奖励
         UInt32 YanHua = marryBoard->_YHlively;
-        if(YanHua / 1000)
+        if(YanHua / 2000)
         {
             std::string str1 ;
             SYSMSG(title1, 4196);
             SYSMSGV(content1,4185,YanHua);
             MailPackage::MailItem mitem3[] = {{1325, 1}};
-            mitem3[0].count = YanHua/1000;
+            mitem3[0].count = YanHua/2000;
             strItems += Itoa(mitem3[0].id);
             strItems += ",";
             strItems += Itoa(mitem3[0].count);
             strItems += "|";
-            if(YanHua/1000 >= 255 )
+            if(YanHua/2000 >= 255 )
             {
-                for(UInt8 i =0 ;i< YanHua/1000/255 ; ++i )
+                for(UInt8 i =0 ;i< YanHua/2000/255 ; ++i )
                 {
                     mitem3[0].count  = 255 ;
                     Mail * mail1 = p->GetMailBox()->newMail(NULL, 0x21, title1, content1, 0xFFFE0000);
@@ -132,9 +132,9 @@ namespace GObject
                         mailPackageManager.push(mail1->id, mitem3, 1, true);
                 }
             }
-            if((YanHua/1000)%255 != 0)
+            if((YanHua/2000)%255 != 0)
             {
-                mitem3[0].count  = (YanHua/1000)%255;
+                mitem3[0].count  = (YanHua/2000)%255;
                 Mail * mail1 = p->GetMailBox()->newMail(NULL, 0x21, title1, content1, 0xFFFE0000);
                 if(mail1)
                     mailPackageManager.push(mail1->id, mitem3, 1, true);
