@@ -3918,9 +3918,23 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             doSkillStrenghtenHitConfuse(bf, skill, ss, target_side, target_pos);
 
             BattleFighter* ptarget = static_cast<BattleFighter*>(getObject(target_side, target_pos));
-            if(ptarget && ptarget->getHP() <= 0)  // beat to death!!!
+            if(ptarget && ptarget->getHP() <= 0)
             {
-                bf->setMainTargetDeadFlag(true);
+                if (ptarget->getHP() <= 0)  // beat to death!!!
+                    bf->setMainTargetDeadFlag(true);
+                else
+                {
+                    if (ss)
+                    {
+                        const GData::SkillStrengthenEffect* ef = NULL;
+                        ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_DEF_CHANGE);
+                        if (ef) // 有防御变化的符文
+                        {
+                            ptarget->setDefendChangeSS(ef->value, ef->last);
+                            ptarget->setMagDefendChangeSS(ef->value, ef->last);
+                        }
+                    }
+                }
             }
         }
         // 群体技能
@@ -4381,6 +4395,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 BleedRandom_SkillStrengthen(bf, bo, ef);
             }
         }
+        
 
         // 主目标死亡，有符文要返还灵气
         if(bf->getMainTargetDeadFlag())
@@ -8244,6 +8259,28 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
                     clearDefDec = true;
                 }
            }
+        }
+
+        UInt8& defendChangeSSLast = bf->getDefendChangeSSLast();
+        if (defendChangeSSLast > 0)
+        {
+            -- defendChangeSSLast;
+            if (0 == defendChangeSSLast)
+            {
+                bf->setDefendChangeSS(0, 0);
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stDef, 0, 0, false);
+            }
+        }
+
+        UInt8& magDefendChangeSSLast = bf->getMagDefendChangeSSLast();
+        if (magDefendChangeSSLast > 0)
+        {
+            -- magDefendChangeSSLast;
+            if (0 == magDefendChangeSSLast)
+            {
+                bf->setMagDefendChangeSS(0, 0);
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagDef, 0, 0, false);
+            }
         }
 
         if(clearDefDec)

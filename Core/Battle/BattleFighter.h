@@ -174,12 +174,12 @@ public:
 
 	inline float getDefend() 
     {
-        float ret = _defend + _defAdd + _defAdd2 + _counter_spirit_def_add; 
+        float ret = _defend + _defAdd + _defAdd2 + _counter_spirit_def_add + _defendChangeSS; 
         return (ret > 0 ? ret : 0);
     }
 	inline float getMagDefend() 
     {
-        float ret = _magdef + _magDefAdd + _magDefAdd2 + _counter_spirit_magdef_add + _fire_defend; 
+        float ret = _magdef + _magDefAdd + _magDefAdd2 + _counter_spirit_magdef_add + _fire_defend + _magDefendChangeSS;
         return (ret > 0 ? ret : 0);
     }
 
@@ -201,6 +201,8 @@ public:
     inline float getMagAttackAdd() {return _magAtkAdd;}
 	inline float getDefendAdd() {return _defAdd;}
 	inline float getMagDefendAdd() {return _magDefAdd;}
+    inline float getDefendChangeSS() {return _defendChangeSS;}
+    inline float getMagDefendChangeSS() {return _magDefendChangeSS;}
 	inline float getHitrateAdd() {return _hitrateAdd;}
 	inline float getEvadeAdd() {return _evadeAdd;}
 	inline float getCriticalAdd() {return _criticalAdd;}
@@ -218,6 +220,8 @@ public:
 	void setMagAttackAdd(float v, UInt16 last = 0);
 	void setDefendAdd(float v, UInt16 last = 0);
 	void setMagDefendAdd(float v, UInt16 last = 0);
+    void setDefendChangeSS(float v, UInt16 last = 0);
+    void setMagDefendChangeSS(float v, UInt16 last = 0);
 	void setHitrateAdd(float v, UInt16 last = 0);
 	void setEvadeAdd(float v, UInt16 last = 0);
 	void setCriticalAdd(float v, UInt16 last = 0);
@@ -237,6 +241,8 @@ public:
     inline UInt8& getMagAttackAddLast() {return _magAtkAdd_last;}
 	inline UInt8& getDefendAddLast() {return _defAdd_last;}
 	inline UInt8& getMagDefendAddLast() {return _magDefAdd_last;}
+    inline UInt8& getDefendChangeSSLast() { return _defendChangeSSLast;}
+    inline UInt8& getMagDefendChangeSSLast() { return _magDefendChangeSSLast;}
 	inline UInt8& getHitrateAddLast() {return _hitrateAdd_last;}
 	inline UInt8& getEvadeAddLast() {return _evadeAdd_last;}
 	inline UInt8& getCriticalAddLast() {return _criticalAdd_last;}
@@ -393,6 +399,8 @@ public:
         _magAtkAdd = 0;
         _defAdd = 0;
         _magDefAdd = 0;
+        _defendChangeSS = 0;
+        _magDefendChangeSS = 0;
         _hitrateAdd = 0;
         _evadeAdd = 0;
         _criticalAdd = 0;
@@ -407,6 +415,8 @@ public:
         _magAtkAdd_last = 0;
         _defAdd_last = 0;
         _magDefAdd_last = 0;
+        _defendChangeSSLast = 0;
+        _magDefendChangeSSLast = 0;
         _hitrateAdd_last = 0;
         _evadeAdd_last = 0;
         _criticalAdd_last = 0;
@@ -488,9 +498,11 @@ private:
 	UInt32 _maxhp;
     Int32 _maxAction;
 	float _attackAdd, _magAtkAdd, _defAdd, _magDefAdd, _hitrateAdd, _evadeAdd;
+    float _defendChangeSS, _magDefendChangeSS;
     float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd, _toughAdd;
 	Int32 _maxhpAdd, _maxActionAdd;
     UInt8 _atkAdd_last, _magAtkAdd_last, _defAdd_last, _magDefAdd_last, _hitrateAdd_last, _evadeAdd_last;
+    UInt8 _defendChangeSSLast, _magDefendChangeSSLast;
     UInt8 _criticalAdd_last, _criticalDmgAdd_last, _pierceAdd_last, _counterAdd_last, _magResAdd_last, _toughAdd_last;
     UInt8 _maxhpAdd_last, _maxActionAdd_last;
     UInt8 _atkreduce_last, _magatkreduce_last;

@@ -20,9 +20,11 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _atkreduce(0), _magatkreduce(0),
 	_maxhp(f->getMaxHP()), _maxAction(0),
 	_attackAdd(0), _magAtkAdd(0), _defAdd(0), _magDefAdd(0), _hitrateAdd(0), _evadeAdd(0), _criticalAdd(0), _criticalDmgAdd(0),
+    _defendChangeSS(0), _magDefendChangeSS(0),
     _pierceAdd(0), _counterAdd(0), _magResAdd(0), _toughAdd(0),
 	_maxhpAdd(0), _maxActionAdd(0),
     _atkAdd_last(0), _magAtkAdd_last(0), _defAdd_last(0), _magDefAdd_last(0), _hitrateAdd_last(0), _evadeAdd_last(0),
+    _defendChangeSSLast(0), _magDefendChangeSSLast(0),
     _criticalAdd_last(0), _criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),
     _maxhpAdd_last(0), _maxActionAdd_last(0), _atkreduce_last(0), _magatkreduce_last(0), _formEffect(NULL), _formula(bf),
     _forgetLevel(0), _forgetRound(0), _flag(0),_flag2(0),  _poisonRound(0), _poisonLevel(0), _stunRound(0), _stunLevel(0),
@@ -1704,6 +1706,32 @@ void BattleFighter::setMagDefendAdd(float v, UInt16 last)
     {
         _magDefAdd = v;
         _magDefAdd_last = last;
+    }
+}
+
+void BattleFighter::setDefendChangeSS(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_defendChangeSS < 0.001f)
+            || ( _defendChangeSS > 0 && v < 0)
+            || ( _defendChangeSS < 0 && v > 0)
+            || ((_defendChangeSS > 0) && (v > 0) && ((_defendChangeSS - v) < 0.001f))
+            || ((_defendChangeSS < 0) && (v < 0) && ((_defendChangeSS - v) > 0.001f)))
+    {
+        _defendChangeSS = v;
+        _defendChangeSSLast = last;
+    }
+}
+
+void BattleFighter::setMagDefendChangeSS(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_magDefendChangeSS < 0.001f)
+            || ( _magDefendChangeSS > 0 && v < 0)
+            || ( _magDefendChangeSS < 0 && v > 0)
+            || ((_magDefendChangeSS > 0) && (v > 0) && ((_magDefendChangeSS - v) < 0.001f))
+            || ((_magDefendChangeSS < 0) && (v < 0) && ((_magDefendChangeSS - v) > 0.001f)))
+    {
+        _magDefendChangeSS = v;
+        _magDefendChangeSSLast = last;
     }
 }
 
