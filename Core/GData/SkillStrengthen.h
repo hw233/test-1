@@ -84,6 +84,12 @@ enum
     TYPE_FAKE_DEAD = 38,   // 概率不死
     TYPE_SNEAD_RECOVER = 39,  // 暗杀消失时概率恢复暗杀
     TYPE_ZXBJ_HP_ADD = 40,  // 诸天宝鉴符文增加己方生命
+    TYPE_DMG_STRENGHTHEN = 41,  // 提升伤害
+    TYPE_2ND_HAPPEND = 42,  // 一回合内第二次触发
+    TYPE_APPEND_SELF_ATTACK = 43,        // 附加自己百分比攻击力
+    TYPE_DMG_DEEP = 44,        // 重伤
+    TYPE_NINGSHI = 45,        // 凝视
+
     TYPE_MAX,
 };
 
