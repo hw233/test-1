@@ -1585,6 +1585,14 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         break;
                     }
                 }
+                if (ss)
+                    ef = ss->getEffect(GData::ON_DAMAGE, GData::TYPE_LINGYAN);
+                if (ef)
+                {
+                    appendDefStatus(e_lingYan, 0, area_target);
+                    area_target->setBleedLingYan(ef->value/100*(dmg + magdmg), ef->last, ef->valueExt1, ef->valueExt2);
+                }
+
             }
         }
         else
@@ -5816,9 +5824,12 @@ UInt32 BattleSimulator::doAttack( int pos )
                     while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBleed100(idx, noPossibleTarget)))
                     {
                         if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) && !bo->isSoulOut() &&
+                                bo->isBleeding())
+                                /*
                                 (bo->getBleedRandomLast() || bo->getBleedBySkillLast() || 
                                  bo->getBleed1Last() || bo->getBleed2Last() || bo ->getBleed3Last() || bo->getAuraBleedLast() || bo->getStunBleedLast() || bo->getConfuceBleedLast() ||
                                  bo->getBleedMoLast() || bo->getSelfBleedLast() || bo->getBlindBleedLast()))
+                                 */
                         {
                             int cnt = 0;
                             getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
@@ -7676,8 +7687,16 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, UInt32 dmg)
     size_t idx = 0;
     while(NULL != (passiveSkill = bo2->getPassiveSkillOnGetDmg100(idx)))
     {
-        // XXX: 写死是被动增益技能
-        if (_getDamageSkillCount[bo2->getSide()] >= 3)
+        // XXX: 写死是被动增益技能，触发上限为3/6（有对应技能符文）
+        GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+        if (ss)
+        {
+            const GData::SkillStrengthenEffect* ef = NULL;
+            ef = ss->getEffect(GData::ON_GET_SKILL_PROB, GData::TYPE_PROB_ADD);
+            if (_getDamageSkillCount[bo2->getSide()] >= 6)
+                break;
+        }
+        else if (_getDamageSkillCount[bo2->getSide()] >= 3)
             break;
         ++_getDamageSkillCount[bo2->getSide()];
         int target_side, target_pos, cnt;
@@ -7689,8 +7708,16 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, UInt32 dmg)
     }
     while(NULL != (passiveSkill = bo2->getPassiveSkillOnGetDmg()))
     {
-        // XXX: 写死是被动增益技能
-        if (_getDamageSkillCount[bo2->getSide()] >= 3)
+        // XXX: 写死是被动增益技能，触发上限为3/6（有对应技能符文）
+        GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+        if (ss)
+        {
+            const GData::SkillStrengthenEffect* ef = NULL;
+            ef = ss->getEffect(GData::ON_GET_SKILL_PROB, GData::TYPE_PROB_ADD);
+            if (_getDamageSkillCount[bo2->getSide()] >= 6)
+                break;
+        }
+        else if (_getDamageSkillCount[bo2->getSide()] >= 3)
             break;
         ++_getDamageSkillCount[bo2->getSide()];
         int target_side, target_pos, cnt;
@@ -7777,7 +7804,6 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
             }
         }
     }
-
 }
 
 BattleFighter * BattleSimulator::getRandomFighter( UInt8 side, UInt8 * excepts, size_t exceptCount )
@@ -9945,6 +9971,25 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(selflast == 0)
                 bf->setSelfBleed(0, 0);
         }
+
+        UInt8& lingYanLast = bf->getBleedLingYanLast();
+        if (lingYanLast != 0)
+        {
+            UInt32 dmg = static_cast<UInt32>(bf->getBleedLingYan()) * 0.01;
+            calcBleedTypeCnt(bf);
+            -- lingYanLast;
+            if(lingYanLast == 0)
+                makeDamage(bf, dmg, e_unLingYan, e_damageTrue);
+            else
+                makeDamage(bf, dmg, e_lingYan, e_damageTrue);
+            UInt32 prob = static_cast<UInt32>(bf->getBleedLingYanAuraDescProb() * 100);
+            float aura = bf->getBleedLingYanAuraDesc();
+            if (uRand(10000) < prob)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, NULL, e_stAura, -aura, 0, false);
+            if(lingYanLast == 0)
+                bf->setBleedLingYan(0, 0, 0, 0);
+        }
+
 
         UInt8& ablast = bf->getAuraBleedLast();
         if(ablast != 0)

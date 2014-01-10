@@ -42,6 +42,22 @@ class BattleFighter:
 	public BattleObject
 {
 	friend class BattleSimulator;
+
+#define BLEED_TYPE_FLAG_NONE            0x00000000      // 没人
+#define BLEED_TYPE_FLAG_1               0x00000001      // 儒流血
+#define BLEED_TYPE_FLAG_2               0x00000002      // 释流血
+#define BLEED_TYPE_FLAG_3               0x00000004      // 道流血
+#define BLEED_TYPE_FLAG_MO              0x00000008      // 墨流血
+#define BLEED_TYPE_FLAG_PET             0x00000010      // 宠物流血（灵焱）
+#define BLEED_TYPE_FLAG_POISON          0x00000020      // 毒流血
+#define BLEED_TYPE_FLAG_SELF            0x00000040      // 自己造成的流血（宠物自焚）
+#define BLEED_TYPE_FLAG_AURA            0x00000080      // 无双造成的流血（御雷神针、芭蕉巨扇、盘古神斧, 幽灵碧炎梭）
+#define BLEED_TYPE_FLAG_CONFUSE         0x00000100      // 混乱流血 (天劫法宝)
+#define BLEED_TYPE_FLAG_STUN            0x00000200      // 眩晕流血 (天劫法宝)
+#define BLEED_TYPE_FLAG_BLIND           0x00000400      // 致盲流血
+#define BLEED_TYPE_FLAG_LINGSHI         0x00000800      // 灵蚀流血
+#define BLEED_TYPE_FLAG_LINGYAN         0x00001000      // 灵焱流血
+
 public:
 	BattleFighter(Script::BattleFormula *, GObject::Fighter * = NULL, UInt8 side = 0, UInt8 pos = 0);
 
@@ -786,27 +802,70 @@ public:
     inline float getAuraDec() { return _aura_dec; }
     inline void setAuraDec(float value, UInt8 last) { _aura_dec = value; _aura_dec_last = last; }
 
-    inline bool hasBleed() { return _bleedFlag?true:false; }
+    inline bool isBleeding() { return _bleedFlag?true:false; }
 
     inline UInt8& getBleed1Last() { return _bleed1_last; }
     inline float getBleed1() { return _bleed1; }
-    inline void setBleed1(float value, UInt8 last) { _bleed1 = value; _bleed1_last = last; }
+    inline void setBleed1(float value, UInt8 last) 
+    { 
+        _bleed1 = value; 
+        _bleed1_last = last; 
+        if (_bleed1 && _bleed1_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_1;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_1;
+    }
+
     inline UInt8& getBleed2Last() { return _bleed2_last; }
     inline float getBleed2() { return _bleed2; }
-    inline void setBleed2(float value, UInt8 last) { _bleed2 = value; _bleed2_last = last; }
+    inline void setBleed2(float value, UInt8 last)
+    { 
+        _bleed2 = value; 
+        _bleed2_last = last; 
+        if (_bleed2 && _bleed2_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_2;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_2;
+    }
     inline UInt8& getBleed3Last() { return _bleed3_last; }
     inline float getBleed3() { return _bleed3; }
-    inline void setBleed3(float value, UInt8 last) { _bleed3 = value; _bleed3_last = last; }
+    inline void setBleed3(float value, UInt8 last)
+    { 
+        _bleed3 = value; 
+        _bleed3_last = last; 
+        if (_bleed3 && _bleed3_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_3;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_3;
+    }
 
     inline UInt8& getSelfBleedLast() { return _self_bleed_last; }
     inline float getSelfBleed() { return _self_bleed; }
-    inline void setSelfBleed(float value, UInt8 last) { _self_bleed = value; _self_bleed_last = last; }
+    inline void setSelfBleed(float value, UInt8 last)
+    { 
+        _self_bleed = value; 
+        _self_bleed_last = last; 
+        if (_self_bleed && _self_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_SELF;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_SELF;
+    }
 
     inline UInt8& getAuraDecCD() { return _aura_dec_cd; }
     inline float getAuraPrecent() { return _aura_present; }
     inline UInt8& getAuraBleedLast() { return _aura_bleed_last; }
     inline float getAuraBleed() { return _aura_bleed; }
-    inline void setAuraBleed(float value, UInt8 last, UInt8 cd) { _aura_bleed = value; _aura_bleed_last = last; _aura_dec_cd = cd; }
+    inline void setAuraBleed(float value, UInt8 last, UInt8 cd) 
+    { 
+        _aura_bleed = value; 
+        _aura_bleed_last = last; 
+        _aura_dec_cd = cd; 
+        if (_aura_bleed && _aura_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_AURA;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_AURA;
+
+    }
     inline void setAuraPresent(float v, UInt8 cd) { _aura_present = v; _aura_present_cd = cd; }
     inline UInt8 getAruaPresentCD() { return _aura_present_cd; }
 
@@ -814,7 +873,16 @@ public:
     inline float getStunPresent() { return _stun_present; }
     inline UInt8& getStunBleedLast() { return _stun_bleed_last; }
     inline float getStunBleed() { return _stun_bleed; }
-    inline void setStunBleed(float value, UInt8 last, UInt8 cd) { _stun_bleed = value; _stun_bleed_last = last; _stun_cd = cd; }
+    inline void setStunBleed(float value, UInt8 last, UInt8 cd) 
+    { 
+        _stun_bleed = value; 
+        _stun_bleed_last = last; 
+        _stun_cd = cd; 
+        if (_stun_bleed && _stun_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_STUN;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_STUN;
+    }
     inline void setStunPresent(float v, UInt8 cd) { _stun_present = v; _stun_present_cd = cd; }
     inline UInt8 getStunPresentCD() { return _stun_present_cd; }
 
@@ -822,7 +890,16 @@ public:
     inline float getConfucePresent() { return _confuse_present; }
     inline UInt8& getConfuceBleedLast() { return _confuse_bleed_last; }
     inline float getConfuceBleed() { return _confuse_bleed; }
-    inline void setConfuceBleed(float value, UInt8 last, UInt8 cd) { _confuse_bleed = value; _confuse_bleed_last = last; _confuse_cd = cd; }
+    inline void setConfuceBleed(float value, UInt8 last, UInt8 cd) 
+    { 
+        _confuse_bleed = value; 
+        _confuse_bleed_last = last; 
+        _confuse_cd = cd; 
+        if (_confuse_bleed && _confuse_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_CONFUSE;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_CONFUSE;
+    }
     inline void setConfusePresent(float v, UInt8 cd) { _confuse_present = v; _confuse_present_cd = cd; }
     inline UInt8 getConfucePresentCD() { return _confuse_present_cd; }
 
@@ -938,7 +1015,17 @@ public:
 
     inline float getBleedMo() { return _bleedMo; }
     inline UInt16 getBleedMoLast() { return _bleedMoLast; }
-    inline void setBleedMo(float value, UInt8 last) { if(last == 0) return; _bleedMo = value; _bleedMoLast = last; }
+    inline void setBleedMo(float value, UInt8 last) 
+    { 
+        if(last == 0) 
+            return; 
+        _bleedMo = value; 
+        _bleedMoLast = last; 
+        if (_bleedMo && _bleedMoLast)
+            _bleedFlag |= BLEED_TYPE_FLAG_MO;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_MO;
+    }
     inline void resetBleedMo() { _bleedMo = 0; _bleedMoLast = 0; }
     bool releaseBleedMo();
 
@@ -947,9 +1034,34 @@ public:
     inline float getBlindPresent() { return _blind_present; }
     inline UInt8& getBlindBleedLast() { return _blind_bleed_last; }
     inline float getBlindBleed() { return _blind_bleed; }
-    inline void setBlindBleed(float value, UInt8 last, UInt8 cd) { _blind_bleed = value; _blind_bleed_last = last; _blind_cd = cd; }
+    inline void setBlindBleed(float value, UInt8 last, UInt8 cd) 
+    { 
+        _blind_bleed = value; 
+        _blind_bleed_last = last; 
+        _blind_cd = cd; 
+        if (_blind_bleed && _blind_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_BLIND;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_BLIND;
+    }
     inline void setBlindPresent(float v, UInt8 cd) { _blind_present = v; _blind_present_cd = cd; }
     inline UInt8 getBlindPresentCD() { return _blind_present_cd; }
+
+    inline UInt8& getBleedLingYanLast() { return _bleedLingYanLast; }
+    inline float getBleedLingYan() { return _bleedLingYan; }
+    inline void setBleedLingYan(float value, UInt8 last, float auraDec, float auraDecProb) 
+    { 
+        _bleedLingYan = value;
+        _bleedLingYanLast = last;
+        _bleedLingYanAuraDec = auraDec;
+        _bleedLingYanAuraDecProb = auraDecProb;
+        if (_bleedLingYan && _bleedLingYanLast)
+            _bleedFlag |= BLEED_TYPE_FLAG_LINGYAN;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_LINGYAN;
+    }
+    inline float getBleedLingYanAuraDescProb() { return _bleedLingYanAuraDecProb; }
+    inline float getBleedLingYanAuraDesc() { return _bleedLingYanAuraDec; }
 
     void setUnSummonAura(BattleFighter* bf, UInt32 aura) { _summoner = bf, _unSummonAura = aura; }
     bool isSummon() { return _summon; }
@@ -1144,7 +1256,15 @@ private:
     float _lingshi_bleed;
     UInt8 _lingshi_bleed_last;
     float getLingShiBleed() { return _lingshi_bleed; }
-    void setLingShiBleed(float v, UInt8 l) { _lingshi_bleed = v; _lingshi_bleed_last = l; }
+    void setLingShiBleed(float v, UInt8 l) 
+    { 
+        _lingshi_bleed = v; 
+        _lingshi_bleed_last = l; 
+        if (_lingshi_bleed && _lingshi_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_LINGSHI;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_LINGSHI;
+    }
     bool releaseLingShiBleed();
 
     float _lingyou_atk;

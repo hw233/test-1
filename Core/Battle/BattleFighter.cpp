@@ -1126,7 +1126,17 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
 
     for(size_t idx = 0; idx < cnt; ++idx)
     {
-        if(rnd < passiveSkill[idx].rateExtent && passiveSkill[idx].cd == 0)
+        float rate = passiveSkill[idx].rateExtent; 
+
+        // 技能符文增加触发概率
+        GData::SkillStrengthenBase* ss = getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+        const GData::SkillStrengthenEffect* ef = NULL;
+        if (ss)
+            ef = ss->getEffect(GData::ON_GET_SKILL_PROB, TYPE_PROB_ADD);
+        if (ef)
+            rate = passiveSkill[idx].rateExtent * (1.0f + ef->value);
+
+        if(rnd < rate && passiveSkill[idx].cd == 0)
         {
             if(passiveSkill[idx].base == NULL)
                 continue;
@@ -2889,6 +2899,7 @@ const GData::SkillBase* BattleFighter::get2ndCoAtkSkill()
 
     if(_2ndRateCoAtk > uRand(10000))
         return _2ndCoAtkSkill;
+    return NULL;
 }
 
 void BattleFighter::set2ndCoAtkSkill(float rate, const GData::SkillBase* pskill)
@@ -2904,6 +2915,7 @@ const GData::SkillBase* BattleFighter::get2ndProtectSkill()
 
     if(_2ndRateProtect > uRand(10000))
         return _2ndProtectSkill;
+    return NULL;
 }
 
 void BattleFighter::set2ndProtectSkill(float rate, const GData::SkillBase* pskill)

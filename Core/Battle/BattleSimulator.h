@@ -366,12 +366,6 @@ private:
         e_ss_DecMagAtk,
         MAX_SPECIAL_STATUS,
     };
-#define BLEED_TYPE_FLAG_NONE            0x0000      // 没人
-#define BLEED_TYPE_FLAG_1               0x0001
-#define BLEED_TYPE_FLAG_2               0x0002
-#define BLEED_TYPE_FLAG_3               0x0004
-#define BLEED_TYPE_FLAG_MO              0x0008
-#define BLEED_TYPE_FLAG_PET             0x0010
 
 private:
     int getSideStartPos(int side);
