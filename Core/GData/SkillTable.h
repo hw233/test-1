@@ -121,7 +121,6 @@ enum
     e_eft_no_use = 42,           //未使用
     e_eft_bi_lan_tian_yi = 43,   //未使用
     e_eft_zhu_tian_bao_jian = 44, //诸天宝鉴
-    e_eft_hp_lostp_buff = 45,            // HP损失百分比增减buff技能
 
     e_eft_max
 };
