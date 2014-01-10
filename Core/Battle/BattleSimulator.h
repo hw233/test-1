@@ -381,6 +381,8 @@ private:
 	BattleFighter * getMinHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMaxAtkFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMinAtkFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
+    BattleFighter * get2ndAtkFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
+
     bool doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct = NULL, float factor = 1, bool canProtect = false);
     bool doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0, UInt8* launchPeerLess = NULL, bool canProtect = false);
     BattleFighter* getTherapyTarget(BattleFighter* bf);
@@ -455,6 +457,8 @@ private:
 
     typedef bool (Battle::BattleSimulator::*doSkillStrengthenFunc)(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
+    bool doSkillStrengthen_NingShi(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
+    bool doSkillStrengthen_DmgDeep(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
     bool doSkillStrengthen_SelfAttack(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
     bool doSkillStrengthen_FireFakeDead(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 

@@ -1196,17 +1196,17 @@ private:
 
 private:
     float _2ndRateCoAtk;
-    GData::SkillBase* _2ndCoAtkSkill;
+    const GData::SkillBase* _2ndCoAtkSkill;
 
-    GData::SkillBase* get2ndCoAtkSkill();
-    void set2ndCoAtkSkill(float rate, GData::SkillBase* pskill);
+    const GData::SkillBase* get2ndCoAtkSkill();
+    void set2ndCoAtkSkill(float rate, const GData::SkillBase* pskill);
 
 
     float _2ndRateProtect;
-    GData::SkillBase* _2ndProtectSkill;
+    const GData::SkillBase* _2ndProtectSkill;
 
-    GData::SkillBase* get2ndProtectSkill();
-    void set2ndProtectSkill(float rate, GData::SkillBase* pskill);
+    const GData::SkillBase* get2ndProtectSkill();
+    void set2ndProtectSkill(float rate, const GData::SkillBase* pskill);
 
     float _dmg_deep;
     UInt8 _dmg_deep_last;
@@ -1214,12 +1214,12 @@ private:
     bool isDmgDeep() { return _dmg_deep_last > 0; }
     float getDmgDeep() { return _dmg_deep; }
     void setDmgDeep(float value, UInt8 last) { _dmg_deep = value; _dmg_deep_last = last; }
-    void releaseDmgDeep();
+    bool releaseDmgDeep();
 
-    BattleFighter* _ningshizhe;
-    std::vector<BattleFighter*> _beiningshizhe;
     float _dmg_ningshi;
     UInt8 _dmg_ningshi_last;
+    BattleFighter* _ningshizhe;
+    std::vector<BattleFighter*> _beiningshizhe;
 
     void pushBeiNingShiZhe(BattleFighter* bo);
     void popBeiNingShiZhe(BattleFighter* bo);
@@ -1227,7 +1227,7 @@ private:
     bool isDmgNingShi() { return _dmg_ningshi_last > 0; }
     float getDmgNingShi() { return _dmg_ningshi; }
     bool setDmgNingShi(BattleFighter* bf, float value, UInt8 last);
-    void releaseDmgNingShi();
+    bool releaseDmgNingShi();
     std::vector<BattleFighter*> getBeiNingShiZhe() { return _beiningshizhe; }
 
 public:

@@ -7600,7 +7600,7 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, UInt32 dmg)
     }
     if(bo2->isDmgDeep())
     {
-        float value = dmg * bo2->getDmgDeep();
+        UInt32 value = dmg * bo2->getDmgDeep();
         bo2->makeDamage(value);
         appendDefStatus(e_damNormal, value, bo2);
     }
@@ -7769,14 +7769,14 @@ BattleFighter * BattleSimulator::getMaxAtkFighter( UInt8 side, UInt8 * excepts, 
 
 BattleFighter * BattleSimulator::get2ndAtkFighter( UInt8 side, UInt8 * excepts, size_t exceptCount )
 {
-    BattleFighter* bo = getMaxAtkFighter(side, excepts, exceptCnt);
+    BattleFighter* bo = getMaxAtkFighter(side, excepts, exceptCount);
     if(!bo)
         return NULL;
 
-    excepts[exceptCnt] = bo->getPos();
-    ++ exceptCnt;
+    excepts[exceptCount] = bo->getPos();
+    ++ exceptCount;
 
-    bo = getMaxAtkFighter(side, excepts, exceptCnt);
+    bo = getMaxAtkFighter(side, excepts, exceptCount);
     return bo;
 }
 
@@ -7832,10 +7832,10 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
     do
     {
         std::vector<BattleFighter*> vbo = bf->getBeiNingShiZhe();
-        for(std::vector<BattleFighter*>::iterator it = vbo.begin(); it != vbo.end() ++ it)
+        for(std::vector<BattleFighter*>::iterator it = vbo.begin(); it != vbo.end(); ++ it)
         {
             BattleFighter* bo = *it;
-            float value = bo->getDmgNingShi();
+            UInt32 value = bo->getDmgNingShi();
             makeDamage(bo, value, e_damNormal, e_damageTrue);
         }
 
@@ -7845,11 +7845,11 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
         if(bf->releaseDmgDeep())
         {
-            appendDefStatus(e_unDmgDeep, 0, bf2);
+            appendDefStatus(e_unDmgDeep, 0, bf);
         }
         if(bf->releaseDmgNingShi())
         {
-            appendDefStatus(e_unDmgNingShi, 0, bf2);
+            appendDefStatus(e_unDmgNingShi, 0, bf);
         }
 
         if(bf->releaseLingQu())
@@ -9306,7 +9306,7 @@ bool BattleSimulator::AddExtraDamageAfterResist_SkillStrengthen(BattleFighter* p
         return false;
 
     UInt32 nRealDamage = ef->value/100 * nDamage;  // 伤害值
-    UInt32 nRealDamageShow = makeDamage(pTarget, nRealDamage, e_damNormal, e_damageTrue);
+    makeDamage(pTarget, nRealDamage, e_damNormal, e_damageTrue);
 
     return true;
 }
@@ -9664,7 +9664,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                 if(bf->releaseLingShiBleed())
                     makeDamage(bf, dmg, e_unLingShiBleed, e_damageTrue);
                 else
-                    makeDamage(bf, dmg, e_LingShiBleed, e_damageTrue);
+                    makeDamage(bf, dmg, e_lingShiBleed, e_damageTrue);
             }
         }
         if(bf->getHP() == 0)
@@ -9786,7 +9786,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(selflast == 0)
                 makeDamage(bf, dmg, e_unSelfBleed, e_damageTrue);
             else
-                makeDamage(bf, dmg, e_SelfBleed, e_damageTrue);
+                makeDamage(bf, dmg, e_selfBleed, e_damageTrue);
             if(selflast == 0)
                 bf->setSelfBleed(0, 0);
         }
@@ -10557,7 +10557,7 @@ void BattleSimulator::doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int ta
 
     float ssfactor = 0.0f;
     ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 增加额外伤害效果
-    float vlaue = skill->effect->efv[eftIdx] * (1 + ssfactor);
+    float value = skill->effect->efv[eftIdx] * (1 + ssfactor);
     attackOnce(bf, first, cs, pr, NULL, area_target, value, 1);
 }
 
