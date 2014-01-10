@@ -626,6 +626,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_MARRYBOARD_YANHUA = 681,          //烟花积分
         VAR_3366_RECHARGE = 682,       //空间充值 
         VAR_3366_RECHARGE_AWARD = 683,       //空间充值奖励领取
+        VAR_MARRYBOARD_BAIHE = 684,          //烟花积分
         VAR_MAX,
     };
 
@@ -1189,6 +1190,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_MARRYBOARD_YANHUA, CYCLE_NONE);
             REGISTER_VAR(VAR_3366_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_3366_RECHARGE_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_MARRYBOARD_BAIHE, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

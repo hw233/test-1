@@ -7934,16 +7934,20 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
             break;
         case 0x04:
             {
+                UInt32 baiHe = player->GetVar(VAR_MARRYBOARD_BAIHE);
                 if(mType == 0)
                     return;
                 UInt8 num = 0;
                 brd >> num ;
                 if(num == 0)
                     break;
+                if( (baiHe + num) > 50)
+                    return ;
                 if(num > 99)
                     num = 99;
                 if(!player->giveFlower(1,num))
                     break; 
+                player->AddVar(VAR_MARRYBOARD_BAIHE,num);
                 GObject::MarryBoard::instance()._lively += 5*num;
                 SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
             }

@@ -1404,11 +1404,11 @@ namespace GObject
             char buf[1024] = {0};
             char* pbuf = &buf[0];
             if (cfg.isTestPlatform())
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s|%u||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|1|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), IsMale() ? 1 : 2, GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|1|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
             else
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s|%u||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), IsMale() ? 1 : 2, GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -26725,7 +26725,7 @@ void Player::getInterestingAward(UInt8 type)
     {
         ScoreAward = GetVar(VAR_OLDMAN_SCORE_AWARD);
         Score = GetVar(VAR_OLDMAN_SCORE);
-        if( Score < (type * 100 + (type-1)*50) || ScoreAward &(1 << (type-1)))  //修改累计欢乐值
+        if( Score < static_cast<UInt32>(type * 100 + (type-1)*50) || ScoreAward &(1 << (type-1)))  //修改累计欢乐值
             return ;
     }
     if(!GameAction()->RunInterestingAward(this, type))

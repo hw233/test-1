@@ -86,8 +86,8 @@ namespace GObject
         }
         //个人积分奖励 
         {
-            MailPackage::MailItem mitem1[] = {{9371, 2},{1126,2},{500,10},{501,10},{549,1},{509,5},{134,12},{1325,12},{9076,15}};
-            UInt32 Score[] = {100,300,600,600,600,1000,2000,2000,4000};
+            MailPackage::MailItem mitem1[] = {{9371, 3},{1126,3},{134,5},{1325,5},{509,10},{500,20},{501,10},{549,5},{9076,20}};
+            UInt32 Score[] = {100,300,600,600,1000,2000,2000,2000,4000};
             if(lively >=100)
             {
                 SYSMSGV(buf,4184,lively);
@@ -143,6 +143,7 @@ namespace GObject
 
         //红包奖励
         UInt8 countR = 0;
+        
         for(UInt8 i = 0 ; i < 8 ; i ++ )
         {
             if(marryBoard->_door[i] >= marryBoard->doorMax)
@@ -150,7 +151,7 @@ namespace GObject
                 countR ++ ;
             }
         }
-        if(countR)
+        if(countR && marryBoard->doorMax )
         {
             MailPackage::MailItem mitemR[] ={ {9444, 1},{9445,1},{9446 ,1}};  //红包ID
             MailPackage::MailItem mitem2 = mitemR[marryBoard->_norms-1]; 
@@ -403,10 +404,12 @@ namespace GObject
                 break;
             case 9:  //更新活跃度
                 {
+                    UInt32 baihe = pl->GetVar(VAR_MARRYBOARD_BAIHE);
                     st << static_cast<UInt8>(0x02);
                     st << _lively ; 
                     st << pl->GetVar(VAR_MARRYBOARD_LIVELY);
                     st << _YHlively ; 
+                    st << static_cast<UInt8>( (baihe > 50 ) ? 0:(50-baihe) );
                 }
                 break;
             case 10:

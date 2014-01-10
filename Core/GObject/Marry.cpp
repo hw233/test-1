@@ -1033,7 +1033,7 @@ namespace GObject
             player->sendMsgCode(0, 6019);
             return 1;
         }        
-        obj_player->GetMarriageInfo()->eraseInfo(PARM_marriageTime);  
+        obj_player->GetMarriageInfo()->eraseInfo(PARM_yuyueTime);  
         obj_player->GetMarriageInfo()->eraseInfo(PARM_eWedding);  
         
         sendMoneyMail(obj_player,sMoney.price_type,sMoney.price_num,sMoney.useType,sMoney.eParm); 
