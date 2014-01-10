@@ -21017,6 +21017,7 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         leaderboard.erasePetInfo(it->second);
         it->second->delSanHun();
+        it->second->deleteSevenSoul();
         SAFE_DELETE(it->second);
         _fairyPets.erase(it);
         DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE `id` = %u AND `playerId` = %" I64_FMT "u", id, getId());

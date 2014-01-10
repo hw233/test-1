@@ -2292,8 +2292,8 @@ CREATE TABLE IF NOT EXISTS `modify_mount` (
     PRIMARY KEY (`id`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `player_sevensoul`;
-CREATE TABLE IF NOT EXISTS `player_sevensoul` (
+DROP TABLE IF EXISTS `pet_sevensoul`;
+CREATE TABLE IF NOT EXISTS `pet_sevensoul` (
     `playerId` bigint(20) unsigned NOT NULL,
     `petId` int(10) unsigned NOT NULL,
     `soulId` tinyint(3) unsigned NOT NULL,

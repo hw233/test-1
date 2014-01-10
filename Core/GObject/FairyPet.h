@@ -144,6 +144,7 @@ public:
     void setSkillFromSevenSoul(UInt8 soulId);
     void addSkillFromSevenSoul(UInt16 soulId);
     void delSkillFromSevenSoul(UInt16 skillId);
+    void deleteSevenSoul();
 private:
     UInt8 _soulLevel[7];
     UInt8 _skillIndex[7];
