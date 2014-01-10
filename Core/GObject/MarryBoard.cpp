@@ -659,6 +659,7 @@ namespace GObject
         GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
         WORLD().RemoveTimer(_marryBoardTimer);
         _marryBoardTimer = NULL;
+        _YHlively = 0;
         return flag;
     }
 }
