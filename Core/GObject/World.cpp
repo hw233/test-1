@@ -429,6 +429,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -451,6 +459,7 @@ bool enum_midnight(void * ptr, void* next)
         (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 25)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
         ))
     {
 #if 0
@@ -1234,6 +1243,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 9)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1518,6 +1535,12 @@ void World::World_MarryBoard_Refresh(void *)
 {
     GObject::MarryBoard::instance().MarryBoard_Timer(); 
 }
+
+void World::World_Marry_Process(void *)
+{
+    gMarryMgr.DoProcess(); 
+}
+
 void World::DaysRank_Refresh(void*)
 {
 	GObject::DaysRank::instance().process();
@@ -1968,6 +1991,11 @@ bool World::Init()
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
     
+    if( GObject::MarryBoard::instance().sendAward())
+    {
+        gMarryMgr.MarryingCrush();
+    }
+    AddTimer(60 * 60 * 3 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
     return true;
 }
 

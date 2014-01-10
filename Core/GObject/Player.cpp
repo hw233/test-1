@@ -83,6 +83,7 @@
 #include "GObject/ClanBoss.h"
 #include "ClanCityBattle.h"
 #include "MoFang.h"
+#include "Marry.h"
 #include "Leaderboard.h"
 #include "ArenaServerWar.h"
 #include "GData/SevenSoul.h"
@@ -768,6 +769,7 @@ namespace GObject
         m_hf = new HoneyFall(this);
         m_dpData = new DeamonPlayerData();
 		m_moFang = new MoFang(this);
+		m_marriageInfo = new MarriageInfo();
         m_csFlag = 0;
         m_spreadInterval = 0;
         m_spreadCoolTime = 0;
@@ -4703,7 +4705,6 @@ namespace GObject
         udpLog("xuyuanshu", str, "", "", "", "", "act");
         GameAction()->doStrong(this, SthPrayTree, 0 ,0 );
         GuangGunCompleteTask(0,24);
-        SYSMSG_SENDV(2026,this);
     }
     void Player::SendOtherInfoForPray(Player* other,UInt32 op)
     {
@@ -19752,7 +19753,7 @@ void Player::get3366GiftAward(UInt8 type)
 {
     if (getPlatform() != 11)
         return;
-    if (GetVar(VAR_3366GIFT) >= 9)
+    if (GetVar(VAR_3366GIFT) >= 12)
         return;
     if (GetFreePackageSize() < 6)
     {
@@ -19769,7 +19770,7 @@ void Player::get3366GiftAward(UInt8 type)
         ConsumeInfo ci(Enum3366Gift,0,0);
         useGold(45, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {505, 2, 512, 2, 513, 2, 9082, 2, 548, 2, 465, 2};
+        static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -20093,63 +20094,63 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
             UInt8 validMaxDay = 0;
             UInt8 serverDay = 0;
             UInt32 now = TimeUtil::Now();
-            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 3))
+            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 1, 23))
             {
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 3))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 1, 23))
             {
                 validMaxDay = 1;
                 serverDay = 1;
             }
-            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 9))
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 1, 30))
             {
                 validMaxDay = 1;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 9))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 1, 30))
             {
                 validMaxDay = 2;
                 serverDay = 2;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 10))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 1, 31))
             {
                 validMaxDay = 3;
                 serverDay = 3;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 11))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 1))
             {
                 validMaxDay = 4;
                 serverDay = 4;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 12))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 2))
             {
                 validMaxDay = 5;
                 serverDay = 5;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 13))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 3))
             {
                 validMaxDay = 6;
                 serverDay = 6;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 14))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 4))
             {
                 validMaxDay = 7;
                 serverDay = 7;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 15))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 5))
             {
                 validMaxDay = 8;
                 serverDay = 8;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 16))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 6))
             {
                 validMaxDay = 9;
                 serverDay = 9;
             }
-            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 24))
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 2, 14))
             {
                 validMaxDay = 9;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 24))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 14))
             {
                 validMaxDay = 10;
                 serverDay = 10;
@@ -26939,6 +26940,7 @@ void Player::joinAllServerRecharge(UInt32 num)
     if(num == 0) return;
     Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
     st << getId() << getName() << num << TimeUtil::Now();
+    st << static_cast<UInt8>(getCountry()<<4 | (IsMale()?0:1));
     st << Stream::eos;
     NETWORK()->SendToServerWar(st);
 }

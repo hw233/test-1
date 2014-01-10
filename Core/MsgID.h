@@ -438,6 +438,8 @@ namespace REQ
 
     /** 墨守成规 */
     const UInt8 CCB                 = 0X26;
+    /** 结婚系统 */
+    const UInt8 MARRYMGR            = 0x75;
 }
 
 namespace REP
@@ -734,6 +736,8 @@ namespace REP
     const UInt8 SINGLE_HERO         = 0XA5;
     /** 墨守成规 */
     const UInt8 CCB                 = 0X26;
+    /** 结婚系统 */
+    const UInt8 MARRYMGR            = 0x75;
 }
 
 namespace SPEQ
