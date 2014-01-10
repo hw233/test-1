@@ -20094,63 +20094,63 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
             UInt8 validMaxDay = 0;
             UInt8 serverDay = 0;
             UInt32 now = TimeUtil::Now();
-            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 3))
+            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 1, 23))
             {
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 3))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 1, 23))
             {
                 validMaxDay = 1;
                 serverDay = 1;
             }
-            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 9))
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 1, 30))
             {
                 validMaxDay = 1;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 9))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 1, 30))
             {
                 validMaxDay = 2;
                 serverDay = 2;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 10))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 1, 31))
             {
                 validMaxDay = 3;
                 serverDay = 3;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 11))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 1))
             {
                 validMaxDay = 4;
                 serverDay = 4;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 12))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 2))
             {
                 validMaxDay = 5;
                 serverDay = 5;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 13))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 3))
             {
                 validMaxDay = 6;
                 serverDay = 6;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 14))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 4))
             {
                 validMaxDay = 7;
                 serverDay = 7;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 15))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 5))
             {
                 validMaxDay = 8;
                 serverDay = 8;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 16))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 6))
             {
                 validMaxDay = 9;
                 serverDay = 9;
             }
-            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2013, 2, 24))
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 2, 14))
             {
                 validMaxDay = 9;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2013, 2, 24))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 14))
             {
                 validMaxDay = 10;
                 serverDay = 10;
