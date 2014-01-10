@@ -11,7 +11,6 @@
 #include "GData/AttrExtra.h"
 #include "GObject/World.h"
 #include "MarryBoard.h"
-#include "GVar.h"
 
 namespace GObject
 {
@@ -1984,10 +1983,9 @@ namespace GObject
                     else
                         eWedding = static_cast<UInt8>(player->GetMarriageInfo()->eWedding);
                     if(it->first < TimeUtil::Now())
-                        WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,TimeUtil::Now() + 60*60); 
+                        WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,TimeUtil::Now() + 60*90); 
                     else
                         WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,it->first + 60*30); 
-                    GVAR.SetVar(GVAR_CREATMARRY_TIMES,1);
                 }
                 it ++;
             }

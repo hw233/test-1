@@ -29,7 +29,7 @@ namespace GObject
             void SendPreMarryPresent(Player * man,Player * woman ,UInt8 norms );
             void sendTodayMarryInfo(Player * pl);
             void CheckTheAnswerBoard2();
-            void sendAward();
+            bool sendAward();
             static MarryBoard & instance()
             {
                 static MarryBoard s;

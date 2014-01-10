@@ -5,6 +5,7 @@
 #include "Server/SysMsg.h"
 #include "Common/Itoa.h"
 #include "Marry.h"
+#include "GVar.h"
 namespace GObject
 {
     void* MarryBoard::_marryBoardTimer = NULL;
@@ -204,6 +205,7 @@ namespace GObject
         //SendPreMarryPresent(man,woman,norms);
         //GObject::globalOnlinePlayers.enumerate(player_enum_marryBoard,this,11);
         GObject::globalPlayers.enumerate(player_enum_marryBoard,this,11);
+
         return true;
     }
     void MarryBoard::MarryBoard_Timer()
@@ -217,6 +219,7 @@ namespace GObject
             if(_type != 1)
             {
                 GObject::globalOnlinePlayers.enumerate(player_enum_marryBoard,this,1);
+                SendPreMarryPresent(_man,_woman,_norms);
                 _type =1 ;
             }
         }
@@ -266,6 +269,7 @@ namespace GObject
             {
     //          WORLD().CreateMarryBoard(_man->getId(),_woman->getId(),_norms,0);
                 sendAward();
+                gMarryMgr.FinishMarry(_man->getId(),_woman->getId());
             }
             return ;
         }
@@ -421,6 +425,7 @@ namespace GObject
                 break;
             case 12:
                 {
+                    _lively += pl->GetVar(VAR_MARRYBOARD_LIVELY);
                     _YHlively += pl->GetVar(VAR_MARRYBOARD_YANHUA);
                 }
                 break;
@@ -544,7 +549,6 @@ namespace GObject
             _questionId[i] = 0;
         for(UInt8 i =0 ; i < 10 ;++i )
            _answers[i] = 0;
-        GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
     }
     void MarryBoard::SetQuestionOnMarryBoard()
     {
@@ -639,16 +643,23 @@ namespace GObject
         if(_askNum > 9)
             _askNum = 9;
     }
-    void MarryBoard::sendAward()
+    bool MarryBoard::sendAward()
     {
+        bool flag = false ;
         if(_type == 0 )
+        {
             GObject::globalPlayers.enumerate(player_enum_marryBoard,this,12);
+            if(!_lively)
+                return false;
+            _lively = 0 ;
+            flag = true;
+        }
         GObject::globalPlayers.enumerate(player_enum_marryBoardAward,this);
         _type = 0;
         GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
-        gMarryMgr.FinishMarry(_man->getId(),_woman->getId());
         WORLD().RemoveTimer(_marryBoardTimer);
         _marryBoardTimer = NULL;
+        return flag;
     }
 }
 

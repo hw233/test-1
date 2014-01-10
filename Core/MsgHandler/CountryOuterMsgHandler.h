@@ -7456,7 +7456,6 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                         ret = GObject::gMarryMgr.JieYuan(player,obj_playerid); 
                         if(ret == 2)
                         {
-                            GObject::Player * obj_player = GObject::globalPlayers[obj_playerid];//获得结缘玩家对象
                             ret = GObject::gMarryMgr.doCancelMarriage(player,1);
                             flag = 4;
                         }
