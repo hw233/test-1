@@ -2008,8 +2008,10 @@ namespace GObject
     {
         CheckingListTimeOut(m_maleList);
         CheckingListTimeOut(m_femaleList);
-        Mutex::ScopedLock lk(_mutex);
-        Process();
+        { // 限制lock的生命周期
+            Mutex::ScopedLock lk(_mutex);
+            Process();
+        }
     }
 
     void MarryMgr::Process()
