@@ -7686,7 +7686,7 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, UInt32 dmg)
     while(NULL != (passiveSkill = bo2->getPassiveSkillOnGetDmg100(idx)))
     {
         // XXX: 写死是被动增益技能，触发上限为3/6（有对应技能符文）
-        GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+        GData::SkillStrengthenBase* ss = bo2->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
         if (ss)
         {
             const GData::SkillStrengthenEffect* ef = NULL;
@@ -7707,7 +7707,7 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, UInt32 dmg)
     while(NULL != (passiveSkill = bo2->getPassiveSkillOnGetDmg()))
     {
         // XXX: 写死是被动增益技能，触发上限为3/6（有对应技能符文）
-        GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+        GData::SkillStrengthenBase* ss = bo2->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
         if (ss)
         {
             const GData::SkillStrengthenEffect* ef = NULL;

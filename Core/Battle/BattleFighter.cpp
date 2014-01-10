@@ -1129,10 +1129,10 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
         float rate = passiveSkill[idx].rateExtent; 
 
         // 技能符文增加触发概率
-        GData::SkillStrengthenBase* ss = getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+        GData::SkillStrengthenBase* ss = getSkillStrengthen(SKILL_ID(passiveSkill[idx].base->getId()));
         const GData::SkillStrengthenEffect* ef = NULL;
         if (ss)
-            ef = ss->getEffect(GData::ON_GET_SKILL_PROB, TYPE_PROB_ADD);
+            ef = ss->getEffect(GData::ON_GET_SKILL_PROB, GData::TYPE_PROB_ADD);
         if (ef)
             rate = passiveSkill[idx].rateExtent * (1.0f + ef->value);
 
