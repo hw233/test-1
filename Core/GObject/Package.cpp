@@ -6945,7 +6945,7 @@ namespace GObject
                 }
                 else
                 {
-                    UInt8 lbAttrIdx[12] = {0, 0, 11, 6, 2, 3, 5, 4, 9, 10, 8, 7};
+                    UInt8 lbAttrIdx[12] = {0, 0, 10, 5, 1, 2, 4, 3, 8, 9, 7, 6};
                     idx = lbAttrIdx[gjIdx - 4];
                 }
 
