@@ -1324,7 +1324,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         {
                             appendDefStatus(e_skill, passiveSkill->getId(), bf);
                             float ssfactor = 0.0f;
-                            ModifySingleAttackValue_SkillStrengthen(bf, passiveSkill, ssfactor, true);
+                            ModifyAttackValue_SkillStrengthen(bf, passiveSkill, ssfactor, true);
                             factor += passiveSkill->effect->atkP * (1 + ssfactor);
                         }
                     }
@@ -1407,8 +1407,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_DMG_STRENGHTHEN);
                 if (ef)
                 {
-                    atk *= (ef->value + 1);
-                    magatk *= (ef->value + 1);
+                    atk *= (ef->value / 100 + 1);
+                    magatk *= (ef->value / 100 + 1);
                 }
             }
             else
@@ -3463,7 +3463,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             float deFactor = calcTherapyFactor(bo);
 
             // 技能符文对治疗效果的加成
-            ModifySingleAttackValue_SkillStrengthen(bo, skill, deFactor, true);
+            ModifyAttackValue_SkillStrengthen(bo, skill, deFactor, true);
 
             UInt32 hpr = bo->regenHP(rhp * deFactor, skill->cond == GData::SKILL_ACTIVE, skill->effect->hppec, maxRhp);
             if(hpr != 0)
@@ -4683,7 +4683,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
                     float value = bf->_aura * skill->effect->auraP + skill->effect->aura;
 
                     float ssfactor = 0.0f;
-                    ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加灵气效果
+                    ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加灵气效果
                     if (ssfactor != 0)
                         value *= (1 + ssfactor);
                     setStatusChange(bf, bf->getSide(), bf->getPos(), 1, skill, e_stAura, value, skill->last, !activeFlag);
@@ -4726,7 +4726,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
                 else
                 {
                     float ssfactor = 0.0f;
-                    ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加灵气效果
+                    ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加灵气效果
                     if (ssfactor != 0)
                         value *= (1 + ssfactor);
                 }
@@ -4749,7 +4749,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
             {
                 float value = bf->_attack * skill->effect->atkP + skill->effect->atk;
                 float ssfactor = 0.0f;
-                ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
+                ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
                 if (ssfactor != 0)
                     value *= (1 + ssfactor);
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, skill, e_stAtk, value, skill->last, !activeFlag);
@@ -4759,7 +4759,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
         else
         {
             float ssfactor = 0.0f;
-            ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
+            ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
             if (ssfactor != 0)
                 value *= (1 + ssfactor);
             setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stAtk, value, skill->last, activeFlag);
@@ -4806,7 +4806,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
             {
                 float value = bf->_magatk * skill->effect->magatkP + skill->effect->magatk;
                 float ssfactor = 0.0f;
-                ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
+                ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
                 if (ssfactor != 0)
                     value *= (1 + ssfactor);
 
@@ -4817,7 +4817,7 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
         else
         {
             float ssfactor = 0.0f;
-            ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
+            ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
             if (ssfactor != 0)
                 value *= (1 + ssfactor);
 
@@ -9775,6 +9775,25 @@ void BattleSimulator::ModifySingleAttackValue_SkillStrengthen(BattleFighter* bf,
     }
 }
 
+void BattleSimulator::ModifyAttackValue_SkillStrengthen(BattleFighter* bf,const GData::SkillBase* skill, float& fvalue, bool isAdd)
+{
+    if(!skill)
+        return;
+
+    GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+    if(!ss)
+        return;
+
+    const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_INTENSIFYSTATE);
+    if(ef)
+    {
+        if(isAdd)
+            fvalue += ef->value;
+        else
+            fvalue -= ef->valueExt1;  // 减掉的值取这个
+    }
+}
+
 bool BattleSimulator::doSkillStrengthenAttack(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active)
 {
     if(!bf || !ef || !skill)
@@ -10712,7 +10731,7 @@ void BattleSimulator::doSkillEffectExtra_RandomShield(BattleFighter* bf, int tar
         return;
 
     float ssfactor = 0.0f;
-    ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 增加减防效果
+    ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);
     float factor = 1 + ssfactor;
 
     float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx]) * factor;
@@ -10800,7 +10819,7 @@ void BattleSimulator::doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int ta
     bool pr    = false;
 
     float ssfactor = 0.0f;
-    ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 增加额外伤害效果
+    ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);
     float value = skill->effect->efv[eftIdx] * (1 + ssfactor);
     attackOnce(bf, first, cs, pr, NULL, area_target, value, 1);
 }
@@ -12194,7 +12213,7 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
     }
 
     float ssfactor = 0.0f;
-    ModifySingleAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);  // 增加减防效果
+    ModifyAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);
     factor *= ( 1 + ssfactor );
 
     {
@@ -12233,7 +12252,7 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
             if(ss)
             {
                 const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_2ND_HAPPEND);
-                pet->set2ndProtectSkill(ef->value*100, pskill);
+                pet->set2ndProtectSkill(ef->value, pskill);
             }
         }
 
@@ -12260,7 +12279,7 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
         }
 
         float ssfactor = 0.0f;
-        ModifySingleAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);  // 增加减防效果
+        ModifyAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);
         factor *= ( 1 + ssfactor );
 
         return protectDamage(bf, pet, phyAtk, magAtk, factor, dmgreduce);
@@ -12438,7 +12457,7 @@ bool BattleSimulator::doAttackWithPet(BattleFighter* bf, BattleFighter* pet)
             if(ss)
             {
                 const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_2ND_HAPPEND);
-                pet->set2ndCoAtkSkill(ef->value*100, pskill);
+                pet->set2ndCoAtkSkill(ef->value, pskill);
             }
         }
 
@@ -12596,7 +12615,7 @@ bool BattleSimulator::doSkillStrengthen_SelfAttack(BattleFighter* bf, const GDat
 
     // 附加自己百分比的攻击力到指定人身上
     UInt16 last = ef->last;
-    float atkadd = (bf->_magatk) * (ef->value);
+    float atkadd = (bf->_magatk) * (ef->value / 100);
     BattleObject * bo = getObject(target_side, target_pos);
     if (!bo || !bo->isChar())
         return false;
@@ -12628,7 +12647,7 @@ bool BattleSimulator::doSkillStrengthen_DmgDeep(BattleFighter* bf, const GData::
         return false;
     BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
 
-    bf2->setDmgDeep(ef->last, ef->value);
+    bf2->setDmgDeep(ef->value / 100, ef->last);
     appendDefStatus(e_dmgDeep, 0, bf2);
 
     return true;
@@ -12645,7 +12664,7 @@ bool BattleSimulator::doSkillStrengthen_NingShi(BattleFighter* bf, const GData::
         return false;
     BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
 
-    bf2->setDmgNingShi(bf, ef->last, ef->value * getBFAttack(bf));
+    bf2->setDmgNingShi(bf, ef->last, ef->value / 100 * getBFAttack(bf));
     appendDefStatus(e_dmgNingShi, 0, bf2);
 
     return true;

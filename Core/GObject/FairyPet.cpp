@@ -1154,6 +1154,9 @@ namespace GObject
         {
             _owner->SetVar(VAR_SEVEN_SOUL_NUM, curNum - needNum);
 
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, _owner->getId(), SevenSoulUpgrade, 0, 0, needNum, TimeUtil::Now());
+
             UInt8 oldSkillLevel = GData::sevenSoul.getSkillLevel(_soulLevel[sevenSoulIndex]);
             ++_soulLevel[sevenSoulIndex];
             DB4().PushUpdateData("UPDATE `pet_sevensoul` SET `soulLevel` = %u WHERE `playerId` = %" I64_FMT "u AND petId = %u AND soulId = %u", _soulLevel[sevenSoulIndex], _owner->getId(), getId(), sevenSoulIndex + 1);

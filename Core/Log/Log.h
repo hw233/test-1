@@ -143,6 +143,7 @@ enum PurchaseType
     JieHun                      = 133, //结婚 
     LiHun                       = 134, //离婚 
     RestStep                    = 1001, //七石板重置
+    SevenSoulUpgrade            = 1010, //七魄升级
     //繁体私有占150～200
 };
 
