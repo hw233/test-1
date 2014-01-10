@@ -10635,7 +10635,7 @@ void BattleSimulator::doSkillEffectExtra_RandomShield(BattleFighter* bf, int tar
 
     float ssfactor = 0.0f;
     ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 增加减防效果
-    factor *= ( 1 + ssfactor );
+    float factor = 1 + ssfactor;
 
     float hp = bf->getMaxHP() * (skill->effect->efv[eftIdx]) * factor;
     if (hp < 1.0f)
@@ -12138,7 +12138,7 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
     }
 
     float ssfactor = 0.0f;
-    ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 增加减防效果
+    ModifySingleAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);  // 增加减防效果
     factor *= ( 1 + ssfactor );
 
     {
@@ -12178,14 +12178,14 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
         {
             if(eft[i] == GData::e_eft_pet_protect_reduce)
             {
-                factor *= (1.0f - (efv[i] + subFactor));
+                factor *= (1.0f - efv[i]);
                 if(!dmgreduce)
                     dmgreduce = true;
             }
         }
 
         float ssfactor = 0.0f;
-        ModifySingleAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 增加减防效果
+        ModifySingleAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);  // 增加减防效果
         factor *= ( 1 + ssfactor );
 
         return protectDamage(bf, pet, phyAtk, magAtk, factor, dmgreduce);
@@ -12196,7 +12196,6 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
 bool BattleSimulator::protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor, bool dmgreduce)
 {
     // 吸收一半伤害给仙宠
-    GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(pskill->getId()));
     if(!dmgreduce)
     {
         phyAtk /= 2;
