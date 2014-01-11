@@ -1137,7 +1137,7 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
         if (ss)
             ef = ss->getEffect(GData::ON_GET_SKILL_PROB, GData::TYPE_PROB_ADD);
         if (ef)
-            rate = passiveSkill[idx].rateExtent * (1.0f + ef->value);
+            rate = passiveSkill[idx].rateExtent + ef->value;
 
         if(rnd < rate && passiveSkill[idx].cd == 0)
         {
