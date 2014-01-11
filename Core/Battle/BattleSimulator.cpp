@@ -152,6 +152,8 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_criticaldmgreduce] = &BattleSimulator::doSkillEffectExtra_CriticalDmgReduce;
         skillEffectExtraTable[GData::e_eft_buddha_light] = &BattleSimulator::doSkillEffectExtra_BuddhaLight;
         skillEffectExtraTable[GData::e_eft_zhu_tian_bao_jian] = &BattleSimulator::doSkillEffectExtra_OtherSidePeerlessDisable;
+        skillEffectExtraTable[GData::e_eft_trigger_count_max] = &BattleSimulator::doSkillEffectExtra_CheckMaxTrigger;
+        skillEffectExtraTable[GData::e_eft_hp_lostp] = &BattleSimulator::doSkillEffectExtra_HpLostP;
     }
 }
 
@@ -269,6 +271,8 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_criticaldmgreduce] = &BattleSimulator::doSkillEffectExtra_CriticalDmgReduce;
         skillEffectExtraTable[GData::e_eft_buddha_light] = &BattleSimulator::doSkillEffectExtra_BuddhaLight;
         skillEffectExtraTable[GData::e_eft_zhu_tian_bao_jian] = &BattleSimulator::doSkillEffectExtra_OtherSidePeerlessDisable;
+        skillEffectExtraTable[GData::e_eft_trigger_count_max] = &BattleSimulator::doSkillEffectExtra_CheckMaxTrigger;
+        skillEffectExtraTable[GData::e_eft_hp_lostp] = &BattleSimulator::doSkillEffectExtra_HpLostP;
     }
 }
 
@@ -7798,6 +7802,8 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
         {
             int target_side, target_pos, cnt;
             getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
+            doSkillEffectExtraAttack(bf, target_side, target_pos, passiveSkill);
+            /*
             GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
             if(ss)
             {
@@ -7815,6 +7821,7 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
                         appendDefStatus(e_skill, passiveSkill->getId(), bf);
 
             }
+            */
         }
     }
 }
@@ -13024,6 +13031,52 @@ void BattleSimulator::doSkillEffectExtra_OtherSidePeerlessDisable(BattleFighter*
             }
         }
         return;
+    }
+}
+
+void BattleSimulator::doSkillEffectExtra_CheckMaxTrigger(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+}
+
+void BattleSimulator::doSkillEffectExtra_HpLostP(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+    size_t cnt = eft.size();
+    if(cnt != efl.size() || efv.size() != cnt)
+        return;
+    
+    float maxCount = 0;
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        if(eft[i] == GData::e_eft_trigger_count_max)
+            maxCount = efv[i];
+        break;
+    }
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        if(eft[i] == GData::e_eft_hp_lostp)
+        {
+            if (skill->effect->atkreduce || skill->effect->magatkreduce)
+            {
+                if (bf->updateHPPAttackReduce(skill->effect->atkreduce, efv[i], maxCount))
+                    appendDefStatus(e_skill, skill->getId(), bf);
+            }
+            if (skill->effect->crrdam || skill->effect->crrdamP)
+            {
+                if (bf->updateHPPAttackAdd(skill->effect->crrdamP, efv[i], maxCount))
+                    appendDefStatus(e_skill, skill->getId(), bf);
+            }
+            if (skill->effect->hppec)
+            {
+                UInt32 hpr = bf->regenHP(0, false, skill->effect->hppec, skill->effect->maxhpdampec);
+                if(hpr != 0)
+                    appendDefStatus(e_damHpAdd, hpr, bf);
+            }
+        }
     }
 }
 
