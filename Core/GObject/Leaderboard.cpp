@@ -1219,7 +1219,7 @@ void Leaderboard::readRechargeRank100(BinaryReader& brd)
     {
         AllServersRecharge asrData;
         UInt64 playerId = 0;
-        brd >> playerId >> asrData.name >> asrData.total;
+        brd >> playerId >> asrData.name >> asrData.total >> asrData.country;
 
         Player * player = globalPlayers[playerId];
         asrData.player = player;
@@ -1242,95 +1242,120 @@ void Leaderboard::readRechargeSelf(BinaryReader& brd)
         Player * player = globalPlayers[playerId];
         asrData.player = player;
         asrData.name = player ? player->getName() : "";
-        _rechargeSelf.push_back(asrData);
+        _rechargeSelf.insert(std::make_pair(playerId, asrData));
     }
+}
+
+void Leaderboard::sendMyRechargeRank(Player * player)
+{
+    if(!player) return;
+
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(6) << static_cast<UInt8>(1);
+    std::map<UInt64, AllServersRecharge>::iterator it = _rechargeSelf.find(player->getId());
+    if(it != _rechargeSelf.end())
+        st << it->second.total << it->second.rank;
+    else
+        st << static_cast<UInt32>(0) << static_cast<UInt32>(0);
+    st << Stream::eos;
+    player->send(st);
+}
+
+void Leaderboard::sendRechargeRank100(Player * player, UInt8 idx, UInt8 cnt)
+{
+    if(!player) return;
+
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(6) << static_cast<UInt8>(0);
+    UInt8 size = _rechargeRank100.size();
+	if(idx >= size)
+	{
+		idx = size;
+		cnt = 0;
+	}
+	else
+	{
+		if(idx + cnt > size)
+			cnt = size - idx;
+	}
+	st << size << idx << cnt;
+
+    for(UInt8 i = 0; i < cnt; ++ i)
+    {
+        std::vector<AllServersRecharge>::iterator it = _rechargeRank100.begin();
+        std::advance(it, idx+i);
+        st << (*it).name << (*it).total << (*it).country;
+    }
+    st << Stream::eos;
+    player->send(st);
 }
 
 void Leaderboard::giveRechargeRankAward()
 {
-    SYSMSGV(title, 835);
     SYSMSGV(title1, 827);
     SYSMSGV(title2, 829);
-    std::string name10[10];
-    UInt32 total10[10] = {0};
+    std::string str;
     std::vector<AllServersRecharge>::iterator it;
     for(it = _rechargeRank100.begin(); it != _rechargeRank100.end(); ++ it)
     {
         if((*it).rank && (*it).rank <= 10)
         {
-            name10[(*it).rank-1] = (*it).name;
-            total10[(*it).rank-1] = (*it).total;
+            SYSMSGV(buf, 835, (*it).rank, (*it).country >> 4, (*it).name.c_str(), (*it).total);
+            str += buf;
         }
 
         Player * player = (*it).player;
         if(!player)
             continue;
 
-        UInt16 count = 0;
         UInt16 count1 = 0, count2 = 0, count3 = 0, count4 = 0;
         if((*it).rank == 1)
         {
-            count1 = 200; count2 = 200;
+            count1 = 180; count2 = 180;
             count3 = 100; count4 = 100;
-            count = 10;
         }
         else if((*it).rank == 2)
         {
-            count1 = 180; count2 = 180;
+            count1 = 160; count2 = 160;
             count3 = 88; count4 = 88;
-            count = 9;
         }
         else if((*it).rank == 3)
         {
-            count1 = 160; count2 = 160;
+            count1 = 140; count2 = 140;
             count3 = 66;  count4 = 66;
-            count = 8;
         }
         else if((*it).rank >= 4 && (*it).rank <= 10)
         {
-            count1 = 140; count2 = 140;
+            count1 = 120; count2 = 120;
             count3 = 50;  count4 = 50;
-            count = 7;
         }
         else if((*it).rank >= 11 && (*it).rank <= 20)
         {
             count1 = 100; count2 = 100;
             count3 = 40;  count4 = 40;
-            count = 6;
         }
         else if((*it).rank >= 21 && (*it).rank <= 40)
         {
             count1 = 80; count2 = 80;
             count3 = 30; count4 = 30;
-            count = 5;
         }
         else if((*it).rank >= 41 && (*it).rank <= 60)
         {
             count1 = 60; count2 = 60;
             count3 = 25; count4 = 25;
-            count = 4;
         }
         else if((*it).rank >= 61 && (*it).rank <= 80)
         {
-            count1 = 50; count2 = 50;
+            count1 = 40; count2 = 40;
             count3 = 20; count4 = 20;
-            count = 3;
         }
         else if((*it).rank >= 81 && (*it).rank <= 100)
         {
-            count1 = 25; count2 = 25;
+            count1 = 20; count2 = 20;
             count3 = 10; count4 = 10;
-            count = 2;
         }
         else
             continue;
-        SYSMSGV(content, 836);
-        MailPackage::MailItem item[] = {{500, count}};
-        MailItemsInfo itemsInfo(item, Activity, 1);
-        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-        if(mail)
-             mailPackageManager.push(mail->id, item, 1, true);
-        /*
         SYSMSGV(content2, 830, player->getCountry(), player->getName().c_str(), (*it).rank, (*it).total);
         MailPackage::MailItem item[] = {{9418, count1}, {9438, count2}, {9022, count3}, {9075, count4},};
         MailItemsInfo itemsInfo(item, Activity, 4);
@@ -1345,29 +1370,26 @@ void Leaderboard::giveRechargeRankAward()
             if(mail)
                 mail->writeMailLog(player, Activity);
         }
-        */
     }
 
-    /*
-    for(it = _rechargeSelf.begin(); it != _rechargeSelf.end(); ++ it)
+    std::map<UInt64, AllServersRecharge>::iterator iter;
+    for(iter = _rechargeSelf.begin(); iter != _rechargeSelf.end(); ++ iter)
     {
-        Player * player = (*it).player;
+        Player * player = iter->second.player;
         if(!player)
             continue;
-        SYSMSGV(content1, 828, player->getCountry(), player->getName().c_str(), (*it).total, (*it).rank, name10[0].c_str(), total10[0],
-                name10[1].c_str(), total10[1], name10[2].c_str(), total10[2], name10[3].c_str(), total10[3], name10[4].c_str(), total10[4],
-                name10[5].c_str(), total10[5], name10[6].c_str(), total10[6], name10[7].c_str(), total10[7], name10[8].c_str(), total10[8],
-                name10[9].c_str(), total10[9]);
+        SYSMSGV(content1, 828, player->getCountry(), player->getName().c_str(), iter->second.total, iter->second.rank, str.c_str());
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title1, content1);
         if(mail)
             mail->writeMailLog(player, Activity);
     }
-    */
+
+    _rechargeSelf.clear();
+    _rechargeRank100.clear();
 }
 
 void Leaderboard::sendGoldLvlAward(BinaryReader& brd)
 {
-    return;     //测试时没有
     UInt64 playerId = 0;
     UInt8 cnt = 0;
     brd >> playerId >> cnt;

@@ -126,6 +126,7 @@ function loadStore()
         store:add(2, 11116, 80)
         store:add(2, 11117, 90)
         store:add(2, 11118, 100)
+        --store:add(2, 11203, 110)
     end
 
     if getSurnameLegend(30) then
@@ -147,6 +148,8 @@ function loadStore()
         store:add(2, 9415,10)
     end
 
+        store:add(2, 9603, 20)
+        store:add(2, 9604, 20)
         store:add(2, 1126, 20)
         store:add(2, 9388, 100)
         store:add(2, 9371, 10)
@@ -175,7 +178,7 @@ function loadStore()
         if  getFoolBao() then
             store:add(2 ,9375 ,20)
         end
-       --store:add(2 ,9442 ,100)
+        store:add(2 ,9442 ,100)
         
         --if getSurnameLegend(30) then
             --store:add(2 ,9383 , 20)
@@ -411,7 +414,7 @@ function loadStore()
         store:add(4,5143,20)
 
         -- 银币
-        --store:add(5,9443,1000)
+        store:add(5,9443,1000)
 		store:add(5,9307,200)
 		store:add(5,9309,500)
         store:add(5,550,1000)
@@ -441,6 +444,7 @@ function loadStore()
         store:add(5,5141,500)
 
         -- 荣誉
+        store:add(6,9602,1300)
         store:add(6,9340,1000)
         store:add(6,1504,3000)
         store:add(6,1522,10000)
@@ -459,6 +463,7 @@ function loadStore()
         store:add(6,509,2000)
 
         -- 声望
+        store:add(7,9601,2000)
         store:add(7,9340,1000)
         store:add(7,1511,6000)
         store:add(7,1520,15000)
@@ -592,6 +597,17 @@ function loadStore()
         store:add(15,11597,10000)
         store:add(15,11598,10000)
         store:add(15,11599,10000)
+
+        store:add(15,11579,11000)
+        store:add(15,11580,11000)
+        store:add(15,11581,11000)
+        store:add(15,11582,12000)
+        store:add(15,11583,12000)
+        store:add(15,11584,12000)
+        store:add(15,11585,13000)
+        store:add(15,11586,13000)
+        store:add(15,11587,13000)
+
         -- 帮贡
         store:add(16,5041,300000)
         store:add(16,5051,300000)

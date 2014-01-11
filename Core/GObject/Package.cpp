@@ -5808,6 +5808,14 @@ namespace GObject
 		if (IsEquipTypeId(typeId)) return false;
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
 		if(itemType == NULL) return false;
+        if(itemType->subClass == Item_Mount || itemType->subClass == Item_MountChip)
+        {
+            if(m_Owner->GetLev() < 75)
+            {
+                m_Owner->sendMsgCode(0, 1096, 75);
+                return false;
+            }
+        }
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		ItemBase * item = FindItem(typeId, bind);
         if(item)
@@ -6559,14 +6567,14 @@ namespace GObject
         UInt8 lvIdx = (guji->getReqLev() - 70)/10;
         UInt8 gujiIdx = gujiClass - Item_Guji;
         UInt8 itemIdx = item->getQuality() == 2 ? 0 : 1;
-        if(colorIdx > 3 || lvIdx > 5 || gujiIdx > 16 || itemIdx > 1)
+        if(colorIdx > 3 || lvIdx > 6 || gujiIdx > 16 || itemIdx > 1)
             return 2;
 
         DelItem2(guji, 1, ToLingbao);
         DelItem2(item, 1, ToLingbao);
         double gujiFactor[17] = {0.7, 0.7, 0.7, 0.7, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 10};
         double itemFactor[2] = {1, 1.5};
-        double lvFactor[6] = {1, 1.2, 1.4, 1.6, 1.8, 2.0};
+        double lvFactor[] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0};
         double colorFactor[4] = {1, 1, 2, 3};
 
         m_Owner->udpLog("Tongling", "F_10000_15", "", "", "", "", "act");
@@ -6598,7 +6606,7 @@ namespace GObject
             m_lbSmeltInfo.orangeAdjVal += 25;
         }
 
-        if(gujiId >= 11113 && gujiId <= 11118) //皇帝古籍
+        if((gujiId >= 11113 && gujiId <= 11118) || gujiId == 11203) //皇帝古籍
         {            
             m_lbSmeltInfo.counts += 2;
             m_lbSmeltInfo.orangeAdjVal += 75;
@@ -6786,12 +6794,15 @@ namespace GObject
     bool Package::FinishLBSmeltSpecial(const GData::ItemBaseType * itype, ItemLingbaoAttr &lbattr, UInt8& attrNum)
     {
         //黄帝卷宗（11113），炎帝卷宗（11114），神农卷宗（11115），女娲卷宗（11116）
-        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118};
+        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118, 11203 };
         bool hasSpe = false;
         for(UInt8 i = 0; i < sizeof(lbids) / sizeof(lbids[0]); ++i)
         {
             if(m_lbSmeltInfo.gujiId == lbids[i])
+            {
                 hasSpe = true;
+                break;
+            }
         }
         if(!hasSpe)
             return false;
@@ -6879,13 +6890,14 @@ namespace GObject
 
         UInt16 gjIdx = guji->subClass - Item_Guji;
         UInt8 lbIdx[17] = {0xFF, 0, 1, 2, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 0xFF};
-        UInt16 lbids[6][3] = {
+        UInt16 lbids[7][3] = {
             {11500, 11501, 11502},
             {11503, 11504, 11505},
             {11506, 11507, 11508},
             {11509, 11510, 11511},
             {11515, 11516, 11517},
-            {11518, 11519, 11520}};
+            {11518, 11519, 11520},
+            {11521, 11522, 11523}};
 
         UInt8 itemIdx = lbIdx[gjIdx];
         if(lbIdx[gjIdx] == 0xFF)
@@ -6904,7 +6916,7 @@ namespace GObject
         UInt16 subClass = itype->subClass;
         bool fSpecial = true;
         if(!FinishLBSmeltSpecial(itype, lbattr, attrNum))
-        {
+        {   //非皇帝卷宗才进来！！
             fSpecial = false;
             UInt8 minAttrNum = item->quality > 3 ? 3 : 1;
             UInt8 color2 = item->quality;
@@ -6919,6 +6931,8 @@ namespace GObject
 
             std::vector<UInt8> allAttrType = lbAttrConf.attrType;
             //allAttrType.erase(allAttrType.begin() + 1);
+            if(find(allAttrType.begin(),allAttrType.end(),2) != allAttrType.end())
+                allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),2));
             UInt8 itemTypeIdx = subClass - Item_LBling;
             // 古籍指定的属性
             {
@@ -6931,7 +6945,7 @@ namespace GObject
                 }
                 else
                 {
-                    UInt8 lbAttrIdx[12] = {0, 1, 11, 6, 2, 3, 5, 4, 9, 10, 8, 7};
+                    UInt8 lbAttrIdx[12] = {0, 0, 10, 5, 1, 2, 4, 3, 8, 9, 7, 6};
                     idx = lbAttrIdx[gjIdx - 4];
                 }
 
@@ -6942,8 +6956,6 @@ namespace GObject
                     orangeCnt -= 1;
 
                 lbattr.type[0] = allAttrType[idx];
-                if(lbattr.type[0] == 2)
-                    lbattr.type[0] = 1;
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color);
@@ -6951,8 +6963,6 @@ namespace GObject
                 lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]-1) * disFactor + 0.9999f;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
-            if(find(allAttrType.begin(),allAttrType.end(),2) != allAttrType.end())
-                allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),2));
             for(int i = 1; i < attrNum; ++ i)
             {
                 if(5 == color2)

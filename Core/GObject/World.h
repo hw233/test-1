@@ -50,8 +50,9 @@ struct stOldMan
 {
     UInt8 _loc;
     UInt16 _spot;
+    UInt32 _time ;
     std::set<UInt64> _players;
-    stOldMan():_loc(0),_spot(0){}
+    stOldMan():_loc(0),_spot(0),_time(0){}
 };
 struct stArenaExtra
 {
@@ -594,8 +595,8 @@ public:
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 11, 27);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 12, 2);
+        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 1, 25);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 1, 30);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
@@ -1254,6 +1255,7 @@ private:
     static void World_Boss_Prepare(void*);
     static void World_OldMan_Refresh(void*);   //圣诞老人刷新
     static void World_MarryBoard_Refresh(void*);   //圣诞老人刷新
+    static void World_Marry_Process(void*);   //婚礼执行
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );

@@ -2563,6 +2563,22 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
     brd >> type;
     switch(type)
     {
+        case 0x02:  //排行活动
+        {
+            UInt8 flag = 0;
+            brd >> op >> flag;
+            if(op != 6)     //跨服充值排行活动
+                return;
+            if(0 == flag)
+            {
+                UInt8 idx = 0, cnt = 0;
+                brd >> idx >> cnt;
+                leaderboard.sendRechargeRank100(player, idx, cnt);
+            }
+            else if(1 == flag)
+                leaderboard.sendMyRechargeRank(player);
+            break;
+        }
         case 0x01:  // 七夕
         case 0x03:  // 万圣节
         case 0x09:  // 情人节浪漫之旅
@@ -2699,6 +2715,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x21:
         case 0x24:
         case 0x25:
+        case 0x27:
         {
             brd >> op;
             switch(op)
@@ -3546,7 +3563,6 @@ void OnServerWarLeaderBoard( ServerWarMsgHdr& hdr, const void * data )
 }
 void OnMarryBard( GameMsgHdr& hdr, const void* data)
 {
-    return ;
 	MSG_QUERY_PLAYER(player);
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
@@ -3602,7 +3618,7 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
                 br >> outKey ;
                 if(GObject::MarryBoard::instance().unWrapTheOutKey(outKey) == player->GetVar(VAR_MARRYBOARD3_KEY))
                 {
-                    if(now - var > 20)
+                    if(now - var > 16)
                     {
                         flag = 1 ; 
                         player->AddVar(VAR_MARRYBOARD3,1);
@@ -3611,6 +3627,9 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
                         player->SetVar(VAR_MARRYBOARD3_KEY,rand);
                         player->AddVar(VAR_MARRYBOARD_LIVELY,10);
                         GObject::MarryBoard::instance()._lively += 1;
+                        char str[16] = {0};
+                        sprintf(str, "F_140102_15");
+                        player->udpLog("jiehunjinxing", str, "", "", "", "", "act");
                     }
                 }
                 else
@@ -3621,7 +3640,7 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
                 if(flag)
                     st << static_cast<UInt32>(GObject::MarryBoard::instance().wrapTheKey(player->GetVar(VAR_MARRYBOARD3_KEY)));
                 else 
-                    st <<static_cast<UInt32>(var + 20 -now );
+                    st <<static_cast<UInt32>(var + 16 -now );
                 st<<Stream::eos;
                 player->send(st);
             }
@@ -3649,7 +3668,13 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
                 st <<static_cast<UInt8>(op);
                 st << static_cast<UInt8>(door);
                 st<<Stream::eos;
-                player->send(st);
+                if(player == GObject::MarryBoard::instance()._man || player == GObject::MarryBoard::instance()._woman)
+                {
+                    GObject::MarryBoard::instance()._man ->send(st);
+                    GObject::MarryBoard::instance()._woman->send(st);
+                }
+                else
+                    player->send(st);
             }
             break;
         default:

@@ -136,11 +136,15 @@ enum PurchaseType
     QSBAddTime                  = 125, //七石板加时
     TuPoJieXian                 = 126, //星辰图突破界限
     ServerWarConsume            = 127, //仙界传奇消费
-    SearchOldMan                = 129, //捉迷藏活动包打听
-    MarryYanHua                 = 130, //结婚送烟花
-    MarryBaiHe                  = 131, //结婚送百合花
     RestStep                    = 1001, //七石板重置
-    OutBuyFund                  = 1002, //购买基金消费
+    ZhengHun                    = 1002, //征婚
+    JieHun                      = 1003, //结婚 
+    LiHun                       = 1004, //离婚 
+    SearchOldMan                = 1005, //捉迷藏活动包打听
+    MarryYanHua                 = 1006, //结婚送烟花
+    MarryBaiHe                  = 1007, //结婚送百合花
+    DINGQINGXINWU               = 1008, //定情信物
+    OutBuyFund                  = 1009, //购买基金消费
     //繁体私有占150～200
 };
 
@@ -215,6 +219,7 @@ enum MailItemType
 	DismissXingchen,
     NewHeroIslandAward,
     ArenaAward,
+    BuChangMarry,
 };
 enum ItemFrom
 {

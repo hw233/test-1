@@ -430,6 +430,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -452,6 +460,7 @@ bool enum_midnight(void * ptr, void* next)
         (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 25)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
         ))
     {
 #if 0
@@ -1235,6 +1244,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 9)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1423,18 +1440,20 @@ void World::World_OldMan_Refresh(void *)
         return ;
     UInt32 now = TimeUtil::Now();
     UInt32 time = now - TimeUtil::SharpDay(0, now);
+    if(_oldMan._time < 8*3600  ) 
+        _oldMan._time = 8*3600;
   //  std::cout<<time-8*3600+300<<std::endl;
     if(time >= 8*3600 - 300 - 2 && time < 8*3600 - 300 +3 )
     {
     //    std::cout<<"即将出现"<<std::endl;
         SYSMSG_BROADCASTV(575); 
     }
-    else if ( time < 7 *3600  )
+    else if ( time < (7 *3600 + 50 * 60 ) )
     {
       //  std::cout<<"End"<<std::endl;
         return ;
     }
-    else if(time > 20*3600 + 5)
+    else if(time > 20*3600 )
     {
        if(!_oldMan._spot) 
            return ;
@@ -1449,8 +1468,9 @@ void World::World_OldMan_Refresh(void *)
        GLOBAL().PushMsg(hdr1, &mapNpc);
        _oldMan._loc = 0;
        _oldMan._spot = 0 ;
+       _oldMan._time = 0;
     }
-    else if( (time%3600) < 3 || (time%3600)>= 3600 -2 )
+    else if( time > _oldMan._time )
    // else if ((time%600) < 3 || (time%600)>= 600 -2)    //测试
     {
         UInt16 spot = GetRandomSpot();
@@ -1486,6 +1506,7 @@ void World::World_OldMan_Refresh(void *)
         mo.m_ActionType = 0;
         GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
         GLOBAL().PushMsg(hdr1, &mo);
+        _oldMan._time = (time/3600+1)*3600; 
     }
     else if ((time%600) < 3 || (time%600)>= 600 -2)     
    // else if ((time%180) < 3 || (time%180)>= 180 -2)         //测试
@@ -1502,18 +1523,25 @@ void World::Tianjie_Refresh(void*)
 }
 void World::CreateMarryBoard(UInt64 man , UInt64 woman ,UInt8 type,UInt32 time )
 {
-    return ;
-    if(time == 0)
-        time = TimeUtil::Now()+ 1830 ;
+//   if(time == 0)
+  //      time = TimeUtil::SharpDayT(0,TimeUtil::Now()) + 14* 3600 ;
    Player * pman = GObject::globalPlayers[man]; 
    Player * pwoman = GObject::globalPlayers[woman]; 
-   GObject::MarryBoard::instance().CreateMarry(pman,pwoman,type,time);
-   GObject::MarryBoard::instance()._marryBoardTimer = AddTimer(2 * 1000, World_MarryBoard_Refresh, static_cast<void*>(NULL));
+   if(pman==NULL || pwoman == NULL)
+       return ;
+   if(GObject::MarryBoard::instance().CreateMarry(pman,pwoman,type,time))
+       GObject::MarryBoard::instance()._marryBoardTimer = AddTimer(2 * 1000, World_MarryBoard_Refresh, static_cast<void*>(NULL));
 }
 void World::World_MarryBoard_Refresh(void *)
 {
     GObject::MarryBoard::instance().MarryBoard_Timer(); 
 }
+
+void World::World_Marry_Process(void *)
+{
+    gMarryMgr.DoProcess(); 
+}
+
 void World::DaysRank_Refresh(void*)
 {
 	GObject::DaysRank::instance().process();
@@ -1964,6 +1992,11 @@ bool World::Init()
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
     
+    if( GObject::MarryBoard::instance().sendAward())
+    {
+        gMarryMgr.MarryingCrush();
+    }
+    AddTimer(60 * 60 * 3 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
     return true;
 }
 
@@ -3834,7 +3867,7 @@ void World::SendHappyFireAward()
 {
     World::initRCRank();
     int pos = 0;
-    UInt8 type =0;
+    UInt32 type =0;
     static MailPackage::MailItem s_item[][4] = {
         {{515,30},{503,30},{509,25},{134,30}},
         {{515,25},{503,25},{509,20},{134,25}},
@@ -3880,7 +3913,7 @@ void World::SendHappyFireAward()
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
             if(mail)
             {
-                mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
+                mailPackageManager.push(mail->id, s_item[type-1], 4, true);
                 if(pos ==1)
                     mailPackageManager.push(mail->id, &card, 1, true);
             }

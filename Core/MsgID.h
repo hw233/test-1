@@ -139,8 +139,8 @@ namespace REQ
     const UInt8 MAP_LOCATE          = 0xA0;// 0x51
     /**地图传送 */
     const UInt8 MAP_TRANSPORT       = 0xA1;// 0x52
-    /**进入离开通天塔 */
-    const UInt8 BABEL_JOIN          = 0xAA;// 0x58
+    /**坐骑系统 */
+    const UInt8 MODIFY_MOUNT         = 0xAA;// 0x58
     /**请求通天塔信息 */
     const UInt8 BABEL_UPDATE        = 0xAB;// 0x59
     /**开始通天塔战斗 */
@@ -438,6 +438,10 @@ namespace REQ
 
     /** 墨守成规 */
     const UInt8 CCB                 = 0X26;
+    /** 结婚系统 */
+    const UInt8 MARRYMGR            = 0x75;
+    /** 结婚养成 */
+    const UInt8 MARRIEDMGR          = 0x77;
 }
 
 namespace REP
@@ -521,7 +525,7 @@ namespace REP
     const UInt8 MAP_TRANSPORT_UPDATE= 0xA2;// 0x53
     const UInt8 MAP_SAMPLEUSER      = 0xA3;// 0x54
     const UInt8 MAP_POINT_JOIN      = 0xA4;// 0x55
-    const UInt8 COPY_JOIN           = 0xAA;// 0x58
+    const UInt8 MODIFY_MOUNT        = 0xAA;// 0x58
     const UInt8 COPY_DATA_UPDATE    = 0xAB;// 0x59
     const UInt8 COPY_FIGHT_RESULT   = 0xAC;// 0x5A
     const UInt8 COPY_AUTO_FIGHT     = 0xAD;// 0x5B
@@ -734,6 +738,10 @@ namespace REP
     const UInt8 SINGLE_HERO         = 0XA5;
     /** 墨守成规 */
     const UInt8 CCB                 = 0X26;
+    /** 结婚系统 */
+    const UInt8 MARRYMGR            = 0x75;
+    /** 结婚养成 */
+    const UInt8 MARRIEDMGR          = 0x77;
 }
 
 namespace SPEQ
@@ -809,6 +817,7 @@ namespace SPEQ
     const UInt16 GETQQCLANTALK       = 0x14C;// 接收QQ群聊天记录
     const UInt16 SETVAR              = 0x14D;// 设置VAR
     const UInt16 VIAPLAYERINFO       = 0x14E;// 查询导入玩家信息
+    const UInt16 SETMARRYBOARD          = 0x14F;// 设置婚礼 
 }
 
 namespace SPEP
@@ -876,7 +885,8 @@ namespace SPEP
     const UInt8 OFFQQOPENID         = 0x4B;// 解除QQ群绑定 
     const UInt8 GETQQCLANTALK       = 0x4C;// 接收QQ群聊天记录
     const UInt8 SETVAR              = 0x4D;//设置var
-    const UInt16 VIAPLAYERINFO      = 0x4E;// 查询导入玩家信息
+    const UInt8 VIAPLAYERINFO       = 0x4E;// 查询导入玩家信息
+    const UInt8 SETMARRYBOARD       = 0x4F;//设置婚礼
 
 }
 

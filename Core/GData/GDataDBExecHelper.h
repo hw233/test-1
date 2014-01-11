@@ -641,6 +641,25 @@ struct DBTeamArenaInspireConfig
     float actionP;
 };
 
+struct DBRideConfig
+{
+    UInt8 id;
+    std::string name;
+    UInt32 itemId;
+    std::string chips;
+    UInt32 propId;
+};
+
+struct DBRideUpgradeCfg
+{
+    UInt16 level;
+    std::string name;
+    UInt8 lvLimit;
+    UInt32 singleCost;
+    UInt32 lvExp;
+    float rate;
+};
+
 struct DBKeyinConfig
 {
     UInt8 keyinId;
@@ -684,6 +703,21 @@ struct DBSanHunConfig
     float attr9;
     UInt32 money1;
     UInt32 money2;
+};
+
+struct DBPetSevenSoulLevel
+{
+	UInt8 soullevel;
+	UInt32 needsoulnum;
+	UInt8 skilllevel;
+};
+
+struct DBPetSevenSoulUpgrade
+{
+	UInt8 pettype;
+	UInt8 soulid;
+    std::string skillstr;
+	UInt8 condionvalue;
 };
 
 }
@@ -1476,6 +1510,48 @@ SPECIALDEF(7)
     float, defendP,
     float, hpP,
     float, actionP
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBPetSevenSoulLevel)
+SPECIALDEF(3)
+    (
+	UInt8, soullevel,
+	UInt32, needsoulnum,
+	UInt8, skilllevel
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBPetSevenSoulUpgrade)
+SPECIALDEF(4)
+    (
+	UInt8, pettype,
+	UInt8, soulid,
+    std::string, skillstr,
+	UInt8, condionvalue
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBRideConfig)
+SPECIALDEF(5)
+	(
+    UInt8, id,
+    std::string, name,
+    UInt32, itemId,
+    std::string, chips,
+    UInt32, propId
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBRideUpgradeCfg)
+SPECIALDEF(6)
+	(
+    UInt16, level,
+    std::string, name,
+    UInt8, lvLimit,
+    UInt32, singleCost,
+    UInt32, lvExp,
+    float, rate
 	)
 SPECIALEND()
 
