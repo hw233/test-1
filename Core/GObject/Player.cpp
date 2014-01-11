@@ -11773,6 +11773,7 @@ namespace GObject
         }
     }
 
+   
     void Player::GMSetQTNUM(UInt8 num)
     {
         SetVar(VAR_QT_REGIST_NUM, num);
@@ -26999,6 +27000,120 @@ void Player::getMarryBoard3Award(UInt8 type)   //砸蛋
     }
 
 }
+
+void Player::getBuyFundInfo(UInt8 opt)
+{
+    UInt16 totalNum = GetVar(VAR_BUY_FUND_NuM);
+    UInt8 mark = GetVar(VAR_BUY_FUND_TRUMP_AWARD);
+    if(totalNum >= 100 && mark == 1 && opt == 1)
+    {
+        if(GetPackage()->GetRestPackageSize() < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        GetPackage()->AddItem(56, 1, true, false, FromQTAward);
+        mark = 2;
+        SetVar(VAR_BUY_FUND_TRUMP_AWARD, mark);
+    }
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x28) << static_cast<UInt8>(0x00);
+    st << totalNum << mark << Stream::eos;
+    send(st);
+}
+
+void Player::buyFund(UInt16 num)
+{
+    if(!World::getBuyFundAct())
+        return;
+    
+    if(num == 0)
+        return;
+
+    if (getGold() < 100 * num)
+    {
+        sendMsgCode(0, 1104);
+        return;
+    }
+
+    ConsumeInfo ci(OutBuyFund, 0, 0);
+    useGold(100*num, &ci);
+
+    UInt16 lastNum = GetVar(VAR_BUY_FUND_NuM);
+    UInt16 totalNum = lastNum + num;
+    SetVar(VAR_BUY_FUND_NuM, totalNum);
+    UInt8 mark = GetVar(VAR_BUY_FUND_TRUMP_AWARD);
+    if((lastNum + num) >= 100 && mark == 0)
+    {
+        mark = 1;
+        SetVar(VAR_BUY_FUND_TRUMP_AWARD, mark)
+    }
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x28) << static_cast<UInt8>(0x01);
+    st << totalNum << mark << Stream::eos;
+    send(st);
+}
+
+
+void Player::getBuyFundAward(UInt8 opt)
+{
+    UInt32 status = GetVar(VAR_BUY_FUND_AWARD);
+    
+    UInt16 num = GetVar(VAR_BUY_FUND_NuM);
+
+    if(num > 0)
+    {
+        for(UInt8 i=0; i<9; i++)
+        {
+            UInt8 state = GET_BIT_2(status, i);
+            if(state == 0)
+            {
+                UInt8 date[9] = {0, 3, 6, 9, 12, 17, 22, 27, 32};
+                if(TimeUtil::Now() >= (TimeUtil::MkTime(2014, 2, 14) + date[i]*86400))
+                    status = SET_BIT(status, (i*2));
+            }
+        }
+    }
+
+    if(num > 0 && opt >= 1 && opt <= 9)
+    {
+        UInt8 mark = GET_BIT_2(status, (opt-1));
+        if(mark == 1)
+        {
+            UInt8 award[3][9] = {
+                {8, 10, 12, 15, 18, 20, 6, 6, 25},
+                {8, 10, 12, 16, 20, 20, 7, 7, 25},
+                {8, 10, 12, 16, 20, 22, 8, 8, 26}
+            }
+
+            UInt8 index = 0;
+            if(num >= 1 && num <= 200)
+                index = 0;
+            else if(num >= 201 && num <= 300)
+                index = 1;
+            else if(num >= 301 && num <= 1000)
+                index = 2;
+            
+            UInt8 money = award[index][opt-1] * num;
+            IncommingInfo ii(InBuyFund, 0, 0);
+            if(opt == 7 || opt == 8)
+                getCoupon(money, &ii);  
+            else
+                getGold(money, &ii);
+
+            status = CLR_BIT(status, ((opt - 1) * 2));
+            status = SET_BIT(status, ((opt - 1) * 2 + 1));
+            SetVar(VAR_BUY_FUND_AWARD, status);
+        }
+    }
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x28) << static_cast<UInt8>(0x02);
+    st << static_cast<UInt8>(status) << Stream::eos;
+    send(st);
+}
+
 } // namespace GObject
 
 

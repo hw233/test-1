@@ -708,6 +708,11 @@ public:
     inline static bool getMiLuZhiJiaoAct()
     { return _miluzhijiao; }
 
+    inline static void setBuyFundAct(bool v)
+    { _buyfund = v; }
+    inline static bool getBuyFundAct()
+    { return _buyfund; }
+
     inline static bool getLuckyStarAct()
     {
         UInt32 now = TimeUtil::Now();
@@ -1210,6 +1215,7 @@ public:
     static UInt8 _arenaState;      //0:无 1:仙界第一 2:仙界至尊 3:仙界传奇
     static bool _memcinited;
     static bool _miluzhijiao;
+    static bool _buyfund;
 public:
     static RCSortType qishibanScoreSort;     //七石板积分排名
     static RCSortType rechargeSort;

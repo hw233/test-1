@@ -1159,6 +1159,13 @@ function onActivityCheck(tm)
   else
       setMiLuZhiJiaoAct(false)
   end
+
+  if tm >= actTime2014_01_18 and tm < actTime2014_01_24 then
+      setBuyFundAct(true)
+  else
+      setBuyFundAct(false)
+  end
+
   --[[
   if tm >= actTime234_0 and tm < actTime234_1 then
       setHeroIslandAct(true)
@@ -1468,7 +1475,10 @@ function initActTime(y, m, d)
   --圣诞节活动（麋鹿之角）
   local  SerStartTm2013_12_24 = { ['year'] = 2013, ['month'] = 12, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_12_26 = { ['year'] = 2013, ['month'] = 12, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-
+  
+  --购买基金
+  local  SerStartTm2014_01_18 = { ['year'] = 2014, ['month'] = 01, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2014_01_24 = { ['year'] = 2014, ['month'] = 01, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     --日月合璧活动
   local  SerStartTmRYHB= { ['year'] = 2013, ['month'] = 6, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTmRYHB_1= { ['year'] = 2013, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1953,6 +1963,9 @@ function initActTime(y, m, d)
   actTime2013_05_18= os.time(SerStartTm2013_05_18)
   actTime2013_12_24= os.time(SerStartTm2013_12_24)
   actTime2013_12_26= os.time(SerStartTm2013_12_26)
+
+  actTime2014_01_18= os.time(SerStartTm2014_01_18)
+  actTime2014_01_24= os.time(SerStartTm2014_01_24)
 
   actTime_2013_1 = os.time(SerStartTm_2013_1);
   actTime_2013_1_1 = os.time(SerStartTm_2013_1) + 7*86400;

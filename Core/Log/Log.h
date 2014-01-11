@@ -140,6 +140,7 @@ enum PurchaseType
     MarryYanHua                 = 130, //结婚送烟花
     MarryBaiHe                  = 131, //结婚送百合花
     RestStep                    = 1001, //七石板重置
+    OutBuyFund                  = 1002, //购买基金消费
     //繁体私有占150～200
 };
 
@@ -166,6 +167,7 @@ enum IncomingType
     ShouHunFromYouli            = 146, //游历获得兽魂
     LongHunFromTeamArena        = 147, //仙界至尊龙魂获得
     LongHunFromServerWar        = 148, //仙界传奇龙魂获得
+    InBuyFund                   = 149, //购买基金获得
 };
 
 enum MoneyType

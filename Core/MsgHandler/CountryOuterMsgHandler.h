@@ -7551,6 +7551,41 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     break;
             }
         }
+        break;
+    case 0x28:
+        {
+            brd >> op;
+            switch(op)
+            {
+            case 0x00:
+                {
+                    UInt8 type = 0;
+                    brd >> type;
+                    player->getBuyFundInfo(type);
+                }
+                break;
+            case 0x02:
+                {
+                    if(!World::getBuyFundAct())
+                        return;
+
+                    if(!player->hasChecked())
+                        return;
+
+                    UInt8 num = 0;
+                    brd >> num;
+                    player->buyFund(num);
+                }
+                break;
+            case 0x03:
+                {
+                    UInt8 type = 0;
+                    brd >> type;
+                    player->getBuyFundAward(type);
+                }
+                break;
+            }
+        }
     default:
         break;
     }
