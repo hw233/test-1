@@ -1993,6 +1993,8 @@ namespace GObject
             {
                 if(it->first < TimeUtil::Now())
                 {
+                    if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD())
+                        break;  
                     it1 = it->second;
                     player = GObject::globalPlayers[it1.first];
                     obj_player = GObject::globalPlayers[it1.second];
