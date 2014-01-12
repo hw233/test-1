@@ -200,9 +200,10 @@ namespace GObject
             
             void sendWhoisMarrybuyer(Player* player,Player* obj_player);
 
-            void DoProcess();
+            void FuckDoProcess(UInt32 now);
+            void DoProcess(UInt32 now);
             
-            void Process();
+            void Process(UInt32 now);
             
             void SetDirty(Player*,Player*);
             

@@ -952,6 +952,7 @@ namespace GObject
     UInt8 MarryMgr::ConfirmReqWeddingAppointMent(Player* player)
     {
         Mutex::ScopedLock lk(_mutex); 
+        UInt32 now = TimeUtil::Now();
         if(player->GetVar(VAR_MARRY_STATUS) != 2)
         {
             player->sendMsgCode(0, 6002);
@@ -1022,7 +1023,7 @@ namespace GObject
         player->udpLog("jiehunqianzhi", "F_140102_11", "", "", "", "", "act");
         sendWhoisMarrybuyer(player,obj_player);//告知客户端谁是婚礼购买者
 
-        Process();
+        Process(now);
         return 0;
     }
     
@@ -2008,20 +2009,21 @@ namespace GObject
         return;
     }
     
+    void MarryMgr::FuckDoProcess(UInt32 now)
+    {
+        Mutex::ScopedLock lk(_mutex);
+        Process(now);
+    }
 
-    void MarryMgr::DoProcess()
+    void MarryMgr::DoProcess(UInt32 now)
     {
         CheckingListTimeOut(m_maleList);
         CheckingListTimeOut(m_femaleList);
-        { // 限制lock的生命周期
-            Mutex::ScopedLock lk(_mutex);
-            Process();
-        }
+        FuckDoProcess(now);
     }
 
-    void MarryMgr::Process()
+    void MarryMgr::Process(UInt32 now)
     {
-        UInt32 now = TimeUtil::Now();
         if(GVAR.GetVar(GVAR_MARRY_TIME1) < now)
             GVAR.SetVar(GVAR_MARRY_TIME1,0);
         if(GVAR.GetVar(GVAR_MARRY_TIME2) < now)
