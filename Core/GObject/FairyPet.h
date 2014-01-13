@@ -141,8 +141,9 @@ public:
     void upgradeSevenSoul(UInt8 sevenSoulIndex);
     void switchSevenSoulSkill(UInt8 sevenSoulIndex, UInt8 skillIndex);
     void loadPlayerSevenSoul(UInt8 soulId, UInt8 soulLevel, UInt8 skillIndex);
-    void setSkillFromSevenSoul(UInt8 soulId);
-    void addSkillFromSevenSoul(UInt16 soulId);
+    void loadSkillFromSevenSoul(UInt8 soulId);
+    void setSkillFromSevenSoul(UInt16 skillId);
+    void addSkillFromSevenSoul(UInt16 skillId);
     void delSkillFromSevenSoul(UInt16 skillId);
     void deleteSevenSoul();
 private:

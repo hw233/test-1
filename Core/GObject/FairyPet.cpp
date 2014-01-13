@@ -1241,15 +1241,15 @@ namespace GObject
 
     void FairyPet::loadPlayerSevenSoul(UInt8 soulId, UInt8 soulLevel, UInt8 skillIndex)
     {
-        if(soulId >= 1 && soulId <= 25)
+        if(soulId >= 1 && soulId <= 7)
         {
             _soulLevel[soulId - 1] = soulLevel;
             _skillIndex[soulId - 1] = skillIndex;
-            setSkillFromSevenSoul(soulId - 1);
+            loadSkillFromSevenSoul(soulId - 1);
         }
     }
 
-    void FairyPet::setSkillFromSevenSoul(UInt8 soulId)
+    void FairyPet::loadSkillFromSevenSoul(UInt8 soulId)
     {
         if(soulId >= 7)
             return;
@@ -1262,22 +1262,31 @@ namespace GObject
         UInt16 skillId = GData::sevenSoul.getSkillId(petType, soulId + 1, _skillIndex[soulId]);
         UInt16 skillLevel = GData::sevenSoul.getSkillLevel(_soulLevel[soulId]);
         UInt16 skill_id = SKILLANDLEVEL(skillId, skillLevel);
-        addSkillFromSevenSoul(skill_id);
+        setSkillFromSevenSoul(skill_id);
+    }
+
+    void FairyPet::setSkillFromSevenSoul(UInt16 skillId)
+    {
+        printf("set: skillId = %d\n", skillId);
+        std::string skills = Itoa(skillId);
+        setSkills(skills, false);
     }
 
     void FairyPet::addSkillFromSevenSoul(UInt16 skillId)
     {
+        printf("add: skillId = %d\n", skillId);
         std::vector<const GData::SkillBase*> vSkills;
         const GData::SkillBase* s = GData::skillManager[skillId];
         if(s)
         {
             vSkills.push_back(s);
-            delSkillsFromCT(vSkills, false);
+            addSkillsFromCT(vSkills, false, true);
         }
     }
 
     void FairyPet::delSkillFromSevenSoul(UInt16 skillId)
     {
+        printf("delete: skillId = %d\n", skillId);
         std::vector<const GData::SkillBase*> vSkills;
         const GData::SkillBase* s = GData::skillManager[skillId];
         if(s)
