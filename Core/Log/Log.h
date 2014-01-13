@@ -170,6 +170,7 @@ enum IncomingType
     ShouHunFromYouli            = 146, //游历获得兽魂
     LongHunFromTeamArena        = 147, //仙界至尊龙魂获得
     LongHunFromServerWar        = 148, //仙界传奇龙魂获得
+    XianpoFromUseItem         = 149, //使用物品仙魄丹
 };
 
 enum MoneyType

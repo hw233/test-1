@@ -21768,6 +21768,54 @@ UInt8 Player::toQQGroup(bool isJoin)
         return shouhun;
     }*/
 
+    void Player::getXianpoLua(UInt32 c)
+    {
+        IncommingInfo ii(XianpoFromUseItem, 0, 0);
+        getXianpo(c, &ii);
+    }
+
+    UInt32 Player::getXianpo(UInt32 c, IncommingInfo* ii)
+    {
+        UInt32 xianpo = GetVar(VAR_SEVEN_SOUL_NUM);
+		if(c == 0)
+			return xianpo;
+		xianpo += c;
+		SYSMSG_SENDV(191, this, c);
+		SYSMSG_SENDV(1067, this, c);
+        SetVar(VAR_SEVEN_SOUL_NUM, xianpo);
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
+
+        return xianpo;
+	}
+
+	UInt32 Player::useXianpo(UInt32 a, ConsumeInfo* ci)
+	{
+        UInt32 xianpo = GetVar(VAR_SEVEN_SOUL_NUM);
+        if(a == 0 || xianpo == 0)
+            return xianpo;
+        if(xianpo < a)
+            xianpo = 0;
+        else
+        {
+            xianpo -= a;
+            if(ci != NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(191, this, a);
+        SYSMSG_SENDV(1067, this, a);
+        SetVar(VAR_SEVEN_SOUL_NUM, xianpo);
+
+        return xianpo;
+    }
+
 void Player::getQQGameOnlineAward()
 {
     if(!World::getQQGameOnlineAwardAct())

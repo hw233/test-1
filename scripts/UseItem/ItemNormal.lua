@@ -10330,8 +10330,13 @@ end
 
 function ItemNormal_00009649(iid, num, bind, param)
     local player = GetPlayer()
-    player:AddVar(603, 500 * num)
+    if player:GetLev() < 80 then
+        player:sendMsgCode(0, 1093, 80);
+        return false
+    end
+    local package = player:GetPackage();
     package:DelItemSendMsg(iid, player);
+    player:getXianpoLua(num * 500);
     return num
 end
 

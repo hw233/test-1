@@ -332,6 +332,7 @@ namespace Script
         CLASS_DEF(Player, hasMountChip);
         CLASS_DEF(Player, addMountChip);
         CLASS_DEF(Player, addMountFromItem);
+        CLASS_DEF(Player, getXianpoLua);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);

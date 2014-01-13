@@ -1127,7 +1127,7 @@ namespace GObject
         const UInt8 type = 0;
         const UInt8 count = 7;
         Stream st(REP::FAIRY_PET);
-        st << static_cast<UInt8>(0x08) << type << getId() << _owner->GetVar(VAR_SEVEN_SOUL_NUM) << count;
+        st << static_cast<UInt8>(0x08) << type << getId() << _owner->getXianpo() << count;
         for(UInt8 i = 0; i < count; i++)
         {
             st << _soulLevel[i];
@@ -1148,14 +1148,12 @@ namespace GObject
             return;
 
         UInt32 needNum = GData::sevenSoul.getNeedSoulNum(soulLevel);
-        UInt32 curNum = _owner->GetVar(VAR_SEVEN_SOUL_NUM);
+        UInt32 curNum = _owner->getXianpo();
         UInt8 ret;
         if(curNum >= needNum)
         {
-            _owner->SetVar(VAR_SEVEN_SOUL_NUM, curNum - needNum);
-
-            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
-                cfg.serverLogId, _owner->getId(), SevenSoulUpgrade, 0, 0, needNum, TimeUtil::Now());
+            ConsumeInfo ci(SevenSoulUpgrade, 0, 0);
+            _owner->useXianpo(needNum, &ci);
 
             UInt8 oldSkillLevel = GData::sevenSoul.getSkillLevel(_soulLevel[sevenSoulIndex]);
             ++_soulLevel[sevenSoulIndex];

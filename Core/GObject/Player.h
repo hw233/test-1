@@ -2829,6 +2829,9 @@ namespace GObject
         void spreadToSelf();
         void spreadGetAward();
         void spreadGetAwardInCountry(UInt32 spreadCount);
+        void getXianpoLua(UInt32 c);
+        UInt32 getXianpo(UInt32 c = 0, IncommingInfo* ii = NULL);
+        UInt32 useXianpo(UInt32 a, ConsumeInfo* ci);
 
     public:
         // 八部浮屠
