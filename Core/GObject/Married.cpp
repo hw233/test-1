@@ -67,7 +67,7 @@ namespace GObject
             woman_player = player;
         }
         
-        CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        //CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
         if(man_player->GetVar(VAR_COUPLE_ONLINE_TIME) >= 60 * 60 * 8) 
             return;
         
@@ -123,7 +123,7 @@ namespace GObject
             woman_player = player;
         }
         
-        CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        //CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
         
         Stream st(REP::MARRIEDMGR);
         st << static_cast<UInt8>(2) << man_player->getName() << man_player->isOnline() << woman_player->getName() << woman_player->isOnline() ;
@@ -198,7 +198,6 @@ namespace GObject
         CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
         if(it == m_couple.end())
             return;
-        
         if(man_player->GetVar(VAR_COUPLE_ONLINE_START_TIME) != 0)
         {
             UInt32 tmp_time = man_player->GetVar(VAR_COUPLE_ONLINE_TIME) + now - man_player->GetVar(VAR_COUPLE_ONLINE_START_TIME);//计算同时在线时间
@@ -252,6 +251,8 @@ namespace GObject
         }
         
         CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        if(it == m_couple.end())
+            return;
         if(man_player->GetVar(VAR_COUPLE_ONLINE_RENAME) != 0)
             useMoney(player,2,50,1); 
         UInt8 tmp_count = man_player->GetVar(VAR_COUPLE_ONLINE_RENAME) + 1;
@@ -290,7 +291,7 @@ namespace GObject
             return;
         if(static_cast<UInt8>(man_player->GetMarriageInfo()->eLove) >= eLove)
             return;
-        UInt8 consumeType = 3;
+        //UInt8 consumeType = 3;
         UInt16 consumeNum = 0; 
         UInt16 old_consumeNum = 0; 
         UInt16 new_consumeNum = 0; 
@@ -312,6 +313,8 @@ namespace GObject
             return;
 
         CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        if(it == m_couple.end())
+            return;
         it->second->eLove = eLove;
         man_player->GetMarriageInfo()->eLove = static_cast<ELoveToken>(eLove);
         woman_player->GetMarriageInfo()->eLove = static_cast<ELoveToken>(eLove);
@@ -344,7 +347,7 @@ namespace GObject
             woman_player = player;
         }
         
-        CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        //CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
         if(man_player->GetVar(VAR_COUPLE_ONLINE_FISH) + count > 10)
             return 1;
         
@@ -496,6 +499,9 @@ namespace GObject
     void MarriedMgr::ChangPetAttr(Player* player,ECoupleAward eAward)
     {
         CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        if(it == m_couple.end())
+            return;
+
         switch(eAward)
         {
             case AWARD_WHITEFISH:
