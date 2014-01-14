@@ -8181,13 +8181,13 @@ function onRoamingQueqiao(player, pos)
     }
 
     local eventItem = {
-        {{502, 2, 10}, {510, 1, 10}, {29, 10, 10}},
+        {{511, 1, 10}, {500, 1, 10}, {30, 1, 10}},
         {{56, 1, 20}, {500, 1, 20}, {57, 1, 20}},
         {{511, 2, 20}, {512, 1, 30}, {517, 1, 30}},
-        {{9122, 1, 10}, {9122, 1, 10}, {9122, 1, 10}},
+        {{9450, 1, 10}, {9450, 1, 10}, {9450, 1, 10}},
         {{503, 1, 30}, {514, 1, 30}, {501, 1, 30}},
         {{509, 1, 40}, {134, 1, 40}, {1325, 1, 40}},
-        {{1647, 1, 50}, {1648, 1, 50}, {1649, 1, 50}},
+        {{1663, 1, 50}, {1664, 1, 50}, {1665, 1, 50}},
     }
 
     step = math.random(1, 3)
@@ -8330,7 +8330,7 @@ function Qixi(player, lootlvl)
     if getQixi() then
         -- 喜鹊
         local package = player:GetPackage();
-        package:AddItem(9122, 1, true, 0, 10);
+        package:AddItem(9450, 1, true, 0, 10);
     end
 end
 
@@ -8414,7 +8414,8 @@ function SurnameLegendLoot(player,lootlvl)
     --package:AddItem(9397, itemNum[lootlvl], true,0,10);
     --package:AddItem(9401, itemNum[lootlvl], true,0,10);
     --package:AddItem(9422, itemNum[lootlvl], true,0,10);
-    package:AddItem(9437, itemNum[lootlvl], true,0,10);
+    --package:AddItem(9437, itemNum[lootlvl], true,0,10);
+    package:AddItem(9449, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -9270,7 +9271,7 @@ function GetLuckyBagAward(player)
     end
 
     local items = {
-       { 9367,5} , {9369,5},{ 503,5},{515,1},{1525,1},{1325,2}
+       { 9371,5}, {9424,5}, {503,5}, {515,1}, {134,1}, {1325,1}
     }
     for i = 1 , 5  do
         local num = player:GetVar(452+i);
@@ -9282,7 +9283,7 @@ function GetLuckyBagAward(player)
         local num = player:GetVar(452+i);
         player:SetVar(452+i,num-1);
     end
-    for i = 1,#items do
+    for i = 1, #items do
         local item = items[i];
         player:GetPackage():Add(item[1],item[2],true,false,32);
     end

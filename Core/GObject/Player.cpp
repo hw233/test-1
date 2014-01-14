@@ -24174,7 +24174,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+            //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9449, 1, true, false, FromNpc);
         }
         else
         {
@@ -24184,7 +24185,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+                //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9449, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
@@ -26916,21 +26918,20 @@ void Player::getHappyValueAward(UInt8 val)
 {
     if (!World::getHappyFireTime())
         return;
-    UInt32 score[]={20,40,60,80,100};
+    UInt32 score[]={20,40,60,80,100,300};
     UInt32 value = GetVar(VAR_YEARHAPPY_DAYVALUE);
-    if(val<1||val>5)
-        return ;
+    if(val < 1 || val > sizeof(score)/sizeof(score[0]))
+        return;
     if(value < score[val-1])
-        return ;
+        return;
     UInt32 ctslandingAward = GetVar(VAR_YEARHAPPY_DAYVALUE_AWARD);
     if(ctslandingAward & (1<<(val-1)))
-        return ;
-    if(!GameAction()->RunHappyValueAward(this, val))
-    {
         return;
+    if(GameAction()->RunHappyValueAward(this, val))
+    {
+        ctslandingAward |= (1<<(val - 1));
+        SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
     }
-    ctslandingAward |= (1<<(val - 1));
-    SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
 }
 
 void Player::joinAllServerRecharge(UInt32 num)

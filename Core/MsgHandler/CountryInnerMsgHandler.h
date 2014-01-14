@@ -2323,9 +2323,10 @@ void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
         case 0x00:
             player->sendLuckyBagInfo();
             break;
-        /*case 0x03:
-              GameAction()->GetLuckyBagAward(player);
-              break;*/
+        case 0x03:
+            GameAction()->GetLuckyBagAward(player);
+            break;
+        /*
         case 0x04:
               {
                   std::string name = sdata->name;
@@ -2354,6 +2355,7 @@ void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
         case 0x05:
               GameAction()->UseToSystem(player);
               break;
+       */
        }
    }
     

@@ -299,6 +299,7 @@ GMHandler::GMHandler()
     Reg(3, "addshlvl", &GMHandler::OnAddSHLvl);
     Reg(3, "playermsg", &GMHandler::OnPlayerMsg);
     Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
+    Reg(2, "use9440", &GMHandler::OnUseItem9440);
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
 
     _printMsgPlayer = NULL;
@@ -4912,6 +4913,22 @@ void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::stri
         break;
     }
 }
+
+void GMHandler::OnUseItem9440(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+        return;
+    UInt32 count = atoi(args[0].c_str());
+    UInt32 i = 0;
+    for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+    {
+        if(i > 600)
+            break;
+        it->second->GetPetPackage()->Add(9440, count);
+        it->second->GetPetPackage()->UseItem(9440, count, 0, 0, 0);
+    }
+}
+
 void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string>& args)
 {
     if (args.size() < 1)
