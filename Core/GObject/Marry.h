@@ -203,6 +203,8 @@ namespace GObject
             void Process();
             
             void SetDirty(Player*,Player*);
+            
+            void MarryingCrush();
         private:
             Mutex _mutex;
             MoneyStruct sMoney; 

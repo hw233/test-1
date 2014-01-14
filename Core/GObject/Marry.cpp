@@ -282,7 +282,11 @@ namespace GObject
         SYSMSGV(content, content_flag,price_num);
         
         MailItemsInfo itemsInfo(mitem, BuChangMarry, 1);
-        Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        Mail * pmail; 
+        if(price_num == 0)    
+            pmail = player->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000, true, &itemsInfo);
+        else
+            pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
 
@@ -1051,7 +1055,7 @@ namespace GObject
     UInt8 MarryMgr::doCancelAppointMent(Player* player)
     {
         Mutex::ScopedLock lk(_mutex); 
-        UInt8 ret = CancelReqWeddingAppointMent(player);
+        UInt8 ret = CancelAppointMent(player);
         return ret;
     }
 
@@ -1974,7 +1978,7 @@ namespace GObject
                     eWedding = static_cast<UInt8>(obj_player->GetMarriageInfo()->eWedding);
                 else
                     eWedding = static_cast<UInt8>(player->GetMarriageInfo()->eWedding);
-                MarryBoard::instance().SendPreMarryPresent(player,obj_player,eWedding);
+                //MarryBoard::instance().SendPreMarryPresent(player,obj_player,eWedding);
                 i++;
             }
         }
@@ -1987,6 +1991,24 @@ namespace GObject
             
             while(it != m_yuyueList.end())
             {
+                if(it->first < TimeUtil::Now())
+                {
+                    it1 = it->second;
+                    player = GObject::globalPlayers[it1.first];
+                    obj_player = GObject::globalPlayers[it1.second];
+                    UInt8 ret; 
+                    if(player->GetMarriageInfo()->eWedding == WEDDING_NULL)
+                    {
+                        ret = CancelAppointMent(player);
+                        sendMoneyMail(obj_player,MailPackage::Gold,0,7,1); 
+                    }
+                    else
+                    {
+                        ret = CancelAppointMent(obj_player);
+                        sendMoneyMail(player,MailPackage::Gold,0,7,1); 
+                    }
+                }
+                
                 if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD())
                 {
                     it1 = it->second;
@@ -1996,19 +2018,7 @@ namespace GObject
                         eWedding = static_cast<UInt8>(obj_player->GetMarriageInfo()->eWedding);
                     else
                         eWedding = static_cast<UInt8>(player->GetMarriageInfo()->eWedding);
-                    if(it->first < TimeUtil::Now())
-                    {
-                        UInt8 ret; 
-                        if(player->GetMarriageInfo()->eWedding == WEDDING_NULL)
-                            ret = CancelAppointMent(obj_player);
-                        else
-                            ret = CancelAppointMent(player);
-                        if(ret == 0)
-                            sendMoneyMail(player,MailPackage::Gold,0,7,1); 
-                        //WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,TimeUtil::Now() + 60*90); 
-                    }
-                    else
-                        WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,it->first + 60*30); 
+                    WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,it->first + 60*30); 
                 }
                 if(it != m_yuyueList.end())
                     it++;
@@ -2034,6 +2044,28 @@ namespace GObject
 
     }
     
+    void MarryMgr::MarryingCrush()
+    {
+        Mutex::ScopedLock lk(_mutex);
+        if(m_yuyueList.begin() == m_yuyueList.end())
+            return;
+        ReserveList::iterator it = this->m_yuyueList.begin();
+        
+        if(it->first < TimeUtil::Now())
+        {
+            std::pair<UInt64,UInt64> it1 = it->second;
+            GObject::Player * player = GObject::globalPlayers[it1.first];
+            GObject::Player * obj_player = GObject::globalPlayers[it1.second];
+            UInt8 ret; 
+            if(player->GetMarriageInfo()->eWedding == WEDDING_NULL)
+                ret = CancelAppointMent(player);
+            else
+                ret = CancelAppointMent(obj_player);
+            if(ret == 0)
+                sendMoneyMail(player,MailPackage::Gold,0,8,1); 
+        }
 
+        return;
+    }
 
 }
