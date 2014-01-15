@@ -1418,6 +1418,21 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->sendGuangGunInfo();
     pl->setQTSpecialMark();
+    //通知结婚养成
+    if(pl->GetVar(GObject::VAR_MARRY_STATUS) == 5 || pl->GetVar(GObject::VAR_MARRY_STATUS) == 6)
+    {
+        Stream st1(REP::MARRIEDMGR);
+        st1  << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
+        pl->send(st1);
+        return;
+    }
+    else
+    {
+        Stream st1(REP::MARRIEDMGR);
+        st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0)<< Stream::eos;
+        pl->send(st1);
+        return;
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

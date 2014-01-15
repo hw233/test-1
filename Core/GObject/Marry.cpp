@@ -269,11 +269,11 @@ namespace GObject
                 content_flag = 912;
                 break;
             case 7:
-                str_type = "婚礼宕机处理";
+                str_type = "婚礼超时处理";
                 content_flag = 917;
                 break;
             case 8:
-                str_type = "婚礼进行时宕机处理";
+                str_type = "婚礼超时处理";
                 content_flag = 918;
                 break;
             default:
@@ -1265,6 +1265,12 @@ namespace GObject
         player->SetVar(VAR_MARRY_STATUS,5); 
    
         SetDirty(player,obj_player); 
+        
+        //通知结婚养成
+        Stream st1(REP::MARRIEDMGR);
+        st1 << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
+        player->send(st1);
+        obj_player->send(st1);
         return 0;
     }
 
@@ -1278,6 +1284,7 @@ namespace GObject
             return 1;
         }
         PairList::iterator it;
+        Stream st1(REP::MARRIEDMGR);
         Stream st2(REP::MARRYMGR);
         switch(status)
         {
@@ -1417,7 +1424,11 @@ namespace GObject
                 
                 st2 << static_cast<UInt8>(9) << static_cast<UInt8>(6) << player->getId() << player->getName() << player->getMainFighter()->getColor() << Stream::eos;
 
+                //通知结婚养成
                 obj_player->send(st2);
+                st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0) << Stream::eos;
+                player->send(st1);
+                obj_player->send(st1);
                 
                 break;
             case 2:
@@ -1448,6 +1459,11 @@ namespace GObject
                         erase_marryList(player);        
                         sendMoneyMail(player,MailPackage::Gold,0,5,1); 
                         sendMoneyMail(obj_player,MailPackage::Gold,0,5,1); 
+                        //通知结婚养成
+                        st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0) << Stream::eos;
+                        player->send(st1);
+                        obj_player->send(st1);
+                        
                         player->SetVar(VAR_MARRY_STATUS,0);
                         obj_player->SetVar(VAR_MARRY_STATUS,0);
                     }
@@ -1840,6 +1856,9 @@ namespace GObject
                 obj_player->GetMarriageInfo()->pronouncement = dbpn->pronouncement ;
             
         }
+
+        
+        
         return 0;
     } 
 
@@ -1853,6 +1872,42 @@ namespace GObject
 
         return 0;
     } 
+
+    void MarryMgr::RepairBug()
+    {
+        if(GVAR.GetVar(GVAR_REPAIRMARRYBUG) == 1)
+            return;
+        ReserveList::iterator it; 
+        for(it = m_yuyueList.begin();it != m_yuyueList.end(); ++it)
+        {
+            GObject::Player * man_player = GObject::globalPlayers[(it->second).first];
+            GObject::Player * woman_player = GObject::globalPlayers[(it->second).second];
+            if(man_player->GetVar(VAR_MARRY_STATUS) == 4)
+            {
+                if(it->first == 1) 
+                {
+                    if(man_player->GetMarriageInfo()->eWedding == WEDDING_NULL)    
+                        doCancelAppointMent(man_player);
+                    else
+                        doCancelAppointMent(woman_player);
+                }
+            }
+            
+            if(woman_player->GetVar(VAR_MARRY_STATUS) == 4)
+            {
+                if(it->first == 1) 
+                {
+                    if(woman_player->GetMarriageInfo()->eWedding == WEDDING_NULL)    
+                        doCancelAppointMent(woman_player);
+                    else
+                        doCancelAppointMent(man_player);
+                }
+            }
+        }
+        GVAR.SetVar(GVAR_REPAIRMARRYBUG,1);
+        return;
+    }
+
 
 
     void MarryMgr::addMarriedAttr(Player* player,GData::AttrExtra& ae)
@@ -2018,6 +2073,8 @@ namespace GObject
                     it1 = it->second;
                     player = GObject::globalPlayers[it1.first];
                     obj_player = GObject::globalPlayers[it1.second];
+                    if(!player || !obj_player)
+                        continue;
                     UInt8 ret; 
                     if(player->GetMarriageInfo()->eWedding == WEDDING_NULL)
                     {

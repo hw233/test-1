@@ -3048,6 +3048,8 @@ namespace GObject
 		}
 		lc.finalize();
 
+        gMarryMgr.RepairBug();
+
 		return true;
 	}
 
@@ -6872,6 +6874,8 @@ namespace GObject
 			Player * obj_player = globalPlayers[dbpn.woman_playerid];
 			if(player == NULL || obj_player == NULL)
 				continue;
+            if(!dbpn.jh_time && dbpn.wedding_type != 0)
+                dbpn.jh_time = 1;
             gMarryMgr.LoadReplyMarriage(player,obj_player,&dbpn); 
         }
 		lc.finalize();

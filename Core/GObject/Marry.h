@@ -205,6 +205,8 @@ namespace GObject
             void SetDirty(Player*,Player*);
             
             void MarryingCrush();
+            
+            void RepairBug();
         private:
             Mutex _mutex;
             MoneyStruct sMoney; 
