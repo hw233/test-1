@@ -27,6 +27,7 @@ class SevenSoul
         UInt8 getSkillLevel(UInt8 level);
         UInt16 getSkillId(UInt32 petType, UInt8 soulId, UInt8 order);
         UInt32 getConditonValue(UInt8 soulId);
+        UInt16 getAnotherSimilarSkill(UInt16 skillId);
 
     private:
         UInt32 _needSoulNum[SEVEN_SOUL_LEVEL_MAX];

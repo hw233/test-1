@@ -10336,7 +10336,7 @@ function ItemNormal_00009649(iid, num, bind, param)
     end
     local package = player:GetPackage();
     package:DelItemSendMsg(iid, player);
-    player:getXianpoLua(num * 500);
+    player:getXianpoLua(num * 50);
     return num
 end
 

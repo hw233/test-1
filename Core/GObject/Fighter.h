@@ -1047,6 +1047,8 @@ public:
     void GMSetXCTMaxVal(UInt16 value);
 
     void pushPetInfo2Leaderboard();
+    void petSSAdd(UInt16 id);
+    void petSSErase(UInt16 id);
 };
 
 class GlobalFighters

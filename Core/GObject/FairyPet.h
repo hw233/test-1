@@ -142,13 +142,12 @@ public:
     void switchSevenSoulSkill(UInt8 sevenSoulIndex, UInt8 skillIndex);
     void loadPlayerSevenSoul(UInt8 soulId, UInt8 soulLevel, UInt8 skillIndex);
     void loadSkillFromSevenSoul(UInt8 soulId);
-    void setSkillFromSevenSoul(UInt16 skillId);
-    void addSkillFromSevenSoul(UInt16 skillId);
-    void delSkillFromSevenSoul(UInt16 skillId);
     void deleteSevenSoul();
+    UInt16 getSkillLevelBySkill(UInt16 skillId);
 private:
     UInt8 _soulLevel[7];
     UInt8 _skillIndex[7];
+    UInt8 _petType;
 };
 
 }
