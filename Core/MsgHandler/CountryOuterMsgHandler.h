@@ -7317,15 +7317,23 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                     cancel_status = obj_player->GetVar(VAR_CANCEL_APPOINTMENT);
                     lover_name = obj_player->getName();                    
                     st << static_cast<UInt8>(obj_status) << static_cast<UInt8>(cancel_status) << static_cast<UInt8>(1)  << obj_playerid << lover_name << obj_player->getMainFighter()->getClass() << obj_player->getMainFighter()->getSex() << obj_player->getMainFighter()->getColor()<< static_cast<UInt8>(obj_player->GetMarriageInfo()->eLove) << obj_player->GetMarriageInfo()->pronouncement;
+                    GObject::gMarryMgr.sendWhoisMarrybuyer(player,obj_player);
                 }
                 else
                     st << static_cast<UInt8>(0) << static_cast<UInt8>(0)<< static_cast<UInt8>(0);
                 st << static_cast<UInt8>(player->GetMarriageInfo()->eLove) << player->GetMarriageInfo()->pronouncement;
-
-                if(player->GetMarriageInfo()->yuyueTime == 0 && static_cast<UInt8>(player->GetMarriageInfo()->eWedding))
-                    st << obj_player->GetMarriageInfo()->yuyueTime << static_cast<UInt8>(obj_player->GetMarriageInfo()->eWedding) << Stream::eos;
+                
+                if(player->GetMarriageInfo()->yuyueTime == 0 && static_cast<UInt8>(player->GetMarriageInfo()->eWedding) == WEDDING_NULL)
+                {
+                    if(obj_player)
+                        st << obj_player->GetMarriageInfo()->yuyueTime << static_cast<UInt8>(obj_player->GetMarriageInfo()->eWedding) << Stream::eos;
+                    else
+                        st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << Stream::eos;
+                }
                 else
                     st << player->GetMarriageInfo()->yuyueTime << static_cast<UInt8>(player->GetMarriageInfo()->eWedding) << Stream::eos;
+
+
 
                 player->send(st);
                 GObject::gMarryMgr.sendyuyueList(player,obj_player);
@@ -7374,25 +7382,29 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                         ret = GObject::gMarryMgr.ModifyMarriageInfo(player,sMarriage,flag1); 
                         break;
                     case 4:
-                        ret = GObject::gMarryMgr.CancelMarriage(player); 
+                        ret = GObject::gMarryMgr.doCancelMarriage(player); 
                         break;
                     case 6:
                         brd >> obj_playerid >> b_loverToken; 
                         sMarriage->eLove = static_cast<ELoveToken>(b_loverToken);
                         if(player->GetVar(VAR_MARRY_STATUS) == 1)
                         {
-                            result = GObject::gMarryMgr.CancelMarriage(player);
+                            result = GObject::gMarryMgr.doCancelMarriage(player);
                             if(result != 0)
                             {
                                 ret = 1;
                                 break;
                             }
+                            Stream st3(REP::MARRYMGR);
+                            string str_null = "";
+                            st3 << static_cast<UInt8>(3) << static_cast<UInt8>(0) << str_null << Stream::eos;
+                            player->send(st3); 
                         }
                         ret = GObject::gMarryMgr.ReplyMarriage(player,sMarriage,obj_playerid);
                         if(ret == 2)
                         {
                             GObject::Player * obj_player = GObject::globalPlayers[obj_playerid];//获得结缘玩家对象
-                            ret = GObject::gMarryMgr.CancelMarriage(obj_player,1);
+                            ret = GObject::gMarryMgr.doCancelMarriage(obj_player,1);
                             flag = 4;
                         }
                             
@@ -7403,7 +7415,7 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                         if(ret == 2)
                         {
                             GObject::Player * obj_player = GObject::globalPlayers[obj_playerid];//获得结缘玩家对象
-                            ret = GObject::gMarryMgr.CancelMarriage(obj_player,1);
+                            ret = GObject::gMarryMgr.doCancelMarriage(obj_player,1);
                             flag = 4;
                         }
                         break;
@@ -7413,7 +7425,7 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                         if(ret == 2)
                         {
                             GObject::Player * obj_player = GObject::globalPlayers[obj_playerid];//获得结缘玩家对象
-                            ret = GObject::gMarryMgr.CancelMarriage(obj_player,1);
+                            ret = GObject::gMarryMgr.doCancelMarriage(player,1);
                             flag = 4;
                         }
                         break;

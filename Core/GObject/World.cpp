@@ -1521,7 +1521,7 @@ void World::World_MarryBoard_Refresh(void *)
 
 void World::World_Marry_Process(void *)
 {
-    gMarryMgr.Process(); 
+    gMarryMgr.DoProcess(); 
 }
 
 void World::DaysRank_Refresh(void*)

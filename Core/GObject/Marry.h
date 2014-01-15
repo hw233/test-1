@@ -129,8 +129,12 @@ namespace GObject
             MarryMgr();
             ~MarryMgr();
             bool CheckingTimeOut(UInt32 );//检测征婚薄超时
+            
+            void CheckingListTimeOut(std::map<UInt64,UInt32>&);//检测征婚薄超时
        
             UInt8 StartMarriage(Player* ,MarriageInfo*);//发起征婚
+    
+            UInt8 doCancelMarriage(Player* player,UInt8 flag = 0);
             
             UInt8 CancelMarriage(Player*,UInt8 flag = 0);//取消征婚
             
@@ -141,6 +145,7 @@ namespace GObject
             UInt8 JieYuan(Player* ,UInt64);//结缘                
             
             UInt8 CancelAppointMent(Player*);//取消婚礼预约 0--取消预约申请 1-- 取消确定的预约
+            
             UInt8 DivorceMarry(Player* ,UInt8);//离婚 0--放弃结缘 1-- 单独离婚 2--共同离婚
     
             UInt8 FinishMarry(UInt64,UInt64);
@@ -188,8 +193,14 @@ namespace GObject
             void sendyuyueList(Player* player,Player* obj_player);
     
             void sendMarriageTimeOut(Player* player,Player* obj_player);
+            
+            void sendWhoisMarrybuyer(Player* player,Player* obj_player);
 
+            void DoProcess();
+            
             void Process();
+            
+            void SetDirty(Player*,Player*);
         private:
             Mutex _mutex;
             MoneyStruct sMoney; 
