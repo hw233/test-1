@@ -3603,7 +3603,7 @@ bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync, bool offskill )
         return false;
 
     if (offskill)
-        offSkill(skill);
+        offSkill(skill, writedb);
 
     std::vector<UInt16>::iterator it = _skills.begin();
     std::advance(it, idx);

@@ -1233,6 +1233,9 @@ namespace GObject
                 if(SKILL_ID(_initskl[i]) == oldSkillId)
                     _initskl[i] = SKILLANDLEVEL(newSkillId, 1);
             }
+#ifdef _DEBUG
+            TRACE_LOG("delSkills(%s), addSkills(%s).", oldSkill.c_str(), newSkill.c_str());
+#endif
             updateToDBPetSkill();
         }
         else
@@ -1264,6 +1267,9 @@ namespace GObject
             return;
 
         UInt16 skillId = GData::sevenSoul.getSkillId(_petType, soulId + 1, _skillIndex[soulId]);
+        if (!skillId)
+            return;
+
         UInt16 ssLevel = GData::sevenSoul.getSkillLevel(_soulLevel[soulId - 1]);
 #if 0
         GData::Pet::PinjieData * pjd = GData::pet.getLevTable(_petLev);
@@ -1292,19 +1298,17 @@ namespace GObject
         UInt16 conflictSkillId = GData::sevenSoul.getAnotherSimilarSkill(skillId);
         for(UInt8 i = 0; i < INIT_SKILL_UPMAX; ++ i)
         {
-            if(SKILL_ID(_initskl[i]) == skillId)
-            {
-                petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
-                break;
-            }
-
             if (SKILL_ID(_initskl[i]) == conflictSkillId)
             {
                 _initskl[i] = SKILLANDLEVEL(skillId, 1);
-                petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
                 break;
             }
         }
+        std::string oldSkill = Itoa(SKILLANDLEVEL(conflictSkillId, 1));
+        delSkills(oldSkill);
+        std::string newSkill = Itoa(SKILLANDLEVEL(skillId, ssLevel));
+        setSkills(newSkill, false);
+        petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
 #endif
     }
 
