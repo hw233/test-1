@@ -139,8 +139,23 @@ void PetTeamCopy::reqTeamList(Player* pl)
     UInt16 helpCount = pl->GetVar(VAR_HELP_NUM);
     UInt16 ordinaryKillCount = pl->GetVar(VAR_ORDINARY_KILL_NUM);
     UInt16 difficultyKillCount = pl->GetVar(VAR_DIFFICULTY_KILL_NUM);
-    
-    st << ordinaryKillCount << difficultyKillCount << helpCount;
+    UInt8 mark = pl->GetVar(VAR_PETTEAMCOPY_BATTLE_RES);
+    UInt8 freeKillA = 0;
+    UInt8 freeKillB = 0;
+
+    if(0 == ordinaryKillCount)
+        freeKillA = 1;
+
+    if(0 == difficultyKillCount)
+        freeKillB = 1;
+
+    if(1 == GET_BIT(mark, 0))
+        freeKillA++;
+
+    if(1 == GET_BIT(mark, 1))
+        freeKillB++;
+
+    st << ordinaryKillCount << difficultyKillCount << freeKillA << freeKillB << helpCount;
     UInt16 pos = st.size();
     UInt16 cnt = 0;
     st << cnt;
@@ -253,91 +268,6 @@ void PetTeamCopy::delTeamInfo(Player* pl, UInt32 teamId)
     pl->send(st);
 }
 
-/*void PetTeamCopy::reqTeamList(Player* pl, UInt8 opt)
-{
-    if(pl == NULL)
-        return;
-
-    Stream st(REP::PET_TEAM_COPY);
-    st << static_cast<UInt8>(0x01);
-    st << opt;
-    UInt8 pos = st.size();
-    UInt8 cnt = 0;
-    st << cnt;
-    if(opt >= GREEN && opt <= ORANGE)
-    {
-        AllTeamsQualityIterator it = m_allTeamsQuality[opt-1].begin();
-        for(; it!=m_allTeamsQuality[opt-1].end(); it++)
-        {
-            if(cnt >= PETTEAMCOPY_MAXPAGECNT)
-                break;
-
-            PetTeamData* td = it->second;
-            if(!td)
-                continue;
-
-            if(td->leader == NULL)
-                continue;
-
-            FairyPet * pet = td->leader->getBattlePet();
-            if(NULL == pet)
-                continue;
-
-            GData::NpcGroups::iterator it = GData::npcGroups.find(td->NPCId);
-            if(it == GData::npcGroups.end())
-                continue;
-
-            GData::NpcGroup * ng = it->second;
-            if (!ng)
-                continue;
-   
-            cnt++;
-            st << static_cast<UInt8>(td->index) << static_cast<UInt8>(td->type) 
-                << static_cast<UInt32>(td->id) << static_cast<UInt32>(ng->getId())
-                << static_cast<UInt32>(td->leader->getId()) << static_cast<UInt32>(pet->getId()) << static_cast<UInt8>(td->count);
-        }
-    }
-    else if(opt >= ORDINARY && opt <= DIFFICULTY)
-    {
-        AllTeamsTypeIterator it = m_allTeamsType[opt-5].begin();
-        for(; it!=m_allTeamsType[opt-5].end(); it++)
-        { 
-            if(cnt >= PETTEAMCOPY_MAXPAGECNT)
-                break;
-
-            PetTeamData* td = it->second;
-            if(!td)
-                continue;
-
-            if(td->leader == NULL)
-                continue;
-
-            FairyPet * pet = td->leader->getBattlePet();
-            if(NULL == pet)
-                continue;
-
-            GData::NpcGroups::iterator it = GData::npcGroups.find(td->NPCId);
-            if(it == GData::npcGroups.end())
-                continue;
-
-            GData::NpcGroup * ng = it->second;
-            if (!ng)
-                continue;
-
-            cnt++;
-            st << static_cast<UInt8>(td->index) << static_cast<UInt8>(td->type) 
-                << static_cast<UInt32>(td->id) << static_cast<UInt32>(ng->getId()) 
-                << static_cast<UInt32>(td->leader->getId()) << static_cast<UInt32>(pet->getId()) << static_cast<UInt8>(td->count);
-        }
-    }
-    else
-        return;
-    
-    st.data<UInt8>(pos) = cnt;
-    st << Stream::eos;
-    pl->send(st);
-}*/
-
 void PetTeamCopy::teamInfo(Player* pl, Stream& st)
 {
     if(pl == NULL)
@@ -355,11 +285,19 @@ void PetTeamCopy::teamInfo(Player* pl, Stream& st)
 
     for(UInt8 i=0; i<td->count; ++i)
     {
-        st << td->members[i]->getId() << td->members[i]->getName().c_str() << static_cast<UInt8>(td->formation[i]);
+        st << td->members[i]->getId() << td->members[i]->getCountry() << td->members[i]->getName().c_str() << static_cast<UInt8>(td->formation[i]);
         FairyPet * pet = td->members[i]->getBattlePet();
         if(pet)
-            st << static_cast<UInt32>(pet->getId()) << static_cast<UInt32>(pet->getBattlePoint()) 
-                << static_cast<UInt32>(pet->getPetLev()) << static_cast<UInt32>(pet->getPetBone());
+        {
+            st << static_cast<UInt32>(pet->getId()); 
+            st << static_cast<UInt32>(pet->getBattlePoint()); 
+            st << pet->getPetLev();
+            st << pet->getPetBone();
+            st << pet->getChongNum();
+            st << pet->getPetEvolve();
+            pet->AppendEquipData(st);
+            pet->sendHunPoInfo(st);
+        }
     }
 }
 
@@ -390,8 +328,23 @@ void PetTeamCopy::reqMonsterInfo(Player* pl)
 
     UInt16 ordinaryKillCount = pl->GetVar(VAR_ORDINARY_KILL_NUM);
     UInt16 difficultyKillCount = pl->GetVar(VAR_DIFFICULTY_KILL_NUM);
-    
-    st << refreshNum << ordinaryKillCount << difficultyKillCount;
+    UInt8 mark = pl->GetVar(VAR_PETTEAMCOPY_BATTLE_RES);
+    UInt8 freeKillA = 0;
+    UInt8 freeKillB = 0;
+
+    if(0 == ordinaryKillCount)
+        freeKillA = 1;
+
+    if(0 == difficultyKillCount)
+        freeKillB = 1;
+
+    if(1 == GET_BIT(mark, 0))
+        freeKillA++;
+
+    if(1 == GET_BIT(mark, 1))
+        freeKillB++;
+ 
+    st << refreshNum << ordinaryKillCount << difficultyKillCount << freeKillA << freeKillB;
     for(UInt8 j=0; j<ptcpInfo->m_playerNpcId[t][copyIdx].size(); j++)
     {
         UInt32 NPCId = ptcpInfo->m_playerNpcId[t][copyIdx][j];
@@ -461,7 +414,6 @@ void PetTeamCopy::pushLog(UInt8 color1, const std::string& playerName, UInt8 col
             its += ",";
             itemnames += ",";
         }
-
     }
 
     if (playerName.empty() || monsterName.empty() || its.empty() || itemnames.empty())
@@ -593,19 +545,24 @@ void PetTeamCopy::refreshMonster(Player* pl)
     else
         refreshNum = pl->GetVar(VAR_DIFFICULTY_REFRESH_NUM);
     
-    if(refreshNum >= 3)
+    if(refreshNum >= 2)
     {
         if(!pl->hasChecked())
             return;
 
         if(pl->getGold() == 0)
         {
-            pl->sendMsgCode(0, 1101);
+            pl->sendMsgCode(0, 1104);
             return;
         }
 
         ConsumeInfo ci(RefreshMonster, 0, 0);
         pl->useGold(1, &ci);
+        
+        if(0 == t)
+            pl->udpLog("chongwufuben", "F_55500", "", "", "", "", "act");
+        else
+            pl->udpLog("chongwufuben", "F_55501", "", "", "", "", "act");
     }
 
     UInt8 quality = 0;
@@ -669,6 +626,14 @@ void PetTeamCopy::refreshMonster(Player* pl)
                 GObject::Fighter* monster = _npcList[0].fighter;
                 monsterId[i] = monster->getId();
             }
+        }
+        
+        if(5 == quality)
+        {
+            if(0 == t)
+                pl->udpLog("chongwufuben", "F_556005", "", "", "", "", "act");
+            else
+                pl->udpLog("chongwufuben", "F_556015", "", "", "", "", "act");
         }
     }
 
@@ -810,22 +775,70 @@ UInt32 PetTeamCopy::createTeam(Player* pl, UInt32 NPCId, UInt32 monsterId)
         else if(killNum > 1)
             money = 20 + (killNum - 1) * 10;
     }
+    bool markA = false;
+    UInt8 mark = pl->GetVar(VAR_PETTEAMCOPY_BATTLE_RES);
+    if(0 == GET_BIT(mark, t))
+        markA = true;
 
-    if(killNum >= 1)
+    if(killNum >= 1 && 0 == GET_BIT(mark, t))
     {
         if(!pl->hasChecked())
             return 0;
 
         if(money > pl->getGold())
         {
-            pl->sendMsgCode(0, 1101);
+            pl->sendMsgCode(0, 1104);
             return 0;
         }
 
         ConsumeInfo ci(CreateRoom, 0, 0);
         pl->useGold(money, &ci);
-    }
+        mark = SET_BIT(mark, t);
+        pl->SetVar(VAR_PETTEAMCOPY_BATTLE_RES, mark);
 
+        if(0 == t)
+        {
+            switch(copyId)
+            {
+                case 1:
+                    pl->udpLog("chongwufuben", "F_58000", "", "", "", "", "act");
+                    break;
+                case 2:
+                    pl->udpLog("chongwufuben", "F_59000", "", "", "", "", "act");
+                    break;
+                case 3:
+                    pl->udpLog("chongwufuben", "F_510000", "", "", "", "", "act");
+                    break;
+                case 4:
+                    pl->udpLog("chongwufuben", "F_511000", "", "", "", "", "act");
+                    break;
+                case 5:
+                    pl->udpLog("chongwufuben", "F_512000", "", "", "", "", "act");
+                    break;
+            }
+        }
+        else
+        {
+            switch(copyId)
+            {
+                case 1:
+                    pl->udpLog("chongwufuben", "F_58001", "", "", "", "", "act");
+                    break;
+                case 2:
+                    pl->udpLog("chongwufuben", "F_59001", "", "", "", "", "act");
+                    break;
+                case 3:
+                    pl->udpLog("chongwufuben", "F_510001", "", "", "", "", "act");
+                    break;
+                case 4:
+                    pl->udpLog("chongwufuben", "F_511001", "", "", "", "", "act");
+                    break;
+                case 5:
+                    pl->udpLog("chongwufuben", "F_512001", "", "", "", "", "act");
+                    break;
+            }
+        }
+    }
 
     UInt8 pos = 0;
     UInt8 petClass = pet->getClass();
@@ -863,10 +876,12 @@ UInt32 PetTeamCopy::createTeam(Player* pl, UInt32 NPCId, UInt32 monsterId)
     td->members[0] = pl;
     td->formation[0] = pos;
     td->NPCId = NPCId;
+    if(markA)
+        td->useMoney = true;
+
     pl->setPetTeamData(td);
     pl->SetInPTCStatus(true);
     m_allTeams.insert(std::make_pair(td->id, td));
-
 
     Stream st(REP::PET_TEAM_COPY);
     st << static_cast<UInt8>(0x06);
@@ -882,6 +897,10 @@ UInt32 PetTeamCopy::createTeam(Player* pl, UInt32 NPCId, UInt32 monsterId)
 UInt32 PetTeamCopy::joinTeam(Player* pl, UInt32 teamId)
 {
     if(pl == NULL)
+        return 0;
+
+    UInt8 level = pl->GetLev();
+    if(level < 80)
         return 0;
 
     UInt8 copyId = teamId & 0x1F;
@@ -1505,18 +1524,30 @@ void PetTeamCopy::sendBattleReport(PetTeamData* td, GData::NpcGroup* ng, Battle:
                     if(logits.size() > 0)
                         pushLog(pl->getCountry(), pl->getName(), 3, monster->getName(), logits);
                 }
+                
+                if(td->useMoney)
+                {
+                    if(td->type == ORDINARYCOPY)
+                        pl->AddVar(VAR_ORDINARY_KILL_NUM, 1);
+                    else
+                        pl->AddVar(VAR_DIFFICULTY_KILL_NUM, 1);
+                }
 
-                if(td->type == ORDINARYCOPY)
-                    pl->AddVar(VAR_ORDINARY_KILL_NUM, 1);
-                else
-                    pl->AddVar(VAR_DIFFICULTY_KILL_NUM, 1);
-
+                UInt8 mark = pl->GetVar(VAR_PETTEAMCOPY_BATTLE_RES);
+                if(1 == GET_BIT(mark, td->type))
+                {
+                    mark = CLR_BIT(mark, td->type);
+                    pl->SetVar(VAR_PETTEAMCOPY_BATTLE_RES, mark);
+                }
                 addMonster(pl, td->index, td->type, td->NPCId);
             }
-            else if(pl->GetVar(VAR_HELP_NUM) < 2)
-                ng->getLoots(pl, pl->_lastLoot, 1, NULL);
-            
-            pl->AddVar(VAR_HELP_NUM, 1);
+            else
+            {
+                if(pl->GetVar(VAR_HELP_NUM) < 2)
+                    ng->getLoots(pl, pl->_lastLoot, 1, NULL);
+
+                pl->AddVar(VAR_HELP_NUM, 1);
+            }
         }
 
         if(rptid == 0)

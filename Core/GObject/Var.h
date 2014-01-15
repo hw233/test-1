@@ -632,6 +632,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_HELP_NUM = 674,                         //协助次数
         VAR_PURPLE_NUM = 675,                       //紫色次数
         VAR_ORANGE_NUM = 676,                       //橙色次数
+        VAR_PETTEAMCOPY_BATTLE_RES = 677,           //宠物副本战斗结果
 
         //681 - 700 for lb
         VAR_MARRYBOARD_YANHUA = 681,          //烟花积分
@@ -1194,6 +1195,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_HELP_NUM, CYCLE_DAY);
             REGISTER_VAR(VAR_PURPLE_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_ORANGE_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_PETTEAMCOPY_BATTLE_RES, CYCLE_NONE);
+
             REGISTER_VAR(VAR_OLDMAN_DAYSCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_OLDMAN_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_OLDMAN_PRESENT, CYCLE_DAY);

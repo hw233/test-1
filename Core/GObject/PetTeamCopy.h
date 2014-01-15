@@ -52,6 +52,7 @@ struct PetTeamData
         NPCId = 0;
         mark = false;
         start = false;
+        useMoney = false;
     }
 
     UInt32 id;                                  // 宠物组队副本 队伍id
@@ -65,6 +66,7 @@ struct PetTeamData
     UInt32 NPCId;                               // npcGroupId
     bool mark;                                  // 是否设置阵形标志
     bool start;                                 // 是否倒计时开始标志
+    bool useMoney;                              // 创建房间是否是否花费仙石标志
 };
 
 class PetTeamCopyPlayerInfo
