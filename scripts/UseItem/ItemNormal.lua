@@ -3334,6 +3334,24 @@ function ItemNormal_00009440(iid, num, bind, param)
     player:sendHappyValueInfo();
     return num
 end
+function ItemNormal_00009435(iid ,num,bind,param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    local used = 0;
+    if package:GetRestPackageSize() < 2 then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+    for n = 1, num do
+        local rand = math.random(1,10000)
+        package:Add(9443, 1, true, false, 2)
+        if rand <= 10 then
+            package:Add(9442, 1, true, false, 2)
+        end
+        used = used +1 
+    end
+    return used
+end
 function ItemNormal_00009444(iid, num, bind, param)
     local Award ={
     [9444] = {{15,1},{400,1},{133,1}},
@@ -12078,6 +12096,7 @@ local ItemNormal_Table = {
     [9424] = ItemNormal_keyin,
     [9425] = ItemNormal_keyin,
     [9428] = ItemNormal_00009428,
+    [9435] = ItemNormal_00009435,
     [9438] = ItemNormal_zhenyuan,
     [9444] = ItemNormal_00009444,
     [9445] = ItemNormal_00009444,
