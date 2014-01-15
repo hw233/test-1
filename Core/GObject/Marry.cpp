@@ -11,6 +11,7 @@
 #include "GData/AttrExtra.h"
 #include "GObject/World.h"
 #include "MarryBoard.h"
+#include "Married.h"
 
 namespace GObject
 {
@@ -299,13 +300,16 @@ namespace GObject
         switch (useType)
         {
             case 1:
-                ci.purchaseType = ZhengHun; 
+                ci.purchaseType = DINGQINGXINWU; 
                 break;
             case 2:
                 ci.purchaseType = JieHun; 
                 break;
             case 3:
                 ci.purchaseType = LiHun;
+                break;
+            case 4:
+                ci.purchaseType = ZhengHun; 
                 break;
             default:
                 return 1;
@@ -415,7 +419,7 @@ namespace GObject
         if(!player->getMainFighter()->getSex())//男的
         {
             useMoney(player,sMoney.price_type,sMoney.price_num,sMoney.useType);
-            useMoney(player,0,ZHENGHUN,3);
+            useMoney(player,0,ZHENGHUN,4);
             player->udpLog("jiehunqianzhi", "F_140102_1", "", "", "", "", "act");
             switch(sMarriage->eLove)
             {
@@ -434,7 +438,7 @@ namespace GObject
         }
         else
         {
-            useMoney(player,0,ZHENGHUN,3);
+            useMoney(player,0,ZHENGHUN,4);
             player->udpLog("jiehunqianzhi", "F_140102_2", "", "", "", "", "act");
         }
        
@@ -883,6 +887,13 @@ namespace GObject
         if(TimeUtil::GetYYMMDD(sMarry->yuyueTime) == TimeUtil::GetYYMMDD())
         {
             player->sendMsgCode(0, 6023);
+            return 1;
+        }
+        
+        if(sMarry->yuyueTime < TimeUtil::Now())
+        {
+            player->sendMsgCode(0, 6023);
+            return 1;
         }
 
         useMoney(player,sMoney.price_type,sMoney.price_num,sMoney.useType);
@@ -1231,16 +1242,25 @@ namespace GObject
         if(player->GetMarriageInfo()->yuyueTime != 0 && player->GetMarriageInfo()->eWedding != WEDDING_NULL)
         {
             jh_time = player->GetMarriageInfo()->yuyueTime;
+            obj_player->GetMarriageInfo()->yuyueTime = player->GetMarriageInfo()->yuyueTime;
             wedding_type = static_cast<UInt8>(player->GetMarriageInfo()->eWedding);
         }
         else
         {
             jh_time = obj_player->GetMarriageInfo()->yuyueTime;
+            player->GetMarriageInfo()->yuyueTime = obj_player->GetMarriageInfo()->yuyueTime;
             wedding_type = static_cast<UInt8>(obj_player->GetMarriageInfo()->eWedding);
         }
 
         DB7().PushUpdateData("REPLACE INTO `married_log` VALUES(%u,%" I64_FMT "u,%" I64_FMT "u, '%s',%u,%u,%u,%u,%u )", jh_time,playerid,obj_playerid, str_pronouncement.c_str(),static_cast<UInt8>(player->GetMarriageInfo()->eLove),marriage_time,replymarriage_time,player->GetMarriageInfo()->jieyuanTime,wedding_type);
         
+        DB4().PushUpdateData("REPLACE INTO `married_couple` VALUES(%u,%" I64_FMT "u,%" I64_FMT "u,%u,%u,'%s',%u,%u,%u )", jh_time,playerid,obj_playerid, static_cast<UInt8>(player->GetMarriageInfo()->eLove),0,"",0,0,0);
+
+        std::string str_tmp = "";
+        CoupleInfo* ci = new CoupleInfo();
+        ci->eLove = player->GetMarriageInfo()->eLove;
+        gMarriedMgr.InsertCoupleInfo(jh_time,ci);
+
         obj_player->SetVar(VAR_MARRY_STATUS,5);
         player->SetVar(VAR_MARRY_STATUS,5); 
    
