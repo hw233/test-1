@@ -7051,6 +7051,38 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                 pet->upgradeSH(petId, sanhunId, opt);
             }
             break;
+#if 0
+        case 0x08:  //七魄
+            {
+                if(player->GetLev() < 80)
+                    return;
+                if(opt > 2)
+                    return;
+                UInt32 petId = 0;
+                brd >> petId;
+                FairyPet *pet = player->findFairyPet(petId);
+                if(!pet)
+                    return;
+
+                if(opt == 0)
+                    pet->sendSevenSoul();
+                else if(opt == 1)
+                {
+                    UInt8 sevenSoulIndex = 0;
+                    brd >> sevenSoulIndex;
+                    pet->upgradeSevenSoul(sevenSoulIndex);
+                }
+                else
+                {
+                    UInt8 sevenSoulIndex = 0;
+                    UInt8 skillIndex = 0;
+                    brd >> sevenSoulIndex;
+                    brd >> skillIndex;
+                    pet->switchSevenSoulSkill(sevenSoulIndex, skillIndex);
+                }
+            }
+            break;
+#endif
         default:
             break;
     }

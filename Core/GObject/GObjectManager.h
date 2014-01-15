@@ -364,6 +364,7 @@ namespace GObject
 	    static bool LoadMarriage();
 	    static bool LoadReplyMarriage();
 	    static bool LoadMarriedLog();
+	    static bool LoadSevenSoul();
         static bool loadZhenwei();
         static bool loadQiShiBan();
         static bool LoadPlayerModifyMounts();

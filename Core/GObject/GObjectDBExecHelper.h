@@ -1448,6 +1448,15 @@ struct DBMarriedLog
     UInt8 wedding_type;
 };
 
+struct DBSevenSoul
+{
+    UInt64 playerId;
+    UInt32 petId;
+    UInt8 soulId;
+    UInt8 soulLevel;
+    UInt8 skillIndex;
+};
+
 struct DBModifyMount
 {
     UInt8 id;
@@ -3290,6 +3299,17 @@ SPECIALDEF(9)
     )
 SPECIALEND()
     
+SPECIALBEGIN(GObject::DBSevenSoul)
+SPECIALDEF(5)
+    (
+    UInt64, playerId,
+    UInt32, petId,
+    UInt8, soulId,
+    UInt8, soulLevel,
+    UInt8, skillIndex
+    )
+SPECIALEND()
+
 SPECIALBEGIN(GObject::DBModifyMount)
 SPECIALDEF(3)
     (

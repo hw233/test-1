@@ -86,7 +86,7 @@
 #include "Marry.h"
 #include "Leaderboard.h"
 #include "ArenaServerWar.h"
-
+#include "GData/SevenSoul.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -4705,7 +4705,6 @@ namespace GObject
         udpLog("xuyuanshu", str, "", "", "", "", "act");
         GameAction()->doStrong(this, SthPrayTree, 0 ,0 );
         GuangGunCompleteTask(0,24);
-        SYSMSG_SENDV(2026,this);
     }
     void Player::SendOtherInfoForPray(Player* other,UInt32 op)
     {
@@ -19754,7 +19753,7 @@ void Player::get3366GiftAward(UInt8 type)
 {
     if (getPlatform() != 11)
         return;
-    if (GetVar(VAR_3366GIFT) >= 9)
+    if (GetVar(VAR_3366GIFT) >= 12)
         return;
     if (GetFreePackageSize() < 6)
     {
@@ -19771,7 +19770,7 @@ void Player::get3366GiftAward(UInt8 type)
         ConsumeInfo ci(Enum3366Gift,0,0);
         useGold(45, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {505, 2, 512, 2, 513, 2, 9082, 2, 548, 2, 465, 2};
+        static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -26686,9 +26685,9 @@ void Player::GetFindOldManAward(UInt32 type)
 {
     if(!World::getOldManTime())
         return ;
-    if(GetLev()<45)
+    if(GetLev()<30)
     {
-        SYSMSG_BROADCASTV(2109, GetLev(), 45 );
+        SYSMSG_BROADCASTV(2109, GetLev(), 30 );
         return ; 
     }
     if(type ==0)
@@ -26940,6 +26939,7 @@ void Player::joinAllServerRecharge(UInt32 num)
     if(num == 0) return;
     Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
     st << getId() << getName() << num << TimeUtil::Now();
+    st << static_cast<UInt8>(getCountry()<<4 | (IsMale()?0:1));
     st << Stream::eos;
     NETWORK()->SendToServerWar(st);
 }

@@ -6794,12 +6794,15 @@ namespace GObject
     bool Package::FinishLBSmeltSpecial(const GData::ItemBaseType * itype, ItemLingbaoAttr &lbattr, UInt8& attrNum)
     {
         //黄帝卷宗（11113），炎帝卷宗（11114），神农卷宗（11115），女娲卷宗（11116）
-        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118};
+        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118, 11203 };
         bool hasSpe = false;
         for(UInt8 i = 0; i < sizeof(lbids) / sizeof(lbids[0]); ++i)
         {
             if(m_lbSmeltInfo.gujiId == lbids[i])
+            {
                 hasSpe = true;
+                break;
+            }
         }
         if(!hasSpe)
             return false;
@@ -6913,7 +6916,7 @@ namespace GObject
         UInt16 subClass = itype->subClass;
         bool fSpecial = true;
         if(!FinishLBSmeltSpecial(itype, lbattr, attrNum))
-        {
+        {   //非皇帝卷宗才进来！！
             fSpecial = false;
             UInt8 minAttrNum = item->quality > 3 ? 3 : 1;
             UInt8 color2 = item->quality;

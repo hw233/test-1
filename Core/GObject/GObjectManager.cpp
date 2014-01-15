@@ -74,6 +74,7 @@
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
 #include "GObject/Marry.h"
+#include "GData/SevenSoul.h"
 
 namespace GObject
 {
@@ -573,6 +574,13 @@ namespace GObject
             std::abort();
         }
 		
+#if 0
+        if(!LoadSevenSoul())
+        {
+            fprintf(stderr, "LoadSevenSoul error!\n");
+            std::abort();
+        }
+#endif
         if(!LoadPlayerModifyMounts())
         {
             fprintf(stderr, "LoadPlayerModifyMounts error!\n");
@@ -6760,6 +6768,35 @@ namespace GObject
 		lc.finalize();
 		return true;
 	}
+
+    bool GObjectManager::LoadSevenSoul()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading player_sevensoul:");
+		DBSevenSoul dbvalue;
+		if(execu->Prepare("SELECT `playerId`, `petId`, `soulId`, `soulLevel`, `skillIndex` FROM `player_sevensoul` ", dbvalue) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbvalue.playerId != last_id)
+			{
+				last_id = dbvalue.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if (pl == NULL)
+				continue;
+			FairyPet *pet = pl->findFairyPet(dbvalue.petId);
+            if(pet)
+                pet->loadPlayerSevenSoul(dbvalue.soulId, dbvalue.soulLevel, dbvalue.skillIndex);
+		}
+		lc.finalize();
+		return true;
+    }
 
     bool GObjectManager::LoadPlayerModifyMounts()
 	{

@@ -2953,5 +2953,4 @@ namespace GObject
     typedef Visitor<Player> PlayerVisitor;
 
 }
-
 #endif // _PLAYER_H_
