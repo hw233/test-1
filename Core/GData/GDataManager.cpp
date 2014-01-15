@@ -38,6 +38,7 @@
 #include "JiguanData.h"
 #include "HunPoData.h"
 #include "TeamArenaSkill.h"
+#include "SevenSoul.h"
 #include "RideConfig.h"
 
 namespace GData
@@ -388,7 +389,19 @@ namespace GData
             fprintf (stderr, "Load LoadTeamArenaInspireConfig Error !\n");
             std::abort();
         }
+#if 0
+        if (!LoadPetSevenSoulLevel())
+        {
+            fprintf (stderr, "LoadPetSevenSoulLevel Error !\n");
+            std::abort();
+        }
 
+        if (!LoadPetSevenSoulUpgrade())
+        {
+            fprintf (stderr, "LoadPetSevenSoulUpgrade Error !\n");
+            std::abort();
+        }
+#endif
         if (!LoadRideConfig())
         {
             fprintf (stderr, "Load LoadRideConfig Error !\n");
@@ -2714,6 +2727,32 @@ namespace GData
                 return i->second[clvl];
         }
         return 0;
+    }
+
+    bool GDataManager::LoadPetSevenSoulLevel()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBPetSevenSoulLevel dbvalue;
+		if(execu->Prepare("SELECT `soullevel`, `needsoulnum`, `skilllevel` FROM `pet_sevensoullevel`", dbvalue) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            sevenSoul.loadSevenSoulLevel(dbvalue.soullevel, dbvalue.needsoulnum, dbvalue.skilllevel);
+
+		return true;
+	}
+
+    bool GDataManager::LoadPetSevenSoulUpgrade()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBPetSevenSoulUpgrade dbvalue;
+		if(execu->Prepare("SELECT `pettype`, `soulid`, `skillstr`, `condionvalue` FROM `pet_sevensoulupgrade`", dbvalue) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            sevenSoul.loadSevenSoulUpgrade(dbvalue.pettype, dbvalue.soulid, dbvalue.skillstr, dbvalue.condionvalue);
+
+		return true;
     }
 }
 

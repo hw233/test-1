@@ -1373,13 +1373,29 @@ inline bool player_enum_setvar(GObject::Player* p, void* msg)
     {
         UInt32 var;
         UInt32 value;
+        UInt8 type;
     };
 
     Msg* _msg = (Msg*)msg;
-    if(_msg->value == 0)
-        p->DelVar(_msg->var);
+    UInt32 var = _msg->var;
+    UInt32 value = _msg->value;
+    UInt8 type = _msg->type;
+    UInt32 v = p->GetVar(var); 
+    UInt32 value1 = 0 ;
+    if(type == 1 )
+        value1 = value ;
+    else if(type ==2)
+        value1 = value + v; 
+    else if(type == 3 )
+        value1 = value | v ;
+    else if(type == 4 )
+        value1 = value & v;
+    else if(type == 5)
+        value1 = ((v > value)?(v-value):0);
+    if(value1 == 0)
+        p->DelVar(var);
     else
-        p->SetVar(_msg->var,_msg->value);
+        p->SetVar(var,value1);
     return true;
 }
 
@@ -3868,15 +3884,19 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt32 var = 0;
     UInt32 value = 0;
+    UInt8 type = 0 ;
+    UInt16 serverNo = 0;
     std::string playerIds;
     CHKKEY();
     br >> var;
     br >> value;
-    br>>playerIds;
+    br >> type;
+    br >> playerIds;
+    br >> serverNo; 
    
 //开启起封交易客户平台测试
     
-#define TEST_TABLE
+//#define TEST_TABLE
 #ifdef TEST_TABLE
 #pragma pack(1) 
     struct test
@@ -3884,6 +3904,8 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
         UInt8 blamk[36];
         UInt32 var;
         UInt32 value;
+        UInt8 type ;
+        UInt16 serverNo;
         char msg[1024];
     };
 #pragma pack()
@@ -3891,14 +3913,17 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
     var = _test->var;
     value = _test->value;
     playerIds = _test->msg;
+    type = _test->type;
+    serverNo = _test->serverNo;
 #endif
 #undef TEST_TABLE 
 
     UInt8 ret = 1;
-    //INFO_LOG("GMBIGLOCK: %s, %u", playerIds.c_str(), expireTime);
+    INFO_LOG("SetVar: %s, var:%u value:%u type:%u serverNo:%u", playerIds.c_str(), var ,value ,static_cast<UInt32>(type),static_cast<UInt32>(serverNo));
     std::string playerId = GetNextSection(playerIds, ',');
     while (!playerId.empty())
     {
+
         UInt64 pid = atoll(playerId.c_str());
         if(pid == 0)
         {
@@ -3906,23 +3931,42 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
             {
                 UInt32 var;
                 UInt32 value;
+                UInt8 type;
             } _msg;
             _msg.var = var;
             _msg.value = value;
+            _msg.type = type;
             GObject::globalPlayers.enumerate(player_enum_setvar, (void*)&_msg);
+            ret = 0;
             break;
+        }
+        if(cfg.merged)
+        {
+            pid += (static_cast<UInt64>(serverNo) << 48);
         }
         GObject::Player * pl = GObject::globalPlayers[pid];
         if (NULL != pl)
         {
-            if(value==0)
+            UInt32 v = pl->GetVar(var); 
+            UInt32 value1 = 0 ;
+            if(type == 1 )
+                value1 = value ;
+            else if(type == 2)
+                value1 = value + v; 
+            else if(type == 3 )
+                value1 = value | v ;
+            else if(type == 4 )
+                value1 = value & v;
+            else if(type == 5)
+                value1 = ((v > value)?(v-value):0);
+            if(value1==0)
                 pl->DelVar(var);
             else
-                pl->SetVar(var,value);
+                pl->SetVar(var,value1);
+            ret = 0;
         }
         playerId = GetNextSection(playerIds, ',');
     }
-    ret = 0;
     Stream st(SPEP::SETVAR);
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
@@ -3993,14 +4037,23 @@ void SetMarryBoard(LoginMsgHdr& hdr,const void * data)
 {
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     CHKKEY();
+    UInt16 manServerId = 0;
+    UInt16 womanServerId = 0;
     UInt64 manId = 0;
+    br >> manServerId ;
     br >> manId;
-    UInt64 womanId = 0;
+    UInt64 womanId = 0 ;
+    br >> womanServerId ;
     br >> womanId;
     UInt8 type = 0 ;
     br >> type ;
     UInt32 time = 0;
     br >> time;
+    if( cfg.merged )
+    {
+       manId += ( static_cast<UInt64>(manServerId)<<48 ); 
+       womanId += ( static_cast<UInt64>(womanServerId)<<48 ); 
+    }
     if(type > 0 && type < 4)
         WORLD().CreateMarryBoard(manId,womanId,type,time);
     else 

@@ -123,6 +123,12 @@ namespace GObject
 
         GVAR_3366_RECHARGE_BEGIN = 72,
         GVAR_3366_RECHARGE_END = 73,
+        
+        GVAR_MARRY_TIME1 = 74,//婚礼发放烟花
+        GVAR_MARRY_TIME2 = 75,
+        GVAR_MARRY_TIME3 = 76,
+        GVAR_CREATMARRY_TIMES = 77,//婚礼当天创建
+        
         GVAR_MAX,
     };
 
@@ -225,6 +231,11 @@ namespace GObject
             GREGISTER_VAR(GVAR_CHRISTMAS_PILESNOW_END, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_YEARHAPPY_RANK_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_YEARHAPPY_RANK_END, GCYCLE_NONE);
+            
+            GREGISTER_VAR(GVAR_MARRY_TIME1, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_MARRY_TIME2, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_MARRY_TIME3, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_CREATMARRY_TIMES, GCYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

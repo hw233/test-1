@@ -30,6 +30,7 @@
 #include "FairySpar.h"
 #include "MoFang.h"
 #include "ArenaTeam.h"
+#include "Marry.h"
 #include "ModifyMount.h"
 
 
@@ -324,6 +325,7 @@ namespace GObject
     class JobHunter;
     class Dreamer;
     class MoFang;
+    struct MarriageInfo;
 
     struct TripodData
     {
@@ -1610,6 +1612,7 @@ namespace GObject
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
         MoFang * GetMoFang()        { return m_moFang; }
+        MarriageInfo * GetMarriageInfo()  { return m_marriageInfo; }
 	// ????ϵͳ
 	public:
 
@@ -2851,6 +2854,7 @@ namespace GObject
         void get7DayFundAward(UInt8 type);
     private:
         MoFang* m_moFang;
+        MarriageInfo* m_marriageInfo;
 
     public:
         void sendCollectCard(UInt8 fighterIndex);
@@ -2949,5 +2953,4 @@ namespace GObject
     typedef Visitor<Player> PlayerVisitor;
 
 }
-
 #endif // _PLAYER_H_

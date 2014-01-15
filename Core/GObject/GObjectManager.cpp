@@ -73,6 +73,8 @@
 #include "FairyPet.h"
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
+#include "GObject/Marry.h"
+#include "GData/SevenSoul.h"
 
 namespace GObject
 {
@@ -553,7 +555,32 @@ namespace GObject
             fprintf(stderr, "LoadPlayerNamed error!\n");
             std::abort();
         }
+	
+        if(!LoadMarriage())
+        {
+            fprintf(stderr, "LoadMarriage error!\n");
+            std::abort();
+        }
+        
+        if(!LoadReplyMarriage())
+        {
+            fprintf(stderr, "LoadReplyMarriage error!\n");
+            std::abort();
+        }
+        
+        if(!LoadMarriedLog())
+        {
+            fprintf(stderr, "LoadMarriedLog error!\n");
+            std::abort();
+        }
 		
+#if 0
+        if(!LoadSevenSoul())
+        {
+            fprintf(stderr, "LoadSevenSoul error!\n");
+            std::abort();
+        }
+#endif
         if(!LoadPlayerModifyMounts())
         {
             fprintf(stderr, "LoadPlayerModifyMounts error!\n");
@@ -1526,7 +1553,8 @@ namespace GObject
 		Player * pl;
 
 		using namespace std::placeholders;
-		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading players:");
@@ -6741,6 +6769,35 @@ namespace GObject
 		return true;
 	}
 
+    bool GObjectManager::LoadSevenSoul()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading player_sevensoul:");
+		DBSevenSoul dbvalue;
+		if(execu->Prepare("SELECT `playerId`, `petId`, `soulId`, `soulLevel`, `skillIndex` FROM `player_sevensoul` ", dbvalue) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbvalue.playerId != last_id)
+			{
+				last_id = dbvalue.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if (pl == NULL)
+				continue;
+			FairyPet *pet = pl->findFairyPet(dbvalue.petId);
+            if(pet)
+                pet->loadPlayerSevenSoul(dbvalue.soulId, dbvalue.soulLevel, dbvalue.skillIndex);
+		}
+		lc.finalize();
+		return true;
+    }
+
     bool GObjectManager::LoadPlayerModifyMounts()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -6770,5 +6827,70 @@ namespace GObject
 		return true;
 	}
 
+    bool GObjectManager::LoadMarriage()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading marriage:");
+		DBMarriage dbpn;
+		if(execu->Prepare("SELECT `playerid`, `marriage_time`, `prouncement`, `lover_item`, `status` FROM `marriage` ORDER BY `status`", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * player = globalPlayers[dbpn.playerid];
+			if(player == NULL)
+				continue;
+            gMarryMgr.LoadMarriage(player,&dbpn);
+
+        }
+		lc.finalize();
+		return true;
+	}
+
+    bool GObjectManager::LoadReplyMarriage()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading reply_marriage:");
+		DBReplyMarriage dbpn;
+		if(execu->Prepare("SELECT `reply_marriage`.`man_playerid`, `reply_marriage`.`woman_playerid`, `reply_marriage`.`jy_time`, `reply_marriage`.`jh_time`, `reply_marriage`.`wedding_type`, `reply_marriage`.`wedding_buyer`, `marry_log`.`marriage_buyer`, `marry_log`.`prouncement`, `marry_log`.`lover_item` from `reply_marriage`  left join `marry_log` on `reply_marriage`.`man_playerid` = `marry_log`.`man_playerid` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * player = globalPlayers[dbpn.man_playerid];
+			Player * obj_player = globalPlayers[dbpn.woman_playerid];
+			if(player == NULL)
+				continue;
+            gMarryMgr.LoadReplyMarriage(player,obj_player,&dbpn); 
+        }
+		lc.finalize();
+		return true;
+	}
+
+    bool GObjectManager::LoadMarriedLog()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading married_log:");
+		DBMarriedLog dbpn;
+		if(execu->Prepare("SELECT `jh_time` ,`man_playerid`, `woman_playerid`, `prouncement`, `lover_item`, `marriage_time`, `replymarriage_time`, `jy_time`, `wedding_type` FROM `married_log` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * player = globalPlayers[dbpn.man_playerid];
+			Player * obj_player = globalPlayers[dbpn.woman_playerid];
+			if(player == NULL)
+				continue;
+            gMarryMgr.LoadMarriedLog(player,obj_player,&dbpn); 
+        }
+		lc.finalize();
+		return true;
+	}
 }
 

@@ -139,6 +139,9 @@ enum PurchaseType
     SearchOldMan                = 129, //捉迷藏活动包打听
     MarryYanHua                 = 130, //结婚送烟花
     MarryBaiHe                  = 131, //结婚送百合花
+    ZhengHun                    = 132, //征婚
+    JieHun                      = 133, //结婚 
+    LiHun                       = 134, //离婚 
     RestStep                    = 1001, //七石板重置
     //繁体私有占150～200
 };
@@ -213,6 +216,7 @@ enum MailItemType
 	DismissXingchen,
     NewHeroIslandAward,
     ArenaAward,
+    BuChangMarry,
 };
 enum ItemFrom
 {
