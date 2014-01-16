@@ -315,7 +315,9 @@ namespace GObject
     struct PracticeData;
     class AttainMgr;
     struct TeamData;
+    struct PetTeamData;
     class TeamCopyPlayerInfo;
+    class PetTeamCopyPlayerInfo;
     class ActivityMgr;
     class HeroMemo;
     class ShuoShuo;
@@ -579,6 +581,12 @@ namespace GObject
         UInt8 type;
     };
 
+    struct PetCopyTeamPage
+    {
+        UInt8 copyId;
+        UInt8 t;
+    };
+
     struct ClanSkill
     {
         UInt8 id;
@@ -797,6 +805,7 @@ namespace GObject
             InCopyTeam      = 0x00000100,
             ClanRankBattle  = 0x00000200,
             AutoTlz         = 0x00000400,
+            InPetCopyTeam   = 0x00000800,
             AthleticsBuff   = 0x80000000,
 			AllFlags		= 0xFFFFFFFF
 		};
@@ -1616,6 +1625,12 @@ namespace GObject
 	// ????ϵͳ
 	public:
 
+        void SetEnterPTCStatus(UInt8 status) { m_EnterPTCStatus = status;}
+        UInt8 GetEnterPTCStatus() const { return m_EnterPTCStatus; }
+        
+        void SetInPTCStatus(UInt8 status) { m_InPTCStatus = status;}
+        UInt8 GetInPTCStatus() const { return m_InPTCStatus; }
+
         void SetClanBattleStatus(UInt8 status) { m_ClanBattleStatus = status;}
         UInt8 GetClanBattleStatus() const { return m_ClanBattleStatus; }
 
@@ -1679,6 +1694,7 @@ namespace GObject
         
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
         void PutPets (Battle::BattleSimulator&, int side, bool init = true);
+        void PutSpecialPets (Battle::BattleSimulator&, int side, int pos, bool init = true);
 
 		inline void setNextTavernUpdate(UInt32 n) { _nextTavernUpdate = n; }
         void resetShiMen();
@@ -2072,6 +2088,9 @@ namespace GObject
         UInt32 m_ClanBattleWinTimes;  //帮会战连胜次数
         UInt32 m_ClanBattleSkillFlag; //帮派战已使用技能位
 
+        bool m_EnterPTCStatus;
+        bool m_InPTCStatus;
+
 #ifdef _ARENA_SERVER
         inline const std::string& getDisplayName() { if(_displayName.empty()) rebuildBattleName(); return _displayName; }
     private:
@@ -2398,6 +2417,13 @@ namespace GObject
         CopyTeamPage& getCopyTeamPage();
         void clearCopyTeamPage();
         TeamCopyPlayerInfo* getTeamCopyPlayerInfo();
+
+        PetTeamData* getPetTeamData();
+        void setPetTeamData(PetTeamData* ptd);
+        PetCopyTeamPage& getPetCopyTeamPage();
+        void clearPetCopyTeamPage();
+        PetTeamCopyPlayerInfo* getPetTeamCopyPlayerInfo();
+
         HoneyFall* getHoneyFall();
 
         // 帮派技能
@@ -2501,6 +2527,7 @@ namespace GObject
         void getQQXiuAward(UInt8 opt);                                                                                       
         void getHappyValueAward(UInt8 val);
         void sendHappyValueInfo();
+        void getMicroCloudAward(UInt8 opt);
 
         void getMarryBoard3Award(UInt8 type);
 
@@ -2533,6 +2560,9 @@ namespace GObject
         TeamData* m_teamData;
         CopyTeamPage m_ctp;
         TeamCopyPlayerInfo* m_tcpInfo;
+        PetTeamData* m_petTeamData;
+        PetCopyTeamPage m_pctp;
+        PetTeamCopyPlayerInfo* m_ptcpInfo;
         HoneyFall* m_hf;
         DeamonPlayerData* m_dpData;
         std::map<UInt8, ClanSkill> m_clanSkill;
@@ -2545,7 +2575,7 @@ namespace GObject
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
         inline const std::string& getAtoHICfg() const { return m_hicfg; }
     public:
-        UInt8 getMaxIcCount(UInt8 vipLevel);
+        UInt8 getMaxIcCount(UInt8 vipLevel ,UInt8 flag = 0);
     private:
         std::string m_hicfg;
 
@@ -2832,6 +2862,9 @@ namespace GObject
         void getXianpoLua(UInt32 c);
         UInt32 getXianpo(UInt32 c = 0, IncommingInfo* ii = NULL);
         UInt32 useXianpo(UInt32 a, ConsumeInfo* ci);
+        void getBuyFundInfo(UInt8 opt);
+        void buyFund(UInt16 num);
+        void getBuyFundAward(UInt8 opt);
 
     public:
         // 八部浮屠

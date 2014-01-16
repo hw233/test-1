@@ -837,12 +837,12 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
             UInt32 left = p;
             if(left >= duration)
             {
-                exp *= (1.8f + extraFactor);
+                exp *= (1.8f + 0.1f + extraFactor);
                 left -= duration;
             }
             else
             {
-                exp = exp * (1 + 0.8f * left / duration + extraFactor);
+                exp = exp * (1 + (0.8f + 0.1f)* left / duration + extraFactor);
                 left = 0;
             }
             player->SetVar(VAR_TRAINP3, left);
@@ -2323,9 +2323,10 @@ void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
         case 0x00:
             player->sendLuckyBagInfo();
             break;
-        /*case 0x03:
-              GameAction()->GetLuckyBagAward(player);
-              break;*/
+        case 0x03:
+            GameAction()->GetLuckyBagAward(player);
+            break;
+        /*
         case 0x04:
               {
                   std::string name = sdata->name;
@@ -2354,6 +2355,7 @@ void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
         case 0x05:
               GameAction()->UseToSystem(player);
               break;
+       */
        }
    }
     
