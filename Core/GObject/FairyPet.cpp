@@ -1270,7 +1270,9 @@ namespace GObject
         if (!skillId)
             return;
 
-        UInt16 ssLevel = GData::sevenSoul.getSkillLevel(_soulLevel[soulId - 1]);
+        UInt16 ssLevel = GData::sevenSoul.getSkillLevel(_soulLevel[soulId]);
+        if(soulId >= INIT_SKILL_UPMAX)
+            return petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
 #if 0
         GData::Pet::PinjieData * pjd = GData::pet.getLevTable(_petLev);
         if(pjd)
@@ -1296,7 +1298,8 @@ namespace GObject
         }
 #else
         UInt16 conflictSkillId = GData::sevenSoul.getAnotherSimilarSkill(skillId);
-        for(UInt8 i = 0; i < INIT_SKILL_UPMAX; ++ i)
+        UInt8 i;
+        for(i = 0; i < INIT_SKILL_UPMAX; ++ i)
         {
             if (SKILL_ID(_initskl[i]) == conflictSkillId)
             {
@@ -1304,10 +1307,19 @@ namespace GObject
                 break;
             }
         }
-        std::string oldSkill = Itoa(SKILLANDLEVEL(conflictSkillId, 1));
-        delSkills(oldSkill);
-        std::string newSkill = Itoa(SKILLANDLEVEL(skillId, ssLevel));
-        setSkills(newSkill, false);
+        if(i < INIT_SKILL_UPMAX)
+        {
+            GData::Pet::PinjieData* pjd = GData::pet.getLevTable(_petLev);
+            UInt8 sLevel = 0;
+            if(pjd)
+                sLevel = pjd->skillLev[i];
+            if(sLevel == 0) 
+                sLevel = 1;
+            std::string oldSkill = Itoa(SKILLANDLEVEL(conflictSkillId, sLevel));
+            delSkills(oldSkill);
+            std::string newSkill = Itoa(SKILLANDLEVEL(skillId, sLevel));
+            setSkills(newSkill, false);
+        }
         petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
 #endif
     }
@@ -1350,12 +1362,20 @@ namespace GObject
         {
             if( _soulLevel[soulIndex - 1] < pet->_soulLevel[soulIndex - 1])
             {
+                UInt16 skillId = GData::sevenSoul.getSkillId(_petType, soulIndex, _skillIndex[soulIndex - 1]);
+                if(skillId)
+                {
+                    std::string skills = Itoa(SKILLANDLEVEL(skillId, 1));
+                    delSkills(skills);
+                }
+
                 _soulLevel[soulIndex - 1] = pet->_soulLevel[soulIndex - 1];
                 _skillIndex[soulIndex - 1] = pet->_skillIndex[soulIndex - 1];
                 DB4().PushUpdateData("REPLACE INTO `pet_sevensoul` VALUES(%" I64_FMT "u, %u, %u, %u, %u)", _owner->getId(), getId(), soulIndex, _soulLevel[soulIndex - 1], _skillIndex[soulIndex -1]);
-                loadSkillFromSevenSoul(soulIndex -1);
+                loadSkillFromSevenSoul(soulIndex - 1);
             }
         }
+        updateToDBPetSkill();
     }
 
 }
