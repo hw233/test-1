@@ -12463,7 +12463,8 @@ bool BattleSimulator::doAttackWithPet(BattleFighter* bf, BattleFighter* pet)
             if(ss)
             {
                 const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_2ND_HAPPEND);
-                pet->set2ndCoAtkSkill(ef->value, pskill);
+                if(ef)
+                    pet->set2ndCoAtkSkill(ef->value, pskill);
             }
         }
 

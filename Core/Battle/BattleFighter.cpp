@@ -109,6 +109,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     {
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[activeSkill[idx]];
+        if(!skillItem.base || !skillItem.base->effect)
+            continue;
         skillItem.cd = 0;
         bool isTherapy = (skillItem.base->effect->hp > 0 || skillItem.base->effect->hpP > 0.001) && skillItem.base->target == GData::e_battle_target_selfside;
         if(isTherapy)
