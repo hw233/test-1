@@ -1340,5 +1340,23 @@ namespace GObject
         }
         return 1;
     }
+
+    void FairyPet::getSevenSoulFromAnother(FairyPet* pet)
+    {
+        if(!pet || !_owner)
+            return;
+
+        for(UInt8 soulIndex = 1; soulIndex <= 7; soulIndex++)
+        {
+            if( _soulLevel[soulIndex - 1] < pet->_soulLevel[soulIndex - 1])
+            {
+                _soulLevel[soulIndex - 1] = pet->_soulLevel[soulIndex - 1];
+                _skillIndex[soulIndex - 1] = pet->_skillIndex[soulIndex - 1];
+                DB4().PushUpdateData("REPLACE INTO `pet_sevensoul` VALUES(%" I64_FMT "u, %u, %u, %u, %u)", _owner->getId(), getId(), soulIndex, _soulLevel[soulIndex - 1], _skillIndex[soulIndex -1]);
+                loadSkillFromSevenSoul(soulIndex -1);
+            }
+        }
+    }
+
 }
 

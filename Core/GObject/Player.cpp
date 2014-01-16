@@ -21562,6 +21562,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             equip = pet2->findEquip(2);
             if(equip)
                 GetPetPackage()->AddExistEquip(equip);
+            pet1->getSevenSoulFromAnother(pet2);
             delFairyPet(petId2, 1);
 
             petId2 = GameAction()->getYellowPetId(petId2);
@@ -21608,6 +21609,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         if(equip)
             GetPetPackage()->AddExistEquip(equip);
 
+        pet2->getSevenSoulFromAnother(pet1);
         delFairyPet(petId1, 1);
         //pet2->sendPinjieInfo();
         //pet2->sendGenguInfo();
@@ -21675,6 +21677,7 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         SYSMSG_BROADCASTV(4139, getCountry(), getName().c_str(), npet2->getColor(), npet2->getName().c_str());
 		SYSMSG_SENDV(4134, this, npet2->getColor(), npet2->getName().c_str());
+        npet2->getSevenSoulFromAnother(pet);
         delFairyPet(petId, 2);
         //npet2->sendPinjieInfo();
         //npet2->sendGenguInfo();

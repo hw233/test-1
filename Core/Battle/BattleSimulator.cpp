@@ -9791,9 +9791,9 @@ void BattleSimulator::ModifyAttackValue_SkillStrengthen(BattleFighter* bf,const 
     if(ef)
     {
         if(isAdd)
-            fvalue += ef->value;
+            fvalue += ef->value / 100;
         else
-            fvalue -= ef->valueExt1;  // 减掉的值取这个
+            fvalue -= ef->valueExt1 / 100;  // 减掉的值取这个
     }
 }
 
@@ -10779,8 +10779,11 @@ void BattleSimulator::doSkillEffectExtra_RandomTargetAttack(BattleFighter* bf, i
         return;
     if (!bo->isChar())
         return;
-    setStatusChange_Atk(bf, bo->getSide(), bo->getPos(), skill, bo->_attack * skill->effect->efv[eftIdx], skill->effect->efl[eftIdx], true);
-    setStatusChange_MagAtk(bf, bo->getSide(), bo->getPos(), skill, bo->_magatk * skill->effect->efv[eftIdx], skill->effect->efl[eftIdx], true);
+    float ssfactor = 0.0f;
+    ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);
+    float factor = 1 + ssfactor;
+    setStatusChange_Atk(bf, bo->getSide(), bo->getPos(), skill, bo->_attack * skill->effect->efv[eftIdx] * factor, skill->effect->efl[eftIdx], true);
+    setStatusChange_MagAtk(bf, bo->getSide(), bo->getPos(), skill, bo->_magatk * skill->effect->efv[eftIdx] * factor, skill->effect->efl[eftIdx], true);
 }
 
 void BattleSimulator::doSkillEffectExtra_MarkPet(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
@@ -12448,7 +12451,7 @@ bool BattleSimulator::doAttackWithPet(BattleFighter* bf, BattleFighter* pet)
         const GData::SkillBase* pskill = pet->getPassiveSkillOnAtkDmg();
         if(!pskill)
         {
-            pet->get2ndCoAtkSkill();
+            pskill = pet->get2ndCoAtkSkill();
             if(!pskill)
                 return false;
             else
