@@ -584,8 +584,10 @@ public:
     } 
     inline static bool  getOldManTime()
     {
-        UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
-        UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        //UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
+        UInt32 begin = TimeUtil::MkTime(2014, 1, 31);
+        //UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        UInt32 end = TimeUtil::MkTime(2014, 2, 7);
         UInt32 now = TimeUtil::Now() ;
         if( now >= begin && now <= end)
             return true;
