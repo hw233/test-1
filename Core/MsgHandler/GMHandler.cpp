@@ -304,6 +304,7 @@ GMHandler::GMHandler()
     Reg(3, "setmarry", &GMHandler::OnSetMarryStatus);
     Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
     Reg(2, "use9440", &GMHandler::OnUseItem9440);
+    Reg(2, "jiqiren", &GMHandler::OnJiqirenAction);
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
 
     _printMsgPlayer = NULL;
@@ -5000,6 +5001,54 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
     return ;   
 #endif
 #undef TEST_TABLE
+}
+
+void GMHandler::OnJiqirenAction(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    switch(atoi(args[0].c_str()))
+    {
+    case 1:
+        {
+            UInt32 copy = player->GetVar(VAR_JIQIREN_COPY);
+            copy = SET_BIT_8(copy, 0, (GET_BIT_8(copy, 0)+10));
+            copy = SET_BIT_8(copy, 1, (GET_BIT_8(copy, 1)+10));
+            copy = SET_BIT_8(copy, 2, (GET_BIT_8(copy, 2)+10));
+            copy = SET_BIT_8(copy, 3, (GET_BIT_8(copy, 3)+10));
+
+            UInt32 front = player->GetVar(VAR_JIQIREN_FRONTMAP);
+            front = SET_BIT_8(front, 0, (GET_BIT_8(front, 0)+10));
+            front = SET_BIT_8(front, 1, (GET_BIT_8(front, 1)+10));
+            front = SET_BIT_8(front, 2, (GET_BIT_8(front, 2)+10));
+            front = SET_BIT_8(front, 3, (GET_BIT_8(front, 3)+10));
+
+            UInt32 dungeon = player->GetVar(VAR_JIQIREN_DUNGEON);
+            dungeon = SET_BIT_8(dungeon, 0, (GET_BIT_8(dungeon, 0)+10));
+            dungeon = SET_BIT_8(dungeon, 1, (GET_BIT_8(dungeon, 1)+10));
+            dungeon = SET_BIT_8(dungeon, 2, (GET_BIT_8(dungeon, 2)+10));
+            dungeon = SET_BIT_8(dungeon, 3, (GET_BIT_8(dungeon, 3)+10));
+
+            UInt32 sybs = player->GetVar(VAR_JIQIREN_SYBS);
+            sybs = SET_BIT_8(sybs, 0, (GET_BIT_8(sybs, 0)+10));
+            sybs = SET_BIT_8(sybs, 1, (GET_BIT_8(sybs, 1)+10));
+            sybs = SET_BIT_8(sybs, 2, (GET_BIT_8(sybs, 2)+10));
+            sybs = SET_BIT_8(sybs, 3, (GET_BIT_8(sybs, 3)+10));
+
+            player->SetVar(VAR_JIQIREN_COPY, copy);
+            player->SetVar(VAR_JIQIREN_FRONTMAP, front);
+            player->SetVar(VAR_JIQIREN_DUNGEON, dungeon);
+            player->SetVar(VAR_JIQIREN_SYBS, sybs);
+        }
+        break;
+    case 2:
+        player->SetVar(VAR_JIQIREN_COPY, 0);
+        player->SetVar(VAR_JIQIREN_FRONTMAP, 0);
+        player->SetVar(VAR_JIQIREN_DUNGEON, 0);
+        player->SetVar(VAR_JIQIREN_SYBS, 0);
+        break;
+    }
+    player->sendJiqirenInfo();
 }
 
 void GMHandler::OnCreateMarryBoard(GObject::Player *player, std::vector<std::string>& args)

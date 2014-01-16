@@ -629,6 +629,13 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_3366_RECHARGE = 682,       //空间充值 
         VAR_3366_RECHARGE_AWARD = 683,       //空间充值奖励领取
         VAR_MARRYBOARD_BAIHE = 684,          //烟花积分
+
+        //701-710 for suntao
+        VAR_JIQIREN_COPY = 701,     //机器人之副本未完成次数(1byte免费，2byte付费1，3byte付费2，4byte付费3)
+        VAR_JIQIREN_FRONTMAP = 702, //机器人之阵图未完成次数(1byte免费，2byte付费1，3byte付费2，4byte付费3)
+        VAR_JIQIREN_DUNGEON = 703,  //机器人之决战之地未完成次数(1byte普通免费，2byte普通付费，3byte困难免费，4byte困难付费)
+        VAR_JIQIREN_SYBS = 704,     //机器人之帮派、师门、衙门、锁妖塔未完成次数
+
         VAR_MAX,
     };
 
@@ -1195,6 +1202,11 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_3366_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_3366_RECHARGE_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_MARRYBOARD_BAIHE, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_JIQIREN_COPY, CYCLE_NONE);
+            REGISTER_VAR(VAR_JIQIREN_FRONTMAP, CYCLE_NONE);
+            REGISTER_VAR(VAR_JIQIREN_DUNGEON, CYCLE_NONE);
+            REGISTER_VAR(VAR_JIQIREN_SYBS, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

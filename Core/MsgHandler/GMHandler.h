@@ -237,6 +237,7 @@ private:
     void OnCleanMarryList(GObject::Player* player, std::vector<std::string>& args);
     void OnSetMarryStatus(GObject::Player* player, std::vector<std::string>& args);
     void OnHandleServerWar(GObject::Player* player, std::vector<std::string>& args);
+    void OnJiqirenAction(GObject::Player *player, std::vector<std::string>& args);
     void OnUseItem9440(GObject::Player *player, std::vector<std::string>& args);
 };
 

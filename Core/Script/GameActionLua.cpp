@@ -1864,10 +1864,25 @@ namespace Script
 		return Call<bool>("TaskFuncExist", taskId);
 	}
 
-
     bool GameActionLua::isSalePriceLimitServer()
     {
         return Call<bool>("isSalePriceLimitServer", cfg.serverNum);
+    }
+
+    void GameActionLua::getJiqirenAward_Copy(Player* player, UInt8 isFree)
+    {
+		assert(player != NULL);
+        Call<void>("getJiqirenAward_Copy", player, isFree);
+    }
+    void GameActionLua::getJiqirenAward_FrontMap(Player* player, UInt8 isFree)
+    {
+		assert(player != NULL);
+        Call<void>("getJiqirenAward_FrontMap", player, isFree);
+    }
+    void GameActionLua::getJiqirenAward_Dungeon(Player* player, UInt8 diff, UInt8 isFree)
+    {
+		assert(player != NULL);
+        Call<void>("getJiqirenAward_Dungeon", player, diff, isFree);
     }
 }
 

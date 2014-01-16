@@ -1002,7 +1002,12 @@ public:
     inline static void setQQBoardLoginTime(bool v)
     { _qqBoardLogin = v; }
     inline static bool getQQBoardLoginTime()
-    { return _qqBoardLogin; } 
+    { return _qqBoardLogin; }
+
+    inline static void setJiqirenAct(bool v)
+    { _jiqirenAct = v; }
+    inline static bool getJiqirenAct()
+    { return _jiqirenAct; }
 
     inline static void setCallSnakeEggAct(UInt8 v)
     { _callsnakeeggact = v; }
@@ -1199,6 +1204,7 @@ public:
     static bool _zcjbActivity;
     static bool _halfgold;
     static bool _qqBoardLogin;
+    static bool _jiqirenAct;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
     static bool _item9344act;

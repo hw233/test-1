@@ -27147,6 +27147,275 @@ void Player::addMountAttrExtra(GData::AttrExtra& attr)
     attr += tmpAttr;
 }
 
+void Player::handleJiqirenAct()
+{
+    UInt32 info = GetVar(VAR_JIQIREN_SYBS);
+    int remain = getClanTaskMax() - _playerData.ctFinishCount;
+    int remain1 = getShiMenMax() - _playerData.smFinishCount;
+    int remain2 = getYaMenMax() - _playerData.ymFinishCount;
+    if(remain > 0)
+        info = SET_BIT_8(info, 0, (GET_BIT_8(info, 0)+remain));
+    if(remain1 > 0)
+        info = SET_BIT_8(info, 1, (GET_BIT_8(info, 1)+remain1));
+    if(remain2 > 0)
+        info = SET_BIT_8(info, 2, (GET_BIT_8(info, 2)+remain2));
+    SetVar(VAR_JIQIREN_SYBS, info);
+
+    int dungeon = GetVar(VAR_JIQIREN_DUNGEON);
+    int dungeonCnt = Dungeon::getMaxCount(0) + Dungeon::getExtraCount(getVipLevel(), 0) - PLAYER_DATA(this, dungeonCnt);
+    int dungeonCnt1 = Dungeon::getMaxCount(1) + Dungeon::getExtraCount(getVipLevel(), 1) - PLAYER_DATA(this, dungeonCnt1);
+    UInt8 fcnt = GET_BIT_8(dungeon, 0);
+    UInt8 gcnt = GET_BIT_8(dungeon, 1);
+    UInt8 fcnt1 = GET_BIT_8(dungeon, 2);
+    UInt8 gcnt1 = GET_BIT_8(dungeon, 3);
+    if(dungeonCnt == 3)
+    {
+        fcnt += 2;
+        gcnt += 1;
+    }
+    else if(dungeonCnt == 2)
+    {
+        fcnt += 1;
+        gcnt += 1;
+    }
+    else if(dungeonCnt == 1)
+    {
+        gcnt += 1;
+    }
+    if(dungeonCnt1 == 3)
+    {
+        fcnt1 += 2;
+        gcnt1 += 1;
+    }
+    else if(dungeonCnt1 == 2)
+    {
+        fcnt1 += 1;
+        gcnt1 += 1;
+    }
+    else if(dungeonCnt1 == 1)
+    {
+        gcnt1 += 1;
+    }
+    dungeon = SET_BIT_8(dungeon, 0, fcnt);
+    dungeon = SET_BIT_8(dungeon, 1, gcnt);
+    dungeon = SET_BIT_8(dungeon, 2, fcnt1);
+    dungeon = SET_BIT_8(dungeon, 3, gcnt1);
+    SetVar(VAR_JIQIREN_DUNGEON, dungeon);
+}
+
+static const UInt32 Need_tael[16] = { 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 500, 500, 500, 100 };
+static const UInt32 Need_gold[16] = { 0, 20, 40, 60, 0, 20, 40, 60, 0, 20, 0, 50, 0, 0, 0, 0 };
+void Player::completeJiqirenTask(UInt8 type, UInt8 count)
+{
+    //type==>0:副本免费 1:副本付费1 2:副本付费2 3:副本付费3
+    //       4:阵图免费 5:阵图付费1 6:阵图付费2 7:阵图付费3
+    //       8:决战之地(简单)免费 9:决战之地(简单)付费 10:决战之地(困难)免费 11:决战之地(困难)付费
+    //       12:帮派任务 13:师门任务 14:衙门任务 15:锁妖塔
+    if(!World::getJiqirenAct() || type >= 16 || !count)
+        return;
+    if((type <= 11 && GetFreePackageSize() < 30*count) || (type == 15 && GetFreePackageSize() < 50*count))
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    UInt32 tael = Need_tael[type] * count;
+    UInt32 gold = Need_gold[type] * count;
+    if(type == 15)
+    {
+        DeamonPlayerData * dpd = getDeamonPlayerData();
+        if(!dpd || dpd->maxLevel == 0)
+        {
+            sendMsgCode(0, 1099);
+            return;
+        }
+        tael *= dpd->maxLevel * count;
+    }
+    if(getTael() < tael)
+    {
+        sendMsgCode(0, 1100);
+        return;
+    }
+    if(getGold() < gold)
+    {
+        sendMsgCode(0, 1104);
+        return;
+    }
+
+    if(type < 4)
+    {
+        UInt32 info = GetVar(VAR_JIQIREN_COPY);
+        UInt8 curCnt = GET_BIT_8(info, type);
+        if(curCnt < count || GetLev() < 30)
+            return;
+        TeamCopyPlayerInfo* tcpInfo = getTeamCopyPlayerInfo();
+        if(!tcpInfo || !tcpInfo->getPassMax())
+        {
+            sendMsgCode(0, 1097);
+            return;
+        }
+
+        SetVar(VAR_JIQIREN_COPY, SET_BIT_8(info, type, (curCnt-count)));
+    }
+    else if(type >= 4 && type < 8)
+    {
+        UInt32 info = GetVar(VAR_JIQIREN_FRONTMAP);
+        UInt8 curCnt = GET_BIT_8(info, (type%4));
+        if(curCnt < count || GetLev() < 35)
+            return;
+
+        SetVar(VAR_JIQIREN_FRONTMAP, SET_BIT_8(info, type, (curCnt-count)));
+    }
+    else if(type >= 8 && type < 12)
+    {
+        UInt32 info = GetVar(VAR_JIQIREN_DUNGEON);
+        UInt8 curCnt = GET_BIT_8(info, (type%4));
+        if(curCnt < count || GetLev() < 30)
+            return;
+        UInt8 dunId = 0;
+        if(GetLev() < 45)
+            dunId = 1;
+        else if(GetLev() < 60)
+            dunId = 2;
+        else if(GetLev() < 75)
+            dunId = 3;
+        else if(GetLev() < 90)
+            dunId = 4;
+        else
+            dunId = 5;
+        UInt8 difficulty = 0xFF;
+        if(type < 10)
+            difficulty = 0;
+        else
+            difficulty = 1;
+        Dungeon * dg = GObject::dungeonManager[dunId];
+        if(!dg || !dg->getFirstPass(this, difficulty))
+        {
+            sendMsgCode(0, 1098);
+            return;
+        }
+
+        SetVar(VAR_JIQIREN_DUNGEON, SET_BIT_8(info, type, (curCnt-count)));
+    }
+    else
+    {
+        UInt32 info = GetVar(VAR_JIQIREN_SYBS);
+        UInt8 curCnt = GET_BIT_8(info, (type%4));
+        if(curCnt < count || (type == 12 && !getClan()))
+            return;
+        SetVar(VAR_JIQIREN_SYBS, SET_BIT_8(info, type, (curCnt-count)));
+
+    }
+    ConsumeInfo ci(DailyActivity, 0, 0);
+    useTael(tael, &ci);
+    ConsumeInfo ci1(DailyActivity, 0, 0);
+    useGold(gold, &ci1);
+
+    UInt32 vipLevel = getVipLevel();
+    UInt32 exp = (GetLev() - 10) * ((GetLev() > 99 ? 99 : GetLev()) / 10) * 5 + 25;
+    switch(type)
+    {
+        case 0:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_Copy(this, 1);
+            break;
+        case 1:
+        case 2:
+        case 3:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_Copy(this, 0);
+            break;
+        case 4:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_FrontMap(this, 1);
+            break;
+        case 5:
+        case 6:
+        case 7:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_FrontMap(this, 0);
+            break;
+        case 8:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_Dungeon(this, 0, 1);
+            break;
+        case 9:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_Dungeon(this, 0, 0);
+            break;
+        case 10:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_Dungeon(this, 1, 1);
+            break;
+        case 11:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_Dungeon(this, 1, 0);
+            break;
+        case 12:    //帮派任务
+            {
+                exp *= 2;
+                AddExp(exp*count);
+            }
+            break;
+        case 13:    //师门任务
+            {
+                if(vipLevel <= 2)
+                    exp *= 10.8;
+                else if(vipLevel <= 5)
+                    exp *= 14.4;
+                else
+                    exp *= 21.6;
+                AddExp(exp*count);
+            }
+            break;
+        case 14:    //衙门任务
+            {
+                UInt32 tael = 0;
+                if(vipLevel <= 1)
+                    tael = 800;
+                else if(vipLevel <= 4)
+                    tael = 1000;
+                else
+                    tael = 1300;
+                getTael(tael*count);
+            }
+            break;
+        case 15:    //锁妖塔
+            for(UInt8 i = 0; i < count; ++ i)
+            {
+                townDeamonManager->getJiqirenAward(this);
+            }
+            break;
+    }
+    sendJiqirenInfo();
+    char action[16] = "";
+    snprintf (action, 16, "F_140107_%d", type+1);
+    udpLog("mashangyoujiang", action, "", "", "", "", "act", count);
+}
+
+void Player::sendJiqirenInfo()
+{
+    UInt32 copy = GetVar(VAR_JIQIREN_COPY);
+    UInt32 front = GetVar(VAR_JIQIREN_FRONTMAP);
+    UInt32 dungeon = GetVar(VAR_JIQIREN_DUNGEON);
+    UInt32 sybs = GetVar(VAR_JIQIREN_SYBS);
+
+	Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x10) << static_cast<UInt8>(0);
+    st << static_cast<UInt8>(GET_BIT_8(copy, 0)) << static_cast<UInt8>(GET_BIT_8(copy, 1));
+    st << static_cast<UInt8>(GET_BIT_8(copy, 2)) << static_cast<UInt8>(GET_BIT_8(copy, 3));
+
+    st << static_cast<UInt8>(GET_BIT_8(front, 0)) << static_cast<UInt8>(GET_BIT_8(front, 1));
+    st << static_cast<UInt8>(GET_BIT_8(front, 2)) << static_cast<UInt8>(GET_BIT_8(front, 3));
+
+    st << static_cast<UInt8>(GET_BIT_8(dungeon, 0)) << static_cast<UInt8>(GET_BIT_8(dungeon, 1));
+    st << static_cast<UInt8>(GET_BIT_8(dungeon, 2)) << static_cast<UInt8>(GET_BIT_8(dungeon, 3));
+
+    st << static_cast<UInt8>(GET_BIT_8(sybs, 0)) << static_cast<UInt8>(GET_BIT_8(sybs, 1));
+    st << static_cast<UInt8>(GET_BIT_8(sybs, 2)) << static_cast<UInt8>(GET_BIT_8(sybs, 3));
+    st << Stream::eos;
+    send(st);
+}
+
 } // namespace GObject
 
 

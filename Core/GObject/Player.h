@@ -2889,6 +2889,9 @@ namespace GObject
         void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
         bool giveFlower(UInt8 type , UInt32 num = 0);
         void joinAllServerRecharge(UInt32);
+        void handleJiqirenAct();
+        void completeJiqirenTask(UInt8, UInt8);
+        void sendJiqirenInfo();
 	};
 
 
