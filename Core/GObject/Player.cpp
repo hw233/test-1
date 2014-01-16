@@ -57,6 +57,7 @@
 #endif
 #include "ClanRankBattle.h"
 #include "TeamCopy.h"
+#include "PetTeamCopy.h"
 #include "HoneyFall.h"
 #include "GData/ClanTechTable.h"
 #include "GData/ClanLvlTable.h"
@@ -769,8 +770,11 @@ namespace GObject
 		m_FairySpar = new FairySpar(this);
         m_pVars = new VarSystem(id);
         memset(&m_ctp, 0, sizeof(m_ctp));
+        memset(&m_pctp, 0, sizeof(m_pctp));
         m_teamData = NULL;
+        m_petTeamData = NULL;
         m_tcpInfo = new TeamCopyPlayerInfo(this);
+        m_ptcpInfo = new PetTeamCopyPlayerInfo(this);
         m_hf = new HoneyFall(this);
         m_dpData = new DeamonPlayerData();
 		m_moFang = new MoFang(this);
@@ -814,6 +818,8 @@ namespace GObject
         memset(_partCnt, 0, sizeof(_partCnt));
         memset(_alreadyCnt, 0, sizeof(_alreadyCnt));
         memset(_alreadyload, 0, sizeof(_alreadyload));
+        m_EnterPTCStatus = false;
+        m_InPTCStatus = false;
 	}
 
 
@@ -822,6 +828,8 @@ namespace GObject
 		UnInit();
         delete m_tcpInfo;
         m_tcpInfo = NULL;
+        delete m_ptcpInfo;
+        m_ptcpInfo = NULL;
         delete m_hf;
         m_hf = NULL;
         delete m_dpData;
@@ -2242,6 +2250,12 @@ namespace GObject
         SetVar(VAR_OFFLINE, curtime);
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
+       
+        if(GetEnterPTCStatus())
+            petTeamCopyManager->quit(this);
+
+        if(GetInPTCStatus())
+            petTeamCopyManager->leaveTeam(this, 2);
 
 		if(cfg.enableWallow && _playerData.wallow)
 		{
@@ -4184,6 +4198,16 @@ namespace GObject
         if (_onBattlePet)
         {
             Battle::BattleFighter * bf = bsim.newPet(side, 0, _onBattlePet);
+            bf->setHP(_onBattlePet->getMaxHP());
+        }
+    }
+
+    void Player::PutSpecialPets( Battle::BattleSimulator& bsim, int side, int pos, bool init /* = true */)
+    {
+        // 战斗模拟器中加载宠物
+        if(_onBattlePet)
+        {
+            Battle::BattleFighter * bf = bsim.newFighter(side, pos, _onBattlePet);
             bf->setHP(_onBattlePet->getMaxHP());
         }
     }
@@ -6367,7 +6391,9 @@ namespace GObject
             _jobHunter->OnLeaveGame(_playerData.location);
 
         if(hasFlag(InCopyTeam))
+        {
             teamCopyManager->leaveTeamCopy(this);
+        }
 
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)
@@ -11802,6 +11828,9 @@ namespace GObject
         case 36:
             setQTSign();
             break;
+        case 37:
+            getMicroCloudAward(opt);
+            break;
         }
     }
 
@@ -12354,6 +12383,25 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(20);
         st << states << Stream::eos;
+        send(st);
+    }
+
+    void Player::getMicroCloudAward(UInt8 opt)
+    {
+        UInt8 state = GetVar(VAR_MicroCloud_AWARD);
+        if(1 == opt && 0 == state)
+        {
+            GetPackage()->AddItem(503, 3, true, false, FromMicroCloudAward);
+            GetPackage()->AddItem(500, 3, true, false, FromMicroCloudAward);
+            GetPackage()->AddItem(48, 3, true, false, FromMicroCloudAward);
+            GetPackage()->AddItem(440, 3, true, false, FromMicroCloudAward);
+            SetVar(VAR_MicroCloud_AWARD, 1);
+            state = 1;
+        }
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(37);
+        st << state << Stream::eos;
         send(st);
     }
 
@@ -14195,9 +14243,24 @@ namespace GObject
         m_teamData = td;
     }
 
+    PetTeamData* Player::getPetTeamData()
+    {
+        return m_petTeamData;
+    }
+
+    void Player::setPetTeamData(PetTeamData* td)
+    {
+        m_petTeamData = td;
+    }
+
     CopyTeamPage& Player::getCopyTeamPage()
     {
         return m_ctp;
+    }
+
+    PetCopyTeamPage& Player::getPetCopyTeamPage()
+    {
+        return m_pctp;
     }
 
     void Player::clearCopyTeamPage()
@@ -14205,11 +14268,20 @@ namespace GObject
         memset(&m_ctp, 0, sizeof(m_ctp));
     }
 
+    void Player::clearPetCopyTeamPage()
+    {
+        memset(&m_pctp, 0, sizeof(m_pctp));
+    }
+
     TeamCopyPlayerInfo* Player::getTeamCopyPlayerInfo()
     {
         return m_tcpInfo;
     }
 
+    PetTeamCopyPlayerInfo* Player::getPetTeamCopyPlayerInfo()
+    {
+        return m_ptcpInfo;
+    }
     HoneyFall* Player::getHoneyFall()
     {
         return m_hf;
@@ -19888,7 +19960,7 @@ void Player::sendFeastLoginAct()
         //MailPackage::MailItem mitem = {1763,1};
         //MailPackage::MailItem mitem = {1760,1};
         //MailPackage::MailItem mitem = {9422,1};
-        MailPackage::MailItem mitem = {1773,1};
+        MailPackage::MailItem mitem = {1768,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     //SetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY, 1);

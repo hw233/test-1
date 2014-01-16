@@ -149,6 +149,8 @@ enum PurchaseType
     MODIFYPET                   = 1011, //夫妻更改信物
     COUPLECOPY                  = 1012, //夫妻副本
     OutBuyFund                  = 1013, //购买基金消费
+    RefreshMonster              = 1015, //宠物组队副本刷怪
+    CreateRoom                  = 1016, //宠物组队副本创建房间
     //繁体私有占150～200
 };
 
@@ -294,6 +296,7 @@ enum ItemFrom
     FromServerWarJijian = 65, //仙界传奇祭剑宝箱
     FromQTAward = 66, //QT奖励
     FromBuyFundAward = 67, //购买基金奖励
+    FromMicroCloudAward = 68, //微云合作奖励
     //80 ~ 100，繁体占用
 };
 
