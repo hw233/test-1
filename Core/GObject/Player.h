@@ -2501,6 +2501,7 @@ namespace GObject
         void getQQXiuAward(UInt8 opt);                                                                                       
         void getHappyValueAward(UInt8 val);
         void sendHappyValueInfo();
+        void getMicroCloudAward(UInt8 opt);
 
         void getMarryBoard3Award(UInt8 type);
 

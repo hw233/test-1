@@ -626,6 +626,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_MARRYBOARD_YANHUA = 681,          //烟花积分
         VAR_3366_RECHARGE = 682,       //空间充值 
         VAR_3366_RECHARGE_AWARD = 683,       //空间充值奖励领取
+
+        VAR_MicroCloud_AWARD = 701,     //是否领取微云合作奖励
         VAR_MAX,
     };
 
@@ -1185,6 +1187,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_MARRYBOARD2_NUM, CYCLE_DAY);
             REGISTER_VAR(VAR_MARRYBOARD2_ANS, CYCLE_DAY);
             REGISTER_VAR(VAR_MARRYBOARD4_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_MicroCloud_AWARD, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

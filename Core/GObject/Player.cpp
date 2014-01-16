@@ -11768,6 +11768,9 @@ namespace GObject
         case 36:
             setQTSign();
             break;
+        case 37:
+            getMicroCloudAward(opt);
+            break;
         }
     }
 
@@ -12319,6 +12322,25 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(20);
         st << states << Stream::eos;
+        send(st);
+    }
+
+    void Player::getMicroCloudAward(UInt8 opt)
+    {
+        UInt8 state = GetVar(VAR_MicroCloud_AWARD);
+        if(1 == opt && 0 == state)
+        {
+            GetPackage()->AddItem(503, 3, true, false, FromMicroCloudAward);
+            GetPackage()->AddItem(500, 3, true, false, FromMicroCloudAward);
+            GetPackage()->AddItem(48, 3, true, false, FromMicroCloudAward);
+            GetPackage()->AddItem(440, 3, true, false, FromMicroCloudAward);
+            SetVar(VAR_MicroCloud_AWARD, 1);
+            state = 1;
+        }
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(37);
+        st << state << Stream::eos;
         send(st);
     }
 
