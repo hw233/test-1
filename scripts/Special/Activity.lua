@@ -9060,6 +9060,7 @@ function getDragonKingAward(step, flag)
             [15] = {{312,1}},
             [16] = {{8550,1}, {8551,1}, {8552,1}},
             [17] = {{6210,1}},
+            [18] = {{313,1}},
         },
     }
     local chances = {
@@ -9197,42 +9198,54 @@ function onGetNewYearGiveGiftAward(player, index, times)
 end
 
 local answers = {
-    --[[["0817"] = {
-        [0] = {  68, 65, 67, 67, 68, 68, 67, 67, 67, 67,    --70级以上题库
-                 65, 65, 68, 66, 67, 67, 68, 68, 68, 68,
+    ["0209"] = {
+        [0] = {  4, 3, 2, 3, 1, 4, 4, 1, 3, 3,    --70级以上题库
+                 2, 1, 1, 1, 1, 1, 1, 4, 3, 3,
+                 1, 2, 4, 1, 4, 1, 2, 4, 4, 3
               },
-        [1] = {  67, 68, 67, 65, 65, 68, 68, 65, 67, 67,    --70级以下题库
-                 68, 68, 68, 68, 68, 67, 67, 67, 67, 67,
+        [1] = {  4, 3, 2, 3, 1, 4, 4, 1, 3, 3,    --70级以下题库
+                 2, 1, 1, 1, 1, 1, 1, 4, 3, 3,
+                 1, 2, 4, 1, 4, 1, 2, 4, 4, 3
              },
-    },]]
-    ["1221"] = {
-        [0] = {  1, 3, 1, 3, 1, 4, 2, 1, 1, 4,    --70级以上题库
-                 1, 4, 1, 1, 3, 2, 4, 3, 1, 3,
-                 2, 4, 2, 3, 4, 3, 2, 2, 3, 4,
+    },
+    ["0210"] = {
+        [0] = {  4, 4, 4, 3, 3, 3, 3, 4, 3, 4,    --70级以上题库
+                 4, 1, 2, 3, 1, 1, 2, 3, 1, 1,
+                 3, 3, 2, 1, 4, 2, 1, 3, 1, 4,
               },
-        [1] = {  1, 3, 1, 3, 1, 4, 2, 1, 1, 4,    --70级以下题库
-                 1, 4, 1, 1, 3, 2, 4, 3, 1, 3,
-                 2, 4, 2, 3, 4, 3, 2, 2, 3, 4,
+        [1] = {  4, 4, 4, 3, 3, 3, 3, 4, 3, 4,    --70级以下题库
+                 4, 1, 2, 3, 1, 1, 2, 3, 1, 1,
+                 3, 3, 2, 1, 4, 2, 1, 3, 1, 4,
               },
     },
-    ["1222"] = {
-        [0] = {  4, 3, 1, 3, 3, 4, 4, 1, 1, 1,    --70级以上题库
-                 1, 1, 1, 3, 2, 3, 2, 2, 3, 2,
-                 2, 4, 2, 3, 1, 4, 3, 3, 1, 3,
+    ["0211"] = {
+        [0] = {  1, 3, 1, 3, 4, 3, 2, 4, 3, 4,    --70级以上题库
+                 1, 1, 1, 1, 1, 4, 2, 4, 2, 3,
+                 2, 4, 1, 4, 1, 2, 2, 1, 2, 3,
               },
-        [1] = {  4, 3, 1, 3, 3, 4, 4, 1, 1, 1,    --70级以下题库
-                 1, 1, 1, 3, 2, 3, 2, 2, 3, 2,
-                 2, 4, 2, 3, 1, 4, 3, 3, 1, 3,
+        [1] = {  1, 3, 1, 3, 4, 3, 2, 4, 3, 4,   --70级以下题库
+                 1, 1, 1, 1, 1, 4, 2, 4, 2, 3,
+                 2, 4, 1, 4, 1, 2, 2, 1, 2, 3,
               },
     },
-    ["1223"] = {
-        [0] = {  1, 4, 1, 3, 1, 1, 4, 1, 2, 3,    --70级以上题库
-                 1, 1, 1, 1, 1, 1, 2, 4, 3, 2,
-                 2, 2, 4, 3, 2, 4, 3, 3, 4, 4,
+    ["0212"] = {
+        [0] = {  4, 2, 1, 2, 2, 4, 1, 4, 1, 2,    --70级以上题库
+                 2, 1, 1, 1, 3, 1, 1, 4, 2, 3,
+                 1, 3, 1, 1, 1, 4, 3, 1, 3, 2,
               },
-        [1] = {  1, 4, 1, 3, 1, 1, 4, 1, 2, 3,    --70级以下题库
-                 1, 1, 1, 1, 1, 1, 2, 4, 3, 2,
-                 2, 2, 4, 3, 2, 4, 3, 3, 4, 4,
+        [1] = {  4, 2, 1, 2, 2, 4, 1, 4, 1, 2,    --70级以下题库
+                 2, 1, 1, 1, 3, 1, 1, 4, 2, 3,
+                 1, 3, 1, 1, 1, 4, 3, 1, 3, 2,
+              },
+    },
+    ["0213"] = {
+        [0] = {  3, 3, 2, 3, 4, 2, 2, 3, 1, 3,    --70级以上题库
+                 1, 1, 3, 2, 1, 1, 1, 1, 1, 1,
+                 4, 3, 3, 1, 3, 1, 4, 3, 2, 3,
+              },
+        [1] = {  3, 3, 2, 3, 4, 2, 2, 3, 1, 3,   --70级以下题库
+                 1, 1, 3, 2, 1, 1, 1, 1, 1, 1,
+                 4, 3, 3, 1, 3, 1, 4, 3, 2, 3,
               },
     },
 }
@@ -9249,9 +9262,11 @@ function getAnswerInFoolsDay(qid, type)
 end
 
 local answerAwardItems = {
-    ["1221"] = { {500, 1}, {503, 2}, {501, 2}, {8000, 2}, {1126, 2}, {515, 1} },
-    ["1222"] = { {9371, 2}, {9418, 2}, {513, 2}, {9371, 6}, {551, 2}, {509, 1} },
-    ["1223"] = { {33, 2}, {514, 2}, {547, 2}, {516, 2}, {134, 1}, {549, 1} },
+    ["0209"] = { {500, 1}, {503, 1}, {516, 1}, {1325, 1}, {134, 1}, {515, 1} },
+    ["0210"] = { {514, 1}, {1126, 1}, {513, 1}, {134, 1}, {1325, 1}, {9076, 1} },
+    ["0211"] = { {9371, 1}, {8000, 1}, {501, 1}, {9338, 1}, {1325, 1}, {9388, 1} },
+    ["0212"] = { {511, 2}, {517, 1}, {547, 1}, {134, 1}, {9338, 1}, {509, 1} },
+    ["0213"] = { {33, 1}, {503, 1}, {9308, 1}, {1325, 1}, {9371, 6}, {549, 1} },
 }
 
 function getAwardInFoolsDay(player, startId, endId)
@@ -10217,19 +10232,19 @@ function getJiqirenAward_Copy(player, isFree)
     local equip4Num = #copyAward[key]["equip4"]
     for k = 1, 5 do
         if equip1Num > 0 and math.random(1, 10000) <= 5000 then
-            package:Add(copyAward[key]["equip1"][math.random(1, equip1Num)], 1, isFree, false, 67)
+            package:Add(copyAward[key]["equip1"][math.random(1, equip1Num)], 1, isFree, false, 69)
         end
         if equip2Num > 0 and math.random(1, 10000) <= 5000 then
-            package:Add(copyAward[key]["equip2"][math.random(1, equip2Num)], 1, isFree, false, 67)
+            package:Add(copyAward[key]["equip2"][math.random(1, equip2Num)], 1, isFree, false, 69)
         end
     end
     for k = 1, 2 do
         if equip3Num > 0 and math.random(1, 10000) <= 5000 then
-            package:Add(copyAward[key]["equip3"][math.random(1, equip3Num)], 1, isFree, false, 67)
+            package:Add(copyAward[key]["equip3"][math.random(1, equip3Num)], 1, isFree, false, 69)
         end
     end
     if equip4Num > 0 and math.random(1, 10000) <= 5000 then
-        package:Add(copyAward[key]["equip4"][math.random(1, equip4Num)], 1, isFree, false, 67)
+        package:Add(copyAward[key]["equip4"][math.random(1, equip4Num)], 1, isFree, false, 69)
     end
 
     local cittaNum = #copyAward[key]["citta"]
@@ -10238,38 +10253,38 @@ function getJiqirenAward_Copy(player, isFree)
     local otherNum = #copyAward[key]["other"]
     for k = 1, 2 do
         if cittaNum > 0 and math.random(1, 10000) <= 3000 then
-            package:Add(copyAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 67)
+            package:Add(copyAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 69)
         end
         if trumpNum > 0 and math.random(1, 10000) <= 3000 then
-            package:Add(copyAward[key]["trump"][math.random(1, trumpNum)], 1, isFree, false, 67)
+            package:Add(copyAward[key]["trump"][math.random(1, trumpNum)], 1, isFree, false, 69)
         end
         if gemsNum > 0 and math.random(1, 10000) <= 2000 then
-            package:Add(copyAward[key]["gems"][math.random(1, gemsNum)], 1, isFree, false, 67)
+            package:Add(copyAward[key]["gems"][math.random(1, gemsNum)], 1, isFree, false, 69)
         end
         if otherNum > 0 and math.random(1, 10000) <= 10000 then
-            package:Add(copyAward[key]["other"][math.random(1, otherNum)], 1, isFree, false, 67)
+            package:Add(copyAward[key]["other"][math.random(1, otherNum)], 1, isFree, false, 69)
         end
     end
     for _, id in pairs(copyAward[key]["huiji"]) do
-        package:Add(id, 1, true, false, 67)
+        package:Add(id, 1, true, false, 69)
     end
     --元神
     local key1 = key .. "_" .. isFree
     if nil ~= yuanshenAward[key1] then
         local ysNum = #yuanshenAward[key1]
         if ysNum > 0 and math.random(1, 10000) <= 10000 then
-            package:Add(yuanshenAward[key1][math.random(1, ysNum)], 1, isFree, false, 67)
+            package:Add(yuanshenAward[key1][math.random(1, ysNum)], 1, isFree, false, 69)
         end
     end
     player:AddExp(copyAward[key]["exp"])
     --类似抽奖功能
     local rnd = math.random(1, 3)
     if rnd == 1 and equip4Num > 0 then
-        package:Add(copyAward[key]["equip4"][math.random(1, equip4Num)], 1, isFree, false, 67)
+        package:Add(copyAward[key]["equip4"][math.random(1, equip4Num)], 1, isFree, false, 69)
     elseif rnd == 2 and cittaNum > 0 then
-        package:Add(copyAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 67)
+        package:Add(copyAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 69)
     elseif rnd == 3 and gemsNum > 0 then
-        package:Add(copyAward[key]["gems"][math.random(1, gemsNum)], 1, isFree, false, 67)
+        package:Add(copyAward[key]["gems"][math.random(1, gemsNum)], 1, isFree, false, 69)
     end
 end
 
@@ -10430,35 +10445,35 @@ function getJiqirenAward_FrontMap(player, isFree)
     local otherNum = #frontAward[key]["other"]
     for k = 1, 2 do
         if zhenqiNum > 0 and math.random(1, 10000) <= 5000 then
-            package:Add(frontAward[key]["zhenqi"][math.random(1, zhenqiNum)], 1, isFree, false, 67)
+            package:Add(frontAward[key]["zhenqi"][math.random(1, zhenqiNum)], 1, isFree, false, 69)
         end
         if cittaNum > 0 and math.random(1, 10000) <= 3000 then
-            package:Add(frontAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 67)
+            package:Add(frontAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 69)
         end
         if trumpNum > 0 and math.random(1, 10000) <= 3000 then
-            package:Add(frontAward[key]["trump"][math.random(1, trumpNum)], 1, isFree, false, 67)
+            package:Add(frontAward[key]["trump"][math.random(1, trumpNum)], 1, isFree, false, 69)
         end
         if gemsNum > 0 and math.random(1, 10000) <= 2000 then
-            package:Add(frontAward[key]["gems"][math.random(1, gemsNum)], 1, isFree, false, 67)
+            package:Add(frontAward[key]["gems"][math.random(1, gemsNum)], 1, isFree, false, 69)
         end
         if otherNum > 0 and math.random(1, 10000) <= 10000 then
-            package:Add(frontAward[key]["other"][math.random(1, otherNum)], 1, isFree, false, 67)
+            package:Add(frontAward[key]["other"][math.random(1, otherNum)], 1, isFree, false, 69)
         end
     end
     for _, id in pairs(frontAward[key]["huiji"]) do
-        package:Add(id, 1, true, false, 67)
+        package:Add(id, 1, true, false, 69)
     end
     player:AddExp(frontAward[key]["exp"])
     --类似抽奖功能
     local rnd = math.random(1, 4)
     if rnd == 1 and zhenqiNum > 0 then
-        package:Add(frontAward[key]["zhenqi"][math.random(1, zhenqiNum)], 1, isFree, false, 67)
+        package:Add(frontAward[key]["zhenqi"][math.random(1, zhenqiNum)], 1, isFree, false, 69)
     elseif rnd == 2 and cittaNum > 0 then
-        package:Add(frontAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 67)
+        package:Add(frontAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 69)
     elseif rnd == 3 and trumpNum > 0 then
-        package:Add(frontAward[key]["trump"][math.random(1, trumpNum)], 1, isFree, false, 67)
+        package:Add(frontAward[key]["trump"][math.random(1, trumpNum)], 1, isFree, false, 69)
     elseif rnd == 4 and gemsNum > 0 then
-        package:Add(frontAward[key]["gems"][math.random(1, gemsNum)], 1, isFree, false, 67)
+        package:Add(frontAward[key]["gems"][math.random(1, gemsNum)], 1, isFree, false, 69)
     end
 end
 
@@ -10574,29 +10589,29 @@ function getJiqirenAward_Dungeon(player, diff, isFree)
     local equip3Num = #dungeonAward[key]["equip3"]
     for k = 1, 5 do
         if equip1Num > 0 and math.random(1, 10000) <= 5000 then
-            package:Add(dungeonAward[key]["equip1"][math.random(1, equip1Num)], 1, isFree, false, 67)
+            package:Add(dungeonAward[key]["equip1"][math.random(1, equip1Num)], 1, isFree, false, 69)
         end
         if equip2Num > 0 and math.random(1, 10000) <= 5000 then
-            package:Add(dungeonAward[key]["equip2"][math.random(1, equip2Num)], 1, isFree, false, 67)
+            package:Add(dungeonAward[key]["equip2"][math.random(1, equip2Num)], 1, isFree, false, 69)
         end
     end
     for k = 1, 2 do
         if equip3Num > 0 and math.random(1, 10000) <= 5000 then
-            package:Add(dungeonAward[key]["equip3"][math.random(1, equip3Num)], 1, isFree, false, 67)
+            package:Add(dungeonAward[key]["equip3"][math.random(1, equip3Num)], 1, isFree, false, 69)
         end
     end
     local cittaNum = #dungeonAward[key]["citta"]
     local otherNum = #dungeonAward[key]["other"]
     for k = 1, 2 do
         if cittaNum > 0 and math.random(1, 10000) <= 3000 then
-            package:Add(dungeonAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 67)
+            package:Add(dungeonAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 69)
         end
         if otherNum > 0 and math.random(1, 10000) <= 10000 then
-            package:Add(dungeonAward[key]["other"][math.random(1, otherNum)], 1, isFree, false, 67)
+            package:Add(dungeonAward[key]["other"][math.random(1, otherNum)], 1, isFree, false, 69)
         end
     end
     for _, id in pairs(dungeonAward[key]["huiji"]) do
-        package:Add(id, 1, true, false, 67)
+        package:Add(id, 1, true, false, 69)
     end
 
     local key1 = key .. "_" .. diff
@@ -10605,7 +10620,7 @@ function getJiqirenAward_Dungeon(player, diff, isFree)
         specailNum = #dungeonAward_diff[key1]["special"]
         if specailNum > 0 then
             for k = 1, math.random(2, 5) do
-                package:Add(dungeonAward_diff[key1]["special"][math.random(1, specailNum)], 1, isFree, false, 67)
+                package:Add(dungeonAward_diff[key1]["special"][math.random(1, specailNum)], 1, isFree, false, 69)
             end
         end
         player:AddExp(dungeonAward_diff[key1]["exp"])
@@ -10613,9 +10628,9 @@ function getJiqirenAward_Dungeon(player, diff, isFree)
     --类似抽奖功能
     local rnd = math.random(1, 2)
     if rnd == 1 and cittaNum > 0 then
-        package:Add(dungeonAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 67)
+        package:Add(dungeonAward[key]["citta"][math.random(1, cittaNum)], 1, isFree, false, 69)
     elseif rnd == 2 and specailNum > 0 then
-        package:Add(dungeonAward_diff[key1]["special"][math.random(1, specailNum)], 1, isFree, false, 67)
+        package:Add(dungeonAward_diff[key1]["special"][math.random(1, specailNum)], 1, isFree, false, 69)
     end
 end
 

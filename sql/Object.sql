@@ -2284,6 +2284,26 @@ CREATE TABLE IF NOT EXISTS `player_named` (
     INDEX (`playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `player_petteamcopy`;
+CREATE TABLE IF NOT EXISTS `player_petteamcopy` (
+    `playerId` bigint(20) unsigned NOT NULL,
+    `copyId` tinyint(3) unsigned NOT NULL,
+    `type` tinyint(3) unsigned NOT NULL,
+    `npcGroup1Id` int(10) unsigned NOT NULL DEFAULT '0',
+    `npcGroup2Id` int(10) unsigned NOT NULL DEFAULT '0',
+    `npcGroup3Id` int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`playerId`,`copyId`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `petteamcopylog`;
+CREATE TABLE `petteamcopylog` (
+    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `playerName` varchar(255) NOT NULL,
+    `monsterName` varchar(255) NOT NULL,
+    `items` varchar(512) NOT NULL,
+    PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `modify_mount`;
 CREATE TABLE IF NOT EXISTS `modify_mount` (
     `id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2301,17 +2321,14 @@ CREATE TABLE IF NOT EXISTS `marriage` (
     PRIMARY KEY(`playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `married_log` (
-    `jh_time` int(10) unsigned NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `marry_log` (
     `man_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
     `woman_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
     `prouncement` varchar(255) NOT NULL,
     `lover_item` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `marriage_time` int(10) unsigned NOT NULL DEFAULT '0',
     `replymarriage_time` int(10) unsigned NOT NULL DEFAULT '0',
-    `jy_time` int(10) unsigned NOT NULL DEFAULT '0',
-    `wedding_type` tinyint(3) unsigned NOT NULL DEFAULT  '0',
-    PRIMARY KEY(`jh_time`),
+    `marriage_buyer` tinyint(3) unsigned NOT NULL DEFAULT  '0',
     unique KEY man_woman_playerid(`man_playerid`,`woman_playerid`),
     INDEX (`man_playerid`),
     INDEX (`woman_playerid`)
@@ -2350,7 +2367,6 @@ CREATE TABLE IF NOT EXISTS `married_couple` (
     `man_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
     `woman_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
     `lover_item` tinyint(3) unsigned NOT NULL DEFAULT '0',
-    `both_onlinetime` int(10) unsigned NOT NULL DEFAULT '0',
     `pet_name` varchar(255) NOT NULL,
     `pet_level` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `pet_levelExp` int(10) unsigned NOT NULL DEFAULT '0',

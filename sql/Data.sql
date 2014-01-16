@@ -1053,6 +1053,15 @@ CREATE TABLE `acupragold` (
   PRIMARY KEY (`id`, `lvl`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
+DROP TABLE IF EXISTS `petteamcopy`;
+CREATE TABLE `petteamcopy` (
+  `copyIdx` tinyint(3) unsigned NOT NULL,
+  `type` tinyint(3) unsigned NOT NULL,
+  `npcgroupId` int(10) unsigned NOT NULL,
+  `quality` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`npcgroupId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `ride`;
 CREATE TABLE `ride` (
     `id` tinyint(3) unsigned NOT NULL,
@@ -1071,6 +1080,18 @@ CREATE TABLE `ride_upgrade` (
     `singleCost` int(10) unsigned NOT NULL,
     `lvExp` int(10) unsigned NOT NULL,
     `rate` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    PRIMARY KEY (`level`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+
+DROP TABLE IF EXISTS `coupleinfo`;
+CREATE TABLE `coupleinfo` (
+    `level` tinyint(3) unsigned NOT NULL,
+    `levelExp` int(10) NOT NULL ,
+    `hp` int(10) unsigned NOT NULL,
+    `attak` int(10) unsigned  NOT NULL ,
+    `magic_attak` int(10) unsigned NOT NULL,
+    `df_critical` float(5,2) unsigned NOT NULL,
+    `action` int(10) unsigned NOT NULL,
     PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 

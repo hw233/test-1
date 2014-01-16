@@ -2716,6 +2716,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x24:
         case 0x25:
         case 0x27:
+        case 0x29:
         {
             brd >> op;
             switch(op)
@@ -3077,31 +3078,38 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         }
         break;
         case 0x26:
+        {
+            if(!World::getOldManTime())
+                return ;
+            brd >> op;
+            if(op ==2)
             {
-                if(!World::getOldManTime())
-                    return ;
-                brd >> op;
-                if(op ==2)
+                UInt8 index =0 ;
+                brd >> index ;
+                if(index == 0)
                 {
-                    UInt8 index =0 ;
-                    brd >> index ;
-                    if(index == 0)
+                    UInt32 type = GObject::World::FindTheOldMan(player);
+                    if( type ==0 )
                     {
-                        UInt32 type = GObject::World::FindTheOldMan(player);
-                        if( type ==0 )
-                        {
-                            player->sendMsgCode(0, 1910);
-                            break;
-                        }
-                        GameMsgHdr h(0x355,  player->getThreadId(), player, sizeof(UInt32));
-                        GLOBAL().PushMsg(h, &type);
+                        player->sendMsgCode(0, 1910);
                         break;
                     }
+                    GameMsgHdr h(0x355,  player->getThreadId(), player, sizeof(UInt32));
+                    GLOBAL().PushMsg(h, &type);
+                    break;
                 }
-                hdr.msgHdr.desWorkerID = player->getThreadId();
-                GLOBAL().PushMsg(hdr, (void*)data);
-                break;
             }
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            break;
+        }
+        break;
+        case 0x28:
+        {
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            break;
+        }
         default:
             break;
     }
@@ -3616,9 +3624,9 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
                         flag = 1 ; 
                         player->AddVar(VAR_MARRYBOARD3,1);
                         player->SetVar(VAR_MARRYBOARD4_TIME , now);
-                        UInt32 rand = uRand(10000);
+                        UInt32 rand = uRand(9900)+ 100 ;
                         player->SetVar(VAR_MARRYBOARD3_KEY,rand);
-                        player->AddVar(VAR_MARRYBOARD_LIVELY,10);
+                        player->AddVar(VAR_MARRYBOARD_LIVELY,15);
                         GObject::MarryBoard::instance()._lively += 1;
                         char str[16] = {0};
                         sprintf(str, "F_140102_15");
