@@ -1538,7 +1538,7 @@ namespace GObject
 
         if(!player->GetMarriageInfo()->lovers)
             return 1;
-        //Player * obj_player = globalPlayers[player->GetMarriageInfo()->lovers];
+        Player * obj_player = globalPlayers[player->GetMarriageInfo()->lovers];
         if(!player->GetMarriageInfo()->lovers)
             return 1;
         
