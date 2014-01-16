@@ -27415,9 +27415,9 @@ void Player::addMountAttrExtra(GData::AttrExtra& attr)
 void Player::handleJiqirenAct()
 {
     UInt32 info = GetVar(VAR_JIQIREN_SYBS);
-    int remain = getClanTaskMax() - _playerData.ctFinishCount;
-    int remain1 = getShiMenMax() - _playerData.smFinishCount;
-    int remain2 = getYaMenMax() - _playerData.ymFinishCount;
+    int remain = 5 - _playerData.ctFinishCount;
+    int remain1 = 5 - _playerData.smFinishCount;
+    int remain2 = 5 - _playerData.ymFinishCount;
     if(remain > 0)
         info = SET_BIT_8(info, 0, (GET_BIT_8(info, 0)+remain));
     if(remain1 > 0)
