@@ -720,6 +720,17 @@ struct DBPetSevenSoulUpgrade
 	UInt8 condionvalue;
 };
 
+struct DBCoupleInfo 
+{
+    UInt8 level;
+    UInt32 levelExp;
+    UInt32 hp;
+    UInt32 attak;
+    UInt32 magic_attak;
+    float df_critical;
+    UInt32 action;
+};
+
 }
 
 namespace DB {
@@ -1529,6 +1540,19 @@ SPECIALDEF(4)
 	UInt8, soulid,
     std::string, skillstr,
 	UInt8, condionvalue
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCoupleInfo)
+SPECIALDEF(7)
+    (
+	UInt8, level,
+    UInt32, levelExp,
+    UInt32, hp,
+    UInt32, attak,
+    UInt32, magic_attak,
+    float, df_critical,
+    UInt32, action
     )
 SPECIALEND()
 

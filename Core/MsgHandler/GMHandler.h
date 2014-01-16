@@ -238,6 +238,7 @@ private:
     void OnSetMarryStatus(GObject::Player* player, std::vector<std::string>& args);
     void OnHandleServerWar(GObject::Player* player, std::vector<std::string>& args);
     void OnUseItem9440(GObject::Player *player, std::vector<std::string>& args);
+    void OnAddPetAttr(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

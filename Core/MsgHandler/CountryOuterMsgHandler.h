@@ -1425,6 +1425,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         st1  << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
         pl->send(st1);
         gMarriedMgr.ProcessOnlineAward(pl,0);
+        gMarriedMgr.ReturnCouplePet(pl);
     }
     else
     {
