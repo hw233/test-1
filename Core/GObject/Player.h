@@ -267,6 +267,7 @@ namespace GObject
         ZHUTIAN     = 15,   //诸天宝鉴
         TIANYOU     = 16,   //天佑术
         FANTIAN     = 17,   //梵天宝卷
+        JIUXIAO     = 18,   //九霄唤龙枪
 
         DRAGONKING_MAX,
     };

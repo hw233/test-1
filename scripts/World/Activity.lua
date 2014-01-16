@@ -941,6 +941,12 @@ function onActivityCheck(tm)
           setSurnameLegend(false)
       end
 
+      if tm >= actTime557 and tm < actTime557_1 then
+          setHappyFireTime(true)
+      else
+          setHappyFireTime(false)
+      end
+
       if tm >= actTimeRYHB and tm < actTimeRYHB_1 then
           setRYHBActivity(true)
       else
@@ -1333,9 +1339,13 @@ function initActTime(y, m, d)
   local  SerStartTm555= { ['year'] = 2013, ['month'] = 4, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm555_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
  
-    --蜀山传奇掉落活动
-  local  SerStartTm556= { ['year'] = 2013, ['month'] = 11, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm556_1= { ['year'] = 2013, ['month'] = 11, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --蜀山传奇掉落活动
+  local  SerStartTm556= { ['year'] = 2014, ['month'] = 1, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm556_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  --新年大转盘活动
+  local  SerStartTm557= { ['year'] = 2014, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm557_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1779,6 +1789,9 @@ function initActTime(y, m, d)
   
   actTime556 = os.time(SerStartTm556);
   actTime556_1 = os.time(SerStartTm556_1) ;
+
+  actTime557 = os.time(SerStartTm557);
+  actTime557_1 = os.time(SerStartTm557_1) ;
 
   actTimeRYHB = os.time(SerStartTmRYHB);
   actTimeRYHB_1 = os.time(SerStartTmRYHB_1) ;
