@@ -1270,56 +1270,34 @@ namespace GObject
         if (!skillId)
             return;
 
-        UInt16 ssLevel = GData::sevenSoul.getSkillLevel(_soulLevel[soulId - 1]);
-        UInt16 skillLevel = 1;
-#if 0
-        GData::Pet::PinjieData * pjd = GData::pet.getLevTable(_petLev);
-        if(pjd)
-        {
-            UInt16 conflictSkillId = GData::sevenSoul.getAnotherSimilarSkill(skillId);
-            for(UInt8 i = 0; i < INIT_SKILL_UPMAX; ++ i)
-            {
-                UInt8 lev = pjd->skillLev[i];
-                if(_initskl[i] == 0 || lev <= 0 || lev > 9)
-                    continue;
-                if (SKILL_ID(_initskl[i]) == conflictSkillId)
-                {
-                    _initskl[i] = SKILLANDLEVEL(skillId, 1);
-                    petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
-                    break;
-                }
-                if (SKILL_ID(_initskl[i]) == skillId)
-                {
-                    petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
-                    break;
-                }
-            }
-        }
-#else
+        UInt16 ssLevel = GData::sevenSoul.getSkillLevel(_soulLevel[soulId]);
+        if(soulId >= INIT_SKILL_UPMAX)
+            return petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
 
         UInt16 conflictSkillId = GData::sevenSoul.getAnotherSimilarSkill(skillId);
-        UInt8 skillIndex = 0xFF;
-        for(UInt8 i = 0; i < INIT_SKILL_UPMAX; ++ i)
+        UInt8 i;
+        for(i = 0; i < INIT_SKILL_UPMAX; ++ i)
         {
             if (SKILL_ID(_initskl[i]) == conflictSkillId)
             {
                 _initskl[i] = SKILLANDLEVEL(skillId, 1);
-                skillIndex = i;
                 break;
             }
         }
-        if (skillIndex != 0xFF)
+        if(i < INIT_SKILL_UPMAX)
         {
-            GData::Pet::PinjieData * pjd = GData::pet.getLevTable(_petLev);
-            if(pjd) 
-                skillLevel = pjd->skillLev[skillIndex];
-            std::string oldSkill = Itoa(SKILLANDLEVEL(conflictSkillId, 1));
+            GData::Pet::PinjieData* pjd = GData::pet.getLevTable(_petLev);
+            UInt8 sLevel = 0;
+            if(pjd)
+                sLevel = pjd->skillLev[i];
+            if(sLevel == 0) 
+                sLevel = 1;
+            std::string oldSkill = Itoa(SKILLANDLEVEL(conflictSkillId, sLevel));
             delSkills(oldSkill);
-            std::string newSkill = Itoa(SKILLANDLEVEL(skillId, skillLevel));
+            std::string newSkill = Itoa(SKILLANDLEVEL(skillId, sLevel));
             setSkills(newSkill, false);
         }
         petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
-#endif
     }
 
     void FairyPet::deleteSevenSoul()
@@ -1350,5 +1328,31 @@ namespace GObject
         }
         return 1;
     }
+
+    void FairyPet::getSevenSoulFromAnother(FairyPet* pet)
+    {
+        if(!pet || !_owner)
+            return;
+
+        for(UInt8 soulIndex = 1; soulIndex <= 7; soulIndex++)
+        {
+            if( _soulLevel[soulIndex - 1] < pet->_soulLevel[soulIndex - 1])
+            {
+                UInt16 skillId = GData::sevenSoul.getSkillId(_petType, soulIndex, _skillIndex[soulIndex - 1]);
+                if(skillId)
+                {
+                    std::string skills = Itoa(SKILLANDLEVEL(skillId, 1));
+                    delSkills(skills);
+                }
+
+                _soulLevel[soulIndex - 1] = pet->_soulLevel[soulIndex - 1];
+                _skillIndex[soulIndex - 1] = pet->_skillIndex[soulIndex - 1];
+                DB4().PushUpdateData("REPLACE INTO `pet_sevensoul` VALUES(%" I64_FMT "u, %u, %u, %u, %u)", _owner->getId(), getId(), soulIndex, _soulLevel[soulIndex - 1], _skillIndex[soulIndex -1]);
+                loadSkillFromSevenSoul(soulIndex - 1);
+            }
+        }
+        updateToDBPetSkill();
+    }
+
 }
 

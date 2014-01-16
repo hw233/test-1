@@ -95,6 +95,7 @@ enum
     TYPE_PROB_ADD = 47,         //  概率增加
     TYPE_DEF_CHANGE = 48,       //  目标防御变化
     TYPE_HPP_RECOVER = 49,       // HP百分比回复
+    TYPE_EX_HP_ADD_ADD = 50,    // 技能额外治疗效果提升
 
     TYPE_MAX,
 };

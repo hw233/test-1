@@ -61,7 +61,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_petAttackAddCD(0), _petMagAtkAddCD(0), _petAtkReduceCD(0), _petMagAtkReduceCD(0),
     _petExAtk(0), _petExAtkEnable(false), _petExAtkId(0),
     _hpAtkAdd(0), _hpMagAtkAdd(0), _hpAtkAddCount(0),
-    _hpAtkReduce(0), _hpMagAtkReduce(0), _hpAtkReduceCount(0),
+    _hpAtkReduce(0), _hpMagAtkReduce(0), _hpAtkReduceCount(0), _hpRecoverCount(0),
     _bleedMo(0), _bleedMoLast(0), _blind_bleed(0), _blind_present(0), _blind_present_cd(0),
     _blind_cd(0), _blind_bleed_last(0), _summoner(NULL), _unSummonAura(0), 
     _bleedLingYan(0), _bleedLingYanLast(0), _bleedLingYanAuraDec(0), _bleedLingYanAuraDecProb(0),
@@ -109,6 +109,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     {
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[activeSkill[idx]];
+        if(!skillItem.base || !skillItem.base->effect)
+            continue;
         skillItem.cd = 0;
         bool isTherapy = (skillItem.base->effect->hp > 0 || skillItem.base->effect->hpP > 0.001) && skillItem.base->target == GData::e_battle_target_selfside;
         if(isTherapy)
@@ -1974,6 +1976,33 @@ bool BattleFighter::updateHPPAttackReduce(float reduceP, float hpLostp, float ma
         return true;
     }
     return false;
+}
+ 
+UInt32 BattleFighter::updateHPPRecover(float recoverP, float hpLostp, float maxCount)
+{
+    // 回复HP
+    if (maxCount >= 1.0f) // 是否存在触发上限次数
+    {
+        UInt32 count = (UInt32) maxCount;
+        if (count > 0 && _hpRecoverCount >= count) // 是否已经超过触发上限次数
+            return 0;
+    }
+    float rhp = 1.0f;
+    UInt32 lostHP = 0;
+    if (_hp < _maxhp)
+        lostHP = _maxhp - _hp;
+    float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount = (UInt32)(lostP / hpLostp);
+    if (lostCount)
+    {
+        rhp = ((float)_maxhp) * recoverP;
+        if (_hp + rhp >= _maxhp)
+            rhp = _maxhp - _hp;
+        regenHP(rhp);
+        ++_hpRecoverCount;
+        return static_cast<UInt32>(rhp);
+    }
+    return 0;
 }
  
 
