@@ -1320,9 +1320,11 @@ namespace GObject
             return 1;
         for(UInt8 i = 0; i < INIT_SKILL_UPMAX; ++ i)
         {
-            if(SKILL_ID(_initskl[i] == skillId))
+            if(SKILL_ID(_initskl[i]) == skillId)
             {
                 UInt16 lev = pjd->skillLev[i];
+                if(lev == 0)
+                    lev = 1;
                 return lev;
             }
         }
@@ -1343,6 +1345,7 @@ namespace GObject
                 {
                     std::string skills = Itoa(SKILLANDLEVEL(skillId, 1));
                     delSkills(skills);
+                    petSSErase(skillId);
                 }
 
                 _soulLevel[soulIndex - 1] = pet->_soulLevel[soulIndex - 1];
