@@ -246,6 +246,10 @@ LOCK TABLES `acupragold` WRITE;
 source acupragold
 UNLOCK TABLES;
 
+LOCK TABLES `coupleinfo` WRITE;
+source coupleinfo;
+UNLOCK TABLES;
+
 LOCK TABLES `petteamcopy` WRITE;
 source petteamcopy;
 UNLOCK TABLES;

@@ -5,6 +5,7 @@
 #include "MsgID.h"
 #include "Common/URandom.h"
 #include "Server/SysMsg.h"
+#include "GData/CoupleUpgrade.h"
 
 namespace GObject
 {
@@ -222,7 +223,15 @@ namespace GObject
                 tmp = SET_BIT(tmp,i);
                 man_player->SetVar(VAR_COUPLE_ONLINE_AWARD,tmp);      
                 man_player->SetVar(VAR_COUPLE_ONLINE_START_TIME,now);
-                ChangPetAttr(player,static_cast<ECoupleAward>(i+1));
+                ChangPetAttr(man_player,woman_player,static_cast<ECoupleAward>(i+1));
+                if(i == 0)
+                    player->udpLog("fuqijiayuan", "F_140116_4", "", "", "", "", "act");
+                   else if(i == 1)
+                        player->udpLog("fuqijiayuan", "F_140116_4", "", "", "", "", "act");
+                            else if(i == 2)
+                                player->udpLog("fuqijiayuan", "F_140116_4", "", "", "", "", "act");
+                                    else if(i == 3)
+                                        player->udpLog("fuqijiayuan", "F_140116_4", "", "", "", "", "act");
             }
         }
             
@@ -264,6 +273,7 @@ namespace GObject
 
         ReturnCouplePet(man_player);
         ReturnCouplePet(woman_player);
+        player->udpLog("fuqijiayuan", "F_140116_4", "", "", "", "", "act");
     }
 
     void MarriedMgr::ModifyeLove(Player* player,UInt8 eLove)
@@ -296,9 +306,15 @@ namespace GObject
         UInt16 old_consumeNum = 0; 
         UInt16 new_consumeNum = 0; 
         if(eLove == 2)
+        {
             new_consumeNum = YUPEI;
+            player->udpLog("fuqijiayuan", "F_140116_5", "", "", "", "", "act");
+        }
         else
+        {
             new_consumeNum = JINZAN;
+            player->udpLog("fuqijiayuan", "F_140116_6", "", "", "", "", "act");
+        }
         
         if(man_player->GetMarriageInfo()->eLove == LOVE_TONGXINJIE)
             old_consumeNum = TONGXINJIE;
@@ -361,7 +377,7 @@ namespace GObject
             case 1://礼券
                consumeNum = 10; 
                break;
-            case 2://银币
+            case 2://仙石
                consumeNum = 10;
                break;
             default:
@@ -384,48 +400,51 @@ namespace GObject
                 case 0:
                     if(rand <= 5) 
                     {
-                        ChangPetAttr(player,AWARD_JINJINFISH);
+                        ChangPetAttr(man_player,woman_player,AWARD_JINJINFISH);
                         jinjin_num++;
                     }
                     else if(rand <= 20)
                      {
-                         ChangPetAttr(player,AWARD_QIXINGFISH);
+                         ChangPetAttr(man_player,woman_player,AWARD_QIXINGFISH);
                          qixing_num++;
                      }
                         else 
                         {
-                            ChangPetAttr(player,AWARD_WHITEFISH);
+                            ChangPetAttr(man_player,woman_player,AWARD_WHITEFISH);
                             white_num++;
                         }
+                    player->udpLog("fuqijiayuan", "F_140116_1", "", "", "", "", "act");
                     break;
                 case 1:
                     if(rand <= 15)
                     {
-                        ChangPetAttr(player,AWARD_JINJINFISH);
+                        ChangPetAttr(man_player,woman_player,AWARD_JINJINFISH);
                         jinjin_num++;
                     }
                     else if(rand <= 90)
                     {
-                        ChangPetAttr(player,AWARD_QIXINGFISH);
+                        ChangPetAttr(man_player,woman_player,AWARD_QIXINGFISH);
                         qixing_num++;
                     }
                         else
                         {
-                            ChangPetAttr(player,AWARD_WHITEFISH);
+                            ChangPetAttr(man_player,woman_player,AWARD_WHITEFISH);
                             white_num++;
                         }
+                    player->udpLog("fuqijiayuan", "F_140116_2", "", "", "", "", "act");
                     break;
                 case 2:
                     if(rand <= 80)
                     {
-                        ChangPetAttr(player,AWARD_JINJINFISH);
+                        ChangPetAttr(man_player,woman_player,AWARD_JINJINFISH);
                         jinjin_num++;
                     }
                     else 
                     {
-                        ChangPetAttr(player,AWARD_QIXINGFISH);
+                        ChangPetAttr(man_player,woman_player,AWARD_QIXINGFISH);
                         qixing_num++;
                     }
+                    player->udpLog("fuqijiayuan", "F_140116_3", "", "", "", "", "act");
                     break;
                 default:
                     return 1;
@@ -496,83 +515,105 @@ namespace GObject
         return 0;
     }
    
-    void MarriedMgr::ChangPetAttr(Player* player,ECoupleAward eAward)
+    void MarriedMgr::ChangPetAttr(Player* man_player,Player* woman_player,ECoupleAward eAward)
     {
-        CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        CoupleList::iterator it = m_couple.find(man_player->GetMarriageInfo()->yuyueTime);
         if(it == m_couple.end())
             return;
-
+        
         switch(eAward)
         {
             case AWARD_WHITEFISH:
                 it->second->levelExp += 1;
-                if(it->second->levelExp >= 49)
-                {
-                    if(it->second->levelExp < 62)
-                        it->second->level = 2;
-                    if(it->second->levelExp >= 62 && it->second->levelExp <= 77)
-                        it->second->level = 3;
-                    if(it->second->levelExp > 77 && it->second->levelExp < 96)
-                        it->second->level = 4;
-                }
-                SYSMSG_SENDV(918, player);
-                SYSMSG_SENDV(921, player);
-                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,player->GetMarriageInfo()->yuyueTime);
+                rebuildCouplePet(man_player);
+                gMarryMgr.SetDirty(man_player,woman_player);
+                
+                SYSMSG_SENDV(918, man_player);
+                SYSMSG_SENDV(921, man_player);
+                SYSMSG_SENDV(918, woman_player);
+                SYSMSG_SENDV(921, woman_player);
+                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,man_player->GetMarriageInfo()->yuyueTime);
                 break;
             case AWARD_QIXINGFISH:
                 it->second->levelExp += 2;
-                if(it->second->levelExp >= 49)
-                {
-                    if(it->second->levelExp < 62)
-                        it->second->level = 2;
-                    if(it->second->levelExp >= 62 && it->second->levelExp <= 77)
-                        it->second->level = 3;
-                    if(it->second->levelExp > 77 && it->second->levelExp < 96)
-                        it->second->level = 4;
-                }
-                SYSMSG_SENDV(919, player);
-                SYSMSG_SENDV(922, player);
-                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,player->GetMarriageInfo()->yuyueTime);
+                rebuildCouplePet(man_player);
+                gMarryMgr.SetDirty(man_player,woman_player);
+
+                SYSMSG_SENDV(919, man_player);
+                SYSMSG_SENDV(922, man_player);
+                SYSMSG_SENDV(919, woman_player);
+                SYSMSG_SENDV(922, woman_player);
+                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,man_player->GetMarriageInfo()->yuyueTime);
                 break;
             case AWARD_JINJINFISH:
                 it->second->levelExp += 3;
-                if(it->second->levelExp >= 49)
-                {
-                    if(it->second->levelExp < 62)
-                        it->second->level = 2;
-                    if(it->second->levelExp >= 62 && it->second->levelExp <= 77)
-                        it->second->level = 3;
-                    if(it->second->levelExp > 77 && it->second->levelExp < 96)
-                        it->second->level = 4;
-                }               
-                SYSMSG_SENDV(920, player);
-                SYSMSG_SENDV(923, player);
-                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,player->GetMarriageInfo()->yuyueTime);
+                rebuildCouplePet(man_player);
+                gMarryMgr.SetDirty(man_player,woman_player);
+                               
+                SYSMSG_SENDV(920, man_player);
+                SYSMSG_SENDV(923, man_player);
+                SYSMSG_SENDV(920, woman_player);
+                SYSMSG_SENDV(923, woman_player);
+                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,man_player->GetMarriageInfo()->yuyueTime);
                 break;
             case AWARD_MEMEORY:
                 it->second->levelExp += 4;
-                if(it->second->levelExp >= 49)
-                {
-                    if(it->second->levelExp < 62)
-                        it->second->level = 2;
-                    if(it->second->levelExp >= 62 && it->second->levelExp <= 77)
-                        it->second->level = 3;
-                    if(it->second->levelExp > 77 && it->second->levelExp < 96)
-                        it->second->level = 4;
-                }
-                SYSMSG_SENDV(919, player);
-                SYSMSG_SENDV(922, player);
-                SYSMSG_SENDV(919, player);
-                SYSMSG_SENDV(922, player);
-                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,player->GetMarriageInfo()->yuyueTime);
+                rebuildCouplePet(man_player);
+                gMarryMgr.SetDirty(man_player,woman_player);
+                
+                SYSMSG_SENDV(919, man_player);
+                SYSMSG_SENDV(922, man_player);
+                SYSMSG_SENDV(919, man_player);
+                SYSMSG_SENDV(922, man_player);
+                SYSMSG_SENDV(919, woman_player);
+                SYSMSG_SENDV(922, woman_player);
+                SYSMSG_SENDV(919, woman_player);
+                SYSMSG_SENDV(922, woman_player);
+                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,man_player->GetMarriageInfo()->yuyueTime);
                /* it->second->friendliness += 5;
-                SYSMSG_SENDV(925, player);
-                SYSMSG_SENDV(924, player);
-                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_friendliness` = %u WHERE `jh_time` = %u", it->second->friendliness, player->GetMarriageInfo()->yuyueTime);*/
+                SYSMSG_SENDV(925, man_player);
+                SYSMSG_SENDV(924, man_player);
+                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_friendliness` = %u WHERE `jh_time` = %u", it->second->friendliness, man_player->GetMarriageInfo()->yuyueTime);*/
                 break;
             default:
                 break;
         }
+
+        return;
+    }
+    
+    void MarriedMgr::rebuildCouplePet(Player* player)
+    {
+        CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        if(it == m_couple.end())
+            return;
+        while((GData::cu).getUpgradeData(it->second->level)->levelUpExp <= it->second->levelExp)
+            it->second->level += 1; 
+
+        return;
+    }
+
+    void MarriedMgr::addCouplePetAttr(Player* player,GData::AttrExtra& ae)
+    {
+        CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        if(it == m_couple.end())
+            return;
+                
+        GData::CoupleUpgradeData* cud = (GData::cu).getUpgradeData(it->second->level);
+                
+        UInt32 friendliness = it->second->friendliness;
+        if(friendliness < 250)
+            return; 
+        if(friendliness >= 250 ) 
+            ae.hp += cud->hp;
+        if(friendliness >= 375 )
+            ae.attack += cud->attak;
+        if(friendliness >= 625 )
+            ae.magatk += cud->magic_attak;
+        if(friendliness >= 1000)
+            ae.criticaldmgimmune += cud->df_critical; 
+        if(friendliness >= 1500)
+            ae.action += cud->action; 
 
         return;
     }
@@ -588,6 +629,42 @@ namespace GObject
     void MarriedMgr::InsertCoupleInfo(UInt32 time,CoupleInfo* ci)
     {
         m_couple.insert(std::make_pair(time,ci));
+        return;
+    }
+
+    void MarriedMgr::AddPetAttr(Player* player,UInt8 type,UInt16 num)
+    {
+        CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        if(it == m_couple.end())
+            return;
+        if(type == 0)
+            it->second->levelExp += num;
+        if(type == 1)
+            it->second->friendliness += num;
+
+        return;
+    }
+
+    void MarriedMgr::AppendPetData(Player* player,Stream& st)
+    {
+        CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        if(it == m_couple.end())
+            return;
+        if(it->second->petName == "")
+            it->second->petName = "玉兔";
+        st << it->second->petName << it->second->eLove << it->second->level << it->second->levelExp << it->second->friendliness; 
+
+        return;
+    }
+
+    void MarriedMgr::eraseCoupleList(Player* player)
+    {
+        Mutex::ScopedLock lk(_mutex);
+        
+        CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+        if(it == m_couple.end())
+            return;
+        m_couple.erase(it);  
         return;
     }
 

@@ -57,6 +57,7 @@
 #include "Version.h"
 #include "GObject/FairySpar.h"
 #include "GObject/Marry.h"
+#include "GObject/Married.h"
 #include "GObject/ArenaServerWar.h"
 GMHandler gmHandler;
 
@@ -305,6 +306,7 @@ GMHandler::GMHandler()
     Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
     Reg(2, "use9440", &GMHandler::OnUseItem9440);
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
+    Reg(3, "addpetattr", &GMHandler::OnAddPetAttr);
 
     _printMsgPlayer = NULL;
 }
@@ -5018,4 +5020,13 @@ void GMHandler::OnCreateMarryBoard(GObject::Player *player, std::vector<std::str
     }
     else 
         GObject::MarryBoard::instance().resetData();
+}
+
+void GMHandler::OnAddPetAttr(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() != 2)
+        return ;
+    UInt8 type = atoll(args[0].c_str());
+    UInt16 num = atoll(args[1].c_str());
+    gMarriedMgr.AddPetAttr(player,type,num);     
 }
