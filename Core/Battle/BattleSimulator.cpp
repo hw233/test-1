@@ -235,6 +235,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillStrengthenTable[GData::TYPE_APPEND_SELF_ATTACK] = &BattleSimulator::doSkillStrengthen_SelfAttack;
         skillStrengthenTable[GData::TYPE_DMG_DEEP] = &BattleSimulator::doSkillStrengthen_DmgDeep;
         skillStrengthenTable[GData::TYPE_NINGSHI] = &BattleSimulator::doSkillStrengthen_NingShi;
+        skillStrengthenTable[GData::TYPE_HPP_RECOVER] = &BattleSimulator::doSkillStrengthen_HPPRecover;
     }
     {
         for(int i = 0; i < GData::e_eft_max; ++ i)
@@ -7797,13 +7798,12 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
         }
 
         if (!passiveSkill || !passiveSkill->effect)
-            passiveSkill = bf->getPassiveSkillOnHPChange100(idx);
+            passiveSkill = bf->getPassiveSkillOnHPChange(idx);
         if (passiveSkill && passiveSkill->effect)
         {
             int target_side, target_pos, cnt;
             getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
             doSkillEffectExtraAttack(bf, target_side, target_pos, passiveSkill);
-            /*
             GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
             if(ss)
             {
@@ -7811,17 +7811,16 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
 
                 // HP减少伤害增加
                 ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_ATKADD);
-                if (ef && bf->updateHPPAttackAdd(ef->value, ef->valueExt1, ef->valueExt2))
+                if (ef && bf->updateHPPAttackAdd(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
                         appendDefStatus(e_skill, passiveSkill->getId(), bf);
 
                 ef = NULL;
                 // HP减少减伤增加
                 ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_DAMAG_REDUCE);
-                if (ef && bf->updateHPPAttackReduce(ef->value, ef->valueExt1, ef->valueExt2))
+                if (ef && bf->updateHPPAttackReduce(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
                         appendDefStatus(e_skill, passiveSkill->getId(), bf);
 
             }
-            */
         }
     }
 }
@@ -12673,6 +12672,21 @@ bool BattleSimulator::doSkillStrengthen_NingShi(BattleFighter* bf, const GData::
 
     bf2->setDmgNingShi(bf, ef->last, ef->value / 100 * getBFAttack(bf));
     appendDefStatus(e_dmgNingShi, 0, bf2);
+
+    return true;
+}
+
+bool BattleSimulator::doSkillStrengthen_HPPRecover(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active)
+{
+    if(!bf || !skill || !ef)
+        return false;
+
+    UInt32 hpr = bf->regenHP(bf->getMaxHP() * ef->value / 100);
+    if(hpr > 0)
+    {
+        appendDefStatus(e_damHpAdd, hpr, bf);
+        onHPChanged(bf);
+    }
 
     return true;
 }
