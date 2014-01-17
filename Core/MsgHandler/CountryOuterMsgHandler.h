@@ -1425,14 +1425,13 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         Stream st1(REP::MARRIEDMGR);
         st1  << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
         pl->send(st1);
-        return;
+        gMarriedMgr.ProcessOnlineAward(pl,0);
     }
     else
     {
         Stream st1(REP::MARRIEDMGR);
         st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0)<< Stream::eos;
         pl->send(st1);
-        return;
     }
 }
 
@@ -7776,26 +7775,32 @@ void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
     
     UInt8 req = 0;
     brd >> req;
-    /*
+    std::string str_tmp = ""; 
+    UInt8 eLove = 1;
+    UInt8 consumeType= 0;
+    UInt8 fish_count = 0;
     switch(req)
     {
         case 2:
             gMarriedMgr.ReturnFirstStatus(player);
             break;
         case 3:
-            
+            gMarriedMgr.GetOnlineAward(player); 
             break;
         case 4:
-
+            gMarriedMgr.ReturnCouplePet(player);
             break;
         case 5:
-
+            brd >> str_tmp; 
+            gMarriedMgr.ModifyPetName(player,str_tmp);
             break;
         case 6:
-
+            brd >> eLove;
+            gMarriedMgr.ModifyeLove(player,eLove);
             break;
         case 7:
-
+            brd >> consumeType >> fish_count; 
+            gMarriedMgr.Fishing(player,consumeType,fish_count);
             break;
         case 8:
 
@@ -7803,7 +7808,7 @@ void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
         default:
 
             break;
-    }*/
+    }
 
 
 }

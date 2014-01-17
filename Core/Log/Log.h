@@ -144,9 +144,13 @@ enum PurchaseType
     MarryYanHua                 = 1006, //结婚送烟花
     MarryBaiHe                  = 1007, //结婚送百合花
     DINGQINGXINWU               = 1008, //定情信物
-    OutBuyFund                  = 1009, //购买基金消费
-    RefreshMonster              = 1010, //宠物组队副本刷怪
-    CreateRoom                  = 1011, //宠物组队副本创建房间
+    COUPLEFISH                  = 1009, //夫妻钓鱼
+    PETRENAME                   = 1010, //夫妻宠物改名
+    MODIFYPET                   = 1011, //夫妻更改信物
+    COUPLECOPY                  = 1012, //夫妻副本
+    OutBuyFund                  = 1013, //购买基金消费
+    RefreshMonster              = 1015, //宠物组队副本刷怪
+    CreateRoom                  = 1016, //宠物组队副本创建房间
     //繁体私有占150～200
 };
 
@@ -292,6 +296,7 @@ enum ItemFrom
     FromServerWarJijian = 65, //仙界传奇祭剑宝箱
     FromQTAward = 66, //QT奖励
     FromBuyFundAward = 67, //购买基金奖励
+    FromMicroCloudAward = 68, //微云合作奖励
     //80 ~ 100，繁体占用
 };
 

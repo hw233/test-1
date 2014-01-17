@@ -3623,9 +3623,9 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
                         flag = 1 ; 
                         player->AddVar(VAR_MARRYBOARD3,1);
                         player->SetVar(VAR_MARRYBOARD4_TIME , now);
-                        UInt32 rand = uRand(10000);
+                        UInt32 rand = uRand(9900)+ 100 ;
                         player->SetVar(VAR_MARRYBOARD3_KEY,rand);
-                        player->AddVar(VAR_MARRYBOARD_LIVELY,10);
+                        player->AddVar(VAR_MARRYBOARD_LIVELY,15);
                         GObject::MarryBoard::instance()._lively += 1;
                         char str[16] = {0};
                         sprintf(str, "F_140102_15");

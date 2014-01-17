@@ -154,6 +154,7 @@ bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
 bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
+bool World::_speedTime = false;
 bool World::_happyFire = false;
 bool World::_11time = false;
 bool World::_ggtime = false;
@@ -3432,9 +3433,9 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{509,30},{515,30},{503,60},{134,30},{9022,50}},
-        {{509,25},{515,25},{503,50},{134,25},{9022,30}},
-        {{509,20},{515,20},{503,40},{134,20},{9022,20}},
+        {{509,30},{515,30},{9438,60},{134,30},{9075,50}},
+        {{509,25},{515,25},{9438,50},{134,25},{9075,40}},
+        {{509,20},{515,20},{9438,40},{134,20},{9075,30}},
     };
    // static MailPackage::MailItem card = {9922,1};
     SYSMSG(title, 4950);
@@ -3527,7 +3528,7 @@ void World::Send11ClanRankAward()
         if(pos > 7 )
         {
             UInt32 ClanGrade = clan->getGradeInAirBook();
-            if(ClanGrade < 24000)
+            if(ClanGrade < 25000)
                 break;
             else 
                 type = 5;

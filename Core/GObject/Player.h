@@ -2527,6 +2527,7 @@ namespace GObject
         void getQQXiuAward(UInt8 opt);                                                                                       
         void getHappyValueAward(UInt8 val);
         void sendHappyValueInfo();
+        void getMicroCloudAward(UInt8 opt);
 
         void getMarryBoard3Award(UInt8 type);
 
@@ -2574,7 +2575,7 @@ namespace GObject
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
         inline const std::string& getAtoHICfg() const { return m_hicfg; }
     public:
-        UInt8 getMaxIcCount(UInt8 vipLevel);
+        UInt8 getMaxIcCount(UInt8 vipLevel ,UInt8 flag = 0);
     private:
         std::string m_hicfg;
 

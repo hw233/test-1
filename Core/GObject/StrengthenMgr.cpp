@@ -463,15 +463,9 @@ void StrengthenMgr::Send11GradeInfo(UInt8 type)
     {
         UInt8 maxFlag = GameAction()->GetGradeCheckFlag(idx,type);
         UInt8 curnum = _item.flag[idx];
-        if(idx != 12 && curnum > maxFlag)
+        if( curnum > maxFlag)
             curnum = maxFlag;
-        if(idx == 12)
-        {
-            curnum = curnum < 5?0:1;
-            st << idx << curnum <<maxFlag;
-        }
-        else
-            st << idx << curnum << maxFlag;
+        st << idx << curnum << maxFlag;
     }
     st << Stream::eos;
     _owner->send(st);
