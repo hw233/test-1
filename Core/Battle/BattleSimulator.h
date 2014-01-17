@@ -481,6 +481,7 @@ private:
     typedef bool (Battle::BattleSimulator::*doSkillStrengthenFunc)(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
     bool doSkillStrengthen_NingShi(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
+    bool doSkillStrengthen_DefChange(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
     bool doSkillStrengthen_HPPRecover(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
     bool doSkillStrengthen_DmgDeep(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
     bool doSkillStrengthen_SelfAttack(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
