@@ -1242,7 +1242,7 @@ void World::World_Midnight_Check( World * world )
 
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
     UInt32 nextday = curtime + 30;
-
+    //充值奖励结束判断
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 1)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 2)
@@ -1263,6 +1263,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)

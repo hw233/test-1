@@ -9615,6 +9615,7 @@ end
 
 function sendAccRechargeAwards(player, awards)
     local c = player:GetVar(174)
+    print("~")
     if awards[c] == nil then
         return
     end
@@ -9936,7 +9937,7 @@ function onAccRecharge_2014_01_18(player)
         [1] = {0xA000,100,1},
         [3] = {514,5,1, 501,3,1, 5025,1,1},
         [5] = {9371,5,1, 5085,1,1, 0xA000,150,1},
-        [7] = {515,2,1, 5126,1,1},
+        [7] = {515,2,1, 5026,1,1},
     }
     sendAccRechargeAwards(player, awards)
 end
@@ -9976,7 +9977,6 @@ function onRecharge(player, r)
             local t = { ['year'] = 2014, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
             local s = os.time(t)
             local n = os.time() + 11
-
             if n >= s and n < (s + 7*86400) then
                 onAccRecharge_2014_01_18(player)
             end
