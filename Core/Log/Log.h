@@ -144,7 +144,14 @@ enum PurchaseType
     MarryYanHua                 = 1006, //结婚送烟花
     MarryBaiHe                  = 1007, //结婚送百合花
     DINGQINGXINWU               = 1008, //定情信物
-    SevenSoulUpgrade            = 1010, //七魄升级
+    COUPLEFISH                  = 1009, //夫妻钓鱼
+    PETRENAME                   = 1010, //夫妻宠物改名
+    MODIFYPET                   = 1011, //夫妻更改信物
+    COUPLECOPY                  = 1012, //夫妻副本
+    OutBuyFund                  = 1013, //购买基金消费
+    RefreshMonster              = 1015, //宠物组队副本刷怪
+    CreateRoom                  = 1016, //宠物组队副本创建房间
+    SevenSoulUpgrade            = 1017 //七魄升级
     //繁体私有占150～200
 };
 
@@ -171,7 +178,8 @@ enum IncomingType
     ShouHunFromYouli            = 146, //游历获得兽魂
     LongHunFromTeamArena        = 147, //仙界至尊龙魂获得
     LongHunFromServerWar        = 148, //仙界传奇龙魂获得
-    XianpoFromUseItem         = 149, //使用物品仙魄丹
+    InBuyFund                   = 149, //购买基金获得
+    XianpoFromUseItem           = 150, //使用物品仙魄丹
 };
 
 enum MoneyType
@@ -289,6 +297,8 @@ enum ItemFrom
     FromQiShiBan = 64, //七石斗法
     FromServerWarJijian = 65, //仙界传奇祭剑宝箱
     FromQTAward = 66, //QT奖励
+    FromBuyFundAward = 67, //购买基金奖励
+    FromMicroCloudAward = 68, //微云合作奖励
     //80 ~ 100，繁体占用
 };
 

@@ -235,6 +235,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillStrengthenTable[GData::TYPE_APPEND_SELF_ATTACK] = &BattleSimulator::doSkillStrengthen_SelfAttack;
         skillStrengthenTable[GData::TYPE_DMG_DEEP] = &BattleSimulator::doSkillStrengthen_DmgDeep;
         skillStrengthenTable[GData::TYPE_NINGSHI] = &BattleSimulator::doSkillStrengthen_NingShi;
+        skillStrengthenTable[GData::TYPE_HPP_RECOVER] = &BattleSimulator::doSkillStrengthen_HPPRecover;
     }
     {
         for(int i = 0; i < GData::e_eft_max; ++ i)
@@ -3763,7 +3764,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
         }
         //仙宠、十字攻击，两次伤害则混乱（先选取主目标横排攻击，再选取剩下的主目标纵排攻击）(火龙地狱)
-        else if(SKILL_ID(skill->getId()) == 53 || SKILL_ID(skill->getId()) == 70)
+        else if(SKILL_ID(skill->getId()) == 53 || SKILL_ID(skill->getId()) == 70 || SKILL_ID(skill->getId()) == 77|| SKILL_ID(skill->getId()) == 631 )
         {
             AtkList atklist;
             getAtkList(bf, skill, atklist);
@@ -3821,7 +3822,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
         }
         //仙宠、两次单体攻击，两次伤害则眩晕 (天崩地裂)
-        else if(SKILL_ID(skill->getId()) == 48 || SKILL_ID(skill->getId()) == 67)
+        else if(SKILL_ID(skill->getId()) == 48 || SKILL_ID(skill->getId()) == 67 || SKILL_ID(skill->getId()) == 92 || SKILL_ID(skill->getId()) == 640)
         {
             UInt32 dmg1 = 0;
             UInt32 dmg2 = 0;
@@ -5229,18 +5230,14 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
             {
                 int target_side, target_pos, cnt;
                 getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-                UInt32 res = doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
-                if(rcnt == 0 && res != 0)
-                    rcnt = 1;
+                rcnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
             }
 
             if(NULL != (passiveSkill = bf->getPassiveSkillEnter()))
             {
                 int target_side, target_pos, cnt;
                 getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-                UInt32 res = doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
-                if(rcnt == 0 && res != 0)
-                    rcnt = 1;
+                rcnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
             }
         }
 
@@ -5263,8 +5260,9 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
     //if(rcnt != 0)
     appendMaxReiatsu();
     appendToPacket(0, -1, -1, 0, 0, false, false);
+    ++ rcnt;
 
-    return 1;
+    return rcnt;
 }
 
 UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt)
@@ -7797,13 +7795,12 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
         }
 
         if (!passiveSkill || !passiveSkill->effect)
-            passiveSkill = bf->getPassiveSkillOnHPChange100(idx);
+            passiveSkill = bf->getPassiveSkillOnHPChange(idx);
         if (passiveSkill && passiveSkill->effect)
         {
             int target_side, target_pos, cnt;
             getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
             doSkillEffectExtraAttack(bf, target_side, target_pos, passiveSkill);
-            /*
             GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
             if(ss)
             {
@@ -7811,17 +7808,16 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
 
                 // HP减少伤害增加
                 ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_ATKADD);
-                if (ef && bf->updateHPPAttackAdd(ef->value, ef->valueExt1, ef->valueExt2))
+                if (ef && bf->updateHPPAttackAdd(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
                         appendDefStatus(e_skill, passiveSkill->getId(), bf);
 
                 ef = NULL;
                 // HP减少减伤增加
                 ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_DAMAG_REDUCE);
-                if (ef && bf->updateHPPAttackReduce(ef->value, ef->valueExt1, ef->valueExt2))
+                if (ef && bf->updateHPPAttackReduce(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
                         appendDefStatus(e_skill, passiveSkill->getId(), bf);
 
             }
-            */
         }
     }
 }
@@ -12464,7 +12460,8 @@ bool BattleSimulator::doAttackWithPet(BattleFighter* bf, BattleFighter* pet)
             if(ss)
             {
                 const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_2ND_HAPPEND);
-                pet->set2ndCoAtkSkill(ef->value, pskill);
+                if (ef)
+                    pet->set2ndCoAtkSkill(ef->value, pskill);
             }
         }
 
@@ -12673,6 +12670,21 @@ bool BattleSimulator::doSkillStrengthen_NingShi(BattleFighter* bf, const GData::
 
     bf2->setDmgNingShi(bf, ef->last, ef->value / 100 * getBFAttack(bf));
     appendDefStatus(e_dmgNingShi, 0, bf2);
+
+    return true;
+}
+
+bool BattleSimulator::doSkillStrengthen_HPPRecover(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active)
+{
+    if(!bf || !skill || !ef)
+        return false;
+
+    UInt32 hpr = bf->regenHP(bf->getMaxHP() * ef->value / 100);
+    if(hpr > 0)
+    {
+        appendDefStatus(e_damHpAdd, hpr, bf);
+        onHPChanged(bf);
+    }
 
     return true;
 }

@@ -54,6 +54,7 @@ UInt32 SevenSoul::getNeedSoulNum(UInt8 level)
         return 0xFFFFFFFF;
 }
 
+/** 技能符文等级 **/
 UInt8 SevenSoul::getSkillLevel(UInt8 level)
 {
     if(level == 0 || level > SEVEN_SOUL_LEVEL_MAX)
@@ -82,6 +83,29 @@ UInt32 SevenSoul::getConditonValue(UInt8 soulId)
         return _condtionValue[soulId - 1];
     else
         return 0xFFFFFFFF;
+}
+
+UInt16 SevenSoul::getAnotherSimilarSkill(UInt16 skillId)
+{
+    UInt32 indexMax = (PET_TYPE_MAX - 1) * SOUL_ID_MAX + SOUL_ID_MAX - 1;
+    UInt8 index;
+    for(index = 0; index < indexMax; index++)
+    {
+        if(_skillId[index][0] == skillId)
+            break;
+    }
+    if(index < indexMax)
+        return _skillId[index][1];
+
+    for(index = 0; index < indexMax; index++)
+    {
+        if(_skillId[index][1] == skillId)
+            break;
+    }
+    if(index < indexMax)
+        return _skillId[index][0];
+
+    return 0;
 }
 
 }

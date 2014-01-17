@@ -94,6 +94,7 @@ enum
     TYPE_LINGYAN = 46,         // 灵焱 (宠物造成的流血和每回合概率减灵气)
     TYPE_PROB_ADD = 47,         //  概率增加
     TYPE_DEF_CHANGE = 48,       //  目标防御变化
+    TYPE_HPP_RECOVER = 49,       // HP百分比回复
 
     TYPE_MAX,
 };

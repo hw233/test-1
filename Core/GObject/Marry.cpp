@@ -1258,16 +1258,21 @@ namespace GObject
 
         DB7().PushUpdateData("REPLACE INTO `married_log` VALUES(%u,%" I64_FMT "u,%" I64_FMT "u, '%s',%u,%u,%u,%u,%u )", jh_time,playerid,obj_playerid, str_pronouncement.c_str(),static_cast<UInt8>(player->GetMarriageInfo()->eLove),marriage_time,replymarriage_time,player->GetMarriageInfo()->jieyuanTime,wedding_type);
         
-        DB4().PushUpdateData("REPLACE INTO `married_couple` VALUES(%u,%" I64_FMT "u,%" I64_FMT "u,%u,%u,'%s',%u,%u,%u )", jh_time,playerid,obj_playerid, static_cast<UInt8>(player->GetMarriageInfo()->eLove),0,"",0,0,0);
+        DB4().PushUpdateData("REPLACE INTO `married_couple` VALUES(%u,%" I64_FMT "u,%" I64_FMT "u,%u,'%s',%u,%u,%u )", jh_time,playerid,obj_playerid, static_cast<UInt8>(player->GetMarriageInfo()->eLove),"",1,0,0);
+        
+        obj_player->SetVar(VAR_MARRY_STATUS,5);
+        player->SetVar(VAR_MARRY_STATUS,5); 
 
         std::string str_tmp = "";
         CoupleInfo* ci = new CoupleInfo();
         ci->eLove = player->GetMarriageInfo()->eLove;
+        ci->level = static_cast<UInt8>(1);
         gMarriedMgr.InsertCoupleInfo(jh_time,ci);
+        if(player->isOnline())
+            gMarriedMgr.ProcessOnlineAward(player,0);
+        if(obj_player->isOnline()) 
+            gMarriedMgr.ProcessOnlineAward(obj_player,0);
 
-        obj_player->SetVar(VAR_MARRY_STATUS,5);
-        player->SetVar(VAR_MARRY_STATUS,5); 
-   
         SetDirty(player,obj_player); 
         
         //通知结婚养成
@@ -1528,10 +1533,10 @@ namespace GObject
             player->sendMsgCode(0, 6002);
             return 1;
         }
-/*        if(!player->getMainFighter()->getSex())//男的
+        if(!player->getMainFighter()->getSex())//男的
             FinishMarry(player->getId(),obj_player->getId());
         else
-            FinishMarry(obj_player->getId(),player->getId());*/
+            FinishMarry(obj_player->getId(),player->getId());
 
         return 0;
     }
@@ -1966,7 +1971,7 @@ namespace GObject
     {
         if(player)
         {
-            if(player->GetMarriageInfo()->marriageTime != 0)
+            if(player->GetMarriageInfo()->pronouncement != "")
             {
                 Stream st(REP::MARRYMGR);
                 st << static_cast<UInt8>(0x11) << player->GetMarriageInfo()->marriageTime + 86400 * 2 - TimeUtil::Now() << Stream::eos;
@@ -1978,10 +1983,10 @@ namespace GObject
         }
         if(obj_player)
         {
-            if(obj_player->GetMarriageInfo()->marriageTime != 0)
+            if(obj_player->GetMarriageInfo()->pronouncement != "")
             {
                 Stream st(REP::MARRYMGR);
-                st << static_cast<UInt8>(0x11) << player->GetMarriageInfo()->marriageTime + 86400 * 2 - TimeUtil::Now() << Stream::eos;
+                st << static_cast<UInt8>(0x11) << obj_player->GetMarriageInfo()->marriageTime + 86400 * 2 - TimeUtil::Now() << Stream::eos;
                 if(player)
                     player->send(st);
                 if(obj_player)

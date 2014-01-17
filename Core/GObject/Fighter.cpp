@@ -3603,7 +3603,7 @@ bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync, bool offskill )
         return false;
 
     if (offskill)
-        offSkill(skill);
+        offSkill(skill, writedb);
 
     std::vector<UInt16>::iterator it = _skills.begin();
     std::advance(it, idx);
@@ -7203,6 +7203,30 @@ float Fighter::getAcupointsGoldAttr(UInt8 attrId)
     else 
         return pap->attrValue/100;
 }
+
+void Fighter::petSSAdd(UInt16 id)
+{
+    UInt16 sid = SKILL_ID(id);
+    UInt16 slv = SKILL_LEVEL(id);
+
+    SStrengthen s;
+    s.father = 0;
+    s.maxVal = 0;
+    s.curVal = 0;
+    s.lvl = slv;
+    s.maxLvl = 0;
+
+    m_ss[sid] = s;
+}
+
+void Fighter::petSSErase(UInt16 sid)
+{
+    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
+    if (i == m_ss.end())
+        return;
+    m_ss.erase(sid);
+}
+
 /*
  *end分别计算散仙的战斗力
 */
