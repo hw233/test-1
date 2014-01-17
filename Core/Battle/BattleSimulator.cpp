@@ -10753,6 +10753,13 @@ void BattleSimulator::doSkillEffectExtra_SelfAttack(BattleFighter* bf, int targe
     BattleObject * bo = getObject(target_side, target_pos);
     if (!bo->isChar())
         return;
+
+    float ssfactor = 0.0f;
+    ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
+    float factor = 1 + ssfactor;
+
+    atkadd = atkadd * factor;
+
     BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
     //if (bf2->getClass() == e_cls_dao || bf2->getClass() == e_cls_mo)
     {
@@ -12450,28 +12457,27 @@ bool BattleSimulator::doAttackWithPet(BattleFighter* bf, BattleFighter* pet)
 
         const GData::SkillBase* pskill = pet->getPassiveSkillOnAtkDmg();
         if(!pskill)
-        {
             pskill = pet->get2ndCoAtkSkill();
-            if(!pskill)
-                return false;
-            else
-                pet->set2ndCoAtkSkill(0, NULL);
-        }
-        else
-        {
-            GData::SkillStrengthenBase* ss = pet->getSkillStrengthen(SKILL_ID(pskill->getId()));
-            if(ss)
-            {
-                const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_2ND_HAPPEND);
-                if (ef)
-                    pet->set2ndCoAtkSkill(ef->value, pskill);
-            }
-        }
+        if(!pskill)
+            return false;
 
-        float atk = getBFMagAtk(pet) * pskill->effect->magatkP;
+        float ssfactor = 0.0f;
+        ModifyAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);
+        float factor = 1 + ssfactor;
+
+        float atk = getBFMagAtk(pet) * pskill->effect->magatkP * factor;
         bf->setPetCoAtk(atk);
-
         appendDefStatus(e_skill, pskill->getId(), pet);
+        pet->set2ndCoAtkSkill(0, NULL);
+
+        GData::SkillStrengthenBase* ss = pet->getSkillStrengthen(SKILL_ID(pskill->getId()));
+        if(ss)
+        {
+            const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_2ND_HAPPEND);
+            if (ef)
+                pet->set2ndCoAtkSkill(ef->value, pskill);
+        }
+
     }
     return true;
 }
