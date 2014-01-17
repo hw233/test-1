@@ -57,6 +57,7 @@ public:
     void sendAutoFrontMap(Player* pl);
 
     void addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UInt8 status, UInt8 lootlvl);
+    void handleJiqirenAct(Player * pl);
 private:
     void sendFrontMap(Stream& st, Player* pl, UInt8 id, bool force = false);
 

@@ -153,6 +153,7 @@ bool World::_foolbao = false;
 bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
 bool World::_qqBoardLogin = false;
+bool World::_jiqirenAct = false;
 bool World::_surnamelegend = false;
 bool World::_speedTime = false;
 bool World::_happyFire = false;
@@ -546,6 +547,12 @@ bool enum_midnight(void * ptr, void* next)
         pl->sendLevelAward();
 #endif
 
+    //活动机器人（马上有奖）活动
+    if(World::getJiqirenAct())
+    {
+        GameMsgHdr h(0x23A,  pl->getThreadId(), pl, 0);
+        GLOBAL().PushMsg(h, NULL);
+    }
     /*
     if (nextday >= TimeUtil::MkTime(2013, 2, 9))
     {   //金蛇献瑞 聚福兆祥活动

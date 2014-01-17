@@ -81,6 +81,7 @@ namespace GData
         static bool LoadPetSevenSoulUpgrade();
         static bool LoadRideConfig();
         static bool LoadRideUpgradeConfig();
+        static bool LoadCoupleInfo();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);

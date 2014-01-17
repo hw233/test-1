@@ -1426,6 +1426,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         st1  << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
         pl->send(st1);
         gMarriedMgr.ProcessOnlineAward(pl,0);
+        gMarriedMgr.ReturnCouplePet(pl);
     }
     else
     {
@@ -1986,7 +1987,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
     switch(opt)
     {
         /** 周岁红包送不停 **/
-        case 1:
+        case 0x01:
         {
             if(!player->hasChecked())
                 return;
@@ -2004,7 +2005,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 player->sendYearActInfo();
         }
         break;
-        case 2:
+        case 0x02:
         {
             if(!player->hasChecked())
                 return;
@@ -2024,7 +2025,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 3:
+        case 0x03:
         {
             if(!player->hasChecked())
                 return;
@@ -2038,7 +2039,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 4:
+        case 0x04:
         {
             UInt8 type;
             UInt8 copy_or_front;
@@ -2064,7 +2065,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 player->closeCopyFrontAwardByIndex(copy_or_front, index);
         }
 
-        case 5:
+        case 0x05:
         {
             if(!player->hasChecked())
                 return;
@@ -2076,7 +2077,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 6:
+        case 0x06:
         {
             if(!player->hasChecked())
                 return;
@@ -2094,7 +2095,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 7:
+        case 0x07:
         {
             if(!player->hasChecked())
                 return;
@@ -2106,7 +2107,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 8:
+        case 0x08:
         {
             if(!World::getNewYearGiveGiftAct())
                 return;
@@ -2118,13 +2119,23 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 9:
+        case 0x09:
         {
             UInt8 type;
             if(!World::getNewYearQQGameAct())
                 return;
             br >> type;
             player->getNewYearQQGameAward(type);
+        }
+        break;
+
+        case 0x0A:
+        {
+            UInt8 type;
+            if(!World::getNewYearQzoneContinueAct())
+                return;
+            br >> type;
+            player->getNewYearQzoneContinueAward(type);
         }
         break;
 
@@ -2206,13 +2217,20 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 10:
+        case 0x10:
         {
-            UInt8 type;
-            if(!World::getNewYearQzoneContinueAct())
+            if(!World::getJiqirenAct())
                 return;
+            UInt8 type = 0xFF;
             br >> type;
-            player->getNewYearQzoneContinueAward(type);
+            if(type == 0)
+                player->sendJiqirenInfo();
+            else if(type == 1)
+            {
+                UInt8 idx = 0xFF, count = 0xFF;
+                br >> idx >> count;
+                player->completeJiqirenTask(idx, count);
+            }
         }
         break;
 

@@ -152,6 +152,7 @@ namespace Script
 		lua_tinker::def(_L, "getAutoBattleAct", GObject::World::getAutoBattleAct);
 		lua_tinker::def(_L, "getSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
 		lua_tinker::def(_L, "getFoolBao", GObject::World::getFoolBao);
+		lua_tinker::def(_L, "setHappyFireTime", GObject::World::setHappyFireTime);
 		lua_tinker::def(_L, "getHappyFireTime", GObject::World::getHappyFireTime);
 		lua_tinker::def(_L, "getHalfGold", GObject::World::getHalfGold);
 		lua_tinker::def(_L, "getSurnameLegend", GObject::World::getSurnameLegend);
@@ -1864,10 +1865,25 @@ namespace Script
 		return Call<bool>("TaskFuncExist", taskId);
 	}
 
-
     bool GameActionLua::isSalePriceLimitServer()
     {
         return Call<bool>("isSalePriceLimitServer", cfg.serverNum);
+    }
+
+    void GameActionLua::getJiqirenAward_Copy(Player* player, UInt8 isFree)
+    {
+		assert(player != NULL);
+        Call<void>("getJiqirenAward_Copy", player, isFree);
+    }
+    void GameActionLua::getJiqirenAward_FrontMap(Player* player, UInt8 isFree)
+    {
+		assert(player != NULL);
+        Call<void>("getJiqirenAward_FrontMap", player, isFree);
+    }
+    void GameActionLua::getJiqirenAward_Dungeon(Player* player, UInt8 diff, UInt8 isFree)
+    {
+		assert(player != NULL);
+        Call<void>("getJiqirenAward_Dungeon", player, diff, isFree);
     }
 }
 

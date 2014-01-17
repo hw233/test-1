@@ -294,6 +294,8 @@ void WorldScript::init()
     //def("setStartTick", GObject::ClanCopy::setStartTick);
     def("setQQGameOnlineAwardAct", GObject::World::setQQGameOnlineAwardAct);
     def("setQZoneQQGameAct", GObject::World::setQZoneQQGameAct);
+    def("setJiqirenAct", GObject::World::setJiqirenAct);
+    def("getJiqirenAct", GObject::World::getJiqirenAct);
 }
 
 void WorldScript::postInit()

@@ -7009,28 +7009,6 @@ namespace GObject
 		lc.finalize();
 		return true;
     }
-/*
-    bool GObjectManager::LoadCoupleInfo()
-    {
-        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-		if (execu.get() == NULL || !execu->isConnected()) return false;
-		LoadingCounter lc("Loading coupleinfo:");
-		DBMarriedCouple dbpn;
-		if(execu->Prepare("SELECT `level` ,`levelExp`, `hp`, `attak`, `magic_attak`, `df_critical`, `action` FROM `married_couple` ", dbpn) != DB::DB_OK)
-			return false;
-		lc.reset(1000);
-		while(execu->Next() == DB::DB_OK)
-		{
-			lc.advance();
-			Player * player = globalPlayers[dbpn.man_playerid];
-			Player * obj_player = globalPlayers[dbpn.woman_playerid];
-			if(player == NULL || obj_player == NULL)
-				continue;
-            gMarriedMgr.LoadMarriedCouple(&dbpn); 
-        }
-		lc.finalize();
-		return true;
-    }*/
 
 }
 

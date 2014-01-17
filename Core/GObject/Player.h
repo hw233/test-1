@@ -267,6 +267,7 @@ namespace GObject
         ZHUTIAN     = 15,   //诸天宝鉴
         TIANYOU     = 16,   //天佑术
         FANTIAN     = 17,   //梵天宝卷
+        JIUXIAO     = 18,   //九霄唤龙枪
 
         DRAGONKING_MAX,
     };
@@ -2922,6 +2923,9 @@ namespace GObject
         void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
         bool giveFlower(UInt8 type , UInt32 num = 0);
         void joinAllServerRecharge(UInt32);
+        void handleJiqirenAct();
+        void completeJiqirenTask(UInt8, UInt8);
+        void sendJiqirenInfo();
 	};
 
 

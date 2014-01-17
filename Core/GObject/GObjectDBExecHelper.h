@@ -1484,17 +1484,6 @@ struct DBMarriedCouple
     UInt32 pet_levelExp;
     UInt32 pet_friendliness;
 };
-/*
-struct DBCoupleInfo 
-{
-    UInt8 level;
-    UInt32 levelExp;
-    UInt32 hp;
-    UInt32 attak;
-    UInt32 magic_attak;
-    float df_critical;
-    UInt32 action;
-};*/
 
 struct DBSevenSoul
 {

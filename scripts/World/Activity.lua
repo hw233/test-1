@@ -916,6 +916,12 @@ function onActivityCheck(tm)
          setCFriendAct(false)
       end
 
+      if tm >= actTime257 and tm < actTime257_1 then
+         setJiqirenAct(true)
+      else
+         setJiqirenAct(false)
+      end
+
       if tm >= actTime551 and tm < actTime551_1 then
           setCompassAct(true)
       else
@@ -939,6 +945,12 @@ function onActivityCheck(tm)
           setSurnameLegend(true)
       else
           setSurnameLegend(false)
+      end
+
+      if tm >= actTime557 and tm < actTime557_1 then
+          setHappyFireTime(true)
+      else
+          setHappyFireTime(false)
       end
 
       if tm >= actTimeRYHB and tm < actTimeRYHB_1 then
@@ -1333,9 +1345,13 @@ function initActTime(y, m, d)
   local  SerStartTm555= { ['year'] = 2013, ['month'] = 4, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm555_1= { ['year'] = 2013, ['month'] = 4, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
  
-    --蜀山传奇掉落活动
-  local  SerStartTm556= { ['year'] = 2013, ['month'] = 11, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm556_1= { ['year'] = 2013, ['month'] = 11, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --蜀山传奇掉落活动
+  local  SerStartTm556= { ['year'] = 2014, ['month'] = 1, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm556_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  --新年大转盘活动
+  local  SerStartTm557= { ['year'] = 2014, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm557_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1492,6 +1508,8 @@ function initActTime(y, m, d)
   local  SerStartTm256= { ['year'] = 2013, ['month'] =12, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm256_1= { ['year'] = 2014, ['month'] = 1, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  local  SerStartTm257= { ['year'] = 2014, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm257_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1780,6 +1798,9 @@ function initActTime(y, m, d)
   actTime556 = os.time(SerStartTm556);
   actTime556_1 = os.time(SerStartTm556_1) ;
 
+  actTime557 = os.time(SerStartTm557);
+  actTime557_1 = os.time(SerStartTm557_1) ;
+
   actTimeRYHB = os.time(SerStartTmRYHB);
   actTimeRYHB_1 = os.time(SerStartTmRYHB_1) ;
 
@@ -1942,6 +1963,8 @@ function initActTime(y, m, d)
   actTime256= os.time(SerStartTm256)
   actTime256_1= os.time(SerStartTm256_1);
 
+  actTime257= os.time(SerStartTm257)
+  actTime257_1= os.time(SerStartTm257_1);
 
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);
