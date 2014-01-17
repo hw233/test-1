@@ -1374,6 +1374,7 @@ namespace GObject
                     sendMoneyMail(obj_player,sMoney.price_type,sMoney.price_num,sMoney.useType,sMoney.eParm); 
                     DB7().PushUpdateData("DELETE FROM `reply_marriage` WHERE `woman_playerid` = %" I64_FMT "u", player->getId());
                     DB7().PushUpdateData("DELETE FROM `married_log` WHERE `woman_playerid` = %" I64_FMT "u", player->getId());
+                    DB7().PushUpdateData("DELETE FROM `marry_log` WHERE `man_playerid` = %" I64_FMT "u", obj_player->getId());
                 }
 
                 if(obj_player->GetMarriageInfo()->eWedding != WEDDING_NULL)
