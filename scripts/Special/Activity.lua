@@ -9615,7 +9615,6 @@ end
 
 function sendAccRechargeAwards(player, awards)
     local c = player:GetVar(174)
-    print("~")
     if awards[c] == nil then
         return
     end
