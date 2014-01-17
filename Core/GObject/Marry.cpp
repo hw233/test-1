@@ -1966,7 +1966,7 @@ namespace GObject
         {
             if(it2 == m_yuyueList.end())
                 break;
-            if(TimeUtil::GetYYMMDD(it2->first) < TimeUtil::GetYYMMDD())
+            if(it2->first < TimeUtil::Now())
                 it2++;
             if(TimeUtil::GetYYMMDD(it2->first) == TimeUtil::GetYYMMDD(TimeUtil::Now() + idx * 86400))
             {
