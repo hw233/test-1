@@ -243,6 +243,7 @@ function update_object()
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140101_1.sql     #仙宠组队副本
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140101_2.sql     #仙宠组队副本击杀橙色怪物日志
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140117_1.sql
 }
 
 #sh player_jiguan.sh
