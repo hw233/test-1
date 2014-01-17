@@ -5230,18 +5230,14 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
             {
                 int target_side, target_pos, cnt;
                 getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-                UInt32 res = doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
-                if(rcnt == 0 && res != 0)
-                    rcnt = 1;
+                rcnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
             }
 
             if(NULL != (passiveSkill = bf->getPassiveSkillEnter()))
             {
                 int target_side, target_pos, cnt;
                 getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-                UInt32 res = doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
-                if(rcnt == 0 && res != 0)
-                    rcnt = 1;
+                rcnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
             }
         }
 
@@ -5264,8 +5260,9 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
     //if(rcnt != 0)
     appendMaxReiatsu();
     appendToPacket(0, -1, -1, 0, 0, false, false);
+    ++ rcnt;
 
-    return 1;
+    return rcnt;
 }
 
 UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt)

@@ -53,6 +53,7 @@
 #include "GObject/FrontMap.h"
 #include "GObject/WBossMgr.h"
 #include "GObject/TeamCopy.h"
+#include "GObject/PetTeamCopy.h"
 #include "ActivityMgr.h"
 #include "HoneyFall.h"
 #include "TownDeamon.h"
@@ -74,6 +75,7 @@
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
 #include "GObject/Marry.h"
+#include "GObject/Married.h"
 #include "GData/SevenSoul.h"
 
 namespace GObject
@@ -375,6 +377,19 @@ namespace GObject
             fprintf(stderr, "loadTeamCopy error!\n");
             std::abort();
         }
+        
+        if(!loadPetTeamCopy())
+        {
+            fprintf(stderr, "loadPetTeamCopy error!\n");
+            std::abort();
+        }
+
+        if(!loadPetTeamCopyLog())
+        {
+            fprintf(stderr, "loadPetTeamCopyLog error!\n");
+            std::abort();
+        }
+
 		if(!loadAllClans())
         {
             fprintf(stderr, "loadAllClans error!\n");
@@ -571,6 +586,12 @@ namespace GObject
         if(!LoadMarriedLog())
         {
             fprintf(stderr, "LoadMarriedLog error!\n");
+            std::abort();
+        }
+        
+        if(!LoadMarriedCouple())
+        {
+            fprintf(stderr, "LoadMarriedCouple error!\n");
             std::abort();
         }
 		
@@ -2481,6 +2502,26 @@ namespace GObject
         }
 		lc.finalize();
 
+        lc.prepare("Loading player_petteamcopy:");
+        last_id = 0xFFFFFFFFFFFFFFFFull;
+        DBPetTeamCopyPlayer dbptcp;
+        if(execu->Prepare("SELECT `playerId`, `copyId`, `type`, `npcGroup1Id`, `npcGroup2Id`, `npcGroup3Id` FROM `player_petteamcopy` ORDER BY `playerId`, `copyId`, `type`", dbptcp) != DB::DB_OK)
+            return false;
+        lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[dbptcp.playerId];
+            if(!pl)
+                continue;
+            PetTeamCopyPlayerInfo* ptcpInfo = pl->getPetTeamCopyPlayerInfo();
+            if(!ptcpInfo)
+                continue;
+
+            ptcpInfo->setNpcGroupIdFromDB(dbptcp.copyId, dbptcp.type, dbptcp.npcGroup1Id, dbptcp.npcGroup2Id, dbptcp.npcGroup3Id);
+        }
+		lc.finalize();
+
 		lc.prepare("Loading player pending tasks:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
@@ -3040,6 +3081,8 @@ namespace GObject
 		}
 		lc.finalize();
 
+        gMarryMgr.RepairBug();
+
 		return true;
 	}
 
@@ -3340,6 +3383,43 @@ namespace GObject
 			{
                 teamCopyManager->addTeamCopyNpc(dbtc.id, dbtc.type, dbtc.location, atoi(tk[i].c_str()));
             }
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadPetTeamCopy()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading petteamcopy templates:");
+		GData::DBPetTeamCopy dbptc;
+		if(execu->Prepare("SELECT `copyIdx`, `type`, `npcgroupId`, `quality` FROM `petteamcopy`", dbptc) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            petTeamCopyManager->addPetTeamCopyNpc(dbptc.copyIdx, dbptc.type, dbptc.quality, dbptc.npcgroupId);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadPetTeamCopyLog()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading petteamcopylog");
+		DBPetTeamCopyLog t;
+		if(execu->Prepare("SELECT `playerName`, `monsterName`, `items` FROM `petteamcopylog` ORDER BY `id` DESC LIMIT 10", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            petTeamCopyManager->pushLog(t.playerName, t.monsterName, t.items);
         }
         lc.finalize();
         return true;
@@ -6862,8 +6942,10 @@ namespace GObject
 			lc.advance();
 			Player * player = globalPlayers[dbpn.man_playerid];
 			Player * obj_player = globalPlayers[dbpn.woman_playerid];
-			if(player == NULL)
+			if(player == NULL || obj_player == NULL)
 				continue;
+            if(!dbpn.jh_time && dbpn.wedding_type != 0)
+                dbpn.jh_time = 1;
             gMarryMgr.LoadReplyMarriage(player,obj_player,&dbpn); 
         }
 		lc.finalize();
@@ -6884,12 +6966,57 @@ namespace GObject
 			lc.advance();
 			Player * player = globalPlayers[dbpn.man_playerid];
 			Player * obj_player = globalPlayers[dbpn.woman_playerid];
-			if(player == NULL)
+			if(player == NULL || obj_player == NULL)
 				continue;
             gMarryMgr.LoadMarriedLog(player,obj_player,&dbpn); 
         }
 		lc.finalize();
 		return true;
 	}
+
+    bool GObjectManager::LoadMarriedCouple()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading married_couple:");
+		DBMarriedCouple dbpn;
+		if(execu->Prepare("SELECT `jh_time` ,`man_playerid`, `woman_playerid`, `lover_item`, `pet_name`, `pet_level`, `pet_levelExp`, `pet_friendliness` FROM `married_couple` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * player = globalPlayers[dbpn.man_playerid];
+			Player * obj_player = globalPlayers[dbpn.woman_playerid];
+			if(player == NULL || obj_player == NULL)
+				continue;
+            gMarriedMgr.LoadMarriedCouple(&dbpn); 
+        }
+		lc.finalize();
+		return true;
+    }
+/*
+    bool GObjectManager::LoadCoupleInfo()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading coupleinfo:");
+		DBMarriedCouple dbpn;
+		if(execu->Prepare("SELECT `level` ,`levelExp`, `hp`, `attak`, `magic_attak`, `df_critical`, `action` FROM `married_couple` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * player = globalPlayers[dbpn.man_playerid];
+			Player * obj_player = globalPlayers[dbpn.woman_playerid];
+			if(player == NULL || obj_player == NULL)
+				continue;
+            gMarriedMgr.LoadMarriedCouple(&dbpn); 
+        }
+		lc.finalize();
+		return true;
+    }*/
+
 }
 

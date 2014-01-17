@@ -142,8 +142,8 @@ local grade11 = {
     [11] = {{ 14,3},{ 17,5},{ 10,5},{ 6,1},{ 20,6},{12,1}},
     ]]--
     [1] = {{10,7},{17,5},{4,4},{5,2},{14,3},{19,1}}, --ok
-    [2] = {{13,10},{17,5},{ 10,5},{20,6},{40,1},{16,3} }, --ok
-    [3] = {{17,5},{20,6},{4,6},{ 18,1 },{0,1},{6,1} },  --ok
+    [2] = {{13,10},{17,7},{ 10,5},{20,6},{40,1},{16,3} }, --ok
+    [3] = {{17,5},{20,6},{4,4},{ 18,1 },{0,5},{6,1} },  --ok
     [4] = {{14,3},{10,5},{5,2},{17,5},{37,1},{19,1}},
     [5] = {{17,5},{14,3},{18,1},{10,5},{4,4},{13,10}},
 ---华丽的分割线
@@ -166,7 +166,7 @@ function GetSthCheckFlag(idx)
 end
 function GetGradeCheckFlag(idx,day)
     --local num = get11TimeNum();
-    if day > 11 then 
+    if day > 5 then 
         return 0
     end
     local max = grade11[day];   --lb
@@ -372,14 +372,8 @@ function do11Grade(player, id, param1, param2)
     local curflag = mgr:GetFlag(id);
     for i = 1, #dayTask do
         if id == dayTask[i][1]  then
-            if id == 0 or id == 12 then
-                if curflag ~=4 then 
-                    return ;
-                end
-            else
-                if curflag >= dayTask[i][2] then
-                    return ;
-                end
+            if curflag >= dayTask[i][2] then
+                return ;
             end
             player:Add11grade(10);
             break

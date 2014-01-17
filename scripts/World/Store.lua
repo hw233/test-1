@@ -115,6 +115,10 @@ function loadStore()
 
         discount(store)
 
+    if getQixi() then
+        store:add(2,9450,10)
+    end
+
     if getSnowAct(300) then
         store:add(2, 9275, 10)
     end
@@ -134,7 +138,7 @@ function loadStore()
         --store:add(2 ,9397, 20)
         --store:add(2 ,9401, 20)
         --store:add(2 ,9422, 20)
-        store:add(2 ,9437, 20)
+        store:add(2 ,9449, 20)
     end
     if getHappyFireTime(300) then
         store:add(2, 9440, 10)
@@ -180,14 +184,6 @@ function loadStore()
         end
         store:add(2 ,9442 ,100)
         
-        --if getSurnameLegend(30) then
-            --store:add(2 ,9383 , 20)
-            --store:add(2 ,9397, 20)
-            --store:add(2 ,9401, 20)
-            --store:add(2 ,9422, 20)
-            --store:add(2 ,9437, 20)
-        --end
-
         if is2013_0201_0228() then
             store:add(2, 1711, 599) --爆竹
             store:add(2, 1712, 599) --莲花灯
@@ -289,10 +285,6 @@ function loadStore()
 
         if is0808_0814() then
             store:add(2,9120,400)
-        end
-
-        if getQixi() then
-            store:add(2,9122,10)
         end
 
         if getWansheng() then
