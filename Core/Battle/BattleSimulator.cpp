@@ -1610,7 +1610,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     }
                 }
                 if (ss)
-                    ef = ss->getEffect(GData::ON_DAMAGE, GData::TYPE_LINGYAN);
+                    ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_LINGYAN);
                 if (ef)
                 {
                     appendDefStatus(e_lingYan, 0, area_target);
@@ -10021,6 +10021,17 @@ void BattleSimulator::ModifyTherapy_SkillStrengthen(BattleFighter* bf, const GDa
         std::cout << "ModifyTherapy_SkillStrengthen factor(2) = " << fvalue << "." << std::endl << std::endl;
 #endif
     }
+    ef = ss->getEffect(GData::ON_THERAPY, GData::TYPE_EX_HP_ADD_ADD);
+    if (ef)
+    {
+        if(isAdd)
+            fvalue += ef->value / 100;
+        else
+            fvalue -= ef->valueExt1 / 100;  // 减掉的值取这个
+#ifdef _BATTLE_DEBUG
+        std::cout << "ModifyTherapy_SkillStrengthen factor(3) = " << fvalue << "." << std::endl << std::endl;
+#endif
+    }
 #ifdef _BATTLE_DEBUG
         std::cout << "ModifyTherapy_SkillStrengthen factor(final) = " << fvalue << "." << std::endl << std::endl;
 #endif
@@ -10267,7 +10278,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         UInt8& lingYanLast = bf->getBleedLingYanLast();
         if (lingYanLast != 0)
         {
-            UInt32 dmg = static_cast<UInt32>(bf->getBleedLingYan()) * 0.01;
+            UInt32 dmg = static_cast<UInt32>(bf->getBleedLingYan());
             calcBleedTypeCnt(bf);
             -- lingYanLast;
             if(lingYanLast == 0)

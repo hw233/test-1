@@ -331,8 +331,8 @@ private:
         e_dmgNingShi = 109,    // 凝视
         e_unDmgNingShi = 110,    // 解除凝视
 
-        e_lingYan = 121,            // 灵焱效果
-        e_unLingYan = 122,          // 灵焱效果消失
+        e_lingYan = e_selfBleed,            // 灵焱效果
+        e_unLingYan = e_unSelfBleed,          // 灵焱效果消失
 
         e_MAX_STATE,
     };
