@@ -1345,7 +1345,7 @@ function initActTime(y, m, d)
   local  SerStartTm201= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 七夕
-  local  SerStartTm202= { ['year'] = 2013, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm202= { ['year'] = 2014, ['month'] = 2, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --商城消费大酬宾(9/18-9/24)
   local  SerStartTm210= { ['year'] = 2012, ['month'] = 9, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 中秋国庆
@@ -1815,7 +1815,7 @@ function initActTime(y, m, d)
   setLevelAwardEnd(actTime202)
 
   actTime203= os.time(SerStartTm202);
-  actTime204= os.time(SerStartTm202) + 7 * 86400;
+  actTime204= os.time(SerStartTm202) + 5 * 86400;
 
   actTime205= os.time(SerStartTm205);
   actTime206= os.time(SerStartTm206);

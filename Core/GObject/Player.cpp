@@ -1404,11 +1404,11 @@ namespace GObject
             char buf[1024] = {0};
             char* pbuf = &buf[0];
             if (cfg.isTestPlatform())
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|1|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s||%u|||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|1|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), IsMale() ? 1 : 2, GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
             else
-                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s|||||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
+                pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%" I64_FMT "u|%s||%u|||%u||%u|%u|%u|%u|%u|%u|%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId(), IsMale() ? 1 : 2, GetLev(), _playerData.gold, _playerData.coupon, _playerData.tael, getVipLevel(), _clan? _clan->getId() : 0, getXinYue(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -24224,7 +24224,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+            //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9449, 1, true, false, FromNpc);
         }
         else
         {
@@ -24234,7 +24235,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+                //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9449, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
@@ -26747,7 +26749,7 @@ void Player::GetFindOldManAward(UInt32 type)
         num =2;
         SYSMSG_BROADCASTV(574, getCountry(), getPName(), type );
     }
-    GetPackage()->AddItem(9439, num, true, false);   //欢乐礼包(9439)
+    GetPackage()->AddItem(9451, num, true, false);   //欢乐礼包(9439) 其他活动要修改
     AddVar(VAR_OLDMAN_DAYSCORE,num*10);
     AddVar(VAR_OLDMAN_SCORE,num*10);
     SYSMSG_SENDV(2024,this,num*10);
@@ -26774,7 +26776,7 @@ void Player::getInterestingAward(UInt8 type)
     {
         ScoreAward = GetVar(VAR_OLDMAN_SCORE_AWARD);
         Score = GetVar(VAR_OLDMAN_SCORE);
-        if( Score < type * 100 || ScoreAward &(1 << (type-1)))
+        if( Score < static_cast<UInt32>(type * 100 + (type-1)*50) || ScoreAward &(1 << (type-1)))  //修改累计欢乐值
             return ;
     }
     if(!GameAction()->RunInterestingAward(this, type))
@@ -26801,7 +26803,7 @@ void Player::sendInterestingBag(Player* pl)
         sendMsgCode(0, 2218);
         return ;
     }
-    ItemBase* item = GetPackage()->GetItem(9439, true);					
+    ItemBase* item = GetPackage()->GetItem(9451, true);					
     if(item ==NULL)
         return ;
     UInt16 count = item->Count();
@@ -26812,7 +26814,7 @@ void Player::sendInterestingBag(Player* pl)
         return;
     }
     GetPackage()->DelItem2(item, 1);
-    GetPackage()->AddItemHistoriesLog(9439, 1);
+    GetPackage()->AddItemHistoriesLog(9451, 1);
     UInt64 id = getId();
     GameMsgHdr hdr(0x356, pl->getThreadId(),pl,sizeof(id) );
     GLOBAL().PushMsg(hdr, &id);
@@ -26833,7 +26835,7 @@ void Player::getInteresingBag(UInt64 pid)
         Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
         {
-            MailPackage::MailItem mitem[] = {{56, 1},{57,1},{500,1},{9371,1},{511,1},{505,1},{503,1}};
+            MailPackage::MailItem mitem[] = {{56, 1},{15,1},{500,1},{9371,1},{511,1},{505,1},{503,1}};
             UInt32 chance[] = {2500,5000,7000,8000,9000,9500,10000};
             UInt32 rand = uRand(10000);
             UInt8 k =0;
@@ -26966,21 +26968,20 @@ void Player::getHappyValueAward(UInt8 val)
 {
     if (!World::getHappyFireTime())
         return;
-    UInt32 score[]={20,40,60,80,100};
+    UInt32 score[]={20,40,60,80,100,300};
     UInt32 value = GetVar(VAR_YEARHAPPY_DAYVALUE);
-    if(val<1||val>5)
-        return ;
+    if(val < 1 || val > sizeof(score)/sizeof(score[0]))
+        return;
     if(value < score[val-1])
-        return ;
+        return;
     UInt32 ctslandingAward = GetVar(VAR_YEARHAPPY_DAYVALUE_AWARD);
     if(ctslandingAward & (1<<(val-1)))
-        return ;
-    if(!GameAction()->RunHappyValueAward(this, val))
-    {
         return;
+    if(GameAction()->RunHappyValueAward(this, val))
+    {
+        ctslandingAward |= (1<<(val - 1));
+        SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
     }
-    ctslandingAward |= (1<<(val - 1));
-    SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
 }
 
 void Player::joinAllServerRecharge(UInt32 num)

@@ -86,8 +86,8 @@ namespace GObject
         }
         //个人积分奖励 
         {
-            MailPackage::MailItem mitem1[] = {{9371, 2},{1126,2},{500,10},{501,10},{549,1},{509,5},{134,12},{1325,12},{9076,15}};
-            UInt32 Score[] = {100,300,600,600,600,1000,2000,2000,4000};
+            MailPackage::MailItem mitem1[] = {{9371, 2},{1126,2},{134,5},{1325,5},{509,5},{500,20},{501,10},{549,5},{9076,15}};
+            UInt32 Score[] = {100,300,600,600,1000,2000,2000,2000,4000};
             if(lively >=100)
             {
                 SYSMSGV(buf,4184,lively);
@@ -111,20 +111,20 @@ namespace GObject
         }
         //烟花积分奖励
         UInt32 YanHua = marryBoard->_YHlively;
-        if(YanHua / 1000)
+        if(YanHua / 2000)
         {
             std::string str1 ;
             SYSMSG(title1, 4196);
             SYSMSGV(content1,4185,YanHua);
             MailPackage::MailItem mitem3[] = {{1325, 1}};
-            mitem3[0].count = YanHua/1000;
+            mitem3[0].count = YanHua/2000;
             strItems += Itoa(mitem3[0].id);
             strItems += ",";
             strItems += Itoa(mitem3[0].count);
             strItems += "|";
-            if(YanHua/1000 >= 255 )
+            if(YanHua/2000 >= 255 )
             {
-                for(UInt8 i =0 ;i< YanHua/1000/255 ; ++i )
+                for(UInt8 i =0 ;i< YanHua/2000/255 ; ++i )
                 {
                     mitem3[0].count  = 255 ;
                     Mail * mail1 = p->GetMailBox()->newMail(NULL, 0x21, title1, content1, 0xFFFE0000);
@@ -132,9 +132,9 @@ namespace GObject
                         mailPackageManager.push(mail1->id, mitem3, 1, true);
                 }
             }
-            if((YanHua/1000)%255 != 0)
+            if((YanHua/2000)%255 != 0)
             {
-                mitem3[0].count  = (YanHua/1000)%255;
+                mitem3[0].count  = (YanHua/2000)%255;
                 Mail * mail1 = p->GetMailBox()->newMail(NULL, 0x21, title1, content1, 0xFFFE0000);
                 if(mail1)
                     mailPackageManager.push(mail1->id, mitem3, 1, true);
@@ -143,6 +143,7 @@ namespace GObject
 
         //红包奖励
         UInt8 countR = 0;
+        
         for(UInt8 i = 0 ; i < 8 ; i ++ )
         {
             if(marryBoard->_door[i] >= marryBoard->doorMax)
@@ -150,7 +151,7 @@ namespace GObject
                 countR ++ ;
             }
         }
-        if(countR)
+        if(countR && marryBoard->doorMax )
         {
             MailPackage::MailItem mitemR[] ={ {9444, 1},{9445,1},{9446 ,1}};  //红包ID
             MailPackage::MailItem mitem2 = mitemR[marryBoard->_norms-1]; 
@@ -403,10 +404,12 @@ namespace GObject
                 break;
             case 9:  //更新活跃度
                 {
+                    UInt32 baihe = pl->GetVar(VAR_MARRYBOARD_BAIHE);
                     st << static_cast<UInt8>(0x02);
                     st << _lively ; 
                     st << pl->GetVar(VAR_MARRYBOARD_LIVELY);
                     st << _YHlively ; 
+                    st << static_cast<UInt8>( (baihe > 50 ) ? 0:(50-baihe) );
                 }
                 break;
             case 10:
@@ -659,6 +662,7 @@ namespace GObject
         GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
         WORLD().RemoveTimer(_marryBoardTimer);
         _marryBoardTimer = NULL;
+        _YHlively = 0;
         return flag;
     }
 }
