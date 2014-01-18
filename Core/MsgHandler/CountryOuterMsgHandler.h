@@ -7670,7 +7670,7 @@ void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
     
     UInt8 req = 0;
     brd >> req;
-    
+    /*
     switch(req)
     {
         case 2:
@@ -7697,7 +7697,7 @@ void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
         default:
 
             break;
-    }
+    }*/
 
 
 }
