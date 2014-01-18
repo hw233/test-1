@@ -1280,6 +1280,7 @@ namespace GObject
     UInt8 MarryMgr::DivorceMarry(Player* player,UInt8 status)
     {
         Mutex::ScopedLock lk(_mutex); 
+        UInt32 now = TimeUtil::Now();
 		Player * obj_player = globalPlayers[player->GetMarriageInfo()->lovers];
         if(!obj_player) 
         {
@@ -1292,9 +1293,9 @@ namespace GObject
         switch(status)
         {
             case 0:
-                if(player->GetVar(VAR_CANCEL_GIVEUP_JIEYUAN) < TimeUtil::Now())
+                if(player->GetVar(VAR_CANCEL_GIVEUP_JIEYUAN) < now)
                 {
-                    player->SetVar(VAR_CANCEL_GIVEUP_JIEYUAN,TimeUtil::Now() + 86400);
+                    player->SetVar(VAR_CANCEL_GIVEUP_JIEYUAN,now + 86400);
                 }
                 else
                 {
@@ -2013,16 +2014,17 @@ namespace GObject
 
     void MarryMgr::Process()
     {
-        if(GVAR.GetVar(GVAR_MARRY_TIME1) < TimeUtil::Now())
+        UInt32 now = TimeUtil::Now();
+        if(GVAR.GetVar(GVAR_MARRY_TIME1) < now)
             GVAR.SetVar(GVAR_MARRY_TIME1,0);
-        if(GVAR.GetVar(GVAR_MARRY_TIME2) < TimeUtil::Now())
+        if(GVAR.GetVar(GVAR_MARRY_TIME2) < now)
             GVAR.SetVar(GVAR_MARRY_TIME2,0);
 
-        if(GVAR.GetVar(GVAR_MARRY_TIME1) >= TimeUtil::Now() + 86400*2)
+        if(GVAR.GetVar(GVAR_MARRY_TIME1) >= now + 86400*2)
             GVAR.SetVar(GVAR_MARRY_TIME1,0);
-        if(GVAR.GetVar(GVAR_MARRY_TIME2) >= TimeUtil::Now() + 86400*2)
+        if(GVAR.GetVar(GVAR_MARRY_TIME2) >= now + 86400*2)
             GVAR.SetVar(GVAR_MARRY_TIME2,0);
-        //if(GVAR.GetVar(GVAR_MARRY_TIME3) >= TimeUtil::Now() + 86400*3)
+        //if(GVAR.GetVar(GVAR_MARRY_TIME3) >= now + 86400*3)
           //  GVAR.SetVar(GVAR_MARRY_TIME3,0);
 
         GObject::Player * player;
@@ -2037,11 +2039,11 @@ namespace GObject
             {
                 if(i > 2)
                     break;
-                if(it->first < TimeUtil::Now())
+                if(it->first < now)
                     continue;
                 if(it->first == GVAR.GetVar(GVAR_MARRY_TIME1) || it->first == GVAR.GetVar(GVAR_MARRY_TIME2) ) //|| it->first == GVAR.GetVar(GVAR_MARRY_TIME3))
                     continue;
-                if(it->first >= (TimeUtil::Now() + 86400*2))
+                if(it->first >= (now + 86400*2))
                     break;
                 if(GVAR.GetVar(GVAR_MARRY_TIME1) == 0)
                     GVAR.SetVar(GVAR_MARRY_TIME1,it->first);
@@ -2069,7 +2071,7 @@ namespace GObject
             
             while(it != m_yuyueList.end())
             {
-                if(it->first < TimeUtil::Now())
+                if(it->first < now)
                 {
                     if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD())
                         break;  
