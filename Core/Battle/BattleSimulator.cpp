@@ -3764,7 +3764,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
         }
         //仙宠、十字攻击，两次伤害则混乱（先选取主目标横排攻击，再选取剩下的主目标纵排攻击）(火龙地狱)
-        else if(SKILL_ID(skill->getId()) == 53 || SKILL_ID(skill->getId()) == 70)
+        else if(SKILL_ID(skill->getId()) == 53 || SKILL_ID(skill->getId()) == 70 || SKILL_ID(skill->getId()) == 77|| SKILL_ID(skill->getId()) == 631 )
         {
             AtkList atklist;
             getAtkList(bf, skill, atklist);
@@ -3822,7 +3822,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
         }
         //仙宠、两次单体攻击，两次伤害则眩晕 (天崩地裂)
-        else if(SKILL_ID(skill->getId()) == 48 || SKILL_ID(skill->getId()) == 67)
+        else if(SKILL_ID(skill->getId()) == 48 || SKILL_ID(skill->getId()) == 67 || SKILL_ID(skill->getId()) == 92 || SKILL_ID(skill->getId()) == 640)
         {
             UInt32 dmg1 = 0;
             UInt32 dmg2 = 0;
@@ -12463,7 +12463,8 @@ bool BattleSimulator::doAttackWithPet(BattleFighter* bf, BattleFighter* pet)
             if(ss)
             {
                 const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_2ND_HAPPEND);
-                pet->set2ndCoAtkSkill(ef->value, pskill);
+                if (ef)
+                    pet->set2ndCoAtkSkill(ef->value, pskill);
             }
         }
 
