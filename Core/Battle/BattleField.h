@@ -90,6 +90,7 @@ protected:
 protected:
 	BattleObject * _objs[2][25];
     BattleObject * _backupObjs[2];
+    bool  _hpCheckCache[2][25];
 	UInt8 _isBody[2][25];
     UInt8 _reiatsu[2];          // 战场中双方的灵压(这单词是网上搜的，就是灵压的意思)
     UInt8 _toggleReiatsu[2];    // 后备军团上场所需的灵压（仙宠上场）

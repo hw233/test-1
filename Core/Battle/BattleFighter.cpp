@@ -1139,7 +1139,7 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
         if (ss)
             ef = ss->getEffect(GData::ON_GET_SKILL_PROB, GData::TYPE_PROB_ADD);
         if (ef)
-            rate = passiveSkill[idx].rateExtent + ef->value;
+            rate = passiveSkill[idx].rateExtent + ef->value * 100;
 
         if(rnd < rate && passiveSkill[idx].cd == 0)
         {
@@ -1935,6 +1935,9 @@ void BattleFighter::setPuduDebuf(float v, UInt16 last)
 
 bool BattleFighter::updateHPPAttackAdd(float addP, float hpLostp, float maxCount)
 {
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPAttackAdd: " << addP << "," << hpLostp << "," << maxCount << "." << std::endl;
+#endif
     if (maxCount >= 1.0f) // 是否存在触发上限次数
     {
         UInt32 count = (UInt32) maxCount;
@@ -1949,8 +1952,12 @@ bool BattleFighter::updateHPPAttackAdd(float addP, float hpLostp, float maxCount
     UInt32 lostCount = (UInt32)(lostP / hpLostp);
     if (lostCount)
     {
-        _hpAtkAdd = hpLostp * lostCount;
+        _hpMagAtkAdd = _attack * hpLostp * lostCount;
+        _hpAtkAdd = _magatk * hpLostp * lostCount;
         ++_hpAtkAddCount;
+#ifdef _BATTLE_DEBUG
+        std::cout << "updateHPPAttackAdd2: " << _hpAtkAdd << "," << _hpAtkAddCount << "," << lostCount << "." << std::endl << std::endl;
+#endif
         return true;
     }
     return false;
@@ -1958,6 +1965,9 @@ bool BattleFighter::updateHPPAttackAdd(float addP, float hpLostp, float maxCount
 
 bool BattleFighter::updateHPPAttackReduce(float reduceP, float hpLostp, float maxCount)
 {
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPAttackReduce: " << reduceP << "," << hpLostp << "," << maxCount << "." << std::endl;
+#endif
     if (maxCount >= 1.0f) // 是否存在触发上限次数
     {
         UInt32 count = (UInt32) maxCount;
@@ -1971,8 +1981,12 @@ bool BattleFighter::updateHPPAttackReduce(float reduceP, float hpLostp, float ma
     UInt32 lostCount = (UInt32)(lostP / hpLostp);
     if (lostCount)
     {
+        _hpMagAtkReduce = hpLostp * lostCount;
         _hpAtkReduce = hpLostp * lostCount;
         ++_hpAtkReduceCount;
+#ifdef _BATTLE_DEBUG
+        std::cout << "updateHPPAttackReduce2: " << _hpAtkReduce << "," << _hpAtkReduceCount << "," << lostCount << "." << std::endl << std::endl;
+#endif
         return true;
     }
     return false;
@@ -1981,6 +1995,9 @@ bool BattleFighter::updateHPPAttackReduce(float reduceP, float hpLostp, float ma
 UInt32 BattleFighter::updateHPPRecover(float recoverP, float hpLostp, float maxCount)
 {
     // 回复HP
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPRecover: " << recoverP << "," << hpLostp << "," << maxCount << "." << std::endl;
+#endif
     if (maxCount >= 1.0f) // 是否存在触发上限次数
     {
         UInt32 count = (UInt32) maxCount;
@@ -2000,6 +2017,9 @@ UInt32 BattleFighter::updateHPPRecover(float recoverP, float hpLostp, float maxC
             rhp = _maxhp - _hp;
         regenHP(rhp);
         ++_hpRecoverCount;
+#ifdef _BATTLE_DEBUG
+        std::cout << "updateHPPRecover2: " << rhp << "," << _hpRecoverCount << "," << lostCount << "." << std::endl << std::endl;
+#endif
         return static_cast<UInt32>(rhp);
     }
     return 0;

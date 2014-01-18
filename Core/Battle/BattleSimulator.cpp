@@ -6217,6 +6217,50 @@ UInt32 BattleSimulator::doAttack( int pos )
         if (bf->getHP() && !_winner)
         {
             const GData::SkillBase *skill = NULL;
+            size_t idx = 0;
+            while(NULL != (skill = bf->getPassiveSkillAftAction100(idx)))
+            {
+                int cnt = 0;
+                getSkillTarget(bf, skill, otherside, target_pos, cnt);
+                GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+                if(ss)
+                {
+                    const GData::SkillStrengthenEffect* ef = NULL;
+
+                    // HP百分比回复
+                    ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_HPP_RECOVER);
+                    if (ef)
+                    {
+                        UInt32 rhp = static_cast<UInt32>(bf->getMaxHP() * ef->value);
+                        rhp = bf->regenHP(rhp);
+                        if (rhp)
+                        {
+                            appendDefStatus(e_skill, skill->getId(), bf);
+                            appendDefStatus(e_damHpAdd, rhp, bf);
+#ifdef _BATTLE_DEBUG
+                            std::cout << "updateHPPRecoverAftAction: " << ef->value << "," << ef->valueExt1 << "," << ef->valueExt2 << "," << rhp << "." << std::endl;
+#endif
+                        }
+                    }
+
+                }
+                /*
+                std::vector<AttackAct> atkAct;
+                atkAct.clear();
+                if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct))
+                    ++ rcnt;
+
+                size_t actCnt = atkAct.size();
+                for(size_t idx = 0; idx < actCnt; idx++)
+                {
+                    if(atkAct[idx].bf->getHP() == 0)
+                        continue;
+                    if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                        ++ rcnt;
+                }
+                atkAct.clear();
+                */
+            }
             while(NULL != (skill = bf->getPassiveSkillAftAction()))
             {
                 int cnt = 0;
@@ -6227,10 +6271,11 @@ UInt32 BattleSimulator::doAttack( int pos )
                     const GData::SkillStrengthenEffect* ef = NULL;
 
                     // HP百分比回复
-                    ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_HPP_RECOVER);
+                    ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_HPP_RECOVER);
                     if (ef)
                     {
-                        UInt32 rhp = bf->updateHPPRecover(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2);
+                        UInt32 rhp = static_cast<UInt32>(bf->getMaxHP() * ef->value);
+                        rhp = bf->regenHP(rhp);
                         if (rhp)
                         {
                             appendDefStatus(e_skill, skill->getId(), bf);
@@ -7824,6 +7869,11 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
         BattleFighter * bf = static_cast<BattleFighter *>(bo);
         if (!bf->getHP()) // 已经死了，不做处理
             return;
+        UInt8 boSide = bo->getSide();
+        UInt8 boPos = bo->getPos();
+        if (_hpCheckCache[boSide][boPos])
+            return;
+        _hpCheckCache[boSide][boPos] = true;
 
         size_t idx = 0;
         const GData::SkillBase* passiveSkill = NULL;
@@ -7831,55 +7881,55 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
         {
             if(passiveSkill->effect == NULL)
                 continue;
-            break;
-        }
 
-        if (!passiveSkill || !passiveSkill->effect)
-            passiveSkill = bf->getPassiveSkillOnHPChange(idx);
-        if (passiveSkill && passiveSkill->effect)
-        {
-            int target_side, target_pos, cnt;
-            getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-            //doSkillEffectExtraAttack(bf, target_side, target_pos, passiveSkill);
-            GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
-            if(ss)
+            if (!passiveSkill || !passiveSkill->effect)
+                passiveSkill = bf->getPassiveSkillOnHPChange(idx);
+            if (passiveSkill && passiveSkill->effect)
             {
-                const GData::SkillStrengthenEffect* ef = NULL;
-
-                // HP减少伤害增加
-                ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_ATKADD);
-                if (ef && bf->updateHPPAttackAdd(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
+                int target_side, target_pos, cnt;
+                getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
+                //doSkillEffectExtraAttack(bf, target_side, target_pos, passiveSkill);
+                GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+                if(ss)
                 {
-#ifdef _BATTLE_DEBUG
-                    std::cout << "updateHPPAttackAdd: " << ef->value << "," << ef->valueExt1 << "," << ef->valueExt2 << "." << std::endl;
-#endif
-                    appendDefStatus(e_skill, passiveSkill->getId(), bf);
-                }
+                    const GData::SkillStrengthenEffect* ef = NULL;
 
-                ef = NULL;
-                // HP减少减伤增加
-                ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_DAMAG_REDUCE);
-                if (ef && bf->updateHPPAttackReduce(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
-                {
-#ifdef _BATTLE_DEBUG
-                    std::cout << "updateHPPAttackReduce: " << ef->value << "," << ef->valueExt1 << "," << ef->valueExt2 << "." << std::endl;
-#endif
-                    appendDefStatus(e_skill, passiveSkill->getId(), bf);
-                }
+                    // HP减少伤害增加
+                    ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_ATKADD);
+                    if (ef && bf->updateHPPAttackAdd(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
+                    {
+                        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stAtk, bf->getHPAtkAdd(), 0, false);
+                        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stMagAtk, bf->getHPMagAtkAdd(), 0, false);
+                        appendDefStatus(e_skill, passiveSkill->getId(), bf);
+                    }
 
-                ef = NULL;
-                // HP百分比回复
-                ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_HPP_RECOVER);
-                if (ef && bf->updateHPPRecover(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
-                {
-#ifdef _BATTLE_DEBUG
-                    std::cout << "updateHPPRecover: " << ef->value << "," << ef->valueExt1 << "," << ef->valueExt2 << "." << std::endl;
-#endif
-                    appendDefStatus(e_skill, passiveSkill->getId(), bf);
-                }
+                    ef = NULL;
+                    // HP减少减伤增加
+                    ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_DAMAG_REDUCE);
+                    if (ef && bf->updateHPPAttackReduce(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
+                    {
+                        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stAtkReduce, bf->getAtkReduce(), 0, false);
+                        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stMagAtkReduce, bf->getMagAtkReduce(), 0, false);
+                        appendDefStatus(e_skill, passiveSkill->getId(), bf);
+                    }
 
+                    ef = NULL;
+                    // HP百分比回复
+                    ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_HPP_RECOVER);
+                    if (ef)
+                    {
+                        UInt32 hpr = bf->updateHPPRecover(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2);
+                        if (hpr)
+                        {
+                            appendDefStatus(e_skill, passiveSkill->getId(), bf);
+                            appendDefStatus(e_damHpAdd, hpr, bf);
+                        }
+                    }
+
+                }
             }
         }
+        _hpCheckCache[boSide][boPos] = false;
     }
 }
 
@@ -9864,6 +9914,15 @@ void BattleSimulator::ModifyTherapy_SkillStrengthen(BattleFighter* bf, const GDa
     if(!skill)
         return;
 
+#ifndef _THERAPY_DEBUG
+
+#ifdef _BATTLE_DEBUG
+#define _TMP_THERAPY
+#endif // #ifdef _BATTLE_DEBUG
+
+#undef _BATTLE_DEBUG
+#endif // #ifndef _THERAPY_DEBUG
+
 #ifdef _BATTLE_DEBUG
     std::cout << "skillId = " << skill->getId() << ":" << std::endl;
     std::cout << "ModifyTherapy_SkillStrengthen factor = " << fvalue << "." << std::endl;
@@ -9908,6 +9967,12 @@ void BattleSimulator::ModifyTherapy_SkillStrengthen(BattleFighter* bf, const GDa
 #ifdef _BATTLE_DEBUG
         std::cout << "ModifyTherapy_SkillStrengthen factor(final) = " << fvalue << "." << std::endl << std::endl;
 #endif
+
+#ifndef _THERAPY_DEBUG
+#ifdef _TMP_THERAPY
+#define _BATTLE_DEBUG
+#endif //#ifdef _TMP_THERAPY
+#endif //#ifndef _THERAPY_DEBUG
 }
 
 bool BattleSimulator::doSkillStrengthenAttack(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active)
@@ -10826,6 +10891,11 @@ void BattleSimulator::doSkillEffectExtra_HpShield(BattleFighter* bf, int target_
         if(ef)
         {
             factor += ef->value / 100;
+        }
+        ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_DEF_CHANGE);
+        if(ef)
+        {
+            (this->*skillStrengthenTable[ef->type])(bf, skill, ef, target_side, target_pos, false);
         }
     }
     hp *= factor;
@@ -12837,10 +12907,10 @@ bool BattleSimulator::doSkillStrengthen_DefChange(BattleFighter* bf, const GData
         return false;
     BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
 
-    bf2->setDefendChangeSS(ef->value, ef->last);
-    bf2->setMagDefendChangeSS(ef->value, ef->last);
-    setStatusChange(bf2, bf2->getSide(), bf2->getPos(), 1, 0, e_stDef, 0, 0, false);
-    setStatusChange(bf2, bf2->getSide(), bf2->getPos(), 1, 0, e_stMagDef, 0, 0, false);
+    bf2->setDefendChangeSS(bf2->_defend * ef->value/100, ef->last);
+    bf2->setMagDefendChangeSS(bf2->_defend * ef->value, ef->last);
+    setStatusChange(bf2, bf2->getSide(), bf2->getPos(), 1, skill, e_stDef, bf2->getDefendChangeSS(), ef->last, false);
+    setStatusChange(bf2, bf2->getSide(), bf2->getPos(), 1, skill, e_stMagDef, bf2->getMagDefendChangeSS(), ef->last, false);
 
     return true;
 
