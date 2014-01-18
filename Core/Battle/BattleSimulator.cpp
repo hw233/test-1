@@ -1335,6 +1335,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                             ModifyAttackValue_SkillStrengthen(bf, passiveSkill, ssfactor, true);
                             factor += passiveSkill->effect->atkP * (1 + ssfactor);
 
+                            GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
                             const GData::SkillStrengthenEffect* ef = NULL;
                             if(ss)
                                 ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_NINGSHI);
@@ -12512,16 +12513,24 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
     // 宠物概率保护主目标吸收一半伤害
     for(size_t i = 0; i < _onPetProtect.size(); ++ i)
     {
-        const GData::SkillBase* pskill = pet->getPassiveSkillOnPetProtect();
-        if(!pskill)
+        const GData::SkillBase* pskill = pet->get2ndProtectSkill();
+        bool is2nd;
+        if(pskill)
         {
-            pet->get2ndProtectSkill();
-            if(!pskill)
-                return false;
-            else
-                pet->set2ndProtectSkill(0, NULL);
+            is2nd = true;
         }
         else
+        {
+            is2nd = false;
+            pskill = pet->getPassiveSkillOnPetProtect();
+            if(!pskill)
+                return false;
+        }
+        if(!pskill)
+            return false;
+
+        pet->set2ndProtectSkill(0, NULL);
+        if(!is2nd)
         {
             GData::SkillStrengthenBase* ss = pet->getSkillStrengthen(SKILL_ID(pskill->getId()));
             if(ss)
@@ -12555,7 +12564,7 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
         }
 
         float ssfactor = 0.0f;
-        ModifyAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);
+        ModifyAttackValue_SkillStrengthen(bf, pskill, ssfactor, false);
         factor *= ( 1 + ssfactor );
 
         return protectDamage(bf, pet, phyAtk, magAtk, factor, dmgreduce);
