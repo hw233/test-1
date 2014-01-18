@@ -521,6 +521,7 @@ private:
     bool doSkillStrengthen_ShieldHP(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
 
+    void doAllSkillStrengthenEffect(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos);
 
     UInt32 doSkillStrenghtenCriticalPierceDmgB(BattleFighter* bf, const GData::SkillBase* skill, bool cs, bool pr, GData::SkillStrengthenBase*  ss, int target_side, int target_pos);
 

@@ -3062,6 +3062,55 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
     }
 }
 
+void BattleSimulator::doAllSkillStrengthenEffect(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos)
+{
+    if(!bf || !skill)
+        return;
+
+    GData::SkillStrengthenBase*  ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+    const std::vector<const GData::SkillStrengthenEffect*>& efs = ss->effect;
+    const GData::SkillStrengthenEffect* ef = NULL;
+    for(size_t i = 0; i < efs.size(); ++ i)
+    {
+        ef = efs[i];
+        if(ef->target == GData::e_battle_target_self)
+        {
+            doSkillStrengthenAttack(bf, skill, ef, bf->getSide(), bf->getPos(), true);
+        }
+        else if(ef->target == GData::e_battle_target_selfside_atk_2nd) // 攻击力第二高的目标
+        {
+            UInt8 excepts[25] = {0};
+            size_t exceptCnt = 1;
+            excepts[0] = bf->getPos();
+            UInt8 side = bf->getSide();
+            for (int i = 0; i < 25; ++i)
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+                if(!bo)  // 雪人
+                    continue;
+
+                if(bo->getId() == 5679 || bo->isSoulOut())
+                {
+                    excepts[exceptCnt] = i;
+                    ++ exceptCnt;
+                }
+            }
+            BattleFighter* bo = get2ndAtkFighter(bf->getSide(), excepts, exceptCnt);
+            if(bo)
+            {
+                int target_side = bo->getSide();
+                int target_pos = bo->getPos();
+                doSkillStrengthenAttack(bf, skill, ef, target_side, target_pos, true);
+            }
+        }
+        else
+        {
+            doSkillStrengthenAttack(bf, skill, ef, target_side, target_pos, true);
+        }
+    }
+}
+
+
 bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct, UInt32 skillParam, UInt8* launchPeerLess /* = NULL */, bool canProtect /* = false */)
 {
     if(NULL == skill || target_pos < 0 || bf == NULL)
@@ -4338,48 +4387,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
     if(ss && bf->getHP() != 0)
     {
-        const std::vector<const GData::SkillStrengthenEffect*>& efs = ss->effect;
-        const GData::SkillStrengthenEffect* ef = NULL;
-        for(size_t i = 0; i < efs.size(); ++ i)
-        {
-            ef = efs[i];
-            if(ef->target == GData::e_battle_target_self)
-            {
-                doSkillStrengthenAttack(bf, skill, ef, bf->getSide(), bf->getPos(), true);
-            }
-            else if(ef->target == GData::e_battle_target_selfside_atk_2nd) // 攻击力第二高的目标
-            {
-                UInt8 excepts[25] = {0};
-                size_t exceptCnt = 1;
-                excepts[0] = bf->getPos();
-                UInt8 side = bf->getSide();
-                for (int i = 0; i < 25; ++i)
-                {
-                    BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
-                    if(!bo)  // 雪人
-                        continue;
-
-                    if(bo->getId() == 5679 || bo->isSoulOut())
-                    {
-                        excepts[exceptCnt] = i;
-                        ++ exceptCnt;
-                    }
-                }
-                BattleFighter* bo = get2ndAtkFighter(bf->getSide(), excepts, exceptCnt);
-                if(bo)
-                {
-                    int target_side = bo->getSide();
-                    int target_pos = bo->getPos();
-                    doSkillStrengthenAttack(bf, skill, ef, target_side, target_pos, true);
-                }
-            }
-            else
-            {
-                doSkillStrengthenAttack(bf, skill, ef, target_side, target_pos, true);
-            }
-        }
-
-        ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_RANDOM_BLEED);
+        doAllSkillStrengthenEffect(bf, skill, target_side, target_pos);
+        const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_RANDOM_BLEED);
         if(ef) // 有随机流血的符文
         {
             // 找出所有有效目标，然后随机一个
@@ -4408,7 +4417,6 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
         }
         
-
         // 主目标死亡，有符文要返还灵气
         if(bf->getMainTargetDeadFlag())
         {
@@ -5280,6 +5288,7 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
         return rcnt;
     }
 
+    bool useSkillStrengthen = true;
     do {
         appendDefStatus(e_skill, skill->getId(), bf);
 
@@ -5328,6 +5337,7 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
                 if (doSkillAttack(bf, skill, target_side, target_pos, 1))
                 {
                     ++ rcnt;
+                    useSkillStrengthen = false;
                     return rcnt;
                 }
             }
@@ -5342,6 +5352,7 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
                 if (doSkillAttack(bf, skill, target_side, target_pos, 1))
                 {
                     ++ rcnt;
+                    useSkillStrengthen = false;
                     return rcnt;
                 }
             }
@@ -5388,6 +5399,8 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
 
     } while(false);
     doSkillEffectExtraAttack(bf, target_side, target_pos, skill);
+    if(useSkillStrengthen)
+        doAllSkillStrengthenEffect(bf, skill, target_side, target_pos);
 
     return rcnt;
 }
@@ -12670,14 +12683,22 @@ bool BattleSimulator::doAttackWithPet(BattleFighter* bf, BattleFighter* pet)
         if(stun > 0 || confuse > 0 || forget > 0)
             return false;
 
-        const GData::SkillBase* pskill = pet->getPassiveSkillOnAtkDmg();
-        if(!pskill)
-            pskill = pet->get2ndCoAtkSkill();
+        const GData::SkillBase* pskill = pet->get2ndCoAtkSkill();
+        bool is2nd;
+        if(pskill)
+        {
+            is2nd = true;
+        }
+        else
+        {
+            is2nd = false;
+            pskill = pet->getPassiveSkillOnAtkDmg();
+        }
         if(!pskill)
             return false;
 
         float ssfactor = 0.0f;
-        ModifyAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);
+        ModifyAttackValue_SkillStrengthen(pet, pskill, ssfactor, true);
         float factor = 1 + ssfactor;
 
         float atk = getBFMagAtk(pet) * pskill->effect->magatkP * factor;
@@ -12685,14 +12706,16 @@ bool BattleSimulator::doAttackWithPet(BattleFighter* bf, BattleFighter* pet)
         appendDefStatus(e_skill, pskill->getId(), pet);
         pet->set2ndCoAtkSkill(0, NULL);
 
-        GData::SkillStrengthenBase* ss = pet->getSkillStrengthen(SKILL_ID(pskill->getId()));
-        if(ss)
+        if(!is2nd)
         {
-            const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_2ND_HAPPEND);
-            if (ef)
-                pet->set2ndCoAtkSkill(ef->value, pskill);
+            GData::SkillStrengthenBase* ss = pet->getSkillStrengthen(SKILL_ID(pskill->getId()));
+            if(ss)
+            {
+                const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_2ND_HAPPEND);
+                if (ef)
+                    pet->set2ndCoAtkSkill(ef->value, pskill);
+            }
         }
-
     }
     return true;
 }
