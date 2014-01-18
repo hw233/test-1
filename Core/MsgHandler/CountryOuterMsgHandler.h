@@ -7552,13 +7552,13 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                 switch(flag)
                 {
                     case 0:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     case 1:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     case 2:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     default:
                         Stream st(REP::MARRYMGR);

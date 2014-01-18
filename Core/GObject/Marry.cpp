@@ -952,6 +952,7 @@ namespace GObject
     UInt8 MarryMgr::ConfirmReqWeddingAppointMent(Player* player)
     {
         Mutex::ScopedLock lk(_mutex); 
+        UInt32 now = TimeUtil::Now();
         if(player->GetVar(VAR_MARRY_STATUS) != 2)
         {
             player->sendMsgCode(0, 6002);
@@ -1022,7 +1023,7 @@ namespace GObject
         player->udpLog("jiehunqianzhi", "F_140102_11", "", "", "", "", "act");
         sendWhoisMarrybuyer(player,obj_player);//告知客户端谁是婚礼购买者
 
-        Process();
+        Process(now);
         return 0;
     }
     
@@ -1527,10 +1528,10 @@ namespace GObject
             player->sendMsgCode(0, 6002);
             return 1;
         }
-        if(!player->getMainFighter()->getSex())//男的
+/*        if(!player->getMainFighter()->getSex())//男的
             FinishMarry(player->getId(),obj_player->getId());
         else
-            FinishMarry(obj_player->getId(),player->getId());
+            FinishMarry(obj_player->getId(),player->getId());*/
 
         return 0;
     }
@@ -1606,10 +1607,15 @@ namespace GObject
 
         return 0;
     }
-   
-    UInt8 MarryMgr::GetList(Player* player,UInt8 flag,UInt16 idx)
+  
+    UInt8 MarryMgr::DoGetList(Player* player,UInt8 flag,UInt16 idx)
     {
         Mutex::ScopedLock lk(_mutex); 
+        return GetList(player,flag,idx); 
+    }
+
+    UInt8 MarryMgr::GetList(Player* player,UInt8 flag,UInt16 idx)
+    {
         UInt8 len = 3;
         UInt16 count;//总数
         UInt16 num;//页数
@@ -2003,20 +2009,21 @@ namespace GObject
         return;
     }
     
+    void MarryMgr::FuckDoProcess(UInt32 now)
+    {
+        Mutex::ScopedLock lk(_mutex);
+        Process(now);
+    }
 
-    void MarryMgr::DoProcess()
+    void MarryMgr::DoProcess(UInt32 now)
     {
         CheckingListTimeOut(m_maleList);
         CheckingListTimeOut(m_femaleList);
-        { // 限制lock的生命周期
-            Mutex::ScopedLock lk(_mutex);
-            Process();
-        }
+        FuckDoProcess(now);
     }
 
-    void MarryMgr::Process()
+    void MarryMgr::Process(UInt32 now)
     {
-        UInt32 now = TimeUtil::Now();
         if(GVAR.GetVar(GVAR_MARRY_TIME1) < now)
             GVAR.SetVar(GVAR_MARRY_TIME1,0);
         if(GVAR.GetVar(GVAR_MARRY_TIME2) < now)
