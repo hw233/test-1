@@ -32,6 +32,7 @@
 #include "GObject/Leaderboard.h"
 #include "FairySpar.h"
 #include "HoneyFall.h" 
+#include "GObject/Married.h"
 
 namespace GObject
 {
@@ -2048,7 +2049,10 @@ void Fighter::rebuildEquipAttr()
     {
         //结婚加的buffer
         if(_owner->GetVar(GObject::VAR_MARRY_STATUS) == 5 || _owner->GetVar(GObject::VAR_MARRY_STATUS) == 6)
+        {
             GObject::gMarryMgr.addMarriedAttr(_owner,_attrExtraEquip);
+            GObject::gMarriedMgr.addCouplePetAttr(_owner,_attrExtraEquip);
+        }
     }
 	
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
@@ -6210,6 +6214,10 @@ UInt16 Fighter::getPortrait()
             portrait = 1100;
         else if(getFashionTypeId() == 1724)
             portrait = 1101;
+        else if(getFashionTypeId() == 1726)
+            portrait = 1103;
+        else if(getFashionTypeId() == 1727)
+            portrait = 1104;
  
     }
 

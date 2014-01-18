@@ -913,6 +913,40 @@ void PlayerCopy::sendAutoCopy(Player* pl)
     pl->send(st);
 }
 
+void PlayerCopy::handleJiqirenAct(Player * pl)
+{
+    if(!pl) return;
+    int copy = pl->GetVar(VAR_JIQIREN_COPY);
+    int goldCnt = getGoldCount(pl->getVipLevel()) - PLAYER_DATA(pl, copyGoldCnt);
+    int freeCnt = getFreeCount() - PLAYER_DATA(pl, copyFreeCnt);
+    UInt8 fcnt = GET_BIT_8(copy, 0);
+    UInt8 gcnt1 = GET_BIT_8(copy, 1);
+    UInt8 gcnt2 = GET_BIT_8(copy, 2);
+    UInt8 gcnt3 = GET_BIT_8(copy, 3);
+    if(goldCnt == 3)
+    {
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
+    }
+    else if(goldCnt == 2)
+    {
+        gcnt2 += 1;
+        gcnt3 += 1;
+    }
+    else if(goldCnt == 1)
+    {
+        gcnt3 += 1;
+    }
+    if(freeCnt > 0)
+        fcnt += freeCnt;
+    copy = SET_BIT_8(copy, 0, fcnt);
+    copy = SET_BIT_8(copy, 1, gcnt1);
+    copy = SET_BIT_8(copy, 2, gcnt2);
+    copy = SET_BIT_8(copy, 3, gcnt3);
+    pl->SetVar(VAR_JIQIREN_COPY, copy);
+}
+
 } // namespace GObject
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */

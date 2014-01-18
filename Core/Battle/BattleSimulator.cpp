@@ -1335,26 +1335,13 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                             ModifyAttackValue_SkillStrengthen(bf, passiveSkill, ssfactor, true);
                             factor += passiveSkill->effect->atkP * (1 + ssfactor);
 
-#if 0
-                        }
-                        const GData::SkillStrengthenEffect* ef = NULL;
-                        if(passiveSkill)
-                            ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
-                        if(ss)
-                            ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_NINGSHI);
-                        if(ef)
-                        {
-                            int side = 1 - bf->getSide();
-                            BattleFighter* bo = getRandomFighter(side, NULL, 0);
-                            if(bo)
-#else
                             GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
                             const GData::SkillStrengthenEffect* ef = NULL;
                             if(ss)
                                 ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_NINGSHI);
                             if(ef)
-#endif
                             {
+                                BattleFighter* bo = getRandomFighter(side, NULL, 0);
                                 BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
                                 bf2->setDmgNingShi(bf, ef->last, ef->value / 100 * getBFAttack(bf));
                                 appendDefStatus(e_dmgNingShi, 0, bf2);

@@ -938,7 +938,9 @@ void ServerWarMgr::readFrom(BinaryReader& brd)
             if(_warSort.size() < 10)
                 setWarSort();
             if(cfg.isTestPlatform())
-                enterArena_neice();
+            {
+                //enterArena_neice();
+            }
             else
                 enterArena();
         }

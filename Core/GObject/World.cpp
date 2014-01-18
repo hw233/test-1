@@ -153,6 +153,7 @@ bool World::_foolbao = false;
 bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
 bool World::_qqBoardLogin = false;
+bool World::_jiqirenAct = false;
 bool World::_surnamelegend = false;
 bool World::_speedTime = false;
 bool World::_happyFire = false;
@@ -341,6 +342,11 @@ bool enum_midnight(void * ptr, void* next)
 	Player * pl = static_cast<Player *>(ptr);
 	if(pl == NULL)
 		return true;
+    if(World::getJiqirenAct())
+    {
+        GameMsgHdr h(0x23A,  pl->getThreadId(), pl, 0);
+        GLOBAL().PushMsg(h, NULL);
+    }
 	if (pl->isOnline())
 	{
 		GameMsgHdr hdr(0x269, pl->getThreadId(), pl, sizeof(nextday));
@@ -439,6 +445,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -462,6 +476,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
         ))
     {
 #if 0
@@ -537,6 +552,7 @@ bool enum_midnight(void * ptr, void* next)
         pl->sendLevelAward();
 #endif
 
+    //活动机器人（马上有奖）活动
     /*
     if (nextday >= TimeUtil::MkTime(2013, 2, 9))
     {   //金蛇献瑞 聚福兆祥活动
@@ -1233,7 +1249,7 @@ void World::World_Midnight_Check( World * world )
 
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
     UInt32 nextday = curtime + 30;
-
+    //充值奖励结束判断
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 1)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 2)
@@ -1254,6 +1270,13 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1465,7 +1488,7 @@ void World::World_OldMan_Refresh(void *)
            UInt16 loc;
            UInt32 npcId;
        };
-       MapNpc mapNpc = {_oldMan._spot, 4243};
+       MapNpc mapNpc = {_oldMan._spot, 4244};
        GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
        GLOBAL().PushMsg(hdr1, &mapNpc);
        _oldMan._loc = 0;
@@ -1493,7 +1516,7 @@ void World::World_OldMan_Refresh(void *)
             UInt16 loc;
             UInt32 npcId;
         };
-        MapNpc mapNpc = {_oldMan._spot, 4243};
+        MapNpc mapNpc = {_oldMan._spot, 4244};
         GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
         GLOBAL().PushMsg(hdr, &mapNpc);
 
@@ -1501,7 +1524,7 @@ void World::World_OldMan_Refresh(void *)
         _oldMan._players.clear();
         GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
         GObject::MOData mo;
-        mo.m_ID = 4243;
+        mo.m_ID = 4244;
         mo.m_Hide = false;
         mo.m_Spot = _oldMan._spot;
         mo.m_Type = 100;

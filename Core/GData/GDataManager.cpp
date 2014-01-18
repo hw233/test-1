@@ -40,6 +40,8 @@
 #include "TeamArenaSkill.h"
 #include "SevenSoul.h"
 #include "RideConfig.h"
+#include "GObject/Married.h"
+#include "CoupleUpgrade.h"
 
 namespace GData
 {
@@ -410,6 +412,11 @@ namespace GData
         if (!LoadRideUpgradeConfig())
         {
             fprintf (stderr, "Load LoadRideUpgradeConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadCoupleInfo())
+        {
+            fprintf (stderr, "Load LoadCoupleInfoConfig Error !\n");
             std::abort();
         }
 
@@ -2754,5 +2761,18 @@ namespace GData
 
 		return true;
     }
+
+    bool GDataManager::LoadCoupleInfo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCoupleInfo dbpn;
+		if(execu->Prepare("SELECT `level` ,`levelExp`, `hp`, `attak`, `magic_attak`, `df_critical`, `action` FROM `coupleinfo` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            cu.loadUpgradeTable(dbpn); 
+		return true;
+    }
+
 }
 

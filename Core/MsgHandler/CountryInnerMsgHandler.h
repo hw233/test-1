@@ -2582,6 +2582,16 @@ void OnServerWarBeAttack( GameMsgHdr& hdr, const void* data )
     serverWarMgr.beAttackByPlayer(player, swbad->attacker, swbad->formation, swbad->portrait, swbad->lineup);
 }
 
+//活动机器人（马上有奖）活动
+void OnhandleJiqirenAct( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+
+    frontMap.handleJiqirenAct(player);
+    playerCopy.handleJiqirenAct(player);
+    player->handleJiqirenAct();
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 

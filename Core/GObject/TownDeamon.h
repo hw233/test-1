@@ -119,6 +119,8 @@ class TownDeamon
         void sendTjItemInfo(Player* pl);
         void getTownReward_10_15(Player* pl, UInt16 level);
         inline void setMaxLevel(UInt16 lv) { m_maxLevel = lv; }
+        void handleJiqirenAct(Player * pl);
+        void getJiqirenAward(Player * pl);
     private:
         void quitDeamon(Player* pl, Player* attacker = NULL);
         void occupyDeamon(Player* pl, UInt16 level);
