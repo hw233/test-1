@@ -2829,6 +2829,9 @@ namespace GObject
         void spreadToSelf();
         void spreadGetAward();
         void spreadGetAwardInCountry(UInt32 spreadCount);
+        void getBuyFundInfo(UInt8 opt);
+        void buyFund(UInt16 num);
+        void getBuyFundAward(UInt8 opt);
 
     public:
         // 八部浮屠

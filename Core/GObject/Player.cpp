@@ -27047,7 +27047,7 @@ void Player::buyFund(UInt16 num)
     if((lastNum + num) >= 100 && mark == 0)
     {
         mark = 1;
-        SetVar(VAR_BUY_FUND_TRUMP_AWARD, mark)
+        SetVar(VAR_BUY_FUND_TRUMP_AWARD, mark);
     }
 
     Stream st(REP::ACT);
@@ -27086,7 +27086,7 @@ void Player::getBuyFundAward(UInt8 opt)
                 {8, 10, 12, 15, 18, 20, 6, 6, 25},
                 {8, 10, 12, 16, 20, 20, 7, 7, 25},
                 {8, 10, 12, 16, 20, 22, 8, 8, 26}
-            }
+            };
 
             UInt8 index = 0;
             if(num >= 1 && num <= 200)
@@ -27099,7 +27099,7 @@ void Player::getBuyFundAward(UInt8 opt)
             UInt8 money = award[index][opt-1] * num;
             IncommingInfo ii(InBuyFund, 0, 0);
             if(opt == 7 || opt == 8)
-                getCoupon(money, &ii);  
+                getCoupon(money);  
             else
                 getGold(money, &ii);
 
