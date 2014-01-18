@@ -3990,7 +3990,9 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONBEDMG ||
                         s->cond == GData::SKILL_ONBEPHYDMG ||
                         s->cond == GData::SKILL_ONBEMAGDMG ||
-                        s->cond == GData::SKILL_ONHP10P
+                        s->cond == GData::SKILL_ONHP10P ||
+                        s->cond == GData::SKILL_AFTACTION ||
+                        s->cond == GData::SKILL_ONHPCHANGE
                         )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
@@ -4042,7 +4044,9 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONBEDMG ||
                         s->cond == GData::SKILL_ONBEPHYDMG ||
                         s->cond == GData::SKILL_ONBEMAGDMG ||
-                        s->cond == GData::SKILL_ONHP10P
+                        s->cond == GData::SKILL_ONHP10P ||
+                        s->cond == GData::SKILL_AFTACTION ||
+                        s->cond == GData::SKILL_ONHPCHANGE
                         )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
