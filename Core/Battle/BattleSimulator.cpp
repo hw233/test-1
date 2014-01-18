@@ -3068,6 +3068,9 @@ void BattleSimulator::doAllSkillStrengthenEffect(BattleFighter* bf, const GData:
         return;
 
     GData::SkillStrengthenBase*  ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+    if(!ss)
+        return;
+
     const std::vector<const GData::SkillStrengthenEffect*>& efs = ss->effect;
     const GData::SkillStrengthenEffect* ef = NULL;
     for(size_t i = 0; i < efs.size(); ++ i)
@@ -9872,6 +9875,25 @@ void BattleSimulator::ModifyAttackValue_SkillStrengthen(BattleFighter* bf,const 
 }
 
 
+void BattleSimulator::ModifyAttackValue_SkillStrengthen_Other(BattleFighter* bf,const GData::SkillBase* skill, float& fvalue, bool isAdd)
+{
+    if(!skill)
+        return;
+
+    GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+    if(!ss)
+        return;
+
+    const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_INTENSIFYSTATE_OTHER);
+    if(ef)
+    {
+        if(isAdd)
+            fvalue += ef->value / 100;
+        else
+            fvalue -= ef->valueExt1 / 100;  // 减掉的值取这个
+    }
+}
+
 void BattleSimulator::ModifyTherapy_SkillStrengthen(BattleFighter* bf, const GData::SkillBase* skill, float& fvalue, bool isAdd)
 {
     if(!skill)
@@ -10903,7 +10925,7 @@ void BattleSimulator::doSkillEffectExtra_SelfAttack(BattleFighter* bf, int targe
         return;
 
     float ssfactor = 0.0f;
-    ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);  // 提升增加攻击力效果
+    ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);
     float factor = 1 + ssfactor;
 
     atkadd = atkadd * factor;
@@ -10935,7 +10957,7 @@ void BattleSimulator::doSkillEffectExtra_RandomTargetAttack(BattleFighter* bf, i
     if (!bo->isChar())
         return;
     float ssfactor = 0.0f;
-    ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);
+    ModifyAttackValue_SkillStrengthen_Other(bf, skill, ssfactor, true);
     float factor = 1 + ssfactor;
     setStatusChange_Atk(bf, bo->getSide(), bo->getPos(), skill, bo->_attack * skill->effect->efv[eftIdx] * factor, skill->effect->efl[eftIdx], true);
     setStatusChange_MagAtk(bf, bo->getSide(), bo->getPos(), skill, bo->_magatk * skill->effect->efv[eftIdx] * factor, skill->effect->efl[eftIdx], true);
