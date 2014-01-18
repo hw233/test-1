@@ -176,6 +176,8 @@ namespace GObject
 
             UInt8 ModifyMarriageInfo(Player* player,MarriageInfo* sMarry,UInt8 flag);
 
+            UInt8 DoGetList(Player* player,UInt8 flag,UInt16 idx = 1);
+            
             UInt8 GetList(Player* player,UInt8 flag,UInt16 idx = 1);
             
             UInt8 LoadMarriage(Player* player, DBMarriage*);

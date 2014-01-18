@@ -1527,10 +1527,10 @@ namespace GObject
             player->sendMsgCode(0, 6002);
             return 1;
         }
-        if(!player->getMainFighter()->getSex())//男的
+/*        if(!player->getMainFighter()->getSex())//男的
             FinishMarry(player->getId(),obj_player->getId());
         else
-            FinishMarry(obj_player->getId(),player->getId());
+            FinishMarry(obj_player->getId(),player->getId());*/
 
         return 0;
     }
@@ -1606,10 +1606,15 @@ namespace GObject
 
         return 0;
     }
-   
-    UInt8 MarryMgr::GetList(Player* player,UInt8 flag,UInt16 idx)
+  
+    UInt8 MarryMgr::DoGetList(Player* player,UInt8 flag,UInt16 idx)
     {
         Mutex::ScopedLock lk(_mutex); 
+        return GetList(player,flag,idx); 
+    }
+
+    UInt8 MarryMgr::GetList(Player* player,UInt8 flag,UInt16 idx)
+    {
         UInt8 len = 3;
         UInt16 count;//总数
         UInt16 num;//页数
