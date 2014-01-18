@@ -331,21 +331,6 @@ private:
         e_dmgNingShi = 109,    // 凝视
         e_unDmgNingShi = 110,    // 解除凝视
 
-        /*
-        e_petZhongShu = 109,        // 中枢1（每回合行动后恢复10%生命）
-        e_unPetZhongShu = 110,      // 中枢1消失
-        e_petWeiJing = 111,         // 为精1（每损失5%的生命值获得额外2%的伤害减免）
-        e_unPetWeiJing = 112,       // 为精1消失
-        e_petWeiYing = 113,         // 为英 （每损失5%的生命值获得额外2%的伤害提升）
-        e_unPetWeiYing = 114,       // 为英1消失
-        e_petZhongShu2 = 115,       // 中枢2（生命低于30%时恢复30%生命，一场战斗只能触发一次）
-        e_unPetZhongShu2 = 116,     // 中枢2消失
-        e_petWeiJing2 = 117,        // 为精2 （生命低于30%时获得额外50%的伤害减免，一场战斗只能触发一次）
-        e_unPetWeiJing2 = 118,      // 为精2消失
-        e_petWeiYing2 = 119,        // 为英2（生命低于30%时获得额外50%的伤害提升，一场战斗只能触发一次）
-        e_unPetWeiYing2 = 120,      // 为英2消失
-        */
-
         e_lingYan = 121,            // 灵焱效果
         e_unLingYan = 122,          // 灵焱效果消失
 

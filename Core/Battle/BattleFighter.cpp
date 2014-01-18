@@ -1139,7 +1139,7 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
         if (ss)
             ef = ss->getEffect(GData::ON_GET_SKILL_PROB, GData::TYPE_PROB_ADD);
         if (ef)
-            rate = passiveSkill[idx].rateExtent + ef->value;
+            rate = passiveSkill[idx].rateExtent + ef->value * 100;
 
         if(rnd < rate && passiveSkill[idx].cd == 0)
         {
@@ -1935,11 +1935,19 @@ void BattleFighter::setPuduDebuf(float v, UInt16 last)
 
 bool BattleFighter::updateHPPAttackAdd(float addP, float hpLostp, float maxCount)
 {
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPAttackAdd: " << addP << "," << hpLostp << "," << maxCount << "." << std::endl;
+#endif
     if (maxCount >= 1.0f) // 是否存在触发上限次数
     {
         UInt32 count = (UInt32) maxCount;
         if (count > 0 && _hpAtkAddCount >= count) // 是否已经超过触发上限次数
+        {
+#ifdef _BATTLE_DEBUG
+            std::cout << "count: " << count << "," << _hpAtkAddCount << "." << std::endl << std::endl;
+#endif
             return false;
+        }
     }
 
     UInt32 lostHP = 0;
@@ -1947,45 +1955,75 @@ bool BattleFighter::updateHPPAttackAdd(float addP, float hpLostp, float maxCount
         lostHP = _maxhp - _hp;
     float lostP = (float)lostHP / (float)_maxhp;
     UInt32 lostCount = (UInt32)(lostP / hpLostp);
-    if (lostCount)
+    if (!lostCount)
     {
-        _hpAtkAdd = hpLostp * lostCount;
-        ++_hpAtkAddCount;
-        return true;
+#ifdef _BATTLE_DEBUG
+        std::cout << "lostCount: " << lostCount << "." << std::endl << std::endl;
+#endif
+        return false;
     }
-    return false;
+    _hpMagAtkAdd = _attack * hpLostp * lostCount;
+    _hpAtkAdd = _magatk * hpLostp * lostCount;
+    ++_hpAtkAddCount;
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPAttackAdd2: " << _hpAtkAdd << "," << _hpAtkAddCount << "," << lostCount << "." << std::endl << std::endl;
+#endif
+    return true;
 }
 
 bool BattleFighter::updateHPPAttackReduce(float reduceP, float hpLostp, float maxCount)
 {
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPAttackReduce: " << reduceP << "," << hpLostp << "," << maxCount << "." << std::endl;
+#endif
     if (maxCount >= 1.0f) // 是否存在触发上限次数
     {
         UInt32 count = (UInt32) maxCount;
         if (count > 0 && _hpAtkReduceCount >= count) // 是否已经超过触发上限次数
+        {
+#ifdef _BATTLE_DEBUG
+            std::cout << "count: " << count << "," << _hpAtkReduceCount << "." << std::endl << std::endl;
+#endif
             return false;
+        }
     }
     UInt32 lostHP = 0;
     if (_hp < _maxhp)
         lostHP = _maxhp - _hp;
     float lostP = (float)lostHP / (float)_maxhp;
     UInt32 lostCount = (UInt32)(lostP / hpLostp);
-    if (lostCount)
+    if (!lostCount)
     {
-        _hpAtkReduce = hpLostp * lostCount;
-        ++_hpAtkReduceCount;
-        return true;
+#ifdef _BATTLE_DEBUG
+        std::cout << "lostCount: " << lostCount << "." << std::endl << std::endl;
+#endif
+        return false;
     }
-    return false;
+    _hpMagAtkReduce = reduceP * lostCount;
+    _hpAtkReduce = reduceP * lostCount;
+    ++_hpAtkReduceCount;
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPAttackReduce2: " << _hpAtkReduce << "," << _hpAtkReduceCount << "," << lostCount << "." << std::endl << std::endl;
+#endif
+    return true;
 }
  
 UInt32 BattleFighter::updateHPPRecover(float recoverP, float hpLostp, float maxCount)
 {
     // 回复HP
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPRecover: " << recoverP << "," << hpLostp << "," << maxCount << "." << std::endl;
+#endif
     if (maxCount >= 1.0f) // 是否存在触发上限次数
     {
         UInt32 count = (UInt32) maxCount;
         if (count > 0 && _hpRecoverCount >= count) // 是否已经超过触发上限次数
+        {
+#ifdef _BATTLE_DEBUG
+            std::cout << "count: " << count << "," << _hpRecoverCount << "." << std::endl << std::endl;
+#endif
             return 0;
+        }
     }
     float rhp = 1.0f;
     UInt32 lostHP = 0;
@@ -1993,17 +2031,66 @@ UInt32 BattleFighter::updateHPPRecover(float recoverP, float hpLostp, float maxC
         lostHP = _maxhp - _hp;
     float lostP = (float)lostHP / (float)_maxhp;
     UInt32 lostCount = (UInt32)(lostP / hpLostp);
-    if (lostCount)
+    if (!lostCount)
     {
-        rhp = ((float)_maxhp) * recoverP;
-        if (_hp + rhp >= _maxhp)
-            rhp = _maxhp - _hp;
-        regenHP(rhp);
-        ++_hpRecoverCount;
-        return static_cast<UInt32>(rhp);
+#ifdef _BATTLE_DEBUG
+        std::cout << "lostCount: " << lostCount << "." << std::endl << std::endl;
+#endif
+        return 0;
     }
-    return 0;
+
+    rhp = ((float)_maxhp) * recoverP;
+    if (_hp + rhp >= _maxhp)
+        rhp = _maxhp - _hp;
+    regenHP(rhp);
+    ++_hpRecoverCount;
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPRecover2: " << rhp << "," << _hpRecoverCount << "," << lostCount << "." << std::endl << std::endl;
+#endif
+    return static_cast<UInt32>(rhp);
 }
+
+UInt32 BattleFighter::updateHPPRecover2Fake(float recoverP, float hpLostp, float maxCount)
+{
+    // 回复HP
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPRecover: " << recoverP << "," << hpLostp << "," << maxCount << "." << std::endl;
+#endif
+    if (maxCount >= 1.0f) // 是否存在触发上限次数
+    {
+        UInt32 count = (UInt32) maxCount;
+        if (count > 0 && _hpRecoverCount >= count) // 是否已经超过触发上限次数
+        {
+#ifdef _BATTLE_DEBUG
+            std::cout << "count: " << count << "," << _hpRecoverCount << "." << std::endl << std::endl;
+#endif
+            return 0;
+        }
+    }
+    float rhp = 1.0f;
+    UInt32 lostHP = 0;
+    if (_hp < _maxhp)
+        lostHP = _maxhp - _hp;
+    float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount = (UInt32)(lostP / hpLostp);
+    if (!lostCount)
+    {
+#ifdef _BATTLE_DEBUG
+        std::cout << "lostCount: " << lostCount << "." << std::endl << std::endl;
+#endif
+        return 0;
+    }
+
+    rhp = ((float)_maxhp) * recoverP;
+    if (_hp + rhp >= _maxhp)
+        rhp = _maxhp - _hp;
+    ++_hpRecoverCount;
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPRecover2: " << rhp << "," << _hpRecoverCount << "," << lostCount << "." << std::endl << std::endl;
+#endif
+    return static_cast<UInt32>(rhp);
+}
+
  
 
 void BattleFighter::makeDamage( UInt32& u )

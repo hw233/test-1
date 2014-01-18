@@ -1000,6 +1000,7 @@ public:
     bool updateHPPAttackAdd(float addP, float hpLostp, float maxCount);
     bool updateHPPAttackReduce(float reduceP, float hpLostp, float maxCount);
     UInt32  updateHPPRecover(float recoverP, float hpLostp, float maxCount);
+    UInt32  updateHPPRecover2Fake(float recoverP, float hpLostp, float maxCount);
 
     inline void resetPetAttackAdd() { _petAttackAdd = 0; _petAttackAddCD = 0; }
     inline void resetPetMagAtkAdd() { _petMagAtkAdd = 0; _petMagAtkAddCD = 0; }
