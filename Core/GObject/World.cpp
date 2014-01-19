@@ -1465,7 +1465,7 @@ void World::World_OldMan_Refresh(void *)
            UInt16 loc;
            UInt32 npcId;
        };
-       MapNpc mapNpc = {_oldMan._spot, 4243};
+       MapNpc mapNpc = {_oldMan._spot, 4244};
        GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
        GLOBAL().PushMsg(hdr1, &mapNpc);
        _oldMan._loc = 0;
@@ -1493,7 +1493,7 @@ void World::World_OldMan_Refresh(void *)
             UInt16 loc;
             UInt32 npcId;
         };
-        MapNpc mapNpc = {_oldMan._spot, 4243};
+        MapNpc mapNpc = {_oldMan._spot, 4244};
         GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
         GLOBAL().PushMsg(hdr, &mapNpc);
 
@@ -1501,7 +1501,7 @@ void World::World_OldMan_Refresh(void *)
         _oldMan._players.clear();
         GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
         GObject::MOData mo;
-        mo.m_ID = 4243;
+        mo.m_ID = 4244;
         mo.m_Hide = false;
         mo.m_Spot = _oldMan._spot;
         mo.m_Type = 100;
