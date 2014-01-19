@@ -234,6 +234,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140109_1.sql     #修复仙界8强之前押注未结算的问题
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_married_couple.sql     #创建结婚log表
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140114.sql   #去除夫妻家园表中的在线时长字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140103_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_setVar636.sql    #qq浏览器补签1月3 4 5 号
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_married_couple.sql     #创建结婚log表

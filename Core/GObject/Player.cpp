@@ -84,6 +84,7 @@
 #include "ClanCityBattle.h"
 #include "MoFang.h"
 #include "Marry.h"
+#include "Married.h"
 #include "Leaderboard.h"
 #include "ArenaServerWar.h"
 #include "GData/SevenSoul.h"
@@ -2222,6 +2223,8 @@ namespace GObject
             LoginMsgHdr hdr1(0x301, WORKER_THREAD_LOGIN, 0, this->GetSessionID(), sizeof(crackValue));
             GLOBAL().PushMsg(hdr1, &crackValue);
         }
+        if(GetVar(GObject::VAR_MARRY_STATUS) == 5 || GetVar(GObject::VAR_MARRY_STATUS) == 6)
+            gMarriedMgr.ProcessOnlineAward(this,1);
 
         SetVar(VAR_OFFLINE, curtime);
         PopTimerEvent(this, EVENT_AUTOBATTLE, 0);
@@ -2356,6 +2359,8 @@ namespace GObject
         delFlag(Training);
         sendQQBoardOnlineTime();  
         SetQQBoardValue();
+        if(GetVar(GObject::VAR_MARRY_STATUS) == 5 || GetVar(GObject::VAR_MARRY_STATUS) == 6)
+            gMarriedMgr.ProcessOnlineAward(this,1);
 	}
 
 	void Player::checkLastBattled()
