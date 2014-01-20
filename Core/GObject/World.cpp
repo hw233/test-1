@@ -342,6 +342,11 @@ bool enum_midnight(void * ptr, void* next)
 	Player * pl = static_cast<Player *>(ptr);
 	if(pl == NULL)
 		return true;
+    if(World::getJiqirenAct())
+    {
+        GameMsgHdr h(0x23A,  pl->getThreadId(), pl, 0);
+        GLOBAL().PushMsg(h, NULL);
+    }
 	if (pl->isOnline())
 	{
 		GameMsgHdr hdr(0x269, pl->getThreadId(), pl, sizeof(nextday));
@@ -548,11 +553,6 @@ bool enum_midnight(void * ptr, void* next)
 #endif
 
     //活动机器人（马上有奖）活动
-    if(World::getJiqirenAct())
-    {
-        GameMsgHdr h(0x23A,  pl->getThreadId(), pl, 0);
-        GLOBAL().PushMsg(h, NULL);
-    }
     /*
     if (nextday >= TimeUtil::MkTime(2013, 2, 9))
     {   //金蛇献瑞 聚福兆祥活动

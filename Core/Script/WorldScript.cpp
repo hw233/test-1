@@ -265,6 +265,7 @@ void WorldScript::init()
     def("getRYHBActivity",GObject::World::getRYHBActivity);
 
     def("setMergeAthAct", GObject::World::setMergeAthAct);
+    def("setHappyFireTime", GObject::World::setHappyFireTime);
     def("getMergeAthAct", GObject::World::getMergeAthAct);
     def("setFourCopAct", GObject::World::setFourCopAct);
     def("getFourCopAct", GObject::World::getFourCopAct);
