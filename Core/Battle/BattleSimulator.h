@@ -721,7 +721,7 @@ private:
     bool    tryProtectDamage(BattleFighter* bf, float& phyAtk, float& magatk, float factor);
     bool    do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
     bool    doProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
-    bool    protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor, bool dmgreduce);
+    bool    protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor);
 
     bool    tryAttackWithPet(BattleFighter* bf);
     bool    do100AttackWithPet(BattleFighter* bf, BattleFighter* pet);

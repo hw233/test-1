@@ -7862,6 +7862,8 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, UInt32 dmg)
         UInt32 value = dmg * bo2->getDmgDeep();
         bo2->makeDamage(value);
         appendDefStatus(e_damNormal, value, bo2);
+        if(bo2->getHP() == 0)
+            onDead(false, bo2);
     }
 #if 0
     if(bo->isChar() && bo->getHP() > 0)
@@ -12496,10 +12498,6 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
         }
     }
 
-    float ssfactor = 0.0f;
-    ModifyAttackValue_SkillStrengthen(bf, pskill, ssfactor, true);
-    factor *= ( 1 + ssfactor );
-
     {
     const GData::SkillBase* pskill = pet->getPassiveSkillOnPetProtectForce();
     if(!pskill || !pskill->effect)
@@ -12513,7 +12511,28 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
 
     appendDefStatus(e_skill, pskill->getId(), pet);
     }
-    return protectDamage(bf, pet, phyAtk, magAtk, factor, dmgreduce);
+
+    float ssfactor = 0.0f;
+    ModifyAttackValue_SkillStrengthen(bf, pskill, ssfactor, false);
+    factor *= ( 1 + ssfactor );
+
+    float phyAtkPet;
+    float magAtkPet;
+    if(ssfactor > 0.001f)
+    {
+        phyAtkPet = phyAtk * 0.7;
+        magAtkPet = magAtk * 0.7;
+        phyAtk *= 0.3;
+        magAtk *= 0.3;
+    }
+    else
+    {
+        phyAtkPet /= 2;
+        magAtkPet /= 2;
+        phyAtk /= 2;
+        magAtk /= 2;
+    }
+    return protectDamage(bf, pet, phyAtkPet, magAtkPet, factor);
 }
 
 bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor)
@@ -12560,14 +12579,11 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
             return false;
 
         appendDefStatus(e_skill, pskill->getId(), pet);
-        bool dmgreduce = false;
         for(size_t i = 0; i < cnt; ++ i)
         {
             if(eft[i] == GData::e_eft_pet_protect_reduce)
             {
                 factor *= (1.0f - efv[i]);
-                if(!dmgreduce)
-                    dmgreduce = true;
             }
         }
 
@@ -12575,24 +12591,30 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
         ModifyAttackValue_SkillStrengthen(bf, pskill, ssfactor, false);
         factor *= ( 1 + ssfactor );
 
-        return protectDamage(bf, pet, phyAtk, magAtk, factor, dmgreduce);
+        float phyAtkPet;
+        float magAtkPet;
+        if(ssfactor > 0.001f)
+        {
+            phyAtkPet = phyAtk * 0.7;
+            magAtkPet = magAtk * 0.7;
+            phyAtk *= 0.3;
+            magAtk *= 0.3;
+        }
+        else
+        {
+            phyAtkPet /= 2;
+            magAtkPet /= 2;
+            phyAtk /= 2;
+            magAtk /= 2;
+        }
+
+        return protectDamage(bf, pet, phyAtkPet, magAtkPet, factor);
     }
     return false;
 }
 
-bool BattleSimulator::protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor, bool dmgreduce)
+bool BattleSimulator::protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor)
 {
-    // 吸收一半伤害给仙宠
-    if(!dmgreduce)
-    {
-        phyAtk /= 2;
-        magAtk /= 2;
-    }
-    else
-    {
-        phyAtk *= 0.3;
-        magAtk *= 0.3;
-    }
     UInt32 dmg = 0;
     UInt32 magdmg = 0;
     bool dmgFlag = false;
