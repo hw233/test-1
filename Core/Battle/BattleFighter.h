@@ -657,6 +657,8 @@ private:
     bool  _petExAtkEnable;
     UInt16 _petExAtkId;
 
+    float _lastHPLostP;
+
     // 根据损失HP增加的伤害提升
     float _hpAtkAdd, _hpMagAtkAdd; 
     UInt32 _hpAtkAddCount;
@@ -1001,6 +1003,7 @@ public:
     bool updateHPPAttackReduce(float reduceP, float hpLostp, float maxCount);
     UInt32  updateHPPRecover(float recoverP, float hpLostp, float maxCount);
     UInt32  updateHPPRecover2Fake(float recoverP, float hpLostp, float maxCount);
+    void    updateLastHPLostP();
 
     inline void resetPetAttackAdd() { _petAttackAdd = 0; _petAttackAddCD = 0; }
     inline void resetPetMagAtkAdd() { _petMagAtkAdd = 0; _petMagAtkAddCD = 0; }

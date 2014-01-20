@@ -60,6 +60,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_petAttackAdd(0), _petMagAtkAdd(0), _petAtkReduce(0), _petMagAtkReduce(0),
 	_petAttackAddCD(0), _petMagAtkAddCD(0), _petAtkReduceCD(0), _petMagAtkReduceCD(0),
     _petExAtk(0), _petExAtkEnable(false), _petExAtkId(0),
+    _lastHPLostP(0), 
     _hpAtkAdd(0), _hpMagAtkAdd(0), _hpAtkAddCount(0),
     _hpAtkReduce(0), _hpMagAtkReduce(0), _hpAtkReduceCount(0), _hpRecoverCount(0),
     _bleedMo(0), _bleedMoLast(0), _blind_bleed(0), _blind_present(0), _blind_present_cd(0),
@@ -1954,11 +1955,12 @@ bool BattleFighter::updateHPPAttackAdd(float addP, float hpLostp, float maxCount
     if (_hp < _maxhp)
         lostHP = _maxhp - _hp;
     float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount2 = (UInt32)(_lastHPLostP / hpLostp);
     UInt32 lostCount = (UInt32)(lostP / hpLostp);
-    if (!lostCount)
+    if (lostCount == lostCount2)
     {
 #ifdef _BATTLE_DEBUG
-        std::cout << "lostCount: " << lostCount << "." << std::endl << std::endl;
+        std::cout << "lostCount: " << lostCount << ", _lastHPLostP = " << _lastHPLostP << "." << std::endl << std::endl;
 #endif
         return false;
     }
@@ -1991,11 +1993,12 @@ bool BattleFighter::updateHPPAttackReduce(float reduceP, float hpLostp, float ma
     if (_hp < _maxhp)
         lostHP = _maxhp - _hp;
     float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount2 = (UInt32)(_lastHPLostP / hpLostp);
     UInt32 lostCount = (UInt32)(lostP / hpLostp);
-    if (!lostCount)
+    if (lostCount == lostCount2)
     {
 #ifdef _BATTLE_DEBUG
-        std::cout << "lostCount: " << lostCount << "." << std::endl << std::endl;
+        std::cout << "lostCount: " << lostCount << ", _lastHPLostP = " << _lastHPLostP << "." << std::endl << std::endl;
 #endif
         return false;
     }
@@ -2030,11 +2033,12 @@ UInt32 BattleFighter::updateHPPRecover(float recoverP, float hpLostp, float maxC
     if (_hp < _maxhp)
         lostHP = _maxhp - _hp;
     float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount2 = (UInt32)(_lastHPLostP / hpLostp);
     UInt32 lostCount = (UInt32)(lostP / hpLostp);
-    if (!lostCount)
+    if (lostCount == lostCount2)
     {
 #ifdef _BATTLE_DEBUG
-        std::cout << "lostCount: " << lostCount << "." << std::endl << std::endl;
+        std::cout << "lostCount: " << lostCount << ", _lastHPLostP = " << _lastHPLostP << "." << std::endl << std::endl;
 #endif
         return 0;
     }
@@ -2072,11 +2076,12 @@ UInt32 BattleFighter::updateHPPRecover2Fake(float recoverP, float hpLostp, float
     if (_hp < _maxhp)
         lostHP = _maxhp - _hp;
     float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount2 = (UInt32)(_lastHPLostP / hpLostp);
     UInt32 lostCount = (UInt32)(lostP / hpLostp);
-    if (!lostCount)
+    if (lostCount == lostCount2)
     {
 #ifdef _BATTLE_DEBUG
-        std::cout << "lostCount: " << lostCount << "." << std::endl << std::endl;
+        std::cout << "lostCount: " << lostCount << ", _lastHPLostP = " << _lastHPLostP << "." << std::endl << std::endl;
 #endif
         return 0;
     }
@@ -2091,6 +2096,13 @@ UInt32 BattleFighter::updateHPPRecover2Fake(float recoverP, float hpLostp, float
     return static_cast<UInt32>(rhp);
 }
 
+void    BattleFighter::updateLastHPLostP()
+{
+    UInt32 lostHP = 0;
+    if (_hp < _maxhp)
+        lostHP = _maxhp - _hp;
+    _lastHPLostP = (float)lostHP / (float)_maxhp;
+}
  
 
 void BattleFighter::makeDamage( UInt32& u )
