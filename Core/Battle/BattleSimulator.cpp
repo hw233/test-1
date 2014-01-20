@@ -1334,20 +1334,21 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                             float ssfactor = 0.0f;
                             ModifyAttackValue_SkillStrengthen(bf, passiveSkill, ssfactor, true);
                             factor += passiveSkill->effect->atkP * (1 + ssfactor);
-                        }
-                        ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
-                        const GData::SkillStrengthenEffect* ef = NULL;
-                        if(ss)
-                            ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_NINGSHI);
-                        if(ef)
-                        {
-                            int side = 1 - bf->getSide();
-                            BattleFighter* bo = getRandomFighter(side, NULL, 0);
-                            if(bo)
+
+                            ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+                            const GData::SkillStrengthenEffect* ef = NULL;
+                            if(ss)
+                                ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_NINGSHI);
+                            if(ef)
                             {
-                                BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
-                                bf2->setDmgNingShi(bf, ef->last, ef->value / 100 * getBFAttack(bf));
-                                appendDefStatus(e_dmgNingShi, 0, bf2);
+                                int side = 1 - bf->getSide();
+                                BattleFighter* bo = getRandomFighter(side, NULL, 0);
+                                if(bo)
+                                {
+                                    BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
+                                    bf2->setDmgNingShi(bf, ef->value / 100 * getBFAttack(bf), ef->last);
+                                    appendDefStatus(e_dmgNingShi, 0, bf2);
+                                }
                             }
                         }
                     }
@@ -8177,6 +8178,8 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
         for(std::vector<BattleFighter*>::iterator it = vbo.begin(); it != vbo.end(); ++ it)
         {
             BattleFighter* bo = *it;
+            if(bo->getHP() == 0)
+                continue;
             UInt32 value = bo->getDmgNingShi();
             makeDamage(bo, value, e_damNormal, e_damageTrue);
         }
@@ -12490,34 +12493,18 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
     if(cnt != efv.size())
         return false;
 
-    bool dmgreduce = false;
+    float ssfactor = 0.0f;
+    ModifyAttackValue_SkillStrengthen(pet, pskill, ssfactor, true);  //免伤率提升效果提升100%
+
     for(size_t i = 0; i < cnt; ++ i)
     {
         if(eft[i] == GData::e_eft_pet_protect_reduce)
         {
-            factor *= (1 - efv[i]);
-            if(!dmgreduce)
-                dmgreduce = true;
+            factor *= (1 - efv[i] * (1 + ssfactor));
         }
     }
 
-    {
-    const GData::SkillBase* pskill = pet->getPassiveSkillOnPetProtectForce();
-    if(!pskill || !pskill->effect)
-        return false;
-    const std::vector<UInt16>& eft = pskill->effect->eft;
-    const std::vector<float>& efv = pskill->effect->efv;
-
-    size_t cnt = eft.size();
-    if(cnt != efv.size())
-        return false;
-
     appendDefStatus(e_skill, pskill->getId(), pet);
-    }
-
-    float ssfactor = 0.0f;
-    ModifyAttackValue_SkillStrengthen(bf, pskill, ssfactor, false);
-    factor *= ( 1 + ssfactor );
 
     float phyAtkPet;
     float magAtkPet;
@@ -12530,12 +12517,12 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
     }
     else
     {
-        phyAtkPet /= 2;
-        magAtkPet /= 2;
+        phyAtkPet = phyAtk / 2;
+        magAtkPet = magAtk / 2;
         phyAtk /= 2;
         magAtk /= 2;
     }
-    return protectDamage(bf, pet, phyAtkPet, magAtkPet, factor);
+    return protectDamage(bf, pet, phyAtk, magAtk, factor);
 }
 
 bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor)
@@ -12581,18 +12568,17 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
         if(cnt != efv.size())
             return false;
 
+        float ssfactor = 0.0f;
+        ModifyAttackValue_SkillStrengthen(pet, pskill, ssfactor, true);  //免伤率提升效果提升100%
+
         appendDefStatus(e_skill, pskill->getId(), pet);
         for(size_t i = 0; i < cnt; ++ i)
         {
             if(eft[i] == GData::e_eft_pet_protect_reduce)
             {
-                factor *= (1.0f - efv[i]);
+                factor *= (1.0f - efv[i] * (1 + ssfactor));
             }
         }
-
-        float ssfactor = 0.0f;
-        ModifyAttackValue_SkillStrengthen(bf, pskill, ssfactor, false);
-        factor *= ( 1 + ssfactor );
 
         float phyAtkPet;
         float magAtkPet;
@@ -12605,12 +12591,11 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
         }
         else
         {
-            phyAtkPet /= 2;
-            magAtkPet /= 2;
+            phyAtkPet = phyAtk / 2;
+            magAtkPet = magAtk / 2;
             phyAtk /= 2;
             magAtk /= 2;
         }
-
         return protectDamage(bf, pet, phyAtkPet, magAtkPet, factor);
     }
     return false;
