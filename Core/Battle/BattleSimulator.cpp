@@ -1335,7 +1335,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                             ModifyAttackValue_SkillStrengthen(bf, passiveSkill, ssfactor, true);
                             factor += passiveSkill->effect->atkP * (1 + ssfactor);
 
-#if 0
+#if 1
                         }
                         const GData::SkillStrengthenEffect* ef = NULL;
                         if(passiveSkill)
