@@ -96,6 +96,7 @@ enum
     TYPE_DEF_CHANGE = 48,       //  目标防御变化
     TYPE_HPP_RECOVER = 49,       // HP百分比回复
     TYPE_EX_HP_ADD_ADD = 50,    // 技能额外治疗效果提升
+    TYPE_INTENSIFYSTATE_OTHER = 51, // 强化队友技能效果
 
     TYPE_MAX,
 };
