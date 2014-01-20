@@ -111,7 +111,7 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from petteamcopy; source petteamcopy;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from ride; source ride;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from ride_upgrade; source ride_upgrade;";
-    #mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from coupleinfo; source coupleinfo;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from coupleinfo; source coupleinfo;";
 }
 
 update_data
