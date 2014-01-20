@@ -3538,7 +3538,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             float deFactor = calcTherapyFactor(bo);
 
             // 技能符文对治疗效果的加成
-            ModifyTherapy_SkillStrengthen(bo, skill, deFactor, true);
+            ModifyTherapy_SkillStrengthen(bf, skill, deFactor, true);
 
             UInt32 hpr = bo->regenHP(rhp * deFactor, skill->cond == GData::SKILL_ACTIVE, skill->effect->hppec, maxRhp);
             if(hpr != 0)
@@ -7911,7 +7911,7 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
         size_t idx = 0;
         const GData::SkillBase* passiveSkill = NULL;
         UInt32 hpr = 0;
-        const GData::SkillBase* passiveSkill2 = NULL;
+        //const GData::SkillBase* passiveSkill2 = NULL;
         while(NULL != (passiveSkill = bf->getPassiveSkillOnHPChange100(idx)))
         {
             if(passiveSkill->effect == NULL)
@@ -7933,9 +7933,13 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
                     ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_ATKADD);
                     if (ef && bf->updateHPPAttackAdd(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
                     {
+                        /*
                         setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stAtk, bf->getHPAtkAdd(), 0, false);
                         setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stMagAtk, bf->getHPMagAtkAdd(), 0, false);
+                        */
                         appendDefStatus(e_skill, passiveSkill->getId(), bf);
+                        appendStatusChange(e_stAtk, static_cast<UInt32>(bf->getAttack()), passiveSkill->getId(), bf);
+                        appendStatusChange(e_stMagAtk, static_cast<UInt32>(bf->getMagAttack()), passiveSkill->getId(), bf);
                     }
 
                     ef = NULL;
@@ -7943,11 +7947,17 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
                     ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_DAMAG_REDUCE);
                     if (ef && bf->updateHPPAttackReduce(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
                     {
+                        /*
                         UInt32 value = static_cast<UInt32>(bf->getAtkReduce()*100);
                         setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stAtkReduce, value, 0, false);
                         value = static_cast<UInt32>(bf->getMagAtkReduce()*100);
                         setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stMagAtkReduce, value, 0, false);
+                        */
                         appendDefStatus(e_skill, passiveSkill->getId(), bf);
+                        UInt32 value = static_cast<UInt32>(bf->getMagAtkReduce()*100);
+                        appendStatusChange(e_stMagAtkReduce, value, passiveSkill->getId(), bf);
+                        value = static_cast<UInt32>(bf->getAtkReduce()*100);
+                        appendStatusChange(e_stAtkReduce, value, passiveSkill->getId(), bf);
                     }
 
                     ef = NULL;
@@ -7955,19 +7965,29 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
                     ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_HPP_RECOVER);
                     if (ef)
                     {
-                        hpr += bf->updateHPPRecover2Fake(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2);
-                        passiveSkill2 = passiveSkill;
+                        //hpr += bf->updateHPPRecover2Fake(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2);
+                        hpr += bf->updateHPPRecover(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2);
+                        if (hpr)
+                        {
+                            bf->regenHP(hpr);
+                            appendDefStatus(e_skill, passiveSkill->getId(), bf);
+                            appendDefStatus(e_damHpAdd, hpr, bf);
+                        }
                     }
 
                 }
             }
         }
+        bf->updateLastHPLostP();
+
+        /*
         if (hpr)
         {
             bf->regenHP(hpr);
             appendDefStatus(e_skill, passiveSkill2->getId(), bf);
             appendDefStatus(e_damHpAdd, hpr, bf);
         }
+        */
         _hpCheckCache[boSide][boPos] = false;
     }
 }
