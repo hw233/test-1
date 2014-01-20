@@ -328,8 +328,8 @@ private:
         e_unSoulProtect = 108,    // 天佑
         e_dmgDeep = 109,    // 重伤
         e_unDmgDeep = 110,    // 解除重伤
-        e_dmgNingShi = 109,    // 凝视
-        e_unDmgNingShi = 110,    // 解除凝视
+        e_dmgNingShi = 111,    // 凝视
+        e_unDmgNingShi = 112,    // 解除凝视
 
         e_lingYan = e_selfBleed,            // 灵焱效果
         e_unLingYan = e_unSelfBleed,          // 灵焱效果消失

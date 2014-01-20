@@ -1335,19 +1335,21 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                             ModifyAttackValue_SkillStrengthen(bf, passiveSkill, ssfactor, true);
                             factor += passiveSkill->effect->atkP * (1 + ssfactor);
 
-                            const GData::SkillStrengthenEffect* ef = NULL;
-                            if(ss)
-                                ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_NINGSHI);
-                            if(ef)
+                        }
+                        const GData::SkillStrengthenEffect* ef = NULL;
+                        if(passiveSkill)
+                            ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+                        if(ss)
+                            ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_NINGSHI);
+                        if(ef)
+                        {
+                            int side = 1 - bf->getSide();
+                            BattleFighter* bo = getRandomFighter(side, NULL, 0);
+                            if(bo)
                             {
-                                int side = 1 - bf->getSide();
-                                BattleFighter* bo = getRandomFighter(side, NULL, 0);
-                                if(bo)
-                                {
-                                    BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
-                                    bf2->setDmgNingShi(bf, ef->last, ef->value / 100 * getBFAttack(bf));
-                                    appendDefStatus(e_dmgNingShi, 0, bf2);
-                                }
+                                BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
+                                bf2->setDmgNingShi(bf, ef->last, ef->value / 100 * getBFAttack(bf));
+                                appendDefStatus(e_dmgNingShi, 0, bf2);
                             }
                         }
                     }
@@ -11107,6 +11109,7 @@ void BattleSimulator::doSkillEffectExtra_AtkPetMarkDmg(BattleFighter* bf, int ta
     ModifyAttackValue_SkillStrengthen(bf, skill, ssfactor, true);
     float value = skill->effect->efv[eftIdx] * (1 + ssfactor);
     attackOnce(bf, first, cs, pr, NULL, area_target, value, 1);
+
 }
 
 void BattleSimulator::doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
