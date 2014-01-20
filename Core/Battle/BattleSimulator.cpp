@@ -7932,7 +7932,7 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
 
                     // HP减少伤害增加
                     ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_ATKADD);
-                    if (ef && bf->updateHPPAttackAdd(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
+                    if (ef && bf->updateHPPAttackAdd(ef->value, ef->valueExt1 / 100, ef->valueExt2))
                     {
                         /*
                         setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stAtk, bf->getHPAtkAdd(), 0, false);
@@ -7946,7 +7946,7 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
                     ef = NULL;
                     // HP减少减伤增加
                     ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_DAMAG_REDUCE);
-                    if (ef && bf->updateHPPAttackReduce(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2))
+                    if (ef && bf->updateHPPAttackReduce(ef->value, ef->valueExt1 / 100, ef->valueExt2))
                     {
                         /*
                         UInt32 value = static_cast<UInt32>(bf->getAtkReduce()*100);
@@ -11150,8 +11150,7 @@ void BattleSimulator::doSkillEffectExtra_ProtectPet100(BattleFighter* bf, int ta
     if (!bo || !bo->isChar())
         return;
     BattleFighter * area_target = static_cast<BattleFighter *>(bo);
-    //area_target->setPetProtect100(skill->effect->efv[eftIdx], skill->effect->efl[eftIdx]);
-    area_target->setPetProtect100(true, 0);
+    area_target->setPetProtect100(true, static_cast<UInt8>(0), skill);
     appendDefStatus(e_petProtect100, 0, area_target);
 }
 
@@ -12501,7 +12500,10 @@ bool BattleSimulator::tryProtectDamage(BattleFighter* bf, float& phyAtk, float& 
 bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor)
 {
     // 宠物100%保护主目标吸收一半伤害
-    bf->setPetProtect100(false, 0);
+    const GData::SkillBase* pskillOrign = bf->getPetProtect100Skill();
+    if (!pskillOrign) 
+        return false;
+    bf->setPetProtect100(false, static_cast<UInt8>(0), NULL);
     appendDefStatus(e_unPetProtect100, 0, bf);
     const GData::SkillBase* pskill = pet->getPassiveSkillOnPetProtectForce();
     if(!pskill || !pskill->effect)
@@ -12513,8 +12515,10 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
     if(cnt != efv.size())
         return false;
 
+
     float ssfactor = 0.0f;
-    ModifyAttackValue_SkillStrengthen(pet, pskill, ssfactor, true);  //免伤率提升效果提升100%
+
+    ModifyAttackValue_SkillStrengthen(pet, pskillOrign, ssfactor, true);  //免伤率提升效果提升100%
 
     for(size_t i = 0; i < cnt; ++ i)
     {

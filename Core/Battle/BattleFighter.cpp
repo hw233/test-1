@@ -67,7 +67,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _blind_cd(0), _blind_bleed_last(0), _summoner(NULL), _unSummonAura(0), 
     _bleedLingYan(0), _bleedLingYanLast(0), _bleedLingYanAuraDec(0), _bleedLingYanAuraDecProb(0),
     _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
-    _petProtect100(false), _petProtect100Last(0), _petAtk100(0), _petAtk100Last(0), _petMark(false),
+    _petProtect100(false), _petProtect100Last(0), _petProtect100Skill(NULL), _petAtk100(0), _petAtk100Last(0), _petMark(false),
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
     _atkDecSpecial(0), _atkDecSpecialLast(0), _magAtkDecSpecial(0), _magAtkDecSpecialLast(0),
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
@@ -2715,21 +2715,6 @@ bool BattleFighter::releaseHpSieldSelf()
 
     -- _hpShieldSelf_last;
     if(_hpShieldSelf_last == 0)
-    {
-        _hpShieldSelf = 0;
-        return true;
-    }
-
-    return false;
-}
-
-bool BattleFighter::releasePetProtect100()
-{
-    if(_petProtect100Last == 0)
-        return false;
-
-    -- _petProtect100Last;
-    if(_petProtect100Last == 0)
     {
         _hpShieldSelf = 0;
         return true;
