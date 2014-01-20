@@ -406,6 +406,9 @@ namespace Script
         bool onCollectCardAct(Player* player, UInt8 idx);
         UInt16 addClanProfferFromItem(Player* player, UInt16 num, UInt16 unit);
 	    bool TaskFuncExist(UInt32 taskId);
+        void getJiqirenAward_Copy(Player* player, UInt8 isFree);
+        void getJiqirenAward_FrontMap(Player* player, UInt8 isFree);
+        void getJiqirenAward_Dungeon(Player* player, UInt8 diff, UInt8 isFree);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

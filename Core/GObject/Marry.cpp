@@ -1194,9 +1194,14 @@ namespace GObject
         return 1;
     }
 
-    UInt8 MarryMgr::FinishMarry(UInt64 playerid,UInt64 obj_playerid)
+    UInt8 MarryMgr::DoFinishMarry(UInt64 playerid,UInt64 obj_playerid)
     {
         Mutex::ScopedLock lk(_mutex); 
+        return FinishMarry(playerid, obj_playerid);
+    }
+
+    UInt8 MarryMgr::FinishMarry(UInt64 playerid,UInt64 obj_playerid)
+    {
 		Player * player = globalPlayers[playerid];
 		Player * obj_player = globalPlayers[obj_playerid];
         
@@ -1268,6 +1273,8 @@ namespace GObject
         ci->eLove = player->GetMarriageInfo()->eLove;
         ci->level = static_cast<UInt8>(1);
         gMarriedMgr.InsertCoupleInfo(jh_time,ci);
+        gMarriedMgr.ReturnCouplePet(player);
+        gMarriedMgr.ReturnCouplePet(obj_player);
         if(player->isOnline())
             gMarriedMgr.ProcessOnlineAward(player,0);
         if(obj_player->isOnline()) 
@@ -1372,6 +1379,7 @@ namespace GObject
                     sendMoneyMail(obj_player,sMoney.price_type,sMoney.price_num,sMoney.useType,sMoney.eParm); 
                     DB7().PushUpdateData("DELETE FROM `reply_marriage` WHERE `woman_playerid` = %" I64_FMT "u", player->getId());
                     DB7().PushUpdateData("DELETE FROM `married_log` WHERE `woman_playerid` = %" I64_FMT "u", player->getId());
+                    DB7().PushUpdateData("DELETE FROM `marry_log` WHERE `man_playerid` = %" I64_FMT "u", obj_player->getId());
                 }
 
                 if(obj_player->GetMarriageInfo()->eWedding != WEDDING_NULL)
@@ -1419,12 +1427,19 @@ namespace GObject
                 }
                 player->GetMarriageInfo()->eraseInfo();
                 erase_marryList(player);
+                gMarriedMgr.eraseCoupleList(player);
                 SetDirty(player,obj_player); 
                
                 if(!player->getMainFighter()->getSex())//男的
+                {
                     DB7().PushUpdateData("DELETE FROM `married_log` WHERE `man_playerid` = %" I64_FMT "u", player->getId());
+                    DB7().PushUpdateData("DELETE FROM `married_couple` WHERE `man_playerid` = %" I64_FMT "u", player->getId());
+                }
                 else
+                {
                     DB7().PushUpdateData("DELETE FROM `married_log` WHERE `woman_playerid` = %" I64_FMT "u", player->getId());
+                    DB7().PushUpdateData("DELETE FROM `married_couple` WHERE `man_playerid` = %" I64_FMT "u", player->getId());
+                }
 
                 sendMoneyMail(player,MailPackage::Gold,0,5,1); 
                 sendMoneyMail(obj_player,MailPackage::Gold,0,5,1); 
@@ -1462,10 +1477,15 @@ namespace GObject
                         SetDirty(player,obj_player); 
 
                         if(!player->getMainFighter()->getSex())//男的
+                        {
                             DB7().PushUpdateData("DELETE FROM `married_log` WHERE `man_playerid` = %" I64_FMT "u", player->getId());
+                            DB4().PushUpdateData("DELETE FROM `married_couple` WHERE `man_playerid` = %" I64_FMT "u", player->getId());
+                        }
                         else
+                        {
                             DB7().PushUpdateData("DELETE FROM `married_log` WHERE `woman_playerid` = %" I64_FMT "u", player->getId());
-
+                            DB4().PushUpdateData("DELETE FROM `married_couple` WHERE `man_playerid` = %" I64_FMT "u", player->getId());
+                        }       
                         erase_marryList(player);        
                         sendMoneyMail(player,MailPackage::Gold,0,5,1); 
                         sendMoneyMail(obj_player,MailPackage::Gold,0,5,1); 
@@ -1543,6 +1563,7 @@ namespace GObject
 
     void MarryMgr::cleanMemmory()
     {
+        Mutex::ScopedLock lk(_mutex); 
         m_maleList.clear();
         m_femaleList.clear();
         m_replyList.clear();
@@ -1952,7 +1973,7 @@ namespace GObject
         {
             if(it2 == m_yuyueList.end())
                 break;
-            if(TimeUtil::GetYYMMDD(it2->first) < TimeUtil::GetYYMMDD())
+            if(it2->first < TimeUtil::Now())
                 it2++;
             if(TimeUtil::GetYYMMDD(it2->first) == TimeUtil::GetYYMMDD(TimeUtil::Now() + idx * 86400))
             {

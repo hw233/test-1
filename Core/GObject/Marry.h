@@ -151,6 +151,7 @@ namespace GObject
             UInt8 DivorceMarry(Player* ,UInt8);//离婚 0--放弃结缘 1-- 单独离婚 2--共同离婚
     
             UInt8 FinishMarry(UInt64,UInt64);
+            UInt8 DoFinishMarry(UInt64,UInt64);
 
             std::map<UInt64,UInt32>& GetOppsiteSexList(Player* player);//获得异性征婚薄
     

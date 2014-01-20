@@ -1104,6 +1104,30 @@ bool TeamCopyPlayerInfo::getPass(UInt8 copyId)
     return getPass(copyId, 0);
 }
 
+bool TeamCopyPlayerInfo::getPassMax()
+{
+    UInt8 level = m_owner->GetLev();
+    if(level < TeamCopy::lvls[0])
+        return false;
+    UInt8 copyId = 0;
+    for(UInt8 i = 1; i < sizeof(TeamCopy::lvls)/sizeof(TeamCopy::lvls[0]); ++ i)
+    {
+        if(level < TeamCopy::lvls[i])
+        {
+            copyId = i;
+            break;
+        }
+        if(i + 1 == sizeof(TeamCopy::lvls)/sizeof(TeamCopy::lvls[0]))
+        {
+            if(level >= TeamCopy::lvls[i])
+                copyId = i+1;
+        }
+    }
+    if(copyId == 0)
+        return false;
+    return getPass(copyId, 0);
+}
+
 UInt8 TeamCopyPlayerInfo::getPassTimes(UInt8 copyId, UInt8 t)
 {
     UInt8 copyIdx = copyId - 1;

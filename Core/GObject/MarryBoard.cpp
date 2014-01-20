@@ -93,7 +93,8 @@ namespace GObject
                 SYSMSGV(buf,4184,lively);
                 str += buf;
             }
-            for(UInt8 k=0;k<9;++k)  
+            UInt8 k =0;
+            for(;k<9;++k)  
             {
                 if(lively < Score[k])
                     break ;
@@ -107,6 +108,19 @@ namespace GObject
                 }
                 mitemall[count].id = mitem1[k].id;
                 mitemall[count++].count = mitem1[k].count;
+            }
+            if(k >=9 )
+            {
+                char str[16] = {0};
+                sprintf(str, "F_140114_X");
+                p->udpLog("jiehunjinxinger", str, "", "", "", "", "act");
+            }
+            else 
+            {
+                char str[16] = {0};
+                sprintf(str, "F_140114_%d",Score[k]);
+                p->udpLog("jiehunjinxinger", str, "", "", "", "", "act");
+            
             }
         }
         //烟花积分奖励
@@ -195,6 +209,8 @@ namespace GObject
         {
             resetData();
         }
+        if(man==NULL || woman == NULL)
+            return false;
         if(woman->IsMale() || !man->IsMale())
             return false;
         if(_man!=NULL || _woman!=NULL ||_atTime!=0 || _norms!=0 ||_marryBoardTimer!=NULL)
@@ -207,7 +223,9 @@ namespace GObject
         //SendPreMarryPresent(man,woman,norms);
         //GObject::globalOnlinePlayers.enumerate(player_enum_marryBoard,this,11);
         GObject::globalPlayers.enumerate(player_enum_marryBoard,this,11);
-
+        char str[16] = {0};
+        sprintf(str, "F_140114_1");
+        _man->udpLog("jiehunjinxinger", str, "", "", "", "", "act");
         return true;
     }
     void MarryBoard::MarryBoard_Timer()
@@ -271,7 +289,7 @@ namespace GObject
             {
     //          WORLD().CreateMarryBoard(_man->getId(),_woman->getId(),_norms,0);
                 sendAward();
-                gMarryMgr.FinishMarry(_man->getId(),_woman->getId());
+                gMarryMgr.DoFinishMarry(_man->getId(),_woman->getId());
             }
             return ;
         }
@@ -664,6 +682,27 @@ namespace GObject
         WORLD().RemoveTimer(_marryBoardTimer);
         _marryBoardTimer = NULL;
         _YHlively = 0;
+        if(_man != NULL)
+        {
+            if(_YHlively > 1000)
+            {
+                char str[16] = {0};
+                sprintf(str, "F_140114_8");
+                _man->udpLog("jiehunjinxinger", str, "", "", "", "", "act");
+            }
+            if(_YHlively > 2000)
+            {
+                char str[16] = {0};
+                sprintf(str, "F_140114_9");
+                _man->udpLog("jiehunjinxinger", str, "", "", "", "", "act");
+            }
+            if(_lively > 1999 )
+            {
+                char str[16] = {0};
+                sprintf(str, "F_140114_10");
+                _man->udpLog("jiehunjinxinger", str, "", "", "", "", "act");
+            }
+        }
         return flag;
     }
 }

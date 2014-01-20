@@ -299,6 +299,7 @@ enum ItemFrom
     FromQTAward = 66, //QT奖励
     FromBuyFundAward = 67, //购买基金奖励
     FromMicroCloudAward = 68, //微云合作奖励
+    FromJiqirenAct = 69, //机器人活动
     //80 ~ 100，繁体占用
 };
 
