@@ -1334,13 +1334,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                             float ssfactor = 0.0f;
                             ModifyAttackValue_SkillStrengthen(bf, passiveSkill, ssfactor, true);
                             factor += passiveSkill->effect->atkP * (1 + ssfactor);
-
-<<<<<<< HEAD
-#if 1
                         }
-                        const GData::SkillStrengthenEffect* ef = NULL;
-                        if(passiveSkill)
-                            ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+                        ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
                         if(ss)
                             ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_NINGSHI);
                         if(ef)
@@ -1348,16 +1343,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                             int side = 1 - bf->getSide();
                             BattleFighter* bo = getRandomFighter(side, NULL, 0);
                             if(bo)
-#else
-=======
->>>>>>> 53600a5f11a9d7b4982d812dc7e42db8b971668c
-                            GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
-                            const GData::SkillStrengthenEffect* ef = NULL;
-                            if(ss)
-                                ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_NINGSHI);
-                            if(ef)
                             {
-                                BattleFighter* bo = getRandomFighter(side, NULL, 0);
                                 BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
                                 bf2->setDmgNingShi(bf, ef->last, ef->value / 100 * getBFAttack(bf));
                                 appendDefStatus(e_dmgNingShi, 0, bf2);
