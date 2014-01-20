@@ -1336,6 +1336,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                             factor += passiveSkill->effect->atkP * (1 + ssfactor);
                         }
                         ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
+                        const GData::SkillStrengthenEffect* ef = NULL;
                         if(ss)
                             ef = ss->getEffect(GData::ON_ATTACK, GData::TYPE_NINGSHI);
                         if(ef)
