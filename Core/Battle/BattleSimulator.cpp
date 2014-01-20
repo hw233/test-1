@@ -7863,11 +7863,15 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, UInt32 dmg)
 
     if(bo2->isDmgDeep())
     {
-        UInt32 value = dmg * bo2->getDmgDeep();
-        bo2->makeDamage(value);
-        appendDefStatus(e_damNormal, value, bo2);
-        if(bo2->getHP() == 0)
-            onDead(false, bo2);
+        doShieldHPAttack(bo2, dmg);
+        if(dmg > 0)
+        {
+            UInt32 value = dmg * bo2->getDmgDeep();
+            bo2->makeDamage(value);
+            appendDefStatus(e_damNormal, value, bo2);
+            if(bo2->getHP() == 0)
+                onDead(false, bo2);
+        }
     }
 #if 0
     if(bo->isChar() && bo->getHP() > 0)
@@ -12256,7 +12260,7 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
     {
         onDead(false, bf);
     }
-    else if(_winner == 0 && u > 0)
+    else if(_winner == 0)
     {
         onDamage(bf, true, u);
     }
