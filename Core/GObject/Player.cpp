@@ -27475,7 +27475,7 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
     //type==>0:副本免费 1:副本付费1 2:副本付费2 3:副本付费3
     //       4:阵图免费 5:阵图付费1 6:阵图付费2 7:阵图付费3
     //       8:决战之地(简单)免费 9:决战之地(简单)付费 10:决战之地(困难)免费 11:决战之地(困难)付费
-    //       12:帮派任务 13:师门任务 14:衙门任务 15:锁妖塔
+    //       12:帮派任务 14:师门任务 13:衙门任务 15:锁妖塔
     if(!World::getJiqirenAct() || type >= 16 || !count)
         return;
     if((type <= 11 && GetFreePackageSize() < 30*count) || (type == 15 && GetFreePackageSize() < 50*count))
@@ -27617,11 +27617,14 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
             break;
         case 12:    //帮派任务
             {
+
+                AddClanContrib(300*count);
+                AddClanBuilding(300*count);
                 exp *= 2;
                 AddExp(exp*count);
             }
             break;
-        case 13:    //师门任务
+        case 14:    //师门任务
             {
                 if(vipLevel <= 2)
                     exp *= 10.8;
@@ -27632,7 +27635,7 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
                 AddExp(exp*count);
             }
             break;
-        case 14:    //衙门任务
+        case 13:    //衙门任务
             {
                 UInt32 tael = 0;
                 if(vipLevel <= 1)
