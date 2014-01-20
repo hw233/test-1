@@ -689,6 +689,7 @@ private:
 
     bool  _petProtect100;
     UInt8 _petProtect100Last;
+    const GData::SkillBase* _petProtect100Skill;
 
     float  _petAtk100;
     UInt8 _petAtk100Last;
@@ -1161,8 +1162,8 @@ public:
     inline void setPetShieldHP(float value) { _petShieldHP = value; }
 
     inline bool getPetProtect100() { return _petProtect100; }
-    inline void setPetProtect100(bool v, UInt8 l) { _petProtect100 = v; _petProtect100Last = l; }
-    bool releasePetProtect100();
+    inline void setPetProtect100(bool v, UInt8 l, const GData::SkillBase* skill) { _petProtect100 = v; _petProtect100Last = l; _petProtect100Skill = skill; }
+    const GData::SkillBase* getPetProtect100Skill() { return _petProtect100Skill; }
 
     inline void setPetMark(bool v) { _petMark = v; }
     inline bool isPetMark() { return _petMark; }
