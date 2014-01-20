@@ -289,7 +289,7 @@ namespace GObject
             {
     //          WORLD().CreateMarryBoard(_man->getId(),_woman->getId(),_norms,0);
                 sendAward();
-                gMarryMgr.FinishMarry(_man->getId(),_woman->getId());
+                gMarryMgr.DoFinishMarry(_man->getId(),_woman->getId());
             }
             return ;
         }

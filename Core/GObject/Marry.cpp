@@ -1194,9 +1194,14 @@ namespace GObject
         return 1;
     }
 
-    UInt8 MarryMgr::FinishMarry(UInt64 playerid,UInt64 obj_playerid)
+    UInt8 MarryMgr::DoFinishMarry(UInt64 playerid,UInt64 obj_playerid)
     {
         Mutex::ScopedLock lk(_mutex); 
+        return FinishMarry(playerid, obj_playerid);
+    }
+
+    UInt8 MarryMgr::FinishMarry(UInt64 playerid,UInt64 obj_playerid)
+    {
 		Player * player = globalPlayers[playerid];
 		Player * obj_player = globalPlayers[obj_playerid];
         
@@ -1557,6 +1562,7 @@ namespace GObject
 
     void MarryMgr::cleanMemmory()
     {
+        Mutex::ScopedLock lk(_mutex); 
         m_maleList.clear();
         m_femaleList.clear();
         m_replyList.clear();
