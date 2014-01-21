@@ -27603,6 +27603,16 @@ void Player::handleJiqirenAct_dungeon()
     int dungeon = GetVar(VAR_JIQIREN_DUNGEON);
     int dungeonCnt = Dungeon::getMaxCount(0) + vipNum - PLAYER_DATA(this, dungeonCnt);
     int dungeonCnt1 = Dungeon::getMaxCount(1) + vipNum1 - PLAYER_DATA(this, dungeonCnt1);
+    if (World::_wday == 5)
+    {
+        dungeonCnt -= 1;
+        dungeonCnt1 -= 1;
+    }
+    else if (World::_wday == 6)
+    {
+        dungeonCnt += 1;
+        dungeonCnt1 += 1;
+    }
     UInt8 fcnt = GET_BIT_8(dungeon, 0);
     UInt8 gcnt = GET_BIT_8(dungeon, 1);
     UInt8 fcnt1 = GET_BIT_8(dungeon, 2);
