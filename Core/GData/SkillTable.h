@@ -123,6 +123,10 @@ enum
     e_eft_zhu_tian_bao_jian = 44, //诸天宝鉴
     e_eft_trigger_count_max = 45, // 技能触发上限
     e_eft_hp_lostp = 46,    // HP损失百分比
+    e_eft_ru_red_carpet = 47,    // 儒：红毯
+    e_eft_shi_flower = 48,    // 释：鲜花
+    e_eft_dao_rose = 47,    // 道：玫瑰
+    e_eft_mo_knot = 47,    // 墨：同心结
 
     e_eft_max
 };

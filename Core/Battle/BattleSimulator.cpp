@@ -156,6 +156,10 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_zhu_tian_bao_jian] = &BattleSimulator::doSkillEffectExtra_OtherSidePeerlessDisable;
         skillEffectExtraTable[GData::e_eft_trigger_count_max] = &BattleSimulator::doSkillEffectExtra_CheckMaxTrigger;
         skillEffectExtraTable[GData::e_eft_hp_lostp] = &BattleSimulator::doSkillEffectExtra_HpLostP;
+        skillEffectExtraTable[GData::e_eft_ru_red_carpet] = &BattleSimulator::doSkillEffectExtra_Ru_RedCarpet;
+        skillEffectExtraTable[GData::e_eft_shi_flower] = &BattleSimulator::doSkillEffectExtra_Shi_Flower;
+        skillEffectExtraTable[GData::e_eft_dao_rose] = &BattleSimulator::doSkillEffectExtra_Dao_Rose;
+        skillEffectExtraTable[GData::e_eft_mo_knot] = &BattleSimulator::doSkillEffectExtra_Mo_Knot;
     }
 }
 
@@ -277,6 +281,10 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_zhu_tian_bao_jian] = &BattleSimulator::doSkillEffectExtra_OtherSidePeerlessDisable;
         skillEffectExtraTable[GData::e_eft_trigger_count_max] = &BattleSimulator::doSkillEffectExtra_CheckMaxTrigger;
         skillEffectExtraTable[GData::e_eft_hp_lostp] = &BattleSimulator::doSkillEffectExtra_HpLostP;
+        skillEffectExtraTable[GData::e_eft_ru_red_carpet] = &BattleSimulator::doSkillEffectExtra_Ru_RedCarpet;
+        skillEffectExtraTable[GData::e_eft_shi_flower] = &BattleSimulator::doSkillEffectExtra_Shi_Flower;
+        skillEffectExtraTable[GData::e_eft_dao_rose] = &BattleSimulator::doSkillEffectExtra_Dao_Rose;
+        skillEffectExtraTable[GData::e_eft_mo_knot] = &BattleSimulator::doSkillEffectExtra_Mo_Knot;
     }
 }
 
@@ -1538,6 +1546,33 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     makeDamage(area_target, magdmg, e_damNormal, e_damageMagic);
                 if (dmgFlag)
                     makeDamage(area_target, dmg, e_damNormal, e_damagePhysic);
+
+                if(cs2 || pr2)
+                {
+                    const GData::SkillStrengthenEffect* ef = NULL;
+                    if(ss)
+                        ef = ss->getEffect(GData::ON_SPREAD, GData::TYPE_DAMAG_C);
+                    if(ef)
+                    {
+                        UInt8 side2 = area_target->getSide();
+                        UInt8 pos2 = area_target->getPos() + 5; //后方单位
+                        BattleFighter* bo2 = static_cast<BattleFighter*>(getObject(side2, pos2));
+                        if(bo2)
+                        {
+                            UInt32 curDmg;
+                            if(magdmgFlag)
+                            {
+                                curDmg = ef->value / 100 * magdmg;
+                                makeDamage(bo2, curDmg, e_damNormal, e_damageMagic);
+                            }
+                            if (dmgFlag)
+                            {
+                                curDmg = ef->value / 100 * dmg;
+                                makeDamage(bo2, ef->value / 100 * curDmg, e_damNormal, e_damagePhysic);
+                            }
+                        }
+                    }
+                }
             }
             //appendDefStatus(e_damNormal, dmg3, area_target);
             //printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
@@ -10571,6 +10606,46 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             }
         }
 
+        if(bf->getHP() == 0)
+            break;
+        UInt8 side = bf->getSide();
+        BattleFighter* bo;
+        for(UInt8 pos = 0; pos < 25; pos++)
+        {
+            bo = static_cast<BattleFighter*>(getObject(side, pos));
+            if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+                continue;
+
+            if(bf->getRuRedCarpet() > 0 && bo->getRuRedCarpet() > 0)
+            {
+                UInt8 last = bo->getConfuseRound();
+                bo->setConfuseRound(last + 1);
+                appendDefStatus(e_Confuse, 0, bo);
+                calcAbnormalTypeCnt(bo);
+            }
+
+            if(bf->getShiFlower() > 0 && bo->getShiFlower() > 0)
+            {
+                float nChangeAuraNum = 25;
+                setStatusChange_Aura2(bo, bo->getSide(), bo->getPos(), NULL, nChangeAuraNum, 0, false);
+            }
+
+            if(bf->getDaoRose() > 0 && bo->getDaoRose() > 0)
+            {
+                UInt8 last = bo->getStunRound();
+                bo->setStunRound(last + 1);
+                appendDefStatus(e_Stun, 0, bo);
+                calcAbnormalTypeCnt(bo);
+            }
+
+            if(bf->getMoKnot() > 0 && bo->getMoKnot() > 0)
+            {
+                bo->setBlind(0.75f, 1);
+                appendDefStatus(e_blind, 0, bo);
+                calcAbnormalTypeCnt(bo);
+            }
+        }
+
     }while(false);
 
     if(_defList.size() > 0 || _scList.size() > 0)
@@ -13486,6 +13561,70 @@ void BattleSimulator::doSkillEffectExtra_HpLostP(BattleFighter* bf, int target_s
             }
         }
     }
+}
+
+void BattleSimulator::doSkillEffectExtra_Ru_RedCarpet(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+        return;
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+    size_t cnt = eft.size();
+    if(cnt != efl.size() || efv.size() != cnt)
+        return;
+    bo->setRuRedCarpet(eft[0]);
+}
+
+void BattleSimulator::doSkillEffectExtra_Shi_Flower(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+        return;
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+    size_t cnt = eft.size();
+    if(cnt != efl.size() || efv.size() != cnt)
+        return;
+    bo->setRuRedCarpet(efl[0]);
+}
+
+void BattleSimulator::doSkillEffectExtra_Dao_Rose(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+        return;
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+    size_t cnt = eft.size();
+    if(cnt != efl.size() || efv.size() != cnt)
+        return;
+    bo->setRuRedCarpet(efl[0]);
+}
+
+void BattleSimulator::doSkillEffectExtra_Mo_Knot(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+        return;
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+    size_t cnt = eft.size();
+    if(cnt != efl.size() || efv.size() != cnt)
+        return;
+    bo->setRuRedCarpet(efl[0]);
 }
 
 bool BattleSimulator::doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, UInt32 dmg)
