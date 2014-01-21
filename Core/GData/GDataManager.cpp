@@ -391,7 +391,7 @@ namespace GData
             fprintf (stderr, "Load LoadTeamArenaInspireConfig Error !\n");
             std::abort();
         }
-#if 0
+
         if (!LoadPetSevenSoulLevel())
         {
             fprintf (stderr, "LoadPetSevenSoulLevel Error !\n");
@@ -403,7 +403,7 @@ namespace GData
             fprintf (stderr, "LoadPetSevenSoulUpgrade Error !\n");
             std::abort();
         }
-#endif
+
         if (!LoadRideConfig())
         {
             fprintf (stderr, "Load LoadRideConfig Error !\n");

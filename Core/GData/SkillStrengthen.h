@@ -40,6 +40,8 @@ enum
     ON_HITE = 23,      // 命中时
     ON_BUDDHA_LIGHT = 24,      // 佛光效果触发后
     ON_ZXBJ = 25,  // 诸天宝鉴触发后
+    ON_HPCHANGE = 26,  // HP改变时触发
+    ON_GET_SKILL_PROB = 27, // 概率选择技能时触发（目前只会改变技能概率）
 };
 
 enum
@@ -84,6 +86,18 @@ enum
     TYPE_FAKE_DEAD = 38,   // 概率不死
     TYPE_SNEAD_RECOVER = 39,  // 暗杀消失时概率恢复暗杀
     TYPE_ZXBJ_HP_ADD = 40,  // 诸天宝鉴符文增加己方生命
+    TYPE_DMG_STRENGHTHEN = 41,  // 提升伤害
+    TYPE_2ND_HAPPEND = 42,  // 一回合内第二次触发
+    TYPE_APPEND_SELF_ATTACK = 43,        // 附加自己百分比攻击力
+    TYPE_DMG_DEEP = 44,        // 重伤
+    TYPE_NINGSHI = 45,        // 凝视
+    TYPE_LINGYAN = 46,         // 灵焱 (宠物造成的流血和每回合概率减灵气)
+    TYPE_PROB_ADD = 47,         //  概率增加
+    TYPE_DEF_CHANGE = 48,       //  目标防御变化
+    TYPE_HPP_RECOVER = 49,       // HP百分比回复
+    TYPE_EX_HP_ADD_ADD = 50,    // 技能额外治疗效果提升
+    TYPE_INTENSIFYSTATE_OTHER = 51, // 强化队友技能效果
+
     TYPE_MAX,
 };
 

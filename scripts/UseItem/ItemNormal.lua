@@ -10360,6 +10360,18 @@ function ItemNormal_00009611(iid, num, bind, param)
     end
 end
 
+function ItemNormal_00009649(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:GetLev() < 80 then
+        player:sendMsgCode(0, 1093, 80);
+        return false
+    end
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    player:getXianpoLua(num * 50);
+    return num
+end
+
 local ItemNormal_Table = {
     [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -12154,6 +12166,7 @@ local ItemNormal_Table = {
     [9646] = ItemNormal_00009611,
     [9647] = ItemNormal_00009611,
     [9648] = ItemNormal_00009611,
+    [9649] = ItemNormal_00009649,
 
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,

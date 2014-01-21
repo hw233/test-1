@@ -141,9 +141,14 @@ public:
     void upgradeSevenSoul(UInt8 sevenSoulIndex);
     void switchSevenSoulSkill(UInt8 sevenSoulIndex, UInt8 skillIndex);
     void loadPlayerSevenSoul(UInt8 soulId, UInt8 soulLevel, UInt8 skillIndex);
+    void loadSkillFromSevenSoul(UInt8 soulId);
+    void deleteSevenSoul();
+    UInt16 getSkillLevelBySkill(UInt16 skillId);
+    void getSevenSoulFromAnother(FairyPet* pet);
 private:
     UInt8 _soulLevel[7];
     UInt8 _skillIndex[7];
+    UInt8 _petType;
 };
 
 }

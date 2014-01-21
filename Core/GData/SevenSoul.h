@@ -7,9 +7,9 @@
 namespace GData
 {
 //七魄等级
-#define SEVEN_SOUL_LEVEL_MAX 24
+#define SEVEN_SOUL_LEVEL_MAX 25
 //宠物类型
-#define PET_TYPE_MAX 4
+#define PET_TYPE_MAX 25
 //七魄个数
 #define SOUL_ID_MAX  7
 #define TYPE_SOUL_ID_MAX (PET_TYPE_MAX * SOUL_ID_MAX)
@@ -27,6 +27,7 @@ class SevenSoul
         UInt8 getSkillLevel(UInt8 level);
         UInt16 getSkillId(UInt32 petType, UInt8 soulId, UInt8 order);
         UInt32 getConditonValue(UInt8 soulId);
+        UInt16 getAnotherSimilarSkill(UInt16 skillId);
 
     private:
         UInt32 _needSoulNum[SEVEN_SOUL_LEVEL_MAX];

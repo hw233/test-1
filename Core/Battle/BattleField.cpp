@@ -14,6 +14,7 @@ BattleField::BattleField()
     memset(_backupObjs, 0, sizeof(_backupObjs));
     memset(_reiatsu, 0, sizeof(_reiatsu));
     memset(_toggleReiatsu, 0, sizeof(_toggleReiatsu));
+    memset(_hpCheckCache, 0, sizeof(_hpCheckCache));
 }
 
 BattleField::~BattleField()
@@ -276,6 +277,9 @@ void BattleField::clear()
 	memset(_objs, 0, sizeof(_objs));
 	memset(_formation, 0, sizeof(_formation));
     memset(_backupObjs, 0, sizeof(_backupObjs));
+	for(int i = 0; i < 2; ++ i)
+		for(int j = 0; j < 25; ++ j)
+            _hpCheckCache[i][j] = false;
 }
 
 void BattleField::reset()
