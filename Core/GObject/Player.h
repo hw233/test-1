@@ -202,8 +202,8 @@ namespace GObject
 
 #define SYS_DIALOG_ALL_PLATFORM 0
 
-#define SPREAD_START_WEEK         6
-#define SPREAD_END_WEEK           7
+#define SPREAD_START_WEEK         5
+#define SPREAD_END_WEEK           6
 #define SPREAD_START_TIME         10*3600
 #define SPREAD_END_TIME           22*3600
 #define SPREAD_INTERVA_TIME       150

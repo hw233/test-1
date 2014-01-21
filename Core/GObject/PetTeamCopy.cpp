@@ -9,6 +9,7 @@
 #include "GData/Money.h"
 #include "Country.h"
 #include "Server/SysMsg.h"
+#include "TeamCopy.h"
 
 namespace GObject
 {
@@ -722,13 +723,13 @@ UInt32 PetTeamCopy::createTeam(Player* pl, UInt32 NPCId, UInt32 monsterId)
     UInt8 copyIdx = ctp.copyId - 1;
     UInt8 t = ctp.t;
 
-    UInt32 now = TimeUtil::Now();
+    /*UInt32 now = TimeUtil::Now();
     UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
     if(cfg.GMCheck && buffLeft > now)
     {
         pl->sendMsgCode(0, 1407, buffLeft - now);
         return 0;
-    }
+    }*/
 
     UInt8 level = pl->GetLev();
     if(level < lvls[copyIdx])
@@ -896,6 +897,9 @@ UInt32 PetTeamCopy::createTeam(Player* pl, UInt32 NPCId, UInt32 monsterId)
 
 UInt32 PetTeamCopy::joinTeam(Player* pl, UInt32 teamId)
 {
+    if(pl->hasFlag(GObject::Player::InCopyTeam))
+        return 0;
+
     if(pl == NULL)
         return 0;
 
@@ -915,13 +919,13 @@ UInt32 PetTeamCopy::joinTeam(Player* pl, UInt32 teamId)
         return 0;
     }
 
-    UInt32 now = TimeUtil::Now();
+    /*UInt32 now = TimeUtil::Now();
     UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
     if(cfg.GMCheck && buffLeft > now)
     {
         pl->sendMsgCode(0, 1407, buffLeft - now);
         return 0;
-    }
+    }*/
 
     if(pl->getPetTeamData() != NULL)
         return 0;
@@ -1347,7 +1351,7 @@ void PetTeamCopy::reqStart(Player* pl, UInt8 opt)
     if(td->leader != pl)
         return;
 
-    UInt32 now = TimeUtil::Now();
+    /*UInt32 now = TimeUtil::Now();
     for(int i=0; i<td->count; ++i)
     {
         Player* member = td->members[i];
@@ -1357,7 +1361,7 @@ void PetTeamCopy::reqStart(Player* pl, UInt8 opt)
             member->sendMsgCode(0, 1407, buffLeft - now);
             return;
         }
-    }
+    }*/
 
     if(opt == 0)
         td->start = true;
@@ -1389,7 +1393,7 @@ void PetTeamCopy::teamBattleStart(Player* pl)
     if(td->leader != pl)
         return;
     
-    UInt32 now = TimeUtil::Now();
+    /*UInt32 now = TimeUtil::Now();
     for(int i=0; i<td->count; ++i)
     {
         Player* member = td->members[i];
@@ -1399,7 +1403,7 @@ void PetTeamCopy::teamBattleStart(Player* pl)
             member->sendMsgCode(0, 1407, buffLeft - now);
             return;
         }
-    }
+    }*/
 
     for(int j=0; j<td->count; ++j)
     {
