@@ -739,10 +739,12 @@ void OnSaleItemCancleAll( GameMsgHdr& hdr, const void * data )
 void OnDailyCheck( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
+    UInt32 time = *(UInt32*)data;
 
 	player->GetTaskMgr()->CheckDayTask(TimeUtil::SharpDay(0));
 	player->sendDailyInfo();
 
+    player->checkDungeonTimeout(time);
     player->buildClanTask(true);
     player->clearFinishCount();
     /*
@@ -759,7 +761,6 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
 
-    UInt32 time = *(UInt32*)data;
     player->SendNextdayTime(time);
     player->GetStrengthenMgr()->CheckTimeOver(time);
 }
@@ -2586,10 +2587,25 @@ void OnServerWarBeAttack( GameMsgHdr& hdr, const void* data )
 void OnhandleJiqirenAct( GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
-
-    frontMap.handleJiqirenAct(player);
-    playerCopy.handleJiqirenAct(player);
-    player->handleJiqirenAct();
+	const UInt8 type = *reinterpret_cast<const UInt8 *>(data);
+    switch(type)
+    {
+        case 1:
+            player->handleJiqirenAct_shiyamen();
+            break;
+        case 2:
+            player->handleJiqirenAct_clan();
+            break;
+        case 3:
+            player->handleJiqirenAct_copy();
+            break;
+        case 4:
+            player->handleJiqirenAct_frontMap();
+            break;
+        case 5:
+            player->handleJiqirenAct_dungeon();
+            break;
+    }
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

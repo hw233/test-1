@@ -1737,6 +1737,7 @@ namespace GObject
         void ColorTaskAccept(UInt8 type, UInt32 taskid);
         void ColorTaskAbandon(UInt8 type, UInt32 taskid);
         void clearFinishCount();
+        void checkDungeonTimeout(UInt32 now);
 		UInt16 calcNextTavernUpdate(UInt32);
 		UInt32 hireRecruit(UInt8);
 		void updateNextTavernUpdate(UInt32);
@@ -2923,7 +2924,11 @@ namespace GObject
         void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
         bool giveFlower(UInt8 type , UInt32 num = 0);
         void joinAllServerRecharge(UInt32);
-        void handleJiqirenAct();
+        void handleJiqirenAct_shiyamen();
+        void handleJiqirenAct_clan();
+        void handleJiqirenAct_copy();
+        void handleJiqirenAct_frontMap();
+        void handleJiqirenAct_dungeon();
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
 	};
