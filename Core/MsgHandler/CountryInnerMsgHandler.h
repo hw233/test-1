@@ -2583,31 +2583,6 @@ void OnServerWarBeAttack( GameMsgHdr& hdr, const void* data )
     serverWarMgr.beAttackByPlayer(player, swbad->attacker, swbad->formation, swbad->portrait, swbad->lineup);
 }
 
-//活动机器人（马上有奖）活动
-void OnhandleJiqirenAct( GameMsgHdr& hdr, const void * data)
-{
-    MSG_QUERY_PLAYER(player);
-	const UInt8 type = *reinterpret_cast<const UInt8 *>(data);
-    switch(type)
-    {
-        case 1:
-            player->handleJiqirenAct_shiyamen();
-            break;
-        case 2:
-            player->handleJiqirenAct_clan();
-            break;
-        case 3:
-            player->handleJiqirenAct_copy();
-            break;
-        case 4:
-            player->handleJiqirenAct_frontMap();
-            break;
-        case 5:
-            player->handleJiqirenAct_dungeon();
-            break;
-    }
-}
-
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 
