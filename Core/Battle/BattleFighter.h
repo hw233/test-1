@@ -1438,8 +1438,10 @@ private:
     UInt8 getRuRedCarpet() { return _ruRedCarpetLast; }
 
     UInt8 _shiFlowerLast;
-    void setShiFlower(UInt8 last) { _shiFlowerLast = last; }
+    UInt8 _shiFlowerAura;
+    void setShiFlower(UInt8 last, UInt8 aura) { _shiFlowerLast = last; _shiFlowerAura = aura; }
     UInt8 getShiFlower() { return _shiFlowerLast; }
+    UInt8 getShiFlowerAura() { return _shiFlowerAura; }
 
     UInt8 _daoRoseLast;
     void setDaoRose(UInt8 last) { _daoRoseLast = last; }
