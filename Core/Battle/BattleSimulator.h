@@ -295,6 +295,8 @@ private:
         e_unPetShield = 75,     // 解除仙宠的护盾
         e_selfBleed = 76,       // 自己流血 （自焚）
         e_unSelfBleed = 77,     // 自己流血结束 （自焚烧完了）
+        e_lingYan = e_selfBleed,            // 灵焱效果
+        e_unLingYan = e_unSelfBleed,          // 灵焱效果消失
         e_petAppear = 78,       // 仙宠入场
         e_petMark = 79,         // 神兽印记
         e_unPetMark = 80,         // 神兽印记
@@ -339,9 +341,6 @@ private:
         e_unDaoRose = 120,  //解除缘定今生
         e_moKnot = 121,  //琴瑟和鸣
         e_unMoKnot = 122,  //解除琴瑟和鸣
-
-        e_lingYan = e_selfBleed,            // 灵焱效果
-        e_unLingYan = e_unSelfBleed,          // 灵焱效果消失
 
         e_MAX_STATE,
     };

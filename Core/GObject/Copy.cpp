@@ -676,6 +676,8 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
         FastMutex::ScopedLock lk(_mutex);
         if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, copyUpdate)) ||
                 getFreeCount() < PLAYER_DATA(pl, copyFreeCnt) || getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, copyGoldCnt)) {
+            if(World::getJiqirenAct())
+                pl->handleJiqirenAct_copy();
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;
             PLAYER_DATA(pl, copyGoldCnt) = 0;
@@ -693,6 +695,8 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
     } else {
         if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, copyUpdate)) ||
                 getFreeCount() < PLAYER_DATA(pl, copyFreeCnt) || getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, copyGoldCnt)) {
+            if(World::getJiqirenAct())
+                pl->handleJiqirenAct_copy();
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;
             PLAYER_DATA(pl, copyGoldCnt) = 0;
@@ -911,40 +915,6 @@ void PlayerCopy::sendAutoCopy(Player* pl)
     Stream st(REP::AUTO_COPY);
     st << static_cast<UInt8>(0) << id << tcd.floor << tcd.spot << Stream::eos;
     pl->send(st);
-}
-
-void PlayerCopy::handleJiqirenAct(Player * pl)
-{
-    if(!pl) return;
-    int copy = pl->GetVar(VAR_JIQIREN_COPY);
-    int goldCnt = getGoldCount(pl->getVipLevel()) - PLAYER_DATA(pl, copyGoldCnt);
-    int freeCnt = getFreeCount() - PLAYER_DATA(pl, copyFreeCnt);
-    UInt8 fcnt = GET_BIT_8(copy, 0);
-    UInt8 gcnt1 = GET_BIT_8(copy, 1);
-    UInt8 gcnt2 = GET_BIT_8(copy, 2);
-    UInt8 gcnt3 = GET_BIT_8(copy, 3);
-    if(goldCnt == 3)
-    {
-        gcnt1 += 1;
-        gcnt2 += 1;
-        gcnt3 += 1;
-    }
-    else if(goldCnt == 2)
-    {
-        gcnt2 += 1;
-        gcnt3 += 1;
-    }
-    else if(goldCnt == 1)
-    {
-        gcnt3 += 1;
-    }
-    if(freeCnt > 0)
-        fcnt += freeCnt;
-    copy = SET_BIT_8(copy, 0, fcnt);
-    copy = SET_BIT_8(copy, 1, gcnt1);
-    copy = SET_BIT_8(copy, 2, gcnt2);
-    copy = SET_BIT_8(copy, 3, gcnt3);
-    pl->SetVar(VAR_JIQIREN_COPY, copy);
 }
 
 } // namespace GObject
