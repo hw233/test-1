@@ -10623,57 +10623,62 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                 bo = static_cast<BattleFighter*>(getObject(side, pos));
                 if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                     continue;
-
-                if(ruRedCarpetLast > 0 && bo->getRuRedCarpet() > 0)
+                if(bo == bf)
+                    continue;
+                if(bo->getRuRedCarpet() > 0 || bo->getShiFlower() > 0 || bo->getDaoRose() > 0 || bo->getMoKnot() > 0)
                 {
-                    bo->setConfuseRound(1);
-                    appendDefStatus(e_Confuse, 0, bo);
-                    calcAbnormalTypeCnt(bo);
-                }
+                    if(ruRedCarpetLast > 0)
+                    {
+                        bf->setConfuseRound(1);
+                        appendDefStatus(e_Confuse, 0, bf);
+                        calcAbnormalTypeCnt(bf);
+                    }
 
-                if(shiFlowerLast > 0 && bo->getShiFlower() > 0)
-                {
-                    float nChangeAuraNum = bo->getShiFlowerAura() * (-1);
-                    setStatusChange_Aura2(bo, bo->getSide(), bo->getPos(), NULL, nChangeAuraNum, 0, false);
-                }
+                    if(shiFlowerLast > 0)
+                    {
+                        float nChangeAuraNum = bf->getShiFlowerAura() * (-1);
+                        setStatusChange_Aura2(bf, bf->getSide(), bf->getPos(), NULL, nChangeAuraNum, 0, false);
+                    }
 
-                if(daoRoselast > 0 && bo->getDaoRose() > 0)
-                {
-                    bo->setStunRound(1);
-                    appendDefStatus(e_Stun, 0, bo);
-                    calcAbnormalTypeCnt(bo);
-                }
+                    if(daoRoselast > 0)
+                    {
+                        bf->setStunRound(1);
+                        appendDefStatus(e_Stun, 0, bf);
+                        calcAbnormalTypeCnt(bf);
+                    }
 
-                if(moKnotLast > 0 && bo->getMoKnot() > 0)
-                {
-                    bo->setBlind(0.75f, 1);
-                    appendDefStatus(e_blind, 0, bo);
-                    calcAbnormalTypeCnt(bo);
+                    if(moKnotLast > 0)
+                    {
+                        bf->setBlind(0.75f, 1);
+                        appendDefStatus(e_blind, 0, bf);
+                        calcAbnormalTypeCnt(bf);
+                    }
+
                 }
             }
 
             if(ruRedCarpetLast > 0)
             {
                 //appendDefStatus(e_unRuRedCarpet, 0, bf);
-                appendDefStatus(e_unRuRedCarpet, 0, bf);
+                appendDefStatus(e_unSoulProtect, 0, bf);
                 bf->setRuRedCarpet(0);
             }
             if(shiFlowerLast > 0)
             {
                 //appendDefStatus(e_unShiFlower, 0, bf);
-                appendDefStatus(e_unRuRedCarpet, 0, bf);
+                appendDefStatus(e_unSoulProtect, 0, bf);
                 bf->setShiFlower(0, 0);
             }
             if(daoRoselast > 0)
             {
                 //appendDefStatus(e_unDaoRose, 0, bf);
-                appendDefStatus(e_unRuRedCarpet, 0, bf);
+                appendDefStatus(e_unSoulProtect, 0, bf);
                 bf->setDaoRose(0);
             }
             if(moKnotLast > 0)
             {
                 //appendDefStatus(e_unMoKnot, 0, bf);
-                appendDefStatus(e_unRuRedCarpet, 0, bf);
+                appendDefStatus(e_unSoulProtect, 0, bf);
                 bf->setMoKnot(0);
             }
         }
