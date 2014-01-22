@@ -402,6 +402,9 @@ namespace REQ
     /** 组队副本 */
     const UInt8 TEAM_COPY_REQ       = 0x99;
 
+    /** 宠物组队副本 */
+    const UInt8 PET_TEAM_COPY       = 0x76;
+
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
 
@@ -438,6 +441,10 @@ namespace REQ
 
     /** 墨守成规 */
     const UInt8 CCB                 = 0X26;
+    /** 结婚系统 */
+    const UInt8 MARRYMGR            = 0x75;
+    /** 结婚养成 */
+    const UInt8 MARRIEDMGR          = 0x77;
 }
 
 namespace REP
@@ -701,6 +708,8 @@ namespace REP
 
     const UInt8 TEAM_COPY_REQ       = 0x99;
 
+    const UInt8 PET_TEAM_COPY       = 0x76;
+
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
     /** 系统弹窗公告 */
@@ -734,6 +743,10 @@ namespace REP
     const UInt8 SINGLE_HERO         = 0XA5;
     /** 墨守成规 */
     const UInt8 CCB                 = 0X26;
+    /** 结婚系统 */
+    const UInt8 MARRYMGR            = 0x75;
+    /** 结婚养成 */
+    const UInt8 MARRIEDMGR          = 0x77;
 }
 
 namespace SPEQ

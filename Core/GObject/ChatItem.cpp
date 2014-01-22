@@ -11,6 +11,7 @@
 #include "Server/WorldServer.h"
 #include "Server/OidGenerator.h"
 #include "Common/TimeUtil.h"
+#include "Married.h"
 
 namespace GObject
 {
@@ -102,7 +103,8 @@ void ChatItem::post( UInt8 type, UInt64 pid, UInt32 id, Player * player )
 			addFairyPet(player, id);
 			return;
 		}
-	case 0x11:
+		break;
+    case 0x11:
 		{
 			FastMutex::ScopedLock lk(_itemMutex);
 			std::map<UInt32, ChatItemData>::iterator it = _itemData.find(id);
@@ -147,6 +149,27 @@ void ChatItem::post( UInt8 type, UInt64 pid, UInt32 id, Player * player )
 			FIndex fi = {pid, id};
 			std::map<FIndex, ChatItemData>::iterator it = _fairyPetData.find(fi);
 			if(it == _fairyPetData.end())
+			{
+				return;
+			}
+			it->second.lastAccess = TimeUtil::Now();
+			player->send(it->second.st);
+			return;
+		}
+		break;
+    case 0x19:
+		{
+			FastMutex::ScopedLock lk(_coupleMutex);
+			addCouplePet(player);
+			return;
+		}
+		break;
+
+    case 0x20:
+		{
+			FastMutex::ScopedLock lk(_coupleMutex);
+			std::map<UInt64, ChatItemData>::iterator it = _couplePetData.find(pid);
+			if(it == _couplePetData.end())
 			{
 				return;
 			}
@@ -207,6 +230,18 @@ void ChatItem::purge( UInt32 curtime )
 				++ it;
 		}
 	}
+
+    {
+		FastMutex::ScopedLock lk(_coupleMutex);
+		std::map<UInt64, ChatItemData>::iterator it = _couplePetData.begin();
+		while(it != _couplePetData.end())
+		{
+			if(curtime > it->second.lastAccess + 3600 * 3)
+				_couplePetData.erase(it ++);
+			else
+				++ it;
+		}
+	}
 }
 
 void ChatItem::addPetItem( Player * player, UInt32 id, UInt32 petId )
@@ -245,5 +280,38 @@ UInt32 ChatItem::addFairyPet( Player * player, UInt32 id )
 
 	return id;
 }
+
+void ChatItem::addCouplePet( Player * player)
+{
+    if(gMarriedMgr.PreCheckingStatus(player) != 0)
+        return;
+    
+    GObject::Player * man_player = NULL;
+    GObject::Player * woman_player = NULL;
+    
+    GObject::Player * obj_player = GObject::globalPlayers[player->GetMarriageInfo()->lovers];
+    if(!obj_player || !player) 
+        return;
+    if(!player->getMainFighter()->getSex())//男的
+    {
+        man_player = player;
+        woman_player = obj_player;
+    }
+    else
+    {
+        man_player = obj_player;
+        woman_player = player;
+    }
+    
+    ChatItemData& cid = _couplePetData[player->getId()];
+	cid.st.init(REP::FLAUNT_GOOD);
+    cid.st << static_cast<UInt8>(0x19) << static_cast<UInt8>(player->IsMale() ? 0 : 1) << player->getCountry() << player->getName() << man_player->getName() << man_player->getCountry() << woman_player->getName() << woman_player->getCountry();
+    gMarriedMgr.AppendPetData(player,cid.st); 
+    cid.st << Stream::eos;
+	cid.lastAccess = TimeUtil::Now();
+
+    return;
+}
+
 
 }

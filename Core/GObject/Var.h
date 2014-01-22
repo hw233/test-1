@@ -283,6 +283,16 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
          */
         VAR_GAMEBOX_DAILY = 221,
         VAR_GAMEBOX_NEW = 222,
+        VAR_MARRY_STATUS = 223,//结婚状态
+        VAR_CANCEL_APPOINTMENT = 224,//取消婚礼预约
+        VAR_CANCEL_REPLYMARRIAGE = 225,//反悔回复征婚
+        VAR_CANCEL_MARRIAGE = 226,//取消提出的征婚
+        VAR_CANCEL_GIVEUP_JIEYUAN = 227,//放弃结缘
+        VAR_COUPLE_ONLINE_START_TIME = 228,//夫妻双方同时在线开始时间
+        VAR_COUPLE_ONLINE_AWARD = 229,//夫妻在线奖励
+        VAR_COUPLE_ONLINE_TIME = 230,//夫妻当日在线总时间
+        VAR_COUPLE_ONLINE_FISH = 231,//夫妻家园的钓鱼次数
+        VAR_COUPLE_ONLINE_RENAME = 232,//夫妻家园修改名字
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
@@ -510,25 +520,25 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_VIP_PRIVILEGE_BREAK_LAST = 541 ,
         VAR_SUMMERFLOW_TYPE = 542 ,
         VAR_SUMMERFLOW_AWARD = 543,   //是否领取暑期回流礼包
-        VAR_QQBOARD = 544 ,
-        VAR_QQBOARD_AWARD = 545,
-        VAR_LUCKYMEET = 546,
-        VAR_LUCKYMEET_AWARD = 547,
-        VAR_LUCKYMEET_RECHARGE = 548,
-        VAR_LUCKYMEET_RECHARGE_AWARD = 549 ,
-        VAR_LUCKYMEET_VIP = 550 ,
-        VAR_LUCKYMEET_STRENTH_AWARD = 551,
+        VAR_QQBOARD = 544 ,           //QQ面板
+        VAR_QQBOARD_AWARD = 545,     //QQ面板奖励领取情况
+        VAR_LUCKYMEET = 546,        //暑假奇遇
+        VAR_LUCKYMEET_AWARD = 547,  //暑假奇遇登陆奖励
+        VAR_LUCKYMEET_RECHARGE = 548,  //暑假奇遇充值数
+        VAR_LUCKYMEET_RECHARGE_AWARD = 549 ,  //暑假奇遇充值奖励
+        VAR_LUCKYMEET_VIP = 550 ,      //暑假奇遇期间御剑等级
+        VAR_LUCKYMEET_STRENTH_AWARD = 551,  //暑假奇遇变强
 
       
-        VAR_SUMMER_MEET_TYPE = 552 ,
-        VAR_SUMMER_MEET_TYPE_AWARD = 553,
-        VAR_SUMMER_MEET_LOGIN = 554,
-        VAR_SUMMER_MEET_LOGIN_AWARD = 555,
-        VAR_SUMMER_MEET_RECHARGE = 556,
-        VAR_SUMMER_MEET_RECHARGE_AWARD = 557 ,
-        VAR_SUMMER_MEET_STRENTH_AWARD = 558,
+        VAR_SUMMER_MEET_TYPE = 552 ,    //蜀山奇遇类型
+        VAR_SUMMER_MEET_TYPE_AWARD = 553,  //蜀山奇遇类型奖励（登陆弹框）
+        VAR_SUMMER_MEET_LOGIN = 554,    //蜀山奇遇登陆
+        VAR_SUMMER_MEET_LOGIN_AWARD = 555, //蜀山奇遇登陆奖励领取情况
+        VAR_SUMMER_MEET_RECHARGE = 556,   //蜀山奇遇充值
+        VAR_SUMMER_MEET_RECHARGE_AWARD = 557 , //蜀山奇遇充值奖励领取
+        VAR_SUMMER_MEET_STRENTH_AWARD = 558, //蜀山奇遇变强奖励领取
 
-        VAR_SUMMER_FLOW_LOGIN_AWARD = 559,
+        VAR_SUMMER_FLOW_LOGIN_AWARD = 559,   //暑假回流登陆奖励
         // 560-580 for zhgc
         VAR_CLAN_SPTR_WATER = 560,       // 每日神魔之树浇水数
         VAR_CLAN_SPTR_AWARD = 561,       // 每日神魔之树奖励领取标识
@@ -537,26 +547,26 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_QZONGPYGIFT = 564, //Qzong,PY合作礼包
 
         //581-600 for lb 
-        VAR_SUMMERFLOW3_TYPE = 581 ,
-        VAR_SUMMERFLOW3_TYPE_AWARD = 582 ,
-        VAR_SUMMERFLOW3_TIME_AWARD = 583,
+        VAR_SUMMERFLOW3_TYPE = 581 ,    //付费回流类型
+        VAR_SUMMERFLOW3_TYPE_AWARD = 582 ,  //付费回流类型奖励
+        VAR_SUMMERFLOW3_TIME_AWARD = 583, //付费回流第三期在线时间奖励
 
-        VAR_PRAY_TYPE = 584 ,
-        VAR_PRAY_VALUE = 585,
-        VAR_PRAY_COUNT = 586,
-        VAR_PRAY_SUCTIME = 587,
-        VAR_PRAY_TYPE_TODAY = 588 ,
-        VAR_PRAY_TIME = 589 ,
-        VAR_PRAY_LOGIN = 590,
+        VAR_PRAY_TYPE = 584 ,    //许愿类型
+        VAR_PRAY_VALUE = 585,   //许愿值
+        VAR_PRAY_COUNT = 586,   //一周许愿次数
+        VAR_PRAY_SUCTIME = 587,  //愿望积满的时间
+        VAR_PRAY_TYPE_TODAY = 588 ,   //今天是否许愿
+        VAR_PRAY_TIME = 589 ,   //许愿时间
+        VAR_PRAY_LOGIN = 590,   //一周连续登陆记录
         
-        VAR_QQBOARD_ONLINE = 591,
-        VAR_QQBOARD_LOGIN_AWARD = 592,
-        VAR_QQBOARD_ONLINE_AWARD = 593,
-        VAR_RANDfRIEND = 594 ,
-        VAR_SENDPRESENT_VALUE = 595,
-        VAR_GETPRESENT_VALUE = 596,
-        VAR_PRESENT_LOGIN = 597 ,
-        VAR_STRENGTH_LEVEL = 598,  
+        VAR_QQBOARD_ONLINE = 591,   //无效
+        VAR_QQBOARD_LOGIN_AWARD = 592, //登陆奖励
+        VAR_QQBOARD_ONLINE_AWARD = 593, //在线奖励（无效）
+        VAR_RANDfRIEND = 594 ,   //是否发送推荐好友
+        VAR_SENDPRESENT_VALUE = 595,  //赠送礼物数量（开服7天活动）
+        VAR_GETPRESENT_VALUE = 596, //接受礼物数量（开服7天活动）
+        VAR_PRESENT_LOGIN = 597 ,  //连续登陆记录
+        VAR_STRENGTH_LEVEL = 598,      //
         VAR_11AIRBOOK_GRADE = 599,  //10· 1 活动积分
         VAR_11AIRBOOK_GRADE_DAY = 600,  //10· 1 活动积分
         //601-620 for qiwy  ^_^
@@ -565,10 +575,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_SEVEN_SOUL_NUM = 603,  //玩家七魂仙魄数
 
         //621-660 for lib 
-        VAR_AIRBOOK_LOGIN = 621,
-        VAR_AIRBOOK_LOGIN_AWARD = 622,
-        VAR_AIRBOOK_ONLINE_AWARD = 623,
-        VAR_AIRBOOK_RECHARGE = 624,
+        VAR_AIRBOOK_LOGIN = 621,    //天书奇缘登陆
+        VAR_AIRBOOK_LOGIN_AWARD = 622,  //天书奇缘登陆奖励
+        VAR_AIRBOOK_ONLINE_AWARD = 623,  //天书奇缘在线奖励
+        VAR_AIRBOOK_RECHARGE = 624,    //天书奇缘充值
         VAR_AIRBOOK_CONSUME = 625,
         VAR_GUANGGUN_TIMES = 626,        //光棍节倍数（每天清零）
         VAR_GUANGGUN_GETROLL = 627,     //每天积分获得的抽奖次数（最大为3，每天清零）
@@ -590,7 +600,6 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_QZONE_RECHARGE = 643,       //空间充值 
         VAR_QZONE_RECHARGE_AWARD = 644,       //空间充值奖励领取
         
-
         VAR_OLDMAN_DAYSCORE = 645,       //捉迷藏活动每日积分
         VAR_OLDMAN_SCORE = 646,       //捉迷藏活动累计积分
         VAR_OLDMAN_PRESENT = 647,      //捉迷藏活动接受礼包数
@@ -608,19 +617,42 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_MARRYBOARD2_ANS  = 657,             // 表示当前答案 
         VAR_MARRYBOARD4_TIME = 658,             //表示婚礼第三阶段吃喜筵第四阶段驱赶时间
         VAR_MARRYBOARD3_KEY  = 659,
+
         //660-680 for lijr
-        VAR_CHRISTMAS_PRESENT = 660,    //圣诞礼物——麋鹿之角
-        VAR_QT_AWARD_MARK = 661,        //QT奖励领取
+        VAR_CHRISTMAS_PRESENT = 660,                //圣诞礼物——麋鹿之角
+        VAR_QT_AWARD_MARK = 661,                    //QT奖励领取
         VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE = 662,    //七石板每期最高积分
-        //VAR_QT_REGIST_SIGN = 663,       //QT天签到标志
-        VAR_QT_REGIST_NUM = 664,        //QT月签到次数
-        VAR_QT_SPECIAL_MARK = 665,      //QT记录12月份默认加6天签到次数
-        VAR_QT_REGIST_MARK = 666,       //QT月签到标志
+        VAR_QT_REGIST_NUM = 664,                    //QT月签到次数
+        VAR_QT_SPECIAL_MARK = 665,                  //QT记录12月份默认加6天签到次数
+        VAR_QT_REGIST_MARK = 666,                   //QT月签到标志
+        VAR_BUY_FUND_NuM = 667,                     //购买基金标志
+        VAR_BUY_FUND_AWARD = 668,                   //购买基金回馈标志
+        VAR_BUY_FUND_TRUMP_AWARD = 669,             //购买基金法宝奖励标志
+        VAR_ORDINARY_KILL_NUM = 670,                //普通击杀次数
+        VAR_DIFFICULTY_KILL_NUM = 671,              //困难击杀次数
+        VAR_ORDINARY_REFRESH_NUM = 672,             //普通刷新次数
+        VAR_DIFFICULTY_REFRESH_NUM = 673,           //困难 刷新次数
+        VAR_HELP_NUM = 674,                         //协助次数
+        VAR_PURPLE_NUM = 675,                       //紫色次数
+        VAR_ORANGE_NUM = 676,                       //橙色次数
+        VAR_PETTEAMCOPY_BATTLE_RES = 677,           //宠物副本战斗结果
 
         //681 - 700 for lb
         VAR_MARRYBOARD_YANHUA = 681,          //烟花积分
         VAR_3366_RECHARGE = 682,       //空间充值 
         VAR_3366_RECHARGE_AWARD = 683,       //空间充值奖励领取
+        VAR_MARRYBOARD_BAIHE = 684,          //百合使用
+        VAR_NEWYEARSPEED_COUNT = 685 ,
+        VAR_ONCE_ONDAY = 686 ,    //记录一天只有一次
+        VAR_NEWYEAR_PRATICE_COUNT = 687 ,    //记录一天只有一次
+
+        //701-710 for suntao
+        VAR_MicroCloud_AWARD = 701,     //是否领取微云合作奖励
+        VAR_JIQIREN_COPY = 702,     //机器人之副本未完成次数(1byte免费，2byte付费1，3byte付费2，4byte付费3)
+        VAR_JIQIREN_FRONTMAP = 703, //机器人之阵图未完成次数(1byte免费，2byte付费1，3byte付费2，4byte付费3)
+        VAR_JIQIREN_DUNGEON = 704,  //机器人之决战之地未完成次数(1byte普通免费，2byte普通付费，3byte困难免费，4byte困难付费)
+        VAR_JIQIREN_SYBS = 705,     //机器人之帮派、师门、衙门、锁妖塔未完成次数
+
         VAR_MAX,
     };
 
@@ -1152,15 +1184,36 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_NOV_LOGIN_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_GAMEBOX_DAILY, CYCLE_DAY);
             REGISTER_VAR(VAR_GAMEBOX_NEW, CYCLE_NONE);
+            REGISTER_VAR(VAR_MARRY_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_CANCEL_APPOINTMENT, CYCLE_NONE);
+            REGISTER_VAR(VAR_CANCEL_REPLYMARRIAGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_CANCEL_MARRIAGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_CANCEL_GIVEUP_JIEYUAN, CYCLE_NONE);
+            REGISTER_VAR(VAR_COUPLE_ONLINE_START_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_COUPLE_ONLINE_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_COUPLE_ONLINE_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_COUPLE_ONLINE_FISH, CYCLE_DAY);
+            REGISTER_VAR(VAR_COUPLE_ONLINE_RENAME, CYCLE_NONE);
             REGISTER_VAR(VAR_REAL_SPIRIT, CYCLE_NONE);
             REGISTER_VAR(VAR_REAL_SPIRIT_GET, CYCLE_DAY);
             REGISTER_VAR(VAR_QZONE_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_QZONE_RECHARGE_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_QT_AWARD_MARK, CYCLE_MONTH);
-            //REGISTER_VAR(VAR_QT_REGIST_SIGN, CYCLE_DAY);
             REGISTER_VAR(VAR_QT_REGIST_NUM, CYCLE_MONTH);
             REGISTER_VAR(VAR_QT_SPECIAL_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_QT_REGIST_MARK, CYCLE_MONTH);
+            REGISTER_VAR(VAR_BUY_FUND_NuM, CYCLE_NONE);
+            REGISTER_VAR(VAR_BUY_FUND_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_BUY_FUND_TRUMP_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_ORDINARY_KILL_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_DIFFICULTY_KILL_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ORDINARY_REFRESH_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_DIFFICULTY_REFRESH_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_HELP_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_PURPLE_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_ORANGE_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_PETTEAMCOPY_BATTLE_RES, CYCLE_NONE);
+
             REGISTER_VAR(VAR_OLDMAN_DAYSCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_OLDMAN_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_OLDMAN_PRESENT, CYCLE_DAY);
@@ -1170,11 +1223,24 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_YEARHAPPY_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_YEARHAPPY_LEFTVALUE, CYCLE_DAY);
-            REGISTER_VAR(VAR_MARRYBOARD_LIVELY, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD_LIVELY, CYCLE_NONE);
             REGISTER_VAR(VAR_MARRYBOARD3, CYCLE_DAY);
             REGISTER_VAR(VAR_MARRYBOARD2_NUM, CYCLE_DAY);
             REGISTER_VAR(VAR_MARRYBOARD2_ANS, CYCLE_DAY);
             REGISTER_VAR(VAR_MARRYBOARD4_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_MARRYBOARD_YANHUA, CYCLE_NONE);
+            REGISTER_VAR(VAR_3366_RECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_3366_RECHARGE_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_MARRYBOARD_BAIHE, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_NEWYEARSPEED_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ONCE_ONDAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_NEWYEAR_PRATICE_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_MicroCloud_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_JIQIREN_COPY, CYCLE_NONE);
+            REGISTER_VAR(VAR_JIQIREN_FRONTMAP, CYCLE_NONE);
+            REGISTER_VAR(VAR_JIQIREN_DUNGEON, CYCLE_NONE);
+            REGISTER_VAR(VAR_JIQIREN_SYBS, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

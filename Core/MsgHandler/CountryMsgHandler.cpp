@@ -159,6 +159,7 @@ MSG_REG(GameMsgHdr, OnGuideUdp);
 MSG_REG(GameMsgHdr, OnGetAward);
 MSG_REG_2(GameMsgHdr, REQ::FOURCOP, OnFourCopReq);
 MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);
+MSG_REG_2(GameMsgHdr, REQ::PET_TEAM_COPY, OnPetTeamCopyReq);
 MSG_REG_2(GameMsgHdr, REQ::NEWRELATION, OnNewRelationReq);
 MSG_REG_2(GameMsgHdr, REQ::SKILLSTRENGTHEN, OnSkillStrengthen);
 
@@ -194,6 +195,10 @@ MSG_REG_2(GameMsgHdr, REQ::RP_SERVER, OnRPServerReq);
 
 
 MSG_REG_2(GameMsgHdr, REQ::CCB, OnCCBReq);
+
+MSG_REG_2(GameMsgHdr, REQ::MARRYMGR, OnMARRYMGRReq);
+
+MSG_REG_2(GameMsgHdr, REQ::MARRIEDMGR, OnMARRIEDMGRReq);
 
 MSG_REG_2(GameMsgHdr, REQ::CLAN_SPIRIT_TREE, OnClanSpiritTree);
 
@@ -337,6 +342,7 @@ MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 MSG_REG_2(GameMsgHdr, 0x237, OnSendShusanLoveTitleCard);
 MSG_REG_2(GameMsgHdr, 0x238, OnAddPExpBy);
 MSG_REG_2(GameMsgHdr, 0x239, OnPracticeAttack);
+
 MSG_REG_2(GameMsgHdr, 0x240, OnHeroMemo);
 MSG_REG_2(GameMsgHdr, 0x241, OnAddItemBy);
 MSG_REG_2(GameMsgHdr, 0x242, OnCFriendLvlUp);

@@ -739,10 +739,12 @@ void OnSaleItemCancleAll( GameMsgHdr& hdr, const void * data )
 void OnDailyCheck( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
+    UInt32 time = *(UInt32*)data;
 
 	player->GetTaskMgr()->CheckDayTask(TimeUtil::SharpDay(0));
 	player->sendDailyInfo();
 
+    player->checkDungeonTimeout(time);
     player->buildClanTask(true);
     player->clearFinishCount();
     /*
@@ -759,7 +761,6 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
 
-    UInt32 time = *(UInt32*)data;
     player->SendNextdayTime(time);
     player->GetStrengthenMgr()->CheckTimeOver(time);
 }
@@ -837,12 +838,12 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
             UInt32 left = p;
             if(left >= duration)
             {
-                exp *= (1.8f + extraFactor);
+                exp *= (1.8f + 0.1f + extraFactor);
                 left -= duration;
             }
             else
             {
-                exp = exp * (1 + 0.8f * left / duration + extraFactor);
+                exp = exp * (1 + (0.8f + 0.1f)* left / duration + extraFactor);
                 left = 0;
             }
             player->SetVar(VAR_TRAINP3, left);

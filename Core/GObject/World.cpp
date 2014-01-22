@@ -153,7 +153,9 @@ bool World::_foolbao = false;
 bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
 bool World::_qqBoardLogin = false;
+bool World::_jiqirenAct = false;
 bool World::_surnamelegend = false;
+bool World::_speedTime = false;
 bool World::_happyFire = false;
 bool World::_11time = false;
 bool World::_ggtime = false;
@@ -246,6 +248,7 @@ UInt32 World::spreadBuff = 0;
 UInt8 World::_arenaState = 0;      //0:无 1:仙界第一 2:仙界至尊
 bool World::_memcinited = false;
 bool World::_miluzhijiao = false;
+bool World::_buyfund = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -346,6 +349,7 @@ bool enum_midnight(void * ptr, void* next)
 	}
     else
     {
+        pl->checkDungeonTimeout(nextday);
         pl->buildClanTask(true);
         pl->clearFinishCount();
         /*
@@ -429,6 +433,22 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -451,6 +471,8 @@ bool enum_midnight(void * ptr, void* next)
         (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 25)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
         ))
     {
 #if 0
@@ -1222,7 +1244,7 @@ void World::World_Midnight_Check( World * world )
 
     bool bMonsterActEnd = bMonsterAct && !getKillMonsterAct();
     UInt32 nextday = curtime + 30;
-
+    //充值奖励结束判断
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 1)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 2)
@@ -1235,6 +1257,21 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 9)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1446,7 +1483,7 @@ void World::World_OldMan_Refresh(void *)
            UInt16 loc;
            UInt32 npcId;
        };
-       MapNpc mapNpc = {_oldMan._spot, 4243};
+       MapNpc mapNpc = {_oldMan._spot, 4244};
        GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
        GLOBAL().PushMsg(hdr1, &mapNpc);
        _oldMan._loc = 0;
@@ -1474,7 +1511,7 @@ void World::World_OldMan_Refresh(void *)
             UInt16 loc;
             UInt32 npcId;
         };
-        MapNpc mapNpc = {_oldMan._spot, 4243};
+        MapNpc mapNpc = {_oldMan._spot, 4244};
         GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
         GLOBAL().PushMsg(hdr, &mapNpc);
 
@@ -1482,7 +1519,7 @@ void World::World_OldMan_Refresh(void *)
         _oldMan._players.clear();
         GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
         GObject::MOData mo;
-        mo.m_ID = 4243;
+        mo.m_ID = 4244;
         mo.m_Hide = false;
         mo.m_Spot = _oldMan._spot;
         mo.m_Type = 100;
@@ -1519,6 +1556,12 @@ void World::World_MarryBoard_Refresh(void *)
 {
     GObject::MarryBoard::instance().MarryBoard_Timer(); 
 }
+
+void World::World_Marry_Process(void *)
+{
+    gMarryMgr.DoProcess(TimeUtil::Now()); 
+}
+
 void World::DaysRank_Refresh(void*)
 {
 	GObject::DaysRank::instance().process();
@@ -1969,6 +2012,11 @@ bool World::Init()
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
     
+    if( GObject::MarryBoard::instance().sendAward())
+    {
+        gMarryMgr.MarryingCrush();
+    }
+    AddTimer(60 * 60 * 3 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
     return true;
 }
 
@@ -3403,9 +3451,9 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{509,30},{515,30},{503,60},{134,30},{9022,50}},
-        {{509,25},{515,25},{503,50},{134,25},{9022,30}},
-        {{509,20},{515,20},{503,40},{134,20},{9022,20}},
+        {{509,30},{515,30},{9438,60},{134,30},{9075,50}},
+        {{509,25},{515,25},{9438,50},{134,25},{9075,40}},
+        {{509,20},{515,20},{9438,40},{134,20},{9075,30}},
     };
    // static MailPackage::MailItem card = {9922,1};
     SYSMSG(title, 4950);
@@ -3498,7 +3546,7 @@ void World::Send11ClanRankAward()
         if(pos > 7 )
         {
             UInt32 ClanGrade = clan->getGradeInAirBook();
-            if(ClanGrade < 24000)
+            if(ClanGrade < 25000)
                 break;
             else 
                 type = 5;

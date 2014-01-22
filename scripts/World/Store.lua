@@ -130,6 +130,7 @@ function loadStore()
         store:add(2, 11116, 80)
         store:add(2, 11117, 90)
         store:add(2, 11118, 100)
+        --store:add(2, 11203, 110)
     end
 
     if getSurnameLegend(30) then

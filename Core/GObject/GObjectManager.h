@@ -321,6 +321,9 @@ namespace GObject
         static bool LoadTripodData();
         static bool LoadWorldBoss();
         static bool loadTeamCopy();
+        static bool loadPetTeamCopy();
+        static bool loadPlayerPetTeamCopy();
+        static bool loadPetTeamCopyLog();
         static bool LoadTownDeamon();
         static bool InitMoneyLog();
         static bool LoadHeroMemo();
@@ -361,6 +364,10 @@ namespace GObject
 	    static bool LoadArenaServerWar();
 	    static bool LoadServerWarBets();
 	    static bool LoadPlayerNamed();
+	    static bool LoadMarriage();
+	    static bool LoadReplyMarriage();
+	    static bool LoadMarriedLog();
+	    static bool LoadMarriedCouple();
 	    static bool LoadSevenSoul();
         static bool loadZhenwei();
         static bool loadQiShiBan();

@@ -831,6 +831,13 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 curLevel, UInt16 levels)
 
 void TownDeamon::process()
 {
+    if(World::getJiqirenAct())
+    {
+        for (GlobalPlayers::iterator it = globalPlayers.begin(); it != globalPlayers.end(); ++it)
+        {
+            handleJiqirenAct(it->second);
+        }
+    }
     int cnt = m_Monsters.size();
     for(int i = 0; i < cnt; ++ i)
     {
@@ -1048,6 +1055,36 @@ void TownDeamon::getTownReward_10_15(Player* pl, UInt16 level)
     if (newVar != var)
         pl->SetVar(VAR_TOWN_REWARD, newVar);
 
+}
+
+void TownDeamon::handleJiqirenAct(Player * pl)
+{
+    if(!pl) return;
+    DeamonPlayerData * dpd = pl->getDeamonPlayerData();
+    if(dpd && dpd->curLevel == 0)
+    {
+        UInt32 info = pl->GetVar(VAR_JIQIREN_SYBS);
+        info = SET_BIT_8(info, 3, (GET_BIT_8(info, 3)+1));
+        pl->SetVar(VAR_JIQIREN_SYBS, info);
+    }
+}
+
+void TownDeamon::getJiqirenAward(Player * pl)
+{
+    if(!pl) return;
+    DeamonPlayerData * dpd = pl->getDeamonPlayerData();
+    if(!dpd) return;
+    for(UInt32 idx = 0; idx < dpd->maxLevel; ++idx)
+    {
+        GData::NpcGroups::iterator it = GData::npcGroups.find(m_Monsters[idx].npcId);
+        if(it == GData::npcGroups.end())
+            continue;
+
+        GData::NpcGroup * ng = it->second;
+        pl->pendExp(ng->getExp());
+        ng->getLoots(pl, pl->_lastLoot, 0, NULL);
+    }
+    pl->checkLastBattled();
 }
 
 }

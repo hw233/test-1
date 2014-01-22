@@ -6794,12 +6794,15 @@ namespace GObject
     bool Package::FinishLBSmeltSpecial(const GData::ItemBaseType * itype, ItemLingbaoAttr &lbattr, UInt8& attrNum)
     {
         //黄帝卷宗（11113），炎帝卷宗（11114），神农卷宗（11115），女娲卷宗（11116）
-        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118};
+        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118, 11203 };
         bool hasSpe = false;
         for(UInt8 i = 0; i < sizeof(lbids) / sizeof(lbids[0]); ++i)
         {
             if(m_lbSmeltInfo.gujiId == lbids[i])
+            {
                 hasSpe = true;
+                break;
+            }
         }
         if(!hasSpe)
             return false;
@@ -6913,7 +6916,7 @@ namespace GObject
         UInt16 subClass = itype->subClass;
         bool fSpecial = true;
         if(!FinishLBSmeltSpecial(itype, lbattr, attrNum))
-        {
+        {   //非皇帝卷宗才进来！！
             fSpecial = false;
             UInt8 minAttrNum = item->quality > 3 ? 3 : 1;
             UInt8 color2 = item->quality;
@@ -6928,6 +6931,8 @@ namespace GObject
 
             std::vector<UInt8> allAttrType = lbAttrConf.attrType;
             //allAttrType.erase(allAttrType.begin() + 1);
+            if(find(allAttrType.begin(),allAttrType.end(),2) != allAttrType.end())
+                allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),2));
             UInt8 itemTypeIdx = subClass - Item_LBling;
             // 古籍指定的属性
             {
@@ -6940,7 +6945,7 @@ namespace GObject
                 }
                 else
                 {
-                    UInt8 lbAttrIdx[12] = {0, 1, 11, 6, 2, 3, 5, 4, 9, 10, 8, 7};
+                    UInt8 lbAttrIdx[12] = {0, 0, 10, 5, 1, 2, 4, 3, 8, 9, 7, 6};
                     idx = lbAttrIdx[gjIdx - 4];
                 }
 
@@ -6951,8 +6956,6 @@ namespace GObject
                     orangeCnt -= 1;
 
                 lbattr.type[0] = allAttrType[idx];
-                if(lbattr.type[0] == 2)
-                    lbattr.type[0] = 1;
                 UInt16 chance = uRand(10000);
                 float fChance = ((float)(uRand(10000)))/10000;
                 float disFactor = lbAttrConf.getDisFactor4(chance, fChance, color);
@@ -6960,8 +6963,6 @@ namespace GObject
                 lbattr.value[0] = lbAttrConf.getAttrMax(lv, itemTypeIdx, lbattr.type[0]-1) * disFactor + 0.9999f;
                 allAttrType.erase(allAttrType.begin() + idx);
             }
-            if(find(allAttrType.begin(),allAttrType.end(),2) != allAttrType.end())
-                allAttrType.erase(find(allAttrType.begin(),allAttrType.end(),2));
             for(int i = 1; i < attrNum; ++ i)
             {
                 if(5 == color2)

@@ -95,13 +95,13 @@ namespace GObject
         GVAR_SUMMER_FLOW_BEGIN = 53,
         GVAR_SUMMER_FLOW_END = 54,
 
-        GVAR_QZONEQQGAME_BEGIN = 55,
+        GVAR_QZONEQQGAME_BEGIN = 55,   //蓝钻空间
         GVAR_QZONEQQGAME_END = 56,
 
         GVAR_QISHIBANGAME_BEGIN = 57,  //七石斗法开始时间
         GVAR_QISHIBANGAME_END = 58,    //七石斗法结束时间
 
-        GVAR_QZONEQQGAMEY_BEGIN = 59,
+        GVAR_QZONEQQGAMEY_BEGIN = 59,  //黄钻空间
         GVAR_QZONEQQGAMEY_END = 60,
 
         GVAR_QZONE_RECHARGE_BEGIN = 61,
@@ -111,10 +111,10 @@ namespace GObject
         GVAR_SERVERWAR_JIJIANTAI = 64, //跨服服战祭剑台 所有人成功的祭剑总数
         GVAR_SERVERWAR_XIUWEI = 65, //服战名次带来的修为加成 20表明服战第一名
 
-        GVAR_CHRISTMAS_PILESNOW_BEGIN = 66,
+        GVAR_CHRISTMAS_PILESNOW_BEGIN = 66,    
         GVAR_CHRISTMAS_PILESNOW_END = 67,
        
-        GVAR_OLDMAN_BEGIN = 68,
+        GVAR_OLDMAN_BEGIN = 68,   //捉迷藏
         GVAR_OLDMAN_END = 69,
 
         GVAR_YEARHAPPY_RANK_BEGIN = 70, //跨年大转盘
@@ -123,6 +123,14 @@ namespace GObject
 
         GVAR_3366_RECHARGE_BEGIN = 72,
         GVAR_3366_RECHARGE_END = 73,
+        
+        GVAR_MARRY_TIME1 = 74,//婚礼发放烟花
+        GVAR_MARRY_TIME2 = 75,
+        GVAR_MARRY_TIME3 = 76,
+        GVAR_CREATMARRY_TIMES = 77,//婚礼当天创建
+        
+        GVAR_REPAIRMARRYBUG = 78,//婚礼bug修复
+        
         GVAR_MAX,
     };
 
@@ -225,6 +233,12 @@ namespace GObject
             GREGISTER_VAR(GVAR_CHRISTMAS_PILESNOW_END, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_YEARHAPPY_RANK_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_YEARHAPPY_RANK_END, GCYCLE_NONE);
+            
+            GREGISTER_VAR(GVAR_MARRY_TIME1, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_MARRY_TIME2, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_MARRY_TIME3, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_CREATMARRY_TIMES, GCYCLE_DAY);
+            GREGISTER_VAR(GVAR_REPAIRMARRYBUG, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

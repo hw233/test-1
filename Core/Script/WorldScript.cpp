@@ -171,6 +171,7 @@ void WorldScript::init()
     def("setCollectCardAct", GObject::World::setCollectCardAct);
     def("setHalloweenAct", GObject::World::setHalloweenAct);
     def("setMiLuZhiJiaoAct", GObject::World::setMiLuZhiJiaoAct);
+    def("setBuyFundAct", GObject::World::setBuyFundAct);
     
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);
@@ -243,6 +244,7 @@ void WorldScript::init()
 	def("setSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
     def("setFoolBao",GObject::World::setFoolBao);
     def("getFoolBao",GObject::World::getFoolBao);
+    def("setHappyFireTime",GObject::World::setHappyFireTime);
     def("getHappyFireTime",GObject::World::getHappyFireTime);
     def("setSummerFlow3Time",GObject::World::setSummerFlow3Time);
     def("getSummerFlow3Time",GObject::World::getSummerFlow3Time);
@@ -263,6 +265,7 @@ void WorldScript::init()
     def("getRYHBActivity",GObject::World::getRYHBActivity);
 
     def("setMergeAthAct", GObject::World::setMergeAthAct);
+    def("setHappyFireTime", GObject::World::setHappyFireTime);
     def("getMergeAthAct", GObject::World::getMergeAthAct);
     def("setFourCopAct", GObject::World::setFourCopAct);
     def("getFourCopAct", GObject::World::getFourCopAct);
@@ -293,6 +296,8 @@ void WorldScript::init()
     //def("setStartTick", GObject::ClanCopy::setStartTick);
     def("setQQGameOnlineAwardAct", GObject::World::setQQGameOnlineAwardAct);
     def("setQZoneQQGameAct", GObject::World::setQZoneQQGameAct);
+    def("setJiqirenAct", GObject::World::setJiqirenAct);
+    def("getJiqirenAct", GObject::World::getJiqirenAct);
 }
 
 void WorldScript::postInit()
