@@ -331,6 +331,15 @@ private:
         e_dmgNingShi = 111,    // 凝视
         e_unDmgNingShi = 112,    // 解除凝视
 
+        e_ruRedCarpet = 115,  //情定红毯
+        e_unRuRedCarpet = 116,  //解除情定红毯
+        e_shiFlower = 117,  //心心相印
+        e_unShiFlower = 118,  //解除心心相印
+        e_daoRose = 119,  //缘定今生
+        e_unDaoRose = 120,  //解除缘定今生
+        e_moKnot = 121,  //琴瑟和鸣
+        e_unMoKnot = 122,  //解除琴瑟和鸣
+
         e_lingYan = e_selfBleed,            // 灵焱效果
         e_unLingYan = e_unSelfBleed,          // 灵焱效果消失
 

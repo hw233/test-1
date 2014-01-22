@@ -97,7 +97,8 @@ enum
     TYPE_HPP_RECOVER = 49,       // HP百分比回复
     TYPE_EX_HP_ADD_ADD = 50,    // 技能额外治疗效果提升
     TYPE_INTENSIFYSTATE_OTHER = 51, // 强化队友技能效果
-    TYPE_DAMAG_C = 52,       // 波及后方单位
+    TYPE_DAMAG_CS = 52,       // (爆击)波及后方单位伤害
+    TYPE_DAMAG_PR = 53,       // (破击)波及后方单位伤害
 
     TYPE_MAX,
 };

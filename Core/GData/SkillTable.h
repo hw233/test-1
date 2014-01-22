@@ -125,8 +125,8 @@ enum
     e_eft_hp_lostp = 46,    // HP损失百分比
     e_eft_ru_red_carpet = 47,    // 儒：红毯
     e_eft_shi_flower = 48,    // 释：鲜花
-    e_eft_dao_rose = 47,    // 道：玫瑰
-    e_eft_mo_knot = 47,    // 墨：同心结
+    e_eft_dao_rose = 49,    // 道：玫瑰
+    e_eft_mo_knot = 50,    // 墨：同心结
 
     e_eft_max
 };
