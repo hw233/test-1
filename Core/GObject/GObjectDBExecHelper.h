@@ -64,6 +64,14 @@ struct DBTeamCopy
     std::string npcgroups;
 };
 
+struct DBPetTeamCopy
+{
+    UInt8 copyIdx;
+    UInt8 type;
+    UInt32 npcgroupId;
+    UInt8 quality;
+};
+
 struct DBClanAssistant
 {
 	UInt32 id;
@@ -172,6 +180,23 @@ struct DBTeamCopyPlayerAward
     UInt8  roll;
     UInt32 awardId;
     UInt32 awardCnt;
+};
+
+struct DBPetTeamCopyPlayer
+{
+    UInt64 playerId;
+    UInt8  copyId;
+    UInt8  type;
+    UInt32 npcGroup1Id;
+    UInt32 npcGroup2Id;
+    UInt32 npcGroup3Id;
+};
+
+struct DBPetTeamCopyLog
+{
+    std::string playerName;
+    std::string monsterName;
+    std::string items;
 };
 
 struct DBPlayerData
@@ -1448,6 +1473,18 @@ struct DBMarriedLog
     UInt8 wedding_type;
 };
 
+struct DBMarriedCouple
+{
+    UInt32 jh_time;
+    UInt64 man_playerid;
+    UInt64 woman_playerid;
+    UInt8 lover_item;
+    std::string pet_name;
+    UInt8 pet_level;
+    UInt32 pet_levelExp;
+    UInt32 pet_friendliness;
+};
+
 struct DBSevenSoul
 {
     UInt64 playerId;
@@ -1795,7 +1832,26 @@ SPECIALDEF(5)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBPetTeamCopyPlayer)
+SPECIALDEF(6)
+(
+    UInt64, playerId,
+    UInt8,  copyId,
+    UInt8,  type,
+    UInt32, npcGroup1Id,
+    UInt32, npcGroup2Id,
+    UInt32, npcGroup3Id
+)
+SPECIALEND()
 
+SPECIALBEGIN(GObject::DBPetTeamCopyLog)
+SPECIALDEF(3)
+(
+    std::string, playerName,
+    std::string, monsterName,
+    std::string, items
+)
+SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter)
 SPECIALDEF(33)
@@ -2106,6 +2162,16 @@ SPECIALDEF(4)
 	UInt8, type,
 	UInt16, location,
 	std::string, npcgroups
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBPetTeamCopy)
+SPECIALDEF(4)
+	(
+	UInt8, copyIdx,
+	UInt8, type,
+	UInt32, npcgroupId,
+	UInt8, quality
 	)
 SPECIALEND()
 
@@ -3296,6 +3362,20 @@ SPECIALDEF(9)
     UInt32, replymarriage_time,
     UInt32, jy_time,
     UInt8, wedding_type
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBMarriedCouple)
+SPECIALDEF(8)
+    (
+    UInt32, jh_time,
+    UInt64, man_playerid,
+    UInt64, woman_playerid,
+    UInt8, lover_item,
+    std::string, pet_name,
+    UInt8, pet_level,
+    UInt32, pet_levelExp,
+    UInt32, pet_friendliness
     )
 SPECIALEND()
     

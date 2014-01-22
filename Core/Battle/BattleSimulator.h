@@ -7,6 +7,10 @@
 #include "GData/Area.h"
 #include "GData/SkillStrengthen.h"
 
+#ifdef _DEBUG
+//#define _BATTLE_DEBUG
+#endif
+
 namespace Script
 {
 class BattleFormula;
@@ -291,7 +295,9 @@ private:
         e_unPetShield = 75,     // 解除仙宠的护盾
         e_selfBleed = 76,       // 自己流血 （自焚）
         e_unSelfBleed = 77,     // 自己流血结束 （自焚烧完了）
-        e_petAppear = 78,
+        e_lingYan = e_selfBleed,            // 灵焱效果
+        e_unLingYan = e_unSelfBleed,          // 灵焱效果消失
+        e_petAppear = 78,       // 仙宠入场
         e_petMark = 79,         // 神兽印记
         e_unPetMark = 80,         // 神兽印记
         e_petProtect100 = 81,   // 100%援护标志
@@ -324,8 +330,9 @@ private:
         e_unSoulProtect = 108,    // 天佑
         e_dmgDeep = 109,    // 重伤
         e_unDmgDeep = 110,    // 解除重伤
-        e_dmgNingShi = 109,    // 凝视
-        e_unDmgNingShi = 110,    // 解除凝视
+        e_dmgNingShi = 111,    // 凝视
+        e_unDmgNingShi = 112,    // 解除凝视
+
 
         e_MAX_STATE,
     };
@@ -375,12 +382,15 @@ private:
 	void setStatusChange(UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, UInt32 value, bool active);
 	void setStatusChange(BattleFighter * bf, UInt8 side, UInt8 pos, int cnt, const GData::SkillBase* skill, UInt8 type, float value, UInt16 last, bool active);
 	void setStatusChange2(BattleFighter* bf, UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, UInt16 last, bool active);
+    void onHPChanged(BattleObject* bo);
 	void onDamage(BattleObject * bo, bool active, UInt32 dmg);
 	BattleFighter * getRandomFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMaxHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMinHpFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMaxAtkFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
 	BattleFighter * getMinAtkFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
+    BattleFighter * get2ndAtkFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
+
     bool doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct = NULL, float factor = 1, bool canProtect = false);
     bool doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0, UInt8* launchPeerLess = NULL, bool canProtect = false);
     BattleFighter* getTherapyTarget(BattleFighter* bf);
@@ -455,6 +465,10 @@ private:
 
     typedef bool (Battle::BattleSimulator::*doSkillStrengthenFunc)(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
+    bool doSkillStrengthen_NingShi(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
+    bool doSkillStrengthen_DefChange(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
+    bool doSkillStrengthen_HPPRecover(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
+    bool doSkillStrengthen_DmgDeep(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
     bool doSkillStrengthen_SelfAttack(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
     bool doSkillStrengthen_FireFakeDead(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
@@ -476,6 +490,9 @@ private:
     bool AddYuanCiState_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill, const int nAttackCount);
     // 群攻的时候只中一个目标产生加强
     void ModifySingleAttackValue_SkillStrengthen(BattleFighter* bf,const GData::SkillBase* skill, float& fvalue, bool isAdd);
+    void ModifyAttackValue_SkillStrengthen(BattleFighter* bf,const GData::SkillBase* skill, float& fvalue, bool isAdd);
+    void ModifyAttackValue_SkillStrengthen_Other(BattleFighter* bf,const GData::SkillBase* skill, float& fvalue, bool isAdd);
+    void ModifyTherapy_SkillStrengthen(BattleFighter* bf, const GData::SkillBase* skill, float& fvalue, bool isAdd);
     // 上状态，只跟作用双方和状态有关的函数接口，主要用在技能符文加强的上状态
     bool AddSkillStrengthenState(BattleFighter* pFighter, BattleFighter* pTarget,const UInt16 nSkillId, const UInt8 nState, const Int16 nLast);
     bool AddStateAfterResist_SkillStrengthen(BattleFighter* pFighter, BattleFighter* pTarget, const GData::SkillBase* skill);
@@ -505,6 +522,7 @@ private:
     bool doSkillStrengthen_ShieldHP(BattleFighter* bf, const GData::SkillBase* skill, const GData::SkillStrengthenEffect* ef, int target_side, int target_pos, bool active);
 
 
+    void doAllSkillStrengthenEffect(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos);
 
     UInt32 doSkillStrenghtenCriticalPierceDmgB(BattleFighter* bf, const GData::SkillBase* skill, bool cs, bool pr, GData::SkillStrengthenBase*  ss, int target_side, int target_pos);
 
@@ -545,6 +563,8 @@ private:
     void doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_OtherSidePeerlessDisable(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_CheckMaxTrigger(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_HpLostP(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
     bool doSkillEffectExtra_Dead(BattleFighter* bf, const GData::SkillBase* skill);
     void doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, const GData::SkillBase* skill, bool& cs, bool& pr);

@@ -387,6 +387,9 @@ bool TeamCopy::quikJoinTeam(Player* pl)
 
 UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
 {
+    if(pl->GetEnterPTCStatus())
+        return 0;
+
     CopyTeamPage& ctp = pl->getCopyTeamPage();
     UInt8 copyId = ctp.copyId;
     UInt8 copyIdx = ctp.copyId - 1;
@@ -1101,6 +1104,30 @@ bool TeamCopyPlayerInfo::getPass(UInt8 copyId, UInt8 t)
 
 bool TeamCopyPlayerInfo::getPass(UInt8 copyId)
 {
+    return getPass(copyId, 0);
+}
+
+bool TeamCopyPlayerInfo::getPassMax()
+{
+    UInt8 level = m_owner->GetLev();
+    if(level < TeamCopy::lvls[0])
+        return false;
+    UInt8 copyId = 0;
+    for(UInt8 i = 1; i < sizeof(TeamCopy::lvls)/sizeof(TeamCopy::lvls[0]); ++ i)
+    {
+        if(level < TeamCopy::lvls[i])
+        {
+            copyId = i;
+            break;
+        }
+        if(i + 1 == sizeof(TeamCopy::lvls)/sizeof(TeamCopy::lvls[0]))
+        {
+            if(level >= TeamCopy::lvls[i])
+                copyId = i+1;
+        }
+    }
+    if(copyId == 0)
+        return false;
     return getPass(copyId, 0);
 }
 

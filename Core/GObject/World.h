@@ -584,8 +584,10 @@ public:
     } 
     inline static bool  getOldManTime()
     {
-        UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
-        UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        //UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
+        UInt32 begin = TimeUtil::MkTime(2014, 1, 31);
+        //UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        UInt32 end = TimeUtil::MkTime(2014, 2, 7);
         UInt32 now = TimeUtil::Now() ;
         if( now >= begin && now <= end)
             return true;
@@ -595,8 +597,8 @@ public:
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 11, 27);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 12, 2);
+        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 1, 25);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 1, 30);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
@@ -646,6 +648,18 @@ public:
         _consumebegin = begin;
         _consumeend = end;
     }
+    inline static bool  getNewYearSpeedTime(UInt32 now = 1)
+    {
+        if( now == 1 )
+              now = TimeUtil::Now();
+        UInt32 _speedBegin = TimeUtil::MkTime(2014, 1, 18);
+        UInt32 _speedEnd = TimeUtil::MkTime(2014, 2,16);
+        if(now >_speedBegin && now <= _speedEnd)
+            return true;
+        else 
+            return false;
+    } 
+
     inline static UInt32 getConsumeBegin() { return _consumebegin; }
     inline static UInt32 getConsumeEnd() { return _consumeend; }
     inline static void setNeedConsumeRank(bool v)
@@ -708,6 +722,11 @@ public:
     { _miluzhijiao = v; }
     inline static bool getMiLuZhiJiaoAct()
     { return _miluzhijiao; }
+
+    inline static void setBuyFundAct(bool v)
+    { _buyfund = v; }
+    inline static bool getBuyFundAct()
+    { return _buyfund; }
 
     inline static bool getLuckyStarAct()
     {
@@ -838,16 +857,19 @@ public:
 
     inline static void setSurnameLegend(bool v)
     {
+        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now();
         if( now >= begin && now <= end)
             return;
+        */
         _surnamelegend = v;
     }
    
     inline static bool getSurnameLegend(UInt32 time = 0)
     {
+        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now() + time;
@@ -859,6 +881,7 @@ public:
             _surnamelegend = true;
         else
             _surnamelegend = false;
+        */
         return _surnamelegend;
     }
 
@@ -888,8 +911,20 @@ public:
         return _snowAct;
     }
 
+    inline static void setHappyFireTime(bool v)
+    {
+        /* 春节期间注释掉
+        UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
+        UInt32 now = TimeUtil::Now();
+        if( now >= begin && now <= end)
+            return;
+        */
+        _happyFire = v;
+    }
     inline static bool getHappyFireTime(UInt32 time = 0)
     {
+        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
         UInt32 now = TimeUtil::Now()+time;
@@ -897,6 +932,7 @@ public:
             _happyFire = true;
         else
             _happyFire = false;
+        */
         return _happyFire;
     } 
     inline static bool getLuckyMeet(UInt32 time = 0)
@@ -1002,7 +1038,12 @@ public:
     inline static void setQQBoardLoginTime(bool v)
     { _qqBoardLogin = v; }
     inline static bool getQQBoardLoginTime()
-    { return _qqBoardLogin; } 
+    { return _qqBoardLogin; }
+
+    inline static void setJiqirenAct(bool v)
+    { _jiqirenAct = v; }
+    inline static bool getJiqirenAct()
+    { return _jiqirenAct; }
 
     inline static void setCallSnakeEggAct(UInt8 v)
     { _callsnakeeggact = v; }
@@ -1190,6 +1231,7 @@ public:
     static bool _foolbao;
     static bool _summerFlow3;
     static bool _surnamelegend;
+    static bool _speedTime;
     static bool _happyFire;
     static bool _11time;
     static bool _qishiban;
@@ -1199,6 +1241,7 @@ public:
     static bool _zcjbActivity;
     static bool _halfgold;
     static bool _qqBoardLogin;
+    static bool _jiqirenAct;
     static UInt8 _callsnakeeggact;
     static UInt8 _snakeeggawardact;
     static bool _item9344act;
@@ -1211,6 +1254,7 @@ public:
     static UInt8 _arenaState;      //0:无 1:仙界第一 2:仙界至尊 3:仙界传奇
     static bool _memcinited;
     static bool _miluzhijiao;
+    static bool _buyfund;
 public:
     static RCSortType qishibanScoreSort;     //七石板积分排名
     static RCSortType rechargeSort;

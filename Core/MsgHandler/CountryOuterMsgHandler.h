@@ -55,6 +55,7 @@
 #include "LoginMsgHandler.h"
 #include "GObject/SaleMgr.h"
 #include "GObject/TeamCopy.h"
+#include "GObject/PetTeamCopy.h"
 #include "GObject/HeroMemo.h"
 #include "GObject/ShuoShuo.h"
 #include "GObject/CFriend.h"
@@ -69,6 +70,7 @@
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
 #include "GObject/Marry.h"
+#include "GObject/Married.h"
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
 
@@ -1417,6 +1419,21 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->sendGuangGunInfo();
     pl->setQTSpecialMark();
+    //通知结婚养成
+    if(pl->GetVar(GObject::VAR_MARRY_STATUS) == 5 || pl->GetVar(GObject::VAR_MARRY_STATUS) == 6)
+    {
+        Stream st1(REP::MARRIEDMGR);
+        st1  << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
+        pl->send(st1);
+        gMarriedMgr.ProcessOnlineAward(pl,0);
+        gMarriedMgr.ReturnCouplePet(pl);
+    }
+    else
+    {
+        Stream st1(REP::MARRIEDMGR);
+        st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0)<< Stream::eos;
+        pl->send(st1);
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1970,7 +1987,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
     switch(opt)
     {
         /** 周岁红包送不停 **/
-        case 1:
+        case 0x01:
         {
             if(!player->hasChecked())
                 return;
@@ -1988,7 +2005,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 player->sendYearActInfo();
         }
         break;
-        case 2:
+        case 0x02:
         {
             if(!player->hasChecked())
                 return;
@@ -2008,7 +2025,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 3:
+        case 0x03:
         {
             if(!player->hasChecked())
                 return;
@@ -2022,7 +2039,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 4:
+        case 0x04:
         {
             UInt8 type;
             UInt8 copy_or_front;
@@ -2048,7 +2065,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 player->closeCopyFrontAwardByIndex(copy_or_front, index);
         }
 
-        case 5:
+        case 0x05:
         {
             if(!player->hasChecked())
                 return;
@@ -2060,7 +2077,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 6:
+        case 0x06:
         {
             if(!player->hasChecked())
                 return;
@@ -2078,7 +2095,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 7:
+        case 0x07:
         {
             if(!player->hasChecked())
                 return;
@@ -2090,7 +2107,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 8:
+        case 0x08:
         {
             if(!World::getNewYearGiveGiftAct())
                 return;
@@ -2102,13 +2119,23 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 9:
+        case 0x09:
         {
             UInt8 type;
             if(!World::getNewYearQQGameAct())
                 return;
             br >> type;
             player->getNewYearQQGameAward(type);
+        }
+        break;
+
+        case 0x0A:
+        {
+            UInt8 type;
+            if(!World::getNewYearQzoneContinueAct())
+                return;
+            br >> type;
+            player->getNewYearQzoneContinueAward(type);
         }
         break;
 
@@ -2190,13 +2217,20 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
-        case 10:
+        case 0x10:
         {
-            UInt8 type;
-            if(!World::getNewYearQzoneContinueAct())
+            if(!World::getJiqirenAct())
                 return;
+            UInt8 type = 0xFF;
             br >> type;
-            player->getNewYearQzoneContinueAward(type);
+            if(type == 0)
+                player->sendJiqirenInfo();
+            else if(type == 1)
+            {
+                UInt8 idx = 0xFF, count = 0xFF;
+                br >> idx >> count;
+                player->completeJiqirenTask(idx, count);
+            }
         }
         break;
 
@@ -5370,6 +5404,111 @@ void OnFairySparReq(GameMsgHdr& hdr, const void * data)
     }
 }
 
+void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    if (player->isJumpingMap())
+        return;
+
+    switch(op)
+    {
+    case 0x00:
+        {
+            petTeamCopyManager->enter(player);
+        }
+        break;
+    /*case 0x01:
+        {
+            UInt8 type = 0;
+            br >> type;
+            petTeamCopyManager->reqTeamList(player, type);
+        }
+        break;*/
+    case 0x02:
+        {
+            petTeamCopyManager->quit(player);
+        }
+        break;
+    case 0x03:
+        {
+            petTeamCopyManager->reqTeamInfo(player);
+        }
+        break;
+    case 0x04:
+        {
+            UInt8 copyLvl = 0;
+            UInt8 type = 0;
+            br >> copyLvl >> type;
+            petTeamCopyManager->enterTeamCopy(player, copyLvl, type);
+        }
+        break;
+    case 0x05:
+        {
+            petTeamCopyManager->refreshMonster(player);
+        }
+        break;
+    case 0x06:
+        {
+            UInt32 npcGroupId = 0;
+            UInt32 monsterId = 0;
+            br >> npcGroupId >> monsterId;
+            petTeamCopyManager->createTeam(player, npcGroupId, monsterId);
+        }
+        break;
+    case 0x07:
+        {
+            UInt32 teamId = 0;
+            br >> teamId;
+            petTeamCopyManager->joinTeam(player, teamId);
+        }
+        break;
+    case 0x08:
+        {
+            petTeamCopyManager->leaveTeam(player, 1);
+        }
+        break;
+    case 0x09:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            petTeamCopyManager->teamKick(player, playerId);
+        }
+        break;
+    case 0x10:
+        {
+            petTeamCopyManager->teamBattleStart(player);
+        }
+        break;
+    case 0x11:
+        {
+            UInt8 pos1 = 0;
+            UInt8 pos2 = 0;
+            UInt8 pos3 = 0;
+            br >> pos1 >> pos2 >> pos3;
+            petTeamCopyManager->setFormation(player, pos1, pos2, pos3);
+        }
+        break;
+    case 0x12:
+        {
+            petTeamCopyManager->dismissTeam(player);
+        }
+        break;
+    case 0x15:
+        {
+            UInt8 type = 0;
+            br >> type;
+            petTeamCopyManager->reqStart(player, type);
+        }
+        break;
+    default:
+        return;
+    }
+}
+
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -6051,6 +6190,12 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
               {
                   br >>index ;
                   player->getNovLoginAward(index);
+              }
+              else if(idx == 2)
+              {
+                  char str[16] = {0};
+                  sprintf(str, "F_140115_1");
+                  player->udpLog("liulanqiqiandao", str, "", "", "", "", "act");
               }
               player->sendNovLoginInfo();
             }
@@ -7051,7 +7196,6 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                 pet->upgradeSH(petId, sanhunId, opt);
             }
             break;
-#if 0
         case 0x08:  //七魄
             {
                 if(player->GetLev() < 80)
@@ -7082,7 +7226,6 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                 }
             }
             break;
-#endif
         default:
             break;
     }
@@ -7536,13 +7679,13 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                 switch(flag)
                 {
                     case 0:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     case 1:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     case 2:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     default:
                         Stream st(REP::MARRYMGR);
@@ -7647,7 +7790,50 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
 
 }
 
+void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    
+    UInt8 req = 0;
+    brd >> req;
+    std::string str_tmp = ""; 
+    UInt8 eLove = 1;
+    UInt8 consumeType= 0;
+    UInt8 fish_count = 0;
+    switch(req)
+    {
+        case 2:
+            gMarriedMgr.ReturnFirstStatus(player);
+            break;
+        case 3:
+            gMarriedMgr.GetOnlineAward(player); 
+            break;
+        case 4:
+            gMarriedMgr.ReturnCouplePet(player);
+            break;
+        case 5:
+            brd >> str_tmp; 
+            gMarriedMgr.ModifyPetName(player,str_tmp);
+            break;
+        case 6:
+            brd >> eLove;
+            gMarriedMgr.ModifyeLove(player,eLove);
+            break;
+        case 7:
+            brd >> consumeType >> fish_count; 
+            gMarriedMgr.Fishing(player,consumeType,fish_count);
+            break;
+        case 8:
 
+            break;
+        default:
+
+            break;
+    }
+
+
+}
 
 void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
 {
@@ -7895,6 +8081,41 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     break;
             }
         }
+        break;
+    case 0x28:
+        {
+            brd >> op;
+            switch(op)
+            {
+            case 0x00:
+                {
+                    UInt8 type = 0;
+                    brd >> type;
+                    player->getBuyFundInfo(type);
+                }
+                break;
+            case 0x01:
+                {
+                    if(!World::getBuyFundAct())
+                        return;
+
+                    if(!player->hasChecked())
+                        return;
+
+                    UInt16 num = 0;
+                    brd >> num;
+                    player->buyFund(num);
+                }
+                break;
+            case 0x02:
+                {
+                    UInt8 type = 0;
+                    brd >> type;
+                    player->getBuyFundAward(type);
+                }
+                break;
+            }
+        }
     default:
         break;
     }
@@ -7934,16 +8155,20 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
             break;
         case 0x04:
             {
+                UInt32 baiHe = player->GetVar(VAR_MARRYBOARD_BAIHE);
                 if(mType == 0)
                     return;
                 UInt8 num = 0;
                 brd >> num ;
                 if(num == 0)
                     break;
+                if( (baiHe + num) > 50)
+                    return ;
                 if(num > 99)
                     num = 99;
                 if(!player->giveFlower(1,num))
                     break; 
+                player->AddVar(VAR_MARRYBOARD_BAIHE,num);
                 GObject::MarryBoard::instance()._lively += 5*num;
                 SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
             }

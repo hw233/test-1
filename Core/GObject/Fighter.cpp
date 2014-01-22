@@ -32,6 +32,7 @@
 #include "GObject/Leaderboard.h"
 #include "FairySpar.h"
 #include "HoneyFall.h" 
+#include "GObject/Married.h"
 
 namespace GObject
 {
@@ -2048,7 +2049,10 @@ void Fighter::rebuildEquipAttr()
     {
         //结婚加的buffer
         if(_owner->GetVar(GObject::VAR_MARRY_STATUS) == 5 || _owner->GetVar(GObject::VAR_MARRY_STATUS) == 6)
+        {
             GObject::gMarryMgr.addMarriedAttr(_owner,_attrExtraEquip);
+            GObject::gMarriedMgr.addCouplePetAttr(_owner,_attrExtraEquip);
+        }
     }
 	
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
@@ -3603,7 +3607,7 @@ bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync, bool offskill )
         return false;
 
     if (offskill)
-        offSkill(skill);
+        offSkill(skill, writedb);
 
     std::vector<UInt16>::iterator it = _skills.begin();
     std::advance(it, idx);
@@ -3990,7 +3994,9 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONBEDMG ||
                         s->cond == GData::SKILL_ONBEPHYDMG ||
                         s->cond == GData::SKILL_ONBEMAGDMG ||
-                        s->cond == GData::SKILL_ONHP10P
+                        s->cond == GData::SKILL_ONHP10P ||
+                        s->cond == GData::SKILL_AFTACTION ||
+                        s->cond == GData::SKILL_ONHPCHANGE
                         )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
@@ -4042,7 +4048,9 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONBEDMG ||
                         s->cond == GData::SKILL_ONBEPHYDMG ||
                         s->cond == GData::SKILL_ONBEMAGDMG ||
-                        s->cond == GData::SKILL_ONHP10P
+                        s->cond == GData::SKILL_ONHP10P ||
+                        s->cond == GData::SKILL_AFTACTION ||
+                        s->cond == GData::SKILL_ONHPCHANGE
                         )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
@@ -6206,6 +6214,10 @@ UInt16 Fighter::getPortrait()
             portrait = 1100;
         else if(getFashionTypeId() == 1724)
             portrait = 1101;
+        else if(getFashionTypeId() == 1726)
+            portrait = 1103;
+        else if(getFashionTypeId() == 1727)
+            portrait = 1104;
  
     }
 
@@ -7199,6 +7211,30 @@ float Fighter::getAcupointsGoldAttr(UInt8 attrId)
     else 
         return pap->attrValue/100;
 }
+
+void Fighter::petSSAdd(UInt16 id)
+{
+    UInt16 sid = SKILL_ID(id);
+    UInt16 slv = SKILL_LEVEL(id);
+
+    SStrengthen s;
+    s.father = 0;
+    s.maxVal = 0;
+    s.curVal = 0;
+    s.lvl = slv;
+    s.maxLvl = 0;
+
+    m_ss[sid] = s;
+}
+
+void Fighter::petSSErase(UInt16 sid)
+{
+    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
+    if (i == m_ss.end())
+        return;
+    m_ss.erase(sid);
+}
+
 /*
  *end分别计算散仙的战斗力
 */
