@@ -12341,16 +12341,8 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
         }
     }
 
-
-    if(type == e_damCounter)
-    {
-        _defList[idx].counterDmg = uShow;
-        _defList[idx].counterLeft = bf->getHP();
-    }
-    else
-    {
+    if(type != e_damCounter)
         appendDefStatus(type, uShow, bf, damageType);
-    }
 
     if(bf->getHP() == 0)
     {
@@ -12359,6 +12351,12 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
     else if(_winner == 0)
     {
         onDamage(bf, true, u);
+    }
+
+    if(type == e_damCounter)
+    {
+        _defList[idx].counterDmg = uShow;
+        _defList[idx].counterLeft = bf->getHP();
     }
 
     return uShow;
