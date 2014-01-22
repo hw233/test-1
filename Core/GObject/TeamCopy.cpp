@@ -387,6 +387,9 @@ bool TeamCopy::quikJoinTeam(Player* pl)
 
 UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
 {
+    if(pl->GetEnterPTCStatus())
+        return 0;
+
     CopyTeamPage& ctp = pl->getCopyTeamPage();
     UInt8 copyId = ctp.copyId;
     UInt8 copyIdx = ctp.copyId - 1;

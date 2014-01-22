@@ -225,13 +225,13 @@ namespace GObject
                 man_player->SetVar(VAR_COUPLE_ONLINE_START_TIME,now);
                 ChangPetAttr(man_player,woman_player,static_cast<ECoupleAward>(i+1));
                 if(i == 0)
-                    player->udpLog("fuqijiayuan", "F_140116_4", "", "", "", "", "act");
+                    player->udpLog("fuqijiayuan", "F_140116_7", "", "", "", "", "act");
                    else if(i == 1)
-                        player->udpLog("fuqijiayuan", "F_140116_4", "", "", "", "", "act");
+                        player->udpLog("fuqijiayuan", "F_140116_8", "", "", "", "", "act");
                             else if(i == 2)
-                                player->udpLog("fuqijiayuan", "F_140116_4", "", "", "", "", "act");
+                                player->udpLog("fuqijiayuan", "F_140116_9", "", "", "", "", "act");
                                     else if(i == 3)
-                                        player->udpLog("fuqijiayuan", "F_140116_4", "", "", "", "", "act");
+                                        player->udpLog("fuqijiayuan", "F_140116_10", "", "", "", "", "act");
             }
         }
             
