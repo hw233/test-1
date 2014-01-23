@@ -1285,7 +1285,7 @@ namespace GObject
                 break;
             }
         }
-        if(i < INIT_SKILL_UPMAX)
+        //if(i < INIT_SKILL_UPMAX)
         {
             GData::Pet::PinjieData* pjd = GData::pet.getLevTable(_petLev);
             UInt8 sLevel = 0;
@@ -1367,6 +1367,17 @@ namespace GObject
             }
         }
         updateToDBPetSkill();
+    }
+
+    void FairyPet::sendSevenSoulInfo(Stream & st)
+    {
+        const UInt8 count = 7;
+        st << count;
+        for(UInt8 i = 0; i < count; i++)
+        {
+            st << _soulLevel[i];
+            st << _skillIndex[i];
+        }
     }
 
 }

@@ -21928,6 +21928,11 @@ UInt8 Player::toQQGroup(bool isJoin)
     {
         IncommingInfo ii(XianpoFromUseItem, 0, 0);
         getXianpo(c, &ii);
+
+        const UInt8 type = 3;
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x08) << type << getXianpo() << Stream::eos;
+        send(st);
     }
 
     UInt32 Player::getXianpo(UInt32 c, IncommingInfo* ii)
