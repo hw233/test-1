@@ -148,6 +148,7 @@ enum PurchaseType
     PETRENAME                   = 1010, //夫妻宠物改名
     MODIFYPET                   = 1011, //夫妻更改信物
     COUPLECOPY                  = 1012, //夫妻副本
+    OutBuyFund                  = 1013, //购买基金消费
     //繁体私有占150～200
 };
 
@@ -174,6 +175,7 @@ enum IncomingType
     ShouHunFromYouli            = 146, //游历获得兽魂
     LongHunFromTeamArena        = 147, //仙界至尊龙魂获得
     LongHunFromServerWar        = 148, //仙界传奇龙魂获得
+    InBuyFund                   = 149, //购买基金获得
 };
 
 enum MoneyType
@@ -291,6 +293,7 @@ enum ItemFrom
     FromQiShiBan = 64, //七石斗法
     FromServerWarJijian = 65, //仙界传奇祭剑宝箱
     FromQTAward = 66, //QT奖励
+    FromBuyFundAward = 67, //购买基金奖励
     //80 ~ 100，繁体占用
 };
 

@@ -111,20 +111,21 @@ namespace GObject
         }
         //烟花积分奖励
         UInt32 YanHua = marryBoard->_YHlively;
-        if(YanHua / 2000)
+        if(YanHua / 1000)
         {
+            UInt32 Count = YanHua/1000 * 3 ;
             std::string str1 ;
             SYSMSG(title1, 4196);
             SYSMSGV(content1,4185,YanHua);
-            MailPackage::MailItem mitem3[] = {{1325, 1}};
-            mitem3[0].count = YanHua/2000;
+            MailPackage::MailItem mitem3[] = {{1411, 1}};
+            mitem3[0].count = Count;
             strItems += Itoa(mitem3[0].id);
             strItems += ",";
             strItems += Itoa(mitem3[0].count);
             strItems += "|";
-            if(YanHua/2000 >= 255 )
+            if(Count >= 255 )
             {
-                for(UInt8 i =0 ;i< YanHua/2000/255 ; ++i )
+                for(UInt8 i =0 ;i< Count/255 ; ++i )
                 {
                     mitem3[0].count  = 255 ;
                     Mail * mail1 = p->GetMailBox()->newMail(NULL, 0x21, title1, content1, 0xFFFE0000);
@@ -132,9 +133,9 @@ namespace GObject
                         mailPackageManager.push(mail1->id, mitem3, 1, true);
                 }
             }
-            if((YanHua/2000)%255 != 0)
+            if(Count%255 != 0)
             {
-                mitem3[0].count  = (YanHua/2000)%255;
+                mitem3[0].count  = Count%255;
                 Mail * mail1 = p->GetMailBox()->newMail(NULL, 0x21, title1, content1, 0xFFFE0000);
                 if(mail1)
                     mailPackageManager.push(mail1->id, mitem3, 1, true);
@@ -319,14 +320,14 @@ namespace GObject
                     if(pl->GetVar(VAR_MARRYBOARD2_ANS) == _answers[_askNum] && _answers[_askNum]!=0 )
                     {
                         pl->AddVar(VAR_MARRYBOARD3,1);
-                        pl->AddVar(VAR_MARRYBOARD_LIVELY,5);
+                        pl->AddVar(VAR_MARRYBOARD_LIVELY,10);
                     }
                     st <<static_cast<UInt8>(0x25);
                     st << _answers[_askNum]; 
                     st << static_cast<UInt8>(_man->GetVar(VAR_MARRYBOARD2_ANS));
                     st << static_cast<UInt8>(_woman->GetVar(VAR_MARRYBOARD2_ANS));
                     st << _questionId[(_askNum+1)%10];
-                    UInt32 rand = uRand(10000);
+                    UInt32 rand = uRand(9900) + 100;
                     pl->SetVar(VAR_MARRYBOARD3_KEY,rand);
                     if(_askNum == 9)
                         pl->SetVar(VAR_MARRYBOARD3,0);
@@ -351,7 +352,7 @@ namespace GObject
                     if(_type != 3)
                         return false;
                     UInt32 MarryBoard3 = pl->GetVar(VAR_MARRYBOARD3);
-                    pl->SetVar(VAR_MARRYBOARD3_KEY,100 + uRand(10000));
+                    pl->SetVar(VAR_MARRYBOARD3_KEY,100 + uRand(9900));
                     st <<static_cast<UInt8>(0x41);
                     st << _man->getName();
                     st << _woman->getName();
@@ -507,7 +508,7 @@ namespace GObject
                 }
             }
             pl->SetVar(VAR_MARRYBOARD4_TIME,now);
-            pl->AddVar(VAR_MARRYBOARD_LIVELY,10);
+            pl->AddVar(VAR_MARRYBOARD_LIVELY,15);
             _lively += 1;
             char str[16] = {0};
             sprintf(str, "F_140102_16");
@@ -524,7 +525,7 @@ namespace GObject
     }
     void MarryBoard::setDoorMax()
     {
-        doorMax = plNum * 20 / 7;
+        doorMax = plNum ;
     //    doorMax = 3;    //测试用例
     }
     void MarryBoard::resetData()

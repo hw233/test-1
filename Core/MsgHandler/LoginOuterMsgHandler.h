@@ -24,6 +24,7 @@
 #include "GObject/Fighter.h"
 #include "GObject/Package.h"
 #include "GObject/Clan.h"
+#include "GObject/PracticePlace.h"
 #include "Battle/BattleReport.h"
 #include "MsgHandler/GMHandler.h"
 #include "Common/BinaryReader.h"
@@ -422,6 +423,22 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             {
                 player->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
             }
+             /*if(!player->GetVar(GObject::VAR_ONCE_ONDAY))
+            {
+                UInt32 icCount = player->GetVar(GObject::VAR_NEWYEARSPEED_COUNT);
+                if(icCount + player->getMaxIcCount(player->getVipLevel(),1) > 255)
+                    player->SetVar(VAR_NEWYEARSPEED_COUNT,255);
+                else
+                    player->AddVar(VAR_NEWYEARSPEED_COUNT,player->getMaxIcCount(player->getVipLevel(),1));
+
+                UInt32 picCount = player->GetVar(GObject::VAR_NEWYEAR_PRATICE_COUNT);
+                if(icCount + GObject::PracticePlace::_picCnt[player->getVipLevel()] > 255)
+                    player->SetVar(VAR_NEWYEAR_PRATICE_COUNT,255);
+                else
+                    player->AddVar(GObject::VAR_NEWYEAR_PRATICE_COUNT,GObject::PracticePlace::_picCnt[player->getVipLevel()]);
+                player->SetVar(GObject::VAR_ONCE_ONDAY,1);
+            }
+            */
             player->SetReqDataTime(0);
             //player->SetReqDataTime1(0);
 #ifdef _FB
@@ -803,6 +820,22 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
                 GameMsgHdr hdr1(0x1DD, WORKER_THREAD_WORLD, pl, sizeof(userId));
                 GLOBAL().PushMsg(hdr1, &userId);
             }
+       /*     if(!pl->GetVar(GObject::VAR_ONCE_ONDAY))
+            {
+                UInt32 icCount = pl->GetVar(GObject::VAR_NEWYEARSPEED_COUNT);
+                if(icCount + pl->getMaxIcCount(pl->getVipLevel(),1) > 255)
+                    pl->SetVar(VAR_NEWYEARSPEED_COUNT,255);
+                else
+                    pl->AddVar(VAR_NEWYEARSPEED_COUNT,pl->getMaxIcCount(pl->getVipLevel(),1));
+
+                UInt32 picCount = pl->GetVar(GObject::VAR_NEWYEAR_PRATICE_COUNT);
+                if(icCount + GObject::PracticePlace::_picCnt[pl->getVipLevel()] > 255)
+                    pl->SetVar(VAR_NEWYEAR_PRATICE_COUNT,255);
+                else
+                    pl->AddVar(GObject::VAR_NEWYEAR_PRATICE_COUNT,GObject::PracticePlace::_picCnt[pl->getVipLevel()]);
+                pl->SetVar(GObject::VAR_ONCE_ONDAY,1);
+            }
+        */
             if(cfg.merged)
             {
                 UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
