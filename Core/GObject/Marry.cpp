@@ -1431,9 +1431,9 @@ namespace GObject
                     }
                     obj_player->GetMarriageInfo()->eraseInfo();
                 }
+                gMarriedMgr.eraseCoupleList(player);
                 player->GetMarriageInfo()->eraseInfo();
                 erase_marryList(player);
-                gMarriedMgr.eraseCoupleList(player);
                 SetDirty(player,obj_player); 
                
                 if(!player->getMainFighter()->getSex())//男的
@@ -1461,6 +1461,18 @@ namespace GObject
                 player->send(st1);
                 obj_player->send(st1);
                 
+                player->SetVar(VAR_COUPLE_NAME,0);
+                obj_player->SetVar(VAR_COUPLE_NAME,0);
+                
+                player->SetVar(VAR_COUPLE_ONLINE_RENAME,0);
+                obj_player->SetVar(VAR_COUPLE_ONLINE_RENAME,0);
+                
+                player->SetVar(VAR_COUPLE_COPY_STATUS,0);
+                obj_player->SetVar(VAR_COUPLE_COPY_STATUS,0);
+                
+                player->SetVar(VAR_COUPLE_COPY_COUNT,0);
+                obj_player->SetVar(VAR_COUPLE_COPY_COUNT,0);
+                
                 break;
             case 2:
                 if(player->GetVar(VAR_MARRY_STATUS) != 5)
@@ -1478,6 +1490,7 @@ namespace GObject
 
                     if(obj_player->GetVar(VAR_MARRY_STATUS) == 6)
                     {
+                        gMarriedMgr.eraseCoupleList(player);
                         obj_player->GetMarriageInfo()->eraseInfo();
                         player->GetMarriageInfo()->eraseInfo();
                         SetDirty(player,obj_player); 
@@ -1502,6 +1515,18 @@ namespace GObject
                         
                         player->SetVar(VAR_MARRY_STATUS,0);
                         obj_player->SetVar(VAR_MARRY_STATUS,0);
+                        
+                        player->SetVar(VAR_COUPLE_NAME,0);
+                        obj_player->SetVar(VAR_COUPLE_NAME,0);
+                        
+                        player->SetVar(VAR_COUPLE_ONLINE_RENAME,0);
+                        obj_player->SetVar(VAR_COUPLE_ONLINE_RENAME,0);
+                        
+                        player->SetVar(VAR_COUPLE_COPY_STATUS,0);
+                        obj_player->SetVar(VAR_COUPLE_COPY_STATUS,0);
+                        
+                        player->SetVar(VAR_COUPLE_COPY_COUNT,0);
+                        obj_player->SetVar(VAR_COUPLE_COPY_COUNT,0);
                     }
                     else
                     {
