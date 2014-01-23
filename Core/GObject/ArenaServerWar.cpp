@@ -289,7 +289,8 @@ void ServerWarMgr::challenge(Player * atker, std::string& name)
 
 void ServerWarMgr::notifyChallengeResult(Player* atker, Player* defer, bool win)
 {
-    if(!atker || !defer) return;
+    if(!atker || !defer || _progress != e_war_challenge)
+        return;
     std::map<Player *, UInt8>::iterator it = _warSort.find(defer);
     if (it == _warSort.end())
         return;

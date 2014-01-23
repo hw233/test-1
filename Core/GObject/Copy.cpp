@@ -359,6 +359,7 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
                 tcd.floor, tcd.spot, lootlvl, pl->getId(), id);
 
         GameAction()->doStrong(pl, SthCopy , 0,0);
+        pl->getSummerMeetScore(1);
     }
 
     Stream st(REP::COPY_INFO);

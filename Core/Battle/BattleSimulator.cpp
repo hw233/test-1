@@ -156,6 +156,8 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_zhu_tian_bao_jian] = &BattleSimulator::doSkillEffectExtra_OtherSidePeerlessDisable;
         skillEffectExtraTable[GData::e_eft_trigger_count_max] = &BattleSimulator::doSkillEffectExtra_CheckMaxTrigger;
         skillEffectExtraTable[GData::e_eft_hp_lostp] = &BattleSimulator::doSkillEffectExtra_HpLostP;
+        skillEffectExtraTable[GData::e_eft_flaw] = &BattleSimulator::doSkillEffectExtra_Flaw;
+        skillEffectExtraTable[GData::e_eft_withstand] = &BattleSimulator::doSkillEffectExtra_Withstand;
         skillEffectExtraTable[GData::e_eft_ru_red_carpet] = &BattleSimulator::doSkillEffectExtra_Ru_RedCarpet;
         skillEffectExtraTable[GData::e_eft_shi_flower] = &BattleSimulator::doSkillEffectExtra_Shi_Flower;
         skillEffectExtraTable[GData::e_eft_dao_rose] = &BattleSimulator::doSkillEffectExtra_Dao_Rose;
@@ -281,6 +283,8 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_zhu_tian_bao_jian] = &BattleSimulator::doSkillEffectExtra_OtherSidePeerlessDisable;
         skillEffectExtraTable[GData::e_eft_trigger_count_max] = &BattleSimulator::doSkillEffectExtra_CheckMaxTrigger;
         skillEffectExtraTable[GData::e_eft_hp_lostp] = &BattleSimulator::doSkillEffectExtra_HpLostP;
+        skillEffectExtraTable[GData::e_eft_flaw] = &BattleSimulator::doSkillEffectExtra_Flaw;
+        skillEffectExtraTable[GData::e_eft_withstand] = &BattleSimulator::doSkillEffectExtra_Withstand;
         skillEffectExtraTable[GData::e_eft_ru_red_carpet] = &BattleSimulator::doSkillEffectExtra_Ru_RedCarpet;
         skillEffectExtraTable[GData::e_eft_shi_flower] = &BattleSimulator::doSkillEffectExtra_Shi_Flower;
         skillEffectExtraTable[GData::e_eft_dao_rose] = &BattleSimulator::doSkillEffectExtra_Dao_Rose;
@@ -1281,8 +1285,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
 
         if(!colorStock && !defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(area_target, skill) && !area_target->getMoEvade100())))
         {
-            hit = true;
             // 攻击命中，没有被闪避
+            hit = true;
             UInt8& deepforgetlast = area_target->getDeepForgetLast();
             if(deepforgetlast > 0 && bf->getSide() != area_target->getSide())
             {
@@ -1493,6 +1497,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 {
                     tryProtectDamage(area_target, atk, magatk, factor);
                 }
+                
 
                 if(magatk)
                 {
@@ -1538,8 +1543,12 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 appendStatusChange(e_stAtkReduce, value, 0, area_target);
             }
 
+            tryParry(area_target, dmg, magdmg, bf); // 概率招架
+
             UInt32 dmg3 = dmg + magdmg;
             doShieldHPAttack(area_target, dmg3);
+
+
             if(dmg3 > 0)
             {
                 if (magdmgFlag)
@@ -8645,6 +8654,19 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
         if (isPet(bf))
             bf->setPetExAtkEnable(false);
+
+        UInt8& flawLast = bf->getFlawLast();
+        if (flawLast > 0)
+        {
+            -- flawLast;
+            if (0 == flawLast)
+            {
+                bf->setFlaw(0, 0, 0);
+                appendDefStatus(e_unFlaw, 0, bf);
+            }
+
+        }
+        bf->resetWithstandCount();
     }while(false);
 
     if(_defList.size() > 0 || _scList.size() > 0)
@@ -13602,6 +13624,51 @@ void BattleSimulator::doSkillEffectExtra_HpLostP(BattleFighter* bf, int target_s
     }
 }
 
+void BattleSimulator::doSkillEffectExtra_Flaw(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+    size_t cnt = eft.size();
+    if(cnt != efl.size() || efv.size() != cnt)
+        return;
+    
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        if(eft[i] == GData::e_eft_flaw)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+            if(bo == NULL || bo->getHP() == 0)
+                continue;
+            bo->addFlaw(efv[i] * 100, efl[i]);
+            appendDefStatus(e_flaw, bo->getFlawCount(), bo);
+        }
+    }
+}
+
+void BattleSimulator::doSkillEffectExtra_Withstand(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+    size_t cnt = eft.size();
+    if(cnt != efl.size() || efv.size() != cnt)
+        return;
+    
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        if(eft[i] == GData::e_eft_withstand)
+        {
+            bf->setWithstand(efv[i]);
+            bf->addWithstandCount();
+        }
+    }
+}
+
 void BattleSimulator::doSkillEffectExtra_Ru_RedCarpet(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
 {
     BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
@@ -14302,6 +14369,66 @@ UInt32 BattleSimulator::doBufMakeDamage(BattleFighter* bf, UInt32& u)
     }
     return uShow;
 }
+
+void BattleSimulator::tryParry( BattleFighter* bf, UInt32& dmg, UInt32& magDmg, BattleFighter* bfAttacker)
+{
+    // 格挡
+    if (bf->getWithstandCount() >= 3)
+        return;
+
+    const GData::SkillBase* passiveSkill = NULL;
+    float bfAtk = bf->getAttack();
+    float bfMagAtk = bf->getMagAttack();
+    float dmgReduce = 0.0f;
+    size_t idx = 0;
+    while(NULL != (passiveSkill = bf->getPassiveSkillOnWithstand100(idx)))
+    {
+        if(passiveSkill->effect == NULL)
+            continue;
+        appendDefStatus(e_skill, passiveSkill->getId(), bf);
+        doSkillEffectExtraAttack(bf, bfAttacker->getSide(), bfAttacker->getPos(), passiveSkill);
+        float factor = bf->getWithstandFactor();
+        dmgReduce = (bfAtk + bfMagAtk) * factor;
+    }
+
+    passiveSkill = bf->getPassiveSkillOnWithstand();
+    if (passiveSkill)
+    {
+        if(passiveSkill->effect)
+        {
+            appendDefStatus(e_skill, passiveSkill->getId(), bf);
+            doSkillEffectExtraAttack(bf, bfAttacker->getSide(), bfAttacker->getPos(), passiveSkill);
+            float factor = bf->getWithstandFactor();
+            dmgReduce = (bfAtk + bfMagAtk) * factor;
+        }
+    }
+    if (dmgReduce > 0.1f)
+    {
+        UInt32 reduce = static_cast<UInt32>(dmgReduce);
+        if (dmg < reduce)
+        {
+            reduce -= dmg;
+            dmg = 0;
+        }
+        else
+        {
+            dmg -= reduce;
+            reduce = 0;
+        }
+        if (magDmg < reduce)
+        {
+            reduce -= magDmg;
+            magDmg = 0;
+        }
+        else
+        {
+            magDmg -= reduce;
+            reduce = 0;
+        }
+    }
+    return ;
+}
+
 
 } // namespace Battle
 

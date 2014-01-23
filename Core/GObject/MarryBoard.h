@@ -11,7 +11,7 @@ namespace GObject
     class MarryBoard
     {
         public:
-            MarryBoard():_man(NULL),_woman(NULL),finder(NULL)
+            MarryBoard():_man(NULL),_woman(NULL),finder(NULL),_boardTime(0)
             {
                 resetData(); 
             }
@@ -27,7 +27,7 @@ namespace GObject
             void SetQuestionOnMarryBoard();
             UInt8 getTheMaxSupport();
             void SendPreMarryPresent(Player * man,Player * woman ,UInt8 norms );
-            void sendTodayMarryInfo(Player * pl);
+            void sendTodayMarryInfo(Player * pl ,UInt8 flag = 0);
             void CheckTheAnswerBoard2();
             bool sendAward();
             static MarryBoard & instance()
@@ -38,6 +38,7 @@ namespace GObject
         public:
             static void * _marryBoardTimer ;
             static UInt8 answers[QuestionMax];
+            static std::string norms[3];
             static std::string doorName[8];
             Player * _man;
             Player * _woman;
@@ -46,6 +47,7 @@ namespace GObject
             UInt8 _norms;
             UInt8 _type;
             UInt32 _atTime;
+            UInt32 _boardTime ;
             //第一阶段
             UInt32 _lively;
             UInt32 _YHlively;

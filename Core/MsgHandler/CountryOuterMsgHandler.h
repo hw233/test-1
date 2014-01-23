@@ -1131,6 +1131,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendSecondInfo();
     }
+    if(!pl->GetVar(VAR_ONCE_ONDAY))
+    {
+        pl->sendNovLoginInfo();
+        pl->SetVar(VAR_ONCE_ONDAY,1);
+    }
     {
         TeamCopyPlayerInfo* tcp = pl->getTeamCopyPlayerInfo();
         if (tcp && tcp->getPass(4) && (pl->GetVar(VAR_EX_JOB_ENABLE) == 0))
@@ -1180,7 +1185,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
-    GObject::MarryBoard::instance().sendTodayMarryInfo(pl);
+    GObject::MarryBoard::instance().sendTodayMarryInfo(pl ,1);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -4046,8 +4051,8 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 	Stream st(REP::CHAT);
 	UInt8 office = player->getTitle(), guard = 0;
     guard = player->getPF();
-	st << cr._type << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
-        << office << guard << cr._text << player->GetLev() << Stream::eos;
+	st << cr._type << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1) 
+        << office << guard << cr._text << player->GetLev() <<static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME)) <<Stream::eos;
 	switch(cr._type)
 	{
 	case 0xFF:
@@ -8149,7 +8154,7 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
                 UInt8 office = player->getTitle();
                 UInt8 guard = player->getPF();
                 st << static_cast<UInt8>(11)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
-                    << office << guard << text.c_str()<< player->GetLev() << Stream::eos;
+                    << office << guard << text.c_str()<< player->GetLev() << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME) )<< Stream::eos;
                 NETWORK()->Broadcast(st);
             }
             break;
