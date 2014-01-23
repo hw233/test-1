@@ -24226,11 +24226,11 @@ static UInt32 ryhb_items_2[15][4] = {
     {99, 99, 5136, 9},         // 六级身法石
     {99, 99, 1717, 2},       // 变身法宝
     {88, 88, 8555, 64},        //
-    {4, 10, 9229, 64},        //
+    {8, 10, 9229, 64},        //
     {1, 3, 9371, 99},        //
     {2, 6, 1126, 99},        //
-    {2, 5, 547, 99},        //
-    {2, 5, 501, 99},        //
+    {7, 5, 9438, 99},        //
+    {7, 2, 9390, 99},        //
     {5, 3, 503, 99},       //
     {5, 13, 515, 99},      //
     {3, 8, 1325, 99},    //
@@ -27603,16 +27603,6 @@ void Player::handleJiqirenAct_dungeon()
     int dungeon = GetVar(VAR_JIQIREN_DUNGEON);
     int dungeonCnt = Dungeon::getMaxCount(0) + vipNum - PLAYER_DATA(this, dungeonCnt);
     int dungeonCnt1 = Dungeon::getMaxCount(1) + vipNum1 - PLAYER_DATA(this, dungeonCnt1);
-    if (World::_wday == 5)
-    {
-        dungeonCnt -= 1;
-        dungeonCnt1 -= 1;
-    }
-    else if (World::_wday == 6)
-    {
-        dungeonCnt += 1;
-        dungeonCnt1 += 1;
-    }
     UInt8 fcnt = GET_BIT_8(dungeon, 0);
     UInt8 gcnt = GET_BIT_8(dungeon, 1);
     UInt8 fcnt1 = GET_BIT_8(dungeon, 2);
