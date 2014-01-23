@@ -3068,16 +3068,18 @@ void BattleSimulator::doAllSkillStrengthenEffect(BattleFighter* bf, const GData:
         return;
 
     GData::SkillStrengthenBase*  ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+    if (!ss)
+        return;
     const std::vector<const GData::SkillStrengthenEffect*>& efs = ss->effect;
     const GData::SkillStrengthenEffect* ef = NULL;
     for(size_t i = 0; i < efs.size(); ++ i)
     {
         ef = efs[i];
-        if(ef->target == GData::e_battle_target_self)
+        if(ef && ef->target == GData::e_battle_target_self)
         {
             doSkillStrengthenAttack(bf, skill, ef, bf->getSide(), bf->getPos(), true);
         }
-        else if(ef->target == GData::e_battle_target_selfside_atk_2nd) // 攻击力第二高的目标
+        else if(ef && ef->target == GData::e_battle_target_selfside_atk_2nd) // 攻击力第二高的目标
         {
             UInt8 excepts[25] = {0};
             size_t exceptCnt = 1;
@@ -3103,7 +3105,7 @@ void BattleSimulator::doAllSkillStrengthenEffect(BattleFighter* bf, const GData:
                 doSkillStrengthenAttack(bf, skill, ef, target_side, target_pos, true);
             }
         }
-        else
+        else if (ef)
         {
             doSkillStrengthenAttack(bf, skill, ef, target_side, target_pos, true);
         }
