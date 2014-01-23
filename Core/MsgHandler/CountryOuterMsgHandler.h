@@ -5511,6 +5511,20 @@ void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
             petTeamCopyManager->reqStart(player, type);
         }
         break;
+    case 0x16:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            petTeamCopyManager->inviteFriend(player, playerId);
+        }
+        break;
+    case 0x17:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            petTeamCopyManager->refuseJoin(player, playerId);
+        }
+        break;
     default:
         return;
     }

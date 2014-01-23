@@ -109,6 +109,8 @@ class PetTeamCopy
         void teamKick(Player* pl, UInt64 playerId, UInt8 mark=0);
         void leaveTeam(Player* pl, UInt8 mark=0/*0:被踢退出队伍；1:主动退出队伍；2:退出游戏; 3:顶号退出游戏*/);
         void dismissTeam(Player* pl, UInt8 mark=0);
+        void inviteFriend(Player* pl, UInt64 friendId);
+        void refuseJoin(Player* pl, UInt64 leaderId);
         void reqStart(Player* pl, UInt8 opt);
         void teamBattleStart(Player* pl);
         void sendBattleReport(PetTeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid);
