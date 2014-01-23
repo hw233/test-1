@@ -295,6 +295,8 @@ private:
         e_unPetShield = 75,     // 解除仙宠的护盾
         e_selfBleed = 76,       // 自己流血 （自焚）
         e_unSelfBleed = 77,     // 自己流血结束 （自焚烧完了）
+        e_lingYan = e_selfBleed,            // 灵焱效果
+        e_unLingYan = e_unSelfBleed,          // 灵焱效果消失
         e_petAppear = 78,       // 仙宠入场
         e_petMark = 79,         // 神兽印记
         e_unPetMark = 80,         // 神兽印记
@@ -331,8 +333,6 @@ private:
         e_dmgNingShi = 111,    // 凝视
         e_unDmgNingShi = 112,    // 解除凝视
 
-        e_lingYan = e_selfBleed,            // 灵焱效果
-        e_unLingYan = e_unSelfBleed,          // 灵焱效果消失
 
         e_flaw = e_bleedType,                 // 破绽效果
         e_unFlaw  = e_unBleedType,                // 解除破绽效果
