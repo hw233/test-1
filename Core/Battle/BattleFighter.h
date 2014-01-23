@@ -1471,6 +1471,24 @@ private:
     bool releaseDmgNingShi();
     std::vector<BattleFighter*> getBeiNingShiZhe() { return _beiningshizhe; }
 
+    UInt8 _ruRedCarpetLast;
+    void setRuRedCarpet(UInt8 last) { _ruRedCarpetLast = last; }
+    UInt8 getRuRedCarpet() { return _ruRedCarpetLast; }
+
+    UInt8 _shiFlowerLast;
+    UInt8 _shiFlowerAura;
+    void setShiFlower(UInt8 last, UInt8 aura) { _shiFlowerLast = last; _shiFlowerAura = aura; }
+    UInt8 getShiFlower() { return _shiFlowerLast; }
+    UInt8 getShiFlowerAura() { return _shiFlowerAura; }
+
+    UInt8 _daoRoseLast;
+    void setDaoRose(UInt8 last) { _daoRoseLast = last; }
+    UInt8 getDaoRose() { return _daoRoseLast; }
+
+    UInt8 _moKnotLast;
+    void setMoKnot(UInt8 last) { _moKnotLast = last; }
+    UInt8 getMoKnot() { return _moKnotLast; }
+
 public:
 	enum StatusFlag
 	{

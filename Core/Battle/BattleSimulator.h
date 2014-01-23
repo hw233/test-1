@@ -334,6 +334,14 @@ private:
         e_unDmgNingShi = 112,    // 解除凝视
         e_flaw = 113,                 // 破绽效果
         e_unFlaw  = 114,                // 解除破绽效果
+        e_ruRedCarpet = 115,  //情定红毯
+        e_unRuRedCarpet = 116,  //解除情定红毯
+        e_shiFlower = 117,  //心心相印
+        e_unShiFlower = 118,  //解除心心相印
+        e_daoRose = 119,  //缘定今生
+        e_unDaoRose = 120,  //解除缘定今生
+        e_moKnot = 121,  //琴瑟和鸣
+        e_unMoKnot = 122,  //解除琴瑟和鸣
 
         e_MAX_STATE,
     };
@@ -560,6 +568,10 @@ private:
     void doSkillEffectExtra_LingYouMagAtk(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_LingYouDef(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_LingYouMagDef(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_Ru_RedCarpet(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_Shi_Flower(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_Dao_Rose(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_Mo_Knot(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_LingShiBleed2(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);

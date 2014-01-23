@@ -126,6 +126,10 @@ enum
     e_eft_hp_lostp = 46,    // HP损失百分比
     e_eft_withstand = 47,       // 招架效果
     e_eft_flaw = 48,            // 破绽效果
+    e_eft_ru_red_carpet = 49,    // 儒：红毯
+    e_eft_shi_flower = 50,    // 释：鲜花
+    e_eft_dao_rose = 51,    // 道：玫瑰
+    e_eft_mo_knot = 52,    // 墨：同心结
 
     e_eft_max
 };

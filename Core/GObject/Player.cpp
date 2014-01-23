@@ -1295,6 +1295,7 @@ namespace GObject
         sendFeastLoginAct();
         //蛇年春节套装
         sendSnakeSpringEquipMail();
+        //getNewYearGiveGiftAward(0,0);
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%" I64_FMT "u", _id);
@@ -2374,7 +2375,10 @@ namespace GObject
         sendQQBoardOnlineTime();  
         SetQQBoardValue();
         if(GetVar(GObject::VAR_MARRY_STATUS) == 5 || GetVar(GObject::VAR_MARRY_STATUS) == 6)
+        {
             gMarriedMgr.ProcessOnlineAward(this,1);
+            gMarriedMgr.EnterCoupleCopy(this,0);
+        }
 	}
 
 	void Player::checkLastBattled()
