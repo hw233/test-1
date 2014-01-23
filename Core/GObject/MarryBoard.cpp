@@ -547,7 +547,7 @@ namespace GObject
                     {
                         finder = pl;
                         _lively += 500;
-                        SYSMSG_BROADCASTV(577,pl->getCountry(),pl->getName().c_str(),doorName[door-1].c_str());
+                        SYSMSG_BROADCASTV(577,doorName[door-1].c_str(),pl->getCountry(),pl->getName().c_str());
                         GObject::globalOnlinePlayers.enumerate(player_enum_marryBoard,this,13);
                     }
                     char str[16] = {0};
