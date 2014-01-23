@@ -68,6 +68,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _bleedLingYan(0), _bleedLingYanLast(0), _bleedLingYanAuraDec(0), _bleedLingYanAuraDecProb(0),
     _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
     _petProtect100(false), _petProtect100Last(0), _petProtect100Skill(NULL), _petAtk100(0), _petAtk100Last(0), _petMark(false),
+    _flawCount(0), _flawDamageAdd(0), _flawLast(0), _withstandFactor(0), _withstandCount(0),
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
     _atkDecSpecial(0), _atkDecSpecialLast(0), _magAtkDecSpecial(0), _magAtkDecSpecialLast(0),
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
@@ -151,6 +152,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillXMCZ100(), _passiveSkillXMCZ100);
     updatePassiveSkill100(_fighter->getPassiveSkillBLTY100(), _passiveSkillBLTY100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnHPChange100(), _passiveSkillOnHPChange100);
+    updatePassiveSkill100(_fighter->getPassiveSkillOnWithstand100(), _passiveSkillOnWithstand100);
 
     updatePassiveSkill(_fighter->getPassiveSkillPreAtk(), _passiveSkillPreAtk);
     updatePassiveSkill(_fighter->getPassiveSkillAftAtk(), _passiveSkillAftAtk);
@@ -171,6 +173,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill(_fighter->getPassiveSkillOnHP10P(), _passiveSkillOnHP10P);
     updatePassiveSkill(_fighter->getPassiveSkillDeadFake(), _passiveSkillDeadFake);
     updatePassiveSkill(_fighter->getPassiveSkillOnHPChange(), _passiveSkillOnHPChange);
+    updatePassiveSkill(_fighter->getPassiveSkillOnWithstand(), _passiveSkillOnWithstand);
 
     updateSoulSkillDead(_fighter->getSoulSkillSoulOut());
     updateSoulSkillProtect(_fighter->getSoulSkillProtect());
@@ -1120,6 +1123,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnHPChange100(size_t& idx,
     return getPassiveSkill100(_passiveSkillOnHPChange100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnWithstand100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnWithstand100, idx, noPossibleTarget);
+}
+
 
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
 {
@@ -1300,6 +1308,10 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnHPChange(bool noPossible
     return getPassiveSkill(_passiveSkillOnHPChange, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnWithstand(bool noPossibleTarget)
+{
+    return getPassiveSkill(_passiveSkillOnWithstand, noPossibleTarget);
+}
 
 const GData::SkillBase* BattleFighter::getSkillSoulProtect()
 {
@@ -1347,6 +1359,7 @@ void BattleFighter::releaseSkillCD(int cd)
     releaseSkillCD(_passiveSkillOnHP10P100, cd);
     releaseSkillCD(_passiveSkillDeadFake100, cd);
     releaseSkillCD(_passiveSkillOnHPChange100, cd);
+    releaseSkillCD(_passiveSkillOnWithstand100, cd);
 
     releaseSkillCD(_passiveSkillPreAtk, cd);
     releaseSkillCD(_passiveSkillAftAtk, cd);
@@ -1370,6 +1383,7 @@ void BattleFighter::releaseSkillCD(int cd)
     releaseSkillCD(_passiveSkillDeadFake, cd);
     releaseSkillCD(_passiveSkillSoulProtect, cd);
     releaseSkillCD(_passiveSkillOnHPChange, cd);
+    releaseSkillCD(_passiveSkillOnWithstand, cd);
 
     releaseLBSkillCD();
 }
@@ -2214,6 +2228,7 @@ void BattleFighter::clearSkill()
     _passiveSkillXMCZ100.clear();
     _passiveSkillBLTY100.clear();
     _passiveSkillOnHPChange100.clear();
+    _passiveSkillOnWithstand100.clear();
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();
@@ -2234,6 +2249,7 @@ void BattleFighter::clearSkill()
     _passiveSkillDeadFake.clear();
     _passiveSkillBleedTypeDmg.clear();
     _passiveSkillOnHPChange.clear();
+    _passiveSkillOnWithstand.clear();
 
     _passiveSkillOnTherapy.clear();
     _passiveSkillOnSkillDmg.clear();

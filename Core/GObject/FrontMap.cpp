@@ -265,6 +265,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
         st << static_cast<UInt8>(3) << count << Stream::eos;
         pl->send(st);
         GameAction()->doStrong(pl, SthFormation, 0 ,0 );
+        pl->getSummerMeetScore(3);
     } else {
         sendInfo2(pl, id, false);
     }

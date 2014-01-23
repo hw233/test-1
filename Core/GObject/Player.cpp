@@ -4126,6 +4126,7 @@ namespace GObject
 		GameMsgHdr hdr(0x178, WORKER_THREAD_WORLD, this, 0);
 		GLOBAL().PushMsg(hdr, NULL);
         GameAction()->doStrong(this, SthHookSpeed, 0,0);
+        getSummerMeetScore(6);
         GuangGunCompleteTask(0,27);
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 1);
 	}
@@ -5065,6 +5066,15 @@ namespace GObject
         {
             AddVar(VAR_USEGOLD_CNT, c);
             AddHYYJCount(c);
+            if(ci->purchaseType != Fund &&ci->purchaseType != OutBuyFund)
+            {
+               UInt32 val =  GetVar(VAR_SUMMERMEET_SCORE5);
+               if((val + c) >= 1000)
+                   SetVar(VAR_SUMMERMEET_SCORE5 ,1000);
+               else
+                   AddVar(VAR_SUMMERMEET_SCORE5 ,c );
+               sendSummerMeetScoreInfo();
+            }
         }
         if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
             SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
@@ -6905,6 +6915,7 @@ namespace GObject
         OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
         writeClanTask();
         GameAction()->doStrong(this, SthClanTask, 0 ,0 );
+        getSummerMeetScore(9);
         return true;
     }
 
@@ -13997,8 +14008,12 @@ namespace GObject
 
     void Player::getSummerMeetStrenthAward(UInt8 val)
     {
-        UInt32 souls = GetStrengthenMgr()->GetSouls();
-        if(val*25 > souls)
+        //UInt32 souls = GetStrengthenMgr()->GetSouls();
+        UInt32 ScoreNeed[] = {50,100,150,200,280,380,500,800};
+        if(val<1 ||val >8)
+            return ;
+        UInt32 score = getSummerMeetTotalScore();
+        if(ScoreNeed[val-1] > score)
             return ;
         UInt32 ctslandingAward = GetVar(VAR_SUMMER_MEET_STRENTH_AWARD);
         if(ctslandingAward & (1<<(val-1)))
@@ -15473,6 +15488,7 @@ namespace GObject
         st <<static_cast<UInt8>(SummerMeetRechargeAward);
         st << Stream::eos;
         send(st);
+        sendSummerMeetScoreInfo();
     }
     void Player::sendSummerMeetRechargeInfo()
     {
@@ -16405,6 +16421,7 @@ namespace GObject
         if (!rf || now < rf ||rf > rf2)
             return;
         AddVar(VAR_SUMMER_MEET_RECHARGE, r);
+        getSummerMeetScore(10,r);
         sendSummerMeetInfo();
     }
 
@@ -26466,6 +26483,7 @@ void Player::sendNovLoginInfo()
     st<<novLogin;
     st<<static_cast<UInt8>(max);
     st<<static_cast<UInt8>(value);
+    st<<static_cast<UInt8>(!GetVar(VAR_ONCE_ONDAY));
     st<<Stream::eos;
     send(st);
 }
@@ -27204,6 +27222,9 @@ void Player::getMarryBoard3Award(UInt8 type)   //砸蛋
         }
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         SetVar(VAR_MARRYBOARD3,Award + 31);
+        char str[16] = {0};
+        sprintf(str, "F_140114_11");
+        udpLog("jiehunjinxinger", str, "", "", "", "", "act");
     }
 
 }
@@ -27872,7 +27893,65 @@ void Player::sendJiqirenInfo()
     st << Stream::eos;
     send(st);
 }
-
+void Player::getSummerMeetScore(UInt8 num , UInt32 val)
+{
+    if (!World::getSummerMeetTime())
+        return;
+    UInt32 type = GetVar(VAR_SUMMER_MEET_TYPE);
+    UInt32 max[] = {16,16,70,16,10,10,56,35,35,35,1000,1000}; 
+    UInt32 Award = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
+    if(type==0 || Award == 0 )
+        return ;
+    if(num > 11)
+        return ;
+    if(num == 10)
+    {
+        UInt32 value = GetVar(VAR_SUMMERMEET_SCORE4 );
+        if((value + val) >= 1000)
+        {
+            SetVar(VAR_SUMMERMEET_SCORE4  , 1000);
+        }
+        else
+            SetVar(VAR_SUMMERMEET_SCORE4 , value + val);
+        sendSummerMeetScoreInfo();
+        return ;
+    }
+    UInt32 value_var = GetVar(VAR_SUMMERMEET_SCORE1 + num / 4) ; 
+    UInt8 count = GET_BIT_8( value_var ,num % 4);     
+    if(count >= max[num])
+        return ;
+   SetVar(( VAR_SUMMERMEET_SCORE1 + num / 4 ) , SET_BIT_8( value_var ,num % 4 , (count + 1) ));
+   sendSummerMeetScoreInfo();
+}
+UInt32 Player::getSummerMeetTotalScore()
+{
+    UInt32 sum  =0;
+    UInt32 addScore[] = {3,3,1,3,3,1,1,1,1,1,1};
+    for(UInt8 i = 0; i<10 ; ++i)
+    {
+        UInt8 count = GET_BIT_8( GetVar(VAR_SUMMERMEET_SCORE1 + i / 4) ,i % 4);     
+        sum+= addScore[i] * count ;
+    }
+    sum += GetVar(VAR_SUMMERMEET_SCORE4);
+    sum += GetVar(VAR_SUMMERMEET_SCORE5);
+    return sum;
+}
+void Player::sendSummerMeetScoreInfo()
+{
+    if (!World::getSummerMeetTime())
+        return;
+    Stream st(REP::RC7DAY);  //协议
+    st << static_cast<UInt8>(28);
+    for(UInt8 i =0 ;i < 10 ; ++i)
+    {
+        st <<static_cast<UInt8>( GET_BIT_8( GetVar(VAR_SUMMERMEET_SCORE1 + i / 4) ,i % 4) ); 
+    }
+    st << GetVar(VAR_SUMMERMEET_SCORE4); 
+    st << GetVar(VAR_SUMMERMEET_SCORE5); 
+    st <<getSummerMeetTotalScore();
+    st << Stream::eos;
+    send(st);
+}
 } // namespace GObject
 
 

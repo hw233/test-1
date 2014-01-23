@@ -332,7 +332,8 @@ private:
         e_unDmgDeep = 110,    // 解除重伤
         e_dmgNingShi = 111,    // 凝视
         e_unDmgNingShi = 112,    // 解除凝视
-
+        e_flaw = 113,                 // 破绽效果
+        e_unFlaw  = 114,                // 解除破绽效果
 
         e_MAX_STATE,
     };
@@ -565,6 +566,8 @@ private:
     void doSkillEffectExtra_OtherSidePeerlessDisable(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_CheckMaxTrigger(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_HpLostP(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_Flaw(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_Withstand(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
     bool doSkillEffectExtra_Dead(BattleFighter* bf, const GData::SkillBase* skill);
     void doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, const GData::SkillBase* skill, bool& cs, bool& pr);
@@ -759,6 +762,8 @@ private:
     float getBFMagAtkReduce(BattleFighter* bf);
     void doPassiveSkillBeMagDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
     void doPassiveSkillBePHYDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
+
+    void tryParry(BattleFighter* bf, UInt32& dmg, UInt32& magDmg, BattleFighter* bfAttacker);
 };
 
 }

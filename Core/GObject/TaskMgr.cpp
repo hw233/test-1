@@ -351,11 +351,13 @@ namespace GObject
         {
             GameAction()->doAttainment(m_PlayerOwner,  Script::SUBMIT_SHIMEN_TASKS,   1);
             GameAction()->doStrong(m_PlayerOwner, SthShimenTask, 0, 0);
+            m_PlayerOwner->getSummerMeetScore(7);
         }
         else if(taskType->m_Class == 5)
         {
             GameAction()->doAttainment(m_PlayerOwner,  Script:: SUBMIT_YAMEN_TASKS,   1);
             GameAction()->doStrong(m_PlayerOwner, SthYamenTask, 0, 0);
+            m_PlayerOwner->getSummerMeetScore(8);
         }
         else if(taskType->m_Class == 6)
         {
