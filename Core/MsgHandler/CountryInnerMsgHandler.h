@@ -255,6 +255,7 @@ void OnAthleticsReq( GameMsgHdr& hdr, const void * data )
 	GameAction()->RunOperationTaskAction0(player, 1);
 	GameAction()->RunOperationTaskAction0(player, 2);
     GameAction()->doStrong(player, SthAthletics1, 0,0);
+    player->getSummerMeetScore(5);
     player->GuangGunCompleteTask(0,26);
 }
 
@@ -739,10 +740,12 @@ void OnSaleItemCancleAll( GameMsgHdr& hdr, const void * data )
 void OnDailyCheck( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
+    UInt32 time = *(UInt32*)data;
 
 	player->GetTaskMgr()->CheckDayTask(TimeUtil::SharpDay(0));
 	player->sendDailyInfo();
 
+    player->checkDungeonTimeout(time);
     player->buildClanTask(true);
     player->clearFinishCount();
     /*
@@ -759,7 +762,6 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
     player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
 
-    UInt32 time = *(UInt32*)data;
     player->SendNextdayTime(time);
     player->GetStrengthenMgr()->CheckTimeOver(time);
 }
@@ -1500,9 +1502,15 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
             player->SetVar(VAR_TOWNDEAMON, 1);
     }
     if(co->id == SthAthletics1)
+    {
         player->GuangGunCompleteTask(0,26);
+        player->getSummerMeetScore(5);
+    }
     else if(co->id == SthAthletics2)
+    {
         player->GuangGunCompleteTask(0,25);
+        player->getSummerMeetScore(4);
+    }
     GameAction()->doStrong(player, co->id, co->param1, co->param2);
 }
 void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
@@ -2580,16 +2588,6 @@ void OnServerWarBeAttack( GameMsgHdr& hdr, const void* data )
     if(!swbad) return;
 
     serverWarMgr.beAttackByPlayer(player, swbad->attacker, swbad->formation, swbad->portrait, swbad->lineup);
-}
-
-//活动机器人（马上有奖）活动
-void OnhandleJiqirenAct( GameMsgHdr& hdr, const void * data)
-{
-    MSG_QUERY_PLAYER(player);
-
-    frontMap.handleJiqirenAct(player);
-    playerCopy.handleJiqirenAct(player);
-    player->handleJiqirenAct();
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

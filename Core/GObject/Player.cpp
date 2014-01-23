@@ -4129,6 +4129,7 @@ namespace GObject
 		GameMsgHdr hdr(0x178, WORKER_THREAD_WORLD, this, 0);
 		GLOBAL().PushMsg(hdr, NULL);
         GameAction()->doStrong(this, SthHookSpeed, 0,0);
+        getSummerMeetScore(6);
         GuangGunCompleteTask(0,27);
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 1);
 	}
@@ -5068,6 +5069,15 @@ namespace GObject
         {
             AddVar(VAR_USEGOLD_CNT, c);
             AddHYYJCount(c);
+            if(ci->purchaseType != Fund &&ci->purchaseType != OutBuyFund)
+            {
+               UInt32 val =  GetVar(VAR_SUMMERMEET_SCORE5);
+               if((val + c) >= 1000)
+                   SetVar(VAR_SUMMERMEET_SCORE5 ,1000);
+               else
+                   AddVar(VAR_SUMMERMEET_SCORE5 ,c );
+               sendSummerMeetScoreInfo();
+            }
         }
         if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
             SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
@@ -6830,8 +6840,24 @@ namespace GObject
         }
     }
 
+    void Player::checkDungeonTimeout(UInt32 now)
+    {
+        if(now >= _playerData.dungeonEnd)
+        {
+            if(World::getJiqirenAct())
+                handleJiqirenAct_dungeon();
+            _playerData.dungeonEnd = TimeUtil::SharpDay(1, now);
+            _playerData.dungeonCnt = 0;
+            _playerData.dungeonCnt1 = 0;
+
+            DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = %u, `dungeonCnt1` = %u , `dungeonEnd` = %u where `id` = %" I64_FMT "u", PLAYER_DATA(this, dungeonCnt), PLAYER_DATA(this, dungeonCnt1), PLAYER_DATA(this, dungeonEnd), getId());
+        }
+    }
+
     void Player::clearFinishCount()
     {
+        if(World::getJiqirenAct())
+            handleJiqirenAct_shiyamen();
         _playerData.smFinishCount = 0;
         _playerData.ymFinishCount = 0;
         _playerData.smFreeCount = 0;
@@ -6892,6 +6918,7 @@ namespace GObject
         OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
         writeClanTask();
         GameAction()->doStrong(this, SthClanTask, 0 ,0 );
+        getSummerMeetScore(9);
         return true;
     }
 
@@ -6942,6 +6969,8 @@ namespace GObject
             GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
         } while(false);
 
+        if(fReset && World::getJiqirenAct())
+            handleJiqirenAct_clan();
         if(fReset && _playerData.ctFinishCount != 0)
         {
             _playerData.ctFinishCount = 0;
@@ -8806,12 +8835,15 @@ namespace GObject
         copy = freeCnt + goldCnt + currentCnt + currentCnt2;
         copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt + totalCnt2;
 
+        checkDungeonTimeout(TimeUtil::Now());
+        /*
         UInt32 now = TimeUtil::Now();
         if(now >= _playerData.dungeonEnd)
         {
             _playerData.dungeonCnt = 0;
             _playerData.dungeonCnt1 = 0;
         }
+        */
         dung = _playerData.dungeonCnt;
         dungMax = GObject::Dungeon::getMaxCount() + GObject::Dungeon::getExtraCount(vipLevel);
 
@@ -8888,11 +8920,15 @@ namespace GObject
             playerCopy.buildInfo(this, st);
         }
 
+        checkDungeonTimeout(TimeUtil::Now());
+        /*
         UInt32 now = TimeUtil::Now();
         if(now >= _playerData.dungeonEnd)
         {
             _playerData.dungeonCnt = 0;
+            _playerData.dungeonCnt1 = 0;
         }
+        */
 
         cnt = dungeonManager.size();
         st << cnt << _playerData.dungeonCnt << GObject::Dungeon::getMaxCount(0) << GObject::Dungeon::getExtraCount(vipLevel,0);
@@ -13975,8 +14011,12 @@ namespace GObject
 
     void Player::getSummerMeetStrenthAward(UInt8 val)
     {
-        UInt32 souls = GetStrengthenMgr()->GetSouls();
-        if(val*25 > souls)
+        //UInt32 souls = GetStrengthenMgr()->GetSouls();
+        UInt32 ScoreNeed[] = {50,100,150,200,280,380,500,800};
+        if(val<1 ||val >8)
+            return ;
+        UInt32 score = getSummerMeetTotalScore();
+        if(ScoreNeed[val-1] > score)
             return ;
         UInt32 ctslandingAward = GetVar(VAR_SUMMER_MEET_STRENTH_AWARD);
         if(ctslandingAward & (1<<(val-1)))
@@ -15451,6 +15491,7 @@ namespace GObject
         st <<static_cast<UInt8>(SummerMeetRechargeAward);
         st << Stream::eos;
         send(st);
+        sendSummerMeetScoreInfo();
     }
     void Player::sendSummerMeetRechargeInfo()
     {
@@ -16383,6 +16424,7 @@ namespace GObject
         if (!rf || now < rf ||rf > rf2)
             return;
         AddVar(VAR_SUMMER_MEET_RECHARGE, r);
+        getSummerMeetScore(10,r);
         sendSummerMeetInfo();
     }
 
@@ -21128,6 +21170,7 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         leaderboard.erasePetInfo(it->second);
         it->second->delSanHun();
+        it->second->deleteSevenSoul();
         SAFE_DELETE(it->second);
         _fairyPets.erase(it);
         DB2().PushUpdateData("DELETE FROM `fairyPet` WHERE `id` = %u AND `playerId` = %" I64_FMT "u", id, getId());
@@ -21564,6 +21607,7 @@ UInt8 Player::toQQGroup(bool isJoin)
             equip = pet2->findEquip(2);
             if(equip)
                 GetPetPackage()->AddExistEquip(equip);
+            pet1->getSevenSoulFromAnother(pet2);
             delFairyPet(petId2, 1);
 
             petId2 = GameAction()->getYellowPetId(petId2);
@@ -21610,6 +21654,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         if(equip)
             GetPetPackage()->AddExistEquip(equip);
 
+        pet2->getSevenSoulFromAnother(pet1);
         delFairyPet(petId1, 1);
         //pet2->sendPinjieInfo();
         //pet2->sendGenguInfo();
@@ -21677,6 +21722,7 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         SYSMSG_BROADCASTV(4139, getCountry(), getName().c_str(), npet2->getColor(), npet2->getName().c_str());
 		SYSMSG_SENDV(4134, this, npet2->getColor(), npet2->getName().c_str());
+        npet2->getSevenSoulFromAnother(pet);
         delFairyPet(petId, 2);
         //npet2->sendPinjieInfo();
         //npet2->sendGenguInfo();
@@ -21876,6 +21922,54 @@ UInt8 Player::toQQGroup(bool isJoin)
 
         return shouhun;
     }*/
+
+    void Player::getXianpoLua(UInt32 c)
+    {
+        IncommingInfo ii(XianpoFromUseItem, 0, 0);
+        getXianpo(c, &ii);
+    }
+
+    UInt32 Player::getXianpo(UInt32 c, IncommingInfo* ii)
+    {
+        UInt32 xianpo = GetVar(VAR_SEVEN_SOUL_NUM);
+		if(c == 0)
+			return xianpo;
+		xianpo += c;
+		SYSMSG_SENDV(191, this, c);
+		SYSMSG_SENDV(1067, this, c);
+        SetVar(VAR_SEVEN_SOUL_NUM, xianpo);
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
+
+        return xianpo;
+	}
+
+	UInt32 Player::useXianpo(UInt32 a, ConsumeInfo* ci)
+	{
+        UInt32 xianpo = GetVar(VAR_SEVEN_SOUL_NUM);
+        if(a == 0 || xianpo == 0)
+            return xianpo;
+        if(xianpo < a)
+            xianpo = 0;
+        else
+        {
+            xianpo -= a;
+            if(ci != NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_pet (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(192, this, a);
+        SYSMSG_SENDV(1068, this, a);
+        SetVar(VAR_SEVEN_SOUL_NUM, xianpo);
+
+        return xianpo;
+    }
 
 void Player::getQQGameOnlineAward()
 {
@@ -24152,11 +24246,11 @@ static UInt32 ryhb_items_2[15][4] = {
     {99, 99, 5136, 9},         // 六级身法石
     {99, 99, 1717, 2},       // 变身法宝
     {88, 88, 8555, 64},        //
-    {4, 10, 9229, 64},        //
+    {8, 10, 9229, 64},        //
     {1, 3, 9371, 99},        //
     {2, 6, 1126, 99},        //
-    {2, 5, 547, 99},        //
-    {2, 5, 501, 99},        //
+    {7, 5, 9438, 99},        //
+    {7, 2, 9390, 99},        //
     {5, 3, 503, 99},       //
     {5, 13, 515, 99},      //
     {3, 8, 1325, 99},    //
@@ -26392,6 +26486,7 @@ void Player::sendNovLoginInfo()
     st<<novLogin;
     st<<static_cast<UInt8>(max);
     st<<static_cast<UInt8>(value);
+    st<<static_cast<UInt8>(!GetVar(VAR_ONCE_ONDAY));
     st<<Stream::eos;
     send(st);
 }
@@ -27130,6 +27225,9 @@ void Player::getMarryBoard3Award(UInt8 type)   //砸蛋
         }
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         SetVar(VAR_MARRYBOARD3,Award + 31);
+        char str[16] = {0};
+        sprintf(str, "F_140114_11");
+        udpLog("jiehunjinxinger", str, "", "", "", "", "act");
     }
 
 }
@@ -27415,23 +27513,120 @@ void Player::addMountAttrExtra(GData::AttrExtra& attr)
     attr += tmpAttr;
 }
 
-void Player::handleJiqirenAct()
+void Player::handleJiqirenAct_shiyamen()
 {
+    if(!World::getJiqirenAct())
+        return;
     UInt32 info = GetVar(VAR_JIQIREN_SYBS);
-    int remain = 5 - _playerData.ctFinishCount;
     int remain1 = 5 - _playerData.smFinishCount;
     int remain2 = 5 - _playerData.ymFinishCount;
-    if(remain > 0)
-        info = SET_BIT_8(info, 0, (GET_BIT_8(info, 0)+remain));
     if(remain1 > 0)
         info = SET_BIT_8(info, 1, (GET_BIT_8(info, 1)+remain1));
     if(remain2 > 0)
         info = SET_BIT_8(info, 2, (GET_BIT_8(info, 2)+remain2));
     SetVar(VAR_JIQIREN_SYBS, info);
+}
 
+void Player::handleJiqirenAct_clan()
+{
+    if(!World::getJiqirenAct())
+        return;
+    UInt32 info = GetVar(VAR_JIQIREN_SYBS);
+    int remain = 5 - _playerData.ctFinishCount;
+    if(remain > 0)
+    {
+        info = SET_BIT_8(info, 0, (GET_BIT_8(info, 0)+remain));
+        SetVar(VAR_JIQIREN_SYBS, info);
+    }
+}
+
+void Player::handleJiqirenAct_copy()
+{
+    if(!World::getJiqirenAct())
+        return;
+    int copy = GetVar(VAR_JIQIREN_COPY);
+    int goldCnt = PlayerCopy::getGoldCount(getVipLevel()) - PLAYER_DATA(this, copyGoldCnt);
+    int freeCnt = PlayerCopy::getFreeCount() - PLAYER_DATA(this, copyFreeCnt);
+    if (World::_wday == 6)
+        freeCnt -= PlayerCopy::FREECNT;
+    else if (World::_wday == 7)
+        freeCnt += PlayerCopy::FREECNT;
+    UInt8 fcnt = GET_BIT_8(copy, 0);
+    UInt8 gcnt1 = GET_BIT_8(copy, 1);
+    UInt8 gcnt2 = GET_BIT_8(copy, 2);
+    UInt8 gcnt3 = GET_BIT_8(copy, 3);
+    if(goldCnt == 3)
+    {
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
+    }
+    else if(goldCnt == 2)
+    {
+        gcnt2 += 1;
+        gcnt3 += 1;
+    }
+    else if(goldCnt == 1)
+    {
+        gcnt3 += 1;
+    }
+    if(freeCnt > 0)
+        fcnt += freeCnt;
+    copy = SET_BIT_8(copy, 0, fcnt);
+    copy = SET_BIT_8(copy, 1, gcnt1);
+    copy = SET_BIT_8(copy, 2, gcnt2);
+    copy = SET_BIT_8(copy, 3, gcnt3);
+    SetVar(VAR_JIQIREN_COPY, copy);
+}
+
+void Player::handleJiqirenAct_frontMap()
+{
+    if(!World::getJiqirenAct())
+        return;
+    int front = GetVar(VAR_JIQIREN_FRONTMAP);
+    int goldCnt = FrontMap::getGoldCount(getVipLevel()) - PLAYER_DATA(this, frontGoldCnt);
+    int freeCnt = FrontMap::getFreeCount() - PLAYER_DATA(this, frontFreeCnt);
+    if (World::_wday == 7)
+        freeCnt -= FrontMap::FREECNT;
+    else if (World::_wday == 1)
+        freeCnt += FrontMap::FREECNT;
+    UInt8 fcnt = GET_BIT_8(front, 0);
+    UInt8 gcnt1 = GET_BIT_8(front, 1);
+    UInt8 gcnt2 = GET_BIT_8(front, 2);
+    UInt8 gcnt3 = GET_BIT_8(front, 3);
+    if(goldCnt == 3)
+    {
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
+    }
+    else if(goldCnt == 2)
+    {
+        gcnt2 += 1;
+        gcnt3 += 1;
+    }
+    else if(goldCnt == 1)
+    {
+        gcnt3 += 1;
+    }
+    if(freeCnt > 0)
+        fcnt += freeCnt;
+    front = SET_BIT_8(front, 0, fcnt);
+    front = SET_BIT_8(front, 1, gcnt1);
+    front = SET_BIT_8(front, 2, gcnt2);
+    front = SET_BIT_8(front, 3, gcnt3);
+    SetVar(VAR_JIQIREN_FRONTMAP, front);
+}
+
+void Player::handleJiqirenAct_dungeon()
+{
+    if(!World::getJiqirenAct())
+        return;
+    int vipNum = Dungeon::getExtraCount(getVipLevel(), 0);
+    int vipNum1 = Dungeon::getExtraCount(getVipLevel(), 1);
     int dungeon = GetVar(VAR_JIQIREN_DUNGEON);
-    int dungeonCnt = Dungeon::getMaxCount(0) + Dungeon::getExtraCount(getVipLevel(), 0) - PLAYER_DATA(this, dungeonCnt);
-    int dungeonCnt1 = Dungeon::getMaxCount(1) + Dungeon::getExtraCount(getVipLevel(), 1) - PLAYER_DATA(this, dungeonCnt1);
+    int dungeonCnt = Dungeon::getMaxCount(0) + vipNum - PLAYER_DATA(this, dungeonCnt);
+    int dungeonCnt1 = Dungeon::getMaxCount(1) + vipNum1 - PLAYER_DATA(this, dungeonCnt1);
     UInt8 fcnt = GET_BIT_8(dungeon, 0);
     UInt8 gcnt = GET_BIT_8(dungeon, 1);
     UInt8 fcnt1 = GET_BIT_8(dungeon, 2);
@@ -27443,13 +27638,22 @@ void Player::handleJiqirenAct()
     }
     else if(dungeonCnt == 2)
     {
-        fcnt += 1;
-        gcnt += 1;
+        if(vipNum == 0)
+            fcnt += 2;
+        else
+        {
+            fcnt += 1;
+            gcnt += 1;
+        }
     }
     else if(dungeonCnt == 1)
     {
-        gcnt += 1;
+        if(vipNum == 0)
+            fcnt += 1;
+        else
+            gcnt += 1;
     }
+
     if(dungeonCnt1 == 3)
     {
         fcnt1 += 2;
@@ -27457,12 +27661,20 @@ void Player::handleJiqirenAct()
     }
     else if(dungeonCnt1 == 2)
     {
-        fcnt1 += 1;
-        gcnt1 += 1;
+        if(vipNum1 == 0)
+            fcnt1 += 2;
+        else
+        {
+            fcnt1 += 1;
+            gcnt1 += 1;
+        }
     }
     else if(dungeonCnt1 == 1)
     {
-        gcnt1 += 1;
+        if(vipNum1 == 0)
+            fcnt1 += 1;
+        else
+            gcnt1 += 1;
     }
     dungeon = SET_BIT_8(dungeon, 0, fcnt);
     dungeon = SET_BIT_8(dungeon, 1, gcnt);
@@ -27478,7 +27690,7 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
     //type==>0:副本免费 1:副本付费1 2:副本付费2 3:副本付费3
     //       4:阵图免费 5:阵图付费1 6:阵图付费2 7:阵图付费3
     //       8:决战之地(简单)免费 9:决战之地(简单)付费 10:决战之地(困难)免费 11:决战之地(困难)付费
-    //       12:帮派任务 14:师门任务 13:衙门任务 15:锁妖塔
+    //       12:帮派任务 13:衙门任务 14:师门任务 15:锁妖塔
     if(!World::getJiqirenAct() || type >= 16 || !count)
         return;
     if((type <= 11 && GetFreePackageSize() < 30*count) || (type == 15 && GetFreePackageSize() < 50*count))
@@ -27531,7 +27743,7 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
         if(curCnt < count || GetLev() < 35)
             return;
 
-        SetVar(VAR_JIQIREN_FRONTMAP, SET_BIT_8(info, type, (curCnt-count)));
+        SetVar(VAR_JIQIREN_FRONTMAP, SET_BIT_8(info, (type%4), (curCnt-count)));
     }
     else if(type >= 8 && type < 12)
     {
@@ -27562,7 +27774,7 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
             return;
         }
 
-        SetVar(VAR_JIQIREN_DUNGEON, SET_BIT_8(info, type, (curCnt-count)));
+        SetVar(VAR_JIQIREN_DUNGEON, SET_BIT_8(info, (type%4), (curCnt-count)));
     }
     else
     {
@@ -27570,8 +27782,7 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
         UInt8 curCnt = GET_BIT_8(info, (type%4));
         if(curCnt < count || (type == 12 && !getClan()))
             return;
-        SetVar(VAR_JIQIREN_SYBS, SET_BIT_8(info, type, (curCnt-count)));
-
+        SetVar(VAR_JIQIREN_SYBS, SET_BIT_8(info, (type%4), (curCnt-count)));
     }
     ConsumeInfo ci(DailyActivity, 0, 0);
     useTael(tael, &ci);
@@ -27620,7 +27831,6 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
             break;
         case 12:    //帮派任务
             {
-
                 AddClanContrib(300*count);
                 AddClanBuilding(300*count);
                 exp *= 2;
@@ -27686,7 +27896,65 @@ void Player::sendJiqirenInfo()
     st << Stream::eos;
     send(st);
 }
-
+void Player::getSummerMeetScore(UInt8 num , UInt32 val)
+{
+    if (!World::getSummerMeetTime())
+        return;
+    UInt32 type = GetVar(VAR_SUMMER_MEET_TYPE);
+    UInt32 max[] = {16,16,70,16,10,10,56,35,35,35,1000,1000}; 
+    UInt32 Award = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
+    if(type==0 || Award == 0 )
+        return ;
+    if(num > 11)
+        return ;
+    if(num == 10)
+    {
+        UInt32 value = GetVar(VAR_SUMMERMEET_SCORE4 );
+        if((value + val) >= 1000)
+        {
+            SetVar(VAR_SUMMERMEET_SCORE4  , 1000);
+        }
+        else
+            SetVar(VAR_SUMMERMEET_SCORE4 , value + val);
+        sendSummerMeetScoreInfo();
+        return ;
+    }
+    UInt32 value_var = GetVar(VAR_SUMMERMEET_SCORE1 + num / 4) ; 
+    UInt8 count = GET_BIT_8( value_var ,num % 4);     
+    if(count >= max[num])
+        return ;
+   SetVar(( VAR_SUMMERMEET_SCORE1 + num / 4 ) , SET_BIT_8( value_var ,num % 4 , (count + 1) ));
+   sendSummerMeetScoreInfo();
+}
+UInt32 Player::getSummerMeetTotalScore()
+{
+    UInt32 sum  =0;
+    UInt32 addScore[] = {3,3,1,3,3,1,1,1,1,1,1};
+    for(UInt8 i = 0; i<10 ; ++i)
+    {
+        UInt8 count = GET_BIT_8( GetVar(VAR_SUMMERMEET_SCORE1 + i / 4) ,i % 4);     
+        sum+= addScore[i] * count ;
+    }
+    sum += GetVar(VAR_SUMMERMEET_SCORE4);
+    sum += GetVar(VAR_SUMMERMEET_SCORE5);
+    return sum;
+}
+void Player::sendSummerMeetScoreInfo()
+{
+    if (!World::getSummerMeetTime())
+        return;
+    Stream st(REP::RC7DAY);  //协议
+    st << static_cast<UInt8>(28);
+    for(UInt8 i =0 ;i < 10 ; ++i)
+    {
+        st <<static_cast<UInt8>( GET_BIT_8( GetVar(VAR_SUMMERMEET_SCORE1 + i / 4) ,i % 4) ); 
+    }
+    st << GetVar(VAR_SUMMERMEET_SCORE4); 
+    st << GetVar(VAR_SUMMERMEET_SCORE5); 
+    st <<getSummerMeetTotalScore();
+    st << Stream::eos;
+    send(st);
+}
 } // namespace GObject
 
 

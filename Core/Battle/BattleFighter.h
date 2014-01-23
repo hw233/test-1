@@ -42,6 +42,22 @@ class BattleFighter:
 	public BattleObject
 {
 	friend class BattleSimulator;
+
+#define BLEED_TYPE_FLAG_NONE            0x00000000      // 没人
+#define BLEED_TYPE_FLAG_1               0x00000001      // 儒流血
+#define BLEED_TYPE_FLAG_2               0x00000002      // 释流血
+#define BLEED_TYPE_FLAG_3               0x00000004      // 道流血
+#define BLEED_TYPE_FLAG_MO              0x00000008      // 墨流血
+#define BLEED_TYPE_FLAG_PET             0x00000010      // 宠物流血（灵焱）
+#define BLEED_TYPE_FLAG_POISON          0x00000020      // 毒流血
+#define BLEED_TYPE_FLAG_SELF            0x00000040      // 自己造成的流血（宠物自焚）
+#define BLEED_TYPE_FLAG_AURA            0x00000080      // 无双造成的流血（御雷神针、芭蕉巨扇、盘古神斧, 幽灵碧炎梭）
+#define BLEED_TYPE_FLAG_CONFUSE         0x00000100      // 混乱流血 (天劫法宝)
+#define BLEED_TYPE_FLAG_STUN            0x00000200      // 眩晕流血 (天劫法宝)
+#define BLEED_TYPE_FLAG_BLIND           0x00000400      // 致盲流血
+#define BLEED_TYPE_FLAG_LINGSHI         0x00000800      // 灵蚀流血
+#define BLEED_TYPE_FLAG_LINGYAN         0x00001000      // 灵焱流血
+
 public:
 	BattleFighter(Script::BattleFormula *, GObject::Fighter * = NULL, UInt8 side = 0, UInt8 pos = 0);
 
@@ -142,10 +158,31 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return (_aura > 0 ? _aura : 0); }
 	inline float getAuraMax() { return (_auraMax > 0 ? _auraMax : 0); }
-	inline float getAttack() {float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0) + _counter_spirit_atk_add + _pet_coatk; return  ret;}
-	inline float getMagAttack() {float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial + _moMagAtkAdd + _petMagAtkAdd + _counter_spirit_magatk_add + _pet_coatk; return ret;}
-	inline float getDefend() {float ret = _defend + _defAdd + _defAdd2 + _counter_spirit_def_add; return (ret > 0 ? ret : 0);}
-	inline float getMagDefend() {float ret = _magdef + _magDefAdd + _magDefAdd2 + _counter_spirit_magdef_add + _fire_defend; return (ret > 0 ? ret : 0);}
+
+	inline float getAttack() 
+    {
+        float ret = _attack + _attackAdd + _attackAdd2 + _atkAddSpecial + _atkDecSpecial 
+            + _moAttackAdd + _petAttackAdd + (_petExAtkEnable?_petExAtk:0) + _counter_spirit_atk_add + _pet_coatk + _hpAtkAdd; 
+        return  ret;
+    }
+	inline float getMagAttack() 
+    {
+        float ret = _magatk + _magAtkAdd + _magAtkAdd2 + _magAtkAddSpecial + _magAtkDecSpecial 
+            + _moMagAtkAdd + _petMagAtkAdd + _counter_spirit_magatk_add + _pet_coatk + _hpMagAtkAdd; 
+        return ret;
+    }
+
+	inline float getDefend() 
+    {
+        float ret = _defend + _defAdd + _defAdd2 + _counter_spirit_def_add + _defendChangeSS; 
+        return (ret > 0 ? ret : 0);
+    }
+	inline float getMagDefend() 
+    {
+        float ret = _magdef + _magDefAdd + _magDefAdd2 + _counter_spirit_magdef_add + _fire_defend + _magDefendChangeSS;
+        return (ret > 0 ? ret : 0);
+    }
+
 	float getHitrate(BattleFighter* defgt);
 	float getEvade(BattleFighter* defgt);
 	float getCritical(BattleFighter* defgt);
@@ -164,6 +201,8 @@ public:
     inline float getMagAttackAdd() {return _magAtkAdd;}
 	inline float getDefendAdd() {return _defAdd;}
 	inline float getMagDefendAdd() {return _magDefAdd;}
+    inline float getDefendChangeSS() {return _defendChangeSS;}
+    inline float getMagDefendChangeSS() {return _magDefendChangeSS;}
 	inline float getHitrateAdd() {return _hitrateAdd;}
 	inline float getEvadeAdd() {return _evadeAdd;}
 	inline float getCriticalAdd() {return _criticalAdd;}
@@ -174,13 +213,15 @@ public:
 	inline Int32 getMaxHPAdd() {return _maxhpAdd;}
 	inline Int32 getActionAdd() {return _maxActionAdd;}
     inline float getToughAdd() { return _toughAdd;}
-    inline float getAtkReduce() { return _atkreduce + _atkreduce2 + _atkreduce3 + _moAtkReduce; }
-    inline float getMagAtkReduce() { return _magatkreduce + _magatkreduce2 + _magatkreduce3 + _moMagAtkReduce; }
+    inline float getAtkReduce() { return _atkreduce + _atkreduce2 + _atkreduce3 + _moAtkReduce + _hpAtkReduce - (_flawDamageAdd * _flawCount); }
+    inline float getMagAtkReduce() { return _magatkreduce + _magatkreduce2 + _magatkreduce3 + _moMagAtkReduce + _hpMagAtkReduce - (_flawDamageAdd * _flawCount); }
 
 	void setAttackAdd(float v, UInt16 last = 0);
 	void setMagAttackAdd(float v, UInt16 last = 0);
 	void setDefendAdd(float v, UInt16 last = 0);
 	void setMagDefendAdd(float v, UInt16 last = 0);
+    void setDefendChangeSS(float v, UInt16 last = 0);
+    void setMagDefendChangeSS(float v, UInt16 last = 0);
 	void setHitrateAdd(float v, UInt16 last = 0);
 	void setEvadeAdd(float v, UInt16 last = 0);
 	void setCriticalAdd(float v, UInt16 last = 0);
@@ -200,6 +241,8 @@ public:
     inline UInt8& getMagAttackAddLast() {return _magAtkAdd_last;}
 	inline UInt8& getDefendAddLast() {return _defAdd_last;}
 	inline UInt8& getMagDefendAddLast() {return _magDefAdd_last;}
+    inline UInt8& getDefendChangeSSLast() { return _defendChangeSSLast;}
+    inline UInt8& getMagDefendChangeSSLast() { return _magDefendChangeSSLast;}
 	inline UInt8& getHitrateAddLast() {return _hitrateAdd_last;}
 	inline UInt8& getEvadeAddLast() {return _evadeAdd_last;}
 	inline UInt8& getCriticalAddLast() {return _criticalAdd_last;}
@@ -286,6 +329,7 @@ public:
     const GData::SkillBase* getActiveSkill(bool need_therapy = false, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillAftAction100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBeAtk100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftEvd100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftRes100(size_t& idx, bool noPossibleTarget = false);
@@ -298,9 +342,12 @@ public:
     const GData::SkillBase* getPassiveSkillOnBePHYDmg100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnBeMagDmg100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHP10P100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnHPChange100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnWithstand100(size_t& idx, bool noPossibleTarget = false);
 
     const GData::SkillBase* getPassiveSkillPreAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillAftAction(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBeAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftEvd(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftRes(bool noPossibleTarget = false);
@@ -317,6 +364,8 @@ public:
     const GData::SkillBase* getPassiveSkillOnBePHYDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnBeMagDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHP10P(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnHPChange(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnWithstand(bool noPossibleTarget = false);
 
     const GData::SkillBase* getSkillSoulProtect();
 
@@ -352,6 +401,8 @@ public:
         _magAtkAdd = 0;
         _defAdd = 0;
         _magDefAdd = 0;
+        _defendChangeSS = 0;
+        _magDefendChangeSS = 0;
         _hitrateAdd = 0;
         _evadeAdd = 0;
         _criticalAdd = 0;
@@ -366,6 +417,8 @@ public:
         _magAtkAdd_last = 0;
         _defAdd_last = 0;
         _magDefAdd_last = 0;
+        _defendChangeSSLast = 0;
+        _magDefendChangeSSLast = 0;
         _hitrateAdd_last = 0;
         _evadeAdd_last = 0;
         _criticalAdd_last = 0;
@@ -447,9 +500,11 @@ private:
 	UInt32 _maxhp;
     Int32 _maxAction;
 	float _attackAdd, _magAtkAdd, _defAdd, _magDefAdd, _hitrateAdd, _evadeAdd;
+    float _defendChangeSS, _magDefendChangeSS;
     float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd, _toughAdd;
 	Int32 _maxhpAdd, _maxActionAdd;
     UInt8 _atkAdd_last, _magAtkAdd_last, _defAdd_last, _magDefAdd_last, _hitrateAdd_last, _evadeAdd_last;
+    UInt8 _defendChangeSSLast, _magDefendChangeSSLast;
     UInt8 _criticalAdd_last, _criticalDmgAdd_last, _pierceAdd_last, _counterAdd_last, _magResAdd_last, _toughAdd_last;
     UInt8 _maxhpAdd_last, _maxActionAdd_last;
     UInt8 _atkreduce_last, _magatkreduce_last;
@@ -482,6 +537,7 @@ private:
     std::vector<GData::SkillItem> _therapySkill;
     std::vector<GData::SkillItem> _passiveSkillPrvAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftAtk100;
+    std::vector<GData::SkillItem> _passiveSkillAftAction100;
     std::vector<GData::SkillItem> _passiveSkillBeAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftEvd100;
     std::vector<GData::SkillItem> _passiveSkillAftRes100;
@@ -489,9 +545,12 @@ private:
     std::vector<GData::SkillItem> _passiveSkillDead100;
     std::vector<GData::SkillItem> _passiveSkillAftNAtk100;
     std::vector<GData::SkillItem> _passiveSkillOnPetProtect100;
+    std::vector<GData::SkillItem> _passiveSkillOnHPChange100;
+    std::vector<GData::SkillItem> _passiveSkillOnWithstand100;
 
     std::vector<GData::SkillItem> _passiveSkillPreAtk;
     std::vector<GData::SkillItem> _passiveSkillAftAtk;
+    std::vector<GData::SkillItem> _passiveSkillAftAction;
     std::vector<GData::SkillItem> _passiveSkillBeAtk;
     std::vector<GData::SkillItem> _passiveSkillAftEvd;
     std::vector<GData::SkillItem> _passiveSkillAftRes;
@@ -499,6 +558,8 @@ private:
     std::vector<GData::SkillItem> _passiveSkillDead;
     std::vector<GData::SkillItem> _passiveSkillAftNAtk;
     std::vector<GData::SkillItem> _passiveSkillOnPetProtect;
+    std::vector<GData::SkillItem> _passiveSkillOnHPChange;
+    std::vector<GData::SkillItem> _passiveSkillOnWithstand;
 
     std::vector<GData::SkillItem> _passiveSkillOnTherapy;
     std::vector<GData::SkillItem> _passiveSkillOnSkillDmg;
@@ -552,6 +613,8 @@ private:
     float _aura_dec;
     UInt8 _aura_dec_last;
 
+    UInt32 _bleedFlag;  // 身上所带流血类型
+    
     float _bleed1, _bleed2, _bleed3, _self_bleed;
     UInt8 _bleed1_last, _bleed2_last, _bleed3_last, _self_bleed_last;
     UInt16 _immune2;
@@ -598,6 +661,17 @@ private:
     bool  _petExAtkEnable;
     UInt16 _petExAtkId;
 
+    float _lastHPLostP;
+
+    // 根据损失HP增加的伤害提升
+    float _hpAtkAdd, _hpMagAtkAdd; 
+    UInt32 _hpAtkAddCount;
+
+    // 根据损失HP增加的伤害减免
+    float _hpAtkReduce, _hpMagAtkReduce; 
+    UInt32 _hpAtkReduceCount;      
+    float _hpRecoverCount;
+
     float _bleedMo;
     UInt8 _bleedMoLast;
     UInt32 _blind_bleed;
@@ -607,6 +681,11 @@ private:
     BattleFighter* _summoner;
     UInt8 _unSummonAura;
 
+    float _bleedLingYan;            // 灵焱流血伤害
+    UInt8 _bleedLingYanLast;        // 灵焱持续时间
+    float _bleedLingYanAuraDec;     // 灵焱特效减少灵气值
+    float _bleedLingYanAuraDecProb; // 灵焱特效减少灵气值触发概率
+
     float _shieldHP;
     UInt8 _shieldHPLast;
 
@@ -614,11 +693,19 @@ private:
 
     bool  _petProtect100;
     UInt8 _petProtect100Last;
+    const GData::SkillBase* _petProtect100Skill;
 
     float  _petAtk100;
     UInt8 _petAtk100Last;
 
     bool  _petMark;
+
+    UInt8 _flawCount;
+    float _flawDamageAdd;
+    UInt8 _flawLast;
+
+    float _withstandFactor;
+    UInt8 _withstandCount;
 
 
     // cotton add for skillstrengthen
@@ -747,25 +834,70 @@ public:
     inline float getAuraDec() { return _aura_dec; }
     inline void setAuraDec(float value, UInt8 last) { _aura_dec = value; _aura_dec_last = last; }
 
+    inline bool isBleeding() { return _bleedFlag?true:false; }
+
     inline UInt8& getBleed1Last() { return _bleed1_last; }
     inline float getBleed1() { return _bleed1; }
-    inline void setBleed1(float value, UInt8 last) { _bleed1 = value; _bleed1_last = last; }
+    inline void setBleed1(float value, UInt8 last) 
+    { 
+        _bleed1 = value; 
+        _bleed1_last = last; 
+        if (_bleed1 && _bleed1_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_1;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_1;
+    }
+
     inline UInt8& getBleed2Last() { return _bleed2_last; }
     inline float getBleed2() { return _bleed2; }
-    inline void setBleed2(float value, UInt8 last) { _bleed2 = value; _bleed2_last = last; }
+    inline void setBleed2(float value, UInt8 last)
+    { 
+        _bleed2 = value; 
+        _bleed2_last = last; 
+        if (_bleed2 && _bleed2_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_2;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_2;
+    }
     inline UInt8& getBleed3Last() { return _bleed3_last; }
     inline float getBleed3() { return _bleed3; }
-    inline void setBleed3(float value, UInt8 last) { _bleed3 = value; _bleed3_last = last; }
+    inline void setBleed3(float value, UInt8 last)
+    { 
+        _bleed3 = value; 
+        _bleed3_last = last; 
+        if (_bleed3 && _bleed3_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_3;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_3;
+    }
 
     inline UInt8& getSelfBleedLast() { return _self_bleed_last; }
     inline float getSelfBleed() { return _self_bleed; }
-    inline void setSelfBleed(float value, UInt8 last) { _self_bleed = value; _self_bleed_last = last; }
+    inline void setSelfBleed(float value, UInt8 last)
+    { 
+        _self_bleed = value; 
+        _self_bleed_last = last; 
+        if (_self_bleed && _self_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_SELF;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_SELF;
+    }
 
     inline UInt8& getAuraDecCD() { return _aura_dec_cd; }
     inline float getAuraPrecent() { return _aura_present; }
     inline UInt8& getAuraBleedLast() { return _aura_bleed_last; }
     inline float getAuraBleed() { return _aura_bleed; }
-    inline void setAuraBleed(float value, UInt8 last, UInt8 cd) { _aura_bleed = value; _aura_bleed_last = last; _aura_dec_cd = cd; }
+    inline void setAuraBleed(float value, UInt8 last, UInt8 cd) 
+    { 
+        _aura_bleed = value; 
+        _aura_bleed_last = last; 
+        _aura_dec_cd = cd; 
+        if (_aura_bleed && _aura_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_AURA;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_AURA;
+
+    }
     inline void setAuraPresent(float v, UInt8 cd) { _aura_present = v; _aura_present_cd = cd; }
     inline UInt8 getAruaPresentCD() { return _aura_present_cd; }
 
@@ -773,7 +905,16 @@ public:
     inline float getStunPresent() { return _stun_present; }
     inline UInt8& getStunBleedLast() { return _stun_bleed_last; }
     inline float getStunBleed() { return _stun_bleed; }
-    inline void setStunBleed(float value, UInt8 last, UInt8 cd) { _stun_bleed = value; _stun_bleed_last = last; _stun_cd = cd; }
+    inline void setStunBleed(float value, UInt8 last, UInt8 cd) 
+    { 
+        _stun_bleed = value; 
+        _stun_bleed_last = last; 
+        _stun_cd = cd; 
+        if (_stun_bleed && _stun_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_STUN;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_STUN;
+    }
     inline void setStunPresent(float v, UInt8 cd) { _stun_present = v; _stun_present_cd = cd; }
     inline UInt8 getStunPresentCD() { return _stun_present_cd; }
 
@@ -781,7 +922,16 @@ public:
     inline float getConfucePresent() { return _confuse_present; }
     inline UInt8& getConfuceBleedLast() { return _confuse_bleed_last; }
     inline float getConfuceBleed() { return _confuse_bleed; }
-    inline void setConfuceBleed(float value, UInt8 last, UInt8 cd) { _confuse_bleed = value; _confuse_bleed_last = last; _confuse_cd = cd; }
+    inline void setConfuceBleed(float value, UInt8 last, UInt8 cd) 
+    { 
+        _confuse_bleed = value; 
+        _confuse_bleed_last = last; 
+        _confuse_cd = cd; 
+        if (_confuse_bleed && _confuse_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_CONFUSE;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_CONFUSE;
+    }
     inline void setConfusePresent(float v, UInt8 cd) { _confuse_present = v; _confuse_present_cd = cd; }
     inline UInt8 getConfucePresentCD() { return _confuse_present_cd; }
 
@@ -856,15 +1006,36 @@ public:
     inline void setPetAtkReduce(float value, UInt8 last) { if(last == 0) return; _petAtkReduce = value; _petAtkReduceCD = last; }
     inline void setPetMagAtkReduce(float value, UInt8 last) { if(last == 0) return; _petMagAtkReduce = value; _petMagAtkReduceCD = last; }
 
+    inline void setHPAtkReduce(float value) { _hpAtkReduce = value;}
+    inline void setHPMagAtkReduce(float value) { _hpMagAtkReduce = value;}
+    inline void setHPAtkAdd(float value) { _hpAtkAdd = value;}
+    inline void setHPMagAtkAdd(float value) { _hpMagAtkAdd = value;}
+
+    bool updateHPPAttackAdd(float addP, float hpLostp, float maxCount);
+    bool updateHPPAttackReduce(float reduceP, float hpLostp, float maxCount);
+    UInt32  updateHPPRecover(float recoverP, float hpLostp, float maxCount);
+    UInt32  updateHPPRecover2Fake(float recoverP, float hpLostp, float maxCount);
+    void    updateLastHPLostP();
+
     inline void resetPetAttackAdd() { _petAttackAdd = 0; _petAttackAddCD = 0; }
     inline void resetPetMagAtkAdd() { _petMagAtkAdd = 0; _petMagAtkAddCD = 0; }
     inline void resetPetAtkReduce() { _petAtkReduce = 0; _petAtkReduceCD = 0; }
     inline void resetPetMagAtkReduce() { _petMagAtkReduce = 0; _petMagAtkReduceCD = 0; }
 
+    inline void resetHPAtkReduce() { _hpAtkReduce = 0;}
+    inline void resetHPMagAtkReduce() { _hpMagAtkReduce = 0;}
+    inline void resetHPAtkAdd() { _hpAtkAdd = 0;}
+    inline void resetHPMagAtkAdd() { _hpMagAtkAdd = 0;}
+
     inline float getPetAttackAdd() { return _petAttackAdd; }
     inline float getPetMagAtkAdd() { return _petMagAtkAdd; }
     inline float getPetAtkReduce() { return _petAtkReduce; }
     inline float getPetMagAtkReduce() { return _petMagAtkReduce; }
+
+    inline float getHPAtkReduce() { return _hpAtkReduce; }
+    inline float getHPMagAtkReduce() { return _hpMagAtkReduce; }
+    inline float getHPAtkAdd() { return _hpAtkAdd; }
+    inline float getHPMagAtkAdd() { return _hpMagAtkAdd; }
 
     inline void setPetExAtk(float v, UInt16 skillId) { _petExAtk = v; _petExAtkId = skillId;}
     inline float getPetExAtk() { return _petExAtk; }
@@ -879,7 +1050,17 @@ public:
 
     inline float getBleedMo() { return _bleedMo; }
     inline UInt16 getBleedMoLast() { return _bleedMoLast; }
-    inline void setBleedMo(float value, UInt8 last) { if(last == 0) return; _bleedMo = value; _bleedMoLast = last; }
+    inline void setBleedMo(float value, UInt8 last) 
+    { 
+        if(last == 0) 
+            return; 
+        _bleedMo = value; 
+        _bleedMoLast = last; 
+        if (_bleedMo && _bleedMoLast)
+            _bleedFlag |= BLEED_TYPE_FLAG_MO;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_MO;
+    }
     inline void resetBleedMo() { _bleedMo = 0; _bleedMoLast = 0; }
     bool releaseBleedMo();
 
@@ -888,9 +1069,34 @@ public:
     inline float getBlindPresent() { return _blind_present; }
     inline UInt8& getBlindBleedLast() { return _blind_bleed_last; }
     inline float getBlindBleed() { return _blind_bleed; }
-    inline void setBlindBleed(float value, UInt8 last, UInt8 cd) { _blind_bleed = value; _blind_bleed_last = last; _blind_cd = cd; }
+    inline void setBlindBleed(float value, UInt8 last, UInt8 cd) 
+    { 
+        _blind_bleed = value; 
+        _blind_bleed_last = last; 
+        _blind_cd = cd; 
+        if (_blind_bleed && _blind_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_BLIND;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_BLIND;
+    }
     inline void setBlindPresent(float v, UInt8 cd) { _blind_present = v; _blind_present_cd = cd; }
     inline UInt8 getBlindPresentCD() { return _blind_present_cd; }
+
+    inline UInt8& getBleedLingYanLast() { return _bleedLingYanLast; }
+    inline float getBleedLingYan() { return _bleedLingYan; }
+    inline void setBleedLingYan(float value, UInt8 last, float auraDec, float auraDecProb) 
+    { 
+        _bleedLingYan = value;
+        _bleedLingYanLast = last;
+        _bleedLingYanAuraDec = auraDec;
+        _bleedLingYanAuraDecProb = auraDecProb;
+        if (_bleedLingYan && _bleedLingYanLast)
+            _bleedFlag |= BLEED_TYPE_FLAG_LINGYAN;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_LINGYAN;
+    }
+    inline float getBleedLingYanAuraDescProb() { return _bleedLingYanAuraDecProb; }
+    inline float getBleedLingYanAuraDesc() { return _bleedLingYanAuraDec; }
 
     void setUnSummonAura(BattleFighter* bf, UInt32 aura) { _summoner = bf, _unSummonAura = aura; }
     bool isSummon() { return _summon; }
@@ -967,8 +1173,8 @@ public:
     inline void setPetShieldHP(float value) { _petShieldHP = value; }
 
     inline bool getPetProtect100() { return _petProtect100; }
-    inline void setPetProtect100(bool v, UInt8 l) { _petProtect100 = v; _petProtect100Last = l; }
-    bool releasePetProtect100();
+    inline void setPetProtect100(bool v, UInt8 l, const GData::SkillBase* skill) { _petProtect100 = v; _petProtect100Last = l; _petProtect100Skill = skill; }
+    const GData::SkillBase* getPetProtect100Skill() { return _petProtect100Skill; }
 
     inline void setPetMark(bool v) { _petMark = v; }
     inline bool isPetMark() { return _petMark; }
@@ -977,6 +1183,33 @@ public:
     inline bool getPetAtk100Last() { return _petAtk100Last;}
     inline void setPetAtk100(float v, UInt8 l) { _petAtk100 = v; _petAtk100Last = l; }
     bool releasePetAtk100();
+
+    UInt8 setFlaw(float damageAdd, UInt8 last, UInt8 count) 
+    { 
+        _flawDamageAdd = damageAdd; _flawLast = last; _flawCount = count;
+        return _flawCount;
+    }
+    UInt8 addFlaw(float damageAdd, UInt8 last, UInt8 count = 1)
+    {
+        _flawDamageAdd = damageAdd; _flawLast = last; _flawCount += count;
+        if (_flawCount > 3) _flawCount = 3;
+        return _flawCount;
+    }
+
+    UInt8 getFlawCount() { return _flawCount; }
+    float getFlawDamageAdd() { return _flawDamageAdd; }
+    UInt8& getFlawLast()     { return _flawLast; }
+
+    void  setWithstand(float withstand) { _withstandFactor = withstand; }
+    void  addWithstandCount()   
+    { 
+        ++_withstandCount; 
+        if (_withstandCount > 3)
+            _withstandCount = 3; 
+    }
+    float getWithstandFactor() { return _withstandFactor; }
+    UInt8 getWithstandCount() { return _withstandCount; }
+    void  resetWithstandCount() { _withstandCount = 0; }
 
 public:
     float _counter_spirit_atk_add;
@@ -1085,7 +1318,15 @@ private:
     float _lingshi_bleed;
     UInt8 _lingshi_bleed_last;
     float getLingShiBleed() { return _lingshi_bleed; }
-    void setLingShiBleed(float v, UInt8 l) { _lingshi_bleed = v; _lingshi_bleed_last = l; }
+    void setLingShiBleed(float v, UInt8 l) 
+    { 
+        _lingshi_bleed = v; 
+        _lingshi_bleed_last = l; 
+        if (_lingshi_bleed && _lingshi_bleed_last)
+            _bleedFlag |= BLEED_TYPE_FLAG_LINGSHI;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_LINGSHI;
+    }
     bool releaseLingShiBleed();
 
     float _lingyou_atk;
@@ -1192,6 +1433,61 @@ private:
     const GData::SkillBase* getPassiveSkillBleedTypeDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillXMCZ100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget = false);
+
+
+private:
+    float _2ndRateCoAtk;
+    const GData::SkillBase* _2ndCoAtkSkill;
+
+    const GData::SkillBase* get2ndCoAtkSkill();
+    void set2ndCoAtkSkill(float rate, const GData::SkillBase* pskill);
+
+
+    float _2ndRateProtect;
+    const GData::SkillBase* _2ndProtectSkill;
+
+    const GData::SkillBase* get2ndProtectSkill();
+    void set2ndProtectSkill(float rate, const GData::SkillBase* pskill);
+
+    float _dmg_deep;
+    UInt8 _dmg_deep_last;
+
+    bool isDmgDeep() { return _dmg_deep_last > 0; }
+    float getDmgDeep() { return _dmg_deep; }
+    void setDmgDeep(float value, UInt8 last) { _dmg_deep = value; _dmg_deep_last = last; }
+    bool releaseDmgDeep();
+
+    float _dmg_ningshi;
+    UInt8 _dmg_ningshi_last;
+    BattleFighter* _ningshizhe;
+    std::vector<BattleFighter*> _beiningshizhe;
+
+    void pushBeiNingShiZhe(BattleFighter* bo);
+    void popBeiNingShiZhe(BattleFighter* bo);
+
+    bool isDmgNingShi() { return _dmg_ningshi_last > 0; }
+    float getDmgNingShi() { return _dmg_ningshi; }
+    bool setDmgNingShi(BattleFighter* bf, float value, UInt8 last);
+    bool releaseDmgNingShi();
+    std::vector<BattleFighter*> getBeiNingShiZhe() { return _beiningshizhe; }
+
+    UInt8 _ruRedCarpetLast;
+    void setRuRedCarpet(UInt8 last) { _ruRedCarpetLast = last; }
+    UInt8 getRuRedCarpet() { return _ruRedCarpetLast; }
+
+    UInt8 _shiFlowerLast;
+    UInt8 _shiFlowerAura;
+    void setShiFlower(UInt8 last, UInt8 aura) { _shiFlowerLast = last; _shiFlowerAura = aura; }
+    UInt8 getShiFlower() { return _shiFlowerLast; }
+    UInt8 getShiFlowerAura() { return _shiFlowerAura; }
+
+    UInt8 _daoRoseLast;
+    void setDaoRose(UInt8 last) { _daoRoseLast = last; }
+    UInt8 getDaoRose() { return _daoRoseLast; }
+
+    UInt8 _moKnotLast;
+    void setMoKnot(UInt8 last) { _moKnotLast = last; }
+    UInt8 getMoKnot() { return _moKnotLast; }
 
 public:
 	enum StatusFlag

@@ -19,10 +19,13 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_attack(0), _magatk(0), _defend(0), _magdef(0), _hitrate(0), _evade(0), _critical(0), _criticaldmg(0), _pierce(0), _counter(0), _magres(0),
     _atkreduce(0), _magatkreduce(0),
 	_maxhp(f->getMaxHP()), _maxAction(0),
-	_attackAdd(0), _magAtkAdd(0), _defAdd(0), _magDefAdd(0), _hitrateAdd(0), _evadeAdd(0), _criticalAdd(0), _criticalDmgAdd(0),
+	_attackAdd(0), _magAtkAdd(0), _defAdd(0), _magDefAdd(0), _hitrateAdd(0), _evadeAdd(0), 
+    _defendChangeSS(0), _magDefendChangeSS(0),
+    _criticalAdd(0), _criticalDmgAdd(0),
     _pierceAdd(0), _counterAdd(0), _magResAdd(0), _toughAdd(0),
 	_maxhpAdd(0), _maxActionAdd(0),
     _atkAdd_last(0), _magAtkAdd_last(0), _defAdd_last(0), _magDefAdd_last(0), _hitrateAdd_last(0), _evadeAdd_last(0),
+    _defendChangeSSLast(0), _magDefendChangeSSLast(0),
     _criticalAdd_last(0), _criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),
     _maxhpAdd_last(0), _maxActionAdd_last(0), _atkreduce_last(0), _magatkreduce_last(0), _formEffect(NULL), _formula(bf),
     _forgetLevel(0), _forgetRound(0), _flag(0),_flag2(0),  _poisonRound(0), _poisonLevel(0), _stunRound(0), _stunLevel(0),
@@ -40,6 +43,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     //_therapy_dec(0), _therapy_dec_last(0),_therapy_add(0),_therapy_add_last(0),
     _therapy_buff(0), _therapy_buff_last(0),
     _aura_dec(0), _aura_dec_last(0),
+    _bleedFlag(0),
     _bleed1(0), _bleed2(0), _bleed3(0), _self_bleed(0),
     _bleed1_last(0), _bleed2_last(0), _bleed3_last(0), _self_bleed_last(0),
     _immune2(0), _def_dec(0), _def_dec_last(0), _def_dec_times(0),
@@ -56,10 +60,15 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_petAttackAdd(0), _petMagAtkAdd(0), _petAtkReduce(0), _petMagAtkReduce(0),
 	_petAttackAddCD(0), _petMagAtkAddCD(0), _petAtkReduceCD(0), _petMagAtkReduceCD(0),
     _petExAtk(0), _petExAtkEnable(false), _petExAtkId(0),
+    _lastHPLostP(0), 
+    _hpAtkAdd(0), _hpMagAtkAdd(0), _hpAtkAddCount(0),
+    _hpAtkReduce(0), _hpMagAtkReduce(0), _hpAtkReduceCount(0), _hpRecoverCount(0),
     _bleedMo(0), _bleedMoLast(0), _blind_bleed(0), _blind_present(0), _blind_present_cd(0),
     _blind_cd(0), _blind_bleed_last(0), _summoner(NULL), _unSummonAura(0), 
+    _bleedLingYan(0), _bleedLingYanLast(0), _bleedLingYanAuraDec(0), _bleedLingYanAuraDecProb(0),
     _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
-    _petProtect100(false), _petProtect100Last(0), _petAtk100(0), _petAtk100Last(0), _petMark(false),
+    _petProtect100(false), _petProtect100Last(0), _petProtect100Skill(NULL), _petAtk100(0), _petAtk100Last(0), _petMark(false),
+    _flawCount(0), _flawDamageAdd(0), _flawLast(0), _withstandFactor(0), _withstandCount(0),
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
     _atkDecSpecial(0), _atkDecSpecialLast(0), _magAtkDecSpecial(0), _magAtkDecSpecialLast(0),
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
@@ -68,7 +77,8 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _darkVigor(0), _dvFactor(0), _darkVigorLast(0), _hpShieldSelf(0), _hpShieldSelf_last(0),
     _counter_spirit_atk_add(0), _counter_spirit_magatk_add(0), _counter_spirit_def_add(0), _counter_spirit_magdef_add(0), _counter_spirit_times(0), _counter_spirit_last(0), _counter_spirit_efv(0), _counter_spirit_skillid(0), _counter_spirit_skill_cd(0), _pet_coatk(0), _fire_defend(0), _fire_defend_last(0), _fire_fake_dead_rate(0), _fire_fake_dead_rate_last(0), _sneak_atk(0), _sneak_atk_status(0), _sneak_atk_last(0), _sneak_atk_recover_rate(0),
     _selfSummon(NULL), _dec_wave_dmg(0), _lingqu_last(0), _lingqu_times(0), _lingqu(false), _soulout_last(0), _soulout(false),  _lingshi_bleed(0), _lingshi_bleed_last(0),
-    _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0), _abnormalTypeCnt(0), _bleedTypeCnt(0),_evadeCnt(0), _peerlessDisableLast(0), _soulProtectLast(0), _soulProtectCount(0)
+    _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0), _abnormalTypeCnt(0), _bleedTypeCnt(0),_evadeCnt(0), _peerlessDisableLast(0), _soulProtectLast(0), _soulProtectCount(0), _2ndRateCoAtk(0), _2ndCoAtkSkill(NULL), _2ndRateProtect(0), _2ndProtectSkill(NULL), _dmg_deep(0), _dmg_deep_last(0), _dmg_ningshi(0), _dmg_ningshi_last(0), _ningshizhe(NULL)
+   ,_ruRedCarpetLast(0), _shiFlowerLast(0), _shiFlowerAura(0), _daoRoseLast(0), _moKnotLast(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -102,6 +112,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     {
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[activeSkill[idx]];
+        if(!skillItem.base || !skillItem.base->effect)
+            continue;
         skillItem.cd = 0;
         bool isTherapy = (skillItem.base->effect->hp > 0 || skillItem.base->effect->hpP > 0.001) && skillItem.base->target == GData::e_battle_target_selfside;
         if(isTherapy)
@@ -117,6 +129,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 
     updatePassiveSkill100(_fighter->getPassiveSkillPreAtk100(), _passiveSkillPrvAtk100);
     updatePassiveSkill100(_fighter->getPassiveSkillAftAtk100(), _passiveSkillAftAtk100);
+    updatePassiveSkill100(_fighter->getPassiveSkillAftAction100(), _passiveSkillAftAction100);
     updatePassiveSkill100(_fighter->getPassiveSkillBeAtk100(), _passiveSkillBeAtk100);
     updatePassiveSkill100(_fighter->getPassiveSkillAftEvd100(), _passiveSkillAftEvd100);
     updatePassiveSkill100(_fighter->getPassiveSkillAftRes100(), _passiveSkillAftRes100);
@@ -139,9 +152,12 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillBleedTypeDmg100(), _passiveSkillBleedTypeDmg100);
     updatePassiveSkill100(_fighter->getPassiveSkillXMCZ100(), _passiveSkillXMCZ100);
     updatePassiveSkill100(_fighter->getPassiveSkillBLTY100(), _passiveSkillBLTY100);
+    updatePassiveSkill100(_fighter->getPassiveSkillOnHPChange100(), _passiveSkillOnHPChange100);
+    updatePassiveSkill100(_fighter->getPassiveSkillOnWithstand100(), _passiveSkillOnWithstand100);
 
     updatePassiveSkill(_fighter->getPassiveSkillPreAtk(), _passiveSkillPreAtk);
     updatePassiveSkill(_fighter->getPassiveSkillAftAtk(), _passiveSkillAftAtk);
+    updatePassiveSkill(_fighter->getPassiveSkillAftAction(), _passiveSkillAftAction);
     updatePassiveSkill(_fighter->getPassiveSkillBeAtk(), _passiveSkillBeAtk);
     updatePassiveSkill(_fighter->getPassiveSkillAftEvd(), _passiveSkillAftEvd);
     updatePassiveSkill(_fighter->getPassiveSkillAftRes(), _passiveSkillAftRes);
@@ -157,6 +173,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill(_fighter->getPassiveSkillOnBeMagDmg(), _passiveSkillOnBeMagDmg);
     updatePassiveSkill(_fighter->getPassiveSkillOnHP10P(), _passiveSkillOnHP10P);
     updatePassiveSkill(_fighter->getPassiveSkillDeadFake(), _passiveSkillDeadFake);
+    updatePassiveSkill(_fighter->getPassiveSkillOnHPChange(), _passiveSkillOnHPChange);
+    updatePassiveSkill(_fighter->getPassiveSkillOnWithstand(), _passiveSkillOnWithstand);
 
     updateSoulSkillDead(_fighter->getSoulSkillSoulOut());
     updateSoulSkillProtect(_fighter->getSoulSkillProtect());
@@ -989,6 +1007,12 @@ const GData::SkillBase* BattleFighter::getPassiveSkillAftAtk100(size_t& idx, boo
     return getPassiveSkill100(_passiveSkillAftAtk100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillAftAction100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillAftAction100, idx, noPossibleTarget);
+}
+
+
 const GData::SkillBase* BattleFighter::getPassiveSkillBeAtk100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillBeAtk100, idx, noPossibleTarget);
@@ -1095,6 +1119,17 @@ const GData::SkillBase* BattleFighter::getPassiveSkillBLTY100(size_t& idx, bool 
     return getPassiveSkill100(_passiveSkillBLTY100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnHPChange100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnHPChange100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnWithstand100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnWithstand100, idx, noPossibleTarget);
+}
+
+
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
 {
     size_t cnt = passiveSkill.size();
@@ -1106,7 +1141,17 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
 
     for(size_t idx = 0; idx < cnt; ++idx)
     {
-        if(rnd < passiveSkill[idx].rateExtent && passiveSkill[idx].cd == 0)
+        float rate = passiveSkill[idx].rateExtent; 
+
+        // 技能符文增加触发概率
+        GData::SkillStrengthenBase* ss = getSkillStrengthen(SKILL_ID(passiveSkill[idx].base->getId()));
+        const GData::SkillStrengthenEffect* ef = NULL;
+        if (ss)
+            ef = ss->getEffect(GData::ON_GET_SKILL_PROB, GData::TYPE_PROB_ADD);
+        if (ef)
+            rate = passiveSkill[idx].rateExtent + ef->value * 100;
+
+        if(rnd < rate && passiveSkill[idx].cd == 0)
         {
             if(passiveSkill[idx].base == NULL)
                 continue;
@@ -1156,6 +1201,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillPreAtk(bool noPossibleTarg
 const GData::SkillBase* BattleFighter::getPassiveSkillAftAtk(bool noPossibleTarget)
 {
     return getPassiveSkill(_passiveSkillAftAtk, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillAftAction(bool noPossibleTarget)
+{
+    return getPassiveSkill(_passiveSkillAftAction, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillBeAtk(bool noPossibleTarget)
@@ -1254,6 +1304,16 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnBeDmg(bool noPossibleTar
     return getPassiveSkill( _passiveSkillOnBeDmg, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnHPChange(bool noPossibleTarget)
+{
+    return getPassiveSkill(_passiveSkillOnHPChange, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnWithstand(bool noPossibleTarget)
+{
+    return getPassiveSkill(_passiveSkillOnWithstand, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getSkillSoulProtect()
 {
     const GData::SkillBase* skillBase = NULL;
@@ -1282,6 +1342,7 @@ void BattleFighter::releaseSkillCD(int cd)
 
     releaseSkillCD(_passiveSkillPrvAtk100, cd);
     releaseSkillCD(_passiveSkillAftAtk100, cd);
+    releaseSkillCD(_passiveSkillAftAction100, cd);
     releaseSkillCD(_passiveSkillBeAtk100, cd);
     releaseSkillCD(_passiveSkillAftEvd100, cd);
     releaseSkillCD(_passiveSkillAftRes100, cd);
@@ -1298,9 +1359,12 @@ void BattleFighter::releaseSkillCD(int cd)
     releaseSkillCD(_passiveSkillOnBeMagDmg100, cd);
     releaseSkillCD(_passiveSkillOnHP10P100, cd);
     releaseSkillCD(_passiveSkillDeadFake100, cd);
+    releaseSkillCD(_passiveSkillOnHPChange100, cd);
+    releaseSkillCD(_passiveSkillOnWithstand100, cd);
 
     releaseSkillCD(_passiveSkillPreAtk, cd);
     releaseSkillCD(_passiveSkillAftAtk, cd);
+    releaseSkillCD(_passiveSkillAftAction, cd);
     releaseSkillCD(_passiveSkillBeAtk, cd);
     releaseSkillCD(_passiveSkillAftEvd, cd);
     releaseSkillCD(_passiveSkillAftRes, cd);
@@ -1319,6 +1383,8 @@ void BattleFighter::releaseSkillCD(int cd)
     releaseSkillCD(_passiveSkillOnHP10P, cd);
     releaseSkillCD(_passiveSkillDeadFake, cd);
     releaseSkillCD(_passiveSkillSoulProtect, cd);
+    releaseSkillCD(_passiveSkillOnHPChange, cd);
+    releaseSkillCD(_passiveSkillOnWithstand, cd);
 
     releaseLBSkillCD();
 }
@@ -1662,6 +1728,32 @@ void BattleFighter::setMagDefendAdd(float v, UInt16 last)
     }
 }
 
+void BattleFighter::setDefendChangeSS(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_defendChangeSS < 0.001f)
+            || ( _defendChangeSS > 0 && v < 0)
+            || ( _defendChangeSS < 0 && v > 0)
+            || ((_defendChangeSS > 0) && (v > 0) && ((_defendChangeSS - v) < 0.001f))
+            || ((_defendChangeSS < 0) && (v < 0) && ((_defendChangeSS - v) > 0.001f)))
+    {
+        _defendChangeSS = v;
+        _defendChangeSSLast = last;
+    }
+}
+
+void BattleFighter::setMagDefendChangeSS(float v, UInt16 last)
+{
+    if((v < 0.001f) || (_magDefendChangeSS < 0.001f)
+            || ( _magDefendChangeSS > 0 && v < 0)
+            || ( _magDefendChangeSS < 0 && v > 0)
+            || ((_magDefendChangeSS > 0) && (v > 0) && ((_magDefendChangeSS - v) < 0.001f))
+            || ((_magDefendChangeSS < 0) && (v < 0) && ((_magDefendChangeSS - v) > 0.001f)))
+    {
+        _magDefendChangeSS = v;
+        _magDefendChangeSSLast = last;
+    }
+}
+
 void BattleFighter::setHitrateAdd(float v, UInt16 last)
 {
     if((v < 0.001f) || (_hitrateAdd < 0.001f)
@@ -1856,6 +1948,176 @@ void BattleFighter::setPuduDebuf(float v, UInt16 last)
         _pudu_debuf_last = last;
     }
 }
+
+bool BattleFighter::updateHPPAttackAdd(float addP, float hpLostp, float maxCount)
+{
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPAttackAdd: " << addP << "," << hpLostp << "," << maxCount << "." << std::endl;
+#endif
+    if (maxCount >= 1.0f) // 是否存在触发上限次数
+    {
+        UInt32 count = (UInt32) maxCount;
+        if (count > 0 && _hpAtkAddCount >= count) // 是否已经超过触发上限次数
+        {
+#ifdef _BATTLE_DEBUG
+            std::cout << "count: " << count << "," << _hpAtkAddCount << "." << std::endl << std::endl;
+#endif
+            return false;
+        }
+    }
+
+    UInt32 lostHP = 0;
+    if (_hp < _maxhp)
+        lostHP = _maxhp - _hp;
+    float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount2 = (UInt32)(_lastHPLostP / hpLostp);
+    UInt32 lostCount = (UInt32)(lostP / hpLostp);
+    if (lostCount == lostCount2)
+    {
+#ifdef _BATTLE_DEBUG
+        std::cout << "lostCount: " << lostCount << ", _lastHPLostP = " << _lastHPLostP << "." << std::endl << std::endl;
+#endif
+        return false;
+    }
+    _hpMagAtkAdd = _attack * hpLostp * lostCount;
+    _hpAtkAdd = _magatk * hpLostp * lostCount;
+    ++_hpAtkAddCount;
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPAttackAdd2: " << _hpAtkAdd << "," << _hpAtkAddCount << "," << lostCount << "." << std::endl << std::endl;
+#endif
+    return true;
+}
+
+bool BattleFighter::updateHPPAttackReduce(float reduceP, float hpLostp, float maxCount)
+{
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPAttackReduce: " << reduceP << "," << hpLostp << "," << maxCount << "." << std::endl;
+#endif
+    if (maxCount >= 1.0f) // 是否存在触发上限次数
+    {
+        UInt32 count = (UInt32) maxCount;
+        if (count > 0 && _hpAtkReduceCount >= count) // 是否已经超过触发上限次数
+        {
+#ifdef _BATTLE_DEBUG
+            std::cout << "count: " << count << "," << _hpAtkReduceCount << "." << std::endl << std::endl;
+#endif
+            return false;
+        }
+    }
+    UInt32 lostHP = 0;
+    if (_hp < _maxhp)
+        lostHP = _maxhp - _hp;
+    float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount2 = (UInt32)(_lastHPLostP / hpLostp);
+    UInt32 lostCount = (UInt32)(lostP / hpLostp);
+    if (lostCount == lostCount2)
+    {
+#ifdef _BATTLE_DEBUG
+        std::cout << "lostCount: " << lostCount << ", _lastHPLostP = " << _lastHPLostP << "." << std::endl << std::endl;
+#endif
+        return false;
+    }
+    _hpMagAtkReduce = reduceP * lostCount;
+    _hpAtkReduce = reduceP * lostCount;
+    ++_hpAtkReduceCount;
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPAttackReduce2: " << _hpAtkReduce << "," << _hpAtkReduceCount << "," << lostCount << "." << std::endl << std::endl;
+#endif
+    return true;
+}
+ 
+UInt32 BattleFighter::updateHPPRecover(float recoverP, float hpLostp, float maxCount)
+{
+    // 回复HP
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPRecover: " << recoverP << "," << hpLostp << "," << maxCount << "." << std::endl;
+#endif
+    if (maxCount >= 1.0f) // 是否存在触发上限次数
+    {
+        UInt32 count = (UInt32) maxCount;
+        if (count > 0 && _hpRecoverCount >= count) // 是否已经超过触发上限次数
+        {
+#ifdef _BATTLE_DEBUG
+            std::cout << "count: " << count << "," << _hpRecoverCount << "." << std::endl << std::endl;
+#endif
+            return 0;
+        }
+    }
+    float rhp = 1.0f;
+    UInt32 lostHP = 0;
+    if (_hp < _maxhp)
+        lostHP = _maxhp - _hp;
+    float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount2 = (UInt32)(_lastHPLostP / hpLostp);
+    UInt32 lostCount = (UInt32)(lostP / hpLostp);
+    if (lostCount == lostCount2)
+    {
+#ifdef _BATTLE_DEBUG
+        std::cout << "lostCount: " << lostCount << ", _lastHPLostP = " << _lastHPLostP << "." << std::endl << std::endl;
+#endif
+        return 0;
+    }
+
+    rhp = ((float)_maxhp) * recoverP;
+    if (_hp + rhp >= _maxhp)
+        rhp = _maxhp - _hp;
+    regenHP(rhp);
+    ++_hpRecoverCount;
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPRecover2: " << rhp << "," << _hpRecoverCount << "," << lostCount << "." << std::endl << std::endl;
+#endif
+    return static_cast<UInt32>(rhp);
+}
+
+UInt32 BattleFighter::updateHPPRecover2Fake(float recoverP, float hpLostp, float maxCount)
+{
+    // 回复HP
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPRecover: " << recoverP << "," << hpLostp << "," << maxCount << "." << std::endl;
+#endif
+    if (maxCount >= 1.0f) // 是否存在触发上限次数
+    {
+        UInt32 count = (UInt32) maxCount;
+        if (count > 0 && _hpRecoverCount >= count) // 是否已经超过触发上限次数
+        {
+#ifdef _BATTLE_DEBUG
+            std::cout << "count: " << count << "," << _hpRecoverCount << "." << std::endl << std::endl;
+#endif
+            return 0;
+        }
+    }
+    float rhp = 1.0f;
+    UInt32 lostHP = 0;
+    if (_hp < _maxhp)
+        lostHP = _maxhp - _hp;
+    float lostP = (float)lostHP / (float)_maxhp;
+    UInt32 lostCount2 = (UInt32)(_lastHPLostP / hpLostp);
+    UInt32 lostCount = (UInt32)(lostP / hpLostp);
+    if (lostCount == lostCount2)
+    {
+#ifdef _BATTLE_DEBUG
+        std::cout << "lostCount: " << lostCount << ", _lastHPLostP = " << _lastHPLostP << "." << std::endl << std::endl;
+#endif
+        return 0;
+    }
+
+    rhp = ((float)_maxhp) * recoverP;
+    if (_hp + rhp >= _maxhp)
+        rhp = _maxhp - _hp;
+    ++_hpRecoverCount;
+#ifdef _BATTLE_DEBUG
+    std::cout << "updateHPPRecover2: " << rhp << "," << _hpRecoverCount << "," << lostCount << "." << std::endl << std::endl;
+#endif
+    return static_cast<UInt32>(rhp);
+}
+
+void    BattleFighter::updateLastHPLostP()
+{
+    UInt32 lostHP = 0;
+    if (_hp < _maxhp)
+        lostHP = _maxhp - _hp;
+    _lastHPLostP = (float)lostHP / (float)_maxhp;
+}
  
 
 void BattleFighter::makeDamage( UInt32& u )
@@ -1946,6 +2208,7 @@ void BattleFighter::clearSkill()
     _therapySkill.clear();
     _passiveSkillPrvAtk100.clear();
     _passiveSkillAftAtk100.clear();
+    _passiveSkillAftAction100.clear();
     _passiveSkillBeAtk100.clear();
     _passiveSkillAftEvd100.clear();
     _passiveSkillAftRes100.clear();
@@ -1965,9 +2228,12 @@ void BattleFighter::clearSkill()
     _passiveSkillBleedTypeDmg100.clear();
     _passiveSkillXMCZ100.clear();
     _passiveSkillBLTY100.clear();
+    _passiveSkillOnHPChange100.clear();
+    _passiveSkillOnWithstand100.clear();
 
     _passiveSkillPreAtk.clear();
     _passiveSkillAftAtk.clear();
+    _passiveSkillAftAction.clear();
     _passiveSkillBeAtk.clear();
     _passiveSkillAftEvd.clear();
     _passiveSkillAftRes.clear();
@@ -1983,6 +2249,8 @@ void BattleFighter::clearSkill()
     _passiveSkillOnHP10P.clear();
     _passiveSkillDeadFake.clear();
     _passiveSkillBleedTypeDmg.clear();
+    _passiveSkillOnHPChange.clear();
+    _passiveSkillOnWithstand.clear();
 
     _passiveSkillOnTherapy.clear();
     _passiveSkillOnSkillDmg.clear();
@@ -2472,21 +2740,6 @@ bool BattleFighter::releaseHpSieldSelf()
     return false;
 }
 
-bool BattleFighter::releasePetProtect100()
-{
-    if(_petProtect100Last == 0)
-        return false;
-
-    -- _petProtect100Last;
-    if(_petProtect100Last == 0)
-    {
-        _hpShieldSelf = 0;
-        return true;
-    }
-
-    return false;
-}
-
 bool BattleFighter::releasePetAtk100()
 {
     if(_petAtk100Last == 0)
@@ -2792,6 +3045,101 @@ bool BattleFighter::releaseSoulOut()
     if(_soulout_last == 0)
     {
         _hp = 0;
+        return true;
+    }
+
+    return false;
+}
+
+const GData::SkillBase* BattleFighter::get2ndCoAtkSkill()
+{
+    if(!_2ndCoAtkSkill)
+        return NULL;
+
+    if(_2ndRateCoAtk * 100 > uRand(10000))
+        return _2ndCoAtkSkill;
+    return NULL;
+}
+
+void BattleFighter::set2ndCoAtkSkill(float rate, const GData::SkillBase* pskill)
+{
+    _2ndRateCoAtk = rate;
+    _2ndCoAtkSkill = pskill;
+}
+
+const GData::SkillBase* BattleFighter::get2ndProtectSkill()
+{
+    if(!_2ndProtectSkill)
+        return NULL;
+
+    if(_2ndRateProtect * 100 > uRand(10000))
+        return _2ndProtectSkill;
+    return NULL;
+}
+
+void BattleFighter::set2ndProtectSkill(float rate, const GData::SkillBase* pskill)
+{
+    _2ndRateProtect = rate;
+    _2ndProtectSkill = pskill;
+}
+
+bool BattleFighter::releaseDmgDeep()
+{
+    if(_dmg_deep_last == 0)
+        return false;
+    -- _dmg_deep_last;
+    if(_dmg_deep_last == 0)
+    {
+        _dmg_deep = 0;
+        return true;
+    }
+
+    return false;
+}
+
+void BattleFighter::pushBeiNingShiZhe(BattleFighter* bo)
+{
+    if(!bo)
+        return;
+
+    if(std::find(_beiningshizhe.begin(),_beiningshizhe.end(),bo) == _beiningshizhe.end())
+        _beiningshizhe.push_back(bo);
+}
+
+void BattleFighter::popBeiNingShiZhe(BattleFighter* bo)
+{
+    if(!bo)
+        return;
+
+    std::vector<BattleFighter*>::iterator it = std::find(_beiningshizhe.begin(),_beiningshizhe.end(),bo);
+    if(it != _beiningshizhe.end())
+        _beiningshizhe.erase(it);
+}
+
+bool BattleFighter::setDmgNingShi(BattleFighter* bf, float value, UInt8 last)
+{
+    if(!_ningshizhe)
+    {
+        _ningshizhe = bf;
+        _ningshizhe->pushBeiNingShiZhe(this);
+        _dmg_ningshi = value;
+        _dmg_ningshi_last = last;
+        return true;
+    }
+
+    return false;
+}
+
+bool BattleFighter::releaseDmgNingShi()
+{
+    if(_dmg_ningshi_last == 0)
+        return false;
+    -- _dmg_ningshi_last;
+    if(_dmg_ningshi_last == 0)
+    {
+        _ningshizhe->popBeiNingShiZhe(this);
+        _ningshizhe = NULL;
+        _dmg_ningshi= 0;
         return true;
     }
 

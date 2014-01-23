@@ -11,6 +11,8 @@ namespace GObject
     void* MarryBoard::_marryBoardTimer = NULL;
     UInt8 MarryBoard::answers[QuestionMax]={4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 ,4 ,3 ,2 ,1 };
     std::string MarryBoard::doorName[8]={"麒麟门","汀兰门","墨韵门","弄玉门","听雪门","清凉门","星辉门","邀月门"};
+    std::string MarryBoard::norms[3]={"比翼双飞" , "珠联璧合" ,"龙凤呈祥"};
+
     inline bool player_enum_marryBoard(GObject::Player * p, MarryBoard * marryBoard ,UInt8 type)
     {
         return marryBoard->sendMarryBoardInfo(p,type); 
@@ -224,7 +226,7 @@ namespace GObject
         //GObject::globalOnlinePlayers.enumerate(player_enum_marryBoard,this,11);
         GObject::globalPlayers.enumerate(player_enum_marryBoard,this,11);
         char str[16] = {0};
-        sprintf(str, "F_140114_1");
+        sprintf(str, "F_140114_1_%d",_norms);
         _man->udpLog("jiehunjinxinger", str, "", "", "", "", "act");
         return true;
     }
@@ -232,6 +234,8 @@ namespace GObject
     {
         UInt32 now = TimeUtil::Now();
     //    std::cout<<static_cast<UInt32>(_type)<<std::endl;
+        if(_norms < 1 )
+            return ;
         if(now  < _atTime - 1800)
            return ;
         if(now >= (_atTime - 1800) && now < _atTime )
@@ -241,6 +245,13 @@ namespace GObject
                 GObject::globalOnlinePlayers.enumerate(player_enum_marryBoard,this,1);
                 SendPreMarryPresent(_man,_woman,_norms);
                 _type =1 ;
+                SYSMSG_BROADCASTV(4197 , _man->getName().c_str() , _woman->getName().c_str() ,norms[_norms-1].c_str()); 
+                _boardTime = _atTime - 300;
+            }
+            if(now > _boardTime && _boardTime !=0 )
+            {
+                SYSMSG_BROADCASTV(4198 , _man->getName().c_str() , _woman->getName().c_str() ,norms[_norms-1].c_str()); 
+                _boardTime = 0;
             }
         }
         else if(now >= _atTime  && now < _atTime + OneTime  )
@@ -250,6 +261,7 @@ namespace GObject
                 SetQuestionOnMarryBoard();
                 _type =2 ;
                 GObject::globalOnlinePlayers.enumerate(player_enum_marryBoard,this,_type);
+                SYSMSG_BROADCASTV(4199 , _man->getName().c_str() , _woman->getName().c_str() ,norms[_norms-1].c_str()); 
             }
             if((now - _atTime)/30 != _askNum )
             {
@@ -413,6 +425,10 @@ namespace GObject
                         st<<_door[i];
                         //std::cout<<"door"<<static_cast<UInt32>(i)<<":"<<_door[i]<<std::endl;
                     }
+                    if(_door[_rightDoor - 1] >= doorMax )
+                        st<< _rightDoor ;
+                    else
+                        st <<static_cast<UInt8>(0);
                 } 
                 break;
             case 6:    //计算当前活跃人数
@@ -434,6 +450,7 @@ namespace GObject
             case 10:
                 {
                     st <<static_cast<UInt8>(0x71);
+                    st << static_cast<UInt32>(GVAR.GetVar(GVAR_COUPLE_NUM)); 
                     pl->SetVar(VAR_MARRYBOARD_LIVELY,0);
                     pl->SetVar(VAR_MARRYBOARD_YANHUA,0);
                 }
@@ -451,8 +468,20 @@ namespace GObject
                     _YHlively += pl->GetVar(VAR_MARRYBOARD_YANHUA);
                 }
                 break;
+            case 13:
+                {
+                    st <<static_cast<UInt8>(0x73);
+                    st << static_cast<UInt8>(_rightDoor);
+                    if(finder)
+                    {
+                        st << finder->getName();
+                    }
+                    else
+                        st << ""; 
+                }
+                break;
         }
-        if(type == 6 || type >=11)
+        if(type == 6 || type ==11 ||type == 12)
             return true;
         st <<Stream::eos;
         pl->send(st); 
@@ -518,7 +547,8 @@ namespace GObject
                     {
                         finder = pl;
                         _lively += 500;
-                        SYSMSG_BROADCASTV(577,pl->getCountry(),pl->getName().c_str(),doorName[door-1].c_str());
+                        SYSMSG_BROADCASTV(577,doorName[door-1].c_str(),pl->getCountry(),pl->getName().c_str());
+                        GObject::globalOnlinePlayers.enumerate(player_enum_marryBoard,this,13);
                     }
                     char str[16] = {0};
                     sprintf(str, "F_140102_17");
@@ -543,7 +573,7 @@ namespace GObject
     }
     void MarryBoard::setDoorMax()
     {
-        doorMax = plNum ;
+        doorMax = plNum * 4 / 3;
     //    doorMax = 3;    //测试用例
     }
     void MarryBoard::resetData()
@@ -627,14 +657,18 @@ namespace GObject
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId,man->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId,woman->getId(), mail1->id, Activity, title, content, strItems.c_str(), mail1->recvTime);
     }
-    void MarryBoard::sendTodayMarryInfo(Player *pl)
+    void MarryBoard::sendTodayMarryInfo(Player *pl , UInt8 flag)
     {
         UInt32 now = TimeUtil::Now();
         if(_man==NULL || _woman==NULL ||_atTime==0 || _norms==0 || now >( _atTime + 3*OneTime ))
             return ;
+        if(_norms > 3 ) 
+            return ;
         if(now > (_atTime - 1800)&& now < (_atTime + 3*OneTime))
         {
             sendMarryBoardInfo(pl,0);
+            if(flag)
+                SYSMSG_SENDV(4200, pl, _man->getName().c_str() , _woman->getName().c_str() ,norms[_norms-1].c_str());
             return ;
         }
         Stream st(REP::MARRYBOARD);
@@ -678,6 +712,7 @@ namespace GObject
         }
         GObject::globalPlayers.enumerate(player_enum_marryBoardAward,this);
         _type = 0;
+        GVAR.AddVar(GVAR_COUPLE_NUM,1); 
         GObject::globalPlayers.enumerate(player_enum_marryBoard,this,10);
         WORLD().RemoveTimer(_marryBoardTimer);
         _marryBoardTimer = NULL;

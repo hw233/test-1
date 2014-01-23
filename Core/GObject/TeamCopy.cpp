@@ -387,6 +387,9 @@ bool TeamCopy::quikJoinTeam(Player* pl)
 
 UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
 {
+    if(pl->GetEnterPTCStatus())
+        return 0;
+
     CopyTeamPage& ctp = pl->getCopyTeamPage();
     UInt8 copyId = ctp.copyId;
     UInt8 copyIdx = ctp.copyId - 1;
@@ -1209,6 +1212,7 @@ void TeamCopyPlayerInfo::incPass(UInt8 copyId, UInt8 t)
     if(m_passTimes[t][copyIdx] == 1)
     {
         GameAction()->doStrong(m_owner, SthGroupCopy, 1,0);
+        m_owner->getSummerMeetScore(2);
     }
     UInt32 now = TimeUtil::Now();
     if(now > m_vTime[t][copyIdx])

@@ -202,8 +202,8 @@ namespace GObject
 
 #define SYS_DIALOG_ALL_PLATFORM 0
 
-#define SPREAD_START_WEEK         6
-#define SPREAD_END_WEEK           7
+#define SPREAD_START_WEEK         5
+#define SPREAD_END_WEEK           6
 #define SPREAD_START_TIME         10*3600
 #define SPREAD_END_TIME           22*3600
 #define SPREAD_INTERVA_TIME       150
@@ -961,6 +961,7 @@ namespace GObject
         void sendLuckybagInfo();
         void sendSummerFlowInfo();
         void sendSummerMeetInfo();
+        void sendSummerMeetScoreInfo();
         void sendSummerMeetRechargeInfo();
         void sendSummerFlow3TimeInfo();
         void sendSummerFlow3LoginInfo();
@@ -1737,6 +1738,7 @@ namespace GObject
         void ColorTaskAccept(UInt8 type, UInt32 taskid);
         void ColorTaskAbandon(UInt8 type, UInt32 taskid);
         void clearFinishCount();
+        void checkDungeonTimeout(UInt32 now);
 		UInt16 calcNextTavernUpdate(UInt32);
 		UInt32 hireRecruit(UInt8);
 		void updateNextTavernUpdate(UInt32);
@@ -2494,6 +2496,8 @@ namespace GObject
         void sendLuckyMeetLoginInfo();
         void SetLuckyMeetValue();
         void SetSummerMeetValue();
+        void getSummerMeetScore(UInt8 num , UInt32 val = 0 );
+        UInt32 getSummerMeetTotalScore();
         void SetSummerFlow3Value();
         void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
         void getQQBoardInstantLoginAward(UInt8 val);
@@ -2860,6 +2864,9 @@ namespace GObject
         void spreadToSelf();
         void spreadGetAward();
         void spreadGetAwardInCountry(UInt32 spreadCount);
+        void getXianpoLua(UInt32 c);
+        UInt32 getXianpo(UInt32 c = 0, IncommingInfo* ii = NULL);
+        UInt32 useXianpo(UInt32 a, ConsumeInfo* ci);
         void getBuyFundInfo(UInt8 opt);
         void buyFund(UInt16 num);
         void getBuyFundAward(UInt8 opt);
@@ -2923,7 +2930,11 @@ namespace GObject
         void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
         bool giveFlower(UInt8 type , UInt32 num = 0);
         void joinAllServerRecharge(UInt32);
-        void handleJiqirenAct();
+        void handleJiqirenAct_shiyamen();
+        void handleJiqirenAct_clan();
+        void handleJiqirenAct_copy();
+        void handleJiqirenAct_frontMap();
+        void handleJiqirenAct_dungeon();
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
 	};
