@@ -898,6 +898,7 @@ function onActivityCheck(tm)
          set11Time(false)
       end
 
+
       if tm >= actTime254 and tm < actTime254_1 then
          setGGTime(true)
       else
@@ -1159,6 +1160,13 @@ function onActivityCheck(tm)
   else
       setMiLuZhiJiaoAct(false)
   end
+
+  if tm >= actTime2014_01_18 and tm < actTime2014_01_24 then
+      setBuyFundAct(true)
+  else
+      setBuyFundAct(false)
+  end
+
   --[[
   if tm >= actTime234_0 and tm < actTime234_1 then
       setHeroIslandAct(true)
@@ -1345,7 +1353,7 @@ function initActTime(y, m, d)
   local  SerStartTm201= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 七夕
-  local  SerStartTm202= { ['year'] = 2013, ['month'] = 8, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm202= { ['year'] = 2014, ['month'] = 2, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --商城消费大酬宾(9/18-9/24)
   local  SerStartTm210= { ['year'] = 2012, ['month'] = 9, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 中秋国庆
@@ -1453,8 +1461,8 @@ function initActTime(y, m, d)
   local  SerStartTm252= { ['year'] = 2013, ['month'] = 12, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm252_1= { ['year'] = 2013, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
-  local  SerStartTm253= { ['year'] = 2013, ['month'] = 11, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm253_1= { ['year'] = 2013, ['month'] = 12, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm253= { ['year'] = 2014, ['month'] = 1, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm253_1= { ['year'] = 2014, ['month'] = 1, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm254= { ['year'] = 2013, ['month'] =11, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm254_1= { ['year'] = 2013, ['month'] = 11, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1468,7 +1476,10 @@ function initActTime(y, m, d)
   --圣诞节活动（麋鹿之角）
   local  SerStartTm2013_12_24 = { ['year'] = 2013, ['month'] = 12, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_12_26 = { ['year'] = 2013, ['month'] = 12, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-
+  
+  --购买基金
+  local  SerStartTm2014_01_18 = { ['year'] = 2014, ['month'] = 01, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2014_01_24 = { ['year'] = 2014, ['month'] = 01, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     --日月合璧活动
   local  SerStartTmRYHB= { ['year'] = 2013, ['month'] = 6, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTmRYHB_1= { ['year'] = 2013, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1480,6 +1491,7 @@ function initActTime(y, m, d)
 
   local  SerStartTm256= { ['year'] = 2013, ['month'] =12, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm256_1= { ['year'] = 2014, ['month'] = 1, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1815,7 +1827,7 @@ function initActTime(y, m, d)
   setLevelAwardEnd(actTime202)
 
   actTime203= os.time(SerStartTm202);
-  actTime204= os.time(SerStartTm202) + 7 * 86400;
+  actTime204= os.time(SerStartTm202) + 5 * 86400;
 
   actTime205= os.time(SerStartTm205);
   actTime206= os.time(SerStartTm206);
@@ -1930,6 +1942,7 @@ function initActTime(y, m, d)
   actTime256= os.time(SerStartTm256)
   actTime256_1= os.time(SerStartTm256_1);
 
+
   actTime2013_01_29= os.time(SerStartTm2013_01_29);
   actTime2013_02_01= os.time(SerStartTm2013_02_01);
   actTime2013_02_05= os.time(SerStartTm2013_02_05);
@@ -1953,6 +1966,9 @@ function initActTime(y, m, d)
   actTime2013_05_18= os.time(SerStartTm2013_05_18)
   actTime2013_12_24= os.time(SerStartTm2013_12_24)
   actTime2013_12_26= os.time(SerStartTm2013_12_26)
+
+  actTime2014_01_18= os.time(SerStartTm2014_01_18)
+  actTime2014_01_24= os.time(SerStartTm2014_01_24)
 
   actTime_2013_1 = os.time(SerStartTm_2013_1);
   actTime_2013_1_1 = os.time(SerStartTm_2013_1) + 7*86400;

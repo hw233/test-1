@@ -2546,7 +2546,7 @@ namespace GObject
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
         inline const std::string& getAtoHICfg() const { return m_hicfg; }
     public:
-        UInt8 getMaxIcCount(UInt8 vipLevel);
+        UInt8 getMaxIcCount(UInt8 vipLevel ,UInt8 flag = 0);
     private:
         std::string m_hicfg;
 
@@ -2830,6 +2830,9 @@ namespace GObject
         void spreadToSelf();
         void spreadGetAward();
         void spreadGetAwardInCountry(UInt32 spreadCount);
+        void getBuyFundInfo(UInt8 opt);
+        void buyFund(UInt16 num);
+        void getBuyFundAward(UInt8 opt);
 
     public:
         // 八部浮屠

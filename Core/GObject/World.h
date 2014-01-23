@@ -595,8 +595,8 @@ public:
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 11, 27);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 12, 2);
+        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 1, 25);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 1, 30);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
@@ -646,6 +646,18 @@ public:
         _consumebegin = begin;
         _consumeend = end;
     }
+    inline static bool  getNewYearSpeedTime(UInt32 now = 1)
+    {
+        if( now == 1 )
+              now = TimeUtil::Now();
+        UInt32 _speedBegin = TimeUtil::MkTime(2014, 1, 18);
+        UInt32 _speedEnd = TimeUtil::MkTime(2014, 2,16);
+        if(now >_speedBegin && now <= _speedEnd)
+            return true;
+        else 
+            return false;
+    } 
+
     inline static UInt32 getConsumeBegin() { return _consumebegin; }
     inline static UInt32 getConsumeEnd() { return _consumeend; }
     inline static void setNeedConsumeRank(bool v)
@@ -708,6 +720,11 @@ public:
     { _miluzhijiao = v; }
     inline static bool getMiLuZhiJiaoAct()
     { return _miluzhijiao; }
+
+    inline static void setBuyFundAct(bool v)
+    { _buyfund = v; }
+    inline static bool getBuyFundAct()
+    { return _buyfund; }
 
     inline static bool getLuckyStarAct()
     {
@@ -1190,6 +1207,7 @@ public:
     static bool _foolbao;
     static bool _summerFlow3;
     static bool _surnamelegend;
+    static bool _speedTime;
     static bool _happyFire;
     static bool _11time;
     static bool _qishiban;
@@ -1211,6 +1229,7 @@ public:
     static UInt8 _arenaState;      //0:无 1:仙界第一 2:仙界至尊 3:仙界传奇
     static bool _memcinited;
     static bool _miluzhijiao;
+    static bool _buyfund;
 public:
     static RCSortType qishibanScoreSort;     //七石板积分排名
     static RCSortType rechargeSort;

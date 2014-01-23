@@ -246,6 +246,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
 		UInt32 now = TimeUtil::Now();
         if(World::get11TimeNum() <= 15)    //lb加
             time = 18;
+        if(World::getNewYearSpeedTime())    //lb加
+            time = 21;
         pp->place = place;
         pp->type = type;
         pp->pricetype = priceType;

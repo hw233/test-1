@@ -136,13 +136,19 @@ enum PurchaseType
     QSBAddTime                  = 125, //七石板加时
     TuPoJieXian                 = 126, //星辰图突破界限
     ServerWarConsume            = 127, //仙界传奇消费
-    SearchOldMan                = 129, //捉迷藏活动包打听
-    MarryYanHua                 = 130, //结婚送烟花
-    MarryBaiHe                  = 131, //结婚送百合花
-    ZhengHun                    = 132, //征婚
-    JieHun                      = 133, //结婚 
-    LiHun                       = 134, //离婚 
     RestStep                    = 1001, //七石板重置
+    ZhengHun                    = 1002, //征婚
+    JieHun                      = 1003, //结婚 
+    LiHun                       = 1004, //离婚 
+    SearchOldMan                = 1005, //捉迷藏活动包打听
+    MarryYanHua                 = 1006, //结婚送烟花
+    MarryBaiHe                  = 1007, //结婚送百合花
+    DINGQINGXINWU               = 1008, //定情信物
+    COUPLEFISH                  = 1009, //夫妻钓鱼
+    PETRENAME                   = 1010, //夫妻宠物改名
+    MODIFYPET                   = 1011, //夫妻更改信物
+    COUPLECOPY                  = 1012, //夫妻副本
+    OutBuyFund                  = 1013, //购买基金消费
     //繁体私有占150～200
 };
 
@@ -169,6 +175,7 @@ enum IncomingType
     ShouHunFromYouli            = 146, //游历获得兽魂
     LongHunFromTeamArena        = 147, //仙界至尊龙魂获得
     LongHunFromServerWar        = 148, //仙界传奇龙魂获得
+    InBuyFund                   = 149, //购买基金获得
 };
 
 enum MoneyType
@@ -286,7 +293,8 @@ enum ItemFrom
     FromQiShiBan = 64, //七石斗法
     FromServerWarJijian = 65, //仙界传奇祭剑宝箱
     FromQTAward = 66, //QT奖励
-    FromMicroCloudAward = 67, //微云合作奖励
+    FromBuyFundAward = 67, //购买基金奖励
+    FromMicroCloudAward = 68, //微云合作奖励
     //80 ~ 100，繁体占用
 };
 

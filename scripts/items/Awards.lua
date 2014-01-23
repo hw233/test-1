@@ -718,9 +718,9 @@ end
 function RunInterestingAward(player, cts)
     local item = {
         [0] = {{500,3},{56,3},{9371,3},{15,3}},
-        [1] = {{503,2},{514,2},{500,2},{516,2}},
+        [1] = {{503,3},{514,3},{500,3},{516,2}},
         [2] = {{501, 3},{547,3},{517,3},{513,3}},
-        [3] = {{134,3},{1325,3},{509,3},{515,2}},
+        [3] = {{134,3},{1325,3},{509,3},{515,3}},
     };
     local package = player:GetPackage();
 --    package:DelItemSendMsg(9371, player)
@@ -743,10 +743,10 @@ function RunInterestingAward(player, cts)
 end
 function RunInterestingBag(player, cts)
     local item = {
-        [0] = {{15,1},{30,1},{11,5}},
+        [0] = {{15,1},{9371,1},{500,1}},
     };
     local package = player:GetPackage();
-    package:DelItemSendMsg(9439, player)
+    package:DelItemSendMsg(9451, player)   --需要修改
     if cts > 1  then
         return false
     end
@@ -902,7 +902,7 @@ function RunBlueDiamondAward(player, opt)
    end
    
    if opt ==8 and j%2 ==1 then 
-        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."在跨年欢乐大转盘中幸运的获得了".."[4:"..items[j][1].."]x"..items[j][2])
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."在新年欢乐大转盘中幸运的获得了".."[4:"..items[j][1].."]x"..items[j][2])
     end
     local extraAward_9191 = {
         [2] = {9191,1,1},
@@ -1047,10 +1047,10 @@ function RunSummerFlowAward(player, idx)
         return 0
     end
     local item = {
-        [1] = {{499,88},{9418,8},{49,3},{9141,3},{9144,3}},
-        [2] = {{499,188},{9418,8},{50,3},{9141,5},{9144,5}},
-        [3] = {{499,288},{15,10},{9418,10},{9141,8},{9144,8},{49,3},{50,3}},
-        [4] = {{499,288},{15,20},{9418,20},{9141,8},{9144,8},{49,3},{50,3}},
+        [1] = {{499,88},{9443,10},{9442,3},{9141,3},{9144,3}},
+        [2] = {{499,188},{9443,20},{9442,5},{9141,5},{9144,5}},
+        [3] = {{499,288},{9443,30},{9442,8},{9141,8},{9144,8},{49,3},{50,3}},
+        [4] = {{499,288},{9443,40},{9442,10},{9141,8},{9144,8},{49,3},{50,3}},
     };
     local award = item[idx]
     local package = player:GetPackage()
@@ -1685,25 +1685,19 @@ function RunGameBoxDailyActionAward(player, cts)
 end
 function RunHappyValueAward(player, cts)
     local item = {
-        [1] = {{56,2},{57,2},{15,2},{508,2},{506,2}},
-        [2] = {{500, 3},{511,3},{501,2},{517,3}},
-        [3] = {{514,1},{465,1}},
-        [4] = {{516,3},{503, 3},{551,3},{547,3}},
-        [5] = {{509,2},{134,2},{9076,1}},
+        [1] = {{56,2},{57,2},{15,2},{500,2},{9371,3}},
+        [2] = {{500,2},{511,2},{501,2},{517,2}},
+        [3] = {{516,3},{503,3},{547,3},{551,3}},
+        [4] = {{465,1},{514,1}},
+        [5] = {{515,2},{134,2},{1325,2}},
+        [6] = {{9022,2},{509,3},{9076,1}},
     };
     local baoshi = {5005,5015,5025,5035,5045,5055,5065,5075,5085,5095,5105,5115,5125,5135,5145}
     local package = player:GetPackage();
-    if cts == 0 then
-        return false
-    end
-    if cts > 5  then
-        return false
-    end
-    if item[cts] == nil then
+    if nil == player or nil == cts or nil == item[cts] then
         return false 
     end
-    num = #item[cts]
-    if package:GetRestPackageSize() < num  then
+    if package:GetRestPackageSize() < #item[cts] then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -1711,7 +1705,7 @@ function RunHappyValueAward(player, cts)
     for count = 1, #item[cts] do
         package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
     end
-    if cts == 3 then 
+    if cts == 4 then
         local index = math.random(1,#baoshi)
         package:Add(baoshi[index], 1, true, 0, 59);
     end

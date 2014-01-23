@@ -11,6 +11,7 @@
 #include "GData/AttrExtra.h"
 #include "GObject/World.h"
 #include "MarryBoard.h"
+#include "Married.h"
 
 namespace GObject
 {
@@ -174,10 +175,13 @@ namespace GObject
                 player->sendMsgCode(0, 6006);
                 return 3;
         }
-        if(player->getGold() < sMoney.price_num)
-        {
-            player->sendMsgCode(0, 1101);
-            return 2;
+        if(isUseMoney)
+        { 
+            if(player->getGold() < sMoney.price_num)
+            {
+                player->sendMsgCode(0, 1101);
+                return 2;
+            }
         }
         return 0;
     }
@@ -267,6 +271,14 @@ namespace GObject
                 str_type = "婚礼退还仙石";
                 content_flag = 912;
                 break;
+            case 7:
+                str_type = "婚礼超时处理";
+                content_flag = 917;
+                break;
+            case 8:
+                str_type = "婚礼超时处理";
+                content_flag = 918;
+                break;
             default:
                 return 1;
         }
@@ -274,7 +286,11 @@ namespace GObject
         SYSMSGV(content, content_flag,price_num);
         
         MailItemsInfo itemsInfo(mitem, BuChangMarry, 1);
-        Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        Mail * pmail; 
+        if(price_num == 0)    
+            pmail = player->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000, true, &itemsInfo);
+        else
+            pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
 
@@ -287,13 +303,16 @@ namespace GObject
         switch (useType)
         {
             case 1:
-                ci.purchaseType = ZhengHun; 
+                ci.purchaseType = DINGQINGXINWU; 
                 break;
             case 2:
                 ci.purchaseType = JieHun; 
                 break;
             case 3:
                 ci.purchaseType = LiHun;
+                break;
+            case 4:
+                ci.purchaseType = ZhengHun; 
                 break;
             default:
                 return 1;
@@ -312,14 +331,15 @@ namespace GObject
         {
             if(it->second > TimeUtil::Now() - MARRY_TIME_OUT)
             { 
+                it++;
                 break;
             }
             else
             {
                 GObject::Player * player = GObject::globalPlayers[it->first];
+                it++;
                 CancelMarriage(player,1); 
             }
-            it++;
         }
         return;    
     }
@@ -402,7 +422,7 @@ namespace GObject
         if(!player->getMainFighter()->getSex())//男的
         {
             useMoney(player,sMoney.price_type,sMoney.price_num,sMoney.useType);
-            useMoney(player,0,ZHENGHUN,3);
+            useMoney(player,0,ZHENGHUN,4);
             player->udpLog("jiehunqianzhi", "F_140102_1", "", "", "", "", "act");
             switch(sMarriage->eLove)
             {
@@ -421,7 +441,7 @@ namespace GObject
         }
         else
         {
-            useMoney(player,0,ZHENGHUN,3);
+            useMoney(player,0,ZHENGHUN,4);
             player->udpLog("jiehunqianzhi", "F_140102_2", "", "", "", "", "act");
         }
        
@@ -870,6 +890,13 @@ namespace GObject
         if(TimeUtil::GetYYMMDD(sMarry->yuyueTime) == TimeUtil::GetYYMMDD())
         {
             player->sendMsgCode(0, 6023);
+            return 1;
+        }
+        
+        if(sMarry->yuyueTime < TimeUtil::Now())
+        {
+            player->sendMsgCode(0, 6023);
+            return 1;
         }
 
         useMoney(player,sMoney.price_type,sMoney.price_num,sMoney.useType);
@@ -925,6 +952,7 @@ namespace GObject
     UInt8 MarryMgr::ConfirmReqWeddingAppointMent(Player* player)
     {
         Mutex::ScopedLock lk(_mutex); 
+        UInt32 now = TimeUtil::Now();
         if(player->GetVar(VAR_MARRY_STATUS) != 2)
         {
             player->sendMsgCode(0, 6002);
@@ -995,7 +1023,7 @@ namespace GObject
         player->udpLog("jiehunqianzhi", "F_140102_11", "", "", "", "", "act");
         sendWhoisMarrybuyer(player,obj_player);//告知客户端谁是婚礼购买者
 
-        Process();
+        Process(now);
         return 0;
     }
     
@@ -1020,7 +1048,7 @@ namespace GObject
             player->sendMsgCode(0, 6019);
             return 1;
         }        
-        obj_player->GetMarriageInfo()->eraseInfo(PARM_marriageTime);  
+        obj_player->GetMarriageInfo()->eraseInfo(PARM_yuyueTime);  
         obj_player->GetMarriageInfo()->eraseInfo(PARM_eWedding);  
         
         sendMoneyMail(obj_player,sMoney.price_type,sMoney.price_num,sMoney.useType,sMoney.eParm); 
@@ -1039,9 +1067,15 @@ namespace GObject
         return 0;
     }
 
-    UInt8 MarryMgr::CancelAppointMent(Player* player)
+    UInt8 MarryMgr::doCancelAppointMent(Player* player)
     {
         Mutex::ScopedLock lk(_mutex); 
+        UInt8 ret = CancelAppointMent(player);
+        return ret;
+    }
+
+    UInt8 MarryMgr::CancelAppointMent(Player* player)
+    {
         
         Player * obj_player = globalPlayers[player->GetMarriageInfo()->lovers];
         if(!obj_player)//爱人不存在
@@ -1212,26 +1246,47 @@ namespace GObject
         if(player->GetMarriageInfo()->yuyueTime != 0 && player->GetMarriageInfo()->eWedding != WEDDING_NULL)
         {
             jh_time = player->GetMarriageInfo()->yuyueTime;
+            obj_player->GetMarriageInfo()->yuyueTime = player->GetMarriageInfo()->yuyueTime;
             wedding_type = static_cast<UInt8>(player->GetMarriageInfo()->eWedding);
         }
         else
         {
             jh_time = obj_player->GetMarriageInfo()->yuyueTime;
+            player->GetMarriageInfo()->yuyueTime = obj_player->GetMarriageInfo()->yuyueTime;
             wedding_type = static_cast<UInt8>(obj_player->GetMarriageInfo()->eWedding);
         }
 
         DB7().PushUpdateData("REPLACE INTO `married_log` VALUES(%u,%" I64_FMT "u,%" I64_FMT "u, '%s',%u,%u,%u,%u,%u )", jh_time,playerid,obj_playerid, str_pronouncement.c_str(),static_cast<UInt8>(player->GetMarriageInfo()->eLove),marriage_time,replymarriage_time,player->GetMarriageInfo()->jieyuanTime,wedding_type);
         
+        DB4().PushUpdateData("REPLACE INTO `married_couple` VALUES(%u,%" I64_FMT "u,%" I64_FMT "u,%u,'%s',%u,%u,%u )", jh_time,playerid,obj_playerid, static_cast<UInt8>(player->GetMarriageInfo()->eLove),"",1,0,0);
+        
         obj_player->SetVar(VAR_MARRY_STATUS,5);
         player->SetVar(VAR_MARRY_STATUS,5); 
-   
+
+        std::string str_tmp = "";
+        CoupleInfo* ci = new CoupleInfo();
+        ci->eLove = player->GetMarriageInfo()->eLove;
+        ci->level = static_cast<UInt8>(1);
+        gMarriedMgr.InsertCoupleInfo(jh_time,ci);
+        if(player->isOnline())
+            gMarriedMgr.ProcessOnlineAward(player,0);
+        if(obj_player->isOnline()) 
+            gMarriedMgr.ProcessOnlineAward(obj_player,0);
+
         SetDirty(player,obj_player); 
+        
+        //通知结婚养成
+        Stream st1(REP::MARRIEDMGR);
+        st1 << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
+        player->send(st1);
+        obj_player->send(st1);
         return 0;
     }
 
     UInt8 MarryMgr::DivorceMarry(Player* player,UInt8 status)
     {
         Mutex::ScopedLock lk(_mutex); 
+        UInt32 now = TimeUtil::Now();
 		Player * obj_player = globalPlayers[player->GetMarriageInfo()->lovers];
         if(!obj_player) 
         {
@@ -1239,13 +1294,14 @@ namespace GObject
             return 1;
         }
         PairList::iterator it;
+        Stream st1(REP::MARRIEDMGR);
         Stream st2(REP::MARRYMGR);
         switch(status)
         {
             case 0:
-                if(player->GetVar(VAR_CANCEL_GIVEUP_JIEYUAN) < TimeUtil::Now())
+                if(player->GetVar(VAR_CANCEL_GIVEUP_JIEYUAN) < now)
                 {
-                    player->SetVar(VAR_CANCEL_GIVEUP_JIEYUAN,TimeUtil::Now() + 86400);
+                    player->SetVar(VAR_CANCEL_GIVEUP_JIEYUAN,now + 86400);
                 }
                 else
                 {
@@ -1378,7 +1434,11 @@ namespace GObject
                 
                 st2 << static_cast<UInt8>(9) << static_cast<UInt8>(6) << player->getId() << player->getName() << player->getMainFighter()->getColor() << Stream::eos;
 
+                //通知结婚养成
                 obj_player->send(st2);
+                st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0) << Stream::eos;
+                player->send(st1);
+                obj_player->send(st1);
                 
                 break;
             case 2:
@@ -1409,6 +1469,11 @@ namespace GObject
                         erase_marryList(player);        
                         sendMoneyMail(player,MailPackage::Gold,0,5,1); 
                         sendMoneyMail(obj_player,MailPackage::Gold,0,5,1); 
+                        //通知结婚养成
+                        st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0) << Stream::eos;
+                        player->send(st1);
+                        obj_player->send(st1);
+                        
                         player->SetVar(VAR_MARRY_STATUS,0);
                         obj_player->SetVar(VAR_MARRY_STATUS,0);
                     }
@@ -1547,10 +1612,15 @@ namespace GObject
 
         return 0;
     }
-   
-    UInt8 MarryMgr::GetList(Player* player,UInt8 flag,UInt16 idx)
+  
+    UInt8 MarryMgr::DoGetList(Player* player,UInt8 flag,UInt16 idx)
     {
         Mutex::ScopedLock lk(_mutex); 
+        return GetList(player,flag,idx); 
+    }
+
+    UInt8 MarryMgr::GetList(Player* player,UInt8 flag,UInt16 idx)
+    {
         UInt8 len = 3;
         UInt16 count;//总数
         UInt16 num;//页数
@@ -1801,6 +1871,9 @@ namespace GObject
                 obj_player->GetMarriageInfo()->pronouncement = dbpn->pronouncement ;
             
         }
+
+        
+        
         return 0;
     } 
 
@@ -1814,6 +1887,42 @@ namespace GObject
 
         return 0;
     } 
+
+    void MarryMgr::RepairBug()
+    {
+        if(GVAR.GetVar(GVAR_REPAIRMARRYBUG) == 1)
+            return;
+        ReserveList::iterator it; 
+        for(it = m_yuyueList.begin();it != m_yuyueList.end(); ++it)
+        {
+            GObject::Player * man_player = GObject::globalPlayers[(it->second).first];
+            GObject::Player * woman_player = GObject::globalPlayers[(it->second).second];
+            if(man_player->GetVar(VAR_MARRY_STATUS) == 4)
+            {
+                if(it->first == 1) 
+                {
+                    if(man_player->GetMarriageInfo()->eWedding == WEDDING_NULL)    
+                        doCancelAppointMent(man_player);
+                    else
+                        doCancelAppointMent(woman_player);
+                }
+            }
+            
+            if(woman_player->GetVar(VAR_MARRY_STATUS) == 4)
+            {
+                if(it->first == 1) 
+                {
+                    if(woman_player->GetMarriageInfo()->eWedding == WEDDING_NULL)    
+                        doCancelAppointMent(woman_player);
+                    else
+                        doCancelAppointMent(man_player);
+                }
+            }
+        }
+        GVAR.SetVar(GVAR_REPAIRMARRYBUG,1);
+        return;
+    }
+
 
 
     void MarryMgr::addMarriedAttr(Player* player,GData::AttrExtra& ae)
@@ -1862,7 +1971,7 @@ namespace GObject
     {
         if(player)
         {
-            if(player->GetMarriageInfo()->marriageTime != 0)
+            if(player->GetMarriageInfo()->pronouncement != "")
             {
                 Stream st(REP::MARRYMGR);
                 st << static_cast<UInt8>(0x11) << player->GetMarriageInfo()->marriageTime + 86400 * 2 - TimeUtil::Now() << Stream::eos;
@@ -1874,10 +1983,10 @@ namespace GObject
         }
         if(obj_player)
         {
-            if(obj_player->GetMarriageInfo()->marriageTime != 0)
+            if(obj_player->GetMarriageInfo()->pronouncement != "")
             {
                 Stream st(REP::MARRYMGR);
-                st << static_cast<UInt8>(0x11) << player->GetMarriageInfo()->marriageTime + 86400 * 2 - TimeUtil::Now() << Stream::eos;
+                st << static_cast<UInt8>(0x11) << obj_player->GetMarriageInfo()->marriageTime + 86400 * 2 - TimeUtil::Now() << Stream::eos;
                 if(player)
                     player->send(st);
                 if(obj_player)
@@ -1905,28 +2014,31 @@ namespace GObject
         return;
     }
     
-
-    void MarryMgr::DoProcess()
+    void MarryMgr::FuckDoProcess(UInt32 now)
     {
         Mutex::ScopedLock lk(_mutex);
-        Process();
+        Process(now);
     }
 
-    void MarryMgr::Process()
+    void MarryMgr::DoProcess(UInt32 now)
     {
         CheckingListTimeOut(m_maleList);
         CheckingListTimeOut(m_femaleList);
-        
-        if(GVAR.GetVar(GVAR_MARRY_TIME1) < TimeUtil::Now())
+        FuckDoProcess(now);
+    }
+
+    void MarryMgr::Process(UInt32 now)
+    {
+        if(GVAR.GetVar(GVAR_MARRY_TIME1) < now)
             GVAR.SetVar(GVAR_MARRY_TIME1,0);
-        if(GVAR.GetVar(GVAR_MARRY_TIME2) < TimeUtil::Now())
+        if(GVAR.GetVar(GVAR_MARRY_TIME2) < now)
             GVAR.SetVar(GVAR_MARRY_TIME2,0);
 
-        if(GVAR.GetVar(GVAR_MARRY_TIME1) >= TimeUtil::Now() + 86400*2)
+        if(GVAR.GetVar(GVAR_MARRY_TIME1) >= now + 86400*2)
             GVAR.SetVar(GVAR_MARRY_TIME1,0);
-        if(GVAR.GetVar(GVAR_MARRY_TIME2) >= TimeUtil::Now() + 86400*2)
+        if(GVAR.GetVar(GVAR_MARRY_TIME2) >= now + 86400*2)
             GVAR.SetVar(GVAR_MARRY_TIME2,0);
-        //if(GVAR.GetVar(GVAR_MARRY_TIME3) >= TimeUtil::Now() + 86400*3)
+        //if(GVAR.GetVar(GVAR_MARRY_TIME3) >= now + 86400*3)
           //  GVAR.SetVar(GVAR_MARRY_TIME3,0);
 
         GObject::Player * player;
@@ -1941,11 +2053,11 @@ namespace GObject
             {
                 if(i > 2)
                     break;
-                if(it->first < TimeUtil::Now())
+                if(it->first < now)
                     continue;
                 if(it->first == GVAR.GetVar(GVAR_MARRY_TIME1) || it->first == GVAR.GetVar(GVAR_MARRY_TIME2) ) //|| it->first == GVAR.GetVar(GVAR_MARRY_TIME3))
                     continue;
-                if(it->first >= (TimeUtil::Now() + 86400*2))
+                if(it->first >= (now + 86400*2))
                     break;
                 if(GVAR.GetVar(GVAR_MARRY_TIME1) == 0)
                     GVAR.SetVar(GVAR_MARRY_TIME1,it->first);
@@ -1960,7 +2072,7 @@ namespace GObject
                     eWedding = static_cast<UInt8>(obj_player->GetMarriageInfo()->eWedding);
                 else
                     eWedding = static_cast<UInt8>(player->GetMarriageInfo()->eWedding);
-                MarryBoard::instance().SendPreMarryPresent(player,obj_player,eWedding);
+                //MarryBoard::instance().SendPreMarryPresent(player,obj_player,eWedding);
                 i++;
             }
         }
@@ -1973,6 +2085,28 @@ namespace GObject
             
             while(it != m_yuyueList.end())
             {
+                if(it->first < now)
+                {
+                    if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD())
+                        break;  
+                    it1 = it->second;
+                    player = GObject::globalPlayers[it1.first];
+                    obj_player = GObject::globalPlayers[it1.second];
+                    if(!player || !obj_player)
+                        continue;
+                    UInt8 ret; 
+                    if(player->GetMarriageInfo()->eWedding == WEDDING_NULL)
+                    {
+                        ret = CancelAppointMent(player);
+                        sendMoneyMail(obj_player,MailPackage::Gold,0,7,1); 
+                    }
+                    else
+                    {
+                        ret = CancelAppointMent(obj_player);
+                        sendMoneyMail(player,MailPackage::Gold,0,7,1); 
+                    }
+                }
+                
                 if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD())
                 {
                     it1 = it->second;
@@ -1982,12 +2116,10 @@ namespace GObject
                         eWedding = static_cast<UInt8>(obj_player->GetMarriageInfo()->eWedding);
                     else
                         eWedding = static_cast<UInt8>(player->GetMarriageInfo()->eWedding);
-                    if(it->first < TimeUtil::Now())
-                        WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,TimeUtil::Now() + 60*90); 
-                    else
-                        WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,it->first + 60*30); 
+                    WORLD().CreateMarryBoard(it1.first,it1.second,eWedding,it->first + 60*30); 
                 }
-                it ++;
+                if(it != m_yuyueList.end())
+                    it++;
             }
          }
 
@@ -2010,6 +2142,28 @@ namespace GObject
 
     }
     
+    void MarryMgr::MarryingCrush()
+    {
+        Mutex::ScopedLock lk(_mutex);
+        if(m_yuyueList.begin() == m_yuyueList.end())
+            return;
+        ReserveList::iterator it = this->m_yuyueList.begin();
+        
+        if(it->first < TimeUtil::Now())
+        {
+            std::pair<UInt64,UInt64> it1 = it->second;
+            GObject::Player * player = GObject::globalPlayers[it1.first];
+            GObject::Player * obj_player = GObject::globalPlayers[it1.second];
+            UInt8 ret; 
+            if(player->GetMarriageInfo()->eWedding == WEDDING_NULL)
+                ret = CancelAppointMent(player);
+            else
+                ret = CancelAppointMent(obj_player);
+            if(ret == 0)
+                sendMoneyMail(player,MailPackage::Gold,0,8,1); 
+        }
 
+        return;
+    }
 
 }

@@ -69,6 +69,7 @@
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
 #include "GObject/Marry.h"
+#include "GObject/Married.h"
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
 
@@ -1417,6 +1418,20 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->sendGuangGunInfo();
     pl->setQTSpecialMark();
+    //通知结婚养成
+    if(pl->GetVar(GObject::VAR_MARRY_STATUS) == 5 || pl->GetVar(GObject::VAR_MARRY_STATUS) == 6)
+    {
+        Stream st1(REP::MARRIEDMGR);
+        st1  << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
+        pl->send(st1);
+        gMarriedMgr.ProcessOnlineAward(pl,0);
+    }
+    else
+    {
+        Stream st1(REP::MARRIEDMGR);
+        st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0)<< Stream::eos;
+        pl->send(st1);
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -7536,13 +7551,13 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                 switch(flag)
                 {
                     case 0:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     case 1:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     case 2:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     default:
                         Stream st(REP::MARRYMGR);
@@ -7574,7 +7589,7 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                         }
                     case 2:
                         {
-                            ret = GObject::gMarryMgr.CancelAppointMent(player);
+                            ret = GObject::gMarryMgr.doCancelAppointMent(player);
                             break; 
                         }
                     case 3:
@@ -7647,7 +7662,50 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
 
 }
 
+void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    
+    UInt8 req = 0;
+    brd >> req;
+    std::string str_tmp = ""; 
+    UInt8 eLove = 1;
+    UInt8 consumeType= 0;
+    UInt8 fish_count = 0;
+    switch(req)
+    {
+        case 2:
+            gMarriedMgr.ReturnFirstStatus(player);
+            break;
+        case 3:
+            gMarriedMgr.GetOnlineAward(player); 
+            break;
+        case 4:
+            gMarriedMgr.ReturnCouplePet(player);
+            break;
+        case 5:
+            brd >> str_tmp; 
+            gMarriedMgr.ModifyPetName(player,str_tmp);
+            break;
+        case 6:
+            brd >> eLove;
+            gMarriedMgr.ModifyeLove(player,eLove);
+            break;
+        case 7:
+            brd >> consumeType >> fish_count; 
+            gMarriedMgr.Fishing(player,consumeType,fish_count);
+            break;
+        case 8:
 
+            break;
+        default:
+
+            break;
+    }
+
+
+}
 
 void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
 {
@@ -7895,6 +7953,41 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     break;
             }
         }
+        break;
+    case 0x28:
+        {
+            brd >> op;
+            switch(op)
+            {
+            case 0x00:
+                {
+                    UInt8 type = 0;
+                    brd >> type;
+                    player->getBuyFundInfo(type);
+                }
+                break;
+            case 0x01:
+                {
+                    if(!World::getBuyFundAct())
+                        return;
+
+                    if(!player->hasChecked())
+                        return;
+
+                    UInt16 num = 0;
+                    brd >> num;
+                    player->buyFund(num);
+                }
+                break;
+            case 0x02:
+                {
+                    UInt8 type = 0;
+                    brd >> type;
+                    player->getBuyFundAward(type);
+                }
+                break;
+            }
+        }
     default:
         break;
     }
@@ -7934,16 +8027,20 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
             break;
         case 0x04:
             {
+                UInt32 baiHe = player->GetVar(VAR_MARRYBOARD_BAIHE);
                 if(mType == 0)
                     return;
                 UInt8 num = 0;
                 brd >> num ;
                 if(num == 0)
                     break;
+                if( (baiHe + num) > 50)
+                    return ;
                 if(num > 99)
                     num = 99;
                 if(!player->giveFlower(1,num))
                     break; 
+                player->AddVar(VAR_MARRYBOARD_BAIHE,num);
                 GObject::MarryBoard::instance()._lively += 5*num;
                 SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
             }
