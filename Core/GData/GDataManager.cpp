@@ -42,6 +42,7 @@
 #include "RideConfig.h"
 #include "GObject/Married.h"
 #include "CoupleUpgrade.h"
+#include "CoupleCopy.h"
 
 namespace GData
 {
@@ -417,6 +418,11 @@ namespace GData
         if (!LoadCoupleInfo())
         {
             fprintf (stderr, "Load LoadCoupleInfoConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadCoupleCopy())
+        {
+            fprintf (stderr, "Load LoadCoupleCopyConfig Error !\n");
             std::abort();
         }
 
@@ -2771,6 +2777,18 @@ namespace GData
 			return false;
 		while(execu->Next() == DB::DB_OK)
             cu.loadUpgradeTable(dbpn); 
+		return true;
+    }
+
+    bool GDataManager::LoadCoupleCopy()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCoupleCopy dbcc;
+		if(execu->Prepare("SELECT `id` ,`name`, `location`, `monster` FROM `couplecopy` ", dbcc) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            cc.loadCopyTable(dbcc); 
 		return true;
     }
 

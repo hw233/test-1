@@ -1427,6 +1427,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->send(st1);
         gMarriedMgr.ProcessOnlineAward(pl,0);
         gMarriedMgr.ReturnCouplePet(pl);
+        gMarriedMgr.EnterCoupleCopy(pl,0);
     }
     else
     {
@@ -7525,6 +7526,7 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
             {
                 UInt8 b_loverToken = 0;
                 string str_pronouncement = "";
+                string str_sql= "'";
                 UInt8 ret = 1;//操作返回值
                 UInt64 obj_playerid = 0;
                 UInt8 flag1 = 0;//修改征婚信息标志位 
@@ -7536,6 +7538,9 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                 {
                     case 0:
                         brd >> b_loverToken >> str_pronouncement;  
+                        
+                        if(str_pronouncement.find(str_sql) != std::string::npos)
+                            str_pronouncement.replace(str_pronouncement.find(str_sql),str_sql.length(),"//");
                         sMarriage->pronouncement = str_pronouncement;
                         sMarriage->eLove = static_cast<ELoveToken>(b_loverToken);
                         ret = GObject::gMarryMgr.StartMarriage(player,sMarriage); 
@@ -7803,6 +7808,9 @@ void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
     UInt8 eLove = 1;
     UInt8 consumeType= 0;
     UInt8 fish_count = 0;
+    UInt8 copy_type = 0;
+    UInt8 op_type = 0;
+    UInt8 flag= 0;
     switch(req)
     {
         case 2:
@@ -7827,7 +7835,22 @@ void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
             gMarriedMgr.Fishing(player,consumeType,fish_count);
             break;
         case 8:
-
+            brd >> copy_type;
+            gMarriedMgr.EnterCoupleCopy(player,copy_type);
+            break;
+        case 9:
+            brd >> op_type; 
+            gMarriedMgr.OpCoupleCopy(player,op_type);
+            break;
+        case 0x10:
+            gMarriedMgr.InvitePlayer(player); 
+            break;
+        case 0x11:
+            brd >> flag; 
+            gMarriedMgr.SetCoupleFix(player,flag); 
+            break;
+        case 0x12:
+            gMarriedMgr.EnterBattle(player);
             break;
         default:
 
