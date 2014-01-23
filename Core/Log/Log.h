@@ -144,6 +144,10 @@ enum PurchaseType
     MarryYanHua                 = 1006, //结婚送烟花
     MarryBaiHe                  = 1007, //结婚送百合花
     DINGQINGXINWU               = 1008, //定情信物
+    COUPLEFISH                  = 1009, //夫妻钓鱼
+    PETRENAME                   = 1010, //夫妻宠物改名
+    MODIFYPET                   = 1011, //夫妻更改信物
+    COUPLECOPY                  = 1012, //夫妻副本
     //繁体私有占150～200
 };
 
