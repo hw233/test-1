@@ -332,12 +332,8 @@ private:
         e_unDmgDeep = 110,    // 解除重伤
         e_dmgNingShi = 111,    // 凝视
         e_unDmgNingShi = 112,    // 解除凝视
-
-
-        e_flaw = e_bleedType,                 // 破绽效果
-        e_unFlaw  = e_unBleedType,                // 解除破绽效果
-        //e_flaw = 113,                 // 破绽效果
-        //e_unFlaw  = 114,                // 解除破绽效果
+        e_flaw = 113,                 // 破绽效果
+        e_unFlaw  = 114,                // 解除破绽效果
 
         e_MAX_STATE,
     };
