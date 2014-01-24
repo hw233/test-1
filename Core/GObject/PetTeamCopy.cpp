@@ -298,6 +298,7 @@ void PetTeamCopy::teamInfo(Player* pl, Stream& st)
             st << pet->getPetEvolve();
             pet->AppendEquipData(st);
             pet->sendHunPoInfo(st);
+            pet->sendSevenSoulInfo(st);
         }
     }
 }
