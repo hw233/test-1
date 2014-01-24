@@ -151,8 +151,9 @@ enum PurchaseType
     OutBuyFund                  = 1013, //购买基金消费
     RefreshMonster              = 1015, //宠物组队副本刷怪
     CreateRoom                  = 1016, //宠物组队副本创建房间
-    BuyOpenCard                 = 1017, //购买翻牌次数
-    RefreshMoBaoAward           = 1018, //刷新墨宝奖励
+    SevenSoulUpgrade            = 1017, //七魄升级
+    BuyOpenCard                 = 1018, //购买翻牌次数
+    RefreshMoBaoAward           = 1019, //刷新墨宝奖励
     //繁体私有占150～200
 };
 
@@ -180,6 +181,7 @@ enum IncomingType
     LongHunFromTeamArena        = 147, //仙界至尊龙魂获得
     LongHunFromServerWar        = 148, //仙界传奇龙魂获得
     InBuyFund                   = 149, //购买基金获得
+    XianpoFromUseItem           = 150, //使用物品仙魄丹
 };
 
 enum MoneyType

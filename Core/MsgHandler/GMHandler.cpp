@@ -160,6 +160,7 @@ GMHandler::GMHandler()
 	Reg(3, "setacu", &GMHandler::OnSetAcu);
 	Reg(3, "setacugold", &GMHandler::OnSetAcuGold);
 	Reg(3, "useitem", &GMHandler::OnUseItem);
+	Reg(3, "baozhu", &GMHandler::OnUseItem9440);
 	Reg(3, "uitem", &GMHandler::OnUseItem);
     Reg(3, "ocupyplace", &GMHandler::OnOcupyPlace);
     Reg(3, "ec", &GMHandler::OnEnterCopy);
@@ -304,7 +305,6 @@ GMHandler::GMHandler()
     Reg(3, "clmarrylist", &GMHandler::OnCleanMarryList);
     Reg(3, "setmarry", &GMHandler::OnSetMarryStatus);
     Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
-    Reg(2, "use9440", &GMHandler::OnUseItem9440);
     Reg(2, "jiqiren", &GMHandler::OnJiqirenAction);
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
     Reg(3, "addpetattr", &GMHandler::OnAddPetAttr);
@@ -5062,7 +5062,7 @@ void GMHandler::OnCreateMarryBoard(GObject::Player *player, std::vector<std::str
 	UInt64 playerId2 = strtoull(args[1].c_str(), &endptr, 10);
     UInt8 type = atoi(args[2].c_str());
     UInt32 now = TimeUtil::Now();
-    if(type > 1 && type < 4 )
+    if(type > 0 && type < 4 )
     {
         WORLD().CreateMarryBoard(playerId1,playerId2,type,now + 1860);
         GObject::MarryBoard::instance().SetQuestionOnMarryBoard();

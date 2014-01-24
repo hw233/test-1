@@ -20,7 +20,7 @@ namespace GData
 #define CITTA_TO_ITEMID(x) ((UInt16)(x) / CITTA_LEVEL_MAX + LCITTA_ID - 1)
 #define ITEMID_TO_CITTA(x,l) (((UInt16)(x) - LCITTA_ID + 1)*100 + ((UInt16)(l > 9 ? 9 : l)))
 
-enum
+enum    // 技能触发方式
 {
     /*0*/ SKILL_ACTIVE = 0,
     /*1*/ SKILL_PEERLESS,
@@ -40,8 +40,8 @@ enum
     /*14*/ SKILL_ONATKBLEED,
     /*15*/ SKILL_ONATKDMG,
     /*16*/ SKILL_ONPETPROTECT,
-    /*17*/ SKILL_ONGETDMG,
-    /*18*/ SKILL_ONBEDMG,
+    /*17*/ SKILL_ONGETDMG,      // 受到任何伤害触发
+    /*18*/ SKILL_ONBEDMG,       // 被其他人攻击触发
     /*19*/ SKILL_ONBEPHYDMG,
     /*20*/ SKILL_ONBEMAGDMG,
     /*21*/ SKILL_ONHP10P,    // 生命剩余1/3
@@ -50,6 +50,9 @@ enum
     /*24*/ SKILL_BLEED_TYPE_DMG,  // 流血类状态伤害
     /*25*/ SKILL_XMCZ,  //降魔禅杖
     /*26*/ SKILL_BLTY,  //碧岚天衣
+    /*27*/ SKILL_AFTACTION,      // 行动后触发（包括被眩晕）
+    /*28*/ SKILL_ONHPCHANGE,       // HP改变时触发
+    /*29*/ SKILL_ONWITHSTAND,    // 招架（可以反击状态下触发）
     SKILL_PASSIVES
 };
 
@@ -68,6 +71,7 @@ enum
     e_battle_target_selfside_max = 5,
     e_battle_target_selfside_min = 6,
     e_battle_target_selfside_atk_max = 7,
+    e_battle_target_selfside_atk_2nd = 8,
 };
 
 
@@ -118,6 +122,14 @@ enum
     e_eft_no_use = 42,           //未使用
     e_eft_bi_lan_tian_yi = 43,   //未使用
     e_eft_zhu_tian_bao_jian = 44, //诸天宝鉴
+    e_eft_trigger_count_max = 45, // 技能触发上限
+    e_eft_hp_lostp = 46,    // HP损失百分比
+    e_eft_withstand = 47,       // 招架效果
+    e_eft_flaw = 48,            // 破绽效果
+    e_eft_ru_red_carpet = 49,    // 儒：红毯
+    e_eft_shi_flower = 50,    // 释：鲜花
+    e_eft_dao_rose = 51,    // 道：玫瑰
+    e_eft_mo_knot = 52,    // 墨：同心结
 
     e_eft_max
 };

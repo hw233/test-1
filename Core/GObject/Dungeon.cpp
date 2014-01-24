@@ -153,6 +153,7 @@ UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
 	updateToDB(player, *dpi);
 
     GameAction()->doStrong( player, SthDungeon, 0 , 0);
+    player->getSummerMeetScore(0);
 	return 0;
 }
 
@@ -1096,19 +1097,25 @@ void Dungeon::updateToDB( Player * player, DungeonPlayerInfo& dpi )
 void Dungeon::checkForTimeout( Player * player, DungeonPlayerInfo& dpi, bool writeDB )
 {
 	UInt32 now = TimeUtil::Now();
-	if(now >= PLAYER_DATA(player, dungeonEnd))
+	if(now >= dpi.counterEnd)
+       // PLAYER_DATA(player, dungeonEnd))
 	{
         dpi.counterEnd = TimeUtil::SharpDay(1);
         dpi.count[dpi.difficulty] = 0;
+        player->checkDungeonTimeout(now);
+        /*
 		PLAYER_DATA(player, dungeonEnd) = dpi.counterEnd;
 		PLAYER_DATA(player, dungeonCnt) = 0;
 		PLAYER_DATA(player, dungeonCnt1) = 0;
+        */
 		dpi.lootToday[dpi.difficulty].clear();
 		if(writeDB)
 		{
 			DB3().PushUpdateData("UPDATE `dungeon_player` SET `count` = 0, `counterEnd` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", dpi.counterEnd, _id, player->getId());
 
+            /*
             DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = %u, `dungeonCnt1` = %u , `dungeonEnd` = %u where `id` = %" I64_FMT "u", PLAYER_DATA(player, dungeonCnt), PLAYER_DATA(player, dungeonCnt1), PLAYER_DATA(player, dungeonEnd), player->getId());
+            */
 		}
 	}
 }

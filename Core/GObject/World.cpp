@@ -342,11 +342,6 @@ bool enum_midnight(void * ptr, void* next)
 	Player * pl = static_cast<Player *>(ptr);
 	if(pl == NULL)
 		return true;
-    if(World::getJiqirenAct())
-    {
-        GameMsgHdr h(0x23A,  pl->getThreadId(), pl, 0);
-        GLOBAL().PushMsg(h, NULL);
-    }
 	if (pl->isOnline())
 	{
 		GameMsgHdr hdr(0x269, pl->getThreadId(), pl, sizeof(nextday));
@@ -354,6 +349,7 @@ bool enum_midnight(void * ptr, void* next)
 	}
     else
     {
+        pl->checkDungeonTimeout(nextday);
         pl->buildClanTask(true);
         pl->clearFinishCount();
         /*
@@ -453,6 +449,28 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 24)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -477,6 +495,9 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 1)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 8)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
         ))
     {
 #if 0
@@ -552,7 +573,6 @@ bool enum_midnight(void * ptr, void* next)
         pl->sendLevelAward();
 #endif
 
-    //活动机器人（马上有奖）活动
     /*
     if (nextday >= TimeUtil::MkTime(2013, 2, 9))
     {   //金蛇献瑞 聚福兆祥活动
@@ -1277,6 +1297,28 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 23)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 24)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -3556,7 +3598,7 @@ void World::Send11ClanRankAward()
             else 
                 type = 5;
             char str[16] = {0};
-            sprintf(str, "F_130926_4");
+            sprintf(str, "F_130926_12");
             udpLog("tianshuqiyuan", str, "", "", "", "", "act");
         }
     //    SYSMSGV(content, 4947, pos+1);
