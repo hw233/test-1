@@ -5418,6 +5418,9 @@ void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
     UInt8 op = 0;
     br >> op;
 
+    if(player->getLocation() != 4874) 
+        return;
+
     if (player->isJumpingMap())
         return;
 

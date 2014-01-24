@@ -6409,6 +6409,12 @@ namespace GObject
             teamCopyManager->leaveTeamCopy(this);
         }
 
+        if(GetEnterPTCStatus())
+            petTeamCopyManager->quit(this);
+
+        if(GetInPTCStatus())
+            petTeamCopyManager->leaveTeam(this, 1);
+
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)
         {
