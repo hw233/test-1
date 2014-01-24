@@ -248,6 +248,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_sevensoul.sql  #创建七魄
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_SetGVar79_Marry.sql  #设置夫妻对数
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #天书奇缘清空
 }
 
 #sh player_jiguan.sh
