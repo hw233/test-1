@@ -246,14 +246,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140117_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_reset_newyeargift_var.sql  #清除春节礼包(var349)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_sevensoul.sql  #创建七魄
-<<<<<<< HEAD
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_SetGVar79_Marry.sql  #设置夫妻对数
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #天书奇缘清空
-=======
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_SetGVar79_Marry.sql  #设置夫妻对数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
->>>>>>> b34f5ee0542271694c3fb176f08586b419636470
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #天书奇缘清空
 }
 
 #sh player_jiguan.sh
