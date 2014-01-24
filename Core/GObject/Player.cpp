@@ -27684,6 +27684,365 @@ void Player::sendJiqirenInfo()
     send(st);
 }
 
+void Player::LoadMoBaoData(UInt16 buyNum, UInt16 status, const std::string& item, 
+        UInt8 itemACnt, UInt8 itemBCnt, UInt8 itemCCnt, UInt8 itemDCnt, UInt8 itemECnt, UInt8 itemFCnt)
+{
+    m_mobao.buyNum = buyNum;
+    m_mobao.status = status;
+
+    StringTokenizer items(item, ",");
+    UInt32 sz = items.count();
+    if (!sz)
+        return;
+
+    for(UInt32 i=0; i<sz&&i<9; i++)
+    {
+        UInt32 itemId = atoi(items[i].c_str());
+        m_mobao.item[i] = itemId;
+    }
+    m_mobao.openFLMSNum = itemACnt;
+    m_mobao.openFLMYNum = itemBCnt;
+    m_mobao.openJGBXNum = itemCCnt;
+    m_mobao.openBFMYNum = itemDCnt;
+    m_mobao.openPLMYNum = itemECnt;
+    m_mobao.openCSRLBJNum = itemFCnt;
+}
+
+void Player::InitMoBaoAward()
+{
+    memset(m_mobao.item, 0, sizeof(m_mobao.item));
+    std::string its;
+    for(UInt32 j=0; j<9; ++j)
+    {
+        m_mobao.item[j] = RandMoBaoAward();
+        its += Itoa(m_mobao.item[j]);
+        if(j != 8)
+            its += ",";
+    }
+    if(0 != m_mobao.status)
+        m_mobao.status = 0;
+    
+    if(m_mobao.openFLMSNum > 0)
+        m_mobao.openFLMSNum = 0;
+
+    if(m_mobao.openFLMYNum > 0)
+        m_mobao.openFLMYNum = 0;
+
+    if(m_mobao.openJGBXNum > 0)
+        m_mobao.openJGBXNum = 0;
+
+    if(m_mobao.openBFMYNum > 0)
+        m_mobao.openBFMYNum = 0;
+
+    if(m_mobao.openPLMYNum > 0)
+        m_mobao.openPLMYNum = 0;
+
+    if(m_mobao.openCSRLBJNum > 0)
+        m_mobao.openCSRLBJNum = 0;
+
+    DB1().PushUpdateData("REPLACE INTO `mobao`(`playerId`, `buyNum`, `status`, `item`, `itemACnt`, `itemBCnt`, `itemCCnt`,`itemDCnt`,`itemECnt`,`itemFCnt`)  VALUES(%" I64_FMT "u, %u, %u, '%s', %u, %u, %u, %u,  %u, %u)", getId(), m_mobao.buyNum, 0, its.c_str(), 0, 0, 0, 0, 0, 0);
+}
+
+void Player::ReqMoBaoInfo()
+{
+    UInt8 refreshMark = GetVar(VAR_MOBAO_REFRESH_AWARD_MARK);
+    if(0 == refreshMark) //全部翻完或每天第一次进入墨宝
+    {
+        InitMoBaoAward();
+        SetVar(VAR_MOBAO_REFRESH_AWARD_MARK, 1);
+    }
+
+    UInt16 buyOpenCardNum = GetVar(VAR_BUY_OPENCARD_NUM);
+    UInt16 openCardNum = GetVar(VAR_OPENCARD_NUM);
+    UInt16 refreshNum = GetVar(VAR_REFRESH_AWARD_NUM);
+    UInt16 buyNum = m_mobao.buyNum;
+    
+    UInt16 surplusNum = 0; 
+    if(0 == openCardNum)
+        surplusNum = 3;
+    else if(1 == openCardNum)
+        surplusNum = 2;
+    else if(2 == openCardNum)
+        surplusNum = 1;
+    else
+        surplusNum = 0;
+
+    surplusNum += buyNum;
+    
+    Stream st(REP::MO_BAO);
+    st << static_cast<UInt8>(0x00);
+    st << surplusNum << buyOpenCardNum << refreshNum << m_mobao.status;
+    for(UInt8 i=0; i<9; i++)
+    {
+        st << m_mobao.item[i];
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::OpenCard(UInt8 pos)
+{
+    if(pos < 0 || pos > 8)
+        return;
+
+    UInt16 openCardNum = GetVar(VAR_OPENCARD_NUM);
+    if(openCardNum >= 3 &&  0 == m_mobao.buyNum)
+        return;
+
+    UInt32 status = m_mobao.status;
+    UInt8 mark = GET_BIT(status, pos);
+    if(1 == mark)
+        return;
+
+    UInt32 itemId = m_mobao.item[pos];
+    if(0 == itemId 
+            && 9413 != itemId 
+            && 9414 != itemId 
+            && 9418 != itemId 
+            && 9424 != itemId 
+            && 9425 != itemId 
+            && 9338 != itemId)
+        return;
+    
+    UInt8 count = 0;
+    if(9413 == itemId)
+        count = m_mobao.openFLMSNum;
+    else if(9414 == itemId)
+        count = m_mobao.openFLMYNum;
+    else if(9418 == itemId)
+        count = m_mobao.openJGBXNum;
+    else if(9424 == itemId)
+        count = m_mobao.openBFMYNum;
+    else if(9425 == itemId)
+        count = m_mobao.openPLMYNum;
+    else if(9338 == itemId)
+        count = m_mobao.openCSRLBJNum;
+
+    if(count >= 4)
+        return;
+    
+    if(0 == count)
+        count = 1;
+    else if(1 == count)
+        count = 2;
+    else if(2 == count)
+        count = 4;
+    else if(3 == count)
+        count = 8;
+
+    if(GetPackage()->GetRestPackageSize() < count)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    GetPackage()->AddItem(itemId, count, true, false, FromMoBao);
+
+    if(9413 == itemId)
+        m_mobao.openFLMSNum++;
+    else if(9414 == itemId)
+        m_mobao.openFLMYNum++;
+    else if(9418 == itemId)
+        m_mobao.openJGBXNum++;
+    else if(9424 == itemId)
+        m_mobao.openBFMYNum++;
+    else if(9425 == itemId)
+        m_mobao.openPLMYNum++;
+    else if(9338 == itemId)
+        m_mobao.openCSRLBJNum++;
+
+    status = SET_BIT(status, pos);
+    m_mobao.status = status;
+    if(4095 == m_mobao.status) //所有牌都被翻开了
+        SetVar(VAR_MOBAO_REFRESH_AWARD_MARK, 0);
+
+    std::string its;
+    for(UInt8 j=0; j<9; ++j)
+    {
+        its += Itoa(m_mobao.item[j]);
+        if(j != 8)
+            its += ",";
+    }
+    
+    AddVar(VAR_OPENCARD_NUM, 1);
+    if(openCardNum >= 3 && m_mobao.buyNum > 0)
+        m_mobao.buyNum--;
+
+    DB1().PushUpdateData("REPLACE INTO `mobao`(`playerId`, `buyNum`, `status`, `item`, `itemACnt`, `itemBCnt`, `itemCCnt`,`itemDCnt`,`itemECnt`,`itemFCnt`) VALUES(%" I64_FMT "u, %u, %u, '%s',  %u, %u,  %u, %u,  %u, %u)", getId(), m_mobao.buyNum, m_mobao.status, its.c_str(), m_mobao.openFLMSNum, m_mobao.openFLMYNum, m_mobao.openJGBXNum, m_mobao.openBFMYNum, m_mobao.openPLMYNum, m_mobao.openCSRLBJNum);
+
+    Stream st(REP::MO_BAO);
+    st << static_cast<UInt8>(0x01);
+    st << pos;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::BuyOpenCardNum()
+{
+    if(!hasChecked())
+        return;
+
+    UInt32 money[5] = {10, 20, 40, 80, 100};
+    UInt16 buyOpenCardNum = GetVar(VAR_BUY_OPENCARD_NUM);
+    if(buyOpenCardNum > 4)
+        buyOpenCardNum = 4;
+    
+    if(getGold() < money[buyOpenCardNum])
+    {
+        sendMsgCode(0, 1104);
+        return;
+    }
+
+    ConsumeInfo ci(BuyOpenCard, 0, 0);
+    useGold(money[buyOpenCardNum], &ci);
+        
+    m_mobao.buyNum++;
+    AddVar(VAR_BUY_OPENCARD_NUM, 1);
+    
+    DB3().PushUpdateData("UPDATE `mobao` SET `buyNum`  WHERE `playerId` = %" I64_FMT "u", m_mobao.buyNum, getId());
+
+    UInt16 buyNum = m_mobao.buyNum;
+    
+    UInt16 openCardNum = GetVar(VAR_OPENCARD_NUM);
+    UInt16 surplusNum = 0; 
+    if(0 == openCardNum)
+        surplusNum = 3;
+    else if(1 == openCardNum)
+        surplusNum = 2;
+    else if(2 == openCardNum)
+        surplusNum = 1;
+    else
+        surplusNum = 0;
+
+    surplusNum += buyNum;
+    
+    Stream st(REP::MO_BAO);
+    st << static_cast<UInt8>(0x03);
+    st << surplusNum << static_cast<UInt16>(GetVar(VAR_BUY_OPENCARD_NUM));
+    st << Stream::eos;
+    send(st);
+
+}
+
+void Player::RefreshAward()
+{
+    if(!hasChecked())
+        return;
+
+    UInt32 money[5] = {1000, 2000, 4000, 20, 40};
+    UInt16 refreshAwardNum = GetVar(VAR_REFRESH_AWARD_NUM);
+    if(refreshAwardNum > 4)
+        refreshAwardNum = 4;
+  
+    ConsumeInfo ci(RefreshMoBaoAward, 0, 0);
+    if(refreshAwardNum < 3)
+    {
+        if(getTael() < money[refreshAwardNum])
+        {
+            sendMsgCode(0, 1100);
+            return;
+        }
+
+        useTael(money[refreshAwardNum], &ci);
+    }
+    else
+    {
+        if(getGold() < money[refreshAwardNum])
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+
+        useGold(money[refreshAwardNum], &ci);
+    }  
+
+    AddVar(VAR_REFRESH_AWARD_NUM, 1);
+    
+    for(UInt8 i=0; i<9; i++)
+    {
+        UInt8 mark = GET_BIT(m_mobao.status, i);
+        if(0 == mark)
+            m_mobao.item[i] = 0;
+    }
+
+    std::vector<UInt32> items;
+    UInt32 award[6] = {9413, 9424, 9418, 9414, 9425, 9338};
+    for(UInt8 i=0; i<6; i++)
+    {
+        items.push_back(award[i]);
+    }
+
+    std::string its;
+    for(UInt8 i=0; i<9; i++)
+    {
+        UInt8 mark = GET_BIT(m_mobao.status, i);
+        if(0 == mark)
+            m_mobao.item[i] = RandMoBaoAward(items);
+
+        its += Itoa(m_mobao.item[i]);
+        if(i != 8)
+            its += ",";
+    }
+    
+    DB3().PushUpdateData("UPDATE `mobao` SET `item` = '%s' WHERE `playerId` = %" I64_FMT "u", its.c_str(), getId());
+
+    ReqMoBaoInfo();
+}
+
+UInt32 Player::RandMoBaoAward(std::vector<UInt32>& items)
+{
+    UInt8 rand = uRand(1000);
+    UInt32 itemId = 0;
+    UInt8 pos = 0;
+
+    if(rand >= 700)
+        pos = 1;
+    else if(rand >= 400)
+        pos = 2;
+    else if(rand >= 250)
+        pos = 3;
+    else if(rand >= 150)
+        pos = 4;
+    else if(rand >= 75)
+        pos = 5;
+    else
+        pos = 6;
+   
+    UInt8 cnt = items.size();
+    if(pos > cnt)
+    {
+        UInt8 randA = uRand(cnt);
+        itemId = items[randA];
+    }
+    else
+        itemId = items[pos-1];
+
+    if(!CheckMoBaoAward(itemId))
+    {
+        for(UInt8 i=0; i<items.size(); i++)
+        {
+            if(itemId == itemId[i])
+                items.erase(items.begin() + i);
+        }
+        RandMoBaoAward();
+    }
+
+    return itemId;
+}
+
+bool Player::CheckMoBaoAward(UInt32 itemId)
+{
+    UInt8 cnt = 0;
+    for(UInt8 i=0; i<9; i++)
+    {
+        if(itemId == m_mobao.item[i])
+            cnt++;
+
+        if(cnt >= 4)
+            return false;
+    }
+    return true;
+}
+
 } // namespace GObject
 
 

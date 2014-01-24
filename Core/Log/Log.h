@@ -151,6 +151,8 @@ enum PurchaseType
     OutBuyFund                  = 1013, //购买基金消费
     RefreshMonster              = 1015, //宠物组队副本刷怪
     CreateRoom                  = 1016, //宠物组队副本创建房间
+    BuyOpenCard                 = 1017, //购买翻牌次数
+    RefreshMoBaoAward           = 1018, //刷新墨宝奖励
     //繁体私有占150～200
 };
 
@@ -298,6 +300,7 @@ enum ItemFrom
     FromBuyFundAward = 67, //购买基金奖励
     FromMicroCloudAward = 68, //微云合作奖励
     FromJiqirenAct = 69, //机器人活动
+    FromMoBao = 69, //墨宝
     //80 ~ 100，繁体占用
 };
 
