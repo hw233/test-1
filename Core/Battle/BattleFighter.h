@@ -1469,6 +1469,7 @@ private:
     float getDmgNingShi() { return _dmg_ningshi; }
     bool setDmgNingShi(BattleFighter* bf, float value, UInt8 last);
     bool releaseDmgNingShi();
+    bool clearDmgNingShi();
     std::vector<BattleFighter*> getBeiNingShiZhe() { return _beiningshizhe; }
 
     UInt8 _ruRedCarpetLast;

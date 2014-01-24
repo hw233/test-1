@@ -3146,4 +3146,18 @@ bool BattleFighter::releaseDmgNingShi()
     return false;
 }
 
+bool BattleFighter::clearDmgNingShi()
+{
+    if(_dmg_ningshi_last > 0)
+    {
+        _dmg_ningshi_last = 0;
+        _ningshizhe->popBeiNingShiZhe(this);
+        _ningshizhe = NULL;
+        _dmg_ningshi= 0;
+        return true;
+    }
+
+    return false;
+}
+
 }
