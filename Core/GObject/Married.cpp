@@ -218,7 +218,7 @@ namespace GObject
             man_player->SetVar(VAR_COUPLE_ONLINE_TIME,tmp_time);
         }
         UInt8 num = 0;
-        num = man_player->GetVar(VAR_COUPLE_ONLINE_TIME) / (60*60); 
+        num = man_player->GetVar(VAR_COUPLE_ONLINE_TIME) / (15*60); 
         if(num < 1)
             return; 
         if(num > 2 && num <= 7)
@@ -541,8 +541,8 @@ namespace GObject
         {
             case AWARD_WHITEFISH:
                 it->second->levelExp += 1;
-                if(it->second->levelExp >= 58539)
-                    it->second->levelExp = 58539;
+                if(it->second->levelExp >= 63770)
+                    it->second->levelExp = 63770;
                 rebuildCouplePet(man_player);
                 gMarryMgr.SetDirty(man_player,woman_player);
                 
@@ -554,8 +554,8 @@ namespace GObject
                 break;
             case AWARD_QIXINGFISH:
                 it->second->levelExp += 2;
-                if(it->second->levelExp >= 58539)
-                    it->second->levelExp = 58539;
+                if(it->second->levelExp >= 63770)
+                    it->second->levelExp = 63770;
                 rebuildCouplePet(man_player);
                 gMarryMgr.SetDirty(man_player,woman_player);
 
@@ -567,8 +567,8 @@ namespace GObject
                 break;
             case AWARD_JINJINFISH:
                 it->second->levelExp += 3;
-                if(it->second->levelExp >= 58539)
-                    it->second->levelExp = 58539;
+                if(it->second->levelExp >= 63770)
+                    it->second->levelExp = 63770;
                 rebuildCouplePet(man_player);
                 gMarryMgr.SetDirty(man_player,woman_player);
                                
@@ -632,6 +632,8 @@ namespace GObject
             if(it->second->level == 46)
                 break;
             it->second->level += 1; 
+            if((GData::cu).getUpgradeData(it->second->level) == NULL)
+                break;
         }
 
         return;
@@ -644,11 +646,13 @@ namespace GObject
             return;
                 
         GData::CoupleUpgradeData* cud = (GData::cu).getUpgradeData(it->second->level);
-                
+        if(cud == NULL)
+            return;
+
         UInt32 friendliness = it->second->friendliness;
-        if(friendliness < 250)
+        if(friendliness < 125)
             return; 
-        if(friendliness >= 250 ) 
+        if(friendliness >= 125 ) 
             ae.hp += cud->hp;
         if(friendliness >= 375 )
             ae.attack += cud->attak;
@@ -822,11 +826,21 @@ namespace GObject
         if(PreCheckingStatus(player) != 0)
             return ;
         obj_player = GObject::globalPlayers[player->GetMarriageInfo()->lovers];
+
+        if(obj_player->getMainFighter()->getLevel() < 75)
+        {
+            if(static_cast<UInt8>(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS),0)) >= 2)
+            {
+                player->sendMsgCode(0,1709); 
+                return;
+            }
+        }
+        
         Stream st(REP::MARRIEDMGR);
         st << static_cast<UInt8>(0x10) << player->getName() << player->getId() << player->getMainFighter()->getColor() << static_cast<UInt8>(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS), 0)) << Stream::eos;   
         obj_player->send(st);
         //SYSMSG_SENDV(928, player);
-        player->sendMsgCode(0, 6029);
+        player->sendMsgCode(0, 1708);
         return;
     }
 

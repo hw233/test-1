@@ -462,7 +462,7 @@ namespace GObject
 
     UInt8 MarryMgr::CancelMarriage(Player* player, UInt8 flag)
     {
-        if(player->GetVar(VAR_MARRY_STATUS) != 1 )
+        if(player->GetVar(VAR_MARRY_STATUS) != 1 || player->GetMarriageInfo()->pronouncement == "")
         {
             player->sendMsgCode(0, 6002);
             return 1;
