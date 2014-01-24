@@ -1161,7 +1161,7 @@ function onActivityCheck(tm)
   end
 
   -- ACC
-  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 21*86400) then
+  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 22*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1488,7 +1488,7 @@ function initActTime(y, m, d)
 
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm2014_01_25 = { ['year'] = 2014, ['month'] = 1, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2014_01_25 = { ['year'] = 2014, ['month'] = 1, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   
   --圣诞节活动（麋鹿之角）
   local  SerStartTm2013_12_24 = { ['year'] = 2013, ['month'] = 12, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
