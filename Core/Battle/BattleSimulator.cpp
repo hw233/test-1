@@ -408,7 +408,7 @@ UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
 
             BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
             if(bo)
-                bo->releaseDmgNingShi();
+                bo->clearDmgNingShi();
         }
     }
 
