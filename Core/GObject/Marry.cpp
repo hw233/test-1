@@ -1464,6 +1464,15 @@ namespace GObject
                 player->SetVar(VAR_COUPLE_NAME,0);
                 obj_player->SetVar(VAR_COUPLE_NAME,0);
                 
+                player->SetVar(VAR_COUPLE_ONLINE_RENAME,0);
+                obj_player->SetVar(VAR_COUPLE_ONLINE_RENAME,0);
+                
+                player->SetVar(VAR_COUPLE_COPY_STATUS,0);
+                obj_player->SetVar(VAR_COUPLE_COPY_STATUS,0);
+                
+                player->SetVar(VAR_COUPLE_COPY_COUNT,0);
+                obj_player->SetVar(VAR_COUPLE_COPY_COUNT,0);
+                
                 break;
             case 2:
                 if(player->GetVar(VAR_MARRY_STATUS) != 5)
@@ -1508,6 +1517,15 @@ namespace GObject
                         
                         player->SetVar(VAR_COUPLE_NAME,0);
                         obj_player->SetVar(VAR_COUPLE_NAME,0);
+                        
+                        player->SetVar(VAR_COUPLE_ONLINE_RENAME,0);
+                        obj_player->SetVar(VAR_COUPLE_ONLINE_RENAME,0);
+                        
+                        player->SetVar(VAR_COUPLE_COPY_STATUS,0);
+                        obj_player->SetVar(VAR_COUPLE_COPY_STATUS,0);
+                        
+                        player->SetVar(VAR_COUPLE_COPY_COUNT,0);
+                        obj_player->SetVar(VAR_COUPLE_COPY_COUNT,0);
                     }
                     else
                     {
