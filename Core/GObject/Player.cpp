@@ -25124,9 +25124,9 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={500,1100,2000};
+    UInt32 gradeAward[]={100,200,400,500,700,900,1200,2300,5000,12000,24000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
-    for(UInt8 i =0 ; i< 3 ;i++)
+    for(UInt8 i =0 ; i< 11 ;i++)
     {
         if(airGrade < gradeAward[i] &&( airGrade + grade) >=gradeAward[i])
             Send11GradeAward(i+1);
@@ -25169,12 +25169,23 @@ void Player::SendClanMemberGrade()
 }
 void Player::Send11GradeAward(UInt8 type)
 {
-    UInt32 gradeAward[]={500,1100,2000};
+    if(type > 11)
+        return ;
+    UInt32 gradeAward[]={100,200,400,500,700,900,1200,2300,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
-        {{500,6},{503,6},{501,4},{512,5},{516,4},{514,6}},
-        {{1325,3},{503,6},{509,5},{547,6},{134,2},{9388,1}/*{549,1}*/},
-        {{1719,1},{8555,4}},
+        {{500,1 }, {503,1}},
+        {{500,2},{514,2}},
+        {{503,3},{501,2},{516,1}},
+        {{512,3},{516,2},{514,2}},
+        {{501,2},{513,2},{517,2}},
+        {{515,1},{551,2},{134,2}},
+        {{1325,2},{503,2},{509,2},{547,2},{134,2},{9438,2}},
+        {{1717,1},{8555,4}},
+        {{9438,20},{1126,20}},
+        {{9022,10},{134,20},{9438,20}},
+        {{1727,1},{509,30},{9075,20}},
     };
+    static UInt32 count[] = {2,2,3,3,3,3,6,2,2,3,3};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -25183,16 +25194,21 @@ void Player::Send11GradeAward(UInt8 type)
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)
         {
-            if(type!=3)
-                mailPackageManager.push(mail->id, s_item[type-1], 6, true);
-            else 
-                mailPackageManager.push(mail->id, s_item[type-1], 2, true);
+                mailPackageManager.push(mail->id, s_item[type-1], count[type-1], true);
         }
+        std::string strItems;
+        for(UInt8 index = 0; index < count[type-1]; ++ index)
+        {
+            strItems += Itoa(s_item[type-1][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[type-1][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
     }
     char str[16] = {0};
     sprintf(str, "F_130926_%d",type);
     udpLog("tianshuqiyuan", str, "", "", "", "", "act");
-
 }
 
 void Player::loadQiShiBanFromDB(UInt32 score, UInt32 step, UInt32 beginTime, UInt32 endTime, UInt16 awardMark)
