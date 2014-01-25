@@ -1431,9 +1431,9 @@ namespace GObject
                     }
                     obj_player->GetMarriageInfo()->eraseInfo();
                 }
+                gMarriedMgr.eraseCoupleList(player);
                 player->GetMarriageInfo()->eraseInfo();
                 erase_marryList(player);
-                gMarriedMgr.eraseCoupleList(player);
                 SetDirty(player,obj_player); 
                
                 if(!player->getMainFighter()->getSex())//男的
@@ -1490,6 +1490,7 @@ namespace GObject
 
                     if(obj_player->GetVar(VAR_MARRY_STATUS) == 6)
                     {
+                        gMarriedMgr.eraseCoupleList(player);
                         obj_player->GetMarriageInfo()->eraseInfo();
                         player->GetMarriageInfo()->eraseInfo();
                         SetDirty(player,obj_player); 
