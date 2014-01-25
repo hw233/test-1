@@ -26319,7 +26319,7 @@ void Player::getNovLoginAward(UInt8 type)
 {
     if(type <1 ||type >3)
         return ;
-    UInt32 timeBegin = TimeUtil::MkTime(2013,12,13);
+    UInt32 timeBegin = TimeUtil::MkTime(2014,1,17);
     UInt32 now = TimeUtil::Now();
     UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 ;
     if(now < timeBegin)
