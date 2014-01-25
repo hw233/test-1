@@ -1295,6 +1295,7 @@ namespace GObject
         sendFeastLoginAct();
         //蛇年春节套装
         sendSnakeSpringEquipMail();
+        //getNewYearGiveGiftAward(0,0);
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%" I64_FMT "u", _id);
@@ -24250,7 +24251,7 @@ static UInt32 ryhb_items_2[15][4] = {
     {1, 3, 9371, 99},        //
     {2, 6, 1126, 99},        //
     {7, 5, 9438, 99},        //
-    {7, 2, 9390, 99},        //
+    {2, 2, 9390, 99},        //
     {5, 3, 503, 99},       //
     {5, 13, 515, 99},      //
     {3, 8, 1325, 99},    //

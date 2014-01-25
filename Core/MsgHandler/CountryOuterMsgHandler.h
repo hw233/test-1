@@ -1440,6 +1440,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0)<< Stream::eos;
         pl->send(st1);
     }
+    pl->getNewYearGiveGiftAward(0,0);
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -5508,6 +5509,20 @@ void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
             UInt8 type = 0;
             br >> type;
             petTeamCopyManager->reqStart(player, type);
+        }
+        break;
+    case 0x16:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            petTeamCopyManager->inviteFriend(player, playerId);
+        }
+        break;
+    case 0x17:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            petTeamCopyManager->refuseJoin(player, playerId);
         }
         break;
     default:
