@@ -716,7 +716,7 @@ namespace GObject
 
     void MarriedMgr::EnterCoupleCopy(Player* player,UInt8 copy_type)
     {
-        if(player->getMainFighter()->getLevel() < 75)
+        if(copy_type != 0 && player->getMainFighter()->getLevel() < 75)
         {
             if(copy_type != 1)
                 return;
@@ -825,6 +825,8 @@ namespace GObject
         Stream st(REP::MARRIEDMGR);
         st << static_cast<UInt8>(0x10) << player->getName() << player->getId() << player->getMainFighter()->getColor() << static_cast<UInt8>(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS), 0)) << Stream::eos;   
         obj_player->send(st);
+        //SYSMSG_SENDV(928, player);
+        player->sendMsgCode(0, 6029);
         return;
     }
 
