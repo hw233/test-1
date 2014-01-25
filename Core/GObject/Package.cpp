@@ -4870,10 +4870,12 @@ namespace GObject
              }
 
 
+             /*
              if (m_Owner->GetVar(VAR_EQUIP_MOVE_COUNT) >= 8)
              {
                  return 9;
              }
+             */
         }
         else if(1 == mark)
         {
@@ -5098,10 +5100,10 @@ namespace GObject
         {
             ConsumeInfo ci(MoveEquip,0,0);
             m_Owner->useGold(money, &ci);
-            m_Owner->AddVar(VAR_EQUIP_MOVE_COUNT,1);
+            //m_Owner->AddVar(VAR_EQUIP_MOVE_COUNT,1);
         }
         return 0;
-    }  
+    }
 
     //炼器转换装备扣除金钱
     UInt8 Package::moveDeductMoney(ItemEquip* fromEquip, ItemEquip* toEquip, UInt8 type)
