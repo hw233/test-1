@@ -166,6 +166,7 @@ namespace GObject
             setSkills(skills, false);
             updateToDBPetSkill();
         }
+        setDirty();
     }
 
     void FairyPet::delSkills(std::string& skills)
