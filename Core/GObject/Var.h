@@ -619,10 +619,12 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_CHRISTMAS_PRESENT = 660,    //圣诞礼物——麋鹿之角
         VAR_QT_AWARD_MARK = 661,        //QT奖励领取
         VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE = 662,    //七石板每期最高积分
-        //VAR_QT_REGIST_SIGN = 663,       //QT天签到标志
         VAR_QT_REGIST_NUM = 664,        //QT月签到次数
         VAR_QT_SPECIAL_MARK = 665,      //QT记录12月份默认加6天签到次数
         VAR_QT_REGIST_MARK = 666,       //QT月签到标志
+        VAR_BUY_FUND_NuM = 667,         //购买基金标志
+        VAR_BUY_FUND_AWARD = 668,       //购买基金回馈标志
+        VAR_BUY_FUND_TRUMP_AWARD = 669, //购买基金法宝奖励标志
 
         //681 - 700 for lb
         VAR_MARRYBOARD_YANHUA = 681,          //烟花积分

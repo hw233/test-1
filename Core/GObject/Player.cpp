@@ -11800,6 +11800,7 @@ namespace GObject
         }
     }
 
+   
     void Player::GMSetQTNUM(UInt8 num)
     {
         SetVar(VAR_QT_REGIST_NUM, num);
@@ -24204,7 +24205,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+            //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9449, 1, true, false, FromNpc);
         }
         else
         {
@@ -24214,7 +24216,8 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+                //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9449, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
@@ -26965,21 +26968,20 @@ void Player::getHappyValueAward(UInt8 val)
 {
     if (!World::getHappyFireTime())
         return;
-    UInt32 score[]={20,40,60,80,100};
+    UInt32 score[]={20,40,60,80,100,300};
     UInt32 value = GetVar(VAR_YEARHAPPY_DAYVALUE);
-    if(val<1||val>5)
-        return ;
+    if(val < 1 || val > sizeof(score)/sizeof(score[0]))
+        return;
     if(value < score[val-1])
-        return ;
+        return;
     UInt32 ctslandingAward = GetVar(VAR_YEARHAPPY_DAYVALUE_AWARD);
     if(ctslandingAward & (1<<(val-1)))
-        return ;
-    if(!GameAction()->RunHappyValueAward(this, val))
-    {
         return;
+    if(GameAction()->RunHappyValueAward(this, val))
+    {
+        ctslandingAward |= (1<<(val - 1));
+        SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
     }
-    ctslandingAward |= (1<<(val - 1));
-    SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
 }
 
 void Player::joinAllServerRecharge(UInt32 num)
@@ -27047,6 +27049,142 @@ void Player::getMarryBoard3Award(UInt8 type)   //砸蛋
         SetVar(VAR_MARRYBOARD3,Award + 31);
     }
 
+}
+
+void Player::getBuyFundInfo(UInt8 opt)
+{
+    UInt16 totalNum = GetVar(VAR_BUY_FUND_NuM);
+    UInt8 mark = GetVar(VAR_BUY_FUND_TRUMP_AWARD);
+    if(totalNum >= 100 && mark == 1 && opt == 1)
+    {
+        if(GetPackage()->GetRestPackageSize() < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        GetPackage()->AddEquip(1726, true, false, FromBuyFundAward);
+        mark = 2;
+        SetVar(VAR_BUY_FUND_TRUMP_AWARD, mark);
+    }
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x28) << static_cast<UInt8>(0x00);
+    st << totalNum << mark << Stream::eos;
+    send(st);
+}
+
+void Player::buyFund(UInt16 num)
+{
+    if(!World::getBuyFundAct())
+        return;
+    
+    if(num == 0)
+        return;
+
+    UInt16 lastNum = GetVar(VAR_BUY_FUND_NuM);
+    UInt16 totalNum = lastNum + num;
+    if(totalNum > 1000)
+        return;
+
+    if(getGold() < 100 * num)
+    {
+        sendMsgCode(0, 1104);
+        return;
+    }
+    ConsumeInfo ci(OutBuyFund, 0, 0);
+    useGold(100*num, &ci);
+
+    SetVar(VAR_BUY_FUND_NuM, totalNum);
+    UInt8 mark = GetVar(VAR_BUY_FUND_TRUMP_AWARD);
+    if((lastNum + num) >= 100 && mark == 0)
+    {
+        mark = 1;
+        SetVar(VAR_BUY_FUND_TRUMP_AWARD, mark);
+    }
+
+    udpLog("huodong", "F_140108_1", "", "", "", "", "act", num);
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x28) << static_cast<UInt8>(0x01);
+    st << totalNum << mark << Stream::eos;
+    send(st);
+}
+
+
+void Player::getBuyFundAward(UInt8 opt)
+{
+    UInt32 status = GetVar(VAR_BUY_FUND_AWARD);
+    
+    UInt16 num = GetVar(VAR_BUY_FUND_NuM);
+
+    if(num > 0)
+    {
+        for(UInt8 i=0; i<9; i++)
+        {
+            UInt8 state = GET_BIT_2(status, i);
+            if(state == 0)
+            {
+                UInt8 date[9] = {0, 3, 6, 9, 12, 17, 22, 27, 32};
+                if(TimeUtil::Now() >= (TimeUtil::MkTime(2014, 2, 14) + date[i]*86400))
+                    status = SET_BIT(status, (i*2));
+            }
+        }
+    }
+
+    if(num > 0 && opt >= 1 && opt <= 9)
+    {
+        UInt8 mark = GET_BIT_2(status, (opt-1));
+        if(mark == 1)
+        {
+            UInt8 award[3][9] = {
+                {8, 10, 12, 15, 18, 20, 6, 6, 25},
+                {8, 10, 12, 16, 20, 20, 7, 7, 25},
+                {8, 10, 12, 16, 20, 22, 8, 8, 26}
+            };
+
+            UInt8 index = 0;
+            if(num >= 1 && num <= 200)
+                index = 0;
+            else if(num >= 201 && num <= 300)
+                index = 1;
+            else if(num >= 301 && num <= 1000)
+                index = 2;
+            
+            UInt32 money = award[index][opt-1] * num;
+            IncommingInfo ii(InBuyFund, 0, 0);
+            if(opt == 7 || opt == 8)
+                getCoupon(money);  
+            else
+                getGold(money, &ii);
+
+            status = CLR_BIT(status, ((opt - 1) * 2));
+            status = SET_BIT(status, ((opt - 1) * 2 + 1));
+            SetVar(VAR_BUY_FUND_AWARD, status);
+
+            if(opt == 1)
+                udpLog("huodong", "F_140108_2", "", "", "", "", "act");
+            else if(opt == 2)
+                udpLog("huodong", "F_140108_3", "", "", "", "", "act");
+            else if(opt == 3)
+                udpLog("huodong", "F_140108_4", "", "", "", "", "act");
+            else if(opt == 4)
+                udpLog("huodong", "F_140108_5", "", "", "", "", "act");
+            else if(opt == 5)
+                udpLog("huodong", "F_140108_6", "", "", "", "", "act");
+            else if(opt == 6)
+                udpLog("huodong", "F_140108_7", "", "", "", "", "act");
+            else if(opt == 7)
+                udpLog("huodong", "F_140108_8", "", "", "", "", "act");
+            else if(opt == 8)
+                udpLog("huodong", "F_140108_9", "", "", "", "", "act");
+            else
+                udpLog("huodong", "F_140108_10", "", "", "", "", "act");
+        }
+    }
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x28) << static_cast<UInt8>(0x02);
+    st << static_cast<UInt32>(status) << Stream::eos;
+    send(st);
 }
 
 bool Player::setMounts(UInt8 mounts)
