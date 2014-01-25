@@ -150,8 +150,7 @@ namespace GObject
         
         Stream st1(REP::MARRIEDMGR);
         st1 << static_cast<UInt8>(0x11) << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME)) << Stream::eos;
-        man_player->send(st1);
-        woman_player->send(st1);
+        player->send(st1);
         
         return;
     }
