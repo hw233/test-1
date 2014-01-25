@@ -149,7 +149,7 @@ namespace GObject
         player->send(st);
         
         Stream st1(REP::MARRIEDMGR);
-        st1 << static_cast<UInt8>(0x11) << static_cast<UInt8>(man_player->GetVar(692)) << Stream::eos;
+        st1 << static_cast<UInt8>(0x11) << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME)) << Stream::eos;
         man_player->send(st1);
         woman_player->send(st1);
         
@@ -717,6 +717,12 @@ namespace GObject
 
     void MarriedMgr::EnterCoupleCopy(Player* player,UInt8 copy_type)
     {
+        if(player->getMainFighter()->getLevel() < 75)
+        {
+            if(copy_type != 1)
+                return;
+        }
+        
         player->SetVar(VAR_COUPLE_COPY_STATUS,0);//清空状态 
         if(copy_type != 0 && copy_type != 1 && copy_type != 2 && copy_type != 3)
             return;
@@ -1101,10 +1107,10 @@ namespace GObject
         if(PreCheckingStatus(player) != 0)
             return ;
 
-        player->SetVar(692,flag);
+        player->SetVar(VAR_COUPLE_NAME,flag);
         
         Stream st(REP::MARRIEDMGR);
-        st << static_cast<UInt8>(0x11) << static_cast<UInt8>(player->GetVar(692)) << Stream::eos;
+        st << static_cast<UInt8>(0x11) << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME)) << Stream::eos;
         player->send(st);
 
         return;
