@@ -6896,7 +6896,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading player ModifyMount:");
 		DBModifyMount dbmm;
-		if(execu->Prepare("SELECT `id`, `playerId`, `chips` FROM `modify_mount`", dbmm) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `chips`, `curfloor`, `failtimes` FROM `modify_mount`", dbmm) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -6913,6 +6913,8 @@ namespace GObject
             {
                 mount->setChipFromDB(i, atoi(tk[i].c_str()));
             }
+            mount->setCurfoor(dbmm.curfloor);
+            mount->setFailtimes(dbmm.failtimes);
             player->addModifyMount(mount, false);
         }
 		lc.finalize();

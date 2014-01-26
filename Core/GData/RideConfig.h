@@ -33,19 +33,40 @@ public:
 
         RideUpgradeData() : level(0), lvLimit(0), singleCost(0), lvExp(0), rate(0.0f) {}
     };
+    struct cjBless
+    {
+        UInt16 times;
+        UInt16 prob;
+        cjBless() { times = 0; prob = 0; }
+    };
+    struct CangjianData
+    {
+        UInt8 floor;
+        std::string name;
+        UInt16 prob;
+        UInt8 otherNum;
+        std::vector<cjBless> bless;  //失败祝福值
+
+        CangjianData() : floor(0), prob(0), otherNum(0) {}
+    };
 public:
     void setRideTable(DBRideConfig&);
     void setRideUpgradeTable(DBRideUpgradeCfg&);
+    void setCangjianTable(DBCangjianCfg&);
+    bool checkHasMountId(UInt8);
     UInt32 getMountItemId(UInt8);
     UInt8 getModifyMountId(UInt32);
     float getMountRate(UInt16);
     RideUpgradeData * getRideUpgTable(UInt16);
     UInt8 getChipPos(UInt8, UInt32);
+    CangjianData * getCangjianTable(UInt8);
+    UInt16 getCangjianBless(UInt8 floor, UInt16 v);
 
 private:
     std::map<UInt8, RideData> _rideData;
     std::map<UInt16, RideUpgradeData> _rideUpgData;
     std::map<UInt32, UInt8> _rideChipsMap;
+    std::map<UInt8, CangjianData> _cangjianData;
 };
 
 extern Ride ride;

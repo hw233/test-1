@@ -224,6 +224,10 @@ namespace GObject
 
 #define GET_BIT_2(X,Y)   ((X >> (Y*2)) & 0x03)
 
+//飞剑(坐骑)系统
+#define MOUNT_COSTID 9500
+#define MOUNT_CANGJIANID 9600
+
 #ifdef _FB
 #define LIMIT_LEVEL  60
 #else
@@ -2795,9 +2799,12 @@ namespace GObject
         void addModifyMount(ModifyMount *, bool = true);
         bool hasMountChip(UInt32);
         bool addMountChip(UInt32);
-        void sendMountInfo();
+        void sendAllMountInfo();
         void upgradeMount(bool isAuto);
         void addMountAttrExtra(GData::AttrExtra&);
+        bool check_Cangjianya();
+        void mount_Cangjianya(UInt8, UInt8, bool);
+        void mount_Cangjianya1(UInt8);
         inline UInt8 getMounts() { return _playerData.mounts; }
         inline ModifyMount * getCurrentMount() { return getOneMount(getMounts()); }
         inline ModifyMount * getOneMount(UInt8 id)
