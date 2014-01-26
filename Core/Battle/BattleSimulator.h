@@ -8,7 +8,7 @@
 #include "GData/SkillStrengthen.h"
 
 #ifdef _DEBUG
-#define _BATTLE_DEBUG
+//#define _BATTLE_DEBUG
 #endif
 
 namespace Script

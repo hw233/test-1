@@ -12498,6 +12498,9 @@ bool BattleSimulator::tryProtectDamage(BattleFighter* bf, float& phyAtk, float& 
 bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor)
 {
     // 宠物100%保护主目标吸收一半伤害
+#ifdef _BATTLE_DEBUG
+    std::cout << "phyAtk = " << phyAtk << ", magAtk = " << magAtk << "." << std::endl;
+#endif
     const GData::SkillBase* pskillOrign = bf->getPetProtect100Skill();
     if (!pskillOrign) 
         return false;
@@ -12522,7 +12525,10 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
     {
         if(eft[i] == GData::e_eft_pet_protect_reduce)
         {
-            factor *= (1 - efv[i] * (1 + ssfactor));
+            if (efv[i] + ssfactor >= 1)
+                factor = 0.001f;
+            else
+                factor *= (1 - efv[i] - ssfactor);
         }
     }
 
@@ -12544,11 +12550,14 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
         phyAtk /= 2;
         magAtk /= 2;
     }
-    return protectDamage(bf, pet, phyAtk, magAtk, factor);
+    return protectDamage(bf, pet, phyAtkPet, magAtkPet, factor);
 }
 
 bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor)
 {
+#ifdef _BATTLE_DEBUG
+    std::cout << "phyAtk = " << phyAtk << ", magAtk = " << magAtk << "." << std::endl;
+#endif
     // 宠物概率保护主目标吸收一半伤害
     for(size_t i = 0; i < _onPetProtect.size(); ++ i)
     {
@@ -12594,11 +12603,15 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
         ModifyAttackValue_SkillStrengthen(pet, pskill, ssfactor, true);  //免伤率提升效果提升100%
 
         appendDefStatus(e_skill, pskill->getId(), pet);
+
         for(size_t i = 0; i < cnt; ++ i)
         {
             if(eft[i] == GData::e_eft_pet_protect_reduce)
             {
-                factor *= (1.0f - efv[i] * (1 + ssfactor));
+                if (efv[i] + ssfactor >= 1)
+                    factor = 0.001f;
+                else
+                    factor *= (1 - efv[i] - ssfactor);
             }
         }
 
@@ -12625,12 +12638,16 @@ bool BattleSimulator::doProtectDamage(BattleFighter* bf, BattleFighter* pet, flo
 
 bool BattleSimulator::protectDamage(BattleFighter* bf, BattleFighter* pet, float& phyAtk, float& magAtk, float factor)
 {
+#ifdef _BATTLE_DEBUG
+    std::cout << "phyAtk = " << phyAtk << ", magAtk = " << magAtk << "." << std::endl;
+#endif
     UInt32 dmg = 0;
     UInt32 magdmg = 0;
     bool dmgFlag = false;
     bool magdmgFlag = false;
-    bool pr = bf->calcPierce(pet);
-    float toughFactor = pr ? pet->getTough(bf) : 1.0f;
+    //bool pr = bf->calcPierce(pet);
+    //float toughFactor = pr ? pet->getTough(bf) : 1.0f;
+    float toughFactor = 1.0f;
 
     if(magAtk)
     {
@@ -12668,6 +12685,9 @@ bool BattleSimulator::protectDamage(BattleFighter* bf, BattleFighter* pet, float
         if (dmgFlag)
             makeDamage(pet, dmg, e_damNormal, e_damagePhysic);
     }
+#ifdef _BATTLE_DEBUG
+    std::cout << "dmg: " << dmg << ", magdmg: " << magdmg << std::endl << std::endl;
+#endif
 
     return true;
 }
