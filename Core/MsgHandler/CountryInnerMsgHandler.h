@@ -2536,6 +2536,7 @@ void OnServerWarEnter( GameMsgHdr& hdr, const void* data )
     delete swed;
 }
 
+
 void OnServerWarLineup( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -2590,6 +2591,62 @@ void OnServerWarBeAttack( GameMsgHdr& hdr, const void* data )
     serverWarMgr.beAttackByPlayer(player, swbad->attacker, swbad->formation, swbad->portrait, swbad->lineup);
 }
 
+void OnServerLeftEnter( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct SWarEnterData {
+        Stream st;
+        std::map<Player *, UInt8> warSort;
+    };
+
+	SWarEnterData * swed = *reinterpret_cast<SWarEnterData**>(const_cast<void *>(data));
+    if(!swed)
+        return;
+    std::map<Player *, UInt8>::iterator it = swed->warSort.begin();
+    while(it != swed->warSort.end())
+    {
+        Player * player = it->first;
+        if(!player)
+        {
+            delete swed;
+            return;
+        }
+        if(player->getThreadId() != CURRENT_THREAD_ID())
+        {
+            GameMsgHdr hdr(0x391, player->getThreadId(), player, sizeof(SWarEnterData*));
+            GLOBAL().PushMsg(hdr, &swed);
+            return;
+        }
+        swed->st << player->getId() << player->getName() << player->getTitle();
+        player->appendLineup2(swed->st);
+        player->appendPetOnBattle(swed->st);
+        swed->warSort.erase(it ++);
+    }
+    swed->st << Stream::eos;
+    NETWORK()->SendToServerLeft(swed->st);
+    delete swed;
+}
+void OnServerLeftLineup( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    if(player->GetLev() < LIMIT_LEVEL)
+        return;
+
+    Stream st(SERVERLEFTREQ::COMMIT_LINEUP, 0xEE);
+    st << player->getId();
+    player->appendLineup2(st);
+    player->appendPetOnBattle(st);
+    st << Stream::eos;
+    NETWORK()->SendToServerLeft(st);
+}
+void OnServerLeftChangeTeamMember( GameMsgHdr& hdr, const void* data )
+{
+
+}
+void OnServerLeftAddPowerHold( GameMsgHdr& hdr, const void* data )
+{
+
+}
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 

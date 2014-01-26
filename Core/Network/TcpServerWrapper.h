@@ -13,6 +13,7 @@
 //#include "SocialConn.h"
 #include "TcpServer.h"
 #include "Common/Stream.h"
+#include "ServerLeftConn.h"
 
 typedef std::shared_ptr<Network::TcpConduit> TcpConnection;
 
@@ -56,6 +57,14 @@ namespace Network
                 if(sock < 0)
                     return NULL;
 				return new(std::nothrow) ServerWarConn(sock, s, id);
+			case -3:
+				if(!ServerLeftConn::enabled())
+					return NULL;
+                sock = socket( AF_INET, SOCK_STREAM, 0 );
+                printf("FD %s: %u\n", __PRETTY_FUNCTION__, sock);
+                if(sock < 0)
+                    return NULL;
+				return new(std::nothrow) ServerLeftConn(sock, s, id);
             /*
 			case -3:
 				if(!SocialConn::enabled())
@@ -157,6 +166,7 @@ namespace Network
 		void SendToArena(Stream& st);
 		void SendToServerWar(Stream& st);
 		//void SendToSocial(Stream& st);
+		void SendToServerLeft(Stream& st);
 
 		void Broadcast(const void *, int);
 		template <typename PredType>
@@ -256,6 +266,18 @@ namespace Network
 			return;
 		if (st.size() <= 0) return ;
 		TcpConnection conn = m_TcpService->findConn(-2);
+		if(conn.get() == NULL)
+		{
+			return;
+		}
+		conn->send(&st[0], st.size());
+	}
+	inline void TcpServerWrapper::SendToServerLeft(Stream& st)
+	{
+		if(!m_Active)
+			return;
+		if (st.size() <= 0) return ;
+		TcpConnection conn = m_TcpService->findConn(-3);   //XXX
 		if(conn.get() == NULL)
 		{
 			return;
