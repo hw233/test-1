@@ -2324,6 +2324,7 @@ CREATE TABLE IF NOT EXISTS `pet_sevensoul` (
     PRIMARY KEY(`playerId`, `petId`, `soulId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `marriage`;
 CREATE TABLE IF NOT EXISTS `marriage` (
     `playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
     `marriage_time` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2333,6 +2334,7 @@ CREATE TABLE IF NOT EXISTS `marriage` (
     PRIMARY KEY(`playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `marry_log`;
 CREATE TABLE IF NOT EXISTS `marry_log` (
     `man_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
     `woman_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -2346,6 +2348,7 @@ CREATE TABLE IF NOT EXISTS `marry_log` (
     INDEX (`woman_playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `reply_marriage`;
 CREATE TABLE IF NOT EXISTS `reply_marriage` (
     `man_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
     `woman_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -2358,6 +2361,7 @@ CREATE TABLE IF NOT EXISTS `reply_marriage` (
     INDEX (`woman_playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `married_log`;
 CREATE TABLE IF NOT EXISTS `married_log` (
     `jh_time` int(10) unsigned NOT NULL DEFAULT '0',
     `man_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -2374,6 +2378,7 @@ CREATE TABLE IF NOT EXISTS `married_log` (
     INDEX (`woman_playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `married_couple`;
 CREATE TABLE IF NOT EXISTS `married_couple` (
     `jh_time` int(10) unsigned NOT NULL DEFAULT '0',
     `man_playerid` bigint(20) unsigned NOT NULL DEFAULT '0',

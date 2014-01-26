@@ -1212,6 +1212,7 @@ void TeamCopyPlayerInfo::incPass(UInt8 copyId, UInt8 t)
     if(m_passTimes[t][copyIdx] == 1)
     {
         GameAction()->doStrong(m_owner, SthGroupCopy, 1,0);
+        m_owner->getSummerMeetScore(2);
     }
     UInt32 now = TimeUtil::Now();
     if(now > m_vTime[t][copyIdx])

@@ -114,6 +114,7 @@ function loadStore()
         store:clear()
 
         discount(store)
+    store:add(2,9427,50)
 
     store:add(2,9600,10)
     if getQixi() then

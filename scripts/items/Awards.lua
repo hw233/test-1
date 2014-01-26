@@ -631,16 +631,20 @@ end
 function RunLuckyMeetStrengthAward(player, cts)
     -- 领取蜀山奇遇变强奖励
     local item = {
-        [1] = {{509,1}, {503, 2},{5123,2},{5103,2}},
-        [2] = {{507,1}, {514, 3},{5063,3},{5073,3}},
-        [3] = {{515,1}, {5133, 3},{5113,3},{513,3}},
-        [4] = {{516,3}, {5023, 3},{5003,3},{9076,2}},
+        [1] = {{516,3}, {509, 3},{507,3}},
+        [2] = {{500,5}, {501, 5},{549,2}},
+        [3] = {{503,8}, {515, 8},{30 ,8}},
+        [4] = {{513,5}, {5115,1},{5125,1},{5105,1},{5075,1}},
+        [5] = {{513,5}, {5065,1},{5005,1},{5025,1},{5135,1}},
+        [6] = {{9371,10}, {9390, 10},{9427,10}},
+        [7] = {{1126,10}, {134, 10},{1325,10},{9076,10}},
+        [8] = {{499,300}},
     }
     local package = player:GetPackage();
     if cts == 0 then
         return false
     end
-    if cts > 4  then
+    if cts > 8  then
         return false
     end
 
@@ -651,7 +655,11 @@ function RunLuckyMeetStrengthAward(player, cts)
     end
 
     for count = 1, #item[cts] do
-        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
     end
     return true
 end

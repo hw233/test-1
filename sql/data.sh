@@ -49,6 +49,7 @@ function update_data()
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_modify_lbskills.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140103_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140114_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140121_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140214_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
@@ -113,6 +114,7 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from ride; source ride;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from ride_upgrade; source ride_upgrade;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from coupleinfo; source coupleinfo;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from couplecopy; source couplecopy;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from ride_cangjian; source ride_cangjian;";
 }
 
