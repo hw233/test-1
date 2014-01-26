@@ -7912,7 +7912,7 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
         size_t idx = 0;
         const GData::SkillBase* passiveSkill = NULL;
         UInt32 hpr = 0;
-        //const GData::SkillBase* passiveSkill2 = NULL;
+        const GData::SkillBase* passiveSkill2 = NULL;
         while(NULL != (passiveSkill = bf->getPassiveSkillOnHPChange100(idx)))
         {
             if(passiveSkill->effect == NULL)
@@ -7967,28 +7967,22 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
                     if (ef)
                     {
                         //hpr += bf->updateHPPRecover2Fake(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2);
-                        hpr += bf->updateHPPRecover(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2);
+                        hpr += bf->updateHPPRecover2Fake(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2);
                         if (hpr)
-                        {
-                            bf->regenHP(hpr);
-                            appendDefStatus(e_skill, passiveSkill->getId(), bf);
-                            appendDefStatus(e_damHpAdd, hpr, bf);
-                        }
+                            passiveSkill2 = passiveSkill;
                     }
 
                 }
             }
         }
-        bf->updateLastHPLostP();
-
-        /*
-        if (hpr)
+        if (hpr && passiveSkill2)
         {
             bf->regenHP(hpr);
             appendDefStatus(e_skill, passiveSkill2->getId(), bf);
             appendDefStatus(e_damHpAdd, hpr, bf);
         }
-        */
+        bf->updateLastHPLostP();
+
         _hpCheckCache[boSide][boPos] = false;
     }
 }
@@ -12518,7 +12512,7 @@ bool BattleSimulator::do100ProtectDamage(BattleFighter* bf, BattleFighter* pet, 
 
     float ssfactor = 0.0f;
 
-    ModifyAttackValue_SkillStrengthen(pet, pskillOrign, ssfactor, true);  //免伤率提升效果提升100%
+    ModifyAttackValue_SkillStrengthen(pet, pskill, ssfactor, true);  //免伤率提升效果提升100%
 
     for(size_t i = 0; i < cnt; ++ i)
     {
