@@ -7961,7 +7961,7 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     player->getBuyFundInfo(type);
                 }
                 break;
-            case 0x02:
+            case 0x01:
                 {
                     if(!World::getBuyFundAct())
                         return;
@@ -7969,12 +7969,12 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     if(!player->hasChecked())
                         return;
 
-                    UInt8 num = 0;
+                    UInt16 num = 0;
                     brd >> num;
                     player->buyFund(num);
                 }
                 break;
-            case 0x03:
+            case 0x02:
                 {
                     UInt8 type = 0;
                     brd >> type;

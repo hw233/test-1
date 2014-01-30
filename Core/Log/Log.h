@@ -289,6 +289,7 @@ enum ItemFrom
     FromQiShiBan = 64, //七石斗法
     FromServerWarJijian = 65, //仙界传奇祭剑宝箱
     FromQTAward = 66, //QT奖励
+    FromBuyFundAward = 67, //购买基金奖励
     //80 ~ 100，繁体占用
 };
 

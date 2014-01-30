@@ -27013,7 +27013,7 @@ void Player::getBuyFundInfo(UInt8 opt)
             sendMsgCode(0, 1011);
             return;
         }
-        GetPackage()->AddItem(56, 1, true, false, FromQTAward);
+        GetPackage()->AddEquip(1726, true, false, FromBuyFundAward);
         mark = 2;
         SetVar(VAR_BUY_FUND_TRUMP_AWARD, mark);
     }
@@ -27031,17 +27031,19 @@ void Player::buyFund(UInt16 num)
     if(num == 0)
         return;
 
-    if (getGold() < 100 * num)
+    UInt16 lastNum = GetVar(VAR_BUY_FUND_NuM);
+    UInt16 totalNum = lastNum + num;
+    if(totalNum > 1000)
+        return;
+
+    if(getGold() < 100 * num)
     {
         sendMsgCode(0, 1104);
         return;
     }
-
     ConsumeInfo ci(OutBuyFund, 0, 0);
     useGold(100*num, &ci);
 
-    UInt16 lastNum = GetVar(VAR_BUY_FUND_NuM);
-    UInt16 totalNum = lastNum + num;
     SetVar(VAR_BUY_FUND_NuM, totalNum);
     UInt8 mark = GetVar(VAR_BUY_FUND_TRUMP_AWARD);
     if((lastNum + num) >= 100 && mark == 0)
@@ -27049,6 +27051,8 @@ void Player::buyFund(UInt16 num)
         mark = 1;
         SetVar(VAR_BUY_FUND_TRUMP_AWARD, mark);
     }
+
+    udpLog("huodong", "F_140108_1", "", "", "", "", "act", num);
 
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x28) << static_cast<UInt8>(0x01);
@@ -27096,7 +27100,7 @@ void Player::getBuyFundAward(UInt8 opt)
             else if(num >= 301 && num <= 1000)
                 index = 2;
             
-            UInt8 money = award[index][opt-1] * num;
+            UInt32 money = award[index][opt-1] * num;
             IncommingInfo ii(InBuyFund, 0, 0);
             if(opt == 7 || opt == 8)
                 getCoupon(money);  
@@ -27106,12 +27110,31 @@ void Player::getBuyFundAward(UInt8 opt)
             status = CLR_BIT(status, ((opt - 1) * 2));
             status = SET_BIT(status, ((opt - 1) * 2 + 1));
             SetVar(VAR_BUY_FUND_AWARD, status);
+
+            if(opt == 1)
+                udpLog("huodong", "F_140108_2", "", "", "", "", "act");
+            else if(opt == 2)
+                udpLog("huodong", "F_140108_3", "", "", "", "", "act");
+            else if(opt == 3)
+                udpLog("huodong", "F_140108_4", "", "", "", "", "act");
+            else if(opt == 4)
+                udpLog("huodong", "F_140108_5", "", "", "", "", "act");
+            else if(opt == 5)
+                udpLog("huodong", "F_140108_6", "", "", "", "", "act");
+            else if(opt == 6)
+                udpLog("huodong", "F_140108_7", "", "", "", "", "act");
+            else if(opt == 7)
+                udpLog("huodong", "F_140108_8", "", "", "", "", "act");
+            else if(opt == 8)
+                udpLog("huodong", "F_140108_9", "", "", "", "", "act");
+            else
+                udpLog("huodong", "F_140108_10", "", "", "", "", "act");
         }
     }
 
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x28) << static_cast<UInt8>(0x02);
-    st << static_cast<UInt8>(status) << Stream::eos;
+    st << static_cast<UInt32>(status) << Stream::eos;
     send(st);
 }
 
