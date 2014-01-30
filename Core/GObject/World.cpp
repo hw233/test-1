@@ -1087,9 +1087,10 @@ void World::SendSurnameLegendAward()
                 //{9911, 1}
                 //{9913, 1}
                 //{9921, 1}
-                {9926, 1}
+                //{9926, 1}
+                {9931, 1}
             };
-            player->sendMailItem(4175, 4176, items, sizeof(items)/sizeof(items[0]), false);
+            player->sendMailItem(4173, 4174, items, sizeof(items)/sizeof(items[0]), false);
         }
         World::LuckyBagSort.clear();
     }
@@ -3866,56 +3867,48 @@ void World::SendGuangGunAward()    //待定
 void World::SendHappyFireAward()
 {
     World::initRCRank();
-    int pos = 0;
-    UInt32 type =0;
-    static MailPackage::MailItem s_item[][4] = {
-        {{515,30},{503,30},{509,25},{134,30}},
-        {{515,25},{503,25},{509,20},{134,25}},
-        {{515,20},{503,20},{509,15},{134,20}},
-        {{515,10},{503,10},{509,10},{134,10}},
+    static MailPackage::MailItem s_item[][5] = {
+        {{515,50},{503,50},{509,50},{9438,50},{9022,50}},
+        {{515,30},{503,30},{509,30},{9438,30},{0,0}},
+        {{515,20},{503,20},{509,20},{9438,20},{0,0}},
+        {{515,10},{503,10},{509,10},{9438,10},{0,0}},
     };
-    static MailPackage::MailItem card = {9929,1};   //暂无白马王子
+    //static MailPackage::MailItem card = {9929,1};   //暂无白马王子
     UInt8 mark = 0;
     std::string str = "";
-    for(RCSortType::iterator iter = happyFireSort.begin(); iter != happyFireSort.end() && mark < 7; ++iter )
+    for(RCSortType::iterator iter = happyFireSort.begin(); iter != happyFireSort.end() && mark < 7; ++iter)
     {
-        Player* play = iter->player;
-        if (!play)
+        Player* player = iter->player;
+        if (!player)
             continue;
-        UInt32 totalScore = iter->total;
-        SYSMSGV(buf, 4181, mark+1,play->getCountry(),play->getName().c_str(), totalScore);
+        SYSMSGV(buf, 4181, mark+1, player->getCountry(), player->getName().c_str(), iter->total);
         str += buf;
-        if(6 == mark || mark == (happyFireSort.size()-1) )
-        {
-            SYSMSGV(buf, 4182, str.c_str());
-            str = buf;
-            break;
-        }
-        ++mark;
+        ++ mark;
     }
+    int pos = 0;
     SYSMSG(title, 4177);
     for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSort.end(); i != e; ++i)
     {
-        Player* play = i->player;
-        if (!play)
+        Player* player = i->player;
+        if (!player)
             continue;
-        ++pos;
+        ++ pos;
         UInt32 score = i->total;
-        type = pos;
-        if( pos >3 &&pos <8)
-            type = 4;
         SYSMSGV(content1, 4180, score, pos, str.c_str());
-        play->GetMailBox()->newMail(NULL, 0x01, title, content1);
-        if(type <5)
+        player->GetMailBox()->newMail(NULL, 0x01, title, content1);
+        if(pos > 0 && pos < 8)     //奖励前7名
         {
-            SYSMSGV(content, 4178, pos ,pos);
-            Mail * mail = play->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-            //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+            int type = pos > 3 ? 4 : pos;
+            SYSMSGV(content, 4178, pos, pos);
+            MailItemsInfo itemsInfo(s_item[type-1], Activity, 5);
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
             if(mail)
             {
-                mailPackageManager.push(mail->id, s_item[type-1], 4, true);
+                mailPackageManager.push(mail->id, s_item[type-1], 5, true);
+                /*
                 if(pos ==1)
                     mailPackageManager.push(mail->id, &card, 1, true);
+                */
             }
         }
     }

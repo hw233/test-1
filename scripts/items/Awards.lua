@@ -902,7 +902,7 @@ function RunBlueDiamondAward(player, opt)
    end
    
    if opt ==8 and j%2 ==1 then 
-        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."在跨年欢乐大转盘中幸运的获得了".."[4:"..items[j][1].."]x"..items[j][2])
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."在新年欢乐大转盘中幸运的获得了".."[4:"..items[j][1].."]x"..items[j][2])
     end
     local extraAward_9191 = {
         [2] = {9191,1,1},
@@ -1685,25 +1685,19 @@ function RunGameBoxDailyActionAward(player, cts)
 end
 function RunHappyValueAward(player, cts)
     local item = {
-        [1] = {{56,2},{57,2},{15,2},{508,2},{506,2}},
-        [2] = {{500, 3},{511,3},{501,2},{517,3}},
-        [3] = {{514,1},{465,1}},
-        [4] = {{516,3},{503, 3},{551,3},{547,3}},
-        [5] = {{509,2},{134,2},{9076,1}},
+        [1] = {{56,2},{57,2},{15,2},{500,2},{9371,3}},
+        [2] = {{500,2},{511,2},{501,2},{517,2}},
+        [3] = {{516,3},{503,3},{547,3},{551,3}},
+        [4] = {{465,1},{514,1}},
+        [5] = {{515,2},{134,2},{1325,2}},
+        [6] = {{9022,2},{509,3},{9076,1}},
     };
     local baoshi = {5005,5015,5025,5035,5045,5055,5065,5075,5085,5095,5105,5115,5125,5135,5145}
     local package = player:GetPackage();
-    if cts == 0 then
-        return false
-    end
-    if cts > 5  then
-        return false
-    end
-    if item[cts] == nil then
+    if nil == player or nil == cts or nil == item[cts] then
         return false 
     end
-    num = #item[cts]
-    if package:GetRestPackageSize() < num  then
+    if package:GetRestPackageSize() < #item[cts] then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -1711,7 +1705,7 @@ function RunHappyValueAward(player, cts)
     for count = 1, #item[cts] do
         package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
     end
-    if cts == 3 then 
+    if cts == 4 then
         local index = math.random(1,#baoshi)
         package:Add(baoshi[index], 1, true, 0, 59);
     end
