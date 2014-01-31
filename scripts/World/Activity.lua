@@ -1415,7 +1415,7 @@ function initActTime(y, m, d)
   local  SerStartTm2013_03_15 = { ['year'] = 2013, ['month'] = 3, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 迎新纳福 红包入袋
-  local  SerStartTm237 = { ['year'] = 2013, ['month'] = 2, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm237 = { ['year'] = 2014, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 蓝钻新年回馈活动
   local  SerStartTm238 = { ['year'] = 2013, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 空间朋友连续登录奖励
@@ -1877,7 +1877,7 @@ function initActTime(y, m, d)
   actTime236_1= os.time(SerStartTm236_1);
 
   actTime237_0= os.time(SerStartTm237);
-  actTime237_1= os.time(SerStartTm237) + 28 * 86400;
+  actTime237_1= os.time(SerStartTm237) + 42 * 86400;
 
   actTime238_0= os.time(SerStartTm238);
   actTime238_1= os.time(SerStartTm238) + 21 * 86400;
