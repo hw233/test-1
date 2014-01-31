@@ -1413,6 +1413,13 @@ struct DBPlayerNamed
     std::string name;
 };
 
+struct DBModifyMount
+{
+    UInt8 id;
+    UInt64 playerId;
+    std::string chips;
+};
+
 }
 
 namespace DB {
@@ -3207,6 +3214,16 @@ SPECIALDEF(3)
     std::string,name 
     )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::DBModifyMount)
+SPECIALDEF(3)
+    (
+    UInt8, id,
+    UInt64, playerId,
+    std::string, chips
+    )
+SPECIALEND()
+
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

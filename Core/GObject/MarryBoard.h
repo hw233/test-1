@@ -25,6 +25,10 @@ namespace GObject
             void setDoorMax();
             void resetData();
             void SetQuestionOnMarryBoard();
+            UInt8 getTheMaxSupport();
+            void SendPreMarryPresent(Player * man,Player * woman ,UInt8 norms );
+            void sendTodayMarryInfo(Player * pl);
+            void CheckTheAnswerBoard2();
             static MarryBoard & instance()
             {
                 static MarryBoard s;
@@ -33,6 +37,7 @@ namespace GObject
         public:
             static void * _marryBoardTimer ;
             static UInt8 answers[QuestionMax];
+            static std::string doorName[8];
             Player * _man;
             Player * _woman;
             Player * finder;
@@ -48,6 +53,7 @@ namespace GObject
             UInt8 _questionId[10];
             UInt8 _answers[10];
             UInt32 _support[4];
+            UInt8 _mAnswer;
             //第三阶段
             //第四阶段
             UInt32 _door[8];

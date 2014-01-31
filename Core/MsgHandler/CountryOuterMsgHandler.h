@@ -287,13 +287,6 @@ struct CityTransportReq
 	MESSAGE_DEF2(REQ::MAP_TRANSPORT, UInt16, _locid, UInt8, flag);
 };
 
-struct DungeonOpReq
-{
-	UInt8 op;
-	UInt8 type;
-	MESSAGE_DEF2(REQ::BABEL_JOIN, UInt8, op, UInt8, type);
-};
-
 struct DungeonInfoReq
 {
 	UInt8 op;
@@ -783,7 +776,7 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
         sprintf(str, "F_130808_1_%u", price);
         pl->udpLog("wupinhuigou", str, "", "", "", "", "act");
 	}
-    if(canDestroyNum > 0)
+    if(price > 0 && canDestroyNum > 0)
     {
 		SYSMSG_SEND(116, pl);
 		SYSMSG_SEND(1016, pl);
@@ -817,8 +810,8 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 		bool  bindType = *reinterpret_cast<const bool*>(data+offset+4);
 		UInt16 itemNum = *reinterpret_cast<const UInt16*>(data+offset+4+1);
 		offset += 7;
-        pl->addItem(itemId, itemNum, bindType);
-        if(World::canDestory(itemId))
+        bool res = pl->addItem(itemId, itemNum, bindType);
+        if(res && World::canDestory(itemId))
             ++canDestroyNum;
 	}
     if(canDestroyNum > 0)
@@ -1183,7 +1176,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
-    GObject::MarryBoard::instance().sendMarryBoardInfo(pl,0);
+    GObject::MarryBoard::instance().sendTodayMarryInfo(pl);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -1322,8 +1315,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 #if 0
     if (World::getHappyFireTime())
     {
-        GameMsgHdr hdr(0x1CA, WORKER_THREAD_WORLD, pl, 0);
-        GLOBAL().PushMsg(hdr, NULL);
+        //GameMsgHdr hdr(0x1DB, WORKER_THREAD_WORLD, pl, 0);
+        //GLOBAL().PushMsg(hdr, NULL);
     }
 #endif
     /*if(World::getQiShiBanTime())
@@ -2545,40 +2538,6 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 
 	pl->moveTo(ctr._locid, true);
 }
-
-/*void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
-{
-	MSG_QUERY_PLAYER(pl);
-	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
-		return;
-	GObject::Dungeon * dg = GObject::dungeonManager[dor.type];
-	if(dg == NULL)
-		return;
-	Stream st(REP::COPY_JOIN);
-	st << dor.op;
-	UInt8 result = 0;
-	switch(dor.op)
-	{
-	case 0:
-		result = dg->playerEnter(pl,1);
-		break;
-	case 1:
-		result = dg->playerLeave(pl,1);
-		break;
-	case 2:
-		result = dg->playerContinue(pl,0);
-		break;
-	case 3:
-		result = dg->playerBreak(pl,1);
-		break;
-	default:
-		break;
-	}
-    if (result == 4)
-        return;
-	st << result << dor.type << Stream::eos;
-	pl->send(st);
-}*/
 
 void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 {
@@ -6217,12 +6176,6 @@ void OnGetAward( GameMsgHdr& hdr, GetAward& req )
     MSG_QUERY_PLAYER(player);
     player->getAward(req._type, req._opt);
 }
-void OnGiveFlower( GameMsgHdr& hdr, void * data )
-{
-    MSG_QUERY_PLAYER(player);
-    UInt8  type = *reinterpret_cast<const UInt8*>(data);
-    player->giveFlower(type);
-}
 
 void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )
 {
@@ -6415,6 +6368,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 4:
                     case 5:
                     case 6:
+                    case 7:
                         jobHunter->OnRequestStart(val);
                         GameAction()->doStrong(player, SthSerachMo, 0, 0);
                         break;
@@ -7363,6 +7317,29 @@ void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
     }
 }
 
+void OnPlayerMountReq( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(player->GetLev() < 75)
+        return;
+
+    UInt8 type = 0;
+    brd >> type;
+    switch(type)
+    {
+        case 0x00:
+            player->sendMountInfo();
+            break;
+        case 0x01:
+            player->upgradeMount(false);
+            break;
+        case 0x02:
+            player->upgradeMount(true);
+            break;
+    }
+}
+
 void OnQixiReq2(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -7557,7 +7534,6 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
 }
 void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
 {
-    return ;
 	MSG_QUERY_PLAYER(player);
     /*
 	if(!player->hasChecked())
@@ -7572,19 +7548,19 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
     {
         case 0x03:
             {
-                if(!player->giveFlower(0))
-                    break; 
                 if(mType == 0)
                     return;
-                GObject::MarryBoard::instance()._lively += 500;
-                GObject::MarryBoard::instance()._YHlively += 500;
+                if(!player->giveFlower(0))
+                    break; 
+                GObject::MarryBoard::instance()._lively += 100;
+                GObject::MarryBoard::instance()._YHlively += 100;
                 player->AddVar(VAR_MARRYBOARD_YANHUA,100);
                 std::string text;
                 brd >> text;
                 Stream st(REP::CHAT);
                 UInt8 office = player->getTitle();
                 UInt8 guard = player->getPF();
-                st << static_cast<UInt8>(8)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+                st << static_cast<UInt8>(11)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
                     << office << guard << text.c_str()<< player->GetLev() << Stream::eos;
                 NETWORK()->Broadcast(st);
             }
@@ -7595,9 +7571,13 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
                     return;
                 UInt8 num = 0;
                 brd >> num ;
+                if(num == 0)
+                    break;
+                if(num > 99)
+                    num = 99;
                 if(!player->giveFlower(1,num))
                     break; 
-                GObject::MarryBoard::instance()._lively += 50;
+                GObject::MarryBoard::instance()._lively += 5*num;
                 SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
             }
     }

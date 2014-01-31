@@ -30,6 +30,7 @@
 #include "FairySpar.h"
 #include "MoFang.h"
 #include "ArenaTeam.h"
+#include "ModifyMount.h"
 
 
 namespace Battle
@@ -264,6 +265,7 @@ namespace GObject
         LIUGUANG    = 14,   //刹那流光
         ZHUTIAN     = 15,   //诸天宝鉴
         TIANYOU     = 16,   //天佑术
+        FANTIAN     = 17,   //梵天宝卷
 
         DRAGONKING_MAX,
     };
@@ -1383,8 +1385,6 @@ namespace GObject
         void checkPIcCount();
 
 		inline UInt16 getPacksize(UInt8 type = 0) { return type ? _playerData.packSizeSoul : _playerData.packSize; }
-        inline UInt8 getMounts() { return _playerData.mounts; }
-        bool setMounts(UInt8 mounts);
 
         void setLineupDirty(bool = true);
         void setFightersDirty(bool bDirty=true);
@@ -2358,7 +2358,7 @@ namespace GObject
 
     public:
         void sendTripodInfo();
-        void addItem(UInt32 itemid, UInt16 num, UInt8 bind);
+        bool addItem(UInt32 itemid, UInt16 num, UInt8 bind);
         void makeFire(UInt32 id1, UInt32 id2);
 
         void getAward();
@@ -2751,6 +2751,27 @@ namespace GObject
 	    UInt32 useLongyuan( UInt32 a, ConsumeInfo * ci );
 	    //UInt32 useShouHun( UInt32 a, ConsumeInfo * ci );
 
+
+    private:    //坐骑
+		std::map<UInt8, ModifyMount *> _modifyMounts;
+    public:
+        bool setMounts(UInt8 mounts);
+        void addMountFromItem(UInt32);
+        void addModifyMount(ModifyMount *, bool = true);
+        bool hasMountChip(UInt32);
+        bool addMountChip(UInt32);
+        void sendMountInfo();
+        void upgradeMount(bool isAuto);
+        void addMountAttrExtra(GData::AttrExtra&);
+        inline UInt8 getMounts() { return _playerData.mounts; }
+        inline ModifyMount * getCurrentMount() { return getOneMount(getMounts()); }
+        inline ModifyMount * getOneMount(UInt8 id)
+        {
+            std::map<UInt8, ModifyMount *>::iterator it = _modifyMounts.find(id);
+            if(it != _modifyMounts.end())
+                return it->second;
+            return NULL;
+        }
     public:     //活动相关
         void checkAnswerActInFoolsDay();
         void sendFoolsDayInfo(UInt8 = 0);

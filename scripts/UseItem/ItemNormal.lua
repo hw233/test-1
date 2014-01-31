@@ -3334,6 +3334,40 @@ function ItemNormal_00009440(iid, num, bind, param)
     player:sendHappyValueInfo();
     return num
 end
+function ItemNormal_00009444(iid, num, bind, param)
+    local Award ={
+    [9444] = {{15,1},{400,1},{133,1}},
+    [9445] = {{15,1},{134,1},{56,1},{9088,1}},
+    [9446] = {{9088,1},{515,1},{134,1}}
+    } 
+    local chance = {
+    [9444] = {50,80,100},
+    [9445] = {35,45,80,100},
+    [9446] = {40,50,100}
+    }
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    local chanceR = chance[iid]
+    local AwardR = Award[iid];
+    if chanceR == nil or AwardR ==nil then
+        return ;
+    end
+    if #AwardR ~= #chanceR then
+        return ;
+    end
+    local used = 0;
+    for n = 1, num do
+        local rand = math.random(1,100)
+        for i = 1, #chanceR do
+            if rand <= chanceR[i] then
+                package:Add(AwardR[i][1], AwardR[i][2], true, false, 2)
+                break
+            end
+        end
+        used = used + 1
+    end
+    return used;
+end
 
 function ItemNormal_00009067(iid, num, bind, param)
     local player = GetPlayer()
@@ -9740,7 +9774,8 @@ function ItemNormal_Lingbao(iid, num, bind, param)
         {11506, 11507, 11508},
         {11509, 11510, 11511},
         {11515, 11516, 11517},
-        {11518, 11519, 11520}
+        {11518, 11519, 11520},
+        {11521, 11522, 11523}
     }
 
     local idx = 1;
@@ -9756,6 +9791,8 @@ function ItemNormal_Lingbao(iid, num, bind, param)
         idx = 5;
     elseif 9431 == iid then
         idx = 6;
+    elseif 9448 == iid then
+        idx = 7;
     end
 
     --[[local idx = 1;
@@ -10174,6 +10211,7 @@ end
 function ItemNormal_jgsexp(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 70 then
+        player:sendMsgCode(0, 1093, 70);
         return 0
     end
     local moFang = player:GetMoFang();
@@ -10181,6 +10219,73 @@ function ItemNormal_jgsexp(iid, num, bind, param)
     moFang:addJGSExp(num*100);
     package:DelItemSendMsg(iid, player);
     return num;
+end
+
+function ItemNormal_00009601(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:GetLev() < 75 then
+        player:sendMsgCode(0, 1093, 75);
+        return 0
+    end
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < num then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    local items = {
+        [9601] = { 9611, 9612, 9613, 9614, 9615, 9616, 9617, 9618, 9500 },
+        [9602] = { 9621, 9622, 9623, 9624, 9625, 9626, 9627, 9628, 9500 },
+        [9603] = { 9631, 9632, 9633, 9634, 9635, 9636, 9637, 9638, 9500 },
+        [9604] = { 9641, 9642, 9643, 9644, 9645, 9646, 9647, 9648, 9500 },
+    }
+    local chance = { 1500, 3000, 3500, 4000, 4150, 4300, 4350, 4400, 10000 }
+    local replaceNum = { 1, 1, 2, 2, 4, 4, 8, 8, 1 }
+    if items[iid] == nil then
+        return false
+    end
+    local rp = 0
+    for k = 1, num do
+        local itemId = 0
+        local rnd = math.random(10000)
+        for i = 1, #chance do
+            if rnd <= chance[i] then
+                itemId = items[iid][i]
+                rp = i
+                break
+            end
+        end
+        local res = false
+        if itemId ~= 9500 then
+            res = player:hasMountChip(itemId)
+        end
+        if true == res then
+            package:Add(9500, replaceNum[rp], true, false, 2)
+        else
+            if rp == 7 or rp == 8 then
+                Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]获得了".."[4:"..itemId.."]，仙运奇佳，战力又增！")
+            end
+            package:Add(itemId, 1, true, false, 2)
+        end
+    end
+
+    package:DelItemSendMsg(iid, player)
+    return num;
+end
+
+function ItemNormal_00009611(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:GetLev() < 75 then
+        player:sendMsgCode(0, 1093, 75);
+        return 0
+    end
+    player:addMountFromItem(iid)
+    if true == player:addMountChip(iid) then
+        local package = player:GetPackage()
+        package:DelItemSendMsg(iid, player)
+        return 1
+    else
+        return 0
+    end
 end
 
 local ItemNormal_Table = {
@@ -11897,6 +12002,7 @@ local ItemNormal_Table = {
     [9353] = ItemNormal_Lingbao,
     [9387] = ItemNormal_Lingbao,
     [9431] = ItemNormal_Lingbao,
+    [9448] = ItemNormal_Lingbao,
 
     [9360] = ItemNormal_00009360,
     [9361] = ItemNormal_00009361,
@@ -11933,6 +12039,47 @@ local ItemNormal_Table = {
     [9425] = ItemNormal_keyin,
     [9428] = ItemNormal_00009428,
     [9438] = ItemNormal_zhenyuan,
+    [9444] = ItemNormal_00009444,
+    [9445] = ItemNormal_00009444,
+    [9446] = ItemNormal_00009444,
+
+    --坐骑
+    [9601] = ItemNormal_00009601,
+    [9602] = ItemNormal_00009601,
+    [9603] = ItemNormal_00009601,
+    [9604] = ItemNormal_00009601,
+    [9611] = ItemNormal_00009611,
+    [9612] = ItemNormal_00009611,
+    [9613] = ItemNormal_00009611,
+    [9614] = ItemNormal_00009611,
+    [9615] = ItemNormal_00009611,
+    [9616] = ItemNormal_00009611,
+    [9617] = ItemNormal_00009611,
+    [9618] = ItemNormal_00009611,
+    [9621] = ItemNormal_00009611,
+    [9622] = ItemNormal_00009611,
+    [9623] = ItemNormal_00009611,
+    [9624] = ItemNormal_00009611,
+    [9625] = ItemNormal_00009611,
+    [9626] = ItemNormal_00009611,
+    [9627] = ItemNormal_00009611,
+    [9628] = ItemNormal_00009611,
+    [9631] = ItemNormal_00009611,
+    [9632] = ItemNormal_00009611,
+    [9633] = ItemNormal_00009611,
+    [9634] = ItemNormal_00009611,
+    [9635] = ItemNormal_00009611,
+    [9636] = ItemNormal_00009611,
+    [9637] = ItemNormal_00009611,
+    [9638] = ItemNormal_00009611,
+    [9641] = ItemNormal_00009611,
+    [9642] = ItemNormal_00009611,
+    [9643] = ItemNormal_00009611,
+    [9644] = ItemNormal_00009611,
+    [9645] = ItemNormal_00009611,
+    [9646] = ItemNormal_00009611,
+    [9647] = ItemNormal_00009611,
+    [9648] = ItemNormal_00009611,
 
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,

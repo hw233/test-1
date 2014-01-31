@@ -5808,6 +5808,14 @@ namespace GObject
 		if (IsEquipTypeId(typeId)) return false;
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
 		if(itemType == NULL) return false;
+        if(itemType->subClass == Item_Mount || itemType->subClass == Item_MountChip)
+        {
+            if(m_Owner->GetLev() < 75)
+            {
+                m_Owner->sendMsgCode(0, 1096, 75);
+                return false;
+            }
+        }
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		ItemBase * item = FindItem(typeId, bind);
         if(item)
@@ -6559,14 +6567,14 @@ namespace GObject
         UInt8 lvIdx = (guji->getReqLev() - 70)/10;
         UInt8 gujiIdx = gujiClass - Item_Guji;
         UInt8 itemIdx = item->getQuality() == 2 ? 0 : 1;
-        if(colorIdx > 3 || lvIdx > 5 || gujiIdx > 16 || itemIdx > 1)
+        if(colorIdx > 3 || lvIdx > 6 || gujiIdx > 16 || itemIdx > 1)
             return 2;
 
         DelItem2(guji, 1, ToLingbao);
         DelItem2(item, 1, ToLingbao);
         double gujiFactor[17] = {0.7, 0.7, 0.7, 0.7, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 10};
         double itemFactor[2] = {1, 1.5};
-        double lvFactor[6] = {1, 1.2, 1.4, 1.6, 1.8, 2.0};
+        double lvFactor[] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0};
         double colorFactor[4] = {1, 1, 2, 3};
 
         m_Owner->udpLog("Tongling", "F_10000_15", "", "", "", "", "act");
@@ -6598,7 +6606,7 @@ namespace GObject
             m_lbSmeltInfo.orangeAdjVal += 25;
         }
 
-        if(gujiId >= 11113 && gujiId <= 11118) //皇帝古籍
+        if((gujiId >= 11113 && gujiId <= 11118) || gujiId == 11203) //皇帝古籍
         {            
             m_lbSmeltInfo.counts += 2;
             m_lbSmeltInfo.orangeAdjVal += 75;
@@ -6879,13 +6887,14 @@ namespace GObject
 
         UInt16 gjIdx = guji->subClass - Item_Guji;
         UInt8 lbIdx[17] = {0xFF, 0, 1, 2, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 0xFF};
-        UInt16 lbids[6][3] = {
+        UInt16 lbids[7][3] = {
             {11500, 11501, 11502},
             {11503, 11504, 11505},
             {11506, 11507, 11508},
             {11509, 11510, 11511},
             {11515, 11516, 11517},
-            {11518, 11519, 11520}};
+            {11518, 11519, 11520},
+            {11521, 11522, 11523}};
 
         UInt8 itemIdx = lbIdx[gjIdx];
         if(lbIdx[gjIdx] == 0xFF)
