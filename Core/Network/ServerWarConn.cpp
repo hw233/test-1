@@ -22,7 +22,7 @@ ServerWarConn::ServerWarConn( int fd, Network::TcpSlaveServer * s, int id ) :
 
 bool ServerWarConn::enabled()
 {
-	return cfg.arenaPort > 0 && cfg.serverWarPort > 0;
+	return cfg.serverWarPort > 0;
 }
 
 void ServerWarConn::initConnection()

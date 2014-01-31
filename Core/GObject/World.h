@@ -46,6 +46,14 @@ struct MoneyIn
     int prestige;
 };
 
+struct stOldMan
+{
+    UInt8 _loc;
+    UInt16 _spot;
+    UInt32 _time ;
+    std::set<UInt64> _players;
+    stOldMan():_loc(0),_spot(0),_time(0){}
+};
 struct stArenaExtra
 {
     UInt8 week;
@@ -271,6 +279,10 @@ public:
     { _cfriend = v; }
     inline static bool getCFriend()
     { return _cfriend; }
+    inline static void setCFriendAct(bool v)
+    { _cfriendAct = v; }
+    inline static bool getCFriendAct()
+    { return _cfriendAct; }
     inline static void setMayDay(bool v)
     { _mayday = v; }
     inline static bool getMayDay()
@@ -560,11 +572,31 @@ public:
         else
             return false;
     } 
+    inline static bool  get3366RechargeTime()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_3366_RECHARGE_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_3366_RECHARGE_END);
+        UInt32 now = TimeUtil::Now() ;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
+    inline static bool  getOldManTime()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        UInt32 now = TimeUtil::Now() ;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 11, 27);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2013, 12, 2);
+        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 1, 25);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 1, 30);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
@@ -676,6 +708,11 @@ public:
     { _miluzhijiao = v; }
     inline static bool getMiLuZhiJiaoAct()
     { return _miluzhijiao; }
+
+    inline static void setBuyFundAct(bool v)
+    { _buyfund = v; }
+    inline static bool getBuyFundAct()
+    { return _buyfund; }
 
     inline static bool getLuckyStarAct()
     {
@@ -856,6 +893,17 @@ public:
         return _snowAct;
     }
 
+    inline static bool getHappyFireTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
+        UInt32 now = TimeUtil::Now()+time;
+        if( now >= begin && now <= end)
+            _happyFire = true;
+        else
+            _happyFire = false;
+        return _happyFire;
+    } 
     inline static bool getLuckyMeet(UInt32 time = 0)
     {
         UInt32 begin = GVAR.GetVar(GVAR_LUCKYMEET_BEGIN);
@@ -1025,9 +1073,11 @@ public:
     inline static UInt8 getSysDailogPlatform() { return m_sysDailogPlatform; }
     static Player* getSpreadKeeper();
     static UInt32 getSpreadCount();
+    static UInt32 FindTheOldMan(Player* pl); // 找到圣诞老人
 public:
     static UInt32 _moneyLogged;
     static MoneyIn _moneyIn[7][2];
+    static stOldMan _oldMan;
 
 	static int _activityStage;
 	static bool _actAvailable;//??????+6??
@@ -1061,6 +1111,7 @@ public:
     static bool _rc7day;
     static bool _shuoshuo;
     static bool _cfriend;
+    static bool _cfriendAct;
     static bool _mayday;
     static bool _mayday1;
     static bool _ydmdact;
@@ -1144,6 +1195,7 @@ public:
     static bool _foolbao;
     static bool _summerFlow3;
     static bool _surnamelegend;
+    static bool _happyFire;
     static bool _11time;
     static bool _qishiban;
     static bool _ggtime;
@@ -1164,6 +1216,7 @@ public:
     static UInt8 _arenaState;      //0:无 1:仙界第一 2:仙界至尊 3:仙界传奇
     static bool _memcinited;
     static bool _miluzhijiao;
+    static bool _buyfund;
 public:
     static RCSortType qishibanScoreSort;     //七石板积分排名
     static RCSortType rechargeSort;
@@ -1173,6 +1226,7 @@ public:
     static RCSortType PlayerGradeSort; //十一活动
     static ClanGradeSort clanGradeSort; // 十一活动
     static RCSortType guangGunSort; //十一活动
+    static RCSortType happyFireSort;     //七石板积分排名
     static void initRCRank();
     static void initRP7RCRank();
 
@@ -1199,6 +1253,9 @@ private:
 	static void World_Athletics_Check( void * );
     static void World_Boss_Refresh(void*);
     static void World_Boss_Prepare(void*);
+    static void World_OldMan_Refresh(void*);   //圣诞老人刷新
+    static void World_MarryBoard_Refresh(void*);   //圣诞老人刷新
+    static void World_Marry_Process(void*);   //婚礼执行
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
 	static void World_One_Min( World * );
@@ -1227,6 +1284,12 @@ public:
     bool MemCachInit();
     void SetMemCach_qishiban(UInt32 score, const char * openId);
     UInt32 GetMemCach_qishiban(const char * openId);
+    void SetMemCach_CFriend_Invited(UInt64);
+    UInt16 GetMemCach_CFriend_Invited(UInt64);
+    void DelMemCach_CFriend_Invited(UInt64);
+    void DelMemCach_CFriend_InvitedAct(UInt64);
+    void SetMemCach_CFriend_InvitedAct(UInt64);
+    UInt16 GetMemCach_CFriend_InvitedAct(UInt64);
     void UpdateQixiScore(Player* pl, Player* lover);
     void sendGuangGunPlayers(Player* pl);
     void sendQixiPlayers(Player* pl);
@@ -1250,14 +1313,18 @@ public:
     void DivorceSnowPair(Player* pl);
     void LoadSnowScore(Player* pl, Player* lover);
     void SendSnowAward();
+    void SnowClear();
     void SendQiShiBanAward();
     void SendGuangGunAward();
+    static UInt16 GetRandomSpot();
+    void SendHappyFireAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();
     void UpdateKillMonsterRank(Player* pl, UInt8 Type, UInt8 count);
 
     void UpdateGuangGunScore(Player* pl);
+    void CreateMarryBoard(UInt64 man , UInt64 woman ,UInt8 type, UInt32 time);
     static void SendRechargeRP7RankAward();
 private:
 	void testUpdate();

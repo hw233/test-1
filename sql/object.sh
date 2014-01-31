@@ -178,8 +178,6 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130721_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_tempItem.sql #创建临时物品表
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130805_1.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_qixi.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130802_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_set_gvar51_52.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_jiguan.sql #机关兽创建player_jiguanshu、player_jiguanyu和player_tuzhi
@@ -201,11 +199,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130913_1.sql  #三魂创建fairyPet_sanhun
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_2013_09_02_presentbox.sql  #创建礼品箱
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar182_187.sql        #清除仗剑江湖蜀山路
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130922_1.sql  #机关兽创建player_zhenwei
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130926_1.sql #创建天书奇缘记录表
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131001_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131018_1.sql
@@ -229,6 +224,20 @@ function update_object()
     #. clearshiyamen.sh
     #mysql -h$H -u$U -p$P -P$PT $DBO < clanscore.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clan_battlescore.sql     #重置帮战积分
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140103_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_setVar636.sql    #qq浏览器补签1月3 4 5 号
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140103_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_marriage.sql     #创建征婚薄
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_reply_marriage.sql  #创建征婚回复表
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_marry_log.sql     #创建征婚log表
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_married_log.sql     #创建结婚log表
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140109_1.sql     #修复仙界8强之前押注未结算的问题
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_married_couple.sql     #创建结婚log表
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140103_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_setVar636.sql    #qq浏览器补签1月3 4 5 号
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_qixi.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140101_1.sql     #仙宠组队副本
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140101_2.sql     #仙宠组队副本击杀橙色怪物日志
 }

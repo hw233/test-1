@@ -9,6 +9,7 @@
 #include "Fighter.h"
 #include "TaskMgr.h"
 #include "EventBase.h"
+#include "MapCollection.h"
 #include "ChatItem.h"
 #include "Announce.h"
 #include "Dungeon.h"
@@ -48,6 +49,7 @@
 #include "Common/Itoa.h"
 #include "Server/SysMsg.h"
 #include "Arena.h"
+#include "MarryBoard.h"  //婚礼进行时
 #include "ArenaTeam.h"
 #include "ArenaServerWar.h"
 #include "Tianjie.h"
@@ -122,6 +124,7 @@ bool World::_carnival = false;
 bool World::_rc7day = false;
 bool World::_shuoshuo = false;
 bool World::_cfriend = false;
+bool World::_cfriendAct = false;
 bool World::_mayday = false;
 bool World::_mayday1 = false;
 bool World::_ydmdact = false;
@@ -151,6 +154,7 @@ bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
 bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
+bool World::_happyFire = false;
 bool World::_11time = false;
 bool World::_ggtime = false;
 bool World::_qzoneRechargetime = false;
@@ -202,6 +206,7 @@ RCSortType World::popularitySort;
 RCSortType World::LuckyBagSort;
 RCSortType World::PlayerGradeSort;
 RCSortType World::guangGunSort;
+RCSortType World::happyFireSort;
 ClanGradeSort World::clanGradeSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
@@ -232,6 +237,7 @@ UInt8 World::_snakespringequipact = 0;
 /** 场外活动 **/
 stArenaExtra World::stArenaOld[2];
 stArenaExtra World::stArena;
+stOldMan World::_oldMan ;
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
@@ -240,6 +246,7 @@ UInt32 World::spreadBuff = 0;
 UInt8 World::_arenaState = 0;      //0:无 1:仙界第一 2:仙界至尊
 bool World::_memcinited = false;
 bool World::_miluzhijiao = false;
+bool World::_buyfund = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -318,6 +325,7 @@ bool bXiaoyaoEnd = false;
 bool bFoolBaoEnd =  false;
 bool bHalfGoldEnd = false;
 bool bSurnameLegendEnd = false;
+bool bHappyFireEnd = false;
 bool b11TimeEnd = false;
 bool bGGTimeEnd = false;
 bool bSnowEnd = false;
@@ -410,29 +418,25 @@ bool enum_midnight(void * ptr, void* next)
         pl->sendRNR(nextday);
 
     if (pl->GetVar(VAR_RECHARGE_TOTAL) && (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -454,36 +458,9 @@ bool enum_midnight(void * ptr, void* next)
 
     if (pl->GetVar(VAR_RECHARGE_CONDCNT) &&
         (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 25)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 1)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 8)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 15)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 22)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 6, 29)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 6)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 13)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 20)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 7, 27)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 3)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 10)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 17)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 24)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 8, 31)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 7)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 14)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 21)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 9, 28)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 12)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 19)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 26)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 2)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 9)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 16)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 23)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 11, 30)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 14)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 21)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
         ))
     {
 #if 0
@@ -1110,9 +1087,10 @@ void World::SendSurnameLegendAward()
                 //{9911, 1}
                 //{9913, 1}
                 //{9921, 1}
-                {9926, 1}
+                //{9926, 1}
+                {9931, 1}
             };
-            player->sendMailItem(4175, 4176, items, sizeof(items)/sizeof(items[0]), false);
+            player->sendMailItem(4173, 4174, items, sizeof(items)/sizeof(items[0]), false);
         }
         World::LuckyBagSort.clear();
     }
@@ -1187,6 +1165,7 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bfoolbao = getFoolBao();
     bool bsurnamelegend = getSurnameLegend();
+    bool bhappyfirend = getHappyFireTime();
     bool b11time = get11Time();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
@@ -1227,10 +1206,12 @@ void World::World_Midnight_Check( World * world )
     bJuneEnd = bJune && !getJune();
     //愚公宝箱是否结束
     bFoolBaoEnd =  bfoolbao && !getFoolBao(); 
-   // 
+   // GVAR控制的时间记住加300秒结算
     bHalfGoldEnd = bhalfgold && !getHalfGold();
     //蜀山传奇掉落活动是否结束
     bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
+    //跨年大转盘
+    bHappyFireEnd = bhappyfirend && !getHappyFireTime(300);
     b11TimeEnd = b11time && !get11Time();
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
@@ -1253,27 +1234,25 @@ void World::World_Midnight_Check( World * world )
     UInt32 nextday = curtime + 30;
 
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 12, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1357,6 +1336,11 @@ void World::World_Midnight_Check( World * world )
         world->SendItem9343Award();
      if (bQiShiBanEnd)
         world->SendQiShiBanAward();
+    if(bHappyFireEnd)
+        world->SendHappyFireAward();
+  //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
+  //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
+  //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
  
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -1440,11 +1424,125 @@ void World::World_Boss_Refresh(void*)
 {
     worldBoss.process(TimeUtil::Now());
 }
+inline bool player_enum_AskOldMan(GObject::Player * p, int)
+{
+    UInt32 flag = p->GetVar(VAR_OLDMAN_SCORE_AWARD);
+    if(flag&(1<<8))
+    {
+        flag &= 255;
+        p->SetVar(VAR_OLDMAN_SCORE_AWARD,flag);
+    }
+    return true;
+}
 
+void World::World_OldMan_Refresh(void *)
+{
+    if(!getOldManTime())
+        return ;
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = now - TimeUtil::SharpDay(0, now);
+    if(_oldMan._time < 8*3600  ) 
+        _oldMan._time = 8*3600;
+  //  std::cout<<time-8*3600+300<<std::endl;
+    if(time >= 8*3600 - 300 - 2 && time < 8*3600 - 300 +3 )
+    {
+    //    std::cout<<"即将出现"<<std::endl;
+        SYSMSG_BROADCASTV(575); 
+    }
+    else if ( time < (7 *3600 + 50 * 60 ) )
+    {
+      //  std::cout<<"End"<<std::endl;
+        return ;
+    }
+    else if(time > 20*3600 )
+    {
+       if(!_oldMan._spot) 
+           return ;
+       UInt8 thrId = mapCollection.getCountryFromSpot(_oldMan._spot);
+       struct MapNpc
+       {
+           UInt16 loc;
+           UInt32 npcId;
+       };
+       MapNpc mapNpc = {_oldMan._spot, 4243};
+       GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
+       GLOBAL().PushMsg(hdr1, &mapNpc);
+       _oldMan._loc = 0;
+       _oldMan._spot = 0 ;
+       _oldMan._time = 0;
+    }
+    else if( time > _oldMan._time )
+   // else if ((time%600) < 3 || (time%600)>= 600 -2)    //测试
+    {
+        UInt16 spot = GetRandomSpot();
+        //std::cout<<"ChangeTo:"<<spot<<std::endl;
+        if(!spot)
+            return ;
+        if(_oldMan._spot == 0)
+        {
+            SYSMSG_BROADCASTV(572,spot); 
+        }
+        else 
+        {
+            SYSMSG_BROADCASTV(573,spot); 
+        }
+        UInt8 thrId = mapCollection.getCountryFromSpot(_oldMan._spot);
+        struct MapNpc
+        {
+            UInt16 loc;
+            UInt32 npcId;
+        };
+        MapNpc mapNpc = {_oldMan._spot, 4243};
+        GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
+        GLOBAL().PushMsg(hdr, &mapNpc);
+
+        _oldMan._spot = spot;
+        _oldMan._players.clear();
+        GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
+        GObject::MOData mo;
+        mo.m_ID = 4243;
+        mo.m_Hide = false;
+        mo.m_Spot = _oldMan._spot;
+        mo.m_Type = 100;
+        mo.m_ActionType = 0;
+        GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
+        GLOBAL().PushMsg(hdr1, &mo);
+        _oldMan._time = (time/3600+1)*3600; 
+    }
+    else if ((time%600) < 3 || (time%600)>= 600 -2)     
+   // else if ((time%180) < 3 || (time%180)>= 180 -2)         //测试
+    {
+        if(!_oldMan._spot)
+            return ;
+        SYSMSG_BROADCASTV(572,_oldMan._spot); 
+    }
+
+}
 void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
 }
+void World::CreateMarryBoard(UInt64 man , UInt64 woman ,UInt8 type,UInt32 time )
+{
+//   if(time == 0)
+  //      time = TimeUtil::SharpDayT(0,TimeUtil::Now()) + 14* 3600 ;
+   Player * pman = GObject::globalPlayers[man]; 
+   Player * pwoman = GObject::globalPlayers[woman]; 
+   if(pman==NULL || pwoman == NULL)
+       return ;
+   if(GObject::MarryBoard::instance().CreateMarry(pman,pwoman,type,time))
+       GObject::MarryBoard::instance()._marryBoardTimer = AddTimer(2 * 1000, World_MarryBoard_Refresh, static_cast<void*>(NULL));
+}
+void World::World_MarryBoard_Refresh(void *)
+{
+    GObject::MarryBoard::instance().MarryBoard_Timer(); 
+}
+
+void World::World_Marry_Process(void *)
+{
+    gMarryMgr.DoProcess(TimeUtil::Now()); 
+}
+
 void World::DaysRank_Refresh(void*)
 {
 	GObject::DaysRank::instance().process();
@@ -1853,6 +1951,8 @@ bool World::Init()
 #endif
     if(getQixi() || getWansheng() || getQingren())
         globalPlayers.enumerate(enum_qixi_rank_list, static_cast<void *>(NULL));
+    if(getSnowAct())
+        globalPlayers.enumerate(enum_snow_rank_list, static_cast<void *>(NULL));
 
 	UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10;
 	if(sday < now) sday += 86400;
@@ -1886,12 +1986,18 @@ bool World::Init()
     AddTimer(3600 * 24 * 7 * 1000, SendPopulatorRankAward, static_cast<void * >(NULL), (sweek - now - 10) * 1000);
 	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
     
+    AddTimer(5 * 1000, World_OldMan_Refresh, static_cast<void*>(NULL), 5 * 1000);
     //开服战世界boss
     UInt32 value = GVAR.GetVar(GVAR_SERVERWAR_XIUWEI);
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
     
+    if( GObject::MarryBoard::instance().sendAward())
+    {
+        gMarryMgr.MarryingCrush();
+    }
+    AddTimer(60 * 60 * 3 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
     return true;
 }
 
@@ -2104,6 +2210,16 @@ void World::SendLuckyDrawAward()
     }
 }
 
+UInt32 World::FindTheOldMan(Player* pl)
+{
+    UInt16 loc = pl->getLocation();
+    if(_oldMan._spot != loc)
+        return 0;
+    if(_oldMan._players.find(pl->getId())!= _oldMan._players.end())
+        return 0;
+    _oldMan._players.insert(pl->getId());
+    return _oldMan._players.size();
+}
 bool enum_openact(void * ptr, void * v)
 {
 	Player * pl = static_cast<Player *>(ptr);
@@ -2780,6 +2896,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             }
         }
     }
+    if (World::getHappyFireTime())
+    {
+        UInt32 used = p->GetVar(VAR_YEARHAPPY_VALUE);
+        if (used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::happyFireSort.insert(s);
+        }
+    }
     return true;
 }
 inline bool clan_enum_grade(GObject::Clan *clan,int)
@@ -3228,6 +3355,13 @@ void World::SendSnowAward()
         }
     }
 }
+
+void World::SnowClear()
+{
+    _snowPlayerSet.clear();
+    _snowScoreMap.clear();
+}
+
 void World::SendRechargeRP7RankAward()
 {
     static UInt32 s_couponCount[] = {2000,1000,500,200,200,200,200,200,200,200};
@@ -3532,6 +3666,146 @@ UInt32 World::GetMemCach_qishiban(const char * openId)
     return score;
 }
 
+void World::SetMemCach_CFriend_Invited(UInt64 userId)
+{
+    if (_memcinited && userId)
+    {
+        char value[128] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        size_t len = snprintf(key, sizeof(key), "CFriend_%lu", userId);
+        const char* res = m_MCached.get(key, value, sizeof(value));
+        UInt32 info[2] = {0};
+        if(*res && *value)
+        {   //0:time 1:value
+            StringTokenizer tk(value, "_");
+            for(UInt8 i = 0; i < 2 && i < tk.count(); ++ i)
+                info[i] = atoi(tk[i].c_str());
+        }
+        if(info[0] && info[0] <= TimeUtil::Now())
+            info[1] = 1;
+        else
+            info[1] += 1;
+        info[0] = TimeUtil::SharpMonth(1);
+
+        memset(value, 0, sizeof(value));
+        size_t vlen = snprintf(value, sizeof(value), "%u_%u", info[0], info[1]);
+
+        bool result = m_MCached.set(key, len, value, vlen, 0);
+        TRACE_LOG("CFriend_Memcach::setKey: %s, setValue: %s, res:%u", key, value, result);
+
+        SetMemCach_CFriend_InvitedAct(userId);
+    }
+}
+
+UInt16 World::GetMemCach_CFriend_Invited(UInt64 userId)
+{
+    UInt16 invitedNum = 0;
+    if (_memcinited && userId)
+    {
+        char value[128]={0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        snprintf(key, MEMCACHED_MAX_KEY, "CFriend_%lu", userId);
+
+        const char* res = m_MCached.get(key, value, sizeof(value));
+        TRACE_LOG("CFriend_Memcach::getKey: %s, getValue: %s, res:%u", key, value, res);
+        UInt32 info[2] = {0};
+        if(*res && *value)
+        {   //0:time 1:value
+            StringTokenizer tk(value, "_");
+            for(UInt8 i = 0; i < 2 && i < tk.count(); ++ i)
+                info[i] = atoi(tk[i].c_str());
+            if(info[0] && info[0] <= TimeUtil::Now())
+            {
+                memset(info, 0, sizeof(info));
+                m_MCached.del(key);
+                TRACE_LOG("CFriend_Memcach:DELETE:getKey: %s, getValue: %s", key, value);
+            }
+        }
+        invitedNum = info[1];
+    }
+
+    return invitedNum;
+}
+
+void World::SetMemCach_CFriend_InvitedAct(UInt64 userId)
+{
+    if (getCFriendAct() && _memcinited && userId)
+    {
+        char value[128] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        size_t len = snprintf(key, sizeof(key), "CFriendAct_%lu", userId);
+        m_MCached.get(key, value, sizeof(value));
+
+        UInt32 newValue = atoi(value) + 1;
+        size_t vlen = snprintf(value, sizeof(value), "%u", newValue);
+
+        bool res = m_MCached.set(key, len, value, vlen, 0);
+        TRACE_LOG("CFriendAct_Memcach::setKey: %s, setValue: %s, res:%u", key, value, res);
+    }
+}
+
+UInt16 World::GetMemCach_CFriend_InvitedAct(UInt64 userId)
+{
+    UInt16 invitedNum = 0;
+    if (getCFriendAct() && _memcinited && userId)
+    {
+        char value[128]={0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+        snprintf(key, MEMCACHED_MAX_KEY, "CFriendAct_%lu", userId);
+
+        const char* res = m_MCached.get(key, value, sizeof(value));
+        TRACE_LOG("CFriendAct_Memcach::getKey: %s, getValue: %s, res:%u", key, value, res);
+        invitedNum = atoi(value);
+    }
+
+    return invitedNum;
+}
+
+void World::DelMemCach_CFriend_Invited(UInt64 userId)
+{
+    if (_memcinited || !userId)
+    {
+        char key[MEMCACHED_MAX_KEY] = {0};
+        snprintf(key, MEMCACHED_MAX_KEY, "CFriend_%lu", userId);
+        m_MCached.del(key);
+    }
+}
+
+void World::DelMemCach_CFriend_InvitedAct(UInt64 userId)
+{
+    if (_memcinited || !userId)
+    {
+        char key[MEMCACHED_MAX_KEY] = {0};
+        snprintf(key, MEMCACHED_MAX_KEY, "CFriendAct_%lu", userId);
+        m_MCached.del(key);
+    }
+}
+
+UInt16 World::GetRandomSpot()
+{
+    GObject::MapList::iterator it;
+    UInt16 count = 0;
+    for (it = mapList.begin(); it != mapList.end(); ++ it)
+    {
+        if(*it)
+            ++ count;
+    }
+    UInt16 index = uRand(count);
+    count = 0;
+    for (it = mapList.begin(); it != mapList.end(); ++ it)
+    {
+        if(*it)
+        {
+            if (count ++ == index)
+            {
+                _oldMan._loc = (*it)->GetMapData().m_ID;
+                return (*it)->GetRandomSpot(9);
+            }
+        }
+    }
+    return 0;
+}
+
 void World::SendGuangGunAward()    //待定
 {
     World::initRCRank();
@@ -3590,5 +3864,54 @@ void World::SendGuangGunAward()    //待定
     }
 }
 
+void World::SendHappyFireAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][5] = {
+        {{515,50},{503,50},{509,50},{9438,50},{9022,50}},
+        {{515,30},{503,30},{509,30},{9438,30},{0,0}},
+        {{515,20},{503,20},{509,20},{9438,20},{0,0}},
+        {{515,10},{503,10},{509,10},{9438,10},{0,0}},
+    };
+    //static MailPackage::MailItem card = {9929,1};   //暂无白马王子
+    UInt8 mark = 0;
+    std::string str = "";
+    for(RCSortType::iterator iter = happyFireSort.begin(); iter != happyFireSort.end() && mark < 7; ++iter)
+    {
+        Player* player = iter->player;
+        if (!player)
+            continue;
+        SYSMSGV(buf, 4181, mark+1, player->getCountry(), player->getName().c_str(), iter->total);
+        str += buf;
+        ++ mark;
+    }
+    int pos = 0;
+    SYSMSG(title, 4177);
+    for (RCSortType::iterator i = World::happyFireSort.begin(), e = World::happyFireSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (!player)
+            continue;
+        ++ pos;
+        UInt32 score = i->total;
+        SYSMSGV(content1, 4180, score, pos, str.c_str());
+        player->GetMailBox()->newMail(NULL, 0x01, title, content1);
+        if(pos > 0 && pos < 8)     //奖励前7名
+        {
+            int type = pos > 3 ? 4 : pos;
+            SYSMSGV(content, 4178, pos, pos);
+            MailItemsInfo itemsInfo(s_item[type-1], Activity, 5);
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+            {
+                mailPackageManager.push(mail->id, s_item[type-1], 5, true);
+                /*
+                if(pos ==1)
+                    mailPackageManager.push(mail->id, &card, 1, true);
+                */
+            }
+        }
+    }
+}
 }
 

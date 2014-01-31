@@ -837,12 +837,12 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
             UInt32 left = p;
             if(left >= duration)
             {
-                exp *= (1.8f + extraFactor);
+                exp *= (1.8f + 0.1f + extraFactor);
                 left -= duration;
             }
             else
             {
-                exp = exp * (1 + 0.8f * left / duration + extraFactor);
+                exp = exp * (1 + (0.8f + 0.1f)* left / duration + extraFactor);
                 left = 0;
             }
             player->SetVar(VAR_TRAINP3, left);
@@ -943,7 +943,17 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
 
         Recharge* recharge = (Recharge*)(data);
         if(recharge->gold == 0)
+        {
+            //为了统计
+            char gold[32] = {0};
+            char nno[256] = {0};
+            const char* id = "29998";  //Q点直钩
+            snprintf(gold, 32, "%u", recharge->gold);
+            snprintf(nno, 256, "%s#%s", recharge->uint, recharge->no);
+            player->udpLog(nno, recharge->money, gold, id, "", "pay", "pay");
+            //结束
             return;
+        }
         IncommingInfo ii(InFromRecharge, 0, 0);
         player->getGold(recharge->gold, &ii);
         player->addTotalRecharge(recharge->gold);
@@ -2074,6 +2084,25 @@ void OnCFriendAthleticsRank( GameMsgHdr& hdr, const void * data)
     player->OnCFriendAthleticsRank();
 }
 
+void OnSetCFriendSuccess( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct CFInvited
+    {
+        UInt8 type;
+        UInt16 invited;
+    };
+
+    CFInvited * cfData = reinterpret_cast<CFInvited *>(const_cast<void *>(data));
+    if(!cfData) return;
+
+    if(cfData->type)
+        player->GetCFriend()->setCFriendSuccess(cfData->invited);
+    else
+        player->GetCFriend()->setCFriendSuccess_TMP(cfData->invited);
+}
+
 void OnForbidSaleQueryFail( GameMsgHdr &hdr, const void *data)
 {
     MSG_QUERY_PLAYER(player);
@@ -2228,6 +2257,18 @@ void OnCalcLBBattlePoint( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     player->calcLingbaoBattlePoint();
 }
+void OnGetFindOldManAward( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt32 flag = *reinterpret_cast<const UInt32 *>(data);
+    player->GetFindOldManAward(flag);
+}
+void OnGetInteresingBag( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 playerId  = *reinterpret_cast<const UInt64 *>(data);
+    player->getInteresingBag(playerId);
+}
 
 void OnSpreadWhisper(GameMsgHdr &hdr, const void* data)
 {
@@ -2282,9 +2323,10 @@ void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
         case 0x00:
             player->sendLuckyBagInfo();
             break;
-        /*case 0x03:
-              GameAction()->GetLuckyBagAward(player);
-              break;*/
+        case 0x03:
+            GameAction()->GetLuckyBagAward(player);
+            break;
+        /*
         case 0x04:
               {
                   std::string name = sdata->name;
@@ -2313,6 +2355,7 @@ void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
         case 0x05:
               GameAction()->UseToSystem(player);
               break;
+       */
        }
    }
     

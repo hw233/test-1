@@ -648,7 +648,7 @@ bool Clan::leave(Player * player)
     }
 
 	UInt32 now = TimeUtil::Now();
-    if (cfg.GMCheck && player != getOwner() && now > member->joinTime && now - member->joinTime < 24 * 60 * 60)
+    if (cfg.GMCheck && now > member->joinTime && now - member->joinTime < 24 * 60 * 60)
     {
 		player->sendMsgCode(0, 1324);
 		return false;
@@ -3696,6 +3696,7 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
                 st<<static_cast<UInt8>(1);
             else st<<static_cast<UInt8>(0);
             st<<player->getBePrayednum(pl->getId());
+            st<<static_cast<UInt8>(pl->GetVar(VAR_OLDMAN_PRESENT));
             ++it;
         }
     }

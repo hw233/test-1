@@ -30,6 +30,8 @@
 #include "FairySpar.h"
 #include "MoFang.h"
 #include "ArenaTeam.h"
+#include "Marry.h"
+#include "ModifyMount.h"
 
 
 namespace Battle
@@ -264,6 +266,7 @@ namespace GObject
         LIUGUANG    = 14,   //刹那流光
         ZHUTIAN     = 15,   //诸天宝鉴
         TIANYOU     = 16,   //天佑术
+        FANTIAN     = 17,   //梵天宝卷
 
         DRAGONKING_MAX,
     };
@@ -324,6 +327,7 @@ namespace GObject
     class JobHunter;
     class Dreamer;
     class MoFang;
+    struct MarriageInfo;
 
     struct TripodData
     {
@@ -1392,8 +1396,6 @@ namespace GObject
         void checkPIcCount();
 
 		inline UInt16 getPacksize(UInt8 type = 0) { return type ? _playerData.packSizeSoul : _playerData.packSize; }
-        inline UInt8 getMounts() { return _playerData.mounts; }
-        bool setMounts(UInt8 mounts);
 
         void setLineupDirty(bool = true);
         void setFightersDirty(bool bDirty=true);
@@ -1619,6 +1621,7 @@ namespace GObject
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
         MoFang * GetMoFang()        { return m_moFang; }
+        MarriageInfo * GetMarriageInfo()  { return m_marriageInfo; }
 	// ????ϵͳ
 	public:
 
@@ -2377,7 +2380,7 @@ namespace GObject
 
     public:
         void sendTripodInfo();
-        void addItem(UInt32 itemid, UInt16 num, UInt8 bind);
+        bool addItem(UInt32 itemid, UInt16 num, UInt8 bind);
         void makeFire(UInt32 id1, UInt32 id2);
 
         void getAward();
@@ -2499,6 +2502,13 @@ namespace GObject
         void getQZoneRechargeAward(UInt8 val);
         void sendQZoneRechargeAwardInfo();
         void AddQZoneRecharge(UInt32 r =0);
+        void GetFindOldManAward(UInt32 type = 0 );
+        void getInterestingAward(UInt8 type);
+        void sendInterestingBag(Player* pl);
+        void getInteresingBag(UInt64 pid);
+        void sendInteresingInfo();
+        void sendOldManLeftTime();
+        void sendOldManPos(UInt8 type = 0);
         void getSummerFlow3OnlineAward(UInt8 val);
         void getSummerMeetAward(UInt8 idx,UInt8 index);
         void getNewRC7DayRechargeAward(UInt8 val);
@@ -2515,6 +2525,11 @@ namespace GObject
         void getEquipMoveAward(UInt8 opt);
         void getVipLevelAward(UInt8 opt);
         void getQQXiuAward(UInt8 opt);                                                                                       
+        void getHappyValueAward(UInt8 val);
+        void sendHappyValueInfo();
+
+        void getMarryBoard3Award(UInt8 type);
+
         UInt32 getFighterEquipAward();
         void checkZhenying();
         void changeZYAward(UInt8 country); 
@@ -2768,6 +2783,27 @@ namespace GObject
 	    UInt32 useLongyuan( UInt32 a, ConsumeInfo * ci );
 	    //UInt32 useShouHun( UInt32 a, ConsumeInfo * ci );
 
+
+    private:    //坐骑
+		std::map<UInt8, ModifyMount *> _modifyMounts;
+    public:
+        bool setMounts(UInt8 mounts);
+        void addMountFromItem(UInt32);
+        void addModifyMount(ModifyMount *, bool = true);
+        bool hasMountChip(UInt32);
+        bool addMountChip(UInt32);
+        void sendMountInfo();
+        void upgradeMount(bool isAuto);
+        void addMountAttrExtra(GData::AttrExtra&);
+        inline UInt8 getMounts() { return _playerData.mounts; }
+        inline ModifyMount * getCurrentMount() { return getOneMount(getMounts()); }
+        inline ModifyMount * getOneMount(UInt8 id)
+        {
+            std::map<UInt8, ModifyMount *>::iterator it = _modifyMounts.find(id);
+            if(it != _modifyMounts.end())
+                return it->second;
+            return NULL;
+        }
     public:     //活动相关
         void checkAnswerActInFoolsDay();
         void sendFoolsDayInfo(UInt8 = 0);
@@ -2822,6 +2858,9 @@ namespace GObject
         void spreadToSelf();
         void spreadGetAward();
         void spreadGetAwardInCountry(UInt32 spreadCount);
+        void getBuyFundInfo(UInt8 opt);
+        void buyFund(UInt16 num);
+        void getBuyFundAward(UInt8 opt);
 
     public:
         // 八部浮屠
@@ -2847,6 +2886,7 @@ namespace GObject
         void get7DayFundAward(UInt8 type);
     private:
         MoFang* m_moFang;
+        MarriageInfo* m_marriageInfo;
 
     public:
         void sendCollectCard(UInt8 fighterIndex);
@@ -2878,6 +2918,9 @@ namespace GObject
         UInt8 getFighterGoldCnt();
         void sendRealSpirit();
         void AddRealSpirit(UInt32 real = 0);
+        void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
+        bool giveFlower(UInt8 type , UInt32 num = 0);
+        void joinAllServerRecharge(UInt32);
 	};
 
 
@@ -2942,5 +2985,4 @@ namespace GObject
     typedef Visitor<Player> PlayerVisitor;
 
 }
-
 #endif // _PLAYER_H_

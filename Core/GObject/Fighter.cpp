@@ -2039,9 +2039,19 @@ void Fighter::rebuildEquipAttr()
     {
         _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
         _owner->GetMoFang()->addKYAttr(_attrExtraEquip);
+
+        //坐骑加成
+        _owner->addMountAttrExtra(_attrExtraEquip);
     }
 
-	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
+    if(_owner && !isPet())
+    {
+        //结婚加的buffer
+        if(_owner->GetVar(GObject::VAR_MARRY_STATUS) == 5 || _owner->GetVar(GObject::VAR_MARRY_STATUS) == 6)
+            GObject::gMarryMgr.addMarriedAttr(_owner,_attrExtraEquip);
+    }
+	
+    _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 
 void Fighter::isCanStrengthenSuit(UInt32 * setId, UInt32 * setNum, Fighter * fgt)
@@ -2463,7 +2473,8 @@ void Fighter::rebuildBattlePoint()
         for(UInt8 i = 0; i < cnt; ++ i)
         {
             const GData::LBSkillBase* lbskill = GData::lbSkillManager[_lbSkill[i].skillid];
-            _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
+            if(lbskill)
+                _battlePoint += lbskill->battlepoint * (((float)(_lbSkill[i].factor))/10000);
         }
         calcLingbaoBattlePoint();
     }
@@ -6813,6 +6824,9 @@ UInt32 Fighter::calcBaseBattlePoint()
             addAttrExtraXCGem(attrExtra, igt);
         }
     }
+    //坐骑加成
+    _owner->addMountAttrExtra(attrExtra);
+
 	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
 	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);
     delete fgt;

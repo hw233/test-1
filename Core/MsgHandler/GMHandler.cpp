@@ -16,6 +16,7 @@
 #include "GObject/Fighter.h"
 #include "GObject/Clan.h"
 #include "GObject/Country.h"
+#include "GObject/MarryBoard.h"
 #include "GObject/ClanManager.h"
 #include "GObject/ClanBattle.h"
 #include "GObject/ClanManager.h"
@@ -55,6 +56,7 @@
 #include "Memcached.h"
 #include "Version.h"
 #include "GObject/FairySpar.h"
+#include "GObject/Marry.h"
 #include "GObject/ArenaServerWar.h"
 GMHandler gmHandler;
 
@@ -297,7 +299,12 @@ GMHandler::GMHandler()
     Reg(2, "getkey", &GMHandler::OnGetKey);
     Reg(3, "addshlvl", &GMHandler::OnAddSHLvl);
     Reg(3, "playermsg", &GMHandler::OnPlayerMsg);
+    Reg(3, "clmarry", &GMHandler::OnCleanMarry);
+    Reg(3, "clmarrylist", &GMHandler::OnCleanMarryList);
+    Reg(3, "setmarry", &GMHandler::OnSetMarryStatus);
     Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
+    Reg(2, "use9440", &GMHandler::OnUseItem9440);
+    Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
 
     _printMsgPlayer = NULL;
 }
@@ -713,6 +720,7 @@ void GMHandler::OnAddVar( GObject::Player * player, std::vector<std::string>& ar
 		UInt32 value = atoi(args[1].c_str());
         UInt32 num = player->GetVar(var);
 		player->SetVar(var,num+value);
+        GObject::MarryBoard::instance()._YHlively = value ; 
 	}
 }
 void GMHandler::OnSetVar( GObject::Player * player, std::vector<std::string>& args )
@@ -3919,11 +3927,24 @@ void GMHandler::OnCFriend(GObject::Player *player, std::vector<std::string>& arg
             if(idx > 3 && idx < 7)
                 cFriend->setCFriendNum(3);
             if(idx >= 39)
-                cFriend->setCFriendSuccess(3);
+            {
+                UInt64 userId = player->getId();
+                if(cfg.merged)
+                    userId &= 0x0000ffffffffffull;
+                for(int i = 0; i < 3; ++ i)
+                {
+                    GameMsgHdr hdr1(0x1DD, WORKER_THREAD_WORLD, player, sizeof(userId));
+                    GLOBAL().PushMsg(hdr1, &userId);
+                }
+            }
         }
         break;
     case 2:
-        cFriend->clearAllForGM();
+        {
+            cFriend->clearAllForGM();
+            GameMsgHdr hdr(0x1DE, WORKER_THREAD_WORLD, player, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
         break;
     case 3:
         player->AddVar(VAR_CFRIENDTICKETS, atoi(args[1].c_str()));
@@ -3976,8 +3997,21 @@ void GMHandler::OnSaveGoldAct(GObject::Player *player, std::vector<std::string>&
             player->SetVar(VAR_SAVEGOLD_SET_TIME, TimeUtil::Now() - 7*86400-10);
         }
         break;
+    case 4:
+        {
+            UInt32 value = atoi(args[1].c_str());
+            IncommingInfo ii(InFromTopUp, 0, 0);
+            for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+            {
+                UInt32 val = uRand(value) + 1;
+                it->second->getGold(val, &ii);
+                it->second->addTotalRecharge(val);
+            }
+        }
+        break;
     }
-    player->sendSaveGoldAct();
+    if(World::getSaveGoldAct())
+        player->sendSaveGoldAct();
 }
 
 void GMHandler::OnLingbao(GObject::Player * player, std::vector<std::string>& args)
@@ -4443,6 +4477,36 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_BEGIN, 0);
             GVAR.SetVar(GVAR_CHRISTMAS_PILESNOW_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+        case 19:
+            GVAR.SetVar(GVAR_OLDMAN_BEGIN, TimeUtil::SharpDayT(0, TimeUtil::Now()));
+            GVAR.SetVar(GVAR_OLDMAN_END, TimeUtil::SharpDayT(2, TimeUtil::Now()));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 20:
+            GVAR.SetVar(GVAR_OLDMAN_BEGIN, 0);
+            GVAR.SetVar(GVAR_OLDMAN_END, 0);
+        case 21:
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_BEGIN,TimeUtil::SharpDayT(0, TimeUtil::Now()));
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_END,TimeUtil::SharpDayT(2, TimeUtil::Now()));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 22:
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_BEGIN, 0);
+            GVAR.SetVar(GVAR_YEARHAPPY_RANK_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+        case 23:
+            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::Now() + 86400*15);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 24:
+            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, 0);
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
     }
 }
@@ -4477,6 +4541,8 @@ void GMHandler::OnSendMsg(GObject::Player *player, std::vector<std::string>& arg
     }
 	GameMsgHdr hdr(type, player->getThreadId(), player, sizeof(value));
 	GLOBAL().PushMsg(hdr, value);
+	GameMsgHdr hdr1(type, WORKER_THREAD_WORLD, player, sizeof(value));
+	GLOBAL().PushMsg(hdr1, value);
 }
 
 void GMHandler::OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args)
@@ -4757,6 +4823,27 @@ void GMHandler::OnPlayerMsg(GObject::Player* player, std::vector<std::string>& a
     _printMsgPlayer = pl;
 }
 
+void GMHandler::OnCleanMarry(GObject::Player* player, std::vector<std::string>& args)
+{
+    player->SetVar(VAR_MARRY_STATUS,0);
+    player->SetVar(VAR_CANCEL_APPOINTMENT,0);
+    GObject::gMarryMgr.cleanPlayerData(player); 
+}
+
+void GMHandler::OnCleanMarryList(GObject::Player* player, std::vector<std::string>& args)
+{
+    GObject::gMarryMgr.cleanMemmory(); 
+}
+
+void GMHandler::OnSetMarryStatus(GObject::Player* player, std::vector<std::string>& args)
+{
+    GObject::gMarryMgr.SetMarryStatus(player); 
+}
+
+
+
+
+
 void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::string>& args)
 {
 	if(args.size() < 1)
@@ -4851,22 +4938,42 @@ void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::stri
         break;
     }
 }
+
+void GMHandler::OnUseItem9440(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+        return;
+    UInt32 count = atoi(args[0].c_str());
+    UInt32 i = 0;
+    for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+    {
+        if(i > 600)
+            break;
+        it->second->GetPetPackage()->Add(9440, count);
+        it->second->GetPetPackage()->UseItem(9440, count, 0, 0, 0);
+    }
+}
+
 void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string>& args)
 {
     if (args.size() < 1)
         return ;
     UInt32 var = 0;   //修改
     UInt32 value = 0;   //修改
+    UInt8 type =0 ;
+    UInt16 serverNo = 0;
     if(args.size() >=2 )
     {
         var = atoll(args[1].c_str());
         value = atoll(args[2].c_str());
+        type = atoi(args[3].c_str());
+		serverNo = atoi(args[4].c_str());
     }
 //    UInt32 fTime = atol(args[1].c_str());
 //    setForbidSaleValue(playerId, true,fTime);
 //
 //开启起封交易客户平台测试
-#define TEST_TABLE
+//#define TEST_TABLE
 #ifdef TEST_TABLE
     //测试平台 begin
 #pragma pack(1)
@@ -4875,12 +4982,16 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
         UInt8 blank[36];
         UInt32 var ;
         UInt32 value ;
+        UInt8 type ;
+        UInt16 serverNo;
         char   msg[1024];
     };
 #pragma pack()
     struct test _test;
     _test.var =var;
     _test.value =value;
+    _test.type = type;
+    _test.serverNo = serverNo;
     strncpy (_test.msg, args[0].c_str(), strlen(args[0].c_str()));
   //  _test.msg = args[0].c_str();
     LoginMsgHdr hdr1(0x14D, WORKER_THREAD_LOGIN, 0, 0, sizeof(_test));
@@ -4891,4 +5002,20 @@ void GMHandler::OnSetPlayersVar(GObject::Player *player, std::vector<std::string
 #undef TEST_TABLE
 }
 
-
+void GMHandler::OnCreateMarryBoard(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() !=3 )
+        return ;
+	char * endptr;
+	UInt64 playerId1 = strtoull(args[0].c_str(), &endptr, 10);
+	UInt64 playerId2 = strtoull(args[1].c_str(), &endptr, 10);
+    UInt8 type = atoi(args[2].c_str());
+    UInt32 now = TimeUtil::Now();
+    if(type > 1 && type < 4 )
+    {
+        WORLD().CreateMarryBoard(playerId1,playerId2,type,now + 1860);
+        GObject::MarryBoard::instance().SetQuestionOnMarryBoard();
+    }
+    else 
+        GObject::MarryBoard::instance().resetData();
+}

@@ -4,6 +4,7 @@
 #include "Common/Stream.h"
 #include "Common/AtomicVal.h"
 #include "Common/Mutex.h"
+#include "Common/BinaryReader.h"
 
 namespace GObject
 {
@@ -132,6 +133,18 @@ struct PetInfoList
     }
 };
 
+//全服充值排行
+struct AllServersRecharge
+{
+    Player * player;
+    std::string name;
+    UInt32 total;
+    UInt32 rank;
+    UInt8 country;
+
+    AllServersRecharge() : player(NULL), total(0), rank(0), country(0) {}
+};
+
 class Leaderboard
 {
 public:
@@ -209,6 +222,13 @@ public:
     void erasePetInfo(FairyPet* pet);
     void buildPacketForPet();
 
+    //全服充值排名活动
+    void readRechargeRank100(BinaryReader&);
+    void readRechargeSelf(BinaryReader&);
+    void sendMyRechargeRank(Player *);
+    void sendRechargeRank100(Player *, UInt8, UInt8);
+    void giveRechargeRankAward();
+    void sendGoldLvlAward(BinaryReader&);
 private:
 	void doUpdate();
     void makeRankStream(Stream* st, UInt8 type, Player* pl);
@@ -265,6 +285,9 @@ private:
     std::map<UInt64, int> _petRank;
     FastMutex _opMutex;
     FastMutex _petMutex;
+
+    std::map<UInt64, AllServersRecharge> _rechargeSelf;
+    std::vector<AllServersRecharge> _rechargeRank100;
 };
 
 extern Leaderboard leaderboard;

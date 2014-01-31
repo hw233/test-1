@@ -1276,9 +1276,11 @@ void TeamArenaMgr::readFrom( BinaryReader& brd )
 		_progress = progress;
 		_notified = 0;
         fStatus = true;
+        if(_progress == e_team_nextbegin)
+            World::setArenaState(ARENA_XIANJIE_NONE);
 	}
     if(_progress != e_team_nextbegin)
-        GObject::World::setArenaState(GObject::ARENA_XIANJIE_ZHIZUN);
+        World::setArenaState(ARENA_XIANJIE_ZHIZUN);
 
 	switch(_progress)
 	{
@@ -2094,7 +2096,7 @@ void TeamArenaMgr::updateBattlePoint(BinaryReader& brd)
     UInt32 sid = 0;
     UInt64 tid = 0, pid = 0;
     UInt32 battlePoint = 0, battlePoint1 = 0;
-    brd >> cid >> sid >> tid >> battlePoint >> battlePoint1;
+    brd >> cid >> sid >> tid >> pid >> battlePoint >> battlePoint1;
     GET_ORIGINID(tid, sid, cid);
     GET_ORIGINID(tid, sid, pid);
 

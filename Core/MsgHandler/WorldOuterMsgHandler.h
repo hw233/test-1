@@ -32,6 +32,7 @@
 #include "GObject/TownDeamon.h"
 #include "GObject/ClanRankBattle.h"
 #include "GObject/SingleHeroStage.h"
+#include "GObject/MarryBoard.h"
 
 #ifdef _ARENA_SERVER
 #include "GObject/GameServer.h"
@@ -1644,6 +1645,8 @@ void OnArenaLeaderBoardReq( GameMsgHdr&hdr, ArenaLeaderBoardReq& aer )
 void OnArenaWarOpReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
+    if(!cfg.enabledServerWar())
+        return;
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
 	UInt8 type = 0, opt = 0;
 	brd >> type >> opt;
@@ -2560,6 +2563,22 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
     brd >> type;
     switch(type)
     {
+        case 0x02:  //排行活动
+        {
+            UInt8 flag = 0;
+            brd >> op >> flag;
+            if(op != 6)     //跨服充值排行活动
+                return;
+            if(0 == flag)
+            {
+                UInt8 idx = 0, cnt = 0;
+                brd >> idx >> cnt;
+                leaderboard.sendRechargeRank100(player, idx, cnt);
+            }
+            else if(1 == flag)
+                leaderboard.sendMyRechargeRank(player);
+            break;
+        }
         case 0x01:  // 七夕
         case 0x03:  // 万圣节
         case 0x09:  // 情人节浪漫之旅
@@ -2696,6 +2715,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x21:
         case 0x24:
         case 0x25:
+        case 0x27:
         {
             brd >> op;
             switch(op)
@@ -3056,6 +3076,39 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
         }
         break;
+        case 0x26:
+        {
+            if(!World::getOldManTime())
+                return ;
+            brd >> op;
+            if(op ==2)
+            {
+                UInt8 index =0 ;
+                brd >> index ;
+                if(index == 0)
+                {
+                    UInt32 type = GObject::World::FindTheOldMan(player);
+                    if( type ==0 )
+                    {
+                        player->sendMsgCode(0, 1910);
+                        break;
+                    }
+                    GameMsgHdr h(0x355,  player->getThreadId(), player, sizeof(UInt32));
+                    GLOBAL().PushMsg(h, &type);
+                    break;
+                }
+            }
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            break;
+        }
+        break;
+        case 0x28:
+        {
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            break;
+        }
         default:
             break;
     }
@@ -3404,6 +3457,8 @@ void OnUpdateArenaSession( ArenaMsgHdr& hdr, const void * data )
 void OnServerWarConnected( ServerWarMsgHdr& hdr, const void * data )
 {
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(!cfg.enabledServerWar())
+        return;
 	UInt8 r = 0;
 	brd >> r;
 	if(r == 1)
@@ -3454,6 +3509,8 @@ void OnServerWarLineupCommited( ServerWarMsgHdr& hdr, const void * data )
 
 void OnServerWarPreliminary( ServerWarMsgHdr& hdr, const void * data )
 {
+    if(!cfg.enabledServerWar())
+        return;
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     GObject::serverWarMgr.pushPreliminary(brd);
 }
@@ -3499,8 +3556,145 @@ void OnServerWarBattlePoint( ServerWarMsgHdr& hdr, const void * data )
 
 void OnServerWarLeaderBoard( ServerWarMsgHdr& hdr, const void * data )
 {
+    if(!cfg.enabledServerWar())
+        return;
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     GObject::serverWarMgr.updateLeaderBoard(brd);
+}
+void OnMarryBard( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+    UInt8 mType = GObject::MarryBoard::instance()._type;
+    switch(op)
+    {
+        case 0x03:
+        case 0x04:
+            {
+                hdr.msgHdr.desWorkerID = player->getThreadId();
+                GLOBAL().PushMsg(hdr, (void*)data);
+            }
+            break;
+        case 0x23:
+        case 0x24:
+            {
+                if(mType != 2)
+                    return;
+                UInt8 ans = 0 ;
+                br >>ans;
+                GObject::MarryBoard::instance().answerTheQuestionOn2(player,ans);  
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(op);
+                st <<static_cast<UInt8>(ans);
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x42:
+            {
+                if(mType != 3)
+                    return;
+                player->SetVar(VAR_MARRYBOARD3,1);
+                UInt32 rand = uRand(10000);
+                player->SetVar(VAR_MARRYBOARD3_KEY,rand);
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(0x42);
+                st << static_cast<UInt32>(GObject::MarryBoard::instance().wrapTheKey(player->GetVar(VAR_MARRYBOARD3_KEY)));
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x43:
+            {
+                if(mType != 3)
+                    return;
+                UInt32 outKey = 0;
+                UInt8 flag = 0;
+                UInt32 now = TimeUtil::Now();
+                UInt32 var = player->GetVar(VAR_MARRYBOARD4_TIME);
+                br >> outKey ;
+                if(GObject::MarryBoard::instance().unWrapTheOutKey(outKey) == player->GetVar(VAR_MARRYBOARD3_KEY))
+                {
+                    if(now - var > 16)
+                    {
+                        flag = 1 ; 
+                        player->AddVar(VAR_MARRYBOARD3,1);
+                        player->SetVar(VAR_MARRYBOARD4_TIME , now);
+                        UInt32 rand = uRand(10000);
+                        player->SetVar(VAR_MARRYBOARD3_KEY,rand);
+                        player->AddVar(VAR_MARRYBOARD_LIVELY,10);
+                        GObject::MarryBoard::instance()._lively += 1;
+                        char str[16] = {0};
+                        sprintf(str, "F_140102_15");
+                        player->udpLog("jiehunjinxing", str, "", "", "", "", "act");
+                    }
+                }
+                else
+                    break ;
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(0x43);
+                st <<static_cast<UInt8>(flag);
+                if(flag)
+                    st << static_cast<UInt32>(GObject::MarryBoard::instance().wrapTheKey(player->GetVar(VAR_MARRYBOARD3_KEY)));
+                else 
+                    st <<static_cast<UInt32>(var + 16 -now );
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x44:
+            {
+                if(mType != 3)
+                    return;
+                player->getMarryBoard3Award(GObject::MarryBoard::instance()._norms);
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(0x44);
+                st <<Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x63:
+        case 0x64:
+            {
+                if(mType != 4)
+                    return;
+                UInt8 door=0 ;
+                br >> door;
+                GObject::MarryBoard::instance().selectDoor(player,door);
+                Stream st(REP::MARRYBOARD);
+                st <<static_cast<UInt8>(op);
+                st << static_cast<UInt8>(door);
+                st<<Stream::eos;
+                if(player == GObject::MarryBoard::instance()._man || player == GObject::MarryBoard::instance()._woman)
+                {
+                    GObject::MarryBoard::instance()._man ->send(st);
+                    GObject::MarryBoard::instance()._woman->send(st);
+                }
+                else
+                    player->send(st);
+            }
+            break;
+        default:
+            return;
+    }
+}
+
+void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    if(type == 0)
+        GObject::leaderboard.giveRechargeRankAward();
+    else if(type == 1)
+        GObject::leaderboard.readRechargeRank100(brd);
+    else if(type == 2)
+        GObject::leaderboard.readRechargeSelf(brd);
+    else if(type == 3)
+        GObject::leaderboard.sendGoldLvlAward(brd);
 }
 
 #endif // _WORLDOUTERMSGHANDLER_H_

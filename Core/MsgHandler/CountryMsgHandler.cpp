@@ -27,6 +27,7 @@ MSG_REG(GameMsgHdr, OnFighterDismissReq);
 MSG_REG(GameMsgHdr, OnFighterRegenReq);
 MSG_REG(GameMsgHdr, OnFighterTrainReq);
 //MSG_REG(GameMsgHdr, OnFighterTrain2Req);
+MSG_REG_2(GameMsgHdr, REQ::MODIFY_MOUNT, OnPlayerMountReq);
 MSG_REG_2(GameMsgHdr, REQ::TRAIN_FIGHTER_OP, OnFighterTrainOpReq);
 MSG_REG_2(GameMsgHdr, REQ::HERO_ISLAND, OnHeroIslandReq);
 MSG_REG_2(GameMsgHdr, REQ::NEWHERO_ISLAND, OnNewHeroIslandReq);
@@ -195,9 +196,14 @@ MSG_REG_2(GameMsgHdr, REQ::RP_SERVER, OnRPServerReq);
 
 MSG_REG_2(GameMsgHdr, REQ::CCB, OnCCBReq);
 
+MSG_REG_2(GameMsgHdr, REQ::MARRYMGR, OnMARRYMGRReq);
+
+MSG_REG_2(GameMsgHdr, REQ::MARRIEDMGR, OnMARRIEDMGRReq);
+
 MSG_REG_2(GameMsgHdr, REQ::CLAN_SPIRIT_TREE, OnClanSpiritTree);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq2);
+MSG_REG_2(GameMsgHdr, REQ::MARRYBOARD, OnMarryBoard2);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -327,6 +333,7 @@ MSG_REG_2(GameMsgHdr, 0x343, OnSaveGoldAct);
 MSG_REG_2(GameMsgHdr, 0x344, OnFoolsDayAct);
 MSG_REG_2(GameMsgHdr, 0x345, OnLuckyStarAct);
 MSG_REG_2(GameMsgHdr, 0x346, OnSurnameLegendAct);
+MSG_REG_2(GameMsgHdr, 0x347, OnSetCFriendSuccess);
 
 MSG_REG_2(GameMsgHdr, 0x348, OnSendSpreadAwardInfo);
 MSG_REG_2(GameMsgHdr, 0x349, OnSpreadGetAward);
@@ -398,6 +405,8 @@ MSG_REG_2(GameMsgHdr, 0x351, OnGGTeamPlayerLeave);
 MSG_REG_2(GameMsgHdr, 0x352, OnSaleItemCancleAll);
 MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
 MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
+MSG_REG_2(GameMsgHdr, 0x355, OnGetFindOldManAward);
+MSG_REG_2(GameMsgHdr, 0x356, OnGetInteresingBag);
 
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);

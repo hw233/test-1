@@ -137,8 +137,16 @@ enum PurchaseType
     TuPoJieXian                 = 126, //星辰图突破界限
     ServerWarConsume            = 127, //仙界传奇消费
     RestStep                    = 1001, //七石板重置
-    RefreshMonster              = 1002, //宠物组队副本刷怪
-    CreateRoom                  = 1003, //宠物组队副本创建房间
+    ZhengHun                    = 1002, //征婚
+    JieHun                      = 1003, //结婚 
+    LiHun                       = 1004, //离婚 
+    SearchOldMan                = 1005, //捉迷藏活动包打听
+    MarryYanHua                 = 1006, //结婚送烟花
+    MarryBaiHe                  = 1007, //结婚送百合花
+    DINGQINGXINWU               = 1008, //定情信物
+    OutBuyFund                  = 1009, //购买基金消费
+    RefreshMonster              = 1010, //宠物组队副本刷怪
+    CreateRoom                  = 1011, //宠物组队副本创建房间
     //繁体私有占150～200
 };
 
@@ -165,6 +173,7 @@ enum IncomingType
     ShouHunFromYouli            = 146, //游历获得兽魂
     LongHunFromTeamArena        = 147, //仙界至尊龙魂获得
     LongHunFromServerWar        = 148, //仙界传奇龙魂获得
+    InBuyFund                   = 149, //购买基金获得
 };
 
 enum MoneyType
@@ -212,6 +221,7 @@ enum MailItemType
 	DismissXingchen,
     NewHeroIslandAward,
     ArenaAward,
+    BuChangMarry,
 };
 enum ItemFrom
 {
@@ -281,6 +291,7 @@ enum ItemFrom
     FromQiShiBan = 64, //七石斗法
     FromServerWarJijian = 65, //仙界传奇祭剑宝箱
     FromQTAward = 66, //QT奖励
+    FromBuyFundAward = 67, //购买基金奖励
     //80 ~ 100，繁体占用
 };
 

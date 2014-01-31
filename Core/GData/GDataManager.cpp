@@ -38,6 +38,8 @@
 #include "JiguanData.h"
 #include "HunPoData.h"
 #include "TeamArenaSkill.h"
+#include "SevenSoul.h"
+#include "RideConfig.h"
 
 namespace GData
 {
@@ -46,6 +48,7 @@ namespace GData
 	ObjectMapT<GObject::ItemWeapon> npcWeapons;
 	std::vector<ItemGemType *> gemTypes(1000);
 	std::vector<ItemGemType *> petGemTypes(1000);
+	std::vector<ItemGemType *> mountTypes(400);
 	ItemEquipSetTypeManager	itemEquipSetTypeManager;
     std::map<UInt16, UInt16> skill2item;
 
@@ -384,6 +387,29 @@ namespace GData
         if (!LoadTeamArenaInspireConfig())
         {
             fprintf (stderr, "Load LoadTeamArenaInspireConfig Error !\n");
+            std::abort();
+        }
+#if 0
+        if (!LoadPetSevenSoulLevel())
+        {
+            fprintf (stderr, "LoadPetSevenSoulLevel Error !\n");
+            std::abort();
+        }
+
+        if (!LoadPetSevenSoulUpgrade())
+        {
+            fprintf (stderr, "LoadPetSevenSoulUpgrade Error !\n");
+            std::abort();
+        }
+#endif
+        if (!LoadRideConfig())
+        {
+            fprintf (stderr, "Load LoadRideConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadRideUpgradeConfig())
+        {
+            fprintf (stderr, "Load LoadRideUpgradeConfig Error !\n");
             std::abort();
         }
 
@@ -753,6 +779,14 @@ namespace GData
                     if(idt.reqLev > 0 && idt.reqLev <= 20)
                         m_petGems[idt.reqLev - 1].push_back(idt.typeId);
 				}
+				break;
+            case Item_Mount:
+            case Item_MountChip:
+				{
+					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
+					wt = igt;
+					mountTypes[wt->getId() - LMOUNT_ID] = igt;
+                }
 				break;
             case Item_PetEquip:
             case Item_PetEquip1:
@@ -2641,6 +2675,39 @@ namespace GData
         return true;
     }
 
+    bool GDataManager::LoadRideConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBRideConfig dbrc;
+		if(execu->Prepare("SELECT `id`, `name`, `itemId`, `chips`, `propId` FROM `ride`", dbrc) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbrc.id > 0)
+                ride.setRideTable(dbrc);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadRideUpgradeConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBRideUpgradeCfg dbruc;
+		if(execu->Prepare("SELECT `level`, `name`, `lvLimit`, `singleCost`, `lvExp`, `rate` FROM `ride_upgrade`", dbruc) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            ride.setRideUpgradeTable(dbruc);
+        }
+        return true;
+    }
+
     UInt32 GDataManager::getMaxStrengthenVal(UInt16 id, UInt8 clvl)
     {
         std::map<UInt16, std::vector<UInt32> >::iterator i = m_skillstrengthexp.find(id);
@@ -2660,6 +2727,32 @@ namespace GData
                 return i->second[clvl];
         }
         return 0;
+    }
+
+    bool GDataManager::LoadPetSevenSoulLevel()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBPetSevenSoulLevel dbvalue;
+		if(execu->Prepare("SELECT `soullevel`, `needsoulnum`, `skilllevel` FROM `pet_sevensoullevel`", dbvalue) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            sevenSoul.loadSevenSoulLevel(dbvalue.soullevel, dbvalue.needsoulnum, dbvalue.skilllevel);
+
+		return true;
+	}
+
+    bool GDataManager::LoadPetSevenSoulUpgrade()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBPetSevenSoulUpgrade dbvalue;
+		if(execu->Prepare("SELECT `pettype`, `soulid`, `skillstr`, `condionvalue` FROM `pet_sevensoulupgrade`", dbvalue) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            sevenSoul.loadSevenSoulUpgrade(dbvalue.pettype, dbvalue.soulid, dbvalue.skillstr, dbvalue.condionvalue);
+
+		return true;
     }
 }
 

@@ -20,6 +20,7 @@
 #include "GObject/Map.h"
 #include "GObject/MapCollection.h"
 #include "GObject/MapObject.h"
+#include "GObject/MarryBoard.h"
 #include "GObject/MOAction.h"
 #include "GObject/Package.h"
 #include "GObject/PetPackage.h"
@@ -68,6 +69,9 @@
 #include "GObject/RechargeTmpl.h"
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
+#include "GObject/Marry.h"
+#include "GObject/Married.h"
+#include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
 
 struct NullReq
@@ -285,13 +289,6 @@ struct CityTransportReq
 	UInt8 flag;
 
 	MESSAGE_DEF2(REQ::MAP_TRANSPORT, UInt16, _locid, UInt8, flag);
-};
-
-struct DungeonOpReq
-{
-	UInt8 op;
-	UInt8 type;
-	MESSAGE_DEF2(REQ::BABEL_JOIN, UInt8, op, UInt8, type);
 };
 
 struct DungeonInfoReq
@@ -783,7 +780,7 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
         sprintf(str, "F_130808_1_%u", price);
         pl->udpLog("wupinhuigou", str, "", "", "", "", "act");
 	}
-    if(canDestroyNum > 0)
+    if(price > 0 && canDestroyNum > 0)
     {
 		SYSMSG_SEND(116, pl);
 		SYSMSG_SEND(1016, pl);
@@ -817,8 +814,8 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 		bool  bindType = *reinterpret_cast<const bool*>(data+offset+4);
 		UInt16 itemNum = *reinterpret_cast<const UInt16*>(data+offset+4+1);
 		offset += 7;
-        pl->addItem(itemId, itemNum, bindType);
-        if(World::canDestory(itemId))
+        bool res = pl->addItem(itemId, itemNum, bindType);
+        if(res && World::canDestory(itemId))
             ++canDestroyNum;
 	}
     if(canDestroyNum > 0)
@@ -1183,6 +1180,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
+    GObject::MarryBoard::instance().sendTodayMarryInfo(pl);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -1318,7 +1316,13 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr1(0x1D3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr1, NULL);
     }
-
+#if 0
+    if (World::getHappyFireTime())
+    {
+        //GameMsgHdr hdr(0x1DB, WORKER_THREAD_WORLD, pl, 0);
+        //GLOBAL().PushMsg(hdr, NULL);
+    }
+#endif
     /*if(World::getQiShiBanTime())
     {
         GameMsgHdr hdr(0x1D6, WORKER_THREAD_WORLD, pl, 0);
@@ -1345,8 +1349,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->getClan()->sendQQOpenid(pl);
     }
-    pl->sendQZoneQQGameAct(1);
-    pl->sendQZoneQQGameAct(2);
+    //pl->sendQZoneQQGameAct(1);
+    //pl->sendQZoneQQGameAct(2);
+    pl->sendQZoneQQGameAct(3);
     pl->sendVipPrivilege();
     pl->svrSt(4);
     pl->sendRP7TreasureInfo(true);
@@ -1396,6 +1401,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
    
     pl->MiLuZhiJiao();
+    pl->QiShiBanState();
+    UInt32 flag = pl->GetVar(VAR_OLDMAN_SCORE_AWARD);
+    if(flag & (1<<8))
+        pl->sendOldManPos(1);
+    pl->sendInteresingInfo();
     if(atoi(pl->getDomain()) == 23)
     {
         if(!pl)
@@ -1409,6 +1419,21 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->sendGuangGunInfo();
     pl->setQTSpecialMark();
+    //通知结婚养成
+    if(pl->GetVar(GObject::VAR_MARRY_STATUS) == 5 || pl->GetVar(GObject::VAR_MARRY_STATUS) == 6)
+    {
+        Stream st1(REP::MARRIEDMGR);
+        st1  << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
+        pl->send(st1);
+        return;
+    }
+    else
+    {
+        Stream st1(REP::MARRIEDMGR);
+        st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0)<< Stream::eos;
+        pl->send(st1);
+        return;
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1455,6 +1480,7 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 br >> itemid >> binding >> name;
                 player->modifyPlayerName(itemid,binding,name);
             }
+            break;
         case 0x21:
             player->getRealSpirit();
             player->sendRealSpirit();
@@ -2531,40 +2557,6 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 
 	pl->moveTo(ctr._locid, true);
 }
-
-/*void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
-{
-	MSG_QUERY_PLAYER(pl);
-	if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
-		return;
-	GObject::Dungeon * dg = GObject::dungeonManager[dor.type];
-	if(dg == NULL)
-		return;
-	Stream st(REP::COPY_JOIN);
-	st << dor.op;
-	UInt8 result = 0;
-	switch(dor.op)
-	{
-	case 0:
-		result = dg->playerEnter(pl,1);
-		break;
-	case 1:
-		result = dg->playerLeave(pl,1);
-		break;
-	case 2:
-		result = dg->playerContinue(pl,0);
-		break;
-	case 3:
-		result = dg->playerBreak(pl,1);
-		break;
-	default:
-		break;
-	}
-    if (result == 4)
-        return;
-	st << result << dor.type << Stream::eos;
-	pl->send(st);
-}*/
 
 void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 {
@@ -5926,8 +5918,6 @@ void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
         cFriend->getLift();
     else if (req._flag == 5)
         cFriend->useTickets(req._idx);
-    else if (req._flag == 6)
-        cFriend->setCFriendSuccess(req._idx);
 }
 
 void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )
@@ -6502,6 +6492,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 4:
                     case 5:
                     case 6:
+                    case 7:
                         jobHunter->OnRequestStart(val);
                         GameAction()->doStrong(player, SthSerachMo, 0, 0);
                         break;
@@ -7182,6 +7173,38 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                 pet->upgradeSH(petId, sanhunId, opt);
             }
             break;
+#if 0
+        case 0x08:  //七魄
+            {
+                if(player->GetLev() < 80)
+                    return;
+                if(opt > 2)
+                    return;
+                UInt32 petId = 0;
+                brd >> petId;
+                FairyPet *pet = player->findFairyPet(petId);
+                if(!pet)
+                    return;
+
+                if(opt == 0)
+                    pet->sendSevenSoul();
+                else if(opt == 1)
+                {
+                    UInt8 sevenSoulIndex = 0;
+                    brd >> sevenSoulIndex;
+                    pet->upgradeSevenSoul(sevenSoulIndex);
+                }
+                else
+                {
+                    UInt8 sevenSoulIndex = 0;
+                    UInt8 skillIndex = 0;
+                    brd >> sevenSoulIndex;
+                    brd >> skillIndex;
+                    pet->switchSevenSoulSkill(sevenSoulIndex, skillIndex);
+                }
+            }
+            break;
+#endif
         default:
             break;
     }
@@ -7415,6 +7438,376 @@ void OnCCBReq( GameMsgHdr& hdr, const void* data )
     }
 }
 
+void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    UInt8 req = 0;
+    brd >> req;
+     
+    if(req == 0)
+        return;
+    UInt8 flag = 0;
+    switch(req)
+    {
+        case 1:
+            {
+                UInt8 status = 0;
+                UInt32 cancel_status = 0;
+                UInt8 obj_status = 0;
+
+                status = player->GetVar(VAR_MARRY_STATUS); 
+                UInt64 obj_playerid =  player->GetMarriageInfo()->lovers;
+                GObject::Player * obj_player = GObject::globalPlayers[obj_playerid];//获得结缘玩家对象
+                std::string lover_name = "";
+                
+                Stream st(REP::MARRYMGR);
+                st << static_cast<UInt8>(1) <<static_cast<UInt8>(status);
+                
+                if(obj_player)
+                {
+                    obj_status = obj_player->GetVar(VAR_MARRY_STATUS); 
+                    cancel_status = obj_player->GetVar(VAR_CANCEL_APPOINTMENT);
+                    lover_name = obj_player->getName();                    
+                    st << static_cast<UInt8>(obj_status) << static_cast<UInt8>(cancel_status) << static_cast<UInt8>(1)  << obj_playerid << lover_name << obj_player->getMainFighter()->getClass() << obj_player->getMainFighter()->getSex() << obj_player->getMainFighter()->getColor()<< static_cast<UInt8>(obj_player->GetMarriageInfo()->eLove) << obj_player->GetMarriageInfo()->pronouncement;
+                    GObject::gMarryMgr.sendWhoisMarrybuyer(player,obj_player);
+                }
+                else
+                    st << static_cast<UInt8>(0) << static_cast<UInt8>(0)<< static_cast<UInt8>(0);
+                st << static_cast<UInt8>(player->GetMarriageInfo()->eLove) << player->GetMarriageInfo()->pronouncement;
+                
+                if(player->GetMarriageInfo()->yuyueTime == 0 && static_cast<UInt8>(player->GetMarriageInfo()->eWedding) == WEDDING_NULL)
+                {
+                    if(obj_player)
+                        st << obj_player->GetMarriageInfo()->yuyueTime << static_cast<UInt8>(obj_player->GetMarriageInfo()->eWedding) << Stream::eos;
+                    else
+                        st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << Stream::eos;
+                }
+                else
+                    st << player->GetMarriageInfo()->yuyueTime << static_cast<UInt8>(player->GetMarriageInfo()->eWedding) << Stream::eos;
+
+
+
+                player->send(st);
+                GObject::gMarryMgr.sendyuyueList(player,obj_player);
+                GObject::gMarryMgr.sendMarriageTimeOut(player,obj_player);
+            }
+            break;
+
+        case 2:
+            break;
+        
+        case 3:
+            {
+                UInt8 b_loverToken = 0;
+                string str_pronouncement = "";
+                UInt8 ret = 1;//操作返回值
+                UInt64 obj_playerid = 0;
+                UInt8 flag1 = 0;//修改征婚信息标志位 
+                UInt8 result = 1;
+                brd >> flag;            
+                MarriageInfo* sMarriage = new MarriageInfo();
+                Stream st(REP::MARRYMGR);
+                switch(flag)
+                {
+                    case 0:
+                        brd >> b_loverToken >> str_pronouncement;  
+                        sMarriage->pronouncement = str_pronouncement;
+                        sMarriage->eLove = static_cast<ELoveToken>(b_loverToken);
+                        ret = GObject::gMarryMgr.StartMarriage(player,sMarriage); 
+                        if(ret == 2)
+                        {
+                            obj_playerid = player->GetMarriageInfo()->lovers;
+                            result = GObject::gMarryMgr.CancelReplayMarriage(player,obj_playerid);
+                            if(result == 0)
+                                ret = GObject::gMarryMgr.StartMarriage(player,sMarriage); 
+                                
+                        }
+                        break;
+                    case 2:
+                        brd >> flag1;
+                        if(flag1 == 0 || flag1 == 2)
+                            brd >> b_loverToken; 
+                        if(flag1 == 1 || flag1 == 2)
+                            brd >> str_pronouncement; 
+                        sMarriage->pronouncement = str_pronouncement;
+                        sMarriage->eLove = static_cast<ELoveToken>(b_loverToken);
+                        ret = GObject::gMarryMgr.ModifyMarriageInfo(player,sMarriage,flag1); 
+                        break;
+                    case 4:
+                        ret = GObject::gMarryMgr.doCancelMarriage(player); 
+                        break;
+                    case 6:
+                        brd >> obj_playerid >> b_loverToken; 
+                        sMarriage->eLove = static_cast<ELoveToken>(b_loverToken);
+                        if(player->GetVar(VAR_MARRY_STATUS) == 1)
+                        {
+                            result = GObject::gMarryMgr.doCancelMarriage(player);
+                            if(result != 0)
+                            {
+                                ret = 1;
+                                break;
+                            }
+                            Stream st3(REP::MARRYMGR);
+                            string str_null = "";
+                            st3 << static_cast<UInt8>(3) << static_cast<UInt8>(0) << str_null << Stream::eos;
+                            player->send(st3); 
+                        }
+                        ret = GObject::gMarryMgr.ReplyMarriage(player,sMarriage,obj_playerid);
+                        if(ret == 2)
+                        {
+                            GObject::Player * obj_player = GObject::globalPlayers[obj_playerid];//获得结缘玩家对象
+                            ret = GObject::gMarryMgr.doCancelMarriage(obj_player,1);
+                            flag = 4;
+                        }
+                            
+                        break;
+                    case 7:
+                        obj_playerid = player->GetMarriageInfo()->lovers;
+                        ret = GObject::gMarryMgr.CancelReplayMarriage(player,obj_playerid); 
+                        if(ret == 2)
+                        {
+                            GObject::Player * obj_player = GObject::globalPlayers[obj_playerid];//获得结缘玩家对象
+                            ret = GObject::gMarryMgr.doCancelMarriage(obj_player,1);
+                            flag = 4;
+                        }
+                        break;
+                    case 8:
+                        brd >> obj_playerid; 
+                        ret = GObject::gMarryMgr.JieYuan(player,obj_playerid); 
+                        if(ret == 2)
+                        {
+                            ret = GObject::gMarryMgr.doCancelMarriage(player,1);
+                            flag = 4;
+                        }
+                        break;
+                    default:
+                        ret = 0xFE;
+                        break;
+                }
+                
+                if(ret == 0)
+                {
+                    Stream st(REP::MARRYMGR);
+                    if(flag == 0 || flag == 2 || flag ==4)
+                        st << static_cast<UInt8>(7) << static_cast<UInt8>(player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << Stream::eos ;
+                    else if(flag == 6 || flag == 7 || flag == 8)
+                        {
+                            GObject::Player * obj_player = GObject::globalPlayers[obj_playerid];
+                            st << static_cast<UInt8>(7) << static_cast<UInt8>(player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(obj_player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(obj_player->GetVar(VAR_CANCEL_APPOINTMENT)) << Stream::eos ;
+                            
+                            Stream st1(REP::MARRYMGR);
+                            st1 << static_cast<UInt8>(7) << static_cast<UInt8>(obj_player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(player->GetVar(VAR_CANCEL_APPOINTMENT)) << Stream::eos ;
+                            obj_player->send(st1);
+                        } 
+                    player->send(st);
+
+                }
+                break;
+            }
+
+        case 4:
+            {
+                brd >> flag;
+                UInt8 ret = 0;
+                UInt64 obj_playerid = player->GetMarriageInfo()->lovers;
+                switch(flag)
+                {
+                    case 0:
+                        ret = GObject::gMarryMgr.DivorceMarry(player,0); 
+                        break;
+                    case 1:
+                        ret = GObject::gMarryMgr.DivorceMarry(player,1); 
+                        break;
+                    case 2:
+                        ret = GObject::gMarryMgr.DivorceMarry(player,2); 
+                        break;
+                    case 3:
+                        ret = GObject::gMarryMgr.DivorceMarry(player,3); 
+                        break;
+                    case 4:
+                        ret = GObject::gMarryMgr.DivorceMarry(player,4); 
+                        break;
+                    default:
+                        ret = 0xFE;
+                        Stream st(REP::MARRYMGR);
+                        st << ret << Stream::eos;
+                        break;
+                }
+                if(ret == 0)
+                {
+                    GObject::Player * obj_player = GObject::globalPlayers[obj_playerid];
+                    Stream st(REP::MARRYMGR);
+                    st << static_cast<UInt8>(7) << static_cast<UInt8>(player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(obj_player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(obj_player->GetVar(VAR_CANCEL_APPOINTMENT)) << Stream::eos ;
+                    player->send(st);
+                
+                    Stream st1(REP::MARRYMGR);
+                    st1 << static_cast<UInt8>(7) << static_cast<UInt8>(obj_player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(player->GetVar(VAR_CANCEL_APPOINTMENT)) << Stream::eos ;
+                    obj_player->send(st1);
+                }
+
+
+                break;
+            }
+
+        case 5:
+            {
+                UInt16 idx;
+                brd >> flag >> idx;
+                switch(flag)
+                {
+                    case 0:
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
+                        break;
+                    case 1:
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
+                        break;
+                    case 2:
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
+                        break;
+                    default:
+                        Stream st(REP::MARRYMGR);
+                        UInt8 ret = 0xFE;
+                        st << ret << Stream::eos;
+                        player->send(st);
+                        break;
+                }
+                
+                break;
+            }
+        case 6:
+            {
+                brd >> flag;
+                MarriageInfo* sMarriage = new MarriageInfo();
+                UInt8 ret = 1;
+                UInt8 type;
+                UInt64 obj_playerid = player->GetMarriageInfo()->lovers;
+                switch(flag)
+                {
+                    case 1:
+                        {
+                            UInt32 time;
+                            brd >> type >> time; 
+                            sMarriage->yuyueTime = time;
+                            sMarriage->eWedding = static_cast<EWedding>(type);
+                            ret = GObject::gMarryMgr.ReqWeddingAppointMent(player,sMarriage); 
+                            break; 
+                        }
+                    case 2:
+                        {
+                            ret = GObject::gMarryMgr.doCancelAppointMent(player);
+                            break; 
+                        }
+                    case 3:
+                        {
+                            brd >> type;
+                            if(type == 0)
+                                ret = GObject::gMarryMgr.CancelReqWeddingAppointMent(player);
+                            else
+                            {
+                                ret = GObject::gMarryMgr.ConfirmReqWeddingAppointMent(player);
+                                if(ret == 2)
+                                    ret = GObject::gMarryMgr.CancelReqWeddingAppointMent(player);
+                            }
+                            break; 
+                        }
+                    case 4:
+                        break; 
+                    default:
+
+                        break;
+                }
+                if(ret == 0)
+                {
+                    Stream st(REP::MARRYMGR);
+                    GObject::Player * obj_player = GObject::globalPlayers[obj_playerid];
+                    st << static_cast<UInt8>(7) << static_cast<UInt8>(player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(obj_player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(obj_player->GetVar(VAR_CANCEL_APPOINTMENT)) << Stream::eos ;
+                    player->send(st);
+                    
+                    Stream st1(REP::MARRYMGR);
+                    st1 << static_cast<UInt8>(7) << static_cast<UInt8>(obj_player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(player->GetVar(VAR_MARRY_STATUS)) << static_cast<UInt8>(player->GetVar(VAR_CANCEL_APPOINTMENT)) << Stream::eos ;
+                    obj_player->send(st1);
+                }
+
+                break;
+            }
+        case 8:
+            {
+                UInt64 obj_playerid;
+                UInt16 serverNo; 
+                brd >> obj_playerid;
+                GObject::Player * obj_player = GObject::globalPlayers[obj_playerid];
+                if(obj_player == NULL)
+                    break; 
+                if(cfg.merged && obj_playerid >= 0x1000000000000ull)
+                    serverNo = obj_player->getServerNo();
+                else
+                    serverNo = cfg.serverNo;
+
+                Stream st(REP::MARRYMGR);
+                st << static_cast<UInt8>(8) <<obj_playerid << obj_player->getName() << obj_player->getMainFighter()->getLevel()  << obj_player->getMainFighter()->getColor() <<  obj_player->getMainFighter()->getClass()  << obj_player->getMainFighter()->getSex() << serverNo << obj_player->getCountry() << obj_player->getClanName() << obj_player->getBattlePoint() << GObject::gAthleticsRank.getAthleticsRank(obj_player) << static_cast<UInt8>(obj_player->GetMarriageInfo()->eLove) << obj_player->GetMarriageInfo()->pronouncement << obj_player->getLineupCount() ;
+                for(int i = 0; i < obj_player->getLineupCount(); ++ i)
+                {
+                    if(obj_player->getLineup(i).fighter == NULL)
+                        continue;
+                    st << obj_player->getLineup(i).fighter->getName() << obj_player->getLineup(i).fighter->getLevel() << obj_player->getLineup(i).fighter->getColor();
+                }
+                if(!obj_player->getBattlePet())
+                    st << static_cast<UInt8>(0);
+                else
+                    st << static_cast<UInt8>(1) << obj_player->getBattlePet()->getName() << obj_player->getBattlePet()->getLevel() << obj_player->getBattlePet()->getColor(); 
+
+                st << Stream::eos ;
+                player->send(st);
+            }    
+            brd >> flag;
+            break;
+        default:
+            break;
+    }
+
+}
+
+void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    
+    UInt8 req = 0;
+    brd >> req;
+    /*
+    switch(req)
+    {
+        case 2:
+            gMarriedMgr.ReturnFirstStatus(player);
+            break;
+        case 3:
+            
+            break;
+        case 4:
+
+            break;
+        case 5:
+
+            break;
+        case 6:
+
+            break;
+        case 7:
+
+            break;
+        case 8:
+
+            break;
+        default:
+
+            break;
+    }*/
+
+
+}
+
 void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -7447,6 +7840,29 @@ void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
             clan->getSpiritTreeAward(player, idx);
         }
         break;
+    }
+}
+
+void OnPlayerMountReq( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(player->GetLev() < 75)
+        return;
+
+    UInt8 type = 0;
+    brd >> type;
+    switch(type)
+    {
+        case 0x00:
+            player->sendMountInfo();
+            break;
+        case 0x01:
+            player->upgradeMount(false);
+            break;
+        case 0x02:
+            player->upgradeMount(true);
+            break;
     }
 }
 
@@ -7597,11 +8013,140 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
             }
         }
         break;
+    case 0x26:
+        {
+            if(!World::getOldManTime())
+                return ;
+            brd >>op ;
+            switch(op)
+            {
+                case 1:
+                    {
+                        UInt8 idx = 0;
+                        brd >> idx ;
+                        if(idx == 0)
+                            player->sendOldManPos();
+                        player->sendOldManLeftTime();
+                        break;
+                    }
+                case 2:
+                    UInt8 idx =0 ;
+                    brd >> idx ;
+                    switch(idx)
+                    {
+                        case 1:
+                            {
+                                UInt8 index = 0 ;
+                                brd >> index ;
+                                player->getInterestingAward(index); 
+                            }
+                            break;
+                        case 2:
+                            std::string name ;
+                            brd >>name ;
+                            GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
+                            if(pl==NULL)
+                                break;
+                            player->sendInterestingBag(pl);
+                            break ;
+                    }
+                    player->sendInteresingInfo();
+                    break;
+            }
+        }
+        break;
+    case 0x28:
+        {
+            brd >> op;
+            switch(op)
+            {
+            case 0x00:
+                {
+                    UInt8 type = 0;
+                    brd >> type;
+                    player->getBuyFundInfo(type);
+                }
+                break;
+            case 0x01:
+                {
+                    if(!World::getBuyFundAct())
+                        return;
+
+                    if(!player->hasChecked())
+                        return;
+
+                    UInt16 num = 0;
+                    brd >> num;
+                    player->buyFund(num);
+                }
+                break;
+            case 0x02:
+                {
+                    UInt8 type = 0;
+                    brd >> type;
+                    player->getBuyFundAward(type);
+                }
+                break;
+            }
+        }
     default:
         break;
     }
 }
+void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    /*
+	if(!player->hasChecked())
+		return;
+    */
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
 
+    brd >> type;
+    UInt8 mType = GObject::MarryBoard::instance()._type;
+    switch(type)
+    {
+        case 0x03:
+            {
+                if(mType == 0)
+                    return;
+                if(!player->giveFlower(0))
+                    break; 
+                GObject::MarryBoard::instance()._lively += 100;
+                GObject::MarryBoard::instance()._YHlively += 100;
+                player->AddVar(VAR_MARRYBOARD_YANHUA,100);
+                std::string text;
+                brd >> text;
+                Stream st(REP::CHAT);
+                UInt8 office = player->getTitle();
+                UInt8 guard = player->getPF();
+                st << static_cast<UInt8>(11)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
+                    << office << guard << text.c_str()<< player->GetLev() << Stream::eos;
+                NETWORK()->Broadcast(st);
+            }
+            break;
+        case 0x04:
+            {
+                UInt32 baiHe = player->GetVar(VAR_MARRYBOARD_BAIHE);
+                if(mType == 0)
+                    return;
+                UInt8 num = 0;
+                brd >> num ;
+                if(num == 0)
+                    break;
+                if( (baiHe + num) > 50)
+                    return ;
+                if(num > 99)
+                    num = 99;
+                if(!player->giveFlower(1,num))
+                    break; 
+                player->AddVar(VAR_MARRYBOARD_BAIHE,num);
+                GObject::MarryBoard::instance()._lively += 5*num;
+                SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
+            }
+    }
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

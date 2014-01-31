@@ -104,6 +104,8 @@ void WorldScript::init()
 	def("setShuoShuo", GObject::World::setShuoShuo);
 	def("getCFriend", GObject::World::getCFriend);
 	def("setCFriend", GObject::World::setCFriend);
+	def("getCFriendAct", GObject::World::getCFriendAct);
+	def("setCFriendAct", GObject::World::setCFriendAct);
 	def("getMayDay", GObject::World::getMayDay);
 	def("setMayDay", GObject::World::setMayDay);
 	def("getMayDay1", GObject::World::getMayDay1);
@@ -169,6 +171,7 @@ void WorldScript::init()
     def("setCollectCardAct", GObject::World::setCollectCardAct);
     def("setHalloweenAct", GObject::World::setHalloweenAct);
     def("setMiLuZhiJiaoAct", GObject::World::setMiLuZhiJiaoAct);
+    def("setBuyFundAct", GObject::World::setBuyFundAct);
     
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);
@@ -241,6 +244,7 @@ void WorldScript::init()
 	def("setSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
     def("setFoolBao",GObject::World::setFoolBao);
     def("getFoolBao",GObject::World::getFoolBao);
+    def("getHappyFireTime",GObject::World::getHappyFireTime);
     def("setSummerFlow3Time",GObject::World::setSummerFlow3Time);
     def("getSummerFlow3Time",GObject::World::getSummerFlow3Time);
     def("setHalfGold",GObject::World::setHalfGold);

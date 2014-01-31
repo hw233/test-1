@@ -16,7 +16,7 @@ namespace GObject
 
 TeamCopy* teamCopyManager = new TeamCopy();
 
-const UInt8 TeamCopy::lvls[TEAMCOPY_MAXCOPYCNT] = {30, 45, 60, 70, 80, 90, 100, 110, 120};
+const UInt8 TeamCopy::lvls[TEAMCOPY_MAXCOPYCNT] = {30, 45, 60, 70, 80, 90, 100, 110, 120, 130};
 const UInt8 TeamCopyPlayerInfo::_needRoll = 1;
 const UInt8 TeamCopyPlayerInfo::_hasRoll = 2;
 std::vector<TeamCopyAwards> TeamCopyPlayerInfo::_awards[TEAMCOPY_MAXCOPYCNT];
@@ -836,7 +836,7 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
 
         member->PutFighters( bsim, 0 );
         if(memIdx != 0)
-            bsim.switchPlayer( member, 0 );
+            bsim.switchPlayer( member, 0 );     
 
         for(UInt8 mIdx = memIdx + 1; mIdx < td->count; ++mIdx)
         {
@@ -873,7 +873,7 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
                 bsim.start(res);
 
             turns += bsim.getTurns();
-            res = bsim.getWinner();
+            res = bsim.getWinner();    // 1表示攻防胜利(右下角)，2表示守方胜利(左上角)
             if( 2 == res )
             {
                 break;

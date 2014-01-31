@@ -152,6 +152,7 @@ namespace Script
 		lua_tinker::def(_L, "getAutoBattleAct", GObject::World::getAutoBattleAct);
 		lua_tinker::def(_L, "getSnakeSpringEquipAct", GObject::World::setSnakeSpringEquipAct);
 		lua_tinker::def(_L, "getFoolBao", GObject::World::getFoolBao);
+		lua_tinker::def(_L, "getHappyFireTime", GObject::World::getHappyFireTime);
 		lua_tinker::def(_L, "getHalfGold", GObject::World::getHalfGold);
 		lua_tinker::def(_L, "getSurnameLegend", GObject::World::getSurnameLegend);
 		lua_tinker::def(_L, "getOpenTime", GObject::World::getOpenTime);
@@ -318,6 +319,7 @@ namespace Script
         CLASS_DEF(Player, SetVipPrivilege);
         CLASS_DEF(Player, sendVipPrivilege);
         CLASS_DEF(Player, sendLuckyBagInfo);
+        CLASS_DEF(Player, sendHappyValueInfo);
 		CLASS_DEF(Player, LuckyBagRank);
 		CLASS_DEF(Player, findFairyPet);
 		CLASS_DEF(Player, updateCuilianTimes);
@@ -326,6 +328,10 @@ namespace Script
         CLASS_DEF(Player, in7DayFromCreated);
         CLASS_DEF(Player, GetMoFang);
         CLASS_DEF(Player, addClanProfferFromItem);
+        CLASS_DEF(Player, AddYearHappyValue);
+        CLASS_DEF(Player, hasMountChip);
+        CLASS_DEF(Player, addMountChip);
+        CLASS_DEF(Player, addMountFromItem);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);
@@ -1410,6 +1416,21 @@ namespace Script
         assert(player != NULL);
         return Call<bool>("RunQZoneRechargeAward", player, val);
     }
+    bool GameActionLua::RunInterestingAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunInterestingAward", player, val);
+    }
+    bool GameActionLua::RunInterestingBag(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunInterestingBag", player, val);
+    }
+    bool GameActionLua::RunHappyValueAward(Player* player, UInt8 val)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunHappyValueAward", player, val);
+    }
     bool GameActionLua::RunLuckyMeetRechargeAward(Player* player, UInt8 val)
     {
         assert(player != NULL);
@@ -1754,6 +1775,10 @@ namespace Script
     UInt8 GameActionLua::getAnswerInFoolsDay(UInt8 qid, UInt8 type)
     {
 		return Call<UInt8>("getAnswerInFoolsDay", qid, type);
+    }
+    UInt8 GameActionLua::getAnswerInMarryBoard(UInt8 id)
+    {
+		return Call<UInt8>("getAnswerInMarryBoard", id);
     }
 
     void GameActionLua::getAwardInFoolsDay(Player* player, UInt8 startId, UInt8 endId)

@@ -594,6 +594,7 @@ UInt16 Map::GetRandomSpot(UInt8 type)
         if((it->second).m_Type == type)
             ++ count;
     }
+  
     UInt16 index = uRand(count);
     count = 0;
     for (it = m_Spots.begin(); it != m_Spots.end(); ++ it)
