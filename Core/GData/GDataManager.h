@@ -82,6 +82,7 @@ namespace GData
         static bool LoadRideConfig();
         static bool LoadRideUpgradeConfig();
         static bool LoadCoupleInfo();
+        static bool LoadCoupleCopy();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);

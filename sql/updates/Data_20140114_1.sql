@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS `coupleinfo`;
 CREATE TABLE `coupleinfo` (
     `level` tinyint(3) unsigned NOT NULL,
     `levelExp` int(10) NOT NULL ,
