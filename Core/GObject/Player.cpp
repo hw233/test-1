@@ -11744,6 +11744,18 @@ namespace GObject
         }
     }
 
+    void Player::GMSetQTNUM(UInt8 num)
+    {
+        SetVar(VAR_QT_REGIST_NUM, num);
+        SetVar(VAR_QT_AWARD_MARK, 0);
+
+        UInt32 state = GetVar(VAR_QT_AWARD_MARK);
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(35);
+        st << static_cast<UInt8>(state) << Stream::eos;
+        send(st);
+        
+    }
     void Player::setQTSpecialMark()
     {
         UInt32 day = 0;
@@ -11786,14 +11798,20 @@ namespace GObject
             bool res = false;
             UInt8 regNum = GetVar(VAR_QT_REGIST_NUM);
             if(1 == opt)
+            {
                 if(regNum >= 1)
                     res = true;
-            if(5 == opt)
+            }
+            else if(5 == opt)
+            {
                 if(regNum >= 25)
                     res = true;
+            }
             else
+            {
                 if(regNum >= ((opt - 1) * 5))
                     res = true;
+            }
 
             UInt8 mark = GET_BIT(state, (opt-1));
             if(mark == 0 && res)
