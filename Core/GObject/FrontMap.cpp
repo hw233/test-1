@@ -279,6 +279,8 @@ UInt8 FrontMap::getCount(Player* pl)
     if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, frontUpdate)) ||
             getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, frontGoldCnt) ||
             getFreeCount() < PLAYER_DATA(pl, frontFreeCnt)) {
+        if(World::getJiqirenAct())
+            pl->handleJiqirenAct_frontMap();
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
         PLAYER_DATA(pl, frontFreeCnt) = 0;
         PLAYER_DATA(pl, frontGoldCnt) = 0;
@@ -771,40 +773,6 @@ void FrontMap::sendAutoFrontMap(Player* pl)
     Stream st(REP::AUTO_FRONTMAP);
     st << static_cast<UInt8>(0) << id << nspot << Stream::eos;
     pl->send(st);
-}
-
-void FrontMap::handleJiqirenAct(Player * pl)
-{
-    if(!pl) return;
-    int front = pl->GetVar(VAR_JIQIREN_FRONTMAP);
-    int goldCnt = getGoldCount(pl->getVipLevel()) - PLAYER_DATA(pl, frontGoldCnt);
-    int freeCnt = getFreeCount() - PLAYER_DATA(pl, frontFreeCnt);
-    UInt8 fcnt = GET_BIT_8(front, 0);
-    UInt8 gcnt1 = GET_BIT_8(front, 1);
-    UInt8 gcnt2 = GET_BIT_8(front, 2);
-    UInt8 gcnt3 = GET_BIT_8(front, 3);
-    if(goldCnt == 3)
-    {
-        gcnt1 += 1;
-        gcnt2 += 1;
-        gcnt3 += 1;
-    }
-    else if(goldCnt == 2)
-    {
-        gcnt2 += 1;
-        gcnt3 += 1;
-    }
-    else if(goldCnt == 1)
-    {
-        gcnt3 += 1;
-    }
-    if(freeCnt > 0)
-        fcnt += freeCnt;
-    front = SET_BIT_8(front, 0, fcnt);
-    front = SET_BIT_8(front, 1, gcnt1);
-    front = SET_BIT_8(front, 2, gcnt2);
-    front = SET_BIT_8(front, 3, gcnt3);
-    pl->SetVar(VAR_JIQIREN_FRONTMAP, front);
 }
 
 } // namespace GObject

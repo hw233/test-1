@@ -179,13 +179,15 @@ int mrecv(int fd, void* buf, int size, int flag)
 
 int read_jason_req(int fd, char* buf)
 {
-    int read_len1 = mrecv( fd, buf, 5, 0);
+    int read_len1 = recv( fd, buf, 5, 0);
     if(read_len1 != 5)
         return 0;
     unsigned short len = *(unsigned short*)buf;
     if(len <= 0)
         return 0;
-    int read_len2 = mrecv( fd, buf+5, len, 0 );
+    if (len >= 16*1024-6)
+        return 0;
+    int read_len2 = recv( fd, buf+5, len, 0 );
     if(read_len2 != len)
         return 0;
 
@@ -194,13 +196,13 @@ int read_jason_req(int fd, char* buf)
 
 int read_jason_rep(int fd, char* buf)
 {
-    int read_len1 = mrecv( fd, buf, 4, 0);
+    int read_len1 = recv( fd, buf, 4, 0);
     if(read_len1 != 4)
         return 0;
     unsigned short len = *(unsigned short*)buf;
     if(len <= 0)
         return 0;
-    int read_len2 = mrecv( fd, buf+4, len, 0 );
+    int read_len2 = recv( fd, buf+4, len, 0 );
     if(read_len2 != len)
         return 0;
 
@@ -315,7 +317,7 @@ int main()
             g_log->OutTrace("RECV: %s\n", buf);
 
             int sd = 0;
-            if( (sd = msend( asss_conn, buf, len, 0 )) < 0)
+            if( (sd = send( asss_conn, buf, len, 0 )) < 0)
             {
                 CLOSE(new_fd);
                 CLOSE(asss_conn);
@@ -331,7 +333,7 @@ int main()
                 break;
             }
 
-            int cnt = msend( new_fd, buf, len, 0 );
+            int cnt = send( new_fd, buf, len, 0 );
             if( cnt <= 0 )
             {
                 CLOSE(new_fd);

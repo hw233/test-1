@@ -8434,7 +8434,7 @@ function onRoamingQueqiao(player, pos)
         {{9450, 1, 10}, {9450, 1, 10}, {9450, 1, 10}},
         {{503, 1, 30}, {514, 1, 30}, {501, 1, 30}},
         {{509, 1, 40}, {134, 1, 40}, {1325, 1, 40}},
-        {{1663, 1, 50}, {1664, 1, 50}, {1665, 1, 50}},
+        {{1663, 1, 50}, {1664, 1, 50}, {1665, 1, 50}, {1666, 1, 50}},
     }
 
     step = math.random(1, 3)
@@ -8445,7 +8445,7 @@ function onRoamingQueqiao(player, pos)
 
     local package = player:GetPackage()
     i = roamPlace[pos2]
-    j = math.random(1, 3)
+    j = math.random(1, #eventItem[i])
 
     package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
     player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
@@ -9780,7 +9780,7 @@ function GetSpreadCountForAward(serverNo)
 end
 
 function GetSpreadAward()
-    local award = {{515,1}, {1325,2}, {1126,2}, {134,1}, {509,1}}
+    local award = {{515,2}, {1325,2}, {1126,2}, {134,2}, {509,2}}
     return award
 end
 
