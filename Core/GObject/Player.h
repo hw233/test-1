@@ -1845,6 +1845,7 @@ namespace GObject
         bool _qixiBinding;
         QiShiBanInfo m_qishiban;
     public:
+		inline bool isFriend(Player *pl) const { return _hasFriend(0, pl); }
         inline bool isJumpingMap() { return _isJumpingMap; }
         inline void setJumpingMap(bool v) { _isJumpingMap = v; }
         bool in7DayFromCreated();
