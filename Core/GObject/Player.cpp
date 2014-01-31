@@ -11754,9 +11754,15 @@ namespace GObject
         SetVar(VAR_QT_AWARD_MARK, 0);
 
         UInt32 state = GetVar(VAR_QT_AWARD_MARK);
+        UInt32 regState = GetVar(VAR_QT_REGIST_MARK);
+        for(UInt8 pos=0; pos<num; pos++)
+        {
+            regState = SET_BIT(regState, pos);
+        }
+        SetVar(VAR_QT_REGIST_MARK, regState);
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(35);
-        st << static_cast<UInt8>(state) << Stream::eos;
+        st << static_cast<UInt8>(state) << regState << Stream::eos;
         send(st);
         
     }
@@ -11767,23 +11773,32 @@ namespace GObject
         UInt32 year = 0;
         TimeUtil::GetDMY(&day, &mon, &year);
         if(year != 2013 || mon != 12 || day < 13 || day > 31)
+            return;
+        
+        UInt32 specialMark = GetVar(VAR_QT_SPECIAL_MARK);
+        if(0 == specialMark)
         {
-            UInt32 specialMark = GetVar(VAR_QT_SPECIAL_MARK);
-            if(0 == specialMark)
-            {
-                SetVar(VAR_QT_REGIST_NUM, 6);
-                SetVar(VAR_QT_SPECIAL_MARK, 1);
-            }
+            SetVar(VAR_QT_REGIST_NUM, 6);
+            SetVar(VAR_QT_SPECIAL_MARK, 1);
+            SetVar(VAR_QT_REGIST_MARK, 63);
         }
+        
     }
 
     void Player::setQTSign()
     {
-        UInt32 registSign = GetVar(VAR_QT_REGIST_SIGN);
-        if(0 == registSign)
+        //UInt32 registSign = GetVar(VAR_QT_REGIST_SIGN);
+        UInt32 day = 0;
+        UInt32 mon = 0;
+        UInt32 year = 0;
+        TimeUtil::GetDMY(&day, &mon, &year);
+        UInt32 state = GetVar(VAR_QT_REGIST_MARK);
+        UInt8 dayRegistMark = GET_BIT(state, (day-1));
+        if(0 == dayRegistMark)
         {
+            state = SET_BIT(state, (day-1));
+            SetVar(VAR_QT_REGIST_MARK, state);
             AddVar(VAR_QT_REGIST_NUM, 1);
-            SetVar(VAR_QT_REGIST_SIGN, 1);
         }
     }
 
@@ -11859,9 +11874,11 @@ namespace GObject
                 SetVar(VAR_QT_AWARD_MARK, state);
             }
         }
+
+        UInt32 registState = GetVar(VAR_QT_REGIST_MARK);
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(35);
-        st << static_cast<UInt8>(state) << Stream::eos;
+        st << static_cast<UInt8>(state) << registState << Stream::eos;
         send(st);
     }
 

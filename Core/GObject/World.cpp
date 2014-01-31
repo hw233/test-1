@@ -3365,6 +3365,7 @@ void World::SendQiShiBanAward()
             mailPackageManager.push(mail->id, s_item[pos-1], 2, true);
         }
     }
+    World::qishibanScoreSort.clear();
 }
 
 void World::Send11ClanRankAward()

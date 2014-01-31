@@ -4404,12 +4404,12 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_QISHIBANGAME_END, TimeUtil::SharpDayT( 5 , TimeUtil::Now()));
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
-            GObject::globalPlayers.enumerate(player_enum_1, 0);
             break;
         case 12:
             GVAR.SetVar(GObject::GVAR_QISHIBANGAME_BEGIN, 0);
             GVAR.SetVar(GVAR_QISHIBANGAME_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GObject::globalPlayers.enumerate(player_enum_1, 0);
             break;
         case 13:
             GVAR.SetVar(GVAR_QZONEQQGAMEY_BEGIN, TimeUtil::Now());
