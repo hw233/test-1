@@ -41,7 +41,6 @@
 #include "GObject/HeroMemo.h"
 #include "MsgHandler/JsonParser.h"
 #include "GObject/LuckyDraw.h"
-#include "GObject/ClanCopy.h"
 #include "GObject/SingleHeroStage.h"
 #include "GObject/NewCountryBattle.h"
 #include "GObject/Tianjie.h"
@@ -59,6 +58,9 @@
 #include "GObject/Marry.h"
 #include "GObject/Married.h"
 #include "GObject/ArenaServerWar.h"
+
+#include "GObject/ClanBuilding.h"
+
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -309,6 +311,11 @@ GMHandler::GMHandler()
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
     Reg(3, "addpetattr", &GMHandler::OnAddPetAttr);
     Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
+
+    //  帮派建筑相关指令
+    Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
+    Reg(1, "cbop", &GMHandler::OnClanBuildingOp);
+    Reg(3, "cblvl", &GMHandler::OnClanBuildingLevelChange);
 
     _printMsgPlayer = NULL;
 }
@@ -5097,3 +5104,57 @@ void GMHandler::TestSameTimeRecharge(GObject::Player *player, std::vector<std::s
     }
 }
 
+void GMHandler::OnClanBuildingInfo(GObject::Player *player, std::vector<std::string>& args)
+{
+    Clan *clan = player->getClan();
+    if (!clan)
+        return;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    if (!buildingOwner)
+        return;
+    SYSMSG_SENDV(5200, player, player->getName().c_str(), clan->getName().c_str());
+    SYSMSG_SENDV(5201, player, buildingOwner->getEnergy());
+    SYSMSG_SENDV(5202, player,
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingPhyAtk), 
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingMagAtk),
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingAction), 
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingHP));
+}
+
+// TODO: 帮派建筑相关GM操作 
+void GMHandler::OnClanBuildingOp(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    Clan *clan = player->getClan();
+    if (!clan)
+        return;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    if (!buildingOwner)
+        return;
+    UInt8 opType = atoi(args[0].c_str());
+    switch (opType)
+    {
+        case 1:
+            break;
+        case 2:
+            break;
+        default:
+            break;
+    }
+
+}
+
+void GMHandler::OnClanBuildingLevelChange(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    Clan *clan = player->getClan();
+    if (!clan)
+        return;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getBuildingOwner();
+    if (!buildingOwner)
+        return;
+    Int32 iVal = atoi(args[0].c_str());
+    buildingOwner->levelChange(iVal);
+}

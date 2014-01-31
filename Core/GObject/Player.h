@@ -2555,6 +2555,11 @@ namespace GObject
         void  AddStatueExp(UInt32 exp);
         void  SubStatueExp(UInt32 exp);
 
+        float getClanBuildingHPEffect();
+        float getClanBuildingPhyAtkEffect();
+        float getClanBuildingMagAtkEffect();
+        float getClanBuildingActionEffect();
+
         // 所有将互斥法宝
         bool checkTrumpMutually(UInt32 trumpid);
         //先天法宝遵循互斥规则

@@ -23,6 +23,7 @@ class Clan;
 class ClanStatue;
 class ClanCopy;
 struct ClanCopyLog;
+class ClanBuildingOwner;
 
 #define BASE_MEMBER_COUNT 30
 struct AllocItem
@@ -247,6 +248,7 @@ enum CLAN_DONATE_TYPE
     e_donate_type_tael = 1,
     e_donate_type_gold = 2,
 };
+
 
 class Clan:
 	public GObjectBaseT<Clan>
@@ -760,6 +762,8 @@ private:
     UInt8 _urge[3];
 
     ClanSpiritTree m_spiritTree;
+
+    ClanBuildingOwner *_buildingOwner;
 public:
     void raiseSpiritTree(Player* pl, UInt8 type);   // 培养 type(甘露:0 冰晶:1)
     void refreshColorAward();
@@ -775,6 +779,14 @@ public:
     void checkMemberActivePoint(ClanMember* mem);
     void listMembersActivePoint( Player * player );
     UInt32 getMemberActivePoint(ClanMember* mem);
+
+    ClanBuildingOwner* getBuildingOwner();
+    ClanBuildingOwner* getNewBuildOwner();
+    ClanBuildingOwner* getClanBuildingOwner();
+
+    bool loadBuildingsFromDB(UInt32 fairylandEnergy, 
+            UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, 
+            UInt16 updateTime);
 };
 
 typedef GGlobalObjectManagerT<Clan, UInt32> GlobalClans;

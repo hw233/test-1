@@ -241,6 +241,10 @@ private:
     void OnUseItem9440(GObject::Player *player, std::vector<std::string>& args);
     void OnAddPetAttr(GObject::Player *player, std::vector<std::string>& args);
     void TestSameTimeRecharge(GObject::Player *player, std::vector<std::string>& args);
+
+    void OnClanBuildingInfo(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBuildingOp(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBuildingLevelChange(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

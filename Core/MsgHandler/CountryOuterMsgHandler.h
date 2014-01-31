@@ -73,6 +73,7 @@
 #include "GObject/Married.h"
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
+#include "GObject/ClanBuilding.h"
 
 struct NullReq
 {
@@ -4995,7 +4996,7 @@ void OnClanRankBattleSortList(GameMsgHdr& hdr, const void* data)
 
 void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
 {
-    // TODO: 帮派副本系统的请求协议
+    // 帮派副本系统的请求协议
     MSG_QUERY_PLAYER(player);
 
 	GObject::Clan * clan = player->getClan();
@@ -8219,6 +8220,27 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
                 SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
             }
     }
+}
+
+// 仙境遗迹协议请求处理
+void OnClanFairyLandReq(GameMsgHdr& hdr,const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL)
+	{
+		Stream st(REP::CLAN_COPY);
+		st << static_cast<UInt8>(0);
+		st << Stream::eos;
+		player->send(st);
+		return;
+    }
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    GObject::ClanBuildingOwner* buildingOwner = clan->getBuildingOwner();
+    if (buildingOwner)
+        buildingOwner->processFromBrd(player, brd);
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

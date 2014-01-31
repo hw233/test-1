@@ -1500,6 +1500,17 @@ struct DBModifyMount
     UInt64 playerId;
     std::string chips;
 };
+
+struct DBClanBuildings
+{
+    UInt64 clanId;
+    UInt32 fairylandEnergy;
+    UInt16 phyAtkLevel;
+    UInt16 magAtkLevel;
+    UInt16 actionLevel;
+    UInt16 hpLevel;
+    UInt16 updateTime;
+};
 }
 
 namespace DB {
@@ -3399,6 +3410,18 @@ SPECIALDEF(3)
     )
 SPECIALEND()
 
+SPECIALBEGIN (GObject::DBClanBuildings)
+SPECIALDEF(7)
+    (
+    UInt64, clanId,
+    UInt32, fairylandEnergy,
+    UInt16, phyAtkLevel,
+    UInt16, magAtkLevel,
+    UInt16, actionLevel,
+    UInt16, hpLevel,
+    UInt16, updateTime
+    )
+SPECIALEND()
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_
