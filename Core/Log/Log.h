@@ -137,6 +137,8 @@ enum PurchaseType
     TuPoJieXian                 = 126, //星辰图突破界限
     ServerWarConsume            = 127, //仙界传奇消费
     RestStep                    = 1001, //七石板重置
+    RefreshMonster              = 1002, //宠物组队副本刷怪
+    CreateRoom                  = 1003, //宠物组队副本创建房间
     //繁体私有占150～200
 };
 

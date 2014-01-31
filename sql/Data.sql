@@ -1052,5 +1052,14 @@ CREATE TABLE `acupragold` (
   `attrvalue` float(10,4) NOT NULL DEFAULT '0.0000',
   PRIMARY KEY (`id`, `lvl`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+
+DROP TABLE IF EXISTS `petteamcopy`;
+CREATE TABLE `petteamcopy` (
+  `copyIdx` tinyint(3) unsigned NOT NULL,
+  `type` tinyint(3) unsigned NOT NULL,
+  `npcgroupId` int(10) unsigned NOT NULL,
+  `quality` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`npcgroupId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 -- Dump completed
 

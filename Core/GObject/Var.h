@@ -585,13 +585,20 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_QZONE_RECHARGE_AWARD = 644,       //空间充值奖励领取
         
         //660-760 for lijr
-        VAR_CHRISTMAS_PRESENT = 660,    //圣诞礼物——麋鹿之角
-        VAR_QT_AWARD_MARK = 661,        //QT奖励领取
+        VAR_CHRISTMAS_PRESENT = 660,                //圣诞礼物——麋鹿之角
+        VAR_QT_AWARD_MARK = 661,                    //QT奖励领取
         VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE = 662,    //七石板每期最高积分
-        //VAR_QT_REGIST_SIGN = 663,       //QT天签到标志
-        VAR_QT_REGIST_NUM = 664,        //QT月签到次数
-        VAR_QT_SPECIAL_MARK = 665,      //QT记录12月份默认加6天签到次数
-        VAR_QT_REGIST_MARK = 666,       //QT月签到标志
+        //VAR_QT_REGIST_SIGN = 663,                 //QT天签到标志
+        VAR_QT_REGIST_NUM = 664,                    //QT月签到次数
+        VAR_QT_SPECIAL_MARK = 665,                  //QT记录12月份默认加6天签到次数
+        VAR_QT_REGIST_MARK = 666,                   //QT月签到标志
+        VAR_ORDINARY_KILL_NUM = 667,                //普通击杀次数
+        VAR_DIFFICULTY_KILL_NUM = 668,              //困难击杀次数
+        VAR_ORDINARY_REFRESH_NUM = 669,             //普通刷新次数
+        VAR_DIFFICULTY_REFRESH_NUM = 670,           //困难 刷新次数
+        VAR_HELP_NUM = 671,                         //协助次数
+        VAR_PURPLE_NUM = 672,                       //紫色次数
+        VAR_ORANGE_NUM = 673,                       //橙色次数
 
         VAR_MAX,
     };
@@ -1129,6 +1136,13 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_QT_REGIST_NUM, CYCLE_MONTH);
             REGISTER_VAR(VAR_QT_SPECIAL_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_QT_REGIST_MARK, CYCLE_MONTH);
+            REGISTER_VAR(VAR_ORDINARY_KILL_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_DIFFICULTY_KILL_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ORDINARY_REFRESH_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_DIFFICULTY_REFRESH_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_HELP_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_PURPLE_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_ORANGE_NUM, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

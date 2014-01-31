@@ -400,6 +400,9 @@ namespace REQ
     /** 组队副本 */
     const UInt8 TEAM_COPY_REQ       = 0x99;
 
+    /** 宠物组队副本 */
+    const UInt8 PET_TEAM_COPY       = 0x76;
+
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
 
@@ -697,6 +700,8 @@ namespace REP
     const UInt8 CLAN_RANKBATTLE_SORTLIST = 0x5B; //帮会战排名列表
 
     const UInt8 TEAM_COPY_REQ       = 0x99;
+
+    const UInt8 PET_TEAM_COPY       = 0x76;
 
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;

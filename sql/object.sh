@@ -229,6 +229,8 @@ function update_object()
     #. clearshiyamen.sh
     #mysql -h$H -u$U -p$P -P$PT $DBO < clanscore.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clan_battlescore.sql     #重置帮战积分
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140101_1.sql     #仙宠组队副本
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140101_2.sql     #仙宠组队副本击杀橙色怪物日志
 }
 
 #sh player_jiguan.sh
