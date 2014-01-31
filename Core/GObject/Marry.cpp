@@ -1068,7 +1068,7 @@ namespace GObject
 
         if(player->GetVar(VAR_MARRY_STATUS) == 3)
         {
-            if(obj_player->GetMarriageInfo()->yuyueTime == 0 && obj_player->GetMarriageInfo()->eWedding == WEDDING_NULL)  
+            if(obj_player->GetMarriageInfo()->yuyueTime == 0 )  
             {
                 if(getMoney(player,player->GetMarriageInfo()->eWedding) != 0)
                     return 1; 
@@ -1430,7 +1430,7 @@ namespace GObject
             
             case 3:
                 {
-                    st2 << static_cast<UInt8>(9) << static_cast<UInt8>(8) << obj_player->getId() << obj_player->getName() << obj_player->getMainFighter()->getColor() << Stream::eos;
+                    st2 << static_cast<UInt8>(9) << static_cast<UInt8>(8) << player->getId() << player->getName() << player->getMainFighter()->getColor() << Stream::eos;
 
                     obj_player->send(st2);
                     
@@ -1918,6 +1918,11 @@ namespace GObject
         CheckingListTimeOut(m_maleList);
         CheckingListTimeOut(m_femaleList);
         
+        if(GVAR.GetVar(GVAR_MARRY_TIME1) < TimeUtil::Now())
+            GVAR.SetVar(GVAR_MARRY_TIME1,0);
+        if(GVAR.GetVar(GVAR_MARRY_TIME2) < TimeUtil::Now())
+            GVAR.SetVar(GVAR_MARRY_TIME2,0);
+
         if(GVAR.GetVar(GVAR_MARRY_TIME1) >= TimeUtil::Now() + 86400*2)
             GVAR.SetVar(GVAR_MARRY_TIME1,0);
         if(GVAR.GetVar(GVAR_MARRY_TIME2) >= TimeUtil::Now() + 86400*2)
@@ -1937,6 +1942,8 @@ namespace GObject
             {
                 if(i > 2)
                     break;
+                if(it->first < TimeUtil::Now())
+                    continue;
                 if(it->first == GVAR.GetVar(GVAR_MARRY_TIME1) || it->first == GVAR.GetVar(GVAR_MARRY_TIME2) ) //|| it->first == GVAR.GetVar(GVAR_MARRY_TIME3))
                     continue;
                 if(it->first >= (TimeUtil::Now() + 86400*2))
