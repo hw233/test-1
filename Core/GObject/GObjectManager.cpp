@@ -2189,7 +2189,7 @@ namespace GObject
                 fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setAttrType1(specfgtobj.attrType1);
             fgt2->setAttrValue1(specfgtobj.attrValue1);
-            fgt2->setAttrType2(specfgtobj.attrType2);
+            fgt->setAttrType2(specfgtobj.attrType2);
             fgt2->setAttrValue2(specfgtobj.attrValue2);
             fgt2->setAttrType3(specfgtobj.attrType3);
             fgt2->setAttrValue3(specfgtobj.attrValue3);

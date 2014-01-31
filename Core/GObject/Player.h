@@ -961,6 +961,7 @@ namespace GObject
         void sendLuckybagInfo();
         void sendSummerFlowInfo();
         void sendSummerMeetInfo();
+        void sendSummerMeetScoreInfo();
         void sendSummerMeetRechargeInfo();
         void sendSummerFlow3TimeInfo();
         void sendSummerFlow3LoginInfo();
@@ -2494,6 +2495,8 @@ namespace GObject
         void sendLuckyMeetLoginInfo();
         void SetLuckyMeetValue();
         void SetSummerMeetValue();
+        void getSummerMeetScore(UInt8 num , UInt32 val = 0 );
+        UInt32 getSummerMeetTotalScore();
         void SetSummerFlow3Value();
         void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
         void getQQBoardInstantLoginAward(UInt8 val);

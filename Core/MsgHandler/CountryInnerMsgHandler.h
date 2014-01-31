@@ -255,6 +255,7 @@ void OnAthleticsReq( GameMsgHdr& hdr, const void * data )
 	GameAction()->RunOperationTaskAction0(player, 1);
 	GameAction()->RunOperationTaskAction0(player, 2);
     GameAction()->doStrong(player, SthAthletics1, 0,0);
+    player->getSummerMeetScore(5);
     player->GuangGunCompleteTask(0,26);
 }
 
@@ -1500,9 +1501,15 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
             player->SetVar(VAR_TOWNDEAMON, 1);
     }
     if(co->id == SthAthletics1)
+    {
         player->GuangGunCompleteTask(0,26);
+        player->getSummerMeetScore(5);
+    }
     else if(co->id == SthAthletics2)
+    {
         player->GuangGunCompleteTask(0,25);
+        player->getSummerMeetScore(4);
+    }
     GameAction()->doStrong(player, co->id, co->param1, co->param2);
 }
 void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
