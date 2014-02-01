@@ -439,6 +439,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -462,6 +470,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
         ))
     {
 #if 0

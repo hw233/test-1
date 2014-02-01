@@ -6067,6 +6067,12 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
                   br >>index ;
                   player->getNovLoginAward(index);
               }
+              else if(idx == 2)
+              {
+                  char str[16] = {0};
+                  sprintf(str, "F_140115_1");
+                  player->udpLog("liulanqiqiandao", str, "", "", "", "", "act");
+              }
               player->sendNovLoginInfo();
             }
             break;

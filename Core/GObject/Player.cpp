@@ -26361,6 +26361,9 @@ void Player::getNovLoginAward(UInt8 type)
        off = 31; 
    novLoginAward |= (1<<off); 
    SetVar(VAR_NOV_LOGIN_AWARD,novLoginAward);
+   char str[16] = {0};
+   sprintf(str, "F_140115_%d",type + 1);
+   udpLog("liulanqiqiandao", str, "", "", "", "", "act");
 }
 
 bool Player::checkClientIP()
