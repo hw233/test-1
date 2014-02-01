@@ -210,7 +210,7 @@ namespace GObject
             resetData();
         }
         if(man==NULL || woman == NULL)
-            return ;
+            return false;
         if(woman->IsMale() || !man->IsMale())
             return false;
         if(_man!=NULL || _woman!=NULL ||_atTime!=0 || _norms!=0 ||_marryBoardTimer!=NULL)
