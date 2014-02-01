@@ -545,19 +545,19 @@ void PetTeamCopy::refreshMonster(Player* pl)
     else
         refreshNum = pl->GetVar(VAR_DIFFICULTY_REFRESH_NUM);
     
-    if(refreshNum >= 2)
+    if(refreshNum > 2)
     {
         if(!pl->hasChecked())
             return;
 
-        if(pl->getGold() == 0)
+        if(pl->getGold() < 2)
         {
             pl->sendMsgCode(0, 1104);
             return;
         }
 
         ConsumeInfo ci(RefreshMonster, 0, 0);
-        pl->useGold(1, &ci);
+        pl->useGold(2, &ci);
         
         if(0 == t)
             pl->udpLog("chongwufuben", "F_55500", "", "", "", "", "act");
@@ -948,62 +948,58 @@ UInt32 PetTeamCopy::joinTeam(Player* pl, UInt32 teamId)
         return 0;
 
     UInt8 pos = 0;
-    UInt8 cnt = 0;
     UInt8 petClass = pet->getClass();
     switch(petClass)
     {
     case e_cls_xuanwu:
         {
-            pos = 1;
-            if(td->count == 1 && td->formation[0] >= 1 && td->formation[0] <= 3)
-               cnt++;
-            if(td->count == 2 && td->formation[1] >= 1 && td->formation[1] <= 3)
-               cnt++;
-            pos += cnt;
+            pos = 0;
         }
         break;
     case e_cls_zhuque:
         {
-            pos = 4;
-            if(td->count == 1 && td->formation[0] >= 4 && td->formation[0] <= 6)
-               cnt++;
-            if(td->count == 2 && td->formation[1] >= 4 && td->formation[1] <= 6)
-               cnt++;
-            pos += cnt;
+            pos = 3;
         }
         break;
     case e_cls_qinglong:
         {
-            pos = 7;
-            if(td->count == 1 && td->formation[0] >= 7 && td->formation[0] <= 9)
-               cnt++;
-            if(td->count == 2 && td->formation[1] >= 7 && td->formation[1] <= 9)
-               cnt++;
-            pos += cnt;
-
+            pos = 6;
         }
         break;
     case e_cls_baihu:
         {
-            pos = 7;
-            if(td->count == 1 && td->formation[0] >= 7 && td->formation[0] <= 9)
-               cnt++;
-            if(td->count == 2 && td->formation[1] >= 7 && td->formation[1] <= 9)
-               cnt++;
-            pos += cnt;
+            pos = 6;
         }
         break;
     }
 
+    UInt8 temp[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    for(UInt8 k=0; k<3; k++)
+    {  
+        bool markA = false;
+        for(UInt8 i=0; i<td->count; i++)
+        {
+            if(td->formation[i] == temp[pos+k])
+            {
+                markA = true;
+                break;
+            }
+        }
+        if(!markA)
+        {
+            td->formation[td->count] = temp[pos+k];
+            break;
+        }
+    }
+
     td->members[td->count] = pl;
-    td->formation[td->count] = pos;
     ++td->count;
 
     pl->setPetTeamData(td);
-    /*for(UInt8 k=0; k<td->count; k++)
+    for(UInt8 k=0; k<td->count; k++)
     {
         std::cout << "Formation A: " <<  static_cast<UInt32>(td->formation[k]) << std::endl;
-    }*/
+    }
 
     if(td->count == 3 && !td->mark)
     {
@@ -1295,10 +1291,10 @@ void PetTeamCopy::setFormation(Player* pl, UInt8 pos1, UInt8 pos2, UInt8 pos3)
             td->formation[2] = 9; 
         }
        
-        /*for(UInt8 k=0; k<td->count; k++)
+        for(UInt8 k=0; k<td->count; k++)
         {
             std::cout << "Formation B: " << static_cast<UInt32>(td->formation[k]) << std::endl;
-        }*/
+        }
     }
     else
     {
@@ -1320,7 +1316,7 @@ void PetTeamCopy::setFormation(Player* pl, UInt8 pos1, UInt8 pos2, UInt8 pos3)
 
         for(UInt8 j = 0; j < td->count; ++j)
         {
-            //std::cout << "Formation C: " << static_cast<UInt32>(td->formation[j]) << std::endl;
+            std::cout << "Formation C: " << static_cast<UInt32>(td->formation[j]) << std::endl;
             Stream st(REP::PET_TEAM_COPY);
             st << static_cast<UInt8>(0x11);
             teamInfo(td->members[j], st);
