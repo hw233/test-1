@@ -2284,6 +2284,26 @@ CREATE TABLE IF NOT EXISTS `player_named` (
     INDEX (`playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `player_petteamcopy`;
+CREATE TABLE IF NOT EXISTS `player_petteamcopy` (
+    `playerId` bigint(20) unsigned NOT NULL,
+    `copyId` tinyint(3) unsigned NOT NULL,
+    `type` tinyint(3) unsigned NOT NULL,
+    `npcGroup1Id` int(10) unsigned NOT NULL DEFAULT '0',
+    `npcGroup2Id` int(10) unsigned NOT NULL DEFAULT '0',
+    `npcGroup3Id` int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`playerId`,`copyId`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `petteamcopylog`;
+CREATE TABLE `petteamcopylog` (
+    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `playerName` varchar(255) NOT NULL,
+    `monsterName` varchar(255) NOT NULL,
+    `items` varchar(512) NOT NULL,
+    PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `modify_mount`;
 CREATE TABLE IF NOT EXISTS `modify_mount` (
     `id` int(10) unsigned NOT NULL DEFAULT '0',

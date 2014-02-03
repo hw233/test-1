@@ -55,6 +55,7 @@
 #include "LoginMsgHandler.h"
 #include "GObject/SaleMgr.h"
 #include "GObject/TeamCopy.h"
+#include "GObject/PetTeamCopy.h"
 #include "GObject/HeroMemo.h"
 #include "GObject/ShuoShuo.h"
 #include "GObject/CFriend.h"
@@ -5382,6 +5383,111 @@ void OnFairySparReq(GameMsgHdr& hdr, const void * data)
         break;
         default:
         break;
+    }
+}
+
+void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    if (player->isJumpingMap())
+        return;
+
+    switch(op)
+    {
+    case 0x00:
+        {
+            petTeamCopyManager->enter(player);
+        }
+        break;
+    /*case 0x01:
+        {
+            UInt8 type = 0;
+            br >> type;
+            petTeamCopyManager->reqTeamList(player, type);
+        }
+        break;*/
+    case 0x02:
+        {
+            petTeamCopyManager->quit(player);
+        }
+        break;
+    case 0x03:
+        {
+            petTeamCopyManager->reqTeamInfo(player);
+        }
+        break;
+    case 0x04:
+        {
+            UInt8 copyLvl = 0;
+            UInt8 type = 0;
+            br >> copyLvl >> type;
+            petTeamCopyManager->enterTeamCopy(player, copyLvl, type);
+        }
+        break;
+    case 0x05:
+        {
+            petTeamCopyManager->refreshMonster(player);
+        }
+        break;
+    case 0x06:
+        {
+            UInt32 npcGroupId = 0;
+            UInt32 monsterId = 0;
+            br >> npcGroupId >> monsterId;
+            petTeamCopyManager->createTeam(player, npcGroupId, monsterId);
+        }
+        break;
+    case 0x07:
+        {
+            UInt32 teamId = 0;
+            br >> teamId;
+            petTeamCopyManager->joinTeam(player, teamId);
+        }
+        break;
+    case 0x08:
+        {
+            petTeamCopyManager->leaveTeam(player, 1);
+        }
+        break;
+    case 0x09:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            petTeamCopyManager->teamKick(player, playerId);
+        }
+        break;
+    case 0x10:
+        {
+            petTeamCopyManager->teamBattleStart(player);
+        }
+        break;
+    case 0x11:
+        {
+            UInt8 pos1 = 0;
+            UInt8 pos2 = 0;
+            UInt8 pos3 = 0;
+            br >> pos1 >> pos2 >> pos3;
+            petTeamCopyManager->setFormation(player, pos1, pos2, pos3);
+        }
+        break;
+    case 0x12:
+        {
+            petTeamCopyManager->dismissTeam(player);
+        }
+        break;
+    case 0x15:
+        {
+            UInt8 type = 0;
+            br >> type;
+            petTeamCopyManager->reqStart(player, type);
+        }
+        break;
+    default:
+        return;
     }
 }
 

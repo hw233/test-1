@@ -600,7 +600,6 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_QZONE_RECHARGE = 643,       //空间充值 
         VAR_QZONE_RECHARGE_AWARD = 644,       //空间充值奖励领取
         
-
         VAR_OLDMAN_DAYSCORE = 645,       //捉迷藏活动每日积分
         VAR_OLDMAN_SCORE = 646,       //捉迷藏活动累计积分
         VAR_OLDMAN_PRESENT = 647,      //捉迷藏活动接受礼包数
@@ -618,16 +617,25 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_MARRYBOARD2_ANS  = 657,             // 表示当前答案 
         VAR_MARRYBOARD4_TIME = 658,             //表示婚礼第三阶段吃喜筵第四阶段驱赶时间
         VAR_MARRYBOARD3_KEY  = 659,
+
         //660-680 for lijr
-        VAR_CHRISTMAS_PRESENT = 660,    //圣诞礼物——麋鹿之角
-        VAR_QT_AWARD_MARK = 661,        //QT奖励领取
+        VAR_CHRISTMAS_PRESENT = 660,                //圣诞礼物——麋鹿之角
+        VAR_QT_AWARD_MARK = 661,                    //QT奖励领取
         VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE = 662,    //七石板每期最高积分
-        VAR_QT_REGIST_NUM = 664,        //QT月签到次数
-        VAR_QT_SPECIAL_MARK = 665,      //QT记录12月份默认加6天签到次数
-        VAR_QT_REGIST_MARK = 666,       //QT月签到标志
-        VAR_BUY_FUND_NuM = 667,         //购买基金标志
-        VAR_BUY_FUND_AWARD = 668,       //购买基金回馈标志
-        VAR_BUY_FUND_TRUMP_AWARD = 669, //购买基金法宝奖励标志
+        VAR_QT_REGIST_NUM = 664,                    //QT月签到次数
+        VAR_QT_SPECIAL_MARK = 665,                  //QT记录12月份默认加6天签到次数
+        VAR_QT_REGIST_MARK = 666,                   //QT月签到标志
+        VAR_BUY_FUND_NuM = 667,                     //购买基金标志
+        VAR_BUY_FUND_AWARD = 668,                   //购买基金回馈标志
+        VAR_BUY_FUND_TRUMP_AWARD = 669,             //购买基金法宝奖励标志
+        VAR_ORDINARY_KILL_NUM = 670,                //普通击杀次数
+        VAR_DIFFICULTY_KILL_NUM = 671,              //困难击杀次数
+        VAR_ORDINARY_REFRESH_NUM = 672,             //普通刷新次数
+        VAR_DIFFICULTY_REFRESH_NUM = 673,           //困难 刷新次数
+        VAR_HELP_NUM = 674,                         //协助次数
+        VAR_PURPLE_NUM = 675,                       //紫色次数
+        VAR_ORANGE_NUM = 676,                       //橙色次数
+        VAR_PETTEAMCOPY_BATTLE_RES = 677,           //宠物副本战斗结果
 
         //681 - 700 for lb
         VAR_MARRYBOARD_YANHUA = 681,          //烟花积分
@@ -637,6 +645,8 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_NEWYEARSPEED_COUNT = 685 ,
         VAR_ONCE_ONDAY = 686 ,    //记录一天只有一次
         VAR_NEWYEAR_PRATICE_COUNT = 687 ,    //记录一天只有一次
+
+        VAR_MicroCloud_AWARD = 701,     //是否领取微云合作奖励
 
         VAR_MAX,
     };
@@ -1184,10 +1194,21 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_QZONE_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_QZONE_RECHARGE_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_QT_AWARD_MARK, CYCLE_MONTH);
-            //REGISTER_VAR(VAR_QT_REGIST_SIGN, CYCLE_DAY);
             REGISTER_VAR(VAR_QT_REGIST_NUM, CYCLE_MONTH);
             REGISTER_VAR(VAR_QT_SPECIAL_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_QT_REGIST_MARK, CYCLE_MONTH);
+            REGISTER_VAR(VAR_BUY_FUND_NuM, CYCLE_NONE);
+            REGISTER_VAR(VAR_BUY_FUND_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_BUY_FUND_TRUMP_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_ORDINARY_KILL_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_DIFFICULTY_KILL_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ORDINARY_REFRESH_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_DIFFICULTY_REFRESH_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_HELP_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_PURPLE_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_ORANGE_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_PETTEAMCOPY_BATTLE_RES, CYCLE_NONE);
+
             REGISTER_VAR(VAR_OLDMAN_DAYSCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_OLDMAN_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_OLDMAN_PRESENT, CYCLE_DAY);
@@ -1202,7 +1223,6 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_MARRYBOARD2_NUM, CYCLE_DAY);
             REGISTER_VAR(VAR_MARRYBOARD2_ANS, CYCLE_DAY);
             REGISTER_VAR(VAR_MARRYBOARD4_TIME, CYCLE_DAY);
-
             REGISTER_VAR(VAR_MARRYBOARD_YANHUA, CYCLE_NONE);
             REGISTER_VAR(VAR_3366_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_3366_RECHARGE_AWARD, CYCLE_NONE);
@@ -1210,6 +1230,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_NEWYEARSPEED_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ONCE_ONDAY, CYCLE_DAY);
             REGISTER_VAR(VAR_NEWYEAR_PRATICE_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_MicroCloud_AWARD, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
