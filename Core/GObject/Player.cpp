@@ -26240,7 +26240,7 @@ void Player::BuyCompassChance(UInt8 counts)
 }
 void Player::SetNovLogin()
 {
-    UInt32 timeBegin = TimeUtil::MkTime(2013,12,13);
+    UInt32 timeBegin = TimeUtil::MkTime(2014,1,17);
     UInt32 now = TimeUtil::Now();
     UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400 +1;
     if(now < timeBegin)
@@ -26741,20 +26741,23 @@ void Player::getInterestingAward(UInt8 type)
 {
     if(!World::getOldManTime())
         return ;
+    UInt32 scoreReq[] = {30,100,250,350};
     UInt32 ScoreAward = 0;
     UInt32 Score = 0;
+    if(type > 3 )
+        return ;
     if(type == 0 )
     {
         Score = GetVar(VAR_OLDMAN_DAYSCORE);
         ScoreAward = GetVar(VAR_OLDMAN_DAYSCORE_AWARD);
-        if( Score < 30 || ScoreAward == 1)
+        if( Score < scoreReq[type] || ScoreAward == 1)
             return ;
     }
     else
     {
         ScoreAward = GetVar(VAR_OLDMAN_SCORE_AWARD);
         Score = GetVar(VAR_OLDMAN_SCORE);
-        if( Score < static_cast<UInt32>(type * 100 + (type-1)*50) || ScoreAward &(1 << (type-1)))  //修改累计欢乐值
+        if( Score < scoreReq[type] || ScoreAward &(1 << (type-1)))  //修改累计欢乐值
             return ;
     }
     if(!GameAction()->RunInterestingAward(this, type))
