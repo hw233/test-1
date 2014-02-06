@@ -974,6 +974,12 @@ namespace GObject
         std::pair<ReserveList,bool> ret;
         ReserveList::iterator it; 
 
+        if(obj_player->GetMarriageInfo()->yuyueTime < now)
+        {
+            player->sendMsgCode(0, 6027);
+            return 1;
+        }
+
         for(it = m_yuyueList.begin();it != m_yuyueList.end(); ++it)
         {
             if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD(obj_player->GetMarriageInfo()->yuyueTime))
@@ -1805,7 +1811,7 @@ namespace GObject
                             GObject::Player * woman_player = GObject::globalPlayers[(it->second).second];
                             if(man_player&&woman_player)
                             {
-                                st << it->first << man_player->getName() << man_player->getMainFighter()->getColor() << woman_player->getName() << woman_player->getMainFighter()->getColor();
+                                st << it->first << man_player->getName() << man_player->getMainFighter()->getColor() << woman_player->getName() << woman_player->getMainFighter()->getColor() << static_cast<UInt8>(man_player->GetMarriageInfo()->eWedding);
                             }
             
                             ++it;

@@ -213,8 +213,8 @@ public:
 	inline Int32 getMaxHPAdd() {return _maxhpAdd;}
 	inline Int32 getActionAdd() {return _maxActionAdd;}
     inline float getToughAdd() { return _toughAdd;}
-    inline float getAtkReduce() { return _atkreduce + _atkreduce2 + _atkreduce3 + _moAtkReduce + _hpAtkReduce; }
-    inline float getMagAtkReduce() { return _magatkreduce + _magatkreduce2 + _magatkreduce3 + _moMagAtkReduce + _hpMagAtkReduce; }
+    inline float getAtkReduce() { return _atkreduce + _atkreduce2 + _atkreduce3 + _moAtkReduce + _hpAtkReduce - (_flawDamageAdd * _flawCount); }
+    inline float getMagAtkReduce() { return _magatkreduce + _magatkreduce2 + _magatkreduce3 + _moMagAtkReduce + _hpMagAtkReduce - (_flawDamageAdd * _flawCount); }
 
 	void setAttackAdd(float v, UInt16 last = 0);
 	void setMagAttackAdd(float v, UInt16 last = 0);
@@ -343,6 +343,7 @@ public:
     const GData::SkillBase* getPassiveSkillOnBeMagDmg100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHP10P100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHPChange100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnWithstand100(size_t& idx, bool noPossibleTarget = false);
 
     const GData::SkillBase* getPassiveSkillPreAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk(bool noPossibleTarget = false);
@@ -364,6 +365,7 @@ public:
     const GData::SkillBase* getPassiveSkillOnBeMagDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHP10P(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHPChange(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnWithstand(bool noPossibleTarget = false);
 
     const GData::SkillBase* getSkillSoulProtect();
 
@@ -544,6 +546,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillAftNAtk100;
     std::vector<GData::SkillItem> _passiveSkillOnPetProtect100;
     std::vector<GData::SkillItem> _passiveSkillOnHPChange100;
+    std::vector<GData::SkillItem> _passiveSkillOnWithstand100;
 
     std::vector<GData::SkillItem> _passiveSkillPreAtk;
     std::vector<GData::SkillItem> _passiveSkillAftAtk;
@@ -556,6 +559,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillAftNAtk;
     std::vector<GData::SkillItem> _passiveSkillOnPetProtect;
     std::vector<GData::SkillItem> _passiveSkillOnHPChange;
+    std::vector<GData::SkillItem> _passiveSkillOnWithstand;
 
     std::vector<GData::SkillItem> _passiveSkillOnTherapy;
     std::vector<GData::SkillItem> _passiveSkillOnSkillDmg;
@@ -695,6 +699,13 @@ private:
     UInt8 _petAtk100Last;
 
     bool  _petMark;
+
+    UInt8 _flawCount;
+    float _flawDamageAdd;
+    UInt8 _flawLast;
+
+    float _withstandFactor;
+    UInt8 _withstandCount;
 
 
     // cotton add for skillstrengthen
@@ -1173,6 +1184,33 @@ public:
     inline void setPetAtk100(float v, UInt8 l) { _petAtk100 = v; _petAtk100Last = l; }
     bool releasePetAtk100();
 
+    UInt8 setFlaw(float damageAdd, UInt8 last, UInt8 count) 
+    { 
+        _flawDamageAdd = damageAdd; _flawLast = last; _flawCount = count;
+        return _flawCount;
+    }
+    UInt8 addFlaw(float damageAdd, UInt8 last, UInt8 count = 1)
+    {
+        _flawDamageAdd = damageAdd; _flawLast = last; _flawCount += count;
+        if (_flawCount > 3) _flawCount = 3;
+        return _flawCount;
+    }
+
+    UInt8 getFlawCount() { return _flawCount; }
+    float getFlawDamageAdd() { return _flawDamageAdd; }
+    UInt8& getFlawLast()     { return _flawLast; }
+
+    void  setWithstand(float withstand) { _withstandFactor = withstand; }
+    void  addWithstandCount()   
+    { 
+        ++_withstandCount; 
+        if (_withstandCount > 3)
+            _withstandCount = 3; 
+    }
+    float getWithstandFactor() { return _withstandFactor; }
+    UInt8 getWithstandCount() { return _withstandCount; }
+    void  resetWithstandCount() { _withstandCount = 0; }
+
 public:
     float _counter_spirit_atk_add;
     float _counter_spirit_magatk_add;
@@ -1432,6 +1470,24 @@ private:
     bool setDmgNingShi(BattleFighter* bf, float value, UInt8 last);
     bool releaseDmgNingShi();
     std::vector<BattleFighter*> getBeiNingShiZhe() { return _beiningshizhe; }
+
+    UInt8 _ruRedCarpetLast;
+    void setRuRedCarpet(UInt8 last) { _ruRedCarpetLast = last; }
+    UInt8 getRuRedCarpet() { return _ruRedCarpetLast; }
+
+    UInt8 _shiFlowerLast;
+    UInt8 _shiFlowerAura;
+    void setShiFlower(UInt8 last, UInt8 aura) { _shiFlowerLast = last; _shiFlowerAura = aura; }
+    UInt8 getShiFlower() { return _shiFlowerLast; }
+    UInt8 getShiFlowerAura() { return _shiFlowerAura; }
+
+    UInt8 _daoRoseLast;
+    void setDaoRose(UInt8 last) { _daoRoseLast = last; }
+    UInt8 getDaoRose() { return _daoRoseLast; }
+
+    UInt8 _moKnotLast;
+    void setMoKnot(UInt8 last) { _moKnotLast = last; }
+    UInt8 getMoKnot() { return _moKnotLast; }
 
 public:
 	enum StatusFlag

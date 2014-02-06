@@ -153,6 +153,7 @@ UInt8 Dungeon::playerEnter( Player * player, UInt8 difficulty )
 	updateToDB(player, *dpi);
 
     GameAction()->doStrong( player, SthDungeon, 0 , 0);
+    player->getSummerMeetScore(0);
 	return 0;
 }
 
