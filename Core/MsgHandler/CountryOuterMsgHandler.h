@@ -1434,6 +1434,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0)<< Stream::eos;
         pl->send(st1);
     }
+    pl->getNewYearGiveGiftAward(0,0);
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

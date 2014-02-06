@@ -1295,6 +1295,7 @@ namespace GObject
         sendFeastLoginAct();
         //蛇年春节套装
         sendSnakeSpringEquipMail();
+        //getNewYearGiveGiftAward(0,0);
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%" I64_FMT "u", _id);
