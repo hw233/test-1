@@ -2033,7 +2033,7 @@ namespace GObject
         void OpenCard(UInt8 pos);
         void BuyOpenCardNum();
         void RefreshAward();
-        UInt32 RandMoBaoAward(std::vector<UInt32>& i);
+        void RandMoBaoAward(std::vector<UInt32>& items, UInt8 i);
         bool CheckMoBaoAward(UInt32 itemId);
 
         //墨宝 end
