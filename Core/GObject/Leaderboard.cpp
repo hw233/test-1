@@ -1294,15 +1294,14 @@ void Leaderboard::giveRechargeRankAward()
 {
     SYSMSGV(title1, 827);
     SYSMSGV(title2, 829);
-    std::string name10[10];
-    UInt32 total10[10] = {0};
+    std::string str;
     std::vector<AllServersRecharge>::iterator it;
     for(it = _rechargeRank100.begin(); it != _rechargeRank100.end(); ++ it)
     {
         if((*it).rank && (*it).rank <= 10)
         {
-            name10[(*it).rank-1] = (*it).name;
-            total10[(*it).rank-1] = (*it).total;
+            SYSMSGV(buf, 835, (*it).rank, (*it).country >> 4, (*it).name.c_str(), (*it).total);
+            str += buf;
         }
 
         Player * player = (*it).player;
@@ -1379,10 +1378,7 @@ void Leaderboard::giveRechargeRankAward()
         Player * player = iter->second.player;
         if(!player)
             continue;
-        SYSMSGV(content1, 828, player->getCountry(), player->getName().c_str(), iter->second.total, iter->second.rank, name10[0].c_str(), total10[0],
-                name10[1].c_str(), total10[1], name10[2].c_str(), total10[2], name10[3].c_str(), total10[3], name10[4].c_str(), total10[4],
-                name10[5].c_str(), total10[5], name10[6].c_str(), total10[6], name10[7].c_str(), total10[7], name10[8].c_str(), total10[8],
-                name10[9].c_str(), total10[9]);
+        SYSMSGV(content1, 828, player->getCountry(), player->getName().c_str(), iter->second.total, iter->second.rank, str.c_str());
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title1, content1);
         if(mail)
             mail->writeMailLog(player, Activity);
