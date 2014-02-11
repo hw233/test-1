@@ -34,6 +34,7 @@
 #include <mysql.h>
 #include <sstream>
 #include "GObject/ClanBoss.h"
+#include "ClanBuilding.h"
 
 namespace GObject
 {
@@ -263,7 +264,8 @@ void ClanItemPkg::GetItems(Player* player)
 Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	GObjectBaseT<Clan>(id), _name(name), _rank(0), _level(lvl), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
-    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0)
+    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0),
+    _buildingOwner(NULL)
 {
     _itemPkg.Init(_id, 0, GData::clanLvlTable.getPkgSize(_level));
 
@@ -4920,4 +4922,34 @@ void Clan::SendClanMemberGrade(Player* player)
     st<<Stream::eos;
     player->send(st);
 }
+
+ClanBuildingOwner* Clan::getClanBuildingOwner()
+{
+    return _buildingOwner;
+}
+
+ClanBuildingOwner* Clan::getBuildingOwner()
+{
+    return _buildingOwner;
+}
+
+ClanBuildingOwner* Clan::getNewBuildOwner()
+{
+    if (!_buildingOwner)
+        _buildingOwner = new ClanBuildingOwner(this);
+    return _buildingOwner;
+}
+
+bool Clan::loadBuildingsFromDB(UInt32 fairylandEnergy, 
+        UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, 
+        UInt16 updateTime)
+{
+    if (!_buildingOwner)
+        _buildingOwner = new ClanBuildingOwner(this);
+    if (!_buildingOwner)
+        return false;
+    _buildingOwner->loadFromDB(fairylandEnergy, phyAtkLevel, magAtkLevel, actionLevel, hpLevel, updateTime);
+    return true;
+}
+
 }

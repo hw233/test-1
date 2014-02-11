@@ -24,6 +24,7 @@
 #include "GData/Title.h"
 #include "Clan.h"
 #include "ClanCopy.h"
+#include "ClanBuilding.h"
 #include "Mail.h"
 #include "Boss.h"
 #include "Athletics.h"
@@ -1295,6 +1296,7 @@ namespace GObject
         sendFeastLoginAct();
         //蛇年春节套装
         sendSnakeSpringEquipMail();
+        //getNewYearGiveGiftAward(0,0);
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%" I64_FMT "u", _id);
@@ -2374,7 +2376,10 @@ namespace GObject
         sendQQBoardOnlineTime();  
         SetQQBoardValue();
         if(GetVar(GObject::VAR_MARRY_STATUS) == 5 || GetVar(GObject::VAR_MARRY_STATUS) == 6)
+        {
             gMarriedMgr.ProcessOnlineAward(this,1);
+            gMarriedMgr.EnterCoupleCopy(this,0);
+        }
 	}
 
 	void Player::checkLastBattled()
@@ -4126,6 +4131,7 @@ namespace GObject
 		GameMsgHdr hdr(0x178, WORKER_THREAD_WORLD, this, 0);
 		GLOBAL().PushMsg(hdr, NULL);
         GameAction()->doStrong(this, SthHookSpeed, 0,0);
+        getSummerMeetScore(6);
         GuangGunCompleteTask(0,27);
         OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 1);
 	}
@@ -5065,6 +5071,15 @@ namespace GObject
         {
             AddVar(VAR_USEGOLD_CNT, c);
             AddHYYJCount(c);
+            if(ci->purchaseType != Fund &&ci->purchaseType != OutBuyFund)
+            {
+               UInt32 val =  GetVar(VAR_SUMMERMEET_SCORE5);
+               if((val + c) >= 1000)
+                   SetVar(VAR_SUMMERMEET_SCORE5 ,1000);
+               else
+                   AddVar(VAR_SUMMERMEET_SCORE5 ,c );
+               sendSummerMeetScoreInfo();
+            }
         }
         if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
             SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
@@ -6395,6 +6410,12 @@ namespace GObject
             teamCopyManager->leaveTeamCopy(this);
         }
 
+        if(GetEnterPTCStatus())
+            petTeamCopyManager->quit(this);
+
+        if(GetInPTCStatus())
+            petTeamCopyManager->leaveTeam(this, 1);
+
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)
         {
@@ -6905,6 +6926,7 @@ namespace GObject
         OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
         writeClanTask();
         GameAction()->doStrong(this, SthClanTask, 0 ,0 );
+        getSummerMeetScore(9);
         return true;
     }
 
@@ -13997,8 +14019,12 @@ namespace GObject
 
     void Player::getSummerMeetStrenthAward(UInt8 val)
     {
-        UInt32 souls = GetStrengthenMgr()->GetSouls();
-        if(val*25 > souls)
+        //UInt32 souls = GetStrengthenMgr()->GetSouls();
+        UInt32 ScoreNeed[] = {50,100,150,200,280,380,500,800};
+        if(val<1 ||val >8)
+            return ;
+        UInt32 score = getSummerMeetTotalScore();
+        if(ScoreNeed[val-1] > score)
             return ;
         UInt32 ctslandingAward = GetVar(VAR_SUMMER_MEET_STRENTH_AWARD);
         if(ctslandingAward & (1<<(val-1)))
@@ -14009,7 +14035,7 @@ namespace GObject
 
         SetVar(VAR_SUMMER_MEET_STRENTH_AWARD, ctslandingAward);
         char str[16] = {0};
-        sprintf(str, "F_130801_%d", 11+val);
+        sprintf(str, "F_130801_%d", 22+val);
         udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
     void Player::getSummerFlow3OnlineAward(UInt8 val)
@@ -14594,6 +14620,45 @@ namespace GObject
         _clan->subStatueExp(exp);
     }
 
+    float Player::getClanBuildingHPEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingHP));
+        return 0;
+    }
+
+    float Player::getClanBuildingPhyAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingPhyAtk));
+        return 0;
+    }
+
+    float Player::getClanBuildingMagAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingMagAtk));
+        return 0;
+    }
+
+    float Player::getClanBuildingActionEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingAction));
+        return 0;
+    }
 
     void Player::onBlueactiveday()
     {
@@ -15473,6 +15538,7 @@ namespace GObject
         st <<static_cast<UInt8>(SummerMeetRechargeAward);
         st << Stream::eos;
         send(st);
+        sendSummerMeetScoreInfo();
     }
     void Player::sendSummerMeetRechargeInfo()
     {
@@ -16405,6 +16471,7 @@ namespace GObject
         if (!rf || now < rf ||rf > rf2)
             return;
         AddVar(VAR_SUMMER_MEET_RECHARGE, r);
+        getSummerMeetScore(10,r);
         sendSummerMeetInfo();
     }
 
@@ -21907,6 +21974,11 @@ UInt8 Player::toQQGroup(bool isJoin)
     {
         IncommingInfo ii(XianpoFromUseItem, 0, 0);
         getXianpo(c, &ii);
+
+        const UInt8 type = 3;
+        Stream st(REP::FAIRY_PET);
+        st << static_cast<UInt8>(0x08) << type << getXianpo() << Stream::eos;
+        send(st);
     }
 
     UInt32 Player::getXianpo(UInt32 c, IncommingInfo* ii)
@@ -24226,11 +24298,11 @@ static UInt32 ryhb_items_2[15][4] = {
     {99, 99, 5136, 9},         // 六级身法石
     {99, 99, 1717, 2},       // 变身法宝
     {88, 88, 8555, 64},        //
-    {4, 10, 9229, 64},        //
+    {8, 10, 9229, 64},        //
     {1, 3, 9371, 99},        //
     {2, 6, 1126, 99},        //
-    {2, 5, 547, 99},        //
-    {2, 5, 501, 99},        //
+    {7, 5, 9438, 99},        //
+    {2, 2, 9390, 99},        //
     {5, 3, 503, 99},       //
     {5, 13, 515, 99},      //
     {3, 8, 1325, 99},    //
@@ -26466,6 +26538,7 @@ void Player::sendNovLoginInfo()
     st<<novLogin;
     st<<static_cast<UInt8>(max);
     st<<static_cast<UInt8>(value);
+    st<<static_cast<UInt8>(!GetVar(VAR_ONCE_ONDAY));
     st<<Stream::eos;
     send(st);
 }
@@ -27204,6 +27277,9 @@ void Player::getMarryBoard3Award(UInt8 type)   //砸蛋
         }
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         SetVar(VAR_MARRYBOARD3,Award + 31);
+        char str[16] = {0};
+        sprintf(str, "F_140114_11");
+        udpLog("jiehunjinxinger", str, "", "", "", "", "act");
     }
 
 }
@@ -27603,16 +27679,6 @@ void Player::handleJiqirenAct_dungeon()
     int dungeon = GetVar(VAR_JIQIREN_DUNGEON);
     int dungeonCnt = Dungeon::getMaxCount(0) + vipNum - PLAYER_DATA(this, dungeonCnt);
     int dungeonCnt1 = Dungeon::getMaxCount(1) + vipNum1 - PLAYER_DATA(this, dungeonCnt1);
-    if (World::_wday == 5)
-    {
-        dungeonCnt -= 1;
-        dungeonCnt1 -= 1;
-    }
-    else if (World::_wday == 6)
-    {
-        dungeonCnt += 1;
-        dungeonCnt1 += 1;
-    }
     UInt8 fcnt = GET_BIT_8(dungeon, 0);
     UInt8 gcnt = GET_BIT_8(dungeon, 1);
     UInt8 fcnt1 = GET_BIT_8(dungeon, 2);
@@ -27882,7 +27948,65 @@ void Player::sendJiqirenInfo()
     st << Stream::eos;
     send(st);
 }
-
+void Player::getSummerMeetScore(UInt8 num , UInt32 val)
+{
+    if (!World::getSummerMeetTime())
+        return;
+    UInt32 type = GetVar(VAR_SUMMER_MEET_TYPE);
+    UInt32 max[] = {16,16,70,16,10,10,56,35,35,35,1000,1000}; 
+    UInt32 Award = GetVar(VAR_SUMMER_MEET_TYPE_AWARD);
+    if(type==0 || Award == 0 )
+        return ;
+    if(num > 11)
+        return ;
+    if(num == 10)
+    {
+        UInt32 value = GetVar(VAR_SUMMERMEET_SCORE4 );
+        if((value + val) >= 1000)
+        {
+            SetVar(VAR_SUMMERMEET_SCORE4  , 1000);
+        }
+        else
+            SetVar(VAR_SUMMERMEET_SCORE4 , value + val);
+        sendSummerMeetScoreInfo();
+        return ;
+    }
+    UInt32 value_var = GetVar(VAR_SUMMERMEET_SCORE1 + num / 4) ; 
+    UInt8 count = GET_BIT_8( value_var ,num % 4);     
+    if(count >= max[num])
+        return ;
+   SetVar(( VAR_SUMMERMEET_SCORE1 + num / 4 ) , SET_BIT_8( value_var ,num % 4 , (count + 1) ));
+   sendSummerMeetScoreInfo();
+}
+UInt32 Player::getSummerMeetTotalScore()
+{
+    UInt32 sum  =0;
+    UInt32 addScore[] = {3,3,1,3,3,1,1,1,1,1,1};
+    for(UInt8 i = 0; i<10 ; ++i)
+    {
+        UInt8 count = GET_BIT_8( GetVar(VAR_SUMMERMEET_SCORE1 + i / 4) ,i % 4);     
+        sum+= addScore[i] * count ;
+    }
+    sum += GetVar(VAR_SUMMERMEET_SCORE4);
+    sum += GetVar(VAR_SUMMERMEET_SCORE5);
+    return sum;
+}
+void Player::sendSummerMeetScoreInfo()
+{
+    if (!World::getSummerMeetTime())
+        return;
+    Stream st(REP::RC7DAY);  //协议
+    st << static_cast<UInt8>(28);
+    for(UInt8 i =0 ;i < 10 ; ++i)
+    {
+        st <<static_cast<UInt8>( GET_BIT_8( GetVar(VAR_SUMMERMEET_SCORE1 + i / 4) ,i % 4) ); 
+    }
+    st << GetVar(VAR_SUMMERMEET_SCORE4); 
+    st << GetVar(VAR_SUMMERMEET_SCORE5); 
+    st <<getSummerMeetTotalScore();
+    st << Stream::eos;
+    send(st);
+}
 } // namespace GObject
 
 

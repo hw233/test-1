@@ -807,7 +807,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+286*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+307*86400 then
           -- RECHARGE
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
@@ -1161,7 +1161,7 @@ function onActivityCheck(tm)
   end
 
   -- ACC
-  if tm >= actTime2013_05_18 and tm < (actTime2013_05_18 + 252*86400) then
+  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 22*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1488,6 +1488,7 @@ function initActTime(y, m, d)
 
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2014_01_25 = { ['year'] = 2014, ['month'] = 1, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   
   --圣诞节活动（麋鹿之角）
   local  SerStartTm2013_12_24 = { ['year'] = 2013, ['month'] = 12, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1987,6 +1988,7 @@ function initActTime(y, m, d)
   actTime2013_04_09= os.time(SerStartTm2013_04_01)+86400*8;
   actTime2013_04_14= os.time(SerStartTm2013_04_14)
   actTime2013_05_18= os.time(SerStartTm2013_05_18)
+  actTime2014_01_25= os.time(SerStartTm2014_01_25)
   actTime2013_12_24= os.time(SerStartTm2013_12_24)
   actTime2013_12_26= os.time(SerStartTm2013_12_26)
 

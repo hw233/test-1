@@ -173,7 +173,9 @@ public:
         {
             if (first.battlePoint != second.battlePoint)
                 return first.battlePoint > second.battlePoint;
-            return first.id < second.id;
+            if (first.id != second.id)
+                return first.id < second.id;
+            return first.petId < second.petId;
         }
     };
     typedef std::set<PetInfoList, petGreater> PetInfoSet;

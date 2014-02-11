@@ -1,11 +1,13 @@
 #include "Married.h"
 #include "Marry.h"
 #include "Player.h"
+#include "Package.h"
 #include "Common/TimeUtil.h"
 #include "MsgID.h"
 #include "Common/URandom.h"
 #include "Server/SysMsg.h"
 #include "GData/CoupleUpgrade.h"
+#include "GData/CoupleCopy.h"
 
 namespace GObject
 {
@@ -124,8 +126,14 @@ namespace GObject
             woman_player = player;
         }
         
+        UInt32 now = TimeUtil::Now();
         //CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
-        
+        if(man_player->isOnline() && woman_player->isOnline() && man_player->GetVar(VAR_COUPLE_ONLINE_START_TIME) == 0)
+        {
+            if(man_player->getLastOnline() < TimeUtil::SharpDay(0, TimeUtil::Now()) && woman_player->getLastOnline() < TimeUtil::SharpDay(0, TimeUtil::Now()))
+                man_player->SetVar(VAR_COUPLE_ONLINE_START_TIME,TimeUtil::SharpDay(0, TimeUtil::Now()));
+        }
+
         Stream st(REP::MARRIEDMGR);
         st << static_cast<UInt8>(2) << man_player->getName() << man_player->isOnline() << woman_player->getName() << woman_player->isOnline() ;
         if(man_player->GetVar(VAR_COUPLE_ONLINE_START_TIME) == 0 || !man_player->isOnline() || !woman_player->isOnline()) 
@@ -139,6 +147,11 @@ namespace GObject
         st << static_cast<UInt8>(man_player->GetVar(VAR_COUPLE_ONLINE_FISH)) << static_cast<UInt8>(man_player->GetVar(VAR_COUPLE_ONLINE_AWARD)) << Stream::eos;
         
         player->send(st);
+        
+        Stream st1(REP::MARRIEDMGR);
+        st1 << static_cast<UInt8>(0x11) << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME)) << Stream::eos;
+        player->send(st1);
+        
         return;
     }
     
@@ -205,7 +218,7 @@ namespace GObject
             man_player->SetVar(VAR_COUPLE_ONLINE_TIME,tmp_time);
         }
         UInt8 num = 0;
-        num = man_player->GetVar(VAR_COUPLE_ONLINE_TIME) / (60*60); 
+        num = man_player->GetVar(VAR_COUPLE_ONLINE_TIME) / (15*60); 
         if(num < 1)
             return; 
         if(num > 2 && num <= 7)
@@ -263,7 +276,10 @@ namespace GObject
         if(it == m_couple.end())
             return;
         if(man_player->GetVar(VAR_COUPLE_ONLINE_RENAME) != 0)
-            useMoney(player,2,50,1); 
+        {
+            if(useMoney(player,2,50,1) != 0)
+                return;
+        }
         UInt8 tmp_count = man_player->GetVar(VAR_COUPLE_ONLINE_RENAME) + 1;
         man_player->SetVar(VAR_COUPLE_ONLINE_RENAME,tmp_count);
         
@@ -525,6 +541,8 @@ namespace GObject
         {
             case AWARD_WHITEFISH:
                 it->second->levelExp += 1;
+                if(it->second->levelExp >= 63770)
+                    it->second->levelExp = 63770;
                 rebuildCouplePet(man_player);
                 gMarryMgr.SetDirty(man_player,woman_player);
                 
@@ -536,6 +554,8 @@ namespace GObject
                 break;
             case AWARD_QIXINGFISH:
                 it->second->levelExp += 2;
+                if(it->second->levelExp >= 63770)
+                    it->second->levelExp = 63770;
                 rebuildCouplePet(man_player);
                 gMarryMgr.SetDirty(man_player,woman_player);
 
@@ -547,6 +567,8 @@ namespace GObject
                 break;
             case AWARD_JINJINFISH:
                 it->second->levelExp += 3;
+                if(it->second->levelExp >= 63770)
+                    it->second->levelExp = 63770;
                 rebuildCouplePet(man_player);
                 gMarryMgr.SetDirty(man_player,woman_player);
                                
@@ -557,7 +579,7 @@ namespace GObject
                 DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,man_player->GetMarriageInfo()->yuyueTime);
                 break;
             case AWARD_MEMEORY:
-                it->second->levelExp += 4;
+                /*it->second->levelExp += 4;
                 rebuildCouplePet(man_player);
                 gMarryMgr.SetDirty(man_player,woman_player);
                 
@@ -570,10 +592,28 @@ namespace GObject
                 SYSMSG_SENDV(919, woman_player);
                 SYSMSG_SENDV(922, woman_player);
                 DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,man_player->GetMarriageInfo()->yuyueTime);
-               /* it->second->friendliness += 5;
+                it->second->friendliness += 5;
+                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_friendliness` = %u WHERE `jh_time` = %u", it->second->friendliness, man_player->GetMarriageInfo()->yuyueTime);*/
+                man_player->AddVar(VAR_COUPLE_COPY_COUNT,1);
                 SYSMSG_SENDV(925, man_player);
                 SYSMSG_SENDV(924, man_player);
-                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_friendliness` = %u WHERE `jh_time` = %u", it->second->friendliness, man_player->GetMarriageInfo()->yuyueTime);*/
+                SYSMSG_SENDV(925, woman_player);
+                SYSMSG_SENDV(924, woman_player);
+                break;
+            case WINNER_COPY:
+                it->second->levelExp += 5;
+                it->second->friendliness += 5;
+                if(it->second->friendliness >= 1500)
+                    it->second->friendliness = 1500;
+
+                rebuildCouplePet(man_player);
+                gMarryMgr.SetDirty(man_player,woman_player);
+                SYSMSG_SENDV(926, man_player);
+                SYSMSG_SENDV(927, man_player);
+                SYSMSG_SENDV(926, woman_player);
+                SYSMSG_SENDV(927, woman_player);
+                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u, `pet_friendliness` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp, it->second->friendliness, man_player->GetMarriageInfo()->yuyueTime);
+
                 break;
             default:
                 break;
@@ -588,7 +628,13 @@ namespace GObject
         if(it == m_couple.end())
             return;
         while((GData::cu).getUpgradeData(it->second->level)->levelUpExp <= it->second->levelExp)
+        {
+            if(it->second->level == 46)
+                break;
             it->second->level += 1; 
+            if((GData::cu).getUpgradeData(it->second->level) == NULL)
+                break;
+        }
 
         return;
     }
@@ -600,11 +646,13 @@ namespace GObject
             return;
                 
         GData::CoupleUpgradeData* cud = (GData::cu).getUpgradeData(it->second->level);
-                
+        if(cud == NULL)
+            return;
+
         UInt32 friendliness = it->second->friendliness;
-        if(friendliness < 250)
+        if(friendliness < 125)
             return; 
-        if(friendliness >= 250 ) 
+        if(friendliness >= 125 ) 
             ae.hp += cud->hp;
         if(friendliness >= 375 )
             ae.attack += cud->attak;
@@ -665,6 +713,421 @@ namespace GObject
         if(it == m_couple.end())
             return;
         m_couple.erase(it);  
+        return;
+    }
+
+/* VAR_COUPLE_COPY_STATUS  从低到高 副本类型 0-离开副本 1，2，3-三个副本类型，玩家队伍状态 0-空 1-队长 2-组员，跳过战斗flag 0-表示勾选 ，自动开始战斗flag 0-表示勾选  */
+
+    void MarriedMgr::EnterCoupleCopy(Player* player,UInt8 copy_type)
+    {
+        if(copy_type != 0 && player->getMainFighter()->getLevel() < 75)
+        {
+            if(copy_type != 1)
+                return;
+        }
+        
+        player->SetVar(VAR_COUPLE_COPY_STATUS,0);//清空状态 
+        if(copy_type != 0 && copy_type != 1 && copy_type != 2 && copy_type != 3)
+            return;
+        GObject::Player * man_player = NULL;
+        GObject::Player * woman_player = NULL;
+        GObject::Player * obj_player = NULL;
+        if(PreCheckingStatus(player) != 0)
+            return ;
+        obj_player = GObject::globalPlayers[player->GetMarriageInfo()->lovers];
+
+        if(!player->getMainFighter()->getSex())//男的
+        {
+            man_player = player;
+            woman_player = obj_player;
+        }
+        else
+        {
+            man_player = obj_player;
+            woman_player = player;
+        }
+        
+      /*  if(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT), 1) == 0)//每日免费次数
+        {
+            man_player->AddVar(VAR_COUPLE_COPY_COUNT,1);
+            
+            UInt32 tmp_value = SET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_STATUS),1,1);  
+            man_player->SetVar(VAR_COUPLE_COPY_DAY_COUNT,tmp_value);
+        }*/
+        
+        if(copy_type == 0)
+            player->SetVar(VAR_COUPLE_COPY_STATUS,0);
+        else
+        {
+            UInt32 tmp_status = player->GetVar(VAR_COUPLE_COPY_STATUS);
+            tmp_status = SET_BIT_8(tmp_status,0,copy_type);  
+            if(GET_BIT_8(obj_player->GetVar(VAR_COUPLE_COPY_STATUS), 0) == copy_type)//同一个副本
+                tmp_status = SET_BIT_8(tmp_status,1,2);
+            else 
+                tmp_status = SET_BIT_8(tmp_status,1,1);
+            player->SetVar(VAR_COUPLE_COPY_STATUS,tmp_status);
+        }
+
+        ReturnCoupleCopyInfo(player); 
+        ReturnCoupleCopyInfo(obj_player); 
+        return;
+    }
+    
+    void MarriedMgr::ReturnCoupleCopyInfo(Player* player)
+    {
+        GObject::Player * man_player = NULL;
+        GObject::Player * woman_player = NULL;
+        GObject::Player * obj_player = NULL;
+        obj_player = GObject::globalPlayers[player->GetMarriageInfo()->lovers];
+
+        if(!player->getMainFighter()->getSex())//男的
+        {
+            man_player = player;
+            woman_player = obj_player;
+        }
+        else
+        {
+            man_player = obj_player;
+            woman_player = player;
+        }
+
+        Stream st(REP::MARRIEDMGR);//返回夫妻副本信息
+        st << static_cast<UInt8>(0x08) << static_cast<UInt8>(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS),0));
+        if(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS), 1) == 1)
+        {
+            st << player->getId();
+            if(GET_BIT_8(obj_player->GetVar(VAR_COUPLE_COPY_STATUS), 0) == (GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS), 0)))
+                st << static_cast<UInt64>(obj_player->getId());
+            else
+                st << static_cast<UInt64>(0);
+        }
+        else if(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS), 1) == 2)
+            {
+                if(GET_BIT_8(obj_player->GetVar(VAR_COUPLE_COPY_STATUS), 0) != (GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS), 0)))
+                {
+                    player->SetVar(VAR_COUPLE_COPY_STATUS,SET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS),1,1)); 
+                    st << player->getId() << static_cast<UInt64>(0);
+                }
+                st << obj_player->getId() << player->getId(); 
+            }
+        if(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT), 1) == 0)//每日免费次数
+            st << static_cast<UInt8>(man_player->GetVar(VAR_COUPLE_COPY_COUNT) + 1) ;
+        else
+            st << static_cast<UInt8>(man_player->GetVar(VAR_COUPLE_COPY_COUNT)) ;
+        st << static_cast<UInt8>(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS), 2)) << static_cast<UInt8>(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS), 3)) << static_cast<UInt8>(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT),0)) << Stream::eos;     
+        player->send(st);
+        
+        return;
+    }
+
+    void MarriedMgr::InvitePlayer(Player* player)
+    {
+        GObject::Player * obj_player = NULL;
+        if(PreCheckingStatus(player) != 0)
+            return ;
+        obj_player = GObject::globalPlayers[player->GetMarriageInfo()->lovers];
+
+        if(obj_player->getMainFighter()->getLevel() < 75)
+        {
+            if(static_cast<UInt8>(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS),0)) >= 2)
+            {
+                player->sendMsgCode(0,1709); 
+                return;
+            }
+        }
+        
+        Stream st(REP::MARRIEDMGR);
+        st << static_cast<UInt8>(0x10) << player->getName() << player->getId() << player->getMainFighter()->getColor() << static_cast<UInt8>(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS), 0)) << Stream::eos;   
+        obj_player->send(st);
+        //SYSMSG_SENDV(928, player);
+        player->sendMsgCode(0, 1708);
+        return;
+    }
+
+    void MarriedMgr::OpCoupleCopy(Player* player,UInt8 op_type)
+    {
+        if(op_type != 0 && op_type != 1 && op_type != 2)
+            return;
+        GObject::Player * man_player = NULL;
+        GObject::Player * woman_player = NULL;
+        GObject::Player * obj_player = NULL;
+        if(PreCheckingStatus(player) != 0)
+            return ;
+        obj_player = GObject::globalPlayers[player->GetMarriageInfo()->lovers];
+        
+        if(!player->getMainFighter()->getSex())//男的
+        {
+            man_player = player;
+            woman_player = obj_player;
+        }
+        else
+        {
+            man_player = obj_player;
+            woman_player = player;
+        }
+
+        Stream st(REP::MARRIEDMGR);
+        if(op_type == 2)
+        {
+            UInt32 tmp_count = 1 + GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT),0); 
+            if(useMoney(player,2,15*tmp_count,3) != 0)
+                return;
+            //购买次数
+            man_player->AddVar(VAR_COUPLE_COPY_COUNT,1);
+            man_player->AddVar(VAR_COUPLE_COPY_DAY_COUNT,1);//每日购买计数加一
+            
+            st << static_cast<UInt8>(0x09) << static_cast<UInt8>(2);
+            if(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT), 1) == 0)//每日免费次数
+                st << static_cast<UInt8>(man_player->GetVar(VAR_COUPLE_COPY_COUNT) + 1) ;
+            else
+                st << static_cast<UInt8>(man_player->GetVar(VAR_COUPLE_COPY_COUNT)) ;
+            st<< static_cast<UInt8>(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT),0)) << Stream::eos;
+            man_player->send(st);
+            woman_player->send(st);
+        }
+        else
+        {
+            if(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS), 1) != 1 && (op_type+2) == 3)//只有队长才能改变跳过战斗或自动开始战斗 
+                return;
+            UInt32 tmp_status = player->GetVar(VAR_COUPLE_COPY_STATUS);
+            UInt32 tmp_status1 = obj_player->GetVar(VAR_COUPLE_COPY_STATUS);
+            UInt8 leader_bit = 0;
+            if(GET_BIT_8(tmp_status, (op_type+2)) == 0)
+            {
+                tmp_status = SET_BIT_8(tmp_status,(op_type+2),1);
+                if(GET_BIT_8(tmp_status,0) == GET_BIT_8(tmp_status1,0) && (op_type+2) == 3)//同一个副本
+                {
+                    tmp_status1 = SET_BIT_8(tmp_status1,(op_type+2),1);
+                    leader_bit = 1; 
+                }
+            }
+            else 
+            {
+                tmp_status = SET_BIT_8(tmp_status,(op_type+2),0);
+                if(GET_BIT_8(tmp_status,0) == GET_BIT_8(tmp_status1,0) && (op_type+2) == 3)//同一个副本
+                {
+                    tmp_status1 = SET_BIT_8(tmp_status1,(op_type+2),0);
+                    leader_bit = 1; 
+                }
+            }
+            player->SetVar(VAR_COUPLE_COPY_STATUS,tmp_status);
+            obj_player->SetVar(VAR_COUPLE_COPY_STATUS,tmp_status1);
+            st << static_cast<UInt8>(0x09) << op_type << static_cast<UInt8>(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS),(op_type+2))) << Stream::eos;
+            player->send(st);
+            if(leader_bit)
+                obj_player->send(st);
+        }
+        return;
+    }
+
+    void MarriedMgr::EnterBattle(Player* player)
+    {
+        if(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS), 1) != 1)//只有队长才能改变跳过战斗或自动开始战斗 
+            return; 
+        GObject::Player * man_player = NULL;
+        GObject::Player * woman_player = NULL;
+        GObject::Player * obj_player = NULL;
+        if(PreCheckingStatus(player) != 0)
+            return ;
+        obj_player = GObject::globalPlayers[player->GetMarriageInfo()->lovers];
+        if(!player->getMainFighter()->getSex())//男的
+        {
+            man_player = player;
+            woman_player = obj_player;
+        }
+        else
+        {
+            man_player = obj_player;
+            woman_player = player;
+        }
+        
+        if(static_cast<UInt8>(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS),0)) == 0 || GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS),0) != GET_BIT_8(obj_player->GetVar(VAR_COUPLE_COPY_STATUS),0))//判断俩玩家是否都在副本
+            return;
+
+        if(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT), 1) == 1 && man_player->GetVar(VAR_COUPLE_COPY_COUNT) <= 0)//判断夫妻双方进入副本次数
+            return ;
+
+        if(!player->isOnline() || !obj_player->isOnline())
+            return;
+        player->checkLastBattled();
+        obj_player->checkLastBattled();
+    
+        if (man_player->GetPackage()->GetRestPackageSize() <= 0)
+        {
+            man_player->sendMsgCode(0, 1011);
+            woman_player->sendMsgCode(0, 6028);
+            return ;
+        }
+        if (woman_player->GetPackage()->GetRestPackageSize() <= 0)
+        {
+            woman_player->sendMsgCode(0, 1011);
+            man_player->sendMsgCode(0, 6028);
+            return ;
+        }
+
+        //读取怪物npcgroup
+        UInt8 mapid = static_cast<UInt8>(GET_BIT_8(player->GetVar(VAR_COUPLE_COPY_STATUS),0));
+        GData::CoupleCopyData* ccd = (GData::cc).getCopyData(mapid);
+        
+        if(ccd->location != PLAYER_DATA(player, location))//判断是否在据点上
+            return;
+        if(ccd->location != PLAYER_DATA(obj_player, location))//判断是否在据点上
+            return;
+        
+        UInt32 NPCId = ccd->monster; 
+        UInt32 rptid = 0;
+        GData::NpcGroups::iterator it = GData::npcGroups.find(NPCId);
+        if(it == GData::npcGroups.end())
+            return;
+        GData::NpcGroup * ng = it->second;
+        if (!ng)
+            return;
+        
+        std::vector<GData::NpcFData>& _npcList = ng->getList();
+        if (_npcList.size() == 0)
+            return;
+
+        GObject::Fighter* monster = _npcList[0].fighter;
+
+        Battle::BattleSimulator bsim(Battle::BS_COPY1, player, monster->getName(), monster->getLevel(), false);
+        bsim.newFighter(0,11,player->getMainFighter());
+        bsim.newFighter(0,13,obj_player->getMainFighter());
+
+        ng->putFighters(bsim);
+        bsim.start();
+        sendBattleReport(man_player,woman_player,ng,bsim,rptid);
+        
+        man_player->AddVar(VAR_COUPLE_COPY_BATTLE,1);
+        UInt8 tmp_count = man_player->GetVar(VAR_COUPLE_COPY_BATTLE);
+        if(tmp_count >= 1) 
+        {
+            if(tmp_count >= 6)
+                tmp_count = 6;
+            switch(tmp_count)
+            {
+                case 1:
+                    man_player->udpLog("fuqijiayuan", "F_140116_15", "", "", "", "", "act");
+                    break;
+                case 2:
+                    man_player->udpLog("fuqijiayuan", "F_140116_16", "", "", "", "", "act");
+                    break;
+                case 3:
+                    man_player->udpLog("fuqijiayuan", "F_140116_17", "", "", "", "", "act");
+                    break;
+                case 4:
+                    man_player->udpLog("fuqijiayuan", "F_140116_18", "", "", "", "", "act");
+                    break;
+                case 5:
+                    man_player->udpLog("fuqijiayuan", "F_140116_19", "", "", "", "", "act");
+                    break;
+                case 6:
+                    man_player->udpLog("fuqijiayuan", "F_140116_20", "", "", "", "", "act");
+                    break;
+                default:
+                   break;
+            }
+        }
+        man_player->udpLog("fuqijiayuan", "F_140116_15", "", "", "", "", "act");
+        man_player->udpLog("fuqijiayuan", "F_140116_7", "", "", "", "", "act");
+
+//        bsim.applyFighterHP(0, pl);
+        EnterCoupleCopy(player,0);      
+        EnterCoupleCopy(obj_player,0);      
+        return;
+    }
+    
+    void MarriedMgr::sendBattleReport(Player* man_player,Player* woman_player,GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid)
+    {
+        Stream& packet = bsim.getPacket();
+        if(packet.size() <= 8)
+            return;
+
+        bool isLast = (ng != NULL);
+        UInt8 side = 0;
+        UInt8 res = bsim.getWinner();
+        UInt16 r = 0;
+        if(res == 1)
+        {
+            side = 1;
+            r = static_cast<UInt16>(0x0201);
+        }
+        else if(res == 2)
+        {
+            r = static_cast<UInt16>(0x0200);
+        }
+
+        UInt32 id = bsim.clearLastBattle(side, isLast);
+
+        if(ng && res == 1)
+        {
+            ng->getLoots(man_player, man_player->_lastLoot, 0, NULL);
+            ng->getLoots(woman_player, woman_player->_lastLoot, 0, NULL);
+            
+            ChangPetAttr(man_player,woman_player,WINNER_COPY);
+            if(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT), 1) == 0)//每日免费次数
+            {
+                UInt32 tmp_value = SET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT),1,1); 
+                man_player->SetVar(VAR_COUPLE_COPY_DAY_COUNT,tmp_value);
+            }
+            else
+            {
+                UInt32 tmp_count = man_player->GetVar(VAR_COUPLE_COPY_COUNT); 
+                tmp_count --;
+                man_player->SetVar(VAR_COUPLE_COPY_COUNT,tmp_count);
+            }
+        }
+        
+        Stream st(REP::ATTACK_NPC);
+        st << r << id << Stream::eos;
+   
+        Stream st1(REP::MARRIEDMGR);
+        st1 << static_cast<UInt8>(0x12) << static_cast<UInt8>(res-1);
+        if(man_player->_lastLoot.size() != 0)
+            st1 << static_cast<UInt32>((man_player->_lastLoot.at(0)).id) << Stream::eos;
+        else
+            st1 << static_cast<UInt32>(0) << Stream::eos; 
+        
+        Stream st2(REP::MARRIEDMGR);
+        st2 << static_cast<UInt8>(0x12) << static_cast<UInt8>(res-1) ;
+        if(woman_player->_lastLoot.size() != 0)
+            st2 << static_cast<UInt32>((woman_player->_lastLoot.at(0)).id) << Stream::eos;
+        else
+            st2 << static_cast<UInt32>(0) << Stream::eos; 
+        
+        if(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_STATUS),2) == 0)
+            man_player->send(st);
+        else
+        {
+            man_player->send(st1);
+            man_player->checkLastBattled();
+        }
+        if(GET_BIT_8(woman_player->GetVar(VAR_COUPLE_COPY_STATUS),2) == 0)
+            woman_player->send(st);
+        else
+        {
+            woman_player->send(st2);
+            woman_player->checkLastBattled();
+        }
+
+        if(rptid == 0)
+            rptid = id;
+
+        return;
+    }
+    
+    void MarriedMgr::SetCoupleFix(Player* player,UInt8 flag)
+    {
+        if(flag != 0 && flag != 1)
+            return;
+        if(PreCheckingStatus(player) != 0)
+            return ;
+
+        player->SetVar(VAR_COUPLE_NAME,flag);
+        
+        Stream st(REP::MARRIEDMGR);
+        st << static_cast<UInt8>(0x11) << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME)) << Stream::eos;
+        player->send(st);
+
         return;
     }
 

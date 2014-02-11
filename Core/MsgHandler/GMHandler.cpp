@@ -41,7 +41,6 @@
 #include "GObject/HeroMemo.h"
 #include "MsgHandler/JsonParser.h"
 #include "GObject/LuckyDraw.h"
-#include "GObject/ClanCopy.h"
 #include "GObject/SingleHeroStage.h"
 #include "GObject/NewCountryBattle.h"
 #include "GObject/Tianjie.h"
@@ -59,6 +58,9 @@
 #include "GObject/Marry.h"
 #include "GObject/Married.h"
 #include "GObject/ArenaServerWar.h"
+
+#include "GObject/ClanBuilding.h"
+
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -308,6 +310,12 @@ GMHandler::GMHandler()
     Reg(2, "jiqiren", &GMHandler::OnJiqirenAction);
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
     Reg(3, "addpetattr", &GMHandler::OnAddPetAttr);
+    Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
+
+    //  帮派建筑相关指令
+    Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
+    Reg(1, "cbop", &GMHandler::OnClanBuildingOp);
+    Reg(3, "cblvl", &GMHandler::OnClanBuildingLevelChange);
 
     _printMsgPlayer = NULL;
 }
@@ -5062,7 +5070,7 @@ void GMHandler::OnCreateMarryBoard(GObject::Player *player, std::vector<std::str
 	UInt64 playerId2 = strtoull(args[1].c_str(), &endptr, 10);
     UInt8 type = atoi(args[2].c_str());
     UInt32 now = TimeUtil::Now();
-    if(type > 1 && type < 4 )
+    if(type > 0 && type < 4 )
     {
         WORLD().CreateMarryBoard(playerId1,playerId2,type,now + 1860);
         GObject::MarryBoard::instance().SetQuestionOnMarryBoard();
@@ -5078,4 +5086,75 @@ void GMHandler::OnAddPetAttr(GObject::Player *player, std::vector<std::string>& 
     UInt8 type = atoll(args[0].c_str());
     UInt16 num = atoll(args[1].c_str());
     gMarriedMgr.AddPetAttr(player,type,num);     
+}
+
+void GMHandler::TestSameTimeRecharge(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return ;
+    UInt64 serverId = 2;
+    for (size_t i = 0; i < args.size(); ++i)
+    {
+        UInt64 pid = serverId << 48 | atoll(args[i].c_str());
+        GObject::Player * pl = GObject::globalPlayers[pid];
+        if (pl)
+        {
+            pl->addTotalRecharge(1000);
+        }
+    }
+}
+
+void GMHandler::OnClanBuildingInfo(GObject::Player *player, std::vector<std::string>& args)
+{
+    Clan *clan = player->getClan();
+    if (!clan)
+        return;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    if (!buildingOwner)
+        return;
+    SYSMSG_SENDV(5200, player, player->getName().c_str(), clan->getName().c_str());
+    SYSMSG_SENDV(5201, player, buildingOwner->getEnergy());
+    SYSMSG_SENDV(5202, player,
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingPhyAtk), 
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingMagAtk),
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingAction), 
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingHP));
+}
+
+// TODO: 帮派建筑相关GM操作 
+void GMHandler::OnClanBuildingOp(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    Clan *clan = player->getClan();
+    if (!clan)
+        return;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    if (!buildingOwner)
+        return;
+    UInt8 opType = atoi(args[0].c_str());
+    switch (opType)
+    {
+        case 1:
+            break;
+        case 2:
+            break;
+        default:
+            break;
+    }
+
+}
+
+void GMHandler::OnClanBuildingLevelChange(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    Clan *clan = player->getClan();
+    if (!clan)
+        return;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getBuildingOwner();
+    if (!buildingOwner)
+        return;
+    Int32 iVal = atoi(args[0].c_str());
+    buildingOwner->levelChange(iVal);
 }

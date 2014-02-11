@@ -961,6 +961,7 @@ namespace GObject
         void sendLuckybagInfo();
         void sendSummerFlowInfo();
         void sendSummerMeetInfo();
+        void sendSummerMeetScoreInfo();
         void sendSummerMeetRechargeInfo();
         void sendSummerFlow3TimeInfo();
         void sendSummerFlow3LoginInfo();
@@ -1845,6 +1846,7 @@ namespace GObject
         bool _qixiBinding;
         QiShiBanInfo m_qishiban;
     public:
+		inline bool isFriend(Player *pl) const { return _hasFriend(0, pl); }
         inline bool isJumpingMap() { return _isJumpingMap; }
         inline void setJumpingMap(bool v) { _isJumpingMap = v; }
         bool in7DayFromCreated();
@@ -2495,6 +2497,8 @@ namespace GObject
         void sendLuckyMeetLoginInfo();
         void SetLuckyMeetValue();
         void SetSummerMeetValue();
+        void getSummerMeetScore(UInt8 num , UInt32 val = 0 );
+        UInt32 getSummerMeetTotalScore();
         void SetSummerFlow3Value();
         void getNewRC7DayLoginAward(UInt8 val, UInt8 off);
         void getQQBoardInstantLoginAward(UInt8 val);
@@ -2550,6 +2554,11 @@ namespace GObject
         float getClanStatueHitrLvlEffect();
         void  AddStatueExp(UInt32 exp);
         void  SubStatueExp(UInt32 exp);
+
+        float getClanBuildingHPEffect();
+        float getClanBuildingPhyAtkEffect();
+        float getClanBuildingMagAtkEffect();
+        float getClanBuildingActionEffect();
 
         // 所有将互斥法宝
         bool checkTrumpMutually(UInt32 trumpid);

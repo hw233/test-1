@@ -185,7 +185,7 @@ void PetTeamCopy::reqTeamList(Player* pl)
             continue;
 
         GData::NpcGroup * ng = it->second;
-        if (!ng)
+        if (ng == NULL)
             continue;
 
         std::vector<GData::NpcFData>& _npcList = ng->getList();
@@ -193,6 +193,8 @@ void PetTeamCopy::reqTeamList(Player* pl)
             continue;
 
         GObject::Fighter* monster = _npcList[0].fighter;
+        if(monster == NULL)
+            continue;
 
         cnt++;
         st << static_cast<UInt8>(td->index) << static_cast<UInt8>(td->type) 
@@ -298,6 +300,7 @@ void PetTeamCopy::teamInfo(Player* pl, Stream& st)
             st << pet->getPetEvolve();
             pet->AppendEquipData(st);
             pet->sendHunPoInfo(st);
+            pet->sendSevenSoulInfo(st);
         }
     }
 }
@@ -354,7 +357,7 @@ void PetTeamCopy::reqMonsterInfo(Player* pl)
             return;
 
         GData::NpcGroup * ng = it->second;
-        if (!ng)
+        if (ng == NULL)
             return;
 
         std::vector<GData::NpcFData>& _npcList = ng->getList();
@@ -362,6 +365,8 @@ void PetTeamCopy::reqMonsterInfo(Player* pl)
             return;
 
         GObject::Fighter* monster = _npcList[0].fighter;
+        if(monster == NULL)
+            return;
 
         st << static_cast<UInt32>(monster->getId()) << NPCId;
     }
@@ -617,7 +622,7 @@ void PetTeamCopy::refreshMonster(Player* pl)
                     continue;
 
                 GData::NpcGroup * ng = itA->second;
-                if (!ng)
+                if(ng == NULL)
                     continue;
 
                 std::vector<GData::NpcFData>& _npcList = ng->getList();
@@ -625,6 +630,9 @@ void PetTeamCopy::refreshMonster(Player* pl)
                     continue;
 
                 GObject::Fighter* monster = _npcList[0].fighter;
+                if(monster == NULL)
+                    continue;
+
                 monsterId[i] = monster->getId();
             }
         }
@@ -1001,8 +1009,9 @@ UInt32 PetTeamCopy::joinTeam(Player* pl, UInt32 teamId)
 
     td->members[td->count] = pl;
     ++td->count;
-
     pl->setPetTeamData(td);
+
+    pl->udpLog("chongwufuben", "F_55000", "", "", "", "", "act");
     /*for(UInt8 k=0; k<td->count; k++)
     {
         std::cout << "Formation A: " <<  static_cast<UInt32>(td->formation[k]) << std::endl;
@@ -1333,6 +1342,65 @@ void PetTeamCopy::setFormation(Player* pl, UInt8 pos1, UInt8 pos2, UInt8 pos3)
     }
 }
 
+void PetTeamCopy::inviteFriend(Player* pl, UInt64 friendId)
+{
+    if(pl == NULL)
+        return;
+
+    Player* member = GObject::globalPlayers[friendId];
+    if(NULL == member)
+        return;
+
+    if(!member->isOnline())
+    {
+        pl->sendMsgCode(0, 2218);
+        return;
+    }
+
+    if(!pl->isFriend(member))
+        return;
+
+    PetTeamData* td = pl->getPetTeamData();
+    if(td == NULL)
+        return;
+
+    if(!checkPetTeamCopy(pl, td->index, td->type))
+        return;
+
+    if(td->start)
+        return;
+
+    if(td->leader != pl)
+        return;
+
+    Stream st(REP::PET_TEAM_COPY);
+    st << static_cast<UInt8>(0x16);
+    st << pl->getId() << pl->getCountry() << pl->getName().c_str() << static_cast<UInt8>(td->index) << static_cast<UInt8>(td->type) << static_cast<UInt32>(td->id) << static_cast<UInt32>(td->NPCId); 
+    st << Stream::eos;
+    member->send(st);
+
+    SYSMSG_SEND(5130, pl);
+}
+
+void PetTeamCopy::refuseJoin(Player* pl, UInt64 leaderId)
+{
+    if(pl == NULL)
+        return;
+
+    Player* leader = GObject::globalPlayers[leaderId];
+    if(NULL == leader)
+        return;
+
+    if(!pl->isFriend(leader))
+        return;
+
+    Stream st(REP::PET_TEAM_COPY);
+    st << static_cast<UInt8>(0x17);
+    st << pl->getCountry() << pl->getName().c_str(); 
+    st << Stream::eos;
+    leader->send(st);
+}
+
 void PetTeamCopy::reqStart(Player* pl, UInt8 opt)
 {
     if(opt != 0 && opt != 1)
@@ -1419,7 +1487,7 @@ void PetTeamCopy::teamBattleStart(Player* pl)
     if(it == GData::npcGroups.end())
         return;
     GData::NpcGroup * ng = it->second;
-    if (!ng)
+    if (ng == NULL)
         return;
     
     std::vector<GData::NpcFData>& _npcList = ng->getList();
@@ -1427,6 +1495,8 @@ void PetTeamCopy::teamBattleStart(Player* pl)
         return;
 
     GObject::Fighter* monster = _npcList[0].fighter;
+    if(monster == NULL)
+        return;
 
     UInt16 bs = 0;
     bs = td->index - 1 + Battle::BS_COPY1;
@@ -1518,6 +1588,8 @@ void PetTeamCopy::sendBattleReport(PetTeamData* td, GData::NpcGroup* ng, Battle:
                         continue;
 
                     GObject::Fighter* monster = _npcList[0].fighter;
+                    if(monster == NULL)
+                        continue;
 
                     std::vector<UInt32> logits;
                     for(UInt8 k=0; k<pl->_lastLoot.size(); k++)

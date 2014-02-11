@@ -73,6 +73,7 @@
 #include "GObject/Married.h"
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
+#include "GObject/ClanBuilding.h"
 
 struct NullReq
 {
@@ -1131,6 +1132,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendSecondInfo();
     }
+    if(!pl->GetVar(VAR_ONCE_ONDAY))
+    {
+        pl->sendNovLoginInfo();
+        pl->SetVar(VAR_ONCE_ONDAY,1);
+    }
     {
         TeamCopyPlayerInfo* tcp = pl->getTeamCopyPlayerInfo();
         if (tcp && tcp->getPass(4) && (pl->GetVar(VAR_EX_JOB_ENABLE) == 0))
@@ -1180,7 +1186,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
-    GObject::MarryBoard::instance().sendTodayMarryInfo(pl);
+    GObject::MarryBoard::instance().sendTodayMarryInfo(pl ,1);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
     {
@@ -1427,6 +1433,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->send(st1);
         gMarriedMgr.ProcessOnlineAward(pl,0);
         gMarriedMgr.ReturnCouplePet(pl);
+        gMarriedMgr.EnterCoupleCopy(pl,0);
     }
     else
     {
@@ -1434,6 +1441,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0)<< Stream::eos;
         pl->send(st1);
     }
+    pl->getNewYearGiveGiftAward(0,0);
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -4046,8 +4054,8 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 	Stream st(REP::CHAT);
 	UInt8 office = player->getTitle(), guard = 0;
     guard = player->getPF();
-	st << cr._type << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
-        << office << guard << cr._text << player->GetLev() << Stream::eos;
+	st << cr._type << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1) 
+        << office << guard << cr._text << player->GetLev() <<static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME)) <<Stream::eos;
 	switch(cr._type)
 	{
 	case 0xFF:
@@ -4988,7 +4996,7 @@ void OnClanRankBattleSortList(GameMsgHdr& hdr, const void* data)
 
 void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
 {
-    // TODO: 帮派副本系统的请求协议
+    // 帮派副本系统的请求协议
     MSG_QUERY_PLAYER(player);
 
 	GObject::Clan * clan = player->getClan();
@@ -5411,6 +5419,9 @@ void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
     UInt8 op = 0;
     br >> op;
 
+    if(player->getLocation() != 4874) 
+        return;
+
     if (player->isJumpingMap())
         return;
 
@@ -5502,6 +5513,20 @@ void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
             UInt8 type = 0;
             br >> type;
             petTeamCopyManager->reqStart(player, type);
+        }
+        break;
+    case 0x16:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            petTeamCopyManager->inviteFriend(player, playerId);
+        }
+        break;
+    case 0x17:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            petTeamCopyManager->refuseJoin(player, playerId);
         }
         break;
     default:
@@ -7523,6 +7548,7 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
             {
                 UInt8 b_loverToken = 0;
                 string str_pronouncement = "";
+                string str_sql= "'";
                 UInt8 ret = 1;//操作返回值
                 UInt64 obj_playerid = 0;
                 UInt8 flag1 = 0;//修改征婚信息标志位 
@@ -7534,6 +7560,9 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                 {
                     case 0:
                         brd >> b_loverToken >> str_pronouncement;  
+                        
+                        if(str_pronouncement.find(str_sql) != std::string::npos)
+                            str_pronouncement.replace(str_pronouncement.find(str_sql),str_sql.length(),"//");
                         sMarriage->pronouncement = str_pronouncement;
                         sMarriage->eLove = static_cast<ELoveToken>(b_loverToken);
                         ret = GObject::gMarryMgr.StartMarriage(player,sMarriage); 
@@ -7801,6 +7830,9 @@ void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
     UInt8 eLove = 1;
     UInt8 consumeType= 0;
     UInt8 fish_count = 0;
+    UInt8 copy_type = 0;
+    UInt8 op_type = 0;
+    UInt8 flag= 0;
     switch(req)
     {
         case 2:
@@ -7825,7 +7857,22 @@ void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
             gMarriedMgr.Fishing(player,consumeType,fish_count);
             break;
         case 8:
-
+            brd >> copy_type;
+            gMarriedMgr.EnterCoupleCopy(player,copy_type);
+            break;
+        case 9:
+            brd >> op_type; 
+            gMarriedMgr.OpCoupleCopy(player,op_type);
+            break;
+        case 0x10:
+            gMarriedMgr.InvitePlayer(player); 
+            break;
+        case 0x11:
+            brd >> flag; 
+            gMarriedMgr.SetCoupleFix(player,flag); 
+            break;
+        case 0x12:
+            gMarriedMgr.EnterBattle(player);
             break;
         default:
 
@@ -8149,7 +8196,7 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
                 UInt8 office = player->getTitle();
                 UInt8 guard = player->getPF();
                 st << static_cast<UInt8>(11)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
-                    << office << guard << text.c_str()<< player->GetLev() << Stream::eos;
+                    << office << guard << text.c_str()<< player->GetLev() << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME) )<< Stream::eos;
                 NETWORK()->Broadcast(st);
             }
             break;
@@ -8173,6 +8220,27 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
                 SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
             }
     }
+}
+
+// 仙境遗迹协议请求处理
+void OnClanFairyLandReq(GameMsgHdr& hdr,const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL)
+	{
+		Stream st(REP::CLAN_COPY);
+		st << static_cast<UInt8>(0);
+		st << Stream::eos;
+		player->send(st);
+		return;
+    }
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    GObject::ClanBuildingOwner* buildingOwner = clan->getBuildingOwner();
+    if (buildingOwner)
+        buildingOwner->processFromBrd(player, brd);
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

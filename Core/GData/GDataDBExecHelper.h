@@ -279,6 +279,17 @@ struct DBClanStatue
     UInt32 exHitRate;   // 神像增加的命中值
 };
 
+struct DBClanBuilding
+{
+    // 帮派建筑模板参数
+    UInt16 level;       // 建筑等级
+    UInt32 needExp;     // 升级所需经验值
+    UInt32 phyAtkValue;     // 物攻类型
+    UInt32 magAtkValue;     // 法攻加成
+    UInt32 actionValue;     // 身法加成
+    UInt32 hpValue;         // 生命加成
+};
+
 struct DBSoulSkillType
 {
 	UInt16 id;          // 技能ID
@@ -731,6 +742,14 @@ struct DBCoupleInfo
     UInt32 action;
 };
 
+struct DBCoupleCopy 
+{
+    UInt8 id;
+    std::string name;
+    UInt32 location;
+    UInt32 monster;
+};
+
 }
 
 namespace DB {
@@ -958,6 +977,18 @@ SPECIALDEF(10)
     UInt32, exMagDef,    
     UInt32, exAction,    
     UInt32, exHitRate
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBClanBuilding)
+SPECIALDEF(6)
+    (
+    UInt16, level,
+    UInt32, needExp,
+    UInt32, phyAtkValue,
+    UInt32, magAtkValue,
+    UInt32, actionValue,
+    UInt32, hpValue
     )
 SPECIALEND()
 
@@ -1553,6 +1584,16 @@ SPECIALDEF(7)
     UInt32, magic_attak,
     float, df_critical,
     UInt32, action
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCoupleCopy)
+SPECIALDEF(4)
+    (
+	UInt8, id,
+    std::string, name,
+    UInt32, location,
+    UInt32, monster
     )
 SPECIALEND()
 

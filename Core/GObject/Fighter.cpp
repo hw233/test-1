@@ -2007,6 +2007,16 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.hitrlvl += _owner->getClanStatueHitrLvlEffect();
     }
 
+    if (_owner)
+    {
+        // 帮派建筑对额外属性的加成
+        _attrExtraEquip.hp += _owner->getClanBuildingHPEffect();
+        _attrExtraEquip.attack += _owner->getClanBuildingPhyAtkEffect();
+        _attrExtraEquip.magatk += _owner->getClanBuildingMagAtkEffect();
+        _attrExtraEquip.action += _owner->getClanBuildingActionEffect();
+        
+    }
+
     if(m_2ndSoul)
     {
         m_2ndSoul->addAttr(_attrExtraEquip);
@@ -2226,7 +2236,7 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
         UInt8 sl = SKILL_LEVEL(skillId);
         UInt8 ssl = 0;
         SStrengthen* ss = SSGetInfo(skillId);
-        if(ss)
+        if(ss && !isPet())
             ssl = ss->lvl;
         return Script::BattleFormula::getCurrent()->calcSkillBattlePoint(sc, sl, type, ssl);
     }
@@ -3996,7 +4006,8 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONBEMAGDMG ||
                         s->cond == GData::SKILL_ONHP10P ||
                         s->cond == GData::SKILL_AFTACTION ||
-                        s->cond == GData::SKILL_ONHPCHANGE
+                        s->cond == GData::SKILL_ONHPCHANGE ||
+                        s->cond == GData::SKILL_ONWITHSTAND
                         )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
@@ -4050,7 +4061,8 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONBEMAGDMG ||
                         s->cond == GData::SKILL_ONHP10P ||
                         s->cond == GData::SKILL_AFTACTION ||
-                        s->cond == GData::SKILL_ONHPCHANGE
+                        s->cond == GData::SKILL_ONHPCHANGE ||
+                        s->cond == GData::SKILL_ONWITHSTAND
                         )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);

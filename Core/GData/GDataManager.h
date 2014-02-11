@@ -46,6 +46,7 @@ namespace GData
         static bool LoadClanCopy();
         static bool LoadClanCopyMonster();
         static bool LoadClanStatue();
+        static bool LoadClanBuilding();
 		static bool LoadClanTechTable();
 		static bool LoadClanSkillTable();
         static bool LoadSoulSkillTable();
@@ -82,6 +83,7 @@ namespace GData
         static bool LoadRideConfig();
         static bool LoadRideUpgradeConfig();
         static bool LoadCoupleInfo();
+        static bool LoadCoupleCopy();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);

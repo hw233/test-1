@@ -423,22 +423,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             {
                 player->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
             }
-             /*if(!player->GetVar(GObject::VAR_ONCE_ONDAY))
-            {
-                UInt32 icCount = player->GetVar(GObject::VAR_NEWYEARSPEED_COUNT);
-                if(icCount + player->getMaxIcCount(player->getVipLevel(),1) > 255)
-                    player->SetVar(VAR_NEWYEARSPEED_COUNT,255);
-                else
-                    player->AddVar(VAR_NEWYEARSPEED_COUNT,player->getMaxIcCount(player->getVipLevel(),1));
-
-                UInt32 picCount = player->GetVar(GObject::VAR_NEWYEAR_PRATICE_COUNT);
-                if(icCount + GObject::PracticePlace::_picCnt[player->getVipLevel()] > 255)
-                    player->SetVar(VAR_NEWYEAR_PRATICE_COUNT,255);
-                else
-                    player->AddVar(GObject::VAR_NEWYEAR_PRATICE_COUNT,GObject::PracticePlace::_picCnt[player->getVipLevel()]);
-                player->SetVar(GObject::VAR_ONCE_ONDAY,1);
-            }
-            */
             player->SetReqDataTime(0);
             //player->SetReqDataTime1(0);
 #ifdef _FB
@@ -1967,7 +1951,7 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
         UInt8 office = player->getTitle(), guard = 0;
         guard = player->getPF();
         st << static_cast<UInt8>(2) << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
-            << office << guard << talk_record << player->GetLev() << Stream::eos;
+            << office << guard << talk_record << player->GetLev() <<static_cast<UInt8>(player->GetVar(GObject::VAR_COUPLE_NAME)) <<Stream::eos;
 
         GameMsgHdr hdr(0x160, WORKER_THREAD_WORLD, player, st.size());
         GLOBAL().PushMsg(hdr, static_cast<UInt8 *>(st));
@@ -3370,6 +3354,11 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN_AWARD, 0);
                  //pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
+                pl->SetVar(GObject::VAR_SUMMERMEET_SCORE1, 0);
+                pl->SetVar(GObject::VAR_SUMMERMEET_SCORE2, 0);
+                pl->SetVar(GObject::VAR_SUMMERMEET_SCORE3, 0);
+                pl->SetVar(GObject::VAR_SUMMERMEET_SCORE4, 0);
+                pl->SetVar(GObject::VAR_SUMMERMEET_SCORE5, 0);
             //    pl->checLuckyMeet();
             }
             break;
