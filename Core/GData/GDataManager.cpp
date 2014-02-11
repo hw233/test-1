@@ -42,6 +42,7 @@
 #include "RideConfig.h"
 #include "GObject/Married.h"
 #include "CoupleUpgrade.h"
+#include "CoupleCopy.h"
 
 namespace GData
 {
@@ -417,6 +418,11 @@ namespace GData
         if (!LoadCoupleInfo())
         {
             fprintf (stderr, "Load LoadCoupleInfoConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadCoupleCopy())
+        {
+            fprintf (stderr, "Load LoadCoupleCopyConfig Error !\n");
             std::abort();
         }
 
@@ -1043,7 +1049,7 @@ namespace GData
 			{
 				lua_tinker::table tael_train_elem = tael_train.get<lua_tinker::table>(i+1);
 				UInt32 elem_sz = tael_train_elem.size();
-				m_TaelTrainList.resize(151);
+				m_TaelTrainList.resize(LEVEL_MAX + 1);
 				for (UInt32 j = 0; j < elem_sz; ++ j)
 				{
 					UInt8 lowLev, highLev;
@@ -1059,7 +1065,7 @@ namespace GData
 			//GoldTrain
 			lua_tinker::table gold_train = lua_tinker::call<lua_tinker::table>(L, "GetGoldTrain");
 			UInt32 sz2 = gold_train.size();
-			m_GoldTrainList.resize(151);
+			m_GoldTrainList.resize(LEVEL_MAX + 1);
 			for (UInt32 i = 0; i < sz2; ++ i)
 			{
 				lua_tinker::table gold_train_elem = gold_train.get<lua_tinker::table>(i+1);
@@ -1079,7 +1085,7 @@ namespace GData
 			//LevelTrainExp
 			lua_tinker::table exp_train = lua_tinker::call<lua_tinker::table>(L, "GetLevelTrainExp");
 			UInt32 sz3 = exp_train.size();
-			m_LevelTrainExp.resize(151);
+			m_LevelTrainExp.resize(LEVEL_MAX + 1);
 			for (UInt32 i = 0; i < sz3; ++ i)
 			{
 				lua_tinker::table exp_train_elem = exp_train.get<lua_tinker::table>(i+1);
@@ -2771,6 +2777,18 @@ namespace GData
 			return false;
 		while(execu->Next() == DB::DB_OK)
             cu.loadUpgradeTable(dbpn); 
+		return true;
+    }
+
+    bool GDataManager::LoadCoupleCopy()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCoupleCopy dbcc;
+		if(execu->Prepare("SELECT `id` ,`name`, `location`, `monster` FROM `couplecopy` ", dbcc) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            cc.loadCopyTable(dbcc); 
 		return true;
     }
 

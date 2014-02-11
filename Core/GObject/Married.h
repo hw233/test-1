@@ -44,6 +44,7 @@ namespace GObject
         AWARD_QIXINGFISH,               //七星鱼
         AWARD_JINJINFISH,               //金锦鱼
         AWARD_MEMEORY,               //记忆碎片
+        WINNER_COPY,               //副本胜利
     };
     
     class MarriedMgr  
@@ -70,6 +71,15 @@ namespace GObject
             void AddPetAttr(Player* player,UInt8 type,UInt16 num);
             void AppendPetData(Player* player,Stream& st);
             void eraseCoupleList(Player* player);
+           
+            //夫妻副本
+            void EnterCoupleCopy(Player* player,UInt8 copy_type);
+            void OpCoupleCopy(Player* player,UInt8 op_type);
+            void EnterBattle(Player* player);
+            void ReturnCoupleCopyInfo(Player* player);
+            void InvitePlayer(Player* player);
+            void sendBattleReport(Player* player,Player* obj_player,GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid);
+            void SetCoupleFix(Player* player,UInt8 flag);
 
         private:
             std::map<UInt32,CoupleInfo*> m_couple;

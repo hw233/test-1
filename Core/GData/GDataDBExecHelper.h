@@ -731,6 +731,14 @@ struct DBCoupleInfo
     UInt32 action;
 };
 
+struct DBCoupleCopy 
+{
+    UInt8 id;
+    std::string name;
+    UInt32 location;
+    UInt32 monster;
+};
+
 }
 
 namespace DB {
@@ -1553,6 +1561,16 @@ SPECIALDEF(7)
     UInt32, magic_attak,
     float, df_critical,
     UInt32, action
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCoupleCopy)
+SPECIALDEF(4)
+    (
+	UInt8, id,
+    std::string, name,
+    UInt32, location,
+    UInt32, monster
     )
 SPECIALEND()
 

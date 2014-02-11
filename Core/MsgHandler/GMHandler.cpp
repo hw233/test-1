@@ -5062,7 +5062,7 @@ void GMHandler::OnCreateMarryBoard(GObject::Player *player, std::vector<std::str
 	UInt64 playerId2 = strtoull(args[1].c_str(), &endptr, 10);
     UInt8 type = atoi(args[2].c_str());
     UInt32 now = TimeUtil::Now();
-    if(type > 1 && type < 4 )
+    if(type > 0 && type < 4 )
     {
         WORLD().CreateMarryBoard(playerId1,playerId2,type,now + 1860);
         GObject::MarryBoard::instance().SetQuestionOnMarryBoard();

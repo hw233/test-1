@@ -52,6 +52,7 @@ enum    // 技能触发方式
     /*26*/ SKILL_BLTY,  //碧岚天衣
     /*27*/ SKILL_AFTACTION,      // 行动后触发（包括被眩晕）
     /*28*/ SKILL_ONHPCHANGE,       // HP改变时触发
+    /*29*/ SKILL_ONWITHSTAND,    // 招架（可以反击状态下触发）
     SKILL_PASSIVES
 };
 
@@ -123,6 +124,12 @@ enum
     e_eft_zhu_tian_bao_jian = 44, //诸天宝鉴
     e_eft_trigger_count_max = 45, // 技能触发上限
     e_eft_hp_lostp = 46,    // HP损失百分比
+    e_eft_withstand = 47,       // 招架效果
+    e_eft_flaw = 48,            // 破绽效果
+    e_eft_ru_red_carpet = 49,    // 儒：红毯
+    e_eft_shi_flower = 50,    // 释：鲜花
+    e_eft_dao_rose = 51,    // 道：玫瑰
+    e_eft_mo_knot = 52,    // 墨：同心结
 
     e_eft_max
 };
