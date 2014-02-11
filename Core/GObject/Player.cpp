@@ -25446,7 +25446,7 @@ void Player::QiShiBanState()
         UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
         if(totalScore > highestScore)
         {
-            WORLD().SetMemCach_qishiban(totalScore, getOpenId());
+            WORLD().SetMemCach_qishiban(totalScore, getOpenId(), getName(), getName());
             highestScore = totalScore;
         }
 
@@ -25481,7 +25481,7 @@ void Player::MyQSBInfo()
     UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
     if(cycleHighestScore > highestScore)
     {
-        WORLD().SetMemCach_qishiban(cycleHighestScore, getOpenId());
+        WORLD().SetMemCach_qishiban(cycleHighestScore, getOpenId(), getName());
         highestScore = cycleHighestScore;
     }
 
@@ -25624,13 +25624,13 @@ void Player::FinishCurStep(int randMark, UInt32 clintTime)
     UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
     if(totalScore > highestScore)
     {
-        WORLD().SetMemCach_qishiban(totalScore, getOpenId());
+        WORLD().SetMemCach_qishiban(totalScore, getOpenId(), getName());
         highestScore = totalScore;
     }
 
     /*if(GetQiShiBanScore() > highestScore)
     {
-        WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId());
+        WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId(), getName());
         highestScore = GetQiShiBanScore();
     }*/
 

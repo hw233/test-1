@@ -3071,6 +3071,17 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     case 0x12:
                         player->RestCurStep();
                         break;
+                    case 0x13:
+                        {
+                            player->ReqQiShiBanPlayCount();
+                            UInt16 count = 0;
+                            brd >> count;
+                            for (UInt16 i = 0; i < count; ++i)
+                            {
+                                std::string name;
+                                brd >> name;
+                            }
+                        }
                     default:
                         break;
                 }
