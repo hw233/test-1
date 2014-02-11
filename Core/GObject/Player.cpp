@@ -24,6 +24,7 @@
 #include "GData/Title.h"
 #include "Clan.h"
 #include "ClanCopy.h"
+#include "ClanBuilding.h"
 #include "Mail.h"
 #include "Boss.h"
 #include "Athletics.h"
@@ -14034,7 +14035,7 @@ namespace GObject
 
         SetVar(VAR_SUMMER_MEET_STRENTH_AWARD, ctslandingAward);
         char str[16] = {0};
-        sprintf(str, "F_130801_%d", 11+val);
+        sprintf(str, "F_130801_%d", 22+val);
         udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
     void Player::getSummerFlow3OnlineAward(UInt8 val)
@@ -14619,6 +14620,45 @@ namespace GObject
         _clan->subStatueExp(exp);
     }
 
+    float Player::getClanBuildingHPEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingHP));
+        return 0;
+    }
+
+    float Player::getClanBuildingPhyAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingPhyAtk));
+        return 0;
+    }
+
+    float Player::getClanBuildingMagAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingMagAtk));
+        return 0;
+    }
+
+    float Player::getClanBuildingActionEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingAction));
+        return 0;
+    }
 
     void Player::onBlueactiveday()
     {

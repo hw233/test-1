@@ -1868,7 +1868,21 @@ namespace GObject
         {
             ReplyMarriageList::iterator it = m_replyList.find(dbpn->status);
             if(it == m_replyList.end())
+            {
+                if(!player->getMainFighter()->getSex())//男的
+                {
+                    UInt8 ret = getMoney(player,sMarriageInfo->eLove);
+                    if(ret != 0)
+                        return 1;
+                    //还信物钱
+                    sendMoneyMail(player,sMoney.price_type,sMoney.price_num,sMoney.useType,sMoney.eParm); 
+                }
+                DB7().PushUpdateData("DELETE FROM `marriage` WHERE `playerid` = %" I64_FMT "u", player->getId());
+                player->SetVar(VAR_MARRY_STATUS,0);
+                player->sendMsgCode(0, 6022);
+                
                 return 1;
+            }
             std::vector<UInt64>& vec = it->second;
             vec.insert(vec.begin(),static_cast<UInt64>(dbpn->playerid));
             sMarriageInfo->lovers = static_cast<UInt64>(dbpn->status);
