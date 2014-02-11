@@ -3701,7 +3701,7 @@ bool World::MemCachInit()
     return true;
 }
 
-void World::SetMemCach_qishiban(UInt32 score, const char * openId, const char * name)
+void World::SetMemCach_qishiban(UInt32 score, const char * openId)
 {
     if (_memcinited)
     {
@@ -3713,16 +3713,18 @@ void World::SetMemCach_qishiban(UInt32 score, const char * openId, const char * 
         bool res = m_MCached.set(key, len, value, vlen, 0);
         TRACE_LOG("setKey: %s, setScore: %u, res:%u", key, score, res);
 
+        /*
         len = snprintf(key,sizeof(key), "qishibanname_%s", openId);
         key[MEMCACHED_MAX_KEY - 1] = '\0';
         vlen = snprintf(value, sizeof(value), "%s", name);
         value[31] = '\0';
         res = m_MCached.set(key, len, value, vlen, 0);
         TRACE_LOG("setKey: %s, setName: %u, res:%u", key, score, res);
+        */
     }
 }
 
-UInt32 World::GetMemCach_qishiban(const char * openId, const char * name)
+UInt32 World::GetMemCach_qishiban(const char * openId)
 {
     char value[32]={0};
     char key[MEMCACHED_MAX_KEY] = {0};

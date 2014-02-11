@@ -3071,6 +3071,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     case 0x12:
                         player->RestCurStep();
                         break;
+                        /*
                     case 0x13:
                         {
                             player->ReqQiShiBanPlayCount();
@@ -3082,6 +3083,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                                 brd >> name;
                             }
                         }
+                        */
                     default:
                         break;
                 }
