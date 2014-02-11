@@ -307,6 +307,9 @@ GMHandler::GMHandler()
     Reg(3, "clmarrylist", &GMHandler::OnCleanMarryList);
     Reg(3, "setmarry", &GMHandler::OnSetMarryStatus);
     Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
+    Reg(2, "serverleft", &GMHandler::OnHandleServerLeft);
+    Reg(2, "leftreport", &GMHandler::OnServerLeftReport);
+    Reg(2, "leftaddr", &GMHandler::OnHandleLeftAddr);
     Reg(2, "jiqiren", &GMHandler::OnJiqirenAction);
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
     Reg(3, "addpetattr", &GMHandler::OnAddPetAttr);
@@ -5158,3 +5161,81 @@ void GMHandler::OnClanBuildingLevelChange(GObject::Player *player, std::vector<s
     Int32 iVal = atoi(args[0].c_str());
     buildingOwner->levelChange(iVal);
 }
+void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+        return;
+    UInt32 leftId = atoi(args[0].c_str());
+    std::map<Player *, UInt8> warSort;
+    UInt8 i = 0, j = 0;
+    UInt32 clanId = 0;
+    std::string clanName = "";
+    for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+    {
+        if(j > 2)
+            break;
+        GObject::Player * player = it->second;
+        if(clanId == 0 )
+        {
+            if(player->getClan())
+            {
+                clanId = player->getClan()->getId();
+                clanName = player->getClanName();
+            }
+            else
+                continue ;
+        }
+        if(player && player->GetLev() >= LIMIT_LEVEL)
+            warSort.insert(std::make_pair(player, i++));
+        if(warSort.size() == 5)
+        {
+            struct SWarEnterData {
+                Stream st;
+                std::map<Player *, UInt8> warSort;
+
+                SWarEnterData(Stream& st2, std::map<Player *, UInt8>& warSort2) : st(st2), warSort(warSort2) {}
+            };
+
+            Stream st(SERVERLEFTREQ::ENTER, 0xEE);
+            st<<clanId <<clanName<<leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
+            SWarEnterData * swed = new SWarEnterData(st, warSort);
+            std::map<Player *, UInt8>::iterator it = warSort.begin();
+            GameMsgHdr hdr(0x391, it->first->getThreadId(), it->first, sizeof(SWarEnterData*));
+            GLOBAL().PushMsg(hdr, &swed);
+
+            i = 0;
+            j ++;
+            clanId = 0 ;
+            warSort.clear();
+        }
+    }
+}
+void GMHandler::OnServerLeftReport(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() !=1 )
+        return ;
+	UInt64 playerId1 = player->getId();
+    UInt32 bpId = atoi(args[0].c_str());
+    Stream st(SERVERLEFTREQ::BATTLE_REPORT, 0xEE);
+    st << playerId1 << bpId ; 
+    st << Stream::eos;
+    NETWORK()->SendToServerLeft(st);
+}
+void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::string>& args)
+{
+    UInt32 bpId = atoi(args[0].c_str());
+    UInt64 playerId1 = player->getId();
+    switch(bpId)
+    {
+        case 1:
+            {
+                Stream st(SERVERLEFTREQ::LEFTADDR_INFO, 0xEE);
+                st << playerId1 ; 
+                st << Stream::eos;
+                NETWORK()->SendToServerLeft(st);
+                break;
+            }
+    }
+}
+
+

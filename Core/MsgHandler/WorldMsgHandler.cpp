@@ -94,6 +94,14 @@ MSG_REG_2(ServerWarMsgHdr, 0x128, OnServerWarBattlePoint);
 MSG_REG_2(ServerWarMsgHdr, 0x129, OnServerWarLeaderBoard);
 MSG_REG_2(ServerWarMsgHdr, 0x12A, OnServerRechargeRank);
 
+MSG_REG_2(ServerLeftMsgHdr, 0x131, OnServerLeftConnected);  //连接
+MSG_REG_2(ServerLeftMsgHdr, 0x132, OnServerLeftPlayerEntered); //组队攻击
+MSG_REG_2(ServerLeftMsgHdr, 0x133, OnServerLeftLineupCommited);//阵形确认
+MSG_REG_2(ServerLeftMsgHdr, 0x134, OnServerLeftGetSpirit);  //帮派获得元气
+MSG_REG_2(ServerLeftMsgHdr, 0x135, OnServerLeftGetAward);  //帮派获得仙界赐福
+MSG_REG_2(ServerLeftMsgHdr, 0x136, OnServerLeftBattleReport); //接受战报
+MSG_REG_2(ServerLeftMsgHdr, 0x137, OnServerLeftRevInfo);   //接受遗迹信息
+
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 

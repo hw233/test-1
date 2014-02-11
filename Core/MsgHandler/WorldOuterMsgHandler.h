@@ -3708,5 +3708,128 @@ void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )
     else if(type == 3)
         GObject::leaderboard.sendGoldLvlAward(brd);
 }
+void OnServerLeftConnected( ServerLeftMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(!cfg.enabledServerWar())
+        return;
+	UInt8 r = 0;
+	brd >> r;
+	if(r == 1)
+	{
+		INFO_LOG("Failed to connect to ServerWar arena.");
+		NETWORK()->CloseServerWar();
+		return;
+	}
+    UInt8 fhaslater = 0;
+    brd >> fhaslater;
+    GObject::serverWarMgr._readbuf.append((UInt8*)(data) + brd.pos(), brd.size() - brd.pos());
+    if(!fhaslater)
+    {
+        BinaryReader brd2((UInt8*)(GObject::serverWarMgr._readbuf), GObject::serverWarMgr._readbuf.size());
+	    GObject::serverWarMgr.readFrom(brd2);
+        GObject::serverWarMgr._readbuf.clear();
+    }
+}
 
+void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    int cid = 0, sid = 0;
+    brd >> cid >> sid;
+	if(sid != cfg.serverNo || cid != cfg.channelNum)
+		return;
+    GVAR.SetVar(GVAR_SERVERWAR_ISENTER, 1);
+
+    SYSMSGV(title, 825);
+    SYSMSGV(content, 826, GObject::serverWarMgr.getSession());
+    GObject::serverWarMgr.sendTeamMail(title, content);
+}
+
+void OnServerLeftLineupCommited( ServerLeftMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 r;
+	UInt64 playerId;
+    brd >> r >> playerId;
+	GObject::Player * player = GObject::globalPlayers[playerId];
+	if(player == NULL)
+		return;
+    Stream st(REP::SERVERWAR_ARENA_OP);
+    st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x04);
+    st << r << Stream::eos;
+    player->send(st);
+}
+void OnServerLeftBattleReport( ServerLeftMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt64 pid = 0;
+    br >> pid;
+    Stream st;
+    std::vector<UInt8> buf;
+    buf.resize(br.size()-8);
+    br >> buf;
+    st << buf;
+    st << Stream::eos;
+
+	GObject::Player * player = GObject::globalPlayers[pid];
+    if(player == NULL)
+        return;
+	player->send(&(st[0]), st.size());
+}
+void OnServerLeftRevInfo(ServerLeftMsgHdr& hdr, const void * data)
+{
+#define LEFTADDRMAX 30
+#define POWERTOWERMAX 9
+#define SERVERLEFT_MAX_MEMBER 5
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt64 playerId = 0;
+    br >> playerId ;
+	GObject::Player * player = GObject::globalPlayers[playerId];
+    if(!player)
+        return ;
+    Stream st;
+    std::vector<UInt8> buf;
+    buf.resize(br.size()-16);
+    br >> buf;
+    st << buf;
+    st << Stream::eos;
+    player->send(st);
+}
+void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 clanId = 0 ;
+    br >> clanId ;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    UInt32 energy = 0;
+    br >> energy;
+    UInt8 num = 0;
+    br >> num ;
+    //std::vector<UInt32> item_vec ;
+    //std::vector<UInt32> itemNum_vec;
+    UInt32 item = 0;
+    UInt32 itemNum = 0;
+    for(UInt8 i = 0 ; i < num ; ++i )
+    {
+        br >> item ;
+        br >>itemNum;
+    //    item_vec.push_back(item);
+    //    itemNum_vec.push(itemNum);
+        clan->AddItem(item,itemNum);
+    }
+}
+void OnServerLeftGetSpirit(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 clanId = 0 ;
+    br >> clanId ;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    UInt32 num = 0;
+    br >> num ; 
+}
 #endif // _WORLDOUTERMSGHANDLER_H_
