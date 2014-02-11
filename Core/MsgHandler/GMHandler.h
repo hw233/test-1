@@ -242,6 +242,7 @@ private:
     void OnAddPetAttr(GObject::Player *player, std::vector<std::string>& args);
     void OnHandleServerLeft(GObject::Player* player, std::vector<std::string>& args);
     void OnServerLeftReport(GObject::Player* player, std::vector<std::string>& args);
+    void OnHandleLeftAddr(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

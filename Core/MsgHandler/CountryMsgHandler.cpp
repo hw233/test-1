@@ -433,5 +433,6 @@ MSG_REG_2(GameMsgHdr, 0x391, OnServerLeftEnter);     //进入遗迹，攻击遗�
 MSG_REG_2(GameMsgHdr, 0x392, OnServerLeftLineup);    //阵形
 MSG_REG_2(GameMsgHdr, 0x393, OnServerLeftChangeTeamMember);   //改变已占遗迹人员配置
 MSG_REG_2(GameMsgHdr, 0x394, OnServerLeftAddPowerHold);   //灵气池
+MSG_REG_2(GameMsgHdr, 0x395, OnServerLeftInfoReq);   //遗迹信息请求
 
 MSG_HANDLER_END()

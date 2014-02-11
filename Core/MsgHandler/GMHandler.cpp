@@ -5117,7 +5117,7 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
                 SWarEnterData(Stream& st2, std::map<Player *, UInt8>& warSort2) : st(st2), warSort(warSort2) {}
             };
 
-            Stream st(SERVERWARREQ::ENTER, 0xEE);
+            Stream st(SERVERLEFTREQ::ENTER, 0xEE);
             st<<clanId <<clanName<<leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
             SWarEnterData * swed = new SWarEnterData(st, warSort);
             std::map<Player *, UInt8>::iterator it = warSort.begin();
@@ -5137,18 +5137,26 @@ void GMHandler::OnServerLeftReport(GObject::Player* player, std::vector<std::str
         return ;
 	UInt64 playerId1 = player->getId();
     UInt32 bpId = atoi(args[0].c_str());
-    Stream st(SERVERWARREQ::BATTLE_REPORT, 0xEE);
+    Stream st(SERVERLEFTREQ::BATTLE_REPORT, 0xEE);
     st << playerId1 << bpId ; 
     st << Stream::eos;
     NETWORK()->SendToServerLeft(st);
 }
 void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::string>& args)
 {
-    Stream st(SERVERWARREQ::BATTLE_REPORT, 0xEE);
-    st << playerId1 << bpId ; 
-    st << Stream::eos;
-    NETWORK()->SendToServerLeft(st);
-    
+    UInt32 bpId = atoi(args[0].c_str());
+    UInt64 playerId1 = player->getId();
+    switch(bpId)
+    {
+        case 1:
+            {
+                Stream st(SERVERLEFTREQ::LEFTADDR_INFO, 0xEE);
+                st << playerId1 ; 
+                st << Stream::eos;
+                NETWORK()->SendToServerLeft(st);
+                break;
+            }
+    }
 }
 
 

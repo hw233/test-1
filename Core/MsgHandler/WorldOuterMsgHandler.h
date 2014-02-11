@@ -3772,38 +3772,53 @@ void OnServerLeftRevInfo(ServerLeftMsgHdr& hdr, const void * data)
 #define POWERTOWERMAX 9
 #define SERVERLEFT_MAX_MEMBER 5
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
-    Stream st(br._buf,br._len);
-/*    for(UInt8 i = 0 ;i < LEFTADDRMAX ; ++i )   
-    {
-        std::string clanName = ""; 
-        br >> clanName;
-        st << clanName;
-        UInt32 spiritAddPH = 0;
-        br >> spiritAddPH;
-        st << spiritAddPH;
-        UInt32 occupyTime = 0;
-        br >> occupyTime;
-        st << occupyTime;
-        UInt32 spiritNow = 0;
-        br >> spiritNow;
-        st << spiritNow;
-        UInt8  power = 0;
-        br >> power;
-        st << power;
-        for(UInt8 i = 0 ; i < SERVERLEFT_MAX_MEMBER ; ++i )  
-        {
-            std::string playerName = "";
-            br >> playerName;
-            st << playerName;
-            UInt8 lev = 0;
-            br >> lev;
-            st << lev;
-            UInt32 battlePower = 0 ;
-            br >> battlePower;
-            st << battlePower;
-        }
-    }
-    */
+    UInt64 playerId = 0;
+    br >> playerId ;
+	GObject::Player * player = GObject::globalPlayers[playerId];
+    if(!player)
+        return ;
+    Stream st;
+    std::vector<UInt8> buf;
+    buf.resize(br.size()-16);
+    br >> buf;
+    st << buf;
+    st << Stream::eos;
+    player->send(st);
 }
-
+void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 clanId = 0 ;
+    br >> clanId ;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    UInt32 energy = 0;
+    br >> energy;
+    UInt8 num = 0;
+    br >> num ;
+    //std::vector<UInt32> item_vec ;
+    //std::vector<UInt32> itemNum_vec;
+    UInt32 item = 0;
+    UInt32 itemNum = 0;
+    for(UInt8 i = 0 ; i < num ; ++i )
+    {
+        br >> item ;
+        br >>itemNum;
+    //    item_vec.push_back(item);
+    //    itemNum_vec.push(itemNum);
+        clan->AddItem(item,itemNum);
+    }
+}
+void OnServerLeftGetSpirit(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 clanId = 0 ;
+    br >> clanId ;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    UInt32 num = 0;
+    br >> num ; 
+}
 #endif // _WORLDOUTERMSGHANDLER_H_

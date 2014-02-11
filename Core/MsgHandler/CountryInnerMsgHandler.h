@@ -2649,6 +2649,16 @@ void OnServerLeftAddPowerHold( GameMsgHdr& hdr, const void* data )
 {
 
 }
+void OnServerLeftInfoReq(GameMsgHdr& hdr, const void* data)
+{
+    Stream st(SERVERLEFTREQ::LEFTADDR_INFO, 0xEE);
+	Player * player = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    if(!player)
+        return ;
+    st << player->getId();
+    st << Stream::eos;
+    NETWORK()->SendToServerLeft(st);
+}
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 
