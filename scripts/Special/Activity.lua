@@ -7929,7 +7929,7 @@ function sendRechargeRankAward(player, pos, total, f7)
     elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
         sendRechargeRankAward_2013_09_06(player, pos, total, f7)
     end
- end
+end
 
 function sendConsumeRankAward_2012_10_19(player, pos)
     local items = {

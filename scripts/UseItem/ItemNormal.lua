@@ -3353,6 +3353,7 @@ function ItemNormal_00009435(iid ,num,bind,param)
     return used
 end
 function ItemNormal_00009444(iid, num, bind, param)
+    print("X")
     local Award ={
     [9444] = {{15,1},{400,1},{133,1}},
     [9445] = {{15,1},{134,1},{56,1},{9088,1}},

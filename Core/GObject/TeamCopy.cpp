@@ -832,8 +832,9 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
         if(!member)
             break;
 
-        if(res == 2)
+        if(res == 2)    //战败
         {
+            std::cout << "XXXX"  <<std::endl;
             sendBattleReport(td, NULL, bsim, rptid);
         }
 
@@ -850,8 +851,9 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
 
         while(npcIdx < cnt)
         {
-            if( 1 == res )
+            if( 1 == res )   //战胜
             {
+                std::cout << "!!!!!!" << std::endl;
                 sendBattleReport(td, NULL, bsim, rptid);
             }
 
@@ -870,6 +872,7 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
                 }
             }
 
+            std::cout << "QQQQQQQ"  <<std::endl;
             if(res == 0)
                 bsim.start();
             else
@@ -885,6 +888,7 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
         }
     }
 
+    std::cout << "@@@@@@" <<std::endl;
     sendBattleReport(td, ng, bsim, rptid);
 
     if( 1 == res )
@@ -971,12 +975,12 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
     UInt8 side = 0;
     UInt8 res = bsim.getWinner();
     UInt16 r = 0;
-    if(res == 1)
+    if(res == 1)    //战胜
     {
         side = 1;
         r = static_cast<UInt16>(0x0201);
     }
-    else if(res == 2)
+    else if(res == 2)   //战败
     {
         r = static_cast<UInt16>(0x0200);
     }
@@ -1014,6 +1018,7 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
 
         if(rptid == 0)
         {
+            std::cout << "######" <<std::endl;
             Stream st(REP::ATTACK_NPC);
             UInt64 exp;
             if(ng)
