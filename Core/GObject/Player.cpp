@@ -6409,6 +6409,12 @@ namespace GObject
             teamCopyManager->leaveTeamCopy(this);
         }
 
+        if(GetEnterPTCStatus())
+            petTeamCopyManager->quit(this);
+
+        if(GetInPTCStatus())
+            petTeamCopyManager->leaveTeam(this, 1);
+
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)
         {
@@ -27930,19 +27936,19 @@ void Player::LoadMoBaoData(UInt16 buyNum, UInt16 status, const std::string& item
 void Player::InitMoBaoAward()
 {
     std::vector<UInt32> items;
-    UInt32 award[6] = {9413, 9424, 9418, 9414, 9425, 9338};
-    for(UInt8 i=0; i<6; i++)
+    UInt32 award[4] = {9413, 9424, 9418, 9414};
+    for(UInt8 i=0; i<4; i++)
     {
         items.push_back(award[i]);
     }
 
     memset(m_mobao.item, 0, sizeof(m_mobao.item));
-    std::string its;
     for(UInt32 j=0; j<9; ++j)
     {
-        RandMoBaoAward(items, j);
+        RandMoBaoAward(items, j, 0);
     }
 
+    std::string its;
     for(UInt32 j=0; j<9; ++j)
     {
         its += Itoa(m_mobao.item[j]);
@@ -27964,12 +27970,16 @@ void Player::InitMoBaoAward()
 void Player::ReqMoBaoInfo()
 {
     UInt8 refreshMark = GetVar(VAR_MOBAO_REFRESH_AWARD_MARK);
-    if(0 == refreshMark) //全部翻完或每天第一次进入墨宝
+    if(0 == refreshMark || 1 == refreshMark) // 1:全部翻完; 0:每天第一次进入墨宝, 重置数据！！！
     {
         InitMoBaoAward();
-        SetVar(VAR_MOBAO_REFRESH_AWARD_MARK, 1);
+        SetVar(VAR_MOBAO_REFRESH_AWARD_MARK, 2);
     }
+    MoBaoData(1);
+}
 
+void Player::MoBaoData(UInt8 mark)
+{
     UInt16 buyOpenCardNum = GetVar(VAR_BUY_OPENCARD_NUM);
     UInt16 openCardNum = GetVar(VAR_OPENCARD_NUM);
     UInt16 refreshNum = GetVar(VAR_REFRESH_AWARD_NUM);
@@ -27994,12 +28004,35 @@ void Player::ReqMoBaoInfo()
     {
         st << m_mobao.item[i];
     }
+    st << mark;
     st << Stream::eos;
     send(st);
 }
 
+bool Player::CheckForZero()
+{
+    UInt8 refreshMark = GetVar(VAR_MOBAO_REFRESH_AWARD_MARK);
+    if(0 == refreshMark)
+    {
+        InitMoBaoAward();
+        SetVar(VAR_MOBAO_REFRESH_AWARD_MARK, 2);
+        UInt8 mark = 0;
+        if(1 == refreshMark)
+            mark = 1;
+
+        MoBaoData(mark);
+
+        return false;
+    }
+
+    return true;
+}
+
 void Player::OpenCard(UInt8 pos)
 {
+    if(!CheckForZero())
+        return;
+
     if(pos < 0 || pos > 8)
         return;
 
@@ -28075,7 +28108,7 @@ void Player::OpenCard(UInt8 pos)
     status = SET_BIT(status, pos);
     m_mobao.status = status;
     if(511 == m_mobao.status) //所有牌都被翻开了
-        SetVar(VAR_MOBAO_REFRESH_AWARD_MARK, 0);
+        SetVar(VAR_MOBAO_REFRESH_AWARD_MARK, 1);
 
     std::string its;
     for(UInt8 j=0; j<9; ++j)
@@ -28100,6 +28133,9 @@ void Player::OpenCard(UInt8 pos)
 
 void Player::BuyOpenCardNum()
 {
+    if(!CheckForZero())
+        return;
+
     if(!hasChecked())
         return;
 
@@ -28142,11 +28178,13 @@ void Player::BuyOpenCardNum()
     st << surplusNum << static_cast<UInt16>(GetVar(VAR_BUY_OPENCARD_NUM));
     st << Stream::eos;
     send(st);
-
 }
 
 void Player::RefreshAward()
 {
+    if(!CheckForZero())
+        return;
+
     if(!hasChecked())
         return;
 
@@ -28177,8 +28215,6 @@ void Player::RefreshAward()
         useGold(money[refreshAwardNum], &ci);
     }  
 
-    AddVar(VAR_REFRESH_AWARD_NUM, 1);
-    
     for(UInt8 i=0; i<9; i++)
     {
         UInt8 mark = GET_BIT(m_mobao.status, i);
@@ -28186,21 +28222,36 @@ void Player::RefreshAward()
             m_mobao.item[i] = 0;
     }
 
+    UInt8 sign = 0;
     std::vector<UInt32> items;
-    UInt32 award[6] = {9413, 9424, 9418, 9414, 9425, 9338};
-    for(UInt8 i=0; i<6; i++)
+    if(refreshAwardNum < 3)
     {
-        items.push_back(award[i]);
+        UInt32 award[4] = {9413, 9424, 9418, 9414};
+        for(UInt8 i=0; i<4; i++)
+        {
+            items.push_back(award[i]);
+        }
+    }
+    else
+    {
+        UInt32 award[6] = {9413, 9424, 9418, 9414, 9425, 9338};
+        for(UInt8 i=0; i<6; i++)
+        {
+            items.push_back(award[i]);
+        }
+        sign = 1;
     }
 
-    std::string its;
     for(UInt8 i=0; i<9; i++)
     {
         UInt8 mark = GET_BIT(m_mobao.status, i);
         if(0 == mark)
-            RandMoBaoAward(items, i);
+            RandMoBaoAward(items, i, sign);
     }
-    
+
+    AddVar(VAR_REFRESH_AWARD_NUM, 1);
+
+    std::string its;
     for(UInt8 i=0; i<9; i++)
     {
         if(m_mobao.item[i] > 0)
@@ -28213,27 +28264,41 @@ void Player::RefreshAward()
 
     DB3().PushUpdateData("UPDATE `mobao` SET `item` = '%s' WHERE `playerId` = %" I64_FMT "u", its.c_str(), getId());
 
-    ReqMoBaoInfo();
+    MoBaoData(1);
 }
 
-void Player::RandMoBaoAward(std::vector<UInt32>& items, UInt8 k)
+void Player::RandMoBaoAward(std::vector<UInt32>& items, UInt8 k, UInt8 mark)
 {
     UInt8 rand = uRand(100);
     UInt32 itemId = 0;
     UInt8 pos = 0;
 
-   if(rand >= 93)
-        pos = 6;
-    else if(rand >= 85)
-        pos = 5;
-    else if(rand >= 75)
-        pos = 4;
-    else if(rand >= 60)
-        pos = 3;
-    else if(rand >= 30)
-        pos = 2;
+    if(0 == mark)
+    {
+        if(rand >= 90)
+            pos = 4;
+        else if(rand >= 70)
+            pos = 3;
+        else if(rand >= 35)
+            pos = 2;
+        else
+            pos = 1;
+    }
     else
-        pos = 1;
+    {
+        if(rand >= 93)
+            pos = 6;
+        else if(rand >= 85)
+            pos = 5;
+        else if(rand >= 75)
+            pos = 4;
+        else if(rand >= 60)
+            pos = 3;
+        else if(rand >= 30)
+            pos = 2;
+        else
+            pos = 1;
+    }
 
     UInt8 cnt = items.size();
     if(pos > cnt)

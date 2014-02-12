@@ -158,7 +158,6 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearqqvipdiamond.sql     #QQ会员活动需要打开 
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130403_1.sql # must be once 有删除操作
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130408_1.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130422_1.sql   #末日之战帮派增加xianyun和gongxian
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130425_1.sql   #末日之战帮派增加urge
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130510_1.sql   #清除消费抽奖(var142/348)
@@ -246,9 +245,16 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140117_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_reset_newyeargift_var.sql  #清除春节礼包(var349)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_sevensoul.sql  #创建七魄
+<<<<<<< HEAD
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_SetGVar79_Marry.sql  #设置夫妻对数
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140214_1.sql     #墨宝
+=======
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_SetGVar79_Marry.sql  #设置夫妻对数
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #天书奇缘清空
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
+>>>>>>> 36484d5f2ea93d4afdecfb9cfe605863b07c9a4c
 }
 
 #sh player_jiguan.sh

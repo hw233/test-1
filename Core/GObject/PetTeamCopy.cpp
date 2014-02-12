@@ -185,7 +185,7 @@ void PetTeamCopy::reqTeamList(Player* pl)
             continue;
 
         GData::NpcGroup * ng = it->second;
-        if (!ng)
+        if (ng == NULL)
             continue;
 
         std::vector<GData::NpcFData>& _npcList = ng->getList();
@@ -193,6 +193,8 @@ void PetTeamCopy::reqTeamList(Player* pl)
             continue;
 
         GObject::Fighter* monster = _npcList[0].fighter;
+        if(monster == NULL)
+            continue;
 
         cnt++;
         st << static_cast<UInt8>(td->index) << static_cast<UInt8>(td->type) 
@@ -355,7 +357,7 @@ void PetTeamCopy::reqMonsterInfo(Player* pl)
             return;
 
         GData::NpcGroup * ng = it->second;
-        if (!ng)
+        if (ng == NULL)
             return;
 
         std::vector<GData::NpcFData>& _npcList = ng->getList();
@@ -363,6 +365,8 @@ void PetTeamCopy::reqMonsterInfo(Player* pl)
             return;
 
         GObject::Fighter* monster = _npcList[0].fighter;
+        if(monster == NULL)
+            return;
 
         st << static_cast<UInt32>(monster->getId()) << NPCId;
     }
@@ -618,7 +622,7 @@ void PetTeamCopy::refreshMonster(Player* pl)
                     continue;
 
                 GData::NpcGroup * ng = itA->second;
-                if (!ng)
+                if(ng == NULL)
                     continue;
 
                 std::vector<GData::NpcFData>& _npcList = ng->getList();
@@ -626,6 +630,9 @@ void PetTeamCopy::refreshMonster(Player* pl)
                     continue;
 
                 GObject::Fighter* monster = _npcList[0].fighter;
+                if(monster == NULL)
+                    continue;
+
                 monsterId[i] = monster->getId();
             }
         }
@@ -1480,7 +1487,7 @@ void PetTeamCopy::teamBattleStart(Player* pl)
     if(it == GData::npcGroups.end())
         return;
     GData::NpcGroup * ng = it->second;
-    if (!ng)
+    if (ng == NULL)
         return;
     
     std::vector<GData::NpcFData>& _npcList = ng->getList();
@@ -1488,6 +1495,8 @@ void PetTeamCopy::teamBattleStart(Player* pl)
         return;
 
     GObject::Fighter* monster = _npcList[0].fighter;
+    if(monster == NULL)
+        return;
 
     UInt16 bs = 0;
     bs = td->index - 1 + Battle::BS_COPY1;
@@ -1579,6 +1588,8 @@ void PetTeamCopy::sendBattleReport(PetTeamData* td, GData::NpcGroup* ng, Battle:
                         continue;
 
                     GObject::Fighter* monster = _npcList[0].fighter;
+                    if(monster == NULL)
+                        continue;
 
                     std::vector<UInt32> logits;
                     for(UInt8 k=0; k<pl->_lastLoot.size(); k++)

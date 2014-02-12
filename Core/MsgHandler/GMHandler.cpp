@@ -308,6 +308,7 @@ GMHandler::GMHandler()
     Reg(2, "jiqiren", &GMHandler::OnJiqirenAction);
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
     Reg(3, "addpetattr", &GMHandler::OnAddPetAttr);
+    Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
 
     _printMsgPlayer = NULL;
 }
@@ -5079,3 +5080,20 @@ void GMHandler::OnAddPetAttr(GObject::Player *player, std::vector<std::string>& 
     UInt16 num = atoll(args[1].c_str());
     gMarriedMgr.AddPetAttr(player,type,num);     
 }
+
+void GMHandler::TestSameTimeRecharge(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return ;
+    UInt64 serverId = 2;
+    for (size_t i = 0; i < args.size(); ++i)
+    {
+        UInt64 pid = serverId << 48 | atoll(args[i].c_str());
+        GObject::Player * pl = GObject::globalPlayers[pid];
+        if (pl)
+        {
+            pl->addTotalRecharge(1000);
+        }
+    }
+}
+

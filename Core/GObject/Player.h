@@ -2029,11 +2029,13 @@ namespace GObject
         void LoadMoBaoData(UInt16 buyNum, UInt16 status, const std::string& item, 
                             UInt8 itemACnt, UInt8 itemBCnt, UInt8 itemCCnt, UInt8 itemDCnt, UInt8 itemECnt, UInt8 itemFCnt);
         void InitMoBaoAward();
+        void MoBaoData(UInt8 mark=0);
+        bool CheckForZero();
         void ReqMoBaoInfo();
         void OpenCard(UInt8 pos);
         void BuyOpenCardNum();
         void RefreshAward();
-        void RandMoBaoAward(std::vector<UInt32>& items, UInt8 i);
+        void RandMoBaoAward(std::vector<UInt32>& items, UInt8 i, UInt8 mark=0);
         bool CheckMoBaoAward(UInt32 itemId);
 
         //墨宝 end

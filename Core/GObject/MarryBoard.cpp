@@ -668,7 +668,7 @@ namespace GObject
         {
             sendMarryBoardInfo(pl,0);
             if(flag)
-                SYSMSG_SENDV(4200, pl, _man->getName().c_str() , _woman->getName().c_str() ,norms[_norms-1].c_str());
+                SYSMSG_SENDV(4899, pl, _man->getName().c_str() , _woman->getName().c_str() ,norms[_norms-1].c_str());
             return ;
         }
         Stream st(REP::MARRYBOARD);
