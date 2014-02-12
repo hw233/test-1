@@ -199,6 +199,20 @@ struct DBPetTeamCopyLog
     std::string items;
 };
 
+struct DBMoBao
+{
+    UInt64 playerId;
+    UInt16 buyNum;
+    UInt16 status;
+    std::string item;
+    UInt8 itemACnt;
+    UInt8 itemBCnt;
+    UInt8 itemCCnt;
+    UInt8 itemDCnt;
+    UInt8 itemECnt;
+    UInt8 itemFCnt;
+};
+
 struct DBPlayerData
 {
 	UInt64 id;
@@ -1850,6 +1864,22 @@ SPECIALDEF(3)
     std::string, playerName,
     std::string, monsterName,
     std::string, items
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBMoBao)
+SPECIALDEF(10)
+(
+    UInt64, playerId,
+    UInt16, buyNum,
+    UInt16, status,
+    std::string, item,
+    UInt8, itemACnt,
+    UInt8, itemBCnt,
+    UInt8, itemCCnt,
+    UInt8, itemDCnt,
+    UInt8, itemECnt,
+    UInt8, itemFCnt
 )
 SPECIALEND()
 

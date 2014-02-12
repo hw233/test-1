@@ -5533,6 +5533,39 @@ void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
     }
 }
 
+void OnMoBaoReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+    switch(op)
+    {
+    case 0x00:
+        {
+            player->ReqMoBaoInfo();
+        }
+        break;
+    case 0x01:
+        {
+            UInt8 pos = 0;
+            br >> pos;
+            player->OpenCard(pos);
+        }
+        break;
+    case 0x02:
+        {
+            player->RefreshAward();
+        }
+        break;
+    case 0x03:
+        {
+            player->BuyOpenCardNum();
+        }
+        break;
+    }
+}
+
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);

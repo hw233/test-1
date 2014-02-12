@@ -324,6 +324,7 @@ namespace GObject
         static bool loadPetTeamCopy();
         static bool loadPlayerPetTeamCopy();
         static bool loadPetTeamCopyLog();
+        static bool loadMoBao();
         static bool LoadTownDeamon();
         static bool InitMoneyLog();
         static bool LoadHeroMemo();
