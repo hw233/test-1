@@ -126,7 +126,6 @@ namespace GObject
             woman_player = player;
         }
         
-        UInt32 now = TimeUtil::Now();
         //CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
         if(man_player->isOnline() && woman_player->isOnline() && man_player->GetVar(VAR_COUPLE_ONLINE_START_TIME) == 0)
         {
