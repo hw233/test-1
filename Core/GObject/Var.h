@@ -626,6 +626,7 @@ namespace GObject
         VAR_CHRISTMAS_PRESENT = 660,                //圣诞礼物——麋鹿之角
         VAR_QT_AWARD_MARK = 661,                    //QT奖励领取
         VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE = 662,    //七石板每期最高积分
+        VAR_MOBAO_REFRESH_AWARD_MARK = 663,         //墨宝刷新奖励标记
         VAR_QT_REGIST_NUM = 664,                    //QT月签到次数
         VAR_QT_SPECIAL_MARK = 665,                  //QT记录12月份默认加6天签到次数
         VAR_QT_REGIST_MARK = 666,                   //QT月签到标志
@@ -640,6 +641,9 @@ namespace GObject
         VAR_PURPLE_NUM = 675,                       //紫色次数
         VAR_ORANGE_NUM = 676,                       //橙色次数
         VAR_PETTEAMCOPY_BATTLE_RES = 677,           //宠物副本战斗结果
+        VAR_REFRESH_AWARD_NUM = 678,                //墨宝刷新奖品次数
+        VAR_OPENCARD_NUM = 679,                     //墨宝翻牌次数
+        VAR_BUY_OPENCARD_NUM = 680,                 //当天购买翻牌次数
 
         //681 - 700 for lb
         VAR_MARRYBOARD_YANHUA = 681,          //烟花积分
@@ -1231,6 +1235,10 @@ namespace GObject
             REGISTER_VAR(VAR_PURPLE_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_ORANGE_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_PETTEAMCOPY_BATTLE_RES, CYCLE_NONE);
+            REGISTER_VAR(VAR_REFRESH_AWARD_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_OPENCARD_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_BUY_OPENCARD_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_MOBAO_REFRESH_AWARD_MARK, CYCLE_DAY);
 
             REGISTER_VAR(VAR_OLDMAN_DAYSCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_OLDMAN_SCORE, CYCLE_NONE);
