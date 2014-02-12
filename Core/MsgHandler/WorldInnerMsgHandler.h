@@ -958,6 +958,43 @@ void SendQiShiBanRank( GameMsgHdr& hdr,  const void* data )
     player->send(st);
 }
 
+void OnAddQiShiBanCount( GameMsgHdr & hdr, const void * data)
+{
+    // 增加玩家七石板游戏次数
+	MSG_QUERY_PLAYER(player);
+	struct QiShiBanMailClickReq
+	{
+		UInt32 id;
+		GObject::Player * applier;
+		UInt8 action;
+	};
+	const QiShiBanMailClickReq * qsbmcr = reinterpret_cast<const QiShiBanMailClickReq *>(data);
+    if (!qsbmcr->applier)
+        return;
+
+    if (!WORLD().getQiShiBanTime())
+    {
+        player->sendMsgCode(0, 1512);
+        return;
+    }
+
+    if (qsbmcr->action)
+    {
+        if (qsbmcr->applier->GetVar(VAR_QISHI_FRIEND_SEND_COUNT) > 2)
+        {
+            player->sendMsgCode(0, 1511);
+            return;
+        }
+        else
+        {
+            qsbmcr->applier->AddVar(VAR_QISHI_FRIEND_SEND_COUNT, 1);
+            SYSMSGV(title, 4979);
+            SYSMSGV(content, 4980, player->getCountry(), player->getName().c_str());
+            qsbmcr->applier->GetMailBox()->newMail(player, 0x01, title, content);
+        }
+    }
+}
+
 void SendLuckyBagRank(Stream& st)
 {
     using namespace GObject;

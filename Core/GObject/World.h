@@ -1320,8 +1320,10 @@ public:
 
 public:
     bool MemCachInit();
-    void SetMemCach_qishiban(UInt32 score, const char * openId, const char * name);
-    UInt32 GetMemCach_qishiban(const char * openId, const char * name);
+    void SetMemCach_qishiban(UInt32 score, const char * openId, const char * name, UInt8 fighterId);
+    void SetMemCach_qishibanInfo(const char * openId, const char * name, UInt8 fighterId);
+    UInt32 GetMemCach_qishibanScore(const char * openId);
+    bool GetMemCach_qishibanInfo(const char * openId, std::string& info);
     void SetMemCach_CFriend_Invited(UInt64);
     UInt16 GetMemCach_CFriend_Invited(UInt64);
     void DelMemCach_CFriend_Invited(UInt64);
