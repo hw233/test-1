@@ -666,6 +666,8 @@ namespace GObject
         VAR_JIQIREN_FRONTMAP = 703, //机器人之阵图未完成次数(1byte免费，2byte付费1，3byte付费2，4byte付费3)
         VAR_JIQIREN_DUNGEON = 704,  //机器人之决战之地未完成次数(1byte普通免费，2byte普通付费，3byte困难免费，4byte困难付费)
         VAR_JIQIREN_SYBS = 705,     //机器人之帮派、师门、衙门、锁妖塔未完成次数
+        VAR_MOUNT_CANGJIANYA_LEFT_CNT = 706,     //藏剑崖每天免费次数
+        VAR_MOUNT_CANGJIANYA_DATE = 707,     //取藏剑崖每天免费次数时间
 
         //711-720 for JLT
         VAR_QISHI_FRIEND_SEND_COUNT = 711,  // 七石斗法玩家赠送次数
@@ -1276,6 +1278,8 @@ namespace GObject
 
             REGISTER_VAR(VAR_QISHI_FRIEND_SEND_COUNT, CYCLE_DAY);
             REGISTER_VAR(VAR_QISHI_FRIEND_USE_COUNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_MOUNT_CANGJIANYA_LEFT_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_MOUNT_CANGJIANYA_DATE, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

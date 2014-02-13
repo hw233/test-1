@@ -415,6 +415,11 @@ namespace GData
             fprintf (stderr, "Load LoadRideUpgradeConfig Error !\n");
             std::abort();
         }
+        if (!LoadCangjianConfig())
+        {
+            fprintf (stderr, "Load LoadCangjianConfig Error !\n");
+            std::abort();
+        }
         if (!LoadCoupleInfo())
         {
             fprintf (stderr, "Load LoadCoupleInfoConfig Error !\n");
@@ -2717,6 +2722,22 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
 		{
             ride.setRideUpgradeTable(dbruc);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadCangjianConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBCangjianCfg dbcjc;
+		if(execu->Prepare("SELECT `floor`, `name`, `prob`, `otherNum`, `bless` FROM `ride_cangjian`", dbcjc) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            ride.setCangjianTable(dbcjc);
         }
         return true;
     }

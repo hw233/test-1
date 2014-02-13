@@ -7354,6 +7354,9 @@ namespace GObject
 			sendMsgCode(0, 1200);
             return;
         }
+        //触发新手任务
+        if(type > 0)
+            GetTaskMgr()->CompletedTask(203);
 
         while(color > 0)
         {
@@ -27483,7 +27486,7 @@ bool Player::addMountChip(UInt32 itemId)
     return mount->addChip(itemId);
 }
 
-void Player::sendMountInfo()
+void Player::sendAllMountInfo()
 {
 	Stream st(REP::MODIFY_MOUNT);
     st << static_cast<UInt8>(0);
@@ -27507,7 +27510,6 @@ void Player::sendMountInfo()
 
 void Player::upgradeMount(bool isAuto)
 {
-#define MOUNT_COSTID 9500
     UInt16 mountLvl = GetVar(VAR_MOUNT_LEVEL);
     UInt32 mountExp = GetVar(VAR_MOUNT_EXP);
     if(mountLvl >= 60)
@@ -27516,7 +27518,7 @@ void Player::upgradeMount(bool isAuto)
     if(!rud || GetLev() < rud->lvLimit)
         return;
     int itemNum = GetPackage()->GetItemAnyNum(MOUNT_COSTID);
-    if(GetPackage()->GetItemAnyNum(MOUNT_COSTID) < rud->singleCost)
+    if(itemNum < (int)(rud->singleCost))
         return;
     int costNum = 0;
     UInt16 oldLvl = mountLvl;
@@ -27569,6 +27571,58 @@ void Player::addMountAttrExtra(GData::AttrExtra& attr)
     float rate = GData::ride.getMountRate(mountLvl);
     tmpAttr = tmpAttr * (1.0 + rate);
     attr += tmpAttr;
+}
+
+bool Player::check_Cangjianya()
+{
+    if(GetLev() < 75)
+        return false;
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 today = TimeUtil::SharpDayT(1, now);
+    UInt32 lastDate = GetVar(VAR_MOUNT_CANGJIANYA_DATE);
+    lastDate = lastDate == 0 ? 0 :TimeUtil::SharpDayT(1, lastDate);
+    UInt32 leftCnt = GetVar(VAR_MOUNT_CANGJIANYA_LEFT_CNT);
+
+    if(today > lastDate)
+    {
+        if(leftCnt < 5)
+        {
+            SetVar(VAR_MOUNT_CANGJIANYA_LEFT_CNT, 5);
+        }
+        SetVar(VAR_MOUNT_CANGJIANYA_DATE, now);
+
+    }
+    Stream st(REP::MODIFY_MOUNT);
+    st << static_cast<UInt8>(3);
+    st << static_cast<UInt8>(GetVar(VAR_MOUNT_CANGJIANYA_LEFT_CNT));
+    st << Stream::eos;
+    send(st);
+
+    return true;
+}
+
+void Player::mount_Cangjianya(UInt8 rideId, UInt8 floors, bool isAuto)
+{
+    if(rideId <= 7)     //之前出过的前7个飞剑不能用
+        return;
+    if(!GData::ride.checkHasMountId(rideId)) //判断是否存在此坐骑id
+        return;
+    ModifyMount * mount = getOneMount(rideId);
+    if(NULL == mount)
+    {
+        mount = new ModifyMount(rideId, this);
+        if(NULL == mount)
+            return;
+        addModifyMount(mount);
+    }
+    if(GetFreePackageSize() < 1)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if(mount)
+        mount->cangjianya(floors, isAuto);
 }
 
 void Player::handleJiqirenAct_shiyamen()
