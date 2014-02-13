@@ -401,14 +401,14 @@ UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
 
         for(int i = 0; i < 25; ++ i)
         {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(bo)
+                bo->clearDmgNingShi();
+
             if(getObject(side, i) && !_isBody[side][i])
             {
                 deleteObject(side, i);
             }
-
-            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
-            if(bo)
-                bo->clearDmgNingShi();
         }
     }
 
@@ -7559,6 +7559,23 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
         // remove from action queue
         BattleFighter* toremove = static_cast<BattleFighter *>(bo);
         removeFighterStatus(toremove);
+        {
+            BattleFighter* bo2 = static_cast<BattleFighter*>(bo);
+            if(bo2)
+            {
+                if(static_cast<BattleFighter*>(bo)->clearDmgNingShi())
+                    appendDefStatus(e_unDmgNingShi, 0, bo2);
+            }
+
+            std::vector<BattleFighter*> vbo = bo2->getBeiNingShiZhe();
+            for(std::vector<BattleFighter*>::iterator it = vbo.begin(); it != vbo.end(); ++ it)
+            {
+                BattleFighter* bo = *it;
+                if(static_cast<BattleFighter*>(bo)->clearDmgNingShi())
+                    appendDefStatus(e_unDmgNingShi, 0, bo);
+            }
+        }
+
 
         size_t idx = 0;
         for(idx = 0; idx < _onTherapy.size(); ++ idx)
@@ -7627,10 +7644,8 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
         _winner = testWinner();
         if(_winner != 0)
             return true;
-        else if(bIfDead)
-        {
-            doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
-        }
+
+        doItemWuSkillAttack(static_cast<BattleFighter*>(bo));
 
         // 五彩石
         for(size_t i = 0; i < _onOtherDead.size(); ++ i)
@@ -14412,7 +14427,8 @@ void BattleSimulator::tryParry( BattleFighter* bf, UInt32& dmg, UInt32& magDmg, 
         if (dmg < reduce)
         {
             reduce -= dmg;
-            dmg = 0;
+            if (dmg)
+                dmg = 1;
         }
         else
         {
@@ -14422,7 +14438,8 @@ void BattleSimulator::tryParry( BattleFighter* bf, UInt32& dmg, UInt32& magDmg, 
         if (magDmg < reduce)
         {
             reduce -= magDmg;
-            magDmg = 0;
+            if (magDmg)
+                magDmg = 1;
         }
         else
         {

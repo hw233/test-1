@@ -1277,6 +1277,7 @@ namespace GObject
 
         UInt16 conflictSkillId = GData::sevenSoul.getAnotherSimilarSkill(skillId);
         UInt8 i;
+        bool update = true;
         for(i = 0; i < INIT_SKILL_UPMAX; ++ i)
         {
             if (SKILL_ID(_initskl[i]) == conflictSkillId)
@@ -1284,8 +1285,14 @@ namespace GObject
                 _initskl[i] = SKILLANDLEVEL(skillId, 1);
                 break;
             }
+            else if (SKILL_ID(_initskl[i]) == skillId)
+            {
+                update = false;
+                break;
+            }
         }
         //if(i < INIT_SKILL_UPMAX)
+        if(update)
         {
             GData::Pet::PinjieData* pjd = GData::pet.getLevTable(_petLev);
             UInt8 sLevel = 0;
