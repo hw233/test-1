@@ -1499,6 +1499,9 @@ struct DBModifyMount
     UInt8 id;
     UInt64 playerId;
     std::string chips;
+    UInt8 curfloor;
+    UInt8 curfloor1;
+    UInt16 failtimes;
 };
 }
 
@@ -3391,11 +3394,14 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBModifyMount)
-SPECIALDEF(3)
+SPECIALDEF(6)
     (
     UInt8, id,
     UInt64, playerId,
-    std::string, chips
+    std::string, chips,
+    UInt8, curfloor,
+    UInt8, curfloor1,
+    UInt16, failtimes
     )
 SPECIALEND()
 

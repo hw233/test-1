@@ -2309,6 +2309,9 @@ CREATE TABLE IF NOT EXISTS `modify_mount` (
     `id` int(10) unsigned NOT NULL DEFAULT '0',
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `chips` varchar(255) NOT NULL,
+    `curfloor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `curfloor1` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `failtimes` int(10) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

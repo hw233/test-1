@@ -7923,18 +7923,26 @@ void OnPlayerMountReq( GameMsgHdr& hdr, const void* data )
     if(player->GetLev() < 75)
         return;
 
+    player->check_Cangjianya();
     UInt8 type = 0;
     brd >> type;
     switch(type)
     {
         case 0x00:
-            player->sendMountInfo();
+            player->sendAllMountInfo();
             break;
         case 0x01:
             player->upgradeMount(false);
             break;
         case 0x02:
             player->upgradeMount(true);
+            break;
+        case 0x03:
+            {
+                UInt8 rideId = 0, isAuto = 0, floors = 0;
+                brd >> rideId >> isAuto >> floors;
+                player->mount_Cangjianya(rideId, floors, isAuto > 0);
+            }
             break;
     }
 }

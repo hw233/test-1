@@ -249,6 +249,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #天书奇缘清空
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140214_2.sql
 }
 
 #sh player_jiguan.sh
