@@ -2867,6 +2867,7 @@ namespace GObject
         GVAR.SetVar(GVAR_OLDRC7DAYBUCHANG, 1);
         GVAR.SetVar(GVAR_JOB_MO_PEXP, 1);
         //GVAR.SetVar(GVAR_EXP_HOOK_NEW, 1);
+
 		return true;
 	}
 

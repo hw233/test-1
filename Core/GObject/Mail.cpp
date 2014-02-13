@@ -940,6 +940,27 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			_owner->GetPackage()->AddItem(mail->additional, 1);
 			delIt = true;
 		}
+        break;
+    case 0x28: // 七石板好友索取次数
+        {
+			Player * p = GObject::globalNamedPlayers[_owner->fixName(mail->sender)];
+			if(p == NULL)
+			{
+				delIt = true;
+				break;
+			}
+			struct QiShiBanMailClickReq
+			{
+				UInt32 id;
+				GObject::Player * applier;
+				UInt8 action;
+			};
+			QiShiBanMailClickReq qsbmcr = {mail->id, p, action == 0 ? true:false};
+			GameMsgHdr hdr(0x1B5, WORKER_THREAD_WORLD, _owner, sizeof(QiShiBanMailClickReq));
+			GLOBAL().PushMsg(hdr, &qsbmcr);
+            delIt = true;
+        }
+
 		break;
 	default:
 		return;

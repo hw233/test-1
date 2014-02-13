@@ -1996,6 +1996,7 @@ namespace GObject
         void GetPersonalAward(UInt8 opt);
         UInt32 GetNextStepTime();
         UInt32 GetQQFriendScore(const char * openId);
+        bool GetQQFriendInfo(const char * openId, std::string& info);
         bool CheckReqDataTime();
         void SetReqDataTime(UInt8 mark=1);
         //bool CheckReqDataTime1();
@@ -2023,6 +2024,8 @@ namespace GObject
         void SetQiShiBanAddTimeNum(UInt8 num) { m_qishiban.addTimeNum = num; }
         void AddQiShiBanAddTimeNum() { m_qishiban.addTimeNum += 1; }
         UInt32 GetQiShiBanAddTimeNum() const { return m_qishiban.addTimeNum; }
+
+        void ReqQiShiBanPlayCount(std::vector<std::string>&);
 
         UInt32  m_checkTime;
         //UInt32  m_checkTime1;
