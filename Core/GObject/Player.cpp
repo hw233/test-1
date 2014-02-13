@@ -4409,7 +4409,7 @@ namespace GObject
             st<<getBePrayednum(pl->getId());
             
             st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
-            std::string openid = getOpenId();
+            std::string openid = pl->getOpenId();
             st << openid;
 
             st<<Stream::eos;
@@ -4446,7 +4446,7 @@ namespace GObject
             else st<<static_cast<UInt8>(0);
             st<<getBePrayednum(pl->getId());
             st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
-            std::string openid = getOpenId();
+            std::string openid = pl->getOpenId();
             st << openid;
             st<<Stream::eos;
             send(st);
@@ -4552,7 +4552,7 @@ namespace GObject
         else st<<static_cast<UInt8>(0);
         st<<getBePrayednum(pl->getId());
         st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
-        std::string openid = getOpenId();
+        std::string openid = pl->getOpenId();
         st << openid;
         st<<Stream::eos;
 		send(st);
@@ -4666,7 +4666,7 @@ namespace GObject
                 st<<getBePrayednum(pl->getId());
                 st<<static_cast<UInt8>(pl->GetVar(VAR_OLDMAN_PRESENT));
                 // std::cout <<pl->getId()<<"@!@# "<<pl->GetVar(VAR_PRAY_TYPE)<<"!!@!"<<pl->GetVar(VAR_PRAY_VALUE)<<std::endl;
-                std::string openid = getOpenId();
+                std::string openid = pl->getOpenId();
                 st << openid;
                 ++it;
             }
@@ -4769,7 +4769,7 @@ namespace GObject
         else st<<static_cast<UInt8>(0);
         st<<getBePrayednum(other->getId());
         st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
-        std::string openid = getOpenId();
+        std::string openid = other->getOpenId();
         st << openid;
         st<< Stream::eos;
         send(st);

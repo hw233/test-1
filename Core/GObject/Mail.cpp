@@ -958,6 +958,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			QiShiBanMailClickReq qsbmcr = {mail->id, p, action == 0 ? true:false};
 			GameMsgHdr hdr(0x1B5, WORKER_THREAD_WORLD, _owner, sizeof(QiShiBanMailClickReq));
 			GLOBAL().PushMsg(hdr, &qsbmcr);
+            delIt = true;
         }
 
 		break;

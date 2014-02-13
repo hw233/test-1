@@ -980,7 +980,7 @@ void OnAddQiShiBanCount( GameMsgHdr & hdr, const void * data)
 
     if (qsbmcr->action)
     {
-        if (qsbmcr->applier->GetVar(VAR_QISHI_FRIEND_SEND_COUNT) > 2)
+        if (qsbmcr->applier->GetVar(VAR_QISHI_FRIEND_SEND_COUNT) >= 2)
         {
             player->sendMsgCode(0, 1511);
             return;
