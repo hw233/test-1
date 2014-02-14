@@ -14427,7 +14427,8 @@ void BattleSimulator::tryParry( BattleFighter* bf, UInt32& dmg, UInt32& magDmg, 
         if (dmg < reduce)
         {
             reduce -= dmg;
-            dmg = 0;
+            if (dmg)
+                dmg = 1;
         }
         else
         {
@@ -14437,7 +14438,8 @@ void BattleSimulator::tryParry( BattleFighter* bf, UInt32& dmg, UInt32& magDmg, 
         if (magDmg < reduce)
         {
             reduce -= magDmg;
-            magDmg = 0;
+            if (magDmg)
+                magDmg = 1;
         }
         else
         {

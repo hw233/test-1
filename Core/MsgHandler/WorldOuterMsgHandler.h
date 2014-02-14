@@ -3015,6 +3015,26 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                                             openId.clear();
                                             brd >> openId;
                                             UInt32 score = player->GetQQFriendScore(openId.c_str());
+                                            std::string info;
+                                            bool ret = player->GetQQFriendInfo(openId.c_str(), info);
+                                            if (ret)
+                                            {
+                                                StringTokenizer tokenizer(info, "_");
+                                                if (tokenizer.count() >= 2)
+                                                {
+                                                    st << tokenizer[1];
+                                                    UInt8 fighterId = atoi(tokenizer[0].c_str());
+                                                    st << fighterId;
+                                                }
+                                                else 
+                                                    ret = false;
+                                            }
+
+                                            if (!ret)
+                                            {
+                                                st << std::string("未找到");
+                                                st << static_cast<UInt8>(0);
+                                            }
                                             st << score;
                                         }
                                         st << Stream::eos;
@@ -3074,14 +3094,16 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                         /*
                     case 0x13:
                         {
-                            player->ReqQiShiBanPlayCount();
-                            UInt16 count = 0;
+                            UInt8 count = 0;
                             brd >> count;
+                            std::vector<std::string> nameList;
                             for (UInt16 i = 0; i < count; ++i)
                             {
                                 std::string name;
                                 brd >> name;
+                                nameList.push_back(name);
                             }
+                            player->ReqQiShiBanPlayCount(nameList);
                         }
                         */
                     default:

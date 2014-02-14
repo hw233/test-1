@@ -82,6 +82,7 @@ namespace GData
         static bool LoadPetSevenSoulUpgrade();
         static bool LoadRideConfig();
         static bool LoadRideUpgradeConfig();
+        static bool LoadCangjianConfig();
         static bool LoadCoupleInfo();
         static bool LoadCoupleCopy();
 

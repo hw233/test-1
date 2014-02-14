@@ -100,7 +100,7 @@ namespace GObject
         VAR_ATYITEM_5 = 64, //活跃度星期五奖励
         VAR_ATYITEM_6 = 65, //活跃度星期六奖励
         VAR_ATYITEM_7 = 66, //活跃度星期天奖励
-VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
+        VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_FIGHTER1_3_6_8 = 68, // 繁体版主将潜力值达到1.3，资质达到6.8活动是否达成
 
         VAR_CFRIEND_1 = 70, //密友等级相应个数 1级
@@ -626,6 +626,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_CHRISTMAS_PRESENT = 660,                //圣诞礼物——麋鹿之角
         VAR_QT_AWARD_MARK = 661,                    //QT奖励领取
         VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE = 662,    //七石板每期最高积分
+        VAR_MOBAO_REFRESH_AWARD_MARK = 663,         //墨宝刷新奖励标记
         VAR_QT_REGIST_NUM = 664,                    //QT月签到次数
         VAR_QT_SPECIAL_MARK = 665,                  //QT记录12月份默认加6天签到次数
         VAR_QT_REGIST_MARK = 666,                   //QT月签到标志
@@ -640,6 +641,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_PURPLE_NUM = 675,                       //紫色次数
         VAR_ORANGE_NUM = 676,                       //橙色次数
         VAR_PETTEAMCOPY_BATTLE_RES = 677,           //宠物副本战斗结果
+        VAR_REFRESH_AWARD_NUM = 678,                //墨宝刷新奖品次数
+        VAR_OPENCARD_NUM = 679,                     //墨宝翻牌次数
+        VAR_BUY_OPENCARD_NUM = 680,                 //当天购买翻牌次数
 
         //681 - 700 for lb
         VAR_MARRYBOARD_YANHUA = 681,          //烟花积分
@@ -662,6 +666,12 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_JIQIREN_FRONTMAP = 703, //机器人之阵图未完成次数(1byte免费，2byte付费1，3byte付费2，4byte付费3)
         VAR_JIQIREN_DUNGEON = 704,  //机器人之决战之地未完成次数(1byte普通免费，2byte普通付费，3byte困难免费，4byte困难付费)
         VAR_JIQIREN_SYBS = 705,     //机器人之帮派、师门、衙门、锁妖塔未完成次数
+        VAR_MOUNT_CANGJIANYA_LEFT_CNT = 706,     //藏剑崖每天免费次数
+        VAR_MOUNT_CANGJIANYA_DATE = 707,     //取藏剑崖每天免费次数时间
+
+        //711-720 for JLT
+        VAR_QISHI_FRIEND_SEND_COUNT = 711,  // 七石斗法玩家赠送次数
+        VAR_QISHI_FRIEND_USE_COUNT = 712,   // 七石斗法玩家赠送已使用次数
 
         VAR_MAX,
     };
@@ -1227,6 +1237,10 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_PURPLE_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_ORANGE_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_PETTEAMCOPY_BATTLE_RES, CYCLE_NONE);
+            REGISTER_VAR(VAR_REFRESH_AWARD_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_OPENCARD_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_BUY_OPENCARD_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_MOBAO_REFRESH_AWARD_MARK, CYCLE_DAY);
 
             REGISTER_VAR(VAR_OLDMAN_DAYSCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_OLDMAN_SCORE, CYCLE_NONE);
@@ -1261,6 +1275,11 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_JIQIREN_FRONTMAP, CYCLE_NONE);
             REGISTER_VAR(VAR_JIQIREN_DUNGEON, CYCLE_NONE);
             REGISTER_VAR(VAR_JIQIREN_SYBS, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_QISHI_FRIEND_SEND_COUNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_QISHI_FRIEND_USE_COUNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_MOUNT_CANGJIANYA_LEFT_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_MOUNT_CANGJIANYA_DATE, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

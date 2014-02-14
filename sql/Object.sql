@@ -2309,6 +2309,9 @@ CREATE TABLE IF NOT EXISTS `modify_mount` (
     `id` int(10) unsigned NOT NULL DEFAULT '0',
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `chips` varchar(255) NOT NULL,
+    `curfloor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `curfloor1` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `failtimes` int(10) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2402,4 +2405,19 @@ CREATE TABLE `clan_buildings` (
       `updateTime` int(10) DEFAULT '0' COMMENT '数据更新时间',
       PRIMARY KEY (`clanId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='帮派建筑';
+
+DROP TABLE IF EXISTS `mobao`;
+CREATE TABLE `mobao` (
+   `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+   `buyNum`  int(10) unsigned NOT NULL DEFAULT '0',
+   `status` int(10) unsigned NOT NULL DEFAULT '0',
+   `item` varchar(1024) NOT NULL DEFAULT '',
+   `itemACnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `itemBCnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `itemCCnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `itemDCnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `itemECnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `itemFCnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 

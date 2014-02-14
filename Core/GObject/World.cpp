@@ -62,6 +62,7 @@
 #include "MsgHandler/Memcached.h"
 #include "RechargeTmpl.h"
 #include "GVar.h"
+#include "Package.h"
 
 static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 
@@ -470,6 +471,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 13)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 14)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -498,6 +507,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 1)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 8)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
         ))
     {
 #if 0
@@ -1071,7 +1081,7 @@ void SendRechargeRankAward()
             char ctx[1024] = {0};
             snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
             snprintf(ctx, sizeof(ctx), "%" I64_FMT "u_%s_%u", player->getId(), player->getRealName().c_str(), i->total);
-            World::udpLog(id, ctx, "", "", "", "", "act");
+            World::udpLog("huodong", id, ctx, "", "", "", "act");
         }
         World::rechargeSort.clear();
     }
@@ -1252,7 +1262,7 @@ void World::World_Midnight_Check( World * world )
     b11TimeEnd = b11time && !get11Time();
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
-    bGGTimeEnd = bGGtime && !getGGTime();
+    bGGTimeEnd = bGGtime && !getGGTime(300);
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
@@ -1319,6 +1329,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 13)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 14)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1373,6 +1391,7 @@ void World::World_Midnight_Check( World * world )
         world->SendQixiAward();
     if(bGuoqingEnd)
         world->SendGuoqingAward();
+   
     if (bRechargeEnd)
         SendRechargeRankAward();
     if (bConsumeEnd)
@@ -1960,6 +1979,17 @@ void World::advancedHookTimer(void *para)
 	globalPlayers.enumerate(advancedHookEnumerate, static_cast<UInt8>(0));
 }
 #endif
+
+bool enum_qishibaninviteenable(void * ptr, void* v)
+{
+	Player * pl = static_cast<Player *>(ptr);
+	if(pl == NULL)
+		return true;
+    WORLD().SetMemCach_qishibanInfo(pl->getOpenId(), pl->getName().c_str(), 
+            pl->getMainFighter()?((pl->getMainFighter()->getId()<<4)|pl->getMainFighter()->getSex()):0);
+    return true;
+}
+
 bool World::Init()
 {
     MemCachInit();
@@ -2059,6 +2089,13 @@ bool World::Init()
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
+
+    if (!GVAR.GetVar(GVAR_QISHIBAN_INVITE_ENABLE))
+    {
+        globalPlayers.enumerate(enum_qishibaninviteenable, static_cast<void *>(NULL));
+        GVAR.SetVar(GVAR_QISHIBAN_INVITE_ENABLE, 1);
+    }
+
     
     if( GObject::MarryBoard::instance().sendAward())
     {
@@ -3702,11 +3739,11 @@ bool World::MemCachInit()
     return true;
 }
 
-void World::SetMemCach_qishiban(UInt32 score, const char * openId)
+void World::SetMemCach_qishiban(UInt32 score, const char * openId, const char * name, UInt8 fighterId)
 {
     if (_memcinited)
     {
-        char value[32] = {0};
+        char value[64] = {0};
         char key[MEMCACHED_MAX_KEY] = {0};
         size_t len = snprintf(key, sizeof(key), "qishiban_%s", openId);
         size_t vlen = snprintf(value, sizeof(value), "%d", score);
@@ -3714,22 +3751,31 @@ void World::SetMemCach_qishiban(UInt32 score, const char * openId)
         bool res = m_MCached.set(key, len, value, vlen, 0);
         TRACE_LOG("setKey: %s, setScore: %u, res:%u", key, score, res);
 
-        /*
-        len = snprintf(key,sizeof(key), "qishibanname_%s", openId);
-        key[MEMCACHED_MAX_KEY - 1] = '\0';
-        vlen = snprintf(value, sizeof(value), "%s", name);
-        value[31] = '\0';
-        res = m_MCached.set(key, len, value, vlen, 0);
-        TRACE_LOG("setKey: %s, setName: %u, res:%u", key, score, res);
-        */
+        SetMemCach_qishibanInfo(openId, name, fighterId);
     }
 }
 
-UInt32 World::GetMemCach_qishiban(const char * openId)
+void World::SetMemCach_qishibanInfo(const char * openId, const char *name, UInt8 fighterId)
+{
+    if (_memcinited)
+    {
+        char value[64] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+
+        size_t len = snprintf(key,sizeof(key), "qishibaninfo_%s", openId);
+        key[MEMCACHED_MAX_KEY - 1] = '\0';
+        size_t vlen = snprintf(value, sizeof(value), "%u_%s", fighterId, name);
+        value[64 - 1] = '\0';
+        bool res = m_MCached.set(key, len, value, vlen, 0);
+        TRACE_LOG("setKey: %s, setName: %s, res:%u", key, value, res);
+    }
+}
+
+UInt32 World::GetMemCach_qishibanScore(const char * openId)
 {
     char value[32]={0};
     char key[MEMCACHED_MAX_KEY] = {0};
-    snprintf(key, MEMCACHED_MAX_KEY, "qishiban2_%s", openId);
+    snprintf(key, MEMCACHED_MAX_KEY, "qishiban_%s", openId);
 
     UInt32 score = 0;
     if (_memcinited)
@@ -3740,6 +3786,27 @@ UInt32 World::GetMemCach_qishiban(const char * openId)
     }
 
     return score;
+}
+
+bool World::GetMemCach_qishibanInfo(const char * openId, std::string& info)
+{
+    // 获取七石版玩家相关信息
+    char value[64]={0};
+    char key[MEMCACHED_MAX_KEY] = {0};
+    snprintf(key, MEMCACHED_MAX_KEY, "qishibaninfo_%s", openId);
+
+    bool ret = false;
+
+    if (_memcinited)
+    {
+        const char* res = m_MCached.get(key, value, sizeof(value));
+        TRACE_LOG("getKey: %s, getInfo: %s, res:%u", key, value, res);
+        info = value;
+        if (res)
+            ret = true;
+    }
+
+    return ret;
 }
 
 void World::SetMemCach_CFriend_Invited(UInt64 userId)
@@ -3884,21 +3951,32 @@ UInt16 World::GetRandomSpot()
 
 void World::SendGuangGunAward()    //待定
 {
+    UInt32 now = TimeUtil::Now();
+    if(now <( getOpenTime() + 7 * 86400) || now >( getOpenTime() + 15* 86400))
+        return ;
+    
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{515,30},{503,40},{134,30},{1325,30},{9435,20}},
-        {{515,25},{503,30},{134,25},{1325,25},{9435,10}},
-        {{515,20},{503,25},{134,20},{1325,20},{9435,8}},
+        {{515,30},{503,30},{134,25},{1325,25}},
+        {{515,25},{503,30},{134,20},{1325,20}},
+        {{515,20},{503,25},{134,15},{1325,15}},
     };
-    static MailPackage::MailItem card = {9924,1};
-    SYSMSG(title, 4964);
+	const UInt32 itemOrangeWeapon[3][5] = {
+        {2544, 2568, 2592, 2616, 2640},//儒
+        {2552, 2576, 2600, 2624, 2648},//释
+        {2560, 2584, 2608, 2632, 2656}
+    };
+    UInt8 type = 0;
+    UInt8 lvl = 0;
+    SYSMSG(title, 4981);
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
         Player* play = i->player;
         if (!play)
             continue;
         Player* player = play->getGGTimeCaptain();
+	    Package * package = player->GetPackage();
         ++pos;
         if(pos > 3) break;
         SYSMSGV(content, 4965, pos);
@@ -3906,14 +3984,49 @@ void World::SendGuangGunAward()    //待定
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)
         {
+            type = player->getMainFighter()->getClass() - 1;
+            if(player->getMainFighter()->getLevel() < 60)
+                lvl = 0;
+            else
+                if(player->getMainFighter()->getLevel() < 70)
+                    lvl = 1;
+                else
+                    if(player->getMainFighter()->getLevel() < 80)
+                        lvl = 2;
+                    else
+                        if(player->getMainFighter()->getLevel() < 90)
+                            lvl = 3;
+                        else
+                            lvl = 4;
+
             mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
             if(pos ==1)
-                mailPackageManager.push(mail->id, &card, 1, true);
+                package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+            else if(pos == 2)
+                package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                else if(pos == 3)
+                    package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
         }
 
         Player* player1 = player->getGGPlayer1();
         if (player1)
         {
+	        type = player1->getMainFighter()->getClass() - 1;
+            if(player1->getMainFighter()->getLevel() < 60)
+                lvl = 0;
+            else
+                if(player1->getMainFighter()->getLevel() < 70)
+                    lvl = 1;
+                else
+                    if(player1->getMainFighter()->getLevel() < 80)
+                        lvl = 2;
+                    else
+                        if(player1->getMainFighter()->getLevel() < 90)
+                            lvl = 3;
+                        else
+                            lvl = 4;
+
+            Package * package1 = player1->GetPackage();
             SYSMSGV(content, 4965, pos);
             Mail * mail1 = player1->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
@@ -3921,12 +4034,32 @@ void World::SendGuangGunAward()    //待定
             {
                 mailPackageManager.push(mail1->id, s_item[pos-1], 5, true);
                 if(pos ==1)
-                    mailPackageManager.push(mail1->id, &card, 1, true);
+                    package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+                else if(pos == 2)
+                    package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                    else if(pos == 3)
+                        package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
             }
         }
         Player* player2 = player->getGGPlayer2();
         if (player2)
         {
+	        type = player2->getMainFighter()->getClass() - 1;
+            if(player2->getMainFighter()->getLevel() < 60)
+                lvl = 0;
+            else
+                if(player2->getMainFighter()->getLevel() < 70)
+                    lvl = 1;
+                else
+                    if(player2->getMainFighter()->getLevel() < 80)
+                        lvl = 2;
+                    else
+                        if(player2->getMainFighter()->getLevel() < 90)
+                            lvl = 3;
+                        else
+                            lvl = 4;
+
+            Package * package2 = player2->GetPackage();
             SYSMSGV(content, 4965, pos);
             Mail * mail2 = player2->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
@@ -3934,7 +4067,11 @@ void World::SendGuangGunAward()    //待定
             {
                 mailPackageManager.push(mail2->id, s_item[pos-1], 5, true);
                 if(pos ==1)
-                    mailPackageManager.push(mail2->id, &card, 1, true);
+                    package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+                else if(pos == 2)
+                    package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                    else if(pos == 3)
+                        package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
             }
         }
     }

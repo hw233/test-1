@@ -3699,6 +3699,8 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
             else st<<static_cast<UInt8>(0);
             st<<player->getBePrayednum(pl->getId());
             st<<static_cast<UInt8>(pl->GetVar(VAR_OLDMAN_PRESENT));
+            std::string openid = pl->getOpenId();
+            st << openid;
             ++it;
         }
     }

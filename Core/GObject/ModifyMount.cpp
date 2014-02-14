@@ -1,12 +1,16 @@
 ﻿#include "Config.h"
 #include "Common/StringTokenizer.h"
 #include "Common/Itoa.h"
+#include "Log/Log.h"
 #include "Server/SysMsg.h"
+#include "Script/GameActionLua.h"
+#include "GObject/Country.h"
 #include "GData/RideConfig.h"
 #include "GObjectDBExecHelper.h"
 #include "Player.h"
 #include "MsgID.h"
 #include "ModifyMount.h"
+#include "Package.h"
 
 namespace GObject
 {
@@ -20,8 +24,8 @@ namespace GObject
             if(i < MOUNTCHIP_MAX-1)
                 chipStr += ",";
         }
-        DB2().PushUpdateData("REPLACE INTO `modify_mount` (`id`, `playerId`, `chips`) VALUES (%u, %" I64_FMT "u, '%s')",
-                getId(), _owner->getId(), chipStr.c_str());
+        DB2().PushUpdateData("REPLACE INTO `modify_mount` (`id`, `playerId`, `chips`, `curfloor`, `curfloor1`, `failtimes`)\
+                VALUES (%u, %" I64_FMT "u, '%s', %u, %u, %u)", getId(), _owner->getId(), chipStr.c_str(), _curFloor, _curFloor1, _failTimes);
     }
 
     bool ModifyMount::hasChip(UInt32 itemId)
@@ -62,11 +66,7 @@ namespace GObject
             SYSMSG_BROADCASTV(4158, _owner->getCountry(), _owner->getName().c_str(), item_id);
         }
 
-        Stream st(REP::MODIFY_MOUNT);
-        st << static_cast<UInt8>(2);
-        appendMountInfo(st);
-        st << Stream::eos;
-        _owner->send(st);
+        sendMountInfo();
         return true;
     }
 
@@ -86,6 +86,7 @@ namespace GObject
                 flag |= 1<<i;
         }
         st << getId() << flag;
+        st << _curFloor << _curFloor1 << _failTimes;
     }
 
     void ModifyMount::addAttrExtra(GData::AttrExtra& attr)
@@ -113,4 +114,135 @@ namespace GObject
         }
     }
 
+    void ModifyMount::cangjianya(UInt8 floors, bool isAuto)
+    {
+        if(!_owner) return;
+        Package * pkg = _owner->GetPackage();
+        if(!pkg) return;
+        UInt8 curFloor = _curFloor;
+        if(isFullFloor())
+            curFloor = _curFloor1;
+        if(curFloor >= MOUNTCHIP_MAX)
+            curFloor = 0;
+        if(floors > MOUNTCHIP_MAX || floors <= curFloor)
+            floors = curFloor + 1;
+        GData::Ride::CangjianData * cjd = GData::ride.getCangjianTable(curFloor+1);
+        if(NULL == cjd) return;
+        int itemNum = pkg->GetItemAnyNum(MOUNT_CANGJIANID);
+        int cost = 0, cost1 = 0;
+        int leftcnt = _owner->GetVar(VAR_MOUNT_CANGJIANYA_LEFT_CNT);
+        if(itemNum + leftcnt < 1)
+            return;
+        UInt32 failNum = 0;
+        if(isAuto)  //自动唤剑
+        {
+            while(curFloor < floors)
+            {
+                cjd = GData::ride.getCangjianTable(curFloor+1);
+                if(NULL == cjd) break;
+                if(leftcnt > 0)
+                {
+                    ++ cost;
+                    -- leftcnt;
+                }
+                else if(itemNum > 0)
+                {
+                    ++ cost1;
+                    -- itemNum;
+                }
+                else
+                    break;
+                UInt16 bless = GData::ride.getCangjianBless(curFloor+1, _failTimes);
+                if(uRand(10000) <= cjd->prob + bless)
+                {   //成功
+                    _failTimes = 0;
+                    ++ curFloor;
+                    UInt32 itemId = GData::ride.getMountItemId(getId());
+                    UInt32 chipId = GameAction()->getMountChipByCangjian(itemId, curFloor); 
+                    if(chipId == 0)
+                        break;
+                    if(_owner->hasMountChip(chipId))
+                        pkg->Add(MOUNT_COSTID, cjd->otherNum, true, false, FromBox);
+                    else
+                    {
+		                const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[chipId];
+                        if(itemType && itemType->quality == Item_Yellow)
+                            SYSMSG_BROADCASTV(4159, _owner->getCountry(), _owner->getName().c_str(), chipId);
+                        pkg->Add(chipId, 1, true, true, FromBox);
+                        pkg->UseItem(chipId, 1, 0, 0, 1);
+                    }
+                    /*
+                    if(isFullFloor())
+                        break;
+                    */
+                    if(curFloor >= MOUNTCHIP_MAX)
+                        break;
+                }
+                else
+                {   //失败
+                    ++ _failTimes;
+                    ++ failNum;
+                }
+                if(leftcnt <= 0 && itemNum <= 0)
+                    break;
+            }
+        }
+        else    //唤剑一次
+        {
+            if(leftcnt > 0)
+            {
+                ++ cost;
+                -- leftcnt;
+            }
+            else if(itemNum > 0)
+            {
+                ++ cost1;
+                -- itemNum;
+            }
+            UInt16 bless = GData::ride.getCangjianBless(curFloor+1, _failTimes);
+            if(uRand(10000) <= cjd->prob + bless)
+            {   //成功
+                _failTimes = 0;
+                ++ curFloor;
+                UInt32 itemId = GData::ride.getMountItemId(getId());
+                UInt32 chipId = GameAction()->getMountChipByCangjian(itemId, curFloor); 
+                if(!chipId || _owner->hasMountChip(chipId))
+                    pkg->Add(MOUNT_COSTID, cjd->otherNum, true, false, FromBox);
+                else
+                {
+                    pkg->Add(chipId, 1, true, true, FromBox);
+                    pkg->UseItem(chipId, 1, 0, 0, 1);
+                }
+            }
+            else
+            {   //失败
+                ++ _failTimes;
+                ++ failNum;
+            }
+        }
+        if(isFullFloor())
+            setCurfoor1(curFloor);
+        else
+            setCurfoor(curFloor);
+        _owner->SetVar(VAR_MOUNT_CANGJIANYA_LEFT_CNT, leftcnt);
+        if(cost1 > 0)
+        {
+            pkg->DelItemAny(MOUNT_CANGJIANID, cost1, NULL, ToUse);
+            pkg->DelItemSendMsg(MOUNT_CANGJIANID, _owner);
+        }
+        if(failNum > 0)
+            pkg->Add(MOUNT_COSTID, failNum, true, false, FromBox);
+        updateToDB();
+        sendMountInfo();
+        _owner->check_Cangjianya();
+    }
+
+    void ModifyMount::sendMountInfo()
+    {
+        Stream st(REP::MODIFY_MOUNT);
+        st << static_cast<UInt8>(2);
+        appendMountInfo(st);
+        st << Stream::eos;
+        _owner->send(st);
+    }
 }

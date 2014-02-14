@@ -159,6 +159,8 @@ MSG_REG_2(GameMsgHdr, 0x1B2, OnPutSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B3, OnBuySaleCheckOKNotify);
 MSG_REG_2(GameMsgHdr, 0x1B4, OnSaleItemCancle);
 
+MSG_REG_2(GameMsgHdr, 0x1B5, OnAddQiShiBanCount);
+
 MSG_REG_2(GameMsgHdr, 0x1C0, OnLuckyDraw);
 MSG_REG_2(GameMsgHdr, 0x1C1, OnRechargeRank);
 MSG_REG_2(GameMsgHdr, 0x1C2, OnConsumeRank);

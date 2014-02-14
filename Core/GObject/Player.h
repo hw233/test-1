@@ -224,6 +224,10 @@ namespace GObject
 
 #define GET_BIT_2(X,Y)   ((X >> (Y*2)) & 0x03)
 
+//飞剑(坐骑)系统
+#define MOUNT_COSTID 9500
+#define MOUNT_CANGJIANID 9600
+
 #ifdef _FB
 #define LIMIT_LEVEL  60
 #else
@@ -635,6 +639,20 @@ namespace GObject
         UInt16 randKey;
         UInt8 addTimeNum;
         QiShiBanInfo() : score(0), step(0), beginTime(0), endTime(0), awardMark(0), randKey(0), addTimeNum(0) {}
+    };
+
+    struct MoBaoInfo
+    {
+        UInt16 status;          // 卡牌状态
+        UInt32 item[9];        // 卡牌对应的物品
+        UInt16 buyNum;          // 购买翻牌的次数
+        UInt8 openFLMSNum;      // 翻开翡龙墨石个数
+        UInt8 openFLMYNum;      // 翻开翡龙墨玉个数
+        UInt8 openJGBXNum;      // 翻开机关宝匣个数
+        UInt8 openBFMYNum;      // 翻开壁凤墨砚个数
+        UInt8 openPLMYNum;      // 翻开磐龙墨砚个数
+        UInt8 openCSRLBJNum;    // 翻开橙色熔炼宝具个数
+        MoBaoInfo() : status(0), buyNum(0), openFLMSNum(0), openFLMYNum(0), openJGBXNum(0), openBFMYNum(0), openPLMYNum(0), openCSRLBJNum(0) { memset(item, 0, sizeof(item)); }
     };
 
 	struct PlayerData
@@ -1845,6 +1863,7 @@ namespace GObject
         GuangGunInfo m_gginfo;
         bool _qixiBinding;
         QiShiBanInfo m_qishiban;
+        MoBaoInfo m_mobao;
     public:
 		inline bool isFriend(Player *pl) const { return _hasFriend(0, pl); }
         inline bool isJumpingMap() { return _isJumpingMap; }
@@ -1977,6 +1996,7 @@ namespace GObject
         void GetPersonalAward(UInt8 opt);
         UInt32 GetNextStepTime();
         UInt32 GetQQFriendScore(const char * openId);
+        bool GetQQFriendInfo(const char * openId, std::string& info);
         bool CheckReqDataTime();
         void SetReqDataTime(UInt8 mark=1);
         //bool CheckReqDataTime1();
@@ -2005,10 +2025,27 @@ namespace GObject
         void AddQiShiBanAddTimeNum() { m_qishiban.addTimeNum += 1; }
         UInt32 GetQiShiBanAddTimeNum() const { return m_qishiban.addTimeNum; }
 
+        void ReqQiShiBanPlayCount(std::vector<std::string>&);
+
         UInt32  m_checkTime;
         //UInt32  m_checkTime1;
         UInt32  m_curPage;
         //七石斗法 end
+        
+        //墨宝 begin
+        void LoadMoBaoData(UInt16 buyNum, UInt16 status, const std::string& item, 
+                            UInt8 itemACnt, UInt8 itemBCnt, UInt8 itemCCnt, UInt8 itemDCnt, UInt8 itemECnt, UInt8 itemFCnt);
+        void InitMoBaoAward();
+        void MoBaoData(UInt8 mark=0);
+        bool CheckForZero();
+        void ReqMoBaoInfo();
+        void OpenCard(UInt8 pos);
+        void BuyOpenCardNum();
+        void RefreshAward();
+        void RandMoBaoAward(std::vector<UInt32>& items, UInt8 i, UInt8 mark=0);
+        bool CheckMoBaoAward(UInt32 itemId);
+
+        //墨宝 end
 
         void MiLuZhiJiao();
         void setForbidSale(bool b, bool isAuto = false);
@@ -2804,9 +2841,11 @@ namespace GObject
         void addModifyMount(ModifyMount *, bool = true);
         bool hasMountChip(UInt32);
         bool addMountChip(UInt32);
-        void sendMountInfo();
+        void sendAllMountInfo();
         void upgradeMount(bool isAuto);
         void addMountAttrExtra(GData::AttrExtra&);
+        bool check_Cangjianya();
+        void mount_Cangjianya(UInt8, UInt8, bool);
         inline UInt8 getMounts() { return _playerData.mounts; }
         inline ModifyMount * getCurrentMount() { return getOneMount(getMounts()); }
         inline ModifyMount * getOneMount(UInt8 id)

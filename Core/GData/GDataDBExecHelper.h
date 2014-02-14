@@ -671,6 +671,15 @@ struct DBRideUpgradeCfg
     float rate;
 };
 
+struct DBCangjianCfg
+{
+    UInt8 floor;
+    std::string name;
+    UInt16 prob;
+    UInt8 otherNum;
+    std::string bless;
+};
+
 struct DBKeyinConfig
 {
     UInt8 keyinId;
@@ -1617,6 +1626,17 @@ SPECIALDEF(6)
     UInt32, singleCost,
     UInt32, lvExp,
     float, rate
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCangjianCfg)
+SPECIALDEF(5)
+	(
+    UInt8, floor,
+    std::string, name,
+    UInt16, prob,
+    UInt8, otherNum,
+    std::string, bless
 	)
 SPECIALEND()
 
