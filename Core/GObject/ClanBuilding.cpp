@@ -235,6 +235,12 @@ namespace GObject
 
     void ClanBuildingOwner::upgradeBuilding(Player *player, UInt8 type)
     {
+        UInt16 maxLevel = getAddVal(ClanBuilding::eClanBuildingOracle);
+        if (getLevel(type) >= maxLevel)
+        {
+            player->sendMsgCode(0, 1102); // TODO:
+            return;
+        }
         UInt32 uErr = tryLevelUp(type);
         if (uErr == 0)
             player->sendMsgCode(0, 1100);// TODO

@@ -2402,6 +2402,7 @@ CREATE TABLE `clan_buildings` (
       `magAtkLevel` smallint(6) DEFAULT '0' COMMENT '法攻建筑等级',
       `actionLevel` smallint(6) DEFAULT '0' COMMENT '身法建筑等级',
       `hpLevel` smallint(6) DEFAULT '0' COMMENT '生命建筑等级',
+      `oracleLevel` smallint(6) DEFAULT '0' COMMENT '神谕塔建筑等级',
       `updateTime` int(10) DEFAULT '0' COMMENT '数据更新时间',
       PRIMARY KEY (`clanId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='帮派建筑';

@@ -14,6 +14,7 @@ namespace GData
         buildingTypeMagAtk = 2,     // 法攻加成
         buildingTypeAction = 3,     // 身法加成
         buildingTypeHP = 4,         // 生命加成
+        buildingTypeOracle = 5,     // 神谕塔（限制其他建筑等级）
         buildingTypeMax
     };
     struct ClanBuildingTableData
