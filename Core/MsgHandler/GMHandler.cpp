@@ -5239,6 +5239,12 @@ void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::strin
 {
     UInt32 bpId = atoi(args[0].c_str());
     UInt64 playerId1 = player->getId();
+    UInt32 leftId = atoi(args[1].c_str());
+    UInt32 clanId = atoi(args[2].c_str());
+	char * endptr;
+	UInt64 pid = strtoull(args[3].c_str(), &endptr, 10);
+    UInt8 pos1 = atoi(args[4].c_str());
+    UInt8 pos2 = atoi(args[5].c_str());
     switch(bpId)
     {
         case 1:
@@ -5249,6 +5255,18 @@ void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::strin
                 NETWORK()->SendToServerLeft(st);
                 break;
             }
+        case 2:
+            {
+                Stream st(SERVERLEFTREQ::LEFTADDR_SWITCHPLAYER, 0xEE);
+                st << leftId ; 
+                st << clanId ;
+                st << pid ; 
+                st << pos1;
+                st << pos2;
+                st << Stream::eos;
+                NETWORK()->SendToServerLeft(st);
+                break; 
+            } 
     }
 }
 
