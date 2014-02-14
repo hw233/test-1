@@ -2617,11 +2617,9 @@ void OnServerLeftEnter( GameMsgHdr& hdr, const void* data )
             GLOBAL().PushMsg(hdr, &swed);
             return;
         }
-        std::cout << "begin:"<<static_cast<UInt32>(swed->st.size())<<std::endl;
         swed->st << player->getId() << player->getName() << player->getTitle();
         player->appendLineup2(swed->st);
         player->appendPetOnBattle(swed->st);
-        std::cout<<"player"<<static_cast<UInt32>(player->getId()>>48) <<"X"<<static_cast<UInt32>(player->getId()&0xffffffffff)<<" size "<<static_cast<UInt32>(swed->st.size()) << std::endl;
         swed->warSort.erase(it ++);
     }
     swed->st << Stream::eos;

@@ -5170,10 +5170,20 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
     UInt8 i = 0, j = 0;
     UInt32 clanId = 0;
     std::string clanName = "";
+    UInt32 size = globalPlayers.size();
+    if(size < 5 )
+        return ;
+    UInt32 urand = uRand(size - 5); 
+    UInt8 k = 0 ;
     for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
     {
         if(j > 2)
             break;
+        if(k < urand )
+        {
+            k ++;
+            continue;
+        }
         GObject::Player * player = it->second;
         if(clanId == 0 )
         {
@@ -5181,6 +5191,9 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
             {
                 clanId = player->getClan()->getId();
                 clanName = player->getClanName();
+                std::cout << "rand:" << urand <<std::endl;
+                std::cout << "clanId:" << clanId <<std::endl;
+                std::cout << "clanName:" << clanName.c_str() <<std::endl;
             }
             else
                 continue ;
@@ -5207,6 +5220,7 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
             j ++;
             clanId = 0 ;
             warSort.clear();
+            break;
         }
     }
 }
