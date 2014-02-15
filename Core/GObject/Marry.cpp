@@ -1971,7 +1971,7 @@ namespace GObject
     {
         if(player)
         {
-            if(player->GetMarriageInfo()->marriageTime != 0)
+            if(player->GetMarriageInfo()->pronouncement != "")
             {
                 Stream st(REP::MARRYMGR);
                 st << static_cast<UInt8>(0x11) << player->GetMarriageInfo()->marriageTime + 86400 * 2 - TimeUtil::Now() << Stream::eos;
@@ -1983,10 +1983,10 @@ namespace GObject
         }
         if(obj_player)
         {
-            if(obj_player->GetMarriageInfo()->marriageTime != 0)
+            if(obj_player->GetMarriageInfo()->pronouncement != "")
             {
                 Stream st(REP::MARRYMGR);
-                st << static_cast<UInt8>(0x11) << player->GetMarriageInfo()->marriageTime + 86400 * 2 - TimeUtil::Now() << Stream::eos;
+                st << static_cast<UInt8>(0x11) << obj_player->GetMarriageInfo()->marriageTime + 86400 * 2 - TimeUtil::Now() << Stream::eos;
                 if(player)
                     player->send(st);
                 if(obj_player)
