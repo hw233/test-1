@@ -240,6 +240,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_married_couple.sql     #创建结婚log表
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_qixi.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131212_clear636and637.sql   #清空VAR（QQ大厅登录） 2014年1月17号活动
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
 }
 
 #sh player_jiguan.sh
