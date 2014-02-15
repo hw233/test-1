@@ -3834,4 +3834,8 @@ void OnServerLeftGetSpirit(ServerLeftMsgHdr& hdr, const void * data)
     UInt32 num = 0;
     br >> num ; 
 }
+void OnServerLeftErrInfo(ServerLeftMsgHdr& hdr, const void * data)
+{
+   //0-操作成功 1-对共有遗迹进行守卫操作错误  2-该遗迹无该镇守成员 3-对象以及非该帮派占领 
+}
 #endif // _WORLDOUTERMSGHANDLER_H_

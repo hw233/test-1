@@ -101,6 +101,7 @@ MSG_REG_2(ServerLeftMsgHdr, 0x134, OnServerLeftGetSpirit);  //帮派获得元气
 MSG_REG_2(ServerLeftMsgHdr, 0x135, OnServerLeftGetAward);  //帮派获得仙界赐福
 MSG_REG_2(ServerLeftMsgHdr, 0x136, OnServerLeftBattleReport); //接受战报
 MSG_REG_2(ServerLeftMsgHdr, 0x137, OnServerLeftRevInfo);   //接受遗迹信息
+MSG_REG_2(ServerLeftMsgHdr, 0x138, OnServerLeftErrInfo);   //接受错误信息
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
