@@ -1083,6 +1083,16 @@ CREATE TABLE `ride_upgrade` (
     PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
+DROP TABLE IF EXISTS `ride_cangjian`;
+CREATE TABLE `ride_cangjian` (
+    `floor` tinyint(3) unsigned NOT NULL,
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `prob` int(10) unsigned NOT NULL,
+    `otherNum` int(10) unsigned NOT NULL,
+    `bless` varchar(255) NOT NULL DEFAULT '',
+    PRIMARY KEY (`floor`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `pet_sevensoullevel`;
 CREATE TABLE IF NOT EXISTS `pet_sevensoullevel` (
   `soullevel` tinyint(3) unsigned NOT NULL,
@@ -1128,6 +1138,7 @@ CREATE TABLE `clan_building_template` (
       `magAtkValue` int(10) DEFAULT NULL COMMENT '法攻属性加成值',
       `actionValue` int(10) DEFAULT NULL COMMENT '身法属性加成值',
       `hpValue` int(10) DEFAULT NULL COMMENT '生命属性加成值',
+      `oracleValue` int(10) DEFAULT NULL COMMENT '神谕塔对其他建筑的等级限制',
       PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='帮派建筑属性等级表';
 -- Dump completed

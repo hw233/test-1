@@ -161,6 +161,7 @@ MSG_REG(GameMsgHdr, OnGetAward);
 MSG_REG_2(GameMsgHdr, REQ::FOURCOP, OnFourCopReq);
 MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);
 MSG_REG_2(GameMsgHdr, REQ::PET_TEAM_COPY, OnPetTeamCopyReq);
+MSG_REG_2(GameMsgHdr, REQ::MO_BAO, OnMoBaoReq);
 MSG_REG_2(GameMsgHdr, REQ::NEWRELATION, OnNewRelationReq);
 MSG_REG_2(GameMsgHdr, REQ::SKILLSTRENGTHEN, OnSkillStrengthen);
 

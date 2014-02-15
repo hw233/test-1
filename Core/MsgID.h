@@ -407,6 +407,9 @@ namespace REQ
     /** 宠物组队副本 */
     const UInt8 PET_TEAM_COPY       = 0x76;
 
+    /** 墨宝 */
+    const UInt8 MO_BAO              = 0x78;
+
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
 
@@ -711,6 +714,9 @@ namespace REP
     const UInt8 TEAM_COPY_REQ       = 0x99;
 
     const UInt8 PET_TEAM_COPY       = 0x76;
+
+    /** 墨宝 */
+    const UInt8 MO_BAO              = 0x78;
 
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;

@@ -25,6 +25,7 @@ namespace GObject
                 eClanBuildingMagAtk = 2,  // 法攻加成建筑
                 eClanBuildingAction = 3,  // 身法加成建筑
                 eClanBuildingHP     = 4,  // 生命加成建筑
+                eClanBuildingOracle = 5,  // 神谕塔（限制其他建筑等级）
                 eClanBuildingMax,
             };
         public:

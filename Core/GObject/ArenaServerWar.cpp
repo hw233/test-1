@@ -290,7 +290,11 @@ void ServerWarMgr::challenge(Player * atker, std::string& name)
 void ServerWarMgr::notifyChallengeResult(Player* atker, Player* defer, bool win)
 {
     if(!atker || !defer || _progress != e_war_challenge)
+    {
+        atker->delGlobalFlag(Player::Challenging);
+        defer->delGlobalFlag(Player::BeChallenging);
         return;
+    }
     std::map<Player *, UInt8>::iterator it = _warSort.find(defer);
     if (it == _warSort.end())
         return;

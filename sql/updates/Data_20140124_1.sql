@@ -5,5 +5,6 @@ CREATE TABLE `clan_building_template` (
       `magAtkValue` int(10) DEFAULT NULL COMMENT '法攻属性加成值',
       `actionValue` int(10) DEFAULT NULL COMMENT '身法属性加成值',
       `hpValue` int(10) DEFAULT NULL COMMENT '生命属性加成值',
+      `oracleValue` int(10) DEFAULT NULL COMMENT '神谕塔对其他建筑的等级限制',
       PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='帮派建筑属性等级表';

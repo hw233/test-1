@@ -558,8 +558,14 @@ public:
     {return _11time; } 
     inline static void  setGGTime(bool v)
     {   _ggtime=v; } 
-    inline static bool  getGGTime()
-    {return _ggtime; } 
+    inline static bool  getGGTime(UInt32 time =0 )
+    {
+        UInt32 now = TimeUtil::Now() + time;
+        if ((now > getOpenTime() + 7 * 86400) && (now  < getOpenTime() + 14 * 86400) )
+            return true;
+        return false ;
+        //return _ggtime; 
+    } 
     inline static void  setQZoneRechargeTime(bool v)
     {   _qzoneRechargetime=v; } 
     inline static bool  getQZoneRechargeTime()
@@ -1320,8 +1326,10 @@ public:
 
 public:
     bool MemCachInit();
-    void SetMemCach_qishiban(UInt32 score, const char * openId);
-    UInt32 GetMemCach_qishiban(const char * openId);
+    void SetMemCach_qishiban(UInt32 score, const char * openId, const char * name, UInt8 fighterId);
+    void SetMemCach_qishibanInfo(const char * openId, const char * name, UInt8 fighterId);
+    UInt32 GetMemCach_qishibanScore(const char * openId);
+    bool GetMemCach_qishibanInfo(const char * openId, std::string& info);
     void SetMemCach_CFriend_Invited(UInt64);
     UInt16 GetMemCach_CFriend_Invited(UInt64);
     void DelMemCach_CFriend_Invited(UInt64);
