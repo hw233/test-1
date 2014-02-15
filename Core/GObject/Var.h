@@ -652,13 +652,13 @@ namespace GObject
         VAR_MARRYBOARD_BAIHE = 684,          //百合使用
         VAR_NEWYEARSPEED_COUNT = 685 ,
         VAR_ONCE_ONDAY = 686 ,    //记录一天只有一次
-        VAR_NEWYEAR_PRATICE_COUNT = 687 ,    //记录一天只有一次
         VAR_SUMMERMEET_SCORE1 = 687 ,    //决战之地，个人副本，组队副本，阵图  计数
         VAR_SUMMERMEET_SCORE2 = 688 ,    //斗剑历练，斗剑天梯，挂机加速，师门任务
         VAR_SUMMERMEET_SCORE3 = 689 ,    //衙门任务，帮派任务任务
         VAR_SUMMERMEET_SCORE4 = 690 ,    //充值数
         VAR_SUMMERMEET_SCORE5 = 691 ,    //消费数
         VAR_COUPLE_NAME= 692 ,    //夫妻称号佩戴
+        VAR_NEWYEAR_PRATICE_COUNT = 693 ,    //记录一天只有一次
 
         //701-710 for suntao
         VAR_MicroCloud_AWARD = 701,     //是否领取微云合作奖励
