@@ -1265,9 +1265,7 @@ namespace GObject
 
         UInt16 skillId = GData::sevenSoul.getSkillId(_petType, soulId + 1, _skillIndex[soulId]);
         UInt16 ssLevel = GData::sevenSoul.getSkillLevel(_soulLevel[soulId - 1]);
-
-        std::string delSkills = "";
-        std::string skills = "";
+#if 0
         GData::Pet::PinjieData * pjd = GData::pet.getLevTable(_petLev);
         if(pjd)
         {
@@ -1290,6 +1288,24 @@ namespace GObject
                 }
             }
         }
+#else
+        UInt16 conflictSkillId = GData::sevenSoul.getAnotherSimilarSkill(skillId);
+        for(UInt8 i = 0; i < INIT_SKILL_UPMAX; ++ i)
+        {
+            if(SKILL_ID(_initskl[i]) == skillId)
+            {
+                petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
+                break;
+            }
+
+            if (SKILL_ID(_initskl[i]) == conflictSkillId)
+            {
+                _initskl[i] = SKILLANDLEVEL(skillId, 1);
+                petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
+                break;
+            }
+        }
+#endif
     }
 
     void FairyPet::deleteSevenSoul()
