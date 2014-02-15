@@ -21809,8 +21809,8 @@ UInt8 Player::toQQGroup(bool isJoin)
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
-        SYSMSG_SENDV(191, this, a);
-        SYSMSG_SENDV(1067, this, a);
+        SYSMSG_SENDV(192, this, a);
+        SYSMSG_SENDV(1068, this, a);
         SetVar(VAR_SEVEN_SOUL_NUM, xianpo);
 
         return xianpo;

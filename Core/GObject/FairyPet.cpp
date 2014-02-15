@@ -1108,8 +1108,14 @@ namespace GObject
             _soulLevel[soulIndex - 1] = 1;
             DB4().PushUpdateData("REPLACE INTO `pet_sevensoul` VALUES(%" I64_FMT "u, %u, %u, %u, 0)", _owner->getId(), getId(), soulIndex, _soulLevel[soulIndex - 1]);
 
-            UInt8 petType = getSevenSoulPetType();
-            UInt16 skillId = GData::sevenSoul.getSkillId(petType, soulIndex, _skillIndex[soulIndex - 1]);
+            UInt16 skillId = GData::sevenSoul.getSkillId(_petType, soulIndex, _skillIndex[soulIndex - 1]);
+            if(soulIndex > 4)
+            {
+                UInt16 skill_id = SKILLANDLEVEL(skillId, 1);
+                std::string skills = Itoa(skill_id);
+                setSkills(skills, false);
+                updateToDBPetSkill();
+            }
             UInt16 ssLevel = GData::sevenSoul.getSkillLevel(_soulLevel[soulIndex - 1]);
             petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
             return true;
@@ -1162,8 +1168,7 @@ namespace GObject
             UInt8 newSSLevel = GData::sevenSoul.getSkillLevel(_soulLevel[sevenSoulIndex]);
             if(oldSSLevel != newSSLevel)
             {
-                UInt8 petType = getSevenSoulPetType();
-                UInt16 skillId = GData::sevenSoul.getSkillId(petType, sevenSoulIndex + 1, _skillIndex[sevenSoulIndex]);
+                UInt16 skillId = GData::sevenSoul.getSkillId(_petType, sevenSoulIndex + 1, _skillIndex[sevenSoulIndex]);
                 petSSAdd(SKILLANDLEVEL(skillId, newSSLevel));
             }
 
@@ -1205,14 +1210,13 @@ namespace GObject
             std::string newSkill = "";
             ret = 0;
 
-            UInt8 petType = getSevenSoulPetType();
-            UInt16 oldSkillId = GData::sevenSoul.getSkillId(petType, sevenSoulIndex + 1, _skillIndex[sevenSoulIndex]);
+            UInt16 oldSkillId = GData::sevenSoul.getSkillId(_petType, sevenSoulIndex + 1, _skillIndex[sevenSoulIndex]);
             UInt16 sLevel = getSkillLevelBySkill(oldSkillId);
 
             _skillIndex[sevenSoulIndex] = skillIndex;
             DB4().PushUpdateData("UPDATE `pet_sevensoul` SET `skillIndex` = %u WHERE `playerId` = %" I64_FMT "u AND petId = %u AND soulId = %u", skillIndex, _owner->getId(), getId(), sevenSoulIndex + 1);
 
-            UInt16 newSkillId = GData::sevenSoul.getSkillId(petType, sevenSoulIndex + 1, _skillIndex[sevenSoulIndex]);
+            UInt16 newSkillId = GData::sevenSoul.getSkillId(_petType, sevenSoulIndex + 1, _skillIndex[sevenSoulIndex]);
 
             petSSErase(oldSkillId);
             UInt16 old_skill_id = SKILLANDLEVEL(oldSkillId, sLevel);
@@ -1259,8 +1263,7 @@ namespace GObject
         if(_skillIndex[soulId] >= 2)
             return;
 
-        UInt8 petType = getSevenSoulPetType();
-        UInt16 skillId = GData::sevenSoul.getSkillId(petType, soulId + 1, _skillIndex[soulId]);
+        UInt16 skillId = GData::sevenSoul.getSkillId(_petType, soulId + 1, _skillIndex[soulId]);
         UInt16 ssLevel = GData::sevenSoul.getSkillLevel(_soulLevel[soulId - 1]);
 
         std::string delSkills = "";
@@ -1292,12 +1295,11 @@ namespace GObject
     void FairyPet::deleteSevenSoul()
     {
         std::vector<const GData::SkillBase*> vSkills;
-        UInt8 petType = getSevenSoulPetType();
         for(UInt8 i = 0; i < 7; i++)
         {
             if(_soulLevel[i] == 0 || _soulLevel[i] > 25)
                 continue;
-            UInt16 skillId = GData::sevenSoul.getSkillId(petType, i + 1, _skillIndex[i]);
+            UInt16 skillId = GData::sevenSoul.getSkillId(_petType, i + 1, _skillIndex[i]);
             petSSErase(skillId);
         }
         DB4().PushUpdateData("DELETE FROM `pet_sevensoul` WHERE `playerId` = %" I64_FMT "u AND petId = %u", _owner->getId(), getId());
