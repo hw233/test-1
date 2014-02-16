@@ -154,6 +154,7 @@ bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
 bool World::_qqBoardLogin = false;
 bool World::_surnamelegend = false;
+bool World::_speedTime = false;
 bool World::_happyFire = false;
 bool World::_11time = false;
 bool World::_ggtime = false;
@@ -1538,7 +1539,7 @@ void World::World_MarryBoard_Refresh(void *)
 
 void World::World_Marry_Process(void *)
 {
-    gMarryMgr.DoProcess(); 
+    gMarryMgr.DoProcess(TimeUtil::Now()); 
 }
 
 void World::DaysRank_Refresh(void*)

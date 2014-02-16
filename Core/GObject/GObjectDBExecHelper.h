@@ -1448,6 +1448,19 @@ struct DBMarriedLog
     UInt8 wedding_type;
 };
 
+struct DBMarriedCouple
+{
+    UInt32 jh_time;
+    UInt64 man_playerid;
+    UInt64 woman_playerid;
+    UInt8 lover_item;
+    UInt32 both_onlinetime;
+    std::string pet_name;
+    UInt8 pet_level;
+    UInt32 pet_levelExp;
+    UInt32 pet_friendliness;
+};
+
 struct DBSevenSoul
 {
     UInt64 playerId;
@@ -3296,6 +3309,21 @@ SPECIALDEF(9)
     UInt32, replymarriage_time,
     UInt32, jy_time,
     UInt8, wedding_type
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBMarriedCouple)
+SPECIALDEF(9)
+    (
+    UInt32, jh_time,
+    UInt64, man_playerid,
+    UInt64, woman_playerid,
+    UInt8, lover_item,
+    UInt32, both_onlinetime,
+    std::string, pet_name,
+    UInt8, pet_level,
+    UInt32, pet_levelExp,
+    UInt32, pet_friendliness
     )
 SPECIALEND()
     

@@ -646,6 +646,18 @@ public:
         _consumebegin = begin;
         _consumeend = end;
     }
+    inline static bool  getNewYearSpeedTime(UInt32 now = 1)
+    {
+        if( now == 1 )
+              now = TimeUtil::Now();
+        UInt32 _speedBegin = TimeUtil::MkTime(2014, 1, 18);
+        UInt32 _speedEnd = TimeUtil::MkTime(2014, 2,16);
+        if(now >_speedBegin && now <= _speedEnd)
+            return true;
+        else 
+            return false;
+    } 
+
     inline static UInt32 getConsumeBegin() { return _consumebegin; }
     inline static UInt32 getConsumeEnd() { return _consumeend; }
     inline static void setNeedConsumeRank(bool v)
@@ -1190,6 +1202,7 @@ public:
     static bool _foolbao;
     static bool _summerFlow3;
     static bool _surnamelegend;
+    static bool _speedTime;
     static bool _happyFire;
     static bool _11time;
     static bool _qishiban;

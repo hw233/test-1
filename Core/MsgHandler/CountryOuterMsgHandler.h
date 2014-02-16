@@ -69,6 +69,7 @@
 #include "GObject/ClanBoss.h"
 #include "GObject/ClanCityBattle.h"
 #include "GObject/Marry.h"
+#include "GObject/Married.h"
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
 
@@ -1417,6 +1418,21 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->sendGuangGunInfo();
     pl->setQTSpecialMark();
+    //通知结婚养成
+    if(pl->GetVar(GObject::VAR_MARRY_STATUS) == 5 || pl->GetVar(GObject::VAR_MARRY_STATUS) == 6)
+    {
+        Stream st1(REP::MARRIEDMGR);
+        st1  << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
+        pl->send(st1);
+        return;
+    }
+    else
+    {
+        Stream st1(REP::MARRIEDMGR);
+        st1 << static_cast<UInt8>(1) << static_cast<UInt8>(0)<< Stream::eos;
+        pl->send(st1);
+        return;
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -7536,13 +7552,13 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
                 switch(flag)
                 {
                     case 0:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     case 1:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     case 2:
-                        GObject::gMarryMgr.GetList(player,flag,idx); 
+                        GObject::gMarryMgr.DoGetList(player,flag,idx); 
                         break;
                     default:
                         Stream st(REP::MARRYMGR);
@@ -7647,7 +7663,44 @@ void OnMARRYMGRReq( GameMsgHdr& hdr, const void* data )
 
 }
 
+void OnMARRIEDMGRReq( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    
+    UInt8 req = 0;
+    brd >> req;
+    /*
+    switch(req)
+    {
+        case 2:
+            gMarriedMgr.ReturnFirstStatus(player);
+            break;
+        case 3:
+            
+            break;
+        case 4:
 
+            break;
+        case 5:
+
+            break;
+        case 6:
+
+            break;
+        case 7:
+
+            break;
+        case 8:
+
+            break;
+        default:
+
+            break;
+    }*/
+
+
+}
 
 void OnClanSpiritTree( GameMsgHdr& hdr, const void* data )
 {

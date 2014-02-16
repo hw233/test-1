@@ -142,11 +142,11 @@ namespace GObject
     AtomicVal<UInt32> g_eMeiCount = (AtomicVal<UInt32>)(0);
     AtomicVal<UInt32> g_kunLunCount = (AtomicVal<UInt32>)(0);
 
-	UInt8 Player::getMaxIcCount(UInt8 vipLevel)
+	UInt8 Player::getMaxIcCount(UInt8 vipLevel ,UInt8 flag)
 	{
         if (World::getICAct())
             return MaxICCount[5];
-		UInt8 maxCount = MaxICCount[vipLevel];
+		UInt32 maxCount = MaxICCount[vipLevel];
         // 限时vip特权
         UInt32 VipType = GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
         if( in7DayFromCreated() && VipType >4 )
@@ -155,7 +155,11 @@ namespace GObject
             maxCount = 16;
         if(maxCount < 24 && inVipPrivilegeTime() &&( VipType % 2 ==0 ) )
             maxCount = 24;
-		return maxCount;
+        if(World::getNewYearSpeedTime() && !flag)
+        {
+             maxCount += GetVar(VAR_NEWYEARSPEED_COUNT);
+        }
+		return maxCount > 255 ? 255 : maxCount;
 	}
 
     EventAutoBattle::~EventAutoBattle()
@@ -3942,6 +3946,8 @@ namespace GObject
             count = 60*216;
         if(World::get11TimeNum()<=15)
             count = 60 * 144 ;
+        if(World::getNewYearSpeedTime())
+            count = 168 * 60;
         return count;
     }
 
@@ -7796,6 +7802,16 @@ namespace GObject
 		UInt32 now = TimeUtil::Now();
 		if(now >= _playerData.nextIcReset)
 		{
+            if(World::getNewYearSpeedTime() && World::getNewYearSpeedTime(_playerData.nextIcReset))
+            {
+                UInt8 day = (TimeUtil::SharpDay(0, now) - _playerData.nextIcReset )/86400 ;
+                UInt8 oldValue = getMaxIcCount(getVipLevel(),1);
+                UInt32 value = getMaxIcCount(getVipLevel()) - _playerData.icCount + (day) * oldValue;
+                if((value + oldValue) > 255 )
+                    SetVar(VAR_NEWYEARSPEED_COUNT,255 - oldValue );
+                else
+                    SetVar(VAR_NEWYEARSPEED_COUNT,value );
+            }
 			_playerData.nextIcReset = TimeUtil::SharpDay(1, now);
 			_playerData.icCount = 0;
 			DB1().PushUpdateData("UPDATE `player` SET `icCount` = '%u|%u' WHERE `id` = %" I64_FMT "u", _playerData.icCount, _playerData.nextIcReset, _id);
@@ -11251,9 +11267,12 @@ namespace GObject
     {
         checkPIcCount();
         int nVipLevel = getVipLevel();
-        if (PracticePlace::_picCnt[nVipLevel] < _playerData.picCount)
+        UInt8 cnt = PracticePlace::_picCnt[nVipLevel];
+        if(World::getNewYearSpeedTime())
+            cnt += GetVar(VAR_NEWYEAR_PRATICE_COUNT);
+        if ( cnt < _playerData.picCount)
             _playerData.picCount = 0;
-        return PracticePlace::_picCnt[nVipLevel] - _playerData.picCount;
+        return cnt - _playerData.picCount;
     }
 
     void Player::checkPIcCount()
@@ -11261,6 +11280,16 @@ namespace GObject
 		UInt32 now = TimeUtil::Now();
 		if(now >= _playerData.nextPIcReset)
 		{
+            if(World::getNewYearSpeedTime() && World::getNewYearSpeedTime(_playerData.nextPIcReset))
+            {
+                UInt8 day = (TimeUtil::SharpDay(0, now) - _playerData.nextPIcReset )/86400 ;
+                UInt8 oldValue = PracticePlace::_picCnt[getVipLevel()];
+                UInt32 value =  oldValue*(day +1 )+ GetVar(VAR_NEWYEAR_PRATICE_COUNT) - _playerData.picCount;
+                if(value + oldValue > 255 )
+                    SetVar(VAR_NEWYEAR_PRATICE_COUNT,255 - oldValue);
+                else
+                    SetVar(VAR_NEWYEAR_PRATICE_COUNT,value);
+            }
 			_playerData.nextPIcReset = TimeUtil::SharpDay(1, now);
             _playerData.picCount = 0;
             DB1().PushUpdateData("UPDATE `player` SET piccount = %u, nextpicreset = %u where `id`= %" I64_FMT "u", _playerData.picCount, _playerData.nextPIcReset, _id);
@@ -26227,7 +26256,7 @@ void Player::sendNovLoginInfo()
 {
     UInt32 novLogin = GetVar(VAR_NOV_LOGIN);
     UInt32 novLoginAward = GetVar(VAR_NOV_LOGIN_AWARD); 
-    UInt32 timeBegin = TimeUtil::MkTime(2013,12,13);
+    UInt32 timeBegin = TimeUtil::MkTime(2014,1,17);
     UInt32 now = TimeUtil::Now();
     UInt32 off =(TimeUtil::SharpDay(0, now)-TimeUtil::SharpDay(0, timeBegin))/86400;
     if(now < timeBegin)
@@ -26699,10 +26728,10 @@ void Player::GetFindOldManAward(UInt32 type)
         SYSMSG_BROADCASTV(574, getCountry(), getPName(), type );
     }
     GetPackage()->AddItem(9451, num, true, false);   //欢乐礼包(9439) 其他活动要修改
-    AddVar(VAR_OLDMAN_DAYSCORE,num*10);
-    AddVar(VAR_OLDMAN_SCORE,num*10);
-    SYSMSG_SENDV(2024,this,num*10);
-    SYSMSG_SENDV(2025,this,num*10);
+    AddVar(VAR_OLDMAN_DAYSCORE,num*5);
+    AddVar(VAR_OLDMAN_SCORE,num*5);
+    SYSMSG_SENDV(2024,this,num*5);
+    SYSMSG_SENDV(2025,this,num*5);
     char str[16] = {0};
     sprintf(str, "F_131205_5");
     udpLog("shengdanzhuomicang", str, "", "", "", "", "act");
@@ -26822,9 +26851,9 @@ void Player::sendOldManPos(UInt8 type)
     UInt32 time = now- TimeUtil::SharpDay(0, now);
     if(time < 7*3600 || time > 20*3600)
         return ;
-    if(GetLev()<45)
+    if(GetLev()< 30 )
     {
-        SYSMSG_BROADCASTV(2109, GetLev(), 45 );
+        SYSMSG_BROADCASTV(2109, GetLev(), 30 );
         return ; 
     }
     UInt32 gold = 5;

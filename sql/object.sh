@@ -221,7 +221,6 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131201_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131203_1.sql   #fighter_xingchen 表中添加 gem4、gem5、gem6、xctCurVal、xctMaxVal 五个字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearvar592_1211.sql   #清空var592（QQ大厅登录）
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131212_clear636and637.sql   #清空var592（QQ大厅登录）
     #. clearshiyamen.sh
     #mysql -h$H -u$U -p$P -P$PT $DBO < clanscore.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clan_battlescore.sql     #重置帮战积分
@@ -235,6 +234,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_married_log.sql     #创建结婚log表
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366蓝砖礼包购买次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140109_1.sql     #修复仙界8强之前押注未结算的问题
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_married_couple.sql     #创建结婚log表
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131212_clear636and637.sql   #清空VAR（QQ大厅登录） 2014年1月17号活动
 }
 
 #sh player_jiguan.sh
