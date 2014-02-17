@@ -62,6 +62,7 @@
 #include "MsgHandler/Memcached.h"
 #include "RechargeTmpl.h"
 #include "GVar.h"
+#include "Package.h"
 
 static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 
@@ -1252,7 +1253,7 @@ void World::World_Midnight_Check( World * world )
     b11TimeEnd = b11time && !get11Time();
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
-    bGGTimeEnd = bGGtime && !getGGTime();
+    bGGTimeEnd = bGGtime && !getGGTime(300);
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
@@ -3874,21 +3875,32 @@ UInt16 World::GetRandomSpot()
 
 void World::SendGuangGunAward()    //待定
 {
+    UInt32 now = TimeUtil::Now();
+    if(now <( getOpenTime() + 7 * 86400) || now >( getOpenTime() + 15* 86400))
+        return ;
+    
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{515,30},{503,40},{134,30},{1325,30},{9435,20}},
-        {{515,25},{503,30},{134,25},{1325,25},{9435,10}},
-        {{515,20},{503,25},{134,20},{1325,20},{9435,8}},
+        {{515,30},{503,30},{134,25},{1325,25}},
+        {{515,25},{503,30},{134,20},{1325,20}},
+        {{515,20},{503,25},{134,15},{1325,15}},
     };
-    static MailPackage::MailItem card = {9924,1};
-    SYSMSG(title, 4964);
+	const UInt32 itemOrangeWeapon[3][5] = {
+        {2544, 2568, 2592, 2616, 2640},//儒
+        {2552, 2576, 2600, 2624, 2648},//释
+        {2560, 2584, 2608, 2632, 2656}
+    };
+    UInt8 type = 0;
+    UInt8 lvl = 0;
+    SYSMSG(title, 4977);
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
         Player* play = i->player;
         if (!play)
             continue;
         Player* player = play->getGGTimeCaptain();
+	    Package * package = player->GetPackage();
         ++pos;
         if(pos > 3) break;
         SYSMSGV(content, 4965, pos);
@@ -3896,14 +3908,49 @@ void World::SendGuangGunAward()    //待定
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)
         {
+            type = player->getMainFighter()->getClass() - 1;
+            if(player->getMainFighter()->getLevel() < 60)
+                lvl = 0;
+            else
+                if(player->getMainFighter()->getLevel() < 70)
+                    lvl = 1;
+                else
+                    if(player->getMainFighter()->getLevel() < 80)
+                        lvl = 2;
+                    else
+                        if(player->getMainFighter()->getLevel() < 90)
+                            lvl = 3;
+                        else
+                            lvl = 4;
+
             mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
             if(pos ==1)
-                mailPackageManager.push(mail->id, &card, 1, true);
+                package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+            else if(pos == 2)
+                package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                else if(pos == 3)
+                    package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
         }
 
         Player* player1 = player->getGGPlayer1();
         if (player1)
         {
+	        type = player1->getMainFighter()->getClass() - 1;
+            if(player1->getMainFighter()->getLevel() < 60)
+                lvl = 0;
+            else
+                if(player1->getMainFighter()->getLevel() < 70)
+                    lvl = 1;
+                else
+                    if(player1->getMainFighter()->getLevel() < 80)
+                        lvl = 2;
+                    else
+                        if(player1->getMainFighter()->getLevel() < 90)
+                            lvl = 3;
+                        else
+                            lvl = 4;
+
+            Package * package1 = player1->GetPackage();
             SYSMSGV(content, 4965, pos);
             Mail * mail1 = player1->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
@@ -3911,12 +3958,32 @@ void World::SendGuangGunAward()    //待定
             {
                 mailPackageManager.push(mail1->id, s_item[pos-1], 5, true);
                 if(pos ==1)
-                    mailPackageManager.push(mail1->id, &card, 1, true);
+                    package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+                else if(pos == 2)
+                    package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                    else if(pos == 3)
+                        package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
             }
         }
         Player* player2 = player->getGGPlayer2();
         if (player2)
         {
+	        type = player2->getMainFighter()->getClass() - 1;
+            if(player2->getMainFighter()->getLevel() < 60)
+                lvl = 0;
+            else
+                if(player2->getMainFighter()->getLevel() < 70)
+                    lvl = 1;
+                else
+                    if(player2->getMainFighter()->getLevel() < 80)
+                        lvl = 2;
+                    else
+                        if(player2->getMainFighter()->getLevel() < 90)
+                            lvl = 3;
+                        else
+                            lvl = 4;
+
+            Package * package2 = player2->GetPackage();
             SYSMSGV(content, 4965, pos);
             Mail * mail2 = player2->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
@@ -3924,7 +3991,11 @@ void World::SendGuangGunAward()    //待定
             {
                 mailPackageManager.push(mail2->id, s_item[pos-1], 5, true);
                 if(pos ==1)
-                    mailPackageManager.push(mail2->id, &card, 1, true);
+                    package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+                else if(pos == 2)
+                    package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                    else if(pos == 3)
+                        package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
             }
         }
     }

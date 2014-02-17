@@ -8005,8 +8005,8 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                             break;
                         if(cap->CheckGGCanInvit(pl))
                             return;
-                        SYSMSGV(title, 218, player->getCountry(), player->getName().c_str());
-                        SYSMSGV(content, 219, player->getCountry(), player->getName().c_str());
+                        SYSMSGV(title, 220, player->getCountry(), player->getName().c_str());
+                        SYSMSGV(content, 221, player->getCountry(), player->getName().c_str());
                         pl->GetMailBox()->newMail(player, 0x15, title, content);
                     }
                     else if(form == 1)

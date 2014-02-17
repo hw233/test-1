@@ -558,8 +558,14 @@ public:
     {return _11time; } 
     inline static void  setGGTime(bool v)
     {   _ggtime=v; } 
-    inline static bool  getGGTime()
-    {return _ggtime; } 
+    inline static bool  getGGTime(UInt32 time =0 )
+    {
+        UInt32 now = TimeUtil::Now() + time;
+        if ((now > getOpenTime() + 7 * 86400) && (now  < getOpenTime() + 14 * 86400) )
+            return true;
+        return false ;
+        //return _ggtime; 
+    } 
     inline static void  setQZoneRechargeTime(bool v)
     {   _qzoneRechargetime=v; } 
     inline static bool  getQZoneRechargeTime()

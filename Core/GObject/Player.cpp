@@ -25981,6 +25981,9 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
 {
     if(!World::getGGTime())
         return ; 
+    UInt32 now = TimeUtil::Now();
+    if(now <( World::getOpenTime() + 7 * 86400) || now >( World::getOpenTime() + 14* 86400))
+        return ;
     if(type == 0)
     {
         if( m_gginfo.task != task)
@@ -26329,8 +26332,8 @@ void Player::getGGTaskAward()
     getTael(tael*(100+times)/100); 
     AddPExp(pexp*(100+times)/100);
     AddExp(exp_*(100+times)/100);
-    if(pos ==1 || pos == 8 ||pos == 12 ||pos ==19)
-        m_Package->AddItem(9435, 1, true, false );
+    //if(pos ==1 || pos == 8 ||pos == 12 ||pos ==19)
+        //m_Package->AddItem(9435, 1, true, false );
 
 }
 void Player::giveGGTeamMemberInfo(Stream& st)
