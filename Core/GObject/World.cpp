@@ -2088,12 +2088,13 @@ bool World::Init()
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
-
+    /*
     if (!GVAR.GetVar(GVAR_QISHIBAN_INVITE_ENABLE))
     {
         globalPlayers.enumerate(enum_qishibaninviteenable, static_cast<void *>(NULL));
         GVAR.SetVar(GVAR_QISHIBAN_INVITE_ENABLE, 1);
     }
+    */
 
     
     if( GObject::MarryBoard::instance().sendAward())
