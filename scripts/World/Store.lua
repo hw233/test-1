@@ -116,6 +116,7 @@ function loadStore()
         discount(store)
     store:add(2,9427,50)
 
+    store:add(2,9600,20)
     if getQixi() then
         store:add(2,9450,10)
     end
@@ -131,7 +132,7 @@ function loadStore()
         store:add(2, 11116, 80)
         store:add(2, 11117, 90)
         store:add(2, 11118, 100)
-        --store:add(2, 11203, 110)
+        store:add(2, 11203, 110)
     end
 
     if getSurnameLegend(30) then

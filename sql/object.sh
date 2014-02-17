@@ -249,7 +249,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #天书奇缘清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearGuangGun.sql        #清除光棍节情义罗盘相关数据(为开服活动做准备)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140214_1.sql     #墨宝
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140214_2.sql   #藏剑崖
 }
 
 #sh player_jiguan.sh

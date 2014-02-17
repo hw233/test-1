@@ -224,6 +224,10 @@ namespace GObject
 
 #define GET_BIT_2(X,Y)   ((X >> (Y*2)) & 0x03)
 
+//飞剑(坐骑)系统
+#define MOUNT_COSTID 9500
+#define MOUNT_CANGJIANID 9600
+
 #ifdef _FB
 #define LIMIT_LEVEL  60
 #else
@@ -1992,6 +1996,7 @@ namespace GObject
         void GetPersonalAward(UInt8 opt);
         UInt32 GetNextStepTime();
         UInt32 GetQQFriendScore(const char * openId);
+        bool GetQQFriendInfo(const char * openId, std::string& info);
         bool CheckReqDataTime();
         void SetReqDataTime(UInt8 mark=1);
         //bool CheckReqDataTime1();
@@ -2019,6 +2024,8 @@ namespace GObject
         void SetQiShiBanAddTimeNum(UInt8 num) { m_qishiban.addTimeNum = num; }
         void AddQiShiBanAddTimeNum() { m_qishiban.addTimeNum += 1; }
         UInt32 GetQiShiBanAddTimeNum() const { return m_qishiban.addTimeNum; }
+
+        void ReqQiShiBanPlayCount(std::vector<std::string>&);
 
         UInt32  m_checkTime;
         //UInt32  m_checkTime1;
@@ -2829,9 +2836,11 @@ namespace GObject
         void addModifyMount(ModifyMount *, bool = true);
         bool hasMountChip(UInt32);
         bool addMountChip(UInt32);
-        void sendMountInfo();
+        void sendAllMountInfo();
         void upgradeMount(bool isAuto);
         void addMountAttrExtra(GData::AttrExtra&);
+        bool check_Cangjianya();
+        void mount_Cangjianya(UInt8, UInt8, bool);
         inline UInt8 getMounts() { return _playerData.mounts; }
         inline ModifyMount * getCurrentMount() { return getOneMount(getMounts()); }
         inline ModifyMount * getOneMount(UInt8 id)
