@@ -1978,6 +1978,17 @@ void World::advancedHookTimer(void *para)
 	globalPlayers.enumerate(advancedHookEnumerate, static_cast<UInt8>(0));
 }
 #endif
+
+bool enum_qishibaninviteenable(void * ptr, void* v)
+{
+	Player * pl = static_cast<Player *>(ptr);
+	if(pl == NULL)
+		return true;
+    WORLD().SetMemCach_qishibanInfo(pl->getOpenId(), pl->getName().c_str(), 
+            pl->getMainFighter()?((pl->getMainFighter()->getId()<<4)|pl->getMainFighter()->getSex()):0);
+    return true;
+}
+
 bool World::Init()
 {
     MemCachInit();
@@ -2077,6 +2088,13 @@ bool World::Init()
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
+
+    if (!GVAR.GetVar(GVAR_QISHIBAN_INVITE_ENABLE))
+    {
+        globalPlayers.enumerate(enum_qishibaninviteenable, static_cast<void *>(NULL));
+        GVAR.SetVar(GVAR_QISHIBAN_INVITE_ENABLE, 1);
+    }
+
     
     if( GObject::MarryBoard::instance().sendAward())
     {
@@ -3720,11 +3738,11 @@ bool World::MemCachInit()
     return true;
 }
 
-void World::SetMemCach_qishiban(UInt32 score, const char * openId)
+void World::SetMemCach_qishiban(UInt32 score, const char * openId, const char * name, UInt8 fighterId)
 {
     if (_memcinited)
     {
-        char value[32] = {0};
+        char value[64] = {0};
         char key[MEMCACHED_MAX_KEY] = {0};
         size_t len = snprintf(key, sizeof(key), "qishiban_%s", openId);
         size_t vlen = snprintf(value, sizeof(value), "%d", score);
@@ -3732,22 +3750,31 @@ void World::SetMemCach_qishiban(UInt32 score, const char * openId)
         bool res = m_MCached.set(key, len, value, vlen, 0);
         TRACE_LOG("setKey: %s, setScore: %u, res:%u", key, score, res);
 
-        /*
-        len = snprintf(key,sizeof(key), "qishibanname_%s", openId);
-        key[MEMCACHED_MAX_KEY - 1] = '\0';
-        vlen = snprintf(value, sizeof(value), "%s", name);
-        value[31] = '\0';
-        res = m_MCached.set(key, len, value, vlen, 0);
-        TRACE_LOG("setKey: %s, setName: %u, res:%u", key, score, res);
-        */
+        SetMemCach_qishibanInfo(openId, name, fighterId);
     }
 }
 
-UInt32 World::GetMemCach_qishiban(const char * openId)
+void World::SetMemCach_qishibanInfo(const char * openId, const char *name, UInt8 fighterId)
+{
+    if (_memcinited)
+    {
+        char value[64] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+
+        size_t len = snprintf(key,sizeof(key), "qishibaninfo_%s", openId);
+        key[MEMCACHED_MAX_KEY - 1] = '\0';
+        size_t vlen = snprintf(value, sizeof(value), "%u_%s", fighterId, name);
+        value[64 - 1] = '\0';
+        bool res = m_MCached.set(key, len, value, vlen, 0);
+        TRACE_LOG("setKey: %s, setName: %s, res:%u", key, value, res);
+    }
+}
+
+UInt32 World::GetMemCach_qishibanScore(const char * openId)
 {
     char value[32]={0};
     char key[MEMCACHED_MAX_KEY] = {0};
-    snprintf(key, MEMCACHED_MAX_KEY, "qishiban2_%s", openId);
+    snprintf(key, MEMCACHED_MAX_KEY, "qishiban_%s", openId);
 
     UInt32 score = 0;
     if (_memcinited)
@@ -3758,6 +3785,27 @@ UInt32 World::GetMemCach_qishiban(const char * openId)
     }
 
     return score;
+}
+
+bool World::GetMemCach_qishibanInfo(const char * openId, std::string& info)
+{
+    // 获取七石版玩家相关信息
+    char value[64]={0};
+    char key[MEMCACHED_MAX_KEY] = {0};
+    snprintf(key, MEMCACHED_MAX_KEY, "qishibaninfo_%s", openId);
+
+    bool ret = false;
+
+    if (_memcinited)
+    {
+        const char* res = m_MCached.get(key, value, sizeof(value));
+        TRACE_LOG("getKey: %s, getInfo: %s, res:%u", key, value, res);
+        info = value;
+        if (res)
+            ret = true;
+    }
+
+    return ret;
 }
 
 void World::SetMemCach_CFriend_Invited(UInt64 userId)
@@ -3920,7 +3968,7 @@ void World::SendGuangGunAward()    //待定
     };
     UInt8 type = 0;
     UInt8 lvl = 0;
-    SYSMSG(title, 4979);
+    SYSMSG(title, 4981);
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
         Player* play = i->player;

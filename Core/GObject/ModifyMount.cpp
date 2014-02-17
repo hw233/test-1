@@ -133,6 +133,7 @@ namespace GObject
         int leftcnt = _owner->GetVar(VAR_MOUNT_CANGJIANYA_LEFT_CNT);
         if(itemNum + leftcnt < 1)
             return;
+        UInt32 failNum = 0;
         if(isAuto)  //自动唤剑
         {
             while(curFloor < floors)
@@ -163,7 +164,13 @@ namespace GObject
                     if(_owner->hasMountChip(chipId))
                         pkg->Add(MOUNT_COSTID, cjd->otherNum, true, false, FromBox);
                     else
-                        pkg->Add(chipId, 1, true, false, FromBox);
+                    {
+		                const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[chipId];
+                        if(itemType && itemType->quality == Item_Yellow)
+                            SYSMSG_BROADCASTV(4159, _owner->getCountry(), _owner->getName().c_str(), chipId);
+                        pkg->Add(chipId, 1, true, true, FromBox);
+                        pkg->UseItem(chipId, 1, 0, 0, 1);
+                    }
                     /*
                     if(isFullFloor())
                         break;
@@ -174,6 +181,7 @@ namespace GObject
                 else
                 {   //失败
                     ++ _failTimes;
+                    ++ failNum;
                 }
                 if(leftcnt <= 0 && itemNum <= 0)
                     break;
@@ -201,11 +209,15 @@ namespace GObject
                 if(!chipId || _owner->hasMountChip(chipId))
                     pkg->Add(MOUNT_COSTID, cjd->otherNum, true, false, FromBox);
                 else
-                    pkg->Add(chipId, 1, true, false, FromBox);
+                {
+                    pkg->Add(chipId, 1, true, true, FromBox);
+                    pkg->UseItem(chipId, 1, 0, 0, 1);
+                }
             }
             else
             {   //失败
                 ++ _failTimes;
+                ++ failNum;
             }
         }
         if(isFullFloor())
@@ -218,6 +230,8 @@ namespace GObject
             pkg->DelItemAny(MOUNT_CANGJIANID, cost1, NULL, ToUse);
             pkg->DelItemSendMsg(MOUNT_CANGJIANID, _owner);
         }
+        if(failNum > 0)
+            pkg->Add(MOUNT_COSTID, failNum, true, false, FromBox);
         updateToDB();
         sendMountInfo();
         _owner->check_Cangjianya();

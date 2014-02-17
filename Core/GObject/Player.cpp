@@ -4409,6 +4409,8 @@ namespace GObject
             st<<getBePrayednum(pl->getId());
             
             st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
+            std::string openid = pl->getOpenId();
+            st << openid;
 
             st<<Stream::eos;
 			send(st);
@@ -4434,22 +4436,24 @@ namespace GObject
 	{
 		if(notify)
 		{
-			//notifyFriendAct(1, pl);
-			Stream st(REP::FRIEND_ACTION);
-        st <<static_cast<UInt8>(0x07) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()<< pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl);
-        st << static_cast<UInt8>(pl->isOnline());
-        st << static_cast<UInt8>(pl->GetVar(VAR_PRAY_TYPE))<<static_cast<UInt8>(pl->GetVar(VAR_PRAY_VALUE));
-        if(CheckFriendPray(pl->getId()))
-            st<<static_cast<UInt8>(1);
-        else st<<static_cast<UInt8>(0);
-        st<<getBePrayednum(pl->getId());
-        st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
-        st<<Stream::eos;
-		send(st);
-        SYSMSG_SEND(2341, this);
-        SYSMSG_SENDV(2342, this, pl->getCountry(), pl->getName().c_str());
-        if(writedb)
-            DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 3, %" I64_FMT "u)", getId(), pl->getId());
+            //notifyFriendAct(1, pl);
+            Stream st(REP::FRIEND_ACTION);
+            st <<static_cast<UInt8>(0x07) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()<< pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl);
+            st << static_cast<UInt8>(pl->isOnline());
+            st << static_cast<UInt8>(pl->GetVar(VAR_PRAY_TYPE))<<static_cast<UInt8>(pl->GetVar(VAR_PRAY_VALUE));
+            if(CheckFriendPray(pl->getId()))
+                st<<static_cast<UInt8>(1);
+            else st<<static_cast<UInt8>(0);
+            st<<getBePrayednum(pl->getId());
+            st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
+            std::string openid = pl->getOpenId();
+            st << openid;
+            st<<Stream::eos;
+            send(st);
+            SYSMSG_SEND(2341, this);
+            SYSMSG_SENDV(2342, this, pl->getCountry(), pl->getName().c_str());
+            if(writedb)
+                DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 3, %" I64_FMT "u)", getId(), pl->getId());
 		}
 		_friends[3].insert(pl);
         //更新密友信息
@@ -4548,6 +4552,8 @@ namespace GObject
         else st<<static_cast<UInt8>(0);
         st<<getBePrayednum(pl->getId());
         st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
+        std::string openid = pl->getOpenId();
+        st << openid;
         st<<Stream::eos;
 		send(st);
 		DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 1, %" I64_FMT "u)", getId(), pl->getId());
@@ -4660,6 +4666,8 @@ namespace GObject
                 st<<getBePrayednum(pl->getId());
                 st<<static_cast<UInt8>(pl->GetVar(VAR_OLDMAN_PRESENT));
                 // std::cout <<pl->getId()<<"@!@# "<<pl->GetVar(VAR_PRAY_TYPE)<<"!!@!"<<pl->GetVar(VAR_PRAY_VALUE)<<std::endl;
+                std::string openid = pl->getOpenId();
+                st << openid;
                 ++it;
             }
         }
@@ -4761,6 +4769,8 @@ namespace GObject
         else st<<static_cast<UInt8>(0);
         st<<getBePrayednum(other->getId());
         st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
+        std::string openid = other->getOpenId();
+        st << openid;
         st<< Stream::eos;
         send(st);
     }
@@ -25434,22 +25444,23 @@ void Player::QiShiBanState()
     if((GetQiShiBanEndTime() > _playerData.lastOnline) && (GetQiShiBanBeginTime() < GetQiShiBanEndTime())) // 继续（考虑玩家掉线可能）
     {
         mark = 1;
+
+        if (GetVar(VAR_QISHI_FRIEND_SEND_COUNT) < GetVar(VAR_QISHI_FRIEND_USE_COUNT))
+            SetVar(VAR_QISHI_FRIEND_USE_COUNT, GetVar(VAR_QISHI_FRIEND_SEND_COUNT));
+        UInt32 restNum2 = GetVar(VAR_QISHI_FRIEND_SEND_COUNT) - GetVar(VAR_QISHI_FRIEND_USE_COUNT);
         UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
         if(0 == restNum)
-            restNum = 3;
-        else if(1 == restNum)
-            restNum = 2;
-        else if(2 == restNum)
             restNum = 1;
         else
             restNum = 0;
+        restNum += restNum2;
 
         UInt32 time = GetQiShiBanEndTime() - _playerData.lastOnline;
         UInt32 totalScore = GetVar(VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE);
-        UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
+        UInt32 highestScore = WORLD().GetMemCach_qishibanScore(getOpenId());
         if(totalScore > highestScore)
         {
-            WORLD().SetMemCach_qishiban(totalScore, getOpenId());
+            WORLD().SetMemCach_qishiban(totalScore, getOpenId(), getName().c_str(), getMainFighter()?((getMainFighter()->getId()<<4)|getMainFighter()->getSex()):0);
             highestScore = totalScore;
         }
 
@@ -25467,24 +25478,24 @@ void Player::MyQSBInfo()
     if(!World::getQiShiBanTime())
         return;
 
+    if (GetVar(VAR_QISHI_FRIEND_SEND_COUNT) < GetVar(VAR_QISHI_FRIEND_USE_COUNT))
+        SetVar(VAR_QISHI_FRIEND_USE_COUNT, GetVar(VAR_QISHI_FRIEND_SEND_COUNT));
+    UInt32 restNum2 = GetVar(VAR_QISHI_FRIEND_SEND_COUNT) - GetVar(VAR_QISHI_FRIEND_USE_COUNT);
     UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
     if(0 == restNum)
-        restNum = 3;
-    else if(1 == restNum)
-        restNum = 2;
-    else if(2 == restNum)
         restNum = 1;
     else
         restNum = 0;
+    restNum += restNum2;
 
     UInt32 addTime = GetNextStepTime();
     UInt32 lastFailHighestScore = GetVar(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE);
     UInt32 cycleHighestScore = GetVar(VAR_QISHIDOUFA_CYCLE_HIGHESTSCORE);
 
-    UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
+    UInt32 highestScore = WORLD().GetMemCach_qishibanScore(getOpenId());
     if(cycleHighestScore > highestScore)
     {
-        WORLD().SetMemCach_qishiban(cycleHighestScore, getOpenId());
+        WORLD().SetMemCach_qishiban(cycleHighestScore, getOpenId(), getName().c_str(), getMainFighter()?((getMainFighter()->getId()<<4)|getMainFighter()->getSex()):0);
         highestScore = cycleHighestScore;
     }
 
@@ -25529,15 +25540,16 @@ void Player::ReqStartQSB()
     SetQiShiBanBeginTime(TimeUtil::Now());
     SetQiShiBanEndTime(GetQiShiBanBeginTime() + addTime);
 
+
+    if (GetVar(VAR_QISHI_FRIEND_SEND_COUNT) < GetVar(VAR_QISHI_FRIEND_USE_COUNT))
+        SetVar(VAR_QISHI_FRIEND_USE_COUNT, GetVar(VAR_QISHI_FRIEND_SEND_COUNT));
+    UInt32 restNum2 = GetVar(VAR_QISHI_FRIEND_SEND_COUNT) - GetVar(VAR_QISHI_FRIEND_USE_COUNT);
     UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
     if(0 == restNum)
-        restNum = 3;
-    else if(1 == restNum)
-        restNum = 2;
-    else if(2 == restNum)
         restNum = 1;
     else
         restNum = 0;
+    restNum += restNum2;
 
     Update_QSB_DB();
 
@@ -25624,30 +25636,30 @@ void Player::FinishCurStep(int randMark, UInt32 clintTime)
 
     Update_QSB_DB();
 
-    UInt32 highestScore = WORLD().GetMemCach_qishiban(getOpenId());
+    UInt32 highestScore = WORLD().GetMemCach_qishibanScore(getOpenId());
     if(totalScore > highestScore)
     {
-        WORLD().SetMemCach_qishiban(totalScore, getOpenId());
+        WORLD().SetMemCach_qishiban(totalScore, getOpenId(), getName().c_str(), getMainFighter()?((getMainFighter()->getId()<<4)|getMainFighter()->getSex()):0);
         highestScore = totalScore;
     }
 
     /*if(GetQiShiBanScore() > highestScore)
     {
-        WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId());
+        WORLD().SetMemCach_qishiban(GetQiShiBanScore(), getOpenId(),  getMainFighter()?((getMainFighter()->getId()<<4)|getMainFighter()->getSex()):0);
         highestScore = GetQiShiBanScore();
     }*/
 
     UInt32 addTime = GetNextStepTime();
 
+    if (GetVar(VAR_QISHI_FRIEND_SEND_COUNT) < GetVar(VAR_QISHI_FRIEND_USE_COUNT))
+        SetVar(VAR_QISHI_FRIEND_USE_COUNT, GetVar(VAR_QISHI_FRIEND_SEND_COUNT));
+    UInt32 restNum2 = GetVar(VAR_QISHI_FRIEND_SEND_COUNT) - GetVar(VAR_QISHI_FRIEND_USE_COUNT);
     UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
     if(0 == restNum)
-        restNum = 3;
-    else if(1 == restNum)
-        restNum = 2;
-    else if(2 == restNum)
         restNum = 1;
     else
         restNum = 0;
+    restNum += restNum2;
 
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x03) << static_cast<UInt16>(GetQiShiBanStep()) << GetQiShiBanScore() 
@@ -25667,7 +25679,7 @@ void Player::Fail()
     
     Update_QSB_DB();
     MyQSBInfo();
-    SetVar(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE, WORLD().GetMemCach_qishiban(getOpenId()));
+    SetVar(VAR_QISHIDOUFA_LASTFAIL_HIGHTERSCORE, WORLD().GetMemCach_qishibanScore(getOpenId()));
 }
 
 void Player::AddTime()
@@ -25730,41 +25742,46 @@ void Player::RestCurStep()
             && 0 != GetQiShiBanBeginTime()
             && 0 != GetQiShiBanEndTime())
     {
-        UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
-
-        if(restNum >= 3)
+        if (GetVar(VAR_QISHI_FRIEND_USE_COUNT) >= GetVar(VAR_QISHI_FRIEND_SEND_COUNT))
         {
-            if(!hasChecked())
-                return;
+            UInt32 restNum = GetVar(VAR_QISHIDOUFA_REST_NUM);
 
-            UInt8 useMoney = 10;
-            if(getCoupon() + getGold() >= useMoney)
+            if(restNum)
             {
-                ConsumeInfo ci(RestStep, 0, 0);
-                if(getCoupon() > 0)
+                if(!hasChecked())
+                    return;
+
+                UInt8 useMoney = 10;
+                if(getCoupon() + getGold() >= useMoney)
                 {
-                    if(getCoupon() < useMoney)
+                    ConsumeInfo ci(RestStep, 0, 0);
+                    if(getCoupon() > 0)
                     {
-                        useMoney -= getCoupon();
-                        useCoupon(getCoupon(), &ci);
+                        if(getCoupon() < useMoney)
+                        {
+                            useMoney -= getCoupon();
+                            useCoupon(getCoupon(), &ci);
+                        }
+                        else
+                        {
+                            useCoupon(useMoney, &ci);
+                            useMoney = 0;
+                        }
                     }
-                    else
-                    {
-                        useCoupon(useMoney, &ci);
-                        useMoney = 0;
-                    }
-                }
 
-                if(useMoney > 0)
-                    useGold(useMoney, &ci);
+                    if(useMoney > 0)
+                        useGold(useMoney, &ci);
+                }
+                else
+                {
+                    sendMsgCode(0, 1101);
+                    return;
+                }
             }
-            else
-            {
-                sendMsgCode(0, 1101);
-                return;
-            }
+            AddVar(VAR_QISHIDOUFA_REST_NUM, 1);
         }
-        AddVar(VAR_QISHIDOUFA_REST_NUM, 1);
+        else
+            AddVar(VAR_QISHI_FRIEND_USE_COUNT, 1);
     }
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x23) << static_cast<UInt8>(0x12) << Stream::eos;
@@ -25907,7 +25924,7 @@ void Player::Update_QSB_DB()
     DB1().PushUpdateData("REPLACE INTO `player_qishiban` VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u)", getId(), GetQiShiBanStep(), GetQiShiBanScore(), GetQiShiBanBeginTime(), GetQiShiBanEndTime(), GetQiShiBanAwardMark());
 }
 
-void Player::CleanQiShiBan(UInt8 mark)
+void Player::CleanQiShiBan(UInt8 mark /* = 0 */)
 {
     if(0 == mark)
     {
@@ -25926,10 +25943,39 @@ void Player::CleanQiShiBan(UInt8 mark)
     DB1().PushUpdateData("DELETE FROM `player_qishiban` WHERE `playerId` = %" I64_FMT "u", getId());
 }
 
+void Player::ReqQiShiBanPlayCount(vector<std::string>& nameList)
+{
+    // 向好友索求七石板次数
+    for (vector<std::string>::iterator it = nameList.begin(); it != nameList.end(); ++it)
+    {
+        Stream st(REP::ACTIVE);
+        st << static_cast<UInt8>(0x23);
+        st << static_cast<UInt8>(0x13);
+        st << *it;
+        Player * player = globalNamedPlayers[fixName(*it)];
+        if (player)
+        {
+            SYSMSGV(title, 4977);
+            SYSMSGV(content, 4978, getCountry(), getName().c_str());
+            player->GetMailBox()->newMail(this, 0x28, title, content);
+            st << static_cast<UInt32>(0);
+        }
+        else
+            st << static_cast<UInt32>(1);
+        st << Stream::eos;
+        send(st);
+    }
+}
+
 UInt32 Player::GetQQFriendScore(const char * openId)
 {
-    UInt32 score = WORLD().GetMemCach_qishiban(openId);
+    UInt32 score = WORLD().GetMemCach_qishibanScore(openId);
     return score;
+}
+
+bool Player::GetQQFriendInfo(const char * openId, std::string& info)
+{
+    return WORLD().GetMemCach_qishibanInfo(openId, info);
 }
 
 bool Player::CheckReqDataTime()
