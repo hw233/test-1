@@ -5533,6 +5533,39 @@ void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
     }
 }
 
+void OnMoBaoReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+    switch(op)
+    {
+    case 0x00:
+        {
+            player->ReqMoBaoInfo();
+        }
+        break;
+    case 0x01:
+        {
+            UInt8 pos = 0;
+            br >> pos;
+            player->OpenCard(pos);
+        }
+        break;
+    case 0x02:
+        {
+            player->RefreshAward();
+        }
+        break;
+    case 0x03:
+        {
+            player->BuyOpenCardNum();
+        }
+        break;
+    }
+}
+
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -7923,18 +7956,26 @@ void OnPlayerMountReq( GameMsgHdr& hdr, const void* data )
     if(player->GetLev() < 75)
         return;
 
+    player->check_Cangjianya();
     UInt8 type = 0;
     brd >> type;
     switch(type)
     {
         case 0x00:
-            player->sendMountInfo();
+            player->sendAllMountInfo();
             break;
         case 0x01:
             player->upgradeMount(false);
             break;
         case 0x02:
             player->upgradeMount(true);
+            break;
+        case 0x03:
+            {
+                UInt8 rideId = 0, isAuto = 0, floors = 0;
+                brd >> rideId >> isAuto >> floors;
+                player->mount_Cangjianya(rideId, floors, isAuto > 0);
+            }
             break;
     }
 }

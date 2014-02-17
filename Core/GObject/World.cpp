@@ -471,6 +471,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 13)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 14)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -499,6 +507,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 1)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 8)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
         ))
     {
 #if 0
@@ -1072,7 +1081,7 @@ void SendRechargeRankAward()
             char ctx[1024] = {0};
             snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
             snprintf(ctx, sizeof(ctx), "%" I64_FMT "u_%s_%u", player->getId(), player->getRealName().c_str(), i->total);
-            World::udpLog(id, ctx, "", "", "", "", "act");
+            World::udpLog("huodong", id, ctx, "", "", "", "act");
         }
         World::rechargeSort.clear();
     }
@@ -1320,6 +1329,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 13)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 14)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1374,6 +1391,7 @@ void World::World_Midnight_Check( World * world )
         world->SendQixiAward();
     if(bGuoqingEnd)
         world->SendGuoqingAward();
+   
     if (bRechargeEnd)
         SendRechargeRankAward();
     if (bConsumeEnd)
@@ -3713,6 +3731,15 @@ void World::SetMemCach_qishiban(UInt32 score, const char * openId)
 
         bool res = m_MCached.set(key, len, value, vlen, 0);
         TRACE_LOG("setKey: %s, setScore: %u, res:%u", key, score, res);
+
+        /*
+        len = snprintf(key,sizeof(key), "qishibanname_%s", openId);
+        key[MEMCACHED_MAX_KEY - 1] = '\0';
+        vlen = snprintf(value, sizeof(value), "%s", name);
+        value[31] = '\0';
+        res = m_MCached.set(key, len, value, vlen, 0);
+        TRACE_LOG("setKey: %s, setName: %u, res:%u", key, score, res);
+        */
     }
 }
 
@@ -3720,7 +3747,7 @@ UInt32 World::GetMemCach_qishiban(const char * openId)
 {
     char value[32]={0};
     char key[MEMCACHED_MAX_KEY] = {0};
-    snprintf(key, MEMCACHED_MAX_KEY, "qishiban_%s", openId);
+    snprintf(key, MEMCACHED_MAX_KEY, "qishiban2_%s", openId);
 
     UInt32 score = 0;
     if (_memcinited)
@@ -3893,7 +3920,7 @@ void World::SendGuangGunAward()    //待定
     };
     UInt8 type = 0;
     UInt8 lvl = 0;
-    SYSMSG(title, 4977);
+    SYSMSG(title, 4979);
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
         Player* play = i->player;

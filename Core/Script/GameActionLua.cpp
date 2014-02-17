@@ -1860,6 +1860,11 @@ namespace Script
 		return Call<UInt16>("addClanProfferFromItem", player, num, unit);
     }
 
+    UInt32 GameActionLua::getMountChipByCangjian(UInt32 itemId, UInt8 floor)
+    {
+		return Call<UInt32>("getMountChipByCangjian", itemId, floor);
+    }
+
 	bool GameActionLua::TaskFuncExist(UInt32 taskId)
 	{
 		return Call<bool>("TaskFuncExist", taskId);

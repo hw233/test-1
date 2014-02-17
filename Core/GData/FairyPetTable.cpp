@@ -16,6 +16,8 @@ void Pet::setLevTable(DBPinJie& dbpj)
     {
         stBless stb;
         StringTokenizer ntk(tk[idx].c_str(), ",");
+        if(ntk.count() != 2)
+            continue;
         stb.times = atoi(ntk[0].c_str());
         stb.prob = atoi(ntk[1].c_str());
         pd.bless.push_back(stb);

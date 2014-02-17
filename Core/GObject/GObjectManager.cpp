@@ -396,6 +396,12 @@ namespace GObject
             std::abort();
         }
 
+        if(!loadMoBao())
+        {
+            fprintf(stderr, "loadMoBao error!\n");
+            std::abort();
+        }
+
 		if(!loadAllClans())
         {
             fprintf(stderr, "loadAllClans error!\n");
@@ -3433,6 +3439,35 @@ namespace GObject
 		{
 			lc.advance();
             petTeamCopyManager->pushLog(t.playerName, t.monsterName, t.items);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadMoBao()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading mobao");
+		DBMoBao mb;
+		if(execu->Prepare("SELECT `playerId`, `buyNum`, `status`, `item`, `itemACnt`, `itemBCnt`, `itemCCnt`,`itemDCnt`,`itemECnt`,`itemFCnt` FROM `mobao` ORDER BY `playerId`", mb)!= DB::DB_OK)
+			return false;
+
+		lc.reset(1000);
+        Player* pl = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+            lc.advance();
+			if(mb.playerId != last_id)
+			{
+				last_id = mb.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->LoadMoBaoData(mb.buyNum, mb.status, mb.item, mb.itemACnt, mb.itemBCnt, mb.itemCCnt, mb.itemDCnt, mb.itemECnt, mb.itemFCnt);
         }
         lc.finalize();
         return true;
@@ -6896,7 +6931,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading player ModifyMount:");
 		DBModifyMount dbmm;
-		if(execu->Prepare("SELECT `id`, `playerId`, `chips` FROM `modify_mount`", dbmm) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `chips`, `curfloor`, `curfloor1`, `failtimes` FROM `modify_mount`", dbmm) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -6913,6 +6948,9 @@ namespace GObject
             {
                 mount->setChipFromDB(i, atoi(tk[i].c_str()));
             }
+            mount->setCurfoor(dbmm.curfloor);
+            mount->setCurfoor1(dbmm.curfloor1);
+            mount->setFailtimes(dbmm.failtimes);
             player->addModifyMount(mount, false);
         }
 		lc.finalize();
