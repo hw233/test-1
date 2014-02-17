@@ -28047,12 +28047,12 @@ void Player::OpenCard(UInt8 pos)
 
     UInt32 itemId = m_mobao.item[pos];
     if(0 == itemId 
-            && 9413 != itemId 
+            || (9413 != itemId 
             && 9414 != itemId 
             && 9418 != itemId 
             && 9424 != itemId 
             && 9425 != itemId 
-            && 9338 != itemId)
+            && 9338 != itemId))
         return;
     
     UInt8 count = 0;
