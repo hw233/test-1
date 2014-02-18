@@ -3697,5 +3697,113 @@ void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )
     else if(type == 3)
         GObject::leaderboard.sendGoldLvlAward(brd);
 }
+void OnServerLeftConnected( ServerLeftMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(!cfg.enabledServerWar())
+        return;
+	UInt8 r = 0;
+	brd >> r;
+	if(r == 1)
+	{
+		INFO_LOG("Failed to connect to ServerWar arena.");
+		NETWORK()->CloseServerWar();
+		return;
+	}
+    UInt8 fhaslater = 0;
+    brd >> fhaslater;
+    GObject::serverWarMgr._readbuf.append((UInt8*)(data) + brd.pos(), brd.size() - brd.pos());
+    if(!fhaslater)
+    {
+        BinaryReader brd2((UInt8*)(GObject::serverWarMgr._readbuf), GObject::serverWarMgr._readbuf.size());
+	    GObject::serverWarMgr.readFrom(brd2);
+        GObject::serverWarMgr._readbuf.clear();
+    }
+}
+
+void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    int cid = 0, sid = 0;
+    brd >> cid >> sid;
+	if(sid != cfg.serverNo || cid != cfg.channelNum)
+		return;
+    GVAR.SetVar(GVAR_SERVERWAR_ISENTER, 1);
+
+    SYSMSGV(title, 825);
+    SYSMSGV(content, 826, GObject::serverWarMgr.getSession());
+    GObject::serverWarMgr.sendTeamMail(title, content);
+}
+
+void OnServerLeftLineupCommited( ServerLeftMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 r;
+	UInt64 playerId;
+    brd >> r >> playerId;
+	GObject::Player * player = GObject::globalPlayers[playerId];
+	if(player == NULL)
+		return;
+    Stream st(REP::SERVERWAR_ARENA_OP);
+    st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x04);
+    st << r << Stream::eos;
+    player->send(st);
+}
+void OnServerLeftBattleReport( ServerLeftMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt64 pid = 0;
+    br >> pid;
+    Stream st;
+    std::vector<UInt8> buf;
+    buf.resize(br.size()-8);
+    br >> buf;
+    st << buf;
+    st << Stream::eos;
+
+	GObject::Player * player = GObject::globalPlayers[pid];
+    if(player == NULL)
+        return;
+	player->send(&(st[0]), st.size());
+}
+void OnServerLeftRevInfo(ServerLeftMsgHdr& hdr, const void * data)
+{
+#define LEFTADDRMAX 30
+#define POWERTOWERMAX 9
+#define SERVERLEFT_MAX_MEMBER 5
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    Stream st(br._buf,br._len);
+/*    for(UInt8 i = 0 ;i < LEFTADDRMAX ; ++i )   
+    {
+        std::string clanName = ""; 
+        br >> clanName;
+        st << clanName;
+        UInt32 spiritAddPH = 0;
+        br >> spiritAddPH;
+        st << spiritAddPH;
+        UInt32 occupyTime = 0;
+        br >> occupyTime;
+        st << occupyTime;
+        UInt32 spiritNow = 0;
+        br >> spiritNow;
+        st << spiritNow;
+        UInt8  power = 0;
+        br >> power;
+        st << power;
+        for(UInt8 i = 0 ; i < SERVERLEFT_MAX_MEMBER ; ++i )  
+        {
+            std::string playerName = "";
+            br >> playerName;
+            st << playerName;
+            UInt8 lev = 0;
+            br >> lev;
+            st << lev;
+            UInt32 battlePower = 0 ;
+            br >> battlePower;
+            st << battlePower;
+        }
+    }
+    */
+}
 
 #endif // _WORLDOUTERMSGHANDLER_H_

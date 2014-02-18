@@ -240,6 +240,8 @@ private:
     void OnJiqirenAction(GObject::Player *player, std::vector<std::string>& args);
     void OnUseItem9440(GObject::Player *player, std::vector<std::string>& args);
     void OnAddPetAttr(GObject::Player *player, std::vector<std::string>& args);
+    void OnHandleServerLeft(GObject::Player* player, std::vector<std::string>& args);
+    void OnServerLeftReport(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

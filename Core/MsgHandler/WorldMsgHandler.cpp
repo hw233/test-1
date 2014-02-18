@@ -94,6 +94,12 @@ MSG_REG_2(ServerWarMsgHdr, 0x128, OnServerWarBattlePoint);
 MSG_REG_2(ServerWarMsgHdr, 0x129, OnServerWarLeaderBoard);
 MSG_REG_2(ServerWarMsgHdr, 0x12A, OnServerRechargeRank);
 
+MSG_REG_2(ServerLeftMsgHdr, 0x131, OnServerLeftConnected);
+MSG_REG_2(ServerLeftMsgHdr, 0x132, OnServerLeftPlayerEntered);
+MSG_REG_2(ServerLeftMsgHdr, 0x133, OnServerLeftLineupCommited);
+MSG_REG_2(ServerLeftMsgHdr, 0x136, OnServerLeftBattleReport);
+MSG_REG_2(ServerLeftMsgHdr, 0x137, OnServerLeftRevInfo);
+
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 
