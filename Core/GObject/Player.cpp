@@ -14034,7 +14034,7 @@ namespace GObject
 
         SetVar(VAR_SUMMER_MEET_STRENTH_AWARD, ctslandingAward);
         char str[16] = {0};
-        sprintf(str, "F_130801_%d", 11+val);
+        sprintf(str, "F_130801_%d", 22+val);
         udpLog("shushanqiyu", str, "", "", "", "", "act");
     }
     void Player::getSummerFlow3OnlineAward(UInt8 val)
