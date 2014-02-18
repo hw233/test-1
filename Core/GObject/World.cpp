@@ -1077,11 +1077,11 @@ void SendRechargeRankAward()
             if (pos <= 7)
                 SYSMSG_BROADCASTV(4033, pos, player->getCountry(), player->getPName(), i->total);
 
-            char id[1024] = {0};
+            //char id[1024] = {0};
             char ctx[1024] = {0};
-            snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
-            snprintf(ctx, sizeof(ctx), "%" I64_FMT "u_%s_%u", player->getId(), player->getRealName().c_str(), i->total);
-            World::udpLog("huodong", id, ctx, "", "", "", "act");
+            //snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
+            snprintf(ctx, sizeof(ctx), "%u_%u_%" I64_FMT "u_%s_%u", cfg.serverNum, pos, player->getId(), player->getRealName().c_str(), i->total);
+            World::udpLog("huodong", "F_10000_1213", ctx, "", "", "", "act");
         }
         World::rechargeSort.clear();
     }

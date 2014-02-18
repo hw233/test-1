@@ -4933,7 +4933,7 @@ void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::stri
         break;
     case 7:
         {
-            UInt32 data = 0;
+            UInt32 data = player->GetVar(VAR_SERVERWAR_JIJIANTAI1);
             data = SET_BIT_8(data, 0, 20);
             data = SET_BIT_8(data, 1, 20);
             player->SetVar(VAR_SERVERWAR_JIJIANTAI1, data);
