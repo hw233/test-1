@@ -134,6 +134,8 @@ namespace GObject
 
         GVAR_QISHIBAN_INVITE_ENABLE = 80, // 七石斗法好友赠送开启（用于设置老玩家的MemCached的值）
 
+        GVAR_3366_BUY_BEGIN = 81,
+        GVAR_3366_BUY_END = 82,
         
         GVAR_MAX,
     };
