@@ -1293,6 +1293,9 @@ namespace GObject
         st1 << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
         player->send(st1);
         obj_player->send(st1);
+            
+        GVAR.SetVar(GVAR_CREATMARRY_TIMES,1);
+        
         return 0;
     }
 
@@ -1956,37 +1959,40 @@ namespace GObject
 
     void MarryMgr::RepairBug()
     {
-        if(GVAR.GetVar(GVAR_REPAIRMARRYBUG) == 1)
+        if(0)
+        {    
+            if(GVAR.GetVar(GVAR_REPAIRMARRYBUG) == 1)
+                return;
+            ReserveList::iterator it; 
+            for(it = m_yuyueList.begin();it != m_yuyueList.end(); ++it)
+            {
+                GObject::Player * man_player = GObject::globalPlayers[(it->second).first];
+                GObject::Player * woman_player = GObject::globalPlayers[(it->second).second];
+                if(man_player->GetVar(VAR_MARRY_STATUS) == 4)
+                {
+                    if(it->first == 1) 
+                    {
+                        if(man_player->GetMarriageInfo()->eWedding == WEDDING_NULL)    
+                            doCancelAppointMent(man_player);
+                        else
+                            doCancelAppointMent(woman_player);
+                    }
+                }
+                
+                if(woman_player->GetVar(VAR_MARRY_STATUS) == 4)
+                {
+                    if(it->first == 1) 
+                    {
+                        if(woman_player->GetMarriageInfo()->eWedding == WEDDING_NULL)    
+                            doCancelAppointMent(woman_player);
+                        else
+                            doCancelAppointMent(man_player);
+                    }
+                }
+            }
+            GVAR.SetVar(GVAR_REPAIRMARRYBUG,1);
             return;
-        ReserveList::iterator it; 
-        for(it = m_yuyueList.begin();it != m_yuyueList.end(); ++it)
-        {
-            GObject::Player * man_player = GObject::globalPlayers[(it->second).first];
-            GObject::Player * woman_player = GObject::globalPlayers[(it->second).second];
-            if(man_player->GetVar(VAR_MARRY_STATUS) == 4)
-            {
-                if(it->first == 1) 
-                {
-                    if(man_player->GetMarriageInfo()->eWedding == WEDDING_NULL)    
-                        doCancelAppointMent(man_player);
-                    else
-                        doCancelAppointMent(woman_player);
-                }
-            }
-            
-            if(woman_player->GetVar(VAR_MARRY_STATUS) == 4)
-            {
-                if(it->first == 1) 
-                {
-                    if(woman_player->GetMarriageInfo()->eWedding == WEDDING_NULL)    
-                        doCancelAppointMent(woman_player);
-                    else
-                        doCancelAppointMent(man_player);
-                }
-            }
         }
-        GVAR.SetVar(GVAR_REPAIRMARRYBUG,1);
-        return;
     }
 
 
@@ -2143,7 +2149,7 @@ namespace GObject
             }
         }
         
-        if(!GVAR.GetVar(GVAR_CREATMARRY_TIMES))//是否创建婚礼
+        //if(!GVAR.GetVar(GVAR_CREATMARRY_TIMES))//是否创建婚礼
         {
             if(m_yuyueList.begin() == m_yuyueList.end())
                 return;
@@ -2173,7 +2179,7 @@ namespace GObject
                     }
                 }
                 
-                if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD())
+                if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD()  && !GVAR.GetVar(GVAR_CREATMARRY_TIMES))
                 {
                     it1 = it->second;
                     player = GObject::globalPlayers[it1.first];

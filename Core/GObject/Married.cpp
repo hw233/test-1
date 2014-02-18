@@ -883,6 +883,14 @@ namespace GObject
             st<< static_cast<UInt8>(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT),0)) << Stream::eos;
             man_player->send(st);
             woman_player->send(st);
+            if(static_cast<UInt8>(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT),0)) == 1)
+                man_player->udpLog("fuqijiayuan", "F_140116_11", "", "", "", "", "act");
+            else if(static_cast<UInt8>(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT),0)) == 2)
+                man_player->udpLog("fuqijiayuan", "F_140116_12", "", "", "", "", "act");
+                else if(static_cast<UInt8>(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT),0)) == 3)
+                    man_player->udpLog("fuqijiayuan", "F_140116_13", "", "", "", "", "act");
+                    else if(static_cast<UInt8>(GET_BIT_8(man_player->GetVar(VAR_COUPLE_COPY_DAY_COUNT),0)) >= 4)
+                        man_player->udpLog("fuqijiayuan", "F_140116_14", "", "", "", "", "act");
         }
         else
         {

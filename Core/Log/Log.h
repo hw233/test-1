@@ -302,7 +302,7 @@ enum ItemFrom
     FromBuyFundAward = 67, //购买基金奖励
     FromMicroCloudAward = 68, //微云合作奖励
     FromJiqirenAct = 69, //机器人活动
-    FromMoBao = 69, //墨宝
+    FromMoBao = 70, //墨宝
     //80 ~ 100，繁体占用
 };
 
