@@ -5237,14 +5237,25 @@ void GMHandler::OnServerLeftReport(GObject::Player* player, std::vector<std::str
 }
 void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::string>& args)
 {
+    if(args.size() < 1 )
+        return ;
     UInt32 bpId = atoi(args[0].c_str());
-    UInt64 playerId1 = player->getId();
-    UInt32 leftId = atoi(args[1].c_str());
-    UInt32 clanId = atoi(args[2].c_str());
-	char * endptr;
-	UInt64 pid = strtoull(args[3].c_str(), &endptr, 10);
-    UInt8 pos1 = atoi(args[4].c_str());
-    UInt8 pos2 = atoi(args[5].c_str());
+    UInt64 playerId1 =  player->getId();
+    UInt32 leftId = 0;
+    UInt32 clanId = 0;
+	UInt64 pid = 0;
+    UInt8 pos1 = 0;
+    UInt8 pos2 = 0;
+    if(bpId == 2)
+    {
+        leftId = atoi(args[1].c_str());
+        clanId = atoi(args[2].c_str());
+        char * endptr;
+        pid = strtoull(args[3].c_str(), &endptr, 10);
+        pos1 = atoi(args[4].c_str());
+        pos2 = atoi(args[5].c_str());
+    }
+
     switch(bpId)
     {
         case 1:

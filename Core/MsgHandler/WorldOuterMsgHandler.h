@@ -1277,10 +1277,16 @@ void OnPlayerIdReq( GameMsgHdr& hdr, PlayerIdReq& pir )
 void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
 {
 	MSG_QUERY_PLAYER(player);
+/*    Stream st(SERVERLEFTREQ::BATTLE_REPORT, 0xEE);
+    st << player->getId() << static_cast<UInt32>(brr._reportId); 
+    st << Stream::eos;
+    NETWORK()->SendToServerLeft(st);
+*/
 	std::vector<UInt8> *r = Battle::battleReport[brr._reportId];
 	if(r == NULL)
 		return;
 	player->send(&(*r)[0], r->size());
+
 }
 
 void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq2& brr)
@@ -3812,7 +3818,7 @@ void OnServerLeftRevInfo(ServerLeftMsgHdr& hdr, const void * data)
 	GObject::Player * player = GObject::globalPlayers[playerId];
     if(!player)
         return ;
-    Stream st;
+    Stream st(REQ::CLAN_FAIRYLAND,0x02);
     std::vector<UInt8> buf;
     buf.resize(br.size()-16);
     br >> buf;
