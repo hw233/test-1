@@ -521,7 +521,7 @@ void ServerWarMgr::jiJianTai_operate(Player * player)
     UInt8 pos = GET_BIT_8(value, 0);
     UInt8 flag = GET_BIT_8(value, 1);
     UInt16 itemId = value >> 16;
-    if(GET_BIT_8(data, 0) >= 20 || itemId > 0)     //次数已满,道具未消耗
+    if(GET_BIT_8(data, 0) >= 20 + GET_BIT_8(data, 3)*5 || itemId > 0)     //次数已满,道具未消耗
         return;
     if(!flag && pos <= WAIQUAN_MAX && waiQuan[pos] == 0)
         return;
@@ -586,7 +586,7 @@ void ServerWarMgr::jiJianTai_complete(Player * player, UInt8 type)
     UInt32 itemId = value >> 16;
     UInt8 times = GET_BIT_8(data, 0);
     UInt8 succTimes = GET_BIT_8(data, 1);
-    if(times >= 20 || succTimes > times)
+    if(times >= 20 + GET_BIT_8(data, 3)*5 || succTimes > times)
         return;
     if(!type && !itemId)    //放弃祭剑
         return;
@@ -768,6 +768,32 @@ void ServerWarMgr::jiJianTai_openBox(Player * player, UInt8 idx)
     player->send(st);
 }
 
+void ServerWarMgr::jiJianTai_buyTimes(Player * player)
+{
+    if(!player) return;
+    UInt32 data = player->GetVar(VAR_SERVERWAR_JIJIANTAI1);
+    UInt8 times = GET_BIT_8(data, 3);
+    if(times >= 5)
+        return;
+    UInt32 golds[] = { 5, 15, 30, 50, 80 };
+    if(player->getGold() < golds[times])
+    {
+        player->sendMsgCode(0, 1104);
+        return;
+    }
+    GameMsgHdr hdr(0x385, player->getThreadId(), player, sizeof(golds[times]));
+    GLOBAL().PushMsg(hdr, &golds[times]);
+
+    ++ times;
+    data = SET_BIT_8(data, 3, times);
+    player->SetVar(VAR_SERVERWAR_JIJIANTAI1, data);
+
+    Stream st(REP::SERVERWAR_ARENA_OP);
+    st << static_cast<UInt8>(0x04) << static_cast<UInt8>(7);
+    st << times << Stream::eos;
+    player->send(st);
+}
+
 void ServerWarMgr::sendjiJianTaiInfo(Player * player)
 {
     if(!player) return;
@@ -781,7 +807,7 @@ void ServerWarMgr::sendjiJianTaiInfo(Player * player)
     st << static_cast<UInt8>(GET_BIT_8(value, 0)) << flag;
     st << static_cast<UInt16>(value >> 16) << calculateExp(player, flag);
     st << static_cast<UInt8>(GET_BIT_8(data, 0)) << static_cast<UInt8>(GET_BIT_8(data, 1));
-	st << static_cast<UInt8>(GET_BIT_8(data, 2));
+	st << static_cast<UInt8>(GET_BIT_8(data, 2)) << static_cast<UInt8>(GET_BIT_8(data, 3));
     st << Stream::eos;
 	player->send(st);
 }

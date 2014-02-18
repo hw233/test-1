@@ -1752,6 +1752,9 @@ void OnArenaWarOpReq( GameMsgHdr& hdr, const void * data )
                     GObject::serverWarMgr.jiJianTai_openBox(player, idx);
                 }
                 break;
+            case 0x06:
+                GObject::serverWarMgr.jiJianTai_buyTimes(player);
+                break;
             }
         }
 		break;
