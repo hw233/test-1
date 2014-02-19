@@ -19934,15 +19934,16 @@ void Player::get3366GiftAward(UInt8 type)
     }
     if(type == 1)
     {
-        if (getGold() < 45)
+        if (getGold() < 48)
         {
             sendMsgCode(0, 1104);
             return;
         }
         ConsumeInfo ci(Enum3366Gift,0,0);
-        useGold(45, &ci);
+        useGold(48, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
+        //static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
+        static UInt32 itemId[] = {9600, 2, 9371, 2, 9082, 2, 503, 2, 513, 2, 9443, 5};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -19958,7 +19959,8 @@ void Player::get3366GiftAward(UInt8 type)
         ConsumeInfo ci(Enum3366Gift,0,0);
         useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
+        //static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
+        static UInt32 itemId[] = {9229, 30, 9141, 9338, 9082, 500};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
         {
             GetPackage()->Add(itemId[i], 1, true);
@@ -19975,8 +19977,12 @@ void Player::send3366GiftInfo()
     if(!isBD())
         return;
     */
-    if(!World::get3366GiftAct())
+    /*if(!World::get3366GiftAct())
+        return;*/
+
+    if(!World::get3366BuyTime())
         return;
+
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(6);
     UInt8 opt = GetVar(VAR_3366GIFT);
