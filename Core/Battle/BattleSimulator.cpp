@@ -4123,15 +4123,15 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                         switch(type)
                         {
                             case 0:
-                                bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                bo->setBleedFieldGape(bf->getAttack() * ef->value / 100, ef->last, ef->valueExt1, type);
                                 appendDefStatus(e_bleedFieldGape, 0, bo);
                                 break;
                             case 1:
-                                bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                bo->setBleedFieldGape(bf->getAttack() * ef->value / 100, ef->last, ef->valueExt1, type);
                                 appendDefStatus(e_bleedFieldGape2, 0, bo);
                                 break;
                             case 2:
-                                bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                bo->setBleedFieldGape(bf->getAttack() * ef->value / 100, ef->last, ef->valueExt1, type);
                                 appendDefStatus(e_bleedFieldGape3, 0, bo);
                                 break;
                         }
@@ -4165,15 +4165,15 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                             switch(type)
                             {
                                 case 0:
-                                    bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                    bo->setBleedFieldGape(bf->getAttack() * ef->value / 100, ef->last, ef->valueExt1, type);
                                     appendDefStatus(e_bleedFieldGape, 0, bo);
                                     break;
                                 case 1:
-                                    bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                    bo->setBleedFieldGape(bf->getAttack() * ef->value / 100, ef->last, ef->valueExt1, type);
                                     appendDefStatus(e_bleedFieldGape2, 0, bo);
                                     break;
                                 case 2:
-                                    bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                    bo->setBleedFieldGape(bf->getAttack() * ef->value / 100, ef->last, ef->valueExt1, type);
                                     appendDefStatus(e_bleedFieldGape3, 0, bo);
                                     break;
                             }
@@ -10298,7 +10298,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                 {
                     if(static_cast<float>(uRand(10000) < bf->getBleedFieldGapeStunProb() * 100))
                     {
-                        bf->setStunRound(2);
+                        bf->setStunRound(1);
                         appendDefStatus(e_Stun, 0, bf);
                     }
                 }
