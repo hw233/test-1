@@ -146,6 +146,20 @@ int BattleField::getSpecificTarget(int side, bool(*f)(BattleObject* bo))
 	return -1;
 }
 
+bool BattleField::getSpecificTargets(int side, int pos, int val, std::vector<UInt8>& poslist, bool(*f)(BattleObject* bo, UInt8 targetPos, UInt8 maxLength))
+{
+    bool ret = false;
+    for (UInt8 i = 0; i < 25; ++i)
+    {
+        if (_objs[side][i] && f(_objs[side][i], pos, val))
+        {
+            poslist.push_back(i);
+            ret = true;
+        }
+    }
+    return ret;
+}
+
 int BattleField::getPossibleTarget( int side, int idx )
 {
     //overload in Simulator

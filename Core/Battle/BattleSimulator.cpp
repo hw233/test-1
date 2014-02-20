@@ -4055,21 +4055,6 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             {
                 if (ptarget->getHP() <= 0)  // beat to death!!!
                     bf->setMainTargetDeadFlag(true);
-                else
-                {
-                    /*
-                    if (ss)
-                    {
-                        const GData::SkillStrengthenEffect* ef = NULL;
-                        ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_DEF_CHANGE);
-                        if (ef) // 有防御变化的符文
-                        {
-                            ptarget->setDefendChangeSS(ef->value, ef->last);
-                            ptarget->setMagDefendChangeSS(ef->value, ef->last);
-                        }
-                    }
-                    */
-                }
             }
         }
         // 群体技能
@@ -4117,9 +4102,42 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
             bf->setAttackIndex(1); // 标记是第一个目标，供后面使用，哭泣。。。
 
-            dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, target_pos), skill->factor[0], apcnt, ap, atkAct, canProtect);
+            UInt32 tmpDmg = 0;
+            tmpDmg = attackOnce(bf, first, cs, pr, skill, getObject(target_side, target_pos), skill->factor[0], apcnt, ap, atkAct, canProtect);
+            dmg += tmpDmg;
             canProtect = false;
             doSkillEffectExtraAbsorb(bf, dmg, skill);
+            // 给主目标及相关目标上相关技能符文效果
+            if (ss)
+            {
+                const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_FIELD_GAPE);
+                if (ef)
+                {
+                    BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+                    if (bo->isChar())
+                    {
+                        UInt8 type = bo->getPos();
+                        if (type >= target_pos)
+                            type = (type - target_pos) / 5;
+
+                        switch(type)
+                        {
+                            case 0:
+                                bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                appendDefStatus(e_bleedFieldGape, 0, bo);
+                                break;
+                            case 1:
+                                bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                appendDefStatus(e_bleedFieldGape2, 0, bo);
+                                break;
+                            case 2:
+                                bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                appendDefStatus(e_bleedFieldGape3, 0, bo);
+                                break;
+                        }
+                    }
+                }
+            }
             int nindex = 2;
             for(int i = 0; i < apcnt; ++ i)
             {
@@ -4127,8 +4145,41 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 if(!ptarget || ptarget->getHP() == 0)  // 活人才需要打，死人略过
                     continue;
                 bf->setAttackIndex(nindex++);  // 依次第二、第三记录下来
-                dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, ap[i].pos), ap[i].factor);
+                tmpDmg = attackOnce(bf, first, cs, pr, skill, getObject(target_side, ap[i].pos), ap[i].factor);
+                dmg += tmpDmg;
                 doSkillEffectExtraAbsorb(bf, dmg, skill);
+
+                // 给主目标及相关目标上相关技能符文效果
+                if (ss)
+                {
+                    const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_FIELD_GAPE);
+                    if (ef)
+                    {
+                        BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, ap[i].pos));
+                        if (bo->isChar())
+                        {
+                            UInt8 type = bo->getPos();
+                            if (type >= target_pos)
+                                type = (type - target_pos) / 5;
+
+                            switch(type)
+                            {
+                                case 0:
+                                    bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                    appendDefStatus(e_bleedFieldGape, 0, bo);
+                                    break;
+                                case 1:
+                                    bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                    appendDefStatus(e_bleedFieldGape2, 0, bo);
+                                    break;
+                                case 2:
+                                    bo->setBleedFieldGape(tmpDmg * ef->value / 100, ef->last, ef->valueExt1, type);
+                                    appendDefStatus(e_bleedFieldGape3, 0, bo);
+                                    break;
+                            }
+                        }
+                    }
+                }
             }
             if(ef)
             {
@@ -4334,6 +4385,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     dmg += attackOnce(bf, first, cs, pr, pskill, getObject(target_side, target_pos), factor);
                 }
             }
+
         }
     }
 
@@ -4501,6 +4553,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
         }
     }
+
 
     // 有给自己加的属性驻留在临时变量中，取出来，加上去
     if (bf->getHP() > 0)
@@ -5118,10 +5171,10 @@ bool BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
         }
     }
 
+    // 存在技能符文
     GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
     if(ss)
     {
-        // 存在技能符文
         const GData::SkillStrengthenEffect* ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_ATK_RETURN);
         if(ef)
         {
@@ -10226,6 +10279,64 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
 
     do
     {
+        /////////////////////////////////////////////////////////
+        // 地裂效果造成的流血状态
+        UInt8& lastFieldGape = bf->getBleedFieldGapeLast();
+        if(lastFieldGape != 0)
+        {
+            GData::LBSkillItem* item = bf->getBleedCondItem();
+            float factor = 1 - getItemXin_BleedDec(bf, item);
+            bool bleedout = getItemXin_BleedOut(bf, item);
+            if(bleedout)
+            {
+                bf->setBleedFieldGape(0, 0, 0);
+                appendDefStatus(e_unBleedFieldGape, 0, bf, e_damageTrue);
+            }
+            else
+            {
+                if (!bf->getStunRound())
+                {
+                    if(static_cast<float>(uRand(10000) < bf->getBleedFieldGapeStunProb() * 100))
+                    {
+                        bf->setStunRound(2);
+                        appendDefStatus(e_Stun, 0, bf);
+                    }
+                }
+                UInt32 dmg = static_cast<UInt32>(bf->getBleedFieldGape()) * factor;
+                calcBleedTypeCnt(bf);
+                -- lastFieldGape;
+                switch(bf->getBleedFieldGapeType())
+                {
+                    case 0:
+                        if(lastFieldGape == 0)
+                            makeDamage(bf, dmg, e_unBleedFieldGape, e_damageTrue);
+                        else
+                            makeDamage(bf, dmg, e_bleedFieldGape, e_damageTrue);
+                        break;
+                    case 1:
+                        if(lastFieldGape == 0)
+                            makeDamage(bf, dmg, e_unBleedFieldGape2, e_damageTrue);
+                        else
+                            makeDamage(bf, dmg, e_bleedFieldGape2, e_damageTrue);
+                        break;
+                    case 2:
+                        if(lastFieldGape == 0)
+                            makeDamage(bf, dmg, e_unBleedFieldGape3, e_damageTrue);
+                        else
+                            makeDamage(bf, dmg, e_bleedFieldGape3, e_damageTrue);
+                        break;
+                    default:
+                        break;
+                }
+                if(lastFieldGape == 0)
+                    bf->setBleedFieldGape(0, 0, 0);
+            }
+        }
+        if(bf->getHP() == 0)
+            break;
+        // 地裂效果造成的流血状态
+        /////////////////////////////////////////////////////////
+
         float darkVigor = bf->getDarkVigor();
         if(bf->releaseDarkVigor())
         {
@@ -12868,6 +12979,15 @@ bool BattleSimulator::isPet(BattleObject* bo)
         return bf->isPet();
     }
     return false;
+}
+
+bool BattleSimulator::isBehindPos(BattleObject* bo, UInt8 targetPos, UInt8 maxLength)
+{
+    UInt8 pos = bo->getPos();
+    if ((pos % 5) != (targetPos % 5))
+        return false;
+    if ((targetPos / 5 + maxLength) >= (pos / 5))
+        return true;
 }
 
 int BattleSimulator::getPossibleTarget( int side, int idx , BattleFighter * bf /* = NULL */)
