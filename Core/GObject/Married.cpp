@@ -602,8 +602,11 @@ namespace GObject
             case WINNER_COPY:
                 it->second->levelExp += 5;
                 it->second->friendliness += 5;
-                if(it->second->friendliness >= 1500)
-                    it->second->friendliness = 1500;
+                if(0)//亲密度无上限
+                {
+                    if(it->second->friendliness >= 1500)
+                        it->second->friendliness = 1500;
+                }
 
                 rebuildCouplePet(man_player);
                 gMarryMgr.SetDirty(man_player,woman_player);
@@ -724,9 +727,18 @@ namespace GObject
             if(copy_type != 1)
                 return;
         }
-        
+       
+        if(copy_type == 4)
+        {
+            if(player->getMainFighter()->getLevel() < 75)
+                return;
+            CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+            if(it->second->friendliness < 2000)//亲密度到达2000后，才能打开第四个副本
+                return;
+        }
+
         player->SetVar(VAR_COUPLE_COPY_STATUS,0);//清空状态 
-        if(copy_type != 0 && copy_type != 1 && copy_type != 2 && copy_type != 3)
+        if(copy_type != 0 && copy_type != 1 && copy_type != 2 && copy_type != 3 && copy_type != 4)
             return;
         GObject::Player * man_player = NULL;
         GObject::Player * woman_player = NULL;
@@ -1040,6 +1052,8 @@ namespace GObject
 //        bsim.applyFighterHP(0, pl);
         EnterCoupleCopy(player,0);      
         EnterCoupleCopy(obj_player,0);      
+        ReturnCouplePet(man_player);
+        ReturnCouplePet(woman_player);
         return;
     }
     
@@ -1124,10 +1138,16 @@ namespace GObject
     
     void MarriedMgr::SetCoupleFix(Player* player,UInt8 flag)
     {
-        if(flag != 0 && flag != 1)
+        if(flag != 0 && flag != 1 && flag != 2)
             return;
         if(PreCheckingStatus(player) != 0)
             return ;
+        if(flag == 2)
+        {
+            CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
+            if(it->second->friendliness < 2500)//亲密度到达2000后，才能打开第四个副本
+                return;
+        }
 
         player->SetVar(VAR_COUPLE_NAME,flag);
         
