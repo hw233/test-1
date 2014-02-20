@@ -19934,15 +19934,16 @@ void Player::get3366GiftAward(UInt8 type)
     }
     if(type == 1)
     {
-        if (getGold() < 45)
+        if (getGold() < 48)
         {
             sendMsgCode(0, 1104);
             return;
         }
         ConsumeInfo ci(Enum3366Gift,0,0);
-        useGold(45, &ci);
+        useGold(48, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
+        //static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
+        static UInt32 itemId[] = {9600, 2, 9371, 2, 9082, 2, 503, 2, 513, 2, 9443, 5};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -19958,7 +19959,8 @@ void Player::get3366GiftAward(UInt8 type)
         ConsumeInfo ci(Enum3366Gift,0,0);
         useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
+        //static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
+        static UInt32 itemId[] = {9229, 30, 9141, 9338, 9082, 500};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
         {
             GetPackage()->Add(itemId[i], 1, true);
@@ -19975,8 +19977,12 @@ void Player::send3366GiftInfo()
     if(!isBD())
         return;
     */
-    if(!World::get3366GiftAct())
+    /*if(!World::get3366GiftAct())
+        return;*/
+
+    if(!World::get3366BuyTime())
         return;
+
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(6);
     UInt8 opt = GetVar(VAR_3366GIFT);
@@ -25376,16 +25382,16 @@ void Player::Send11GradeAward(UInt8 type)
     UInt32 gradeAward[]={100,200,400,500,700,900,1200,2300,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
         {{500,1 }, {503,1}},
-        {{500,2},{514,2}},
-        {{503,3},{501,2},{516,1}},
-        {{512,3},{516,2},{514,2}},
+        {{9424,2},{500,2}},
+        {{9418,3},{501,2},{9438,1}},
+        {{9649,3},{516,2},{503,2}},
         {{501,2},{513,2},{517,2}},
-        {{515,1},{551,2},{134,2}},
+        {{9388,1},{551,2},{134,2}},
         {{1325,2},{503,2},{509,2},{547,2},{134,2},{9438,2}},
-        {{1717,1},{8555,4}},
-        {{9438,20},{1126,20}},
-        {{9022,10},{134,20},{9438,20}},
-        {{1727,1},{509,30},{9075,20}},
+        {{1719,1},{8555,4}},
+        {{9604,20},{9418,20}},
+        {{9022,20}},
+        {{1726,1},{515,15},{9075,20}},
     };
     static UInt32 count[] = {2,2,3,3,3,3,6,2,2,3,3};
     SYSMSG(title, 4954);
