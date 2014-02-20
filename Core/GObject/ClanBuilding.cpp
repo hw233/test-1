@@ -302,6 +302,25 @@ namespace GObject
             _buildings[type].getAddVal();
         return 0;
     }
-        
+    void ClanBuildingOwner::AddBattlesInfo(struct ClanBuildBattleInfo cbbi)
+    {
+        battles_vec.push_back(cbbi);
+    } 
+    void ClanBuildingOwner::SendBattlesInfo( Player * player)
+    {
+        UInt32 size  = battles_vec.size(); 
+        Stream st(REP::CLAN_FAIRYLAND,0x03);
+        st << static_cast<UInt32>(size); 
+        for(UInt32 i = 0 ; i < size ; ++i )
+        {
+            ClanBuildBattleInfo cbbi = battles_vec[i]; 
+            st << static_cast<UInt8>(leftId);
+            st << clanNameOther ;
+            st <<static_cast<UInt8>(res);
+            st << static_cast<UInt32>(battleId);
+        }
+        st <<Stream::eos; 
+        player->send(st);
+    }
 }
 

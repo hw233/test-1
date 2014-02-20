@@ -33,6 +33,7 @@
 #include "GObject/ClanRankBattle.h"
 #include "GObject/SingleHeroStage.h"
 #include "GObject/MarryBoard.h"
+#include "GObject/ClanBuilding.h"
 
 #ifdef _ARENA_SERVER
 #include "GObject/GameServer.h"
@@ -3769,11 +3770,30 @@ void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
     brd >> cid >> sid;
 	if(sid != cfg.serverNo || cid != cfg.channelNum)
 		return;
-    GVAR.SetVar(GVAR_SERVERWAR_ISENTER, 1);
+//    GVAR.SetVar(GVAR_SERVERWAR_ISENTER, 1);
 
-    SYSMSGV(title, 825);
-    SYSMSGV(content, 826, GObject::serverWarMgr.getSession());
-    GObject::serverWarMgr.sendTeamMail(title, content);
+    UInt32 clanId = 0;
+    UInt8 type = 0;
+    UInt8 leftId = 0; 
+    std::string clanName ;
+    UInt8 res = 0;
+    UInt32 rpid = 0; 
+    brd >> clanId ;
+    brd >> type ;
+    brd >> leftId;
+    brd >> clanName;
+    brd >> res;
+    brd >> rpid;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    ClanBuildBattleInfo cbbi(leftId , clanName , res , rpid);
+    if(clan->getBuildingOwner() == NULL)
+        return ;
+    clan->getBuildingOwner()->AddBattlesInfo(cbbi);
+   // SYSMSGV(title, 825);
+   // SYSMSGV(content, 826, GObject::serverWarMgr.getSession());
+   // GObject::serverWarMgr.sendTeamMail(title, content);
 }
 
 void OnServerLeftLineupCommited( ServerLeftMsgHdr& hdr, const void * data )

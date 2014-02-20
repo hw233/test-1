@@ -10,7 +10,15 @@ namespace GObject
     class Clan;
     class ClanBuildingOwner;
     class Player;
-
+    struct ClanBuildBattleInfo
+    {
+        UInt8 leftId ; 
+        std::string clanNameOther;
+        UInt8 res ;
+        UInt32 battleId;
+        ClanBuildBattleInfo():leftId(0),clanNameOther(""),res(0),battleId(0){}
+        ClanBuildBattleInfo(UInt8 leftId_ ,std::string  clanNameOther_ , UInt8 res_ , UInt32 battleId_ ):leftId(leftId_),clanNameOther(clanNameOther_),res(res_),battleId(battleId_){}
+    };
     enum ClanBuildingErrCode
     {
         eErrTypeWrong = 4,      // 建筑类型错误 
@@ -38,7 +46,6 @@ namespace GObject
 
             UInt8 getType() const;
             UInt8 getAttrValue() const;
-
             virtual UInt32 getTableLevelExp(UInt16 level) const;
             virtual UInt16 getTableLevel(UInt32 exp) const;
             virtual UInt16 getMaxLevel() const;
@@ -89,10 +96,13 @@ namespace GObject
 
             UInt16 getLevel(UInt8 type) const;
             UInt32 getAddVal(UInt8 type) const;
+            void AddBattlesInfo(struct ClanBuildBattleInfo cbbi);
+            void SendBattlesInfo(Player* player);
         private:
             Clan * _clan;
             std::vector<ClanBuilding> _buildings;
             UInt32  _energy;        // 仙界元气
+            std::vector<struct ClanBuildBattleInfo> battles_vec;
     };
 }
 #endif // #ifndef CLAN_BUILDING_H
