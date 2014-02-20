@@ -587,7 +587,19 @@ public:
             return true;
         else
             return false;
-    } 
+    }
+    
+    inline static bool  get3366BuyTime()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_3366_BUY_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_3366_BUY_END);
+        UInt32 now = TimeUtil::Now() ;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    }
+
     inline static bool  getOldManTime()
     {
         //UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
@@ -603,8 +615,8 @@ public:
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 1, 25);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 1, 30);
+        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 2, 24);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 3, 1);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;

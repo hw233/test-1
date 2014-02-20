@@ -1077,11 +1077,11 @@ void SendRechargeRankAward()
             if (pos <= 7)
                 SYSMSG_BROADCASTV(4033, pos, player->getCountry(), player->getPName(), i->total);
 
-            char id[1024] = {0};
+            //char id[1024] = {0};
             char ctx[1024] = {0};
-            snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
-            snprintf(ctx, sizeof(ctx), "%" I64_FMT "u_%s_%u", player->getId(), player->getRealName().c_str(), i->total);
-            World::udpLog("huodong", id, ctx, "", "", "", "act");
+            //snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
+            snprintf(ctx, sizeof(ctx), "%u_%u_%" I64_FMT "u_%s_%u", cfg.serverNum, pos, player->getId(), player->getRealName().c_str(), i->total);
+            World::udpLog("huodong", "F_10000_1213", ctx, "", "", "", "act");
         }
         World::rechargeSort.clear();
     }
@@ -3536,9 +3536,9 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{509,30},{515,30},{9438,60},{134,30},{9075,50}},
-        {{509,25},{515,25},{9438,50},{134,25},{9075,40}},
-        {{509,20},{515,20},{9438,40},{134,20},{9075,30}},
+        {{9424,50},{515,30},{9438,60},{134,30},{9022,40}},
+        {{9424,40},{515,25},{9438,50},{134,25},{9022,30}},
+        {{9424,30},{515,20},{9438,40},{134,20},{9022,20}},
     };
    // static MailPackage::MailItem card = {9922,1};
     SYSMSG(title, 4950);

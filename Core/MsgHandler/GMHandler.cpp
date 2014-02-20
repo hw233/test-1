@@ -4359,6 +4359,13 @@ inline bool player_enum_1(GObject::Player* p, int)
     return true;
 }
 
+inline bool player_enum_2(GObject::Player* p, int)
+{
+    p->SetVar(GObject::VAR_3366GIFT, 0);
+
+    return true;
+}
+
 void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& args)
 {
     if(sizeof(args)<1)
@@ -4503,7 +4510,7 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             break;
         case 23:
             GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::Now());
-            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::Now() + 86400*15);
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::Now() + 86400*5);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
             break;
@@ -4512,6 +4519,19 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_3366_RECHARGE_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
+        case 25:
+            GVAR.SetVar(GVAR_3366_BUY_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_3366_BUY_END, TimeUtil::Now() + 86400*5);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 26:
+            GVAR.SetVar(GVAR_3366_BUY_BEGIN, 0);
+            GVAR.SetVar(GVAR_3366_BUY_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GObject::globalPlayers.enumerate(player_enum_2, 0);
+            break;
+
     }
 }
 
@@ -4933,7 +4953,7 @@ void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::stri
         break;
     case 7:
         {
-            UInt32 data = 0;
+            UInt32 data = player->GetVar(VAR_SERVERWAR_JIJIANTAI1);
             data = SET_BIT_8(data, 0, 20);
             data = SET_BIT_8(data, 1, 20);
             player->SetVar(VAR_SERVERWAR_JIJIANTAI1, data);
