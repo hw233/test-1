@@ -12988,6 +12988,7 @@ bool BattleSimulator::isBehindPos(BattleObject* bo, UInt8 targetPos, UInt8 maxLe
         return false;
     if ((targetPos / 5 + maxLength) >= (pos / 5))
         return true;
+    return false;
 }
 
 int BattleSimulator::getPossibleTarget( int side, int idx , BattleFighter * bf /* = NULL */)
