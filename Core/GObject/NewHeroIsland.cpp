@@ -636,6 +636,7 @@ void NewHeroIsland::randomEvent()
                 else
                 {
                     pd1->score[_stage-1] += events[idx];
+                    insertNHIPlayerData(pd1);
                     addSpotScore(pd1->spot, pd1->type, events[idx], pd1->player);
                 }
                 if (idx >= 3)
@@ -660,6 +661,7 @@ void NewHeroIsland::randomEvent()
                 else
                 {
                     pd2->score[_stage-1] += events[idx];
+                    insertNHIPlayerData(pd2);
                     addSpotScore(pd2->spot, pd2->type, events[idx], pd2->player);
                 }
                 if (idx >= 3)
@@ -667,6 +669,8 @@ void NewHeroIsland::randomEvent()
             }
         }
     }
+    if(idx < 3)
+        broadcastRank();
 }
 
 void NewHeroIsland::makePairPlayers()
