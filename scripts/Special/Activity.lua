@@ -10171,7 +10171,6 @@ end
 -- ACCRECHARGE
 function onRecharge(player, r)
     if getAccRecharge() then
-    print("ACC")
         local cond = 100
         if player:GetVar(172) >= cond and player:GetVar(173) == 0 then
             player:AddVar(174, 1);
@@ -10213,7 +10212,6 @@ function onRecharge(player, r)
             if n >= s and n < (s + 7*86400) then
                 onAccRecharge_2014_01_25(player)
             end
-            print("~~")
             local t = { ['year'] = 2014, ['month'] = 2, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
             local s = os.time(t)
             local n = os.time() + 11
