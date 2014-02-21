@@ -6827,7 +6827,7 @@ namespace GObject
         }
     }
 
-    inline void Player::checkDungeonTimeout(UInt32 now)
+    void Player::checkDungeonTimeout(UInt32 now)
     {
         if(now >= _playerData.dungeonEnd)
         {
@@ -27493,13 +27493,6 @@ void Player::handleJiqirenAct_shiyamen()
 {
     if(!World::getJiqirenAct())
         return;
-    if (CURRENT_THREAD_ID() != getThreadId())
-    {
-        UInt8 type = 1;
-        GameMsgHdr h(0x23A,  getThreadId(), this, sizeof(type));
-        GLOBAL().PushMsg(h, &type);
-        return;
-    }
     UInt32 info = GetVar(VAR_JIQIREN_SYBS);
     int remain1 = 5 - _playerData.smFinishCount;
     int remain2 = 5 - _playerData.ymFinishCount;
@@ -27514,13 +27507,6 @@ void Player::handleJiqirenAct_clan()
 {
     if(!World::getJiqirenAct())
         return;
-    if (CURRENT_THREAD_ID() != getThreadId())
-    {
-        UInt8 type = 2;
-        GameMsgHdr h(0x23A,  getThreadId(), this, sizeof(type));
-        GLOBAL().PushMsg(h, &type);
-        return;
-    }
     UInt32 info = GetVar(VAR_JIQIREN_SYBS);
     int remain = 5 - _playerData.ctFinishCount;
     if(remain > 0)
@@ -27534,16 +27520,13 @@ void Player::handleJiqirenAct_copy()
 {
     if(!World::getJiqirenAct())
         return;
-    if (CURRENT_THREAD_ID() != getThreadId())
-    {
-        UInt8 type = 3;
-        GameMsgHdr h(0x23A,  getThreadId(), this, sizeof(type));
-        GLOBAL().PushMsg(h, &type);
-        return;
-    }
     int copy = GetVar(VAR_JIQIREN_COPY);
     int goldCnt = PlayerCopy::getGoldCount(getVipLevel()) - PLAYER_DATA(this, copyGoldCnt);
     int freeCnt = PlayerCopy::getFreeCount() - PLAYER_DATA(this, copyFreeCnt);
+    if (World::_wday == 6)
+        freeCnt -= PlayerCopy::FREECNT;
+    else if (World::_wday == 7)
+        freeCnt += PlayerCopy::FREECNT;
     UInt8 fcnt = GET_BIT_8(copy, 0);
     UInt8 gcnt1 = GET_BIT_8(copy, 1);
     UInt8 gcnt2 = GET_BIT_8(copy, 2);
@@ -27576,16 +27559,13 @@ void Player::handleJiqirenAct_frontMap()
 {
     if(!World::getJiqirenAct())
         return;
-    if (CURRENT_THREAD_ID() != getThreadId())
-    {
-        UInt8 type = 4;
-        GameMsgHdr h(0x23A,  getThreadId(), this, sizeof(type));
-        GLOBAL().PushMsg(h, &type);
-        return;
-    }
     int front = GetVar(VAR_JIQIREN_FRONTMAP);
     int goldCnt = FrontMap::getGoldCount(getVipLevel()) - PLAYER_DATA(this, frontGoldCnt);
     int freeCnt = FrontMap::getFreeCount() - PLAYER_DATA(this, frontFreeCnt);
+    if (World::_wday == 7)
+        freeCnt -= FrontMap::FREECNT;
+    else if (World::_wday == 1)
+        freeCnt += FrontMap::FREECNT;
     UInt8 fcnt = GET_BIT_8(front, 0);
     UInt8 gcnt1 = GET_BIT_8(front, 1);
     UInt8 gcnt2 = GET_BIT_8(front, 2);
@@ -27618,13 +27598,6 @@ void Player::handleJiqirenAct_dungeon()
 {
     if(!World::getJiqirenAct())
         return;
-    if (CURRENT_THREAD_ID() != getThreadId())
-    {
-        UInt8 type = 5;
-        GameMsgHdr h(0x23A,  getThreadId(), this, sizeof(type));
-        GLOBAL().PushMsg(h, &type);
-        return;
-    }
     int vipNum = Dungeon::getExtraCount(getVipLevel(), 0);
     int vipNum1 = Dungeon::getExtraCount(getVipLevel(), 1);
     int dungeon = GetVar(VAR_JIQIREN_DUNGEON);
@@ -27746,7 +27719,7 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
         if(curCnt < count || GetLev() < 35)
             return;
 
-        SetVar(VAR_JIQIREN_FRONTMAP, SET_BIT_8(info, type, (curCnt-count)));
+        SetVar(VAR_JIQIREN_FRONTMAP, SET_BIT_8(info, (type%4), (curCnt-count)));
     }
     else if(type >= 8 && type < 12)
     {
@@ -27777,7 +27750,7 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
             return;
         }
 
-        SetVar(VAR_JIQIREN_DUNGEON, SET_BIT_8(info, type, (curCnt-count)));
+        SetVar(VAR_JIQIREN_DUNGEON, SET_BIT_8(info, (type%4), (curCnt-count)));
     }
     else
     {
@@ -27785,8 +27758,7 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
         UInt8 curCnt = GET_BIT_8(info, (type%4));
         if(curCnt < count || (type == 12 && !getClan()))
             return;
-        SetVar(VAR_JIQIREN_SYBS, SET_BIT_8(info, type, (curCnt-count)));
-
+        SetVar(VAR_JIQIREN_SYBS, SET_BIT_8(info, (type%4), (curCnt-count)));
     }
     ConsumeInfo ci(DailyActivity, 0, 0);
     useTael(tael, &ci);
