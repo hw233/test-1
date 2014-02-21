@@ -405,6 +405,7 @@ namespace Script
         Table GetNewHeroIslandBuffs();
         bool onCollectCardAct(Player* player, UInt8 idx);
         UInt16 addClanProfferFromItem(Player* player, UInt16 num, UInt16 unit);
+        UInt32 getMountChipByCangjian(UInt32 itemId, UInt8 floor);
 	    bool TaskFuncExist(UInt32 taskId);
         void getJiqirenAward_Copy(Player* player, UInt8 isFree);
         void getJiqirenAward_FrontMap(Player* player, UInt8 isFree);
