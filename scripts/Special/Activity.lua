@@ -7128,7 +7128,6 @@ function sendRechargeRankAward_2014_02_11(player, pos, total, f7)
         {1126,90,1},
         {1126,90,1},
         {1126,90,1},
-        {1126,0,1},
     }
     sendRCAward(player, pos, total, f7, items[pos])
 end
