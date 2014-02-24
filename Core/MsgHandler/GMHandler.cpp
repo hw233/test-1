@@ -3608,6 +3608,13 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
             }
         }
     }
+    else if(type == 4)
+    {
+        UInt32 petId = atoi(args[1].c_str());
+        FairyPet * pet = player->findFairyPet(petId);
+        if(pet == NULL) return;
+        pet->setDirty();
+    }
 }
 
 void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& args)

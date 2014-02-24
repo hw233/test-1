@@ -2054,7 +2054,6 @@ void Fighter::rebuildEquipAttr()
             GObject::gMarriedMgr.addCouplePetAttr(_owner,_attrExtraEquip);
         }
     }
-	
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 
@@ -2226,7 +2225,7 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
         UInt8 sl = SKILL_LEVEL(skillId);
         UInt8 ssl = 0;
         SStrengthen* ss = SSGetInfo(skillId);
-        if(ss && !isPet())
+        if(ss)
             ssl = ss->lvl;
         return Script::BattleFormula::getCurrent()->calcSkillBattlePoint(sc, sl, type, ssl);
     }
@@ -7227,6 +7226,7 @@ void Fighter::petSSAdd(UInt16 id)
     s.maxLvl = 0;
 
     m_ss[sid] = s;
+    _skillBPDirty = true;
 }
 
 void Fighter::petSSErase(UInt16 sid)
@@ -7235,6 +7235,7 @@ void Fighter::petSSErase(UInt16 sid)
     if (i == m_ss.end())
         return;
     m_ss.erase(sid);
+    _skillBPDirty = true;
 }
 
 /*

@@ -743,9 +743,20 @@ namespace GObject
                 addAttrExtra(_attrExtraEquip, igt->attrExtra);
             }
         }
+        addSHAttr(_attrExtraEquip);
+        //七魄属性
+        _attrExtraEquip.hitrlvl += 4 * _soulLevel[0];
+        _attrExtraEquip.evdlvl += 4 * _soulLevel[1];
+        _attrExtraEquip.crilvl += 4 * _soulLevel[2];
+        _attrExtraEquip.toughlvl += 4 * _soulLevel[3];
+        _attrExtraEquip.defend += 240 * _soulLevel[4];
+        _attrExtraEquip.magdef += 240 * _soulLevel[4];
+        _attrExtraEquip.attack += 60 * _soulLevel[5];
+        _attrExtraEquip.magatk += 60 * _soulLevel[5];
+        _attrExtraEquip.hp += 400 * _soulLevel[6];
+
 	    _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
         
-        addSHAttr(_attrExtraEquip);
     }
 
     void FairyPet::GMSHUpLvl(UInt32 petId, UInt8 sanhunId, UInt8 lvl)
@@ -1108,6 +1119,7 @@ namespace GObject
         {
             _soulLevel[soulIndex - 1] = 1;
             DB4().PushUpdateData("REPLACE INTO `pet_sevensoul` VALUES(%" I64_FMT "u, %u, %u, %u, 0)", _owner->getId(), getId(), soulIndex, _soulLevel[soulIndex - 1]);
+            setDirty();
 
             UInt16 skillId = GData::sevenSoul.getSkillId(_petType, soulIndex, _skillIndex[soulIndex - 1]);
             if(soulIndex > 4)
@@ -1165,6 +1177,7 @@ namespace GObject
             UInt8 oldSSLevel = GData::sevenSoul.getSkillLevel(_soulLevel[sevenSoulIndex]);
             ++_soulLevel[sevenSoulIndex];
             DB4().PushUpdateData("UPDATE `pet_sevensoul` SET `soulLevel` = %u WHERE `playerId` = %" I64_FMT "u AND petId = %u AND soulId = %u", _soulLevel[sevenSoulIndex], _owner->getId(), getId(), sevenSoulIndex + 1);
+            setDirty();
 
             UInt8 newSSLevel = GData::sevenSoul.getSkillLevel(_soulLevel[sevenSoulIndex]);
             if(oldSSLevel != newSSLevel)
@@ -1291,7 +1304,8 @@ namespace GObject
                 break;
             }
         }
-        //if(i < INIT_SKILL_UPMAX)
+        if(i >= INIT_SKILL_UPMAX)
+            return;
         if(update)
         {
             GData::Pet::PinjieData* pjd = GData::pet.getLevTable(_petLev);
@@ -1299,6 +1313,55 @@ namespace GObject
             if(pjd)
                 sLevel = pjd->skillLev[i];
             if(sLevel == 0) 
+                sLevel = 1;
+            std::string oldSkill = Itoa(SKILLANDLEVEL(conflictSkillId, sLevel));
+            delSkills(oldSkill);
+            std::string newSkill = Itoa(SKILLANDLEVEL(skillId, sLevel));
+            setSkills(newSkill, false);
+        }
+        petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
+    }
+
+    void FairyPet::updateSevenSoul(UInt8 soulId)
+    {
+        if(soulId >= 7)
+            return;
+        if(_soulLevel[soulId] == 0 || _soulLevel[soulId] > 25)
+            return;
+        if(_skillIndex[soulId] >= 2)
+            return;
+
+        UInt16 skillId = GData::sevenSoul.getSkillId(_petType, soulId + 1, _skillIndex[soulId]);
+        if (!skillId)
+            return;
+
+        UInt16 ssLevel = GData::sevenSoul.getSkillLevel(_soulLevel[soulId]);
+        if(soulId >= INIT_SKILL_UPMAX)
+            return petSSAdd(SKILLANDLEVEL(skillId, ssLevel));
+
+        UInt16 conflictSkillId = GData::sevenSoul.getAnotherSimilarSkill(skillId);
+        UInt8 i;
+        for(i = 0; i < INIT_SKILL_UPMAX; ++ i)
+        {
+            if (SKILL_ID(_initskl[i]) == conflictSkillId)
+            {
+                _initskl[i] = SKILLANDLEVEL(skillId, 1);
+                break;
+            }
+            else if (SKILL_ID(_initskl[i]) == skillId)
+            {
+                break;
+            }
+        }
+        if(i >= INIT_SKILL_UPMAX)
+            return;
+        if(1)
+        {
+            GData::Pet::PinjieData* pjd = GData::pet.getLevTable(_petLev);
+            UInt8 sLevel = 0;
+            if(pjd)
+                sLevel = pjd->skillLev[i];
+            if(sLevel == 0)
                 sLevel = 1;
             std::string oldSkill = Itoa(SKILLANDLEVEL(conflictSkillId, sLevel));
             delSkills(oldSkill);
@@ -1370,9 +1433,10 @@ namespace GObject
                     setSkills(newSkill, false);
                 }
 
-                loadSkillFromSevenSoul(soulIndex - 1);
+                updateSevenSoul(soulIndex - 1);
             }
         }
+        setDirty();
         updateToDBPetSkill();
     }
 

@@ -8171,6 +8171,16 @@ namespace GObject
 
         sendVipPrivilegeMail(nLev);
         getLevelAwardInfo();
+        if(nLev == 80)
+        {
+            for(std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin(); it != _fairyPets.end(); ++ it)
+            {
+                FairyPet* pet = it->second;
+                if(!pet)
+                    continue;
+                pet->sendSevenSoul();
+            }
+        }
 	}
 
     void Player::sendFormationList()
@@ -21552,6 +21562,12 @@ UInt8 Player::toQQGroup(bool isJoin)
             send(st);
             if(res != 0)
                 delCanHirePet(id);
+            else
+            {
+                FairyPet* pet = findFairyPet(id);
+                if(pet)
+                    pet->sendSevenSoul();
+            }
         }
         return res;
     }

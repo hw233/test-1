@@ -7086,6 +7086,12 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                         st << type << opt;
                         st << res << petId << Stream::eos;
                         player->send(st);
+                        if(res == 0)
+                        {
+                            FairyPet* pet = player->findFairyPet(petId);
+                            if(pet)
+                                pet->sendSevenSoul();
+                        }
                     }
                     break;
                 case 0x04:
