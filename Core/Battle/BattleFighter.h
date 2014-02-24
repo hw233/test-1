@@ -57,6 +57,7 @@ class BattleFighter:
 #define BLEED_TYPE_FLAG_BLIND           0x00000400      // 致盲流血
 #define BLEED_TYPE_FLAG_LINGSHI         0x00000800      // 灵蚀流血
 #define BLEED_TYPE_FLAG_LINGYAN         0x00001000      // 灵焱流血
+#define BLEED_TYPE_FLAG_FIELD_GAPE      0x00002000      // 地裂效果流血
 
 public:
 	BattleFighter(Script::BattleFormula *, GObject::Fighter * = NULL, UInt8 side = 0, UInt8 pos = 0);
@@ -686,6 +687,11 @@ private:
     float _bleedLingYanAuraDec;     // 灵焱特效减少灵气值
     float _bleedLingYanAuraDecProb; // 灵焱特效减少灵气值触发概率
 
+    float _bleedFieldGape;               // 地裂效果每回合持续伤害
+    UInt8 _bleedFieldGapeLast;           // 地裂效果持续时间
+    float _bleedFieldGapeStunProb;       // 地裂效果时触发眩晕的概率
+    UInt8 _bleedFieldGapeType;           // 地裂效果类型 0，1，2 
+
     float _shieldHP;
     UInt8 _shieldHPLast;
 
@@ -1097,6 +1103,24 @@ public:
     }
     inline float getBleedLingYanAuraDescProb() { return _bleedLingYanAuraDecProb; }
     inline float getBleedLingYanAuraDesc() { return _bleedLingYanAuraDec; }
+
+    inline UInt8& getBleedFieldGapeLast() { return _bleedFieldGapeLast; }
+    inline float getBleedFieldGape() { return _bleedFieldGape; }
+    inline float getBleedFieldGapeStunProb() { return _bleedFieldGapeStunProb; }
+    inline UInt8& getBleedFieldGapeType() { return _bleedFieldGapeType;}
+    inline void setBleedFieldGape(float value, UInt8 last, float stunProb, UInt8 type = 0) 
+    { 
+        _bleedFieldGape = value;
+        _bleedFieldGapeLast = last;
+        _bleedFieldGapeStunProb = stunProb;
+        _bleedFieldGapeType = type;
+        if (_bleedFieldGape && _bleedFieldGapeLast)
+            _bleedFlag |= BLEED_TYPE_FLAG_FIELD_GAPE;
+        else
+            _bleedFlag &= ~BLEED_TYPE_FLAG_FIELD_GAPE;
+    }
+
+
 
     void setUnSummonAura(BattleFighter* bf, UInt32 aura) { _summoner = bf, _unSummonAura = aura; }
     bool isSummon() { return _summon; }

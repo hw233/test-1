@@ -1839,7 +1839,11 @@ namespace GObject
                             GObject::Player * woman_player = GObject::globalPlayers[(it->second).second];
                             if(man_player&&woman_player)
                             {
-                                st << it->first << man_player->getName() << man_player->getMainFighter()->getColor() << woman_player->getName() << woman_player->getMainFighter()->getColor() << static_cast<UInt8>(man_player->GetMarriageInfo()->eWedding);
+                                st << it->first << man_player->getName() << man_player->getMainFighter()->getColor() << woman_player->getName() << woman_player->getMainFighter()->getColor(); 
+                                if(static_cast<UInt8>(man_player->GetMarriageInfo()->eWedding) != 0)
+                                    st << static_cast<UInt8>(man_player->GetMarriageInfo()->eWedding);
+                                else
+                                    st << static_cast<UInt8>(woman_player->GetMarriageInfo()->eWedding);
                             }
             
                             ++it;

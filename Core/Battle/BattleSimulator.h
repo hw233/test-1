@@ -342,6 +342,12 @@ private:
         e_unDaoRose = 120,  //解除缘定今生
         e_moKnot = 121,  //琴瑟和鸣
         e_unMoKnot = 122,  //解除琴瑟和鸣
+        e_bleedFieldGape = 123, // 地裂效果1
+        e_unBleedFieldGape = 124, // 解除地裂效果1
+        e_bleedFieldGape2 = 125, // 地裂效果2
+        e_unBleedFieldGape2 = 126, // 解除地裂效果2
+        e_bleedFieldGape3 = 127, // 地裂效果3
+        e_unBleedFieldGape3 = 128, // 解除地裂效果3
 
         e_MAX_STATE,
     };
@@ -747,6 +753,7 @@ private:
 
     static  bool hasPetMarked(BattleObject* bo);
     static  bool isPet(BattleObject* bo);
+    static  bool isBehindPos(BattleObject* bo, UInt8 targetPos, UInt8 maxLength);
     UInt32 upPetObject(UInt8, bool = true);
     UInt32 doSpiritAttack(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first);
 

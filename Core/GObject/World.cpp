@@ -479,6 +479,11 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -508,6 +513,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 8)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
         ))
     {
 #if 0
@@ -1337,6 +1343,12 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -2088,12 +2100,13 @@ bool World::Init()
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
-
+    /*
     if (!GVAR.GetVar(GVAR_QISHIBAN_INVITE_ENABLE))
     {
         globalPlayers.enumerate(enum_qishibaninviteenable, static_cast<void *>(NULL));
         GVAR.SetVar(GVAR_QISHIBAN_INVITE_ENABLE, 1);
     }
+    */
 
     
     if( GObject::MarryBoard::instance().sendAward())
@@ -3535,9 +3548,9 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{509,30},{515,30},{9438,60},{134,30},{9075,50}},
-        {{509,25},{515,25},{9438,50},{134,25},{9075,40}},
-        {{509,20},{515,20},{9438,40},{134,20},{9075,30}},
+        {{9424,50},{515,30},{9438,60},{134,30},{9022,40}},
+        {{9424,40},{515,25},{9438,50},{134,25},{9022,30}},
+        {{9424,30},{515,20},{9438,40},{134,20},{9022,20}},
     };
    // static MailPackage::MailItem card = {9922,1};
     SYSMSG(title, 4950);

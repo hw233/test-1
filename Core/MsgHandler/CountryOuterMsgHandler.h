@@ -2090,7 +2090,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 return;
             UInt8 type;
             br >> type;
-            if(World::get3366GiftAct())
+            //if(World::get3366GiftAct())
+            if(World::get3366BuyTime())
             {
                 player->get3366GiftAward(type);
             }

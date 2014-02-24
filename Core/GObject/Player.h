@@ -272,6 +272,7 @@ namespace GObject
         TIANYOU     = 16,   //天佑术
         FANTIAN     = 17,   //梵天宝卷
         JIUXIAO     = 18,   //九霄唤龙枪
+        TIANGANG    = 19,   //天罡剑诀
 
         DRAGONKING_MAX,
     };

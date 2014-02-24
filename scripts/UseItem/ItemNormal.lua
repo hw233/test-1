@@ -8935,6 +8935,64 @@ function ItemNormal_00010236(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
     return num;
 end
+function ItemNormal_00010237(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (3+(3*num*8)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    player:getCoupon(num*88)
+    package:Add(56, num*8, true, false, 2);
+    package:Add(57, num*8, true, false, 2);
+    package:Add(15, num*8, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+function ItemNormal_00010238(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (2+(2*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    player:getCoupon(num*20)
+    package:Add(51, num*1, true, false, 2);
+    package:Add(48, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+function ItemNormal_00010239(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (6+(6*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    local count1 = 1
+    local count2 = 2
+    if 10240 == iid then
+        count1 = 3
+        count2 = 6
+    elseif 10241 == iid then
+        count1 = 6
+        count2 = 12
+    end
+    package:Add(51, num*count1, true, false, 2);
+    package:Add(48, num*count1, true, false, 2);
+    package:Add(49, num*count1, true, false, 2);
+    package:Add(50, num*count1, true, false, 2);
+    package:Add(440, num*count2, true, false, 2);
+    package:Add(9123, num*count2, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
 
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
@@ -12527,6 +12585,11 @@ local ItemNormal_Table = {
     [10234] = ItemNormal_00010232,
     [10235] = ItemNormal_00010235,
     [10236] = ItemNormal_00010236,
+    [10237] = ItemNormal_00010237,
+    [10238] = ItemNormal_00010238,
+    [10239] = ItemNormal_00010239,
+    [10240] = ItemNormal_00010239,
+    [10241] = ItemNormal_00010239,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)
