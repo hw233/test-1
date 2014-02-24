@@ -592,6 +592,7 @@ public:
     inline bool isMainFighter() { return isMainFighter(_id); }
 
     void getAllSSAndLevel(Stream& st);
+    void getAllSSAndLevelOfPet(Stream& st);
 
 
 public:
