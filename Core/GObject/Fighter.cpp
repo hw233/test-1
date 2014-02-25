@@ -2054,7 +2054,6 @@ void Fighter::rebuildEquipAttr()
             GObject::gMarriedMgr.addCouplePetAttr(_owner,_attrExtraEquip);
         }
     }
-	
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 
@@ -2226,7 +2225,7 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
         UInt8 sl = SKILL_LEVEL(skillId);
         UInt8 ssl = 0;
         SStrengthen* ss = SSGetInfo(skillId);
-        if(ss && !isPet())
+        if(ss)
             ssl = ss->lvl;
         return Script::BattleFormula::getCurrent()->calcSkillBattlePoint(sc, sl, type, ssl);
     }
@@ -5698,6 +5697,9 @@ void Fighter::makeFighterSSInfoWithNoSkill(Stream& st)
 
 void Fighter::getAllSSAndLevel(Stream& st)
 {
+    if(isPet())
+        return getAllSSAndLevelOfPet(st);
+
     size_t offset = st.size();
     st << static_cast<UInt8>(0);
     UInt8 c = 0;
@@ -5722,6 +5724,53 @@ void Fighter::getAllSSAndLevel(Stream& st)
             ++c;
             UInt16 skill_id = SKILL_ID(peerless);
             st << static_cast<UInt16>(SKILLANDLEVEL(skill_id, ss->lvl));
+        }
+    }
+    st.data<UInt8>(offset) = c;
+}
+
+void Fighter::getAllSSAndLevelOfPet(Stream& st)
+{
+    size_t offset = st.size();
+    st << static_cast<UInt8>(0);
+
+    if(!isPet())
+        return;
+
+    UInt8 c = 0;
+    std::vector<UInt16> petSkills;
+    //主动
+    for(UInt32 i = 0; i < _skills.size(); i++)
+        petSkills.push_back(_skills[i]);
+    //无双
+    for(UInt32 i = 0; i < _peerless.size(); i++)
+        petSkills.push_back(_peerless[i]);
+
+    UInt32 count = GData::SKILL_PASSIVES - GData::SKILL_PASSSTART;
+    //100%触发技能
+    for(UInt32 i = 0; i < count; i++)
+    {
+        for(UInt32 j = 0; j < _passkl[i].size(); j++)
+            petSkills.push_back(_passkl[i][j]);
+    }
+    //概率触发
+    for(UInt32 i = 0; i < count; i++)
+    {
+        for(UInt32 j = 0; j < _rpasskl[i].size(); j++)
+            petSkills.push_back(_rpasskl[i][j]);
+    }
+
+    for(UInt32 i = 0; i < petSkills.size(); i++)
+    {
+        if(petSkills[i])
+        {
+            SStrengthen* ss = SSGetInfo(petSkills[i]);
+            if(ss)
+            {
+                ++c;
+                UInt16 skill_id = SKILL_ID(petSkills[i]);
+                st << static_cast<UInt16>(SKILLANDLEVEL(skill_id, ss->lvl));
+            }
         }
     }
     st.data<UInt8>(offset) = c;
@@ -7227,6 +7276,7 @@ void Fighter::petSSAdd(UInt16 id)
     s.maxLvl = 0;
 
     m_ss[sid] = s;
+    _skillBPDirty = true;
 }
 
 void Fighter::petSSErase(UInt16 sid)
@@ -7235,6 +7285,7 @@ void Fighter::petSSErase(UInt16 sid)
     if (i == m_ss.end())
         return;
     m_ss.erase(sid);
+    _skillBPDirty = true;
 }
 
 /*

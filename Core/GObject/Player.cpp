@@ -8178,6 +8178,16 @@ namespace GObject
 
         sendVipPrivilegeMail(nLev);
         getLevelAwardInfo();
+        if(oLev < 80 && nLev >= 80)
+        {
+            for(std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin(); it != _fairyPets.end(); ++ it)
+            {
+                FairyPet* pet = it->second;
+                if(!pet)
+                    continue;
+                pet->sendSevenSoul();
+            }
+        }
 	}
 
     void Player::sendFormationList()
@@ -21535,6 +21545,9 @@ UInt8 Player::toQQGroup(bool isJoin)
             if(res)
                 delCanHirePet(petId[idx]);
             SetVar(VAR_FAIRYPET_ISGET_PET, isGet | (1 << 0));
+            FairyPet* pet = findFairyPet(petId[idx]);
+            if(pet)
+                pet->sendSevenSoul();
         }
         else
         {
@@ -21565,6 +21578,12 @@ UInt8 Player::toQQGroup(bool isJoin)
             send(st);
             if(res != 0)
                 delCanHirePet(id);
+            else
+            {
+                FairyPet* pet = findFairyPet(id);
+                if(pet)
+                    pet->sendSevenSoul();
+            }
         }
         return res;
     }
@@ -28514,6 +28533,19 @@ void Player::sendSummerMeetScoreInfo()
     st << Stream::eos;
     send(st);
 }
+
+void Player::sevensoul_fixed()
+{
+    for(std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin(); it != _fairyPets.end(); ++ it)
+    {
+        FairyPet* pet = it->second;
+        if(!pet)
+            continue;
+        if(pet->getSevenSoulSoulLevel(0) > 0)
+            pet->updateToDBPetSkill();
+    }
+}
+
 } // namespace GObject
 
 
