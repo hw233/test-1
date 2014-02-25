@@ -1141,7 +1141,8 @@ namespace GObject
         if(!_owner)
             return;
 
-        checkSevenSoulLevel(1);
+        if(_owner->GetLev() >= 80)
+            checkSevenSoulLevel(1);
 
         const UInt8 type = 0;
         const UInt8 count = 7;
@@ -1300,7 +1301,8 @@ namespace GObject
             }
             else if (SKILL_ID(_initskl[i]) == skillId)
             {
-                update = false;
+                if(GVAR.GetVar(GVAR_SEVENSOUL_FIX) > 0)
+                    update = false;
                 break;
             }
         }

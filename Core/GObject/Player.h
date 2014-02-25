@@ -2978,6 +2978,7 @@ namespace GObject
         void handleJiqirenAct_dungeon();
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
+        void sevensoul_fixed();
 	};
 
 
