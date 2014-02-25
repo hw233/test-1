@@ -26397,7 +26397,7 @@ void Player::RunFriendlyCompass(UInt8 type)
 void Player::getGGTaskAward()
 {
     UInt8 plvl = GetLev();
-    UInt8 pos = getGuangGunPos();
+    //UInt8 pos = getGuangGunPos();
     UInt32 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
     UInt32 exp_ = static_cast<float>(exp)*30;
     UInt32 pexp = 5000;

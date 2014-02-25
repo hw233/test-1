@@ -1924,6 +1924,28 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             _maxSkillDmg[s] = std::max(_maxSkillDmg[s], d);
         }
     }
+    const GData::SkillBase* violentSKill = bf->getViolentSkill();
+    if(violentSKill != NULL && bf->getActCnt() >= 15)
+    {
+        UInt16 useCnt = bf->getUsedCnt();
+        if(useCnt == 0)
+        {
+            Int32 value = 30000;
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stAtk, value, violentSKill->last, bf->getSide() != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stMagAtk, value, violentSKill->last, bf->getSide() != 0);
+            bf->setImmune3(GData::e_state_c_s_f);
+            UInt32 hpr = bf->regenHP(30000);
+            appendDefStatus(e_damHpAdd, hpr, bf);
+        }
+        else if(useCnt == 40)
+        {
+            Int32 value = 0;
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stAtk, value, violentSKill->last, bf->getSide() != 0);
+            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stMagAtk, value, violentSKill->last, bf->getSide() != 0);
+            bf->setImmune3(0);
+        }
+        bf->addUsedCnt(1);
+    }
     return dmg + magdmg;
 }
 
@@ -2102,7 +2124,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             }
 
             UInt16 immune = bo->getImmune();
-            if((effect_state & immune) && SKILL_LEVEL(boSkill->getId()) <= bo->getImmuneLevel(effect_state))
+            if(((effect_state & immune) && SKILL_LEVEL(boSkill->getId()) <= bo->getImmuneLevel(effect_state)) || (effect_state & bo->getImmune3()))
             {
                 appendDefStatus(e_Immune, 0, bo);
                 continue;
@@ -2613,6 +2635,7 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
 
     if(SKILL_LEVEL(skill->getId()) <= target_bo->getImmuneLevel(effect_state))
         effect_state = effect_state & (0xFFFF ^ immune);
+    effect_state = effect_state & (0xFFFF ^ target_bo->getImmune3());
     if(effect_state == 0)
     {
         appendDefStatus(e_Immune, 0, target_bo);
@@ -5366,6 +5389,7 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
     size_t cnt = cur_fgtlist.size();
     for(size_t idx = 0; idx < cnt; idx++)
     {
+        UInt16 startCnt = rcnt;
         BattleFighter* bf = cur_fgtlist[idx];
         if((prevWin-1) != bf->getSide())
         {
@@ -5407,6 +5431,7 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
                     doSkillEffectExtra_HpShield(bf, bf->getSide(), bf->getPos(), skill, i);
             }
         }
+        bf->addActCnt(rcnt - startCnt);
     }
 
     //if(rcnt != 0)
@@ -6603,6 +6628,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
     }
 
+    bf->addActCnt(rcnt);
     return rcnt;
 }
 
@@ -9955,7 +9981,7 @@ bool BattleSimulator::AddSkillStrengthenState(BattleFighter* pFighter, BattleFig
         appendDefStatus(e_unImmune2, 0, pTarget);  // 技能符文里面的那个免疫起效了
         return true;
     }
-    if((arrayState[nIndex] & nImmu) && SKILL_LEVEL(nSkillId) <= pTarget->getImmuneLevel(arrayState[nIndex]))
+    if(((arrayState[nIndex] & nImmu) && SKILL_LEVEL(nSkillId) <= pTarget->getImmuneLevel(arrayState[nIndex])) || ((arrayState[nIndex] & pTarget->getImmune3())))
     {
         appendDefStatus(e_Immune, 0, pTarget);
         return true;
@@ -12731,6 +12757,7 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
         ++ rcnt;
     }
     _activeFgt = NULL;
+    bf->addActCnt(rcnt);
     return rcnt;
 }
 

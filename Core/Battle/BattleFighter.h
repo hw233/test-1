@@ -380,6 +380,7 @@ public:
     void updateSoulSkillProtect(UInt16 skillId);
     void updatePassiveSkillPrvAtk100Status();
     void updatePassiveSkillBLTY100Status();
+    void updatePassiveSkillViolent();
 
     const GData::SkillBase* getPassiveSkillOnTherapy();
     const GData::SkillBase* getPassiveSkillOnSkillDmg();
@@ -1449,6 +1450,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;
     std::vector<GData::SkillItem> _passiveSkillXMCZ100;
     std::vector<GData::SkillItem> _passiveSkillBLTY100;
+    std::vector<GData::SkillItem> _passiveSkillViolent;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1457,6 +1459,7 @@ private:
     const GData::SkillBase* getPassiveSkillBleedTypeDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillXMCZ100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget = false);
 
 
 private:
@@ -1513,6 +1516,19 @@ private:
     UInt8 _moKnotLast;
     void setMoKnot(UInt8 last) { _moKnotLast = last; }
     UInt8 getMoKnot() { return _moKnotLast; }
+
+    UInt16 _bActCnt;
+    bool getActCnt() { return _bActCnt; }
+    void addActCnt(UInt16 count) { _bActCnt += count; }
+    const GData::SkillBase* _ViolentSkill;
+    void setViolentSkill(const GData::SkillBase* skill) { _ViolentSkill = skill; }
+    const GData::SkillBase* getViolentSkill() { return _ViolentSkill; }
+    UInt16 _bUsedCnt;
+    bool getUsedCnt() { return _bUsedCnt; }
+    void addUsedCnt(UInt16 count) { _bUsedCnt += count; }
+    UInt16 _immune3;
+    void setImmune3(UInt16 v) { _immune3 = v; }
+    UInt16 getImmune3() { return _immune3; }
 
 public:
 	enum StatusFlag

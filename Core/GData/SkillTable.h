@@ -53,6 +53,7 @@ enum    // 技能触发方式
     /*27*/ SKILL_AFTACTION,      // 行动后触发（包括被眩晕）
     /*28*/ SKILL_ONHPCHANGE,       // HP改变时触发
     /*29*/ SKILL_ONWITHSTAND,    // 招架（可以反击状态下触发）
+    /*30*/ SKILL_VIOLENT,    // 狂暴(怪物技能)
     SKILL_PASSIVES
 };
 
@@ -130,6 +131,7 @@ enum
     e_eft_shi_flower = 50,    // 释：鲜花
     e_eft_dao_rose = 51,    // 道：玫瑰
     e_eft_mo_knot = 52,    // 墨：同心结
+    e_eft_violent = 53,    // 狂暴
 
     e_eft_max
 };
@@ -146,6 +148,7 @@ enum
     e_state_mark_mo = 0x80, // 墨印
     e_state_blind = 0x100, // 至盲
 
+    e_state_c_s_f = 0x0E, //混乱、晕眩、沉默
     e_state_c_s_f_w = 0x2e, // 混乱，晕眩，封印，虚弱
     e_state_c_s_f_m_b = 0x18e, // 混乱，晕眩，封印，墨印，至盲
     e_state_c_s_f_b = 0x10e, // 混乱，晕眩，封印，至盲
