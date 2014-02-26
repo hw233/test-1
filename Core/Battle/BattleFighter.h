@@ -396,7 +396,6 @@ public:
     void updateSoulSkillProtect(UInt16 skillId);
     void updatePassiveSkillPrvAtk100Status();
     void updatePassiveSkillBLTY100Status();
-    void updatePassiveSkillSilkworm100();
 
     const GData::SkillBase* getPassiveSkillOnTherapy();
     const GData::SkillBase* getPassiveSkillOnSkillDmg();
@@ -1553,9 +1552,6 @@ private:
     void setHitrateMinus(UInt32 value) { _HitrateMinus = value; }
     float getHitrateMinus() { return _HitrateMinus;}
 
-    const GData::SkillBase* _silkwormSkill;
-    void setSilkwormSkill(const GData::SkillBase* skill) { _silkwormSkill = skill; }
-    const GData::SkillBase* getSilkwormSkill() { return _silkwormSkill; }
     UInt16 _silkwormCnt;
     void setSilkwormCnt(UInt16 count) { _silkwormCnt = count; }
     UInt16 getSilkwormCnt() { return _silkwormCnt;}

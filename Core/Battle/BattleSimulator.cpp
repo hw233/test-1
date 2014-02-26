@@ -4098,7 +4098,11 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 int idx = std::min(abs(fsize-1), i);
                 if(fsize > 0)
                     factor = skill->factor[idx];
-                if(bf->getSilkwormSkill() == skill)
+                size_t skillIdx = 0;
+                const GData::SkillBase* silkwormSkill;
+                while(NULL != (silkwormSkill = bf->getPassiveSkillPrudent100(skillIdx)))
+                    break;
+                if(skill == silkwormSkill)
                 {
                     bf->setSilkwormCnt(0);
                     doAbnormalStatusClear(getObject(target_side, pos));
@@ -10367,7 +10371,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         {
             bf->addActCnt(1);
             UInt16 actCnt = bf->getActCnt();
-            if(actCnt <= 15 && actCnt <= 55)
+            if(actCnt <= 15 && actCnt < 55)
             {
                 UInt32 hpValue = 30000;
                 UInt32 hpr = bf->regenHP(hpValue);
