@@ -5660,12 +5660,14 @@ UInt32 BattleSimulator::doAttack( int pos )
     BattleFighter* mainTarget = NULL;
     rcnt += doDeBufAttack(bf);
     UInt8 attackCnt = 1;
-    const GData::SkillBase* prudentSkill = bf->getPrudentSkill();
-    if(prudentSkill != NULL)
+    size_t skillIdx = 0;
+    const GData::SkillBase* prudentSkill;
+    while(NULL != (prudentSkill = bf->getPassiveSkillPrudent100(skillIdx)))
     {
         attackCnt = 3;
         if(prudentSkill->effect)
             bf->setHitrateMinus(prudentSkill->effect->efv[0]);
+        break;
     }
     for(UInt8 cntIndex = 0; cntIndex < attackCnt; cntIndex++)
     {

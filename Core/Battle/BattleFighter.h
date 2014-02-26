@@ -396,7 +396,6 @@ public:
     void updateSoulSkillProtect(UInt16 skillId);
     void updatePassiveSkillPrvAtk100Status();
     void updatePassiveSkillBLTY100Status();
-    void updatePassiveSkillPrudent100();
     void updatePassiveSkillSilkworm100();
 
     const GData::SkillBase* getPassiveSkillOnTherapy();
@@ -1550,9 +1549,6 @@ private:
     void setRevivalCnt(UInt16 count) { _revivalCnt = count; }
     UInt16 getRevivalCnt() { return _revivalCnt;}
 
-    const GData::SkillBase* _prudentSkill;
-    void setPrudentSkill(const GData::SkillBase* skill) { _prudentSkill = skill; }
-    const GData::SkillBase* getPrudentSkill() { return _prudentSkill; }
     float _HitrateMinus;
     void setHitrateMinus(UInt32 value) { _HitrateMinus = value; }
     float getHitrateMinus() { return _HitrateMinus;}
