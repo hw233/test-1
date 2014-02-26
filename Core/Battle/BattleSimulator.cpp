@@ -5662,6 +5662,16 @@ UInt32 BattleSimulator::doAttack( int pos )
 
     BattleFighter* mainTarget = NULL;
     rcnt += doDeBufAttack(bf);
+    UInt8 attackCnt = 1;
+    const GData::SkillBase* prudentSkill = bf->getPrudentSkill();
+    if(prudentSkill != NULL)
+    {
+        attackCnt = 3;
+        if(prudentSkill->effect)
+            bf->setHitrateMinus(prudentSkill->effect->efv[0]);
+    }
+    for(UInt8 cntIndex = 0; cntIndex < attackCnt; cntIndex++)
+    {
     if(bf->getHP() && !_winner && bf->getId() != 5679) // 行动者存活 && 战斗胜负未分 && 行动者不是雪人
     {
 
@@ -6485,6 +6495,9 @@ UInt32 BattleSimulator::doAttack( int pos )
                 */
             }
         }
+    }
+    if(bf->getHitrateMinus() > 0)
+        bf->setHitrateMinus(0);
     }
 
     rcnt += releaseCD(bf);

@@ -398,6 +398,7 @@ public:
     void updatePassiveSkillBLTY100Status();
     void updatePassiveSkillViolent100();
     void updatePassiveSkillRevival100();
+    void updatePassiveSkillPrudent100();
 
     const GData::SkillBase* getPassiveSkillOnTherapy();
     const GData::SkillBase* getPassiveSkillOnSkillDmg();
@@ -1469,6 +1470,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillBLTY100;
     std::vector<GData::SkillItem> _passiveSkillViolent100;
     std::vector<GData::SkillItem> _passiveSkillRevival100;
+    std::vector<GData::SkillItem> _passiveSkillPrudent100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1479,6 +1481,7 @@ private:
     const GData::SkillBase* getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillPrudent100(size_t& idx, bool noPossibleTarget = false);
 
 private:
     float _2ndRateCoAtk;
@@ -1557,6 +1560,13 @@ private:
     UInt16 _revivalCntMax;
     void setRevivalCntMax(UInt16 count) { _revivalCntMax = count; }
     UInt16 getRevivalCntMax() { return _revivalCntMax;}
+
+    const GData::SkillBase* _prudentSkill;
+    void setPrudentSkill(const GData::SkillBase* skill) { _prudentSkill = skill; }
+    const GData::SkillBase* getPrudentSkill() { return _prudentSkill; }
+    float _HitrateMinus;
+    void setHitrateMinus(UInt32 value) { _HitrateMinus = value; }
+    float getHitrateMinus() { return _HitrateMinus;}
 
 public:
 	enum StatusFlag
