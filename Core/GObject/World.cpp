@@ -1261,8 +1261,8 @@ inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
 {
     UInt32 val = pl->GetVar(VAR_LEFTADDR_POWER) ;
     val += 3 ;
-    if(val > 10 )
-        val = 10;
+    if(val > 20 )
+        val = 20;
     pl->SetVar(VAR_LEFTADDR_POWER,val);
     return true;
 }

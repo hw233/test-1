@@ -29444,35 +29444,69 @@ void Player::do_fighter_xinmo(Fighter* fgt, UInt32 oldId)
 {
     DB1().PushUpdateData("UPDATE `fighter_xinmo` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
 }
+void Player::BuyLeftPower()
+{
+    UInt32 buyCount = GetVar(VAR_LEFTADDR_POWER_ADD);
+    if(buyCount >=2 )
+        return ;
+    UInt32 power = GetVar(VAR_LEFTADDR_POWER);
+    if(buyCount == 0 )
+    {
+        if (getTael() < 1000)
+        {
+            sendMsgCode(0, 1100);
+            return ;
+        }
+        ConsumeInfo ci(TianjieTask, 0, 0);
+        useTael(1000, &ci);
+    }
+    if(buyCount == 1)
+    {
+        if (getGold() < 5)
+        {
+            sendMsgCode(0, 1104);
+            return ;
+        }
+        ConsumeInfo ci(TianjieTask, 0, 0);
+        useGold(5, &ci);
+    }
+    SetVar(VAR_LEFTADDR_POWER_ADD , buyCount + 1 );
+    if( ( power + 3 ) > 20)
+        SetVar(VAR_LEFTADDR_POWER,20);
+    else
+        SetVar(VAR_LEFTADDR_POWER,power + 3);
+    GameMsgHdr hdr1(0x142, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr1, NULL);
+}
 
 /*
 //增加和某好友的友好度
 void Player::CompleteFriendlyTask(Player * friender , UInt8 taskNum)
 {
-    return ;
-    if(friender == NULL)
-        return ;
-    if(!_hasFriend(friender))
-        return ;
+return ;
+if(friender == NULL)
+return ;
+if(!_hasFriend(friender))
+return ;
 
-    static UInt8 task_num_val_max[][4] = {
-     {1,1,1,3},
-     {1,1,1,3},
-     {1,1,1,1},
-     {1,10,1,10},
-     {1,4,1,4},
-     {1,20,1,20},
-    };
+static UInt8 task_num_val_max[][4] = {
+{1,1,1,3},
+{1,1,1,3},
+{1,1,1,1},
+{1,10,1,10},
+{1,4,1,4},
+{1,20,1,20},
+};
 
-    UInt32 count_var =GetVar(VAR_FRIEND_TASK1 + taskNum/3);  
-    UInt8 count = GET_BIT_8(count_var , taskNum%3);
-    if(count < task_num_val_max[taskNum][2])
-    {
-        AddFriendlyCount( friender , task_num_val_max[taskNum][1])          ;
-    }
-    if(count < task_num_val_max[taskNum][4])
-    {
-       AddVar(VAR_FRIEND_VALUE , task_num_val_max[taskNum][3]);
+UInt32 count_var =GetVar(VAR_FRIEND_TASK1 + taskNum/3);  
+UInt8 count = GET_BIT_8(count_var , taskNum%3);
+if(count < task_num_val_max[taskNum][2])
+{
+AddFriendlyCount( friender , task_num_val_max[taskNum][1])          ;
+}
+if(count < task_num_val_max[taskNum][4])
+{
+AddVar(VAR_FRIEND_VALUE , task_num_val_max[taskNum][3]);
     }
     SET_BIT_8(count_var , taskNum %3 , (count +1) );
     SetVar(VAR_FRIEND_TASK1+taskNum/3 , count_var);

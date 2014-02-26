@@ -108,6 +108,7 @@ MSG_REG_2(ServerLeftMsgHdr, 0x138, OnServerLeftErrInfo);   //接受错误信息
 MSG_REG_2(ServerLeftMsgHdr, 0x139, OnServerLeftMemberLeave);   //帮派成员改变
 MSG_REG_2(ServerLeftMsgHdr, 0x140, OnServerLeftMemberGet);   //帮派成员获得
 MSG_REG_2(ServerLeftMsgHdr, 0x141, OnServerLeftNotice);   //帮派成员获得
+MSG_REG_2(GameMsgHdr, 0x142, OnServerLeftAttackInfo);   //进攻小队信息
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);

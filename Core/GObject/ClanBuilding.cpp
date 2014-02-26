@@ -332,7 +332,7 @@ namespace GObject
                         }
                         if(pos1 ==0 && pos2 == 0)
                         {
-                               //player->setLeftAddrEnter(false);
+                               player->setLeftAddrEnter(false);
                                TRACE_LOG("leftaddr(leaveleft) 0 (pid: %" I64_FMT "u)", player->getId());
                         }
                         struct TeamChange
@@ -365,6 +365,11 @@ namespace GObject
                     if(!player->inLeftAddrCommitCD())
                         LineUp(player);
                     break;
+                case 0x0C:
+                    {
+                        GameMsgHdr hdr(0x397, player->getThreadId(), player, 0 );
+                        GLOBAL().PushMsg(hdr, NULL);
+                    }
             }
             if(type < 9)
                 sendAttackTeamInfo(player); 
@@ -807,6 +812,7 @@ namespace GObject
             return ;
         st <<static_cast<UInt8>(9);
         st <<static_cast<UInt8>(player->GetVar(VAR_LEFTADDR_POWER));
+        st <<static_cast<UInt8>(player->GetVar(VAR_LEFTADDR_POWER_ADD));
         st <<static_cast<UInt8>( leftAttackTeams.size() ); 
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
