@@ -1547,9 +1547,6 @@ private:
     const GData::SkillBase* _ViolentSkill;
     void setViolentSkill(const GData::SkillBase* skill) { _ViolentSkill = skill; }
     const GData::SkillBase* getViolentSkill() { return _ViolentSkill; }
-    UInt16 _bUsedCnt;
-    bool getUsedCnt() { return _bUsedCnt; }
-    void addUsedCnt(UInt16 count) { _bUsedCnt += count; }
     UInt16 _immune3;
     void setImmune3(UInt16 v) { _immune3 = v; }
     UInt16 getImmune3() { return _immune3; }

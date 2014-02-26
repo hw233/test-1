@@ -80,7 +80,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _selfSummon(NULL), _dec_wave_dmg(0), _lingqu_last(0), _lingqu_times(0), _lingqu(false), _soulout_last(0), _soulout(false),  _lingshi_bleed(0), _lingshi_bleed_last(0),
     _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0), _abnormalTypeCnt(0), _bleedTypeCnt(0),_evadeCnt(0), _peerlessDisableLast(0), _soulProtectLast(0), _soulProtectCount(0), _2ndRateCoAtk(0), _2ndCoAtkSkill(NULL), _2ndRateProtect(0), _2ndProtectSkill(NULL), _dmg_deep(0), _dmg_deep_last(0), _dmg_ningshi(0), _dmg_ningshi_last(0), _ningshizhe(NULL)
    ,_ruRedCarpetLast(0), _shiFlowerLast(0), _shiFlowerAura(0), _daoRoseLast(0), _moKnotLast(0)
-   ,_bActCnt(0), _ViolentSkill(NULL), _bUsedCnt(0), _immune3(0), _revivalCntSkill(NULL), _revivalCnt(0), _revivalCntMax(0), _prudentSkill(NULL), _HitrateMinus(0), _silkwormSkill(NULL), _silkwormCnt(0)
+   ,_bActCnt(0), _ViolentSkill(NULL), _immune3(0), _revivalCntSkill(NULL), _revivalCnt(0), _revivalCntMax(0), _prudentSkill(NULL), _HitrateMinus(0), _silkwormSkill(NULL), _silkwormCnt(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));

@@ -1924,28 +1924,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             _maxSkillDmg[s] = std::max(_maxSkillDmg[s], d);
         }
     }
-    const GData::SkillBase* violentSKill = bf->getViolentSkill();
-    if(violentSKill != NULL && bf->getActCnt() >= 15)
-    {
-        UInt16 useCnt = bf->getUsedCnt();
-        if(useCnt == 0)
-        {
-            Int32 value = 30000;
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stAtk, value, violentSKill->last, bf->getSide() != 0);
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stMagAtk, value, violentSKill->last, bf->getSide() != 0);
-            bf->setImmune3(GData::e_state_c_s_f);
-            UInt32 hpr = bf->regenHP(30000);
-            appendDefStatus(e_damHpAdd, hpr, bf);
-        }
-        else if(useCnt == 40)
-        {
-            Int32 value = 0;
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stAtk, value, violentSKill->last, bf->getSide() != 0);
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stMagAtk, value, violentSKill->last, bf->getSide() != 0);
-            bf->setImmune3(0);
-        }
-        bf->addUsedCnt(1);
-    }
     return dmg + magdmg;
 }
 
@@ -5415,7 +5393,6 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
     size_t cnt = cur_fgtlist.size();
     for(size_t idx = 0; idx < cnt; idx++)
     {
-        UInt16 startCnt = rcnt;
         BattleFighter* bf = cur_fgtlist[idx];
         if((prevWin-1) != bf->getSide())
         {
@@ -5457,7 +5434,6 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
                     doSkillEffectExtra_HpShield(bf, bf->getSide(), bf->getPos(), skill, i);
             }
         }
-        bf->addActCnt(rcnt - startCnt);
     }
 
     //if(rcnt != 0)
@@ -6667,7 +6643,6 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
     }
 
-    bf->addActCnt(rcnt);
     return rcnt;
 }
 
@@ -10380,6 +10355,33 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
 
     do
     {
+        const GData::SkillBase* violentSKill = bf->getViolentSkill();
+        if(violentSKill != NULL)
+        {
+            bf->addActCnt(1);
+            UInt16 actCnt = bf->getActCnt();
+            if(actCnt <= 15 && actCnt <= 55)
+            {
+                UInt32 hpValue = 30000;
+                UInt32 hpr = bf->regenHP(hpValue);
+                appendDefStatus(e_damHpAdd, hpr, bf);
+            }
+            if(actCnt == 15)
+            {
+                Int32 atkValue = 30000;
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAtk, atkValue, skill->last, bf->getSide() != 0);
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtk, atkValue, skill->last, bf->getSide() != 0);
+                bf->setImmune3(GData::e_state_c_s_f);
+            }
+            else if(actCnt == 55)
+            {
+                Int32 atkValue = 0;
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAtk, atkValue, skill->last, bf->getSide() != 0);
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtk, atkValue, skill->last, bf->getSide() != 0);
+                bf->setImmune3(0);
+            }
+        }
+
         /////////////////////////////////////////////////////////
         // 地裂效果造成的流血状态
         UInt8& lastFieldGape = bf->getBleedFieldGapeLast();
@@ -12828,7 +12830,6 @@ UInt32 BattleSimulator::doPetEnter(UInt8 side)
         ++ rcnt;
     }
     _activeFgt = NULL;
-    bf->addActCnt(rcnt);
     return rcnt;
 }
 
