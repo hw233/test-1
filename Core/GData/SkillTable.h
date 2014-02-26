@@ -134,7 +134,6 @@ enum
     e_eft_shi_flower = 50,    // 释：鲜花
     e_eft_dao_rose = 51,    // 道：玫瑰
     e_eft_mo_knot = 52,    // 墨：同心结
-    e_eft_silkworm = 53,    // 天蚕变
 
     e_eft_max
 };
