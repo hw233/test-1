@@ -1703,6 +1703,7 @@ namespace GObject
         void beVoted();
 
         void prayForOther(Player *other);
+        void limitQQFriend(UInt8 tmp);
         void sendPresentForOther(UInt64 playerId,UInt32 type);
         UInt32 getPresentBoxRest();
         UInt32 getPresentCount();
