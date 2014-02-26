@@ -184,6 +184,22 @@ public:
         return (ret > 0 ? ret : 0);
     }
 
+    void setDefend(float percent)
+    {
+        _defend *= percent;
+        _defAdd *= percent;
+        _defAdd2 *= percent;
+        _counter_spirit_def_add *= percent;
+        _defendChangeSS *= percent;
+
+        _magdef *= percent;
+        _magDefAdd *= percent;
+        _magDefAdd2 *= percent;
+        _counter_spirit_magdef_add *= percent;
+        _fire_defend *= percent;
+        _magDefendChangeSS *= percent;
+    }
+
 	float getHitrate(BattleFighter* defgt);
 	float getEvade(BattleFighter* defgt);
 	float getCritical(BattleFighter* defgt);
@@ -380,7 +396,8 @@ public:
     void updateSoulSkillProtect(UInt16 skillId);
     void updatePassiveSkillPrvAtk100Status();
     void updatePassiveSkillBLTY100Status();
-    void updatePassiveSkillViolent();
+    void updatePassiveSkillViolent100();
+    void updatePassiveSkillRevival100();
 
     const GData::SkillBase* getPassiveSkillOnTherapy();
     const GData::SkillBase* getPassiveSkillOnSkillDmg();
@@ -1450,7 +1467,8 @@ private:
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;
     std::vector<GData::SkillItem> _passiveSkillXMCZ100;
     std::vector<GData::SkillItem> _passiveSkillBLTY100;
-    std::vector<GData::SkillItem> _passiveSkillViolent;
+    std::vector<GData::SkillItem> _passiveSkillViolent100;
+    std::vector<GData::SkillItem> _passiveSkillRevival100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1460,7 +1478,7 @@ private:
     const GData::SkillBase* getPassiveSkillXMCZ100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget = false);
-
+    const GData::SkillBase* getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget = false);
 
 private:
     float _2ndRateCoAtk;
@@ -1529,6 +1547,16 @@ private:
     UInt16 _immune3;
     void setImmune3(UInt16 v) { _immune3 = v; }
     UInt16 getImmune3() { return _immune3; }
+
+    const GData::SkillBase* _revivalCntSkill;
+    void setRevivalCntSkill(const GData::SkillBase* skill) { _revivalCntSkill = skill; }
+    const GData::SkillBase* getRevivalCntSkill() { return _revivalCntSkill; }
+    UInt16 _revivalCnt;
+    void setRevivalCnt(UInt16 count) { _revivalCnt = count; }
+    UInt16 getRevivalCnt() { return _revivalCnt;}
+    UInt16 _revivalCntMax;
+    void setRevivalCntMax(UInt16 count) { _revivalCntMax = count; }
+    UInt16 getRevivalCntMax() { return _revivalCntMax;}
 
 public:
 	enum StatusFlag

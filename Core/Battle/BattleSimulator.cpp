@@ -3693,11 +3693,16 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 BattleFighter* bo = _onTherapy[i];
                 if(!bo || bo->getHP() == 0)
                     continue;
-                if(bo->getSide() == bf->getSide())
+                const GData::SkillBase* pskill = bo->getPassiveSkillOnTherapy();
+                if(!pskill)
+                    continue;
+                bool skillFlag;
+                if(pskill->getId() == 642)
+                    skillFlag = true;
+                else
+                    skillFlag = false;
+                if((skillFlag && bo->getSide() != bf->getSide()) || (!skillFlag && bo->getSide() == bf->getSide()))
                 {
-                    const GData::SkillBase* pskill = bo->getPassiveSkillOnTherapy();
-                    if(!pskill)
-                        continue;
                     UInt32 hpr = bo->regenHP(hpr_first * pskill->effect->hpP, false);
                     if(hpr != 0)
                     {
@@ -7519,6 +7524,27 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
 {
     if(!bo->isChar())
         return true;
+    if(static_cast<BattleFighter*>(bo)->getRevivalCntSkill() != NULL)
+    {
+        BattleFighter* bf = static_cast<BattleFighter*>(bo);
+        UInt16 revivalCnt = bf->getRevivalCnt();
+        UInt16 revivalCntMax = bf->getRevivalCntMax();
+        if(revivalCnt < revivalCntMax)
+        {
+            UInt16 times = revivalCnt / 7;
+            float hpPercent = 0.8 - 0.05 * times;
+            if(hpPercent < 0.3)
+                hpPercent = 0.3;
+            bf->setHP(hpPercent * bf->getMaxHP());
+
+            float defendPercent = 0.7 - 0.1 * times;
+            if(defendPercent < 0.1)
+                defendPercent = 0.1;
+            bf->setDefend(defendPercent);
+            bf->setRevivalCnt(revivalCnt + 1);
+            return true;
+        }
+    }
 
     bool fRevival = false;
     bool fFakeDead = false;
