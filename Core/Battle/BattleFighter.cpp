@@ -185,6 +185,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkillViolent100();
     updatePassiveSkillRevival100();
     updatePassiveSkillPrudent100();
+    updatePassiveSkillSilkworm100();
+
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
     cnt = lbSkills.size();
@@ -1136,6 +1138,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillRevival100(size_t& idx, bo
 const GData::SkillBase* BattleFighter::getPassiveSkillPrudent100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillPrudent100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillSilkworm100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillSilkworm100, idx, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnHPChange100(size_t& idx, bool noPossibleTarget)
@@ -2255,6 +2262,7 @@ void BattleFighter::clearSkill()
     _passiveSkillViolent100.clear();
     _passiveSkillRevival100.clear();
     _passiveSkillPrudent100.clear();
+    _passiveSkillSilkworm100.clear();
     _passiveSkillOnHPChange100.clear();
     _passiveSkillOnWithstand100.clear();
 
@@ -3032,6 +3040,17 @@ void BattleFighter::updatePassiveSkillPrudent100()
         setPrudentSkill(passiveSkill);
         if(passiveSkill->effect)
             setHitrateMinus(passiveSkill->effect->efv[0]);
+        break;
+    }
+}
+
+void BattleFighter::updatePassiveSkillSilkworm100()
+{
+    const GData::SkillBase* passiveSkill = NULL;
+    size_t skillIdx = 0;
+    while(NULL != (passiveSkill = getPassiveSkillSilkworm100(skillIdx)))
+    {
+        setSilkwormSkill(passiveSkill);
         break;
     }
 }

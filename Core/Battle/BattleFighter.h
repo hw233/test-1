@@ -399,6 +399,7 @@ public:
     void updatePassiveSkillViolent100();
     void updatePassiveSkillRevival100();
     void updatePassiveSkillPrudent100();
+    void updatePassiveSkillSilkworm100();
 
     const GData::SkillBase* getPassiveSkillOnTherapy();
     const GData::SkillBase* getPassiveSkillOnSkillDmg();
@@ -1471,6 +1472,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillViolent100;
     std::vector<GData::SkillItem> _passiveSkillRevival100;
     std::vector<GData::SkillItem> _passiveSkillPrudent100;
+    std::vector<GData::SkillItem> _passiveSkillSilkworm100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1482,6 +1484,7 @@ private:
     const GData::SkillBase* getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillPrudent100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillSilkworm100(size_t& idx, bool noPossibleTarget = false);
 
 private:
     float _2ndRateCoAtk;
@@ -1567,6 +1570,14 @@ private:
     float _HitrateMinus;
     void setHitrateMinus(UInt32 value) { _HitrateMinus = value; }
     float getHitrateMinus() { return _HitrateMinus;}
+
+    const GData::SkillBase* _silkwormSkill;
+    void setSilkwormSkill(const GData::SkillBase* skill) { _silkwormSkill = skill; }
+    const GData::SkillBase* getSilkwormSkill() { return _silkwormSkill; }
+    UInt16 _silkwormCnt;
+    void setSilkwormCnt(UInt16 count) { _silkwormCnt = count; }
+    UInt16 getSilkwormCnt() { return _silkwormCnt;}
+    void addSilkwormCnt(UInt16 count) { _silkwormCnt += count; }
 
 public:
 	enum StatusFlag

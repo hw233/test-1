@@ -783,6 +783,8 @@ private:
     void doPassiveSkillBePHYDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
 
     void tryParry(BattleFighter* bf, UInt32& dmg, UInt32& magDmg, BattleFighter* bfAttacker);
+    void calcSilkwormCnt(BattleObject* bo);
+    void doAbnormalStatusClear(BattleObject* bo);
 };
 
 }

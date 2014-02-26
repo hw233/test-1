@@ -56,6 +56,7 @@ enum    // 技能触发方式
     /*30*/ SKILL_VIOLENT,    // 狂暴(怪物技能)
     /*31*/ SKILL_REVIVAL,    // 生生不息(怪物技能)
     /*32*/ SKILL_PRUDENT,    // 谨慎(怪物技能)
+    /*33*/ SKILL_SILKWORM,    // 天蚕变(怪物技能)
     SKILL_PASSIVES
 };
 
@@ -133,7 +134,7 @@ enum
     e_eft_shi_flower = 50,    // 释：鲜花
     e_eft_dao_rose = 51,    // 道：玫瑰
     e_eft_mo_knot = 52,    // 墨：同心结
-    e_eft_violent = 53,    // 狂暴
+    e_eft_silkworm = 53,    // 天蚕变
 
     e_eft_max
 };
