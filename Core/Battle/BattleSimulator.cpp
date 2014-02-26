@@ -7533,11 +7533,15 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
 {
     if(!bo->isChar())
         return true;
-    if(static_cast<BattleFighter*>(bo)->getRevivalCntSkill() != NULL)
+    size_t skillIdx = 0;
+    const GData::SkillBase* revivalCntSkill;
+    while(NULL != (revivalCntSkill = static_cast<BattleFighter*>(bo)->getPassiveSkillRevival100(skillIdx)))
     {
         BattleFighter* bf = static_cast<BattleFighter*>(bo);
         UInt16 revivalCnt = bf->getRevivalCnt();
-        UInt16 revivalCntMax = bf->getRevivalCntMax();
+        UInt16 revivalCntMax = 0;
+        if(revivalCntSkill->effect)
+            revivalCntMax = revivalCntSkill->effect->efv[0];
         if(revivalCnt < revivalCntMax)
         {
             UInt16 times = revivalCnt / 7;

@@ -396,7 +396,6 @@ public:
     void updateSoulSkillProtect(UInt16 skillId);
     void updatePassiveSkillPrvAtk100Status();
     void updatePassiveSkillBLTY100Status();
-    void updatePassiveSkillRevival100();
     void updatePassiveSkillPrudent100();
     void updatePassiveSkillSilkworm100();
 
@@ -1547,15 +1546,9 @@ private:
     void setImmune3(UInt16 v) { _immune3 = v; }
     UInt16 getImmune3() { return _immune3; }
 
-    const GData::SkillBase* _revivalCntSkill;
-    void setRevivalCntSkill(const GData::SkillBase* skill) { _revivalCntSkill = skill; }
-    const GData::SkillBase* getRevivalCntSkill() { return _revivalCntSkill; }
     UInt16 _revivalCnt;
     void setRevivalCnt(UInt16 count) { _revivalCnt = count; }
     UInt16 getRevivalCnt() { return _revivalCnt;}
-    UInt16 _revivalCntMax;
-    void setRevivalCntMax(UInt16 count) { _revivalCntMax = count; }
-    UInt16 getRevivalCntMax() { return _revivalCntMax;}
 
     const GData::SkillBase* _prudentSkill;
     void setPrudentSkill(const GData::SkillBase* skill) { _prudentSkill = skill; }
