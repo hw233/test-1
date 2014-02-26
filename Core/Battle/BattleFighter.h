@@ -396,7 +396,6 @@ public:
     void updateSoulSkillProtect(UInt16 skillId);
     void updatePassiveSkillPrvAtk100Status();
     void updatePassiveSkillBLTY100Status();
-    void updatePassiveSkillViolent100();
     void updatePassiveSkillRevival100();
     void updatePassiveSkillPrudent100();
     void updatePassiveSkillSilkworm100();
@@ -1544,9 +1543,6 @@ private:
     UInt16 _bActCnt;
     bool getActCnt() { return _bActCnt; }
     void addActCnt(UInt16 count) { _bActCnt += count; }
-    const GData::SkillBase* _ViolentSkill;
-    void setViolentSkill(const GData::SkillBase* skill) { _ViolentSkill = skill; }
-    const GData::SkillBase* getViolentSkill() { return _ViolentSkill; }
     UInt16 _immune3;
     void setImmune3(UInt16 v) { _immune3 = v; }
     UInt16 getImmune3() { return _immune3; }

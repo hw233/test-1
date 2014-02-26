@@ -10355,8 +10355,9 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
 
     do
     {
-        const GData::SkillBase* violentSKill = bf->getViolentSkill();
-        if(violentSKill != NULL)
+        size_t skillIdx = 0;
+        const GData::SkillBase* violentSKill;
+        while(NULL != (violentSKill = bf->getPassiveSkillViolent100(skillIdx)))
         {
             bf->addActCnt(1);
             UInt16 actCnt = bf->getActCnt();
@@ -10369,17 +10370,18 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             if(actCnt == 15)
             {
                 Int32 atkValue = 30000;
-                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAtk, atkValue, skill->last, bf->getSide() != 0);
-                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtk, atkValue, skill->last, bf->getSide() != 0);
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stAtk, atkValue, violentSKill->last, bf->getSide() != 0);
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stMagAtk, atkValue, violentSKill->last, bf->getSide() != 0);
                 bf->setImmune3(GData::e_state_c_s_f);
             }
             else if(actCnt == 55)
             {
                 Int32 atkValue = 0;
-                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAtk, atkValue, skill->last, bf->getSide() != 0);
-                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtk, atkValue, skill->last, bf->getSide() != 0);
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stAtk, atkValue, violentSKill->last, bf->getSide() != 0);
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stMagAtk, atkValue, violentSKill->last, bf->getSide() != 0);
                 bf->setImmune3(0);
             }
+            break;
         }
 
         /////////////////////////////////////////////////////////
