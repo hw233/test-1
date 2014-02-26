@@ -133,6 +133,8 @@ namespace GObject
         GVAR_COUPLE_NUM = 79,//夫妻对数
 
         GVAR_QISHIBAN_INVITE_ENABLE = 80, // 七石斗法好友赠送开启（用于设置老玩家的MemCached的值）
+        GVAR_GUANKAACT_BEGIN = 81,  //关卡活动开始时间
+        GVAR_GUANKAACT_END   = 82,  //关卡活动结束时间
 
         
         GVAR_MAX,
@@ -246,6 +248,8 @@ namespace GObject
             GREGISTER_VAR(GVAR_COUPLE_NUM, GCYCLE_NONE);
 
             GREGISTER_VAR(GVAR_QISHIBAN_INVITE_ENABLE, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_GUANKAACT_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_GUANKAACT_END, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

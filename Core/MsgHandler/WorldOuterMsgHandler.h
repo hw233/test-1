@@ -3146,6 +3146,74 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             GLOBAL().PushMsg(hdr, (void*)data);
             break;
         }
+        case 0x30:
+        {
+            if(!World::getGuankaAct() || player->GetLev() < 65)
+                return;
+            brd >> op;
+            switch(op)
+            {
+                case 0:
+                    player->sendguankaActMyRank();
+                    break;
+                case 1:
+                    {
+                        UInt16 count = 0;
+                        brd >> count;
+
+                        Stream st(REP::ACT);
+                        st << static_cast<UInt8>(0x30) << static_cast<UInt8>(0x01);
+                        st << count;
+
+                        for(UInt32 i = 0; i < count; i ++)
+                        {
+                            std::string openId;
+                            openId.clear();
+                            brd >> openId;
+                            std::string info;
+                            bool ret = WORLD().GetMemCach_guankaActInfo(openId.c_str(), info);
+                            if (ret)
+                            {
+                                StringTokenizer tokenizer(info, "_");
+                                if (tokenizer.count() >= 3)
+                                {
+                                    UInt8 csex = atoi(tokenizer[1].c_str());
+                                    UInt32 score = atoi(tokenizer[0].c_str());
+                                    st << tokenizer[0] << csex << score;
+                                }
+                                else
+                                    ret = false;
+                            }
+
+                            if (!ret)
+                            {
+                                st << std::string("未找到");
+                                st << static_cast<UInt8>(0) << static_cast<UInt32>(0);
+                            }
+                        }
+                        st << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
+                case 2:
+                    {
+                        GameMsgHdr hdr(0x1B8, WORKER_THREAD_WORLD, NULL, 0);
+                        GLOBAL().PushMsg(hdr, NULL);
+                    }
+                    break;
+                case 3:
+                    {
+                        UInt8 type = 0;
+                        brd >> type;
+                        player->doGuankaAct(type);
+                    }
+                    break;
+                case 4:
+                    player->getguankaScoreAward();
+                    break;
+            }
+        }
+        break;
         default:
             break;
     }

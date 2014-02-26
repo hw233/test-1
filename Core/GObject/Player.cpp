@@ -28495,12 +28495,118 @@ void Player::sendSummerMeetScoreInfo()
     {
         st <<static_cast<UInt8>( GET_BIT_8( GetVar(VAR_SUMMERMEET_SCORE1 + i / 4) ,i % 4) ); 
     }
-    st << GetVar(VAR_SUMMERMEET_SCORE4); 
-    st << GetVar(VAR_SUMMERMEET_SCORE5); 
+    st << GetVar(VAR_SUMMERMEET_SCORE4);
+    st << GetVar(VAR_SUMMERMEET_SCORE5);
     st <<getSummerMeetTotalScore();
     st << Stream::eos;
     send(st);
 }
+
+void Player::doGuankaAct(UInt8 type)
+{
+    if(!World::getGuankaAct())
+        return;
+
+    if(CURRENT_THREAD_ID() != getThreadId())
+    {
+        GameMsgHdr h(0x357,  getThreadId(), this, sizeof(type));
+        GLOBAL().PushMsg(h, &type);
+        return;
+    }
+    static UInt32 scores[5] = {20, 30, 50, 200, 400};
+    static UInt32 npcIds[6][5] = {
+        {13500, 13506, 13512, 13518, 13524},
+        {13501, 13507, 13513, 13519, 13525},
+        {13502, 13508, 13514, 13520, 13526},
+        {13503, 13509, 13515, 13521, 13527},
+        {13504, 13510, 13516, 13522, 13528},
+        {13505, 13511, 13517, 13523, 13529},
+    };
+    if(type >= 6) return;
+    UInt32 data = GetVar(VAR_GUANKA_ACTION_NPC);
+    UInt8 index = GET_BIT_3(data, type);
+    if(index >= 5) return;
+    UInt32 npcId = npcIds[type][index];
+    bool res = attackNpc(npcId, 0xFFFFFFFF, GetLev() <= 20);
+    if(res)
+    {
+        AddVar(VAR_GUANKA_ACTION_SCORE, scores[index]);
+        ++ index;
+        data = SET_BIT_3(data, type, index);
+        SetVar(VAR_GUANKA_ACTION_NPC, data);
+
+        UInt32 totalScore = GetVar(VAR_GUANKA_ACTION_SCORE);
+        GameMsgHdr hdr(0x1B6, WORKER_THREAD_WORLD, this, sizeof(totalScore));
+        GLOBAL().PushMsg(hdr, &totalScore);
+
+        sendguankaActMyRank();
+    }
+}
+
+void Player::sendguankaActMyRank()
+{
+    GameMsgHdr hdr(0x1B9, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr, NULL);
+}
+
+void Player::getguankaScoreAward()
+{
+    if(!World::getGuankaAct())
+        return;
+
+    static UInt32 scoreLvl[] = {200, 400, 800, 1000, 1500};
+    static UInt32 awards[5][5][2] = {
+        {{15,2},   {514,5},  {135,5},    {500, 5},   {0, 0}},
+        {{15,5},   {515,5},  {514, 10},  {135, 10},  {500, 5}},
+        {{15,10},  {515,10}, {134, 10},  {9022, 10}, {0, 0}},
+        {{515,30}, {134,30}, {9438, 30}, {9022, 10}, {0, 0}},
+        {{515,40}, {134,40}, {9438, 40}, {9075},     {0, 0}},
+    };
+    UInt32 data = GetVar(VAR_GUANKA_ACTION_NPC);
+    UInt32 score = GetVar(VAR_GUANKA_ACTION_SCORE);
+    UInt8 state = GET_BIT_8(data, 3);
+    if(state >= 5 || score < scoreLvl[0])
+        return;
+    UInt8 idx = 0;
+    UInt8 j = sizeof(scoreLvl)/sizeof(UInt32);
+    for(UInt8 i = 1; i < j; ++ i)
+    {
+        if(score < scoreLvl[i])
+        {
+            idx = i-1;
+            break;
+        }
+    }
+    if(score >= scoreLvl[j-1])
+        idx = j-1;
+    if(state > idx) return;
+    ++ state;
+    data = SET_BIT_8(data, 3, state);
+    SetVar(VAR_GUANKA_ACTION_NPC, data);
+    sendguankaActMyRank();
+
+    for(UInt8 i = 0; i < 5; ++ i)
+    {
+        struct ItemAdd
+        {
+            UInt16 item;
+            UInt16 num;
+            bool bind;
+            UInt16 fromWhere;
+        };
+        ItemAdd ia;
+        ia.item = awards[state-1][i][0];
+        ia.num = awards[state-1][i][1];
+        ia.bind = true;
+        ia.fromWhere = FromQixi;
+        if(ia.item > 0)
+        {
+            GameMsgHdr hdr(0x241, getThreadId(), this, sizeof(ia));
+            GLOBAL().PushMsg(hdr, &ia);
+        }
+    }
+}
+
 } // namespace GObject
 
 

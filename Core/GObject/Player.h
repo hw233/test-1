@@ -2910,6 +2910,9 @@ namespace GObject
         void getBuyFundInfo(UInt8 opt);
         void buyFund(UInt16 num);
         void getBuyFundAward(UInt8 opt);
+        void doGuankaAct(UInt8 type);
+        void sendguankaActMyRank();
+        void getguankaScoreAward();
 
     public:
         // 八部浮屠

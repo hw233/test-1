@@ -202,7 +202,9 @@ bool World::_consumeawardact = false;
 bool World::_summerFlow = false;
 bool World::_summerMeet = false;
 bool World::_qishiban = false;
+bool World::_guankaAct = false;
 RCSortType World::qishibanScoreSort;
+RCSortType World::guankaScoreSort;
 RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 RCSortType World::popularitySort;
@@ -329,6 +331,7 @@ bool bFoolBaoEnd =  false;
 bool bHalfGoldEnd = false;
 bool bSurnameLegendEnd = false;
 bool bHappyFireEnd = false;
+bool bGuankaEnd = false;
 bool b11TimeEnd = false;
 bool bGGTimeEnd = false;
 bool bSnowEnd = false;
@@ -1213,6 +1216,7 @@ void World::World_Midnight_Check( World * world )
     bool bfoolbao = getFoolBao();
     bool bsurnamelegend = getSurnameLegend();
     bool bhappyfirend = getHappyFireTime();
+    bool bGuanka = getGuankaAct();
     bool b11time = get11Time();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
@@ -1259,6 +1263,7 @@ void World::World_Midnight_Check( World * world )
     bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
     //跨年大转盘
     bHappyFireEnd = bhappyfirend && !getHappyFireTime(300);
+    bGuankaEnd = bGuanka && !getGuankaAct(300);
     b11TimeEnd = b11time && !get11Time();
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
@@ -1423,6 +1428,8 @@ void World::World_Midnight_Check( World * world )
         world->SendQiShiBanAward();
     if(bHappyFireEnd)
         world->SendHappyFireAward();
+    if(bGuankaEnd)
+        world->SendGuankaActAward();
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
   //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
@@ -3010,6 +3017,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::happyFireSort.insert(s);
         }
     }
+    if (World::getGuankaAct())
+    {
+        UInt32 score = p->GetVar(VAR_GUANKA_ACTION_SCORE);
+        if (score)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = score;
+            World::guankaScoreSort.insert(s);
+        }
+    }
     return true;
 }
 inline bool clan_enum_grade(GObject::Clan *clan,int)
@@ -3923,6 +3941,54 @@ void World::DelMemCach_CFriend_InvitedAct(UInt64 userId)
     }
 }
 
+void World::SetMemCach_guankaActInfo(const char * openId, std::string info)
+{
+    if (_memcinited)
+    {
+        //info==> name_(country|sex)_score
+        char value[64] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+
+        size_t len = snprintf(key,sizeof(key), "guankaActinfo_%s", openId);
+        key[MEMCACHED_MAX_KEY - 1] = '\0';
+        size_t vlen = snprintf(value, sizeof(value), "%s", info.c_str());
+        value[64 - 1] = '\0';
+        bool res = m_MCached.set(key, len, value, vlen, 0);
+        TRACE_LOG("guanka==>setKey: %s, setName: %s, res:%u", key, value, res);
+    }
+}
+
+bool World::GetMemCach_guankaActInfo(const char * openId, std::string& info)
+{
+    // 获取关卡活动玩家相关信息
+    char value[64]={0};
+    char key[MEMCACHED_MAX_KEY] = {0};
+    snprintf(key, MEMCACHED_MAX_KEY, "guankaActinfo_%s", openId);
+
+    bool ret = false;
+
+    if (_memcinited)
+    {
+        const char* res = m_MCached.get(key, value, sizeof(value));
+        TRACE_LOG("guanka==>getKey: %s, getInfo: %s, res:%u", key, value, res);
+        info = value;
+        if (res)
+            ret = true;
+    }
+
+    return ret;
+}
+
+void World::DelMemCach_guankaAct(const char * openId)
+{
+    if (_memcinited)
+    {
+        char key[MEMCACHED_MAX_KEY] = {0};
+        snprintf(key, MEMCACHED_MAX_KEY, "guankaActinfo_%s", openId);
+        m_MCached.del(key);
+    }
+}
+
 UInt16 World::GetRandomSpot()
 {
     GObject::MapList::iterator it;
@@ -4125,5 +4191,50 @@ void World::SendHappyFireAward()
         }
     }
 }
+
+void World::SendGuankaActAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][5] = {
+        {{1325,40},{9418,60},{9075,40},{515,40},{0,0}},
+        {{1325,20},{9418,20},{9075,20},{515,20},{0,0}},
+        {{515,10},{9438,10},{9075,10},{134,10},{0,0}},
+        {{515,10},{9438,10},{134,10},{0,0},{0,0}},
+        {{15,10},{515,5},{134,5},{9438,5},{500,5}},
+    };
+    //static MailPackage::MailItem card = {9929,1};   //暂无白马王子
+    int pos = 0;
+    SYSMSGV(title, 5123, pos);
+    for (RCSortType::iterator i = World::guankaScoreSort.begin(), e = World::guankaScoreSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (!player)
+            continue;
+        ++ pos;
+        if(pos > 10)
+            break;
+        UInt32 score = i->total;
+        if(pos > 0 && pos <= 10)     //奖励前10名
+        {
+            int type = pos;
+            if(pos >= 4 && pos <= 5)
+                type = 4;
+            else if(pos > 5)
+                type = 5;
+            SYSMSGV(content, 5124, score, pos);
+            MailItemsInfo itemsInfo(s_item[type-1], Activity, 5);
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+            {
+                mailPackageManager.push(mail->id, s_item[type-1], 5, true);
+                /*
+                if(pos ==1)
+                    mailPackageManager.push(mail->id, &card, 1, true);
+                */
+            }
+        }
+    }
+}
+
 }
 
