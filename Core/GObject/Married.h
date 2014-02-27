@@ -45,6 +45,8 @@ namespace GObject
         AWARD_JINJINFISH,               //金锦鱼
         AWARD_MEMEORY,               //记忆碎片
         WINNER_COPY,               //副本胜利
+        AWARD_QIANFISH,            //千年古迹
+        AWARD_WANFISH,             //万年古迹
     };
     
     class MarriedMgr  

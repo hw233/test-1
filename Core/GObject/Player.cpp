@@ -3649,10 +3649,7 @@ namespace GObject
 
 		if(GameAction()->RunExploreTask(this, npcId))
 			turns = 0;
-        UInt32 bs = _playerData.location;
-        if(World::getGuankaAct() && npcId >= 13500 && npcId <= 13529)
-            bs = Battle::BS_WBOSS;
-		Battle::BattleSimulator bsim(bs, this, ng->getName(), ng->getLevel(), false, turns);
+		Battle::BattleSimulator bsim(_playerData.location, this, ng->getName(), ng->getLevel(), false, turns);
 
 		PutFighters( bsim, 0 );
 		if(npcId == 6145)
@@ -3881,6 +3878,8 @@ namespace GObject
             bs = Battle::BS_FRONTMAP1;
         else if(type == 1)
             bs = copyId - 1 + Battle::BS_COPY1;
+        else if(type == 2)
+            bs = Battle::BS_WBOSS;
 
 		Battle::BattleSimulator bsim(bs, this, ng->getName(), ng->getLevel(), false);
 		PutFighters( bsim, 0 );
@@ -28560,7 +28559,9 @@ void Player::doGuankaAct(UInt8 type)
     UInt8 index = GET_BIT_3(data, type);
     if(index >= 5) return;
     UInt32 npcId = npcIds[type][index];
-    bool res = attackNpc(npcId, 500, GetLev() <= 20);
+    bool isFull = false;
+    UInt64 exp =0;
+    bool res = attackCopyNpc(npcId, 2, 0, 1, isFull, exp, 1, false, NULL, false);
     if(res)
     {
         AddVar(VAR_GUANKA_ACTION_SCORE, scores[index]);
