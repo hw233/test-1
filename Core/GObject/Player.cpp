@@ -3649,7 +3649,10 @@ namespace GObject
 
 		if(GameAction()->RunExploreTask(this, npcId))
 			turns = 0;
-		Battle::BattleSimulator bsim(_playerData.location, this, ng->getName(), ng->getLevel(), false, turns);
+        UInt32 bs = _playerData.location;
+        if(World::getGuankaAct() && npcId >= 13500 && npcId <= 13529)
+            bs = Battle::BS_WBOSS;
+		Battle::BattleSimulator bsim(bs, this, ng->getName(), ng->getLevel(), false, turns);
 
 		PutFighters( bsim, 0 );
 		if(npcId == 6145)
@@ -26404,7 +26407,7 @@ void Player::RunFriendlyCompass(UInt8 type)
 void Player::getGGTaskAward()
 {
     UInt8 plvl = GetLev();
-    UInt8 pos = getGuangGunPos();
+    //UInt8 pos = getGuangGunPos();
     UInt32 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
     UInt32 exp_ = static_cast<float>(exp)*30;
     UInt32 pexp = 5000;
@@ -27639,9 +27642,7 @@ bool Player::check_Cangjianya()
 
 void Player::mount_Cangjianya(UInt8 rideId, UInt8 floors, bool isAuto)
 {
-    if(rideId <= 7)     //之前出过的前7个飞剑不能用
-        return;
-    if(!GData::ride.checkHasMountId(rideId)) //判断是否存在此坐骑id
+    if(!GData::ride.canShowCangjian(rideId)) //判断是否可以在藏剑崖
         return;
     ModifyMount * mount = getOneMount(rideId);
     if(NULL == mount)
@@ -28527,11 +28528,125 @@ void Player::sendSummerMeetScoreInfo()
     {
         st <<static_cast<UInt8>( GET_BIT_8( GetVar(VAR_SUMMERMEET_SCORE1 + i / 4) ,i % 4) ); 
     }
-    st << GetVar(VAR_SUMMERMEET_SCORE4); 
-    st << GetVar(VAR_SUMMERMEET_SCORE5); 
+    st << GetVar(VAR_SUMMERMEET_SCORE4);
+    st << GetVar(VAR_SUMMERMEET_SCORE5);
     st <<getSummerMeetTotalScore();
     st << Stream::eos;
     send(st);
+}
+
+void Player::doGuankaAct(UInt8 type)
+{
+    if(!World::getGuankaAct())
+        return;
+
+    if(CURRENT_THREAD_ID() != getThreadId())
+    {
+        GameMsgHdr h(0x357,  getThreadId(), this, sizeof(type));
+        GLOBAL().PushMsg(h, &type);
+        return;
+    }
+    static UInt32 scores[5] = {20, 30, 50, 200, 400};
+    static UInt32 npcIds[6][5] = {
+        {13500, 13506, 13512, 13518, 13524},
+        {13501, 13507, 13513, 13519, 13525},
+        {13502, 13508, 13514, 13520, 13526},
+        {13503, 13509, 13515, 13521, 13527},
+        {13504, 13510, 13516, 13522, 13528},
+        {13505, 13511, 13517, 13523, 13529},
+    };
+    if(type >= 6) return;
+    UInt32 data = GetVar(VAR_GUANKA_ACTION_NPC);
+    UInt8 index = GET_BIT_3(data, type);
+    if(index >= 5) return;
+    UInt32 npcId = npcIds[type][index];
+    bool res = attackNpc(npcId, 500, GetLev() <= 20);
+    if(res)
+    {
+        AddVar(VAR_GUANKA_ACTION_SCORE, scores[index]);
+        SetVar(VAR_GUANKA_ACTION_TIME, TimeUtil::Now());
+        ++ index;
+        data = SET_BIT_3(data, type, index);
+        SetVar(VAR_GUANKA_ACTION_NPC, data);
+
+        UInt32 totalScore = GetVar(VAR_GUANKA_ACTION_SCORE);
+        GameMsgHdr hdr(0x1B6, WORKER_THREAD_WORLD, this, sizeof(totalScore));
+        GLOBAL().PushMsg(hdr, &totalScore);
+        GameMsgHdr hdr1(0x1B8, WORKER_THREAD_WORLD, this, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
+
+        sendguankaActMyRank();
+        if(index >= 5)
+        {
+            SYSMSG_SENDV(5125, this, npcId);
+            SYSMSG_BROADCASTV(5126, getCountry(), getName().c_str(), npcId);
+            UInt8 cnt = 0;
+            for(UInt8 i = 0; i < 6; ++ i)
+            {
+                if(GET_BIT_3(data, i) >= 5)
+                    ++ cnt;
+            }
+            if(cnt >= 6)
+            {
+                SYSMSG_SENDV(5127, this);
+                SYSMSG_BROADCASTV(5128, getCountry(), getName().c_str());
+            }
+        }
+    }
+}
+
+void Player::sendguankaActMyRank()
+{
+    GameMsgHdr hdr(0x1B9, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr, NULL);
+}
+
+void Player::getguankaScoreAward(UInt8 type)
+{
+    if(!World::getGuankaAct() || type > 4)
+        return;
+
+    static UInt32 scoreLvl[] = {200, 400, 800, 1000, 1500};
+    static UInt32 awards[5][5][2] = {
+        {{15,2},   {514,5},  {135,5},    {500, 5},   {0, 0}},
+        {{15,5},   {515,5},  {514, 10},  {135, 10},  {500, 5}},
+        {{15,10},  {515,10}, {134, 10},  {9022, 10}, {0, 0}},
+        {{515,30}, {134,30}, {9438, 30}, {9022, 10}, {0, 0}},
+        {{515,40}, {134,40}, {9438, 40}, {9075, 20}, {0, 0}},
+    };
+    UInt32 data = GetVar(VAR_GUANKA_ACTION_NPC);
+    UInt32 score = GetVar(VAR_GUANKA_ACTION_SCORE);
+    UInt8 state = GET_BIT_8(data, 3);
+    if(score < scoreLvl[type] || (state & (1 << type)) > 0)
+        return;
+    state |= 1 << type;
+    data = SET_BIT_8(data, 3, state);
+    SetVar(VAR_GUANKA_ACTION_NPC, data);
+    sendguankaActMyRank();
+
+    for(UInt8 i = 0; i < 5; ++ i)
+    {
+        struct ItemAdd
+        {
+            UInt16 item;
+            UInt16 num;
+            bool bind;
+            UInt16 fromWhere;
+        };
+        ItemAdd ia;
+        ia.item = awards[type][i][0];
+        ia.num = awards[type][i][1];
+        ia.bind = true;
+        ia.fromWhere = FromQixi;
+        if(ia.item > 0)
+        {
+            GameMsgHdr hdr(0x241, getThreadId(), this, sizeof(ia));
+            GLOBAL().PushMsg(hdr, &ia);
+        }
+    }
+    char str[32] = {0};
+    sprintf(str, "F_140240_%d", type+1);
+    udpLog("hundunmoyu", str, "", "", "", "", "act");
 }
 
 void Player::sevensoul_fixed()

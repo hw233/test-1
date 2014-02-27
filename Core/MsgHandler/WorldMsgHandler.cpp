@@ -152,6 +152,10 @@ MSG_REG_2(GameMsgHdr, 0x1B3, OnBuySaleCheckOKNotify);
 MSG_REG_2(GameMsgHdr, 0x1B4, OnSaleItemCancle);
 
 MSG_REG_2(GameMsgHdr, 0x1B5, OnAddQiShiBanCount);
+MSG_REG_2(GameMsgHdr, 0x1B6, OnSetGuankaActRank);
+MSG_REG_2(GameMsgHdr, 0x1B7, OnClearGuankaActRank);
+MSG_REG_2(GameMsgHdr, 0x1B8, OnSendGuankaActRank10);
+MSG_REG_2(GameMsgHdr, 0x1B9, OnSendGuankaActMyRank);
 
 MSG_REG_2(GameMsgHdr, 0x1C0, OnLuckyDraw);
 MSG_REG_2(GameMsgHdr, 0x1C1, OnRechargeRank);
