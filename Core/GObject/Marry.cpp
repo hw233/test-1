@@ -863,6 +863,7 @@ namespace GObject
     UInt8 MarryMgr::ReqWeddingAppointMent(Player* player,MarriageInfo* sMarry)
     {
         Mutex::ScopedLock lk(_mutex); 
+        UInt32 now = TimeUtil::Now();
         if(!player->GetMarriageInfo()->lovers)
         {
             player->sendMsgCode(0, 6011);
@@ -887,17 +888,28 @@ namespace GObject
         if(getMoney(player,sMarry->eWedding,true) != 0)
             return 1;
         
-        if(TimeUtil::GetYYMMDD(sMarry->yuyueTime) == TimeUtil::GetYYMMDD())
+        if(TimeUtil::GetYYMMDD(sMarry->yuyueTime) == TimeUtil::GetYYMMDD(now))
         {
             player->sendMsgCode(0, 6023);
             return 1;
         }
         
-        if(sMarry->yuyueTime < TimeUtil::Now())
+        if(sMarry->yuyueTime < now)
         {
             player->sendMsgCode(0, 6023);
             return 1;
         }
+
+        UInt32 time = TimeUtil::SharpDay(0 ,sMarry->yuyueTime) + 10 * 3600 + 30 * 60;
+        UInt32 time1 = TimeUtil::SharpDay(0 ,sMarry->yuyueTime) + 13 * 3600;
+        UInt32 time2 = TimeUtil::SharpDay(0 ,sMarry->yuyueTime) + 17 * 3600 + 30 * 60;
+        
+        if(sMarry->yuyueTime < time + 5 * 60)
+            sMarry->yuyueTime = time;
+        else if(sMarry->yuyueTime < time1 + 5 * 60)
+            sMarry->yuyueTime = time1;
+        else 
+            sMarry->yuyueTime = time2;
 
         useMoney(player,sMoney.price_type,sMoney.price_num,sMoney.useType);
 
@@ -2163,7 +2175,7 @@ namespace GObject
             {
                 if(it->first < now)
                 {
-                    if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD())
+                    if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD(now))
                         break;  
                     it1 = it->second;
                     player = GObject::globalPlayers[it1.first];
@@ -2183,7 +2195,7 @@ namespace GObject
                     }
                 }
                 
-                if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD()  && !GVAR.GetVar(GVAR_CREATMARRY_TIMES))
+                if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD(now)  && !GVAR.GetVar(GVAR_CREATMARRY_TIMES))
                 {
                     it1 = it->second;
                     player = GObject::globalPlayers[it1.first];
