@@ -3683,12 +3683,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 const GData::SkillBase* pskill = bo->getPassiveSkillOnTherapy();
                 if(!pskill)
                     continue;
-                bool skillFlag;
-                if(pskill->getId() == 642)
-                    skillFlag = true;
-                else
-                    skillFlag = false;
-                if((skillFlag && bo->getSide() != bf->getSide()) || (!skillFlag && bo->getSide() == bf->getSide()))
+                if(pskill->getId() == 513 || bo->getSide() == bf->getSide())
                 {
                     UInt32 hpr = bo->regenHP(hpr_first * pskill->effect->hpP, false);
                     if(hpr != 0)
@@ -4100,7 +4095,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     factor = skill->factor[idx];
                 size_t skillIdx = 0;
                 const GData::SkillBase* silkwormSkill;
-                while(NULL != (silkwormSkill = bf->getPassiveSkillPrudent100(skillIdx)))
+                while(NULL != (silkwormSkill = bf->getPassiveSkillSilkworm100(skillIdx)))
                     break;
                 if(skill == silkwormSkill)
                 {
@@ -5661,8 +5656,6 @@ UInt32 BattleSimulator::doAttack( int pos )
     UInt8 reiatsuType2 = 0;
     UInt8 launchPeerLess = 0;
 
-    BattleFighter* mainTarget = NULL;
-    rcnt += doDeBufAttack(bf);
     UInt8 attackCnt = 1;
     size_t skillIdx = 0;
     const GData::SkillBase* prudentSkill;
@@ -5675,6 +5668,8 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
     for(UInt8 cntIndex = 0; cntIndex < attackCnt; cntIndex++)
     {
+    BattleFighter* mainTarget = NULL;
+    rcnt += doDeBufAttack(bf);
     if(bf->getHP() && !_winner && bf->getId() != 5679) // 行动者存活 && 战斗胜负未分 && 行动者不是雪人
     {
 
