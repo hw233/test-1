@@ -4095,18 +4095,18 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     factor = skill->factor[idx];
                 if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_silkworm)
                 {
-                    bf->setSilkwormCnt(0);
                     doAbnormalStatusClear(getObject(target_side, pos));
                     float factor2 = 5.0;
                     if(skill->effect)
                         factor2 = skill->effect->efv[0] / 100.f;
-                    factor *= (1.2 * (1.0 + factor2 * bf->getSilkwormCnt()));
+                    factor *= (1.0 + factor2 * bf->getSilkwormCnt());
                 }
                 dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, pos), factor, -1, NULL, NULL, canProtect);
                 canProtect = false;
                 doSkillEffectExtraAbsorb(bf, dmg, skill);
                 ++i;
             }
+            bf->setSilkwormCnt(0);
         }
         else if(specialEf && isQueqiao)
         {

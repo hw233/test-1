@@ -23,7 +23,7 @@ function clantech()
             print "INSERT INTO `clan_tech_template` VALUES";
         } {
             printf("(%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6);
-            if (NR <= ENVIRON["lines"])
+            if (NR < ENVIRON["lines"])
                 printf(",");
             else if (NR >= ENVIRON["lines"])
                 printf(";");
