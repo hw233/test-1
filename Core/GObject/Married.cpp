@@ -379,7 +379,7 @@ namespace GObject
         }
         
         //CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
-        if(man_player->GetVar(VAR_COUPLE_ONLINE_FISH) + count > 10)
+        if(man_player->GetVar(VAR_COUPLE_ONLINE_FISH) + count > 20)
             return 1;
         
         UInt8 i = 0;
@@ -402,14 +402,17 @@ namespace GObject
         UInt8 white_num = 0;
         UInt8 qixing_num = 0;
         UInt8 jinjin_num = 0;
+        UInt8 qian_num = 0;
+        UInt8 wan_num = 0;
 
-        while(man_player->GetVar(VAR_COUPLE_ONLINE_FISH) + i <= 10)
+        while(man_player->GetVar(VAR_COUPLE_ONLINE_FISH) + i <= 20)
         {
             if(i >= count)
                 break;
             if(useMoney(player,consumeType,consumeNum,0) != 0)
                 break;
             UInt8 rand = uRand(100)+1;
+            UInt8 exp_rand = uRand(100) + 1;
             switch(consumeType)
             {
                 case 0:
@@ -419,10 +422,10 @@ namespace GObject
                         jinjin_num++;
                     }
                     else if(rand <= 20)
-                     {
-                         ChangPetAttr(man_player,woman_player,AWARD_QIXINGFISH);
-                         qixing_num++;
-                     }
+                         {
+                             ChangPetAttr(man_player,woman_player,AWARD_QIXINGFISH);
+                             qixing_num++;
+                         }
                         else 
                         {
                             ChangPetAttr(man_player,woman_player,AWARD_WHITEFISH);
@@ -446,6 +449,12 @@ namespace GObject
                             ChangPetAttr(man_player,woman_player,AWARD_WHITEFISH);
                             white_num++;
                         }
+                    if(exp_rand <= 5)
+                    {
+                        ChangPetAttr(man_player,woman_player,AWARD_QIANFISH);
+                        qian_num++;
+                    }
+
                     player->udpLog("fuqijiayuan", "F_140116_2", "", "", "", "", "act");
                     break;
                 case 2:
@@ -459,6 +468,11 @@ namespace GObject
                         ChangPetAttr(man_player,woman_player,AWARD_QIXINGFISH);
                         qixing_num++;
                     }
+                    if(exp_rand <= 5)
+                    {
+                        ChangPetAttr(man_player,woman_player,AWARD_WANFISH);
+                        wan_num++;
+                    }
                     player->udpLog("fuqijiayuan", "F_140116_3", "", "", "", "", "act");
                     break;
                 default:
@@ -471,7 +485,7 @@ namespace GObject
         man_player->SetVar(VAR_COUPLE_ONLINE_FISH,fish_num);
         
         Stream st(REP::MARRIEDMGR);
-        st << static_cast<UInt8>(7) << static_cast<UInt8>(man_player->GetVar(VAR_COUPLE_ONLINE_FISH)) << white_num << qixing_num << jinjin_num << Stream::eos;
+        st << static_cast<UInt8>(7) << static_cast<UInt8>(man_player->GetVar(VAR_COUPLE_ONLINE_FISH)) << white_num << qixing_num << jinjin_num << qian_num << wan_num << Stream::eos;
         man_player->send(st);
         woman_player->send(st);
         
@@ -616,6 +630,30 @@ namespace GObject
                 SYSMSG_SENDV(927, woman_player);
                 DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u, `pet_friendliness` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp, it->second->friendliness, man_player->GetMarriageInfo()->yuyueTime);
 
+                break;
+            case AWARD_QIANFISH:
+                it->second->levelExp += 7;
+                if(it->second->levelExp >= 63770)
+                    it->second->levelExp = 63770;
+                rebuildCouplePet(man_player);
+                gMarryMgr.SetDirty(man_player,woman_player);
+                SYSMSG_SENDV(929, man_player);
+                SYSMSG_SENDV(930, man_player);
+                SYSMSG_SENDV(929, woman_player);
+                SYSMSG_SENDV(930, woman_player);
+                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,man_player->GetMarriageInfo()->yuyueTime);
+                break;
+            case AWARD_WANFISH:
+                it->second->levelExp += 10;
+                if(it->second->levelExp >= 63770)
+                    it->second->levelExp = 63770;
+                rebuildCouplePet(man_player);
+                gMarryMgr.SetDirty(man_player,woman_player);
+                SYSMSG_SENDV(931, man_player);
+                SYSMSG_SENDV(932, man_player);
+                SYSMSG_SENDV(931, woman_player);
+                SYSMSG_SENDV(932, woman_player);
+                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,man_player->GetMarriageInfo()->yuyueTime);
                 break;
             default:
                 break;
