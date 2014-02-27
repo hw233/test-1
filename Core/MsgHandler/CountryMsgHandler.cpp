@@ -39,7 +39,6 @@ MSG_REG_2(GameMsgHdr, REQ::COUNTRY_ACT, OnCountryActReq);
 
 MSG_REG_2(GameMsgHdr, REQ::CLAN_COPY, OnClanCopyReq);
 MSG_REG_2(GameMsgHdr, REQ::CLANBOSS, OnClanBossReq);
-MSG_REG_2(GameMsgHdr, REQ::CLAN_FAIRYLAND, OnClanFairyLandReq);
 
 MSG_REG(GameMsgHdr, OnPracticeHookAddReq);
 MSG_REG(GameMsgHdr, OnExtendPackageReq);

@@ -4,6 +4,7 @@
 #include  "Config.h"
 #include  "BuildingTmpl.h"
 #include  "Common/BinaryReader.h"
+#include  "Common/Stream.h"
 
 namespace GObject
 {
@@ -13,12 +14,30 @@ namespace GObject
     struct ClanBuildBattleInfo
     {
         UInt8 leftId ; 
-        std::string clanNameOther;
+        std::string name;
+        UInt8 type ;
         UInt8 res ;
         UInt32 battleId;
-        ClanBuildBattleInfo():leftId(0),clanNameOther(""),res(0),battleId(0){}
-        ClanBuildBattleInfo(UInt8 leftId_ ,std::string  clanNameOther_ , UInt8 res_ , UInt32 battleId_ ):leftId(leftId_),clanNameOther(clanNameOther_),res(res_),battleId(battleId_){}
+        UInt32 battleTime;
+        ClanBuildBattleInfo():leftId(0),name(""),type(0),res(0),battleId(0),battleTime(0){}
+        ClanBuildBattleInfo(UInt8 leftId_ ,std::string  name_ ,UInt8 type_ , UInt8 res_ , UInt32 battleId_ ,UInt32 battleTime_):leftId(leftId_),name(name_),type(type_) , res(res_),battleId(battleId_),battleTime(battleTime_){}
     };
+    struct LeftAttackLeader
+    {
+        Player * leader;
+        UInt8 leftId;
+        LeftAttackLeader(Player * leader_ , UInt8 leftId_):leader(leader_),leftId(leftId_){}
+        LeftAttackLeader():leader(NULL),leftId(0){}
+        bool operator < ( const  LeftAttackLeader& leftAttack)  const
+        {
+            return leftId < leftAttack.leftId;
+        }
+        bool operator == ( const  LeftAttackLeader& leftAttack) const
+        {
+            return leftId == leftAttack.leftId && leader == leftAttack.leader;
+        }
+    };
+
     enum ClanBuildingErrCode
     {
         eErrTypeWrong = 4,      // 建筑类型错误 
@@ -67,14 +86,20 @@ namespace GObject
             opUnknown = 0,      // 未定义操作
             opGetInfo = 1,      // 获取帮派建筑信息
             opUpgrade = 2,      // 升级帮派建筑
-            
+            /*
+            opLeftAddrInfo = 3,  //查看遗迹信息
+            opCreateTeam = 4 ,  //创建征战小队            
+            opEnterTeam = 5 ,  //加入征战小队
+            opLeaveTeam = 6 ,  //离开征战小队
+            opChangeTeamMember = 7 , //改变小队队形 
+            */
         };
         public:
             ClanBuildingOwner(Clan *clan);
             virtual ~ClanBuildingOwner();
 
             bool loadFromDB( UInt32 fairylandEnergy, 
-                    UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, 
+                    UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, UInt16 oracleLevel,
                     UInt16 updateTime);
 
             bool init();
@@ -96,13 +121,23 @@ namespace GObject
 
             UInt16 getLevel(UInt8 type) const;
             UInt32 getAddVal(UInt8 type) const;
+            void addEnergy(UInt32 energy){ _energy+= energy ;}
+            UInt32 getEnergy(){ return _energy;}
             void AddBattlesInfo(struct ClanBuildBattleInfo cbbi);
-            void SendBattlesInfo(Player* player);
+            void SendBattlesInfo(Stream & st);
+            void CreateTeam(Player * leader , UInt8 leftId);
+            void EnterTeam(Player * leader , Player * player);
+            void ChangeTeamMember(Player * leader , UInt8 first , UInt8 sevond);
+            void LeaveTeam(Player * leader , Player * player );
+            void AttackLeftAddr(Player * player);
+            void LineUp(Player * player);
+            void sendAttackTeamInfo(Player *player);
         private:
             Clan * _clan;
             std::vector<ClanBuilding> _buildings;
             UInt32  _energy;        // 仙界元气
-            std::vector<struct ClanBuildBattleInfo> battles_vec;
+            std::deque<struct ClanBuildBattleInfo> battles_deque;
+            std::map< LeftAttackLeader , std::vector<Player *> > leftAttackTeams;
     };
 }
 #endif // #ifndef CLAN_BUILDING_H

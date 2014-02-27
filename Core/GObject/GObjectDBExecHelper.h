@@ -1526,6 +1526,7 @@ struct DBClanBuildings
     UInt16 magAtkLevel;
     UInt16 actionLevel;
     UInt16 hpLevel;
+    UInt16 oracleLevel;
     UInt16 updateTime;
 };
 }
@@ -3447,7 +3448,7 @@ SPECIALDEF(6)
 SPECIALEND()
 
 SPECIALBEGIN (GObject::DBClanBuildings)
-SPECIALDEF(7)
+SPECIALDEF(8)
     (
     UInt64, clanId,
     UInt32, fairylandEnergy,
@@ -3455,6 +3456,7 @@ SPECIALDEF(7)
     UInt16, magAtkLevel,
     UInt16, actionLevel,
     UInt16, hpLevel,
+    UInt16, oracleLevel,
     UInt16, updateTime
     )
 SPECIALEND()

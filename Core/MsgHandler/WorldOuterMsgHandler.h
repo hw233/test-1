@@ -3775,25 +3775,28 @@ void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
     UInt32 clanId = 0;
     UInt8 type = 0;
     UInt8 leftId = 0; 
-    std::string clanName ;
+    std::string name ;
     UInt8 res = 0;
     UInt32 rpid = 0; 
+    UInt32 battleTime;
     brd >> clanId ;
     brd >> type ;
     brd >> leftId;
-    brd >> clanName;
+    brd >> name;
     brd >> res;
     brd >> rpid;
+    brd >> battleTime;
     Clan * clan = globalClans[clanId];
     if(!clan)
         return ;
-    ClanBuildBattleInfo cbbi(leftId , clanName , res , rpid);
+    ClanBuildBattleInfo cbbi(leftId , name ,type,res , rpid ,battleTime);
     if(clan->getBuildingOwner() == NULL)
         return ;
     clan->getBuildingOwner()->AddBattlesInfo(cbbi);
    // SYSMSGV(title, 825);
    // SYSMSGV(content, 826, GObject::serverWarMgr.getSession());
    // GObject::serverWarMgr.sendTeamMail(title, content);
+    WORLD().setLeftAddrConnection(1);
 }
 
 void OnServerLeftLineupCommited( ServerLeftMsgHdr& hdr, const void * data )
@@ -3838,9 +3841,10 @@ void OnServerLeftRevInfo(ServerLeftMsgHdr& hdr, const void * data)
 	GObject::Player * player = GObject::globalPlayers[playerId];
     if(!player)
         return ;
-    Stream st(REQ::CLAN_FAIRYLAND,0x02);
+    Stream st(REQ::CLAN_FAIRYLAND);
+    st <<static_cast<UInt8>(2);
     std::vector<UInt8> buf;
-    buf.resize(br.size()-16);
+    buf.resize(br.size()-8);
     br >> buf;
     st << buf;
     st << Stream::eos;
@@ -3885,5 +3889,46 @@ void OnServerLeftGetSpirit(ServerLeftMsgHdr& hdr, const void * data)
 void OnServerLeftErrInfo(ServerLeftMsgHdr& hdr, const void * data)
 {
    //0-操作成功 1-对共有遗迹进行守卫操作错误  2-该遗迹无该镇守成员 3-对象以及非该帮派占领 
+}
+// 仙境遗迹协议请求处理
+void OnClanFairyLandReq(GameMsgHdr& hdr,const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL)
+	{
+		Stream st(REP::CLAN_COPY);
+		st << static_cast<UInt8>(0);
+		st << Stream::eos;
+		player->send(st);
+		return;
+    }
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    
+    if (buildingOwner)
+        buildingOwner->processFromBrd(player, brd);
+}
+void OnServerLeftMemberLeave(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 val = 0;
+    br >> val;
+    UInt8 num = 0;
+    br >> num ;
+    UInt64 playerId=  0;
+
+    for(UInt8 i = 0 ; i < num ;++i)
+    {
+        br >> playerId;
+        if( playerId ==0 )
+            continue;
+        GObject::Player * player = GObject::globalPlayers[playerId];
+        if(!player)
+            continue;
+        player->setLeftAddrEnter(!!val);
+    }
 }
 #endif // _WORLDOUTERMSGHANDLER_H_

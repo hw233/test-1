@@ -5,6 +5,8 @@
 #include "Server/WorldServer.h"
 #include "Clan.h"
 #include "Player.h"
+#include "MsgID.h"
+#include "Var.h"
 
 namespace GObject
 {
@@ -16,7 +18,7 @@ namespace GObject
         "actionLevel",
         "hpLevel"
     };
-    
+
     static const UInt8 BUILDINGS_COUNT = 4;
 
     ClanBuilding::ClanBuilding()
@@ -121,27 +123,27 @@ namespace GObject
     {
         if (_clan)
             DB2().PushUpdateData("INSERT IGNORE INTO `clan_buildings` (`clanId`) VALUES (%" I64_FMT "u)", _clan->getId()); 
-    {
-        // 从数据库加载
-        if (!_buildings.empty())
         {
-            WARN_LOG("init ClanBuildingOwner when _buildings not empty.");
+            // 从数据库加载
+            if (!_buildings.empty())
+            {
+                WARN_LOG("init ClanBuildingOwner when _buildings not empty.");
+                return ;
+            }
+            _buildings.resize(GData::clanBuildingList.size());
+            UInt8 index = 0;
+            for (GData::ClanBuildingList::iterator it = GData::clanBuildingList.begin(); it != GData::clanBuildingList.end(); ++it)
+            {
+                _buildings[index].init(index, this);
+                ++index;
+            }
+            if (_buildings.size() <= BUILDINGS_COUNT)
+            {
+                WARN_LOG("_buildings.size = %u.", static_cast<UInt32>(_buildings.size()));
+                return ;
+            }
             return ;
         }
-        _buildings.resize(GData::clanBuildingList.size());
-        UInt8 index = 0;
-        for (GData::ClanBuildingList::iterator it = GData::clanBuildingList.begin(); it != GData::clanBuildingList.end(); ++it)
-        {
-            _buildings[index].init(index, this);
-            ++index;
-        }
-        if (_buildings.size() <= BUILDINGS_COUNT)
-        {
-            WARN_LOG("_buildings.size = %u.", static_cast<UInt32>(_buildings.size()));
-            return ;
-        }
-        return ;
-    }
     }
 
     ClanBuildingOwner::~ClanBuildingOwner()
@@ -149,7 +151,7 @@ namespace GObject
     }
 
     bool ClanBuildingOwner::loadFromDB( UInt32 fairylandEnergy, 
-            UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, 
+            UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, UInt16 oracleLevel,
             UInt16 updateTime)
     {
         // 从数据库加载
@@ -171,6 +173,7 @@ namespace GObject
         _buildings[2].loadFromDB(magAtkLevel, updateTime);
         _buildings[3].loadFromDB(actionLevel, updateTime);
         _buildings[4].loadFromDB(hpLevel, updateTime);
+        _buildings[5].loadFromDB(oracleLevel, updateTime);
         return false;
     }
 
@@ -200,14 +203,127 @@ namespace GObject
         if (brd.empty())
             return;
         brd >> type;
-        std::vector<UInt8> vals;
-        while(!brd.empty())
+        if(type < 2)
         {
-            UInt8 val;
-            brd >> val;
-            vals.push_back(val);
+            std::vector<UInt8> vals;
+            while(brd.left())
+            {
+                UInt8 val;
+                brd >> val;
+                vals.push_back(val);
+            }
+            process(player, type, vals);
         }
-        process(player, type, vals);
+        else
+        {
+            switch(type)
+            {
+                case 0x02:
+                    {
+                        UInt8 op = 0 ;
+                        brd >>op ;
+                        if(op ==1 )
+                        {
+                            UInt8 leftId = 0 ;
+                            UInt8 num = 0;
+                            brd >>leftId ;
+                            brd >> num ; 
+                            if(!player->giveLeftPowerHold(num))
+                                break;
+                            Stream st(SERVERLEFTREQ::LEFTADDR_POWERHOLD, 0xEE);
+                            st << leftId ;
+                            st << static_cast<UInt32>(_clan->getId());
+                            st << num;
+                            st << Stream::eos;
+                            NETWORK()->SendToServerLeft(st);
+                        }
+                        {
+                            Stream st(SERVERLEFTREQ::LEFTADDR_INFO, 0xEE);
+                            st << player->getId() ; 
+                            st << Stream::eos;
+                            NETWORK()->SendToServerLeft(st);
+                        }
+
+                    }
+                    break;
+                case 0x03:
+                    {
+                        UInt8 leftId = 0;
+                        brd >>leftId ;
+                        CreateTeam(player , leftId);
+                    }
+                    break ; 
+                case 0x04:
+                    {
+                        std::string leaderName ;
+                        brd >> leaderName ; 
+                        GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(leaderName)];
+                        EnterTeam(pl,player);
+                    }
+                    break;
+                case 0x05:
+                    {
+                        std::string leaderName ;
+                        std::string playerName;
+                        brd >> leaderName ; 
+                        GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(leaderName)];
+                        GObject::Player * member = GObject::globalNamedPlayers[player->fixName(playerName)];
+                        LeaveTeam(pl,member);
+                    }
+                    break;
+                case 0x06:
+                    {
+                        std::string leaderName ;
+                        UInt8 first = 0;
+                        UInt8 second = 0;
+                        brd >> leaderName ; 
+                        GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(leaderName)];
+                        if( player != pl)
+                            return ;
+                        brd >> first ;
+                        brd >> second ;
+                        ChangeTeamMember(player ,first ,second );
+                    }
+                    break;
+                case 0x07:
+                    AttackLeftAddr(player); 
+                    break;
+                case 0x08:
+                    {
+                        UInt8 leftId = 0;
+                        UInt8 pos1 = 0;
+                        UInt8 pos2 = 0;
+                        UInt64 playerId = player->getId();
+                        brd >> leftId ;
+                        brd >> pos1 ;
+                        brd >> pos2 ;
+                        if(pos1 == 0 && pos2 == 0)
+                            playerId = 0;
+                        Stream st(SERVERLEFTREQ::LEFTADDR_SWITCHPLAYER, 0xEE);
+                        st << leftId ; 
+                        st << _clan->getId() ;
+                        st << playerId ; 
+                        st << pos1;
+                        st << pos2;
+                        st << Stream::eos;
+                        NETWORK()->SendToServerLeft(st);
+                    }
+                    break;
+               case 0x0A:
+                    {
+                        UInt32 battleId = 0;
+                        brd >> battleId;
+                        UInt64 playerId1 = player->getId();
+                        Stream st(SERVERLEFTREQ::BATTLE_REPORT, 0xEE);
+                        st << playerId1 << battleId ; 
+                        st << Stream::eos;
+                        NETWORK()->SendToServerLeft(st);
+                    }
+                    break;
+            }
+            if(type < 9)
+                sendAttackTeamInfo(player); 
+        }
         return;
     }
 
@@ -281,11 +397,19 @@ namespace GObject
     {
         if (!player)
             return;
-        /*
         Stream st(REP::CLAN_FAIRYLAND);
+        st << static_cast<UInt8>(1);
         st << static_cast<UInt8>(0);
+        st << static_cast<UInt32>(_energy);
+        st << getLevel(1);
+        st << getLevel(2);
+        st << getLevel(3);
+        st << getLevel(4);
+        st << getLevel(5);
+        st << static_cast<UInt8>(WORLD().getLeftAddrConnection());
+        SendBattlesInfo(st); 
+        st << Stream::eos;
         player->send(st);
-        */
         return;
     }
 
@@ -304,23 +428,183 @@ namespace GObject
     }
     void ClanBuildingOwner::AddBattlesInfo(struct ClanBuildBattleInfo cbbi)
     {
-        battles_vec.push_back(cbbi);
+        if(battles_deque.size() == 20 )
+            battles_deque.pop_front();
+        battles_deque.push_back(cbbi);
+        for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
+        {
+            if(it->first.leftId == cbbi.leftId )
+            {
+                std::vector<Player *> vec = it->second ;
+                std::map<Player *, UInt8> warSort;
+                for(UInt8 i = 0 ; i < 5 ; ++i)
+                {
+                    UInt32 value = vec[i]->GetVar(VAR_LEFTADDR_POWER);
+                    if(value < 3)
+                        value = 0 ;
+                    else 
+                        value = value - 3 ;
+                    vec[i]->SetVar(VAR_LEFTADDR_POWER ,value);
+                }
+                leftAttackTeams.erase(it);
+                break;
+            }
+        }
     } 
-    void ClanBuildingOwner::SendBattlesInfo( Player * player)
+    void ClanBuildingOwner::SendBattlesInfo( Stream & st)
     {
-        UInt32 size  = battles_vec.size(); 
-        Stream st(REP::CLAN_FAIRYLAND,0x03);
+        UInt32 size  = battles_deque.size(); 
         st << static_cast<UInt32>(size); 
         for(UInt32 i = 0 ; i < size ; ++i )
         {
-            ClanBuildBattleInfo cbbi = battles_vec[i]; 
-            st << static_cast<UInt8>(leftId);
-            st << clanNameOther ;
-            st <<static_cast<UInt8>(res);
-            st << static_cast<UInt32>(battleId);
+            ClanBuildBattleInfo cbbi = battles_deque[i]; 
+            st <<static_cast<UInt32>(cbbi.battleTime);
+            st << static_cast<UInt8>(cbbi.type);
+            st << static_cast<UInt8>(cbbi.leftId);
+            st << cbbi.name ;
+            st <<static_cast<UInt8>(cbbi.res);
+            st << static_cast<UInt32>(cbbi.battleId);
         }
-        st <<Stream::eos; 
+    }
+    void ClanBuildingOwner::CreateTeam(Player * leader ,UInt8 leftId)
+    {
+        if(leader->GetVar(VAR_LEFTADDR_POWER) < 3 )
+            return ;
+        if(leader->getLeftAddrEnter() || leader->GetVar(VAR_LEFTADDR_ENTER))
+            return ;
+        LeftAttackLeader leftAttLeader(leader , leftId);
+        if(leftAttackTeams.size() > 3 )
+            return ;
+        std::vector<Player *> vec ;
+        vec.push_back(leader);
+        leftAttackTeams.insert(make_pair(leftAttLeader , vec));
+        leader->setLeftAddrEnter(true);
+    }
+    void ClanBuildingOwner::ChangeTeamMember(Player * leader , UInt8 first , UInt8 second)
+    {
+        for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
+        {
+            if(it->first.leader == leader )
+            {
+                std::vector<Player *> vec = it->second;
+                if(vec.size() < second)
+                    return ;
+                Player * pl = vec[first];
+                vec[first] = vec[second];
+                vec[second] = pl;
+                break;
+            }
+        }
+    }
+    void ClanBuildingOwner::LeaveTeam(Player * leader, Player * player)
+    {
+        if(player == NULL )
+            return ;
+        for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
+        {
+            if(it->first.leader == leader )
+            {
+                if(leader == player)
+                {
+    //                leftAttackTeams.erase(it);
+                    leader = NULL;
+                }
+                std::vector<Player *> vec = it->second;
+                for(std::vector<Player *>::iterator it_vec = vec.begin(); it_vec != vec.end(); )
+                {
+                    if(*it_vec == player || leader == NULL )
+                    {
+                        (*it_vec)->setLeftAddrEnter(false);
+                        vec.erase(it_vec++);
+                    }
+                    else
+                        ++it_vec;
+                }
+                break;
+            }
+            if(leader == NULL)
+            {
+                leftAttackTeams.erase(it);
+                return ;
+            }
+        }
+        
+    }
+    void ClanBuildingOwner::EnterTeam(Player * leader,  Player * player)
+    {
+        if(player->GetVar(VAR_LEFTADDR_POWER) < 3 )
+            return ;
+        if(player->getLeftAddrEnter() || player->GetVar(VAR_LEFTADDR_ENTER))
+            return ;
+        for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
+        {
+            if(it->first.leader == leader )
+            {
+                if(it->second.size() > 4)
+                    return ;
+                it->second.push_back(player);
+                break;
+            }
+        }
+        player->setLeftAddrEnter(true);
+    }
+    void ClanBuildingOwner::AttackLeftAddr(Player * player)
+    {
+        for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
+        {
+            if(it->first.leader == player )
+            {
+                if(it->second.size() != 5)
+                    return ;
+                std::vector<Player *> vec = it->second ;
+                std::map<Player *, UInt8> warSort;
+                for(UInt8 i = 0 ; i < 5 ; ++i)
+                {
+                    if(vec[i]->GetVar(VAR_LEFTADDR_POWER) < 3 )
+                        return ;
+                    warSort.insert(std::make_pair(vec[i], i)); 
+                }
+                struct SWarEnterData {
+                    Stream st;
+                    std::map<Player *, UInt8> warSort;
+                    SWarEnterData(Stream& st2, std::map<Player *, UInt8>& warSort2) : st(st2), warSort(warSort2) {}
+                };
+
+                Stream st(SERVERLEFTREQ::ENTER, 0xEE);
+                st<<_clan->getId()<<_clan->getName() << player->getName()/*领队*/  << it->first.leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
+                SWarEnterData * swed = new SWarEnterData(st, warSort);
+                std::map<Player *, UInt8>::iterator it = warSort.begin();
+                GameMsgHdr hdr(0x391, it->first->getThreadId(), it->first, sizeof(SWarEnterData*));
+                GLOBAL().PushMsg(hdr, &swed);
+
+            }
+        }
+    }
+    void ClanBuildingOwner::LineUp(Player * player)
+    {
+        GameMsgHdr hdr(0x392, player->getThreadId(), player, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+    void ClanBuildingOwner::sendAttackTeamInfo(Player *player)
+    {
+        Stream st(REP::CLAN_FAIRYLAND);
+        st <<static_cast<UInt8>(9);
+        st <<static_cast<UInt8>(player->GetVar(VAR_LEFTADDR_POWER));
+        st <<static_cast<UInt8>( leftAttackTeams.size() ); 
+        for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
+        {
+            st << it->first.leader->getName();
+            st << static_cast<UInt8>( it->first.leftId );
+            std::vector<Player* > vec = it->second;
+            st << static_cast<UInt8>( vec.size() );
+            for(UInt8 i = 0 ; i < vec.size() ; ++i )
+            {
+                st <<static_cast<UInt8>(vec[i]->GetClassAndSex()) <<vec[i]->getName() << vec[i]->GetLev() << vec[i]->getBattlePoint();
+            }
+        }
+        st << Stream::eos;
         player->send(st);
+        
     }
 }
 

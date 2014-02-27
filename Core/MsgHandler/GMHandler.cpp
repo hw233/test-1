@@ -5163,12 +5163,12 @@ void GMHandler::OnClanBuildingLevelChange(GObject::Player *player, std::vector<s
 }
 void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::string>& args)
 {
-	if(args.size() < 1)
+	if(args.size() < 2)
         return;
     UInt32 leftId = atoi(args[0].c_str());
+    UInt32 clanId = atoi(args[1].c_str());
     std::map<Player *, UInt8> warSort;
     UInt8 i = 0, j = 0;
-    UInt32 clanId = 0;
     std::string clanName = "";
     UInt32 size = globalPlayers.size();
     if(size < 5 )
@@ -5185,9 +5185,9 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
             continue;
         }
         GObject::Player * player = it->second;
-        if(clanId == 0 )
+        //if(clanId == 0 )
         {
-            if(player->getClan())
+            if(player->getClan()->getId() == clanId )
             {
                 clanId = player->getClan()->getId();
                 clanName = player->getClanName();
@@ -5205,12 +5205,11 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
             struct SWarEnterData {
                 Stream st;
                 std::map<Player *, UInt8> warSort;
-
                 SWarEnterData(Stream& st2, std::map<Player *, UInt8>& warSort2) : st(st2), warSort(warSort2) {}
             };
 
             Stream st(SERVERLEFTREQ::ENTER, 0xEE);
-            st<<clanId <<clanName<<leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
+            st<<clanId <<clanName << player->getName()/*领队*/  <<leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
             SWarEnterData * swed = new SWarEnterData(st, warSort);
             std::map<Player *, UInt8>::iterator it = warSort.begin();
             GameMsgHdr hdr(0x391, it->first->getThreadId(), it->first, sizeof(SWarEnterData*));
@@ -5255,7 +5254,6 @@ void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::strin
         pos1 = atoi(args[4].c_str());
         pos2 = atoi(args[5].c_str());
     }
-
     switch(bpId)
     {
         case 1:
@@ -5278,6 +5276,16 @@ void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::strin
                 NETWORK()->SendToServerLeft(st);
                 break; 
             } 
+        case 3:
+            {
+                Stream st(SERVERLEFTREQ::LEFTADDR_POWERHOLD, 0xEE);
+                st << static_cast<UInt8>(12);
+                st << static_cast<UInt32>(10);
+                st << static_cast<UInt8>(5);
+                st << Stream::eos;
+                NETWORK()->SendToServerLeft(st);
+            }
+            break;
     }
 }
 

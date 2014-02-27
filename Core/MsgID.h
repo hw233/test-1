@@ -608,6 +608,7 @@ namespace REP
     const UInt8 CLANALLOCRECORD     = 0x9F;
 
     const UInt8 CLAN_COPY           = 0x5C;
+    const UInt8 CLAN_FAIRYLAND      = 0x5D;
 
     const UInt8 MAIL_ID_LIST        = 0x40;// 0xA6
     const UInt8 MAIL_LIST           = 0x41;// 0xA0
@@ -944,6 +945,7 @@ namespace SERVERLEFTREQ
     const UInt8 BATTLE_REPORT       = 0x05;
     const UInt8 LEFTADDR_INFO       = 0x06;
     const UInt8 LEFTADDR_SWITCHPLAYER       = 0x07;
+    const UInt8 LEFTADDR_POWERHOLD       = 0x08;
     
     const UInt8 ARENA_TO_SERVERWAR  = 0x10;     //"仙界第一/仙界至尊"TCP连接"仙界传奇" 占用
 }

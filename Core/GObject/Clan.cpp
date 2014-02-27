@@ -4943,14 +4943,14 @@ ClanBuildingOwner* Clan::getNewBuildOwner()
 }
 
 bool Clan::loadBuildingsFromDB(UInt32 fairylandEnergy, 
-        UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, 
+        UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, UInt16 oracleLevel,
         UInt16 updateTime)
 {
     if (!_buildingOwner)
         _buildingOwner = new ClanBuildingOwner(this);
     if (!_buildingOwner)
         return false;
-    _buildingOwner->loadFromDB(fairylandEnergy, phyAtkLevel, magAtkLevel, actionLevel, hpLevel, updateTime);
+    _buildingOwner->loadFromDB(fairylandEnergy, phyAtkLevel, magAtkLevel, actionLevel, hpLevel, oracleLevel, updateTime);
     return true;
 }
 

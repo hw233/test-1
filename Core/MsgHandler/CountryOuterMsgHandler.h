@@ -8263,26 +8263,6 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
     }
 }
 
-// 仙境遗迹协议请求处理
-void OnClanFairyLandReq(GameMsgHdr& hdr,const void * data)
-{
-	MSG_QUERY_PLAYER(player);
-
-	GObject::Clan * clan = player->getClan();
-	if(clan == NULL)
-	{
-		Stream st(REP::CLAN_COPY);
-		st << static_cast<UInt8>(0);
-		st << Stream::eos;
-		player->send(st);
-		return;
-    }
-    BinaryReader brd(data, hdr.msgHdr.bodyLen);
-
-    GObject::ClanBuildingOwner* buildingOwner = clan->getBuildingOwner();
-    if (buildingOwner)
-        buildingOwner->processFromBrd(player, brd);
-}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

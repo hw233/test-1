@@ -288,6 +288,7 @@ struct DBClanBuilding
     UInt32 magAtkValue;     // 法攻加成
     UInt32 actionValue;     // 身法加成
     UInt32 hpValue;         // 生命加成
+    UInt32 oracleValue;         // 神谕塔
 };
 
 struct DBSoulSkillType
@@ -990,14 +991,15 @@ SPECIALDEF(10)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBClanBuilding)
-SPECIALDEF(6)
+SPECIALDEF(7)
     (
     UInt16, level,
     UInt32, needExp,
     UInt32, phyAtkValue,
     UInt32, magAtkValue,
     UInt32, actionValue,
-    UInt32, hpValue
+    UInt32, hpValue,
+    UInt32, oracleValue         // 神谕塔
     )
 SPECIALEND()
 

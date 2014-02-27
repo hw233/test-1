@@ -785,7 +785,7 @@ public:
     ClanBuildingOwner* getClanBuildingOwner();
 
     bool loadBuildingsFromDB(UInt32 fairylandEnergy, 
-            UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, 
+            UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, UInt16 oracleLevel,
             UInt16 updateTime);
 };
 

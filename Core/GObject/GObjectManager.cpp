@@ -4130,7 +4130,7 @@ namespace GObject
         lc.prepare("Loading clan buildings:");
         DBClanBuildings clanBuildings;
 		if(execu->Prepare("SELECT `clanId`, `fairylandEnergy`, "
-                    "`phyAtkLevel`, `magAtkLevel`, `actionLevel`, `hpLevel`, "
+                    "`phyAtkLevel`, `magAtkLevel`, `actionLevel`, `hpLevel`,`oracleLevel` "
                     " `updateTime` FROM `clan_buildings`", clanBuildings) != DB::DB_OK)
 			return false;
         clan = NULL;
@@ -4146,7 +4146,7 @@ namespace GObject
             }
             if (clan == NULL) continue;
             clan->loadBuildingsFromDB(clanBuildings.fairylandEnergy, 
-                    clanBuildings.phyAtkLevel, clanBuildings.magAtkLevel, clanBuildings.actionLevel, clanBuildings.hpLevel,
+                    clanBuildings.phyAtkLevel, clanBuildings.magAtkLevel, clanBuildings.actionLevel, clanBuildings.hpLevel,clanBuildings.oracleLevel,
                     clanBuildings.updateTime);
         }
         lc.finalize();

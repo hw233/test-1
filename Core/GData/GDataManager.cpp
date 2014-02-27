@@ -1747,7 +1747,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBClanBuilding cb;
 		if (execu->Prepare("SELECT `level`, `needExp`, "
-                    "`phyAtkValue`, `magAtkValue`, `actionValue`, `hpValue`"
+                    "`phyAtkValue`, `magAtkValue`, `actionValue`, `hpValue` , `oracleValue`"
                     "FROM `clan_building_template` ORDER BY `level` ASC", cb) != DB::DB_OK)
 			return false;
         clanBuildingList.clear();
@@ -1784,6 +1784,13 @@ namespace GData
                 if (cb.level >= clanBuildingTable.size())
                     clanBuildingTable.resize(cb.level + 1);
                 clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypeHP, cb.level, cb.needExp, cb.hpValue);
+            }
+            {
+                // 神域塔
+                ClanBuildingTable& clanBuildingTable = clanBuildingList[GData::buildingTypeOracle];
+                if (cb.level >= clanBuildingTable.size())
+                    clanBuildingTable.resize(cb.level + 1);
+                clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypeOracle, cb.level, cb.needExp, cb.oracleValue);
             }
 		}
         return true;

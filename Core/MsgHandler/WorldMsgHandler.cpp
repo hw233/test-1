@@ -40,6 +40,7 @@ MSG_REG(GameMsgHdr, OnAthleticsListReq);
 MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_CHALLENGE, OnAthleticsChallengeReq);
 MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_PAGING,    OnAthleticsPaging);
 MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_KILLCD,    OnAthleticsKillCD);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_FAIRYLAND, OnClanFairyLandReq);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
 MSG_REG(GameMsgHdr, OnAthleticsGetAwardReq);
 MSG_REG(GameMsgHdr, OnLuckDrawRankListReq);
@@ -102,6 +103,7 @@ MSG_REG_2(ServerLeftMsgHdr, 0x135, OnServerLeftGetAward);  //帮派获得仙界�
 MSG_REG_2(ServerLeftMsgHdr, 0x136, OnServerLeftBattleReport); //接受战报
 MSG_REG_2(ServerLeftMsgHdr, 0x137, OnServerLeftRevInfo);   //接受遗迹信息
 MSG_REG_2(ServerLeftMsgHdr, 0x138, OnServerLeftErrInfo);   //接受错误信息
+MSG_REG_2(ServerLeftMsgHdr, 0x139, OnServerLeftMemberLeave);   //接受错误信息
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);

@@ -28541,6 +28541,24 @@ void Player::sendSummerMeetScoreInfo()
     st << Stream::eos;
     send(st);
 }
+bool Player::giveLeftPowerHold(UInt32 num)
+{
+    UInt8 ret = 0;
+    {
+        UInt16 count = GetPackage()->GetItemAnyNum(466) ;
+        ItemBase * item = GetPackage()->FindItem(466, true);
+        if (!item)
+            item =GetPackage()->FindItem(466, false);
+        if(item ==NULL)
+            return false;
+        if(num > count)
+            return false;
+        GetPackage()->DelItemAny(466, num );
+        GetPackage()->AddItemHistoriesLog(466, num );
+        ret = 1;
+    }
+    return true;
+}
 } // namespace GObject
 
 
