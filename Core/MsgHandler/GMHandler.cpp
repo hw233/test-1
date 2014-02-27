@@ -5173,6 +5173,10 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
     UInt32 size = globalPlayers.size();
     if(size < 5 )
         return ;
+    Clan* clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    clanName = clan->getName();
     UInt32 urand = uRand(size - 5); 
     UInt8 k = 0 ;
     for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
@@ -5185,9 +5189,9 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
             continue;
         }
         GObject::Player * player = it->second;
-        //if(clanId == 0 )
+        if(clanName == "" )
         {
-            if(player->getClan()->getId() == clanId )
+            if(player->getClan()!= NULL && player->getClan()->getId() == clanId )
             {
                 clanId = player->getClan()->getId();
                 clanName = player->getClanName();

@@ -264,7 +264,7 @@ namespace GObject
                 case 0x05:
                     {
                         std::string leaderName ;
-                        std::string playerName;
+                        std::string playerName = player->getName();
                         brd >> leaderName ; 
                         GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(leaderName)];
                         GObject::Player * member = GObject::globalNamedPlayers[player->fixName(playerName)];
@@ -506,26 +506,31 @@ namespace GObject
             {
                 if(leader == player)
                 {
-    //                leftAttackTeams.erase(it);
+    //              leftAttackTeams.erase(it);
                     leader = NULL;
                 }
                 std::vector<Player *> vec = it->second;
-                for(std::vector<Player *>::iterator it_vec = vec.begin(); it_vec != vec.end(); )
+                for(std::vector<Player *>::iterator it_vec = it->second.begin(); it_vec != it->second.end(); )
                 {
                     if(*it_vec == player || leader == NULL )
                     {
                         (*it_vec)->setLeftAddrEnter(false);
-                        vec.erase(it_vec++);
+                        it->second.erase(it_vec);
+                        break;
                     }
                     else
                         ++it_vec;
                 }
+                if(leader == NULL)
+                {
+                    leftAttackTeams.erase(it);
+                }
+                for(UInt8 i = 0 ; i < 5 ; ++i)
+                {
+                    if(vec[i]!=NULL && vec[i] != player)
+                        sendAttackTeamInfo(vec[i]);
+                }
                 break;
-            }
-            if(leader == NULL)
-            {
-                leftAttackTeams.erase(it);
-                return ;
             }
         }
         
@@ -536,17 +541,31 @@ namespace GObject
             return ;
         if(player->getLeftAddrEnter() || player->GetVar(VAR_LEFTADDR_ENTER))
             return ;
+        std::vector<Player *> vec;
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
             if(it->first.leader == leader )
             {
                 if(it->second.size() > 4)
                     return ;
+                vec = it->second ;
+                for(std::vector<Player *>::iterator it_vec = vec.begin(); it_vec != vec.end(); ++ it_vec )
+                {
+                    if(*it_vec == player )
+                    {
+                        return ;
+                    }
+                }
                 it->second.push_back(player);
+                for(std::vector<Player *>::iterator it_vec = vec.begin(); it_vec != vec.end(); ++it_vec)
+                {
+                    sendAttackTeamInfo(*it_vec,leader);
+                }
+                player->setLeftAddrEnter(true);
                 break;
             }
         }
-        player->setLeftAddrEnter(true);
+
     }
     void ClanBuildingOwner::AttackLeftAddr(Player * player)
     {
@@ -585,20 +604,26 @@ namespace GObject
         GameMsgHdr hdr(0x392, player->getThreadId(), player, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
-    void ClanBuildingOwner::sendAttackTeamInfo(Player *player)
+    void ClanBuildingOwner::sendAttackTeamInfo(Player *player  , Player *leader)
     {
         Stream st(REP::CLAN_FAIRYLAND);
+        if(player == NULL)
+            return ;
         st <<static_cast<UInt8>(9);
         st <<static_cast<UInt8>(player->GetVar(VAR_LEFTADDR_POWER));
         st <<static_cast<UInt8>( leftAttackTeams.size() ); 
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
+            if(leader != NULL && it->first.leader != leader)
+                continue ;
             st << it->first.leader->getName();
             st << static_cast<UInt8>( it->first.leftId );
             std::vector<Player* > vec = it->second;
             st << static_cast<UInt8>( vec.size() );
             for(UInt8 i = 0 ; i < vec.size() ; ++i )
             {
+                if(vec[i]==NULL)
+                    continue;
                 st <<static_cast<UInt8>(vec[i]->GetClassAndSex()) <<vec[i]->getName() << vec[i]->GetLev() << vec[i]->getBattlePoint();
             }
         }
@@ -606,5 +631,6 @@ namespace GObject
         player->send(st);
         
     }
+
 }
 

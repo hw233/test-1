@@ -3928,7 +3928,11 @@ void OnServerLeftMemberLeave(ServerLeftMsgHdr& hdr, const void * data)
         GObject::Player * player = GObject::globalPlayers[playerId];
         if(!player)
             continue;
-        player->setLeftAddrEnter(!!val);
+        if(val)
+            player->setLeftAddrEnter(true);
+        else
+            player->setLeftAddrEnter(false);
+
     }
 }
 #endif // _WORLDOUTERMSGHANDLER_H_

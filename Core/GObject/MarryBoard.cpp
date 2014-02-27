@@ -554,13 +554,13 @@ namespace GObject
                     sprintf(str, "F_140102_17");
                     pl->udpLog("jiehunjinxing", str, "", "", "", "", "act");
                 }
+                pl->SetVar(VAR_MARRYBOARD4_TIME,now);
+                pl->AddVar(VAR_MARRYBOARD_LIVELY,15);
+                _lively += 1;
+                char str[16] = {0};
+                sprintf(str, "F_140102_16");
+                pl->udpLog("jiehunjinxing", str, "", "", "", "", "act");
             }
-            pl->SetVar(VAR_MARRYBOARD4_TIME,now);
-            pl->AddVar(VAR_MARRYBOARD_LIVELY,15);
-            _lively += 1;
-            char str[16] = {0};
-            sprintf(str, "F_140102_16");
-            pl->udpLog("jiehunjinxing", str, "", "", "", "", "act");
         }
     }
     UInt32 MarryBoard::wrapTheKey(UInt32 plKey)
