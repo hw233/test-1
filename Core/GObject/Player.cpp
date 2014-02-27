@@ -28560,7 +28560,7 @@ void Player::doGuankaAct(UInt8 type)
     UInt8 index = GET_BIT_3(data, type);
     if(index >= 5) return;
     UInt32 npcId = npcIds[type][index];
-    bool res = attackNpc(npcId, 0xFFFFFFFF, GetLev() <= 20);
+    bool res = attackNpc(npcId, 500, GetLev() <= 20);
     if(res)
     {
         AddVar(VAR_GUANKA_ACTION_SCORE, scores[index]);
