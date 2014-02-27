@@ -2762,7 +2762,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBRideConfig dbrc;
-		if(execu->Prepare("SELECT `id`, `name`, `itemId`, `chips`, `propId` FROM `ride`", dbrc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `itemId`, `chips`, `propId`, `show` FROM `ride`", dbrc) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)

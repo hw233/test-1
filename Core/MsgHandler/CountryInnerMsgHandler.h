@@ -2657,6 +2657,14 @@ void OnServerLeftInfoReq(GameMsgHdr& hdr, const void* data)
     st << Stream::eos;
     NETWORK()->SendToServerLeft(st);
 }
+void OndoGuankaAct( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 type = *reinterpret_cast<const UInt8 *>(data);
+
+    player->doGuankaAct(type);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 

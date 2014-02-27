@@ -420,6 +420,7 @@ class ServerWarMgr
         void jiJianTai_complete(Player *, UInt8);
         void jiJianTai_convert(Player *);
         void jiJianTai_openBox(Player *, UInt8);
+        void jiJianTai_buyTimes(Player *);
         void sendjiJianTaiInfo(Player *);
         void enterArena();
         void enterArena_neice();

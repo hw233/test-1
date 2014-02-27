@@ -409,6 +409,7 @@ MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
 MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
 MSG_REG_2(GameMsgHdr, 0x355, OnGetFindOldManAward);
 MSG_REG_2(GameMsgHdr, 0x356, OnGetInteresingBag);
+MSG_REG_2(GameMsgHdr, 0x357, OndoGuankaAct);
 
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);

@@ -1123,6 +1123,13 @@ void Leaderboard::buildPacketForPet()
             std::map<UInt8, UInt8>::const_iterator iter = item.sanhun.begin();
             for(; iter != item.sanhun.end(); ++iter)
                 st << iter->first << iter->second;
+            //七魄
+            st << static_cast<UInt8>(7);
+            for(UInt8 j = 0; j < 7; j++)
+            {
+                st << item.soulLevel[j];
+                st << item.skillIndex[j];
+            }
         }
         ++ i;
 	}
@@ -1178,6 +1185,11 @@ void Leaderboard::pushPetInfo(FairyPet* pet)
         }
     }
     petInfo.sanhun = pet->getSanhun();
+    for(UInt8 i = 0; i < 7; i++)
+    {
+        petInfo.soulLevel[i] = pet->getSevenSoulSoulLevel(i);
+        petInfo.skillIndex[i] = pet->getSevenSoulSkillIndex(i);
+    }
 
     _petInfoSet.insert(petInfo);
     _petInfoSetMap.insert(std::make_pair(pl, _petInfoSet.find(petInfo)));

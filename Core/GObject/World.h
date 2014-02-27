@@ -587,7 +587,19 @@ public:
             return true;
         else
             return false;
-    } 
+    }
+    
+    inline static bool  get3366BuyTime()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_3366_BUY_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_3366_BUY_END);
+        UInt32 now = TimeUtil::Now() ;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    }
+
     inline static bool  getOldManTime()
     {
         //UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
@@ -603,8 +615,8 @@ public:
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 1, 25);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 1, 30);
+        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 2, 24);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 3, 1);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
@@ -977,6 +989,19 @@ public:
             return false;
     } 
 
+    inline static bool getGuankaAct(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_GUANKAACT_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_GUANKAACT_END);
+        UInt32 now = TimeUtil::Now() + time;
+        if(begin == 0 && end == 0)
+            return _guankaAct;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    }
+
     inline static void setRYHBActivity(bool v)
     {
         UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
@@ -1241,6 +1266,7 @@ public:
     static bool _happyFire;
     static bool _11time;
     static bool _qishiban;
+    static bool _guankaAct;
     static bool _ggtime;
     static bool _qzoneRechargetime;
     static bool _ryhbActivity;
@@ -1263,6 +1289,7 @@ public:
     static bool _buyfund;
 public:
     static RCSortType qishibanScoreSort;     //七石板积分排名
+    static RCSortType guankaScoreSort;     //关卡活动积分排名
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
     static RCSortType popularitySort;
@@ -1336,6 +1363,10 @@ public:
     void DelMemCach_CFriend_InvitedAct(UInt64);
     void SetMemCach_CFriend_InvitedAct(UInt64);
     UInt16 GetMemCach_CFriend_InvitedAct(UInt64);
+    void SetMemCach_guankaActInfo(const char * openId, std::string info);
+    bool GetMemCach_guankaActInfo(const char * openId, std::string& info);
+    void DelMemCach_guankaAct(const char * openId);
+
     void UpdateQixiScore(Player* pl, Player* lover);
     void sendGuangGunPlayers(Player* pl);
     void sendQixiPlayers(Player* pl);
@@ -1364,6 +1395,7 @@ public:
     void SendGuangGunAward();
     static UInt16 GetRandomSpot();
     void SendHappyFireAward();
+    void SendGuankaActAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

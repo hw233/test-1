@@ -202,7 +202,9 @@ bool World::_consumeawardact = false;
 bool World::_summerFlow = false;
 bool World::_summerMeet = false;
 bool World::_qishiban = false;
+bool World::_guankaAct = false;
 RCSortType World::qishibanScoreSort;
+RCSortType World::guankaScoreSort;
 RCSortType World::rechargeSort;
 RCSortType World::consumeSort;
 RCSortType World::popularitySort;
@@ -329,6 +331,7 @@ bool bFoolBaoEnd =  false;
 bool bHalfGoldEnd = false;
 bool bSurnameLegendEnd = false;
 bool bHappyFireEnd = false;
+bool bGuankaEnd = false;
 bool b11TimeEnd = false;
 bool bGGTimeEnd = false;
 bool bSnowEnd = false;
@@ -479,6 +482,20 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -508,6 +525,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 8)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
         ))
     {
 #if 0
@@ -1077,11 +1095,11 @@ void SendRechargeRankAward()
             if (pos <= 7)
                 SYSMSG_BROADCASTV(4033, pos, player->getCountry(), player->getPName(), i->total);
 
-            char id[1024] = {0};
+            //char id[1024] = {0};
             char ctx[1024] = {0};
-            snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
-            snprintf(ctx, sizeof(ctx), "%" I64_FMT "u_%s_%u", player->getId(), player->getRealName().c_str(), i->total);
-            World::udpLog("huodong", id, ctx, "", "", "", "act");
+            //snprintf(id, sizeof(id), "F_10000_1213_%u_%d", cfg.serverNum, pos);
+            snprintf(ctx, sizeof(ctx), "%u_%u_%" I64_FMT "u_%s_%u", cfg.serverNum, pos, player->getId(), player->getRealName().c_str(), i->total);
+            World::udpLog("huodong", "F_10000_1213", ctx, "", "", "", "act");
         }
         World::rechargeSort.clear();
     }
@@ -1213,6 +1231,7 @@ void World::World_Midnight_Check( World * world )
     bool bfoolbao = getFoolBao();
     bool bsurnamelegend = getSurnameLegend();
     bool bhappyfirend = getHappyFireTime();
+    bool bGuanka = getGuankaAct();
     bool b11time = get11Time();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
@@ -1259,6 +1278,7 @@ void World::World_Midnight_Check( World * world )
     bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
     //跨年大转盘
     bHappyFireEnd = bhappyfirend && !getHappyFireTime(300);
+    bGuankaEnd = bGuanka && !getGuankaAct(300);
     b11TimeEnd = b11time && !get11Time();
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
@@ -1337,6 +1357,21 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1424,6 +1459,8 @@ void World::World_Midnight_Check( World * world )
         world->SendQiShiBanAward();
     if(bHappyFireEnd)
         world->SendHappyFireAward();
+    if(bGuankaEnd)
+        world->SendGuankaActAward();
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
   //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
@@ -2089,12 +2126,13 @@ bool World::Init()
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
-
+    /*
     if (!GVAR.GetVar(GVAR_QISHIBAN_INVITE_ENABLE))
     {
         globalPlayers.enumerate(enum_qishibaninviteenable, static_cast<void *>(NULL));
         GVAR.SetVar(GVAR_QISHIBAN_INVITE_ENABLE, 1);
     }
+    */
 
     
     if( GObject::MarryBoard::instance().sendAward())
@@ -3011,6 +3049,18 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::happyFireSort.insert(s);
         }
     }
+    if (World::getGuankaAct())
+    {
+        UInt32 score = p->GetVar(VAR_GUANKA_ACTION_SCORE);
+        if (score)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = score;
+            s.time = p->GetVar(VAR_GUANKA_ACTION_TIME);
+            World::guankaScoreSort.insert(s);
+        }
+    }
     return true;
 }
 inline bool clan_enum_grade(GObject::Clan *clan,int)
@@ -3536,9 +3586,9 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{509,30},{515,30},{9438,60},{134,30},{9075,50}},
-        {{509,25},{515,25},{9438,50},{134,25},{9075,40}},
-        {{509,20},{515,20},{9438,40},{134,20},{9075,30}},
+        {{9424,50},{515,30},{9438,60},{134,30},{9022,40}},
+        {{9424,40},{515,25},{9438,50},{134,25},{9022,30}},
+        {{9424,30},{515,20},{9438,40},{134,20},{9022,20}},
     };
    // static MailPackage::MailItem card = {9922,1};
     SYSMSG(title, 4950);
@@ -3924,6 +3974,54 @@ void World::DelMemCach_CFriend_InvitedAct(UInt64 userId)
     }
 }
 
+void World::SetMemCach_guankaActInfo(const char * openId, std::string info)
+{
+    if (_memcinited)
+    {
+        //info==> name_(country|sex)_score
+        char value[64] = {0};
+        char key[MEMCACHED_MAX_KEY] = {0};
+
+        size_t len = snprintf(key,sizeof(key), "guankaActinfo_%s", openId);
+        key[MEMCACHED_MAX_KEY - 1] = '\0';
+        size_t vlen = snprintf(value, sizeof(value), "%s", info.c_str());
+        value[64 - 1] = '\0';
+        bool res = m_MCached.set(key, len, value, vlen, 0);
+        TRACE_LOG("guanka==>setKey: %s, setName: %s, res:%u", key, value, res);
+    }
+}
+
+bool World::GetMemCach_guankaActInfo(const char * openId, std::string& info)
+{
+    // 获取关卡活动玩家相关信息
+    char value[64]={0};
+    char key[MEMCACHED_MAX_KEY] = {0};
+    snprintf(key, MEMCACHED_MAX_KEY, "guankaActinfo_%s", openId);
+
+    bool ret = false;
+
+    if (_memcinited)
+    {
+        const char* res = m_MCached.get(key, value, sizeof(value));
+        TRACE_LOG("guanka==>getKey: %s, getInfo: %s, res:%u", key, value, res);
+        info = value;
+        if (res)
+            ret = true;
+    }
+
+    return ret;
+}
+
+void World::DelMemCach_guankaAct(const char * openId)
+{
+    if (_memcinited)
+    {
+        char key[MEMCACHED_MAX_KEY] = {0};
+        snprintf(key, MEMCACHED_MAX_KEY, "guankaActinfo_%s", openId);
+        m_MCached.del(key);
+    }
+}
+
 UInt16 World::GetRandomSpot()
 {
     GObject::MapList::iterator it;
@@ -4126,5 +4224,45 @@ void World::SendHappyFireAward()
         }
     }
 }
+
+void World::SendGuankaActAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][5] = {
+        {{1325,40},{9418,60},{9075,40},{515,60},{0,0}},
+        {{1325,20},{9418,30},{9075,20},{515,30},{0,0}},
+        {{515,20},{9438,10},{9075,10},{134,10},{0,0}},
+        {{515,10},{9438,10},{134,10},{0,0},{0,0}},
+        {{15,10},{515,5},{134,5},{9438,5},{500,5}},
+    };
+    int pos = 0;
+    for (RCSortType::iterator i = World::guankaScoreSort.begin(), e = World::guankaScoreSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (!player)
+            continue;
+        ++ pos;
+        SYSMSGV(title, 5123, pos);
+        if(pos > 10)
+            break;
+        UInt32 score = i->total;
+        if(pos > 0 && pos <= 10)     //奖励前10名
+        {
+            int type = pos;
+            if(pos >= 4 && pos <= 5)
+                type = 4;
+            else if(pos > 5)
+                type = 5;
+            SYSMSGV(content, 5124, score, pos);
+            MailItemsInfo itemsInfo(s_item[type-1], Activity, 5);
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+            {
+                mailPackageManager.push(mail->id, s_item[type-1], 5, true);
+            }
+        }
+    }
+}
+
 }
 

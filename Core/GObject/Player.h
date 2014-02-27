@@ -272,6 +272,7 @@ namespace GObject
         TIANYOU     = 16,   //天佑术
         FANTIAN     = 17,   //梵天宝卷
         JIUXIAO     = 18,   //九霄唤龙枪
+        TIANGANG    = 19,   //天罡剑诀
 
         DRAGONKING_MAX,
     };
@@ -1705,6 +1706,7 @@ namespace GObject
         void beVoted();
 
         void prayForOther(Player *other);
+        void limitQQFriend(UInt8 tmp);
         void sendPresentForOther(UInt64 playerId,UInt32 type);
         UInt32 getPresentBoxRest();
         UInt32 getPresentCount();
@@ -2918,6 +2920,9 @@ namespace GObject
         void getBuyFundInfo(UInt8 opt);
         void buyFund(UInt16 num);
         void getBuyFundAward(UInt8 opt);
+        void doGuankaAct(UInt8);
+        void sendguankaActMyRank();
+        void getguankaScoreAward(UInt8);
 
     public:
         // 八部浮屠
@@ -2986,6 +2991,7 @@ namespace GObject
         void handleJiqirenAct_dungeon();
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
+        void sevensoul_fixed();
 	};
 
 

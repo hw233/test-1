@@ -1759,6 +1759,9 @@ void OnArenaWarOpReq( GameMsgHdr& hdr, const void * data )
                     GObject::serverWarMgr.jiJianTai_openBox(player, idx);
                 }
                 break;
+            case 0x06:
+                GObject::serverWarMgr.jiJianTai_buyTimes(player);
+                break;
             }
         }
 		break;
@@ -2724,6 +2727,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x25:
         case 0x27:
         case 0x29:
+        case 0x3A:
         {
             brd >> op;
             switch(op)
@@ -3152,6 +3156,78 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             GLOBAL().PushMsg(hdr, (void*)data);
             break;
         }
+        case 0x30:
+        {
+            if(!World::getGuankaAct() || player->GetLev() < 65)
+                return;
+            brd >> op;
+            switch(op)
+            {
+                case 0:
+                    player->sendguankaActMyRank();
+                    break;
+                case 1:
+                    {
+                        UInt16 count = 0;
+                        brd >> count;
+
+                        Stream st(REP::ACT);
+                        st << static_cast<UInt8>(0x30) << static_cast<UInt8>(0x01);
+                        st << count;
+
+                        for(UInt32 i = 0; i < count; i ++)
+                        {
+                            std::string openId;
+                            openId.clear();
+                            brd >> openId;
+                            std::string info;
+                            bool ret = WORLD().GetMemCach_guankaActInfo(openId.c_str(), info);
+                            if (ret)
+                            {
+                                StringTokenizer tokenizer(info, "_");
+                                if (tokenizer.count() >= 3)
+                                {
+                                    UInt8 csex = atoi(tokenizer[1].c_str());
+                                    UInt16 score = atoi(tokenizer[2].c_str());
+                                    st << tokenizer[0] << csex << score;
+                                }
+                                else
+                                    ret = false;
+                            }
+
+                            if (!ret)
+                            {
+                                st << std::string("未找到");
+                                st << static_cast<UInt8>(0) << static_cast<UInt16>(0);
+                            }
+                        }
+                        st << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
+                case 2:
+                    {
+                        GameMsgHdr hdr(0x1B8, WORKER_THREAD_WORLD, player, 0);
+                        GLOBAL().PushMsg(hdr, NULL);
+                    }
+                    break;
+                case 3:
+                    {
+                        UInt8 type = 0xFF;
+                        brd >> type;
+                        player->doGuankaAct(type);
+                    }
+                    break;
+                case 4:
+                    {
+                        UInt8 type = 0xFF;
+                        brd >> type;
+                        player->getguankaScoreAward(type);
+                    }
+                    break;
+            }
+        }
+        break;
         default:
             break;
     }

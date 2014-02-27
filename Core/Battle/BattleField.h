@@ -56,6 +56,8 @@ public:
 	BattleObject * getObjectXY(int, int, int);
 	int getDistance(int, int, int, int);
     int getSpecificTarget(int side, bool(*f)(BattleObject* bo));
+    bool getSpecificTargets(int side, int pos, int val, std::vector<UInt8>& poslist, 
+            bool(*f)(BattleObject* bo, UInt8 targetPos, UInt8 maxLength));
 	int getPossibleTarget(int, int); // return -1 for no found target, overload in Simulator
 	void updateDistance();
 	void updateDistance(int, int);
