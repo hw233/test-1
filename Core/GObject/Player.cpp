@@ -3649,7 +3649,10 @@ namespace GObject
 
 		if(GameAction()->RunExploreTask(this, npcId))
 			turns = 0;
-		Battle::BattleSimulator bsim(_playerData.location, this, ng->getName(), ng->getLevel(), false, turns);
+        UInt32 bs = _playerData.location;
+        if(World::getGuankaAct() && npcId >= 13500 && npcId <= 13529)
+            bs = Battle::BS_WBOSS;
+		Battle::BattleSimulator bsim(bs, this, ng->getName(), ng->getLevel(), false, turns);
 
 		PutFighters( bsim, 0 );
 		if(npcId == 6145)
@@ -4648,7 +4651,7 @@ namespace GObject
 		else
 			cnt = end - start;
 		Stream st(REP::FRIEND_LIST);
-		st << static_cast<UInt8>(type) << static_cast<UInt8>(GetVar(VAR_HAS_VOTE)?1:0) << start << cnt << sz;
+		st << static_cast<UInt8>(type) << static_cast<UInt8>(GetVar(VAR_HAS_VOTE)?1:0) << static_cast<UInt8>(GetVar(VAR_FRIEND_SECURITY))  << start << cnt << sz;
         if (sz && cnt)
         {
             std::set<Player *>::iterator it = _friends[type].begin();
@@ -4668,6 +4671,7 @@ namespace GObject
                 // std::cout <<pl->getId()<<"@!@# "<<pl->GetVar(VAR_PRAY_TYPE)<<"!!@!"<<pl->GetVar(VAR_PRAY_VALUE)<<std::endl;
                 std::string openid = pl->getOpenId();
                 st << openid;
+                st << static_cast<UInt8>(pl->GetVar(VAR_FRIEND_SECURITY));
                 ++it;
             }
         }
@@ -4754,6 +4758,12 @@ namespace GObject
         GameAction()->doStrong(this, SthPrayTree, 0 ,0 );
         GuangGunCompleteTask(0,24);
     }
+    void Player::limitQQFriend(UInt8 tmp)
+    {
+        SetVar(VAR_FRIEND_SECURITY,tmp); 
+        return;
+    }
+
     void Player::SendOtherInfoForPray(Player* other,UInt32 op)
     {
         UInt32 prayType = other->GetVar(VAR_PRAY_TYPE);
@@ -8171,6 +8181,16 @@ namespace GObject
 
         sendVipPrivilegeMail(nLev);
         getLevelAwardInfo();
+        if(oLev < 80 && nLev >= 80)
+        {
+            for(std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin(); it != _fairyPets.end(); ++ it)
+            {
+                FairyPet* pet = it->second;
+                if(!pet)
+                    continue;
+                pet->sendSevenSoul();
+            }
+        }
 	}
 
     void Player::sendFormationList()
@@ -19934,15 +19954,16 @@ void Player::get3366GiftAward(UInt8 type)
     }
     if(type == 1)
     {
-        if (getGold() < 45)
+        if (getGold() < 48)
         {
             sendMsgCode(0, 1104);
             return;
         }
         ConsumeInfo ci(Enum3366Gift,0,0);
-        useGold(45, &ci);
+        useGold(48, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
+        //static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
+        static UInt32 itemId[] = {9600, 2, 9371, 2, 9082, 2, 503, 2, 513, 2, 9443, 5};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -19958,7 +19979,8 @@ void Player::get3366GiftAward(UInt8 type)
         ConsumeInfo ci(Enum3366Gift,0,0);
         useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
-        static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
+        //static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
+        static UInt32 itemId[] = {9229, 30, 9141, 9338, 9082, 500};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
         {
             GetPackage()->Add(itemId[i], 1, true);
@@ -19975,8 +19997,12 @@ void Player::send3366GiftInfo()
     if(!isBD())
         return;
     */
-    if(!World::get3366GiftAct())
+    /*if(!World::get3366GiftAct())
+        return;*/
+
+    if(!World::get3366BuyTime())
         return;
+
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(6);
     UInt8 opt = GetVar(VAR_3366GIFT);
@@ -20619,10 +20645,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29 };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -21522,6 +21548,9 @@ UInt8 Player::toQQGroup(bool isJoin)
             if(res)
                 delCanHirePet(petId[idx]);
             SetVar(VAR_FAIRYPET_ISGET_PET, isGet | (1 << 0));
+            FairyPet* pet = findFairyPet(petId[idx]);
+            if(pet)
+                pet->sendSevenSoul();
         }
         else
         {
@@ -21552,6 +21581,12 @@ UInt8 Player::toQQGroup(bool isJoin)
             send(st);
             if(res != 0)
                 delCanHirePet(id);
+            else
+            {
+                FairyPet* pet = findFairyPet(id);
+                if(pet)
+                    pet->sendSevenSoul();
+            }
         }
         return res;
     }
@@ -25376,16 +25411,16 @@ void Player::Send11GradeAward(UInt8 type)
     UInt32 gradeAward[]={100,200,400,500,700,900,1200,2300,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
         {{500,1 }, {503,1}},
-        {{500,2},{514,2}},
-        {{503,3},{501,2},{516,1}},
-        {{512,3},{516,2},{514,2}},
+        {{9424,2},{500,2}},
+        {{9418,3},{501,2},{9438,1}},
+        {{9649,3},{516,2},{503,2}},
         {{501,2},{513,2},{517,2}},
-        {{515,1},{551,2},{134,2}},
+        {{9388,1},{551,2},{134,2}},
         {{1325,2},{503,2},{509,2},{547,2},{134,2},{9438,2}},
-        {{1717,1},{8555,4}},
-        {{9438,20},{1126,20}},
-        {{9022,10},{134,20},{9438,20}},
-        {{1727,1},{509,30},{9075,20}},
+        {{1719,1},{8555,4}},
+        {{9604,20},{9418,20}},
+        {{9022,20}},
+        {{1726,1},{515,15},{9075,20}},
     };
     static UInt32 count[] = {2,2,3,3,3,3,6,2,2,3,3};
     SYSMSG(title, 4954);
@@ -26372,7 +26407,7 @@ void Player::RunFriendlyCompass(UInt8 type)
 void Player::getGGTaskAward()
 {
     UInt8 plvl = GetLev();
-    UInt8 pos = getGuangGunPos();
+    //UInt8 pos = getGuangGunPos();
     UInt32 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
     UInt32 exp_ = static_cast<float>(exp)*30;
     UInt32 pexp = 5000;
@@ -27607,9 +27642,7 @@ bool Player::check_Cangjianya()
 
 void Player::mount_Cangjianya(UInt8 rideId, UInt8 floors, bool isAuto)
 {
-    if(rideId <= 7)     //之前出过的前7个飞剑不能用
-        return;
-    if(!GData::ride.checkHasMountId(rideId)) //判断是否存在此坐骑id
+    if(!GData::ride.canShowCangjian(rideId)) //判断是否可以在藏剑崖
         return;
     ModifyMount * mount = getOneMount(rideId);
     if(NULL == mount)
@@ -28531,6 +28564,7 @@ void Player::doGuankaAct(UInt8 type)
     if(res)
     {
         AddVar(VAR_GUANKA_ACTION_SCORE, scores[index]);
+        SetVar(VAR_GUANKA_ACTION_TIME, TimeUtil::Now());
         ++ index;
         data = SET_BIT_3(data, type, index);
         SetVar(VAR_GUANKA_ACTION_NPC, data);
@@ -28538,8 +28572,26 @@ void Player::doGuankaAct(UInt8 type)
         UInt32 totalScore = GetVar(VAR_GUANKA_ACTION_SCORE);
         GameMsgHdr hdr(0x1B6, WORKER_THREAD_WORLD, this, sizeof(totalScore));
         GLOBAL().PushMsg(hdr, &totalScore);
+        GameMsgHdr hdr1(0x1B8, WORKER_THREAD_WORLD, this, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
 
         sendguankaActMyRank();
+        if(index >= 5)
+        {
+            SYSMSG_SENDV(5125, this, npcId);
+            SYSMSG_BROADCASTV(5126, getCountry(), getName().c_str(), npcId);
+            UInt8 cnt = 0;
+            for(UInt8 i = 0; i < 6; ++ i)
+            {
+                if(GET_BIT_3(data, i) >= 5)
+                    ++ cnt;
+            }
+            if(cnt >= 6)
+            {
+                SYSMSG_SENDV(5127, this);
+                SYSMSG_BROADCASTV(5128, getCountry(), getName().c_str());
+            }
+        }
     }
 }
 
@@ -28549,9 +28601,9 @@ void Player::sendguankaActMyRank()
     GLOBAL().PushMsg(hdr, NULL);
 }
 
-void Player::getguankaScoreAward()
+void Player::getguankaScoreAward(UInt8 type)
 {
-    if(!World::getGuankaAct())
+    if(!World::getGuankaAct() || type > 4)
         return;
 
     static UInt32 scoreLvl[] = {200, 400, 800, 1000, 1500};
@@ -28560,27 +28612,14 @@ void Player::getguankaScoreAward()
         {{15,5},   {515,5},  {514, 10},  {135, 10},  {500, 5}},
         {{15,10},  {515,10}, {134, 10},  {9022, 10}, {0, 0}},
         {{515,30}, {134,30}, {9438, 30}, {9022, 10}, {0, 0}},
-        {{515,40}, {134,40}, {9438, 40}, {9075},     {0, 0}},
+        {{515,40}, {134,40}, {9438, 40}, {9075, 20}, {0, 0}},
     };
     UInt32 data = GetVar(VAR_GUANKA_ACTION_NPC);
     UInt32 score = GetVar(VAR_GUANKA_ACTION_SCORE);
     UInt8 state = GET_BIT_8(data, 3);
-    if(state >= 5 || score < scoreLvl[0])
+    if(score < scoreLvl[type] || (state & (1 << type)) > 0)
         return;
-    UInt8 idx = 0;
-    UInt8 j = sizeof(scoreLvl)/sizeof(UInt32);
-    for(UInt8 i = 1; i < j; ++ i)
-    {
-        if(score < scoreLvl[i])
-        {
-            idx = i-1;
-            break;
-        }
-    }
-    if(score >= scoreLvl[j-1])
-        idx = j-1;
-    if(state > idx) return;
-    ++ state;
+    state |= 1 << type;
     data = SET_BIT_8(data, 3, state);
     SetVar(VAR_GUANKA_ACTION_NPC, data);
     sendguankaActMyRank();
@@ -28595,8 +28634,8 @@ void Player::getguankaScoreAward()
             UInt16 fromWhere;
         };
         ItemAdd ia;
-        ia.item = awards[state-1][i][0];
-        ia.num = awards[state-1][i][1];
+        ia.item = awards[type][i][0];
+        ia.num = awards[type][i][1];
         ia.bind = true;
         ia.fromWhere = FromQixi;
         if(ia.item > 0)
@@ -28604,6 +28643,21 @@ void Player::getguankaScoreAward()
             GameMsgHdr hdr(0x241, getThreadId(), this, sizeof(ia));
             GLOBAL().PushMsg(hdr, &ia);
         }
+    }
+    char str[32] = {0};
+    sprintf(str, "F_140240_%d", type+1);
+    udpLog("hundunmoyu", str, "", "", "", "", "act");
+}
+
+void Player::sevensoul_fixed()
+{
+    for(std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin(); it != _fairyPets.end(); ++ it)
+    {
+        FairyPet* pet = it->second;
+        if(!pet)
+            continue;
+        if(pet->getSevenSoulSoulLevel(0) > 0)
+            pet->updateToDBPetSkill();
     }
 }
 

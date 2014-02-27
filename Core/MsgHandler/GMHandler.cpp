@@ -725,6 +725,18 @@ void GMHandler::OnAddVar( GObject::Player * player, std::vector<std::string>& ar
         UInt32 num = player->GetVar(var);
 		player->SetVar(var,num+value);
         GObject::MarryBoard::instance()._YHlively = value ; 
+
+        if(World::getGuankaAct() && var == GObject::VAR_GUANKA_ACTION_SCORE)
+        {
+            player->SetVar(VAR_GUANKA_ACTION_TIME, TimeUtil::Now());
+            UInt32 totalScore = player->GetVar(VAR_GUANKA_ACTION_SCORE);
+            GameMsgHdr hdr(0x1B6, WORKER_THREAD_WORLD, player, sizeof(totalScore));
+            GLOBAL().PushMsg(hdr, &totalScore);
+            GameMsgHdr hdr1(0x1B8, WORKER_THREAD_WORLD, player, 0);
+            GLOBAL().PushMsg(hdr1, NULL);
+
+            player->sendguankaActMyRank();
+        }
 	}
 }
 void GMHandler::OnSetVar( GObject::Player * player, std::vector<std::string>& args )
@@ -3608,6 +3620,13 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
             }
         }
     }
+    else if(type == 4)
+    {
+        UInt32 petId = atoi(args[1].c_str());
+        FairyPet * pet = player->findFairyPet(petId);
+        if(pet == NULL) return;
+        pet->setDirty();
+    }
 }
 
 void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& args)
@@ -4359,6 +4378,13 @@ inline bool player_enum_1(GObject::Player* p, int)
     return true;
 }
 
+inline bool player_enum_2(GObject::Player* p, int)
+{
+    p->SetVar(GObject::VAR_3366GIFT, 0);
+
+    return true;
+}
+
 void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& args)
 {
     if(sizeof(args)<1)
@@ -4503,7 +4529,7 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             break;
         case 23:
             GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::Now());
-            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::Now() + 86400*15);
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::Now() + 86400*5);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
             break;
@@ -4512,6 +4538,19 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_3366_RECHARGE_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
+        case 25:
+            GVAR.SetVar(GVAR_3366_BUY_BEGIN, TimeUtil::Now());
+            GVAR.SetVar(GVAR_3366_BUY_END, TimeUtil::Now() + 86400*5);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 26:
+            GVAR.SetVar(GVAR_3366_BUY_BEGIN, 0);
+            GVAR.SetVar(GVAR_3366_BUY_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GObject::globalPlayers.enumerate(player_enum_2, 0);
+            break;
+
     }
 }
 

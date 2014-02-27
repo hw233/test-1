@@ -694,14 +694,24 @@ function RunSummerMeetRechargeAward(player, cts)
     return true
 end
 function RunQZoneRechargeAward(player, cts)
-    local item = {
+    --[[local item = {
         [1] = {{517,2}},
         [2] = {{551, 2}},
         [3] = {{514,3},{503,3}},
         [4] = {{9371,5},{9390, 5}},
         [5] = {{509,3},{507,3}},
         [6] = {{9076,5}},
+    };--]]
+
+    local item = {
+        [1] = {{9082, 2}},
+        [2] = {{551, 2}},
+        [3] = {{9603, 2},{9604, 2}},
+        [4] = {{549, 1},{503, 3}},
+        [5] = {{500, 5},{501, 5}},
+        [6] = {{9388, 2},{9371, 8}},
     };
+
     local package = player:GetPackage();
     if cts == 0 then
         return false

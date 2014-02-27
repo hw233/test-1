@@ -2720,6 +2720,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x25:
         case 0x27:
         case 0x29:
+        case 0x3A:
         {
             brd >> op;
             switch(op)
@@ -3178,7 +3179,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                                 if (tokenizer.count() >= 3)
                                 {
                                     UInt8 csex = atoi(tokenizer[1].c_str());
-                                    UInt32 score = atoi(tokenizer[0].c_str());
+                                    UInt16 score = atoi(tokenizer[2].c_str());
                                     st << tokenizer[0] << csex << score;
                                 }
                                 else
@@ -3188,7 +3189,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                             if (!ret)
                             {
                                 st << std::string("未找到");
-                                st << static_cast<UInt8>(0) << static_cast<UInt32>(0);
+                                st << static_cast<UInt8>(0) << static_cast<UInt16>(0);
                             }
                         }
                         st << Stream::eos;
@@ -3197,19 +3198,23 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     break;
                 case 2:
                     {
-                        GameMsgHdr hdr(0x1B8, WORKER_THREAD_WORLD, NULL, 0);
+                        GameMsgHdr hdr(0x1B8, WORKER_THREAD_WORLD, player, 0);
                         GLOBAL().PushMsg(hdr, NULL);
                     }
                     break;
                 case 3:
                     {
-                        UInt8 type = 0;
+                        UInt8 type = 0xFF;
                         brd >> type;
                         player->doGuankaAct(type);
                     }
                     break;
                 case 4:
-                    player->getguankaScoreAward();
+                    {
+                        UInt8 type = 0xFF;
+                        brd >> type;
+                        player->getguankaScoreAward(type);
+                    }
                     break;
             }
         }

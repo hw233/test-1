@@ -1023,6 +1023,7 @@ void OnSetGuankaActRank( GameMsgHdr& hdr, const void* data )
     RCSort s;
     s.player = player;
     s.total = total;
+    s.time = player->GetVar(VAR_GUANKA_ACTION_TIME);
     World::guankaScoreSort.insert(s);
 }
 
@@ -1051,7 +1052,7 @@ void OnSendGuankaActRank10( GameMsgHdr& hdr,  const void* data )
     for(; it != World::guankaScoreSort.end() && idx < 10; ++ it, ++ idx)
     {
         UInt8 csex = (it->player->getCountry() << 4) | it->player->getMainFighter()->getSex();
-        st << it->player->getName() << csex << it->total;
+        st << it->player->getName() << csex << static_cast<UInt16>(it->total);
     }
     st.data<UInt8>(offset) = idx;
     st << Stream::eos;

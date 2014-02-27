@@ -17,6 +17,7 @@ void Ride::setRideTable(DBRideConfig& dbrc)
     rd.name = dbrc.name;
     rd.itemId = dbrc.itemId;
     rd.propId = dbrc.propId;
+    rd.show = dbrc.show > 0;
 
     StringTokenizer tk(dbrc.chips, ";");
     for(UInt8 idx = 0; idx < MOUNTCHIP_MAX && idx < tk.count(); ++ idx)
@@ -61,11 +62,11 @@ void Ride::setCangjianTable(DBCangjianCfg& dbcjc)
     _cangjianData.insert(std::make_pair(cjd.floor, cjd));
 }
 
-bool Ride::checkHasMountId(UInt8 rideId)
+bool Ride::canShowCangjian(UInt8 rideId)
 {
     std::map<UInt8, RideData>::iterator it = _rideData.find(rideId);
     if(it != _rideData.end())
-        return true;
+        return it->second.show;
     return false;
 }
 

@@ -297,6 +297,7 @@ namespace GObject
         VAR_COUPLE_COPY_DAY_COUNT = 234,//夫妻家园每日刷新免费次数or当日购买次数 8bit
         VAR_COUPLE_COPY_COUNT = 235,//夫妻家园总次数
         VAR_COUPLE_COPY_BATTLE = 236,//夫妻家园进行次数
+        VAR_FRIEND_SECURITY = 237,//好友列表隐私设置标记
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
@@ -670,6 +671,7 @@ namespace GObject
         VAR_MOUNT_CANGJIANYA_DATE = 707,     //取藏剑崖每天免费次数时间
         VAR_GUANKA_ACTION_NPC = 708,     //关卡活动npc击杀情况,6类npc低18位表示，高8位表示奖励领取情况
         VAR_GUANKA_ACTION_SCORE = 709,   //关卡活动个人镇魔值
+        VAR_GUANKA_ACTION_TIME  = 710,   //关卡活动个人镇魔值变化时间
 
         //711-720 for JLT
         VAR_QISHI_FRIEND_SEND_COUNT = 711,  // 七石斗法玩家赠送次数
@@ -1220,6 +1222,7 @@ namespace GObject
             REGISTER_VAR(VAR_COUPLE_COPY_DAY_COUNT, CYCLE_DAY);
             REGISTER_VAR(VAR_COUPLE_COPY_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_COUPLE_COPY_BATTLE, CYCLE_DAY);
+            REGISTER_VAR(VAR_FRIEND_SECURITY, CYCLE_NONE);
             REGISTER_VAR(VAR_REAL_SPIRIT, CYCLE_NONE);
             REGISTER_VAR(VAR_REAL_SPIRIT_GET, CYCLE_DAY);
             REGISTER_VAR(VAR_QZONE_RECHARGE, CYCLE_NONE);
@@ -1282,6 +1285,9 @@ namespace GObject
             REGISTER_VAR(VAR_QISHI_FRIEND_USE_COUNT, CYCLE_DAY);
             REGISTER_VAR(VAR_MOUNT_CANGJIANYA_LEFT_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_MOUNT_CANGJIANYA_DATE, CYCLE_NONE);
+            REGISTER_VAR(VAR_GUANKA_ACTION_NPC, CYCLE_NONE);
+            REGISTER_VAR(VAR_GUANKA_ACTION_SCORE, CYCLE_NONE);
+            REGISTER_VAR(VAR_GUANKA_ACTION_TIME, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

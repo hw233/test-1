@@ -66,6 +66,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _bleedMo(0), _bleedMoLast(0), _blind_bleed(0), _blind_present(0), _blind_present_cd(0),
     _blind_cd(0), _blind_bleed_last(0), _summoner(NULL), _unSummonAura(0), 
     _bleedLingYan(0), _bleedLingYanLast(0), _bleedLingYanAuraDec(0), _bleedLingYanAuraDecProb(0),
+    _bleedFieldGape(0), _bleedFieldGapeLast(0), _bleedFieldGapeStunProb(0), _bleedFieldGapeType(0),
     _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
     _petProtect100(false), _petProtect100Last(0), _petProtect100Skill(NULL), _petAtk100(0), _petAtk100Last(0), _petMark(false),
     _flawCount(0), _flawDamageAdd(0), _flawLast(0), _withstandFactor(0), _withstandCount(0),

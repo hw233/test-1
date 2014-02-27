@@ -482,6 +482,11 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -511,6 +516,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 8)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
         ))
     {
 #if 0
@@ -1342,6 +1348,12 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -2095,12 +2107,13 @@ bool World::Init()
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
     if(value == SERVERWAR_VALUE_XIUWEI5 && (overTime - TimeUtil::SharpDayT(0, now)) > 7*86400)
         WORLD()._swBosstimer = WORLD().AddTimer(5000, WORLD().ServerWarBoss_Refresh, &(WORLD()), 10000);
-
+    /*
     if (!GVAR.GetVar(GVAR_QISHIBAN_INVITE_ENABLE))
     {
         globalPlayers.enumerate(enum_qishibaninviteenable, static_cast<void *>(NULL));
         GVAR.SetVar(GVAR_QISHIBAN_INVITE_ENABLE, 1);
     }
+    */
 
     
     if( GObject::MarryBoard::instance().sendAward())
@@ -3025,6 +3038,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             RCSort s;
             s.player = p;
             s.total = score;
+            s.time = p->GetVar(VAR_GUANKA_ACTION_TIME);
             World::guankaScoreSort.insert(s);
         }
     }
@@ -3553,9 +3567,9 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{509,30},{515,30},{9438,60},{134,30},{9075,50}},
-        {{509,25},{515,25},{9438,50},{134,25},{9075,40}},
-        {{509,20},{515,20},{9438,40},{134,20},{9075,30}},
+        {{9424,50},{515,30},{9438,60},{134,30},{9022,40}},
+        {{9424,40},{515,25},{9438,50},{134,25},{9022,30}},
+        {{9424,30},{515,20},{9438,40},{134,20},{9022,20}},
     };
    // static MailPackage::MailItem card = {9922,1};
     SYSMSG(title, 4950);
@@ -4196,21 +4210,20 @@ void World::SendGuankaActAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{1325,40},{9418,60},{9075,40},{515,40},{0,0}},
-        {{1325,20},{9418,20},{9075,20},{515,20},{0,0}},
-        {{515,10},{9438,10},{9075,10},{134,10},{0,0}},
+        {{1325,40},{9418,60},{9075,40},{515,60},{0,0}},
+        {{1325,20},{9418,30},{9075,20},{515,30},{0,0}},
+        {{515,20},{9438,10},{9075,10},{134,10},{0,0}},
         {{515,10},{9438,10},{134,10},{0,0},{0,0}},
         {{15,10},{515,5},{134,5},{9438,5},{500,5}},
     };
-    //static MailPackage::MailItem card = {9929,1};   //暂无白马王子
     int pos = 0;
-    SYSMSGV(title, 5123, pos);
     for (RCSortType::iterator i = World::guankaScoreSort.begin(), e = World::guankaScoreSort.end(); i != e; ++i)
     {
         Player* player = i->player;
         if (!player)
             continue;
         ++ pos;
+        SYSMSGV(title, 5123, pos);
         if(pos > 10)
             break;
         UInt32 score = i->total;
@@ -4227,10 +4240,6 @@ void World::SendGuankaActAward()
             if(mail)
             {
                 mailPackageManager.push(mail->id, s_item[type-1], 5, true);
-                /*
-                if(pos ==1)
-                    mailPackageManager.push(mail->id, &card, 1, true);
-                */
             }
         }
     }
