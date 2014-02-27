@@ -4093,11 +4093,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 int idx = std::min(abs(fsize-1), i);
                 if(fsize > 0)
                     factor = skill->factor[idx];
-                size_t skillIdx = 0;
-                const GData::SkillBase* silkwormSkill;
-                while(NULL != (silkwormSkill = bf->getPassiveSkillSilkworm100(skillIdx)))
-                    break;
-                if(skill == silkwormSkill)
+                if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_silkworm)
                 {
                     bf->setSilkwormCnt(0);
                     doAbnormalStatusClear(getObject(target_side, pos));
@@ -5656,6 +5652,7 @@ UInt32 BattleSimulator::doAttack( int pos )
     UInt8 reiatsuType2 = 0;
     UInt8 launchPeerLess = 0;
 
+    BattleFighter* mainTarget = NULL;
     UInt8 attackCnt = 1;
     size_t skillIdx = 0;
     const GData::SkillBase* prudentSkill;
@@ -5668,7 +5665,6 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
     for(UInt8 cntIndex = 0; cntIndex < attackCnt; cntIndex++)
     {
-    BattleFighter* mainTarget = NULL;
     rcnt += doDeBufAttack(bf);
     if(bf->getHP() && !_winner && bf->getId() != 5679) // 行动者存活 && 战斗胜负未分 && 行动者不是雪人
     {
