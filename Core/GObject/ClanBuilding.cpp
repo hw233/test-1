@@ -264,8 +264,9 @@ namespace GObject
                 case 0x05:
                     {
                         std::string leaderName ;
-                        std::string playerName = player->getName();
+                        std::string playerName ;;
                         brd >> leaderName ; 
+                        brd >> playerName ; 
                         GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(leaderName)];
                         GObject::Player * member = GObject::globalNamedPlayers[player->fixName(playerName)];
                         LeaveTeam(pl,member);
@@ -482,16 +483,21 @@ namespace GObject
     }
     void ClanBuildingOwner::ChangeTeamMember(Player * leader , UInt8 first , UInt8 second)
     {
+        if(first == 0 || first > 5)
+            return ;
+        if(second == 0 || second > 5)
+            return ;
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
             if(it->first.leader == leader )
             {
-                std::vector<Player *> vec = it->second;
-                if(vec.size() < second)
+                if( ( first > it->second.size()) ||( second > it->second.size() ) )
                     return ;
-                Player * pl = vec[first];
-                vec[first] = vec[second];
-                vec[second] = pl;
+                Player * pl = it->second.at(first-1);
+                it->second.at(first-1) = it->second.at(second-1);
+                it->second.at(second-1) = pl;
+                sendAttackTeamInfo(it->second.at(first-1));
+                sendAttackTeamInfo(it->second.at(second-1));
                 break;
             }
         }
@@ -525,9 +531,9 @@ namespace GObject
                 {
                     leftAttackTeams.erase(it);
                 }
-                for(UInt8 i = 0 ; i < 5 ; ++i)
+                for(UInt8 i = 0 ; i < vec.size() ; ++i)
                 {
-                    if(vec[i]!=NULL && vec[i] != player)
+                    if(vec[i]!=NULL)
                         sendAttackTeamInfo(vec[i]);
                 }
                 break;
@@ -559,7 +565,7 @@ namespace GObject
                 it->second.push_back(player);
                 for(std::vector<Player *>::iterator it_vec = vec.begin(); it_vec != vec.end(); ++it_vec)
                 {
-                    sendAttackTeamInfo(*it_vec,leader);
+                    sendAttackTeamInfo(*it_vec);
                 }
                 player->setLeftAddrEnter(true);
                 break;
@@ -604,7 +610,7 @@ namespace GObject
         GameMsgHdr hdr(0x392, player->getThreadId(), player, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
-    void ClanBuildingOwner::sendAttackTeamInfo(Player *player  , Player *leader)
+    void ClanBuildingOwner::sendAttackTeamInfo(Player *player)
     {
         Stream st(REP::CLAN_FAIRYLAND);
         if(player == NULL)
@@ -614,8 +620,6 @@ namespace GObject
         st <<static_cast<UInt8>( leftAttackTeams.size() ); 
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
-            if(leader != NULL && it->first.leader != leader)
-                continue ;
             st << it->first.leader->getName();
             st << static_cast<UInt8>( it->first.leftId );
             std::vector<Player* > vec = it->second;

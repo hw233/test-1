@@ -131,7 +131,7 @@ namespace GObject
             void LeaveTeam(Player * leader , Player * player );
             void AttackLeftAddr(Player * player);
             void LineUp(Player * player);
-            void sendAttackTeamInfo(Player *player ,Player * leader =NULL);
+            void sendAttackTeamInfo(Player *player);
         private:
             Clan * _clan;
             std::vector<ClanBuilding> _buildings;
