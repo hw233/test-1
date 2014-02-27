@@ -1703,6 +1703,7 @@ namespace GObject
         void beVoted();
 
         void prayForOther(Player *other);
+        void limitQQFriend(UInt8 tmp);
         void sendPresentForOther(UInt64 playerId,UInt32 type);
         UInt32 getPresentBoxRest();
         UInt32 getPresentCount();
@@ -2978,6 +2979,7 @@ namespace GObject
         void handleJiqirenAct_dungeon();
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
+        void sevensoul_fixed();
 	};
 
 

@@ -4471,13 +4471,21 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
         player->checkSendRandFriend(); 
         return ;
     }
+    UInt8 tmp = 0; 
+    if(fr._op == 0x0E)
+    {
+       tmp = static_cast<UInt8>(atoi(fr._name.c_str()));
+    }
     player->patchDeleteDotS(fr._name);
     GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(fr._name)];
-    if(pl == NULL || pl == player)
-	{
-		player->sendMsgCode(0, 1506);
-		return;
-	}
+    if(fr._op != 0x0E)
+    {
+        if(pl == NULL || pl == player )
+        {
+            player->sendMsgCode(0, 1506);
+            return;
+        }
+    }
 	switch(fr._op)
 	{
 	case 1:
@@ -4529,6 +4537,9 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
         break;
     case 11:
         player->prayForOther(pl);
+        break;
+    case 0x0E:
+        player->limitQQFriend(tmp);
         break;
 	}
 }
@@ -7087,6 +7098,12 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                         st << type << opt;
                         st << res << petId << Stream::eos;
                         player->send(st);
+                        if(res == 0)
+                        {
+                            FairyPet* pet = player->findFairyPet(petId);
+                            if(pet)
+                                pet->sendSevenSoul();
+                        }
                     }
                     break;
                 case 0x04:

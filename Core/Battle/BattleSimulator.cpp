@@ -657,6 +657,16 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
     }
     _packet.data<UInt8>(offset) = cnt[0];
     _packet.data<UInt8>(offset + 1) = cnt[1];
+
+    //宠物技能符文
+    for(int i = 0; i < 2; ++ i)
+    {
+        if(_backupObjs[i] && static_cast<BattleFighter *>(_backupObjs[i])->getFighter())
+            static_cast<BattleFighter *>(_backupObjs[i])->getFighter()->getAllSSAndLevelOfPet(_packet);
+        else
+            _packet << static_cast<UInt8>(0); //技能符文个数为0
+    }
+
     size_t cnt_pos = _packet.size();
     _packet << static_cast<UInt32>(0);
     // ]]
@@ -12988,6 +12998,7 @@ bool BattleSimulator::isBehindPos(BattleObject* bo, UInt8 targetPos, UInt8 maxLe
         return false;
     if ((targetPos / 5 + maxLength) >= (pos / 5))
         return true;
+    return false;
 }
 
 int BattleSimulator::getPossibleTarget( int side, int idx , BattleFighter * bf /* = NULL */)
