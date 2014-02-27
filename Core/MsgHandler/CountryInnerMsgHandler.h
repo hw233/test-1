@@ -2590,6 +2590,14 @@ void OnServerWarBeAttack( GameMsgHdr& hdr, const void* data )
     serverWarMgr.beAttackByPlayer(player, swbad->attacker, swbad->formation, swbad->portrait, swbad->lineup);
 }
 
+void OndoGuankaAct( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 type = *reinterpret_cast<const UInt8 *>(data);
+
+    player->doGuankaAct(type);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 

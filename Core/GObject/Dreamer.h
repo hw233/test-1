@@ -56,7 +56,7 @@ static UInt8 spotMapType[] =
 };
 #endif
 
-static const UInt8 MAX_PROGRESS = 4;
+static const UInt8 MAX_PROGRESS = 7;
 static const UInt8 MAX_LEVEL = 5;
 
 static const UInt16 DREAMER_ITEM[MAX_PROGRESS + 1] =
@@ -66,6 +66,9 @@ static const UInt16 DREAMER_ITEM[MAX_PROGRESS + 1] =
     9295,
     9300,
     9305,
+    9460,
+    9465,
+    9470,
 };
 
 class Dreamer
@@ -104,6 +107,9 @@ class Dreamer
         PROGRESS_80      = 2,    // 80级副本梦境
         PROGRESS_90      = 3,    // 90级副本梦境
         PROGRESS_100     = 4,    // 100级副本梦境
+        PROGRESS_110     = 5,    // 110级副本梦境
+        PROGRESS_120     = 6,    // 120级副本梦境
+        PROGRESS_130     = 7,    // 130级副本梦境
         PROGRESS_MAX,
     };
 

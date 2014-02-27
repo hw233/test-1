@@ -995,6 +995,96 @@ void OnAddQiShiBanCount( GameMsgHdr & hdr, const void * data)
     }
 }
 
+void OnSetGuankaActRank( GameMsgHdr& hdr, const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *(UInt32*)data;
+    if (!total)
+        return;
+
+    UInt32 fgtId = 0;
+    if(player->getMainFighter())
+        fgtId = (player->getCountry()<<4) | player->getMainFighter()->getSex();
+    std::string info = player->getName() + "_" + Itoa(fgtId) + "_" + Itoa(total);
+    WORLD().SetMemCach_guankaActInfo(player->getOpenId(), info);
+
+    for (RCSortType::iterator i = World::guankaScoreSort.begin(), e = World::guankaScoreSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            World::guankaScoreSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    s.time = player->GetVar(VAR_GUANKA_ACTION_TIME);
+    World::guankaScoreSort.insert(s);
+}
+
+void OnClearGuankaActRank( GameMsgHdr& hdr, const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    World::guankaScoreSort.clear();
+    WORLD().DelMemCach_guankaAct(player->getOpenId());
+}
+
+void OnSendGuankaActRank10( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x30) << static_cast<UInt8>(0x02);
+
+    size_t offset = st.size();
+    UInt8 idx = 0;
+    st << idx;
+    RCSortType::iterator it = World::guankaScoreSort.begin();
+    for(; it != World::guankaScoreSort.end() && idx < 10; ++ it, ++ idx)
+    {
+        UInt8 csex = (it->player->getCountry() << 4) | it->player->getMainFighter()->getSex();
+        st << it->player->getName() << csex << static_cast<UInt16>(it->total);
+    }
+    st.data<UInt8>(offset) = idx;
+    st << Stream::eos;
+    player->send(st);
+}
+
+void OnSendGuankaActMyRank( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt16 rank = 0;
+    UInt16 myRank = 0;
+    UInt16 myScore = 0;
+    for (RCSortType::iterator i = World::guankaScoreSort.begin(), e = World::guankaScoreSort.end(); i != e; ++i)
+    {
+        rank++;
+        if (i->player == player)
+        {
+            myScore = i->total;
+            myRank = rank;
+            break;
+        }
+    }
+    UInt32 value = player->GetVar(VAR_GUANKA_ACTION_NPC);
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x30) << static_cast<UInt8>(0x00);
+    st << myScore << myRank << value;
+    st << Stream::eos;
+    player->send(st);
+}
+
 void SendLuckyBagRank(Stream& st)
 {
     using namespace GObject;

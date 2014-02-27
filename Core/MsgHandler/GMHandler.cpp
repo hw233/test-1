@@ -725,6 +725,18 @@ void GMHandler::OnAddVar( GObject::Player * player, std::vector<std::string>& ar
         UInt32 num = player->GetVar(var);
 		player->SetVar(var,num+value);
         GObject::MarryBoard::instance()._YHlively = value ; 
+
+        if(World::getGuankaAct() && var == GObject::VAR_GUANKA_ACTION_SCORE)
+        {
+            player->SetVar(VAR_GUANKA_ACTION_TIME, TimeUtil::Now());
+            UInt32 totalScore = player->GetVar(VAR_GUANKA_ACTION_SCORE);
+            GameMsgHdr hdr(0x1B6, WORKER_THREAD_WORLD, player, sizeof(totalScore));
+            GLOBAL().PushMsg(hdr, &totalScore);
+            GameMsgHdr hdr1(0x1B8, WORKER_THREAD_WORLD, player, 0);
+            GLOBAL().PushMsg(hdr1, NULL);
+
+            player->sendguankaActMyRank();
+        }
 	}
 }
 void GMHandler::OnSetVar( GObject::Player * player, std::vector<std::string>& args )
