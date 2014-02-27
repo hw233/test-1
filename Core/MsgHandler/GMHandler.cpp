@@ -4868,9 +4868,10 @@ void GMHandler::OnPlayerMsg(GObject::Player* player, std::vector<std::string>& a
 
 void GMHandler::OnCleanMarry(GObject::Player* player, std::vector<std::string>& args)
 {
-    player->SetVar(VAR_MARRY_STATUS,0);
-    player->SetVar(VAR_CANCEL_APPOINTMENT,0);
-    GObject::gMarryMgr.cleanPlayerData(player); 
+    //player->SetVar(VAR_MARRY_STATUS,0);
+    //player->SetVar(VAR_CANCEL_APPOINTMENT,0);
+    player->SetVar(VAR_COUPLE_ONLINE_FISH,0);
+    //GObject::gMarryMgr.cleanPlayerData(player); 
 }
 
 void GMHandler::OnCleanMarryList(GObject::Player* player, std::vector<std::string>& args)
