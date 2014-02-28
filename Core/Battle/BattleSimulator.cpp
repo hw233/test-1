@@ -3683,7 +3683,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 const GData::SkillBase* pskill = bo->getPassiveSkillOnTherapy();
                 if(!pskill)
                     continue;
-                if(pskill->getId() == 513 || bo->getSide() == bf->getSide())
+                if(SKILL_ID(pskill->getId()) == 513 || bo->getSide() == bf->getSide())
                 {
                     UInt32 hpr = bo->regenHP(hpr_first * pskill->effect->hpP, false);
                     if(hpr != 0)
@@ -7545,13 +7545,17 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             float hpPercent = 0.8 - 0.05 * times;
             if(hpPercent < 0.3)
                 hpPercent = 0.3;
-            bf->setHP(hpPercent * bf->getMaxHP());
+            UInt32 targetHP = bf->getMaxHP() * hpPercent;
+            UInt32 nowHP = bf->getHP();
+            if (targetHP >= nowHP)
+                bf->regenHP(targetHP - nowHP);
 
             float defendPercent = 0.7 - 0.1 * times;
             if(defendPercent < 0.1)
                 defendPercent = 0.1;
             bf->setDefend(defendPercent);
             bf->setRevivalCnt(revivalCnt + 1);
+            appendDefStatus(e_skill, revivalCntSkill->getId(), bf);
             return true;
         }
     }
