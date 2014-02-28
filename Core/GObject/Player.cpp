@@ -821,6 +821,7 @@ namespace GObject
         memset(_alreadyload, 0, sizeof(_alreadyload));
         m_EnterPTCStatus = false;
         m_InPTCStatus = false;
+        _leftAddrEnter = 0 ;
 	}
 
 
@@ -859,7 +860,6 @@ namespace GObject
 		}
 
         ClanRankBattleMgr::Instance().PlayerEnter(this);
-
 		setBlockBossByLevel();
 		return true;
 	}

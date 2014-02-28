@@ -19,8 +19,9 @@ namespace GObject
         UInt8 res ;
         UInt32 battleId;
         UInt32 battleTime;
-        ClanBuildBattleInfo():leftId(0),name(""),type(0),res(0),battleId(0),battleTime(0){}
-        ClanBuildBattleInfo(UInt8 leftId_ ,std::string  name_ ,UInt8 type_ , UInt8 res_ , UInt32 battleId_ ,UInt32 battleTime_):leftId(leftId_),name(name_),type(type_) , res(res_),battleId(battleId_),battleTime(battleTime_){}
+        UInt32 energy;
+        ClanBuildBattleInfo():leftId(0),name(""),type(0),res(0),battleId(0),battleTime(0),energy(0){}
+        ClanBuildBattleInfo(UInt8 leftId_ ,std::string  name_ ,UInt8 type_ , UInt8 res_ , UInt32 battleId_ ,UInt32 battleTime_,UInt32 energy_):leftId(leftId_),name(name_),type(type_) , res(res_),battleId(battleId_),battleTime(battleTime_),energy(energy_){}
     };
     struct LeftAttackLeader
     {
@@ -128,7 +129,7 @@ namespace GObject
             void CreateTeam(Player * leader , UInt8 leftId);
             void EnterTeam(Player * leader , Player * player);
             void ChangeTeamMember(Player * leader , UInt8 first , UInt8 sevond);
-            void LeaveTeam(Player * leader , Player * player );
+            void LeaveTeam(Player * leader , Player * player ,Player * opter);
             void AttackLeftAddr(Player * player);
             void LineUp(Player * player);
             void sendAttackTeamInfo(Player *player);

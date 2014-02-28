@@ -5205,7 +5205,7 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
 {
 	if(args.size() < 2)
         return;
-    UInt32 leftId = atoi(args[0].c_str());
+    UInt8 leftId = atoi(args[0].c_str());
     UInt32 clanId = atoi(args[1].c_str());
     std::map<Player *, UInt8> warSort;
     UInt8 i = 0, j = 0;

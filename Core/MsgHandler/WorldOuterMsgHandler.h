@@ -3841,6 +3841,7 @@ void OnServerLeftConnected( ServerLeftMsgHdr& hdr, const void * data )
 
 void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
 {
+    WORLD().setLeftAddrConnection(1);
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     int cid = 0, sid = 0;
     brd >> cid >> sid;
@@ -3855,6 +3856,7 @@ void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
     UInt8 res = 0;
     UInt32 rpid = 0; 
     UInt32 battleTime;
+    UInt32 energy;
     brd >> clanId ;
     brd >> type ;
     brd >> leftId;
@@ -3862,17 +3864,17 @@ void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
     brd >> res;
     brd >> rpid;
     brd >> battleTime;
+    brd >> energy;
     Clan * clan = globalClans[clanId];
     if(!clan)
         return ;
-    ClanBuildBattleInfo cbbi(leftId , name ,type,res , rpid ,battleTime);
+    ClanBuildBattleInfo cbbi(leftId , name ,type,res , rpid ,battleTime,energy);
     if(clan->getBuildingOwner() == NULL)
         return ;
     clan->getBuildingOwner()->AddBattlesInfo(cbbi);
    // SYSMSGV(title, 825);
    // SYSMSGV(content, 826, GObject::serverWarMgr.getSession());
    // GObject::serverWarMgr.sendTeamMail(title, content);
-    WORLD().setLeftAddrConnection(1);
 }
 
 void OnServerLeftLineupCommited( ServerLeftMsgHdr& hdr, const void * data )

@@ -269,7 +269,9 @@ namespace GObject
                         brd >> playerName ; 
                         GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(leaderName)];
                         GObject::Player * member = GObject::globalNamedPlayers[player->fixName(playerName)];
-                        LeaveTeam(pl,member);
+                        if( pl == NULL || member == NULL)
+                            return ;
+                        LeaveTeam(pl,member,player);
                     }
                     break;
                 case 0x06:
@@ -322,7 +324,7 @@ namespace GObject
                     }
                     break;
             }
-            if(type < 9)
+            if(type < 9 && type!=7)
                 sendAttackTeamInfo(player); 
         }
         return;
@@ -432,30 +434,29 @@ namespace GObject
         if(battles_deque.size() == 20 )
             battles_deque.pop_front();
         battles_deque.push_back(cbbi);
+        std::vector<Player *> vec;
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
             if(it->first.leftId == cbbi.leftId )
             {
                 std::vector<Player *> vec = it->second ;
-                std::map<Player *, UInt8> warSort;
-                for(UInt8 i = 0 ; i < 5 ; ++i)
-                {
-                    UInt32 value = vec[i]->GetVar(VAR_LEFTADDR_POWER);
-                    if(value < 3)
-                        value = 0 ;
-                    else 
-                        value = value - 3 ;
-                    vec[i]->SetVar(VAR_LEFTADDR_POWER ,value);
-                }
                 leftAttackTeams.erase(it);
                 break;
             }
+        }
+        std::map<Player *, UInt8> warSort;
+        for(UInt8 i = 0 ; i < vec.size() ; ++i)
+        {
+            if(vec[i] == NULL)
+                continue ;
+            vec[i]->setLeftAddrEnter(false);
+            sendAttackTeamInfo(vec[i]);
         }
     } 
     void ClanBuildingOwner::SendBattlesInfo( Stream & st)
     {
         UInt32 size  = battles_deque.size(); 
-        st << static_cast<UInt32>(size); 
+        st << static_cast<UInt8>(size); 
         for(UInt32 i = 0 ; i < size ; ++i )
         {
             ClanBuildBattleInfo cbbi = battles_deque[i]; 
@@ -465,10 +466,13 @@ namespace GObject
             st << cbbi.name ;
             st <<static_cast<UInt8>(cbbi.res);
             st << static_cast<UInt32>(cbbi.battleId);
+            st << static_cast<UInt32>(cbbi.energy);
         }
     }
     void ClanBuildingOwner::CreateTeam(Player * leader ,UInt8 leftId)
     {
+        if(_clan->getClanRank(leader) < 2 )
+            return ;
         if(leader->GetVar(VAR_LEFTADDR_POWER) < 3 )
             return ;
         if(leader->getLeftAddrEnter() || leader->GetVar(VAR_LEFTADDR_ENTER))
@@ -502,8 +506,10 @@ namespace GObject
             }
         }
     }
-    void ClanBuildingOwner::LeaveTeam(Player * leader, Player * player)
+    void ClanBuildingOwner::LeaveTeam(Player * leader, Player * player , Player * opter)
     {
+        if(player != opter && leader!=opter &&_clan->getClanRank(opter) < 3 )
+            return ;
         if(player == NULL )
             return ;
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
@@ -522,7 +528,7 @@ namespace GObject
                     {
                         (*it_vec)->setLeftAddrEnter(false);
                         it->second.erase(it_vec);
-                        break;
+                        it_vec = it->second.begin();
                     }
                     else
                         ++it_vec;
@@ -575,18 +581,27 @@ namespace GObject
     }
     void ClanBuildingOwner::AttackLeftAddr(Player * player)
     {
+        if(!player->getLeftAddrEnter()) 
+            return ;
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
             if(it->first.leader == player )
             {
+                UInt8 leftId = it->first.leftId;
                 if(it->second.size() != 5)
                     return ;
                 std::vector<Player *> vec = it->second ;
+
+                player->setLeftAddrEnter(false);
+
                 std::map<Player *, UInt8> warSort;
                 for(UInt8 i = 0 ; i < 5 ; ++i)
                 {
-                    if(vec[i]->GetVar(VAR_LEFTADDR_POWER) < 3 )
+                    UInt32 val =  vec[i]->GetVar(VAR_LEFTADDR_POWER);
+                    if(val < 3 )
                         return ;
+                    val = val - 3;
+                    vec[i]->SetVar(VAR_LEFTADDR_POWER,val);
                     warSort.insert(std::make_pair(vec[i], i)); 
                 }
                 struct SWarEnterData {
@@ -596,12 +611,13 @@ namespace GObject
                 };
 
                 Stream st(SERVERLEFTREQ::ENTER, 0xEE);
-                st<<_clan->getId()<<_clan->getName() << player->getName()/*领队*/  << it->first.leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
+                st<<_clan->getId()<<_clan->getName() << player->getName()/*领队*/  << leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
                 SWarEnterData * swed = new SWarEnterData(st, warSort);
-                std::map<Player *, UInt8>::iterator it = warSort.begin();
-                GameMsgHdr hdr(0x391, it->first->getThreadId(), it->first, sizeof(SWarEnterData*));
-                GLOBAL().PushMsg(hdr, &swed);
 
+                std::map<Player *, UInt8>::iterator itw = warSort.begin();
+                GameMsgHdr hdr(0x391, itw->first->getThreadId(), itw->first, sizeof(SWarEnterData*));
+                GLOBAL().PushMsg(hdr, &swed);
+                return;
             }
         }
     }
