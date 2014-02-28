@@ -387,7 +387,7 @@ namespace GObject
         switch(consumeType)
         {
             case 0://银币
-               consumeNum = 1000; 
+               consumeNum = 800; 
                break;
             case 1://礼券
                consumeNum = 10; 
