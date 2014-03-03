@@ -401,7 +401,12 @@ namespace GObject
                     st << (_type == 4 ? _atTime + 3 * OneTime -now : 0) ;
                     st << static_cast<UInt8>(_norms); 
                     for(UInt8 i =0 ;i < 8 ;++i)
-                        st<<_door[i];
+                    {
+                        if(_door[i]  < doorMax )
+                            st<<_door[i];
+                        else 
+                            st<< doorMax;
+                    }
                     st << doorMax ;
                     UInt32 knock =pl->GetVar(VAR_MARRYBOARD4_TIME);
                     if(pl == _man || pl == _woman )
@@ -536,8 +541,6 @@ namespace GObject
             UInt32 knockTime = pl->GetVar(VAR_MARRYBOARD4_TIME);
             if(now > _atTime + 2 * OneTime  && now < _atTime + 3 * OneTime && now - knockTime > 15)
             {
-                if(_door[door-1] >= doorMax)
-                    return ;
                 if(_door[door-1] < doorMax)
                     _door[door-1] ++ ; 
 

@@ -3352,6 +3352,7 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_SUMMER_MEET_RECHARGE_AWARD, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN_AWARD, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_STRENTH_AWARD, 0);
                  //pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
                 pl->SetVar(GObject::VAR_SUMMERMEET_SCORE1, 0);
