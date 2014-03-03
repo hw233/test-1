@@ -578,6 +578,7 @@ private:
     void doSkillEffectExtra_Shi_Flower(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_Dao_Rose(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_Mo_Knot(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_Prudent(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_LingShiBleed2(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);

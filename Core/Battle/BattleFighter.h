@@ -1545,9 +1545,15 @@ private:
     void setRevivalCnt(UInt16 count) { _revivalCnt = count; }
     UInt16 getRevivalCnt() { return _revivalCnt;}
 
-    float _HitrateMinus;
-    void setHitrateMinus(UInt32 value) { _HitrateMinus = value; }
-    float getHitrateMinus() { return _HitrateMinus;}
+    const GData::SkillBase* _prudentSkill;
+    void setPrudentSkill(const GData::SkillBase* skill) { _prudentSkill = skill; }
+    const GData::SkillBase* getPrudentSkill() { return _prudentSkill;}
+    UInt8 _prudentLast;
+    void setPrudentLast(UInt8 last) { _prudentLast = last; }
+    UInt8 getPrudentLast() { return _prudentLast; }
+    float _prudentHitrate;
+    void setPrudentHitrate(float value) { _prudentHitrate = value; }
+    float getPrudentHitrate() { return _prudentHitrate;}
 
     UInt16 _silkwormCnt;
     void setSilkwormCnt(UInt16 count) { _silkwormCnt = count; }

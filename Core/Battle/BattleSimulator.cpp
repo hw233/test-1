@@ -162,6 +162,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_shi_flower] = &BattleSimulator::doSkillEffectExtra_Shi_Flower;
         skillEffectExtraTable[GData::e_eft_dao_rose] = &BattleSimulator::doSkillEffectExtra_Dao_Rose;
         skillEffectExtraTable[GData::e_eft_mo_knot] = &BattleSimulator::doSkillEffectExtra_Mo_Knot;
+        skillEffectExtraTable[GData::e_eft_prudent] = &BattleSimulator::doSkillEffectExtra_Prudent;
     }
 }
 
@@ -289,6 +290,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_shi_flower] = &BattleSimulator::doSkillEffectExtra_Shi_Flower;
         skillEffectExtraTable[GData::e_eft_dao_rose] = &BattleSimulator::doSkillEffectExtra_Dao_Rose;
         skillEffectExtraTable[GData::e_eft_mo_knot] = &BattleSimulator::doSkillEffectExtra_Mo_Knot;
+        skillEffectExtraTable[GData::e_eft_prudent] = &BattleSimulator::doSkillEffectExtra_Prudent;
     }
 }
 
@@ -5654,6 +5656,9 @@ UInt32 BattleSimulator::doAttack( int pos )
 
     BattleFighter* mainTarget = NULL;
     UInt8 attackCnt = 1;
+    UInt8 prudentLast = bf->getPrudentLast();
+    if(prudentLast > 0)
+        attackCnt += 2;
     for(UInt8 cntIndex = 0; cntIndex < attackCnt; cntIndex++)
     {
     rcnt += doDeBufAttack(bf);
@@ -6481,8 +6486,8 @@ UInt32 BattleSimulator::doAttack( int pos )
             }
         }
     }
-    if(bf->getHitrateMinus() > 0)
-        bf->setHitrateMinus(0);
+    if(prudentLast > 0)
+        bf->setPrudentLast(--prudentLast);
     }
 
     rcnt += releaseCD(bf);
@@ -13982,6 +13987,17 @@ void BattleSimulator::doSkillEffectExtra_Mo_Knot(BattleFighter* bf, int target_s
         return;
     bo->setMoKnot(efl[0]);
     appendDefStatus(e_moKnot, 0, bo);
+}
+
+void BattleSimulator::doSkillEffectExtra_Prudent(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(!bf)
+        return;
+    if(!skill || !skill->effect)
+        return;
+    bf->setPrudentLast(4);
+    bf->setPrudentHitrate(skill->effect->efv[0]);
+    appendDefStatus(e_skill, skill->getId(), bf);
 }
 
 bool BattleSimulator::doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill, UInt32 dmg)
