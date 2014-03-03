@@ -439,7 +439,7 @@ namespace GObject
         {
             if(it->first.leftId == cbbi.leftId )
             {
-                std::vector<Player *> vec = it->second ;
+                vec = it->second ;
                 leftAttackTeams.erase(it);
                 break;
             }
