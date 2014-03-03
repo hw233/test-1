@@ -1478,7 +1478,6 @@ private:
     const GData::SkillBase* getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget = false);
-    const GData::SkillBase* getPassiveSkillPrudent100(size_t& idx, bool noPossibleTarget = false);
 
 private:
     float _2ndRateCoAtk;

@@ -185,8 +185,6 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkillBLTY100Status();
     updatePassiveSkill100(_fighter->getPassiveSkillViolent100(), _passiveSkillViolent100);
     updatePassiveSkill100(_fighter->getPassiveSkillRevival100(), _passiveSkillRevival100);
-    updatePassiveSkill100(_fighter->getPassiveSkillPrudent100(), _passiveSkillPrudent100);
-
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
     cnt = lbSkills.size();
@@ -1133,11 +1131,6 @@ const GData::SkillBase* BattleFighter::getPassiveSkillViolent100(size_t& idx, bo
 const GData::SkillBase* BattleFighter::getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillRevival100, idx, noPossibleTarget);
-}
-
-const GData::SkillBase* BattleFighter::getPassiveSkillPrudent100(size_t& idx, bool noPossibleTarget)
-{
-    return getPassiveSkill100(_passiveSkillPrudent100, idx, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnHPChange100(size_t& idx, bool noPossibleTarget)
