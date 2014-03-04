@@ -3946,6 +3946,12 @@ namespace GObject
 			checkDeath();
 
 		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+        if(World::getGuankaAct() && npcId >= 13524 && npcId <= 13529)
+            TRACE_LOG("bsim.getRounds():%u_%u_%u_%s_%" I64_FMT "u", npcId, res ? 1 : 0, bsim.getRounds()+1, getName().c_str(), getId());
+        if(res && World::getGuankaAct() && npcId >= 13524 && npcId <= 13529)
+        {
+            addguankaScoreByAttack(bsim.getRounds()+1);
+        }
 		return res;
 	}
 
@@ -28594,6 +28600,52 @@ void Player::doGuankaAct(UInt8 type)
             }
         }
     }
+}
+
+void Player::addguankaScoreByAttack(UInt32 rounds)
+{
+    if(!World::getGuankaAct())
+        return;
+    UInt32 score = 0;
+    switch(rounds)
+    {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+            score = 1026;
+            break;
+        case 4:
+            score = 514;
+            break;
+        case 5:
+            score = 258;
+            break;
+        case 6:
+            score = 130;
+            break;
+        case 7:
+            score = 66;
+            break;
+        case 8:
+            score = 34;
+            break;
+        case 9:
+            score = 18;
+            break;
+        case 10:
+            score = 10;
+            break;
+        case 11:
+            score = 6;
+            break;
+        case 12:
+            score = 4;
+            break;
+        default:
+            return;
+    }
+    AddVar(VAR_GUANKA_ACTION_SCORE, score);
 }
 
 void Player::sendguankaActMyRank()

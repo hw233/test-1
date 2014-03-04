@@ -2915,6 +2915,7 @@ namespace GObject
         void doGuankaAct(UInt8);
         void sendguankaActMyRank();
         void getguankaScoreAward(UInt8);
+        void addguankaScoreByAttack(UInt32);
 
     public:
         // 八部浮屠
