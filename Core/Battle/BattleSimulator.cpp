@@ -6489,6 +6489,9 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
     if(prudentLast > 0)
         bf->setPrudentLast(--prudentLast);
+    UInt8 prudentLastOtherside = bf->getPrudentHitrateLastOtherside();
+    if(prudentLastOtherside > 0)
+        bf->setPrudentHitrateLastOtherside(--prudentLastOtherside);
     bf->addActCnt(1);
 
     rcnt += releaseCD(bf);
@@ -14001,6 +14004,15 @@ void BattleSimulator::doSkillEffectExtra_Prudent(BattleFighter* bf, int target_s
         return;
     bf->setPrudentLast(4);
     bf->setPrudentHitrate(skill->effect->efv[0]);
+
+    Int32 side = 1 - bf->getSide();
+    for(UInt8 i = 0; i < 25; i++)
+    {
+        BattleObject* bo = getObject(side, i);
+        if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+            continue;
+        static_cast<BattleFighter*>(bo)->setPrudentHitrateLastOtherside(4);
+    }
     appendDefStatus(e_skill, skill->getId(), bf);
 }
 

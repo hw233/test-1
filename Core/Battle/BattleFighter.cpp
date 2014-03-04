@@ -80,7 +80,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _selfSummon(NULL), _dec_wave_dmg(0), _lingqu_last(0), _lingqu_times(0), _lingqu(false), _soulout_last(0), _soulout(false),  _lingshi_bleed(0), _lingshi_bleed_last(0),
     _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0), _abnormalTypeCnt(0), _bleedTypeCnt(0),_evadeCnt(0), _peerlessDisableLast(0), _soulProtectLast(0), _soulProtectCount(0), _2ndRateCoAtk(0), _2ndCoAtkSkill(NULL), _2ndRateProtect(0), _2ndProtectSkill(NULL), _dmg_deep(0), _dmg_deep_last(0), _dmg_ningshi(0), _dmg_ningshi_last(0), _ningshizhe(NULL)
    ,_ruRedCarpetLast(0), _shiFlowerLast(0), _shiFlowerAura(0), _daoRoseLast(0), _moKnotLast(0)
-   ,_bActCnt(0), _immune3(0), _revivalCnt(0), _prudentLast(0),_prudentHitrate(0), _silkwormCnt(0)
+   ,_bActCnt(0), _immune3(0), _revivalCnt(0), _prudentLast(0),_prudentHitrate(0), _prudentHitrateLastOtherside(0), _silkwormCnt(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -1437,6 +1437,14 @@ float BattleFighter::getHitrate(BattleFighter* defgt)
     else
         hiterate = _formula->calcHitrate(this, defgt) + _hitrateAdd + _hitrateAdd2 + _hitChangeByPeerless;
 
+    if(getPrudentLast() > 0)
+        hiterate -= getPrudentHitrate();
+    if(getPrudentHitrateLastOtherside() > 0)
+        hiterate -= 90;
+
+    if(getImmune3() > 0)
+        hiterate += 100;
+
 // #ifdef _DEBUG
 //     if (_hitChangeByPeerless != 0)
 //     {
@@ -1445,12 +1453,6 @@ float BattleFighter::getHitrate(BattleFighter* defgt)
 // #endif
     if(hiterate > GObject::GObjectManager::getHiterateMax() && !isNpc())
         hiterate = GObject::GObjectManager::getHiterateMax();
-
-    if(getPrudentLast() > 0)
-        hiterate -= getPrudentHitrate();
-
-    if(getImmune3() > 0)
-        hiterate += 100;
 
     if(hiterate < 0)
         return 0;
@@ -1468,9 +1470,6 @@ float BattleFighter::getEvade(BattleFighter* defgt)
 
     if(evade > GObject::GObjectManager::getEvadeMax() && !isNpc())
         evade = GObject::GObjectManager::getEvadeMax();
-
-    if(getPrudentLast() > 0)
-        evade += 90;
 
     if(evade < 0)
         return 0;

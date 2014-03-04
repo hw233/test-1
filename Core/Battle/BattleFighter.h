@@ -1550,6 +1550,9 @@ private:
     float _prudentHitrate;
     void setPrudentHitrate(float value) { _prudentHitrate = value; }
     float getPrudentHitrate() { return _prudentHitrate;}
+    UInt8 _prudentHitrateLastOtherside;
+    void setPrudentHitrateLastOtherside(UInt8 last) { _prudentHitrateLastOtherside = last; }
+    UInt8 getPrudentHitrateLastOtherside() { return _prudentHitrateLastOtherside; }
 
     UInt16 _silkwormCnt;
     void setSilkwormCnt(UInt16 count) { _silkwormCnt = count; }
