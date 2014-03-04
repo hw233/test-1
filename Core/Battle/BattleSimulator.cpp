@@ -662,7 +662,7 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
     for(int i = 0; i < 2; ++ i)
     {
         if(_backupObjs[i] && static_cast<BattleFighter *>(_backupObjs[i])->getFighter())
-            static_cast<BattleFighter *>(_backupObjs[i])->getFighter()->getAllSSAndLevelOfPet(_packet);
+            static_cast<BattleFighter *>(_backupObjs[i])->getFighter()->getAllSSAndLevel(_packet);
         else
             _packet << static_cast<UInt8>(0); //技能符文个数为0
     }
