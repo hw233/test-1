@@ -1467,7 +1467,6 @@ private:
     std::vector<GData::SkillItem> _passiveSkillBLTY100;
     std::vector<GData::SkillItem> _passiveSkillViolent100;
     std::vector<GData::SkillItem> _passiveSkillRevival100;
-    std::vector<GData::SkillItem> _passiveSkillPrudent100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1535,7 +1534,7 @@ private:
     UInt8 getMoKnot() { return _moKnotLast; }
 
     UInt16 _bActCnt;
-    bool getActCnt() { return _bActCnt; }
+    UInt16 getActCnt() { return _bActCnt; }
     void addActCnt(UInt16 count) { _bActCnt += count; }
     UInt16 _immune3;
     void setImmune3(UInt16 v) { _immune3 = v; }
@@ -1545,9 +1544,6 @@ private:
     void setRevivalCnt(UInt16 count) { _revivalCnt = count; }
     UInt16 getRevivalCnt() { return _revivalCnt;}
 
-    const GData::SkillBase* _prudentSkill;
-    void setPrudentSkill(const GData::SkillBase* skill) { _prudentSkill = skill; }
-    const GData::SkillBase* getPrudentSkill() { return _prudentSkill;}
     UInt8 _prudentLast;
     void setPrudentLast(UInt8 last) { _prudentLast = last; }
     UInt8 getPrudentLast() { return _prudentLast; }

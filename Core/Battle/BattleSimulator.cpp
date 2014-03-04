@@ -6486,9 +6486,10 @@ UInt32 BattleSimulator::doAttack( int pos )
             }
         }
     }
+    }
     if(prudentLast > 0)
         bf->setPrudentLast(--prudentLast);
-    }
+    bf->addActCnt(1);
 
     rcnt += releaseCD(bf);
     _activeFgt = NULL;
@@ -10360,22 +10361,25 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         const GData::SkillBase* violentSKill;
         while(NULL != (violentSKill = bf->getPassiveSkillViolent100(skillIdx)))
         {
-            bf->addActCnt(1);
             UInt16 actCnt = bf->getActCnt();
-            if(actCnt <= 15 && actCnt < 55)
+            UInt16 condtion = 15;
+            if(violentSKill->effect)
+                condtion = violentSKill->effect->efv[0];
+            if(actCnt >= condtion && actCnt < condtion + 40)
             {
-                UInt32 hpValue = 30000;
+                UInt32 hpValue = 300000;
                 UInt32 hpr = bf->regenHP(hpValue);
                 appendDefStatus(e_damHpAdd, hpr, bf);
             }
-            if(actCnt == 15)
+            if(actCnt == condtion)
             {
-                Int32 atkValue = 30000;
+                appendDefStatus(e_skill, violentSKill->getId(), bf);
+                Int32 atkValue = 300000;
                 setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stAtk, atkValue, violentSKill->last, bf->getSide() != 0);
                 setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stMagAtk, atkValue, violentSKill->last, bf->getSide() != 0);
                 bf->setImmune3(GData::e_state_c_s_f);
             }
-            else if(actCnt == 55)
+            else if(actCnt == condtion + 40)
             {
                 Int32 atkValue = 0;
                 setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stAtk, atkValue, violentSKill->last, bf->getSide() != 0);
