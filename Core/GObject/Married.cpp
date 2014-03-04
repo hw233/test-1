@@ -699,7 +699,7 @@ namespace GObject
         if(friendliness >= 625 )
             ae.magatk += cud->magic_attak;
         if(friendliness >= 1000)
-            ae.criticaldmgimmune += cud->df_critical; 
+            ae.criticaldmgimmune += (static_cast<float>(cud->df_critical)) / 100.0f; 
         if(friendliness >= 1500)
             ae.action += cud->action; 
 
