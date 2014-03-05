@@ -820,7 +820,7 @@ namespace GObject
         memset(_alreadyload, 0, sizeof(_alreadyload));
         m_EnterPTCStatus = false;
         m_InPTCStatus = false;
-        m_duobaoOpen = 0;
+        //m_duobaoOpen = 0;
 	}
 
 
