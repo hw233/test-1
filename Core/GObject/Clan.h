@@ -613,7 +613,8 @@ public:
     void LoadDuoBaoScore(Player * pl);
     void DuoBaoInfo(Player * pl);
     void DuoBaoStart(Player * pl);
-    void DuoBaoEnd();
+    //void DuoBaoEnd();
+    void SendDuoBaoAward();
 
 private:
     bool IsDuoBaoTime();
@@ -622,7 +623,6 @@ private:
     void DelDuoBaoScore(Player * pl);
     void SendDuoBaoScore(Stream & st);
     void DuoBaoLvlAward();
-    void SendDuoBaoAward();
     void DuoBaoUpdate(const std::string& playerName, UInt16 score);
     void DuoBaoDel(UInt8 mark);
     void ClearDuoBaoLog();

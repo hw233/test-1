@@ -1969,22 +1969,35 @@ void World::ClanStatueCheck(void *)
 
 void World::ClanDuoBaoCheck(void *)
 {
-    class DuoBaoEndVisitor : public Visitor<Clan>
-    {
-        public:
-            DuoBaoEndVisitor()
-            {
-            }
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    UInt32 start = time + 10*60*60;     // 每天10点开始
+    UInt32 end = time + 22*60*60 + 5;   // 每天22点结束(加5秒, 用于最后一次结算)
 
-            bool operator()(Clan* clan)
+    if(nowTime >= start && nowTime <= end)
+    { 
+        if(TimeUtil::Now() >= GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
+        {
+            class DuoBaoEndVisitor : public Visitor<Clan>
             {
-                clan->DuoBaoEnd();
-                return true;
-            }
+                public:
+                    DuoBaoEndVisitor()
+                    {
+                    }
 
-    };
-    DuoBaoEndVisitor visitor;
-    globalClans.enumerate(visitor);
+                    bool operator()(Clan* clan)
+                    {
+                        clan->SendDuoBaoAward();
+                        return true;
+                    }
+
+            };
+            DuoBaoEndVisitor visitor;
+            globalClans.enumerate(visitor);
+        }
+        //GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (15 * 60) * (15 * 60) + (15 * 60));
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));
+    }
 }
 
 inline static bool enum_spread_send(Player* player, void* data)

@@ -5060,7 +5060,7 @@ void Clan::DuoBaoInfo(Player * pl)
         return;
 
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
-        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (15 * 60) * (15 * 60) + (15 * 60));
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));
 
     UInt32 status = pl->GetVar(VAR_CLAN_DUOBAO_STATUS);
     UInt32 num = pl->GetVar(VAR_CLAN_DUOBAO_SUCCESS_NUM);
@@ -5136,19 +5136,35 @@ void Clan::DuoBaoStart(Player * pl)
     DuoBaoUpdate(pl->getName(), score);
 }
 
-void Clan::DuoBaoEnd()
+/*void Clan::DuoBaoEnd()
 {
     if(IsDuoBaoTime())
     {
         if(TimeUtil::Now() >= GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
         {
-            SendDuoBaoAward();
+            class DuoBaoSendAwardVisitor : public Visitor<Clan>
+            {
+                public:
+                    DuoBaoSendAwardVisitor()
+                    {
+                    }
+
+                    bool operator()(Clan* clan)
+                    {
+                        clan->SendDuoBaoAward();
+                        return true;
+                    }
+
+            };
+            DuoBaoSendAwardVisitor visitor;
+            globalClans.enumerate(visitor);
+
         }
 
-        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (15 * 60) * (15 * 60) + (15 * 60));
-       // GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));
+        //GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (15 * 60) * (15 * 60) + (15 * 60));
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));
     }
-}
+}*/
 
 void Clan::SendDuoBaoAward()
 {
