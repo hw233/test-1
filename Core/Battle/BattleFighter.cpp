@@ -648,14 +648,6 @@ bool BattleFighter::calcHit( BattleFighter * defender, const GData::SkillBase* s
 	// ¼ÆËãÃüÖÐÖµ
 	float hitrate = getHitrate(defender) - defender->getEvade(this);
 
-    if(getPrudentLast() > 0)
-        hitrate -= getPrudentHitrate();
-    if(getPrudentHitrateLastOtherside() > 0)
-        hitrate -= 90;
-
-    if(getImmune3() > 0)
-        hitrate += 100;
-
     if(skill)
     {
         GData::SkillStrengthenBase* ss = getSkillStrengthen(SKILL_ID(skill->getId()));
