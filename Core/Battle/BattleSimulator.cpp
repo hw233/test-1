@@ -10370,7 +10370,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                 condtion = violentSKill->effect->efv[0];
             if(actCnt >= condtion && actCnt < condtion + 40)
             {
-                UInt32 hpValue = 300000;
+                UInt32 hpValue = 800000;
                 UInt32 hpr = bf->regenHP(hpValue);
                 appendDefStatus(e_damHpAdd, hpr, bf);
             }
