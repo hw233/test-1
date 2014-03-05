@@ -648,6 +648,14 @@ bool BattleFighter::calcHit( BattleFighter * defender, const GData::SkillBase* s
 	// ¼ÆËãÃüÖÐÖµ
 	float hitrate = getHitrate(defender) - defender->getEvade(this);
 
+    if(getPrudentLast() > 0)
+        hitrate -= getPrudentHitrate();
+    if(getPrudentHitrateLastOtherside() > 0)
+        hitrate -= 90;
+
+    if(getImmune3() > 0)
+        hitrate += 100;
+
     if(skill)
     {
         GData::SkillStrengthenBase* ss = getSkillStrengthen(SKILL_ID(skill->getId()));
@@ -1518,6 +1526,9 @@ float BattleFighter::getCounter(BattleFighter* defgt, const GData::SkillBase* sk
         counter = _counter + _counterAdd + _counterAdd2 + _counterChangeByPeerless;
     else
         counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2 + _counterChangeByPeerless;
+
+    if(getImmune3() > 0)
+        counter += 100.0f;
 
 // #ifdef _DEBUG
 //     if (_counterChangeByPeerless != 0)

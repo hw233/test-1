@@ -10370,14 +10370,14 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                 condtion = violentSKill->effect->efv[0];
             if(actCnt >= condtion && actCnt < condtion + 40)
             {
-                UInt32 hpValue = 800000;
+                UInt32 hpValue = 400000;
                 UInt32 hpr = bf->regenHP(hpValue);
                 appendDefStatus(e_damHpAdd, hpr, bf);
             }
             if(actCnt == condtion)
             {
                 appendDefStatus(e_skill, violentSKill->getId(), bf);
-                Int32 atkValue = 300000;
+                Int32 atkValue = 400000;
                 setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stAtk, atkValue, violentSKill->last, bf->getSide() != 0);
                 setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, violentSKill->getId(), e_stMagAtk, atkValue, violentSKill->last, bf->getSide() != 0);
                 bf->setImmune3(GData::e_state_c_s_f);
