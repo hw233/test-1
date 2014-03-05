@@ -408,6 +408,9 @@ namespace REQ
     /** 墨宝 */
     const UInt8 MO_BAO              = 0x78;
 
+    /** 夺宝奇兵 */
+    const UInt8 DUOBAO_REQ          = 0x7E;
+
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
 
@@ -715,6 +718,9 @@ namespace REP
 
     /** 墨宝 */
     const UInt8 MO_BAO              = 0x78;
+
+    /** 夺宝奇兵 */
+    const UInt8 DUOBAO_REP          = 0x7E;
 
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
