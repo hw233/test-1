@@ -349,6 +349,8 @@ private:
         e_unBleedFieldGape2 = 126, // 解除地裂效果2
         e_bleedFieldGape3 = 127, // 地裂效果3
         e_unBleedFieldGape3 = 128, // 解除地裂效果3
+        e_yehuoBleedMo = 129,    // 业火(墨流血)
+        e_unYehuoBleedMo = 130,  // 解除业火
 
         e_MAX_STATE,
     };
