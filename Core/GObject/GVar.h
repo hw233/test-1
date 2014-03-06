@@ -136,8 +136,10 @@ namespace GObject
         GVAR_3366_BUY_BEGIN = 81,
         GVAR_3366_BUY_END = 82,
         GVAR_SEVENSOUL_FIX = 83,
+
         GVAR_GUANKAACT_BEGIN = 84,  //关卡活动开始时间
         GVAR_GUANKAACT_END   = 85,  //关卡活动结束时间
+        GVAR_DUOBAO_ENDTIME = 86, // 夺宝每轮结束时间（用作宕机特殊处理）
         
         GVAR_MAX,
     };
@@ -232,6 +234,7 @@ namespace GObject
             GREGISTER_VAR(GVAR_3366_BUY_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_3366_BUY_END, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_SEVENSOUL_FIX, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_DUOBAO_ENDTIME, GCYCLE_NONE);
 
             GREGISTER_VAR(GVAR_SERVERWAR_ISENTER, GCYCLE_WEEK);
             GREGISTER_VAR(GVAR_SERVERWAR_JIJIANTAI, GCYCLE_WEEK);

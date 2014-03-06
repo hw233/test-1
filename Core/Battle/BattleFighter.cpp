@@ -80,6 +80,8 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _selfSummon(NULL), _dec_wave_dmg(0), _lingqu_last(0), _lingqu_times(0), _lingqu(false), _soulout_last(0), _soulout(false),  _lingshi_bleed(0), _lingshi_bleed_last(0),
     _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0), _abnormalTypeCnt(0), _bleedTypeCnt(0),_evadeCnt(0), _peerlessDisableLast(0), _soulProtectLast(0), _soulProtectCount(0), _2ndRateCoAtk(0), _2ndCoAtkSkill(NULL), _2ndRateProtect(0), _2ndProtectSkill(NULL), _dmg_deep(0), _dmg_deep_last(0), _dmg_ningshi(0), _dmg_ningshi_last(0), _ningshizhe(NULL)
    ,_ruRedCarpetLast(0), _shiFlowerLast(0), _shiFlowerAura(0), _daoRoseLast(0), _moKnotLast(0)
+   ,_bActCnt(0), _immune3(0), _revivalCnt(0), _prudentLast(0),_prudentHitrate(0), _prudentHitrateLastOtherside(0), _silkwormCnt(0)
+   ,_yehuoLevel(0), _yehuo_ss_dmgRate(0), _yehuo_ss_upRate(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -182,6 +184,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill(_fighter->getPassiveSkillBleedTypeDmg(), _passiveSkillBleedTypeDmg);
     updatePassiveSkillPrvAtk100Status();
     updatePassiveSkillBLTY100Status();
+    updatePassiveSkill100(_fighter->getPassiveSkillViolent100(), _passiveSkillViolent100);
+    updatePassiveSkill100(_fighter->getPassiveSkillRevival100(), _passiveSkillRevival100);
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
     cnt = lbSkills.size();
@@ -1120,6 +1124,16 @@ const GData::SkillBase* BattleFighter::getPassiveSkillBLTY100(size_t& idx, bool 
     return getPassiveSkill100(_passiveSkillBLTY100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillViolent100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillRevival100, idx, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkillOnHPChange100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillOnHPChange100, idx, noPossibleTarget);
@@ -1424,6 +1438,14 @@ float BattleFighter::getHitrate(BattleFighter* defgt)
     else
         hiterate = _formula->calcHitrate(this, defgt) + _hitrateAdd + _hitrateAdd2 + _hitChangeByPeerless;
 
+    if(getPrudentLast() > 0)
+        hiterate -= getPrudentHitrate();
+    if(getPrudentHitrateLastOtherside() > 0)
+        hiterate -= 90;
+
+    if(getImmune3() > 0)
+        hiterate += 100;
+
 // #ifdef _DEBUG
 //     if (_hitChangeByPeerless != 0)
 //     {
@@ -1497,6 +1519,9 @@ float BattleFighter::getCounter(BattleFighter* defgt, const GData::SkillBase* sk
         counter = _counter + _counterAdd + _counterAdd2 + _counterChangeByPeerless;
     else
         counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2 + _counterChangeByPeerless;
+
+    if(getImmune3() > 0)
+        counter += 100.0f;
 
 // #ifdef _DEBUG
 //     if (_counterChangeByPeerless != 0)
@@ -2229,6 +2254,8 @@ void BattleFighter::clearSkill()
     _passiveSkillBleedTypeDmg100.clear();
     _passiveSkillXMCZ100.clear();
     _passiveSkillBLTY100.clear();
+    _passiveSkillViolent100.clear();
+    _passiveSkillRevival100.clear();
     _passiveSkillOnHPChange100.clear();
     _passiveSkillOnWithstand100.clear();
 

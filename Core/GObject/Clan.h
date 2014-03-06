@@ -216,6 +216,16 @@ struct MemberDonate
 };
 typedef std::multimap<UInt32, MemberDonate> MemberDonates;
 
+struct DuoBaoLog
+{
+	UInt32 clanId;
+	std::string name;
+	UInt16 score;
+    UInt32 itemId;
+    UInt8 cnt;
+    DuoBaoLog() : clanId(0), name(""), score(0), itemId(0), cnt(0) {}
+};
+typedef std::list<DuoBaoLog> DuoBaoLogs;
 
 struct ClanSpiritTree
 {
@@ -288,6 +298,24 @@ private:
 		}
 	};
 	typedef std::multiset<ClanMember *, MemberLess> Members;
+
+    struct ScoreSort
+    {
+        GObject::Player* player;
+        UInt16 score;
+        UInt32 time;
+        ScoreSort():player(NULL),score(0),time(0){}
+    };
+
+    struct lt_sort
+    {
+        bool operator()(const ScoreSort& a, const ScoreSort& b) const { return a.score > b.score || (a.score==b.score && a.time < b.time); }
+    };
+
+    typedef std::multiset<ScoreSort, lt_sort> ScoreSortType;
+public:
+    ScoreSortType DuoBaoScoreSort;     //夺宝排名
+
 public:
 	Clan( UInt32 id, const std::string& name, UInt32 ft = 0, UInt8 lvl = 1 );
 	~Clan();
@@ -580,6 +608,25 @@ public:
     void   insertIntoCopySnap(Player *player, UInt8 spotId);
     UInt8  getCopyPlayerSnap(Player *player);
 
+public:
+    void LoadDuoBaoLog(const std::string& name, UInt16 score, UInt32 itemId, UInt8 cnt);
+    void LoadDuoBaoScore(Player * pl);
+    void DuoBaoInfo(Player * pl);
+    void DuoBaoStart(Player * pl);
+    //void DuoBaoEnd();
+    void SendDuoBaoAward();
+
+private:
+    bool IsDuoBaoTime();
+    void SendDuoBaoLog(Stream & st);
+    void SetDuoBaoScore(Player * pl);
+    void DelDuoBaoScore(Player * pl);
+    void SendDuoBaoScore(Stream & st);
+    void DuoBaoLvlAward();
+    void DuoBaoUpdate(const std::string& playerName, UInt16 score);
+    void DuoBaoDel(UInt8 mark);
+    void ClearDuoBaoLog();
+    void DuoBaoBroadcast(Stream& st);
 
 public:
 
@@ -668,6 +715,8 @@ public:
             DB5().PushUpdateData("UPDATE `clan` SET `gongxian` = %u WHERE `id` = %u", _gongxian, _id);
     }
 
+    void SetDuoBaoAward(UInt32 itemId) { _duoBaoAward = itemId; }
+    UInt32 GetDuoBaoAward() {return _duoBaoAward;}
 public:
 	ClanMember * getClanMember(Player *);
 	bool existClanMember(Player *);
@@ -725,6 +774,7 @@ private:
 
 	//std::map<UInt8, MemberDonates> _memberDonates;
 	MemberDonates _memberDonates;
+    DuoBaoLogs _duobaoLogs;
 
 	std::map<UInt32, UInt8> _repoNum;
 	std::multimap<UInt32, AllocRecord> _allocRecords;
@@ -758,6 +808,7 @@ private:
     UInt32 _xianyun;
     UInt32 _gongxian;
     UInt8 _urge[3];
+    UInt32 _duoBaoAward;
 
     ClanSpiritTree m_spiritTree;
 public:

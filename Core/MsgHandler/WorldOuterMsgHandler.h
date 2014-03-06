@@ -703,6 +703,26 @@ void OnClanGetDynamicMsgReq(GameMsgHdr& hdr, ClanGetDynamicMsgReq& req)
 	player->getClan()->sendClanDynamicMsg(player, req._type, req._start, req._count);
 }
 
+void OnClanDuoBaoReq(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL) return;
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    switch(type)
+    {
+    case 0x00:
+        clan->DuoBaoInfo(player);
+        break;
+    case 0x01:
+        clan->DuoBaoStart(player);
+        break;
+    }
+}
+
 void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
