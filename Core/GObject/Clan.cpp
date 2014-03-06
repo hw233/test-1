@@ -5059,8 +5059,8 @@ void Clan::DuoBaoInfo(Player * pl)
     if(level > 10)
         return;
 
-    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
-        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));
+    /*if(TimeUtil::Now() > GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));*/
 
     UInt32 status = pl->GetVar(VAR_CLAN_DUOBAO_STATUS);
     UInt32 num = pl->GetVar(VAR_CLAN_DUOBAO_SUCCESS_NUM);
@@ -5108,12 +5108,12 @@ void Clan::DuoBaoStart(Player * pl)
     if(NULL == pl)
         return;
 
-    UInt32 num = pl->GetVar(VAR_CLAN_DUOBAO_SUCCESS_NUM);
+    /*UInt32 num = pl->GetVar(VAR_CLAN_DUOBAO_SUCCESS_NUM);
     if(num >= 3)
     {
         pl->sendMsgCode(0, 4012);
         return;
-    }
+    }*/
     
     DuoBaoLvlAward();
     UInt16 score = uRand(778) + 111; //111 ~ 888
