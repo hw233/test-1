@@ -3948,8 +3948,9 @@ namespace GObject
 			checkDeath();
 
 		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
-        if(World::getGuankaAct() && npcId >= 13524 && npcId <= 13529)
-            TRACE_LOG("bsim.getRounds():%u_%u_%u_%s_%" I64_FMT "u", npcId, res ? 1 : 0, bsim.getRounds()+1, getName().c_str(), getId());
+
+        if(World::getGuankaAct() && npcId >= 13500 && npcId <= 13529)
+            guankaActUdpLog(npcId, res);
         if(res && World::getGuankaAct() && npcId >= 13524 && npcId <= 13529)
         {
             addguankaScoreByAttack(bsim.getRounds()+1);
@@ -28604,10 +28605,14 @@ void Player::doGuankaAct(UInt8 type)
             }
         }
     }
+}
+
+void Player::guankaActUdpLog(UInt32 npcId, bool result)
+{
     //add udpLog
     UInt32 logInfo = GetVar(VAR_GUANKA_ACTION_UDPLOG);
-    UInt8 tmpIdx = npcId - npcIds[0][0];    //最大30个
-    if(GET_BIT(logInfo, tmpIdx))
+    int tmpIdx = npcId - 13500;    //最大30个
+    if(tmpIdx < 0 || tmpIdx > 30 || GET_BIT(logInfo, tmpIdx))
         return;
     logInfo = SET_BIT(logInfo, tmpIdx);
     SetVar(VAR_GUANKA_ACTION_UDPLOG, logInfo);
@@ -28628,7 +28633,7 @@ void Player::doGuankaAct(UInt8 type)
         }
     }
     char str[32] = {0};
-    sprintf(str, "F_140240_%u_%u", npcId, res ? 1 : 2);
+    sprintf(str, "F_140240_%u_%u", npcId, result ? 1 : 2);
     udpLog("hundunmoyu", str, trumpStr.c_str(), Itoa(getBattlePoint()).c_str(), "", "", "act");
 }
 

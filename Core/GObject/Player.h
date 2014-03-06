@@ -2916,6 +2916,7 @@ namespace GObject
         void doGuankaAct(UInt8);
         void sendguankaActMyRank();
         void getguankaScoreAward(UInt8);
+        void guankaActUdpLog(UInt32, bool);
         void addguankaScoreByAttack(UInt32);
 
     public:
