@@ -5108,12 +5108,12 @@ void Clan::DuoBaoStart(Player * pl)
     if(NULL == pl)
         return;
 
-    /*UInt32 num = pl->GetVar(VAR_CLAN_DUOBAO_SUCCESS_NUM);
+    UInt32 num = pl->GetVar(VAR_CLAN_DUOBAO_SUCCESS_NUM);
     if(num >= 3)
     {
         pl->sendMsgCode(0, 4012);
         return;
-    }*/
+    }
     
     DuoBaoLvlAward();
     UInt16 score = uRand(778) + 111; //111 ~ 888
