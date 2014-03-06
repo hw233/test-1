@@ -5167,7 +5167,7 @@ void GMHandler::OnClanBuildingInfo(GObject::Player *player, std::vector<std::str
 // TODO: 帮派建筑相关GM操作 
 void GMHandler::OnClanBuildingOp(GObject::Player *player, std::vector<std::string>& args)
 {
-    if (args.size() < 1)
+    if (args.size() < 2)
         return;
     Clan *clan = player->getClan();
     if (!clan)
@@ -5176,9 +5176,11 @@ void GMHandler::OnClanBuildingOp(GObject::Player *player, std::vector<std::strin
     if (!buildingOwner)
         return;
     UInt8 opType = atoi(args[0].c_str());
+    UInt32 val = atoi(args[1].c_str());
     switch (opType)
     {
         case 1:
+            buildingOwner->addEnergy(val);
             break;
         case 2:
             break;
@@ -5207,7 +5209,7 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
         return;
     UInt8 leftId = atoi(args[0].c_str());
     UInt32 clanId = atoi(args[1].c_str());
-    std::map<Player *, UInt8> warSort;
+    std::vector<Player *> warSort;
     UInt8 i = 0, j = 0;
     std::string clanName = "";
     UInt32 size = globalPlayers.size();
@@ -5243,20 +5245,21 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
                 continue ;
         }
         if(player && player->GetLev() >= LIMIT_LEVEL)
-            warSort.insert(std::make_pair(player, i++));
+            warSort.push_back(player);
         if(warSort.size() == 5)
         {
             struct SWarEnterData {
                 Stream st;
-                std::map<Player *, UInt8> warSort;
-                SWarEnterData(Stream& st2, std::map<Player *, UInt8>& warSort2) : st(st2), warSort(warSort2) {}
+                std::vector<Player *> warSort;
+                UInt8 pos ;
+                SWarEnterData(Stream& st2, std::vector<Player *>& warSort2) : st(st2), warSort(warSort2),pos(0) {}
             };
 
             Stream st(SERVERLEFTREQ::ENTER, 0xEE);
             st<<clanId <<clanName << player->getName()/*领队*/  <<leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
             SWarEnterData * swed = new SWarEnterData(st, warSort);
-            std::map<Player *, UInt8>::iterator it = warSort.begin();
-            GameMsgHdr hdr(0x391, it->first->getThreadId(), it->first, sizeof(SWarEnterData*));
+            std::vector<Player *>::iterator it = warSort.begin();
+            GameMsgHdr hdr(0x391, (*it)->getThreadId(), *it, sizeof(SWarEnterData*));
             GLOBAL().PushMsg(hdr, &swed);
 
             i = 0;

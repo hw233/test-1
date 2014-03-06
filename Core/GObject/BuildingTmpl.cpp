@@ -35,9 +35,15 @@ namespace GObject
         switch(_levelType)
         {
             case eLevelUpByLevel:
-                ret = levelUpByLevel(uVal);
+                {
+                    ret = levelUpByLevel(uVal);
+                    break;
+                }
             case eLevelUpByExp:
-                ret = levelUpByExp(uVal);
+                {
+                    ret = levelUpByExp(uVal);
+                    break;
+                }
             case eLevelUpDefault:
             default:
                 ret = levelUpDefault(uVal);

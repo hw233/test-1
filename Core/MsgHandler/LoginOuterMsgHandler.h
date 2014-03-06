@@ -798,6 +798,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->continuousLoginSummerFlow();
             pl->SetQQBoardLogin();
             pl->setPresentLogin();
+            pl->SetVar(GObject::VAR_LEFTADDR_POWER,10);
             UInt64 userId = atoll(nu._invited.c_str());
             if(isNew_qq && userId)     //设置邀请好友成功
             {

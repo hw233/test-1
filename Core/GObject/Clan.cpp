@@ -717,6 +717,22 @@ bool Clan::leave(Player * player)
         DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid` = %" I64_FMT "u", player->getId());
 		// updateRank(NULL, oldLeaderName);
 	}
+    if(player->getLeftAddrEnter())
+    {
+        struct TeamChange
+        {
+            UInt8 leftId ; 
+            UInt32 clanId ;
+            UInt64 playerId;
+            UInt8 pos1;
+            UInt8 pos2;
+            TeamChange(UInt8 leftId_ ,UInt32 clanId_,UInt64 playerId_ ,UInt8 pos1_ ,UInt8 pos2_):leftId(leftId_),clanId(clanId_),playerId(playerId_),pos1(pos1_),pos2(pos2_){}
+        };
+        TeamChange tc(255,getId(),player->getId(), 0 ,0);
+        GameMsgHdr hdr(0x393, player->getThreadId(), player, sizeof(TeamChange));
+        GLOBAL().PushMsg(hdr, &tc);
+        _buildingOwner->LeaveTeam(NULL,player,player,1);
+    }
 
 	return true;
 }
@@ -1666,6 +1682,22 @@ void Clan::disband(Player * player)
         UInt32 clanId = getId(); 
         GameMsgHdr hdr(0x1D4, WORKER_THREAD_WORLD, player, sizeof(clanId));
         GLOBAL().PushMsg(hdr, &clanId);
+    }
+    if(player->getLeftAddrEnter())
+    {
+        struct TeamChange
+        {
+            UInt8 leftId ; 
+            UInt32 clanId ;
+            UInt64 playerId;
+            UInt8 pos1;
+            UInt8 pos2;
+            TeamChange(UInt8 leftId_ ,UInt32 clanId_,UInt64 playerId_ ,UInt8 pos1_ ,UInt8 pos2_):leftId(leftId_),clanId(clanId_),playerId(playerId_),pos1(pos1_),pos2(pos2_){}
+        };
+        TeamChange tc(255,getId(),player->getId(), 0 ,0);
+        GameMsgHdr hdr(0x393, player->getThreadId(), player, sizeof(TeamChange));
+        GLOBAL().PushMsg(hdr, &tc);
+        _buildingOwner->LeaveTeam(NULL,player,player,1);
     }
 }
 float Clan::getAutoBattleSpeed()

@@ -138,6 +138,12 @@ namespace Network
 				return;
 			m_TcpService->closeConn(-2);
 		}
+		inline void CloseServerLeft()
+		{
+			if(!m_Active)
+				return;
+			m_TcpService->closeConn(-3);
+		}
 		/*inline void CloseSocial()
 		{
 			if(!m_Active)

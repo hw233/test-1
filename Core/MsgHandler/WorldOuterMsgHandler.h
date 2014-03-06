@@ -3583,6 +3583,7 @@ void OnServerWarConnected( ServerWarMsgHdr& hdr, const void * data )
 	if(r == 1)
 	{
 		INFO_LOG("Failed to connect to ServerWar arena.");
+
 		NETWORK()->CloseServerWar();
 		return;
 	}
@@ -3825,7 +3826,8 @@ void OnServerLeftConnected( ServerLeftMsgHdr& hdr, const void * data )
 	if(r == 1)
 	{
 		INFO_LOG("Failed to connect to ServerWar arena.");
-		NETWORK()->CloseServerWar();
+        WORLD().setLeftAddrConnection(0);
+		NETWORK()->CloseServerLeft();
 		return;
 	}
     UInt8 fhaslater = 0;
@@ -3963,6 +3965,10 @@ void OnServerLeftGetSpirit(ServerLeftMsgHdr& hdr, const void * data)
         return ;
     UInt32 num = 0;
     br >> num ; 
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    
+    if (buildingOwner)
+        buildingOwner->addEnergy(num);
 }
 void OnServerLeftErrInfo(ServerLeftMsgHdr& hdr, const void * data)
 {
@@ -4011,6 +4017,30 @@ void OnServerLeftMemberLeave(ServerLeftMsgHdr& hdr, const void * data)
         else
             player->setLeftAddrEnter(false);
 
+    }
+}
+void OnServerLeftMemberGet(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 val = 0;
+    br >> val;
+    UInt8 num = 0;
+    br >> num ;
+    UInt64 playerId=  0;
+    Clan * clan = NULL;
+    for(UInt8 i = 0 ; i < num ;++i)
+    {
+        br >> playerId;
+        if( playerId ==0 )
+            continue;
+        GObject::Player * player = GObject::globalPlayers[playerId];
+        if(!player)
+            continue;
+        if(!clan)
+            clan = player->getClan();
+        if(!clan)
+            continue;
+        clan->addMemberProffer(player, val);
     }
 }
 #endif // _WORLDOUTERMSGHANDLER_H_

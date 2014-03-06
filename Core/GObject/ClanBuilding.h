@@ -35,7 +35,7 @@ namespace GObject
         }
         bool operator == ( const  LeftAttackLeader& leftAttack) const
         {
-            return leftId == leftAttack.leftId && leader == leftAttack.leader;
+            return leftId == leftAttack.leftId || leader == leftAttack.leader;
         }
     };
 
@@ -84,9 +84,9 @@ namespace GObject
         public:
         enum OpType
         {
-            opUnknown = 0,      // 未定义操作
-            opGetInfo = 1,      // 获取帮派建筑信息
-            opUpgrade = 2,      // 升级帮派建筑
+       //     opUnknown = 0,      // 未定义操作
+            opGetInfo = 0,      // 获取帮派建筑信息
+            opUpgrade = 1,      // 升级帮派建筑
             /*
             opLeftAddrInfo = 3,  //查看遗迹信息
             opCreateTeam = 4 ,  //创建征战小队            
@@ -110,7 +110,7 @@ namespace GObject
             UInt32 getEnergy() const;
 
             void   processFromBrd(Player *player, BinaryReader& brd);
-            void   process(Player *player, UInt8 type, std::vector<UInt8> vals);
+            void   process(Player *player, std::vector<UInt8> vals);
 
             void   upgradeBuilding(Player *player, UInt8 type);
 
@@ -122,17 +122,19 @@ namespace GObject
 
             UInt16 getLevel(UInt8 type) const;
             UInt32 getAddVal(UInt8 type) const;
-            void addEnergy(UInt32 energy){ _energy+= energy ;}
+            void addEnergy(UInt32 energy){ _energy+= energy ; UpdateEnergy();}
             UInt32 getEnergy(){ return _energy;}
             void AddBattlesInfo(struct ClanBuildBattleInfo cbbi);
             void SendBattlesInfo(Stream & st);
             void CreateTeam(Player * leader , UInt8 leftId);
             void EnterTeam(Player * leader , Player * player);
             void ChangeTeamMember(Player * leader , UInt8 first , UInt8 sevond);
-            void LeaveTeam(Player * leader , Player * player ,Player * opter);
+            void LeaveTeam(Player * leader , Player * player ,Player * opter ,UInt8 broad = 0);
             void AttackLeftAddr(Player * player);
             void LineUp(Player * player);
             void sendAttackTeamInfo(Player *player);
+            void UpdateEnergy();
+            
         private:
             Clan * _clan;
             std::vector<ClanBuilding> _buildings;
