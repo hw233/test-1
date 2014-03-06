@@ -4087,6 +4087,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         {
             int i = 0;
             int fsize = skill->factor.size();
+            bool silkwormFlag = false;
             for(UInt8 pos = 0; pos < 25; pos++)
             {
                 if(getObject(target_side, pos) == NULL || getObject(target_side, pos)->getHP() == 0)
@@ -4102,13 +4103,38 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     if(skill->effect)
                         factor2 = skill->effect->efv[0] / 100.f;
                     factor *= (1.0 + factor2 * bf->getSilkwormCnt());
+                    silkwormFlag = true;
                 }
                 dmg += attackOnce(bf, first, cs, pr, skill, getObject(target_side, pos), factor, -1, NULL, NULL, canProtect);
                 canProtect = false;
                 doSkillEffectExtraAbsorb(bf, dmg, skill);
                 ++i;
             }
-            bf->setSilkwormCnt(0);
+            if(silkwormFlag)
+                bf->setSilkwormCnt(0);
+
+            GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+            const GData::SkillStrengthenEffect* ef = NULL;
+            if(ss)
+                ef = ss->getEffect(GData::ON_DAMAGE, GData::TYPE_YE_HUO);
+            if(ef)
+            {
+                BattleFighter* bo = getRandomFighter(1 - bf->getSide(), NULL, 0);
+                if(bo)
+                {
+                    UInt8 yehuoLeve = bo->getYehuoLevel();
+                    float upRate = ef->value / 100.0f;
+                    float dmgRate = ef->valueExt1;
+                    bo->setYehuoSSUpRate(upRate);
+                    bo->setYehuoSSDmgRate(dmgRate * bf->getAttack());
+                    if(yehuoLeve < 9)
+                    {
+                        yehuoLeve += 1;
+                        bo->setYehuoLevel(yehuoLeve);
+                        appendDefStatus(e_BleedMo, yehuoLeve, bo);
+                    }
+                }
+            }
         }
         else if(specialEf && isQueqiao)
         {
@@ -10391,6 +10417,22 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             }
             break;
         }
+
+        UInt8 yehuoLeve = bf->getYehuoLevel();
+        if(yehuoLeve > 0)
+        {
+            float yehuoSSDmgRate = bf->getYehuoSSDmgRate();
+            UInt32 dmg = static_cast<UInt32>(yehuoSSDmgRate * yehuoLeve);
+            makeDamage(bf, dmg, e_BleedMo, e_damageTrue);
+            if(yehuoLeve < 9 && static_cast<float>(uRand(10000)) < bf->getYehuoSSUpRate() * 10000)
+            {
+                yehuoLeve += 1;
+                bf->setYehuoLevel(yehuoLeve);
+                appendDefStatus(e_BleedMo, yehuoLeve, bf);
+            }
+        }
+        if(bf->getHP() == 0)
+            break;
 
         /////////////////////////////////////////////////////////
         // 地裂效果造成的流血状态

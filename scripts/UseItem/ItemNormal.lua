@@ -9010,6 +9010,64 @@ function ItemNormal_00010242(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010243(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (7+(7*num*2)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(56, num*2, true, false, 2);
+    package:Add(57, num*2, true, false, 2);
+    package:Add(15, num*2, true, false, 2);
+    package:Add(9390, num*2, true, false, 2);
+    package:Add(51, num*1, true, false, 2);
+    package:Add(48, num*1, true, false, 2);
+    package:Add(49, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010244(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (6+(6*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(9600, num*3, true, false, 2);
+    package:Add(9371, num*3, true, false, 2);
+    package:Add(1326, num*3, true, false, 2);
+    package:Add(9340, num*3, true, false, 2);
+    package:Add(49, num*1, true, false, 2);
+    package:Add(50, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010245(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (5+(5*num*8)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    player:getCoupon(num*30)
+    package:Add(1126, num*8, true, false, 2);
+    package:Add(133, num*8, true, false, 2);
+    package:Add(549, num*1, true, false, 2);
+    package:Add(509, num*3, true, false, 2);
+    package:Add(507, num*3, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -12756,6 +12814,9 @@ local ItemNormal_Table = {
     [10240] = ItemNormal_00010239,
     [10241] = ItemNormal_00010239,
     [10242] = ItemNormal_00010242,
+    [10243] = ItemNormal_00010243,
+    [10244] = ItemNormal_00010244,
+    [10245] = ItemNormal_00010245,
     [9480] = ItemNormal_0009480,
     [9481] = ItemNormal_0009480,
     [9482] = ItemNormal_0009480,
