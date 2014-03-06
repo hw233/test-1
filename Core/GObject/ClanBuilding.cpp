@@ -218,11 +218,6 @@ namespace GObject
         }
         else
         {
-            if(_clan->getStatueLevel() < 10 )
-            {
-                player->sendMsgCode(2,4024);
-                return ;
-            }
             switch(type)
             {
                 case 0x02:
@@ -258,6 +253,11 @@ namespace GObject
                     break;
                 case 0x03:
                     {
+                        if(_clan->getStatueLevel() < 10 )
+                        {
+                            player->sendMsgCode(2,4024);
+                            return ;
+                        }
                         UInt8 leftId = 0;
                         brd >>leftId ;
                         CreateTeam(player , leftId);
