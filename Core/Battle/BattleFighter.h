@@ -1559,6 +1559,16 @@ private:
     UInt16 getSilkwormCnt() { return _silkwormCnt;}
     void addSilkwormCnt(UInt16 count) { _silkwormCnt += count; }
 
+    UInt8 _yehuoLevel;
+    void setYehuoLevel(UInt8 level) { _yehuoLevel = level; }
+    UInt8 getYehuoLevel() { return _yehuoLevel; }
+    float _yehuo_ss_dmgRate;
+    void setYehuoSSDmgRate(float f) { _yehuo_ss_dmgRate = f; }
+    float getYehuoSSDmgRate() { return _yehuo_ss_dmgRate; }
+    float _yehuo_ss_upRate;
+    void setYehuoSSUpRate(float f) { _yehuo_ss_upRate = f; }
+    float getYehuoSSUpRate() { return _yehuo_ss_upRate; }
+
 public:
 	enum StatusFlag
 	{
