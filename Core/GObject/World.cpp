@@ -488,7 +488,6 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
-
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 2)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 3)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 4)
@@ -496,6 +495,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 6)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 7)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
+         
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -526,6 +533,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
         ))
     {
 #if 0
@@ -1363,7 +1371,6 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
-
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 2)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 3)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 4)
@@ -1371,6 +1378,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 6)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 7)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
+         
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
 
          )
         bRechargeEnd = true;
@@ -1967,6 +1982,51 @@ void World::ClanStatueCheck(void *)
     globalClans.enumerate(visitor);
 }
 
+void World::ClanDuoBaoCheck(void *)
+{
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    UInt32 start = time + 10*60*60;     // 每天10点开始
+    UInt32 end = time + 22*60*60 + 5;   // 每天22点结束(加5秒, 用于最后一次结算)
+
+    if(nowTime >= start && nowTime <= end)
+    { 
+        if(TimeUtil::Now() >= GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
+        {
+            class DuoBaoEndVisitor : public Visitor<Clan>
+            {
+                public:
+                    DuoBaoEndVisitor()
+                    {
+                    }
+
+                    bool operator()(Clan* clan)
+                    {
+                        clan->SendDuoBaoAward();
+                        return true;
+                    }
+
+            };
+            DuoBaoEndVisitor visitor;
+            globalClans.enumerate(visitor);
+        }
+
+        UInt32 value = 0;
+
+        if(nowTime >= time + 22*60*60)
+            value = time + 10*60*60 + 120 + 86400;
+        else
+            value = nowTime / (2 * 60) * (2 * 60) + (2 * 60);
+
+        /*if(nowTime >= time + 22*60*60)
+            value = time + 10*60*60 + 900 + 86400;
+        else
+            value = nowTime / (15 * 60) * (15 * 60) + (15 * 60);*/
+
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, value);
+    }
+}
+
 inline static bool enum_spread_send(Player* player, void* data)
 {
     if(player == NULL || !player->isOnline())
@@ -2133,12 +2193,31 @@ bool World::Init()
     }
     */
 
-    
     if( GObject::MarryBoard::instance().sendAward())
     {
         gMarryMgr.MarryingCrush();
     }
     AddTimer(60 * 60 * 3 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
+
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    UInt32 start = time + 10*60*60;
+    UInt32 end = time + 22*60*60;
+    UInt32 valueTime = 0;
+
+    if(nowTime < start && nowTime > end)
+        valueTime = time + 10*60*60 + 120;
+    else
+        valueTime = nowTime / (2 * 60) * (2 * 60) + (2 * 60);
+
+    /*if(nowTime < start && nowTime > end)
+        valueTime = time + 10*60*60 + 900;
+    else
+        valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);*/
+
+    GVAR.SetVar(GVAR_DUOBAO_ENDTIME, valueTime);
+
+    AddTimer(5 * 1000, ClanDuoBaoCheck, static_cast<void*>(NULL));
     return true;
 }
 

@@ -1338,6 +1338,7 @@ private:
     static void ArenaExtraActTimer(void *);
     static void ClanCopyCheck(void *);
     static void ClanStatueCheck(void *);
+    static void ClanDuoBaoCheck(void *);
     static void SendPopulatorRankAward(void*);
     //static void advancedHookTimer(void *para);
 public:

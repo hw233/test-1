@@ -579,6 +579,7 @@ private:
     void doSkillEffectExtra_Shi_Flower(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_Dao_Rose(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_Mo_Knot(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_Prudent(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_LingShiBleed2(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
@@ -784,6 +785,8 @@ private:
     void doPassiveSkillBePHYDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
 
     void tryParry(BattleFighter* bf, UInt32& dmg, UInt32& magDmg, BattleFighter* bfAttacker);
+    void calcSilkwormCnt(BattleObject* bo);
+    void doAbnormalStatusClear(BattleObject* bo);
 };
 
 }

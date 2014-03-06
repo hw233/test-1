@@ -184,6 +184,22 @@ public:
         return (ret > 0 ? ret : 0);
     }
 
+    void setDefend(float percent)
+    {
+        _defend *= percent;
+        _defAdd *= percent;
+        _defAdd2 *= percent;
+        _counter_spirit_def_add *= percent;
+        _defendChangeSS *= percent;
+
+        _magdef *= percent;
+        _magDefAdd *= percent;
+        _magDefAdd2 *= percent;
+        _counter_spirit_magdef_add *= percent;
+        _fire_defend *= percent;
+        _magDefendChangeSS *= percent;
+    }
+
 	float getHitrate(BattleFighter* defgt);
 	float getEvade(BattleFighter* defgt);
 	float getCritical(BattleFighter* defgt);
@@ -1449,6 +1465,8 @@ private:
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;
     std::vector<GData::SkillItem> _passiveSkillXMCZ100;
     std::vector<GData::SkillItem> _passiveSkillBLTY100;
+    std::vector<GData::SkillItem> _passiveSkillViolent100;
+    std::vector<GData::SkillItem> _passiveSkillRevival100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1457,7 +1475,8 @@ private:
     const GData::SkillBase* getPassiveSkillBleedTypeDmg(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillXMCZ100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget = false);
-
+    const GData::SkillBase* getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget = false);
 
 private:
     float _2ndRateCoAtk;
@@ -1513,6 +1532,32 @@ private:
     UInt8 _moKnotLast;
     void setMoKnot(UInt8 last) { _moKnotLast = last; }
     UInt8 getMoKnot() { return _moKnotLast; }
+
+    UInt16 _bActCnt;
+    UInt16 getActCnt() { return _bActCnt; }
+    void addActCnt(UInt16 count) { _bActCnt += count; }
+    UInt16 _immune3;
+    void setImmune3(UInt16 v) { _immune3 = v; }
+    UInt16 getImmune3() { return _immune3; }
+
+    UInt16 _revivalCnt;
+    void setRevivalCnt(UInt16 count) { _revivalCnt = count; }
+    UInt16 getRevivalCnt() { return _revivalCnt;}
+
+    UInt8 _prudentLast;
+    void setPrudentLast(UInt8 last) { _prudentLast = last; }
+    UInt8 getPrudentLast() { return _prudentLast; }
+    float _prudentHitrate;
+    void setPrudentHitrate(float value) { _prudentHitrate = value; }
+    float getPrudentHitrate() { return _prudentHitrate;}
+    UInt8 _prudentHitrateLastOtherside;
+    void setPrudentHitrateLastOtherside(UInt8 last) { _prudentHitrateLastOtherside = last; }
+    UInt8 getPrudentHitrateLastOtherside() { return _prudentHitrateLastOtherside; }
+
+    UInt16 _silkwormCnt;
+    void setSilkwormCnt(UInt16 count) { _silkwormCnt = count; }
+    UInt16 getSilkwormCnt() { return _silkwormCnt;}
+    void addSilkwormCnt(UInt16 count) { _silkwormCnt += count; }
 
     UInt8 _yehuoLevel;
     void setYehuoLevel(UInt8 level) { _yehuoLevel = level; }

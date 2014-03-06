@@ -154,6 +154,7 @@ bool Country::Init()
 
         GObject::ClanBoss::instance().init();
 	    AddTimer(1000, ClanBoss_Refresh, static_cast<void*>(NULL));
+
 	}
 
 	return true;
