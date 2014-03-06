@@ -3291,6 +3291,12 @@ UInt8 SwitchAutoForbid(UInt32 val)
     return 0;
 }
 
+inline bool clan_enum_0(GObject::Clan *clan, int)
+{
+   clan->ClearDuoBaoData();
+   return true;
+}
+
 inline bool player_enum_2(GObject::Player* pl, int type)
 {
     switch(type)
@@ -3415,6 +3421,12 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_GUANKA_ACTION_TIME, 0);
                 GameMsgHdr hdr(0x1B7, WORKER_THREAD_WORLD, pl, 0);
                 GLOBAL().PushMsg(hdr, NULL);
+            }
+            break;
+        case 18:
+            {
+                pl->SetVar(GObject::VAR_CLAN_DUOBAO_SCORE, 0);
+                pl->SetVar(GObject::VAR_CLAN_DUOBAO_STATUS, 0);
             }
             break;
         default:
@@ -3891,6 +3903,27 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         }
         GObject::GVAR.SetVar(GObject::GVAR_GUANKAACT_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_GUANKAACT_END, end);
+        ret = 1;
+    }
+    else if (type == 18 && begin <= end )
+    {
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 18);
+            GObject::globalClans.enumerate(clan_enum_0, 0);
+
+            DB5().PushUpdateData("DELETE FROM `duobaolog`");
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_CLAN_DUOBAO_END, end);
+
+        UInt32 valueTime = 0;
+        UInt32 nowTime = TimeUtil::Now();
+        if(nowTime < GObject::GVAR.GetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN) && nowTime > GObject::GVAR.GetVar(GObject::GVAR_CLAN_DUOBAO_END))
+            valueTime = GObject::GVAR.GetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN) / (15 * 60) * (15 * 60) + 900;
+        else
+            valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
+
+        GObject::GVAR.SetVar(GObject::GVAR_DUOBAO_ENDTIME, valueTime);
         ret = 1;
     }
 

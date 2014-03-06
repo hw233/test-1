@@ -465,6 +465,8 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
     {
         updataClanGradeInAirBook();
     }player->OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 0);
+
+    BroadDuoBaoBegin(player);
 	return true;
 }
 
@@ -497,6 +499,9 @@ bool Clan::join(ClanMember * cm)
     {
         updataClanGradeInAirBook();
     }
+
+    BroadDuoBaoBegin(player);
+
     return true;
 }
 
@@ -4926,22 +4931,9 @@ void Clan::SendClanMemberGrade(Player* player)
     player->send(st);
 }
 
-bool Clan::IsDuoBaoTime()
-{
-    UInt32 nowTime = TimeUtil::Now();
-    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
-    UInt32 start = time + 10*60*60;     // 每天10点开始
-    UInt32 end = time + 22*60*60 + 5;   // 每天22点结束(加5秒, 用于最后一次结算)
-
-    if(nowTime >= start && nowTime <= end)
-        return true; 
-    else
-        return false;
-}
-
 void Clan::LoadDuoBaoLog(const std::string& name, UInt16 score, UInt32 itemId, UInt8 cnt)
 {
-    if(!IsDuoBaoTime())
+    if(!World::getDuoBaoTime())
         return;
 
     DuoBaoLog log;
@@ -4955,7 +4947,7 @@ void Clan::LoadDuoBaoLog(const std::string& name, UInt16 score, UInt32 itemId, U
 
 void Clan::SendDuoBaoLog(Stream & st)
 {
-    if(!IsDuoBaoTime())
+    if(!World::getDuoBaoTime())
         return;
 
     UInt8 cnt = _duobaoLogs.size();
@@ -4970,7 +4962,7 @@ void Clan::SendDuoBaoLog(Stream & st)
 
 void Clan::LoadDuoBaoScore(Player * pl)
 {
-    if(!IsDuoBaoTime())
+    if(!World::getDuoBaoTime())
         return;
 
     if(NULL == pl)
@@ -4988,7 +4980,7 @@ void Clan::LoadDuoBaoScore(Player * pl)
 
 void Clan::SetDuoBaoScore(Player * pl)
 {
-    if(!IsDuoBaoTime())
+    if(!World::getDuoBaoTime())
         return;
 
     if(NULL == pl)
@@ -5032,7 +5024,7 @@ void Clan::DelDuoBaoScore(Player * pl)
 
 void Clan::SendDuoBaoScore(Stream & st)
 {
-    if(!IsDuoBaoTime())
+    if(!World::getDuoBaoTime())
         return;
 
     UInt8 cnt = DuoBaoScoreSort.size();
@@ -5047,7 +5039,7 @@ void Clan::SendDuoBaoScore(Stream & st)
 
 void Clan::DuoBaoInfo(Player * pl)
 {
-    if(!IsDuoBaoTime())
+    if(!World::getDuoBaoTime())
         return;
 
     if(NULL == pl)
@@ -5058,9 +5050,6 @@ void Clan::DuoBaoInfo(Player * pl)
     UInt8 level = _techs->getLev(8);
     if(level > 10)
         return;
-
-    /*if(TimeUtil::Now() > GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
-        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));*/
 
     UInt32 status = pl->GetVar(VAR_CLAN_DUOBAO_STATUS);
     UInt32 num = pl->GetVar(VAR_CLAN_DUOBAO_SUCCESS_NUM);
@@ -5091,7 +5080,6 @@ void Clan::DuoBaoLvlAward()
     if(duoBaoAward[level] > GetDuoBaoAward())
     {
         SetDuoBaoAward(duoBaoAward[level]);
-        DB5().PushUpdateData("UPDATE `clan` SET `duoBaoAward` = %u WHERE `id` = %u", _duoBaoAward, _id);
         Stream st(REP::DUOBAO_REP);
         st << static_cast<UInt8>(0x06);
         st << static_cast<UInt32>(duoBaoAward[level]);
@@ -5102,7 +5090,7 @@ void Clan::DuoBaoLvlAward()
 
 void Clan::DuoBaoStart(Player * pl)
 {
-    if(!IsDuoBaoTime())
+    if(!World::getDuoBaoTime())
         return;
 
     if(NULL == pl)
@@ -5115,6 +5103,9 @@ void Clan::DuoBaoStart(Player * pl)
         return;
     }
     
+    if(1 == pl->GetVar(VAR_CLAN_DUOBAO_STATUS))
+        return;
+
     DuoBaoLvlAward();
     UInt16 score = uRand(778) + 111; //111 ~ 888
 
@@ -5135,36 +5126,6 @@ void Clan::DuoBaoStart(Player * pl)
     pl->send(st);
     DuoBaoUpdate(pl->getName(), score);
 }
-
-/*void Clan::DuoBaoEnd()
-{
-    if(IsDuoBaoTime())
-    {
-        if(TimeUtil::Now() >= GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
-        {
-            class DuoBaoSendAwardVisitor : public Visitor<Clan>
-            {
-                public:
-                    DuoBaoSendAwardVisitor()
-                    {
-                    }
-
-                    bool operator()(Clan* clan)
-                    {
-                        clan->SendDuoBaoAward();
-                        return true;
-                    }
-
-            };
-            DuoBaoSendAwardVisitor visitor;
-            globalClans.enumerate(visitor);
-
-        }
-
-        //GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (15 * 60) * (15 * 60) + (15 * 60));
-        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));
-    }
-}*/
 
 void Clan::SendDuoBaoAward()
 {
@@ -5196,6 +5157,8 @@ void Clan::SendDuoBaoAward()
 
         if(!mark)
         {
+            DuoBaoLvlAward();
+
             score = player->GetVar(VAR_CLAN_DUOBAO_SCORE);
             if (score < 111 || score > 888)
                 continue;
@@ -5218,7 +5181,6 @@ void Clan::SendDuoBaoAward()
                 mailPackageManager.push(mail->id, award, cnt, true);
                 player->AddVar(VAR_CLAN_DUOBAO_SUCCESS_NUM, 1);
                 SetDuoBaoAward(0);
-                DB5().PushUpdateData("UPDATE `clan` SET `duoBaoAward` = %u WHERE `id` = %u", 0, _id);
                 
                 if(0 == markA)
                 {
@@ -5284,9 +5246,33 @@ void Clan::DuoBaoDel(UInt8 mark)
 void Clan::ClearDuoBaoLog()
 {
     if(_duobaoLogs.size() > 0)
-    {
         _duobaoLogs.clear();
-        DB5().PushUpdateData("DELETE FROM `duobaolog` WHERE `clanId` = %u", _id);
+}
+
+void Clan::ClearDuoBaoData()
+{
+    if(DuoBaoScoreSort.size() > 0)
+        DuoBaoScoreSort.clear();
+
+    if(_duobaoLogs.size() > 0)
+        _duobaoLogs.clear();
+
+    SetDuoBaoAward(0);
+     
+}
+
+void Clan::BroadDuoBaoBegin(Player * player)
+{
+    if(World::getDuoBaoTime())
+    {
+        if(player->getClan() != NULL)
+        {
+            Stream st(REP::DUOBAO_REP);
+            st << static_cast<UInt8>(0x07);
+            st << static_cast<UInt8>(1);
+            st << Stream::eos;
+            player->send(st);
+        }
     }
 }
 

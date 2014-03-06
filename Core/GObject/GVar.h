@@ -139,7 +139,9 @@ namespace GObject
 
         GVAR_GUANKAACT_BEGIN = 84,  //关卡活动开始时间
         GVAR_GUANKAACT_END   = 85,  //关卡活动结束时间
-        GVAR_DUOBAO_ENDTIME = 86, // 夺宝每轮结束时间（用作宕机特殊处理）
+        GVAR_DUOBAO_ENDTIME = 86,       // 夺宝每轮结束时间
+        GVAR_CLAN_DUOBAO_BEGIN = 87,    // 夺宝每天开始时间
+        GVAR_CLAN_DUOBAO_END = 88,      // 夺宝每天结束时间
         
         GVAR_MAX,
     };
