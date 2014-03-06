@@ -3648,7 +3648,7 @@ namespace GObject
                 if (cl.gongxian > 0)
                     GObject::ClanBoss::instance().insertToGxSort(clan, 0, cl.gongxian);
 
-                clan->SetDuoBaoAward(cl.duobaoAward);
+                //clan->SetDuoBaoAward(cl.duobaoAward);
 		}
 			else
 			{

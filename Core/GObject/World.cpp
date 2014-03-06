@@ -252,6 +252,7 @@ UInt8 World::_arenaState = 0;      //0:无 1:仙界第一 2:仙界至尊
 bool World::_memcinited = false;
 bool World::_miluzhijiao = false;
 bool World::_buyfund = false;
+bool World::_duobaoOpen = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -1982,15 +1983,32 @@ void World::ClanStatueCheck(void *)
     globalClans.enumerate(visitor);
 }
 
+inline bool enum_duobao_send(GObject::Player* player, UInt8 mark)
+{
+    if(player == NULL || !player->isOnline() || player->getClan() == NULL)
+        return true;
+
+    Stream st(REP::DUOBAO_REP);
+    st << static_cast<UInt8>(0x07);
+    st << mark;
+    st << Stream::eos;
+    player->send(st);
+
+    return true;
+}
+
 void World::ClanDuoBaoCheck(void *)
 {
     UInt32 nowTime = TimeUtil::Now();
     UInt32 time = TimeUtil::SharpDayT(0,nowTime);
-    UInt32 start = time + 10*60*60;     // 每天10点开始
-    UInt32 end = time + 22*60*60 + 5;   // 每天22点结束(加5秒, 用于最后一次结算)
+    if(World::getDuoBaoTime())
+    {
+        if(!_duobaoOpen)
+        {
+            GObject::globalPlayers.enumerate(enum_duobao_send, 1);
+            _duobaoOpen = true;
+        }
 
-    if(nowTime >= start && nowTime <= end)
-    { 
         if(TimeUtil::Now() >= GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
         {
             class DuoBaoEndVisitor : public Visitor<Clan>
@@ -2012,16 +2030,18 @@ void World::ClanDuoBaoCheck(void *)
         }
 
         UInt32 value = 0;
-
-        if(nowTime >= time + 22*60*60)
-            value = time + 10*60*60 + 120 + 86400;
+        if(nowTime >= GVAR.GetVar(GVAR_CLAN_DUOBAO_END))
+        {
+            value = time + 10*60*60 + 900 + 86400; //今天活动结束，时间设置到下一天的结束时间
+            if(_duobaoOpen)
+            {
+                GObject::globalPlayers.enumerate(enum_duobao_send, 0);
+                _duobaoOpen = false;
+                DB5().PushUpdateData("DELETE FROM `duobaolog`");
+            }
+        }
         else
-            value = nowTime / (2 * 60) * (2 * 60) + (2 * 60);
-
-        /*if(nowTime >= time + 22*60*60)
-            value = time + 10*60*60 + 900 + 86400;
-        else
-            value = nowTime / (15 * 60) * (15 * 60) + (15 * 60);*/
+            value = nowTime / (15 * 60) * (15 * 60) + (15 * 60); //本轮活动结束，时间设置到下一轮的结束时间
 
         GVAR.SetVar(GVAR_DUOBAO_ENDTIME, value);
     }
@@ -2205,15 +2225,13 @@ bool World::Init()
     UInt32 end = time + 22*60*60;
     UInt32 valueTime = 0;
 
-    if(nowTime < start && nowTime > end)
-        valueTime = time + 10*60*60 + 120;
-    else
-        valueTime = nowTime / (2 * 60) * (2 * 60) + (2 * 60);
+    GVAR.SetVar(GVAR_CLAN_DUOBAO_BEGIN, start);
+    GVAR.SetVar(GVAR_CLAN_DUOBAO_END, end);
 
-    /*if(nowTime < start && nowTime > end)
-        valueTime = time + 10*60*60 + 900;
+    if(nowTime < GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) && nowTime > GVAR.GetVar(GVAR_CLAN_DUOBAO_END))
+        valueTime = GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) / (15 * 60) * (15 * 60) + 900;
     else
-        valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);*/
+        valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
 
     GVAR.SetVar(GVAR_DUOBAO_ENDTIME, valueTime);
 

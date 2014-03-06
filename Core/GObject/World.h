@@ -987,6 +987,18 @@ public:
             return true;
         else
             return false;
+    }
+
+    inline static bool getDuoBaoTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_CLAN_DUOBAO_END);
+        UInt32 now = TimeUtil::Now();
+
+        if(now >= begin && now <= (end+5))
+            return true;
+        else
+            return false;
     } 
 
     inline static bool getGuankaAct(UInt32 time = 0)
@@ -1287,6 +1299,7 @@ public:
     static bool _memcinited;
     static bool _miluzhijiao;
     static bool _buyfund;
+    static bool _duobaoOpen;
 public:
     static RCSortType qishibanScoreSort;     //七石板积分排名
     static RCSortType guankaScoreSort;     //关卡活动积分排名
