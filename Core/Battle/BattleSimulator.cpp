@@ -4100,6 +4100,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     float dmgRate = ef->valueExt1;
                     bo->setYehuoSSUpRate(upRate);
                     bo->setYehuoSSDmgRate(dmgRate * bf->getAttack());
+                    printf("ss:fighterId = %u, yehuoSSDmgRate = %f, yehuoLeve = %u", bo->getId(), bo->getYehuoSSDmgRate(), yehuoLeve);
                     if(yehuoLeve < 9)
                     {
                         yehuoLeve += 1;
@@ -10317,6 +10318,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         {
             float yehuoSSDmgRate = bf->getYehuoSSDmgRate();
             UInt32 dmg = static_cast<UInt32>(yehuoSSDmgRate * yehuoLeve);
+            printf("fighterId = %u, yehuoSSDmgRate = %f, yehuoLeve = %u, dmg = %u", bf->getId(), yehuoSSDmgRate, yehuoLeve, dmg);
             makeDamage(bf, dmg, e_BleedMo, e_damageTrue);
             if(yehuoLeve < 9 && static_cast<float>(uRand(10000)) < bf->getYehuoSSUpRate() * 10000)
             {
