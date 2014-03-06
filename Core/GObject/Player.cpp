@@ -19968,7 +19968,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(48, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
-        static UInt32 itemId[] = {9600, 2, 9371, 2, 9082, 2, 503, 2, 513, 2, 9443, 5};
+        static UInt32 itemId[] = {9600, 2, 9371, 2, 9082, 2, 503, 2, 9418, 2, 1126, 2};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -20650,10 +20650,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -28570,6 +28570,8 @@ void Player::doGuankaAct(UInt8 type)
     bool res = attackCopyNpc(npcId, 2, 0, 1, isFull, exp, 1, false, NULL, false);
     if(res)
     {
+		SYSMSG_SENDV(193, this, scores[index]);
+        SYSMSG_SENDV(194, this, scores[index]);
         AddVar(VAR_GUANKA_ACTION_SCORE, scores[index]);
         SetVar(VAR_GUANKA_ACTION_TIME, TimeUtil::Now());
         ++ index;
@@ -28600,6 +28602,26 @@ void Player::doGuankaAct(UInt8 type)
             }
         }
     }
+    //add udpLog
+    std::string trumpStr;
+    for(int i = 0; i < 5; ++ i)
+    {
+        UInt32 trumps1[3] = {0};
+        UInt8 trumps2[3] = {0};
+        GObject::Fighter * fgt = getLineup(i).fighter;
+        if(fgt != NULL)
+        {
+            fgt->getAllTrumpTypeId(trumps1);
+            fgt->getAllTrumpEnchant(trumps2);
+        }
+        for(int j = 0; j < 3; ++ j)
+        {
+            trumpStr += "{" + Itoa(trumps1[j]) + ":" + Itoa(trumps2[j]) + "},";
+        }
+    }
+    char str[32] = {0};
+    sprintf(str, "F_140240_%u_%u", npcId, res ? 1 : 2);
+    udpLog("hundunmoyu", str, trumpStr.c_str(), Itoa(getBattlePoint()).c_str(), "", "", "act");
 }
 
 void Player::addguankaScoreByAttack(UInt32 rounds)
@@ -28645,6 +28667,8 @@ void Player::addguankaScoreByAttack(UInt32 rounds)
         default:
             return;
     }
+    SYSMSG_SENDV(193, this, score);
+    SYSMSG_SENDV(194, this, score);
     AddVar(VAR_GUANKA_ACTION_SCORE, score);
 }
 

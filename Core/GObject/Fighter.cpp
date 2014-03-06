@@ -1322,6 +1322,21 @@ int Fighter::getAllTrumpTypeId( UInt32* trumps, int size )
     return getMaxTrumps();
 }
 
+int Fighter::getAllTrumpEnchant( UInt8* trumps, int size )
+{
+    if (!trumps || !size)
+        return 0;
+
+    for (int i = 0; i < getMaxTrumps(); ++i)
+    {
+        if (_trump[i])
+            trumps[i] = _trump[i]->getItemEquipData().enchant;
+        else
+            trumps[i] = 0;
+    }
+    return getMaxTrumps();
+}
+
 int Fighter::getAllLingbaoTypeId( UInt32* lingbaos, int size )
 {
     if (!lingbaos || !size)
@@ -6273,6 +6288,8 @@ UInt16 Fighter::getPortrait()
             portrait = 1099;
         else if(getFashionTypeId() == 1729)
             portrait = 1102;
+        else if(getFashionTypeId() == 1730)
+            portrait = 1105;
  
     }
 

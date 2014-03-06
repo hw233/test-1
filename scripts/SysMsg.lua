@@ -94,6 +94,8 @@ sysMsg:set(189, 0x35, "您当前已经加入队伍，无法重复加取，请尝
 sysMsg:set(190, 0x35, "礼包发送成功")
 sysMsg:set(191, 0x35, "获得仙魄%u")
 sysMsg:set(192, 0x35, "消耗仙魄%u")
+sysMsg:set(193, 1, "您获得镇魔值%u")
+sysMsg:set(194, 0x35, "获得镇魔值%u")
 
 sysMsg:set(1000, 1, "[f:%u:%s]获得经验值%u")
 sysMsg:set(1001, 1, "[f:%u:%s]升级了，等级提升到了%u")

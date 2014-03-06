@@ -4528,8 +4528,8 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
         case 23:
-            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::Now());
-            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::Now() + 86400*5);
+            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::SharpDayT(1));
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
             break;
@@ -4539,8 +4539,8 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
         case 25:
-            GVAR.SetVar(GVAR_3366_BUY_BEGIN, TimeUtil::Now());
-            GVAR.SetVar(GVAR_3366_BUY_END, TimeUtil::Now() + 86400*5);
+            GVAR.SetVar(GVAR_3366_BUY_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_3366_BUY_END, TimeUtil::SharpDayT(1));
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
             break;
@@ -4549,6 +4549,11 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_3366_BUY_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GObject::globalPlayers.enumerate(player_enum_2, 0);
+            break;
+        case 27:
+            GVAR.SetVar(GVAR_GUANKAACT_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_GUANKAACT_END, TimeUtil::SharpDayT(1));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
 
     }
