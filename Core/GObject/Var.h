@@ -674,6 +674,11 @@ namespace GObject
         VAR_QISHI_FRIEND_SEND_COUNT = 711,  // 七石斗法玩家赠送次数
         VAR_QISHI_FRIEND_USE_COUNT = 712,   // 七石斗法玩家赠送已使用次数
 
+        //721-730 lijr
+        VAR_CLAN_DUOBAO_SCORE = 713,        // 夺宝奇兵点数
+        VAR_CLAN_DUOBAO_SUCCESS_NUM = 714,  // 夺宝奇兵成功次数
+        VAR_CLAN_DUOBAO_STATUS = 715,       // 夺宝奇兵状态
+
         VAR_MAX,
     };
 
@@ -1282,6 +1287,9 @@ namespace GObject
             REGISTER_VAR(VAR_QISHI_FRIEND_USE_COUNT, CYCLE_DAY);
             REGISTER_VAR(VAR_MOUNT_CANGJIANYA_LEFT_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_MOUNT_CANGJIANYA_DATE, CYCLE_NONE);
+            REGISTER_VAR(VAR_CLAN_DUOBAO_SCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAN_DUOBAO_SUCCESS_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAN_DUOBAO_STATUS, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

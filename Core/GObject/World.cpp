@@ -1942,6 +1942,26 @@ void World::ClanStatueCheck(void *)
     globalClans.enumerate(visitor);
 }
 
+void World::ClanDuoBaoCheck(void *)
+{
+    class DuoBaoEndVisitor : public Visitor<Clan>
+    {
+        public:
+            DuoBaoEndVisitor()
+            {
+            }
+
+            bool operator()(Clan* clan)
+            {
+                clan->DuoBaoEnd();
+                return true;
+            }
+
+    };
+    DuoBaoEndVisitor visitor;
+    globalClans.enumerate(visitor);
+}
+
 inline static bool enum_spread_send(Player* player, void* data)
 {
     if(player == NULL || !player->isOnline())
@@ -2114,6 +2134,8 @@ bool World::Init()
         gMarryMgr.MarryingCrush();
     }
     AddTimer(60 * 60 * 3 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
+
+    AddTimer(5 * 1000, ClanDuoBaoCheck, static_cast<void*>(NULL));
     return true;
 }
 

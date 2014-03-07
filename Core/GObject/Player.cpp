@@ -820,6 +820,7 @@ namespace GObject
         memset(_alreadyload, 0, sizeof(_alreadyload));
         m_EnterPTCStatus = false;
         m_InPTCStatus = false;
+        m_duobaoOpen = 0;
 	}
 
 
@@ -28545,6 +28546,7 @@ void Player::sevensoul_fixed()
             pet->updateToDBPetSkill();
     }
 }
+
 
 } // namespace GObject
 
