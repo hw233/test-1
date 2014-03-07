@@ -3419,6 +3419,7 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_GUANKA_ACTION_NPC, 0);
                 pl->SetVar(GObject::VAR_GUANKA_ACTION_SCORE, 0);
                 pl->SetVar(GObject::VAR_GUANKA_ACTION_TIME, 0);
+                pl->SetVar(GObject::VAR_GUANKA_ACTION_UDPLOG, 0);
                 GameMsgHdr hdr(0x1B7, WORKER_THREAD_WORLD, pl, 0);
                 GLOBAL().PushMsg(hdr, NULL);
             }

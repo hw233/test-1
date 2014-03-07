@@ -3949,11 +3949,12 @@ namespace GObject
 
 		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 
-        if(World::getGuankaAct() && npcId >= 13500 && npcId <= 13529)
-            guankaActUdpLog(npcId, res);
-        if(res && World::getGuankaAct() && npcId >= 13524 && npcId <= 13529)
+        if(World::getGuankaAct())
         {
-            addguankaScoreByAttack(bsim.getRounds()+1);
+            if(res && npcId >= 13524 && npcId <= 13529)
+                addguankaScoreByAttack(bsim.getRounds()+1);
+            if(npcId >= 13500 && npcId <= 13529)
+                guankaActUdpLog(npcId, res);
         }
 		return res;
 	}
@@ -28612,7 +28613,7 @@ void Player::guankaActUdpLog(UInt32 npcId, bool result)
     //add udpLog
     UInt32 logInfo = GetVar(VAR_GUANKA_ACTION_UDPLOG);
     int tmpIdx = npcId - 13500;    //最大30个
-    if(tmpIdx < 0 || tmpIdx > 30 || GET_BIT(logInfo, tmpIdx))
+    if(tmpIdx < 0 || tmpIdx > 30 || (GET_BIT(logInfo, tmpIdx) && !result))
         return;
     logInfo = SET_BIT(logInfo, tmpIdx);
     SetVar(VAR_GUANKA_ACTION_UDPLOG, logInfo);
