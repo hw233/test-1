@@ -3946,6 +3946,12 @@ namespace GObject
 			checkDeath();
 
 		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+        if(World::getGuankaAct() && npcId >= 13524 && npcId <= 13529)
+            TRACE_LOG("bsim.getRounds():%u_%u_%u_%s_%" I64_FMT "u", npcId, res ? 1 : 0, bsim.getRounds()+1, getName().c_str(), getId());
+        if(res && World::getGuankaAct() && npcId >= 13524 && npcId <= 13529)
+        {
+            addguankaScoreByAttack(bsim.getRounds()+1);
+        }
 		return res;
 	}
 
@@ -28596,6 +28602,52 @@ void Player::doGuankaAct(UInt8 type)
     }
 }
 
+void Player::addguankaScoreByAttack(UInt32 rounds)
+{
+    if(!World::getGuankaAct())
+        return;
+    UInt32 score = 0;
+    switch(rounds)
+    {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+            score = 1026;
+            break;
+        case 4:
+            score = 514;
+            break;
+        case 5:
+            score = 258;
+            break;
+        case 6:
+            score = 130;
+            break;
+        case 7:
+            score = 66;
+            break;
+        case 8:
+            score = 34;
+            break;
+        case 9:
+            score = 18;
+            break;
+        case 10:
+            score = 10;
+            break;
+        case 11:
+            score = 6;
+            break;
+        case 12:
+            score = 4;
+            break;
+        default:
+            return;
+    }
+    AddVar(VAR_GUANKA_ACTION_SCORE, score);
+}
+
 void Player::sendguankaActMyRank()
 {
     GameMsgHdr hdr(0x1B9, WORKER_THREAD_WORLD, this, 0);
@@ -28607,13 +28659,13 @@ void Player::getguankaScoreAward(UInt8 type)
     if(!World::getGuankaAct() || type > 4)
         return;
 
-    static UInt32 scoreLvl[] = {200, 400, 800, 1000, 1500};
+    static UInt32 scoreLvl[] = {200, 400, 600, 800, 1000};
     static UInt32 awards[5][5][2] = {
-        {{15,2},   {514,5},  {135,5},    {500, 5},   {0, 0}},
-        {{15,5},   {515,5},  {514, 10},  {135, 10},  {500, 5}},
-        {{15,10},  {515,10}, {134, 10},  {9022, 10}, {0, 0}},
-        {{515,30}, {134,30}, {9438, 30}, {9022, 10}, {0, 0}},
-        {{515,40}, {134,40}, {9438, 40}, {9075, 20}, {0, 0}},
+        {{15,2},  {514,2}, {135,2},   {500,5},   {0, 0}},
+        {{15,5},  {514,5}, {135,5},   {500,5},   {0, 0}},
+        {{15,10}, {515,2}, {134,2},   {514,5},   {135,5}},
+        {{515,4}, {134,4}, {9438,10}, {9022,5},  {0, 0}},
+        {{515,6}, {134,6}, {9438,15}, {9075,10}, {0, 0}},
     };
     UInt32 data = GetVar(VAR_GUANKA_ACTION_NPC);
     UInt32 score = GetVar(VAR_GUANKA_ACTION_SCORE);
