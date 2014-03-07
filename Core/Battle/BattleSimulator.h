@@ -51,6 +51,7 @@ public:
 	BattleSimulator(UInt32, GObject::Player *, GObject::Player *, bool report = true, UInt32 fake_turns = 500);
 	inline int getId() {return _id;}
 	inline int getTurns() {return _turns;}
+	inline int getRounds() {return _attackRound;}
 	void start(UInt8 prevWin = 0xFF, bool checkEnh = true);
 	inline Stream& getPacket() {return _packet;}
 	inline Script::BattleFormula * getFormula() { return _formula; }

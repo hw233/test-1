@@ -3680,7 +3680,7 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
     else
         cnt = end - start;
     Stream st(REP::FRIEND_LIST);
-    st << static_cast<UInt8>(type) << static_cast<UInt8>(player->GetVar(VAR_HAS_VOTE)?1:0)<< start << cnt << sz;
+    st << static_cast<UInt8>(type) << static_cast<UInt8>(player->GetVar(VAR_HAS_VOTE)?1:0) << static_cast<UInt8>(player->GetVar(VAR_FRIEND_SECURITY)) << start << cnt << sz;
     if (sz && cnt)
     {
         Members::iterator it = _members.begin();
@@ -3701,6 +3701,7 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
             st<<static_cast<UInt8>(pl->GetVar(VAR_OLDMAN_PRESENT));
             std::string openid = pl->getOpenId();
             st << openid;
+            st <<  static_cast<UInt8>(pl->GetVar(VAR_FRIEND_SECURITY));
             ++it;
         }
     }

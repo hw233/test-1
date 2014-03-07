@@ -669,6 +669,9 @@ namespace GObject
         VAR_JIQIREN_SYBS = 705,     //机器人之帮派、师门、衙门、锁妖塔未完成次数
         VAR_MOUNT_CANGJIANYA_LEFT_CNT = 706,     //藏剑崖每天免费次数
         VAR_MOUNT_CANGJIANYA_DATE = 707,     //取藏剑崖每天免费次数时间
+        VAR_GUANKA_ACTION_NPC = 708,     //关卡活动npc击杀情况,6类npc低18位表示，高8位表示奖励领取情况
+        VAR_GUANKA_ACTION_SCORE = 709,   //关卡活动个人镇魔值
+        VAR_GUANKA_ACTION_TIME  = 710,   //关卡活动个人镇魔值变化时间
 
         //711-720 for JLT
         VAR_QISHI_FRIEND_SEND_COUNT = 711,  // 七石斗法玩家赠送次数
@@ -1290,6 +1293,9 @@ namespace GObject
             REGISTER_VAR(VAR_CLAN_DUOBAO_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_DUOBAO_SUCCESS_NUM, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_DUOBAO_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANKA_ACTION_NPC, CYCLE_NONE);
+            REGISTER_VAR(VAR_GUANKA_ACTION_SCORE, CYCLE_NONE);
+            REGISTER_VAR(VAR_GUANKA_ACTION_TIME, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

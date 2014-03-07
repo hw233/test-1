@@ -8993,6 +8993,22 @@ function ItemNormal_00010239(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
     return num;
 end
+function ItemNormal_00010242(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (3+(3*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    player:getCoupon(num*8)
+    package:Add(56, num*3, true, false, 2);
+    package:Add(57, num*3, true, false, 2);
+    package:Add(15, num*3, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
 
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
@@ -10370,6 +10386,10 @@ function ItemNormal_00009601(iid, num, bind, param)
         [9605] = { 9651, 9652, 9653, 9654, 9655, 9656, 9657, 9658, 9500 },
         [9606] = { 9661, 9662, 9663, 9664, 9665, 9666, 9667, 9668, 9500 },
         [9607] = { 9671, 9672, 9673, 9674, 9675, 9676, 9677, 9678, 9500 },
+        [9562] = { 9731, 9732, 9733, 9734, 9735, 9736, 9737, 9738, 9500 },
+        [9563] = { 9741, 9742, 9743, 9744, 9745, 9746, 9747, 9748, 9500 },
+        [9564] = { 9751, 9752, 9753, 9754, 9755, 9756, 9757, 9758, 9500 },
+        [9565] = { 9761, 9762, 9763, 9764, 9765, 9766, 9767, 9768, 9500 },
     }
     local chance = { 1500, 3000, 3500, 4000, 4150, 4300, 4350, 4400, 10000 }
     local replaceNum = { 1, 1, 2, 2, 4, 4, 8, 8, 1 }
@@ -12307,6 +12327,10 @@ local ItemNormal_Table = {
     [9605] = ItemNormal_00009601,
     [9606] = ItemNormal_00009601,
     [9607] = ItemNormal_00009601,
+    [9562] = ItemNormal_00009601,
+    [9563] = ItemNormal_00009601,
+    [9564] = ItemNormal_00009601,
+    [9565] = ItemNormal_00009601,
     [9611] = ItemNormal_00009611,
     [9612] = ItemNormal_00009611,
     [9613] = ItemNormal_00009611,
@@ -12363,6 +12387,38 @@ local ItemNormal_Table = {
     [9676] = ItemNormal_00009611,
     [9677] = ItemNormal_00009611,
     [9678] = ItemNormal_00009611,
+    [9731] = ItemNormal_00009611,
+    [9732] = ItemNormal_00009611,
+    [9733] = ItemNormal_00009611,
+    [9734] = ItemNormal_00009611,
+    [9735] = ItemNormal_00009611,
+    [9736] = ItemNormal_00009611,
+    [9737] = ItemNormal_00009611,
+    [9738] = ItemNormal_00009611,
+    [9741] = ItemNormal_00009611,
+    [9742] = ItemNormal_00009611,
+    [9743] = ItemNormal_00009611,
+    [9744] = ItemNormal_00009611,
+    [9745] = ItemNormal_00009611,
+    [9746] = ItemNormal_00009611,
+    [9747] = ItemNormal_00009611,
+    [9748] = ItemNormal_00009611,
+    [9751] = ItemNormal_00009611,
+    [9752] = ItemNormal_00009611,
+    [9753] = ItemNormal_00009611,
+    [9754] = ItemNormal_00009611,
+    [9755] = ItemNormal_00009611,
+    [9756] = ItemNormal_00009611,
+    [9757] = ItemNormal_00009611,
+    [9758] = ItemNormal_00009611,
+    [9761] = ItemNormal_00009611,
+    [9762] = ItemNormal_00009611,
+    [9763] = ItemNormal_00009611,
+    [9764] = ItemNormal_00009611,
+    [9765] = ItemNormal_00009611,
+    [9766] = ItemNormal_00009611,
+    [9767] = ItemNormal_00009611,
+    [9768] = ItemNormal_00009611,
 
     [9681] = ItemNormal_00009611,
     [9682] = ItemNormal_00009611,
@@ -12699,6 +12755,7 @@ local ItemNormal_Table = {
     [10239] = ItemNormal_00010239,
     [10240] = ItemNormal_00010239,
     [10241] = ItemNormal_00010239,
+    [10242] = ItemNormal_00010242,
     [9480] = ItemNormal_0009480,
     [9481] = ItemNormal_0009480,
     [9482] = ItemNormal_0009480,

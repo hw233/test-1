@@ -198,6 +198,7 @@ namespace GObject
                 nibt->trumpExp = ibt->trumpExp;
                 nibt->data = ibt->data;
                 nibt->career = ibt->career;
+                nibt->salePriceUp = ibt->salePriceUp;
                 const GData::AttrExtra* attr = ibt->attrExtra;
                 if (attr)
                 {
