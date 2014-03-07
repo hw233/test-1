@@ -10534,7 +10534,7 @@ function ItemNormal_0009480(id, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
-    local prob = {1250, 3750, 10000}
+    local prob = {6300, 8800, 10000}
     local items = {{502,1}, {1328,1}, {1327,1}}
 
     for k = 1, num do
@@ -10561,7 +10561,7 @@ function ItemNormal_0009484(id, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
-    local prob = {1250, 3750, 10000}
+    local prob = {6300, 8800, 10000}
     local items = {{1125,1}, {1327,2}, {1326,1}}
 
     for k = 1, num do
@@ -10588,7 +10588,7 @@ function ItemNormal_0009487(id, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
-    local prob = {1250, 3750, 10000}
+    local prob = {6300, 8800, 10000}
     local items = {{1125,5}, {1326,2}, {1325,1}}
 
     for k = 1, num do
@@ -10615,7 +10615,7 @@ function ItemNormal_0009490(id, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
-    local prob = {1250, 3750, 10000}
+    local prob = {6300, 8800, 10000}
     local items = {{1126,1}, {1326,4}, {1325,2}}
 
     for k = 1, num do
