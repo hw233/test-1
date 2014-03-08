@@ -299,7 +299,11 @@ namespace GObject
                     }
                     break;
                 case 0x07:
-                    AttackLeftAddr(player); 
+                    {
+                        UInt8 leftId = 0; 
+                        brd >> leftId ;
+                        AttackLeftAddr(leftId,player); 
+                    }
                     break;
                 case 0x08:
                     {
@@ -312,6 +316,19 @@ namespace GObject
                         brd >> pos2 ;
                         if(pos1 != 0 && pos2 != 0)
                             playerId = 0;
+                        if(pos1 !=0 && pos2 == 0)
+                        {
+                           UInt32 val = player->GetVar(VAR_LEFTADDR_POWER) ;
+                           if(player->getLeftAddrEnter())
+                           {
+                               break ;
+                           }
+                           if(val > 0 )
+                           {
+                               player->SetVar(VAR_LEFTADDR_POWER ,val -1);
+                               player->setLeftAddrEnter(true);
+                           }
+                        }
                         struct TeamChange
                         {
                             UInt8 leftId ; 
@@ -324,6 +341,10 @@ namespace GObject
                         TeamChange tc(leftId,_clan->getId(),playerId , pos1 ,pos2);
                         GameMsgHdr hdr(0x393, player->getThreadId(), player, sizeof(TeamChange));
                         GLOBAL().PushMsg(hdr, &tc);
+                        {
+                            GameMsgHdr hdr(0x395, player->getThreadId(), player, 0);
+                            GLOBAL().PushMsg(hdr, NULL);
+                        }
                     }
                     break;
                case 0x0A:
@@ -475,7 +496,21 @@ namespace GObject
             if(vec[i] == NULL)
                 continue ;
             vec[i]->setLeftAddrEnter(false);
+            UInt32 val = vec[i]->GetVar(VAR_LEFTADDR_POWER);
+            if(val < 3)
+                return ;
+            vec[i]->SetVar(VAR_LEFTADDR_POWER , val - 3);
             sendAttackTeamInfo(vec[i]);
+            {
+                if(cbbi.res == 0)
+                {
+                    SYSMSG_SENDV(4303, vec[i], cbbi.leftId ); 
+                }
+                else
+                {
+                    SYSMSG_SENDV(4302, vec[i], cbbi.leftId ); 
+                }
+            }
         }
     } 
     void ClanBuildingOwner::SendBattlesInfo( Stream & st)
@@ -640,21 +675,22 @@ namespace GObject
         }
 
     }
-    void ClanBuildingOwner::AttackLeftAddr(Player * player)
+    void ClanBuildingOwner::AttackLeftAddr(UInt8 leftId ,Player * player)
     {
-        if(!player->getLeftAddrEnter()) 
-            return ;
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
-            if(it->first.leader == player )
+            if(it->first.leftId == leftId )
             {
+                if( ( it->first.leader != player || !it->first.leader->getLeftAddrEnter() ) && _clan->getClanRank(player) < 3)
+                    return ;
+                std::string leaderName = it->first.leader->getName();
                 UInt8 leftId = it->first.leftId;
                 if(it->second.size() != 5)
                     return ;
                 std::vector<Player *> vec = it->second ;
 
-                //player->setLeftAddrEnter(false);
-                LeaveTeam(player , player ,player);
+                it->first.leader->setLeftAddrEnter(false);
+                //LeaveTeam(player , player ,player);
 
                 std::vector<Player *> warSort = vec;
                 struct SWarEnterData {
@@ -667,13 +703,9 @@ namespace GObject
                 {
                     if(!vec[i])
                         return ;
-                    UInt32 val = vec[i]->GetVar(VAR_LEFTADDR_POWER);
-                    if(val < 3)
-                        return ;
-                    vec[i]->SetVar(VAR_LEFTADDR_POWER , val - 3);
                 }
                 Stream st(SERVERLEFTREQ::ENTER, 0xEE);
-                st<<_clan->getId()<<_clan->getName() << player->getName()/*领队*/  << leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
+                st<<static_cast<UInt64>(player->getId()) << _clan->getId()<<_clan->getName() << leaderName/*领队*/  << leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
                 SWarEnterData * swed = new SWarEnterData(st, vec);
 
                 std::vector<Player *>::iterator itw = warSort.begin();

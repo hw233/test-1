@@ -3973,6 +3973,22 @@ void OnServerLeftGetSpirit(ServerLeftMsgHdr& hdr, const void * data)
 void OnServerLeftErrInfo(ServerLeftMsgHdr& hdr, const void * data)
 {
    //0-操作成功 1-对共有遗迹进行守卫操作错误  2-该遗迹无该镇守成员 3-对象以及非该帮派占领 
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt64 playerId = 0 ;
+    UInt32 clanId = 0;
+    UInt8 err = 0;
+    br >> playerId ;
+    br >> clanId;
+    br >> err ;
+    Clan * clan = globalClans[clanId];
+    GObject::Player * player = GObject::globalPlayers[playerId];
+    if(!player)
+        return ;
+    if(player->getClan() != clan )
+        return ;
+    if(err == 0)
+        return ;
+    player->sendMsgCode(0,4028+err);
 }
 // 仙境遗迹协议请求处理
 void OnClanFairyLandReq(GameMsgHdr& hdr,const void * data)

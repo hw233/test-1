@@ -5230,13 +5230,13 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
             k ++;
             continue;
         }
-        GObject::Player * player = it->second;
+        GObject::Player * pl = it->second;
         if(clanName == "" )
         {
-            if(player->getClan()!= NULL && player->getClan()->getId() == clanId )
+            if(pl->getClan()!= NULL && pl->getClan()->getId() == clanId )
             {
-                clanId = player->getClan()->getId();
-                clanName = player->getClanName();
+                clanId = pl->getClan()->getId();
+                clanName = pl->getClanName();
                 std::cout << "rand:" << urand <<std::endl;
                 std::cout << "clanId:" << clanId <<std::endl;
                 std::cout << "clanName:" << clanName.c_str() <<std::endl;
@@ -5244,8 +5244,8 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
             else
                 continue ;
         }
-        if(player && player->GetLev() >= LIMIT_LEVEL)
-            warSort.push_back(player);
+        if(pl && pl->GetLev() >= LIMIT_LEVEL)
+            warSort.push_back(pl);
         if(warSort.size() == 5)
         {
             struct SWarEnterData {
@@ -5256,7 +5256,7 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
             };
 
             Stream st(SERVERLEFTREQ::ENTER, 0xEE);
-            st<<clanId <<clanName << player->getName()/*领队*/  <<leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
+            st<< player->getId()<<clanId <<clanName << pl->getName()/*领队*/  <<leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
             SWarEnterData * swed = new SWarEnterData(st, warSort);
             std::vector<Player *>::iterator it = warSort.begin();
             GameMsgHdr hdr(0x391, (*it)->getThreadId(), *it, sizeof(SWarEnterData*));

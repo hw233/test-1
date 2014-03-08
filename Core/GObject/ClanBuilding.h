@@ -130,7 +130,7 @@ namespace GObject
             void EnterTeam(Player * leader , Player * player);
             void ChangeTeamMember(Player * leader , UInt8 first , UInt8 sevond);
             void LeaveTeam(Player * leader , Player * player ,Player * opter ,UInt8 broad = 0);
-            void AttackLeftAddr(Player * player);
+            void AttackLeftAddr(UInt8 leftId ,Player * player);
             void LineUp(Player * player);
             void sendAttackTeamInfo(Player *player);
             void UpdateEnergy();
