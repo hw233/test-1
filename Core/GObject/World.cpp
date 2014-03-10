@@ -2032,13 +2032,17 @@ void World::ClanDuoBaoCheck(void *)
         UInt32 value = 0;
         if(nowTime >= GVAR.GetVar(GVAR_CLAN_DUOBAO_END))
         {
-            value = time + 10*60*60 + 900 + 86400; //今天活动结束，时间设置到下一天的结束时间
+            value = time + 10*60*60 + 900 + 86400; //今天活动结束，时间设置到下一天第一轮的结束时间
+            UInt32 nextBegin = time + 10*60*60 + 86400;   //今天活动结束，时间设置到下一天的开始时间
+            UInt32 nextEnd = time + 22*60*60 + 86400;       //今天活动结束，时间设置到下一天的结束时间
             if(_duobaoOpen)
             {
                 GObject::globalPlayers.enumerate(enum_duobao_send, 0);
                 _duobaoOpen = false;
                 DB5().PushUpdateData("DELETE FROM `duobaolog`");
             }
+            GVAR.SetVar(GVAR_CLAN_DUOBAO_BEGIN, nextBegin);
+            GVAR.SetVar(GVAR_CLAN_DUOBAO_END, nextEnd);
         }
         else
             value = nowTime / (15 * 60) * (15 * 60) + (15 * 60); //本轮活动结束，时间设置到下一轮的结束时间
@@ -2225,15 +2229,18 @@ bool World::Init()
     UInt32 end = time + 22*60*60;
     UInt32 valueTime = 0;
 
-    GVAR.SetVar(GVAR_CLAN_DUOBAO_BEGIN, start);
-    GVAR.SetVar(GVAR_CLAN_DUOBAO_END, end);
+    if(nowTime < end)
+    {
+        GVAR.SetVar(GVAR_CLAN_DUOBAO_BEGIN, start);
+        GVAR.SetVar(GVAR_CLAN_DUOBAO_END, end);
 
-    if(nowTime < GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) && nowTime > GVAR.GetVar(GVAR_CLAN_DUOBAO_END))
-        valueTime = GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) / (15 * 60) * (15 * 60) + 900;
-    else
-        valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
+        if(nowTime < GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN))
+            valueTime = GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) / (15 * 60) * (15 * 60) + 900;
+        else
+            valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
 
-    GVAR.SetVar(GVAR_DUOBAO_ENDTIME, valueTime);
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, valueTime);
+    }
 
     AddTimer(5 * 1000, ClanDuoBaoCheck, static_cast<void*>(NULL));
     return true;
