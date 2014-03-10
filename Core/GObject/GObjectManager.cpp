@@ -6955,11 +6955,11 @@ namespace GObject
                 pet->loadPlayerSevenSoul(dbvalue.soulId, dbvalue.soulLevel, dbvalue.skillIndex);
 		}
 		lc.finalize();
-        if(GVAR.GetVar(GVAR_SEVENSOUL_FIX) == 0)
-        {
-		    globalPlayers.enumerate(sevensoul_fix, 0);
-            GVAR.SetVar(GVAR_SEVENSOUL_FIX, 1);
-        }
+        //if(GVAR.GetVar(GVAR_SEVENSOUL_FIX) == 0)
+        //{
+		//    globalPlayers.enumerate(sevensoul_fix, 0);
+        //    GVAR.SetVar(GVAR_SEVENSOUL_FIX, 1);
+        //}
 		return true;
     }
 
