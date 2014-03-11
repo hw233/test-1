@@ -99,14 +99,18 @@ void TownDeamon::loadDeamonMonstersFromDB(UInt16 level, UInt32 npcId, UInt32 ite
 
 void TownDeamon::loadDeamonPlayersFromDB(UInt16 level, UInt16 maxLevel, Player* pl)
 {
-    if(level > m_Monsters.size() || level == 0)
-        printf("TownDeamon: loadDeamonPlayerFromDB Error\n");
-    UInt16 idx = level - 1;
     if(level > m_maxDeamonLevel)
         m_maxDeamonLevel = level;
     if (maxLevel > m_maxLevel)
         m_maxLevel = maxLevel;
+    if(m_maxLevel > m_maxDeamonLevel)
+        m_maxDeamonLevel = m_maxLevel;
 
+    if(level == 0)
+        return;
+    if(level > m_Monsters.size() || level == 0)
+        printf("TownDeamon: loadDeamonPlayerFromDB Error\n");
+    UInt16 idx = level - 1;
     DeamonMonster& dm = m_Monsters[idx];
     dm.player = pl;
 }
