@@ -1085,6 +1085,19 @@ void OnSendGuankaActMyRank( GameMsgHdr& hdr,  const void* data )
     player->send(st);
 }
 
+void OnDoTableInWorld( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    struct _stTable
+    {
+        Fighter* fgt;
+        UInt32 oldId;
+    };
+    const _stTable* sttable = reinterpret_cast<const _stTable *>(data);
+    player->doTableInWorld(sttable->fgt, sttable->oldId);
+}
+
 void SendLuckyBagRank(Stream& st)
 {
     using namespace GObject;
