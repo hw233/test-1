@@ -16924,6 +16924,15 @@ namespace GObject
         m_arenaCommitCD = now + 60;
         return false;
     }
+    bool Player::inLeftAddrCommitCD()
+    {
+        UInt32 now = TimeUtil::Now();
+        if(now < m_LeftAddrCommitCD)
+            return true;
+
+        m_LeftAddrCommitCD = now + 60;
+        return false;
+    }
 
     bool Player::inArenaTeamCommitCD()
     {
@@ -28575,18 +28584,19 @@ void Player::sendSummerMeetScoreInfo()
 }
 bool Player::giveLeftPowerHold(UInt32 num)
 {
+    UInt32 iid = 9496;
     UInt8 ret = 0;
     {
-        UInt16 count = GetPackage()->GetItemAnyNum(466) ;
-        ItemBase * item = GetPackage()->FindItem(466, true);
+        UInt16 count = GetPackage()->GetItemAnyNum(iid) ;
+        ItemBase * item = GetPackage()->FindItem(iid, true);
         if (!item)
-            item =GetPackage()->FindItem(466, false);
+            item =GetPackage()->FindItem(iid, false);
         if(item ==NULL)
             return false;
         if(num > count)
             return false;
-        GetPackage()->DelItemAny(466, num );
-        GetPackage()->AddItemHistoriesLog(466, num );
+        GetPackage()->DelItemAny(iid, num );
+        GetPackage()->AddItemHistoriesLog(iid, num );
         ret = 1;
     }
     return true;

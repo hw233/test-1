@@ -3888,10 +3888,7 @@ void OnServerLeftLineupCommited( ServerLeftMsgHdr& hdr, const void * data )
 	GObject::Player * player = GObject::globalPlayers[playerId];
 	if(player == NULL)
 		return;
-    Stream st(REP::SERVERWAR_ARENA_OP);
-    st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x04);
-    st << r << Stream::eos;
-    player->send(st);
+    player->sendMsgCode(0,4033);
 }
 void OnServerLeftBattleReport( ServerLeftMsgHdr& hdr, const void * data )
 {
@@ -3933,7 +3930,11 @@ void OnServerLeftRevInfo(ServerLeftMsgHdr& hdr, const void * data)
 void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
 {
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 leftId = 0;
     UInt32 clanId = 0 ;
+    br >> leftId ;
+    SYSMSG_BROADCASTV(4304 , leftId);
+    std::cout << "msgBorad" << std::endl;
     br >> clanId ;
     Clan * clan = globalClans[clanId];
     if(!clan)
@@ -3953,6 +3954,7 @@ void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
     //    item_vec.push_back(item);
     //    itemNum_vec.push(itemNum);
         clan->AddItem(item,itemNum);
+        Stream st;
     }
 }
 void OnServerLeftGetSpirit(ServerLeftMsgHdr& hdr, const void * data)
@@ -4016,6 +4018,8 @@ void OnServerLeftMemberLeave(ServerLeftMsgHdr& hdr, const void * data)
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 val = 0;
     br >> val;
+    UInt32 var_val = 0;
+    br >> var_val ;
     UInt8 num = 0;
     br >> num ;
     UInt64 playerId=  0;
@@ -4032,7 +4036,8 @@ void OnServerLeftMemberLeave(ServerLeftMsgHdr& hdr, const void * data)
             player->setLeftAddrEnter(true);
         else
             player->setLeftAddrEnter(false);
-
+        if( var_val)
+            player->AddVar(GObject::VAR_LEFTADDR_POWER , var_val);
     }
 }
 void OnServerLeftMemberGet(ServerLeftMsgHdr& hdr, const void * data)

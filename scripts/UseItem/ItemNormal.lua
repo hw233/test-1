@@ -3387,6 +3387,30 @@ function ItemNormal_00009444(iid, num, bind, param)
     end
     return used;
 end
+function ItemNormal_00009475(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    local items = { 1126 , 1326 ,1325 }
+    local nums = { 1, 4, 2}
+    local chance = { 1250,5000,10000 }
+    if package:GetRestPackageSize() < num then
+        player:sendMsgCode(2, 1011, 0)
+        return 0; 
+    end
+    package:DelItemSendMsg(iid, player)
+    for n = 1, num do
+        local rand = math.random(1,10000)
+        local g = 0
+        for i = 1, #chance do
+            if rand <=chance[i] then
+                g = i
+                break
+            end
+        end
+        package:Add(items[g], nums[g], true, false, 2)
+    end
+    return num;
+end
 
 function ItemNormal_00009067(iid, num, bind, param)
     local player = GetPlayer()
@@ -12210,6 +12234,7 @@ local ItemNormal_Table = {
     [9444] = ItemNormal_00009444,
     [9445] = ItemNormal_00009444,
     [9446] = ItemNormal_00009444,
+    [9475] = ItemNormal_00009475,
 
     --坐骑
     [9601] = ItemNormal_00009601,

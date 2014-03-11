@@ -5287,7 +5287,7 @@ void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::strin
         return ;
     UInt32 bpId = atoi(args[0].c_str());
     UInt64 playerId1 =  player->getId();
-    UInt32 leftId = 0;
+    UInt8 leftId = 0;
     UInt32 clanId = 0;
 	UInt64 pid = 0;
     UInt8 pos1 = 0;

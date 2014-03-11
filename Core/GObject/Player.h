@@ -2660,6 +2660,7 @@ namespace GObject
         void sendRechargeNextRetInfo(UInt32 now);
         bool inArenaCommitCD();
         bool inArenaTeamCommitCD();
+        bool inLeftAddrCommitCD();
         UInt16 getServerWarChallengeCD();
         bool inServerWarChallengeCD();
         bool inServerWarCommitCD();
@@ -2668,6 +2669,7 @@ namespace GObject
     private:
         std::vector<RNR> rechargs;
         UInt32 m_arenaCommitCD;
+        UInt32 m_LeftAddrCommitCD;
         UInt32 m_arenaTeamCommitCD;
         UInt32 m_serverWarCommitCD;
         UInt32 m_serverWarChallengeCD;

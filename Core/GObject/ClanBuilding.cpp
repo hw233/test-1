@@ -329,6 +329,10 @@ namespace GObject
                                player->setLeftAddrEnter(true);
                            }
                         }
+                        if(pos1 ==0 && pos2 == 0)
+                        {
+                               player->setLeftAddrEnter(false);
+                        }
                         struct TeamChange
                         {
                             UInt8 leftId ; 
@@ -356,10 +360,11 @@ namespace GObject
                     }
                     break;
                 case 0x0B:
-                    LineUp(player);
+                    if(player->inLeftAddrCommitCD())
+                        LineUp(player);
                     break;
             }
-            if(type < 9 && type!=7)
+            if(type < 9)
                 sendAttackTeamInfo(player); 
         }
         return;
@@ -552,7 +557,10 @@ namespace GObject
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
             if(it->first == leftAttLeader )
+            {
+                leader->sendMsgCode(2,4032);
                 return ;
+            }
         }
         std::vector<Player *> vec ;
         vec.push_back(leader);
