@@ -16927,6 +16927,7 @@ namespace GObject
     bool Player::inLeftAddrCommitCD()
     {
         UInt32 now = TimeUtil::Now();
+
         if(now < m_LeftAddrCommitCD)
             return true;
 

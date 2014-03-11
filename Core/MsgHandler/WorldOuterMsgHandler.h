@@ -4064,4 +4064,18 @@ void OnServerLeftMemberGet(ServerLeftMsgHdr& hdr, const void * data)
         clan->addMemberProffer(player, val);
     }
 }
+void OnServerLeftNotice(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 clanId = 0 ;
+    br >> clanId ;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    UInt8 leftId = 0;
+    br >> leftId ;
+    UInt32 num = 0;
+    br >> num ; 
+    clan->SendLeftAddrMail(num ,leftId);
+}
 #endif // _WORLDOUTERMSGHANDLER_H_

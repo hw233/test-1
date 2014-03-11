@@ -4985,5 +4985,31 @@ bool Clan::loadBuildingsFromDB(UInt32 fairylandEnergy,
     _buildingOwner->loadFromDB(fairylandEnergy, phyAtkLevel, magAtkLevel, actionLevel, hpLevel, oracleLevel, updateTime);
     return true;
 }
+void Clan::SendLeftAddrMail(UInt32 _spirit ,UInt8 leftId)
+{
+	UInt32 now = TimeUtil::Now();
+	Mutex::ScopedLock lk(_mutex);
+	Members::iterator it = _members.begin();
+    SYSMSG(title, 4305);
+    std::string content = "" ;
+    SYSMSGV(content1, 4306 ,leftId , _spirit);
+    content += content1;
+    UInt32 dayInWeek = TimeUtil::GetWeekDay(now);
+    if(dayInWeek == 7)
+    {
+        SYSMSGV(content2, 4307);
+        content += content2;
+    }
+	for (; it != _members.end(); ++it)
+	{
+        Player * pl = (*it)->player; 
+        if(pl == NULL)
+            continue ; 
+		pl->GetMailBox()->newMail(NULL, 1, title, content.c_str());
+	}
+
+    
+}
+
 
 }

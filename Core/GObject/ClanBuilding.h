@@ -119,6 +119,7 @@ namespace GObject
             void levelChange(Int32 iVal);
 
             void sendClanBuildingInfo(Player *player);
+            void getClanBuildingStream(Stream& st);
 
             UInt16 getLevel(UInt8 type) const;
             UInt32 getAddVal(UInt8 type) const;

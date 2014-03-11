@@ -360,7 +360,7 @@ namespace GObject
                     }
                     break;
                 case 0x0B:
-                    if(player->inLeftAddrCommitCD())
+                    if(!player->inLeftAddrCommitCD())
                         LineUp(player);
                     break;
             }
@@ -414,6 +414,9 @@ namespace GObject
             //player->sendMsgCode(0, 1100);// 
             UpdateEnergy();
             _clan->notifyUpdateStatueAttr();
+            Stream st;
+            getClanBuildingStream(st);
+            _clan->broadcast(st);
         }
         else if ( uErr == 2)
             player->sendMsgCode(2, 4026);// 
@@ -451,7 +454,8 @@ namespace GObject
     {
         if (!player)
             return;
-        Stream st(REP::CLAN_FAIRYLAND);
+        Stream st;
+        /*
         st << static_cast<UInt8>(1);
         st << static_cast<UInt8>(0);
         st << static_cast<UInt32>(_energy);
@@ -463,8 +467,26 @@ namespace GObject
         st << static_cast<UInt8>(WORLD().getLeftAddrConnection());
         SendBattlesInfo(st); 
         st << Stream::eos;
+        */
+        getClanBuildingStream(st);
         player->send(st);
         return;
+    }
+
+    void ClanBuildingOwner::getClanBuildingStream(Stream& st)
+    {
+        st.init(REP::CLAN_FAIRYLAND);
+        st << static_cast<UInt8>(1);
+        st << static_cast<UInt8>(0);
+        st << static_cast<UInt32>(_energy);
+        st << getLevel(1);
+        st << getLevel(2);
+        st << getLevel(3);
+        st << getLevel(4);
+        st << getLevel(5);
+        st << static_cast<UInt8>(WORLD().getLeftAddrConnection());
+        SendBattlesInfo(st); 
+        st << Stream::eos;
     }
 
     UInt16 ClanBuildingOwner::getLevel(UInt8 type) const
