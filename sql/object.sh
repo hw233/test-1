@@ -263,6 +263,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_sevensoul_bug.sql     #七魄bug
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140307_1.sql   #clan表中添加duobaoAward字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140307_2.sql   #夺宝日志
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140123_1.sql     # 创建帮派建筑表
 }
 
 #sh player_jiguan.sh
