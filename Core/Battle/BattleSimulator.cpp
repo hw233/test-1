@@ -4131,7 +4131,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     {
                         yehuoLeve += 1;
                         bo->setYehuoLevel(yehuoLeve);
-                        appendDefStatus(e_BleedMo, yehuoLeve, bo);
+                        appendDefStatus(e_yehuoBleedMo, yehuoLeve, bo);
                     }
                 }
             }
@@ -10423,12 +10423,12 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         {
             float yehuoSSDmgRate = bf->getYehuoSSDmgRate();
             UInt32 dmg = static_cast<UInt32>(yehuoSSDmgRate * yehuoLeve);
-            makeDamage(bf, dmg, e_BleedMo, e_damageTrue);
+            makeDamage(bf, dmg, e_damNormal, e_damageTrue);
             if(yehuoLeve < 9 && static_cast<float>(uRand(10000)) < bf->getYehuoSSUpRate() * 10000)
             {
                 yehuoLeve += 1;
                 bf->setYehuoLevel(yehuoLeve);
-                appendDefStatus(e_BleedMo, yehuoLeve, bf);
+                appendDefStatus(e_yehuoBleedMo, yehuoLeve, bf);
             }
         }
         if(bf->getHP() == 0)
