@@ -28605,6 +28605,12 @@ void Player::doGuankaAct(UInt8 type)
         }
     }
     //add udpLog
+    UInt32 logInfo = GetVar(VAR_GUANKA_ACTION_UDPLOG);
+    UInt8 tmpIdx = npcId - npcIds[0][0];    //最大30个
+    if(GET_BIT(logInfo, tmpIdx))
+        return;
+    logInfo = SET_BIT(logInfo, tmpIdx);
+    SetVar(VAR_GUANKA_ACTION_UDPLOG, logInfo);
     std::string trumpStr;
     for(int i = 0; i < 5; ++ i)
     {
