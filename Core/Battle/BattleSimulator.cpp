@@ -10457,6 +10457,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                     if(static_cast<float>(uRand(10000) < bf->getBleedFieldGapeStunProb() * 100))
                     {
                         bf->setStunRound(1);
+                        calcAbnormalTypeCnt(bf);
                         appendDefStatus(e_Stun, 0, bf);
                     }
                 }

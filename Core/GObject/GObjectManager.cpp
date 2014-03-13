@@ -5575,7 +5575,7 @@ namespace GObject
             else
                 dpData->attacker = NULL;
 
-            if(dbtdp.deamonLevel != 0)
+            //if(dbtdp.deamonLevel != 0)
                 townDeamonManager->loadDeamonPlayersFromDB(dbtdp.deamonLevel, dpData->maxLevel, pl);
         }
 		lc.finalize();
