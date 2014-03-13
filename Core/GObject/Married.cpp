@@ -655,6 +655,24 @@ namespace GObject
                 SYSMSG_SENDV(932, woman_player);
                 DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,man_player->GetMarriageInfo()->yuyueTime);
                 break;
+            case AWARD_DIVORCE:
+                it->second->levelExp += man_player->GetVar(VAR_COUPLE_LEVELEXP); 
+                it->second->levelExp += woman_player->GetVar(VAR_COUPLE_LEVELEXP); 
+                if(it->second->levelExp >= 63770)
+                    it->second->levelExp = 63770;
+                it->second->friendliness += man_player->GetVar(VAR_COUPLE_FRIENDLINESS); 
+                it->second->friendliness += woman_player->GetVar(VAR_COUPLE_FRIENDLINESS); 
+                //TODO 删除离婚保留的亲密度和成长值
+                man_player->DelVar(VAR_COUPLE_FRIENDLINESS);
+                woman_player->DelVar(VAR_COUPLE_FRIENDLINESS);
+                man_player->DelVar(VAR_COUPLE_LEVELEXP);
+                woman_player->DelVar(VAR_COUPLE_LEVELEXP);
+                
+                rebuildCouplePet(man_player);
+                gMarryMgr.SetDirty(man_player,woman_player);
+                DB4().PushUpdateData("UPDATE `married_couple` SET `pet_level` = %u, `pet_levelExp` = %u WHERE `jh_time` = %u", it->second->level, it->second->levelExp,man_player->GetMarriageInfo()->yuyueTime);
+                break;
+
             default:
                 break;
         }
@@ -745,13 +763,17 @@ namespace GObject
         return;
     }
 
-    void MarriedMgr::eraseCoupleList(Player* player)
+    void MarriedMgr::eraseCoupleList(Player* player,Player* obj_player)
     {
         Mutex::ScopedLock lk(_mutex);
-        
+         
         CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
         if(it == m_couple.end())
             return;
+        player->SetVar(VAR_COUPLE_LEVELEXP,it->second->levelExp / 2);
+        player->SetVar(VAR_COUPLE_FRIENDLINESS,it->second->friendliness / 2);
+        obj_player->SetVar(VAR_COUPLE_LEVELEXP,it->second->levelExp / 2);
+        obj_player->SetVar(VAR_COUPLE_FRIENDLINESS,it->second->friendliness / 2);
         m_couple.erase(it);  
         return;
     }
