@@ -770,7 +770,8 @@ void ServerWarMgr::jiJianTai_openBox(Player * player, UInt8 idx)
 
 void ServerWarMgr::jiJianTai_buyTimes(Player * player)
 {
-    if(!player) return;
+    if(!player || _progress != e_war_challenge)
+        return;
     UInt32 data = player->GetVar(VAR_SERVERWAR_JIJIANTAI1);
     UInt8 times = GET_BIT_8(data, 3);
     if(times >= 5)

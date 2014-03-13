@@ -2277,6 +2277,29 @@ void SendRechargeRP7Rank(GameMsgHdr& hdr,  const void* data )
     player->send(st);
 }
 
+void OnSendDuoBaoBegin(GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+
+    MSG_QUERY_PLAYER(player);   
+
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    UInt32 start = time + 10*60*60;     // 每天10点开始
+    UInt32 end = time + 22*60*60;       // 每天22点结束(加5秒, 用于最后一次结算)
+    if(nowTime >= start && nowTime <= end)
+    {
+        if(player->getClan() != NULL)
+        {
+            Stream st(REP::DUOBAO_REP);
+            st << static_cast<UInt8>(0x07);
+            st << static_cast<UInt8>(1);
+            st << Stream::eos;
+            player->send(st);
+        }
+    }
+}
+
 void OnSaleItemCancle( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

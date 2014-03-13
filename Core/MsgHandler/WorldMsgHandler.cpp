@@ -193,6 +193,7 @@ MSG_REG_2(GameMsgHdr, 0x1DC, SendQSBState);
 MSG_REG_2(GameMsgHdr, 0x1DD, OnSetCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DE, OnDelCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DF, OnSendCFriendInvited);
+MSG_REG_2(GameMsgHdr, 0x1AF, OnSendDuoBaoBegin);
 
 //FB占位(0x1E0~0x1E9),简体千万别使用
 //0x1E0

@@ -4378,6 +4378,19 @@ inline bool player_enum_1(GObject::Player* p, int)
     return true;
 }
 
+inline bool clan_enum_duobao(GObject::Clan *clan, int)
+{
+   clan->ClearDuoBaoData();
+   return true;
+}
+
+inline bool player_enum_duobao(GObject::Player *pl, int)
+{
+    pl->SetVar(GObject::VAR_CLAN_DUOBAO_SCORE, 0);
+    pl->SetVar(GObject::VAR_CLAN_DUOBAO_STATUS, 0);
+    return true;
+}
+
 inline bool player_enum_2(GObject::Player* p, int)
 {
     p->SetVar(GObject::VAR_3366GIFT, 0);
@@ -4528,8 +4541,8 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
         case 23:
-            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::Now());
-            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::Now() + 86400*5);
+            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::SharpDayT(1));
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
             break;
@@ -4539,8 +4552,8 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
         case 25:
-            GVAR.SetVar(GVAR_3366_BUY_BEGIN, TimeUtil::Now());
-            GVAR.SetVar(GVAR_3366_BUY_END, TimeUtil::Now() + 86400*5);
+            GVAR.SetVar(GVAR_3366_BUY_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_3366_BUY_END, TimeUtil::SharpDayT(1));
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
             break;
@@ -4550,7 +4563,37 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GObject::globalPlayers.enumerate(player_enum_2, 0);
             break;
+        case 27:
+            GVAR.SetVar(GVAR_GUANKAACT_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_GUANKAACT_END, TimeUtil::SharpDayT(1));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+         case 28:
+            {
+                //if(GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) > TimeUtil::Now()
+                  // || GVAR.GetVar(GVAR_CLAN_DUOBAO_END) < TimeUtil::Now())
+                {
+                    GObject::globalClans.enumerate(clan_enum_duobao, 0);
+                    GObject::globalPlayers.enumerate(player_enum_duobao, 0);
 
+                    DB5().PushUpdateData("DELETE FROM `duobaolog`");
+                }
+
+                UInt32 valueTime = 0;
+                UInt32 nowTime = TimeUtil::Now();
+                GVAR.SetVar(GVAR_CLAN_DUOBAO_BEGIN, nowTime);
+                GVAR.SetVar(GVAR_CLAN_DUOBAO_END, nowTime + 3600);
+
+                if(nowTime < GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) && nowTime > GVAR.GetVar(GVAR_CLAN_DUOBAO_END))
+                    valueTime = GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) / (15 * 60) * (15 * 60) + 900;
+                else
+                    valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
+
+                GVAR.SetVar(GVAR_DUOBAO_ENDTIME, valueTime);
+                GLOBAL().PushMsg(hdr4, &reloadFlag);
+                GLOBAL().PushMsg(hdr1, &_msg);
+            }
+            break;
     }
 }
 
