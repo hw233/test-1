@@ -4460,28 +4460,29 @@ void World::SendTYSSClanAward()
 void World::SendTYSSPlayerAward()
 {
     World::initRCRank();
-    int pos = 0;
+    int pos = 1;
     std::string str = "";
     static MailPackage::MailItem s_item[][4] = {
         {{134,50},{1325,50},{515,30},{9075,40}},
         {{134,40},{1325,40},{515,25},{9075,30}},
         {{134,30},{1325,30},{515,20},{9075,20}},
-        {{134,20},{1325,20},{515,10},{9075,10}},
+        {{134,20},{1325,20},{515,15},{9075,10}},
     };
     SYSMSG(title, 946);
     for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
     {
         UInt32 score = i->total;
         str = i->player->getName();
-        if(pos >= 0 || pos < 8)     //奖励前7名
+        if(pos >= 1 && pos < 8)     //奖励前7名
         {
             int type = pos > 3 ? 4 : pos;
             SYSMSGV(content, 951, pos);
-            MailItemsInfo itemsInfo(s_item[type-1], Activity, 5);
+            MailItemsInfo itemsInfo(s_item[type-1], Activity, 4);
             Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
             if(mail)
-                mailPackageManager.push(mail->id, s_item[type-1], 5, true);
+                mailPackageManager.push(mail->id, s_item[type-1], 4, true);
         }        
+        pos++;
         
     }
     return;

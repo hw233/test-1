@@ -8232,7 +8232,7 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
             brd >> op;
             switch(op)
             {
-                case 2:
+                case 0x13:
                     player->OpTYSS(op);//领取每日礼包
                     break;
                 case 3:

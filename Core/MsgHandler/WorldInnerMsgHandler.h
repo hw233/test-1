@@ -2277,13 +2277,14 @@ void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
         return;
     Stream st(REP::ACT);  
     st << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x00);  
-    if(player->getClan() == NULL)
+    if(player->getClan() == NULL || player->getClan()->getLeader() == NULL)
         st << static_cast<UInt32>(0);
     else
         st << player->getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
     st << static_cast<UInt32>(CLR_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
    
     st << static_cast<UInt8>(GET_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
+    st << player->GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
     st << Stream::eos;
     player->send(st);
 
@@ -2311,6 +2312,14 @@ void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
                 }
                 ++idx;
                 ++i;
+                if(i == e)
+                {
+                    st1 << i->total << static_cast<UInt32>(idx - 1); 
+                    if(World::tyss_PlayerSort.size() >= 3)
+                        st1 << static_cast<UInt8>(3);
+                    else
+                        st1 << static_cast<UInt8>(World::tyss_PlayerSort.size());
+                }
                 
             }
             
@@ -2352,6 +2361,14 @@ void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
                
                 ++idx;
                 ++i;
+                if(i == e)
+                {
+                    st2 << i->total << static_cast<UInt32>(idx - 1); 
+                    if(World::tyss_ClanSort.size() >= 3)
+                        st2 << static_cast<UInt8>(3);
+                    else
+                        st2 << static_cast<UInt8>(World::tyss_ClanSort.size());
+                }
             }
 
             for (ClanGradeSort::iterator i = World::tyss_ClanSort.begin(), e = World::tyss_ClanSort.end(); i != e; ++i)

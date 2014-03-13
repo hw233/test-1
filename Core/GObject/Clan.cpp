@@ -5357,10 +5357,10 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str)
         if( player == NULL )
             continue ; 
         SYSMSGV(content, 949, str.c_str());
-        MailItemsInfo itemsInfo(s_item[flag], Activity, 5);
+        MailItemsInfo itemsInfo(s_item[flag], Activity, 4);
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
-            mailPackageManager.push(mail->id, s_item[flag], 5, true);
+            mailPackageManager.push(mail->id, s_item[flag], 4, true);
 	}
 
 

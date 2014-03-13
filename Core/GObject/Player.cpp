@@ -27010,7 +27010,8 @@ void Player::AddLingGuo(UInt32 r)
     AddVar(VAR_TYSS_RECHARGE,r);
     if(GetVar(VAR_TYSS_RECHARGE) >= 30)//充值30仙石兑换一个灵果
     {
-        UInt8 num = 0;//灵果数
+        UInt32 num = 0;//灵果数
+        UInt32 tmp_num = 0;
         while(GetVar(VAR_TYSS_RECHARGE) >= 30)
         {
             SetVar(VAR_TYSS_RECHARGE,GetVar(VAR_TYSS_RECHARGE) - 30);
@@ -27018,13 +27019,27 @@ void Player::AddLingGuo(UInt32 r)
         }
         if(num != 0)
         {
-            SYSMSGV(title, 944);
-            SYSMSGV(content, 945);
-            MailPackage::MailItem item[] = {{9492, num},};
-            MailItemsInfo itemsInfo(item, Activity, 1);
-            Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-            if(mail)
-                 mailPackageManager.push(mail->id, item, 1, true);
+            while(num > 0)
+            {
+                if(num > 200)
+                {
+                    num -= 200;
+                    tmp_num = 200;
+                }
+                else
+                {
+                    tmp_num = num;
+                    num = 0;
+                }
+                SYSMSGV(title, 944);
+                SYSMSGV(content, 945);
+                MailPackage::MailItem item[] = {{9492, tmp_num},};
+                MailItemsInfo itemsInfo(item, Activity, 1);
+                Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(mail)
+                     mailPackageManager.push(mail->id, item, 1, true);
+            }
+            
         }
     }        
 
@@ -27044,27 +27059,6 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
 {
     switch(type)
     {
-        case 2://领取每日礼包
-        {
-            if(GET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31))//已经领取过
-                return;
-            if(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY) < 50)
-                return;
-            
-            if(GetPackage()->GetRestPackageSize() > 9)
-            {
-                GetPackage()->AddItem(500, 2, true, false, FromTYSS);
-                GetPackage()->AddItem(503, 2, true, false, FromTYSS);
-                GetPackage()->AddItem(15, 3, true, false, FromTYSS);
-                GetPackage()->AddItem(9371, 3, true, false, FromTYSS);
-            }
-            else
-            {
-                sendMsgCode(2, 1011);
-            }
-            SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));//打上当日领取奖品的标记
-        }
-            break;
         case 3://喂养神兽
         {
             if(flag != 0 && flag != 1 && GetPackage()->GetItemAnyNum(9492) < 0)
@@ -27196,6 +27190,41 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                         GLOBAL().PushMsg(hdr, &ia);
                     }
                 }
+                switch(flag)
+                {
+                    case 1:
+                        udpLog("tianyuanshenshou", "F_140224_16", "", "", "", "", "act");
+                        break;
+                    case 2:
+                        udpLog("tianyuanshenshou", "F_140224_17", "", "", "", "", "act");
+                        break;
+                    case 3:
+                        udpLog("tianyuanshenshou", "F_140224_18", "", "", "", "", "act");
+                        break;
+                    case 4:
+                        udpLog("tianyuanshenshou", "F_140224_19", "", "", "", "", "act");
+                        break;
+                    case 5:
+                        udpLog("tianyuanshenshou", "F_140224_20", "", "", "", "", "act");
+                        break;
+                    case 6:
+                        udpLog("tianyuanshenshou", "F_140224_21", "", "", "", "", "act");
+                        break;
+                    case 7:
+                        udpLog("tianyuanshenshou", "F_140224_22", "", "", "", "", "act");
+                        break;
+                    case 8:
+                        udpLog("tianyuanshenshou", "F_140224_23", "", "", "", "", "act");
+                        break;
+                    case 9:
+                        udpLog("tianyuanshenshou", "F_140224_24", "", "", "", "", "act");
+                        break;
+                    case 10:
+                        udpLog("tianyuanshenshou", "F_140224_25", "", "", "", "", "act");
+                        break;
+                    default:
+                        break;
+                }
             }
         }
             break;
@@ -27246,6 +27275,27 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             send(st);
 
         }    
+            break;
+        case 0x13://领取每日礼包
+        {
+            if(GET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31))//已经领取过
+                return;
+            if(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY) < 50)
+                return;
+            
+            if(GetPackage()->GetRestPackageSize() > 9)
+            {
+                GetPackage()->AddItem(500, 2, true, false, FromTYSS);
+                GetPackage()->AddItem(503, 2, true, false, FromTYSS);
+                GetPackage()->AddItem(15, 3, true, false, FromTYSS);
+                GetPackage()->AddItem(9371, 3, true, false, FromTYSS);
+            }
+            else
+            {
+                sendMsgCode(2, 1011);
+            }
+            SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));//打上当日领取奖品的标记
+        }
             break;
        default:
             break;

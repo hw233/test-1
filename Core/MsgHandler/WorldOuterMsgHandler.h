@@ -3244,8 +3244,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         {
             if(!World::getTYSSTime())
                 return;
-            UInt8 op;
-            UInt8 flag;
+            UInt8 op = 0;
+            UInt8 flag = 0;
             brd >> op ;
             switch(op)
             {
@@ -3254,11 +3254,6 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     break;
                 case 1:
                     player->OpTYSS(op);//购买灵果
-                    player->ReturnTYSSInfo(9);
-                    break;
-                case 2:
-                    hdr.msgHdr.desWorkerID = player->getThreadId();//领取每日礼包
-                    GLOBAL().PushMsg(hdr, (void*)data);
                     player->ReturnTYSSInfo(9);
                     break;
                 case 3:
@@ -3293,6 +3288,11 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     break;
                 case 0x12:
                     player->ReturnTYSSInfo(0);//返回个人榜
+                case 0x13:
+                    hdr.msgHdr.desWorkerID = player->getThreadId();//领取每日礼包
+                    GLOBAL().PushMsg(hdr, (void*)data);
+                    player->ReturnTYSSInfo(9);
+                    break;
                 default:
                     break;
 
