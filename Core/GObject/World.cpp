@@ -1995,8 +1995,20 @@ void World::ClanDuoBaoCheck(void *)
             DuoBaoEndVisitor visitor;
             globalClans.enumerate(visitor);
         }
-        //GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (15 * 60) * (15 * 60) + (15 * 60));
-        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));
+
+        UInt32 value = 0;
+
+        if(nowTime >= time + 22*60*60)
+            value = time + 10*60*60 + 120 + 86400;
+        else
+            value = nowTime / (2 * 60) * (2 * 60) + (2 * 60);
+
+        /*if(nowTime >= time + 22*60*60)
+            value = time + 10*60*60 + 900 + 86400;
+        else
+            value = nowTime / (15 * 60) * (15 * 60) + (15 * 60);*/
+
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, value);
     }
 }
 
@@ -2166,12 +2178,29 @@ bool World::Init()
     }
     */
 
-    
     if( GObject::MarryBoard::instance().sendAward())
     {
         gMarryMgr.MarryingCrush();
     }
     AddTimer(60 * 60 * 3 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
+
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    UInt32 start = time + 10*60*60;
+    UInt32 end = time + 22*60*60;
+    UInt32 valueTime = 0;
+
+    if(nowTime < start && nowTime > end)
+        valueTime = time + 10*60*60 + 120;
+    else
+        valueTime = nowTime / (2 * 60) * (2 * 60) + (2 * 60);
+
+    /*if(nowTime < start && nowTime > end)
+        valueTime = time + 10*60*60 + 900;
+    else
+        valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);*/
+
+    GVAR.SetVar(GVAR_DUOBAO_ENDTIME, valueTime);
 
     AddTimer(5 * 1000, ClanDuoBaoCheck, static_cast<void*>(NULL));
     return true;
