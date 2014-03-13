@@ -27097,7 +27097,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
     {
         case 3://喂养神兽
         {
-            if(flag != 0 && flag != 1 && GetPackage()->GetItemAnyNum(9492) < 0)
+            if(flag != 0 && flag != 1 && GetPackage()->GetItemAnyNum(9492) <= 0)
                 return;
             if(flag == 0)
             {

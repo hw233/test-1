@@ -5547,7 +5547,7 @@ void Clan::sendMemberBuf(UInt8 pos)
         pl->rebuildBattleName();
         SYSMSG(title, 947);
         SYSMSGV(content, 950, pos);
-        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000);
+        pl->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000);
 
 	}
 }
