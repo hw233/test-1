@@ -5210,6 +5210,7 @@ void Clan::DuoBaoStart(Player * pl)
     st << static_cast<UInt8>(1);
     st << score;
     st << time;
+    st << static_cast<UInt8>(DuoBaoScoreSort.size());
     st << Stream::eos;
     pl->send(st);
     DuoBaoUpdate(pl->getName(), score);
@@ -5219,7 +5220,8 @@ void Clan::SendDuoBaoAward()
 {
     UInt32 award = 0; 
     UInt8 markA = 0;
-    if(DuoBaoScoreSort.size() > 0)
+    UInt8 memCnt = DuoBaoScoreSort.size();
+    if(memCnt > 0)
     {
         UInt32 nowTime = TimeUtil::Now();
         UInt32 time = TimeUtil::SharpDayT(0,nowTime);
@@ -5236,6 +5238,16 @@ void Clan::SendDuoBaoAward()
     }
     else
         return;
+
+    UInt8 specialMark = 0;
+    if(memCnt >= 50 && memCnt <= 60)
+        specialMark = 4;
+    else if(memCnt >= 30)
+        specialMark = 3;
+    else if(memCnt >= 10)
+        specialMark = 2;
+    else
+        specialMark = 1;
 
     UInt8 countA = 0;
     UInt8 offsetA = 0;
@@ -5298,7 +5310,7 @@ void Clan::SendDuoBaoAward()
             st2 << static_cast<UInt8>(awardCnt);
 
             countA++;
-            if(3 == countA)
+            if(specialMark == countA)
                 break;
         }
     }
@@ -5338,6 +5350,7 @@ void Clan::DuoBaoUpdate(const std::string& playerName, UInt16 score)
     st << static_cast<UInt8>(0x02);
     st << playerName;
     st << score;
+    st << static_cast<UInt8>(DuoBaoScoreSort.size());
     st << Stream::eos;
     broadcast(st);
 }
@@ -5366,21 +5379,17 @@ void Clan::ClearDuoBaoData()
         _duobaoLogs.clear();
 
     SetDuoBaoAward(0);
-     
 }
 
 void Clan::BroadDuoBaoBegin(Player * player)
 {
     if(World::getDuoBaoTime())
     {
-        if(player->getClan() != NULL)
-        {
-            Stream st(REP::DUOBAO_REP);
-            st << static_cast<UInt8>(0x07);
-            st << static_cast<UInt8>(1);
-            st << Stream::eos;
-            player->send(st);
-        }
+        Stream st(REP::DUOBAO_REP);
+        st << static_cast<UInt8>(0x07);
+        st << static_cast<UInt8>(1);
+        st << Stream::eos;
+        player->send(st);
     }
 }
 
