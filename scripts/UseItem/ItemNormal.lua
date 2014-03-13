@@ -9068,6 +9068,22 @@ function ItemNormal_00010245(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010246(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    local item = 1514;
+
+    if package:GetRestPackageSize() < (1+(1*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(1514, num*1, true, false, 2);
+
+    Broadcast(0x27, "恭喜".."[p:"..player:getCountry()..":"..player:getPName().."]".."人品大爆发，抢到了".."[4:"..iid.."]".."，获得了".."[4:"..item.."]x1"..msg_141);
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -12817,6 +12833,7 @@ local ItemNormal_Table = {
     [10243] = ItemNormal_00010243,
     [10244] = ItemNormal_00010244,
     [10245] = ItemNormal_00010245,
+    [10246] = ItemNormal_00010246,
     [9480] = ItemNormal_0009480,
     [9481] = ItemNormal_0009480,
     [9482] = ItemNormal_0009480,
