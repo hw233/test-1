@@ -627,6 +627,8 @@ private:
     void ClearDuoBaoLog();
     void BroadDuoBaoBegin(Player * player);
     void DuoBaoBroadcast(Stream& st);
+public:
+    void sendMemberBuf(UInt8 pos);
 
 public:
 

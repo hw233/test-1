@@ -241,6 +241,7 @@ private:
     void OnUseItem9440(GObject::Player *player, std::vector<std::string>& args);
     void OnAddPetAttr(GObject::Player *player, std::vector<std::string>& args);
     void TestSameTimeRecharge(GObject::Player *player, std::vector<std::string>& args);
+    void TestClanRank(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

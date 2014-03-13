@@ -192,7 +192,10 @@ namespace GObject
 	{
 		UInt32 now = TimeUtil::Now();
 		float exp = calcExpEach(now);
+        float expBase = exp;
         float factor = 1.0f;
+        float factorAdd = 0;
+
         UInt32 tmp;
         UInt32 curHookIndex = m_Player->GetVar(VAR_EXP_HOOK_INDEX);
         if(curHookIndex == ENUM_TRAINP1)
@@ -254,16 +257,23 @@ namespace GObject
             _writedb = false;
         else
             _writedb = true;
-
 #if 0
 		_npcGroup->monsterKilled(m_Player);
 #endif
         if (cfg.rpServer && m_Player->GetLev() < 70)
             exp *= 2;
+
+        if(m_Player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
+            factorAdd = 1.0f;
+        else if(m_Player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
+            factorAdd = 0.5f;
+        else if(m_Player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+            factorAdd = 0.3f;
+
 		if(m_Player->isOnline())
-			m_Player->AddExp(static_cast<UInt32>(exp * factor), 0, extraExp, _writedb);
+			m_Player->AddExp(static_cast<UInt32>(exp * factor + expBase * factorAdd), 0, extraExp, _writedb);
 		else
-			m_Player->pendExp(static_cast<UInt32>(exp * factor), false, _writedb);
+			m_Player->pendExp(static_cast<UInt32>(exp * factor + expBase * factorAdd), false, _writedb);
 #if 0
 		_npcGroup->getLoots(m_Player);
 #else
@@ -10325,8 +10335,7 @@ namespace GObject
 
 		char numstr2[16];
         UInt32 clanTitle;
-        Clan *clan =  getClan();
-        if(clan != NULL)
+        if(getBuffData(PLAYER_BUFF_CLAN1) > 0)
             clanTitle = 1;
         else
             clanTitle = 0;
@@ -10340,7 +10349,7 @@ namespace GObject
 		}
         */
 		//_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
-		_battleName = _battleName + sepStr + numstr + sepStr + numstr2 + sepStr + _playerData.name;
+		_battleName = _battleName + sepStr + numstr + sepStr + _playerData.name + sepStr + numstr2;
 #endif
 	}
 
@@ -10747,6 +10756,13 @@ namespace GObject
             fuzhanRatio = (float)SERVERWAR_VALUE_XIUWEI5 / 100;
         factor += fuzhanRatio;
 
+        if(getBuffData(PLAYER_BUFF_CLAN1) > 0)
+            factor += 1.0f;
+        else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
+            factor += 0.5f;
+        else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
+            factor  += 0.3f;
+
         return factor;
     }
 
@@ -10904,7 +10920,17 @@ namespace GObject
                     if(inVipPrivilegeTime()&&(VipType==0||VipType ==1 ||VipType ==3 ) )
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
-                    fgt->addPExp(pExp, true, false, extraPExp);
+
+                    UInt32 pexpAdd = 0;
+                    UInt32 pexpBase = fgt->getBasePExpEach() * pfexp->counts[i];
+                    if(getBuffData(PLAYER_BUFF_CLAN1) > 0)
+                        pexpAdd = pexpBase * 1.0f;
+                    else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
+                        pexpAdd = pexpBase * 0.5f;
+                    else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
+                        pexpAdd = pexpBase * 0.3f;
+
+                    fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }
             }
 
@@ -10964,7 +10990,17 @@ namespace GObject
                     if(inVipPrivilegeTime() && ( VipType==0||VipType ==1 ||VipType ==3 ) )
                         extraPExp = fgt->getBasePExpEach() * pfexp->counts[i] * 1.0f;
                     isDoubleExp(pExp);
-                    fgt->addPExp(pExp, true, false, extraPExp);
+
+                    UInt32 pexpAdd = 0;
+                    UInt32 pexpBase = fgt->getBasePExpEach() * pfexp->counts[i];
+                    if(getBuffData(PLAYER_BUFF_CLAN1) > 0)
+                        pexpAdd = pexpBase * 1.0f;
+                    else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
+                        pexpAdd = pexpBase * 0.5f;
+                    else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
+                        pexpAdd = pexpBase * 0.3f;
+
+                    fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }
             }
         }
