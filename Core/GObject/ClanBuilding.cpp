@@ -543,6 +543,7 @@ namespace GObject
             if(flag)
             {
                 Stream st(REP::CLAN_FAIRYLAND);
+                st << static_cast<UInt8>(0x07);
                 st << static_cast<UInt8>(cbbi.res);
                 st << static_cast<UInt8>(cbbi.leftId);
                 st << static_cast<UInt32>(cbbi.battleId);
