@@ -2687,7 +2687,7 @@ void OnServerLeftLineup( GameMsgHdr& hdr, const void* data )
     if(player->GetLev() < LIMIT_LEVEL)
         return;
 
-    Stream st(SERVERLEFTREQ::COMMIT_LINEUP, 0xEE);
+    Stream st(SERVERLEFTREQ::COMMIT_LINEUP, 0xED);
     st << player->getId();
     player->appendLineup2(st);
     player->appendPetOnBattle(st);
@@ -2707,7 +2707,7 @@ void OnServerLeftChangeTeamMember( GameMsgHdr& hdr, const void* data )
     };
     TeamChange tc = *reinterpret_cast<const TeamChange *>(data);
 
-    Stream st(SERVERLEFTREQ::LEFTADDR_SWITCHPLAYER, 0xEE);
+    Stream st(SERVERLEFTREQ::LEFTADDR_SWITCHPLAYER, 0xED);
     st << tc.leftId ; 
     st << tc.clanId;
     st << tc.playerId ; 
@@ -2727,7 +2727,7 @@ void OnServerLeftAddPowerHold( GameMsgHdr& hdr, const void* data )
         powerHold(UInt8 leftId_ , UInt32 clanId_,UInt8 num_):leftId(leftId_),clanId(clanId_),num(num_){}
     };
     powerHold ph = *reinterpret_cast<const powerHold *>(data);
-    Stream st(SERVERLEFTREQ::LEFTADDR_POWERHOLD, 0xEE);
+    Stream st(SERVERLEFTREQ::LEFTADDR_POWERHOLD, 0xED);
     st << ph.leftId ;
     st << ph.clanId;
     st << ph.num;
@@ -2738,7 +2738,7 @@ void OnServerLeftAddPowerHold( GameMsgHdr& hdr, const void* data )
 void OnServerLeftInfoReq(GameMsgHdr& hdr, const void* data)
 {
     MSG_QUERY_PLAYER(player);
-    Stream st(SERVERLEFTREQ::LEFTADDR_INFO, 0xEE);
+    Stream st(SERVERLEFTREQ::LEFTADDR_INFO, 0xED);
     st << player->getId();
     st << Stream::eos;
     NETWORK()->SendToServerLeft(st);
@@ -2748,7 +2748,7 @@ void OnServerLeftBattleReq(GameMsgHdr& hdr, const void* data)
     MSG_QUERY_PLAYER(player);
     UInt32 battleId = *reinterpret_cast<const UInt32 *>(data);
     UInt64 playerId1 = player->getId();
-    Stream st(SERVERLEFTREQ::BATTLE_REPORT, 0xEE);
+    Stream st(SERVERLEFTREQ::BATTLE_REPORT, 0xED);
     st << playerId1 << battleId ; 
     st << Stream::eos;
     NETWORK()->SendToServerLeft(st);

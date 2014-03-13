@@ -5298,7 +5298,7 @@ void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::str
                 SWarEnterData(Stream& st2, std::vector<Player *>& warSort2) : st(st2), warSort(warSort2),pos(0) {}
             };
 
-            Stream st(SERVERLEFTREQ::ENTER, 0xEE);
+            Stream st(SERVERLEFTREQ::ENTER, 0xED);
             st<< player->getId()<<clanId <<clanName << pl->getName()/*领队*/  <<leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
             SWarEnterData * swed = new SWarEnterData(st, warSort);
             std::vector<Player *>::iterator it = warSort.begin();
@@ -5319,7 +5319,7 @@ void GMHandler::OnServerLeftReport(GObject::Player* player, std::vector<std::str
         return ;
 	UInt64 playerId1 = player->getId();
     UInt32 bpId = atoi(args[0].c_str());
-    Stream st(SERVERLEFTREQ::BATTLE_REPORT, 0xEE);
+    Stream st(SERVERLEFTREQ::BATTLE_REPORT, 0xED);
     st << playerId1 << bpId ; 
     st << Stream::eos;
     NETWORK()->SendToServerLeft(st);
@@ -5348,7 +5348,7 @@ void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::strin
     {
         case 1:
             {
-                Stream st(SERVERLEFTREQ::LEFTADDR_INFO, 0xEE);
+                Stream st(SERVERLEFTREQ::LEFTADDR_INFO, 0xED);
                 st << playerId1 ; 
                 st << Stream::eos;
                 NETWORK()->SendToServerLeft(st);
@@ -5356,7 +5356,7 @@ void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::strin
             }
         case 2:
             {
-                Stream st(SERVERLEFTREQ::LEFTADDR_SWITCHPLAYER, 0xEE);
+                Stream st(SERVERLEFTREQ::LEFTADDR_SWITCHPLAYER, 0xED);
                 st << leftId ; 
                 st << clanId ;
                 st << pid ; 
@@ -5368,7 +5368,7 @@ void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::strin
             } 
         case 3:
             {
-                Stream st(SERVERLEFTREQ::LEFTADDR_POWERHOLD, 0xEE);
+                Stream st(SERVERLEFTREQ::LEFTADDR_POWERHOLD, 0xED);
                 st << static_cast<UInt8>(12);
                 st << static_cast<UInt32>(10);
                 st << static_cast<UInt8>(5);

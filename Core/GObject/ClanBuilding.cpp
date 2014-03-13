@@ -508,12 +508,14 @@ namespace GObject
             battles_deque.pop_front();
         battles_deque.push_back(cbbi);
         std::vector<Player *> vec;
+        bool flag = false ;
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
             if(it->first.leftId == cbbi.leftId )
             {
                 vec = it->second ;
                 leftAttackTeams.erase(it);
+                flag = true ;
                 break;
             }
         }
@@ -537,6 +539,15 @@ namespace GObject
                 {
                     SYSMSG_SENDV(4302, vec[i], cbbi.leftId ); 
                 }
+            }
+            if(flag)
+            {
+                Stream st(REP::CLAN_FAIRYLAND);
+                st << static_cast<UInt8>(cbbi.res);
+                st << static_cast<UInt8>(cbbi.leftId);
+                st << static_cast<UInt32>(cbbi.battleId);
+                st <<Stream::eos;
+                vec[i]->send(st);
             }
         }
     } 
@@ -734,7 +745,7 @@ namespace GObject
                     if(!vec[i])
                         return ;
                 }
-                Stream st(SERVERLEFTREQ::ENTER, 0xEE);
+                Stream st(SERVERLEFTREQ::ENTER, 0xED);
                 st<<static_cast<UInt64>(player->getId()) << _clan->getId()<<_clan->getName() << leaderName/*领队*/  << leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
                 SWarEnterData * swed = new SWarEnterData(st, vec);
 

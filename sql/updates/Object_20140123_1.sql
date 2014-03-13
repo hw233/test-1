@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS `clan_buildings`;
+--DROP TABLE IF EXISTS `clan_buildings`;
 CREATE TABLE `clan_buildings` (
       `clanId` bigint(20) NOT NULL COMMENT '帮派ID',
       `fairylandEnergy` bigint(20) DEFAULT '0' COMMENT '仙界元气',

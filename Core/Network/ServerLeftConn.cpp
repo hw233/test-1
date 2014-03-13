@@ -35,7 +35,7 @@ void ServerLeftConn::initConnection()
 	//if(bufferevent_socket_connect(_bev, (struct sockaddr *)&addr, sizeof(addr)) < 0)
 	if(n < 0)
 		throw std::bad_exception();
-	Stream st(SERVERLEFTREQ::REG, 0xEE);
+	Stream st(SERVERLEFTREQ::REG, 0xED);
 	st << cfg.slugName << cfg.channelNum << cfg.serverNo << cfg.merged;
     if (cfg.merged)
     {
@@ -77,7 +77,7 @@ int ServerLeftConn::parsePacket( struct evbuffer * buf, int &off, int &len )
 
 	switch(buf_[2])
 	{
-	case 0xEE:
+	case 0xED:
 		return 0x100 + buf_[3];
 	default:
 		return 0;
