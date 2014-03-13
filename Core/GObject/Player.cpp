@@ -820,6 +820,7 @@ namespace GObject
         memset(_alreadyload, 0, sizeof(_alreadyload));
         m_EnterPTCStatus = false;
         m_InPTCStatus = false;
+        //m_duobaoOpen = 0;
 	}
 
 
@@ -28659,13 +28660,13 @@ void Player::getguankaScoreAward(UInt8 type)
     if(!World::getGuankaAct() || type > 4)
         return;
 
-    static UInt32 scoreLvl[] = {200, 400, 800, 1000, 1500};
+    static UInt32 scoreLvl[] = {200, 400, 600, 800, 1000};
     static UInt32 awards[5][5][2] = {
-        {{15,2},   {514,5},  {135,5},    {500, 5},   {0, 0}},
-        {{15,5},   {515,5},  {514, 10},  {135, 10},  {500, 5}},
-        {{15,10},  {515,10}, {134, 10},  {9022, 10}, {0, 0}},
-        {{515,30}, {134,30}, {9438, 30}, {9022, 10}, {0, 0}},
-        {{515,40}, {134,40}, {9438, 40}, {9075, 20}, {0, 0}},
+        {{15,2},  {514,2}, {135,2},   {500,5},   {0, 0}},
+        {{15,5},  {514,5}, {135,5},   {500,5},   {0, 0}},
+        {{15,10}, {515,2}, {134,2},   {514,5},   {135,5}},
+        {{515,4}, {134,4}, {9438,10}, {9022,5},  {0, 0}},
+        {{515,6}, {134,6}, {9438,15}, {9075,10}, {0, 0}},
     };
     UInt32 data = GetVar(VAR_GUANKA_ACTION_NPC);
     UInt32 score = GetVar(VAR_GUANKA_ACTION_SCORE);
@@ -28713,6 +28714,7 @@ void Player::sevensoul_fixed()
             pet->updateToDBPetSkill();
     }
 }
+
 
 } // namespace GObject
 

@@ -1967,6 +1967,39 @@ void World::ClanStatueCheck(void *)
     globalClans.enumerate(visitor);
 }
 
+void World::ClanDuoBaoCheck(void *)
+{
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    UInt32 start = time + 10*60*60;     // 每天10点开始
+    UInt32 end = time + 22*60*60 + 5;   // 每天22点结束(加5秒, 用于最后一次结算)
+
+    if(nowTime >= start && nowTime <= end)
+    { 
+        if(TimeUtil::Now() >= GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
+        {
+            class DuoBaoEndVisitor : public Visitor<Clan>
+            {
+                public:
+                    DuoBaoEndVisitor()
+                    {
+                    }
+
+                    bool operator()(Clan* clan)
+                    {
+                        clan->SendDuoBaoAward();
+                        return true;
+                    }
+
+            };
+            DuoBaoEndVisitor visitor;
+            globalClans.enumerate(visitor);
+        }
+        //GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (15 * 60) * (15 * 60) + (15 * 60));
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));
+    }
+}
+
 inline static bool enum_spread_send(Player* player, void* data)
 {
     if(player == NULL || !player->isOnline())
@@ -2139,6 +2172,8 @@ bool World::Init()
         gMarryMgr.MarryingCrush();
     }
     AddTimer(60 * 60 * 3 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
+
+    AddTimer(5 * 1000, ClanDuoBaoCheck, static_cast<void*>(NULL));
     return true;
 }
 
@@ -4228,11 +4263,11 @@ void World::SendGuankaActAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{1325,40},{9418,60},{9075,40},{515,60},{0,0}},
-        {{1325,20},{9418,30},{9075,20},{515,30},{0,0}},
-        {{515,20},{9438,10},{9075,10},{134,10},{0,0}},
-        {{515,10},{9438,10},{134,10},{0,0},{0,0}},
-        {{15,10},{515,5},{134,5},{9438,5},{500,5}},
+        {{1325,20},{9418,30},{9075,20},{515,12},{0,0}},
+        {{1325,10},{9418,15},{9075,10},{515,10},{0,0}},
+        {{515,8},{9438,10},{9075,5},{134,8},{0,0}},
+        {{515,6},{9438,10},{134,6},{0,0},{0,0}},
+        {{15,10},{515,4},{134,4},{9438,5},{500,5}},
     };
     int pos = 0;
     for (RCSortType::iterator i = World::guankaScoreSort.begin(), e = World::guankaScoreSort.end(); i != e; ++i)

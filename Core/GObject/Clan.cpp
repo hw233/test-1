@@ -78,8 +78,6 @@ static bool find_pending_member_id(ClanPendingMember * member, UInt64 id)
 }
 
 
-
-
 bool ClanItemPkg::CheckAddItem(UInt16 id, UInt32 num)
 {
     if(num == 0) return true;
@@ -287,6 +285,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
     _lastCallTime = 0;
     _xianyun = 0;
     _gongxian = 0;
+    _duoBaoAward = 0;
     memset(_urge, 0, sizeof(_urge));
 }
 
@@ -578,6 +577,7 @@ bool Clan::kick(Player * player, UInt64 pid)
 		broadcast(st);
 	}
 
+    DelDuoBaoScore(kicker);
 	_members.erase(found);
 	delete member;
     if(World::get11Time())
@@ -659,6 +659,7 @@ bool Clan::leave(Player * player)
     player->SetVar(VAR_CLAN_LEAVE_TIME, now);
     player->setFightersDirty(true);
 
+    DelDuoBaoScore(player);
 	_members.erase(found);
     player->setBuffData(PLAYER_BUFF_CLANTREE1,0);
     player->setBuffData(PLAYER_BUFF_CLANTREE1+1,0);
@@ -1448,6 +1449,7 @@ void Clan::broadcast( Stream& st )
 		mem->player->send(st);
 	}
 }
+
 
 void Clan::broadcast(SysMsgItem * item)
 {
@@ -4923,4 +4925,388 @@ void Clan::SendClanMemberGrade(Player* player)
     st<<Stream::eos;
     player->send(st);
 }
+
+bool Clan::IsDuoBaoTime()
+{
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    UInt32 start = time + 10*60*60;     // 每天10点开始
+    UInt32 end = time + 22*60*60 + 5;   // 每天22点结束(加5秒, 用于最后一次结算)
+
+    if(nowTime >= start && nowTime <= end)
+        return true; 
+    else
+        return false;
+}
+
+void Clan::LoadDuoBaoLog(const std::string& name, UInt16 score, UInt32 itemId, UInt8 cnt)
+{
+    if(!IsDuoBaoTime())
+        return;
+
+    DuoBaoLog log;
+    log.name = name;
+    log.score = score;
+    log.itemId = itemId;
+    log.cnt = cnt;
+
+    _duobaoLogs.push_back(log);
+}
+
+void Clan::SendDuoBaoLog(Stream & st)
+{
+    if(!IsDuoBaoTime())
+        return;
+
+    UInt8 cnt = _duobaoLogs.size();
+    st << cnt;
+
+    for(DuoBaoLogs::iterator it = _duobaoLogs.begin(); it != _duobaoLogs.end(); ++ it)
+	{
+        DuoBaoLog& log = (*it);
+		st << log.name << log.score << log.itemId << log.cnt;
+	}
+}
+
+void Clan::LoadDuoBaoScore(Player * pl)
+{
+    if(!IsDuoBaoTime())
+        return;
+
+    if(NULL == pl)
+        return;
+
+    UInt32 score = pl->GetVar(VAR_CLAN_DUOBAO_SCORE);
+    if(score < 111 || score > 888)
+        return;
+
+    ScoreSort ss;
+    ss.player = pl;
+    ss.score = score;
+    DuoBaoScoreSort.insert(ss);
+}
+
+void Clan::SetDuoBaoScore(Player * pl)
+{
+    if(!IsDuoBaoTime())
+        return;
+
+    if(NULL == pl)
+        return;
+
+    UInt32 score = pl->GetVar(VAR_CLAN_DUOBAO_SCORE);
+    if (score < 111 || score > 888)
+        return;
+
+    for(ScoreSortType::iterator i = DuoBaoScoreSort.begin(), e = DuoBaoScoreSort.end(); i != e; ++i)
+    {
+        if (i->player == pl)
+        {
+            DuoBaoScoreSort.erase(i);
+            break;
+        }
+    }
+
+    ScoreSort ss;
+    ss.player = pl;
+    ss.score = score;
+    DuoBaoScoreSort.insert(ss);
+}
+
+void Clan::DelDuoBaoScore(Player * pl)
+{
+    if(NULL == pl)
+        return;
+
+    for(ScoreSortType::iterator i = DuoBaoScoreSort.begin(), e = DuoBaoScoreSort.end(); i != e; ++i)
+    {
+        if (i->player == pl)
+        {
+            DuoBaoScoreSort.erase(i);
+            pl->SetVar(VAR_CLAN_DUOBAO_SCORE, 0);
+            pl->SetVar(VAR_CLAN_DUOBAO_STATUS, 0);
+            break;
+        }
+    }
+}
+
+void Clan::SendDuoBaoScore(Stream & st)
+{
+    if(!IsDuoBaoTime())
+        return;
+
+    UInt8 cnt = DuoBaoScoreSort.size();
+    st << cnt;
+
+    for(ScoreSortType::iterator i = DuoBaoScoreSort.begin(), e = DuoBaoScoreSort.end(); i != e; ++i)
+    {
+        st << i->player->getName();
+        st << i->score;
+    }
+}
+
+void Clan::DuoBaoInfo(Player * pl)
+{
+    if(!IsDuoBaoTime())
+        return;
+
+    if(NULL == pl)
+        return;
+    
+    UInt32 duoBaoAward[11] = {9480, 9481, 9482, 9483, 9484, 9485, 9486, 9487, 9488, 9489, 9490};
+
+    UInt8 level = _techs->getLev(8);
+    if(level > 10)
+        return;
+
+    if(TimeUtil::Now() > GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));
+
+    UInt32 status = pl->GetVar(VAR_CLAN_DUOBAO_STATUS);
+    UInt32 num = pl->GetVar(VAR_CLAN_DUOBAO_SUCCESS_NUM);
+    UInt32 time = 0;
+    if(GVAR.GetVar(GVAR_DUOBAO_ENDTIME) > TimeUtil::Now())
+        time = GVAR.GetVar(GVAR_DUOBAO_ENDTIME) - TimeUtil::Now();
+
+    Stream st(REP::DUOBAO_REP);
+    st << static_cast<UInt8>(0x00);
+    st << static_cast<UInt8>(status);
+    st << time;
+    st << static_cast<UInt8>(num);
+    st << static_cast<UInt32>(duoBaoAward[level]);
+    SendDuoBaoScore(st);
+    SendDuoBaoLog(st);
+    st << Stream::eos;
+    pl->send(st);
+}
+
+void Clan::DuoBaoLvlAward()
+{
+    UInt32 duoBaoAward[11] = {9480, 9481, 9482, 9483, 9484, 9485, 9486, 9487, 9488, 9489, 9490};
+
+    UInt8 level = _techs->getLev(8);
+    if(level > 10)
+        return;
+
+    if(duoBaoAward[level] > GetDuoBaoAward())
+    {
+        SetDuoBaoAward(duoBaoAward[level]);
+        DB5().PushUpdateData("UPDATE `clan` SET `duoBaoAward` = %u WHERE `id` = %u", _duoBaoAward, _id);
+        Stream st(REP::DUOBAO_REP);
+        st << static_cast<UInt8>(0x06);
+        st << static_cast<UInt32>(duoBaoAward[level]);
+        st << Stream::eos;
+        broadcast(st);
+    }
+}
+
+void Clan::DuoBaoStart(Player * pl)
+{
+    if(!IsDuoBaoTime())
+        return;
+
+    if(NULL == pl)
+        return;
+
+    UInt32 num = pl->GetVar(VAR_CLAN_DUOBAO_SUCCESS_NUM);
+    if(num >= 3)
+    {
+        pl->sendMsgCode(0, 4012);
+        return;
+    }
+    
+    DuoBaoLvlAward();
+    UInt16 score = uRand(778) + 111; //111 ~ 888
+
+    pl->SetVar(VAR_CLAN_DUOBAO_SCORE, score);
+    pl->SetVar(VAR_CLAN_DUOBAO_STATUS, 1);
+    SetDuoBaoScore(pl);
+
+    UInt32 time = 0;
+    if(GVAR.GetVar(GVAR_DUOBAO_ENDTIME) > TimeUtil::Now())
+        time = GVAR.GetVar(GVAR_DUOBAO_ENDTIME) - TimeUtil::Now();
+
+    Stream st(REP::DUOBAO_REP);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(1);
+    st << score;
+    st << time;
+    st << Stream::eos;
+    pl->send(st);
+    DuoBaoUpdate(pl->getName(), score);
+}
+
+/*void Clan::DuoBaoEnd()
+{
+    if(IsDuoBaoTime())
+    {
+        if(TimeUtil::Now() >= GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
+        {
+            class DuoBaoSendAwardVisitor : public Visitor<Clan>
+            {
+                public:
+                    DuoBaoSendAwardVisitor()
+                    {
+                    }
+
+                    bool operator()(Clan* clan)
+                    {
+                        clan->SendDuoBaoAward();
+                        return true;
+                    }
+
+            };
+            DuoBaoSendAwardVisitor visitor;
+            globalClans.enumerate(visitor);
+
+        }
+
+        //GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (15 * 60) * (15 * 60) + (15 * 60));
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, TimeUtil::Now() / (2 * 60) * (2 * 60) + (2 * 60));
+    }
+}*/
+
+void Clan::SendDuoBaoAward()
+{
+    string winnerName = "";
+    UInt16 score = 0;
+    UInt32 award = 0; 
+    UInt8 cnt = 0;
+    UInt8 markA = 0;
+    bool mark = false;
+
+    if(DuoBaoScoreSort.size() > 0)
+    {
+        UInt32 nowTime = TimeUtil::Now();
+        UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+        UInt32 end = time + 22*60*60;
+        if(nowTime >= end)
+        {
+            ClearDuoBaoLog();
+            markA = 1;
+        }
+        DuoBaoDel(markA);
+    }
+
+    for(ScoreSortType::iterator i = DuoBaoScoreSort.begin(), e = DuoBaoScoreSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (NULL == player)
+            continue;
+
+        if(!mark)
+        {
+            score = player->GetVar(VAR_CLAN_DUOBAO_SCORE);
+            if (score < 111 || score > 888)
+                continue;
+            UInt8 a1 = score / 100; 
+            UInt8 a2 = (score % 100) / 10; 
+            UInt8 a3 = score % 10; 
+            if(a1==a2 && a1==a3) // 如果个、十、百位相同，则奖励个数+1
+                cnt = 2;
+            else
+                cnt = 1;
+
+            winnerName = player->getName();
+            award = GetDuoBaoAward();
+
+            SYSMSG(title, 5131);
+            SYSMSGV(content, 5132, award, cnt);
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                mailPackageManager.push(mail->id, award, cnt, true);
+                player->AddVar(VAR_CLAN_DUOBAO_SUCCESS_NUM, 1);
+                SetDuoBaoAward(0);
+                DB5().PushUpdateData("UPDATE `clan` SET `duoBaoAward` = %u WHERE `id` = %u", 0, _id);
+                
+                if(0 == markA)
+                {
+                    DuoBaoLog log;
+                    log.name = player->getName();
+                    log.score = score;
+                    log.itemId = award;
+                    log.cnt = cnt;
+                    _duobaoLogs.push_front(log);
+                    DB5().PushUpdateData("REPLACE INTO `duobaolog`(`clanId`, `name`, `score`, `itemId`, `cnt`, `time`) VALUES(%u, '%s', %u, %u, %u, %u)", _id, (log.name).c_str(), log.score, log.itemId, log.cnt, TimeUtil::Now());
+                }
+                mark = true;
+
+                Stream st(REP::DUOBAO_REP);
+                st << static_cast<UInt8>(0x04);
+                st << player->getName();
+                st << award;
+                st << cnt;
+                st << static_cast<UInt8>(player->GetVar(VAR_CLAN_DUOBAO_SUCCESS_NUM));
+                st << score;
+                st << Stream::eos;
+                player->send(st);
+            }
+        }
+        else
+        {
+            Stream st(REP::DUOBAO_REP);
+            st << static_cast<UInt8>(0x05);
+            st << winnerName.c_str();
+            st << score;
+            st << award;
+            st << cnt;
+            st << Stream::eos;
+            player->send(st);
+        }
+
+        player->SetVar(VAR_CLAN_DUOBAO_SCORE, 0);
+        player->SetVar(VAR_CLAN_DUOBAO_STATUS, 0);
+    }
+    if(DuoBaoScoreSort.size() > 0)
+        DuoBaoScoreSort.clear();
+}
+
+void Clan::DuoBaoUpdate(const std::string& playerName, UInt16 score)
+{
+    Stream st(REP::DUOBAO_REP);
+    st << static_cast<UInt8>(0x02);
+    st << playerName;
+    st << score;
+    st << Stream::eos;
+    broadcast(st);
+}
+
+void Clan::DuoBaoDel(UInt8 mark)
+{
+    Stream st(REP::DUOBAO_REP);
+    st << static_cast<UInt8>(0x03);
+    st << mark;
+    st << Stream::eos;
+    broadcast(st);
+}
+
+void Clan::ClearDuoBaoLog()
+{
+    if(_duobaoLogs.size() > 0)
+    {
+        _duobaoLogs.clear();
+        DB5().PushUpdateData("DELETE FROM `duobaolog` WHERE `clanId` = %u", _id);
+    }
+}
+
+void Clan::DuoBaoBroadcast(Stream& st)
+{
+	Mutex::ScopedLock lk(_mutex);
+	ClanMember * mem = NULL;
+	Members::iterator offset;
+	for(offset = _members.begin(); offset != _members.end(); ++ offset)
+	{
+		mem = *offset;
+        if(!mem)
+            continue;
+        if(!mem->player)
+            continue;
+        if(!mem->player->GetVar(VAR_CLAN_DUOBAO_STATUS))
+            continue;
+
+		mem->player->send(st);
+	}
+}
+
 }
