@@ -3794,18 +3794,20 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
                     return;
                 UInt8 door=0 ;
                 br >> door;
-                GObject::MarryBoard::instance().selectDoor(player,door);
-                Stream st(REP::MARRYBOARD);
-                st <<static_cast<UInt8>(op);
-                st << static_cast<UInt8>(door);
-                st<<Stream::eos;
-                if(player == GObject::MarryBoard::instance()._man || player == GObject::MarryBoard::instance()._woman)
+                if( GObject::MarryBoard::instance().selectDoor(player,door) )
                 {
-                    GObject::MarryBoard::instance()._man ->send(st);
-                    GObject::MarryBoard::instance()._woman->send(st);
+                    Stream st(REP::MARRYBOARD);
+                    st <<static_cast<UInt8>(op);
+                    st << static_cast<UInt8>(door);
+                    st<<Stream::eos;
+                    if(player == GObject::MarryBoard::instance()._man || player == GObject::MarryBoard::instance()._woman)
+                    {
+                        GObject::MarryBoard::instance()._man ->send(st);
+                        GObject::MarryBoard::instance()._woman->send(st);
+                    }
+                    else
+                        player->send(st);
                 }
-                else
-                    player->send(st);
             }
             break;
         default:

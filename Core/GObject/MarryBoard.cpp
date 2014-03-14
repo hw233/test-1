@@ -518,12 +518,12 @@ namespace GObject
         sprintf(str, "F_140102_14");
         pl->udpLog("jiehunjinxing", str, "", "", "", "", "act");
     }
-    void MarryBoard::selectDoor(Player * pl ,UInt8 door)
+    bool MarryBoard::selectDoor(Player * pl ,UInt8 door)
     {
         if(_type != 4)
-            return ;
+            return false;
         if(door < 1 ||door > 8 || pl == NULL )
-            return ;
+            return false;
         UInt32 now = TimeUtil::Now();
         if( pl == _man || pl == _woman)
         {
@@ -564,6 +564,7 @@ namespace GObject
                 pl->udpLog("jiehunjinxing", str, "", "", "", "", "act");
             }
         }
+        return true ;
     }
     UInt32 MarryBoard::wrapTheKey(UInt32 plKey)
     {

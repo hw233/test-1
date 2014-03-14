@@ -1871,6 +1871,58 @@ void OnDelItemAny( GameMsgHdr& hdr, const void * data )
         player->GetPackage()->DelItemAny(item->id, item->num, NULL, item->toWhere);
 }
 
+void OnUseAccItemInCountry( GameMsgHdr& hdr, const void * data )
+{
+#define ACC_ITEM        465
+	MSG_QUERY_PLAYER(player);
+    struct DelItemInfo
+    {
+        UInt32 id;
+        UInt16 num;
+        UInt16 toWhere;
+    };
+
+	const DelItemInfo* item = reinterpret_cast<const DelItemInfo*>(data);
+    if(!item)
+        return;
+    UInt32 need = item->num;
+    if(player->GetPackage()->GetItemAnyNum(ACC_ITEM) < need)
+        need = player->GetPackage()->GetItemAnyNum(ACC_ITEM);
+    if(need == 0)
+        return;
+
+    player->GetPackage()->DelItemAny(item->id, need, NULL, item->toWhere);
+
+	GameMsgHdr hdr2(0x1BA, WORKER_THREAD_WORLD, player, sizeof(need));
+	GLOBAL().PushMsg(hdr2, &need);
+}
+
+void OnUseVitalityItemInCountry( GameMsgHdr& hdr, const void * data )
+{
+#define VITALITY_ITEM   466
+	MSG_QUERY_PLAYER(player);
+    struct DelItemInfo
+    {
+        UInt32 id;
+        UInt16 num;
+        UInt16 toWhere;
+    };
+
+	const DelItemInfo* item = reinterpret_cast<const DelItemInfo*>(data);
+    if(!item)
+        return;
+    UInt32 need = item->num;
+    if(player->GetPackage()->GetItemAnyNum(VITALITY_ITEM) < need)
+        need = player->GetPackage()->GetItemAnyNum(VITALITY_ITEM);
+    if(need == 0)
+        return;
+
+    player->GetPackage()->DelItemAny(item->id, need, NULL, item->toWhere);
+
+	GameMsgHdr hdr2(0x1BB, WORKER_THREAD_WORLD, player, sizeof(need));
+	GLOBAL().PushMsg(hdr2, &need);
+}
+
 void OnAddItem( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

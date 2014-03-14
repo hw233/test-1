@@ -100,7 +100,9 @@ class TownDeamon
         void showLevelTown(Player*, UInt16 level);
         void showTown(Player*);
         void useAccItem(Player*, UInt8 count);
+        void useAccItemInWorld(Player*, UInt32 count);
         void useVitalityItem(Player*, UInt8 count);
+        void useVitalityItemInWorld(Player*, UInt32 count);
         void cancelDeamon(Player*);
         void challenge(Player*, UInt16 level, UInt8 type);
         void notifyChallengeResult(Player*, Player* defer, bool win);

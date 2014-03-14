@@ -28771,6 +28771,10 @@ UInt8 Player::useChangeSexCard()
         newId = oldId - 1;
     }
 
+    Stream st(REP::USER_INFO_CHANGE);
+    st << static_cast<UInt8>(0x22) << newId << Stream::eos;
+    send(st);
+
     //与改形卡有关的函数
     do_fighter(fgt, oldId, newId);
     do_fighter_buff(fgt, oldId);
@@ -28816,6 +28820,15 @@ void Player::do_fighter(Fighter* fgt, UInt32 oldId, UInt32 newId)
     if(it != _fighters.end())
         _fighters.erase(it);
     DB2().PushUpdateData("UPDATE `fighter` SET  `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        if(_playerData.lineup[i].fid == oldId)
+        {
+            _playerData.lineup[i].fid = newId;
+            storeFighters();
+        }
+    }
 }
 
 void Player::do_fighter_buff(Fighter* fgt, UInt32 oldId)
