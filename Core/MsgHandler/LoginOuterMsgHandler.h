@@ -3424,17 +3424,15 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 GLOBAL().PushMsg(hdr, NULL);
             }
             break;
-#if 0
         case 18:
             {
                 pl->SetVar(GObject::VAR_CLAN_DUOBAO_SCORE, 0);
                 pl->SetVar(GObject::VAR_CLAN_DUOBAO_STATUS, 0);
             }
             break;
-#endif
-        case 18:
+        case 20:
             {
-                //todo
+                //todo 天元神兽
             }
             break;
         default:
@@ -3916,7 +3914,6 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_GUANKAACT_END, end);
         ret = 1;
     }
-#if 0
     else if (type == 18 && begin <= end )
     {
         ret = 1;
@@ -3943,8 +3940,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         return;
     }
-#endif
-    else if (type == 18 && begin <= end )
+    else if (type == 20 && begin <= end )
     {
         ret = 1;
         Stream st(SPEP::ACTIVITYONOFF);
