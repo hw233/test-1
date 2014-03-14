@@ -10351,7 +10351,8 @@ namespace GObject
 		}
         */
 		//_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
-		_battleName = _battleName + sepStr + numstr + sepStr + _playerData.name + sepStr + numstr2;
+		//_battleName = _battleName + sepStr + numstr + sepStr + _playerData.name + sepStr + numstr2;
+		_battleName = numstr2 + sepStr + _battleName + sepStr + numstr + sepStr + _playerData.name;
 #endif
 	}
 

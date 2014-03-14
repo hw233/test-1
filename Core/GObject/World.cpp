@@ -4472,7 +4472,7 @@ void World::SendTYSSPlayerAward()
     SYSMSG(title, 946);
     for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
     {
-        UInt32 score = i->total;
+        //UInt32 score = i->total;
         str = i->player->getName();
         if(pos >= 1 && pos < 8)     //奖励前7名
         {
