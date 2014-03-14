@@ -2460,6 +2460,12 @@ void OnBeVoted( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     player->beVoted();
 }
+void OnBeEatLingGuo( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt32 num = *reinterpret_cast<const UInt32 *>(data);
+    player->beEated(num);
+}
 void OnBePrayed( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);

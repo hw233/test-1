@@ -27093,6 +27093,9 @@ void Player::ReturnTYSSInfo(UInt8 flag)
 
 void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
 {
+    if(!getClan() || !getClan()->getLeader()) 
+        return;
+
     switch(type)
     {
         case 3://喂养神兽
@@ -27140,28 +27143,30 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 {{1728,1}, {0,0}, {0,0},{599,1}},
             };
 
+            UInt32 clan_contribute = GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
+            UInt32 clan_sum = getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
 
-            if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 100 && getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 3000)
+            if(clan_contribute < 100 && clan_sum < 3000)
                 return;
             else
                 if( flag > 1)
                 {
-                    if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 200 || getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 19000)
+                    if(clan_contribute < 200 || clan_sum < 19000)
                         return;
                 }
                 else if( flag > 3 )
                     {
-                        if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 300 || getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 40000)
+                        if(clan_contribute < 300 || clan_sum < 40000)
                             return;
                     }
                     else if( flag > 5 )
                         {
-                            if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 400 || getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 70000)
+                            if(clan_contribute < 400 || clan_sum < 70000)
                                 return;
                         }
                         else if( flag > 7 )
                         {
-                            if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 500 || getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 100000)
+                            if(clan_contribute < 500 || clan_sum < 100000)
                                 return;
                         }
 
@@ -27280,15 +27285,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
         }
             break;
         case 5://查看成员贡献
-            if(!getClan()) 
-                return;
             getClan()->SendTYSSScore(this); 
 
             break;
         case 6://0 - 表扬 1 - 督促
         {
-            if(!getClan()) 
-                return;
             Player * pl = GObject::globalPlayers[playerid];
             if(!pl)
                 return;
@@ -27310,18 +27311,21 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             break;
         case 8:
         {
+            UInt32 consume1 = GetVar(VAR_TYSS_DISCOUNT_CONSUME1); 
+            UInt32 consume2 = GetVar(VAR_TYSS_DISCOUNT_CONSUME2); 
+            UInt32 consume3 = GetVar(VAR_TYSS_DISCOUNT_CONSUME3); 
             Stream st(REP::ACT);  
             st << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x08) << static_cast<UInt8>(10);
-            st << static_cast<UInt8>(10 - GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME1),0)); 
-            st << static_cast<UInt8>(10 - GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME1),1)); 
-            st << static_cast<UInt8>(8 - GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME1),2)); 
-            st << static_cast<UInt8>(8 - GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME1),3)); 
-            st << static_cast<UInt8>(5 - GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME2),0)); 
-            st << static_cast<UInt8>(5 - GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME2),1)); 
-            st << static_cast<UInt8>(3 - GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME2),2)); 
-            st << static_cast<UInt8>(3 - GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME2),3));
-            st << static_cast<UInt8>(5 - GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME3),0)); 
-            st << static_cast<UInt8>(1 - GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME3),1));  
+            st << static_cast<UInt8>(10 - GET_BIT_8(consume1,0)); 
+            st << static_cast<UInt8>(10 - GET_BIT_8(consume1,1)); 
+            st << static_cast<UInt8>(8 - GET_BIT_8(consume1,2)); 
+            st << static_cast<UInt8>(8 - GET_BIT_8(consume1,3)); 
+            st << static_cast<UInt8>(5 - GET_BIT_8(consume2,0)); 
+            st << static_cast<UInt8>(5 - GET_BIT_8(consume2,1)); 
+            st << static_cast<UInt8>(3 - GET_BIT_8(consume2,2)); 
+            st << static_cast<UInt8>(3 - GET_BIT_8(consume2,3));
+            st << static_cast<UInt8>(5 - GET_BIT_8(consume3,0)); 
+            st << static_cast<UInt8>(1 - GET_BIT_8(consume3,1));  
             st << Stream::eos;
             send(st);
 
@@ -27345,6 +27349,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             else
             {
                 sendMsgCode(2, 1011);
+                return;
             }
         }
             break;
@@ -27356,34 +27361,51 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
     return;
 }
 
+void Player::beEated(UInt32 num)
+{
+    AddVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM,10*num);
+}
+
 void Player::EatLingGuo(UInt32 num)
 {
+    if(!getClan()->getLeader())
+        return;
+    Player* leader = getClan()->getLeader();
+
     AddVar(VAR_TYSS_CONTRIBUTE_PLAYER ,10*num); 
     AddVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY ,10*num); 
     AddVar(VAR_TYSS_CONTRIBUTE_CLAN ,10*num); 
-   
+  
+    UInt32 clan_sum = leader->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM); 
     UInt8 flag = 0;//标记
-    if(getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 3000)
+    if(clan_sum < 3000)
         flag = 0;
     else
-        if(getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 19000)
+        if(clan_sum < 19000)
             flag = 1;
         else
-            if(getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 40000)
+            if(clan_sum < 40000)
                 flag = 2;
             else
-                if(getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 70000)
+                if(clan_sum < 70000)
                     flag = 3;
                 else
-                    if(getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 100000)
+                    if(clan_sum < 100000)
                         flag = 4;
                     else
                         flag = 5;
-    ((this->getClan())->getLeader())->AddVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM,10*num);
+    UInt32 clanSum = getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) + 10 * num;//假值
+    if(leader->getThreadId() == getThreadId())
+        leader->AddVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM,10*num);
+    else
+    {
+        GameMsgHdr hdr(0x367, leader->getThreadId(), leader, sizeof(num));
+        GLOBAL().PushMsg(hdr, &num);
+    }
     
     getClan()->SetTYSSScore(this);
     UInt32 pl_grade = this->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER); 
-    UInt32 cl_grade = this->getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM); 
+    UInt32 cl_grade = clanSum; 
     GameMsgHdr hdr(0x1BF, WORKER_THREAD_WORLD, this, sizeof(pl_grade));
     GLOBAL().PushMsg(hdr, &pl_grade);
     GameMsgHdr hdr1(0x1BC, WORKER_THREAD_WORLD, this, sizeof(cl_grade));
@@ -27392,19 +27414,19 @@ void Player::EatLingGuo(UInt32 num)
     switch(flag)
     {
         case 0:
-            if(getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) >= 3000)
+            if(clan_sum >= 3000)
                 SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"幼年期神兽");
         case 1:
-            if(getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) >= 19000)
+            if(clan_sum >= 19000)
                 SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"成长期神兽");
         case 2:
-            if(getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) >= 40000)
+            if(clan_sum >= 40000)
                 SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"青年期神兽");
         case 3:
-            if(getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) >= 70000)
+            if(clan_sum >= 70000)
                 SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"亚圣兽期");
         case 4:
-            if(getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) >= 100000)
+            if(clan_sum >= 100000)
                 SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"天元神兽");
         default:
             break;
