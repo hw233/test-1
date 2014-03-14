@@ -759,8 +759,6 @@ namespace GObject
     }
     void ClanBuildingOwner::LineUp(Player * player)
     {
-        if(!player->getLeftAddrEnter())
-            return ;
         GameMsgHdr hdr(0x392, player->getThreadId(), player, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
