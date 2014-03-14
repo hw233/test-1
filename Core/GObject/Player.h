@@ -2555,6 +2555,7 @@ namespace GObject
         void AddLingGuo(UInt32 r =0);
         void ReturnTYSSInfo(UInt8 flag );
         void OpTYSS(UInt8 type , UInt8 flag = 0,UInt64 playerid = 0);
+        void beEated(UInt32 num);
         void EatLingGuo(UInt32 num);
         void GetFindOldManAward(UInt32 type = 0 );
         void getInterestingAward(UInt8 type);
