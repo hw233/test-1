@@ -27312,8 +27312,8 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
         case 8:
         {
             UInt32 consume1 = GetVar(VAR_TYSS_DISCOUNT_CONSUME1); 
-            UInt32 consume2 = GetVar(VAR_TYSS_DISCOUNT_CONSUME1); 
-            UInt32 consume3 = GetVar(VAR_TYSS_DISCOUNT_CONSUME1); 
+            UInt32 consume2 = GetVar(VAR_TYSS_DISCOUNT_CONSUME2); 
+            UInt32 consume3 = GetVar(VAR_TYSS_DISCOUNT_CONSUME3); 
             Stream st(REP::ACT);  
             st << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x08) << static_cast<UInt8>(10);
             st << static_cast<UInt8>(10 - GET_BIT_8(consume1,0)); 
