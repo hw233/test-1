@@ -3211,6 +3211,8 @@ inline bool player_enum_rc(GObject::Player * p, int)
 }
 inline bool clan_enum_grade(GObject::Clan *clan,int)
 {
+    if(!clan)
+        return true;
     if (World::get11Time())
     {
         clan->updataClanGradeInAirBook();
@@ -3226,7 +3228,10 @@ inline bool clan_enum_grade(GObject::Clan *clan,int)
     
     if(World::getTYSSTime())
     {
-        UInt32 grade = clan->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+        GObject::Player* pl = clan->getLeader();
+        if(!pl)
+            return true;
+        UInt32 grade = pl->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
         if(grade)
         {
             ClanSort s;
