@@ -27404,7 +27404,10 @@ void Player::EatLingGuo(UInt32 num)
         GLOBAL().PushMsg(hdr, &num);
     }
     
-    getClan()->SetTYSSScore(this);
+    //getClan()->SetTYSSScore(this);
+    GameMsgHdr hdr2(0x166, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr2, NULL);
+
     UInt32 pl_grade = this->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER); 
     UInt32 cl_grade = clanSum; 
     GameMsgHdr hdr(0x1BF, WORKER_THREAD_WORLD, this, sizeof(pl_grade));
