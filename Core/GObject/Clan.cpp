@@ -5558,4 +5558,10 @@ void Clan::sendMemberBuf(UInt8 pos)
 	}
 }
 
+void Clan::ClearTYSSScore()
+{
+    if(TYSSScoreSort.size() > 0)
+        TYSSScoreSort.clear();
+}
+
 }

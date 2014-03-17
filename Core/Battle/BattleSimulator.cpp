@@ -12590,6 +12590,8 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
         if(count > 0)
         {
             u /= 10;
+            if (u <= 0)
+                u = 1;
             uShow = u;
             --count;
             bf->setSoulProtectCount(count);
