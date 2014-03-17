@@ -10426,6 +10426,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         {
             float yehuoSSDmgRate = bf->getYehuoSSDmgRate();
             UInt32 dmg = static_cast<UInt32>(yehuoSSDmgRate * yehuoLeve);
+            calcBleedTypeCnt(bf);
             makeDamage(bf, dmg, e_damNormal, e_damageTrue);
             if(yehuoLeve < 9 && static_cast<float>(uRand(10000)) < bf->getYehuoSSUpRate() * 10000)
             {
