@@ -3949,11 +3949,12 @@ namespace GObject
 
 		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 
-        if(World::getGuankaAct() && npcId >= 13500 && npcId <= 13529)
-            guankaActUdpLog(npcId, res);
-        if(res && World::getGuankaAct() && npcId >= 13524 && npcId <= 13529)
+        if(World::getGuankaAct())
         {
-            addguankaScoreByAttack(bsim.getRounds()+1);
+            if(res && npcId >= 13524 && npcId <= 13529)
+                addguankaScoreByAttack(bsim.getRounds()+1);
+            if(npcId >= 13500 && npcId <= 13529)
+                guankaActUdpLog(npcId, res);
         }
 		return res;
 	}
@@ -10323,6 +10324,15 @@ namespace GObject
 		sprintf(numstr, "%u", _playerData.title);
 		_battleName.clear();
 		_battleName = getClanName();
+
+		char numstr2[16];
+        UInt32 clanTitle;
+        Clan *clan =  getClan();
+        if(clan != NULL)
+            clanTitle = 1;
+        else
+            clanTitle = 0;
+		sprintf(numstr2, "%u", clanTitle);
         /*
         if(cfg.merged && !_battleName.empty() && static_cast<UInt8>(*(_battleName.end() - 1)) < 32)
 		{
@@ -10332,7 +10342,7 @@ namespace GObject
 		}
         */
 		//_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
-		_battleName = _battleName + sepStr + numstr + sepStr + _playerData.name;
+		_battleName = _battleName + sepStr + numstr + sepStr + numstr2 + sepStr + _playerData.name;
 #endif
 	}
 
@@ -27023,7 +27033,7 @@ void Player::AddLingGuo(UInt32 r)
 
 void Player::ReturnTYSSInfo(UInt8 flag)
 {
-    GameMsgHdr hdr(0x1BA, WORKER_THREAD_WORLD, this, sizeof(flag));
+    GameMsgHdr hdr(0x1BE, WORKER_THREAD_WORLD, this, sizeof(flag));
     GLOBAL().PushMsg(hdr, &flag);
 
     return;
@@ -27273,7 +27283,7 @@ void Player::EatLingGuo(UInt32 num)
     getClan()->SetTYSSScore(this);
     UInt32 pl_grade = this->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER); 
     UInt32 cl_grade = this->getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM); 
-    GameMsgHdr hdr(0x1BB, WORKER_THREAD_WORLD, this, sizeof(pl_grade));
+    GameMsgHdr hdr(0x1BF, WORKER_THREAD_WORLD, this, sizeof(pl_grade));
     GLOBAL().PushMsg(hdr, &pl_grade);
     GameMsgHdr hdr1(0x1BC, WORKER_THREAD_WORLD, this, sizeof(cl_grade));
     GLOBAL().PushMsg(hdr1, &cl_grade);
@@ -28925,7 +28935,7 @@ void Player::guankaActUdpLog(UInt32 npcId, bool result)
     //add udpLog
     UInt32 logInfo = GetVar(VAR_GUANKA_ACTION_UDPLOG);
     int tmpIdx = npcId - 13500;    //最大30个
-    if(tmpIdx < 0 || tmpIdx > 30 || GET_BIT(logInfo, tmpIdx))
+    if(tmpIdx < 0 || tmpIdx > 30 || (GET_BIT(logInfo, tmpIdx) && !result))
         return;
     logInfo = SET_BIT(logInfo, tmpIdx);
     SetVar(VAR_GUANKA_ACTION_UDPLOG, logInfo);

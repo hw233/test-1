@@ -19,7 +19,7 @@ namespace GObject
             void MarryBoard_Timer();
             bool sendMarryBoardInfo(Player * pl , UInt8 type = 0);
             void answerTheQuestionOn2(Player* pl ,UInt8 ans);
-            void selectDoor(Player * pl ,UInt8 door);
+            bool selectDoor(Player * pl ,UInt8 door);
             UInt32 wrapTheKey(UInt32 plKey);
             UInt32 unWrapTheOutKey(UInt32 key);
             void setDoorMax();

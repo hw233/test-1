@@ -413,8 +413,9 @@ function getStepAward(progress, step)
             return stepAwardID[progress][i]
         end
     end
-    print ("error3")
-    return 0
+    return stepAwardID[progress][#stepCount]
+    --print ("error3")
+    --return 0
 end
 
 function getSpecialItem(id, index)

@@ -9071,13 +9071,13 @@ end
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    local item = 1514;
+    local item = 1353;
 
     if package:GetRestPackageSize() < (1+(1*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
-    package:Add(1514, num*1, true, false, 2);
+    package:Add(1353, num*1, true, false, 2);
 
     Broadcast(0x27, "恭喜".."[p:"..player:getCountry()..":"..player:getPName().."]".."人品大爆发，抢到了".."[4:"..iid.."]".."，获得了".."[4:"..item.."]x1"..msg_141);
     package:DelItemSendMsg(iid, player);
@@ -10555,7 +10555,7 @@ function ItemNormal_0009480(id, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
-    local prob = {1250, 3750, 10000}
+    local prob = {6300, 8800, 10000}
     local items = {{502,1}, {1328,1}, {1327,1}}
 
     for k = 1, num do
@@ -10582,7 +10582,7 @@ function ItemNormal_0009484(id, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
-    local prob = {1250, 3750, 10000}
+    local prob = {6300, 8800, 10000}
     local items = {{1125,1}, {1327,2}, {1326,1}}
 
     for k = 1, num do
@@ -10609,7 +10609,7 @@ function ItemNormal_0009487(id, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
-    local prob = {1250, 3750, 10000}
+    local prob = {6300, 8800, 10000}
     local items = {{1125,5}, {1326,2}, {1325,1}}
 
     for k = 1, num do
@@ -10636,7 +10636,7 @@ function ItemNormal_0009490(id, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
-    local prob = {1250, 3750, 10000}
+    local prob = {6300, 8800, 10000}
     local items = {{1126,1}, {1326,4}, {1325,2}}
 
     for k = 1, num do

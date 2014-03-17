@@ -727,6 +727,7 @@ public:
 
     void SetDuoBaoAward(UInt32 itemId) { _duoBaoAward = itemId; }
     UInt32 GetDuoBaoAward() {return _duoBaoAward;}
+
 public:
 	ClanMember * getClanMember(Player *);
 	bool existClanMember(Player *);

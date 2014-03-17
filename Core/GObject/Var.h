@@ -298,6 +298,8 @@ namespace GObject
         VAR_COUPLE_COPY_COUNT = 235,//夫妻家园总次数
         VAR_COUPLE_COPY_BATTLE = 236,//夫妻家园进行次数
         VAR_FRIEND_SECURITY = 237,//好友列表隐私设置标记
+        VAR_COUPLE_LEVELEXP = 238,//夫妻家园离婚保留下来的成长值
+        VAR_COUPLE_FRIENDLINESS = 239,//夫妻家园保留下来的亲密度
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名

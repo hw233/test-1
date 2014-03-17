@@ -5135,6 +5135,7 @@ void Clan::DuoBaoStart(Player * pl)
     st << static_cast<UInt8>(1);
     st << score;
     st << time;
+    st << static_cast<UInt8>(DuoBaoScoreSort.size());
     st << Stream::eos;
     pl->send(st);
     DuoBaoUpdate(pl->getName(), score);
@@ -5142,14 +5143,10 @@ void Clan::DuoBaoStart(Player * pl)
 
 void Clan::SendDuoBaoAward()
 {
-    string winnerName = "";
-    UInt16 score = 0;
     UInt32 award = 0; 
-    UInt8 cnt = 0;
     UInt8 markA = 0;
-    bool mark = false;
-
-    if(DuoBaoScoreSort.size() > 0)
+    UInt8 memCnt = DuoBaoScoreSort.size();
+    if(memCnt > 0)
     {
         UInt32 nowTime = TimeUtil::Now();
         UInt32 time = TimeUtil::SharpDayT(0,nowTime);
@@ -5160,7 +5157,34 @@ void Clan::SendDuoBaoAward()
             markA = 1;
         }
         DuoBaoDel(markA);
+
+        DuoBaoLvlAward();
+        award = GetDuoBaoAward();
     }
+    else
+        return;
+
+    UInt8 specialMark = 0;
+    if(memCnt >= 50 && memCnt <= 60)
+        specialMark = 4;
+    else if(memCnt >= 30)
+        specialMark = 3;
+    else if(memCnt >= 10)
+        specialMark = 2;
+    else
+        specialMark = 1;
+
+    UInt8 countA = 0;
+    UInt8 offsetA = 0;
+    UInt8 offsetB = 0;
+    Stream st1(REP::DUOBAO_REP);
+    st1 << static_cast<UInt8>(0x04);
+    Stream st2(REP::DUOBAO_REP);
+    st2 << static_cast<UInt8>(0x05);
+    offsetA = st1.size();
+    offsetB = st2.size();
+    st1 << countA;
+    st2 << countA;
 
     for(ScoreSortType::iterator i = DuoBaoScoreSort.begin(), e = DuoBaoScoreSort.end(); i != e; ++i)
     {
@@ -5168,71 +5192,79 @@ void Clan::SendDuoBaoAward()
         if (NULL == player)
             continue;
 
-        if(!mark)
-        {
-            DuoBaoLvlAward();
-
-            score = player->GetVar(VAR_CLAN_DUOBAO_SCORE);
-            if (score < 111 || score > 888)
-                continue;
-            UInt8 a1 = score / 100; 
-            UInt8 a2 = (score % 100) / 10; 
-            UInt8 a3 = score % 10; 
-            if(a1==a2 && a1==a3) // 如果个、十、百位相同，则奖励个数+1
-                cnt = 2;
-            else
-                cnt = 1;
-
-            winnerName = player->getName();
-            award = GetDuoBaoAward();
-
-            SYSMSG(title, 5131);
-            SYSMSGV(content, 5132, award, cnt);
-            Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-            if(mail)
-            {
-                mailPackageManager.push(mail->id, award, cnt, true);
-                player->AddVar(VAR_CLAN_DUOBAO_SUCCESS_NUM, 1);
-                SetDuoBaoAward(0);
-                
-                if(0 == markA)
-                {
-                    DuoBaoLog log;
-                    log.name = player->getName();
-                    log.score = score;
-                    log.itemId = award;
-                    log.cnt = cnt;
-                    _duobaoLogs.push_front(log);
-                    DB5().PushUpdateData("REPLACE INTO `duobaolog`(`clanId`, `name`, `score`, `itemId`, `cnt`, `time`) VALUES(%u, '%s', %u, %u, %u, %u)", _id, (log.name).c_str(), log.score, log.itemId, log.cnt, TimeUtil::Now());
-                }
-                mark = true;
-
-                Stream st(REP::DUOBAO_REP);
-                st << static_cast<UInt8>(0x04);
-                st << player->getName();
-                st << award;
-                st << cnt;
-                st << static_cast<UInt8>(player->GetVar(VAR_CLAN_DUOBAO_SUCCESS_NUM));
-                st << score;
-                st << Stream::eos;
-                player->send(st);
-            }
-        }
+        UInt16 score = player->GetVar(VAR_CLAN_DUOBAO_SCORE);
+        if (score < 111 || score > 888)
+            continue;
+        UInt8 a1 = score / 100; 
+        UInt8 a2 = (score % 100) / 10; 
+        UInt8 a3 = score % 10;
+        UInt8 awardCnt = 0;
+        if(a1==a2 && a1==a3) // 如果个、十、百位相同，则奖励个数+1
+            awardCnt = 2;
         else
-        {
-            Stream st(REP::DUOBAO_REP);
-            st << static_cast<UInt8>(0x05);
-            st << winnerName.c_str();
-            st << score;
-            st << award;
-            st << cnt;
-            st << Stream::eos;
-            player->send(st);
-        }
+            awardCnt = 1;
 
+        SYSMSG(title, 5131);
+        SYSMSGV(content, 5132, award, awardCnt);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, award, awardCnt, true);
+            player->AddVar(VAR_CLAN_DUOBAO_SUCCESS_NUM, 1);
+            SetDuoBaoAward(0);
+            
+            if(0 == markA)
+            {
+                DuoBaoLog log;
+                log.name = player->getName();
+                log.score = score;
+                log.itemId = award;
+                log.cnt = awardCnt;
+                _duobaoLogs.push_front(log);
+                DB5().PushUpdateData("REPLACE INTO `duobaolog`(`clanId`, `name`, `score`, `itemId`, `cnt`, `time`) VALUES(%u, '%s', %u, %u, %u, %u)", _id, (log.name).c_str(), log.score, log.itemId, log.cnt, TimeUtil::Now());
+            }
+
+            st1 << player->getName();
+            st1 << score;
+            st1 << award;
+            st1 << static_cast<UInt8>(awardCnt);
+
+            st2 << player->getName();
+            st2 << score;
+            st2 << award;
+            st2 << static_cast<UInt8>(awardCnt);
+
+            countA++;
+            if(specialMark == countA)
+                break;
+        }
+    }
+    st1.data<UInt8>(offsetA) = countA;
+    st2.data<UInt8>(offsetB) = countA;
+    st1 << Stream::eos;
+    st2 << Stream::eos;
+
+    UInt8 mark = 0;
+    for(ScoreSortType::iterator i = DuoBaoScoreSort.begin(), e = DuoBaoScoreSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (NULL == player)
+            continue;
+
+        UInt16 score = player->GetVar(VAR_CLAN_DUOBAO_SCORE);
+        if (score < 111 || score > 888)
+            continue;
+
+        if(mark < countA)
+            player->send(st1);
+        else
+            player->send(st2);
+        
+        mark++;
         player->SetVar(VAR_CLAN_DUOBAO_SCORE, 0);
         player->SetVar(VAR_CLAN_DUOBAO_STATUS, 0);
     }
+
     if(DuoBaoScoreSort.size() > 0)
         DuoBaoScoreSort.clear();
 }
@@ -5243,6 +5275,7 @@ void Clan::DuoBaoUpdate(const std::string& playerName, UInt16 score)
     st << static_cast<UInt8>(0x02);
     st << playerName;
     st << score;
+    st << static_cast<UInt8>(DuoBaoScoreSort.size());
     st << Stream::eos;
     broadcast(st);
 }
@@ -5271,21 +5304,17 @@ void Clan::ClearDuoBaoData()
         _duobaoLogs.clear();
 
     SetDuoBaoAward(0);
-     
 }
 
 void Clan::BroadDuoBaoBegin(Player * player)
 {
     if(World::getDuoBaoTime())
     {
-        if(player->getClan() != NULL)
-        {
-            Stream st(REP::DUOBAO_REP);
-            st << static_cast<UInt8>(0x07);
-            st << static_cast<UInt8>(1);
-            st << Stream::eos;
-            player->send(st);
-        }
+        Stream st(REP::DUOBAO_REP);
+        st << static_cast<UInt8>(0x07);
+        st << static_cast<UInt8>(1);
+        st << Stream::eos;
+        player->send(st);
     }
 }
 

@@ -3419,6 +3419,7 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_GUANKA_ACTION_NPC, 0);
                 pl->SetVar(GObject::VAR_GUANKA_ACTION_SCORE, 0);
                 pl->SetVar(GObject::VAR_GUANKA_ACTION_TIME, 0);
+                pl->SetVar(GObject::VAR_GUANKA_ACTION_UDPLOG, 0);
                 GameMsgHdr hdr(0x1B7, WORKER_THREAD_WORLD, pl, 0);
                 GLOBAL().PushMsg(hdr, NULL);
             }
@@ -3738,9 +3739,12 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     UInt32 begin = 0, end = 0;
     UInt8 type = 0;
     br >> type >> begin >> end;
-    begin = TimeUtil::SharpDay(0, begin);
-    if(end > begin && (end - begin)%86400 > 0)
-        end = TimeUtil::SharpDay(1, end);
+    if(type != 18)
+    {
+        begin = TimeUtil::SharpDay(0, begin);
+        if(end > begin && (end - begin)%86400 > 0)
+            end = TimeUtil::SharpDay(1, end);
+    }
     UInt8 ret = 0;
     if(type == 1 && begin <= end)
     {   //充值幸运星活动
@@ -3907,6 +3911,10 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 18 && begin <= end )
     {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
         {
             GObject::globalPlayers.enumerate(player_enum_2, 18);
             GObject::globalClans.enumerate(clan_enum_0, 0);
@@ -3918,13 +3926,14 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         UInt32 valueTime = 0;
         UInt32 nowTime = TimeUtil::Now();
-        if(nowTime < GObject::GVAR.GetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN) && nowTime > GObject::GVAR.GetVar(GObject::GVAR_CLAN_DUOBAO_END))
+        if(nowTime < GObject::GVAR.GetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN))
             valueTime = GObject::GVAR.GetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN) / (15 * 60) * (15 * 60) + 900;
         else
             valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
 
         GObject::GVAR.SetVar(GObject::GVAR_DUOBAO_ENDTIME, valueTime);
-        ret = 1;
+
+        return;
     }
 
     Stream st(SPEP::ACTIVITYONOFF);
