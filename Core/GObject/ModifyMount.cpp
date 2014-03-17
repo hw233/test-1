@@ -131,7 +131,7 @@ namespace GObject
         int itemNum = pkg->GetItemAnyNum(MOUNT_CANGJIANID);
         int cost = 0, cost1 = 0;
         int leftcnt = _owner->GetVar(VAR_MOUNT_CANGJIANYA_LEFT_CNT);
-        if(itemNum + leftcnt < 1)
+        if(itemNum + leftcnt < (GData::ride.isUseTwo(getId()) ? 2 : 1))
             return;
         UInt32 failNum = 0;
         if(isAuto)  //自动唤剑
@@ -141,18 +141,43 @@ namespace GObject
                 cjd = GData::ride.getCangjianTable(curFloor+1);
                 if(NULL == cjd) break;
                 UInt16 bless = GData::ride.getCangjianBless(curFloor+1, leftcnt > 0 ? _failTimes/5 : _failTimes);
-                if(leftcnt > 0)
+                if(GData::ride.isUseTwo(getId()))
                 {
-                    ++ cost;
-                    -- leftcnt;
-                }
-                else if(itemNum > 0)
-                {
-                    ++ cost1;
-                    -- itemNum;
+                    if(leftcnt > 1)
+                    {
+                        cost += 2;
+                        leftcnt -= 2;
+                    }
+                    else if(itemNum > 1)
+                    {
+                        cost1 += 2;
+                        itemNum -= 2;
+                    }
+                    else if((leftcnt == 1 && itemNum >= 1) || (itemNum == 1 && leftcnt >= 1))
+                    {
+                        ++ cost;
+                        ++ cost1;
+                        -- leftcnt;
+                        -- itemNum;
+                    }
+                    else
+                        break;
                 }
                 else
-                    break;
+                {
+                    if(leftcnt > 0)
+                    {
+                        ++ cost;
+                        -- leftcnt;
+                    }
+                    else if(itemNum > 0)
+                    {
+                        ++ cost1;
+                        -- itemNum;
+                    }
+                    else
+                        break;
+                }
                 if(uRand(10000) <= cjd->prob + bless)
                 {   //成功
                     _failTimes = 0;
@@ -190,15 +215,38 @@ namespace GObject
         else    //唤剑一次
         {
             UInt16 bless = GData::ride.getCangjianBless(curFloor+1, leftcnt > 0 ? _failTimes/5 : _failTimes);
-            if(leftcnt > 0)
+            if(GData::ride.isUseTwo(getId()))
             {
-                ++ cost;
-                -- leftcnt;
+                if(leftcnt > 1)
+                {
+                    cost += 2;
+                    leftcnt -= 2;
+                }
+                else if(itemNum > 1)
+                {
+                    cost1 += 2;
+                    itemNum -= 2;
+                }
+                else if((leftcnt == 1 && itemNum >= 1) || (itemNum == 1 && leftcnt >= 1))
+                {
+                    ++ cost;
+                    ++ cost1;
+                    -- leftcnt;
+                    -- itemNum;
+                }
             }
-            else if(itemNum > 0)
+            else
             {
-                ++ cost1;
-                -- itemNum;
+                if(leftcnt > 0)
+                {
+                    ++ cost;
+                    -- leftcnt;
+                }
+                else if(itemNum > 0)
+                {
+                    ++ cost1;
+                    -- itemNum;
+                }
             }
             if(uRand(10000) <= cjd->prob + bless)
             {   //成功

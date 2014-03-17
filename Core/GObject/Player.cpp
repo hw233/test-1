@@ -27722,11 +27722,13 @@ void Player::getHappyValueAward(UInt8 val)
 void Player::joinAllServerRecharge(UInt32 num)
 {
     if(num == 0) return;
-    Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
+    //Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
+    Stream st(ARENAREQ::RECHARGE_ACTIVE, 0xEF);
     st << getId() << getName() << num << TimeUtil::Now();
     st << static_cast<UInt8>(getCountry()<<4 | (IsMale()?0:1));
     st << Stream::eos;
-    NETWORK()->SendToServerWar(st);
+    //NETWORK()->SendToServerWar(st);
+	NETWORK()->SendToArena(st);
 }
 
 bool Player::giveFlower(UInt8 type ,UInt32 num)

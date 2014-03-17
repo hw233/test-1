@@ -83,6 +83,7 @@ MSG_REG_2(ArenaMsgHdr, 0x114, OnTeamArenaLeaderBoard);
 MSG_REG_2(ArenaMsgHdr, 0x115, OnTeamArenaInspireLevel);
 MSG_REG_2(ArenaMsgHdr, 0x116, OnTeamArenaLastRank);
 MSG_REG_2(ArenaMsgHdr, 0x117, OnUpdateArenaSession);
+MSG_REG_2(ArenaMsgHdr, 0x118, OnServerRechargeRank);
 
 MSG_REG_2(ServerWarMsgHdr, 0x121, OnServerWarConnected);
 MSG_REG_2(ServerWarMsgHdr, 0x122, OnServerWarPlayerEntered);
