@@ -3594,7 +3594,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3647,6 +3647,8 @@ namespace GObject
                 }
                 if (cl.gongxian > 0)
                     GObject::ClanBoss::instance().insertToGxSort(clan, 0, cl.gongxian);
+
+                //clan->SetDuoBaoAward(cl.duobaoAward);
 		}
 			else
 			{
@@ -3751,6 +3753,8 @@ namespace GObject
 				delete cm;
 
             pl->setInQQGroup(cp.inQQGroup);
+            
+            clan->LoadDuoBaoScore(pl);
 		}
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
@@ -3862,6 +3866,27 @@ namespace GObject
 				continue;
 			}
 			clan->addClanDonateRecordFromDB(ddr.doanteName, ddr.donateTo, ddr.donateType, ddr.donateCount, ddr.donateTime);
+		}
+		lc.finalize();
+
+        lc.prepare("Loading duobaolog:");
+		clan = NULL;
+		lastId = 0xFFFFFFFF;
+		DBDuoBaoLog dbl;
+		if (execu->Prepare("SELECT `clanId`, `name`, `score`, `itemId`, `cnt`, `time` FROM `duobaolog` ORDER BY `clanId`, `time` DESC", dbl) != DB::DB_OK)
+			return false;
+		lc.reset(200);
+		while (execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbl.clanId != lastId)
+				clan = globalClans[dbl.clanId];
+			if(clan == NULL)
+			{
+				DB5().PushUpdateData("DELETE FROM `duobaolog` WHERE `clanId` = %u", dbl.clanId);
+				continue;
+			}
+			clan->LoadDuoBaoLog(dbl.name, dbl.score, dbl.itemId, dbl.cnt);
 		}
 		lc.finalize();
 
@@ -5575,7 +5600,7 @@ namespace GObject
             else
                 dpData->attacker = NULL;
 
-            if(dbtdp.deamonLevel != 0)
+            //if(dbtdp.deamonLevel != 0)
                 townDeamonManager->loadDeamonPlayersFromDB(dbtdp.deamonLevel, dpData->maxLevel, pl);
         }
 		lc.finalize();
@@ -6955,11 +6980,11 @@ namespace GObject
                 pet->loadPlayerSevenSoul(dbvalue.soulId, dbvalue.soulLevel, dbvalue.skillIndex);
 		}
 		lc.finalize();
-        if(GVAR.GetVar(GVAR_SEVENSOUL_FIX) == 0)
-        {
-		    globalPlayers.enumerate(sevensoul_fix, 0);
-            GVAR.SetVar(GVAR_SEVENSOUL_FIX, 1);
-        }
+        //if(GVAR.GetVar(GVAR_SEVENSOUL_FIX) == 0)
+        //{
+		//    globalPlayers.enumerate(sevensoul_fix, 0);
+        //    GVAR.SetVar(GVAR_SEVENSOUL_FIX, 1);
+        //}
 		return true;
     }
 

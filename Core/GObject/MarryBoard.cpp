@@ -401,7 +401,12 @@ namespace GObject
                     st << (_type == 4 ? _atTime + 3 * OneTime -now : 0) ;
                     st << static_cast<UInt8>(_norms); 
                     for(UInt8 i =0 ;i < 8 ;++i)
-                        st<<_door[i];
+                    {
+                        if(_door[i]  < doorMax )
+                            st<<_door[i];
+                        else 
+                            st<< doorMax;
+                    }
                     st << doorMax ;
                     UInt32 knock =pl->GetVar(VAR_MARRYBOARD4_TIME);
                     if(pl == _man || pl == _woman )
@@ -513,12 +518,12 @@ namespace GObject
         sprintf(str, "F_140102_14");
         pl->udpLog("jiehunjinxing", str, "", "", "", "", "act");
     }
-    void MarryBoard::selectDoor(Player * pl ,UInt8 door)
+    bool MarryBoard::selectDoor(Player * pl ,UInt8 door)
     {
         if(_type != 4)
-            return ;
+            return false;
         if(door < 1 ||door > 8 || pl == NULL )
-            return ;
+            return false;
         UInt32 now = TimeUtil::Now();
         if( pl == _man || pl == _woman)
         {
@@ -536,10 +541,7 @@ namespace GObject
             UInt32 knockTime = pl->GetVar(VAR_MARRYBOARD4_TIME);
             if(now > _atTime + 2 * OneTime  && now < _atTime + 3 * OneTime && now - knockTime > 15)
             {
-                if(_door[door-1] >= doorMax)
-                    return ;
-                if(_door[door-1] < doorMax)
-                    _door[door-1] ++ ; 
+                _door[door-1] ++ ; 
 
                 if(_door[door-1] == doorMax )
                 {
@@ -562,6 +564,7 @@ namespace GObject
                 pl->udpLog("jiehunjinxing", str, "", "", "", "", "act");
             }
         }
+        return true ;
     }
     UInt32 MarryBoard::wrapTheKey(UInt32 plKey)
     {

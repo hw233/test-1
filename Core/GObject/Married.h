@@ -47,6 +47,7 @@ namespace GObject
         WINNER_COPY,               //副本胜利
         AWARD_QIANFISH,            //千年古迹
         AWARD_WANFISH,             //万年古迹
+        AWARD_DIVORCE,             //离婚成长值,亲密度补偿
     };
     
     class MarriedMgr  
@@ -72,7 +73,7 @@ namespace GObject
             void LoadMarriedCouple(DBMarriedCouple*);
             void AddPetAttr(Player* player,UInt8 type,UInt16 num);
             void AppendPetData(Player* player,Stream& st);
-            void eraseCoupleList(Player* player);
+            void eraseCoupleList(Player* player,Player* obj_player);
            
             //夫妻副本
             void EnterCoupleCopy(Player* player,UInt8 copy_type);

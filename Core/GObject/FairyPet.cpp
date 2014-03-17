@@ -1301,7 +1301,7 @@ namespace GObject
             }
             else if (SKILL_ID(_initskl[i]) == skillId)
             {
-                if(GVAR.GetVar(GVAR_SEVENSOUL_FIX) > 0)
+                //if(GVAR.GetVar(GVAR_SEVENSOUL_FIX) > 0)
                     update = false;
                 break;
             }

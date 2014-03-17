@@ -365,6 +365,8 @@ MSG_REG_2(GameMsgHdr, 0x255, OnRoamintQueqiaoLastLoot);
 
 MSG_REG_2(GameMsgHdr, 0x256, OnDelItemAny);
 MSG_REG_2(GameMsgHdr, 0x259, OnAddItem);
+MSG_REG_2(GameMsgHdr, 0x25A, OnUseAccItemInCountry);
+MSG_REG_2(GameMsgHdr, 0x25B, OnUseVitalityItemInCountry);
 MSG_REG_2(GameMsgHdr, 0x260, OnTownDeamonChallenge);
 MSG_REG_2(GameMsgHdr, 0x261, OnTownDeamonAutoCompleteQuite);
 MSG_REG_2(GameMsgHdr, 0x262, OnTownDeamonAttackNpc);

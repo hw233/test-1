@@ -3292,6 +3292,12 @@ UInt8 SwitchAutoForbid(UInt32 val)
     return 0;
 }
 
+inline bool clan_enum_0(GObject::Clan *clan, int)
+{
+   clan->ClearDuoBaoData();
+   return true;
+}
+
 inline bool player_enum_2(GObject::Player* pl, int type)
 {
     switch(type)
@@ -3354,6 +3360,7 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_SUMMER_MEET_STRENTH_AWARD, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN_AWARD, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_STRENTH_AWARD, 0);
                  //pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
                 pl->SetVar(GObject::VAR_SUMMERMEET_SCORE1, 0);
@@ -3414,8 +3421,15 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_GUANKA_ACTION_NPC, 0);
                 pl->SetVar(GObject::VAR_GUANKA_ACTION_SCORE, 0);
                 pl->SetVar(GObject::VAR_GUANKA_ACTION_TIME, 0);
+                pl->SetVar(GObject::VAR_GUANKA_ACTION_UDPLOG, 0);
                 GameMsgHdr hdr(0x1B7, WORKER_THREAD_WORLD, pl, 0);
                 GLOBAL().PushMsg(hdr, NULL);
+            }
+            break;
+        case 18:
+            {
+                pl->SetVar(GObject::VAR_CLAN_DUOBAO_SCORE, 0);
+                pl->SetVar(GObject::VAR_CLAN_DUOBAO_STATUS, 0);
             }
             break;
         default:
@@ -3727,9 +3741,12 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     UInt32 begin = 0, end = 0;
     UInt8 type = 0;
     br >> type >> begin >> end;
-    begin = TimeUtil::SharpDay(0, begin);
-    if(end > begin && (end - begin)%86400 > 0)
-        end = TimeUtil::SharpDay(1, end);
+    if(type != 18)
+    {
+        begin = TimeUtil::SharpDay(0, begin);
+        if(end > begin && (end - begin)%86400 > 0)
+            end = TimeUtil::SharpDay(1, end);
+    }
     UInt8 ret = 0;
     if(type == 1 && begin <= end)
     {   //充值幸运星活动
@@ -3893,6 +3910,32 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_GUANKAACT_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_GUANKAACT_END, end);
         ret = 1;
+    }
+    else if (type == 18 && begin <= end )
+    {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, 18);
+            GObject::globalClans.enumerate(clan_enum_0, 0);
+
+            DB5().PushUpdateData("DELETE FROM `duobaolog`");
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_CLAN_DUOBAO_END, end);
+
+        UInt32 valueTime = 0;
+        UInt32 nowTime = TimeUtil::Now();
+        if(nowTime < GObject::GVAR.GetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN))
+            valueTime = GObject::GVAR.GetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN) / (15 * 60) * (15 * 60) + 900;
+        else
+            valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
+
+        GObject::GVAR.SetVar(GObject::GVAR_DUOBAO_ENDTIME, valueTime);
+
+        return;
     }
 
     Stream st(SPEP::ACTIVITYONOFF);

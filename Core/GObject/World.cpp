@@ -252,6 +252,7 @@ UInt8 World::_arenaState = 0;      //0:无 1:仙界第一 2:仙界至尊
 bool World::_memcinited = false;
 bool World::_miluzhijiao = false;
 bool World::_buyfund = false;
+bool World::_duobaoOpen = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -488,7 +489,6 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
-
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 2)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 3)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 4)
@@ -496,6 +496,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 6)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 7)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
+         
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -526,6 +534,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
         ))
     {
 #if 0
@@ -1372,7 +1381,6 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
-
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 2)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 3)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 4)
@@ -1380,6 +1388,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 6)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 7)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
+         
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
 
          )
         bRechargeEnd = true;
@@ -1978,6 +1994,74 @@ void World::ClanStatueCheck(void *)
     globalClans.enumerate(visitor);
 }
 
+inline bool enum_duobao_send(GObject::Player* player, UInt8 mark)
+{
+    if(player == NULL || !player->isOnline() || player->getClan() == NULL)
+        return true;
+
+    Stream st(REP::DUOBAO_REP);
+    st << static_cast<UInt8>(0x07);
+    st << mark;
+    st << Stream::eos;
+    player->send(st);
+
+    return true;
+}
+
+void World::ClanDuoBaoCheck(void *)
+{
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    if(World::getDuoBaoTime())
+    {
+        if(!_duobaoOpen)
+        {
+            GObject::globalPlayers.enumerate(enum_duobao_send, 1);
+            _duobaoOpen = true;
+        }
+
+        if(TimeUtil::Now() >= GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
+        {
+            class DuoBaoEndVisitor : public Visitor<Clan>
+            {
+                public:
+                    DuoBaoEndVisitor()
+                    {
+                    }
+
+                    bool operator()(Clan* clan)
+                    {
+                        clan->SendDuoBaoAward();
+                        return true;
+                    }
+
+            };
+            DuoBaoEndVisitor visitor;
+            globalClans.enumerate(visitor);
+        }
+
+        UInt32 value = 0;
+        if(nowTime >= GVAR.GetVar(GVAR_CLAN_DUOBAO_END))
+        {
+            value = time + 10*60*60 + 900 + 86400; //今天活动结束，时间设置到下一天第一轮的结束时间
+            UInt32 nextBegin = time + 10*60*60 + 86400;   //今天活动结束，时间设置到下一天的开始时间
+            UInt32 nextEnd = time + 22*60*60 + 86400;       //今天活动结束，时间设置到下一天的结束时间
+            if(_duobaoOpen)
+            {
+                GObject::globalPlayers.enumerate(enum_duobao_send, 0);
+                _duobaoOpen = false;
+                DB5().PushUpdateData("DELETE FROM `duobaolog`");
+            }
+            GVAR.SetVar(GVAR_CLAN_DUOBAO_BEGIN, nextBegin);
+            GVAR.SetVar(GVAR_CLAN_DUOBAO_END, nextEnd);
+        }
+        else
+            value = nowTime / (15 * 60) * (15 * 60) + (15 * 60); //本轮活动结束，时间设置到下一轮的结束时间
+
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, value);
+    }
+}
+
 inline static bool enum_spread_send(Player* player, void* data)
 {
     if(player == NULL || !player->isOnline())
@@ -2144,12 +2228,32 @@ bool World::Init()
     }
     */
 
-    
     if( GObject::MarryBoard::instance().sendAward())
     {
         gMarryMgr.MarryingCrush();
     }
     AddTimer(60 * 60 * 3 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
+
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    UInt32 start = time + 10*60*60;
+    UInt32 end = time + 22*60*60;
+    UInt32 valueTime = 0;
+
+    if(nowTime < end)
+    {
+        GVAR.SetVar(GVAR_CLAN_DUOBAO_BEGIN, start);
+        GVAR.SetVar(GVAR_CLAN_DUOBAO_END, end);
+
+        if(nowTime < GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN))
+            valueTime = GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) / (15 * 60) * (15 * 60) + 900;
+        else
+            valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
+
+        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, valueTime);
+    }
+
+    AddTimer(5 * 1000, ClanDuoBaoCheck, static_cast<void*>(NULL));
     return true;
 }
 
@@ -4239,11 +4343,11 @@ void World::SendGuankaActAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{1325,40},{9418,60},{9075,40},{515,60},{0,0}},
-        {{1325,20},{9418,30},{9075,20},{515,30},{0,0}},
-        {{515,20},{9438,10},{9075,10},{134,10},{0,0}},
-        {{515,10},{9438,10},{134,10},{0,0},{0,0}},
-        {{15,10},{515,5},{134,5},{9438,5},{500,5}},
+        {{1325,20},{9418,30},{9075,20},{515,12},{0,0}},
+        {{1325,10},{9418,15},{9075,10},{515,10},{0,0}},
+        {{515,8},{9438,10},{9075,5},{134,8},{0,0}},
+        {{515,6},{9438,10},{134,6},{0,0},{0,0}},
+        {{15,10},{515,4},{134,4},{9438,5},{500,5}},
     };
     int pos = 0;
     for (RCSortType::iterator i = World::guankaScoreSort.begin(), e = World::guankaScoreSort.end(); i != e; ++i)

@@ -405,6 +405,8 @@ public:
 
     inline std::vector<UInt16>& getPassiveSkillXMCZ100() { return _passkl[GData::SKILL_XMCZ-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillBLTY100() { return _passkl[GData::SKILL_BLTY-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillViolent100() { return _passkl[GData::SKILL_VIOLENT-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillRevival100() { return _passkl[GData::SKILL_REVIVAL-GData::SKILL_PASSSTART]; }
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
@@ -481,6 +483,7 @@ public:
     UInt32 getTrumpId(int idx);
     int getAllTrumpId(UInt32* trumps, int size = TRUMP_UPMAX);
     int getAllTrumpTypeId(UInt32* ids, int size = TRUMP_UPMAX);
+    int getAllTrumpEnchant(UInt8* trumps, int size = TRUMP_UPMAX);
     void getAllTrumps(Stream& st);
     UInt32 getTrumpNum();
 

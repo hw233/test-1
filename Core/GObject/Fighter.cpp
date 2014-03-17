@@ -1322,6 +1322,21 @@ int Fighter::getAllTrumpTypeId( UInt32* trumps, int size )
     return getMaxTrumps();
 }
 
+int Fighter::getAllTrumpEnchant( UInt8* trumps, int size )
+{
+    if (!trumps || !size)
+        return 0;
+
+    for (int i = 0; i < getMaxTrumps(); ++i)
+    {
+        if (_trump[i])
+            trumps[i] = _trump[i]->getItemEquipData().enchant;
+        else
+            trumps[i] = 0;
+    }
+    return getMaxTrumps();
+}
+
 int Fighter::getAllLingbaoTypeId( UInt32* lingbaos, int size )
 {
     if (!lingbaos || !size)
@@ -4007,6 +4022,8 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTACTION ||
                         s->cond == GData::SKILL_ONHPCHANGE ||
                         s->cond == GData::SKILL_ONWITHSTAND
+                     || s->cond == GData::SKILL_VIOLENT
+                     || s->cond == GData::SKILL_REVIVAL
                         )
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
@@ -4062,6 +4079,8 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_AFTACTION ||
                         s->cond == GData::SKILL_ONHPCHANGE ||
                         s->cond == GData::SKILL_ONWITHSTAND
+                     || s->cond == GData::SKILL_VIOLENT
+                     || s->cond == GData::SKILL_REVIVAL
                         )
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
@@ -6279,6 +6298,12 @@ UInt16 Fighter::getPortrait()
             portrait = 1103;
         else if(getFashionTypeId() == 1727)
             portrait = 1104;
+        else if (getFashionTypeId() == 1728)
+            portrait = 1099;
+        else if(getFashionTypeId() == 1729)
+            portrait = 1102;
+        else if(getFashionTypeId() == 1730)
+            portrait = 1105;
  
     }
 

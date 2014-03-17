@@ -298,6 +298,8 @@ namespace GObject
         VAR_COUPLE_COPY_COUNT = 235,//夫妻家园总次数
         VAR_COUPLE_COPY_BATTLE = 236,//夫妻家园进行次数
         VAR_FRIEND_SECURITY = 237,//好友列表隐私设置标记
+        VAR_COUPLE_LEVELEXP = 238,//夫妻家园离婚保留下来的成长值
+        VAR_COUPLE_FRIENDLINESS = 239,//夫妻家园保留下来的亲密度
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
@@ -473,6 +475,9 @@ namespace GObject
         VAR_LEVEL_AWARD = 458, 
         VAR_ZCJB_RECHARGE_GOLD = 459, //招财进宝总共充值仙石
         VAR_CLANBOSS_GONGXIAN= 460, //末日之战贡献
+
+        // 441-442 for JLT
+        VAR_GUANKA_ACTION_UDPLOG = 461, //关卡活动npc击杀情况udplog日志
 
         //繁体版占用470-499
 
@@ -678,6 +683,11 @@ namespace GObject
         //711-720 for JLT
         VAR_QISHI_FRIEND_SEND_COUNT = 711,  // 七石斗法玩家赠送次数
         VAR_QISHI_FRIEND_USE_COUNT = 712,   // 七石斗法玩家赠送已使用次数
+
+        //721-730 lijr
+        VAR_CLAN_DUOBAO_SCORE = 713,        // 夺宝奇兵点数
+        VAR_CLAN_DUOBAO_SUCCESS_NUM = 714,  // 夺宝奇兵成功次数
+        VAR_CLAN_DUOBAO_STATUS = 715,       // 夺宝奇兵状态
 
         VAR_MAX,
     };
@@ -1133,6 +1143,7 @@ namespace GObject
             REGISTER_VAR(VAR_LEVEL_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_ZCJB_RECHARGE_GOLD, CYCLE_NONE);
             REGISTER_VAR(VAR_CLANBOSS_GONGXIAN, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANKA_ACTION_UDPLOG, CYCLE_NONE);
 
             REGISTER_VAR(VAR_PET_CUILIAN_EXTRA_LOW_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_PET_CUILIAN_EXTRA_UP_SCORE, CYCLE_DAY);
@@ -1289,6 +1300,9 @@ namespace GObject
             REGISTER_VAR(VAR_QISHI_FRIEND_USE_COUNT, CYCLE_DAY);
             REGISTER_VAR(VAR_MOUNT_CANGJIANYA_LEFT_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_MOUNT_CANGJIANYA_DATE, CYCLE_NONE);
+            REGISTER_VAR(VAR_CLAN_DUOBAO_SCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAN_DUOBAO_SUCCESS_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAN_DUOBAO_STATUS, CYCLE_DAY);
             REGISTER_VAR(VAR_GUANKA_ACTION_NPC, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_TIME, CYCLE_NONE);

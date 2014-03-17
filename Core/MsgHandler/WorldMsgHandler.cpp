@@ -56,6 +56,7 @@ MSG_REG(GameMsgHdr, OnArenaLeaderBoardReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_EXTRA_ACT, OnArenaExtraActReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_OP, OnArenaOpReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVERWAR_ARENA_OP, OnArenaWarOpReq);
+MSG_REG_2(GameMsgHdr, REQ::DUOBAO_REQ, OnClanDuoBaoReq);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq);
 MSG_REG_2(GameMsgHdr, REQ::MARRYBOARD, OnMarryBard);
@@ -169,6 +170,8 @@ MSG_REG_2(GameMsgHdr, 0x1B6, OnSetGuankaActRank);
 MSG_REG_2(GameMsgHdr, 0x1B7, OnClearGuankaActRank);
 MSG_REG_2(GameMsgHdr, 0x1B8, OnSendGuankaActRank10);
 MSG_REG_2(GameMsgHdr, 0x1B9, OnSendGuankaActMyRank);
+MSG_REG_2(GameMsgHdr, 0x1BA, OnUseAccItemInWorld);
+MSG_REG_2(GameMsgHdr, 0x1BB, OnUseVitalityItemInWorld);
 
 MSG_REG_2(GameMsgHdr, 0x1C0, OnLuckyDraw);
 MSG_REG_2(GameMsgHdr, 0x1C1, OnRechargeRank);
@@ -205,6 +208,7 @@ MSG_REG_2(GameMsgHdr, 0x1DC, SendQSBState);
 MSG_REG_2(GameMsgHdr, 0x1DD, OnSetCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DE, OnDelCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DF, OnSendCFriendInvited);
+MSG_REG_2(GameMsgHdr, 0x1AF, OnSendDuoBaoBegin);
 
 //FB占位(0x1E0~0x1E9),简体千万别使用
 //0x1E0

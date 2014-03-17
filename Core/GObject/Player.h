@@ -273,6 +273,7 @@ namespace GObject
         FANTIAN     = 17,   //梵天宝卷
         JIUXIAO     = 18,   //九霄唤龙枪
         TIANGANG    = 19,   //天罡剑诀
+        YEHUO       = 20,   //业火天雷
 
         DRAGONKING_MAX,
     };
@@ -2925,6 +2926,8 @@ namespace GObject
         void doGuankaAct(UInt8);
         void sendguankaActMyRank();
         void getguankaScoreAward(UInt8);
+        void guankaActUdpLog(UInt32, bool);
+        void addguankaScoreByAttack(UInt32);
 
     public:
         // 八部浮屠

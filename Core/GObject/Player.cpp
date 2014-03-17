@@ -1269,8 +1269,10 @@ namespace GObject
                     itemId = 9035;
                 else if(level < 120 )
                     itemId = 9391;
-                else 
+                else if(level < 130) 
                     itemId = 9430;
+                else 
+                    itemId = 9491;
                 MailPackage::MailItem mitem[1] = {{itemId, 1}};
                 MailItemsInfo itemsInfo(mitem, BlueDiamondCmd, 1);
                 mailPackageManager.push(mail->id, mitem, 1, true);
@@ -3947,6 +3949,14 @@ namespace GObject
 			checkDeath();
 
 		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+
+        if(World::getGuankaAct())
+        {
+            if(res && npcId >= 13524 && npcId <= 13529)
+                addguankaScoreByAttack(bsim.getRounds()+1);
+            if(npcId >= 13500 && npcId <= 13529)
+                guankaActUdpLog(npcId, res);
+        }
 		return res;
 	}
 
@@ -20012,7 +20022,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(48, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
-        static UInt32 itemId[] = {9600, 2, 9371, 2, 9082, 2, 503, 2, 513, 2, 9443, 5};
+        static UInt32 itemId[] = {9600, 2, 9371, 2, 9082, 2, 503, 2, 9418, 2, 1126, 2};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -20694,10 +20704,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -28633,6 +28643,8 @@ void Player::doGuankaAct(UInt8 type)
     bool res = attackCopyNpc(npcId, 2, 0, 1, isFull, exp, 1, false, NULL, false);
     if(res)
     {
+		SYSMSG_SENDV(193, this, scores[index]);
+        SYSMSG_SENDV(194, this, scores[index]);
         AddVar(VAR_GUANKA_ACTION_SCORE, scores[index]);
         SetVar(VAR_GUANKA_ACTION_TIME, TimeUtil::Now());
         ++ index;
@@ -28665,6 +28677,84 @@ void Player::doGuankaAct(UInt8 type)
     }
 }
 
+void Player::guankaActUdpLog(UInt32 npcId, bool result)
+{
+    //add udpLog
+    UInt32 logInfo = GetVar(VAR_GUANKA_ACTION_UDPLOG);
+    int tmpIdx = npcId - 13500;    //最大30个
+    if(tmpIdx < 0 || tmpIdx > 30 || (GET_BIT(logInfo, tmpIdx) && !result))
+        return;
+    logInfo = SET_BIT(logInfo, tmpIdx);
+    SetVar(VAR_GUANKA_ACTION_UDPLOG, logInfo);
+    std::string trumpStr;
+    for(int i = 0; i < 5; ++ i)
+    {
+        UInt32 trumps1[3] = {0};
+        UInt8 trumps2[3] = {0};
+        GObject::Fighter * fgt = getLineup(i).fighter;
+        if(fgt != NULL)
+        {
+            fgt->getAllTrumpTypeId(trumps1);
+            fgt->getAllTrumpEnchant(trumps2);
+        }
+        for(int j = 0; j < 3; ++ j)
+        {
+            trumpStr += "{" + Itoa(trumps1[j]) + ":" + Itoa(trumps2[j]) + "},";
+        }
+    }
+    char str[32] = {0};
+    sprintf(str, "F_140240_%u_%u", npcId, result ? 1 : 2);
+    udpLog("hundunmoyu", str, trumpStr.c_str(), Itoa(getBattlePoint()).c_str(), "", "", "act");
+}
+
+void Player::addguankaScoreByAttack(UInt32 rounds)
+{
+    if(!World::getGuankaAct())
+        return;
+    UInt32 score = 0;
+    switch(rounds)
+    {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+            score = 1026;
+            break;
+        case 4:
+            score = 514;
+            break;
+        case 5:
+            score = 258;
+            break;
+        case 6:
+            score = 130;
+            break;
+        case 7:
+            score = 66;
+            break;
+        case 8:
+            score = 34;
+            break;
+        case 9:
+            score = 18;
+            break;
+        case 10:
+            score = 10;
+            break;
+        case 11:
+            score = 6;
+            break;
+        case 12:
+            score = 4;
+            break;
+        default:
+            return;
+    }
+    SYSMSG_SENDV(193, this, score);
+    SYSMSG_SENDV(194, this, score);
+    AddVar(VAR_GUANKA_ACTION_SCORE, score);
+}
+
 void Player::sendguankaActMyRank()
 {
     GameMsgHdr hdr(0x1B9, WORKER_THREAD_WORLD, this, 0);
@@ -28676,13 +28766,13 @@ void Player::getguankaScoreAward(UInt8 type)
     if(!World::getGuankaAct() || type > 4)
         return;
 
-    static UInt32 scoreLvl[] = {200, 400, 800, 1000, 1500};
+    static UInt32 scoreLvl[] = {200, 400, 600, 800, 1000};
     static UInt32 awards[5][5][2] = {
-        {{15,2},   {514,5},  {135,5},    {500, 5},   {0, 0}},
-        {{15,5},   {515,5},  {514, 10},  {135, 10},  {500, 5}},
-        {{15,10},  {515,10}, {134, 10},  {9022, 10}, {0, 0}},
-        {{515,30}, {134,30}, {9438, 30}, {9022, 10}, {0, 0}},
-        {{515,40}, {134,40}, {9438, 40}, {9075, 20}, {0, 0}},
+        {{15,2},  {514,2}, {135,2},   {500,5},   {0, 0}},
+        {{15,5},  {514,5}, {135,5},   {500,5},   {0, 0}},
+        {{15,10}, {515,2}, {134,2},   {514,5},   {135,5}},
+        {{515,4}, {134,4}, {9438,10}, {9022,5},  {0, 0}},
+        {{515,6}, {134,6}, {9438,15}, {9075,10}, {0, 0}},
     };
     UInt32 data = GetVar(VAR_GUANKA_ACTION_NPC);
     UInt32 score = GetVar(VAR_GUANKA_ACTION_SCORE);
@@ -28730,6 +28820,7 @@ void Player::sevensoul_fixed()
             pet->updateToDBPetSkill();
     }
 }
+
 
 } // namespace GObject
 

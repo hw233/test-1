@@ -704,6 +704,26 @@ void OnClanGetDynamicMsgReq(GameMsgHdr& hdr, ClanGetDynamicMsgReq& req)
 	player->getClan()->sendClanDynamicMsg(player, req._type, req._start, req._count);
 }
 
+void OnClanDuoBaoReq(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL) return;
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    switch(type)
+    {
+    case 0x00:
+        clan->DuoBaoInfo(player);
+        break;
+    case 0x01:
+        clan->DuoBaoStart(player);
+        break;
+    }
+}
+
 void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -2728,6 +2748,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x27:
         case 0x29:
         case 0x3A:
+        case 0x3B:
         {
             brd >> op;
             switch(op)
@@ -3783,18 +3804,20 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
                     return;
                 UInt8 door=0 ;
                 br >> door;
-                GObject::MarryBoard::instance().selectDoor(player,door);
-                Stream st(REP::MARRYBOARD);
-                st <<static_cast<UInt8>(op);
-                st << static_cast<UInt8>(door);
-                st<<Stream::eos;
-                if(player == GObject::MarryBoard::instance()._man || player == GObject::MarryBoard::instance()._woman)
+                if( GObject::MarryBoard::instance().selectDoor(player,door) )
                 {
-                    GObject::MarryBoard::instance()._man ->send(st);
-                    GObject::MarryBoard::instance()._woman->send(st);
+                    Stream st(REP::MARRYBOARD);
+                    st <<static_cast<UInt8>(op);
+                    st << static_cast<UInt8>(door);
+                    st<<Stream::eos;
+                    if(player == GObject::MarryBoard::instance()._man || player == GObject::MarryBoard::instance()._woman)
+                    {
+                        GObject::MarryBoard::instance()._man ->send(st);
+                        GObject::MarryBoard::instance()._woman->send(st);
+                    }
+                    else
+                        player->send(st);
                 }
-                else
-                    player->send(st);
             }
             break;
         default:
@@ -4037,7 +4060,11 @@ void OnServerLeftMemberLeave(ServerLeftMsgHdr& hdr, const void * data)
         else
             player->setLeftAddrEnter(false);
         if( var_val)
-            player->AddVar(GObject::VAR_LEFTADDR_POWER , var_val);
+        {
+            UInt32 val = player->GetVar(GObject::VAR_LEFTADDR_POWER);
+            if(val > var_val)
+                player->SetVar(GObject::VAR_LEFTADDR_POWER , val - var_val);
+        }
     }
 }
 void OnServerLeftMemberGet(ServerLeftMsgHdr& hdr, const void * data)

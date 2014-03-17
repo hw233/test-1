@@ -1123,6 +1123,7 @@ CREATE TABLE `coupleinfo` (
     PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
+DROP TABLE IF EXISTS `couplecopy`;
 CREATE TABLE `couplecopy` (
     `id` tinyint(3) unsigned NOT NULL,
     `name` varchar(255) NOT NULL DEFAULT '',

@@ -1407,7 +1407,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
    
     pl->MiLuZhiJiao();
-    pl->QiShiBanState();
+    //pl->QiShiBanState();
     UInt32 flag = pl->GetVar(VAR_OLDMAN_SCORE_AWARD);
     if(flag & (1<<8))
         pl->sendOldManPos(1);
@@ -1442,7 +1442,13 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->send(st1);
     }
     pl->getNewYearGiveGiftAward(0,0);
-}
+
+    {
+        GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+
+    }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
 {
