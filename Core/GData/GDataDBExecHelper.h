@@ -649,6 +649,7 @@ struct DBRideConfig
     std::string chips;
     UInt32 propId;
     UInt8 show;
+    UInt8 useMore;
 };
 
 struct DBRideUpgradeCfg
@@ -1585,14 +1586,15 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBRideConfig)
-SPECIALDEF(6)
+SPECIALDEF(7)
 	(
     UInt8, id,
     std::string, name,
     UInt32, itemId,
     std::string, chips,
     UInt32, propId,
-    UInt8, show
+    UInt8, show,
+    UInt8, useMore
 	)
 SPECIALEND()
 

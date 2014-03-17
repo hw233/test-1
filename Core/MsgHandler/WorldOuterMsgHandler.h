@@ -3874,6 +3874,21 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
     }
 }
 
+void OnServerRechargeRank( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    if(type == 0)
+        GObject::leaderboard.giveRechargeRankAward();
+    else if(type == 1)
+        GObject::leaderboard.readRechargeRank100(brd);
+    else if(type == 2)
+        GObject::leaderboard.readRechargeSelf(brd);
+    else if(type == 3)
+        GObject::leaderboard.sendGoldLvlAward(brd);
+}
+
 void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )
 {
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
