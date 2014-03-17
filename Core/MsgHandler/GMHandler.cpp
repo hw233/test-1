@@ -309,6 +309,7 @@ GMHandler::GMHandler()
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
     Reg(3, "addpetattr", &GMHandler::OnAddPetAttr);
     Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
+    Reg(2, "settyss", &GMHandler::OnSetTYSS);
 
     _printMsgPlayer = NULL;
 }
@@ -5180,3 +5181,8 @@ void GMHandler::TestSameTimeRecharge(GObject::Player *player, std::vector<std::s
     }
 }
 
+void GMHandler::OnSetTYSS(GObject::Player *player, std::vector<std::string>& args)
+{
+    GVAR.SetVar(GVAR_TYSS_BEGIN,TimeUtil::Now());
+    GVAR.SetVar(GVAR_TYSS_END,TimeUtil::Now() + 86400 * 5);
+}

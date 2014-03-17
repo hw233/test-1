@@ -143,6 +143,9 @@ namespace GObject
         GVAR_CLAN_DUOBAO_BEGIN = 87,    // 夺宝每天开始时间
         GVAR_CLAN_DUOBAO_END = 88,      // 夺宝每天结束时间
         
+        GVAR_TYSS_BEGIN= 89,      // 天元神兽开启时间
+        GVAR_TYSS_END= 90,      // 天元神兽结束时间
+        
         GVAR_MAX,
     };
 
@@ -260,6 +263,9 @@ namespace GObject
             GREGISTER_VAR(GVAR_QISHIBAN_INVITE_ENABLE, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_GUANKAACT_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_GUANKAACT_END, GCYCLE_NONE);
+            
+            GREGISTER_VAR(GVAR_TYSS_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_TYSS_END, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

@@ -159,6 +159,7 @@ function loadStore()
         store:add(2, 1126, 20)
         store:add(2, 9388, 100)
         store:add(2, 9371, 10)
+        store:add(2, 9492, 20)
 
         store:add(2, 9413, 10)
         store:add(2, 9414, 30)

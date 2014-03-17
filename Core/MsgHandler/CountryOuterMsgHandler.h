@@ -8227,6 +8227,27 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                 break;
             }
         }
+    case 0x31:
+        {
+            brd >> op;
+            switch(op)
+            {
+                case 2:
+                    player->OpTYSS(op);//领取每日礼包
+                    break;
+                case 3:
+                {
+                    UInt8 flag = 0;
+                    brd >> flag;
+                    player->OpTYSS(op,flag);//喂养神兽
+                }
+                    break;
+                default:
+                    break;
+            }
+
+
+        }
     default:
         break;
     }

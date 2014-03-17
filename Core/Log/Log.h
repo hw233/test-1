@@ -154,6 +154,8 @@ enum PurchaseType
     SevenSoulUpgrade            = 1017, //七魄升级
     BuyOpenCard                 = 1018, //购买翻牌次数
     RefreshMoBaoAward           = 1019, //刷新墨宝奖励
+    BuyLingGuo                  = 1020, //购买灵果
+    BuyTYSSLim                  = 1021, //天元神兽限购礼包
     //繁体私有占150～200
 };
 
@@ -303,6 +305,7 @@ enum ItemFrom
     FromMicroCloudAward = 68, //微云合作奖励
     FromJiqirenAct = 69, //机器人活动
     FromMoBao = 70, //墨宝
+    FromTYSS = 71, //天元神兽
     //80 ~ 100，繁体占用
 };
 

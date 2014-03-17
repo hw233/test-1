@@ -2175,6 +2175,190 @@ void OnSendCFriendInvited( GameMsgHdr& hdr, const void* data )
     GLOBAL().PushMsg(hdr1, &cfData);
 }
 
+void SetTYSSPlayerScoreRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *(UInt32*)data;
+    if (!total)
+        return;
+
+    for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            World::tyss_PlayerSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::tyss_PlayerSort.insert(s);
+
+}
+
+void SetTYSSClanScoreRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    Clan * clan = player->getClan();
+    if(clan == NULL)
+    {
+        return ;
+    }
+    
+    UInt32 total = *(UInt32*)data;
+    if (!total)
+        return;
+
+    for (ClanGradeSort::iterator i = World::tyss_ClanSort.begin(), e = World::tyss_ClanSort.end(); i != e; ++i)
+    {
+        if (i->clan == clan)
+        {
+            World::tyss_ClanSort.erase(i);
+            break;
+        }
+    }
+
+    ClanSort s;
+    s.clan = clan;
+    s.total = total;
+    World::tyss_ClanSort.insert(s);
+
+}
+
+void DelTYSSClanScoreRank( GameMsgHdr& hdr, const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    
+    UInt32 clanId = *((UInt32*)data);
+
+    for (ClanGradeSort::iterator i = World::tyss_ClanSort.begin(), e = World::tyss_ClanSort.end(); i != e; ++i)
+    {
+        if (i->clan->getId() == clanId)
+        {
+            World::tyss_ClanSort.erase(i);
+            break;
+        }
+    }
+
+}
+
+void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
+{
+    World::initRCRank();
+    MSG_QUERY_PLAYER(player);
+    UInt8 opt = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
+    UInt8 c = 0;
+    UInt32 idx = 1;
+    if(opt != 0 && opt != 1 && opt != 9)
+        return;
+    Stream st(REP::ACT);  
+    st << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x00);  
+    if(player->getClan() == NULL)
+        st << static_cast<UInt32>(0);
+    else
+        st << player->getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+    st << static_cast<UInt32>(CLR_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
+   
+    st << static_cast<UInt8>(GET_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
+    st << Stream::eos;
+    player->send(st);
+
+    switch(opt)
+    {
+        case 0 :
+        {
+            Stream st1(REP::ACT);  
+            st1 << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x12);  
+            if(World::tyss_PlayerSort.size() == 0)
+                st1 << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(World::tyss_PlayerSort.size());
+
+            for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; )
+            {
+                if(i->player == NULL)
+                    continue;
+                if(i->player == player) 
+                {
+                    st1 << i->total << idx ; 
+                    if(World::tyss_PlayerSort.size() >= 7)
+                        st1 << static_cast<UInt8>(7);
+                    else
+                        st1 << static_cast<UInt8>(World::tyss_PlayerSort.size());
+                    break;
+                }
+                ++idx;
+                ++i;
+                
+            }
+            
+            for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
+            {
+                if(i->player == NULL)
+                    continue;
+                
+                st1 << i->player->getName();
+                st1 << i->total;
+                ++c;
+                if (c >= 7)
+                    break;
+            }
+            st1 << Stream::eos;
+            player->send(st1);
+        }
+            break;
+        case 1 :
+        {
+            Stream st2(REP::ACT);  
+            st2 << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x11);  
+            if(World::tyss_ClanSort.size() == 0)
+                st2 << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(World::tyss_ClanSort.size());
+            
+            for (ClanGradeSort::iterator i = World::tyss_ClanSort.begin(), e = World::tyss_ClanSort.end(); i != e; )
+            {
+                if(i->clan == NULL)
+                    continue;
+                if(i->clan == player->getClan())
+                {
+                    st2 << i->total << idx ; 
+                    if(World::tyss_ClanSort.size() >= 3)
+                        st2 << static_cast<UInt8>(3);
+                    else
+                        st2 << static_cast<UInt8>(World::tyss_ClanSort.size());
+                    break;
+                }
+               
+                ++idx;
+                ++i;
+            }
+
+            for (ClanGradeSort::iterator i = World::tyss_ClanSort.begin(), e = World::tyss_ClanSort.end(); i != e; ++i)
+            {
+                if(i->clan == NULL)
+                    continue;
+                st2 << i->clan->getName();
+                st2 << i->total;
+                ++c;
+                if (c >= 3)
+                    break;
+            }
+            st2 << Stream::eos;
+            player->send(st2);
+            
+        }
+            break;
+        default :
+            break;
+    }
+
+}
+
 void OnSendClanMemberList( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);

@@ -275,6 +275,10 @@ function onDungeonWin(player, id, count, free)
         local package = player:GetPackage();
         package:Add(9416, 1, true)
     end
+    if getTYSSTime() == true then
+        local package = player:GetPackage();
+        package:Add(9492, 1, true)
+    end
     local lootlvl = 1;
     if  free then
         lootlvl = 0
@@ -1062,6 +1066,11 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Item9343Act(player, lootlvl);
     player:AddZRYJCount(20); -- 逐日印记
     _collectCardAct(player, lootlvl);
+    if getTYSSTime() == true then
+        local package = player:GetPackage();
+        package:Add(9492, 1, true)
+    end
+
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -1093,6 +1102,10 @@ function onFrontMapWin(player, id, spot, lootlvl)
     if getKillMonsterAct() then
         local package = player:GetPackage();
         package:Add(9416, 1, true)
+    end
+    if getTYSSTime() == true then
+        local package = player:GetPackage();
+        package:Add(9492, 1, true)
     end
     sendWinReward(player, lootlvl, 2);
     TgcEvent(player, 2)
