@@ -284,13 +284,23 @@ namespace GObject
         }
         SYSMSGV(title, 916,str_type.c_str());
         SYSMSGV(content, content_flag,price_num);
+        SYSMSGV(content1, content_flag,player->GetVar(VAR_COUPLE_LEVELEXP),player->GetVar(VAR_COUPLE_FRIENDLINESS));//特殊处理成功离婚
         
         MailItemsInfo itemsInfo(mitem, BuChangMarry, 1);
         Mail * pmail; 
-        if(price_num == 0)    
-            pmail = player->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(content_flag == 915)
+        {
+            
+            pmail = player->GetMailBox()->newMail(NULL, 0x01, title, content1, 0xFFFE0000, true, &itemsInfo);
+        }
         else
-            pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        {
+            if(price_num == 0)    
+                pmail = player->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000, true, &itemsInfo);
+            else
+                pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        }
+            
         if(pmail != NULL)
             mailPackageManager.push(pmail->id, mitem, 1, true);
 
@@ -1297,7 +1307,11 @@ namespace GObject
             gMarriedMgr.ProcessOnlineAward(player,0);
         if(obj_player->isOnline()) 
             gMarriedMgr.ProcessOnlineAward(obj_player,0);
-
+        
+        if(!player->getMainFighter()->getSex())//男的
+            gMarriedMgr.ChangPetAttr(player,obj_player,AWARD_DIVORCE);
+        else
+            gMarriedMgr.ChangPetAttr(obj_player,player,AWARD_DIVORCE);
         SetDirty(player,obj_player); 
         
         //通知结婚养成
@@ -1446,7 +1460,7 @@ namespace GObject
                     }
                     obj_player->GetMarriageInfo()->eraseInfo();
                 }
-                gMarriedMgr.eraseCoupleList(player);
+                gMarriedMgr.eraseCoupleList(player,obj_player);
                 player->GetMarriageInfo()->eraseInfo();
                 erase_marryList(player);
                 SetDirty(player,obj_player); 
@@ -1505,7 +1519,7 @@ namespace GObject
 
                     if(obj_player->GetVar(VAR_MARRY_STATUS) == 6)
                     {
-                        gMarriedMgr.eraseCoupleList(player);
+                        gMarriedMgr.eraseCoupleList(player,obj_player);
                         obj_player->GetMarriageInfo()->eraseInfo();
                         player->GetMarriageInfo()->eraseInfo();
                         SetDirty(player,obj_player); 

@@ -1085,6 +1085,22 @@ void OnSendGuankaActMyRank( GameMsgHdr& hdr,  const void* data )
     player->send(st);
 }
 
+void OnUseAccItemInWorld( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+	UInt32 need = *reinterpret_cast<const UInt32 *>(data);
+    GObject::townDeamonManager->useAccItemInWorld(player, need);
+}
+
+void OnUseVitalityItemInWorld( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+	UInt32 need = *reinterpret_cast<const UInt32 *>(data);
+    GObject::townDeamonManager->useVitalityItemInWorld(player, need);
+}
+
 void SendLuckyBagRank(Stream& st)
 {
     using namespace GObject;
