@@ -24497,7 +24497,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9449, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9496, 1, true, false, FromNpc);
         }
         else
         {
@@ -24508,7 +24508,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9449, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9496, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
@@ -27722,11 +27722,13 @@ void Player::getHappyValueAward(UInt8 val)
 void Player::joinAllServerRecharge(UInt32 num)
 {
     if(num == 0) return;
-    Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
+    //Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
+    Stream st(ARENAREQ::RECHARGE_ACTIVE, 0xEF);
     st << getId() << getName() << num << TimeUtil::Now();
     st << static_cast<UInt8>(getCountry()<<4 | (IsMale()?0:1));
     st << Stream::eos;
-    NETWORK()->SendToServerWar(st);
+    //NETWORK()->SendToServerWar(st);
+	NETWORK()->SendToArena(st);
 }
 
 bool Player::giveFlower(UInt8 type ,UInt32 num)
