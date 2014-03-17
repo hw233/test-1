@@ -1157,26 +1157,36 @@ void World::SendSurnameLegendAward()
     if(bSurnameLegendEnd)
     {
         World::initRCRank();
+        static MailPackage::MailItem s_item[][3] = {
+            {{5069,1},{5139,1},{5109,1}},
+            {{5069,1},{5139,1},{5108,1}},
+            {{5069,1},{5138,1},{5108,1}},
+            {{5068,1},{5138,1},{5108,1}},
+            {{5068,1},{5138,1},{5107,1}},
+            {{5068,1},{5137,1},{5107,1}},
+            {{5067,1},{5137,1},{5107,1}},
+        };
         int pos = 0;
         for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
         {
-            ++pos;
-
-            if(pos > 1) break;
-
             Player* player = i->player;
             if (!player)
                 continue;
-            MailPackage::MailItem items[] =
+            ++ pos;
+            SYSMSGV(title, 4173);
+            if(pos > 7)
+                break;
+            UInt32 score = i->total;
+            if(pos > 0 && pos <= 7)     //奖励前10名
             {
-                //{9907, 1}
-                //{9911, 1}
-                //{9913, 1}
-                //{9921, 1}
-                //{9926, 1}
-                {9931, 1}
-            };
-            player->sendMailItem(4173, 4174, items, sizeof(items)/sizeof(items[0]), false);
+                SYSMSGV(content, 4174, pos);
+                MailItemsInfo itemsInfo(s_item[pos-1], Activity, 3);
+                Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(mail)
+                {
+                    mailPackageManager.push(mail->id, s_item[pos-1], 3, true);
+                }
+            }
         }
         World::LuckyBagSort.clear();
     }
