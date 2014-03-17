@@ -160,7 +160,7 @@ function loadStore()
         store:add(2, 9388, 100)
         store:add(2, 9371, 10)
 
-    if getTYSSTime() then
+    if getTYSSTime(300) then
         store:add(2, 9492, 20)
     end
 

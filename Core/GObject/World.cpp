@@ -546,6 +546,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
         ))
     {
 #if 0
@@ -3210,6 +3211,8 @@ inline bool player_enum_rc(GObject::Player * p, int)
 }
 inline bool clan_enum_grade(GObject::Clan *clan,int)
 {
+    if(!clan)
+        return true;
     if (World::get11Time())
     {
         clan->updataClanGradeInAirBook();
@@ -3225,7 +3228,10 @@ inline bool clan_enum_grade(GObject::Clan *clan,int)
     
     if(World::getTYSSTime())
     {
-        UInt32 grade = clan->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+        GObject::Player* pl = clan->getLeader();
+        if(!pl)
+            return true;
+        UInt32 grade = pl->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
         if(grade)
         {
             ClanSort s;
@@ -4472,7 +4478,7 @@ void World::SendTYSSPlayerAward()
     SYSMSG(title, 946);
     for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
     {
-        UInt32 score = i->total;
+        //UInt32 score = i->total;
         str = i->player->getName();
         if(pos >= 1 && pos < 8)     //奖励前7名
         {

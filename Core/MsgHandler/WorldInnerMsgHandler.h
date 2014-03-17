@@ -153,6 +153,14 @@ void OnSpreadModifyVar(GameMsgHdr& hdr, const void* data)
     player->SetVar(VAR_SPREAD_FLAG, player->GetVar(VAR_SPREAD_FLAG) | SPREAD_ALREADY_GET);
 }
 
+void OnSetTYSSScore(GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::Clan* clan = player->getClan();
+    if(clan)
+        clan->SetTYSSScore(player);
+}
+
 void OnClanTakeRewardResultReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -1034,6 +1042,15 @@ void OnClearGuankaActRank( GameMsgHdr& hdr, const void* data )
 
     World::guankaScoreSort.clear();
     WORLD().DelMemCach_guankaAct(player->getOpenId());
+}
+
+void OnClearTYSS( GameMsgHdr& hdr, const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    World::tyss_PlayerSort.clear();
+    World::tyss_ClanSort.clear();
 }
 
 void OnSendGuankaActRank10( GameMsgHdr& hdr,  const void* data )
