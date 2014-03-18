@@ -877,19 +877,16 @@ public:
 
     inline static void setSurnameLegend(bool v)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now();
         if( now >= begin && now <= end)
             return;
-        */
         _surnamelegend = v;
     }
    
     inline static bool getSurnameLegend(UInt32 time = 0)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now() + time;
@@ -901,7 +898,6 @@ public:
             _surnamelegend = true;
         else
             _surnamelegend = false;
-        */
         return _surnamelegend;
     }
 
@@ -933,18 +929,15 @@ public:
 
     inline static void setHappyFireTime(bool v)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
         UInt32 now = TimeUtil::Now();
         if( now >= begin && now <= end)
             return;
-        */
         _happyFire = v;
     }
     inline static bool getHappyFireTime(UInt32 time = 0)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
         UInt32 now = TimeUtil::Now()+time;
@@ -952,7 +945,6 @@ public:
             _happyFire = true;
         else
             _happyFire = false;
-        */
         return _happyFire;
     } 
     inline static bool getLuckyMeet(UInt32 time = 0)

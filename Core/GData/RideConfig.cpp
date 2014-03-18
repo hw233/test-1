@@ -18,6 +18,7 @@ void Ride::setRideTable(DBRideConfig& dbrc)
     rd.itemId = dbrc.itemId;
     rd.propId = dbrc.propId;
     rd.show = dbrc.show > 0;
+    rd.useMore = dbrc.useMore > 0;
 
     StringTokenizer tk(dbrc.chips, ";");
     for(UInt8 idx = 0; idx < MOUNTCHIP_MAX && idx < tk.count(); ++ idx)
@@ -67,6 +68,14 @@ bool Ride::canShowCangjian(UInt8 rideId)
     std::map<UInt8, RideData>::iterator it = _rideData.find(rideId);
     if(it != _rideData.end())
         return it->second.show;
+    return false;
+}
+
+bool Ride::isUseTwo(UInt8 rideId)
+{
+    std::map<UInt8, RideData>::iterator it = _rideData.find(rideId);
+    if(it != _rideData.end())
+        return it->second.useMore;
     return false;
 }
 
