@@ -941,8 +941,11 @@ UInt32 PetTeamCopy::joinTeam(Player* pl, UInt32 teamId)
     }
 
     if(td->start)
+    {
+		pl->sendMsgCode(1, 8001);
         return 0;
-    
+    }
+
     FairyPet * pet = pl->getBattlePet();
     if(pet == NULL)
         return 0;
@@ -996,10 +999,10 @@ UInt32 PetTeamCopy::joinTeam(Player* pl, UInt32 teamId)
     ++td->count;
 
     pl->setPetTeamData(td);
-    for(UInt8 k=0; k<td->count; k++)
+    /*for(UInt8 k=0; k<td->count; k++)
     {
         std::cout << "Formation A: " <<  static_cast<UInt32>(td->formation[k]) << std::endl;
-    }
+    }*/
 
     if(td->count == 3 && !td->mark)
     {
@@ -1291,10 +1294,10 @@ void PetTeamCopy::setFormation(Player* pl, UInt8 pos1, UInt8 pos2, UInt8 pos3)
             td->formation[2] = 9; 
         }
        
-        for(UInt8 k=0; k<td->count; k++)
+        /*for(UInt8 k=0; k<td->count; k++)
         {
             std::cout << "Formation B: " << static_cast<UInt32>(td->formation[k]) << std::endl;
-        }
+        }*/
     }
     else
     {
@@ -1316,7 +1319,7 @@ void PetTeamCopy::setFormation(Player* pl, UInt8 pos1, UInt8 pos2, UInt8 pos3)
 
         for(UInt8 j = 0; j < td->count; ++j)
         {
-            std::cout << "Formation C: " << static_cast<UInt32>(td->formation[j]) << std::endl;
+            //std::cout << "Formation C: " << static_cast<UInt32>(td->formation[j]) << std::endl;
             Stream st(REP::PET_TEAM_COPY);
             st << static_cast<UInt8>(0x11);
             teamInfo(td->members[j], st);
