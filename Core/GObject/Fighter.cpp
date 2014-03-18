@@ -2051,6 +2051,17 @@ void Fighter::rebuildEquipAttr()
         }
     }
 
+    if(m_xinmolev != 0)
+    {
+        GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(m_xingchen.lvl);
+        GData::AttrExtra ae ;
+        ae.attack = stxc->attack;
+        ae.hp = stxc->hp;
+        ae.action = stxc ->action;
+        ae.criticaldmgimmune = stxc->cridec; 
+        addAttr(_attrExtraEquip,ae);
+        //XXX
+    }
     if(_owner)
     {
         _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
@@ -7311,6 +7322,97 @@ void Fighter::petSSErase(UInt16 sid)
         return;
     m_ss.erase(sid);
     _skillBPDirty = true;
+}
+
+void Fighter::updateDBxinmo()
+{
+    DB1().PushUpdateData("REPLACE INTO `fighter_xinmo` (`fighterId`, `playerId`, `level`, `curVal`)\
+            VALUES(%u, %" I64_FMT "u, %u, %u, %u)", getId(), _owner->getId(), m_xinmolev , m_xinmoval);
+}
+bool Fighter::upgradeXinMo(UInt8 type)
+{
+    if (isPet() || !_owner)
+        return false;
+    if (m_xinmo.lvl >= 30)
+        return false;
+    GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(m_xinmolev+1);
+    if(!stxc || getLevel() < stxc->limitLev)
+        return false;
+    UInt32 value = _owner->GetVar(VAR_HEART_SWORD);
+    if (value < stxc->consume)
+        return false;
+    m_xinmoval += uRand(19) + 1;
+    if(m_xinmo.curVal >= stxc->maxVal)
+    {
+        ++m_xinmolev;
+        setDirty();
+    }
+
+    updateDBxinmo();
+    _owner->SetVar(VAR_HEART_SWORD, value - stxc->consume);
+    SYSMSG_SENDV(4918, _owner, stxc->consume);
+    sendXinMoInfo(type);
+    _owner->sendMsgCode(0, 4005);
+   // GameAction()->doStrong(_owner, SthXinMo, 0, 0); 
+   // _owner->GuangGunCompleteTask(0,30);
+    return true;
+}
+bool Fighter::quickUpGrade(UInt8 type)
+{
+    if(isPet() || !_owner)
+        return false;
+
+    if(m_xinmolev >= 30)
+        return false;
+
+    GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(m_xinmolev+1);
+    if(!stxc || getLevel() < stxc->limitLev)
+        return false;
+
+    UInt32 consumeValue = 0;
+    UInt32 curValue = m_xinmoval;
+    UInt32 value = _owner->GetVar(VAR_HEART_SWORD);
+
+    for( ; m_xinmoval < stxc->maxVal; )
+    {
+        consumeValue += stxc->consume;
+
+        if(value < consumeValue)
+        {
+           consumeValue = consumeValue - stxc->consume;
+           break;
+        }
+        
+        m_xinmo.curVal += uRand(19) + 1;
+    }
+
+    if(m_xinmoval >= stxc->maxVal)
+    {
+        ++m_xinmolev;
+        setDirty();
+        _owner->sendMsgCode(0, 4005);
+
+        if(m_xinmo.lvl >= 20 && m_xinmo.xctMaxVal == 0)
+            m_xinmo.xctMaxVal = 100;
+    }
+    
+    if(m_xinmo.curVal > curValue)
+    {
+        updateDBxinmo();
+        _owner->SetVar(VAR_XINGCHENZHEN_VALUE, value - consumeValue);
+
+		SYSMSG_SENDV(4918, _owner, consumeValue);
+    }
+   
+    if(stxc->consume <= _owner->GetVar(VAR_XINGCHENZHEN_VALUE))
+    {
+        type = type - 1;
+    }
+
+    sendXinMoInfo(type);
+    GameAction()->doStrong(_owner, SthXinMo, 0, 0); 
+    _owner->GuangGunCompleteTask(0,30);
+    return true;
 }
 
 /*

@@ -4568,6 +4568,7 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
             {
                 ConsumeInfo ci(ClanSptr,0,0);
                 pl->useGold(10, &ci);
+                addMemberProffer(pl,100);
                 addMemberActivePoint_nolock(pl, 5, e_clan_actpt_none);
                 addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_gold, 10, now);
                 if(m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)

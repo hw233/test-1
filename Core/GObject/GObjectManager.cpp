@@ -7086,5 +7086,41 @@ namespace GObject
 		return true;
     }
 
+    bool GObjectManager::loadFighterXinMo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Fighter xinmo:");
+		DBXinmo dbxc;
+        Player* pl = NULL;
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal` FROM `fighter_xinmo`", dbxc) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbxc.playerId != last_id)
+			{
+				last_id = dbxc.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(dbxc.fighterId);
+			if(fgt == NULL)
+            {
+                continue;
+            }
+
+            fgt->setXinMoLev(dbxc.level);
+            fgt->setXinMoVal(dbxc.curVal);
+
+		}
+		lc.finalize();
+
+        return true;
+    }
 }
 

@@ -1034,9 +1034,17 @@ public:
     //镇封星辰图
 private:
     Xingchenzhen m_xingchen;
+    UInt32 m_xinmoval ;
+    UInt8 m_xinmolev ;
 public:
     inline Xingchenzhen& getXingchen() { return m_xingchen; }
     inline UInt8 getXingchenLvl()  {return m_xingchen.lvl;}
+
+    inline UInt32 getXinMoVal() { return m_xinmoval; }
+    void setXinMoVal(UInt32 val) { m_xinmoval = val;}
+    inline UInt32 getXinMoLev() { return m_xinmolev; }
+    void setXinMoLev(UInt8 val) {m_xinmolev = val ;}
+
     void setXingchenFromDB(DBXingchen&);
     bool upgradeXingchen(UInt8 type);
     void updateDBxingchen();
@@ -1057,6 +1065,9 @@ public:
     void pushPetInfo2Leaderboard();
     void petSSAdd(UInt16 id);
     void petSSErase(UInt16 id);
+
+    void updateDBxinmo();
+    bool upgradeXinMo(UInt8 type);
 };
 
 class GlobalFighters

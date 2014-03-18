@@ -257,6 +257,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140307_1.sql   #clan表中添加duobaoAward字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140307_2.sql   #夺宝日志
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/changevar174.sql        #bug(达到充值额度的次)
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AddFighterXinMo_0317.sql        #添加散仙心魔值
 }
 
 #sh player_jiguan.sh
