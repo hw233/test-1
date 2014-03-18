@@ -3353,6 +3353,7 @@ function ItemNormal_00009435(iid ,num,bind,param)
     return used
 end
 function ItemNormal_00009444(iid, num, bind, param)
+    print("X")
     local Award ={
     [9444] = {{15,1},{400,1},{133,1}},
     [9445] = {{15,1},{134,1},{56,1},{9088,1}},
@@ -3385,6 +3386,30 @@ function ItemNormal_00009444(iid, num, bind, param)
         used = used + 1
     end
     return used;
+end
+function ItemNormal_00009475(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    local items = { 1126 , 1326 ,1325 }
+    local nums = { 1, 4, 2}
+    local chance = { 1250,5000,10000 }
+    if package:GetRestPackageSize() < num then
+        player:sendMsgCode(2, 1011, 0)
+        return 0; 
+    end
+    package:DelItemSendMsg(iid, player)
+    for n = 1, num do
+        local rand = math.random(1,10000)
+        local g = 0
+        for i = 1, #chance do
+            if rand <=chance[i] then
+                g = i
+                break
+            end
+        end
+        package:Add(items[g], nums[g], true, false, 2)
+    end
+    return num;
 end
 
 function ItemNormal_00009067(iid, num, bind, param)
@@ -12504,6 +12529,9 @@ local ItemNormal_Table = {
     [9444] = ItemNormal_00009444,
     [9445] = ItemNormal_00009444,
     [9446] = ItemNormal_00009444,
+
+    [9475] = ItemNormal_00009475,
+
     [9492] = ItemNormal_00009492,
     [9495] = ItemNormal_00009495,
 

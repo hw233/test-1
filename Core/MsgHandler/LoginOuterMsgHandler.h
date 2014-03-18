@@ -798,6 +798,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->continuousLoginSummerFlow();
             pl->SetQQBoardLogin();
             pl->setPresentLogin();
+            pl->SetVar(GObject::VAR_LEFTADDR_POWER,10);
             UInt64 userId = atoll(nu._invited.c_str());
             if(isNew_qq && userId)     //设置邀请好友成功
             {
@@ -3363,6 +3364,7 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
             {
                 pl->SetVar(GObject::VAR_SUMMER_MEET_RECHARGE, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_RECHARGE_AWARD, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_STRENTH_AWARD, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN_AWARD, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_STRENTH_AWARD, 0);

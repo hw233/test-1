@@ -4160,6 +4160,31 @@ namespace GObject
         }
         lc.finalize();
 
+        // 读取帮派建筑
+        lc.prepare("Loading clan buildings:");
+        DBClanBuildings clanBuildings;
+		if(execu->Prepare("SELECT `clanId`, `fairylandEnergy`, "
+                    "`phyAtkLevel`, `magAtkLevel`, `actionLevel`, `hpLevel`,`oracleLevel` "
+                    " `updateTime` FROM `clan_buildings`", clanBuildings) != DB::DB_OK)
+			return false;
+        clan = NULL;
+        lc.reset(1000);
+        lastId = 0xFFFFFFFF;
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if (clanBuildings.clanId != lastId)
+            {
+                lastId = clanBuildings.clanId;
+                clan = globalClans[clanBuildings.clanId];
+            }
+            if (clan == NULL) continue;
+            clan->loadBuildingsFromDB(clanBuildings.fairylandEnergy, 
+                    clanBuildings.phyAtkLevel, clanBuildings.magAtkLevel, clanBuildings.actionLevel, clanBuildings.hpLevel,clanBuildings.oracleLevel,
+                    clanBuildings.updateTime);
+        }
+        lc.finalize();
+
 		return true;
 	}
 

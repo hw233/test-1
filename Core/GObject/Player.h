@@ -1298,6 +1298,7 @@ namespace GObject
         bool _hiattrFlag;
         bool _clanRankBuffFlag;
         bool _cbHPflag;
+        bool _leftAddrEnter ;
         //GData::AttrExtra _hiaf;
         //bool _hiafFlag;
     public:
@@ -1305,6 +1306,8 @@ namespace GObject
         inline bool hasHiAttrFlag() { return _hiattrFlag; }
         inline void setClanRankBuffFlag(bool v) { _clanRankBuffFlag = v; }
         inline bool hasClanRankBuffFlag() { return _clanRankBuffFlag; }
+        inline void setLeftAddrEnter(bool v) { _leftAddrEnter = v; }
+        inline bool getLeftAddrEnter() { return _leftAddrEnter; }
         void addHIAttr(const GData::AttrExtra&);
         void clearHIAttr();
         inline const GData::AttrExtra* getHIAttr() const { return &_hiattr; }
@@ -2603,6 +2606,11 @@ namespace GObject
         void  AddStatueExp(UInt32 exp);
         void  SubStatueExp(UInt32 exp);
 
+        float getClanBuildingHPEffect();
+        float getClanBuildingPhyAtkEffect();
+        float getClanBuildingMagAtkEffect();
+        float getClanBuildingActionEffect();
+
         // 所有将互斥法宝
         bool checkTrumpMutually(UInt32 trumpid);
         //先天法宝遵循互斥规则
@@ -2661,6 +2669,7 @@ namespace GObject
         void sendRechargeNextRetInfo(UInt32 now);
         bool inArenaCommitCD();
         bool inArenaTeamCommitCD();
+        bool inLeftAddrCommitCD();
         UInt16 getServerWarChallengeCD();
         bool inServerWarChallengeCD();
         bool inServerWarCommitCD();
@@ -2669,6 +2678,7 @@ namespace GObject
     private:
         std::vector<RNR> rechargs;
         UInt32 m_arenaCommitCD;
+        UInt32 m_LeftAddrCommitCD;
         UInt32 m_arenaTeamCommitCD;
         UInt32 m_serverWarCommitCD;
         UInt32 m_serverWarChallengeCD;
@@ -2985,6 +2995,7 @@ namespace GObject
         void AddRealSpirit(UInt32 real = 0);
         void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
         bool giveFlower(UInt8 type , UInt32 num = 0);
+        bool giveLeftPowerHold(UInt32 num = 0);
         void joinAllServerRecharge(UInt32);
         void handleJiqirenAct_shiyamen();
         void handleJiqirenAct_clan();

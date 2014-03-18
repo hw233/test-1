@@ -2022,6 +2022,16 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.hitrlvl += _owner->getClanStatueHitrLvlEffect();
     }
 
+    if (_owner)
+    {
+        // 帮派建筑对额外属性的加成
+        _attrExtraEquip.hp += _owner->getClanBuildingHPEffect();
+        _attrExtraEquip.attack += _owner->getClanBuildingPhyAtkEffect();
+        _attrExtraEquip.magatk += _owner->getClanBuildingMagAtkEffect();
+        _attrExtraEquip.action += _owner->getClanBuildingActionEffect();
+        
+    }
+
     if(m_2ndSoul)
     {
         m_2ndSoul->addAttr(_attrExtraEquip);

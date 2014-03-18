@@ -24,6 +24,7 @@
 #include "GData/Title.h"
 #include "Clan.h"
 #include "ClanCopy.h"
+#include "ClanBuilding.h"
 #include "Mail.h"
 #include "Boss.h"
 #include "Athletics.h"
@@ -830,6 +831,7 @@ namespace GObject
         memset(_alreadyload, 0, sizeof(_alreadyload));
         m_EnterPTCStatus = false;
         m_InPTCStatus = false;
+        _leftAddrEnter = 0 ;
 	}
 
 
@@ -868,7 +870,6 @@ namespace GObject
 		}
 
         ClanRankBattleMgr::Instance().PlayerEnter(this);
-
 		setBlockBossByLevel();
 		return true;
 	}
@@ -14709,6 +14710,45 @@ namespace GObject
         _clan->subStatueExp(exp);
     }
 
+    float Player::getClanBuildingHPEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingHP));
+        return 0;
+    }
+
+    float Player::getClanBuildingPhyAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingPhyAtk));
+        return 0;
+    }
+
+    float Player::getClanBuildingMagAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingMagAtk));
+        return 0;
+    }
+
+    float Player::getClanBuildingActionEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingAction));
+        return 0;
+    }
 
     void Player::onBlueactiveday()
     {
@@ -16940,6 +16980,16 @@ namespace GObject
             return true;
 
         m_arenaCommitCD = now + 60;
+        return false;
+    }
+    bool Player::inLeftAddrCommitCD()
+    {
+        UInt32 now = TimeUtil::Now();
+
+        if(now < m_LeftAddrCommitCD)
+            return true;
+
+        m_LeftAddrCommitCD = now + 60;
         return false;
     }
 
@@ -28991,6 +29041,25 @@ void Player::sendSummerMeetScoreInfo()
     st <<getSummerMeetTotalScore();
     st << Stream::eos;
     send(st);
+}
+bool Player::giveLeftPowerHold(UInt32 num)
+{
+    UInt32 iid = 9496;
+    UInt8 ret = 0;
+    {
+        UInt16 count = GetPackage()->GetItemAnyNum(iid) ;
+        ItemBase * item = GetPackage()->FindItem(iid, true);
+        if (!item)
+            item =GetPackage()->FindItem(iid, false);
+        if(item ==NULL)
+            return false;
+        if(num > count)
+            return false;
+        GetPackage()->DelItemAny(iid, num );
+        GetPackage()->AddItemHistoriesLog(iid, num );
+        ret = 1;
+    }
+    return true;
 }
 
 void Player::doGuankaAct(UInt8 type)

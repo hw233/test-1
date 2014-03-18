@@ -14,7 +14,7 @@ struct event;
 namespace Network
 {
 	#define WORKERS 2
-	#define TCP_CONN_IDX_MAX 2
+	#define TCP_CONN_IDX_MAX 3    //LIBO
 
 	class TcpServer:
 		public Runnable

@@ -10,6 +10,7 @@
 #include "ClanSkillTable.h"
 #include "ClanCopyTable.h"
 #include "ClanStatueTable.h"
+#include "ClanBuildingTable.h"
 #include "GObject/Item.h"
 #include "DB/DBConnectionMgr.h"
 #include "GDataDBExecHelper.h"
@@ -300,6 +301,12 @@ namespace GData
         if (!LoadClanStatue())
         {
             fprintf (stderr, "Load Clan Statue Error !\n");
+            std::abort();
+        }
+
+        if (!LoadClanBuilding())
+        {
+            fprintf (stderr, "Load Clan Building Error !\n");
             std::abort();
         }
         
@@ -1730,6 +1737,62 @@ namespace GData
 
 		}
         clanStatueTable[0] = (ClanStatueTableData());
+        return true;
+    }
+
+    bool GDataManager::LoadClanBuilding()
+    {
+        // 读取帮派建筑数据
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBClanBuilding cb;
+		if (execu->Prepare("SELECT `level`, `needExp`, "
+                    "`phyAtkValue`, `magAtkValue`, `actionValue`, `hpValue` , `oracleValue`"
+                    "FROM `clan_building_template` ORDER BY `level` ASC", cb) != DB::DB_OK)
+			return false;
+        clanBuildingList.clear();
+        clanBuildingList.resize(GData::buildingTypeMax);
+		while (execu->Next() == DB::DB_OK)
+		{
+            {
+                // 物攻加成
+                ClanBuildingTable& clanBuildingTable = clanBuildingList[GData::buildingTypePhyAtk];
+                if (cb.level >= clanBuildingTable.size())
+                    clanBuildingTable.resize(cb.level + 1);
+                clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypePhyAtk, cb.level, cb.needExp, cb.phyAtkValue);
+            }
+
+            {
+                // 法攻加成
+                ClanBuildingTable& clanBuildingTable = clanBuildingList[GData::buildingTypeMagAtk];
+                if (cb.level >= clanBuildingTable.size())
+                    clanBuildingTable.resize(cb.level + 1);
+                clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypeMagAtk, cb.level, cb.needExp, cb.magAtkValue);
+            }
+
+            {
+                // 身法加成
+                ClanBuildingTable& clanBuildingTable = clanBuildingList[GData::buildingTypeAction];
+                if (cb.level >= clanBuildingTable.size())
+                    clanBuildingTable.resize(cb.level + 1);
+                clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypeAction, cb.level, cb.needExp, cb.actionValue);
+            }
+
+            {
+                // 生命加成
+                ClanBuildingTable& clanBuildingTable = clanBuildingList[GData::buildingTypeHP];
+                if (cb.level >= clanBuildingTable.size())
+                    clanBuildingTable.resize(cb.level + 1);
+                clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypeHP, cb.level, cb.needExp, cb.hpValue);
+            }
+            {
+                // 神域塔
+                ClanBuildingTable& clanBuildingTable = clanBuildingList[GData::buildingTypeOracle];
+                if (cb.level >= clanBuildingTable.size())
+                    clanBuildingTable.resize(cb.level + 1);
+                clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypeOracle, cb.level, cb.needExp, cb.oracleValue);
+            }
+		}
         return true;
     }
 

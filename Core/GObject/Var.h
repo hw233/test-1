@@ -665,6 +665,8 @@ namespace GObject
         VAR_SUMMERMEET_SCORE5 = 691 ,    //消费数
         VAR_COUPLE_NAME= 692 ,    //夫妻称号佩戴
         VAR_NEWYEAR_PRATICE_COUNT = 693 ,    //记录一天只有一次
+        VAR_LEFTADDR_POWER = 694 ,   //仙界征战体力
+        VAR_LEFTADDR_CREATE = 695 ,   //是否参与仙界遗迹
 
         //701-710 for suntao
         VAR_MicroCloud_AWARD = 701,     //是否领取微云合作奖励
@@ -1298,6 +1300,8 @@ namespace GObject
             REGISTER_VAR(VAR_JIQIREN_FRONTMAP, CYCLE_NONE);
             REGISTER_VAR(VAR_JIQIREN_DUNGEON, CYCLE_NONE);
             REGISTER_VAR(VAR_JIQIREN_SYBS, CYCLE_NONE);
+            REGISTER_VAR(VAR_LEFTADDR_POWER, CYCLE_NONE);
+            REGISTER_VAR(VAR_LEFTADDR_CREATE, CYCLE_NONE);
 
             REGISTER_VAR(VAR_QISHI_FRIEND_SEND_COUNT, CYCLE_DAY);
             REGISTER_VAR(VAR_QISHI_FRIEND_USE_COUNT, CYCLE_DAY);
