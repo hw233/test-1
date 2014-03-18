@@ -266,7 +266,7 @@ function update_object()
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140123_1.sql     # 创建帮派建筑表
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/changevar174.sql        #bug(达到充值额度的次)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140318_1.sql   #clan表中添加tyssAward字段
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140318_2.sql   #clan表中添加tyssAward字段
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140318_2.sql   #清除天元神兽var数据
 }
 
 #sh player_jiguan.sh
