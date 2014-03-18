@@ -153,6 +153,10 @@ namespace GObject
 #define SERVERWAR_BUFF_XIUWEI4       0x66  // 15%
 #define SERVERWAR_BUFF_XIUWEI5       0x67  // 20%
 
+
+#define PLAYER_BUFF_CLAN1           0x68 // （活动）第1帮派BUF
+#define PLAYER_BUFF_CLAN2           0x69 // （活动）第2帮派BUF
+#define PLAYER_BUFF_CLAN3           0x6A // （活动）第3帮派BUF
 #define PLAYER_BUFF_ATHL11          0x71 // 魔
 #define PLAYER_BUFF_ATHL22          0x72 // 神
 #define PLAYER_BUFF_ATHL33          0x73 // 虚
@@ -2551,6 +2555,11 @@ namespace GObject
         void getQZoneRechargeAward(UInt8 val);
         void sendQZoneRechargeAwardInfo();
         void AddQZoneRecharge(UInt32 r =0);
+        void AddLingGuo(UInt32 r =0);
+        void ReturnTYSSInfo(UInt8 flag );
+        void OpTYSS(UInt8 type , UInt8 flag = 0,UInt64 playerid = 0);
+        void beEated(UInt32 num);
+        void EatLingGuo(UInt32 num);
         void GetFindOldManAward(UInt32 type = 0 );
         void getInterestingAward(UInt8 type);
         void sendInterestingBag(Player* pl);

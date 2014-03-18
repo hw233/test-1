@@ -84,6 +84,7 @@ MSG_REG_2(ArenaMsgHdr, 0x114, OnTeamArenaLeaderBoard);
 MSG_REG_2(ArenaMsgHdr, 0x115, OnTeamArenaInspireLevel);
 MSG_REG_2(ArenaMsgHdr, 0x116, OnTeamArenaLastRank);
 MSG_REG_2(ArenaMsgHdr, 0x117, OnUpdateArenaSession);
+MSG_REG_2(ArenaMsgHdr, 0x118, OnServerRechargeRank);
 
 MSG_REG_2(ServerWarMsgHdr, 0x121, OnServerWarConnected);
 MSG_REG_2(ServerWarMsgHdr, 0x122, OnServerWarPlayerEntered);
@@ -110,6 +111,7 @@ MSG_REG_2(ServerLeftMsgHdr, 0x141, OnServerLeftNotice);   //帮派成员获得
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
+MSG_REG_2(GameMsgHdr, 0x166, OnSetTYSSScore);
 
 MSG_REG_2(GameMsgHdr, 0x171, OnClanTakeRewardResultReq);
 MSG_REG_2(GameMsgHdr, 0x172, OnTeamArenaAddMember);
@@ -170,6 +172,10 @@ MSG_REG_2(GameMsgHdr, 0x1B6, OnSetGuankaActRank);
 MSG_REG_2(GameMsgHdr, 0x1B7, OnClearGuankaActRank);
 MSG_REG_2(GameMsgHdr, 0x1B8, OnSendGuankaActRank10);
 MSG_REG_2(GameMsgHdr, 0x1B9, OnSendGuankaActMyRank);
+MSG_REG_2(GameMsgHdr, 0x1BC, SetTYSSClanScoreRank);
+MSG_REG_2(GameMsgHdr, 0x1BD, DelTYSSClanScoreRank);
+MSG_REG_2(GameMsgHdr, 0x1BE, OnReturnTYSSInfo);
+MSG_REG_2(GameMsgHdr, 0x1BF, SetTYSSPlayerScoreRank);
 MSG_REG_2(GameMsgHdr, 0x1BA, OnUseAccItemInWorld);
 MSG_REG_2(GameMsgHdr, 0x1BB, OnUseVitalityItemInWorld);
 
@@ -209,6 +215,7 @@ MSG_REG_2(GameMsgHdr, 0x1DD, OnSetCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DE, OnDelCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DF, OnSendCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1AF, OnSendDuoBaoBegin);
+MSG_REG_2(GameMsgHdr, 0x201, OnClearTYSS);
 
 //FB占位(0x1E0~0x1E9),简体千万别使用
 //0x1E0

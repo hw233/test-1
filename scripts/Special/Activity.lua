@@ -275,6 +275,10 @@ function onDungeonWin(player, id, count, free)
         local package = player:GetPackage();
         package:Add(9416, 1, true)
     end
+    if getTYSSTime() == true then
+        local package = player:GetPackage();
+        package:Add(9492, 1, true)
+    end
     local lootlvl = 1;
     if  free then
         lootlvl = 0
@@ -1062,6 +1066,11 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Item9343Act(player, lootlvl);
     player:AddZRYJCount(20); -- 逐日印记
     _collectCardAct(player, lootlvl);
+    if getTYSSTime() == true then
+        local package = player:GetPackage();
+        package:Add(9492, 1, true)
+    end
+
 end
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
@@ -1093,6 +1102,10 @@ function onFrontMapWin(player, id, spot, lootlvl)
     if getKillMonsterAct() then
         local package = player:GetPackage();
         package:Add(9416, 1, true)
+    end
+    if getTYSSTime() == true then
+        local package = player:GetPackage();
+        package:Add(9492, 1, true)
     end
     sendWinReward(player, lootlvl, 2);
     TgcEvent(player, 2)
@@ -8885,7 +8898,7 @@ function SurnameLegendLoot(player,lootlvl)
     --package:AddItem(9401, itemNum[lootlvl], true,0,10);
     --package:AddItem(9422, itemNum[lootlvl], true,0,10);
     --package:AddItem(9437, itemNum[lootlvl], true,0,10);
-    package:AddItem(9449, itemNum[lootlvl], true,0,10);
+    package:AddItem(9496, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -9758,7 +9771,7 @@ function GetLuckyBagAward(player)
     end
 
     local items = {
-       { 9371,5}, {9424,5}, {503,5}, {515,1}, {134,1}, {1325,1}
+       { 513,6}, {505,6}, {511,6}, {512,6}, {510,6}
     }
     for i = 1 , 5  do
         local num = player:GetVar(452+i);

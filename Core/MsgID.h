@@ -915,6 +915,7 @@ namespace ARENAREQ
     const UInt8 REG                 = 0x01;
     const UInt8 ENTER               = 0x02;
     const UInt8 COMMIT_LINEUP       = 0x03;
+    const UInt8 RECHARGE_ACTIVE     = 0x06;
     const UInt8 BET                 = 0x07;
     const UInt8 BATTLE_REPORT       = 0x08;
     const UInt8 TEAMARENA_ENTER     = 0x10;

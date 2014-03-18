@@ -532,6 +532,7 @@ namespace GObject
                 _rightDoor = door ;  
                 _man->AddVar(VAR_MARRYBOARD_LIVELY,100);
                 _woman->AddVar(VAR_MARRYBOARD_LIVELY,100);
+                return true ;
             }
         }
         else
@@ -562,9 +563,10 @@ namespace GObject
                 char str[16] = {0};
                 sprintf(str, "F_140102_16");
                 pl->udpLog("jiehunjinxing", str, "", "", "", "", "act");
+                return true ;
             }
         }
-        return true ;
+        return false ;
     }
     UInt32 MarryBoard::wrapTheKey(UInt32 plKey)
     {

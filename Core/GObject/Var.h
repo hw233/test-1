@@ -683,11 +683,18 @@ namespace GObject
         //711-720 for JLT
         VAR_QISHI_FRIEND_SEND_COUNT = 711,  // 七石斗法玩家赠送次数
         VAR_QISHI_FRIEND_USE_COUNT = 712,   // 七石斗法玩家赠送已使用次数
-
-        //721-730 lijr
         VAR_CLAN_DUOBAO_SCORE = 713,        // 夺宝奇兵点数
         VAR_CLAN_DUOBAO_SUCCESS_NUM = 714,  // 夺宝奇兵成功次数
         VAR_CLAN_DUOBAO_STATUS = 715,       // 夺宝奇兵状态
+        //721 - 730 for dtc 
+        VAR_TYSS_RECHARGE = 721,//天元神兽期间玩家兑换灵果剩余充值数(充值数满足条件自动兑换灵果)
+        VAR_TYSS_CONTRIBUTE_PLAYER = 722,//天元神兽期间玩家个人总贡献 
+        VAR_TYSS_CONTRIBUTE_PLAYER_DAY = 723,//天元神兽期间玩家个人当日贡献 
+        VAR_TYSS_CONTRIBUTE_CLAN = 724,//天元神兽期间玩家当前帮派贡献 
+        VAR_TYSS_DISCOUNT_CONSUME1 = 725,//天元神兽期间限购栏1(购买次数)(8bit 一个礼包位置)
+        VAR_TYSS_DISCOUNT_CONSUME2 = 726,//天元神兽期间限购栏2(购买次数)
+        VAR_TYSS_DISCOUNT_CONSUME3 = 727,//天元神兽期间限购栏3(购买次数)
+        VAR_TYSS_CONTRIBUTE_CLAN_SUM = 728,//天元神兽期间玩家帮派总贡献(帮主身上) 
 
         VAR_MAX,
     };
@@ -1306,6 +1313,15 @@ namespace GObject
             REGISTER_VAR(VAR_GUANKA_ACTION_NPC, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_TIME, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_CLAN, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME1, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME2, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME3, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_CLAN_SUM, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

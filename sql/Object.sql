@@ -2396,7 +2396,8 @@ CREATE TABLE IF NOT EXISTS `married_couple` (
     INDEX (`woman_playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `clan_buildings` (
+DROP TABLE IF EXISTS `clan_buildings`;
+CREATE TABLE IF NOT EXISTS `clan_buildings` (
       `clanId` bigint(20) NOT NULL COMMENT '帮派ID',
       `fairylandEnergy` bigint(20) DEFAULT '0' COMMENT '仙界元气',
       `phyAtkLevel` smallint(6) DEFAULT '0' COMMENT '物攻建筑等级',

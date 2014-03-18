@@ -317,6 +317,7 @@ private:
     typedef std::multiset<ScoreSort, lt_sort> ScoreSortType;
 public:
     ScoreSortType DuoBaoScoreSort;     //夺宝排名
+    ScoreSortType TYSSScoreSort;     //天元神兽排名
 
 public:
 	Clan( UInt32 id, const std::string& name, UInt32 ft = 0, UInt8 lvl = 1 );
@@ -550,6 +551,16 @@ public:
 
     void addClanGradeInAirBook(UInt32 grade);
     void updataClanGradeInAirBook(Player * pl= NULL);
+    
+    //天元神兽
+    void SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str);
+    void LoadTYSSScore(Player* pl);
+    void SetTYSSScore(Player * pl);
+    void SendTYSSScore(Player* pl);
+    void DelTYSSScore(Player* pl);
+    void ClearTYSSScore();
+
+    
     UInt32 getGradeInAirBook(){return  _gradeInAirbook;}
     void SendClanMemberGrade(Player* player);
     UInt8 skillLevelUp(Player* pl, UInt8 skillId);
@@ -629,6 +640,8 @@ private:
     void ClearDuoBaoLog();
     void BroadDuoBaoBegin(Player * player);
     void DuoBaoBroadcast(Stream& st);
+public:
+    void sendMemberBuf(UInt8 pos);
 
 public:
 
@@ -804,6 +817,7 @@ private:
 	UInt64 _watchman;       // 帮派修炼地护法
 
     UInt32 _gradeInAirbook; //天书奇缘帮派积分
+    UInt32 _gradeInTYSS; //天元神兽帮派积分
     std::string m_qqOpenid;
 
 	Mutex _mutex;

@@ -20,8 +20,9 @@ public:
         UInt32 chips[MOUNTCHIP_MAX];
         UInt32 propId;
         bool show;  //是否在藏剑崖显示
+        bool useMore;  //是否使用多个唤剑令
 
-        RideData() : id(0), itemId(0), propId(0), show(false) { memset(chips, 0, sizeof(chips)); }
+        RideData() : id(0), itemId(0), propId(0), show(false), useMore(false) { memset(chips, 0, sizeof(chips)); }
     };
     struct RideUpgradeData
     {
@@ -55,6 +56,7 @@ public:
     void setRideUpgradeTable(DBRideUpgradeCfg&);
     void setCangjianTable(DBCangjianCfg&);
     bool canShowCangjian(UInt8);
+    bool isUseTwo(UInt8);
     UInt32 getMountItemId(UInt8);
     UInt8 getModifyMountId(UInt32);
     float getMountRate(UInt16);

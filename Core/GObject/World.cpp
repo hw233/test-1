@@ -213,6 +213,8 @@ RCSortType World::PlayerGradeSort;
 RCSortType World::guangGunSort;
 RCSortType World::happyFireSort;
 ClanGradeSort World::clanGradeSort;
+RCSortType World::tyss_PlayerSort;
+ClanGradeSort World::tyss_ClanSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
 bool World::_killMonsteract = 0;
@@ -340,6 +342,7 @@ bool bGoldSnakeEnd = false;
 bool bItem9344End = false;
 bool bItem9343End = false;
 bool bQiShiBanEnd = false;
+bool bTYSSEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -543,6 +546,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
         ))
     {
 #if 0
@@ -1153,26 +1157,36 @@ void World::SendSurnameLegendAward()
     if(bSurnameLegendEnd)
     {
         World::initRCRank();
+        static MailPackage::MailItem s_item[][3] = {
+            {{5069,1},{5139,1},{5109,1}},
+            {{5069,1},{5139,1},{5108,1}},
+            {{5069,1},{5138,1},{5108,1}},
+            {{5068,1},{5138,1},{5108,1}},
+            {{5068,1},{5138,1},{5107,1}},
+            {{5068,1},{5137,1},{5107,1}},
+            {{5067,1},{5137,1},{5107,1}},
+        };
         int pos = 0;
         for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
         {
-            ++pos;
-
-            if(pos > 1) break;
-
             Player* player = i->player;
             if (!player)
                 continue;
-            MailPackage::MailItem items[] =
+            ++ pos;
+            SYSMSGV(title, 4173);
+            if(pos > 7)
+                break;
+            UInt32 score = i->total;
+            if(pos > 0 && pos <= 7)     //奖励前10名
             {
-                //{9907, 1}
-                //{9911, 1}
-                //{9913, 1}
-                //{9921, 1}
-                //{9926, 1}
-                {9931, 1}
-            };
-            player->sendMailItem(4173, 4174, items, sizeof(items)/sizeof(items[0]), false);
+                SYSMSGV(content, 4174, pos);
+                MailItemsInfo itemsInfo(s_item[pos-1], Activity, 3);
+                Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(mail)
+                {
+                    mailPackageManager.push(mail->id, s_item[pos-1], 3, true);
+                }
+            }
         }
         World::LuckyBagSort.clear();
     }
@@ -1276,6 +1290,7 @@ void World::World_Midnight_Check( World * world )
     bool bItem9344 = getItem9344Act();
     bool bItem9343 = getItem9343Act();
     bool bQiShiBanTime = getQiShiBanTime();
+    bool bTYSSTime = getTYSSTime();
 
 	world->_worldScript->onActivityCheck(curtime+300);
 
@@ -1309,6 +1324,8 @@ void World::World_Midnight_Check( World * world )
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
     bGGTimeEnd = bGGtime && !getGGTime(300);
+    //天元神兽活动结束
+    bTYSSEnd = bTYSSTime && !getTYSSTime(300);
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
@@ -1502,6 +1519,11 @@ void World::World_Midnight_Check( World * world )
         world->SendHappyFireAward();
     if(bGuankaEnd)
         world->SendGuankaActAward();
+    if(bTYSSEnd)
+    {
+        world->GObject::World::SendTYSSPlayerAward();
+        world->GObject::World::SendTYSSClanAward();
+    }
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
   //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
@@ -3193,10 +3215,25 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::guankaScoreSort.insert(s);
         }
     }
+    if(World::getTYSSTime())
+    {
+        UInt32 used= p->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER);
+        if(used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::tyss_PlayerSort.insert(s);
+        }
+
+    }
+
     return true;
 }
 inline bool clan_enum_grade(GObject::Clan *clan,int)
 {
+    if(!clan)
+        return true;
     if (World::get11Time())
     {
         clan->updataClanGradeInAirBook();
@@ -3208,6 +3245,22 @@ inline bool clan_enum_grade(GObject::Clan *clan,int)
             s.total = grade;
             World::clanGradeSort.insert(s);
         }
+    }
+    
+    if(World::getTYSSTime())
+    {
+        GObject::Player* pl = clan->getLeader();
+        if(!pl)
+            return true;
+        UInt32 grade = pl->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+        if(grade)
+        {
+            ClanSort s;
+            s.clan = clan;
+            s.total = grade;
+            World::tyss_ClanSort.insert(s);
+        }
+
     }
 
     return true;
@@ -4361,7 +4414,7 @@ void World::SendGuankaActAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{1325,20},{9418,30},{9075,20},{515,12},{0,0}},
+        {{1325,20},{9418,30},{9075,20},{515,12},{9935,1}},
         {{1325,10},{9418,15},{9075,10},{515,10},{0,0}},
         {{515,8},{9438,10},{9075,5},{134,8},{0,0}},
         {{515,6},{9438,10},{134,6},{0,0},{0,0}},
@@ -4395,6 +4448,74 @@ void World::SendGuankaActAward()
         }
     }
 }
+
+void World::SendTYSSClanAward()
+{
+    World::initRCRank();
+        
+    ClanGradeSort::iterator i = World::tyss_ClanSort.begin();
+    ClanGradeSort::iterator e = World::tyss_ClanSort.end();
+    for (UInt32 pos = 0; i != e; ++i)
+    {
+        if(i->clan == NULL)
+            continue;
+        ++pos;
+        if(pos == 1 || pos == 2 || pos == 3)
+            i->clan->sendMemberBuf(pos);
+        if(i->total >= 3000)
+        {
+            i->clan->SendClanMemberAward(i->total,1,"幼年期神兽"); 
+            if(i->total >= 19000)
+            {
+                i->clan->SendClanMemberAward(i->total,2,"成长期神兽"); 
+                if(i->total >= 40000)
+                {
+                    i->clan->SendClanMemberAward(i->total,3,"青年期神兽"); 
+                    if(i->total >= 70000)
+                    {
+                        i->clan->SendClanMemberAward(i->total,4,"亚神兽期"); 
+                        if(i->total >= 100000)
+                            i->clan->SendClanMemberAward(i->total,5,"天元神兽"); 
+                    }
+                }
+            }
+        }
+    }
+
+    return;
+}
+
+void World::SendTYSSPlayerAward()
+{
+    World::initRCRank();
+    int pos = 1;
+    std::string str = "";
+    static MailPackage::MailItem s_item[][4] = {
+        {{134,50},{1325,50},{515,30},{9075,40}},
+        {{134,40},{1325,40},{515,25},{9075,30}},
+        {{134,30},{1325,30},{515,20},{9075,20}},
+        {{134,20},{1325,20},{515,15},{9075,10}},
+    };
+    SYSMSG(title, 946);
+    for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
+    {
+        //UInt32 score = i->total;
+        str = i->player->getName();
+        if(pos >= 1 && pos < 8)     //奖励前7名
+        {
+            int type = pos > 3 ? 4 : pos;
+            SYSMSGV(content, 951, pos);
+            MailItemsInfo itemsInfo(s_item[type-1], Activity, 4);
+            Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+                mailPackageManager.push(mail->id, s_item[type-1], 4, true);
+        }        
+        pos++;
+        
+    }
+    return;
+}
+
 
 }
 
