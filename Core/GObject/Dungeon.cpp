@@ -23,16 +23,22 @@ EventDungeonAuto::EventDungeonAuto( Player * player, UInt32 interval, Dungeon * 
 
 void EventDungeonAuto::Process( UInt32 )
 {
+	if(m_Player->getThreadId() != WORKER_THREAD_NEUTRAL)
+		return;
 	m_Dungeon->processAutoChallenge(m_Player, m_Won ? 1 : 2, &m_TotalExp);
 }
 
 void EventDungeonAuto::NotifyCancel() const
 {
+	if(m_Player->getThreadId() != WORKER_THREAD_NEUTRAL)
+		return;
 	m_Dungeon->cancelAutoChallengeNotify(m_Player, m_TotalExp);
 }
 
 void EventDungeonAuto::Complete() const
 {
+	if(m_Player->getThreadId() != WORKER_THREAD_NEUTRAL)
+		return;
 	m_Dungeon->completeAutoChallenge(m_Player, m_TotalExp, m_Won);
 }
 
