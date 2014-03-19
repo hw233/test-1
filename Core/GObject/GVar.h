@@ -146,6 +146,8 @@ namespace GObject
         GVAR_TYSS_BEGIN= 89,      // 天元神兽开启时间
         GVAR_TYSS_END= 90,      // 天元神兽结束时间
         
+        GVAR_REPAIRTYSSBUG = 91,//天元神兽bug修复
+
         GVAR_MAX,
     };
 
@@ -268,6 +270,8 @@ namespace GObject
             
             GREGISTER_VAR(GVAR_TYSS_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_TYSS_END, GCYCLE_NONE);
+            
+            GREGISTER_VAR(GVAR_REPAIRTYSSBUG, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

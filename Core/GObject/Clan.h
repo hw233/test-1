@@ -749,6 +749,8 @@ public:
     
     void SetTYSSSum(UInt32 num,bool toDB=false) 
     {
+        if(_tyssSum == num)
+            return;
         _tyssSum= num; 
         if (toDB)
             DB5().PushUpdateData("UPDATE `clan` SET `tyssSum` = %u WHERE `id` = %u", _tyssSum, _id);
@@ -756,6 +758,8 @@ public:
     UInt32 GetTYSSSum() {return _tyssSum;}
     void AddTYSSSum(UInt32 num)
     {
+        if(num == 0)
+            return;
         _tyssSum += num; 
         DB5().PushUpdateData("UPDATE `clan` SET `tyssSum` = %u WHERE `id` = %u", _tyssSum, _id);
     }

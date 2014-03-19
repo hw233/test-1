@@ -222,7 +222,6 @@ function update_object()
     #. clearshiyamen.sh
     #mysql -h$H -u$U -p$P -P$PT $DBO < clanscore.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clan_battlescore.sql     #重置帮战积分
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140103_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_setVar636.sql    #qq浏览器补签1月3 4 5 号
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140103_1.sql
@@ -267,6 +266,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/changevar174.sql        #bug(达到充值额度的次)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140318_1.sql   #clan表中添加tyssAward字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140318_2.sql   #清除天元神兽var数据
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
 }
 
 #sh player_jiguan.sh
