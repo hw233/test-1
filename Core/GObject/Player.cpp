@@ -27325,12 +27325,12 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 GetPackage()->AddItem(503, 2, true, false, FromTYSS);
                 GetPackage()->AddItem(15, 3, true, false, FromTYSS);
                 GetPackage()->AddItem(9371, 3, true, false, FromTYSS);
+                SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));//打上当日领取奖品的标记
             }
             else
             {
                 sendMsgCode(2, 1011);
             }
-            SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));//打上当日领取奖品的标记
         }
             break;
        default:
