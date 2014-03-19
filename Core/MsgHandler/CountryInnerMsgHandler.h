@@ -856,6 +856,13 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
         exp *= 1 + extraFactor;
     }
 
+    if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
+        exp += 1.0f * ecs->exp;
+    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
+        exp += 0.5f * ecs->exp;
+    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+        exp += 0.3f * ecs->exp;
+
 	player->AddExp(static_cast<UInt64>(exp), 0, extraExp);
 #if 0
 	ecs->ng->monsterKilled(player, ecs->count);
@@ -1559,6 +1566,20 @@ void OnAddItemBy( GameMsgHdr& hdr, const void* data )
 
     ItemAdd* ia = (ItemAdd*)(data);
     player->GetPackage()->AddItem(ia->item, ia->num, ia->bind, false, ia->fromWhere);
+}
+void OnAddBy( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct ItemAdd
+    {
+        UInt16 item;
+        UInt16 num;
+        bool bind;
+        UInt16 fromWhere;
+    };
+
+    ItemAdd* ia = (ItemAdd*)(data);
+    player->GetPackage()->Add(ia->item, ia->num, ia->bind, false, ia->fromWhere);
 }
 void OnPracticeAttack( GameMsgHdr& hdr, const void* data )
 {

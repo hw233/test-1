@@ -467,6 +467,24 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
     }player->OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 0);
 
     BroadDuoBaoBegin(player);
+
+    Player* leader = getLeader();
+    if(leader)
+    {
+        UInt32 buffData1 = leader->getBuffData(PLAYER_BUFF_CLAN1);
+        UInt32 buffData2 = leader->getBuffData(PLAYER_BUFF_CLAN2);
+        UInt32 buffData3 = leader->getBuffData(PLAYER_BUFF_CLAN3);
+        if(buffData1 > 0)
+            player->setBuffData(PLAYER_BUFF_CLAN1, buffData1);
+        else if(buffData2 > 0)
+            player->setBuffData(PLAYER_BUFF_CLAN2, buffData2);
+        else if(buffData3 > 0)
+            player->setBuffData(PLAYER_BUFF_CLAN3, buffData3);
+
+        if(buffData1 > 0 || buffData2 > 0 || buffData3 > 0)
+            player->rebuildBattleName();
+    }
+
 	return true;
 }
 
@@ -501,6 +519,23 @@ bool Clan::join(ClanMember * cm)
     }
 
     BroadDuoBaoBegin(player);
+
+    Player* leader = getLeader();
+    if(leader)
+    {
+        UInt32 buffData1 = leader->getBuffData(PLAYER_BUFF_CLAN1);
+        UInt32 buffData2 = leader->getBuffData(PLAYER_BUFF_CLAN2);
+        UInt32 buffData3 = leader->getBuffData(PLAYER_BUFF_CLAN3);
+        if(buffData1 > 0)
+            player->setBuffData(PLAYER_BUFF_CLAN1, buffData1);
+        else if(buffData2 > 0)
+            player->setBuffData(PLAYER_BUFF_CLAN2, buffData2);
+        else if(buffData3 > 0)
+            player->setBuffData(PLAYER_BUFF_CLAN3, buffData3);
+
+        if(buffData1 > 0 || buffData2 > 0 || buffData3 > 0)
+            player->rebuildBattleName();
+    }
 
     return true;
 }
@@ -618,6 +653,22 @@ bool Clan::kick(Player * player, UInt64 pid)
     GameMsgHdr hdr1(0x311, kicker->getThreadId(), kicker, sizeof(co));
     GLOBAL().PushMsg(hdr1, &co);
 
+    if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
+    {
+        player->setBuffData(PLAYER_BUFF_CLAN1, 0);
+        player->rebuildBattleName();
+    }
+    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
+    {
+        player->setBuffData(PLAYER_BUFF_CLAN2, 0);
+        player->rebuildBattleName();
+    }
+    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+    {
+        player->setBuffData(PLAYER_BUFF_CLAN3, 0);
+        player->rebuildBattleName();
+    }
+
 	return true;
 }
 
@@ -723,6 +774,22 @@ bool Clan::leave(Player * player)
         DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid` = %" I64_FMT "u", player->getId());
 		// updateRank(NULL, oldLeaderName);
 	}
+
+    if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
+    {
+        player->setBuffData(PLAYER_BUFF_CLAN1, 0);
+        player->rebuildBattleName();
+    }
+    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
+    {
+        player->setBuffData(PLAYER_BUFF_CLAN2, 0);
+        player->rebuildBattleName();
+    }
+    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+    {
+        player->setBuffData(PLAYER_BUFF_CLAN3, 0);
+        player->rebuildBattleName();
+    }
 
 	return true;
 }
@@ -5341,12 +5408,13 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str)
 {
     Mutex::ScopedLock lk(_mutex);
 	Members::iterator it = _members.begin();
-    
+   
+    flag -= 1;
     static MailPackage::MailItem s_item[][5] = {
-        {{503,3},{514,3},{9371,5},{15,5}},
-        {{512,3},{517,3},{500,3},{516,3}},
-        {{501,3},{547,3},{9418,3},{1325,3}},
-        {{134,3},{549,1},{9338,3},{513,3}},
+        {{503,3},{514,3},{9371,5},{15,5},{0,0}},
+        {{512,3},{517,3},{500,3},{516,3},{0,0}},
+        {{501,3},{547,3},{9418,3},{1325,3},{0,0}},
+        {{134,3},{549,1},{9338,3},{513,3},{0,0}},
         {{9076,3},{509,3},{549,1},{515,3},{9418,3}},
     };
 
@@ -5357,10 +5425,10 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str)
         if( player == NULL )
             continue ; 
         SYSMSGV(content, 949, str.c_str());
-        MailItemsInfo itemsInfo(s_item[flag], Activity, 4);
+        MailItemsInfo itemsInfo(s_item[flag], Activity, 5);
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
-            mailPackageManager.push(mail->id, s_item[flag], 4, true);
+            mailPackageManager.push(mail->id, s_item[flag], 5, true);
 	}
 
 
@@ -5451,6 +5519,33 @@ void Clan::DelTYSSScore(Player * pl)
             break;
         }
     }
+}
+
+void Clan::sendMemberBuf(UInt8 pos)
+{
+    if(pos == 0 || pos > 3)
+        return;
+	Mutex::ScopedLock lk(_mutex);
+    UInt32 endTime = TimeUtil::Now() + 86400 * 14;
+	ClanMember * mem = NULL;
+	Members::iterator offset;
+	for(offset = _members.begin(); offset != _members.end(); ++ offset)
+	{
+		mem = *offset;
+        if(!mem)
+            continue;
+        Player* pl = mem->player;
+        if(!pl)
+            continue;
+        if(pos == 1)
+            pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
+        else if(pos == 2)
+            pl->setBuffData(PLAYER_BUFF_CLAN2, endTime);
+        else
+            pl->setBuffData(PLAYER_BUFF_CLAN3, endTime);
+
+        pl->rebuildBattleName();
+	}
 }
 
 }

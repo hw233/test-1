@@ -310,6 +310,7 @@ GMHandler::GMHandler()
     Reg(3, "addpetattr", &GMHandler::OnAddPetAttr);
     Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
     Reg(2, "settyss", &GMHandler::OnSetTYSS);
+    Reg(3, "clanrank", &GMHandler::TestClanRank);
 
     _printMsgPlayer = NULL;
 }
@@ -5186,3 +5187,14 @@ void GMHandler::OnSetTYSS(GObject::Player *player, std::vector<std::string>& arg
     GVAR.SetVar(GVAR_TYSS_BEGIN,TimeUtil::Now());
     GVAR.SetVar(GVAR_TYSS_END,TimeUtil::Now() + 86400 * 5);
 }
+
+void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt8 pos = atoi(args[0].c_str());
+    GObject::Clan *clan = player->getClan();
+    if(clan != NULL)
+        clan->sendMemberBuf(pos);
+}
+

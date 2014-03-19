@@ -4428,12 +4428,13 @@ void World::SendTYSSClanAward()
         
     ClanGradeSort::iterator i = World::tyss_ClanSort.begin();
     ClanGradeSort::iterator e = World::tyss_ClanSort.end();
-    for (; i != e; ++i)
+    for (UInt32 pos = 0; i != e; ++i)
     {
         if(i->clan == NULL)
             continue;
-        //if(i == World::tyss_ClanSort.begin())
-        //    i->clan->sendMemberAward();
+        ++pos;
+        if(pos == 1 || pos == 2 || pos == 3)
+            i->clan->sendMemberBuf(pos);
         if(i->total >= 3000)
         {
             i->clan->SendClanMemberAward(i->total,1,"幼年期神兽"); 
