@@ -1323,53 +1323,48 @@ void Leaderboard::giveRechargeRankAward()
         UInt16 count1 = 0, count2 = 0, count3 = 0, count4 = 0;
         if((*it).rank == 1)
         {
-            count1 = 180; count2 = 180;
-            count3 = 100; count4 = 100;
+            count1 = 150; count2 = 150;
+            count3 = 88; count4 = 88;
         }
         else if((*it).rank == 2)
         {
-            count1 = 160; count2 = 160;
-            count3 = 88; count4 = 88;
+            count1 = 130; count2 = 130;
+            count3 = 68; count4 = 68;
         }
         else if((*it).rank == 3)
         {
-            count1 = 140; count2 = 140;
-            count3 = 66;  count4 = 66;
-        }
-        else if((*it).rank >= 4 && (*it).rank <= 10)
-        {
-            count1 = 120; count2 = 120;
+            count1 = 100; count2 = 100;
             count3 = 50;  count4 = 50;
         }
-        else if((*it).rank >= 11 && (*it).rank <= 20)
-        {
-            count1 = 100; count2 = 100;
-            count3 = 40;  count4 = 40;
-        }
-        else if((*it).rank >= 21 && (*it).rank <= 40)
+        else if((*it).rank >= 4 && (*it).rank <= 7)
         {
             count1 = 80; count2 = 80;
-            count3 = 30; count4 = 30;
+            count3 = 35;  count4 = 35;
         }
-        else if((*it).rank >= 41 && (*it).rank <= 60)
+        else if((*it).rank >= 8 && (*it).rank <= 14)
         {
             count1 = 60; count2 = 60;
-            count3 = 25; count4 = 25;
+            count3 = 25;  count4 = 25;
         }
-        else if((*it).rank >= 61 && (*it).rank <= 80)
+        else if((*it).rank >= 14 && (*it).rank <= 20)
         {
             count1 = 40; count2 = 40;
-            count3 = 20; count4 = 20;
+            count3 = 15; count4 = 15;
         }
-        else if((*it).rank >= 81 && (*it).rank <= 100)
+        else if((*it).rank >= 21 && (*it).rank <= 30)
         {
             count1 = 20; count2 = 20;
             count3 = 10; count4 = 10;
         }
+        else if((*it).rank >= 31 && (*it).rank <= 50)
+        {
+            count1 = 10; count2 = 10;
+            count3 = 5; count4 = 5;
+        }
         else
             continue;
         SYSMSGV(content2, 830, player->getCountry(), player->getName().c_str(), (*it).rank, (*it).total);
-        MailPackage::MailItem item[] = {{9418, count1}, {9438, count2}, {9022, count3}, {9075, count4},};
+        MailPackage::MailItem item[] = {{9424, count1}, {9414, count2}, {9022, count3}, {9068, count4},};
         MailItemsInfo itemsInfo(item, Activity, 4);
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title2, content2, 0xFFFE0000, true, &itemsInfo);
         if(mail)
@@ -1408,6 +1403,7 @@ void Leaderboard::sendGoldLvlAward(BinaryReader& brd)
     Player * player = globalPlayers[playerId];
     if(!player || !cnt)
         return;
+    /*
     static const UInt32 goldLvls[] = { 8888, 18888, 38888, 88888, 188888, 288888 };
     static MailPackage::MailItem s_items[][4] = {
         { {134, 5},   {9438, 5},  {0, 0},      {0, 0} },
@@ -1416,6 +1412,16 @@ void Leaderboard::sendGoldLvlAward(BinaryReader& brd)
         { {9076, 30}, {509, 30},  {1126, 30},  {9424, 30} },
         { {9022, 30}, {9075, 30}, {9068, 30},  {1126, 30} },
         { {9022, 40}, {9076, 30}, {9418, 100}, {8556, 10} },
+    };
+    */
+    static const UInt32 goldLvls[] = { 8888, 18888, 28888, 38888, 58888, 78888 };
+    static MailPackage::MailItem s_items[][4] = {
+        { {503, 5},   {9604, 5},  {9603, 5},   {9424, 5} },
+        { {134, 20},  {1325, 20}, {9438, 20},  {9600, 20} },
+        { {515, 15},  {517, 15},  {551, 15},   {1126, 20} },
+        { {9076, 20}, {9414, 20}, {9418, 25},  {9424, 25} },
+        { {9075, 20}, {9022, 10}, {0, 0}, {0, 0} },
+        { {1729, 1},  {9068, 20}, {9022, 15}, {0, 0} },
     };
     SYSMSGV(title, 831);
     for(UInt8 i = 0; i < cnt; ++ i)

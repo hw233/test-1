@@ -3259,16 +3259,10 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                 case 3:
                     hdr.msgHdr.desWorkerID = player->getThreadId();//喂养神兽
                     GLOBAL().PushMsg(hdr, (void*)data);
-                    //brd >> flag;
-                    //player->OpTYSS(op,flag);//喂养神兽
                     break;
                 case 4:
                     hdr.msgHdr.desWorkerID = player->getThreadId();//购买限购礼包
                     GLOBAL().PushMsg(hdr, (void*)data);
-                    
-                    //brd >> flag;//礼包id
-                    //player->OpTYSS(op,flag-1);//买限购礼包
-                    //player->OpTYSS(8);//返回限购礼包信息
                     break;
                 case 5:
                 {
@@ -3291,6 +3285,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     break;
                 case 0x12:
                     player->ReturnTYSSInfo(0);//返回个人榜
+                    break;
                 case 0x13:
                     hdr.msgHdr.desWorkerID = player->getThreadId();//领取每日礼包
                     GLOBAL().PushMsg(hdr, (void*)data);
@@ -3875,6 +3870,21 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
         default:
             return;
     }
+}
+
+void OnServerRechargeRank( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    if(type == 0)
+        GObject::leaderboard.giveRechargeRankAward();
+    else if(type == 1)
+        GObject::leaderboard.readRechargeRank100(brd);
+    else if(type == 2)
+        GObject::leaderboard.readRechargeSelf(brd);
+    else if(type == 3)
+        GObject::leaderboard.sendGoldLvlAward(brd);
 }
 
 void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )

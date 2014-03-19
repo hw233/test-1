@@ -3299,6 +3299,7 @@ inline bool clan_enum_0(GObject::Clan *clan, int)
 inline bool clan_enum_1(GObject::Clan *clan, int)
 {
    clan->ClearTYSSScore();
+   clan->SetTYSSSum(0,true);
    return true;
 }
 
@@ -3444,7 +3445,7 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME1, 0);
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME2, 0);
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME3, 0);
-                pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_CLAN_SUM, 0);
+                //pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_CLAN_SUM, 0);
                 GameMsgHdr hdr(0x201, WORKER_THREAD_WORLD, pl, 0);
                 GLOBAL().PushMsg(hdr, NULL);
             }
@@ -3935,6 +3936,11 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 17 && begin <= end )
     {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
         curType = 17;
         if(GObject::GVAR.GetVar(GObject::GVAR_GUANKAACT_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_GUANKAACT_END) < TimeUtil::Now())
@@ -3943,7 +3949,8 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         }
         GObject::GVAR.SetVar(GObject::GVAR_GUANKAACT_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_GUANKAACT_END, end);
-        ret = 1;
+
+        return;
     }
     else if (type == 18 && begin <= end )
     {
@@ -3978,11 +3985,12 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         Stream st(SPEP::ACTIVITYONOFF);
         st << ret << Stream::eos;
         NETWORK()->SendMsgToClient(hdr.sessionID, st);
+#if 0
 
         curType = 20;
         GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::globalClans.enumerate(clan_enum_1, 0);
-
+#endif
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_END, end);
 
