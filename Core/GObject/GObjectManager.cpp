@@ -3758,13 +3758,13 @@ namespace GObject
             pl->setInQQGroup(cp.inQQGroup);
             
             clan->LoadDuoBaoScore(pl);
-            clan->LoadTYSSScore(pl);
             if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
             {
                 UInt32 var = pl->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER);
                 pl->SetVar(VAR_TYSS_CONTRIBUTE_CLAN,var);
                 clan->AddTYSSSum(var);
             }
+            clan->LoadTYSSScore(pl);
 		}
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
