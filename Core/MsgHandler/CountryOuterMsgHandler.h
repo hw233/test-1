@@ -1611,10 +1611,12 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
     if(!player->checkFormation(f))
         return;
 
+    bool haveMain = false;
 	for(UInt8 i = 0; i < c; ++ i)
 	{
 		UInt32 pos = 3 + (sizeof(UInt8) + sizeof(UInt32)) * i;
 		UInt8 p = *(buf + pos + sizeof(UInt32));
+		UInt32 fgtid = *reinterpret_cast<const UInt32 *>(buf + pos);
 
         bool find = false;
         for(UInt8 k = 0; k < 5; ++ k)
@@ -1627,7 +1629,11 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
         }
         if(!find)
             return;
+        if(fgtid < 10)
+            haveMain = true;
     }
+    if(!haveMain)
+        return;
 
 	for(UInt8 i = 0; i < c; ++ i)
 	{
@@ -8232,15 +8238,23 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
             brd >> op;
             switch(op)
             {
-                case 0x13:
-                    player->OpTYSS(op);//领取每日礼包
-                    break;
                 case 3:
                 {
                     UInt8 flag = 0;
                     brd >> flag;
                     player->OpTYSS(op,flag);//喂养神兽
                 }
+                    break;
+                case 4:
+                {
+                    UInt8 flag = 0;
+                    brd >> flag;//礼包id
+                    player->OpTYSS(op,flag-1);//买限购礼包
+                    player->OpTYSS(8);//返回限购礼包信息
+                }
+                    break;
+                case 0x13:
+                    player->OpTYSS(op);//领取每日礼包
                     break;
                 default:
                     break;

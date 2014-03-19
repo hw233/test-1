@@ -5486,20 +5486,26 @@ void Clan::SendTYSSScore(Player* pl)
 
     ScoreSortType::iterator it = TYSSScoreSort.begin();
     Stream st(REP::ACTIVE);
-    UInt8 count = TYSSScoreSort.size();
+    UInt8 count = 0;
     
-    st << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x05) << count;
+    st << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x05);
+    size_t offset = st.size();
+    st << count;
 
     while(it != TYSSScoreSort.end())
     {
-        if(it == TYSSScoreSort.end())
-            break;
+        //if(it == TYSSScoreSort.end())
+        //    break;
         st << it->player->getName();
         st << it->player->getId();
         st << static_cast<UInt32>(it->score);
+        if(it->player->getClan() == NULL)
+            continue;
         st << static_cast<UInt8>(it->player->getClan()->getClanRank(it->player));
         ++it;
+        ++count;
     }
+    st.data<UInt8>(offset) = count;
     st << Stream::eos;
     pl->send(st);
     return;
@@ -5550,6 +5556,12 @@ void Clan::sendMemberBuf(UInt8 pos)
         pl->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000);
 
 	}
+}
+
+void Clan::ClearTYSSScore()
+{
+    if(TYSSScoreSort.size() > 0)
+        TYSSScoreSort.clear();
 }
 
 }

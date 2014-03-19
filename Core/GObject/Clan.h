@@ -556,6 +556,7 @@ public:
     void SetTYSSScore(Player * pl);
     void SendTYSSScore(Player* pl);
     void DelTYSSScore(Player* pl);
+    void ClearTYSSScore();
 
     
     UInt32 getGradeInAirBook(){return  _gradeInAirbook;}
