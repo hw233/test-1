@@ -29270,6 +29270,139 @@ void Player::sevensoul_fixed()
     }
 }
 
+UInt8 Player::useChangeSexCard()
+{
+    if(GetVar(VAR_MARRY_STATUS) > 0)
+        return 0;
+
+    Fighter* fgt = getMainFighter();
+    if(!fgt)
+        return 0;
+    UInt32 oldId = fgt->getId();
+    UInt32 newId;
+    if(oldId % 2 == 1) //原先是男
+    {
+        newId = oldId + 1;
+    }
+    else
+    {
+        newId = oldId - 1;
+    }
+
+    Stream st(REP::USER_INFO_CHANGE);
+    st << static_cast<UInt8>(0x22) << newId << Stream::eos;
+    send(st);
+
+    //与改形卡有关的函数
+    do_fighter(fgt, oldId, newId);
+    do_fighter_buff(fgt, oldId);
+    do_fighter_train(fgt, oldId);
+    do_practice_data(fgt, oldId);
+    do_second_soul(fgt, oldId);
+    do_elixir(fgt, oldId);
+    do_skill_strengthen(fgt, oldId);
+    do_fighter_xingchen(fgt, oldId);
+
+    struct _stTable
+    {
+        Fighter* fgt;
+        UInt32 oldId;
+    };
+    _stTable sttable = {fgt, oldId};
+    GameMsgHdr hdr1(0x1A0, WORKER_THREAD_WORLD, this, sizeof(sttable));
+    GLOBAL().PushMsg(hdr1, &sttable);
+
+    UInt32 count = GetVar(VAR_SEX_CHANGE);
+    SetVar(VAR_SEX_CHANGE, ++count);
+    return 1;
+}
+
+void Player::doTableInWorld(Fighter* fgt, UInt32 oldId)
+{
+    if(!fgt)
+        return;
+    do_sh_fighter(fgt, oldId);
+    do_sh_fighter_attr_extra(fgt, oldId);
+    do_sh_fighter_attr2(fgt, oldId);
+}
+
+void Player::do_fighter(Fighter* fgt, UInt32 oldId, UInt32 newId)
+{
+    fgt->setId(newId);
+    if(fgt->getId() % 2 == 1)
+        fgt->setSex(0);
+    else
+        fgt->setSex(1);
+    _fighters.insert(_fighters.begin(), std::make_pair(newId, fgt));
+    std::map<UInt32, Fighter *>::iterator it = _fighters.find(oldId);
+    if(it != _fighters.end())
+        _fighters.erase(it);
+    DB2().PushUpdateData("UPDATE `fighter` SET  `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        if(_playerData.lineup[i].fid == oldId)
+        {
+            _playerData.lineup[i].fid = newId;
+            storeFighters();
+        }
+    }
+}
+
+void Player::do_fighter_buff(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_buff` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_train(Fighter* fgt, UInt32 oldId)
+{
+    //主将不能闭关修炼
+    //DB1().PushUpdateData("UPDATE  `fighter_train` SET `fgtId` = %u WHERE `fgtId` = %u AND `ownerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_practice_data(Fighter* fgt, UInt32 oldId)
+{
+    UInt32 fgts[1] = {oldId};
+    GObject::practicePlace.standup(this, fgts, 1);
+    fgts[0] = fgt->getId();
+    GObject::practicePlace.sitdown(this, fgts, 1);
+    //DB1().PushUpdateData("UPDATE `practice_data` SET `fighters` = '%s' WHERE `id` = %" I64_FMT "u", "5,11,13,15,17,19", oldId, getId());
+}
+
+void Player::do_second_soul(Fighter* fgt, UInt32 oldId)
+{
+    DB2().PushUpdateData("UPDATE `second_soul` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_elixir(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `elixir` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_skill_strengthen(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `skill_strengthen` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_sh_fighter(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `sh_fighter` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_sh_fighter_attr_extra(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `sh_fighter_attr_extra` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_sh_fighter_attr2(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `sh_fighter_attr2` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_xingchen(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_xingchen` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
 
 } // namespace GObject
 

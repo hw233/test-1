@@ -3005,6 +3005,20 @@ namespace GObject
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
         void sevensoul_fixed();
+    public:
+        UInt8 useChangeSexCard();
+        void doTableInWorld(Fighter* fgt, UInt32 oldId);
+        void do_fighter(Fighter* fgt, UInt32 oldId, UInt32 newId);
+        void do_fighter_buff(Fighter* fgt, UInt32 oldId);
+        void do_fighter_train(Fighter* fgt, UInt32 oldId);
+        void do_practice_data(Fighter* fgt, UInt32 oldId);
+        void do_second_soul(Fighter* fgt, UInt32 oldId);
+        void do_elixir(Fighter* fgt, UInt32 oldId);
+        void do_skill_strengthen(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter_attr_extra(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter_attr2(Fighter* fgt, UInt32 oldId);
+        void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
 	};
 
 

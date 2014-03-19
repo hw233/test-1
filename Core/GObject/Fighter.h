@@ -597,6 +597,7 @@ public:
     void getAllSSAndLevel(Stream& st);
     void getAllSSAndLevelOfPet(Stream& st);
 
+	inline void setId(UInt32 id) { _id = id; } //改性卡使用
 
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }

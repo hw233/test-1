@@ -9093,6 +9093,21 @@ function ItemNormal_00010245(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009494(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local flag = player:useChangeSexCard()
+    if flag == 0 then
+        player:sendMsgCode(2, 4013, 0);
+        return 0
+    end
+
+    package:DelItemSendMsg(iid, player);
+    player:sendMsgCode(2, 4014, 0);
+    return 1;
+end
+
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -13007,6 +13022,7 @@ local ItemNormal_Table = {
     [10244] = ItemNormal_00010244,
     [10245] = ItemNormal_00010245,
     [10246] = ItemNormal_00010246,
+    [9494] = ItemNormal_00009494,
     [9480] = ItemNormal_0009480,
     [9481] = ItemNormal_0009480,
     [9482] = ItemNormal_0009480,
