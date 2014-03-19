@@ -3650,6 +3650,8 @@ namespace GObject
 
                 //clan->SetDuoBaoAward(cl.duobaoAward);
                 clan->SetTYSSSum(cl.tyssSum);
+                if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
+                    clan->SetTYSSSum(0,true);
             }
 			else
 			{
@@ -3757,9 +3759,17 @@ namespace GObject
             
             clan->LoadDuoBaoScore(pl);
             clan->LoadTYSSScore(pl);
+            if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
+            {
+                UInt32 var = pl->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER);
+                pl->SetVar(VAR_TYSS_CONTRIBUTE_PLAYER,var);
+                clan->AddTYSSSum(var);
+            }
 		}
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
+        if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
+            GVAR.SetVar(GVAR_REPAIRTYSSBUG,1);
 
         lc.prepare("Loading clan item:");
         DBClanItem ci;
