@@ -32,8 +32,8 @@ void EventDungeonAuto::NotifyCancel() const
 {
 	if(m_Player->getThreadId() != WORKER_THREAD_NEUTRAL)
     {
-        player->delFlag(Player::AutoDungeon);
-        DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %" I64_FMT "u", player->getId());
+        m_Player->delFlag(Player::AutoDungeon);
+        DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %" I64_FMT "u", m_Player->getId());
 		return;
     }
 	m_Dungeon->cancelAutoChallengeNotify(m_Player, m_TotalExp);
