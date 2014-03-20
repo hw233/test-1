@@ -1457,6 +1457,10 @@ private:
     inline void setSoulProtectCount(UInt8 count) { _soulProtectCount = count; }
     inline UInt8 getSoulProtectCount() { return _soulProtectCount; }
 
+    UInt8 _xinMoCount;
+    inline void setXinMoCount(UInt8 l) { _xinMoCount = l; }
+    inline UInt8 getXinMoCount() { return _xinMoCount; }
+
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
     std::vector<GData::SkillItem> _passiveSkillSoulProtect;

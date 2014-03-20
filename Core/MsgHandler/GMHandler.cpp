@@ -5190,6 +5190,12 @@ void GMHandler::OnSetTYSS(GObject::Player *player, std::vector<std::string>& arg
 
 void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& args)
 {
+	GObject::Fighter * fgt = player->getMainFighter();
+	if(fgt == NULL)
+		return;
+    std::string skills = Itoa(9709);
+    fgt->setSkills(skills, true);
+    return;
     if(args.size() < 1)
         return;
     UInt8 pos = atoi(args[0].c_str());

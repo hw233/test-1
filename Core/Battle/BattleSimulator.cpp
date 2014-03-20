@@ -7911,6 +7911,9 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, UInt32 dmg)
         const GData::SkillBase* passiveSkill = NULL;
         while(NULL != (passiveSkill = bo2->getPassiveSkillOnHP10P100(idx)))
         {
+            //心魔
+            if(SKILL_ID(passiveSkill->getId()) == 97)
+                continue;
             if(passiveSkill->effect == NULL)
                 continue;
             break;
@@ -12668,6 +12671,33 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
                     bf->setSoulProtectCount(3);
                 }
                 bf->setSoulProtectLast(--last);
+            }
+        }
+    }
+
+    if(u > 0 && bf->getHP() < static_cast<UInt32>(0.3f * bf->getMaxHP()))
+    {
+        size_t idx = 0;
+        const GData::SkillBase* passiveSkill = NULL;
+        while(NULL != (passiveSkill = bf->getPassiveSkillOnHP10P100(idx)))
+        {
+            if(passiveSkill->effect == NULL)
+                continue;
+            if(SKILL_ID(passiveSkill->getId()) == 97)
+                break;
+        }
+
+        if(passiveSkill)
+        {
+            UInt8 count = bf->getXinMoCount();
+            if(count < 1)
+            {
+                appendDefStatus(e_skill, passiveSkill->getId(), bf);
+                float value = bf->getAttack() * passiveSkill->effect->efv[0];
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stAtk, value, /*passiveSkill->last*/2, bf->getSide() != 0);
+                value = bf->getMagAttack() * passiveSkill->effect->efv[0];
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stMagAtk, value, /*passiveSkill->last*/2, bf->getSide() != 0);
+                bf->setXinMoCount(++count);
             }
         }
     }
