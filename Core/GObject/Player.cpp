@@ -29146,7 +29146,7 @@ void Player::getguankaScoreAward(UInt8 type)
     if(!World::getGuankaAct() || type > 4)
         return;
 
-    static UInt32 scoreLvl[] = {200, 400, 600, 800, 1000};
+    static UInt32 scoreLvl[] = {300, 500, 1000, 1500, 2000};
     static UInt32 awards[5][5][2] = {
         {{15,2},  {514,2}, {135,2},   {500,5},   {0, 0}},
         {{15,5},  {514,5}, {135,5},   {500,5},   {0, 0}},
