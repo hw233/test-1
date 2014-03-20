@@ -1427,6 +1427,8 @@ public:
 
     void UpdateGuangGunScore(Player* pl);
     void CreateMarryBoard(UInt64 man , UInt64 woman ,UInt8 type, UInt32 time);
+    void setLeftAddrConnection(bool v){ _leftAddrConnect =v ;}
+    bool getLeftAddrConnection(){return _leftAddrConnect;}
     static void SendRechargeRP7RankAward();
 private:
 	void testUpdate();
@@ -1444,6 +1446,7 @@ private:
     SnowScoreMap _snowScoreMap;
     SnowPlayerSet _snowPlayerSet;
     MCached m_MCached; // 注意：该m_MCached只用于世界线程；
+    bool _leftAddrConnect; 
 };
 
     void CreateNewDB(UInt32 mon = 0, UInt32 year = 2011);

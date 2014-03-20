@@ -1536,6 +1536,18 @@ struct DBModifyMount
     UInt8 curfloor1;
     UInt16 failtimes;
 };
+
+struct DBClanBuildings
+{
+    UInt64 clanId;
+    UInt32 fairylandEnergy;
+    UInt16 phyAtkLevel;
+    UInt16 magAtkLevel;
+    UInt16 actionLevel;
+    UInt16 hpLevel;
+    UInt16 oracleLevel;
+    UInt16 updateTime;
+};
 }
 
 namespace DB {
@@ -3477,6 +3489,19 @@ SPECIALDEF(6)
     )
 SPECIALEND()
 
+SPECIALBEGIN (GObject::DBClanBuildings)
+SPECIALDEF(8)
+    (
+    UInt64, clanId,
+    UInt32, fairylandEnergy,
+    UInt16, phyAtkLevel,
+    UInt16, magAtkLevel,
+    UInt16, actionLevel,
+    UInt16, hpLevel,
+    UInt16, oracleLevel,
+    UInt16, updateTime
+    )
+SPECIALEND()
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

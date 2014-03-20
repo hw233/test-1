@@ -1257,6 +1257,15 @@ inline bool player_enum_3(GObject::Player* pl, int)
 
     return true;
 }
+inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
+{
+    UInt32 val = pl->GetVar(VAR_LEFTADDR_POWER) ;
+    val += 3 ;
+    if(val > 10 )
+        val = 10;
+    pl->SetVar(VAR_LEFTADDR_POWER,val);
+    return true;
+}
 
 void World::World_Midnight_Check( World * world )
 {
@@ -1510,6 +1519,7 @@ void World::World_Midnight_Check( World * world )
         world->SendSurnameLegendAward();
     if(b11TimeEnd)
         world->Send11AirBookAward();
+    bGGTimeEnd = true;
     if(bGGTimeEnd)
         world->SendGuangGunAward();
     if (bSnowEnd)
@@ -1544,6 +1554,7 @@ void World::World_Midnight_Check( World * world )
     if(World::getQiShiBanTime())
         GObject::globalPlayers.enumerate(player_enum_3, 0);
 
+    GObject::globalPlayers.enumerate(player_enum_LeftAddrPower, 0);
 	calWeekDay(world);
 	Stream st(REP::DAILY_DATA);
 	makeActivityInfo(st);
