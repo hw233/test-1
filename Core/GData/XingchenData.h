@@ -31,8 +31,38 @@ class XingchenData
         stXingchen * getXingchenTable(int);
 };
 
-extern XingchenData xingchenData;
 
+class XinMoData
+{
+    public:
+        struct stXinMo
+        {
+            UInt8 level;
+            UInt8 limitLev;
+            std::string name;
+            UInt32 consume;
+            UInt32 maxVal;
+            //float rate1;    //基础宝石加成
+            //float rate2;    //攻防宝石加成
+            //float rate3;    //身法宝石加成
+            UInt32 attack;
+            UInt32 hp;
+            UInt32 action;
+            float cridec;
+            std::string skilllev;
+            UInt32 payBack; //解雇补偿
+            stXinMo(): level(0), limitLev(0), name(""), consume(0), maxVal(0), attack(0), hp(0), action(0), cridec(0.0),skilllev(""), payBack(0) {}
+        };
+    private:
+        std::map<UInt8, stXinMo> _xinmo;
+    public:
+        void setXinMoTable(stXinMo&);
+        stXinMo * getXinMoTable(int);
+        UInt32 getXinMoLev(UInt32 val);
+};
+
+extern XinMoData xinmoData;
+extern XingchenData xingchenData;
 }
 
 #endif // _XINGCHENDATA_H_

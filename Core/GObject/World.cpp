@@ -3249,6 +3249,7 @@ inline bool clan_enum_grade(GObject::Clan *clan,int)
             ClanSort s;
             s.clan = clan;
             s.total = grade;
+            s.time = TimeUtil::Now();
             World::clanGradeSort.insert(s);
         }
     }

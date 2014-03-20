@@ -583,6 +583,23 @@ struct DBXingchenConfig
     UInt32 payBack;
 };
 
+struct DBXinMoConfig
+{
+    UInt8 id;
+    UInt8 limitLev;
+    std::string name;
+    UInt32 consume;
+    UInt32 maxVal;
+    //float rate1;
+    //float rate2;
+    //float rate3;
+    UInt32 attack;
+    UInt32 hp;
+    UInt32 action;
+    float cridec;
+    std::string skilllev;
+    UInt32 payBack;
+};
 struct DBJiguanyuConfig
 {
     UInt32 jiguanyuId;
@@ -1422,6 +1439,27 @@ SPECIALDEF(9)
     float, rate3,
     UInt32, payBack
 	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBXinMoConfig)
+
+SPECIALDEF(11)
+(
+    UInt8, id,
+    UInt8, limitLev,
+    std::string, name,
+    UInt32, consume,
+    UInt32, maxVal,
+    //float rate1;
+    //float rate2;
+    //float rate3;
+    UInt32, attack,
+    UInt32, hp,
+    UInt32, action,
+    float, cridec,
+    std::string, skilllev,
+    UInt32, payBack
+    )
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBJiguanyuConfig)

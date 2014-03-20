@@ -9069,6 +9069,7 @@ function ItemNormal_00010245(iid, num, bind, param)
 end
 
 function ItemNormal_00009494(iid, num, bind, param)
+    print("X")
     local player = GetPlayer()
     local package = player:GetPackage();
 
@@ -10282,6 +10283,20 @@ function ItemNormal_00009382(iid, num, bind, param)
     end
     player:sendLuckyBagInfo()
     player:LuckyBagRank();
+    return num;
+end
+
+function ItemNormal_00009497(iid, num, bind, param)
+    local val = 100 ;
+    if iid == 9498 then 
+        val = 300;
+    end
+
+    if iid ==  9499 then
+        val = 1000;
+    end
+    local player = GetPlayer()
+    player:AddHeartSword(val * num);
     return num;
 end
 
@@ -12499,6 +12514,9 @@ local ItemNormal_Table = {
     [9437] = ItemNormal_00009382,
     [9449] = ItemNormal_00009382,
     [9496] = ItemNormal_00009382,
+    [9497] = ItemNormal_00009497,
+    [9498] = ItemNormal_00009497,
+    [9499] = ItemNormal_00009497,
 
     [9388] = ItemNormal_00009388,
     [9390] = ItemNormal_00009390,

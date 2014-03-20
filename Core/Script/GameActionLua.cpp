@@ -234,6 +234,7 @@ namespace Script
 		CLASS_DEF(Player, GetTaskMgr);
 		CLASS_DEF(Player, GetPackage);
 		CLASS_DEF(Player, Add11grade);
+		CLASS_DEF(Player, AddHeartSword);
 		CLASS_DEF(Player, GetPetPackage);
 		CLASS_DEF(Player, GetMailBox);
 		CLASS_DEF(Player, GetFreePackageSize);

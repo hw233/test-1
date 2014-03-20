@@ -256,6 +256,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140307_1.sql   #clan表中添加duobaoAward字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140307_2.sql   #夺宝日志
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/changevar174.sql        #bug(达到充值额度的次)
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AddFighterXinMo_0317.sql        #添加散仙心魔值
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140318_1.sql   #clan表中添加tyssAward字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140318_2.sql   #清除天元神兽var数据
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)

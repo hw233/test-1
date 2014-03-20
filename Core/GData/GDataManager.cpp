@@ -344,6 +344,11 @@ namespace GData
             fprintf (stderr, "Load LoadXingchenConfig Error !\n");
             std::abort();
         }
+        if (!LoadXinMoConfig())
+        {
+            fprintf (stderr, "Load LoadXinMoConfig Error !\n");
+            std::abort();
+        }
 
         if (!LoadJiguanshuConfig())
         {
@@ -2813,5 +2818,32 @@ namespace GData
 		return true;
     }
 
+    bool GDataManager::LoadXinMoConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBXinMoConfig dbxcc;
+		if(execu->Prepare("SELECT `id`, `limitLev`, `name`, `consume`, `maxVal`, `attack`, `hp`, `action`,`cridec` ,`skilllev`,`payBack` FROM `xinmo`", dbxcc) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            XinMoData::stXinMo stxc;
+            stxc.level = dbxcc.id;
+            stxc.limitLev = dbxcc.limitLev;
+            stxc.name  = dbxcc.name;
+            stxc.consume = dbxcc.consume;
+            stxc.maxVal = dbxcc.maxVal;
+            stxc.attack = dbxcc.attack;
+            stxc.hp = dbxcc.hp;
+            stxc.action = dbxcc.action;
+            stxc.cridec = dbxcc.cridec;
+            stxc.skilllev = dbxcc.skilllev;
+            stxc.payBack = dbxcc.payBack;
+            xinmoData.setXinMoTable(stxc);
+        }
+        return true;
+    }
 }
 

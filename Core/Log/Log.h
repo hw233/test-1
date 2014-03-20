@@ -232,6 +232,7 @@ enum MailItemType
     NewHeroIslandAward,
     ArenaAward,
     BuChangMarry,
+	DismissXinMo,
 };
 enum ItemFrom
 {

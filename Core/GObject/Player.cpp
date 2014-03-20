@@ -29200,6 +29200,41 @@ void Player::sevensoul_fixed()
             pet->updateToDBPetSkill();
     }
 }
+void Player::sendXinMoInfo()
+{
+    Stream st(REP::EQ_XINMO);
+    st <<static_cast<UInt8>(0);
+    st << GetVar(VAR_HEART_SWORD);
+    std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
+    UInt8 cnt = _fighters.size() ;
+//  st << static_cast<UInt8>(cnt);
+    for (; it != _fighters.end(); ++it)
+    {
+        Fighter* fgt = it->second; // XXX: Fashion can not be enchanted
+        if(fgt==NULL)
+        {
+            st <<  static_cast<UInt32>(0); 
+        }
+        else
+        {
+            st << fgt->getXinMo().val;
+        }
+    }
+    st << Stream::eos;
+    send(st);
+}
+void Player::AddHeartSword(UInt32 val)
+{
+    UInt32 var_val = GetVar(VAR_HEART_SWORD);
+    SetVar(VAR_HEART_SWORD,var_val+val);
+    Stream st(REP::EQ_XINMO);
+    st << static_cast<UInt8>(4);
+    st << static_cast<UInt32>(var_val+val);
+    st << Stream::eos;
+    send(st);
+    SYSMSG_SENDV(2027,this,val);
+    SYSMSG_SENDV(2028,this,val);
+}
 
 UInt8 Player::useChangeSexCard()
 {
@@ -29233,6 +29268,7 @@ UInt8 Player::useChangeSexCard()
     do_elixir(fgt, oldId);
     do_skill_strengthen(fgt, oldId);
     do_fighter_xingchen(fgt, oldId);
+    do_fighter_xinmo(fgt, oldId);
 
     struct _stTable
     {
@@ -29333,6 +29369,10 @@ void Player::do_sh_fighter_attr2(Fighter* fgt, UInt32 oldId)
 void Player::do_fighter_xingchen(Fighter* fgt, UInt32 oldId)
 {
     DB1().PushUpdateData("UPDATE `fighter_xingchen` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+void Player::do_fighter_xinmo(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_xinmo` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
 }
 
 } // namespace GObject
