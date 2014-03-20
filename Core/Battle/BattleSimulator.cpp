@@ -12673,10 +12673,7 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
                 bf->setSoulProtectLast(--last);
             }
         }
-    }
 
-    if(u > 0 && bf->getHP() < static_cast<UInt32>(0.3f * bf->getMaxHP()))
-    {
         size_t idx = 0;
         const GData::SkillBase* passiveSkill = NULL;
         while(NULL != (passiveSkill = bf->getPassiveSkillOnHP10P100(idx)))
