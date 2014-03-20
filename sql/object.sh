@@ -259,6 +259,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140318_1.sql   #clan表中添加tyssAward字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140318_2.sql   #清除天元神兽var数据
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
 }
 
 #sh player_jiguan.sh
