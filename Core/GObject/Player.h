@@ -687,6 +687,7 @@ namespace GObject
             //memset(ymcolor, 0, sizeof(ymcolor));
             memset(bookStore, 0, sizeof(bookStore));
             formations.reserve(32);
+            memset(zhenyuans, 0, sizeof(zhenyuans));
             shimen.reserve(32);
             smcolor.reserve(32);
             yamen.reserve(32);
@@ -776,6 +777,7 @@ namespace GObject
         UInt8 frontGoldCnt;         // ??ͼ?շѴ???
         UInt32 frontUpdate;         // ??ͼ????????ʱ??
         std::vector<UInt16> formations; // ??ѧ??????
+        ItemZhenyuan * zhenyuans[12]; //前后左右阵元
 #ifdef _ARENA_SERVER
         UInt8 entered;
 #endif
@@ -1014,9 +1016,14 @@ namespace GObject
 		void checkLevUp(UInt8, UInt8);
         bool formationLevUp(UInt16);
         bool addNewFormation(UInt16 newformationId, bool writedb = false);
+        void setZhenyuan(UInt8, UInt32);
+        bool setZhenyuan(ItemZhenyuan *, UInt8, bool = true);
+        void updateZhenyuansToDB();
+
         void sendFormationList();
         bool checkFormation(UInt16);
         bool checkFormation_ID(UInt16);
+        UInt8 getFullFormationCnt();
         void sendNationalDayOnlineAward();
         void sendHalloweenOnlineAward(UInt32, bool = false);
         void sendLevelPack(UInt8);

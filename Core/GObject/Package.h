@@ -308,6 +308,13 @@ namespace GObject
         void SendDelTempEquipData(ItemEquip * equip);
         void AppendTempItemData(Stream& st, ItemBase * item);
         void AppendTempEquipData(Stream& st, ItemEquip * equip, bool hascount = true);
+
+        void SendSingleZhenyuanData(ItemZhenyuan *);
+        void AppendZhenyuanData(Stream&, ItemZhenyuan *);
+	    ItemBase* AddZhenYuanN(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere);
+	    ItemBase* AddZhenYuanFromDB(UInt32 id, bool bind);
+	    ItemBase* AddZhenYuan(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere);
+	    UInt8 MergeZhenyuan(UInt32* zhyIds, UInt8 count, UInt16& ogid);
     protected:
 		typedef std::map<ItemKey, ItemBase *> ItemCont;
 		typedef ItemCont::iterator item_elem_iter;

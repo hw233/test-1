@@ -85,6 +85,7 @@ namespace GData
     std::vector<UInt16>     GDataManager::m_petEqs[4];
     std::vector<UInt16>     GDataManager::m_petGems[20];
     std::vector<UInt16>     GDataManager::m_petEqSkills;
+    std::vector<UInt16>     GDataManager::m_zhenyuanItem[20];
 
 	bool GDataManager::LoadAllData()
 	{
@@ -820,6 +821,14 @@ namespace GData
                 {
                     if(idt.quality > 2 && idt.quality < 6)
                         m_petEqs[idt.quality - 2].push_back(idt.typeId);
+                }
+            case Item_Formula6:
+            case Item_Formula7:
+            case Item_Formula8:
+            case Item_Formula9:
+                {
+                    if(idt.reqLev >= 75 && (idt.reqLev % 5) == 0)
+                        m_zhenyuanItem[(idt.reqLev-75)/5].push_back(idt.typeId);
                 }
 			default:
 				{
@@ -2546,6 +2555,16 @@ namespace GData
         if(gemCnt == 0)
             return 0;
         return m_petGems[lvIdx][uRand(gemCnt)];
+    }
+
+    UInt16 GDataManager::GetZhenyuanTypeIdByLev(int lvIdx)
+    {
+        if(lvIdx < 0 || lvIdx >= 20)
+            return 0;
+        size_t cnt = m_zhenyuanItem[lvIdx].size();
+        if(cnt == 0)
+            return 0;
+        return m_zhenyuanItem[lvIdx][uRand(cnt)];
     }
 
     UInt16 GDataManager::GetPetEqSkill()

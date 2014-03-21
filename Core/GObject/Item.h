@@ -293,6 +293,19 @@ namespace GObject
         ItemPetEqAttr m_peAttr;
     };
 
+	//ี๓ิช
+	class ItemZhenyuan : public ItemEquip
+    {
+    public:
+		ItemZhenyuan(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData, ItemZhenyuanAttr& zhyAttr)
+		    : ItemEquip(id, itemEquipType, itemEquipData), m_zhyAttr(zhyAttr)
+		{}
+
+        ItemZhenyuanAttr& getZhyAttr() { return m_zhyAttr; }
+	private:
+        ItemZhenyuanAttr m_zhyAttr;
+	};
+
 }
 
 #endif

@@ -915,6 +915,7 @@ CREATE TABLE `player` (
   `frontGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
   `frontUpdate` int(10) unsigned NOT NULL DEFAULT '0',
   `formations` varchar(255) NOT NULL DEFAULT '',
+  `zhenyuans` varchar(1024) NOT NULL DEFAULT '',
   `atohicfg` varchar(255) NOT NULL DEFAULT '',
   `gmLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `wallow` tinyint(1) unsigned NOT NULL DEFAULT '1',
@@ -2419,5 +2420,15 @@ CREATE TABLE `duobaolog` (
   `itemId` int(10) unsigned NOT NULL DEFAULT '0',
   `cnt` tinyint(10) unsigned NOT NULL DEFAULT '0',
   `time` int(10) unsigned NOT NULL DEFAULT '0'
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `zhenyuanAttr`;
+CREATE TABLE `zhenyuanAttr` (
+   `id` int(10) unsigned NOT NULL DEFAULT '0',
+   `itemId`  int(10) unsigned NOT NULL DEFAULT '0',
+   `zycolor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `types` varchar(255) NOT NULL DEFAULT '',
+   `values` varchar(255) NOT NULL DEFAULT '',
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 

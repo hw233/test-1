@@ -3207,6 +3207,20 @@ namespace GObject
 		}
 	}
 
+    UInt8 Player::getFullFormationCnt()
+    {
+        UInt8 count = 0;
+        int cnt = _playerData.formations.size();
+        for( int idx = 0; idx < cnt; ++ idx )
+        {
+            if(FORMATION_LEVEL(_playerData.formations[idx]) == 2)
+            {
+                ++ count;
+            }
+        }
+        return count;
+    }
+
     bool Player::checkFormation_ID(UInt16 f)
     {
         bool find = false;
@@ -8333,6 +8347,46 @@ namespace GObject
         send(st);
 
         return true;
+    }
+
+    void Player::setZhenyuan(UInt8 index, UInt32 zhyId)
+    {
+        if(index > 12) return;
+        ItemBase * zhenyuan = GetPackage()->FindItem(zhyId, true);
+        if(zhenyuan == NULL)
+            zhenyuan = GetPackage()->FindItem(zhyId, false);
+        ItemBase * old = _playerData.zhenyuans[index];
+        if(old == zhenyuan)
+            return;
+        bool res = setZhenyuan(static_cast<ItemZhenyuan *>(zhenyuan), index);
+    }
+
+    bool Player::setZhenyuan(ItemZhenyuan * zhenyuan, UInt8 index, bool writedb)
+    {
+        if(index > 12) return false;
+        if(_playerData.zhenyuans[index] == zhenyuan)
+            return false;
+        if(_playerData.zhenyuans[index])
+            GetPackage()->AddExistEquip(static_cast<ItemEquip *>(_playerData.zhenyuans[index]));
+        _playerData.zhenyuans[index] = zhenyuan;
+        if(writedb)
+            updateZhenyuansToDB();
+        return true;
+    }
+
+    void Player::updateZhenyuansToDB()
+    {
+        std::string str;
+        for(int i = 0; i < 12; ++ i)
+        {
+            if(_playerData.zhenyuans[i])
+                str += Itoa(_playerData.zhenyuans[i]->getId());
+            else
+                str += Itoa(0);
+            if(i < 11)
+                str += ",";
+        }
+        DB1().PushUpdateData("UPDATE `player` SET `zhenyuans` = '%s' WHERE id = %"  I64_FMT  "u", str.c_str(), _id);
     }
 
 	void Player::addTotalRecharge( UInt32 r )
