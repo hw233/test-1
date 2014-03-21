@@ -597,7 +597,7 @@ struct DBXinMoConfig
     UInt32 hp;
     UInt32 action;
     float cridec;
-    UInt32 skilllev;
+    std::string skilllev;
     UInt32 payBack;
 };
 struct DBJiguanyuConfig
@@ -1457,7 +1457,7 @@ SPECIALDEF(11)
     UInt32, hp,
     UInt32, action,
     float, cridec,
-    UInt32, skilllev,
+    std::string, skilllev,
     UInt32, payBack
     )
 SPECIALEND()

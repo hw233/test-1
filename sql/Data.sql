@@ -1144,7 +1144,7 @@ CREATE TABLE `xinmo` (
     `hp` int(10) unsigned NOT NULL DEFAULT 0,
     `action` int(10) unsigned NOT NULL DEFAULT 0,
     `cridec` float(5,2) unsigned NOT NULL DEFAULT '0.00',
-    `skilllev` int(10) unsigned NOT NULL DEFAULT 0,
+    `skilllev` varchar(255) NOT NULL DEFAULT '',
     `payBack` int(10) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

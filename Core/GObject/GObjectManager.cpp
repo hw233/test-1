@@ -300,6 +300,11 @@ namespace GObject
             fprintf(stderr, "load Fighter xingchen error!\n");
             std::abort();
         }
+		if(!loadFighterXinMo())
+        {
+            fprintf(stderr, "load Fighter xinmo error!\n");
+            std::abort();
+        }
 
 		if(!loadJiguanshu())
         {
@@ -7094,7 +7099,7 @@ namespace GObject
         LoadingCounter lc("Loading Fighter xinmo:");
 		DBXinmo dbxc;
         Player* pl = NULL;
-		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal` FROM `fighter_xinmo`", dbxc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `xinmolev`, `curVal` FROM `fighter_xinmo`", dbxc) != DB::DB_OK)
 			return false;
 		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -7114,8 +7119,7 @@ namespace GObject
                 continue;
             }
 
-            fgt->setXinMoLev(dbxc.level);
-            fgt->setXinMoVal(dbxc.curVal);
+            fgt->setXinMo(dbxc.level,dbxc.curVal);
 
 		}
 		lc.finalize();

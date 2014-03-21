@@ -1074,6 +1074,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		Stream st;
 		pl->makeFighterList(st);
 		conn->send(&st[0], st.size());
+        pl->sendXinMoInfo();
 	}
     {
         Stream st;
@@ -1698,6 +1699,7 @@ void OnFighterInfoReq( GameMsgHdr& hdr, const void * data )
 	st.data<UInt8>(4) = cnt;
 	st << Stream::eos;
 	player->send(st);
+    player->sendXinMoInfo(); 
 }
 
 struct FighterLeaveStruct
@@ -8312,6 +8314,43 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
                 GObject::MarryBoard::instance()._lively += 5*num;
                 SYSMSG_BROADCASTV(576,player->getCountry(),player->getName().c_str(),num);
             }
+    }
+}
+void OnXinMoReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+    {
+		return;
+    }
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    UInt16 fighterId = 0;
+    br >> opt >> fighterId;
+    GObject::Fighter * fgt = player->findFighter(fighterId);
+    if(fgt == NULL)
+    {  
+        return;
+    }
+
+    switch(opt)
+    {
+        case 0:
+            {
+            //    player->sendXinMoInfo();               
+            }
+            break;
+        case 1:
+            {
+                fgt->upgradeXinMo();
+            }
+            break;
+        case 2:
+            {
+                fgt->quickUpGradeXinMo();
+            }
+            break;
     }
 }
 

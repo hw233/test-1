@@ -29202,8 +29202,41 @@ void Player::sevensoul_fixed()
             pet->updateToDBPetSkill();
     }
 }
-
-
+void Player::sendXinMoInfo()
+{
+    Stream st(REP::EQ_XINMO);
+    st <<static_cast<UInt8>(0);
+    st << GetVar(VAR_HEART_SWORD);
+    std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
+    UInt8 cnt = _fighters.size() ;
+//  st << static_cast<UInt8>(cnt);
+    for (; it != _fighters.end(); ++it)
+    {
+        Fighter* fgt = it->second; // XXX: Fashion can not be enchanted
+        if(fgt==NULL)
+        {
+            st <<  static_cast<UInt32>(0); 
+        }
+        else
+        {
+            st << fgt->getXinMo().val;
+        }
+    }
+    st << Stream::eos;
+    send(st);
+}
+void Player::AddHeartSword(UInt32 val)
+{
+    UInt32 var_val = GetVar(VAR_HEART_SWORD);
+    SetVar(VAR_HEART_SWORD,var_val+val);
+    Stream st(REP::EQ_XINMO);
+    st << static_cast<UInt8>(4);
+    st << static_cast<UInt32>(var_val+val);
+    st << Stream::eos;
+    send(st);
+    SYSMSG_SENDV(2027,this,val);
+    SYSMSG_SENDV(2028,this,val);
+}
 } // namespace GObject
 
 

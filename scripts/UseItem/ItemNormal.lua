@@ -10270,6 +10270,16 @@ function ItemNormal_00009382(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009497(iid, num, bind, param)
+    local val = 10 ;
+    if iid == 9498 then 
+        val =100
+    end
+    local player = GetPlayer()
+    player:AddHeartSword(val * num);
+    return num;
+end
+
 function ItemNormal_00009388(iid, num, bind, param)
 	local player = GetPlayer()
     local package = player:GetPackage()
@@ -12484,6 +12494,8 @@ local ItemNormal_Table = {
     [9437] = ItemNormal_00009382,
     [9449] = ItemNormal_00009382,
     [9496] = ItemNormal_00009382,
+    [9497] = ItemNormal_00009497,
+    [9498] = ItemNormal_00009497,
 
     [9388] = ItemNormal_00009388,
     [9390] = ItemNormal_00009390,

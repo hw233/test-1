@@ -30,8 +30,6 @@ namespace GData
 
     XinMoData::stXinMo * XinMoData::getXinMoTable(int lvl)
     {
-        if(lvl <= 0)
-            return NULL;
         std::map<UInt8, stXinMo>::iterator iter = _xinmo.find(lvl);
         if(iter != _xinmo.end())
             return &(iter->second);
@@ -43,7 +41,7 @@ namespace GData
         for(;iter!=_xinmo.end();++iter) 
         {
             if(iter->second.maxVal > val )
-                return iter->first-1;
+                return iter->first;
         }
         return -1;
     }

@@ -2824,13 +2824,11 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBXinMoConfig dbxcc;
-		if(execu->Prepare("SELECT `id`, `limitLev`, `name`, `consume`, `maxVal`, `attack`, `hp`, `action`, `payBack` FROM `xinmo`", dbxcc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `limitLev`, `name`, `consume`, `maxVal`, `attack`, `hp`, `action`,`cridec` ,`skilllev`,`payBack` FROM `xinmo`", dbxcc) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
 		{
-            if(dbxcc.id == 0)
-                continue;
             XinMoData::stXinMo stxc;
             stxc.level = dbxcc.id;
             stxc.limitLev = dbxcc.limitLev;

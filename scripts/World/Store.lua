@@ -303,6 +303,7 @@ function loadStore()
 
         -- 奇珍
 		--store:add(2,9433,500)
+		store:add(2,9498,20)
 		store:add(2,9338,50)
 		--store:add(2,9349,10)
 		store:add(2,9310,30)

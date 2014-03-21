@@ -2340,6 +2340,7 @@ namespace GObject
         UInt8 transformSoul(Fighter * fFgt, Fighter * tFgt);
         UInt8 transfromXingchen(Fighter * fFgt, Fighter * tFgt);
         void transformElixir(Fighter * fFgt, Fighter * tFgt);
+        void sendXinMoInfo(); 
             
     private:
         char m_domain[256+1];
@@ -2927,7 +2928,7 @@ namespace GObject
         void getguankaScoreAward(UInt8);
         void guankaActUdpLog(UInt32, bool);
         void addguankaScoreByAttack(UInt32);
-
+        void AddHeartSword(UInt32 val);
     public:
         // 八部浮屠
         void sendBBFTInfo();

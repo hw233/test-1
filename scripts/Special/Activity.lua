@@ -1077,6 +1077,7 @@ function onFrontMapFloorWin(player, id, spot, lootlvl)
 end
 
 function onFrontMapWin(player, id, spot, lootlvl)
+    print(id)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 1);
     ValentineDay(player, lootlvl)
@@ -1106,6 +1107,11 @@ function onFrontMapWin(player, id, spot, lootlvl)
     if getTYSSTime() == true then
         local package = player:GetPackage();
         package:Add(9492, 1, true)
+    end
+    if id >= 9 then
+        local package = player:GetPackage();
+        print(9497)
+        package:Add(9497, 1, true)
     end
     sendWinReward(player, lootlvl, 2);
     TgcEvent(player, 2)

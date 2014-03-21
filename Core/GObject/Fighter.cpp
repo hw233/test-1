@@ -2051,15 +2051,19 @@ void Fighter::rebuildEquipAttr()
         }
     }
 
-    if(m_xinmolev != 0)
+    if(m_xinmo.lvl != 0)
     {
-        GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(m_xingchen.lvl);
-        GData::AttrExtra ae ;
-        ae.attack = stxc->attack;
-        ae.hp = stxc->hp;
-        ae.action = stxc ->action;
-        ae.criticaldmgimmune = stxc->cridec; 
-        addAttr(_attrExtraEquip,ae);
+        GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(m_xinmo.lvl);
+        if(stxc)
+        {
+            GData::AttrExtra ae ;
+            ae.attack = stxc->attack;
+            ae.magatk = stxc->attack;
+            ae.hp = stxc->hp;
+            ae.action = stxc ->action;
+            ae.criticaldmgimmune = stxc->cridec; 
+            _attrExtraEquip+=ae;
+        }
         //XXX
     }
     if(_owner)
@@ -7326,54 +7330,58 @@ void Fighter::petSSErase(UInt16 sid)
 
 void Fighter::updateDBxinmo()
 {
-    DB1().PushUpdateData("REPLACE INTO `fighter_xinmo` (`fighterId`, `playerId`, `level`, `curVal`)\
-            VALUES(%u, %" I64_FMT "u, %u, %u, %u)", getId(), _owner->getId(), m_xinmolev , m_xinmoval);
+    DB1().PushUpdateData("REPLACE INTO `fighter_xinmo` (`fighterId`, `playerId`, `xinmolev`, `curVal`)\
+            VALUES(%u, %" I64_FMT "u, %u, %u)", getId(), _owner->getId(), m_xinmo.lvl , m_xinmo.val);
 }
-bool Fighter::upgradeXinMo(UInt8 type)
+bool Fighter::upgradeXinMo()
 {
     if (isPet() || !_owner)
         return false;
-    if (m_xinmo.lvl >= 30)
+    if (m_xinmo.lvl >= 50)
         return false;
-    GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(m_xinmolev+1);
+    GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(m_xinmo.lvl);
     if(!stxc || getLevel() < stxc->limitLev)
         return false;
     UInt32 value = _owner->GetVar(VAR_HEART_SWORD);
     if (value < stxc->consume)
         return false;
-    m_xinmoval += uRand(19) + 1;
-    if(m_xinmo.curVal >= stxc->maxVal)
+    m_xinmo.val += uRand(19) + 1;
+    if(m_xinmo.val >= stxc->maxVal)
     {
-        ++m_xinmolev;
+        ++m_xinmo.lvl;
         setDirty();
+        GData::XinMoData::stXinMo * stxcn = GData::xinmoData.getXinMoTable(m_xinmo.lvl);
+        setSkills(stxcn->skilllev,false);
     }
-
-    updateDBxinmo();
     _owner->SetVar(VAR_HEART_SWORD, value - stxc->consume);
-    SYSMSG_SENDV(4918, _owner, stxc->consume);
-    sendXinMoInfo(type);
-    _owner->sendMsgCode(0, 4005);
-   // GameAction()->doStrong(_owner, SthXinMo, 0, 0); 
-   // _owner->GuangGunCompleteTask(0,30);
+    Stream st (REP::EQ_XINMO);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt16>(getId());
+    st << static_cast<UInt32>( m_xinmo.val );
+    st << Stream::eos;
+    _owner->send(st);
+    updateDBxinmo();
+    SYSMSG_SENDV(4919, _owner, stxc->consume);
     return true;
 }
-bool Fighter::quickUpGrade(UInt8 type)
+bool Fighter::quickUpGradeXinMo()
 {
     if(isPet() || !_owner)
         return false;
 
-    if(m_xinmolev >= 30)
+    if(m_xinmo.lvl >= 50)
         return false;
 
-    GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(m_xinmolev+1);
+    GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(m_xinmo.lvl);
     if(!stxc || getLevel() < stxc->limitLev)
         return false;
 
     UInt32 consumeValue = 0;
-    UInt32 curValue = m_xinmoval;
+    UInt32 curValue = m_xinmo.val;
     UInt32 value = _owner->GetVar(VAR_HEART_SWORD);
+    UInt32 count = 0 ;
 
-    for( ; m_xinmoval < stxc->maxVal; )
+    for( ; m_xinmo.val < stxc->maxVal; )
     {
         consumeValue += stxc->consume;
 
@@ -7383,35 +7391,40 @@ bool Fighter::quickUpGrade(UInt8 type)
            break;
         }
         
-        m_xinmo.curVal += uRand(19) + 1;
+        count ++;
+        m_xinmo.val += uRand(19) + 1;
     }
 
-    if(m_xinmoval >= stxc->maxVal)
+    if(m_xinmo.val >= stxc->maxVal)
     {
-        ++m_xinmolev;
+        ++m_xinmo.lvl;
         setDirty();
-        _owner->sendMsgCode(0, 4005);
-
-        if(m_xinmo.lvl >= 20 && m_xinmo.xctMaxVal == 0)
-            m_xinmo.xctMaxVal = 100;
+       // if(m_xinmo.lvl >= 20 && m_xinmo.xctMaxVal == 0)
+        //    m_xinmo.xctMaxVal = 100;
+        GData::XinMoData::stXinMo * stxcn = GData::xinmoData.getXinMoTable(m_xinmo.lvl);
+        setSkills(stxcn->skilllev,false);
     }
     
-    if(m_xinmo.curVal > curValue)
+    if(m_xinmo.val > curValue)
     {
         updateDBxinmo();
-        _owner->SetVar(VAR_XINGCHENZHEN_VALUE, value - consumeValue);
-
-		SYSMSG_SENDV(4918, _owner, consumeValue);
+        _owner->SetVar(VAR_HEART_SWORD, value - consumeValue);
+		SYSMSG_SENDV(4919, _owner, consumeValue);
     }
    
-    if(stxc->consume <= _owner->GetVar(VAR_XINGCHENZHEN_VALUE))
+    if(count!=0)
     {
-        type = type - 1;
+        Stream st (REP::EQ_XINMO);
+        st << static_cast<UInt8>(2);
+        st << static_cast<UInt16>(getId());
+        st << static_cast<UInt8>(count);
+        st << static_cast<UInt32>( m_xinmo.val );
+        st << Stream::eos;
+        _owner->send(st);
     }
 
-    sendXinMoInfo(type);
-    GameAction()->doStrong(_owner, SthXinMo, 0, 0); 
-    _owner->GuangGunCompleteTask(0,30);
+   // GameAction()->doStrong(_owner, SthXinMo, 0, 0); 
+   // _owner->GuangGunCompleteTask(0,30);
     return true;
 }
 

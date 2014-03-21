@@ -49,9 +49,9 @@ class XinMoData
             UInt32 hp;
             UInt32 action;
             float cridec;
-            UInt32 skilllev;
+            std::string skilllev;
             UInt32 payBack; //解雇补偿
-            stXinMo(): level(0), limitLev(0), name(""), consume(0), maxVal(0), attack(0), hp(0), action(0), cridec(0.0),skilllev(0), payBack(0) {}
+            stXinMo(): level(0), limitLev(0), name(""), consume(0), maxVal(0), attack(0), hp(0), action(0), cridec(0.0),skilllev(""), payBack(0) {}
         };
     private:
         std::map<UInt8, stXinMo> _xinmo;
