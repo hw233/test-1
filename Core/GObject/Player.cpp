@@ -10322,6 +10322,15 @@ namespace GObject
 		sprintf(numstr, "%u", _playerData.title);
 		_battleName.clear();
 		_battleName = getClanName();
+
+		char numstr2[16];
+        UInt32 clanTitle;
+        Clan *clan =  getClan();
+        if(clan != NULL)
+            clanTitle = 1;
+        else
+            clanTitle = 0;
+		sprintf(numstr2, "%u", clanTitle);
         /*
         if(cfg.merged && !_battleName.empty() && static_cast<UInt8>(*(_battleName.end() - 1)) < 32)
 		{
@@ -10331,7 +10340,7 @@ namespace GObject
 		}
         */
 		//_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
-		_battleName = _battleName + sepStr + numstr + sepStr + _playerData.name;
+		_battleName = _battleName + sepStr + numstr + sepStr + numstr2 + sepStr + _playerData.name;
 #endif
 	}
 
