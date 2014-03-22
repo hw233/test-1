@@ -669,8 +669,7 @@ namespace GObject
                     {
                         (*it_vec)->setLeftAddrEnter(false);
                         TRACE_LOG("leftaddr(LeaveTeam) 0 (pid: %" I64_FMT "u)", (*it_vec)->getId());
-                        it->second.erase(it_vec);
-                        it_vec = it->second.begin();
+                        it_vec = it->second.erase(it_vec);
                     }
                     else
                         ++it_vec;
@@ -684,6 +683,7 @@ namespace GObject
                         _clan->broadcast(st);
                     }
                     leftAttackTeams.erase(it);
+                    break ;
                 }
                 for(UInt8 i = 0 ; i < vec.size() ; ++i)
                 {
