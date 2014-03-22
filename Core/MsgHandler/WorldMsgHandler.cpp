@@ -112,6 +112,7 @@ MSG_REG_2(ServerLeftMsgHdr, 0x141, OnServerLeftNotice);   //帮派成员获得
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 MSG_REG_2(GameMsgHdr, 0x166, OnSetTYSSScore);
+MSG_REG_2(GameMsgHdr, 0x167, OnAddTYSSSum);
 
 MSG_REG_2(GameMsgHdr, 0x171, OnClanTakeRewardResultReq);
 MSG_REG_2(GameMsgHdr, 0x172, OnTeamArenaAddMember);
