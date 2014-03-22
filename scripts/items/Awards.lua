@@ -1740,3 +1740,29 @@ function RunHappyValueAward(player, cts)
     end
     return true
 end
+function RunTYSSAward(player, cts)
+   local item = {
+        [1] = {{56,2},{57,2},{15,2},{500,2},{9371,3}},
+        [2] = {{500,2},{511,2},{501,2},{517,2}},
+        [3] = {{516,3},{503,3},{547,3},{551,3}},
+        [4] = {{465,1},{514,1}},
+        [5] = {{515,2},{134,2},{1325,2}},
+        [6] = {{9022,2},{509,3},{9076,1}},
+    };
+    local package = player:GetPackage();
+    if nil == player or nil == cts or nil == item[cts] then
+        return false 
+    end
+    if package:GetRestPackageSize() < #item[cts] then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+    end
+    
+    return true
+
+end
+

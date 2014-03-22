@@ -489,6 +489,29 @@ void BattleFighter::updateBuffExtras()
         _attrExtra.defend *= 1.05f;
         _attrExtra.magdef *= 1.05f;
     }
+
+    float clanFactor = 0;
+    if(_fighter && _fighter->getOwner())
+    {
+        if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN1) > 0)
+            clanFactor = 1.1;
+        else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN2) > 0)
+            clanFactor = 1.05;
+        else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+            clanFactor = 1.03;
+    }
+    if(clanFactor > 0.001f)
+    {
+        _attrExtra.attack *= clanFactor;
+        _attrExtra.magatk *= clanFactor;
+        _attrExtra.defend *= clanFactor;
+        _attrExtra.magdef *= clanFactor;
+        _attrExtra.action *= clanFactor;
+        _attrExtra.tough  *= clanFactor;
+        _attrExtra.evade  *= clanFactor;
+        _attrExtra.hitrate *= clanFactor;
+        _attrExtra.hp *= clanFactor;
+    }
 }
 
 float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender, float* pCf)

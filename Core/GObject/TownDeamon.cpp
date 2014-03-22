@@ -532,7 +532,11 @@ bool TownDeamon::attackNpc(Player* pl, UInt16 level)
 
     //镇妖封神 修仙夺宝 10-15--10-18
     if (res)
+    {
         getTownReward_10_15(pl, level);
+        if(m_maxDeamonLevel < level)
+            m_maxDeamonLevel = level;
+    }
     return res;
 }
 

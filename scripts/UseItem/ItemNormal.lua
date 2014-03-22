@@ -10443,6 +10443,27 @@ function ItemNormal_00009428(iid, num, bind, param)
     package:DelItemSendMsg(iid, player)
     return num;
 end
+
+function ItemNormal_00009492(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    
+    if player:getClan() == nil then
+        player:sendMsgCode(0,6031,0);     
+        return;
+    end
+    
+    if not getTYSSTime() then
+        player:sendMsgCode(0,6030,0);
+        return;
+    end
+
+    player:EatLingGuo(num);
+    
+    package:DelItemSendMsg(iid, player)
+    return num;
+end
+
 function ItemNormal_jgsexp(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 70 then
@@ -12407,6 +12428,7 @@ local ItemNormal_Table = {
     [9444] = ItemNormal_00009444,
     [9445] = ItemNormal_00009444,
     [9446] = ItemNormal_00009444,
+    [9492] = ItemNormal_00009492,
 
     --坐骑
     [9601] = ItemNormal_00009601,

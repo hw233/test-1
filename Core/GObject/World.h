@@ -1000,6 +1000,18 @@ public:
         else
             return false;
     } 
+    
+    inline static bool getTYSSTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_TYSS_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_TYSS_END);
+        UInt32 now = TimeUtil::Now() + time;
+
+        if(now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
 
     inline static bool getGuankaAct(UInt32 time = 0)
     {
@@ -1311,6 +1323,8 @@ public:
     static ClanGradeSort clanGradeSort; // 十一活动
     static RCSortType guangGunSort; //十一活动
     static RCSortType happyFireSort;     //七石板积分排名
+    static RCSortType tyss_PlayerSort;     //天元神兽个人积分排名
+    static ClanGradeSort tyss_ClanSort;     //天元神兽帮派积分排名
     static void initRCRank();
     static void initRP7RCRank();
 
@@ -1410,6 +1424,8 @@ public:
     static UInt16 GetRandomSpot();
     void SendHappyFireAward();
     void SendGuankaActAward();
+    void SendTYSSClanAward();
+    void SendTYSSPlayerAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

@@ -213,6 +213,8 @@ RCSortType World::PlayerGradeSort;
 RCSortType World::guangGunSort;
 RCSortType World::happyFireSort;
 ClanGradeSort World::clanGradeSort;
+RCSortType World::tyss_PlayerSort;
+ClanGradeSort World::tyss_ClanSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
 bool World::_killMonsteract = 0;
@@ -340,6 +342,7 @@ bool bGoldSnakeEnd = false;
 bool bItem9344End = false;
 bool bItem9343End = false;
 bool bQiShiBanEnd = false;
+bool bTYSSEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -504,6 +507,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 13)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 14)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 22)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -1259,6 +1270,7 @@ void World::World_Midnight_Check( World * world )
     bool bItem9344 = getItem9344Act();
     bool bItem9343 = getItem9343Act();
     bool bQiShiBanTime = getQiShiBanTime();
+    bool bTYSSTime = getTYSSTime();
 
 	world->_worldScript->onActivityCheck(curtime+300);
 
@@ -1292,6 +1304,8 @@ void World::World_Midnight_Check( World * world )
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
     bGGTimeEnd = bGGtime && !getGGTime(300);
+    //天元神兽活动结束
+    bTYSSEnd = bTYSSTime && !getTYSSTime(300);
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
@@ -1388,6 +1402,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 14)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 22)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1476,6 +1498,11 @@ void World::World_Midnight_Check( World * world )
         world->SendHappyFireAward();
     if(bGuankaEnd)
         world->SendGuankaActAward();
+    if(bTYSSEnd)
+    {
+        world->GObject::World::SendTYSSPlayerAward();
+        world->GObject::World::SendTYSSClanAward();
+    }
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
   //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
@@ -2009,7 +2036,7 @@ void World::ClanDuoBaoCheck(void *)
             _duobaoOpen = true;
         }
 
-        if(TimeUtil::Now() >= GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
+        if(nowTime >= GVAR.GetVar(GVAR_DUOBAO_ENDTIME))
         {
             class DuoBaoEndVisitor : public Visitor<Clan>
             {
@@ -2027,27 +2054,29 @@ void World::ClanDuoBaoCheck(void *)
             };
             DuoBaoEndVisitor visitor;
             globalClans.enumerate(visitor);
-        }
-
-        UInt32 value = 0;
-        if(nowTime >= GVAR.GetVar(GVAR_CLAN_DUOBAO_END))
-        {
-            value = time + 10*60*60 + 900 + 86400; //今天活动结束，时间设置到下一天第一轮的结束时间
-            UInt32 nextBegin = time + 10*60*60 + 86400;   //今天活动结束，时间设置到下一天的开始时间
-            UInt32 nextEnd = time + 22*60*60 + 86400;       //今天活动结束，时间设置到下一天的结束时间
-            if(_duobaoOpen)
+    
             {
-                GObject::globalPlayers.enumerate(enum_duobao_send, 0);
-                _duobaoOpen = false;
-                DB5().PushUpdateData("DELETE FROM `duobaolog`");
-            }
-            GVAR.SetVar(GVAR_CLAN_DUOBAO_BEGIN, nextBegin);
-            GVAR.SetVar(GVAR_CLAN_DUOBAO_END, nextEnd);
-        }
-        else
-            value = nowTime / (15 * 60) * (15 * 60) + (15 * 60); //本轮活动结束，时间设置到下一轮的结束时间
+                UInt32 value = 0;
+                if(nowTime >= GVAR.GetVar(GVAR_CLAN_DUOBAO_END))
+                {
+                    value = time + 10*60*60 + 900 + 86400; //今天活动结束，时间设置到下一天第一轮的结束时间
+                    UInt32 nextBegin = time + 10*60*60 + 86400;   //今天活动结束，时间设置到下一天的开始时间
+                    UInt32 nextEnd = time + 22*60*60 + 86400;       //今天活动结束，时间设置到下一天的结束时间
+                    if(_duobaoOpen)
+                    {
+                        GObject::globalPlayers.enumerate(enum_duobao_send, 0);
+                        _duobaoOpen = false;
+                        DB5().PushUpdateData("DELETE FROM `duobaolog`");
+                    }
+                    GVAR.SetVar(GVAR_CLAN_DUOBAO_BEGIN, nextBegin);
+                    GVAR.SetVar(GVAR_CLAN_DUOBAO_END, nextEnd);
+                }
+                else
+                    value = nowTime / (15 * 60) * (15 * 60) + (15 * 60); //本轮活动结束，时间设置到下一轮的结束时间
 
-        GVAR.SetVar(GVAR_DUOBAO_ENDTIME, value);
+                GVAR.SetVar(GVAR_DUOBAO_ENDTIME, value);
+            }
+        }
     }
 }
 
@@ -3164,6 +3193,19 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::guankaScoreSort.insert(s);
         }
     }
+    if(World::getTYSSTime())
+    {
+        UInt32 used= p->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER);
+        if(used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::tyss_PlayerSort.insert(s);
+        }
+
+    }
+
     return true;
 }
 inline bool clan_enum_grade(GObject::Clan *clan,int)
@@ -3179,6 +3221,19 @@ inline bool clan_enum_grade(GObject::Clan *clan,int)
             s.total = grade;
             World::clanGradeSort.insert(s);
         }
+    }
+    
+    if(World::getTYSSTime())
+    {
+        UInt32 grade = clan->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+        if(grade)
+        {
+            ClanSort s;
+            s.clan = clan;
+            s.total = grade;
+            World::tyss_ClanSort.insert(s);
+        }
+
     }
 
     return true;
@@ -4366,6 +4421,74 @@ void World::SendGuankaActAward()
         }
     }
 }
+
+void World::SendTYSSClanAward()
+{
+    World::initRCRank();
+        
+    ClanGradeSort::iterator i = World::tyss_ClanSort.begin();
+    ClanGradeSort::iterator e = World::tyss_ClanSort.end();
+    for (UInt32 pos = 0; i != e; ++i)
+    {
+        if(i->clan == NULL)
+            continue;
+        ++pos;
+        if(pos == 1 || pos == 2 || pos == 3)
+            i->clan->sendMemberBuf(pos);
+        if(i->total >= 3000)
+        {
+            i->clan->SendClanMemberAward(i->total,1,"幼年期神兽"); 
+            if(i->total >= 19000)
+            {
+                i->clan->SendClanMemberAward(i->total,2,"成长期神兽"); 
+                if(i->total >= 40000)
+                {
+                    i->clan->SendClanMemberAward(i->total,3,"青年期神兽"); 
+                    if(i->total >= 70000)
+                    {
+                        i->clan->SendClanMemberAward(i->total,4,"亚神兽期"); 
+                        if(i->total >= 100000)
+                            i->clan->SendClanMemberAward(i->total,5,"天元神兽"); 
+                    }
+                }
+            }
+        }
+    }
+
+    return;
+}
+
+void World::SendTYSSPlayerAward()
+{
+    World::initRCRank();
+    int pos = 1;
+    std::string str = "";
+    static MailPackage::MailItem s_item[][4] = {
+        {{134,50},{1325,50},{515,30},{9075,40}},
+        {{134,40},{1325,40},{515,25},{9075,30}},
+        {{134,30},{1325,30},{515,20},{9075,20}},
+        {{134,20},{1325,20},{515,15},{9075,10}},
+    };
+    SYSMSG(title, 946);
+    for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
+    {
+        UInt32 score = i->total;
+        str = i->player->getName();
+        if(pos >= 1 && pos < 8)     //奖励前7名
+        {
+            int type = pos > 3 ? 4 : pos;
+            SYSMSGV(content, 951, pos);
+            MailItemsInfo itemsInfo(s_item[type-1], Activity, 4);
+            Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+                mailPackageManager.push(mail->id, s_item[type-1], 4, true);
+        }        
+        pos++;
+        
+    }
+    return;
+}
+
 
 }
 
