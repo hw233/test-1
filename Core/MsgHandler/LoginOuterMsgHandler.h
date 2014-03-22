@@ -3935,6 +3935,11 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 17 && begin <= end )
     {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
         curType = 17;
         if(GObject::GVAR.GetVar(GObject::GVAR_GUANKAACT_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_GUANKAACT_END) < TimeUtil::Now())
@@ -3943,7 +3948,8 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         }
         GObject::GVAR.SetVar(GObject::GVAR_GUANKAACT_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_GUANKAACT_END, end);
-        ret = 1;
+
+        return;
     }
     else if (type == 18 && begin <= end )
     {
