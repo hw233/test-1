@@ -832,6 +832,7 @@ namespace GObject
         m_EnterPTCStatus = false;
         m_InPTCStatus = false;
         _leftAddrEnter = 0 ;
+        _InLeftTeam = false;
 	}
 
 
