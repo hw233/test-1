@@ -29444,9 +29444,11 @@ void Player::do_fighter_xinmo(Fighter* fgt, UInt32 oldId)
     DB1().PushUpdateData("UPDATE `fighter_xinmo` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
 }
 
+/*
 //增加和某好友的友好度
 void Player::CompleteFriendlyTask(Player * friender , UInt8 taskNum)
 {
+    return ;
     if(friender == NULL)
         return ;
     if(!_hasFriend(friender))
@@ -29476,11 +29478,12 @@ void Player::CompleteFriendlyTask(Player * friender , UInt8 taskNum)
 }
 void Player::AddFriendlyCount(Player * friender , UInt8 val) 
 {
+    return ;
     if( !friender )
         return ;
     std::map<UInt64,UInt32 >::iterator it = _friendlyCount.find(friender->getId());
-
 }
+*/
 
 } // namespace GObject
 

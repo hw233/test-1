@@ -671,7 +671,7 @@ bool Clan::kick(Player * player, UInt64 pid)
         kicker->rebuildBattleName();
     }
 
-    if(kicker->getLeftAddrEnter())
+    if(kicker->getInLeftTeam())
     {
         struct TeamChange
         {
@@ -793,7 +793,7 @@ bool Clan::leave(Player * player)
         DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid` = %" I64_FMT "u", player->getId());
 		// updateRank(NULL, oldLeaderName);
 	}
-    if(player->getLeftAddrEnter())
+    if(player->getInLeftTeam())
     {
         struct TeamChange
         {
@@ -1776,7 +1776,7 @@ void Clan::disband(Player * player)
         GameMsgHdr hdr(0x1D4, WORKER_THREAD_WORLD, player, sizeof(clanId));
         GLOBAL().PushMsg(hdr, &clanId);
     }
-    if(player->getLeftAddrEnter())
+    if(player->getInLeftTeam())
     {
         struct TeamChange
         {

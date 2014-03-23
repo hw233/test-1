@@ -757,7 +757,7 @@ namespace GObject
         {
             if(it->first.leftId == leftId )
             {
-                if( ( it->first.leader != player || !it->first.leader->getLeftAddrEnter() || !it->first.leader->getInLeftTeam() ) && _clan->getClanRank(player) < 3)
+                if( ( it->first.leader != player || !it->first.leader->getLeftAddrEnter() ) && _clan->getClanRank(player) < 3)
                     return ;
                 std::string leaderName = it->first.leader->getName();
                 UInt8 leftId = it->first.leftId;
@@ -766,6 +766,7 @@ namespace GObject
                 std::vector<Player *> vec = it->second ;
 
                 //it->first.leader->setLeftAddrEnter(false);
+                it->first.leader->setLeftAddrEnter(false);
                 TRACE_LOG("leftaddr(Attack) 0 (pid: %" I64_FMT "u)", it->first.leader->getId());
                 //LeaveTeam(player , player ,player);
 

@@ -3013,8 +3013,8 @@ namespace GObject
         void sevensoul_fixed();
 
         //友好度
-        void AddFriendlyCount(Player * friender , UInt8 taskNum) ;
-        void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
+        //void AddFriendlyCount(Player * friender , UInt8 taskNum) ;
+        //void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
     public:
         UInt8 useChangeSexCard();
         void doTableInWorld(Fighter* fgt, UInt32 oldId);
