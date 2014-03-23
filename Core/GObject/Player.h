@@ -2089,6 +2089,9 @@ namespace GObject
         std::map<UInt64,std::vector<StuPresentBox> > _present; 
         std::map<UInt64,std::vector<StuPresentBox> >_bePresent; 
 
+        std::map<UInt64,UInt32 > _friendlyCount; 
+
+
 		TaskMgr* m_TaskMgr;
 		Trade* m_Trade;
 		Sale* m_Sale;
