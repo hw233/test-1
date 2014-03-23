@@ -2804,7 +2804,6 @@ void OnAddFriendlyCount(GameMsgHdr & hdr ,const void *data)
         UInt8 val ;
     };
     struct st st_param = *reinterpret_cast<const struct st *>(data); 
-    player->bePrayed(id);
 }
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

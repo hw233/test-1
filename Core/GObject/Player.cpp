@@ -29459,7 +29459,7 @@ void Player::CompleteFriendlyTask(Player * friender , UInt8 taskNum)
      {1,10,1,10},
      {1,4,1,4},
      {1,20,1,20},
-    }
+    };
 
     UInt32 count_var =GetVar(VAR_FRIEND_TASK1 + taskNum/3);  
     UInt8 count = GET_BIT_8(count_var , taskNum%3);
@@ -29469,9 +29469,9 @@ void Player::CompleteFriendlyTask(Player * friender , UInt8 taskNum)
     }
     if(count < task_num_val_max[taskNum][4])
     {
-       AddVar(VAR_FRIEND_VALUE , task_num_val_max[taskNum][3])  ;
+       AddVar(VAR_FRIEND_VALUE , task_num_val_max[taskNum][3]);
     }
-    SET_BIT_8(count_var , taskNum %3 , count +1);
+    SET_BIT_8(count_var , taskNum %3 , (count +1) );
     SetVar(VAR_FRIEND_TASK1+taskNum/3 , count_var);
 }
 void Player::AddFriendlyCount(Player * friender , UInt8 val) 
