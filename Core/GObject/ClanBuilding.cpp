@@ -554,6 +554,12 @@ namespace GObject
                 vec[i]->send(st);
             }
         }
+        if(cbbi.res ==0 && cbbi.type == 1)
+        {
+            Stream st ;
+            SYSMSGVP(st, 4308, cbbi.leftId ,cbbi.name.c_str());
+          //  _clan->broadcast(st);
+        }
     } 
     void ClanBuildingOwner::SendBattlesInfo( Stream & st)
     {
@@ -663,8 +669,7 @@ namespace GObject
                     {
                         (*it_vec)->setLeftAddrEnter(false);
                         TRACE_LOG("leftaddr(LeaveTeam) 0 (pid: %" I64_FMT "u)", (*it_vec)->getId());
-                        it->second.erase(it_vec);
-                        it_vec = it->second.begin();
+                        it_vec = it->second.erase(it_vec);
                     }
                     else
                         ++it_vec;
@@ -678,6 +683,7 @@ namespace GObject
                         _clan->broadcast(st);
                     }
                     leftAttackTeams.erase(it);
+                    break ;
                 }
                 for(UInt8 i = 0 ; i < vec.size() ; ++i)
                 {
@@ -724,7 +730,12 @@ namespace GObject
                 }
                 player->setLeftAddrEnter(true);
                 TRACE_LOG("leftaddr(EnterTeam) 1 (pid: %" I64_FMT "u)", player->getId());
-                break;
+                if(it->second.size() == 5)
+                {
+                    Stream st ;
+                    SYSMSGVP(st, 4309, leader->getName().c_str(),it->first.leftId);
+                    //_clan->broadcast(st);
+                }
             }
         }
 
