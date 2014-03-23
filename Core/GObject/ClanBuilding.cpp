@@ -326,7 +326,7 @@ namespace GObject
                            if(val > 0 )
                            {
                                //player->SetVar(VAR_LEFTADDR_POWER ,val -1);
-                               player->setLeftAddrEnter(true);
+                               //player->setLeftAddrEnter(true);
                                TRACE_LOG("leftaddr(guardleft) 1 (pid: %" I64_FMT "u)", player->getId());
                            }
                         }
