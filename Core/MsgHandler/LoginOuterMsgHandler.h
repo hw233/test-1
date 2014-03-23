@@ -3430,6 +3430,11 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_CLAN_DUOBAO_STATUS, 0);
             }
             break;
+        case 20:
+            {
+                //todo 天元神兽
+            }
+            break;
         default:
             return false;
     }
@@ -3932,6 +3937,17 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
             valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
 
         GObject::GVAR.SetVar(GObject::GVAR_DUOBAO_ENDTIME, valueTime);
+
+        return;
+    }
+    else if (type == 20 && begin <= end )
+    {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        
+        GObject::GVAR.SetVar(GObject::GVAR_TYSS_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_TYSS_END, end);
 
         return;
     }

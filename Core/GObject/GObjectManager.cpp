@@ -3755,6 +3755,7 @@ namespace GObject
             pl->setInQQGroup(cp.inQQGroup);
             
             clan->LoadDuoBaoScore(pl);
+            clan->LoadTYSSScore(pl);
 		}
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
