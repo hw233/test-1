@@ -1091,6 +1091,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->sendFighterSSListWithNoSkill();
 #endif
     }
+    {
+        Stream st;
+        pl->makeFighterSGList(st);
+		conn->send(&st[0], st.size());
+    }
 	{
 		Stream st;
 		pl->makeFormationInfo(st);
@@ -6495,6 +6500,10 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
     }
     else if (type == 3)
         fgt->SSDismiss(skillid);
+    else if(type == 10)
+        fgt->SGradeManual(skillid);
+    else if(type == 11)
+        fgt->SGradeAuto(skillid);
 }
 
 void OnMakeStrong( GameMsgHdr& hdr, const void * data )

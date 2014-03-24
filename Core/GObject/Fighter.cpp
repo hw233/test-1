@@ -7490,6 +7490,168 @@ void Fighter::dismissXinMo()
     DB1().PushUpdateData("DELETE FROM `fighter_xinmo` WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", getId(), _owner->getId());
 }
 
+#define SG_LEVEL_MAX  9
+//static UInt32 SGConsume[SG_LEVEL_MAX] = {1,3,6,10,15,21,28,36,45};
+static UInt32 SGConsume[SG_LEVEL_MAX] = {1,2,3,4,5,6,7,8,9};
+
+void Fighter::SGradeManual(UInt16 skillId)
+{
+    if(!_owner)
+        return;
+    if(_owner->GetLev() < 85)
+        return;
+    if(hasSkill(skillId) < 0)
+        return;
+
+    UInt16 sid = SKILL_ID(skillId);
+    UInt8 sgLevel;
+    UInt16 sgLuck;
+    std::map<UInt16, SGrade>::iterator it = m_sg.find(sid);
+    if(it != m_sg.end())
+    {
+        SGrade& sg = it->second;
+        sgLevel = sg.lvl;
+        if(sgLevel >= SG_LEVEL_MAX)
+        {
+            _owner->sendMsgCode(0, 1361);
+            return;
+        }
+        sgLuck = sg.luck;
+    }
+    else
+    {
+        sgLevel = 1;
+        sgLuck = 0;
+    }
+
+    UInt32 sgMoney = _owner->GetVar(VAR_SKILL_GRADE_MONEY);
+    if(sgMoney < SGConsume[sgLevel - 1])
+    {
+        _owner->sendMsgCode(0, 4001);
+        return;
+    }
+
+    _owner->SetVar(VAR_SKILL_GRADE_MONEY, sgMoney - SGConsume[sgLevel - 1]);
+    ++sgLevel;
+
+    SGrade sgTmp;
+    sgTmp.lvl = sgLevel;
+    sgTmp.luck = sgLuck;
+    m_sg[sid] = sgTmp;
+
+	Stream st(REP::SKILLSTRENGTHEN);
+    st << getId();
+    st << skillId;
+    st << sgLevel;
+    st << sgLuck;
+    st << _owner->GetVar(VAR_SKILL_GRADE_MONEY);
+    st << Stream::eos;
+    _owner->send(st);
+
+}
+
+void Fighter::SGradeAuto(UInt16 skillId)
+{
+    if(!_owner)
+        return;
+    if(_owner->GetLev() < 85)
+        return;
+    if(hasSkill(skillId) < 0)
+        return;
+
+    UInt16 failCnt = 0;
+
+    UInt16 sid = SKILL_ID(skillId);
+    UInt8 sgLevel;
+    UInt16 sgLuck;
+    std::map<UInt16, SGrade>::iterator it = m_sg.find(sid);
+    if(it != m_sg.end())
+    {
+        SGrade& sg = it->second;
+        sgLevel = sg.lvl;
+        if(sgLevel >= SG_LEVEL_MAX)
+            return;
+        sgLuck = sg.luck;
+    }
+    else
+    {
+        sgLevel = 1;
+        sgLuck = 0;
+    }
+
+    UInt32 sgMoney = _owner->GetVar(VAR_SKILL_GRADE_MONEY);
+    if(sgMoney < SGConsume[sgLevel - 1])
+        return;
+
+    _owner->SetVar(VAR_SKILL_GRADE_MONEY, sgMoney - SGConsume[sgLevel - 1]);
+    ++sgLevel;
+
+    SGrade sgTmp;
+    sgTmp.lvl = sgLevel;
+    sgTmp.luck = sgLuck;
+    m_sg[sid] = sgTmp;
+
+	Stream st(REP::SKILLSTRENGTHEN);
+    st << getId();
+    st << skillId;
+    st << sgLevel;
+    st << sgLuck;
+    st << _owner->GetVar(VAR_SKILL_GRADE_MONEY);
+    st << failCnt;
+    st << Stream::eos;
+    _owner->send(st);
+}
+
+void Fighter::makeFighterSGInfo(Stream& st)
+{
+    st << getId();
+    size_t offset = st.size();
+    st << static_cast<UInt8>(0);
+    UInt8 c = 0;
+    for (int i = 0; i < getUpSkillsMax(); ++i)
+    {
+        if (_skill[i])
+        {
+            if (appendFighterSSInfo(st, _skill[i]))
+                ++c;
+        }
+    }
+    // append peerless skill
+    if (peerless)
+    {
+        if (appendFighterSSInfo(st, peerless))
+            ++c;
+    }
+    st.data<UInt8>(offset) = c;
+}
+
+SGrade* Fighter::SGGetInfo(UInt16 skillId)
+{
+    UInt32 sid = SKILL_ID(skillId);
+    std::map<UInt16, SGrade>::iterator i = m_sg.find(sid);
+    if (i == m_sg.end())
+        return NULL;
+    return &i->second;
+}
+
+bool Fighter::appendFighterSGInfo(Stream& st, UInt16 skillId)
+{
+    SGrade* sg = SGGetInfo(skillId);
+    if(!sg)
+        return false;
+    return appendFighterSGInfo(st, skillId, sg);
+}
+
+bool Fighter::appendFighterSGInfo(Stream& st, UInt16 skillId, SGrade* sg)
+{
+    if(sg)
+    {
+        st << skillId << sg->lvl << sg->luck;
+        return true;
+    }
+    return false;
+}
+
 /*
  *end分别计算散仙的战斗力
 */

@@ -108,6 +108,14 @@ struct SStrengthen
     UInt8 maxLvl; // 解封等级
 };
 
+struct SGrade
+{
+    SGrade() : lvl(0), luck(0) {}
+
+    UInt8 lvl; // 当前等级
+    UInt16 luck; //祝福值
+};
+
 struct SoulItemExp
 {
     UInt16 itemId;
@@ -986,6 +994,7 @@ public:
     void pushLingbaoInfo(ItemEquip* equip);
 private:
     std::map<UInt16, SStrengthen> m_ss;
+    std::map<UInt16, SGrade> m_sg; //技能升阶
 
 public:
 	UInt32 favor;
@@ -1074,6 +1083,14 @@ public:
     bool upgradeXinMo();
     bool quickUpGradeXinMo();
     void dismissXinMo();
+
+    void SGradeManual(UInt16 skillId);
+    void SGradeAuto(UInt16 skillId);
+    void makeFighterSGInfo(Stream& st);
+    SGrade* SGGetInfo(UInt16 skillid);
+    bool appendFighterSGInfo(Stream& st, UInt16 skillid);
+    bool appendFighterSGInfo(Stream& st, UInt16 skillid, SGrade* sg);
+
 };
 
 class GlobalFighters

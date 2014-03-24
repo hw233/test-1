@@ -29486,6 +29486,24 @@ void Player::AddFriendlyCount(Player * friender , UInt8 val)
 }
 */
 
+	void Player::makeFighterSGList(Stream& st)
+	{
+		size_t c = _fighters.size();
+		st.init(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(10);
+        st << GetVar(VAR_SKILL_GRADE_MONEY);
+		st << static_cast<UInt8>(c);
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if(it->second)
+            {
+                it->second->makeFighterSGInfo(st);
+            }
+        }
+		st << Stream::eos;
+        send(st);
+	}
+
 } // namespace GObject
 
 
