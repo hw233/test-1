@@ -9996,8 +9996,8 @@ end
 
 function ItemNormal_00009375(iid, num, bind, param)
     local player = GetPlayer();
-        local itemNumber = 0 ;
-        local package = player:GetPackage();
+    local itemNumber = 0 ;
+    local package = player:GetPackage();
 	    if num  <= package:GetRestPackageSize() then
             package:DelItemSendMsg(9375, player);
             for k = 1, num do
@@ -10030,7 +10030,7 @@ function ItemNormal_00009375(iid, num, bind, param)
                     itemNumber = 515;
                 elseif rand <= 10000 then
                     itemNumber = 551;
-                 end
+                end
             package:AddItem(itemNumber,1,1,0,2);
             if getFoolBao() and ( rand > 7930 or itemNumber == 9088 ) then  
             Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:"..itemNumber.."]x1")
@@ -10042,6 +10042,48 @@ function ItemNormal_00009375(iid, num, bind, param)
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 end
+
+function ItemNormal_00009475(iid, num, bind, param)
+    local itemId = 9475;
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local itemNumber = 0;
+    local g = 0;
+    local items = {1126, 1326, 1325}
+    local chance = {1250, 3750, 10000}
+    local gNum = {1, 4, 2}
+    if num  <= package:GetRestPackageSize() then                                                     
+       package:DelItemSendMsg(9475, player);
+     --[[  for n = 1, num do
+          local rand = math.random(1,10000);
+          if rand <= 1250 then
+              itemNumber = 1126;
+              g = 1;
+          elseif rand <= 3750 then
+              itemNumber = 1326;
+              g = 4;
+          elseif rand <= 10000 then
+              itemNumber = 1325;
+              g = 2;
+          end
+          package:AddItem(itemNumber,g,1,0,2);
+       end  --end for--]]
+       for n = 1, num do
+           local rand = math.random(1,10000)
+           for i = 1,#chance do
+               if rand <= chance[i] then
+                   itemNumber=items[i]
+                   g=gNum[i]
+                   break
+               end
+           end
+           package:AddItem(itemNumber,g,1,0,2)
+       end--end for
+       return num;
+    end--end if
+    player:sendMsgCode(2,1011,0);
+    return false;
+end 
 
 function ItemNormal_00009382(iid, num, bind, param)
     local itmeId = 9449;
@@ -12132,6 +12174,8 @@ local ItemNormal_Table = {
     [9445] = ItemNormal_00009444,
     [9446] = ItemNormal_00009444,
 
+    --仙界遗迹宝箱
+    [9475] = ItemNormal_00009475,
     --坐骑
     [9601] = ItemNormal_00009601,
     [9602] = ItemNormal_00009601,

@@ -3498,11 +3498,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{509,30},{515,30},{9438,60},{134,30},{9075,50}},
-        {{509,25},{515,25},{9438,50},{134,25},{9075,40}},
-        {{509,20},{515,20},{9438,40},{134,20},{9075,30}},
+        {{9600,40},{515,30},{9418,60},{503,60},{9022,40}},
+        {{9600,30},{515,25},{9418,60},{503,50},{9022,30}},
+        {{9600,20},{515,20},{9418,60},{503,40},{9022,20}},
     };
-   // static MailPackage::MailItem card = {9922,1};
+    static MailPackage::MailItem card = {9936,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -3517,8 +3517,8 @@ void World::Send11PlayerRankAward()
         if(mail)
         {
             mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
-//            if(pos ==1)
-  //              mailPackageManager.push(mail->id, &card, 1, true);
+            if(pos ==1)
+                mailPackageManager.push(mail->id, &card, 1, true);
         }
         std::string strItems;
         for(int index = 0; index < 5; ++ index)

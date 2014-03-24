@@ -1,5 +1,5 @@
 ﻿#ifndef _COUNTRYINNERMSGHANDLER_H_
-#define _COUNTRYINNERMSGHANDLER_H_
+#define  _COUNTRYINNERMSGHANDLER_H_
 
 #include "Server/GlobalObject.h"
 #include "Server/Cfg.h"
