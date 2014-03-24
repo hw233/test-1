@@ -669,8 +669,8 @@ namespace GObject
         VAR_LEFTADDR_POWER = 694 ,   //仙界征战体力
         VAR_LEFTADDR_CREATE = 695 ,   //创建队伍的时间
         VAR_HEART_SWORD = 696 ,    //心剑值
-        VAR_FRIEND_TASK1 = 697 ,    //友好度任务，主动私聊，帮助浇灌许愿树，发起与好友的切磋
-        VAR_FRIEND_TASK2 = 698 ,    //与好友组队副本，与好友宠物副本，赠送黄色鸢尾
+        VAR_FRIEND_TASK1 = 697 ,    //友好度任务，主动私聊，帮助浇灌许愿树，发起与好友的切磋  
+        VAR_FRIEND_TASK2 = 698 ,    //与好友组队副本，与好友宠物副本，赠送黄色鸢尾 , 每日任务完成数
         VAR_FRIEND_VALUE = 699 ,    //友情值
 
         //701-710 for suntao

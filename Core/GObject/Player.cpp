@@ -832,6 +832,7 @@ namespace GObject
         m_EnterPTCStatus = false;
         m_InPTCStatus = false;
         _leftAddrEnter = 0 ;
+        _InLeftTeam = false;
 	}
 
 
@@ -29447,39 +29448,61 @@ void Player::do_fighter_xinmo(Fighter* fgt, UInt32 oldId)
 //增加和某好友的友好度
 void Player::CompleteFriendlyTask(Player * friender , UInt8 taskNum)
 {
+    return ;
     if(friender == NULL)
         return ;
     if(!_hasFriend(friender))
         return ;
 
-    static UInt8 task_num_val_max[][4] = {
-     {1,1,1,3},
-     {1,1,1,3},
-     {1,1,1,1},
-     {1,10,1,10},
-     {1,4,1,4},
-     {1,20,1,20},
-    }
+    static UInt8 task_num_val_max[][5] = {
+     {1,1,1,3,3},
+     {1,1,1,3,5},
+     {1,1,1,1,1},
+     {1,10,1,10,1},
+     {1,4,1,4,1},
+     {1,20,1,20,10},
+    };
 
     UInt32 count_var =GetVar(VAR_FRIEND_TASK1 + taskNum/3);  
     UInt8 count = GET_BIT_8(count_var , taskNum%3);
-    if(count < task_num_val_max[taskNum][2])
+    if(count < task_num_val_max[taskNum][1])
     {
-        AddFriendlyCount( friender , task_num_val_max[taskNum][1])          ;
+        AddFriendlyCount( friender , task_num_val_max[taskNum][0])          ;
     }
-    if(count < task_num_val_max[taskNum][4])
+    if(count < task_num_val_max[taskNum][3])
     {
-       AddVar(VAR_FRIEND_VALUE , task_num_val_max[taskNum][3])  ;
+       AddVar(VAR_FRIEND_VALUE , task_num_val_max[taskNum][2]);
     }
-    SET_BIT_8(count_var , taskNum %3 , count +1);
+    SET_BIT_8(count_var , taskNum %3 , (count +1) );
     SetVar(VAR_FRIEND_TASK1+taskNum/3 , count_var);
+
+    if((count + 1) == task_num_val_max[taskNum][4])
+    {
+        UInt8 dayTaskNum = 0 ;
+        for(UInt8 i = 0; i < 6; ++i)     
+        {
+            UInt32 count_var_value =GetVar(VAR_FRIEND_TASK1 + i/3);  
+            UInt8 count_num = GET_BIT_8(count_var , i%3);
+            if(count_num == task_num_val_max[taskNum][4]) 
+                ++dayTaskNum ;
+        }
+        if(dayTaskNum == 5)
+        {
+            AddVar(VAR_FRIEND_VALUE , 5);
+        }
+        if(dayTaskNum == 6)
+        {
+            AddVar(VAR_FRIEND_VALUE , 6);
+        }
+    }
 }
+
 void Player::AddFriendlyCount(Player * friender , UInt8 val) 
 {
+    return ;
     if( !friender )
         return ;
     std::map<UInt64,UInt32 >::iterator it = _friendlyCount.find(friender->getId());
-
 }
 
 } // namespace GObject

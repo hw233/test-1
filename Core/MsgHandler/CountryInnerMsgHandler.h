@@ -2796,7 +2796,7 @@ void OndoGuankaAct( GameMsgHdr &hdr, const void * data)
 //XXX
 void OnAddFriendlyCount(GameMsgHdr & hdr ,const void *data)
 {
-    
+    return ;    
     MSG_QUERY_PLAYER(player);
     struct st
     {
@@ -2804,7 +2804,6 @@ void OnAddFriendlyCount(GameMsgHdr & hdr ,const void *data)
         UInt8 val ;
     };
     struct st st_param = *reinterpret_cast<const struct st *>(data); 
-    player->bePrayed(id);
 }
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
