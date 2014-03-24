@@ -558,7 +558,7 @@ namespace GObject
         {
             Stream st ;
             SYSMSGVP(st, 4308, cbbi.leftId ,cbbi.name.c_str());
-          //  _clan->broadcast(st);
+            _clan->broadcast(st);
         }
     } 
     void ClanBuildingOwner::SendBattlesInfo( Stream & st)
@@ -579,7 +579,7 @@ namespace GObject
     }
     void ClanBuildingOwner::CreateTeam(Player * leader ,UInt8 leftId)
     {
-        if(_clan->getClanRank(leader) < 2 )
+        if(_clan->getClanRank(leader) < 1 )
             return ;
         if(leader->GetVar(VAR_LEFTADDR_POWER) < 3 )
             return ;
@@ -619,9 +619,9 @@ namespace GObject
         std::vector<Player *> vec ;
         vec.push_back(leader);
         leftAttackTeams.insert(make_pair(leftAttLeader , vec));
-        Stream st ;
-        SYSMSGVP(st, 4300, leader->getName().c_str(),leftId);
-        _clan->broadcast(st);
+        //Stream st ;
+        //SYSMSGVP(st, 4300, leader->getName().c_str(),leftId);
+        //_clan->broadcast(st);
         leader->setInLeftTeam(true);
         TRACE_LOG("leftaddr(CreateTeamSetInTeam) 1 (pid: %" I64_FMT "u)", leader->getId());
         leader->SetVar(VAR_LEFTADDR_CREATE ,now);
@@ -745,7 +745,7 @@ namespace GObject
                 {
                     Stream st ;
                     SYSMSGVP(st, 4309, leader->getName().c_str(),it->first.leftId);
-                    //_clan->broadcast(st);
+                    _clan->broadcast(st);
                 }
             }
         }
