@@ -4140,7 +4140,7 @@ void OnServerLeftMemberLeave(ServerLeftMsgHdr& hdr, const void * data)
         if( var_val)
         {
             UInt32 val = player->GetVar(GObject::VAR_LEFTADDR_POWER);
-            if(val > var_val)
+            if(val >= var_val)
                 player->SetVar(GObject::VAR_LEFTADDR_POWER , val - var_val);
         }
     }

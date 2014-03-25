@@ -319,14 +319,14 @@ namespace GObject
                         if(pos1 !=0 && pos2 == 0)
                         {
                            UInt32 val = player->GetVar(VAR_LEFTADDR_POWER) ;
-                           if(player->getLeftAddrEnter())
+                           if(player->getLeftAddrEnter() || player->getInLeftTeam())
                            {
                                break ;
                            }
                            if(val > 0 )
                            {
                                //player->SetVar(VAR_LEFTADDR_POWER ,val -1);
-                               player->setLeftAddrEnter(true);
+                               //player->setLeftAddrEnter(true);
                                TRACE_LOG("leftaddr(guardleft) 1 (pid: %" I64_FMT "u)", player->getId());
                            }
                         }
@@ -526,7 +526,7 @@ namespace GObject
         {
             if(vec[i] == NULL)
                 continue ;
-            vec[i]->setLeftAddrEnter(false);
+            vec[i]->setInLeftTeam(false);
             TRACE_LOG("leftaddr(reciveBattleInfo) 0 (pid: %" I64_FMT "u)", vec[i]->getId());
             UInt32 val = vec[i]->GetVar(VAR_LEFTADDR_POWER);
             if(val < 3)
@@ -554,6 +554,12 @@ namespace GObject
                 vec[i]->send(st);
             }
         }
+        if(cbbi.res ==0 && cbbi.type == 1)
+        {
+            Stream st ;
+            SYSMSGVP(st, 4308, cbbi.leftId ,cbbi.name.c_str());
+            _clan->broadcast(st);
+        }
     } 
     void ClanBuildingOwner::SendBattlesInfo( Stream & st)
     {
@@ -573,11 +579,11 @@ namespace GObject
     }
     void ClanBuildingOwner::CreateTeam(Player * leader ,UInt8 leftId)
     {
-        if(_clan->getClanRank(leader) < 2 )
+        if(_clan->getClanRank(leader) < 1 )
             return ;
         if(leader->GetVar(VAR_LEFTADDR_POWER) < 3 )
             return ;
-        if(leader->getLeftAddrEnter())
+        if(leader->getLeftAddrEnter() || leader->getInLeftTeam())
             return ;
         UInt32 now  =   TimeUtil::Now();
         if( ( now  - leader->GetVar(VAR_LEFTADDR_CREATE) ) < 300)
@@ -598,15 +604,26 @@ namespace GObject
                 leader->sendMsgCode(2,4032);
                 return ;
             }
+            std::vector<Player *> vec_team = it->second;
+            for(UInt8 i = 0 ; i < vec_team.size();++i)
+            {
+                if(!vec_team[i])    
+                    continue ;
+                if(vec_team[i] == leader )
+                {
+                    leader->sendMsgCode(2,4032);
+                    return ;
+                }
+            }
         }
         std::vector<Player *> vec ;
         vec.push_back(leader);
         leftAttackTeams.insert(make_pair(leftAttLeader , vec));
-        Stream st ;
-        SYSMSGVP(st, 4300, leader->getName().c_str(),leftId);
-        _clan->broadcast(st);
-        leader->setLeftAddrEnter(true);
-        TRACE_LOG("leftaddr(CreateTeam) 1 (pid: %" I64_FMT "u)", leader->getId());
+        //Stream st ;
+        //SYSMSGVP(st, 4300, leader->getName().c_str(),leftId);
+        //_clan->broadcast(st);
+        leader->setInLeftTeam(true);
+        TRACE_LOG("leftaddr(CreateTeamSetInTeam) 1 (pid: %" I64_FMT "u)", leader->getId());
         leader->SetVar(VAR_LEFTADDR_CREATE ,now);
     }
     void ClanBuildingOwner::ChangeTeamMember(Player * leader , UInt8 first , UInt8 second)
@@ -661,10 +678,9 @@ namespace GObject
                 {
                     if(*it_vec == player || flag )
                     {
-                        (*it_vec)->setLeftAddrEnter(false);
-                        TRACE_LOG("leftaddr(LeaveTeam) 0 (pid: %" I64_FMT "u)", (*it_vec)->getId());
-                        it->second.erase(it_vec);
-                        it_vec = it->second.begin();
+                        (*it_vec)->setInLeftTeam(false);
+                        TRACE_LOG("leftaddr(LeaveTeamSetInTeam) 0 (pid: %" I64_FMT "u)", (*it_vec)->getId());
+                        it_vec = it->second.erase(it_vec);
                     }
                     else
                         ++it_vec;
@@ -678,6 +694,7 @@ namespace GObject
                         _clan->broadcast(st);
                     }
                     leftAttackTeams.erase(it);
+                    break ;
                 }
                 for(UInt8 i = 0 ; i < vec.size() ; ++i)
                 {
@@ -694,7 +711,7 @@ namespace GObject
     {
         if(player->GetVar(VAR_LEFTADDR_POWER) < 3 )
             return ;
-        if(player->getLeftAddrEnter())
+        if(player->getLeftAddrEnter() || player->getInLeftTeam())
         {
             player->sendMsgCode(2,4034);
             return ;
@@ -722,9 +739,14 @@ namespace GObject
                 {
                     sendAttackTeamInfo(*it_vec);
                 }
-                player->setLeftAddrEnter(true);
-                TRACE_LOG("leftaddr(EnterTeam) 1 (pid: %" I64_FMT "u)", player->getId());
-                break;
+                player->setInLeftTeam(true);
+                TRACE_LOG("leftaddr(EnterTeamSetInTeam) 1 (pid: %" I64_FMT "u)", player->getId());
+                if(it->second.size() == 5)
+                {
+                    Stream st ;
+                    SYSMSGVP(st, 4309, leader->getName().c_str(),it->first.leftId);
+                    _clan->broadcast(st);
+                }
             }
         }
 
@@ -735,7 +757,9 @@ namespace GObject
         {
             if(it->first.leftId == leftId )
             {
-                if( ( it->first.leader != player || !it->first.leader->getLeftAddrEnter() ) && _clan->getClanRank(player) < 3)
+                if(it->first.leader == NULL )
+                    return ;
+                if( ( it->first.leader != player || !it->first.leader->getInLeftTeam() ) && _clan->getClanRank(player) < 3)
                     return ;
                 std::string leaderName = it->first.leader->getName();
                 UInt8 leftId = it->first.leftId;
@@ -743,8 +767,9 @@ namespace GObject
                     return ;
                 std::vector<Player *> vec = it->second ;
 
-                it->first.leader->setLeftAddrEnter(false);
-                TRACE_LOG("leftaddr(Attack) 0 (pid: %" I64_FMT "u)", it->first.leader->getId());
+                //it->first.leader->setLeftAddrEnter(false);
+                it->first.leader->setInLeftTeam(false);
+                TRACE_LOG("leftaddr(AttackSetInTeam) 0 (pid: %" I64_FMT "u)", it->first.leader->getId());
                 //LeaveTeam(player , player ,player);
 
                 std::vector<Player *> warSort = vec;

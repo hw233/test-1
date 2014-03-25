@@ -1306,6 +1306,7 @@ namespace GObject
         bool _clanRankBuffFlag;
         bool _cbHPflag;
         bool _leftAddrEnter ;
+        bool _InLeftTeam ;
         //GData::AttrExtra _hiaf;
         //bool _hiafFlag;
     public:
@@ -1315,6 +1316,8 @@ namespace GObject
         inline bool hasClanRankBuffFlag() { return _clanRankBuffFlag; }
         inline void setLeftAddrEnter(bool v) { _leftAddrEnter = v; }
         inline bool getLeftAddrEnter() { return _leftAddrEnter; }
+        inline void setInLeftTeam(bool v) { _InLeftTeam = v; }
+        inline bool getInLeftTeam() { return _InLeftTeam; }
         void addHIAttr(const GData::AttrExtra&);
         void clearHIAttr();
         inline const GData::AttrExtra* getHIAttr() const { return &_hiattr; }
@@ -2092,6 +2095,8 @@ namespace GObject
         std::map<UInt64,StuPrayValue >_bePrayed; 
         std::map<UInt64,std::vector<StuPresentBox> > _present; 
         std::map<UInt64,std::vector<StuPresentBox> >_bePresent; 
+
+        std::map<UInt64,UInt32 > _friendlyCount; 
 
 		TaskMgr* m_TaskMgr;
 		Trade* m_Trade;
@@ -3013,6 +3018,10 @@ namespace GObject
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
         void sevensoul_fixed();
+
+        //友好度
+        //void AddFriendlyCount(Player * friender , UInt8 taskNum) ;
+        //void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
     public:
         UInt8 useChangeSexCard();
         void doTableInWorld(Fighter* fgt, UInt32 oldId);

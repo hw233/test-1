@@ -2735,6 +2735,15 @@ void OnServerLeftChangeTeamMember( GameMsgHdr& hdr, const void* data )
     st << tc.playerId ; 
     st << tc.pos1;
     st << tc.pos2;
+    if(tc.pos1!=0 && tc.pos2 ==0)
+    {
+	    GObject::Player * player = GObject::globalPlayers[tc.playerId];
+        if(player == NULL )
+            return ;
+        st << player->getId() << player->getName() << player->getTitle();
+        player->appendLineup2(st);
+        player->appendPetOnBattle(st);
+    }
     st << Stream::eos;
     NETWORK()->SendToServerLeft(st);
 
@@ -2784,6 +2793,20 @@ void OndoGuankaAct( GameMsgHdr &hdr, const void * data)
     player->doGuankaAct(type);
 }
 
+/*
+//XXX
+void OnAddFriendlyCount(GameMsgHdr & hdr ,const void *data)
+{
+    return ;    
+    MSG_QUERY_PLAYER(player);
+    struct st
+    {
+        UInt64 id ;
+        UInt8 val ;
+    };
+    struct st st_param = *reinterpret_cast<const struct st *>(data); 
+}
+*/
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 

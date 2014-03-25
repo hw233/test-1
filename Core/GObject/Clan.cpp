@@ -655,23 +655,23 @@ bool Clan::kick(Player * player, UInt64 pid)
     GameMsgHdr hdr1(0x311, kicker->getThreadId(), kicker, sizeof(co));
     GLOBAL().PushMsg(hdr1, &co);
 
-    if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
+    if(kicker->getBuffData(PLAYER_BUFF_CLAN1) > 0)
     {
-        player->setBuffData(PLAYER_BUFF_CLAN1, 0);
-        player->rebuildBattleName();
+        kicker->setBuffData(PLAYER_BUFF_CLAN1, 0);
+        kicker->rebuildBattleName();
     }
-    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
+    if(kicker->getBuffData(PLAYER_BUFF_CLAN2) > 0)
     {
-        player->setBuffData(PLAYER_BUFF_CLAN2, 0);
-        player->rebuildBattleName();
+        kicker->setBuffData(PLAYER_BUFF_CLAN2, 0);
+        kicker->rebuildBattleName();
     }
-    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+    if(kicker->getBuffData(PLAYER_BUFF_CLAN3) > 0)
     {
-        player->setBuffData(PLAYER_BUFF_CLAN3, 0);
-        player->rebuildBattleName();
+        kicker->setBuffData(PLAYER_BUFF_CLAN3, 0);
+        kicker->rebuildBattleName();
     }
 
-    if(kicker->getLeftAddrEnter())
+    if(kicker->getInLeftTeam() || kicker->getLeftAddrEnter())
     {
         struct TeamChange
         {
@@ -793,7 +793,7 @@ bool Clan::leave(Player * player)
         DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid` = %" I64_FMT "u", player->getId());
 		// updateRank(NULL, oldLeaderName);
 	}
-    if(player->getLeftAddrEnter())
+    if(player->getInLeftTeam() || player->getLeftAddrEnter())
     {
         struct TeamChange
         {
@@ -815,12 +815,12 @@ bool Clan::leave(Player * player)
         player->setBuffData(PLAYER_BUFF_CLAN1, 0);
         player->rebuildBattleName();
     }
-    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
+    if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
     {
         player->setBuffData(PLAYER_BUFF_CLAN2, 0);
         player->rebuildBattleName();
     }
-    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+    if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
     {
         player->setBuffData(PLAYER_BUFF_CLAN3, 0);
         player->rebuildBattleName();
@@ -1776,7 +1776,7 @@ void Clan::disband(Player * player)
         GameMsgHdr hdr(0x1D4, WORKER_THREAD_WORLD, player, sizeof(clanId));
         GLOBAL().PushMsg(hdr, &clanId);
     }
-    if(player->getLeftAddrEnter())
+    if(player->getInLeftTeam() || player->getLeftAddrEnter())
     {
         struct TeamChange
         {
