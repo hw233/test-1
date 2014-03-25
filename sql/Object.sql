@@ -1114,6 +1114,7 @@ CREATE TABLE `clan` (
   `gongxian` int(10) unsigned NOT NULL DEFAULT '0',
   `urge` int(10) unsigned NOT NULL DEFAULT '0',
   `duobaoAward` int(10) unsigned NOT NULL DEFAULT '0',
+  `tyssSum` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2019,6 +2020,16 @@ CREATE TABLE IF NOT EXISTS `fighter_xingchen` (
     PRIMARY KEY(`fighterId`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+DROP TABLE IF EXISTS `fighter_xinmo`;
+CREATE TABLE IF NOT EXISTS `fighter_xinmo` (
+    `fighterId` int(10) unsigned NOT NULL,
+    `playerId` bigint(20) unsigned NOT NULL,
+    `xinmolev` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `curVal` int(10) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY(`fighterId`, `playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `clancity`;
 CREATE TABLE IF NOT EXISTS `clancity` (
     `id`   tinyint(3) unsigned NOT NULL DEFAULT 1,
@@ -2396,6 +2407,19 @@ CREATE TABLE IF NOT EXISTS `married_couple` (
     INDEX (`man_playerid`),
     INDEX (`woman_playerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `clan_buildings`;
+CREATE TABLE IF NOT EXISTS `clan_buildings` (
+      `clanId` bigint(20) NOT NULL COMMENT '帮派ID',
+      `fairylandEnergy` bigint(20) DEFAULT '0' COMMENT '仙界元气',
+      `phyAtkLevel` smallint(6) DEFAULT '0' COMMENT '物攻建筑等级',
+      `magAtkLevel` smallint(6) DEFAULT '0' COMMENT '法攻建筑等级',
+      `actionLevel` smallint(6) DEFAULT '0' COMMENT '身法建筑等级',
+      `hpLevel` smallint(6) DEFAULT '0' COMMENT '生命建筑等级',
+      `oracleLevel` smallint(6) DEFAULT '0' COMMENT '神谕塔建筑等级',
+      `updateTime` int(10) DEFAULT '0' COMMENT '数据更新时间',
+      PRIMARY KEY (`clanId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='帮派建筑';
 
 DROP TABLE IF EXISTS `mobao`;
 CREATE TABLE `mobao` (

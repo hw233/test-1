@@ -73,6 +73,7 @@
 #include "GObject/Married.h"
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
+#include "GObject/ClanBuilding.h"
 
 struct NullReq
 {
@@ -1074,6 +1075,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		Stream st;
 		pl->makeFighterList(st);
 		conn->send(&st[0], st.size());
+        pl->sendXinMoInfo();
 	}
     {
         Stream st;
@@ -1611,10 +1613,12 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
     if(!player->checkFormation(f))
         return;
 
+    bool haveMain = false;
 	for(UInt8 i = 0; i < c; ++ i)
 	{
 		UInt32 pos = 3 + (sizeof(UInt8) + sizeof(UInt32)) * i;
 		UInt8 p = *(buf + pos + sizeof(UInt32));
+		UInt32 fgtid = *reinterpret_cast<const UInt32 *>(buf + pos);
 
         bool find = false;
         for(UInt8 k = 0; k < 5; ++ k)
@@ -1627,7 +1631,11 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
         }
         if(!find)
             return;
+        if(fgtid < 10)
+            haveMain = true;
     }
+    if(!haveMain)
+        return;
 
 	for(UInt8 i = 0; i < c; ++ i)
 	{
@@ -1698,6 +1706,7 @@ void OnFighterInfoReq( GameMsgHdr& hdr, const void * data )
 	st.data<UInt8>(4) = cnt;
 	st << Stream::eos;
 	player->send(st);
+    player->sendXinMoInfo(); 
 }
 
 struct FighterLeaveStruct
@@ -1902,6 +1911,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     fgt->SSDismissAll(true);
     player->sendFighterSSListWithNoSkill();
     fgt->dismissXingchen();
+    fgt->dismissXinMo();
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
@@ -5013,7 +5023,7 @@ void OnClanRankBattleSortList(GameMsgHdr& hdr, const void* data)
 
 void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
 {
-    // TODO: 帮派副本系统的请求协议
+    // 帮派副本系统的请求协议
     MSG_QUERY_PLAYER(player);
 
 	GObject::Clan * clan = player->getClan();
@@ -8227,10 +8237,73 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                 break;
             }
         }
+    case 0x31:
+        {
+            brd >> op;
+            switch(op)
+            {
+                case 3:
+                {
+                    UInt8 flag = 0;
+                    brd >> flag;
+                    player->OpTYSS(op,flag);//喂养神兽
+                }
+                    break;
+                case 4:
+                {
+                    UInt8 flag = 0;
+                    brd >> flag;//礼包id
+                    player->OpTYSS(op,flag-1);//买限购礼包
+                    player->OpTYSS(8);//返回限购礼包信息
+                }
+                    break;
+                case 0x13:
+                    player->OpTYSS(op);//领取每日礼包
+                    break;
+                default:
+                    break;
+            }
+
+
+        }
     default:
         break;
     }
 }
+
+void OnZhenyuanReq(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+
+    brd >> type;
+    switch(type)
+    {
+        case 0x01:
+            {
+                UInt8 index = 0;
+                UInt32 zhyId = 0;
+                brd >> index >> zhyId;
+                player->setZhenyuan(index, zhyId);
+            }
+            break;
+        case 0x02:
+            {
+                UInt8 cnt = 0;
+                brd >> cnt;
+                cnt = cnt > 3 ? 3 : cnt;
+                UInt32 zhyIds[3] = {0};
+                for(UInt8 i = 0; i < cnt; ++ i)
+                {
+                    brd >> zhyIds[i];
+                }
+                player->GetPackage()->MergeZhenyuan(zhyIds, cnt);
+            }
+            break;
+    }
+}
+
 void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -8285,6 +8358,44 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
             }
     }
 }
+void OnXinMoReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+    {
+		return;
+    }
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    UInt16 fighterId = 0;
+    br >> opt >> fighterId;
+    GObject::Fighter * fgt = player->findFighter(fighterId);
+    if(fgt == NULL)
+    {  
+        return;
+    }
+
+    switch(opt)
+    {
+        case 0:
+            {
+            //    player->sendXinMoInfo();               
+            }
+            break;
+        case 1:
+            {
+                fgt->upgradeXinMo();
+            }
+            break;
+        case 2:
+            {
+                fgt->quickUpGradeXinMo();
+            }
+            break;
+    }
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

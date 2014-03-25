@@ -1,5 +1,5 @@
 ﻿#ifndef _COUNTRYINNERMSGHANDLER_H_
-#define _COUNTRYINNERMSGHANDLER_H_
+#define  _COUNTRYINNERMSGHANDLER_H_
 
 #include "Server/GlobalObject.h"
 #include "Server/Cfg.h"
@@ -856,6 +856,13 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
         exp *= 1 + extraFactor;
     }
 
+    if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
+        exp += 1.0f * ecs->exp;
+    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
+        exp += 0.5f * ecs->exp;
+    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+        exp += 0.3f * ecs->exp;
+
 	player->AddExp(static_cast<UInt64>(exp), 0, extraExp);
 #if 0
 	ecs->ng->monsterKilled(player, ecs->count);
@@ -1560,6 +1567,20 @@ void OnAddItemBy( GameMsgHdr& hdr, const void* data )
     ItemAdd* ia = (ItemAdd*)(data);
     player->GetPackage()->AddItem(ia->item, ia->num, ia->bind, false, ia->fromWhere);
 }
+void OnAddBy( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct ItemAdd
+    {
+        UInt16 item;
+        UInt16 num;
+        bool bind;
+        UInt16 fromWhere;
+    };
+
+    ItemAdd* ia = (ItemAdd*)(data);
+    player->GetPackage()->Add(ia->item, ia->num, ia->bind, false, ia->fromWhere);
+}
 void OnPracticeAttack( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -1869,6 +1890,58 @@ void OnDelItemAny( GameMsgHdr& hdr, const void * data )
 	const DelItemInfo* item = reinterpret_cast<const DelItemInfo*>(data);
     if(item)
         player->GetPackage()->DelItemAny(item->id, item->num, NULL, item->toWhere);
+}
+
+void OnUseAccItemInCountry( GameMsgHdr& hdr, const void * data )
+{
+#define ACC_ITEM        465
+	MSG_QUERY_PLAYER(player);
+    struct DelItemInfo
+    {
+        UInt32 id;
+        UInt16 num;
+        UInt16 toWhere;
+    };
+
+	const DelItemInfo* item = reinterpret_cast<const DelItemInfo*>(data);
+    if(!item)
+        return;
+    UInt32 need = item->num;
+    if(player->GetPackage()->GetItemAnyNum(ACC_ITEM) < need)
+        need = player->GetPackage()->GetItemAnyNum(ACC_ITEM);
+    if(need == 0)
+        return;
+
+    player->GetPackage()->DelItemAny(item->id, need, NULL, item->toWhere);
+
+	GameMsgHdr hdr2(0x1BA, WORKER_THREAD_WORLD, player, sizeof(need));
+	GLOBAL().PushMsg(hdr2, &need);
+}
+
+void OnUseVitalityItemInCountry( GameMsgHdr& hdr, const void * data )
+{
+#define VITALITY_ITEM   466
+	MSG_QUERY_PLAYER(player);
+    struct DelItemInfo
+    {
+        UInt32 id;
+        UInt16 num;
+        UInt16 toWhere;
+    };
+
+	const DelItemInfo* item = reinterpret_cast<const DelItemInfo*>(data);
+    if(!item)
+        return;
+    UInt32 need = item->num;
+    if(player->GetPackage()->GetItemAnyNum(VITALITY_ITEM) < need)
+        need = player->GetPackage()->GetItemAnyNum(VITALITY_ITEM);
+    if(need == 0)
+        return;
+
+    player->GetPackage()->DelItemAny(item->id, need, NULL, item->toWhere);
+
+	GameMsgHdr hdr2(0x1BB, WORKER_THREAD_WORLD, player, sizeof(need));
+	GLOBAL().PushMsg(hdr2, &need);
 }
 
 void OnAddItem( GameMsgHdr& hdr, const void * data )
@@ -2387,6 +2460,7 @@ void OnBeVoted( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     player->beVoted();
 }
+
 void OnBePrayed( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
@@ -2536,6 +2610,7 @@ void OnServerWarEnter( GameMsgHdr& hdr, const void* data )
     delete swed;
 }
 
+
 void OnServerWarLineup( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -2588,6 +2663,117 @@ void OnServerWarBeAttack( GameMsgHdr& hdr, const void* data )
     if(!swbad) return;
 
     serverWarMgr.beAttackByPlayer(player, swbad->attacker, swbad->formation, swbad->portrait, swbad->lineup);
+}
+
+void OnServerLeftEnter( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct SWarEnterData {
+        Stream st;
+        std::vector<Player *> warSort ;
+        UInt8 pos ;
+    };
+
+	SWarEnterData * swed = *reinterpret_cast<SWarEnterData**>(const_cast<void *>(data));
+    if(!swed)
+        return;
+    //std::vector<Player *>::iterator it = swed->warSort.begin();
+    //while(it != swed->warSort.end())
+    for(UInt8 i = swed->pos ; i< swed->warSort.size() ; ++i)
+    {
+        Player * player = swed->warSort[i];
+        if(!player)
+        {
+            delete swed;
+            return;
+        }
+        
+        if(player->getThreadId() != CURRENT_THREAD_ID())
+        {
+            swed->pos = i;
+            GameMsgHdr hdr(0x391, player->getThreadId(), player, sizeof(SWarEnterData*));
+            GLOBAL().PushMsg(hdr, &swed);
+            return;
+        }
+        swed->st << player->getId() << player->getName() << player->getTitle();
+        player->appendLineup2(swed->st);
+        player->appendPetOnBattle(swed->st);
+    }
+    swed->st << Stream::eos;
+    NETWORK()->SendToServerLeft(swed->st);
+    delete swed;
+}
+void OnServerLeftLineup( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    if(player->GetLev() < LIMIT_LEVEL)
+        return;
+
+    Stream st(SERVERLEFTREQ::COMMIT_LINEUP, 0xED);
+    st << player->getId();
+    player->appendLineup2(st);
+    player->appendPetOnBattle(st);
+    st << Stream::eos;
+    NETWORK()->SendToServerLeft(st);
+}
+void OnServerLeftChangeTeamMember( GameMsgHdr& hdr, const void* data )
+{
+    struct TeamChange
+    {
+        UInt8 leftId ; 
+        UInt32 clanId ;
+        UInt64 playerId;
+        UInt8 pos1;
+        UInt8 pos2;
+        TeamChange(UInt8 leftId_ ,UInt32 clanId_,UInt64 playerId_ ,UInt8 pos1_ ,UInt8 pos2_):leftId(leftId_),clanId(clanId_),playerId(playerId_),pos1(pos1_),pos2(pos2_){}
+    };
+    TeamChange tc = *reinterpret_cast<const TeamChange *>(data);
+
+    Stream st(SERVERLEFTREQ::LEFTADDR_SWITCHPLAYER, 0xED);
+    st << tc.leftId ; 
+    st << tc.clanId;
+    st << tc.playerId ; 
+    st << tc.pos1;
+    st << tc.pos2;
+    st << Stream::eos;
+    NETWORK()->SendToServerLeft(st);
+
+}
+void OnServerLeftAddPowerHold( GameMsgHdr& hdr, const void* data )
+{
+    struct powerHold
+    {
+        UInt8 leftId ;                                                                       
+        UInt32 clanId ;
+        UInt8 num ;
+        powerHold(UInt8 leftId_ , UInt32 clanId_,UInt8 num_):leftId(leftId_),clanId(clanId_),num(num_){}
+    };
+    powerHold ph = *reinterpret_cast<const powerHold *>(data);
+    Stream st(SERVERLEFTREQ::LEFTADDR_POWERHOLD, 0xED);
+    st << ph.leftId ;
+    st << ph.clanId;
+    st << ph.num;
+    st << Stream::eos;
+    NETWORK()->SendToServerLeft(st);
+
+}
+void OnServerLeftInfoReq(GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+    Stream st(SERVERLEFTREQ::LEFTADDR_INFO, 0xED);
+    st << player->getId();
+    st << Stream::eos;
+    NETWORK()->SendToServerLeft(st);
+}
+void OnServerLeftBattleReq(GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt32 battleId = *reinterpret_cast<const UInt32 *>(data);
+    UInt64 playerId1 = player->getId();
+    Stream st(SERVERLEFTREQ::BATTLE_REPORT, 0xED);
+    st << playerId1 << battleId ; 
+    st << Stream::eos;
+    NETWORK()->SendToServerLeft(st);
 }
 
 void OndoGuankaAct( GameMsgHdr &hdr, const void * data)

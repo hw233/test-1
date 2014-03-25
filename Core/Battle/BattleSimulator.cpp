@@ -5695,6 +5695,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         UInt32 confuse = bf->getConfuseRound();
         UInt32 forget = bf->getForgetRound();
         int target_pos;
+        int bleed_target_pos = -1;
         int otherside = 1 - bf->getSide();
         if(!stun) // 不是昏迷状态，可以行动
         {
@@ -5902,7 +5903,10 @@ UInt32 BattleSimulator::doAttack( int pos )
                         {
                             bf->setHitChangeByPeerless(0);
                             if(ptarget)
+                            {
+                                bleed_target_pos = ptarget->getPos();
                                 ptarget->setCounterChangeByPeerless(0);
+                            }
                         }
 
                         size_t actCnt = atkAct.size();
@@ -5996,6 +6000,9 @@ UInt32 BattleSimulator::doAttack( int pos )
                                 }
                                 atkAct.clear();
                             }
+
+                            if (bo->getHP() > 0)
+                                bleed_target_pos = bo->getPos();
                         }
                     }
                 }
@@ -6053,21 +6060,17 @@ UInt32 BattleSimulator::doAttack( int pos )
                         atkAct.clear();
                     }
 
+                    bo = static_cast<BattleFighter*>(getObject(otherside, bleed_target_pos));
                     while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBleed100(idx, noPossibleTarget)))
                     {
                         if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) && !bo->isSoulOut() &&
                                 bo->isBleeding())
-                                /*
-                                (bo->getBleedRandomLast() || bo->getBleedBySkillLast() || 
-                                 bo->getBleed1Last() || bo->getBleed2Last() || bo ->getBleed3Last() || bo->getAuraBleedLast() || bo->getStunBleedLast() || bo->getConfuceBleedLast() ||
-                                 bo->getBleedMoLast() || bo->getSelfBleedLast() || bo->getBlindBleedLast()))
-                                 */
                         {
                             int cnt = 0;
-                            getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
+                            getSkillTarget(bf, passiveSkill, otherside, bleed_target_pos, cnt);
                             std::vector<AttackAct> atkAct;
                             atkAct.clear();
-                            if(doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct))
+                            if(doSkillAttack(bf, passiveSkill, otherside, bleed_target_pos, cnt, &atkAct))
                                 ++ rcnt;
 
                             size_t actCnt = atkAct.size();
@@ -7908,6 +7911,9 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, UInt32 dmg)
         const GData::SkillBase* passiveSkill = NULL;
         while(NULL != (passiveSkill = bo2->getPassiveSkillOnHP10P100(idx)))
         {
+            //心魔
+            if(SKILL_ID(passiveSkill->getId()) == 97)
+                continue;
             if(passiveSkill->effect == NULL)
                 continue;
             break;
@@ -10423,6 +10429,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         {
             float yehuoSSDmgRate = bf->getYehuoSSDmgRate();
             UInt32 dmg = static_cast<UInt32>(yehuoSSDmgRate * yehuoLeve);
+            calcBleedTypeCnt(bf);
             makeDamage(bf, dmg, e_damNormal, e_damageTrue);
             if(yehuoLeve < 9 && static_cast<float>(uRand(10000)) < bf->getYehuoSSUpRate() * 10000)
             {
@@ -10454,6 +10461,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                     if(static_cast<float>(uRand(10000) < bf->getBleedFieldGapeStunProb() * 100))
                     {
                         bf->setStunRound(1);
+                        calcAbnormalTypeCnt(bf);
                         appendDefStatus(e_Stun, 0, bf);
                     }
                 }
@@ -12585,6 +12593,8 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
         if(count > 0)
         {
             u /= 10;
+            if (u <= 0)
+                u = 1;
             uShow = u;
             --count;
             bf->setSoulProtectCount(count);
@@ -12661,6 +12671,30 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
                     bf->setSoulProtectCount(3);
                 }
                 bf->setSoulProtectLast(--last);
+            }
+        }
+
+        size_t idx = 0;
+        const GData::SkillBase* passiveSkill = NULL;
+        while(NULL != (passiveSkill = bf->getPassiveSkillOnHP10P100(idx)))
+        {
+            if(passiveSkill->effect == NULL)
+                continue;
+            if(SKILL_ID(passiveSkill->getId()) == 97)
+                break;
+        }
+
+        if(passiveSkill)
+        {
+            UInt8 count = bf->getXinMoCount();
+            if(count < 1)
+            {
+                appendDefStatus(e_skill, passiveSkill->getId(), bf);
+                float value = bf->getAttack() * passiveSkill->effect->efv[0];
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stAtk, value, /*passiveSkill->last*/2, bf->getSide() != 0);
+                value = bf->getMagAttack() * passiveSkill->effect->efv[0];
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stMagAtk, value, /*passiveSkill->last*/2, bf->getSide() != 0);
+                bf->setXinMoCount(++count);
             }
         }
     }

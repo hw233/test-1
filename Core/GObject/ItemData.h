@@ -231,7 +231,7 @@ namespace GObject
                     ++ cnt2;
                 }
             }
-            cnt = (cnt1 << 4) | cnt2;
+            cnt = (cnt2 << 4) | cnt1;
             st.data<UInt8>(offset) = cnt;
         }
 

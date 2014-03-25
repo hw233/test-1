@@ -565,6 +565,8 @@ namespace GObject
 			return AddEquipN(typeId, num, bind, silence, FromWhere);
         else if(IsPetEquipTypeId(typeId))
 			return m_Owner->GetPetPackage()->AddPetEquipN(typeId, num, bind, silence, FromWhere);
+        else if(IsZhenYuanItem(typeId))
+			return AddZhenYuanN(typeId, num, bind, silence, FromWhere);
 		return AddItem(typeId, num, bind, silence, FromWhere);
 	}
 
@@ -645,6 +647,8 @@ namespace GObject
         if (!typeId || !num) return NULL;
 		if (IsEquipTypeId(typeId) || IsPetEquipTypeId(typeId))
             return NULL;
+        else if(IsZhenYuanItem(typeId))
+			return AddZhenYuanN(typeId, num, bind, !notify, fromWhere);
         else if(IsPetItem(typeId))
 			return m_Owner->GetPetPackage()->AddPetItem(typeId, num, bind, notify, fromWhere);
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
@@ -8041,7 +8045,7 @@ namespace GObject
 		return NULL;
 	}
 
-	UInt8 Package::MergeZhenyuan(UInt32* zhyIds, UInt8 count, UInt16& ogid)
+	UInt8 Package::MergeZhenyuan(UInt32* zhyIds, UInt8 count)
 	{   //阵元合成
         if(count > 3 || count < 2)
             return 0;
@@ -8071,6 +8075,7 @@ namespace GObject
             return 0;
         if(count == 3 && items[0]->getReqLev() != items[2]->getReqLev())
             return 0;
+        UInt32 ogid = 0;
         if(count == 3)
             ogid = GData::GDataManager::GetZhenyuanTypeIdByLev((items[0]->getReqLev()-75)/5 + 1);
         else

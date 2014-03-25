@@ -298,6 +298,8 @@ namespace GObject
         VAR_COUPLE_COPY_COUNT = 235,//夫妻家园总次数
         VAR_COUPLE_COPY_BATTLE = 236,//夫妻家园进行次数
         VAR_FRIEND_SECURITY = 237,//好友列表隐私设置标记
+        VAR_COUPLE_LEVELEXP = 238,//夫妻家园离婚保留下来的成长值
+        VAR_COUPLE_FRIENDLINESS = 239,//夫妻家园保留下来的亲密度
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
@@ -581,6 +583,7 @@ namespace GObject
         VAR_TOTAL_BATTLE_POINT = 601,  //（排行）战斗力
         VAR_VIA_ACC_DAYS = 602,  //（导入的玩家）累计登录天数
         VAR_SEVEN_SOUL_NUM = 603,  //玩家七魂仙魄数
+        VAR_SEX_CHANGE = 604,  //使用变形卡的次数
 
         //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,    //天书奇缘登陆
@@ -663,6 +666,9 @@ namespace GObject
         VAR_SUMMERMEET_SCORE5 = 691 ,    //消费数
         VAR_COUPLE_NAME= 692 ,    //夫妻称号佩戴
         VAR_NEWYEAR_PRATICE_COUNT = 693 ,    //记录一天只有一次
+        VAR_LEFTADDR_POWER = 694 ,   //仙界征战体力
+        VAR_LEFTADDR_CREATE = 695 ,   //创建队伍的时间
+        VAR_HEART_SWORD = 696 ,    //心剑值
 
         //701-710 for suntao
         VAR_MicroCloud_AWARD = 701,     //是否领取微云合作奖励
@@ -679,11 +685,18 @@ namespace GObject
         //711-720 for JLT
         VAR_QISHI_FRIEND_SEND_COUNT = 711,  // 七石斗法玩家赠送次数
         VAR_QISHI_FRIEND_USE_COUNT = 712,   // 七石斗法玩家赠送已使用次数
-
-        //721-730 lijr
         VAR_CLAN_DUOBAO_SCORE = 713,        // 夺宝奇兵点数
         VAR_CLAN_DUOBAO_SUCCESS_NUM = 714,  // 夺宝奇兵成功次数
         VAR_CLAN_DUOBAO_STATUS = 715,       // 夺宝奇兵状态
+        //721 - 730 for dtc 
+        VAR_TYSS_RECHARGE = 721,//天元神兽期间玩家兑换灵果剩余充值数(充值数满足条件自动兑换灵果)
+        VAR_TYSS_CONTRIBUTE_PLAYER = 722,//天元神兽期间玩家个人总贡献 
+        VAR_TYSS_CONTRIBUTE_PLAYER_DAY = 723,//天元神兽期间玩家个人当日贡献 
+        VAR_TYSS_CONTRIBUTE_CLAN = 724,//天元神兽期间玩家当前帮派贡献 
+        VAR_TYSS_DISCOUNT_CONSUME1 = 725,//天元神兽期间限购栏1(购买次数)(8bit 一个礼包位置)
+        VAR_TYSS_DISCOUNT_CONSUME2 = 726,//天元神兽期间限购栏2(购买次数)
+        VAR_TYSS_DISCOUNT_CONSUME3 = 727,//天元神兽期间限购栏3(购买次数)
+        VAR_TYSS_CONTRIBUTE_CLAN_SUM = 728,//天元神兽期间玩家帮派总贡献(帮主身上) 
 
         VAR_MAX,
     };
@@ -1196,6 +1209,7 @@ namespace GObject
             REGISTER_VAR(VAR_TOTAL_BATTLE_POINT, CYCLE_NONE);
             REGISTER_VAR(VAR_VIA_ACC_DAYS, CYCLE_NONE);
             REGISTER_VAR(VAR_SEVEN_SOUL_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_SEX_CHANGE, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);
@@ -1289,6 +1303,8 @@ namespace GObject
             REGISTER_VAR(VAR_JIQIREN_FRONTMAP, CYCLE_NONE);
             REGISTER_VAR(VAR_JIQIREN_DUNGEON, CYCLE_NONE);
             REGISTER_VAR(VAR_JIQIREN_SYBS, CYCLE_NONE);
+            REGISTER_VAR(VAR_LEFTADDR_POWER, CYCLE_NONE);
+            REGISTER_VAR(VAR_LEFTADDR_CREATE, CYCLE_NONE);
 
             REGISTER_VAR(VAR_QISHI_FRIEND_SEND_COUNT, CYCLE_DAY);
             REGISTER_VAR(VAR_QISHI_FRIEND_USE_COUNT, CYCLE_DAY);
@@ -1300,6 +1316,15 @@ namespace GObject
             REGISTER_VAR(VAR_GUANKA_ACTION_NPC, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_TIME, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_CLAN, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME1, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME2, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME3, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_CLAN_SUM, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

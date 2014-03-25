@@ -241,6 +241,17 @@ private:
     void OnUseItem9440(GObject::Player *player, std::vector<std::string>& args);
     void OnAddPetAttr(GObject::Player *player, std::vector<std::string>& args);
     void TestSameTimeRecharge(GObject::Player *player, std::vector<std::string>& args);
+
+    void OnClanBuildingInfo(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBuildingOp(GObject::Player *player, std::vector<std::string>& args);
+    void OnClanBuildingLevelChange(GObject::Player *player, std::vector<std::string>& args);
+
+    void OnHandleServerLeft(GObject::Player* player, std::vector<std::string>& args);
+    void OnServerLeftReport(GObject::Player* player, std::vector<std::string>& args);
+    void OnHandleLeftAddr(GObject::Player* player, std::vector<std::string>& args);
+
+    void OnSetTYSS(GObject::Player *player, std::vector<std::string>& args);
+    void TestClanRank(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

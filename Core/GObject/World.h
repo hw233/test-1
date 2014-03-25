@@ -84,6 +84,8 @@ struct ClanSort   //帮派积分（10· 1活动）
 {
     GObject::Clan* clan;
     UInt32 total;
+    UInt32 time ;
+    ClanSort():clan(NULL),total(0),time(0){}
 };   
 struct lt_rcsort
 {
@@ -91,11 +93,11 @@ struct lt_rcsort
 };
 struct clan_sort
 {
-    bool operator()(const ClanSort& a, const ClanSort& b) const { return a.total >= b.total; }
+    bool operator()(const ClanSort& a, const ClanSort& b) const { return a.total > b.total || (a.total==b.total && a.time < b.time); }
 };
 
 typedef std::multiset<RCSort, lt_rcsort> RCSortType;
-typedef std::set<ClanSort,clan_sort> ClanGradeSort;
+typedef std::multiset<ClanSort,clan_sort> ClanGradeSort;
 
 struct supportSort
 {
@@ -615,8 +617,8 @@ public:
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 2, 24);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 3, 1);
+        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 3, 22);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 3, 27);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
@@ -875,19 +877,16 @@ public:
 
     inline static void setSurnameLegend(bool v)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now();
         if( now >= begin && now <= end)
             return;
-        */
         _surnamelegend = v;
     }
    
     inline static bool getSurnameLegend(UInt32 time = 0)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now() + time;
@@ -899,7 +898,6 @@ public:
             _surnamelegend = true;
         else
             _surnamelegend = false;
-        */
         return _surnamelegend;
     }
 
@@ -931,18 +929,15 @@ public:
 
     inline static void setHappyFireTime(bool v)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
         UInt32 now = TimeUtil::Now();
         if( now >= begin && now <= end)
             return;
-        */
         _happyFire = v;
     }
     inline static bool getHappyFireTime(UInt32 time = 0)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
         UInt32 now = TimeUtil::Now()+time;
@@ -950,7 +945,6 @@ public:
             _happyFire = true;
         else
             _happyFire = false;
-        */
         return _happyFire;
     } 
     inline static bool getLuckyMeet(UInt32 time = 0)
@@ -996,6 +990,18 @@ public:
         UInt32 now = TimeUtil::Now();
 
         if(now >= begin && now <= (end+5))
+            return true;
+        else
+            return false;
+    } 
+    
+    inline static bool getTYSSTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_TYSS_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_TYSS_END);
+        UInt32 now = TimeUtil::Now() + time;
+
+        if(now >= begin && now <= end)
             return true;
         else
             return false;
@@ -1311,6 +1317,8 @@ public:
     static ClanGradeSort clanGradeSort; // 十一活动
     static RCSortType guangGunSort; //十一活动
     static RCSortType happyFireSort;     //七石板积分排名
+    static RCSortType tyss_PlayerSort;     //天元神兽个人积分排名
+    static ClanGradeSort tyss_ClanSort;     //天元神兽帮派积分排名
     static void initRCRank();
     static void initRP7RCRank();
 
@@ -1410,6 +1418,8 @@ public:
     static UInt16 GetRandomSpot();
     void SendHappyFireAward();
     void SendGuankaActAward();
+    void SendTYSSClanAward();
+    void SendTYSSPlayerAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();
@@ -1417,6 +1427,8 @@ public:
 
     void UpdateGuangGunScore(Player* pl);
     void CreateMarryBoard(UInt64 man , UInt64 woman ,UInt8 type, UInt32 time);
+    void setLeftAddrConnection(bool v){ _leftAddrConnect =v ;}
+    bool getLeftAddrConnection(){return _leftAddrConnect;}
     static void SendRechargeRP7RankAward();
 private:
 	void testUpdate();
@@ -1434,6 +1446,7 @@ private:
     SnowScoreMap _snowScoreMap;
     SnowPlayerSet _snowPlayerSet;
     MCached m_MCached; // 注意：该m_MCached只用于世界线程；
+    bool _leftAddrConnect; 
 };
 
     void CreateNewDB(UInt32 mon = 0, UInt32 year = 2011);

@@ -114,6 +114,7 @@ function loadStore()
         store:clear()
 
         discount(store)
+    store:add(2,9498,30)
     store:add(2,9427,50)
 
     store:add(2,9600,20)
@@ -140,7 +141,7 @@ function loadStore()
         --store:add(2 ,9397, 20)
         --store:add(2 ,9401, 20)
         --store:add(2 ,9422, 20)
-        store:add(2 ,9449, 20)
+        store:add(2 ,9495, 150)
     end
     if getHappyFireTime(300) then
         store:add(2, 9440, 10)
@@ -159,6 +160,10 @@ function loadStore()
         store:add(2, 1126, 20)
         store:add(2, 9388, 100)
         store:add(2, 9371, 10)
+
+    if getTYSSTime(300) then
+        store:add(2, 9492, 20)
+    end
 
         store:add(2, 9413, 10)
         store:add(2, 9414, 30)
@@ -299,6 +304,7 @@ function loadStore()
 
         -- 奇珍
 		--store:add(2,9433,500)
+		--store:add(2,9498,30)
 		store:add(2,9338,50)
 		--store:add(2,9349,10)
 		store:add(2,9310,30)

@@ -21,4 +21,30 @@ namespace GData
         return NULL;
     }
 
+    XinMoData xinmoData;
+
+    void XinMoData::setXinMoTable(stXinMo& xcd)
+    {
+        _xinmo.insert(std::make_pair(xcd.level, xcd));
+    }
+
+    XinMoData::stXinMo * XinMoData::getXinMoTable(int lvl)
+    {
+        std::map<UInt8, stXinMo>::iterator iter = _xinmo.find(lvl);
+        if(iter != _xinmo.end())
+            return &(iter->second);
+        return NULL;
+    }
+    UInt32 XinMoData::getXinMoLev(UInt32 val )
+    {
+        std::map<UInt8, stXinMo>::iterator iter = _xinmo.begin();
+        UInt32 lev = 0 ;
+        for(;iter!=_xinmo.end();++iter) 
+        {
+            lev = iter->first;
+            if(iter->second.maxVal > val )
+                break;
+        }
+        return  lev;
+    }
 }
