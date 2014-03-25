@@ -623,6 +623,11 @@ namespace GObject
             fprintf(stderr, "LoadPlayerModifyMounts error!\n");
             std::abort();
         }
+		if(!loadFriendlyCount())
+        {
+            fprintf(stderr, "loadFriendlyCount error!\n");
+            std::abort();
+        }
 
         DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -7162,5 +7167,40 @@ namespace GObject
 
         return true;
     }
+	bool GObjectManager::loadFriendlyCount()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading friendlyCount:");
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		DBFriendlyCount dbfr;
+		if(execu->Prepare("SELECT `playerId`, `friendId`, `value` ,`isBrother` FROM `friendlyCount` ORDER BY `playerId`", dbfr) != DB::DB_OK)
+			return false;
+		lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbfr.playerId != last_id)
+			{
+				last_id = dbfr.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Player *friendOne = globalPlayers[dbfr.friendId];
+			if(friendOne == NULL)
+				continue;
+            if(dbfr.value!=0)
+                pl->LoadFriendlyCountFromDB(dbfr.friendId , dbfr.value);
+            if(dbfr.isBrother!=0)
+            {
+                pl->InsertBrother(friendOne);
+            }
+		}
+		lc.finalize();
+		return true;
+	}
 }
 

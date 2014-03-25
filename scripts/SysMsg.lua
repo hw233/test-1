@@ -379,6 +379,7 @@ sysMsg:set(371, 0x27, "")
 sysMsg:set(375, 0x27, "")
 sysMsg:set(376, 0x27, "")
 
+
 sysMsg:set(10000, 0, " [p:%u:%s] ")
 sysMsg:set(10001, 0, " [f:%u:%s] ")
 sysMsg:set(10002, 0, " [4:%u]")
@@ -407,8 +408,8 @@ sysMsg:set(625, 1, "仙宠[%s]: %u")
 sysMsg:set(626, 1, "仙宠[%s]: %u\n生命:%u\n物理攻击:%u\n法术攻击:%u\n物理防御:%u\n法术防御:%u\n身法:%u\n灵压:%u\n暴击:%u\n暴击伤害:%u\n破击:%u\n法术抵抗:%u\n命中:%u\n躲避:%u\n反击:%u\n坚韧:%u\n")
 sysMsg:set(627, 1, "散仙[%s]: 基础:%u,装备:%u,技能:%u,心法:%u,第二元神:%u,帮派:%u,仙宠:%u,宝具:%u,阵法:%u")
 
-sysMsg:set(400, 0x27, "")
-sysMsg:set(401, 0x27, "")
+sysMsg:set(400, 0, "来自 [p:%u:%s] 的结拜邀请")
+sysMsg:set(401, 0, "亲爱的玩家，您的好友[p:%u:%s]正在申请与您结拜，成为结拜好友后，就可以与好久尽情对酒，提升豪饮，增强战斗力啦。")
 sysMsg:set(402, 0x27, "")
 sysMsg:set(403, 0x26, "")
 sysMsg:set(404, 0x27, "")

@@ -23,6 +23,7 @@ MSG_REG_2(GameMsgHdr, REQ::HERO_INFO, OnFighterInfoReq);
 MSG_REG_2(GameMsgHdr, REQ::HOTEL_LIST, OnRecruitListReq);
 MSG_REG_2(GameMsgHdr, REQ::TRIPOD_INFO, OnTripodReq);
 MSG_REG_2(GameMsgHdr, REQ::TASK_CYC_REFRESH, OnFlushTaskColorReq);
+MSG_REG_2(GameMsgHdr, REQ::BROTHER, OnBrotherReq);
 MSG_REG(GameMsgHdr, OnFighterDismissReq);
 MSG_REG(GameMsgHdr, OnFighterRegenReq);
 MSG_REG(GameMsgHdr, OnFighterTrainReq);

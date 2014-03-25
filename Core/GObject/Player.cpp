@@ -4511,7 +4511,10 @@ namespace GObject
 		SYSMSG_SEND(134, this);
 		SYSMSG_SENDV(1034, this, pl->getCountry(), pl->getName().c_str());
 		if(writedb)
+        {
 			DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %" I64_FMT "u AND `type` = 0 AND `friendId` = %" I64_FMT "u", getId(), pl->getId());
+			DB1().PushUpdateData("DELETE FROM `friendlyCount` WHERE `playerId` = %" I64_FMT "u AND `friendId` = %" I64_FMT "u", getId(), pl->getId());
+        }
 	}
 
 	void Player::delCFriendInternal( Player * pl, bool writedb )
@@ -4526,7 +4529,10 @@ namespace GObject
 		SYSMSG_SEND(2339, this);
 		SYSMSG_SENDV(2340, this, pl->getCountry(), pl->getName().c_str());
 		if(writedb)
+        {
 			DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %" I64_FMT "u AND `type` = 3 AND `friendId` = %" I64_FMT "u", getId(), pl->getId());
+			DB1().PushUpdateData("DELETE FROM `friendlyCount` WHERE `playerId` = %" I64_FMT "u AND `friendId` = %" I64_FMT "u", getId(), pl->getId());
+        }
 	}
 
 	Player * Player::_findFriend( UInt8 type, std::string& name )
@@ -4693,6 +4699,8 @@ namespace GObject
                 std::string openid = pl->getOpenId();
                 st << openid;
                 st << static_cast<UInt8>(pl->GetVar(VAR_FRIEND_SECURITY));
+                st << getFriendlyCount(pl->getId());
+                st << static_cast<UInt8>(_hasBrother(pl));
                 ++it;
             }
         }
@@ -4743,6 +4751,9 @@ namespace GObject
     }
     void Player::prayForOther(Player* other)
     {
+        if(other == NULL )
+            return ;
+
         std::map<UInt64,UInt32>::iterator it =_prayFriend.find(other->getId());
         UInt32 now = TimeUtil::Now();
         if(CheckFriendPray(other->getId()))
@@ -4772,6 +4783,7 @@ namespace GObject
         _prayFriend[other->getId()]=now;
         SendOtherInfoForPray(other,prayValue);
         SYSMSG_SENDV(2026, this);
+        CompleteFriendlyTask(other,1);
 
         char str[16] = {0};
         sprintf(str, "F_130822_8");
@@ -29446,43 +29458,49 @@ void Player::do_fighter_xinmo(Fighter* fgt, UInt32 oldId)
 }
 
 //增加和某好友的友好度
-void Player::CompleteFriendlyTask(Player * friender , UInt8 taskNum)
+//flag 为0 表示
+void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 flag)
 {
-    return ;
-    if(friender == NULL)
+    if(friendOne == NULL)
         return ;
-    if(!_hasFriend(friender))
+    if(!_hasFriend(friendOne))
         return ;
 
+    std::cout << static_cast<UInt32>(getId()) << " to " <<static_cast<UInt32>(friendOne->getId()) << " num :" <<static_cast<UInt32>(taskNum) << std::endl;
+
     static UInt8 task_num_val_max[][5] = {
-     {1,1,1,3,3},
-     {1,1,1,3,5},
-     {1,1,1,1,1},
-     {1,10,1,10,1},
-     {1,4,1,4,1},
-     {1,20,1,20,10},
+        {1,1,1,3,3},
+        {1,1,1,3,5},
+        {1,1,1,1,1},
+        {1,10,1,10,1},
+        {1,4,1,4,1},
+        {1,20,1,20,10},
     };
 
     UInt32 count_var =GetVar(VAR_FRIEND_TASK1 + taskNum/3);  
     UInt8 count = GET_BIT_8(count_var , taskNum%3);
     if(count < task_num_val_max[taskNum][1])
     {
-        AddFriendlyCount( friender , task_num_val_max[taskNum][0])          ;
+        AddFriendlyCount( friendOne , task_num_val_max[taskNum][0]);
+        count_var = SET_BIT_8(count_var , taskNum %3 , (count +1) );
+        SetVar(VAR_FRIEND_TASK1+taskNum/3 , count_var);
     }
-    if(count < task_num_val_max[taskNum][3])
+    else
     {
-       AddVar(VAR_FRIEND_VALUE , task_num_val_max[taskNum][2]);
+        flag = 1;
     }
-    SET_BIT_8(count_var , taskNum %3 , (count +1) );
-    SetVar(VAR_FRIEND_TASK1+taskNum/3 , count_var);
+    if(count < task_num_val_max[taskNum][3]) 
+    {
+        AddVar(VAR_FRIEND_VALUE , task_num_val_max[taskNum][2]);
+    }
 
-    if((count + 1) == task_num_val_max[taskNum][4])
+    if((count + 1) == task_num_val_max[taskNum][4] )
     {
         UInt8 dayTaskNum = 0 ;
         for(UInt8 i = 0; i < 6; ++i)     
         {
             UInt32 count_var_value =GetVar(VAR_FRIEND_TASK1 + i/3);  
-            UInt8 count_num = GET_BIT_8(count_var , i%3);
+            UInt8 count_num = GET_BIT_8(count_var_value , i%3);
             if(count_num == task_num_val_max[taskNum][4]) 
                 ++dayTaskNum ;
         }
@@ -29495,14 +29513,180 @@ void Player::CompleteFriendlyTask(Player * friender , UInt8 taskNum)
             AddVar(VAR_FRIEND_VALUE , 6);
         }
     }
+
+    if(!flag)
+    {
+        if(friendOne->getThreadId() == getThreadId())
+        {
+            friendOne->AddFriendlyCount(this , task_num_val_max[taskNum][0]);
+        }
+        else 
+        {
+            struct msg 
+            {
+                UInt64 id ;
+                UInt8 val ;
+                UInt8 flag ;
+            };
+            struct msg _msg;
+            _msg.id = getId();
+            _msg.val = task_num_val_max[taskNum][0];
+            _msg.flag = 1 ;
+            GameMsgHdr hdr(0x358, friendOne->getThreadId(), friendOne, sizeof(_msg));
+            GLOBAL().PushMsg(hdr, &_msg);
+        }
+    }
 }
 
-void Player::AddFriendlyCount(Player * friender , UInt8 val) 
+void Player::AddFriendlyCount(Player * friendOne , UInt8 val) 
 {
-    return ;
-    if( !friender )
+    if( !friendOne )
         return ;
-    std::map<UInt64,UInt32 >::iterator it = _friendlyCount.find(friender->getId());
+    std::map<UInt64,UInt32 >::iterator it = _friendlyCount.find(friendOne->getId());
+    if(it != _friendlyCount.end())
+    {
+       it->second += val; 
+    }
+    else 
+    {
+        _friendlyCount[friendOne->getId()] = val ; 
+    }
+    UpdateFriendlyCountToDB(friendOne->getId());
+}
+void Player::LoadFriendlyCountFromDB(UInt64 friendId , UInt32 val )
+{
+    Player* friendOne = globalPlayers[friendId];
+    if(friendOne == NULL)
+        return ;
+    _friendlyCount[friendId] = val;
+}
+void Player::UpdateFriendlyCountToDB(UInt64 friendId)
+{
+    Player* friendOne = globalPlayers[friendId];
+    if(friendOne == NULL)
+        return ;
+
+    std::map<UInt64,UInt32 >::iterator it = _friendlyCount.find(friendId);
+    if(it == _friendlyCount.end())
+        return ;
+    DB1().PushUpdateData("REPLACE INTO `friendlyCount` (`playerId`, `friendId` , `value` , `isBrother`) VALUES (%" I64_FMT "u, %" I64_FMT "u , %u , %d)", getId(), friendId,it->second,static_cast<UInt8>(_hasBrother(friendOne)));
+}
+void Player::sendFirendlyCountTaskInfo()
+{
+    Stream st(REP::BROTHER);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt32>(GetVar(VAR_FRIEND_VALUE));
+    for(UInt8 i = 0; i < 6; ++i)     
+    {
+        UInt32 count_var_value =GetVar(VAR_FRIEND_TASK1 + i/3);  
+        UInt8 count_num = GET_BIT_8(count_var_value , i%3);
+        st << count_num ;
+    }
+    st << Stream::eos; 
+    send(st);
+}
+void Player::InsertBrother(Player * pl)
+{
+   if(pl == NULL)
+       return ;
+   if(!_hasFriend(pl))
+       return ;
+
+   _brothers.insert(pl);
+}
+bool Player::_hasBrother( Player * pl ) const
+{
+    std::set<Player *>::const_iterator it = _brothers.find(pl);
+    if(it == _brothers.end())
+        return false;
+    return true;
+}
+UInt32 Player::getFriendlyCount(UInt64 playerId)
+{
+   return _friendlyCount[playerId]; 
+}
+void Player::getFriendlyAchievement(UInt8 opt)
+{
+   
+   static UInt32 AchievementAward[] = {30,80,150,50,150,300,350,400};
+   if(opt > 7 )
+       return ;
+   UInt32 Friends[5] ={0,0,0,0,0};
+   UInt32 getAcAward = GetVar(VAR_FRIEND_ACHIEVEMENT);
+   if(getAcAward & (1 << opt ))
+       return ;
+   std::map<UInt64,UInt32 >::iterator it = _friendlyCount.find(friendId);
+   for(;it!=_friendlyCount.end();++i)
+   {
+        if(it->second < 100)
+            Friends[0]++;
+        else if(it->second < 500)
+            Friends[1]++;
+        else if(it->second < 2000)
+            Friends[2]++;
+        else if(it->second < 5000)
+            Friends[3]++;
+        else
+            Friends[4]++;
+   }
+   bool flag = false ;
+   switch(opt)
+   {
+       case 0;
+       {
+           if(Friends[1] >= 3 )
+               flag = true;
+           break ;
+       }
+       case 1:
+       {
+           if(Friends[1] >= 10 )
+               flag = true;
+           break ;
+       }
+       case 2 :
+       {
+           if(Friends[2] >= 3 )
+               flag = true;
+           break ;
+       }
+       case 3:
+       {
+           if(_brothers.size())
+               Award |= (1 << 3);
+           break;
+       }
+       case 4 :
+       {
+           if(Friends[3] >= 1 )
+               flag = true;
+           break ;
+       }
+       case 5 :
+       {
+           if(Friends[3] >= 3 )
+               flag = true;
+           break ;
+       }
+       case 6 :
+       {
+           if(Friends[4] >= 1 )
+               flag = true;
+           break ;
+       }
+       case 7 :
+       {
+           if(Friends[4] >= 2 )
+               flag = true;
+           break ;
+       }
+   }
+   if(flag)
+   {
+       AddVar(VAR_FRIEND_VALUE , AchievementAward[opt]);
+       getAcAward |= (1 << opt );
+       SetVar(VAR_FRIEND_ACHIEVEMENT , getAcAward);
+   }
 }
 
 } // namespace GObject

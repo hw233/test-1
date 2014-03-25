@@ -4151,6 +4151,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.guard = player->getPF();
 		rep.level = player->GetLev();
 		pl->send(rep);
+        player->CompleteFriendlyTask(pl , 0);
 	}
 }
 
@@ -8360,6 +8361,33 @@ void OnXinMoReq( GameMsgHdr & hdr, const void * data )
             }
             break;
     }
+}
+void OnBrotherReq( GameMsgHdr& hdr, const void* data)
+{
+ 	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+	UInt8 type = 0;
+	br >> type;
+	switch(type)
+	{
+	case 1:
+        player->sendFirendlyCountTaskInfo();
+		break;
+	case 2:
+        {
+            std::string name ;
+            br >> string ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(lcr.target)];
+            if(friendOne == NULL)
+                return ;
+            SYSMSGV(title, 400, player->getCountry(), player->getName().c_str());
+            SYSMSGV(content, 401, player->getCountry(), player->getName().c_str());
+            pl->GetMailBox()->newMail(player, 0x16, title, content);
+        }
+		break;
+	}
+
 }
 
 

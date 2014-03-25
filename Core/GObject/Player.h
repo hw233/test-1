@@ -2090,6 +2090,7 @@ namespace GObject
         std::map<UInt64,std::vector<StuPresentBox> >_bePresent; 
 
         std::map<UInt64,UInt32 >_friendlyCount;   //友好度
+		std::set<Player*> _brothers; // 结拜兄弟(不分男女)
 		TaskMgr* m_TaskMgr;
 		Trade* m_Trade;
 		Sale* m_Sale;
@@ -3012,8 +3013,14 @@ namespace GObject
         void sevensoul_fixed();
 
         //友好度
-        void AddFriendlyCount(Player * friender , UInt8 taskNum) ;
-        void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
+        void AddFriendlyCount(Player * friender , UInt8 taskNum) ; //增加友好度
+        void CompleteFriendlyTask(Player * friender , UInt8 taskNum ,UInt8 flag = 0/*是否为主动*/ );
+        void LoadFriendlyCountFromDB(UInt64 friendId , UInt32 val ); //加载友好度
+        void UpdateFriendlyCountToDB(UInt64 friendId);   //更新友好度
+        void sendFirendlyCountTaskInfo();  //发送友好度任务信息(附加友情值)
+        void InsertBrother(Player * pl);  //插入结拜兄弟
+        UInt32 getFriendlyCount(UInt64 playerId);
+		bool _hasBrother( Player * pl ) const;
     public:
         UInt8 useChangeSexCard();
         void doTableInWorld(Fighter* fgt, UInt32 oldId);

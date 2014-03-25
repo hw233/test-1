@@ -291,6 +291,7 @@ void OnNewRelationAttack(GameMsgHdr& hdr, const void *data)
 	};
 	NewRelationBeData *abd = reinterpret_cast<NewRelationBeData *>(const_cast<void *>(data));
     player->GetNewRelation()->beAttack(abd->attacker, abd->formation, abd->portrait, abd->lineup, player);
+//  player->CompleteFriendlyTask(abd->attacker , 2);
 }
 
 void OnNewRelationCountryReq(GameMsgHdr& hdr, const void *data)
@@ -2796,14 +2797,18 @@ void OndoGuankaAct( GameMsgHdr &hdr, const void * data)
 //XXX
 void OnAddFriendlyCount(GameMsgHdr & hdr ,const void *data)
 {
-    return ;    
     MSG_QUERY_PLAYER(player);
     struct st
     {
         UInt64 id ;
         UInt8 val ;
+        UInt8 flag ;
     };
     struct st st_param = *reinterpret_cast<const struct st *>(data); 
+	GObject::Player * pl = GObject::globalPlayers[st_param.id];
+    if(pl==NULL)
+        return ;
+    player->AddFriendlyCount(pl , st_param.val);
 }
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
