@@ -184,6 +184,7 @@ enum IncomingType
     LongHunFromServerWar        = 148, //仙界传奇龙魂获得
     InBuyFund                   = 149, //购买基金获得
     XianpoFromUseItem           = 150, //使用物品仙魄丹
+    XTYLFromUseItem             = 151, //使用物品凝露宝瓶、凝露玉盅
 };
 
 enum MoneyType

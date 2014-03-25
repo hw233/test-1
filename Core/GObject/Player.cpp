@@ -22139,6 +22139,54 @@ UInt8 Player::toQQGroup(bool isJoin)
         return xianpo;
     }
 
+    void Player::getXuanTianNingLuLua(UInt32 c)
+    {
+        IncommingInfo ii(XTYLFromUseItem, 0, 0);
+        getXianpo(c, &ii);
+    }
+
+    UInt32 Player::getXuanTianNingLu(UInt32 c, IncommingInfo* ii)
+    {
+        UInt32 xtnl = GetVar(VAR_SKILL_GRADE_MONEY);
+		if(c == 0)
+			return xtnl;
+		xtnl += c;
+		SYSMSG_SENDV(195, this, c);
+		SYSMSG_SENDV(1069, this, c);
+        SetVar(VAR_SKILL_GRADE_MONEY, xtnl);
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_xtnl (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
+
+        return xtnl;
+	}
+
+	UInt32 Player::useXianpoXuanTianNingLu(UInt32 a, ConsumeInfo* ci)
+	{
+        UInt32 xtnl = GetVar(VAR_SKILL_GRADE_MONEY);
+        if(a == 0 || xtnl == 0)
+            return xtnl;
+        if(xtnl < a)
+            xtnl = 0;
+        else
+        {
+            xtnl -= a;
+            if(ci != NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_xtnl (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(196, this, a);
+        SYSMSG_SENDV(1070, this, a);
+        SetVar(VAR_SKILL_GRADE_MONEY, xtnl);
+
+        return xtnl;
+    }
+
 void Player::getQQGameOnlineAward()
 {
     if(!World::getQQGameOnlineAwardAct())
@@ -29503,6 +29551,29 @@ void Player::AddFriendlyCount(Player * friender , UInt8 val)
 		st << Stream::eos;
         send(st);
 	}
+
+    void Player::sendFighterSGListWithNoSkill()
+    {
+        Stream st;
+        makeFighterSGListWithNoSkill(st);
+		send(st);
+    }
+
+	void Player::makeFighterSGListWithNoSkill(Stream& st)
+    {
+		size_t c = _fighters.size();
+		st.init(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(12);
+		st << static_cast<UInt8>(c);
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if (it->second)
+            {
+                it->second->makeFighterSGInfoWithNoSkill(st);
+            }
+        }
+		st << Stream::eos;
+    }
 
 } // namespace GObject
 

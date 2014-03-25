@@ -110,10 +110,9 @@ struct SStrengthen
 
 struct SGrade
 {
-    SGrade() : lvl(0), luck(0) {}
+    SGrade() : lvl(0) {}
 
     UInt8 lvl; // 当前等级
-    UInt16 luck; //祝福值
 };
 
 struct SoulItemExp
@@ -1090,6 +1089,8 @@ public:
     SGrade* SGGetInfo(UInt16 skillid);
     bool appendFighterSGInfo(Stream& st, UInt16 skillid);
     bool appendFighterSGInfo(Stream& st, UInt16 skillid, SGrade* sg);
+    void SGFromDB(UInt16 id, SGrade& sg);
+    void makeFighterSGInfoWithNoSkill(Stream& st);
 
 };
 

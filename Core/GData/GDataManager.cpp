@@ -2908,5 +2908,24 @@ namespace GData
         }
         return true;
     }
+
+    bool GDataManager::LoadSkillEvConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBSkillEv dbskillev;
+		if(execu->Prepare("SELECT `lev`, `effect`, `consume` FROM `skill_ev`", dbskillev) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            SkillEvData::stSkillEv skillEv;
+            skillEv.effect = dbskillev.effect;
+            skillEv.consume = dbskillev.consume;
+            GData::skillEvData.setSkillEvData(dbskillev.lev, skillEv);
+        }
+        return true;
+    }
 }
 

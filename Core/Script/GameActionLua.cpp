@@ -337,6 +337,7 @@ namespace Script
         CLASS_DEF(Player, getXianpoLua);
         CLASS_DEF(Player, useChangeSexCard);
         CLASS_DEF(Player, EatLingGuo);
+        CLASS_DEF(Player, getXuanTianNingLuLua);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);

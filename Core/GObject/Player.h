@@ -2943,6 +2943,9 @@ namespace GObject
         void guankaActUdpLog(UInt32, bool);
         void addguankaScoreByAttack(UInt32);
         void AddHeartSword(UInt32 val);
+        void getXuanTianNingLuLua(UInt32 c);
+        UInt32 getXuanTianNingLu(UInt32 c, IncommingInfo* ii);
+        UInt32 useXianpoXuanTianNingLu(UInt32 a, ConsumeInfo* ci);
     public:
         // 八部浮屠
         void sendBBFTInfo();
@@ -3017,6 +3020,9 @@ namespace GObject
         //void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
 
         void makeFighterSGList(Stream& st);
+        void sendFighterSGListWithNoSkill();
+        void makeFighterSGListWithNoSkill(Stream& st);
+
     public:
         UInt8 useChangeSexCard();
         void doTableInWorld(Fighter* fgt, UInt32 oldId);

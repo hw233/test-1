@@ -700,6 +700,13 @@ struct DBCangjianCfg
     std::string bless;
 };
 
+struct DBSkillEv
+{
+    UInt8 lev;
+    UInt32 effect;
+    UInt32 consume;
+};
+
 struct DBKeyinConfig
 {
     UInt8 keyinId;
@@ -1681,6 +1688,15 @@ SPECIALDEF(5)
     UInt16, prob,
     UInt8, otherNum,
     std::string, bless
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBSkillEv)
+SPECIALDEF(3)
+	(
+    UInt8, lev,
+    UInt32, effect,
+    UInt32, consume
 	)
 SPECIALEND()
 

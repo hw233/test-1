@@ -1095,6 +1095,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         Stream st;
         pl->makeFighterSGList(st);
 		conn->send(&st[0], st.size());
+        pl->sendFighterSGListWithNoSkill();
     }
 	{
 		Stream st;
