@@ -22142,7 +22142,13 @@ UInt8 Player::toQQGroup(bool isJoin)
     void Player::getXuanTianNingLuLua(UInt32 c)
     {
         IncommingInfo ii(XTYLFromUseItem, 0, 0);
-        getXianpo(c, &ii);
+        getXuanTianNingLu(c, &ii);
+
+        Stream st(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(13);
+        st << GetVar(VAR_SKILL_GRADE_MONEY);
+        st << Stream::eos;
+        send(st);
     }
 
     UInt32 Player::getXuanTianNingLu(UInt32 c, IncommingInfo* ii)

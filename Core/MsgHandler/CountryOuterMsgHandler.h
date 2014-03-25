@@ -1925,6 +1925,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     JobHunter* jobHunter = player->getJobHunter();
     if (jobHunter)
         jobHunter->AddToFighterList(fdr._fgtid);
+    fgt->SGDismissAll(true);
 }
 
 void OnFighterRegenReq( GameMsgHdr& hdr, FighterRegenReq& frr )
@@ -6505,6 +6506,8 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
         fgt->SGradeManual(skillid);
     else if(type == 11)
         fgt->SGradeAuto(skillid);
+    else if(type == 14)
+        fgt->SGDismiss(skillid);
 }
 
 void OnMakeStrong( GameMsgHdr& hdr, const void * data )

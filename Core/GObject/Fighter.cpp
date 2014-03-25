@@ -4512,6 +4512,8 @@ bool Fighter::delCitta( UInt16 citta, bool writedb, bool delSS )
             if (!cb->effect->skill.empty())
                 skillid = cb->effect->skill[0]->getId();
             SSDismiss(skillid, delSS, pmail);
+            bool delSG = delSS;
+            SGDismiss(skillid, delSG, pmail);
         }
     }
 
@@ -7708,6 +7710,108 @@ void Fighter::makeFighterSGInfoWithNoSkill(Stream& st)
     }
 
     st.data<UInt8>(offset) = c;
+}
+
+void Fighter::getAllSGAndLevel(Stream& st)
+{
+    if(isPet())
+        return;
+
+    size_t offset = st.size();
+    st << static_cast<UInt8>(0);
+    UInt8 c = 0;
+    for (int i = 0; i < getUpSkillsMax(); ++i)
+    {
+        if (_skill[i])
+        {
+            SGrade* sg = SGGetInfo(_skill[i]);
+            if (sg)
+            {
+                ++c;
+                UInt16 skill_id = SKILL_ID(_skill[i]);
+                st << static_cast<UInt16>(SKILLANDLEVEL(skill_id, sg->lvl));
+            }
+        }
+    }
+    if (peerless != 0)
+    {
+        SGrade* sg = SGGetInfo(peerless);
+        if (sg)
+        {
+            ++c;
+            UInt16 skill_id = SKILL_ID(peerless);
+            st << static_cast<UInt16>(SKILLANDLEVEL(skill_id, sg->lvl));
+        }
+    }
+    st.data<UInt8>(offset) = c;
+}
+
+void Fighter::SGDismiss(UInt16 skillid, bool isDel, Mail * mail)
+{
+    //技能升阶散功，返回技能升阶60%
+    if(!_owner)
+        return;
+    UInt32 sid = SKILL_ID(skillid);
+    std::map<UInt16, SGrade>::iterator it = m_sg.find(sid);
+    if (it == m_sg.end())
+        return;
+    SGrade& sg = it->second;
+    UInt32 sgExp = 0;
+    for (UInt8 lvl = 0; lvl < sg.lvl; ++lvl)
+    {
+        GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(lvl);
+        if(ev)
+            sgExp += ev->consume;
+    }
+    sgExp *= 0.6;
+    if(sgExp < 100)
+        return;
+    UInt16 sgCount1 = sgExp / 300;
+    sgExp = sgExp % 300;
+    UInt16 sgCount2 = sgExp / 100;
+
+    MailPackage::MailItem sgmitem[2] = {{16000, sgCount1}, {16001, sgCount2}};
+    if(!mail)
+    {
+        const GData::SkillBase* skill = GData::skillManager[skillid];
+        if (!skill) return;
+        StringTokenizer sk(skill->getName(), "LV");
+        SYSMSG(title, 2031);
+        SYSMSGV(content, 2032, getLevel(), getColor(), getName().c_str(), sk[0].c_str());
+        MailItemsInfo itemsInfo(sgmitem, DismissCitta, 2);
+        mail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    }
+    else
+    {
+        mailPackageManager.push(mail->id, sgmitem, 2, true);
+    }
+    sg.lvl = 0;
+    if(!isDel)
+    {
+        SGDeleteDB(sid);
+        _owner->sendFighterSGListWithNoSkill();
+    }
+}
+
+void Fighter::SGDismissAll(bool isDel)
+{
+    std::map<UInt16, SGrade>::iterator it = m_sg.begin();
+    while(it != m_sg.end())
+    {
+        SGDismiss(SKILLANDLEVEL(it->first, 1), isDel);
+        if(isDel)
+        {
+            SGDeleteDB(it->first);
+            m_sg.erase(it++);
+        }
+        else
+            ++ it;
+    }
+}
+
+void Fighter::SGDeleteDB(UInt16 id)
+{
+    DB1().PushUpdateData("DELETE FROM `skill_grade` WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u AND `skillId` = %u", getId(), _owner->getId(), id);
 }
 
 /*

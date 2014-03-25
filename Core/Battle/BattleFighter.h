@@ -1195,6 +1195,7 @@ public:
     GData::LBSkillItem* getDeadCondItem();
     GData::LBSkillItem* getBleedCondItem();
     GData::LBSkillItem* getStateCondItem(UInt16 state);
+    UInt32 getSkillGradeExtraValue(UInt16 skillId);
     void releaseLBSkillCD();
 
     float& getHpShieldSelf() { return _hpShieldSelf; }
