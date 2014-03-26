@@ -4128,9 +4128,15 @@ void OnServerLeftMemberLeave(ServerLeftMsgHdr& hdr, const void * data)
         if(!player)
             continue;
         if(val)
+        {
             player->setLeftAddrEnter(true);
+            TRACE_LOG("leftaddr(leftReturn) 1 (pid: %" I64_FMT "u)", player->getId());
+        }
         else
+        {
             player->setLeftAddrEnter(false);
+            TRACE_LOG("leftaddr(leftReturn) 0 (pid: %" I64_FMT "u)", player->getId());
+        }
         if( var_val)
         {
             UInt32 val = player->GetVar(GObject::VAR_LEFTADDR_POWER);

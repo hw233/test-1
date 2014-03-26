@@ -671,6 +671,23 @@ bool Clan::kick(Player * player, UInt64 pid)
         player->rebuildBattleName();
     }
 
+    if(kicker->getLeftAddrEnter())
+    {
+        struct TeamChange
+        {
+            UInt8 leftId ; 
+            UInt32 clanId ;
+            UInt64 playerId;
+            UInt8 pos1;
+            UInt8 pos2;
+            TeamChange(UInt8 leftId_ ,UInt32 clanId_,UInt64 playerId_ ,UInt8 pos1_ ,UInt8 pos2_):leftId(leftId_),clanId(clanId_),playerId(playerId_),pos1(pos1_),pos2(pos2_){}
+        };
+        TeamChange tc(255,getId(),kicker->getId(), 0 ,0);
+        GameMsgHdr hdr(0x393, kicker->getThreadId(), kicker, sizeof(TeamChange));
+        GLOBAL().PushMsg(hdr, &tc);
+        _buildingOwner->LeaveTeam(NULL,kicker,kicker,1);
+    }
+
 	return true;
 }
 
