@@ -123,6 +123,7 @@ namespace GObject
     ClanBuildingOwner::ClanBuildingOwner(Clan* clan)
         : _clan(clan), _energy(0)
     {
+        memset(_leftAttr, 0, sizeof(_leftAttr));
         if (_clan)
             DB2().PushUpdateData("INSERT IGNORE INTO `clan_buildings` (`clanId`) VALUES (%" I64_FMT "u)", _clan->getId()); 
         {
@@ -831,9 +832,40 @@ namespace GObject
         player->send(st);
         
     }
+
     void ClanBuildingOwner::UpdateEnergy()
     {
         DB5().PushUpdateData("UPDATE `clan_buildings` set `fairylandEnergy` = %u, `updateTime` = %u where `clanId` = %" I64_FMT "u", _energy , TimeUtil::Now() , _clan->getId());
+    }
+
+    UInt32 ClanBuildingOwner::getLeftAttr(UInt8 type) const 
+    {
+       if(type >=LEFTATTRMAX) 
+           return 0;
+       return _leftAttr[type];
+    }  
+    //仙界遗迹属性 opt : 0-重置 1-增加 2-减少
+    void ClanBuildingOwner::AddLeftAttr(UInt8 opt ,UInt8 type , UInt32 value)
+    {
+        if(opt == 0)
+        {
+            memset(_leftAttr, 0, sizeof(_leftAttr));
+            return ;
+        }
+        if( type > LEFTATTRMAX ) 
+            return ;
+        if(type == 0 )
+            return ;
+        if(opt == 1)
+            _leftAttr[type - 1] += value ; 
+        if(opt == 2)
+        {
+            if(_leftAttr[type - 1 ] < value)
+                _leftAttr[type - 1] = 0 ;
+            else
+                _leftAttr[type - 1] -= value;
+        }
+        _clan->notifyUpdateStatueAttr();
     }
 }
 

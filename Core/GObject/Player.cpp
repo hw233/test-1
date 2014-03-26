@@ -14717,7 +14717,7 @@ namespace GObject
             return 0;
         const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
         if (buildingOwner)
-            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingHP));
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingHP) + buildingOwner->getLeftAttr(5));
         return 0;
     }
 
@@ -14727,11 +14727,29 @@ namespace GObject
             return 0;
         const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
         if (buildingOwner)
-            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingPhyAtk));
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingPhyAtk) + buildingOwner ->getLeftAttr(0));
         return 0;
     }
 
     float Player::getClanBuildingMagAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingMagAtk) + buildingOwner ->getLeftAttr(0));
+        return 0;
+    }
+    float Player::getClanBuildingMagDefEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingMagAtk));
+        return 0;
+    }
+    float Player::getClanBuildingPhyDefEffect()
     {
         if (_clan == NULL)
             return 0;
@@ -14747,7 +14765,7 @@ namespace GObject
             return 0;
         const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
         if (buildingOwner)
-            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingAction));
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingAction) + buildingOwner ->getLeftAttr(4));
         return 0;
     }
 
