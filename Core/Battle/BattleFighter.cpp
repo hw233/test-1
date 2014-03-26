@@ -221,6 +221,10 @@ void BattleFighter::setFighter( GObject::Fighter * f )
             break;
         }
     }
+
+    _sg_v.clear();
+    _fighter->getAllSGInfo(_sg_v);
+
 }
 
 void BattleFighter::updateAllAttr()
@@ -615,11 +619,12 @@ float BattleFighter::calcTherapy(bool& isCritical, bool& first, const GData::Ski
         }
     }
 
+    Int32 sg_v = getSkillGradeExtraValue(SKILL_ID(skill->getId()));
     GData::LBSkillItem* item = getSkillCondItem(SKILL_ID(skill->getId()));
     if(NULL != item)
-        return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + item->ef_value);
+        return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + item->ef_value + sg_v);
 
-    return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
+    return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + sg_v);
 }
 
 float BattleFighter::calcMaxTherapy(const GData::SkillBase* skill)
@@ -2315,6 +2320,7 @@ void BattleFighter::clearSkill()
     _onDeadCond.clear();
     _onBleedCond.clear();
     _onStateCond.clear();
+    _sg_v.clear();
 }
 
 void BattleFighter::setSummonFactor(UInt32 aura, float factor, UInt8 last)
@@ -3209,6 +3215,14 @@ bool BattleFighter::clearDmgNingShi()
     }
 
     return false;
+}
+
+Int32 BattleFighter::getSkillGradeExtraValue(UInt16 skillId)
+{
+    std::map<UInt16, Int32>::iterator it = _sg_v.find(skillId);
+    if(it == _sg_v.end())
+        return 0;
+    return it->second;
 }
 
 }

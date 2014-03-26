@@ -66,7 +66,7 @@ class SkillEvData
     public:
         struct stSkillEv
         {
-            UInt32 effect;
+            Int32 effect;
             UInt32 consume;
             stSkillEv() : effect(0), consume(0) {}
         };

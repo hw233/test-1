@@ -29330,7 +29330,7 @@ void Player::sendXinMoInfo()
     st <<static_cast<UInt8>(0);
     st << GetVar(VAR_HEART_SWORD);
     std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
-    UInt8 cnt = _fighters.size() ;
+    //UInt8 cnt = _fighters.size() ;
 //  st << static_cast<UInt8>(cnt);
     for (; it != _fighters.end(); ++it)
     {
@@ -29569,7 +29569,7 @@ void Player::AddFriendlyCount(Player * friender , UInt8 val)
     {
 		size_t c = _fighters.size();
 		st.init(REP::SKILLSTRENGTHEN);
-        st << static_cast<UInt8>(12);
+        st << static_cast<UInt8>(14);
 		st << static_cast<UInt8>(c);
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
         {

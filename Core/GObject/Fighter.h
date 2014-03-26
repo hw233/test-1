@@ -1095,6 +1095,7 @@ public:
     void SGDismiss(UInt16, bool = false, Mail * = NULL);
     void SGDismissAll(bool isDel);
     void SGDeleteDB(UInt16 id);
+    void getAllSGInfo(std::map<UInt16, Int32>& sg_info);
 
 };
 

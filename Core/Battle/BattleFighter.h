@@ -1195,7 +1195,7 @@ public:
     GData::LBSkillItem* getDeadCondItem();
     GData::LBSkillItem* getBleedCondItem();
     GData::LBSkillItem* getStateCondItem(UInt16 state);
-    UInt32 getSkillGradeExtraValue(UInt16 skillId);
+    Int32 getSkillGradeExtraValue(UInt16 skillId);
     void releaseLBSkillCD();
 
     float& getHpShieldSelf() { return _hpShieldSelf; }
@@ -1573,6 +1573,8 @@ private:
     float _yehuo_ss_upRate;
     void setYehuoSSUpRate(float f) { _yehuo_ss_upRate = f; }
     float getYehuoSSUpRate() { return _yehuo_ss_upRate; }
+
+    std::map<UInt16, Int32> _sg_v;
 
 public:
 	enum StatusFlag

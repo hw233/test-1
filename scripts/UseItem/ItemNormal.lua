@@ -9288,7 +9288,7 @@ function ItemNormal_00016000(iid, num, bind, param)
         player:sendMsgCode(0, 1093, 80);
         return false
     end
-    if iid != 16000 and iid != 16001 then
+    if iid ~= 16000 and iid ~= 16001 then
         return false
     end
 

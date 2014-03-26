@@ -7498,7 +7498,7 @@ void Fighter::SGradeManual(UInt16 skillId)
         return;
     if(_owner->GetLev() < 85)
         return;
-    if(hasSkill(skillId) < 0)
+    if(hasSkill(skillId) < 0 && hasPeerless(skillId) < 0)
         return;
 
     UInt16 sid = SKILL_ID(skillId);
@@ -7516,7 +7516,7 @@ void Fighter::SGradeManual(UInt16 skillId)
     }
     else
     {
-        sgLevel = 1;
+        sgLevel = 0;
     }
 
     GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sgLevel);
@@ -7555,7 +7555,7 @@ void Fighter::SGradeAuto(UInt16 skillId)
         return;
     if(_owner->GetLev() < 85)
         return;
-    if(hasSkill(skillId) < 0)
+    if(hasSkill(skillId) < 0 && hasPeerless(skillId) < 0)
         return;
 
     UInt16 sid = SKILL_ID(skillId);
@@ -7564,7 +7564,7 @@ void Fighter::SGradeAuto(UInt16 skillId)
     if(it != m_sg.end())
         sgLevel = it->second.lvl;
     else
-        sgLevel = 1;
+        sgLevel = 0;
 
     UInt8 maxCnt = GData::skillEvData.getSkillEvSize();
     if(sgLevel >= maxCnt)
@@ -7596,7 +7596,7 @@ void Fighter::SGradeAuto(UInt16 skillId)
     if(realCnt < canCnt)
     {
         _owner->sendMsgCode(0, 4015);
-        return;
+        //return;
     }
 
     if(sgMoney > totalConsume)
@@ -7633,14 +7633,14 @@ void Fighter::makeFighterSGInfo(Stream& st)
     {
         if (_skill[i])
         {
-            if (appendFighterSSInfo(st, _skill[i]))
+            if (appendFighterSGInfo(st, _skill[i]))
                 ++c;
         }
     }
     // append peerless skill
     if (peerless)
     {
-        if (appendFighterSSInfo(st, peerless))
+        if (appendFighterSGInfo(st, peerless))
             ++c;
     }
     st.data<UInt8>(offset) = c;
@@ -7812,6 +7812,20 @@ void Fighter::SGDismissAll(bool isDel)
 void Fighter::SGDeleteDB(UInt16 id)
 {
     DB1().PushUpdateData("DELETE FROM `skill_grade` WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u AND `skillId` = %u", getId(), _owner->getId(), id);
+}
+
+void Fighter::getAllSGInfo(std::map<UInt16, Int32>& sg_v)
+{
+    std::map<UInt16, SGrade>::iterator it = m_sg.begin();
+    while(it != m_sg.end())
+    {
+        GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(it->second.lvl);
+        if(ev)
+        {
+            sg_v.insert(std::make_pair(it->first, ev->effect));
+        }
+        ++it;
+    }
 }
 
 /*

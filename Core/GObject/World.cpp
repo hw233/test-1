@@ -1185,7 +1185,7 @@ void World::SendSurnameLegendAward()
             SYSMSGV(title, 4173);
             if(pos > 7)
                 break;
-            UInt32 score = i->total;
+            //UInt32 score = i->total;
             if(pos > 0 && pos <= 7)     //奖励前10名
             {
                 SYSMSGV(content, 4174, pos);

@@ -442,6 +442,11 @@ namespace GData
             fprintf (stderr, "Load LoadCoupleCopyConfig Error !\n");
             std::abort();
         }
+        if (!LoadSkillEvConfig())
+        {
+            fprintf (stderr, "Load LoadSkillEvConfig Error !\n");
+            std::abort();
+        }
 
 		return true;
 	}

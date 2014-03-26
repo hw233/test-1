@@ -703,7 +703,7 @@ struct DBCangjianCfg
 struct DBSkillEv
 {
     UInt8 lev;
-    UInt32 effect;
+    Int32 effect;
     UInt32 consume;
 };
 
@@ -1695,7 +1695,7 @@ SPECIALBEGIN(GData::DBSkillEv)
 SPECIALDEF(3)
 	(
     UInt8, lev,
-    UInt32, effect,
+    Int32, effect,
     UInt32, consume
 	)
 SPECIALEND()

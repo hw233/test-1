@@ -13,7 +13,7 @@ function skill_ev()
     d=skill_ev
     sed -i /id/d $f
     sed -i /ID/d $f
-    sed -i /name/d $f
+    sed -i /lv/d $f
     sed -i /^$/d $f
     sed -i /REF/d $f
     sed -i s/\"//g $f
