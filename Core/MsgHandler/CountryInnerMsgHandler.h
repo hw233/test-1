@@ -2792,6 +2792,11 @@ void OndoGuankaAct( GameMsgHdr &hdr, const void * data)
 
     player->doGuankaAct(type);
 }
+void OnBuyLeftPower( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->BuyLeftPower();
+}
 
 /*
 //XXX

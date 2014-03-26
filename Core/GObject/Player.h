@@ -3014,6 +3014,7 @@ namespace GObject
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
         void sevensoul_fixed();
+        void BuyLeftPower();
 
         //友好度
         //void AddFriendlyCount(Player * friender , UInt8 taskNum) ;

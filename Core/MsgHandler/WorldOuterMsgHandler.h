@@ -4177,10 +4177,20 @@ void OnServerLeftNotice(ServerLeftMsgHdr& hdr, const void * data)
     Clan * clan = globalClans[clanId];
     if(!clan)
         return ;
-    UInt8 leftId = 0;
-    br >> leftId ;
+    //UInt8 leftId = 0;
+    //br >> leftId ;
     UInt32 num = 0;
     br >> num ; 
-    clan->SendLeftAddrMail(num ,leftId);
+    clan->SendLeftAddrMail(num /*,leftId*/);
+}
+void OnServerLeftAttackInfo(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL)
+        return ;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    if (buildingOwner)
+        buildingOwner->sendAttackTeamInfo(player);
 }
 #endif // _WORLDOUTERMSGHANDLER_H_

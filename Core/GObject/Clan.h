@@ -877,7 +877,7 @@ public:
     void checkMemberActivePoint(ClanMember* mem);
     void listMembersActivePoint( Player * player );
     UInt32 getMemberActivePoint(ClanMember* mem);
-    void SendLeftAddrMail(UInt32 _spirit , UInt8 leftId);
+    void SendLeftAddrMail(UInt32 _spirit /*, UInt8 leftId */);
 
     ClanBuildingOwner* getBuildingOwner();
     ClanBuildingOwner* getNewBuildOwner();

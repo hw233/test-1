@@ -670,9 +670,10 @@ namespace GObject
         VAR_LEFTADDR_POWER = 694 ,   //仙界征战体力
         VAR_LEFTADDR_CREATE = 695 ,   //创建队伍的时间
         VAR_HEART_SWORD = 696 ,    //心剑值
-        VAR_FRIEND_TASK1 = 697 ,    //友好度任务，主动私聊，帮助浇灌许愿树，发起与好友的切磋
-        VAR_FRIEND_TASK2 = 698 ,    //与好友组队副本，与好友宠物副本，赠送黄色鸢尾
-        VAR_FRIEND_VALUE = 699 ,    //友情值
+        VAR_LEFTADDR_POWER_ADD  = 697,  //体力增加次数
+        VAR_FRIEND_TASK1 = 698 ,    //友好度任务，主动私聊，帮助浇灌许愿树，发起与好友的切磋
+        VAR_FRIEND_TASK2 = 699 ,    //与好友组队副本，与好友宠物副本，赠送黄色鸢尾
+        VAR_FRIEND_VALUE = 700 ,    //友情值
 
         //701-710 for suntao
         VAR_MicroCloud_AWARD = 701,     //是否领取微云合作奖励
@@ -701,6 +702,7 @@ namespace GObject
         VAR_TYSS_DISCOUNT_CONSUME2 = 726,//天元神兽期间限购栏2(购买次数)
         VAR_TYSS_DISCOUNT_CONSUME3 = 727,//天元神兽期间限购栏3(购买次数)
         VAR_TYSS_CONTRIBUTE_CLAN_SUM = 728,//天元神兽期间玩家帮派总贡献(帮主身上) 
+        //731 - 751 for lib
 
         VAR_MAX,
     };
@@ -1310,6 +1312,7 @@ namespace GObject
             REGISTER_VAR(VAR_JIQIREN_SYBS, CYCLE_NONE);
             REGISTER_VAR(VAR_LEFTADDR_POWER, CYCLE_NONE);
             REGISTER_VAR(VAR_LEFTADDR_CREATE, CYCLE_NONE);
+            REGISTER_VAR(VAR_LEFTADDR_POWER_ADD, CYCLE_DAY);
 
             REGISTER_VAR(VAR_QISHI_FRIEND_SEND_COUNT, CYCLE_DAY);
             REGISTER_VAR(VAR_QISHI_FRIEND_USE_COUNT, CYCLE_DAY);
