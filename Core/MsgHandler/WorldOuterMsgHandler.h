@@ -3263,7 +3263,6 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                 case 4:
                     hdr.msgHdr.desWorkerID = player->getThreadId();//购买限购礼包
                     GLOBAL().PushMsg(hdr, (void*)data);
-                    player->OpTYSS(8);//返回限购礼包信息
                     break;
                 case 5:
                 {

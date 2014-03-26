@@ -5438,7 +5438,7 @@ void Clan::LoadTYSSScore(Player* pl)
 
     UInt32 score = pl->GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
 
-    ScoreSort ss;
+    ScoreSort32 ss;
     ss.player = pl;
     ss.score = score;
     TYSSScoreSort.insert(ss);
@@ -5456,7 +5456,7 @@ void Clan::SetTYSSScore(Player * pl)
 
     UInt32 score = pl->GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
 
-    for(ScoreSortType::iterator i = TYSSScoreSort.begin(), e = TYSSScoreSort.end(); i != e; ++i)
+    for(ScoreSortType32::iterator i = TYSSScoreSort.begin(), e = TYSSScoreSort.end(); i != e; ++i)
     {
         if (i->player == pl)
         {
@@ -5465,7 +5465,7 @@ void Clan::SetTYSSScore(Player * pl)
         }
     }
 
-    ScoreSort ss;
+    ScoreSort32 ss;
     ss.player = pl;
     ss.score = score;
     TYSSScoreSort.insert(ss);
@@ -5479,7 +5479,7 @@ void Clan::SendTYSSScore(Player* pl)
     if(NULL == pl)
         return;
 
-    ScoreSortType::iterator it = TYSSScoreSort.begin();
+    ScoreSortType32::iterator it = TYSSScoreSort.begin();
     Stream st(REP::ACTIVE);
     UInt8 count = 0;
     
@@ -5514,7 +5514,7 @@ void Clan::DelTYSSScore(Player * pl)
     if(NULL == pl)
         return;
 
-    for(ScoreSortType::iterator i = TYSSScoreSort.begin(), e = TYSSScoreSort.end(); i != e; ++i)
+    for(ScoreSortType32::iterator i = TYSSScoreSort.begin(), e = TYSSScoreSort.end(); i != e; ++i)
     {
         if (i->player == pl)
         {

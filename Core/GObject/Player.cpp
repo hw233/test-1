@@ -27195,7 +27195,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                     if(tmp_int >= awards[flag][3][1])
                         return;
                     ++tmp_int; 
-                    SetVar(VAR_TYSS_DISCOUNT_CONSUME1,SET_BIT_8(consume2,consume_pos,tmp_int)); 
+                    SetVar(VAR_TYSS_DISCOUNT_CONSUME1,SET_BIT_8(consume1,consume_pos,tmp_int)); 
 		            ConsumeInfo ci(BuyTYSSLim,0,0);
                     useGold(awards[flag][3][0], &ci);
                     add_flag = 1;

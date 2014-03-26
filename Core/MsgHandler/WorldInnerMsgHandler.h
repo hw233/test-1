@@ -2348,7 +2348,7 @@ void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
                 ++i;
                 if(i == e)
                 {
-                    st1 << i->total << static_cast<UInt32>(idx - 1); 
+                    st1 << i->total << static_cast<UInt32>(idx); 
                     if(World::tyss_PlayerSort.size() >= 7)
                         st1 << static_cast<UInt8>(7);
                     else
@@ -2397,7 +2397,7 @@ void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
                 ++i;
                 if(i == e)
                 {
-                    st2 << i->total << static_cast<UInt32>(idx - 1); 
+                    st2 << i->total << static_cast<UInt32>(idx); 
                     if(World::tyss_ClanSort.size() >= 3)
                         st2 << static_cast<UInt8>(3);
                     else
