@@ -7518,7 +7518,7 @@ void Fighter::SGradeManual(UInt16 skillId)
     {
         SGrade& sg = it->second;
         sgLevel = sg.lvl;
-        if(sgLevel >= GData::skillEvData.getSkillEvSize())
+        if(sgLevel >= GData::skillEvData.getSkillEvSize() - 1)
         {
             _owner->sendMsgCode(0, 1361);
             return;
@@ -7547,6 +7547,7 @@ void Fighter::SGradeManual(UInt16 skillId)
     sgTmp.lvl = sgLevel;
     m_sg[sid] = sgTmp;
     DB1().PushUpdateData("REPLACE INTO `skill_grade` (`playerId`, `fighterId`, `skillId`, `level`) VALUES(%" I64_FMT "u, %u, %u, %u)", _owner->getId(), getId(), sid, sgLevel);
+    _skillBPDirty = true;
 
 	Stream st(REP::SKILLSTRENGTHEN);
     st << static_cast<UInt8>(11);
@@ -7603,7 +7604,7 @@ void Fighter::SGradeAuto(UInt16 skillId)
         totalConsume += consume;
     }
 
-    if(realCnt < canCnt)
+    if(realCnt == 0 || realCnt < canCnt)
     {
         _owner->sendMsgCode(0, 4015);
         //return;
@@ -7621,6 +7622,7 @@ void Fighter::SGradeAuto(UInt16 skillId)
     sgTmp.lvl = sgLevel;
     m_sg[sid] = sgTmp;
     DB1().PushUpdateData("REPLACE INTO `skill_grade` (`playerId`, `fighterId`, `skillId`, `level`) VALUES(%" I64_FMT "u, %u, %u, %u)", _owner->getId(), getId(), sid, sgLevel);
+    _skillBPDirty = true;
 
 	Stream st(REP::SKILLSTRENGTHEN);
     st << static_cast<UInt8>(12);
