@@ -3762,7 +3762,7 @@ namespace GObject
             if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
             {
                 UInt32 var = pl->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER);
-                pl->SetVar(VAR_TYSS_CONTRIBUTE_PLAYER,var);
+                pl->SetVar(VAR_TYSS_CONTRIBUTE_CLAN,var);
                 clan->AddTYSSSum(var);
             }
 		}
