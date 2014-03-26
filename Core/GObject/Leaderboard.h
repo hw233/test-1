@@ -126,10 +126,14 @@ struct PetInfoList
     UInt16 gengu;
     PetNeidanAttr neidan[3];
     std::map<UInt8, UInt8> sanhun;
+    UInt8 soulLevel[7];
+    UInt8 skillIndex[7];
 
     PetInfoList() : id(0), pf(0), country(0), battlePoint(0), petId(0), petLev(0), gengu(0)
     {
         memset(neidan, 0, sizeof(neidan));
+        memset(soulLevel, 0, sizeof(soulLevel));
+        memset(skillIndex, 0, sizeof(skillIndex));
     }
 };
 

@@ -216,6 +216,16 @@ struct MemberDonate
 };
 typedef std::multimap<UInt32, MemberDonate> MemberDonates;
 
+struct DuoBaoLog
+{
+	UInt32 clanId;
+	std::string name;
+	UInt16 score;
+    UInt32 itemId;
+    UInt8 cnt;
+    DuoBaoLog() : clanId(0), name(""), score(0), itemId(0), cnt(0) {}
+};
+typedef std::list<DuoBaoLog> DuoBaoLogs;
 
 struct ClanSpiritTree
 {
@@ -288,6 +298,39 @@ private:
 		}
 	};
 	typedef std::multiset<ClanMember *, MemberLess> Members;
+
+    struct ScoreSort
+    {
+        GObject::Player* player;
+        UInt16 score;
+        UInt32 time;
+        ScoreSort():player(NULL),score(0),time(0){}
+    };
+
+    struct lt_sort
+    {
+        bool operator()(const ScoreSort& a, const ScoreSort& b) const { return a.score > b.score || (a.score==b.score && a.time < b.time); }
+    };
+
+    struct ScoreSort32
+    {
+        GObject::Player* player;
+        UInt32 score;
+        UInt32 time;
+        ScoreSort32():player(NULL),score(0),time(0){}
+    };
+
+    struct lt_sort32
+    {
+        bool operator()(const ScoreSort32& a, const ScoreSort32& b) const { return a.score > b.score || (a.score==b.score && a.time < b.time); }
+    };
+
+    typedef std::multiset<ScoreSort, lt_sort> ScoreSortType;
+    typedef std::multiset<ScoreSort32, lt_sort32> ScoreSortType32;
+public:
+    ScoreSortType DuoBaoScoreSort;     //夺宝排名
+    ScoreSortType32 TYSSScoreSort;     //天元神兽排名
+
 public:
 	Clan( UInt32 id, const std::string& name, UInt32 ft = 0, UInt8 lvl = 1 );
 	~Clan();
@@ -520,6 +563,16 @@ public:
 
     void addClanGradeInAirBook(UInt32 grade);
     void updataClanGradeInAirBook(Player * pl= NULL);
+    
+    //天元神兽
+    void SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str);
+    void LoadTYSSScore(Player* pl);
+    void SetTYSSScore(Player * pl);
+    void SendTYSSScore(Player* pl);
+    void DelTYSSScore(Player* pl);
+    void ClearTYSSScore();
+
+    
     UInt32 getGradeInAirBook(){return  _gradeInAirbook;}
     void SendClanMemberGrade(Player* player);
     UInt8 skillLevelUp(Player* pl, UInt8 skillId);
@@ -580,6 +633,27 @@ public:
     void   insertIntoCopySnap(Player *player, UInt8 spotId);
     UInt8  getCopyPlayerSnap(Player *player);
 
+public:
+    void LoadDuoBaoLog(const std::string& name, UInt16 score, UInt32 itemId, UInt8 cnt);
+    void LoadDuoBaoScore(Player * pl);
+    void DuoBaoInfo(Player * pl);
+    void DuoBaoStart(Player * pl);
+    void SendDuoBaoAward();
+    void ClearDuoBaoData();
+
+private:
+    void SendDuoBaoLog(Stream & st);
+    void SetDuoBaoScore(Player * pl);
+    void DelDuoBaoScore(Player * pl);
+    void SendDuoBaoScore(Stream & st);
+    void DuoBaoLvlAward();
+    void DuoBaoUpdate(const std::string& playerName, UInt16 score);
+    void DuoBaoDel(UInt8 mark);
+    void ClearDuoBaoLog();
+    void BroadDuoBaoBegin(Player * player);
+    void DuoBaoBroadcast(Stream& st);
+public:
+    void sendMemberBuf(UInt8 pos);
 
 public:
 
@@ -668,6 +742,26 @@ public:
             DB5().PushUpdateData("UPDATE `clan` SET `gongxian` = %u WHERE `id` = %u", _gongxian, _id);
     }
 
+    void SetDuoBaoAward(UInt32 itemId) { _duoBaoAward = itemId; }
+    UInt32 GetDuoBaoAward() {return _duoBaoAward;}
+    
+    void SetTYSSSum(UInt32 num,bool toDB=false) 
+    {
+        if(_tyssSum == num)
+            return;
+        _tyssSum= num; 
+        if (toDB)
+            DB5().PushUpdateData("UPDATE `clan` SET `tyssSum` = %u WHERE `id` = %u", _tyssSum, _id);
+    }
+    UInt32 GetTYSSSum() {return _tyssSum;}
+    void AddTYSSSum(UInt32 num)
+    {
+        if(num == 0)
+            return;
+        _tyssSum += num; 
+        DB5().PushUpdateData("UPDATE `clan` SET `tyssSum` = %u WHERE `id` = %u", _tyssSum, _id);
+    }
+
 public:
 	ClanMember * getClanMember(Player *);
 	bool existClanMember(Player *);
@@ -725,6 +819,7 @@ private:
 
 	//std::map<UInt8, MemberDonates> _memberDonates;
 	MemberDonates _memberDonates;
+    DuoBaoLogs _duobaoLogs;
 
 	std::map<UInt32, UInt8> _repoNum;
 	std::multimap<UInt32, AllocRecord> _allocRecords;
@@ -751,6 +846,7 @@ private:
 	UInt64 _watchman;       // 帮派修炼地护法
 
     UInt32 _gradeInAirbook; //天书奇缘帮派积分
+    UInt32 _gradeInTYSS; //天元神兽帮派积分
     std::string m_qqOpenid;
 
 	Mutex _mutex;
@@ -758,6 +854,8 @@ private:
     UInt32 _xianyun;
     UInt32 _gongxian;
     UInt8 _urge[3];
+    UInt32 _duoBaoAward;
+    UInt32 _tyssSum;
 
     ClanSpiritTree m_spiritTree;
 public:

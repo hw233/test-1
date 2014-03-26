@@ -116,6 +116,7 @@ function loadStore()
         discount(store)
     store:add(2,9427,50)
 
+    store:add(2,9600,20)
     if getQixi() then
         store:add(2,9450,10)
     end
@@ -131,7 +132,7 @@ function loadStore()
         store:add(2, 11116, 80)
         store:add(2, 11117, 90)
         store:add(2, 11118, 100)
-        --store:add(2, 11203, 110)
+        store:add(2, 11203, 110)
     end
 
     if getSurnameLegend(30) then
@@ -139,7 +140,7 @@ function loadStore()
         --store:add(2 ,9397, 20)
         --store:add(2 ,9401, 20)
         --store:add(2 ,9422, 20)
-        store:add(2 ,9449, 20)
+        store:add(2 ,9495, 150)
     end
     if getHappyFireTime(300) then
         store:add(2, 9440, 10)
@@ -158,6 +159,10 @@ function loadStore()
         store:add(2, 1126, 20)
         store:add(2, 9388, 100)
         store:add(2, 9371, 10)
+
+    if getTYSSTime(300) then
+        store:add(2, 9492, 20)
+    end
 
         store:add(2, 9413, 10)
         store:add(2, 9414, 30)
@@ -324,6 +329,7 @@ function loadStore()
         store:add(2,9035,10)
         store:add(2,9391,10)
         store:add(2,9430,10)
+        store:add(2,9491,10)
         store:add(2,548,1)
         store:add(2,465,20)
         store:add(2,466,10)
@@ -577,6 +583,10 @@ function loadStore()
         store:add(14,507,2000)
         store:add(14,509,2000)
 		store:add(14,9427,1500,2)
+        store:add(14,9562,120)
+        store:add(14,9563,180)
+        store:add(14,9564,240)
+        store:add(14,9565,300)
         -- 龙魂灵宝
         store:add(15,11588,7000)
         store:add(15,11589,7000)

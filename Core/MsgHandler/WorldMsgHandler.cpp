@@ -55,6 +55,7 @@ MSG_REG(GameMsgHdr, OnArenaLeaderBoardReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_EXTRA_ACT, OnArenaExtraActReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_OP, OnArenaOpReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVERWAR_ARENA_OP, OnArenaWarOpReq);
+MSG_REG_2(GameMsgHdr, REQ::DUOBAO_REQ, OnClanDuoBaoReq);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq);
 MSG_REG_2(GameMsgHdr, REQ::MARRYBOARD, OnMarryBard);
@@ -82,6 +83,7 @@ MSG_REG_2(ArenaMsgHdr, 0x114, OnTeamArenaLeaderBoard);
 MSG_REG_2(ArenaMsgHdr, 0x115, OnTeamArenaInspireLevel);
 MSG_REG_2(ArenaMsgHdr, 0x116, OnTeamArenaLastRank);
 MSG_REG_2(ArenaMsgHdr, 0x117, OnUpdateArenaSession);
+MSG_REG_2(ArenaMsgHdr, 0x118, OnServerRechargeRank);
 
 MSG_REG_2(ServerWarMsgHdr, 0x121, OnServerWarConnected);
 MSG_REG_2(ServerWarMsgHdr, 0x122, OnServerWarPlayerEntered);
@@ -96,6 +98,8 @@ MSG_REG_2(ServerWarMsgHdr, 0x12A, OnServerRechargeRank);
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
+MSG_REG_2(GameMsgHdr, 0x166, OnSetTYSSScore);
+MSG_REG_2(GameMsgHdr, 0x167, OnAddTYSSSum);
 
 MSG_REG_2(GameMsgHdr, 0x171, OnClanTakeRewardResultReq);
 MSG_REG_2(GameMsgHdr, 0x172, OnTeamArenaAddMember);
@@ -128,6 +132,7 @@ MSG_REG_2(GameMsgHdr, 0x19D, OnAthleticsOver);
 MSG_REG_2(GameMsgHdr, 0x19E, OnAthleticsEnter);
 MSG_REG_2(GameMsgHdr, 0x19F, OnAthleticsAndClanNotify);
 
+MSG_REG_2(GameMsgHdr, 0x1A0, OnDoTableInWorld);
 MSG_REG_2(GameMsgHdr, 0x1A1, OnAddTradeCheckNotify);
 MSG_REG_2(GameMsgHdr, 0x1A2, OnDelTradeCheckNotify);
 
@@ -150,6 +155,18 @@ MSG_REG_2(GameMsgHdr, 0x1B1, OnSearchSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B2, OnPutSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B3, OnBuySaleCheckOKNotify);
 MSG_REG_2(GameMsgHdr, 0x1B4, OnSaleItemCancle);
+
+MSG_REG_2(GameMsgHdr, 0x1B5, OnAddQiShiBanCount);
+MSG_REG_2(GameMsgHdr, 0x1B6, OnSetGuankaActRank);
+MSG_REG_2(GameMsgHdr, 0x1B7, OnClearGuankaActRank);
+MSG_REG_2(GameMsgHdr, 0x1B8, OnSendGuankaActRank10);
+MSG_REG_2(GameMsgHdr, 0x1B9, OnSendGuankaActMyRank);
+MSG_REG_2(GameMsgHdr, 0x1BC, SetTYSSClanScoreRank);
+MSG_REG_2(GameMsgHdr, 0x1BD, DelTYSSClanScoreRank);
+MSG_REG_2(GameMsgHdr, 0x1BE, OnReturnTYSSInfo);
+MSG_REG_2(GameMsgHdr, 0x1BF, SetTYSSPlayerScoreRank);
+MSG_REG_2(GameMsgHdr, 0x1BA, OnUseAccItemInWorld);
+MSG_REG_2(GameMsgHdr, 0x1BB, OnUseVitalityItemInWorld);
 
 MSG_REG_2(GameMsgHdr, 0x1C0, OnLuckyDraw);
 MSG_REG_2(GameMsgHdr, 0x1C1, OnRechargeRank);
@@ -186,6 +203,8 @@ MSG_REG_2(GameMsgHdr, 0x1DC, SendQSBState);
 MSG_REG_2(GameMsgHdr, 0x1DD, OnSetCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DE, OnDelCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DF, OnSendCFriendInvited);
+MSG_REG_2(GameMsgHdr, 0x1AF, OnSendDuoBaoBegin);
+MSG_REG_2(GameMsgHdr, 0x201, OnClearTYSS);
 
 //FB占位(0x1E0~0x1E9),简体千万别使用
 //0x1E0

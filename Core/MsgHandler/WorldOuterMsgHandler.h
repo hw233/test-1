@@ -703,6 +703,26 @@ void OnClanGetDynamicMsgReq(GameMsgHdr& hdr, ClanGetDynamicMsgReq& req)
 	player->getClan()->sendClanDynamicMsg(player, req._type, req._start, req._count);
 }
 
+void OnClanDuoBaoReq(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL) return;
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    switch(type)
+    {
+    case 0x00:
+        clan->DuoBaoInfo(player);
+        break;
+    case 0x01:
+        clan->DuoBaoStart(player);
+        break;
+    }
+}
+
 void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -1752,6 +1772,9 @@ void OnArenaWarOpReq( GameMsgHdr& hdr, const void * data )
                     GObject::serverWarMgr.jiJianTai_openBox(player, idx);
                 }
                 break;
+            case 0x06:
+                GObject::serverWarMgr.jiJianTai_buyTimes(player);
+                break;
             }
         }
 		break;
@@ -2717,6 +2740,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x25:
         case 0x27:
         case 0x29:
+        case 0x3A:
+        case 0x3B:
         {
             brd >> op;
             switch(op)
@@ -3015,6 +3040,26 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                                             openId.clear();
                                             brd >> openId;
                                             UInt32 score = player->GetQQFriendScore(openId.c_str());
+                                            std::string info;
+                                            bool ret = player->GetQQFriendInfo(openId.c_str(), info);
+                                            if (ret)
+                                            {
+                                                StringTokenizer tokenizer(info, "_");
+                                                if (tokenizer.count() >= 2)
+                                                {
+                                                    st << tokenizer[1];
+                                                    UInt8 fighterId = atoi(tokenizer[0].c_str());
+                                                    st << fighterId;
+                                                }
+                                                else 
+                                                    ret = false;
+                                            }
+
+                                            if (!ret)
+                                            {
+                                                st << std::string("未找到");
+                                                st << static_cast<UInt8>(0);
+                                            }
                                             st << score;
                                         }
                                         st << Stream::eos;
@@ -3071,19 +3116,19 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     case 0x12:
                         player->RestCurStep();
                         break;
-                        /*
                     case 0x13:
                         {
-                            player->ReqQiShiBanPlayCount();
-                            UInt16 count = 0;
+                            UInt8 count = 0;
                             brd >> count;
+                            std::vector<std::string> nameList;
                             for (UInt16 i = 0; i < count; ++i)
                             {
                                 std::string name;
                                 brd >> name;
+                                nameList.push_back(name);
                             }
+                            player->ReqQiShiBanPlayCount(nameList);
                         }
-                        */
                     default:
                         break;
                 }
@@ -3123,7 +3168,136 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             GLOBAL().PushMsg(hdr, (void*)data);
             break;
         }
-        default:
+        case 0x30:
+        {
+            if(!World::getGuankaAct() || player->GetLev() < 65)
+                return;
+            brd >> op;
+            switch(op)
+            {
+                case 0:
+                    player->sendguankaActMyRank();
+                    break;
+                case 1:
+                    {
+                        UInt16 count = 0;
+                        brd >> count;
+
+                        Stream st(REP::ACT);
+                        st << static_cast<UInt8>(0x30) << static_cast<UInt8>(0x01);
+                        st << count;
+
+                        for(UInt32 i = 0; i < count; i ++)
+                        {
+                            std::string openId;
+                            openId.clear();
+                            brd >> openId;
+                            std::string info;
+                            bool ret = WORLD().GetMemCach_guankaActInfo(openId.c_str(), info);
+                            if (ret)
+                            {
+                                StringTokenizer tokenizer(info, "_");
+                                if (tokenizer.count() >= 3)
+                                {
+                                    UInt8 csex = atoi(tokenizer[1].c_str());
+                                    UInt16 score = atoi(tokenizer[2].c_str());
+                                    st << tokenizer[0] << csex << score;
+                                }
+                                else
+                                    ret = false;
+                            }
+
+                            if (!ret)
+                            {
+                                st << std::string("未找到");
+                                st << static_cast<UInt8>(0) << static_cast<UInt16>(0);
+                            }
+                        }
+                        st << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
+                case 2:
+                    {
+                        GameMsgHdr hdr(0x1B8, WORKER_THREAD_WORLD, player, 0);
+                        GLOBAL().PushMsg(hdr, NULL);
+                    }
+                    break;
+                case 3:
+                    {
+                        UInt8 type = 0xFF;
+                        brd >> type;
+                        player->doGuankaAct(type);
+                    }
+                    break;
+                case 4:
+                    {
+                        UInt8 type = 0xFF;
+                        brd >> type;
+                        player->getguankaScoreAward(type);
+                    }
+                    break;
+            }
+        }
+        break;
+        case 0x31:
+        {
+            if(!World::getTYSSTime())
+                return;
+            UInt8 op = 0;
+            UInt8 flag = 0;
+            brd >> op ;
+            switch(op)
+            {
+                case 0:
+                    player->ReturnTYSSInfo(9);
+                    break;
+                case 1:
+                    player->OpTYSS(op);//购买灵果
+                    player->ReturnTYSSInfo(9);
+                    break;
+                case 3:
+                    hdr.msgHdr.desWorkerID = player->getThreadId();//喂养神兽
+                    GLOBAL().PushMsg(hdr, (void*)data);
+                    break;
+                case 4:
+                    hdr.msgHdr.desWorkerID = player->getThreadId();//购买限购礼包
+                    GLOBAL().PushMsg(hdr, (void*)data);
+                    break;
+                case 5:
+                {
+                    brd >> flag;
+                    player->OpTYSS(op,flag);//查看成员贡献
+                }
+                    break;
+                case 6:
+                {
+                    UInt64 playerid = 0;
+                    brd >> flag >> playerid;
+                    player->OpTYSS(op,flag,playerid);//flag 0 - 表扬 1 - 督促
+                }
+                    break;
+                case 8:
+                    player->OpTYSS(op); 
+                    break;
+                case 0x11:
+                    player->ReturnTYSSInfo(1);//返回帮派榜
+                    break;
+                case 0x12:
+                    player->ReturnTYSSInfo(0);//返回个人榜
+                    break;
+                case 0x13:
+                    hdr.msgHdr.desWorkerID = player->getThreadId();//领取每日礼包
+                    GLOBAL().PushMsg(hdr, (void*)data);
+                    player->ReturnTYSSInfo(9);
+                    break;
+                default:
+                    break;
+
+            }
+
+       }
+       default:
             break;
     }
 }
@@ -3677,23 +3851,40 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
                     return;
                 UInt8 door=0 ;
                 br >> door;
-                GObject::MarryBoard::instance().selectDoor(player,door);
-                Stream st(REP::MARRYBOARD);
-                st <<static_cast<UInt8>(op);
-                st << static_cast<UInt8>(door);
-                st<<Stream::eos;
-                if(player == GObject::MarryBoard::instance()._man || player == GObject::MarryBoard::instance()._woman)
+                if( GObject::MarryBoard::instance().selectDoor(player,door) )
                 {
-                    GObject::MarryBoard::instance()._man ->send(st);
-                    GObject::MarryBoard::instance()._woman->send(st);
+                    Stream st(REP::MARRYBOARD);
+                    st <<static_cast<UInt8>(op);
+                    st << static_cast<UInt8>(door);
+                    st<<Stream::eos;
+                    if(player == GObject::MarryBoard::instance()._man || player == GObject::MarryBoard::instance()._woman)
+                    {
+                        GObject::MarryBoard::instance()._man ->send(st);
+                        GObject::MarryBoard::instance()._woman->send(st);
+                    }
+                    else
+                        player->send(st);
                 }
-                else
-                    player->send(st);
             }
             break;
         default:
             return;
     }
+}
+
+void OnServerRechargeRank( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    if(type == 0)
+        GObject::leaderboard.giveRechargeRankAward();
+    else if(type == 1)
+        GObject::leaderboard.readRechargeRank100(brd);
+    else if(type == 2)
+        GObject::leaderboard.readRechargeSelf(brd);
+    else if(type == 3)
+        GObject::leaderboard.sendGoldLvlAward(brd);
 }
 
 void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )

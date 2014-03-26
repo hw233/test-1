@@ -1108,14 +1108,11 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             static UInt16 ids[] =
             {
                 56,   2,
-                57,   2,
-                15,   2,
-                9371, 5,
-                1126, 5,
+                9371, 4,
+                9600, 4,
                 503,  5,
-                515,  3,
-                1325, 6,
-                134,  6,
+                1126, 5,
+                9338, 5,
             };
 
             UInt8 idx = 0;
@@ -3291,8 +3288,21 @@ UInt8 SwitchAutoForbid(UInt32 val)
     return 0;
 }
 
-inline bool player_enum_2(GObject::Player* pl, int type)
+inline bool clan_enum_0(GObject::Clan *clan, int)
 {
+   clan->ClearDuoBaoData();
+   return true;
+}
+inline bool clan_enum_1(GObject::Clan *clan, int)
+{
+   clan->ClearTYSSScore();
+   clan->SetTYSSSum(0,true);
+   return true;
+}
+
+inline bool player_enum_2(GObject::Player* pl, int* curType)
+{
+    int type = *curType;
     switch(type)
     {
         case 1:
@@ -3352,6 +3362,7 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_SUMMER_MEET_RECHARGE_AWARD, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_LOGIN_AWARD, 0);
+                pl->SetVar(GObject::VAR_SUMMER_MEET_STRENTH_AWARD, 0);
                  //pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE, 0);
                 pl->SetVar(GObject::VAR_SUMMER_MEET_TYPE_AWARD, 0);
                 pl->SetVar(GObject::VAR_SUMMERMEET_SCORE1, 0);
@@ -3402,6 +3413,40 @@ inline bool player_enum_2(GObject::Player* pl, int type)
                 pl->SetVar(GObject::VAR_3366_RECHARGE_AWARD, 0);
             }
             break;
+        case 16:
+            {
+                pl->SetVar(GObject::VAR_3366GIFT, 0);
+            }
+            break;
+        case 17:
+            {
+                pl->SetVar(GObject::VAR_GUANKA_ACTION_NPC, 0);
+                pl->SetVar(GObject::VAR_GUANKA_ACTION_SCORE, 0);
+                pl->SetVar(GObject::VAR_GUANKA_ACTION_TIME, 0);
+                pl->SetVar(GObject::VAR_GUANKA_ACTION_UDPLOG, 0);
+                GameMsgHdr hdr(0x1B7, WORKER_THREAD_WORLD, pl, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            break;
+        case 18:
+            {
+                pl->SetVar(GObject::VAR_CLAN_DUOBAO_SCORE, 0);
+                pl->SetVar(GObject::VAR_CLAN_DUOBAO_STATUS, 0);
+            }
+            break;
+        case 20:
+            {
+                //todo 天元神兽
+                pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_PLAYER, 0);
+                pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_CLAN, 0);
+                pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME1, 0);
+                pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME2, 0);
+                pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME3, 0);
+                //pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_CLAN_SUM, 0);
+                GameMsgHdr hdr(0x201, WORKER_THREAD_WORLD, pl, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            break;
         default:
             return false;
     }
@@ -3441,8 +3486,9 @@ void GMCmd(LoginMsgHdr& hdr, const void* data)
                 {
                     if (flag != 10)
                     {
+                        static int curType = 1;
                         if(flag != GObject::GVAR.GetVar(GObject::GVAR_DRAGONKING_ACTION))
-                            GObject::globalPlayers.enumerate(player_enum_2, 1);
+                            GObject::globalPlayers.enumerate(player_enum_2, &curType);
                         GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_BEGIN, val);
                         GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_END, endTime);
                         GObject::GVAR.SetVar(GObject::GVAR_DRAGONKING_ACTION, flag);
@@ -3711,65 +3757,76 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     UInt32 begin = 0, end = 0;
     UInt8 type = 0;
     br >> type >> begin >> end;
-    begin = TimeUtil::SharpDay(0, begin);
-    if(end > begin && (end - begin)%86400 > 0)
-        end = TimeUtil::SharpDay(1, end);
+    static int curType;
+    if(type != 18)
+    {
+        begin = TimeUtil::SharpDay(0, begin);
+        if(end > begin && (end - begin)%86400 > 0)
+            end = TimeUtil::SharpDay(1, end);
+    }
     UInt8 ret = 0;
     if(type == 1 && begin <= end)
     {   //充值幸运星活动
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYSTAR_END, end);
-        GObject::globalPlayers.enumerate(player_enum_2, 2);
+        curType = 2;
+        GObject::globalPlayers.enumerate(player_enum_2, &curType);
         ret = 1;
     }
     else if (type == 2 && begin <= end)
     {
+        curType = 3;
         if(GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_BEGIN) > TimeUtil::Now()
                 || GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_END) < TimeUtil::Now())
-            GObject::globalPlayers.enumerate(player_enum_2, 3);
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_END, end);
         ret = 1;
     }
     else if (type == 3 && begin <= end && !GObject::World::inActive_opTime_20130531())
     {
+        curType = 4;
         if(!GObject::World::getRYHBActivity())
-            GObject::globalPlayers.enumerate(player_enum_2, 4);
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::GVAR.SetVar(GObject::GVAR_RYHB_ACTIVITY_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_RYHB_ACTIVITY_END, end);
         ret = 1;
     }
     else if (type == 4 && begin <= end && !GObject::World::inActive_opTime_20130531())
     {
+        curType = 5;
         if(!GObject::World::getZCJBActivity())
-            GObject::globalPlayers.enumerate(player_enum_2, 5);
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::GVAR.SetVar(GObject::GVAR_ZCJB_ACTIVITY_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_ZCJB_ACTIVITY_END, end);
         ret = 1;
     }
     else if (type == 5 && begin <= end )
     {
+        curType = 6;
         if(GObject::GVAR.GetVar(GObject::GVAR_LUCKYMEET_BEGIN) > TimeUtil::Now()
                 || GObject::GVAR.GetVar(GObject::GVAR_LUCKYMEET_END) < TimeUtil::Now())
-            GObject::globalPlayers.enumerate(player_enum_2, 6);
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYMEET_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_LUCKYMEET_END, end);
         ret = 1;
     }
     else if (type == 6 && begin <= end )
     {
+        curType = 7;
         if(GObject::GVAR.GetVar(GObject::GVAR_SUMMER_MEET_BEGIN) > TimeUtil::Now()
                 || GObject::GVAR.GetVar(GObject::GVAR_SUMMER_MEET_END) < TimeUtil::Now())
-            GObject::globalPlayers.enumerate(player_enum_2, 7);
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::GVAR.SetVar(GObject::GVAR_SUMMER_MEET_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_SUMMER_MEET_END, end);
         ret = 1;
     }
     else if (type == 7 && begin <= end )
     {
+        curType = 8;
         if(GObject::GVAR.GetVar(GObject::GVAR_SUMMER_FLOW_BEGIN) > TimeUtil::Now()
                 || GObject::GVAR.GetVar(GObject::GVAR_SUMMER_FLOW_END) < TimeUtil::Now())
-            GObject::globalPlayers.enumerate(player_enum_2, 8);
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::GVAR.SetVar(GObject::GVAR_SUMMER_FLOW_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_SUMMER_FLOW_END, end);
         ret = 1;
@@ -3783,15 +3840,16 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 9 && begin <= end )
     {
+        curType = 9;
         if(GObject::GVAR.GetVar(GObject::GVAR_QISHIBANGAME_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_QISHIBANGAME_END) < TimeUtil::Now())
         {
-            GObject::globalPlayers.enumerate(player_enum_2, 9);
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         }
 
         GObject::GVAR.SetVar(GObject::GVAR_QISHIBANGAME_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_QISHIBANGAME_END, end);
-        ret = 1 ;
+        ret = 1;
     }
     else if (type == 10 && begin <= end )
     {
@@ -3804,18 +3862,20 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         if(GObject::GVAR.GetVar(GObject::GVAR_QZONE_RECHARGE_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_QZONE_RECHARGE_END) < TimeUtil::Now())
         {
-            GObject::globalPlayers.enumerate(player_enum_2, 10);
+            curType = 10;
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         }
         GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_QZONE_RECHARGE_END, end);
-        ret = 1 ;
+        ret = 1;
     }
     else if (type == 12 && begin <= end )
     {
+        curType = 12;
         if(GObject::GVAR.GetVar(GObject::GVAR_CHRISTMAS_PILESNOW_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_CHRISTMAS_PILESNOW_END) < TimeUtil::Now())
         {
-            GObject::globalPlayers.enumerate(player_enum_2, 12);
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         }
 
         GObject::GVAR.SetVar(GObject::GVAR_CHRISTMAS_PILESNOW_BEGIN, begin);
@@ -3824,10 +3884,11 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 13 && begin <= end )
     {
+        curType = 11;
         if(GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_END) < TimeUtil::Now())
         {
-            GObject::globalPlayers.enumerate(player_enum_2, 11);
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         }
         GObject::GVAR.SetVar(GObject::GVAR_OLDMAN_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_OLDMAN_END, end);
@@ -3835,27 +3896,104 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 14 && begin <= end )
     {
+        curType = 13;
         if(GObject::GVAR.GetVar(GObject::GVAR_YEARHAPPY_RANK_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_YEARHAPPY_RANK_END) < TimeUtil::Now())
         {
-            GObject::globalPlayers.enumerate(player_enum_2, 13);
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         }
 
         GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_YEARHAPPY_RANK_END, end);
-        ret = 1 ;
+        ret = 1;
     }
     else if (type == 15 && begin <= end )
     {
+        curType = 15;
         if(GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_3366_RECHARGE_END) < TimeUtil::Now())
         {
-            GObject::globalPlayers.enumerate(player_enum_2, 15);
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
         }
         GObject::GVAR.SetVar(GObject::GVAR_3366_RECHARGE_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_3366_RECHARGE_END, end);
-        ret = 1 ;
+        ret = 1;
     }
+    else if (type == 16 && begin <= end )
+    {
+        curType = 16;
+        if(GObject::GVAR.GetVar(GObject::GVAR_3366_BUY_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_3366_BUY_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_3366_BUY_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_3366_BUY_END, end);
+        ret = 1;
+    }
+    else if (type == 17 && begin <= end )
+    {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
+        curType = 17;
+        if(GObject::GVAR.GetVar(GObject::GVAR_GUANKAACT_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_GUANKAACT_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_GUANKAACT_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_GUANKAACT_END, end);
+
+        return;
+    }
+    else if (type == 18 && begin <= end )
+    {
+        curType = 18;
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
+            GObject::globalClans.enumerate(clan_enum_0, 0);
+
+            DB5().PushUpdateData("DELETE FROM `duobaolog`");
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_CLAN_DUOBAO_END, end);
+
+        UInt32 valueTime = 0;
+        UInt32 nowTime = TimeUtil::Now();
+        if(nowTime < GObject::GVAR.GetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN))
+            valueTime = GObject::GVAR.GetVar(GObject::GVAR_CLAN_DUOBAO_BEGIN) / (15 * 60) * (15 * 60) + 900;
+        else
+            valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
+
+        GObject::GVAR.SetVar(GObject::GVAR_DUOBAO_ENDTIME, valueTime);
+
+        return;
+    }
+    else if (type == 20 && begin <= end )
+    {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+#if 0
+
+        curType = 20;
+        GObject::globalPlayers.enumerate(player_enum_2, &curType);
+        GObject::globalClans.enumerate(clan_enum_1, 0);
+#endif
+        GObject::GVAR.SetVar(GObject::GVAR_TYSS_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_TYSS_END, end);
+
+        return;
+    }
+
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);

@@ -309,6 +309,8 @@ GMHandler::GMHandler()
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
     Reg(3, "addpetattr", &GMHandler::OnAddPetAttr);
     Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
+    Reg(2, "settyss", &GMHandler::OnSetTYSS);
+    Reg(3, "clanrank", &GMHandler::TestClanRank);
 
     _printMsgPlayer = NULL;
 }
@@ -725,6 +727,18 @@ void GMHandler::OnAddVar( GObject::Player * player, std::vector<std::string>& ar
         UInt32 num = player->GetVar(var);
 		player->SetVar(var,num+value);
         GObject::MarryBoard::instance()._YHlively = value ; 
+
+        if(World::getGuankaAct() && var == GObject::VAR_GUANKA_ACTION_SCORE)
+        {
+            player->SetVar(VAR_GUANKA_ACTION_TIME, TimeUtil::Now());
+            UInt32 totalScore = player->GetVar(VAR_GUANKA_ACTION_SCORE);
+            GameMsgHdr hdr(0x1B6, WORKER_THREAD_WORLD, player, sizeof(totalScore));
+            GLOBAL().PushMsg(hdr, &totalScore);
+            GameMsgHdr hdr1(0x1B8, WORKER_THREAD_WORLD, player, 0);
+            GLOBAL().PushMsg(hdr1, NULL);
+
+            player->sendguankaActMyRank();
+        }
 	}
 }
 void GMHandler::OnSetVar( GObject::Player * player, std::vector<std::string>& args )
@@ -3608,6 +3622,13 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
             }
         }
     }
+    else if(type == 4)
+    {
+        UInt32 petId = atoi(args[1].c_str());
+        FairyPet * pet = player->findFairyPet(petId);
+        if(pet == NULL) return;
+        pet->setDirty();
+    }
 }
 
 void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& args)
@@ -4359,6 +4380,26 @@ inline bool player_enum_1(GObject::Player* p, int)
     return true;
 }
 
+inline bool clan_enum_duobao(GObject::Clan *clan, int)
+{
+   clan->ClearDuoBaoData();
+   return true;
+}
+
+inline bool player_enum_duobao(GObject::Player *pl, int)
+{
+    pl->SetVar(GObject::VAR_CLAN_DUOBAO_SCORE, 0);
+    pl->SetVar(GObject::VAR_CLAN_DUOBAO_STATUS, 0);
+    return true;
+}
+
+inline bool player_enum_2(GObject::Player* p, int)
+{
+    p->SetVar(GObject::VAR_3366GIFT, 0);
+
+    return true;
+}
+
 void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& args)
 {
     if(sizeof(args)<1)
@@ -4502,8 +4543,8 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             break;
         case 23:
-            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::Now());
-            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::Now() + 86400*15);
+            GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_3366_RECHARGE_END, TimeUtil::SharpDayT(1));
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
             break;
@@ -4511,6 +4552,49 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_3366_RECHARGE_BEGIN, 0);
             GVAR.SetVar(GVAR_3366_RECHARGE_END, 0);
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+        case 25:
+            GVAR.SetVar(GVAR_3366_BUY_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_3366_BUY_END, TimeUtil::SharpDayT(1));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 26:
+            GVAR.SetVar(GVAR_3366_BUY_BEGIN, 0);
+            GVAR.SetVar(GVAR_3366_BUY_END, 0);
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GObject::globalPlayers.enumerate(player_enum_2, 0);
+            break;
+        case 27:
+            GVAR.SetVar(GVAR_GUANKAACT_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_GUANKAACT_END, TimeUtil::SharpDayT(1));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            break;
+         case 28:
+            {
+                //if(GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) > TimeUtil::Now()
+                  // || GVAR.GetVar(GVAR_CLAN_DUOBAO_END) < TimeUtil::Now())
+                {
+                    GObject::globalClans.enumerate(clan_enum_duobao, 0);
+                    GObject::globalPlayers.enumerate(player_enum_duobao, 0);
+
+                    DB5().PushUpdateData("DELETE FROM `duobaolog`");
+                }
+
+                UInt32 valueTime = 0;
+                UInt32 nowTime = TimeUtil::Now();
+                GVAR.SetVar(GVAR_CLAN_DUOBAO_BEGIN, nowTime);
+                GVAR.SetVar(GVAR_CLAN_DUOBAO_END, nowTime + 3600);
+
+                if(nowTime < GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) && nowTime > GVAR.GetVar(GVAR_CLAN_DUOBAO_END))
+                    valueTime = GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN) / (15 * 60) * (15 * 60) + 900;
+                else
+                    valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
+
+                GVAR.SetVar(GVAR_DUOBAO_ENDTIME, valueTime);
+                GLOBAL().PushMsg(hdr4, &reloadFlag);
+                GLOBAL().PushMsg(hdr1, &_msg);
+            }
             break;
     }
 }
@@ -4829,9 +4913,10 @@ void GMHandler::OnPlayerMsg(GObject::Player* player, std::vector<std::string>& a
 
 void GMHandler::OnCleanMarry(GObject::Player* player, std::vector<std::string>& args)
 {
-    player->SetVar(VAR_MARRY_STATUS,0);
-    player->SetVar(VAR_CANCEL_APPOINTMENT,0);
-    GObject::gMarryMgr.cleanPlayerData(player); 
+    //player->SetVar(VAR_MARRY_STATUS,0);
+    //player->SetVar(VAR_CANCEL_APPOINTMENT,0);
+    player->SetVar(VAR_COUPLE_ONLINE_FISH,0);
+    //GObject::gMarryMgr.cleanPlayerData(player); 
 }
 
 void GMHandler::OnCleanMarryList(GObject::Player* player, std::vector<std::string>& args)
@@ -4933,7 +5018,7 @@ void GMHandler::OnHandleServerWar(GObject::Player* player, std::vector<std::stri
         break;
     case 7:
         {
-            UInt32 data = 0;
+            UInt32 data = player->GetVar(VAR_SERVERWAR_JIJIANTAI1);
             data = SET_BIT_8(data, 0, 20);
             data = SET_BIT_8(data, 1, 20);
             player->SetVar(VAR_SERVERWAR_JIJIANTAI1, data);
@@ -5095,5 +5180,21 @@ void GMHandler::TestSameTimeRecharge(GObject::Player *player, std::vector<std::s
             pl->addTotalRecharge(1000);
         }
     }
+}
+
+void GMHandler::OnSetTYSS(GObject::Player *player, std::vector<std::string>& args)
+{
+    GVAR.SetVar(GVAR_TYSS_BEGIN,TimeUtil::Now());
+    GVAR.SetVar(GVAR_TYSS_END,TimeUtil::Now() + 86400 * 5);
+}
+
+void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt8 pos = atoi(args[0].c_str());
+    GObject::Clan *clan = player->getClan();
+    if(clan != NULL)
+        clan->sendMemberBuf(pos);
 }
 

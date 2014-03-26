@@ -1406,7 +1406,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
    
     pl->MiLuZhiJiao();
-    pl->QiShiBanState();
+    //pl->QiShiBanState();
     UInt32 flag = pl->GetVar(VAR_OLDMAN_SCORE_AWARD);
     if(flag & (1<<8))
         pl->sendOldManPos(1);
@@ -1441,7 +1441,13 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->send(st1);
     }
     pl->getNewYearGiveGiftAward(0,0);
-}
+
+    {
+        GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+
+    }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
 {
@@ -1605,10 +1611,12 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
     if(!player->checkFormation(f))
         return;
 
+    bool haveMain = false;
 	for(UInt8 i = 0; i < c; ++ i)
 	{
 		UInt32 pos = 3 + (sizeof(UInt8) + sizeof(UInt32)) * i;
 		UInt8 p = *(buf + pos + sizeof(UInt32));
+		UInt32 fgtid = *reinterpret_cast<const UInt32 *>(buf + pos);
 
         bool find = false;
         for(UInt8 k = 0; k < 5; ++ k)
@@ -1621,7 +1629,11 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
         }
         if(!find)
             return;
+        if(fgtid < 10)
+            haveMain = true;
     }
+    if(!haveMain)
+        return;
 
 	for(UInt8 i = 0; i < c; ++ i)
 	{
@@ -2090,7 +2102,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 return;
             UInt8 type;
             br >> type;
-            if(World::get3366GiftAct())
+            //if(World::get3366GiftAct())
+            if(World::get3366BuyTime())
             {
                 player->get3366GiftAward(type);
             }
@@ -4470,13 +4483,21 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
         player->checkSendRandFriend(); 
         return ;
     }
+    UInt8 tmp = 0; 
+    if(fr._op == 0x0E)
+    {
+       tmp = static_cast<UInt8>(atoi(fr._name.c_str()));
+    }
     player->patchDeleteDotS(fr._name);
     GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(fr._name)];
-    if(pl == NULL || pl == player)
-	{
-		player->sendMsgCode(0, 1506);
-		return;
-	}
+    if(fr._op != 0x0E)
+    {
+        if(pl == NULL || pl == player )
+        {
+            player->sendMsgCode(0, 1506);
+            return;
+        }
+    }
 	switch(fr._op)
 	{
 	case 1:
@@ -4528,6 +4549,9 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
         break;
     case 11:
         player->prayForOther(pl);
+        break;
+    case 0x0E:
+        player->limitQQFriend(tmp);
         break;
 	}
 }
@@ -7086,6 +7110,12 @@ void OnFairyPet( GameMsgHdr & hdr, const void * data)
                         st << type << opt;
                         st << res << petId << Stream::eos;
                         player->send(st);
+                        if(res == 0)
+                        {
+                            FairyPet* pet = player->findFairyPet(petId);
+                            if(pet)
+                                pet->sendSevenSoul();
+                        }
                     }
                     break;
                 case 0x04:
@@ -7956,18 +7986,26 @@ void OnPlayerMountReq( GameMsgHdr& hdr, const void* data )
     if(player->GetLev() < 75)
         return;
 
+    player->check_Cangjianya();
     UInt8 type = 0;
     brd >> type;
     switch(type)
     {
         case 0x00:
-            player->sendMountInfo();
+            player->sendAllMountInfo();
             break;
         case 0x01:
             player->upgradeMount(false);
             break;
         case 0x02:
             player->upgradeMount(true);
+            break;
+        case 0x03:
+            {
+                UInt8 rideId = 0, isAuto = 0, floors = 0;
+                brd >> rideId >> isAuto >> floors;
+                player->mount_Cangjianya(rideId, floors, isAuto > 0);
+            }
             break;
     }
 }
@@ -8038,8 +8076,8 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                             break;
                         if(cap->CheckGGCanInvit(pl))
                             return;
-                        SYSMSGV(title, 218, player->getCountry(), player->getName().c_str());
-                        SYSMSGV(content, 219, player->getCountry(), player->getName().c_str());
+                        SYSMSGV(title, 220, player->getCountry(), player->getName().c_str());
+                        SYSMSGV(content, 221, player->getCountry(), player->getName().c_str());
                         pl->GetMailBox()->newMail(player, 0x15, title, content);
                     }
                     else if(form == 1)
@@ -8194,6 +8232,35 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                 }
                 break;
             }
+        }
+    case 0x31:
+        {
+            brd >> op;
+            switch(op)
+            {
+                case 3:
+                {
+                    UInt8 flag = 0;
+                    brd >> flag;
+                    player->OpTYSS(op,flag);//喂养神兽
+                }
+                    break;
+                case 4:
+                {
+                    UInt8 flag = 0;
+                    brd >> flag;//礼包id
+                    player->OpTYSS(op,flag-1);//买限购礼包
+                    player->OpTYSS(8);//返回限购礼包信息
+                }
+                    break;
+                case 0x13:
+                    player->OpTYSS(op);//领取每日礼包
+                    break;
+                default:
+                    break;
+            }
+
+
         }
     default:
         break;

@@ -92,6 +92,8 @@ bp_factor_crt      = 14000    -- 暴击
 bp_factor_pir      = 14000    -- 破击
 bp_factor_counter  = 12000    -- 反击
 bp_factor_magres   = 12000    -- 法术抵抗
+bp_factor_crtdmgimm   = 14000     -- 暴击减免
+
 
 bp_factor_skill_color = {0, 20, 30, 40, 50}    -- 技能颜色
 bp_factor_skill_level = {3.81, 4.58, 5.5, 6.59, 7.85, 9.31, 10.98, 12.87, 15}  -- 技能等级
@@ -599,7 +601,7 @@ function calcBattlePoint(fgt)
     bp = bp + (fgt:getBasePierce() + fgt:getExtraPierce())/100 * bp_factor_pir
     bp = bp + (fgt:getBaseCounter() + fgt:getExtraCounter())/100 * bp_factor_counter
     bp = bp + (fgt:getBaseMagRes() + fgt:getExtraMagRes())/100 * bp_factor_magres
-    bp = bp + fgt:getExtraCriticalDmgImmune() * bp_factor_crtdmg
+    bp = bp + fgt:getExtraCriticalDmgImmune() * bp_factor_crtdmgimm 
 
     --printBattlePoint(fgt)
     return bp;

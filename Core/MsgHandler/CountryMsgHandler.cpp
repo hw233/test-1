@@ -352,6 +352,7 @@ MSG_REG_2(GameMsgHdr, 0x246, OnSendMayDayTitleCard);
 MSG_REG_2(GameMsgHdr, 0x247, OnSendJuneHappyTitleCard);
 MSG_REG_2(GameMsgHdr, 0x248, OnAddItemByIDIP);
 MSG_REG_2(GameMsgHdr, 0x249, OnSendRNR);
+MSG_REG_2(GameMsgHdr, 0x24A, OnAddBy);
 
 
 MSG_REG_2(GameMsgHdr, 0x250, OnRemoveClanRank);
@@ -365,6 +366,8 @@ MSG_REG_2(GameMsgHdr, 0x255, OnRoamintQueqiaoLastLoot);
 
 MSG_REG_2(GameMsgHdr, 0x256, OnDelItemAny);
 MSG_REG_2(GameMsgHdr, 0x259, OnAddItem);
+MSG_REG_2(GameMsgHdr, 0x25A, OnUseAccItemInCountry);
+MSG_REG_2(GameMsgHdr, 0x25B, OnUseVitalityItemInCountry);
 MSG_REG_2(GameMsgHdr, 0x260, OnTownDeamonChallenge);
 MSG_REG_2(GameMsgHdr, 0x261, OnTownDeamonAutoCompleteQuite);
 MSG_REG_2(GameMsgHdr, 0x262, OnTownDeamonAttackNpc);
@@ -409,6 +412,7 @@ MSG_REG_2(GameMsgHdr, 0x353, OnCalcLBBattlePoint);
 MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
 MSG_REG_2(GameMsgHdr, 0x355, OnGetFindOldManAward);
 MSG_REG_2(GameMsgHdr, 0x356, OnGetInteresingBag);
+MSG_REG_2(GameMsgHdr, 0x357, OndoGuankaAct);
 
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);

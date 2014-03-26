@@ -17,6 +17,8 @@ void Ride::setRideTable(DBRideConfig& dbrc)
     rd.name = dbrc.name;
     rd.itemId = dbrc.itemId;
     rd.propId = dbrc.propId;
+    rd.show = dbrc.show > 0;
+    rd.useMore = dbrc.useMore > 0;
 
     StringTokenizer tk(dbrc.chips, ";");
     for(UInt8 idx = 0; idx < MOUNTCHIP_MAX && idx < tk.count(); ++ idx)
@@ -37,6 +39,44 @@ void Ride::setRideUpgradeTable(DBRideUpgradeCfg& dbruc)
     rud.singleCost = dbruc.singleCost;
     rud.rate = dbruc.rate;
     _rideUpgData.insert(std::make_pair(rud.level, rud));
+}
+
+void Ride::setCangjianTable(DBCangjianCfg& dbcjc)
+{
+    CangjianData cjd;
+    StringTokenizer tk(dbcjc.bless, "|");
+    UInt8 cnt = tk.count();
+    for(UInt8 idx = 0; idx < cnt; ++idx)
+    {
+        cjBless cjb;
+        StringTokenizer ntk(tk[idx].c_str(), ",");
+        if(ntk.count() != 2)
+            continue;
+        cjb.times = atoi(ntk[0].c_str());
+        cjb.prob = atoi(ntk[1].c_str());
+        cjd.bless.push_back(cjb);
+    }
+    cjd.floor = dbcjc.floor;
+    cjd.name = dbcjc.name;
+    cjd.prob = dbcjc.prob;
+    cjd.otherNum = dbcjc.otherNum;
+    _cangjianData.insert(std::make_pair(cjd.floor, cjd));
+}
+
+bool Ride::canShowCangjian(UInt8 rideId)
+{
+    std::map<UInt8, RideData>::iterator it = _rideData.find(rideId);
+    if(it != _rideData.end())
+        return it->second.show;
+    return false;
+}
+
+bool Ride::isUseTwo(UInt8 rideId)
+{
+    std::map<UInt8, RideData>::iterator it = _rideData.find(rideId);
+    if(it != _rideData.end())
+        return it->second.useMore;
+    return false;
 }
 
 UInt32 Ride::getMountItemId(UInt8 rideId)
@@ -84,6 +124,30 @@ UInt8 Ride::getChipPos(UInt8 rideId, UInt32 chipId)
         }
     }
     return 0xFF;
+}
+
+Ride::CangjianData * Ride::getCangjianTable(UInt8 floor)
+{
+    std::map<UInt8, CangjianData>::iterator it = _cangjianData.find(floor);
+    if(it != _cangjianData.end())
+        return &(it->second);
+    return NULL;
+}
+
+UInt16 Ride::getCangjianBless(UInt8 floor, UInt16 v)
+{
+    std::map<UInt8, CangjianData>::iterator it = _cangjianData.find(floor);
+    if(it == _cangjianData.end())
+        return 0;
+    int size = it->second.bless.size();
+    if(!size)
+        return 0;
+    for(int i = size - 1; i >= 0; -- i)
+    {
+        if(it->second.bless[i].times <= v)
+            return it->second.bless[i].prob;
+    }
+    return 0;
 }
 
 }

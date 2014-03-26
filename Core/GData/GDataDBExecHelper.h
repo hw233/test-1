@@ -648,6 +648,8 @@ struct DBRideConfig
     UInt32 itemId;
     std::string chips;
     UInt32 propId;
+    UInt8 show;
+    UInt8 useMore;
 };
 
 struct DBRideUpgradeCfg
@@ -658,6 +660,15 @@ struct DBRideUpgradeCfg
     UInt32 singleCost;
     UInt32 lvExp;
     float rate;
+};
+
+struct DBCangjianCfg
+{
+    UInt8 floor;
+    std::string name;
+    UInt16 prob;
+    UInt8 otherNum;
+    std::string bless;
 };
 
 struct DBKeyinConfig
@@ -1575,13 +1586,15 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBRideConfig)
-SPECIALDEF(5)
+SPECIALDEF(7)
 	(
     UInt8, id,
     std::string, name,
     UInt32, itemId,
     std::string, chips,
-    UInt32, propId
+    UInt32, propId,
+    UInt8, show,
+    UInt8, useMore
 	)
 SPECIALEND()
 
@@ -1594,6 +1607,17 @@ SPECIALDEF(6)
     UInt32, singleCost,
     UInt32, lvExp,
     float, rate
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCangjianCfg)
+SPECIALDEF(5)
+	(
+    UInt8, floor,
+    std::string, name,
+    UInt16, prob,
+    UInt8, otherNum,
+    std::string, bless
 	)
 SPECIALEND()
 

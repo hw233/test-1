@@ -298,9 +298,9 @@ local specialItem = {
     [2]  = {9291, 9292, 9293, 9294},
     [3]  = {9296, 9297, 9298, 9299},
     [4]  = {9301, 9302, 9303, 9304},
-	[5]  = {9301, 9302, 9303, 9304},
-	[6]  = {9301, 9302, 9303, 9304},
-	[7]  = {9301, 9302, 9303, 9304},
+	[5]  = {9461, 9462, 9463, 9464},
+	[6]  = {9466, 9467, 9468, 9469},
+	[7]  = {9471, 9472, 9473, 9474},
 }
 
 function getRandomNormalMonster(id)
@@ -413,8 +413,9 @@ function getStepAward(progress, step)
             return stepAwardID[progress][i]
         end
     end
-    print ("error3")
-    return 0
+    return stepAwardID[progress][#stepCount]
+    --print ("error3")
+    --return 0
 end
 
 function getSpecialItem(id, index)

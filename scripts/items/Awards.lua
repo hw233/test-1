@@ -694,14 +694,24 @@ function RunSummerMeetRechargeAward(player, cts)
     return true
 end
 function RunQZoneRechargeAward(player, cts)
-    local item = {
+    --[[local item = {
         [1] = {{517,2}},
         [2] = {{551, 2}},
         [3] = {{514,3},{503,3}},
         [4] = {{9371,5},{9390, 5}},
         [5] = {{509,3},{507,3}},
         [6] = {{9076,5}},
+    };--]]
+
+    local item = {
+        [1] = {{9082, 2}},
+        [2] = {{551, 2}},
+        [3] = {{9418, 3},{9413, 3}},
+        [4] = {{549, 1},{503, 3}},
+        [5] = {{500, 5},{501, 5}},
+        [6] = {{9388, 2},{9371, 8}},
     };
+
     local package = player:GetPackage();
     if cts == 0 then
         return false
@@ -867,7 +877,7 @@ function RunBlueDiamondAward(player, opt)
         [4] = {{515,3},{9338,4},{134,4},{1325,4},{507,2},{509,2},{47,3},{5006,1}},
         [5] = {{515,6},{507,4},{509,4},{503,20},{1325,8},{47,6},{134,8},{5026,2}},
         [6] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{503,5},{1719,1},{5135,1}},
-        [7] = {{503,1},{500,2},{517,1},{515,1},{9076,2},{1325,1},{516,1},{8555,1},{134,1},{5065,1},{56,2},{5005,1}},
+        [7] = {{503,1},{9414,1},{9438,1},{515,1},{9076,2},{1325,1},{9649,1},{8555,1},{134,1},{5065,1},{56,2},{5005,1}},
         [8] = {{9022,1},{56,1},{515,1},{503,1},{509,1},{514,1},{134,1},{15,1}}
     };
     local item_id = {9190, 9191, 9217, 9284,10119};
@@ -1730,3 +1740,29 @@ function RunHappyValueAward(player, cts)
     end
     return true
 end
+function RunTYSSAward(player, cts)
+   local item = {
+        [1] = {{56,2},{57,2},{15,2},{500,2},{9371,3}},
+        [2] = {{500,2},{511,2},{501,2},{517,2}},
+        [3] = {{516,3},{503,3},{547,3},{551,3}},
+        [4] = {{465,1},{514,1}},
+        [5] = {{515,2},{134,2},{1325,2}},
+        [6] = {{9022,2},{509,3},{9076,1}},
+    };
+    local package = player:GetPackage();
+    if nil == player or nil == cts or nil == item[cts] then
+        return false 
+    end
+    if package:GetRestPackageSize() < #item[cts] then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+    end
+    
+    return true
+
+end
+

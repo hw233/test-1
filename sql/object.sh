@@ -222,7 +222,6 @@ function update_object()
     #. clearshiyamen.sh
     #mysql -h$H -u$U -p$P -P$PT $DBO < clanscore.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clan_battlescore.sql     #重置帮战积分
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140103_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_setVar636.sql    #qq浏览器补签1月3 4 5 号
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140103_1.sql
@@ -247,9 +246,19 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_sevensoul.sql  #创建七魄
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_SetGVar79_Marry.sql  #设置夫妻对数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #天书奇缘清空
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #捉迷藏清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140214_1.sql     #墨宝
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearGuangGun.sql        #清除光棍节情义罗盘相关数据(为开服活动做准备)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140214_1.sql     #墨宝
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140214_2.sql   #藏剑崖
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_sevensoul_bug.sql     #七魄bug
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140307_1.sql   #clan表中添加duobaoAward字段
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140307_2.sql   #夺宝日志
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/changevar174.sql        #bug(达到充值额度的次)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140318_1.sql   #clan表中添加tyssAward字段
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140318_2.sql   #清除天元神兽var数据
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
 }
 
 #sh player_jiguan.sh

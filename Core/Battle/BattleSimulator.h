@@ -51,6 +51,7 @@ public:
 	BattleSimulator(UInt32, GObject::Player *, GObject::Player *, bool report = true, UInt32 fake_turns = 500);
 	inline int getId() {return _id;}
 	inline int getTurns() {return _turns;}
+	inline int getRounds() {return _attackRound;}
 	void start(UInt8 prevWin = 0xFF, bool checkEnh = true);
 	inline Stream& getPacket() {return _packet;}
 	inline Script::BattleFormula * getFormula() { return _formula; }
@@ -342,6 +343,14 @@ private:
         e_unDaoRose = 120,  //解除缘定今生
         e_moKnot = 121,  //琴瑟和鸣
         e_unMoKnot = 122,  //解除琴瑟和鸣
+        e_bleedFieldGape = 123, // 地裂效果1
+        e_unBleedFieldGape = 124, // 解除地裂效果1
+        e_bleedFieldGape2 = 125, // 地裂效果2
+        e_unBleedFieldGape2 = 126, // 解除地裂效果2
+        e_bleedFieldGape3 = 127, // 地裂效果3
+        e_unBleedFieldGape3 = 128, // 解除地裂效果3
+        e_yehuoBleedMo = 129,    // 业火(墨流血)
+        e_unYehuoBleedMo = 130,  // 解除业火
 
         e_MAX_STATE,
     };
@@ -572,6 +581,7 @@ private:
     void doSkillEffectExtra_Shi_Flower(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_Dao_Rose(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_Mo_Knot(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_Prudent(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_LingShiBleed2(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_CriticalDmgReduce(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_BuddhaLight(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
@@ -747,6 +757,7 @@ private:
 
     static  bool hasPetMarked(BattleObject* bo);
     static  bool isPet(BattleObject* bo);
+    static  bool isBehindPos(BattleObject* bo, UInt8 targetPos, UInt8 maxLength);
     UInt32 upPetObject(UInt8, bool = true);
     UInt32 doSpiritAttack(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first);
 
@@ -776,6 +787,8 @@ private:
     void doPassiveSkillBePHYDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
 
     void tryParry(BattleFighter* bf, UInt32& dmg, UInt32& magDmg, BattleFighter* bfAttacker);
+    void calcSilkwormCnt(BattleObject* bo);
+    void doAbnormalStatusClear(BattleObject* bo);
 };
 
 }

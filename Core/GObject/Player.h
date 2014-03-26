@@ -153,6 +153,10 @@ namespace GObject
 #define SERVERWAR_BUFF_XIUWEI4       0x66  // 15%
 #define SERVERWAR_BUFF_XIUWEI5       0x67  // 20%
 
+
+#define PLAYER_BUFF_CLAN1           0x68 // （活动）第1帮派BUF
+#define PLAYER_BUFF_CLAN2           0x69 // （活动）第2帮派BUF
+#define PLAYER_BUFF_CLAN3           0x6A // （活动）第3帮派BUF
 #define PLAYER_BUFF_ATHL11          0x71 // 魔
 #define PLAYER_BUFF_ATHL22          0x72 // 神
 #define PLAYER_BUFF_ATHL33          0x73 // 虚
@@ -224,6 +228,10 @@ namespace GObject
 
 #define GET_BIT_2(X,Y)   ((X >> (Y*2)) & 0x03)
 
+//飞剑(坐骑)系统
+#define MOUNT_COSTID 9500
+#define MOUNT_CANGJIANID 9600
+
 #ifdef _FB
 #define LIMIT_LEVEL  60
 #else
@@ -268,6 +276,8 @@ namespace GObject
         TIANYOU     = 16,   //天佑术
         FANTIAN     = 17,   //梵天宝卷
         JIUXIAO     = 18,   //九霄唤龙枪
+        TIANGANG    = 19,   //天罡剑诀
+        YEHUO       = 20,   //业火天雷
 
         DRAGONKING_MAX,
     };
@@ -1698,6 +1708,7 @@ namespace GObject
         void beVoted();
 
         void prayForOther(Player *other);
+        void limitQQFriend(UInt8 tmp);
         void sendPresentForOther(UInt64 playerId,UInt32 type);
         UInt32 getPresentBoxRest();
         UInt32 getPresentCount();
@@ -1992,6 +2003,7 @@ namespace GObject
         void GetPersonalAward(UInt8 opt);
         UInt32 GetNextStepTime();
         UInt32 GetQQFriendScore(const char * openId);
+        bool GetQQFriendInfo(const char * openId, std::string& info);
         bool CheckReqDataTime();
         void SetReqDataTime(UInt8 mark=1);
         //bool CheckReqDataTime1();
@@ -2019,6 +2031,8 @@ namespace GObject
         void SetQiShiBanAddTimeNum(UInt8 num) { m_qishiban.addTimeNum = num; }
         void AddQiShiBanAddTimeNum() { m_qishiban.addTimeNum += 1; }
         UInt32 GetQiShiBanAddTimeNum() const { return m_qishiban.addTimeNum; }
+
+        void ReqQiShiBanPlayCount(std::vector<std::string>&);
 
         UInt32  m_checkTime;
         //UInt32  m_checkTime1;
@@ -2538,6 +2552,10 @@ namespace GObject
         void getQZoneRechargeAward(UInt8 val);
         void sendQZoneRechargeAwardInfo();
         void AddQZoneRecharge(UInt32 r =0);
+        void AddLingGuo(UInt32 r =0);
+        void ReturnTYSSInfo(UInt8 flag );
+        void OpTYSS(UInt8 type , UInt8 flag = 0,UInt64 playerid = 0);
+        void EatLingGuo(UInt32 num);
         void GetFindOldManAward(UInt32 type = 0 );
         void getInterestingAward(UInt8 type);
         void sendInterestingBag(Player* pl);
@@ -2829,9 +2847,11 @@ namespace GObject
         void addModifyMount(ModifyMount *, bool = true);
         bool hasMountChip(UInt32);
         bool addMountChip(UInt32);
-        void sendMountInfo();
+        void sendAllMountInfo();
         void upgradeMount(bool isAuto);
         void addMountAttrExtra(GData::AttrExtra&);
+        bool check_Cangjianya();
+        void mount_Cangjianya(UInt8, UInt8, bool);
         inline UInt8 getMounts() { return _playerData.mounts; }
         inline ModifyMount * getCurrentMount() { return getOneMount(getMounts()); }
         inline ModifyMount * getOneMount(UInt8 id)
@@ -2901,6 +2921,11 @@ namespace GObject
         void getBuyFundInfo(UInt8 opt);
         void buyFund(UInt16 num);
         void getBuyFundAward(UInt8 opt);
+        void doGuankaAct(UInt8);
+        void sendguankaActMyRank();
+        void getguankaScoreAward(UInt8);
+        void guankaActUdpLog(UInt32, bool);
+        void addguankaScoreByAttack(UInt32);
 
     public:
         // 八部浮屠
@@ -2968,6 +2993,21 @@ namespace GObject
         void handleJiqirenAct_dungeon();
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
+        void sevensoul_fixed();
+    public:
+        UInt8 useChangeSexCard();
+        void doTableInWorld(Fighter* fgt, UInt32 oldId);
+        void do_fighter(Fighter* fgt, UInt32 oldId, UInt32 newId);
+        void do_fighter_buff(Fighter* fgt, UInt32 oldId);
+        void do_fighter_train(Fighter* fgt, UInt32 oldId);
+        void do_practice_data(Fighter* fgt, UInt32 oldId);
+        void do_second_soul(Fighter* fgt, UInt32 oldId);
+        void do_elixir(Fighter* fgt, UInt32 oldId);
+        void do_skill_strengthen(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter_attr_extra(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter_attr2(Fighter* fgt, UInt32 oldId);
+        void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
 	};
 
 

@@ -161,6 +161,7 @@ namespace Script
 		lua_tinker::def(_L, "getGMCheck", GObject::World::getGMCheck);
 		lua_tinker::def(_L, "inActive_opTime_20130531", GObject::World::inActive_opTime_20130531);
 		lua_tinker::def(_L, "get11TimeNum", GObject::World::get11TimeAirNum);  //天书奇缘计算天书
+		lua_tinker::def(_L, "getTYSSTime", GObject::World::getTYSSTime);  //天元神兽
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -333,6 +334,8 @@ namespace Script
         CLASS_DEF(Player, addMountChip);
         CLASS_DEF(Player, addMountFromItem);
         CLASS_DEF(Player, getXianpoLua);
+        CLASS_DEF(Player, useChangeSexCard);
+        CLASS_DEF(Player, EatLingGuo);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);
@@ -1858,6 +1861,11 @@ namespace Script
     {
 		assert(player != NULL);
 		return Call<UInt16>("addClanProfferFromItem", player, num, unit);
+    }
+
+    UInt32 GameActionLua::getMountChipByCangjian(UInt32 itemId, UInt8 floor)
+    {
+		return Call<UInt32>("getMountChipByCangjian", itemId, floor);
     }
 
 	bool GameActionLua::TaskFuncExist(UInt32 taskId)

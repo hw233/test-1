@@ -153,6 +153,14 @@ void OnSpreadModifyVar(GameMsgHdr& hdr, const void* data)
     player->SetVar(VAR_SPREAD_FLAG, player->GetVar(VAR_SPREAD_FLAG) | SPREAD_ALREADY_GET);
 }
 
+void OnSetTYSSScore(GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::Clan* clan = player->getClan();
+    if(clan)
+        clan->SetTYSSScore(player);
+}
+
 void OnClanTakeRewardResultReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -956,6 +964,183 @@ void SendQiShiBanRank( GameMsgHdr& hdr,  const void* data )
     }
     st << Stream::eos;
     player->send(st);
+}
+
+void OnAddQiShiBanCount( GameMsgHdr & hdr, const void * data)
+{
+    // 增加玩家七石板游戏次数
+	MSG_QUERY_PLAYER(player);
+	struct QiShiBanMailClickReq
+	{
+		UInt32 id;
+		GObject::Player * applier;
+		UInt8 action;
+	};
+	const QiShiBanMailClickReq * qsbmcr = reinterpret_cast<const QiShiBanMailClickReq *>(data);
+    if (!qsbmcr->applier)
+        return;
+
+    if (!WORLD().getQiShiBanTime())
+    {
+        player->sendMsgCode(0, 1512);
+        return;
+    }
+
+    if (qsbmcr->action)
+    {
+        if (qsbmcr->applier->GetVar(VAR_QISHI_FRIEND_SEND_COUNT) >= 2)
+        {
+            player->sendMsgCode(0, 1511);
+            return;
+        }
+        else
+        {
+            qsbmcr->applier->AddVar(VAR_QISHI_FRIEND_SEND_COUNT, 1);
+            SYSMSGV(title, 4979);
+            SYSMSGV(content, 4980, player->getCountry(), player->getName().c_str());
+            qsbmcr->applier->GetMailBox()->newMail(player, 0x01, title, content);
+        }
+    }
+}
+
+void OnSetGuankaActRank( GameMsgHdr& hdr, const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *(UInt32*)data;
+    if (!total)
+        return;
+
+    UInt32 fgtId = 0;
+    if(player->getMainFighter())
+        fgtId = (player->getCountry()<<4) | player->getMainFighter()->getSex();
+    std::string info = player->getName() + "_" + Itoa(fgtId) + "_" + Itoa(total);
+    WORLD().SetMemCach_guankaActInfo(player->getOpenId(), info);
+
+    for (RCSortType::iterator i = World::guankaScoreSort.begin(), e = World::guankaScoreSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            World::guankaScoreSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    s.time = player->GetVar(VAR_GUANKA_ACTION_TIME);
+    World::guankaScoreSort.insert(s);
+}
+
+void OnClearGuankaActRank( GameMsgHdr& hdr, const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    World::guankaScoreSort.clear();
+    WORLD().DelMemCach_guankaAct(player->getOpenId());
+}
+
+void OnClearTYSS( GameMsgHdr& hdr, const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    World::tyss_PlayerSort.clear();
+    World::tyss_ClanSort.clear();
+}
+
+void OnAddTYSSSum( GameMsgHdr& hdr, const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    Clan * clan = player->getClan();
+    if(clan == NULL)
+        return ;
+    UInt32 sum = *((UInt32*)data);
+    clan->AddTYSSSum(sum);
+
+}
+void OnSendGuankaActRank10( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x30) << static_cast<UInt8>(0x02);
+
+    size_t offset = st.size();
+    UInt8 idx = 0;
+    st << idx;
+    RCSortType::iterator it = World::guankaScoreSort.begin();
+    for(; it != World::guankaScoreSort.end() && idx < 10; ++ it, ++ idx)
+    {
+        UInt8 csex = (it->player->getCountry() << 4) | it->player->getMainFighter()->getSex();
+        st << it->player->getName() << csex << static_cast<UInt16>(it->total);
+    }
+    st.data<UInt8>(offset) = idx;
+    st << Stream::eos;
+    player->send(st);
+}
+
+void OnSendGuankaActMyRank( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt16 rank = 0;
+    UInt16 myRank = 0;
+    UInt16 myScore = 0;
+    for (RCSortType::iterator i = World::guankaScoreSort.begin(), e = World::guankaScoreSort.end(); i != e; ++i)
+    {
+        rank++;
+        if (i->player == player)
+        {
+            myScore = i->total;
+            myRank = rank;
+            break;
+        }
+    }
+    UInt32 value = player->GetVar(VAR_GUANKA_ACTION_NPC);
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x30) << static_cast<UInt8>(0x00);
+    st << myScore << myRank << value;
+    st << Stream::eos;
+    player->send(st);
+}
+
+void OnUseAccItemInWorld( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+	UInt32 need = *reinterpret_cast<const UInt32 *>(data);
+    GObject::townDeamonManager->useAccItemInWorld(player, need);
+}
+
+void OnUseVitalityItemInWorld( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+	UInt32 need = *reinterpret_cast<const UInt32 *>(data);
+    GObject::townDeamonManager->useVitalityItemInWorld(player, need);
+}
+
+void OnDoTableInWorld( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    struct _stTable
+    {
+        Fighter* fgt;
+        UInt32 oldId;
+    };
+    const _stTable* sttable = reinterpret_cast<const _stTable *>(data);
+    player->doTableInWorld(sttable->fgt, sttable->oldId);
 }
 
 void SendLuckyBagRank(Stream& st)
@@ -2048,6 +2233,212 @@ void OnSendCFriendInvited( GameMsgHdr& hdr, const void* data )
     GLOBAL().PushMsg(hdr1, &cfData);
 }
 
+void SetTYSSPlayerScoreRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *(UInt32*)data;
+    if (!total)
+        return;
+
+    for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            World::tyss_PlayerSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::tyss_PlayerSort.insert(s);
+
+}
+
+void SetTYSSClanScoreRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    Clan * clan = player->getClan();
+    if(clan == NULL)
+    {
+        return ;
+    }
+    
+    UInt32 total = *(UInt32*)data;
+    if (!total)
+        return;
+
+    for (ClanGradeSort::iterator i = World::tyss_ClanSort.begin(), e = World::tyss_ClanSort.end(); i != e; ++i)
+    {
+        if (i->clan == clan)
+        {
+            World::tyss_ClanSort.erase(i);
+            break;
+        }
+    }
+
+    ClanSort s;
+    s.clan = clan;
+    s.total = total;
+    World::tyss_ClanSort.insert(s);
+
+}
+
+void DelTYSSClanScoreRank( GameMsgHdr& hdr, const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    
+    UInt32 clanId = *((UInt32*)data);
+
+    for (ClanGradeSort::iterator i = World::tyss_ClanSort.begin(), e = World::tyss_ClanSort.end(); i != e; ++i)
+    {
+        if (i->clan->getId() == clanId)
+        {
+            World::tyss_ClanSort.erase(i);
+            break;
+        }
+    }
+
+}
+
+void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
+{
+    World::initRCRank();
+    MSG_QUERY_PLAYER(player);
+    UInt8 opt = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
+    UInt8 c = 0;
+    UInt32 idx = 1;
+    if(opt != 0 && opt != 1 && opt != 9)
+        return;
+    Clan* clan = player->getClan();
+    if(clan == NULL)
+        return;
+
+    Stream st(REP::ACT);  
+    st << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x00);  
+    if(player->getClan() == NULL || player->getClan()->getLeader() == NULL)
+        st << static_cast<UInt32>(0);
+    else
+        st << clan->GetTYSSSum();
+        //st << player->getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+    st << static_cast<UInt32>(CLR_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
+   
+    st << static_cast<UInt8>(GET_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
+    st << player->GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
+    st << Stream::eos;
+    player->send(st);
+
+    switch(opt)
+    {
+        case 0 :
+        {
+            Stream st1(REP::ACT);  
+            st1 << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x12);  
+            if(World::tyss_PlayerSort.size() == 0)
+                st1 << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(World::tyss_PlayerSort.size());
+
+            for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; )
+            {
+                if(i->player == NULL)
+                    continue;
+                if(i->player == player) 
+                {
+                    st1 << i->total << idx ; 
+                    if(World::tyss_PlayerSort.size() >= 7)
+                        st1 << static_cast<UInt8>(7);
+                    else
+                        st1 << static_cast<UInt8>(World::tyss_PlayerSort.size());
+                    break;
+                }
+                ++idx;
+                ++i;
+                if(i == e)
+                {
+                    st1 << i->total << static_cast<UInt32>(idx); 
+                    if(World::tyss_PlayerSort.size() >= 7)
+                        st1 << static_cast<UInt8>(7);
+                    else
+                        st1 << static_cast<UInt8>(World::tyss_PlayerSort.size());
+                }
+                
+            }
+            
+            for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
+            {
+                if(i->player == NULL)
+                    continue;
+                
+                st1 << i->player->getName();
+                st1 << i->total;
+                ++c;
+                if (c >= 7)
+                    break;
+            }
+            st1 << Stream::eos;
+            player->send(st1);
+        }
+            break;
+        case 1 :
+        {
+            Stream st2(REP::ACT);  
+            st2 << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x11);  
+            if(World::tyss_ClanSort.size() == 0)
+                st2 << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(World::tyss_ClanSort.size());
+            
+            for (ClanGradeSort::iterator i = World::tyss_ClanSort.begin(), e = World::tyss_ClanSort.end(); i != e; )
+            {
+                if(i->clan == NULL)
+                    continue;
+                if(i->clan == player->getClan())
+                {
+                    st2 << i->total << idx ; 
+                    if(World::tyss_ClanSort.size() >= 3)
+                        st2 << static_cast<UInt8>(3);
+                    else
+                        st2 << static_cast<UInt8>(World::tyss_ClanSort.size());
+                    break;
+                }
+               
+                ++idx;
+                ++i;
+                if(i == e)
+                {
+                    st2 << i->total << static_cast<UInt32>(idx); 
+                    if(World::tyss_ClanSort.size() >= 3)
+                        st2 << static_cast<UInt8>(3);
+                    else
+                        st2 << static_cast<UInt8>(World::tyss_ClanSort.size());
+                }
+            }
+
+            for (ClanGradeSort::iterator i = World::tyss_ClanSort.begin(), e = World::tyss_ClanSort.end(); i != e; ++i)
+            {
+                if(i->clan == NULL)
+                    continue;
+                st2 << i->clan->getName();
+                st2 << i->total;
+                ++c;
+                if (c >= 3)
+                    break;
+            }
+            st2 << Stream::eos;
+            player->send(st2);
+            
+        }
+            break;
+        default :
+            break;
+    }
+
+}
+
 void OnSendClanMemberList( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -2148,6 +2539,29 @@ void SendRechargeRP7Rank(GameMsgHdr& hdr,  const void* data )
     }
     st << Stream::eos;
     player->send(st);
+}
+
+void OnSendDuoBaoBegin(GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+
+    MSG_QUERY_PLAYER(player);   
+
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    UInt32 start = time + 10*60*60;     // 每天10点开始
+    UInt32 end = time + 22*60*60;       // 每天22点结束(加5秒, 用于最后一次结算)
+    if(nowTime >= start && nowTime <= end)
+    {
+        if(player->getClan() != NULL)
+        {
+            Stream st(REP::DUOBAO_REP);
+            st << static_cast<UInt8>(0x07);
+            st << static_cast<UInt8>(1);
+            st << Stream::eos;
+            player->send(st);
+        }
+    }
 }
 
 void OnSaleItemCancle( GameMsgHdr& hdr, const void * data )

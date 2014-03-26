@@ -684,6 +684,8 @@ struct DBClan
     UInt32 xianyun;
     UInt32 gongxian;
     UInt32 urge;
+    UInt32 duobaoAward;
+    UInt32 tyssSum;
 };
 
 struct DBClanRepo
@@ -762,6 +764,16 @@ struct DBClanDonateRecord
     UInt8 donateType;
 	UInt32 donateCount;
 	UInt32 donateTime;
+};
+
+struct DBDuoBaoLog
+{
+	UInt32 clanId;
+	std::string name;
+	UInt16 score;
+    UInt32 itemId;
+    UInt8 cnt;
+	UInt32 time;
 };
 
 struct DBClanBattleResult
@@ -1513,6 +1525,9 @@ struct DBModifyMount
     UInt8 id;
     UInt64 playerId;
     std::string chips;
+    UInt8 curfloor;
+    UInt8 curfloor1;
+    UInt16 failtimes;
 };
 }
 
@@ -2237,7 +2252,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(33)
+SPECIALDEF(35)
 (
 	UInt32, id,
 	std::string, name,
@@ -2271,7 +2286,9 @@ SPECIALDEF(33)
     std::string, qqOpenid,
     UInt32, xianyun,
     UInt32, gongxian,
-    UInt32, urge
+    UInt32, urge,
+    UInt32, duobaoAward,
+    UInt32,tyssSum 
 )
 SPECIALEND()
 
@@ -2298,6 +2315,17 @@ SPECIALDEF(6)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBDuoBaoLog)
+SPECIALDEF(6)
+(
+	UInt32, clanId,
+	std::string, name,
+	UInt16, score,
+    UInt32, itemId,
+    UInt8, cnt,
+	UInt32, time
+)
+SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClanPlayer)
 SPECIALDEF(25)
@@ -3421,11 +3449,14 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBModifyMount)
-SPECIALDEF(3)
+SPECIALDEF(6)
     (
     UInt8, id,
     UInt64, playerId,
-    std::string, chips
+    std::string, chips,
+    UInt8, curfloor,
+    UInt8, curfloor1,
+    UInt16, failtimes
     )
 SPECIALEND()
 

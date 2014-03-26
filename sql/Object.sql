@@ -1112,6 +1112,8 @@ CREATE TABLE `clan` (
   `xianyun` int(10) unsigned NOT NULL DEFAULT '0',
   `gongxian` int(10) unsigned NOT NULL DEFAULT '0',
   `urge` int(10) unsigned NOT NULL DEFAULT '0',
+  `duobaoAward` int(10) unsigned NOT NULL DEFAULT '0',
+  `tyssSum` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2309,6 +2311,9 @@ CREATE TABLE IF NOT EXISTS `modify_mount` (
     `id` int(10) unsigned NOT NULL DEFAULT '0',
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `chips` varchar(255) NOT NULL,
+    `curfloor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `curfloor1` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `failtimes` int(10) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2405,5 +2410,15 @@ CREATE TABLE `mobao` (
    `itemECnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
    `itemFCnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `duobaolog`;
+CREATE TABLE `duobaolog` (
+  `clanId` int(10) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `score` int(10) unsigned NOT NULL DEFAULT '0',
+  `itemId` int(10) unsigned NOT NULL DEFAULT '0',
+  `cnt` tinyint(10) unsigned NOT NULL DEFAULT '0',
+  `time` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 

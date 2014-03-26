@@ -856,6 +856,13 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
         exp *= 1 + extraFactor;
     }
 
+    if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
+        exp += 1.0f * ecs->exp;
+    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
+        exp += 0.5f * ecs->exp;
+    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+        exp += 0.3f * ecs->exp;
+
 	player->AddExp(static_cast<UInt64>(exp), 0, extraExp);
 #if 0
 	ecs->ng->monsterKilled(player, ecs->count);
@@ -1560,6 +1567,20 @@ void OnAddItemBy( GameMsgHdr& hdr, const void* data )
     ItemAdd* ia = (ItemAdd*)(data);
     player->GetPackage()->AddItem(ia->item, ia->num, ia->bind, false, ia->fromWhere);
 }
+void OnAddBy( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct ItemAdd
+    {
+        UInt16 item;
+        UInt16 num;
+        bool bind;
+        UInt16 fromWhere;
+    };
+
+    ItemAdd* ia = (ItemAdd*)(data);
+    player->GetPackage()->Add(ia->item, ia->num, ia->bind, false, ia->fromWhere);
+}
 void OnPracticeAttack( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
@@ -1869,6 +1890,58 @@ void OnDelItemAny( GameMsgHdr& hdr, const void * data )
 	const DelItemInfo* item = reinterpret_cast<const DelItemInfo*>(data);
     if(item)
         player->GetPackage()->DelItemAny(item->id, item->num, NULL, item->toWhere);
+}
+
+void OnUseAccItemInCountry( GameMsgHdr& hdr, const void * data )
+{
+#define ACC_ITEM        465
+	MSG_QUERY_PLAYER(player);
+    struct DelItemInfo
+    {
+        UInt32 id;
+        UInt16 num;
+        UInt16 toWhere;
+    };
+
+	const DelItemInfo* item = reinterpret_cast<const DelItemInfo*>(data);
+    if(!item)
+        return;
+    UInt32 need = item->num;
+    if(player->GetPackage()->GetItemAnyNum(ACC_ITEM) < need)
+        need = player->GetPackage()->GetItemAnyNum(ACC_ITEM);
+    if(need == 0)
+        return;
+
+    player->GetPackage()->DelItemAny(item->id, need, NULL, item->toWhere);
+
+	GameMsgHdr hdr2(0x1BA, WORKER_THREAD_WORLD, player, sizeof(need));
+	GLOBAL().PushMsg(hdr2, &need);
+}
+
+void OnUseVitalityItemInCountry( GameMsgHdr& hdr, const void * data )
+{
+#define VITALITY_ITEM   466
+	MSG_QUERY_PLAYER(player);
+    struct DelItemInfo
+    {
+        UInt32 id;
+        UInt16 num;
+        UInt16 toWhere;
+    };
+
+	const DelItemInfo* item = reinterpret_cast<const DelItemInfo*>(data);
+    if(!item)
+        return;
+    UInt32 need = item->num;
+    if(player->GetPackage()->GetItemAnyNum(VITALITY_ITEM) < need)
+        need = player->GetPackage()->GetItemAnyNum(VITALITY_ITEM);
+    if(need == 0)
+        return;
+
+    player->GetPackage()->DelItemAny(item->id, need, NULL, item->toWhere);
+
+	GameMsgHdr hdr2(0x1BB, WORKER_THREAD_WORLD, player, sizeof(need));
+	GLOBAL().PushMsg(hdr2, &need);
 }
 
 void OnAddItem( GameMsgHdr& hdr, const void * data )
@@ -2387,6 +2460,7 @@ void OnBeVoted( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     player->beVoted();
 }
+
 void OnBePrayed( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
@@ -2588,6 +2662,14 @@ void OnServerWarBeAttack( GameMsgHdr& hdr, const void* data )
     if(!swbad) return;
 
     serverWarMgr.beAttackByPlayer(player, swbad->attacker, swbad->formation, swbad->portrait, swbad->lineup);
+}
+
+void OndoGuankaAct( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 type = *reinterpret_cast<const UInt8 *>(data);
+
+    player->doGuankaAct(type);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

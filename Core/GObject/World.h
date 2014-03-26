@@ -558,8 +558,14 @@ public:
     {return _11time; } 
     inline static void  setGGTime(bool v)
     {   _ggtime=v; } 
-    inline static bool  getGGTime()
-    {return _ggtime; } 
+    inline static bool  getGGTime(UInt32 time =0 )
+    {
+        UInt32 now = TimeUtil::Now() + time;
+        if ((now > getOpenTime() + 7 * 86400) && (now  < getOpenTime() + 14 * 86400) )
+            return true;
+        return false ;
+        //return _ggtime; 
+    } 
     inline static void  setQZoneRechargeTime(bool v)
     {   _qzoneRechargetime=v; } 
     inline static bool  getQZoneRechargeTime()
@@ -581,7 +587,19 @@ public:
             return true;
         else
             return false;
-    } 
+    }
+    
+    inline static bool  get3366BuyTime()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_3366_BUY_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_3366_BUY_END);
+        UInt32 now = TimeUtil::Now() ;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    }
+
     inline static bool  getOldManTime()
     {
         //UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
@@ -857,19 +875,16 @@ public:
 
     inline static void setSurnameLegend(bool v)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now();
         if( now >= begin && now <= end)
             return;
-        */
         _surnamelegend = v;
     }
    
     inline static bool getSurnameLegend(UInt32 time = 0)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND_END);
         UInt32 now = TimeUtil::Now() + time;
@@ -881,7 +896,6 @@ public:
             _surnamelegend = true;
         else
             _surnamelegend = false;
-        */
         return _surnamelegend;
     }
 
@@ -913,18 +927,15 @@ public:
 
     inline static void setHappyFireTime(bool v)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
         UInt32 now = TimeUtil::Now();
         if( now >= begin && now <= end)
             return;
-        */
         _happyFire = v;
     }
     inline static bool getHappyFireTime(UInt32 time = 0)
     {
-        /* 春节期间注释掉
         UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
         UInt32 now = TimeUtil::Now()+time;
@@ -932,7 +943,6 @@ public:
             _happyFire = true;
         else
             _happyFire = false;
-        */
         return _happyFire;
     } 
     inline static bool getLuckyMeet(UInt32 time = 0)
@@ -969,7 +979,44 @@ public:
             return true;
         else
             return false;
+    }
+
+    inline static bool getDuoBaoTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_CLAN_DUOBAO_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_CLAN_DUOBAO_END);
+        UInt32 now = TimeUtil::Now();
+
+        if(now >= begin && now <= (end+5))
+            return true;
+        else
+            return false;
     } 
+    
+    inline static bool getTYSSTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_TYSS_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_TYSS_END);
+        UInt32 now = TimeUtil::Now() + time;
+
+        if(now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
+
+    inline static bool getGuankaAct(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_GUANKAACT_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_GUANKAACT_END);
+        UInt32 now = TimeUtil::Now() + time;
+        if(begin == 0 && end == 0)
+            return _guankaAct;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    }
 
     inline static void setRYHBActivity(bool v)
     {
@@ -1235,6 +1282,7 @@ public:
     static bool _happyFire;
     static bool _11time;
     static bool _qishiban;
+    static bool _guankaAct;
     static bool _ggtime;
     static bool _qzoneRechargetime;
     static bool _ryhbActivity;
@@ -1255,8 +1303,10 @@ public:
     static bool _memcinited;
     static bool _miluzhijiao;
     static bool _buyfund;
+    static bool _duobaoOpen;
 public:
     static RCSortType qishibanScoreSort;     //七石板积分排名
+    static RCSortType guankaScoreSort;     //关卡活动积分排名
     static RCSortType rechargeSort;
     static RCSortType consumeSort;
     static RCSortType popularitySort;
@@ -1265,6 +1315,8 @@ public:
     static ClanGradeSort clanGradeSort; // 十一活动
     static RCSortType guangGunSort; //十一活动
     static RCSortType happyFireSort;     //七石板积分排名
+    static RCSortType tyss_PlayerSort;     //天元神兽个人积分排名
+    static ClanGradeSort tyss_ClanSort;     //天元神兽帮派积分排名
     static void initRCRank();
     static void initRP7RCRank();
 
@@ -1305,6 +1357,7 @@ private:
     static void ArenaExtraActTimer(void *);
     static void ClanCopyCheck(void *);
     static void ClanStatueCheck(void *);
+    static void ClanDuoBaoCheck(void *);
     static void SendPopulatorRankAward(void*);
     //static void advancedHookTimer(void *para);
 public:
@@ -1320,14 +1373,20 @@ public:
 
 public:
     bool MemCachInit();
-    void SetMemCach_qishiban(UInt32 score, const char * openId);
-    UInt32 GetMemCach_qishiban(const char * openId);
+    void SetMemCach_qishiban(UInt32 score, const char * openId, const char * name, UInt8 fighterId);
+    void SetMemCach_qishibanInfo(const char * openId, const char * name, UInt8 fighterId);
+    UInt32 GetMemCach_qishibanScore(const char * openId);
+    bool GetMemCach_qishibanInfo(const char * openId, std::string& info);
     void SetMemCach_CFriend_Invited(UInt64);
     UInt16 GetMemCach_CFriend_Invited(UInt64);
     void DelMemCach_CFriend_Invited(UInt64);
     void DelMemCach_CFriend_InvitedAct(UInt64);
     void SetMemCach_CFriend_InvitedAct(UInt64);
     UInt16 GetMemCach_CFriend_InvitedAct(UInt64);
+    void SetMemCach_guankaActInfo(const char * openId, std::string info);
+    bool GetMemCach_guankaActInfo(const char * openId, std::string& info);
+    void DelMemCach_guankaAct(const char * openId);
+
     void UpdateQixiScore(Player* pl, Player* lover);
     void sendGuangGunPlayers(Player* pl);
     void sendQixiPlayers(Player* pl);
@@ -1356,6 +1415,9 @@ public:
     void SendGuangGunAward();
     static UInt16 GetRandomSpot();
     void SendHappyFireAward();
+    void SendGuankaActAward();
+    void SendTYSSClanAward();
+    void SendTYSSPlayerAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

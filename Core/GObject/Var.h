@@ -100,7 +100,7 @@ namespace GObject
         VAR_ATYITEM_5 = 64, //活跃度星期五奖励
         VAR_ATYITEM_6 = 65, //活跃度星期六奖励
         VAR_ATYITEM_7 = 66, //活跃度星期天奖励
-VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
+        VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_FIGHTER1_3_6_8 = 68, // 繁体版主将潜力值达到1.3，资质达到6.8活动是否达成
 
         VAR_CFRIEND_1 = 70, //密友等级相应个数 1级
@@ -297,6 +297,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_COUPLE_COPY_DAY_COUNT = 234,//夫妻家园每日刷新免费次数or当日购买次数 8bit
         VAR_COUPLE_COPY_COUNT = 235,//夫妻家园总次数
         VAR_COUPLE_COPY_BATTLE = 236,//夫妻家园进行次数
+        VAR_FRIEND_SECURITY = 237,//好友列表隐私设置标记
+        VAR_COUPLE_LEVELEXP = 238,//夫妻家园离婚保留下来的成长值
+        VAR_COUPLE_FRIENDLINESS = 239,//夫妻家园保留下来的亲密度
 
         VAR_LOCAL_RANK = 240, //本服斗剑，当前排名
         VAR_LOCAL_MAXRANK = 241, //本服斗剑，最好排名
@@ -434,7 +437,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_TEAMARENA_INSPIRE = 427, //组队跨服战鼓舞等级失败保护次数
 
         VAR_SERVERWAR_JIJIANTAI = 428,  //跨服服战祭剑台 1byte步数,2byte内外圈,3和4byte道具id
-        VAR_SERVERWAR_JIJIANTAI1 = 429,  //跨服服战祭剑台 1byte每人祭剑的次数,2byte成功完成的祭剑次数 3byte宝箱开启情况
+        VAR_SERVERWAR_JIJIANTAI1 = 429,  //跨服服战祭剑台 1byte每人祭剑的次数,2byte成功完成的祭剑次数 3byte宝箱开启情况 4byte购买祭剑的次数
 
          VAR_MOUNT_EXP = 430,   //铸剑经验总值
 
@@ -472,6 +475,9 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_LEVEL_AWARD = 458, 
         VAR_ZCJB_RECHARGE_GOLD = 459, //招财进宝总共充值仙石
         VAR_CLANBOSS_GONGXIAN= 460, //末日之战贡献
+
+        // 441-442 for JLT
+        VAR_GUANKA_ACTION_UDPLOG = 461, //关卡活动npc击杀情况udplog日志
 
         //繁体版占用470-499
 
@@ -577,6 +583,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_TOTAL_BATTLE_POINT = 601,  //（排行）战斗力
         VAR_VIA_ACC_DAYS = 602,  //（导入的玩家）累计登录天数
         VAR_SEVEN_SOUL_NUM = 603,  //玩家七魂仙魄数
+        VAR_SEX_CHANGE = 604,  //使用变形卡的次数
 
         //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,    //天书奇缘登陆
@@ -652,13 +659,13 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_MARRYBOARD_BAIHE = 684,          //百合使用
         VAR_NEWYEARSPEED_COUNT = 685 ,
         VAR_ONCE_ONDAY = 686 ,    //记录一天只有一次
-        VAR_NEWYEAR_PRATICE_COUNT = 687 ,    //记录一天只有一次
         VAR_SUMMERMEET_SCORE1 = 687 ,    //决战之地，个人副本，组队副本，阵图  计数
         VAR_SUMMERMEET_SCORE2 = 688 ,    //斗剑历练，斗剑天梯，挂机加速，师门任务
         VAR_SUMMERMEET_SCORE3 = 689 ,    //衙门任务，帮派任务任务
         VAR_SUMMERMEET_SCORE4 = 690 ,    //充值数
         VAR_SUMMERMEET_SCORE5 = 691 ,    //消费数
         VAR_COUPLE_NAME= 692 ,    //夫妻称号佩戴
+        VAR_NEWYEAR_PRATICE_COUNT = 693 ,    //记录一天只有一次
 
         //701-710 for suntao
         VAR_MicroCloud_AWARD = 701,     //是否领取微云合作奖励
@@ -666,6 +673,27 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
         VAR_JIQIREN_FRONTMAP = 703, //机器人之阵图未完成次数(1byte免费，2byte付费1，3byte付费2，4byte付费3)
         VAR_JIQIREN_DUNGEON = 704,  //机器人之决战之地未完成次数(1byte普通免费，2byte普通付费，3byte困难免费，4byte困难付费)
         VAR_JIQIREN_SYBS = 705,     //机器人之帮派、师门、衙门、锁妖塔未完成次数
+        VAR_MOUNT_CANGJIANYA_LEFT_CNT = 706,     //藏剑崖每天免费次数
+        VAR_MOUNT_CANGJIANYA_DATE = 707,     //取藏剑崖每天免费次数时间
+        VAR_GUANKA_ACTION_NPC = 708,     //关卡活动npc击杀情况,6类npc低18位表示，高8位表示奖励领取情况
+        VAR_GUANKA_ACTION_SCORE = 709,   //关卡活动个人镇魔值
+        VAR_GUANKA_ACTION_TIME  = 710,   //关卡活动个人镇魔值变化时间
+
+        //711-720 for JLT
+        VAR_QISHI_FRIEND_SEND_COUNT = 711,  // 七石斗法玩家赠送次数
+        VAR_QISHI_FRIEND_USE_COUNT = 712,   // 七石斗法玩家赠送已使用次数
+        VAR_CLAN_DUOBAO_SCORE = 713,        // 夺宝奇兵点数
+        VAR_CLAN_DUOBAO_SUCCESS_NUM = 714,  // 夺宝奇兵成功次数
+        VAR_CLAN_DUOBAO_STATUS = 715,       // 夺宝奇兵状态
+        //721 - 730 for dtc 
+        VAR_TYSS_RECHARGE = 721,//天元神兽期间玩家兑换灵果剩余充值数(充值数满足条件自动兑换灵果)
+        VAR_TYSS_CONTRIBUTE_PLAYER = 722,//天元神兽期间玩家个人总贡献 
+        VAR_TYSS_CONTRIBUTE_PLAYER_DAY = 723,//天元神兽期间玩家个人当日贡献 
+        VAR_TYSS_CONTRIBUTE_CLAN = 724,//天元神兽期间玩家当前帮派贡献 
+        VAR_TYSS_DISCOUNT_CONSUME1 = 725,//天元神兽期间限购栏1(购买次数)(8bit 一个礼包位置)
+        VAR_TYSS_DISCOUNT_CONSUME2 = 726,//天元神兽期间限购栏2(购买次数)
+        VAR_TYSS_DISCOUNT_CONSUME3 = 727,//天元神兽期间限购栏3(购买次数)
+        VAR_TYSS_CONTRIBUTE_CLAN_SUM = 728,//天元神兽期间玩家帮派总贡献(帮主身上) 
 
         VAR_MAX,
     };
@@ -1121,6 +1149,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_LEVEL_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_ZCJB_RECHARGE_GOLD, CYCLE_NONE);
             REGISTER_VAR(VAR_CLANBOSS_GONGXIAN, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANKA_ACTION_UDPLOG, CYCLE_NONE);
 
             REGISTER_VAR(VAR_PET_CUILIAN_EXTRA_LOW_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_PET_CUILIAN_EXTRA_UP_SCORE, CYCLE_DAY);
@@ -1177,6 +1206,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_TOTAL_BATTLE_POINT, CYCLE_NONE);
             REGISTER_VAR(VAR_VIA_ACC_DAYS, CYCLE_NONE);
             REGISTER_VAR(VAR_SEVEN_SOUL_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_SEX_CHANGE, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);
@@ -1212,6 +1242,7 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_COUPLE_COPY_DAY_COUNT, CYCLE_DAY);
             REGISTER_VAR(VAR_COUPLE_COPY_COUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_COUPLE_COPY_BATTLE, CYCLE_DAY);
+            REGISTER_VAR(VAR_FRIEND_SECURITY, CYCLE_NONE);
             REGISTER_VAR(VAR_REAL_SPIRIT, CYCLE_NONE);
             REGISTER_VAR(VAR_REAL_SPIRIT_GET, CYCLE_DAY);
             REGISTER_VAR(VAR_QZONE_RECHARGE, CYCLE_NONE);
@@ -1269,6 +1300,26 @@ VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
             REGISTER_VAR(VAR_JIQIREN_FRONTMAP, CYCLE_NONE);
             REGISTER_VAR(VAR_JIQIREN_DUNGEON, CYCLE_NONE);
             REGISTER_VAR(VAR_JIQIREN_SYBS, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_QISHI_FRIEND_SEND_COUNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_QISHI_FRIEND_USE_COUNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_MOUNT_CANGJIANYA_LEFT_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_MOUNT_CANGJIANYA_DATE, CYCLE_NONE);
+            REGISTER_VAR(VAR_CLAN_DUOBAO_SCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAN_DUOBAO_SUCCESS_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAN_DUOBAO_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANKA_ACTION_NPC, CYCLE_NONE);
+            REGISTER_VAR(VAR_GUANKA_ACTION_SCORE, CYCLE_NONE);
+            REGISTER_VAR(VAR_GUANKA_ACTION_TIME, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_CLAN, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME1, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME2, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME3, CYCLE_NONE);
+            REGISTER_VAR(VAR_TYSS_CONTRIBUTE_CLAN_SUM, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

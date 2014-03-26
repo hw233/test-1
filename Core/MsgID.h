@@ -408,6 +408,9 @@ namespace REQ
     /** 墨宝 */
     const UInt8 MO_BAO              = 0x78;
 
+    /** 夺宝奇兵 */
+    const UInt8 DUOBAO_REQ          = 0x7E;
+
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
 
@@ -716,6 +719,9 @@ namespace REP
     /** 墨宝 */
     const UInt8 MO_BAO              = 0x78;
 
+    /** 夺宝奇兵 */
+    const UInt8 DUOBAO_REP          = 0x7E;
+
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
     /** 系统弹窗公告 */
@@ -906,6 +912,7 @@ namespace ARENAREQ
     const UInt8 REG                 = 0x01;
     const UInt8 ENTER               = 0x02;
     const UInt8 COMMIT_LINEUP       = 0x03;
+    const UInt8 RECHARGE_ACTIVE     = 0x06;
     const UInt8 BET                 = 0x07;
     const UInt8 BATTLE_REPORT       = 0x08;
     const UInt8 TEAMARENA_ENTER     = 0x10;
