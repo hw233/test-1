@@ -29607,17 +29607,16 @@ UInt32 Player::getFriendlyCount(UInt64 playerId)
 }
 void Player::getFriendlyAchievement(UInt8 opt)
 {
-   
-   static UInt32 AchievementAward[] = {30,80,150,50,150,300,350,400};
-   if(opt > 7 )
-       return ;
-   UInt32 Friends[5] ={0,0,0,0,0};
-   UInt32 getAcAward = GetVar(VAR_FRIEND_ACHIEVEMENT);
-   if(getAcAward & (1 << opt ))
-       return ;
-   std::map<UInt64,UInt32 >::iterator it = _friendlyCount.find(friendId);
-   for(;it!=_friendlyCount.end();++i)
-   {
+    static UInt32 AchievementAward[] = {30,80,150,50,150,300,350,400};
+    if(opt > 7 )
+        return ;
+    UInt32 Friends[5] ={0,0,0,0,0};
+    UInt32 getAcAward = GetVar(VAR_FRIEND_ACHIEVEMENT);
+    if(getAcAward & (1 << opt ))
+        return ;
+    std::map<UInt64,UInt32 >::iterator it = _friendlyCount.begin();
+    for(;it!=_friendlyCount.end();++it)
+    {
         if(it->second < 100)
             Friends[0]++;
         else if(it->second < 500)
@@ -29628,65 +29627,85 @@ void Player::getFriendlyAchievement(UInt8 opt)
             Friends[3]++;
         else
             Friends[4]++;
-   }
-   bool flag = false ;
-   switch(opt)
-   {
-       case 0;
-       {
-           if(Friends[1] >= 3 )
-               flag = true;
-           break ;
-       }
-       case 1:
-       {
-           if(Friends[1] >= 10 )
-               flag = true;
-           break ;
-       }
-       case 2 :
-       {
-           if(Friends[2] >= 3 )
-               flag = true;
-           break ;
-       }
-       case 3:
-       {
-           if(_brothers.size())
-               Award |= (1 << 3);
-           break;
-       }
-       case 4 :
-       {
-           if(Friends[3] >= 1 )
-               flag = true;
-           break ;
-       }
-       case 5 :
-       {
-           if(Friends[3] >= 3 )
-               flag = true;
-           break ;
-       }
-       case 6 :
-       {
-           if(Friends[4] >= 1 )
-               flag = true;
-           break ;
-       }
-       case 7 :
-       {
-           if(Friends[4] >= 2 )
-               flag = true;
-           break ;
-       }
-   }
-   if(flag)
-   {
-       AddVar(VAR_FRIEND_VALUE , AchievementAward[opt]);
-       getAcAward |= (1 << opt );
-       SetVar(VAR_FRIEND_ACHIEVEMENT , getAcAward);
-   }
+    }
+    bool flag = false ;
+    switch(opt)
+    {
+        case 0:
+        {
+            if(Friends[1] >= 3 )
+                flag = true;
+            break ;
+        }
+        case 1:
+        {
+            if(Friends[1] >= 10 )
+                flag = true;
+            break ;
+        }
+        case 2 :
+        {
+            if(Friends[2] >= 3 )
+                flag = true;
+            break ;
+        }
+        case 3:
+        {
+            if(_brothers.size())
+                flag = true ;
+            break;
+        }
+        case 4 :
+        {
+            if(Friends[3] >= 1 )
+                flag = true;
+            break ;
+        }
+        case 5 :
+        ;{
+            if(Friends[3] >= 3 )
+                flag = true;
+            break ;
+        }
+        case 6 :
+        {
+            if(Friends[4] >= 1 )
+                flag = true;
+            break ;
+        }
+        case 7 :
+        {
+            if(Friends[4] >= 2 )
+                flag = true;
+            break ;
+        }
+    }
+    if(flag)
+    {
+        AddVar(VAR_FRIEND_VALUE , AchievementAward[opt]);
+        getAcAward |= (1 << opt );
+        SetVar(VAR_FRIEND_ACHIEVEMENT , getAcAward);
+    }
+}
+void Player::acceptBrother(Player * friendOne , bool flag)
+{
+    if(!_hasFriend(friendOne))
+        return ;
+    _brothers.insert(friendOne);
+    UpdateFriendlyCountToDB(friendOne->getId());
+    UInt64 friendId = friendOne->getId();
+    if(!flag)
+    {
+        if(friendOne->getThreadId() == getThreadId())
+        {
+            friendOne->acceptBrother(this , true);
+        }
+        else
+        {
+            GameMsgHdr hdr(0x401, friendOne->getThreadId(), friendOne, sizeof(friendId));
+            GLOBAL().PushMsg(hdr, &friendId);
+        }
+    }
 }
 
 } // namespace GObject

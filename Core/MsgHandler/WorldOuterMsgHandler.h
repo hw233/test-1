@@ -4029,7 +4029,7 @@ void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
     UInt32 clanId = 0 ;
     br >> leftId ;
     SYSMSG_BROADCASTV(4304 , leftId);
-    std::cout << "msgBorad" << std::endl;
+    //std::cout << "msgBorad" << std::endl;
     br >> clanId ;
     Clan * clan = globalClans[clanId];
     if(!clan)

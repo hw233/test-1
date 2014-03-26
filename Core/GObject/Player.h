@@ -2990,6 +2990,7 @@ namespace GObject
         UInt16 _partCnt[8][9];
         UInt16 _alreadyCnt[8];
         UInt8 _alreadyload[8];
+        Player * _drinking ;
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();
@@ -3021,6 +3022,10 @@ namespace GObject
         void InsertBrother(Player * pl);  //插入结拜兄弟
         UInt32 getFriendlyCount(UInt64 playerId);
 		bool _hasBrother( Player * pl ) const;
+        void getFriendlyAchievement(UInt8 opt);
+        void acceptBrother(Player * friendOne , bool flag = false /*抛对方*/);
+        void setDrinking(Player * drinker){ _drinking = drinker ;}
+        Player* getDrinking(){return _drinking ;}
     public:
         UInt8 useChangeSexCard();
         void doTableInWorld(Fighter* fgt, UInt32 oldId);

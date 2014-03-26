@@ -2810,6 +2810,15 @@ void OnAddFriendlyCount(GameMsgHdr & hdr ,const void *data)
         return ;
     player->AddFriendlyCount(pl , st_param.val);
 }
+void OnAcceptBrother(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 playerId  = *reinterpret_cast<const UInt64 *>(data);
+	GObject::Player * pl = GObject::globalPlayers[playerId];
+    if(pl==NULL)
+        return ;
+    player->acceptBrother(pl,true);
+}
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 

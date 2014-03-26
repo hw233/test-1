@@ -8377,13 +8377,13 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
 	case 2:
         {
             std::string name ;
-            br >> string ;
-            GObject::Player *friendOne = globalNamedPlayers[player->fixName(lcr.target)];
+            br >> name ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
             if(friendOne == NULL)
                 return ;
             SYSMSGV(title, 400, player->getCountry(), player->getName().c_str());
             SYSMSGV(content, 401, player->getCountry(), player->getName().c_str());
-            pl->GetMailBox()->newMail(player, 0x16, title, content);
+            friendOne->GetMailBox()->newMail(player, 0x16, title, content);
         }
 		break;
 	}

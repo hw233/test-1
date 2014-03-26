@@ -841,18 +841,9 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			mail->flag = 0x83;
 			if(action == 0)
 			{
-                Player *cap = pl->getGGTimeCaptain();
-                if(!cap->CheckGGCanInvit(_owner))
-                {
-                    _owner->EnterGGTeam(cap);
-                    SYSMSG(content, 212);
-                    mail->content = content;
-                }
-                else
-                {
-                    SYSMSG(content, 211);
-                    mail->content = content;
-                }
+                _owner->acceptBrother(pl);
+				SYSMSG(content, 212);
+				mail->content = content;
 			}
 			else
 			{

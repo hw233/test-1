@@ -3,7 +3,7 @@
 
 #include "Server/GlobalObject.h"
 
-#define MAX_MSG_NUM 0x400
+#define MAX_MSG_NUM 0x500
 #define MIN_INNER_CHECK_MSG 0x200
 
 namespace GObject
