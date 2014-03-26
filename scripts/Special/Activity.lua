@@ -8898,7 +8898,7 @@ function SurnameLegendLoot(player,lootlvl)
     --package:AddItem(9401, itemNum[lootlvl], true,0,10);
     --package:AddItem(9422, itemNum[lootlvl], true,0,10);
     --package:AddItem(9437, itemNum[lootlvl], true,0,10);
-    package:AddItem(9449, itemNum[lootlvl], true,0,10);
+    package:AddItem(9496, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -9771,7 +9771,7 @@ function GetLuckyBagAward(player)
     end
 
     local items = {
-       { 9371,5}, {9424,5}, {503,5}, {515,1}, {134,1}, {1325,1}
+       { 513,6}, {505,6}, {511,6}, {512,6}, {510,6}
     }
     for i = 1 , 5  do
         local num = player:GetVar(452+i);

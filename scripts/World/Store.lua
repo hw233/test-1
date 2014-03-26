@@ -140,7 +140,7 @@ function loadStore()
         --store:add(2 ,9397, 20)
         --store:add(2 ,9401, 20)
         --store:add(2 ,9422, 20)
-        store:add(2 ,9449, 20)
+        store:add(2 ,9495, 150)
     end
     if getHappyFireTime(300) then
         store:add(2, 9440, 10)
