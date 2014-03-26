@@ -1036,6 +1036,15 @@ void OnClearGuankaActRank( GameMsgHdr& hdr, const void* data )
     WORLD().DelMemCach_guankaAct(player->getOpenId());
 }
 
+void OnClearTYSS( GameMsgHdr& hdr, const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    World::tyss_PlayerSort.clear();
+    World::tyss_ClanSort.clear();
+}
+
 void OnSendGuankaActRank10( GameMsgHdr& hdr,  const void* data )
 {
     World::initRCRank();
