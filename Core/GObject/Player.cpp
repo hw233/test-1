@@ -17051,6 +17051,7 @@ namespace GObject
                 fgt->getAllUpSkillAndLevel(st);
                 fgt->getAllPSkillAndLevel4Arena(st);
                 fgt->getAllSSAndLevel(st);
+                fgt->getAllSGAndValue(st);
                 fgt->getAllLbSkills(st);
 
                 fgt->getAttrExtraEquip(st);
@@ -17076,6 +17077,7 @@ namespace GObject
             _onBattlePet->getAllUpSkillAndLevel(st);
             _onBattlePet->getAllPSkillAndLevel4Arena(st);
             _onBattlePet->getAllSSAndLevel(st);
+            _onBattlePet->getAllSGAndValue(st);
             _onBattlePet->getAllLbSkills(st);
 
             _onBattlePet->getAttrExtraEquip(st);

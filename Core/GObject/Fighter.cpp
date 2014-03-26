@@ -2269,7 +2269,17 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
         SStrengthen* ss = SSGetInfo(skillId);
         if(ss)
             ssl = ss->lvl;
-        return Script::BattleFormula::getCurrent()->calcSkillBattlePoint(sc, sl, type, ssl);
+
+        UInt16 poingAdd = 0;
+        SGrade *sg = SGGetInfo(skillId);
+        if(sg)
+        {
+            GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sg->lvl);
+            if(ev)
+                poingAdd *= 1.2;
+        }
+
+        return Script::BattleFormula::getCurrent()->calcSkillBattlePoint(sc, sl, type, ssl) + poingAdd;
     }
     return 0;
 }
@@ -7712,35 +7722,49 @@ void Fighter::makeFighterSGInfoWithNoSkill(Stream& st)
     st.data<UInt8>(offset) = c;
 }
 
-void Fighter::getAllSGAndLevel(Stream& st)
+void Fighter::getAllSGAndValue(Stream& st)
 {
-    if(isPet())
-        return;
-
     size_t offset = st.size();
     st << static_cast<UInt8>(0);
     UInt8 c = 0;
-    for (int i = 0; i < getUpSkillsMax(); ++i)
+    if(!isPet())
     {
-        if (_skill[i])
+        for (int i = 0; i < getUpSkillsMax(); ++i)
         {
-            SGrade* sg = SGGetInfo(_skill[i]);
+            if (_skill[i])
+            {
+                SGrade* sg = SGGetInfo(_skill[i]);
+                if (sg)
+                {
+                    ++c;
+                    UInt16 skill_id = SKILL_ID(_skill[i]);
+                    st << skill_id;
+                    Int32 effect;
+                    GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sg->lvl);
+                    if(ev)
+                        effect = ev->effect;
+                    else
+                        effect = 0;
+                    st << effect;
+                }
+            }
+        }
+        if (peerless != 0)
+        {
+            SGrade* sg = SGGetInfo(peerless);
             if (sg)
             {
                 ++c;
-                UInt16 skill_id = SKILL_ID(_skill[i]);
-                st << static_cast<UInt16>(SKILLANDLEVEL(skill_id, sg->lvl));
+                UInt16 skill_id = SKILL_ID(peerless);
+                st << skill_id;
+                Int32 effect;
+                GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sg->lvl);
+                if(ev)
+                    effect = ev->effect;
+                else
+                    effect = 0;
+                st << effect;
             }
-        }
-    }
-    if (peerless != 0)
-    {
-        SGrade* sg = SGGetInfo(peerless);
-        if (sg)
-        {
-            ++c;
-            UInt16 skill_id = SKILL_ID(peerless);
-            st << static_cast<UInt16>(SKILLANDLEVEL(skill_id, sg->lvl));
         }
     }
     st.data<UInt8>(offset) = c;

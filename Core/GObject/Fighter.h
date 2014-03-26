@@ -1091,7 +1091,7 @@ public:
     bool appendFighterSGInfo(Stream& st, UInt16 skillid, SGrade* sg);
     void SGFromDB(UInt16 id, SGrade& sg);
     void makeFighterSGInfoWithNoSkill(Stream& st);
-    void getAllSGAndLevel(Stream& st);
+    void getAllSGAndValue(Stream& st);
     void SGDismiss(UInt16, bool = false, Mail * = NULL);
     void SGDismissAll(bool isDel);
     void SGDeleteDB(UInt16 id);
