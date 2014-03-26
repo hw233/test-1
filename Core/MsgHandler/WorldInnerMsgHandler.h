@@ -153,6 +153,14 @@ void OnSpreadModifyVar(GameMsgHdr& hdr, const void* data)
     player->SetVar(VAR_SPREAD_FLAG, player->GetVar(VAR_SPREAD_FLAG) | SPREAD_ALREADY_GET);
 }
 
+void OnSetTYSSScore(GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::Clan* clan = player->getClan();
+    if(clan)
+        clan->SetTYSSScore(player);
+}
+
 void OnClanTakeRewardResultReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);

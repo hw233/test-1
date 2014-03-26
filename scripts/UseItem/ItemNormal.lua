@@ -9071,13 +9071,13 @@ end
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    local item = 1353;
+    local item = 9368;
 
     if package:GetRestPackageSize() < (1+(1*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
-    package:Add(1353, num*1, true, false, 2);
+    package:Add(item, num*1, true, false, 2);
 
     Broadcast(0x27, "恭喜".."[p:"..player:getCountry()..":"..player:getPName().."]".."人品大爆发，抢到了".."[4:"..iid.."]".."，获得了".."[4:"..item.."]x1"..msg_141);
     package:DelItemSendMsg(iid, player);

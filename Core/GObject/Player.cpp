@@ -10351,7 +10351,8 @@ namespace GObject
 		}
         */
 		//_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
-		_battleName = _battleName + sepStr + numstr + sepStr + _playerData.name + sepStr + numstr2;
+		//_battleName = _battleName + sepStr + numstr + sepStr + _playerData.name + sepStr + numstr2;
+		_battleName = numstr2 + sepStr + _battleName + sepStr + numstr + sepStr + _playerData.name;
 #endif
 	}
 
@@ -27100,7 +27101,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
     {
         case 3://喂养神兽
         {
-            if(flag != 0 && flag != 1 && GetPackage()->GetItemAnyNum(9492) <= 0)
+            if((flag != 0 && flag != 1) || GetPackage()->GetItemAnyNum(9492) <= 0)
                 return;
             if(flag == 0)
             {
@@ -27403,7 +27404,10 @@ void Player::EatLingGuo(UInt32 num)
         GLOBAL().PushMsg(hdr, &num);
     }
     
-    getClan()->SetTYSSScore(this);
+    //getClan()->SetTYSSScore(this);
+    GameMsgHdr hdr2(0x166, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr2, NULL);
+
     UInt32 pl_grade = this->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER); 
     UInt32 cl_grade = clanSum; 
     GameMsgHdr hdr(0x1BF, WORKER_THREAD_WORLD, this, sizeof(pl_grade));
