@@ -1565,6 +1565,7 @@ void Update11ClanRank(GameMsgHdr& hdr,const void* data)
     ClanSort s;
     s.clan = clan;
     s.total = total;
+    s.time = TimeUtil::Now();
     World::clanGradeSort.insert(s);
     Stream st;
     Send11ClanGradeRank(st);

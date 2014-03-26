@@ -668,6 +668,7 @@ namespace GObject
         VAR_NEWYEAR_PRATICE_COUNT = 693 ,    //记录一天只有一次
         VAR_LEFTADDR_POWER = 694 ,   //仙界征战体力
         VAR_LEFTADDR_CREATE = 695 ,   //创建队伍的时间
+        VAR_HEART_SWORD = 696 ,    //心剑值
 
         //701-710 for suntao
         VAR_MicroCloud_AWARD = 701,     //是否领取微云合作奖励

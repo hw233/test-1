@@ -1375,6 +1375,13 @@ struct DBXingchen
     UInt16 xctCurVal;
     UInt16 xctMaxVal;
 };
+struct DBXinmo
+{
+	UInt32 fighterId;
+	UInt64 playerId;
+	UInt8  level;
+	UInt32 curVal;
+};
 
 struct DBJiguanshu
 {
@@ -3291,6 +3298,16 @@ SPECIALDEF(3)
     UInt8,  curLvl,
     UInt32, curExp
     )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBXinmo)
+SPECIALDEF(4)
+(
+	UInt32, fighterId,
+	UInt64, playerId,
+	UInt8,  level,
+	UInt32, curVal
+)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBJiguanyu)

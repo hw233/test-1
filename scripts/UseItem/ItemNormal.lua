@@ -9094,6 +9094,7 @@ function ItemNormal_00010245(iid, num, bind, param)
 end
 
 function ItemNormal_00009494(iid, num, bind, param)
+    print("X")
     local player = GetPlayer()
     local package = player:GetPackage();
 
@@ -10183,8 +10184,8 @@ end
 
 function ItemNormal_00009375(iid, num, bind, param)
     local player = GetPlayer();
-        local itemNumber = 0 ;
-        local package = player:GetPackage();
+    local itemNumber = 0 ;
+    local package = player:GetPackage();
 	    if num  <= package:GetRestPackageSize() then
             package:DelItemSendMsg(9375, player);
             for k = 1, num do
@@ -10217,7 +10218,7 @@ function ItemNormal_00009375(iid, num, bind, param)
                     itemNumber = 515;
                 elseif rand <= 10000 then
                     itemNumber = 551;
-                 end
+                end
             package:AddItem(itemNumber,1,1,0,2);
             if getFoolBao() and ( rand > 7930 or itemNumber == 9088 ) then  
             Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:"..itemNumber.."]x1")
@@ -10267,27 +10268,27 @@ function ItemNormal_00009382(iid, num, bind, param)
                 card_chance = 500;
             end
             if rand_card <= card_chance then
-               local rand_card_num = 0;
-               local card_chance_ = {0,0,0,0,0}; 
-               local card_chance_max = 0;
-               for n=1,5 do 
-                   local num_c =player:GetVar(452+n);
-                   --print(num_c)
-                   card_chance_[n] = 5 - num_c;
-                   if card_chance_[n] <1 then
-                       card_chance_[n] =1;
-                   end
-                   card_chance_max = card_chance_max + card_chance_[n];
-               end
-               --print(card_chance_max)
-               for n=2,5 do
+                local rand_card_num = 0;
+                local card_chance_ = {0,0,0,0,0}; 
+                local card_chance_max = 0;
+                for n=1,5 do 
+                    local num_c =player:GetVar(452+n);
+                    --print(num_c)
+                    card_chance_[n] = 5 - num_c;
+                    if card_chance_[n] <1 then
+                        card_chance_[n] =1;
+                    end
+                    card_chance_max = card_chance_max + card_chance_[n];
+                end
+                --print(card_chance_max)
+                for n=2,5 do
                     card_chance_[n] = card_chance_[n-1]+card_chance_[n]
-               end
-               --card_chance_max = 25 - card_chance_max;
-               if card_chance_max > 0 then
-                   card_rand = math.random(1,card_chance_max);
-                   for i = 1, #card_chance_ do
-                       if card_rand <=card_chance_[i] then
+                end
+                --card_chance_max = 25 - card_chance_max;
+                if card_chance_max > 0 then
+                    card_rand = math.random(1,card_chance_max);
+                    for i = 1, #card_chance_ do
+                        if card_rand <=card_chance_[i] then
                            rand_card_num = i
                            break;
                        end
@@ -10307,6 +10308,20 @@ function ItemNormal_00009382(iid, num, bind, param)
     end
     player:sendLuckyBagInfo()
     player:LuckyBagRank();
+    return num;
+end
+
+function ItemNormal_00009497(iid, num, bind, param)
+    local val = 100 ;
+    if iid == 9498 then 
+        val = 300;
+    end
+
+    if iid ==  9499 then
+        val = 1000;
+    end
+    local player = GetPlayer()
+    player:AddHeartSword(val * num);
     return num;
 end
 
@@ -12524,6 +12539,9 @@ local ItemNormal_Table = {
     [9437] = ItemNormal_00009382,
     [9449] = ItemNormal_00009382,
     [9496] = ItemNormal_00009382,
+    [9497] = ItemNormal_00009497,
+    [9498] = ItemNormal_00009497,
+    [9499] = ItemNormal_00009497,
 
     [9388] = ItemNormal_00009388,
     [9390] = ItemNormal_00009390,
@@ -12550,6 +12568,7 @@ local ItemNormal_Table = {
     [9492] = ItemNormal_00009492,
     [9495] = ItemNormal_00009495,
 
+    --仙界遗迹宝箱
     --坐骑
     [9601] = ItemNormal_00009601,
     [9602] = ItemNormal_00009601,
@@ -13022,7 +13041,7 @@ local ItemNormal_Table = {
     [10244] = ItemNormal_00010244,
     [10245] = ItemNormal_00010245,
     [10246] = ItemNormal_00010246,
-    --[9494] = ItemNormal_00009494,
+    [9494] = ItemNormal_00009494,
     [9480] = ItemNormal_0009480,
     [9481] = ItemNormal_0009480,
     [9482] = ItemNormal_0009480,
