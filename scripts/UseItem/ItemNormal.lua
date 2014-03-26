@@ -10205,48 +10205,6 @@ function ItemNormal_00009375(iid, num, bind, param)
 		return false;
 end
 
-function ItemNormal_00009475(iid, num, bind, param)
-    local itemId = 9475;
-    local player = GetPlayer();
-    local package = player:GetPackage();
-    local itemNumber = 0;
-    local g = 0;
-    local items = {1126, 1326, 1325}
-    local chance = {1250, 3750, 10000}
-    local gNum = {1, 4, 2}
-    if num  <= package:GetRestPackageSize() then                                                     
-       package:DelItemSendMsg(9475, player);
-     --[[  for n = 1, num do
-          local rand = math.random(1,10000);
-          if rand <= 1250 then
-              itemNumber = 1126;
-              g = 1;
-          elseif rand <= 3750 then
-              itemNumber = 1326;
-              g = 4;
-          elseif rand <= 10000 then
-              itemNumber = 1325;
-              g = 2;
-          end
-          package:AddItem(itemNumber,g,1,0,2);
-       end  --end for--]]
-       for n = 1, num do
-           local rand = math.random(1,10000)
-           for i = 1,#chance do
-               if rand <= chance[i] then
-                   itemNumber=items[i]
-                   g=gNum[i]
-                   break
-               end
-           end
-           package:AddItem(itemNumber,g,1,0,2)
-       end--end for
-       return num;
-    end--end if
-    player:sendMsgCode(2,1011,0);
-    return false;
-end 
-
 function ItemNormal_00009382(iid, num, bind, param)
     local itmeId = 9496;
     local player = GetPlayer()
@@ -10284,27 +10242,27 @@ function ItemNormal_00009382(iid, num, bind, param)
                 card_chance = 500;
             end
             if rand_card <= card_chance then
-               local rand_card_num = 0;
-               local card_chance_ = {0,0,0,0,0}; 
-               local card_chance_max = 0;
-               for n=1,5 do 
-                   local num_c =player:GetVar(452+n);
-                   --print(num_c)
-                   card_chance_[n] = 5 - num_c;
-                   if card_chance_[n] <1 then
-                       card_chance_[n] =1;
-                   end
-                   card_chance_max = card_chance_max + card_chance_[n];
-               end
-               --print(card_chance_max)
-               for n=2,5 do
+                local rand_card_num = 0;
+                local card_chance_ = {0,0,0,0,0}; 
+                local card_chance_max = 0;
+                for n=1,5 do 
+                    local num_c =player:GetVar(452+n);
+                    --print(num_c)
+                    card_chance_[n] = 5 - num_c;
+                    if card_chance_[n] <1 then
+                        card_chance_[n] =1;
+                    end
+                    card_chance_max = card_chance_max + card_chance_[n];
+                end
+                --print(card_chance_max)
+                for n=2,5 do
                     card_chance_[n] = card_chance_[n-1]+card_chance_[n]
-               end
-               --card_chance_max = 25 - card_chance_max;
-               if card_chance_max > 0 then
-                   card_rand = math.random(1,card_chance_max);
-                   for i = 1, #card_chance_ do
-                       if card_rand <=card_chance_[i] then
+                end
+                --card_chance_max = 25 - card_chance_max;
+                if card_chance_max > 0 then
+                    card_rand = math.random(1,card_chance_max);
+                    for i = 1, #card_chance_ do
+                        if card_rand <=card_chance_[i] then
                            rand_card_num = i
                            break;
                        end
@@ -12565,7 +12523,6 @@ local ItemNormal_Table = {
     [9495] = ItemNormal_00009495,
 
     --仙界遗迹宝箱
-    [9475] = ItemNormal_00009475,
     --坐骑
     [9601] = ItemNormal_00009601,
     [9602] = ItemNormal_00009601,
