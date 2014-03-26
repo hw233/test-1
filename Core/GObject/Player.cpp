@@ -27094,8 +27094,12 @@ void Player::ReturnTYSSInfo(UInt8 flag)
 
 void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
 {
-    if(!getClan() || !getClan()->getLeader()) 
+    Clan* clan = getClan();
+    if(clan == NULL ) 
         return;
+    /*Player* leader = clan->getLeader();
+    if(leader == NULL)
+        return;*/
 
     switch(type)
     {
@@ -27113,13 +27117,9 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             else
             {
                 if(GetPackage()->GetItemNum(9492,true) > 0)
-                {
                     GetPackage()->UseItem(9492,GetPackage()->GetItemNum(9492,true),0,0,1);
-                }
                 if(GetPackage()->GetItemNum(9492,false) > 0)
-                {
                     GetPackage()->UseItem(9492,GetPackage()->GetItemNum(9492,false),0,0,0);
-                }
             }
             
         }
@@ -27145,7 +27145,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             };
 
             UInt32 clan_contribute = GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
-            UInt32 clan_sum = getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+            UInt32 clan_sum = clan->GetTYSSSum();
 
             if(clan_contribute < 100 && clan_sum < 3000)
                 return;
@@ -27184,15 +27184,18 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             }
            
             UInt8 add_flag = 0;//购买成功标记
+            UInt32 consume1 = GetVar(VAR_TYSS_DISCOUNT_CONSUME1); 
+            UInt32 consume2 = GetVar(VAR_TYSS_DISCOUNT_CONSUME2); 
+            UInt32 consume3 = GetVar(VAR_TYSS_DISCOUNT_CONSUME3); 
             switch(consume_type)
             {
                 case 0:
                 {
-                    tmp_int = GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME1),consume_pos);  
+                    tmp_int = GET_BIT_8(consume1,consume_pos);  
                     if(tmp_int >= awards[flag][3][1])
                         return;
                     ++tmp_int; 
-                    SetVar(VAR_TYSS_DISCOUNT_CONSUME1,SET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME1),consume_pos,tmp_int)); 
+                    SetVar(VAR_TYSS_DISCOUNT_CONSUME1,SET_BIT_8(consume1,consume_pos,tmp_int)); 
 		            ConsumeInfo ci(BuyTYSSLim,0,0);
                     useGold(awards[flag][3][0], &ci);
                     add_flag = 1;
@@ -27200,11 +27203,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 break;
                 case 1:
                 {
-                    tmp_int = GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME2),consume_pos);  
+                    tmp_int = GET_BIT_8(consume2,consume_pos);  
                     if(tmp_int >= awards[flag][3][1])
                         return;
                     ++tmp_int; 
-                    SetVar(VAR_TYSS_DISCOUNT_CONSUME2,SET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME2),consume_pos,tmp_int)); 
+                    SetVar(VAR_TYSS_DISCOUNT_CONSUME2,SET_BIT_8(consume2,consume_pos,tmp_int)); 
 		            ConsumeInfo ci(BuyTYSSLim,0,0);
                     useGold(awards[flag][3][0], &ci);
                     add_flag = 1;
@@ -27212,11 +27215,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 break;
                 case 2:
                 {
-                    tmp_int = GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME3),consume_pos);  
+                    tmp_int = GET_BIT_8(consume3,consume_pos);  
                     if(tmp_int >= awards[flag][3][1])
                         return;
                     ++tmp_int; 
-                    SetVar(VAR_TYSS_DISCOUNT_CONSUME3,SET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME3),consume_pos,tmp_int)); 
+                    SetVar(VAR_TYSS_DISCOUNT_CONSUME3,SET_BIT_8(consume3,consume_pos,tmp_int)); 
 		            ConsumeInfo ci(BuyTYSSLim,0,0);
                     useGold(awards[flag][3][0], &ci);
                     add_flag = 1;
@@ -27249,34 +27252,34 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 }
                 switch(flag)
                 {
-                    case 1:
+                    case 0:
                         udpLog("tianyuanshenshou", "F_140224_16", "", "", "", "", "act");
                         break;
-                    case 2:
+                    case 1:
                         udpLog("tianyuanshenshou", "F_140224_17", "", "", "", "", "act");
                         break;
-                    case 3:
+                    case 2:
                         udpLog("tianyuanshenshou", "F_140224_18", "", "", "", "", "act");
                         break;
-                    case 4:
+                    case 3:
                         udpLog("tianyuanshenshou", "F_140224_19", "", "", "", "", "act");
                         break;
-                    case 5:
+                    case 4:
                         udpLog("tianyuanshenshou", "F_140224_20", "", "", "", "", "act");
                         break;
-                    case 6:
+                    case 5:
                         udpLog("tianyuanshenshou", "F_140224_21", "", "", "", "", "act");
                         break;
-                    case 7:
+                    case 6:
                         udpLog("tianyuanshenshou", "F_140224_22", "", "", "", "", "act");
                         break;
-                    case 8:
+                    case 7:
                         udpLog("tianyuanshenshou", "F_140224_23", "", "", "", "", "act");
                         break;
-                    case 9:
+                    case 8:
                         udpLog("tianyuanshenshou", "F_140224_24", "", "", "", "", "act");
                         break;
-                    case 10:
+                    case 9:
                         udpLog("tianyuanshenshou", "F_140224_25", "", "", "", "", "act");
                         break;
                     default:
@@ -27286,7 +27289,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
         }
             break;
         case 5://查看成员贡献
-            getClan()->SendTYSSScore(this); 
+            clan->SendTYSSScore(this); 
 
             break;
         case 6://0 - 表扬 1 - 督促
@@ -27307,7 +27310,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                     return;
                     break;
             }
-            getClan()->broadcast(st);
+            clan->broadcast(st);
         }
             break;
         case 8:
@@ -27362,22 +27365,21 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
     return;
 }
 
-void Player::beEated(UInt32 num)
-{
-    AddVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM,10*num);
-}
 
 void Player::EatLingGuo(UInt32 num)
 {
-    if(!getClan()->getLeader())
+    Clan* clan = getClan();
+    if(clan == NULL ) 
         return;
-    Player* leader = getClan()->getLeader();
+    Player* leader = clan->getLeader();
+    if(leader == NULL)
+        return;
 
     AddVar(VAR_TYSS_CONTRIBUTE_PLAYER ,10*num); 
     AddVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY ,10*num); 
     AddVar(VAR_TYSS_CONTRIBUTE_CLAN ,10*num); 
   
-    UInt32 clan_sum = leader->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM); 
+    UInt32 clan_sum = clan->GetTYSSSum();
     UInt8 flag = 0;//标记
     if(clan_sum < 3000)
         flag = 0;
@@ -27395,21 +27397,17 @@ void Player::EatLingGuo(UInt32 num)
                         flag = 4;
                     else
                         flag = 5;
-    UInt32 clanSum = getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) + 10 * num;//假值
-    if(leader->getThreadId() == getThreadId())
-        leader->AddVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM,10*num);
-    else
-    {
-        GameMsgHdr hdr(0x367, leader->getThreadId(), leader, sizeof(num));
-        GLOBAL().PushMsg(hdr, &num);
-    }
+    clan_sum += 10 * num;
+    UInt32 add_num = 10* num;
+    GameMsgHdr hdr3(0x167, WORKER_THREAD_WORLD, this, sizeof(add_num));
+    GLOBAL().PushMsg(hdr3, &add_num);
     
-    //getClan()->SetTYSSScore(this);
+    
     GameMsgHdr hdr2(0x166, WORKER_THREAD_WORLD, this, 0);
     GLOBAL().PushMsg(hdr2, NULL);
 
     UInt32 pl_grade = this->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER); 
-    UInt32 cl_grade = clanSum; 
+    UInt32 cl_grade = clan_sum; 
     GameMsgHdr hdr(0x1BF, WORKER_THREAD_WORLD, this, sizeof(pl_grade));
     GLOBAL().PushMsg(hdr, &pl_grade);
     GameMsgHdr hdr1(0x1BC, WORKER_THREAD_WORLD, this, sizeof(cl_grade));
@@ -27419,19 +27417,19 @@ void Player::EatLingGuo(UInt32 num)
     {
         case 0:
             if(clan_sum >= 3000)
-                SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"幼年期神兽");
+                SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"幼年期神兽");
         case 1:
             if(clan_sum >= 19000)
-                SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"成长期神兽");
+                SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"成长期神兽");
         case 2:
             if(clan_sum >= 40000)
-                SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"青年期神兽");
+                SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"青年期神兽");
         case 3:
             if(clan_sum >= 70000)
-                SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"亚圣兽期");
+                SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"亚圣兽期");
         case 4:
             if(clan_sum >= 100000)
-                SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"天元神兽");
+                SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"天元神兽");
         default:
             break;
     }
@@ -29237,6 +29235,146 @@ void Player::AddHeartSword(UInt32 val)
     SYSMSG_SENDV(2027,this,val);
     SYSMSG_SENDV(2028,this,val);
 }
+
+UInt8 Player::useChangeSexCard()
+{
+    if(GetVar(VAR_MARRY_STATUS) > 0)
+        return 0;
+
+    Fighter* fgt = getMainFighter();
+    if(!fgt)
+        return 0;
+    UInt32 oldId = fgt->getId();
+    UInt32 newId;
+    if(oldId % 2 == 1) //原先是男
+    {
+        newId = oldId + 1;
+    }
+    else
+    {
+        newId = oldId - 1;
+    }
+
+    Stream st(REP::USER_INFO_CHANGE);
+    st << static_cast<UInt8>(0x22) << newId << Stream::eos;
+    send(st);
+
+    //与改形卡有关的函数
+    do_fighter(fgt, oldId, newId);
+    do_fighter_buff(fgt, oldId);
+    do_fighter_train(fgt, oldId);
+    do_practice_data(fgt, oldId);
+    do_second_soul(fgt, oldId);
+    do_elixir(fgt, oldId);
+    do_skill_strengthen(fgt, oldId);
+    do_fighter_xingchen(fgt, oldId);
+    do_fighter_xinmo(fgt, oldId);
+
+    struct _stTable
+    {
+        Fighter* fgt;
+        UInt32 oldId;
+    };
+    _stTable sttable = {fgt, oldId};
+    GameMsgHdr hdr1(0x1A0, WORKER_THREAD_WORLD, this, sizeof(sttable));
+    GLOBAL().PushMsg(hdr1, &sttable);
+
+    UInt32 count = GetVar(VAR_SEX_CHANGE);
+    SetVar(VAR_SEX_CHANGE, ++count);
+    return 1;
+}
+
+void Player::doTableInWorld(Fighter* fgt, UInt32 oldId)
+{
+    if(!fgt)
+        return;
+    do_sh_fighter(fgt, oldId);
+    do_sh_fighter_attr_extra(fgt, oldId);
+    do_sh_fighter_attr2(fgt, oldId);
+}
+
+void Player::do_fighter(Fighter* fgt, UInt32 oldId, UInt32 newId)
+{
+    fgt->setId(newId);
+    if(fgt->getId() % 2 == 1)
+        fgt->setSex(0);
+    else
+        fgt->setSex(1);
+    _fighters.insert(_fighters.begin(), std::make_pair(newId, fgt));
+    std::map<UInt32, Fighter *>::iterator it = _fighters.find(oldId);
+    if(it != _fighters.end())
+        _fighters.erase(it);
+    DB2().PushUpdateData("UPDATE `fighter` SET  `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        if(_playerData.lineup[i].fid == oldId)
+        {
+            _playerData.lineup[i].fid = newId;
+            storeFighters();
+        }
+    }
+}
+
+void Player::do_fighter_buff(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_buff` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_train(Fighter* fgt, UInt32 oldId)
+{
+    //主将不能闭关修炼
+    //DB1().PushUpdateData("UPDATE  `fighter_train` SET `fgtId` = %u WHERE `fgtId` = %u AND `ownerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_practice_data(Fighter* fgt, UInt32 oldId)
+{
+    UInt32 fgts[1] = {oldId};
+    GObject::practicePlace.standup(this, fgts, 1);
+    fgts[0] = fgt->getId();
+    GObject::practicePlace.sitdown(this, fgts, 1);
+    //DB1().PushUpdateData("UPDATE `practice_data` SET `fighters` = '%s' WHERE `id` = %" I64_FMT "u", "5,11,13,15,17,19", oldId, getId());
+}
+
+void Player::do_second_soul(Fighter* fgt, UInt32 oldId)
+{
+    DB2().PushUpdateData("UPDATE `second_soul` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_elixir(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `elixir` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_skill_strengthen(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `skill_strengthen` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_sh_fighter(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `sh_fighter` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_sh_fighter_attr_extra(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `sh_fighter_attr_extra` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_sh_fighter_attr2(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `sh_fighter_attr2` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_xingchen(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_xingchen` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+void Player::do_fighter_xinmo(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_xinmo` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
 } // namespace GObject
 
 

@@ -603,6 +603,7 @@ public:
     void getAllSSAndLevel(Stream& st);
     void getAllSSAndLevelOfPet(Stream& st);
 
+	inline void setId(UInt32 id) { _id = id; } //改性卡使用
 
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }
@@ -1046,11 +1047,7 @@ public:
     inline UInt8 getXingchenLvl()  {return m_xingchen.lvl;}
 
     inline XinMoData getXinMo() { return m_xinmo; }
-    void setXinMo(UInt8 lev , UInt32 val)
-    {
-        m_xinmo.lvl = lev ; 
-        m_xinmo.val = val;
-    }
+    void setXinMo(UInt8 lev , UInt32 val);
 
     void setXingchenFromDB(DBXingchen&);
     bool upgradeXingchen(UInt8 type);
@@ -1076,6 +1073,7 @@ public:
     void updateDBxinmo();
     bool upgradeXinMo();
     bool quickUpGradeXinMo();
+    void dismissXinMo();
 };
 
 class GlobalFighters

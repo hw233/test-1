@@ -1053,6 +1053,18 @@ void OnClearTYSS( GameMsgHdr& hdr, const void* data )
     World::tyss_ClanSort.clear();
 }
 
+void OnAddTYSSSum( GameMsgHdr& hdr, const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    Clan * clan = player->getClan();
+    if(clan == NULL)
+        return ;
+    UInt32 sum = *((UInt32*)data);
+    clan->AddTYSSSum(sum);
+
+}
 void OnSendGuankaActRank10( GameMsgHdr& hdr,  const void* data )
 {
     World::initRCRank();
@@ -1116,6 +1128,19 @@ void OnUseVitalityItemInWorld( GameMsgHdr& hdr,  const void* data )
     MSG_QUERY_PLAYER(player);
 	UInt32 need = *reinterpret_cast<const UInt32 *>(data);
     GObject::townDeamonManager->useVitalityItemInWorld(player, need);
+}
+
+void OnDoTableInWorld( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    struct _stTable
+    {
+        Fighter* fgt;
+        UInt32 oldId;
+    };
+    const _stTable* sttable = reinterpret_cast<const _stTable *>(data);
+    player->doTableInWorld(sttable->fgt, sttable->oldId);
 }
 
 void SendLuckyBagRank(Stream& st)
@@ -2293,12 +2318,17 @@ void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
     UInt32 idx = 1;
     if(opt != 0 && opt != 1 && opt != 9)
         return;
+    Clan* clan = player->getClan();
+    if(clan == NULL)
+        return;
+
     Stream st(REP::ACT);  
     st << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x00);  
     if(player->getClan() == NULL || player->getClan()->getLeader() == NULL)
         st << static_cast<UInt32>(0);
     else
-        st << player->getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+        st << clan->GetTYSSSum();
+        //st << player->getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
     st << static_cast<UInt32>(CLR_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
    
     st << static_cast<UInt8>(GET_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
@@ -2332,7 +2362,7 @@ void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
                 ++i;
                 if(i == e)
                 {
-                    st1 << i->total << static_cast<UInt32>(idx - 1); 
+                    st1 << i->total << static_cast<UInt32>(idx); 
                     if(World::tyss_PlayerSort.size() >= 7)
                         st1 << static_cast<UInt8>(7);
                     else
@@ -2381,7 +2411,7 @@ void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
                 ++i;
                 if(i == e)
                 {
-                    st2 << i->total << static_cast<UInt32>(idx - 1); 
+                    st2 << i->total << static_cast<UInt32>(idx); 
                     if(World::tyss_ClanSort.size() >= 3)
                         st2 << static_cast<UInt8>(3);
                     else

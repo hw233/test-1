@@ -3599,7 +3599,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3654,7 +3654,10 @@ namespace GObject
                     GObject::ClanBoss::instance().insertToGxSort(clan, 0, cl.gongxian);
 
                 //clan->SetDuoBaoAward(cl.duobaoAward);
-		}
+                clan->SetTYSSSum(cl.tyssSum);
+                if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
+                    clan->SetTYSSSum(0,true);
+            }
 			else
 			{
 				clanBattle = clanManager.getRobBattleClan();
@@ -3760,10 +3763,18 @@ namespace GObject
             pl->setInQQGroup(cp.inQQGroup);
             
             clan->LoadDuoBaoScore(pl);
+            if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
+            {
+                UInt32 var = pl->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER);
+                pl->SetVar(VAR_TYSS_CONTRIBUTE_CLAN,var);
+                clan->AddTYSSSum(var);
+            }
             clan->LoadTYSSScore(pl);
 		}
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
+        if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
+            GVAR.SetVar(GVAR_REPAIRTYSSBUG,1);
 
         lc.prepare("Loading clan item:");
         DBClanItem ci;

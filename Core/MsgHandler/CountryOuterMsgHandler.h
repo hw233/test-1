@@ -1612,10 +1612,12 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
     if(!player->checkFormation(f))
         return;
 
+    bool haveMain = false;
 	for(UInt8 i = 0; i < c; ++ i)
 	{
 		UInt32 pos = 3 + (sizeof(UInt8) + sizeof(UInt32)) * i;
 		UInt8 p = *(buf + pos + sizeof(UInt32));
+		UInt32 fgtid = *reinterpret_cast<const UInt32 *>(buf + pos);
 
         bool find = false;
         for(UInt8 k = 0; k < 5; ++ k)
@@ -1628,7 +1630,11 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
         }
         if(!find)
             return;
+        if(fgtid < 10)
+            haveMain = true;
     }
+    if(!haveMain)
+        return;
 
 	for(UInt8 i = 0; i < c; ++ i)
 	{
@@ -1904,6 +1910,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     fgt->SSDismissAll(true);
     player->sendFighterSSListWithNoSkill();
     fgt->dismissXingchen();
+    fgt->dismissXinMo();
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;

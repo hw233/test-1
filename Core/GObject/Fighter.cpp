@@ -2251,6 +2251,8 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
     const GData::SkillBase* s = GData::skillManager[skillId];
     if(s)
     {
+        if(SKILL_ID(skillId) == 97)
+            return 0;
         UInt8 sc = s->color;
         UInt8 sl = SKILL_LEVEL(skillId);
         UInt8 ssl = 0;
@@ -7337,7 +7339,9 @@ bool Fighter::upgradeXinMo()
 {
     if (isPet() || !_owner)
         return false;
-    if (m_xinmo.lvl >= 50)
+
+    m_xinmo.lvl = GData::xinmoData.getXinMoLev(m_xinmo.val);
+    if (m_xinmo.lvl >= 80)
         return false;
     GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(m_xinmo.lvl);
     if(!stxc || getLevel() < stxc->limitLev)
@@ -7351,7 +7355,8 @@ bool Fighter::upgradeXinMo()
         ++m_xinmo.lvl;
         setDirty();
         GData::XinMoData::stXinMo * stxcn = GData::xinmoData.getXinMoTable(m_xinmo.lvl);
-        setSkills(stxcn->skilllev,false);
+        if(stxcn)
+            setSkills(stxcn->skilllev,true);
     }
     _owner->SetVar(VAR_HEART_SWORD, value - stxc->consume);
     Stream st (REP::EQ_XINMO);
@@ -7369,7 +7374,9 @@ bool Fighter::quickUpGradeXinMo()
     if(isPet() || !_owner)
         return false;
 
-    if(m_xinmo.lvl >= 50)
+    m_xinmo.lvl = GData::xinmoData.getXinMoLev(m_xinmo.val);
+
+    if(m_xinmo.lvl >= 80)
         return false;
 
     GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(m_xinmo.lvl);
@@ -7402,7 +7409,8 @@ bool Fighter::quickUpGradeXinMo()
        // if(m_xinmo.lvl >= 20 && m_xinmo.xctMaxVal == 0)
         //    m_xinmo.xctMaxVal = 100;
         GData::XinMoData::stXinMo * stxcn = GData::xinmoData.getXinMoTable(m_xinmo.lvl);
-        setSkills(stxcn->skilllev,false);
+        if(stxcn)
+            setSkills(stxcn->skilllev,true);
     }
     
     if(m_xinmo.val > curValue)
@@ -7412,7 +7420,6 @@ bool Fighter::quickUpGradeXinMo()
 		SYSMSG_SENDV(4919, _owner, consumeValue);
     }
    
-    if(count!=0)
     {
         Stream st (REP::EQ_XINMO);
         st << static_cast<UInt8>(2);
@@ -7426,6 +7433,51 @@ bool Fighter::quickUpGradeXinMo()
    // GameAction()->doStrong(_owner, SthXinMo, 0, 0); 
    // _owner->GuangGunCompleteTask(0,30);
     return true;
+}
+void Fighter::setXinMo(UInt8 lev , UInt32 val)
+{
+    m_xinmo.val = val;
+    m_xinmo.lvl = GData::xinmoData.getXinMoLev(m_xinmo.val);
+    GData::XinMoData::stXinMo * stxcn = GData::xinmoData.getXinMoTable(m_xinmo.lvl);
+    if(!stxcn)
+        return ;
+    setSkills(stxcn->skilllev,true);
+}
+
+void Fighter::dismissXinMo()
+{
+    if (isPet() || !_owner)
+        return;
+    GData::XinMoData::stXinMo * stxc = GData::xinmoData.getXinMoTable(1);
+    if(!stxc || getLevel() < stxc->limitLev)
+        return;
+    bool hasMail = false;
+    SYSMSG(title, 2029);
+    SYSMSGV(content, 2030, getLevel(), getColor(), getName().c_str());
+    MailPackage::MailItem  mitem[3] ;
+
+    stxc = GData::xinmoData.getXinMoTable(m_xinmo.lvl);
+    UInt32 payBack = stxc ? stxc->payBack : 0;
+
+    mitem[0].id = 9499;
+    mitem[0].count = static_cast<UInt16>(payBack / 1000);
+    payBack = payBack % 1000;
+    mitem[1].id = 9497;
+    mitem[1].count = static_cast<UInt16>(payBack / 100);
+    
+    if(mitem[0].count > 0 || mitem[1].count > 0)
+        hasMail = true;
+
+    if(hasMail)
+    {
+        MailItemsInfo itemsInfo(mitem, DismissXinMo, static_cast<UInt16>(2));
+
+        GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(pmail)
+            GObject::mailPackageManager.push(pmail->id,mitem, 2, true);
+    }
+
+    DB1().PushUpdateData("DELETE FROM `fighter_xinmo` WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", getId(), _owner->getId());
 }
 
 /*

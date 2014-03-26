@@ -2556,7 +2556,6 @@ namespace GObject
         void AddLingGuo(UInt32 r =0);
         void ReturnTYSSInfo(UInt8 flag );
         void OpTYSS(UInt8 type , UInt8 flag = 0,UInt64 playerid = 0);
-        void beEated(UInt32 num);
         void EatLingGuo(UInt32 num);
         void GetFindOldManAward(UInt32 type = 0 );
         void getInterestingAward(UInt8 type);
@@ -2996,6 +2995,21 @@ namespace GObject
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
         void sevensoul_fixed();
+    public:
+        UInt8 useChangeSexCard();
+        void doTableInWorld(Fighter* fgt, UInt32 oldId);
+        void do_fighter(Fighter* fgt, UInt32 oldId, UInt32 newId);
+        void do_fighter_buff(Fighter* fgt, UInt32 oldId);
+        void do_fighter_train(Fighter* fgt, UInt32 oldId);
+        void do_practice_data(Fighter* fgt, UInt32 oldId);
+        void do_second_soul(Fighter* fgt, UInt32 oldId);
+        void do_elixir(Fighter* fgt, UInt32 oldId);
+        void do_skill_strengthen(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter_attr_extra(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter_attr2(Fighter* fgt, UInt32 oldId);
+        void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
+        void do_fighter_xinmo(Fighter* fgt, UInt32 oldId);
 	};
 
 

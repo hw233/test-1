@@ -3204,7 +3204,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::guankaScoreSort.insert(s);
         }
     }
-    if(World::getTYSSTime())
+    //if(World::getTYSSTime())
     {
         UInt32 used= p->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER);
         if(used)
@@ -3237,12 +3237,12 @@ inline bool clan_enum_grade(GObject::Clan *clan,int)
         }
     }
     
-    if(World::getTYSSTime())
+    //if(World::getTYSSTime())
     {
         GObject::Player* pl = clan->getLeader();
         if(!pl)
             return true;
-        UInt32 grade = pl->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+        UInt32 grade = clan->GetTYSSSum();
         if(grade)
         {
             ClanSort s;

@@ -1108,14 +1108,11 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             static UInt16 ids[] =
             {
                 56,   2,
-                57,   2,
-                15,   2,
-                9371, 5,
-                1126, 5,
+                9371, 4,
+                9600, 4,
                 503,  5,
-                515,  3,
-                1325, 6,
-                134,  6,
+                1126, 5,
+                9338, 5,
             };
 
             UInt8 idx = 0;
@@ -3299,6 +3296,7 @@ inline bool clan_enum_0(GObject::Clan *clan, int)
 inline bool clan_enum_1(GObject::Clan *clan, int)
 {
    clan->ClearTYSSScore();
+   clan->SetTYSSSum(0,true);
    return true;
 }
 
@@ -3444,7 +3442,7 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME1, 0);
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME2, 0);
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME3, 0);
-                pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_CLAN_SUM, 0);
+                //pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_CLAN_SUM, 0);
                 GameMsgHdr hdr(0x201, WORKER_THREAD_WORLD, pl, 0);
                 GLOBAL().PushMsg(hdr, NULL);
             }

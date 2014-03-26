@@ -9068,6 +9068,22 @@ function ItemNormal_00010245(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009494(iid, num, bind, param)
+    print("X")
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local flag = player:useChangeSexCard()
+    if flag == 0 then
+        player:sendMsgCode(2, 4013, 0);
+        return 0
+    end
+
+    package:DelItemSendMsg(iid, player);
+    player:sendMsgCode(2, 4014, 0);
+    return 1;
+end
+
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -10271,9 +10287,13 @@ function ItemNormal_00009382(iid, num, bind, param)
 end
 
 function ItemNormal_00009497(iid, num, bind, param)
-    local val = 10 ;
+    local val = 100 ;
     if iid == 9498 then 
-        val =100
+        val = 300;
+    end
+
+    if iid ==  9499 then
+        val = 1000;
     end
     local player = GetPlayer()
     player:AddHeartSword(val * num);
@@ -12496,6 +12516,7 @@ local ItemNormal_Table = {
     [9496] = ItemNormal_00009382,
     [9497] = ItemNormal_00009497,
     [9498] = ItemNormal_00009497,
+    [9499] = ItemNormal_00009497,
 
     [9388] = ItemNormal_00009388,
     [9390] = ItemNormal_00009390,
@@ -12991,6 +13012,7 @@ local ItemNormal_Table = {
     [10244] = ItemNormal_00010244,
     [10245] = ItemNormal_00010245,
     [10246] = ItemNormal_00010246,
+    --[9494] = ItemNormal_00009494,
     [9480] = ItemNormal_0009480,
     [9481] = ItemNormal_0009480,
     [9482] = ItemNormal_0009480,

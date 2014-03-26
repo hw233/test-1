@@ -3259,16 +3259,10 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                 case 3:
                     hdr.msgHdr.desWorkerID = player->getThreadId();//喂养神兽
                     GLOBAL().PushMsg(hdr, (void*)data);
-                    //brd >> flag;
-                    //player->OpTYSS(op,flag);//喂养神兽
                     break;
                 case 4:
                     hdr.msgHdr.desWorkerID = player->getThreadId();//购买限购礼包
                     GLOBAL().PushMsg(hdr, (void*)data);
-                    
-                    //brd >> flag;//礼包id
-                    //player->OpTYSS(op,flag-1);//买限购礼包
-                    //player->OpTYSS(8);//返回限购礼包信息
                     break;
                 case 5:
                 {

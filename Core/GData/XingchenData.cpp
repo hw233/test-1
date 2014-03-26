@@ -38,11 +38,13 @@ namespace GData
     UInt32 XinMoData::getXinMoLev(UInt32 val )
     {
         std::map<UInt8, stXinMo>::iterator iter = _xinmo.begin();
+        UInt32 lev = 0 ;
         for(;iter!=_xinmo.end();++iter) 
         {
+            lev = iter->first;
             if(iter->second.maxVal > val )
-                return iter->first;
+                break;
         }
-        return -1;
+        return  lev;
     }
 }
