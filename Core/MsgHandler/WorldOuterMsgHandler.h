@@ -4216,5 +4216,14 @@ void OnServerLeftAttr(ServerLeftMsgHdr& hdr, const void * data)
             continue ;
         buildingOwner->AddLeftAttr(opt , type ,value);
     }
+    UInt8 flag = 0 ;
+    br >>flag ;
+    if( flag == 0)
+    {
+        Stream st(REP::CLAN_FAIRYLAND);
+        st << static_cast<UInt8>(0x0D);
+        st << Stream::eos;
+        clan->broadcast(st); 
+    }
 }
 #endif // _WORLDOUTERMSGHANDLER_H_
