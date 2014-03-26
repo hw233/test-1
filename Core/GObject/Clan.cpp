@@ -5431,8 +5431,8 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str)
 }
 void Clan::LoadTYSSScore(Player* pl)
 {
-    if(!World::getTYSSTime())
-        return;
+    /*if(!World::getTYSSTime())
+        return;*/
     if(NULL == pl)
         return;
 
