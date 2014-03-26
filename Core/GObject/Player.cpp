@@ -29395,6 +29395,7 @@ UInt8 Player::useChangeSexCard()
     do_skill_strengthen(fgt, oldId);
     do_fighter_xingchen(fgt, oldId);
     do_fighter_xinmo(fgt, oldId);
+    do_skill_grade(fgt, oldId);
 
     struct _stTable
     {
@@ -29500,6 +29501,12 @@ void Player::do_fighter_xinmo(Fighter* fgt, UInt32 oldId)
 {
     DB1().PushUpdateData("UPDATE `fighter_xinmo` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
 }
+
+void Player::do_skill_grade(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `skill_grade` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
 void Player::BuyLeftPower()
 {
     UInt32 buyCount = GetVar(VAR_LEFTADDR_POWER_ADD);

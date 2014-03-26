@@ -9296,9 +9296,9 @@ function ItemNormal_00016000(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
     local totalNum;
     if iid == 16000 then
-        totalNum = num * 100
+        totalNum = num * 15
     else
-        totalNum = num * 300
+        totalNum = num * 100
     end
     player:getXuanTianNingLuLua(totalNum);
     return num

@@ -1915,6 +1915,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     fgt->delAllCitta();
     //此处只剩下法宝符文未散功了！！
     fgt->SSDismissAll(true);
+    fgt->SGDismissAll(true);
     player->sendFighterSSListWithNoSkill();
     fgt->dismissXingchen();
     fgt->dismissXinMo();
@@ -1925,7 +1926,6 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     JobHunter* jobHunter = player->getJobHunter();
     if (jobHunter)
         jobHunter->AddToFighterList(fdr._fgtid);
-    fgt->SGDismissAll(true);
 }
 
 void OnFighterRegenReq( GameMsgHdr& hdr, FighterRegenReq& frr )

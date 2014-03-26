@@ -705,6 +705,7 @@ struct DBSkillEv
     UInt8 lev;
     Int32 effect;
     UInt32 consume;
+    UInt8 needLev;
 };
 
 struct DBKeyinConfig
@@ -1692,11 +1693,12 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSkillEv)
-SPECIALDEF(3)
+SPECIALDEF(4)
 	(
     UInt8, lev,
     Int32, effect,
-    UInt32, consume
+    UInt32, consume,
+    UInt8, needLev
 	)
 SPECIALEND()
 

@@ -2276,7 +2276,7 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
         {
             GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sg->lvl);
             if(ev)
-                poingAdd *= 1.2;
+                poingAdd = ev->effect * 1.2;
         }
 
         return Script::BattleFormula::getCurrent()->calcSkillBattlePoint(sc, sl, type, ssl) + poingAdd;
@@ -7515,23 +7515,25 @@ void Fighter::SGradeManual(UInt16 skillId)
     UInt8 sgLevel;
     std::map<UInt16, SGrade>::iterator it = m_sg.find(sid);
     if(it != m_sg.end())
-    {
-        SGrade& sg = it->second;
-        sgLevel = sg.lvl;
-        if(sgLevel >= GData::skillEvData.getSkillEvSize() - 1)
-        {
-            _owner->sendMsgCode(0, 1361);
-            return;
-        }
-    }
+        sgLevel = it->second.lvl;
     else
-    {
         sgLevel = 0;
-    }
 
+    UInt8 maxCnt = GData::skillEvData.getSkillEvSize() - 1;
+    if(sgLevel >= maxCnt)
+    {
+        _owner->sendMsgCode(0, 1361);
+        return;
+    }
     GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sgLevel);
     if(!ev)
         return;
+    if(_owner->GetLev() < ev->needLev)
+    {
+        _owner->sendMsgCode(0, 4016);
+        return;
+    }
+
     UInt32 sgMoney = _owner->GetVar(VAR_SKILL_GRADE_MONEY);
     UInt32 consume = ev->consume;
     if(sgMoney < consume)
@@ -7577,7 +7579,7 @@ void Fighter::SGradeAuto(UInt16 skillId)
     else
         sgLevel = 0;
 
-    UInt8 maxCnt = GData::skillEvData.getSkillEvSize();
+    UInt8 maxCnt = GData::skillEvData.getSkillEvSize() - 1;
     if(sgLevel >= maxCnt)
     {
         _owner->sendMsgCode(0, 1361);
@@ -7592,11 +7594,18 @@ void Fighter::SGradeAuto(UInt16 skillId)
     UInt32 totalConsume = 0;
     UInt32 moneyTmp = sgMoney;
     UInt8 realCnt;
+    UInt8 playerLev = _owner->GetLev();
+    UInt8 flag = 0;
     for(realCnt = 0; realCnt < canCnt; realCnt++)
     {
         GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sgLevel + realCnt);
         if(!ev)
             break;
+        if(playerLev < ev->needLev)
+        {
+            flag = 1;
+            break;
+        }
         UInt32 consume = ev->consume;
         if(moneyTmp < consume)
             break;
@@ -7604,10 +7613,13 @@ void Fighter::SGradeAuto(UInt16 skillId)
         totalConsume += consume;
     }
 
-    if(realCnt == 0 || realCnt < canCnt)
+    if(flag == 1)
+    {
+        _owner->sendMsgCode(0, 4016);
+    }
+    else if(realCnt == 0 || realCnt < canCnt)
     {
         _owner->sendMsgCode(0, 4015);
-        //return;
     }
 
     if(sgMoney > totalConsume)

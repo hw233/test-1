@@ -2920,7 +2920,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBSkillEv dbskillev;
-		if(execu->Prepare("SELECT `lev`, `effect`, `consume` FROM `skill_ev`", dbskillev) != DB::DB_OK)
+		if(execu->Prepare("SELECT `lev`, `effect`, `consume`, `needLev` FROM `skill_ev`", dbskillev) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
@@ -2928,6 +2928,7 @@ namespace GData
             SkillEvData::stSkillEv skillEv;
             skillEv.effect = dbskillev.effect;
             skillEv.consume = dbskillev.consume;
+            skillEv.needLev = dbskillev.needLev;
             GData::skillEvData.setSkillEvData(dbskillev.lev, skillEv);
         }
         return true;

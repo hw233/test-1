@@ -3039,6 +3039,7 @@ namespace GObject
         void do_sh_fighter_attr2(Fighter* fgt, UInt32 oldId);
         void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
         void do_fighter_xinmo(Fighter* fgt, UInt32 oldId);
+        void do_skill_grade(Fighter* fgt, UInt32 oldId);
 	};
 
 

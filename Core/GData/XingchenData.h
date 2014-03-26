@@ -68,7 +68,8 @@ class SkillEvData
         {
             Int32 effect;
             UInt32 consume;
-            stSkillEv() : effect(0), consume(0) {}
+            UInt8 needLev;
+            stSkillEv() : effect(0), consume(0), needLev(0) {}
         };
     private:
         std::map<UInt8, stSkillEv> _skillEv;
