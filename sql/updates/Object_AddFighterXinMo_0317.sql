@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS `fighter_xinmo`;
 CREATE TABLE IF NOT EXISTS `fighter_xinmo` (
     `fighterId` int(10) unsigned NOT NULL,
     `playerId` bigint(20) unsigned NOT NULL,
