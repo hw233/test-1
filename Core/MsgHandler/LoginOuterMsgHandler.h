@@ -3299,6 +3299,7 @@ inline bool clan_enum_0(GObject::Clan *clan, int)
 inline bool clan_enum_1(GObject::Clan *clan, int)
 {
    clan->ClearTYSSScore();
+   clan->SetTYSSSum(0,true);
    return true;
 }
 
@@ -3444,7 +3445,7 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME1, 0);
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME2, 0);
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME3, 0);
-                pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_CLAN_SUM, 0);
+                //pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_CLAN_SUM, 0);
                 GameMsgHdr hdr(0x201, WORKER_THREAD_WORLD, pl, 0);
                 GLOBAL().PushMsg(hdr, NULL);
             }

@@ -261,7 +261,7 @@ void ClanItemPkg::GetItems(Player* player)
 Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	GObjectBaseT<Clan>(id), _name(name), _rank(0), _level(lvl), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
-    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0)
+    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0), _tyssSum(0)
 {
     _itemPkg.Init(_id, 0, GData::clanLvlTable.getPkgSize(_level));
 
@@ -833,12 +833,7 @@ bool Clan::handoverLeader(Player * leader, UInt64 pid)
 	DB5().PushUpdateData("UPDATE `clan` SET `leader` = %" I64_FMT "u WHERE `id` = %u", pid, _id);
 	// updateRank(cmLeader, cmLeader->player->getName());
 	setLeaderId(pid);
-    if(World::getTYSSTime())
-    {
-        cmPlayer->player->SetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM , leader->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM));
-        leader->DelVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
-    }
-
+    
 	return true;
 }
 

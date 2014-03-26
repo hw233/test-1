@@ -730,6 +730,19 @@ public:
 
     void SetDuoBaoAward(UInt32 itemId) { _duoBaoAward = itemId; }
     UInt32 GetDuoBaoAward() {return _duoBaoAward;}
+    
+    void SetTYSSSum(UInt32 num,bool toDB=false) 
+    {
+        _tyssSum= num; 
+        if (toDB)
+            DB5().PushUpdateData("UPDATE `clan` SET `tyssSum` = %u WHERE `id` = %u", _tyssSum, _id);
+    }
+    UInt32 GetTYSSSum() {return _tyssSum;}
+    void AddTYSSSum(UInt32 num)
+    {
+        _tyssSum += num; 
+        DB5().PushUpdateData("UPDATE `clan` SET `tyssSum` = %u WHERE `id` = %u", _tyssSum, _id);
+    }
 
 public:
 	ClanMember * getClanMember(Player *);
@@ -824,6 +837,7 @@ private:
     UInt32 _gongxian;
     UInt8 _urge[3];
     UInt32 _duoBaoAward;
+    UInt32 _tyssSum;
 
     ClanSpiritTree m_spiritTree;
 public:

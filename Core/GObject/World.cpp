@@ -3231,7 +3231,7 @@ inline bool clan_enum_grade(GObject::Clan *clan,int)
         GObject::Player* pl = clan->getLeader();
         if(!pl)
             return true;
-        UInt32 grade = pl->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+        UInt32 grade = clan->GetTYSSSum();
         if(grade)
         {
             ClanSort s;
