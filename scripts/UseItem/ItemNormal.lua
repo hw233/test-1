@@ -9306,6 +9306,36 @@ function ItemNormal_00016000(iid, num, bind, param)
     return num
 end
 
+function ItemNormal_00016003(iid, num, bind, param)
+    local player = GetPlayer()
+	local fgt = player:findFighter(param);
+    local mainFgt = player:getMainFighter();
+    local package = player:GetPackage();
+	if fgt == nil or fgt == mainFgt then
+		return false;
+	end
+
+    if fgt:isExpFull() then
+        player:sendMsgCode(2, 1070, 0);
+        return false
+    end
+
+    local exp = fgt:getExp()
+    local expbak = exp
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        exp = exp + 5000000000
+        if exp >= fgt:getExpMax() then
+            break
+        end
+    end
+
+	fgt:addExp(exp - expbak);
+    package:DelItemSendMsg(iid, player);
+    return n
+end
+
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -13234,6 +13264,7 @@ local ItemNormal_Table = {
     [16000] = ItemNormal_00016000,
     [16001] = ItemNormal_00016000,
     [16002] = ItemNormal_00016000,
+    [16003] = ItemNormal_00016003,
 
     [9494] = ItemNormal_00009494,
     [9480] = ItemNormal_0009480,

@@ -1,7 +1,7 @@
 sysMsg:set(10, 0x20, "[p:%u:%s] 招募了散仙 [f:%u:%s]")
 sysMsg:set(11, 0x20, "[p:%u:%s] 解雇了散仙 [f:%u:%s]")
 
-sysMsg:set(100, 0x35, "获得经验值%u")
+sysMsg:set(100, 0x35, "获得经验值%llu")
 sysMsg:set(101, 0x35, "升到了%u级")
 sysMsg:set(102, 0x35, "获得了[4:%u]x%u")
 sysMsg:set(103, 0x35, "获得了[4:%u]")
@@ -99,7 +99,7 @@ sysMsg:set(194, 0x35, "获得镇魔值%u")
 sysMsg:set(195, 0x35, "获得玄天瑞露%u")
 sysMsg:set(196, 0x35, "消耗玄天瑞露%u")
 
-sysMsg:set(1000, 1, "[f:%u:%s]获得经验值%u")
+sysMsg:set(1000, 1, "[f:%u:%s]获得经验值%llu")
 sysMsg:set(1001, 1, "[f:%u:%s]升级了，等级提升到了%u")
 sysMsg:set(1002, 1, "您获得了[4:%u]x%u")
 sysMsg:set(1003, 1, "您获得了[4:%u]")
@@ -1361,8 +1361,8 @@ sysMsg:set(5127, 0x35, "恭喜你征服了一处混沌魔域！")
 sysMsg:set(5128, 0x27, "[p:%u:%s]大显神威，征服了一处混沌魔域，再写蜀山传奇！");
 sysMsg:set(5130, 0x35, "邀请发送成功")
 
-sysMsg:set(6000, 0x35, "获得经验值%u\n御剑特权体验额外经验%u")
-sysMsg:set(6001, 1, "[f:%u:%s]获得经验值%u\n御剑特权体验额外经验%u")
+sysMsg:set(6000, 0x35, "获得经验值%llu\n御剑特权体验额外经验%u")
+sysMsg:set(6001, 1, "[f:%u:%s]获得经验值%llu\n御剑特权体验额外经验%u")
 sysMsg:set(6002, 0x35, "[f:%u:%s]获得修为值%u\n御剑特权体验额外修为%u")
 sysMsg:set(6003, 1, "[f:%u:%s]获得修为值%u\n御剑特权体验额外修为%u")
 
