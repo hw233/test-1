@@ -29475,7 +29475,7 @@ void Player::BuyLeftPower()
             sendMsgCode(0, 1100);
             return ;
         }
-        ConsumeInfo ci(TianjieTask, 0, 0);
+        ConsumeInfo ci(BuyPower, 0, 0);
         useTael(1000, &ci);
     }
     if(buyCount == 1)
@@ -29485,7 +29485,7 @@ void Player::BuyLeftPower()
             sendMsgCode(0, 1104);
             return ;
         }
-        ConsumeInfo ci(TianjieTask, 0, 0);
+        ConsumeInfo ci(BuyPower, 0, 0);
         useGold(5, &ci);
     }
     SetVar(VAR_LEFTADDR_POWER_ADD , buyCount + 1 );
