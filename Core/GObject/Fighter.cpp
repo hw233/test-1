@@ -7529,7 +7529,7 @@ void Fighter::SGradeManual(UInt16 skillId)
     if(skill->cond != GData::SKILL_PEERLESS && skill->cond != GData::SKILL_ACTIVE)
         return;
     UInt16 sid = SKILL_ID(skillId);
-    if(sid == 12 || sid == 16)
+    if(sid == 12 || sid == 16 || sid == 73)
         return;
 
     UInt8 sgLevel;
@@ -7595,7 +7595,7 @@ void Fighter::SGradeAuto(UInt16 skillId)
     if(skill->cond != GData::SKILL_PEERLESS && skill->cond != GData::SKILL_ACTIVE)
         return;
     UInt16 sid = SKILL_ID(skillId);
-    if(sid == 12 || sid == 16)
+    if(sid == 12 || sid == 16 || sid == 73)
         return;
 
     UInt8 sgLevel;
