@@ -9288,14 +9288,16 @@ function ItemNormal_00016000(iid, num, bind, param)
         player:sendMsgCode(0, 1093, 80);
         return false
     end
-    if iid ~= 16000 and iid ~= 16001 then
+    if iid ~= 16000 and iid ~= 16001 and iid ~= 16002 then
         return false
     end
 
     local package = player:GetPackage();
     package:DelItemSendMsg(iid, player);
     local totalNum;
-    if iid == 16000 then
+    if iid == 16002 then
+        totalNum = num * 1000
+    else if iid == 16000 then
         totalNum = num * 15
     else
         totalNum = num * 100
@@ -13231,6 +13233,7 @@ local ItemNormal_Table = {
 
     [16000] = ItemNormal_00016000,
     [16001] = ItemNormal_00016000,
+    [16002] = ItemNormal_00016000,
 
     [9494] = ItemNormal_00009494,
     [9480] = ItemNormal_0009480,

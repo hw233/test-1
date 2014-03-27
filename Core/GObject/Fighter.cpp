@@ -3248,7 +3248,10 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     else
     {
         if (_owner && writedb)
+        {
             _owner->sendFighterSSListWithNoSkill();
+            _owner->sendFighterSGListWithNoSkill();
+        }
     }
 }
 
@@ -3551,7 +3554,10 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
 
         SSSendSSInfo(skill);
         if(_owner && writedb)
+        {
             _owner->sendFighterSSListWithNoSkill();
+            _owner->sendFighterSGListWithNoSkill();
+        }
     }
     else
     {
@@ -3567,7 +3573,10 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
                 ret = true;
             }
             if(_owner && writedb)
+            {
                 _owner->sendFighterSSListWithNoSkill();
+                _owner->sendFighterSGListWithNoSkill();
+            }
         }
         else
         { // upgrade
@@ -3619,7 +3628,10 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     _skillBPDirty = true;
     sendModification(0x2a, 0, i, writedb);
     if(_owner && writedb)
+    {
         _owner->sendFighterSSListWithNoSkill();
+        _owner->sendFighterSGListWithNoSkill();
+    }
 #else
     _skill[idx] = 0;
     sendModification(0x2a, 0, idx, writedb);
@@ -6188,7 +6200,10 @@ void Fighter::PeerlessSSNotify(UInt16 id, bool writedb)
     SSNotify(id, it->second);
 
     if(_owner && writedb)
+    {
         _owner->sendFighterSSListWithNoSkill();
+        _owner->sendFighterSGListWithNoSkill();
+    }
 }
 
 void Fighter::SSDeleteDB(UInt16 id)
@@ -7508,10 +7523,15 @@ void Fighter::SGradeManual(UInt16 skillId)
         return;
     if(_owner->GetLev() < 85)
         return;
-    if(hasSkill(skillId) < 0 && hasPeerless(skillId) < 0)
+    const GData::SkillBase* skill = GData::skillManager[skillId];
+    if(!skill)
+        return;
+    if(skill->cond != GData::SKILL_PEERLESS && skill->cond != GData::SKILL_ACTIVE)
+        return;
+    UInt16 sid = SKILL_ID(skillId);
+    if(sid == 12 || sid == 16)
         return;
 
-    UInt16 sid = SKILL_ID(skillId);
     UInt8 sgLevel;
     std::map<UInt16, SGrade>::iterator it = m_sg.find(sid);
     if(it != m_sg.end())
@@ -7568,10 +7588,15 @@ void Fighter::SGradeAuto(UInt16 skillId)
         return;
     if(_owner->GetLev() < 85)
         return;
-    if(hasSkill(skillId) < 0 && hasPeerless(skillId) < 0)
+    const GData::SkillBase* skill = GData::skillManager[skillId];
+    if(!skill)
+        return;
+    if(skill->cond != GData::SKILL_PEERLESS && skill->cond != GData::SKILL_ACTIVE)
+        return;
+    UInt16 sid = SKILL_ID(skillId);
+    if(sid == 12 || sid == 16)
         return;
 
-    UInt16 sid = SKILL_ID(skillId);
     UInt8 sgLevel;
     std::map<UInt16, SGrade>::iterator it = m_sg.find(sid);
     if(it != m_sg.end())
@@ -7802,13 +7827,15 @@ void Fighter::SGDismiss(UInt16 skillid, bool isDel, Mail * mail)
             sgExp += ev->consume;
     }
     sgExp *= 0.6;
-    if(sgExp < 100)
+    if(sgExp < 15)
         return;
-    UInt16 sgCount1 = sgExp / 300;
-    sgExp = sgExp % 300;
-    UInt16 sgCount2 = sgExp / 100;
+    UInt16 sgCount = sgExp / 1000;
+    sgExp = sgExp % 1000;
+    UInt16 sgCount1 = sgExp / 100;
+    sgExp = sgExp % 100;
+    UInt16 sgCount2 = sgExp / 15;
 
-    MailPackage::MailItem sgmitem[2] = {{16000, sgCount1}, {16001, sgCount2}};
+    MailPackage::MailItem sgmitem[3] = {{16002, sgCount}, {16001, sgCount1}, {16000, sgCount2}};
     if(!mail)
     {
         const GData::SkillBase* skill = GData::skillManager[skillid];
@@ -7816,18 +7843,26 @@ void Fighter::SGDismiss(UInt16 skillid, bool isDel, Mail * mail)
         StringTokenizer sk(skill->getName(), "LV");
         SYSMSG(title, 2031);
         SYSMSGV(content, 2032, getLevel(), getColor(), getName().c_str(), sk[0].c_str());
-        MailItemsInfo itemsInfo(sgmitem, DismissCitta, 2);
+        MailItemsInfo itemsInfo(sgmitem, DismissCitta, 3);
         mail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
     }
-    else
+    if(mail)
     {
-        mailPackageManager.push(mail->id, sgmitem, 2, true);
+        mailPackageManager.push(mail->id, sgmitem, 3, true);
     }
+
     sg.lvl = 0;
     if(!isDel)
     {
         SGDeleteDB(sid);
         _owner->sendFighterSGListWithNoSkill();
+
+        Stream st(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(15);
+        st << getId();
+        st << skillid;
+        st << Stream::eos;
+        _owner->send(st);
     }
 }
 

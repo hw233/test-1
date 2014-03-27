@@ -1917,6 +1917,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     fgt->SSDismissAll(true);
     fgt->SGDismissAll(true);
     player->sendFighterSSListWithNoSkill();
+    player->sendFighterSGListWithNoSkill();
     fgt->dismissXingchen();
     fgt->dismissXinMo();
 	delete fgt;
