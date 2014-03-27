@@ -5500,7 +5500,10 @@ void Clan::SendTYSSScore(Player* pl)
         st << it->player->getId();
         st << static_cast<UInt32>(it->score);
         if(it->player->getClan() == NULL)
+        {
+            ++it;
             continue;
+        }
         st << static_cast<UInt8>(it->player->getClan()->getClanRank(it->player));
         ++it;
         ++count;
