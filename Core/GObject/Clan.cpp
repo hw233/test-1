@@ -618,7 +618,7 @@ bool Clan::kick(Player * player, UInt64 pid)
 	}
 
     DelDuoBaoScore(kicker);
-    DelTYSSScore(player);
+    DelTYSSScore(kicker);
 	_members.erase(found);
 	delete member;
     if(World::get11Time())
