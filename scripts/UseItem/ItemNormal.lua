@@ -9346,6 +9346,8 @@ function ItemNormal_00010257(iid, num, bind, param)
 
     package:DelItemSendMsg(iid, player);
     return num;
+end
+
 function ItemNormal_00016000(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 75 then
