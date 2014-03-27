@@ -2616,6 +2616,8 @@ namespace GObject
         float getClanBuildingPhyAtkEffect();
         float getClanBuildingMagAtkEffect();
         float getClanBuildingActionEffect();
+        float getClanBuildingPhyDefEffect();
+        float getClanBuildingMagDefEffect();
 
         // 所有将互斥法宝
         bool checkTrumpMutually(UInt32 trumpid);

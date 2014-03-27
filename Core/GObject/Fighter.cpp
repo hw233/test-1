@@ -7562,7 +7562,6 @@ void Fighter::SGradeManual(UInt16 skillId)
         return;
     }
 
-    //_owner->SetVar(VAR_SKILL_GRADE_MONEY, sgMoney - consume);
     ConsumeInfo ci(SkillGrade, 0, 0);
     _owner->useXuanTianNingLu(consume, &ci);
     ++sgLevel;

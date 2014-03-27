@@ -136,6 +136,7 @@ enum PurchaseType
     QSBAddTime                  = 125, //七石板加时
     TuPoJieXian                 = 126, //星辰图突破界限
     ServerWarConsume            = 127, //仙界传奇消费
+
     RestStep                    = 1001, //七石板重置
     ZhengHun                    = 1002, //征婚
     JieHun                      = 1003, //结婚 
@@ -156,7 +157,8 @@ enum PurchaseType
     RefreshMoBaoAward           = 1019, //刷新墨宝奖励
     BuyLingGuo                  = 1020, //购买灵果
     BuyTYSSLim                  = 1021, //天元神兽限购礼包
-    SkillGrade                  = 1022, //技能升阶
+    BuyPower                    = 1022, //购买仙界体力
+    SkillGrade                  = 1023, //技能升阶
     //繁体私有占150～200
 };
 
