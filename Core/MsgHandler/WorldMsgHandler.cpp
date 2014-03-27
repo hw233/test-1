@@ -132,6 +132,7 @@ MSG_REG_2(GameMsgHdr, 0x19D, OnAthleticsOver);
 MSG_REG_2(GameMsgHdr, 0x19E, OnAthleticsEnter);
 MSG_REG_2(GameMsgHdr, 0x19F, OnAthleticsAndClanNotify);
 
+MSG_REG_2(GameMsgHdr, 0x1A0, OnDoTableInWorld);
 MSG_REG_2(GameMsgHdr, 0x1A1, OnAddTradeCheckNotify);
 MSG_REG_2(GameMsgHdr, 0x1A2, OnDelTradeCheckNotify);
 
