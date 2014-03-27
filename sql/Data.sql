@@ -1070,6 +1070,7 @@ CREATE TABLE `ride` (
     `chips` varchar(255) NOT NULL DEFAULT '',
     `propId` int(10) unsigned NOT NULL,
     `show` tinyint(3) unsigned NOT NULL,
+    `useMore` tinyint(3) unsigned NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
