@@ -1950,7 +1950,8 @@ void ServerWarMgr::updateBattlePoint(BinaryReader& brd)
     int cid = 0, sid = 0;
     UInt64 pid = 0;
     UInt32 battlePoint = 0, battlePoint1 = 0;
-    brd >> cid >> sid >> pid >> battlePoint >> battlePoint1;
+    std::string name;
+    brd >> cid >> sid >> pid >> battlePoint >> battlePoint1 >> name;
 
     for(UInt8 i = 0; i < SWAR_ENTERED_MAX-1; ++ i)
     {
@@ -1968,6 +1969,7 @@ void ServerWarMgr::updateBattlePoint(BinaryReader& brd)
                 {
                     PlayerInfo pInfo = *it;
                     pInfo.battlePoint = battlePoint1;
+                    pInfo.name = name;
                     pp.pInfoSet.erase(it);
                     pp.pInfoSet.insert(pInfo);
                     break;
@@ -1992,6 +1994,7 @@ void ServerWarMgr::updateBattlePoint(BinaryReader& brd)
                     {
                         PlayerInfo pInfo = *it;
                         pInfo.battlePoint = battlePoint1;
+                        pInfo.name = name;
                         _finals[i][j].pInfoSet.erase(it);
                         _finals[i][j].pInfoSet.insert(pInfo);
                         break;
