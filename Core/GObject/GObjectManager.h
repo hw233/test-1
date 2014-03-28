@@ -362,6 +362,14 @@ namespace GObject
             return 0;
         }
 
+        stZhyExtraAttr * getExtraAttr(UInt16 attrId)
+        {
+            std::map<UInt16, stZhyExtraAttr>::iterator it = extraAttrMax.find(attrId);
+            if(it == extraAttrMax.end())
+                return NULL;
+            return &(it->second);
+        }
+
         float getExtraAttrMax(UInt16 attrId)
         {
             std::map<UInt16, stZhyExtraAttr>::iterator it = extraAttrMax.find(attrId);
@@ -468,6 +476,7 @@ namespace GObject
         static bool loadLingbaoSmelt();
         static bool fixItem9383Leader();
         static bool loadPetEquipAttr();
+	    static bool loadZhenyuanAttr();
         static bool loadFairySpar();
         static bool loadCollectCard();
         //static bool loadSanHun();

@@ -803,7 +803,7 @@ void GMHandler::OnAddItem(GObject::Player * player, std::vector<std::string>& ar
         else if(IsPetEquipTypeId(itemId))
 			player->GetPetPackage()->AddRandomPetEq(0, itemId);
         else if(IsZhenYuanItem(itemId))
-			player->GetPetPackage()->AddZhenYuan(itemId, false, true);
+			player->GetPackage()->AddZhenYuan(itemId, false, true);
 		else
 		{
 			++ i;
@@ -827,7 +827,7 @@ void GMHandler::OnAddItemB(GObject::Player * player, std::vector<std::string>& a
         else if(IsPetEquipTypeId(itemId))
 			player->GetPetPackage()->AddRandomPetEq(0, itemId);
         else if(IsZhenYuanItem(itemId))
-			player->GetPetPackage()->AddZhenYuan(itemId, true, true);
+			player->GetPackage()->AddZhenYuan(itemId, true, true);
 		else
 		{
 			++ i;

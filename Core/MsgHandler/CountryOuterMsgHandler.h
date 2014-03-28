@@ -8280,15 +8280,21 @@ void OnZhenyuanReq(GameMsgHdr& hdr, const void * data)
     brd >> type;
     switch(type)
     {
-        case 0x01:
+        case 0x11:
             {
-                UInt8 index = 0;
                 UInt32 zhyId = 0;
-                brd >> index >> zhyId;
-                player->setZhenyuan(index, zhyId);
+                brd >> zhyId;
+                player->setZhenyuan(zhyId);
             }
             break;
-        case 0x02:
+        case 0x12:
+            {
+                UInt32 zhyId = 0;
+                brd >> zhyId;
+                player->takedownZhenyuan(zhyId);
+            }
+            break;
+        case 0x13:
             {
                 UInt8 cnt = 0;
                 brd >> cnt;

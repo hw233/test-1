@@ -206,6 +206,10 @@ namespace GObject
 		execu->Extract("SELECT max(`id`) FROM `equipment`", maxId);
         if(maxItemId > maxId)
             maxId = maxItemId;
+        maxItemId = 0;
+		execu->Extract("SELECT max(`id`) FROM `zhenyuanAttr`", maxItemId);
+        if(maxItemId > maxId)
+            maxId = maxItemId;
 		IDGenerator::gItemOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`tradeId`) FROM `trade`", maxId);
 		IDGenerator::gTradeOidGenerator.Init(maxId);
@@ -273,6 +277,11 @@ namespace GObject
         if(!loadPetEquipAttr())
         {
             fprintf(stderr, "loadPetEquipAttr error!\n");
+            std::abort();
+        }
+        if(!loadZhenyuanAttr())
+        {
+            fprintf(stderr, "loadZhenyuanAttr error!\n");
             std::abort();
         }
 		if(!loadEquipmentsSpirit())
@@ -1635,7 +1644,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -1910,6 +1919,16 @@ namespace GObject
                 for(size_t idx = 0; idx < count; ++ idx)
                 {
                     pl->addNewFormation(atoi(tk[idx].c_str()));
+                }
+            }
+            if (dbpd.zhenyuans.length())
+            {
+				StringTokenizer tk(dbpd.zhenyuans, ",");
+				size_t count = tk.count();
+                for(size_t idx = 0; idx < count && idx < 12; ++ idx)
+                {
+                    ItemZhenyuan * zhenyuan = static_cast<ItemZhenyuan *>(fetchEquipment(atoi(tk[idx].c_str())));
+                    pl->setZhenyuan(zhenyuan, idx/3, idx%3, false);
                 }
             }
 
@@ -2381,6 +2400,8 @@ namespace GObject
 				pl->GetPetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
             else if (!IsEquipId(idata.id))
 				pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
+			else
+				pl->GetPackage()->AddEquipFromDB(idata.id, idata.bindType != 0);
 #else
             if (IsPetItem(idata.id))
 				pl->GetPetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
@@ -2411,8 +2432,6 @@ namespace GObject
                 }
             }
 #endif
-			else
-				pl->GetPackage()->AddEquipFromDB(idata.id, idata.bindType != 0);
 		}
 		lc.finalize();
 
@@ -6863,6 +6882,51 @@ namespace GObject
                 eqa.gems[2] = dbeqa.socket3;
                 eqa.gems[3] = dbeqa.socket4;
 			}
+		}
+		lc.finalize();
+
+		return true;
+    }
+
+	bool GObjectManager::loadZhenyuanAttr()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading zhenyuan attr:");
+        DBZhenyuanAttr dbzhya;
+        if(execu->Prepare("SELECT `id`, `itemId`, `zycolor`, `types`, `values` FROM `zhenyuanAttr`", dbzhya) != DB::DB_OK)
+            return false;
+
+        lc.reset(2000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            const GData::ItemBaseType * itype = GData::itemBaseTypeManager[dbzhya.itemId];
+            if(itype == NULL)
+                continue;
+            StringTokenizer tkt(dbzhya.types, ",");
+            StringTokenizer tkv(dbzhya.values, ",");
+            if(tkt.count() < 6 || tkv.count() < 6)
+                continue;
+            ItemZhenyuanAttr zyattr;
+            zyattr.color = dbzhya.zycolor;
+            for(UInt8 i = 0; i < tkt.count(); ++ i)
+            {
+                if(i < 4)
+                {
+                    zyattr.type[i] = ::atoi(tkt[i].c_str());
+                    zyattr.value[i] = ::atoi(tkv[i].c_str());
+                }
+                else if(i < 6)
+                {
+                    zyattr.typeExtra[i-4] = ::atoi(tkt[i].c_str());
+                    zyattr.valueExtra[i-4] = ::atoi(tkv[i].c_str());
+                }
+            }
+            ItemEquipData itemEquipData;
+            ItemZhenyuan * zhenyuan = new ItemZhenyuan(dbzhya.id, itype, itemEquipData, zyattr);
+            pushEquipment(static_cast<ItemEquip *>(zhenyuan));
 		}
 		lc.finalize();
 

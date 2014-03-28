@@ -314,7 +314,7 @@ namespace GObject
 	    ItemBase* AddZhenYuanN(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere = 0);
 	    ItemBase* AddZhenYuanFromDB(UInt32 id, bool bind);
 	    ItemBase* AddZhenYuan(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere = 0);
-	    UInt8 MergeZhenyuan(UInt32* zhyIds, UInt8 count);
+	    void MergeZhenyuan(UInt32* zhyIds, UInt8 count);
     protected:
 		typedef std::map<ItemKey, ItemBase *> ItemCont;
 		typedef ItemCont::iterator item_elem_iter;

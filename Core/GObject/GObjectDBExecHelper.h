@@ -230,6 +230,7 @@ struct DBPlayerData
 	std::string fyamen;
     std::string clantask;
     std::string formations;
+    std::string zhenyuans;
     std::string atohicfg;
     std::string openid;
     std::string canHirePet;
@@ -1548,6 +1549,16 @@ struct DBClanBuildings
     UInt16 oracleLevel;
     UInt16 updateTime;
 };
+
+struct DBZhenyuanAttr
+{
+    UInt32 id;
+    UInt32 itemId;
+    UInt8  zycolor;
+    std::string types;
+    std::string values;
+};
+
 }
 
 namespace DB {
@@ -1622,7 +1633,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(60)
+SPECIALDEF(61)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1674,6 +1685,7 @@ SPECIALDEF(60)
 	UInt8, pdata.frontGoldCnt,
 	UInt32, pdata.frontUpdate,
     std::string, formations,
+    std::string, zhenyuans,
     std::string, atohicfg,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
@@ -3502,6 +3514,18 @@ SPECIALDEF(8)
     UInt16, updateTime
     )
 SPECIALEND()
+
+SPECIALBEGIN (GObject::DBZhenyuanAttr)
+SPECIALDEF(5)
+    (
+    UInt32, id,
+    UInt32, itemId,
+    UInt8,  zycolor,
+    std::string, types,
+    std::string, values
+    )
+SPECIALEND()
+
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

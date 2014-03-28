@@ -8020,22 +8020,6 @@ namespace GObject
                 zhenyuan->SetBindStatus(bind);
                 AddEquip2(static_cast<ItemEquip *>(zhenyuan));
                 DB4().PushUpdateData("REPLACE INTO `zhenyuanAttr`(`id`, `itemId`, `zycolor`, `types`, `values`) VALUES(%u, %u, %u, '%s', '%s')", id, itype->getId(), zyattr.color, strType.c_str(), strValue.c_str());
-                /*
-                ItemBase *& e = m_Items[ItemKey(zhenyuan->getId())];
-                if(e == NULL)
-                    ++ m_Size;
-                e = zhenyuan;
-                OnAddEquipAndCheckAttainment(& (zhenyuan->GetItemType() ),  FromWhere);
-                if(notify)
-                    ItemNotify(zhenyuan->GetItemType().getId(), 1);
-
-                DB4().PushUpdateData("REPLACE INTO `item` VALUES(%u, %u, %" I64_FMT "u, %d)", zhenyuan->getId(), 1, m_Owner->getId(), zhenyuan->GetBindStatus() ? 1 : 0);
-                DB4().PushUpdateData("REPLACE INTO `zhenyuanAttr`(`id`, `itemId`, `zycolor`, `types`, `values`) VALUES(%u, %u, %u, '%s', '%s')", id, itype->getId(), zyattr.color, strType.c_str(), strValue.c_str());
-                SendSingleZhenyuanData(zhenyuan);
-                //ItemNotifyEquip(equip);
-                //if(FromWhere != 0 && zhenyuan->getQuality() >= 4)
-                    DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), zhenyuan->GetItemType().getId(), zhenyuan->getId(), FromWhere, TimeUtil::Now());
-                */
                 return zhenyuan;
             }
             break;
@@ -8045,14 +8029,14 @@ namespace GObject
 		return NULL;
 	}
 
-	UInt8 Package::MergeZhenyuan(UInt32* zhyIds, UInt8 count)
+	void Package::MergeZhenyuan(UInt32* zhyIds, UInt8 count)
 	{   //阵元合成
         if(count > 3 || count < 2)
-            return 0;
+            return;
 		if(GetRestPackageSize() < 1)
 		{
 			m_Owner->sendMsgCode(0, 1011);
-			return 0;
+			return;
 		}
         bool binds[3] = { false };
 		ItemBase * items[3] = { NULL };
@@ -8062,26 +8046,26 @@ namespace GObject
             if(items[i] == NULL)
 		        items[i] = FindItem(zhyIds[i], false);
             if(items[i] == NULL)
-                return 0;
+                return;
             UInt32 typeId = items[i]->GetItemType().getId();
             if(!IsZhenYuanItem(typeId))
-                return 0;
+                return;
             if(items[i]->getReqLev() >= 130)
-                return 0;
+                return;
             binds[i] = items[i]->GetBindStatus();
         }
 
         if(items[0]->getReqLev() != items[1]->getReqLev())
-            return 0;
+            return;
         if(count == 3 && items[0]->getReqLev() != items[2]->getReqLev())
-            return 0;
+            return;
         UInt32 ogid = 0;
         if(count == 3)
             ogid = GData::GDataManager::GetZhenyuanTypeIdByLev((items[0]->getReqLev()-75)/5 + 1);
         else
             ogid = GData::GDataManager::GetZhenyuanTypeIdByLev((items[0]->getReqLev()-75)/5);
         if(!IsZhenYuanItem(ogid))
-            return 0;
+            return;
         bool bind = false;
         for(int i = 0; i < count; ++ i)
         {
@@ -8089,8 +8073,20 @@ namespace GObject
             if(binds[i] != bind)
                 bind = true;
         }
-	    AddZhenYuan(ogid, bind, false, FromZhenyuanMerge);
-		return 1;
+	    ItemBase * item = AddZhenYuan(ogid, bind, false, FromZhenyuanMerge);
+        if(item == NULL)
+            return;
+
+        Stream st(REP::ZHENYUAN_REQ);
+        st << static_cast<UInt8>(0x13) << count;
+        for(int i = 0; i < count; ++ i)
+        {
+            st << zhyIds[i];
+        }
+		st << ogid << item->getId();
+        static_cast<ItemZhenyuan *>(item)->getZhyAttr().appendAttrToStream(st);
+        st << Stream::eos;
+        m_Owner->send(st);
 	}
 
 

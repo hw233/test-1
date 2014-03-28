@@ -8361,50 +8361,317 @@ namespace GObject
         return true;
     }
 
-    void Player::setZhenyuan(UInt8 index, UInt32 zhyId)
+    void Player::setZhenyuan(UInt32 zhyId)
     {
-        if(index > 12) return;
         ItemBase * zhenyuan = GetPackage()->FindItem(zhyId, true);
         if(zhenyuan == NULL)
             zhenyuan = GetPackage()->FindItem(zhyId, false);
-        ItemBase * old = _playerData.zhenyuans[index];
-        if(old == zhenyuan)
+        if(NULL == zhenyuan)
             return;
-        UInt8 fcnt = getFullFormationCnt();
-        //if(zhenyuan && 
-        bool res = setZhenyuan(static_cast<ItemZhenyuan *>(zhenyuan), index);
-        Stream st(REP::ZHENYUAN_REQ);
-        st << static_cast<UInt8>(res ? 1 : 0);
-        st << Stream::eos;
-        send(st);
+        ItemClass subcls = zhenyuan->getClass();
+        if(!IsZhenYuan(subcls))
+            return;
+        if(getZhenyuanCnt() >= getFullFormationCnt())
+            return;
+        UInt8 index = subcls - Item_Formula6;
+        UInt8 idx = 0xFF, tmpcnt = 0;
+        for(int i = 0; i < 3; ++ i)
+        {
+            ItemZhenyuan * izy = _playerData.zhenyuans[index][i];
+            if(izy == zhenyuan)
+                return;
+            if(izy)
+                ++ tmpcnt;
+            else
+            {
+                idx = i;
+                break;
+            }
+        }
+        if(tmpcnt >= 3)
+            return;
+        bool res = setZhenyuan(static_cast<ItemZhenyuan *>(zhenyuan), index, idx);
+        if(res)
+        {
+            setLineupDirty();
+            Stream st(REP::ZHENYUAN_REQ);
+            st << static_cast<UInt8>(0x11) << zhyId;
+            st << Stream::eos;
+            send(st);
+        }
     }
 
-    bool Player::setZhenyuan(ItemZhenyuan * zhenyuan, UInt8 index, bool writedb)
+    bool Player::setZhenyuan(ItemZhenyuan * zhenyuan, UInt8 idx, UInt8 idx1, bool writedb)
     {
-        if(index > 12) return false;
-        if(_playerData.zhenyuans[index] == zhenyuan)
+        if(idx >= 4 || idx1 >= 3)
             return false;
-        if(_playerData.zhenyuans[index])
-            GetPackage()->AddExistEquip(static_cast<ItemEquip *>(_playerData.zhenyuans[index]));
-        _playerData.zhenyuans[index] = zhenyuan;
+        if(_playerData.zhenyuans[idx][idx1] == zhenyuan)
+            return false;
+        if(_playerData.zhenyuans[idx][idx1])
+            GetPackage()->AddExistEquip(static_cast<ItemEquip *>(_playerData.zhenyuans[idx][idx1]));
+        _playerData.zhenyuans[idx][idx1] = zhenyuan;
         if(writedb)
             updateZhenyuansToDB();
         return true;
     }
 
+    void Player::takedownZhenyuan(UInt32 zhyId)
+    {
+        bool find = false;
+        for(int i = 0; i < 4; ++ i)
+        {
+            for(int j = 0; j < 3; ++ j)
+            {
+                if(_playerData.zhenyuans[i][j] && _playerData.zhenyuans[i][j]->getId() == zhyId)
+                {
+                    setZhenyuan(NULL, i, j);
+                    find = true;
+                    break;
+                }
+            }
+        }
+        if(!find) return;
+        setLineupDirty();
+
+        Stream st(REP::ZHENYUAN_REQ);
+        st << static_cast<UInt8>(0x12) << zhyId;
+        st << Stream::eos;
+        send(st);
+    }
+
     void Player::updateZhenyuansToDB()
     {
         std::string str;
-        for(int i = 0; i < 12; ++ i)
+        for(int i = 0; i < 4; ++ i)
         {
-            if(_playerData.zhenyuans[i])
-                str += Itoa(_playerData.zhenyuans[i]->getId());
-            else
-                str += Itoa(0);
-            if(i < 11)
+            for(int j = 0; j < 3; ++ j)
+            {
+                if(_playerData.zhenyuans[i][j])
+                    str += Itoa(_playerData.zhenyuans[i][j]->getId());
+                else
+                    str += Itoa(0);
+                if(j < 2)
+                    str += ",";
+            }
+            if(i < 3)
                 str += ",";
         }
         DB1().PushUpdateData("UPDATE `player` SET `zhenyuans` = '%s' WHERE id = %"  I64_FMT  "u", str.c_str(), _id);
+    }
+
+    void Player::addZhenyuanAttr(GData::AttrExtra& ae, Fighter * fgt)
+    {
+        if(!fgt || fgt->isPet()) return;
+        UInt8 pos = 0xFF;
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            if(_playerData.lineup[i].fighter == fgt)
+                pos = _playerData.lineup[i].pos;
+        }
+        switch(pos)
+        {
+            case 6: //前1 后1 左1 右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0][0], fgt);   //前1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2][0], fgt);   //后1
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1][0], fgt);   //左1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3][0], fgt);   //右1
+                break;
+            case 7: //前2 后2 左1 右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0][1], fgt);   //前2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2][1], fgt);   //后2
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1][0], fgt);   //左1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3][0], fgt);   //右1
+                break;
+            case 8: //前3 后3 左1 右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0][2], fgt);   //前3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2][2], fgt);   //后3
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1][0], fgt);   //左1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3][0], fgt);   //右1
+                break;
+            case 11: //前1 后1 左2 右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0][0], fgt);   //前1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2][0], fgt);   //后1
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1][1], fgt);   //右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3][1], fgt);   //左2
+                break;
+            case 12: //前2 后2 左2 右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0][1], fgt);   //前2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2][1], fgt);   //后2
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1][1], fgt);   //右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3][1], fgt);   //左2
+                break;
+            case 13: //前3 后3 左2 右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0][2], fgt);   //前3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2][2], fgt);   //后3
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1][1], fgt);   //右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3][1], fgt);   //左2
+                break;
+            case 16: //前1 后1 左3 右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0][0], fgt);   //前1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2][0], fgt);   //后1
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1][2], fgt);   //右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3][2], fgt);   //左3
+                break;
+            case 17: //前2 后2 左3 右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0][1], fgt);   //前2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2][1], fgt);   //后2
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1][2], fgt);   //右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3][2], fgt);   //左3
+                break;
+            case 18: //前3 后3 左3 右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0][2], fgt);   //前3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2][2], fgt);   //后3
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1][2], fgt);   //右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3][2], fgt);   //左3
+                break;
+            default:
+                return;
+        }
+    }
+
+    void Player::addZhenyuanAttr(GData::AttrExtra& ae, ItemZhenyuan * zhenyuan, Fighter * fgt)
+    {
+        if(!zhenyuan || !fgt) return;
+        ItemZhenyuanAttr& zhyAttr = zhenyuan->getZhyAttr();
+        for(int i = 0; i < 4; ++ i)
+        {
+            switch(zhyAttr.type[i])
+            {
+            case 1:
+                ae.attack += zhyAttr.value[i];
+                break;
+            case 2:
+                ae.magatk += zhyAttr.value[i];
+                break;
+            case 3:
+                ae.defend += zhyAttr.value[i];
+                break;
+            case 4:
+                ae.magdef += zhyAttr.value[i];
+                break;
+            case 5:
+                ae.hp += zhyAttr.value[i];
+                break;
+            case 6:
+                ae.toughlvl += zhyAttr.value[i];
+                break;
+            case 7:
+                ae.action += zhyAttr.value[i];
+                break;
+            case 8:
+                ae.hitrlvl += zhyAttr.value[i];
+                break;
+            case 9:
+                ae.evdlvl += zhyAttr.value[i];
+                break;
+            case 10:
+                ae.crilvl += zhyAttr.value[i];
+                break;
+            case 11:
+                ae.pirlvl += zhyAttr.value[i];
+                break;
+            case 12:
+                ae.counterlvl += zhyAttr.value[i];
+                break;
+            case 13:
+                ae.magres += zhyAttr.value[i];
+                break;
+            case 14:
+                ae.criticaldmgimmune += zhyAttr.value[i] / 100.0f;
+                break;
+            }
+        }
+        stZHYAttrConf& zhyAttrConf = GObjectManager::getZHYAttrConf();
+        for(int i = 0; i < 2; ++ i)
+        {
+            stZhyExtraAttr * zhyea = zhyAttrConf.getExtraAttr(zhyAttr.typeExtra[i]);
+            if(zhyea == NULL)
+                continue;
+            UInt8 type1 = zhyea->type1;
+            UInt8 type2 = zhyea->type2;
+            if(type1 == 1)  //全加
+            {
+                if(type2 == 1)  //力量
+                    ae.strength += zhyAttr.valueExtra[i];
+                else if(type2 == 2) //智力
+                    ae.intelligence += zhyAttr.valueExtra[i];
+                else if(type2 == 3) //耐力
+                    ae.physique += zhyAttr.valueExtra[i];
+                else if(type2 == 4) //敏捷
+                    ae.agility += zhyAttr.valueExtra[i];
+                else if(type2 == 5) //意志
+                    ae.will += zhyAttr.valueExtra[i];
+            }
+            else if(type1 == 2)  //儒加
+            {
+                if(fgt->getClass() != e_cls_ru)
+                    continue;
+                if(type2 == 1)  //力量
+                    ae.strength += zhyAttr.valueExtra[i];
+                else if(type2 == 2) //智力
+                    ae.intelligence += zhyAttr.valueExtra[i];
+                else if(type2 == 3) //耐力
+                    ae.physique += zhyAttr.valueExtra[i];
+                else if(type2 == 4) //敏捷
+                    ae.agility += zhyAttr.valueExtra[i];
+                else if(type2 == 5) //意志
+                    ae.will += zhyAttr.valueExtra[i];
+            }
+            else if(type1 == 3)  //释加
+            {
+                if(fgt->getClass() != e_cls_shi)
+                    continue;
+                if(type2 == 1)  //力量
+                    ae.strength += zhyAttr.valueExtra[i];
+                else if(type2 == 2) //智力
+                    ae.intelligence += zhyAttr.valueExtra[i];
+                else if(type2 == 3) //耐力
+                    ae.physique += zhyAttr.valueExtra[i];
+                else if(type2 == 4) //敏捷
+                    ae.agility += zhyAttr.valueExtra[i];
+                else if(type2 == 5) //意志
+                    ae.will += zhyAttr.valueExtra[i];
+            }
+            else if(type1 == 4)  //道加
+            {
+                if(fgt->getClass() != e_cls_dao)
+                    continue;
+                if(type2 == 1)  //力量
+                    ae.strength += zhyAttr.valueExtra[i];
+                else if(type2 == 2) //智力
+                    ae.intelligence += zhyAttr.valueExtra[i];
+                else if(type2 == 3) //耐力
+                    ae.physique += zhyAttr.valueExtra[i];
+                else if(type2 == 4) //敏捷
+                    ae.agility += zhyAttr.valueExtra[i];
+                else if(type2 == 5) //意志
+                    ae.will += zhyAttr.valueExtra[i];
+            }
+            else if(type1 == 5)  //墨加
+            {
+                if(fgt->getClass() != e_cls_mo)
+                    continue;
+                if(type2 == 1)  //力量
+                    ae.strength += zhyAttr.valueExtra[i];
+                else if(type2 == 2) //智力
+                    ae.intelligence += zhyAttr.valueExtra[i];
+                else if(type2 == 3) //耐力
+                    ae.physique += zhyAttr.valueExtra[i];
+                else if(type2 == 4) //敏捷
+                    ae.agility += zhyAttr.valueExtra[i];
+                else if(type2 == 5) //意志
+                    ae.will += zhyAttr.valueExtra[i];
+            }
+        }
     }
 
 	void Player::addTotalRecharge( UInt32 r )
@@ -29336,8 +29603,8 @@ void Player::sendXinMoInfo()
     st <<static_cast<UInt8>(0);
     st << GetVar(VAR_HEART_SWORD);
     std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
-    UInt8 cnt = _fighters.size() ;
-//  st << static_cast<UInt8>(cnt);
+    //UInt8 cnt = _fighters.size() ;
+    //st << static_cast<UInt8>(cnt);
     for (; it != _fighters.end(); ++it)
     {
         Fighter* fgt = it->second; // XXX: Fashion can not be enchanted
