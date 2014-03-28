@@ -17069,6 +17069,7 @@ namespace GObject
                 fgt->getAllUpSkillAndLevel(st);
                 fgt->getAllPSkillAndLevel4Arena(st);
                 fgt->getAllSSAndLevel(st);
+                fgt->getAllSGAndValue(st);
                 fgt->getAllLbSkills(st);
 
                 fgt->getAttrExtraEquip(st);
@@ -17094,6 +17095,7 @@ namespace GObject
             _onBattlePet->getAllUpSkillAndLevel(st);
             _onBattlePet->getAllPSkillAndLevel4Arena(st);
             _onBattlePet->getAllSSAndLevel(st);
+            _onBattlePet->getAllSGAndValue(st);
             _onBattlePet->getAllLbSkills(st);
 
             _onBattlePet->getAttrExtraEquip(st);
@@ -22155,6 +22157,60 @@ UInt8 Player::toQQGroup(bool isJoin)
         SetVar(VAR_SEVEN_SOUL_NUM, xianpo);
 
         return xianpo;
+    }
+
+    void Player::getXuanTianNingLuLua(UInt32 c)
+    {
+        IncommingInfo ii(XTYLFromUseItem, 0, 0);
+        getXuanTianNingLu(c, &ii);
+
+        Stream st(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(13);
+        st << GetVar(VAR_SKILL_GRADE_MONEY);
+        st << Stream::eos;
+        send(st);
+    }
+
+    UInt32 Player::getXuanTianNingLu(UInt32 c, IncommingInfo* ii)
+    {
+        UInt32 xtnl = GetVar(VAR_SKILL_GRADE_MONEY);
+		if(c == 0)
+			return xtnl;
+		xtnl += c;
+		SYSMSG_SENDV(195, this, c);
+		SYSMSG_SENDV(1069, this, c);
+        SetVar(VAR_SKILL_GRADE_MONEY, xtnl);
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_xtnl (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
+
+        return xtnl;
+	}
+
+	UInt32 Player::useXuanTianNingLu(UInt32 a, ConsumeInfo* ci)
+	{
+        UInt32 xtnl = GetVar(VAR_SKILL_GRADE_MONEY);
+        if(a == 0 || xtnl == 0)
+            return xtnl;
+        if(xtnl < a)
+            xtnl = 0;
+        else
+        {
+            xtnl -= a;
+            if(ci != NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_xtnl (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(196, this, a);
+        SYSMSG_SENDV(1070, this, a);
+        SetVar(VAR_SKILL_GRADE_MONEY, xtnl);
+
+        return xtnl;
     }
 
 void Player::getQQGameOnlineAward()
@@ -29294,7 +29350,7 @@ void Player::sendXinMoInfo()
     st <<static_cast<UInt8>(0);
     st << GetVar(VAR_HEART_SWORD);
     std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
-    UInt8 cnt = _fighters.size() ;
+    //UInt8 cnt = _fighters.size() ;
 //  st << static_cast<UInt8>(cnt);
     for (; it != _fighters.end(); ++it)
     {
@@ -29357,6 +29413,7 @@ UInt8 Player::useChangeSexCard()
     do_skill_strengthen(fgt, oldId);
     do_fighter_xingchen(fgt, oldId);
     do_fighter_xinmo(fgt, oldId);
+    do_skill_grade(fgt, oldId);
 
     struct _stTable
     {
@@ -29462,6 +29519,12 @@ void Player::do_fighter_xinmo(Fighter* fgt, UInt32 oldId)
 {
     DB1().PushUpdateData("UPDATE `fighter_xinmo` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
 }
+
+void Player::do_skill_grade(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `skill_grade` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
 void Player::BuyLeftPower()
 {
     UInt32 buyCount = GetVar(VAR_LEFTADDR_POWER_ADD);
@@ -29537,6 +29600,47 @@ void Player::AddFriendlyCount(Player * friender , UInt8 val)
     std::map<UInt64,UInt32 >::iterator it = _friendlyCount.find(friender->getId());
 }
 */
+
+	void Player::makeFighterSGList(Stream& st)
+	{
+		size_t c = _fighters.size();
+		st.init(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(10);
+        st << GetVar(VAR_SKILL_GRADE_MONEY);
+		st << static_cast<UInt8>(c);
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if(it->second)
+            {
+                it->second->makeFighterSGInfo(st);
+            }
+        }
+		st << Stream::eos;
+        send(st);
+	}
+
+    void Player::sendFighterSGListWithNoSkill()
+    {
+        Stream st;
+        makeFighterSGListWithNoSkill(st);
+		send(st);
+    }
+
+	void Player::makeFighterSGListWithNoSkill(Stream& st)
+    {
+		size_t c = _fighters.size();
+		st.init(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(14);
+		st << static_cast<UInt8>(c);
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if (it->second)
+            {
+                it->second->makeFighterSGInfoWithNoSkill(st);
+            }
+        }
+		st << Stream::eos;
+    }
 
 } // namespace GObject
 

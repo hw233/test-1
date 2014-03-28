@@ -1453,6 +1453,15 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         magatk += aura_factor * itemSkill->ef_value * (cs2 ? bf->calcCriticalDmg(area_target) : 1);
                 }
 
+                Int32 sg_v = bf->getSkillGradeExtraValue(SKILL_ID(skill->getId()));
+                if(sg_v != 0)
+                {
+                    if(bf->getClass() == e_cls_dao || bf->getClass() == e_cls_mo)
+                        atk += aura_factor * sg_v * (cs2 ? bf->calcCriticalDmg(area_target) : 1);
+                    else
+                        magatk += aura_factor * sg_v * (cs2 ? bf->calcCriticalDmg(area_target) : 1);
+                }
+
                 // 伤害提升
                 const GData::SkillStrengthenEffect* ef = NULL;
                 if(ss)
@@ -14388,11 +14397,12 @@ float BattleSimulator::calcTherapy(BattleFighter* bf, bool& isCritical, bool& fi
         }
     }
 
+    Int32 sg_v = bf->getSkillGradeExtraValue(SKILL_ID(skill->getId()));
     GData::LBSkillItem* item = bf->getSkillCondItem(SKILL_ID(skill->getId()));
     if(NULL != item)
-        return aura_factor * (getBFMagAtk(bf) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + item->ef_value);
+        return aura_factor * (getBFMagAtk(bf) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + item->ef_value + sg_v);
 
-    return aura_factor * (getBFMagAtk(bf) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
+    return aura_factor * (getBFMagAtk(bf) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + sg_v);
 }
 
 float BattleSimulator::calcMaxTherapy(BattleFighter* bf, const GData::SkillBase* skill)

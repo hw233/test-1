@@ -158,6 +158,7 @@ enum PurchaseType
     BuyLingGuo                  = 1020, //购买灵果
     BuyTYSSLim                  = 1021, //天元神兽限购礼包
     BuyPower                    = 1022, //购买仙界体力
+    SkillGrade                  = 1023, //技能升阶
     //繁体私有占150～200
 };
 
@@ -186,6 +187,8 @@ enum IncomingType
     LongHunFromServerWar        = 148, //仙界传奇龙魂获得
     InBuyFund                   = 149, //购买基金获得
     XianpoFromUseItem           = 150, //使用物品仙魄丹
+    XTYLFromUseItem             = 151, //使用物品凝露宝瓶、凝露玉盅
+    XTYLFromDismiss             = 152, //散去技能升阶
 };
 
 enum MoneyType
