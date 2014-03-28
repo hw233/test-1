@@ -29592,11 +29592,11 @@ void Player::InsertBrother(Player * pl)
    if(!_hasFriend(pl))
        return ;
 
-   _brothers.insert(pl);
+   _brothers[pl->getId()] = 0;
 }
 bool Player::_hasBrother( Player * pl ) const
 {
-    std::set<Player *>::const_iterator it = _brothers.find(pl);
+    std::map<UInt64,UInt32>::const_iterator it = _brothers.find(pl->getId());
     if(it == _brothers.end())
         return false;
     return true;
@@ -29662,7 +29662,7 @@ void Player::getFriendlyAchievement(UInt8 opt)
             break ;
         }
         case 5 :
-        ;{
+        {
             if(Friends[3] >= 3 )
                 flag = true;
             break ;
@@ -29691,7 +29691,7 @@ void Player::acceptBrother(Player * friendOne , bool flag)
 {
     if(!_hasFriend(friendOne))
         return ;
-    _brothers.insert(friendOne);
+    InsertBrother(friendOne);
     UpdateFriendlyCountToDB(friendOne->getId());
     UInt64 friendId = friendOne->getId();
     if(!flag)
@@ -29708,6 +29708,150 @@ void Player::acceptBrother(Player * friendOne , bool flag)
     }
 }
 
+bool Player::CheckCanBeBrother(Player * friendOne , UInt8 type)
+{
+    if(type > 1 ) 
+        return false;
+    std::map<UInt64,UInt32 >::iterator it = _friendlyCount.find(friendOne->getId());
+    if(it == _friendlyCount.end() && type == 0 )
+        return false;
+    if(type == 0 && it->second < 500)
+        return false;
+    if(type == 0 && it->second >= 500)
+        return true ;
+    if(type == 1 )
+    {
+       UInt32 Count = ( 500 - _friendlyCount[friendOne->getId()] )/20 +1 ; 
+    }
+
+    //XXX
+    return true;
+}
+bool Player::CheckCanDrink(Player * friendOne , UInt8 type)
+{
+   // Player* obj_player = GObject::globalPlayers[GetMarriageInfo()->lovers];
+   // if(obj_player != friendOne && _hasBrother(friendOne))
+   //     return ;
+    if(type == 0)
+        return 1;
+    if(getDrinkInfo().type != 0 || getDrinkInfo().drinker != NULL || getDrinkInfo().time != 0)
+        return 1;
+
+    UInt32 drinkCount = GetVar(VAR_DRINK_COUNT);
+    UInt8 count = GET_BIT_8(drinkCount , 0 );
+    UInt32 drinkAddCount = GetVar(VAR_CLAN_FRIEND); 
+    UInt8 addCount = GET_BIT_8( drinkAddCount , 1 );
+    if(count < 2 || addCount > 0)
+        return 2;
+    setDrinkType(type);
+    return 0;
+}
+void Player::InviteDrinking(Player * friendOne)
+{
+    if(getDrinkInfo().type == 0)
+        return ;
+
+    UInt32 now = TimeUtil::Now();
+    std::map<UInt64,UInt32>::const_iterator it = _brothers.find(friendOne->getId());
+    if(now < it->second )
+        return ;
+
+    if(friendOne->getThreadId() == getThreadId())
+    {
+        friendOne->beInviteDrinking(this , getDrinkInfo().type);
+    }
+    else 
+    {
+        struct st
+        {
+            UInt64 playerId ; 
+            UInt8 type ;
+        };
+        st _st ;
+        _st.playerId = getId();
+        _st.type = getDrinkInfo().type;
+        GameMsgHdr hdr(0x403, friendOne->getThreadId(), friendOne, sizeof(_st));
+        GLOBAL().PushMsg(hdr, &_st);
+    }
+}
+void Player::beInviteDrinking(Player * pl , UInt8 type)
+{
+    if(pl==NULL||type == 0)
+        return ;
+    Stream st(REP::BROTHER);
+    st << static_cast<UInt8>(0x05);
+    st << pl->getName();
+    st << static_cast<UInt8>(type);
+    st << Stream::eos;
+    send(st);
+}
+void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type)
+{
+    UInt8 shenfen = 0;  //0表示被邀请
+    if(getDrinkInfo().type != 0)
+        shenfen = 1;    //1表示主动邀请
+    UInt32 now = TimeUtil::Now();
+    UInt8 result = 0;
+    std::map<UInt64,UInt32>::iterator it = _brothers.find(pl->getId());
+    if(it == _brothers.end()) 
+        return ;
+    if(res == 0 )
+    {
+        if(shenfen)    //主动方被拒绝，添加冷却时间
+            it->second = now + 300; 
+        else           //被动方被拒绝，清楚标志位(_drinkInfo.drinker)
+            getDrinkInfo().reset(); 
+        return ;
+    }
+    if(type !=0 && shenfen)   //防止即发起了对酒，又接受了邀请
+        return ;
+
+    if(getDrinkInfo().drinker != NULL)  //判断是否已经有人对酒
+    {
+        setDrinking(pl,now);
+        result = 1 ;
+    }
+    if(type == 0 && shenfen )  //type用来告诉对方对酒级别  由主动发起方赋值
+    {
+        type = getDrinkInfo().type ; 
+    }
+    std::string  playerName1;
+    std::string  playerName2;
+    if(shenfen)
+    {
+       playerName1 = getName(); 
+       playerName2 = pl->getName();
+    }
+    else
+    {
+       playerName2 = getName(); 
+       playerName1 = pl->getName();
+    
+    }
+    Stream st(REP::BROTHER);
+    st << static_cast<UInt8>(0x06);
+    st << playerName1;
+    st << playerName2;
+    st << static_cast<UInt8>(type);
+    st <<Stream::eos;
+    send(st);
+    if(shenfen) //主动方要告知被动房斗酒开始
+    {
+        struct st 
+        {
+            UInt64 playerId1;
+            UInt8 result ;
+            UInt8 type ;
+        };
+        st _st;
+        _st.playerId1 = getId();
+        _st.result = result;
+        _st.type = type ;
+        GameMsgHdr hdr(0x404, pl->getThreadId(), pl , sizeof(_st));
+        GLOBAL().PushMsg( hdr, &_st );
+    }
+            
+}
 } // namespace GObject
 
 

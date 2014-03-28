@@ -2819,6 +2819,37 @@ void OnAcceptBrother(GameMsgHdr & hdr ,const void *data)
         return ;
     player->acceptBrother(pl,true);
 }
+void OnBeInviteDrinking(GameMsgHdr & hdr ,const void *data)
+{
+    struct st
+    {
+        UInt64 playerId; 
+        UInt8 type ;
+    };
+    MSG_QUERY_PLAYER(player);
+    struct st _st  = *reinterpret_cast<const struct st *>(data);
+	GObject::Player * pl = GObject::globalPlayers[_st.playerId];
+    if(pl==NULL)
+        return ;
+    player->beInviteDrinking(pl,_st.type);
+}
+
+void OnBeAcceptDrinking(GameMsgHdr & hdr ,const void *data)
+{
+    struct st
+    {
+        UInt64 playerId; 
+        UInt8 res ;
+        UInt8 type;
+    };
+    MSG_QUERY_PLAYER(player);
+    struct st _st  = *reinterpret_cast<const struct st *>(data);
+	GObject::Player * pl = GObject::globalPlayers[_st.playerId];
+    if(pl==NULL)
+        return ;
+    player->beReplyForDrinking(pl,_st.res ,_st.type);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 
