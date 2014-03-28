@@ -2096,7 +2096,8 @@ void TeamArenaMgr::updateBattlePoint(BinaryReader& brd)
     UInt32 sid = 0;
     UInt64 tid = 0, pid = 0;
     UInt32 battlePoint = 0, battlePoint1 = 0;
-    brd >> cid >> sid >> tid >> pid >> battlePoint >> battlePoint1;
+    std::string name;
+    brd >> cid >> sid >> tid >> pid >> battlePoint >> battlePoint1 >> name;
     GET_ORIGINID(tid, sid, cid);
     GET_ORIGINID(tid, sid, pid);
 
@@ -2112,6 +2113,7 @@ void TeamArenaMgr::updateBattlePoint(BinaryReader& brd)
             if(pp.tprd.playerId[i] == pid)
             {
                 pp.tprd.battlePoint[i] = battlePoint1;
+                pp.tprd.name[i] = name;
                 break;
             }
         }
@@ -2130,6 +2132,7 @@ void TeamArenaMgr::updateBattlePoint(BinaryReader& brd)
                     if(_finals[i][j].tprd.playerId[m] == pid)
                     {
                         _finals[i][j].tprd.battlePoint[m] = battlePoint1;
+                        _finals[i][j].tprd.name[m] = name;
                         break;
                     }
                 }

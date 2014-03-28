@@ -2211,7 +2211,8 @@ void Arena::updateBattlePoint(BinaryReader& brd)
     UInt32 sid = 0;
     UInt64 pid = 0;
     UInt32 battlePoint = 0;
-    brd >> cid >> sid >> pid >> battlePoint;
+    std::string name;
+    brd >> cid >> sid >> pid >> battlePoint >> name;
     UInt64 ppid = pid;
     if((cid != (UInt32)cfg.channelNum || sid != (UInt32)cfg.serverNo) && (ppid >> 48) == 0)
         ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
@@ -2223,6 +2224,7 @@ void Arena::updateBattlePoint(BinaryReader& brd)
         PreliminaryPlayer& pp = *ppit;
         _preliminaryPlayers_list_set[0].erase(ppit);
         pp.battlePoint = battlePoint;
+        pp.name = name;
         _preliminaryPlayers_list_set[0].insert(ppit);
     }
     PreliminaryPlayerListMap::iterator pit1 = _preliminaryPlayers[1].find(ppid);
@@ -2232,6 +2234,7 @@ void Arena::updateBattlePoint(BinaryReader& brd)
         PreliminaryPlayer& pp = *ppit;
         _preliminaryPlayers_list_set[1].erase(ppit);
         pp.battlePoint = battlePoint;
+        pp.name = name;
         _preliminaryPlayers_list_set[1].insert(ppit);
     }
     for(int i = 0; i < 2; ++ i)
@@ -2241,6 +2244,7 @@ void Arena::updateBattlePoint(BinaryReader& brd)
             if(_finals[i][j].id == ppid)
             {
                 _finals[i][j].battlePoint = battlePoint;
+                _finals[i][j].name = name;
             }
         }
     }
