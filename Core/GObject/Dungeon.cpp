@@ -24,7 +24,11 @@ EventDungeonAuto::EventDungeonAuto( Player * player, UInt32 interval, Dungeon * 
 void EventDungeonAuto::Process( UInt32 )
 {
 	if(m_Player->getThreadId() != WORKER_THREAD_NEUTRAL)
+    {
+        m_Player->delFlag(Player::AutoDungeon);
+        DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %" I64_FMT "u", m_Player->getId());
 		return;
+    }
 	m_Dungeon->processAutoChallenge(m_Player, m_Won ? 1 : 2, &m_TotalExp);
 }
 
@@ -42,7 +46,11 @@ void EventDungeonAuto::NotifyCancel() const
 void EventDungeonAuto::Complete() const
 {
 	if(m_Player->getThreadId() != WORKER_THREAD_NEUTRAL)
+    {
+        m_Player->delFlag(Player::AutoDungeon);
+        DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %" I64_FMT "u", m_Player->getId());
 		return;
+    }
 	m_Dungeon->completeAutoChallenge(m_Player, m_TotalExp, m_Won);
 }
 

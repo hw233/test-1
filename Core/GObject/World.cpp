@@ -1257,6 +1257,15 @@ inline bool player_enum_3(GObject::Player* pl, int)
 
     return true;
 }
+inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
+{
+    UInt32 val = pl->GetVar(VAR_LEFTADDR_POWER) ;
+    val += 3 ;
+    if(val > 10 )
+        val = 10;
+    pl->SetVar(VAR_LEFTADDR_POWER,val);
+    return true;
+}
 
 void World::World_Midnight_Check( World * world )
 {
@@ -1510,6 +1519,7 @@ void World::World_Midnight_Check( World * world )
         world->SendSurnameLegendAward();
     if(b11TimeEnd)
         world->Send11AirBookAward();
+    bGGTimeEnd = true;
     if(bGGTimeEnd)
         world->SendGuangGunAward();
     if (bSnowEnd)
@@ -1544,6 +1554,7 @@ void World::World_Midnight_Check( World * world )
     if(World::getQiShiBanTime())
         GObject::globalPlayers.enumerate(player_enum_3, 0);
 
+    GObject::globalPlayers.enumerate(player_enum_LeftAddrPower, 0);
 	calWeekDay(world);
 	Stream st(REP::DAILY_DATA);
 	makeActivityInfo(st);
@@ -3249,6 +3260,7 @@ inline bool clan_enum_grade(GObject::Clan *clan,int)
             ClanSort s;
             s.clan = clan;
             s.total = grade;
+            s.time = TimeUtil::Now();
             World::clanGradeSort.insert(s);
         }
     }
@@ -3777,11 +3789,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9424,50},{515,30},{9438,60},{134,30},{9022,40}},
-        {{9424,40},{515,25},{9438,50},{134,25},{9022,30}},
-        {{9424,30},{515,20},{9438,40},{134,20},{9022,20}},
+        {{9600,40},{515,30},{9418,60},{503,60},{9022,40}},
+        {{9600,30},{515,25},{9418,60},{503,50},{9022,30}},
+        {{9600,20},{515,20},{9418,60},{503,40},{9022,20}},
     };
-   // static MailPackage::MailItem card = {9922,1};
+    static MailPackage::MailItem card = {9936,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -3796,8 +3808,8 @@ void World::Send11PlayerRankAward()
         if(mail)
         {
             mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
-//            if(pos ==1)
-  //              mailPackageManager.push(mail->id, &card, 1, true);
+            if(pos ==1)
+                mailPackageManager.push(mail->id, &card, 1, true);
         }
         std::string strItems;
         for(int index = 0; index < 5; ++ index)

@@ -279,6 +279,18 @@ struct DBClanStatue
     UInt32 exHitRate;   // 神像增加的命中值
 };
 
+struct DBClanBuilding
+{
+    // 帮派建筑模板参数
+    UInt16 level;       // 建筑等级
+    UInt32 needExp;     // 升级所需经验值
+    UInt32 phyAtkValue;     // 物攻类型
+    UInt32 magAtkValue;     // 法攻加成
+    UInt32 actionValue;     // 身法加成
+    UInt32 hpValue;         // 生命加成
+    UInt32 oracleValue;         // 神谕塔
+};
+
 struct DBSoulSkillType
 {
 	UInt16 id;          // 技能ID
@@ -583,6 +595,23 @@ struct DBXingchenConfig
     UInt32 payBack;
 };
 
+struct DBXinMoConfig
+{
+    UInt8 id;
+    UInt8 limitLev;
+    std::string name;
+    UInt32 consume;
+    UInt32 maxVal;
+    //float rate1;
+    //float rate2;
+    //float rate3;
+    UInt32 attack;
+    UInt32 hp;
+    UInt32 action;
+    float cridec;
+    std::string skilllev;
+    UInt32 payBack;
+};
 struct DBJiguanyuConfig
 {
     UInt32 jiguanyuId;
@@ -977,6 +1006,19 @@ SPECIALDEF(10)
     UInt32, exMagDef,    
     UInt32, exAction,    
     UInt32, exHitRate
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBClanBuilding)
+SPECIALDEF(7)
+    (
+    UInt16, level,
+    UInt32, needExp,
+    UInt32, phyAtkValue,
+    UInt32, magAtkValue,
+    UInt32, actionValue,
+    UInt32, hpValue,
+    UInt32, oracleValue         // 神谕塔
     )
 SPECIALEND()
 
@@ -1422,6 +1464,27 @@ SPECIALDEF(9)
     float, rate3,
     UInt32, payBack
 	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBXinMoConfig)
+
+SPECIALDEF(11)
+(
+    UInt8, id,
+    UInt8, limitLev,
+    std::string, name,
+    UInt32, consume,
+    UInt32, maxVal,
+    //float rate1;
+    //float rate2;
+    //float rate3;
+    UInt32, attack,
+    UInt32, hp,
+    UInt32, action,
+    float, cridec,
+    std::string, skilllev,
+    UInt32, payBack
+    )
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBJiguanyuConfig)

@@ -3353,6 +3353,7 @@ function ItemNormal_00009435(iid ,num,bind,param)
     return used
 end
 function ItemNormal_00009444(iid, num, bind, param)
+    print("X")
     local Award ={
     [9444] = {{15,1},{400,1},{133,1}},
     [9445] = {{15,1},{134,1},{56,1},{9088,1}},
@@ -3385,6 +3386,30 @@ function ItemNormal_00009444(iid, num, bind, param)
         used = used + 1
     end
     return used;
+end
+function ItemNormal_00009475(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    local items = { 1126 , 1326 ,1325 }
+    local nums = { 1, 4, 2}
+    local chance = { 1250,5000,10000 }
+    if package:GetRestPackageSize() < num then
+        player:sendMsgCode(2, 1011, 0)
+        return 0; 
+    end
+    package:DelItemSendMsg(iid, player)
+    for n = 1, num do
+        local rand = math.random(1,10000)
+        local g = 0
+        for i = 1, #chance do
+            if rand <=chance[i] then
+                g = i
+                break
+            end
+        end
+        package:Add(items[g], nums[g], true, false, 2)
+    end
+    return num;
 end
 
 function ItemNormal_00009067(iid, num, bind, param)
@@ -9069,6 +9094,7 @@ function ItemNormal_00010245(iid, num, bind, param)
 end
 
 function ItemNormal_00009494(iid, num, bind, param)
+    print("X")
     local player = GetPlayer()
     local package = player:GetPackage();
 
@@ -10316,8 +10342,8 @@ end
 
 function ItemNormal_00009375(iid, num, bind, param)
     local player = GetPlayer();
-        local itemNumber = 0 ;
-        local package = player:GetPackage();
+    local itemNumber = 0 ;
+    local package = player:GetPackage();
 	    if num  <= package:GetRestPackageSize() then
             package:DelItemSendMsg(9375, player);
             for k = 1, num do
@@ -10350,7 +10376,7 @@ function ItemNormal_00009375(iid, num, bind, param)
                     itemNumber = 515;
                 elseif rand <= 10000 then
                     itemNumber = 551;
-                 end
+                end
             package:AddItem(itemNumber,1,1,0,2);
             if getFoolBao() and ( rand > 7930 or itemNumber == 9088 ) then  
             Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."打开了愚公宝箱，幸运的获得了".."[4:"..itemNumber.."]x1")
@@ -10400,27 +10426,27 @@ function ItemNormal_00009382(iid, num, bind, param)
                 card_chance = 500;
             end
             if rand_card <= card_chance then
-               local rand_card_num = 0;
-               local card_chance_ = {0,0,0,0,0}; 
-               local card_chance_max = 0;
-               for n=1,5 do 
-                   local num_c =player:GetVar(452+n);
-                   --print(num_c)
-                   card_chance_[n] = 5 - num_c;
-                   if card_chance_[n] <1 then
-                       card_chance_[n] =1;
-                   end
-                   card_chance_max = card_chance_max + card_chance_[n];
-               end
-               --print(card_chance_max)
-               for n=2,5 do
+                local rand_card_num = 0;
+                local card_chance_ = {0,0,0,0,0}; 
+                local card_chance_max = 0;
+                for n=1,5 do 
+                    local num_c =player:GetVar(452+n);
+                    --print(num_c)
+                    card_chance_[n] = 5 - num_c;
+                    if card_chance_[n] <1 then
+                        card_chance_[n] =1;
+                    end
+                    card_chance_max = card_chance_max + card_chance_[n];
+                end
+                --print(card_chance_max)
+                for n=2,5 do
                     card_chance_[n] = card_chance_[n-1]+card_chance_[n]
-               end
-               --card_chance_max = 25 - card_chance_max;
-               if card_chance_max > 0 then
-                   card_rand = math.random(1,card_chance_max);
-                   for i = 1, #card_chance_ do
-                       if card_rand <=card_chance_[i] then
+                end
+                --card_chance_max = 25 - card_chance_max;
+                if card_chance_max > 0 then
+                    card_rand = math.random(1,card_chance_max);
+                    for i = 1, #card_chance_ do
+                        if card_rand <=card_chance_[i] then
                            rand_card_num = i
                            break;
                        end
@@ -10440,6 +10466,20 @@ function ItemNormal_00009382(iid, num, bind, param)
     end
     player:sendLuckyBagInfo()
     player:LuckyBagRank();
+    return num;
+end
+
+function ItemNormal_00009497(iid, num, bind, param)
+    local val = 100 ;
+    if iid == 9498 then 
+        val = 300;
+    end
+
+    if iid ==  9499 then
+        val = 1000;
+    end
+    local player = GetPlayer()
+    player:AddHeartSword(val * num);
     return num;
 end
 
@@ -12657,6 +12697,9 @@ local ItemNormal_Table = {
     [9437] = ItemNormal_00009382,
     [9449] = ItemNormal_00009382,
     [9496] = ItemNormal_00009382,
+    [9497] = ItemNormal_00009497,
+    [9498] = ItemNormal_00009497,
+    [9499] = ItemNormal_00009497,
 
     [9388] = ItemNormal_00009388,
     [9390] = ItemNormal_00009390,
@@ -12677,9 +12720,13 @@ local ItemNormal_Table = {
     [9444] = ItemNormal_00009444,
     [9445] = ItemNormal_00009444,
     [9446] = ItemNormal_00009444,
+
+    [9475] = ItemNormal_00009475,
+
     [9492] = ItemNormal_00009492,
     [9495] = ItemNormal_00009495,
 
+    --仙界遗迹宝箱
     --坐骑
     [9601] = ItemNormal_00009601,
     [9602] = ItemNormal_00009601,
@@ -13159,7 +13206,7 @@ local ItemNormal_Table = {
     [10251] = ItemNormal_00010251,
     [10252] = ItemNormal_00010252,
     [10253] = ItemNormal_00010253,
-    --[9494] = ItemNormal_00009494,
+    [9494] = ItemNormal_00009494,
     [9480] = ItemNormal_0009480,
     [9481] = ItemNormal_0009480,
     [9482] = ItemNormal_0009480,

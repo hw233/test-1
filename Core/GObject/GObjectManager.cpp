@@ -300,6 +300,11 @@ namespace GObject
             fprintf(stderr, "load Fighter xingchen error!\n");
             std::abort();
         }
+		if(!loadFighterXinMo())
+        {
+            fprintf(stderr, "load Fighter xinmo error!\n");
+            std::abort();
+        }
 
 		if(!loadJiguanshu())
         {
@@ -4170,6 +4175,31 @@ namespace GObject
         }
         lc.finalize();
 
+        // 读取帮派建筑
+        lc.prepare("Loading clan buildings:");
+        DBClanBuildings clanBuildings;
+		if(execu->Prepare("SELECT `clanId`, `fairylandEnergy`, "
+                    "`phyAtkLevel`, `magAtkLevel`, `actionLevel`, `hpLevel`,`oracleLevel` "
+                    " `updateTime` FROM `clan_buildings`", clanBuildings) != DB::DB_OK)
+			return false;
+        clan = NULL;
+        lc.reset(1000);
+        lastId = 0xFFFFFFFF;
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if (clanBuildings.clanId != lastId)
+            {
+                lastId = clanBuildings.clanId;
+                clan = globalClans[clanBuildings.clanId];
+            }
+            if (clan == NULL) continue;
+            clan->loadBuildingsFromDB(clanBuildings.fairylandEnergy, 
+                    clanBuildings.phyAtkLevel, clanBuildings.magAtkLevel, clanBuildings.actionLevel, clanBuildings.hpLevel,clanBuildings.oracleLevel,
+                    clanBuildings.updateTime);
+        }
+        lc.finalize();
+
 		return true;
 	}
 
@@ -7097,5 +7127,40 @@ namespace GObject
 		return true;
     }
 
+    bool GObjectManager::loadFighterXinMo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Fighter xinmo:");
+		DBXinmo dbxc;
+        Player* pl = NULL;
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `xinmolev`, `curVal` FROM `fighter_xinmo`", dbxc) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbxc.playerId != last_id)
+			{
+				last_id = dbxc.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(dbxc.fighterId);
+			if(fgt == NULL)
+            {
+                continue;
+            }
+
+            fgt->setXinMo(dbxc.level,dbxc.curVal);
+
+		}
+		lc.finalize();
+
+        return true;
+    }
 }
 

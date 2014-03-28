@@ -73,6 +73,7 @@
 #include "GObject/Married.h"
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
+#include "GObject/ClanBuilding.h"
 
 struct NullReq
 {
@@ -1074,6 +1075,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		Stream st;
 		pl->makeFighterList(st);
 		conn->send(&st[0], st.size());
+        pl->sendXinMoInfo();
 	}
     {
         Stream st;
@@ -1704,6 +1706,7 @@ void OnFighterInfoReq( GameMsgHdr& hdr, const void * data )
 	st.data<UInt8>(4) = cnt;
 	st << Stream::eos;
 	player->send(st);
+    player->sendXinMoInfo(); 
 }
 
 struct FighterLeaveStruct
@@ -1908,6 +1911,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     fgt->SSDismissAll(true);
     player->sendFighterSSListWithNoSkill();
     fgt->dismissXingchen();
+    fgt->dismissXinMo();
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
@@ -5019,7 +5023,7 @@ void OnClanRankBattleSortList(GameMsgHdr& hdr, const void* data)
 
 void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
 {
-    // TODO: 帮派副本系统的请求协议
+    // 帮派副本系统的请求协议
     MSG_QUERY_PLAYER(player);
 
 	GObject::Clan * clan = player->getClan();
@@ -8320,6 +8324,44 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
             }
     }
 }
+void OnXinMoReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+    {
+		return;
+    }
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    UInt16 fighterId = 0;
+    br >> opt >> fighterId;
+    GObject::Fighter * fgt = player->findFighter(fighterId);
+    if(fgt == NULL)
+    {  
+        return;
+    }
+
+    switch(opt)
+    {
+        case 0:
+            {
+            //    player->sendXinMoInfo();               
+            }
+            break;
+        case 1:
+            {
+                fgt->upgradeXinMo();
+            }
+            break;
+        case 2:
+            {
+                fgt->quickUpGradeXinMo();
+            }
+            break;
+    }
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

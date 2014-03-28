@@ -24,6 +24,7 @@
 #include "GData/Title.h"
 #include "Clan.h"
 #include "ClanCopy.h"
+#include "ClanBuilding.h"
 #include "Mail.h"
 #include "Boss.h"
 #include "Athletics.h"
@@ -830,6 +831,7 @@ namespace GObject
         memset(_alreadyload, 0, sizeof(_alreadyload));
         m_EnterPTCStatus = false;
         m_InPTCStatus = false;
+        _leftAddrEnter = 0 ;
 	}
 
 
@@ -868,7 +870,6 @@ namespace GObject
 		}
 
         ClanRankBattleMgr::Instance().PlayerEnter(this);
-
 		setBlockBossByLevel();
 		return true;
 	}
@@ -14709,6 +14710,45 @@ namespace GObject
         _clan->subStatueExp(exp);
     }
 
+    float Player::getClanBuildingHPEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingHP));
+        return 0;
+    }
+
+    float Player::getClanBuildingPhyAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingPhyAtk));
+        return 0;
+    }
+
+    float Player::getClanBuildingMagAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingMagAtk));
+        return 0;
+    }
+
+    float Player::getClanBuildingActionEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingAction));
+        return 0;
+    }
 
     void Player::onBlueactiveday()
     {
@@ -16940,6 +16980,16 @@ namespace GObject
             return true;
 
         m_arenaCommitCD = now + 60;
+        return false;
+    }
+    bool Player::inLeftAddrCommitCD()
+    {
+        UInt32 now = TimeUtil::Now();
+
+        if(now < m_LeftAddrCommitCD)
+            return true;
+
+        m_LeftAddrCommitCD = now + 60;
         return false;
     }
 
@@ -25418,7 +25468,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={100,200,400,500,700,900,1200,2300,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1300,2350,5000,12000,24000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
@@ -25465,21 +25515,21 @@ void Player::Send11GradeAward(UInt8 type)
 {
     if(type > 11)
         return ;
-    UInt32 gradeAward[]={100,200,400,500,700,900,1200,2300,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1300,2350,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
-        {{500,1 }, {503,1}},
-        {{9424,2},{500,2}},
-        {{9418,3},{501,2},{9438,1}},
-        {{9649,3},{516,2},{503,2}},
-        {{501,2},{513,2},{517,2}},
-        {{9388,1},{551,2},{134,2}},
-        {{1325,2},{503,2},{509,2},{547,2},{134,2},{9438,2}},
-        {{1719,1},{8555,4}},
-        {{9604,20},{9418,20}},
-        {{9022,20}},
-        {{1726,1},{515,15},{9075,20}},
+        {{9424,1 }, {503,1}},
+        {{501,2},{500,2}},
+        {{9604,3},{513,2},{9438,1}},
+        {{9600,2},{516,2},{503,2}},
+        {{547,3},{9308,3},{517,3}},
+        {{549,1},{551,2},{134,2}},
+        {{1325,2},{503,2},{509,2},{134,2},{9438,2}},
+        {{1728,1},{8555,4}},
+        {{9600,25},{9418,25},{9424,40}},
+        {{9068,20}},
+        {{9019,20},{9017,20},{9022,15}},
     };
-    static UInt32 count[] = {2,2,3,3,3,3,6,2,2,3,3};
+    static UInt32 count[] = {2,2,3,3,3,3,5,2,3,1,3};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -28992,6 +29042,25 @@ void Player::sendSummerMeetScoreInfo()
     st << Stream::eos;
     send(st);
 }
+bool Player::giveLeftPowerHold(UInt32 num)
+{
+    UInt32 iid = 9496;
+    UInt8 ret = 0;
+    {
+        UInt16 count = GetPackage()->GetItemAnyNum(iid) ;
+        ItemBase * item = GetPackage()->FindItem(iid, true);
+        if (!item)
+            item =GetPackage()->FindItem(iid, false);
+        if(item ==NULL)
+            return false;
+        if(num > count)
+            return false;
+        GetPackage()->DelItemAny(iid, num );
+        GetPackage()->AddItemHistoriesLog(iid, num );
+        ret = 1;
+    }
+    return true;
+}
 
 void Player::doGuankaAct(UInt8 type)
 {
@@ -29146,7 +29215,7 @@ void Player::getguankaScoreAward(UInt8 type)
     if(!World::getGuankaAct() || type > 4)
         return;
 
-    static UInt32 scoreLvl[] = {200, 400, 600, 800, 1000};
+    static UInt32 scoreLvl[] = {300, 500, 1000, 1500, 2000};
     static UInt32 awards[5][5][2] = {
         {{15,2},  {514,2}, {135,2},   {500,5},   {0, 0}},
         {{15,5},  {514,5}, {135,5},   {500,5},   {0, 0}},
@@ -29200,6 +29269,41 @@ void Player::sevensoul_fixed()
             pet->updateToDBPetSkill();
     }
 }
+void Player::sendXinMoInfo()
+{
+    Stream st(REP::EQ_XINMO);
+    st <<static_cast<UInt8>(0);
+    st << GetVar(VAR_HEART_SWORD);
+    std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
+    UInt8 cnt = _fighters.size() ;
+//  st << static_cast<UInt8>(cnt);
+    for (; it != _fighters.end(); ++it)
+    {
+        Fighter* fgt = it->second; // XXX: Fashion can not be enchanted
+        if(fgt==NULL)
+        {
+            st <<  static_cast<UInt32>(0); 
+        }
+        else
+        {
+            st << fgt->getXinMo().val;
+        }
+    }
+    st << Stream::eos;
+    send(st);
+}
+void Player::AddHeartSword(UInt32 val)
+{
+    UInt32 var_val = GetVar(VAR_HEART_SWORD);
+    SetVar(VAR_HEART_SWORD,var_val+val);
+    Stream st(REP::EQ_XINMO);
+    st << static_cast<UInt8>(4);
+    st << static_cast<UInt32>(var_val+val);
+    st << Stream::eos;
+    send(st);
+    SYSMSG_SENDV(2027,this,val);
+    SYSMSG_SENDV(2028,this,val);
+}
 
 UInt8 Player::useChangeSexCard()
 {
@@ -29233,6 +29337,7 @@ UInt8 Player::useChangeSexCard()
     do_elixir(fgt, oldId);
     do_skill_strengthen(fgt, oldId);
     do_fighter_xingchen(fgt, oldId);
+    do_fighter_xinmo(fgt, oldId);
 
     struct _stTable
     {
@@ -29334,7 +29439,14 @@ void Player::do_fighter_xingchen(Fighter* fgt, UInt32 oldId)
 {
     DB1().PushUpdateData("UPDATE `fighter_xingchen` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
 }
+void Player::do_fighter_xinmo(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_xinmo` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
 
 } // namespace GObject
+
+
+
 
 

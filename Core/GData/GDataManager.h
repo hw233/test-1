@@ -46,6 +46,7 @@ namespace GData
         static bool LoadClanCopy();
         static bool LoadClanCopyMonster();
         static bool LoadClanStatue();
+        static bool LoadClanBuilding();
 		static bool LoadClanTechTable();
 		static bool LoadClanSkillTable();
         static bool LoadSoulSkillTable();
@@ -69,6 +70,7 @@ namespace GData
         static bool LoadPetEquipExp();
         static bool LoadPetEqAttreffect();
         static bool LoadXingchenConfig();
+        static bool LoadXinMoConfig();
         static bool LoadJiguanshuConfig();
         static bool LoadJiguanyuConfig();
         static bool LoadTuzhiConfig();

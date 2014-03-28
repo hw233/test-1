@@ -90,6 +90,12 @@ struct Xingchenzhen
     UInt16 xctCurVal;   // 星辰图当前值
     UInt16 xctMaxVal;   // 星辰图最大值
 };
+struct XinMoData
+{
+    XinMoData() : lvl(0),val(0){}
+    UInt8 lvl;
+    UInt32 val;
+};
 
 struct SStrengthen
 {
@@ -1035,9 +1041,14 @@ public:
     //镇封星辰图
 private:
     Xingchenzhen m_xingchen;
+    XinMoData m_xinmo;
 public:
     inline Xingchenzhen& getXingchen() { return m_xingchen; }
     inline UInt8 getXingchenLvl()  {return m_xingchen.lvl;}
+
+    inline XinMoData getXinMo() { return m_xinmo; }
+    void setXinMo(UInt8 lev , UInt32 val);
+
     void setXingchenFromDB(DBXingchen&);
     bool upgradeXingchen(UInt8 type);
     void updateDBxingchen();
@@ -1058,6 +1069,11 @@ public:
     void pushPetInfo2Leaderboard();
     void petSSAdd(UInt16 id);
     void petSSErase(UInt16 id);
+
+    void updateDBxinmo();
+    bool upgradeXinMo();
+    bool quickUpGradeXinMo();
+    void dismissXinMo();
 };
 
 class GlobalFighters

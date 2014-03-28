@@ -41,7 +41,6 @@
 #include "GObject/HeroMemo.h"
 #include "MsgHandler/JsonParser.h"
 #include "GObject/LuckyDraw.h"
-#include "GObject/ClanCopy.h"
 #include "GObject/SingleHeroStage.h"
 #include "GObject/NewCountryBattle.h"
 #include "GObject/Tianjie.h"
@@ -59,6 +58,9 @@
 #include "GObject/Marry.h"
 #include "GObject/Married.h"
 #include "GObject/ArenaServerWar.h"
+
+#include "GObject/ClanBuilding.h"
+
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -305,12 +307,20 @@ GMHandler::GMHandler()
     Reg(3, "clmarrylist", &GMHandler::OnCleanMarryList);
     Reg(3, "setmarry", &GMHandler::OnSetMarryStatus);
     Reg(2, "serverwar", &GMHandler::OnHandleServerWar);
+    Reg(2, "serverleft", &GMHandler::OnHandleServerLeft);
+    Reg(2, "leftreport", &GMHandler::OnServerLeftReport);
+    Reg(2, "leftaddr", &GMHandler::OnHandleLeftAddr);
     Reg(2, "jiqiren", &GMHandler::OnJiqirenAction);
     Reg(3, "marryb", &GMHandler::OnCreateMarryBoard);
     Reg(3, "addpetattr", &GMHandler::OnAddPetAttr);
     Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
     Reg(2, "settyss", &GMHandler::OnSetTYSS);
     Reg(3, "clanrank", &GMHandler::TestClanRank);
+
+    //  帮派建筑相关指令
+    Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
+    Reg(1, "cbop", &GMHandler::OnClanBuildingOp);
+    Reg(3, "cblvl", &GMHandler::OnClanBuildingLevelChange);
 
     _printMsgPlayer = NULL;
 }
@@ -5182,6 +5192,195 @@ void GMHandler::TestSameTimeRecharge(GObject::Player *player, std::vector<std::s
     }
 }
 
+void GMHandler::OnClanBuildingInfo(GObject::Player *player, std::vector<std::string>& args)
+{
+    Clan *clan = player->getClan();
+    if (!clan)
+        return;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    if (!buildingOwner)
+        return;
+    SYSMSG_SENDV(5200, player, player->getName().c_str(), clan->getName().c_str());
+    SYSMSG_SENDV(5201, player, buildingOwner->getEnergy());
+    SYSMSG_SENDV(5202, player,
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingPhyAtk), 
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingMagAtk),
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingAction), 
+            buildingOwner->getBuildingLevel(ClanBuilding::eClanBuildingHP));
+}
+
+// TODO: 帮派建筑相关GM操作 
+void GMHandler::OnClanBuildingOp(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 2)
+        return;
+    Clan *clan = player->getClan();
+    if (!clan)
+        return;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    if (!buildingOwner)
+        return;
+    UInt8 opType = atoi(args[0].c_str());
+    UInt32 val = atoi(args[1].c_str());
+    switch (opType)
+    {
+        case 1:
+            buildingOwner->addEnergy(val);
+            break;
+        case 2:
+            break;
+        default:
+            break;
+    }
+
+}
+
+void GMHandler::OnClanBuildingLevelChange(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    Clan *clan = player->getClan();
+    if (!clan)
+        return;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getBuildingOwner();
+    if (!buildingOwner)
+        return;
+    Int32 iVal = atoi(args[0].c_str());
+    buildingOwner->levelChange(iVal);
+}
+void GMHandler::OnHandleServerLeft(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 2)
+        return;
+    UInt8 leftId = atoi(args[0].c_str());
+    UInt32 clanId = atoi(args[1].c_str());
+    std::vector<Player *> warSort;
+    UInt8 i = 0, j = 0;
+    std::string clanName = "";
+    UInt32 size = globalPlayers.size();
+    if(size < 5 )
+        return ;
+    Clan* clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    clanName = clan->getName();
+    UInt32 urand = uRand(size - 5); 
+    UInt8 k = 0 ;
+    for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(); it != GObject::globalPlayers.end(); ++it)
+    {
+        if(j > 2)
+            break;
+        if(k < urand )
+        {
+            k ++;
+            continue;
+        }
+        GObject::Player * pl = it->second;
+        if(clanName == "" )
+        {
+            if(pl->getClan()!= NULL && pl->getClan()->getId() == clanId )
+            {
+                clanId = pl->getClan()->getId();
+                clanName = pl->getClanName();
+                std::cout << "rand:" << urand <<std::endl;
+                std::cout << "clanId:" << clanId <<std::endl;
+                std::cout << "clanName:" << clanName.c_str() <<std::endl;
+            }
+            else
+                continue ;
+        }
+        if(pl && pl->GetLev() >= LIMIT_LEVEL)
+            warSort.push_back(pl);
+        if(warSort.size() == 5)
+        {
+            struct SWarEnterData {
+                Stream st;
+                std::vector<Player *> warSort;
+                UInt8 pos ;
+                SWarEnterData(Stream& st2, std::vector<Player *>& warSort2) : st(st2), warSort(warSort2),pos(0) {}
+            };
+
+            Stream st(SERVERLEFTREQ::ENTER, 0xED);
+            st<< player->getId()<<clanId <<clanName << pl->getName()/*领队*/  <<leftId << static_cast<UInt8>(0) << static_cast<UInt8>(warSort.size()); 
+            SWarEnterData * swed = new SWarEnterData(st, warSort);
+            std::vector<Player *>::iterator it = warSort.begin();
+            GameMsgHdr hdr(0x391, (*it)->getThreadId(), *it, sizeof(SWarEnterData*));
+            GLOBAL().PushMsg(hdr, &swed);
+
+            i = 0;
+            j ++;
+            clanId = 0 ;
+            warSort.clear();
+            break;
+        }
+    }
+}
+void GMHandler::OnServerLeftReport(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() !=1 )
+        return ;
+	UInt64 playerId1 = player->getId();
+    UInt32 bpId = atoi(args[0].c_str());
+    Stream st(SERVERLEFTREQ::BATTLE_REPORT, 0xED);
+    st << playerId1 << bpId ; 
+    st << Stream::eos;
+    NETWORK()->SendToServerLeft(st);
+}
+void GMHandler::OnHandleLeftAddr(GObject::Player* player, std::vector<std::string>& args)
+{
+    if(args.size() < 1 )
+        return ;
+    UInt32 bpId = atoi(args[0].c_str());
+    UInt64 playerId1 =  player->getId();
+    UInt8 leftId = 0;
+    UInt32 clanId = 0;
+	UInt64 pid = 0;
+    UInt8 pos1 = 0;
+    UInt8 pos2 = 0;
+    if(bpId == 2)
+    {
+        leftId = atoi(args[1].c_str());
+        clanId = atoi(args[2].c_str());
+        char * endptr;
+        pid = strtoull(args[3].c_str(), &endptr, 10);
+        pos1 = atoi(args[4].c_str());
+        pos2 = atoi(args[5].c_str());
+    }
+    switch(bpId)
+    {
+        case 1:
+            {
+                Stream st(SERVERLEFTREQ::LEFTADDR_INFO, 0xED);
+                st << playerId1 ; 
+                st << Stream::eos;
+                NETWORK()->SendToServerLeft(st);
+                break;
+            }
+        case 2:
+            {
+                Stream st(SERVERLEFTREQ::LEFTADDR_SWITCHPLAYER, 0xED);
+                st << leftId ; 
+                st << clanId ;
+                st << pid ; 
+                st << pos1;
+                st << pos2;
+                st << Stream::eos;
+                NETWORK()->SendToServerLeft(st);
+                break; 
+            } 
+        case 3:
+            {
+                Stream st(SERVERLEFTREQ::LEFTADDR_POWERHOLD, 0xED);
+                st << static_cast<UInt8>(12);
+                st << static_cast<UInt32>(10);
+                st << static_cast<UInt8>(5);
+                st << Stream::eos;
+                NETWORK()->SendToServerLeft(st);
+            }
+            break;
+    }
+}
+
 void GMHandler::OnSetTYSS(GObject::Player *player, std::vector<std::string>& args)
 {
     GVAR.SetVar(GVAR_TYSS_BEGIN,TimeUtil::Now());
@@ -5190,6 +5389,12 @@ void GMHandler::OnSetTYSS(GObject::Player *player, std::vector<std::string>& arg
 
 void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& args)
 {
+	GObject::Fighter * fgt = player->getMainFighter();
+	if(fgt == NULL)
+		return;
+    std::string skills = Itoa(9709);
+    fgt->setSkills(skills, true);
+    return;
     if(args.size() < 1)
         return;
     UInt8 pos = atoi(args[0].c_str());
