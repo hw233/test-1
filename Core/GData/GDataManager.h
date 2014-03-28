@@ -71,6 +71,7 @@ namespace GData
         static bool LoadPetEqAttreffect();
         static bool LoadXingchenConfig();
         static bool LoadXinMoConfig();
+        static bool LoadSkillEvConfig();
         static bool LoadJiguanshuConfig();
         static bool LoadJiguanyuConfig();
         static bool LoadTuzhiConfig();

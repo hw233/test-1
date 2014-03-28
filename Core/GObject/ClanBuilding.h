@@ -8,6 +8,7 @@
 
 namespace GObject
 {
+#define LEFTATTRMAX 6
     class Clan;
     class ClanBuildingOwner;
     class Player;
@@ -135,6 +136,9 @@ namespace GObject
             void LineUp(Player * player);
             void sendAttackTeamInfo(Player *player);
             void UpdateEnergy();
+            UInt32 getLeftAttr(UInt8 type) const;
+            void AddLeftAttr(UInt8 opt , UInt8 type , UInt32 value);
+            void resetLeftAttr();
             
         private:
             Clan * _clan;
@@ -142,6 +146,8 @@ namespace GObject
             UInt32  _energy;        // 仙界元气
             std::deque<struct ClanBuildBattleInfo> battles_deque;
             std::map< LeftAttackLeader , std::vector<Player *> > leftAttackTeams;
+            //1-物攻魔攻 2 -（） 3-物防 4-魔防 5-身法 6-HP
+            UInt32 _leftAttr[LEFTATTRMAX];
     };
 }
 #endif // #ifndef CLAN_BUILDING_H

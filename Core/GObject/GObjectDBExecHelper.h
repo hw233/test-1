@@ -283,6 +283,14 @@ struct DBSS
     UInt8 maxLvl;
 };
 
+struct DBSG
+{
+    UInt64 playerId;
+    UInt32 fighterId;
+    UInt16 skillId;
+    UInt8 level;
+};
+
 struct DBQixi
 {
     UInt64 playerId;
@@ -1755,6 +1763,16 @@ SPECIALDEF(8)
     UInt32, curVal,
     UInt8, lvl,
     UInt8, maxLvl
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSG)
+SPECIALDEF(4)
+    (
+    UInt64, playerId,
+    UInt32, fighterId,
+    UInt16, skillId,
+    UInt8, level
     )
 SPECIALEND()
 

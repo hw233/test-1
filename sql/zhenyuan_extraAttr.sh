@@ -1,17 +1,16 @@
 
 #!/bin/bash
 
-F=jiguanshu.txt
+F=formProfession.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function jiguanshu()
+function formProfession()
 {
     f=$1
-    d=jiguanshu
-    sed -i /level/d $f
+    d=zhenyuan_extraAttr
     sed -i /ID/d $f
     sed -i /id/d $f
     sed -i /^$/d $f
@@ -21,10 +20,10 @@ function jiguanshu()
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `jiguanshu` VALUES";
+            print "INSERT INTO `zhenyuan_extraAttr` VALUES";
         } {
-            printf("(%d,%d,%d,%f,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7);
-            if (NR < ENVIRON["lines"])
+            printf("(%d,\x27%s\x27,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6);
+            if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
                 printf(";");
@@ -52,7 +51,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    jiguanshu $F
+    formProfession $F
 else
     echo "File $F is not exists"
 fi

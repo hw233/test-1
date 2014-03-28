@@ -664,6 +664,12 @@ namespace GObject
             std::abort();
         }
 
+        if(!loadSkillGrade())
+        {
+            fprintf(stderr, "loadSkillGrade error!\n");
+            std::abort();
+        }
+
         DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -7240,6 +7246,39 @@ namespace GObject
 		lc.finalize();
 		return true;
 	}
+
+    bool GObjectManager::loadSkillGrade()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading skill grade");
+        DBSG sg;
+        if(execu->Prepare("SELECT `playerId`, `fighterId`, `skillId`, `level` FROM `skill_grade` ORDER BY `playerId`", sg) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+			if(sg.playerId != last_id)
+			{
+				last_id = sg.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(sg.fighterId);
+			if(fgt == NULL)
+				continue;
+
+            SGrade s;
+            s.lvl = sg.level;
+            fgt->SGFromDB(sg.skillId, s);
+        }
+        lc.finalize();
+        return true;
+    }
 
     bool GObjectManager::LoadMarriage()
 	{

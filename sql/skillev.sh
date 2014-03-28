@@ -1,19 +1,19 @@
 
 #!/bin/bash
 
-F=jiguanshu.txt
+F=skillev.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function jiguanshu()
+function skill_ev()
 {
     f=$1
-    d=jiguanshu
-    sed -i /level/d $f
-    sed -i /ID/d $f
+    d=skill_ev
     sed -i /id/d $f
+    sed -i /ID/d $f
+    sed -i /lv/d $f
     sed -i /^$/d $f
     sed -i /REF/d $f
     sed -i s/\"//g $f
@@ -21,9 +21,9 @@ function jiguanshu()
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `jiguanshu` VALUES";
+            print "INSERT INTO `skill_ev` VALUES";
         } {
-            printf("(%d,%d,%d,%f,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7);
+            printf("(%u,%u,%u,%u)",$1,$3,$4,$5);
             if (NR < ENVIRON["lines"])
                 printf(",");
             else if (NR >= ENVIRON["lines"])
@@ -52,7 +52,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    jiguanshu $F
+     skill_ev $F
 else
     echo "File $F is not exists"
 fi

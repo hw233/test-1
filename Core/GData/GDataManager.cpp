@@ -443,6 +443,11 @@ namespace GData
             fprintf (stderr, "Load LoadCoupleCopyConfig Error !\n");
             std::abort();
         }
+        if (!LoadSkillEvConfig())
+        {
+            fprintf (stderr, "Load LoadSkillEvConfig Error !\n");
+            std::abort();
+        }
 
 		return true;
 	}
@@ -2924,6 +2929,26 @@ namespace GData
             stxc.skilllev = dbxcc.skilllev;
             stxc.payBack = dbxcc.payBack;
             xinmoData.setXinMoTable(stxc);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadSkillEvConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBSkillEv dbskillev;
+		if(execu->Prepare("SELECT `lev`, `effect`, `consume`, `needLev` FROM `skill_ev`", dbskillev) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            SkillEvData::stSkillEv skillEv;
+            skillEv.effect = dbskillev.effect;
+            skillEv.consume = dbskillev.consume;
+            skillEv.needLev = dbskillev.needLev;
+            GData::skillEvData.setSkillEvData(dbskillev.lev, skillEv);
         }
         return true;
     }

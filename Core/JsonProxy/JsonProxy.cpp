@@ -181,15 +181,27 @@ int read_jason_req(int fd, char* buf)
 {
     int read_len1 = recv( fd, buf, 5, 0);
     if(read_len1 != 5)
+    {
+        g_log->OutTrace("len error 1, len is %d\n",read_len1);
         return 0;
+    }
     unsigned short len = *(unsigned short*)buf;
     if(len <= 0)
+    {
+        g_log->OutTrace("len error 2\n");
         return 0;
+    }
     if (len >= 16*1024-6)
+    {
+        g_log->OutTrace("len error 3\n");
         return 0;
+    }
     int read_len2 = recv( fd, buf+5, len, 0 );
     if(read_len2 != len)
+    {
+        g_log->OutTrace("len error 4\n");
         return 0;
+    }
 
     return read_len1 + read_len2;
 }

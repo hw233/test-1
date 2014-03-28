@@ -495,6 +495,7 @@ namespace GObject
         static bool loadZhenwei();
         static bool loadQiShiBan();
         static bool LoadPlayerModifyMounts();
+        static bool loadSkillGrade();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

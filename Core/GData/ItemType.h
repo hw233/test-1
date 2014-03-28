@@ -34,9 +34,11 @@
 #define RPETARM_ID      12999
 #define LPETGEM_ID      13000
 #define RPETGEM_ID      14999
-#define LZHENYAUN_ID    15000
+#define LZHENYAUN_ID    15001
 #define RZHENYUAN_ID    15499
 #define LOTHER_ID       15500
+#define LNORMAL2_ID     16000
+#define RNORMAL2_ID     16999
 #define ROTHER_ID       65535
 
 #define COUPON_ID       499
@@ -240,7 +242,7 @@ inline bool IsFighterTypeId(UInt32 id)
 
 inline ItemClass GetItemSubClass(UInt32 id)
 {
-    if ((id >= LNORMAL_ID && id <= RNORMAL_ID) || (id >= LNORMAL1_ID && id <= RNORMAL1_ID))
+    if ((id >= LNORMAL_ID && id <= RNORMAL_ID) || (id >= LNORMAL1_ID && id <= RNORMAL1_ID) || (id >= LNORMAL2_ID && id <= RNORMAL2_ID))
         return Item_Normal;
     if (id >= LENHANCE_ID && id <= RENHANCE_ID)
         return Item_Enhance;

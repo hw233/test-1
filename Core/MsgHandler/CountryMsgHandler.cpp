@@ -416,6 +416,7 @@ MSG_REG_2(GameMsgHdr, 0x355, OnGetFindOldManAward);
 MSG_REG_2(GameMsgHdr, 0x356, OnGetInteresingBag);
 MSG_REG_2(GameMsgHdr, 0x357, OndoGuankaAct);
 //MSG_REG_2(GameMsgHdr, 0x358, OnAddFriendlyCount); 
+MSG_REG_2(GameMsgHdr, 0x359, OnBuyLeftPower);
 
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
@@ -443,6 +444,7 @@ MSG_REG_2(GameMsgHdr, 0x393, OnServerLeftChangeTeamMember);   //改变已占遗�
 MSG_REG_2(GameMsgHdr, 0x394, OnServerLeftAddPowerHold);   //灵气池
 MSG_REG_2(GameMsgHdr, 0x395, OnServerLeftInfoReq);   //遗迹信息请求
 MSG_REG_2(GameMsgHdr, 0x396, OnServerLeftBattleReq);   //战斗信息请求
+MSG_REG_2(GameMsgHdr, 0x397, OnBuyLeftPower);  //购买体力
 
 //游戏服务器
 

@@ -9112,7 +9112,7 @@ end
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    local item = 1354;
+    local item = 1544;
 
     if package:GetRestPackageSize() < (1+(1*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
@@ -9280,6 +9280,126 @@ function ItemNormal_00010253(iid, num, bind, param)
 
     package:DelItemSendMsg(iid, player);
     return num;
+end
+
+function ItemNormal_00010254(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (3+(3*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(56, num*3, true, false, 2);
+    package:Add(57, num*3, true, false, 2);
+    package:Add(15, num*3, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010255(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (4+(4*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(9371, num*3, true, false, 2);
+    package:Add(9418, num*3, true, false, 2);
+    package:Add(9413, num*3, true, false, 2);
+    package:Add(9424, num*3, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010256(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (4+(4*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(51, num*1, true, false, 2);
+    package:Add(48, num*1, true, false, 2);
+    package:Add(49, num*1, true, false, 2);
+    package:Add(50, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010257(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (3+(3*num*3)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(1325, num*3, true, false, 2);
+    package:Add(134, num*3, true, false, 2);
+    package:Add(1126, num*3, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00016000(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:GetLev() < 75 then
+        player:sendMsgCode(0, 1093, 75);
+        return false
+    end
+    if iid ~= 16000 and iid ~= 16001 and iid ~= 16002 then
+        return false
+    end
+
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    local totalNum;
+    if iid == 16002 then
+        totalNum = num * 1000
+    elseif iid == 16000 then
+        totalNum = num * 15
+    else
+        totalNum = num * 100
+    end
+    player:getXuanTianNingLuLua(totalNum);
+    return num
+end
+
+function ItemNormal_00016003(iid, num, bind, param)
+    local player = GetPlayer()
+	local fgt = player:findFighter(param);
+    local mainFgt = player:getMainFighter();
+    local package = player:GetPackage();
+	if fgt == nil or fgt == mainFgt then
+		return false;
+	end
+
+    if fgt:isExpFull() then
+        player:sendMsgCode(2, 1070, 0);
+        return false
+    end
+
+    local exp = fgt:getExp()
+    local expbak = exp
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        exp = exp + 5000000000
+        if exp >= fgt:getExpMax() then
+            break
+        end
+    end
+
+	fgt:addExp(exp - expbak);
+    package:DelItemSendMsg(iid, player);
+    return n
 end
 
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
@@ -13206,6 +13326,16 @@ local ItemNormal_Table = {
     [10251] = ItemNormal_00010251,
     [10252] = ItemNormal_00010252,
     [10253] = ItemNormal_00010253,
+    [10254] = ItemNormal_00010254,
+    [10255] = ItemNormal_00010255,
+    [10256] = ItemNormal_00010256,
+    [10257] = ItemNormal_00010257,
+
+    [16000] = ItemNormal_00016000,
+    [16001] = ItemNormal_00016000,
+    [16002] = ItemNormal_00016000,
+    [16003] = ItemNormal_00016003,
+
     [9494] = ItemNormal_00009494,
     [9480] = ItemNormal_0009480,
     [9481] = ItemNormal_0009480,
