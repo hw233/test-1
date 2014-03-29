@@ -61,8 +61,28 @@ class XinMoData
         UInt32 getXinMoLev(UInt32 val);
 };
 
+class SkillEvData
+{
+    public:
+        struct stSkillEv
+        {
+            Int32 effect;
+            UInt32 consume;
+            UInt8 needLev;
+            stSkillEv() : effect(0), consume(0), needLev(0) {}
+        };
+    private:
+        std::map<UInt8, stSkillEv> _skillEv;
+    public:
+        void setSkillEvData(UInt8 lev, stSkillEv& skillEv);
+        stSkillEv* getSkillEvData(UInt8 lev);
+        UInt8 getSkillEvSize() { return static_cast<UInt8>(_skillEv.size()); }
+
+};
+
 extern XinMoData xinmoData;
 extern XingchenData xingchenData;
+extern SkillEvData skillEvData;
 }
 
 #endif // _XINGCHENDATA_H_

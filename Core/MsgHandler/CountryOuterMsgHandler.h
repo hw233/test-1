@@ -1092,6 +1092,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->sendFighterSSListWithNoSkill();
 #endif
     }
+    {
+        Stream st;
+        pl->makeFighterSGList(st);
+		conn->send(&st[0], st.size());
+        pl->sendFighterSGListWithNoSkill();
+    }
 	{
 		Stream st;
 		pl->makeFormationInfo(st);
@@ -1878,9 +1884,11 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     else
         exp = fgt->getExp() / 2;
 
-    UInt16 rCount1 = 0, rCount2 = 0, rCount3 = 0;
+    UInt16 rCount = 0, rCount1 = 0, rCount2 = 0, rCount3 = 0;
 	if(exp >= 25000 || (fgt->getClass() == 4))
 	{
+        rCount = static_cast<UInt16>(exp / 5000000000);
+        exp = exp % 5000000000;
 		rCount1 = static_cast<UInt16>(exp / 50000000);
 		exp = exp % 50000000;
 		rCount2 = static_cast<UInt16>(exp / 500000);
@@ -1894,23 +1902,25 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     pexp = pexp % 10000;
     UInt16 rCount6 = static_cast<UInt16>(pexp / 100);
     bool hasMail = false;
-    if(rCount1 > 0 || rCount2 > 0 || rCount3 > 0 || rCount4 > 0 || rCount5 > 0 || rCount6 > 0)
+    if(rCount > 0 || rCount1 > 0 || rCount2 > 0 || rCount3 > 0 || rCount4 > 0 || rCount5 > 0 || rCount6 > 0)
         hasMail = true;
     if(hasMail)
     {
         SYSMSG(title, 236);
         SYSMSGV(content, 237, fgt->getLevel(), fgt->getColor(), fgt->getName().c_str());
-        MailPackage::MailItem mitem[6] = {{14, rCount1}, {13, rCount2}, {12, rCount3}, {31, rCount4}, {30, rCount5}, {29, rCount6}};
-        MailItemsInfo itemsInfo(mitem, DismissFighter, 6);
+        MailPackage::MailItem mitem[7] = {{16003, rCount}, {14, rCount1}, {13, rCount2}, {12, rCount3}, {31, rCount4}, {30, rCount5}, {29, rCount6}};
+        MailItemsInfo itemsInfo(mitem, DismissFighter, 7);
         GObject::Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
-            GObject::mailPackageManager.push(pmail->id, mitem, 6, true);
+            GObject::mailPackageManager.push(pmail->id, mitem, 7, true);
     }
 
     fgt->delAllCitta();
     //此处只剩下法宝符文未散功了！！
     fgt->SSDismissAll(true);
+    fgt->SGDismissAll(true);
     player->sendFighterSSListWithNoSkill();
+    player->sendFighterSGListWithNoSkill();
     fgt->dismissXingchen();
     fgt->dismissXinMo();
 	delete fgt;
@@ -6496,6 +6506,12 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
     }
     else if (type == 3)
         fgt->SSDismiss(skillid);
+    else if(type == 10)
+        fgt->SGradeManual(skillid);
+    else if(type == 11)
+        fgt->SGradeAuto(skillid);
+    else if(type == 14)
+        fgt->SGDismiss(skillid);
 }
 
 void OnMakeStrong( GameMsgHdr& hdr, const void * data )

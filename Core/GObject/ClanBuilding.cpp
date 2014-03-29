@@ -123,6 +123,7 @@ namespace GObject
     ClanBuildingOwner::ClanBuildingOwner(Clan* clan)
         : _clan(clan), _energy(0)
     {
+        memset(_leftAttr, 0, sizeof(_leftAttr));
         if (_clan)
             DB2().PushUpdateData("INSERT IGNORE INTO `clan_buildings` (`clanId`) VALUES (%" I64_FMT "u)", _clan->getId()); 
         {
@@ -332,7 +333,7 @@ namespace GObject
                         }
                         if(pos1 ==0 && pos2 == 0)
                         {
-                               //player->setLeftAddrEnter(false);
+                               player->setLeftAddrEnter(false);
                                TRACE_LOG("leftaddr(leaveleft) 0 (pid: %" I64_FMT "u)", player->getId());
                         }
                         struct TeamChange
@@ -365,6 +366,11 @@ namespace GObject
                     if(!player->inLeftAddrCommitCD())
                         LineUp(player);
                     break;
+                case 0x0C:
+                    {
+                        GameMsgHdr hdr(0x397, player->getThreadId(), player, 0 );
+                        GLOBAL().PushMsg(hdr, NULL);
+                    }
             }
             if(type < 9)
                 sendAttackTeamInfo(player); 
@@ -558,7 +564,7 @@ namespace GObject
         {
             Stream st ;
             SYSMSGVP(st, 4308, cbbi.leftId ,cbbi.name.c_str());
-          //  _clan->broadcast(st);
+            _clan->broadcast(st);
         }
     } 
     void ClanBuildingOwner::SendBattlesInfo( Stream & st)
@@ -579,7 +585,7 @@ namespace GObject
     }
     void ClanBuildingOwner::CreateTeam(Player * leader ,UInt8 leftId)
     {
-        if(_clan->getClanRank(leader) < 2 )
+        if(_clan->getClanRank(leader) < 1 )
             return ;
         if(leader->GetVar(VAR_LEFTADDR_POWER) < 3 )
             return ;
@@ -619,9 +625,9 @@ namespace GObject
         std::vector<Player *> vec ;
         vec.push_back(leader);
         leftAttackTeams.insert(make_pair(leftAttLeader , vec));
-        Stream st ;
-        SYSMSGVP(st, 4300, leader->getName().c_str(),leftId);
-        _clan->broadcast(st);
+        //Stream st ;
+        //SYSMSGVP(st, 4300, leader->getName().c_str(),leftId);
+        //_clan->broadcast(st);
         leader->setInLeftTeam(true);
         TRACE_LOG("leftaddr(CreateTeamSetInTeam) 1 (pid: %" I64_FMT "u)", leader->getId());
         leader->SetVar(VAR_LEFTADDR_CREATE ,now);
@@ -745,7 +751,7 @@ namespace GObject
                 {
                     Stream st ;
                     SYSMSGVP(st, 4309, leader->getName().c_str(),it->first.leftId);
-                    //_clan->broadcast(st);
+                    _clan->broadcast(st);
                 }
             }
         }
@@ -807,6 +813,7 @@ namespace GObject
             return ;
         st <<static_cast<UInt8>(9);
         st <<static_cast<UInt8>(player->GetVar(VAR_LEFTADDR_POWER));
+        st <<static_cast<UInt8>(player->GetVar(VAR_LEFTADDR_POWER_ADD));
         st <<static_cast<UInt8>( leftAttackTeams.size() ); 
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
@@ -825,9 +832,40 @@ namespace GObject
         player->send(st);
         
     }
+
     void ClanBuildingOwner::UpdateEnergy()
     {
         DB5().PushUpdateData("UPDATE `clan_buildings` set `fairylandEnergy` = %u, `updateTime` = %u where `clanId` = %" I64_FMT "u", _energy , TimeUtil::Now() , _clan->getId());
+    }
+
+    UInt32 ClanBuildingOwner::getLeftAttr(UInt8 type) const 
+    {
+       if(type >=LEFTATTRMAX) 
+           return 0;
+       return _leftAttr[type];
+    }  
+    //仙界遗迹属性 opt : 0-重置 1-增加 2-减少
+    void ClanBuildingOwner::AddLeftAttr(UInt8 opt ,UInt8 type , UInt32 value)
+    {
+        if(opt == 0)
+        {
+            memset(_leftAttr, 0, sizeof(_leftAttr));
+            return ;
+        }
+        if( type > LEFTATTRMAX ) 
+            return ;
+        if(type == 0 )
+            return ;
+        if(opt == 1)
+            _leftAttr[type - 1] += value ; 
+        if(opt == 2)
+        {
+            if(_leftAttr[type - 1 ] < value)
+                _leftAttr[type - 1] = 0 ;
+            else
+                _leftAttr[type - 1] -= value;
+        }
+        _clan->notifyUpdateStatueAttr();
     }
 }
 

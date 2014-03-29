@@ -1700,7 +1700,7 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
     else if(type == 1)
     {
         Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
-        st << player->getId();
+        st << player->getId() << player->getName();
         player->appendLineup2(st);
         player->appendPetOnBattle(st);
         st << Stream::eos;
@@ -2618,7 +2618,7 @@ void OnServerWarLineup( GameMsgHdr& hdr, const void* data )
         return;
 
     Stream st(SERVERWARREQ::COMMIT_LINEUP, 0xEE);
-    st << player->getId();
+    st << player->getId() << player->getName();
     player->appendLineup2(st);
     player->appendPetOnBattle(st);
     st << Stream::eos;
@@ -2791,6 +2791,11 @@ void OndoGuankaAct( GameMsgHdr &hdr, const void * data)
     UInt8 type = *reinterpret_cast<const UInt8 *>(data);
 
     player->doGuankaAct(type);
+}
+void OnBuyLeftPower( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->BuyLeftPower();
 }
 
 /*

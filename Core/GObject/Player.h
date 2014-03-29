@@ -2616,6 +2616,8 @@ namespace GObject
         float getClanBuildingPhyAtkEffect();
         float getClanBuildingMagAtkEffect();
         float getClanBuildingActionEffect();
+        float getClanBuildingPhyDefEffect();
+        float getClanBuildingMagDefEffect();
 
         // 所有将互斥法宝
         bool checkTrumpMutually(UInt32 trumpid);
@@ -2943,6 +2945,9 @@ namespace GObject
         void guankaActUdpLog(UInt32, bool);
         void addguankaScoreByAttack(UInt32);
         void AddHeartSword(UInt32 val);
+        void getXuanTianNingLuLua(UInt32 c);
+        UInt32 getXuanTianNingLu(UInt32 c, IncommingInfo* ii);
+        UInt32 useXuanTianNingLu(UInt32 a, ConsumeInfo* ci);
     public:
         // 八部浮屠
         void sendBBFTInfo();
@@ -3011,10 +3016,16 @@ namespace GObject
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
         void sevensoul_fixed();
+        void BuyLeftPower();
 
         //友好度
         //void AddFriendlyCount(Player * friender , UInt8 taskNum) ;
         //void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
+
+        void makeFighterSGList(Stream& st);
+        void sendFighterSGListWithNoSkill();
+        void makeFighterSGListWithNoSkill(Stream& st);
+
     public:
         UInt8 useChangeSexCard();
         void doTableInWorld(Fighter* fgt, UInt32 oldId);
@@ -3030,6 +3041,7 @@ namespace GObject
         void do_sh_fighter_attr2(Fighter* fgt, UInt32 oldId);
         void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
         void do_fighter_xinmo(Fighter* fgt, UInt32 oldId);
+        void do_skill_grade(Fighter* fgt, UInt32 oldId);
 	};
 
 
