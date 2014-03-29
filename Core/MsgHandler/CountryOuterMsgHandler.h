@@ -74,6 +74,7 @@
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
 #include "GObject/ClanBuilding.h"
+#include "GObject/RaceBattle.h"
 
 struct NullReq
 {
@@ -6543,6 +6544,71 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
         default:
             return;
             break;
+    }
+}
+
+void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+    if(!gRaceBattle)
+        return;
+    //if(player->getLocation() != gRaceBattle->getLocation())
+    //    return;
+    if(player->GetLev() < 40)
+        return;
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    switch(type)
+    {
+        case 4:
+        {
+            UInt8 pos = 0;
+            brd >> pos;
+            gRaceBattle->enterPos(player, pos);
+        }
+        break;
+
+        case 5:
+        {
+            gRaceBattle->autoBattle(player);
+        }
+        break;
+
+        case 6:
+        {
+            gRaceBattle->cancelBattle(player);
+        }
+        break;
+
+        case 7:
+        {
+            gRaceBattle->freshContinueWinRank(player);
+        }
+        break;
+
+        case 8:
+        {
+            gRaceBattle->getAward(player);
+        }
+        break;
+
+        case 9:
+        {
+            UInt32 reportId = 0;
+            gRaceBattle->readBattleReport(player, reportId);
+        }
+        break;
+
+        case 10:
+        {
+            gRaceBattle->requestMatch(player);
+        }
+        break;
+
+        default:
+        break;
     }
 }
 
