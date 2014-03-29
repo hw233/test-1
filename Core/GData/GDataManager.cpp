@@ -447,6 +447,11 @@ namespace GData
             fprintf (stderr, "Load LoadSkillEvConfig Error !\n");
             std::abort();
         }
+        if (!LoadRandBattleConfig())
+        {
+            fprintf (stderr, "Load LoadRandBattleConfig Error !\n");
+            std::abort();
+        }
 
 		return true;
 	}
@@ -2930,6 +2935,26 @@ namespace GData
             skillEv.consume = dbskillev.consume;
             skillEv.needLev = dbskillev.needLev;
             GData::skillEvData.setSkillEvData(dbskillev.lev, skillEv);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadRandBattleConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBRandBattleAttr dbattr;
+		if(execu->Prepare("SELECT `lev`, `id`, `value`, `next` FROM `randbattle_attr`", dbattr) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            RandBattleData::stRandBattle randBattle;
+            randBattle.id = dbattr.id;
+            randBattle.value = dbattr.value;
+            randBattle.next = dbattr.next;
+            GData::randBattleData.setRandBattleData(dbattr.lev, randBattle);
         }
         return true;
     }

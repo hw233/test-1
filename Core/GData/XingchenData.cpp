@@ -63,4 +63,19 @@ namespace GData
         return NULL;
     }
 
+    RandBattleData randBattleData;
+
+    void RandBattleData::setRandBattleData(UInt8 lev, stRandBattle& randBattle)
+    {
+        _randBattle.insert(std::make_pair(lev, randBattle));
+    }
+
+    RandBattleData::stRandBattle* RandBattleData::getRandBattleData(UInt8 lev)
+    {
+        std::map<UInt8, stRandBattle>::iterator iter = _randBattle.find(lev);
+        if(iter != _randBattle.end())
+            return &(iter->second);
+        return NULL;
+    }
+
 }

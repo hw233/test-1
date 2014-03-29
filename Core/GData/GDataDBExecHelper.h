@@ -708,6 +708,14 @@ struct DBSkillEv
     UInt8 needLev;
 };
 
+struct DBRandBattleAttr
+{
+    UInt8 lev;
+    Int8 id;
+    float value;
+    UInt8 next;
+};
+
 struct DBKeyinConfig
 {
     UInt8 keyinId;
@@ -1699,6 +1707,16 @@ SPECIALDEF(4)
     Int32, effect,
     UInt32, consume,
     UInt8, needLev
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBRandBattleAttr)
+SPECIALDEF(4)
+	(
+    UInt8, lev,
+    Int8, id,
+    float, value,
+    UInt8, next
 	)
 SPECIALEND()
 
