@@ -24,7 +24,7 @@ function skill_ev()
             print "INSERT INTO `skill_ev` VALUES";
         } {
             printf("(%u,%u,%u,%u)",$1,$3,$4,$5);
-            if (NR <= ENVIRON["lines"]-1)
+            if (NR < ENVIRON["lines"])
                 printf(",");
             else if (NR >= ENVIRON["lines"])
                 printf(";");

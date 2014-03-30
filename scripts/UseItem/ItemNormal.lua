@@ -9284,8 +9284,8 @@ end
 
 function ItemNormal_00016000(iid, num, bind, param)
     local player = GetPlayer()
-    if player:GetLev() < 85 then
-        player:sendMsgCode(0, 1093, 80);
+    if player:GetLev() < 75 then
+        player:sendMsgCode(0, 1093, 75);
         return false
     end
     if iid ~= 16000 and iid ~= 16001 and iid ~= 16002 then
@@ -9297,7 +9297,7 @@ function ItemNormal_00016000(iid, num, bind, param)
     local totalNum;
     if iid == 16002 then
         totalNum = num * 1000
-    else if iid == 16000 then
+    elseif iid == 16000 then
         totalNum = num * 15
     else
         totalNum = num * 100

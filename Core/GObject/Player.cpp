@@ -22172,7 +22172,7 @@ UInt8 Player::toQQGroup(bool isJoin)
         return xtnl;
 	}
 
-	UInt32 Player::useXianpoXuanTianNingLu(UInt32 a, ConsumeInfo* ci)
+	UInt32 Player::useXuanTianNingLu(UInt32 a, ConsumeInfo* ci)
 	{
         UInt32 xtnl = GetVar(VAR_SKILL_GRADE_MONEY);
         if(a == 0 || xtnl == 0)

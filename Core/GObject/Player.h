@@ -2945,7 +2945,7 @@ namespace GObject
         void AddHeartSword(UInt32 val);
         void getXuanTianNingLuLua(UInt32 c);
         UInt32 getXuanTianNingLu(UInt32 c, IncommingInfo* ii);
-        UInt32 useXianpoXuanTianNingLu(UInt32 a, ConsumeInfo* ci);
+        UInt32 useXuanTianNingLu(UInt32 a, ConsumeInfo* ci);
     public:
         // 八部浮屠
         void sendBBFTInfo();

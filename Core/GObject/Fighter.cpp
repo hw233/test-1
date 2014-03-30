@@ -7521,7 +7521,7 @@ void Fighter::SGradeManual(UInt16 skillId)
 {
     if(!_owner)
         return;
-    if(_owner->GetLev() < 85)
+    if(_owner->GetLev() < 75)
         return;
     const GData::SkillBase* skill = GData::skillManager[skillId];
     if(!skill)
@@ -7562,7 +7562,9 @@ void Fighter::SGradeManual(UInt16 skillId)
         return;
     }
 
-    _owner->SetVar(VAR_SKILL_GRADE_MONEY, sgMoney - consume);
+    //_owner->SetVar(VAR_SKILL_GRADE_MONEY, sgMoney - consume);
+    ConsumeInfo ci(SkillGrade, 0, 0);
+    _owner->useXuanTianNingLu(consume, &ci);
     ++sgLevel;
 
     SGrade sgTmp;
@@ -7586,7 +7588,7 @@ void Fighter::SGradeAuto(UInt16 skillId)
 {
     if(!_owner)
         return;
-    if(_owner->GetLev() < 85)
+    if(_owner->GetLev() < 75)
         return;
     const GData::SkillBase* skill = GData::skillManager[skillId];
     if(!skill)
@@ -7647,11 +7649,8 @@ void Fighter::SGradeAuto(UInt16 skillId)
         _owner->sendMsgCode(0, 4015);
     }
 
-    if(sgMoney > totalConsume)
-        moneyTmp = sgMoney - totalConsume;
-    else
-        moneyTmp = 0;
-    _owner->SetVar(VAR_SKILL_GRADE_MONEY, moneyTmp);
+    ConsumeInfo ci(SkillGrade, 0, 0);
+    _owner->useXuanTianNingLu(totalConsume, &ci);
 
     sgLevel += realCnt;
 
@@ -7668,6 +7667,7 @@ void Fighter::SGradeAuto(UInt16 skillId)
     st << sgLevel;
     st << _owner->GetVar(VAR_SKILL_GRADE_MONEY);
     st << realCnt;
+    st << totalConsume;
     st << Stream::eos;
     _owner->send(st);
 }
@@ -7814,11 +7814,15 @@ void Fighter::SGDismiss(UInt16 skillid, bool isDel, Mail * mail)
     //技能升阶散功，返回技能升阶60%
     if(!_owner)
         return;
+    if(_owner->GetLev() < 75)
+        return;
     UInt32 sid = SKILL_ID(skillid);
     std::map<UInt16, SGrade>::iterator it = m_sg.find(sid);
     if (it == m_sg.end())
         return;
     SGrade& sg = it->second;
+    if(sg.lvl == 0)
+        return;
     UInt32 sgExp = 0;
     for (UInt8 lvl = 0; lvl < sg.lvl; ++lvl)
     {
@@ -7828,27 +7832,40 @@ void Fighter::SGDismiss(UInt16 skillid, bool isDel, Mail * mail)
     }
     sgExp *= 0.6;
     if(sgExp < 15)
-        return;
-    UInt16 sgCount = sgExp / 1000;
-    sgExp = sgExp % 1000;
-    UInt16 sgCount1 = sgExp / 100;
-    sgExp = sgExp % 100;
-    UInt16 sgCount2 = sgExp / 15;
-
-    MailPackage::MailItem sgmitem[3] = {{16002, sgCount}, {16001, sgCount1}, {16000, sgCount2}};
-    if(!mail)
     {
-        const GData::SkillBase* skill = GData::skillManager[skillid];
-        if (!skill) return;
-        StringTokenizer sk(skill->getName(), "LV");
-        SYSMSG(title, 2031);
-        SYSMSGV(content, 2032, getLevel(), getColor(), getName().c_str(), sk[0].c_str());
-        MailItemsInfo itemsInfo(sgmitem, DismissCitta, 3);
-        mail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(!mail)
+        {
+            const GData::SkillBase* skill = GData::skillManager[skillid];
+            if (!skill) return;
+            StringTokenizer sk(skill->getName(), "LV");
+            SYSMSG(title, 2031);
+            SYSMSGV(content, 2033, getLevel(), getColor(), getName().c_str(), sk[0].c_str());
+            _owner->GetMailBox()->newMail(NULL, 0x01, title, content);
+        }
     }
-    if(mail)
+    else
     {
-        mailPackageManager.push(mail->id, sgmitem, 3, true);
+        UInt16 sgCount = sgExp / 1000;
+        sgExp = sgExp % 1000;
+        UInt16 sgCount1 = sgExp / 100;
+        sgExp = sgExp % 100;
+        UInt16 sgCount2 = sgExp / 15;
+
+        MailPackage::MailItem sgmitem[3] = {{16002, sgCount}, {16001, sgCount1}, {16000, sgCount2}};
+        if(!mail)
+        {
+            const GData::SkillBase* skill = GData::skillManager[skillid];
+            if (!skill) return;
+            StringTokenizer sk(skill->getName(), "LV");
+            SYSMSG(title, 2031);
+            SYSMSGV(content, 2032, getLevel(), getColor(), getName().c_str(), sk[0].c_str());
+            MailItemsInfo itemsInfo(sgmitem, DismissCitta, 3);
+            mail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        }
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, sgmitem, 3, true);
+        }
     }
 
     sg.lvl = 0;
