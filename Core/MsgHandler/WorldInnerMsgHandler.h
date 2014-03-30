@@ -2315,8 +2315,8 @@ void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
                 if(i == e)
                 {
                     st1 << i->total << static_cast<UInt32>(idx - 1); 
-                    if(World::tyss_PlayerSort.size() >= 3)
-                        st1 << static_cast<UInt8>(3);
+                    if(World::tyss_PlayerSort.size() >= 7)
+                        st1 << static_cast<UInt8>(7);
                     else
                         st1 << static_cast<UInt8>(World::tyss_PlayerSort.size());
                 }

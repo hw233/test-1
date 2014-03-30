@@ -5529,6 +5529,7 @@ void Clan::sendMemberBuf(UInt8 pos)
     UInt32 endTime = TimeUtil::Now() + 86400 * 14;
 	ClanMember * mem = NULL;
 	Members::iterator offset;
+    MailPackage::MailItem * mitem = new MailPackage::MailItem;
 	for(offset = _members.begin(); offset != _members.end(); ++ offset)
 	{
 		mem = *offset;
@@ -5545,6 +5546,13 @@ void Clan::sendMemberBuf(UInt8 pos)
             pl->setBuffData(PLAYER_BUFF_CLAN3, endTime);
 
         pl->rebuildBattleName();
+        SYSMSG(title, 947);
+        SYSMSGV(content, 950, pos);
+        MailItemsInfo itemsInfo(mitem, Activity, 1);
+        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000);
+        if(mail)
+            mailPackageManager.push(mail->id, mitem, 1, true);
+
 	}
 }
 

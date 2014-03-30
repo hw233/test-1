@@ -27122,6 +27122,8 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             break;
         case 4://购买限购礼包
         {
+            if(flag >= 10)
+                return;
             UInt8 consume_type = flag / 4;
             UInt8 consume_pos = flag % 4;
             UInt8 tmp_int = 0;
@@ -27138,23 +27140,36 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 {{1728,1}, {0,0}, {0,0},{599,1}},
             };
 
+
             if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 100 && getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 3000)
                 return;
             else
-                if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 200 && flag > 2 && getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 19000)
-                    return;
-                else if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 300 && flag > 4 && getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 40000)
-                    return;
-                    else if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 400 && flag > 6 && getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 70000)
+                if( flag > 1)
+                {
+                    if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 200 || getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 19000)
                         return;
-                        else if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 500 && flag > 8 && getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 100000)
+                }
+                else if( flag > 3 )
+                    {
+                        if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 300 || getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 40000)
                             return;
+                    }
+                    else if( flag > 5 )
+                        {
+                            if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 400 || getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 70000)
+                                return;
+                        }
+                        else if( flag > 7 )
+                        {
+                            if(GetVar(VAR_TYSS_CONTRIBUTE_CLAN) < 500 || getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) < 100000)
+                                return;
+                        }
 
             if(GetPackage()->GetRestPackageSize() < 2)
+            {
                 sendMsgCode(2, 1011);
-
-            if(flag >= 10)
                 return;
+            }
 
             if(getGold() < awards[flag][3][0])
             {
