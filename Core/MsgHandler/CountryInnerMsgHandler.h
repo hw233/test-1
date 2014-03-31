@@ -2822,11 +2822,15 @@ void OnAcceptBrother(GameMsgHdr & hdr ,const void *data)
 
 void OnDrinking(GameMsgHdr & hdr,const void *data)
 {
-    NSG_QUERY_PLAYER(player);
-    UInt64 GObject:: player = 
+    MSG_QUERY_PLAYER(player);
+    struct st
+    {
+        UInt64 playerId;
+        UInt8 drinkCount;
+    };
+    struct st _st = *reinterpret_cast<const struct st *>(data);
     GObject::Player *p1 = player->getDrinkInfo().drinker;
-    UInt32 btime = player->getDrinkInfo().time;
-    player->drinking(p1,btime,true);
+    player->drinking(p1,_st.drinkCount);
 }
 void OnBeInviteDrinking(GameMsgHdr & hdr ,const void *data)
 {

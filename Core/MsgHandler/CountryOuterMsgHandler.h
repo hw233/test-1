@@ -8392,16 +8392,6 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             friendOne->GetMailBox()->newMail(player, 0x16, title, content);
         }
 		break;
-<<<<<<< HEAD
-    case 3:
-        break;
-    case 4:
-        {
-           if(player->IsAccept())
-           {
-               SYSMSGV(content, 402,player->getCountry(), player->getName().c_str());
-           }
-=======
 	case 0x03:
         {
             std::string name ;
@@ -8418,6 +8408,14 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             player->send(st);
         }
 		break;
+    case 4:
+        {
+           if(player->IsAccept())
+           {
+               SYSMSGV(content, 402,player->getCountry(), player->getName().c_str());
+           }
+        }
+        break;
     case 0x05:
         {
             std::string name ;
@@ -8452,7 +8450,6 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             GameMsgHdr hdr(0x404, friendOne->getThreadId(), friendOne, sizeof(_st));
             GLOBAL().PushMsg( hdr, &_st );
             //friendOne->beReplyForDrinking(player,res);
->>>>>>> f956c72d336c112c9b9c3fd8f7916dc332b7eef4
         }
         break;
 	}

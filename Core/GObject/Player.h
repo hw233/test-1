@@ -646,7 +646,7 @@ namespace GObject
         UInt8 addTimeNum;
         QiShiBanInfo() : score(0), step(0), beginTime(0), endTime(0), awardMark(0), randKey(0), addTimeNum(0) {}
     };
-    
+
     struct DrinkInfo
     {
         Player * drinker;   //饮酒对象
@@ -654,6 +654,17 @@ namespace GObject
         UInt8 type ;        //酒壶类型
         DrinkInfo() : drinker(NULL) , time(0) , type(0){}
         void reset(){ drinker = NULL ; time = 0 ; type = 0;}
+    };
+    struct FriendCount
+    {
+        UInt32 value ;  //友好度
+        UInt32 time ; // 发送结拜时间
+        UInt32 cost ; // 发起结拜时消耗数
+        FriendCount():value(0),time(0),cost(0){}
+        FriendCount(UInt32 val):value(val),time(0),cost(0){}
+        FriendCount(UInt32 val, UInt32 tm ,UInt32 ct):value(val),time(tm),cost(ct){}
+        void setTimeAndCost(UInt32 tm , UInt32 ct){time = tm ; cost = ct;}
+        void resetTimeAmdCost(){time =0 ; cost = 0;}
     };
 
     struct MoBaoInfo
@@ -2098,8 +2109,9 @@ namespace GObject
         std::map<UInt64,std::vector<StuPresentBox> > _present; 
         std::map<UInt64,std::vector<StuPresentBox> >_bePresent; 
 
-        std::map<UInt64, UInt32 >_friendlyCount;   //友好度
-		std::map<UInt64 , UInt32> _brothers; // 结拜兄弟(不分男女)
+        std::map<UInt64, struct FriendCount >_friendlyCount;   //友好度
+		std::map<UInt64 , UInt32> _brothers; // 结拜兄弟(不分男女) 第二参数为发起饮酒的时间
+
 		TaskMgr* m_TaskMgr;
 		Trade* m_Trade;
 		Sale* m_Sale;
@@ -3000,11 +3012,8 @@ namespace GObject
         UInt16 _alreadyCnt[8];
         UInt8 _alreadyload[8];
         //
-        Player * _drinking ;
-        UInt32 _drinkingValue;
         UInt32 _drinkingSum;
-        UInt32 _drinkingAdd;
-        UInt32 _drinkingPoint;
+        UInt32 _friendSum;
         //
         DrinkInfo drinkInfo ;
     public:
@@ -3032,7 +3041,7 @@ namespace GObject
         //友好度
         void AddFriendlyCount(Player * friender , UInt8 taskNum) ; //增加友好度
         void CompleteFriendlyTask(Player * friender , UInt8 taskNum ,UInt8 flag = 0/*是否为主动*/ );
-        void LoadFriendlyCountFromDB(UInt64 friendId , UInt32 val ); //加载友好度
+        void LoadFriendlyCountFromDB(UInt64 friendId , UInt32 val ,UInt32 time, UInt32 cost ); //加载友好度
         void UpdateFriendlyCountToDB(UInt64 friendId);   //更新友好度
         void sendFirendlyCountTaskInfo();  //发送友好度任务信息(附加友情值)
         void InsertBrother(Player * pl);  //插入结拜兄弟
@@ -3044,18 +3053,14 @@ namespace GObject
         void InviteDrinking(Player * friendOne);
         void beInviteDrinking(Player * pl ,  UInt8 type);
         void acceptBrother(Player * friendOne , bool flag = false /*抛对方*/);
-//<<<<<<< HEAD
-        void setDrinking(Player * drinker){ _drinking = drinker ;}
-        Player* getDrinking(){return _drinking ;}
-        void setDrinkingValue(UInt32 value){_drinkingValue = value ;};
-        UInt32 getDrinkingValue(){return _drinkingValue;}
-//=======
+        
         void setDrinking(Player * drinker ,UInt32 val){ drinkInfo.drinker = drinker ;}
         void setDrinkType(UInt8 type ){ drinkInfo.type = type ;}
         DrinkInfo getDrinkInfo(){ return drinkInfo;}
         void beReplyForDrinking(Player * pl , UInt8 res ,UInt8 type = 0);
+        bool UseMeiHuaJian(UInt32 num);
+        void sendFriendlyTimeAndCost();
 
-//>>>>>>> f956c72d336c112c9b9c3fd8f7916dc332b7eef4
     public:
         UInt8 useChangeSexCard();
         void doTableInWorld(Fighter* fgt, UInt32 oldId);
