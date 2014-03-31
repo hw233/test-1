@@ -2711,6 +2711,8 @@ void OnServerLeftLineup( GameMsgHdr& hdr, const void* data )
 
     Stream st(SERVERLEFTREQ::COMMIT_LINEUP, 0xED);
     st << player->getId();
+    st << player->getName();
+    st << player->getTitle();
     player->appendLineup2(st);
     player->appendPetOnBattle(st);
     st << Stream::eos;
