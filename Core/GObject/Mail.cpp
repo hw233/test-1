@@ -849,6 +849,9 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			{
 				SYSMSG(content, 213);
 				mail->content = content;
+                UInt64 playerId = _owner->getId();
+                GameMsgHdr hdr(0x405, pl->getThreadId(), pl, sizeof(UInt64));
+                GLOBAL().PushMsg(hdr, &playerId);
 			}
 			updateMail(mail);
         }

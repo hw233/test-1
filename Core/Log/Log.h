@@ -309,6 +309,7 @@ enum ItemFrom
     FromJiqirenAct = 69, //机器人活动
     FromMoBao = 70, //墨宝
     FromTYSS = 71, //天元神兽
+    FromJieBai = 72 ,
     //80 ~ 100，繁体占用
 };
 

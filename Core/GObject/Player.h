@@ -664,7 +664,7 @@ namespace GObject
         FriendCount(UInt32 val):value(val),time(0),cost(0){}
         FriendCount(UInt32 val, UInt32 tm ,UInt32 ct):value(val),time(tm),cost(ct){}
         void setTimeAndCost(UInt32 tm , UInt32 ct){time = tm ; cost = ct;}
-        void resetTimeAmdCost(){time =0 ; cost = 0;}
+        void resetTimeAndCost(){time =0 ; cost = 0;}
     };
 
     struct MoBaoInfo
@@ -3047,7 +3047,8 @@ namespace GObject
         bool CheckCanDrink(Player * friendOne , UInt8 type);
         void InviteDrinking(Player * friendOne);
         void beInviteDrinking(Player * pl ,  UInt8 type);
-        void acceptBrother(Player * friendOne , bool flag = false /*抛对方*/);
+        bool acceptBrother(Player * friendOne , bool flag = false /*抛对方*/);
+        void beRefuceBrother(Player * friendOne );
         void setDrinking(Player * drinker ,UInt32 val){ drinkInfo.drinker = drinker ;}
         void setDrinkType(UInt8 type ){ drinkInfo.type = type ;}
         DrinkInfo getDrinkInfo(){ return drinkInfo;}
