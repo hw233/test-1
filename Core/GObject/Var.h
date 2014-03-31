@@ -706,6 +706,7 @@ namespace GObject
         VAR_CLAN_FRIEND = 732 ,    //帮派玩家是否增加过友好度(8位) , 玩家购买的饮酒次数
         VAR_DRINK_COUNT = 733 ,    //饮酒次数 主动发起(8位) ,被动接受(8位)
         VAR_DRINK_VALUE = 734 ,    //豪饮值
+        VAR_FRIEND_VALUE_DAY = 735 ,    //每日友情值
         VAR_MAX,
     };
 
