@@ -474,6 +474,9 @@ namespace GObject
         VAR_ZCJB_RECHARGE_GOLD = 459, //招财进宝总共充值仙石
         VAR_CLANBOSS_GONGXIAN= 460, //末日之战贡献
 
+        // 441-442 for JLT
+        VAR_GUANKA_ACTION_UDPLOG = 461, //关卡活动npc击杀情况udplog日志
+
         //繁体版占用470-499
 
         //500-520 for lijr
@@ -1136,6 +1139,7 @@ namespace GObject
             REGISTER_VAR(VAR_LEVEL_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_ZCJB_RECHARGE_GOLD, CYCLE_NONE);
             REGISTER_VAR(VAR_CLANBOSS_GONGXIAN, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANKA_ACTION_UDPLOG, CYCLE_NONE);
 
             REGISTER_VAR(VAR_PET_CUILIAN_EXTRA_LOW_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_PET_CUILIAN_EXTRA_UP_SCORE, CYCLE_DAY);

@@ -541,8 +541,7 @@ namespace GObject
             UInt32 knockTime = pl->GetVar(VAR_MARRYBOARD4_TIME);
             if(now > _atTime + 2 * OneTime  && now < _atTime + 3 * OneTime && now - knockTime > 15)
             {
-                if(_door[door-1] < doorMax)
-                    _door[door-1] ++ ; 
+                _door[door-1] ++ ; 
 
                 if(_door[door-1] == doorMax )
                 {
