@@ -448,6 +448,8 @@ MSG_REG_2(GameMsgHdr, 0x396, OnServerLeftBattleReq);   //战斗信息请求
 //游戏服务器
 MSG_REG_2(GameMsgHdr, 0x401, OnAcceptBrother);   //战斗信息请求
 MSG_REG_2(GameMsgHdr, 0x402, OnDrinking);   // 饮酒
+MSG_REG_2(GameMsgHdr, 0x403, OnBeInviteDrinking);   //被邀请对酒
+MSG_REG_2(GameMsgHdr, 0x404, OnBeAcceptDrinking);   //被邀请对酒
 
 
 MSG_HANDLER_END()
