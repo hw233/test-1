@@ -29693,7 +29693,7 @@ void Player::acceptBrother(Player * friendOne , bool flag)
         return ;
     _brothers.insert(friendOne);
     UpdateFriendlyCountToDB(friendOne->getId());
-    UInt64 friendId = friendOne->getId();
+    UInt64 friendId = getId();
     if(!flag)
     {
         if(friendOne->getThreadId() == getThreadId())
@@ -29706,6 +29706,64 @@ void Player::acceptBrother(Player * friendOne , bool flag)
             GLOBAL().PushMsg(hdr, &friendId);
         }
     }
+}
+
+bool IsAccept(Player * friendOne)
+{
+    return true;
+}
+
+void Player::drinking(Player * friendOne, UInt32 btime, bool flag)
+{
+    if(!_hasFriend(friendOne))
+        return;
+    _drinkingSum += friendOne->getDrinkingValue();
+    setDrinkingValue(getDrinkingValue()+friendOne->getDrinkingValue());
+    UInt32 friendId = getId();
+    UInt32 time = btime -  TimeUntil::Now();
+    
+    if(!flag && time < 20 && _drinkingSum < 50)
+    {
+        if(friendOne->getThreadId() == getThreadId())
+        {
+            friendOne->drinking(this, true);
+        }
+        else
+        {
+            GameMsgHdr hdr(0x402, friendOne->getDrinkingValue(), friendOne, 4);
+            GLOBAL().PushMsg(hdr, &friendId);
+        }
+    }
+    Stream st(REP::BROTHER);
+    st << static_cast<UInt8>(getDrinkingValue());
+    send(st); 
+}
+
+UInt32 DrinkingPoint(Player *friendOne)
+{
+    if(_drinkingSum>0 && _drinkingSum<40)
+    { 
+        _drinkingAdd = 0.9;
+        friendOne->_drinkingAdd = 0;
+    }
+    else if(_drinkingSum<45)
+    {
+        _drinkingAdd = 0.95;
+        friendOne->_drinkingAdd = 0.05;
+    }
+    else if(_drinkingSum<50)
+    {
+        _drinkingAdd = 1;
+        friendOne->_drinkingAdd = 0.1;
+    }
+    else 
+    {
+       _drinkingAdd = 0.95;
+       friendOne->_drinkingAdd = 0.5;
+    }
+    
+    UInt32 _drinkingPoint=(_drinkingAdd+friendOne->_drinkingAdd)*_drinkingSum;
+    return _drinkingPoint;
 }
 
 } // namespace GObject

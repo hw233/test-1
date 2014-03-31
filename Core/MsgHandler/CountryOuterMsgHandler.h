@@ -8386,6 +8386,16 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             friendOne->GetMailBox()->newMail(player, 0x16, title, content);
         }
 		break;
+    case 3:
+        break;
+    case 4:
+        {
+           if(player->IsAccept())
+           {
+               SYSMSGV(content, 402,player->getCountry(), player->getName().c_str());
+           }
+        }
+        break;
 	}
 
 }

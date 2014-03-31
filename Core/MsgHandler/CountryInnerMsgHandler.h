@@ -2819,6 +2819,16 @@ void OnAcceptBrother(GameMsgHdr & hdr ,const void *data)
         return ;
     player->acceptBrother(pl,true);
 }
+
+void OnDrinking(GameMsgHdr & hdr,const void *data)
+{
+    NSG_QUERY_PLAYER(player);
+    UInt64 GObject:: player = 
+    GObject::Player *p1 = player->getDrinkInfo().drinker;
+    UInt32 btime = getDrinkInfo().time;
+    player->drinking(p1,btime,true);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 
