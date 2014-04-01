@@ -664,7 +664,7 @@ namespace GObject
         FriendCount(UInt32 val):value(val),time(0),cost(0){}
         FriendCount(UInt32 val, UInt32 tm ,UInt32 ct):value(val),time(tm),cost(ct){}
         void setTimeAndCost(UInt32 tm , UInt32 ct){time = tm ; cost = ct;}
-        void resetTimeAmdCost(){time =0 ; cost = 0;}
+        void resetTimeAndCost(){time =0 ; cost = 0;}
     };
 
     struct MoBaoInfo
@@ -3052,14 +3052,21 @@ namespace GObject
         bool CheckCanDrink(Player * friendOne , UInt8 type);
         void InviteDrinking(Player * friendOne);
         void beInviteDrinking(Player * pl ,  UInt8 type);
-        void acceptBrother(Player * friendOne , bool flag = false /*抛对方*/);
-        
+
+        bool acceptBrother(Player * friendOne , bool flag = false /*抛对方*/);
+        void beRefuceBrother(Player * friendOne );
+
         void setDrinking(Player * drinker ,UInt32 val){ drinkInfo.drinker = drinker ;}
         void setDrinkType(UInt8 type ){ drinkInfo.type = type ;}
         DrinkInfo getDrinkInfo(){ return drinkInfo;}
+        UInt32 getfriendSum(){return _friendSum;}
         void beReplyForDrinking(Player * pl , UInt8 res ,UInt8 type = 0);
         bool UseMeiHuaJian(UInt32 num);
         void sendFriendlyTimeAndCost();
+
+        bool IsAccept(Player * friendOne);
+        void drinking(Player * friendOne, UInt8 drinkCount);
+        float DrinkingPoint(Player *friendOne);
 
     public:
         UInt8 useChangeSexCard();

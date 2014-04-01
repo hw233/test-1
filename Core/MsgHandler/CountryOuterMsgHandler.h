@@ -8410,10 +8410,23 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
 		break;
     case 4:
         {
-           if(player->IsAccept())
-           {
-               SYSMSGV(content, 402,player->getCountry(), player->getName().c_str());
-           }
+            std::string name;
+            br >> name;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            if(player->IsAccept(friendOne)) 
+            {
+                struct st
+                {
+                    UInt64 playerId;
+                    UInt8 drinkCount;
+                }_st;
+                _st.playerId = player->getId();
+                _st.drinkCount = 0;
+                GameMsgHdr hdr(0x402, friendOne->getThreadId(), friendOne, sizeof(_st));
+                GLOBAL().PushMsg( hdr, &_st );
+            }
         }
         break;
     case 0x05:
