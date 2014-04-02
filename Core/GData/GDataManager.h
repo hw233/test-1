@@ -53,6 +53,7 @@ namespace GData
         static bool LoadFighterProb();
         static bool LoadCopyData();
         static bool LoadFrontMapData();
+        static bool LoadXJFrontMapData();
         static bool LoadOnlineAwardData();
         static bool LoadMoney();
         static bool LoadEUpgradeData();

@@ -906,6 +906,17 @@ void OnAutoFrontMapAttack( GameMsgHdr& hdr, const void * data )
         player->autoFrontMapFailed();
 }
 
+void OnAutoXJFrontMapAttack( GameMsgHdr& hdr, const void * data )
+{
+    if (!data)
+        return;
+
+	MSG_QUERY_PLAYER(player);
+
+    UInt16 idspot = *(UInt16*)data;
+    UInt8 ret = xjfrontMap.fight(player, (idspot>>8)&0xFF, idspot&0xFF, true);
+}
+
 void OnPlayerTimeTick( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1700,7 +1711,7 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
     else if(type == 1)
     {
         Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
-        st << player->getId();
+        st << player->getId() << player->getName();
         player->appendLineup2(st);
         player->appendPetOnBattle(st);
         st << Stream::eos;
@@ -2618,7 +2629,7 @@ void OnServerWarLineup( GameMsgHdr& hdr, const void* data )
         return;
 
     Stream st(SERVERWARREQ::COMMIT_LINEUP, 0xEE);
-    st << player->getId();
+    st << player->getId() << player->getName();
     player->appendLineup2(st);
     player->appendPetOnBattle(st);
     st << Stream::eos;
@@ -2711,6 +2722,8 @@ void OnServerLeftLineup( GameMsgHdr& hdr, const void* data )
 
     Stream st(SERVERLEFTREQ::COMMIT_LINEUP, 0xED);
     st << player->getId();
+    st << player->getName();
+    st << player->getTitle();
     player->appendLineup2(st);
     player->appendPetOnBattle(st);
     st << Stream::eos;

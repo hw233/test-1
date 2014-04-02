@@ -159,7 +159,9 @@ enum PurchaseType
     BuyTYSSLim                  = 1021, //天元神兽限购礼包
     BuyPower                    = 1022, //购买仙界体力
     SkillGrade                  = 1023, //技能升阶
-    ZhenYuanCuiLian             = 1024, //阵元淬炼费
+    EnterAutoXJFrontMap         = 1024, //璇玑阵图
+    EnterXJFrontMap             = 1025, //璇玑阵图
+    ZhenYuanCuiLian             = 1026, //阵元淬炼费
     //繁体私有占150～200
 };
 

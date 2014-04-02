@@ -1121,11 +1121,11 @@ namespace GObject
             player->sendMsgCode(0, 6018);
             return 1;
         }
-        if(time1 - TimeUtil::Now() < 86400 * 2)//判断前两天不能取消确定的婚约
+        /*if(time1 - TimeUtil::Now() < 86400 * 2)//判断前两天不能取消确定的婚约
         {
             player->sendMsgCode(0, 6017);
             return 1;
-        }
+        }*/
 
         if(player->GetVar(VAR_MARRY_STATUS) == 3)
         {
@@ -1154,7 +1154,13 @@ namespace GObject
         
         if(player->GetVar(VAR_MARRY_STATUS) == 4 && obj_player->GetVar(VAR_MARRY_STATUS) == 4)
         {
-                            
+        
+            if(time1 - TimeUtil::Now() < 86400 * 2)//判断前两天不能取消确定的婚约
+            {
+                player->sendMsgCode(0, 6017);
+                return 1;
+            }
+
             if(player->GetMarriageInfo()->yuyueTime != 0 && player->GetMarriageInfo()->eWedding != WEDDING_NULL )  
             {
                 if(getMoney(player,player->GetMarriageInfo()->eWedding) != 0)

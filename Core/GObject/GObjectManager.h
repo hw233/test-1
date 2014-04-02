@@ -452,6 +452,7 @@ namespace GObject
 		static bool loadFighters();
 		static bool loadCopy();
         static bool loadFrontMap();
+        static bool loadXJFrontMap();
 		static bool loadClanAssist();
 		static bool loadClanRobMonster();
 		static bool loadAllPlayers();

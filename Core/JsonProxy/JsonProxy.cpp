@@ -312,7 +312,7 @@ int main()
 #endif
             int flag = 1;
             setsockopt(new_fd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag));
-            setNonblock(new_fd);
+            //setNonblock(new_fd);
 
             g_log->OutTrace("accept new connection %s\n", inet_ntoa(their_addr.sin_addr));
         }

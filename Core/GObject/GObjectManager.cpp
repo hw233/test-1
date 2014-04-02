@@ -51,6 +51,7 @@
 #include "GObject/PracticePlace.h"
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
+#include "GObject/XJFrontMap.h"
 #include "GObject/WBossMgr.h"
 #include "GObject/TeamCopy.h"
 #include "GObject/PetTeamCopy.h"
@@ -292,6 +293,11 @@ namespace GObject
         if(!loadFrontMap())
         {
             fprintf(stderr, "loadFrontMap error!\n");
+            std::abort();
+        }
+        if(!loadXJFrontMap())
+        {
+            fprintf(stderr, "loadXJFrontMap error!\n");
             std::abort();
         }
 		if(!loadEquipments())
@@ -921,6 +927,24 @@ namespace GObject
 		while(execu->Next() == DB::DB_OK)
 		{
             frontMap.addPlayer(dbcd.playerId, dbcd.id, dbcd.spot, dbcd.count, dbcd.status, dbcd.lootlvl);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadXJFrontMap()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading xjfrontmap:");
+		DBFrontMapData dbcd;
+        lc.reset(2000);
+		if(execu->Prepare("SELECT `playerId`, `id`, `spot`, `count`, `status`, `lootlvl` FROM `player_xjfrontmap` ORDER BY `playerId`,`id`", dbcd) != DB::DB_OK)
+            return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            xjfrontMap.addPlayer(dbcd.playerId, dbcd.id, dbcd.spot, dbcd.count, dbcd.status, dbcd.lootlvl);
         }
         lc.finalize();
         return true;
@@ -1675,7 +1699,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1`,`xjfrontFreeCnt`, `xjfrontGoldCnt`, `xjfrontUpdate` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -3110,6 +3134,21 @@ namespace GObject
 			if(pl == NULL)
 				continue;
 			frontMap.autoBattle(pl, afm.id, 0, 0, true);
+		}
+		lc.finalize();
+
+        lc.prepare("Loading auto xjfrontmat challenge data:");
+		DBAutoFrontMap axjfm;
+		if(execu->Prepare("SELECT `playerId`, `id` FROM `auto_xjfrontmap`", axjfm) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[axjfm.playerId];
+			if(pl == NULL)
+				continue;
+			xjfrontMap.autoBattle(pl, axjfm.id, 0, 0, true);
 		}
 		lc.finalize();
 

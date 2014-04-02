@@ -9112,7 +9112,7 @@ end
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    local item = 1544;
+    local item = 1539;
 
     if package:GetRestPackageSize() < (1+(1*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
@@ -10257,12 +10257,17 @@ function ItemNormal_00009349(iid, num, bind, param)
 end
 
 function ItemNormal_NameCard(iid, num, bind, param)
-    if iid < 9900 or iid >= 10000 then
+    if iid == 9960 or iid < 9900 or iid >= 10000 then
         return false
     end
+    --9600:新手御剑特权卡 客户端占用
     local player = GetPlayer()
     local package = player:GetPackage();
-    player:setTitle(iid-9900+54, 0)
+    if iid < 9960 then
+        player:setTitle(iid-9900+54, 0)
+    else
+        player:setTitle(iid-9900+54-1, 0)
+    end
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -13086,6 +13091,55 @@ local ItemNormal_Table = {
     [9948] = ItemNormal_NameCard,
     [9949] = ItemNormal_NameCard,
     [9950] = ItemNormal_NameCard,
+    [9951] = ItemNormal_NameCard,
+    [9952] = ItemNormal_NameCard,
+    [9953] = ItemNormal_NameCard,
+    [9954] = ItemNormal_NameCard,
+    [9955] = ItemNormal_NameCard,
+    [9956] = ItemNormal_NameCard,
+    [9957] = ItemNormal_NameCard,
+    [9958] = ItemNormal_NameCard,
+    [9959] = ItemNormal_NameCard,
+
+    [9961] = ItemNormal_NameCard,
+    [9962] = ItemNormal_NameCard,
+    [9963] = ItemNormal_NameCard,
+    [9964] = ItemNormal_NameCard,
+    [9965] = ItemNormal_NameCard,
+    [9966] = ItemNormal_NameCard,
+    [9967] = ItemNormal_NameCard,
+    [9968] = ItemNormal_NameCard,
+    [9969] = ItemNormal_NameCard,
+    [9970] = ItemNormal_NameCard,
+    [9971] = ItemNormal_NameCard,
+    [9972] = ItemNormal_NameCard,
+    [9973] = ItemNormal_NameCard,
+    [9974] = ItemNormal_NameCard,
+    [9975] = ItemNormal_NameCard,
+    [9976] = ItemNormal_NameCard,
+    [9977] = ItemNormal_NameCard,
+    [9978] = ItemNormal_NameCard,
+    [9979] = ItemNormal_NameCard,
+    [9980] = ItemNormal_NameCard,
+    [9981] = ItemNormal_NameCard,
+    [9982] = ItemNormal_NameCard,
+    [9983] = ItemNormal_NameCard,
+    [9984] = ItemNormal_NameCard,
+    [9985] = ItemNormal_NameCard,
+    [9986] = ItemNormal_NameCard,
+    [9987] = ItemNormal_NameCard,
+    [9988] = ItemNormal_NameCard,
+    [9989] = ItemNormal_NameCard,
+    [9990] = ItemNormal_NameCard,
+    [9991] = ItemNormal_NameCard,
+    [9992] = ItemNormal_NameCard,
+    [9993] = ItemNormal_NameCard,
+    [9994] = ItemNormal_NameCard,
+    [9995] = ItemNormal_NameCard,
+    [9996] = ItemNormal_NameCard,
+    [9997] = ItemNormal_NameCard,
+    [9998] = ItemNormal_NameCard,
+    [9999] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,

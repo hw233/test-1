@@ -93,6 +93,8 @@ MSG_REG_2(GameMsgHdr, REQ::FORMATION_DATA, OnFrontMapReq);
 MSG_REG_2(GameMsgHdr, REQ::AUTO_COPY, OnAutoCopy);
 MSG_REG_2(GameMsgHdr, REQ::AUTO_FRONTMAP, OnAutoFrontMap);
 
+MSG_REG_2(GameMsgHdr, REQ::XJFRONTMAP, OnXJFrontMapReq);
+
 MSG_REG(GameMsgHdr, OnDayTaskAutoCompletedReq);
 MSG_REG(GameMsgHdr, OnQueryAutoCompletedTaskTimeReq);
 MSG_REG(GameMsgHdr, OnQueryDayTaskCompletedCountReq);
@@ -426,6 +428,8 @@ MSG_REG_2(GameMsgHdr, 0x363, OnBePresented);
 MSG_REG_2(GameMsgHdr, 0x364, OnDoStrongInWorld);
 MSG_REG_2(GameMsgHdr, 0x365, OnSend11GradeInfo);
 MSG_REG_2(GameMsgHdr, 0x366, OnRunFriendlyCompass);
+//MSG_REG_2(GameMsgHdr, 0x367, OnBeEatLingGuo);
+MSG_REG_2(GameMsgHdr, 0x368, OnAutoXJFrontMapAttack);
 
 //0x365-380繁体占用
 
