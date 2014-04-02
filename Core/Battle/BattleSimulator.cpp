@@ -3859,34 +3859,29 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 {
                     if(x < 4)
                     {
-                        pos += 5;
-                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor);
+                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos + 5), factor);
                     }
                 }
                 else if(index < 6500) //左右两侧
                 {
                     if(y > 0)
                     {
-                        pos -= 1;
-                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor);
+                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos - 1), factor);
                     }
                     if(y < 4)
                     {
-                        pos += 1;
-                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor);
+                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos + 1), factor);
                     }
                 }
                 else //左后右后
                 {
                     if(y > 0 && x < 4)
                     {
-                        pos =+ 4;
-                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor);
+                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos + 4), factor);
                     }
                     if(y < 4 && x < 4)
                     {
-                        pos += 6;
-                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor);
+                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos + 6), factor);
                     }
                 }
             }
