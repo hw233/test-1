@@ -3818,8 +3818,82 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             || skill->effect->magdam || skill->effect->magdamP || skill->effect->addmag
             || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr)
     {
+        if(SKILL_ID(skill->getId()) == 168)
+        {
+            static UInt8 skill_prob_168[4] = {0,  0,  50,  100};
+            UInt8 cnt;
+            UInt8 roll = _rnd(100);
+            if(skill_prob_168[0] > roll)
+                cnt = 0;
+            else if(skill_prob_168[1] > roll)
+                cnt = 1;
+            else if(skill_prob_168[2] > roll)
+                cnt = 2;
+            else if(skill_prob_168[3] > roll)
+                cnt = 3;
+            else
+                cnt = 0;
+
+            int fsize = skill->factor.size();
+            for(int i = 0; i < cnt + 1; ++ i)
+            {
+                UInt8 pos = target_pos;
+                UInt8 x = pos / 5;
+                UInt8 y = pos % 5;
+                float factor = 1;
+
+                if(i == cnt)
+                {
+                    dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor, 0, NULL, atkAct, canProtect);
+                    canProtect = false;
+                }
+                else
+                    dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor);
+
+                if(fsize > 1)
+                    factor = skill->factor[1];
+                else
+                    factor = 0.3;
+                UInt16 index = _rnd(10000);
+                if(index < 3000) //后方
+                {
+                    if(x < 4)
+                    {
+                        pos += 5;
+                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor);
+                    }
+                }
+                else if(index < 6500) //左右两侧
+                {
+                    if(y > 0)
+                    {
+                        pos -= 1;
+                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor);
+                    }
+                    if(y < 4)
+                    {
+                        pos += 1;
+                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor);
+                    }
+                }
+                else //左后右后
+                {
+                    if(y > 0 && x < 4)
+                    {
+                        pos =+ 4;
+                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor);
+                    }
+                    if(y < 4 && x < 4)
+                    {
+                        pos += 6;
+                        dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos), factor);
+                    }
+                }
+            }
+            attackByJiuziSS(bf, skill);
+        }
         //儒、元磁神雷
-        if(SKILL_ID(skill->getId()) == 122 || SKILL_ID(skill->getId()) == 477)
+        else if(SKILL_ID(skill->getId()) == 122 || SKILL_ID(skill->getId()) == 477)
         {
             static UInt8 skill_prob_122[10][4] = {
                 {0, 0, 0},
@@ -14848,6 +14922,51 @@ void BattleSimulator::doAbnormalStatusClear(BattleObject* bo)
         bf->setConfuseRound(0);
         appendDefStatus(e_UnConfuse, 0, bf);
     }
+}
+
+//九子神雷
+UInt32 BattleSimulator::attackByJiuzi(BattleFighter * bf, bool& first, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, int counter_deny, AttackPoint * counter_deny_list, std::vector<AttackAct>* atkAct, bool canProtect)
+{
+    UInt32 curDmg = attackOnce(bf, first, cs, pr, skill, bo, factor, counter_deny, counter_deny_list, atkAct, canProtect);
+    if(curDmg > 0)
+    {
+        UInt8 cnt = static_cast<BattleFighter*>(bo)->getJiuziDmgCnt();
+        static_cast<BattleFighter*>(bo)->setJiuziDmgCnt(++cnt);
+    }
+    return curDmg;
+}
+
+void BattleSimulator::attackByJiuziSS(BattleFighter* bf, const GData::SkillBase* skill)
+{
+    if(!bf || !skill)
+        return;
+    GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+    const GData::SkillStrengthenEffect* ef = NULL;
+    if(ss)
+        ef = ss->getEffect(GData::ON_DAMAGE, GData::TYPE_ADDSTATE);
+    if(!ef)
+        return;
+
+    Int32 target_side = 1 - bf->getSide();
+    for(UInt8 i = 0; i < 25; i++)
+    {
+        BattleObject* bo = getObject(target_side, i);
+        if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+            continue;
+        BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
+        UInt8 count = bf2->getJiuziDmgCnt();
+        if(count == 0)
+            return;
+        UInt32 rate = (0.1 * 100 + ef->value * count) * 100;
+        if(rate < _rnd(10000) && bf2->getConfuseRound() < 1)
+        {
+            bf2->setConfuseRound(1);
+            appendDefStatus(e_Confuse, 0, bf2);
+            calcAbnormalTypeCnt(bf2);
+        }
+        bf2->setJiuziDmgCnt(0);
+    }
+
 }
 
 } // namespace Battle
