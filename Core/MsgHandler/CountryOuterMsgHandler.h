@@ -6572,6 +6572,8 @@ void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
     //    return;
     if(player->GetLev() < 40)
         return;
+    if(!gRaceBattle->isStart())
+        return;
 
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;

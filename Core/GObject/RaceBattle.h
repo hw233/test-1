@@ -4,25 +4,46 @@
 namespace GObject
 {
 #define RACEBATTLE_LOCATION 0xFFFF
-    class RaceBattle
-    {
-        public:
-            RaceBattle();
-            ~RaceBattle();
-            void RaceBattleCheck(UInt32 time);
-            UInt16 getLocation() { return RACEBATTLE_LOCATION; }
-            void enterPos(Player* pl, UInt8 pos);
-            void autoBattle(Player* pl);
-            void cancelBattle(Player* pl);
-            void freshContinueWinRank(Player* pl);
-            void getAward(Player* pl);
-            void readBattleReport(Player* pl, UInt32 reportId);
-            void requestMatch(Player* pl);
-        private:
-            UInt8 _status; //0（未开启），1（17：50~20：00），2（20：00~20：30）
-    };
 
-    extern RaceBattle* gRaceBattle;
+struct TSort
+{
+    Player* player;
+    UInt8 total;
+    UInt32 time;
+    TSort() : player(NULL), total(0), time(0) {}
+};
+
+struct t_sort
+{
+    bool operator()(const TSort& a, const TSort& b) const { return a.total > b.total || (a.total == b.total && a.time < b.time); }
+};
+
+typedef std::set<TSort, t_sort> RBSortType;
+
+
+class RaceBattle
+{
+    public:
+        RaceBattle();
+        ~RaceBattle();
+        void RaceBattleCheck(UInt32 time);
+        UInt16 getLocation() { return RACEBATTLE_LOCATION; }
+        void enterPos(Player* pl, UInt8 pos);
+        void autoBattle(Player* pl);
+        void cancelBattle(Player* pl);
+        void freshContinueWinRank(Player* pl);
+        void getAward(Player* pl);
+        void readBattleReport(Player* pl, UInt32 reportId);
+        void requestMatch(Player* pl);
+        bool isStart();
+        void makeStarInfo(Stream& st, Player* pl, UInt8 level);
+
+    private:
+        UInt8 _status; //0（未开启），1（17：50~20：00），2（20：00~20：30）
+        static RBSortType _levelStarSort[5]; //每层星级数排名
+};
+
+extern RaceBattle* gRaceBattle;
 
 } //namespace GObject
 

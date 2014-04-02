@@ -3042,6 +3042,29 @@ namespace GObject
         void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
         void do_fighter_xinmo(Fighter* fgt, UInt32 oldId);
         void do_skill_grade(Fighter* fgt, UInt32 oldId);
+
+    private:
+        //玩家位置（包括层数、当层位置）
+        UInt8 _playerPos;
+        //本层每个offset位置的星级数
+        UInt8 _starCnt[7];
+        //可挑战次数
+        UInt8 _canChallengeCnt;
+        //连斩人数
+        UInt8 _continueWinCnt;
+        //第几层奖励可以领取
+        UInt8 _awardLevel;
+    public:
+        UInt8 getRaceBattlePos() { return _playerPos; }
+        void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
+        UInt8 getStarCnt(UInt8 i) { if(i < 7) return _starCnt[i]; else return 0; }
+        void setStarCnt(UInt8 i, UInt8 cnt) { if(i < 7) _starCnt[i] = cnt; else _starCnt[i] = 0; }
+        UInt8 getCanChallengeCnt() { return _canChallengeCnt; }
+        void setCanChallengeCnt(UInt8 cnt) { _canChallengeCnt = cnt; }
+        UInt8 getContinueWinCnt() { return _continueWinCnt; }
+        void setContinueWinCnt(UInt8 cnt) { _continueWinCnt = cnt; }
+        UInt8 getAwardLevel() { return _awardLevel; }
+        void setAwardLevel(UInt8 level) { _awardLevel = level; }
 	};
 
 

@@ -833,6 +833,11 @@ namespace GObject
         m_InPTCStatus = false;
         _leftAddrEnter = 0 ;
         _InLeftTeam = false;
+        _playerPos = 0;
+        memset(_starCnt, 0, sizeof(_starCnt));
+        _canChallengeCnt = 0;
+        _continueWinCnt = 0;
+        _awardLevel = 0;
 	}
 
 
