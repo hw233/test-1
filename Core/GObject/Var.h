@@ -538,7 +538,6 @@ namespace GObject
         VAR_LUCKYMEET_RECHARGE_AWARD = 549 ,  //暑假奇遇充值奖励
         VAR_LUCKYMEET_VIP = 550 ,      //暑假奇遇期间御剑等级
         VAR_LUCKYMEET_STRENTH_AWARD = 551,  //暑假奇遇变强
-
       
         VAR_SUMMER_MEET_TYPE = 552 ,    //蜀山奇遇类型
         VAR_SUMMER_MEET_TYPE_AWARD = 553,  //蜀山奇遇类型奖励（登陆弹框）
@@ -693,6 +692,9 @@ namespace GObject
         VAR_CLAN_DUOBAO_SCORE = 713,        // 夺宝奇兵点数
         VAR_CLAN_DUOBAO_SUCCESS_NUM = 714,  // 夺宝奇兵成功次数
         VAR_CLAN_DUOBAO_STATUS = 715,       // 夺宝奇兵状态
+
+        VAR_ZHENYUAN_TIQU_DATE = 716,    //阵元提取神符免费次数时间
+        VAR_ZHENYUAN_TIQU_CNT = 717,     //阵元提取神符 低16位每天次数 高16位每天仙石购买次数
         //721 - 730 for dtc 
         VAR_TYSS_RECHARGE = 721,//天元神兽期间玩家兑换灵果剩余充值数(充值数满足条件自动兑换灵果)
         VAR_TYSS_CONTRIBUTE_PLAYER = 722,//天元神兽期间玩家个人总贡献 
@@ -1321,6 +1323,9 @@ namespace GObject
             REGISTER_VAR(VAR_CLAN_DUOBAO_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_DUOBAO_SUCCESS_NUM, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_DUOBAO_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_ZHENYUAN_TIQU_DATE, CYCLE_NONE);
+            REGISTER_VAR(VAR_ZHENYUAN_TIQU_CNT, CYCLE_NONE);
+
             REGISTER_VAR(VAR_GUANKA_ACTION_NPC, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_TIME, CYCLE_NONE);

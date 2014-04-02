@@ -189,6 +189,31 @@ namespace GObject
         return 0;
     }
 
+    float stZHYAttrConf::getDisFactor2(UInt8 color)
+    {
+        UInt16 lastDisChance = 0;
+        UInt8 colorIdx = color - 2;
+        if(colorIdx > 3)
+            colorIdx = 0;
+        float minDis = ((float)(colorVal[colorIdx]))/400;
+
+        UInt32 chance = uRand(10000-disChance[colorIdx][0]) + disChance[colorIdx][0];
+        float fChance = ((float)(uRand(10000)))/10000;
+        for(int i = 0; i < 9; ++ i)
+        {
+            if(chance < disChance[colorIdx][i])
+            {
+                float fDis = ((float)(dis[colorIdx][i]) + (dis[colorIdx][i+1] - dis[colorIdx][i])*fChance) / 100;
+                if(fDis > minDis)
+                    return fDis;
+                else
+                    fChance *= 0.5;
+            }
+            lastDisChance = disChance[colorIdx][i];
+        }
+        return 0;
+    }
+
     //std::map <UInt32, UInt32>  GObjectManager::_EUpgradeIdMap;
 	bool GObjectManager::InitIDGen()
 	{
@@ -1934,7 +1959,7 @@ namespace GObject
                 for(size_t idx = 0; idx < count && idx < 12; ++ idx)
                 {
                     ItemZhenyuan * zhenyuan = static_cast<ItemZhenyuan *>(fetchEquipment(atoi(tk[idx].c_str())));
-                    pl->setZhenyuan(zhenyuan, idx/3, idx%3, false);
+                    pl->setZhenyuan(zhenyuan, idx, false);
                 }
             }
 
@@ -4880,15 +4905,21 @@ namespace GObject
                 {
                     lua_tinker::table table_dis = table_temp.get<lua_tinker::table>(1);
                     lua_tinker::table table_disChance = table_temp.get<lua_tinker::table>(2);
-                    UInt32 sizeDis = std::min(11, table_dis.size());
-                    UInt32 sizeDisChance = std::min(11, table_disChance.size());
-                    for(UInt32 i = 0; i < sizeDis; ++ i)
+                    UInt32 count = std::min(4, table_dis.size());
+                    for(UInt32 j = 0; j < count; ++ j)
                     {
-                        _zhyAttrConf.dis[i] = table_dis.get<UInt16>(i + 1);
+                        lua_tinker::table table_dis_1 = table_dis.get<lua_tinker::table>(j+1);
+                        UInt32 sizeDis_1 = std::min(11, table_dis_1.size());
+                        for(UInt32 k = 0; k < sizeDis_1; ++ k)
+                            _zhyAttrConf.dis[j][k] = table_dis_1.get<UInt16>(k + 1);
                     }
-                    for(UInt32 j = 0; j < sizeDisChance; ++ j)
+                    count = std::min(4, table_disChance.size());
+                    for(UInt32 j = 0; j < count; ++ j)
                     {
-                        _zhyAttrConf.disChance[j] = table_disChance.get<UInt16>(j + 1);
+                        lua_tinker::table table_disChance_1 = table_disChance.get<lua_tinker::table>(j+1);
+                        UInt32 sizeDisChance_1 = std::min(11, table_disChance_1.size());
+                        for(UInt32 k = 0; k < sizeDisChance_1; ++ k)
+                            _zhyAttrConf.disChance[j][k] = table_disChance_1.get<UInt16>(k + 1);
                     }
                 }
             }
@@ -4924,12 +4955,12 @@ namespace GObject
                 stzea.type2 = zeadb.type2;
                 stzea.attrMax = zeadb.maxVal;
                 _zhyAttrConf.extraAttrMax.insert(std::make_pair(stzea.id, stzea));
-                if(stzea.type1 == 1)
+                if(stzea.type1 == 1)    //全职业
                 {
                     std::vector<UInt16>& extraAttrType = _zhyAttrConf.extraAttrType[0][stzea.level];
                     extraAttrType.push_back(stzea.id);
                 }
-                else
+                else    //单职业
                 {
                     std::vector<UInt16>& extraAttrType = _zhyAttrConf.extraAttrType[1][stzea.level];
                     extraAttrType.push_back(stzea.id);

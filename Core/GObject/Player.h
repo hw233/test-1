@@ -231,6 +231,7 @@ namespace GObject
 //飞剑(坐骑)系统
 #define MOUNT_COSTID 9500
 #define MOUNT_CANGJIANID 9600
+#define ZHENYUAN_MAXCNT 12
 
 #ifdef _FB
 #define LIMIT_LEVEL  60
@@ -781,7 +782,7 @@ namespace GObject
         UInt8 frontGoldCnt;         // ??ͼ?շѴ???
         UInt32 frontUpdate;         // ??ͼ????????ʱ??
         std::vector<UInt16> formations; // ??ѧ??????
-        ItemZhenyuan * zhenyuans[4][3]; //前后左右阵元
+        ItemZhenyuan * zhenyuans[12]; //前右后左阵元 逆时针
 #ifdef _ARENA_SERVER
         UInt8 entered;
 #endif
@@ -1021,21 +1022,23 @@ namespace GObject
         bool formationLevUp(UInt16);
         bool addNewFormation(UInt16 newformationId, bool writedb = false);
         void setZhenyuan(UInt32);
-        bool setZhenyuan(ItemZhenyuan *, UInt8, UInt8, bool = true);
+        bool setZhenyuan(ItemZhenyuan *, UInt8, bool = true);
         void takedownZhenyuan(UInt32);
         void updateZhenyuansToDB();
+        void sendZhenyuansInfo();
+        void updateZhenyuanTiQu();
+        void addZhenyuanTiQuTimes(UInt16);
+        bool checkTQSF();
+        void zhenyuanTiQu();
         void addZhenyuanAttr(GData::AttrExtra& ae, Fighter * fgt);
         void addZhenyuanAttr(GData::AttrExtra& ae, ItemZhenyuan * zhenyuan, Fighter * fgt);
         inline UInt8 getZhenyuanCnt()
         {
             UInt8 count = 0;
-            for(int i = 0; i < 4; ++ i)
+            for(int i = 0; i < ZHENYUAN_MAXCNT; ++ i)
             {
-                for(int j = 0; j < 3; ++ j)
-                {
-                    if(_playerData.zhenyuans[i][j])
-                        ++ count;
-                }
+                if(_playerData.zhenyuans[i])
+                    ++ count;
             }
             return count;
         }

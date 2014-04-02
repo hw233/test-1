@@ -159,6 +159,7 @@ enum PurchaseType
     BuyTYSSLim                  = 1021, //天元神兽限购礼包
     BuyPower                    = 1022, //购买仙界体力
     SkillGrade                  = 1023, //技能升阶
+    ZhenYuanCuiLian             = 1024, //阵元淬炼费
     //繁体私有占150～200
 };
 
@@ -313,6 +314,7 @@ enum ItemFrom
     FromMoBao = 70, //墨宝
     FromTYSS = 71, //天元神兽
     FromZhenyuanMerge = 72, //阵元合成
+    FromZhenyuanTiQu = 73, //阵元提取
     //80 ~ 100，繁体占用
 };
 

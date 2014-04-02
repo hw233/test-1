@@ -235,17 +235,25 @@ namespace GObject
             st.data<UInt8>(offset) = cnt;
         }
 
-        UInt16 getType(UInt8 i)
+        UInt8 getAttrNum()
         {
-            if (i >= 0 && i < 4)
-                return type[i];
-            return 0;
+            UInt8 count = 0;
+            for(int i = 0; i < 4; ++ i)
+            {
+                if(type[i] > 0)
+                    ++ count;
+            }
+            return count;
         }
-        UInt16 getValue(UInt8 i)
+        UInt8 getExtraAttrNum()
         {
-            if (i >= 0 && i < 4)
-                return value[i];
-            return 0;
+            UInt8 count = 0;
+            for(int i = 0; i < 2; ++ i)
+            {
+                if(typeExtra[i] > 0)
+                    ++ count;
+            }
+            return count;
         }
     };
 }

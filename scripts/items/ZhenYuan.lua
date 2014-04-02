@@ -20,14 +20,27 @@ local Zhenyuan_AttrMax = {
 -- 1条，2条，3条，4条， 0条,1条全职,1条单职,1全+1单
 local Zhenyuan_AttrNum = {25,60,90,100,40,60,90,100}
 
--- 宝具区域概率
+-- 阵元区域概率
 local Zhenyuan_AttrDis = {
-    {20,  30,  40,  50,  60,  70,  80,  90,  95,100},
-    {2400,3600,4800,6000,7600,8800,9400,9800,10000},
+    {
+        {20,  30,  40,  50,  60,  70,  80,  90,  95, 100},
+        {30,  40,  50,  60,  70,  80,  90,  95,  100},
+        {60,  70,  80,  90,  95, 100},
+        {80,  90,  95,  100},
+    },
+    {
+        {2400,3600,4800,6000,7600,8800,9400,9800,10000},    --绿
+        {2000,4000,6000,7600,8800,9400,9800,10000},         --蓝
+        {5200,8800,9400,9800,10000},                        --紫
+        {5400,9000,10000},                                  --橙
+    }
 }
 
 -- 阵元颜色判定
 local Zhenyuan_Color = {20,120,240,320}
+
+--阵元提取掉落id
+local Zhenyuan_TiQu = {60061, 60062, 60063, 60064, 60065, 60066, 60067, 60068, 60069, 60070, 60071, 60072}
 
 function getZhenyuanAttrMax()
     return Zhenyuan_AttrMax
@@ -45,4 +58,13 @@ function getZhenyuanColor()
     return Zhenyuan_Color
 end
 
+function getZhenyuanLootId(idx)
+    if nil == idx or 0 == idx then
+        return 0
+    end
+    if idx > #Zhenyuan_TiQu then
+        idx = #Zhenyuan_TiQu
+    end
+    return Zhenyuan_TiQu[idx]
+end
 

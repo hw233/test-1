@@ -1405,6 +1405,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerMeetInfo();   //Fund
     pl->sendRealSpirit();   //真元
     pl->send7DayFundInfo();
+    pl->sendZhenyuansInfo();    //阵元
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
     //pl->QiShiBanState();
@@ -1679,6 +1680,7 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
 
 	player->updateBattleFighters();
     player->setFormation(f);
+    player->setLineupDirty();
 
 	Stream st;
 	player->makeFormationInfo(st);
@@ -8293,6 +8295,8 @@ void OnZhenyuanReq(GameMsgHdr& hdr, const void * data)
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
 
+    if(player->GetLev() < 75)
+        return;
     brd >> type;
     switch(type)
     {
@@ -8322,6 +8326,9 @@ void OnZhenyuanReq(GameMsgHdr& hdr, const void * data)
                 }
                 player->GetPackage()->MergeZhenyuan(zhyIds, cnt);
             }
+            break;
+        case 0x14:
+            player->zhenyuanTiQu();
             break;
     }
 }

@@ -10971,6 +10971,19 @@ function ItemNormal_00009649(iid, num, bind, param)
     return num
 end
 
+function ItemNormal_00009650(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    if player:GetLev() < 75 then
+        player:sendMsgCode(0, 1093, 75);
+        return false
+    end
+    player:addZhenyuanTiQuTimes(num)
+    package:DelItemSendMsg(iid, player)
+    SendMsg(player, 0x35, "获得"..num.."次阵元提取次数！")
+    return num;
+end
+
 function ItemNormal_0009480(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
@@ -13021,6 +13034,7 @@ local ItemNormal_Table = {
     [9808] = ItemNormal_00009611,
 
     [9649] = ItemNormal_00009649,
+    [9650] = ItemNormal_00009650,
 
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,

@@ -410,6 +410,7 @@ namespace Script
         void getJiqirenAward_Copy(Player* player, UInt8 isFree);
         void getJiqirenAward_FrontMap(Player* player, UInt8 isFree);
         void getJiqirenAward_Dungeon(Player* player, UInt8 diff, UInt8 isFree);
+        UInt32 getZhenyuanLootId(UInt8 idx);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

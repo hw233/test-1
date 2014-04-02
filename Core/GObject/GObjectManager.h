@@ -314,6 +314,8 @@ namespace GObject
         }
 
         UInt16 getExtraAttrid(UInt8 lv, bool isFull);
+        float getDisFactor2(UInt8 color);
+
         UInt8 getAttrNum(UInt16 chance)
         {
             for(int i = 0; i < 4; ++ i)
@@ -330,6 +332,18 @@ namespace GObject
             for(; i < 4; ++ i)
             {
                 if(chance < extraSwitchChance[i])
+                    break;
+            }
+            return i;
+        }
+
+        UInt8 getSkillSwitch1(UInt16 chance)
+        {
+            static UInt16 mergeChance[4] = {0, 33, 90, 100};
+            int i = 0;
+            for(; i < 4; ++ i)
+            {
+                if(chance < mergeChance[i])
                     break;
             }
             return i;
@@ -384,21 +398,41 @@ namespace GObject
             UInt16 lastDisChance = 0;
             for(int i = 0; i < 9; ++ i)
             {
-                if(chance < disChance[i])
+                if(chance < disChance[0][i])
                 {
-                    float fChance = ((float)(chance + 1 - lastDisChance)) / (disChance[i] - lastDisChance);
-                    float fDis = ((float)(dis[i]) + (dis[i+1] - dis[i])*fChance) / dis[maxIdx];
+                    float fChance = ((float)(chance + 1 - lastDisChance)) / (disChance[0][i] - lastDisChance);
+                    float fDis = ((float)(dis[0][i]) + (dis[0][i+1] - dis[0][i])*fChance) / dis[0][maxIdx];
                     return fDis;
                 }
-                lastDisChance = disChance[i];
+                lastDisChance = disChance[0][i];
             }
             return 0;
         }
 
+        void getAttrColor(UInt8 lv, UInt8* at, UInt16* av, UInt8 size, UInt8* colors)
+        {
+            static float colorLvl[4] = { 30, 60, 80, 100 }; //绿 蓝 紫 橙
+            for(int i = 0; i < size; ++ i)
+            {
+                if(at[i] > 0)
+                {
+                    float colorP = ((float)(av[i])/getAttrMax(lv, at[i]-1))*100;
+                    for(int j = 0; j < 4; ++ j)
+                    {
+                        if(colorP <= colorLvl[j])
+                        {
+                            colors[i] = j + 2;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         UInt8 attrNumChance[4];
         UInt8 extraSwitchChance[3];
-        UInt16 dis[11];
-        UInt16 disChance[11];
+        UInt16 dis[4][11];
+        UInt16 disChance[4][11];
         UInt16 colorVal[4];
         std::vector<UInt8> attrType;
 		std::map<UInt8, stZhyAttrMax> zhyAttrMax;  // 阵元属性上限

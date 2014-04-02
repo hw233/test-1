@@ -8366,7 +8366,7 @@ namespace GObject
         ItemBase * zhenyuan = GetPackage()->FindItem(zhyId, true);
         if(zhenyuan == NULL)
             zhenyuan = GetPackage()->FindItem(zhyId, false);
-        if(NULL == zhenyuan)
+        if(!zhenyuan || GetLev() < zhenyuan->getReqLev())
             return;
         ItemClass subcls = zhenyuan->getClass();
         if(!IsZhenYuan(subcls))
@@ -8375,9 +8375,9 @@ namespace GObject
             return;
         UInt8 index = subcls - Item_Formula6;
         UInt8 idx = 0xFF, tmpcnt = 0;
-        for(int i = 0; i < 3; ++ i)
+        for(int i = index*3; i < (index+1)*3; ++ i)
         {
-            ItemZhenyuan * izy = _playerData.zhenyuans[index][i];
+            ItemZhenyuan * izy = _playerData.zhenyuans[i];
             if(izy == zhenyuan)
                 return;
             if(izy)
@@ -8388,9 +8388,9 @@ namespace GObject
                 break;
             }
         }
-        if(tmpcnt >= 3)
+        if(tmpcnt >= 3 || idx >= ZHENYUAN_MAXCNT)
             return;
-        bool res = setZhenyuan(static_cast<ItemZhenyuan *>(zhenyuan), index, idx);
+        bool res = setZhenyuan(static_cast<ItemZhenyuan *>(zhenyuan), idx);
         if(res)
         {
             setLineupDirty();
@@ -8398,18 +8398,20 @@ namespace GObject
             st << static_cast<UInt8>(0x11) << zhyId;
             st << Stream::eos;
             send(st);
+            static_cast<ItemEquip *>(zhenyuan)->DoEquipBind();
+            GetPackage()->eraseEquip(zhenyuan->getId());
         }
     }
 
-    bool Player::setZhenyuan(ItemZhenyuan * zhenyuan, UInt8 idx, UInt8 idx1, bool writedb)
+    bool Player::setZhenyuan(ItemZhenyuan * zhenyuan, UInt8 idx, bool writedb)
     {
-        if(idx >= 4 || idx1 >= 3)
+        if(idx >= ZHENYUAN_MAXCNT)
             return false;
-        if(_playerData.zhenyuans[idx][idx1] == zhenyuan)
+        if(_playerData.zhenyuans[idx] == zhenyuan)
             return false;
-        if(_playerData.zhenyuans[idx][idx1])
-            GetPackage()->AddExistEquip(static_cast<ItemEquip *>(_playerData.zhenyuans[idx][idx1]));
-        _playerData.zhenyuans[idx][idx1] = zhenyuan;
+        if(_playerData.zhenyuans[idx])
+            GetPackage()->AddExistEquip(static_cast<ItemEquip *>(_playerData.zhenyuans[idx]));
+        _playerData.zhenyuans[idx] = zhenyuan;
         if(writedb)
             updateZhenyuansToDB();
         return true;
@@ -8418,16 +8420,13 @@ namespace GObject
     void Player::takedownZhenyuan(UInt32 zhyId)
     {
         bool find = false;
-        for(int i = 0; i < 4; ++ i)
+        for(int i = 0; i < ZHENYUAN_MAXCNT; ++ i)
         {
-            for(int j = 0; j < 3; ++ j)
+            if(_playerData.zhenyuans[i] && _playerData.zhenyuans[i]->getId() == zhyId)
             {
-                if(_playerData.zhenyuans[i][j] && _playerData.zhenyuans[i][j]->getId() == zhyId)
-                {
-                    setZhenyuan(NULL, i, j);
-                    find = true;
-                    break;
-                }
+                setZhenyuan(NULL, i);
+                find = true;
+                break;
             }
         }
         if(!find) return;
@@ -8442,21 +8441,131 @@ namespace GObject
     void Player::updateZhenyuansToDB()
     {
         std::string str;
-        for(int i = 0; i < 4; ++ i)
+        for(int i = 0; i < ZHENYUAN_MAXCNT; ++ i)
         {
-            for(int j = 0; j < 3; ++ j)
-            {
-                if(_playerData.zhenyuans[i][j])
-                    str += Itoa(_playerData.zhenyuans[i][j]->getId());
-                else
-                    str += Itoa(0);
-                if(j < 2)
-                    str += ",";
-            }
-            if(i < 3)
+            if(_playerData.zhenyuans[i])
+                str += Itoa(_playerData.zhenyuans[i]->getId());
+            else
+                str += Itoa(0);
+            if(i < ZHENYUAN_MAXCNT-1)
                 str += ",";
         }
         DB1().PushUpdateData("UPDATE `player` SET `zhenyuans` = '%s' WHERE id = %"  I64_FMT  "u", str.c_str(), _id);
+    }
+
+    void Player::sendZhenyuansInfo()
+    {
+        checkTQSF();
+        Stream st(REP::ZHENYUAN_REQ);
+        st << static_cast<UInt8>(0x10);
+        st << GetVar(VAR_ZHENYUAN_TIQU_CNT);
+        UInt16 flag = 0;
+        size_t offset = st.size();
+        st << flag;
+        for(int i = 0; i < ZHENYUAN_MAXCNT; ++ i)
+        {
+            if(_playerData.zhenyuans[i])
+            {
+                flag |= 1 << i;
+                st << _playerData.zhenyuans[i]->GetItemType().getId();
+                st << _playerData.zhenyuans[i]->getId();
+                _playerData.zhenyuans[i]->getZhyAttr().appendAttrToStream(st);
+            }
+        }
+        st.data<UInt16>(offset)= flag;
+        st << Stream::eos;
+        send(st);
+    }
+
+    bool Player::checkTQSF()    //阵元提取神符
+    {
+        if(GetLev() < 75)
+            return false;
+
+        UInt32 now = TimeUtil::Now();
+        UInt32 today = TimeUtil::SharpDayT(1, now);
+        UInt32 lastDate = GetVar(VAR_ZHENYUAN_TIQU_DATE);
+        lastDate = lastDate == 0 ? 0 :TimeUtil::SharpDayT(1, lastDate);
+        UInt32 info = GetVar(VAR_ZHENYUAN_TIQU_CNT);
+
+        UInt16 leftCnt = info;  //去除高16位
+        if(today > lastDate)
+        {
+            if(leftCnt < 5)
+                leftCnt = 5;
+            SetVar(VAR_ZHENYUAN_TIQU_CNT, leftCnt);
+            SetVar(VAR_ZHENYUAN_TIQU_DATE, now);
+        }
+        return true;
+    }
+
+    void Player::addZhenyuanTiQuTimes(UInt16 num)
+    {
+        if(!checkTQSF())
+            return;
+        if(0 == num) return;
+        UInt32 info = GetVar(VAR_ZHENYUAN_TIQU_CNT);
+        UInt16 leftCnt = info;  //去除高16位
+
+        info |= leftCnt + num;
+        SetVar(VAR_ZHENYUAN_TIQU_CNT, info);
+        updateZhenyuanTiQu();
+    }
+
+    void Player::updateZhenyuanTiQu()
+    {
+        Stream st(REP::ZHENYUAN_REQ);
+        st << static_cast<UInt8>(0x14);
+        st << GetVar(VAR_ZHENYUAN_TIQU_CNT);
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::zhenyuanTiQu()
+    {
+        if(!checkTQSF())
+            return;
+        if(!hasChecked())
+            return;
+        if (GetPackage()->GetRestPackageSize() <= 0)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        UInt32 info = GetVar(VAR_ZHENYUAN_TIQU_CNT);
+        UInt16 leftCnt = info;  //去除高16位
+        UInt16 buyTimes = info >> 16;
+        UInt32 lootId = GameAction()->getZhenyuanLootId((GetLev()-75)/5 + 1);
+        const GData::LootItem* li = GData::lootTable[lootId];
+        if(NULL == li) return;
+        std::vector<GData::LootResult> lr;
+        li->roll(lr);
+        if (!lr.size())
+            return;
+        UInt32 itemId = lr[0].id;
+        if(leftCnt > 0)
+        {
+            if(!GetPackage()->AddZhenYuan(itemId, true, true, FromZhenyuanTiQu))
+                return;
+            -- leftCnt;
+        }
+        else
+        {
+            UInt32 needGold = (buyTimes + 1) * 5;
+			if (getGold() < needGold)
+			{
+				sendMsgCode(0, 1104);
+				return;
+			}
+            if(!GetPackage()->AddZhenYuan(itemId, false, true, FromZhenyuanTiQu))
+                return;
+            ConsumeInfo ci(ZhenYuanCuiLian, 0, 0);
+            useGold(needGold, &ci);
+            ++ buyTimes;
+        }
+        info = (buyTimes << 16) | leftCnt;
+        SetVar(VAR_ZHENYUAN_TIQU_CNT, info);
+        updateZhenyuanTiQu();
     }
 
     void Player::addZhenyuanAttr(GData::AttrExtra& ae, Fighter * fgt)
@@ -8470,68 +8579,68 @@ namespace GObject
         }
         switch(pos)
         {
-            case 6: //前1 后1 左1 右1
-                addZhenyuanAttr(ae, _playerData.zhenyuans[0][0], fgt);   //前1
-                addZhenyuanAttr(ae, _playerData.zhenyuans[2][0], fgt);   //后1
+            case 6: //前1 后3 右1 左3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0], fgt);   //前1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
 
-                addZhenyuanAttr(ae, _playerData.zhenyuans[1][0], fgt);   //左1
-                addZhenyuanAttr(ae, _playerData.zhenyuans[3][0], fgt);   //右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3], fgt);   //右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[11], fgt);   //左3
                 break;
-            case 7: //前2 后2 左1 右1
-                addZhenyuanAttr(ae, _playerData.zhenyuans[0][1], fgt);   //前2
-                addZhenyuanAttr(ae, _playerData.zhenyuans[2][1], fgt);   //后2
+            case 7: //前2 后2 右1 左3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1], fgt);   //前2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[7], fgt);   //后2
 
-                addZhenyuanAttr(ae, _playerData.zhenyuans[1][0], fgt);   //左1
-                addZhenyuanAttr(ae, _playerData.zhenyuans[3][0], fgt);   //右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3], fgt);   //右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[11], fgt);   //左3
                 break;
-            case 8: //前3 后3 左1 右1
-                addZhenyuanAttr(ae, _playerData.zhenyuans[0][2], fgt);   //前3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[2][2], fgt);   //后3
+            case 8: //前3 后1 右1 左3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2], fgt);   //前3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[6], fgt);   //后1
 
-                addZhenyuanAttr(ae, _playerData.zhenyuans[1][0], fgt);   //左1
-                addZhenyuanAttr(ae, _playerData.zhenyuans[3][0], fgt);   //右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3], fgt);   //右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[11], fgt);   //左3
                 break;
-            case 11: //前1 后1 左2 右2
-                addZhenyuanAttr(ae, _playerData.zhenyuans[0][0], fgt);   //前1
-                addZhenyuanAttr(ae, _playerData.zhenyuans[2][0], fgt);   //后1
+            case 11: //前1 后3 右2 左2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0], fgt);   //前1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
 
-                addZhenyuanAttr(ae, _playerData.zhenyuans[1][1], fgt);   //右2
-                addZhenyuanAttr(ae, _playerData.zhenyuans[3][1], fgt);   //左2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[4], fgt);   //右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[10], fgt);   //左2
                 break;
-            case 12: //前2 后2 左2 右2
-                addZhenyuanAttr(ae, _playerData.zhenyuans[0][1], fgt);   //前2
-                addZhenyuanAttr(ae, _playerData.zhenyuans[2][1], fgt);   //后2
+            case 12: //前2 后2 右2 左2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1], fgt);   //前2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[7], fgt);   //后2
 
-                addZhenyuanAttr(ae, _playerData.zhenyuans[1][1], fgt);   //右2
-                addZhenyuanAttr(ae, _playerData.zhenyuans[3][1], fgt);   //左2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[4], fgt);   //右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[10], fgt);   //左2
                 break;
-            case 13: //前3 后3 左2 右2
-                addZhenyuanAttr(ae, _playerData.zhenyuans[0][2], fgt);   //前3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[2][2], fgt);   //后3
+            case 13: //前3 后1 右2 左2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2], fgt);   //前3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[6], fgt);   //后1
 
-                addZhenyuanAttr(ae, _playerData.zhenyuans[1][1], fgt);   //右2
-                addZhenyuanAttr(ae, _playerData.zhenyuans[3][1], fgt);   //左2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[4], fgt);   //右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[10], fgt);   //左2
                 break;
-            case 16: //前1 后1 左3 右3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[0][0], fgt);   //前1
-                addZhenyuanAttr(ae, _playerData.zhenyuans[2][0], fgt);   //后1
+            case 16: //前1 后3 右3 左1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0], fgt);   //前1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
 
-                addZhenyuanAttr(ae, _playerData.zhenyuans[1][2], fgt);   //右3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[3][2], fgt);   //左3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
                 break;
-            case 17: //前2 后2 左3 右3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[0][1], fgt);   //前2
-                addZhenyuanAttr(ae, _playerData.zhenyuans[2][1], fgt);   //后2
+            case 17: //前2 后2 右3 左1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1], fgt);   //前2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[7], fgt);   //后2
 
-                addZhenyuanAttr(ae, _playerData.zhenyuans[1][2], fgt);   //右3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[3][2], fgt);   //左3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
                 break;
-            case 18: //前3 后3 左3 右3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[0][2], fgt);   //前3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[2][2], fgt);   //后3
+            case 18: //前3 后3 右3 左1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2], fgt);   //前3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
 
-                addZhenyuanAttr(ae, _playerData.zhenyuans[1][2], fgt);   //右3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[3][2], fgt);   //左3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
                 break;
             default:
                 return;
@@ -8583,10 +8692,10 @@ namespace GObject
                 ae.counterlvl += zhyAttr.value[i];
                 break;
             case 13:
-                ae.magres += zhyAttr.value[i];
+                ae.mreslvl += zhyAttr.value[i];
                 break;
             case 14:
-                ae.criticaldmgimmune += zhyAttr.value[i] / 100.0f;
+                ae.criticaldmgimmune += zhyAttr.value[i] / 10000.0f;
                 break;
             }
         }

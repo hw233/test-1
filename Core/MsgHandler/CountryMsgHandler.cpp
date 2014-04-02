@@ -207,6 +207,7 @@ MSG_REG_2(GameMsgHdr, REQ::CLAN_SPIRIT_TREE, OnClanSpiritTree);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq2);
 MSG_REG_2(GameMsgHdr, REQ::MARRYBOARD, OnMarryBoard2);
+MSG_REG_2(GameMsgHdr, REQ::ZHENYUAN_REQ, OnZhenyuanReq);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
