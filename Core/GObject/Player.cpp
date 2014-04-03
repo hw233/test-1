@@ -8393,11 +8393,6 @@ namespace GObject
 
     void Player::setZhenyuan(UInt32 zhyId, UInt8 index)
     {
-        /*
-        ItemBase * zhenyuan = GetPackage()->FindItem(zhyId, true);
-        if(zhenyuan == NULL)
-            zhenyuan = GetPackage()->FindItem(zhyId, false);
-        */
         if(index >= ZHENYUAN_MAXCNT || _playerData.zhenyuans[index])
             return;
         ItemZhenyuan * zhenyuan = static_cast<ItemZhenyuan *>(GetPackage()->GetEquip(zhyId));
@@ -8406,10 +8401,10 @@ namespace GObject
         UInt8 subClass = zhenyuan->getClass();
         if(!IsZhenYuan(zhenyuan->getClass()))
             return;
-        if(subClass != index/3 + Item_Formula6) //不是对应类型
+        if(subClass != static_cast<ItemClass>(index/3 + Item_Formula6)) //不是对应类型
             return;
-        UInt8 zCnt = getZhenyuanCnt();
-        if(zCnt <= index || zCnt >= getFullFormationCnt())
+        UInt8 fcnt = getFullFormationCnt();
+        if(fcnt <= index || fcnt <= getZhenyuanCnt())
             return;
         UInt8 tmpcnt = 0;
         for(int i = index/3*3; i < (index/3+1)*3; ++ i)
@@ -8427,7 +8422,7 @@ namespace GObject
         {
             setLineupDirty();
             Stream st(REP::XJFRONTMAP);
-            st << static_cast<UInt8>(0x11) << zhyId;
+            st << static_cast<UInt8>(0x11) << zhyId << index;
             st << Stream::eos;
             send(st);
             static_cast<ItemEquip *>(zhenyuan)->DoEquipBind();
