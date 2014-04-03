@@ -45,6 +45,7 @@
 #include "Script/BattleFormula.h"
 #include "Copy.h"
 #include "FrontMap.h"
+#include "XJFrontMap.h"
 #include "HeroIsland.h"
 #include "NewHeroIsland.h"
 #include "GObject/AthleticsRank.h"
@@ -640,6 +641,33 @@ namespace GObject
     }
 
     bool EventAutoFrontMap::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
+    bool EventAutoXJFrontMap::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoXJFrontMap::Process(UInt32 leftCount)
+    {
+        UInt16 idspot = (id << 8) + spot;
+		GameMsgHdr hdr(0x368, m_Player->getThreadId(), m_Player, sizeof(idspot));
+		GLOBAL().PushMsg(hdr, &idspot);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTOFRONTMAP, m_Player->getId());
+        ++spot;
+    }
+
+    bool EventAutoXJFrontMap::Accelerate(UInt32 times)
     {
 		UInt32 count = m_Timer.GetLeftTimes();
 		if(times > count)
@@ -6418,6 +6446,8 @@ namespace GObject
             cancelAutoCopy(getBuffData(PLAYER_BUFF_AUTOCOPY));
         if (GetVar(VAR_ATOFM))
             cancelAutoFrontMap(GetVar(VAR_ATOFM));
+        if (GetVar(VAR_ATOXJFM))
+            cancelAutoXJFrontMap(GetVar(VAR_ATOXJFM));
 
         if (_playerData.location == 8977)
         {
@@ -9009,6 +9039,15 @@ namespace GObject
         {
             frontMap.buildInfo(this, st);
         }
+        
+        cnt = xjfrontMap.getFrontMapSize(this);
+        UInt8 fcnt1 = xjfrontMap.getCount(this); // XXX: lock???
+        st << cnt << static_cast<UInt8>(GObject::XJFrontMap::getFreeCount()+GObject::XJFrontMap::getGoldCount()-(((fcnt1&0xf0)>>4)+(fcnt1&0xf))) << static_cast<UInt8>(GObject::XJFrontMap::getFreeCount()) << static_cast<UInt8>(GObject::XJFrontMap::getGoldCount());
+        if(cnt)
+        {
+            xjfrontMap.buildInfo(this, st);
+        }
+
 #if 0
 		size_t sz;
 		UInt16 * prices = Dungeon::getPrice(sz);
@@ -10887,6 +10926,26 @@ namespace GObject
     void Player::sendAutoFrontMap()
     {
         frontMap.sendAutoFrontMap(this);
+    }
+
+    void Player::startAutoXJFrontMap(UInt8 id, UInt8 mtype = 0)
+    {
+        xjfrontMap.autoBattle(this, id, 0, mtype);
+    }
+
+    void Player::cancelAutoXJFrontMap(UInt8 id)
+    {
+        xjfrontMap.autoBattle(this, id, 1);
+    }
+
+    void Player::instantAutoXJFrontMap(UInt8 id)
+    {
+        xjfrontMap.autoBattle(this, id, 2);
+    }
+
+    void Player::sendAutoXJFrontMap()
+    {
+        xjfrontMap.sendAutoFrontMap(this);
     }
 
     void Player::AddPracticeExp(const PracticeFighterExp* pfexp)
