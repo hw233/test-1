@@ -8052,11 +8052,8 @@ namespace GObject
 	{   //阵元合成
         if(count > 3 || count < 2)
             return;
-		if(GetRestPackageSize() < 1)
-		{
-			m_Owner->sendMsgCode(0, 1011);
-			return;
-		}
+        if(zhyIds[0] == zhyIds[1] || zhyIds[0] == zhyIds[2] || zhyIds[1] == zhyIds[2])
+            return;
         bool binds[3] = { false };
 		ItemBase * items[3] = { NULL };
         for(int i = 0; i < count; ++ i)
