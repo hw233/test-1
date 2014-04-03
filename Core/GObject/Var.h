@@ -706,7 +706,8 @@ namespace GObject
         VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 729,//璇玑阵图自动战斗使用金钱标志
         VAR_ATOXJFM = 730,     //自动璇玑阵图id
         //731 - 751 for lib
-        VAR_LIMIT_APPOINTMENT = 731,//取消婚礼预约限制
+        //752 - 770 for dtc
+        VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
 
         VAR_MAX,
     };
