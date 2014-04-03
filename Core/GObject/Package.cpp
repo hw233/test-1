@@ -8054,7 +8054,7 @@ namespace GObject
             return;
         if(zhyIds[0] == zhyIds[1] || zhyIds[0] == zhyIds[2] || zhyIds[1] == zhyIds[2])
             return;
-        bool binds[3] = { false };
+        bool bind = false;
 		ItemBase * items[3] = { NULL };
         for(int i = 0; i < count; ++ i)
         {
@@ -8066,7 +8066,8 @@ namespace GObject
                 return;
             if(items[i]->getReqLev() >= 130 && count == 3)
                 return;
-            binds[i] = items[i]->GetBindStatus();
+            if(items[i]->GetBindStatus())
+                bind = true;
         }
 
         UInt8 lv = items[0]->getReqLev();
@@ -8085,15 +8086,12 @@ namespace GObject
 		if(itype == NULL) return;
 
         //求待合成阵元属性最小值
-        bool bind = false;
         int attrNum = 4;
         int extraAttrNum = 2;
         UInt8 attrColor[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
         stZHYAttrConf& zhyAttrConf = GObjectManager::getZHYAttrConf();
         for(int i = 0; i < count; ++ i)
         {
-            if(binds[i] != bind)
-                bind = true;
             ItemZhenyuanAttr& zhyAttr = static_cast<ItemZhenyuan *>(items[i])->getZhyAttr();
             UInt8 tmpNum = zhyAttr.getAttrNum();
             UInt8 tmpNum1 = zhyAttr.getExtraAttrNum();
