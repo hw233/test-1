@@ -279,6 +279,7 @@ namespace GObject
         JIUXIAO     = 18,   //九霄唤龙枪
         TIANGANG    = 19,   //天罡剑诀
         YEHUO       = 20,   //业火天雷
+        JIUZI       = 21,   //九子神雷
 
         DRAGONKING_MAX,
     };
@@ -1042,7 +1043,7 @@ namespace GObject
 		void checkLevUp(UInt8, UInt8);
         bool formationLevUp(UInt16);
         bool addNewFormation(UInt16 newformationId, bool writedb = false);
-        void setZhenyuan(UInt32);
+        void setZhenyuan(UInt32, UInt8);
         bool setZhenyuan(ItemZhenyuan *, UInt8, bool = true);
         void takedownZhenyuan(UInt32);
         void updateZhenyuansToDB();

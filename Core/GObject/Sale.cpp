@@ -164,6 +164,13 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
                     if(sales[i].price > priceUp[c] + 0.001f)
                         return;
                 }
+                else if(IsZhenYuan(saleItems[i]->getClass()))
+                {
+                    UInt8 c = static_cast<ItemZhenyuan *>(saleItems[i])->getZhyAttr().color;
+                    UInt16 priceUp[6] = {0, 0, 1, 5, 20, 50};
+                    if(sales[i].price > saleItems[i]->GetItemType().salePriceUp * priceUp[c] + 0.001f)
+                        return;
+                }
                 else if(sales[i].price > (sales[i].count * saleItems[i]->GetItemType().salePriceUp + 0.001f))
                 {
                     return;
@@ -473,11 +480,15 @@ void Sale::makeMailInfo(UInt32 id, Stream& st, UInt16& num)
 	}
 	ItemBase * item = found->second->item;
     st << static_cast<UInt16>(item->GetItemType().getId()) << item->Count();
-
     if(item->getClass() == Item_LBling || item->getClass() == Item_LBwu || item->getClass() == Item_LBxin)
     {
         ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(item))->getLingbaoAttr();
         lba.appendAttrToStream(st);
+    }
+    else if(IsZhenYuan(item->getClass()))
+    {
+        st << item->getId();
+        static_cast<ItemZhenyuan *>(item)->getZhyAttr().appendAttrToStream(st);
     }
 
 	num = 1;

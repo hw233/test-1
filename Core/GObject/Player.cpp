@@ -8391,36 +8391,38 @@ namespace GObject
         return true;
     }
 
-    void Player::setZhenyuan(UInt32 zhyId)
+    void Player::setZhenyuan(UInt32 zhyId, UInt8 index)
     {
+        /*
         ItemBase * zhenyuan = GetPackage()->FindItem(zhyId, true);
         if(zhenyuan == NULL)
             zhenyuan = GetPackage()->FindItem(zhyId, false);
+        */
+        if(index >= ZHENYUAN_MAXCNT || _playerData.zhenyuans[index])
+            return;
+        ItemZhenyuan * zhenyuan = static_cast<ItemZhenyuan *>(GetPackage()->GetEquip(zhyId));
         if(!zhenyuan || GetLev() < zhenyuan->getReqLev())
             return;
-        ItemClass subcls = zhenyuan->getClass();
-        if(!IsZhenYuan(subcls))
+        UInt8 subClass = zhenyuan->getClass();
+        if(!IsZhenYuan(zhenyuan->getClass()))
             return;
-        if(getZhenyuanCnt() >= getFullFormationCnt())
+        if(subClass != index/3 + Item_Formula6) //不是对应类型
             return;
-        UInt8 index = subcls - Item_Formula6;
-        UInt8 idx = 0xFF, tmpcnt = 0;
-        for(int i = index*3; i < (index+1)*3; ++ i)
+        UInt8 zCnt = getZhenyuanCnt();
+        if(zCnt <= index || zCnt >= getFullFormationCnt())
+            return;
+        UInt8 tmpcnt = 0;
+        for(int i = index/3*3; i < (index/3+1)*3; ++ i)
         {
             ItemZhenyuan * izy = _playerData.zhenyuans[i];
             if(izy == zhenyuan)
                 return;
             if(izy)
                 ++ tmpcnt;
-            else
-            {
-                idx = i;
-                break;
-            }
         }
-        if(tmpcnt >= 3 || idx >= ZHENYUAN_MAXCNT)
+        if(tmpcnt >= 3)
             return;
-        bool res = setZhenyuan(static_cast<ItemZhenyuan *>(zhenyuan), idx);
+        bool res = setZhenyuan(zhenyuan, index);
         if(res)
         {
             setLineupDirty();
@@ -8454,7 +8456,7 @@ namespace GObject
         {
             if(_playerData.zhenyuans[i] && _playerData.zhenyuans[i]->getId() == zhyId)
             {
-                setZhenyuan(NULL, i);
+                setZhenyuan(static_cast<ItemZhenyuan *>(NULL), i);
                 find = true;
                 break;
             }
@@ -12117,7 +12119,14 @@ namespace GObject
                 return false;
 
             m_td.soul += (ib->getEnergy() * num);
-            UInt8 quality = ib->getQuality() > 1 ? ib->getQuality() - 2 : 0;
+            UInt8 quality = 0;
+            if(IsLingbaoTypeId(ib->GetTypeId()))
+                quality = static_cast<ItemLingbao *>(ib)->getLbColor();
+            else if(IsZhenYuanItem(ib->GetTypeId()))
+                quality = static_cast<ItemZhenyuan *>(ib)->getZhyAttr().color;
+            else
+                quality = ib->getQuality();
+            quality = quality > 1 ? quality - 2 : 0;
             for (UInt16 j = 0; j < num; ++j)
             {
                 int rnd = uRand(100);
@@ -21268,10 +21277,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)

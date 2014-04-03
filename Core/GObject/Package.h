@@ -311,7 +311,7 @@ namespace GObject
         void AppendTempEquipData(Stream& st, ItemEquip * equip, bool hascount = true);
 
         void SendSingleZhenyuanData(ItemZhenyuan *);
-        void AppendZhenyuanData(Stream&, ItemZhenyuan *);
+        static void AppendZhenyuanData(Stream&, ItemZhenyuan *);
 	    ItemBase* AddZhenYuanN(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere = 0);
         ItemZhenyuan * newZhenyuanToDB(const GData::ItemBaseType *, ItemZhenyuanAttr&, bool);
 	    ItemBase* AddZhenYuan(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere = 0);

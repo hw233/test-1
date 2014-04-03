@@ -8091,8 +8091,8 @@ namespace GObject
 
         //求待合成阵元属性最小值
         bool bind = false;
-        UInt8 attrNum = 4;
-        UInt8 extraAttrNum = 2;
+        int attrNum = 4;
+        int extraAttrNum = 2;
         UInt8 attrColor[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
         stZHYAttrConf& zhyAttrConf = GObjectManager::getZHYAttrConf();
         for(int i = 0; i < count; ++ i)
@@ -8131,11 +8131,8 @@ namespace GObject
             UInt8 idx = uRand(size);
             zhyattr.type[i] = allAttrType[idx];
             zhyattr.value[i] = zhyAttrConf.getAttrMax(lv, zhyattr.type[i]-1) * zhyAttrConf.getDisFactor2(attrColor[i]) + 0.9999f;
-            printf("______________:%f, %f\n", zhyAttrConf.getDisFactor2(attrColor[i])*100, zhyAttrConf.getAttrMax(lv, zhyattr.type[i]-1));
-            printf("++++++++++++++:i:%u,%u,%u\n",i,zhyattr.type[i], zhyattr.value[i]);
             allAttrType.erase(allAttrType.begin() + idx);
         }
-        printf("\n");
         zhyattr.color = 2 + zhyAttrConf.getColor(lv, zhyattr.type, zhyattr.value, attrNum);
         if(zhyattr.color == 5)
         {
