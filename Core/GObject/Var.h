@@ -711,6 +711,8 @@ namespace GObject
         //731 - 751 for lib
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
+        //771 - 780 for qimj
+        VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
 
         VAR_MAX,
     };
@@ -1344,6 +1346,7 @@ namespace GObject
             REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME2, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME3, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_CLAN_SUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
