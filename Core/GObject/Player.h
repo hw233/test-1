@@ -798,9 +798,6 @@ namespace GObject
         UInt8 frontFreeCnt;         // ??ͼ???Ѵ???
         UInt8 frontGoldCnt;         // ??ͼ?շѴ???
         UInt32 frontUpdate;         // ??ͼ????????ʱ??
-        UInt8 xjfrontFreeCnt;         // ??ͼ???Ѵ???
-        UInt8 xjfrontGoldCnt;         // ??ͼ?շѴ???
-        UInt32 xjfrontUpdate;         // ??ͼ????????ʱ??
         std::vector<UInt16> formations; // ??ѧ??????
         ItemZhenyuan * zhenyuans[12]; //前右后左阵元 逆时针
 #ifdef _ARENA_SERVER
@@ -819,6 +816,9 @@ namespace GObject
         std::map<UInt8, UInt32> titleAll;      //玩家所有的称号id
         std::vector<UInt32> canHirePet;     //玩家未招募的仙宠
         TeamArenaData * teamArena;  //组队跨服战
+        UInt8 xjfrontFreeCnt;         // ??ͼ???Ѵ???
+        UInt8 xjfrontGoldCnt;         // ??ͼ?շѴ???
+        UInt32 xjfrontUpdate;         // ??ͼ????????ʱ??
     };
 
 	class Player:
