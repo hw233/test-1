@@ -8115,6 +8115,12 @@ namespace GObject
         }
 
         //阵元属性生成
+        if(4-attrNum > 0)
+            attrNum = uRand(4-attrNum) + attrNum;
+        if(2-extraAttrNum > 0)
+            extraAttrNum = uRand(2-extraAttrNum) + extraAttrNum;
+        if(count == 3)
+            lv = lv+5 > 130 ? 130 : lv+5;
         ItemZhenyuanAttr zhyattr;
         std::vector<UInt8> allAttrType = zhyAttrConf.attrType;
         for(int i = 0; i < attrNum; ++ i)
@@ -8159,7 +8165,7 @@ namespace GObject
             }
         }
         ItemZhenyuan * zhenyuan = newZhenyuanToDB(itype, zhyattr, bind);
-        Stream st(REP::ZHENYUAN_REQ);
+        Stream st(REP::XJFRONTMAP);
         st << static_cast<UInt8>(0x13) << count;
         for(int i = 0; i < count; ++ i)
         {

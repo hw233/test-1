@@ -3447,100 +3447,134 @@ void OnXJFrontMapReq( GameMsgHdr& hdr, const void* data)
 	MSG_QUERY_PLAYER(player);
 
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(player->GetLev() < 75)
+        return;
     UInt8 flag = 0;
     brd >> flag;// 01 - 璇玑阵图信息 02 - 自动璇玑阵图
-    switch (flag){
-        case 1:
-        {
-            if(!player->isInCity())
+    switch (flag)
+    {
+        case 0x01:
             {
-                player->sendMsgCode(0, 1408);
-                return;
+                if(!player->isInCity())
+                {
+                    player->sendMsgCode(0, 1408);
+                    return;
+                }
+                player->cancelAutoBattle();
+                player->cancelAutoDungeon();
+                UInt16 loc = player->getLocation();
+                GObject::Map * map = Map::FromSpot(loc);
+                if(map == NULL)
+                {
+                    player->sendMsgCode(0, 1408);
+                    return;
+                }
+
+                UInt8 type = 0;
+                UInt8 id = 0;
+                UInt8 param = 0;
+                brd >> type;
+                brd >> id;
+
+                switch (type)
+                {
+                    case 0:
+                        brd >> param; // flag
+                        GObject::xjfrontMap.sendInfo(player, id, param?true:false);
+                        break;
+
+                    case 1:
+                        GObject::xjfrontMap.enter(player, id);
+                        break;
+
+                    case 2:
+                        GObject::xjfrontMap.reset(player, id);
+                        break;
+
+                    case 3:
+                        break;
+
+                    case 4:
+                        brd >> param; // spot
+                        GObject::xjfrontMap.fight(player, id, param);
+                        break;
+                    case 5:
+                        //GObject::xjfrontMap.sendFrontMap(player, id);
+                        break;
+
+                    default:
+                        break;
+                }
+
             }
-            player->cancelAutoBattle();
-            player->cancelAutoDungeon();
-            UInt16 loc = player->getLocation();
-            GObject::Map * map = Map::FromSpot(loc);
-            if(map == NULL)
-            {
-                player->sendMsgCode(0, 1408);
-                return;
-            }
-            
-            UInt8 type = 0;
-            UInt8 id = 0;
-            UInt8 param = 0;
-            brd >> type;
-            brd >> id;
-
-            switch (type) {
-                case 0:
-                    brd >> param; // flag
-                    GObject::xjfrontMap.sendInfo(player, id, param?true:false);
-                    break;
-
-                case 1:
-                    GObject::xjfrontMap.enter(player, id);
-                    break;
-
-                case 2:
-                    GObject::xjfrontMap.reset(player, id);
-                    break;
-
-                case 3:
-                    break;
-
-                case 4:
-                    brd >> param; // spot
-                    GObject::xjfrontMap.fight(player, id, param);
-                    break;
-                case 5:
-                    //GObject::xjfrontMap.sendFrontMap(player, id);
-                    break;
-
-                default:
-                    break;
-            }
-
-        }
             break;
-        case 2:
-        {
-            if(!player->hasChecked())
-                return;
-            UInt8 type = 0;
-            UInt8 id = 0;
-            brd >> type;
-            brd >> id;
-
-            if((player->GetPackage()->GetRestPackageSize() < 1) && (type != 1))
+        case 0x02:
             {
-                player->sendMsgCode(1, 1014);
-                return;
-            }
+                if(!player->hasChecked())
+                    return;
+                UInt8 type = 0;
+                UInt8 id = 0;
+                brd >> type;
+                brd >> id;
 
-            switch (type)
-            {
-                case 0:
+                if((player->GetPackage()->GetRestPackageSize() < 1) && (type != 1))
+                {
+                    player->sendMsgCode(1, 1014);
+                    return;
+                }
+
+                switch (type)
                     {
-                        UInt8 mtype = 0;
-                        brd >> mtype;
-                        player->startAutoXJFrontMap(id, mtype);
+                        case 0:
+                            {
+                                UInt8 mtype = 0;
+                                brd >> mtype;
+                                player->startAutoXJFrontMap(id, mtype);
+                            }
+                            break;
+
+                        case 1:
+                            player->cancelAutoXJFrontMap(id);
+                            break;
+
+                        case 2:
+                            player->instantAutoXJFrontMap(id);
+                            break;
+
+                        default:
+                            break;
                     }
-                    break;
-
-                case 1:
-                    player->cancelAutoXJFrontMap(id);
-                    break;
-
-                case 2:
-                    player->instantAutoXJFrontMap(id);
-                    break;
-
-                default:
-                    break;
             }
-        }
+            break;
+        case 0x11:
+            {
+                UInt32 zhyId = 0;
+                brd >> zhyId;
+                player->setZhenyuan(zhyId);
+            }
+            break;
+        case 0x12:
+            {
+                UInt32 zhyId = 0;
+                brd >> zhyId;
+                player->takedownZhenyuan(zhyId);
+            }
+            break;
+        case 0x13:
+            {
+                UInt8 cnt = 0;
+                brd >> cnt;
+                cnt = cnt > 3 ? 3 : cnt;
+                UInt32 zhyIds[3] = {0};
+                for(UInt8 i = 0; i < cnt; ++ i)
+                {
+                    brd >> zhyIds[i];
+                }
+                player->GetPackage()->MergeZhenyuan(zhyIds, cnt);
+            }
+            break;
+        case 0x14:
+            player->zhenyuanTiQu();
             break;
         default:
             break;
@@ -8396,50 +8430,6 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
         }
     default:
         break;
-    }
-}
-
-void OnZhenyuanReq(GameMsgHdr& hdr, const void * data)
-{
-	MSG_QUERY_PLAYER(player);
-	BinaryReader brd(data, hdr.msgHdr.bodyLen);
-    UInt8 type = 0;
-
-    if(player->GetLev() < 75)
-        return;
-    brd >> type;
-    switch(type)
-    {
-        case 0x11:
-            {
-                UInt32 zhyId = 0;
-                brd >> zhyId;
-                player->setZhenyuan(zhyId);
-            }
-            break;
-        case 0x12:
-            {
-                UInt32 zhyId = 0;
-                brd >> zhyId;
-                player->takedownZhenyuan(zhyId);
-            }
-            break;
-        case 0x13:
-            {
-                UInt8 cnt = 0;
-                brd >> cnt;
-                cnt = cnt > 3 ? 3 : cnt;
-                UInt32 zhyIds[3] = {0};
-                for(UInt8 i = 0; i < cnt; ++ i)
-                {
-                    brd >> zhyIds[i];
-                }
-                player->GetPackage()->MergeZhenyuan(zhyIds, cnt);
-            }
-            break;
-        case 0x14:
-            player->zhenyuanTiQu();
-            break;
     }
 }
 

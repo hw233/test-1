@@ -1641,7 +1641,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(63)
+SPECIALDEF(64)
 	(
 	UInt64, id,
 	std::string, pdata.name,

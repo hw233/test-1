@@ -57,8 +57,6 @@ namespace REQ
     const UInt8 USER_INFO           = 0xE4;// 0x14
     /**BUFFER信息改变 */
     const UInt8 STATE               = 0xE5;// 0x15
-    /** 阵元系统 */
-    const UInt8 ZHENYUAN_REQ        = 0xE6;
     /**回流用户7日活动指令 */
     const UInt8 RF7DAY              = 0x15;
     /** ??? */
@@ -483,7 +481,6 @@ namespace REP
     const UInt8 GUIDE_RESPONSE_STEP = 0xE3;// 0x13
     const UInt8 USER_INFO           = 0xE4;// 0x14
     const UInt8 USER_INFO_CHANGE    = 0xE5;// 0x15
-    const UInt8 ZHENYUAN_REQ        = 0xE6;
     const UInt8 STATE_CHANGE        = 0x16;
     const UInt8 RF7DAY              = 0x15;
     const UInt8 BOOK_SHOP_LIST      = 0xEC;// 0x1A

@@ -8424,7 +8424,7 @@ namespace GObject
         if(res)
         {
             setLineupDirty();
-            Stream st(REP::ZHENYUAN_REQ);
+            Stream st(REP::XJFRONTMAP);
             st << static_cast<UInt8>(0x11) << zhyId;
             st << Stream::eos;
             send(st);
@@ -8462,7 +8462,7 @@ namespace GObject
         if(!find) return;
         setLineupDirty();
 
-        Stream st(REP::ZHENYUAN_REQ);
+        Stream st(REP::XJFRONTMAP);
         st << static_cast<UInt8>(0x12) << zhyId;
         st << Stream::eos;
         send(st);
@@ -8486,7 +8486,7 @@ namespace GObject
     void Player::sendZhenyuansInfo()
     {
         checkTQSF();
-        Stream st(REP::ZHENYUAN_REQ);
+        Stream st(REP::XJFRONTMAP);
         st << static_cast<UInt8>(0x10);
         st << GetVar(VAR_ZHENYUAN_TIQU_CNT);
         UInt16 flag = 0;
@@ -8544,7 +8544,7 @@ namespace GObject
 
     void Player::updateZhenyuanTiQu()
     {
-        Stream st(REP::ZHENYUAN_REQ);
+        Stream st(REP::XJFRONTMAP);
         st << static_cast<UInt8>(0x14);
         st << GetVar(VAR_ZHENYUAN_TIQU_CNT);
         st << Stream::eos;
