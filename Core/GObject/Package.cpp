@@ -8058,9 +8058,7 @@ namespace GObject
 		ItemBase * items[3] = { NULL };
         for(int i = 0; i < count; ++ i)
         {
-		    items[i] = FindItem(zhyIds[i], true);
-            if(items[i] == NULL)
-		        items[i] = FindItem(zhyIds[i], false);
+            items[i] = GetEquip(zhyIds[i]);
             if(items[i] == NULL)
                 return;
             UInt32 typeId = items[i]->GetTypeId();
