@@ -182,6 +182,8 @@ int read_jason_req(int fd, char* buf)
     int read_len1 = recv( fd, buf, 5, 0);
     if(read_len1 != 5)
     {
+        if(read_len1 < 0)
+            g_log->OutError("socket error[%d]!\n", errno);
         g_log->OutTrace("len error 1, len is %d\n",read_len1);
         return 0;
     }
