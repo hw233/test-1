@@ -693,7 +693,7 @@ namespace GObject
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonCnt1(0), dungeonEnd(0),
-            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0), xjfrontFreeCnt(0), xjfrontGoldCnt(0), xjfrontUpdate(0), teamArena(NULL)
+            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0), teamArena(NULL), xjfrontFreeCnt(0), xjfrontGoldCnt(0), xjfrontUpdate(0)
 #ifdef _ARENA_SERVER
             , entered(0)
 #endif

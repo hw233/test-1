@@ -6055,6 +6055,8 @@ namespace GObject
 
 	void Package::ItemNotify( UInt32 id, UInt16 num )
 	{
+        if(IsZhenYuanItem(id))
+            return;
         if(IsEquipId(id))
 		{
 			SYSMSG_SENDV(103, m_Owner, id);

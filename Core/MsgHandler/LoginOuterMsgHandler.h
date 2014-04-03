@@ -1112,7 +1112,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 9093, 2,
                 9088, 3,
                 517,  2,
-                503,  4,
+                134,  4,
                 515,  3,
             };
 
