@@ -4482,6 +4482,12 @@ inline bool player_enum_duobao(GObject::Player *pl, int)
     return true;
 }
 
+inline bool player_enum_KJTM(GObject::Player *pl, int)
+{
+    pl->ClearKJTMData();
+    return true;
+}
+
 inline bool player_enum_2(GObject::Player* p, int)
 {
     p->SetVar(GObject::VAR_3366GIFT, 0);
@@ -4683,6 +4689,24 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
                 GVAR.SetVar(GVAR_DUOBAO_ENDTIME, valueTime);
                 GLOBAL().PushMsg(hdr4, &reloadFlag);
                 GLOBAL().PushMsg(hdr1, &_msg);
+            }
+            break;
+        case 29:
+            {
+                {
+                    GObject::globalPlayers.enumerate(player_enum_KJTM, 0);
+
+                    DB5().PushUpdateData("DELETE FROM `inactivemember`");
+                    DB5().PushUpdateData("DELETE FROM `applylist`");
+                    DB5().PushUpdateData("DELETE FROM `invitegoback`");
+                    DB5().PushUpdateData("DELETE FROM `teammember`");
+
+                    GObject::KJTMManager->ClearInactiveMember();
+                    GObject::KJTMManager->AddInactiveMember();
+                }
+
+                GVAR.SetVar(GObject::GVAR_KANGJITIANMO_BEGIN, TimeUtil::SharpDayT(0));
+                GVAR.SetVar(GObject::GVAR_KANGJITIANMO_END, TimeUtil::SharpDayT(20));
             }
             break;
     }

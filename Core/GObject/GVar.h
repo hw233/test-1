@@ -142,6 +142,9 @@ namespace GObject
         GVAR_DUOBAO_ENDTIME = 86,       // 夺宝每轮结束时间
         GVAR_CLAN_DUOBAO_BEGIN = 87,    // 夺宝每天开始时间
         GVAR_CLAN_DUOBAO_END = 88,      // 夺宝每天结束时间
+        GVAR_KANGJITIANMO_BEGIN = 89,   // 抗击天魔开始时间
+        GVAR_KANGJITIANMO_END = 90,     // 抗击天魔结束时间
+        GVAR_MAX_TEAM_NUM = 91,         // 抗击天魔最大队伍数量
         
         GVAR_TYSS_BEGIN= 89,      // 天元神兽开启时间
         GVAR_TYSS_END= 90,      // 天元神兽结束时间
@@ -244,6 +247,9 @@ namespace GObject
             GREGISTER_VAR(GVAR_DUOBAO_ENDTIME, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_CLAN_DUOBAO_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_CLAN_DUOBAO_END, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_KANGJITIANMO_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_KANGJITIANMO_END, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_MAX_TEAM_NUM, GCYCLE_NONE);
 
             GREGISTER_VAR(GVAR_SERVERWAR_ISENTER, GCYCLE_WEEK);
             GREGISTER_VAR(GVAR_SERVERWAR_JIJIANTAI, GCYCLE_WEEK);

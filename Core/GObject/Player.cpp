@@ -91,6 +91,7 @@
 #include "Leaderboard.h"
 #include "ArenaServerWar.h"
 #include "GData/SevenSoul.h"
+#include "KangJiTianMo.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -861,6 +862,11 @@ namespace GObject
         m_InPTCStatus = false;
         _leftAddrEnter = 0 ;
         _InLeftTeam = false;
+        m_teamMemberData = NULL;
+        m_TMDYRoomStatus = 0;
+        m_curType = 0;
+        m_curPageA = 0;
+        _KJTM_factor = 1.0f;
 	}
 
 
@@ -2299,6 +2305,9 @@ namespace GObject
 
         if(GetInPTCStatus())
             petTeamCopyManager->leaveTeam(this, 2);
+
+        if(GetTMDYRoomStatus())
+            KJTMManager->LeaveRoom(this, 1);
 
 		if(cfg.enableWallow && _playerData.wallow)
 		{
@@ -6501,6 +6510,9 @@ namespace GObject
 
         if(GetInPTCStatus())
             petTeamCopyManager->leaveTeam(this, 1);
+
+        if(GetTMDYRoomStatus())
+            KJTMManager->LeaveRoom(this, 1);
 
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)
@@ -21270,10 +21282,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -29935,6 +29947,7 @@ void Player::doTableInWorld(Fighter* fgt, UInt32 oldId)
     do_sh_fighter_attr2(fgt, oldId);
 }
 
+
 void Player::do_fighter(Fighter* fgt, UInt32 oldId, UInt32 newId)
 {
     fgt->setId(newId);
@@ -30098,46 +30111,526 @@ void Player::AddFriendlyCount(Player * friender , UInt8 val)
 }
 */
 
-	void Player::makeFighterSGList(Stream& st)
+TeamMemberData* Player::getTeamMemberData()
+{
+    return m_teamMemberData;
+}
+
+void Player::setTeamMemberData(TeamMemberData* tmd)
+{
+    if(tmd)
+    {
+        ++tmd->refCount;
+    }
+    if(m_teamMemberData)
+    {
+        if((--m_teamMemberData->refCount) == 0)
+            delete m_teamMemberData;
+    }
+    m_teamMemberData = tmd;
+}
+
+void Player::SendFriendsA(UInt8 type)
+{
+	Mutex::ScopedLock lk(_mutex);
+
+    ClearInactiveSort();
+
+    Player* pfriend = NULL;
+    std::set<Player*>::iterator offset;
+    for(offset = _friends[0].begin(); offset != _friends[0].end(); ++offset)
 	{
-		size_t c = _fighters.size();
-		st.init(REP::SKILLSTRENGTHEN);
-        st << static_cast<UInt8>(10);
-        st << GetVar(VAR_SKILL_GRADE_MONEY);
-		st << static_cast<UInt8>(c);
-		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
-        {
-            if(it->second)
-            {
-                it->second->makeFighterSGInfo(st);
-            }
-        }
-		st << Stream::eos;
-        send(st);
+		pfriend = *offset;
+        if(!pfriend)
+            continue;
+
+        if(NULL != pfriend->getTeamMemberData())
+            continue;
+
+        UInt32 status = pfriend->GetVar(VAR_KJTM_STATUS);
+        UInt8 mark = GET_BIT(status, 0);
+        if(1 == mark)
+            SetInactiveSort(pfriend);
 	}
+    SendInactiveSort(type);
+}
 
-    void Player::sendFighterSGListWithNoSkill()
+void Player::SendFriendsB(UInt8 type)
+{
+	Mutex::ScopedLock lk(_mutex);
+
+    ClearActiveSort();
+
+    Player* pfriend = NULL;
+    std::set<Player*>::iterator offset;
+    for(offset = _friends[0].begin(); offset != _friends[0].end(); ++offset)
+	{
+		pfriend = *offset;
+        if(!pfriend)
+            continue;
+
+        UInt32 status = pfriend->GetVar(VAR_KJTM_STATUS);
+        UInt8 mark = GET_BIT(status, 0);
+        if(0==mark)
+            SetActiveSort(pfriend);
+	}
+    SendActiveSort(type);
+}
+
+void Player::SetInactiveSort(Player* pl)
+{
+    if(NULL == pl)
+        return;
+
+    InactiveSort s;
+    s.player = pl;
+    s.level = pl->GetLev();
+    s.power = pl->GetVar(VAR_TOTAL_BATTLE_POINT);
+    _CommonSort.insert(s);
+}
+        
+void Player::SendInactiveSort(UInt8 type, UInt8 curPage)
+{
+    if(0 == curPage)
+        return;
+
+    UInt32 status = GetVar(VAR_KJTM_STATUS);
+    UInt8 mark = GET_BIT(status, 2);
+    if(0 == mark)
     {
-        Stream st;
-        makeFighterSGListWithNoSkill(st);
-		send(st);
+        status = SET_BIT(status, 2);
+        SetVar(VAR_KJTM_STATUS, status);
     }
 
-	void Player::makeFighterSGListWithNoSkill(Stream& st)
+    UInt8 cnt = _CommonSort.size();
+    UInt8 totalPage = 0;
+    if(0 == cnt)
+        totalPage = 1;
+    else if(0 == cnt % 10)
+        totalPage = cnt / 10;
+    else
+        totalPage = cnt / 10 + 1;
+
+    if(curPage < totalPage)
+        cnt = 10;
+    else if(curPage == totalPage)
+        cnt = cnt - (curPage - 1) * 10;
+    else
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x01);
+    st << type;
+    st << totalPage << curPage << cnt;
+    UInt8 c = 0;
+    UInt8 c1 = 0;
+    for(InactiveSortType::iterator i = _CommonSort.begin(), e = _CommonSort.end(); i != e; ++i)
     {
-		size_t c = _fighters.size();
-		st.init(REP::SKILLSTRENGTHEN);
-        st << static_cast<UInt8>(14);
-		st << static_cast<UInt8>(c);
-		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        if(NULL == i->player)
+            continue;
+
+        if((c>=(curPage-1)*10) && (c<=(curPage*10)))
         {
-            if (it->second)
-            {
-                it->second->makeFighterSGInfoWithNoSkill(st);
-            }
+            st << i->player->getId();
+            st << i->player->getCountry();
+            st << i->player->getName();
+            st << i->level;
+            st << i->power;
+            st << i->player->getOpenId();
+            st <<  static_cast<UInt8>(i->player->GetVar(VAR_FRIEND_SECURITY));
+            c1++;
         }
-		st << Stream::eos;
+        c++;
+        if(c1 >= 10)
+            break;
     }
+    st << Stream::eos;
+    send(st);
+
+    SetCurPageA(curPage);
+}
+
+void Player::ClearInactiveSort()
+{
+    if(_CommonSort.size() > 0)
+        _CommonSort.clear();
+}
+
+void Player::SetActiveSort(Player* pl)
+{
+    if(NULL == pl)
+        return;
+
+    ActiveSort s;
+    s.player = pl;
+    s.power = pl->GetVar(VAR_TOTAL_BATTLE_POINT);
+    if(pl->isOnline())
+        s.isOnline = 1;
+    else
+        s.isOnline = 0;
+
+    _ActiveSort.insert(s);
+}
+
+void Player::SendActiveSort(UInt8 type, UInt8 curPage)
+{
+    if(0 == curPage)
+        return;
+
+    UInt32 status = GetVar(VAR_KJTM_STATUS);
+    UInt8 mark = GET_BIT(status, 2);
+    if(0 == mark)
+    {
+        status = SET_BIT(status, 2);
+        SetVar(VAR_KJTM_STATUS, status);
+    }
+
+    UInt8 cnt = _ActiveSort.size();
+    UInt8 totalPage = 0;
+    if(0 == cnt)
+        totalPage = 1;
+    else if(0 == cnt % 10)
+        totalPage = cnt / 10;
+    else
+        totalPage = cnt / 10 + 1;
+
+    if(curPage < totalPage)
+        cnt = 10;
+    else if(curPage == totalPage)
+        cnt = cnt - (curPage - 1) * 10;
+    else
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x02);
+    st << type;
+    st << totalPage << curPage << cnt;
+    UInt8 c = 0;
+    UInt8 c1 = 0;
+    for(ActiveSortType::iterator i = _ActiveSort.begin(), e = _ActiveSort.end(); i != e; ++i)
+    {
+        if(NULL == i->player)
+            continue;
+
+        if((c>=(curPage-1)*10) && (c<=(curPage*10)))
+        {
+            st << i->player->getId();
+            st << i->player->getCountry();
+            st << i->player->getName();
+            st << i->power;
+            c1++;
+        }
+        c++;
+        if(c1 >= 10)
+            break;
+    }
+    st << Stream::eos;
+    send(st);
+
+    SetCurPageA(curPage);
+}
+
+void Player::ClearActiveSort()
+{
+    if(_ActiveSort.size() > 0)
+        _ActiveSort.clear();
+}
+
+void Player::AddGobackFromDB(UInt64 inviterId)
+{
+    _Goback.push_back(inviterId);
+}
+
+void Player::AddGoback(UInt64 inviterId)
+{
+    _Goback.push_back(inviterId);
+
+    DB5().PushUpdateData("INSERT INTO `invitegoback` (`inviteeId`, `playerId`) VALUES (%" I64_FMT "u, %" I64_FMT "u)", getId(), inviterId);
+
+    udpLog("kangjitianmo", "F_140406_1", "", "", "", "", "act");
+}
+
+void Player::DelGoback(UInt64 inviterId)
+{
+    UInt32 cnt = _Goback.size();
+    for(UInt32 i=0; i<cnt; i++)
+    {
+        if(inviterId == _Goback[i])
+        {
+            _Goback.erase(_Goback.begin()+i);
+            DB5().PushUpdateData("DELETE FROM `invitegoback` WHERE `inviteeId` = %" I64_FMT "u AND `playerId` = %" I64_FMT "u", getId(), inviterId);
+        }
+    }
+}
+
+bool Player::CheckGoback(UInt64 inviterId)
+{
+    Player* inviter = globalPlayers[inviterId];
+    if(NULL == inviter)
+        return false;
+
+    UInt32 cnt = _Goback.size();
+    for(UInt32 i=0; i<cnt; i++)
+    {
+        if(inviterId == _Goback[i])
+        {
+            inviter->sendMsgCode(1, 8010);
+            return false;
+        }
+    }
+    return true;
+}
+
+void Player::SendGoback(UInt8 type)
+{
+    ClearActiveSort();
+
+    UInt32 cnt = _Goback.size();
+    for(UInt32 i=0; i<cnt; i++)
+    {
+        Player* member = globalPlayers[_Goback[i]];
+        if(NULL == member)
+            continue;
+
+        SetActiveSort(member);
+    }
+    SendActiveSort(type);
+}
+
+void Player::AddApplyListFromDB(UInt64 applicantId)
+{
+    _ApplyList.push_back(applicantId);
+}
+
+void Player::AddApplyList(UInt64 applicantId)
+{
+    _ApplyList.push_back(applicantId);
+
+    DB5().PushUpdateData("INSERT INTO `applylist` (`playerId`, `applicantId`) VALUES (%" I64_FMT "u, %" I64_FMT "u)", getId(), applicantId);
+
+    Player* applicant = globalPlayers[applicantId];
+    if(NULL == applicant)
+        return;
+
+    applicant->sendMsgCode(1, 4050);
+}
+
+bool Player::CheckApplyList(UInt64 applicantId)
+{
+    Player* applicant = globalPlayers[applicantId];
+    if (NULL == applicant)
+        return false;
+
+    UInt32 cnt = _ApplyList.size();
+    if(cnt >= 2000)
+    {
+		applicant->sendMsgCode(1, 8011);
+        return false; //最多接受2000个回流玩家的申请
+    }
+
+    for(UInt32 i=0; i<cnt; i++)
+    {
+        if(applicantId == _ApplyList[i])
+        {
+            applicant->sendMsgCode(1, 8012);
+            return false;
+        }
+    }
+    return true;
+}
+
+void Player::SendApplyList(UInt8 type, UInt8 curPage)
+{
+    if(0 == curPage)
+        return;
+
+    UInt8 totalPage = 0;
+    UInt32 cnt = _ApplyList.size();
+    if(0 == cnt)
+        totalPage = 1;
+    else if(0 == cnt % 10)
+        totalPage = cnt / 10;
+    else
+        totalPage = cnt / 10 + 1;
+
+    if(curPage < totalPage)
+        cnt = 10;
+    else if(curPage == totalPage)
+        cnt = cnt - (curPage - 1) * 10;
+    else
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x05);
+    st << type;
+    st << totalPage << curPage << static_cast<UInt8>(cnt);
+    UInt32 c = 0;
+    UInt32 c1 = 0;
+    for(UInt32 i=0; i<_ApplyList.size(); i++)
+    {
+        Player* member = globalPlayers[_ApplyList[i]];
+        if(NULL == member)
+            continue;
+
+        if((c>=(static_cast<UInt32>(curPage-1)*10)) && (c<=(static_cast<UInt8>(curPage*10))))
+        {
+            st << member->getId();
+            st << member->getCountry();
+            st << member->getName();
+            st << member->GetLev();
+            c1++;
+        }
+        c++;
+        if(c1 >= 10)
+            break;
+    }
+    st << Stream::eos;
+    send(st);
+
+    SetCurPageA(curPage);
+}
+
+void Player::AcceptApply(UInt64 applicantId)
+{
+    KJTMManager->JoinTeamMember(getId(), applicantId);
+    DelApplyList(applicantId);
+}
+
+void Player::RefuseApply(UInt64 applicantId)
+{
+    DelApplyList(applicantId);
+}
+
+void Player::DelApplyList(UInt64 applicantId)
+{
+    UInt32 cnt = _ApplyList.size();
+    for(UInt32 i=0; i<cnt; i++)
+    {
+        if(applicantId == _ApplyList[i])
+        {
+            _ApplyList.erase(_ApplyList.begin() + i);
+            DB5().PushUpdateData("DELETE FROM `applylist` WHERE `playerId` = %" I64_FMT "u AND `applicantId` = %" I64_FMT "u", getId(), applicantId);
+        }
+    }
+}
+
+void Player::ApplyToName(Player* pl)
+{
+    if(NULL == pl)
+        return;
+
+    if(!isOnline())
+    {
+        sendMsgCode(1, 2218);
+        return;
+    }
+
+    TeamMemberData* tmdB = getTeamMemberData();
+    if(NULL == tmdB)
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x1A);
+    st << pl->getId();
+    st << pl->getName();
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::InviteToName(Player* pl)
+{
+    if(NULL == pl)
+        return;
+
+    if(!isOnline())
+    {
+        sendMsgCode(1, 2218);
+        return;
+    }
+
+    TeamMemberData* tmdB = getTeamMemberData();
+    if(NULL != tmdB)
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x1B);
+    st << pl->getId();
+    st << pl->getName();
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::ClearKJTMData()
+{
+    ClearInactiveSort();
+    ClearActiveSort();
+    if(_Goback.size() > 0)
+        _Goback.clear();
+    if(_ApplyList.size() > 0)
+        _ApplyList.clear();
+
+    setTeamMemberData(NULL);
+    SetVar(VAR_KJTM_STATUS, 0); 
+    SetVar(VAR_KJTM_KILL_NPC_STATUS, 0); 
+    SetVar(VAR_KJTM_LOGIN_STATUS, 0); 
+}
+
+/*void Player::KJTMUdpLog()
+{
+    UInt32 status = GetVar(VAR_KJTM_STATUS);
+    UInt8 mark = GET_BIT(status, 0);
+    if(1 == mark)
+    {
+        UInt32 statusA = GetVar(VAR_KJTM_LOGIN_STATUS);
+        if(0 == statusA)
+        {
+            UInt32 dur = TimeUtil::Now() - pl->getLastOnline();
+            if(dur >= 2*86400)
+            SetVar(VAR_KJTM_LOGIN_STATUS, 1);
+        }
+    }
+}*/
+
+void Player::makeFighterSGList(Stream& st)
+{
+    size_t c = _fighters.size();
+    st.init(REP::SKILLSTRENGTHEN);
+    st << static_cast<UInt8>(10);
+    st << GetVar(VAR_SKILL_GRADE_MONEY);
+    st << static_cast<UInt8>(c);
+    for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+    {
+        if(it->second)
+        {
+            it->second->makeFighterSGInfo(st);
+        }
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::sendFighterSGListWithNoSkill()
+{
+    Stream st;
+    makeFighterSGListWithNoSkill(st);
+    send(st);
+}
+
+void Player::makeFighterSGListWithNoSkill(Stream& st)
+{
+    size_t c = _fighters.size();
+    st.init(REP::SKILLSTRENGTHEN);
+    st << static_cast<UInt8>(14);
+    st << static_cast<UInt8>(c);
+    for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+    {
+        if (it->second)
+        {
+            it->second->makeFighterSGInfoWithNoSkill(st);
+        }
+    }
+    st << Stream::eos;
+}
 
    void Player::makeClanTitleInfo(Stream & st)
    {
