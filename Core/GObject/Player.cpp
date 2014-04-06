@@ -838,6 +838,7 @@ namespace GObject
         _canChallengeCnt = 0;
         _continueWinCnt = 0;
         _awardLevel = 0;
+        _recordId = 0;
 	}
 
 
@@ -29646,6 +29647,50 @@ void Player::AddFriendlyCount(Player * friender , UInt8 val)
         }
 		st << Stream::eos;
     }
+
+    UInt8 Player::getChallengeStatus(Player* pl)
+    {
+        if(!pl)
+            return 1;
+        std::map <Player *, UInt8>::iterator it = _challengePlayer.find(pl);
+        if(it != _challengePlayer.end())
+            return 0;
+        return 0;
+    }
+
+    void Player::insertChallengePlayer(Player* pl)
+    {
+        if(!pl)
+            return;
+        std::map <Player *, UInt8>::iterator it = _challengePlayer.find(pl);
+        if(it != _challengePlayer.end())
+            return;
+        _challengePlayer[pl] = 1;
+    }
+
+    void Player::makeRBBattleInfo(Stream& st)
+    {
+        UInt8 reportCnt = _recordId;
+        st << reportCnt;
+        for(UInt8 i = 0; i < reportCnt; i++)
+        {
+            Player* pl = _playerReport[i].pl;
+            st << pl->getName();
+            st << pl->getCountry();
+            st << _playerReport[i].win;
+            st << _playerReport[i].reportId;
+        }
+    }
+
+    void Player::insertPlayerRecord(Player* pl)
+    {
+        if(!pl)
+            return;
+        //_playerReport[_recordId] = pl;
+        ++_recordId;
+    }
+
+
 
 } // namespace GObject
 

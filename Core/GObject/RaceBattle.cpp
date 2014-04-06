@@ -17,6 +17,7 @@ namespace GObject
     RaceBattle* gRaceBattle = NULL;
     static UInt8 gPerLeveCnt[] = {2, 3, 4, 5, 7};
     RBSortType RaceBattle::_levelStarSort[5];
+    RBSortType RaceBattle::_contineWinSort;
 
     RaceBattle::RaceBattle() : _status(0)
     {
@@ -141,7 +142,7 @@ namespace GObject
             totalCnt += pl->getStarCnt(i);
         if(totalCnt == 0)
         {
-            rank = starSort.size();
+            rank = starSort.size() + 1;
             rstart = starSort.rbegin();
         }
         else
@@ -157,22 +158,119 @@ namespace GObject
             if(it != starSort.rend())
                 rstart = it;
             else
+            {
+                rank = starSort.size() + 1;
                 rstart = starSort.rbegin();
+            }
         }
 
         st << rank;
         UInt32 offset = st.size();
         st.data<UInt8>(offset) = 0;
         UInt8 count = 0;
-        Int32 i = rank;
-        for(RBSortType::reverse_iterator it = rstart; it != starSort.rend() && i > 0 && i > rank - 3; ++it, --i)
+        for(RBSortType::reverse_iterator it = rstart; it != starSort.rend(); ++it)
         {
             ++count;
+            if(count > 3)
+                break;
             st << it->player->getName();
-            st << i;
+            st << static_cast<UInt32>(rank - count);
             st << it->total;
         }
         st.data<UInt8>(offset) = count; 
+    }
+
+    void RaceBattle::sendContinueWinSort(Player* player, UInt8 page)
+    {
+        #define PAGE_MAX 5
+        if(player == NULL || page == 0)
+            return;
+
+        UInt32 playerTotal = _contineWinSort.size();
+        if(playerTotal > 50)
+            playerTotal = 50;
+        UInt32 pageTotal = playerTotal / PAGE_MAX;
+        if(pageTotal * PAGE_MAX < playerTotal)
+            ++pageTotal;
+        if(page > pageTotal)
+            return;
+
+        Stream st(REP::RACE_BATTLE);
+        UInt8 type = 3;
+        st << type;
+        st << page;
+        st << pageTotal;
+
+        UInt8 playerCnt;
+        if(page == pageTotal)
+            playerCnt = playerTotal - (page - 1) * PAGE_MAX;
+        else
+            playerCnt = PAGE_MAX;
+        st << playerCnt;
+
+        UInt8 count = 0;
+        UInt8 aimBegin = (page - 1) * PAGE_MAX;
+        RBSortType::iterator it = _contineWinSort.begin();
+        for(; it != _contineWinSort.end(); it++)
+        {
+           if(count == aimBegin)
+               break;
+           ++count;
+        }
+
+        count = 0;
+        for(; it != _contineWinSort.end(); it++)
+        {
+            if(count == playerCnt)
+                break;
+            Player* pl = it->player;
+            st << pl->getName();
+            st << pl->getContinueWinCnt();
+            st << player->getChallengeStatus(pl) ;
+
+            ++count;
+        }
+
+        st << Stream::eos;
+        player->send(st);
+    }
+
+    void RaceBattle::sendBattleInfo(Player* pl)
+    {
+        if(!pl)
+            return;
+        Stream st(REP::RACE_BATTLE);
+        UInt8 type = 4;
+        st << type;
+        pl->makeRBBattleInfo(st);
+        st << Stream::eos;
+        pl->send(st);
+    }
+
+    void RaceBattle::matchPlayer(Player* pl, Player* matchPlayer)
+    {
+        if(!pl || !matchPlayer)
+            return;
+        Stream st(REP::RACE_BATTLE);
+        UInt8 type = 4;
+        st << type;
+
+        st << pl->getName();
+        st << pl->getCountry();
+        st << pl->GetClass();
+        st << pl->GetLev();
+        st << pl->getBattlePoint();
+        st << pl->getRaceBattlePos();
+
+        st << matchPlayer->getName();
+        st << matchPlayer->getCountry();
+        st << matchPlayer->GetClass();
+        st << matchPlayer->GetLev();
+        st << matchPlayer->getBattlePoint();
+        st << matchPlayer->getRaceBattlePos();
+
+        st << Stream::eos;
+        pl->send(st);
     }
 }
 

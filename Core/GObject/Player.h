@@ -661,6 +661,13 @@ namespace GObject
         MoBaoInfo() : status(0), buyNum(0), openFLMSNum(0), openFLMYNum(0), openJGBXNum(0), openBFMYNum(0), openPLMYNum(0), openCSRLBJNum(0) { memset(item, 0, sizeof(item)); }
     };
 
+    struct PlayerReport
+    {
+        Player* pl;
+        UInt8 win; //0赢，1输
+        UInt32 reportId;
+    };
+
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 150;
@@ -3054,6 +3061,11 @@ namespace GObject
         UInt8 _continueWinCnt;
         //第几层奖励可以领取
         UInt8 _awardLevel;
+        //挑战（连斩榜）
+        std::map <Player *, UInt8> _challengePlayer;
+        //所有挑战记录
+        UInt8 _recordId;
+        std::vector<PlayerReport> _playerReport;
     public:
         UInt8 getRaceBattlePos() { return _playerPos; }
         void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
@@ -3065,6 +3077,10 @@ namespace GObject
         void setContinueWinCnt(UInt8 cnt) { _continueWinCnt = cnt; }
         UInt8 getAwardLevel() { return _awardLevel; }
         void setAwardLevel(UInt8 level) { _awardLevel = level; }
+        UInt8 getChallengeStatus(Player* pl);
+        void insertChallengePlayer(Player* pl);
+        void makeRBBattleInfo(Stream &st);
+        void insertPlayerRecord(Player* pl);
 	};
 
 

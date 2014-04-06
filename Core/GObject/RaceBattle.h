@@ -37,10 +37,14 @@ class RaceBattle
         void requestMatch(Player* pl);
         bool isStart();
         void makeStarInfo(Stream& st, Player* pl, UInt8 level);
+        void sendContinueWinSort(Player* player, UInt8 page);
+        void sendBattleInfo(Player* pl);
+        void matchPlayer(Player* pl, Player* matchPlayer);
 
     private:
         UInt8 _status; //0（未开启），1（17：50~20：00），2（20：00~20：30）
         static RBSortType _levelStarSort[5]; //每层星级数排名
+        static RBSortType _contineWinSort;
 };
 
 extern RaceBattle* gRaceBattle;
