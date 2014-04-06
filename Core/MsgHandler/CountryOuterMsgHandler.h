@@ -1413,6 +1413,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->sendZhenyuansInfo();    //阵元
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
+    pl->KJTMUdpLog();
     //pl->QiShiBanState();
     {
         GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);

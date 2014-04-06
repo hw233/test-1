@@ -2186,6 +2186,7 @@ namespace GObject
         void InviteToName(Player* member);
         void ApplyToName(Player* leader);
         void ClearKJTMData();
+        void KJTMUdpLog();
  
         //抗击天魔 end
 

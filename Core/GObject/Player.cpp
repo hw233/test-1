@@ -21282,10 +21282,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -30289,15 +30289,15 @@ void Player::SendActiveSort(UInt8 type, UInt8 curPage)
     UInt8 totalPage = 0;
     if(0 == cnt)
         totalPage = 1;
-    else if(0 == cnt % 10)
-        totalPage = cnt / 10;
+    else if(0 == cnt % 7)
+        totalPage = cnt / 7;
     else
-        totalPage = cnt / 10 + 1;
+        totalPage = cnt / 7 + 1;
 
     if(curPage < totalPage)
-        cnt = 10;
+        cnt = 7;
     else if(curPage == totalPage)
-        cnt = cnt - (curPage - 1) * 10;
+        cnt = cnt - (curPage - 1) * 7;
     else
         return;
 
@@ -30312,7 +30312,7 @@ void Player::SendActiveSort(UInt8 type, UInt8 curPage)
         if(NULL == i->player)
             continue;
 
-        if((c>=(curPage-1)*10) && (c<=(curPage*10)))
+        if((c>=(curPage-1)*7) && (c<=(curPage*7)))
         {
             st << i->player->getId();
             st << i->player->getCountry();
@@ -30321,7 +30321,7 @@ void Player::SendActiveSort(UInt8 type, UInt8 curPage)
             c1++;
         }
         c++;
-        if(c1 >= 10)
+        if(c1 >= 7)
             break;
     }
     st << Stream::eos;
@@ -30575,7 +30575,7 @@ void Player::ClearKJTMData()
     SetVar(VAR_KJTM_LOGIN_STATUS, 0); 
 }
 
-/*void Player::KJTMUdpLog()
+void Player::KJTMUdpLog()
 {
     UInt32 status = GetVar(VAR_KJTM_STATUS);
     UInt8 mark = GET_BIT(status, 0);
@@ -30584,12 +30584,15 @@ void Player::ClearKJTMData()
         UInt32 statusA = GetVar(VAR_KJTM_LOGIN_STATUS);
         if(0 == statusA)
         {
-            UInt32 dur = TimeUtil::Now() - pl->getLastOnline();
-            if(dur >= 2*86400)
-            SetVar(VAR_KJTM_LOGIN_STATUS, 1);
+            UInt32 durtime = TimeUtil::SharpDayT(0, TimeUtil::Now()) - TimeUtil::SharpDayT(0, getLastOnline());
+            if(durtime == 86400)
+            {
+                udpLog("kangjitianmo", "F_140406_8", "", "", "", "", "act");
+                SetVar(VAR_KJTM_LOGIN_STATUS, 1);
+            }
         }
     }
-}*/
+}
 
 void Player::makeFighterSGList(Stream& st)
 {

@@ -5838,15 +5838,15 @@ void Clan::SendActiveSort(Player* pl, UInt8 type, UInt8 curPage)
     UInt8 totalPage = 0;
     if(0 == cnt)
         totalPage = 1;
-    else if(0 == cnt % 10)
-        totalPage = cnt / 10;
+    else if(0 == cnt % 7)
+        totalPage = cnt / 7;
     else
-        totalPage = cnt / 10 + 1;
+        totalPage = cnt / 7 + 1;
 
     if(curPage < totalPage)
-        cnt = 10;
+        cnt = 7;
     else if(curPage == totalPage)
-        cnt = cnt - (curPage - 1) * 10;
+        cnt = cnt - (curPage - 1) * 7;
     else
         return;
 
@@ -5861,7 +5861,7 @@ void Clan::SendActiveSort(Player* pl, UInt8 type, UInt8 curPage)
         if(NULL == i->player)
             continue;
 
-        if((c>=(curPage-1)*10) && (c<=(curPage*10)))
+        if((c>=(curPage-1)*7) && (c<=(curPage*7)))
         {
             st << i->player->getId();
             st << i->player->getCountry();
