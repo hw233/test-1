@@ -230,6 +230,7 @@ struct DBPlayerData
 	std::string fyamen;
     std::string clantask;
     std::string formations;
+    std::string zhenyuans;
     std::string atohicfg;
     std::string openid;
     std::string canHirePet;
@@ -694,6 +695,7 @@ struct DBClan
     UInt32 urge;
     UInt32 duobaoAward;
     UInt32 tyssSum;
+    std::string clantitleAll;
 };
 
 struct DBClanRepo
@@ -1556,6 +1558,17 @@ struct DBClanBuildings
     UInt16 oracleLevel;
     UInt16 updateTime;
 };
+
+struct DBZhenyuanAttr
+{
+    UInt32 id;
+    UInt32 itemId;
+    UInt8  zycolor;
+    std::string types;
+    std::string values;
+    UInt8 bindType;
+};
+
 }
 
 namespace DB {
@@ -1630,7 +1643,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(60)
+SPECIALDEF(64)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1682,6 +1695,7 @@ SPECIALDEF(60)
 	UInt8, pdata.frontGoldCnt,
 	UInt32, pdata.frontUpdate,
     std::string, formations,
+    std::string, zhenyuans,
     std::string, atohicfg,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
@@ -1691,7 +1705,10 @@ SPECIALDEF(60)
 	UInt32, pdata.lockExpireTime,
     std::string, openid,
     std::string, canHirePet,
-    UInt8,  pdata.dungeonCnt1
+    UInt8,  pdata.dungeonCnt1,
+	UInt8, pdata.xjfrontFreeCnt,
+	UInt8, pdata.xjfrontGoldCnt,
+	UInt32, pdata.xjfrontUpdate
     )
 SPECIALEND()
 
@@ -2289,7 +2306,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(35)
+SPECIALDEF(36)
 (
 	UInt32, id,
 	std::string, name,
@@ -2325,7 +2342,8 @@ SPECIALDEF(35)
     UInt32, gongxian,
     UInt32, urge,
     UInt32, duobaoAward,
-    UInt32,tyssSum 
+    UInt32,tyssSum, 
+    std::string, clantitleAll
 )
 SPECIALEND()
 
@@ -3520,6 +3538,19 @@ SPECIALDEF(8)
     UInt16, updateTime
     )
 SPECIALEND()
+
+SPECIALBEGIN (GObject::DBZhenyuanAttr)
+SPECIALDEF(6)
+    (
+    UInt32, id,
+    UInt32, itemId,
+    UInt8,  zycolor,
+    std::string, types,
+    std::string, values,
+	UInt8, bindType
+    )
+SPECIALEND()
+
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

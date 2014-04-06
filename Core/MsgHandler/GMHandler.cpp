@@ -112,6 +112,7 @@ GMHandler::GMHandler()
     Reg(3, "lbskill", &GMHandler::OnLingbaoSkill);
     Reg(3, "lbs", &GMHandler::OnLingbaos);
     Reg(3, "testlb", &GMHandler::testLingbao);
+    Reg(2, "zhenyuan", &GMHandler::OnAddZhenyuan);
     Reg(3, "peteq", &GMHandler::OnPetEq);
 
 
@@ -799,13 +800,11 @@ void GMHandler::OnAddItem(GObject::Player * player, std::vector<std::string>& ar
 	{
 		UInt32 itemId = atoi(args[i].c_str());
 		if(IsEquipTypeId(itemId))
-		{
 			player->GetPackage()->AddEquip(itemId);
-		}
         else if(IsPetEquipTypeId(itemId))
-		{
 			player->GetPetPackage()->AddRandomPetEq(0, itemId);
-		}
+        else if(IsZhenYuanItem(itemId))
+			player->GetPackage()->AddZhenYuan(itemId, false, true);
 		else
 		{
 			++ i;
@@ -825,13 +824,11 @@ void GMHandler::OnAddItemB(GObject::Player * player, std::vector<std::string>& a
 	{
 		UInt32 itemId = atoi(args[i].c_str());
 		if(IsEquipTypeId(itemId))
-		{
 			player->GetPackage()->AddEquip(itemId, true);
-		}
         else if(IsPetEquipTypeId(itemId))
-		{
 			player->GetPetPackage()->AddRandomPetEq(0, itemId);
-		}
+        else if(IsZhenYuanItem(itemId))
+			player->GetPackage()->AddZhenYuan(itemId, true, true);
 		else
 		{
 			++ i;
@@ -3343,11 +3340,15 @@ void GMHandler::OnClearCFT(GObject::Player* player, std::vector<std::string>& ar
     PLAYER_DATA(player, frontGoldCnt) = 0;
     PLAYER_DATA(player, dungeonCnt) = 0;
     PLAYER_DATA(player, dungeonCnt1) = 0;
+    PLAYER_DATA(player, xjfrontFreeCnt) = 0;
+    PLAYER_DATA(player, xjfrontGoldCnt) = 0;
+    PLAYER_DATA(player, xjfrontUpdate) = TimeUtil::Now();
     
     DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
     DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
 	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = 0 where `id` = %" I64_FMT "u", player->getId());
 	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt1` = 0 where `id` = %" I64_FMT "u", player->getId());
+    DB1().PushUpdateData("UPDATE `player` SET `xjfrontFreeCnt` = 0, `xjfrontGoldCnt` = 0, `xjfrontUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
     player->sendDailyInfo();
 }
 
@@ -4269,6 +4270,84 @@ void GMHandler::testLingbao(GObject::Player * player, std::vector<std::string>& 
 	SYSMSG_SENDV(4116, player, itemId, cnt, colors[0], colors[1], colors[2], colors[3], skills[0], skills[1]);
 }
 
+void GMHandler::OnAddZhenyuan(GObject::Player * player, std::vector<std::string>& args)
+{
+	if (args.size() < 1)
+		return ;
+	for(size_t k = 0; k < args.size(); ++ k)
+	{
+		UInt32 itemId = atoi(args[k].c_str());
+		if(!IsZhenYuanItem(itemId))
+            continue;
+
+		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[itemId];
+		if(itype == NULL)
+            continue;
+        ItemZhenyuanAttr zhyattr;
+        ItemEquipData itemEquipData;
+
+        stZHYAttrConf& zhyAttrConf = GObjectManager::getZHYAttrConf();
+        std::vector<UInt8> allAttrType = zhyAttrConf.attrType;
+        UInt8 attrNum = 4;
+        for(int i = 0; i < attrNum; ++ i)
+        {
+            UInt8 size = allAttrType.size();
+            UInt8 idx = uRand(size);
+            zhyattr.type[i] = allAttrType[idx];
+            zhyattr.value[i] = zhyAttrConf.getAttrMax(itype->vLev, zhyattr.type[i]-1) * zhyAttrConf.getDisFactor(9999);
+            allAttrType.erase(allAttrType.begin() + idx);
+        }
+        zhyattr.color = 2 + zhyAttrConf.getColor(itype->vLev, zhyattr.type, zhyattr.value, attrNum);
+        if(zhyattr.color == 5)
+        {
+            UInt8 skillSwitch = zhyAttrConf.getSkillSwitch(uRand(100));
+            switch(skillSwitch)
+            {
+            case 1:     //1条全职
+                zhyattr.typeExtra[0] = zhyAttrConf.getExtraAttrid(itype->vLev, true);
+                zhyattr.valueExtra[0] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[0]) * zhyAttrConf.getDisFactor(uRand(10000));
+                break;
+            case 2:     //1条单职
+                zhyattr.typeExtra[1] = zhyAttrConf.getExtraAttrid(itype->vLev, false);
+                zhyattr.valueExtra[1] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[1]) * zhyAttrConf.getDisFactor(uRand(10000));
+                break;
+            case 3:     //1全+1单
+                zhyattr.typeExtra[0] = zhyAttrConf.getExtraAttrid(itype->vLev, true);
+                zhyattr.valueExtra[0] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[0]) * zhyAttrConf.getDisFactor(uRand(10000));
+                zhyattr.typeExtra[1] = zhyAttrConf.getExtraAttrid(itype->vLev, false);
+                zhyattr.valueExtra[1] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[1]) * zhyAttrConf.getDisFactor(uRand(10000));
+                break;
+            default:
+                break;
+            }
+        }
+        UInt32 id = IDGenerator::gItemOidGenerator.ID();
+        ItemZhenyuan * zhenyuan = new ItemZhenyuan(id, itype, itemEquipData, zhyattr);
+        player->GetPackage()->AddEquip2(static_cast<ItemEquip *>(zhenyuan));
+        std::string strType;
+        std::string strValue;
+        for(int i = 0; i < 6; ++ i)
+        {
+            if(i < 4)
+            {
+                strType += Itoa(zhyattr.type[i], 10);
+                strValue += Itoa(zhyattr.value[i], 10);
+            }
+            else
+            {
+                strType += Itoa(zhyattr.typeExtra[i-4], 10);
+                strValue += Itoa(zhyattr.valueExtra[i-4], 10);
+            }
+
+            if(i < 5)
+            {
+                strType += ',';
+                strValue += ',';
+            }
+        }
+        DB4().PushUpdateData("REPLACE INTO `zhenyuanAttr`(`id`, `itemId`, `zycolor`, `types`, `values`) VALUES(%u, %u, %u, '%s', '%s')", id, itype->getId(), zhyattr.color, strType.c_str(), strValue.c_str());
+    }
+}
 
 
 void GMHandler::OnDreamerTimeSet(GObject::Player *player, std::vector<std::string>& args)
@@ -5389,12 +5468,14 @@ void GMHandler::OnSetTYSS(GObject::Player *player, std::vector<std::string>& arg
 
 void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& args)
 {
+#if 0
 	GObject::Fighter * fgt = player->getMainFighter();
 	if(fgt == NULL)
 		return;
     std::string skills = Itoa(9709);
     fgt->setSkills(skills, true);
     return;
+#endif
     if(args.size() < 1)
         return;
     UInt8 pos = atoi(args[0].c_str());

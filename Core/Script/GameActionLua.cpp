@@ -325,6 +325,7 @@ namespace Script
 		CLASS_DEF(Player, LuckyBagRank);
 		CLASS_DEF(Player, findFairyPet);
 		CLASS_DEF(Player, updateCuilianTimes);
+		CLASS_DEF(Player, addZhenyuanTiQuTimes);
         CLASS_DEF(Player, AddZRYJCount);
         CLASS_DEF(Player, AddHYYJCount);
         CLASS_DEF(Player, in7DayFromCreated);
@@ -1894,6 +1895,11 @@ namespace Script
     {
 		assert(player != NULL);
         Call<void>("getJiqirenAward_Dungeon", player, diff, isFree);
+    }
+
+    UInt32 GameActionLua::getZhenyuanLootId(UInt8 idx)
+    {
+        return Call<UInt32>("getZhenyuanLootId", idx);
     }
 }
 

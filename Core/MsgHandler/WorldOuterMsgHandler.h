@@ -2749,6 +2749,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x29:
         case 0x3A:
         case 0x3B:
+        case 0x3C:
         {
             brd >> op;
             switch(op)
@@ -2928,6 +2929,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         {
             UInt8 flag = 0;
             brd >> flag;
+            if(flag && player->getTotalRecharge() >= 1000)
+                return;
             player->SetVar(VAR_DIRECTPUROPEN, flag?1:0);
         }
         break;

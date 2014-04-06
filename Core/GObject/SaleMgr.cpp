@@ -17,7 +17,7 @@ namespace GObject
 SaleMgr gSaleMgr;
 static const UInt8 ReqCvt[] = { 0xFF, 1, 2, 3, 12, 16, 21, 34, 51, 60, 63};
 #define MAX_SALE_REQ  11
-#define MAX_TYPE_IDX  66
+#define MAX_TYPE_IDX  67
 
 SaleMgr::SaleMgr()
 {
@@ -423,13 +423,19 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 		{
 			//请求单个列表
 			if (req > 2 && req < MAX_SALE_REQ)
+            {
+                if(req == 6 && eqType > 12)     //处理交易阵元
+                    eqType = 46;
                 req = ReqCvt[req] + eqType;
+            }
             else if(req < 3)
                 req = ReqCvt[req];
             else
                 req = ReqCvt[0];
 
 			UInt16 sz = static_cast<UInt16>(saleRowStat(req, color, career, attrId));
+            if(req == 21 && eqType == 0 && color > 0)     //处理交易阵元筛选颜色
+			    sz += static_cast<UInt16>(saleRowStat(req+46, color, career, attrId));
 			UInt16 end = start + count;
 			if (end > sz)
 				end = sz;
@@ -501,8 +507,10 @@ UInt16 SaleMgr::appendSingleSaleList(Player * player, Stream& st, UInt8 type, UI
 				else
 				{
 					st << static_cast<UInt8>(0) << sale->_owner->getName() << sale->_price << sale->_priceType;
-					if (IsEquipId(sale->_item->getId()))
+					if (IsEquip(sale->_item->getClass()))
 						Package::AppendEquipData(st, static_cast<ItemEquip *>(sale->_item));
+                    else if(IsZhenYuan(sale->_item->getClass()))
+						Package::AppendZhenyuanData(st, static_cast<ItemZhenyuan *>(sale->_item));
 					else
 						Package::AppendItemData(st, sale->_item);
 					player->GetSale()->addAccessSaleItem(sale->_id);
@@ -691,8 +699,10 @@ void SaleMgr::searchSaleByItemName(Player * player, std::string& itemName, UInt1
 				else
 				{
 					st << static_cast<UInt8>(0) << sale->_owner->getName() << sale->_price << sale->_priceType;
-					if (IsEquipId(sale->_item->getId()))
+					if (IsEquip(sale->_item->getClass()))
 						Package::AppendEquipData(st, static_cast<ItemEquip *>(sale->_item));
+                    else if(IsZhenYuan(sale->_item->getClass()))
+						Package::AppendZhenyuanData(st, static_cast<ItemZhenyuan *>(sale->_item));
 					else
 						Package::AppendItemData(st, sale->_item);
 					player->GetSale()->addAccessSaleItem(sale->_id);
@@ -772,8 +782,10 @@ void SaleMgr::searchPlayerSaleResp(Player * founder, Player * beFounder, UInt16 
 			else
 			{
 				st << static_cast<UInt8>(0) << sale->_owner->getName() << sale->_price << sale->_priceType;
-				if (IsEquipId(sale->_item->getId()))
-					Package::AppendEquipData(st, static_cast<ItemEquip *>(sale->_item));
+                if (IsEquip(sale->_item->getClass()))
+                    Package::AppendEquipData(st, static_cast<ItemEquip *>(sale->_item));
+                else if(IsZhenYuan(sale->_item->getClass()))
+                    Package::AppendZhenyuanData(st, static_cast<ItemZhenyuan *>(sale->_item));
 				else
 					Package::AppendItemData(st, sale->_item);
 				founder->GetSale()->addAccessSaleItem(sale->_id);
@@ -847,6 +859,7 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
     // 魂51 52攻击 53防御 54暴击 55破击 56身法 57坚韧 58毁灭 59生命
     // 元神60 61元神技能 62元神
     // 灵宝63 64灵 65悟 66信
+    // 阵元67
     //                     0   1   2   3   4   5   6   7   8   9
     static UInt8 cvt[] = { 1,  4,  5,  6,  7,  8,  9,  10, 11, 1, // 0
                            16, 16, 20, 64, 65, 66, 1,  1,  1,  1, // 1
@@ -901,7 +914,9 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
         break;
     case 21:                                                         //阵法
         parent = 21;
-        if(typeId == 1000 || (typeId > 1011 && typeId < 1020))       //两仪微尘阵
+        if(IsZhenYuanItem(typeId))  //阵元
+            res += 46;
+        else if(typeId == 1000 || (typeId > 1011 && typeId < 1020))       //两仪微尘阵
             res += 12;
         else if(typeId == 1001 || (typeId > 1019 && typeId < 1031))  //须弥九宫阵
             res += 11;
@@ -979,6 +994,17 @@ void SaleMgr::getLBColor_AttrId(ItemBase* item, UInt8& quality, std::vector<UInt
             }
         }
     }
+    else if(IsZhenYuan(subClass))
+    {
+        ItemZhenyuanAttr& zhyattr = static_cast<ItemZhenyuan *>(item)->getZhyAttr();
+        quality = zhyattr.color;
+        for(int i = 0; i < 4; ++ i)
+        {
+            if(zhyattr.type[i] == 0)
+                continue;
+            attrId.push_back(zhyattr.type[i]);
+        }
+    }
 }
 
 bool SaleMgr::hasAttrId(ItemBase* item, UInt8 attrId)
@@ -997,6 +1023,15 @@ bool SaleMgr::hasAttrId(ItemBase* item, UInt8 attrId)
             }
         }
     }
+    else if(IsZhenYuan(subClass))
+    {
+        ItemZhenyuanAttr& zhyattr = static_cast<ItemZhenyuan *>(item)->getZhyAttr();
+        for(int i = 0; i < 4; ++ i)
+        {
+            if(zhyattr.type[i] == attrId)
+                return true;
+        }
+    }
 
     return false;
 }
@@ -1012,6 +1047,11 @@ bool SaleMgr::isQuality(ItemBase* item, UInt8 quality)
             ItemLingbaoAttr& lba = lb->getLingbaoAttr();
             return (quality == lba.lbColor);
         }
+    }
+    else if(IsZhenYuan(subClass))
+    {
+        ItemZhenyuanAttr& zhyattr = static_cast<ItemZhenyuan *>(item)->getZhyAttr();
+        return quality == zhyattr.color;
     }
     return (item->getQuality() == quality);
 }

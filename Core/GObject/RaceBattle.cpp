@@ -177,7 +177,7 @@ namespace GObject
             st << static_cast<UInt32>(rank - count);
             st << it->total;
         }
-        st.data<UInt8>(offset) = count; 
+        st.data<UInt8>(offset) = count;
     }
 
     void RaceBattle::sendContinueWinSort(Player* player, UInt8 page)

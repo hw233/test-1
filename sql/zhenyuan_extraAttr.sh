@@ -1,30 +1,31 @@
+
 #!/bin/bash
 
-F=clanbuildingtemplate.txt
+F=formProfession.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function clanbuildingtemplate()
+function formProfession()
 {
     f=$1
-    d=clanbuildingtemplate
-    sed -i /建筑等级/d $f
-    sed -i /EXP/d $f
-    sed -i /level/d $f
+    d=zhenyuan_extraAttr
+    sed -i /ID/d $f
+    sed -i /id/d $f
     sed -i /^$/d $f
+    sed -i /REF/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `clan_building_template` VALUES";
+            print "INSERT INTO `zhenyuan_extraAttr` VALUES";
         } {
-            printf("(%d,%d,%d,%d,%d,%d,%d)",$1,$2,$4,$5,$6,$7,$8);
-            if (NR <= ENVIRON["lines"])
+            printf("(%d,\x27%s\x27,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6);
+            if (NR <= ENVIRON["lines"]-1)
                 printf(",");
-            else if (NR > ENVIRON["lines"])
+            else if (NR >= ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }
@@ -50,7 +51,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    clanbuildingtemplate $F
+    formProfession $F
 else
     echo "File $F is not exists"
 fi

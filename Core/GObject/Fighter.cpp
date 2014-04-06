@@ -2093,6 +2093,8 @@ void Fighter::rebuildEquipAttr()
             GObject::gMarryMgr.addMarriedAttr(_owner,_attrExtraEquip);
             GObject::gMarriedMgr.addCouplePetAttr(_owner,_attrExtraEquip);
         }
+        //阵元系统加成
+        _owner->addZhenyuanAttr(_attrExtraEquip, this);
     }
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }

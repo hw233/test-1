@@ -159,6 +159,9 @@ enum PurchaseType
     BuyTYSSLim                  = 1021, //天元神兽限购礼包
     BuyPower                    = 1022, //购买仙界体力
     SkillGrade                  = 1023, //技能升阶
+    EnterAutoXJFrontMap         = 1024, //璇玑阵图
+    EnterXJFrontMap             = 1025, //璇玑阵图
+    ZhenYuanCuiLian             = 1026, //阵元淬炼费
     //繁体私有占150～200
 };
 
@@ -290,7 +293,7 @@ enum ItemFrom
     FromQQNavigation = 47, //QQ导航奖励
     FromQQMusic = 48, //QQ音乐奖励
     FromDirectPurchase = 49, //Q点直购
-    FromPetGemMgerge = 50, //仙宠宝石合成
+    FromPetGemMerge = 50, //仙宠宝石合成
     FromPetDetachGem = 51, //仙宠宝石拆卸
     FromQQTenpay = 52, //QQ财付通奖励
     FromQQIMQuickLogin = 53, //QQIM快速登录奖励
@@ -312,6 +315,8 @@ enum ItemFrom
     FromJiqirenAct = 69, //机器人活动
     FromMoBao = 70, //墨宝
     FromTYSS = 71, //天元神兽
+    FromZhenyuanMerge = 72, //阵元合成
+    FromZhenyuanTiQu = 73, //阵元提取
     //80 ~ 100，繁体占用
 };
 
@@ -344,7 +349,7 @@ enum ItemTo
     ToDeleteTrade = 152, //删除交易
     ToLingbao = 153, // 附灵
     ToPetEquipUpgrade = 154, //仙宠装备升级(吞噬)
-    ToPetGemMgerge = 155, //仙宠宝石合成
+    ToPetGemMerge = 155, //仙宠宝石合成
     ToPetGemAttach = 156, //仙宠宝石镶嵌
     ToPetDetachGemDesdroy = 157, //仙宠宝石拆卸
     ToSetGem = 158, //多彩宝石镶嵌
@@ -357,6 +362,7 @@ enum ItemTo
     ToSanHunUp = 164, //三魂升级
     ToTunShiXingKong = 165, //吞噬星空
     ToServerWarJijian = 166, //仙界传奇祭剑
+    ToZhenyuanMgerge = 167, //阵元合成
 };
 
 struct IncommingInfo

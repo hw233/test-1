@@ -66,7 +66,7 @@ namespace GObject
 				return 1;
 			return (num + _itemBaseType->maxQuantity - 1) / _itemBaseType->maxQuantity;
 		}
-		inline UInt16 Count() const		{ return IsEquip(_itemBaseType->subClass) ? 1 : m_TotalCount; }
+		inline UInt16 Count() const { return IsEquip(_itemBaseType->subClass) || IsZhenYuan(_itemBaseType->subClass) ? 1 : m_TotalCount; }
 		inline UInt16 GetLeftNum() const { return m_TotalCount % _itemBaseType->maxQuantity; }
 		inline UInt16 GetOverlayNum() const { return _itemBaseType->maxQuantity; }
 		inline UInt32 GetSellTime() const { return m_SellTime; }
@@ -292,6 +292,19 @@ namespace GObject
     private:
         ItemPetEqAttr m_peAttr;
     };
+
+	//ี๓ิช
+	class ItemZhenyuan : public ItemEquip
+    {
+    public:
+		ItemZhenyuan(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData, ItemZhenyuanAttr& zhyAttr)
+		    : ItemEquip(id, itemEquipType, itemEquipData), m_zhyAttr(zhyAttr)
+		{}
+
+        ItemZhenyuanAttr& getZhyAttr() { return m_zhyAttr; }
+	private:
+        ItemZhenyuanAttr m_zhyAttr;
+	};
 
 }
 

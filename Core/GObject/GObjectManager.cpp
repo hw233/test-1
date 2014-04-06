@@ -51,6 +51,7 @@
 #include "GObject/PracticePlace.h"
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
+#include "GObject/XJFrontMap.h"
 #include "GObject/WBossMgr.h"
 #include "GObject/TeamCopy.h"
 #include "GObject/PetTeamCopy.h"
@@ -160,9 +161,60 @@ namespace GObject
     std::vector<UInt32> GObjectManager::_decSoulStateExp;
 
     stLBAttrConf GObjectManager::_lbAttrConf;
+    stZHYAttrConf GObjectManager::_zhyAttrConf;
 
     GObjectManager:: vMergeStfs    GObjectManager:: _vMergeStfs;
     std::map <UInt32,  std::vector<UInt32> >   GObjectManager:: _mMergeStfsIndex;
+
+    UInt16 stZHYAttrConf::getExtraAttrid(UInt8 lv, bool isFull)
+    {
+        std::map<UInt8, std::vector<UInt16>>::iterator iter;
+        if(isFull)  //全职业属性
+        {
+            iter = extraAttrType[0].find(lv);
+            if(iter != extraAttrType[0].end())
+            {
+                UInt32 size = iter->second.size();
+                return iter->second[uRand(size)];
+            }
+        }
+        else    //单职业属性
+        {
+            iter = extraAttrType[1].find(lv);
+            if(iter != extraAttrType[1].end())
+            {
+                UInt32 size = iter->second.size();
+                return iter->second[uRand(size)];
+            }
+        }
+        return 0;
+    }
+
+    float stZHYAttrConf::getDisFactor2(UInt8 color)
+    {
+        UInt16 lastDisChance = 0;
+        UInt8 colorIdx = color - 2;
+        if(colorIdx > 3)
+            colorIdx = 0;
+        float minDis = ((float)(colorVal[colorIdx]))/400;
+
+        UInt32 chance = uRand(10000-disChance[colorIdx][0]) + disChance[colorIdx][0];
+        float fChance = ((float)(uRand(10000)))/10000;
+        for(int i = 0; i < 9; ++ i)
+        {
+            if(chance < disChance[colorIdx][i])
+            {
+                float fDis = ((float)(dis[colorIdx][i]) + (dis[colorIdx][i+1] - dis[colorIdx][i])*fChance) / 100;
+                if(fDis > minDis)
+                    return fDis;
+                else
+                    fChance *= 0.5;
+            }
+            lastDisChance = disChance[colorIdx][i];
+        }
+        return 0;
+    }
+
     //std::map <UInt32, UInt32>  GObjectManager::_EUpgradeIdMap;
 	bool GObjectManager::InitIDGen()
 	{
@@ -178,6 +230,10 @@ namespace GObject
         UInt32 maxItemId;
 		execu->Extract("SELECT max(`id`) FROM `item`", maxItemId);
 		execu->Extract("SELECT max(`id`) FROM `equipment`", maxId);
+        if(maxItemId > maxId)
+            maxId = maxItemId;
+        maxItemId = 0;
+		execu->Extract("SELECT max(`id`) FROM `zhenyuanAttr`", maxItemId);
         if(maxItemId > maxId)
             maxId = maxItemId;
 		IDGenerator::gItemOidGenerator.Init(maxId);
@@ -239,6 +295,11 @@ namespace GObject
             fprintf(stderr, "loadFrontMap error!\n");
             std::abort();
         }
+        if(!loadXJFrontMap())
+        {
+            fprintf(stderr, "loadXJFrontMap error!\n");
+            std::abort();
+        }
 		if(!loadEquipments())
         {
             fprintf(stderr, "loadEquipments error!\n");
@@ -247,6 +308,11 @@ namespace GObject
         if(!loadPetEquipAttr())
         {
             fprintf(stderr, "loadPetEquipAttr error!\n");
+            std::abort();
+        }
+        if(!loadZhenyuanAttr())
+        {
+            fprintf(stderr, "loadZhenyuanAttr error!\n");
             std::abort();
         }
 		if(!loadEquipmentsSpirit())
@@ -262,6 +328,11 @@ namespace GObject
         if(!loadFightersPCChance())
         {
             fprintf(stderr, "loadFightersPCChance error!\n");
+            std::abort();
+        }
+		if(!loadZhenyuanConfig())
+        {
+            fprintf(stderr, "loadZhenyuanConfig error!\n");
             std::abort();
         }
 		if(!loadFighters())
@@ -856,6 +927,24 @@ namespace GObject
 		while(execu->Next() == DB::DB_OK)
 		{
             frontMap.addPlayer(dbcd.playerId, dbcd.id, dbcd.spot, dbcd.count, dbcd.status, dbcd.lootlvl);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadXJFrontMap()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading xjfrontmap:");
+		DBFrontMapData dbcd;
+        lc.reset(2000);
+		if(execu->Prepare("SELECT `playerId`, `id`, `spot`, `count`, `status`, `lootlvl` FROM `player_xjfrontmap` ORDER BY `playerId`,`id`", dbcd) != DB::DB_OK)
+            return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            xjfrontMap.addPlayer(dbcd.playerId, dbcd.id, dbcd.spot, dbcd.count, dbcd.status, dbcd.lootlvl);
         }
         lc.finalize();
         return true;
@@ -1610,7 +1699,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1`,`xjfrontFreeCnt`, `xjfrontGoldCnt`, `xjfrontUpdate` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -1885,6 +1974,16 @@ namespace GObject
                 for(size_t idx = 0; idx < count; ++ idx)
                 {
                     pl->addNewFormation(atoi(tk[idx].c_str()));
+                }
+            }
+            if (dbpd.zhenyuans.length())
+            {
+				StringTokenizer tk(dbpd.zhenyuans, ",");
+				size_t count = tk.count();
+                for(size_t idx = 0; idx < count && idx < 12; ++ idx)
+                {
+                    ItemZhenyuan * zhenyuan = static_cast<ItemZhenyuan *>(fetchEquipment(atoi(tk[idx].c_str())));
+                    pl->setZhenyuan(zhenyuan, idx, false);
                 }
             }
 
@@ -2356,6 +2455,8 @@ namespace GObject
 				pl->GetPetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
             else if (!IsEquipId(idata.id))
 				pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
+			else
+				pl->GetPackage()->AddEquipFromDB(idata.id, idata.bindType != 0);
 #else
             if (IsPetItem(idata.id))
 				pl->GetPetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
@@ -2386,8 +2487,6 @@ namespace GObject
                 }
             }
 #endif
-			else
-				pl->GetPackage()->AddEquipFromDB(idata.id, idata.bindType != 0);
 		}
 		lc.finalize();
 
@@ -3038,6 +3137,21 @@ namespace GObject
 		}
 		lc.finalize();
 
+        lc.prepare("Loading auto xjfrontmat challenge data:");
+		DBAutoFrontMap axjfm;
+		if(execu->Prepare("SELECT `playerId`, `id` FROM `auto_xjfrontmap`", axjfm) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[axjfm.playerId];
+			if(pl == NULL)
+				continue;
+			xjfrontMap.autoBattle(pl, axjfm.id, 0, 0, true);
+		}
+		lc.finalize();
+
 		lc.prepare("Loading auto dungeon challenge data:");
 		DBDungeonAuto dda;
 		if(execu->Prepare("SELECT `playerId`, `dungeonId`, `totalExp`, `won` FROM `dungeon_auto`", dda) != DB::DB_OK)
@@ -3605,7 +3719,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum`, `clantitleAll` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3663,6 +3777,7 @@ namespace GObject
                 clan->SetTYSSSum(cl.tyssSum);
                 if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
                     clan->SetTYSSSum(0,true);
+                clan->SetClanTitle(cl.clantitleAll);
             }
 			else
 			{
@@ -4778,6 +4893,121 @@ namespace GObject
 
         }
         lua_close(L);
+
+        return true;
+    }
+
+    bool GObjectManager::loadZhenyuanConfig()
+    {
+		lua_State* L = lua_open();
+		luaopen_base(L);
+		luaopen_string(L);
+		luaopen_table(L);
+		{
+			std::string path = cfg.scriptPath + "items/ZhenYuan.lua";
+			lua_tinker::dofile(L, path.c_str());
+            // 灵宝
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getZhenyuanAttrMax");
+                UInt32 size = table_temp.size();
+                UInt8 typeCnt = 0;
+                for(UInt32 j = 0; j < size; ++ j)
+                {
+                    lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(j + 1);
+                    UInt32 size2 = std::min(15, table_temp2.size()) - 1;
+                    UInt8 lv = table_temp2.get<UInt8>(1);
+                    stZhyAttrMax& zhyAttrMax = _zhyAttrConf.zhyAttrMax[lv];
+                    if(size2 > typeCnt)
+                        typeCnt = size2;
+                    for(UInt32 k = 0; k < size2; ++ k)
+                    {
+                        zhyAttrMax.attrMax[k] = table_temp2.get<float>(k+2);
+                    }
+                }
+                for(UInt8 type = 0; type < typeCnt; ++ type)
+                    _zhyAttrConf.attrType.push_back(type+1);
+            }
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getZhenyuanAttrNum");
+				UInt32 size = std::min(8, table_temp.size());
+                for(UInt32 i = 0; i < size; ++ i)
+                {
+                    if(i < 4)
+                        _zhyAttrConf.attrNumChance[i] = table_temp.get<UInt16>(i + 1);
+                    else
+                        _zhyAttrConf.extraSwitchChance[i-4] = table_temp.get<UInt16>(i + 1);
+                }
+            }
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getZhenyuanAttrDis");
+				UInt32 size = std::min(2, table_temp.size());
+                if(size == 2)
+                {
+                    lua_tinker::table table_dis = table_temp.get<lua_tinker::table>(1);
+                    lua_tinker::table table_disChance = table_temp.get<lua_tinker::table>(2);
+                    UInt32 count = std::min(4, table_dis.size());
+                    for(UInt32 j = 0; j < count; ++ j)
+                    {
+                        lua_tinker::table table_dis_1 = table_dis.get<lua_tinker::table>(j+1);
+                        UInt32 sizeDis_1 = std::min(11, table_dis_1.size());
+                        for(UInt32 k = 0; k < sizeDis_1; ++ k)
+                            _zhyAttrConf.dis[j][k] = table_dis_1.get<UInt16>(k + 1);
+                    }
+                    count = std::min(4, table_disChance.size());
+                    for(UInt32 j = 0; j < count; ++ j)
+                    {
+                        lua_tinker::table table_disChance_1 = table_disChance.get<lua_tinker::table>(j+1);
+                        UInt32 sizeDisChance_1 = std::min(11, table_disChance_1.size());
+                        for(UInt32 k = 0; k < sizeDisChance_1; ++ k)
+                            _zhyAttrConf.disChance[j][k] = table_disChance_1.get<UInt16>(k + 1);
+                    }
+                }
+            }
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getZhenyuanColor");
+				UInt32 size = std::min(4, table_temp.size());
+                for(UInt32 i = 0; i < size; ++ i)
+                {
+                    _zhyAttrConf.colorVal[i] = table_temp.get<UInt16>(i + 1);
+                }
+            }
+
+        }
+        lua_close(L);
+
+        {
+		    std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+            if (execu.get() == NULL || !execu->isConnected()) return false;
+
+            LoadingCounter lc("Loading zhenyuan_extraAttr:");
+            GData::DBZHYExtraAttr zeadb;
+            if(execu->Prepare("SELECT `id`, `lvLimit`, `type1`, `type2`, `maxVal` FROM `zhenyuan_extraAttr` ORDER BY `lvLimit`, `id`", zeadb) != DB::DB_OK)
+                return false;
+
+            lc.reset(20);
+            while(execu->Next() == DB::DB_OK)
+            {
+                lc.advance();
+                stZhyExtraAttr stzea;
+                stzea.id = zeadb.id;
+                stzea.level = zeadb.lvLimit;
+                stzea.type1 = zeadb.type1;
+                stzea.type2 = zeadb.type2;
+                stzea.attrMax = zeadb.maxVal;
+                _zhyAttrConf.extraAttrMax.insert(std::make_pair(stzea.id, stzea));
+                if(stzea.type1 == 1)    //全职业
+                {
+                    std::vector<UInt16>& extraAttrType = _zhyAttrConf.extraAttrType[0][stzea.level];
+                    extraAttrType.push_back(stzea.id);
+                }
+                else    //单职业
+                {
+                    std::vector<UInt16>& extraAttrType = _zhyAttrConf.extraAttrType[1][stzea.level];
+                    extraAttrType.push_back(stzea.id);
+                }
+            }
+            lc.finalize();
+        }
 
         return true;
     }
@@ -6729,6 +6959,52 @@ namespace GObject
                 eqa.gems[2] = dbeqa.socket3;
                 eqa.gems[3] = dbeqa.socket4;
 			}
+		}
+		lc.finalize();
+
+		return true;
+    }
+
+	bool GObjectManager::loadZhenyuanAttr()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading zhenyuan attr:");
+        DBZhenyuanAttr dbzhya;
+        if(execu->Prepare("SELECT `zhenyuanAttr`.`id`, `itemId`, `zycolor`, `types`, `values`, `bindType` FROM `zhenyuanAttr` LEFT JOIN `item` ON `zhenyuanAttr`.`id` = `item`.`id` OR `item`.`id` = NULL", dbzhya) != DB::DB_OK)
+            return false;
+
+        lc.reset(2000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            const GData::ItemBaseType * itype = GData::itemBaseTypeManager[dbzhya.itemId];
+            if(itype == NULL)
+                continue;
+            StringTokenizer tkt(dbzhya.types, ",");
+            StringTokenizer tkv(dbzhya.values, ",");
+            if(tkt.count() < 6 || tkv.count() < 6)
+                continue;
+            ItemZhenyuanAttr zyattr;
+            zyattr.color = dbzhya.zycolor;
+            for(UInt8 i = 0; i < tkt.count(); ++ i)
+            {
+                if(i < 4)
+                {
+                    zyattr.type[i] = ::atoi(tkt[i].c_str());
+                    zyattr.value[i] = ::atoi(tkv[i].c_str());
+                }
+                else if(i < 6)
+                {
+                    zyattr.typeExtra[i-4] = ::atoi(tkt[i].c_str());
+                    zyattr.valueExtra[i-4] = ::atoi(tkv[i].c_str());
+                }
+            }
+            ItemEquipData itemEquipData;
+            ItemZhenyuan * zhenyuan = new ItemZhenyuan(dbzhya.id, itype, itemEquipData, zyattr);
+	        zhenyuan->SetBindStatus(dbzhya.bindType > 0);
+            pushEquipment(static_cast<ItemEquip *>(zhenyuan));
 		}
 		lc.finalize();
 

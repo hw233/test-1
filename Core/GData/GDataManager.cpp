@@ -86,6 +86,7 @@ namespace GData
     std::vector<UInt16>     GDataManager::m_petEqs[4];
     std::vector<UInt16>     GDataManager::m_petGems[20];
     std::vector<UInt16>     GDataManager::m_petEqSkills;
+    std::vector<UInt16>     GDataManager::m_zhenyuanItem[20];
 
 	bool GDataManager::LoadAllData()
 	{
@@ -238,6 +239,11 @@ namespace GData
 		if (!LoadFrontMapData())
 		{
 			fprintf(stderr, "Load front map data template Error !\n");
+            std::abort();
+		}
+		if (!LoadXJFrontMapData())
+		{
+			fprintf(stderr, "Load xjfront map data template Error !\n");
             std::abort();
 		}
 		if (!LoadOnlineAwardData())
@@ -842,6 +848,14 @@ namespace GData
                 {
                     if(idt.quality > 2 && idt.quality < 6)
                         m_petEqs[idt.quality - 2].push_back(idt.typeId);
+                }
+            case Item_Formula6:
+            case Item_Formula7:
+            case Item_Formula8:
+            case Item_Formula9:
+                {
+                    if(idt.reqLev >= 75 && (idt.reqLev % 5) == 0)
+                        m_zhenyuanItem[(idt.reqLev-75)/5].push_back(idt.typeId);
                 }
 			default:
 				{
@@ -1867,7 +1881,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBFrontMap dbc;
-		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `frontmap` ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `frontmap` WHERE `id` < 100 ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
 			return false;
 
         bool nextfrontmap = false;
@@ -1876,6 +1890,9 @@ namespace GData
         int spot = 0;
 		while(execu->Next() == DB::DB_OK)
 		{
+            if(dbc.id > 100)
+                break;
+            
             if (!first && id != dbc.id)
                 nextfrontmap = true;
 
@@ -1895,6 +1912,44 @@ namespace GData
             first = false;
         }
         frontMapMaxManager[id] = spot;
+        return true;
+    }
+
+    bool GDataManager::LoadXJFrontMapData()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBFrontMap dbc;
+		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `frontmap` WHERE `id` > 100 ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
+			return false;
+
+        bool nextfrontmap = false;
+        bool first = true;
+        int id = 0;
+        int spot = 0;
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbc.id < 100)
+                break;
+            if (!first && id != dbc.id)
+                nextfrontmap = true;
+
+            if (nextfrontmap) {
+                xjfrontMapMaxManager[id] = spot;
+                nextfrontmap = false;
+            }
+
+            std::vector<FrontMapFighter>& cpv = xjfrontMapManager[dbc.id];
+            if (cpv.size() <= dbc.spot)
+                cpv.resize(dbc.spot+1);
+            cpv[dbc.spot].count = dbc.count;
+            cpv[dbc.spot].fighterId = dbc.fighterId;
+
+            id = dbc.id;
+            spot = dbc.spot;
+            first = false;
+        }
+        xjfrontMapMaxManager[id] = spot;
         return true;
     }
 
@@ -2624,6 +2679,16 @@ namespace GData
         if(gemCnt == 0)
             return 0;
         return m_petGems[lvIdx][uRand(gemCnt)];
+    }
+
+    UInt16 GDataManager::GetZhenyuanTypeIdByLev(int lvIdx)
+    {
+        if(lvIdx < 0 || lvIdx >= 20)
+            return 0;
+        size_t cnt = m_zhenyuanItem[lvIdx].size();
+        if(cnt == 0)
+            return 0;
+        return m_zhenyuanItem[lvIdx][uRand(cnt)];
     }
 
     UInt16 GDataManager::GetPetEqSkill()
