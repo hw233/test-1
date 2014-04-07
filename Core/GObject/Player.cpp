@@ -30168,6 +30168,8 @@ void Player::SendFriendsB(UInt8 type)
 		pfriend = *offset;
         if(!pfriend)
             continue;
+        if(NULL == pfriend->getTeamMemberData())
+            continue;
 
         UInt32 status = pfriend->GetVar(VAR_KJTM_STATUS);
         UInt8 mark = GET_BIT(status, 0);
@@ -30186,6 +30188,7 @@ void Player::SetInactiveSort(Player* pl)
     s.player = pl;
     s.level = pl->GetLev();
     s.power = pl->GetVar(VAR_TOTAL_BATTLE_POINT);
+    s.time = TimeUtil::Now();
     _CommonSort.insert(s);
 }
         
@@ -30268,7 +30271,7 @@ void Player::SetActiveSort(Player* pl)
         s.isOnline = 1;
     else
         s.isOnline = 0;
-
+    s.time = TimeUtil::Now();
     _ActiveSort.insert(s);
 }
 
@@ -30318,6 +30321,10 @@ void Player::SendActiveSort(UInt8 type, UInt8 curPage)
             st << i->player->getCountry();
             st << i->player->getName();
             st << i->power;
+            UInt8 isOnline = 0;
+            if(i->player->isOnline())
+                isOnline = 1;
+            st << isOnline;
             c1++;
         }
         c++;
@@ -30436,6 +30443,16 @@ bool Player::CheckApplyList(UInt64 applicantId)
             return false;
         }
     }
+
+    TeamMemberData* tmd = getTeamMemberData();
+    if(NULL == tmd)
+        return false;
+    if(tmd->memCnt >= 3)
+    {
+        applicant->sendMsgCode(1, 8014);
+        return false;
+    }
+
     return true;
 }
 
@@ -30512,6 +30529,11 @@ void Player::DelApplyList(UInt64 applicantId)
             DB5().PushUpdateData("DELETE FROM `applylist` WHERE `playerId` = %" I64_FMT "u AND `applicantId` = %" I64_FMT "u", getId(), applicantId);
         }
     }
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x07);
+    st << Stream::eos;
+    send(st);
 }
 
 void Player::ApplyToName(Player* pl)
@@ -30521,13 +30543,18 @@ void Player::ApplyToName(Player* pl)
 
     if(!isOnline())
     {
-        sendMsgCode(1, 2218);
+        pl->sendMsgCode(1, 2218);
         return;
     }
 
-    TeamMemberData* tmdB = getTeamMemberData();
-    if(NULL == tmdB)
+    TeamMemberData* tmd = getTeamMemberData();
+    if(NULL == tmd)
         return;
+    if(tmd->memCnt >= 3)
+    {
+        pl->sendMsgCode(1, 8014);
+        return;
+    }
 
     Stream st(REP::KANGJITIANMO_REP);
     st << static_cast<UInt8>(0x1A);
@@ -30544,13 +30571,22 @@ void Player::InviteToName(Player* pl)
 
     if(!isOnline())
     {
-        sendMsgCode(1, 2218);
+        pl->sendMsgCode(1, 2218);
         return;
     }
 
     TeamMemberData* tmdB = getTeamMemberData();
     if(NULL != tmdB)
         return;
+
+    TeamMemberData* tmd = pl->getTeamMemberData();
+    if(NULL == tmd)
+        return;
+    if(tmd->memCnt >= 3)
+    {
+        pl->sendMsgCode(1, 8014);
+        return;
+    }
 
     Stream st(REP::KANGJITIANMO_REP);
     st << static_cast<UInt8>(0x1B);

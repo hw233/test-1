@@ -4497,11 +4497,11 @@ inline bool player_enum_2(GObject::Player* p, int)
 
 void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& args)
 {
-    if(sizeof(args)<1)
+    if(args.size()<1)
         return ;
     UInt8 type = atoi(args[0].c_str());
-     UInt16 reloadFlag = 0x00FF;
-     GameMsgHdr hdr4(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(UInt16));
+    UInt16 reloadFlag = 0x00FF;
+    GameMsgHdr hdr4(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(UInt16));
 #pragma pack(1)
             struct mas
             {

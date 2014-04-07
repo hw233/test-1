@@ -7140,8 +7140,15 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
             case 0x01:
                 {
                     player->SetCurType(2);
-                    GameMsgHdr hdr(0x191, WORKER_THREAD_WORLD, player, sizeof(type));
-                    GLOBAL().PushMsg(hdr, &type);
+                    UInt8 page = 1;
+                    struct ClanInactive
+                    {
+                        UInt8 type;
+                        UInt8 curPage;
+                    };
+                    ClanInactive ci = {type, page};
+                    GameMsgHdr hdr(0x191, WORKER_THREAD_WORLD, player, sizeof(ci));
+                    GLOBAL().PushMsg(hdr, &ci);
                 }
                 break;
             case 0x02:
@@ -7165,7 +7172,7 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                                 UInt8 curPage;
                             };
                             ClanInactive ci = {type, page};
-                            GameMsgHdr hdr(0x193, WORKER_THREAD_WORLD, player, sizeof(ci));
+                            GameMsgHdr hdr(0x191, WORKER_THREAD_WORLD, player, sizeof(ci));
                             GLOBAL().PushMsg(hdr, &ci);
 
                         }
@@ -7187,7 +7194,7 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                                 UInt8 curPage;
                             };
                             ClanInactive ci = {type, page};
-                            GameMsgHdr hdr(0x193, WORKER_THREAD_WORLD, player, sizeof(ci));
+                            GameMsgHdr hdr(0x191, WORKER_THREAD_WORLD, player, sizeof(ci));
                             GLOBAL().PushMsg(hdr, &ci);
                         }
                     }
@@ -7219,8 +7226,15 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
             case 0x01:
                 {
                     player->SetCurType(2);
-                    GameMsgHdr hdr(0x192, WORKER_THREAD_WORLD, player, sizeof(type));
-                    GLOBAL().PushMsg(hdr, &type);
+                    UInt8 page = 1;
+                    struct ClanActive
+                    {
+                        UInt8 type;
+                        UInt8 curPage;
+                    };
+                    ClanActive ca = {type, page};
+                    GameMsgHdr hdr(0x192, WORKER_THREAD_WORLD, player, sizeof(ca));
+                    GLOBAL().PushMsg(hdr, &ca);
                 }
                 break;
             case 0x02:
@@ -7244,7 +7258,7 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                                 UInt8 curPage;
                             };
                             ClanActive ca = {type, page};
-                            GameMsgHdr hdr(0x194, WORKER_THREAD_WORLD, player, sizeof(ca));
+                            GameMsgHdr hdr(0x192, WORKER_THREAD_WORLD, player, sizeof(ca));
                             GLOBAL().PushMsg(hdr, &ca);
                         }
                     }
@@ -7265,7 +7279,7 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                                 UInt8 curPage;
                             };
                             ClanActive ca = {type, page};
-                            GameMsgHdr hdr(0x194, WORKER_THREAD_WORLD, player, sizeof(ca));
+                            GameMsgHdr hdr(0x192, WORKER_THREAD_WORLD, player, sizeof(ca));
                             GLOBAL().PushMsg(hdr, &ca);
                         }
                     }
@@ -7325,7 +7339,6 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                     GameMsgHdr hdr(0x33B, threadId, leader, sizeof(Player *));
                     GLOBAL().PushMsg(hdr, &player);
                 }
-                player->sendMsgCode(1, 8016);
             }
         }
         break;
@@ -7444,7 +7457,7 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                 player->sendMsgCode(1, 1506);
                 return;
             }
-
+            
             UInt32 status = leader->GetVar(VAR_KJTM_STATUS);
             UInt8 mark = GET_BIT(status, 0);
             if(1 == mark)
@@ -7522,7 +7535,6 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
             }
         }
         break;
-
     }
 }
 

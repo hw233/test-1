@@ -5670,7 +5670,7 @@ void Clan::ClearTYSSScore()
         TYSSScoreSort.clear();
 }
 
-void Clan::SendClanFriendsA(Player* pl, UInt8 type)
+void Clan::SendClanFriendsA(Player* pl, UInt8 type, UInt8 page)
 {
 	Mutex::ScopedLock lk(_mutex);
 	ClanMember * mem = NULL;
@@ -5692,10 +5692,10 @@ void Clan::SendClanFriendsA(Player* pl, UInt8 type)
         if(1 == mark)
             SetInactiveSort(mem->player);
 	}
-    SendInactiveSort(pl, type);
+    SendInactiveSort(pl, type, page);
 }
 
-void Clan::SendClanFriendsB(Player* pl, UInt8 type)
+void Clan::SendClanFriendsB(Player* pl, UInt8 type, UInt8 page)
 {
 	Mutex::ScopedLock lk(_mutex);
 	ClanMember * mem = NULL;
@@ -5709,13 +5709,14 @@ void Clan::SendClanFriendsB(Player* pl, UInt8 type)
             continue;
         if(!mem->player)
             continue;
-
+        if(NULL == mem->player->getTeamMemberData())
+            continue;
         UInt32 status = mem->player->GetVar(VAR_KJTM_STATUS);
         UInt8 mark = GET_BIT(status, 0);
         if(0 == mark)
             SetActiveSort(mem->player);
 	}
-    SendActiveSort(pl, type);
+    SendActiveSort(pl, type, page);
 }
 
 bool Clan::IsClanFriends(Player* pl)
@@ -5745,6 +5746,7 @@ void Clan::SetInactiveSort(Player* pl)
     s.player = pl;
     s.level = pl->GetLev();
     s.power = pl->GetVar(VAR_TOTAL_BATTLE_POINT);
+    s.time = TimeUtil::Now(); 
     _CommonSort.insert(s);
 }
         
@@ -5822,6 +5824,7 @@ void Clan::SetActiveSort(Player* pl)
         s.isOnline = 1;
     else
         s.isOnline = 0;
+    s.time = TimeUtil::Now(); 
 
     _ActiveSort.insert(s);
 }
@@ -5867,10 +5870,14 @@ void Clan::SendActiveSort(Player* pl, UInt8 type, UInt8 curPage)
             st << i->player->getCountry();
             st << i->player->getName();
             st << i->power;
+            UInt8 isOnline = 0;
+            if(i->player->isOnline())
+                isOnline = 1;
+            st << isOnline;
             c1++;
         }
         c++;
-        if(c1 >= 10)
+        if(c1 >= 7)
             break;
     }
     st << Stream::eos;

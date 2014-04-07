@@ -2469,10 +2469,16 @@ void OnSendClanFriendsA( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
 
-    UInt8 type = *(UInt32*)data;
+    struct ClanInactive
+    {
+        UInt8 type;
+        UInt8 curPage;
+    };
+    ClanInactive* ci = reinterpret_cast<ClanInactive*>(const_cast<void*>(data));
+
     GObject::Clan *clan = player->getClan();
     if(clan != NULL)
-        clan->SendClanFriendsA(player, type);
+        clan->SendClanFriendsA(player, ci->type, ci->curPage);
     else
     {
         Stream st(REP::KANGJITIANMO_REP);
@@ -2487,10 +2493,16 @@ void OnSendClanFriendsB( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
 
-    UInt8 type = *(UInt32*)data;
+    struct ClanActive
+    {
+        UInt8 type;
+        UInt8 curPage;
+    };
+    ClanActive* ca = reinterpret_cast<ClanActive*>(const_cast<void*>(data));
+
     GObject::Clan *clan = player->getClan();
     if(clan != NULL)
-        clan->SendClanFriendsB(player, type);
+        clan->SendClanFriendsB(player, ca->type, ca->curPage);
     else
     {
         Stream st(REP::KANGJITIANMO_REP);
@@ -2501,7 +2513,7 @@ void OnSendClanFriendsB( GameMsgHdr& hdr, const void* data )
     }
 }
 
-void OnSendInactive( GameMsgHdr& hdr, const void* data )
+/*void OnSendInactive( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
 
@@ -2531,7 +2543,7 @@ void OnSendActive( GameMsgHdr& hdr, const void* data )
     GObject::Clan *clan = player->getClan();
     if(clan != NULL)
         clan->SendActiveSort(player, ca->type, ca->curPage);
-}
+}*/
 
 #define CNT10 10
 

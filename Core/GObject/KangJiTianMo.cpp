@@ -64,17 +64,17 @@ inline bool player_enum_0(GObject::Player* pl, int)
     if(NULL == pl)
         return false;
 
-    //if(pl->getVipLevel() < 1)
-       // return false;
-
     UInt32 dur = TimeUtil::Now() - pl->getLastOnline();
     if(dur >= 7*86400)
     {
-        KJTMManager->_InactiveMember.push_back(pl->getId());
-        KJTMManager->_Mark.push_back(KJTMManager->_InactiveMember.size());
         pl->SetVar(VAR_KJTM_STATUS, 1);
+        if(pl->getVipLevel() > 0)
+        {
+            KJTMManager->_InactiveMember.push_back(pl->getId());
+            KJTMManager->_Mark.push_back(KJTMManager->_InactiveMember.size());
 
-        DB5().PushUpdateData("INSERT INTO `inactivemember` (`playerId`) VALUES (%" I64_FMT "u)", pl->getId());
+            DB5().PushUpdateData("INSERT INTO `inactivemember` (`playerId`) VALUES (%" I64_FMT "u)", pl->getId());
+        }
     }
     return true;
 }
@@ -101,15 +101,17 @@ void KangJiTianMo::AddInactiveMemberFromDB(UInt64 playerId)
 
 void KangJiTianMo::RandInactiveMember(Player* pl, UInt8 type)
 {
+	Mutex::ScopedLock lk(_mutex);
+
     if(NULL == pl)
         return;
 
     ClearInactiveSort();
     
     UInt8 cnt = 0;
-    InactiveMemberMark tempMark;
-    tempMark.resize(_Mark.size());
-    memcpy(&tempMark[0], &_Mark[0], _Mark.size()*sizeof(UInt32));
+    InactiveMemberMark tempMark(_Mark);
+    //tempMark.resize(_Mark.size());
+    //memcpy(&tempMark[0], &_Mark[0], _Mark.size()*sizeof(UInt32));
 
     InactiveMember tempMember;
     while(tempMark.size() > 0 &&_InactiveMember.size() >= tempMark.size() && cnt<10)
@@ -144,19 +146,26 @@ void KangJiTianMo::RandInactiveMember(Player* pl, UInt8 type)
                 continue;
             }
         }
-    
+  
+        bool mark = false;
         for(UInt8 i=0; i<tempMember.size(); i++)
         {
             if(playerId == tempMember[i])
             {
                 tempMark.erase(tempMark.begin()+pos);
-                continue;
+                mark = false;
+                break;
             }
+            mark = true;
         }
-
-        SetInactiveSort(member);
-        tempMember.push_back(playerId);
-        cnt++;
+        
+        if(mark || 0 == cnt)
+        {
+            //std::cout <<playerId<<"@!@# "<<member->getName()<<std::endl;
+            SetInactiveSort(member);
+            tempMember.push_back(playerId);
+            cnt++;
+        }
     }
     SendInactiveSort(pl, type);
 }
@@ -170,6 +179,7 @@ void KangJiTianMo::SetInactiveSort(Player* pl)
     s.player = pl;
     s.level = pl->GetLev();
     s.power = pl->GetVar(VAR_TOTAL_BATTLE_POINT);
+    s.time = TimeUtil::Now();
     _CommonSort.insert(s);
 }
         
@@ -191,6 +201,7 @@ void KangJiTianMo::SendInactiveSort(Player* pl, UInt8 type)
         st << i->power;
         st << i->player->getOpenId();
         st <<  static_cast<UInt8>(i->player->GetVar(VAR_FRIEND_SECURITY));
+        //std::cout <<i->player->getId()<<"@!@# "<<i->player->getName()<<std::endl;
     }
     st << Stream::eos;
     pl->send(st);
@@ -278,7 +289,7 @@ void KangJiTianMo::JoinTeamMember(UInt64 playerId, UInt64 applicantId)
     TeamMemberData* tmdA = applicant->getTeamMemberData();
     if(NULL != tmdA)
     {
-        pl->sendMsgCode(1, 8017);
+        pl->sendMsgCode(1, 8016);
         return;
     }
 
@@ -287,7 +298,7 @@ void KangJiTianMo::JoinTeamMember(UInt64 playerId, UInt64 applicantId)
 
     if(tmd->memCnt >= TEAM_MAXMEMCNT)
     {
-        applicant->sendMsgCode(1, 8014);
+        pl->sendMsgCode(1, 8017);
         return;
     }
 
@@ -586,7 +597,10 @@ void KangJiTianMo::JoinBattleRoom(Player* pl, UInt64 leaderId)
         return;
 
     if(1 != leader->GetTMDYRoomStatus())
+    {
+		pl->sendMsgCode(1, 2102);
         return;
+    }
 
     if(1 == pl->GetTMDYRoomStatus())
         return;
@@ -810,22 +824,20 @@ void KangJiTianMo::StartBattle(Player* pl)
         if(memIdx != 0)
             bsim.switchPlayer(member, 0);
 
+        float factor = 1.0f;
+        if(memIdx==0)
+            factor = static_cast<float>(30)/100.0f;
+
         UInt32 status = member->GetVar(VAR_KJTM_KILL_NPC_STATUS); 
         UInt8 mark = GET_BIT(status, (tmd->index-1));
         if(0 == mark)
         {
-            float factor = 1.0f;
-            if(memIdx==0)
-                factor = static_cast<float>(30)/100.0f;
-            else
-            {
-                if(member->getVipLevel() >= 1 && member->getVipLevel() <= 4)
-                    factor = static_cast<float>(150)/100.0f;
-                else if(member->getVipLevel() >= 5)
-                    factor = static_cast<float>(200)/100.0f;
-            }
-            member->setKJTMFactor(factor);
+            if(member->getVipLevel() >= 1 && member->getVipLevel() <= 4)
+                factor = static_cast<float>(150)/100.0f;
+            else if(member->getVipLevel() >= 5)
+                factor = static_cast<float>(200)/100.0f;
         }
+        member->setKJTMFactor(factor);
 
         for(UInt8 mIdx = memIdx + 1; mIdx < tmd->memCnt; ++mIdx)
         {

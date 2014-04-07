@@ -2128,24 +2128,26 @@ namespace GObject
             GObject::Player* player;
             UInt8 level;
             UInt32 power;
+            UInt32 time;
 
-            InactiveSort() : player(NULL), level(0), power(0){}
+            InactiveSort() : player(NULL), level(0), power(0), time(0){}
         };
         struct lt_sortA
         {
-            bool operator()(const InactiveSort& a, const InactiveSort& b) const { return a.power > b.power || (a.power == b.power && a.level > b.level); }
+            bool operator()(const InactiveSort& a, const InactiveSort& b) const { return a.power > b.power || (a.power == b.power && a.level > b.level) || (a.power == b.power && a.level == b.level && a.time < b.time); }
         };
         struct ActiveSort
         {
             GObject::Player* player;
             UInt8 isOnline;
             UInt32 power;
+            UInt32 time;
 
-            ActiveSort() : player(NULL), isOnline(0), power(0){}
+            ActiveSort() : player(NULL), isOnline(0), power(0), time(0){}
         };
         struct lt_sortB
         {
-            bool operator()(const ActiveSort& a, const ActiveSort& b) const { return a.isOnline > b.isOnline || (a.isOnline == b.isOnline && a.power > b.power); }
+            bool operator()(const ActiveSort& a, const ActiveSort& b) const { return a.isOnline > b.isOnline || (a.isOnline == b.isOnline && a.power > b.power) || (a.isOnline == b.isOnline && a.power == b.power && a.time < b.time); }
         };
         typedef std::multiset<InactiveSort, lt_sortA> InactiveSortType;
         typedef std::multiset<ActiveSort, lt_sortB> ActiveSortType;

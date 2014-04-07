@@ -222,8 +222,8 @@ MSG_REG_2(GameMsgHdr, 0x1AF, OnSendDuoBaoBegin);
 MSG_REG_2(GameMsgHdr, 0x201, OnClearTYSS);
 MSG_REG_2(GameMsgHdr, 0x191, OnSendClanFriendsA);
 MSG_REG_2(GameMsgHdr, 0x192, OnSendClanFriendsB);
-MSG_REG_2(GameMsgHdr, 0x193, OnSendInactive);
-MSG_REG_2(GameMsgHdr, 0x194, OnSendActive);
+//MSG_REG_2(GameMsgHdr, 0x193, OnSendInactive);
+//MSG_REG_2(GameMsgHdr, 0x194, OnSendActive);
 
 //FB占位(0x1E0~0x1E9),简体千万别使用
 //0x1E0
