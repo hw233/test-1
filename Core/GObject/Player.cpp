@@ -28739,6 +28739,27 @@ void Player::mount_Cangjianya(UInt8 rideId, UInt8 floors, bool isAuto)
         mount->cangjianya(floors, isAuto);
 }
 
+void Player::sendUseRideItemInfo(lua_tinker::table table_items)
+{
+	UInt32 size = table_items.size();
+	if(size == 0 || size % 2 > 0)
+		return;
+    Stream st(REP::MODIFY_MOUNT);
+    st << static_cast<UInt8>(4);
+    size_t offset = st.size();
+    UInt8 count = 0;
+    st << count;
+    for (UInt32 i = 0; i < size; i += 2)
+    {
+		st << table_items.get<UInt32>(i+1);
+		st << table_items.get<UInt16>(i+2);
+        ++ count;
+    }
+    st.data<UInt8>(offset) = count;
+    st << Stream::eos;
+    send(st);
+}
+
 void Player::handleJiqirenAct_shiyamen()
 {
     if(!World::getJiqirenAct())
