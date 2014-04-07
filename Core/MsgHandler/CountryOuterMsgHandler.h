@@ -1409,8 +1409,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerMeetInfo();   //Fund
     pl->sendRealSpirit();   //真元
     pl->send7DayFundInfo();
-    //if(cfg.serverNo <= 10)
-        pl->sendZhenyuansInfo();    //阵元
+    pl->sendZhenyuansInfo();    //阵元
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
     //pl->QiShiBanState();
@@ -3454,8 +3453,6 @@ void OnXJFrontMapReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
 
-    //if(cfg.serverNo > 10)
-    //    return;
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     if(player->GetLev() < 75)
         return;

@@ -2923,6 +2923,7 @@ namespace GObject
         void addMountAttrExtra(GData::AttrExtra&);
         bool check_Cangjianya();
         void mount_Cangjianya(UInt8, UInt8, bool);
+        void sendUseRideItemInfo(lua_tinker::table);
         inline UInt8 getMounts() { return _playerData.mounts; }
         inline ModifyMount * getCurrentMount() { return getOneMount(getMounts()); }
         inline ModifyMount * getOneMount(UInt8 id)
@@ -2959,7 +2960,6 @@ namespace GObject
         void AirBookPriase(UInt8 type , UInt64 playerid);
         void SendClanMemberGrade();
         void Send11GradeAward(UInt8 type);
-        void doStrongInWorld(UInt8 type);
         void setGGValue()  ; //光棍节
         //女娲石盘
         void sendNuwaInfo();

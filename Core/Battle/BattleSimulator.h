@@ -701,6 +701,7 @@ private:
     std::vector<StatusChange> _scList;
     void appendDefStatus(StateType type, UInt32 value, BattleFighter* bf, DamageType damageType = e_damageNone);
     void appendStatusChange(StatusType type, UInt32 value, UInt16 skillId, BattleFighter* bf);
+    void appendAttackRoundChange();
     void appendReiatsuChange(int side);
     void appendStatusChangeForReiastu(StatusType type, UInt32 value, UInt16 skillId, UInt8 side);
     void appendMaxReiatsu();
