@@ -271,9 +271,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_skillgrade.sql     #创建技能升阶
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     #增加的表中如果有fighterId，记得在useChangeSexCard函数中添加修改主将ID的函数
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140401_1.sql         #璇玑阵图
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140403_1.sql   #clan表中添加iclantitleAll字段
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140403_2.sql   #修改clanTitleAll
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140401_1.sql         #璇玑阵图
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140403_1.sql   #clan表中添加iclantitleAll字段
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140403_2.sql   #修改clanTitleAll
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140408_1.sql   #修改strengthenData字段flag
 }
 
