@@ -678,6 +678,8 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
     act_count += FightersEnter(prevWin);
 
     UInt32 oldAttackRount = _attackRound;
+    if(_winner == 0)
+        appendAttackRoundChange();
     while(_winner == 0 && act_count < _fake_turns)
     {
         int pos = findFirstAttacker();
@@ -943,6 +945,7 @@ int BattleSimulator::findFirstAttacker()
     {
         _cur_fgtlist_idx = _cur_fgtlist_idx == 0 ? 1 : 0;
         _attackRound ++ ;
+        appendAttackRoundChange();
     }
 
     std::vector<BattleFighter*>& cur_fgtlist = _fgtlist[_cur_fgtlist_idx];
@@ -3854,15 +3857,17 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     factor = skill->factor[1];
                 else
                     factor = 0.3;
-                UInt16 index = _rnd(10000);
-                if(index < 3000) //后方
+                //UInt16 index = _rnd(10000);
+                //if(index < 3000) //后方
+                if(1)
                 {
                     if(x < 4)
                     {
                         dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos + 5), factor);
                     }
                 }
-                else if(index < 6500) //左右两侧
+                //else if(index < 6500) //左右两侧
+                if(1)
                 {
                     if(y > 0)
                     {
@@ -3873,7 +3878,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                         dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos + 1), factor);
                     }
                 }
-                else //左后右后
+                //else //左后右后
+                if(1)
                 {
                     if(y > 0 && x < 4)
                     {
@@ -12044,6 +12050,17 @@ void BattleSimulator::appendStatusChange(StatusType type, UInt32 value, UInt16 s
     _scList.push_back(sc);
 }
 
+void BattleSimulator::appendAttackRoundChange()
+{
+    StatusChange sc;
+    sc.pos = 51;
+    sc.type = 0;
+    sc.data = _attackRound + 1;
+    sc.statusId = 0;
+
+    _scList.push_back(sc);
+}
+
 void BattleSimulator::appendStatusChangeForReiastu(StatusType type, UInt32 value, UInt16 skillId, UInt8 side)
 {
     StatusChange sc;
@@ -14951,7 +14968,7 @@ void BattleSimulator::attackByJiuziSS(BattleFighter* bf, const GData::SkillBase*
         BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
         UInt8 count = bf2->getJiuziDmgCnt();
         if(count == 0)
-            return;
+            continue;
         UInt32 rate = (0.1 * 100 + ef->value * count) * 100;
         if(rate > _rnd(10000) && bf2->getConfuseRound() < 1)
         {
