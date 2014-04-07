@@ -7061,7 +7061,10 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 10:
         {
-            player->GetMoFang()->changeMoney(opt);               
+            UInt16 num = 0;
+
+            br >> num;
+            player->GetMoFang()->changeMoney(num, opt);               
         }
         break;
     case 12:
