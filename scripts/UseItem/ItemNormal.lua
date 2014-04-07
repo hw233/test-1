@@ -10951,9 +10951,11 @@ function ItemNormal_00009601(iid, num, bind, param)
             end
         end
     end
-    package:Add(9500, num9500, true, false, 2)
-    table.insert(ItemTable, 9500)
-    table.insert(ItemTable, num9500)
+    if num9500 ~= 0 then
+        package:Add(9500, num9500, true, false, 2)
+        table.insert(ItemTable,1, 9500)
+        table.insert(ItemTable,2, num9500)
+    end
 
     player:sendUseRideItemInfo(ItemTable)
     package:DelItemSendMsg(iid, player)
