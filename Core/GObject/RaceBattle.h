@@ -26,7 +26,7 @@ class RaceBattle
     public:
         RaceBattle();
         ~RaceBattle();
-        void RaceBattleCheck(UInt32 time);
+        void raceBattleCheck(UInt32 time);
         UInt16 getLocation() { return RACEBATTLE_LOCATION; }
         void enterPos(Player* pl, UInt8 pos);
         void autoBattle(Player* pl);
@@ -39,7 +39,12 @@ class RaceBattle
         void makeStarInfo(Stream& st, Player* pl, UInt8 level);
         void sendContinueWinSort(Player* player, UInt8 page);
         void sendBattleInfo(Player* pl);
-        void matchPlayer(Player* pl, Player* matchPlayer);
+        void sendMatchPlayer(Player* pl, Player* matchPlayer);
+        void attackPlayer(Player* pl, Player* matchPlayer);
+        void awardLevelRank();
+        void awardContinueWinRank();
+        void awardLevelRankOne(Player* pl, UInt8 rank);
+        void awardContinueWinRankOne(Player* pl, UInt8 num);
 
     private:
         UInt8 _status; //0（未开启），1（17：50~20：00），2（20：00~20：30）

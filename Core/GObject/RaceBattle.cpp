@@ -6,6 +6,11 @@
 #include "Server/WorldServer.h"
 #include "Player.h"
 #include "GData/XingchenData.h"
+#include "Common/URandom.h"
+#include "Package.h"
+#include "Server/SysMsg.h"
+#include "Mail.h"
+#include "Common/Itoa.h"
 
 #include "RaceBattle.h"
 
@@ -23,7 +28,7 @@ namespace GObject
     {
     }
 
-    void RaceBattleBroadcast(UInt8 type, UInt32 lefttime)
+    void raceBattleBroadcast(UInt8 type, UInt32 lefttime)
     {
         Stream st(REP::RACE_BATTLE);
         st << type;
@@ -32,7 +37,7 @@ namespace GObject
         NETWORK()->Broadcast(st);
     }
 
-    void RaceBattle::RaceBattleCheck(UInt32 time)
+    void RaceBattle::raceBattleCheck(UInt32 time)
     {
         UInt32 curTime = TimeUtil::SharpDay(0, time);
 
@@ -43,19 +48,23 @@ namespace GObject
             if(_status == 1)
                 return;
             _status = 1;
-            RaceBattleBroadcast(0, RACEBATTLE_STARTTIME - curTime);
+            raceBattleBroadcast(0, RACEBATTLE_STARTTIME - curTime);
         }
-        else if(curTime <= RACEBATTLE_ENDTIME)
+        else if(curTime < RACEBATTLE_ENDTIME)
         {
             if(_status == 2)
                 return;
             _status = 2;
-            RaceBattleBroadcast(1, RACEBATTLE_ENDTIME - curTime);
+            raceBattleBroadcast(1, RACEBATTLE_ENDTIME - curTime);
         }
         else
         {
             if(_status == 2)
-                RaceBattleBroadcast(1, 0);
+            {
+                raceBattleBroadcast(1, 0);
+                awardLevelRank();
+                awardContinueWinRank();
+            }
             _status = 0;
         }
     }
@@ -64,10 +73,6 @@ namespace GObject
     {
         if(pl->getRaceBattlePos() == pos)
             return;
-        pl->setRaceBattlePos(pos);
-        if(pl->GetVar(VAR_RCAE_BATTLE_SIGN) == 0)
-            pl->SetVar(VAR_RCAE_BATTLE_SIGN, 1);
-
         GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pos);
         if(!rb)
             return;
@@ -79,6 +84,11 @@ namespace GObject
         UInt8 offset = pos % 10;
         if(offset > gPerLeveCnt[level - 1])
             return;
+
+        pl->setRaceBattlePos(pos);
+        if(pl->GetVar(VAR_RCAE_BATTLE_SIGN) == 0)
+            pl->SetVar(VAR_RCAE_BATTLE_SIGN, 1);
+
         Stream st(REP::RACE_BATTLE);
         UInt8 type = 2;
         st << type;
@@ -92,6 +102,16 @@ namespace GObject
         makeStarInfo(st, pl, level);
         st << pl->getAwardLevel();
         st << Stream::eos;
+
+        UInt8 page = pl->getContinueWinPage();
+        if(page == 0)
+        {
+            page = 1;
+            pl->setContinueWinPage(page);
+        }
+        sendContinueWinSort(pl, page);
+
+        sendBattleInfo(pl);
     }
 
     void RaceBattle::autoBattle(Player* pl)
@@ -104,18 +124,78 @@ namespace GObject
 
     void RaceBattle::freshContinueWinRank(Player* pl)
     {
+        sendContinueWinSort(pl, pl->getContinueWinPage());
     }
 
     void RaceBattle::getAward(Player* pl)
     {
+        if(!pl)
+            return;
+        UInt8 awardlevel = pl->getAwardLevel();
+        UInt8 pos = pl->getRaceBattlePos();
+        UInt8 level = pos / 10;
+        if(level < 3 || awardlevel > level)
+            return;
+        UInt8 index = level - 3;
+        if(index > 3)
+            return;
+
+        static UInt32 awardItem[][3][2] = {
+            {{503, 2}, {515, 2}, {25, 1}},
+            {{503, 2}, {515, 2}, {25, 1}},
+            {{503, 2}, {515, 2}, {25, 1}},
+            {{503, 2}, {515, 2}, {25, 1}}
+        };
+
+        for(UInt8 i = 0; i < 3; i++)
+           pl->GetPackage()->Add(awardItem[index][i][0], awardItem[index][i][1], true, false);
+
+        ++awardlevel;
+        pl->setAwardLevel(awardlevel);
     }
 
     void RaceBattle::readBattleReport(Player* pl, UInt32 reportId)
     {
+        if(!pl)
+            return;
+        pl->readRandBattleReport(reportId);
     }
 
     void RaceBattle::requestMatch(Player* pl)
     {
+        UInt8 pos = pl->getRaceBattlePos();
+        UInt8 level = pos / 10;
+        if(level == 0)
+            return;
+        if(level > sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]))
+            return;
+
+        std::vector<Player* > vecPlayer;
+        UInt32 count = 0;
+        for(UInt8 i = level; i <= 5; i++)
+        {
+            RBSortType& levelSort = _levelStarSort[i - 1];
+            for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
+                vecPlayer[count++] = it->player;
+            if(count > 5)
+                break;
+        }
+        for(Int8 i = level - 1; i >= 0; i--)
+        {
+            if(count > 5)
+                break;
+            RBSortType& levelSort = _levelStarSort[i - 1];
+            for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
+                vecPlayer[count++] = it->player;
+        }
+        if(count <= 1)
+            return;
+
+        UInt32 index = uRand(count);
+        Player* matchPlayer = vecPlayer[index];
+        sendMatchPlayer(pl, matchPlayer);
+
+        attackPlayer(pl, matchPlayer);
     }
 
     bool RaceBattle::isStart()
@@ -247,7 +327,7 @@ namespace GObject
         pl->send(st);
     }
 
-    void RaceBattle::matchPlayer(Player* pl, Player* matchPlayer)
+    void RaceBattle::sendMatchPlayer(Player* pl, Player* matchPlayer)
     {
         if(!pl || !matchPlayer)
             return;
@@ -272,5 +352,162 @@ namespace GObject
         st << Stream::eos;
         pl->send(st);
     }
+
+    void RaceBattle::attackPlayer(Player* pl, Player* matchPlayer)
+    {
+        if(!pl || !matchPlayer)
+            return;
+        if(pl->getBuffData(PLAYER_BUFF_ATTACKING))
+        {
+            pl->sendMsgCode(0, 1407);
+            return;
+        }
+
+        Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, pl, matchPlayer);
+        pl->PutFighters( bsim, 0 );
+        matchPlayer->PutFighters( bsim, 1 );
+        bsim.start();
+        bool res = bsim.getWinner() == 1;
+        UInt32 reptid = bsim.getId();
+
+		Stream st(REP::ATTACK_NPC);
+		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId()<<static_cast<UInt64>(0) << Stream::eos;
+		pl->send(st);
+
+        PlayerReport stReport;
+        stReport.pl = matchPlayer;
+        stReport.win = res ? 0 : 1;
+        stReport.reportId = reptid;
+        pl->insertPlayerRecord(stReport);
+
+        if(res)
+        {
+        }
+    }
+
+    void RaceBattle::awardLevelRank()
+    {
+        UInt8 rank = 0;
+        for(UInt8 i = 5; i >= 1; i--)
+        {
+            RBSortType& levelSort = _levelStarSort[i - 1];
+            for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
+            {
+                ++rank; 
+                if(rank > 50)
+                    return;
+                awardLevelRankOne(it->player, rank);
+            }
+        }
+    }
+
+    void RaceBattle::awardContinueWinRank()
+    {
+        for(RBSortType::iterator it = _contineWinSort.begin(); it != _contineWinSort.end(); ++it)
+        {
+            if(it->total < 5)
+                return;
+            awardContinueWinRankOne(it->player, it->total);
+        }
+    }
+
+    void RaceBattle::awardLevelRankOne(Player* pl, UInt8 rank)
+    {
+        if(!pl)
+            return;
+
+        UInt8 type;
+        if(rank == 0)
+            return;
+        else if(rank <= 1)
+            type = 0;
+        else if(rank <= 2)
+            type = 1;
+        else if(rank <= 3)
+            type = 2;
+        else if(rank <= 9)
+            type = 3;
+        else if(rank <= 29)
+            type = 4;
+        else if(rank <= 50)
+            type = 5;
+        else
+            return;
+
+        SYSMSG(title, 5135);
+        SYSMSGV(content, 5136, rank);
+        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            static MailPackage::MailItem mitem[][3] = {
+                {{503, 2}, {515, 2}, {25, 1}},
+                {{503, 2}, {515, 2}, {25, 1}},
+                {{503, 2}, {515, 2}, {25, 1}},
+                {{503, 2}, {515, 2}, {25, 1}},
+                {{503, 2}, {515, 2}, {25, 1}},
+                {{503, 2}, {515, 2}, {25, 1}}
+            };
+            MailItemsInfo itemsInfo(mitem[type], RandBattleAward, 3);
+            mailPackageManager.push(mail->id, mitem[type], 3, true);
+            std::string strItems;
+            for (int i = 0; i < 3; ++i)
+            {
+                strItems += Itoa(mitem[type][i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[type][i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+
+    void RaceBattle::awardContinueWinRankOne(Player* pl, UInt8 num)
+    {
+        if(!pl)
+            return;
+
+        UInt8 type;
+        if(num < 5)
+            return;
+        else if(num < 10)
+            type = 0;
+        else if(num <= 20)
+            type = 1;
+        else if(num <= 30)
+            type = 2;
+        else if(num <= 40)
+            type = 3;
+        else if(num <= 50)
+            type = 4;
+        else
+            type = 5;
+
+        SYSMSG(title, 5137);
+        SYSMSGV(content, 5138, num);
+        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            static MailPackage::MailItem mitem[][3] = {
+                {{503, 2}, {515, 2}, {25, 1}},
+                {{503, 2}, {515, 2}, {25, 1}},
+                {{503, 2}, {515, 2}, {25, 1}},
+                {{503, 2}, {515, 2}, {25, 1}},
+                {{503, 2}, {515, 2}, {25, 1}},
+                {{503, 2}, {515, 2}, {25, 1}}
+            };
+            MailItemsInfo itemsInfo(mitem[type], RandBattleAward, 3);
+            mailPackageManager.push(mail->id, mitem[type], 3, true);
+            std::string strItems;
+            for (int i = 0; i < 3; ++i)
+            {
+                strItems += Itoa(mitem[type][i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[type][i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+
 }
 

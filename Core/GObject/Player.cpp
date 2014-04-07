@@ -91,6 +91,7 @@
 #include "Leaderboard.h"
 #include "ArenaServerWar.h"
 #include "GData/SevenSoul.h"
+#include "Battle/BattleReport.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -867,6 +868,7 @@ namespace GObject
         _continueWinCnt = 0;
         _awardLevel = 0;
         _recordId = 0;
+        _continueWinPage = 0;
 	}
 
 
@@ -30270,15 +30272,27 @@ void Player::AddFriendlyCount(Player * friender , UInt8 val)
         }
     }
 
-    void Player::insertPlayerRecord(Player* pl)
+    void Player::insertPlayerRecord(PlayerReport record)
     {
-        if(!pl)
-            return;
-        //_playerReport[_recordId] = pl;
-        ++_recordId;
+        _playerReport[_recordId++] = record;
     }
 
+    void Player::readRandBattleReport(UInt32 reportId)
+    {
+        std::vector<PlayerReport>::iterator it;
+        for(it = _playerReport.begin(); it != _playerReport.end(); ++it)
+        {
+            if(it->reportId == reportId)
+                break;
+        }
+        if(it == _playerReport.end())
+            return;
 
+        std::vector<UInt8> *r = Battle::battleReport[reportId];
+        if(r == NULL)
+            return;
+        send(&(*r)[0], r->size());
+    }
 
 } // namespace GObject
 

@@ -3127,6 +3127,7 @@ namespace GObject
         //所有挑战记录
         UInt8 _recordId;
         std::vector<PlayerReport> _playerReport;
+        UInt8 _continueWinPage;
     public:
         UInt8 getRaceBattlePos() { return _playerPos; }
         void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
@@ -3141,7 +3142,10 @@ namespace GObject
         UInt8 getChallengeStatus(Player* pl);
         void insertChallengePlayer(Player* pl);
         void makeRBBattleInfo(Stream &st);
-        void insertPlayerRecord(Player* pl);
+        void insertPlayerRecord(PlayerReport record);
+        UInt8 getContinueWinPage() { return _continueWinPage; }
+        void setContinueWinPage(UInt8 page) { _continueWinPage = page; }
+        void readRandBattleReport(UInt32 reportId);
 	};
 
 

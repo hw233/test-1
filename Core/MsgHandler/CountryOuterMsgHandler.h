@@ -6723,10 +6723,10 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
 void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
+	if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+		return;
     if(!gRaceBattle)
         return;
-    //if(player->getLocation() != gRaceBattle->getLocation())
-    //    return;
     if(player->GetLev() < 40)
         return;
     if(!gRaceBattle->isStart())

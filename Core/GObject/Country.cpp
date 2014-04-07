@@ -113,10 +113,10 @@ void Country::ClanBoss_Refresh(void*)
 	GObject::ClanBoss::instance().refresh();
 }
 
-void Country::RaceBattleCheck(void* )
+void Country::raceBattleCheck(void* )
 {
     if(gRaceBattle)
-        gRaceBattle->RaceBattleCheck(TimeUtil::Now());
+        gRaceBattle->raceBattleCheck(TimeUtil::Now());
 }
 
 bool Country::Init()
@@ -161,7 +161,7 @@ bool Country::Init()
 
         GObject::ClanBoss::instance().init();
 	    AddTimer(1000, ClanBoss_Refresh, static_cast<void*>(NULL));
-        AddTimer(1000, RaceBattleCheck);
+        AddTimer(1000, raceBattleCheck);
 
 	}
 
