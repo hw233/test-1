@@ -274,6 +274,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140401_1.sql         #璇玑阵图
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140403_1.sql   #clan表中添加iclantitleAll字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140403_2.sql   #修改clanTitleAll
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140408_1.sql   #修改strengthenData字段flag
 }
 
 #sh player_jiguan.sh

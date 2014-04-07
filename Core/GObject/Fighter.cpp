@@ -7293,6 +7293,7 @@ bool Fighter::setAcupointsGold( int idx, UInt8 v, bool writedb, bool init )
             SYSMSG_SENDV(2019, _owner, _color, getName().c_str(), pap->useReal);
 
             _acupointsGold[idx] = v;
+            GameAction()->doStrong(_owner, SthAcupointGold, 0,0);
 
 /*            if (_owner && writedb)
                 _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 0);
@@ -7406,6 +7407,7 @@ bool Fighter::upgradeXinMo()
     _owner->send(st);
     updateDBxinmo();
     SYSMSG_SENDV(4919, _owner, stxc->consume);
+    GameAction()->doStrong(_owner, SthXinMo, 0 , 0);
     return true;
 }
 bool Fighter::quickUpGradeXinMo()
@@ -7469,7 +7471,7 @@ bool Fighter::quickUpGradeXinMo()
         _owner->send(st);
     }
 
-   // GameAction()->doStrong(_owner, SthXinMo, 0, 0); 
+    GameAction()->doStrong(_owner, SthXinMo, 0, 0);
    // _owner->GuangGunCompleteTask(0,30);
     return true;
 }
@@ -7583,6 +7585,7 @@ void Fighter::SGradeManual(UInt16 skillId)
     st << Stream::eos;
     _owner->send(st);
 
+    GameAction()->doStrong(_owner, SthSkillUpgrade, 0, 0);
 }
 
 void Fighter::SGradeAuto(UInt16 skillId)
@@ -7671,6 +7674,7 @@ void Fighter::SGradeAuto(UInt16 skillId)
     st << totalConsume;
     st << Stream::eos;
     _owner->send(st);
+    GameAction()->doStrong(_owner, SthSkillUpgrade, 0, 0);
 }
 
 void Fighter::makeFighterSGInfo(Stream& st)

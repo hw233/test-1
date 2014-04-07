@@ -7,8 +7,9 @@
 #include "Package.h"
 #include "Server/Cfg.h"
 #include "GData/Money.h"
-#include "Country.h"
 #include "Server/SysMsg.h"
+#include "Script/GameActionLua.h"
+#include "Country.h"
 #include "TeamCopy.h"
 
 namespace GObject
@@ -1545,6 +1546,7 @@ void PetTeamCopy::teamBattleStart(Player* pl)
             continue;
 
         bsim.applyFighterHP(0, pl);
+        GameAction()->doStrong(pl, SthPetCopy, 0,0);
     }
     dismissTeam(td->leader, 1);
 }
