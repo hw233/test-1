@@ -6782,6 +6782,26 @@ void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
         }
         break;
 
+        case 11:
+            gRaceBattle->exitRB(player);
+        break;
+
+        case 12:
+        {
+            UInt64 defenderId = 0;
+            brd >> defenderId;
+            gRaceBattle->attackLevelPlayer(player, defenderId);
+        }
+        break;
+
+        case 13:
+        {
+            UInt64 defenderId = 0;
+            brd >> defenderId;
+            gRaceBattle->attackContinueWinPlayer(player, defenderId);
+        }
+        break;
+
         default:
         break;
     }

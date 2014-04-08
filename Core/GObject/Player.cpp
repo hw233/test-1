@@ -869,6 +869,11 @@ namespace GObject
         _awardLevel = 0;
         _recordId = 0;
         _continueWinPage = 0;
+        _rbBufId = 0;
+        _rbValue = 0;
+        _exitCd = 0;
+        _starTotal = 0;
+        _canContinueCnt = 0;
 	}
 
 

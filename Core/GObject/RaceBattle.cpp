@@ -11,6 +11,7 @@
 #include "Server/SysMsg.h"
 #include "Mail.h"
 #include "Common/Itoa.h"
+#include "Common/TimeUtil.h"
 
 #include "RaceBattle.h"
 
@@ -71,11 +72,20 @@ namespace GObject
 
     void RaceBattle::enterPos(Player* pl, UInt8 pos)
     {
-        if(pl->getRaceBattlePos() == pos)
-            return;
-        GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pos);
-        if(!rb)
-            return;
+        UInt8 origPos = pl->getRaceBattlePos();
+        if(pos == 0)
+        {
+            if(origPos == 0)
+                pos = 10;
+            else
+                pos = origPos;
+        }
+        else
+        {
+            if(origPos == pos)
+                return;
+        }
+
         UInt8 level = pos / 10;
         if(level == 0)
             return;
@@ -83,6 +93,18 @@ namespace GObject
             return;
         UInt8 offset = pos % 10;
         if(offset > gPerLeveCnt[level - 1])
+            return;
+        UInt8 origLevel = origPos / 10;
+        if((origLevel == 0 && level == 1) || (origLevel > 0 && origLevel == level))
+        {
+        }
+        else
+        {
+            return;
+        }
+
+        GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pos);
+        if(!rb)
             return;
 
         pl->setRaceBattlePos(pos);
@@ -93,6 +115,7 @@ namespace GObject
         UInt8 type = 2;
         st << type;
         st << pl->getRaceBattlePos();
+        st << pl->getStarTotal();
         st << gPerLeveCnt[level - 1];
         for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
             st << pl->getStarCnt(i);
@@ -163,12 +186,32 @@ namespace GObject
 
     void RaceBattle::requestMatch(Player* pl)
     {
+        if(!pl)
+            return;
+        if(pl->getExitCd() > TimeUtil::Now())
+        {
+            pl->sendMsgCode(0, 4019);
+            return;
+        }
         UInt8 pos = pl->getRaceBattlePos();
         UInt8 level = pos / 10;
         if(level == 0)
             return;
         if(level > sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]))
             return;
+        UInt8 offset = pos % 10;
+        if(offset == 0)
+        {
+            pl->sendMsgCode(0, 4017);
+            return;
+        }
+        if(offset > gPerLeveCnt[level - 1])
+            return;
+        if(pl->getStarCnt(offset - 1) >= 6)
+        {
+            pl->sendMsgCode(0, 4018);
+            return;
+        }
 
         std::vector<Player* > vecPlayer;
         UInt32 count = 0;
@@ -194,8 +237,6 @@ namespace GObject
         UInt32 index = uRand(count);
         Player* matchPlayer = vecPlayer[index];
         sendMatchPlayer(pl, matchPlayer);
-
-        attackPlayer(pl, matchPlayer);
     }
 
     bool RaceBattle::isStart()
@@ -341,6 +382,7 @@ namespace GObject
         st << pl->GetLev();
         st << pl->getBattlePoint();
         st << pl->getRaceBattlePos();
+        st << pl->getId();
 
         st << matchPlayer->getName();
         st << matchPlayer->getCountry();
@@ -348,25 +390,39 @@ namespace GObject
         st << matchPlayer->GetLev();
         st << matchPlayer->getBattlePoint();
         st << matchPlayer->getRaceBattlePos();
+        st << matchPlayer->getId();
 
         st << Stream::eos;
         pl->send(st);
     }
 
-    void RaceBattle::attackPlayer(Player* pl, Player* matchPlayer)
+    void RaceBattle::attackPlayer(Player* pl, Player* matchPlayer, AttackType type)
     {
         if(!pl || !matchPlayer)
             return;
+        if(pl->getExitCd() > TimeUtil::Now())
+        {
+            pl->sendMsgCode(0, 4019);
+            return;
+        }
         if(pl->getBuffData(PLAYER_BUFF_ATTACKING))
         {
             pl->sendMsgCode(0, 1407);
             return;
         }
+		pl->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + 3);
 
         Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, pl, matchPlayer);
         pl->PutFighters( bsim, 0 );
         matchPlayer->PutFighters( bsim, 1 );
+
+        GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pl->getRaceBattlePos());
+        if(rb)
+            pl->setRBBuf(rb->id, rb->value);
         bsim.start();
+        if(rb)
+            pl->setRBBuf(0, 0);
+
         bool res = bsim.getWinner() == 1;
         UInt32 reptid = bsim.getId();
 
@@ -380,8 +436,71 @@ namespace GObject
         stReport.reportId = reptid;
         pl->insertPlayerRecord(stReport);
 
+        UInt8 starAdd;
         if(res)
         {
+            starAdd = 2;
+            if(type == eLevelAttack)
+                pl->setContinueWinCnt(pl->getContinueWinCnt() + 1);
+            else
+            {
+                UInt8 contineWinCnt = matchPlayer->getContinueWinCnt();
+                if(contineWinCnt < 3)
+                {
+                }
+                else if(contineWinCnt < 10)
+                    starAdd += 1;
+                else if(contineWinCnt < 20)
+                    starAdd += 2;
+                else if(contineWinCnt < 30)
+                    starAdd += 4;
+                else
+                    starAdd += 6;
+            }
+        }
+        else
+        {
+            starAdd = 1;
+            if(type == eLevelAttack)
+                pl->setContinueWinCnt(0);
+        }
+
+        UInt8 pos = pl->getRaceBattlePos();
+        UInt8 level = pos / 10;
+        UInt8 offset = pos % 10;
+        if(level == 0 || level > 5)
+            return;
+        if(offset == 0)
+            return;
+        if(offset > gPerLeveCnt[level - 1])
+            return;
+
+        UInt8 starCnt = pl->getStarCnt(offset - 1) + starAdd;
+        if(starCnt < 6)
+            pl->setStarCnt(offset - 1, starCnt);
+        else
+        {
+            pl->setStarCnt(offset - 1, 6);
+            UInt8 canContinueCnt = pl->getCanContinueCnt();
+            pl->setCanContinueCnt(++canContinueCnt);
+        }
+        UInt8 starTotal = pl->getStarTotal();
+        pl->setStarTotal(starTotal + starAdd);
+        eraseLevelStarSort(pl, level);
+        if(rb && starCnt >= rb->next * 2)
+        {
+            UInt8 pos = (level + 1) * 10;
+            enterPos(pl, pos);
+        }
+        else
+        {
+            TSort tsort;
+            tsort.player = pl;
+            tsort.total = starCnt;
+            tsort.time = TimeUtil::Now();
+            _levelStarSort[level - 1].insert(tsort);
+            if(type == eLevelAttack)
+                sendContinueWinSort(pl, pl->getContinueWinPage());
         }
     }
 
@@ -507,6 +626,87 @@ namespace GObject
             }
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         }
+    }
+
+    void RaceBattle::eraseLevelStarSort(Player* pl, UInt8 level)
+    {
+        if(!pl)
+            return;
+        if(level == 0 || level > 5)
+            return;
+
+        RBSortType& levelSort = _levelStarSort[level - 1];
+        for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
+        {
+            if(it->player == pl)
+            {
+                levelSort.erase(it);
+                break;
+            }
+        }
+    }
+
+    void RaceBattle::exitRB(Player* pl)
+    {
+        if(!pl)
+            return;
+        pl->setExitCd(TimeUtil::Now() + 20);
+        pl->setContinueWinCnt(0);
+        eraseLevelStarSort(pl, pl->getRaceBattlePos() / 10);
+    }
+
+    void RaceBattle::attackLevelPlayer(Player* pl, UInt64 defenderId)
+    {
+        if(!pl)
+            return;
+        UInt8 pos = pl->getRaceBattlePos();
+        UInt8 level = pos / 10;
+        UInt8 offset = pos % 10;
+        if(level == 0 || level > 5)
+            return;
+        if(offset == 0)
+            return;
+        if(offset > gPerLeveCnt[level - 1])
+            return;
+
+        Player* defender = globalPlayers[defenderId];
+        if(!defender)
+            return;
+
+        if(pl->getStarCnt(offset - 1) >= 6)
+        {
+            pl->sendMsgCode(0, 4018);
+            return;
+        }
+
+        attackPlayer(pl, defender, eLevelAttack);
+    }
+
+    void RaceBattle::attackContinueWinPlayer(Player* pl, UInt64 defenderId)
+    {
+        if(!pl)
+            return;
+        UInt8 pos = pl->getRaceBattlePos();
+        UInt8 level = pos / 10;
+        UInt8 offset = pos % 10;
+        if(level == 0 || level > 5)
+            return;
+        if(offset == 0)
+            return;
+        if(offset > gPerLeveCnt[level - 1])
+            return;
+
+        if(pl->getCanContinueCnt() > 0)
+        {
+            pl->sendMsgCode(0, 4020);
+            return;
+        }
+
+        Player* defender = globalPlayers[defenderId];
+        if(!defender)
+            return;
+
+        attackPlayer(pl, defender, eContinueWinAttack);
     }
 
 }

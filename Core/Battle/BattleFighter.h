@@ -59,6 +59,28 @@ class BattleFighter:
 #define BLEED_TYPE_FLAG_LINGYAN         0x00001000      // 灵焱流血
 #define BLEED_TYPE_FLAG_FIELD_GAPE      0x00002000      // 地裂效果流血
 
+#define HP_ID           1
+#define ACTION_ID       2
+#define HIT_ID          3
+#define EVADE_ID        4
+#define CRITICAL_ID     5
+#define PIERCE_ID       6
+#define COUNTER_ID      7
+#define TOUGH_ID        8
+#define MAGRES_ID       9
+#define STRENGTH_ID     10
+#define PHYSIQUE_ID     11
+#define AGILITY_ID      12
+#define INTELLIGENCE_ID 13
+#define WILL_ID         14
+#define ATTACK_ID       15
+#define MAGATK_ID       16
+#define DEFEND_ID       17
+#define MAGDEF_ID       18
+#define CRIDMG_ID       19
+#define CRIIMMUNE_ID    20
+#define AURA_ID         21
+
 public:
 	BattleFighter(Script::BattleFormula *, GObject::Fighter * = NULL, UInt8 side = 0, UInt8 pos = 0);
 

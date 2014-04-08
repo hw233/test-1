@@ -3115,7 +3115,7 @@ namespace GObject
         //玩家位置（包括层数、当层位置）
         UInt8 _playerPos;
         //本层每个offset位置的星级数
-        UInt8 _starCnt[7];
+        UInt8 _starCnt[7]; //放大2倍
         //可挑战次数
         UInt8 _canChallengeCnt;
         //连斩人数
@@ -3128,6 +3128,12 @@ namespace GObject
         UInt8 _recordId;
         std::vector<PlayerReport> _playerReport;
         UInt8 _continueWinPage;
+        //增益ID
+        UInt8 _rbBufId;
+        float _rbValue;
+        UInt32 _exitCd;
+        UInt16 _starTotal;
+        UInt8 _canContinueCnt;
     public:
         UInt8 getRaceBattlePos() { return _playerPos; }
         void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
@@ -3146,6 +3152,15 @@ namespace GObject
         UInt8 getContinueWinPage() { return _continueWinPage; }
         void setContinueWinPage(UInt8 page) { _continueWinPage = page; }
         void readRandBattleReport(UInt32 reportId);
+        void setRBBuf(UInt8 id, float value) { _rbBufId = id; _rbValue = value; }
+        UInt8 getRBBufId() { return _rbBufId; }
+        float getRBBufValue() { return _rbValue; }
+        void setExitCd(UInt32 cd) { _exitCd = cd; }
+        UInt32 getExitCd() { return _exitCd; }
+        UInt8 getStarTotal() { return _starTotal; }
+        void setStarTotal(UInt8 cnt) { _starTotal = cnt; }
+        UInt8 getCanContinueCnt() { return _canContinueCnt; }
+        void setCanContinueCnt(UInt8 cnt) { _canContinueCnt = cnt; }
 	};
 
 

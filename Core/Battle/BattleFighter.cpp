@@ -516,6 +516,80 @@ void BattleFighter::updateBuffExtras()
         _attrExtra.hitrate *= clanFactor;
         _attrExtra.hp *= clanFactor;
     }
+
+    if(_fighter && _fighter->getOwner())
+    {
+        UInt8 bufId = _fighter->getOwner()->getRBBufId();
+        float factor = _fighter->getOwner()->getRBBufValue();
+        switch(bufId)
+        {
+            case HP_ID:
+                _attrExtra.hp *= (1 + factor);
+            break;
+            case ACTION_ID:
+                _attrExtra.action *= (1 + factor);
+            break;
+            case HIT_ID:
+                _attrExtra.hitrate *= (1 + factor);
+            break;
+            case EVADE_ID:
+                _attrExtra.evade *= (1 + factor);
+            break;
+            case CRITICAL_ID:
+                _attrExtra.critical *= (1 + factor);
+            break;
+            case PIERCE_ID:
+                _attrExtra.pierce *= (1 + factor);
+            break;
+            case COUNTER_ID:
+                _attrExtra.counter *= (1 + factor);
+            break;
+            case TOUGH_ID:
+                _attrExtra.tough *= (1 + factor);
+            break;
+            case MAGRES_ID:
+                _attrExtra.magres *= (1 + factor);
+            break;
+            case STRENGTH_ID:
+                _attrExtra.strength *= (1 + factor);
+            break;
+            case PHYSIQUE_ID:
+                _attrExtra.physique *= (1 + factor);
+            break;
+            case AGILITY_ID:
+                _attrExtra.agility *= (1 + factor);
+            break;
+            case INTELLIGENCE_ID:
+                _attrExtra.intelligence *= (1 + factor);
+            break;
+            case WILL_ID:
+                _attrExtra.will *= (1 + factor);
+            break;
+            case ATTACK_ID:
+                _attrExtra.attack *= (1 + factor);
+            break;
+            case MAGATK_ID:
+                _attrExtra.magatk *= (1 + factor);
+            break;
+            case DEFEND_ID:
+                _attrExtra.defend *= (1 + factor);
+            break;
+            case MAGDEF_ID:
+                _attrExtra.magdef *= (1 + factor);
+            break;
+            case CRIDMG_ID:
+                _attrExtra.criticaldmg *= (1 + factor);
+            break;
+            case CRIIMMUNE_ID:
+                _attrExtra.criticaldmgimmune *= (1 + factor);
+            break;
+            case AURA_ID:
+                _attrExtra.aura += factor;
+            break;
+            default:
+            break;
+        }
+    }
 }
 
 float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender, float* pCf)
