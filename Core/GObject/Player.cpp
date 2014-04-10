@@ -8429,6 +8429,7 @@ namespace GObject
             send(st);
             static_cast<ItemEquip *>(zhenyuan)->DoEquipBind();
             GetPackage()->eraseEquip(zhenyuan->getId());
+            GameAction()->doStrong(this, SthSetZhenYuan, 0, 0);
         }
     }
 
@@ -25870,10 +25871,6 @@ void Player::checkSelectPray()
         }
     }
 }
-void Player::doStrongInWorld(UInt8 type)
-{
-    GameAction()->doStrong(this, type, 0, 0);
-}
 
 void Player::SetAirBookValue()
 {
@@ -28675,6 +28672,7 @@ void Player::upgradeMount(bool isAuto)
     st << mountLvl << mountExp;
     st << Stream::eos;
     send(st);
+    GameAction()->doStrong(this, SthModifyMount, 0,0);
 }
 
 void Player::addMountAttrExtra(GData::AttrExtra& attr)
@@ -29345,6 +29343,7 @@ void Player::OpenCard(UInt8 pos)
     st << pos;
     st << Stream::eos;
     send(st);
+    GameAction()->doStrong(this, SthMoBao, 0,0);
 }
 
 void Player::BuyOpenCardNum()

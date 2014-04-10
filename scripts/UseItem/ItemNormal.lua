@@ -10260,7 +10260,7 @@ function ItemNormal_NameCard(iid, num, bind, param)
     if iid == 9960 or iid < 9900 or iid >= 10000 then
         return false
     end
-    --9600:新手御剑特权卡 客户端占用
+    --9960:新手御剑特权卡 客户端占用
     local player = GetPlayer()
     local package = player:GetPackage();
     if iid < 9960 then
