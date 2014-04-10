@@ -1091,6 +1091,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->sendFighterSSListWithNoSkill();
 #endif
     }
+    {
+        Stream st;
+        pl->makeFighterSGList(st);
+		conn->send(&st[0], st.size());
+        pl->sendFighterSGListWithNoSkill();
+    }
 	{
 		Stream st;
 		pl->makeFormationInfo(st);
@@ -1909,7 +1915,9 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     fgt->delAllCitta();
     //此处只剩下法宝符文未散功了！！
     fgt->SSDismissAll(true);
+    fgt->SGDismissAll(true);
     player->sendFighterSSListWithNoSkill();
+    player->sendFighterSGListWithNoSkill();
     fgt->dismissXingchen();
     fgt->dismissXinMo();
 	delete fgt;
@@ -6495,6 +6503,12 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
     }
     else if (type == 3)
         fgt->SSDismiss(skillid);
+    else if(type == 10)
+        fgt->SGradeManual(skillid);
+    else if(type == 11)
+        fgt->SGradeAuto(skillid);
+    else if(type == 14)
+        fgt->SGDismiss(skillid);
 }
 
 void OnMakeStrong( GameMsgHdr& hdr, const void * data )

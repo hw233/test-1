@@ -47,4 +47,20 @@ namespace GData
         }
         return  lev;
     }
+
+    SkillEvData skillEvData;
+
+    void SkillEvData::setSkillEvData(UInt8 lev, stSkillEv& skillEv)
+    {
+        _skillEv.insert(std::make_pair(lev, skillEv));
+    }
+
+    SkillEvData::stSkillEv* SkillEvData::getSkillEvData(UInt8 lev)
+    {
+        std::map<UInt8, stSkillEv>::iterator iter = _skillEv.find(lev);
+        if(iter != _skillEv.end())
+            return &(iter->second);
+        return NULL;
+    }
+
 }

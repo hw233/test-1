@@ -9346,6 +9346,28 @@ function ItemNormal_00010257(iid, num, bind, param)
 
     package:DelItemSendMsg(iid, player);
     return num;
+function ItemNormal_00016000(iid, num, bind, param)
+    local player = GetPlayer()
+    if player:GetLev() < 75 then
+        player:sendMsgCode(0, 1093, 75);
+        return false
+    end
+    if iid ~= 16000 and iid ~= 16001 and iid ~= 16002 then
+        return false
+    end
+
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    local totalNum;
+    if iid == 16002 then
+        totalNum = num * 1000
+    elseif iid == 16000 then
+        totalNum = num * 15
+    else
+        totalNum = num * 100
+    end
+    player:getXuanTianNingLuLua(totalNum);
+    return num
 end
 
 function ItemNormal_QixiLoveCard(iid, num, bind, param)
@@ -13276,6 +13298,11 @@ local ItemNormal_Table = {
     [10255] = ItemNormal_00010255,
     [10256] = ItemNormal_00010256,
     [10257] = ItemNormal_00010257,
+
+    [16000] = ItemNormal_00016000,
+    [16001] = ItemNormal_00016000,
+    [16002] = ItemNormal_00016000,
+
     [9494] = ItemNormal_00009494,
     [9480] = ItemNormal_0009480,
     [9481] = ItemNormal_0009480,
