@@ -74,6 +74,7 @@
 #include "GObject/Married.h"
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
+#include "GObject/ClanBuilding.h"
 
 struct NullReq
 {
@@ -1075,6 +1076,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		Stream st;
 		pl->makeFighterList(st);
 		conn->send(&st[0], st.size());
+        pl->sendXinMoInfo();
 	}
     {
         Stream st;
@@ -1089,6 +1091,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 #else
         pl->sendFighterSSListWithNoSkill();
 #endif
+    }
+    {
+        Stream st;
+        pl->makeFighterSGList(st);
+		conn->send(&st[0], st.size());
+        pl->sendFighterSGListWithNoSkill();
     }
 	{
 		Stream st;
@@ -1615,10 +1623,12 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
     if(!player->checkFormation(f))
         return;
 
+    bool haveMain = false;
 	for(UInt8 i = 0; i < c; ++ i)
 	{
 		UInt32 pos = 3 + (sizeof(UInt8) + sizeof(UInt32)) * i;
 		UInt8 p = *(buf + pos + sizeof(UInt32));
+		UInt32 fgtid = *reinterpret_cast<const UInt32 *>(buf + pos);
 
         bool find = false;
         for(UInt8 k = 0; k < 5; ++ k)
@@ -1631,7 +1641,11 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
         }
         if(!find)
             return;
+        if(fgtid < 10)
+            haveMain = true;
     }
+    if(!haveMain)
+        return;
 
 	for(UInt8 i = 0; i < c; ++ i)
 	{
@@ -1702,6 +1716,7 @@ void OnFighterInfoReq( GameMsgHdr& hdr, const void * data )
 	st.data<UInt8>(4) = cnt;
 	st << Stream::eos;
 	player->send(st);
+    player->sendXinMoInfo(); 
 }
 
 struct FighterLeaveStruct
@@ -1872,9 +1887,11 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     else
         exp = fgt->getExp() / 2;
 
-    UInt16 rCount1 = 0, rCount2 = 0, rCount3 = 0;
+    UInt16 rCount = 0, rCount1 = 0, rCount2 = 0, rCount3 = 0;
 	if(exp >= 25000 || (fgt->getClass() == 4))
 	{
+        rCount = static_cast<UInt16>(exp / 5000000000);
+        exp = exp % 5000000000;
 		rCount1 = static_cast<UInt16>(exp / 50000000);
 		exp = exp % 50000000;
 		rCount2 = static_cast<UInt16>(exp / 500000);
@@ -1888,24 +1905,27 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
     pexp = pexp % 10000;
     UInt16 rCount6 = static_cast<UInt16>(pexp / 100);
     bool hasMail = false;
-    if(rCount1 > 0 || rCount2 > 0 || rCount3 > 0 || rCount4 > 0 || rCount5 > 0 || rCount6 > 0)
+    if(rCount > 0 || rCount1 > 0 || rCount2 > 0 || rCount3 > 0 || rCount4 > 0 || rCount5 > 0 || rCount6 > 0)
         hasMail = true;
     if(hasMail)
     {
         SYSMSG(title, 236);
         SYSMSGV(content, 237, fgt->getLevel(), fgt->getColor(), fgt->getName().c_str());
-        MailPackage::MailItem mitem[6] = {{14, rCount1}, {13, rCount2}, {12, rCount3}, {31, rCount4}, {30, rCount5}, {29, rCount6}};
-        MailItemsInfo itemsInfo(mitem, DismissFighter, 6);
+        MailPackage::MailItem mitem[7] = {{16003, rCount}, {14, rCount1}, {13, rCount2}, {12, rCount3}, {31, rCount4}, {30, rCount5}, {29, rCount6}};
+        MailItemsInfo itemsInfo(mitem, DismissFighter, 7);
         GObject::Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(pmail != NULL)
-            GObject::mailPackageManager.push(pmail->id, mitem, 6, true);
+            GObject::mailPackageManager.push(pmail->id, mitem, 7, true);
     }
 
     fgt->delAllCitta();
     //此处只剩下法宝符文未散功了！！
     fgt->SSDismissAll(true);
+    fgt->SGDismissAll(true);
     player->sendFighterSSListWithNoSkill();
+    player->sendFighterSGListWithNoSkill();
     fgt->dismissXingchen();
+    fgt->dismissXinMo();
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
@@ -5123,7 +5143,7 @@ void OnClanRankBattleSortList(GameMsgHdr& hdr, const void* data)
 
 void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
 {
-    // TODO: 帮派副本系统的请求协议
+    // 帮派副本系统的请求协议
     MSG_QUERY_PLAYER(player);
 
 	GObject::Clan * clan = player->getClan();
@@ -6595,6 +6615,12 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
     }
     else if (type == 3)
         fgt->SSDismiss(skillid);
+    else if(type == 10)
+        fgt->SGradeManual(skillid);
+    else if(type == 11)
+        fgt->SGradeAuto(skillid);
+    else if(type == 14)
+        fgt->SGDismiss(skillid);
 }
 
 void OnMakeStrong( GameMsgHdr& hdr, const void * data )
@@ -8424,6 +8450,44 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
             }
     }
 }
+void OnXinMoReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+    {
+		return;
+    }
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    UInt16 fighterId = 0;
+    br >> opt >> fighterId;
+    GObject::Fighter * fgt = player->findFighter(fighterId);
+    if(fgt == NULL)
+    {  
+        return;
+    }
+
+    switch(opt)
+    {
+        case 0:
+            {
+            //    player->sendXinMoInfo();               
+            }
+            break;
+        case 1:
+            {
+                fgt->upgradeXinMo();
+            }
+            break;
+        case 2:
+            {
+                fgt->quickUpGradeXinMo();
+            }
+            break;
+    }
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

@@ -306,6 +306,11 @@ namespace GObject
             fprintf(stderr, "load Fighter xingchen error!\n");
             std::abort();
         }
+		if(!loadFighterXinMo())
+        {
+            fprintf(stderr, "load Fighter xinmo error!\n");
+            std::abort();
+        }
 
 		if(!loadJiguanshu())
         {
@@ -622,6 +627,12 @@ namespace GObject
         if(!LoadPlayerModifyMounts())
         {
             fprintf(stderr, "LoadPlayerModifyMounts error!\n");
+            std::abort();
+        }
+
+        if(!loadSkillGrade())
+        {
+            fprintf(stderr, "loadSkillGrade error!\n");
             std::abort();
         }
 
@@ -3633,7 +3644,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3688,7 +3699,10 @@ namespace GObject
                     GObject::ClanBoss::instance().insertToGxSort(clan, 0, cl.gongxian);
 
                 //clan->SetDuoBaoAward(cl.duobaoAward);
-		}
+                clan->SetTYSSSum(cl.tyssSum);
+                if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
+                    clan->SetTYSSSum(0,true);
+            }
 			else
 			{
 				clanBattle = clanManager.getRobBattleClan();
@@ -3794,10 +3808,18 @@ namespace GObject
             pl->setInQQGroup(cp.inQQGroup);
             
             clan->LoadDuoBaoScore(pl);
+            if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
+            {
+                UInt32 var = pl->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER);
+                pl->SetVar(VAR_TYSS_CONTRIBUTE_CLAN,var);
+                clan->AddTYSSSum(var);
+            }
             clan->LoadTYSSScore(pl);
 		}
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
+        if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
+            GVAR.SetVar(GVAR_REPAIRTYSSBUG,1);
 
         lc.prepare("Loading clan item:");
         DBClanItem ci;
@@ -4195,6 +4217,31 @@ namespace GObject
             }
             if (clan == NULL) continue;
             clan->loadSptrFromDB(csptr.exp, csptr.level, csptr.endTime, csptr.refreshTimes, csptr.color);
+        }
+        lc.finalize();
+
+        // 读取帮派建筑
+        lc.prepare("Loading clan buildings:");
+        DBClanBuildings clanBuildings;
+		if(execu->Prepare("SELECT `clanId`, `fairylandEnergy`, "
+                    "`phyAtkLevel`, `magAtkLevel`, `actionLevel`, `hpLevel`,`oracleLevel` "
+                    " `updateTime` FROM `clan_buildings`", clanBuildings) != DB::DB_OK)
+			return false;
+        clan = NULL;
+        lc.reset(1000);
+        lastId = 0xFFFFFFFF;
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if (clanBuildings.clanId != lastId)
+            {
+                lastId = clanBuildings.clanId;
+                clan = globalClans[clanBuildings.clanId];
+            }
+            if (clan == NULL) continue;
+            clan->loadBuildingsFromDB(clanBuildings.fairylandEnergy, 
+                    clanBuildings.phyAtkLevel, clanBuildings.magAtkLevel, clanBuildings.actionLevel, clanBuildings.hpLevel,clanBuildings.oracleLevel,
+                    clanBuildings.updateTime);
         }
         lc.finalize();
 
@@ -7035,6 +7082,39 @@ namespace GObject
 		return true;
 	}
 
+    bool GObjectManager::loadSkillGrade()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading skill grade");
+        DBSG sg;
+        if(execu->Prepare("SELECT `playerId`, `fighterId`, `skillId`, `level` FROM `skill_grade` ORDER BY `playerId`", sg) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+			if(sg.playerId != last_id)
+			{
+				last_id = sg.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(sg.fighterId);
+			if(fgt == NULL)
+				continue;
+
+            SGrade s;
+            s.lvl = sg.level;
+            fgt->SGFromDB(sg.skillId, s);
+        }
+        lc.finalize();
+        return true;
+    }
+
     bool GObjectManager::LoadMarriage()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -7125,5 +7205,40 @@ namespace GObject
 		return true;
     }
 
+    bool GObjectManager::loadFighterXinMo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Fighter xinmo:");
+		DBXinmo dbxc;
+        Player* pl = NULL;
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `xinmolev`, `curVal` FROM `fighter_xinmo`", dbxc) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbxc.playerId != last_id)
+			{
+				last_id = dbxc.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(dbxc.fighterId);
+			if(fgt == NULL)
+            {
+                continue;
+            }
+
+            fgt->setXinMo(dbxc.level,dbxc.curVal);
+
+		}
+		lc.finalize();
+
+        return true;
+    }
 }
 

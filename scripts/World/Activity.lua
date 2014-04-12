@@ -807,7 +807,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+342*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+356*86400 then
           -- RECHARGE
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
@@ -1161,7 +1161,7 @@ function onActivityCheck(tm)
   end
 
   -- ACC
-  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 57*86400) then
+  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 71*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1477,8 +1477,8 @@ function initActTime(y, m, d)
   local  SerStartTm252= { ['year'] = 2013, ['month'] = 12, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm252_1= { ['year'] = 2013, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
-  local  SerStartTm253= { ['year'] = 2014, ['month'] = 2, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm253_1= { ['year'] = 2014, ['month'] = 3, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm253= { ['year'] = 2014, ['month'] = 3, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm253_1= { ['year'] = 2014, ['month'] = 3, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm254= { ['year'] = 2013, ['month'] =11, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm254_1= { ['year'] = 2013, ['month'] = 11, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };

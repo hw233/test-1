@@ -90,6 +90,12 @@ struct Xingchenzhen
     UInt16 xctCurVal;   // 星辰图当前值
     UInt16 xctMaxVal;   // 星辰图最大值
 };
+struct XinMoData
+{
+    XinMoData() : lvl(0),val(0){}
+    UInt8 lvl;
+    UInt32 val;
+};
 
 struct SStrengthen
 {
@@ -100,6 +106,13 @@ struct SStrengthen
     UInt32 curVal; // 熔炼当前值
     UInt8 lvl; // 熔炼等级
     UInt8 maxLvl; // 解封等级
+};
+
+struct SGrade
+{
+    SGrade() : lvl(0) {}
+
+    UInt8 lvl; // 当前等级
 };
 
 struct SoulItemExp
@@ -597,6 +610,7 @@ public:
     void getAllSSAndLevel(Stream& st);
     void getAllSSAndLevelOfPet(Stream& st);
 
+	inline void setId(UInt32 id) { _id = id; } //改性卡使用
 
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }
@@ -979,6 +993,7 @@ public:
     void pushLingbaoInfo(ItemEquip* equip);
 private:
     std::map<UInt16, SStrengthen> m_ss;
+    std::map<UInt16, SGrade> m_sg; //技能升阶
 
 public:
 	UInt32 favor;
@@ -1034,9 +1049,14 @@ public:
     //镇封星辰图
 private:
     Xingchenzhen m_xingchen;
+    XinMoData m_xinmo;
 public:
     inline Xingchenzhen& getXingchen() { return m_xingchen; }
     inline UInt8 getXingchenLvl()  {return m_xingchen.lvl;}
+
+    inline XinMoData getXinMo() { return m_xinmo; }
+    void setXinMo(UInt8 lev , UInt32 val);
+
     void setXingchenFromDB(DBXingchen&);
     bool upgradeXingchen(UInt8 type);
     void updateDBxingchen();
@@ -1057,6 +1077,26 @@ public:
     void pushPetInfo2Leaderboard();
     void petSSAdd(UInt16 id);
     void petSSErase(UInt16 id);
+
+    void updateDBxinmo();
+    bool upgradeXinMo();
+    bool quickUpGradeXinMo();
+    void dismissXinMo();
+
+    void SGradeManual(UInt16 skillId);
+    void SGradeAuto(UInt16 skillId);
+    void makeFighterSGInfo(Stream& st);
+    SGrade* SGGetInfo(UInt16 skillid);
+    bool appendFighterSGInfo(Stream& st, UInt16 skillid);
+    bool appendFighterSGInfo(Stream& st, UInt16 skillid, SGrade* sg);
+    void SGFromDB(UInt16 id, SGrade& sg);
+    void makeFighterSGInfoWithNoSkill(Stream& st);
+    void getAllSGAndValue(Stream& st);
+    void SGDismiss(UInt16, bool = false, Mail * = NULL);
+    void SGDismissAll(bool isDel);
+    void SGDeleteDB(UInt16 id);
+    void getAllSGInfo(std::map<UInt16, Int32>& sg_info);
+
 };
 
 class GlobalFighters

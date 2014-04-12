@@ -23,6 +23,7 @@ class Clan;
 class ClanStatue;
 class ClanCopy;
 struct ClanCopyLog;
+class ClanBuildingOwner;
 
 #define BASE_MEMBER_COUNT 30
 struct AllocItem
@@ -258,6 +259,7 @@ enum CLAN_DONATE_TYPE
     e_donate_type_gold = 2,
 };
 
+
 class Clan:
 	public GObjectBaseT<Clan>
 {
@@ -312,10 +314,24 @@ private:
         bool operator()(const ScoreSort& a, const ScoreSort& b) const { return a.score > b.score || (a.score==b.score && a.time < b.time); }
     };
 
+    struct ScoreSort32
+    {
+        GObject::Player* player;
+        UInt32 score;
+        UInt32 time;
+        ScoreSort32():player(NULL),score(0),time(0){}
+    };
+
+    struct lt_sort32
+    {
+        bool operator()(const ScoreSort32& a, const ScoreSort32& b) const { return a.score > b.score || (a.score==b.score && a.time < b.time); }
+    };
+
     typedef std::multiset<ScoreSort, lt_sort> ScoreSortType;
+    typedef std::multiset<ScoreSort32, lt_sort32> ScoreSortType32;
 public:
     ScoreSortType DuoBaoScoreSort;     //夺宝排名
-    ScoreSortType TYSSScoreSort;     //天元神兽排名
+    ScoreSortType32 TYSSScoreSort;     //天元神兽排名
 
 public:
 	Clan( UInt32 id, const std::string& name, UInt32 ft = 0, UInt8 lvl = 1 );
@@ -730,6 +746,23 @@ public:
 
     void SetDuoBaoAward(UInt32 itemId) { _duoBaoAward = itemId; }
     UInt32 GetDuoBaoAward() {return _duoBaoAward;}
+    
+    void SetTYSSSum(UInt32 num,bool toDB=false) 
+    {
+        if(_tyssSum == num)
+            return;
+        _tyssSum= num; 
+        if (toDB)
+            DB5().PushUpdateData("UPDATE `clan` SET `tyssSum` = %u WHERE `id` = %u", _tyssSum, _id);
+    }
+    UInt32 GetTYSSSum() {return _tyssSum;}
+    void AddTYSSSum(UInt32 num)
+    {
+        if(num == 0)
+            return;
+        _tyssSum += num; 
+        DB5().PushUpdateData("UPDATE `clan` SET `tyssSum` = %u WHERE `id` = %u", _tyssSum, _id);
+    }
 
 public:
 	ClanMember * getClanMember(Player *);
@@ -824,8 +857,11 @@ private:
     UInt32 _gongxian;
     UInt8 _urge[3];
     UInt32 _duoBaoAward;
+    UInt32 _tyssSum;
 
     ClanSpiritTree m_spiritTree;
+
+    ClanBuildingOwner *_buildingOwner;
 public:
     void raiseSpiritTree(Player* pl, UInt8 type);   // 培养 type(甘露:0 冰晶:1)
     void refreshColorAward();
@@ -841,6 +877,15 @@ public:
     void checkMemberActivePoint(ClanMember* mem);
     void listMembersActivePoint( Player * player );
     UInt32 getMemberActivePoint(ClanMember* mem);
+    void SendLeftAddrMail(UInt32 _spirit /*, UInt8 leftId */);
+
+    ClanBuildingOwner* getBuildingOwner();
+    ClanBuildingOwner* getNewBuildOwner();
+    ClanBuildingOwner* getClanBuildingOwner();
+
+    bool loadBuildingsFromDB(UInt32 fairylandEnergy, 
+            UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, UInt16 oracleLevel,
+            UInt16 updateTime);
 };
 
 typedef GGlobalObjectManagerT<Clan, UInt32> GlobalClans;

@@ -1195,6 +1195,7 @@ public:
     GData::LBSkillItem* getDeadCondItem();
     GData::LBSkillItem* getBleedCondItem();
     GData::LBSkillItem* getStateCondItem(UInt16 state);
+    Int32 getSkillGradeExtraValue(UInt16 skillId);
     void releaseLBSkillCD();
 
     float& getHpShieldSelf() { return _hpShieldSelf; }
@@ -1457,6 +1458,10 @@ private:
     inline void setSoulProtectCount(UInt8 count) { _soulProtectCount = count; }
     inline UInt8 getSoulProtectCount() { return _soulProtectCount; }
 
+    UInt8 _xinMoCount;
+    inline void setXinMoCount(UInt8 l) { _xinMoCount = l; }
+    inline UInt8 getXinMoCount() { return _xinMoCount; }
+
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
     std::vector<GData::SkillItem> _passiveSkillSoulProtect;
@@ -1568,6 +1573,8 @@ private:
     float _yehuo_ss_upRate;
     void setYehuoSSUpRate(float f) { _yehuo_ss_upRate = f; }
     float getYehuoSSUpRate() { return _yehuo_ss_upRate; }
+
+    std::map<UInt16, Int32> _sg_v;
 
 public:
 	enum StatusFlag

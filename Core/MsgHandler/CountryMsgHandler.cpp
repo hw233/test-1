@@ -190,6 +190,8 @@ MSG_REG_2(GameMsgHdr, REQ::EQ_LINGBAO, OnEquipLingbaoReq);
 
 MSG_REG_2(GameMsgHdr, REQ::EQ_DELUEGEM, OnDelueGemReq);
 
+MSG_REG_2(GameMsgHdr, REQ::EQ_XINMO, OnXinMoReq);
+
 MSG_REG_2(GameMsgHdr, REQ::TEMPITEM_INFO, OnQueryTempItemReq);
 
 MSG_REG_2(GameMsgHdr, REQ::MOFANG_INFO, OnMoFangInfo);
@@ -415,6 +417,8 @@ MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
 MSG_REG_2(GameMsgHdr, 0x355, OnGetFindOldManAward);
 MSG_REG_2(GameMsgHdr, 0x356, OnGetInteresingBag);
 MSG_REG_2(GameMsgHdr, 0x357, OndoGuankaAct);
+//MSG_REG_2(GameMsgHdr, 0x358, OnAddFriendlyCount); 
+MSG_REG_2(GameMsgHdr, 0x359, OnBuyLeftPower);
 
 MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
@@ -436,5 +440,16 @@ MSG_REG_2(GameMsgHdr, 0x384, OnServerWarGetMoney);
 MSG_REG_2(GameMsgHdr, 0x385, OnServerWarUseGold);
 MSG_REG_2(GameMsgHdr, 0x386, OnServerWarAttack);
 MSG_REG_2(GameMsgHdr, 0x387, OnServerWarBeAttack);
+
+//跨服帮派资源站（仙界遗迹）
+MSG_REG_2(GameMsgHdr, 0x391, OnServerLeftEnter);     //进入遗迹，攻击遗迹
+MSG_REG_2(GameMsgHdr, 0x392, OnServerLeftLineup);    //阵形
+MSG_REG_2(GameMsgHdr, 0x393, OnServerLeftChangeTeamMember);   //改变已占遗迹人员配置
+MSG_REG_2(GameMsgHdr, 0x394, OnServerLeftAddPowerHold);   //灵气池
+MSG_REG_2(GameMsgHdr, 0x395, OnServerLeftInfoReq);   //遗迹信息请求
+MSG_REG_2(GameMsgHdr, 0x396, OnServerLeftBattleReq);   //战斗信息请求
+MSG_REG_2(GameMsgHdr, 0x397, OnBuyLeftPower);  //购买体力
+
+//游戏服务器
 
 MSG_HANDLER_END()

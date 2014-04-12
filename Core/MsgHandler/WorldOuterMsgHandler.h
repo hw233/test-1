@@ -33,6 +33,7 @@
 #include "GObject/ClanRankBattle.h"
 #include "GObject/SingleHeroStage.h"
 #include "GObject/MarryBoard.h"
+#include "GObject/ClanBuilding.h"
 
 #ifdef _ARENA_SERVER
 #include "GObject/GameServer.h"
@@ -1297,10 +1298,16 @@ void OnPlayerIdReq( GameMsgHdr& hdr, PlayerIdReq& pir )
 void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
 {
 	MSG_QUERY_PLAYER(player);
+/*    Stream st(SERVERLEFTREQ::BATTLE_REPORT, 0xEE);
+    st << player->getId() << static_cast<UInt32>(brr._reportId); 
+    st << Stream::eos;
+    NETWORK()->SendToServerLeft(st);
+*/
 	std::vector<UInt8> *r = Battle::battleReport[brr._reportId];
 	if(r == NULL)
 		return;
 	player->send(&(*r)[0], r->size());
+
 }
 
 void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq2& brr)
@@ -3116,6 +3123,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     case 0x12:
                         player->RestCurStep();
                         break;
+                        /*
                     case 0x13:
                         {
                             UInt8 count = 0;
@@ -3129,6 +3137,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                             }
                             player->ReqQiShiBanPlayCount(nameList);
                         }
+                        */
                     default:
                         break;
                 }
@@ -3259,16 +3268,10 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                 case 3:
                     hdr.msgHdr.desWorkerID = player->getThreadId();//喂养神兽
                     GLOBAL().PushMsg(hdr, (void*)data);
-                    //brd >> flag;
-                    //player->OpTYSS(op,flag);//喂养神兽
                     break;
                 case 4:
                     hdr.msgHdr.desWorkerID = player->getThreadId();//购买限购礼包
                     GLOBAL().PushMsg(hdr, (void*)data);
-                    
-                    //brd >> flag;//礼包id
-                    //player->OpTYSS(op,flag-1);//买限购礼包
-                    //player->OpTYSS(8);//返回限购礼包信息
                     break;
                 case 5:
                 {
@@ -3291,6 +3294,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     break;
                 case 0x12:
                     player->ReturnTYSSInfo(0);//返回个人榜
+                    break;
                 case 0x13:
                     hdr.msgHdr.desWorkerID = player->getThreadId();//领取每日礼包
                     GLOBAL().PushMsg(hdr, (void*)data);
@@ -3657,6 +3661,7 @@ void OnServerWarConnected( ServerWarMsgHdr& hdr, const void * data )
 	if(r == 1)
 	{
 		INFO_LOG("Failed to connect to ServerWar arena.");
+
 		NETWORK()->CloseServerWar();
 		return;
 	}
@@ -3877,7 +3882,7 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
     }
 }
 
-void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )
+void OnServerRechargeRank( ArenaMsgHdr& hdr, const void * data )
 {
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
@@ -3892,4 +3897,333 @@ void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )
         GObject::leaderboard.sendGoldLvlAward(brd);
 }
 
+void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    if(type == 0)
+        GObject::leaderboard.giveRechargeRankAward();
+    else if(type == 1)
+        GObject::leaderboard.readRechargeRank100(brd);
+    else if(type == 2)
+        GObject::leaderboard.readRechargeSelf(brd);
+    else if(type == 3)
+        GObject::leaderboard.sendGoldLvlAward(brd);
+}
+void OnServerLeftConnected( ServerLeftMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(!cfg.enabledServerWar())
+        return;
+	UInt8 r = 0;
+	brd >> r;
+	if(r == 1)
+	{
+		INFO_LOG("Failed to connect to ServerWar arena.");
+        WORLD().setLeftAddrConnection(0);
+		NETWORK()->CloseServerLeft();
+		return;
+	}
+    UInt8 fhaslater = 0;
+    brd >> fhaslater;
+    GObject::serverWarMgr._readbuf.append((UInt8*)(data) + brd.pos(), brd.size() - brd.pos());
+    if(!fhaslater)
+    {
+        BinaryReader brd2((UInt8*)(GObject::serverWarMgr._readbuf), GObject::serverWarMgr._readbuf.size());
+	    GObject::serverWarMgr.readFrom(brd2);
+        GObject::serverWarMgr._readbuf.clear();
+    }
+}
+
+void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
+{
+    WORLD().setLeftAddrConnection(1);
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    int cid = 0, sid = 0;
+    brd >> cid >> sid;
+	if(sid != cfg.serverNo || cid != cfg.channelNum)
+		return;
+//    GVAR.SetVar(GVAR_SERVERWAR_ISENTER, 1);
+
+    UInt32 clanId = 0;
+    UInt8 type = 0;
+    UInt8 leftId = 0; 
+    std::string name ;
+    UInt8 res = 0;
+    UInt32 rpid = 0; 
+    UInt32 battleTime;
+    UInt32 energy;
+    brd >> clanId ;
+    brd >> type ;
+    brd >> leftId;
+    brd >> name;
+    brd >> res;
+    brd >> rpid;
+    brd >> battleTime;
+    brd >> energy;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    ClanBuildBattleInfo cbbi(leftId , name ,type,res , rpid ,battleTime,energy);
+    if(clan->getBuildingOwner() == NULL)
+        return ;
+    clan->getBuildingOwner()->AddBattlesInfo(cbbi);
+   // SYSMSGV(title, 825);
+   // SYSMSGV(content, 826, GObject::serverWarMgr.getSession());
+   // GObject::serverWarMgr.sendTeamMail(title, content);
+}
+
+void OnServerLeftLineupCommited( ServerLeftMsgHdr& hdr, const void * data )
+{
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 r;
+	UInt64 playerId;
+    brd >> r >> playerId;
+	GObject::Player * player = GObject::globalPlayers[playerId];
+	if(player == NULL)
+		return;
+    player->sendMsgCode(0,4033);
+}
+void OnServerLeftBattleReport( ServerLeftMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt64 pid = 0;
+    br >> pid;
+    Stream st;
+    std::vector<UInt8> buf;
+    buf.resize(br.size()-8);
+    br >> buf;
+    st << buf;
+    st << Stream::eos;
+
+	GObject::Player * player = GObject::globalPlayers[pid];
+    if(player == NULL)
+        return;
+	player->send(&(st[0]), st.size());
+}
+void OnServerLeftRevInfo(ServerLeftMsgHdr& hdr, const void * data)
+{
+#define LEFTADDRMAX 30
+#define POWERTOWERMAX 9
+#define SERVERLEFT_MAX_MEMBER 5
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt64 playerId = 0;
+    br >> playerId ;
+	GObject::Player * player = GObject::globalPlayers[playerId];
+    if(!player)
+        return ;
+    Stream st(REQ::CLAN_FAIRYLAND);
+    st <<static_cast<UInt8>(2);
+    std::vector<UInt8> buf;
+    buf.resize(br.size()-8);
+    br >> buf;
+    st << buf;
+    st << Stream::eos;
+    player->send(st);
+}
+void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 leftId = 0;
+    UInt32 clanId = 0 ;
+    br >> leftId ;
+    SYSMSG_BROADCASTV(4304 , leftId);
+    std::cout << "msgBorad" << std::endl;
+    br >> clanId ;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    UInt32 energy = 0;
+    br >> energy;
+    UInt8 num = 0;
+    br >> num ;
+    //std::vector<UInt32> item_vec ;
+    //std::vector<UInt32> itemNum_vec;
+    UInt32 item = 0;
+    UInt32 itemNum = 0;
+    for(UInt8 i = 0 ; i < num ; ++i )
+    {
+        br >> item ;
+        br >>itemNum;
+    //    item_vec.push_back(item);
+    //    itemNum_vec.push(itemNum);
+        clan->AddItem(item,itemNum);
+        Stream st;
+    }
+}
+void OnServerLeftGetSpirit(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 clanId = 0 ;
+    br >> clanId ;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    UInt32 num = 0;
+    br >> num ; 
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    
+    if (buildingOwner)
+        buildingOwner->addEnergy(num);
+}
+void OnServerLeftErrInfo(ServerLeftMsgHdr& hdr, const void * data)
+{
+   //0-操作成功 1-对共有遗迹进行守卫操作错误  2-该遗迹无该镇守成员 3-对象以及非该帮派占领 
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt64 playerId = 0 ;
+    UInt32 clanId = 0;
+    UInt8 err = 0;
+    br >> playerId ;
+    br >> clanId;
+    br >> err ;
+    Clan * clan = globalClans[clanId];
+    GObject::Player * player = GObject::globalPlayers[playerId];
+    if(!player)
+        return ;
+    if(player->getClan() != clan )
+        return ;
+    if(err == 0)
+        return ;
+    player->sendMsgCode(0,4028+err);
+}
+// 仙境遗迹协议请求处理
+void OnClanFairyLandReq(GameMsgHdr& hdr,const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL)
+	{
+		Stream st(REP::CLAN_COPY);
+		st << static_cast<UInt8>(0);
+		st << Stream::eos;
+		player->send(st);
+		return;
+    }
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    
+    if (buildingOwner)
+        buildingOwner->processFromBrd(player, brd);
+}
+void OnServerLeftMemberLeave(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 val = 0;
+    br >> val;
+    UInt32 var_val = 0;
+    br >> var_val ;
+    UInt8 num = 0;
+    br >> num ;
+    UInt64 playerId=  0;
+
+    for(UInt8 i = 0 ; i < num ;++i)
+    {
+        br >> playerId;
+        if( playerId ==0 )
+            continue;
+        GObject::Player * player = GObject::globalPlayers[playerId];
+        if(!player)
+            continue;
+        if(val)
+        {
+            player->setLeftAddrEnter(true);
+            TRACE_LOG("leftaddr(leftReturn) 1 (pid: %" I64_FMT "u)", player->getId());
+        }
+        else
+        {
+            player->setLeftAddrEnter(false);
+            TRACE_LOG("leftaddr(leftReturn) 0 (pid: %" I64_FMT "u)", player->getId());
+        }
+        if( var_val)
+        {
+            UInt32 val = player->GetVar(GObject::VAR_LEFTADDR_POWER);
+            if(val >= var_val)
+                player->SetVar(GObject::VAR_LEFTADDR_POWER , val - var_val);
+        }
+    }
+}
+void OnServerLeftMemberGet(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 val = 0;
+    br >> val;
+    UInt8 num = 0;
+    br >> num ;
+    UInt64 playerId=  0;
+    Clan * clan = NULL;
+    for(UInt8 i = 0 ; i < num ;++i)
+    {
+        br >> playerId;
+        if( playerId ==0 )
+            continue;
+        GObject::Player * player = GObject::globalPlayers[playerId];
+        if(!player)
+            continue;
+        if(!clan)
+            clan = player->getClan();
+        if(!clan)
+            continue;
+        clan->addMemberProffer(player, val);
+    }
+}
+void OnServerLeftNotice(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 clanId = 0 ;
+    br >> clanId ;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    //UInt8 leftId = 0;
+    //br >> leftId ;
+    UInt32 num = 0;
+    br >> num ; 
+    clan->SendLeftAddrMail(num /*,leftId*/);
+}
+void OnServerLeftAttackInfo(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL)
+        return ;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    if (buildingOwner)
+        buildingOwner->sendAttackTeamInfo(player);
+}
+void OnServerLeftAttr(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 clanId = 0 ;
+    br >> clanId ;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    if (!buildingOwner)
+        return ;
+    UInt8 opt = 0;
+    br >> opt ;
+    for(UInt8 i = 0; i < 3 ;++i)
+    {
+        UInt8 type = 0;
+        br >>type ;
+        UInt32 value = 0;
+        br >>value;
+        if(type == 0)
+            continue ;
+        buildingOwner->AddLeftAttr(opt , type ,value);
+    }
+    UInt8 flag = 0 ;
+    br >>flag ;
+    if( flag == 0)
+    {
+        Stream st(REP::CLAN_FAIRYLAND);
+        st << static_cast<UInt8>(0x0D);
+        st << Stream::eos;
+        clan->broadcast(st); 
+    }
+}
 #endif // _WORLDOUTERMSGHANDLER_H_

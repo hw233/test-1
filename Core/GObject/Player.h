@@ -1319,6 +1319,8 @@ namespace GObject
         bool _hiattrFlag;
         bool _clanRankBuffFlag;
         bool _cbHPflag;
+        bool _leftAddrEnter ;
+        bool _InLeftTeam ;
         //GData::AttrExtra _hiaf;
         //bool _hiafFlag;
     public:
@@ -1326,6 +1328,10 @@ namespace GObject
         inline bool hasHiAttrFlag() { return _hiattrFlag; }
         inline void setClanRankBuffFlag(bool v) { _clanRankBuffFlag = v; }
         inline bool hasClanRankBuffFlag() { return _clanRankBuffFlag; }
+        inline void setLeftAddrEnter(bool v) { _leftAddrEnter = v; }
+        inline bool getLeftAddrEnter() { return _leftAddrEnter; }
+        inline void setInLeftTeam(bool v) { _InLeftTeam = v; }
+        inline bool getInLeftTeam() { return _InLeftTeam; }
         void addHIAttr(const GData::AttrExtra&);
         void clearHIAttr();
         inline const GData::AttrExtra* getHIAttr() const { return &_hiattr; }
@@ -2109,6 +2115,8 @@ namespace GObject
         std::map<UInt64,std::vector<StuPresentBox> > _present; 
         std::map<UInt64,std::vector<StuPresentBox> >_bePresent; 
 
+        std::map<UInt64,UInt32 > _friendlyCount; 
+
 		TaskMgr* m_TaskMgr;
 		Trade* m_Trade;
 		Sale* m_Sale;
@@ -2366,6 +2374,7 @@ namespace GObject
         UInt8 transformSoul(Fighter * fFgt, Fighter * tFgt);
         UInt8 transfromXingchen(Fighter * fFgt, Fighter * tFgt);
         void transformElixir(Fighter * fFgt, Fighter * tFgt);
+        void sendXinMoInfo(); 
             
     private:
         char m_domain[256+1];
@@ -2581,7 +2590,6 @@ namespace GObject
         void AddLingGuo(UInt32 r =0);
         void ReturnTYSSInfo(UInt8 flag );
         void OpTYSS(UInt8 type , UInt8 flag = 0,UInt64 playerid = 0);
-        void beEated(UInt32 num);
         void EatLingGuo(UInt32 num);
         void GetFindOldManAward(UInt32 type = 0 );
         void getInterestingAward(UInt8 type);
@@ -2629,6 +2637,13 @@ namespace GObject
         float getClanStatueHitrLvlEffect();
         void  AddStatueExp(UInt32 exp);
         void  SubStatueExp(UInt32 exp);
+
+        float getClanBuildingHPEffect();
+        float getClanBuildingPhyAtkEffect();
+        float getClanBuildingMagAtkEffect();
+        float getClanBuildingActionEffect();
+        float getClanBuildingPhyDefEffect();
+        float getClanBuildingMagDefEffect();
 
         // 所有将互斥法宝
         bool checkTrumpMutually(UInt32 trumpid);
@@ -2688,6 +2703,7 @@ namespace GObject
         void sendRechargeNextRetInfo(UInt32 now);
         bool inArenaCommitCD();
         bool inArenaTeamCommitCD();
+        bool inLeftAddrCommitCD();
         UInt16 getServerWarChallengeCD();
         bool inServerWarChallengeCD();
         bool inServerWarCommitCD();
@@ -2696,6 +2712,7 @@ namespace GObject
     private:
         std::vector<RNR> rechargs;
         UInt32 m_arenaCommitCD;
+        UInt32 m_LeftAddrCommitCD;
         UInt32 m_arenaTeamCommitCD;
         UInt32 m_serverWarCommitCD;
         UInt32 m_serverWarChallengeCD;
@@ -2953,7 +2970,10 @@ namespace GObject
         void getguankaScoreAward(UInt8);
         void guankaActUdpLog(UInt32, bool);
         void addguankaScoreByAttack(UInt32);
-
+        void AddHeartSword(UInt32 val);
+        void getXuanTianNingLuLua(UInt32 c);
+        UInt32 getXuanTianNingLu(UInt32 c, IncommingInfo* ii);
+        UInt32 useXuanTianNingLu(UInt32 a, ConsumeInfo* ci);
     public:
         // 八部浮屠
         void sendBBFTInfo();
@@ -3012,6 +3032,7 @@ namespace GObject
         void AddRealSpirit(UInt32 real = 0);
         void AddYearHappyValue(UInt32 real = 0 ,UInt8 flag =0);
         bool giveFlower(UInt8 type , UInt32 num = 0);
+        bool giveLeftPowerHold(UInt32 num = 0);
         void joinAllServerRecharge(UInt32);
         void handleJiqirenAct_shiyamen();
         void handleJiqirenAct_clan();
@@ -3021,6 +3042,32 @@ namespace GObject
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
         void sevensoul_fixed();
+        void BuyLeftPower();
+
+        //友好度
+        //void AddFriendlyCount(Player * friender , UInt8 taskNum) ;
+        //void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
+
+        void makeFighterSGList(Stream& st);
+        void sendFighterSGListWithNoSkill();
+        void makeFighterSGListWithNoSkill(Stream& st);
+
+    public:
+        UInt8 useChangeSexCard();
+        void doTableInWorld(Fighter* fgt, UInt32 oldId);
+        void do_fighter(Fighter* fgt, UInt32 oldId, UInt32 newId);
+        void do_fighter_buff(Fighter* fgt, UInt32 oldId);
+        void do_fighter_train(Fighter* fgt, UInt32 oldId);
+        void do_practice_data(Fighter* fgt, UInt32 oldId);
+        void do_second_soul(Fighter* fgt, UInt32 oldId);
+        void do_elixir(Fighter* fgt, UInt32 oldId);
+        void do_skill_strengthen(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter_attr_extra(Fighter* fgt, UInt32 oldId);
+        void do_sh_fighter_attr2(Fighter* fgt, UInt32 oldId);
+        void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
+        void do_fighter_xinmo(Fighter* fgt, UInt32 oldId);
+        void do_skill_grade(Fighter* fgt, UInt32 oldId);
 	};
 
 

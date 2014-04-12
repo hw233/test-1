@@ -10,6 +10,7 @@
 #include "ClanSkillTable.h"
 #include "ClanCopyTable.h"
 #include "ClanStatueTable.h"
+#include "ClanBuildingTable.h"
 #include "GObject/Item.h"
 #include "DB/DBConnectionMgr.h"
 #include "GDataDBExecHelper.h"
@@ -307,6 +308,12 @@ namespace GData
             fprintf (stderr, "Load Clan Statue Error !\n");
             std::abort();
         }
+
+        if (!LoadClanBuilding())
+        {
+            fprintf (stderr, "Load Clan Building Error !\n");
+            std::abort();
+        }
         
         if (!LoadDreamer())
         {
@@ -347,6 +354,11 @@ namespace GData
         if (!LoadXingchenConfig())
         {
             fprintf (stderr, "Load LoadXingchenConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadXinMoConfig())
+        {
+            fprintf (stderr, "Load LoadXinMoConfig Error !\n");
             std::abort();
         }
 
@@ -433,6 +445,11 @@ namespace GData
         if (!LoadCoupleCopy())
         {
             fprintf (stderr, "Load LoadCoupleCopyConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadSkillEvConfig())
+        {
+            fprintf (stderr, "Load LoadSkillEvConfig Error !\n");
             std::abort();
         }
 
@@ -1738,6 +1755,62 @@ namespace GData
         return true;
     }
 
+    bool GDataManager::LoadClanBuilding()
+    {
+        // 读取帮派建筑数据
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBClanBuilding cb;
+		if (execu->Prepare("SELECT `level`, `needExp`, "
+                    "`phyAtkValue`, `magAtkValue`, `actionValue`, `hpValue` , `oracleValue`"
+                    "FROM `clan_building_template` ORDER BY `level` ASC", cb) != DB::DB_OK)
+			return false;
+        clanBuildingList.clear();
+        clanBuildingList.resize(GData::buildingTypeMax);
+		while (execu->Next() == DB::DB_OK)
+		{
+            {
+                // 物攻加成
+                ClanBuildingTable& clanBuildingTable = clanBuildingList[GData::buildingTypePhyAtk];
+                if (cb.level >= clanBuildingTable.size())
+                    clanBuildingTable.resize(cb.level + 1);
+                clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypePhyAtk, cb.level, cb.needExp, cb.phyAtkValue);
+            }
+
+            {
+                // 法攻加成
+                ClanBuildingTable& clanBuildingTable = clanBuildingList[GData::buildingTypeMagAtk];
+                if (cb.level >= clanBuildingTable.size())
+                    clanBuildingTable.resize(cb.level + 1);
+                clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypeMagAtk, cb.level, cb.needExp, cb.magAtkValue);
+            }
+
+            {
+                // 身法加成
+                ClanBuildingTable& clanBuildingTable = clanBuildingList[GData::buildingTypeAction];
+                if (cb.level >= clanBuildingTable.size())
+                    clanBuildingTable.resize(cb.level + 1);
+                clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypeAction, cb.level, cb.needExp, cb.actionValue);
+            }
+
+            {
+                // 生命加成
+                ClanBuildingTable& clanBuildingTable = clanBuildingList[GData::buildingTypeHP];
+                if (cb.level >= clanBuildingTable.size())
+                    clanBuildingTable.resize(cb.level + 1);
+                clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypeHP, cb.level, cb.needExp, cb.hpValue);
+            }
+            {
+                // 神域塔
+                ClanBuildingTable& clanBuildingTable = clanBuildingList[GData::buildingTypeOracle];
+                if (cb.level >= clanBuildingTable.size())
+                    clanBuildingTable.resize(cb.level + 1);
+                clanBuildingTable[cb.level] = ClanBuildingTableData(GData::buildingTypeOracle, cb.level, cb.needExp, cb.oracleValue);
+            }
+		}
+        return true;
+    }
+
 	bool GDataManager::LoadFighterProb()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
@@ -2745,7 +2818,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBRideConfig dbrc;
-		if(execu->Prepare("SELECT `id`, `name`, `itemId`, `chips`, `propId`, `show` FROM `ride`", dbrc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `itemId`, `chips`, `propId`, `show`, `useMore` FROM `ride`", dbrc) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
@@ -2859,5 +2932,52 @@ namespace GData
 		return true;
     }
 
+    bool GDataManager::LoadXinMoConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBXinMoConfig dbxcc;
+		if(execu->Prepare("SELECT `id`, `limitLev`, `name`, `consume`, `maxVal`, `attack`, `hp`, `action`,`cridec` ,`skilllev`,`payBack` FROM `xinmo`", dbxcc) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            XinMoData::stXinMo stxc;
+            stxc.level = dbxcc.id;
+            stxc.limitLev = dbxcc.limitLev;
+            stxc.name  = dbxcc.name;
+            stxc.consume = dbxcc.consume;
+            stxc.maxVal = dbxcc.maxVal;
+            stxc.attack = dbxcc.attack;
+            stxc.hp = dbxcc.hp;
+            stxc.action = dbxcc.action;
+            stxc.cridec = dbxcc.cridec;
+            stxc.skilllev = dbxcc.skilllev;
+            stxc.payBack = dbxcc.payBack;
+            xinmoData.setXinMoTable(stxc);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadSkillEvConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBSkillEv dbskillev;
+		if(execu->Prepare("SELECT `lev`, `effect`, `consume`, `needLev` FROM `skill_ev`", dbskillev) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            SkillEvData::stSkillEv skillEv;
+            skillEv.effect = dbskillev.effect;
+            skillEv.consume = dbskillev.consume;
+            skillEv.needLev = dbskillev.needLev;
+            GData::skillEvData.setSkillEvData(dbskillev.lev, skillEv);
+        }
+        return true;
+    }
 }
 

@@ -1453,6 +1453,15 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         magatk += aura_factor * itemSkill->ef_value * (cs2 ? bf->calcCriticalDmg(area_target) : 1);
                 }
 
+                Int32 sg_v = bf->getSkillGradeExtraValue(SKILL_ID(skill->getId()));
+                if(sg_v != 0)
+                {
+                    if(bf->getClass() == e_cls_dao || bf->getClass() == e_cls_mo)
+                        atk += aura_factor * sg_v * (cs2 ? bf->calcCriticalDmg(area_target) : 1);
+                    else
+                        magatk += aura_factor * sg_v * (cs2 ? bf->calcCriticalDmg(area_target) : 1);
+                }
+
                 // 伤害提升
                 const GData::SkillStrengthenEffect* ef = NULL;
                 if(ss)
@@ -7911,6 +7920,9 @@ void BattleSimulator::onDamage( BattleObject * bo, bool active, UInt32 dmg)
         const GData::SkillBase* passiveSkill = NULL;
         while(NULL != (passiveSkill = bo2->getPassiveSkillOnHP10P100(idx)))
         {
+            //心魔
+            if(SKILL_ID(passiveSkill->getId()) == 97)
+                continue;
             if(passiveSkill->effect == NULL)
                 continue;
             break;
@@ -10426,6 +10438,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         {
             float yehuoSSDmgRate = bf->getYehuoSSDmgRate();
             UInt32 dmg = static_cast<UInt32>(yehuoSSDmgRate * yehuoLeve);
+            calcBleedTypeCnt(bf);
             makeDamage(bf, dmg, e_damNormal, e_damageTrue);
             if(yehuoLeve < 9 && static_cast<float>(uRand(10000)) < bf->getYehuoSSUpRate() * 10000)
             {
@@ -12669,6 +12682,30 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
                 bf->setSoulProtectLast(--last);
             }
         }
+
+        size_t idx = 0;
+        const GData::SkillBase* passiveSkill = NULL;
+        while(NULL != (passiveSkill = bf->getPassiveSkillOnHP10P100(idx)))
+        {
+            if(passiveSkill->effect == NULL)
+                continue;
+            if(SKILL_ID(passiveSkill->getId()) == 97)
+                break;
+        }
+
+        if(passiveSkill)
+        {
+            UInt8 count = bf->getXinMoCount();
+            if(count < 1)
+            {
+                appendDefStatus(e_skill, passiveSkill->getId(), bf);
+                float value = bf->getAttack() * passiveSkill->effect->efv[0];
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stAtk, value, /*passiveSkill->last*/2, bf->getSide() != 0);
+                value = bf->getMagAttack() * passiveSkill->effect->efv[0];
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stMagAtk, value, /*passiveSkill->last*/2, bf->getSide() != 0);
+                bf->setXinMoCount(++count);
+            }
+        }
     }
 
     if(type != e_damCounter)
@@ -14360,11 +14397,12 @@ float BattleSimulator::calcTherapy(BattleFighter* bf, bool& isCritical, bool& fi
         }
     }
 
+    Int32 sg_v = bf->getSkillGradeExtraValue(SKILL_ID(skill->getId()));
     GData::LBSkillItem* item = bf->getSkillCondItem(SKILL_ID(skill->getId()));
     if(NULL != item)
-        return aura_factor * (getBFMagAtk(bf) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + item->ef_value);
+        return aura_factor * (getBFMagAtk(bf) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + item->ef_value + sg_v);
 
-    return aura_factor * (getBFMagAtk(bf) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
+    return aura_factor * (getBFMagAtk(bf) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + sg_v);
 }
 
 float BattleSimulator::calcMaxTherapy(BattleFighter* bf, const GData::SkillBase* skill)

@@ -24,6 +24,7 @@
 #include "GData/Title.h"
 #include "Clan.h"
 #include "ClanCopy.h"
+#include "ClanBuilding.h"
 #include "Mail.h"
 #include "Boss.h"
 #include "Athletics.h"
@@ -858,6 +859,8 @@ namespace GObject
         memset(_alreadyload, 0, sizeof(_alreadyload));
         m_EnterPTCStatus = false;
         m_InPTCStatus = false;
+        _leftAddrEnter = 0 ;
+        _InLeftTeam = false;
 	}
 
 
@@ -896,7 +899,6 @@ namespace GObject
 		}
 
         ClanRankBattleMgr::Instance().PlayerEnter(this);
-
 		setBlockBossByLevel();
 		return true;
 	}
@@ -14768,6 +14770,63 @@ namespace GObject
         _clan->subStatueExp(exp);
     }
 
+    float Player::getClanBuildingHPEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingHP) + buildingOwner->getLeftAttr(5));
+        return 0;
+    }
+
+    float Player::getClanBuildingPhyAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingPhyAtk) + buildingOwner ->getLeftAttr(0));
+        return 0;
+    }
+
+    float Player::getClanBuildingMagAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingMagAtk) + buildingOwner ->getLeftAttr(0));
+        return 0;
+    }
+    float Player::getClanBuildingMagDefEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingMagAtk));
+        return 0;
+    }
+    float Player::getClanBuildingPhyDefEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingMagAtk));
+        return 0;
+    }
+
+    float Player::getClanBuildingActionEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingAction) + buildingOwner ->getLeftAttr(4));
+        return 0;
+    }
 
     void Player::onBlueactiveday()
     {
@@ -17001,6 +17060,16 @@ namespace GObject
         m_arenaCommitCD = now + 60;
         return false;
     }
+    bool Player::inLeftAddrCommitCD()
+    {
+        UInt32 now = TimeUtil::Now();
+
+        if(now < m_LeftAddrCommitCD)
+            return true;
+
+        m_LeftAddrCommitCD = now + 60;
+        return false;
+    }
 
     bool Player::inArenaTeamCommitCD()
     {
@@ -17059,6 +17128,7 @@ namespace GObject
                 fgt->getAllUpSkillAndLevel(st);
                 fgt->getAllPSkillAndLevel4Arena(st);
                 fgt->getAllSSAndLevel(st);
+                fgt->getAllSGAndValue(st);
                 fgt->getAllLbSkills(st);
 
                 fgt->getAttrExtraEquip(st);
@@ -17084,6 +17154,7 @@ namespace GObject
             _onBattlePet->getAllUpSkillAndLevel(st);
             _onBattlePet->getAllPSkillAndLevel4Arena(st);
             _onBattlePet->getAllSSAndLevel(st);
+            _onBattlePet->getAllSGAndValue(st);
             _onBattlePet->getAllLbSkills(st);
 
             _onBattlePet->getAttrExtraEquip(st);
@@ -22147,6 +22218,60 @@ UInt8 Player::toQQGroup(bool isJoin)
         return xianpo;
     }
 
+    void Player::getXuanTianNingLuLua(UInt32 c)
+    {
+        IncommingInfo ii(XTYLFromUseItem, 0, 0);
+        getXuanTianNingLu(c, &ii);
+
+        Stream st(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(13);
+        st << GetVar(VAR_SKILL_GRADE_MONEY);
+        st << Stream::eos;
+        send(st);
+    }
+
+    UInt32 Player::getXuanTianNingLu(UInt32 c, IncommingInfo* ii)
+    {
+        UInt32 xtnl = GetVar(VAR_SKILL_GRADE_MONEY);
+		if(c == 0)
+			return xtnl;
+		xtnl += c;
+		SYSMSG_SENDV(195, this, c);
+		SYSMSG_SENDV(1069, this, c);
+        SetVar(VAR_SKILL_GRADE_MONEY, xtnl);
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_xtnl (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
+
+        return xtnl;
+	}
+
+	UInt32 Player::useXuanTianNingLu(UInt32 a, ConsumeInfo* ci)
+	{
+        UInt32 xtnl = GetVar(VAR_SKILL_GRADE_MONEY);
+        if(a == 0 || xtnl == 0)
+            return xtnl;
+        if(xtnl < a)
+            xtnl = 0;
+        else
+        {
+            xtnl -= a;
+            if(ci != NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_xtnl (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(196, this, a);
+        SYSMSG_SENDV(1070, this, a);
+        SetVar(VAR_SKILL_GRADE_MONEY, xtnl);
+
+        return xtnl;
+    }
+
 void Player::getQQGameOnlineAward()
 {
     if(!World::getQQGameOnlineAwardAct())
@@ -24556,7 +24681,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9449, 1, true, false, FromNpc);
+            GetPackage()->AddItem(9496, 1, true, false, FromNpc);
         }
         else
         {
@@ -24567,7 +24692,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9449, 1, true, false, FromNpc);
+                GetPackage()->AddItem(9496, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
@@ -25477,7 +25602,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={100,200,400,500,700,900,1200,2300,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1300,2350,5000,12000,24000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
@@ -25524,21 +25649,21 @@ void Player::Send11GradeAward(UInt8 type)
 {
     if(type > 11)
         return ;
-    UInt32 gradeAward[]={100,200,400,500,700,900,1200,2300,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1300,2350,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
-        {{500,1 }, {503,1}},
-        {{9424,2},{500,2}},
-        {{9418,3},{501,2},{9438,1}},
-        {{9649,3},{516,2},{503,2}},
-        {{501,2},{513,2},{517,2}},
-        {{9388,1},{551,2},{134,2}},
-        {{1325,2},{503,2},{509,2},{547,2},{134,2},{9438,2}},
-        {{1719,1},{8555,4}},
-        {{9604,20},{9418,20}},
-        {{9022,20}},
-        {{1726,1},{515,15},{9075,20}},
+        {{9424,1 }, {503,1}},
+        {{501,2},{500,2}},
+        {{9604,3},{513,2},{9438,1}},
+        {{9600,2},{516,2},{503,2}},
+        {{547,3},{9308,3},{517,3}},
+        {{549,1},{551,2},{134,2}},
+        {{1325,2},{503,2},{509,2},{134,2},{9438,2}},
+        {{1728,1},{8555,4}},
+        {{9600,25},{9418,25},{9424,40}},
+        {{9068,20}},
+        {{9019,20},{9017,20},{9022,15}},
     };
-    static UInt32 count[] = {2,2,3,3,3,3,6,2,2,3,3};
+    static UInt32 count[] = {2,2,3,3,3,3,5,2,3,1,3};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -27153,8 +27278,12 @@ void Player::ReturnTYSSInfo(UInt8 flag)
 
 void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
 {
-    if(!getClan() || !getClan()->getLeader()) 
+    Clan* clan = getClan();
+    if(clan == NULL ) 
         return;
+    /*Player* leader = clan->getLeader();
+    if(leader == NULL)
+        return;*/
 
     switch(type)
     {
@@ -27172,13 +27301,9 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             else
             {
                 if(GetPackage()->GetItemNum(9492,true) > 0)
-                {
                     GetPackage()->UseItem(9492,GetPackage()->GetItemNum(9492,true),0,0,1);
-                }
                 if(GetPackage()->GetItemNum(9492,false) > 0)
-                {
                     GetPackage()->UseItem(9492,GetPackage()->GetItemNum(9492,false),0,0,0);
-                }
             }
             
         }
@@ -27204,7 +27329,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             };
 
             UInt32 clan_contribute = GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
-            UInt32 clan_sum = getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+            UInt32 clan_sum = clan->GetTYSSSum();
 
             if(clan_contribute < 100 && clan_sum < 3000)
                 return;
@@ -27243,15 +27368,18 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             }
            
             UInt8 add_flag = 0;//购买成功标记
+            UInt32 consume1 = GetVar(VAR_TYSS_DISCOUNT_CONSUME1); 
+            UInt32 consume2 = GetVar(VAR_TYSS_DISCOUNT_CONSUME2); 
+            UInt32 consume3 = GetVar(VAR_TYSS_DISCOUNT_CONSUME3); 
             switch(consume_type)
             {
                 case 0:
                 {
-                    tmp_int = GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME1),consume_pos);  
+                    tmp_int = GET_BIT_8(consume1,consume_pos);  
                     if(tmp_int >= awards[flag][3][1])
                         return;
                     ++tmp_int; 
-                    SetVar(VAR_TYSS_DISCOUNT_CONSUME1,SET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME1),consume_pos,tmp_int)); 
+                    SetVar(VAR_TYSS_DISCOUNT_CONSUME1,SET_BIT_8(consume1,consume_pos,tmp_int)); 
 		            ConsumeInfo ci(BuyTYSSLim,0,0);
                     useGold(awards[flag][3][0], &ci);
                     add_flag = 1;
@@ -27259,11 +27387,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 break;
                 case 1:
                 {
-                    tmp_int = GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME2),consume_pos);  
+                    tmp_int = GET_BIT_8(consume2,consume_pos);  
                     if(tmp_int >= awards[flag][3][1])
                         return;
                     ++tmp_int; 
-                    SetVar(VAR_TYSS_DISCOUNT_CONSUME2,SET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME2),consume_pos,tmp_int)); 
+                    SetVar(VAR_TYSS_DISCOUNT_CONSUME2,SET_BIT_8(consume2,consume_pos,tmp_int)); 
 		            ConsumeInfo ci(BuyTYSSLim,0,0);
                     useGold(awards[flag][3][0], &ci);
                     add_flag = 1;
@@ -27271,11 +27399,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 break;
                 case 2:
                 {
-                    tmp_int = GET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME3),consume_pos);  
+                    tmp_int = GET_BIT_8(consume3,consume_pos);  
                     if(tmp_int >= awards[flag][3][1])
                         return;
                     ++tmp_int; 
-                    SetVar(VAR_TYSS_DISCOUNT_CONSUME3,SET_BIT_8(GetVar(VAR_TYSS_DISCOUNT_CONSUME3),consume_pos,tmp_int)); 
+                    SetVar(VAR_TYSS_DISCOUNT_CONSUME3,SET_BIT_8(consume3,consume_pos,tmp_int)); 
 		            ConsumeInfo ci(BuyTYSSLim,0,0);
                     useGold(awards[flag][3][0], &ci);
                     add_flag = 1;
@@ -27308,34 +27436,34 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 }
                 switch(flag)
                 {
-                    case 1:
+                    case 0:
                         udpLog("tianyuanshenshou", "F_140224_16", "", "", "", "", "act");
                         break;
-                    case 2:
+                    case 1:
                         udpLog("tianyuanshenshou", "F_140224_17", "", "", "", "", "act");
                         break;
-                    case 3:
+                    case 2:
                         udpLog("tianyuanshenshou", "F_140224_18", "", "", "", "", "act");
                         break;
-                    case 4:
+                    case 3:
                         udpLog("tianyuanshenshou", "F_140224_19", "", "", "", "", "act");
                         break;
-                    case 5:
+                    case 4:
                         udpLog("tianyuanshenshou", "F_140224_20", "", "", "", "", "act");
                         break;
-                    case 6:
+                    case 5:
                         udpLog("tianyuanshenshou", "F_140224_21", "", "", "", "", "act");
                         break;
-                    case 7:
+                    case 6:
                         udpLog("tianyuanshenshou", "F_140224_22", "", "", "", "", "act");
                         break;
-                    case 8:
+                    case 7:
                         udpLog("tianyuanshenshou", "F_140224_23", "", "", "", "", "act");
                         break;
-                    case 9:
+                    case 8:
                         udpLog("tianyuanshenshou", "F_140224_24", "", "", "", "", "act");
                         break;
-                    case 10:
+                    case 9:
                         udpLog("tianyuanshenshou", "F_140224_25", "", "", "", "", "act");
                         break;
                     default:
@@ -27345,7 +27473,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
         }
             break;
         case 5://查看成员贡献
-            getClan()->SendTYSSScore(this); 
+            clan->SendTYSSScore(this); 
 
             break;
         case 6://0 - 表扬 1 - 督促
@@ -27366,7 +27494,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                     return;
                     break;
             }
-            getClan()->broadcast(st);
+            clan->broadcast(st);
         }
             break;
         case 8:
@@ -27421,22 +27549,21 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
     return;
 }
 
-void Player::beEated(UInt32 num)
-{
-    AddVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM,10*num);
-}
 
 void Player::EatLingGuo(UInt32 num)
 {
-    if(!getClan()->getLeader())
+    Clan* clan = getClan();
+    if(clan == NULL ) 
         return;
-    Player* leader = getClan()->getLeader();
+    Player* leader = clan->getLeader();
+    if(leader == NULL)
+        return;
 
     AddVar(VAR_TYSS_CONTRIBUTE_PLAYER ,10*num); 
     AddVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY ,10*num); 
     AddVar(VAR_TYSS_CONTRIBUTE_CLAN ,10*num); 
   
-    UInt32 clan_sum = leader->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM); 
+    UInt32 clan_sum = clan->GetTYSSSum();
     UInt8 flag = 0;//标记
     if(clan_sum < 3000)
         flag = 0;
@@ -27454,21 +27581,17 @@ void Player::EatLingGuo(UInt32 num)
                         flag = 4;
                     else
                         flag = 5;
-    UInt32 clanSum = getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM) + 10 * num;//假值
-    if(leader->getThreadId() == getThreadId())
-        leader->AddVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM,10*num);
-    else
-    {
-        GameMsgHdr hdr(0x367, leader->getThreadId(), leader, sizeof(num));
-        GLOBAL().PushMsg(hdr, &num);
-    }
+    clan_sum += 10 * num;
+    UInt32 add_num = 10* num;
+    GameMsgHdr hdr3(0x167, WORKER_THREAD_WORLD, this, sizeof(add_num));
+    GLOBAL().PushMsg(hdr3, &add_num);
     
-    //getClan()->SetTYSSScore(this);
+    
     GameMsgHdr hdr2(0x166, WORKER_THREAD_WORLD, this, 0);
     GLOBAL().PushMsg(hdr2, NULL);
 
     UInt32 pl_grade = this->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER); 
-    UInt32 cl_grade = clanSum; 
+    UInt32 cl_grade = clan_sum; 
     GameMsgHdr hdr(0x1BF, WORKER_THREAD_WORLD, this, sizeof(pl_grade));
     GLOBAL().PushMsg(hdr, &pl_grade);
     GameMsgHdr hdr1(0x1BC, WORKER_THREAD_WORLD, this, sizeof(cl_grade));
@@ -27478,19 +27601,19 @@ void Player::EatLingGuo(UInt32 num)
     {
         case 0:
             if(clan_sum >= 3000)
-                SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"幼年期神兽");
+                SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"幼年期神兽");
         case 1:
             if(clan_sum >= 19000)
-                SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"成长期神兽");
+                SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"成长期神兽");
         case 2:
             if(clan_sum >= 40000)
-                SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"青年期神兽");
+                SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"青年期神兽");
         case 3:
             if(clan_sum >= 70000)
-                SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"亚圣兽期");
+                SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"亚圣兽期");
         case 4:
             if(clan_sum >= 100000)
-                SYSMSG_BROADCASTV(952, getClan()->getName().c_str(),getClan()->getLeader()->getName().c_str(),"天元神兽");
+                SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"天元神兽");
         default:
             break;
     }
@@ -27781,11 +27904,13 @@ void Player::getHappyValueAward(UInt8 val)
 void Player::joinAllServerRecharge(UInt32 num)
 {
     if(num == 0) return;
-    Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
+    //Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
+    Stream st(ARENAREQ::RECHARGE_ACTIVE, 0xEF);
     st << getId() << getName() << num << TimeUtil::Now();
     st << static_cast<UInt8>(getCountry()<<4 | (IsMale()?0:1));
     st << Stream::eos;
-    NETWORK()->SendToServerWar(st);
+    //NETWORK()->SendToServerWar(st);
+	NETWORK()->SendToArena(st);
 }
 
 bool Player::giveFlower(UInt8 type ,UInt32 num)
@@ -29051,6 +29176,25 @@ void Player::sendSummerMeetScoreInfo()
     st << Stream::eos;
     send(st);
 }
+bool Player::giveLeftPowerHold(UInt32 num)
+{
+    UInt32 iid = 9496;
+    UInt8 ret = 0;
+    {
+        UInt16 count = GetPackage()->GetItemAnyNum(iid) ;
+        ItemBase * item = GetPackage()->FindItem(iid, true);
+        if (!item)
+            item =GetPackage()->FindItem(iid, false);
+        if(item ==NULL)
+            return false;
+        if(num > count)
+            return false;
+        GetPackage()->DelItemAny(iid, num );
+        GetPackage()->AddItemHistoriesLog(iid, num );
+        ret = 1;
+    }
+    return true;
+}
 
 void Player::doGuankaAct(UInt8 type)
 {
@@ -29205,7 +29349,7 @@ void Player::getguankaScoreAward(UInt8 type)
     if(!World::getGuankaAct() || type > 4)
         return;
 
-    static UInt32 scoreLvl[] = {200, 400, 600, 800, 1000};
+    static UInt32 scoreLvl[] = {300, 500, 1000, 1500, 2000};
     static UInt32 awards[5][5][2] = {
         {{15,2},  {514,2}, {135,2},   {500,5},   {0, 0}},
         {{15,5},  {514,5}, {135,5},   {500,5},   {0, 0}},
@@ -29259,8 +29403,307 @@ void Player::sevensoul_fixed()
             pet->updateToDBPetSkill();
     }
 }
+void Player::sendXinMoInfo()
+{
+    Stream st(REP::EQ_XINMO);
+    st <<static_cast<UInt8>(0);
+    st << GetVar(VAR_HEART_SWORD);
+    std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
+    //UInt8 cnt = _fighters.size() ;
+//  st << static_cast<UInt8>(cnt);
+    for (; it != _fighters.end(); ++it)
+    {
+        Fighter* fgt = it->second; // XXX: Fashion can not be enchanted
+        if(fgt==NULL)
+        {
+            st <<  static_cast<UInt32>(0); 
+        }
+        else
+        {
+            st << fgt->getXinMo().val;
+        }
+    }
+    st << Stream::eos;
+    send(st);
+}
+void Player::AddHeartSword(UInt32 val)
+{
+    UInt32 var_val = GetVar(VAR_HEART_SWORD);
+    SetVar(VAR_HEART_SWORD,var_val+val);
+    Stream st(REP::EQ_XINMO);
+    st << static_cast<UInt8>(4);
+    st << static_cast<UInt32>(var_val+val);
+    st << Stream::eos;
+    send(st);
+    SYSMSG_SENDV(2027,this,val);
+    SYSMSG_SENDV(2028,this,val);
+}
 
+UInt8 Player::useChangeSexCard()
+{
+    if(GetVar(VAR_MARRY_STATUS) > 0)
+        return 0;
+
+    Fighter* fgt = getMainFighter();
+    if(!fgt)
+        return 0;
+    UInt32 oldId = fgt->getId();
+    UInt32 newId;
+    if(oldId % 2 == 1) //原先是男
+    {
+        newId = oldId + 1;
+    }
+    else
+    {
+        newId = oldId - 1;
+    }
+
+    Stream st(REP::USER_INFO_CHANGE);
+    st << static_cast<UInt8>(0x22) << newId << Stream::eos;
+    send(st);
+
+    //与改形卡有关的函数
+    do_fighter(fgt, oldId, newId);
+    do_fighter_buff(fgt, oldId);
+    do_fighter_train(fgt, oldId);
+    do_practice_data(fgt, oldId);
+    do_second_soul(fgt, oldId);
+    do_elixir(fgt, oldId);
+    do_skill_strengthen(fgt, oldId);
+    do_fighter_xingchen(fgt, oldId);
+    do_fighter_xinmo(fgt, oldId);
+    do_skill_grade(fgt, oldId);
+
+    struct _stTable
+    {
+        Fighter* fgt;
+        UInt32 oldId;
+    };
+    _stTable sttable = {fgt, oldId};
+    GameMsgHdr hdr1(0x1A0, WORKER_THREAD_WORLD, this, sizeof(sttable));
+    GLOBAL().PushMsg(hdr1, &sttable);
+
+    UInt32 count = GetVar(VAR_SEX_CHANGE);
+    SetVar(VAR_SEX_CHANGE, ++count);
+    return 1;
+}
+
+void Player::doTableInWorld(Fighter* fgt, UInt32 oldId)
+{
+    if(!fgt)
+        return;
+    do_sh_fighter(fgt, oldId);
+    do_sh_fighter_attr_extra(fgt, oldId);
+    do_sh_fighter_attr2(fgt, oldId);
+}
+
+void Player::do_fighter(Fighter* fgt, UInt32 oldId, UInt32 newId)
+{
+    fgt->setId(newId);
+    if(fgt->getId() % 2 == 1)
+        fgt->setSex(0);
+    else
+        fgt->setSex(1);
+    _fighters.insert(_fighters.begin(), std::make_pair(newId, fgt));
+    std::map<UInt32, Fighter *>::iterator it = _fighters.find(oldId);
+    if(it != _fighters.end())
+        _fighters.erase(it);
+    DB2().PushUpdateData("UPDATE `fighter` SET  `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+
+    for(UInt8 i = 0; i < 5; i++)
+    {
+        if(_playerData.lineup[i].fid == oldId)
+        {
+            _playerData.lineup[i].fid = newId;
+            storeFighters();
+        }
+    }
+}
+
+void Player::do_fighter_buff(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_buff` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_train(Fighter* fgt, UInt32 oldId)
+{
+    //主将不能闭关修炼
+    //DB1().PushUpdateData("UPDATE  `fighter_train` SET `fgtId` = %u WHERE `fgtId` = %u AND `ownerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_practice_data(Fighter* fgt, UInt32 oldId)
+{
+    UInt32 fgts[1] = {oldId};
+    GObject::practicePlace.standup(this, fgts, 1);
+    fgts[0] = fgt->getId();
+    GObject::practicePlace.sitdown(this, fgts, 1);
+    //DB1().PushUpdateData("UPDATE `practice_data` SET `fighters` = '%s' WHERE `id` = %" I64_FMT "u", "5,11,13,15,17,19", oldId, getId());
+}
+
+void Player::do_second_soul(Fighter* fgt, UInt32 oldId)
+{
+    DB2().PushUpdateData("UPDATE `second_soul` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_elixir(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `elixir` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_skill_strengthen(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `skill_strengthen` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_sh_fighter(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `sh_fighter` SET `id` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_sh_fighter_attr_extra(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `sh_fighter_attr_extra` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_sh_fighter_attr2(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `sh_fighter_attr2` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_xingchen(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_xingchen` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+void Player::do_fighter_xinmo(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_xinmo` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_skill_grade(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `skill_grade` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::BuyLeftPower()
+{
+    UInt32 buyCount = GetVar(VAR_LEFTADDR_POWER_ADD);
+    if(buyCount >=2 )
+        return ;
+    UInt32 power = GetVar(VAR_LEFTADDR_POWER);
+    if(buyCount == 0 )
+    {
+        if (getTael() < 1000)
+        {
+            sendMsgCode(0, 1100);
+            return ;
+        }
+        ConsumeInfo ci(BuyPower, 0, 0);
+        useTael(1000, &ci);
+    }
+    if(buyCount == 1)
+    {
+        if (getGold() < 5)
+        {
+            sendMsgCode(0, 1104);
+            return ;
+        }
+        ConsumeInfo ci(BuyPower, 0, 0);
+        useGold(5, &ci);
+    }
+    SetVar(VAR_LEFTADDR_POWER_ADD , buyCount + 1 );
+    if( ( power + 3 ) > 20)
+        SetVar(VAR_LEFTADDR_POWER,20);
+    else
+        SetVar(VAR_LEFTADDR_POWER,power + 3);
+    GameMsgHdr hdr1(0x142, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr1, NULL);
+}
+
+/*
+//增加和某好友的友好度
+void Player::CompleteFriendlyTask(Player * friender , UInt8 taskNum)
+{
+return ;
+if(friender == NULL)
+return ;
+if(!_hasFriend(friender))
+return ;
+
+static UInt8 task_num_val_max[][4] = {
+{1,1,1,3},
+{1,1,1,3},
+{1,1,1,1},
+{1,10,1,10},
+{1,4,1,4},
+{1,20,1,20},
+};
+
+UInt32 count_var =GetVar(VAR_FRIEND_TASK1 + taskNum/3);  
+UInt8 count = GET_BIT_8(count_var , taskNum%3);
+if(count < task_num_val_max[taskNum][2])
+{
+AddFriendlyCount( friender , task_num_val_max[taskNum][1])          ;
+}
+if(count < task_num_val_max[taskNum][4])
+{
+AddVar(VAR_FRIEND_VALUE , task_num_val_max[taskNum][3]);
+    }
+    SET_BIT_8(count_var , taskNum %3 , (count +1) );
+    SetVar(VAR_FRIEND_TASK1+taskNum/3 , count_var);
+}
+void Player::AddFriendlyCount(Player * friender , UInt8 val) 
+{
+    return ;
+    if( !friender )
+        return ;
+    std::map<UInt64,UInt32 >::iterator it = _friendlyCount.find(friender->getId());
+}
+*/
+
+	void Player::makeFighterSGList(Stream& st)
+	{
+		size_t c = _fighters.size();
+		st.init(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(10);
+        st << GetVar(VAR_SKILL_GRADE_MONEY);
+		st << static_cast<UInt8>(c);
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if(it->second)
+            {
+                it->second->makeFighterSGInfo(st);
+            }
+        }
+		st << Stream::eos;
+        send(st);
+	}
+
+    void Player::sendFighterSGListWithNoSkill()
+    {
+        Stream st;
+        makeFighterSGListWithNoSkill(st);
+		send(st);
+    }
+
+	void Player::makeFighterSGListWithNoSkill(Stream& st)
+    {
+		size_t c = _fighters.size();
+		st.init(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(14);
+		st << static_cast<UInt8>(c);
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            if (it->second)
+            {
+                it->second->makeFighterSGInfoWithNoSkill(st);
+            }
+        }
+		st << Stream::eos;
+    }
 
 } // namespace GObject
+
+
+
 
 

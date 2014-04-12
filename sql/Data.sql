@@ -1070,6 +1070,7 @@ CREATE TABLE `ride` (
     `chips` varchar(255) NOT NULL DEFAULT '',
     `propId` int(10) unsigned NOT NULL,
     `show` tinyint(3) unsigned NOT NULL,
+    `useMore` tinyint(3) unsigned NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
@@ -1131,5 +1132,42 @@ CREATE TABLE `couplecopy` (
     `monster` int(10)  NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
--- Dump completed
 
+DROP TABLE IF EXISTS `clan_building_template`;
+CREATE TABLE `clan_building_template` (
+      `level` smallint(6) NOT NULL COMMENT '建筑等级',
+      `needExp` int(10) DEFAULT NULL COMMENT '该等级所需经验值',
+      `phyAtkValue` int(10) DEFAULT NULL COMMENT '物攻属性加成值',
+      `magAtkValue` int(10) DEFAULT NULL COMMENT '法攻属性加成值',
+      `actionValue` int(10) DEFAULT NULL COMMENT '身法属性加成值',
+      `hpValue` int(10) DEFAULT NULL COMMENT '生命属性加成值',
+      `oracleValue` int(10) DEFAULT NULL COMMENT '神谕塔对其他建筑的等级限制',
+      PRIMARY KEY (`level`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='帮派建筑属性等级表';
+
+DROP TABLE IF EXISTS `xinmo`;
+CREATE TABLE `xinmo` (
+    `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `limitLev` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `consume` int(10) unsigned NOT NULL DEFAULT 0,
+    `maxVal` int(10) unsigned NOT NULL DEFAULT 0,
+    `attack` int(10) unsigned NOT NULL DEFAULT 0,
+    `hp` int(10) unsigned NOT NULL DEFAULT 0,
+    `action` int(10) unsigned NOT NULL DEFAULT 0,
+    `cridec` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `skilllev` varchar(255) NOT NULL DEFAULT '',
+    `payBack` int(10) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `skill_ev`;
+CREATE TABLE `skill_ev` (
+    `lev` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `effect` int(10) NOT NULL DEFAULT 0,
+    `consume` int(10) unsigned NOT NULL DEFAULT 0,
+    `needLev` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`lev`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Dump completed

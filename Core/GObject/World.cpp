@@ -516,6 +516,22 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 21)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 22)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 29)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 5)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -547,6 +563,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 22)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 29)
         ))
     {
 #if 0
@@ -1157,26 +1175,36 @@ void World::SendSurnameLegendAward()
     if(bSurnameLegendEnd)
     {
         World::initRCRank();
+        static MailPackage::MailItem s_item[][3] = {
+            {{5069,1},{5139,1},{5109,1}},
+            {{5069,1},{5139,1},{5108,1}},
+            {{5069,1},{5138,1},{5108,1}},
+            {{5068,1},{5138,1},{5108,1}},
+            {{5068,1},{5138,1},{5107,1}},
+            {{5068,1},{5137,1},{5107,1}},
+            {{5067,1},{5137,1},{5107,1}},
+        };
         int pos = 0;
         for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
         {
-            ++pos;
-
-            if(pos > 1) break;
-
             Player* player = i->player;
             if (!player)
                 continue;
-            MailPackage::MailItem items[] =
+            ++ pos;
+            SYSMSGV(title, 4173);
+            if(pos > 7)
+                break;
+            //UInt32 score = i->total;
+            if(pos > 0 && pos <= 7)     //奖励前10名
             {
-                //{9907, 1}
-                //{9911, 1}
-                //{9913, 1}
-                //{9921, 1}
-                //{9926, 1}
-                {9931, 1}
-            };
-            player->sendMailItem(4173, 4174, items, sizeof(items)/sizeof(items[0]), false);
+                SYSMSGV(content, 4174, pos);
+                MailItemsInfo itemsInfo(s_item[pos-1], Activity, 3);
+                Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(mail)
+                {
+                    mailPackageManager.push(mail->id, s_item[pos-1], 3, true);
+                }
+            }
         }
         World::LuckyBagSort.clear();
     }
@@ -1236,6 +1264,15 @@ inline bool player_enum_3(GObject::Player* pl, int)
 {
     pl->CleanQiShiBan(1);
 
+    return true;
+}
+inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
+{
+    UInt32 val = pl->GetVar(VAR_LEFTADDR_POWER) ;
+    val += 3 ;
+    if(val > 20 )
+        val = 20;
+    pl->SetVar(VAR_LEFTADDR_POWER,val);
     return true;
 }
 
@@ -1411,6 +1448,22 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 21)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 22)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 29)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 5)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1483,6 +1536,7 @@ void World::World_Midnight_Check( World * world )
         world->SendSurnameLegendAward();
     if(b11TimeEnd)
         world->Send11AirBookAward();
+    bGGTimeEnd = true;
     if(bGGTimeEnd)
         world->SendGuangGunAward();
     if (bSnowEnd)
@@ -1517,6 +1571,7 @@ void World::World_Midnight_Check( World * world )
     if(World::getQiShiBanTime())
         GObject::globalPlayers.enumerate(player_enum_3, 0);
 
+    GObject::globalPlayers.enumerate(player_enum_LeftAddrPower, 0);
 	calWeekDay(world);
 	Stream st(REP::DAILY_DATA);
 	makeActivityInfo(st);
@@ -3194,7 +3249,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::guankaScoreSort.insert(s);
         }
     }
-    if(World::getTYSSTime())
+    //if(World::getTYSSTime())
     {
         UInt32 used= p->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER);
         if(used)
@@ -3222,16 +3277,17 @@ inline bool clan_enum_grade(GObject::Clan *clan,int)
             ClanSort s;
             s.clan = clan;
             s.total = grade;
+            s.time = TimeUtil::Now();
             World::clanGradeSort.insert(s);
         }
     }
     
-    if(World::getTYSSTime())
+    //if(World::getTYSSTime())
     {
         GObject::Player* pl = clan->getLeader();
         if(!pl)
             return true;
-        UInt32 grade = pl->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
+        UInt32 grade = clan->GetTYSSSum();
         if(grade)
         {
             ClanSort s;
@@ -3750,11 +3806,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9424,50},{515,30},{9438,60},{134,30},{9022,40}},
-        {{9424,40},{515,25},{9438,50},{134,25},{9022,30}},
-        {{9424,30},{515,20},{9438,40},{134,20},{9022,20}},
+        {{9600,40},{515,30},{9418,60},{503,60},{9022,40}},
+        {{9600,30},{515,25},{9418,60},{503,50},{9022,30}},
+        {{9600,20},{515,20},{9418,60},{503,40},{9022,20}},
     };
-   // static MailPackage::MailItem card = {9922,1};
+    static MailPackage::MailItem card = {9936,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -3769,8 +3825,8 @@ void World::Send11PlayerRankAward()
         if(mail)
         {
             mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
-//            if(pos ==1)
-  //              mailPackageManager.push(mail->id, &card, 1, true);
+            if(pos ==1)
+                mailPackageManager.push(mail->id, &card, 1, true);
         }
         std::string strItems;
         for(int index = 0; index < 5; ++ index)

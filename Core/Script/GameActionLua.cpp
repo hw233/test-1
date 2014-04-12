@@ -234,6 +234,7 @@ namespace Script
 		CLASS_DEF(Player, GetTaskMgr);
 		CLASS_DEF(Player, GetPackage);
 		CLASS_DEF(Player, Add11grade);
+		CLASS_DEF(Player, AddHeartSword);
 		CLASS_DEF(Player, GetPetPackage);
 		CLASS_DEF(Player, GetMailBox);
 		CLASS_DEF(Player, GetFreePackageSize);
@@ -334,7 +335,9 @@ namespace Script
         CLASS_DEF(Player, addMountChip);
         CLASS_DEF(Player, addMountFromItem);
         CLASS_DEF(Player, getXianpoLua);
+        CLASS_DEF(Player, useChangeSexCard);
         CLASS_DEF(Player, EatLingGuo);
+        CLASS_DEF(Player, getXuanTianNingLuLua);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);

@@ -34,6 +34,7 @@
 #include <mysql.h>
 #include <sstream>
 #include "GObject/ClanBoss.h"
+#include "ClanBuilding.h"
 
 namespace GObject
 {
@@ -261,7 +262,8 @@ void ClanItemPkg::GetItems(Player* player)
 Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	GObjectBaseT<Clan>(id), _name(name), _rank(0), _level(lvl), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
-    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0)
+    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0),_tyssSum(0),
+    _buildingOwner(NULL)
 {
     _itemPkg.Init(_id, 0, GData::clanLvlTable.getPkgSize(_level));
 
@@ -618,7 +620,7 @@ bool Clan::kick(Player * player, UInt64 pid)
 	}
 
     DelDuoBaoScore(kicker);
-    DelTYSSScore(player);
+    DelTYSSScore(kicker);
 	_members.erase(found);
 	delete member;
     if(World::get11Time())
@@ -653,20 +655,37 @@ bool Clan::kick(Player * player, UInt64 pid)
     GameMsgHdr hdr1(0x311, kicker->getThreadId(), kicker, sizeof(co));
     GLOBAL().PushMsg(hdr1, &co);
 
-    if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
+    if(kicker->getBuffData(PLAYER_BUFF_CLAN1) > 0)
     {
-        player->setBuffData(PLAYER_BUFF_CLAN1, 0);
-        player->rebuildBattleName();
+        kicker->setBuffData(PLAYER_BUFF_CLAN1, 0);
+        kicker->rebuildBattleName();
     }
-    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
+    if(kicker->getBuffData(PLAYER_BUFF_CLAN2) > 0)
     {
-        player->setBuffData(PLAYER_BUFF_CLAN2, 0);
-        player->rebuildBattleName();
+        kicker->setBuffData(PLAYER_BUFF_CLAN2, 0);
+        kicker->rebuildBattleName();
     }
-    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+    if(kicker->getBuffData(PLAYER_BUFF_CLAN3) > 0)
     {
-        player->setBuffData(PLAYER_BUFF_CLAN3, 0);
-        player->rebuildBattleName();
+        kicker->setBuffData(PLAYER_BUFF_CLAN3, 0);
+        kicker->rebuildBattleName();
+    }
+
+    if(kicker->getInLeftTeam() || kicker->getLeftAddrEnter())
+    {
+        struct TeamChange
+        {
+            UInt8 leftId ; 
+            UInt32 clanId ;
+            UInt64 playerId;
+            UInt8 pos1;
+            UInt8 pos2;
+            TeamChange(UInt8 leftId_ ,UInt32 clanId_,UInt64 playerId_ ,UInt8 pos1_ ,UInt8 pos2_):leftId(leftId_),clanId(clanId_),playerId(playerId_),pos1(pos1_),pos2(pos2_){}
+        };
+        TeamChange tc(255,getId(),kicker->getId(), 0 ,0);
+        GameMsgHdr hdr(0x393, kicker->getThreadId(), kicker, sizeof(TeamChange));
+        GLOBAL().PushMsg(hdr, &tc);
+        _buildingOwner->LeaveTeam(NULL,kicker,kicker,1);
     }
 
 	return true;
@@ -774,18 +793,34 @@ bool Clan::leave(Player * player)
         DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid` = %" I64_FMT "u", player->getId());
 		// updateRank(NULL, oldLeaderName);
 	}
+    if(player->getInLeftTeam() || player->getLeftAddrEnter())
+    {
+        struct TeamChange
+        {
+            UInt8 leftId ; 
+            UInt32 clanId ;
+            UInt64 playerId;
+            UInt8 pos1;
+            UInt8 pos2;
+            TeamChange(UInt8 leftId_ ,UInt32 clanId_,UInt64 playerId_ ,UInt8 pos1_ ,UInt8 pos2_):leftId(leftId_),clanId(clanId_),playerId(playerId_),pos1(pos1_),pos2(pos2_){}
+        };
+        TeamChange tc(255,getId(),player->getId(), 0 ,0);
+        GameMsgHdr hdr(0x393, player->getThreadId(), player, sizeof(TeamChange));
+        GLOBAL().PushMsg(hdr, &tc);
+        _buildingOwner->LeaveTeam(NULL,player,player,1);
+    }
 
     if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
     {
         player->setBuffData(PLAYER_BUFF_CLAN1, 0);
         player->rebuildBattleName();
     }
-    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
+    if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
     {
         player->setBuffData(PLAYER_BUFF_CLAN2, 0);
         player->rebuildBattleName();
     }
-    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+    if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
     {
         player->setBuffData(PLAYER_BUFF_CLAN3, 0);
         player->rebuildBattleName();
@@ -833,12 +868,7 @@ bool Clan::handoverLeader(Player * leader, UInt64 pid)
 	DB5().PushUpdateData("UPDATE `clan` SET `leader` = %" I64_FMT "u WHERE `id` = %u", pid, _id);
 	// updateRank(cmLeader, cmLeader->player->getName());
 	setLeaderId(pid);
-    if(World::getTYSSTime())
-    {
-        cmPlayer->player->SetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM , leader->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM));
-        leader->DelVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
-    }
-
+    
 	return true;
 }
 
@@ -1745,6 +1775,22 @@ void Clan::disband(Player * player)
         UInt32 clanId = getId(); 
         GameMsgHdr hdr(0x1D4, WORKER_THREAD_WORLD, player, sizeof(clanId));
         GLOBAL().PushMsg(hdr, &clanId);
+    }
+    if(player->getInLeftTeam() || player->getLeftAddrEnter())
+    {
+        struct TeamChange
+        {
+            UInt8 leftId ; 
+            UInt32 clanId ;
+            UInt64 playerId;
+            UInt8 pos1;
+            UInt8 pos2;
+            TeamChange(UInt8 leftId_ ,UInt32 clanId_,UInt64 playerId_ ,UInt8 pos1_ ,UInt8 pos2_):leftId(leftId_),clanId(clanId_),playerId(playerId_),pos1(pos1_),pos2(pos2_){}
+        };
+        TeamChange tc(255,getId(),player->getId(), 0 ,0);
+        GameMsgHdr hdr(0x393, player->getThreadId(), player, sizeof(TeamChange));
+        GLOBAL().PushMsg(hdr, &tc);
+        _buildingOwner->LeaveTeam(NULL,player,player,1);
     }
     if(World::getTYSSTime())
     {
@@ -4568,6 +4614,7 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
             {
                 ConsumeInfo ci(ClanSptr,0,0);
                 pl->useGold(10, &ci);
+                addMemberProffer(pl,100);
                 addMemberActivePoint_nolock(pl, 5, e_clan_actpt_none);
                 addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_gold, 10, now);
                 if(m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
@@ -5011,6 +5058,60 @@ void Clan::SendClanMemberGrade(Player* player)
     player->send(st);
 }
 
+ClanBuildingOwner* Clan::getClanBuildingOwner()
+{
+    return _buildingOwner;
+}
+
+ClanBuildingOwner* Clan::getBuildingOwner()
+{
+    return _buildingOwner;
+}
+
+ClanBuildingOwner* Clan::getNewBuildOwner()
+{
+    if (!_buildingOwner)
+        _buildingOwner = new ClanBuildingOwner(this);
+    return _buildingOwner;
+}
+
+bool Clan::loadBuildingsFromDB(UInt32 fairylandEnergy, 
+        UInt16 phyAtkLevel, UInt16 magAtkLevel, UInt16 actionLevel, UInt16 hpLevel, UInt16 oracleLevel,
+        UInt16 updateTime)
+{
+    if (!_buildingOwner)
+        _buildingOwner = new ClanBuildingOwner(this);
+    if (!_buildingOwner)
+        return false;
+    _buildingOwner->loadFromDB(fairylandEnergy, phyAtkLevel, magAtkLevel, actionLevel, hpLevel, oracleLevel, updateTime);
+    return true;
+}
+void Clan::SendLeftAddrMail(UInt32 _spirit /*,UInt8 leftId */)
+{
+	UInt32 now = TimeUtil::Now();
+	Mutex::ScopedLock lk(_mutex);
+	Members::iterator it = _members.begin();
+    SYSMSG(title, 4305);
+    std::string content = "" ;
+    SYSMSGV(content1, 4306 ,/*leftId ,*/ _spirit);
+    content += content1;
+    UInt32 dayInWeek = TimeUtil::GetWeekDay(now);
+    if(dayInWeek == 7)
+    {
+        SYSMSGV(content2, 4307);
+        content += content2;
+    }
+	for (; it != _members.end(); ++it)
+	{
+        Player * pl = (*it)->player; 
+        if(pl == NULL)
+            continue ; 
+		pl->GetMailBox()->newMail(NULL, 1, title, content.c_str());
+	}
+
+    
+}
+
 void Clan::LoadDuoBaoLog(const std::string& name, UInt16 score, UInt32 itemId, UInt8 cnt)
 {
     if(!World::getDuoBaoTime())
@@ -5436,14 +5537,14 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str)
 }
 void Clan::LoadTYSSScore(Player* pl)
 {
-    if(!World::getTYSSTime())
-        return;
+    /*if(!World::getTYSSTime())
+        return;*/
     if(NULL == pl)
         return;
 
     UInt32 score = pl->GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
 
-    ScoreSort ss;
+    ScoreSort32 ss;
     ss.player = pl;
     ss.score = score;
     TYSSScoreSort.insert(ss);
@@ -5461,7 +5562,7 @@ void Clan::SetTYSSScore(Player * pl)
 
     UInt32 score = pl->GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
 
-    for(ScoreSortType::iterator i = TYSSScoreSort.begin(), e = TYSSScoreSort.end(); i != e; ++i)
+    for(ScoreSortType32::iterator i = TYSSScoreSort.begin(), e = TYSSScoreSort.end(); i != e; ++i)
     {
         if (i->player == pl)
         {
@@ -5470,7 +5571,7 @@ void Clan::SetTYSSScore(Player * pl)
         }
     }
 
-    ScoreSort ss;
+    ScoreSort32 ss;
     ss.player = pl;
     ss.score = score;
     TYSSScoreSort.insert(ss);
@@ -5484,7 +5585,7 @@ void Clan::SendTYSSScore(Player* pl)
     if(NULL == pl)
         return;
 
-    ScoreSortType::iterator it = TYSSScoreSort.begin();
+    ScoreSortType32::iterator it = TYSSScoreSort.begin();
     Stream st(REP::ACTIVE);
     UInt8 count = 0;
     
@@ -5500,7 +5601,10 @@ void Clan::SendTYSSScore(Player* pl)
         st << it->player->getId();
         st << static_cast<UInt32>(it->score);
         if(it->player->getClan() == NULL)
+        {
+            ++it;
             continue;
+        }
         st << static_cast<UInt8>(it->player->getClan()->getClanRank(it->player));
         ++it;
         ++count;
@@ -5516,7 +5620,7 @@ void Clan::DelTYSSScore(Player * pl)
     if(NULL == pl)
         return;
 
-    for(ScoreSortType::iterator i = TYSSScoreSort.begin(), e = TYSSScoreSort.end(); i != e; ++i)
+    for(ScoreSortType32::iterator i = TYSSScoreSort.begin(), e = TYSSScoreSort.end(); i != e; ++i)
     {
         if (i->player == pl)
         {

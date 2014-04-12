@@ -282,6 +282,14 @@ struct DBSS
     UInt8 maxLvl;
 };
 
+struct DBSG
+{
+    UInt64 playerId;
+    UInt32 fighterId;
+    UInt16 skillId;
+    UInt8 level;
+};
+
 struct DBQixi
 {
     UInt64 playerId;
@@ -685,6 +693,7 @@ struct DBClan
     UInt32 gongxian;
     UInt32 urge;
     UInt32 duobaoAward;
+    UInt32 tyssSum;
 };
 
 struct DBClanRepo
@@ -1374,6 +1383,13 @@ struct DBXingchen
     UInt16 xctCurVal;
     UInt16 xctMaxVal;
 };
+struct DBXinmo
+{
+	UInt32 fighterId;
+	UInt64 playerId;
+	UInt8  level;
+	UInt32 curVal;
+};
 
 struct DBJiguanshu
 {
@@ -1527,6 +1543,18 @@ struct DBModifyMount
     UInt8 curfloor;
     UInt8 curfloor1;
     UInt16 failtimes;
+};
+
+struct DBClanBuildings
+{
+    UInt64 clanId;
+    UInt32 fairylandEnergy;
+    UInt16 phyAtkLevel;
+    UInt16 magAtkLevel;
+    UInt16 actionLevel;
+    UInt16 hpLevel;
+    UInt16 oracleLevel;
+    UInt16 updateTime;
 };
 }
 
@@ -1726,6 +1754,16 @@ SPECIALDEF(8)
     UInt32, curVal,
     UInt8, lvl,
     UInt8, maxLvl
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSG)
+SPECIALDEF(4)
+    (
+    UInt64, playerId,
+    UInt32, fighterId,
+    UInt16, skillId,
+    UInt8, level
     )
 SPECIALEND()
 
@@ -2254,7 +2292,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(34)
+SPECIALDEF(35)
 (
 	UInt32, id,
 	std::string, name,
@@ -2289,7 +2327,8 @@ SPECIALDEF(34)
     UInt32, xianyun,
     UInt32, gongxian,
     UInt32, urge,
-    UInt32, duobaoAward
+    UInt32, duobaoAward,
+    UInt32,tyssSum 
 )
 SPECIALEND()
 
@@ -3282,6 +3321,16 @@ SPECIALDEF(3)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBXinmo)
+SPECIALDEF(4)
+(
+	UInt32, fighterId,
+	UInt64, playerId,
+	UInt8,  level,
+	UInt32, curVal
+)
+SPECIALEND()
+
 SPECIALBEGIN(GObject::DBJiguanyu)
 SPECIALDEF(3)
     (
@@ -3461,6 +3510,19 @@ SPECIALDEF(6)
     )
 SPECIALEND()
 
+SPECIALBEGIN (GObject::DBClanBuildings)
+SPECIALDEF(8)
+    (
+    UInt64, clanId,
+    UInt32, fairylandEnergy,
+    UInt16, phyAtkLevel,
+    UInt16, magAtkLevel,
+    UInt16, actionLevel,
+    UInt16, hpLevel,
+    UInt16, oracleLevel,
+    UInt16, updateTime
+    )
+SPECIALEND()
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

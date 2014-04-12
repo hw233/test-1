@@ -22,7 +22,7 @@ function ride()
         BEGIN {
             print "INSERT INTO `ride` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d,\x27%s\x27,%u,%u)",$1,$2,$3,$4,$5,$6);
+            printf("(%d,\x27%s\x27,%d,\x27%s\x27,%u,%u,%u)",$1,$2,$3,$4,$5,$6,$7);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

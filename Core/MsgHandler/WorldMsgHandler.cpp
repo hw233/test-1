@@ -40,6 +40,7 @@ MSG_REG(GameMsgHdr, OnAthleticsListReq);
 MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_CHALLENGE, OnAthleticsChallengeReq);
 MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_PAGING,    OnAthleticsPaging);
 MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_KILLCD,    OnAthleticsKillCD);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_FAIRYLAND, OnClanFairyLandReq);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
 MSG_REG(GameMsgHdr, OnAthleticsGetAwardReq);
 MSG_REG(GameMsgHdr, OnLuckDrawRankListReq);
@@ -83,6 +84,7 @@ MSG_REG_2(ArenaMsgHdr, 0x114, OnTeamArenaLeaderBoard);
 MSG_REG_2(ArenaMsgHdr, 0x115, OnTeamArenaInspireLevel);
 MSG_REG_2(ArenaMsgHdr, 0x116, OnTeamArenaLastRank);
 MSG_REG_2(ArenaMsgHdr, 0x117, OnUpdateArenaSession);
+MSG_REG_2(ArenaMsgHdr, 0x118, OnServerRechargeRank);
 
 MSG_REG_2(ServerWarMsgHdr, 0x121, OnServerWarConnected);
 MSG_REG_2(ServerWarMsgHdr, 0x122, OnServerWarPlayerEntered);
@@ -95,9 +97,24 @@ MSG_REG_2(ServerWarMsgHdr, 0x128, OnServerWarBattlePoint);
 MSG_REG_2(ServerWarMsgHdr, 0x129, OnServerWarLeaderBoard);
 MSG_REG_2(ServerWarMsgHdr, 0x12A, OnServerRechargeRank);
 
+MSG_REG_2(ServerLeftMsgHdr, 0x131, OnServerLeftConnected);  //连接
+MSG_REG_2(ServerLeftMsgHdr, 0x132, OnServerLeftPlayerEntered); //组队攻击
+MSG_REG_2(ServerLeftMsgHdr, 0x133, OnServerLeftLineupCommited);//阵形确认
+MSG_REG_2(ServerLeftMsgHdr, 0x134, OnServerLeftGetSpirit);  //帮派获得元气
+MSG_REG_2(ServerLeftMsgHdr, 0x135, OnServerLeftGetAward);  //帮派获得仙界赐福
+MSG_REG_2(ServerLeftMsgHdr, 0x136, OnServerLeftBattleReport); //接受战报
+MSG_REG_2(ServerLeftMsgHdr, 0x137, OnServerLeftRevInfo);   //接受遗迹信息
+MSG_REG_2(ServerLeftMsgHdr, 0x138, OnServerLeftErrInfo);   //接受错误信息
+MSG_REG_2(ServerLeftMsgHdr, 0x139, OnServerLeftMemberLeave);   //帮派成员改变
+MSG_REG_2(ServerLeftMsgHdr, 0x140, OnServerLeftMemberGet);   //帮派成员获得
+MSG_REG_2(ServerLeftMsgHdr, 0x141, OnServerLeftNotice);   //帮派成员获得
+MSG_REG_2(GameMsgHdr, 0x142, OnServerLeftAttackInfo);   //进攻小队信息
+MSG_REG_2(ServerLeftMsgHdr, 0x143, OnServerLeftAttr);   //帮派成员获得
+
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 MSG_REG_2(GameMsgHdr, 0x166, OnSetTYSSScore);
+MSG_REG_2(GameMsgHdr, 0x167, OnAddTYSSSum);
 
 MSG_REG_2(GameMsgHdr, 0x171, OnClanTakeRewardResultReq);
 MSG_REG_2(GameMsgHdr, 0x172, OnTeamArenaAddMember);
@@ -130,6 +147,7 @@ MSG_REG_2(GameMsgHdr, 0x19D, OnAthleticsOver);
 MSG_REG_2(GameMsgHdr, 0x19E, OnAthleticsEnter);
 MSG_REG_2(GameMsgHdr, 0x19F, OnAthleticsAndClanNotify);
 
+MSG_REG_2(GameMsgHdr, 0x1A0, OnDoTableInWorld);
 MSG_REG_2(GameMsgHdr, 0x1A1, OnAddTradeCheckNotify);
 MSG_REG_2(GameMsgHdr, 0x1A2, OnDelTradeCheckNotify);
 
