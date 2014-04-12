@@ -1602,7 +1602,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(60)
+SPECIALDEF(63)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1663,7 +1663,10 @@ SPECIALDEF(60)
 	UInt32, pdata.lockExpireTime,
     std::string, openid,
     std::string, canHirePet,
-    UInt8,  pdata.dungeonCnt1
+    UInt8,  pdata.dungeonCnt1,
+	UInt8, pdata.xjfrontFreeCnt,
+	UInt8, pdata.xjfrontGoldCnt,
+	UInt32, pdata.xjfrontUpdate
     )
 SPECIALEND()
 

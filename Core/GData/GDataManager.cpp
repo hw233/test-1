@@ -239,6 +239,11 @@ namespace GData
 			fprintf(stderr, "Load front map data template Error !\n");
             std::abort();
 		}
+		if (!LoadXJFrontMapData())
+		{
+			fprintf(stderr, "Load xjfront map data template Error !\n");
+            std::abort();
+		}
 		if (!LoadOnlineAwardData())
 		{
 			fprintf(stderr, "Load online award template Error !\n");
@@ -1789,7 +1794,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBFrontMap dbc;
-		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `frontmap` ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `frontmap` WHERE `id` < 100 ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
 			return false;
 
         bool nextfrontmap = false;
@@ -1798,6 +1803,9 @@ namespace GData
         int spot = 0;
 		while(execu->Next() == DB::DB_OK)
 		{
+            if(dbc.id > 100)
+                break;
+            
             if (!first && id != dbc.id)
                 nextfrontmap = true;
 
@@ -1817,6 +1825,44 @@ namespace GData
             first = false;
         }
         frontMapMaxManager[id] = spot;
+        return true;
+    }
+
+    bool GDataManager::LoadXJFrontMapData()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBFrontMap dbc;
+		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `frontmap` WHERE `id` > 100 ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
+			return false;
+
+        bool nextfrontmap = false;
+        bool first = true;
+        int id = 0;
+        int spot = 0;
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbc.id < 100)
+                break;
+            if (!first && id != dbc.id)
+                nextfrontmap = true;
+
+            if (nextfrontmap) {
+                xjfrontMapMaxManager[id] = spot;
+                nextfrontmap = false;
+            }
+
+            std::vector<FrontMapFighter>& cpv = xjfrontMapManager[dbc.id];
+            if (cpv.size() <= dbc.spot)
+                cpv.resize(dbc.spot+1);
+            cpv[dbc.spot].count = dbc.count;
+            cpv[dbc.spot].fighterId = dbc.fighterId;
+
+            id = dbc.id;
+            spot = dbc.spot;
+            first = false;
+        }
+        xjfrontMapMaxManager[id] = spot;
         return true;
     }
 

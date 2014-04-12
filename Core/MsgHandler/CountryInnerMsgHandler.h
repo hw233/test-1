@@ -906,6 +906,17 @@ void OnAutoFrontMapAttack( GameMsgHdr& hdr, const void * data )
         player->autoFrontMapFailed();
 }
 
+void OnAutoXJFrontMapAttack( GameMsgHdr& hdr, const void * data )
+{
+    if (!data)
+        return;
+
+	MSG_QUERY_PLAYER(player);
+
+    UInt16 idspot = *(UInt16*)data;
+    UInt8 ret = xjfrontMap.fight(player, (idspot>>8)&0xFF, idspot&0xFF, true);
+}
+
 void OnPlayerTimeTick( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

@@ -156,6 +156,8 @@ enum PurchaseType
     RefreshMoBaoAward           = 1019, //刷新墨宝奖励
     BuyLingGuo                  = 1020, //购买灵果
     BuyTYSSLim                  = 1021, //天元神兽限购礼包
+    EnterAutoXJFrontMap         = 1022, //璇玑阵图
+    EnterXJFrontMap         = 1022, //璇玑阵图
     //繁体私有占150～200
 };
 

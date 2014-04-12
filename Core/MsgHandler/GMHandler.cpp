@@ -3333,11 +3333,15 @@ void GMHandler::OnClearCFT(GObject::Player* player, std::vector<std::string>& ar
     PLAYER_DATA(player, frontGoldCnt) = 0;
     PLAYER_DATA(player, dungeonCnt) = 0;
     PLAYER_DATA(player, dungeonCnt1) = 0;
+    PLAYER_DATA(player, xjfrontFreeCnt) = 0;
+    PLAYER_DATA(player, xjfrontGoldCnt) = 0;
+    PLAYER_DATA(player, xjfrontUpdate) = TimeUtil::Now();
     
     DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
     DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
 	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = 0 where `id` = %" I64_FMT "u", player->getId());
 	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt1` = 0 where `id` = %" I64_FMT "u", player->getId());
+    DB1().PushUpdateData("UPDATE `player` SET `xjfrontFreeCnt` = 0, `xjfrontGoldCnt` = 0, `xjfrontUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
     player->sendDailyInfo();
 }
 

@@ -451,6 +451,8 @@ namespace REQ
     const UInt8 MARRYMGR            = 0x75;
     /** 结婚养成 */
     const UInt8 MARRIEDMGR          = 0x77;
+    /** 璇玑阵图*/
+    const UInt8 XJFRONTMAP          = 0xE6;
 }
 
 namespace REP
@@ -759,6 +761,8 @@ namespace REP
     const UInt8 MARRYMGR            = 0x75;
     /** 结婚养成 */
     const UInt8 MARRIEDMGR          = 0x77;
+    /** 璇玑阵图*/
+    const UInt8 XJFRONTMAP          = 0xE6;
 }
 
 namespace SPEQ

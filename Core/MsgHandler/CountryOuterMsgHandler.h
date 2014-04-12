@@ -41,6 +41,7 @@
 #include "GMHandler.h"
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
+#include "GObject/XJFrontMap.h"
 #include "GData/Money.h"
 #include "GObject/WBossMgr.h"
 #include "GObject/HeroIsland.h"
@@ -1127,6 +1128,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     {
         pl->sendAutoFrontMap();
+    }
+    {
+        pl->sendAutoXJFrontMap();
     }
     {
         pl->sendSecondInfo();
@@ -2742,7 +2746,6 @@ void OnAutoFrontMap( GameMsgHdr& hdr, const void* data )
 	if(!pl->hasChecked())
 		return;
 
-
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     UInt8 id = 0;
@@ -3416,6 +3419,113 @@ void OnFrontMapReq( GameMsgHdr& hdr, const void* data)
             break;
     }
 }
+
+void OnXJFrontMapReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 flag = 0;
+    brd >> flag;// 01 - 璇玑阵图信息 02 - 自动璇玑阵图
+    switch (flag){
+        case 1:
+        {
+            if(!player->isInCity())
+            {
+                player->sendMsgCode(0, 1408);
+                return;
+            }
+            player->cancelAutoBattle();
+            player->cancelAutoDungeon();
+            UInt16 loc = player->getLocation();
+            GObject::Map * map = Map::FromSpot(loc);
+            if(map == NULL)
+            {
+                player->sendMsgCode(0, 1408);
+                return;
+            }
+            
+            UInt8 type = 0;
+            UInt8 id = 0;
+            UInt8 param = 0;
+            brd >> type;
+            brd >> id;
+
+            switch (type) {
+                case 0:
+                    brd >> param; // flag
+                    GObject::xjfrontMap.sendInfo(player, id, param?true:false);
+                    break;
+
+                case 1:
+                    GObject::xjfrontMap.enter(player, id);
+                    break;
+
+                case 2:
+                    GObject::xjfrontMap.reset(player, id);
+                    break;
+
+                case 3:
+                    break;
+
+                case 4:
+                    brd >> param; // spot
+                    GObject::xjfrontMap.fight(player, id, param);
+                    break;
+                case 5:
+                    //GObject::xjfrontMap.sendFrontMap(player, id);
+                    break;
+
+                default:
+                    break;
+            }
+
+        }
+            break;
+        case 2:
+        {
+            if(!player->hasChecked())
+                return;
+            UInt8 type = 0;
+            UInt8 id = 0;
+            brd >> type;
+            brd >> id;
+
+            if((player->GetPackage()->GetRestPackageSize() < 1) && (type != 1))
+            {
+                player->sendMsgCode(1, 1014);
+                return;
+            }
+
+            switch (type)
+            {
+                case 0:
+                    {
+                        UInt8 mtype = 0;
+                        brd >> mtype;
+                        player->startAutoXJFrontMap(id, mtype);
+                    }
+                    break;
+
+                case 1:
+                    player->cancelAutoXJFrontMap(id);
+                    break;
+
+                case 2:
+                    player->instantAutoXJFrontMap(id);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+            break;
+        default:
+            break;
+    }
+    
+}
+
 
 void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 {
