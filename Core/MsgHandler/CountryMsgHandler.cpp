@@ -427,7 +427,7 @@ MSG_REG_2(GameMsgHdr, 0x363, OnBePresented);
 MSG_REG_2(GameMsgHdr, 0x364, OnDoStrongInWorld);
 MSG_REG_2(GameMsgHdr, 0x365, OnSend11GradeInfo);
 MSG_REG_2(GameMsgHdr, 0x366, OnRunFriendlyCompass);
-MSG_REG_2(GameMsgHdr, 0x367, OnBeEatLingGuo);
+//MSG_REG_2(GameMsgHdr, 0x367, OnBeEatLingGuo);
 MSG_REG_2(GameMsgHdr, 0x368, OnAutoXJFrontMapAttack);
 
 //0x365-380繁体占用
