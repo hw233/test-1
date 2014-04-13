@@ -2858,6 +2858,15 @@ void OnBeRefuceBrother(GameMsgHdr & hdr ,const void *data)
         return ;
     player->beRefuceBrother(pl);
 }
+void OnAfterDrink(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 playerId  = *reinterpret_cast<const UInt64 *>(data);
+	GObject::Player * pl = GObject::globalPlayers[playerId];
+    if(pl==NULL)
+        return ;
+    player->AfterDrinking(pl);
+}
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

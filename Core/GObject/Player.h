@@ -652,8 +652,9 @@ namespace GObject
         Player * drinker;   //饮酒对象
         UInt32 time ;       //饮酒时间
         UInt8 type ;        //酒壶类型
-        DrinkInfo() : drinker(NULL) , time(0) , type(0){}
-        void reset(){ drinker = NULL ; time = 0 ; type = 0;}
+        std::set<Player *> plset;
+        DrinkInfo() : drinker(NULL) , time(0) , type(0){ plset.clear(); }
+        void reset(){ drinker = NULL ; time = 0 ; type = 0; plset.clear();}
     };
     struct FriendCount
     {
@@ -665,6 +666,13 @@ namespace GObject
         FriendCount(UInt32 val, UInt32 tm ,UInt32 ct):value(val),time(tm),cost(ct){}
         void setTimeAndCost(UInt32 tm , UInt32 ct){time = tm ; cost = ct;}
         void resetTimeAndCost(){time =0 ; cost = 0;}
+    };
+    struct FriendYellowBird
+    {
+        UInt32 time ;
+        UInt8  count;
+        FriendYellowBird():time(0),count(0){}
+        FriendYellowBird(UInt32 time_ , UInt8 count_):time(time_),count(count_){}
     };
 
     struct MoBaoInfo
@@ -2111,6 +2119,7 @@ namespace GObject
 
         std::map<UInt64, struct FriendCount >_friendlyCount;   //友好度
 		std::map<UInt64 , UInt32> _brothers; // 结拜兄弟(不分男女) 第二参数为发起饮酒的时间
+        std::map<UInt64, struct FriendYellowBird >_friendYB;   //黄色鸢尾赠送情况
 		TaskMgr* m_TaskMgr;
 		Trade* m_Trade;
 		Sale* m_Sale;
@@ -3044,17 +3053,24 @@ namespace GObject
 		bool _hasBrother( Player * pl ) const; //判断是否结拜
         void getFriendlyAchievement(UInt8 opt); //获得好友度成就奖励
         bool CheckCanBeBrother(Player * friendOne , UInt8 type);
-        bool CheckCanDrink(Player * friendOne , UInt8 type);
+        bool CheckCanDrink(UInt8 type);
         void InviteDrinking(Player * friendOne);
         void beInviteDrinking(Player * pl ,  UInt8 type);
         bool acceptBrother(Player * friendOne , bool flag = false /*抛对方*/);
         void beRefuceBrother(Player * friendOne );
-        void setDrinking(Player * drinker ,UInt32 val){ drinkInfo.drinker = drinker ;}
+        void setDrinking(Player * drinker ,UInt32 val){ drinkInfo.drinker = drinker ; drinkInfo.time = val ;}
+        void resetDrinking(){ drinkInfo.drinker = NULL ; drinkInfo.time = 0 ; drinkInfo.plset.clear();}
         void setDrinkType(UInt8 type ){ drinkInfo.type = type ;}
-        DrinkInfo getDrinkInfo(){ return drinkInfo;}
+        DrinkInfo& getDrinkInfo(){ return drinkInfo;}
         void beReplyForDrinking(Player * pl , UInt8 res ,UInt8 type = 0);
-        bool UseMeiHuaJian(UInt32 num);
+        bool UseMeiHuaJian(UInt16 iid ,UInt32 num);
         void sendFriendlyTimeAndCost();
+        bool AfterDrinking(Player * friendOne);
+        void BuyDrinkCount();
+        bool UseYellowBird(Player * friendOne ,UInt32 num);
+        void BuyFriendlyGoods(UInt32 num);
+        UInt8 GetYBCount(Player *friendOne);
+        void SetYBCount(Player * friendOne , UInt32 time ,UInt8 count);
 
     public:
         UInt8 useChangeSexCard();

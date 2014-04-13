@@ -7169,6 +7169,7 @@ namespace GObject
     }
 	bool GObjectManager::loadFriendlyCount()
 	{
+		UInt32 now = TimeUtil::Now();
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
@@ -7176,7 +7177,7 @@ namespace GObject
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		DBFriendlyCount dbfr;
-		if(execu->Prepare("SELECT `playerId`, `friendId`, `value` ,`isBrother` ,`time`,`cost` FROM `friendlyCount` ORDER BY `playerId`", dbfr) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `friendId`, `value` ,`isBrother` ,`time`,`cost`,`ybTime`,`ybCount` FROM `friendlyCount` ORDER BY `playerId`", dbfr) != DB::DB_OK)
 			return false;
 		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
@@ -7197,6 +7198,10 @@ namespace GObject
             if(dbfr.isBrother!=0)
             {
                 pl->InsertBrother(friendOne);
+            }
+            if(dbfr.ybTime!= 0 && TimeUtil::SharpDay(0, now) == TimeUtil::SharpDay(0, dbfr.ybTime))
+            {
+                pl->SetYBCount( friendOne, dbfr.ybTime, dbfr.ybCount);
             }
 		}
 		lc.finalize();

@@ -450,6 +450,7 @@ MSG_REG_2(GameMsgHdr, 0x401, OnAcceptBrother);   //接受结拜
 MSG_REG_2(GameMsgHdr, 0x403, OnBeInviteDrinking);   //被邀请对酒
 MSG_REG_2(GameMsgHdr, 0x404, OnBeAcceptDrinking);   //被邀请对酒
 MSG_REG_2(GameMsgHdr, 0x405, OnBeRefuceBrother);   //被邀请对酒
+MSG_REG_2(GameMsgHdr, 0x406, OnAfterDrink);   //被邀请对酒
 
 
 MSG_HANDLER_END()
