@@ -818,6 +818,7 @@ namespace GObject
         m_dpData = new DeamonPlayerData();
 		m_moFang = new MoFang(this);
 		m_marriageInfo = new MarriageInfo();
+		m_collecCard= new CollectCard(this);
         m_csFlag = 0;
         m_spreadInterval = 0;
         m_spreadCoolTime = 0;
@@ -1075,6 +1076,7 @@ namespace GObject
         SAFE_DELETE(m_relation);
 		SAFE_DELETE(m_FairySpar);
 		SAFE_DELETE(m_moFang);
+		SAFE_DELETE(m_collecCard);
 	}
 
 	UInt8 Player::GetCountryThread()

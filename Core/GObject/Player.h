@@ -32,6 +32,7 @@
 #include "ArenaTeam.h"
 #include "Marry.h"
 #include "ModifyMount.h"
+#include "CollectCard.h"
 
 
 namespace Battle
@@ -1680,6 +1681,7 @@ namespace GObject
 		Athletics* GetAthletics()	{ return m_Athletics; }
         MoFang * GetMoFang()        { return m_moFang; }
         MarriageInfo * GetMarriageInfo()  { return m_marriageInfo; }
+        CollectCard * GetCollectCard()        { return m_collecCard; }
 	// ????ϵͳ
 	public:
 
@@ -2999,6 +3001,7 @@ namespace GObject
     private:
         MoFang* m_moFang;
         MarriageInfo* m_marriageInfo;
+        CollectCard * m_collecCard;
 
     public:
         void sendCollectCard(UInt8 fighterIndex);

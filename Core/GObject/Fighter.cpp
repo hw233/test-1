@@ -2083,6 +2083,7 @@ void Fighter::rebuildEquipAttr()
 
         //坐骑加成
         _owner->addMountAttrExtra(_attrExtraEquip);
+        _owner->GetCollectCard()->AddCardAttr(_attrExtraEquip);
     }
 
     if(_owner && !isPet())
@@ -2094,6 +2095,7 @@ void Fighter::rebuildEquipAttr()
             GObject::gMarriedMgr.addCouplePetAttr(_owner,_attrExtraEquip);
         }
     }
+
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 

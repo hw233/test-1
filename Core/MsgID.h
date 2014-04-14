@@ -456,6 +456,8 @@ namespace REQ
     const UInt8 MARRIEDMGR          = 0x77;
     /** 璇玑阵图*/
     const UInt8 XJFRONTMAP          = 0xE6;
+    /** 卡牌系统*/
+    const UInt8 COLLECTCARD         = 0x5F;
 }
 
 namespace REP
@@ -768,6 +770,8 @@ namespace REP
     const UInt8 MARRIEDMGR          = 0x77;
     /** 璇玑阵图*/
     const UInt8 XJFRONTMAP          = 0xE6;
+    /** 卡牌系统*/
+    const UInt8 COLLECTCARD         = 0x5F;
 }
 
 namespace SPEQ
