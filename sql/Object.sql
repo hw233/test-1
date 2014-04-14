@@ -926,6 +926,9 @@ CREATE TABLE `player` (
   `openid` varchar(1024) NOT NULL DEFAULT '',
   `canHirePet` varchar(2048) NOT NULL DEFAULT '',
   `dungeonCnt1` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `xjfrontFreeCnt` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `xjfrontGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `xjfrontUpdate` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
   KEY `mainFighter` (`mainFighter`)
@@ -2479,6 +2482,27 @@ CREATE TABLE `teammember` (
    `member3` bigint(20) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`teamId`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `player_xjfrontmap`;
+CREATE TABLE `player_xjfrontmap` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `id` tinyint(3) unsigned NOT NULL,
+  `spot` tinyint(3) unsigned NOT NULL,
+  `count` tinyint(3) unsigned NOT NULL,
+  `status` tinyint(3) unsigned NOT NULL,
+  `lootlvl` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  UNIQUE KEY `player_id_spot` (`playerId`,`id`, `spot`),
+  KEY `playerIdId` (`playerId`, `id`),
+  KEY `playerId` (`playerId`),
+  KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `auto_xjfrontmap`;
+CREATE TABLE `auto_xjfrontmap` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `id` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `zhenyuanAttr`;
 CREATE TABLE `zhenyuanAttr` (
