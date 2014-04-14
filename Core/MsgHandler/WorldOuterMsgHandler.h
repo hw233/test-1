@@ -2932,6 +2932,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             if(flag && player->getTotalRecharge() >= 1000)
                 return;
             player->SetVar(VAR_DIRECTPUROPEN, flag?1:0);
+            if(flag > 0)
+                player->sendDirectPurInfo();
         }
         break;
         case 0x20:

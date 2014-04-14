@@ -1,5 +1,6 @@
 #ifndef _RACEBATTLE_H_
 #define _RACEBATTLE_H_
+#include "Common/Singleton.h"
 
 namespace GObject
 {
@@ -8,7 +9,7 @@ namespace GObject
 struct TSort
 {
     Player* player;
-    UInt8 total;
+    UInt16 total;
     UInt32 time;
     TSort() : player(NULL), total(0), time(0) {}
 };
@@ -21,11 +22,11 @@ struct t_sort
 typedef std::set<TSort, t_sort> RBSortType;
 
 
-class RaceBattle
+class RaceBattle : public Singleton<RaceBattle>
 {
     public:
-        RaceBattle();
-        ~RaceBattle();
+        RaceBattle() {}
+        ~RaceBattle() {}
         void raceBattleCheck(UInt32 time);
         UInt16 getLocation() { return RACEBATTLE_LOCATION; }
         void enterPos(Player* pl, UInt8 pos);
@@ -53,12 +54,12 @@ class RaceBattle
         void eraseContinueWinSort(Player* pl);
 
     private:
-        UInt8 _status; //0（未开启），1（17：50~20：00），2（20：00~20：30）
+        static UInt8 _status; //0（未开启），1（17：50~20：00），2（20：00~20：30）
         static RBSortType _levelStarSort[5]; //每层星级数排名
         static RBSortType _contineWinSort;
 };
 
-extern RaceBattle* gRaceBattle;
+#define raceBattle RaceBattle::Instance()
 
 } //namespace GObject
 

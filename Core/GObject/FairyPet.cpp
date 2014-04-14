@@ -901,6 +901,7 @@ namespace GObject
         st << Stream::eos;
         _owner->send(st);
         _owner->GuangGunCompleteTask(0,12);
+        GameAction()->doStrong(_owner, SthPetSanHun, 0 ,0 );
     }
 
     bool FairyPet::checkSanHunUp(UInt8 sanhunId, UInt8 sanhunLvl)
@@ -1192,6 +1193,7 @@ namespace GObject
                 checkSevenSoulLevel(sevenSoulIndex + 2);
             }
 
+            GameAction()->doStrong(_owner, SthPetQiPo, 0 , 0);
             ret = 0;
         }
         else

@@ -115,8 +115,7 @@ void Country::ClanBoss_Refresh(void*)
 
 void Country::raceBattleCheck(void* )
 {
-    if(gRaceBattle)
-        gRaceBattle->raceBattleCheck(TimeUtil::Now());
+    GObject::raceBattle.raceBattleCheck(TimeUtil::Now());
 }
 
 bool Country::Init()

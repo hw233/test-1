@@ -1410,10 +1410,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerMeetInfo();   //Fund
     pl->sendRealSpirit();   //真元
     pl->send7DayFundInfo();
-    //if(cfg.serverNo <= 10)
-        pl->sendZhenyuansInfo();    //阵元
+    pl->sendZhenyuansInfo();    //阵元
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
+    pl->KJTMUdpLog();
     //pl->QiShiBanState();
     {
         GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);
@@ -3455,8 +3455,6 @@ void OnXJFrontMapReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
 
-    //if(cfg.serverNo > 10)
-    //    return;
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     if(player->GetLev() < 75)
         return;
@@ -6723,14 +6721,12 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
 void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
-	if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
-		return;
-    if(!gRaceBattle)
-        return;
+	//if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+	//	return;
     if(player->GetLev() < 40)
         return;
-    if(!gRaceBattle->isStart())
-        return;
+    //if(!GObject::raceBattle.isStart())
+    //    return;
 
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
@@ -6741,56 +6737,56 @@ void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
         {
             UInt8 pos = 0;
             brd >> pos;
-            gRaceBattle->enterPos(player, pos);
+            GObject::raceBattle.enterPos(player, pos);
         }
         break;
 
         case 5:
         {
-            gRaceBattle->autoBattle(player);
+            GObject::raceBattle.autoBattle(player);
         }
         break;
 
         case 6:
         {
-            gRaceBattle->cancelBattle(player);
+            GObject::raceBattle.cancelBattle(player);
         }
         break;
 
         case 7:
         {
-            gRaceBattle->freshContinueWinRank(player);
+            GObject::raceBattle.freshContinueWinRank(player);
         }
         break;
 
         case 8:
         {
-            gRaceBattle->getAward(player);
+            GObject::raceBattle.getAward(player);
         }
         break;
 
         case 9:
         {
             UInt32 reportId = 0;
-            gRaceBattle->readBattleReport(player, reportId);
+            GObject::raceBattle.readBattleReport(player, reportId);
         }
         break;
 
         case 10:
         {
-            gRaceBattle->requestMatch(player);
+            GObject::raceBattle.requestMatch(player);
         }
         break;
 
         case 11:
-            gRaceBattle->exitRB(player);
+            GObject::raceBattle.exitRB(player);
         break;
 
         case 12:
         {
             UInt64 defenderId = 0;
             brd >> defenderId;
-            gRaceBattle->attackLevelPlayer(player, defenderId);
+            GObject::raceBattle.attackLevelPlayer(player, defenderId);
         }
         break;
 
@@ -6798,7 +6794,7 @@ void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
         {
             UInt64 defenderId = 0;
             brd >> defenderId;
-            gRaceBattle->attackContinueWinPlayer(player, defenderId);
+            GObject::raceBattle.attackContinueWinPlayer(player, defenderId);
         }
         break;
 
@@ -7149,7 +7145,10 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 10:
         {
-            player->GetMoFang()->changeMoney(opt);               
+            UInt16 num = 0;
+
+            br >> num;
+            player->GetMoFang()->changeMoney(num, opt);               
         }
         break;
     case 12:
@@ -7161,6 +7160,467 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         }
         break;
 
+    }
+}
+
+void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
+{
+    UInt32 now = TimeUtil::Now();
+    if(GVAR.GetVar(GVAR_KANGJITIANMO_BEGIN) > now || GVAR.GetVar(GVAR_KANGJITIANMO_END) < now)
+        return;
+
+    MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+
+    if(opt >= 0x10 && opt <= 0x17)
+    {
+        if(player->getLocation() != 4100) 
+            return;
+
+        if(player->isJumpingMap())
+            return;
+    }
+
+    switch(opt)
+    {
+    case 0x00:
+        {
+            UInt8 type = 0;
+            br >> type;
+            switch(type)
+            {
+            case 0x00:
+                {
+                    KJTMManager->GetKJTMStatus(player);
+                }
+                break;
+            case 0x01:
+                {
+                    KJTMManager->GetKJTMData(player);
+                }
+                break;
+            }
+        }
+        break;
+    case 0x01:
+        {
+            UInt32 status = player->GetVar(VAR_KJTM_STATUS);
+            UInt8 mark = GET_BIT(status, 0);
+            if(1 == mark)
+                return;
+
+            UInt8 type = 0;
+            br >> type;
+
+            switch(type)
+            {
+            case 0x00:
+                {
+                    player->SetCurType(1);
+                    player->SendFriendsA(type);
+                }
+                break;
+            case 0x01:
+                {
+                    player->SetCurType(2);
+                    UInt8 page = 1;
+                    struct ClanInactive
+                    {
+                        UInt8 type;
+                        UInt8 curPage;
+                    };
+                    ClanInactive ci = {type, page};
+                    GameMsgHdr hdr(0x191, WORKER_THREAD_WORLD, player, sizeof(ci));
+                    GLOBAL().PushMsg(hdr, &ci);
+                }
+                break;
+            case 0x02:
+                {
+                    player->SetCurType(3);
+                    KJTMManager->RandInactiveMember(player, type);
+                }
+                break;
+            case 0x03:
+                {
+                    if(player->GetCurPageA() > 1)
+                    {
+                        UInt8 page = player->GetCurPageA()-1;
+                        if(1 == player->GetCurType())
+                             player->SendInactiveSort(type, page);
+                        else if(2 == player->GetCurType())
+                        {
+                            struct ClanInactive
+                            {
+                                UInt8 type;
+                                UInt8 curPage;
+                            };
+                            ClanInactive ci = {type, page};
+                            GameMsgHdr hdr(0x191, WORKER_THREAD_WORLD, player, sizeof(ci));
+                            GLOBAL().PushMsg(hdr, &ci);
+
+                        }
+                    }
+                }
+                break;
+            case 0x04:
+                {
+                    if(player->GetCurPageA() > 0)
+                    {
+                        UInt8 page = player->GetCurPageA()+1;
+                        if(1 == player->GetCurType())
+                             player->SendInactiveSort(type, page);
+                        else if(2 == player->GetCurType())
+                        {
+                            struct ClanInactive
+                            {
+                                UInt8 type;
+                                UInt8 curPage;
+                            };
+                            ClanInactive ci = {type, page};
+                            GameMsgHdr hdr(0x191, WORKER_THREAD_WORLD, player, sizeof(ci));
+                            GLOBAL().PushMsg(hdr, &ci);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        break;
+    case 0x02:
+        {
+            UInt32 status = player->GetVar(VAR_KJTM_STATUS);
+            UInt8 mark = GET_BIT(status, 0);
+            if(0 == mark)
+                return;
+
+            if(NULL != player->getTeamMemberData())
+                return;
+
+            UInt8 type = 0;
+            br >> type;
+            switch(type)
+            {
+            case 0x00:
+                {
+                    player->SetCurType(1);
+                    player->SendFriendsB(type);
+                }
+                break;
+            case 0x01:
+                {
+                    player->SetCurType(2);
+                    UInt8 page = 1;
+                    struct ClanActive
+                    {
+                        UInt8 type;
+                        UInt8 curPage;
+                    };
+                    ClanActive ca = {type, page};
+                    GameMsgHdr hdr(0x192, WORKER_THREAD_WORLD, player, sizeof(ca));
+                    GLOBAL().PushMsg(hdr, &ca);
+                }
+                break;
+            case 0x02:
+                {
+                    player->SetCurType(3);
+                    player->SendGoback(type);
+                }
+                break;
+            case 0x03:
+                {
+                    if(player->GetCurPageA() > 1)
+                    {
+                        UInt8 page = player->GetCurPageA()-1;
+                        if(1 == player->GetCurType())
+                             player->SendActiveSort(type, page);
+                        else if(2 == player->GetCurType())
+                        {
+                            struct ClanActive
+                            {
+                                UInt8 type;
+                                UInt8 curPage;
+                            };
+                            ClanActive ca = {type, page};
+                            GameMsgHdr hdr(0x192, WORKER_THREAD_WORLD, player, sizeof(ca));
+                            GLOBAL().PushMsg(hdr, &ca);
+                        }
+                    }
+                }
+                break;
+            case 0x04:
+                {
+                    if(player->GetCurPageA() > 0)
+                    {
+                        UInt8 page = player->GetCurPageA()+1;
+                        if(1 == player->GetCurType() || 3 == player->GetCurType())
+                             player->SendActiveSort(type, page);
+                        else if(2 == player->GetCurType())
+                        {
+                            struct ClanActive
+                            {
+                                UInt8 type;
+                                UInt8 curPage;
+                            };
+                            ClanActive ca = {type, page};
+                            GameMsgHdr hdr(0x192, WORKER_THREAD_WORLD, player, sizeof(ca));
+                            GLOBAL().PushMsg(hdr, &ca);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        break;
+    case 0x03:
+        {
+            UInt64 inviteeId = 0;
+            br >> inviteeId;
+            if(inviteeId > 0)
+            {
+                Player* invitee = globalPlayers[inviteeId];
+                if (NULL == invitee)
+                    return;
+
+                UInt8 threadId = invitee->getThreadId();
+                if(threadId == player->getThreadId())
+                {
+                    if(invitee->CheckGoback(player->getId()))
+                        invitee->AddGoback(player->getId());
+                }
+                else
+                {
+                    GameMsgHdr hdr(0x33A, threadId, invitee, sizeof(Player *));
+                    GLOBAL().PushMsg(hdr, &player);
+                }
+            }
+        }
+        break;
+    case 0x04:
+        {
+            if(NULL != player->getTeamMemberData())
+            {
+                player->sendMsgCode(1, 8016);
+                return;
+            }
+
+            UInt64 leaderId = 0;
+            br >> leaderId;
+            if(leaderId > 0)
+            {
+                Player* leader = globalPlayers[leaderId];
+                if (NULL == leader)
+                    return;
+
+                UInt8 threadId = leader->getThreadId();
+                if(threadId == player->getThreadId())
+                {
+                    if(leader->CheckApplyList(player->getId()))
+                        leader->AddApplyList(player->getId());
+                }
+                else
+                {
+                    GameMsgHdr hdr(0x33B, threadId, leader, sizeof(Player *));
+                    GLOBAL().PushMsg(hdr, &player);
+                }
+            }
+        }
+        break;
+    case 0x05:
+        {
+            UInt8 type = 0;
+            br >> type;
+            switch(type)
+            {
+            case 0x00:
+                {
+                    player->SendApplyList(type);
+                }
+                break;
+            case 0x01:
+                {
+                    if(player->GetCurPageA() > 1)
+                        player->SendApplyList(type, player->GetCurPageA()-1);
+                }
+                break;
+            case 0x02:
+                {
+                    if(player->GetCurPageA() > 0)
+                        player->SendApplyList(type, player->GetCurPageA()+1);
+                }
+                break;
+            }
+        }
+        break;
+    case 0x06:
+        {
+            UInt64 applicantId = 0;
+            br >> applicantId;
+            if(applicantId > 0)
+                player->AcceptApply(applicantId);
+        }
+        break;
+    case 0x07:
+        {
+            UInt64 applicantId = 0;
+            br >> applicantId;
+            if(applicantId > 0)
+                player->RefuseApply(applicantId);
+        }
+        break;
+    case 0x08:
+        {
+            KJTMManager->LeaveTeamMember(player);
+        }
+        break;
+    case 0x09:
+        {
+            UInt64 memberId = 0;
+            br >> memberId;
+            if(memberId > 0)
+            {
+                GObject::Player* member = GObject::globalPlayers[memberId];
+                KJTMManager->TeamMemberKick(player, member);
+            }
+        }
+        break;
+    case 0x10:
+        {
+            KJTMManager->GetKillNPCStatus(player);
+        }
+        break;
+    case 0x11:
+        {
+            UInt8 index = 0;
+            br >> index;
+            KJTMManager->CreateBattleRoom(player, index);
+        }
+        break;
+    case 0x12:
+        {
+            KJTMManager->InviteTeamMember(player);
+        }
+        break;
+    case 0x13:
+        {
+            UInt64 leaderId = 0;
+            br >> leaderId;
+            KJTMManager->JoinBattleRoom(player, leaderId);
+        }
+        break;
+    case 0x14:
+        {
+            KJTMManager->LeaveBattleRoom(player);
+        }
+        break;
+    case 0x15:
+        {
+            KJTMManager->DismissBattleRoom(player);
+        }
+        break;
+     case 0x16:
+        {
+            KJTMManager->NoticeBattle(player);
+        }
+        break;
+    case 0x17:
+        {
+            KJTMManager->StartBattle(player);
+        }
+        break;
+    case 0x1A:
+        {
+            if(NULL != player->getTeamMemberData())
+                return;
+
+            std::string name;
+            br >> name;
+            GObject::Player* leader = GObject::globalNamedPlayers[player->fixName(name)];
+            if(NULL == leader)
+            {
+                player->sendMsgCode(1, 1506);
+                return;
+            }
+            
+            UInt32 status = leader->GetVar(VAR_KJTM_STATUS);
+            UInt8 mark = GET_BIT(status, 0);
+            if(1 == mark)
+            {
+                player->sendMsgCode(1, 8013);
+                return;
+            }
+
+            UInt8 threadId = leader->getThreadId();
+            if(threadId == player->getThreadId())
+            {
+                leader->ApplyToName(player);
+            }
+            else
+            {
+                GameMsgHdr hdr(0x33C, threadId, leader, sizeof(Player *));
+                GLOBAL().PushMsg(hdr, &player);
+            }
+        }
+        break;
+    case 0x1B:
+        {
+            if(NULL == player->getTeamMemberData())
+                return;
+
+            std::string name;
+            br >> name;
+            GObject::Player* member = GObject::globalNamedPlayers[player->fixName(name)];
+            if(NULL == member)
+            {
+                player->sendMsgCode(1, 1506);
+                return;
+            }
+            
+            UInt32 status = member->GetVar(VAR_KJTM_STATUS);
+            UInt8 mark = GET_BIT(status, 0);
+            if(0 == mark)
+            {
+                player->sendMsgCode(1, 8015);
+                return;
+            }
+
+            UInt8 threadId = member->getThreadId();
+            if(threadId == player->getThreadId())
+            {
+                member->InviteToName(player);
+            }
+            else
+            {
+                GameMsgHdr hdr(0x33D, threadId, member, sizeof(Player *));
+                GLOBAL().PushMsg(hdr, &player);
+            }
+        }
+        break;
+    case 0x1C:
+        {
+            UInt64 leaderId = 0;
+            br >> leaderId;
+            if(leaderId > 0)
+            {
+                Player* leader = globalPlayers[leaderId];
+                if (NULL == leader)
+                    return;
+
+                UInt8 threadId = leader->getThreadId();
+                if(threadId == player->getThreadId())
+                {
+                    leader->AcceptApply(player->getId());
+                }
+                else
+                {
+                    GameMsgHdr hdr(0x33E, threadId, leader, sizeof(Player *));
+                    GLOBAL().PushMsg(hdr, &player);
+                }
+            }
+        }
+        break;
     }
 }
 

@@ -166,7 +166,6 @@ MSG_REG_2(GameMsgHdr, REQ::MO_BAO, OnMoBaoReq);
 MSG_REG_2(GameMsgHdr, REQ::NEWRELATION, OnNewRelationReq);
 MSG_REG_2(GameMsgHdr, REQ::SKILLSTRENGTHEN, OnSkillStrengthen);
 
-MSG_REG_2(GameMsgHdr, REQ::RACE_BATTLE, OnActivityList);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_REWARD,OnActivityReward);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_SIGNIN, OnActivitySignIn);
 MSG_REG_2(GameMsgHdr, REQ::STRENGTHEN_LIST, OnMakeStrong);
@@ -211,6 +210,7 @@ MSG_REG_2(GameMsgHdr, REQ::CLAN_SPIRIT_TREE, OnClanSpiritTree);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq2);
 MSG_REG_2(GameMsgHdr, REQ::MARRYBOARD, OnMarryBoard2);
+MSG_REG_2(GameMsgHdr, REQ::KANGJITIANMO_REQ, OnKangJiTianMoReq);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -410,6 +410,12 @@ MSG_REG_2(GameMsgHdr, 0x337, OnTeamArenaUseGold);
 MSG_REG_2(GameMsgHdr, 0x338, OnGetTeamArenaMoney);
 MSG_REG_2(GameMsgHdr, 0x339, OnTeamArenaInspire);
 
+MSG_REG_2(GameMsgHdr, 0x33A, OnInviteGoback);
+MSG_REG_2(GameMsgHdr, 0x33B, OnApplyJoin);
+MSG_REG_2(GameMsgHdr, 0x33C, OnApplyToName);
+MSG_REG_2(GameMsgHdr, 0x33D, OnInviteToName);
+MSG_REG_2(GameMsgHdr, 0x33E, OnAcceptApply);
+
 MSG_REG_2(GameMsgHdr, 0x350, OnGGBeTeam);
 MSG_REG_2(GameMsgHdr, 0x351, OnGGTeamPlayerLeave);
 
@@ -426,7 +432,6 @@ MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
 MSG_REG_2(GameMsgHdr, 0x362, OnBePrayed);
 MSG_REG_2(GameMsgHdr, 0x363, OnBePresented);
-MSG_REG_2(GameMsgHdr, 0x364, OnDoStrongInWorld);
 MSG_REG_2(GameMsgHdr, 0x365, OnSend11GradeInfo);
 MSG_REG_2(GameMsgHdr, 0x366, OnRunFriendlyCompass);
 //MSG_REG_2(GameMsgHdr, 0x367, OnBeEatLingGuo);

@@ -926,6 +926,9 @@ CREATE TABLE `player` (
   `openid` varchar(1024) NOT NULL DEFAULT '',
   `canHirePet` varchar(2048) NOT NULL DEFAULT '',
   `dungeonCnt1` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `xjfrontFreeCnt` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `xjfrontGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `xjfrontUpdate` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
   KEY `mainFighter` (`mainFighter`)
@@ -1238,7 +1241,7 @@ CREATE TABLE `strengthenData` (
    `overTime` int(10) unsigned NOT NULL,
    `souls`  int(10) unsigned NOT NULL,
    `soulId` tinyint(3) unsigned NOT NULL,
-   `flags`  varchar(255) NOT NULL DEFAULT '',
+   `flags`  varchar(1024) NOT NULL DEFAULT '',
    `greenBox`  varchar(255) NOT NULL DEFAULT '',
    `blueBox`  varchar(255) NOT NULL DEFAULT '',
    `purpleBox`  varchar(255) NOT NULL DEFAULT '',
@@ -2446,6 +2449,60 @@ CREATE TABLE `duobaolog` (
   `cnt` tinyint(10) unsigned NOT NULL DEFAULT '0',
   `time` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `inactivemember`;
+CREATE TABLE `inactivemember` (
+   `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `invitegoback`;
+CREATE TABLE `invitegoback` (
+   `inviteeId` bigint(20) unsigned NOT NULL DEFAULT '0',
+   `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    unique KEY invitee_player_id(`inviteeId`,`playerId`),
+    INDEX (`inviteeId`),
+    INDEX (`playerId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `applylist`;
+CREATE TABLE `applylist` (
+   `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+   `applicantId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    unique KEY player_applicant_id(`playerId`,`applicantId`),
+    INDEX (`playerId`),
+    INDEX (`applicantId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `teammember`;
+CREATE TABLE `teammember` (
+   `teamId` int(10) unsigned NOT NULL DEFAULT '0',
+   `member1` bigint(20) unsigned NOT NULL DEFAULT '0',
+   `member2` bigint(20) unsigned NOT NULL DEFAULT '0',
+   `member3` bigint(20) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`teamId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `player_xjfrontmap`;
+CREATE TABLE `player_xjfrontmap` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `id` tinyint(3) unsigned NOT NULL,
+  `spot` tinyint(3) unsigned NOT NULL,
+  `count` tinyint(3) unsigned NOT NULL,
+  `status` tinyint(3) unsigned NOT NULL,
+  `lootlvl` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  UNIQUE KEY `player_id_spot` (`playerId`,`id`, `spot`),
+  KEY `playerIdId` (`playerId`, `id`),
+  KEY `playerId` (`playerId`),
+  KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `auto_xjfrontmap`;
+CREATE TABLE `auto_xjfrontmap` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `id` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `zhenyuanAttr`;
 CREATE TABLE `zhenyuanAttr` (

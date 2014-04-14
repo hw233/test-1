@@ -20,14 +20,10 @@
 
 namespace GObject
 {
-    RaceBattle* gRaceBattle = NULL;
     static UInt8 gPerLeveCnt[] = {2, 3, 4, 5, 7};
+    UInt8 RaceBattle::_status = 0;
     RBSortType RaceBattle::_levelStarSort[5];
     RBSortType RaceBattle::_contineWinSort;
-
-    RaceBattle::RaceBattle() : _status(0)
-    {
-    }
 
     void raceBattleBroadcast(UInt8 type, UInt32 lefttime)
     {
@@ -258,7 +254,7 @@ namespace GObject
         Int32 rank;
         RBSortType::reverse_iterator rstart;
         RBSortType& starSort = _levelStarSort[level - 1];
-        UInt8 totalCnt = 0;
+        UInt16 totalCnt = 0;
         for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
             totalCnt += pl->getStarCnt(i);
         if(totalCnt == 0)
@@ -448,7 +444,7 @@ namespace GObject
             RBSortType& levelSort = _levelStarSort[i - 1];
             for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
             {
-                ++rank; 
+                ++rank;
                 if(rank > 50)
                     return;
                 awardLevelRankOne(it->player, rank);
@@ -632,7 +628,7 @@ namespace GObject
             insertContinueWinSort(pl);
         }
 
-        UInt8 starCnt = pl->getStarCnt(offset - 1) + starAdd;
+        UInt16 starCnt = pl->getStarCnt(offset - 1) + starAdd;
         if(starCnt < 6)
             pl->setStarCnt(offset - 1, starCnt);
         else
@@ -641,7 +637,7 @@ namespace GObject
             UInt8 canContinueCnt = pl->getCanContinueCnt();
             pl->setCanContinueCnt(++canContinueCnt);
         }
-        UInt8 starTotal = pl->getStarTotal();
+        UInt16 starTotal = pl->getStarTotal();
         pl->setStarTotal(starTotal + starAdd);
         eraseLevelStarSort(pl, level);
         GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pl->getRaceBattlePos());
@@ -716,13 +712,13 @@ namespace GObject
                 starAdd += 6;
         }
 
-        UInt8 starCnt = pl->getStarCnt(offset - 1) + starAdd;
+        UInt16 starCnt = pl->getStarCnt(offset - 1) + starAdd;
         if(starCnt < 6)
             pl->setStarCnt(offset - 1, starCnt);
         else
             pl->setStarCnt(offset - 1, 6);
 
-        UInt8 starTotal = pl->getStarTotal();
+        UInt16 starTotal = pl->getStarTotal();
         pl->setStarTotal(starTotal + starAdd);
         eraseLevelStarSort(pl, level);
         GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pl->getRaceBattlePos());

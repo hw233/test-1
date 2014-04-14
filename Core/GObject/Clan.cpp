@@ -34,6 +34,7 @@
 #include <mysql.h>
 #include <sstream>
 #include "GObject/ClanBoss.h"
+#include "KangJiTianMo.h"
 #include "ClanBuilding.h"
 
 namespace GObject
@@ -3782,9 +3783,10 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
 
         GameMsgHdr hdr1(0x312, pl->getThreadId(), pl, sizeof(skillId));
         GLOBAL().PushMsg(hdr1, &skillId);
-        UInt8 strongId = SthSkillUp;
-        GameMsgHdr hdr2(0x364, pl->getThreadId(), pl, sizeof(strongId));
-        GLOBAL().PushMsg(hdr2, &strongId);
+        stActivityMsg msg;
+        msg.id = SthSkillUp;
+        GameMsgHdr hdr2(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
+        GLOBAL().PushMsg(hdr2, &msg);
 
     } while(false);
 
@@ -4581,9 +4583,6 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                 if(needTeal > 0)
                     addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_tael, needTeal, now);
                 m_spiritTree.m_exp += 100;
-                UInt8 strongId = SthClanSpirit;
-                GameMsgHdr hdr1(0x364, pl->getThreadId(), pl, sizeof(strongId));
-                GLOBAL().PushMsg(hdr1, &strongId);
                 addMemberActivePoint_nolock(pl, 1, e_clan_actpt_none);
                 while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
                 {
@@ -4600,6 +4599,10 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                 }
                 writeSptrToDB();
                 pl->udpLog("shenmozhishu", clansptr_udp_tael[idx], "", "", "", "", "act");
+                stActivityMsg msg;
+                msg.id = SthClanSpirit;
+                GameMsgHdr hdr(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
+                GLOBAL().PushMsg(hdr, &msg);
             }
         }
         else
@@ -5309,6 +5312,11 @@ void Clan::DuoBaoStart(Player * pl)
     st << Stream::eos;
     pl->send(st);
     DuoBaoUpdate(pl->getName(), score);
+
+    stActivityMsg msg;
+    msg.id = SthDuoBao;
+    GameMsgHdr hdr(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
+    GLOBAL().PushMsg(hdr, &msg);
 }
 
 void Clan::SendDuoBaoAward()
@@ -5667,6 +5675,228 @@ void Clan::ClearTYSSScore()
 {
     if(TYSSScoreSort.size() > 0)
         TYSSScoreSort.clear();
+}
+
+void Clan::SendClanFriendsA(Player* pl, UInt8 type, UInt8 page)
+{
+	Mutex::ScopedLock lk(_mutex);
+	ClanMember * mem = NULL;
+	Members::iterator offset;
+    ClearInactiveSort();
+
+	for(offset = _members.begin(); offset != _members.end(); ++offset)
+	{
+		mem = *offset;
+        if(!mem)
+            continue;
+        if(!mem->player)
+            continue;
+        if(NULL != mem->player->getTeamMemberData())
+            continue;
+
+        UInt32 status = mem->player->GetVar(VAR_KJTM_STATUS);
+        UInt8 mark = GET_BIT(status, 0);
+        if(1 == mark)
+            SetInactiveSort(mem->player);
+	}
+    SendInactiveSort(pl, type, page);
+}
+
+void Clan::SendClanFriendsB(Player* pl, UInt8 type, UInt8 page)
+{
+	Mutex::ScopedLock lk(_mutex);
+	ClanMember * mem = NULL;
+	Members::iterator offset;
+    ClearActiveSort();
+
+	for(offset = _members.begin(); offset != _members.end(); ++offset)
+	{
+		mem = *offset;
+        if(!mem)
+            continue;
+        if(!mem->player)
+            continue;
+        if(NULL == mem->player->getTeamMemberData())
+            continue;
+        UInt32 status = mem->player->GetVar(VAR_KJTM_STATUS);
+        UInt8 mark = GET_BIT(status, 0);
+        if(0 == mark)
+            SetActiveSort(mem->player);
+	}
+    SendActiveSort(pl, type, page);
+}
+
+bool Clan::IsClanFriends(Player* pl)
+{
+	ClanMember * mem = NULL;
+	Members::iterator offset;
+	for(offset = _members.begin(); offset != _members.end(); ++offset)
+    {    
+		mem = *offset;
+        if(!mem)
+            continue;
+        if(!mem->player)
+            continue;
+        if(mem->player == pl)
+            return true;
+	}
+    return false;
+}
+
+
+void Clan::SetInactiveSort(Player* pl)
+{
+    if(NULL == pl)
+        return;
+
+    InactiveSort s;
+    s.player = pl;
+    s.level = pl->GetLev();
+    s.power = pl->GetVar(VAR_TOTAL_BATTLE_POINT);
+    s.time = TimeUtil::Now(); 
+    _CommonSort.insert(s);
+}
+        
+void Clan::SendInactiveSort(Player* pl, UInt8 type, UInt8 curPage)
+{
+    if(NULL == pl)
+        return;
+
+    if(0 == curPage)
+        return;
+
+    UInt8 cnt = _CommonSort.size();
+    UInt8 totalPage = 0;
+    if(0 == cnt)
+        totalPage = 1;
+    else if(0 == cnt % 10)
+        totalPage = cnt / 10;
+    else
+        totalPage = cnt / 10 + 1;
+
+    if(curPage < totalPage)
+        cnt = 10;
+    else if(curPage == totalPage)
+        cnt = cnt - (curPage - 1) * 10;
+    else
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x01);
+    st << type;
+    st << totalPage << curPage << cnt;
+    UInt8 c = 0;
+    UInt8 c1 = 0;
+    for(InactiveSortType::iterator i = _CommonSort.begin(), e = _CommonSort.end(); i != e; ++i)
+    {
+        if(NULL == i->player)
+            continue;
+
+        if((c>=(curPage-1)*10) && (c<=(curPage*10)))
+        {
+            st << i->player->getId();
+            st << i->player->getCountry();
+            st << i->player->getName();
+            st << i->level;
+            st << i->power;
+            st << i->player->getOpenId();
+            st <<  static_cast<UInt8>(i->player->GetVar(VAR_FRIEND_SECURITY));
+            c1++;
+        }
+        c++;
+        if(c1 >= 10)
+            break;
+    }
+    st << Stream::eos;
+    pl->send(st);
+
+    pl->SetCurPageA(curPage);
+}
+
+void Clan::ClearInactiveSort()
+{
+    if(_CommonSort.size() > 0)
+        _CommonSort.clear();
+}
+
+void Clan::SetActiveSort(Player* pl)
+{
+    if(NULL == pl)
+        return;
+
+    ActiveSort s;
+    s.player = pl;
+    s.power = pl->GetVar(VAR_TOTAL_BATTLE_POINT);
+    if(pl->isOnline())
+        s.isOnline = 1;
+    else
+        s.isOnline = 0;
+    s.time = TimeUtil::Now(); 
+
+    _ActiveSort.insert(s);
+}
+
+void Clan::SendActiveSort(Player* pl, UInt8 type, UInt8 curPage)
+{
+    if(NULL == pl)
+        return;
+
+    if(0 == curPage)
+        return;
+    
+    UInt8 cnt = _ActiveSort.size();
+    UInt8 totalPage = 0;
+    if(0 == cnt)
+        totalPage = 1;
+    else if(0 == cnt % 7)
+        totalPage = cnt / 7;
+    else
+        totalPage = cnt / 7 + 1;
+
+    if(curPage < totalPage)
+        cnt = 7;
+    else if(curPage == totalPage)
+        cnt = cnt - (curPage - 1) * 7;
+    else
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x02);
+    st << type;
+    st << totalPage << curPage << cnt;
+    UInt8 c = 0;
+    UInt8 c1 = 0;
+    for(ActiveSortType::iterator i = _ActiveSort.begin(), e = _ActiveSort.end(); i != e; ++i)
+    {
+        if(NULL == i->player)
+            continue;
+
+        if((c>=(curPage-1)*7) && (c<=(curPage*7)))
+        {
+            st << i->player->getId();
+            st << i->player->getCountry();
+            st << i->player->getName();
+            st << i->power;
+            UInt8 isOnline = 0;
+            if(i->player->isOnline())
+                isOnline = 1;
+            st << isOnline;
+            c1++;
+        }
+        c++;
+        if(c1 >= 7)
+            break;
+    }
+    st << Stream::eos;
+    pl->send(st);
+
+    pl->SetCurPageA(curPage);
+}
+
+void Clan::ClearActiveSort()
+{
+    if(_ActiveSort.size() > 0)
+        _ActiveSort.clear();
 }
 
 void Clan::SetClanTitle(std::string clantitleAll)

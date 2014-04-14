@@ -3436,6 +3436,11 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_CLAN_DUOBAO_STATUS, 0);
             }
             break;
+        case 19:
+            {
+                pl->ClearKJTMData();
+            }
+            break;
         case 20:
             {
                 //todo 天元神兽
@@ -3977,6 +3982,30 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_DUOBAO_ENDTIME, valueTime);
 
         return;
+    }
+    else if(type == 19 && begin <= end)
+    {
+         ret = 1;
+         Stream st(SPEP::ACTIVITYONOFF);
+         st << ret << Stream::eos;
+         NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
+         curType = 19;
+         {
+              GObject::globalPlayers.enumerate(player_enum_2, &curType);
+
+              DB5().PushUpdateData("DELETE FROM `inactivemember`");
+              DB5().PushUpdateData("DELETE FROM `applylist`");
+              DB5().PushUpdateData("DELETE FROM `invitegoback`");
+              DB5().PushUpdateData("DELETE FROM `teammember`");
+
+              GObject::KJTMManager->ClearInactiveMember();
+              GObject::KJTMManager->AddInactiveMember();
+         }
+
+         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_BEGIN, begin);
+         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_END, end);
+         return;
     }
     else if (type == 20 && begin <= end )
     {

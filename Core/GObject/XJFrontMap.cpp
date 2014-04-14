@@ -238,6 +238,7 @@ namespace GObject
             st << static_cast<UInt8>(1);//璇玑阵图信息
             st << static_cast<UInt8>(3) << count << Stream::eos;
             pl->send(st);
+            GameAction()->doStrong(pl, SthXuanjiFront, 0 ,0 );
         } else {
             sendInfo2(pl, id, false);
         }
