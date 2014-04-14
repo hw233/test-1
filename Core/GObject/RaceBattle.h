@@ -5,11 +5,6 @@ namespace GObject
 {
 #define RACEBATTLE_LOCATION 0xFFFF
 
-enum AttackType {
-    eLevelAttack = 1,
-    eContinueWinAttack
-};
-
 struct TSort
 {
     Player* player;
@@ -45,7 +40,7 @@ class RaceBattle
         void sendContinueWinSort(Player* player, UInt8 page);
         void sendBattleInfo(Player* pl);
         void sendMatchPlayer(Player* pl, Player* matchPlayer);
-        void attackPlayer(Player* pl, Player* matchPlayer, AttackType type);
+        UInt8 attackPlayer(Player* pl, Player* matchPlayer);
         void awardLevelRank();
         void awardContinueWinRank();
         void awardLevelRankOne(Player* pl, UInt8 rank);
@@ -54,6 +49,8 @@ class RaceBattle
         void exitRB(Player* pl);
         void attackLevelPlayer(Player* pl, UInt64 defenderId);
         void attackContinueWinPlayer(Player* pl, UInt64 defenderId);
+        void insertContinueWinSort(Player* pl);
+        void eraseContinueWinSort(Player* pl);
 
     private:
         UInt8 _status; //0（未开启），1（17：50~20：00），2（20：00~20：30）

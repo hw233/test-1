@@ -396,19 +396,20 @@ namespace GObject
         pl->send(st);
     }
 
-    void RaceBattle::attackPlayer(Player* pl, Player* matchPlayer, AttackType type)
+    //return value: 0-invalid,1-win,2-lose
+    UInt8 RaceBattle::attackPlayer(Player* pl, Player* matchPlayer)
     {
         if(!pl || !matchPlayer)
-            return;
+            return 0;
         if(pl->getExitCd() > TimeUtil::Now())
         {
             pl->sendMsgCode(0, 4019);
-            return;
+            return 0;
         }
         if(pl->getBuffData(PLAYER_BUFF_ATTACKING))
         {
             pl->sendMsgCode(0, 1407);
-            return;
+            return 0;
         }
 		pl->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + 3);
 
@@ -436,72 +437,7 @@ namespace GObject
         stReport.reportId = reptid;
         pl->insertPlayerRecord(stReport);
 
-        UInt8 starAdd;
-        if(res)
-        {
-            starAdd = 2;
-            if(type == eLevelAttack)
-                pl->setContinueWinCnt(pl->getContinueWinCnt() + 1);
-            else
-            {
-                UInt8 contineWinCnt = matchPlayer->getContinueWinCnt();
-                if(contineWinCnt < 3)
-                {
-                }
-                else if(contineWinCnt < 10)
-                    starAdd += 1;
-                else if(contineWinCnt < 20)
-                    starAdd += 2;
-                else if(contineWinCnt < 30)
-                    starAdd += 4;
-                else
-                    starAdd += 6;
-            }
-        }
-        else
-        {
-            starAdd = 1;
-            if(type == eLevelAttack)
-                pl->setContinueWinCnt(0);
-        }
-
-        UInt8 pos = pl->getRaceBattlePos();
-        UInt8 level = pos / 10;
-        UInt8 offset = pos % 10;
-        if(level == 0 || level > 5)
-            return;
-        if(offset == 0)
-            return;
-        if(offset > gPerLeveCnt[level - 1])
-            return;
-
-        UInt8 starCnt = pl->getStarCnt(offset - 1) + starAdd;
-        if(starCnt < 6)
-            pl->setStarCnt(offset - 1, starCnt);
-        else
-        {
-            pl->setStarCnt(offset - 1, 6);
-            UInt8 canContinueCnt = pl->getCanContinueCnt();
-            pl->setCanContinueCnt(++canContinueCnt);
-        }
-        UInt8 starTotal = pl->getStarTotal();
-        pl->setStarTotal(starTotal + starAdd);
-        eraseLevelStarSort(pl, level);
-        if(rb && starCnt >= rb->next * 2)
-        {
-            UInt8 pos = (level + 1) * 10;
-            enterPos(pl, pos);
-        }
-        else
-        {
-            TSort tsort;
-            tsort.player = pl;
-            tsort.total = starCnt;
-            tsort.time = TimeUtil::Now();
-            _levelStarSort[level - 1].insert(tsort);
-            if(type == eLevelAttack)
-                sendContinueWinSort(pl, pl->getContinueWinPage());
-        }
+        return res ? 1 : 2;
     }
 
     void RaceBattle::awardLevelRank()
@@ -668,18 +604,63 @@ namespace GObject
             return;
         if(offset > gPerLeveCnt[level - 1])
             return;
-
         Player* defender = globalPlayers[defenderId];
         if(!defender)
             return;
-
         if(pl->getStarCnt(offset - 1) >= 6)
         {
             pl->sendMsgCode(0, 4018);
             return;
         }
 
-        attackPlayer(pl, defender, eLevelAttack);
+        UInt8 res = attackPlayer(pl, defender);
+        if(res == 0)
+            return;
+
+        UInt8 starAdd;
+        if(res == 1)
+        {
+            starAdd = 2;
+            eraseContinueWinSort(pl);
+            pl->setContinueWinCnt(0);
+        }
+        else
+        {
+            starAdd = 1;
+            eraseContinueWinSort(pl);
+            pl->setContinueWinCnt(pl->getContinueWinCnt() + 1);
+            insertContinueWinSort(pl);
+        }
+
+        UInt8 starCnt = pl->getStarCnt(offset - 1) + starAdd;
+        if(starCnt < 6)
+            pl->setStarCnt(offset - 1, starCnt);
+        else
+        {
+            pl->setStarCnt(offset - 1, 6);
+            UInt8 canContinueCnt = pl->getCanContinueCnt();
+            pl->setCanContinueCnt(++canContinueCnt);
+        }
+        UInt8 starTotal = pl->getStarTotal();
+        pl->setStarTotal(starTotal + starAdd);
+        eraseLevelStarSort(pl, level);
+        GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pl->getRaceBattlePos());
+        if(rb && starCnt >= rb->next * 2)
+        {
+            UInt8 pos = (level + 1) * 10;
+            enterPos(pl, pos);
+        }
+        else
+        {
+            TSort tsort;
+            tsort.player = pl;
+            tsort.total = starCnt;
+            tsort.time = TimeUtil::Now();
+            _levelStarSort[level - 1].insert(tsort);
+        }
+        eraseContinueWinSort(pl);
+        insertContinueWinSort(pl);
+        sendContinueWinSort(pl, pl->getContinueWinPage());
     }
 
     void RaceBattle::attackContinueWinPlayer(Player* pl, UInt64 defenderId)
@@ -695,18 +676,105 @@ namespace GObject
             return;
         if(offset > gPerLeveCnt[level - 1])
             return;
-
-        if(pl->getCanContinueCnt() > 0)
+        UInt8 continueCnt = pl->getCanContinueCnt();
+        if(continueCnt > 0)
         {
             pl->sendMsgCode(0, 4020);
             return;
         }
-
         Player* defender = globalPlayers[defenderId];
         if(!defender)
             return;
 
-        attackPlayer(pl, defender, eContinueWinAttack);
+        RBSortType::iterator it;
+        for(it = _contineWinSort.begin(); it != _contineWinSort.end(); ++it)
+        {
+            if(it->player == defender)
+                break;
+        }
+        if(it == _contineWinSort.end())
+            return;
+
+        UInt8 res = attackPlayer(pl, defender);
+        if(res == 0)
+            return;
+
+        UInt8 starAdd = 1;
+        if(res == 1)
+        {
+            UInt8 contineWinCnt = defender->getContinueWinCnt();
+            if(contineWinCnt < 3)
+            {
+            }
+            else if(contineWinCnt < 10)
+                starAdd += 1;
+            else if(contineWinCnt < 20)
+                starAdd += 2;
+            else if(contineWinCnt < 30)
+                starAdd += 4;
+            else
+                starAdd += 6;
+        }
+
+        UInt8 starCnt = pl->getStarCnt(offset - 1) + starAdd;
+        if(starCnt < 6)
+            pl->setStarCnt(offset - 1, starCnt);
+        else
+            pl->setStarCnt(offset - 1, 6);
+
+        UInt8 starTotal = pl->getStarTotal();
+        pl->setStarTotal(starTotal + starAdd);
+        eraseLevelStarSort(pl, level);
+        GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pl->getRaceBattlePos());
+        if(rb && starCnt >= rb->next * 2)
+        {
+            UInt8 pos = (level + 1) * 10;
+            enterPos(pl, pos);
+        }
+        else
+        {
+            TSort tsort;
+            tsort.player = pl;
+            tsort.total = starCnt;
+            tsort.time = TimeUtil::Now();
+            _levelStarSort[level - 1].insert(tsort);
+            eraseContinueWinSort(pl);
+            insertContinueWinSort(pl);
+            sendContinueWinSort(pl, pl->getContinueWinPage());
+        }
+        pl->setCanContinueCnt(--continueCnt);
+        pl->insertChallengePlayer(defender);
+    }
+
+    void RaceBattle::insertContinueWinSort(Player* pl)
+    {
+        if(!pl)
+            return;
+        if(pl->getContinueWinCnt() < 3)
+            return;
+
+        TSort tsort;
+        tsort.player = pl;
+        tsort.total = pl->getContinueWinCnt();
+        tsort.time = TimeUtil::Now();
+        _contineWinSort.insert(tsort);
+    }
+
+    void RaceBattle::eraseContinueWinSort(Player* pl)
+    {
+        if(!pl)
+            return;
+        if(pl->getStarTotal() < 3)
+            return;
+
+        for(RBSortType::iterator it = _contineWinSort.begin(); it != _contineWinSort.end(); ++it)
+        {
+            if(it->player == pl)
+            {
+                _contineWinSort.erase(it);
+                break;
+            }
+        }
     }
 
 }
