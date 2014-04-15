@@ -1238,7 +1238,7 @@ CREATE TABLE `strengthenData` (
    `overTime` int(10) unsigned NOT NULL,
    `souls`  int(10) unsigned NOT NULL,
    `soulId` tinyint(3) unsigned NOT NULL,
-   `flags`  varchar(255) NOT NULL DEFAULT '',
+   `flags`  varchar(1024) NOT NULL DEFAULT '',
    `greenBox`  varchar(255) NOT NULL DEFAULT '',
    `blueBox`  varchar(255) NOT NULL DEFAULT '',
    `purpleBox`  varchar(255) NOT NULL DEFAULT '',

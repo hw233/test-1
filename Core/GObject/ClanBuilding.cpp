@@ -1,5 +1,4 @@
 #include "ClanBuilding.h"
-
 #include "GData/ClanBuildingTable.h"
 #include "Log/Log.h"
 #include "Server/WorldServer.h"
@@ -8,6 +7,9 @@
 #include "MsgID.h"
 #include "Var.h"
 #include "Server/SysMsg.h"
+#include "Script/GameActionLua.h"
+#include "MsgHandler/CountryMsgStruct.h"
+#include "Country.h"
 
 namespace GObject
 {
@@ -558,6 +560,11 @@ namespace GObject
                 st << static_cast<UInt32>(cbbi.battleId);
                 st <<Stream::eos;
                 vec[i]->send(st);
+
+                stActivityMsg msg;
+                msg.id = SthArenaLeft;
+                GameMsgHdr hdr(0x245, vec[i]->getThreadId(), vec[i], sizeof(stActivityMsg));
+                GLOBAL().PushMsg(hdr, &msg);
             }
         }
         if(cbbi.res ==0 && cbbi.type == 1)

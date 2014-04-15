@@ -1384,12 +1384,6 @@ void OnClanSkillLevel( GameMsgHdr& hdr, const void* data )
     player->clanSkillLevelUp(skillId);
     player->setFightersDirty(true);
 }
-void OnWaterSpiritTree( GameMsgHdr& hdr, const void* data )
-{
-    MSG_QUERY_PLAYER(player);
-    //UInt8 skillId = *(UInt8*)(data);
-    player->doStrongInWorld(43);
-}
 
 void OnClanSkillList( GameMsgHdr& hdr, const void* data )
 {
@@ -1514,12 +1508,10 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
     if(co->id == SthTownDeamon)
     {
         player->GuangGunCompleteTask(0,16);
-        if(player->GetVar(VAR_TOWNDEAMON))
-            return;
-        else
+        if(!player->GetVar(VAR_TOWNDEAMON))
             player->SetVar(VAR_TOWNDEAMON, 1);
     }
-    if(co->id == SthAthletics1)
+    else if(co->id == SthAthletics1)
     {
         player->GuangGunCompleteTask(0,26);
         player->getSummerMeetScore(5);
@@ -2489,12 +2481,6 @@ void OnGGTeamPlayerLeave( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
     player->GGTeamPlayerLeave(id);
-}
-void OnDoStrongInWorld( GameMsgHdr &hdr, const void * data)
-{
-    MSG_QUERY_PLAYER(player);
-    UInt8 id = *reinterpret_cast<const UInt64 *>(data); 
-    player->doStrongInWorld(id);
 }
 void OnSend11GradeInfo( GameMsgHdr &hdr, const void * data)
 {

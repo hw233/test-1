@@ -431,7 +431,6 @@ MSG_REG_2(GameMsgHdr, 0x360, OnBeVoted);
 MSG_REG_2(GameMsgHdr, 0x361, OnSendPopularityAward);
 MSG_REG_2(GameMsgHdr, 0x362, OnBePrayed);
 MSG_REG_2(GameMsgHdr, 0x363, OnBePresented);
-MSG_REG_2(GameMsgHdr, 0x364, OnDoStrongInWorld);
 MSG_REG_2(GameMsgHdr, 0x365, OnSend11GradeInfo);
 MSG_REG_2(GameMsgHdr, 0x366, OnRunFriendlyCompass);
 //MSG_REG_2(GameMsgHdr, 0x367, OnBeEatLingGuo);
