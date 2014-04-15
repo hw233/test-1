@@ -66,46 +66,25 @@ namespace GObject
         }
     }
 
-    void RaceBattle::enterPos(Player* pl, UInt8 pos)
+    void RaceBattle::enterPos(Player* pl, UInt8 offset)
     {
         UInt8 origPos = pl->getRaceBattlePos();
-        if(pos == 0)
-        {
-            if(origPos == 0)
-                pos = 10;
-            else
-                pos = origPos;
-        }
-        else
-        {
-            if(origPos == pos)
-                return;
-        }
-
-        UInt8 level = pos / 10;
+        UInt8 level = origPos / 10;
         if(level == 0)
-            return;
+            level = 1;
         if(level > sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]))
             return;
-        UInt8 offset = pos % 10;
         if(offset > gPerLeveCnt[level - 1])
             return;
-        UInt8 origLevel = origPos / 10;
-        if((origLevel == 0 && level == 1) || (origLevel > 0 && origLevel == level))
-        {
-        }
-        else
-        {
-            return;
-        }
 
+        UInt8 pos = level * 10 + offset;
         GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pos);
         if(!rb)
             return;
 
         pl->setRaceBattlePos(pos);
-        if(pl->GetVar(VAR_RCAE_BATTLE_SIGN) == 0)
-            pl->SetVar(VAR_RCAE_BATTLE_SIGN, 1);
+        //if(pl->GetVar(VAR_RCAE_BATTLE_SIGN) == 0)
+        //    pl->SetVar(VAR_RCAE_BATTLE_SIGN, 1);
 
         Stream st(REP::RACE_BATTLE);
         UInt8 type = 2;
@@ -171,6 +150,13 @@ namespace GObject
 
         ++awardlevel;
         pl->setAwardLevel(awardlevel);
+
+        Stream st(REP::RACE_BATTLE);
+        UInt8 type = 8;
+        st << type;
+        st << awardlevel;
+        st << Stream::eos;
+        pl->send(st);
     }
 
     void RaceBattle::readBattleReport(Player* pl, UInt32 reportId)
@@ -290,9 +276,12 @@ namespace GObject
             ++count;
             if(count > 3)
                 break;
-            st << it->player->getName();
+            Player* player = it->player;
+            st << player->getName();
             st << static_cast<UInt32>(rank - count);
             st << it->total;
+            st << player->getCountry();
+            st << player->GetClass();
         }
         st.data<UInt8>(offset) = count;
     }
@@ -342,6 +331,7 @@ namespace GObject
                 break;
             Player* pl = it->player;
             st << pl->getName();
+            st << pl->getId();
             st << pl->getContinueWinCnt();
             st << player->getChallengeStatus(pl) ;
 
