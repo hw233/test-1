@@ -1507,11 +1507,12 @@ SPECIALDEF(11)
     UInt32, payBack
     )
 SPECIALEND()
+
 SPECIALBEGIN(GData::DBDrinkAttrConfig)
 SPECIALDEF(2)
 (
     UInt32 , value,
-    UINt32 , hp
+    UInt32 , hp
 )
 SPECIALEND()
 

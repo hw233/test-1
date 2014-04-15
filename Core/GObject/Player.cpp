@@ -30819,7 +30819,7 @@ bool Player::UseYellowBird(Player * friendOne ,UInt32 num)
 }
 void Player::BuyFriendlyGoods(UInt8 type)
 {
-    if(!GameAction()->RunFriendlyGoods(this, type))
+    if(!GameAction()->RunFriendlyGoods(this, type,1))
     {
         return;
     }

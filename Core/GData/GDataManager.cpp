@@ -1,4 +1,4 @@
-LoadDrinkAttrConfiginclude "Config.h"
+#include "Config.h"
 #include "GDataManager.h"
 #include "Area.h"
 #include "WeaponDef.h"
@@ -2997,7 +2997,7 @@ namespace GData
 		{
             DrinkAttr::stDrinkAttr da;
             da.hp = dbda.hp;
-            drinkAttrData.setDrinkAttrTable(dbda.value);
+            drinkAttrData.setDrinkAttrTable(dbda.value , da);
         }
         return true;
     }
