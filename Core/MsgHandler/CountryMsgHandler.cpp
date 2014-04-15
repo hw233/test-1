@@ -94,6 +94,7 @@ MSG_REG_2(GameMsgHdr, REQ::AUTO_COPY, OnAutoCopy);
 MSG_REG_2(GameMsgHdr, REQ::AUTO_FRONTMAP, OnAutoFrontMap);
 
 MSG_REG_2(GameMsgHdr, REQ::XJFRONTMAP, OnXJFrontMapReq);
+MSG_REG_2(GameMsgHdr, REQ::COLLECTCARD, OnCollectCardReq);
 
 MSG_REG(GameMsgHdr, OnDayTaskAutoCompletedReq);
 MSG_REG(GameMsgHdr, OnQueryAutoCompletedTaskTimeReq);

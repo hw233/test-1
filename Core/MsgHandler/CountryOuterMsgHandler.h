@@ -8488,6 +8488,67 @@ void OnXinMoReq( GameMsgHdr & hdr, const void * data )
     }
 }
 
+void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+     
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt ; 
+
+    switch(opt)
+    {
+        case 1:
+        {
+            UInt8 opt1 = 0;
+            br >> opt1;
+            if(opt1 > 2)
+                return;
+            if(opt1 != 2)
+                player->GetCollectCard()->ReturnCardInfo(opt1);  
+            else
+            {    
+                UInt32 id = 0;
+                UInt8 pos = 0;
+                br >> id >> pos;
+                player->GetCollectCard()->EquipCard(id,pos);
+            }
+
+        }
+            break;
+        case 2:
+        {
+            
+
+        }
+            break;
+        case 4:
+        {
+             UInt32 id = 0;
+             UInt8 len = 0;
+             br >> id >> len;
+             if(id == 0 || len == 0)
+                 return;
+             std::vector<UInt32> vecid;
+             while(len != 0)
+             {
+                 UInt32 id_tmp = 0;
+                 br >> id_tmp; 
+                 vecid.push_back(id_tmp);
+                 -- len;
+             }
+             player->GetCollectCard()->UpGradeCard(id,vecid);
+
+        }
+            break;
+        default:
+            break;
+
+    }
+
+}
+
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

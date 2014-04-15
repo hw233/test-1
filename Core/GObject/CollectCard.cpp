@@ -13,6 +13,8 @@ namespace GObject
     CollectCard::CollectCard(Player* player)
     {
         m_owner = player;
+        VecEquipSlot.resize(5);
+
     }
     
     CollectCard::~CollectCard()
@@ -21,9 +23,21 @@ namespace GObject
 
     bool CardInfo::checkInfo()
     {
-        if(id == 0 || cid == 0 || type == 0 || level == 0)
+        if(this == NULL || id == 0 || cid == 0 || type == 0 || level == 0)
             return false;
 
+        return true;
+    }
+
+    bool SuitCardInfo::checkExistSetBit(UInt8 cid)
+    {
+        UInt8 card_index = cid % 10;
+        if(!GET_BIT(suit_mark,card_index))
+            return false;  
+        
+        suit_mark = SET_BIT(suit_mark,card_index); 
+        //TODO DB
+        
         return true;
     }
 
@@ -42,19 +56,13 @@ namespace GObject
             st << (*i)->id << (*i)->cid << (*i)->level << (*i)->exp;
             ++size;
         }
-
-        if(RoleCard->checkInfo())//人物卡牌
-        {
-            st << static_cast<UInt8>(1) << RoleCard->id << RoleCard->cid << RoleCard->level << RoleCard->exp;
-            ++size;
-        }
         
         if (size)
             st.data<UInt8>(off) = size;
 
         if(flag == 1)//请求追加空闲卡牌信息
         {
-            size_t off1 = st.size();
+            size_t off1 = st.size();//空闲卡牌数
             st << static_cast<UInt8>(0);
             UInt8 size1 = 0;
             for(MSlot::iterator i = MapFreeCardSlot.begin(); i != MapFreeCardSlot.end(); i++)
@@ -67,12 +75,43 @@ namespace GObject
             
             if (size1)
                 st.data<UInt8>(off1) = size1;
+        
+            size_t off2 = st.size();//套牌个数
+            st << static_cast<UInt8>(0);
+            UInt8 size2 = 0;
+            for(MStamp::iterator i = MapCardStamp.begin(); i != MapCardStamp.end(); i++)
+            {
+                if(!ReturnSuitInfo(st,i->second->id))
+                    continue;
+                ++size2;
+            }       
+            
+            if (size2)
+                st.data<UInt8>(off2) = size2;
+    
         } 
 
         st << Stream::eos; 
         m_owner->send(st);
 
         return;
+    }
+
+    bool CollectCard::ReturnSuitInfo(Stream& st,UInt8 suit_lvl)
+    {
+        if(MapCardStamp.find(suit_lvl) == MapCardStamp.end())
+            return false;
+        MStamp::iterator it = MapCardStamp.find(suit_lvl);
+    
+        st << suit_lvl;
+        if(suit_lvl == 20)
+            st << it->second->suit_mark;
+        else
+            st << it->second->spe_mark;
+        
+        st << it->second->active;
+            
+        return true;
     }
 
     void CollectCard::EquipCard(UInt32 id,UInt8 pos)//装备卡牌
@@ -85,40 +124,44 @@ namespace GObject
         
         if(pos == 0)//卸下装备
         {
-            if(VecEquipSlot[pos-1]->id != id)
-                return ;
-            VecEquipSlot[pos-1]->pos = 0;
-            VecEquipSlot.erase(VecEquipSlot.begin() + pos - 1);//
-            //DB
-        }
-        else if(pos <= 4)
+            VecSlot::iterator it = std::find_if(VecEquipSlot.begin(),VecEquipSlot.end(),CardInfo_eq(id));
+            if(it == VecEquipSlot.end())
+                return;
+            
+            (*it)->pos = 0;
+            MapFreeCardSlot.insert(std::make_pair((*it)->id,(*it))); 
+            *it = NULL; 
+            //VecEquipSlot.erase(VecEquipSlot.begin() + pos - 1);//
+            //TODO DB
+        }else if(pos <= 4)
         {
-            if(!VecEquipSlot[pos - 1]->checkInfo())
+            if(VecEquipSlot[pos - 1]->checkInfo())
                 return ;
             
-            CardInfo* ci = VecEquipSlot[pos - 1];
-            if(ci->type != 2 && ci->type != 3)//卡牌类型一定为装备卡牌和特殊卡牌
-                return ;
-
             if(MapFreeCardSlot.find(id) == MapFreeCardSlot.end())
                 return ;
             CardInfo* tmp = (MapFreeCardSlot.find(id))->second;
+            if(tmp->type != 2 && tmp->type != 3)//卡牌类型一定为装备卡牌和特殊卡牌
+                return ;
+            tmp->pos = pos; 
             VecEquipSlot[pos - 1] = tmp;
             MapFreeCardSlot.erase(MapFreeCardSlot.find(id)); 
+            //TODO DB
 
         }else if(pos == 5)
         {
-            if(!RoleCard->checkInfo())
-                return ;
-            
-            if(RoleCard->type != 2 && RoleCard->type != 3)//卡牌类型一定为装备卡牌和特殊卡牌
+            if(VecEquipSlot[pos - 1]->checkInfo())
                 return ;
             
             if(MapFreeCardSlot.find(id) == MapFreeCardSlot.end())
                 return ;
             CardInfo* tmp = (MapFreeCardSlot.find(id))->second;
-            RoleCard = tmp; 
+            if(tmp->type != 1 && tmp->type != 3)//卡牌类型一定为人物卡牌和特殊卡牌
+                return ;
+            tmp->pos = pos; 
+            VecEquipSlot[pos - 1] = tmp; 
             MapFreeCardSlot.erase(MapFreeCardSlot.find(id)); 
+            //TODO DB
         }
         
         st << static_cast<UInt8>(pos) << id ;
@@ -141,8 +184,11 @@ namespace GObject
         return;
     } 
 
-    void CollectCard::UpGradeCard(CardInfo* ci)//卡片升级
+    void CollectCard::UpGradeCard(UInt32 id,std::vector<UInt32>& vecid)//卡片升级
     {
+        
+
+
         return;
     }
 
@@ -202,9 +248,6 @@ namespace GObject
             }
             it++;
         }
-       
-        if(RoleCard->checkInfo())
-            switchAttrFunc(ae,RoleCard->type1,RoleCard->attr_num1);        
 
         return;
     }
@@ -224,12 +267,31 @@ namespace GObject
         if(!ci->checkInfo())
             return false;
         MapFreeCardSlot.insert(std::make_pair(ci->id,ci)); 
-        if(MapCardLog.find(cid/10)->second->id  )
-        //DB
+        
+        if(MapCardStamp.find(cid/10) == MapCardStamp.end())
+        {
+            SuitCardInfo* si = new SuitCardInfo(cid/10);
+            MapCardStamp.insert(std::make_pair(cid/10,si));
+            //TODO DB
+        }
+        SuitCardInfo* tmp = MapCardStamp.find(cid/10)->second;
+        if(!tmp->checkExistSetBit(ci->id))
+            return false;
+        //TODO DB
+        
         return true;
     }
 
+    bool CollectCard::DelAddCard(UInt32 id)
+    {
+        if(MapFreeCardSlot.find(id) == MapFreeCardSlot.end())
+            return false;
+        MSlot::iterator it = MapFreeCardSlot.find(id);   
+        delete it->second;
+        MapFreeCardSlot.erase(it);
 
+        //TODO DB
+    }
 
 
 

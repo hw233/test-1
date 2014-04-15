@@ -79,6 +79,21 @@ namespace GObject
         bool checkInfo();
 
     };
+    
+    class CardInfo_eq
+    {
+        public: 
+            CardInfo_eq(const UInt32& num):id(num){}
+            bool operator() (const CardInfo* c) const
+            {
+                if(!c)
+                    return false;
+                return c->id == id; 
+            }
+        private:
+            UInt32 id;
+
+    };
 
     struct SuitCardInfo
     {
@@ -94,9 +109,10 @@ namespace GObject
             active = num3;
             spe_mark = num4;
         }
+        
+        bool checkExistSetBit(UInt8 cid);
 
-    }
-
+    };
 
     class Player;
 	class Fighter;
@@ -109,6 +125,8 @@ namespace GObject
         ~CollectCard();
 
         void ReturnCardInfo(UInt8 flag);
+        
+        bool ReturnSuitInfo(Stream&,UInt8 suit_lvl);
 
         void EquipCard(UInt32 id,UInt8 pos);//装备卡牌
         
@@ -116,22 +134,22 @@ namespace GObject
         
         void ActiveCardSet(UInt8 set_num);//激活卡组
         
-        void UpGradeCard(CardInfo* ci);//卡片升级
+        void UpGradeCard(UInt32 id,std::vector<UInt32>& vecid);//卡片升级
 
         void AddCardAttr(GData::AttrExtra& ae);//计算增加的属性
 
         void RebuildCardAttr();//重算卡片属性
 
-        bool AddCard(UInt16 cid ,UInt8 type ,EAttrType type1,float attr_num1,EAttrType type2,float attr_num2,UInt16 skill_id);//增加卡牌
+        bool AddCard(UInt16 cid ,UInt8 type ,EAttrType type1 = ATTR_ATK,float attr_num1 = 0,EAttrType type2 = ATTR_ATK,float attr_num2 = 0,UInt16 skill_id = 0);//增加卡牌
+    
+        bool DelAddCard(UInt32 id);
 
     private:
         std::vector<CardInfo*> VecEquipSlot;//装备卡牌槽
         
-        CardInfo* RoleCard;//人物卡牌槽
-        
         std::map<UInt32,CardInfo*> MapFreeCardSlot;//空闲卡牌槽
         
-        std::map<UInt8,SuitCardInfo*> MapCardLog;//套牌集邮册
+        std::map<UInt8,SuitCardInfo*> MapCardStamp;//套牌集邮册
         
         Player* m_owner;//卡牌拥有者
             
@@ -139,6 +157,7 @@ namespace GObject
         
         typedef std::map<UInt32,CardInfo*> MSlot;//空闲卡牌槽
 
+        typedef std::map<UInt8,SuitCardInfo*> MStamp;//空闲卡牌槽
     };
 
 }
