@@ -325,6 +325,7 @@ namespace Script
 		CLASS_DEF(Player, LuckyBagRank);
 		CLASS_DEF(Player, findFairyPet);
 		CLASS_DEF(Player, updateCuilianTimes);
+		CLASS_DEF(Player, addZhenyuanTiQuTimes);
         CLASS_DEF(Player, AddZRYJCount);
         CLASS_DEF(Player, AddHYYJCount);
         CLASS_DEF(Player, in7DayFromCreated);
@@ -337,6 +338,7 @@ namespace Script
         CLASS_DEF(Player, getXianpoLua);
         CLASS_DEF(Player, useChangeSexCard);
         CLASS_DEF(Player, EatLingGuo);
+        CLASS_DEF(Player, getXuanTianNingLuLua);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);
@@ -1466,6 +1468,11 @@ namespace Script
         assert(player != NULL);
         return Call<bool>("RunAirBookLoginAward", player, val);
     }
+    bool GameActionLua::RunFriendlyGoods(Player* player, UInt8 val ,UInt32 count)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunFriendlyGoods", player, val , count);
+    }
     bool GameActionLua::RunPrayAward(Player* player, UInt8 val)
     {
         assert(player != NULL);
@@ -1893,6 +1900,11 @@ namespace Script
     {
 		assert(player != NULL);
         Call<void>("getJiqirenAward_Dungeon", player, diff, isFree);
+    }
+
+    UInt32 GameActionLua::getZhenyuanLootId(UInt8 idx)
+    {
+        return Call<UInt32>("getZhenyuanLootId", idx);
     }
 }
 

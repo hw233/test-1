@@ -1,4 +1,4 @@
-#include "Config.h"
+LoadDrinkAttrConfiginclude "Config.h"
 #include "GDataManager.h"
 #include "Area.h"
 #include "WeaponDef.h"
@@ -36,6 +36,7 @@
 #include "DreamerTable.h"
 #include "FairyPetTable.h"
 #include "XingchenData.h"
+#include "DrinkAttr.h"
 #include "JiguanData.h"
 #include "HunPoData.h"
 #include "TeamArenaSkill.h"
@@ -86,6 +87,7 @@ namespace GData
     std::vector<UInt16>     GDataManager::m_petEqs[4];
     std::vector<UInt16>     GDataManager::m_petGems[20];
     std::vector<UInt16>     GDataManager::m_petEqSkills;
+    std::vector<UInt16>     GDataManager::m_zhenyuanItem[20];
 
 	bool GDataManager::LoadAllData()
 	{
@@ -240,6 +242,11 @@ namespace GData
 			fprintf(stderr, "Load front map data template Error !\n");
             std::abort();
 		}
+		if (!LoadXJFrontMapData())
+		{
+			fprintf(stderr, "Load xjfront map data template Error !\n");
+            std::abort();
+		}
 		if (!LoadOnlineAwardData())
 		{
 			fprintf(stderr, "Load online award template Error !\n");
@@ -356,6 +363,11 @@ namespace GData
             fprintf (stderr, "Load LoadXinMoConfig Error !\n");
             std::abort();
         }
+        if (!LoadDrinkAttrConfig())
+        {
+            fprintf (stderr, "Load LoadDrinkAttrConfig Error !\n");
+            std::abort();
+        }
 
         if (!LoadJiguanshuConfig())
         {
@@ -440,6 +452,11 @@ namespace GData
         if (!LoadCoupleCopy())
         {
             fprintf (stderr, "Load LoadCoupleCopyConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadSkillEvConfig())
+        {
+            fprintf (stderr, "Load LoadSkillEvConfig Error !\n");
             std::abort();
         }
 
@@ -832,6 +849,14 @@ namespace GData
                 {
                     if(idt.quality > 2 && idt.quality < 6)
                         m_petEqs[idt.quality - 2].push_back(idt.typeId);
+                }
+            case Item_Formula6:
+            case Item_Formula7:
+            case Item_Formula8:
+            case Item_Formula9:
+                {
+                    if(idt.reqLev >= 75 && (idt.reqLev % 5) == 0)
+                        m_zhenyuanItem[(idt.reqLev-75)/5].push_back(idt.typeId);
                 }
 			default:
 				{
@@ -1857,7 +1882,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBFrontMap dbc;
-		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `frontmap` ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `frontmap` WHERE `id` < 100 ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
 			return false;
 
         bool nextfrontmap = false;
@@ -1866,6 +1891,9 @@ namespace GData
         int spot = 0;
 		while(execu->Next() == DB::DB_OK)
 		{
+            if(dbc.id > 100)
+                break;
+            
             if (!first && id != dbc.id)
                 nextfrontmap = true;
 
@@ -1885,6 +1913,44 @@ namespace GData
             first = false;
         }
         frontMapMaxManager[id] = spot;
+        return true;
+    }
+
+    bool GDataManager::LoadXJFrontMapData()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBFrontMap dbc;
+		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `frontmap` WHERE `id` > 100 ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
+			return false;
+
+        bool nextfrontmap = false;
+        bool first = true;
+        int id = 0;
+        int spot = 0;
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbc.id < 100)
+                break;
+            if (!first && id != dbc.id)
+                nextfrontmap = true;
+
+            if (nextfrontmap) {
+                xjfrontMapMaxManager[id] = spot;
+                nextfrontmap = false;
+            }
+
+            std::vector<FrontMapFighter>& cpv = xjfrontMapManager[dbc.id];
+            if (cpv.size() <= dbc.spot)
+                cpv.resize(dbc.spot+1);
+            cpv[dbc.spot].count = dbc.count;
+            cpv[dbc.spot].fighterId = dbc.fighterId;
+
+            id = dbc.id;
+            spot = dbc.spot;
+            first = false;
+        }
+        xjfrontMapMaxManager[id] = spot;
         return true;
     }
 
@@ -2616,6 +2682,16 @@ namespace GData
         return m_petGems[lvIdx][uRand(gemCnt)];
     }
 
+    UInt16 GDataManager::GetZhenyuanTypeIdByLev(int lvIdx)
+    {
+        if(lvIdx < 0 || lvIdx >= 20)
+            return 0;
+        size_t cnt = m_zhenyuanItem[lvIdx].size();
+        if(cnt == 0)
+            return 0;
+        return m_zhenyuanItem[lvIdx][uRand(cnt)];
+    }
+
     UInt16 GDataManager::GetPetEqSkill()
     {
         /*
@@ -2905,6 +2981,43 @@ namespace GData
             stxc.skilllev = dbxcc.skilllev;
             stxc.payBack = dbxcc.payBack;
             xinmoData.setXinMoTable(stxc);
+        }
+        return true;
+    }
+    bool GDataManager::LoadDrinkAttrConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBDrinkAttrConfig dbda;
+		if(execu->Prepare("SELECT `value`, `hp`  FROM `drinkAttr`", dbda) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            DrinkAttr::stDrinkAttr da;
+            da.hp = dbda.hp;
+            drinkAttrData.setDrinkAttrTable(dbda.value);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadSkillEvConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBSkillEv dbskillev;
+		if(execu->Prepare("SELECT `lev`, `effect`, `consume`, `needLev` FROM `skill_ev`", dbskillev) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            SkillEvData::stSkillEv skillEv;
+            skillEv.effect = dbskillev.effect;
+            skillEv.consume = dbskillev.consume;
+            skillEv.needLev = dbskillev.needLev;
+            GData::skillEvData.setSkillEvData(dbskillev.lev, skillEv);
         }
         return true;
     }

@@ -538,7 +538,6 @@ namespace GObject
         VAR_LUCKYMEET_RECHARGE_AWARD = 549 ,  //暑假奇遇充值奖励
         VAR_LUCKYMEET_VIP = 550 ,      //暑假奇遇期间御剑等级
         VAR_LUCKYMEET_STRENTH_AWARD = 551,  //暑假奇遇变强
-
       
         VAR_SUMMER_MEET_TYPE = 552 ,    //蜀山奇遇类型
         VAR_SUMMER_MEET_TYPE_AWARD = 553,  //蜀山奇遇类型奖励（登陆弹框）
@@ -584,6 +583,7 @@ namespace GObject
         VAR_VIA_ACC_DAYS = 602,  //（导入的玩家）累计登录天数
         VAR_SEVEN_SOUL_NUM = 603,  //玩家七魂仙魄数
         VAR_SEX_CHANGE = 604,  //使用变形卡的次数
+        VAR_SKILL_GRADE_MONEY = 605,  //技能升阶货币
 
         //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,    //天书奇缘登陆
@@ -669,8 +669,10 @@ namespace GObject
         VAR_LEFTADDR_POWER = 694 ,   //仙界征战体力
         VAR_LEFTADDR_CREATE = 695 ,   //创建队伍的时间
         VAR_HEART_SWORD = 696 ,    //心剑值
-        VAR_FRIEND_TASK1 = 698 ,    //友好度任务，主动私聊，帮助浇灌许愿树，发起与好友的切磋  
-        VAR_FRIEND_TASK2 = 699 ,    //与好友组队副本，与好友宠物副本，赠送黄色鸢尾 , 每日任务完成数
+
+        VAR_LEFTADDR_POWER_ADD  = 697,  //体力增加次数
+        VAR_FRIEND_TASK1 = 698 ,    //友好度任务，主动私聊，帮助浇灌许愿树，发起与好友的切磋
+        VAR_FRIEND_TASK2 = 699 ,    //与好友组队副本，与好友宠物副本，赠送黄色鸢尾
         VAR_FRIEND_VALUE = 700 ,    //友情值
 
         //701-710 for suntao
@@ -691,7 +693,11 @@ namespace GObject
         VAR_CLAN_DUOBAO_SCORE = 713,        // 夺宝奇兵点数
         VAR_CLAN_DUOBAO_SUCCESS_NUM = 714,  // 夺宝奇兵成功次数
         VAR_CLAN_DUOBAO_STATUS = 715,       // 夺宝奇兵状态
-        //721 - 730 for dtc 
+
+        VAR_ZHENYUAN_TIQU_DATE = 716,    //阵元提取神符免费次数时间
+        VAR_ZHENYUAN_TIQU_CNT = 717,     //阵元提取神符 低16位每天次数 高16位每天仙石购买次数
+
+        //721 - 740 for dtc 
         VAR_TYSS_RECHARGE = 721,//天元神兽期间玩家兑换灵果剩余充值数(充值数满足条件自动兑换灵果)
         VAR_TYSS_CONTRIBUTE_PLAYER = 722,//天元神兽期间玩家个人总贡献 
         VAR_TYSS_CONTRIBUTE_PLAYER_DAY = 723,//天元神兽期间玩家个人当日贡献 
@@ -700,13 +706,20 @@ namespace GObject
         VAR_TYSS_DISCOUNT_CONSUME2 = 726,//天元神兽期间限购栏2(购买次数)
         VAR_TYSS_DISCOUNT_CONSUME3 = 727,//天元神兽期间限购栏3(购买次数)
         VAR_TYSS_CONTRIBUTE_CLAN_SUM = 728,//天元神兽期间玩家帮派总贡献(帮主身上) 
-
+        
+        VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 729,//璇玑阵图自动战斗使用金钱标志
+        VAR_ATOXJFM = 730,     //自动璇玑阵图id
         // 731 - 740 for lib
         VAR_FRIEND_ACHIEVEMENT  = 731,  //友好度成就奖励领取情况
         VAR_CLAN_FRIEND = 732 ,    //帮派玩家是否增加过友好度(8位) , 玩家购买的剩余饮酒次数 ,玩家总购买的次数 
         VAR_DRINK_COUNT = 733 ,    //饮酒次数 主动发起(8位) ,被动接受(8位)
         VAR_DRINK_VALUE = 734 ,    //豪饮值
         VAR_FRIEND_VALUE_DAY = 735 ,    //每日友情值
+        //752 - 770 for dtc
+        VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
+        //771 - 780 for qimj
+        VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
+
         VAR_MAX,
     };
 
@@ -1219,6 +1232,7 @@ namespace GObject
             REGISTER_VAR(VAR_VIA_ACC_DAYS, CYCLE_NONE);
             REGISTER_VAR(VAR_SEVEN_SOUL_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_SEX_CHANGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_SKILL_GRADE_MONEY, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);
@@ -1319,6 +1333,7 @@ namespace GObject
             REGISTER_VAR(VAR_FRIEND_TASK2, CYCLE_DAY);
             REGISTER_VAR(VAR_FRIEND_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_CLAN_FRIEND, CYCLE_NONE);
+            REGISTER_VAR(VAR_LEFTADDR_POWER_ADD, CYCLE_DAY);
 
             REGISTER_VAR(VAR_QISHI_FRIEND_SEND_COUNT, CYCLE_DAY);
             REGISTER_VAR(VAR_QISHI_FRIEND_USE_COUNT, CYCLE_DAY);
@@ -1327,6 +1342,9 @@ namespace GObject
             REGISTER_VAR(VAR_CLAN_DUOBAO_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_DUOBAO_SUCCESS_NUM, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_DUOBAO_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_ZHENYUAN_TIQU_DATE, CYCLE_NONE);
+            REGISTER_VAR(VAR_ZHENYUAN_TIQU_CNT, CYCLE_NONE);
+
             REGISTER_VAR(VAR_GUANKA_ACTION_NPC, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_TIME, CYCLE_NONE);
@@ -1345,6 +1363,11 @@ namespace GObject
             REGISTER_VAR(VAR_CLAN_FRIEND, CYCLE_NONE);
             REGISTER_VAR(VAR_DRINK_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_FRIEND_VALUE_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
+            REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
+            REGISTER_VAR(VAR_LIMIT_APPOINTMENT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

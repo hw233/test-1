@@ -907,6 +907,17 @@ void OnAutoFrontMapAttack( GameMsgHdr& hdr, const void * data )
         player->autoFrontMapFailed();
 }
 
+void OnAutoXJFrontMapAttack( GameMsgHdr& hdr, const void * data )
+{
+    if (!data)
+        return;
+
+	MSG_QUERY_PLAYER(player);
+
+    UInt16 idspot = *(UInt16*)data;
+    xjfrontMap.fight(player, (idspot>>8)&0xFF, idspot&0xFF, true);
+}
+
 void OnPlayerTimeTick( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1374,12 +1385,6 @@ void OnClanSkillLevel( GameMsgHdr& hdr, const void* data )
     player->clanSkillLevelUp(skillId);
     player->setFightersDirty(true);
 }
-void OnWaterSpiritTree( GameMsgHdr& hdr, const void* data )
-{
-    MSG_QUERY_PLAYER(player);
-    //UInt8 skillId = *(UInt8*)(data);
-    player->doStrongInWorld(43);
-}
 
 void OnClanSkillList( GameMsgHdr& hdr, const void* data )
 {
@@ -1504,12 +1509,10 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
     if(co->id == SthTownDeamon)
     {
         player->GuangGunCompleteTask(0,16);
-        if(player->GetVar(VAR_TOWNDEAMON))
-            return;
-        else
+        if(!player->GetVar(VAR_TOWNDEAMON))
             player->SetVar(VAR_TOWNDEAMON, 1);
     }
-    if(co->id == SthAthletics1)
+    else if(co->id == SthAthletics1)
     {
         player->GuangGunCompleteTask(0,26);
         player->getSummerMeetScore(5);
@@ -1701,7 +1704,7 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
     else if(type == 1)
     {
         Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
-        st << player->getId();
+        st << player->getId() << player->getName();
         player->appendLineup2(st);
         player->appendPetOnBattle(st);
         st << Stream::eos;
@@ -2480,12 +2483,6 @@ void OnGGTeamPlayerLeave( GameMsgHdr &hdr, const void * data)
     UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
     player->GGTeamPlayerLeave(id);
 }
-void OnDoStrongInWorld( GameMsgHdr &hdr, const void * data)
-{
-    MSG_QUERY_PLAYER(player);
-    UInt8 id = *reinterpret_cast<const UInt64 *>(data); 
-    player->doStrongInWorld(id);
-}
 void OnSend11GradeInfo( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
@@ -2619,7 +2616,7 @@ void OnServerWarLineup( GameMsgHdr& hdr, const void* data )
         return;
 
     Stream st(SERVERWARREQ::COMMIT_LINEUP, 0xEE);
-    st << player->getId();
+    st << player->getId() << player->getName();
     player->appendLineup2(st);
     player->appendPetOnBattle(st);
     st << Stream::eos;
@@ -2712,6 +2709,8 @@ void OnServerLeftLineup( GameMsgHdr& hdr, const void* data )
 
     Stream st(SERVERLEFTREQ::COMMIT_LINEUP, 0xED);
     st << player->getId();
+    st << player->getName();
+    st << player->getTitle();
     player->appendLineup2(st);
     player->appendPetOnBattle(st);
     st << Stream::eos;
@@ -2792,6 +2791,11 @@ void OndoGuankaAct( GameMsgHdr &hdr, const void * data)
     UInt8 type = *reinterpret_cast<const UInt8 *>(data);
 
     player->doGuankaAct(type);
+}
+void OnBuyLeftPower( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->BuyLeftPower();
 }
 
 //XXX

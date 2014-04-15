@@ -2749,6 +2749,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x29:
         case 0x3A:
         case 0x3B:
+        case 0x3C:
         {
             brd >> op;
             switch(op)
@@ -2928,7 +2929,11 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         {
             UInt8 flag = 0;
             brd >> flag;
+            if(flag && player->getTotalRecharge() >= 1000)
+                return;
             player->SetVar(VAR_DIRECTPUROPEN, flag?1:0);
+            if(flag > 0)
+                player->sendDirectPurInfo();
         }
         break;
         case 0x20:
@@ -4177,10 +4182,53 @@ void OnServerLeftNotice(ServerLeftMsgHdr& hdr, const void * data)
     Clan * clan = globalClans[clanId];
     if(!clan)
         return ;
-    UInt8 leftId = 0;
-    br >> leftId ;
+    //UInt8 leftId = 0;
+    //br >> leftId ;
     UInt32 num = 0;
     br >> num ; 
-    clan->SendLeftAddrMail(num ,leftId);
+    clan->SendLeftAddrMail(num /*,leftId*/);
+}
+void OnServerLeftAttackInfo(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL)
+        return ;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    if (buildingOwner)
+        buildingOwner->sendAttackTeamInfo(player);
+}
+void OnServerLeftAttr(ServerLeftMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 clanId = 0 ;
+    br >> clanId ;
+    Clan * clan = globalClans[clanId];
+    if(!clan)
+        return ;
+    GObject::ClanBuildingOwner* buildingOwner = clan->getNewBuildOwner();
+    if (!buildingOwner)
+        return ;
+    UInt8 opt = 0;
+    br >> opt ;
+    for(UInt8 i = 0; i < 3 ;++i)
+    {
+        UInt8 type = 0;
+        br >>type ;
+        UInt32 value = 0;
+        br >>value;
+        if(type == 0)
+            continue ;
+        buildingOwner->AddLeftAttr(opt , type ,value);
+    }
+    UInt8 flag = 0 ;
+    br >>flag ;
+    if( flag == 0)
+    {
+        Stream st(REP::CLAN_FAIRYLAND);
+        st << static_cast<UInt8>(0x0D);
+        st << Stream::eos;
+        clan->broadcast(st); 
+    }
 }
 #endif // _WORLDOUTERMSGHANDLER_H_

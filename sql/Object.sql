@@ -915,6 +915,7 @@ CREATE TABLE `player` (
   `frontGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
   `frontUpdate` int(10) unsigned NOT NULL DEFAULT '0',
   `formations` varchar(255) NOT NULL DEFAULT '',
+  `zhenyuans` varchar(1024) NOT NULL DEFAULT '',
   `atohicfg` varchar(255) NOT NULL DEFAULT '',
   `gmLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `wallow` tinyint(1) unsigned NOT NULL DEFAULT '1',
@@ -1114,6 +1115,7 @@ CREATE TABLE `clan` (
   `urge` int(10) unsigned NOT NULL DEFAULT '0',
   `duobaoAward` int(10) unsigned NOT NULL DEFAULT '0',
   `tyssSum` int(10) unsigned NOT NULL DEFAULT '0',
+  `clantitleAll` varchar(1024) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1236,7 +1238,7 @@ CREATE TABLE `strengthenData` (
    `overTime` int(10) unsigned NOT NULL,
    `souls`  int(10) unsigned NOT NULL,
    `soulId` tinyint(3) unsigned NOT NULL,
-   `flags`  varchar(255) NOT NULL DEFAULT '',
+   `flags`  varchar(1024) NOT NULL DEFAULT '',
    `greenBox`  varchar(255) NOT NULL DEFAULT '',
    `blueBox`  varchar(255) NOT NULL DEFAULT '',
    `purpleBox`  varchar(255) NOT NULL DEFAULT '',
@@ -2457,5 +2459,24 @@ CREATE TABLE `friendlyCount` (
     `ybTime` int(10) unsigned NOT NULL DEFAULT '0',
     `ybCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY(`playerId`, `friendId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `zhenyuanAttr`;
+CREATE TABLE `zhenyuanAttr` (
+   `id` int(10) unsigned NOT NULL DEFAULT '0',
+   `itemId`  int(10) unsigned NOT NULL DEFAULT '0',
+   `zycolor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `types` varchar(255) NOT NULL DEFAULT '',
+   `values` varchar(255) NOT NULL DEFAULT '',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `skill_grade`;
+CREATE TABLE `skill_grade` (
+    `playerId` bigint(20) unsigned NOT NULL,
+    `fighterId` int(10) unsigned NOT NULL,
+    `skillId` smallint(5) unsigned NOT NULL,
+    `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`playerId`, `fighterId`, `skillId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

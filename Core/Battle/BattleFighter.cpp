@@ -81,7 +81,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0), _abnormalTypeCnt(0), _bleedTypeCnt(0),_evadeCnt(0), _peerlessDisableLast(0), _soulProtectLast(0), _soulProtectCount(0), _xinMoCount(0), _2ndRateCoAtk(0), _2ndCoAtkSkill(NULL), _2ndRateProtect(0), _2ndProtectSkill(NULL), _dmg_deep(0), _dmg_deep_last(0), _dmg_ningshi(0), _dmg_ningshi_last(0), _ningshizhe(NULL)
    ,_ruRedCarpetLast(0), _shiFlowerLast(0), _shiFlowerAura(0), _daoRoseLast(0), _moKnotLast(0)
    ,_bActCnt(0), _immune3(0), _revivalCnt(0), _prudentLast(0),_prudentHitrate(0), _prudentHitrateLastOtherside(0), _silkwormCnt(0)
-   ,_yehuoLevel(0), _yehuo_ss_dmgRate(0), _yehuo_ss_upRate(0)
+   ,_yehuoLevel(0), _yehuo_ss_dmgRate(0), _yehuo_ss_upRate(0), _jiuziDmgCnt(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -221,6 +221,10 @@ void BattleFighter::setFighter( GObject::Fighter * f )
             break;
         }
     }
+
+    _sg_v.clear();
+    _fighter->getAllSGInfo(_sg_v);
+
 }
 
 void BattleFighter::updateAllAttr()
@@ -615,11 +619,12 @@ float BattleFighter::calcTherapy(bool& isCritical, bool& first, const GData::Ski
         }
     }
 
+    Int32 sg_v = getSkillGradeExtraValue(SKILL_ID(skill->getId()));
     GData::LBSkillItem* item = getSkillCondItem(SKILL_ID(skill->getId()));
     if(NULL != item)
-        return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + item->ef_value);
+        return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + item->ef_value + sg_v);
 
-    return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
+    return aura_factor * (getMagAttack() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + sg_v);
 }
 
 float BattleFighter::calcMaxTherapy(const GData::SkillBase* skill)
@@ -2315,6 +2320,7 @@ void BattleFighter::clearSkill()
     _onDeadCond.clear();
     _onBleedCond.clear();
     _onStateCond.clear();
+    _sg_v.clear();
 }
 
 void BattleFighter::setSummonFactor(UInt32 aura, float factor, UInt8 last)
@@ -3209,6 +3215,14 @@ bool BattleFighter::clearDmgNingShi()
     }
 
     return false;
+}
+
+Int32 BattleFighter::getSkillGradeExtraValue(UInt16 skillId)
+{
+    std::map<UInt16, Int32>::iterator it = _sg_v.find(skillId);
+    if(it == _sg_v.end())
+        return 0;
+    return it->second;
 }
 
 }

@@ -34,7 +34,11 @@
 #define RPETARM_ID      12999
 #define LPETGEM_ID      13000
 #define RPETGEM_ID      14999
-#define LOTHER_ID       15000
+#define LZHENYAUN_ID    15001
+#define RZHENYUAN_ID    15499
+#define LOTHER_ID       15500
+#define LNORMAL2_ID     16000
+#define RNORMAL2_ID     16999
 #define ROTHER_ID       65535
 
 #define COUPON_ID       499
@@ -160,6 +164,11 @@ inline bool IsPetItem(UInt32 id)
 	return id >= LPETGEM_ID && id <= RPETGEM_ID;
 }
 
+inline bool IsZhenYuanItem(UInt32 id)
+{
+	return id >= LZHENYAUN_ID && id <= RZHENYUAN_ID;
+}
+
 /** 新增11,12级宝石 **/
 inline bool IsGemId2(UInt32 id)
 {
@@ -195,6 +204,11 @@ inline bool IsEquip(UInt8 subClass)
 	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_InnateTrump);
 }
 
+inline bool IsZhenYuan(UInt8 subClass)
+{
+	return subClass >= static_cast<UInt8>(Item_Formula6) && subClass <= static_cast<UInt8>(Item_Formula9);
+}
+
 inline bool IsWeapon(UInt8 subClass)
 {
     return subClass == static_cast<UInt8>(Item_Weapon);
@@ -228,7 +242,7 @@ inline bool IsFighterTypeId(UInt32 id)
 
 inline ItemClass GetItemSubClass(UInt32 id)
 {
-    if ((id >= LNORMAL_ID && id <= RNORMAL_ID) || (id >= LNORMAL1_ID && id <= RNORMAL1_ID))
+    if ((id >= LNORMAL_ID && id <= RNORMAL_ID) || (id >= LNORMAL1_ID && id <= RNORMAL1_ID) || (id >= LNORMAL2_ID && id <= RNORMAL2_ID))
         return Item_Normal;
     if (id >= LENHANCE_ID && id <= RENHANCE_ID)
         return Item_Enhance;

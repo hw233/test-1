@@ -12,6 +12,7 @@
 #include "GData/CittaTable.h"
 #include "GData/AcuPraTable.h"
 #include "GData/XingchenData.h"
+#include "GData/DrinkAttr.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
 #include "Common/Stream.h"
@@ -2076,6 +2077,16 @@ void Fighter::rebuildEquipAttr()
         }
         //XXX
     }
+    {
+        UInt32 val = _owner->GetVar(VAR_CLAN_FRIEND);
+        GData::DrinkAttr::stDrinkAttr * da = GData::drinkAttrData.getDrinkAttrTable(val);
+        if(da)
+        {
+            GData::AttrExtra ae ;
+            ae.hp = da->hp;
+            _attrExtraEquip+=ae;
+        }
+    }
     if(_owner)
     {
         _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
@@ -2093,6 +2104,8 @@ void Fighter::rebuildEquipAttr()
             GObject::gMarryMgr.addMarriedAttr(_owner,_attrExtraEquip);
             GObject::gMarriedMgr.addCouplePetAttr(_owner,_attrExtraEquip);
         }
+        //阵元系统加成
+        _owner->addZhenyuanAttr(_attrExtraEquip, this);
     }
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
@@ -2269,7 +2282,17 @@ UInt16 Fighter::calcSkillBattlePoint(UInt16 skillId, UInt8 type)
         SStrengthen* ss = SSGetInfo(skillId);
         if(ss)
             ssl = ss->lvl;
-        return Script::BattleFormula::getCurrent()->calcSkillBattlePoint(sc, sl, type, ssl);
+
+        UInt16 poingAdd = 0;
+        SGrade *sg = SGGetInfo(skillId);
+        if(sg)
+        {
+            GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sg->lvl);
+            if(ev)
+                poingAdd = ev->effect * 1.2;
+        }
+
+        return Script::BattleFormula::getCurrent()->calcSkillBattlePoint(sc, sl, type, ssl) + poingAdd;
     }
     return 0;
 }
@@ -3238,7 +3261,10 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     else
     {
         if (_owner && writedb)
+        {
             _owner->sendFighterSSListWithNoSkill();
+            _owner->sendFighterSGListWithNoSkill();
+        }
     }
 }
 
@@ -3541,7 +3567,10 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
 
         SSSendSSInfo(skill);
         if(_owner && writedb)
+        {
             _owner->sendFighterSSListWithNoSkill();
+            _owner->sendFighterSGListWithNoSkill();
+        }
     }
     else
     {
@@ -3557,7 +3586,10 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
                 ret = true;
             }
             if(_owner && writedb)
+            {
                 _owner->sendFighterSSListWithNoSkill();
+                _owner->sendFighterSGListWithNoSkill();
+            }
         }
         else
         { // upgrade
@@ -3609,7 +3641,10 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     _skillBPDirty = true;
     sendModification(0x2a, 0, i, writedb);
     if(_owner && writedb)
+    {
         _owner->sendFighterSSListWithNoSkill();
+        _owner->sendFighterSGListWithNoSkill();
+    }
 #else
     _skill[idx] = 0;
     sendModification(0x2a, 0, idx, writedb);
@@ -4512,6 +4547,8 @@ bool Fighter::delCitta( UInt16 citta, bool writedb, bool delSS )
             if (!cb->effect->skill.empty())
                 skillid = cb->effect->skill[0]->getId();
             SSDismiss(skillid, delSS, pmail);
+            bool delSG = delSS;
+            SGDismiss(skillid, delSG, pmail);
         }
     }
 
@@ -6176,7 +6213,10 @@ void Fighter::PeerlessSSNotify(UInt16 id, bool writedb)
     SSNotify(id, it->second);
 
     if(_owner && writedb)
+    {
         _owner->sendFighterSSListWithNoSkill();
+        _owner->sendFighterSGListWithNoSkill();
+    }
 }
 
 void Fighter::SSDeleteDB(UInt16 id)
@@ -7264,6 +7304,7 @@ bool Fighter::setAcupointsGold( int idx, UInt8 v, bool writedb, bool init )
             SYSMSG_SENDV(2019, _owner, _color, getName().c_str(), pap->useReal);
 
             _acupointsGold[idx] = v;
+            GameAction()->doStrong(_owner, SthAcupointGold, 0,0);
 
 /*            if (_owner && writedb)
                 _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 1, 0);
@@ -7377,6 +7418,7 @@ bool Fighter::upgradeXinMo()
     _owner->send(st);
     updateDBxinmo();
     SYSMSG_SENDV(4919, _owner, stxc->consume);
+    GameAction()->doStrong(_owner, SthXinMo, 0 , 0);
     return true;
 }
 bool Fighter::quickUpGradeXinMo()
@@ -7440,7 +7482,7 @@ bool Fighter::quickUpGradeXinMo()
         _owner->send(st);
     }
 
-   // GameAction()->doStrong(_owner, SthXinMo, 0, 0); 
+    GameAction()->doStrong(_owner, SthXinMo, 0, 0);
    // _owner->GuangGunCompleteTask(0,30);
     return true;
 }
@@ -7488,6 +7530,408 @@ void Fighter::dismissXinMo()
     }
 
     DB1().PushUpdateData("DELETE FROM `fighter_xinmo` WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", getId(), _owner->getId());
+}
+
+void Fighter::SGradeManual(UInt16 skillId)
+{
+    if(!_owner)
+        return;
+    if(_owner->GetLev() < 75)
+        return;
+    const GData::SkillBase* skill = GData::skillManager[skillId];
+    if(!skill)
+        return;
+    if(skill->cond != GData::SKILL_PEERLESS && skill->cond != GData::SKILL_ACTIVE)
+        return;
+    UInt16 sid = SKILL_ID(skillId);
+    if(sid == 12 || sid == 16 || sid == 73)
+        return;
+
+    UInt8 sgLevel;
+    std::map<UInt16, SGrade>::iterator it = m_sg.find(sid);
+    if(it != m_sg.end())
+        sgLevel = it->second.lvl;
+    else
+        sgLevel = 0;
+
+    UInt8 maxCnt = GData::skillEvData.getSkillEvSize() - 1;
+    if(sgLevel >= maxCnt)
+    {
+        _owner->sendMsgCode(0, 1361);
+        return;
+    }
+    GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sgLevel);
+    if(!ev)
+        return;
+    if(_owner->GetLev() < ev->needLev)
+    {
+        _owner->sendMsgCode(0, 4016);
+        return;
+    }
+
+    UInt32 sgMoney = _owner->GetVar(VAR_SKILL_GRADE_MONEY);
+    UInt32 consume = ev->consume;
+    if(sgMoney < consume)
+    {
+        _owner->sendMsgCode(0, 4015);
+        return;
+    }
+
+    ConsumeInfo ci(SkillGrade, 0, 0);
+    _owner->useXuanTianNingLu(consume, &ci);
+    ++sgLevel;
+
+    SGrade sgTmp;
+    sgTmp.lvl = sgLevel;
+    m_sg[sid] = sgTmp;
+    DB1().PushUpdateData("REPLACE INTO `skill_grade` (`playerId`, `fighterId`, `skillId`, `level`) VALUES(%" I64_FMT "u, %u, %u, %u)", _owner->getId(), getId(), sid, sgLevel);
+    _skillBPDirty = true;
+
+	Stream st(REP::SKILLSTRENGTHEN);
+    st << static_cast<UInt8>(11);
+    st << getId();
+    st << skillId;
+    st << sgLevel;
+    st << _owner->GetVar(VAR_SKILL_GRADE_MONEY);
+    st << Stream::eos;
+    _owner->send(st);
+
+    GameAction()->doStrong(_owner, SthSkillUpgrade, 0, 0);
+}
+
+void Fighter::SGradeAuto(UInt16 skillId)
+{
+    if(!_owner)
+        return;
+    if(_owner->GetLev() < 75)
+        return;
+    const GData::SkillBase* skill = GData::skillManager[skillId];
+    if(!skill)
+        return;
+    if(skill->cond != GData::SKILL_PEERLESS && skill->cond != GData::SKILL_ACTIVE)
+        return;
+    UInt16 sid = SKILL_ID(skillId);
+    if(sid == 12 || sid == 16 || sid == 73)
+        return;
+
+    UInt8 sgLevel;
+    std::map<UInt16, SGrade>::iterator it = m_sg.find(sid);
+    if(it != m_sg.end())
+        sgLevel = it->second.lvl;
+    else
+        sgLevel = 0;
+
+    UInt8 maxCnt = GData::skillEvData.getSkillEvSize() - 1;
+    if(sgLevel >= maxCnt)
+    {
+        _owner->sendMsgCode(0, 1361);
+        return;
+    }
+
+    UInt8 canCnt = maxCnt - sgLevel;
+    if(canCnt > 10)
+        canCnt = 10;
+
+    UInt32 sgMoney = _owner->GetVar(VAR_SKILL_GRADE_MONEY);
+    UInt32 totalConsume = 0;
+    UInt32 moneyTmp = sgMoney;
+    UInt8 realCnt;
+    UInt8 playerLev = _owner->GetLev();
+    UInt8 flag = 0;
+    for(realCnt = 0; realCnt < canCnt; realCnt++)
+    {
+        GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sgLevel + realCnt);
+        if(!ev)
+            break;
+        if(playerLev < ev->needLev)
+        {
+            flag = 1;
+            break;
+        }
+        UInt32 consume = ev->consume;
+        if(moneyTmp < consume)
+            break;
+        moneyTmp -= consume;
+        totalConsume += consume;
+    }
+
+    if(flag == 1)
+    {
+        _owner->sendMsgCode(0, 4016);
+    }
+    else if(realCnt == 0 || realCnt < canCnt)
+    {
+        _owner->sendMsgCode(0, 4015);
+    }
+
+    ConsumeInfo ci(SkillGrade, 0, 0);
+    _owner->useXuanTianNingLu(totalConsume, &ci);
+
+    sgLevel += realCnt;
+
+    SGrade sgTmp;
+    sgTmp.lvl = sgLevel;
+    m_sg[sid] = sgTmp;
+    DB1().PushUpdateData("REPLACE INTO `skill_grade` (`playerId`, `fighterId`, `skillId`, `level`) VALUES(%" I64_FMT "u, %u, %u, %u)", _owner->getId(), getId(), sid, sgLevel);
+    _skillBPDirty = true;
+
+	Stream st(REP::SKILLSTRENGTHEN);
+    st << static_cast<UInt8>(12);
+    st << getId();
+    st << skillId;
+    st << sgLevel;
+    st << _owner->GetVar(VAR_SKILL_GRADE_MONEY);
+    st << realCnt;
+    st << totalConsume;
+    st << Stream::eos;
+    _owner->send(st);
+    GameAction()->doStrong(_owner, SthSkillUpgrade, 0, 0);
+}
+
+void Fighter::makeFighterSGInfo(Stream& st)
+{
+    st << getId();
+    size_t offset = st.size();
+    st << static_cast<UInt8>(0);
+    UInt8 c = 0;
+    for (int i = 0; i < getUpSkillsMax(); ++i)
+    {
+        if (_skill[i])
+        {
+            if (appendFighterSGInfo(st, _skill[i]))
+                ++c;
+        }
+    }
+    // append peerless skill
+    if (peerless)
+    {
+        if (appendFighterSGInfo(st, peerless))
+            ++c;
+    }
+    st.data<UInt8>(offset) = c;
+}
+
+SGrade* Fighter::SGGetInfo(UInt16 skillId)
+{
+    UInt32 sid = SKILL_ID(skillId);
+    std::map<UInt16, SGrade>::iterator i = m_sg.find(sid);
+    if (i == m_sg.end())
+        return NULL;
+    return &i->second;
+}
+
+bool Fighter::appendFighterSGInfo(Stream& st, UInt16 skillId)
+{
+    SGrade* sg = SGGetInfo(skillId);
+    if(!sg)
+        return false;
+    return appendFighterSGInfo(st, skillId, sg);
+}
+
+bool Fighter::appendFighterSGInfo(Stream& st, UInt16 skillId, SGrade* sg)
+{
+    if(sg)
+    {
+        st << skillId << sg->lvl;
+        return true;
+    }
+    return false;
+}
+
+void Fighter::SGFromDB(UInt16 id, SGrade& sg)
+{
+    if (!_owner)
+        return;
+    m_sg[id] = sg;
+}
+
+void Fighter::makeFighterSGInfoWithNoSkill(Stream& st)
+{
+    st << getId();
+    size_t offset = st.size();
+    st << static_cast<UInt8>(0);
+    UInt8 c = 0;
+
+    std::set<UInt16> skills;
+
+    for (int i = 0; i < getUpSkillsMax(); ++i)
+    {
+        if (_skill[i])
+        {
+            skills.insert(SKILL_ID(_skill[i]));
+        }
+    }
+
+    if (peerless)
+        skills.insert(SKILL_ID(peerless));
+
+    for (std::map<UInt16, SGrade>::iterator i = m_sg.begin(), e = m_sg.end(); i != e; ++i)
+    {
+        if (skills.find(i->first) == skills.end())
+        {
+            if (appendFighterSGInfo(st, SKILLANDLEVEL(i->first, 0)))
+                ++c;
+        }
+    }
+
+    st.data<UInt8>(offset) = c;
+}
+
+void Fighter::getAllSGAndValue(Stream& st)
+{
+    size_t offset = st.size();
+    st << static_cast<UInt8>(0);
+    UInt8 c = 0;
+    if(!isPet())
+    {
+        for (int i = 0; i < getUpSkillsMax(); ++i)
+        {
+            if (_skill[i])
+            {
+                SGrade* sg = SGGetInfo(_skill[i]);
+                if (sg)
+                {
+                    ++c;
+                    UInt16 skill_id = SKILL_ID(_skill[i]);
+                    st << skill_id;
+                    Int32 effect;
+                    GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sg->lvl);
+                    if(ev)
+                        effect = ev->effect;
+                    else
+                        effect = 0;
+                    st << effect;
+                }
+            }
+        }
+        if (peerless != 0)
+        {
+            SGrade* sg = SGGetInfo(peerless);
+            if (sg)
+            {
+                ++c;
+                UInt16 skill_id = SKILL_ID(peerless);
+                st << skill_id;
+                Int32 effect;
+                GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(sg->lvl);
+                if(ev)
+                    effect = ev->effect;
+                else
+                    effect = 0;
+                st << effect;
+            }
+        }
+    }
+    st.data<UInt8>(offset) = c;
+}
+
+void Fighter::SGDismiss(UInt16 skillid, bool isDel, Mail * mail)
+{
+    //技能升阶散功，返回技能升阶60%
+    if(!_owner)
+        return;
+    if(_owner->GetLev() < 75)
+        return;
+    UInt32 sid = SKILL_ID(skillid);
+    std::map<UInt16, SGrade>::iterator it = m_sg.find(sid);
+    if (it == m_sg.end())
+        return;
+    SGrade& sg = it->second;
+    if(sg.lvl == 0)
+        return;
+    UInt32 sgExp = 0;
+    for (UInt8 lvl = 0; lvl < sg.lvl; ++lvl)
+    {
+        GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(lvl);
+        if(ev)
+            sgExp += ev->consume;
+    }
+    sgExp *= 0.6;
+    if(sgExp < 15)
+    {
+        if(!mail)
+        {
+            const GData::SkillBase* skill = GData::skillManager[skillid];
+            if (!skill) return;
+            StringTokenizer sk(skill->getName(), "LV");
+            SYSMSG(title, 2031);
+            SYSMSGV(content, 2033, getLevel(), getColor(), getName().c_str(), sk[0].c_str());
+            _owner->GetMailBox()->newMail(NULL, 0x01, title, content);
+        }
+    }
+    else
+    {
+        UInt16 sgCount = sgExp / 1000;
+        sgExp = sgExp % 1000;
+        UInt16 sgCount1 = sgExp / 100;
+        sgExp = sgExp % 100;
+        UInt16 sgCount2 = sgExp / 15;
+
+        MailPackage::MailItem sgmitem[3] = {{16002, sgCount}, {16001, sgCount1}, {16000, sgCount2}};
+        if(!mail)
+        {
+            const GData::SkillBase* skill = GData::skillManager[skillid];
+            if (!skill) return;
+            StringTokenizer sk(skill->getName(), "LV");
+            SYSMSG(title, 2031);
+            SYSMSGV(content, 2032, getLevel(), getColor(), getName().c_str(), sk[0].c_str());
+            MailItemsInfo itemsInfo(sgmitem, DismissCitta, 3);
+            mail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        }
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, sgmitem, 3, true);
+        }
+    }
+
+    sg.lvl = 0;
+    if(!isDel)
+    {
+        SGDeleteDB(sid);
+        _owner->sendFighterSGListWithNoSkill();
+
+        Stream st(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(15);
+        st << getId();
+        st << skillid;
+        st << Stream::eos;
+        _owner->send(st);
+    }
+}
+
+void Fighter::SGDismissAll(bool isDel)
+{
+    std::map<UInt16, SGrade>::iterator it = m_sg.begin();
+    while(it != m_sg.end())
+    {
+        SGDismiss(SKILLANDLEVEL(it->first, 1), isDel);
+        if(isDel)
+        {
+            SGDeleteDB(it->first);
+            m_sg.erase(it++);
+        }
+        else
+            ++ it;
+    }
+}
+
+void Fighter::SGDeleteDB(UInt16 id)
+{
+    DB1().PushUpdateData("DELETE FROM `skill_grade` WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u AND `skillId` = %u", getId(), _owner->getId(), id);
+}
+
+void Fighter::getAllSGInfo(std::map<UInt16, Int32>& sg_v)
+{
+    std::map<UInt16, SGrade>::iterator it = m_sg.begin();
+    while(it != m_sg.end())
+    {
+        GData::SkillEvData::stSkillEv* ev = GData::skillEvData.getSkillEvData(it->second.lvl);
+        if(ev)
+        {
+            sg_v.insert(std::make_pair(it->first, ev->effect));
+        }
+        ++it;
+    }
 }
 
 /*

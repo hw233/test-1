@@ -1765,4 +1765,41 @@ function RunTYSSAward(player, cts)
     return true
 
 end
+function RunFriendlyGoods(player, cts ,count)
+    local item = {
+        [1] = {0,15,50},
+        [2] = {0,1526,50},
+        [3] = {0,57,50},
+        [4] = {0,56,50},
+        [5] = {0,1326,50},
+        [6] = {50,9371,50},
+        [7] = {80,9498,150},
+        [8] = {75,16001,200},
+        [9] = {55,1126,100},
+    };
+    local package = player:GetPackage();
+
+    if cts > 9  or cts <= 0 then
+        return false
+    end
+    if count == 0 then 
+        return 
+    end
+    local value = player:GetVar(734)
+    if value < item[cts][3] * count then
+        return 
+    end
+    local lev = player:GetLev()
+    if lev < item[cts][1] then 
+        player:sendMsgCode(2, 1010, 0);
+        return false
+    end
+    if package:GetRestPackageSize() < ( count / 99 + 1)  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(item[cts][2], count, true, 0, 74);
+    player:SetVar(734 , value - item[cts][3] * count );
+    return true
+end
 

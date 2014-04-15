@@ -701,6 +701,7 @@ private:
     std::vector<StatusChange> _scList;
     void appendDefStatus(StateType type, UInt32 value, BattleFighter* bf, DamageType damageType = e_damageNone);
     void appendStatusChange(StatusType type, UInt32 value, UInt16 skillId, BattleFighter* bf);
+    void appendAttackRoundChange();
     void appendReiatsuChange(int side);
     void appendStatusChangeForReiastu(StatusType type, UInt32 value, UInt16 skillId, UInt8 side);
     void appendMaxReiatsu();
@@ -789,6 +790,8 @@ private:
     void tryParry(BattleFighter* bf, UInt32& dmg, UInt32& magDmg, BattleFighter* bfAttacker);
     void calcSilkwormCnt(BattleObject* bo);
     void doAbnormalStatusClear(BattleObject* bo);
+	UInt32 attackByJiuzi(BattleFighter * bf, bool& first, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, int counter_deny = -1, AttackPoint * counter_deny_list = NULL, std::vector<AttackAct>* atkAct = NULL, bool canProtect = false);
+    void attackByJiuziSS(BattleFighter* bf, const GData::SkillBase* skill);
 };
 
 }

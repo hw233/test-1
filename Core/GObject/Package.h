@@ -132,6 +132,7 @@ namespace GObject
 		bool   DelItem(UInt32 id, UInt16 num, bool bind = false, UInt16 toWhere = 0);
 		bool   DelItem2(ItemBase* item, UInt16 num, UInt16 toWhere = 0);
 		bool   DelItemAny(UInt32 id, UInt16 num, bool * = NULL, UInt16 toWhere = 0);
+        bool   eraseEquip(UInt32 id);     //删除背包道具容器
 		bool   DelEquip(UInt32 id, UInt16 toWhere = 0);
 		bool   DelEquip2(ItemEquip *, UInt16 toWhere = 0);
 		bool   DelEquip3(ItemEquip *);
@@ -308,6 +309,13 @@ namespace GObject
         void SendDelTempEquipData(ItemEquip * equip);
         void AppendTempItemData(Stream& st, ItemBase * item);
         void AppendTempEquipData(Stream& st, ItemEquip * equip, bool hascount = true);
+
+        void SendSingleZhenyuanData(ItemZhenyuan *);
+        static void AppendZhenyuanData(Stream&, ItemZhenyuan *);
+	    ItemBase* AddZhenYuanN(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere = 0);
+        ItemZhenyuan * newZhenyuanToDB(const GData::ItemBaseType *, ItemZhenyuanAttr&, bool);
+	    ItemBase* AddZhenYuan(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere = 0);
+	    void MergeZhenyuan(UInt32* zhyIds, UInt8 count);
     protected:
 		typedef std::map<ItemKey, ItemBase *> ItemCont;
 		typedef ItemCont::iterator item_elem_iter;

@@ -487,6 +487,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
             player->rebuildBattleName();
     }
 
+    player->notifyClanTitle();
 	return true;
 }
 
@@ -539,6 +540,7 @@ bool Clan::join(ClanMember * cm)
             player->rebuildBattleName();
     }
 
+    player->notifyClanTitle();
     return true;
 }
 
@@ -3780,9 +3782,10 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
 
         GameMsgHdr hdr1(0x312, pl->getThreadId(), pl, sizeof(skillId));
         GLOBAL().PushMsg(hdr1, &skillId);
-        UInt8 strongId = SthSkillUp;
-        GameMsgHdr hdr2(0x364, pl->getThreadId(), pl, sizeof(strongId));
-        GLOBAL().PushMsg(hdr2, &strongId);
+        stActivityMsg msg;
+        msg.id = SthSkillUp;
+        GameMsgHdr hdr2(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
+        GLOBAL().PushMsg(hdr2, &msg);
 
     } while(false);
 
@@ -4581,9 +4584,6 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                 if(needTeal > 0)
                     addClanDonateRecord(pl->getName(), e_donate_to_tree, e_donate_type_tael, needTeal, now);
                 m_spiritTree.m_exp += 100;
-                UInt8 strongId = SthClanSpirit;
-                GameMsgHdr hdr1(0x364, pl->getThreadId(), pl, sizeof(strongId));
-                GLOBAL().PushMsg(hdr1, &strongId);
                 addMemberActivePoint_nolock(pl, 1, e_clan_actpt_none);
                 while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
                 {
@@ -4600,6 +4600,10 @@ void Clan::raiseSpiritTree(Player* pl, UInt8 type)
                 }
                 writeSptrToDB();
                 pl->udpLog("shenmozhishu", clansptr_udp_tael[idx], "", "", "", "", "act");
+                stActivityMsg msg;
+                msg.id = SthClanSpirit;
+                GameMsgHdr hdr(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
+                GLOBAL().PushMsg(hdr, &msg);
             }
         }
         else
@@ -5088,14 +5092,14 @@ bool Clan::loadBuildingsFromDB(UInt32 fairylandEnergy,
     _buildingOwner->loadFromDB(fairylandEnergy, phyAtkLevel, magAtkLevel, actionLevel, hpLevel, oracleLevel, updateTime);
     return true;
 }
-void Clan::SendLeftAddrMail(UInt32 _spirit ,UInt8 leftId)
+void Clan::SendLeftAddrMail(UInt32 _spirit /*,UInt8 leftId */)
 {
 	UInt32 now = TimeUtil::Now();
 	Mutex::ScopedLock lk(_mutex);
 	Members::iterator it = _members.begin();
     SYSMSG(title, 4305);
     std::string content = "" ;
-    SYSMSGV(content1, 4306 ,leftId , _spirit);
+    SYSMSGV(content1, 4306 ,/*leftId ,*/ _spirit);
     content += content1;
     UInt32 dayInWeek = TimeUtil::GetWeekDay(now);
     if(dayInWeek == 7)
@@ -5309,6 +5313,11 @@ void Clan::DuoBaoStart(Player * pl)
     st << Stream::eos;
     pl->send(st);
     DuoBaoUpdate(pl->getName(), score);
+
+    stActivityMsg msg;
+    msg.id = SthDuoBao;
+    GameMsgHdr hdr(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
+    GLOBAL().PushMsg(hdr, &msg);
 }
 
 void Clan::SendDuoBaoAward()
@@ -5660,7 +5669,6 @@ void Clan::sendMemberBuf(UInt8 pos)
         SYSMSG(title, 947);
         SYSMSGV(content, 950, pos);
         pl->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000);
-
 	}
 }
 
@@ -5668,6 +5676,60 @@ void Clan::ClearTYSSScore()
 {
     if(TYSSScoreSort.size() > 0)
         TYSSScoreSort.clear();
+}
+
+void Clan::SetClanTitle(std::string clantitleAll)
+{
+     if (clantitleAll.length())
+     {
+         StringTokenizer tk(clantitleAll, "|");
+         size_t count = tk.count();
+         for(size_t idx = 0; idx < count; ++ idx)
+         {
+             StringTokenizer tk1(tk[idx].c_str(), ",");
+             if(tk1.count() > 1)
+                 _clanTitle[atoi(tk1[0].c_str())] = atoi(tk1[1].c_str());
+             else
+                 _clanTitle[atoi(tk1[0].c_str())] = 0;
+         }
+      }
+      else
+          _clanTitle[0] = 0;
+}
+
+std::map<UInt8, UInt32> & Clan::GetClanTitle()
+{
+    return _clanTitle;
+}
+
+void Clan::addClanTitle(UInt8 titleId, UInt32 endTime, Player * pl)
+{
+    if(TimeUtil::Now() < endTime)
+        _clanTitle.insert(make_pair(titleId, endTime));
+    writeClanTitleAll();
+    pl->notifyClanTitle();
+}
+
+void Clan::writeClanTitleAll()
+{
+    UInt8 cnt = _clanTitle.size();
+    std::string title = "";
+
+    if(!cnt)
+    {
+        _clanTitle[0] = 0;
+        title += "0,0|";
+    }
+
+    for(std::map<UInt8, UInt32>::iterator it = _clanTitle.begin(); it != _clanTitle.end(); ++ it)
+    {
+        title += Itoa(it->first);
+        title += ',';
+        title += Itoa(it->second);
+        title += '|';
+    }
+
+    DB1().PushUpdateData("UPDATE `clan` SET `clantitleAll` = '%s' WHERE `id` = %" I64_FMT "u", title.c_str(), getId());
 }
 
 }

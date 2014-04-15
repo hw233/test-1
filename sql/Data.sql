@@ -1133,6 +1133,16 @@ CREATE TABLE `couplecopy` (
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
+DROP TABLE IF EXISTS `zhenyuan_extraAttr`;
+CREATE TABLE `zhenyuan_extraAttr` (
+    `id` int(10) unsigned NOT NULL,
+    `lvLimit` tinyint(3) unsigned NOT NULL,
+    `type1` tinyint(3) unsigned NOT NULL,
+    `type2` tinyint(3) unsigned NOT NULL,
+    `maxVal` int(10) unsigned NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `clan_building_template`;
 CREATE TABLE `clan_building_template` (
       `level` smallint(6) NOT NULL COMMENT '建筑等级',
@@ -1161,4 +1171,19 @@ CREATE TABLE `xinmo` (
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `skill_ev`;
+CREATE TABLE `skill_ev` (
+    `lev` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `effect` int(10) NOT NULL DEFAULT 0,
+    `consume` int(10) unsigned NOT NULL DEFAULT 0,
+    `needLev` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`lev`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `drinkAttr`;
+CREATE TABLE `drinkAttr` (
+    `value` int(10) unsigned NOT NULL DEFAULT 0,
+    `consume` int(10) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`value`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 -- Dump completed

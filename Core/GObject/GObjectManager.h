@@ -286,6 +286,160 @@ namespace GObject
         UInt32 chance;
     };
 
+    struct stZhyAttrMax
+    {
+        stZhyAttrMax() { memset( attrMax, 0, sizeof(attrMax)); }
+        float attrMax[14];
+    };
+
+    struct stZhyExtraAttr
+    {
+        stZhyExtraAttr() : id(0), level(0), type1(0), type2(0), attrMax(0.0f) { }
+        UInt16 id;
+        UInt8 level;
+        UInt8 type1;
+        UInt8 type2;
+        float attrMax;
+    };
+
+    struct stZHYAttrConf
+    {
+        stZHYAttrConf()
+        {
+            memset( attrNumChance, 0, sizeof(attrNumChance));
+            memset( extraSwitchChance, 0, sizeof(extraSwitchChance));
+            memset( dis, 0, sizeof(dis));
+            memset( disChance, 0, sizeof(disChance));
+            memset( colorVal, 0, sizeof(colorVal));
+        }
+
+        UInt16 getExtraAttrid(UInt8 lv, bool isFull);
+        float getDisFactor2(UInt8 color);
+
+        UInt8 getAttrNum(UInt16 chance)
+        {
+            for(int i = 0; i < 4; ++ i)
+            {
+                if(chance < attrNumChance[i])
+                    return (i + 1);
+            }
+            return 1;
+        }
+
+        UInt8 getSkillSwitch(UInt16 chance)
+        {
+            int i = 0;
+            for(; i < 4; ++ i)
+            {
+                if(chance < extraSwitchChance[i])
+                    break;
+            }
+            return i;
+        }
+
+        UInt8 getSkillSwitch1(UInt16 chance)
+        {
+            static UInt16 mergeChance[4] = {0, 33, 90, 100};
+            int i = 0;
+            for(; i < 4; ++ i)
+            {
+                if(chance < mergeChance[i])
+                    break;
+            }
+            return i;
+        }
+
+        float getAttrMax(UInt8 lv, UInt8 attrTypeIdx)
+        {
+            if(attrTypeIdx > 13)
+                return 0;
+            std::map<UInt8, stZhyAttrMax>::iterator it = zhyAttrMax.find(lv);
+            if(it == zhyAttrMax.end())
+                return 0;
+            stZhyAttrMax& zhyAttr = it->second;
+            return zhyAttr.attrMax[attrTypeIdx];
+        }
+
+        UInt8 getColor(UInt8 lv, UInt8* at, UInt16* av, UInt8 size)
+        {
+            float colorP = 0;
+            for(int i = 0; i < size; ++ i)
+            {
+                if(at[i] > 0)
+                    colorP += ((float)(av[i])/getAttrMax(lv, at[i]-1))*100;
+            }
+            for(int j = 3; j > 0; -- j)
+            {
+                if(colorP > colorVal[j])
+                    return j;
+            }
+            return 0;
+        }
+
+        stZhyExtraAttr * getExtraAttr(UInt16 attrId)
+        {
+            std::map<UInt16, stZhyExtraAttr>::iterator it = extraAttrMax.find(attrId);
+            if(it == extraAttrMax.end())
+                return NULL;
+            return &(it->second);
+        }
+
+        float getExtraAttrMax(UInt16 attrId)
+        {
+            std::map<UInt16, stZhyExtraAttr>::iterator it = extraAttrMax.find(attrId);
+            if(it == extraAttrMax.end())
+                return 0;
+            return it->second.attrMax;
+        }
+
+        float getDisFactor(UInt16 chance)
+        {
+            int maxIdx = 9;
+            UInt16 lastDisChance = 0;
+            for(int i = 0; i < 9; ++ i)
+            {
+                if(chance < disChance[0][i])
+                {
+                    float fChance = ((float)(chance + 1 - lastDisChance)) / (disChance[0][i] - lastDisChance);
+                    float fDis = ((float)(dis[0][i]) + (dis[0][i+1] - dis[0][i])*fChance) / dis[0][maxIdx];
+                    return fDis;
+                }
+                lastDisChance = disChance[0][i];
+            }
+            return 0;
+        }
+
+        void getAttrColor(UInt8 lv, UInt8* at, UInt16* av, UInt8 size, UInt8* colors)
+        {
+            static float colorLvl[4] = { 30, 60, 80, 100 }; //绿 蓝 紫 橙
+            for(int i = 0; i < size; ++ i)
+            {
+                if(at[i] > 0)
+                {
+                    float colorP = ((float)(av[i])/getAttrMax(lv, at[i]-1))*100;
+                    for(int j = 0; j < 4; ++ j)
+                    {
+                        if(colorP <= colorLvl[j])
+                        {
+                            colors[i] = j + 2;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        UInt8 attrNumChance[4];
+        UInt8 extraSwitchChance[3];
+        UInt16 dis[4][11];
+        UInt16 disChance[4][11];
+        UInt16 colorVal[4];
+        std::vector<UInt8> attrType;
+		std::map<UInt8, stZhyAttrMax> zhyAttrMax;  // 阵元属性上限
+		std::map<UInt8, std::vector<UInt16>> extraAttrType[2];  // 阵元属性类型
+		std::map<UInt16, stZhyExtraAttr> extraAttrMax;  // 阵元额外属性上限
+    };
+
 	class GObjectManager
 	{
 	public:
@@ -298,6 +452,7 @@ namespace GObject
 		static bool loadFighters();
 		static bool loadCopy();
         static bool loadFrontMap();
+        static bool loadXJFrontMap();
 		static bool loadClanAssist();
 		static bool loadClanRobMonster();
 		static bool loadAllPlayers();
@@ -356,6 +511,7 @@ namespace GObject
         static bool loadLingbaoSmelt();
         static bool fixItem9383Leader();
         static bool loadPetEquipAttr();
+	    static bool loadZhenyuanAttr();
         static bool loadFairySpar();
         static bool loadCollectCard();
         //static bool loadSanHun();
@@ -375,6 +531,7 @@ namespace GObject
         static bool loadQiShiBan();
         static bool LoadPlayerModifyMounts();
         static bool loadFriendlyCount();
+        static bool loadSkillGrade();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);
@@ -395,6 +552,7 @@ namespace GObject
 
         static bool loadEquipForge();
         static bool loadFightersPCChance();
+        static bool loadZhenyuanConfig();
         static bool loadAttrFactor();
 
         static bool loadQQVipAward();
@@ -469,6 +627,7 @@ namespace GObject
         static float getCriticalDmgMax() { return _cridmg_max; }
 
 		static stLBAttrConf& getLBAttrConf() { return _lbAttrConf; }
+		static stZHYAttrConf& getZHYAttrConf() { return _zhyAttrConf; }
 
         static UInt16 getAttrTypeChance(UInt8 q, UInt8 idx) { return _attrTypeChances[q][idx]; }
         static UInt16 getAttrChance( UInt8 q, UInt8 idx ) { return _attrChances[q][idx]; }
@@ -721,6 +880,8 @@ namespace GObject
 
         // 灵宝属性上限
 		static stLBAttrConf _lbAttrConf;
+
+		static stZHYAttrConf _zhyAttrConf;
 
         public:
         static  vMergeStfs  getMergeStfs( UInt32 id)

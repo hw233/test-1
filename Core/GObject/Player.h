@@ -231,6 +231,7 @@ namespace GObject
 //飞剑(坐骑)系统
 #define MOUNT_COSTID 9500
 #define MOUNT_CANGJIANID 9600
+#define ZHENYUAN_MAXCNT 12
 
 #ifdef _FB
 #define LIMIT_LEVEL  60
@@ -278,6 +279,7 @@ namespace GObject
         JIUXIAO     = 18,   //九霄唤龙枪
         TIANGANG    = 19,   //天罡剑诀
         YEHUO       = 20,   //业火天雷
+        JIUZI       = 21,   //九子神雷
 
         DRAGONKING_MAX,
     };
@@ -459,6 +461,23 @@ namespace GObject
 		{}
 
         virtual UInt32 GetID() const { return EVENT_AUTOFRONTMAP; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+
+    private:
+        UInt8 id;
+        UInt8 spot;
+    };
+
+    class EventAutoXJFrontMap : public EventBase
+    {
+    public:
+		EventAutoXJFrontMap(Player * player, UInt32 interval, UInt32 count, UInt8 id, UInt8 spot)
+			: EventBase(player, interval, count), id(id), spot(spot)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_AUTOXJFRONTMAP; }
         virtual bool Equal(UInt32 id, size_t playerid) const;
         void Process(UInt32);
 		bool Accelerate(UInt32);
@@ -703,7 +722,7 @@ namespace GObject
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonCnt1(0), dungeonEnd(0),
-            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0), teamArena(NULL)
+            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0), teamArena(NULL), xjfrontFreeCnt(0), xjfrontGoldCnt(0), xjfrontUpdate(0)
 #ifdef _ARENA_SERVER
             , entered(0)
 #endif
@@ -719,6 +738,7 @@ namespace GObject
             //memset(ymcolor, 0, sizeof(ymcolor));
             memset(bookStore, 0, sizeof(bookStore));
             formations.reserve(32);
+            memset(zhenyuans, 0, sizeof(zhenyuans));
             shimen.reserve(32);
             smcolor.reserve(32);
             yamen.reserve(32);
@@ -808,6 +828,7 @@ namespace GObject
         UInt8 frontGoldCnt;         // ??ͼ?շѴ???
         UInt32 frontUpdate;         // ??ͼ????????ʱ??
         std::vector<UInt16> formations; // ??ѧ??????
+        ItemZhenyuan * zhenyuans[12]; //前右后左阵元 逆时针
 #ifdef _ARENA_SERVER
         UInt8 entered;
 #endif
@@ -824,6 +845,9 @@ namespace GObject
         std::map<UInt8, UInt32> titleAll;      //玩家所有的称号id
         std::vector<UInt32> canHirePet;     //玩家未招募的仙宠
         TeamArenaData * teamArena;  //组队跨服战
+        UInt8 xjfrontFreeCnt;         // ??ͼ???Ѵ???
+        UInt8 xjfrontGoldCnt;         // ??ͼ?շѴ???
+        UInt32 xjfrontUpdate;         // ??ͼ????????ʱ??
     };
 
 	class Player:
@@ -859,6 +883,7 @@ namespace GObject
             ClanRankBattle  = 0x00000200,
             AutoTlz         = 0x00000400,
             InPetCopyTeam   = 0x00000800,
+            AutoXJFrontMap  = 0x00001000,
             AthleticsBuff   = 0x80000000,
 			AllFlags		= 0xFFFFFFFF
 		};
@@ -1046,9 +1071,32 @@ namespace GObject
 		void checkLevUp(UInt8, UInt8);
         bool formationLevUp(UInt16);
         bool addNewFormation(UInt16 newformationId, bool writedb = false);
+        void setZhenyuan(UInt32, UInt8);
+        bool setZhenyuan(ItemZhenyuan *, UInt8, bool = true);
+        void takedownZhenyuan(UInt32);
+        void updateZhenyuansToDB();
+        void sendZhenyuansInfo();
+        void updateZhenyuanTiQu();
+        void addZhenyuanTiQuTimes(UInt16);
+        bool checkTQSF();
+        void zhenyuanTiQu();
+        void addZhenyuanAttr(GData::AttrExtra& ae, Fighter * fgt);
+        void addZhenyuanAttr(GData::AttrExtra& ae, ItemZhenyuan * zhenyuan, Fighter * fgt);
+        inline UInt8 getZhenyuanCnt()
+        {
+            UInt8 count = 0;
+            for(int i = 0; i < ZHENYUAN_MAXCNT; ++ i)
+            {
+                if(_playerData.zhenyuans[i])
+                    ++ count;
+            }
+            return count;
+        }
+
         void sendFormationList();
         bool checkFormation(UInt16);
         bool checkFormation_ID(UInt16);
+        UInt8 getFullFormationCnt();
         void sendNationalDayOnlineAward();
         void sendHalloweenOnlineAward(UInt32, bool = false);
         void sendLevelPack(UInt8);
@@ -1606,6 +1654,11 @@ namespace GObject
         void cancelAutoFrontMap(UInt8 id);
         void instantAutoFrontMap(UInt8 id);
         void sendAutoFrontMap();
+
+        void startAutoXJFrontMap(UInt8 id, UInt8 mtype);
+        void cancelAutoXJFrontMap(UInt8 id);
+        void instantAutoXJFrontMap(UInt8 id);
+        void sendAutoXJFrontMap();
 
 		inline UInt32 getNextExtraReward()
 		{ return _playerData.nextExtraReward; }
@@ -2646,6 +2699,8 @@ namespace GObject
         float getClanBuildingPhyAtkEffect();
         float getClanBuildingMagAtkEffect();
         float getClanBuildingActionEffect();
+        float getClanBuildingPhyDefEffect();
+        float getClanBuildingMagDefEffect();
 
         // 所有将互斥法宝
         bool checkTrumpMutually(UInt32 trumpid);
@@ -2934,7 +2989,6 @@ namespace GObject
         void AirBookPriase(UInt8 type , UInt64 playerid);
         void SendClanMemberGrade();
         void Send11GradeAward(UInt8 type);
-        void doStrongInWorld(UInt8 type);
         void setGGValue()  ; //光棍节
         //女娲石盘
         void sendNuwaInfo();
@@ -2973,6 +3027,9 @@ namespace GObject
         void guankaActUdpLog(UInt32, bool);
         void addguankaScoreByAttack(UInt32);
         void AddHeartSword(UInt32 val);
+        void getXuanTianNingLuLua(UInt32 c);
+        UInt32 getXuanTianNingLu(UInt32 c, IncommingInfo* ii);
+        UInt32 useXuanTianNingLu(UInt32 a, ConsumeInfo* ci);
     public:
         // 八部浮屠
         void sendBBFTInfo();
@@ -3046,6 +3103,7 @@ namespace GObject
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
         void sevensoul_fixed();
+        void BuyLeftPower();
 
         //友好度
         void AddFriendlyCount(Player * friender , UInt8 taskNum) ; //增加友好度
@@ -3077,7 +3135,7 @@ namespace GObject
         bool AfterDrinking();
         void BuyDrinkCount();
         bool UseYellowBird(Player * friendOne ,UInt32 num);
-        void BuyFriendlyGoods(UInt32 num);
+        void BuyFriendlyGoods(UInt8 type);
         UInt8 GetYBCount(Player *friendOne);
         void SetYBCount(Player * friendOne , UInt32 time ,UInt8 count);
 
@@ -3087,7 +3145,12 @@ namespace GObject
         void calcDrinkPoint();
         void BeginDrink();
         void AddClanFriend();
-        AttrExtra getDrinkInfo();
+        //void AddFriendlyCount(Player * friender , UInt8 taskNum) ;
+        //void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
+
+        void makeFighterSGList(Stream& st);
+        void sendFighterSGListWithNoSkill();
+        void makeFighterSGListWithNoSkill(Stream& st);
 
     public:
         UInt8 useChangeSexCard();
@@ -3104,6 +3167,14 @@ namespace GObject
         void do_sh_fighter_attr2(Fighter* fgt, UInt32 oldId);
         void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
         void do_fighter_xinmo(Fighter* fgt, UInt32 oldId);
+        void do_skill_grade(Fighter* fgt, UInt32 oldId);
+    public:
+        void makeClanTitleInfo(Stream & st);
+        void changeClanTitle(UInt8 id);
+        void notifyClanTitle();
+        UInt32 getCurClanTitle();
+        void clearClanTitle();
+        void checkClanTitle();
 	};
 
 

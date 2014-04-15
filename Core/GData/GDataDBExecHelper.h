@@ -612,6 +612,11 @@ struct DBXinMoConfig
     std::string skilllev;
     UInt32 payBack;
 };
+struct DBDrinkAttrConfig
+{
+    UInt32 value;
+    UInt32 hp;
+};
 struct DBJiguanyuConfig
 {
     UInt32 jiguanyuId;
@@ -700,6 +705,14 @@ struct DBCangjianCfg
     std::string bless;
 };
 
+struct DBSkillEv
+{
+    UInt8 lev;
+    Int32 effect;
+    UInt32 consume;
+    UInt8 needLev;
+};
+
 struct DBKeyinConfig
 {
     UInt8 keyinId;
@@ -777,6 +790,15 @@ struct DBCoupleCopy
     std::string name;
     UInt32 location;
     UInt32 monster;
+};
+
+struct DBZHYExtraAttr
+{
+    UInt16 id;
+    UInt8 lvLimit;
+    UInt8 type1;
+    UInt8 type2;
+    UInt16 maxVal;
 };
 
 }
@@ -1467,7 +1489,6 @@ SPECIALDEF(9)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBXinMoConfig)
-
 SPECIALDEF(11)
 (
     UInt8, id,
@@ -1485,6 +1506,13 @@ SPECIALDEF(11)
     std::string, skilllev,
     UInt32, payBack
     )
+SPECIALEND()
+SPECIALBEGIN(GData::DBDrinkAttrConfig)
+SPECIALDEF(2)
+(
+    UInt32 , value,
+    UINt32 , hp
+)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBJiguanyuConfig)
@@ -1681,6 +1709,27 @@ SPECIALDEF(5)
     UInt16, prob,
     UInt8, otherNum,
     std::string, bless
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBZHYExtraAttr)
+SPECIALDEF(5)
+    (
+    UInt16, id,
+    UInt8, lvLimit,
+    UInt8, type1,
+    UInt8, type2,
+    UInt16, maxVal
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBSkillEv)
+SPECIALDEF(4)
+	(
+    UInt8, lev,
+    Int32, effect,
+    UInt32, consume,
+    UInt8, needLev
 	)
 SPECIALEND()
 

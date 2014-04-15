@@ -24,6 +24,7 @@ private:
 	UInt32 addFighter(Player *, UInt32);
     UInt32 addFairyPet(Player *, UInt32);
     void addCouplePet(Player *);
+    void addZhenyuan(Player *, UInt32);
 
 	struct ChatItemData
 	{
@@ -42,12 +43,13 @@ private:
 			return pid < other.pid;
 		}
 	};
-	FastMutex _itemMutex, _fighterMutex, _petItemMutex, _petMutex, _coupleMutex;
+	FastMutex _itemMutex, _fighterMutex, _petItemMutex, _petMutex, _coupleMutex, _zhenyuanMutex;
 	std::map<UInt32, ChatItemData> _itemData;
 	std::map<FIndex, ChatItemData> _fighterData;
 	std::map<UInt32, ChatItemData> _petItemData;
 	std::map<FIndex, ChatItemData> _fairyPetData;
 	std::map<UInt64, ChatItemData> _couplePetData;
+	std::map<UInt32, ChatItemData> _zhenyuanData;
 };
 
 extern ChatItem chatItem;

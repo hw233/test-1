@@ -9,6 +9,7 @@
 #include "Server/ServerTypes.h"
 #include "Server/WorldServer.h"
 #include "Common/BinaryReader.h"
+#include "Common/StringTokenizer.h"
 
 class SysMsgItem;
 namespace GObject
@@ -574,6 +575,11 @@ public:
     void DelTYSSScore(Player* pl);
     void ClearTYSSScore();
 
+    //帮派称号
+    void SetClanTitle(std::string clantitleAll);
+    std::map<UInt8, UInt32> & GetClanTitle();
+    void addClanTitle(UInt8 titleId, UInt32 endTime, Player * pl);
+    void writeClanTitleAll();
     
     UInt32 getGradeInAirBook(){return  _gradeInAirbook;}
     void SendClanMemberGrade(Player* player);
@@ -858,6 +864,7 @@ private:
     UInt8 _urge[3];
     UInt32 _duoBaoAward;
     UInt32 _tyssSum;
+    std::map<UInt8, UInt32> _clanTitle;
 
     ClanSpiritTree m_spiritTree;
 
@@ -877,7 +884,7 @@ public:
     void checkMemberActivePoint(ClanMember* mem);
     void listMembersActivePoint( Player * player );
     UInt32 getMemberActivePoint(ClanMember* mem);
-    void SendLeftAddrMail(UInt32 _spirit , UInt8 leftId);
+    void SendLeftAddrMail(UInt32 _spirit /*, UInt8 leftId */);
 
     ClanBuildingOwner* getBuildingOwner();
     ClanBuildingOwner* getNewBuildOwner();

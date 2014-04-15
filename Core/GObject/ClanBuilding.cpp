@@ -1,5 +1,4 @@
 #include "ClanBuilding.h"
-
 #include "GData/ClanBuildingTable.h"
 #include "Log/Log.h"
 #include "Server/WorldServer.h"
@@ -8,6 +7,9 @@
 #include "MsgID.h"
 #include "Var.h"
 #include "Server/SysMsg.h"
+#include "Script/GameActionLua.h"
+#include "MsgHandler/CountryMsgStruct.h"
+#include "Country.h"
 
 namespace GObject
 {
@@ -123,6 +125,7 @@ namespace GObject
     ClanBuildingOwner::ClanBuildingOwner(Clan* clan)
         : _clan(clan), _energy(0)
     {
+        memset(_leftAttr, 0, sizeof(_leftAttr));
         if (_clan)
             DB2().PushUpdateData("INSERT IGNORE INTO `clan_buildings` (`clanId`) VALUES (%" I64_FMT "u)", _clan->getId()); 
         {
@@ -332,7 +335,7 @@ namespace GObject
                         }
                         if(pos1 ==0 && pos2 == 0)
                         {
-                               //player->setLeftAddrEnter(false);
+                               player->setLeftAddrEnter(false);
                                TRACE_LOG("leftaddr(leaveleft) 0 (pid: %" I64_FMT "u)", player->getId());
                         }
                         struct TeamChange
@@ -365,6 +368,11 @@ namespace GObject
                     if(!player->inLeftAddrCommitCD())
                         LineUp(player);
                     break;
+                case 0x0C:
+                    {
+                        GameMsgHdr hdr(0x397, player->getThreadId(), player, 0 );
+                        GLOBAL().PushMsg(hdr, NULL);
+                    }
             }
             if(type < 9)
                 sendAttackTeamInfo(player); 
@@ -552,6 +560,11 @@ namespace GObject
                 st << static_cast<UInt32>(cbbi.battleId);
                 st <<Stream::eos;
                 vec[i]->send(st);
+
+                stActivityMsg msg;
+                msg.id = SthArenaLeft;
+                GameMsgHdr hdr(0x245, vec[i]->getThreadId(), vec[i], sizeof(stActivityMsg));
+                GLOBAL().PushMsg(hdr, &msg);
             }
         }
         if(cbbi.res ==0 && cbbi.type == 1)
@@ -807,6 +820,7 @@ namespace GObject
             return ;
         st <<static_cast<UInt8>(9);
         st <<static_cast<UInt8>(player->GetVar(VAR_LEFTADDR_POWER));
+        st <<static_cast<UInt8>(player->GetVar(VAR_LEFTADDR_POWER_ADD));
         st <<static_cast<UInt8>( leftAttackTeams.size() ); 
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {
@@ -825,9 +839,40 @@ namespace GObject
         player->send(st);
         
     }
+
     void ClanBuildingOwner::UpdateEnergy()
     {
         DB5().PushUpdateData("UPDATE `clan_buildings` set `fairylandEnergy` = %u, `updateTime` = %u where `clanId` = %" I64_FMT "u", _energy , TimeUtil::Now() , _clan->getId());
+    }
+
+    UInt32 ClanBuildingOwner::getLeftAttr(UInt8 type) const 
+    {
+       if(type >=LEFTATTRMAX) 
+           return 0;
+       return _leftAttr[type];
+    }  
+    //仙界遗迹属性 opt : 0-重置 1-增加 2-减少
+    void ClanBuildingOwner::AddLeftAttr(UInt8 opt ,UInt8 type , UInt32 value)
+    {
+        if(opt == 0)
+        {
+            memset(_leftAttr, 0, sizeof(_leftAttr));
+            return ;
+        }
+        if( type > LEFTATTRMAX ) 
+            return ;
+        if(type == 0 )
+            return ;
+        if(opt == 1)
+            _leftAttr[type - 1] += value ; 
+        if(opt == 2)
+        {
+            if(_leftAttr[type - 1 ] < value)
+                _leftAttr[type - 1] = 0 ;
+            else
+                _leftAttr[type - 1] -= value;
+        }
+        _clan->notifyUpdateStatueAttr();
     }
 }
 

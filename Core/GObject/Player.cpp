@@ -45,6 +45,7 @@
 #include "Script/BattleFormula.h"
 #include "Copy.h"
 #include "FrontMap.h"
+#include "XJFrontMap.h"
 #include "HeroIsland.h"
 #include "NewHeroIsland.h"
 #include "GObject/AthleticsRank.h"
@@ -640,6 +641,33 @@ namespace GObject
     }
 
     bool EventAutoFrontMap::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
+    bool EventAutoXJFrontMap::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoXJFrontMap::Process(UInt32 leftCount)
+    {
+        UInt16 idspot = (id << 8) + spot;
+		GameMsgHdr hdr(0x368, m_Player->getThreadId(), m_Player, sizeof(idspot));
+		GLOBAL().PushMsg(hdr, &idspot);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTOFRONTMAP, m_Player->getId());
+        ++spot;
+    }
+
+    bool EventAutoXJFrontMap::Accelerate(UInt32 times)
     {
 		UInt32 count = m_Timer.GetLeftTimes();
 		if(times > count)
@@ -3228,6 +3256,20 @@ namespace GObject
 		}
 	}
 
+    UInt8 Player::getFullFormationCnt()
+    {
+        UInt8 count = 0;
+        int cnt = _playerData.formations.size();
+        for( int idx = 0; idx < cnt; ++ idx )
+        {
+            if(FORMATION_LEVEL(_playerData.formations[idx]) == 2)
+            {
+                ++ count;
+            }
+        }
+        return count;
+    }
+
     bool Player::checkFormation_ID(UInt16 f)
     {
         bool find = false;
@@ -3335,6 +3377,8 @@ namespace GObject
         st << getClanProffer();
         bool fchange = makeTitleAllInfo(st);
         st << static_cast<UInt8>(GetVar(VAR_MAP_INDEX));
+        checkClanTitle();
+        makeClanTitleInfo(st);
         st << Stream::eos;
 
         if(fchange)
@@ -6446,6 +6490,8 @@ namespace GObject
             cancelAutoCopy(getBuffData(PLAYER_BUFF_AUTOCOPY));
         if (GetVar(VAR_ATOFM))
             cancelAutoFrontMap(GetVar(VAR_ATOFM));
+        if (GetVar(VAR_ATOXJFM))
+            cancelAutoXJFrontMap(GetVar(VAR_ATOXJFM));
 
         if (_playerData.location == 8977)
         {
@@ -8375,6 +8421,426 @@ namespace GObject
         return true;
     }
 
+    void Player::setZhenyuan(UInt32 zhyId, UInt8 index)
+    {
+        if(index >= ZHENYUAN_MAXCNT || _playerData.zhenyuans[index])
+            return;
+        ItemZhenyuan * zhenyuan = static_cast<ItemZhenyuan *>(GetPackage()->GetEquip(zhyId));
+        if(!zhenyuan || GetLev() < zhenyuan->getReqLev())
+            return;
+        UInt8 subClass = zhenyuan->getClass();
+        if(!IsZhenYuan(zhenyuan->getClass()))
+            return;
+        if(subClass != static_cast<ItemClass>(index/3 + Item_Formula6)) //不是对应类型
+            return;
+        UInt8 fcnt = getFullFormationCnt();
+        if(fcnt <= index || fcnt <= getZhenyuanCnt())
+            return;
+        UInt8 tmpcnt = 0;
+        for(int i = index/3*3; i < (index/3+1)*3; ++ i)
+        {
+            ItemZhenyuan * izy = _playerData.zhenyuans[i];
+            if(izy == zhenyuan)
+                return;
+            if(izy)
+                ++ tmpcnt;
+        }
+        if(tmpcnt >= 3)
+            return;
+        bool res = setZhenyuan(zhenyuan, index);
+        if(res)
+        {
+            setLineupDirty();
+            Stream st(REP::XJFRONTMAP);
+            st << static_cast<UInt8>(0x11) << zhyId << index;
+            st << Stream::eos;
+            send(st);
+            static_cast<ItemEquip *>(zhenyuan)->DoEquipBind();
+            GetPackage()->eraseEquip(zhenyuan->getId());
+            GameAction()->doStrong(this, SthSetZhenYuan, 0, 0);
+        }
+    }
+
+    bool Player::setZhenyuan(ItemZhenyuan * zhenyuan, UInt8 idx, bool writedb)
+    {
+        if(idx >= ZHENYUAN_MAXCNT)
+            return false;
+        if(_playerData.zhenyuans[idx] == zhenyuan)
+            return false;
+        if(_playerData.zhenyuans[idx])
+            GetPackage()->AddExistEquip(static_cast<ItemEquip *>(_playerData.zhenyuans[idx]));
+        _playerData.zhenyuans[idx] = zhenyuan;
+        if(writedb)
+            updateZhenyuansToDB();
+        return true;
+    }
+
+    void Player::takedownZhenyuan(UInt32 zhyId)
+    {
+        bool find = false;
+        for(int i = 0; i < ZHENYUAN_MAXCNT; ++ i)
+        {
+            if(_playerData.zhenyuans[i] && _playerData.zhenyuans[i]->getId() == zhyId)
+            {
+                setZhenyuan(static_cast<ItemZhenyuan *>(NULL), i);
+                find = true;
+                break;
+            }
+        }
+        if(!find) return;
+        setLineupDirty();
+
+        Stream st(REP::XJFRONTMAP);
+        st << static_cast<UInt8>(0x12) << zhyId;
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::updateZhenyuansToDB()
+    {
+        std::string str;
+        for(int i = 0; i < ZHENYUAN_MAXCNT; ++ i)
+        {
+            if(_playerData.zhenyuans[i])
+                str += Itoa(_playerData.zhenyuans[i]->getId());
+            else
+                str += Itoa(0);
+            if(i < ZHENYUAN_MAXCNT-1)
+                str += ",";
+        }
+        DB1().PushUpdateData("UPDATE `player` SET `zhenyuans` = '%s' WHERE id = %"  I64_FMT  "u", str.c_str(), _id);
+    }
+
+    void Player::sendZhenyuansInfo()
+    {
+        checkTQSF();
+        Stream st(REP::XJFRONTMAP);
+        st << static_cast<UInt8>(0x10);
+        st << GetVar(VAR_ZHENYUAN_TIQU_CNT);
+        UInt16 flag = 0;
+        size_t offset = st.size();
+        st << flag;
+        for(int i = 0; i < ZHENYUAN_MAXCNT; ++ i)
+        {
+            if(_playerData.zhenyuans[i])
+            {
+                flag |= 1 << i;
+                st << _playerData.zhenyuans[i]->GetItemType().getId();
+                st << _playerData.zhenyuans[i]->getId();
+                _playerData.zhenyuans[i]->getZhyAttr().appendAttrToStream(st);
+            }
+        }
+        st.data<UInt16>(offset)= flag;
+        st << Stream::eos;
+        send(st);
+    }
+
+    bool Player::checkTQSF()    //阵元提取神符
+    {
+        if(GetLev() < 75)
+            return false;
+
+        UInt32 now = TimeUtil::Now();
+        UInt32 today = TimeUtil::SharpDayT(1, now);
+        UInt32 lastDate = GetVar(VAR_ZHENYUAN_TIQU_DATE);
+        lastDate = lastDate == 0 ? 0 :TimeUtil::SharpDayT(1, lastDate);
+        UInt32 info = GetVar(VAR_ZHENYUAN_TIQU_CNT);
+
+        UInt16 leftCnt = info;  //去除高16位
+        if(today > lastDate)
+        {
+            if(leftCnt < 5)
+                leftCnt = 5;
+            SetVar(VAR_ZHENYUAN_TIQU_CNT, leftCnt);
+            SetVar(VAR_ZHENYUAN_TIQU_DATE, now);
+        }
+        return true;
+    }
+
+    void Player::addZhenyuanTiQuTimes(UInt16 num)
+    {
+        if(!checkTQSF())
+            return;
+        if(0 == num) return;
+        UInt32 info = GetVar(VAR_ZHENYUAN_TIQU_CNT);
+        UInt16 leftCnt = info;  //去除高16位
+
+        info |= leftCnt + num;
+        SetVar(VAR_ZHENYUAN_TIQU_CNT, info);
+        updateZhenyuanTiQu();
+    }
+
+    void Player::updateZhenyuanTiQu()
+    {
+        Stream st(REP::XJFRONTMAP);
+        st << static_cast<UInt8>(0x14);
+        st << GetVar(VAR_ZHENYUAN_TIQU_CNT);
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::zhenyuanTiQu()
+    {
+        if(!checkTQSF())
+            return;
+        if(!hasChecked())
+            return;
+        if (GetPackage()->GetRestPackageSize() <= 0)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+        UInt32 info = GetVar(VAR_ZHENYUAN_TIQU_CNT);
+        UInt16 leftCnt = info;  //去除高16位
+        UInt16 buyTimes = info >> 16;
+        UInt32 lootId = GameAction()->getZhenyuanLootId((GetLev()-75)/5 + 1);
+        const GData::LootItem* li = GData::lootTable[lootId];
+        if(NULL == li) return;
+        std::vector<GData::LootResult> lr;
+        li->roll(lr);
+        if (!lr.size())
+            return;
+        UInt32 itemId = lr[0].id;
+        if(leftCnt > 0)
+        {
+            if(!GetPackage()->AddZhenYuan(itemId, true, true, FromZhenyuanTiQu))
+                return;
+            -- leftCnt;
+        }
+        else
+        {
+            UInt32 needGold = (buyTimes + 1) * 5;
+			if (getGold() < needGold)
+			{
+				sendMsgCode(0, 1104);
+				return;
+			}
+            if(!GetPackage()->AddZhenYuan(itemId, false, true, FromZhenyuanTiQu))
+                return;
+            ConsumeInfo ci(ZhenYuanCuiLian, 0, 0);
+            useGold(needGold, &ci);
+            ++ buyTimes;
+        }
+        info = (buyTimes << 16) | leftCnt;
+        SetVar(VAR_ZHENYUAN_TIQU_CNT, info);
+        updateZhenyuanTiQu();
+    }
+
+    void Player::addZhenyuanAttr(GData::AttrExtra& ae, Fighter * fgt)
+    {
+        if(!fgt || fgt->isPet()) return;
+        UInt8 pos = 0xFF;
+        for(UInt8 i = 0; i < 5; i++)
+        {
+            if(_playerData.lineup[i].fighter == fgt)
+                pos = _playerData.lineup[i].pos;
+        }
+        switch(pos)
+        {
+            case 6: //前1 后3 右1 左3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0], fgt);   //前1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3], fgt);   //右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[11], fgt);   //左3
+                break;
+            case 7: //前2 后2 右1 左3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1], fgt);   //前2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[7], fgt);   //后2
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3], fgt);   //右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[11], fgt);   //左3
+                break;
+            case 8: //前3 后1 右1 左3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2], fgt);   //前3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[6], fgt);   //后1
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[3], fgt);   //右1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[11], fgt);   //左3
+                break;
+            case 11: //前1 后3 右2 左2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0], fgt);   //前1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[4], fgt);   //右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[10], fgt);   //左2
+                break;
+            case 12: //前2 后2 右2 左2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1], fgt);   //前2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[7], fgt);   //后2
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[4], fgt);   //右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[10], fgt);   //左2
+                break;
+            case 13: //前3 后1 右2 左2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2], fgt);   //前3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[6], fgt);   //后1
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[4], fgt);   //右2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[10], fgt);   //左2
+                break;
+            case 16: //前1 后3 右3 左1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[0], fgt);   //前1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
+                break;
+            case 17: //前2 后2 右3 左1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[1], fgt);   //前2
+                addZhenyuanAttr(ae, _playerData.zhenyuans[7], fgt);   //后2
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
+                break;
+            case 18: //前3 后3 右3 左1
+                addZhenyuanAttr(ae, _playerData.zhenyuans[2], fgt);   //前3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
+
+                addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
+                break;
+            default:
+                return;
+        }
+    }
+
+    void Player::addZhenyuanAttr(GData::AttrExtra& ae, ItemZhenyuan * zhenyuan, Fighter * fgt)
+    {
+        if(!zhenyuan || !fgt) return;
+        ItemZhenyuanAttr& zhyAttr = zhenyuan->getZhyAttr();
+        for(int i = 0; i < 4; ++ i)
+        {
+            switch(zhyAttr.type[i])
+            {
+            case 1:
+                ae.attack += zhyAttr.value[i];
+                break;
+            case 2:
+                ae.magatk += zhyAttr.value[i];
+                break;
+            case 3:
+                ae.defend += zhyAttr.value[i];
+                break;
+            case 4:
+                ae.magdef += zhyAttr.value[i];
+                break;
+            case 5:
+                ae.hp += zhyAttr.value[i];
+                break;
+            case 6:
+                ae.toughlvl += zhyAttr.value[i];
+                break;
+            case 7:
+                ae.action += zhyAttr.value[i];
+                break;
+            case 8:
+                ae.hitrlvl += zhyAttr.value[i];
+                break;
+            case 9:
+                ae.evdlvl += zhyAttr.value[i];
+                break;
+            case 10:
+                ae.crilvl += zhyAttr.value[i];
+                break;
+            case 11:
+                ae.pirlvl += zhyAttr.value[i];
+                break;
+            case 12:
+                ae.counterlvl += zhyAttr.value[i];
+                break;
+            case 13:
+                ae.mreslvl += zhyAttr.value[i];
+                break;
+            case 14:
+                ae.criticaldmgimmune += zhyAttr.value[i] / 10000.0f;
+                break;
+            }
+        }
+        stZHYAttrConf& zhyAttrConf = GObjectManager::getZHYAttrConf();
+        for(int i = 0; i < 2; ++ i)
+        {
+            stZhyExtraAttr * zhyea = zhyAttrConf.getExtraAttr(zhyAttr.typeExtra[i]);
+            if(zhyea == NULL)
+                continue;
+            UInt8 type1 = zhyea->type1;
+            UInt8 type2 = zhyea->type2;
+            if(type1 == 1)  //全加
+            {
+                if(type2 == 1)  //力量
+                    ae.strength += zhyAttr.valueExtra[i];
+                else if(type2 == 2) //智力
+                    ae.intelligence += zhyAttr.valueExtra[i];
+                else if(type2 == 3) //耐力
+                    ae.physique += zhyAttr.valueExtra[i];
+                else if(type2 == 4) //敏捷
+                    ae.agility += zhyAttr.valueExtra[i];
+                else if(type2 == 5) //意志
+                    ae.will += zhyAttr.valueExtra[i];
+            }
+            else if(type1 == 2)  //儒加
+            {
+                if(fgt->getClass() != e_cls_ru)
+                    continue;
+                if(type2 == 1)  //力量
+                    ae.strength += zhyAttr.valueExtra[i];
+                else if(type2 == 2) //智力
+                    ae.intelligence += zhyAttr.valueExtra[i];
+                else if(type2 == 3) //耐力
+                    ae.physique += zhyAttr.valueExtra[i];
+                else if(type2 == 4) //敏捷
+                    ae.agility += zhyAttr.valueExtra[i];
+                else if(type2 == 5) //意志
+                    ae.will += zhyAttr.valueExtra[i];
+            }
+            else if(type1 == 3)  //释加
+            {
+                if(fgt->getClass() != e_cls_shi)
+                    continue;
+                if(type2 == 1)  //力量
+                    ae.strength += zhyAttr.valueExtra[i];
+                else if(type2 == 2) //智力
+                    ae.intelligence += zhyAttr.valueExtra[i];
+                else if(type2 == 3) //耐力
+                    ae.physique += zhyAttr.valueExtra[i];
+                else if(type2 == 4) //敏捷
+                    ae.agility += zhyAttr.valueExtra[i];
+                else if(type2 == 5) //意志
+                    ae.will += zhyAttr.valueExtra[i];
+            }
+            else if(type1 == 4)  //道加
+            {
+                if(fgt->getClass() != e_cls_dao)
+                    continue;
+                if(type2 == 1)  //力量
+                    ae.strength += zhyAttr.valueExtra[i];
+                else if(type2 == 2) //智力
+                    ae.intelligence += zhyAttr.valueExtra[i];
+                else if(type2 == 3) //耐力
+                    ae.physique += zhyAttr.valueExtra[i];
+                else if(type2 == 4) //敏捷
+                    ae.agility += zhyAttr.valueExtra[i];
+                else if(type2 == 5) //意志
+                    ae.will += zhyAttr.valueExtra[i];
+            }
+            else if(type1 == 5)  //墨加
+            {
+                if(fgt->getClass() != e_cls_mo)
+                    continue;
+                if(type2 == 1)  //力量
+                    ae.strength += zhyAttr.valueExtra[i];
+                else if(type2 == 2) //智力
+                    ae.intelligence += zhyAttr.valueExtra[i];
+                else if(type2 == 3) //耐力
+                    ae.physique += zhyAttr.valueExtra[i];
+                else if(type2 == 4) //敏捷
+                    ae.agility += zhyAttr.valueExtra[i];
+                else if(type2 == 5) //意志
+                    ae.will += zhyAttr.valueExtra[i];
+            }
+        }
+    }
+
 	void Player::addTotalRecharge( UInt32 r )
 	{
 		if(r == 0)
@@ -9037,6 +9503,15 @@ namespace GObject
         {
             frontMap.buildInfo(this, st);
         }
+        
+        cnt = xjfrontMap.getFrontMapSize(this);
+        UInt8 fcnt1 = xjfrontMap.getCount(this); // XXX: lock???
+        st << cnt << static_cast<UInt8>(GObject::XJFrontMap::getFreeCount()+GObject::XJFrontMap::getGoldCount()-(((fcnt1&0xf0)>>4)+(fcnt1&0xf))) << static_cast<UInt8>(GObject::XJFrontMap::getFreeCount()) << static_cast<UInt8>(GObject::XJFrontMap::getGoldCount());
+        if(cnt)
+        {
+            xjfrontMap.buildInfo(this, st);
+        }
+
 #if 0
 		size_t sz;
 		UInt16 * prices = Dungeon::getPrice(sz);
@@ -10366,11 +10841,7 @@ namespace GObject
 		_battleName = getClanName();
 
 		char numstr2[16];
-        UInt32 clanTitle;
-        if(getBuffData(PLAYER_BUFF_CLAN1) > 0)
-            clanTitle = 1;
-        else
-            clanTitle = 0;
+        UInt32 clanTitle = getCurClanTitle();
 		sprintf(numstr2, "%u", clanTitle);
         /*
         if(cfg.merged && !_battleName.empty() && static_cast<UInt8>(*(_battleName.end() - 1)) < 32)
@@ -10915,6 +11386,26 @@ namespace GObject
     void Player::sendAutoFrontMap()
     {
         frontMap.sendAutoFrontMap(this);
+    }
+
+    void Player::startAutoXJFrontMap(UInt8 id, UInt8 mtype = 0)
+    {
+        xjfrontMap.autoBattle(this, id, 0, mtype);
+    }
+
+    void Player::cancelAutoXJFrontMap(UInt8 id)
+    {
+        xjfrontMap.autoBattle(this, id, 1);
+    }
+
+    void Player::instantAutoXJFrontMap(UInt8 id)
+    {
+        xjfrontMap.autoBattle(this, id, 2);
+    }
+
+    void Player::sendAutoXJFrontMap()
+    {
+        xjfrontMap.sendAutoFrontMap(this);
     }
 
     void Player::AddPracticeExp(const PracticeFighterExp* pfexp)
@@ -11650,7 +12141,14 @@ namespace GObject
                 return false;
 
             m_td.soul += (ib->getEnergy() * num);
-            UInt8 quality = ib->getQuality() > 1 ? ib->getQuality() - 2 : 0;
+            UInt8 quality = 0;
+            if(IsLingbaoTypeId(ib->GetTypeId()))
+                quality = static_cast<ItemLingbao *>(ib)->getLbColor();
+            else if(IsZhenYuanItem(ib->GetTypeId()))
+                quality = static_cast<ItemZhenyuan *>(ib)->getZhyAttr().color;
+            else
+                quality = ib->getQuality();
+            quality = quality > 1 ? quality - 2 : 0;
             for (UInt16 j = 0; j < num; ++j)
             {
                 int rnd = uRand(100);
@@ -14745,7 +15243,7 @@ namespace GObject
             return 0;
         const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
         if (buildingOwner)
-            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingHP));
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingHP) + buildingOwner->getLeftAttr(5));
         return 0;
     }
 
@@ -14755,11 +15253,29 @@ namespace GObject
             return 0;
         const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
         if (buildingOwner)
-            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingPhyAtk));
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingPhyAtk) + buildingOwner ->getLeftAttr(0));
         return 0;
     }
 
     float Player::getClanBuildingMagAtkEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingMagAtk) + buildingOwner ->getLeftAttr(0));
+        return 0;
+    }
+    float Player::getClanBuildingMagDefEffect()
+    {
+        if (_clan == NULL)
+            return 0;
+        const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
+        if (buildingOwner)
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingMagAtk));
+        return 0;
+    }
+    float Player::getClanBuildingPhyDefEffect()
     {
         if (_clan == NULL)
             return 0;
@@ -14775,7 +15291,7 @@ namespace GObject
             return 0;
         const ClanBuildingOwner* buildingOwner = _clan->getBuildingOwner();
         if (buildingOwner)
-            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingAction));
+            return static_cast<float>(buildingOwner->getAddVal(ClanBuilding::eClanBuildingAction) + buildingOwner ->getLeftAttr(4));
         return 0;
     }
 
@@ -17079,6 +17595,7 @@ namespace GObject
                 fgt->getAllUpSkillAndLevel(st);
                 fgt->getAllPSkillAndLevel4Arena(st);
                 fgt->getAllSSAndLevel(st);
+                fgt->getAllSGAndValue(st);
                 fgt->getAllLbSkills(st);
 
                 fgt->getAttrExtraEquip(st);
@@ -17104,6 +17621,7 @@ namespace GObject
             _onBattlePet->getAllUpSkillAndLevel(st);
             _onBattlePet->getAllPSkillAndLevel4Arena(st);
             _onBattlePet->getAllSSAndLevel(st);
+            _onBattlePet->getAllSGAndValue(st);
             _onBattlePet->getAllLbSkills(st);
 
             _onBattlePet->getAttrExtraEquip(st);
@@ -20781,10 +21299,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C };
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 };
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314 };
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 };
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -22165,6 +22683,60 @@ UInt8 Player::toQQGroup(bool isJoin)
         SetVar(VAR_SEVEN_SOUL_NUM, xianpo);
 
         return xianpo;
+    }
+
+    void Player::getXuanTianNingLuLua(UInt32 c)
+    {
+        IncommingInfo ii(XTYLFromUseItem, 0, 0);
+        getXuanTianNingLu(c, &ii);
+
+        Stream st(REP::SKILLSTRENGTHEN);
+        st << static_cast<UInt8>(13);
+        st << GetVar(VAR_SKILL_GRADE_MONEY);
+        st << Stream::eos;
+        send(st);
+    }
+
+    UInt32 Player::getXuanTianNingLu(UInt32 c, IncommingInfo* ii)
+    {
+        UInt32 xtnl = GetVar(VAR_SKILL_GRADE_MONEY);
+		if(c == 0)
+			return xtnl;
+		xtnl += c;
+		SYSMSG_SENDV(195, this, c);
+		SYSMSG_SENDV(1069, this, c);
+        SetVar(VAR_SKILL_GRADE_MONEY, xtnl);
+
+        if(ii && ii->incommingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_xtnl (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ii->incommingType, ii->itemId, ii->itemNum, c, TimeUtil::Now());
+        }
+
+        return xtnl;
+	}
+
+	UInt32 Player::useXuanTianNingLu(UInt32 a, ConsumeInfo* ci)
+	{
+        UInt32 xtnl = GetVar(VAR_SKILL_GRADE_MONEY);
+        if(a == 0 || xtnl == 0)
+            return xtnl;
+        if(xtnl < a)
+            xtnl = 0;
+        else
+        {
+            xtnl -= a;
+            if(ci != NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_xtnl (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(196, this, a);
+        SYSMSG_SENDV(1070, this, a);
+        SetVar(VAR_SKILL_GRADE_MONEY, xtnl);
+
+        return xtnl;
     }
 
 void Player::getQQGameOnlineAward()
@@ -25327,10 +25899,6 @@ void Player::checkSelectPray()
         }
     }
 }
-void Player::doStrongInWorld(UInt8 type)
-{
-    GameAction()->doStrong(this, type, 0, 0);
-}
 
 void Player::SetAirBookValue()
 {
@@ -28132,6 +28700,7 @@ void Player::upgradeMount(bool isAuto)
     st << mountLvl << mountExp;
     st << Stream::eos;
     send(st);
+    GameAction()->doStrong(this, SthModifyMount, 0,0);
 }
 
 void Player::addMountAttrExtra(GData::AttrExtra& attr)
@@ -28802,6 +29371,7 @@ void Player::OpenCard(UInt8 pos)
     st << pos;
     st << Stream::eos;
     send(st);
+    GameAction()->doStrong(this, SthMoBao, 0,0);
 }
 
 void Player::BuyOpenCardNum()
@@ -29304,8 +29874,8 @@ void Player::sendXinMoInfo()
     st <<static_cast<UInt8>(0);
     st << GetVar(VAR_HEART_SWORD);
     std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
-    UInt8 cnt = _fighters.size() ;
-//  st << static_cast<UInt8>(cnt);
+    //UInt8 cnt = _fighters.size() ;
+    //st << static_cast<UInt8>(cnt);
     for (; it != _fighters.end(); ++it)
     {
         Fighter* fgt = it->second; // XXX: Fashion can not be enchanted
@@ -29367,6 +29937,7 @@ UInt8 Player::useChangeSexCard()
     do_skill_strengthen(fgt, oldId);
     do_fighter_xingchen(fgt, oldId);
     do_fighter_xinmo(fgt, oldId);
+    do_skill_grade(fgt, oldId);
 
     struct _stTable
     {
@@ -29558,6 +30129,45 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
         }
     }
 }
+void Player::do_skill_grade(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `skill_grade` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::BuyLeftPower()
+{
+    UInt32 buyCount = GetVar(VAR_LEFTADDR_POWER_ADD);
+    if(buyCount >=2 )
+        return ;
+    UInt32 power = GetVar(VAR_LEFTADDR_POWER);
+    if(buyCount == 0 )
+    {
+        if (getTael() < 1000)
+        {
+            sendMsgCode(0, 1100);
+            return ;
+        }
+        ConsumeInfo ci(BuyPower, 0, 0);
+        useTael(1000, &ci);
+    }
+    if(buyCount == 1)
+    {
+        if (getGold() < 5)
+        {
+            sendMsgCode(0, 1104);
+            return ;
+        }
+        ConsumeInfo ci(BuyPower, 0, 0);
+        useGold(5, &ci);
+    }
+    SetVar(VAR_LEFTADDR_POWER_ADD , buyCount + 1 );
+    if( ( power + 3 ) > 20)
+        SetVar(VAR_LEFTADDR_POWER,20);
+    else
+        SetVar(VAR_LEFTADDR_POWER,power + 3);
+    GameMsgHdr hdr1(0x142, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr1, NULL);
+}
 
 void Player::AddFriendlyCount(Player * friendOne , UInt8 val) 
 {
@@ -29566,7 +30176,7 @@ void Player::AddFriendlyCount(Player * friendOne , UInt8 val)
     std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendOne->getId());
     if(it != _friendlyCount.end())
     {
-       it->second.value += val; 
+        it->second.value += val; 
     }
     else 
     {
@@ -29619,12 +30229,12 @@ void Player::sendFirendlyCountTaskInfo()
 }
 void Player::InsertBrother(Player * pl)
 {
-   if(pl == NULL)
-       return ;
-   if(!_hasFriend(pl))
-       return ;
+    if(pl == NULL)
+        return ;
+    if(!_hasFriend(pl))
+        return ;
 
-   _brothers[pl->getId()] = 1;
+    _brothers[pl->getId()] = 1;
 }
 bool Player::_hasBrother( Player * pl ) const
 {
@@ -29635,7 +30245,7 @@ bool Player::_hasBrother( Player * pl ) const
 }
 UInt32 Player::getFriendlyCount(UInt64 playerId)
 {
-   return _friendlyCount[playerId].value; 
+    return _friendlyCount[playerId].value; 
 }
 void Player::getFriendlyAchievement(UInt8 opt)
 {
@@ -29664,53 +30274,53 @@ void Player::getFriendlyAchievement(UInt8 opt)
     switch(opt)
     {
         case 0:
-        {
-            if(Friends[1] >= 3 )
-                flag = true;
-            break ;
-        }
+            {
+                if(Friends[1] >= 3 )
+                    flag = true;
+                break ;
+            }
         case 1:
-        {
-            if(Friends[1] >= 10 )
-                flag = true;
-            break ;
-        }
+            {
+                if(Friends[1] >= 10 )
+                    flag = true;
+                break ;
+            }
         case 2 :
-        {
-            if(Friends[2] >= 3 )
-                flag = true;
-            break ;
-        }
+            {
+                if(Friends[2] >= 3 )
+                    flag = true;
+                break ;
+            }
         case 3:
-        {
-            if(_brothers.size())
-                flag = true ;
-            break;
-        }
+            {
+                if(_brothers.size())
+                    flag = true ;
+                break;
+            }
         case 4 :
-        {
-            if(Friends[3] >= 1 )
-                flag = true;
-            break ;
-        }
+            {
+                if(Friends[3] >= 1 )
+                    flag = true;
+                break ;
+            }
         case 5 :
-        {
-            if(Friends[3] >= 3 )
-                flag = true;
-            break ;
-        }
+            {
+                if(Friends[3] >= 3 )
+                    flag = true;
+                break ;
+            }
         case 6 :
-        {
-            if(Friends[4] >= 1 )
-                flag = true;
-            break ;
-        }
+            {
+                if(Friends[4] >= 1 )
+                    flag = true;
+                break ;
+            }
         case 7 :
-        {
-            if(Friends[4] >= 2 )
-                flag = true;
-            break ;
-        }
+            {
+                if(Friends[4] >= 2 )
+                    flag = true;
+                break ;
+            }
     }
     if(flag)
     {
@@ -29750,7 +30360,7 @@ bool Player::acceptBrother(Player * friendOne , UInt8 flag)
             UpdateFriendlyCountToDB(friendOne->getId());
         }
     }
-   //if(flag)
+    //if(flag)
     {
         struct st
         {
@@ -30207,8 +30817,12 @@ bool Player::UseYellowBird(Player * friendOne ,UInt32 num)
 
     return true;
 }
-void Player::BuyFriendlyGoods(UInt32 num)
+void Player::BuyFriendlyGoods(UInt8 type)
 {
+    if(!GameAction()->RunFriendlyGoods(this, type))
+    {
+        return;
+    }
 }
 UInt8 Player::GetYBCount(Player *friendOne)
 {
@@ -30269,10 +30883,144 @@ void Player::AddClanFriend()
     }
     SetVar(VAR_CLAN_FRIEND, SET_BIT_8(val, 0, 1));
 }
+/*
 AttrExtra Player::getDrinkInfo()
 {
    AttrExtra ae; 
 }
+*/
+void Player::makeFighterSGList(Stream& st)
+{
+    size_t c = _fighters.size();
+    st.init(REP::SKILLSTRENGTHEN);
+    st << static_cast<UInt8>(10);
+    st << GetVar(VAR_SKILL_GRADE_MONEY);
+    st << static_cast<UInt8>(c);
+    for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+    {
+        if(it->second)
+        {
+            it->second->makeFighterSGInfo(st);
+        }
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::sendFighterSGListWithNoSkill()
+{
+    Stream st;
+    makeFighterSGListWithNoSkill(st);
+    send(st);
+}
+
+void Player::makeFighterSGListWithNoSkill(Stream& st)
+{
+    size_t c = _fighters.size();
+    st.init(REP::SKILLSTRENGTHEN);
+    st << static_cast<UInt8>(14);
+    st << static_cast<UInt8>(c);
+    for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+    {
+        if (it->second)
+        {
+            it->second->makeFighterSGInfoWithNoSkill(st);
+        }
+    }
+    st << Stream::eos;
+}
+
+void Player::makeClanTitleInfo(Stream & st)
+{
+    if(_clan == NULL)
+    {
+        st << static_cast<UInt8>(0);
+        st << static_cast<UInt8>(0);
+        return;
+    }
+    std::map<UInt8, UInt32> & _clanTitle = _clan->GetClanTitle();
+    UInt8 count = _clanTitle.size();
+    UInt8 curClanTitle = GetVar(VAR_CUR_CLAN_TITLE);
+    UInt32 now = TimeUtil::Now();
+    st << curClanTitle;
+    size_t offset = st.size();
+    st << count;
+    for(std::map<UInt8, UInt32>::iterator it = _clanTitle.begin(); it != _clanTitle.end(); ++it)
+    {
+        //first==0表示“无称号”，seonc==0表示永久称号
+        if(it->first == 0 || it->second > now || it->second == 0)
+        {
+            st << it->first <<static_cast<UInt32>(it->second);
+        }
+        else
+        {
+            --count;
+        }
+    }
+    st.data<UInt8>(offset) = count;
+}
+
+void Player::changeClanTitle(UInt8 id)
+{
+    if(_clan == NULL)
+        return;
+    std::map<UInt8, UInt32> & _clanTitle = _clan->GetClanTitle();
+    std::map<UInt8, UInt32>::iterator it = _clanTitle.find(id);
+    if(it != _clanTitle.end())
+        SetVar(VAR_CUR_CLAN_TITLE, id);
+    rebuildBattleName();
+}
+
+void Player::notifyClanTitle()
+{
+    Stream st(REP::USER_INFO_CHANGE);
+    st << static_cast<UInt8>(0x23);
+    makeClanTitleInfo(st);
+    st << Stream::eos;
+    send(st);
+}
+
+UInt32 Player::getCurClanTitle()
+{
+    if(_clan == NULL)
+        return 0;
+    checkClanTitle();
+    return GetVar(VAR_CUR_CLAN_TITLE);
+}
+
+void Player::checkClanTitle()
+{
+    if(_clan == NULL)
+        return;
+    bool writeDB = false;
+    std::map<UInt8, UInt32> & _clanTitle = _clan->GetClanTitle();
+    for(std::map<UInt8, UInt32>::iterator it = _clanTitle.begin(); it != _clanTitle.end();)
+    {
+        if(it->second != 0 && it->second < TimeUtil::Now() )
+        {
+            std::map<UInt8, UInt32>::iterator tmp = it;
+            ++ tmp;
+            if(GetVar(VAR_CUR_CLAN_TITLE) == it->first)
+                SetVar(VAR_CUR_CLAN_TITLE, 0);
+            _clanTitle.erase(it->first);
+            it = tmp;
+            writeDB = true;
+            continue;
+        }
+        ++it;
+    }
+    if(writeDB)
+        _clan->writeClanTitleAll();
+}
+
+void Player::clearClanTitle()
+{
+    UInt8 titleId = GetVar(VAR_CUR_CLAN_TITLE);
+    if(titleId != 0)
+        SetVar(VAR_CUR_CLAN_TITLE, 0);
+    notifyClanTitle();
+}
+
 } // namespace GObject
 
 
