@@ -57,7 +57,7 @@ namespace GObject
         SthFuwenRong,  //符文熔炼
         SthSkillUp,   //个人技能提升
         SthStoreFix, //晶石融合
-        SthXingchen, //星辰描绘
+        SthXingchen = 50, //星辰描绘
         SthPinJieUp, //品阶进阶
         SthGenguUp, //根骨提升
         SthSpiritEat, //元神吞噬
@@ -67,7 +67,26 @@ namespace GObject
         SthEquipLH, //装备炼化
         SthEquipSpirit,//装备注灵
         SthGuJiSpirit, //古籍唤灵
-        SthBaoJuSpirit, //宝具通灵
+        SthBaoJuSpirit = 60, //宝具通灵
+
+        SthZixiaozhidian, //紫霄之巅
+        SthXuanjiFront, //璇玑阵法
+        SthMoBao,  //墨家墨宝
+        SthDuoBao, //夺宝奇兵
+        SthPetCopy, //宠物副本
+        SthCangjiya, //藏剑崖
+        SthArenaLeft, //仙界遗迹
+        SthAcupointGold, //凝结金丹
+        SthModifyMount, //人物飞剑
+        SthSetZhenYuan = 70,  //阵元嵌入
+        SthClanBuild,  //帮派建筑  --注：暂时未使用,可去除
+        SthMarryCopy, //夫妻副本
+        SthMarryFish, //水中垂钓
+        SthPetSanHun, //宠物三魂
+        SthPetQiPo,   //宠物七魄
+        SthXinMo, //人物心魔
+        SthSkillUpgrade, //技能升阶
+
         SthMaxFlag,      //标志记录的个数
     };
 #define STRONGTYPE_CNT 2
