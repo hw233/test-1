@@ -827,15 +827,17 @@ void KangJiTianMo::StartBattle(Player* pl)
         float factor = 1.0f;
         if(memIdx==0)
             factor = static_cast<float>(30)/100.0f;
-
-        UInt32 status = member->GetVar(VAR_KJTM_KILL_NPC_STATUS); 
-        UInt8 mark = GET_BIT(status, (tmd->index-1));
-        if(0 == mark)
+        else
         {
-            if(member->getVipLevel() >= 1 && member->getVipLevel() <= 4)
-                factor = static_cast<float>(150)/100.0f;
-            else if(member->getVipLevel() >= 5)
-                factor = static_cast<float>(200)/100.0f;
+            UInt32 status = member->GetVar(VAR_KJTM_KILL_NPC_STATUS); 
+            UInt8 mark = GET_BIT(status, (tmd->index-1));
+            if(0 == mark)
+            {
+                if(member->getVipLevel() >= 1 && member->getVipLevel() <= 4)
+                    factor = static_cast<float>(150)/100.0f;
+                else if(member->getVipLevel() >= 5)
+                    factor = static_cast<float>(200)/100.0f;
+            }
         }
         member->setKJTMFactor(factor);
 
