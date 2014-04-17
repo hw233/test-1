@@ -26,7 +26,7 @@ const float WBOSS_HP_FACTOR = 1.f;
 const float WBOSS_ATK_FACTOR = .5f;
 const UInt8 WBOSS_BASE_LVL = 20;
 const UInt32 WBOSS_MIN_HP = 20000000;
-const UInt32 WBOSS_MAX_HP = 10500000000;
+const UInt32 WBOSS_MAX_HP = 4290000000;
 const Int32 WBOSS_MAX_ATK= 100000;
 const float WBOSS_MAX_ASC_HP_FACTOR = 1.40f;
 const float WBOSS_MAX_ASC_ATK_FACTOR = 1.40f;
@@ -745,7 +745,8 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         m_lastAtk = extatk + atk;
         m_lastMAtk = extmagatk + matk;
 
-        UInt8 level = WBOSS_BASE_LVL + _hp[0]/1500000;
+        int tmpLvl = WBOSS_BASE_LVL + _hp[0]/1500000;
+        UInt8 level = tmpLvl > 255 ? 255 : tmpLvl;
         nflist[0].fighter->setLevel(level);
         nflist[0].fighter->setColor(getColor(_mgr->getLevel()));
         _ng->setExp(getExp(_mgr->getLevel()));

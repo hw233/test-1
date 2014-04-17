@@ -5160,7 +5160,7 @@ namespace GObject
 
 #endif
 #endif // _WIN32
-        if(ci && ci->purchaseType != TrainFighter && ci->purchaseType != ZCJBRoolAward)
+        if(ci && ci->purchaseType != TrainFighter && ci->purchaseType != ZCJBRoolAward && ci->purchaseType != ZhengHun && ci->purchaseType != DINGQINGXINWU && ci->purchaseType != JieHun)
         {
             AddVar(VAR_USEGOLD_CNT, c);
             AddHYYJCount(c);
@@ -5168,9 +5168,9 @@ namespace GObject
             {
                UInt32 val =  GetVar(VAR_SUMMERMEET_SCORE5);
                if((val + c) >= 1000)
-                   SetVar(VAR_SUMMERMEET_SCORE5 ,1000);
+                   SetVar(VAR_SUMMERMEET_SCORE5, 1000);
                else
-                   AddVar(VAR_SUMMERMEET_SCORE5 ,c );
+                   AddVar(VAR_SUMMERMEET_SCORE5, c);
                sendSummerMeetScoreInfo();
             }
         }
