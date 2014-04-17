@@ -25046,17 +25046,26 @@ void Player::AddHYYJCount(UInt32 v)
 void Player::sendRYHBInfo()
 {
     UInt32 (*ryhb_items)[4] = ryhb_items_1;
+    UInt32 beginTime = 0, endTime = 0;
     if(!World::inActive_opTime_20130531())
     {
         if(!World::getRYHBActivity())
             return;
         ryhb_items = ryhb_items_2;
+        beginTime = GVAR.GetVar(GVAR_RYHB_ACTIVITY_BEGIN);
+        endTime = GVAR.GetVar(GVAR_RYHB_ACTIVITY_END);
+    }
+    else
+    {
+        beginTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+        endTime = beginTime + 7 * 86400;
     }
 
     Stream st(REP::RP_SERVER);
     st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0);
     st << (GetVar(VAR_ZRYJ_COUNT)/20);
     st << (GetVar(VAR_HYYJ_COUNT)/20);
+    st << beginTime << endTime;
 
     UInt8 cnt = 0;
     size_t offset = st.size();
