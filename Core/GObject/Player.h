@@ -3213,7 +3213,6 @@ namespace GObject
         //挑战（连斩榜）
         std::map <Player *, UInt8> _challengePlayer;
         //所有挑战记录
-        UInt8 _recordId;
         std::vector<PlayerReport> _playerReport;
         UInt8 _continueWinPage;
         //增益ID

@@ -874,7 +874,6 @@ namespace GObject
         _canChallengeCnt = 0;
         _continueWinCnt = 0;
         _awardLevel = 0;
-        _recordId = 0;
         _continueWinPage = 0;
         _rbBufId = 0;
         _rbValue = 0;
@@ -30818,7 +30817,7 @@ void Player::makeFighterSGListWithNoSkill(Stream& st)
 
     void Player::makeRBBattleInfo(Stream& st)
     {
-        UInt8 reportCnt = _recordId;
+        UInt8 reportCnt = _playerReport.size();
         st << reportCnt;
         for(UInt8 i = 0; i < reportCnt; i++)
         {
@@ -30832,7 +30831,7 @@ void Player::makeFighterSGListWithNoSkill(Stream& st)
 
     void Player::insertPlayerRecord(PlayerReport record)
     {
-        _playerReport[_recordId++] = record;
+        _playerReport.push_back(record);
     }
 
     void Player::readRandBattleReport(UInt32 reportId)

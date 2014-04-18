@@ -60,6 +60,7 @@
 #include "GObject/ArenaServerWar.h"
 
 #include "GObject/ClanBuilding.h"
+#include "GObject/RaceBattle.h"
 
 GMHandler gmHandler;
 
@@ -317,6 +318,7 @@ GMHandler::GMHandler()
     Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
     Reg(2, "settyss", &GMHandler::OnSetTYSS);
     Reg(3, "clanrank", &GMHandler::TestClanRank);
+    Reg(3, "rb", &GMHandler::OnRaceBattle);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -5506,5 +5508,34 @@ void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& 
     GObject::Clan *clan = player->getClan();
     if(clan != NULL)
         clan->sendMemberBuf(pos);
+}
+
+void GMHandler::OnRaceBattle(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt8 type;
+    type = atoi(args[0].c_str());
+    if(type == 4)
+    {
+        if(args.size() < 2)
+            return;
+        UInt8 pos = atoi(args[1].c_str());
+        GObject::raceBattle.enterPos(player, pos);
+    }
+    else if(type == 12)
+    {
+        if(args.size() < 2)
+            return;
+        UInt64 defenderId = (1LL << 48) + atoll(args[1].c_str());
+        GObject::raceBattle.attackLevelPlayer(player, defenderId);
+    }
+    else if(type == 13)
+    {
+        if(args.size() < 2)
+            return;
+        UInt64 defenderId = (1LL << 48) + atoll(args[1].c_str());
+        GObject::raceBattle.attackContinueWinPlayer(player, defenderId);
+    }
 }
 

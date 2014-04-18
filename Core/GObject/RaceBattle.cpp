@@ -100,6 +100,7 @@ namespace GObject
         makeStarInfo(st, pl, level);
         st << pl->getAwardLevel();
         st << Stream::eos;
+        pl->send(st);
 
         UInt8 page = pl->getContinueWinPage();
         if(page == 0)
@@ -663,7 +664,7 @@ namespace GObject
         if(offset > gPerLeveCnt[level - 1])
             return;
         UInt8 continueCnt = pl->getCanContinueCnt();
-        if(continueCnt > 0)
+        if(continueCnt == 0)
         {
             pl->sendMsgCode(0, 4020);
             return;
