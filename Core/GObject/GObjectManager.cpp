@@ -332,7 +332,7 @@ namespace GObject
         }
 		if(!loadZhenyuanConfig())
         {
-            fprintf(stderr, "loadZhenyuanAttr error!\n");
+            fprintf(stderr, "loadZhenyuanConfig error!\n");
             std::abort();
         }
 		if(!loadFighters())
@@ -6972,7 +6972,7 @@ namespace GObject
 
         LoadingCounter lc("Loading zhenyuan attr:");
         DBZhenyuanAttr dbzhya;
-        if(execu->Prepare("SELECT `id`, `itemId`, `zycolor`, `types`, `values` FROM `zhenyuanAttr`", dbzhya) != DB::DB_OK)
+        if(execu->Prepare("SELECT `zhenyuanAttr`.`id`, `itemId`, `zycolor`, `types`, `values`, `bindType` FROM `zhenyuanAttr` LEFT JOIN `item` ON `zhenyuanAttr`.`id` = `item`.`id` OR `item`.`id` = NULL", dbzhya) != DB::DB_OK)
             return false;
 
         lc.reset(2000);
@@ -7003,6 +7003,7 @@ namespace GObject
             }
             ItemEquipData itemEquipData;
             ItemZhenyuan * zhenyuan = new ItemZhenyuan(dbzhya.id, itype, itemEquipData, zyattr);
+	        zhenyuan->SetBindStatus(dbzhya.bindType > 0);
             pushEquipment(static_cast<ItemEquip *>(zhenyuan));
 		}
 		lc.finalize();

@@ -1566,6 +1566,7 @@ struct DBZhenyuanAttr
     UInt8  zycolor;
     std::string types;
     std::string values;
+    UInt8 bindType;
 };
 
 }
@@ -3539,13 +3540,14 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN (GObject::DBZhenyuanAttr)
-SPECIALDEF(5)
+SPECIALDEF(6)
     (
     UInt32, id,
     UInt32, itemId,
     UInt8,  zycolor,
     std::string, types,
-    std::string, values
+    std::string, values,
+	UInt8, bindType
     )
 SPECIALEND()
 
