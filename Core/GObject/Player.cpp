@@ -30759,8 +30759,16 @@ void Player::makeFighterSGListWithNoSkill(Stream& st)
    {
        if(_clan == NULL)
            return 0;
+       UInt32 clanTitleId = GetVar(VAR_CUR_CLAN_TITLE);
+       if(clanTitleId == 0)
+           return 0;
        checkClanTitle();
-       return GetVar(VAR_CUR_CLAN_TITLE);
+       std::map<UInt8, UInt32> & _clanTitle = _clan->GetClanTitle();
+       std::map<UInt8, UInt32>::iterator it = _clanTitle.find(clanTitleId);
+       if(it != _clanTitle.end())
+           return clanTitleId;
+       SetVar(VAR_CUR_CLAN_TITLE, 0);
+       return 0;
    }
 
    void Player::checkClanTitle()
