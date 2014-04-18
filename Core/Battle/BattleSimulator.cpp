@@ -14953,7 +14953,7 @@ void BattleSimulator::attackByJiuziSS(BattleFighter* bf, const GData::SkillBase*
         if(count == 0)
             return;
         UInt32 rate = (0.1 * 100 + ef->value * count) * 100;
-        if(rate < _rnd(10000) && bf2->getConfuseRound() < 1)
+        if(rate > _rnd(10000) && bf2->getConfuseRound() < 1)
         {
             bf2->setConfuseRound(1);
             appendDefStatus(e_Confuse, 0, bf2);
