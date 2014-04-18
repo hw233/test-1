@@ -25120,7 +25120,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9496, 1, true, false, FromNpc);
+            GetPackage()->AddItem(16010, 1, true, false, FromNpc);
         }
         else
         {
@@ -25131,7 +25131,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9496, 1, true, false, FromNpc);
+                GetPackage()->AddItem(16010, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
