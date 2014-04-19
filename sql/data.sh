@@ -51,11 +51,11 @@ function update_data()
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140114_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140114_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140121_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140124_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140214_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_AddXinMo_0317.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_create_skill_ev.sql
-    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140404_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140124_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140214_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_AddXinMo_0317.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_create_skill_ev.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140404_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from item_template; source itemtemplate;";
