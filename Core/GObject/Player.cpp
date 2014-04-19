@@ -30796,6 +30796,16 @@ void Player::makeFighterSGListWithNoSkill(Stream& st)
        notifyClanTitle();
    }
 
+   void Player::specialUdpLog(UInt8 type)
+   {
+       switch(type)
+       {
+           case 1:
+               udpLog("huodong", "F_140417_1", "", "", "", "", "act");
+               break;
+       }
+   }
+
 } // namespace GObject
 
 
