@@ -54,13 +54,13 @@ namespace GObject
     {
         if (GData::clanBuildingList.size() <= _type)
         {
-            WARN_LOG("ClanBuilding: GData::clanBuildingList.size() = %d.", (UInt32) GData::clanBuildingList.size());
+            //WARN_LOG("ClanBuilding: GData::clanBuildingList.size() = %d.", (UInt32) GData::clanBuildingList.size());
             return 0;
         }
         GData::ClanBuildingTable& clanBuildingTable = GData::clanBuildingList[_type];
         if (clanBuildingTable.size() <= level)
         {
-            WARN_LOG("ClanBuilding: GData::clanBuildingList.size() = %d.", (UInt32) GData::clanBuildingList.size());
+            //WARN_LOG("ClanBuilding: GData::clanBuildingList.size() = %d.", (UInt32) GData::clanBuildingList.size());
             return 0;
         }
         return clanBuildingTable[level].needExp;
