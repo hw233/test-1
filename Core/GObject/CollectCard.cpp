@@ -3,9 +3,13 @@
 #include <map>
 #include "Server/OidGenerator.h"
 #include "GObject/Player.h"
+#include "GObject/Package.h"
+#include "GObject/Country.h"
 #include "Common/Stream.h"
 #include "MsgID.h"
 #include "GData/AttrExtra.h"
+#include "Script/GameActionLua.h"
+
 
 namespace GObject
 {
@@ -129,9 +133,48 @@ namespace GObject
         return ;
     }
     
-    void CollectCard::ExchangeCard(UInt8 flag/* 0 - 手动 1- 自动*/,UInt8 level)//兑换卡牌
+    void CollectCard::ExchangeCard(UInt8 flag/* 0 - 手动 1- 自动*/,UInt8 level ,UInt8 color ,UInt16 count)//兑换卡牌
     {
+        UInt32 iid = 9075;
+        UInt16 mCount = m_owner->GetPackage()->GetItemAnyNum(iid) ;
+        if(mCount < count) //天界牌不足
+            return ;   
+        if(level < 40 || level > 130 )
+           return ;
+        static UInt8 PCardChance[]= {5,4,4,3,3,2,2,2};
+        std::vector<UInt16> getCards ;
+        UInt16 index = 0;
+        UInt8 lev = level/10-4;
+        while(index < count)
+        {
+            UInt8 CNum= GameAction()->GetCardByChance(m_owner,_cnt[lev][0],_cnt[lev][1],_cnt[lev][2]);    
+            if(CNum > 8)
+                continue ;
+            getCards.push_back( (static_cast<UInt16>(level)) * 10 + CNum);
+            _cnt[lev][0] ++ ;
+            _cnt[lev][1] ++ ;
+            _cnt[lev][2] ++ ;
+            if(PCardChance[CNum] > 2)
+            {
+               _cnt[lev][PCardChance[CNum]-3] = static_cast<UInt16>(0);
+            }
+            if(PCardChance[CNum] == color)
+                break;
+            ++index;
+        }
 
+        Stream st(REP::COLLECTCARD);  
+        st << static_cast<UInt8>(3);
+        st << static_cast<UInt32>(getCards.size());
+        for(UInt8 i = 0; i < getCards.size();++i)
+        {
+           //AddCard(level * 10 + getCards[i] , ); 
+           st << static_cast<UInt16>(level*10 + getCards[i]);
+        }
+        st << Stream::eos;
+        m_owner->send(st);
+
+        updateCollectCnt(level);
         return;
     }
     
@@ -228,10 +271,21 @@ namespace GObject
         //DB
         return true;
     }
-
-
-
-
-
-
+    void CollectCard::loadCollectCnt(UInt8 level ,UInt16 cnt1 ,UInt16 cnt2 ,UInt16 cnt3)
+    {
+        if(level < 40 || level > 130)
+            return ;
+        _cnt[level/10-4][0] = cnt1;
+        _cnt[level/10-4][1] = cnt2;
+        _cnt[level/10-4][2] = cnt3;
+    }
+    void CollectCard::updateCollectCnt(UInt8 level)
+    {
+        if(level < 40 || level  > 130 )
+            return ;
+        if(!m_owner)
+            return ;
+        DB1().PushUpdateData("REPLACE INTO `collect_cnt` (`playerId`, `level`, `bluecnt`,`purlecnt`,`orangecnt`) VALUES (%" I64_FMT "u, %u , %u , %u ,%u )", m_owner->getId(), level , _cnt[level/10-4][0],_cnt[level/10-4][1], _cnt[level/10-4][2]);
+    }
+        
 }

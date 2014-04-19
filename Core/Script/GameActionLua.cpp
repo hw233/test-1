@@ -1472,6 +1472,11 @@ namespace Script
         assert(player != NULL);
         return Call<bool>("RunPrayAward", player, val);
     }
+    UInt8 GameActionLua::GetCardByChance(Player* player ,UInt16 cnt1,UInt16 cnt2,UInt16 cnt3)
+    {
+        assert(player != NULL);
+        return Call<UInt8>("GetCardByChance", player, cnt1, cnt2 ,cnt3);
+    }
     bool GameActionLua::RunNovLoginAward(Player* player, UInt8 val)
     {
         assert(player != NULL);

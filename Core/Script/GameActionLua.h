@@ -280,6 +280,7 @@ namespace Script
         bool  RunSummerFlow3OnlineAward(Player* player, UInt8 val);
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         bool  RunPrayAward(Player* player, UInt8 val);
+        UInt8  GetCardByChance(Player* player, UInt16 cnt1 ,UInt16 cnt2 ,UInt16 cnt3);
         bool  RunNovLoginAward(Player* player, UInt8 val);
         bool  RunGameBoxDailyActionAward(Player* player, UInt8 val);
         UInt8 RunNewRC7DayTargetAward(Player* player);

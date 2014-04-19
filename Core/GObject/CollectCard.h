@@ -14,7 +14,7 @@ namespace GData
 
 namespace GObject
 {
-
+    
     enum EAttrType
     {
         ATTR_NULL = 0,
@@ -95,7 +95,7 @@ namespace GObject
             spe_mark = num4;
         }
 
-    }
+    };
 
 
     class Player;
@@ -112,7 +112,7 @@ namespace GObject
 
         void EquipCard(UInt32 id,UInt8 pos);//装备卡牌
         
-        void ExchangeCard(UInt8 flag/* 0 - 手动 1- 自动*/,UInt8 level);//兑换卡牌
+        void ExchangeCard(UInt8 flag/* 0 - 手动 1- 自动*/,UInt8 level ,UInt8 color ,UInt16 count);//兑换卡牌
         
         void ActiveCardSet(UInt8 set_num);//激活卡组
         
@@ -123,6 +123,9 @@ namespace GObject
         void RebuildCardAttr();//重算卡片属性
 
         bool AddCard(UInt16 cid ,UInt8 type ,EAttrType type1,float attr_num1,EAttrType type2,float attr_num2,UInt16 skill_id);//增加卡牌
+        void loadCollectCnt(UInt8 level ,UInt16 cnt1 ,UInt16 cnt2 ,UInt16 cnt3);
+
+        void updateCollectCnt(UInt8 level);
 
     private:
         std::vector<CardInfo*> VecEquipSlot;//装备卡牌槽
@@ -139,6 +142,7 @@ namespace GObject
         
         typedef std::map<UInt32,CardInfo*> MSlot;//空闲卡牌槽
 
+        UInt16 _cnt[10][3];
     };
 
 }

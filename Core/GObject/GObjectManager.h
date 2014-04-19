@@ -337,6 +337,7 @@ namespace GObject
         static bool loadSecondSoul();
         static bool loadFighterXingchen();
         static bool loadFighterXinMo();
+        static bool loadGCollectCnt();
         static bool loadTempItem();
         static bool loadJiguanshu();
         static bool loadJiguanyu();

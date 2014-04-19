@@ -311,6 +311,11 @@ namespace GObject
             fprintf(stderr, "load Fighter xinmo error!\n");
             std::abort();
         }
+		if(!loadGCollectCnt())
+        {
+            fprintf(stderr, "load GCollectCnt error!\n");
+            std::abort();
+        }
 
 		if(!loadJiguanshu())
         {
@@ -7238,6 +7243,29 @@ namespace GObject
 		}
 		lc.finalize();
 
+        return true;
+    }
+    bool GObjectManager::loadGCollectCnt()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if(execu.get() == NULL || !execu->isConnected())
+            return false;
+        LoadingCounter lc("Loading Collect Card");
+        DBCollectCnt t;
+        if(execu->Prepare("SELECT `playerId`, `level`, `bluecnt`, `purlecnt`, `orangecnt` FROM `collect_cnt` ORDER BY `playerId`", t)!= DB::DB_OK)
+            return false;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            Player* pl = globalPlayers[t.playerId];
+            if(!pl)
+                continue;
+            if(!pl->GetCollectCard())
+                continue;
+            pl->GetCollectCard()->loadCollectCnt( t.level , t.bluecnt , t.purlecnt , t.orangecnt);
+        }
+        lc.finalize();
         return true;
     }
 }

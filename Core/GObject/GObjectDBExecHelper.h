@@ -1207,6 +1207,14 @@ struct DBFairySpar
     UInt8 breakoutCnt;
 };
 
+struct DBCollectCnt
+{
+    UInt64 playerId;
+    UInt8 level;
+    UInt16 bluecnt;
+    UInt16 purlecnt;
+    UInt16 orangecnt;
+};
 struct DBCollectCard
 {
     UInt64 playerId;
@@ -3065,6 +3073,18 @@ SPECIALDEF(12)
     UInt16, alreadyCnt
 )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::DBCollectCnt)
+SPECIALDEF(5)
+(
+    UInt64, playerId,
+    UInt8, level,
+    UInt16, bluecnt,
+    UInt16, purlecnt,
+    UInt16, orangecnt
+)
+SPECIALEND()
+
 
 SPECIALBEGIN(GObject::DBRNR)
 SPECIALDEF(2)
