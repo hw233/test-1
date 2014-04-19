@@ -26058,7 +26058,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1300,2350,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
@@ -26105,21 +26105,21 @@ void Player::Send11GradeAward(UInt8 type)
 {
     if(type > 11)
         return ;
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1300,2350,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
-        {{9424,1 }, {503,1}},
-        {{501,2},{500,2}},
-        {{9604,3},{513,2},{9438,1}},
-        {{9600,2},{516,2},{503,2}},
+        {{9418,1}, {503,1}},
+        {{501,2},{9497,2}},
+        {{9603,3},{9438,2}},
+        {{9414,2},{16001,2},{1126,2}},
         {{547,3},{9308,3},{517,3}},
-        {{549,1},{551,2},{134,2}},
-        {{1325,2},{503,2},{509,2},{134,2},{9438,2}},
-        {{1728,1},{8555,4}},
+        {{549,1},{551,3},{8000,4}},
+        {{16001,3},{9498,2},{509,2},{134,2},{9438,2}},
+        {{1729,1},{8555,4}},
         {{9600,25},{9418,25},{9424,40}},
-        {{9068,20}},
-        {{9019,20},{9017,20},{9022,15}},
+        {{9498,50},{9022,10}},
+        {{9021,10},{9068,15},{9075,15}},
     };
-    static UInt32 count[] = {2,2,3,3,3,3,5,2,3,1,3};
+    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,2,3};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -30759,8 +30759,16 @@ void Player::makeFighterSGListWithNoSkill(Stream& st)
    {
        if(_clan == NULL)
            return 0;
+       UInt32 clanTitleId = GetVar(VAR_CUR_CLAN_TITLE);
+       if(clanTitleId == 0)
+           return 0;
        checkClanTitle();
-       return GetVar(VAR_CUR_CLAN_TITLE);
+       std::map<UInt8, UInt32> & _clanTitle = _clan->GetClanTitle();
+       std::map<UInt8, UInt32>::iterator it = _clanTitle.find(clanTitleId);
+       if(it != _clanTitle.end())
+           return clanTitleId;
+       SetVar(VAR_CUR_CLAN_TITLE, 0);
+       return 0;
    }
 
    void Player::checkClanTitle()
