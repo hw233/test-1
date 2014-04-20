@@ -2603,6 +2603,7 @@ namespace GObject
         TripodData& runTripodData(TripodData& data, bool = false);
 
     public:
+        void specialUdpLog(UInt8 type);
         void sendSingleEnchant(UInt8 enchant);
         void sendOldRC7DayAward();
 
