@@ -28111,10 +28111,10 @@ void Player::GetFindOldManAward(UInt32 type)
         SYSMSG_BROADCASTV(574, getCountry(), getPName(), type );
     }
     GetPackage()->AddItem(9451, num, true, false);   //欢乐礼包(9439) 其他活动要修改
-    AddVar(VAR_OLDMAN_DAYSCORE,num*5);
-    AddVar(VAR_OLDMAN_SCORE,num*5);
-    SYSMSG_SENDV(2024,this,num*5);
-    SYSMSG_SENDV(2025,this,num*5);
+    AddVar(VAR_OLDMAN_DAYSCORE,num*10);
+    AddVar(VAR_OLDMAN_SCORE,num*10);
+    SYSMSG_SENDV(2024,this,num*10);
+    SYSMSG_SENDV(2025,this,num*10);
     char str[16] = {0};
     sprintf(str, "F_131205_5");
     udpLog("shengdanzhuomicang", str, "", "", "", "", "act");

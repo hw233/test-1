@@ -735,10 +735,10 @@ function RunQZoneRechargeAward(player, cts)
 end
 function RunInterestingAward(player, cts)
     local item = {
-        [0] = {{500,3},{56,3},{9371,3},{15,3}},
-        [1] = {{503,3},{514,3},{500,3},{516,2}},
-        [2] = {{501, 3},{547,3},{517,3},{513,3}},
-        [3] = {{134,3},{1325,3},{509,3},{515,3}},
+        [0] = {{500,3},{9424,3},{511,3}},
+        [1] = {{501,3},{503,3},{514,3},{516,3}},
+        [2] = {{547,3},{1325,3},{551,3},{517,3}},
+        [3] = {{134,3},{509,3},{549,1},{515,3}},
     };
     local package = player:GetPackage();
 --    package:DelItemSendMsg(9371, player)
@@ -761,7 +761,7 @@ function RunInterestingAward(player, cts)
 end
 function RunInterestingBag(player, cts)
     local item = {
-        [0] = {{15,1},{9371,1},{500,1}},
+        [0] = {{33,1},{9371,1},{500,1}},
     };
     local package = player:GetPackage();
     package:DelItemSendMsg(9451, player)   --需要修改
