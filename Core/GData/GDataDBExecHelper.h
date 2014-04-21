@@ -796,6 +796,15 @@ struct DBZHYExtraAttr
     UInt16 maxVal;
 };
 
+struct DBErlkingConfig
+{
+    UInt8 copyId;
+    UInt8 conditionA;
+    UInt8 conditionB;
+    UInt32 npcgroup;
+    UInt32 itemId;
+};
+
 }
 
 namespace DB {
@@ -1719,6 +1728,17 @@ SPECIALDEF(4)
     Int32, effect,
     UInt32, consume,
     UInt8, needLev
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBErlkingConfig)
+SPECIALDEF(5)
+	(
+    UInt8, copyId,
+    UInt8, conditionA,
+    UInt8, conditionB,
+    UInt32, npcgroup,
+    UInt32, itemId
 	)
 SPECIALEND()
 

@@ -38,6 +38,7 @@
 #include "XingchenData.h"
 #include "JiguanData.h"
 #include "HunPoData.h"
+#include "ErlkingTable.h"
 #include "TeamArenaSkill.h"
 #include "SevenSoul.h"
 #include "RideConfig.h"
@@ -396,6 +397,12 @@ namespace GData
         if (!LoadSanHunConfig())
         {
             fprintf (stderr, "Load LoadSanHunConfig Error !\n");
+            std::abort();
+        }
+
+        if (!LoadErlkingConfig())
+        {
+            fprintf (stderr, "Load LoadErlkingConfig Error !\n");
             std::abort();
         }
 
@@ -2446,6 +2453,24 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
 		{
             hunpoData.setSanHunInfo(dbsh);
+        }
+
+        return true;
+    }
+
+    bool GDataManager::LoadErlkingConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBErlkingConfig db;
+
+		if(execu->Prepare("SELECT `copyId`, `conditionA`, `conditionB`, `npcgroup`, `itemId` FROM `erlking`", db) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            erlkingData.setErlkingInfo(db);
         }
 
         return true;
