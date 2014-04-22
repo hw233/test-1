@@ -1895,5 +1895,16 @@ namespace Script
 		assert(player != NULL);
         Call<void>("getJiqirenAward_Dungeon", player, diff, isFree);
     }
+    
+    UInt16 GameActionLua::getSpeCard(UInt16 itemId)
+    {
+		return Call<UInt16>("getSpeCard", itemId);
+    }
+
+    UInt16 GameActionLua::getsuitAttr(UInt8 suitId)
+    {
+		return Call<UInt16>("getsuitAttr", suitId);
+    }
+
 }
 

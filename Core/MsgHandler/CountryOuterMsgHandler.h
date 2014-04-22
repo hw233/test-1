@@ -8518,8 +8518,12 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
             break;
         case 2:
         {
-            
-
+            UInt8 opt1 = 0;
+            UInt8 opt2 = 0;
+            br >> opt1 >> opt2;
+            if(opt2 != 1 && opt2 != 2 && opt2 != 3)
+                return;
+            player->GetCollectCard()->ActiveCardSet(opt1,opt2);
         }
             break;
         case 4:
@@ -8539,6 +8543,13 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
              }
              player->GetCollectCard()->UpGradeCard(id,vecid);
 
+        }
+            break;
+        case 5:
+        {
+            UInt16 opt1 = 0;
+            br >> opt1; 
+            player->GetCollectCard()->ExchangeSpeCard(opt1);
         }
             break;
         default:

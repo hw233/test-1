@@ -6,6 +6,9 @@
 #include "Common/Stream.h"
 #include "MsgID.h"
 #include "GData/AttrExtra.h"
+#include "GData/CardSystem.h"
+#include "Script/GameActionLua.h"
+#include "Country.h"
 
 namespace GObject
 {
@@ -23,22 +26,65 @@ namespace GObject
 
     bool CardInfo::checkInfo()
     {
-        if(this == NULL || id == 0 || cid == 0 || type == 0 || level == 0)
+        if(this == NULL || id == 0 || cid == 0 || type == 0 || level == 0 || color == 0 || attr_id == 0)
             return false;
 
         return true;
     }
 
-    bool SuitCardInfo::checkExistSetBit(UInt8 cid)
+    void SuitCardInfo::checkExistSetBit(UInt16 cid)
     {
-        UInt8 card_index = cid % 10;
-        if(!GET_BIT(suit_mark,card_index))
-            return false;  
-        
-        suit_mark = SET_BIT(suit_mark,card_index); 
+        if(id != 20)
+        {
+            UInt8 card_index = cid % 10;
+            if(GET_BIT(suit_mark,card_index-1))
+                return ;  
+            
+            suit_mark = SET_BIT(suit_mark,card_index-1); 
+
+            if(card_index == 1)
+                collect_degree += 20;
+            else if(card_index == 2 || card_index == 3)
+                collect_degree += 15;
+            else if(card_index == 4 || card_index == 5)
+                collect_degree += 10;
+            else
+                collect_degree += 5;
+        }
+        else
+        {
+            UInt8 card_index = cid % 200;
+            if(GET_BIT(spe_mark,card_index))
+                return ;  
+            
+            spe_mark = SET_BIT(spe_mark,card_index); 
+        }
+
         //TODO DB
         
-        return true;
+        return ;
+    }
+
+    bool SuitCardInfo::checkActive(UInt8 active_set)
+    {
+        switch(active_set)
+        {
+            case 1:
+                if(collect_degree >= 25)
+                    return true;
+                break;
+            case 2:
+                if(collect_degree >= 50)
+                    return true;
+                break;
+            case 3:
+                if(collect_degree >= 100)
+                    return true;
+                break;
+            default:
+                break;
+        }
+        return false;
     }
 
     void CollectCard::ReturnCardInfo(UInt8 flag)
@@ -53,7 +99,7 @@ namespace GObject
         {
             if((*i)->checkInfo() == false)  
                 continue;
-            st << (*i)->id << (*i)->cid << (*i)->level << (*i)->exp;
+            st << (*i)->id << (*i)->cid << (*i)->level << (*i)->exp << (*i)->pos;
             ++size;
         }
         
@@ -69,7 +115,7 @@ namespace GObject
             {
                 if(i->second->checkInfo() == false)  
                     continue;
-                st << i->second->id << i->second->cid << i->second->level << i->second->exp;
+                st << i->second->id << i->second->cid << i->second->level << i->second->exp << i->second->pos;
                 ++size1;
             }       
             
@@ -104,7 +150,7 @@ namespace GObject
         MStamp::iterator it = MapCardStamp.find(suit_lvl);
     
         st << suit_lvl;
-        if(suit_lvl == 20)
+        if(suit_lvl != 20)
             st << it->second->suit_mark;
         else
             st << it->second->spe_mark;
@@ -135,6 +181,18 @@ namespace GObject
             //TODO DB
         }else if(pos <= 4)
         {
+            //装备卡牌槽的御剑等级限制
+            if(pos == 3)
+            {
+                if(m_owner->getVipLevel() < 1)
+                    return;
+            }
+            if(pos == 4)
+            {
+                if(m_owner->getVipLevel() < 2)
+                    return;
+            }
+
             if(VecEquipSlot[pos - 1]->checkInfo())
                 return ;
             
@@ -178,62 +236,81 @@ namespace GObject
         return;
     }
     
-    void CollectCard::ActiveCardSet(UInt8 set_num)//激活卡组
+    void CollectCard::ActiveCardSet(UInt8 suit_lvl,UInt8 active_set)//激活卡组
     {
-        
+        if(MapCardStamp.find(suit_lvl) == MapCardStamp.end())
+            return ;
+
+        SuitCardInfo* sci = MapCardStamp.find(suit_lvl)->second;
+        if(sci->active >= active_set)
+            return;
+        else
+        {
+            if(sci->checkActive(active_set))
+                sci->active = active_set;
+            //TODO DB
+
+        }
+
+        Stream st(REP::COLLECTCARD);  
+        st << static_cast<UInt8>(2) ;//0x02套牌信息
+        ReturnSuitInfo(st,suit_lvl);
+        st << Stream::eos; 
+        m_owner->send(st);
         return;
     } 
 
     void CollectCard::UpGradeCard(UInt32 id,std::vector<UInt32>& vecid)//卡片升级
     {
+        UInt16 add_exp = 0;
+        std::vector<UInt32>::iterator it = vecid.begin();
         
+        if(MapFreeCardSlot.find(id) == MapFreeCardSlot.end())
+            return;
+        CardInfo* upcard = MapFreeCardSlot.find(id)->second;
 
+        while(it != vecid.end())
+        {
+            if(MapFreeCardSlot.find(*it) == MapFreeCardSlot.end())
+                break;
+            UInt16 cid = MapFreeCardSlot.find(*it)->second->cid;
+            //TODO 找到卡牌经验值
+            GData::CardInitInfo* cii = GData::csys.getCardInitInfo(cid);
+            if(cii == NULL)
+                break;
+            upcard->exp += cii->initExp + MapFreeCardSlot.find(*it)->second->exp;
+            while(GData::csys.checkUpgrade(upcard));
+
+            DelAddCard(*it);
+
+            it++;
+        }
+
+        Stream st(REP::COLLECTCARD);  
+        st << static_cast<UInt8>(4) ;//0x02套牌信息
+        st << upcard->id << upcard->cid << upcard->level << upcard->exp << upcard->pos;
+
+        size_t off1 = st.size();//空闲卡牌数
+        st << static_cast<UInt8>(0);
+        UInt8 size1 = 0;
+        for(MSlot::iterator i = MapFreeCardSlot.begin(); i != MapFreeCardSlot.end(); i++)
+        {
+            if(i->second->checkInfo() == false)  
+                continue;
+            st << i->second->id << i->second->cid << i->second->level << i->second->exp << i->second->pos;
+            ++size1;
+        }       
+        
+        if (size1)
+            st.data<UInt8>(off1) = size1;
+
+        st << Stream::eos; 
+        m_owner->send(st);
 
         return;
     }
 
-    void switchAttrFunc(GData::AttrExtra& ae,EAttrType type ,float num)
-    {
-        switch(type)
-        {
-            case ATTR_ATK:
-                ae.attack += num;
-                break;
-            case ATTR_MAGATK:
-                ae.magatk += num;
-                break;
-            case ATTR_DEF:
-                ae.defend += num;
-                break;
-            case ATTR_MAGDEF:
-                ae.magdef += num;
-                break;
-            case ATTR_PIERCE:
-                ae.pierce += num;
-                break;
-            case ATTR_CRITICAL:
-                ae.critical += num;
-                break;
-            case ATTR_EVADE:
-                ae.evade += num;
-                break;
-            case ATTR_HITRATE:
-                ae.hitrate += num;
-                break;
-            case ATTR_COUNTER:
-                ae.counter += num;
-                break;
-            case ATTR_TOUGH:
-                ae.tough += num;
-                break;
-            case ATTR_HP:
-                ae.hp += num;
-                break;
-            default:
-                break;
-        }
-    }
-
+    
     void CollectCard::AddCardAttr(GData::AttrExtra& ae)//计算增加的属性
     {
         VecSlot::iterator it = VecEquipSlot.begin();
@@ -242,12 +319,38 @@ namespace GObject
         while(it != VecEquipSlot.end()) 
         {
             if((*it)->checkInfo())
-            {
-                switchAttrFunc(ae,(*it)->type1,(*it)->attr_num1);        
-                switchAttrFunc(ae,(*it)->type2,(*it)->attr_num2);        
-            }
+                GData::csys.AddCardAttr(ae,(*it)->attr_id,(*it)->level ,(*it)->color,(*it)->type);
             it++;
         }
+
+        for(MStamp::iterator i = MapCardStamp.begin(); i != MapCardStamp.end(); i++)
+        {
+            if(i->second->active == 0 || i->second->active > 3) 
+                continue;
+
+            UInt16 attr_id = GameAction()->getsuitAttr(i->second->id);
+            GData::csys.AddSuitCardAttr(ae,attr_id,i->second->active);
+        }
+        
+        if(MapCardStamp.find(20) != MapCardStamp.end())
+        {
+            MStamp::iterator i = MapCardStamp.find(20); 
+            if(i->second->spe_mark != 0)
+            {
+                UInt8 num = 0;
+                while(num < 32) 
+                {
+                    if(GET_BIT(i->second->spe_mark,num))
+                    {
+                        UInt16 attr_id = GameAction()->getsuitAttr(200 + num);
+                        GData::csys.AddSuitCardAttr(ae,attr_id,i->second->active);
+                    }
+                    num ++;
+                }
+
+            }
+        }
+        
 
         return;
     }
@@ -261,11 +364,18 @@ namespace GObject
         return;
     }
 
-    bool CollectCard::AddCard(UInt16 cid ,UInt8 type ,EAttrType type1,float attr_num1,EAttrType type2,float attr_num2,UInt16 skill_id)//增加卡牌
+    CardInfo* CollectCard::AddCard(UInt16 cid )//增加卡牌
     {
-        CardInfo* ci = new CardInfo(IDGenerator::gCardOidGenerator.ID(),cid,type,static_cast<UInt8>(1),static_cast<UInt16>(0),type1,attr_num1,type2,attr_num2,skill_id,0);
+        GData::CardInitInfo* citmp = GData::csys.getCardInitInfo(cid); 
+        if(citmp == NULL)
+            return NULL;
+
+        CardInfo* ci = new CardInfo(IDGenerator::gCardOidGenerator.ID(),cid,citmp->type,static_cast<UInt8>(1),static_cast<UInt16>(0),citmp->skillId,static_cast<UInt8>(0), citmp->color,static_cast<UInt16>(32001));
         if(!ci->checkInfo())
-            return false;
+        {
+            delete ci;
+            return NULL;
+        }        
         MapFreeCardSlot.insert(std::make_pair(ci->id,ci)); 
         
         if(MapCardStamp.find(cid/10) == MapCardStamp.end())
@@ -275,11 +385,10 @@ namespace GObject
             //TODO DB
         }
         SuitCardInfo* tmp = MapCardStamp.find(cid/10)->second;
-        if(!tmp->checkExistSetBit(ci->id))
-            return false;
+        tmp->checkExistSetBit(ci->cid);
         //TODO DB
         
-        return true;
+        return ci;
     }
 
     bool CollectCard::DelAddCard(UInt32 id)
@@ -293,6 +402,23 @@ namespace GObject
         //TODO DB
     }
 
+    void CollectCard::ExchangeSpeCard(UInt16 itemid)
+    {
+        UInt16 cid = GameAction()->getSpeCard(itemid);        
+        if(cid == 0)
+            return;
+        
+        SuitCardInfo* tmp = MapCardStamp.find(cid/10)->second;
+        if(GET_BIT(tmp->spe_mark,cid % 200))
+            return;
+        AddCard(cid); 
+        Stream st(REP::COLLECTCARD);  
+        st << static_cast<UInt8>(2) ;//0x02套牌信息
+        ReturnSuitInfo(st,20);
+        st << Stream::eos; 
+        m_owner->send(st);
+        return;
+    }
 
 
 
