@@ -376,6 +376,8 @@ namespace GObject
         static bool loadQiShiBan();
         static bool LoadPlayerModifyMounts();
         static bool loadSkillGrade();
+        static bool loadCard();
+        static bool loadCardSuit();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

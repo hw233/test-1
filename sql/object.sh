@@ -272,6 +272,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_skillgrade.sql     #创建技能升阶
     #增加的表中如果有fighterId，记得在useChangeSexCard函数中添加修改主将ID的函数
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_cardsystem.sql     #创建卡牌系统
 }
 
 #sh player_jiguan.sh

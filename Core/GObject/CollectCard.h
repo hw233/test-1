@@ -115,6 +115,8 @@ namespace GObject
 
     class Player;
 	class Fighter;
+	class DBCard;
+	class DBCardSuit;
 
     class CollectCard
     {
@@ -144,6 +146,10 @@ namespace GObject
         bool DelAddCard(UInt32 id);
     
         void ExchangeSpeCard(UInt16 itemid);
+    
+        void InsertCard(DBCard dbc);
+        
+        void InsertCardSuit(DBCardSuit dbcs);
 
     private:
         std::vector<CardInfo*> VecEquipSlot;//装备卡牌槽
