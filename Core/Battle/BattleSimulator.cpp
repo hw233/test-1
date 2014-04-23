@@ -15016,11 +15016,7 @@ bool BattleSimulator::doEffectAfterCount(BattleFighter* bf, const GData::SkillBa
     if(last == 0)
         return bRet;
 
-    UInt8 target_side;
-    if(skill->target == 0)
-        target_side = 0;
-    else
-        target_side = 1;
+    UInt8 target_side = bf->getSide();
     for(UInt8 i = 0; i < 25; i++)
     {
         BattleObject* bo2 = getObject(target_side, i);
