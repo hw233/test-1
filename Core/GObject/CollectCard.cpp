@@ -492,12 +492,24 @@ namespace GObject
                     default:
                         break;
                 }
+                
+                
             }
             //TODO 找到卡牌经验值
             DB4().PushUpdateData("UPDATE `card` SET `exp` = '%u',`level` = '%u' WHERE `playerId` = %" I64_FMT "u and id = '%u'",upcard->exp,upcard->level,m_owner->getId(),id);
             
             DelAddCard(*it);
 
+            if(cii->type != 1)
+            {
+                if(upcard->level >= cii->lvLimit)
+                   break;
+            }
+            else
+            {
+                if(upcard->level >= m_owner->getMainFighter()->getLevel())
+                    break;
+            }
             it++;
         }
 
