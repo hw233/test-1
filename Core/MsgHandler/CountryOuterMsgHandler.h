@@ -8906,8 +8906,6 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                 default:
                     break;
             }
-
-
         }
     default:
         break;
