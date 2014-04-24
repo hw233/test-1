@@ -24,7 +24,7 @@ void CalInitExp(UInt8& initExp ,UInt8 level, UInt8 color ,UInt8 type)
     float colorMark= 0.0f;
     float typeMark= 0.0f;
     
-    levelMark = static_cast<float>(level - 40) * 0.2 + 0.78;
+    levelMark = static_cast<float>(level - 40) * 0.2 + lvlmark;
     
     switch(color)
     {
@@ -119,11 +119,13 @@ CardUpgradeTable* CardSystem::getCardUpgradeTable(UInt8 level)
 
 bool CardSystem::checkUpgrade(GObject::CardInfo* ci)
 {
+    if(ci->level == 150)
+        return false;
     if(_cardUpgrade.find(ci->level) == _cardUpgrade.end())
         return false;
     CardUpgradeTable tmp = (_cardUpgrade.find(ci->level))->second; 
                 
-    if(ci->type == 1 || ci->type == 3)
+    if(ci->type == 2 || ci->type == 3)
     {
         switch(ci->color)
         {
@@ -147,7 +149,7 @@ bool CardSystem::checkUpgrade(GObject::CardInfo* ci)
                 return false;
         }
     }
-    else // ci->type == 2 人物卡牌
+    else // ci->type == 1 人物卡牌
     {
         switch(ci->color)
         {

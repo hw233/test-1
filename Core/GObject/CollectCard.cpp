@@ -345,7 +345,7 @@ namespace GObject
                _cnt[lev][PCardChance[CNum-1]-3] = static_cast<UInt16>(0);
                char str[32] = {0};
                sprintf(str, "F_140506_%d",PCardChance[CNum-1]-2);
-               udpLog("kapaixitong", str, "", "", "", "", "act");
+               m_owner->udpLog("kapaixitong", str, "", "", "", "", "act");
             }
             if(PCardChance[CNum - 1] == color)
                 break;
@@ -419,6 +419,19 @@ namespace GObject
         if(MapFreeCardSlot.find(id) == MapFreeCardSlot.end())
             return;
         CardInfo* upcard = MapFreeCardSlot.find(id)->second;
+        if(upcard == NULL)
+            return;
+        GData::CardInitInfo* cii = GData::csys.getCardInitInfo(upcard->cid);
+        if(cii->type != 1)
+        {
+            if(upcard->level > cii->lvLimit)
+               return;
+        }
+        else
+        {
+            if(m_owner->getMainFighter()->getLevel() < cii->lvLimit)
+                return;
+        }
 
         while(it != vecid.end())
         {
@@ -436,43 +449,43 @@ namespace GObject
                 switch(upcard->level)
                 {
                     case 10:
-                        m_owner->udpLog("kaipaixitong", "F_140506_4", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_4", "", "", "", "", "act");
                         break;
                     case 20:
-                        m_owner->udpLog("kaipaixitong", "F_140506_5", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_5", "", "", "", "", "act");
                         break;
                     case 30:
-                        m_owner->udpLog("kaipaixitong", "F_140506_6", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_6", "", "", "", "", "act");
                         break;
                     case 40:
-                        m_owner->udpLog("kaipaixitong", "F_140506_7", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_7", "", "", "", "", "act");
                         break;
                     case 50:
-                        m_owner->udpLog("kaipaixitong", "F_140506_8", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_8", "", "", "", "", "act");
                         break;
                     case 60:
-                        m_owner->udpLog("kaipaixitong", "F_140506_9", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_9", "", "", "", "", "act");
                         break;
                     case 70:
-                        m_owner->udpLog("kaipaixitong", "F_140506_10", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_10", "", "", "", "", "act");
                         break;
                     case 80:
-                        m_owner->udpLog("kaipaixitong", "F_140506_11", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_11", "", "", "", "", "act");
                         break;
                     case 90:
-                        m_owner->udpLog("kaipaixitong", "F_140506_12", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_12", "", "", "", "", "act");
                         break;
                     case 100:
-                        m_owner->udpLog("kaipaixitong", "F_140506_13", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_13", "", "", "", "", "act");
                         break;
                     case 110:
-                        m_owner->udpLog("kaipaixitong", "F_140506_14", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_14", "", "", "", "", "act");
                         break;
                     case 120:
-                        m_owner->udpLog("kaipaixitong", "F_140506_15", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_15", "", "", "", "", "act");
                         break;
                     case 130:
-                        m_owner->udpLog("kaipaixitong", "F_140506_16", "", "", "", "", "act");
+                        m_owner->udpLog("kapaixitong", "F_140506_16", "", "", "", "", "act");
                         break;
                     default:
                         break;

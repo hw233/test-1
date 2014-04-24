@@ -75,6 +75,7 @@
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
 #include "GObject/ClanBuilding.h"
+#include "GObject/CollectCard.h"
 
 struct NullReq
 {
@@ -1197,6 +1198,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
+    pl->GetCollectCard()->ReturnCardInfo(1);
     GObject::MarryBoard::instance().sendTodayMarryInfo(pl ,1);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
