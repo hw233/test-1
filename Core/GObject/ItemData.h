@@ -256,6 +256,14 @@ namespace GObject
             return count;
         }
     };
+     // 散仙灵侍属性
+     struct ItemLingshiAttr
+     {
+        UInt8  lv;
+        UInt32 exp;     //灵侍经验
+
+        ItemLingshiAttr(): lv(1), exp(0) {}
+     };
 }
 
 #endif

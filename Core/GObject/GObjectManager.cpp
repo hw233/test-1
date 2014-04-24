@@ -237,6 +237,10 @@ namespace GObject
 		execu->Extract("SELECT max(`id`) FROM `zhenyuanAttr`", maxItemId);
         if(maxItemId > maxId)
             maxId = maxItemId;
+        maxItemId = 0;
+		execu->Extract("SELECT max(`id`) FROM `lingshi`", maxItemId);
+        if(maxItemId > maxId)
+            maxId = maxItemId;
 		IDGenerator::gItemOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`tradeId`) FROM `trade`", maxId);
 		IDGenerator::gTradeOidGenerator.Init(maxId);
@@ -314,6 +318,11 @@ namespace GObject
         if(!loadZhenyuanAttr())
         {
             fprintf(stderr, "loadZhenyuanAttr error!\n");
+            std::abort();
+        }
+        if(!loadLingshiAttr())
+        {
+            fprintf(stderr, "loadLingshiAttr error!\n");
             std::abort();
         }
 		if(!loadEquipmentsSpirit())
@@ -1724,7 +1733,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1`,`xjfrontFreeCnt`, `xjfrontGoldCnt`, `xjfrontUpdate` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `packSizeLS`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1`,`xjfrontFreeCnt`, `xjfrontGoldCnt`, `xjfrontUpdate` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -1789,6 +1798,11 @@ namespace GObject
             {
                 dbpd.pdata.packSizeSoul = PlayerData::INIT_PACK_SIZE + 50;
 				DB1().PushUpdateData("UPDATE `player` SET `packSizeSoul` = %u WHERE `id` = %" I64_FMT "u", dbpd.pdata.packSizeSoul, id);
+            }
+            if (dbpd.pdata.packSizeLS < 50)
+            {
+                dbpd.pdata.packSizeLS = 50;
+				DB1().PushUpdateData("UPDATE `player` SET `packSizeLS` = %u WHERE `id` = %" I64_FMT "u", dbpd.pdata.packSizeLS, id);
             }
 
 			{
@@ -2199,7 +2213,7 @@ namespace GObject
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
         //if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `lingshi`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -2331,6 +2345,7 @@ namespace GObject
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
+            fgt2->setLingshi(specfgtobj.lingshi, false);
             if (fgt2->isPet())
                 fgt2->setSkills(specfgtobj.skill, false);
             else
@@ -7148,6 +7163,36 @@ namespace GObject
             ItemZhenyuan * zhenyuan = new ItemZhenyuan(dbzhya.id, itype, itemEquipData, zyattr);
 	        zhenyuan->SetBindStatus(dbzhya.bindType > 0);
             pushEquipment(static_cast<ItemEquip *>(zhenyuan));
+		}
+		lc.finalize();
+
+		return true;
+    }
+
+	bool GObjectManager::loadLingshiAttr()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading lingshi attr:");
+        DBLingshiAttr dblsa;
+        if(execu->Prepare("SELECT `lingshiAttr`.`id`, `itemId`, `level`, `exp`, `bindType` FROM `lingshiAttr` LEFT JOIN `item` ON `lingshiAttr`.`id` = `item`.`id` OR `item`.`id` = NULL", dblsa) != DB::DB_OK)
+            return false;
+
+        lc.reset(2000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            const GData::ItemBaseType * itype = GData::itemBaseTypeManager[dblsa.itemId];
+            if(itype == NULL)
+                continue;
+            ItemLingshiAttr lsattr;
+            ItemEquipData itemEquipData;
+            lsattr.lv = dblsa.level;
+            lsattr.exp = dblsa.exp;
+            ItemLingshi * lingshi = new ItemLingshi(dblsa.id, itype, itemEquipData, lsattr);
+	        lingshi->SetBindStatus(dblsa.bindType > 0);
+            pushEquipment(static_cast<ItemLingshi *>(lingshi));
 		}
 		lc.finalize();
 

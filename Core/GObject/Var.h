@@ -711,6 +711,8 @@ namespace GObject
         
         VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 729,//璇玑阵图自动战斗使用金钱标志
         VAR_ATOXJFM = 730,     //自动璇玑阵图id
+        VAR_LINGSHI_PEIYANG_CNT = 731, //灵侍仙石培养次数
+        VAR_LINGSHI_PEIYANG_LUCKY = 732, //灵侍培养出现暴击记录
         //731 - 751 for lib
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
@@ -1356,6 +1358,8 @@ namespace GObject
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
+            REGISTER_VAR(VAR_LINGSHI_PEIYANG_CNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_LINGSHI_PEIYANG_LUCKY, CYCLE_NONE);
             REGISTER_VAR(VAR_LIMIT_APPOINTMENT, CYCLE_NONE);
         }
 

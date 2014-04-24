@@ -33,7 +33,9 @@
 #define LPETARM_ID      12000
 #define RPETARM_ID      12999
 #define LPETGEM_ID      13000
-#define RPETGEM_ID      14999
+#define RPETGEM_ID      13999
+#define LLINGSHI_ID     14000
+#define RLINGSHI_ID     15000
 #define LZHENYAUN_ID    15001
 #define RZHENYUAN_ID    15499
 #define LOTHER_ID       15500
@@ -136,6 +138,8 @@ enum ItemClass
     Item_PetGem1, Item_PetGem2, Item_PetGem3, Item_PetGem4,             //物攻，法功，物防，法防
     Item_PetGem5, Item_PetGem6, Item_PetGem7, Item_PetGem8,             //暴击，暴击伤害，破击，命中
     Item_PetGem9, Item_PetGem10, Item_PetGem11,                         //躲避，反击，坚韧
+    Item_LingShi = 240,
+    Item_LingShi1, Item_LingShi2, Item_LingShi3,
 };
 
 inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号
@@ -167,6 +171,11 @@ inline bool IsPetItem(UInt32 id)
 inline bool IsZhenYuanItem(UInt32 id)
 {
 	return id >= LZHENYAUN_ID && id <= RZHENYUAN_ID;
+}
+
+inline bool IsLingShiItem(UInt32 id)
+{
+	return id >= LLINGSHI_ID && id <= RLINGSHI_ID;
 }
 
 /** 新增11,12级宝石 **/
@@ -207,6 +216,11 @@ inline bool IsEquip(UInt8 subClass)
 inline bool IsZhenYuan(UInt8 subClass)
 {
 	return subClass >= static_cast<UInt8>(Item_Formula6) && subClass <= static_cast<UInt8>(Item_Formula9);
+}
+
+inline bool IsLingShi(UInt8 subClass)
+{
+	return subClass >= static_cast<UInt8>(Item_LingShi) && subClass <= static_cast<UInt8>(Item_LingShi3);
 }
 
 inline bool IsWeapon(UInt8 subClass)
@@ -260,6 +274,8 @@ inline ItemClass GetItemSubClass(UInt32 id)
         return Item_SL;
     if (id >= LPETGEM_ID && id <= RPETGEM_ID)
         return Item_PetGem;
+    if (id >= LLINGSHI_ID && id <= RLINGSHI_ID)
+        return Item_LingShi;
 	return Item_Other;
 }
 
@@ -378,6 +394,7 @@ namespace GData
 	extern std::vector<ItemGemType *> gemTypes;
 	extern std::vector<ItemGemType *> petGemTypes;
 	extern std::vector<ItemGemType *> mountTypes;
+	extern std::vector<ItemGemType *> lingshiTypes;
 	typedef ObjectListT<ItemEquipSetType> ItemEquipSetTypeManager;
 	extern ItemEquipSetTypeManager itemEquipSetTypeManager;
 

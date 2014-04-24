@@ -44,6 +44,7 @@
 #include "GObject/Married.h"
 #include "CoupleUpgrade.h"
 #include "CoupleCopy.h"
+#include "LingShiTable.h"
 
 namespace GData
 {
@@ -53,6 +54,7 @@ namespace GData
 	std::vector<ItemGemType *> gemTypes(1000);
 	std::vector<ItemGemType *> petGemTypes(1000);
 	std::vector<ItemGemType *> mountTypes(400);
+	std::vector<ItemGemType *> lingshiTypes(1000);
 	ItemEquipSetTypeManager	itemEquipSetTypeManager;
     std::map<UInt16, UInt16> skill2item;
 
@@ -453,6 +455,11 @@ namespace GData
             fprintf (stderr, "Load LoadSkillEvConfig Error !\n");
             std::abort();
         }
+        if (!LoadLingShiConfig())
+        {
+            fprintf (stderr, "Load LoadLingShiConfig Error !\n");
+            std::abort();
+        }
 
 		return true;
 	}
@@ -827,6 +834,16 @@ namespace GData
 					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
 					wt = igt;
 					mountTypes[wt->getId() - LMOUNT_ID] = igt;
+                }
+				break;
+            case Item_LingShi:
+            case Item_LingShi1:
+            case Item_LingShi2:
+            case Item_LingShi3:
+				{
+					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
+					wt = igt;
+					lingshiTypes[wt->getId() - LLINGSHI_ID] = igt;
                 }
 				break;
             case Item_PetEquip:
@@ -2998,5 +3015,32 @@ namespace GData
         }
         return true;
     }
+
+    bool GDataManager::LoadLingShiConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBLingShi dbls;
+		if(execu->Prepare("SELECT `id`, `level`, `isUp`, `useItem`, `useGold`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `toughlvl`, `action`, `hitrlvl`, `evdlvl`, `crilvl`, `criticaldmg`, `pirlvl`, `counterlvl`, `mreslvl` FROM `lingshi`", dbls) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbls.id > 0)
+                lingshiCls.setLingshiTable(dbls);
+        }
+
+        DBLingShiUp dblsu;
+		if(execu->Prepare("SELECT `level`, `rate`, `exp` FROM `lingshi_upgrade`", dblsu) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dblsu.level > 0)
+                lingshiCls.setLingshiUpTable(dblsu);
+        }
+        return true;
+    }
+
 }
 

@@ -88,6 +88,7 @@ namespace GData
         static bool LoadCangjianConfig();
         static bool LoadCoupleInfo();
         static bool LoadCoupleCopy();
+        static bool LoadLingShiConfig();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);

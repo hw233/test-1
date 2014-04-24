@@ -29,6 +29,7 @@
 #include "GObjectDBExecHelper.h"
 #include "GData/SoulExpTable.h"
 #include "GData/LBSkillTable.h"
+#include "GData/LingShiTable.h"
 #include "GObject/Leaderboard.h"
 #include "FairySpar.h"
 #include "HoneyFall.h" 
@@ -82,6 +83,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_armor, 0, 5 * sizeof(ItemEquip *));
 	memset(_trump, 0, sizeof(_trump));
 	memset(_trumpSkill, 0, sizeof(_trumpSkill));
+	memset(_lingshi, 0, sizeof(_lingshi));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
 	memset(_lingbao, 0, sizeof(_lingbao));
     m_2ndSoul = NULL;
@@ -1277,6 +1279,67 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
     return t;
 }
 
+UInt32 Fighter::getLingshiNum()
+{
+    UInt32 num = 0;
+     for (int i = 0; i < LINGSHI_UPMAX; ++i)
+     {
+        if (_lingshi[i])
+            num ++ ;
+     }
+     return num;
+}
+
+ItemEquip * Fighter::setLingshi(ItemEquip * lingshi)
+{
+    if(!lingshi || !IsLingShi(lingshi->getClass()))
+        return NULL;
+    UInt8 idx = 0xFF;
+    for(int i = 0; i < LINGSHI_UPMAX; ++ i)
+    {
+        if(_lingshi[i] == NULL)
+        {
+            idx = i;
+            break;
+        }
+    }
+    if(idx >= LINGSHI_UPMAX)
+        idx = 0;
+    return setLingshi(lingshi, idx);
+}
+
+ItemEquip ** Fighter::setLingshi( std::string& lingshi, bool writedb )
+{
+    if (!lingshi.length())
+        return 0;
+
+    StringTokenizer tk(lingshi, ",");
+    for (size_t i = 0; i < tk.count() && static_cast<int>(i) < LINGSHI_UPMAX; ++ i)
+    {
+        ItemEquip* lshi = GObjectManager::fetchEquipment(atoi(tk[i].c_str()));
+        if (lshi)
+            setLingshi(lshi, i, writedb);
+    }
+
+    return &_lingshi[0];
+}
+
+ItemEquip * Fighter::setLingshi(ItemEquip * lingshi, int idx, bool writedb)
+{
+    if((lingshi && !IsLingShi(lingshi->getClass())) || idx >= LINGSHI_UPMAX)
+        return NULL;
+    for(int i = 0; i < LINGSHI_UPMAX; ++ i)
+    {
+        if(_lingshi[i] == lingshi)
+            return NULL;
+    }
+    ItemEquip * old = _lingshi[idx];
+    _lingshi[idx] = lingshi;
+    //sendModification(0x0a+idx, _trump[idx], writedb);
+    setDirty();
+    return old;
+}
+
 int Fighter::getAllTrumpId( UInt32* trumps, int size )
 {
     if (!trumps || !size)
@@ -1847,6 +1910,19 @@ void Fighter::addTrumpAttr( ItemEquip* trump )
 	addEquipAttr2(_attrExtraEquip, trump->getEquipAttr2(), _level);
 }
 
+void Fighter::addLingshiAttr( ItemEquip* lingshi )
+{
+    if (!lingshi)
+        return;
+    GData::ItemGemType * igt = GData::lingshiTypes[lingshi->GetTypeId() - LLINGSHI_ID];
+    GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lingshi->GetTypeId(), static_cast<ItemLingshi *>(lingshi)->getLingshiAttr().lv);
+    if (!igt || !lsd)
+        return;
+
+	addAttrExtra(_attrExtraEquip, igt->attrExtra);
+	addAttrExtra(_attrExtraEquip, &(lsd->attrs));
+}
+
 void Fighter::rebuildEquipAttr()
 {
 	_attrExtraEquip.reset();
@@ -2095,6 +2171,9 @@ void Fighter::rebuildEquipAttr()
         }
         //阵元系统加成
         _owner->addZhenyuanAttr(_attrExtraEquip, this);
+        //灵侍系统加成
+        for(UInt8 i = 0; i < LINGSHI_UPMAX; ++ i)
+            addLingshiAttr(_lingshi[i]);
     }
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
@@ -2658,6 +2737,14 @@ ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
         {
             pos = idx;
             return _trump[idx];
+        }
+    }
+    for(int idx = 0; idx < LINGSHI_UPMAX; ++ idx)
+    {
+        if(_lingshi[idx] != NULL && _lingshi[idx]->getId() == id)  // 灵侍
+        {
+            pos = idx;
+            return _lingshi[idx];
         }
     }
 	return NULL;

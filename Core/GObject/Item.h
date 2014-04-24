@@ -66,7 +66,11 @@ namespace GObject
 				return 1;
 			return (num + _itemBaseType->maxQuantity - 1) / _itemBaseType->maxQuantity;
 		}
-		inline UInt16 Count() const { return IsEquip(_itemBaseType->subClass) || IsZhenYuan(_itemBaseType->subClass) ? 1 : m_TotalCount; }
+		inline UInt16 Count() const
+        {
+            bool result = IsEquip(_itemBaseType->subClass) || IsZhenYuan(_itemBaseType->subClass) || IsLingShi(_itemBaseType->subClass);
+            return result ? 1 : m_TotalCount;
+        }
 		inline UInt16 GetLeftNum() const { return m_TotalCount % _itemBaseType->maxQuantity; }
 		inline UInt16 GetOverlayNum() const { return _itemBaseType->maxQuantity; }
 		inline UInt32 GetSellTime() const { return m_SellTime; }
@@ -304,6 +308,19 @@ namespace GObject
         ItemZhenyuanAttr& getZhyAttr() { return m_zhyAttr; }
 	private:
         ItemZhenyuanAttr m_zhyAttr;
+	};
+
+	//¡È Ã
+	class ItemLingshi : public ItemEquip
+    {
+    public:
+		ItemLingshi(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData, ItemLingshiAttr& lsAttr)
+		    : ItemEquip(id, itemEquipType, itemEquipData), m_lsAttr(lsAttr)
+		{}
+
+        ItemLingshiAttr& getLingshiAttr() { return m_lsAttr; }
+	private:
+        ItemLingshiAttr m_lsAttr;
 	};
 
 }

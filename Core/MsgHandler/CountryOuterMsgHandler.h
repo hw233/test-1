@@ -3588,7 +3588,6 @@ void OnXJFrontMapReq( GameMsgHdr& hdr, const void* data)
         default:
             break;
     }
-    
 }
 
 
@@ -9007,6 +9006,60 @@ void OnXinMoReq( GameMsgHdr & hdr, const void * data )
     }
 }
 
+void OnLingShiReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    if(player->GetLev() < 75)
+        return;
+
+    UInt8 type = 0;
+    brd >> type;
+
+    switch(type)
+    {
+        case 0x10:
+            player->GetPackage()->SendLSPackageItemInfor();
+            break;
+        case 0x12:
+            {
+                UInt8 opt = 0;
+                UInt16 fighterId = 0;
+                UInt32 lsId = 0;
+                brd >> opt >> fighterId >> lsId;
+                player->GetPackage()->lingshiBreak(fighterId, lsId, opt > 0);
+            }
+            break;
+        case 0x13:
+            {
+                UInt16 fighterId = 0;
+                UInt32 lsId = 0;
+                std::string idStr;
+                brd >> fighterId >> lsId >> idStr;
+                player->GetPackage()->lingshiUpgrade(fighterId, lsId, idStr);
+            }
+            break;
+        case 0x14:
+            {
+                UInt8 opt = 0;
+                UInt16 fighterId = 0;
+                UInt32 lsId = 0;
+                brd >> opt >> fighterId >> lsId;
+                player->GetPackage()->lingshiBreak(fighterId, lsId, opt > 0);
+            }
+            break;
+        case 0x15:
+            {
+                UInt8 opt = 0;
+                UInt16 fighterId = 0;
+                UInt32 lsId = 0;
+                brd >> opt >> fighterId >> lsId;
+                player->GetPackage()->lingshiTrain(fighterId, lsId, opt > 0);
+            }
+            break;
+    }
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

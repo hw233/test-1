@@ -162,6 +162,7 @@ enum PurchaseType
     EnterAutoXJFrontMap         = 1024, //璇玑阵图
     EnterXJFrontMap             = 1025, //璇玑阵图
     ZhenYuanCuiLian             = 1026, //阵元淬炼费
+    LingShiPeiYang              = 1027, //灵侍培养仙石消耗
     //繁体私有占150～200
 };
 

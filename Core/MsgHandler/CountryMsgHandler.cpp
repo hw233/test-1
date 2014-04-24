@@ -191,6 +191,7 @@ MSG_REG_2(GameMsgHdr, REQ::EQ_LINGBAO, OnEquipLingbaoReq);
 MSG_REG_2(GameMsgHdr, REQ::EQ_DELUEGEM, OnDelueGemReq);
 
 MSG_REG_2(GameMsgHdr, REQ::EQ_XINMO, OnXinMoReq);
+MSG_REG_2(GameMsgHdr, 0x71, OnLingShiReq);
 
 MSG_REG_2(GameMsgHdr, REQ::TEMPITEM_INFO, OnQueryTempItemReq);
 
