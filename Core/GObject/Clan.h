@@ -610,7 +610,7 @@ public:
     //帮派称号
     void SetClanTitle(std::string clantitleAll);
     std::map<UInt8, UInt32> & GetClanTitle();
-    void addClanTitle(UInt8 titleId, UInt32 endTime, Player * pl);
+    void addClanTitle(UInt8 titleId, UInt32 endTime/*, Player * pl*/);
     void writeClanTitleAll();
     
     UInt32 getGradeInAirBook(){return  _gradeInAirbook;}
