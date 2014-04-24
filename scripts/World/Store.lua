@@ -114,7 +114,7 @@ function loadStore()
         store:clear()
 
         discount(store)
-    store:add(2 ,9457 ,20)
+    --store:add(2 ,9457 ,20)
 
     store:add(2,16004,2)
     store:add(2,16005,10)
