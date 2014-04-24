@@ -9133,7 +9133,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             _st.playerId = player->getId();
             _st.res = res;
             _st.type = 0;
-            _st.type = 0;
+            _st.count = 0;
             GameMsgHdr hdr(0x404, friendOne->getThreadId(), friendOne, sizeof(_st));
             GLOBAL().PushMsg( hdr, &_st );
             //friendOne->beReplyForDrinking(player,res);
