@@ -308,6 +308,21 @@ function loadStore()
         -- 奇珍
 		--store:add(2,9433,500)
 		--store:add(2,9498,30)
+        store:add(2, 1700, 599) --仙墨笔
+        store:add(2, 1701, 599) --折翼扇
+        store:add(2, 1702, 599) --西方之焰
+        store:add(2, 1703, 599) --玫瑰情缘
+        store:add(2, 1704, 599) --轩辕双剑
+        store:add(2, 1705, 599) --伏羲古琴
+        store:add(2, 1706, 599) --QQ管家机器人
+        store:add(2, 1709, 599) --圣诞萌萌的糖
+        store:add(2, 1710, 599) --圣诞老人的包袱
+        store:add(2, 1711, 599) --爆竹
+        store:add(2, 1712, 599) --莲花灯
+        store:add(2, 1717, 599) --女仆头饰
+        store:add(2, 1719, 599) --兔耳朵
+        store:add(2, 1724, 599) --五毒天王
+
 		store:add(2,9338,50)
 		--store:add(2,9349,10)
 		store:add(2,9310,30)
