@@ -7,11 +7,11 @@ namespace GData
 
 CardSystem csys;
 
-static float lvlmark = 0.78;//40级系数
+static float lvlmark = 0.94;//40级系数
 
-static float greenMark = 0.1;//绿色品质系数
-static float blueMark = 0.2;//蓝色品质系数
-static float purpleMark = 0.5;//紫色品质系数
+static float greenMark = 0.4;//绿色品质系数
+static float blueMark = 0.6;//蓝色品质系数
+static float purpleMark = 0.8;//紫色品质系数
 static float orangeMark = 1;//橙色品质系数
 
 static float equipMark = 1;//装备系数
@@ -215,10 +215,10 @@ void CardSystem::AddCardAttr(GData::AttrExtra& ae, UInt16 attr_id,UInt8 level ,U
     switch(type)
     {
         case 1:
-            typeMark = equipMark;
+            typeMark = humanMark;
             break;
         case 2:
-            typeMark = humanMark;
+            typeMark = equipMark;
             break;
         case 3:
             typeMark = speMark;
@@ -241,7 +241,7 @@ void CardSystem::AddSuitCardAttr(GData::AttrExtra& ae,UInt16 attr_id,UInt8 activ
     switch(active_set)
     {
         case 1:
-            activeMark = 0.25; 
+            activeMark = 0.3; 
             break;
         case 2:
             activeMark = 0.5; 
@@ -252,7 +252,7 @@ void CardSystem::AddSuitCardAttr(GData::AttrExtra& ae,UInt16 attr_id,UInt8 activ
         default:
             break;
     }
-    tmp = tmp * activeMark;
+    tmp = tmp ^ activeMark;
     ae += tmp;
     return;
 }

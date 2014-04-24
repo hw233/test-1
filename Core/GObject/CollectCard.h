@@ -108,7 +108,7 @@ namespace GObject
             collect_degree = num5;
         }
         
-        void checkExistSetBit(UInt16 cid);
+        void checkExistSetBit(UInt16 cid, UInt8 color);
         bool checkActive(UInt8 active_set);
 
     };
@@ -127,7 +127,7 @@ namespace GObject
 
         void ReturnCardInfo(UInt8 flag);
         
-        bool ReturnSuitInfo(Stream&,UInt8 suit_lvl);
+        bool ReturnSuitInfo(Stream&,UInt8 suit_lvl,bool isSpe = false,bool isRet = false);
 
         void EquipCard(UInt32 id,UInt8 pos);//装备卡牌
         
