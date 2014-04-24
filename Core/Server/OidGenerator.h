@@ -123,10 +123,8 @@ namespace IDGenerator
     class CardIDGen:
 		public IDGen
 	{
-		//随机种子ID生成规则
 	public:
-		CardIDGen(UInt32 maxid = static_cast<UInt32>(time(NULL))): IDGen(maxid) {}
-		virtual UInt32 genID() { _maxID += static_cast<UInt32>(time(NULL)); return _maxID; }
+		CardIDGen(UInt32 maxid = 0): IDGen(maxid) {}
 	};
 
 	template <typename GenType>

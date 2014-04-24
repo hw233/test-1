@@ -9112,7 +9112,7 @@ end
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    local item = 1514;
+    local item = 1543;
 
     if package:GetRestPackageSize() < (1+(1*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
@@ -12593,6 +12593,7 @@ local ItemNormal_Table = {
 
     [9027] = ItemNormal_00009027,
     [9440] = ItemNormal_00009440,
+    [9458] = ItemNormal_00009440,
 
     [9067] = ItemNormal_00009067,
     [9076] = ItemNormal_00009076,

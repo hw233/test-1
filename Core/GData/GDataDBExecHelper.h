@@ -612,6 +612,11 @@ struct DBXinMoConfig
     std::string skilllev;
     UInt32 payBack;
 };
+struct DBDrinkAttrConfig
+{
+    UInt32 value;
+    UInt32 hp;
+};
 struct DBJiguanyuConfig
 {
     UInt32 jiguanyuId;
@@ -1508,7 +1513,6 @@ SPECIALDEF(9)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBXinMoConfig)
-
 SPECIALDEF(11)
 (
     UInt8, id,
@@ -1526,6 +1530,14 @@ SPECIALDEF(11)
     std::string, skilllev,
     UInt32, payBack
     )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBDrinkAttrConfig)
+SPECIALDEF(2)
+(
+    UInt32 , value,
+    UInt32 , hp
+)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBJiguanyuConfig)

@@ -36,6 +36,7 @@
 #include "DreamerTable.h"
 #include "FairyPetTable.h"
 #include "XingchenData.h"
+#include "DrinkAttr.h"
 #include "JiguanData.h"
 #include "HunPoData.h"
 #include "TeamArenaSkill.h"
@@ -361,6 +362,11 @@ namespace GData
         if (!LoadXinMoConfig())
         {
             fprintf (stderr, "Load LoadXinMoConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadDrinkAttrConfig())
+        {
+            fprintf (stderr, "Load LoadDrinkAttrConfig Error !\n");
             std::abort();
         }
 
@@ -2986,6 +2992,23 @@ namespace GData
             stxc.skilllev = dbxcc.skilllev;
             stxc.payBack = dbxcc.payBack;
             xinmoData.setXinMoTable(stxc);
+        }
+        return true;
+    }
+    bool GDataManager::LoadDrinkAttrConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBDrinkAttrConfig dbda;
+		if(execu->Prepare("SELECT `value`, `hp`  FROM `drinkAttr`", dbda) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            DrinkAttr::stDrinkAttr da;
+            da.hp = dbda.hp;
+            drinkAttrData.setDrinkAttrTable(dbda.value , da);
         }
         return true;
     }

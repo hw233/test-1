@@ -724,6 +724,11 @@ namespace GObject
             fprintf(stderr, "LoadPlayerModifyMounts error!\n");
             std::abort();
         }
+		if(!loadFriendlyCount())
+        {
+            fprintf(stderr, "loadFriendlyCount error!\n");
+            std::abort();
+        }
 
         if(!loadSkillGrade())
         {
@@ -7703,6 +7708,50 @@ namespace GObject
 		return true;
     }
 
+	bool GObjectManager::loadFriendlyCount()
+	{
+		UInt32 now = TimeUtil::Now();
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading friendlyCount:");
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		DBFriendlyCount dbfr;
+		if(execu->Prepare("SELECT `playerId`, `friendId`, `value` ,`isBrother` ,`time`,`cost`,`wait`,`ybTime`,`ybCount`,`clearTime`,`task1`,`task2`,`task3`,`task4`,`task5`,`task6` FROM `friendlyCount` ORDER BY `playerId`", dbfr) != DB::DB_OK)
+			return false;
+		lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbfr.playerId != last_id)
+			{
+				last_id = dbfr.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Player *friendOne = globalPlayers[dbfr.friendId];
+			if(friendOne == NULL)
+				continue;
+            {
+                pl->LoadFriendlyCountFromDB(dbfr.friendId ,dbfr.value, dbfr.time ,dbfr.cost, dbfr.wait);
+                friendOne->LoadFriendlyCountFromDB(pl->getId(),dbfr.value ,0 ,0 ,0 ,1);
+            }
+            if(dbfr.isBrother!=0)
+            {
+                pl->InsertBrother(friendOne);
+            }
+            if(dbfr.ybTime!= 0 && TimeUtil::SharpDay(0, now) == TimeUtil::SharpDay(0, dbfr.ybTime))
+            {
+                pl->SetYBCount( friendOne, dbfr.ybTime, dbfr.ybCount);
+            }
+            if(dbfr.clearTime != 0)
+                pl->SetFriendTaskNum(friendOne ,dbfr.clearTime , dbfr.task1 , dbfr.task2, dbfr.task3, dbfr.task4, dbfr.task5, dbfr.task6);
+		}
+		lc.finalize();
+		return true;
+	}
 }
 
 

@@ -563,7 +563,7 @@ public:
     inline static bool  getGGTime(UInt32 time =0 )
     {
         UInt32 now = TimeUtil::Now() + time;
-        if ((now > getOpenTime() + 7 * 86400) && (now  < getOpenTime() + 14 * 86400) )
+        if ((now > getOpenTime() + 14 * 86400) && (now  < getOpenTime() + 21 * 86400) )
             return true;
         return false ;
         //return _ggtime; 
@@ -605,9 +605,9 @@ public:
     inline static bool  getOldManTime()
     {
         //UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
-        UInt32 begin = TimeUtil::MkTime(2014, 1, 31);
+        UInt32 begin = TimeUtil::MkTime(2014, 4, 25, 8);
         //UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
-        UInt32 end = TimeUtil::MkTime(2014, 2, 7);
+        UInt32 end = TimeUtil::MkTime(2014, 4, 26, 20);
         UInt32 now = TimeUtil::Now() ;
         if( now >= begin && now <= end)
             return true;
@@ -938,8 +938,11 @@ public:
     }
     inline static bool getHappyFireTime(UInt32 time = 0)
     {
-        UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
-        UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
+        //UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
+        //UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
+
+        UInt32 begin = TimeUtil::MkTime(2014, 4, 30);
+        UInt32 end = TimeUtil::MkTime(2014, 5, 5);
         UInt32 now = TimeUtil::Now()+time;
         if( now >= begin && now <= end)
             _happyFire = true;
@@ -1000,6 +1003,9 @@ public:
         UInt32 begin = GVAR.GetVar(GVAR_TYSS_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_TYSS_END);
         UInt32 now = TimeUtil::Now() + time;
+
+        if ((now > getOpenTime() + 7 * 86400) && (now  < getOpenTime() + 14 * 86400) )
+            return true;
 
         if(now >= begin && now <= end)
             return true;

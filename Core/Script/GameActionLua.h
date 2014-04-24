@@ -277,6 +277,7 @@ namespace Script
         bool  RunPresentAward(Player* player, UInt8 val);
         bool  RunAirBookOnlineAward(Player* player, UInt8 val);
         bool  RunAirBookLoginAward(Player* player, UInt8 val);
+        bool  RunFriendlyGoods(Player* player, UInt8 val , UInt32 count);
         bool  RunSummerFlow3OnlineAward(Player* player, UInt8 val);
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         bool  RunPrayAward(Player* player, UInt8 val);

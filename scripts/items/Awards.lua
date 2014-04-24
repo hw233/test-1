@@ -735,10 +735,10 @@ function RunQZoneRechargeAward(player, cts)
 end
 function RunInterestingAward(player, cts)
     local item = {
-        [0] = {{500,3},{56,3},{9371,3},{15,3}},
-        [1] = {{503,3},{514,3},{500,3},{516,2}},
-        [2] = {{501, 3},{547,3},{517,3},{513,3}},
-        [3] = {{134,3},{1325,3},{509,3},{515,3}},
+        [0] = {{500,3},{9424,3},{511,3}},
+        [1] = {{501,3},{503,3},{514,3},{516,3}},
+        [2] = {{547,3},{1325,3},{551,3},{517,3}},
+        [3] = {{134,3},{509,3},{549,1},{515,3}},
     };
     local package = player:GetPackage();
 --    package:DelItemSendMsg(9371, player)
@@ -761,10 +761,10 @@ function RunInterestingAward(player, cts)
 end
 function RunInterestingBag(player, cts)
     local item = {
-        [0] = {{15,1},{9371,1},{500,1}},
+        [0] = {{33,1},{9371,1},{500,1}},
     };
     local package = player:GetPackage();
-    package:DelItemSendMsg(9451, player)   --需要修改
+    package:DelItemSendMsg(16011, player)   --需要修改
     if cts > 1  then
         return false
     end
@@ -878,7 +878,7 @@ function RunBlueDiamondAward(player, opt)
         [5] = {{515,6},{507,4},{509,4},{503,20},{1325,8},{47,6},{134,8},{5026,2}},
         [6] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{503,5},{1719,1},{5135,1}},
         [7] = {{503,1},{9414,1},{9438,1},{515,1},{9076,2},{1325,1},{9649,1},{8555,1},{134,1},{5065,1},{56,2},{5005,1}},
-        [8] = {{9022,1},{56,1},{515,1},{503,1},{509,1},{514,1},{134,1},{15,1}}
+        [8] = {{9076,1},{56,1},{515,1},{503,1},{509,1},{514,1},{134,1},{9497,1}}
     };
     local item_id = {9190, 9191, 9217, 9284,10119};
     
@@ -920,7 +920,7 @@ function RunBlueDiamondAward(player, opt)
    end
    
    if opt ==8 and j%2 ==1 then 
-        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."在新年欢乐大转盘中幸运的获得了".."[4:"..items[j][1].."]x"..items[j][2])
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."在勤劳大转盘中幸运的获得了".."[4:"..items[j][1].."]x"..items[j][2])
     end
     local extraAward_9191 = {
         [2] = {9191,1,1},
@@ -1715,10 +1715,10 @@ end
 function RunHappyValueAward(player, cts)
     local item = {
         [1] = {{56,2},{57,2},{15,2},{500,2},{9371,3}},
-        [2] = {{500,2},{511,2},{501,2},{517,2}},
-        [3] = {{516,3},{503,3},{547,3},{551,3}},
+        [2] = {{500,2},{9497,2},{501,2},{517,2}},
+        [3] = {{9600,3},{503,3},{547,3},{551,3}},
         [4] = {{465,1},{514,1}},
-        [5] = {{515,2},{134,2},{1325,2}},
+        [5] = {{515,2},{134,2},{16001,2}},
         [6] = {{9022,2},{509,3},{9076,1}},
     };
     local baoshi = {5005,5015,5025,5035,5045,5055,5065,5075,5085,5095,5105,5115,5125,5135,5145}
@@ -1806,4 +1806,42 @@ function GetCardByChance(player ,cnt1,cnt2,cnt3)
     return Card[(color-1)*2 +idx]
 end
 
+function RunFriendlyGoods(player, cts ,count)
+    local item = {
+        [1] = {0,15,50},
+        [2] = {0,1526,50},
+        [3] = {0,57,50},
+        [4] = {0,56,50},
+        [5] = {0,1326,50},
+        [6] = {50,9371,50},
+        [7] = {80,9498,150},
+        [8] = {75,16001,200},
+        [9] = {55,1126,100},
+        [10] = {0,16005,50},
+    };
+    local package = player:GetPackage();
+
+    if cts > 10  or cts <= 0 then
+        return false
+    end
+    if count == 0 then 
+        return 
+    end
+    local value = player:GetVar(700)
+    if value < item[cts][3] * count then
+        return 
+    end
+    local lev = player:GetLev()
+    if lev < item[cts][1] then 
+        player:sendMsgCode(2, 1010, 0);
+        return false
+    end
+    if package:GetRestPackageSize() < ( count / 99 + 1)  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(item[cts][2], count, true, 0, 74);
+    player:SetVar(700 , value - item[cts][3] * count );
+    return true
+end
 
