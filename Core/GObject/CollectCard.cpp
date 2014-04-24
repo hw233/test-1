@@ -429,12 +429,14 @@ namespace GObject
         }
         else
         {
-            if(m_owner->getMainFighter()->getLevel() < cii->lvLimit)
+            if(upcard->level > m_owner->getMainFighter()->getLevel())
                 return;
         }
 
         while(it != vecid.end())
         {
+            if(*it == id)
+                break;
             if(MapFreeCardSlot.find(*it) == MapFreeCardSlot.end())
                 break;
             UInt16 cid = MapFreeCardSlot.find(*it)->second->cid;
