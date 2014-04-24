@@ -2554,6 +2554,7 @@ CREATE TABLE `skill_grade` (
     PRIMARY KEY(`playerId`, `fighterId`, `skillId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `card`;
 CREATE TABLE IF NOT EXISTS `card` (
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2564,6 +2565,7 @@ CREATE TABLE IF NOT EXISTS `card` (
     unique KEY id_playerid(`playerid`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cardsuit`;
 CREATE TABLE IF NOT EXISTS `cardsuit` (
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `id` tinyint(3) unsigned NOT NULL DEFAULT '0',
