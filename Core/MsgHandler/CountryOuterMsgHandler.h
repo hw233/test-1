@@ -1198,7 +1198,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
-    //pl->GetCollectCard()->ReturnCardInfo(1);
+    pl->GetCollectCard()->ReturnCardInfo(1);
     GObject::MarryBoard::instance().sendTodayMarryInfo(pl ,1);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
@@ -9220,7 +9220,6 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
 
 void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
 {
-#if 0
 	MSG_QUERY_PLAYER(player);
      
     BinaryReader br(data, hdr.msgHdr.bodyLen);
@@ -9299,7 +9298,6 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
             break;
 
     }
-#endif
 }
 
 
