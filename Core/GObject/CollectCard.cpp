@@ -193,6 +193,18 @@ namespace GObject
             (*it)->pos = 0;
             MapFreeCardSlot.insert(std::make_pair((*it)->id,(*it))); 
             *it = NULL; 
+            
+            if((*it)->type == 1)
+            {
+                const GData::SkillBase* s = NULL;
+                std::vector<const GData::SkillBase*> vt_skills;
+                s = GData::skillManager[(*it)->skill_id];
+                if (s)
+                    vt_skills.push_back(s);
+
+                if (vt_skills.size())
+                    m_owner->getMainFighter()->delSkillsFromCT(vt_skills, true);
+            }
             //VecEquipSlot.erase(VecEquipSlot.begin() + pos - 1);//
         }else if(pos <= 4)
         {
@@ -233,10 +245,13 @@ namespace GObject
             tmp->pos = pos; 
             VecEquipSlot[pos - 1] = tmp; 
             MapFreeCardSlot.erase(MapFreeCardSlot.find(id)); 
-            
-            std::string skills = "";
-            skills += Itoa(tmp->skill_id);
-            m_owner->getMainFighter()->setSkills(skills,true);
+           
+            if(tmp->type == 1)
+            {
+                std::string skills = "";
+                skills += Itoa(tmp->skill_id);
+                m_owner->getMainFighter()->setSkills(skills,true);
+            }
 
         }
         //TODO DB
@@ -364,8 +379,56 @@ namespace GObject
             GData::CardInitInfo* cii = GData::csys.getCardInitInfo(cid);
             if(cii == NULL)
                 break;
+            if(cii->type == 3)//特殊卡牌不能分解
+                break;
             upcard->exp += cii->initExp + MapFreeCardSlot.find(*it)->second->exp;
-            while(GData::csys.checkUpgrade(upcard));
+            while(GData::csys.checkUpgrade(upcard))
+            {
+                switch(upcard->level)
+                {
+                    case 10:
+                        m_owner->udpLog("kaipaixitong", "F_140506_4", "", "", "", "", "act");
+                        break;
+                    case 20:
+                        m_owner->udpLog("kaipaixitong", "F_140506_5", "", "", "", "", "act");
+                        break;
+                    case 30:
+                        m_owner->udpLog("kaipaixitong", "F_140506_6", "", "", "", "", "act");
+                        break;
+                    case 40:
+                        m_owner->udpLog("kaipaixitong", "F_140506_7", "", "", "", "", "act");
+                        break;
+                    case 50:
+                        m_owner->udpLog("kaipaixitong", "F_140506_8", "", "", "", "", "act");
+                        break;
+                    case 60:
+                        m_owner->udpLog("kaipaixitong", "F_140506_9", "", "", "", "", "act");
+                        break;
+                    case 70:
+                        m_owner->udpLog("kaipaixitong", "F_140506_10", "", "", "", "", "act");
+                        break;
+                    case 80:
+                        m_owner->udpLog("kaipaixitong", "F_140506_11", "", "", "", "", "act");
+                        break;
+                    case 90:
+                        m_owner->udpLog("kaipaixitong", "F_140506_12", "", "", "", "", "act");
+                        break;
+                    case 100:
+                        m_owner->udpLog("kaipaixitong", "F_140506_13", "", "", "", "", "act");
+                        break;
+                    case 110:
+                        m_owner->udpLog("kaipaixitong", "F_140506_14", "", "", "", "", "act");
+                        break;
+                    case 120:
+                        m_owner->udpLog("kaipaixitong", "F_140506_15", "", "", "", "", "act");
+                        break;
+                    case 130:
+                        m_owner->udpLog("kaipaixitong", "F_140506_16", "", "", "", "", "act");
+                        break;
+                    default:
+                        break;
+                }
+            }
             //TODO 找到卡牌经验值
             DB4().PushUpdateData("UPDATE `card` SET `exp` = '%u',`level` = `%u` WHERE `playerId` = %u and id = `%u`",upcard->exp,upcard->level,m_owner->getId(),id);
             
@@ -456,6 +519,9 @@ namespace GObject
     {
         GData::CardInitInfo* citmp = GData::csys.getCardInitInfo(cid); 
         if(citmp == NULL)
+            return NULL;
+        //等级保护
+        if(m_owner->getMainFighter()->getLevel() < citmp->lvLimit) 
             return NULL;
 
         CardInfo* ci = new CardInfo(IDGenerator::gCardOidGenerator.ID(),cid,citmp->type,static_cast<UInt8>(1),static_cast<UInt16>(0),citmp->skillId,static_cast<UInt8>(0), citmp->color,static_cast<UInt16>(32001));
