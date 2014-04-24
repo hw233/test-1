@@ -72,6 +72,21 @@ UInt32 ChatItem::addFighter( Player * player, UInt32 id )
 	return id;
 }
 
+void ChatItem::addZhenyuan( Player * player, UInt32 id )
+{
+	ItemEquip * zhenyuan = player->GetPackage()->GetEquip(id);
+	if(zhenyuan == NULL || !IsZhenYuan(zhenyuan->getClass()))
+		return;
+
+	ChatItemData& cid = _zhenyuanData[id];
+	cid.st.init(REP::FLAUNT_GOOD);
+	cid.st << static_cast<UInt8>(0x1B) << static_cast<UInt8>(player->IsMale() ? 0 : 1) << player->getCountry()
+		<< player->getName();
+    player->GetPackage()->AppendZhenyuanData(cid.st, static_cast<ItemZhenyuan *>(zhenyuan));
+	cid.st << Stream::eos;
+	cid.lastAccess = TimeUtil::Now();
+}
+
 void ChatItem::post( UInt8 type, UInt64 pid, UInt32 id, Player * player )
 {
 	switch(type)
@@ -101,6 +116,26 @@ void ChatItem::post( UInt8 type, UInt64 pid, UInt32 id, Player * player )
 		{
 			FastMutex::ScopedLock lk(_petMutex);
 			addFairyPet(player, id);
+			return;
+		}
+		break;
+	case 0x0B:
+		{
+			FastMutex::ScopedLock lk(_zhenyuanMutex);
+			addZhenyuan(player, id);
+			return;
+		}
+		break;
+	case 0x1B:
+		{
+			FastMutex::ScopedLock lk(_zhenyuanMutex);
+			std::map<UInt32, ChatItemData>::iterator it = _zhenyuanData.find(id);
+			if(it == _zhenyuanData.end())
+			{
+				return;
+			}
+			it->second.lastAccess = TimeUtil::Now();
+			player->send(it->second.st);
 			return;
 		}
 		break;
@@ -238,6 +273,18 @@ void ChatItem::purge( UInt32 curtime )
 		{
 			if(curtime > it->second.lastAccess + 3600 * 3)
 				_couplePetData.erase(it ++);
+			else
+				++ it;
+		}
+	}
+
+    {
+		FastMutex::ScopedLock lk(_zhenyuanMutex);
+		std::map<UInt32, ChatItemData>::iterator it = _zhenyuanData.begin();
+		while(it != _zhenyuanData.end())
+		{
+			if(curtime > it->second.lastAccess + 3600 * 3)
+				_zhenyuanData.erase(it ++);
 			else
 				++ it;
 		}

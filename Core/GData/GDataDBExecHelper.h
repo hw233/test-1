@@ -811,6 +811,15 @@ struct DBCardUpgrade
     UInt16 attrIndex;
 };
 
+struct DBZHYExtraAttr
+{
+    UInt16 id;
+    UInt8 lvLimit;
+    UInt8 type1;
+    UInt8 type2;
+    UInt16 maxVal;
+};
+
 }
 
 namespace DB {
@@ -1714,6 +1723,17 @@ SPECIALDEF(5)
     UInt8, otherNum,
     std::string, bless
 	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBZHYExtraAttr)
+SPECIALDEF(5)
+    (
+    UInt16, id,
+    UInt8, lvLimit,
+    UInt8, type1,
+    UInt8, type2,
+    UInt16, maxVal
+    )
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSkillEv)

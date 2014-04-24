@@ -191,6 +191,7 @@ private:
     void OnLingbaoSkill(GObject::Player * player, std::vector<std::string>& args);
     void OnLingbaos(GObject::Player * player, std::vector<std::string>& args);
     void testLingbao(GObject::Player * player, std::vector<std::string>& args);
+    void OnAddZhenyuan(GObject::Player * player, std::vector<std::string>& args);
     void OnPetEq(GObject::Player * player, std::vector<std::string>& args);
 
 
@@ -253,6 +254,7 @@ private:
     void OnSetTYSS(GObject::Player *player, std::vector<std::string>& args);
     void TestClanRank(GObject::Player *player, std::vector<std::string>& args);
     void OnAddCard(GObject::Player *player, std::vector<std::string>& args);
+    void OnSkillTest(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

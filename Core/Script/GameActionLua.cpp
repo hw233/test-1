@@ -325,6 +325,7 @@ namespace Script
 		CLASS_DEF(Player, LuckyBagRank);
 		CLASS_DEF(Player, findFairyPet);
 		CLASS_DEF(Player, updateCuilianTimes);
+		CLASS_DEF(Player, addZhenyuanTiQuTimes);
         CLASS_DEF(Player, AddZRYJCount);
         CLASS_DEF(Player, AddHYYJCount);
         CLASS_DEF(Player, in7DayFromCreated);
@@ -337,6 +338,7 @@ namespace Script
         CLASS_DEF(Player, getXianpoLua);
         CLASS_DEF(Player, useChangeSexCard);
         CLASS_DEF(Player, EatLingGuo);
+        CLASS_DEF(Player, sendUseRideItemInfo);
         CLASS_DEF(Player, getXuanTianNingLuLua);
 
         CLASS_ADD(MoFang);
@@ -1906,5 +1908,9 @@ namespace Script
 		return Call<UInt16>("getsuitAttr", suitId);
     }
 
+    UInt32 GameActionLua::getZhenyuanLootId(UInt8 idx)
+    {
+        return Call<UInt32>("getZhenyuanLootId", idx);
+    }
 }
 

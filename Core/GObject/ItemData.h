@@ -192,6 +192,70 @@ namespace GObject
             st.data<UInt8>(pos) = count;
         }
      };
+    //阵元属性
+    struct ItemZhenyuanAttr
+    {
+        UInt8 color;
+        UInt8 type[4];
+        UInt16 value[4];
+        UInt16 typeExtra[2];
+        UInt16 valueExtra[2];
+
+        ItemZhenyuanAttr() : color(0)
+        {
+            memset(type, 0, sizeof(type));
+            memset(value, 0, sizeof(value));
+            memset(typeExtra, 0, sizeof(typeExtra));
+            memset(valueExtra, 0, sizeof(valueExtra));
+        }
+
+		inline void appendAttrToStream(Stream& st)
+        {
+            //st << color;
+            UInt8 cnt = 0, cnt1 = 0, cnt2 = 0;
+            size_t offset = st.size();
+            st << cnt;
+            for(int i = 0; i < 4; ++ i)
+            {
+                if(type[i] != 0)
+                {
+                    st << type[i] << value[i];
+                    ++ cnt1;
+                }
+            }
+            for(int i = 0; i < 2; ++ i)
+            {
+                if(typeExtra[i] != 0)
+                {
+                    st << typeExtra[i] << valueExtra[i];
+                    ++ cnt2;
+                }
+            }
+            cnt = (cnt2 << 4) | cnt1;
+            st.data<UInt8>(offset) = cnt;
+        }
+
+        UInt8 getAttrNum()
+        {
+            UInt8 count = 0;
+            for(int i = 0; i < 4; ++ i)
+            {
+                if(type[i] > 0)
+                    ++ count;
+            }
+            return count;
+        }
+        UInt8 getExtraAttrNum()
+        {
+            UInt8 count = 0;
+            for(int i = 0; i < 2; ++ i)
+            {
+                if(typeExtra[i] > 0)
+                    ++ count;
+            }
+            return count;
+        }
+    };
 }
 
 #endif

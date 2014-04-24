@@ -538,7 +538,6 @@ namespace GObject
         VAR_LUCKYMEET_RECHARGE_AWARD = 549 ,  //暑假奇遇充值奖励
         VAR_LUCKYMEET_VIP = 550 ,      //暑假奇遇期间御剑等级
         VAR_LUCKYMEET_STRENTH_AWARD = 551,  //暑假奇遇变强
-
       
         VAR_SUMMER_MEET_TYPE = 552 ,    //蜀山奇遇类型
         VAR_SUMMER_MEET_TYPE_AWARD = 553,  //蜀山奇遇类型奖励（登陆弹框）
@@ -693,6 +692,13 @@ namespace GObject
         VAR_CLAN_DUOBAO_SCORE = 713,        // 夺宝奇兵点数
         VAR_CLAN_DUOBAO_SUCCESS_NUM = 714,  // 夺宝奇兵成功次数
         VAR_CLAN_DUOBAO_STATUS = 715,       // 夺宝奇兵状态
+
+        VAR_ZHENYUAN_TIQU_DATE = 716,    //阵元提取神符免费次数时间
+        VAR_ZHENYUAN_TIQU_CNT = 717,     //阵元提取神符 低16位每天次数 高16位每天仙石购买次数
+        VAR_KJTM_STATUS = 718,              // 抗击天魔状态
+        VAR_KJTM_KILL_NPC_STATUS = 719,     // 抗击天魔击杀怪物状态
+        VAR_KJTM_LOGIN_STATUS = 720,     // 抗击天魔回归玩家连续登录两天状态
+
         //721 - 740 for dtc 
         VAR_TYSS_RECHARGE = 721,//天元神兽期间玩家兑换灵果剩余充值数(充值数满足条件自动兑换灵果)
         VAR_TYSS_CONTRIBUTE_PLAYER = 722,//天元神兽期间玩家个人总贡献 
@@ -706,6 +712,10 @@ namespace GObject
         VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 729,//璇玑阵图自动战斗使用金钱标志
         VAR_ATOXJFM = 730,     //自动璇玑阵图id
         //731 - 751 for lib
+        //752 - 770 for dtc
+        VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
+        //771 - 780 for qimj
+        VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
 
         VAR_MAX,
     };
@@ -1324,9 +1334,15 @@ namespace GObject
             REGISTER_VAR(VAR_CLAN_DUOBAO_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_DUOBAO_SUCCESS_NUM, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_DUOBAO_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_ZHENYUAN_TIQU_DATE, CYCLE_NONE);
+            REGISTER_VAR(VAR_ZHENYUAN_TIQU_CNT, CYCLE_NONE);
+
             REGISTER_VAR(VAR_GUANKA_ACTION_NPC, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_KILL_NPC_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_LOGIN_STATUS, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);
@@ -1336,6 +1352,11 @@ namespace GObject
             REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME2, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME3, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_CLAN_SUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
+            REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
+            REGISTER_VAR(VAR_LIMIT_APPOINTMENT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

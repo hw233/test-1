@@ -412,6 +412,7 @@ namespace Script
         void getJiqirenAward_Dungeon(Player* player, UInt8 diff, UInt8 isFree);
         UInt16 getSpeCard(UInt16 itemId);
         UInt16 getsuitAttr(UInt8 suitId);
+        UInt32 getZhenyuanLootId(UInt8 idx);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

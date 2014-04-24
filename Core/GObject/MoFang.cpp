@@ -1526,23 +1526,26 @@ void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 opt)
        
 }
       
-void MoFang::changeMoney(UInt8 mark)
+void MoFang::changeMoney(UInt16 num, UInt8 mark)
 {
     if(!m_owner)
         return;
 
+    if(0 == num)
+        return;
+
     UInt8 res = 0;
     UInt32 money = m_owner->GetVar(VAR_KEYIN_MONEY_A);
-    if(money >= 100)
+    if(money >= num*100)
     {
-        m_owner->SetVar(VAR_KEYIN_MONEY_A, money-100);
-        m_owner->AddVar(VAR_KEYIN_MONEY_B, 10);
+        m_owner->SetVar(VAR_KEYIN_MONEY_A, (money-num*100));
+        m_owner->AddVar(VAR_KEYIN_MONEY_B, (10*num));
 
         res = 1;
     }
 
     Stream st(REP::MOFANG_INFO);
-    st << mark << res;
+    st << mark << res << num;
     st << Stream::eos;
     m_owner->send(st);
 }

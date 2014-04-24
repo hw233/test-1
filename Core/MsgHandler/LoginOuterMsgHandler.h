@@ -1108,12 +1108,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                56,   2,
-                9371, 4,
-                9600, 4,
-                503,  5,
+                15, 2,
+                78, 1,
                 1126, 5,
-                9338, 5,
+                9418, 4,
+                551, 2,
+                1325, 4,
             };
 
             UInt8 idx = 0;
@@ -1143,7 +1143,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 10)
+                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 5)
                         purchase.code = 2;
 
                     purchase.id = id;
@@ -3436,6 +3436,11 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_CLAN_DUOBAO_STATUS, 0);
             }
             break;
+        case 19:
+            {
+                pl->ClearKJTMData();
+            }
+            break;
         case 20:
             {
                 //todo 天元神兽
@@ -3978,18 +3983,48 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         return;
     }
+    else if(type == 19 && begin <= end)
+    {
+         ret = 1;
+         Stream st(SPEP::ACTIVITYONOFF);
+         st << ret << Stream::eos;
+         NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
+         curType = 19;
+         {
+              GObject::globalPlayers.enumerate(player_enum_2, &curType);
+
+              DB5().PushUpdateData("DELETE FROM `inactivemember`");
+              DB5().PushUpdateData("DELETE FROM `applylist`");
+              DB5().PushUpdateData("DELETE FROM `invitegoback`");
+              DB5().PushUpdateData("DELETE FROM `teammember`");
+
+              GObject::KJTMManager->ClearInactiveMember();
+              GObject::KJTMManager->AddInactiveMember();
+         }
+
+         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_BEGIN, begin);
+         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_END, end);
+         return;
+    }
     else if (type == 20 && begin <= end )
     {
+        if(GObject::World::getTYSSTime())
+        {
+            Stream st(SPEP::ACTIVITYONOFF);
+            st << ret << Stream::eos;
+            NETWORK()->SendMsgToClient(hdr.sessionID, st);
+            return;
+        }
+
         ret = 1;
         Stream st(SPEP::ACTIVITYONOFF);
         st << ret << Stream::eos;
         NETWORK()->SendMsgToClient(hdr.sessionID, st);
-#if 0
 
         curType = 20;
         GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::globalClans.enumerate(clan_enum_1, 0);
-#endif
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_END, end);
 

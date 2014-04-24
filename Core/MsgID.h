@@ -414,6 +414,9 @@ namespace REQ
     /** 夺宝奇兵 */
     const UInt8 DUOBAO_REQ          = 0x7E;
 
+    /** 抗击天魔 */
+    const UInt8 KANGJITIANMO_REQ    = 0x7F;
+
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
 
@@ -731,8 +734,12 @@ namespace REP
     /** 夺宝奇兵 */
     const UInt8 DUOBAO_REP          = 0x7E;
 
+    /** 抗击天魔 */
+    const UInt8 KANGJITIANMO_REP    = 0x7F;
+
     /** 战报数据 */
     const UInt8 FIGHT_REPORT2       = 0x0F;
+
     /** 系统弹窗公告 */
     const UInt8 SYSDAILOG           = 0x0E;
 

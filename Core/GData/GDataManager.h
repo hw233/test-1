@@ -136,6 +136,7 @@ namespace GData
         static UInt16 GetPetEqTypeIdByColor(int);
         static UInt16 GetPetGemTypeIdByLev(int);
         static UInt16 GetPetEqSkill();
+        static UInt16 GetZhenyuanTypeIdByLev(int);
 	public:
 		static TaskTypeList				 m_TaskTypeList;
 		static TaskTypeRelationList		 m_TaskTypeRelationList;
@@ -167,6 +168,7 @@ namespace GData
         static std::vector<UInt16>       m_petEqs[4];
         static std::vector<UInt16>       m_petGems[20];
         static std::vector<UInt16>       m_petEqSkills;
+        static std::vector<UInt16>       m_zhenyuanItem[20];
 	};
 
     extern std::map<UInt16, UInt16> skill2item;

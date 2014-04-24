@@ -678,6 +678,8 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
     act_count += FightersEnter(prevWin);
 
     UInt32 oldAttackRount = _attackRound;
+    if(_winner == 0)
+        appendAttackRoundChange();
     while(_winner == 0 && act_count < _fake_turns)
     {
         int pos = findFirstAttacker();
@@ -943,6 +945,7 @@ int BattleSimulator::findFirstAttacker()
     {
         _cur_fgtlist_idx = _cur_fgtlist_idx == 0 ? 1 : 0;
         _attackRound ++ ;
+        appendAttackRoundChange();
     }
 
     std::vector<BattleFighter*>& cur_fgtlist = _fgtlist[_cur_fgtlist_idx];
@@ -3310,9 +3313,12 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             insertFighterStatus(newf);
         }
 
-        int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
-        //setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, false);
-        setStatusChange_Aura2(bf, bf->getSide(), bf->getPos(), NULL, nChangeAuraNum, 0, false);
+        if(bf->getBuddhaLightLast() == 0)
+        {
+            int nChangeAuraNum = -1*bf->getAura() + bf->getAuraLeft(); // 因为天赋术，hero无双之后会留一点灵力
+            //setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, nChangeAuraNum, 0, false);
+            setStatusChange_Aura2(bf, bf->getSide(), bf->getPos(), NULL, nChangeAuraNum, 0, false);
+        }
 
         appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false);
 
@@ -3854,15 +3860,17 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     factor = skill->factor[1];
                 else
                     factor = 0.3;
-                UInt16 index = _rnd(10000);
-                if(index < 3000) //后方
+                //UInt16 index = _rnd(10000);
+                //if(index < 3000) //后方
+                if(1)
                 {
                     if(x < 4)
                     {
                         dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos + 5), factor);
                     }
                 }
-                else if(index < 6500) //左右两侧
+                //else if(index < 6500) //左右两侧
+                if(1)
                 {
                     if(y > 0)
                     {
@@ -3873,7 +3881,8 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                         dmg += attackByJiuzi(bf, first, cs, pr, skill, getObject(target_side, pos + 1), factor);
                     }
                 }
-                else //左后右后
+                //else //左后右后
+                if(1)
                 {
                     if(y > 0 && x < 4)
                     {
@@ -10475,6 +10484,9 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         while(NULL != (violentSKill = bf->getPassiveSkillViolent100(skillIdx)))
         {
             UInt16 actCnt = bf->getActCnt();
+            bool bRet = doEffectAfterCount(bf, violentSKill, actCnt);
+            if(bRet)
+                break;
             UInt16 condtion = 15;
             if(violentSKill->effect)
                 condtion = violentSKill->effect->efv[0];
@@ -12040,6 +12052,17 @@ void BattleSimulator::appendStatusChange(StatusType type, UInt32 value, UInt16 s
     sc.type = type;
     sc.data = value;
     sc.statusId = skillId;
+
+    _scList.push_back(sc);
+}
+
+void BattleSimulator::appendAttackRoundChange()
+{
+    StatusChange sc;
+    sc.pos = 51;
+    sc.type = 0;
+    sc.data = _attackRound + 1;
+    sc.statusId = 0;
 
     _scList.push_back(sc);
 }
@@ -14951,9 +14974,9 @@ void BattleSimulator::attackByJiuziSS(BattleFighter* bf, const GData::SkillBase*
         BattleFighter* bf2 = static_cast<BattleFighter*>(bo);
         UInt8 count = bf2->getJiuziDmgCnt();
         if(count == 0)
-            return;
+            continue;
         UInt32 rate = (0.1 * 100 + ef->value * count) * 100;
-        if(rate < _rnd(10000) && bf2->getConfuseRound() < 1)
+        if(rate > _rnd(10000) && bf2->getConfuseRound() < 1)
         {
             bf2->setConfuseRound(1);
             appendDefStatus(e_Confuse, 0, bf2);
@@ -14962,6 +14985,156 @@ void BattleSimulator::attackByJiuziSS(BattleFighter* bf, const GData::SkillBase*
         bf2->setJiuziDmgCnt(0);
     }
 
+}
+
+float testvalue(const GData::SkillBase* skill)
+{
+    if(skill && SKILL_LEVEL(skill->getId()) == 1)
+        return 100.0f;
+    else
+        return 1.0f;
+}
+
+bool BattleSimulator::doEffectAfterCount(BattleFighter* bf, const GData::SkillBase* skill, UInt16 actCnt)
+{
+    bool bRet = false;
+    if(!bf)
+        return bRet;
+    if(!skill)
+        return bRet;
+    const GData::SkillEffect* effect = skill->effect;
+    if(!effect)
+        return bRet;
+    UInt16 condtion = effect->efv[0];
+    if(condtion > 5)
+        return bRet;
+
+    bRet = true;
+    if(condtion != actCnt + 1)
+        return bRet;
+    UInt16 last = effect->efl[0];
+    if(last == 0)
+        return bRet;
+
+    UInt8 target_side = bf->getSide();
+    for(UInt8 i = 0; i < 25; i++)
+    {
+        BattleObject* bo2 = getObject(target_side, i);
+        if(bo2 == NULL || bo2->getHP() == 0 || !bo2->isChar())
+            continue;
+
+        BattleFighter* bo = static_cast<BattleFighter *>(bo2);
+        if(effect->auraP > 0.001 || effect->aura > 0)
+        {
+            float value = bo->_aura * effect->auraP + effect->aura;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_Aura(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->atkP > 0.001f || effect->atk > 0)
+        {
+            float value = bo->_attack * effect->atkP + effect->atk;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_Atk(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->defP > 0.001f || effect->def > 0)
+        {
+            float value = bo->_defend * effect->defP + effect->def;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_Def(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->magatkP || effect->magatk > 0)
+        {
+            float value = bo->_magatk * effect->magatkP + effect->magatk;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_MagAtk(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->magdefP || effect->magdef > 0)
+        {
+            float value = bo->_magdef * effect->magdefP + effect->magdef;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_MagDef(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->tough > 0.001f)
+        {
+            float value = effect->tough;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_Tough(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->actionP || effect->action > 0.001f)
+        {
+            float value = bo->_maxAction * effect->actionP + effect->action;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_Action(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->hitrate > 0.001f)
+        {
+            float value = effect->hitrate;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_HitR(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->evade > 0.001f)
+        {
+            float value = effect->evade;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_Evade(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->critical > 0.001f)
+        {
+            float value = effect->critical;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_Critical(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->pierce > 0.001f)
+        {
+            float value = effect->pierce;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_Pierce(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->counter > 0.001f)
+        {
+            float value = effect->counter;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_Counter(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->magres > 0.001f)
+        {
+            float value = effect->magres;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_MagRes(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->atkreduce > 0.001f)
+        {
+            float value = effect->atkreduce;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_AtkReduce(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->magatkreduce > 0.001f)
+        {
+            float value = effect->magatkreduce;
+            value *= testvalue(skill);
+            if(value > 0.001f)
+                setStatusChange_MagAtkReduce(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else
+        {
+        }
+    }
+
+    return bRet;
 }
 
 } // namespace Battle
