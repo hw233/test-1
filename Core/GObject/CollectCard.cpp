@@ -11,6 +11,9 @@
 #include "Script/GameActionLua.h"
 #include "GData/CardSystem.h"
 #include "Country.h"
+#include "Fighter.h"
+#include "Common/Itoa.h"
+#include "GObjectDBExecHelper.h"
 
 namespace GObject
 {
@@ -52,6 +55,8 @@ namespace GObject
                 collect_degree += 10;
             else
                 collect_degree += 5;
+            
+
         }
         else
         {
@@ -62,7 +67,6 @@ namespace GObject
             spe_mark = SET_BIT(spe_mark,card_index); 
         }
 
-        //TODO DB
         
         return ;
     }
@@ -190,7 +194,6 @@ namespace GObject
             MapFreeCardSlot.insert(std::make_pair((*it)->id,(*it))); 
             *it = NULL; 
             //VecEquipSlot.erase(VecEquipSlot.begin() + pos - 1);//
-            //TODO DB
         }else if(pos <= 4)
         {
             //装备卡牌槽的御剑等级限制
@@ -216,7 +219,6 @@ namespace GObject
             tmp->pos = pos; 
             VecEquipSlot[pos - 1] = tmp;
             MapFreeCardSlot.erase(MapFreeCardSlot.find(id)); 
-            //TODO DB
 
         }else if(pos == 5)
         {
@@ -231,8 +233,14 @@ namespace GObject
             tmp->pos = pos; 
             VecEquipSlot[pos - 1] = tmp; 
             MapFreeCardSlot.erase(MapFreeCardSlot.find(id)); 
-            //TODO DB
+            
+            std::string skills = "";
+            skills += Itoa(tmp->skill_id);
+            m_owner->getMainFighter()->setSkills(skills,true);
+
         }
+        //TODO DB
+        DB4().PushUpdateData("UPDATE `card` SET `pos` = '%u' WHERE `playerId` = %u and id = `%u`",pos,m_owner->getId(),id);
         
         st << static_cast<UInt8>(pos) << id ;
         st << Stream::eos; 
@@ -276,7 +284,7 @@ namespace GObject
             {
                _cnt[lev][PCardChance[CNum-1]-3] = static_cast<UInt16>(0);
             }
-            if(PCardChance[CNum] == color)
+            if(PCardChance[CNum - 1] == color)
                 break;
             ++index;
         }
@@ -327,6 +335,7 @@ namespace GObject
             if(sci->checkActive(active_set))
                 sci->active = active_set;
             //TODO DB
+            DB4().PushUpdateData("UPDATE `cardsuit` SET `active` = '%u' WHERE `playerId` = %u and `id` = `%u`",sci->active,m_owner->getId(),sci->id);
 
         }
 
@@ -352,13 +361,14 @@ namespace GObject
             if(MapFreeCardSlot.find(*it) == MapFreeCardSlot.end())
                 break;
             UInt16 cid = MapFreeCardSlot.find(*it)->second->cid;
-            //TODO 找到卡牌经验值
             GData::CardInitInfo* cii = GData::csys.getCardInitInfo(cid);
             if(cii == NULL)
                 break;
             upcard->exp += cii->initExp + MapFreeCardSlot.find(*it)->second->exp;
             while(GData::csys.checkUpgrade(upcard));
-
+            //TODO 找到卡牌经验值
+            DB4().PushUpdateData("UPDATE `card` SET `exp` = '%u',`level` = `%u` WHERE `playerId` = %u and id = `%u`",upcard->exp,upcard->level,m_owner->getId(),id);
+            
             DelAddCard(*it);
 
             it++;
@@ -461,10 +471,12 @@ namespace GObject
             SuitCardInfo* si = new SuitCardInfo(cid/10);
             MapCardStamp.insert(std::make_pair(cid/10,si));
             //TODO DB
+		    DB4().PushUpdateData("REPLACE INTO `cardsuit`(`playerId`, `id`, `suit_mark`,`active`,`spe_mark`,`collect_degree`) VALUES(%u, %u,0,0,0)", m_owner->getId(), si->id);
         }
         SuitCardInfo* tmp = MapCardStamp.find(cid/10)->second;
         tmp->checkExistSetBit(ci->cid);
         //TODO DB
+        DB4().PushUpdateData("UPDATE `cardsuit` SET `suit_mark` = '%u', `collect_degree` = `%u`,`spe_mark` = '%u' WHERE `playerId` = `%u` and `id` = `%u`",tmp->suit_mark,tmp->collect_degree,tmp->spe_mark,m_owner->getId(),tmp->id);
         
         return ci;
     }
@@ -495,6 +507,7 @@ namespace GObject
         MapFreeCardSlot.erase(it);
 
         //TODO DB
+        DB4().PushUpdateData("DELETE FROM `card` WHERE `playerId` = `%u` and `id` = `%u`", m_owner->getId(),id);
     }
 
     void CollectCard::ExchangeSpeCard(UInt16 itemid)
@@ -512,6 +525,48 @@ namespace GObject
         ReturnSuitInfo(st,20);
         st << Stream::eos; 
         m_owner->send(st);
+        return;
+    }
+
+    void CollectCard::InsertCard(DBCard dbc)
+    {
+        GData::CardInitInfo* cii = GData::csys.getCardInitInfo(dbc.cid);
+        if(cii == NULL)
+            return;
+        GData::CardUpgradeTable* cut = GData::csys.getCardUpgradeTable(dbc.level);
+        if(cut == NULL)
+            return;
+
+        if(dbc.pos == 0)
+        {
+            UInt16 skillId = 0;
+            if(cii->skillId != 0) 
+                skillId = cii->skillId*100 + cut->skillLevel;                      
+
+            CardInfo* ci = new CardInfo(dbc.id,dbc.cid,cii->type,dbc.level,dbc.exp,skillId,dbc.pos, cii->color,cut->attrIndex);
+            MapFreeCardSlot.insert(std::make_pair(ci->id,ci)); 
+        }else if(dbc.pos < 5)
+        {
+            CardInfo* ci = new CardInfo(dbc.id,dbc.cid,cii->type,dbc.level,dbc.exp,static_cast<UInt16>(0),dbc.pos, cii->color,cut->attrIndex);
+            VecEquipSlot[dbc.pos - 1] = ci; 
+
+        }else if(dbc.pos == 5)
+        {
+            UInt16 skillId = 0;
+            if(cii->skillId != 0) 
+                skillId = cii->skillId*100 + cut->skillLevel;                      
+            CardInfo* ci = new CardInfo(dbc.id,dbc.cid,cii->type,dbc.level,dbc.exp,skillId,dbc.pos, cii->color,cut->attrIndex);
+            VecEquipSlot[dbc.pos - 1] = ci; 
+        }
+        
+        return;
+    }
+
+    void CollectCard::InsertCardSuit(DBCardSuit dbcs)
+    {
+        SuitCardInfo* si = new SuitCardInfo(dbcs.id,dbcs.suit_mark,dbcs.active,dbcs.spe_mark,dbcs.collect_degree);
+        MapCardStamp.insert(std::make_pair(dbcs.id,si));
+
         return;
     }
 }

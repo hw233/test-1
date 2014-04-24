@@ -28,16 +28,16 @@ void CalInitExp(UInt8& initExp ,UInt8 level, UInt8 color ,UInt8 type)
     
     switch(color)
     {
-        case 1:
+        case 2:
             colorMark = greenMark;
             break;
-        case 2:
+        case 3:
             colorMark = blueMark;
             break;
-        case 3:
+        case 4:
             colorMark = purpleMark;
             break;
-        case 4:
+        case 5:
             colorMark = orangeMark;
             break;
         default:
@@ -48,10 +48,10 @@ void CalInitExp(UInt8& initExp ,UInt8 level, UInt8 color ,UInt8 type)
     switch(type)
     {
         case 1:
-            typeMark = equipMark;
+            typeMark = humanMark;
             break;
         case 2:
-            typeMark = humanMark;
+            typeMark = equipMark;
             break;
         case 3:
             typeMark = speMark;
@@ -109,6 +109,14 @@ CardInitInfo* CardSystem::getCardInitInfo(UInt16 id)
     return NULL; 
 }
 
+CardUpgradeTable* CardSystem::getCardUpgradeTable(UInt8 level)
+{
+    std::map<UInt8,CardUpgradeTable>::iterator it = _cardUpgrade.find(level);
+    if(it != _cardUpgrade.end())
+        return &(it->second);
+    return NULL; 
+}
+
 bool CardSystem::checkUpgrade(GObject::CardInfo* ci)
 {
     if(_cardUpgrade.find(ci->level) == _cardUpgrade.end())
@@ -119,19 +127,19 @@ bool CardSystem::checkUpgrade(GObject::CardInfo* ci)
     {
         switch(ci->color)
         {
-            case 1:
+            case 2:
                 if(ci->exp < tmp.gexp)
                     return false;
                 break;
-            case 2:
+            case 3:
                 if(ci->exp < tmp.bexp)
                     return false;
                 break;
-            case 3:
+            case 4:
                 if(ci->exp < tmp.pexp)
                     return false;
                 break;
-            case 4:
+            case 5:
                 if(ci->exp < tmp.yexp)
                     return false;
                 break;
@@ -143,19 +151,19 @@ bool CardSystem::checkUpgrade(GObject::CardInfo* ci)
     {
         switch(ci->color)
         {
-            case 1:
+            case 2:
                 if(ci->exp < tmp.hgexp)
                     return false;
                 break;
-            case 2:
+            case 3:
                 if(ci->exp < tmp.hbexp)
                     return false;
                 break;
-            case 3:
+            case 4:
                 if(ci->exp < tmp.hpexp)
                     return false;
                 break;
-            case 4:
+            case 5:
                 if(ci->exp < tmp.hyexp)
                     return false;
                 break;
@@ -166,7 +174,8 @@ bool CardSystem::checkUpgrade(GObject::CardInfo* ci)
 
     {
         ci->level += 1;                   
-        ci->skill_id = (ci->skill_id / 10) * 10 + tmp.skillLevel; 
+        if(ci->skill_id != 0)
+            ci->skill_id = (ci->skill_id / 10) * 10 + tmp.skillLevel; 
         ci->attr_id = tmp.attrIndex; 
     }
 
@@ -186,16 +195,16 @@ void CardSystem::AddCardAttr(GData::AttrExtra& ae, UInt16 attr_id,UInt8 level ,U
     
     switch(color)
     {
-        case 1:
+        case 2:
             colorMark = greenMark;
             break;
-        case 2:
+        case 3:
             colorMark = blueMark;
             break;
-        case 3:
+        case 4:
             colorMark = purpleMark;
             break;
-        case 4:
+        case 5:
             colorMark = orangeMark;
             break;
         default:

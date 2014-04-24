@@ -47,6 +47,7 @@ public:
     void AddCardAttr(GData::AttrExtra&, UInt16 attr_id,UInt8 level ,UInt8 color,UInt8 type);
     bool checkUpgrade(GObject::CardInfo* ci);
     CardInitInfo* getCardInitInfo(UInt16 id);
+    CardUpgradeTable* getCardUpgradeTable(UInt8 level);
     
 private:
     std::map<UInt8/*level*/, CardUpgradeTable> _cardUpgrade;
