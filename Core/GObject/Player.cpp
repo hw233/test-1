@@ -31294,7 +31294,7 @@ UInt32 Player::DrinkingPoint()
 {
     if(getDrinkInfo().type > 3)
         return 0;
-    UInt32 wine[]={20,20,40,80};
+    UInt32 wine[]={20,20,40,160};
     float drinkingAdd = 0;
     float friendAdd = 0;
 
