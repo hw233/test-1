@@ -563,8 +563,16 @@ public:
     inline static bool  getGGTime(UInt32 time =0 )
     {
         UInt32 now = TimeUtil::Now() + time;
-        if ((now > getOpenTime() + 14 * 86400) && (now  < getOpenTime() + 21 * 86400) )
-            return true;
+        if(cfg.serverNo >= 453)
+        {
+            if ((now > getOpenTime() + 14 * 86400) && (now  < getOpenTime() + 21 * 86400) )
+                return true;
+        }
+        else
+        {
+            if ((now > getOpenTime() + 7 * 86400) && (now  < getOpenTime() + 14 * 86400) )
+                return true;
+        }
         return false ;
         //return _ggtime; 
     } 
