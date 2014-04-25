@@ -10919,6 +10919,8 @@ function ItemNormal_00009601(iid, num, bind, param)
     if items[iid] == nil then
         return false
     end
+    local num9500 = 0
+    local ItemTable = {}
     local rp = 0
     for k = 1, num do
         local itemId = 0
@@ -10935,15 +10937,27 @@ function ItemNormal_00009601(iid, num, bind, param)
             res = player:hasMountChip(itemId)
         end
         if true == res then
-            package:Add(9500, replaceNum[rp], true, false, 2)
+            num9500 = num9500 + replaceNum[rp]
         else
             if rp == 7 or rp == 8 then
                 Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]获得了".."[4:"..itemId.."]，仙运奇佳，战力又增！")
             end
-            package:Add(itemId, 1, true, false, 2)
+            if itemId == 9500 then
+                num9500 = num9500 + 1
+            else
+                table.insert(ItemTable, itemId)
+                table.insert(ItemTable, 1)
+                package:Add(itemId, 1, true, false, 2)
+            end
         end
     end
+    if num9500 ~= 0 then
+        package:Add(9500, num9500, true, false, 2)
+        table.insert(ItemTable,1, 9500)
+        table.insert(ItemTable,2, num9500)
+    end
 
+    player:sendUseRideItemInfo(ItemTable)
     package:DelItemSendMsg(iid, player)
     return num;
 end

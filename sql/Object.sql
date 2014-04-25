@@ -2447,6 +2447,39 @@ CREATE TABLE `duobaolog` (
   `time` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `inactivemember`;
+CREATE TABLE `inactivemember` (
+   `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `invitegoback`;
+CREATE TABLE `invitegoback` (
+   `inviteeId` bigint(20) unsigned NOT NULL DEFAULT '0',
+   `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    unique KEY invitee_player_id(`inviteeId`,`playerId`),
+    INDEX (`inviteeId`),
+    INDEX (`playerId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `applylist`;
+CREATE TABLE `applylist` (
+   `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+   `applicantId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    unique KEY player_applicant_id(`playerId`,`applicantId`),
+    INDEX (`playerId`),
+    INDEX (`applicantId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `teammember`;
+CREATE TABLE `teammember` (
+   `teamId` int(10) unsigned NOT NULL DEFAULT '0',
+   `member1` bigint(20) unsigned NOT NULL DEFAULT '0',
+   `member2` bigint(20) unsigned NOT NULL DEFAULT '0',
+   `member3` bigint(20) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`teamId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `zhenyuanAttr`;
 CREATE TABLE `zhenyuanAttr` (
    `id` int(10) unsigned NOT NULL DEFAULT '0',

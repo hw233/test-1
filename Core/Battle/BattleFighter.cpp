@@ -232,7 +232,7 @@ void BattleFighter::updateAllAttr()
 	updateBuffExtras();
     float factor = 1.0f;
     if(_fighter && _fighter->getOwner())
-        factor = _fighter->getOwner()->getSpiritFactor();
+        factor = _fighter->getOwner()->getSpiritFactor() * _fighter->getOwner()->getKJTMFactor();
 
 	_strength = _formula->calcStrength(this);
 	_agility = _formula->calcAgility(this);
