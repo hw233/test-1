@@ -250,6 +250,8 @@ namespace GObject
 		IDGenerator::gAthleticsEventOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`id`) FROM `arena_team`", maxId);
 		IDGenerator::gTeamArenaOidGenerator.Init(maxId);
+		execu->Extract("SELECT max(`id`) FROM `card`", maxId);
+		IDGenerator::gCardOidGenerator.Init(maxId);
 
 		return true;
 	}
