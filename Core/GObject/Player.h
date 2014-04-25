@@ -33,6 +33,7 @@
 #include "ArenaTeam.h"
 #include "Marry.h"
 #include "ModifyMount.h"
+#include "CollectCard.h"
 #include "KangJiTianMo.h"
 
 
@@ -208,8 +209,8 @@ namespace GObject
 
 #define SYS_DIALOG_ALL_PLATFORM 0
 
-#define SPREAD_START_WEEK         5
-#define SPREAD_END_WEEK           6
+#define SPREAD_START_WEEK         0
+#define SPREAD_END_WEEK           7
 #define SPREAD_START_TIME         10*3600
 #define SPREAD_END_TIME           22*3600
 #define SPREAD_INTERVA_TIME       150
@@ -670,6 +671,58 @@ namespace GObject
         UInt8 addTimeNum;
         QiShiBanInfo() : score(0), step(0), beginTime(0), endTime(0), awardMark(0), randKey(0), addTimeNum(0) {}
     };
+
+    struct DrinkInfo
+    {
+        Player * drinker;   //饮酒对象
+        UInt32 time ;       //饮酒时间
+        UInt8 type ;        //酒壶类型
+        std::set<Player *> plset;
+        DrinkInfo() : drinker(NULL) , time(0) , type(0){ plset.clear(); }
+        void reset(){ drinker = NULL ; time = 0 ; type = 0; plset.clear();}
+    };
+    struct FriendCount
+    {
+        UInt32 value ;  //友好度
+        UInt32 time ; // 发送结拜时间
+        UInt32 cost ; // 发起结拜时消耗数
+        UInt8 flag ;  //是否处于等待结拜状态  0-非等待 1-等待
+        FriendCount():value(0),time(0),cost(0),flag(0){}
+        void setTimeCostFlag(UInt32 tm = 0, UInt32 ct = 0, UInt8 f =0){time = tm ; cost = ct;flag = f ;}
+        void setFriendValue(UInt32 val ){  if(val > value ) value = val;} 
+    };
+    struct FriendYellowBird
+    {
+        UInt32 time ;
+        UInt8  count;
+        FriendYellowBird():time(0),count(0){}
+        FriendYellowBird(UInt32 time_ , UInt8 count_):time(time_),count(count_){}
+    };
+    struct FriendTaskNum
+    {
+        UInt32 clearTime ;
+        UInt8 taskNum[6];
+        FriendTaskNum():clearTime(0){ clear(0);}
+        FriendTaskNum(UInt32 time_ , UInt8 task1 , UInt8 task2 , UInt8 task3 , UInt8 task4, UInt8 task5 , UInt8 task6):clearTime(time_){ 
+            taskNum[0] = task1;
+            taskNum[1] = task2;
+            taskNum[2] = task3;
+            taskNum[3] = task4;
+            taskNum[4] = task5;
+            taskNum[5] = task6;
+        }
+        void clear(UInt32 _clearTime)
+        {
+           clearTime = _clearTime;
+           taskNum[0] = 0; 
+           taskNum[1] = 0; 
+           taskNum[2] = 0; 
+           taskNum[3] = 0; 
+           taskNum[4] = 0; 
+           taskNum[5] = 0; 
+        }
+    };
+
 
     struct MoBaoInfo
     {
@@ -1713,6 +1766,7 @@ namespace GObject
         MoFang * GetMoFang()        { return m_moFang; }
         Erlking * GetErlking()        { return m_erlking; }
         MarriageInfo * GetMarriageInfo()  { return m_marriageInfo; }
+        CollectCard * GetCollectCard()        { return m_collecCard; }
 	// ????ϵͳ
 	public:
 
@@ -2224,7 +2278,10 @@ namespace GObject
         std::map<UInt64,std::vector<StuPresentBox> > _present; 
         std::map<UInt64,std::vector<StuPresentBox> >_bePresent; 
 
-        std::map<UInt64,UInt32 > _friendlyCount; 
+        std::map<UInt64, struct FriendCount >_friendlyCount;   //友好度
+		std::map<UInt64 , UInt32> _brothers; // 结拜兄弟(不分男女) 第二参数为发起饮酒的时间
+        std::map<UInt64, struct FriendYellowBird >_friendYB;   //黄色鸢尾赠送情况
+        std::map<UInt64, struct FriendTaskNum >_friendTask;   //友好度任务
 
 		TaskMgr* m_TaskMgr;
 		Trade* m_Trade;
@@ -2606,6 +2663,7 @@ namespace GObject
         TripodData& runTripodData(TripodData& data, bool = false);
 
     public:
+        void specialUdpLog(UInt8 type);
         void sendSingleEnchant(UInt8 enchant);
         void sendOldRC7DayAward();
 
@@ -3118,6 +3176,7 @@ namespace GObject
         MoFang* m_moFang;
         Erlking* m_erlking;
         MarriageInfo* m_marriageInfo;
+        CollectCard * m_collecCard;
 
     public:
         void sendCollectCard(UInt8 fighterIndex);
@@ -3140,6 +3199,11 @@ namespace GObject
         UInt16 _partCnt[8][9];
         UInt16 _alreadyCnt[8];
         UInt8 _alreadyload[8];
+        //
+        UInt32 _drinkingSum;
+        UInt32 _friendSum;
+        //
+        DrinkInfo drinkInfo ;
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();
@@ -3164,6 +3228,48 @@ namespace GObject
         void BuyLeftPower();
 
         //友好度
+        void AddFriendlyCount(Player * friender , UInt32 value) ; //增加友好度
+        void CompleteFriendlyTask(Player * friender , UInt8 taskNum ,UInt8 flag = 0/*是否为主动*/ );
+        void LoadFriendlyCountFromDB(UInt64 friendId ,UInt32 val ,UInt32 time, UInt32 cost ,UInt8 wait, UInt8 flag = 0); //加载友好度
+        void UpdateFriendlyCountToDB(UInt64 friendId);   //更新友好度
+        void sendFirendlyCountTaskInfo();  //发送友好度任务信息(附加友情值)
+        void InsertBrother(Player * pl);  //插入结拜兄弟
+        UInt32 getFriendlyCount(UInt64 playerId); //获得好友度
+		bool _hasBrother( Player * pl ) const; //判断是否结拜
+        void getFriendlyAchievement(UInt8 opt); //获得好友度成就奖励
+        bool CheckCanBeBrother(Player * friendOne , UInt8 type);
+        UInt8 CheckCanDrink(UInt8 type);
+        void InviteDrinking(Player * friendOne);
+        void beInviteDrinking(Player * pl ,  UInt8 type);
+
+        bool acceptBrother(Player * friendOne , UInt8 flag = 0 /*抛对方*/);
+        void beRefuceBrother(Player * friendOne ,UInt8 flag = 0);
+        void setDrinking(Player * drinker ,UInt32 val){ drinkInfo.drinker = drinker ; drinkInfo.time = val ;}
+        void resetDrinking(){ drinkInfo.drinker = NULL ; drinkInfo.time = 0 ; drinkInfo.plset.clear();}
+        void setDrinkType(UInt8 type ){ drinkInfo.type = type ;}
+        DrinkInfo& getDrinkInfo(){ return drinkInfo;}
+
+        UInt32 getfriendSum(){return _friendSum;}
+
+        void beReplyForDrinking(Player * pl , UInt8 res ,UInt8 type = 0 ,UInt8 count = 0);
+        bool UseMeiHuaJian(UInt16 iid ,UInt32 num , UInt8 use = 0);
+        void sendFriendlyTimeAndCost();
+        void CancelBrother(Player * FriendOne);
+        bool AfterDrinking();
+        void BuyDrinkCount();
+        bool UseYellowBird(Player * friendOne ,UInt32 num);
+        void BuyFriendlyGoods(UInt8 type , UInt8 count );
+        UInt8 GetYBCount(Player *friendOne);
+        void SetYBCount(Player * friendOne , UInt32 time ,UInt8 count);
+
+        void SetFriendTaskNum(Player * pl , UInt32 time,UInt8 task1 , UInt8 task2 , UInt8 task3 , UInt8 task4 , UInt8 task5 , UInt8 task6);
+
+        bool IsAccept(Player * friendOne);
+        void drinking(Player * friendOne, UInt8 drinkCount , UInt8 flag = 0);
+        UInt32 DrinkingPoint();
+        void calcDrinkPoint(UInt8 flag = 0);
+        void BeginDrink();
+        void AddClanFriend();
         //void AddFriendlyCount(Player * friender , UInt8 taskNum) ;
         //void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
 

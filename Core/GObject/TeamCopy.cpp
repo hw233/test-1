@@ -934,10 +934,31 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
                 pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 2);
             pl->setContinuousRFAward(4);
         }
+        
+    }
+
+    if( td->count != 0 )
+    {
+        for(UInt8 i = 0 ; i < (td->count -1); ++i)
+        {
+            Player* pl = td->members[i];
+            if(pl == NULL)
+                continue;
+            for(UInt8 j = i + 1 ; j < td->count ; ++j)
+            {
+                Player* p = td->members[j];
+                if(p == NULL)
+                    continue;
+                if(pl->getThreadId() != p->getThreadId())
+                    continue ;
+                pl->CompleteFriendlyTask(p,3 ,1);
+                p->CompleteFriendlyTask(pl,3 ,1);
+            }
+        }
     }
 
     UInt32 now = TimeUtil::Now();
-    for(UInt8 i = td->count; i > 0; --i)
+    for(UInt8 i = td->count; i > 0; --i)  //离队
     {
         Player* pl = td->members[i-1];
         if(pl == NULL)

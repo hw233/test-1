@@ -157,12 +157,14 @@ enum PurchaseType
     RefreshMoBaoAward           = 1019, //刷新墨宝奖励
     BuyLingGuo                  = 1020, //购买灵果
     BuyTYSSLim                  = 1021, //天元神兽限购礼包
+
     BuyPower                    = 1022, //购买仙界体力
     SkillGrade                  = 1023, //技能升阶
     EnterAutoXJFrontMap         = 1024, //璇玑阵图
     EnterXJFrontMap             = 1025, //璇玑阵图
     ZhenYuanCuiLian             = 1026, //阵元淬炼费
-    erlking                     = 1027, //妖王再临
+    JieBaiYinJiu                = 1027,
+    erlking                     = 1028, //妖王再临
     //繁体私有占150～200
 };
 
@@ -318,6 +320,7 @@ enum ItemFrom
     FromTYSS = 71, //天元神兽
     FromZhenyuanMerge = 72, //阵元合成
     FromZhenyuanTiQu = 73, //阵元提取
+    FromJieBai = 74 ,
     //80 ~ 100，繁体占用
 };
 

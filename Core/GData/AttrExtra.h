@@ -255,6 +255,59 @@ struct AttrExtra
         return aet;
 	}
 
+    AttrExtra operator ^(const float rate) const
+	{
+        AttrExtra aet = *this;
+		aet.strength *= rate;
+		aet.physique *= rate;
+		aet.agility *= rate;
+		aet.intelligence *= rate;
+		aet.will *= rate;
+		aet.soul *= rate;
+		aet.aura *= rate;
+		aet.auraMax *= rate;
+		aet.attack = static_cast<UInt32>(aet.attack * rate + 0.99);
+        aet.magatk = static_cast<UInt32>(aet.magatk * rate + 0.99);
+		aet.defend = static_cast<UInt32>(aet.defend * rate + 0.99);
+        aet.magdef = static_cast<UInt32>(aet.magdef * rate + 0.99);
+		aet.hp = static_cast<UInt32>(aet.hp * rate + 0.99);
+		aet.tough *= rate;
+		aet.action = static_cast<UInt32>(aet.action * rate + 0.99);
+		aet.hitrate *= rate;
+		aet.evade *= rate;
+		aet.critical *= rate;
+		aet.criticaldmg *= rate;
+		aet.pierce *= rate;
+		aet.counter *= rate;
+        aet.magres *= rate;
+
+		aet.strengthP *= rate;
+		aet.physiqueP *= rate;
+		aet.agilityP *= rate;
+		aet.intelligenceP *= rate;
+		aet.willP *= rate;
+		aet.soulP *= rate;
+		aet.attackP *= rate;
+        aet.magatkP *= rate;
+		aet.defendP *= rate;
+        aet.magdefP *= rate;
+
+		aet.hpP *= rate;
+		aet.actionP *= rate;
+		aet.criticaldmgP *= rate;
+		aet.counterP *= rate;
+        aet.magresP *= rate;
+
+        aet.hitrlvl *= rate;
+        aet.evdlvl *= rate;
+        aet.crilvl *= rate;
+        aet.pirlvl *= rate;
+        aet.counterlvl *= rate;
+        aet.mreslvl *= rate;
+        aet.toughlvl *= rate;
+        aet.criticaldmgimmune *= rate;
+        return aet;
+	}
 	inline void reset()
 	{
         strength = 0;

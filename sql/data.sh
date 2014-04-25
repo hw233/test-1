@@ -57,6 +57,13 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_create_skill_ev.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140404_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140420_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_Create_cardSystem.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140407_drinkAttr.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140124_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140214_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_AddXinMo_0317.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_create_skill_ev.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140404_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from item_template; source itemtemplate;";
@@ -127,6 +134,9 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from zhenyuan_extraAttr; source zhenyuan_extraAttr;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skill_ev; source skill_ev;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from erlking; source erlking;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from cardInfo; source cardInfo;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from cardupgrade; source cardupgrade;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from drinkAttr; source drinkAttr;";
 }
 
 update_data

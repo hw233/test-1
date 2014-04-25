@@ -419,6 +419,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setPresentLogin();
             GObject::globalOnlinePlayers.add(player->getId(),player);
             player->SetQQBoardLogin();
+            //player->AddClanFriend();
             if(!player->checkClientIP())
             {
                 player->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);
@@ -1108,12 +1109,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                15,   2,
-                9093, 2,
-                9088, 3,
-                517,  2,
-                134,  4,
-                515,  3,
+                15, 2,
+                78, 1,
+                1126, 5,
+                9418, 4,
+                551, 2,
+                1325, 4,
             };
 
             UInt8 idx = 0;
@@ -3891,7 +3892,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 13 && begin <= end )
     {
-        curType = 11;
+        curType = 13;
         if(GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_END) < TimeUtil::Now())
         {
@@ -4009,16 +4010,22 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 20 && begin <= end )
     {
+        if(GObject::World::getTYSSTime())
+        {
+            Stream st(SPEP::ACTIVITYONOFF);
+            st << ret << Stream::eos;
+            NETWORK()->SendMsgToClient(hdr.sessionID, st);
+            return;
+        }
+
         ret = 1;
         Stream st(SPEP::ACTIVITYONOFF);
         st << ret << Stream::eos;
         NETWORK()->SendMsgToClient(hdr.sessionID, st);
-#if 0
 
         curType = 20;
         GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::globalClans.enumerate(clan_enum_1, 0);
-#endif
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_END, end);
 

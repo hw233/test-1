@@ -10,7 +10,11 @@ function clanbuildingtemplate()
 {
     f=$1
     d=clanbuildingtemplate
-    sed -i /建筑等级/d $f
+<<<<<<< HEAD
+    sed -i /lev/d $f
+=======
+    sed -i /Lv/d $f
+>>>>>>> 2328f2a874a05db7bb431f3c531ed3ae3f7b78bf
     sed -i /EXP/d $f
     sed -i /level/d $f
     sed -i /^$/d $f
@@ -22,9 +26,9 @@ function clanbuildingtemplate()
             print "INSERT INTO `clan_building_template` VALUES";
         } {
             printf("(%d,%d,%d,%d,%d,%d,%d)",$1,$2,$4,$5,$6,$7,$8);
-            if (NR <= ENVIRON["lines"])
+            if (NR < ENVIRON["lines"])
                 printf(",");
-            else if (NR > ENVIRON["lines"])
+            else if (NR >= ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }

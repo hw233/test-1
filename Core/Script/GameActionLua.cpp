@@ -1469,10 +1469,20 @@ namespace Script
         assert(player != NULL);
         return Call<bool>("RunAirBookLoginAward", player, val);
     }
+    bool GameActionLua::RunFriendlyGoods(Player* player, UInt8 val ,UInt32 count)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunFriendlyGoods", player, val , count);
+    }
     bool GameActionLua::RunPrayAward(Player* player, UInt8 val)
     {
         assert(player != NULL);
         return Call<bool>("RunPrayAward", player, val);
+    }
+    UInt8 GameActionLua::GetCardByChance(Player* player ,UInt16 cnt1,UInt16 cnt2,UInt16 cnt3)
+    {
+        assert(player != NULL);
+        return Call<UInt8>("GetCardByChance", player, cnt1, cnt2 ,cnt3);
     }
     bool GameActionLua::RunNovLoginAward(Player* player, UInt8 val)
     {
@@ -1896,6 +1906,16 @@ namespace Script
     {
 		assert(player != NULL);
         Call<void>("getJiqirenAward_Dungeon", player, diff, isFree);
+    }
+    
+    UInt16 GameActionLua::getSpeCard(UInt16 itemId)
+    {
+		return Call<UInt16>("getSpeCard", itemId);
+    }
+
+    UInt16 GameActionLua::getsuitAttr(UInt8 suitId)
+    {
+		return Call<UInt16>("getsuitAttr", suitId);
     }
 
     UInt32 GameActionLua::getZhenyuanLootId(UInt8 idx)

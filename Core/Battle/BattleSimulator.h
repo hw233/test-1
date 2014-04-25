@@ -792,6 +792,7 @@ private:
     void doAbnormalStatusClear(BattleObject* bo);
 	UInt32 attackByJiuzi(BattleFighter * bf, bool& first, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, int counter_deny = -1, AttackPoint * counter_deny_list = NULL, std::vector<AttackAct>* atkAct = NULL, bool canProtect = false);
     void attackByJiuziSS(BattleFighter* bf, const GData::SkillBase* skill);
+    bool doEffectAfterCount(BattleFighter* bf, const GData::SkillBase* skill, UInt16 actCnt);
 };
 
 }
