@@ -1772,12 +1772,6 @@ local collectChance = {
     [4] = {{100,30},{150,60},{180,90},{200,180},{250,210},{300,240},{350,270},{400,300},{450,400},{501,5000},{110,10000}},
 }
 local Card = {8,7,5,4,3,6,1,2}
-local PChance = {
-[1] = { 5000 ,10000},
-[2] = { 5000,10000},
-[3] = { 5000 ,10000},
-[4] = { 5000,10000 },
-}
 function GetCardByChance(player ,cnt1,cnt2,cnt3)
     local chance ={0,0,0,0}
     local cnts = {} 
@@ -1804,13 +1798,11 @@ function GetCardByChance(player ,cnt1,cnt2,cnt3)
     if color ==0 or color > 4 then
         return 0
     end
-    local idx = 0
-    for k = 1,#PChance[color] do
-        if g < PChance[color][k] then 
-                idx = k
-            end
+    local idx = 1
+    if g > 5000 then
+        idx = 2
     end
-    return Card[color]+idx-1 
+    return Card[(color-1)*2 +idx]
 end
 
 
