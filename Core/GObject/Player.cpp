@@ -30569,7 +30569,11 @@ void Player::ApplyToName(Player* pl)
 
     TeamMemberData* tmd = getTeamMemberData();
     if(NULL == tmd)
+    {
+        pl->sendMsgCode(1, 4052);
         return;
+    }
+
     if(tmd->memCnt >= 3)
     {
         pl->sendMsgCode(1, 8014);
