@@ -1076,6 +1076,14 @@ namespace GObject
             player->sendMsgCode(0, 6019);
             return 1;
         }        
+        //TODO 取消预约婚礼点击限制
+        if(player->GetVar(VAR_LIMIT_APPOINTMENT) < TimeUtil::Now())
+            player->SetVar(VAR_LIMIT_APPOINTMENT,TimeUtil::Now() + 86400);
+        else
+        {
+            player->sendMsgCode(0, 6032);
+            return 1;
+        }
         obj_player->GetMarriageInfo()->eraseInfo(PARM_yuyueTime);  
         obj_player->GetMarriageInfo()->eraseInfo(PARM_eWedding);  
         
@@ -1126,6 +1134,14 @@ namespace GObject
             player->sendMsgCode(0, 6017);
             return 1;
         }*/
+        //TODO 取消预约婚礼点击限制
+        if(player->GetVar(VAR_LIMIT_APPOINTMENT) < TimeUtil::Now())
+            player->SetVar(VAR_LIMIT_APPOINTMENT,TimeUtil::Now() + 86400);
+        else
+        {
+            player->sendMsgCode(0, 6032);
+            return 1;
+        }
 
         if(player->GetVar(VAR_MARRY_STATUS) == 3)
         {

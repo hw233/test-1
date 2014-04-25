@@ -6,6 +6,8 @@
 #include "MsgID.h"
 #include "Common/URandom.h"
 #include "Server/SysMsg.h"
+#include "Script/GameActionLua.h"
+#include "Country.h"
 #include "GData/CoupleUpgrade.h"
 #include "GData/CoupleCopy.h"
 
@@ -488,6 +490,8 @@ namespace GObject
         st << static_cast<UInt8>(7) << static_cast<UInt8>(man_player->GetVar(VAR_COUPLE_ONLINE_FISH)) << white_num << qixing_num << jinjin_num << qian_num << wan_num << Stream::eos;
         man_player->send(st);
         woman_player->send(st);
+        GameAction()->doStrong(man_player, SthMarryFish, 0, 0);
+        GameAction()->doStrong(woman_player, SthMarryFish, 0, 0);
         
         return 0;
     }
@@ -1114,6 +1118,8 @@ namespace GObject
         EnterCoupleCopy(obj_player,0);      
         ReturnCouplePet(man_player);
         ReturnCouplePet(woman_player);
+        GameAction()->doStrong(man_player, SthMarryCopy, 0, 0);
+        GameAction()->doStrong(woman_player, SthMarryCopy, 0, 0);
         return;
     }
     

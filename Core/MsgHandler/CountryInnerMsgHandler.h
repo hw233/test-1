@@ -914,7 +914,7 @@ void OnAutoXJFrontMapAttack( GameMsgHdr& hdr, const void * data )
 	MSG_QUERY_PLAYER(player);
 
     UInt16 idspot = *(UInt16*)data;
-    UInt8 ret = xjfrontMap.fight(player, (idspot>>8)&0xFF, idspot&0xFF, true);
+    xjfrontMap.fight(player, (idspot>>8)&0xFF, idspot&0xFF, true);
 }
 
 void OnPlayerTimeTick( GameMsgHdr& hdr, const void * data )
@@ -1384,12 +1384,6 @@ void OnClanSkillLevel( GameMsgHdr& hdr, const void* data )
     player->clanSkillLevelUp(skillId);
     player->setFightersDirty(true);
 }
-void OnWaterSpiritTree( GameMsgHdr& hdr, const void* data )
-{
-    MSG_QUERY_PLAYER(player);
-    //UInt8 skillId = *(UInt8*)(data);
-    player->doStrongInWorld(43);
-}
 
 void OnClanSkillList( GameMsgHdr& hdr, const void* data )
 {
@@ -1514,12 +1508,10 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
     if(co->id == SthTownDeamon)
     {
         player->GuangGunCompleteTask(0,16);
-        if(player->GetVar(VAR_TOWNDEAMON))
-            return;
-        else
+        if(!player->GetVar(VAR_TOWNDEAMON))
             player->SetVar(VAR_TOWNDEAMON, 1);
     }
-    if(co->id == SthAthletics1)
+    else if(co->id == SthAthletics1)
     {
         player->GuangGunCompleteTask(0,26);
         player->getSummerMeetScore(5);
@@ -2490,12 +2482,6 @@ void OnGGTeamPlayerLeave( GameMsgHdr &hdr, const void * data)
     UInt64 id = *reinterpret_cast<const UInt64 *>(data); 
     player->GGTeamPlayerLeave(id);
 }
-void OnDoStrongInWorld( GameMsgHdr &hdr, const void * data)
-{
-    MSG_QUERY_PLAYER(player);
-    UInt8 id = *reinterpret_cast<const UInt64 *>(data); 
-    player->doStrongInWorld(id);
-}
 void OnSend11GradeInfo( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
@@ -2583,6 +2569,43 @@ void OnCompareBP( GameMsgHdr& hdr, const void * data )
 	MSG_QUERY_PLAYER(player);
 	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
     player->sendCompareBP(pl);
+}
+
+void OnInviteGoback( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    if(player->CheckGoback(pl->getId()))
+        player->AddGoback(pl->getId());
+}
+
+void OnApplyJoin( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    if(player->CheckApplyList(pl->getId()))
+        player->AddApplyList(pl->getId());
+}
+
+void OnApplyToName( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    player->ApplyToName(pl);
+}
+
+void OnInviteToName( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    player->InviteToName(pl);
+}
+
+void OnAcceptApply( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    player->AcceptApply(pl->getId());
 }
 
 void OnServerWarEnter( GameMsgHdr& hdr, const void* data )

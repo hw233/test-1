@@ -230,6 +230,7 @@ struct DBPlayerData
 	std::string fyamen;
     std::string clantask;
     std::string formations;
+    std::string zhenyuans;
     std::string atohicfg;
     std::string openid;
     std::string canHirePet;
@@ -694,6 +695,7 @@ struct DBClan
     UInt32 urge;
     UInt32 duobaoAward;
     UInt32 tyssSum;
+    std::string clantitleAll;
 };
 
 struct DBClanRepo
@@ -1480,6 +1482,31 @@ struct DBZhenwei
     UInt8 mark;
 };
 
+struct DBGoback
+{
+    UInt64 inviteeId;
+    UInt64 playerId;
+};
+
+struct DBApplyList
+{
+    UInt64 playerId;
+    UInt64 applicantId;
+};
+
+struct DBTeamMember
+{
+    UInt32 teamId;
+    UInt64 member1;
+    UInt64 member2;
+    UInt64 member3;
+};
+
+struct DBInactiveMember
+{
+    UInt64 playerId;
+};
+
 struct DBPlayerNamed 
 {
     UInt16 serverNo;
@@ -1585,6 +1612,16 @@ struct DBCardSuit
     UInt8 collect_degree;
 };
 
+struct DBZhenyuanAttr
+{
+    UInt32 id;
+    UInt32 itemId;
+    UInt8  zycolor;
+    std::string types;
+    std::string values;
+    UInt8 bindType;
+};
+
 }
 
 namespace DB {
@@ -1659,7 +1696,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(63)
+SPECIALDEF(64)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1711,6 +1748,7 @@ SPECIALDEF(63)
 	UInt8, pdata.frontGoldCnt,
 	UInt32, pdata.frontUpdate,
     std::string, formations,
+    std::string, zhenyuans,
     std::string, atohicfg,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
@@ -2321,7 +2359,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(35)
+SPECIALDEF(36)
 (
 	UInt32, id,
 	std::string, name,
@@ -2357,7 +2395,8 @@ SPECIALDEF(35)
     UInt32, gongxian,
     UInt32, urge,
     UInt32, duobaoAward,
-    UInt32,tyssSum 
+    UInt32,tyssSum, 
+    std::string, clantitleAll
 )
 SPECIALEND()
 
@@ -3464,6 +3503,39 @@ SPECIALDEF(3)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBGoback)
+SPECIALDEF(2)
+    (
+    UInt64, inviteeId,
+    UInt64, playerId
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBApplyList)
+SPECIALDEF(2)
+    (
+    UInt64, playerId,
+    UInt64, applicantId
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTeamMember)
+SPECIALDEF(4)
+    (
+    UInt32, teamId,
+    UInt64, member1,
+    UInt64, member2,
+    UInt64, member3
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBInactiveMember)
+SPECIALDEF(1)
+    (
+    UInt64, playerId
+    )
+SPECIALEND()
+
 SPECIALBEGIN(GObject::DBPlayerNamed)
 SPECIALDEF(3)
     (
@@ -3586,6 +3658,18 @@ SPECIALDEF(6)
     UInt8, active,
     UInt16, spe_mark,
     UInt8, collect_degree
+    )
+SPECIALEND()
+
+SPECIALBEGIN (GObject::DBZhenyuanAttr)
+SPECIALDEF(6)
+    (
+    UInt32, id,
+    UInt32, itemId,
+    UInt8,  zycolor,
+    std::string, types,
+    std::string, values,
+	UInt8, bindType
     )
 SPECIALEND()
 

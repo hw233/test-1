@@ -33,6 +33,7 @@
 #include "Marry.h"
 #include "ModifyMount.h"
 #include "CollectCard.h"
+#include "KangJiTianMo.h"
 
 
 namespace Battle
@@ -232,6 +233,7 @@ namespace GObject
 //飞剑(坐骑)系统
 #define MOUNT_COSTID 9500
 #define MOUNT_CANGJIANID 9600
+#define ZHENYUAN_MAXCNT 12
 
 #ifdef _FB
 #define LIMIT_LEVEL  60
@@ -279,6 +281,7 @@ namespace GObject
         JIUXIAO     = 18,   //九霄唤龙枪
         TIANGANG    = 19,   //天罡剑诀
         YEHUO       = 20,   //业火天雷
+        JIUZI       = 21,   //九子神雷
 
         DRAGONKING_MAX,
     };
@@ -328,6 +331,7 @@ namespace GObject
     class AttainMgr;
     struct TeamData;
     struct PetTeamData;
+    struct TeamMemberData;
     class TeamCopyPlayerInfo;
     class PetTeamCopyPlayerInfo;
     class ActivityMgr;
@@ -340,6 +344,7 @@ namespace GObject
     class Dreamer;
     class MoFang;
     struct MarriageInfo;
+    class KangJiTianMo;
 
     struct TripodData
     {
@@ -709,6 +714,7 @@ namespace GObject
             //memset(ymcolor, 0, sizeof(ymcolor));
             memset(bookStore, 0, sizeof(bookStore));
             formations.reserve(32);
+            memset(zhenyuans, 0, sizeof(zhenyuans));
             shimen.reserve(32);
             smcolor.reserve(32);
             yamen.reserve(32);
@@ -798,6 +804,7 @@ namespace GObject
         UInt8 frontGoldCnt;         // ??ͼ?շѴ???
         UInt32 frontUpdate;         // ??ͼ????????ʱ??
         std::vector<UInt16> formations; // ??ѧ??????
+        ItemZhenyuan * zhenyuans[12]; //前右后左阵元 逆时针
 #ifdef _ARENA_SERVER
         UInt8 entered;
 #endif
@@ -1040,9 +1047,32 @@ namespace GObject
 		void checkLevUp(UInt8, UInt8);
         bool formationLevUp(UInt16);
         bool addNewFormation(UInt16 newformationId, bool writedb = false);
+        void setZhenyuan(UInt32, UInt8);
+        bool setZhenyuan(ItemZhenyuan *, UInt8, bool = true);
+        void takedownZhenyuan(UInt32);
+        void updateZhenyuansToDB();
+        void sendZhenyuansInfo();
+        void updateZhenyuanTiQu();
+        void addZhenyuanTiQuTimes(UInt16);
+        bool checkTQSF();
+        void zhenyuanTiQu();
+        void addZhenyuanAttr(GData::AttrExtra& ae, Fighter * fgt);
+        void addZhenyuanAttr(GData::AttrExtra& ae, ItemZhenyuan * zhenyuan, Fighter * fgt);
+        inline UInt8 getZhenyuanCnt()
+        {
+            UInt8 count = 0;
+            for(int i = 0; i < ZHENYUAN_MAXCNT; ++ i)
+            {
+                if(_playerData.zhenyuans[i])
+                    ++ count;
+            }
+            return count;
+        }
+
         void sendFormationList();
         bool checkFormation(UInt16);
         bool checkFormation_ID(UInt16);
+        UInt8 getFullFormationCnt();
         void sendNationalDayOnlineAward();
         void sendHalloweenOnlineAward(UInt32, bool = false);
         void sendLevelPack(UInt8);
@@ -1691,6 +1721,9 @@ namespace GObject
         void SetInPTCStatus(UInt8 status) { m_InPTCStatus = status;}
         UInt8 GetInPTCStatus() const { return m_InPTCStatus; }
 
+        void SetTMDYRoomStatus(UInt8 status) { m_TMDYRoomStatus = status;}
+        UInt8 GetTMDYRoomStatus() const { return m_TMDYRoomStatus; }
+
         void SetClanBattleStatus(UInt8 status) { m_ClanBattleStatus = status;}
         UInt8 GetClanBattleStatus() const { return m_ClanBattleStatus; }
 
@@ -1910,6 +1943,8 @@ namespace GObject
         inline bool isJumpingMap() { return _isJumpingMap; }
         inline void setJumpingMap(bool v) { _isJumpingMap = v; }
         bool in7DayFromCreated();
+        void SendFriendsA(UInt8 type);
+        void SendFriendsB(UInt8 type);
 
         void loadQixiInfoFromDB(Player* pl, UInt8 bind, UInt8 pos, UInt8 event, UInt32 score)
         {
@@ -2088,6 +2123,77 @@ namespace GObject
 
         //墨宝 end
 
+        //抗击天魔 begin
+
+        struct InactiveSort
+        {
+            GObject::Player* player;
+            UInt8 level;
+            UInt32 power;
+            UInt32 time;
+
+            InactiveSort() : player(NULL), level(0), power(0), time(0){}
+        };
+        struct lt_sortA
+        {
+            bool operator()(const InactiveSort& a, const InactiveSort& b) const { return a.power > b.power || (a.power == b.power && a.level > b.level) || (a.power == b.power && a.level == b.level && a.time < b.time); }
+        };
+        struct ActiveSort
+        {
+            GObject::Player* player;
+            UInt8 isOnline;
+            UInt32 power;
+            UInt32 time;
+
+            ActiveSort() : player(NULL), isOnline(0), power(0), time(0){}
+        };
+        struct lt_sortB
+        {
+            bool operator()(const ActiveSort& a, const ActiveSort& b) const { return a.isOnline > b.isOnline || (a.isOnline == b.isOnline && a.power > b.power) || (a.isOnline == b.isOnline && a.power == b.power && a.time < b.time); }
+        };
+        typedef std::multiset<InactiveSort, lt_sortA> InactiveSortType;
+        typedef std::multiset<ActiveSort, lt_sortB> ActiveSortType;
+        typedef std::vector<UInt64> Goback;       // <活跃玩家>
+        typedef std::vector<UInt64> ApplyList;    // <非活跃玩家>
+        InactiveSortType _CommonSort;     // 普通回流玩家排序
+        ActiveSortType _ActiveSort;       // 活跃玩家排序
+        Goback _Goback;                   // 通过QQ请求回归
+        ApplyList _ApplyList;             // 申请列表
+
+        UInt8  m_curPageA;
+        UInt8 m_curType;
+        void SetCurPageA(UInt8 page) { m_curPageA = page; }
+        void AddCurPageA() { m_curPageA++; }
+        UInt8 GetCurPageA() const { return m_curPageA; }
+
+        void SetCurType(UInt8 type) { m_curType = type; }
+        UInt8 GetCurType() const { return m_curType; }
+
+        void AddGobackFromDB(UInt64 inviterId);
+        void AddGoback(UInt64 inviteeId);
+        void DelGoback(UInt64 inviterId);
+        void SetInactiveSort(Player* member);
+        void SendInactiveSort(UInt8 type, UInt8 page=1);
+        void ClearInactiveSort();
+        bool CheckGoback(UInt64 inviterId);
+        void SendGoback(UInt8 type);
+        void SetActiveSort(Player* member);
+        void SendActiveSort(UInt8 type, UInt8 page=1);
+        void ClearActiveSort();
+        void AddApplyListFromDB(UInt64 applicantId);
+        void AddApplyList(UInt64 applicantId);
+        bool CheckApplyList(UInt64 applicantId);
+        void SendApplyList(UInt8 type, UInt8 curPage=1);
+        void AcceptApply(UInt64 applicantId);
+        void RefuseApply(UInt64 applicantId);
+        void DelApplyList(UInt64 applicantId);
+        void InviteToName(Player* member);
+        void ApplyToName(Player* leader);
+        void ClearKJTMData();
+        void KJTMUdpLog();
+ 
+        //抗击天魔 end
+
         void MiLuZhiJiao();
         void setForbidSale(bool b, bool isAuto = false);
         bool getForbidSale() {return _isForbidSale;}
@@ -2174,6 +2280,7 @@ namespace GObject
 
         bool m_EnterPTCStatus;
         bool m_InPTCStatus;
+        UInt8 m_TMDYRoomStatus;       //天魔大营房间状态（0：未在房间；1：在房间；2:准备战斗；3：战斗中）
 
 #ifdef _ARENA_SERVER
         inline const std::string& getDisplayName() { if(_displayName.empty()) rebuildBattleName(); return _displayName; }
@@ -2225,6 +2332,7 @@ namespace GObject
         // ͨ????????֮??
         UInt8 _justice_roar;
         float _spirit_factor;
+        float _KJTM_factor;
         bool _diamond_privilege;
         bool _qqvip_privilege;
         UInt32 _athlRivalBuf;
@@ -2257,6 +2365,9 @@ namespace GObject
 
         inline void setSpiritFactor(float v) { _spirit_factor = v; }
         inline float getSpiritFactor() { return _spirit_factor; }
+
+        inline void setKJTMFactor(float v) { _KJTM_factor = v; }
+        inline float getKJTMFactor() { return _KJTM_factor; }
 
         inline void setDiamondPrivilege(UInt8 v) { _diamond_privilege = v; }
         inline UInt8 getDiamondPrivilege() { return _diamond_privilege; }
@@ -2494,6 +2605,7 @@ namespace GObject
         TripodData& runTripodData(TripodData& data, bool = false);
 
     public:
+        void specialUdpLog(UInt8 type);
         void sendSingleEnchant(UInt8 enchant);
         void sendOldRC7DayAward();
 
@@ -2508,6 +2620,9 @@ namespace GObject
         PetCopyTeamPage& getPetCopyTeamPage();
         void clearPetCopyTeamPage();
         PetTeamCopyPlayerInfo* getPetTeamCopyPlayerInfo();
+
+        TeamMemberData* getTeamMemberData();
+        void setTeamMemberData(TeamMemberData* tmd);
 
         HoneyFall* getHoneyFall();
 
@@ -2659,6 +2774,7 @@ namespace GObject
         CopyTeamPage m_ctp;
         TeamCopyPlayerInfo* m_tcpInfo;
         PetTeamData* m_petTeamData;
+        TeamMemberData* m_teamMemberData;
         PetCopyTeamPage m_pctp;
         PetTeamCopyPlayerInfo* m_ptcpInfo;
         HoneyFall* m_hf;
@@ -2898,6 +3014,7 @@ namespace GObject
         void addMountAttrExtra(GData::AttrExtra&);
         bool check_Cangjianya();
         void mount_Cangjianya(UInt8, UInt8, bool);
+        void sendUseRideItemInfo(lua_tinker::table);
         inline UInt8 getMounts() { return _playerData.mounts; }
         inline ModifyMount * getCurrentMount() { return getOneMount(getMounts()); }
         inline ModifyMount * getOneMount(UInt8 id)
@@ -2934,7 +3051,6 @@ namespace GObject
         void AirBookPriase(UInt8 type , UInt64 playerid);
         void SendClanMemberGrade();
         void Send11GradeAward(UInt8 type);
-        void doStrongInWorld(UInt8 type);
         void setGGValue()  ; //光棍节
         //女娲石盘
         void sendNuwaInfo();
@@ -3071,6 +3187,13 @@ namespace GObject
         void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
         void do_fighter_xinmo(Fighter* fgt, UInt32 oldId);
         void do_skill_grade(Fighter* fgt, UInt32 oldId);
+    public:
+        void makeClanTitleInfo(Stream & st);
+        void changeClanTitle(UInt8 id);
+        void notifyClanTitle();
+        UInt32 getCurClanTitle();
+        void clearClanTitle();
+        void checkClanTitle();
 	};
 
 

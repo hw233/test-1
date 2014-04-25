@@ -482,6 +482,47 @@ namespace GObject
         }
     }
 
+    static void getRandomZHYAttr(UInt8 lv, ItemZhenyuanAttr& zhyattr)
+    {
+        stZHYAttrConf& zhyAttrConf = GObjectManager::getZHYAttrConf();
+        UInt8 attrNum = zhyAttrConf.getAttrNum(uRand(100));
+        if(attrNum > 4)
+            attrNum = 4;
+        std::vector<UInt8> allAttrType = zhyAttrConf.attrType;
+        for(int i = 0; i < attrNum; ++ i)
+        {
+            UInt8 size = allAttrType.size();
+            UInt8 idx = uRand(size);
+            zhyattr.type[i] = allAttrType[idx];
+            zhyattr.value[i] = zhyAttrConf.getAttrMax(lv, zhyattr.type[i]-1) * zhyAttrConf.getDisFactor(uRand(10000));
+            allAttrType.erase(allAttrType.begin() + idx);
+        }
+        zhyattr.color = 2 + zhyAttrConf.getColor(lv, zhyattr.type, zhyattr.value, attrNum);
+        if(zhyattr.color == 5)
+        {
+            UInt8 skillSwitch = zhyAttrConf.getSkillSwitch(uRand(100));
+            switch(skillSwitch)
+            {
+            case 1:     //1条全职
+                zhyattr.typeExtra[0] = zhyAttrConf.getExtraAttrid(lv, true);
+                zhyattr.valueExtra[0] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[0]) * zhyAttrConf.getDisFactor(uRand(10000));
+                break;
+            case 2:     //1条单职
+                zhyattr.typeExtra[1] = zhyAttrConf.getExtraAttrid(lv, false);
+                zhyattr.valueExtra[1] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[1]) * zhyAttrConf.getDisFactor(uRand(10000));
+                break;
+            case 3:     //1全+1单
+                zhyattr.typeExtra[0] = zhyAttrConf.getExtraAttrid(lv, true);
+                zhyattr.valueExtra[0] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[0]) * zhyAttrConf.getDisFactor(uRand(10000));
+                zhyattr.typeExtra[1] = zhyAttrConf.getExtraAttrid(lv, false);
+                zhyattr.valueExtra[1] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[1]) * zhyAttrConf.getDisFactor(uRand(10000));
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
 	Package::Package(Player* player) : m_Owner(player), m_Size(0), m_SizeSoul(0), _lastActivateLv(0), _lastActivateQ(0), _lastActivateCount(0)
 	{
 	}
@@ -523,6 +564,8 @@ namespace GObject
 			return AddEquipN(typeId, num, bind, silence, FromWhere);
         else if(IsPetEquipTypeId(typeId))
 			return m_Owner->GetPetPackage()->AddPetEquipN(typeId, num, bind, silence, FromWhere);
+        else if(IsZhenYuanItem(typeId))
+			return AddZhenYuanN(typeId, num, bind, silence, FromWhere);
 		return AddItem(typeId, num, bind, silence, FromWhere);
 	}
 
@@ -603,6 +646,8 @@ namespace GObject
         if (!typeId || !num) return NULL;
 		if (IsEquipTypeId(typeId) || IsPetEquipTypeId(typeId))
             return NULL;
+        else if(IsZhenYuanItem(typeId))
+			return AddZhenYuanN(typeId, num, bind, !notify, fromWhere);
         else if(IsPetItem(typeId))
 			return m_Owner->GetPetPackage()->AddPetItem(typeId, num, bind, notify, fromWhere);
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
@@ -998,7 +1043,10 @@ namespace GObject
 		if(e == NULL)
 			++ m_Size;
 		e = equip;
-		SendSingleEquipData(equip);
+        if(IsZhenYuanItem(equip->GetTypeId()))
+		    SendSingleZhenyuanData(static_cast<ItemZhenyuan *>(equip));
+        else
+		    SendSingleEquipData(equip);
 		return equip;
 	}
 
@@ -1385,9 +1433,12 @@ namespace GObject
             m_Owner->OnShuoShuo(SS_TRUMP);
 
 		DB4().PushUpdateData("REPLACE INTO `item` VALUES(%u, %u, %" I64_FMT "u, %d)", equip->getId(), 1, m_Owner->getId(), equip->GetBindStatus() ? 1 : 0);
-		SendSingleEquipData(equip);
+        if(IsZhenYuanItem(equip->GetTypeId()))
+		    SendSingleZhenyuanData(static_cast<ItemZhenyuan *>(equip));
+        else
+		    SendSingleEquipData(equip);
 		ItemNotifyEquip(equip);
-		if(FromWhere != 0 && equip->getQuality() >= 4)
+		if((FromWhere != 0 && equip->getQuality() >= 4) || IsZhenYuanItem(equip->GetTypeId()))
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetItemType().getId(), equip->getId(), FromWhere, TimeUtil::Now());
 
         OnAddEquipAndCheckAttainment(& (equip->GetItemType() ),  FromWhere);
@@ -1553,6 +1604,17 @@ namespace GObject
 		return ret;
 	}
 
+    bool Package::eraseEquip(UInt32 id)
+    {
+        item_elem_iter iter = m_Items.find(ItemKey(id));
+        if(iter == m_Items.end())
+            return false;
+		SendDelEquipData(static_cast<ItemEquip *>(iter->second));
+        m_Items.erase(iter);
+        -- m_Size;
+        return true;
+    }
+
 	bool Package::DelEquip(UInt32 id, UInt16 toWhere)
 	{
 		if(!IsEquipId(id)) return false;
@@ -1568,9 +1630,13 @@ namespace GObject
 		{
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), item->getId(), toWhere, TimeUtil::Now());
 		}
-        if(Item_LBling <= item->GetItemType().subClass || Item_LBxin >= item->GetItemType().subClass)
+        if(Item_LBling <= item->GetItemType().subClass && Item_LBxin >= item->GetItemType().subClass)
         {
             DB4().PushUpdateData("DELETE FROM `lingbaoattr` WHERE `id`=%u", id);
+        }
+        else if(IsZhenYuan(item->getClass()))
+        {
+            DB4().PushUpdateData("DELETE FROM `zhenyuanAttr` WHERE `id`=%u", item->getId());
         }
 
 		SendDelEquipData(static_cast<ItemEquip *>(item));
@@ -1580,22 +1646,30 @@ namespace GObject
 
 	bool Package::DelEquip2(ItemEquip * equip, UInt16 toWhere)
 	{
+        /*
 		item_elem_iter iter = m_Items.find(equip->getId());
 		if(iter == m_Items.end())
 			return false;
 		m_Items.erase(iter);
 		-- m_Size;
+        */
+        if(!eraseEquip(equip->getId()))
+            return false;
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
 		DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
 		if((toWhere != 0 && equip->getQuality() >= 4) || (Item_LBling <= equip->GetItemType().subClass && Item_LBxin >= equip->GetItemType().subClass && (static_cast<ItemLingbao*>(equip))->getLbColor()>=4))
 		{
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetItemType().getId(), equip->getId(), toWhere, TimeUtil::Now());
 		}
-        if(Item_LBling <= equip->GetItemType().subClass || Item_LBxin >= equip->GetItemType().subClass)
+        if(Item_LBling <= equip->GetItemType().subClass && Item_LBxin >= equip->GetItemType().subClass)
         {
             DB4().PushUpdateData("DELETE FROM `lingbaoattr` WHERE `id`=%u", equip->getId());
         }
-		SendDelEquipData(equip);
+        else if(IsZhenYuan(equip->getClass()))
+        {
+            DB4().PushUpdateData("DELETE FROM `zhenyuanAttr` WHERE `id`=%u", equip->getId());
+        }
+		//SendDelEquipData(equip);
 		SAFE_DELETE(equip);
 		return true;
 	}
@@ -2414,6 +2488,12 @@ namespace GObject
 				count ++;
 				ItemEquip * equip = static_cast<ItemEquip *>(item);
 				AppendEquipData(st, equip);
+			}
+            else if(IsZhenYuan(item->getClass()))
+			{
+				count ++;
+				ItemZhenyuan * zhenyuan = static_cast<ItemZhenyuan *>(item);
+				AppendZhenyuanData(st, zhenyuan);
 			}
 			else
 			{
@@ -5975,6 +6055,8 @@ namespace GObject
 
 	void Package::ItemNotify( UInt32 id, UInt16 num )
 	{
+        if(IsZhenYuanItem(id))
+            return;
         if(IsEquipId(id))
 		{
 			SYSMSG_SENDV(103, m_Owner, id);
@@ -5997,6 +6079,15 @@ namespace GObject
             lbnameTmpl.getLBName(name, lb);
 			SYSMSG_SENDV(4117, m_Owner, lba.lbColor, name.c_str());
 			SYSMSG_SENDV(4118, m_Owner, lba.lbColor, name.c_str());
+        }
+        else if(IsZhenYuan(equip->getClass()))
+        {
+            ItemZhenyuanAttr& zhyAttr = static_cast<ItemZhenyuan *>(equip)->getZhyAttr();
+            const GData::ItemBaseType * itype = GData::itemBaseTypeManager[equip->GetTypeId()];
+            if(itype == NULL)
+                return;
+			SYSMSG_SENDV(4117, m_Owner, zhyAttr.color, itype->getName().c_str());
+			SYSMSG_SENDV(4118, m_Owner, zhyAttr.color, itype->getName().c_str());
         }
         else
         {
@@ -7868,4 +7959,213 @@ namespace GObject
 
 		return true;
     }
+
+    void Package::SendSingleZhenyuanData(ItemZhenyuan * zhenyuan)
+    {
+		Stream st(REP::PACK_INFO);
+		st << static_cast<UInt16>(1);
+		AppendZhenyuanData(st, zhenyuan);
+		st << Stream::eos;
+		m_Owner->send(st);
+    }
+
+    void Package::AppendZhenyuanData(Stream& st, ItemZhenyuan * zhenyuan)
+    {
+		st << zhenyuan->GetItemType().getId() << static_cast<UInt8>(zhenyuan->GetBindStatus() ? 1 : 0);
+		st << zhenyuan->Count() << zhenyuan->getId();
+        zhenyuan->getZhyAttr().appendAttrToStream(st);
+    }
+
+	ItemBase* Package::AddZhenYuanN( UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere )
+	{
+		if((UInt32)(GetRestPackageSize()) + 50 < num)
+			return NULL;
+		ItemBase * item = NULL;
+		for(UInt32 i = 0; i < num; ++ i)
+		{
+			item = AddZhenYuan(typeId, bind, !silence, FromWhere);
+		}
+		return item;
+	}
+
+    ItemZhenyuan * Package::newZhenyuanToDB(const GData::ItemBaseType * itype, ItemZhenyuanAttr& zyattr, bool bind)
+    {
+        if(itype == NULL) return NULL;
+        ItemEquipData itemEquipData;
+        UInt32 id = IDGenerator::gItemOidGenerator.ID();
+        ItemZhenyuan * zhenyuan = new ItemZhenyuan(id, itype, itemEquipData, zyattr);
+
+        std::string strType;
+        std::string strValue;
+        for(int i = 0; i < 6; ++ i)
+        {
+            if(i < 4)
+            {
+                strType += Itoa(zyattr.type[i], 10);
+                strValue += Itoa(zyattr.value[i], 10);
+            }
+            else
+            {
+                strType += Itoa(zyattr.typeExtra[i-4], 10);
+                strValue += Itoa(zyattr.valueExtra[i-4], 10);
+            }
+
+            if(i < 5)
+            {
+                strType += ',';
+                strValue += ',';
+            }
+        }
+        ITEM_BIND_CHECK(itype->bindType, bind);
+        zhenyuan->SetBindStatus(bind);
+        AddEquip2(static_cast<ItemEquip *>(zhenyuan));
+        DB4().PushUpdateData("REPLACE INTO `zhenyuanAttr`(`id`, `itemId`, `zycolor`, `types`, `values`) VALUES(%u, %u, %u, '%s', '%s')", id, itype->getId(), zyattr.color, strType.c_str(), strValue.c_str());
+        return zhenyuan;
+    }
+
+	ItemBase* Package::AddZhenYuan(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere)
+	{
+		if (!IsZhenYuanItem(typeId)) return NULL;
+		if(m_Size >= m_Owner->getPacksize() + 50)
+			return NULL;
+		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[typeId];
+		if(itype == NULL) return NULL;
+		switch(itype->subClass)
+		{
+            case Item_Formula6:
+            case Item_Formula7:
+            case Item_Formula8:
+            case Item_Formula9:
+            {
+                ItemZhenyuanAttr zhyattr;
+                getRandomZHYAttr(itype->vLev, zhyattr);
+                return newZhenyuanToDB(itype, zhyattr, bind);
+            }
+            break;
+            default:
+                break;
+        }
+		return NULL;
+	}
+
+	void Package::MergeZhenyuan(UInt32* zhyIds, UInt8 count)
+	{   //阵元合成
+        if(count > 3 || count < 2)
+            return;
+        if(zhyIds[0] == zhyIds[1] || zhyIds[0] == zhyIds[2] || zhyIds[1] == zhyIds[2])
+            return;
+        bool bind = false;
+		ItemBase * items[3] = { NULL };
+        for(int i = 0; i < count; ++ i)
+        {
+            items[i] = GetEquip(zhyIds[i]);
+            if(items[i] == NULL)
+                return;
+            UInt32 typeId = items[i]->GetTypeId();
+            if(!IsZhenYuanItem(typeId))
+                return;
+            if(items[i]->getReqLev() >= 130 && count == 3)
+                return;
+            if(items[i]->GetBindStatus())
+                bind = true;
+        }
+
+        UInt8 lv = items[0]->getReqLev();
+        if(lv != items[1]->getReqLev())
+            return;
+        if(count == 3 && lv != items[2]->getReqLev())
+            return;
+        UInt32 ogid = 0;
+        if(count == 3)
+            ogid = GData::GDataManager::GetZhenyuanTypeIdByLev((lv-75)/5 + 1);
+        else
+            ogid = GData::GDataManager::GetZhenyuanTypeIdByLev((lv-75)/5);
+        if(!IsZhenYuanItem(ogid))
+            return;
+		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[ogid];
+		if(itype == NULL) return;
+
+        //求待合成阵元属性最小值
+        int attrNum = 4;
+        int extraAttrNum = 2;
+        UInt8 attrColor[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
+        stZHYAttrConf& zhyAttrConf = GObjectManager::getZHYAttrConf();
+        for(int i = 0; i < count; ++ i)
+        {
+            ItemZhenyuanAttr& zhyAttr = static_cast<ItemZhenyuan *>(items[i])->getZhyAttr();
+            UInt8 tmpNum = zhyAttr.getAttrNum();
+            UInt8 tmpNum1 = zhyAttr.getExtraAttrNum();
+            UInt8 tmpColor[4] = { 0 };
+            zhyAttrConf.getAttrColor(lv, zhyAttr.type, zhyAttr.value, tmpNum, tmpColor);
+            if(attrNum > tmpNum)
+                attrNum = tmpNum;
+            if(extraAttrNum > tmpNum1)
+                extraAttrNum = tmpNum1;
+            for(int j = 0; j < tmpNum; ++ j)
+            {
+                if(attrColor[j] > tmpColor[j])
+                    attrColor[j] = tmpColor[j];
+            }
+			DelEquip2(static_cast<ItemEquip *>(items[i]), ToZhenyuanMgerge);
+        }
+
+        //阵元属性生成
+        if(4-attrNum > 0)
+            attrNum = uRand(4-attrNum) + attrNum;
+        if(2-extraAttrNum > 0)
+            extraAttrNum = uRand(2-extraAttrNum) + extraAttrNum;
+        if(count == 3)
+            lv = lv+5 > 130 ? 130 : lv+5;
+        ItemZhenyuanAttr zhyattr;
+        std::vector<UInt8> allAttrType = zhyAttrConf.attrType;
+        for(int i = 0; i < attrNum; ++ i)
+        {
+            UInt8 size = allAttrType.size();
+            UInt8 idx = uRand(size);
+            zhyattr.type[i] = allAttrType[idx];
+            zhyattr.value[i] = zhyAttrConf.getAttrMax(lv, zhyattr.type[i]-1) * zhyAttrConf.getDisFactor2(attrColor[i]) + 0.9999f;
+            allAttrType.erase(allAttrType.begin() + idx);
+        }
+        zhyattr.color = 2 + zhyAttrConf.getColor(lv, zhyattr.type, zhyattr.value, attrNum);
+        if(zhyattr.color == 5)
+        {
+            UInt8 skillSwitch = 0;
+            if(extraAttrNum == 0)
+                skillSwitch = zhyAttrConf.getSkillSwitch(uRand(100));
+            else if(extraAttrNum == 1)
+                skillSwitch = zhyAttrConf.getSkillSwitch1(uRand(100));
+            else
+                skillSwitch = 3;
+            switch(skillSwitch)
+            {
+            case 1:     //1条全职
+                zhyattr.typeExtra[0] = zhyAttrConf.getExtraAttrid(lv, true);
+                zhyattr.valueExtra[0] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[0]) * zhyAttrConf.getDisFactor(uRand(10000));
+                break;
+            case 2:     //1条单职
+                zhyattr.typeExtra[1] = zhyAttrConf.getExtraAttrid(lv, false);
+                zhyattr.valueExtra[1] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[1]) * zhyAttrConf.getDisFactor(uRand(10000));
+                break;
+            case 3:     //1全+1单
+                zhyattr.typeExtra[0] = zhyAttrConf.getExtraAttrid(lv, true);
+                zhyattr.valueExtra[0] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[0]) * zhyAttrConf.getDisFactor(uRand(10000));
+                zhyattr.typeExtra[1] = zhyAttrConf.getExtraAttrid(lv, false);
+                zhyattr.valueExtra[1] = zhyAttrConf.getExtraAttrMax(zhyattr.typeExtra[1]) * zhyAttrConf.getDisFactor(uRand(10000));
+                break;
+            default:
+                break;
+            }
+        }
+        ItemZhenyuan * zhenyuan = newZhenyuanToDB(itype, zhyattr, bind);
+        Stream st(REP::XJFRONTMAP);
+        st << static_cast<UInt8>(0x13) << count;
+        for(int i = 0; i < count; ++ i)
+        {
+            st << zhyIds[i];
+        }
+        st << static_cast<UInt32>(zhenyuan ? zhenyuan->getId() : 0);
+        st << Stream::eos;
+        m_Owner->send(st);
+	}
+
 }

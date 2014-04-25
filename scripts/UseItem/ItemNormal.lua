@@ -9112,7 +9112,7 @@ end
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    local item = 1539;
+    local item = 1514;
 
     if package:GetRestPackageSize() < (1+(1*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
@@ -10260,7 +10260,7 @@ function ItemNormal_NameCard(iid, num, bind, param)
     if iid == 9960 or iid < 9900 or iid >= 10000 then
         return false
     end
-    --9600:新手御剑特权卡 客户端占用
+    --9960:新手御剑特权卡 客户端占用
     local player = GetPlayer()
     local package = player:GetPackage();
     if iid < 9960 then
@@ -10515,7 +10515,7 @@ function ItemNormal_00009375(iid, num, bind, param)
 end
 
 function ItemNormal_00009382(iid, num, bind, param)
-    local itmeId = 9496;
+    local itmeId = 16010;
     local player = GetPlayer()
     local package = player:GetPackage()
     local items = { 15, 9088, 512, 33, 9371, 551, 501, 513, 503, 1325, 134, 507, 509, 515 }
@@ -10787,18 +10787,18 @@ function ItemNormal_00009492(iid, num, bind, param)
 end
 
 function ItemNormal_00009495(iid, num, bind, param)
-    local gemlevel6 = {
-        [1] = {5006, 5016, 5026, 5036, 5046, 5056},
-        [2] = {5076, 5136, 5086, 5106, 5146},
-        [3] = {5066, 5096, 5116, 5126},
+    local gemlevel5 = {
+        [1] = {5005, 5025, 5055, 5135, 5035},
+        [2] = {5105, 5145, 5045, 5085, 5075},
+        [3] = {5065, 5095, 5115, 5125, 5015},
     }
 
     local player = GetPlayer()
     local package = player:GetPackage();
-    local chance = {6366, 9336, 9559, 9708, 9807, 9881, 9922, 9950, 9970, 9981, 9989, 9994, 9997, 9999, 10000}
+    local chance = {8151, 8966, 9419, 9745, 9835, 9903, 9940, 9971, 9993, 9995, 9996, 9997, 9998, 9999, 9999, 10000, 10000, 10000}
     local card_num = 0;
 
-    if package:GetRestPackageSize() < num + 1*num/99 then
+    if package:GetRestPackageSize() < num + 2*num/99 then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -10810,18 +10810,23 @@ function ItemNormal_00009495(iid, num, bind, param)
         for k = 1, #chance do
             if idx <= chance[k] then
                 local tmp = (k-1) % 3 + 1
-                local rnd = math.random(1, #gemlevel6[tmp]);
-                itemId = gemlevel6[tmp][rnd] + math.floor((k-1)/3)
+                local rnd = math.random(1, #gemlevel5[tmp]);
+                itemId = gemlevel5[tmp][rnd] + math.floor((k-1)/3)
                 j = k
                 break
             end
         end
-        package:Add(itemId, 1, true, false, 2)
+
+        if j < 4 then
+            package:Add(itemId, 2, true, false, 2)
+        else
+            package:Add(itemId, 1, true, false, 2)
+        end
 
         if j >= 4 then
             Broadcast(0x27, "气运所钟，机缘所至，[p:"..player:getCountry()..":"..player:getPName().."]幸运的从[4:"..iid.."]中获得了[4:"..itemId.."]x1!");
         end
-        player:luaUdpLog("qibaolinglongxia", "F_140317_"..j, "act")
+        player:luaUdpLog("qingguanliulizhan", "F_140317_"..j, "act")
 
         if getSurnameLegend() then
             local used_num = player:GetVar(452);
@@ -10919,6 +10924,8 @@ function ItemNormal_00009601(iid, num, bind, param)
     if items[iid] == nil then
         return false
     end
+    local num9500 = 0
+    local ItemTable = {}
     local rp = 0
     for k = 1, num do
         local itemId = 0
@@ -10935,15 +10942,27 @@ function ItemNormal_00009601(iid, num, bind, param)
             res = player:hasMountChip(itemId)
         end
         if true == res then
-            package:Add(9500, replaceNum[rp], true, false, 2)
+            num9500 = num9500 + replaceNum[rp]
         else
             if rp == 7 or rp == 8 then
                 Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]获得了".."[4:"..itemId.."]，仙运奇佳，战力又增！")
             end
-            package:Add(itemId, 1, true, false, 2)
+            if itemId == 9500 then
+                num9500 = num9500 + 1
+            else
+                table.insert(ItemTable, itemId)
+                table.insert(ItemTable, 1)
+                package:Add(itemId, 1, true, false, 2)
+            end
         end
     end
+    if num9500 ~= 0 then
+        package:Add(9500, num9500, true, false, 2)
+        table.insert(ItemTable,1, 9500)
+        table.insert(ItemTable,2, num9500)
+    end
 
+    player:sendUseRideItemInfo(ItemTable)
     package:DelItemSendMsg(iid, player)
     return num;
 end
@@ -10974,6 +10993,19 @@ function ItemNormal_00009649(iid, num, bind, param)
     package:DelItemSendMsg(iid, player);
     player:getXianpoLua(num * 50);
     return num
+end
+
+function ItemNormal_00009650(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    if player:GetLev() < 75 then
+        player:sendMsgCode(0, 1093, 75);
+        return false
+    end
+    player:addZhenyuanTiQuTimes(num)
+    package:DelItemSendMsg(iid, player)
+    SendMsg(player, 0x35, "获得"..num.."次阵元提取次数！")
+    return num;
 end
 
 function ItemNormal_0009480(id, num, bind, param)
@@ -13026,6 +13058,7 @@ local ItemNormal_Table = {
     [9808] = ItemNormal_00009611,
 
     [9649] = ItemNormal_00009649,
+    [9650] = ItemNormal_00009650,
 
     [9900] = ItemNormal_NameCard,
     [9901] = ItemNormal_NameCard,
@@ -13389,6 +13422,8 @@ local ItemNormal_Table = {
     [16001] = ItemNormal_00016000,
     [16002] = ItemNormal_00016000,
     [16003] = ItemNormal_00016003,
+    [16009] = ItemNormal_00009495,
+    [16010] = ItemNormal_00009382,
 
     [9494] = ItemNormal_00009494,
     [9480] = ItemNormal_0009480,

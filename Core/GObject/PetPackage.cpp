@@ -275,7 +275,7 @@ namespace GObject
         if(notify)
             ItemNotify(typeId, num);
         SendItemData(item);
-        if(item->getQuality() >= Item_Yellow && FromWhere == FromPetGemMgerge)
+        if(item->getQuality() >= Item_Yellow && FromWhere == FromPetGemMerge)
             SYSMSG_BROADCASTV(4155, m_Owner->getCountry(), m_Owner->getName().c_str(), item->getQuality(), item->getName().c_str(), num);
         AddItemCoursesLog(typeId, num, FromWhere);
         if (FromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
@@ -331,13 +331,13 @@ namespace GObject
         if(GetItemSubClass(ogid) != Item_PetGem)
             return 0;
         if(gemId1 == gemId2)
-            DelPetItem(gemId1, 2, true, ToPetGemMgerge);
+            DelPetItem(gemId1, 2, true, ToPetGemMerge);
         else
         {
-            DelPetItem(gemId1, 1, true, ToPetGemMgerge);
-            DelPetItem(gemId2, 1, true, ToPetGemMgerge);
+            DelPetItem(gemId1, 1, true, ToPetGemMerge);
+            DelPetItem(gemId2, 1, true, ToPetGemMerge);
         }
-	    AddPetItem(ogid, 1, true, true, FromPetGemMgerge);
+	    AddPetItem(ogid, 1, true, true, FromPetGemMerge);
 		return 1;
 	}
 

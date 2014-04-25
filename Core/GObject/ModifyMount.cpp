@@ -283,6 +283,7 @@ namespace GObject
         updateToDB();
         sendMountInfo();
         _owner->check_Cangjianya();
+        GameAction()->doStrong(_owner, SthCangjiya, 0,0);
     }
 
     void ModifyMount::sendMountInfo()
