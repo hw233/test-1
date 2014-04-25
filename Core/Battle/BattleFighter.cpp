@@ -1604,6 +1604,9 @@ float BattleFighter::calcCriticalDmg(BattleFighter* defender)
     if(factor < 1.25)
         factor = 1.25;
 
+    if(factor > GObject::GObjectManager::getCriticalDmgMax() && !isNpc())
+        factor = GObject::GObjectManager::getCriticalDmgMax();
+
     return factor;
 }
 
