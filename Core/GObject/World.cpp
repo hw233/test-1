@@ -1566,7 +1566,6 @@ void World::World_Midnight_Check( World * world )
         world->SendSurnameLegendAward();
     if(b11TimeEnd)
         world->Send11AirBookAward();
-    bGGTimeEnd = true;
     if(bGGTimeEnd)
         world->SendGuangGunAward();
     if (bSnowEnd)
