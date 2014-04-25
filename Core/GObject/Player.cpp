@@ -30589,6 +30589,7 @@ void Player::InviteToName(Player* pl)
     if(NULL == pl)
         return;
 
+
     if(!isOnline())
     {
         pl->sendMsgCode(1, 2218);

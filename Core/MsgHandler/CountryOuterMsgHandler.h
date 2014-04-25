@@ -7082,8 +7082,11 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
     UInt32 now = TimeUtil::Now();
     if(GVAR.GetVar(GVAR_KANGJITIANMO_BEGIN) > now || GVAR.GetVar(GVAR_KANGJITIANMO_END) < now)
         return;
-
+   
     MSG_QUERY_PLAYER(player);
+    
+    if(player->GetLev() < 45)
+        return;
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 opt = 0;
@@ -7492,6 +7495,12 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                 return;
             }
             
+            if(member->GetLev() < 45)
+            {
+                player->sendMsgCode(1, 4051);
+                return;
+            }
+
             UInt32 status = member->GetVar(VAR_KJTM_STATUS);
             UInt8 mark = GET_BIT(status, 0);
             if(0 == mark)

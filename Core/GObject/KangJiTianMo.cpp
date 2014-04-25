@@ -117,7 +117,7 @@ void KangJiTianMo::RandInactiveMember(Player* pl, UInt8 type)
     while(tempMark.size() > 0 &&_InactiveMember.size() >= tempMark.size() && cnt<10)
     {
         UInt32 pos = uRand(tempMark.size());
-        UInt64 playerId = _InactiveMember[pos];
+        UInt64 playerId = _InactiveMember[tempMark[pos]-1];
         Player* member = globalPlayers[playerId];
         if(NULL == member)
         {
