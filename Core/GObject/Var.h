@@ -703,6 +703,8 @@ namespace GObject
         VAR_TYSS_DISCOUNT_CONSUME3 = 727,//天元神兽期间限购栏3(购买次数)
         VAR_TYSS_CONTRIBUTE_CLAN_SUM = 728,//天元神兽期间玩家帮派总贡献(帮主身上) 
         //731 - 751 for lib
+        //752 - 760 for qimj
+        VAR_CUR_CLAN_TITLE = 752,
 
         VAR_MAX,
     };
@@ -1333,6 +1335,7 @@ namespace GObject
             REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME2, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME3, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_CLAN_SUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

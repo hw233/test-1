@@ -694,6 +694,7 @@ struct DBClan
     UInt32 urge;
     UInt32 duobaoAward;
     UInt32 tyssSum;
+    std::string clantitleAll;
 };
 
 struct DBClanRepo

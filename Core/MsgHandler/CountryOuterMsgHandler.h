@@ -1506,6 +1506,13 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
             player->getRealSpirit();
             player->sendRealSpirit();
             break;
+        case 0x23:
+            {
+                UInt32 id;
+                br >> id;
+                player->changeClanTitle(static_cast<UInt8>(id));
+            }
+            break;
 
         default:
             return;

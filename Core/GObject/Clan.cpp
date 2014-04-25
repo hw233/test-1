@@ -659,6 +659,7 @@ bool Clan::kick(Player * player, UInt64 pid)
     {
         kicker->setBuffData(PLAYER_BUFF_CLAN1, 0);
         kicker->rebuildBattleName();
+        kicker->clearClanTitle();
     }
     if(kicker->getBuffData(PLAYER_BUFF_CLAN2) > 0)
     {
@@ -814,6 +815,7 @@ bool Clan::leave(Player * player)
     {
         player->setBuffData(PLAYER_BUFF_CLAN1, 0);
         player->rebuildBattleName();
+        player->clearClanTitle();
     }
     if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
     {
@@ -5648,7 +5650,10 @@ void Clan::sendMemberBuf(UInt8 pos)
         if(!pl)
             continue;
         if(pos == 1)
+        {
             pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
+            pl->addClanTitle(1, 0);
+        }
         else if(pos == 2)
             pl->setBuffData(PLAYER_BUFF_CLAN2, endTime);
         else
@@ -5658,7 +5663,6 @@ void Clan::sendMemberBuf(UInt8 pos)
         SYSMSG(title, 947);
         SYSMSGV(content, 950, pos);
         pl->GetMailBox()->newMail(NULL, 0x01, title, content, 0xFFFE0000);
-
 	}
 }
 
@@ -5666,6 +5670,36 @@ void Clan::ClearTYSSScore()
 {
     if(TYSSScoreSort.size() > 0)
         TYSSScoreSort.clear();
+}
+
+void Clan::addClanTitle(UInt8 titleId, UInt32 endTime, Player * pl)
+{
+    if(TimeUtil::Now() < endTime)
+        _clanTitle.insert(make_pair(titleId, endTime));
+    writeClanTitleAll();
+    pl->notifyClanTitle();
+}
+
+void Clan::writeClanTitleAll()
+{
+    UInt8 cnt = _clanTitle.size();
+    std::string title = "";
+
+    if(!cnt)
+    {
+        _clanTitle[0] = 0;
+        title += "0,0|";
+    }
+
+    for(std::map<UInt8, UInt32>::iterator it = _clanTitle.begin(); it != _clanTitle.end(); ++ it)
+    {
+        title += Itoa(it->first);
+        title += ',';
+        title += Itoa(it->second);
+        title += '|';
+    }
+
+    DB1().PushUpdateData("UPDATE `clan` SET `clantitleAll` = '%s' WHERE `id` = %" I64_FMT "u", title.c_str(), getId());
 }
 
 }
