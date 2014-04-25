@@ -336,7 +336,7 @@ namespace GObject
         {
             UInt8 CNum= GameAction()->GetCardByChance(m_owner,_cnt[lev][0],_cnt[lev][1],_cnt[lev][2]);    
             if(CNum > 8 || CNum == 0)
-                continue ;
+                break;
             getCards.push_back( (static_cast<UInt16>(level)) * 10 + CNum);
             _cnt[lev][0] ++ ;
             _cnt[lev][1] ++ ;
@@ -664,10 +664,17 @@ namespace GObject
         if(cid == 0)
             return;
         
-        SuitCardInfo* tmp = MapCardStamp.find(cid/100*10)->second;
-        if(GET_BIT(tmp->spe_mark,cid % 200))
+        std::map<UInt8,SuitCardInfo*>::iterator it = MapCardStamp.find(cid/100*10);
+        if(it == MapCardStamp.end())
+            return;
+        SuitCardInfo* tmp = it->second;
+        if(!tmp)
+            return;
+        if(GET_BIT(tmp->spe_mark,(cid % 200)))
             return;
         CardInfo* citmp = AddCard(cid); 
+        if(!citmp)
+            return;
         Stream st(REP::COLLECTCARD);  
         st << static_cast<UInt8>(2) ;//0x02套牌信息
         ReturnSuitInfo(st,20,true);
