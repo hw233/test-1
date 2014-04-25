@@ -20896,7 +20896,7 @@ void Player::getSnakeEggAward(UInt8 v)
 
 void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
 {
-    if(dayOrder > 10)
+    if(dayOrder > 4)
         return;
 
     Stream st(REP::COUNTRY_ACT);
@@ -20930,34 +20930,34 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
             UInt8 validMaxDay = 0;
             UInt8 serverDay = 0;
             UInt32 now = TimeUtil::Now();
-            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 1, 23))
+            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 5, 1))
             {
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 1, 23))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 5, 1))
             {
                 validMaxDay = 1;
                 serverDay = 1;
             }
-            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 1, 30))
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014,5, 2))
             {
                 validMaxDay = 1;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 1, 30))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 5, 2))
             {
                 validMaxDay = 2;
                 serverDay = 2;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 1, 31))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 5, 3))
             {
                 validMaxDay = 3;
                 serverDay = 3;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 1))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 5, 4))
             {
                 validMaxDay = 4;
                 serverDay = 4;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 2))
+           /* else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 2, 2))
             {
                 validMaxDay = 5;
                 serverDay = 5;
@@ -20990,10 +20990,10 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
             {
                 validMaxDay = 10;
                 serverDay = 10;
-            }
+            }*/
             else
             {
-                validMaxDay = 10;
+                validMaxDay = 4;
             }
 
             if(dayOrder > validMaxDay)

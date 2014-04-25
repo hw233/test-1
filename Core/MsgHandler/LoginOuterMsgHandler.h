@@ -4009,16 +4009,22 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 20 && begin <= end )
     {
+        if(GObject::World::getTYSSTime())
+        {
+            Stream st(SPEP::ACTIVITYONOFF);
+            st << ret << Stream::eos;
+            NETWORK()->SendMsgToClient(hdr.sessionID, st);
+            return;
+        }
+
         ret = 1;
         Stream st(SPEP::ACTIVITYONOFF);
         st << ret << Stream::eos;
         NETWORK()->SendMsgToClient(hdr.sessionID, st);
-#if 0
 
         curType = 20;
         GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::globalClans.enumerate(clan_enum_1, 0);
-#endif
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_END, end);
 
