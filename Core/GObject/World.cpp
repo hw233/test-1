@@ -1731,35 +1731,40 @@ void World::World_OldMan_Refresh(void *)
            UInt16 loc;
            UInt32 npcId;
        };
-       MapNpc mapNpc = {_oldMan._spot, 4244};
+       MapNpc mapNpc = {_oldMan._spot, 4245};
        GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
        GLOBAL().PushMsg(hdr1, &mapNpc);
        _oldMan._loc = 0;
        _oldMan._spot = 0 ;
        _oldMan._time = 0;
     }
-    else if( time > _oldMan._time )
-   // else if ((time%600) < 3 || (time%600)>= 600 -2)    //测试
+    else if((time%600) < 3 || (time%600)>= 600 -2)
     {
         UInt16 spot = GetRandomSpot();
-        //std::cout<<"ChangeTo:"<<spot<<std::endl;
+        if(!spot)
+            return;
+
+        if(_oldMan._spot != 0)
+            SYSMSG_BROADCASTV(573,spot); 
+    
+    }
+    else if( time > _oldMan._time )
+    {
+        UInt16 spot = GetRandomSpot();
         if(!spot)
             return ;
         if(_oldMan._spot == 0)
         {
             SYSMSG_BROADCASTV(572,spot); 
         }
-        else 
-        {
-            SYSMSG_BROADCASTV(573,spot); 
-        }
+
         UInt8 thrId = mapCollection.getCountryFromSpot(_oldMan._spot);
         struct MapNpc
         {
             UInt16 loc;
             UInt32 npcId;
         };
-        MapNpc mapNpc = {_oldMan._spot, 4244};
+        MapNpc mapNpc = {_oldMan._spot, 4245};
         GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
         GLOBAL().PushMsg(hdr, &mapNpc);
 
@@ -1767,7 +1772,7 @@ void World::World_OldMan_Refresh(void *)
         _oldMan._players.clear();
         GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
         GObject::MOData mo;
-        mo.m_ID = 4244;
+        mo.m_ID = 4245;
         mo.m_Hide = false;
         mo.m_Spot = _oldMan._spot;
         mo.m_Type = 100;

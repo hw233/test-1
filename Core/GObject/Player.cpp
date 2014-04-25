@@ -28114,12 +28114,12 @@ void Player::GetFindOldManAward(UInt32 type)
     if(type ==0)
         return ;
     UInt8 num = 1 ;
-    if(type < 11)
+    if(type < 4) //lijr
     {
         num =2;
         SYSMSG_BROADCASTV(574, getCountry(), getPName(), type );
     }
-    GetPackage()->AddItem(9451, num, true, false);   //欢乐礼包(9439) 其他活动要修改
+    GetPackage()->AddItem(16011, num, true, false);   //欢乐礼包(9439) 其他活动要修改
     AddVar(VAR_OLDMAN_DAYSCORE,num*10);
     AddVar(VAR_OLDMAN_SCORE,num*10);
     SYSMSG_SENDV(2024,this,num*10);
@@ -28133,7 +28133,7 @@ void Player::getInterestingAward(UInt8 type)
 {
     if(!World::getOldManTime())
         return ;
-    UInt32 scoreReq[] = {30,100,250,350};
+    UInt32 scoreReq[] = {20,40,70,90};
     UInt32 ScoreAward = 0;
     UInt32 Score = 0;
     if(type > 3 )
@@ -28176,7 +28176,7 @@ void Player::sendInterestingBag(Player* pl)
         sendMsgCode(0, 2218);
         return ;
     }
-    ItemBase* item = GetPackage()->GetItem(9451, true);					
+    ItemBase* item = GetPackage()->GetItem(16011, true);					
     if(item ==NULL)
         return ;
     UInt16 count = item->Count();
@@ -28187,7 +28187,7 @@ void Player::sendInterestingBag(Player* pl)
         return;
     }
     GetPackage()->DelItem2(item, 1);
-    GetPackage()->AddItemHistoriesLog(9451, 1);
+    GetPackage()->AddItemHistoriesLog(16011, 1);
     UInt64 id = getId();
     GameMsgHdr hdr(0x356, pl->getThreadId(),pl,sizeof(id) );
     GLOBAL().PushMsg(hdr, &id);
@@ -28202,7 +28202,7 @@ void Player::getInteresingBag(UInt64 pid)
         return ;
     UInt32 counts = GetVar(VAR_OLDMAN_PRESENT);
     SYSMSG(title, 4974);
-    if(counts <10)
+    if(counts < 3) //lijr 
     {
         SYSMSGV(content, 4975,player->getCountry(),player->getName().c_str());
         Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
@@ -30652,13 +30652,15 @@ void Player::KJTMUdpLog()
     if(1 == mark)
     {
         UInt32 statusA = GetVar(VAR_KJTM_LOGIN_STATUS);
-        if(0 == statusA)
+        UInt8 mark = GET_BIT(statusA, 0);
+        if(0 == mark)
         {
             UInt32 durtime = TimeUtil::SharpDayT(0, TimeUtil::Now()) - TimeUtil::SharpDayT(0, getLastOnline());
             if(durtime == 86400)
             {
                 udpLog("kangjitianmo", "F_140406_8", "", "", "", "", "act");
-                SetVar(VAR_KJTM_LOGIN_STATUS, 1);
+                statusA = SET_BIT(statusA, 0);
+                SetVar(VAR_KJTM_LOGIN_STATUS, statusA);
             }
         }
     }
