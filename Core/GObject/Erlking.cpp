@@ -30,25 +30,29 @@ void Erlking::ErlkingInfo()
 
         UInt8 curMark = GetErlkingStatus(i);
         UInt8 lastMark = GetErlkingStatus(i-1);
-        if(ERLKING_MARKA == curMark && (ERLKING_MARKC == lastMark || 1 == i) && level >= info->conditionB)
-            SetErlkingStatus(i);
+        if((ERLKING_MARKC == lastMark || 1 == i) && level >= info->conditionB)
+        {
+            if(ERLKING_MARKA == curMark)
+                SetErlkingStatus(i);
+        }
         else
             break;
-    }
-    SendErlkingInfo();
-}
 
-void Erlking::SendErlkingInfo()
-{
+    }
     Stream st(REP::ERLKING_INFO);
     st << static_cast<UInt8>(0x00);  
+    SendErlkingInfo(st);
+    st << Stream::eos;
+    m_owner->send(st);
+}
+
+void Erlking::SendErlkingInfo(Stream& st)
+{
     st << GetsurplusNum()  
         << static_cast<UInt8>(m_owner->GetVar(VAR_ERLKING_BUY_PASS_NUM_DAY))
         << m_owner->GetVar(VAR_ERLKING_STATUSA)
         << m_owner->GetVar(VAR_ERLKING_STATUSB)
-        << m_owner->GetVar(VAR_ERLKING_STATUSC)
-        << Stream::eos;
-    m_owner->send(st);
+        << m_owner->GetVar(VAR_ERLKING_STATUSC);
 }
 
 UInt8 Erlking::GetErlkingStatus(UInt8 copyId)
@@ -223,11 +227,28 @@ void Erlking::StartBattle(UInt8 copyId)
     {
         if(ERLKING_MARKB == mark)
         {
-            m_owner->GetPackage()->Add(info->itemId, 1, true, false, FromNpc);
+            ng->getLoots(m_owner, m_owner->_lastLoot, 1, NULL);
             SetErlkingStatus(copyId, 1);
-        }
 
-        ng->getLoots(m_owner, m_owner->_lastLoot, 0, NULL);
+            
+            if(copyId < ERLKING_MAX_COPY_NUM)
+            {
+                DeamonPlayerData* dpd = m_owner->getDeamonPlayerData();
+                if(NULL == dpd)
+                    return;
+
+                GData::ErlkingData::erlkingInfo * info = GData::erlkingData.getErlkingInfo(copyId+1);
+                if(NULL == info)
+                    return;
+
+                UInt16 level = dpd->maxLevel;
+                if(level >= info->conditionB)
+                    SetErlkingStatus(copyId+1);
+            }
+        }
+        else
+            ng->getLoots(m_owner, m_owner->_lastLoot, 0, NULL);
+
         SetsurplusNum();
     }
 
@@ -235,7 +256,11 @@ void Erlking::StartBattle(UInt8 copyId)
     st << r << id << Stream::eos;
     m_owner->send(st);
 
-    SendErlkingInfo();
+    Stream stA(REP::ERLKING_INFO);
+    stA << static_cast<UInt8>(0x01);  
+    SendErlkingInfo(stA);
+    stA << Stream::eos;
+    m_owner->send(stA);
 }
 
 void Erlking::AutoBattle(UInt8 copyId, UInt8 num)

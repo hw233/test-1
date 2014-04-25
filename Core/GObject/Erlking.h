@@ -30,7 +30,7 @@ namespace GObject
 
         void SetErlkingStatus(UInt8 copyId, UInt8 type=0);
 
-        void SendErlkingInfo();
+        void SendErlkingInfo(Stream& st);
 
     public:
         void ErlkingInfo();

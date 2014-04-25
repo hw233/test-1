@@ -802,7 +802,6 @@ struct DBErlkingConfig
     UInt8 conditionA;
     UInt8 conditionB;
     UInt32 npcgroup;
-    UInt32 itemId;
 };
 
 }
@@ -1732,13 +1731,12 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBErlkingConfig)
-SPECIALDEF(5)
+SPECIALDEF(4)
 	(
     UInt8, copyId,
     UInt8, conditionA,
     UInt8, conditionB,
-    UInt32, npcgroup,
-    UInt32, itemId
+    UInt32, npcgroup
 	)
 SPECIALEND()
 

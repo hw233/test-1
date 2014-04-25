@@ -2465,7 +2465,7 @@ namespace GData
 
         DBErlkingConfig db;
 
-		if(execu->Prepare("SELECT `copyId`, `conditionA`, `conditionB`, `npcgroup`, `itemId` FROM `erlking`", db) != DB::DB_OK)
+		if(execu->Prepare("SELECT `copyId`, `conditionA`, `conditionB`, `npcgroup` FROM `erlking`", db) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)

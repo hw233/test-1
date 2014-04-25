@@ -17,9 +17,8 @@ class ErlkingData
             UInt8 conditionA;   // 条件A
             UInt8 conditionB;   // 条件B
             UInt32 npcgroup;    // 妖王Id
-            UInt32 itemId;      // 首次开打掉落物品Id
 
-            erlkingInfo(): copyId(0), conditionA(0), conditionB(0), npcgroup(0), itemId(0) {}
+            erlkingInfo(): copyId(0), conditionA(0), conditionB(0), npcgroup(0) {}
         };
 
     private:

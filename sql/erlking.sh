@@ -22,7 +22,7 @@ function erlking()
         BEGIN {
             print "INSERT INTO `erlking` VALUES";
         } {
-            printf("(%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5);
+            printf("(%d,%d,%d,%d)",$1,$2,$3,$4);
             if (NR <= ENVIRON["lines"])
                 printf(",");
             else if (NR > ENVIRON["lines"])

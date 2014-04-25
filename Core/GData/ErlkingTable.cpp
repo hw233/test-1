@@ -12,7 +12,6 @@ namespace GData
         info.conditionA = data.conditionA;
         info.conditionB = data.conditionB;
         info.npcgroup= data.npcgroup;
-        info.itemId= data.itemId;
 
         _erlkingInfo.insert(std::make_pair(info.copyId, info));
     }
