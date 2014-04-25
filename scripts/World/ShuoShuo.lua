@@ -59,6 +59,7 @@ local SStickets = {     --分享获得抽奖券
     1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1,
 }
 
 function getShuoShuoAward(player, idx)
