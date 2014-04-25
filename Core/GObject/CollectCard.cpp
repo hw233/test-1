@@ -209,7 +209,7 @@ namespace GObject
                     vt_skills.push_back(s);
 
                 if (vt_skills.size())
-                    m_owner->getMainFighter()->delSkillsFromCT(vt_skills, true);
+                    m_owner->getMainFighter()->delSkillsFromCT(vt_skills, false);
             }
             *it = NULL; 
             
@@ -261,7 +261,7 @@ namespace GObject
             {
                 std::string skills = "";
                 skills += Itoa(tmp->skill_id);
-                m_owner->getMainFighter()->setSkills(skills,true);
+                m_owner->getMainFighter()->setSkills(skills,false);
             }
         }else if(pos == 5)
         {
@@ -295,7 +295,7 @@ namespace GObject
             {
                 std::string skills = "";
                 skills += Itoa(tmp->skill_id);
-                m_owner->getMainFighter()->setSkills(skills,true);
+                m_owner->getMainFighter()->setSkills(skills,false);
             }
             RebuildCardAttr();
 
@@ -706,6 +706,12 @@ namespace GObject
                 skillId = cii->skillId*100 + cut->skillLevel;                      
             CardInfo* ci = new CardInfo(dbc.id,dbc.cid,cii->type,dbc.level,dbc.exp,skillId,dbc.pos, cii->color,cut->attrIndex);
             VecEquipSlot[dbc.pos - 1] = ci; 
+            if(cii->type == 1)
+            {
+                std::string skills = "";
+                skills += Itoa(skillId);
+                m_owner->getMainFighter()->setSkills(skills,false);
+            }
         }
         
         return;
