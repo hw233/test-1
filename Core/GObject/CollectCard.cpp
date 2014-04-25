@@ -282,7 +282,7 @@ namespace GObject
 
         if(level < 40 || level > 130 )
            return ;
-        static UInt8 PCardChance[]= {5,4,4,3,3,2,2,2};
+        static UInt8 PCardChance[]= {5,5,4,3,3,4,2,2};
         std::vector<UInt16> getCards ;
         UInt16 index = 0;
         UInt8 lev = level/10-4;
