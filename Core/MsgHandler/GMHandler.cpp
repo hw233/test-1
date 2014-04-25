@@ -322,6 +322,7 @@ GMHandler::GMHandler()
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
     Reg(1, "cbop", &GMHandler::OnClanBuildingOp);
     Reg(3, "cblvl", &GMHandler::OnClanBuildingLevelChange);
+	Reg(3, "st", &GMHandler::OnSkillTest);
 
     _printMsgPlayer = NULL;
 }
@@ -5506,5 +5507,46 @@ void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& 
     GObject::Clan *clan = player->getClan();
     if(clan != NULL)
         clan->sendMemberBuf(pos);
+}
+
+void GMHandler::OnSkillTest(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+
+    std::string skills = args[0];
+    GObject::Fighter* fgt;
+    if(args.size() > 1)
+    {
+        UInt32 fighterId = atoi(args[1].c_str());
+		fgt = player->findFighter(fighterId);
+    }
+    else
+    {
+        fgt = player->getMainFighter();
+    }
+
+    if(fgt)
+    {
+        if(args.size() > 2 && atoi(args[2].c_str()) == 0)
+        {
+            std::cout << "(delete)id: " << fgt->getId() << ", " << "skills: " << skills << std::endl;
+            StringTokenizer tk(skills, ",");
+            const GData::SkillBase* s = NULL;
+            std::vector<const GData::SkillBase*> vt_skills;
+            for (size_t i = 0; i < tk.count(); ++i)
+            {
+                s = GData::skillManager[::atoi(tk[i].c_str())];
+                if (s)
+                    vt_skills.push_back(s);
+            }
+            if (vt_skills.size())
+                fgt->delSkillsFromCT(vt_skills, false);
+            return;
+        }
+
+        std::cout << "id: " << fgt->getId() << ", " << "skills: " << skills << std::endl;
+        fgt->setSkills(skills, false);
+    }
 }
 
