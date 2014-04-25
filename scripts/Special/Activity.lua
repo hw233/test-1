@@ -10304,7 +10304,7 @@ function GetSpreadCountForAward(serverNo)
 end
 
 function GetSpreadAward()
-    local award = {{515,2}, {1325,2}, {1126,2}, {134,2}, {509,2}}
+    local award = {{515,2}, {9498,2}, {9600,2}, {134,2}, {509,2}}
     return award
 end
 
