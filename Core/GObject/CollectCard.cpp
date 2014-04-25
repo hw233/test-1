@@ -37,13 +37,13 @@ namespace GObject
         return true;
     }
 
-    void SuitCardInfo::checkExistSetBit(UInt16 cid,UInt8 color)
+    bool SuitCardInfo::checkExistSetBit(UInt16 cid,UInt8 color)
     {
         if(id != 20)
         {
             UInt8 card_index = cid % 10;
             if(GET_BIT(suit_mark,(card_index-1)))
-                return ;  
+                return false;  
             
             suit_mark = SET_BIT(suit_mark,(card_index-1)); 
 
@@ -62,13 +62,14 @@ namespace GObject
         {
             UInt8 card_index = cid % 200;
             if(GET_BIT(spe_mark,card_index))
-                return ;  
+                return false;  
             
             spe_mark = SET_BIT(spe_mark,card_index); 
+            return true;
         }
 
         
-        return ;
+        return false;
     }
 
     bool SuitCardInfo::checkActive(UInt8 active_set)
@@ -115,8 +116,8 @@ namespace GObject
         if(flag == 1)//请求追加空闲卡牌信息
         {
             size_t off1 = st.size();//空闲卡牌数
-            st << static_cast<UInt8>(0);
-            UInt8 size1 = 0;
+            st << static_cast<UInt16>(0);
+            UInt16 size1 = 0;
             for(MSlot::iterator i = MapFreeCardSlot.begin(); i != MapFreeCardSlot.end(); i++)
             {
                 if(i->second->checkInfo() == false)  
@@ -126,11 +127,11 @@ namespace GObject
             }       
             
             if (size1)
-                st.data<UInt8>(off1) = size1;
+                st.data<UInt16>(off1) = size1;
         
             size_t off2 = st.size();//套牌个数
-            st << static_cast<UInt8>(0);
-            UInt8 size2 = 0;
+            st << static_cast<UInt16>(0);
+            UInt16 size2 = 0;
             for(MStamp::iterator i = MapCardStamp.begin(); i != MapCardStamp.end(); i++)
             {
                 if(!ReturnSuitInfo(st,i->second->id,false,true))
@@ -139,7 +140,7 @@ namespace GObject
             }       
             
             if (size2)
-                st.data<UInt8>(off2) = size2;
+                st.data<UInt16>(off2) = size2;
     
         } 
 
@@ -619,7 +620,8 @@ namespace GObject
 		    DB4().PushUpdateData("REPLACE INTO `cardsuit`(`playerId`, `id`, `suit_mark`,`active`,`spe_mark`,`collect_degree`) VALUES(%" I64_FMT "u, %u,0,0,0,0)", m_owner->getId(), si->id);
         }
         SuitCardInfo* tmp = MapCardStamp.find(cid/100*10)->second;
-        tmp->checkExistSetBit(ci->cid,ci->color);
+        if(tmp->checkExistSetBit(ci->cid,ci->color))
+            RebuildCardAttr();
         //TODO DB
         DB4().PushUpdateData("UPDATE `cardsuit` SET `suit_mark` = '%u', `collect_degree` = '%u',`spe_mark` = '%u' WHERE `playerId` = %" I64_FMT "u and `id` = '%u'",tmp->suit_mark,tmp->collect_degree,tmp->spe_mark,m_owner->getId(),tmp->id);
         
