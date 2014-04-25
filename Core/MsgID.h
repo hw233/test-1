@@ -259,6 +259,8 @@ namespace REQ
     const UInt8 CLAN_COPY           = 0x5C;
     /**仙界遗址系统 */
     const UInt8 CLAN_FAIRYLAND      = 0x5D;
+    /*结拜系统*/
+    const UInt8 BROTHER             = 0x5E;
     /**邮件ID列表 */
     const UInt8 MAIL_ID_LIST        = 0x40;// 0xA6
     /**邮件信息列表 */
@@ -619,6 +621,7 @@ namespace REP
 
     const UInt8 CLAN_COPY           = 0x5C;
     const UInt8 CLAN_FAIRYLAND      = 0x5D;
+    const UInt8 BROTHER             = 0x5E;
 
     const UInt8 MAIL_ID_LIST        = 0x40;// 0xA6
     const UInt8 MAIL_LIST           = 0x41;// 0xA0

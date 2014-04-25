@@ -1460,6 +1460,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+    //结拜邀请信息
+    pl->sendFriendlyTimeAndCost();
 
     }
 
@@ -4316,6 +4318,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.guard = player->getPF();
 		rep.level = player->GetLev();
 		pl->send(rep);
+        player->CompleteFriendlyTask(pl , 0);
 	}
 }
 
@@ -9003,6 +9006,209 @@ void OnXinMoReq( GameMsgHdr & hdr, const void * data )
             }
             break;
     }
+}
+void OnBrotherReq( GameMsgHdr& hdr, const void* data)
+{
+ 	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+	UInt8 type = 0;
+	br >> type;
+//    std::cout<<"playerId:"<<static_cast<UInt32>(player->getId()) << " type: " << static_cast<UInt32>(type) <<std::endl;
+	switch(type)
+	{
+	case 0x01:
+        player->sendFirendlyCountTaskInfo();
+		break;
+	case 0x02:
+        {
+            std::string name ;
+            br >> name ;
+            UInt8 type ;
+            br >> type ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            if(!player->CheckCanBeBrother(friendOne , type))
+            {
+                return ;
+            }
+            SYSMSGV(title, 400, player->getCountry(), player->getName().c_str());
+            SYSMSGV(content, 401, player->getCountry(), player->getName().c_str());
+            friendOne->GetMailBox()->newMail(player, 0x16, title, content);
+            player->sendFriendlyTimeAndCost();
+        }
+		break;
+	case 0x03:
+        {
+            UInt8 opt =0 ;
+            br >> opt ;
+            UInt8 res = 0 ;
+            if(opt)
+            {
+                if(player->getDrinkInfo().type != 0)
+                    player->getDrinkInfo().reset();
+                res = 3;
+                break;
+            }
+            else
+            {
+                UInt8 type = 0;
+                br >> type ;
+                res = player->CheckCanDrink(type);
+            }
+            Stream st(REP::BROTHER);
+            st <<static_cast<UInt8>(0x03);
+            st <<static_cast<UInt8>(res);
+            st <<static_cast<UInt8>(player->getDrinkInfo().type);
+            st << Stream::eos; 
+            player->send(st);
+        }
+		break;
+    case 4:
+        {
+            std::string name;
+            br >> name;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            UInt8 flag = 0;
+            br >>flag ;
+            if(friendOne == NULL)
+                return ;
+            if(player->IsAccept(friendOne)) 
+            {
+                player->drinking(friendOne ,0,flag);
+            }
+        }
+        break;
+    case 0x05:
+        {
+            std::string name ;
+            br >> name ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            player->InviteDrinking(friendOne); 
+        }
+        break;
+    case 0x06:
+        {
+            std::string name ;
+            br >> name ;
+            UInt8 res = 0;
+            br >> res;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            
+            if(res == 1)
+            {
+                if(player->getDrinkInfo().drinker!=NULL )
+                {
+                    if(player->getDrinkInfo().drinker == friendOne)
+                        return ;
+                    res = 0;
+                }
+                else
+                {
+                    if(player->getDrinkInfo().type != 0)
+                        player->getDrinkInfo().reset();
+                    player->setDrinking(friendOne , 0);
+                }
+            }
+            struct st 
+            {
+                UInt64 playerId;
+                UInt8 res ;
+                UInt8 type ;
+                UInt8 count ;
+            };
+            st _st ;
+            _st.playerId = player->getId();
+            _st.res = res;
+            _st.type = 0;
+            _st.type = 0;
+            GameMsgHdr hdr(0x404, friendOne->getThreadId(), friendOne, sizeof(_st));
+            GLOBAL().PushMsg( hdr, &_st );
+            //friendOne->beReplyForDrinking(player,res);
+        }
+        break;
+    case 0x07:
+        {
+            std::string name ;
+            br >> name ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            player->CancelBrother(friendOne);
+        }
+        break;
+    case 0x08:
+        {
+            UInt8 type = 0;
+            br >> type ;
+            player->getFriendlyAchievement(type);
+            player->sendFirendlyCountTaskInfo();
+        }
+        break;
+    case 0x09:
+        {
+            player->BuyDrinkCount();
+            player->sendFirendlyCountTaskInfo();
+        }
+        break;
+    case 0x0A:
+        {
+            std::string name ;
+            br >> name ;
+            UInt32 count = 0;
+            br >> count ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL )
+                break;
+            UInt8 res = player->UseYellowBird(friendOne,count); 
+            Stream st(REP::BROTHER);
+            st << static_cast<UInt8>(0x0A);
+            st << static_cast<UInt8>(res);
+            st << Stream::eos;
+            player->send(st);
+            player->sendFirendlyCountTaskInfo();
+        }
+        break;
+    case 0x0B:
+        {
+            UInt8 type = 0;
+            br >> type;
+            UInt8 count = 0;
+            br >> count;
+            player->BuyFriendlyGoods(type , count);
+            player->sendFirendlyCountTaskInfo();
+        }
+        break;
+    case 0x0C:
+        {
+            std::string name ;
+            br >> name ;
+            if(player->getDrinkInfo().type ==0)
+                return ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL )
+                break;
+            UInt8 flag = 0;
+            UInt32 now = TimeUtil::Now();
+            if((player->getDrinkInfo().time + 20) > now)
+                flag = 1;
+            player->calcDrinkPoint();
+            GameMsgHdr hdr(0x407, friendOne->getThreadId(), friendOne, sizeof(UInt8));
+            GLOBAL().PushMsg( hdr, &flag );
+        }
+        break;
+    case 0x0D:
+        {
+           player->BeginDrink();
+        }
+        break;
+	}
+
 }
 
 

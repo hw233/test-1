@@ -419,6 +419,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setPresentLogin();
             GObject::globalOnlinePlayers.add(player->getId(),player);
             player->SetQQBoardLogin();
+            //player->AddClanFriend();
             if(!player->checkClientIP())
             {
                 player->SetVar(GObject::VAR_DROP_OUT_ITEM_MARK, 1);

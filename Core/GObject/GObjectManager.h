@@ -535,6 +535,7 @@ namespace GObject
         static bool loadTeamMember();
         static bool loadInactiveMember();
         static bool LoadPlayerModifyMounts();
+        static bool loadFriendlyCount();
         static bool loadSkillGrade();
 
         static bool addGM(UInt64 id, UInt8 lvl);
