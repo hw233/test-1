@@ -4422,6 +4422,7 @@ void World::SendGuangGunAward()    //待定
             }
         }
     }
+    World::guangGunSort.clear();
 }
 
 void World::SendHappyFireAward()
