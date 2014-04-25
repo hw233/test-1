@@ -108,7 +108,7 @@ namespace GObject
             collect_degree = num5;
         }
         
-        void checkExistSetBit(UInt16 cid, UInt8 color);
+        bool checkExistSetBit(UInt16 cid, UInt8 color);
         bool checkActive(UInt8 active_set);
 
     };
