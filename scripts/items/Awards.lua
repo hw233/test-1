@@ -1776,10 +1776,11 @@ function RunFriendlyGoods(player, cts ,count)
         [7] = {80,9498,150},
         [8] = {75,16001,200},
         [9] = {55,1126,100},
+        [10] = {0,16005,50},
     };
     local package = player:GetPackage();
 
-    if cts > 9  or cts <= 0 then
+    if cts > 10  or cts <= 0 then
         return false
     end
     if count == 0 then 

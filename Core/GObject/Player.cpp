@@ -30224,6 +30224,7 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
             GLOBAL().PushMsg(hdr, &_msg);
         }
     }
+    sendFirendlyCountTaskInfo();
 }
 void Player::do_skill_grade(Fighter* fgt, UInt32 oldId)
 {
@@ -31352,7 +31353,7 @@ UInt8 Player::CheckCanDrink( UInt8 type)
     
     if(type == 0)
         return 1;
-    getDrinkInfo().reset();
+    //getDrinkInfo().reset();
     if(getDrinkInfo().drinker != NULL || getDrinkInfo().time != 0)
         return 1;
 
@@ -31452,7 +31453,7 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
         }
         return ;
     }
-    if(getDrinkInfo().drinker == NULL || getDrinkInfo().drinker == pl)  //判断是否已经有人对酒
+    if(shenfen &&( getDrinkInfo().drinker == NULL || getDrinkInfo().drinker == pl ))  //判断是否已经有人对酒
     {
         std::set<Player *>::iterator it = getDrinkInfo().plset.find(pl);
         if(it != getDrinkInfo().plset.end())
@@ -31461,7 +31462,8 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
             result = 1 ;
         }
     }
-
+    if(!shenfen && count )
+        setDrinking(pl,0);
 
     if(type == 0 && shenfen )  //type用来告诉对方对酒级别  由主动发起方赋值
     {

@@ -9046,7 +9046,8 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             UInt8 res = 0 ;
             if(opt)
             {
-                player->getDrinkInfo().reset();
+                if(player->getDrinkInfo().type != 0)
+                    player->getDrinkInfo().reset();
                 res = 3;
                 break;
             }
@@ -9194,7 +9195,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
                 break;
             UInt8 flag = 0;
             UInt32 now = TimeUtil::Now();
-            if((player->getDrinkInfo().time + 23) > now)
+            if((player->getDrinkInfo().time + 20) > now)
                 flag = 1;
             player->calcDrinkPoint();
             GameMsgHdr hdr(0x407, friendOne->getThreadId(), friendOne, sizeof(UInt8));
