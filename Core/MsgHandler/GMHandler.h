@@ -205,6 +205,7 @@ private:
     void OnCreateMarryBoard(GObject::Player *player, std::vector<std::string>& args);
     void OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& args);
     void OnSendMsg(GObject::Player *player, std::vector<std::string>& args);
+    void OnAddFriendlyCount(GObject::Player *player, std::vector<std::string>& args);
     void OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBoss(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBossPick(GObject::Player *player, std::vector<std::string>& args);

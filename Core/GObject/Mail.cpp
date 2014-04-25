@@ -438,8 +438,19 @@ bool MailBox::delMail( UInt32 id, bool freeAdd )
 					mailPackageManager.remove(id);
 			}
 			break;
+        case 0x16:
+            {
+                Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
+                if(pl == NULL)
+                    return false;
+                UInt64 playerId = _owner->getId();
+                GameMsgHdr hdr(0x405, pl->getThreadId(), pl, sizeof(UInt64));
+                GLOBAL().PushMsg(hdr, &playerId);
+                mailPackageManager.remove(id);
+            }
+            break;
 		}
-	}
+    }
 
 	_mailBox.erase(it);
 	DB1().PushUpdateData("DELETE FROM `mail` WHERE `mailId` = %u", id);
@@ -829,6 +840,29 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			{
 				SYSMSG(content, 213);
 				mail->content = content;
+			}
+			updateMail(mail);
+        }
+        break;
+    case 0x16:   //结拜活动
+        {
+			Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
+			if(pl == NULL)
+				return;
+			mail->flag = 0x83;
+			if(action == 0)
+			{
+                _owner->acceptBrother(pl);
+				SYSMSG(content, 212);
+				mail->content = content;
+			}
+			else
+			{
+				SYSMSG(content, 213);
+				mail->content = content;
+                UInt64 playerId = _owner->getId();
+                GameMsgHdr hdr(0x405, pl->getThreadId(), pl, sizeof(UInt64));
+                GLOBAL().PushMsg(hdr, &playerId);
 			}
 			updateMail(mail);
         }
