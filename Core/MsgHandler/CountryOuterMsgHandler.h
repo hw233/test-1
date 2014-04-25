@@ -8533,7 +8533,7 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
                UInt8 color = 0;
                UInt16 count = 0;
                br >> flag >> level >> color >> count;
-               if(color > 5 || count == 0)
+               if(color > 5 )
                    return ;
                player->GetCollectCard()->ExchangeCard(flag,level,color , count);
             }

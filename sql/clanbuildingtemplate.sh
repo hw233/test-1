@@ -10,7 +10,7 @@ function clanbuildingtemplate()
 {
     f=$1
     d=clanbuildingtemplate
-    sed -i /建筑等级/d $f
+    sed -i /lev/d $f
     sed -i /EXP/d $f
     sed -i /level/d $f
     sed -i /^$/d $f

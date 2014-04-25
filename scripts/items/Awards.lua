@@ -1766,37 +1766,40 @@ function RunTYSSAward(player, cts)
 
 end
 local collectChance = {
-    [1] = {{0,10000}}
-    [2] = {{6,260},{11,500},{16,1100},{21,5000}},
-    [3] = {{11,60},{21,120},{31,180},{41,240},{51,150},{61,220},{71,320},{81,370},{94,470},{101,5000}},
-    [4] = {{100,30},{150,60},{180,90},{200,180},{250,210},{300,240},{350,270},{400,300},{450,400},{501,5000}},
+    [1] = {{0,10000}},
+    [2] = {{3,260},{5,500},{8,1100},{11,5000},{15,10000}},
+    [3] = {{11,60},{21,120},{31,180},{41,240},{51,150},{61,220},{71,320},{81,370},{94,470},{101,5000},{55,10000}},
+    [4] = {{100,30},{150,60},{180,90},{200,180},{250,210},{300,240},{350,270},{400,300},{450,400},{501,5000},{110,10000}},
 }
 local Card = {6,4,2,1}
 local PChance = {
-[1] = { 1000 , 5500 ,10000}
-[2] = { 5000,10000}
-[3] = { 2500 ,10000}
-[4] = { 10000 }
+[1] = { 1000 , 5500 ,10000},
+[2] = { 5000,10000},
+[3] = { 2500 ,10000},
+[4] = { 10000 },
 }
 function GetCardByChance(player ,cnt1,cnt2,cnt3)
     local chance ={0,0,0,0}
     local cnts = {} 
     local color = 1
-    cnts[1] = cnt1
-    cnts[2] = cnt2
-    cnts[3] = cnt3
+    cnts[1] = 0
+    cnts[2] = cnt1
+    cnts[3] = cnt2
+    cnts[4] = cnt3
     for k = 1,#collectChance  do 
         for j =1,#collectChance[k] do
-            if cnts[k] >= collectChance[j][1] then
-                chance[k] = collectChance[j][2]
+            if cnts[k] >= collectChance[k][j][1] then
+                chance[k] = collectChance[k][j][2]
             end
         end
     end
     local g = math.random(1, 10000)
      
-    for k = 1,#cnts do
-        if g < cnts[k] then
-            color = k + 1
+    for k = 1,#chance do
+        print(chance[k])
+        if g < chance[k] then
+            color = k
+        end
     end
     if color ==0 or color > 4 then
         return 0
@@ -1805,6 +1808,7 @@ function GetCardByChance(player ,cnt1,cnt2,cnt3)
     for k = 1,#PChance[color] do
         if g < PChance[color][k] then 
                 idx = k
+            end
     end
     return Card[color]+idx-1 
 end

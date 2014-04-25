@@ -19,7 +19,7 @@ namespace GObject
     {
         m_owner = player;
         VecEquipSlot.resize(5);
-
+        memset(&_cnt, 0, sizeof(_cnt)); 
     }
     
     CollectCard::~CollectCard()
@@ -158,7 +158,16 @@ namespace GObject
             st << it->second->spe_mark;
         
         if(suit_lvl != 20)
+        {
             st << it->second->active;
+        }
+
+        if(suit_lvl >= 40 && suit_lvl <= 130)
+        {
+            st << _cnt[suit_lvl/10-4][0];
+            st << _cnt[suit_lvl/10-4][1];
+            st << _cnt[suit_lvl/10-4][2];
+        }
             
         return true;
     }
@@ -235,10 +244,19 @@ namespace GObject
     
     void CollectCard::ExchangeCard(UInt8 flag/* 0 - 手动 1- 自动*/,UInt8 level ,UInt8 color ,UInt16 count)//兑换卡牌
     {
-        UInt32 iid = 9075;
+        UInt32 iid = 9457;
+        if(flag == 0 )
+            count = 1;
         UInt16 mCount = m_owner->GetPackage()->GetItemAnyNum(iid) ;
         if(mCount < count) //天界牌不足
             return ;   
+
+        ItemBase * item = m_owner->GetPackage()->FindItem(iid, true);
+        if (!item)
+            item =m_owner->GetPackage()->FindItem(iid, false);
+        if(item ==NULL)
+            return ;
+
         if(level < 40 || level > 130 )
            return ;
         static UInt8 PCardChance[]= {5,4,4,3,3,2,2,2};
@@ -248,15 +266,15 @@ namespace GObject
         while(index < count)
         {
             UInt8 CNum= GameAction()->GetCardByChance(m_owner,_cnt[lev][0],_cnt[lev][1],_cnt[lev][2]);    
-            if(CNum > 8)
+            if(CNum > 8 || CNum == 0)
                 continue ;
             getCards.push_back( (static_cast<UInt16>(level)) * 10 + CNum);
             _cnt[lev][0] ++ ;
             _cnt[lev][1] ++ ;
             _cnt[lev][2] ++ ;
-            if(PCardChance[CNum] > 2)
+            if(PCardChance[CNum-1] > 2)
             {
-               _cnt[lev][PCardChance[CNum]-3] = static_cast<UInt16>(0);
+               _cnt[lev][PCardChance[CNum-1]-3] = static_cast<UInt16>(0);
             }
             if(PCardChance[CNum] == color)
                 break;
@@ -267,14 +285,14 @@ namespace GObject
         st << static_cast<UInt8>(3);
         size_t offset = st.size();
         UInt32 cnt = 0;
-        st <<cnt;
+        st << cnt;
         //st << static_cast<UInt32>(getCards.size());
         for(UInt8 i = 0; i < getCards.size();++i)
         {
-           CardInfo * ci = AddCard(level * 10 + getCards[i] ); 
+           CardInfo * ci = AddCard(getCards[i] ); 
            if(ci == NULL)
                continue;
-           st << static_cast<UInt16>(level*10 + getCards[i]);
+           st << static_cast<UInt16>(getCards[i]);
            st << static_cast<UInt32>(ci->id);
            ++cnt;
         }
@@ -282,7 +300,17 @@ namespace GObject
         st << Stream::eos;
         m_owner->send(st);
 
+
+        m_owner->GetPackage()->DelItemAny(iid, index );
+        m_owner->GetPackage()->AddItemHistoriesLog(iid ,index);
+
         updateCollectCnt(level);
+
+        Stream st1(REP::COLLECTCARD);  
+        st1 << static_cast<UInt8>(2) ;//0x02套牌信息
+        ReturnSuitInfo(st1,level);
+        st1 << Stream::eos; 
+        m_owner->send(st1);
         return;
     }
     
