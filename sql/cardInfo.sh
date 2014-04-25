@@ -22,7 +22,7 @@ function cardInfo()
         BEGIN {
             print "INSERT INTO `cardInfo` VALUES";
         } {
-            printf("(%d,%d,%d,%d,%d)",$1,$3,$4,$5,$8);
+            printf("(%d,%d,%d,%d,%d)",$1,$3,$4,$5,$7);
             if (NR < ENVIRON["lines"])
                 printf(",");
             else if (NR >= ENVIRON["lines"])
