@@ -298,6 +298,9 @@ namespace GObject
             if(PCardChance[CNum-1] > 2)
             {
                _cnt[lev][PCardChance[CNum-1]-3] = static_cast<UInt16>(0);
+               char str[32] = {0};
+               sprintf(str, "F_140506_%d",PCardChance[CNum-1]-2);
+               udpLog("kapaixitong", str, "", "", "", "", "act");
             }
             if(PCardChance[CNum - 1] == color)
                 break;
