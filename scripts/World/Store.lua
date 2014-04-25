@@ -114,6 +114,11 @@ function loadStore()
         store:clear()
 
         discount(store)
+    store:add(2 ,9457 ,20)
+
+    store:add(2,16004,2)
+    store:add(2,16005,10)
+    store:add(2,16008,20)
     store:add(2,16001,20)
     store:add(2,9494,599)
     store:add(2,9433,599)
@@ -147,7 +152,7 @@ function loadStore()
         store:add(2 ,16009, 100)
     end
     if getHappyFireTime(300) then
-        store:add(2, 9440, 10)
+        store:add(2, 9458, 10)
     end
 
     if getKillMonsterAct() then
@@ -308,6 +313,21 @@ function loadStore()
         -- 奇珍
 		--store:add(2,9433,500)
 		--store:add(2,9498,30)
+        store:add(2, 1700, 599) --仙墨笔
+        store:add(2, 1701, 599) --折翼扇
+        store:add(2, 1702, 599) --西方之焰
+        store:add(2, 1703, 599) --玫瑰情缘
+        store:add(2, 1704, 599) --轩辕双剑
+        store:add(2, 1705, 599) --伏羲古琴
+        store:add(2, 1706, 599) --QQ管家机器人
+        store:add(2, 1709, 599) --圣诞萌萌的糖
+        store:add(2, 1710, 599) --圣诞老人的包袱
+        store:add(2, 1711, 599) --爆竹
+        store:add(2, 1712, 599) --莲花灯
+        store:add(2, 1717, 599) --女仆头饰
+        store:add(2, 1719, 599) --兔耳朵
+        store:add(2, 1724, 599) --五毒天王
+
 		store:add(2,9338,50)
 		--store:add(2,9349,10)
 		store:add(2,9310,30)
@@ -392,6 +412,7 @@ function loadStore()
         store:add(3,5133,15)
         store:add(3,5143,20)
         -- 礼券
+        store:add(4,16007,10)
         store:add(4,57,10)
         store:add(4,511,5)
         store:add(4,56,10)
@@ -418,6 +439,7 @@ function loadStore()
         store:add(4,5143,20)
 
         -- 银币
+        store:add(5,16006,1000)
         store:add(5,9443,1000)
 		store:add(5,9307,200)
 		store:add(5,9309,500)
@@ -448,6 +470,7 @@ function loadStore()
         store:add(5,5141,500)
 
         -- 荣誉
+        store:add(6,9457,1500)
         store:add(6,9602,1300)
         store:add(6,9340,1000)
         store:add(6,1504,3000)

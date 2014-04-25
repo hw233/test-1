@@ -277,6 +277,7 @@ GMHandler::GMHandler()
     Reg(2, "openclb", &GMHandler::OnOpenclb);
     Reg(2, "sendmsg", &GMHandler::OnSendMsg);
     Reg(2, "setplvar", &GMHandler::OnSetPlayersVar);
+    Reg(2, "setfc", &GMHandler::OnAddFriendlyCount);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -317,11 +318,13 @@ GMHandler::GMHandler()
     Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
     Reg(2, "settyss", &GMHandler::OnSetTYSS);
     Reg(3, "clanrank", &GMHandler::TestClanRank);
+    Reg(2, "addkapai", &GMHandler::OnAddCard);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
     Reg(1, "cbop", &GMHandler::OnClanBuildingOp);
     Reg(3, "cblvl", &GMHandler::OnClanBuildingLevelChange);
+	Reg(3, "st", &GMHandler::OnSkillTest);
 
     _printMsgPlayer = NULL;
 }
@@ -4619,7 +4622,7 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
         case 19:
             GVAR.SetVar(GVAR_OLDMAN_BEGIN, TimeUtil::SharpDayT(0, TimeUtil::Now()));
-            GVAR.SetVar(GVAR_OLDMAN_END, TimeUtil::SharpDayT(2, TimeUtil::Now()));
+            GVAR.SetVar(GVAR_OLDMAN_END, TimeUtil::SharpDayT(1, TimeUtil::Now()));
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
             GLOBAL().PushMsg(hdr1, &_msg);
             break;
@@ -4744,6 +4747,18 @@ void GMHandler::OnSendMsg(GObject::Player *player, std::vector<std::string>& arg
 	GLOBAL().PushMsg(hdr, value);
 	GameMsgHdr hdr1(type, WORKER_THREAD_WORLD, player, sizeof(value));
 	GLOBAL().PushMsg(hdr1, value);
+}
+void GMHandler::OnAddFriendlyCount(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 2)
+		return;
+	char * endptr;
+	UInt64 playerId = strtoull(args[0].c_str(), &endptr, 10);
+    UInt32 value = atoi(args[1].c_str());
+	GObject::Player * pl = GObject::globalPlayers[playerId];
+    if(pl == NULL)
+        return ;
+    player->AddFriendlyCount(pl , value);
 }
 
 void GMHandler::OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args)
@@ -5506,5 +5521,61 @@ void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& 
     GObject::Clan *clan = player->getClan();
     if(clan != NULL)
         clan->sendMemberBuf(pos);
+}
+
+void GMHandler::OnAddCard(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return ;
+    UInt16 cid = atoi(args[0].c_str());
+    /*
+    UInt8 type = atoi(args[1].c_str());
+    UInt16 attr_id = atoi(args[2].c_str());
+    UInt16 skill_id = atoi(args[3].c_str());
+    UInt8 color = atoi(args[4].c_str());*/
+
+    player->GetCollectCard()->AddCard(cid);   
+
+}
+
+void GMHandler::OnSkillTest(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+
+    std::string skills = args[0];
+    GObject::Fighter* fgt;
+    if(args.size() > 1)
+    {
+        UInt32 fighterId = atoi(args[1].c_str());
+		fgt = player->findFighter(fighterId);
+    }
+    else
+    {
+        fgt = player->getMainFighter();
+    }
+
+    if(fgt)
+    {
+        if(args.size() > 2 && atoi(args[2].c_str()) == 0)
+        {
+            std::cout << "(delete)id: " << fgt->getId() << ", " << "skills: " << skills << std::endl;
+            StringTokenizer tk(skills, ",");
+            const GData::SkillBase* s = NULL;
+            std::vector<const GData::SkillBase*> vt_skills;
+            for (size_t i = 0; i < tk.count(); ++i)
+            {
+                s = GData::skillManager[::atoi(tk[i].c_str())];
+                if (s)
+                    vt_skills.push_back(s);
+            }
+            if (vt_skills.size())
+                fgt->delSkillsFromCT(vt_skills, false);
+            return;
+        }
+
+        std::cout << "id: " << fgt->getId() << ", " << "skills: " << skills << std::endl;
+        fgt->setSkills(skills, false);
+    }
 }
 

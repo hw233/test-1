@@ -642,6 +642,25 @@ struct DBFriend
 	UInt8 type;
 	UInt64 friendId;
 };
+struct DBFriendlyCount
+{
+	UInt64 playerId;
+	UInt64 friendId;
+    UInt32 value ;
+    UInt8  isBrother;
+    UInt32 time ;
+    UInt32 cost ;
+    UInt8 wait;
+    UInt32 ybTime ;
+    UInt8 ybCount ;
+    UInt32 clearTime ;
+    UInt8 task1;
+    UInt8 task2;
+    UInt8 task3;
+    UInt8 task4;
+    UInt8 task5;
+    UInt8 task6;
+};
 
 struct PrayRelation
 {
@@ -1210,6 +1229,14 @@ struct DBFairySpar
     UInt8 breakoutCnt;
 };
 
+struct DBCollectCnt
+{
+    UInt64 playerId;
+    UInt8 level;
+    UInt16 bluecnt;
+    UInt16 purlecnt;
+    UInt16 orangecnt;
+};
 struct DBCollectCard
 {
     UInt64 playerId;
@@ -1583,6 +1610,26 @@ struct DBClanBuildings
     UInt16 hpLevel;
     UInt16 oracleLevel;
     UInt16 updateTime;
+};
+
+struct DBCard
+{
+    UInt64 playerId;
+    UInt32 id;
+    UInt16 cid;
+    UInt8 level;
+    UInt16 exp;
+    UInt8 pos;
+};
+
+struct DBCardSuit
+{
+    UInt64 playerId;
+    UInt8 id;
+    UInt8 suit_mark;
+    UInt8 active;
+    UInt16 spe_mark;
+    UInt8 collect_degree;
 };
 
 struct DBZhenyuanAttr
@@ -2317,6 +2364,28 @@ SPECIALDEF(3)
 	UInt64, id,
 	UInt8, type,
 	UInt64, friendId
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFriendlyCount)
+SPECIALDEF(16)
+(
+	UInt64, playerId,
+	UInt64, friendId,
+    UInt32, value,
+    UInt8 , isBrother,
+    UInt32 , time ,
+    UInt32 ,cost,
+    UInt8 , wait,
+    UInt32 , ybTime,
+    UInt8 , ybCount,
+    UInt32, clearTime,
+    UInt8, task1,
+    UInt8, task2,
+    UInt8, task3,
+    UInt8, task4,
+    UInt8, task5,
+    UInt8, task6
 )
 SPECIALEND()
 
@@ -3118,6 +3187,18 @@ SPECIALDEF(12)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBCollectCnt)
+SPECIALDEF(5)
+(
+    UInt64, playerId,
+    UInt8, level,
+    UInt16, bluecnt,
+    UInt16, purlecnt,
+    UInt16, orangecnt
+)
+SPECIALEND()
+
+
 SPECIALBEGIN(GObject::DBRNR)
 SPECIALDEF(2)
 (
@@ -3606,6 +3687,30 @@ SPECIALDEF(8)
     UInt16, hpLevel,
     UInt16, oracleLevel,
     UInt16, updateTime
+    )
+SPECIALEND()
+
+SPECIALBEGIN (GObject::DBCard)
+SPECIALDEF(6)
+    (
+    UInt64, playerId,
+    UInt32, id,
+    UInt16, cid,
+    UInt8, level,
+    UInt16, exp,
+    UInt8, pos
+    )
+SPECIALEND()
+
+SPECIALBEGIN (GObject::DBCardSuit)
+SPECIALDEF(6)
+    (
+    UInt64, playerId,
+    UInt8, id,
+    UInt8, suit_mark,
+    UInt8, active,
+    UInt16, spe_mark,
+    UInt8, collect_degree
     )
 SPECIALEND()
 

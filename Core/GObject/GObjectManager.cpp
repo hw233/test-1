@@ -254,6 +254,8 @@ namespace GObject
 		IDGenerator::gAthleticsEventOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`id`) FROM `arena_team`", maxId);
 		IDGenerator::gTeamArenaOidGenerator.Init(maxId);
+		execu->Extract("SELECT max(`id`) FROM `card`", maxId);
+		IDGenerator::gCardOidGenerator.Init(maxId);
 
 		return true;
 	}
@@ -384,6 +386,11 @@ namespace GObject
 		if(!loadFighterXinMo())
         {
             fprintf(stderr, "load Fighter xinmo error!\n");
+            std::abort();
+        }
+		if(!loadGCollectCnt())
+        {
+            fprintf(stderr, "load GCollectCnt error!\n");
             std::abort();
         }
 
@@ -728,10 +735,27 @@ namespace GObject
             fprintf(stderr, "LoadPlayerModifyMounts error!\n");
             std::abort();
         }
+		if(!loadFriendlyCount())
+        {
+            fprintf(stderr, "loadFriendlyCount error!\n");
+            std::abort();
+        }
 
         if(!loadSkillGrade())
         {
             fprintf(stderr, "loadSkillGrade error!\n");
+            std::abort();
+        }
+        
+        if(!loadCard())
+        {
+            fprintf(stderr, "loadCard error!\n");
+            std::abort();
+        }
+        
+        if(!loadCardSuit())
+        {
+            fprintf(stderr, "loadCardSuit error!\n");
             std::abort();
         }
 
@@ -7665,5 +7689,118 @@ namespace GObject
 
         return true;
     }
+    bool GObjectManager::loadGCollectCnt()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if(execu.get() == NULL || !execu->isConnected())
+            return false;
+        LoadingCounter lc("Loading Collect Card");
+        DBCollectCnt t;
+        if(execu->Prepare("SELECT `playerId`, `lev`, `bluecnt`, `purlecnt`, `orangecnt` FROM `collect_cnt` ORDER BY `playerId`", t)!= DB::DB_OK)
+            return false;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            Player* pl = globalPlayers[t.playerId];
+            if(!pl)
+                continue;
+            if(!pl->GetCollectCard())
+                continue;
+            pl->GetCollectCard()->loadCollectCnt( t.level , t.bluecnt , t.purlecnt , t.orangecnt);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadCard()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading card:");
+		DBCard dbpn;
+		if(execu->Prepare("SELECT `playerid` ,`id`,`cid`,`level`, `exp`, `pos` FROM `card` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+		    Player* pl = globalPlayers[dbpn.playerId];
+			if(pl == NULL)
+				continue;
+            pl->GetCollectCard()->InsertCard(dbpn); 
+        }
+		lc.finalize();
+		return true;
+    }
+
+    bool GObjectManager::loadCardSuit()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading cardsuit:");
+		DBCardSuit dbpn;
+		if(execu->Prepare("SELECT `playerid` ,`id`, `suit_mark`, `active`, `spe_mark`, `collect_degree` FROM `cardsuit` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+		    Player* pl = globalPlayers[dbpn.playerId];
+			if(pl == NULL)
+				continue;
+            pl->GetCollectCard()->InsertCardSuit(dbpn); 
+        }
+		lc.finalize();
+		return true;
+    }
+
+	bool GObjectManager::loadFriendlyCount()
+	{
+		UInt32 now = TimeUtil::Now();
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading friendlyCount:");
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		DBFriendlyCount dbfr;
+		if(execu->Prepare("SELECT `playerId`, `friendId`, `value` ,`isBrother` ,`time`,`cost`,`wait`,`ybTime`,`ybCount`,`clearTime`,`task1`,`task2`,`task3`,`task4`,`task5`,`task6` FROM `friendlyCount` ORDER BY `playerId`", dbfr) != DB::DB_OK)
+			return false;
+		lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbfr.playerId != last_id)
+			{
+				last_id = dbfr.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Player *friendOne = globalPlayers[dbfr.friendId];
+			if(friendOne == NULL)
+				continue;
+            {
+                pl->LoadFriendlyCountFromDB(dbfr.friendId ,dbfr.value, dbfr.time ,dbfr.cost, dbfr.wait);
+                friendOne->LoadFriendlyCountFromDB(pl->getId(),dbfr.value ,0 ,0 ,0 ,1);
+            }
+            if(dbfr.isBrother!=0)
+            {
+                pl->InsertBrother(friendOne);
+            }
+            if(dbfr.ybTime!= 0 && TimeUtil::SharpDay(0, now) == TimeUtil::SharpDay(0, dbfr.ybTime))
+            {
+                pl->SetYBCount( friendOne, dbfr.ybTime, dbfr.ybCount);
+            }
+            if(dbfr.clearTime != 0)
+                pl->SetFriendTaskNum(friendOne ,dbfr.clearTime , dbfr.task1 , dbfr.task2, dbfr.task3, dbfr.task4, dbfr.task5, dbfr.task6);
+		}
+		lc.finalize();
+		return true;
+	}
 }
+
+
+
 

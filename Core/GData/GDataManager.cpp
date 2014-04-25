@@ -36,6 +36,7 @@
 #include "DreamerTable.h"
 #include "FairyPetTable.h"
 #include "XingchenData.h"
+#include "DrinkAttr.h"
 #include "JiguanData.h"
 #include "HunPoData.h"
 #include "TeamArenaSkill.h"
@@ -45,6 +46,7 @@
 #include "CoupleUpgrade.h"
 #include "CoupleCopy.h"
 #include "LingShiTable.h"
+#include "CardSystem.h"
 
 namespace GData
 {
@@ -364,6 +366,11 @@ namespace GData
             fprintf (stderr, "Load LoadXinMoConfig Error !\n");
             std::abort();
         }
+        if (!LoadDrinkAttrConfig())
+        {
+            fprintf (stderr, "Load LoadDrinkAttrConfig Error !\n");
+            std::abort();
+        }
 
         if (!LoadJiguanshuConfig())
         {
@@ -458,6 +465,16 @@ namespace GData
         if (!LoadLingShiConfig())
         {
             fprintf (stderr, "Load LoadLingShiConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadCardUpgrade())
+        {
+            fprintf (stderr, "Load LoadCardUpgrade Error !\n");
+            std::abort();
+        }
+        if (!LoadCardInfo())
+        {
+            fprintf (stderr, "Load LoadCardInfo Error !\n");
             std::abort();
         }
 
@@ -2995,6 +3012,23 @@ namespace GData
         }
         return true;
     }
+    bool GDataManager::LoadDrinkAttrConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBDrinkAttrConfig dbda;
+		if(execu->Prepare("SELECT `value`, `hp`  FROM `drinkAttr`", dbda) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            DrinkAttr::stDrinkAttr da;
+            da.hp = dbda.hp;
+            drinkAttrData.setDrinkAttrTable(dbda.value , da);
+        }
+        return true;
+    }
 
     bool GDataManager::LoadSkillEvConfig()
     {
@@ -3040,6 +3074,30 @@ namespace GData
                 lingshiCls.setLingshiUpTable(dblsu);
         }
         return true;
+    }
+
+    bool GDataManager::LoadCardUpgrade()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCardUpgrade dbpn;
+		if(execu->Prepare("SELECT `level`, `gexp`, `bexp`, `pexp`, `yexp`  , `hgexp`, `hbexp`, `hpexp`, `hyexp`, `skillLevel`, `attrIndex` FROM `cardupgrade` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            csys.loadCardUpgradeTable(dbpn); 
+		return true;
+    }
+    
+    bool GDataManager::LoadCardInfo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCardInfo dbpn;
+		if(execu->Prepare("SELECT `id`, `type`, `color`, `lvLimit`, `skillId` FROM `cardInfo` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            csys.loadInitCardInfo(dbpn); 
+		return true;
     }
 
 }

@@ -291,6 +291,7 @@ void OnNewRelationAttack(GameMsgHdr& hdr, const void *data)
 	};
 	NewRelationBeData *abd = reinterpret_cast<NewRelationBeData *>(const_cast<void *>(data));
     player->GetNewRelation()->beAttack(abd->attacker, abd->formation, abd->portrait, abd->lineup, player);
+//  player->CompleteFriendlyTask(abd->attacker , 2);
 }
 
 void OnNewRelationCountryReq(GameMsgHdr& hdr, const void *data)
@@ -857,11 +858,11 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
     }
 
     if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
-        exp += 1.0f * ecs->exp;
-    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
         exp += 0.5f * ecs->exp;
-    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
         exp += 0.3f * ecs->exp;
+    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+        exp += 0.2f * ecs->exp;
 
 	player->AddExp(static_cast<UInt64>(exp), 0, extraExp);
 #if 0
@@ -2834,20 +2835,106 @@ void OnBuyLeftPower( GameMsgHdr &hdr, const void * data)
     player->BuyLeftPower();
 }
 
-/*
 //XXX
 void OnAddFriendlyCount(GameMsgHdr & hdr ,const void *data)
 {
-    return ;    
     MSG_QUERY_PLAYER(player);
     struct st
     {
         UInt64 id ;
         UInt8 val ;
+        UInt8 flag ;
     };
     struct st st_param = *reinterpret_cast<const struct st *>(data); 
+	GObject::Player * pl = GObject::globalPlayers[st_param.id];
+    if(pl==NULL)
+        return ;
+    player->AddFriendlyCount(pl , st_param.val);
 }
-*/
+void OnAcceptBrother(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct st
+    {
+        UInt64 playerId;
+        UInt8 flag;
+    };
+    struct st _st = *reinterpret_cast<const struct st *>(data);
+	GObject::Player * pl = GObject::globalPlayers[_st.playerId];
+    if(pl==NULL)
+        return ;
+    player->acceptBrother(pl,_st.flag);
+}
+
+void OnDrinking(GameMsgHdr & hdr,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct st
+    {
+        UInt64 playerId;
+        UInt8 drinkCount;
+    };
+    struct st _st = *reinterpret_cast<const struct st *>(data);
+    GObject::Player *p1 = player->getDrinkInfo().drinker;
+    player->drinking(p1,_st.drinkCount);
+}
+void OnBeInviteDrinking(GameMsgHdr & hdr ,const void *data)
+{
+    struct st
+    {
+        UInt64 playerId; 
+        UInt8 type ;
+    };
+    MSG_QUERY_PLAYER(player);
+    struct st _st  = *reinterpret_cast<const struct st *>(data);
+	GObject::Player * pl = GObject::globalPlayers[_st.playerId];
+    if(pl==NULL)
+        return ;
+    player->beInviteDrinking(pl,_st.type);
+}
+
+void OnBeAcceptDrinking(GameMsgHdr & hdr ,const void *data)
+{
+    struct st
+    {
+        UInt64 playerId; 
+        UInt8 res ;
+        UInt8 type;
+        UInt8 count ;
+    };
+    MSG_QUERY_PLAYER(player);
+    struct st _st  = *reinterpret_cast<const struct st *>(data);
+	GObject::Player * pl = GObject::globalPlayers[_st.playerId];
+    if(pl==NULL)
+        return ;
+    player->beReplyForDrinking(pl,_st.res ,_st.type , _st.count);
+}
+void OnBeRefuceBrother(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 playerId  = *reinterpret_cast<const UInt64 *>(data);
+	GObject::Player * pl = GObject::globalPlayers[playerId];
+    if(pl==NULL)
+        return ;
+    player->beRefuceBrother(pl);
+}
+void OnAfterDrink(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->AfterDrinking();
+}
+void OnCalcDrink(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 type = *reinterpret_cast<const UInt8 *>(data);
+    player->calcDrinkPoint(type);
+}
+void OnBeginDrink(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->BeginDrink();
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 

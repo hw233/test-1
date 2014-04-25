@@ -12,6 +12,7 @@
 #include "GData/CittaTable.h"
 #include "GData/AcuPraTable.h"
 #include "GData/XingchenData.h"
+#include "GData/DrinkAttr.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
 #include "Common/Stream.h"
@@ -2154,11 +2155,23 @@ void Fighter::rebuildEquipAttr()
     }
     if(_owner)
     {
+        UInt32 val = _owner->GetVar(VAR_DRINK_VALUE);
+        GData::DrinkAttr::stDrinkAttr * da = GData::drinkAttrData.getDrinkAttrTable(val);
+        if(da)
+        {
+            GData::AttrExtra ae ;
+            ae.hp = da->hp;
+            _attrExtraEquip+=ae;
+        }
+    }
+    if(_owner)
+    {
         _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
         _owner->GetMoFang()->addKYAttr(_attrExtraEquip);
 
         //坐骑加成
         _owner->addMountAttrExtra(_attrExtraEquip);
+        _owner->GetCollectCard()->AddCardAttr(_attrExtraEquip);
     }
 
     if(_owner && !isPet())
@@ -2175,6 +2188,7 @@ void Fighter::rebuildEquipAttr()
         for(UInt8 i = 0; i < LINGSHI_UPMAX; ++ i)
             addLingshiAttr(_lingshi[i]);
     }
+
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 
