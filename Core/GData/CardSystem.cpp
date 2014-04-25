@@ -18,13 +18,14 @@ static float equipMark = 1;//装备系数
 static float humanMark = 1.2;//人物系数
 static float speMark = 1;//特殊系数
 
-void CalInitExp(UInt8& initExp ,UInt8 level, UInt8 color ,UInt8 type)
+void CalInitExp(UInt32& initExp ,UInt8 level, UInt8 color ,UInt8 type)
 {
     float levelMark = 0.0f;
     float colorMark= 0.0f;
     float typeMark= 0.0f;
     
-    levelMark = static_cast<float>(level - 40) * 0.2 + lvlmark;
+    //levelMark = static_cast<float>(level - 40) * 0.2 + lvlmark;
+    levelMark = static_cast<float>(level - 40) * 0.001 + lvlmark;
     
     switch(color)
     {
