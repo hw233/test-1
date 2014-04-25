@@ -938,8 +938,11 @@ public:
     }
     inline static bool getHappyFireTime(UInt32 time = 0)
     {
-        UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
-        UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
+        //UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
+        //UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
+
+        UInt32 begin = TimeUtil::MkTime(2014, 4, 30);
+        UInt32 end = TimeUtil::MkTime(2014, 5, 4);
         UInt32 now = TimeUtil::Now()+time;
         if( now >= begin && now <= end)
             _happyFire = true;
