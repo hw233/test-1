@@ -2571,6 +2571,43 @@ void OnCompareBP( GameMsgHdr& hdr, const void * data )
     player->sendCompareBP(pl);
 }
 
+void OnInviteGoback( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    if(player->CheckGoback(pl->getId()))
+        player->AddGoback(pl->getId());
+}
+
+void OnApplyJoin( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    if(player->CheckApplyList(pl->getId()))
+        player->AddApplyList(pl->getId());
+}
+
+void OnApplyToName( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    player->ApplyToName(pl);
+}
+
+void OnInviteToName( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    player->InviteToName(pl);
+}
+
+void OnAcceptApply( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	Player * pl = *reinterpret_cast<Player **>(const_cast<void *>(data));
+    player->AcceptApply(pl->getId());
+}
+
 void OnServerWarEnter( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);

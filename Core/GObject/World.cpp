@@ -546,6 +546,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 18)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 19)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 26)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -581,6 +589,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 29)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 5)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 12)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 19)
         ))
     {
 #if 0
@@ -1192,13 +1201,13 @@ void World::SendSurnameLegendAward()
     {
         World::initRCRank();
         static MailPackage::MailItem s_item[][3] = {
-            {{5069,1},{5139,1},{5109,1}},
-            {{5069,1},{5139,1},{5108,1}},
-            {{5069,1},{5138,1},{5108,1}},
             {{5068,1},{5138,1},{5108,1}},
             {{5068,1},{5138,1},{5107,1}},
             {{5068,1},{5137,1},{5107,1}},
             {{5067,1},{5137,1},{5107,1}},
+            {{5067,1},{5137,1},{5106,1}},
+            {{5067,1},{5136,1},{5106,1}},
+            {{5066,1},{5136,1},{5106,1}},
         };
         int pos = 0;
         for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
@@ -1494,6 +1503,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 18)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 19)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 26)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1566,7 +1583,6 @@ void World::World_Midnight_Check( World * world )
         world->SendSurnameLegendAward();
     if(b11TimeEnd)
         world->Send11AirBookAward();
-    bGGTimeEnd = true;
     if(bGGTimeEnd)
         world->SendGuangGunAward();
     if (bSnowEnd)
@@ -3836,11 +3852,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9600,40},{515,30},{9418,60},{503,60},{9022,40}},
-        {{9600,30},{515,25},{9418,60},{503,50},{9022,30}},
-        {{9600,20},{515,20},{9418,60},{503,40},{9022,20}},
+        {{9498,40},{515,30},{16001,60},{503,60},{9022,40}},
+        {{9498,40},{515,25},{16001,60},{503,50},{9022,30}},
+        {{9498,40},{515,20},{16001,60},{503,40},{9022,20}},
     };
-    static MailPackage::MailItem card = {9936,1};
+    static MailPackage::MailItem card = {9971,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -3962,7 +3978,7 @@ void World::Send11CountryRankAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] ={
-         {{503,5},{515,3},{509,3},{134,3},{1325,3}},
+         {{9604,5},{515,3},{509,3},{9498,3},{16001,3}},
     };
     ClanGradeSort::iterator i = World::clanGradeSort.begin();
     UInt32 EM=0,KL=0;
@@ -4423,6 +4439,7 @@ void World::SendGuangGunAward()    //待定
             }
         }
     }
+    World::guangGunSort.clear();
 }
 
 void World::SendHappyFireAward()

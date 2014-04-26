@@ -96,7 +96,7 @@ namespace GObject
         void quickMakejiguan(UInt32 tuzhiId, UInt8 mark);                               // 一键制造机关玉
         void upgradeKY(UInt8 keyinId, UInt8 mark);                                      // 刻篆
         void quickUpgradeKY(UInt8 keyinId, UInt8 mark);                                 // 一键刻篆
-        void changeMoney(UInt8 mark);                                                   // 壁凤墨转换为磐龙墨
+        void changeMoney(UInt16 num, UInt8 mark);                                       // 壁凤墨转换为磐龙墨
         void addMoney(UInt32 toolId, UInt32 count);
         void addKYAttr(GData::AttrExtra& ae);                                           // 刻印添加属性
         void checkKey(UInt16 keyId, UInt8 mark);                                                     
