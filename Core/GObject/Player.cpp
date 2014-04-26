@@ -28177,7 +28177,7 @@ void Player::GetFindOldManAward(UInt32 type)
     if(type ==0)
         return ;
     UInt8 num = 1 ;
-    if(type < 4) //lijr
+    if(type < 11)
     {
         num =2;
         SYSMSG_BROADCASTV(574, getCountry(), getPName(), type );
@@ -28265,7 +28265,7 @@ void Player::getInteresingBag(UInt64 pid)
         return ;
     UInt32 counts = GetVar(VAR_OLDMAN_PRESENT);
     SYSMSG(title, 4974);
-    if(counts < 3) //lijr 
+    if(counts < 10)
     {
         SYSMSGV(content, 4975,player->getCountry(),player->getName().c_str());
         Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
