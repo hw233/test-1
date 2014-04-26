@@ -1539,6 +1539,26 @@ void PetTeamCopy::teamBattleStart(Player* pl)
 
     sendBattleReport(td, ng, bsim, rptid);
 
+    if( td->count != 0 )
+    {
+        for(UInt8 i = 0 ; i < (td->count -1); ++i)
+        {
+            Player* pl = td->members[i];
+            if(pl == NULL)
+                continue;
+            for(UInt8 j = i + 1 ; j < td->count ; ++j)
+            {
+                Player* p = td->members[j];
+                if(p == NULL)
+                    continue;
+                if(pl->getThreadId() != p->getThreadId())
+                    continue ;
+                pl->CompleteFriendlyTask(p,4 ,1);
+                p->CompleteFriendlyTask(pl,4 ,1);
+            }
+        }
+    }
+
     for(UInt8 i = td->count; i > 0; --i)
     {
         Player* pl = td->members[i-1];
