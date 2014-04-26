@@ -858,11 +858,11 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
     }
 
     if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
-        exp += 1.0f * ecs->exp;
-    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
         exp += 0.5f * ecs->exp;
-    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+    else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
         exp += 0.3f * ecs->exp;
+    else if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+        exp += 0.2f * ecs->exp;
 
 	player->AddExp(static_cast<UInt64>(exp), 0, extraExp);
 #if 0

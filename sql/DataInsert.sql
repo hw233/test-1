@@ -253,3 +253,14 @@ UNLOCK TABLES;
 LOCK TABLES `petteamcopy` WRITE;
 source petteamcopy;
 UNLOCK TABLES;
+
+
+LOCK TABLES `cardInfo` WRITE;
+source cardInfo;
+UNLOCK TABLES;
+
+LOCK TABLES `cardupgrade` WRITE;
+source cardupgrade;
+UNLOCK TABLES;
+
+

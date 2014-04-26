@@ -45,6 +45,7 @@
 #include "GObject/Married.h"
 #include "CoupleUpgrade.h"
 #include "CoupleCopy.h"
+#include "CardSystem.h"
 
 namespace GData
 {
@@ -457,6 +458,16 @@ namespace GData
         if (!LoadSkillEvConfig())
         {
             fprintf (stderr, "Load LoadSkillEvConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadCardUpgrade())
+        {
+            fprintf (stderr, "Load LoadCardUpgrade Error !\n");
+            std::abort();
+        }
+        if (!LoadCardInfo())
+        {
+            fprintf (stderr, "Load LoadCardInfo Error !\n");
             std::abort();
         }
 
@@ -3021,5 +3032,31 @@ namespace GData
         }
         return true;
     }
+
+    bool GDataManager::LoadCardUpgrade()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCardUpgrade dbpn;
+		if(execu->Prepare("SELECT `level`, `gexp`, `bexp`, `pexp`, `yexp`  , `hgexp`, `hbexp`, `hpexp`, `hyexp`, `skillLevel`, `attrIndex` FROM `cardupgrade` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            csys.loadCardUpgradeTable(dbpn); 
+		return true;
+    }
+    
+    bool GDataManager::LoadCardInfo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCardInfo dbpn;
+		if(execu->Prepare("SELECT `id`, `type`, `color`, `lvLimit`, `skillId` FROM `cardInfo` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            csys.loadInitCardInfo(dbpn); 
+		return true;
+    }
+
+
 }
 

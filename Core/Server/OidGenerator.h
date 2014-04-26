@@ -120,6 +120,13 @@ namespace IDGenerator
 		virtual UInt32 genID() { _maxID += static_cast<UInt32>(time(NULL)); return _maxID; }
 	};
 
+    class CardIDGen:
+		public IDGen
+	{
+	public:
+		CardIDGen(UInt32 maxid = 0): IDGen(maxid) {}
+	};
+
 	template <typename GenType>
 	class OidGenerator : public GenType
 	{
@@ -147,6 +154,7 @@ namespace IDGenerator
 	typedef OidGenerator<ClanBatterRecordIDGen> ClanBatterRecordIDGenerator;
 	typedef OidGenerator<AthleticsEventIDGen> AthleticsEventOidGenerator;
 	typedef OidGenerator<TeamArenaIDGen> TeamArenaOidGenerator;
+	typedef OidGenerator<CardIDGen> CardOidGenerator;
 
 	extern ItemOidGenerator gItemOidGenerator;
 	extern ChatFgtOidGenerator gChatFgtOidGenerator;
@@ -161,6 +169,7 @@ namespace IDGenerator
 	extern ClanBatterRecordIDGenerator gClanBatterRecordIDGenerator;
 	extern AthleticsEventOidGenerator gAthleticsEventOidGenerator;
 	extern TeamArenaOidGenerator gTeamArenaOidGenerator;
+	extern CardOidGenerator gCardOidGenerator;
 }
 
 

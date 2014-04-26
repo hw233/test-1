@@ -915,14 +915,22 @@ void KangJiTianMo::StartBattle(Player* pl)
 
         bsim.applyFighterHP(0, member);
 
-        member->udpLog("kangjitianmo", "F_140406_4", "", "", "", "", "act");
-        if(0 != i)
+        UInt32 statusA = member->GetVar(VAR_KJTM_LOGIN_STATUS);
+        UInt8 mark = GET_BIT(statusA, 1);
+        if(0 == mark)
         {
-            member->udpLog("kangjitianmo", "F_140406_5", "", "", "", "", "act");
-            if(member->getVipLevel() > 0)
-                member->udpLog("kangjitianmo", "F_140406_6", "", "", "", "", "act");
-            if(member->getVipLevel() > 4)
-                member->udpLog("kangjitianmo", "F_140406_7", "", "", "", "", "act");
+            member->udpLog("kangjitianmo", "F_140406_4", "", "", "", "", "act");
+            if(0 != i)
+            {
+                member->udpLog("kangjitianmo", "F_140406_5", "", "", "", "", "act");
+                if(member->getVipLevel() > 0)
+                    member->udpLog("kangjitianmo", "F_140406_6", "", "", "", "", "act");
+                if(member->getVipLevel() > 4)
+                    member->udpLog("kangjitianmo", "F_140406_7", "", "", "", "", "act");
+            }
+
+            statusA = SET_BIT(statusA, 1);
+            member->SetVar(VAR_KJTM_LOGIN_STATUS, statusA);
         }
     }
     DismissBattleRoom(pl);

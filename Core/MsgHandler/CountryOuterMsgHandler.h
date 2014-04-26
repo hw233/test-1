@@ -75,6 +75,7 @@
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
 #include "GObject/ClanBuilding.h"
+#include "GObject/CollectCard.h"
 
 struct NullReq
 {
@@ -1197,6 +1198,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
+    pl->GetCollectCard()->ReturnCardInfo(1);
     GObject::MarryBoard::instance().sendTodayMarryInfo(pl ,1);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
@@ -1412,7 +1414,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendZhenyuansInfo();    //阵元
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
-    pl->KJTMUdpLog();
+    //pl->KJTMUdpLog();
     //pl->QiShiBanState();
     {
         GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);
@@ -8905,7 +8907,12 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                 }
                     break;
                 case 0x13:
-                    player->OpTYSS(op);//领取每日礼包
+                    {
+                        UInt8 flag = 0;
+                        brd >> flag;//礼包编号
+                        if(flag > 0 && flag < 6)
+                            player->OpTYSS(op, flag);//领取每日礼包
+                    }
                     break;
                 default:
                     break;
@@ -9210,6 +9217,90 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
 	}
 
 }
+
+void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+     
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt ; 
+
+    switch(opt)
+    {
+        case 1:
+        {
+            UInt8 opt1 = 0;
+            br >> opt1;
+            if(opt1 > 2)
+                return;
+            if(opt1 != 2)
+                player->GetCollectCard()->ReturnCardInfo(opt1);  
+            else
+            {    
+                UInt32 id = 0;
+                UInt8 pos = 0;
+                br >> id >> pos;
+                player->GetCollectCard()->EquipCard(id,pos);
+            }
+
+        }
+            break;
+        case 2:
+        {
+            UInt8 opt1 = 0;
+            UInt8 opt2 = 0;
+            br >> opt1 >> opt2;
+            if(opt2 != 1 && opt2 != 2 && opt2 != 3)
+                return;
+            player->GetCollectCard()->ActiveCardSet(opt1,opt2);
+        }
+            break;
+        case 3:
+            {
+               UInt8 flag = 0;
+               UInt8 level = 0;
+               UInt8 color = 0;
+               UInt16 count = 0;
+               br >> flag >> level >> color >> count;
+               if(color > 5 )
+                   return ;
+               player->GetCollectCard()->ExchangeCard(flag,level,color , count);
+            }
+            break;
+        case 4:
+        {
+             UInt32 id = 0;
+             UInt8 len = 0;
+             br >> id >> len;
+             if(id == 0 || len == 0)
+                 return;
+             std::vector<UInt32> vecid;
+             while(len != 0)
+             {
+                 UInt32 id_tmp = 0;
+                 br >> id_tmp; 
+                 vecid.push_back(id_tmp);
+                 -- len;
+             }
+             player->GetCollectCard()->UpGradeCard(id,vecid);
+
+        }
+            break;
+        case 5:
+        {
+            UInt16 opt1 = 0;
+            br >> opt1; 
+            player->GetCollectCard()->ExchangeSpeCard(opt1);
+        }
+            break;
+        default:
+            break;
+
+    }
+
+}
+
 
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
