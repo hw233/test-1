@@ -28051,7 +28051,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             UInt32 needContriLevel[5] = { 50, 100, 300, 700, 1800};
             for(UInt8 i = 0; i < 5; i++)
             {
-                awardStatus[i] = GET_BIT(todayContribution, 27 + i);
+                awardStatus[i] = GET_BIT(todayContribution, (27 + i));
             }
             todayContribution = todayContribution << 6;
             todayContribution = todayContribution >> 6;
@@ -28087,7 +28087,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                     UInt8 dayChoice = (TimeUtil::Now() - World::getOpenTime()) / 86400 - 7;
                     GetPackage()->Add(everydayAward[flag - 1][dayChoice][0], 1 , true, false, FromTYSS);
                 }
-                SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY), 26 + flag));//打上当日领取奖品的标记
+                SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY), (26 + flag)));//打上当日领取奖品的标记
             }
             else
             {
