@@ -91,6 +91,7 @@
 #include "Leaderboard.h"
 #include "ArenaServerWar.h"
 #include "GData/SevenSoul.h"
+#include "KangJiTianMo.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -863,6 +864,11 @@ namespace GObject
         _InLeftTeam = false;
         _drinkingSum =0;
         _friendSum = 0;
+        m_teamMemberData = NULL;
+        m_TMDYRoomStatus = 0;
+        m_curType = 0;
+        m_curPageA = 0;
+        _KJTM_factor = 1.0f;
 	}
 
 
@@ -2301,6 +2307,9 @@ namespace GObject
 
         if(GetInPTCStatus())
             petTeamCopyManager->leaveTeam(this, 2);
+
+        if(GetTMDYRoomStatus())
+            KJTMManager->LeaveRoom(this, 1);
 
 		if(cfg.enableWallow && _playerData.wallow)
 		{
@@ -5202,7 +5211,7 @@ namespace GObject
 
 #endif
 #endif // _WIN32
-        if(ci && ci->purchaseType != TrainFighter && ci->purchaseType != ZCJBRoolAward)
+        if(ci && ci->purchaseType != TrainFighter && ci->purchaseType != ZCJBRoolAward && ci->purchaseType != ZhengHun && ci->purchaseType != DINGQINGXINWU && ci->purchaseType != JieHun)
         {
             AddVar(VAR_USEGOLD_CNT, c);
             AddHYYJCount(c);
@@ -5210,9 +5219,9 @@ namespace GObject
             {
                UInt32 val =  GetVar(VAR_SUMMERMEET_SCORE5);
                if((val + c) >= 1000)
-                   SetVar(VAR_SUMMERMEET_SCORE5 ,1000);
+                   SetVar(VAR_SUMMERMEET_SCORE5, 1000);
                else
-                   AddVar(VAR_SUMMERMEET_SCORE5 ,c );
+                   AddVar(VAR_SUMMERMEET_SCORE5, c);
                sendSummerMeetScoreInfo();
             }
         }
@@ -6552,6 +6561,9 @@ namespace GObject
 
         if(GetInPTCStatus())
             petTeamCopyManager->leaveTeam(this, 1);
+
+        if(GetTMDYRoomStatus())
+            KJTMManager->LeaveRoom(this, 1);
 
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)
@@ -20728,7 +20740,7 @@ void Player::sendFeastLoginAct()
         //MailPackage::MailItem mitem = {1763,1};
         //MailPackage::MailItem mitem = {1760,1};
         //MailPackage::MailItem mitem = {9422,1};
-        MailPackage::MailItem mitem = {1768,1};
+        MailPackage::MailItem mitem = {1770,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     //SetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY, 1);
@@ -25085,17 +25097,26 @@ void Player::AddHYYJCount(UInt32 v)
 void Player::sendRYHBInfo()
 {
     UInt32 (*ryhb_items)[4] = ryhb_items_1;
+    UInt32 beginTime = 0, endTime = 0;
     if(!World::inActive_opTime_20130531())
     {
         if(!World::getRYHBActivity())
             return;
         ryhb_items = ryhb_items_2;
+        beginTime = GVAR.GetVar(GVAR_RYHB_ACTIVITY_BEGIN);
+        endTime = GVAR.GetVar(GVAR_RYHB_ACTIVITY_END);
+    }
+    else
+    {
+        beginTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
+        endTime = beginTime + 7 * 86400;
     }
 
     Stream st(REP::RP_SERVER);
     st << static_cast<UInt8>(0x05) << static_cast<UInt8>(0);
     st << (GetVar(VAR_ZRYJ_COUNT)/20);
     st << (GetVar(VAR_HYYJ_COUNT)/20);
+    st << beginTime << endTime;
 
     UInt8 cnt = 0;
     size_t offset = st.size();
@@ -25171,7 +25192,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9496, 1, true, false, FromNpc);
+            GetPackage()->AddItem(16010, 1, true, false, FromNpc);
         }
         else
         {
@@ -25182,7 +25203,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9496, 1, true, false, FromNpc);
+                GetPackage()->AddItem(16010, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
@@ -26088,7 +26109,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1300,2350,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
@@ -26135,21 +26156,21 @@ void Player::Send11GradeAward(UInt8 type)
 {
     if(type > 11)
         return ;
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1300,2350,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
-        {{9424,1 }, {503,1}},
-        {{501,2},{500,2}},
-        {{9604,3},{513,2},{9438,1}},
-        {{9600,2},{516,2},{503,2}},
+        {{9418,1}, {503,1}},
+        {{501,2},{9497,2}},
+        {{9603,3},{9438,2}},
+        {{9414,2},{16001,2},{1126,2}},
         {{547,3},{9308,3},{517,3}},
-        {{549,1},{551,2},{134,2}},
-        {{1325,2},{503,2},{509,2},{134,2},{9438,2}},
-        {{1728,1},{8555,4}},
+        {{549,1},{551,3},{8000,4}},
+        {{16001,3},{9498,2},{509,2},{134,2},{9438,2}},
+        {{1729,1},{8555,4}},
         {{9600,25},{9418,25},{9424,40}},
-        {{9068,20}},
-        {{9019,20},{9017,20},{9022,15}},
+        {{9498,50},{9022,10}},
+        {{9021,10},{9068,15},{9075,15}},
     };
-    static UInt32 count[] = {2,2,3,3,3,3,5,2,3,1,3};
+    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,2,3};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -28790,6 +28811,27 @@ void Player::mount_Cangjianya(UInt8 rideId, UInt8 floors, bool isAuto)
         mount->cangjianya(floors, isAuto);
 }
 
+void Player::sendUseRideItemInfo(lua_tinker::table table_items)
+{
+	UInt32 size = table_items.size();
+	if(size == 0 || size % 2 > 0)
+		return;
+    Stream st(REP::MODIFY_MOUNT);
+    st << static_cast<UInt8>(4);
+    size_t offset = st.size();
+    UInt8 count = 0;
+    st << count;
+    for (UInt32 i = 0; i < size; i += 2)
+    {
+		st << table_items.get<UInt32>(i+1);
+		st << table_items.get<UInt16>(i+2);
+        ++ count;
+    }
+    st.data<UInt8>(offset) = count;
+    st << Stream::eos;
+    send(st);
+}
+
 void Player::handleJiqirenAct_shiyamen()
 {
     if(!World::getJiqirenAct())
@@ -29985,6 +30027,7 @@ void Player::doTableInWorld(Fighter* fgt, UInt32 oldId)
     do_sh_fighter_attr2(fgt, oldId);
 }
 
+
 void Player::do_fighter(Fighter* fgt, UInt32 oldId, UInt32 newId)
 {
     fgt->setId(newId);
@@ -30215,7 +30258,7 @@ void Player::AddFriendlyCount(Player * friendOne , UInt32 val)
     std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendOne->getId());
     if(it != _friendlyCount.end())
     {
-        if( ( it->second.value < 5000 ) && (it->second.value + val > 5000))
+        if( ( it->second.value < 5000 ) && (it->second.value + val >= 5000))
             OnShuoShuo(SS_FRIEND_2);
         it->second.value += val; 
     }
@@ -30289,7 +30332,6 @@ void Player::InsertBrother(Player * pl)
         return ;
     if(!_hasFriend(pl))
         return ;
-
     _brothers[pl->getId()] = 1;
 }
 bool Player::_hasBrother( Player * pl ) const
@@ -30412,7 +30454,6 @@ bool Player::acceptBrother(Player * friendOne , UInt8 flag)
         return false;
 
     UInt64 friendId = getId();
-
     UInt32 Count = 0 ;
     if(_friendlyCount[friendOne->getId()].value < 500)
     {
@@ -30507,7 +30548,6 @@ bool Player::acceptBrother(Player * friendOne , UInt8 flag)
                 break;
             }
     }
-
     //if(flag)
     {
         struct st
@@ -30531,6 +30571,564 @@ bool Player::acceptBrother(Player * friendOne , UInt8 flag)
     }
     return true;
 }
+TeamMemberData* Player::getTeamMemberData()
+{
+    return m_teamMemberData;
+}
+
+void Player::setTeamMemberData(TeamMemberData* tmd)
+{
+    if(tmd)
+    {
+        ++tmd->refCount;
+    }
+    if(m_teamMemberData)
+    {
+        if((--m_teamMemberData->refCount) == 0)
+            delete m_teamMemberData;
+    }
+    m_teamMemberData = tmd;
+}
+
+void Player::SendFriendsA(UInt8 type)
+{
+	Mutex::ScopedLock lk(_mutex);
+
+    ClearInactiveSort();
+
+    Player* pfriend = NULL;
+    std::set<Player*>::iterator offset;
+    for(offset = _friends[0].begin(); offset != _friends[0].end(); ++offset)
+	{
+		pfriend = *offset;
+        if(!pfriend)
+            continue;
+
+        if(NULL != pfriend->getTeamMemberData())
+            continue;
+
+        UInt32 status = pfriend->GetVar(VAR_KJTM_STATUS);
+        UInt8 mark = GET_BIT(status, 0);
+        if(1 == mark)
+            SetInactiveSort(pfriend);
+	}
+    SendInactiveSort(type);
+}
+
+void Player::SendFriendsB(UInt8 type)
+{
+	Mutex::ScopedLock lk(_mutex);
+
+    ClearActiveSort();
+
+    Player* pfriend = NULL;
+    std::set<Player*>::iterator offset;
+    for(offset = _friends[0].begin(); offset != _friends[0].end(); ++offset)
+	{
+		pfriend = *offset;
+        if(!pfriend)
+            continue;
+        if(NULL == pfriend->getTeamMemberData())
+            continue;
+
+        UInt32 status = pfriend->GetVar(VAR_KJTM_STATUS);
+        UInt8 mark = GET_BIT(status, 0);
+        if(0==mark)
+            SetActiveSort(pfriend);
+	}
+    SendActiveSort(type);
+}
+
+void Player::SetInactiveSort(Player* pl)
+{
+    if(NULL == pl)
+        return;
+
+    InactiveSort s;
+    s.player = pl;
+    s.level = pl->GetLev();
+    s.power = pl->GetVar(VAR_TOTAL_BATTLE_POINT);
+    s.time = TimeUtil::Now();
+    _CommonSort.insert(s);
+}
+        
+void Player::SendInactiveSort(UInt8 type, UInt8 curPage)
+{
+    if(0 == curPage)
+        return;
+
+    UInt32 status = GetVar(VAR_KJTM_STATUS);
+    UInt8 mark = GET_BIT(status, 2);
+    if(0 == mark)
+    {
+        status = SET_BIT(status, 2);
+        SetVar(VAR_KJTM_STATUS, status);
+    }
+
+    UInt8 cnt = _CommonSort.size();
+    UInt8 totalPage = 0;
+    if(0 == cnt)
+        totalPage = 1;
+    else if(0 == cnt % 10)
+        totalPage = cnt / 10;
+    else
+        totalPage = cnt / 10 + 1;
+
+    if(curPage < totalPage)
+        cnt = 10;
+    else if(curPage == totalPage)
+        cnt = cnt - (curPage - 1) * 10;
+    else
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x01);
+    st << type;
+    st << totalPage << curPage << cnt;
+    UInt8 c = 0;
+    UInt8 c1 = 0;
+    for(InactiveSortType::iterator i = _CommonSort.begin(), e = _CommonSort.end(); i != e; ++i)
+    {
+        if(NULL == i->player)
+            continue;
+
+        if((c>=(curPage-1)*10) && (c<=(curPage*10)))
+        {
+            st << i->player->getId();
+            st << i->player->getCountry();
+            st << i->player->getName();
+            st << i->level;
+            st << i->power;
+            st << i->player->getOpenId();
+            st <<  static_cast<UInt8>(i->player->GetVar(VAR_FRIEND_SECURITY));
+            c1++;
+        }
+        c++;
+        if(c1 >= 10)
+            break;
+    }
+    st << Stream::eos;
+    send(st);
+
+    SetCurPageA(curPage);
+}
+
+void Player::ClearInactiveSort()
+{
+    if(_CommonSort.size() > 0)
+        _CommonSort.clear();
+}
+
+void Player::SetActiveSort(Player* pl)
+{
+    if(NULL == pl)
+        return;
+
+    ActiveSort s;
+    s.player = pl;
+    s.power = pl->GetVar(VAR_TOTAL_BATTLE_POINT);
+    if(pl->isOnline())
+        s.isOnline = 1;
+    else
+        s.isOnline = 0;
+    s.time = TimeUtil::Now();
+    _ActiveSort.insert(s);
+}
+
+void Player::SendActiveSort(UInt8 type, UInt8 curPage)
+{
+    if(0 == curPage)
+        return;
+
+    UInt32 status = GetVar(VAR_KJTM_STATUS);
+    UInt8 mark = GET_BIT(status, 2);
+    if(0 == mark)
+    {
+        status = SET_BIT(status, 2);
+        SetVar(VAR_KJTM_STATUS, status);
+    }
+
+    UInt8 cnt = _ActiveSort.size();
+    UInt8 totalPage = 0;
+    if(0 == cnt)
+        totalPage = 1;
+    else if(0 == cnt % 7)
+        totalPage = cnt / 7;
+    else
+        totalPage = cnt / 7 + 1;
+
+    if(curPage < totalPage)
+        cnt = 7;
+    else if(curPage == totalPage)
+        cnt = cnt - (curPage - 1) * 7;
+    else
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x02);
+    st << type;
+    st << totalPage << curPage << cnt;
+    UInt8 c = 0;
+    UInt8 c1 = 0;
+    for(ActiveSortType::iterator i = _ActiveSort.begin(), e = _ActiveSort.end(); i != e; ++i)
+    {
+        if(NULL == i->player)
+            continue;
+
+        if((c>=(curPage-1)*7) && (c<=(curPage*7)))
+        {
+            st << i->player->getId();
+            st << i->player->getCountry();
+            st << i->player->getName();
+            st << i->power;
+            UInt8 isOnline = 0;
+            if(i->player->isOnline())
+                isOnline = 1;
+            st << isOnline;
+            c1++;
+        }
+        c++;
+        if(c1 >= 7)
+            break;
+    }
+    st << Stream::eos;
+    send(st);
+
+    SetCurPageA(curPage);
+}
+
+void Player::ClearActiveSort()
+{
+    if(_ActiveSort.size() > 0)
+        _ActiveSort.clear();
+}
+
+void Player::AddGobackFromDB(UInt64 inviterId)
+{
+    _Goback.push_back(inviterId);
+}
+
+void Player::AddGoback(UInt64 inviterId)
+{
+    _Goback.push_back(inviterId);
+
+    DB5().PushUpdateData("INSERT INTO `invitegoback` (`inviteeId`, `playerId`) VALUES (%" I64_FMT "u, %" I64_FMT "u)", getId(), inviterId);
+
+    udpLog("kangjitianmo", "F_140406_1", "", "", "", "", "act");
+}
+
+void Player::DelGoback(UInt64 inviterId)
+{
+    UInt32 cnt = _Goback.size();
+    for(UInt32 i=0; i<cnt; i++)
+    {
+        if(inviterId == _Goback[i])
+        {
+            _Goback.erase(_Goback.begin()+i);
+            DB5().PushUpdateData("DELETE FROM `invitegoback` WHERE `inviteeId` = %" I64_FMT "u AND `playerId` = %" I64_FMT "u", getId(), inviterId);
+        }
+    }
+}
+
+bool Player::CheckGoback(UInt64 inviterId)
+{
+    Player* inviter = globalPlayers[inviterId];
+    if(NULL == inviter)
+        return false;
+
+    UInt32 cnt = _Goback.size();
+    for(UInt32 i=0; i<cnt; i++)
+    {
+        if(inviterId == _Goback[i])
+        {
+            inviter->sendMsgCode(1, 8010);
+            return false;
+        }
+    }
+    return true;
+}
+
+void Player::SendGoback(UInt8 type)
+{
+    ClearActiveSort();
+
+    UInt32 cnt = _Goback.size();
+    for(UInt32 i=0; i<cnt; i++)
+    {
+        Player* member = globalPlayers[_Goback[i]];
+        if(NULL == member)
+            continue;
+
+        SetActiveSort(member);
+    }
+    SendActiveSort(type);
+}
+
+void Player::AddApplyListFromDB(UInt64 applicantId)
+{
+    _ApplyList.push_back(applicantId);
+}
+
+void Player::AddApplyList(UInt64 applicantId)
+{
+    _ApplyList.push_back(applicantId);
+
+    DB5().PushUpdateData("INSERT INTO `applylist` (`playerId`, `applicantId`) VALUES (%" I64_FMT "u, %" I64_FMT "u)", getId(), applicantId);
+
+    Player* applicant = globalPlayers[applicantId];
+    if(NULL == applicant)
+        return;
+
+    applicant->sendMsgCode(1, 4050);
+}
+
+bool Player::CheckApplyList(UInt64 applicantId)
+{
+    Player* applicant = globalPlayers[applicantId];
+    if (NULL == applicant)
+        return false;
+
+    UInt32 cnt = _ApplyList.size();
+    if(cnt >= 2000)
+    {
+		applicant->sendMsgCode(1, 8011);
+        return false; //最多接受2000个回流玩家的申请
+    }
+
+    for(UInt32 i=0; i<cnt; i++)
+    {
+        if(applicantId == _ApplyList[i])
+        {
+            applicant->sendMsgCode(1, 8012);
+            return false;
+        }
+    }
+
+    TeamMemberData* tmd = getTeamMemberData();
+    if(NULL == tmd)
+        return false;
+    if(tmd->memCnt >= 3)
+    {
+        applicant->sendMsgCode(1, 8014);
+        return false;
+    }
+
+    return true;
+}
+
+void Player::SendApplyList(UInt8 type, UInt8 curPage)
+{
+    if(0 == curPage)
+        return;
+
+    UInt8 totalPage = 0;
+    UInt32 cnt = _ApplyList.size();
+    if(0 == cnt)
+        totalPage = 1;
+    else if(0 == cnt % 10)
+        totalPage = cnt / 10;
+    else
+        totalPage = cnt / 10 + 1;
+
+    if(curPage < totalPage)
+        cnt = 10;
+    else if(curPage == totalPage)
+        cnt = cnt - (curPage - 1) * 10;
+    else
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x05);
+    st << type;
+    st << totalPage << curPage << static_cast<UInt8>(cnt);
+    UInt32 c = 0;
+    UInt32 c1 = 0;
+    for(UInt32 i=0; i<_ApplyList.size(); i++)
+    {
+        Player* member = globalPlayers[_ApplyList[i]];
+        if(NULL == member)
+            continue;
+
+        if((c>=(static_cast<UInt32>(curPage-1)*10)) && (c<=(static_cast<UInt8>(curPage*10))))
+        {
+            st << member->getId();
+            st << member->getCountry();
+            st << member->getName();
+            st << member->GetLev();
+            c1++;
+        }
+        c++;
+        if(c1 >= 10)
+            break;
+    }
+    st << Stream::eos;
+    send(st);
+
+    SetCurPageA(curPage);
+}
+
+void Player::AcceptApply(UInt64 applicantId)
+{
+    KJTMManager->JoinTeamMember(getId(), applicantId);
+    DelApplyList(applicantId);
+}
+
+void Player::RefuseApply(UInt64 applicantId)
+{
+    DelApplyList(applicantId);
+}
+
+void Player::DelApplyList(UInt64 applicantId)
+{
+    UInt32 cnt = _ApplyList.size();
+    for(UInt32 i=0; i<cnt; i++)
+    {
+        if(applicantId == _ApplyList[i])
+        {
+            _ApplyList.erase(_ApplyList.begin() + i);
+            DB5().PushUpdateData("DELETE FROM `applylist` WHERE `playerId` = %" I64_FMT "u AND `applicantId` = %" I64_FMT "u", getId(), applicantId);
+        }
+    }
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x07);
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::ApplyToName(Player* pl)
+{
+    if(NULL == pl)
+        return;
+
+    if(!isOnline())
+    {
+        pl->sendMsgCode(1, 2218);
+        return;
+    }
+
+    TeamMemberData* tmd = getTeamMemberData();
+    if(NULL == tmd)
+    {
+        pl->sendMsgCode(1, 4052);
+        return;
+    }
+
+    if(tmd->memCnt >= 3)
+    {
+        pl->sendMsgCode(1, 8014);
+        return;
+    }
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x1A);
+    st << pl->getId();
+    st << pl->getName();
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::InviteToName(Player* pl)
+{
+    if(NULL == pl)
+        return;
+
+
+    if(!isOnline())
+    {
+        pl->sendMsgCode(1, 2218);
+        return;
+    }
+
+    TeamMemberData* tmdB = getTeamMemberData();
+    if(NULL != tmdB)
+        return;
+
+    TeamMemberData* tmd = pl->getTeamMemberData();
+    if(NULL == tmd)
+        return;
+    if(tmd->memCnt >= 3)
+    {
+        pl->sendMsgCode(1, 8014);
+        return;
+    }
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x1B);
+    st << pl->getId();
+    st << pl->getName();
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::ClearKJTMData()
+{
+    ClearInactiveSort();
+    ClearActiveSort();
+    if(_Goback.size() > 0)
+        _Goback.clear();
+    if(_ApplyList.size() > 0)
+        _ApplyList.clear();
+
+    setTeamMemberData(NULL);
+    SetVar(VAR_KJTM_STATUS, 0); 
+    SetVar(VAR_KJTM_KILL_NPC_STATUS, 0); 
+    SetVar(VAR_KJTM_LOGIN_STATUS, 0); 
+}
+
+void Player::KJTMUdpLog()
+{
+    UInt32 status = GetVar(VAR_KJTM_STATUS);
+    UInt8 mark = GET_BIT(status, 0);
+    if(1 == mark)
+    {
+        UInt32 statusA = GetVar(VAR_KJTM_LOGIN_STATUS);
+        if(0 == statusA)
+        {
+            UInt32 durtime = TimeUtil::SharpDayT(0, TimeUtil::Now()) - TimeUtil::SharpDayT(0, getLastOnline());
+            if(durtime == 86400)
+            {
+                udpLog("kangjitianmo", "F_140406_8", "", "", "", "", "act");
+                SetVar(VAR_KJTM_LOGIN_STATUS, 1);
+            }
+        }
+    }
+}
+
+void Player::makeFighterSGList(Stream& st)
+{
+    size_t c = _fighters.size();
+    st.init(REP::SKILLSTRENGTHEN);
+    st << static_cast<UInt8>(10);
+    st << GetVar(VAR_SKILL_GRADE_MONEY);
+    st << static_cast<UInt8>(c);
+    for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+    {
+        if(it->second)
+        {
+            it->second->makeFighterSGInfo(st);
+        }
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::makeFighterSGListWithNoSkill(Stream& st)
+{
+    size_t c = _fighters.size();
+    st.init(REP::SKILLSTRENGTHEN);
+    st << static_cast<UInt8>(14);
+    st << static_cast<UInt8>(c);
+    for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+    {
+        if (it->second)
+        {
+            it->second->makeFighterSGInfoWithNoSkill(st);
+        }
+    }
+    st << Stream::eos;
+}
+
 void Player::beRefuceBrother(Player * friendOne ,UInt8 flag )  //flag=0表示被拒绝，1表示取消
 {
     UInt32 itemId = 16005 ;
@@ -30560,6 +31158,21 @@ bool Player::IsAccept(Player * friendOne)
         return false;
     return true;
 }
+   UInt32 Player::getCurClanTitle()
+   {
+       if(_clan == NULL)
+           return 0;
+       UInt32 clanTitleId = GetVar(VAR_CUR_CLAN_TITLE);
+       if(clanTitleId == 0)
+           return 0;
+       checkClanTitle();
+       std::map<UInt8, UInt32> & _clanTitle = _clan->GetClanTitle();
+       std::map<UInt8, UInt32>::iterator it = _clanTitle.find(clanTitleId);
+       if(it != _clanTitle.end())
+           return clanTitleId;
+       SetVar(VAR_CUR_CLAN_TITLE, 0);
+       return 0;
+   }
 
 void Player::drinking(Player * friendOne, UInt8 drinkCount ,UInt8 flag)
 {
@@ -31150,45 +31763,12 @@ AttrExtra Player::getDrinkInfo()
    AttrExtra ae; 
 }
 */
-void Player::makeFighterSGList(Stream& st)
-{
-    size_t c = _fighters.size();
-    st.init(REP::SKILLSTRENGTHEN);
-    st << static_cast<UInt8>(10);
-    st << GetVar(VAR_SKILL_GRADE_MONEY);
-    st << static_cast<UInt8>(c);
-    for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
-    {
-        if(it->second)
-        {
-            it->second->makeFighterSGInfo(st);
-        }
-    }
-    st << Stream::eos;
-    send(st);
-}
 
 void Player::sendFighterSGListWithNoSkill()
 {
     Stream st;
     makeFighterSGListWithNoSkill(st);
     send(st);
-}
-
-void Player::makeFighterSGListWithNoSkill(Stream& st)
-{
-    size_t c = _fighters.size();
-    st.init(REP::SKILLSTRENGTHEN);
-    st << static_cast<UInt8>(14);
-    st << static_cast<UInt8>(c);
-    for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
-    {
-        if (it->second)
-        {
-            it->second->makeFighterSGInfoWithNoSkill(st);
-        }
-    }
-    st << Stream::eos;
 }
 
 void Player::makeClanTitleInfo(Stream & st)
@@ -31241,13 +31821,6 @@ void Player::notifyClanTitle()
     send(st);
 }
 
-UInt32 Player::getCurClanTitle()
-{
-    if(_clan == NULL)
-        return 0;
-    checkClanTitle();
-    return GetVar(VAR_CUR_CLAN_TITLE);
-}
 
 void Player::checkClanTitle()
 {
@@ -31281,6 +31854,16 @@ void Player::clearClanTitle()
         SetVar(VAR_CUR_CLAN_TITLE, 0);
     notifyClanTitle();
 }
+
+   void Player::specialUdpLog(UInt8 type)
+   {
+       switch(type)
+       {
+           case 1:
+               udpLog("huodong", "F_140417_1", "", "", "", "", "act");
+               break;
+       }
+   }
 
 } // namespace GObject
 

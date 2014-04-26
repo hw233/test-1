@@ -232,7 +232,7 @@ void BattleFighter::updateAllAttr()
 	updateBuffExtras();
     float factor = 1.0f;
     if(_fighter && _fighter->getOwner())
-        factor = _fighter->getOwner()->getSpiritFactor();
+        factor = _fighter->getOwner()->getSpiritFactor() * _fighter->getOwner()->getKJTMFactor();
 
 	_strength = _formula->calcStrength(this);
 	_agility = _formula->calcAgility(this);
@@ -1603,6 +1603,9 @@ float BattleFighter::calcCriticalDmg(BattleFighter* defender)
     float factor = getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(this);
     if(factor < 1.25)
         factor = 1.25;
+
+    if(factor > GObject::GObjectManager::getCriticalDmgMax() && !isNpc())
+        factor = GObject::GObjectManager::getCriticalDmgMax();
 
     return factor;
 }

@@ -3307,10 +3307,16 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     break;
                 default:
                     break;
-
             }
-
        }
+       break;
+       case 0x45:
+       {
+           UInt8 type = 0;
+           brd >> type;
+           player->specialUdpLog(type);
+       }
+       break;
        default:
             break;
     }

@@ -2464,6 +2464,87 @@ void OnSendClanMemberGrade( GameMsgHdr& hdr, const void* data )
     if(clan != NULL)
         clan->SendClanMemberGrade(player);
 }
+
+void OnSendClanFriendsA( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct ClanInactive
+    {
+        UInt8 type;
+        UInt8 curPage;
+    };
+    ClanInactive* ci = reinterpret_cast<ClanInactive*>(const_cast<void*>(data));
+
+    GObject::Clan *clan = player->getClan();
+    if(clan != NULL)
+        clan->SendClanFriendsA(player, ci->type, ci->curPage);
+    else
+    {
+        Stream st(REP::KANGJITIANMO_REP);
+        st << static_cast<UInt8>(0x01) << static_cast<UInt8>(0x01);
+        st << static_cast<UInt8>(1) << static_cast<UInt8>(1) << static_cast<UInt8>(0);
+        st << Stream::eos;
+        player->send(st);
+    }
+}
+
+void OnSendClanFriendsB( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct ClanActive
+    {
+        UInt8 type;
+        UInt8 curPage;
+    };
+    ClanActive* ca = reinterpret_cast<ClanActive*>(const_cast<void*>(data));
+
+    GObject::Clan *clan = player->getClan();
+    if(clan != NULL)
+        clan->SendClanFriendsB(player, ca->type, ca->curPage);
+    else
+    {
+        Stream st(REP::KANGJITIANMO_REP);
+        st << static_cast<UInt8>(0x02) << static_cast<UInt8>(0x01);
+        st << static_cast<UInt8>(1) << static_cast<UInt8>(1) << static_cast<UInt8>(0);
+        st << Stream::eos;
+        player->send(st);
+    }
+}
+
+/*void OnSendInactive( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct ClanInactive
+    {
+        UInt8 type;
+        UInt8 curPage;
+    };
+    ClanInactive* ci = reinterpret_cast<ClanInactive*>(const_cast<void*>(data));
+
+    GObject::Clan *clan = player->getClan();
+    if(clan != NULL)
+        clan->SendInactiveSort(player, ci->type, ci->curPage);
+}
+
+void OnSendActive( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+
+    struct ClanActive
+    {
+        UInt8 type;
+        UInt8 curPage;
+    };
+    ClanActive* ca = reinterpret_cast<ClanActive*>(const_cast<void*>(data));
+
+    GObject::Clan *clan = player->getClan();
+    if(clan != NULL)
+        clan->SendActiveSort(player, ca->type, ca->curPage);
+}*/
+
 #define CNT10 10
 
 void OnRechargeRP7Rank ( GameMsgHdr& hdr,  const void* data )

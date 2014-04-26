@@ -696,6 +696,9 @@ namespace GObject
 
         VAR_ZHENYUAN_TIQU_DATE = 716,    //阵元提取神符免费次数时间
         VAR_ZHENYUAN_TIQU_CNT = 717,     //阵元提取神符 低16位每天次数 高16位每天仙石购买次数
+        VAR_KJTM_STATUS = 718,              // 抗击天魔状态
+        VAR_KJTM_KILL_NPC_STATUS = 719,     // 抗击天魔击杀怪物状态
+        VAR_KJTM_LOGIN_STATUS = 720,     // 抗击天魔回归玩家连续登录两天状态
 
         //721 - 740 for dtc 
         VAR_TYSS_RECHARGE = 721,//天元神兽期间玩家兑换灵果剩余充值数(充值数满足条件自动兑换灵果)
@@ -1348,6 +1351,9 @@ namespace GObject
             REGISTER_VAR(VAR_GUANKA_ACTION_NPC, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_SCORE, CYCLE_NONE);
             REGISTER_VAR(VAR_GUANKA_ACTION_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_KILL_NPC_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_LOGIN_STATUS, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);

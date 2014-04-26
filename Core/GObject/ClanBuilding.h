@@ -124,7 +124,13 @@ namespace GObject
 
             UInt16 getLevel(UInt8 type) const;
             UInt32 getAddVal(UInt8 type) const;
-            void addEnergy(UInt32 energy){ _energy+= energy ; UpdateEnergy();}
+            void addEnergy(UInt32 energy)
+            { 
+                _energy+= energy ;
+                if(_energy > 9999999)
+                    _energy = 9999999;
+                UpdateEnergy();
+            }
             UInt32 getEnergy(){ return _energy;}
             void AddBattlesInfo(struct ClanBuildBattleInfo cbbi);
             void SendBattlesInfo(Stream & st);

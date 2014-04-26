@@ -55,6 +55,7 @@
 #include "GObject/WBossMgr.h"
 #include "GObject/TeamCopy.h"
 #include "GObject/PetTeamCopy.h"
+#include "GObject/KangJiTianMo.h"
 #include "ActivityMgr.h"
 #include "HoneyFall.h"
 #include "TownDeamon.h"
@@ -475,6 +476,30 @@ namespace GObject
         if(!loadMoBao())
         {
             fprintf(stderr, "loadMoBao error!\n");
+            std::abort();
+        }
+
+        if(!loadInactiveMember())
+        {
+            fprintf(stderr, "loadInactiveMember error!\n");
+            std::abort();
+        }
+
+        if(!loadGoback())
+        {
+            fprintf(stderr, "loadGoback error!\n");
+            std::abort();
+        }
+
+        if(!loadApplyList())
+        {
+            fprintf(stderr, "loadApplyList error!\n");
+            std::abort();
+        }
+
+        if(!loadTeamMember())
+        {
+            fprintf(stderr, "loadTeamMember error!\n");
             std::abort();
         }
 
@@ -6162,7 +6187,7 @@ namespace GObject
 		DBZhenwei zwdata;
         Player* pl = NULL;
 
-		if(execu->Prepare("SELECT `playerId`, keyId, `mark`  FROM `player_zhenwei` ORDER BY `playerId`", zwdata) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `keyId`, `mark`  FROM `player_zhenwei` ORDER BY `playerId`", zwdata) != DB::DB_OK)
 			return false;
 
 		lc.reset(20);
@@ -6179,6 +6204,124 @@ namespace GObject
 				continue;
 
             pl->GetMoFang()->AddZhenweiFromDB(zwdata);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadGoback()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading goback:");
+		DBGoback data;
+        Player* pl = NULL;
+
+		if(execu->Prepare("SELECT `inviteeId`, `playerId`  FROM `invitegoback` ORDER BY `inviteeId`", data) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(data.inviteeId != last_id)
+			{
+				last_id = data.inviteeId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->AddGobackFromDB(data.playerId);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadApplyList()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading applylist:");
+		DBApplyList data;
+        Player* pl = NULL;
+
+		if(execu->Prepare("SELECT `playerId`, `applicantId`  FROM `applylist` ORDER BY `playerId`", data) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(data.playerId != last_id)
+			{
+				last_id = data.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->AddApplyListFromDB(data.applicantId);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadTeamMember()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading teammember:");
+		DBTeamMember data;
+        Player* p1 = NULL;
+        Player* p2 = NULL;
+        Player* p3 = NULL;
+
+		if(execu->Prepare("SELECT `teamId`, `member1`, `member2`, `member3`  FROM `teammember` ORDER BY `teamId`", data) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+
+            p1 = globalPlayers[data.member1];
+            p2 = globalPlayers[data.member2];
+            p3 = globalPlayers[data.member3];
+
+			if(data.teamId > 0)
+                KJTMManager->AddTeamMember(data.teamId, p1, p2, p3);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadInactiveMember()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading inactivemember:");
+		DBInactiveMember data;
+
+		if(execu->Prepare("SELECT `playerId` FROM `inactivemember` ORDER BY `playerId`", data) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            if(data.playerId > 0)
+                KJTMManager->AddInactiveMemberFromDB(data.playerId);
 		}
 		lc.finalize();
 

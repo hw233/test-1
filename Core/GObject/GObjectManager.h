@@ -529,6 +529,11 @@ namespace GObject
 	    static bool LoadSevenSoul();
         static bool loadZhenwei();
         static bool loadQiShiBan();
+
+        static bool loadGoback();
+        static bool loadApplyList();
+        static bool loadTeamMember();
+        static bool loadInactiveMember();
         static bool LoadPlayerModifyMounts();
         static bool loadFriendlyCount();
         static bool loadSkillGrade();

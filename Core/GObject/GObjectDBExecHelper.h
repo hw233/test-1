@@ -1493,6 +1493,31 @@ struct DBZhenwei
     UInt8 mark;
 };
 
+struct DBGoback
+{
+    UInt64 inviteeId;
+    UInt64 playerId;
+};
+
+struct DBApplyList
+{
+    UInt64 playerId;
+    UInt64 applicantId;
+};
+
+struct DBTeamMember
+{
+    UInt32 teamId;
+    UInt64 member1;
+    UInt64 member2;
+    UInt64 member3;
+};
+
+struct DBInactiveMember
+{
+    UInt64 playerId;
+};
+
 struct DBPlayerNamed 
 {
     UInt16 serverNo;
@@ -3476,6 +3501,39 @@ SPECIALDEF(3)
     UInt64, playerId,
     UInt16, keyId,
     UInt8, mark
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBGoback)
+SPECIALDEF(2)
+    (
+    UInt64, inviteeId,
+    UInt64, playerId
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBApplyList)
+SPECIALDEF(2)
+    (
+    UInt64, playerId,
+    UInt64, applicantId
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTeamMember)
+SPECIALDEF(4)
+    (
+    UInt32, teamId,
+    UInt64, member1,
+    UInt64, member2,
+    UInt64, member3
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBInactiveMember)
+SPECIALDEF(1)
+    (
+    UInt64, playerId
     )
 SPECIALEND()
 
