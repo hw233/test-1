@@ -30121,7 +30121,7 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
     if(taskNum > 5 )
         return ;
 
-    std::cout << static_cast<UInt32>(getId()) << " to " <<static_cast<UInt32>(friendOne->getId()) << " num :" <<static_cast<UInt32>(taskNum) << std::endl;
+    //std::cout << static_cast<UInt32>(getId()) << " to " <<static_cast<UInt32>(friendOne->getId()) << " num :" <<static_cast<UInt32>(taskNum) << std::endl;
 
     static UInt8 task_num_val_max[][5] = {
         {1,1,1,3,3},
@@ -30178,13 +30178,13 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
         {
             AddVar(VAR_FRIEND_VALUE , 5);
             AddVar(VAR_FRIEND_VALUE_DAY , 5);
-            std::cout << "XXX5" <<std::endl;
+            //std::cout << "XXX5" <<std::endl;
         }
         if(dayTaskNum == 6)
         {
             AddVar(VAR_FRIEND_VALUE , 3);
             AddVar(VAR_FRIEND_VALUE_DAY , 3);
-            std::cout << "XXX6" <<std::endl;
+            //std::cout << "XXX6" <<std::endl;
         }
     }
 
@@ -31713,7 +31713,7 @@ void Player::calcDrinkPoint(UInt8 flag)
     _friendSum =0;
     _drinkingSum = 0;
     getDrinkInfo().reset();
-    std::cout << "player :" << static_cast<UInt32>(getId() )<<"对酒结束" <<std::endl;
+    //std::cout << "player :" << static_cast<UInt32>(getId() )<<"对酒结束" <<std::endl;
     Stream st(REP::BROTHER);
     st << static_cast<UInt8>(0x0C);
     st << drinkingPoint;
