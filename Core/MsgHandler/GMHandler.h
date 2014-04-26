@@ -252,6 +252,7 @@ private:
 
     void OnSetTYSS(GObject::Player *player, std::vector<std::string>& args);
     void TestClanRank(GObject::Player *player, std::vector<std::string>& args);
+    void OnAddCard(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

@@ -316,6 +316,7 @@ GMHandler::GMHandler()
     Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
     Reg(2, "settyss", &GMHandler::OnSetTYSS);
     Reg(3, "clanrank", &GMHandler::TestClanRank);
+    Reg(2, "addkapai", &GMHandler::OnAddCard);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -5407,3 +5408,13 @@ void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& 
         clan->sendMemberBuf(pos);
 }
 
+void GMHandler::OnAddCard(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 2)
+        return ;
+    UInt16 ii = atoi(args[0].c_str());
+    UInt8 mm = atoi(args[1].c_str());
+
+    player->GetCollectCard()->AddCard(ii,mm);   
+
+}
