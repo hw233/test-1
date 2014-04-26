@@ -449,6 +449,16 @@ namespace GObject
             upcard->exp += ciitmp->initExp + MapFreeCardSlot.find(*it)->second->exp;
             while(GData::csys.checkUpgrade(upcard))
             {
+                if(cii->type != 1)
+                {
+                    if(upcard->level >= cii->lvLimit)
+                       break;
+                }
+                else
+                {
+                    if(upcard->level >= m_owner->getMainFighter()->getLevel())
+                        break;
+                }
                 switch(upcard->level)
                 {
                     case 10:
