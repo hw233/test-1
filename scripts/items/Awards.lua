@@ -735,10 +735,10 @@ function RunQZoneRechargeAward(player, cts)
 end
 function RunInterestingAward(player, cts)
     local item = {
-        [0] = {{500,3},{56,3},{9371,3},{15,3}},
-        [1] = {{503,3},{514,3},{500,3},{516,2}},
-        [2] = {{501, 3},{547,3},{517,3},{513,3}},
-        [3] = {{134,3},{1325,3},{509,3},{515,3}},
+        [0] = {{500,3},{9424,3},{511,3}},
+        [1] = {{501,3},{503,3},{514,3},{516,3}},
+        [2] = {{547,3},{1325,3},{551,3},{517,3}},
+        [3] = {{134,3},{509,3},{549,1},{515,3}},
     };
     local package = player:GetPackage();
 --    package:DelItemSendMsg(9371, player)
@@ -761,10 +761,10 @@ function RunInterestingAward(player, cts)
 end
 function RunInterestingBag(player, cts)
     local item = {
-        [0] = {{15,1},{9371,1},{500,1}},
+        [0] = {{33,1},{9371,1},{500,1}},
     };
     local package = player:GetPackage();
-    package:DelItemSendMsg(9451, player)   --需要修改
+    package:DelItemSendMsg(16011, player)   --需要修改
     if cts > 1  then
         return false
     end
@@ -1764,5 +1764,43 @@ function RunTYSSAward(player, cts)
     
     return true
 
+end
+function RunFriendlyGoods(player, cts ,count)
+    local item = {
+        [1] = {0,15,50},
+        [2] = {0,1526,50},
+        [3] = {0,57,50},
+        [4] = {0,56,50},
+        [5] = {0,1326,50},
+        [6] = {50,9371,50},
+        [7] = {80,9498,150},
+        [8] = {75,16001,200},
+        [9] = {55,1126,100},
+        [10] = {0,16005,50},
+    };
+    local package = player:GetPackage();
+
+    if cts > 10  or cts <= 0 then
+        return false
+    end
+    if count == 0 then 
+        return 
+    end
+    local value = player:GetVar(700)
+    if value < item[cts][3] * count then
+        return 
+    end
+    local lev = player:GetLev()
+    if lev < item[cts][1] then 
+        player:sendMsgCode(2, 1010, 0);
+        return false
+    end
+    if package:GetRestPackageSize() < ( count / 99 + 1)  then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(item[cts][2], count, true, 0, 74);
+    player:SetVar(700 , value - item[cts][3] * count );
+    return true
 end
 
