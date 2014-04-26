@@ -9173,7 +9173,7 @@ function HappyFireLoot(player,lootlvl)
             [3] = 1,
     };
     local package = player:GetPackage();
-    package:AddItem(9440, itemNum[lootlvl], true,0,10); --欢乐礼包
+    package:AddItem(9458, itemNum[lootlvl], true,0,10); --欢乐礼包
 end
 
 --蜀山传奇掉落活动
@@ -10356,7 +10356,7 @@ function GetSpreadCountForAward(serverNo)
 end
 
 function GetSpreadAward()
-    local award = {{515,2}, {1325,2}, {1126,2}, {134,2}, {509,2}}
+    local award = {{515,2}, {9498,2}, {9600,2}, {134,2}, {509,2}}
     return award
 end
 

@@ -1350,8 +1350,8 @@ function initActTime(y, m, d)
   local  SerStartTm556_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --新年大转盘活动
-  local  SerStartTm557= { ['year'] = 2014, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm557_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm557= { ['year'] = 2014, ['month'] = 4, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm557_1= { ['year'] = 2014, ['month'] = 5, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
     
   -- 繁体版
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1460,7 +1460,7 @@ function initActTime(y, m, d)
   -- 五一活动(节日套装)
   local  SerStartTm245 = { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --落英秘典
-  local  SerStartTm246 = { ['year'] = 2014, ['month'] = 2, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm246 = { ['year'] = 2014, ['month'] = 5, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --消费抽奖活动
   local  SerStartTm247= { ['year'] = 2013, ['month'] = 5, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1938,7 +1938,7 @@ function initActTime(y, m, d)
   actTime245_1= os.time(SerStartTm245) + 7*86400;
 
   actTime246_0= os.time(SerStartTm246)
-  actTime246_1= os.time(SerStartTm246) + 2*86400;
+  actTime246_1= os.time(SerStartTm246) + 3*86400;
 
   actTime247_0= os.time(SerStartTm247)
   actTime247_1= os.time(SerStartTm247) + 7*86400;

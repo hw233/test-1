@@ -8905,7 +8905,12 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                 }
                     break;
                 case 0x13:
-                    player->OpTYSS(op);//领取每日礼包
+                    {
+                        UInt8 flag = 0;
+                        brd >> flag;//礼包编号
+                        if(flag > 0 && flag < 6)
+                            player->OpTYSS(op, flag);//领取每日礼包
+                    }
                     break;
                 default:
                     break;

@@ -267,11 +267,11 @@ namespace GObject
             exp *= 2;
 
         if(m_Player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
-            factorAdd = 1.0f;
-        else if(m_Player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
             factorAdd = 0.5f;
-        else if(m_Player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+        else if(m_Player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
             factorAdd = 0.3f;
+        else if(m_Player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+            factorAdd = 0.2f;
 
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp * factor + expBase * factorAdd), 0, extraExp, _writedb);
@@ -11310,11 +11310,11 @@ namespace GObject
         factor += fuzhanRatio;
 
         if(getBuffData(PLAYER_BUFF_CLAN1) > 0)
-            factor += 1.0f;
-        else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
             factor += 0.5f;
+        else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
+            factor += 0.3f;
         else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
-            factor  += 0.3f;
+            factor  += 0.2f;
 
         return factor;
     }
@@ -11497,11 +11497,11 @@ namespace GObject
                     UInt32 pexpAdd = 0;
                     UInt32 pexpBase = fgt->getBasePExpEach() * pfexp->counts[i];
                     if(getBuffData(PLAYER_BUFF_CLAN1) > 0)
-                        pexpAdd = pexpBase * 1.0f;
-                    else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
                         pexpAdd = pexpBase * 0.5f;
-                    else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
+                    else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
                         pexpAdd = pexpBase * 0.3f;
+                    else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
+                        pexpAdd = pexpBase * 0.2f;
 
                     fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }
@@ -11567,11 +11567,11 @@ namespace GObject
                     UInt32 pexpAdd = 0;
                     UInt32 pexpBase = fgt->getBasePExpEach() * pfexp->counts[i];
                     if(getBuffData(PLAYER_BUFF_CLAN1) > 0)
-                        pexpAdd = pexpBase * 1.0f;
-                    else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
                         pexpAdd = pexpBase * 0.5f;
-                    else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
+                    else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
                         pexpAdd = pexpBase * 0.3f;
+                    else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
+                        pexpAdd = pexpBase * 0.2f;
 
                     fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }
@@ -26828,7 +26828,7 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
     if(!World::getGGTime())
         return ; 
     UInt32 now = TimeUtil::Now();
-    if(now <( World::getOpenTime() + 7 * 86400) || now >( World::getOpenTime() + 14* 86400))
+    if(now <( World::getOpenTime() + 14 * 86400) || now >( World::getOpenTime() + 25* 86400))
         return ;
     if(type == 0)
     {
@@ -27837,42 +27837,42 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             UInt8 consume_pos = flag % 4;
             UInt8 tmp_int = 0;
             static UInt32 awards[10][4][2] = {
-                {{503,10},  {500,2}, {501,2}, {99,10}},
-                {{56,8},  {57,8}, {0,0}, {29,10}},
-                {{9649,6}, {9390,6}, {0,0}, {80,8}},
-                {{9604,3}, {9603,3}, {9600,3}, {119,8}},
-                {{9418,10}, {9414,5}, {9413,5},{199,5}},
-                {{9438,10}, {509,3}, {0,0},{299,5}},
-                {{515,10}, {514,5}, {0,0},{499,3}},
-                {{9338,5}, {9310,3}, {9308,3},{210,3}},
-                {{9022,8}, {9075,8}, {0,0},{2399,5}},
-                {{1728,1}, {0,0}, {0,0},{599,1}},
+                {{503,5},  {500,1}, {501,1}, {49,20}},
+                {{56,8},  {57,8}, {0,0}, {29,20}},
+                {{9360,5}, {9093,5}, {0,0}, {50,10}},
+                {{9371,10}, {9388,1}, {0,0}, {89,10}},
+                {{515,5}, {514,5}, {0,0},{200,10}},
+                {{8000,5}, {33,5}, {0,0},{75,20}},
+                {{1126,5}, {1125,5}, {0,0},{51,20}},
+                {{516,5}, {547,5}, {0,0},{131,10}},
+                {{9075,5}, {9019,5}, {0,0},{1200,5}},
+                {{1701,1}, {1700,1}, {0,0},{1198,2}},
             };
 
             UInt32 clan_contribute = GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
             UInt32 clan_sum = clan->GetTYSSSum();
 
-            if(clan_contribute < 100 && clan_sum < 3000)
+            if(clan_contribute < 100 && clan_sum < 2000)
                 return;
             else
                 if( flag > 1)
                 {
-                    if(clan_contribute < 200 || clan_sum < 19000)
+                    if(clan_contribute < 200 || clan_sum < 14000)
                         return;
                 }
                 else if( flag > 3 )
                     {
-                        if(clan_contribute < 300 || clan_sum < 40000)
+                        if(clan_contribute < 300 || clan_sum < 23000)
                             return;
                     }
                     else if( flag > 5 )
                         {
-                            if(clan_contribute < 400 || clan_sum < 70000)
+                            if(clan_contribute < 400 || clan_sum < 46000)
                                 return;
                         }
                         else if( flag > 7 )
                         {
-                            if(clan_contribute < 500 || clan_sum < 100000)
+                            if(clan_contribute < 500 || clan_sum < 70000)
                                 return;
                         }
 
@@ -28025,16 +28025,16 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             UInt32 consume3 = GetVar(VAR_TYSS_DISCOUNT_CONSUME3); 
             Stream st(REP::ACT);  
             st << static_cast<UInt8>(0x31) << static_cast<UInt8>(0x08) << static_cast<UInt8>(10);
-            st << static_cast<UInt8>(10 - GET_BIT_8(consume1,0)); 
-            st << static_cast<UInt8>(10 - GET_BIT_8(consume1,1)); 
-            st << static_cast<UInt8>(8 - GET_BIT_8(consume1,2)); 
-            st << static_cast<UInt8>(8 - GET_BIT_8(consume1,3)); 
-            st << static_cast<UInt8>(5 - GET_BIT_8(consume2,0)); 
-            st << static_cast<UInt8>(5 - GET_BIT_8(consume2,1)); 
-            st << static_cast<UInt8>(3 - GET_BIT_8(consume2,2)); 
-            st << static_cast<UInt8>(3 - GET_BIT_8(consume2,3));
-            st << static_cast<UInt8>(5 - GET_BIT_8(consume3,0)); 
-            st << static_cast<UInt8>(1 - GET_BIT_8(consume3,1));  
+            st << static_cast<UInt8>(20 - GET_BIT_8(consume1,0));
+            st << static_cast<UInt8>(20 - GET_BIT_8(consume1,1));
+            st << static_cast<UInt8>(10 - GET_BIT_8(consume1,2));
+            st << static_cast<UInt8>(10 - GET_BIT_8(consume1,3));
+            st << static_cast<UInt8>(10 - GET_BIT_8(consume2,0));
+            st << static_cast<UInt8>(20 - GET_BIT_8(consume2,1));
+            st << static_cast<UInt8>(20 - GET_BIT_8(consume2,2));
+            st << static_cast<UInt8>(10 - GET_BIT_8(consume2,3));
+            st << static_cast<UInt8>(5 - GET_BIT_8(consume3,0));
+            st << static_cast<UInt8>(2 - GET_BIT_8(consume3,1));
             st << Stream::eos;
             send(st);
 
@@ -28042,18 +28042,52 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             break;
         case 0x13://领取每日礼包
         {
-            if(GET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31))//已经领取过
+            /*if(GET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31))//已经领取过
                 return;
             if(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY) < 50)
-                return;
-            
-            if(GetPackage()->GetRestPackageSize() > 9)
+                return;*/
+            UInt32 todayContribution = GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY);
+            UInt8 awardStatus[5] = {0};
+            UInt32 needContriLevel[5] = { 50, 100, 300, 700, 1800};
+            for(UInt8 i = 0; i < 5; i++)
             {
-                GetPackage()->AddItem(500, 2, true, false, FromTYSS);
-                GetPackage()->AddItem(503, 2, true, false, FromTYSS);
-                GetPackage()->AddItem(15, 3, true, false, FromTYSS);
-                GetPackage()->AddItem(9371, 3, true, false, FromTYSS);
-                SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));//打上当日领取奖品的标记
+                awardStatus[i] = GET_BIT(todayContribution, 27 + i);
+            }
+            todayContribution = todayContribution << 6;
+            todayContribution = todayContribution >> 6;
+            
+            if(needContriLevel[flag - 1] > todayContribution || awardStatus[flag - 1] == 1)
+                return;
+
+            static UInt32 everydayAward[5][7][2] = {
+                { {500, 2}, {503, 2}, {9371, 3}, {15, 2}, {0, 0}, {0, 0}, {0, 0} },
+                { {514, 2}, {1126, 2}, {56, 2}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {501, 3}, {547, 3}, {517, 3}, {0, 0}, {0, 0}, {0, 0}, {0 ,0} },
+                { {134, 3}, {1325, 3}, {9338, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {1719, 1}, {1717, 1}, {1700, 1}, {1711, 1}, {1709, 1}, {1701, 1}, {1703, 1} },
+            };
+            UInt8 totalPackageSize = 0;
+            for(UInt8 i = 0; i < 7; i++)
+            {
+                totalPackageSize += everydayAward[flag - 1][i][1];
+            }
+
+            if(GetPackage()->GetRestPackageSize() > totalPackageSize)
+            {
+                if(flag != 5)
+                {
+                    for(UInt8 i = 0; i < 7; i++)
+                    {
+                        if(everydayAward[flag - 1][i][0])
+                            GetPackage()->AddItem(everydayAward[flag - 1][i][0],everydayAward[flag - 1][i][1] , true, false, FromTYSS);
+                    }
+                }
+                else
+                {
+                    UInt8 dayChoice = (TimeUtil::Now() - World::getOpenTime()) / 86400 - 7;
+                    GetPackage()->Add(everydayAward[flag - 1][dayChoice][0], 1 , true, false, FromTYSS);
+                }
+                SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY), 26 + flag));//打上当日领取奖品的标记
             }
             else
             {
@@ -28121,19 +28155,19 @@ void Player::EatLingGuo(UInt32 num)
     switch(flag)
     {
         case 0:
-            if(clan_sum >= 3000)
+            if(clan_sum >= 2000)
                 SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"幼年期神兽");
         case 1:
-            if(clan_sum >= 19000)
+            if(clan_sum >= 14000)
                 SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"成长期神兽");
         case 2:
-            if(clan_sum >= 40000)
+            if(clan_sum >= 23000)
                 SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"青年期神兽");
         case 3:
-            if(clan_sum >= 70000)
+            if(clan_sum >= 46000)
                 SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"亚圣兽期");
         case 4:
-            if(clan_sum >= 100000)
+            if(clan_sum >= 70000)
                 SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"天元神兽");
         default:
             break;
