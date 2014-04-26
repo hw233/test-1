@@ -464,6 +464,7 @@ function loadStore()
         store:add(5,5141,500)
 
         -- 荣誉
+        store:add(6,9457,1500)
         store:add(6,9602,1300)
         store:add(6,9340,1000)
         store:add(6,1504,3000)
