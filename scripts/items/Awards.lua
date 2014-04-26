@@ -1775,7 +1775,7 @@ local collectChance = {
 local Card = {8,7,5,4,3,6,1,2}
 function GetCardByChance(player ,cnt1,cnt2,cnt3)
     local chance ={0,0,0,0}
-    local cnts = {} 
+    local cnts = {0,0,0,0} 
     local color = 1
     cnts[1] = 0
     cnts[2] = cnt1
@@ -1799,7 +1799,8 @@ function GetCardByChance(player ,cnt1,cnt2,cnt3)
         return 0
     end
     local idx = 1
-    if g > 5000 then
+    local r = math.random(1, 10000)
+    if r > 5000 then
         idx = 2
     end
     return Card[(color-1)*2 +idx]
