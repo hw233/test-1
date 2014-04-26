@@ -157,7 +157,8 @@ namespace GObject
         else
             st << it->second->spe_mark;
         
-        st << it->second->active;
+        if(suit_lvl != 20)
+            st << it->second->active;
             
         return true;
     }
