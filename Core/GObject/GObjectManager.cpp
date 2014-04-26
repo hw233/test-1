@@ -7252,7 +7252,7 @@ namespace GObject
             return false;
         LoadingCounter lc("Loading Collect Card");
         DBCollectCnt t;
-        if(execu->Prepare("SELECT `playerId`, `level`, `bluecnt`, `purlecnt`, `orangecnt` FROM `collect_cnt` ORDER BY `playerId`", t)!= DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`, `lev`, `bluecnt`, `purlecnt`, `orangecnt` FROM `collect_cnt` ORDER BY `playerId`", t)!= DB::DB_OK)
             return false;
         lc.reset(1000);
         while(execu->Next() == DB::DB_OK)

@@ -411,6 +411,8 @@ namespace Script
         void getJiqirenAward_Copy(Player* player, UInt8 isFree);
         void getJiqirenAward_FrontMap(Player* player, UInt8 isFree);
         void getJiqirenAward_Dungeon(Player* player, UInt8 diff, UInt8 isFree);
+        UInt16 getSpeCard(UInt16 itemId);
+        UInt16 getsuitAttr(UInt8 suitId);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
