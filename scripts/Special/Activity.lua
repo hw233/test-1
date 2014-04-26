@@ -9143,7 +9143,7 @@ function SurnameLegendLoot(player,lootlvl)
     --package:AddItem(9401, itemNum[lootlvl], true,0,10);
     --package:AddItem(9422, itemNum[lootlvl], true,0,10);
     --package:AddItem(9437, itemNum[lootlvl], true,0,10);
-    package:AddItem(9496, itemNum[lootlvl], true,0,10);
+    package:AddItem(16010, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装

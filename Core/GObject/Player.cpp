@@ -5160,7 +5160,7 @@ namespace GObject
 
 #endif
 #endif // _WIN32
-        if(ci && ci->purchaseType != TrainFighter && ci->purchaseType != ZCJBRoolAward)
+        if(ci && ci->purchaseType != TrainFighter && ci->purchaseType != ZCJBRoolAward && ci->purchaseType != ZhengHun && ci->purchaseType != DINGQINGXINWU && ci->purchaseType != JieHun)
         {
             AddVar(VAR_USEGOLD_CNT, c);
             AddHYYJCount(c);
@@ -5168,9 +5168,9 @@ namespace GObject
             {
                UInt32 val =  GetVar(VAR_SUMMERMEET_SCORE5);
                if((val + c) >= 1000)
-                   SetVar(VAR_SUMMERMEET_SCORE5 ,1000);
+                   SetVar(VAR_SUMMERMEET_SCORE5, 1000);
                else
-                   AddVar(VAR_SUMMERMEET_SCORE5 ,c );
+                   AddVar(VAR_SUMMERMEET_SCORE5, c);
                sendSummerMeetScoreInfo();
             }
         }
@@ -25141,7 +25141,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
             //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-            GetPackage()->AddItem(9496, 1, true, false, FromNpc);
+            GetPackage()->AddItem(16010, 1, true, false, FromNpc);
         }
         else
         {
@@ -25152,7 +25152,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
                 //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-                GetPackage()->AddItem(9496, 1, true, false, FromNpc);
+                GetPackage()->AddItem(16010, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
@@ -26058,7 +26058,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1300,2350,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
@@ -26105,21 +26105,21 @@ void Player::Send11GradeAward(UInt8 type)
 {
     if(type > 11)
         return ;
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1300,2350,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
-        {{9424,1 }, {503,1}},
-        {{501,2},{500,2}},
-        {{9604,3},{513,2},{9438,1}},
-        {{9600,2},{516,2},{503,2}},
+        {{9418,1}, {503,1}},
+        {{501,2},{9497,2}},
+        {{9603,3},{9438,2}},
+        {{9414,2},{16001,2},{1126,2}},
         {{547,3},{9308,3},{517,3}},
-        {{549,1},{551,2},{134,2}},
-        {{1325,2},{503,2},{509,2},{134,2},{9438,2}},
-        {{1728,1},{8555,4}},
+        {{549,1},{551,3},{8000,4}},
+        {{16001,3},{9498,2},{509,2},{134,2},{9438,2}},
+        {{1729,1},{8555,4}},
         {{9600,25},{9418,25},{9424,40}},
-        {{9068,20}},
-        {{9019,20},{9017,20},{9022,15}},
+        {{9498,50},{9022,10}},
+        {{9021,10},{9068,15},{9075,15}},
     };
-    static UInt32 count[] = {2,2,3,3,3,3,5,2,3,1,3};
+    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,2,3};
     SYSMSG(title, 4954);
     if(type)
     {
