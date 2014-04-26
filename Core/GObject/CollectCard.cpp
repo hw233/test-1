@@ -413,7 +413,7 @@ namespace GObject
 
     void CollectCard::UpGradeCard(UInt32 id,std::vector<UInt32>& vecid)//卡片升级
     {
-        UInt16 add_exp = 0;
+        //UInt16 add_exp = 0;
         std::vector<UInt32>::iterator it = vecid.begin();
         
         if(MapFreeCardSlot.find(id) == MapFreeCardSlot.end())
@@ -639,6 +639,7 @@ namespace GObject
 
         //TODO DB
         DB4().PushUpdateData("DELETE FROM `card` WHERE `playerId` = %" I64_FMT "u and `id` = '%u'", m_owner->getId(),id);
+        return true;
     }
 
     void CollectCard::ExchangeSpeCard(UInt16 itemid)
