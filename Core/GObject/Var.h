@@ -711,8 +711,8 @@ namespace GObject
         VAR_ATOXJFM = 730,     //自动璇玑阵图id
         // 731 - 740 for lib
         VAR_FRIEND_ACHIEVEMENT  = 731,  //友好度成就奖励领取情况
-        VAR_CLAN_FRIEND = 732 ,    //帮派玩家是否增加过友好度(8位) , 玩家购买的剩余饮酒次数 ,玩家总购买的次数 
-        VAR_DRINK_COUNT = 733 ,    //饮酒次数 主动发起(8位) ,被动接受(8位)
+        VAR_CLAN_FRIEND = 732 ,    //帮派玩家是否增加过友好度(8位) , 玩家购买的剩余饮酒次数 
+        VAR_DRINK_COUNT = 733 ,    //饮酒次数 主动发起(8位) ,被动接受(8位) ,玩家总购买的次数 
         VAR_DRINK_VALUE = 734 ,    //豪饮值
         VAR_FRIEND_VALUE_DAY = 735 ,    //每日友情值
         //752 - 770 for dtc

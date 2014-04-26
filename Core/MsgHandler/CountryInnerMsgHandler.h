@@ -2863,13 +2863,14 @@ void OnBeAcceptDrinking(GameMsgHdr & hdr ,const void *data)
         UInt64 playerId; 
         UInt8 res ;
         UInt8 type;
+        UInt8 count ;
     };
     MSG_QUERY_PLAYER(player);
     struct st _st  = *reinterpret_cast<const struct st *>(data);
 	GObject::Player * pl = GObject::globalPlayers[_st.playerId];
     if(pl==NULL)
         return ;
-    player->beReplyForDrinking(pl,_st.res ,_st.type);
+    player->beReplyForDrinking(pl,_st.res ,_st.type , _st.count);
 }
 void OnBeRefuceBrother(GameMsgHdr & hdr ,const void *data)
 {
@@ -2888,7 +2889,8 @@ void OnAfterDrink(GameMsgHdr & hdr ,const void *data)
 void OnCalcDrink(GameMsgHdr & hdr ,const void *data)
 {
     MSG_QUERY_PLAYER(player);
-    player->calcDrinkPoint();
+    UInt8 type = *reinterpret_cast<const UInt8 *>(data);
+    player->calcDrinkPoint(type);
 }
 void OnBeginDrink(GameMsgHdr & hdr ,const void *data)
 {

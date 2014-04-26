@@ -1553,8 +1553,8 @@ void PetTeamCopy::teamBattleStart(Player* pl)
                     continue;
                 if(pl->getThreadId() != p->getThreadId())
                     continue ;
-                pl->CompleteFriendlyTask(p,3 ,1);
-                p->CompleteFriendlyTask(pl,3 ,1);
+                pl->CompleteFriendlyTask(p,4 ,1);
+                p->CompleteFriendlyTask(pl,4 ,1);
             }
         }
     }

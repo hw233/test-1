@@ -13,9 +13,9 @@ namespace GData
         stDrinkAttr* da = NULL;
         for(;it != _drinkAttr.end();++it)
         {
-            da = &(it->second);
             if(val < it->first )
                 break;
+            da = &(it->second);
         }
         return da;
     }

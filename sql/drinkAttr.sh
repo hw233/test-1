@@ -1,30 +1,33 @@
+
+
 #!/bin/bash
 
-F=clanbuildingtemplate.txt
+F=drinkAttr.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function clanbuildingtemplate()
+function drinkAttr()
 {
+# 11,"302,2,3|303,1",0,40,"3,4"
     f=$1
-    d=clanbuildingtemplate
-    sed -i /建筑等级/d $f
-    sed -i /EXP/d $f
-    sed -i /level/d $f
+    d=drinkAttr
+    sed -i /ID/d $f
+    sed -i /hp/d $f
     sed -i /^$/d $f
+    sed -i /REF/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `clan_building_template` VALUES";
+            print "INSERT INTO `drinkAttr` VALUES";
         } {
-            printf("(%d,%d,%d,%d,%d,%d,%d)",$1,$2,$4,$5,$6,$7,$8);
-            if (NR < ENVIRON["lines"])
+            printf("(%d,%d)",$1,$2);
+            if (NR <= ENVIRON["lines"])
                 printf(",");
-            else if (NR >= ENVIRON["lines"])
+            else if (NR > ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }
@@ -50,8 +53,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    clanbuildingtemplate $F
+    drinkAttr $F
 else
     echo "File $F is not exists"
 fi
-

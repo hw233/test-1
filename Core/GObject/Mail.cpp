@@ -438,8 +438,19 @@ bool MailBox::delMail( UInt32 id, bool freeAdd )
 					mailPackageManager.remove(id);
 			}
 			break;
+        case 0x16:
+            {
+                Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
+                if(pl == NULL)
+                    return false;
+                UInt64 playerId = _owner->getId();
+                GameMsgHdr hdr(0x405, pl->getThreadId(), pl, sizeof(UInt64));
+                GLOBAL().PushMsg(hdr, &playerId);
+                mailPackageManager.remove(id);
+            }
+            break;
 		}
-	}
+    }
 
 	_mailBox.erase(it);
 	DB1().PushUpdateData("DELETE FROM `mail` WHERE `mailId` = %u", id);

@@ -1409,7 +1409,7 @@ void Clan::listMembers( Player * player )
 		ClanMember * mem = *offset;
         if (!mem || !mem->player)
             continue;
-		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << getMemberActivePoint(mem) << mem->player->getLastOnline() << mem->player->getPF() << mem->last_actpt << mem->player->GetVar(VAR_CLAN_ACTPT_MONTH);
+		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << getMemberActivePoint(mem) << mem->player->getLastOnline() << mem->player->getPF() << mem->last_actpt << mem->player->GetVar(VAR_CLAN_ACTPT_MONTH) <<static_cast<UInt8>( mem->player->GetVar(VAR_LEFTADDR_POWER) );
 	}
 	st << Stream::eos;
 	player->send(st);
@@ -3838,6 +3838,7 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
             st <<  static_cast<UInt8>(pl->GetVar(VAR_FRIEND_SECURITY));
             st << player->getFriendlyCount(pl->getId());
             st << static_cast<UInt8>(player->_hasBrother(pl));
+            st << static_cast<UInt8>(player->GetYBCount(pl));
             ++it;
         }
     }

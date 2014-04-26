@@ -2423,14 +2423,18 @@ namespace GObject
             gMarriedMgr.ProcessOnlineAward(this,1);
             gMarriedMgr.EnterCoupleCopy(this,0);
         }
-        if(getDrinkInfo().type !=0 && getDrinkInfo().drinker!=0 )
+        if(getDrinkInfo().drinker !=NULL )
         {
             Player * friendOne = getDrinkInfo().drinker;   
             calcDrinkPoint();
-            GameMsgHdr hdr(0x407, friendOne->getThreadId(), friendOne, 0);
-            GLOBAL().PushMsg( hdr, NULL );
+            if(getDrinkInfo().type!=0)
+            {
+                UInt8 flag = 1;
+                GameMsgHdr hdr(0x407, friendOne->getThreadId(), friendOne, sizeof(UInt8));
+                GLOBAL().PushMsg( hdr, &flag );
+            }
         }
-	}
+    }
 
 	void Player::checkLastBattled()
 	{
@@ -4543,6 +4547,7 @@ namespace GObject
 		Mutex::ScopedLock lk2(pl->getMutex());
 		delFriendInternal(pl);
 		pl->delFriendInternal(this);
+
 	}
     void Player::delCFriend(Player* pl)
 	{
@@ -4557,6 +4562,7 @@ namespace GObject
 		std::set<Player *>::iterator it = _friends[0].find(pl);
 		if(it == _friends[0].end())
 			return;
+        beRefuceBrother(pl,1);
 		_friends[0].erase(it);
 		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x02) << pl->getName() << Stream::eos;
@@ -4565,6 +4571,23 @@ namespace GObject
 		SYSMSG_SENDV(1034, this, pl->getCountry(), pl->getName().c_str());
 
         std::map<UInt64,FriendCount >::iterator it_count = _friendlyCount.find(pl->getId());
+        std::map<UInt64,UInt32>::iterator it_brother = _brothers.find(pl->getId());
+        //std::map<UInt64,FriendYellowBird >::iterator it_bird = _friendYB.find(pl->getId());
+        //std::map<UInt64,FriendTaskNum >::iterator it_task = _friendTask.find(pl->getId());
+
+        if(it_brother != _brothers.end())
+        {
+            _brothers.erase(it_brother) ;
+        }
+      //  if(it_bird != _friendYB.end())
+      //  {
+      //      _friendYB.erase(it_bird) ;
+      //  }
+      //  if(it_task != _friendTask.end())
+      //  {
+      //      _friendTask.erase(it_task) ;
+      //  }
+        
         if(it_count != _friendlyCount.end())
         {
             _friendlyCount.erase(it_count);
@@ -30059,17 +30082,32 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
 
     static UInt8 task_num_val_max[][5] = {
         {1,1,1,3,3},
-        {1,1,1,3,5},
+        {1,1,1,3,3},
         {1,1,1,1,1},
         {1,10,1,10,1},
         {1,4,1,4,1},
-        {1,20,1,20,10},
+        {1,10,2,10,10},
     };
+
+    UInt32 now = TimeUtil::Now();
+    std::map<UInt64,FriendTaskNum >::iterator it_task = _friendTask.find(friendOne->getId());
+    if(it_task == _friendTask.end())
+    {
+        FriendTaskNum ft;
+        _friendTask[friendOne->getId()] = ft ;
+        it_task = _friendTask.find(friendOne->getId());
+    }
+    if(now > it_task->second.clearTime)
+    {
+       it_task->second.clear( TimeUtil::SharpDay(1,now) );
+    }
 
     UInt32 count_var =GetVar(VAR_FRIEND_TASK1 + taskNum/3);  
     UInt8 count = GET_BIT_8(count_var , taskNum%3);
-    if(count < task_num_val_max[taskNum][1])
+
+    if(it_task->second.taskNum[taskNum] < task_num_val_max[taskNum][1])
     {
+        ++it_task->second.taskNum[taskNum];
         AddFriendlyCount( friendOne , task_num_val_max[taskNum][0]);
     }
     else
@@ -30083,7 +30121,6 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
         count_var = SET_BIT_8(count_var , taskNum %3 , (count +1) );
         SetVar(VAR_FRIEND_TASK1+taskNum/3 , count_var);
     }
-
     if((count + 1) == task_num_val_max[taskNum][4] )
     {
         UInt8 dayTaskNum = 0 ;
@@ -30091,18 +30128,20 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
         {
             UInt32 count_var_value =GetVar(VAR_FRIEND_TASK1 + i/3);  
             UInt8 count_num = GET_BIT_8(count_var_value , i%3);
-            if(count_num == task_num_val_max[taskNum][4]) 
+            if(count_num == task_num_val_max[i][4]) 
                 ++dayTaskNum ;
         }
         if(dayTaskNum == 5)
         {
             AddVar(VAR_FRIEND_VALUE , 5);
             AddVar(VAR_FRIEND_VALUE_DAY , 5);
+            std::cout << "XXX5" <<std::endl;
         }
         if(dayTaskNum == 6)
         {
-            AddVar(VAR_FRIEND_VALUE , 6);
-            AddVar(VAR_FRIEND_VALUE_DAY , 6);
+            AddVar(VAR_FRIEND_VALUE , 3);
+            AddVar(VAR_FRIEND_VALUE_DAY , 3);
+            std::cout << "XXX6" <<std::endl;
         }
     }
 
@@ -30169,29 +30208,39 @@ void Player::BuyLeftPower()
     GLOBAL().PushMsg(hdr1, NULL);
 }
 
-void Player::AddFriendlyCount(Player * friendOne , UInt8 val) 
+void Player::AddFriendlyCount(Player * friendOne , UInt32 val) 
 {
     if( !friendOne )
         return ;
     std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendOne->getId());
     if(it != _friendlyCount.end())
     {
+        if( ( it->second.value < 5000 ) && (it->second.value + val > 5000))
+            OnShuoShuo(SS_FRIEND_2);
         it->second.value += val; 
     }
     else 
     {
-        FriendCount fc(val);
+        FriendCount fc;
+        fc.setFriendValue(val);
         _friendlyCount[friendOne->getId()] = fc ; 
     }
     UpdateFriendlyCountToDB(friendOne->getId());
 }
-void Player::LoadFriendlyCountFromDB(UInt64 friendId , UInt32 val ,UInt32 time ,UInt32 cost , UInt8 wait)
+void Player::LoadFriendlyCountFromDB(UInt64 friendId , UInt32 val ,UInt32 time ,UInt32 cost , UInt8 wait ,UInt8 flag)
 {
     Player* friendOne = globalPlayers[friendId];
     if(friendOne == NULL)
         return ;
-    FriendCount fc(val,time,cost,wait);
-    _friendlyCount[friendId] = fc;
+    std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendId);
+    if(it == _friendlyCount.end())
+    {
+        FriendCount fc;
+        _friendlyCount[friendId] = fc;
+    }
+    if(!flag)
+        _friendlyCount[friendId].setTimeCostFlag(time,cost,wait);
+    _friendlyCount[friendId].setFriendValue(val);
 }
 void Player::UpdateFriendlyCountToDB(UInt64 friendId)
 {
@@ -30200,9 +30249,16 @@ void Player::UpdateFriendlyCountToDB(UInt64 friendId)
         return ;
 
     std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendId);
+    std::map<UInt64,FriendTaskNum >::iterator it_task = _friendTask.find(friendId);
     if(it == _friendlyCount.end())
         return ;
-    DB1().PushUpdateData("REPLACE INTO `friendlyCount` (`playerId`, `friendId` , `value` , `isBrother` , `time` ,`cost`,`wait`) VALUES (%" I64_FMT "u, %" I64_FMT "u , %u , %d , %u ,%u ,%d)", getId(), friendId,it->second.value,static_cast<UInt8>(_hasBrother(friendOne)),it->second.time , it->second.cost , it->second.flag);
+    if(it_task == _friendTask.end())
+    {
+        FriendTaskNum ft;
+        _friendTask[friendOne->getId()] = ft ;
+        it_task = _friendTask.find(friendOne->getId());
+    }
+    DB1().PushUpdateData("REPLACE INTO `friendlyCount` (`playerId`, `friendId` , `value` , `isBrother` , `time` ,`cost`,`wait`,`clearTime`,`task1`,`task2`,`task3`,`task4`,`task5`,`task6`) VALUES (%" I64_FMT "u, %" I64_FMT "u , %u , %d , %u ,%u ,%d,  %u,%d,%d,%d,%d,%d,%d)", getId(), friendId,it->second.value,static_cast<UInt8>(_hasBrother(friendOne)),it->second.time , it->second.cost , it->second.flag , it_task->second.clearTime , it_task->second.taskNum[0] , it_task->second.taskNum[1] , it_task->second.taskNum[2] , it_task->second.taskNum[3] , it_task->second.taskNum[4] , it_task->second.taskNum[5]);
 }
 void Player::sendFirendlyCountTaskInfo()
 {
@@ -30216,7 +30272,7 @@ void Player::sendFirendlyCountTaskInfo()
     st << static_cast<UInt8>( GET_BIT_8(Count,0) );
     st << static_cast<UInt8>(GET_BIT_8(Count,1));
     st << static_cast<UInt8>(GET_BIT_8(buyCount,1));
-    st << static_cast<UInt8>(GET_BIT_8(buyCount,2));
+    st << static_cast<UInt8>(GET_BIT_8(Count,2));
     st << static_cast<UInt8>(GetVar(VAR_FRIEND_ACHIEVEMENT));
     for(UInt8 i = 0; i < 6; ++i)     
     {
@@ -30328,13 +30384,22 @@ void Player::getFriendlyAchievement(UInt8 opt)
         AddVar(VAR_FRIEND_VALUE_DAY , AchievementAward[opt]);
         getAcAward |= (1 << opt );
         SetVar(VAR_FRIEND_ACHIEVEMENT , getAcAward);
+        UInt8 cnt = 0;
+        UInt8 i = 0;
+        while( i< 8 )
+        {
+            if(getAcAward & (1 << i++))
+                cnt ++; 
+        }
+        if(cnt == 1)
+            OnShuoShuo(SS_FRIEND_3);
+        if(cnt == 8)
+            OnShuoShuo(SS_FRIEND_4);
     }
     sendFirendlyCountTaskInfo();
 }
 bool Player::acceptBrother(Player * friendOne , UInt8 flag)
 {
-    if(!_hasFriend(friendOne))
-        return false;
     if(flag > 3)
     {
         sendMsgCode(2,4017);
@@ -30343,23 +30408,106 @@ bool Player::acceptBrother(Player * friendOne , UInt8 flag)
     if(flag == 3 )
         return false;
 
+    if(!_hasFriend(friendOne))
+        return false;
+
     UInt64 friendId = getId();
-    if(flag)
+
+    UInt32 Count = 0 ;
+    if(_friendlyCount[friendOne->getId()].value < 500)
     {
-        UInt32 now = TimeUtil::Now();
-        std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendOne->getId());
-        if(it->second.time == 0 || it->second.flag != 1)
-            flag = 3;
-        else
-        {
-            UInt32 Count = ( 500 - _friendlyCount[friendOne->getId()].value )/20 +1 ; 
-            if(!UseMeiHuaJian(16005,Count) )
-                return false;
-            it->second.setTimeCostFlag(now,Count,0);
-            InsertBrother(friendOne);
-            UpdateFriendlyCountToDB(friendOne->getId());
-        }
+        Count = ( 500 - _friendlyCount[friendOne->getId()].value )/20; 
+        if(( 500 - _friendlyCount[friendOne->getId()].value )%20)
+            ++Count;
     }
+
+    UInt32 now = TimeUtil::Now();
+    std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendOne->getId());
+    //   if(flag)
+    //   {
+    //       UInt32 now = TimeUtil::Now();
+    //       std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendOne->getId());
+    //       if(it->second.time == 0 || it->second.flag != 1 )
+    //           flag = 3;
+    //       else
+    //       {
+    //           if(flag == 2)
+    //           {
+    //               if(!UseMeiHuaJian(16005,Count))
+    //               {
+    //                   return false;
+    //               }
+    //           }
+    //           it->second.setTimeCostFlag(now,Count,0);
+    //           InsertBrother(friendOne);
+    //           UpdateFriendlyCountToDB(friendOne->getId());
+    //       }
+    //   }
+    //   else
+    //   {
+    //       if(!UseMeiHuaJian(16005,Count,1))
+    //       {
+    //           return false;
+    //       }
+    //   }
+    switch(flag)
+    {
+        case 0:
+            {
+                if(GetVar(VAR_MARRY_STATUS) == 5 && friendOne->getId() == GetMarriageInfo()->lovers)
+                {
+                    UInt64 playerId = getId();
+                    GameMsgHdr hdr(0x405, friendOne->getThreadId(), friendOne, sizeof(UInt64));
+                    GLOBAL().PushMsg(hdr, &playerId);
+                    return false;
+                }
+                if(!UseMeiHuaJian(16005,Count,1))
+                {
+                    return false;
+                }
+            }
+            break;
+        case 1:
+            {
+                if(it->second.time == 0 || it->second.flag != 1 )
+                    flag = 3;
+                else
+                {
+                    it->second.setTimeCostFlag(now,Count,0);
+                    if(_brothers.size() == 0)
+                    {
+                        OnShuoShuo(SS_FRIEND_1) ;
+                    }
+                    InsertBrother(friendOne);
+                    UpdateFriendlyCountToDB(friendOne->getId());
+                    sendFriendlyTimeAndCost();
+                    SYSMSGV(title, 404);
+                    SYSMSGV(content, 405, friendOne->getCountry(), friendOne->getName().c_str());
+                    GetMailBox()->newMail(NULL, 0x01, title, content);
+                }
+                break;
+            }
+        case 2:
+            {
+                if(!UseMeiHuaJian(16005,Count))
+                {
+                    return false;
+                }
+                it->second.setTimeCostFlag(now,Count,0);
+
+                if(_brothers.size() == 0)
+                {
+                    OnShuoShuo(SS_FRIEND_1) ;
+                }
+                InsertBrother(friendOne);
+                UpdateFriendlyCountToDB(friendOne->getId());
+                SYSMSGV(title, 404);
+                SYSMSGV(content, 405, friendOne->getCountry(), friendOne->getName().c_str());
+                GetMailBox()->newMail(NULL, 0x01, title, content);
+                break;
+            }
+    }
+
     //if(flag)
     {
         struct st
@@ -30369,11 +30517,11 @@ bool Player::acceptBrother(Player * friendOne , UInt8 flag)
         };
         st _st;
         _st.playerId = friendId;
-        _st.flag = flag ++ ;
+        _st.flag = flag + 1 ;
 
         if(friendOne->getThreadId() == getThreadId())
         {
-            friendOne->acceptBrother(this , flag);
+            friendOne->acceptBrother(this , flag + 1);
         }
         else
         {
@@ -30383,10 +30531,12 @@ bool Player::acceptBrother(Player * friendOne , UInt8 flag)
     }
     return true;
 }
-void Player::beRefuceBrother(Player * friendOne ,UInt8 flag )
+void Player::beRefuceBrother(Player * friendOne ,UInt8 flag )  //flag=0表示被拒绝，1表示取消
 {
-    UInt32 itemId = 0 ;
+    UInt32 itemId = 16005 ;
     if(!_hasFriend(friendOne))
+        return ;
+    if(_hasBrother(friendOne))
         return ;
 
     if(_friendlyCount[friendOne->getId()].time == 0)
@@ -30394,13 +30544,14 @@ void Player::beRefuceBrother(Player * friendOne ,UInt8 flag )
     UInt32 now = TimeUtil::Now();
     std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendOne->getId());
     UInt32 Count = it->second.cost; 
-    it->second.setTimeCostFlag(flag?now:it->second.time, 0 , 0);
+    it->second.setTimeCostFlag(flag?it->second.time:now, 0 , 0);
     if(Count!=0)
         GetPackage()->AddItem(itemId, Count, true, false, FromJieBai);
     sendFriendlyTimeAndCost();
     SYSMSGV(title, 402);
     SYSMSGV(content, 403, friendOne->getCountry(), friendOne->getName().c_str());
-    GetMailBox()->newMail(this, 0x01, title, content);
+    GetMailBox()->newMail(NULL, 0x01, title, content);
+    UpdateFriendlyCountToDB(friendOne->getId());
 }
 
 bool Player::IsAccept(Player * friendOne)
@@ -30410,20 +30561,38 @@ bool Player::IsAccept(Player * friendOne)
     return true;
 }
 
-void Player::drinking(Player * friendOne, UInt8 drinkCount)
+void Player::drinking(Player * friendOne, UInt8 drinkCount ,UInt8 flag)
 {
     if(friendOne != getDrinkInfo().drinker)
         return;
+    if( (_drinkingSum /100) && flag ==1)
+        return ;
+
+
     if(!drinkCount)
     {
+        if((_friendSum /100) && flag == 1) 
+        {
+            //Player * pl = getDrinkInfo().drinker;
+            calcDrinkPoint();
+            UInt8 flag = 0;
+            GameMsgHdr hdr(0x407, friendOne->getThreadId(), friendOne, sizeof(UInt8));
+            GLOBAL().PushMsg( hdr, &flag );
+            return ;
+        }
         UInt32 time = TimeUtil::Now() - getDrinkInfo().time;
         UInt8 count = rand() % 5 + 5;
-        if(time == 0)
-            return;
-        if( time < 20 && _drinkingSum < 50 )
+        if(flag == 1)
+        {
+            count = 100;
+            _drinkingSum += count;
+        }
+        else if ( (time < 25 && _drinkingSum < 50 ))
         { 
             _drinkingSum += count;
         }   
+        else
+            return ;
         if(friendOne->getThreadId() == getThreadId())
         {
             friendOne->drinking(this, count);
@@ -30443,13 +30612,12 @@ void Player::drinking(Player * friendOne, UInt8 drinkCount)
     }
     else
     {
-        if(_friendSum < 50)
-            _friendSum += drinkCount;
+        _friendSum += drinkCount;
     }
     Stream st(REP::BROTHER);
     st << static_cast<UInt8>(0x04);
-    st << static_cast<UInt8>(_drinkingSum);
-    st << static_cast<UInt8>(_friendSum);
+    st << static_cast<UInt8>(_drinkingSum %100);
+    st << static_cast<UInt8>(_friendSum %100);
     st << Stream::eos;
     send(st); 
 }
@@ -30462,15 +30630,15 @@ UInt32 Player::DrinkingPoint()
     float drinkingAdd = 0;
     float friendAdd = 0;
 
-    if(_drinkingSum > 0 && _drinkingSum < 40)
+    if(_drinkingSum <= 40)
     {
         drinkingAdd = 0.9;
     }
-    else if(_drinkingSum < 45)
+    else if(_drinkingSum <= 45)
     {
         drinkingAdd = 0.95;
     }
-    else if(_drinkingSum < 50)
+    else if(_drinkingSum <= 50)
     {
         drinkingAdd = 1;
     }
@@ -30479,15 +30647,15 @@ UInt32 Player::DrinkingPoint()
        drinkingAdd = 0.95;
     }
 
-    if(_friendSum >0 && _friendSum < 40)
+    if( _friendSum <= 40)
     {
         friendAdd = 0;
     }
-    else if(_friendSum < 45)
+    else if(_friendSum <= 45)
     {
         friendAdd = 0.05;
     }
-    else if(_friendSum <50)
+    else if(_friendSum <= 50)
     {
         friendAdd = 0.10;
     }
@@ -30504,24 +30672,44 @@ bool Player::CheckCanBeBrother(Player * friendOne , UInt8 type)
 {
     if(type > 1 ) 
         return false;
+    if(!_hasFriend(friendOne))
+        return false;
     if(_hasBrother(friendOne))
         return false;
     if(GetVar(VAR_MARRY_STATUS) == 5 && friendOne->getId() == GetMarriageInfo()->lovers)
         return false;
+
     std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendOne->getId());
-    if(it == _friendlyCount.end() && type == 0 )
-        return false;
+    if(it == _friendlyCount.end())
+    {
+        FriendCount fc;
+        _friendlyCount[friendOne->getId()] = fc ; 
+        it = _friendlyCount.find(friendOne->getId());
+        if(type == 0)
+            return false;
+    }
     if(type == 0 && it->second.value < 500)
         return false;
-    if(type == 0 && it->second.value >= 500)
-        return true ;
 
     UInt32 now = TimeUtil::Now();
+
     if(it->second.time !=0 && ( TimeUtil::SharpDay(1,it->second.time)  >=  TimeUtil::SharpDay(1,now) ))
-        return false;
-    if(type == 1 )
     {
-        UInt32 Count = ( 500 - _friendlyCount[friendOne->getId()].value )/20 +1 ; 
+        sendMsgCode(2,4018);
+        return false;
+    }
+
+    if(type == 0 && it->second.value >= 500)
+    {
+        it->second.setTimeCostFlag(now,0,1);
+        UpdateFriendlyCountToDB(friendOne->getId());
+        return true ;
+    }
+    if(type == 1 && it->second.value < 500)
+    {
+        UInt32 Count = ( 500 - _friendlyCount[friendOne->getId()].value )/20 ; 
+        if(( 500 - _friendlyCount[friendOne->getId()].value )%20)
+             ++ Count;
         if(!UseMeiHuaJian(16005,Count))
             return false;
         it->second.setTimeCostFlag(now,Count,1);
@@ -30529,7 +30717,7 @@ bool Player::CheckCanBeBrother(Player * friendOne , UInt8 type)
     }
     return true;
 }
-bool Player::CheckCanDrink( UInt8 type)
+UInt8 Player::CheckCanDrink( UInt8 type)
 {
    // Player* obj_player = GObject::globalPlayers[GetMarriageInfo()->lovers];
    // if(obj_player != friendOne && _hasBrother(friendOne))
@@ -30555,10 +30743,21 @@ void Player::InviteDrinking(Player * friendOne)   //邀请饮酒
 {
     if(getDrinkInfo().type == 0)
         return ;
+    bool flag = true;
+
 
     UInt32 now = TimeUtil::Now();
     std::map<UInt64,UInt32>::const_iterator it = _brothers.find(friendOne->getId());
-    if(now < it->second )
+    if(it == _brothers.end())
+        flag = false;
+    else if(now < it->second )
+    {
+        flag = false ;
+    }
+
+    if( GetVar(VAR_MARRY_STATUS) == 5 && friendOne->getId() == GetMarriageInfo()->lovers ) 
+        flag = true ;
+    if(!flag)
         return ;
 
     getDrinkInfo().plset.insert(friendOne);
@@ -30584,6 +30783,8 @@ void Player::beInviteDrinking(Player * pl , UInt8 type)  //被邀请对酒
 {
     if(pl==NULL||type == 0)
         return ;
+    if(getDrinkInfo().drinker!=NULL)
+        return ;
     Stream st(REP::BROTHER);
     st << static_cast<UInt8>(0x05);
     st << pl->getName();
@@ -30591,16 +30792,26 @@ void Player::beInviteDrinking(Player * pl , UInt8 type)  //被邀请对酒
     st << Stream::eos;
     send(st);
 }
-void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type)  //对酒邀请回复 res 0拒绝 1-接受   type -- 对酒类型
+void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 count)  //对酒邀请回复 res 0拒绝 1-接受   type -- 对酒类型
 {
+    if(count > 1)
+        return ;
     UInt8 shenfen = 0;  //0表示被邀请
     if(getDrinkInfo().type != 0)
         shenfen = 1;    //1表示主动邀请
     UInt32 now = TimeUtil::Now();
     UInt8 result = 0;
+    if(count)
+        result = res ;
+    bool flag = false ;
     std::map<UInt64,UInt32>::iterator it = _brothers.find(pl->getId());
-    if(it == _brothers.end()) 
+    if(it != _brothers.end()) 
+        flag = true ;
+    if( GetVar(VAR_MARRY_STATUS) == 5 && pl->getId() == GetMarriageInfo()->lovers ) 
+        flag = true ;
+    if(!flag)
         return ;
+
     if(res == 0 )
     {
         if(shenfen)    //主动方被拒绝，添加冷却时间
@@ -30610,17 +30821,11 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type)  //对酒�
         else           //被动方被拒绝，清楚标志位(_drinkInfo.drinker)
         {
             getDrinkInfo().reset(); 
-            Stream st(REP::BROTHER);
-            st << static_cast<UInt8>(6);
-            st << static_cast<UInt8>(2);
-            st << Stream::eos;
-            send(st);
+            sendMsgCode(2,4019);
         }
         return ;
     }
-    if(type !=0 && shenfen)   //防止即发起了对酒，又接受了邀请
-        return ;
-    if(getDrinkInfo().drinker == NULL)  //判断是否已经有人对酒
+    if(getDrinkInfo().drinker == NULL || getDrinkInfo().drinker == pl)  //判断是否已经有人对酒
     {
         std::set<Player *>::iterator it = getDrinkInfo().plset.find(pl);
         if(it != getDrinkInfo().plset.end())
@@ -30655,26 +30860,31 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type)  //对酒�
     st << playerName2;
     st << static_cast<UInt8>(type);
     st <<Stream::eos;
-    send(st);
-    if(shenfen) //主动方要告知被动房斗酒开始
+    if(result)
+        send(st);
+    if(shenfen || count == 0) //主动方要告知被动房斗酒开始
     {
         struct st 
         {
             UInt64 playerId1;
             UInt8 result ;
             UInt8 type ;
+            UInt8 count ;
         };
         st _st;
         _st.playerId1 = getId();
         _st.result = result;
         _st.type = type ;
+        _st.count = count + 1 ;
         GameMsgHdr hdr(0x404, pl->getThreadId(), pl , sizeof(_st));
         GLOBAL().PushMsg( hdr, &_st );
    }
             
 }
-bool Player::UseMeiHuaJian(UInt16 iid , UInt32 num)  //梅花笺
+bool Player::UseMeiHuaJian(UInt16 iid , UInt32 num , UInt8 use)  //梅花笺
 {
+    if(num == 0)
+        return true ;
     UInt16 count = GetPackage()->GetItemAnyNum(iid) ;
     ItemBase * item = GetPackage()->FindItem(iid, true);
     if (!item)
@@ -30683,8 +30893,11 @@ bool Player::UseMeiHuaJian(UInt16 iid , UInt32 num)  //梅花笺
         return false;
     if(num > count)
         return false;
-    GetPackage()->DelItemAny(iid, num );
-    GetPackage()->AddItemHistoriesLog(iid , num);
+    if(!use)
+    {
+        GetPackage()->DelItemAny(iid, num );
+        GetPackage()->AddItemHistoriesLog(iid , num);
+    }
     return true;
 }
 void Player::sendFriendlyTimeAndCost()
@@ -30702,6 +30915,8 @@ void Player::sendFriendlyTimeAndCost()
         Player* pl = globalPlayers[it->first];
         if( pl == 0 )
             continue;
+        if(GetVar(VAR_MARRY_STATUS) == 5 && pl->getId() == GetMarriageInfo()->lovers)
+            continue;
         if(_hasBrother(pl))
             continue;
         st << pl->getName() << static_cast<UInt32>(it->second.time) <<static_cast<UInt32>(it->second.cost);
@@ -30711,12 +30926,24 @@ void Player::sendFriendlyTimeAndCost()
     st << Stream::eos;
     send(st);
 }
+void Player::CancelBrother(Player * FriendOne)
+{
+    if(!FriendOne)
+        return ;
+    std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(FriendOne->getId());
+    if(it == _friendlyCount.end())
+        return ;
+    if(!it->second.flag)
+        return ;
+    else
+        it->second.flag = 0;
+    beRefuceBrother(FriendOne,1);
+    sendFriendlyTimeAndCost();
+}
 bool Player::AfterDrinking()
 {
-    if( getDrinkInfo().drinker == NULL || getDrinkInfo().time == 0)
+    if( getDrinkInfo().drinker == NULL )
         return false;     
-    if(!UseMeiHuaJian(16005 + getDrinkInfo().type , 1))
-        return false;
     Player * friendOne = getDrinkInfo().drinker ;
     if(friendOne == NULL)
         return false;
@@ -30724,6 +30951,8 @@ bool Player::AfterDrinking()
     bool res = true;
     if(getDrinkInfo().type != 0)
         shenfen = 1;    //1表示主动邀请
+    if(shenfen && !UseMeiHuaJian(16005 + getDrinkInfo().type , 1))
+        return false;
     UInt32 var_val = GetVar(VAR_DRINK_COUNT);
     UInt8 val = GET_BIT_8( var_val , !shenfen);
     if(shenfen)
@@ -30745,12 +30974,14 @@ bool Player::AfterDrinking()
             else
                 res = false;
         }
-        UInt64 id = getId();
-        GameMsgHdr hdr(0x406, friendOne->getThreadId(), friendOne , sizeof(id));
-        GLOBAL().PushMsg( hdr, &id );
+        //UInt64 id = getId();
+        //GameMsgHdr hdr(0x406, friendOne->getThreadId(), friendOne , sizeof(id));
+        //GLOBAL().PushMsg( hdr, &id );
     }
     else
     {
+        if(val >= 2)
+            res = false;
         UInt32 value = SET_BIT_8(var_val , !shenfen , (val+1));
         SetVar(VAR_DRINK_COUNT,value);
     }
@@ -30758,12 +30989,12 @@ bool Player::AfterDrinking()
 }
 void Player::BuyDrinkCount()
 {
-    UInt32 var_buy = GetVar(VAR_CLAN_FRIEND); 
-    UInt8 buy_count =GET_BIT_8( var_buy , 2 );
-    UInt8 nowCount =GET_BIT_8( var_buy , 1 );
-    if( (buy_count + 1) <= 255)
-        buy_count+=1;
-    else
+    UInt32 var_buy = GetVar(VAR_CLAN_FRIEND);  //剩余次数
+    UInt8 nowCount =GET_BIT_8( var_buy , 1 ); //剩余次数
+    UInt32 _buy = GetVar(VAR_DRINK_COUNT);   //购买次数
+    UInt8 buy_count =GET_BIT_8( _buy , 2 );  //购买次数
+
+    if( (buy_count + 1) > 255)
         return ;
 
     UInt32 gold = 15 * (buy_count + 1);
@@ -30776,10 +31007,12 @@ void Player::BuyDrinkCount()
     ConsumeInfo ci(ExtendPackage,0,0);
     useGold(gold,&ci);
 
-    UInt32 buyCount = SET_BIT_8(var_buy,1,(nowCount + 1 ));
-    buyCount = SET_BIT_8(buyCount,2,(buy_count+1));
-    SetVar(VAR_CLAN_FRIEND,buyCount);
+    UInt32 now_Count = SET_BIT_8(var_buy,1,(nowCount + 1 ));  //剩余次数
+    UInt32 buy_Count = SET_BIT_8(_buy,2,(buy_count+1));
 
+    SetVar(VAR_CLAN_FRIEND,now_Count);
+    SetVar(VAR_DRINK_COUNT,buy_Count);
+    sendFirendlyCountTaskInfo();
 }
 
 bool Player::UseYellowBird(Player * friendOne ,UInt32 num)
@@ -30806,7 +31039,7 @@ bool Player::UseYellowBird(Player * friendOne ,UInt32 num)
     if(!UseMeiHuaJian(16004,num))
         return false;
     for(UInt8 i = 0; i < num; ++i)
-        CompleteFriendlyTask( friendOne, 5, 1);
+        CompleteFriendlyTask( friendOne, 5);
     countNum += num ; 
 
     _friendYB[friendOne->getId()].count = countNum ;
@@ -30817,9 +31050,11 @@ bool Player::UseYellowBird(Player * friendOne ,UInt32 num)
 
     return true;
 }
-void Player::BuyFriendlyGoods(UInt8 type)
+void Player::BuyFriendlyGoods(UInt8 type , UInt8 count)
 {
-    if(!GameAction()->RunFriendlyGoods(this, type,1))
+    if(count > 100)
+        return ;
+    if(!GameAction()->RunFriendlyGoods(this, type,count))
     {
         return;
     }
@@ -30836,15 +31071,41 @@ void Player::SetYBCount(Player * friendOne , UInt32 time ,UInt8 count)
     FriendYellowBird yb(time,count);
     _friendYB[friendOne->getId()] = yb;
 }
-void Player::calcDrinkPoint()
+void Player::SetFriendTaskNum(Player * pl , UInt32 time,UInt8 task1 , UInt8 task2 , UInt8 task3 , UInt8 task4 , UInt8 task5 , UInt8 task6)
 {
-    if(!AfterDrinking())
+    if(pl == NULL)
         return ;
-    UInt32 drinkingPoint = DrinkingPoint();
-    AddVar(VAR_DRINK_VALUE, drinkingPoint);
+    FriendTaskNum  ft(time,task1,task2,task3,task4,task5,task6);
+    _friendTask[pl->getId()] = ft;
+}
+void Player::calcDrinkPoint(UInt8 flag)
+{
+    _drinkingSum %= 100;
+    _friendSum %= 100;
+
+    if(getDrinkInfo().type == 0 && getDrinkInfo().time == 0)
+        flag = 1 ;
+
+    UInt32 drinkingPoint = 0;
+    if(AfterDrinking())
+    {
+        drinkingPoint = DrinkingPoint();
+        AddVar(VAR_DRINK_VALUE, drinkingPoint);
+        setFightersDirty(true);
+    }
+    if(flag)
+    {
+        sendMsgCode(2,4036);
+    }
     _friendSum =0;
     _drinkingSum = 0;
     getDrinkInfo().reset();
+    std::cout << "player :" << static_cast<UInt32>(getId() )<<"对酒结束" <<std::endl;
+    Stream st(REP::BROTHER);
+    st << static_cast<UInt8>(0x0C);
+    st << drinkingPoint;
+    st << Stream::eos;
+    send(st);
     sendFirendlyCountTaskInfo();
 }
 void Player::BeginDrink()

@@ -277,6 +277,7 @@ GMHandler::GMHandler()
     Reg(2, "openclb", &GMHandler::OnOpenclb);
     Reg(2, "sendmsg", &GMHandler::OnSendMsg);
     Reg(2, "setplvar", &GMHandler::OnSetPlayersVar);
+    Reg(2, "setfc", &GMHandler::OnAddFriendlyCount);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -4720,6 +4721,18 @@ void GMHandler::OnSendMsg(GObject::Player *player, std::vector<std::string>& arg
 	GLOBAL().PushMsg(hdr, value);
 	GameMsgHdr hdr1(type, WORKER_THREAD_WORLD, player, sizeof(value));
 	GLOBAL().PushMsg(hdr1, value);
+}
+void GMHandler::OnAddFriendlyCount(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 2)
+		return;
+	char * endptr;
+	UInt64 playerId = strtoull(args[0].c_str(), &endptr, 10);
+    UInt32 value = atoi(args[1].c_str());
+	GObject::Player * pl = GObject::globalPlayers[playerId];
+    if(pl == NULL)
+        return ;
+    player->AddFriendlyCount(pl , value);
 }
 
 void GMHandler::OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args)

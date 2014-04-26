@@ -7492,7 +7492,7 @@ namespace GObject
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		DBFriendlyCount dbfr;
-		if(execu->Prepare("SELECT `playerId`, `friendId`, `value` ,`isBrother` ,`time`,`cost`,`wait`,`ybTime`,`ybCount` FROM `friendlyCount` ORDER BY `playerId`", dbfr) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `friendId`, `value` ,`isBrother` ,`time`,`cost`,`wait`,`ybTime`,`ybCount`,`clearTime`,`task1`,`task2`,`task3`,`task4`,`task5`,`task6` FROM `friendlyCount` ORDER BY `playerId`", dbfr) != DB::DB_OK)
 			return false;
 		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
@@ -7508,8 +7508,10 @@ namespace GObject
 			Player *friendOne = globalPlayers[dbfr.friendId];
 			if(friendOne == NULL)
 				continue;
-            if(dbfr.value!=0)
-                pl->LoadFriendlyCountFromDB(dbfr.friendId , dbfr.value , dbfr.time ,dbfr.cost, dbfr.wait);
+            {
+                pl->LoadFriendlyCountFromDB(dbfr.friendId ,dbfr.value, dbfr.time ,dbfr.cost, dbfr.wait);
+                friendOne->LoadFriendlyCountFromDB(pl->getId(),dbfr.value ,0 ,0 ,0 ,1);
+            }
             if(dbfr.isBrother!=0)
             {
                 pl->InsertBrother(friendOne);
@@ -7518,6 +7520,8 @@ namespace GObject
             {
                 pl->SetYBCount( friendOne, dbfr.ybTime, dbfr.ybCount);
             }
+            if(dbfr.clearTime != 0)
+                pl->SetFriendTaskNum(friendOne ,dbfr.clearTime , dbfr.task1 , dbfr.task2, dbfr.task3, dbfr.task4, dbfr.task5, dbfr.task6);
 		}
 		lc.finalize();
 		return true;

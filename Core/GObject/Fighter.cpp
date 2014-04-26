@@ -2077,8 +2077,9 @@ void Fighter::rebuildEquipAttr()
         }
         //XXX
     }
+    if(_owner)
     {
-        UInt32 val = _owner->GetVar(VAR_CLAN_FRIEND);
+        UInt32 val = _owner->GetVar(VAR_DRINK_VALUE);
         GData::DrinkAttr::stDrinkAttr * da = GData::drinkAttrData.getDrinkAttrTable(val);
         if(da)
         {

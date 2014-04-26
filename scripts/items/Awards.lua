@@ -1785,7 +1785,7 @@ function RunFriendlyGoods(player, cts ,count)
     if count == 0 then 
         return 
     end
-    local value = player:GetVar(734)
+    local value = player:GetVar(700)
     if value < item[cts][3] * count then
         return 
     end
@@ -1799,7 +1799,7 @@ function RunFriendlyGoods(player, cts ,count)
         return false
     end
     package:Add(item[cts][2], count, true, 0, 74);
-    player:SetVar(734 , value - item[cts][3] * count );
+    player:SetVar(700 , value - item[cts][3] * count );
     return true
 end
 
