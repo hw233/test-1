@@ -1764,6 +1764,10 @@ void World::World_OldMan_Refresh(void *)
         {
             SYSMSG_BROADCASTV(572,spot); 
         }
+        else
+        {
+            SYSMSG_BROADCASTV(573,spot); 
+        }
 
         UInt8 thrId = mapCollection.getCountryFromSpot(_oldMan._spot);
         struct MapNpc
