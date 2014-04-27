@@ -10484,6 +10484,9 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
         while(NULL != (violentSKill = bf->getPassiveSkillViolent100(skillIdx)))
         {
             UInt16 actCnt = bf->getActCnt();
+            bool bRet = doEffectAfterCount(bf, violentSKill, actCnt);
+            if(bRet)
+                break;
             UInt16 condtion = 15;
             if(violentSKill->effect)
                 condtion = violentSKill->effect->efv[0];
@@ -14982,6 +14985,134 @@ void BattleSimulator::attackByJiuziSS(BattleFighter* bf, const GData::SkillBase*
         bf2->setJiuziDmgCnt(0);
     }
 
+}
+
+bool BattleSimulator::doEffectAfterCount(BattleFighter* bf, const GData::SkillBase* skill, UInt16 actCnt)
+{
+    bool bRet = false;
+    if(!bf)
+        return bRet;
+    if(!skill)
+        return bRet;
+    const GData::SkillEffect* effect = skill->effect;
+    if(!effect)
+        return bRet;
+    UInt16 condtion = effect->efv[0];
+    if(condtion != actCnt)
+        return bRet;
+    UInt16 last = effect->efl[0];
+    if(last == 0)
+        return bRet;
+
+    bRet = true;
+    UInt8 target_side;
+    if(skill->target == 0)
+        target_side = 0;
+    else
+        target_side = 1;
+    for(UInt8 i = 0; i < 25; i++)
+    {
+        BattleObject* bo2 = getObject(target_side, i);
+        if(bo2 == NULL || bo2->getHP() == 0 || !bo2->isChar())
+            continue;
+
+        BattleFighter* bo = static_cast<BattleFighter *>(bo2);
+        if(effect->auraP > 0.001 || effect->aura > 0)
+        {
+            float value = bo->_aura * effect->auraP + effect->aura;
+            if(value > 0.001f)
+                setStatusChange_Aura(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->atkP > 0.001f || effect->atk > 0)
+        {
+            float value = bo->_attack * effect->atkP + effect->atk;
+            if(value > 0.001f)
+                setStatusChange_Atk(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->defP > 0.001f || effect->def > 0)
+        {
+            float value = bo->_defend * effect->defP + effect->def;
+            if(value > 0.001f)
+                setStatusChange_Def(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->magatkP || effect->magatk > 0)
+        {
+            float value = bo->_magatk * effect->magatkP + effect->magatk;
+            if(value > 0.001f)
+                setStatusChange_MagAtk(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->magdefP || effect->magdef > 0)
+        {
+            float value = bo->_magdef * effect->magdefP + effect->magdef;
+            if(value > 0.001f)
+                setStatusChange_MagDef(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->tough > 0.001f)
+        {
+            float value = effect->tough;
+            if(value > 0.001f)
+                setStatusChange_Tough(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->actionP || effect->action > 0.001f)
+        {
+            float value = bo->_maxAction * effect->actionP + effect->action;
+            if(value > 0.001f)
+                setStatusChange_Action(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->hitrate > 0.001f)
+        {
+            float value = effect->hitrate;
+            if(value > 0.001f)
+                setStatusChange_HitR(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->evade > 0.001f)
+        {
+            float value = effect->evade;
+            if(value > 0.001f)
+                setStatusChange_Evade(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->critical > 0.001f)
+        {
+            float value = effect->critical;
+            if(value > 0.001f)
+                setStatusChange_Critical(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->pierce > 0.001f)
+        {
+            float value = effect->pierce;
+            if(value > 0.001f)
+                setStatusChange_Pierce(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->counter > 0.001f)
+        {
+            float value = effect->counter;
+            if(value > 0.001f)
+                setStatusChange_Counter(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->magres > 0.001f)
+        {
+            float value = effect->magres;
+            if(value > 0.001f)
+                setStatusChange_MagRes(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->atkreduce > 0.001f)
+        {
+            float value = effect->atkreduce;
+            if(value > 0.001f)
+                setStatusChange_AtkReduce(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else if(effect->magatkreduce > 0.001f)
+        {
+            float value = effect->magatkreduce;
+            if(value > 0.001f)
+                setStatusChange_MagAtkReduce(bo, bo->getSide(), bo->getPos(), skill, value, last, true);
+        }
+        else
+        {
+        }
+    }
+
+    return bRet;
 }
 
 } // namespace Battle
