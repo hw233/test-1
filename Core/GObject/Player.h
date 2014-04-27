@@ -3042,14 +3042,13 @@ namespace GObject
         void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
         void do_fighter_xinmo(Fighter* fgt, UInt32 oldId);
         void do_skill_grade(Fighter* fgt, UInt32 oldId);
-    private:
-        std::map<UInt8, UInt32> & _clanTitle;
     public:
         void makeClanTitleInfo(Stream & st);
         void changeClanTitle(UInt8 id);
         void notifyClanTitle();
         UInt32 getCurClanTitle();
         void clearClanTitle();
+        void checkClanTitle();
 	};
 
 

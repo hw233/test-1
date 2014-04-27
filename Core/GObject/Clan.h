@@ -9,6 +9,7 @@
 #include "Server/ServerTypes.h"
 #include "Server/WorldServer.h"
 #include "Common/BinaryReader.h"
+#include "Common/StringTokenizer.h"
 
 class SysMsgItem;
 namespace GObject
@@ -576,7 +577,7 @@ public:
 
     //帮派称号
     void SetClanTitle(std::string clantitleAll);
-    void GetClanTitle(std::map<UInt8, UInt32> & _clanTitle);
+    std::map<UInt8, UInt32> & GetClanTitle();
     void addClanTitle(UInt8 titleId, UInt32 endTime, Player * pl);
     void writeClanTitleAll();
     
@@ -767,30 +768,6 @@ public:
             return;
         _tyssSum += num; 
         DB5().PushUpdateData("UPDATE `clan` SET `tyssSum` = %u WHERE `id` = %u", _tyssSum, _id);
-    }
-
-    void SetClanTitle(std::string clantitleAll)
-    {
-         if (clantitleAll.length())
-         {
-             StringTokenizer tk(clantitleAll, "|");
-             size_t count = tk.count();
-             for(size_t idx = 0; idx < count; ++ idx)
-             {
-                 StringTokenizer tk1(tk[idx].c_str(), ",");
-                 if(tk1.count() > 1)
-                     _clanTitle[atoi(tk1[0].c_str())] = atoi(tk1[1].c_str());
-                 else
-                     _clanTitle[atoi(tk1[0].c_str())] = 0;
-             }
-          }
-          else
-              _clanTitle[0] = 0;
-    }
-
-    std::map<UInt8, UInt32> & GetClanTitle()
-    {
-        return _clanTitle;
     }
 
 public:

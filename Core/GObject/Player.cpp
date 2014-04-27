@@ -3326,6 +3326,7 @@ namespace GObject
         st << getClanProffer();
         bool fchange = makeTitleAllInfo(st);
         st << static_cast<UInt8>(GetVar(VAR_MAP_INDEX));
+        checkClanTitle();
         makeClanTitleInfo(st);
         st << Stream::eos;
 
@@ -29642,9 +29643,13 @@ void Player::AddFriendlyCount(Player * friender , UInt8 val)
    void Player::makeClanTitleInfo(Stream & st)
    {
        if(_clan == NULL)
+       {
+           st << static_cast<UInt8>(0);
+           st << static_cast<UInt8>(0);
            return;
-       _clanTitle = _clan->GetClanTitle();
-       UInt8 count = _clanTitle.size() - 1;
+       }
+       std::map<UInt8, UInt32> & _clanTitle = _clan->GetClanTitle();
+       UInt8 count = _clanTitle.size();
        UInt8 curClanTitle = GetVar(VAR_CUR_CLAN_TITLE);
        UInt32 now = TimeUtil::Now();
        st << curClanTitle;
@@ -29667,6 +29672,9 @@ void Player::AddFriendlyCount(Player * friender , UInt8 val)
 
    void Player::changeClanTitle(UInt8 id)
    {
+       if(_clan == NULL)
+           return;
+       std::map<UInt8, UInt32> & _clanTitle = _clan->GetClanTitle();
        std::map<UInt8, UInt32>::iterator it = _clanTitle.find(id);
        if(it != _clanTitle.end())
            SetVar(VAR_CUR_CLAN_TITLE, id);
@@ -29684,19 +29692,35 @@ void Player::AddFriendlyCount(Player * friender , UInt8 val)
 
    UInt32 Player::getCurClanTitle()
    {
-       UInt8 titleId = GetVar(VAR_CUR_CLAN_TITLE);
-       if(titleId == 0)
+       if(_clan == NULL)
            return 0;
-       std::map<UInt8, UInt32>::iterator it = _clanTitle.find(titleId);
-       if(it == _clanTitle.end())
-           return 0;
-       if(TimeUtil::Now() > it->second)
+       checkClanTitle();
+       return GetVar(VAR_CUR_CLAN_TITLE);
+   }
+
+   void Player::checkClanTitle()
+   {
+       if(_clan == NULL)
+           return;
+       bool writeDB = false;
+       std::map<UInt8, UInt32> & _clanTitle = _clan->GetClanTitle();
+       for(std::map<UInt8, UInt32>::iterator it = _clanTitle.begin(); it != _clanTitle.end();)
        {
-           SetVar(VAR_CUR_CLAN_TITLE, 0);
-           notifyClanTitle();
-           return 0;
+           if(it->second != 0 && it->second < TimeUtil::Now() )
+           {
+               std::map<UInt8, UInt32>::iterator tmp = it;
+               ++ tmp;
+                if(GetVar(VAR_CUR_CLAN_TITLE) == it->first)
+                    SetVar(VAR_CUR_CLAN_TITLE, 0);
+               _clanTitle.erase(it->first);
+               it = tmp;
+               writeDB = true;
+               continue;
+           }
+           ++it;
        }
-       return titleId;
+        if(writeDB)
+            _clan->writeClanTitleAll();
    }
 
    void Player::clearClanTitle()

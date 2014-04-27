@@ -2290,7 +2290,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(35)
+SPECIALDEF(36)
 (
 	UInt32, id,
 	std::string, name,
@@ -2326,7 +2326,8 @@ SPECIALDEF(35)
     UInt32, gongxian,
     UInt32, urge,
     UInt32, duobaoAward,
-    UInt32,tyssSum 
+    UInt32,tyssSum, 
+    std::string, clantitleAll
 )
 SPECIALEND()
 

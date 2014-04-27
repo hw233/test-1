@@ -487,6 +487,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
             player->rebuildBattleName();
     }
 
+    player->notifyClanTitle();
 	return true;
 }
 
@@ -539,6 +540,7 @@ bool Clan::join(ClanMember * cm)
             player->rebuildBattleName();
     }
 
+    player->notifyClanTitle();
     return true;
 }
 
@@ -659,7 +661,6 @@ bool Clan::kick(Player * player, UInt64 pid)
     {
         kicker->setBuffData(PLAYER_BUFF_CLAN1, 0);
         kicker->rebuildBattleName();
-        kicker->clearClanTitle();
     }
     if(kicker->getBuffData(PLAYER_BUFF_CLAN2) > 0)
     {
@@ -815,7 +816,6 @@ bool Clan::leave(Player * player)
     {
         player->setBuffData(PLAYER_BUFF_CLAN1, 0);
         player->rebuildBattleName();
-        player->clearClanTitle();
     }
     if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
     {
@@ -5650,10 +5650,7 @@ void Clan::sendMemberBuf(UInt8 pos)
         if(!pl)
             continue;
         if(pos == 1)
-        {
             pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
-            pl->addClanTitle(1, 0);
-        }
         else if(pos == 2)
             pl->setBuffData(PLAYER_BUFF_CLAN2, endTime);
         else
@@ -5670,6 +5667,30 @@ void Clan::ClearTYSSScore()
 {
     if(TYSSScoreSort.size() > 0)
         TYSSScoreSort.clear();
+}
+
+void Clan::SetClanTitle(std::string clantitleAll)
+{
+     if (clantitleAll.length())
+     {
+         StringTokenizer tk(clantitleAll, "|");
+         size_t count = tk.count();
+         for(size_t idx = 0; idx < count; ++ idx)
+         {
+             StringTokenizer tk1(tk[idx].c_str(), ",");
+             if(tk1.count() > 1)
+                 _clanTitle[atoi(tk1[0].c_str())] = atoi(tk1[1].c_str());
+             else
+                 _clanTitle[atoi(tk1[0].c_str())] = 0;
+         }
+      }
+      else
+          _clanTitle[0] = 0;
+}
+
+std::map<UInt8, UInt32> & Clan::GetClanTitle()
+{
+    return _clanTitle;
 }
 
 void Clan::addClanTitle(UInt8 titleId, UInt32 endTime, Player * pl)
