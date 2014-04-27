@@ -31,7 +31,7 @@ namespace GData
         UInt8 color;//0 - 白色 1 - 绿色 2 - 蓝色 3 - 紫色 4 - 橙色 
         UInt8 lvLimit;
         UInt16 skillId;//初始技能id
-        UInt8 initExp;
+        UInt32 initExp;
 
         CardInitInfo(): type(0),color(0),lvLimit(0),skillId(0){}
     };

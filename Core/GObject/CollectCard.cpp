@@ -441,14 +441,24 @@ namespace GObject
             if(MapFreeCardSlot.find(*it) == MapFreeCardSlot.end())
                 break;
             UInt16 cid = MapFreeCardSlot.find(*it)->second->cid;
-            GData::CardInitInfo* cii = GData::csys.getCardInitInfo(cid);
-            if(cii == NULL)
+            GData::CardInitInfo* ciitmp = GData::csys.getCardInitInfo(cid);
+            if(ciitmp == NULL)
                 break;
-            if(cii->type == 3)//特殊卡牌不能分解
+            if(ciitmp->type == 3)//特殊卡牌不能分解
                 break;
-            upcard->exp += cii->initExp + MapFreeCardSlot.find(*it)->second->exp;
+            upcard->exp += ciitmp->initExp + MapFreeCardSlot.find(*it)->second->exp;
             while(GData::csys.checkUpgrade(upcard))
             {
+                if(cii->type != 1)
+                {
+                    if(upcard->level >= cii->lvLimit)
+                       break;
+                }
+                else
+                {
+                    if(upcard->level >= m_owner->getMainFighter()->getLevel())
+                        break;
+                }
                 switch(upcard->level)
                 {
                     case 10:
@@ -519,8 +529,8 @@ namespace GObject
         st << upcard->id << upcard->cid << upcard->level << upcard->exp << upcard->pos;
 
         size_t off1 = st.size();//空闲卡牌数
-        st << static_cast<UInt8>(0);
-        UInt8 size1 = 0;
+        st << static_cast<UInt16>(0);
+        UInt16 size1 = 0;
         for(MSlot::iterator i = MapFreeCardSlot.begin(); i != MapFreeCardSlot.end(); i++)
         {
             if(i->second->checkInfo() == false)  
@@ -530,7 +540,7 @@ namespace GObject
         }       
         
         if (size1)
-            st.data<UInt8>(off1) = size1;
+            st.data<UInt16>(off1) = size1;
 
         st << Stream::eos; 
         m_owner->send(st);
@@ -665,13 +675,14 @@ namespace GObject
             return;
         
         std::map<UInt8,SuitCardInfo*>::iterator it = MapCardStamp.find(cid/100*10);
-        if(it == MapCardStamp.end())
-            return;
-        SuitCardInfo* tmp = it->second;
-        if(!tmp)
-            return;
-        if(GET_BIT(tmp->spe_mark,(cid % 200)))
-            return;
+        if(it != MapCardStamp.end())
+        {
+            SuitCardInfo* tmp = it->second;
+            if(!tmp)
+                return;
+            if(GET_BIT(tmp->spe_mark,(cid % 200)))
+                return;
+        }
         CardInfo* citmp = AddCard(cid); 
         if(!citmp)
             return;
