@@ -9314,7 +9314,7 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
         case 4:
         {
              UInt32 id = 0;
-             UInt8 len = 0;
+             UInt16 len = 0;
              br >> id >> len;
              if(id == 0 || len == 0)
                  return;
