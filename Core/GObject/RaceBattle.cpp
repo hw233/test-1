@@ -74,6 +74,8 @@ namespace GObject
             level = 1;
         if(level > sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]))
             return;
+        if(offset == 0xFF)
+            offset = origPos % 10;
         if(offset > gPerLeveCnt[level - 1])
             return;
 
@@ -270,8 +272,8 @@ namespace GObject
 
         st << rank;
         UInt32 offset = st.size();
-        st.data<UInt8>(offset) = 0;
         UInt8 count = 0;
+        st << count;
         for(RBSortType::reverse_iterator it = rstart; it != starSort.rend(); ++it)
         {
             ++count;
