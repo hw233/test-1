@@ -3307,10 +3307,16 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     break;
                 default:
                     break;
-
             }
-
        }
+       break;
+       case 0x45:
+       {
+           UInt8 type = 0;
+           brd >> type;
+           player->specialUdpLog(type);
+       }
+       break;
        default:
             break;
     }
@@ -4034,7 +4040,7 @@ void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
     UInt32 clanId = 0 ;
     br >> leftId ;
     SYSMSG_BROADCASTV(4304 , leftId);
-    std::cout << "msgBorad" << std::endl;
+    //std::cout << "msgBorad" << std::endl;
     br >> clanId ;
     Clan * clan = globalClans[clanId];
     if(!clan)

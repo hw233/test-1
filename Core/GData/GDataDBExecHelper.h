@@ -612,6 +612,11 @@ struct DBXinMoConfig
     std::string skilllev;
     UInt32 payBack;
 };
+struct DBDrinkAttrConfig
+{
+    UInt32 value;
+    UInt32 hp;
+};
 struct DBJiguanyuConfig
 {
     UInt32 jiguanyuId;
@@ -793,6 +798,30 @@ struct DBCoupleCopy
     std::string name;
     UInt32 location;
     UInt32 monster;
+};
+
+struct DBCardInfo
+{
+    UInt16 id;
+    UInt8 type;
+    UInt8 color;
+    UInt8 lvLimit;
+    UInt16 skillId;
+};
+
+struct DBCardUpgrade
+{
+    UInt8 level;
+    UInt32 gexp;
+    UInt32 bexp;
+    UInt32 pexp;
+    UInt32 yexp;
+    UInt32 hgexp;
+    UInt32 hbexp;
+    UInt32 hpexp;
+    UInt32 hyexp;
+    UInt8 skillLevel;
+    UInt16 attrIndex;
 };
 
 struct DBZHYExtraAttr
@@ -1492,7 +1521,6 @@ SPECIALDEF(9)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBXinMoConfig)
-
 SPECIALDEF(11)
 (
     UInt8, id,
@@ -1510,6 +1538,14 @@ SPECIALDEF(11)
     std::string, skilllev,
     UInt32, payBack
     )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBDrinkAttrConfig)
+SPECIALDEF(2)
+(
+    UInt32 , value,
+    UInt32 , hp
+)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBJiguanyuConfig)
@@ -1737,6 +1773,34 @@ SPECIALDEF(4)
     Int8, id,
     float, value,
     UInt8, next
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCardUpgrade)
+SPECIALDEF(11)
+    (
+	UInt8, level,
+    UInt32, gexp,
+    UInt32, bexp,
+    UInt32, pexp,
+    UInt32, yexp,
+    UInt32, hgexp,
+    UInt32, hbexp,
+    UInt32, hpexp,
+    UInt32, hyexp,
+    UInt8, skillLevel,
+    UInt16, attrIndex
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCardInfo)
+SPECIALDEF(5)
+	(
+    UInt16, id,
+    UInt8, type,
+    UInt8, color,
+    UInt8, lvLimit,
+    UInt16, skillId
 	)
 SPECIALEND()
 

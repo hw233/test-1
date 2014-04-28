@@ -2329,9 +2329,14 @@ void OnReturnTYSSInfo( GameMsgHdr& hdr, const void* data )
     else
         st << clan->GetTYSSSum();
         //st << player->getClan()->getLeader()->GetVar(VAR_TYSS_CONTRIBUTE_CLAN_SUM);
-    st << static_cast<UInt32>(CLR_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
+    //st << static_cast<UInt32>(CLR_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
+    UInt32 todayContribution = player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY);
+    todayContribution = todayContribution << 6;
+    todayContribution = todayContribution >> 6;
+    st << todayContribution;
    
-    st << static_cast<UInt8>(GET_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
+    //st << static_cast<UInt8>(GET_BIT(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY),31));
+    st << static_cast<UInt8>(player->GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY) >> 27);
     st << player->GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
     st << Stream::eos;
     player->send(st);

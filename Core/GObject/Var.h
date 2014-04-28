@@ -670,6 +670,7 @@ namespace GObject
         VAR_LEFTADDR_POWER = 694 ,   //仙界征战体力
         VAR_LEFTADDR_CREATE = 695 ,   //创建队伍的时间
         VAR_HEART_SWORD = 696 ,    //心剑值
+
         VAR_LEFTADDR_POWER_ADD  = 697,  //体力增加次数
         VAR_FRIEND_TASK1 = 698 ,    //友好度任务，主动私聊，帮助浇灌许愿树，发起与好友的切磋
         VAR_FRIEND_TASK2 = 699 ,    //与好友组队副本，与好友宠物副本，赠送黄色鸢尾
@@ -712,7 +713,12 @@ namespace GObject
         
         VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 729,//璇玑阵图自动战斗使用金钱标志
         VAR_ATOXJFM = 730,     //自动璇玑阵图id
-        //731 - 751 for lib
+        // 731 - 740 for lib
+        VAR_FRIEND_ACHIEVEMENT  = 731,  //友好度成就奖励领取情况
+        VAR_CLAN_FRIEND = 732 ,    //帮派玩家是否增加过友好度(8位) , 玩家购买的剩余饮酒次数 
+        VAR_DRINK_COUNT = 733 ,    //饮酒次数 主动发起(8位) ,被动接受(8位) ,玩家总购买的次数 
+        VAR_DRINK_VALUE = 734 ,    //豪饮值
+        VAR_FRIEND_VALUE_DAY = 735 ,    //每日友情值
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
         //771 - 780 for qimj
@@ -1327,6 +1333,11 @@ namespace GObject
             REGISTER_VAR(VAR_JIQIREN_SYBS, CYCLE_NONE);
             REGISTER_VAR(VAR_LEFTADDR_POWER, CYCLE_NONE);
             REGISTER_VAR(VAR_LEFTADDR_CREATE, CYCLE_NONE);
+            REGISTER_VAR(VAR_HEART_SWORD, CYCLE_NONE);
+            REGISTER_VAR(VAR_FRIEND_TASK1, CYCLE_DAY);
+            REGISTER_VAR(VAR_FRIEND_TASK2, CYCLE_DAY);
+            REGISTER_VAR(VAR_FRIEND_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_CLAN_FRIEND, CYCLE_NONE);
             REGISTER_VAR(VAR_LEFTADDR_POWER_ADD, CYCLE_DAY);
 
             REGISTER_VAR(VAR_QISHI_FRIEND_SEND_COUNT, CYCLE_DAY);
@@ -1354,6 +1365,12 @@ namespace GObject
             REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME2, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME3, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_CLAN_SUM, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_FRIEND_ACHIEVEMENT, CYCLE_NONE);
+            REGISTER_VAR(VAR_DRINK_COUNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAN_FRIEND, CYCLE_NONE);
+            REGISTER_VAR(VAR_DRINK_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_FRIEND_VALUE_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);

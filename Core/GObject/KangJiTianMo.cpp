@@ -29,10 +29,14 @@ void KangJiTianMo::GetKJTMStatus(Player* pl)
     if(NULL == pl)
         return;
 
+    UInt32 begin = GVAR.GetVar(GVAR_KANGJITIANMO_BEGIN);
+    UInt32 end = GVAR.GetVar(GVAR_KANGJITIANMO_END);
     UInt32 status = pl->GetVar(VAR_KJTM_STATUS);
     Stream st(REP::KANGJITIANMO_REP);
     st << static_cast<UInt8>(0x00) << static_cast<UInt8>(0x00);
     st << status;
+    st << begin;
+    st << end;
     st << Stream::eos;
     pl->send(st);
 }
@@ -117,7 +121,7 @@ void KangJiTianMo::RandInactiveMember(Player* pl, UInt8 type)
     while(tempMark.size() > 0 &&_InactiveMember.size() >= tempMark.size() && cnt<10)
     {
         UInt32 pos = uRand(tempMark.size());
-        UInt64 playerId = _InactiveMember[pos];
+        UInt64 playerId = _InactiveMember[tempMark[pos]-1];
         Player* member = globalPlayers[playerId];
         if(NULL == member)
         {
@@ -911,14 +915,22 @@ void KangJiTianMo::StartBattle(Player* pl)
 
         bsim.applyFighterHP(0, member);
 
-        member->udpLog("kangjitianmo", "F_140406_4", "", "", "", "", "act");
-        if(0 != i)
+        UInt32 statusA = member->GetVar(VAR_KJTM_LOGIN_STATUS);
+        UInt8 mark = GET_BIT(statusA, 1);
+        if(0 == mark)
         {
-            member->udpLog("kangjitianmo", "F_140406_5", "", "", "", "", "act");
-            if(member->getVipLevel() > 0)
-                member->udpLog("kangjitianmo", "F_140406_6", "", "", "", "", "act");
-            if(member->getVipLevel() > 4)
-                member->udpLog("kangjitianmo", "F_140406_7", "", "", "", "", "act");
+            member->udpLog("kangjitianmo", "F_140406_4", "", "", "", "", "act");
+            if(0 != i)
+            {
+                member->udpLog("kangjitianmo", "F_140406_5", "", "", "", "", "act");
+                if(member->getVipLevel() > 0)
+                    member->udpLog("kangjitianmo", "F_140406_6", "", "", "", "", "act");
+                if(member->getVipLevel() > 4)
+                    member->udpLog("kangjitianmo", "F_140406_7", "", "", "", "", "act");
+            }
+
+            statusA = SET_BIT(statusA, 1);
+            member->SetVar(VAR_KJTM_LOGIN_STATUS, statusA);
         }
     }
     DismissBattleRoom(pl);

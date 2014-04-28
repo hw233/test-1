@@ -72,6 +72,7 @@ namespace GData
         static bool LoadPetEqAttreffect();
         static bool LoadXingchenConfig();
         static bool LoadXinMoConfig();
+        static bool LoadDrinkAttrConfig();
         static bool LoadSkillEvConfig();
         static bool LoadRandBattleConfig();
         static bool LoadJiguanshuConfig();
@@ -89,6 +90,8 @@ namespace GData
         static bool LoadCangjianConfig();
         static bool LoadCoupleInfo();
         static bool LoadCoupleCopy();
+        static bool LoadCardUpgrade();
+        static bool LoadCardInfo();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);

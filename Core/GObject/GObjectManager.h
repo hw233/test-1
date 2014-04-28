@@ -491,6 +491,7 @@ namespace GObject
         static bool loadSecondSoul();
         static bool loadFighterXingchen();
         static bool loadFighterXinMo();
+        static bool loadGCollectCnt();
         static bool loadTempItem();
         static bool loadJiguanshu();
         static bool loadJiguanyu();
@@ -535,7 +536,10 @@ namespace GObject
         static bool loadTeamMember();
         static bool loadInactiveMember();
         static bool LoadPlayerModifyMounts();
+        static bool loadFriendlyCount();
         static bool loadSkillGrade();
+        static bool loadCard();
+        static bool loadCardSuit();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

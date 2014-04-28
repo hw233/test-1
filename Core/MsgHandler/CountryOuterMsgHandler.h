@@ -76,6 +76,7 @@
 #include "GObject/ArenaServerWar.h"
 #include "GObject/ClanBuilding.h"
 #include "GObject/RaceBattle.h"
+#include "GObject/CollectCard.h"
 
 struct NullReq
 {
@@ -1198,6 +1199,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSummerFlow3TimeInfo();
     pl->sendPrayInfo();
     pl->sendQQBoardLogin();
+    pl->GetCollectCard()->ReturnCardInfo(1);
     GObject::MarryBoard::instance().sendTodayMarryInfo(pl ,1);
     luckyDraw.notifyDisplay(pl);
     if (World::getRechargeActive())
@@ -1413,7 +1415,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendZhenyuansInfo();    //阵元
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
-    pl->KJTMUdpLog();
+    //pl->KJTMUdpLog();
     //pl->QiShiBanState();
     {
         GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);
@@ -1461,6 +1463,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+    //结拜邀请信息
+    pl->sendFriendlyTimeAndCost();
 
     }
 
@@ -4317,6 +4321,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.guard = player->getPF();
 		rep.level = player->GetLev();
 		pl->send(rep);
+        player->CompleteFriendlyTask(pl , 0);
 	}
 }
 
@@ -7168,8 +7173,11 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
     UInt32 now = TimeUtil::Now();
     if(GVAR.GetVar(GVAR_KANGJITIANMO_BEGIN) > now || GVAR.GetVar(GVAR_KANGJITIANMO_END) < now)
         return;
-
+   
     MSG_QUERY_PLAYER(player);
+    
+    if(player->GetLev() < 45)
+        return;
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 opt = 0;
@@ -7578,6 +7586,12 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                 return;
             }
             
+            if(member->GetLev() < 45)
+            {
+                player->sendMsgCode(1, 4051);
+                return;
+            }
+
             UInt32 status = member->GetVar(VAR_KJTM_STATUS);
             UInt8 mark = GET_BIT(status, 0);
             if(0 == mark)
@@ -8979,13 +8993,16 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                 }
                     break;
                 case 0x13:
-                    player->OpTYSS(op);//领取每日礼包
+                    {
+                        UInt8 flag = 0;
+                        brd >> flag;//礼包编号
+                        if(flag > 0 && flag < 6)
+                            player->OpTYSS(op, flag);//领取每日礼包
+                    }
                     break;
                 default:
                     break;
             }
-
-
         }
     default:
         break;
@@ -9083,6 +9100,292 @@ void OnXinMoReq( GameMsgHdr & hdr, const void * data )
             break;
     }
 }
+void OnBrotherReq( GameMsgHdr& hdr, const void* data)
+{
+ 	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+	UInt8 type = 0;
+	br >> type;
+//    std::cout<<"playerId:"<<static_cast<UInt32>(player->getId()) << " type: " << static_cast<UInt32>(type) <<std::endl;
+	switch(type)
+	{
+	case 0x01:
+        player->sendFirendlyCountTaskInfo();
+		break;
+	case 0x02:
+        {
+            std::string name ;
+            br >> name ;
+            UInt8 type ;
+            br >> type ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            if(!player->CheckCanBeBrother(friendOne , type))
+            {
+                return ;
+            }
+            SYSMSGV(title, 400, player->getCountry(), player->getName().c_str());
+            SYSMSGV(content, 401, player->getCountry(), player->getName().c_str());
+            friendOne->GetMailBox()->newMail(player, 0x16, title, content);
+            player->sendFriendlyTimeAndCost();
+        }
+		break;
+	case 0x03:
+        {
+            UInt8 opt =0 ;
+            br >> opt ;
+            UInt8 res = 0 ;
+            if(opt)
+            {
+                if(player->getDrinkInfo().type != 0)
+                    player->getDrinkInfo().reset();
+                res = 3;
+                break;
+            }
+            else
+            {
+                UInt8 type = 0;
+                br >> type ;
+                res = player->CheckCanDrink(type);
+            }
+            Stream st(REP::BROTHER);
+            st <<static_cast<UInt8>(0x03);
+            st <<static_cast<UInt8>(res);
+            st <<static_cast<UInt8>(player->getDrinkInfo().type);
+            st << Stream::eos; 
+            player->send(st);
+        }
+		break;
+    case 4:
+        {
+            std::string name;
+            br >> name;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            UInt8 flag = 0;
+            br >>flag ;
+            if(friendOne == NULL)
+                return ;
+            if(player->IsAccept(friendOne)) 
+            {
+                player->drinking(friendOne ,0,flag);
+            }
+        }
+        break;
+    case 0x05:
+        {
+            std::string name ;
+            br >> name ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            player->InviteDrinking(friendOne); 
+        }
+        break;
+    case 0x06:
+        {
+            std::string name ;
+            br >> name ;
+            UInt8 res = 0;
+            br >> res;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            
+            if(res == 1)
+            {
+                if(player->getDrinkInfo().drinker!=NULL )
+                {
+                    if(player->getDrinkInfo().drinker == friendOne)
+                        return ;
+                    res = 0;
+                }
+                else
+                {
+                    if(player->getDrinkInfo().type != 0)
+                        player->getDrinkInfo().reset();
+                    player->setDrinking(friendOne , 0);
+                }
+            }
+            struct st 
+            {
+                UInt64 playerId;
+                UInt8 res ;
+                UInt8 type ;
+                UInt8 count ;
+            };
+            st _st ;
+            _st.playerId = player->getId();
+            _st.res = res;
+            _st.type = 0;
+            _st.count = 0;
+            GameMsgHdr hdr(0x404, friendOne->getThreadId(), friendOne, sizeof(_st));
+            GLOBAL().PushMsg( hdr, &_st );
+            //friendOne->beReplyForDrinking(player,res);
+        }
+        break;
+    case 0x07:
+        {
+            std::string name ;
+            br >> name ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            player->CancelBrother(friendOne);
+        }
+        break;
+    case 0x08:
+        {
+            UInt8 type = 0;
+            br >> type ;
+            player->getFriendlyAchievement(type);
+            player->sendFirendlyCountTaskInfo();
+        }
+        break;
+    case 0x09:
+        {
+            player->BuyDrinkCount();
+            player->sendFirendlyCountTaskInfo();
+        }
+        break;
+    case 0x0A:
+        {
+            std::string name ;
+            br >> name ;
+            UInt32 count = 0;
+            br >> count ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL )
+                break;
+            UInt8 res = player->UseYellowBird(friendOne,count); 
+            Stream st(REP::BROTHER);
+            st << static_cast<UInt8>(0x0A);
+            st << static_cast<UInt8>(res);
+            st << Stream::eos;
+            player->send(st);
+            player->sendFirendlyCountTaskInfo();
+        }
+        break;
+    case 0x0B:
+        {
+            UInt8 type = 0;
+            br >> type;
+            UInt8 count = 0;
+            br >> count;
+            player->BuyFriendlyGoods(type , count);
+            player->sendFirendlyCountTaskInfo();
+        }
+        break;
+    case 0x0C:
+        {
+            std::string name ;
+            br >> name ;
+            if(player->getDrinkInfo().type ==0)
+                return ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL )
+                break;
+            UInt8 flag = 0;
+            UInt32 now = TimeUtil::Now();
+            if((player->getDrinkInfo().time + 20) > now)
+                flag = 1;
+            player->calcDrinkPoint();
+            GameMsgHdr hdr(0x407, friendOne->getThreadId(), friendOne, sizeof(UInt8));
+            GLOBAL().PushMsg( hdr, &flag );
+        }
+        break;
+    case 0x0D:
+        {
+           player->BeginDrink();
+        }
+        break;
+	}
+
+}
+
+void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+     
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt ; 
+
+    switch(opt)
+    {
+        case 1:
+        {
+            UInt8 opt1 = 0;
+            br >> opt1;
+            if(opt1 > 2)
+                return;
+            if(opt1 != 2)
+                player->GetCollectCard()->ReturnCardInfo(opt1);  
+            else
+            {    
+                UInt32 id = 0;
+                UInt8 pos = 0;
+                br >> id >> pos;
+                player->GetCollectCard()->EquipCard(id,pos);
+            }
+
+        }
+            break;
+        case 2:
+        {
+            UInt8 opt1 = 0;
+            UInt8 opt2 = 0;
+            br >> opt1 >> opt2;
+            if(opt2 != 1 && opt2 != 2 && opt2 != 3)
+                return;
+            player->GetCollectCard()->ActiveCardSet(opt1,opt2);
+        }
+            break;
+        case 3:
+            {
+               UInt8 flag = 0;
+               UInt8 level = 0;
+               UInt8 color = 0;
+               UInt16 count = 0;
+               br >> flag >> level >> color >> count;
+               if(color > 5 )
+                   return ;
+               player->GetCollectCard()->ExchangeCard(flag,level,color , count);
+            }
+            break;
+        case 4:
+        {
+             UInt32 id = 0;
+             UInt16 len = 0;
+             br >> id >> len;
+             if(id == 0 || len == 0)
+                 return;
+             std::vector<UInt32> vecid;
+             while(len != 0)
+             {
+                 UInt32 id_tmp = 0;
+                 br >> id_tmp; 
+                 vecid.push_back(id_tmp);
+                 -- len;
+             }
+             player->GetCollectCard()->UpGradeCard(id,vecid);
+
+        }
+            break;
+        case 5:
+        {
+            UInt16 opt1 = 0;
+            br >> opt1; 
+            player->GetCollectCard()->ExchangeSpeCard(opt1);
+        }
+            break;
+        default:
+            break;
+
+    }
+}
+
 
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
