@@ -23,6 +23,7 @@ MSG_REG_2(GameMsgHdr, REQ::HERO_INFO, OnFighterInfoReq);
 MSG_REG_2(GameMsgHdr, REQ::HOTEL_LIST, OnRecruitListReq);
 MSG_REG_2(GameMsgHdr, REQ::TRIPOD_INFO, OnTripodReq);
 MSG_REG_2(GameMsgHdr, REQ::TASK_CYC_REFRESH, OnFlushTaskColorReq);
+MSG_REG_2(GameMsgHdr, REQ::BROTHER, OnBrotherReq);
 MSG_REG(GameMsgHdr, OnFighterDismissReq);
 MSG_REG(GameMsgHdr, OnFighterRegenReq);
 MSG_REG(GameMsgHdr, OnFighterTrainReq);
@@ -424,6 +425,7 @@ MSG_REG_2(GameMsgHdr, 0x354, OnSpreadWhisper);
 MSG_REG_2(GameMsgHdr, 0x355, OnGetFindOldManAward);
 MSG_REG_2(GameMsgHdr, 0x356, OnGetInteresingBag);
 MSG_REG_2(GameMsgHdr, 0x357, OndoGuankaAct);
+MSG_REG_2(GameMsgHdr, 0x358, OnAddFriendlyCount); 
 //MSG_REG_2(GameMsgHdr, 0x358, OnAddFriendlyCount); 
 MSG_REG_2(GameMsgHdr, 0x359, OnBuyLeftPower);
 
@@ -457,5 +459,14 @@ MSG_REG_2(GameMsgHdr, 0x396, OnServerLeftBattleReq);   //战斗信息请求
 MSG_REG_2(GameMsgHdr, 0x397, OnBuyLeftPower);  //购买体力
 
 //游戏服务器
+MSG_REG_2(GameMsgHdr, 0x401, OnAcceptBrother);   //战斗信息请求
+MSG_REG_2(GameMsgHdr, 0x402, OnDrinking);   // 饮酒
+MSG_REG_2(GameMsgHdr, 0x403, OnBeInviteDrinking);   //被邀请对酒
+MSG_REG_2(GameMsgHdr, 0x404, OnBeAcceptDrinking);   //被邀请对酒
+MSG_REG_2(GameMsgHdr, 0x405, OnBeRefuceBrother);   //被邀请对酒
+MSG_REG_2(GameMsgHdr, 0x406, OnAfterDrink);   //被邀请对酒
+MSG_REG_2(GameMsgHdr, 0x407, OnCalcDrink);   //被邀请对酒
+MSG_REG_2(GameMsgHdr, 0x408, OnBeginDrink);   //被邀请对酒
+
 
 MSG_HANDLER_END()

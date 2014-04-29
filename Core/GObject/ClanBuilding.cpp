@@ -632,9 +632,9 @@ namespace GObject
         std::vector<Player *> vec ;
         vec.push_back(leader);
         leftAttackTeams.insert(make_pair(leftAttLeader , vec));
-        //Stream st ;
-        //SYSMSGVP(st, 4300, leader->getName().c_str(),leftId);
-        //_clan->broadcast(st);
+       // Stream st ;
+       // SYSMSGVP(st, 4300, leader->getName().c_str(),leftId);
+       // _clan->broadcast(st);
         leader->setInLeftTeam(true);
         TRACE_LOG("leftaddr(CreateTeamSetInTeam) 1 (pid: %" I64_FMT "u)", leader->getId());
         leader->SetVar(VAR_LEFTADDR_CREATE ,now);

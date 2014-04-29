@@ -134,6 +134,7 @@ void NewRelation::attack(Player *atker, Player *defer)
         GameMsgHdr hdr(0x223, tid, defer, sizeof(NewRelationBeData));
         GLOBAL().PushMsg(hdr, &abd);
     }
+    atker->CompleteFriendlyTask(defer,2);
 }
 
 void NewRelation::countrySend(Player* responder, UInt8 type, std::string& name)
