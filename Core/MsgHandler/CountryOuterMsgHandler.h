@@ -9290,8 +9290,9 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
         case 5:
         {
             UInt16 opt1 = 0;
-            br >> opt1; 
-            player->GetCollectCard()->ExchangeSpeCard(opt1);
+            UInt32 opt2 = 0;
+            br >> opt1 >> opt2; 
+            player->GetCollectCard()->ExchangeSpeCard(opt1,opt2);
         }
             break;
         default:

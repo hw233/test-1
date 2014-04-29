@@ -2559,7 +2559,7 @@ CREATE TABLE IF NOT EXISTS `card` (
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `id` int(10) unsigned NOT NULL DEFAULT '0',
     `cid` int(10) unsigned NOT NULL DEFAULT '0',
-    `level` tinyint(3) NOT NULL DEFAULT '0',
+    `level` ismallint(5) NOT NULL DEFAULT '0',
     `exp` int(10) NOT NULL DEFAULT '0',
     `pos` tinyint(3) NOT NULL DEFAULT '0',
     unique KEY id_playerid(`playerid`,`id`)
