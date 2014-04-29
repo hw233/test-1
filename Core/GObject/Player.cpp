@@ -26830,8 +26830,6 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
     if(!World::getGGTime())
         return ; 
     UInt32 now = TimeUtil::Now();
-    if(now <( World::getOpenTime() + 14 * 86400) || now >( World::getOpenTime() + 25* 86400))
-        return ;
     if(type == 0)
     {
         if( m_gginfo.task != task)
