@@ -7780,6 +7780,12 @@ namespace GObject
                     ItemEquip * equip = static_cast<ItemEquip *>(item);
                     AppendTempEquipData(st, equip);
                 }
+                else if(IsZhenYuan(item->getClass()))
+                {
+                    count ++;
+                    ItemZhenyuan * zhenyuan = static_cast<ItemZhenyuan *>(item);
+                    AppendTempZhenyuanData(st, zhenyuan);
+                }
                 else
                 {
                     count++;
@@ -7804,7 +7810,10 @@ namespace GObject
 	{
 		Stream st(REP::TEMPITEM_INFO);
 		st << static_cast<UInt16>(1);
-		AppendTempEquipData(st, equip);
+        if(IsZhenYuan(equip->getClass()))
+            AppendTempZhenyuanData(st, static_cast<ItemZhenyuan *>(equip));
+        else
+		    AppendTempEquipData(st, equip);
 		st << Stream::eos;
 		m_Owner->send(st);
 	}
@@ -7825,6 +7834,21 @@ namespace GObject
 		st << Stream::eos;
 		m_Owner->send(st);
 	}
+
+    void Package::AppendTempZhenyuanData(Stream& st, ItemZhenyuan * zhenyuan)
+    {
+		st << zhenyuan->GetItemType().getId() << static_cast<UInt8>(zhenyuan->GetBindStatus() ? 1 : 0);
+		st << zhenyuan->Count();
+        int sellTime = 0;
+        if(m_Owner->getVipLevel() > 0)
+            sellTime = zhenyuan->GetSellTime() + 86400 * 3 - TimeUtil::Now();
+        else
+            sellTime = zhenyuan->GetSellTime() + 86400 - TimeUtil::Now();
+
+        st << static_cast<UInt32>(sellTime > 0 ? sellTime : 0);
+		st << zhenyuan->getId();
+        zhenyuan->getZhyAttr().appendAttrToStream(st);
+    }
 
 	void Package::AppendTempEquipData(Stream& st, ItemEquip * equip, bool hascount)
 	{
@@ -7904,7 +7928,10 @@ namespace GObject
 
             DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %" I64_FMT "u, %u)", typeId, m_Owner->getId(), bind ? 1 : 0);
           
-            SendSingleEquipData(static_cast<ItemEquip *>(item));
+            if(IsZhenYuan(item->getClass()))
+                SendSingleZhenyuanData(static_cast<ItemZhenyuan *>(item));
+            else
+                SendSingleEquipData(static_cast<ItemEquip *>(item));
 
             return item;
         }

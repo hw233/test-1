@@ -308,6 +308,7 @@ namespace GObject
         void SendTempItemData(ItemBase * item);
         void SendDelTempEquipData(ItemEquip * equip);
         void AppendTempItemData(Stream& st, ItemBase * item);
+        void AppendTempZhenyuanData(Stream& st, ItemZhenyuan * zhenyuan);
         void AppendTempEquipData(Stream& st, ItemEquip * equip, bool hascount = true);
 
         void SendSingleZhenyuanData(ItemZhenyuan *);

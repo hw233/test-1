@@ -610,10 +610,11 @@ namespace GObject
         /*//等级保护
         if(m_owner->getMainFighter()->getLevel() < citmp->lvLimit) 
             return NULL;*/
+        UInt16 skillId = 0;//计算技能id
         if(citmp->skillId != 0)
-            citmp->skillId = citmp->skillId * 100 + 1;
+            skillId = citmp->skillId * 100 + 1;
 
-        CardInfo* ci = new CardInfo(IDGenerator::gCardOidGenerator.ID(),cid,citmp->type,static_cast<UInt8>(1),static_cast<UInt16>(0),citmp->skillId,static_cast<UInt8>(0), citmp->color,static_cast<UInt16>(32001));
+        CardInfo* ci = new CardInfo(IDGenerator::gCardOidGenerator.ID(),cid,citmp->type,static_cast<UInt8>(1),static_cast<UInt16>(0),skillId,static_cast<UInt8>(0), citmp->color,static_cast<UInt16>(32001));
         if(!ci->checkInfo())
         {
             delete ci;
