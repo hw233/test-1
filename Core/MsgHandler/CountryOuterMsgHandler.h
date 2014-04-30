@@ -9053,8 +9053,23 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             UInt8 res = 0 ;
             if(opt)
             {
-                if(player->getDrinkInfo().type != 0)
-                    player->getDrinkInfo().reset();
+                if(player->getDrinkInfo().drinker != NULL)
+                {
+                    Player * friendOne = player->getDrinkInfo().drinker;
+                   if(player->getDrinkInfo().time == 0)
+                   {
+                       if(player->getDrinkInfo().type == 0)
+                           friendOne->setDrinking(NULL,0);
+                       else
+                       {
+                           friendOne->getDrinkInfo().reset();
+                           friendOne->sendMsgCode(2,4036);
+                       }
+                       friendOne->sendDrinkInfo();
+                   }
+                }
+                player->getDrinkInfo().reset();
+                player->sendDrinkInfo();
                 res = 3;
                 break;
             }
@@ -9121,6 +9136,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
                         player->getDrinkInfo().reset();
                     player->setDrinking(friendOne , 0);
                 }
+                player->moveTo(9476,true);
             }
             struct st 
             {
@@ -9195,7 +9211,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
         {
             std::string name ;
             br >> name ;
-            if(player->getDrinkInfo().type ==0)
+            if(player->getDrinkInfo().type ==0 || player->getDrinkInfo().time == 0)
                 return ;
             GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
             if(friendOne == NULL )

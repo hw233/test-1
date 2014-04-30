@@ -4137,7 +4137,10 @@ void OnServerLeftMemberLeave(ServerLeftMsgHdr& hdr, const void * data)
             continue;
         GObject::Player * player = GObject::globalPlayers[playerId];
         if(!player)
+        {
+            TRACE_LOG("leftaddr(tryLeftReturn) 1 (pid: %" I64_FMT "u)", playerId);
             continue;
+        }
         if(val)
         {
             player->setLeftAddrEnter(true);

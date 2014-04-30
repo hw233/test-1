@@ -10,11 +10,7 @@ function clanbuildingtemplate()
 {
     f=$1
     d=clanbuildingtemplate
-<<<<<<< HEAD
-    sed -i /lev/d $f
-=======
     sed -i /Lv/d $f
->>>>>>> 2328f2a874a05db7bb431f3c531ed3ae3f7b78bf
     sed -i /EXP/d $f
     sed -i /level/d $f
     sed -i /^$/d $f
