@@ -1327,6 +1327,15 @@ inline bool player_enum_3(GObject::Player* pl, int)
 
     return true;
 }
+inline bool player_enum_4(GObject::Player* pl, int)
+{
+    if(pl->getLeftAddrEnter())
+    {
+        GameMsgHdr hdr(0x392, pl->getThreadId(), pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+    return true;
+}
 inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
 {
     UInt32 val = pl->GetVar(VAR_LEFTADDR_POWER) ;
@@ -1768,6 +1777,38 @@ inline bool player_enum_AskOldMan(GObject::Player * p, int)
         p->SetVar(VAR_OLDMAN_SCORE_AWARD,flag);
     }
     return true;
+}
+
+inline bool player_enum_GetContributionBag(GObject::Player * pl, int)
+{
+    if(pl)
+    {
+        Stream st(REP::CLAN_COPY);
+        st << static_cast<UInt8>(0x20);
+        st << static_cast<UInt8>(4);
+        st << Stream::eos;
+        pl->send(st);
+
+        UInt32 AddFireTimes = (pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) & 0xFF);
+        if(AddFireTimes == 3)
+            pl->getFireContributionBag(pl);
+    }
+    return true;
+}
+
+inline bool clan_enum_GetFireGodBag(GObject::Clan * clan, int)
+{
+    if(clan)
+    {
+       clan->getFireGodBag();
+    }
+    return true;
+}
+
+void World::World_Fire_Sacrifice_Check( World * world )
+{
+    GObject::globalPlayers.enumerate(player_enum_GetContributionBag, 0);
+    GObject::globalClans.enumerate(clan_enum_GetFireGodBag, 0);
 }
 
 void World::World_OldMan_Refresh(void *)
@@ -2374,6 +2415,10 @@ bool World::Init()
     AddTimer(5 * 60 * 1000, World_Online_Log, static_cast<void *>(NULL), ((now + 300) / 300 * 300 - now) * 1000);
     AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 5 * 1000);
 
+    UInt32 fireSacriDay = TimeUtil::SharpDay(1) - 3 * 3600 + 60;
+    if(fireSacriDay < now) fireSacriDay += 86400;
+    AddTimer(86400 * 1000, World_Fire_Sacrifice_Check, this, (fireSacriDay - now) * 1000);
+
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(&type), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
     if(cfg.merged)
@@ -2709,7 +2754,14 @@ void World::World_One_Min( World * world )
 
 void World::commitArenaForceOnce()
 {
-    GObject::arena.commitArenaForceOnce();
+    if(arena.isOpen())
+        arena.commitArenaForceOnce();
+    if(serverWarMgr.isOpen())
+        teamArenaMgr.commitArenaForceOnce();
+    else if(serverWarMgr.isOpen())
+        serverWarMgr.commitArenaForceOnce();
+
+    globalPlayers.enumerate(player_enum_4, 0);  //仙界遗迹同步
 }
 
 void World::LoadQixiScore(Player* pl, Player* lover)
@@ -3918,11 +3970,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9498,40},{515,30},{16001,60},{503,60},{9022,40}},
-        {{9498,40},{515,25},{16001,60},{503,50},{9022,30}},
-        {{9498,40},{515,20},{16001,60},{503,40},{9022,20}},
+        {{9498,40},{515,30},{16001,60},{503,60},{9075,40}},
+        {{9498,40},{515,25},{16001,60},{503,50},{9075,30}},
+        {{9498,40},{515,20},{16001,60},{503,40},{9075,20}},
     };
-    static MailPackage::MailItem card = {9971,1};
+    static MailPackage::MailItem card = {9976,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -4659,7 +4711,6 @@ void World::SendTYSSPlayerAward()
     }
     return;
 }
-
 
 }
 
