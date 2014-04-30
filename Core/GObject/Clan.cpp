@@ -5658,7 +5658,10 @@ void Clan::sendMemberBuf(UInt8 pos)
         if(!pl)
             continue;
         if(pos == 1)
+        {
             pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
+            addClanTitle(1, 0, pl);
+        }
         else if(pos == 2)
             pl->setBuffData(PLAYER_BUFF_CLAN2, endTime);
         else
@@ -5925,7 +5928,7 @@ std::map<UInt8, UInt32> & Clan::GetClanTitle()
 
 void Clan::addClanTitle(UInt8 titleId, UInt32 endTime, Player * pl)
 {
-    if(TimeUtil::Now() < endTime)
+    if(TimeUtil::Now() < endTime || endTime == 0)
         _clanTitle.insert(make_pair(titleId, endTime));
     writeClanTitleAll();
     pl->notifyClanTitle();

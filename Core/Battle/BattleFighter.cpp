@@ -498,11 +498,11 @@ void BattleFighter::updateBuffExtras()
     if(_fighter && _fighter->getOwner())
     {
         if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN1) > 0)
-            clanFactor = 1.1;
-        else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN2) > 0)
             clanFactor = 1.05;
-        else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+        else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN2) > 0)
             clanFactor = 1.03;
+        else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+            clanFactor = 1.02;
     }
     if(clanFactor > 0.001f)
     {

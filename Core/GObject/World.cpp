@@ -4573,10 +4573,10 @@ void World::SendTYSSPlayerAward()
     int pos = 1;
     std::string str = "";
     static MailPackage::MailItem s_item[][4] = {
-        {{134,50},{1325,50},{515,30},{9075,40}},
-        {{134,40},{1325,40},{515,25},{9075,30}},
-        {{134,30},{1325,30},{515,20},{9075,20}},
+        {{134,30},{1325,30},{515,25},{9075,20}},
+        {{134,25},{1325,25},{515,20},{9075,15}},
         {{134,20},{1325,20},{515,15},{9075,10}},
+        {{134,15},{1325,15},{515,10},{9075,8}},
     };
     SYSMSG(title, 946);
     for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
