@@ -7105,7 +7105,6 @@ void OnQueryTempItemReq( GameMsgHdr & hdr, const void * data )
 void OnErlkingReq(GameMsgHdr & hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
-    return ;
 
     if(player->GetLev() < 85)
         return;

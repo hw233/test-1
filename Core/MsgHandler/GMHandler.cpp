@@ -3582,7 +3582,7 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
             GObject::Lineup& lup = PLAYER_DATA(player, lineup)[i];
             Fighter* fighter = lup.fighter;
             if(fighter)
-                SYSMSG_SENDV(624, player, fighter->getName().c_str(), static_cast<UInt32>(fighter->getBattlePoint()));
+                SYSMSG_SENDV(624, player, fighter->getId(), fighter->getName().c_str(), static_cast<UInt32>(fighter->getBattlePoint()));
         }
         std::map<UInt32, FairyPet *>& fairyPet = player->getFairyPet();
         std::map<UInt32, FairyPet *>::iterator it = fairyPet.begin();

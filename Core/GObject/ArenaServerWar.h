@@ -452,6 +452,8 @@ class ServerWarMgr
         void updateLeaderBoard(BinaryReader&);
         void sendLeaderBoard(Player *);
         void sendLastLeaderBoard(Player *);
+
+        void commitArenaForceOnce();    //强制同步仙界传奇
     public:
         Stream _readbuf;
 
