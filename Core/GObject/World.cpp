@@ -554,6 +554,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 25)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 26)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 3)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -590,6 +598,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 5)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 12)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 19)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 26)
         ))
     {
 #if 0
@@ -1511,6 +1520,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 25)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 26)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 3)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1731,7 +1748,7 @@ void World::World_OldMan_Refresh(void *)
            UInt16 loc;
            UInt32 npcId;
        };
-       MapNpc mapNpc = {_oldMan._spot, 4244};
+       MapNpc mapNpc = {_oldMan._spot, 4245};
        GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
        GLOBAL().PushMsg(hdr1, &mapNpc);
        _oldMan._loc = 0;
@@ -1739,27 +1756,22 @@ void World::World_OldMan_Refresh(void *)
        _oldMan._time = 0;
     }
     else if( time > _oldMan._time )
-   // else if ((time%600) < 3 || (time%600)>= 600 -2)    //测试
     {
         UInt16 spot = GetRandomSpot();
-        //std::cout<<"ChangeTo:"<<spot<<std::endl;
         if(!spot)
             return ;
         if(_oldMan._spot == 0)
         {
             SYSMSG_BROADCASTV(572,spot); 
         }
-        else 
-        {
-            SYSMSG_BROADCASTV(573,spot); 
-        }
+
         UInt8 thrId = mapCollection.getCountryFromSpot(_oldMan._spot);
         struct MapNpc
         {
             UInt16 loc;
             UInt32 npcId;
         };
-        MapNpc mapNpc = {_oldMan._spot, 4244};
+        MapNpc mapNpc = {_oldMan._spot, 4245};
         GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
         GLOBAL().PushMsg(hdr, &mapNpc);
 
@@ -1767,7 +1779,7 @@ void World::World_OldMan_Refresh(void *)
         _oldMan._players.clear();
         GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
         GObject::MOData mo;
-        mo.m_ID = 4244;
+        mo.m_ID = 4245;
         mo.m_Hide = false;
         mo.m_Spot = _oldMan._spot;
         mo.m_Type = 100;
@@ -1776,15 +1788,14 @@ void World::World_OldMan_Refresh(void *)
         GLOBAL().PushMsg(hdr1, &mo);
         _oldMan._time = (time/3600+1)*3600; 
     }
-    else if ((time%600) < 3 || (time%600)>= 600 -2)     
-   // else if ((time%180) < 3 || (time%180)>= 180 -2)         //测试
+    else if((time%600) < 3 || (time%600)>= 600 -2)
     {
-        if(!_oldMan._spot)
-            return ;
-        SYSMSG_BROADCASTV(572,_oldMan._spot); 
+        if(_oldMan._spot != 0)
+            SYSMSG_BROADCASTV(573,_oldMan._spot); 
     }
 
 }
+
 void World::Tianjie_Refresh(void*)
 {
 	GObject::Tianjie::instance().process(TimeUtil::Now());
@@ -4446,10 +4457,10 @@ void World::SendHappyFireAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{515,50},{503,50},{509,50},{9438,50},{9022,50}},
-        {{515,30},{503,30},{509,30},{9438,30},{0,0}},
-        {{515,20},{503,20},{509,20},{9438,20},{0,0}},
-        {{515,10},{503,10},{509,10},{9438,10},{0,0}},
+        {{9600,50},{503,50},{16001,50},{9438,50},{9075,50}},
+        {{9600,30},{503,30},{16001,30},{9438,30},{0,0}},
+        {{9600,20},{503,20},{16001,20},{9438,20},{0,0}},
+        {{9600,10},{503,10},{16001,10},{9438,10},{0,0}},
     };
     //static MailPackage::MailItem card = {9929,1};   //暂无白马王子
     UInt8 mark = 0;

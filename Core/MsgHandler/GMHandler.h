@@ -205,6 +205,7 @@ private:
     void OnCreateMarryBoard(GObject::Player *player, std::vector<std::string>& args);
     void OnFoolsDayGM(GObject::Player *player, std::vector<std::string>& args);
     void OnSendMsg(GObject::Player *player, std::vector<std::string>& args);
+    void OnAddFriendlyCount(GObject::Player *player, std::vector<std::string>& args);
     void OnLuckyStarGM(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBoss(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBossPick(GObject::Player *player, std::vector<std::string>& args);
@@ -253,6 +254,7 @@ private:
 
     void OnSetTYSS(GObject::Player *player, std::vector<std::string>& args);
     void TestClanRank(GObject::Player *player, std::vector<std::string>& args);
+    void OnSkillTest(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

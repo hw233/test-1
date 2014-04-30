@@ -114,6 +114,10 @@ function loadStore()
         store:clear()
 
         discount(store)
+
+    store:add(2,16004,2)
+    store:add(2,16005,10)
+    store:add(2,16008,20)
     store:add(2,16001,20)
     store:add(2,9494,599)
     store:add(2,9433,599)
@@ -147,7 +151,7 @@ function loadStore()
         store:add(2 ,16009, 100)
     end
     if getHappyFireTime(300) then
-        store:add(2, 9440, 10)
+        store:add(2, 9458, 10)
     end
 
     if getKillMonsterAct() then
@@ -392,6 +396,7 @@ function loadStore()
         store:add(3,5133,15)
         store:add(3,5143,20)
         -- 礼券
+        store:add(4,16007,10)
         store:add(4,57,10)
         store:add(4,511,5)
         store:add(4,56,10)
@@ -418,6 +423,7 @@ function loadStore()
         store:add(4,5143,20)
 
         -- 银币
+        store:add(5,16006,1000)
         store:add(5,9443,1000)
 		store:add(5,9307,200)
 		store:add(5,9309,500)

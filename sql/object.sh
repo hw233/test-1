@@ -253,7 +253,6 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearGuangGun.sql        #清除光棍节情义罗盘相关数据(为开服活动做准备)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140214_1.sql     #墨宝
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140214_2.sql   #藏剑崖
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #捉迷藏清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar199.sql        #清除强化装备的8次限制
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearGuangGun.sql        #清除光棍节情义罗盘相关数据(为开服活动做准备)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140214_1.sql     #墨宝
@@ -279,9 +278,15 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140328_2.sql   #回流玩家申请加入队伍列表
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140328_3.sql   #队伍数据
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140328_4.sql   #本次活动开启回流玩家数据
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140418_1.sql   #修改数据库世界boss血量
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140418_1.sql   #修改数据库世界boss血量
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140422_1.sql     #五一劳动奖清空
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #捉迷藏清空
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_3_24_CreateFriendlyCount.sql     #创建友好度表
 }
 
 #sh player_jiguan.sh
