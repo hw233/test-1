@@ -1389,7 +1389,7 @@ void Athletics::RequestSubDir(Player* player, UInt8 athlDiffculty, UInt8 athlCat
         return;
     }
     UInt32 now = TimeUtil::Now();
-    if(player->getEPhysicalTime() >= now)
+    if(player->getEPhysicalTime() >= now - 1 )
         return ;
     player->setEPhysicalTime(now);
     PlayerPInfo.ePhysical -= 3;
