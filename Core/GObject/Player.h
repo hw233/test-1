@@ -2325,6 +2325,7 @@ namespace GObject
 		UInt32 _offlineTime; // for wallow use
 		UInt32 _nextTavernUpdate;
 		UInt32 _nextBookStoreUpdate;
+        UInt32 _ePhysicalTime ;
 
 		UInt8 _bossLevel;
 		GData::NpcGroup *_ng;
@@ -2355,6 +2356,8 @@ namespace GObject
         void useToken(UInt8 type);
         void sendTokenInfo();
         void sendDiscountLimit();
+        void setEPhysicalTime(UInt32 time){_ePhysicalTime = time;}
+        UInt32 getEPhysicalTime(){return _ePhysicalTime;}
 
         void useMDSoul(UInt8 v=1);
         void svrSt(UInt8);
@@ -3248,6 +3251,7 @@ namespace GObject
         void resetDrinking(){ drinkInfo.drinker = NULL ; drinkInfo.time = 0 ; drinkInfo.plset.clear();}
         void setDrinkType(UInt8 type ){ drinkInfo.type = type ;}
         DrinkInfo& getDrinkInfo(){ return drinkInfo;}
+        void sendDrinkInfo();
 
         UInt32 getfriendSum(){return _friendSum;}
 
