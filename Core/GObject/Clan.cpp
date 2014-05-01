@@ -5648,6 +5648,8 @@ void Clan::sendMemberBuf(UInt8 pos)
 {
     if(pos == 0 || pos > 3)
         return;
+    if(pos == 1)
+        addClanTitle(1, 0);
 	Mutex::ScopedLock lk(_mutex);
     UInt32 endTime = TimeUtil::Now() + 86400 * 14;
 	ClanMember * mem = NULL;
@@ -5663,7 +5665,9 @@ void Clan::sendMemberBuf(UInt8 pos)
         if(pos == 1)
         {
             pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
-            addClanTitle(1, 0, pl);
+            //addClanTitle(1, 0, pl);
+            if(pl->isOnline())
+                pl->notifyClanTitle();
         }
         else if(pos == 2)
             pl->setBuffData(PLAYER_BUFF_CLAN2, endTime);
@@ -5929,12 +5933,12 @@ std::map<UInt8, UInt32> & Clan::GetClanTitle()
     return _clanTitle;
 }
 
-void Clan::addClanTitle(UInt8 titleId, UInt32 endTime, Player * pl)
+void Clan::addClanTitle(UInt8 titleId, UInt32 endTime/*, Player * pl*/)
 {
     if(TimeUtil::Now() < endTime || endTime == 0)
         _clanTitle.insert(make_pair(titleId, endTime));
     writeClanTitleAll();
-    pl->notifyClanTitle();
+    //pl->notifyClanTitle();
 }
 
 void Clan::writeClanTitleAll()
