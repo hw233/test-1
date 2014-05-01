@@ -4501,6 +4501,9 @@ namespace GObject
             st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
             std::string openid = pl->getOpenId();
             st << openid;
+            st << getFriendlyCount(pl->getId());
+            st << static_cast<UInt8>(_hasBrother(pl));
+            st << static_cast<UInt8>(GetYBCount(pl));
 
             st<<Stream::eos;
 			send(st);
@@ -4538,6 +4541,9 @@ namespace GObject
             st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
             std::string openid = pl->getOpenId();
             st << openid;
+            st << getFriendlyCount(pl->getId());
+            st << static_cast<UInt8>(_hasBrother(pl));
+            st << static_cast<UInt8>(GetYBCount(pl));
             st<<Stream::eos;
             send(st);
             SYSMSG_SEND(2341, this);
@@ -4675,6 +4681,9 @@ namespace GObject
         st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
         std::string openid = pl->getOpenId();
         st << openid;
+        st << getFriendlyCount(pl->getId());
+        st << static_cast<UInt8>(_hasBrother(pl));
+        st << static_cast<UInt8>(GetYBCount(pl));
         st<<Stream::eos;
 		send(st);
 		DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%" I64_FMT "u, 1, %" I64_FMT "u)", getId(), pl->getId());
@@ -4873,9 +4882,9 @@ namespace GObject
         }
         ++prayValue;
         _prayFriend[other->getId()]=now;
+        CompleteFriendlyTask(other,1);
         SendOtherInfoForPray(other,prayValue);
         SYSMSG_SENDV(2026, this);
-        CompleteFriendlyTask(other,1);
 
         char str[16] = {0};
         sprintf(str, "F_130822_8");
@@ -4906,6 +4915,9 @@ namespace GObject
         st<<static_cast<UInt8>(GetVar(VAR_OLDMAN_PRESENT));
         std::string openid = other->getOpenId();
         st << openid;
+        st << getFriendlyCount(other->getId());
+        st << static_cast<UInt8>(_hasBrother(other));
+        st << static_cast<UInt8>(GetYBCount(other));
         st<< Stream::eos;
         send(st);
     }
@@ -30179,12 +30191,14 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
             AddVar(VAR_FRIEND_VALUE , 5);
             AddVar(VAR_FRIEND_VALUE_DAY , 5);
             //std::cout << "XXX5" <<std::endl;
+            udpLog("jiebaixitong", "F_140423_1", "", "", "", "", "act");
         }
         if(dayTaskNum == 6)
         {
             AddVar(VAR_FRIEND_VALUE , 3);
             AddVar(VAR_FRIEND_VALUE_DAY , 3);
             //std::cout << "XXX6" <<std::endl;
+            udpLog("jiebaixitong", "F_140423_2", "", "", "", "", "act");
         }
     }
 
@@ -31574,6 +31588,11 @@ bool Player::AfterDrinking()
         {
             UInt32 value = SET_BIT_8(var_val , !shenfen , (val+1));
             SetVar(VAR_DRINK_COUNT,value);
+            if(val == 0 )
+                udpLog("jiebaixitong", "F_140423_4", "", "", "", "", "act");
+            else
+                udpLog("jiebaixitong", "F_140423_5", "", "", "", "", "act");
+
         }
         else
         {
@@ -31626,6 +31645,9 @@ void Player::BuyDrinkCount()
     SetVar(VAR_CLAN_FRIEND,now_Count);
     SetVar(VAR_DRINK_COUNT,buy_Count);
     sendFirendlyCountTaskInfo();
+    char action[16] = "";
+    snprintf (action, 16, "F_140423_%d",5+((buy_count<3)?(buy_count+1):4) );
+    udpLog("jiebaixitong", action, "", "", "", "", "act");
 }
 
 bool Player::UseYellowBird(Player * friendOne ,UInt32 num)
@@ -31652,8 +31674,12 @@ bool Player::UseYellowBird(Player * friendOne ,UInt32 num)
     if(!UseMeiHuaJian(16004,num))
         return false;
     for(UInt8 i = 0; i < num; ++i)
+    {
         CompleteFriendlyTask( friendOne, 5);
+        udpLog("jiebaixitong", "F_140423_3", "", "", "", "", "act");
+    }
     countNum += num ; 
+
 
     _friendYB[friendOne->getId()].count = countNum ;
     _friendYB[friendOne->getId()].time = now;
@@ -31855,15 +31881,15 @@ void Player::clearClanTitle()
     notifyClanTitle();
 }
 
-   void Player::specialUdpLog(UInt8 type)
-   {
-       switch(type)
-       {
-           case 1:
-               udpLog("huodong", "F_140417_1", "", "", "", "", "act");
-               break;
-       }
-   }
+void Player::specialUdpLog(UInt8 type)
+{
+    switch(type)
+    {
+        case 1:
+            udpLog("huodong", "F_140417_1", "", "", "", "", "act");
+            break;
+    }
+}
 
 } // namespace GObject
 
