@@ -1228,6 +1228,14 @@ struct DBFairySpar
     UInt8 breakoutCnt;
 };
 
+struct DBCollectCnt
+{
+    UInt64 playerId;
+    UInt8 level;
+    UInt16 bluecnt;
+    UInt16 purlecnt;
+    UInt16 orangecnt;
+};
 struct DBCollectCard
 {
     UInt64 playerId;
@@ -1601,6 +1609,26 @@ struct DBClanBuildings
     UInt16 hpLevel;
     UInt16 oracleLevel;
     UInt16 updateTime;
+};
+
+struct DBCard
+{
+    UInt64 playerId;
+    UInt32 id;
+    UInt16 cid;
+    UInt8 level;
+    UInt16 exp;
+    UInt8 pos;
+};
+
+struct DBCardSuit
+{
+    UInt64 playerId;
+    UInt8 id;
+    UInt8 suit_mark;
+    UInt8 active;
+    UInt16 spe_mark;
+    UInt8 collect_degree;
 };
 
 struct DBZhenyuanAttr
@@ -3147,6 +3175,18 @@ SPECIALDEF(12)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBCollectCnt)
+SPECIALDEF(5)
+(
+    UInt64, playerId,
+    UInt8, level,
+    UInt16, bluecnt,
+    UInt16, purlecnt,
+    UInt16, orangecnt
+)
+SPECIALEND()
+
+
 SPECIALBEGIN(GObject::DBRNR)
 SPECIALDEF(2)
 (
@@ -3635,6 +3675,30 @@ SPECIALDEF(8)
     UInt16, hpLevel,
     UInt16, oracleLevel,
     UInt16, updateTime
+    )
+SPECIALEND()
+
+SPECIALBEGIN (GObject::DBCard)
+SPECIALDEF(6)
+    (
+    UInt64, playerId,
+    UInt32, id,
+    UInt16, cid,
+    UInt8, level,
+    UInt16, exp,
+    UInt8, pos
+    )
+SPECIALEND()
+
+SPECIALBEGIN (GObject::DBCardSuit)
+SPECIALDEF(6)
+    (
+    UInt64, playerId,
+    UInt8, id,
+    UInt8, suit_mark,
+    UInt8, active,
+    UInt16, spe_mark,
+    UInt8, collect_degree
     )
 SPECIALEND()
 

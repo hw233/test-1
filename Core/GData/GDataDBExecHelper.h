@@ -792,6 +792,30 @@ struct DBCoupleCopy
     UInt32 monster;
 };
 
+struct DBCardInfo
+{
+    UInt16 id;
+    UInt8 type;
+    UInt8 color;
+    UInt8 lvLimit;
+    UInt16 skillId;
+};
+
+struct DBCardUpgrade
+{
+    UInt8 level;
+    UInt32 gexp;
+    UInt32 bexp;
+    UInt32 pexp;
+    UInt32 yexp;
+    UInt32 hgexp;
+    UInt32 hbexp;
+    UInt32 hpexp;
+    UInt32 hyexp;
+    UInt8 skillLevel;
+    UInt16 attrIndex;
+};
+
 struct DBZHYExtraAttr
 {
     UInt16 id;
@@ -1731,6 +1755,34 @@ SPECIALDEF(4)
     Int32, effect,
     UInt32, consume,
     UInt8, needLev
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCardUpgrade)
+SPECIALDEF(11)
+    (
+	UInt8, level,
+    UInt32, gexp,
+    UInt32, bexp,
+    UInt32, pexp,
+    UInt32, yexp,
+    UInt32, hgexp,
+    UInt32, hbexp,
+    UInt32, hpexp,
+    UInt32, hyexp,
+    UInt8, skillLevel,
+    UInt16, attrIndex
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCardInfo)
+SPECIALDEF(5)
+	(
+    UInt16, id,
+    UInt8, type,
+    UInt8, color,
+    UInt8, lvLimit,
+    UInt16, skillId
 	)
 SPECIALEND()
 

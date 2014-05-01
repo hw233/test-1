@@ -15008,6 +15008,7 @@ bool BattleSimulator::doEffectAfterCount(BattleFighter* bf, const GData::SkillBa
     if(last == 0)
         return bRet;
 
+    appendDefStatus(e_skill, skill->getId(), bf);
     UInt8 target_side = bf->getSide();
     for(UInt8 i = 0; i < 25; i++)
     {

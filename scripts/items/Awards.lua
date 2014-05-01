@@ -1765,6 +1765,47 @@ function RunTYSSAward(player, cts)
     return true
 
 end
+local collectChance = {
+    [1] = {{0,10000}},
+    [2] = {{1,0},{2,5},{3,10},{5,20},{8,500},{10,2000},{13,5000},{15,10000}},
+    [3] = {{1,0},{3,5},{5,10},{10,20},{15,500},{20,2000},{25,5000},{30,10000}},
+    [4] = {{1,0},{10,5},{20,10},{30,20},{40,500},{50,2000},{60,5000},{70,10000}},
+
+}
+local Card = {8,7,5,4,3,6,1,2}
+function GetCardByChance(player ,cnt1,cnt2,cnt3)
+    local chance ={0,0,0,0}
+    local cnts = {0,0,0,0} 
+    local color = 1
+    cnts[1] = 0
+    cnts[2] = cnt1
+    cnts[3] = cnt2
+    cnts[4] = cnt3
+    for k = 1,#collectChance  do 
+        for j =1,#collectChance[k] do
+            if cnts[k] >= collectChance[k][j][1] then
+                chance[k] = collectChance[k][j][2]
+            end
+        end
+    end
+    local g = math.random(1, 10000)
+     
+    for k = 1,#chance do
+        if g < chance[k] then
+            color = k
+        end
+    end
+    if color ==0 or color > 4 then
+        return 0
+    end
+    local idx = 1
+    local r = math.random(1, 10000)
+    if r > 5000 then
+        idx = 2
+    end
+    return Card[(color-1)*2 +idx]
+end
+
 function RunFriendlyGoods(player, cts ,count)
     local item = {
         [1] = {0,15,50},
