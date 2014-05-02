@@ -640,6 +640,7 @@ struct DBFriendlyCount
     UInt8  isBrother;
     UInt32 time ;
     UInt32 cost ;
+    UInt8 wait;
     UInt32 ybTime ;
     UInt8 ybCount ;
 };
@@ -2260,7 +2261,7 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFriendlyCount)
-SPECIALDEF(8)
+SPECIALDEF(9)
 (
 	UInt64, playerId,
 	UInt64, friendId,
@@ -2268,6 +2269,7 @@ SPECIALDEF(8)
     UInt8 , isBrother,
     UInt32 , time ,
     UInt32 ,cost,
+    UInt8 , wait,
     UInt32 , ybTime,
     UInt8 , ybCount
 )

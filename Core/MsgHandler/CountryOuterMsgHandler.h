@@ -8392,6 +8392,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             SYSMSGV(title, 400, player->getCountry(), player->getName().c_str());
             SYSMSGV(content, 401, player->getCountry(), player->getName().c_str());
             friendOne->GetMailBox()->newMail(player, 0x16, title, content);
+            player->sendFriendlyTimeAndCost();
         }
 		break;
 	case 0x03:
@@ -8419,6 +8420,19 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             player->send(st);
         }
 		break;
+    case 4:
+        {
+            std::string name;
+            br >> name;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            if(player->IsAccept(friendOne)) 
+            {
+                player->drinking(friendOne);
+            }
+        }
+        break;
     case 0x05:
         {
             std::string name ;
@@ -8438,8 +8452,14 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
             if(friendOne == NULL)
                 return ;
+            
             if(res == 1)
-               player->setDrinking(friendOne , 0);
+            {
+                if(player->getDrinkInfo().type != 0)
+                    res = 0;
+                else
+                    player->setDrinking(friendOne , 0);
+            }
             struct st 
             {
                 UInt64 playerId;
@@ -8453,6 +8473,16 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             GameMsgHdr hdr(0x404, friendOne->getThreadId(), friendOne, sizeof(_st));
             GLOBAL().PushMsg( hdr, &_st );
             //friendOne->beReplyForDrinking(player,res);
+        }
+        break;
+    case 0x07:
+        {
+            std::string name ;
+            br >> name ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            player->acceptBrother(friendOne , 1);
         }
         break;
     case 0x08:
@@ -8488,6 +8518,23 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
     case 0x0B:
         {
         
+        }
+        break;
+    case 0x0C:
+        {
+            std::string name ;
+            br >> name ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL )
+                break;
+            player->calcDrinkPoint();
+            GameMsgHdr hdr(0x407, friendOne->getThreadId(), friendOne, 0);
+            GLOBAL().PushMsg( hdr, NULL );
+        }
+        break;
+    case 0x0D:
+        {
+           player->BeginDrink();
         }
         break;
 	}

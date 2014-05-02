@@ -7177,7 +7177,7 @@ namespace GObject
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		DBFriendlyCount dbfr;
-		if(execu->Prepare("SELECT `playerId`, `friendId`, `value` ,`isBrother` ,`time`,`cost`,`ybTime`,`ybCount` FROM `friendlyCount` ORDER BY `playerId`", dbfr) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `friendId`, `value` ,`isBrother` ,`time`,`cost`,`wait`,`ybTime`,`ybCount` FROM `friendlyCount` ORDER BY `playerId`", dbfr) != DB::DB_OK)
 			return false;
 		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
@@ -7194,7 +7194,7 @@ namespace GObject
 			if(friendOne == NULL)
 				continue;
             if(dbfr.value!=0)
-                pl->LoadFriendlyCountFromDB(dbfr.friendId , dbfr.value , dbfr.time ,dbfr.cost);
+                pl->LoadFriendlyCountFromDB(dbfr.friendId , dbfr.value , dbfr.time ,dbfr.cost, dbfr.wait);
             if(dbfr.isBrother!=0)
             {
                 pl->InsertBrother(friendOne);

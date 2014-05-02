@@ -2813,11 +2813,29 @@ void OnAddFriendlyCount(GameMsgHdr & hdr ,const void *data)
 void OnAcceptBrother(GameMsgHdr & hdr ,const void *data)
 {
     MSG_QUERY_PLAYER(player);
-    UInt64 playerId  = *reinterpret_cast<const UInt64 *>(data);
-	GObject::Player * pl = GObject::globalPlayers[playerId];
+    struct st
+    {
+        UInt64 playerId;
+        UInt8 flag;
+    };
+    struct st _st = *reinterpret_cast<const struct st *>(data);
+	GObject::Player * pl = GObject::globalPlayers[_st.playerId];
     if(pl==NULL)
         return ;
-    player->acceptBrother(pl,true);
+    player->acceptBrother(pl,_st.flag);
+}
+
+void OnDrinking(GameMsgHdr & hdr,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct st
+    {
+        UInt64 playerId;
+        UInt8 drinkCount;
+    };
+    struct st _st = *reinterpret_cast<const struct st *>(data);
+    GObject::Player *p1 = player->getDrinkInfo().drinker;
+    player->drinking(p1,_st.drinkCount);
 }
 void OnBeInviteDrinking(GameMsgHdr & hdr ,const void *data)
 {
@@ -2861,11 +2879,17 @@ void OnBeRefuceBrother(GameMsgHdr & hdr ,const void *data)
 void OnAfterDrink(GameMsgHdr & hdr ,const void *data)
 {
     MSG_QUERY_PLAYER(player);
-    UInt64 playerId  = *reinterpret_cast<const UInt64 *>(data);
-	GObject::Player * pl = GObject::globalPlayers[playerId];
-    if(pl==NULL)
-        return ;
-    player->AfterDrinking(pl);
+    player->AfterDrinking();
+}
+void OnCalcDrink(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->calcDrinkPoint();
+}
+void OnBeginDrink(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->BeginDrink();
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
