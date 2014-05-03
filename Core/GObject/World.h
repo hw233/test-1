@@ -613,13 +613,11 @@ public:
     inline static bool  getOldManTime()
     {
         //UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
-        UInt32 begin1 = TimeUtil::MkTime(2014, 4, 25) + 8 * 3600;
-        UInt32 end1 = TimeUtil::MkTime(2014, 4, 25) + 20 * 3600;
+        UInt32 begin1 = TimeUtil::MkTime(2014, 4, 25);
+        UInt32 end1 = TimeUtil::MkTime(2014, 4, 27);
         //UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
-        UInt32 begin2 = TimeUtil::MkTime(2014, 4, 26) + 8 * 3600;
-        UInt32 end2 = TimeUtil::MkTime(2014, 4, 26) + 20 * 3600;
         UInt32 now = TimeUtil::Now() ;
-        if((now >= begin1 && now <= end1) || (now >= begin2 && now <= end2))
+        if((now >= begin1 && now <= end1))
             return true;
         else
             return false;
@@ -1013,7 +1011,6 @@ public:
         UInt32 begin = GVAR.GetVar(GVAR_TYSS_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_TYSS_END);
         UInt32 now = TimeUtil::Now() + time;
-
         if ((now > getOpenTime() + 7 * 86400) && (now  < getOpenTime() + 14 * 86400) )
             return true;
 

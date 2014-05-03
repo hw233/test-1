@@ -150,11 +150,13 @@ namespace GObject
     
         bool DelAddCard(UInt32 id);
     
-        void ExchangeSpeCard(UInt16 itemid);
+        void ExchangeSpeCard(UInt16 itemid,UInt32 flowid);
     
         void InsertCard(DBCard dbc);
         
         void InsertCardSuit(DBCardSuit dbcs);
+    
+        void GMAddExp(UInt32 exp);
 
     private:
         std::vector<CardInfo*> VecEquipSlot;//装备卡牌槽

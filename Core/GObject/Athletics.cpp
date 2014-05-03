@@ -1388,6 +1388,10 @@ void Athletics::RequestSubDir(Player* player, UInt8 athlDiffculty, UInt8 athlCat
         player->sendMsgCode(0, 1497);
         return;
     }
+    UInt32 now = TimeUtil::Now();
+    if(player->getEPhysicalTime() >= now - 1 )
+        return ;
+    player->setEPhysicalTime(now);
     PlayerPInfo.ePhysical -= 3;
     Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
     st << static_cast<UInt8>(4) << PlayerPInfo.ePhysical << Stream::eos;
