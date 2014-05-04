@@ -34,7 +34,7 @@ class RaceBattle : public Singleton<RaceBattle>
         void cancelBattle(Player* pl);
         void freshContinueWinRank(Player* pl);
         void getAward(Player* pl);
-        void readBattleReport(Player* pl, UInt32 reportId);
+        //void readBattleReport(Player* pl, UInt32 reportId);
         void requestMatch(Player* pl);
         bool isStart();
         void makeStarInfo(Stream& st, Player* pl, UInt8 level);
@@ -52,6 +52,7 @@ class RaceBattle : public Singleton<RaceBattle>
         void attackContinueWinPlayer(Player* pl, UInt64 defenderId);
         void insertContinueWinSort(Player* pl);
         void eraseContinueWinSort(Player* pl);
+        void sendOwnerInfo(Player* pl);
 
     private:
         static UInt8 _status; //0（未开启），1（17：50~20：00），2（20：00~20：30）

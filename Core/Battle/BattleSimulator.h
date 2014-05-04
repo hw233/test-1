@@ -38,6 +38,8 @@ namespace Battle
         BS_NEWCOUNTRYBATTLE = 0xFD02,
         //末日之战
         BS_CLANBOSSBATTLE = 0xFD03,
+        //乱斗
+        BS_RACEBATTLE = 0xFD04,
         // 世界BOSS
         BS_WBOSS = 0xFC01
     };

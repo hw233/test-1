@@ -3315,7 +3315,7 @@ namespace GObject
         //本层每个offset位置的星级数
         UInt16 _starCnt[7]; //放大2倍
         //可挑战次数
-        UInt8 _canChallengeCnt;
+        //UInt8 _canChallengeCnt;
         //连斩人数
         UInt8 _continueWinCnt;
         //第几层奖励可以领取
@@ -3336,8 +3336,8 @@ namespace GObject
         void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
         UInt16 getStarCnt(UInt8 i) { if(i < 7) return _starCnt[i]; else return 0; }
         void setStarCnt(UInt8 i, UInt16 cnt) { if(i < 7) _starCnt[i] = cnt; else _starCnt[i] = 0; }
-        UInt8 getCanChallengeCnt() { return _canChallengeCnt; }
-        void setCanChallengeCnt(UInt8 cnt) { _canChallengeCnt = cnt; }
+        //UInt8 getCanChallengeCnt() { return _canChallengeCnt; }
+        //void setCanChallengeCnt(UInt8 cnt) { _canChallengeCnt = cnt; }
         UInt8 getContinueWinCnt() { return _continueWinCnt; }
         void setContinueWinCnt(UInt8 cnt) { _continueWinCnt = cnt; }
         UInt8 getAwardLevel() { return _awardLevel; }

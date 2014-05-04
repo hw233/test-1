@@ -105,21 +105,6 @@ namespace GObject
         {
         }
 
-        Stream st(REP::RACE_BATTLE);
-        UInt8 type = 2;
-        st << type;
-        st << pl->getRaceBattlePos();
-        st << pl->getStarTotal();
-        st << gPerLeveCnt[level - 1];
-        for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
-            st << pl->getStarCnt(i);
-        st << pl->getCanChallengeCnt();
-        st << pl->getContinueWinCnt();
-        st << rb->next;
-        makeStarInfo(st, pl, level);
-        st << pl->getAwardLevel();
-        st << Stream::eos;
-        pl->send(st);
 
         UInt8 page = pl->getContinueWinPage();
         if(page == 0)
@@ -128,7 +113,7 @@ namespace GObject
             pl->setContinueWinPage(page);
         }
         sendContinueWinSort(pl, page);
-
+        sendOwnerInfo(pl);
         sendBattleInfo(pl);
     }
 
@@ -178,14 +163,14 @@ namespace GObject
         st << Stream::eos;
         pl->send(st);
     }
-
+#if 0
     void RaceBattle::readBattleReport(Player* pl, UInt32 reportId)
     {
         if(!pl)
             return;
         pl->readRandBattleReport(reportId);
     }
-
+#endif
     void RaceBattle::requestMatch(Player* pl)
     {
         if(!pl)
@@ -204,14 +189,14 @@ namespace GObject
         UInt8 offset = pos % 10;
         if(offset == 0)
         {
-            pl->sendMsgCode(0, 4017);
+            pl->sendMsgCode(0, 4044);
             return;
         }
         if(offset > gPerLeveCnt[level - 1])
             return;
         if(pl->getStarCnt(offset - 1) >= 6)
         {
-            pl->sendMsgCode(0, 4018);
+            pl->sendMsgCode(0, 4043);
             return;
         }
 
@@ -222,6 +207,8 @@ namespace GObject
             RBSortType& levelSort = _levelStarSort[i - 1];
             for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
             {
+                if(it->player == pl)
+                    continue;
                 ++count;
                 vecPlayer.push_back(it->player);
             }
@@ -235,11 +222,13 @@ namespace GObject
             RBSortType& levelSort = _levelStarSort[i - 1];
             for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
             {
+                if(it->player == pl)
+                    continue;
                 ++count;
                 vecPlayer.push_back(it->player);
             }
         }
-        if(count <= 1)
+        if(count == 0)
         {
             pl->sendMsgCode(0, 4042);
             return;
@@ -318,7 +307,7 @@ namespace GObject
     void RaceBattle::sendContinueWinSort(Player* player, UInt8 page)
     {
         #define PAGE_MAX 5
-        if(player == NULL || page == 0)
+        if(player == NULL)
             return;
 
         UInt32 playerTotal = _contineWinSort.size();
@@ -388,7 +377,7 @@ namespace GObject
         if(!pl || !matchPlayer)
             return;
         Stream st(REP::RACE_BATTLE);
-        UInt8 type = 4;
+        UInt8 type = 5;
         st << type;
 
         st << pl->getName();
@@ -430,7 +419,7 @@ namespace GObject
         }
 		pl->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + 3);
 
-        Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, pl, matchPlayer);
+        Battle::BattleSimulator bsim(Battle::BS_RACEBATTLE, pl, matchPlayer);
         pl->PutFighters( bsim, 0 );
         matchPlayer->PutFighters( bsim, 1 );
 
@@ -626,7 +615,7 @@ namespace GObject
             return;
         if(pl->getStarCnt(offset - 1) >= 6)
         {
-            pl->sendMsgCode(0, 4018);
+            pl->sendMsgCode(0, 4043);
             return;
         }
 
@@ -639,14 +628,14 @@ namespace GObject
         {
             starAdd = 2;
             eraseContinueWinSort(pl);
-            pl->setContinueWinCnt(0);
+            pl->setContinueWinCnt(pl->getContinueWinCnt() + 1);
+            insertContinueWinSort(pl);
         }
         else
         {
             starAdd = 1;
             eraseContinueWinSort(pl);
-            pl->setContinueWinCnt(pl->getContinueWinCnt() + 1);
-            insertContinueWinSort(pl);
+            pl->setContinueWinCnt(0);
         }
 
         UInt16 starCnt = pl->getStarCnt(offset - 1) + starAdd;
@@ -658,26 +647,32 @@ namespace GObject
             UInt8 canContinueCnt = pl->getCanContinueCnt();
             pl->setCanContinueCnt(++canContinueCnt);
         }
-        UInt16 starTotal = pl->getStarTotal();
-        pl->setStarTotal(starTotal + starAdd);
+        UInt16 starTotal = pl->getStarTotal() + starAdd;
+        pl->setStarTotal(starTotal);
         eraseLevelStarSort(pl, level);
         GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pl->getRaceBattlePos());
-        if(rb && starCnt >= rb->next * 2)
+        if(rb && starTotal >= rb->next * 2)
         {
-            UInt8 pos = (level + 1) * 10;
-            enterPos(pl, pos);
+            level = level + 1;
+            for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
+                pl->setStarCnt(i, 0);
+            UInt8 pos = level * 10;
+            pl->setRaceBattlePos(pos);
+            enterPos(pl, 0);
         }
         else
         {
             TSort tsort;
             tsort.player = pl;
-            tsort.total = starCnt;
+            tsort.total = starTotal;
             tsort.time = TimeUtil::Now();
             _levelStarSort[level - 1].insert(tsort);
         }
         eraseContinueWinSort(pl);
         insertContinueWinSort(pl);
         sendContinueWinSort(pl, pl->getContinueWinPage());
+        sendOwnerInfo(pl);
+        sendBattleInfo(pl);
     }
 
     void RaceBattle::attackContinueWinPlayer(Player* pl, UInt64 defenderId)
@@ -701,6 +696,8 @@ namespace GObject
         }
         Player* defender = globalPlayers[defenderId];
         if(!defender)
+            return;
+        if(defender == pl)
             return;
 
         RBSortType::iterator it;
@@ -739,14 +736,18 @@ namespace GObject
         else
             pl->setStarCnt(offset - 1, 6);
 
-        UInt16 starTotal = pl->getStarTotal();
-        pl->setStarTotal(starTotal + starAdd);
+        UInt16 starTotal = pl->getStarTotal() + starAdd;
+        pl->setStarTotal(starTotal);
         eraseLevelStarSort(pl, level);
         GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pl->getRaceBattlePos());
         if(rb && starCnt >= rb->next * 2)
         {
-            UInt8 pos = (level + 1) * 10;
-            enterPos(pl, pos);
+            level = level + 1;
+            for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
+                pl->setStarCnt(i, 0);
+            UInt8 pos = level * 10;
+            pl->setRaceBattlePos(pos);
+            enterPos(pl, 0);
         }
         else
         {
@@ -767,7 +768,9 @@ namespace GObject
     {
         if(!pl)
             return;
-        if(pl->getContinueWinCnt() < 3)
+        //if(pl->getContinueWinCnt() < 3)
+        //    return;
+        if(pl->getContinueWinCnt() < 1)
             return;
 
         TSort tsort;
@@ -781,7 +784,9 @@ namespace GObject
     {
         if(!pl)
             return;
-        if(pl->getStarTotal() < 3)
+        //if(pl->getContinueWinCnt() < 3)
+        //    return;
+        if(pl->getContinueWinCnt() < 1)
             return;
 
         for(RBSortType::iterator it = _contineWinSort.begin(); it != _contineWinSort.end(); ++it)
@@ -794,5 +799,34 @@ namespace GObject
         }
     }
 
+    void RaceBattle::sendOwnerInfo(Player* pl)
+    {
+        if(!pl)
+            return;
+        UInt8 pos = pl->getRaceBattlePos();
+        UInt8 level = pos / 10;
+        if(level == 0 || level > 5)
+            return;
+        GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pos);
+        if(!rb)
+            return;
+
+        Stream st(REP::RACE_BATTLE);
+        UInt8 type = 2;
+        st << type;
+        st << pl->getRaceBattlePos();
+        st << pl->getStarTotal();
+        st << gPerLeveCnt[level - 1];
+        for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
+            st << pl->getStarCnt(i);
+        //st << pl->getCanChallengeCnt();
+        st << pl->getCanContinueCnt();
+        st << pl->getContinueWinCnt();
+        st << rb->next;
+        makeStarInfo(st, pl, level);
+        st << pl->getAwardLevel();
+        st << Stream::eos;
+        pl->send(st);
+    }
 }
 

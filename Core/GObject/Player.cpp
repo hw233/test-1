@@ -875,7 +875,7 @@ namespace GObject
 
         _playerPos = 0;
         memset(_starCnt, 0, sizeof(_starCnt));
-        _canChallengeCnt = 0;
+        //_canChallengeCnt = 0;
         _continueWinCnt = 0;
         _awardLevel = 0;
         _continueWinPage = 0;
@@ -32001,10 +32001,10 @@ void Player::specialUdpLog(UInt8 type)
     UInt8 Player::getChallengeStatus(Player* pl)
     {
         if(!pl)
-            return 1;
+            return 0;
         std::map <Player *, UInt8>::iterator it = _challengePlayer.find(pl);
         if(it != _challengePlayer.end())
-            return 0;
+            return it->second;
         return 0;
     }
 
