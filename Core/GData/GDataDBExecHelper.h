@@ -807,6 +807,7 @@ struct DBCardInfo
     UInt8 color;
     UInt8 lvLimit;
     UInt16 skillId;
+    std::string name;
 };
 
 struct DBCardUpgrade
@@ -1794,13 +1795,14 @@ SPECIALDEF(11)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBCardInfo)
-SPECIALDEF(5)
+SPECIALDEF(6)
 	(
     UInt16, id,
     UInt8, type,
     UInt8, color,
     UInt8, lvLimit,
-    UInt16, skillId
+    UInt16, skillId,
+    std::string, name 
 	)
 SPECIALEND()
 

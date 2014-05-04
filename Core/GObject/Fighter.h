@@ -580,6 +580,7 @@ public:
     ItemEquip* setTrump( UInt32 trump, int idx, bool = true);
     ItemEquip* setTrump( ItemEquip* trump, int idx, bool = true);
 	ItemEquip * findEquip(UInt32 id, UInt8& pos);
+	ItemEquip * findfashion(UInt32 id);
 	void findTrumpByTypeId(std::vector<ItemEquip*>& ret, UInt32 id);
 	void removeEquip(UInt8 pos, ItemEquip * equip, UInt8 toWhere = 0);
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }

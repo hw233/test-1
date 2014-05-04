@@ -3077,7 +3077,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBCardInfo dbpn;
-		if(execu->Prepare("SELECT `id`, `type`, `color`, `lvLimit`, `skillId` FROM `cardInfo` ", dbpn) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `type`, `color`, `lvLimit`, `skillId`,`name` FROM `cardInfo` ", dbpn) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
             csys.loadInitCardInfo(dbpn); 

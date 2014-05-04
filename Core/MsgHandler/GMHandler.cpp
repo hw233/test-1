@@ -321,6 +321,7 @@ GMHandler::GMHandler()
     Reg(3, "clanrank", &GMHandler::TestClanRank);
     Reg(3, "rb", &GMHandler::OnRaceBattle);
     Reg(2, "addkapai", &GMHandler::OnAddCard);
+    Reg(2, "addkapaiexp", &GMHandler::OnAddCardExp);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -5569,6 +5570,20 @@ void GMHandler::OnAddCard(GObject::Player *player, std::vector<std::string>& arg
 
 }
 
+void GMHandler::OnAddCardExp(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return ;
+    UInt32 exp = atoi(args[0].c_str());
+    /*
+    UInt8 type = atoi(args[1].c_str());
+    UInt16 attr_id = atoi(args[2].c_str());
+    UInt16 skill_id = atoi(args[3].c_str());
+    UInt8 color = atoi(args[4].c_str());*/
+
+    player->GetCollectCard()->GMAddExp(exp);   
+
+}
 void GMHandler::OnSkillTest(GObject::Player *player, std::vector<std::string>& args)
 {
     if(args.size() < 1)

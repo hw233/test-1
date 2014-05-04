@@ -335,8 +335,11 @@ namespace GObject
                         }
                         if(pos1 ==0 && pos2 == 0)
                         {
-                               player->setLeftAddrEnter(false);
-                               TRACE_LOG("leftaddr(leaveleft) 0 (pid: %" I64_FMT "u)", player->getId());
+                            if(!player->inLeftAddrCommitCD())
+                            {
+                                player->setLeftAddrEnter(false);
+                                TRACE_LOG("leftaddr(leaveleft) 0 (pid: %" I64_FMT "u)", player->getId());
+                            }
                         }
                         struct TeamChange
                         {
@@ -598,6 +601,9 @@ namespace GObject
             return ;
         if(leader->getLeftAddrEnter() || leader->getInLeftTeam())
             return ;
+        if(leader->GetLev() < 70) 
+            return ;
+
         UInt32 now  =   TimeUtil::Now();
         if( ( now  - leader->GetVar(VAR_LEFTADDR_CREATE) ) < 300)
         {
@@ -729,6 +735,8 @@ namespace GObject
             player->sendMsgCode(2,4034);
             return ;
         }
+        if(player->GetLev() < 70) 
+            return ;
         std::vector<Player *> vec;
         for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
         {

@@ -257,6 +257,7 @@ private:
     void OnRaceBattle(GObject::Player *player, std::vector<std::string>& args);
     void OnAddCard(GObject::Player *player, std::vector<std::string>& args);
     void OnSkillTest(GObject::Player *player, std::vector<std::string>& args);
+    void OnAddCardExp(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

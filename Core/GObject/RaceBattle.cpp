@@ -88,6 +88,23 @@ namespace GObject
         //if(pl->GetVar(VAR_RCAE_BATTLE_SIGN) == 0)
         //    pl->SetVar(VAR_RCAE_BATTLE_SIGN, 1);
 
+        if(offset == 0)
+        {
+            if((origPos % 10) != 0)
+                eraseLevelStarSort(pl, level);
+        }
+        else if((origPos % 10) == 0)
+        {
+            TSort tsort;
+            tsort.player = pl;
+            tsort.total = pl->getStarTotal();
+            tsort.time = TimeUtil::Now();
+            _levelStarSort[level - 1].insert(tsort);
+        }
+        else
+        {
+        }
+
         Stream st(REP::RACE_BATTLE);
         UInt8 type = 2;
         st << type;
@@ -175,7 +192,7 @@ namespace GObject
             return;
         if(pl->getExitCd() > TimeUtil::Now())
         {
-            pl->sendMsgCode(0, 4019);
+            pl->sendMsgCode(0, 4040);
             return;
         }
         UInt8 pos = pl->getRaceBattlePos();
@@ -204,20 +221,29 @@ namespace GObject
         {
             RBSortType& levelSort = _levelStarSort[i - 1];
             for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
-                vecPlayer[count++] = it->player;
-            if(count > 5)
+            {
+                ++count;
+                vecPlayer.push_back(it->player);
+            }
+            if(count >= 5)
                 break;
         }
-        for(Int8 i = level - 1; i >= 0; i--)
+        for(UInt8 i = level - 1; i > 0; i--)
         {
-            if(count > 5)
+            if(count >= 5)
                 break;
             RBSortType& levelSort = _levelStarSort[i - 1];
             for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
-                vecPlayer[count++] = it->player;
+            {
+                ++count;
+                vecPlayer.push_back(it->player);
+            }
         }
         if(count <= 1)
+        {
+            pl->sendMsgCode(0, 4042);
             return;
+        }
 
         UInt32 index = uRand(count);
         Player* matchPlayer = vecPlayer[index];
@@ -369,6 +395,7 @@ namespace GObject
         st << pl->getCountry();
         st << pl->GetClass();
         st << pl->GetLev();
+        st << static_cast<UInt8>(pl->getMainFighter()->getId());
         st << pl->getBattlePoint();
         st << pl->getRaceBattlePos();
         st << pl->getId();
@@ -377,6 +404,7 @@ namespace GObject
         st << matchPlayer->getCountry();
         st << matchPlayer->GetClass();
         st << matchPlayer->GetLev();
+        st << static_cast<UInt8>(matchPlayer->getMainFighter()->getId());
         st << matchPlayer->getBattlePoint();
         st << matchPlayer->getRaceBattlePos();
         st << matchPlayer->getId();
@@ -392,7 +420,7 @@ namespace GObject
             return 0;
         if(pl->getExitCd() > TimeUtil::Now())
         {
-            pl->sendMsgCode(0, 4019);
+            pl->sendMsgCode(0, 4040);
             return 0;
         }
         if(pl->getBuffData(PLAYER_BUFF_ATTACKING))
@@ -668,7 +696,7 @@ namespace GObject
         UInt8 continueCnt = pl->getCanContinueCnt();
         if(continueCnt == 0)
         {
-            pl->sendMsgCode(0, 4020);
+            pl->sendMsgCode(0, 4041);
             return;
         }
         Player* defender = globalPlayers[defenderId];

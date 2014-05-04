@@ -74,7 +74,14 @@ namespace GObject
         
         //CoupleList::iterator it = m_couple.find(player->GetMarriageInfo()->yuyueTime);
         if(man_player->GetVar(VAR_COUPLE_ONLINE_TIME) >= 60 * 60 * 8) 
+        {
+            if(!flag)
+            {
+                ReturnFirstStatus(man_player);
+                ReturnFirstStatus(woman_player);
+            }
             return;
+        }
         
         if(flag == 0)
         {
