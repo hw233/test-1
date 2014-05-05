@@ -320,6 +320,7 @@ enum ItemFrom
     FromZhenyuanMerge = 72, //阵元合成
     FromZhenyuanTiQu = 73, //阵元提取
     FromJieBai = 74 ,
+    FromKJTM = 75 , //抗击天魔
     //80 ~ 100，繁体占用
 };
 

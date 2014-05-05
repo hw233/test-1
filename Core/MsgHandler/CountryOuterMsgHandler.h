@@ -7317,6 +7317,8 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                     GameMsgHdr hdr(0x33A, threadId, invitee, sizeof(Player *));
                     GLOBAL().PushMsg(hdr, &player);
                 }
+
+                player->SetKJTMAwardMark(3);
             }
         }
         break;
@@ -7452,6 +7454,18 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
             KJTMManager->StartBattle(player);
         }
         break;
+    case 0x18:
+        {
+            player->GetKJTMAwardMark();
+        }
+        break;
+    case 0x19:
+        {
+            UInt8 type = 0;
+            br >> type;
+            player->GetKJTMAward(type);
+        }
+        break;
     case 0x1A:
         {
             if(NULL != player->getTeamMemberData())
@@ -7547,6 +7561,14 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                     GLOBAL().PushMsg(hdr, &player);
                 }
             }
+        }
+        break;
+    case 0x1D:
+        {
+            UInt32 status = player->GetVar(VAR_KJTM_STATUS);
+            UInt8 mark = GET_BIT(status, 0);
+            if(0 == mark)
+                player->SetKJTMAwardMark(2);
         }
         break;
     }

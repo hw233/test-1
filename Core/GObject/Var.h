@@ -723,6 +723,9 @@ namespace GObject
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
 
+        //781 - 790 for lijr
+        VAR_KJTM_AWARD_MARK = 787, //抗击天魔奖励标志
+        VAR_KJTM_LOGIN_NUM = 789,  // 抗击天魔登录次数
         VAR_MAX,
     };
 
@@ -1354,6 +1357,8 @@ namespace GObject
             REGISTER_VAR(VAR_KJTM_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_KJTM_KILL_NPC_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_KJTM_LOGIN_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_LOGIN_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_AWARD_MARK, CYCLE_DAY);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);

@@ -317,6 +317,9 @@ void KangJiTianMo::JoinTeamMember(UInt64 playerId, UInt64 applicantId)
 
     UpdateTeamMember(pl);
 
+    if(tmd->memCnt == TEAM_MAXMEMCNT)
+        pl->SetKJTMAwardMark(1);
+
     Stream st(REP::KANGJITIANMO_REP);
     st << static_cast<UInt8>(0x08);
     TeamMemberInfo(pl, st);
@@ -829,19 +832,22 @@ void KangJiTianMo::StartBattle(Player* pl)
             bsim.switchPlayer(member, 0);
 
         float factor = 1.0f;
+        UInt32 loginNum = member->GetVar(VAR_KJTM_LOGIN_NUM);
         if(memIdx==0)
-            factor = static_cast<float>(30)/100.0f;
+            factor = static_cast<float>(30+loginNum*5)/100.0f;
         else
         {
             UInt32 status = member->GetVar(VAR_KJTM_KILL_NPC_STATUS); 
             UInt8 mark = GET_BIT(status, (tmd->index-1));
+            UInt16 value = 100;
             if(0 == mark)
             {
                 if(member->getVipLevel() >= 1 && member->getVipLevel() <= 4)
-                    factor = static_cast<float>(150)/100.0f;
+                    value += 50;
                 else if(member->getVipLevel() >= 5)
-                    factor = static_cast<float>(200)/100.0f;
+                    value += 100;
             }
+            factor = static_cast<float>(value+loginNum*10)/100.0f;
         }
         member->setKJTMFactor(factor);
 
@@ -942,6 +948,9 @@ void KangJiTianMo::SendBattleReport(TeamMemberData* tmd, GData::NpcGroup* ng, Ba
     if(packet.size() <= 8)
         return;
 
+    if(NULL == tmd)
+        return;
+
     bool isLast = (ng != NULL);
     UInt8 side = 0;
     UInt16 r = 0;
@@ -954,6 +963,14 @@ void KangJiTianMo::SendBattleReport(TeamMemberData* tmd, GData::NpcGroup* ng, Ba
     else if(2 == res)
     {
         r = static_cast<UInt16>(0x0200);
+
+        Stream st(REP::KANGJITIANMO_REP);
+        st << static_cast<UInt8>(0x17);
+        st << Stream::eos;
+        Player* leader = tmd->members[0];
+        if(NULL == leader)
+            return;
+        leader->send(st);
     }
 
     UInt32 id = bsim.clearLastBattle(side, isLast);

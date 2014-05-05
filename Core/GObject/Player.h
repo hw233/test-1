@@ -2243,6 +2243,9 @@ namespace GObject
         void ApplyToName(Player* leader);
         void ClearKJTMData();
         void KJTMUdpLog();
+        void SetKJTMAwardMark(UInt8 type);
+        void GetKJTMAwardMark();
+        void GetKJTMAward(UInt8 opt);
  
         //抗击天魔 end
 

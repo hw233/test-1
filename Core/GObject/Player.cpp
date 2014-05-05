@@ -1160,7 +1160,8 @@ namespace GObject
                 _offlineTime = 0;
             }
 		}
-
+    
+        SetKJTMAwardMark(0);
         KJTMUdpLog();
 
         if(GetVar(VAR_RP_VALUE) > 0 && TimeUtil::SharpDay(0, TimeUtil::Now()) != TimeUtil::SharpDay(0, _playerData.lastOnline))
@@ -31127,6 +31128,8 @@ void Player::ClearKJTMData()
     SetVar(VAR_KJTM_STATUS, 0); 
     SetVar(VAR_KJTM_KILL_NPC_STATUS, 0); 
     SetVar(VAR_KJTM_LOGIN_STATUS, 0); 
+    SetVar(VAR_KJTM_LOGIN_NUM, 0); 
+    SetVar(VAR_KJTM_AWARD_MARK, 0); 
 }
 
 void Player::KJTMUdpLog()
@@ -31932,6 +31935,93 @@ void Player::specialUdpLog(UInt8 type)
             break;
     }
 }
+
+void Player::SetKJTMAwardMark(UInt8 type)
+{
+    UInt32 status = GetVar(VAR_KJTM_AWARD_MARK);
+    if(0 == GET_BIT_2(status, type))
+    {
+        status = SET_BIT(status, (type*2));
+        SetVar(VAR_KJTM_AWARD_MARK, status);
+        
+        GetKJTMAwardMark();
+    }
+}
+
+void Player::GetKJTMAwardMark()
+{
+    UInt32 status = GetVar(VAR_KJTM_AWARD_MARK);
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x18);
+    st << status;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::GetKJTMAward(UInt8 opt)
+{
+    if(opt > 3)
+        return;
+
+    UInt32 status = GetVar(VAR_KJTM_AWARD_MARK);
+    if(1 == GET_BIT_2(status, opt))
+    {
+        status = CLR_BIT(status, (opt*2));
+        status = SET_BIT(status, ((opt*2)+1));
+        SetVar(VAR_KJTM_AWARD_MARK, status);
+
+        UInt32 statusA = GetVar(VAR_KJTM_STATUS);
+        UInt8 mark = GET_BIT(statusA, 0);
+        switch(opt)
+        {
+            case 0:
+                {
+                    if(0 == mark)
+                        GetPackage()->AddItem(15, 5, true, false, FromKJTM);
+                    else
+                        GetPackage()->AddItem(549, 1, true, false, FromKJTM);
+
+                    AddVar(VAR_KJTM_LOGIN_NUM, 1);
+                }
+                break;
+            case 1:
+                {
+                    if(0 == mark)
+                        GetPackage()->AddItem(15, 5, true, false, FromKJTM);
+                    else
+                    {
+                        GetPackage()->AddItem(549, 1, true, false, FromKJTM);
+                        GetPackage()->AddItem(9420, 2, true, false, FromKJTM);
+                    }
+                }
+                break;
+            case 2:
+                {
+                    if(0 == mark)
+                        GetPackage()->AddItem(503, 1, true, false, FromKJTM);
+                    else
+                    {
+                        GetPackage()->AddItem(503, 5, true, false, FromKJTM);
+                        GetPackage()->AddItem(5054, 1, true, false, FromKJTM);
+                    }
+                }
+                break;
+            case 3:
+                {
+                    if(0 == mark)
+                        GetPackage()->AddItem(503, 1, true, false, FromKJTM);
+                    else
+                    {
+                        GetPackage()->AddItem(30, 10, true, false, FromKJTM);
+                        GetPackage()->AddItem(9420, 2, true, false, FromKJTM);
+                    }
+                }
+                break;
+        }
+        GetKJTMAwardMark();
+    }
+}
+
 
 } // namespace GObject
 
