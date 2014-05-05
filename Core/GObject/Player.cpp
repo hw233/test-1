@@ -877,7 +877,7 @@ namespace GObject
         memset(_starCnt, 0, sizeof(_starCnt));
         //_canChallengeCnt = 0;
         _continueWinCnt = 0;
-        _awardLevel = 0;
+        _awardLevel = 3;
         _continueWinPage = 0;
         _rbBufId = 0;
         _rbValue = 0;

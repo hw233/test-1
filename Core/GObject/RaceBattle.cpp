@@ -91,15 +91,12 @@ namespace GObject
         if(offset == 0)
         {
             if((origPos % 10) != 0)
-                eraseLevelStarSort(pl, level);
+                return;
+            //    eraseLevelStarSort(pl, level);
         }
         else if((origPos % 10) == 0)
         {
-            TSort tsort;
-            tsort.player = pl;
-            tsort.total = pl->getStarTotal();
-            tsort.time = TimeUtil::Now();
-            _levelStarSort[level - 1].insert(tsort);
+            insertLevelStarSort(pl, level);
         }
         else
         {
@@ -137,17 +134,17 @@ namespace GObject
         UInt8 awardlevel = pl->getAwardLevel();
         UInt8 pos = pl->getRaceBattlePos();
         UInt8 level = pos / 10;
-        if(level < 3 || awardlevel > level)
+        if(level < 3 || level > 6 || awardlevel > level)
             return;
         UInt8 index = level - 3;
         if(index > 3)
             return;
 
         static UInt32 awardItem[][3][2] = {
-            {{503, 2}, {515, 2}, {25, 1}},
-            {{503, 2}, {515, 2}, {25, 1}},
-            {{503, 2}, {515, 2}, {25, 1}},
-            {{503, 2}, {515, 2}, {25, 1}}
+            {{499, 20}, {499, 10}, {499, 5}},
+            {{499, 20}, {499, 10}, {499, 5}},
+            {{499, 20}, {499, 10}, {499, 5}},
+            {{499, 20}, {499, 10}, {499, 5}}
         };
 
         for(UInt8 i = 0; i < 3; i++)
@@ -588,6 +585,22 @@ namespace GObject
         }
     }
 
+    void RaceBattle::insertLevelStarSort(Player* pl, UInt8 level)
+    {
+        if(!pl)
+            return;
+        if(level == 0 || level > 5)
+            return;
+        if(pl->getStarTotal() < 1)
+            return;
+
+        TSort tsort;
+        tsort.player = pl;
+        tsort.total = pl->getStarTotal();
+        tsort.time = TimeUtil::Now();
+        _levelStarSort[level - 1].insert(tsort);
+    }
+
     void RaceBattle::exitRB(Player* pl)
     {
         if(!pl)
@@ -662,11 +675,7 @@ namespace GObject
         }
         else
         {
-            TSort tsort;
-            tsort.player = pl;
-            tsort.total = starTotal;
-            tsort.time = TimeUtil::Now();
-            _levelStarSort[level - 1].insert(tsort);
+            insertLevelStarSort(pl, level);
         }
         eraseContinueWinSort(pl);
         insertContinueWinSort(pl);
@@ -751,11 +760,7 @@ namespace GObject
         }
         else
         {
-            TSort tsort;
-            tsort.player = pl;
-            tsort.total = starCnt;
-            tsort.time = TimeUtil::Now();
-            _levelStarSort[level - 1].insert(tsort);
+            insertLevelStarSort(pl, level);
             eraseContinueWinSort(pl);
             insertContinueWinSort(pl);
             sendContinueWinSort(pl, pl->getContinueWinPage());

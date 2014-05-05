@@ -47,6 +47,7 @@ class RaceBattle : public Singleton<RaceBattle>
         void awardLevelRankOne(Player* pl, UInt8 rank);
         void awardContinueWinRankOne(Player* pl, UInt8 num);
         void eraseLevelStarSort(Player* pl, UInt8 level);
+        void insertLevelStarSort(Player* pl, UInt8 level);
         void exitRB(Player* pl);
         void attackLevelPlayer(Player* pl, UInt64 defenderId);
         void attackContinueWinPlayer(Player* pl, UInt64 defenderId);
