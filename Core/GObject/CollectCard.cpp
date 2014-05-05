@@ -14,6 +14,7 @@
 #include "Fighter.h"
 #include "Common/Itoa.h"
 #include "GObjectDBExecHelper.h"
+#include "Server/SysMsg.h"
 
 namespace GObject
 {
@@ -449,6 +450,9 @@ namespace GObject
             upcard->exp += ciitmp->initExp + MapFreeCardSlot.find(*it)->second->exp;
             while(GData::csys.checkUpgrade(upcard))
             {
+                if(upcard->level == 80 && upcard->color >= 3)
+                    SYSMSG_BROADCASTV(954,m_owner->getCountry(), m_owner->getName().c_str(),3,cii->name.c_str());
+
                 if(cii->type != 1)
                 {
                     if(upcard->level >= cii->lvLimit)
@@ -503,7 +507,6 @@ namespace GObject
                     default:
                         break;
                 }
-                
                 
             }
             //TODO 找到卡牌经验值
@@ -636,6 +639,9 @@ namespace GObject
         //TODO DB
         DB4().PushUpdateData("UPDATE `cardsuit` SET `suit_mark` = '%u', `collect_degree` = '%u',`spe_mark` = '%u' WHERE `playerId` = %" I64_FMT "u and `id` = '%u'",tmp->suit_mark,tmp->collect_degree,tmp->spe_mark,m_owner->getId(),tmp->id);
         
+        if(ci->color == 5)
+            SYSMSG_BROADCASTV(953, m_owner->getCountry(),m_owner->getName().c_str(),3,citmp->name.c_str());
+
         return ci;
     }
     void CollectCard::loadCollectCnt(UInt8 level ,UInt16 cnt1 ,UInt16 cnt2 ,UInt16 cnt3)
@@ -669,8 +675,34 @@ namespace GObject
         return true;
     }
 
-    void CollectCard::ExchangeSpeCard(UInt16 itemid)
+    void CollectCard::ExchangeSpeCard(UInt16 itemid,UInt32 flowid)
     {
+        if(flowid != 0)
+        {
+            std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
+            bool find = false;
+            for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
+            {
+                if(it->second->findfashion(flowid) != NULL)
+                {
+                    find = true;
+                    break;
+                }
+            }
+
+            if(!find)
+            {
+                ItemBase * item = m_owner->GetPackage()->GetEquip(flowid);
+                if(item == NULL)
+                    return;
+                UInt32 typeId = item->GetTypeId();
+                if(itemid != typeId)
+                    return;
+                item->SetBindStatus(true);
+                m_owner->GetPackage()->SendPackageItemInfor(); 
+            }
+        }
+
         UInt16 cid = GameAction()->getSpeCard(itemid);        
         if(cid == 0)
             return;
@@ -743,4 +775,15 @@ namespace GObject
 
         return;
     }
+
+    void CollectCard::GMAddExp(UInt32 exp)
+    {
+        CardInfo* upcard = MapFreeCardSlot.begin()->second;
+        if(upcard == NULL)
+            return;
+        upcard->exp += exp; 
+
+        return;
+    }
+
 }

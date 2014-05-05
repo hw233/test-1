@@ -870,6 +870,7 @@ namespace GObject
         m_curType = 0;
         m_curPageA = 0;
         _KJTM_factor = 1.0f;
+        _ePhysicalTime = 0;
 	}
 
 
@@ -2439,13 +2440,22 @@ namespace GObject
         }
         if(getDrinkInfo().drinker !=NULL )
         {
-            Player * friendOne = getDrinkInfo().drinker;   
-            calcDrinkPoint();
-            if(getDrinkInfo().type!=0)
+            if(getDrinkInfo().time != 0 )
             {
-                UInt8 flag = 1;
-                GameMsgHdr hdr(0x407, friendOne->getThreadId(), friendOne, sizeof(UInt8));
-                GLOBAL().PushMsg( hdr, &flag );
+                Player * friendOne = getDrinkInfo().drinker;   
+                calcDrinkPoint();
+                if(getDrinkInfo().type!=0)
+                {
+                    UInt8 flag = 1;
+                    GameMsgHdr hdr(0x407, friendOne->getThreadId(), friendOne, sizeof(UInt8));
+                    GLOBAL().PushMsg( hdr, &flag );
+                }
+            }
+            else
+            {
+                getDrinkInfo().drinker->getDrinkInfo().reset();
+                getDrinkInfo().drinker->sendDrinkInfo();
+                getDrinkInfo().reset();
             }
         }
     }
@@ -26831,8 +26841,6 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
     if(!World::getGGTime())
         return ; 
     UInt32 now = TimeUtil::Now();
-    if(now <( World::getOpenTime() + 14 * 86400) || now >( World::getOpenTime() + 25* 86400))
-        return ;
     if(type == 0)
     {
         if( m_gginfo.task != task)
@@ -30178,9 +30186,9 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
         {1,1,1,3,3},
         {1,1,1,3,3},
         {1,1,1,1,1},
-        {1,10,1,10,1},
-        {1,4,1,4,1},
-        {1,10,2,10,10},
+        {1,10,1,8,1},
+        {1,4,1,2,1},
+        {1,10,4,10,10},
     };
 
     UInt32 now = TimeUtil::Now();
@@ -30222,7 +30230,7 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
         {
             UInt32 count_var_value =GetVar(VAR_FRIEND_TASK1 + i/3);  
             UInt8 count_num = GET_BIT_8(count_var_value , i%3);
-            if(count_num == task_num_val_max[i][4]) 
+            if(count_num >= task_num_val_max[i][4]) 
                 ++dayTaskNum ;
         }
         if(dayTaskNum == 5)
@@ -30312,7 +30320,7 @@ void Player::AddFriendlyCount(Player * friendOne , UInt32 val)
     std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendOne->getId());
     if(it != _friendlyCount.end())
     {
-        if( ( it->second.value < 5000 ) && (it->second.value + val >= 5000))
+        if( ( it->second.value < 3500 ) && (it->second.value + val >= 3500))
             OnShuoShuo(SS_FRIEND_2);
         it->second.value += val; 
     }
@@ -30347,6 +30355,7 @@ void Player::UpdateFriendlyCountToDB(UInt64 friendId)
 
     std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(friendId);
     std::map<UInt64,FriendTaskNum >::iterator it_task = _friendTask.find(friendId);
+    std::map<UInt64,FriendYellowBird >::iterator it_yb = _friendYB.find(friendOne->getId());
     if(it == _friendlyCount.end())
         return ;
     if(it_task == _friendTask.end())
@@ -30355,7 +30364,13 @@ void Player::UpdateFriendlyCountToDB(UInt64 friendId)
         _friendTask[friendOne->getId()] = ft ;
         it_task = _friendTask.find(friendOne->getId());
     }
-    DB1().PushUpdateData("REPLACE INTO `friendlyCount` (`playerId`, `friendId` , `value` , `isBrother` , `time` ,`cost`,`wait`,`clearTime`,`task1`,`task2`,`task3`,`task4`,`task5`,`task6`) VALUES (%" I64_FMT "u, %" I64_FMT "u , %u , %d , %u ,%u ,%d,  %u,%d,%d,%d,%d,%d,%d)", getId(), friendId,it->second.value,static_cast<UInt8>(_hasBrother(friendOne)),it->second.time , it->second.cost , it->second.flag , it_task->second.clearTime , it_task->second.taskNum[0] , it_task->second.taskNum[1] , it_task->second.taskNum[2] , it_task->second.taskNum[3] , it_task->second.taskNum[4] , it_task->second.taskNum[5]);
+    if(it_yb == _friendYB.end())
+    {
+        FriendYellowBird ft;
+        _friendYB[friendOne->getId()] = ft ;
+        it_yb = _friendYB.find(friendOne->getId());
+    }
+    DB1().PushUpdateData("REPLACE INTO `friendlyCount` (`playerId`, `friendId` , `value` , `isBrother` , `time` ,`cost`,`wait`,`ybTime`,`ybCount`,`clearTime`,`task1`,`task2`,`task3`,`task4`,`task5`,`task6`) VALUES (%" I64_FMT "u, %" I64_FMT "u , %u , %d , %u , %u,%u,%u ,%d,  %u,%d,%d,%d,%d,%d,%d)", getId(), friendId,it->second.value,static_cast<UInt8>(_hasBrother(friendOne)),it->second.time , it->second.cost , it->second.flag ,it_yb->second.time,it_yb->second.count, it_task->second.clearTime , it_task->second.taskNum[0] , it_task->second.taskNum[1] , it_task->second.taskNum[2] , it_task->second.taskNum[3] , it_task->second.taskNum[4] , it_task->second.taskNum[5]);
 }
 void Player::sendFirendlyCountTaskInfo()
 {
@@ -30417,9 +30432,9 @@ void Player::getFriendlyAchievement(UInt8 opt)
             Friends[1]++;
         if(it->second.value >= 500)
             Friends[2]++;
-        if(it->second.value >= 2000)
+        if(it->second.value >= 1500)
             Friends[3]++;
-        if(it->second.value >= 5000)
+        if(it->second.value >= 3500)
             Friends[4]++;
     }
     bool flag = false ;
@@ -31297,7 +31312,7 @@ UInt32 Player::DrinkingPoint()
 {
     if(getDrinkInfo().type > 3)
         return 0;
-    UInt32 wine[]={20,20,40,80};
+    UInt32 wine[]={20,20,40,160};
     float drinkingAdd = 0;
     float friendAdd = 0;
 
@@ -31416,6 +31431,8 @@ void Player::InviteDrinking(Player * friendOne)   //邀请饮酒
         return ;
     bool flag = true;
 
+    if(_playerData.location != 9476)
+        moveTo(9476,true);
 
     UInt32 now = TimeUtil::Now();
     std::map<UInt64,UInt32>::const_iterator it = _brothers.find(friendOne->getId());
@@ -31455,7 +31472,23 @@ void Player::beInviteDrinking(Player * pl , UInt8 type)  //被邀请对酒
     if(pl==NULL||type == 0)
         return ;
     if(getDrinkInfo().drinker!=NULL)
+    {
+        struct st 
+        {
+            UInt64 playerId;
+            UInt8 res ;
+            UInt8 type ;
+            UInt8 count ;
+        };
+        st _st ;
+        _st.playerId = getId();
+        _st.res = 2;
+        _st.type = 0;
+        _st.count = 0;
+        GameMsgHdr hdr(0x404, pl->getThreadId(), pl, sizeof(_st));
+        GLOBAL().PushMsg( hdr, &_st );
         return ;
+    }
     Stream st(REP::BROTHER);
     st << static_cast<UInt8>(0x05);
     st << pl->getName();
@@ -31468,8 +31501,16 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
     if(count > 1)
         return ;
     UInt8 shenfen = 0;  //0表示被邀请
-    if(getDrinkInfo().type != 0)
+    if(count == 0)
+    {
         shenfen = 1;    //1表示主动邀请
+        if(getDrinkInfo().type ==0)
+        {
+            pl->getDrinkInfo().reset();
+            pl->sendMsgCode(2,4038);
+            return ;
+        }
+    }
     UInt32 now = TimeUtil::Now();
     UInt8 result = 0;
     if(count)
@@ -31483,11 +31524,14 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
     if(!flag)
         return ;
 
-    if(res == 0 )
+    if(res != 1 )
     {
         if(shenfen)    //主动方被拒绝，添加冷却时间
         {
-            it->second = now + 300; 
+            if(res ==0)
+                it->second = now + 300; 
+            else if(res == 2)
+                sendMsgCode(2,4037);
         }
         else           //被动方被拒绝，清楚标志位(_drinkInfo.drinker)
         {
@@ -31496,12 +31540,14 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
         }
         return ;
     }
+    if(_playerData.location != 9476)
+        moveTo(9476,true);
     if(shenfen &&( getDrinkInfo().drinker == NULL || getDrinkInfo().drinker == pl ))  //判断是否已经有人对酒
     {
         std::set<Player *>::iterator it = getDrinkInfo().plset.find(pl);
         if(it != getDrinkInfo().plset.end())
         {
-            setDrinking(pl,now);
+            setDrinking(pl,0);   //XXX
             result = 1 ;
         }
     }
@@ -31516,14 +31562,14 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
     std::string  playerName2;
     if(shenfen)
     {
-       playerName1 = getName(); 
-       playerName2 = pl->getName();
+        playerName1 = getName(); 
+        playerName2 = pl->getName();
     }
     else
     {
-       playerName2 = getName(); 
-       playerName1 = pl->getName();
-    
+        playerName2 = getName(); 
+        playerName1 = pl->getName();
+
     }
     Stream st(REP::BROTHER);
     st << static_cast<UInt8>(0x06);
@@ -31550,8 +31596,8 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
         _st.count = count + 1 ;
         GameMsgHdr hdr(0x404, pl->getThreadId(), pl , sizeof(_st));
         GLOBAL().PushMsg( hdr, &_st );
-   }
-            
+    }
+
 }
 bool Player::UseMeiHuaJian(UInt16 iid , UInt32 num , UInt8 use)  //梅花笺
 {
@@ -31664,6 +31710,19 @@ bool Player::AfterDrinking()
     }
     return res;
 }
+void Player::sendDrinkInfo()
+{
+    Stream st(REP::BROTHER) ;
+    st <<static_cast<UInt8>(0x0E);
+    st <<static_cast<UInt8>(getDrinkInfo().type);
+    if(getDrinkInfo().drinker)
+        st <<getDrinkInfo().drinker->getName();
+    else
+        st << "" ;
+    st << getDrinkInfo().time;
+    st <<Stream::eos;
+    send(st);
+}
 void Player::BuyDrinkCount()
 {
     UInt32 var_buy = GetVar(VAR_CLAN_FRIEND);  //剩余次数
@@ -31697,25 +31756,10 @@ void Player::BuyDrinkCount()
 
 bool Player::UseYellowBird(Player * friendOne ,UInt32 num)
 {
-    UInt8 countNum = 0 ;
     UInt32 now = TimeUtil::Now();
-    std::map<UInt64,FriendYellowBird >::iterator it = _friendYB.find(friendOne->getId());
-    if(it != _friendYB.end())
-    {
-        if(TimeUtil::SharpDay(0,it->second.time) != TimeUtil::SharpDay(0,now))
-        {
-           it->second.count = 0; 
-           it->second.time = now;
-        }
-        countNum = it->second.count;
-        if(countNum >= 20 )
-            return false ;
-    }
-    else
-    {
-        FriendYellowBird yb;
-        _friendYB[friendOne->getId()] = yb;
-    }
+    UInt8 countNum = GetYBCount(friendOne);
+    if(countNum >= 10 )
+        return false ;
     if(!UseMeiHuaJian(16004,num))
         return false;
     for(UInt8 i = 0; i < num; ++i)
@@ -31725,10 +31769,9 @@ bool Player::UseYellowBird(Player * friendOne ,UInt32 num)
     }
     countNum += num ; 
 
-
     _friendYB[friendOne->getId()].count = countNum ;
     _friendYB[friendOne->getId()].time = now;
-    DB3().PushUpdateData("UPDATE `friendlyCount` SET `ybTime` = %u,`ybCount` = %d WHERE playerId =  %" I64_FMT "u and friendId =  %" I64_FMT "u ", now, countNum , getId() , friendOne->getId());
+    DB1().PushUpdateData("UPDATE `friendlyCount` SET `ybTime` = %u,`ybCount` = %d WHERE playerId =  %" I64_FMT "u and friendId =  %" I64_FMT "u ", now, countNum , getId() , friendOne->getId());
 
     SYSMSG_SENDV(5133, friendOne , getCountry(), getName().c_str() , num);
 
@@ -31748,6 +31791,12 @@ UInt8 Player::GetYBCount(Player *friendOne)
     std::map<UInt64,FriendYellowBird >::iterator it = _friendYB.find(friendOne->getId());
     if(it == _friendYB.end())
         return 0;
+    UInt32 now = TimeUtil::Now();
+    if(TimeUtil::SharpDay(0,it->second.time) != TimeUtil::SharpDay(0,now))
+    {
+        it->second.count = 0; 
+        it->second.time = now;
+    }
     return it->second.count;
 }
 void Player::SetYBCount(Player * friendOne , UInt32 time ,UInt8 count)
@@ -31767,8 +31816,11 @@ void Player::calcDrinkPoint(UInt8 flag)
     _drinkingSum %= 100;
     _friendSum %= 100;
 
-    if(getDrinkInfo().type == 0 && getDrinkInfo().time == 0)
-        flag = 1 ;
+    if(getDrinkInfo().time == 0)
+    {
+        getDrinkInfo().reset();
+        return ;
+    }
 
     UInt32 drinkingPoint = 0;
     if(AfterDrinking())

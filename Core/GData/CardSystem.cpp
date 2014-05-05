@@ -96,6 +96,7 @@ void CardSystem::loadInitCardInfo(DBCardInfo& dbci)
     ci.color = dbci.color;
     ci.lvLimit = dbci.lvLimit;
     ci.skillId = dbci.skillId;
+    ci.name = dbci.name;
     CalInitExp(ci.initExp,static_cast<UInt8>(dbci.id/10),ci.color,ci.type);
     
     _cardInitInfo.insert(std::make_pair(dbci.id,ci));          
@@ -179,7 +180,7 @@ bool CardSystem::checkUpgrade(GObject::CardInfo* ci)
         ci->level += 1;                   
         if(ci->skill_id != 0)
             ci->skill_id = (ci->skill_id / 10) * 10 + tmp.skillLevel; 
-        ci->attr_id = tmp.attrIndex; 
+        ci->attr_id = tmp.attrIndex + 1; 
     }
 
     return true;
