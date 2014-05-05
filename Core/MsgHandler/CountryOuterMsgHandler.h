@@ -6779,7 +6779,9 @@ void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
 #endif
         case 10:
         {
-            GObject::raceBattle.requestMatch(player);
+            bool bRet = GObject::raceBattle.requestMatch(player);
+            if(!bRet)
+                GObject::raceBattle.sendMatchPlayer(player, NULL);
         }
         break;
 

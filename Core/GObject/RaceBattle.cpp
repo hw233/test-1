@@ -20,7 +20,7 @@
 
 namespace GObject
 {
-    static UInt8 gPerLeveCnt[] = {2, 3, 4, 5, 7};
+    static UInt8 gPerLeveCnt[] = {2, 3, 4, 5, 7, 0};
     UInt8 RaceBattle::_status = 0;
     RBSortType RaceBattle::_levelStarSort[5];
     RBSortType RaceBattle::_contineWinSort;
@@ -168,33 +168,39 @@ namespace GObject
         pl->readRandBattleReport(reportId);
     }
 #endif
-    void RaceBattle::requestMatch(Player* pl)
+    bool RaceBattle::requestMatch(Player* pl)
     {
         if(!pl)
-            return;
+            return false;
         if(pl->getExitCd() > TimeUtil::Now())
         {
             pl->sendMsgCode(0, 4040);
-            return;
+            return false;
         }
         UInt8 pos = pl->getRaceBattlePos();
         UInt8 level = pos / 10;
         if(level == 0)
-            return;
+        {
+            return false;
+        }
         if(level > sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]))
-            return;
+        {
+            return false;
+        }
         UInt8 offset = pos % 10;
         if(offset == 0)
         {
             pl->sendMsgCode(0, 4044);
-            return;
+            return false;
         }
         if(offset > gPerLeveCnt[level - 1])
-            return;
+        {
+            return false;
+        }
         if(pl->getStarCnt(offset - 1) >= 6)
         {
             pl->sendMsgCode(0, 4043);
-            return;
+            return false;
         }
 
         std::vector<Player* > vecPlayer;
@@ -228,12 +234,13 @@ namespace GObject
         if(count == 0)
         {
             pl->sendMsgCode(0, 4042);
-            return;
+            return false;
         }
 
         UInt32 index = uRand(count);
         Player* matchPlayer = vecPlayer[index];
         sendMatchPlayer(pl, matchPlayer);
+        return true;
     }
 
     bool RaceBattle::isStart()
@@ -255,29 +262,38 @@ namespace GObject
         Int32 rank;
         RBSortType::reverse_iterator rstart;
         RBSortType& starSort = _levelStarSort[level - 1];
-        UInt16 totalCnt = 0;
-        for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
-            totalCnt += pl->getStarCnt(i);
-        if(totalCnt == 0)
+        //UInt16 totalCnt = 0;
+        //for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
+        //    totalCnt += pl->getStarCnt(i);
+        UInt32 sortSize = starSort.size();
+        //if(totalCnt == 0)
+        if(0)
         {
-            rank = starSort.size() + 1;
+            if(sortSize == 0)
+                rank = 0;
+            else
+                rank = sortSize + 1;
             rstart = starSort.rbegin();
         }
         else
         {
             RBSortType::reverse_iterator it = starSort.rbegin();
-            rank = 0;
+            rank = sortSize;
             for(; it != starSort.rend(); ++it)
             {
-                ++rank;
                 if(it->player == pl)
                     break;
+                --rank;
             }
             if(it != starSort.rend())
+            {
+                ++it;
                 rstart = it;
+            }
             else
             {
-                rank = starSort.size() + 1;
+                if(sortSize > 0)
+                    rank = sortSize + 1;
                 rstart = starSort.rbegin();
             }
         }
@@ -288,12 +304,29 @@ namespace GObject
         st << count;
         for(RBSortType::reverse_iterator it = rstart; it != starSort.rend(); ++it)
         {
-            ++count;
-            if(count > 3)
+            if(count >= 3)
                 break;
+            ++count;
             Player* player = it->player;
             st << player->getName();
             st << static_cast<UInt32>(rank - count);
+            st << it->total;
+            st << player->getCountry();
+            st << player->GetClass();
+        }
+        UInt8 count2 = 0;
+        RBSortType::reverse_iterator it = rstart;
+        if(it != starSort.rbegin())
+            --it;
+        for(; it != starSort.rbegin(); --it)
+        {
+            if(count >= 3)
+                break;
+            ++count;
+            ++count2;
+            Player* player = it->player;
+            st << player->getName();
+            st << static_cast<UInt32>(rank + count2 - 1);
             st << it->total;
             st << player->getCountry();
             st << player->GetClass();
@@ -371,29 +404,31 @@ namespace GObject
 
     void RaceBattle::sendMatchPlayer(Player* pl, Player* matchPlayer)
     {
-        if(!pl || !matchPlayer)
+        if(!pl)
             return;
         Stream st(REP::RACE_BATTLE);
         UInt8 type = 5;
         st << type;
 
-        st << pl->getName();
-        st << pl->getCountry();
-        st << pl->GetClass();
-        st << pl->GetLev();
-        st << static_cast<UInt8>(pl->getMainFighter()->getId());
-        st << pl->getBattlePoint();
-        st << pl->getRaceBattlePos();
-        st << pl->getId();
-
-        st << matchPlayer->getName();
-        st << matchPlayer->getCountry();
-        st << matchPlayer->GetClass();
-        st << matchPlayer->GetLev();
-        st << static_cast<UInt8>(matchPlayer->getMainFighter()->getId());
-        st << matchPlayer->getBattlePoint();
-        st << matchPlayer->getRaceBattlePos();
-        st << matchPlayer->getId();
+        UInt8  isPink;
+        if(matchPlayer)
+        {
+            isPink = 1;
+            st << isPink;
+            st << matchPlayer->getName();
+            st << matchPlayer->getCountry();
+            st << matchPlayer->GetClass();
+            st << matchPlayer->GetLev();
+            st << static_cast<UInt8>(matchPlayer->getMainFighter()->getId());
+            st << matchPlayer->getBattlePoint();
+            st << matchPlayer->getRaceBattlePos();
+            st << matchPlayer->getId();
+        }
+        else
+        {
+            isPink = 0;
+            st << isPink;
+        }
 
         st << Stream::eos;
         pl->send(st);
@@ -591,8 +626,8 @@ namespace GObject
             return;
         if(level == 0 || level > 5)
             return;
-        if(pl->getStarTotal() < 1)
-            return;
+        //if(pl->getStarTotal() < 1)
+        //    return;
 
         TSort tsort;
         tsort.player = pl;
