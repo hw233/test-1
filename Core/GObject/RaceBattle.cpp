@@ -74,7 +74,7 @@ namespace GObject
             level = 1;
         if(level > sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]))
             return;
-        if(offset == 0xFF)
+        if(offset == 0xFF || offset == 0)
             offset = origPos % 10;
         if(offset > gPerLeveCnt[level - 1])
             return;
@@ -90,8 +90,8 @@ namespace GObject
 
         if(offset == 0)
         {
-            if((origPos % 10) != 0)
-                return;
+            //if((origPos % 10) != 0)
+            //    return;
             //    eraseLevelStarSort(pl, level);
         }
         else if((origPos % 10) == 0)
@@ -259,77 +259,64 @@ namespace GObject
             return;
         }
 
-        Int32 rank;
-        RBSortType::reverse_iterator rstart;
+        Int32 rank = 0;
+        Int32 rankAdd = 0;
         RBSortType& starSort = _levelStarSort[level - 1];
-        //UInt16 totalCnt = 0;
-        //for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
-        //    totalCnt += pl->getStarCnt(i);
-        UInt32 sortSize = starSort.size();
-        //if(totalCnt == 0)
-        if(0)
+        //UInt32 sortSize = starSort.size();
+        RBSortType::iterator it1;
+        for(it1 = starSort.begin(); it1 != starSort.end(); ++it1)
         {
-            if(sortSize == 0)
-                rank = 0;
-            else
-                rank = sortSize + 1;
-            rstart = starSort.rbegin();
-        }
-        else
-        {
-            RBSortType::reverse_iterator it = starSort.rbegin();
-            rank = sortSize;
-            for(; it != starSort.rend(); ++it)
+            ++rank;
+            if(it1->player == pl)
             {
-                if(it->player == pl)
-                    break;
-                --rank;
+                break;
             }
-            if(it != starSort.rend())
+
+            RBSortType::iterator it2 = it1;
+            ++it2;
+            if(it2 == starSort.end())
+                break;
+            else if(it2->player == pl)
             {
-                ++it;
-                rstart = it;
+                rankAdd = 1;
+                break;
             }
-            else
+
+            ++it2;
+            if(it2 == starSort.end())
+                break;
+            else if(it2->player == pl)
             {
-                if(sortSize > 0)
-                    rank = sortSize + 1;
-                rstart = starSort.rbegin();
+                rankAdd = 2;
+                break;
+            }
+
+            ++it2;
+            if(it2 == starSort.end())
+                break;
+            else if(it2->player == pl)
+            {
+                rankAdd = 3;
+                break;
             }
         }
 
-        st << rank;
+        st << (rank + rankAdd);
         UInt32 offset = st.size();
         UInt8 count = 0;
         st << count;
-        for(RBSortType::reverse_iterator it = rstart; it != starSort.rend(); ++it)
+
+        for(RBSortType::iterator it = it1; it != starSort.end(); ++it)
         {
             if(count >= 3)
                 break;
-            ++count;
             Player* player = it->player;
             st << player->getName();
-            st << static_cast<UInt32>(rank - count);
+            st << static_cast<UInt32>(rank + count);
             st << it->total;
-            st << player->getCountry();
             st << player->GetClass();
-        }
-        UInt8 count2 = 0;
-        RBSortType::reverse_iterator it = rstart;
-        if(it != starSort.rbegin())
-            --it;
-        for(; it != starSort.rbegin(); --it)
-        {
-            if(count >= 3)
-                break;
+            st << static_cast<UInt8>(player->IsMale() ? 0 : 1);
             ++count;
-            ++count2;
-            Player* player = it->player;
-            st << player->getName();
-            st << static_cast<UInt32>(rank + count2 - 1);
-            st << it->total;
-            st << player->getCountry();
-            st << player->GetClass();
         }
         st.data<UInt8>(offset) = count;
     }
