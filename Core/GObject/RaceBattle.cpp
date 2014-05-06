@@ -60,7 +60,7 @@ namespace GObject
             {
                 raceBattleBroadcast(1, 0);
                 awardLevelRank();
-                awardContinueWinRank();
+                //awardContinueWinRank();
             }
             _status = 0;
         }
@@ -83,6 +83,16 @@ namespace GObject
         GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pos);
         if(!rb)
             return;
+
+        if(level == sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]) && !pl->getIsLastLevel())
+        {
+            pl->setIsLastLevel(true);
+            UInt32 rank = World::getRBTimeRank();
+            ++rank;
+            if(rank <= 3)
+                SYSMSG_BROADCASTV(6004, rank, pl->getCountry(), pl->getPName());
+            World::setRBTimeRank(rank);
+        }
 
         pl->setRaceBattlePos(pos);
         //if(pl->GetVar(VAR_RCAE_BATTLE_SIGN) == 0)
@@ -197,7 +207,7 @@ namespace GObject
         {
             return false;
         }
-        if(pl->getStarCnt(offset - 1) >= 6)
+        if(pl->getStarCnt(offset - 1) >= 6 && !pl->getIsLastLevel())
         {
             pl->sendMsgCode(0, 4043);
             return false;
@@ -496,7 +506,7 @@ namespace GObject
         if(!pl)
             return;
 
-        UInt8 type;
+        UInt8 type = 0;
         if(rank == 0)
             return;
         else if(rank <= 1)
@@ -546,21 +556,21 @@ namespace GObject
         if(!pl)
             return;
 
-        UInt8 type;
-        if(num < 5)
-            return;
-        else if(num < 10)
-            type = 0;
-        else if(num <= 20)
-            type = 1;
-        else if(num <= 30)
-            type = 2;
-        else if(num <= 40)
-            type = 3;
-        else if(num <= 50)
-            type = 4;
-        else
+        UInt8 type = 0;
+        if(type == 50)
             type = 5;
+        else if(num == 40)
+            type = 4;
+        else if(num == 30)
+            type = 3;
+        else if(num == 20)
+            type = 2;
+        else if(num == 10)
+            type = 1;
+        else if(num == 5)
+            type = 0;
+        else
+            return;
 
         SYSMSG(title, 5137);
         SYSMSGV(content, 5138, num);
@@ -648,7 +658,7 @@ namespace GObject
         Player* defender = globalPlayers[defenderId];
         if(!defender)
             return;
-        if(pl->getStarCnt(offset - 1) >= 6)
+        if(pl->getStarCnt(offset - 1) >= 6 && !pl->getIsLastLevel())
         {
             pl->sendMsgCode(0, 4043);
             return;
@@ -666,12 +676,16 @@ namespace GObject
         }
         pl->setAttackCd(now + 20);
 
+        if(pl->getIsLastLevel())
+            return;
+
         UInt8 starAdd;
         if(res == 1)
         {
             starAdd = 2;
             eraseContinueWinSort(pl);
             pl->setContinueWinCnt(pl->getContinueWinCnt() + 1);
+            awardContinueWinRankOne(pl, pl->getContinueWinCnt());
             insertContinueWinSort(pl);
             pl->setContinueLoseCnt(0);
         }
@@ -761,6 +775,9 @@ namespace GObject
             return;
         }
         pl->setAttackCd(now + 20);
+
+        if(pl->getIsLastLevel())
+            return;
 
         UInt8 starAdd = 1;
         if(res == 1)

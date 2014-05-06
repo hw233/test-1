@@ -886,7 +886,8 @@ namespace GObject
         _canContinueCnt = 0;
         _continueLoseCnt = 0;
         _attackCd = 0;
-	}
+        _isLastLevel = false;
+    }
 
 
 	Player::~Player()

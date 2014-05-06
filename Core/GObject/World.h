@@ -1155,6 +1155,9 @@ public:
 
         return !(opTime >= actTime_new1 && opTime <= actTime_new2);
     }
+
+    inline static UInt32 getRBTimeRank() { return _rbTimeRank; }
+    inline static void setRBTimeRank(UInt32 rank) { _rbTimeRank = rank; }
  
 public:
 	inline static UInt8 getWeekDay()
@@ -1319,6 +1322,7 @@ public:
     static bool _miluzhijiao;
     static bool _buyfund;
     static bool _duobaoOpen;
+    static UInt32 _rbTimeRank;
 public:
     static RCSortType qishibanScoreSort;     //七石板积分排名
     static RCSortType guankaScoreSort;     //关卡活动积分排名

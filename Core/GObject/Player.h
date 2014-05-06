@@ -3335,6 +3335,8 @@ namespace GObject
         UInt8 _continueLoseCnt;
         //战斗冷却
         UInt32 _attackCd;
+        //是否是最后一层
+        bool _isLastLevel;
     public:
         UInt8 getRaceBattlePos() { return _playerPos; }
         void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
@@ -3366,6 +3368,8 @@ namespace GObject
         void setContinueLoseCnt(UInt8 cnt) { _continueLoseCnt = cnt; }
         void setAttackCd(UInt32 cd) { _attackCd = cd; }
         UInt32 getAttackCd() { return _attackCd; }
+        void setIsLastLevel(bool flag) { _isLastLevel = flag; }
+        bool getIsLastLevel() { return _isLastLevel; }
 	};
 
 
