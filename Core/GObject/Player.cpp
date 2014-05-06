@@ -895,7 +895,7 @@ namespace GObject
         //_canChallengeCnt = 0;
         _continueWinCnt = 0;
         _awardLevel = 3;
-        _continueWinPage = 0;
+        _continueWinPage = 1;
         _rbBufId = 0;
         _rbValue = 0;
         _exitCd = 0;

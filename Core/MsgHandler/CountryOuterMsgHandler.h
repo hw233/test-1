@@ -6805,6 +6805,18 @@ void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
         }
         break;
 
+        case 14:
+        {
+            GObject::raceBattle.pageContinueWin(player, 0);
+        }
+        break;
+
+        case 15:
+        {
+            GObject::raceBattle.pageContinueWin(player, 1);
+        }
+        break;
+
         default:
         break;
     }

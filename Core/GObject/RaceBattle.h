@@ -55,6 +55,7 @@ class RaceBattle : public Singleton<RaceBattle>
         void eraseContinueWinSort(Player* pl);
         void sendOwnerInfo(Player* pl);
         void braodCancelContinueWin(Player* pl, Player* p2);
+        void pageContinueWin(Player* pl, UInt8 flag);
 
     private:
         static UInt8 _status; //0（未开启），1-3（17：50~20：00），4（20：00~20：30）

@@ -149,11 +149,6 @@ namespace GObject
 
 
         UInt8 page = pl->getContinueWinPage();
-        if(page == 0)
-        {
-            page = 1;
-            pl->setContinueWinPage(page);
-        }
         sendContinueWinSort(pl, page);
         sendOwnerInfo(pl);
         sendBattleInfo(pl);
@@ -215,6 +210,11 @@ namespace GObject
             {{499, 20}, {499, 10}, {499, 5}}
         };
 
+        if(pl->GetPackage()->GetRestPackageSize() < 3)
+        {
+            pl->sendMsgCode(0, 1011);
+            return;
+        }
         for(UInt8 i = 0; i < 3; i++)
         {
             if(awardItem[index][i][0] == 499)
@@ -991,6 +991,36 @@ namespace GObject
             return;
 
         SYSMSG_BROADCASTV(6021 + type, player2->getCountry(), player2->getPName(), pl->getCountry(), pl->getPName());
+    }
+
+    void RaceBattle::pageContinueWin(Player* pl, UInt8 flag)
+    {
+        if(!pl)
+            return;
+        if(flag > 1)
+            return;
+
+        UInt8 page = pl->getContinueWinPage();
+        if(flag == 0)
+        {
+            UInt32 playerTotal = _contineWinSort.size();
+            if(playerTotal > 50)
+                playerTotal = 50;
+            UInt32 pageTotal = playerTotal / PAGE_MAX;
+            if(pageTotal * PAGE_MAX < playerTotal)
+                ++pageTotal;
+            if(page >= pageTotal)
+                return;
+            ++page;
+        }
+        else
+        {
+            if(page <= 1)
+                return;
+            --page;
+        }
+        pl->setContinueWinPage(page);
+        sendContinueWinSort(pl, page);
     }
 }
 
