@@ -3066,7 +3066,7 @@ namespace GData
         }
 
         DBLingShiUp dblsu;
-		if(execu->Prepare("SELECT `level`, `rate`, `exp` FROM `lingshi_upgrade`", dblsu) != DB::DB_OK)
+		if(execu->Prepare("SELECT `level`, `consume`, `exp` FROM `lingshi_upgrade`", dblsu) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{

@@ -851,7 +851,7 @@ struct DBLingShi
 struct DBLingShiUp
 {
     UInt8 level;
-    float rate;
+    UInt32 consume;
     UInt32 exp;
 };
 
@@ -1817,7 +1817,7 @@ SPECIALBEGIN(GData::DBLingShiUp)
 SPECIALDEF(3)
 	(
     UInt8, level,
-    float, rate,
+    UInt32, consume,
     UInt32, exp
     )
 SPECIALEND()

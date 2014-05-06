@@ -5,6 +5,7 @@
 
 namespace REQ
 {
+    const UInt8 LING_SHI            = 0x71;
     /**保持连接 */
     const UInt8 KEEP_ALIVE          = 0x00;
     /**自动重连 */
@@ -467,6 +468,7 @@ namespace REQ
 
 namespace REP
 {
+    const UInt8 LING_SHI            = 0x71;
     const UInt8 KEEP_ALIVE          = 0x00;// 0x00
     const UInt8 RECONNECT           = 0x01;// 帐号被封
     const UInt8 ENTER_ARENA         = 0x02;

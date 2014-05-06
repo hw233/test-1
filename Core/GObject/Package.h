@@ -266,12 +266,6 @@ namespace GObject
                 if(iter == m_ItemsSoul.end())
                     return NULL;
             }
-            else if(GetItemSubClass(id) == Item_LingShi)
-            {
-			    iter = m_ItemsLS.find(ItemKey(id, bind));
-                if(iter == m_ItemsLS.end())
-                    return NULL;
-            }
             else
             {
 			    iter = m_Items.find(ItemKey(id, bind));
@@ -339,10 +333,11 @@ namespace GObject
         void lingshiBreak(UInt16 fighterId, UInt32 lsId, bool type);
 	    bool DelLingshi(UInt32 id, UInt16 toWhere = 0);
 	    bool DelLingshi2(ItemLingshi * lingshi, UInt16 toWhere = 0);
+        void SendLingshiTrainInfo();
         void SendSingleLingshiData(ItemLingshi *, UInt8);
-	    void AppendLingshiData(Stream&, ItemLingshi *);
+	    static void AppendLingshiData(Stream&, ItemLingshi *);
 	    void SendLSPackageItemInfor();
-        void setLingshi(UInt16 fighterId, UInt32 lsId, bool type);
+        void setLingshi(Fighter *, UInt32, UInt8);
     protected:
 		typedef std::map<ItemKey, ItemBase *> ItemCont;
 		typedef ItemCont::iterator item_elem_iter;

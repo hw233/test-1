@@ -238,7 +238,7 @@ namespace GObject
         if(maxItemId > maxId)
             maxId = maxItemId;
         maxItemId = 0;
-		execu->Extract("SELECT max(`id`) FROM `lingshi`", maxItemId);
+		execu->Extract("SELECT max(`id`) FROM `lingshiAttr`", maxItemId);
         if(maxItemId > maxId)
             maxId = maxItemId;
 		IDGenerator::gItemOidGenerator.Init(maxId);

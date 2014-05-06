@@ -23,7 +23,7 @@ function lingshi_upgrade()
         BEGIN {
             print "INSERT INTO `lingshi_upgrade` VALUES";
         } {
-            printf("(%d,%f,%d)",$1,$2,$3);
+            printf("(%d,%d,%d)",$1,$2,$3);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

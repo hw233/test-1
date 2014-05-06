@@ -1207,8 +1207,8 @@ CREATE TABLE `lingshi` (
 DROP TABLE IF EXISTS `lingshi_upgrade`;
 CREATE TABLE `lingshi_upgrade` (
     `level` tinyint(3) unsigned NOT NULL DEFAULT 0,
-    `rate` float(5,2) unsigned NOT NULL DEFAULT '0.00',
-    `exp` bigint(10) unsigned NOT NULL DEFAULT 0,
+    `consume` int(10) unsigned NOT NULL DEFAULT 0,
+    `exp` bigint(20) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

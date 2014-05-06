@@ -8220,9 +8220,10 @@ namespace GObject
 		e = lingshi;
         ITEM_BIND_CHECK(itype->bindType, bind);
         lingshi->SetBindStatus(bind);
+        ItemNotifyEquip(static_cast<ItemEquip *>(lingshi));
 
 	    DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %" I64_FMT "u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
-        DB4().PushUpdateData("REPLACE INTO `lingshi`(`id`, `itemId`, `level`, `exp`) VALUES(%u, %u, %u, %u)", id, itype->getId(), lsAttr.lv, lsAttr.exp);
+        DB4().PushUpdateData("REPLACE INTO `lingshiAttr`(`id`, `itemId`, `level`, `exp`) VALUES(%u, %u, %u, %u)", id, itype->getId(), lsAttr.lv, lsAttr.exp);
 		return lingshi;
 	}
 
@@ -8242,11 +8243,14 @@ namespace GObject
         for(UInt8 i = 0; i < tk.count(); ++ i)
         {
             UInt32 id = atoi(tk[i].c_str());
-            ItemLingshi * eatEq = static_cast<ItemLingshi *>(FindItem(id));
+            item_elem_iter iter = m_ItemsLS.find(ItemKey(id));
+            if(iter == m_ItemsLS.end())
+                continue;
+            ItemLingshi * eatEq = static_cast<ItemLingshi *>(iter->second);
             if(eatEq == NULL)
                 continue;
             UInt8 tmpLvl = eatEq->getLingshiAttr().lv;
-            needTael += tmpLvl * GData::lingshiCls.getLevUpTaelRate(tmpLvl);
+            needTael += GData::lingshiCls.getLevUpTael(tmpLvl);
             eatVec.push_back(eatEq);
         }
         if(m_Owner->getTael() < needTael)
@@ -8261,8 +8265,9 @@ namespace GObject
             if(res > 0)
             {
                 UInt8 tmpLvl = eatVec[i]->getLingshiAttr().lv;
-                needTael += tmpLvl * GData::lingshiCls.getLevUpTaelRate(tmpLvl);
+                needTael += GData::lingshiCls.getLevUpTael(tmpLvl);
                 DelLingshi2(eatVec[i], ToPetEquipUpgrade);
+                m_Owner->udpLog("lingshi", "F_140509_1", "", "", "", "", "act");
                 if(res == 1)
                     break;
             }
@@ -8270,7 +8275,7 @@ namespace GObject
         ConsumeInfo ci(LingShiPeiYang, 0, 0);
         m_Owner->useTael(needTael, &ci);
 
-		Stream st(0x71);
+		Stream st(REP::LING_SHI);
         st << static_cast<UInt8>(0x13);
         st << fighterId << pos;
 		AppendLingshiData(st, equip);
@@ -8329,24 +8334,27 @@ namespace GObject
                 if(cnt <= tmpCnt[idx])
                     break;
             }
-            if(m_Owner->getGold() < moneys[idx])
+            bool isHalf = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_LUCKY) > 0;
+            if(m_Owner->getGold() < moneys[idx] / (isHalf ? 2 : 1))
             {
                 m_Owner->sendMsgCode(0, 1101);
                 return;
             }
             ConsumeInfo ci(LingShiPeiYang, 0, 0);
-            m_Owner->useGold(moneys[idx], &ci);
+            m_Owner->useGold(moneys[idx] / (isHalf ? 2 : 1), &ci);
             m_Owner->SetVar(VAR_LINGSHI_PEIYANG_CNT, cnt+1);
             lsAttr.exp += 3000 * (hasLucky ? 10 : 1);
         }
         else
         {
-#define XIAN_LING_GUO 9600
+#define XIAN_LING_GUO 9459
             if(GetItemAnyNum(XIAN_LING_GUO) < 1)
                 return;
             bool isBind = false;
             DelItemAny(XIAN_LING_GUO, 1, &isBind);
+            DelItemSendMsg(XIAN_LING_GUO, m_Owner);
             lsAttr.exp += 2000 * (hasLucky ? 10 : 1);
+            m_Owner->udpLog("lingshi", "F_140509_2", "", "", "", "", "act");
         }
         if(hasLucky)
             m_Owner->SetVar(VAR_LINGSHI_PEIYANG_LUCKY, 1);
@@ -8368,14 +8376,15 @@ namespace GObject
             lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
             //SYSMSG_BROADCASTV(4157, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->getQuality(), equip->getName().c_str(), maxLev);
         }
-		DB4().PushUpdateData("UPDATE `lingshi` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
+		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
 
-		Stream st(0x71);
+		Stream st(REP::LING_SHI);
         st << static_cast<UInt8>(0x15);
         st << fighterId << pos;
 		AppendLingshiData(st, lingshi);
 		st << Stream::eos;
 		m_Owner->send(st);
+        SendLingshiTrainInfo();
     }
 
     void Package::lingshiBreak(UInt16 fighterId, UInt32 lsId, bool type)
@@ -8410,12 +8419,13 @@ namespace GObject
                 return;
             bool isBind = false;
             DelItemAny(XIAN_LING_GUO, lsd->useItem, &isBind);
+            DelItemSendMsg(XIAN_LING_GUO, m_Owner);
         }
         //突破时经验在临界值，升级
         ++ lsAttr.lv;
-		DB4().PushUpdateData("UPDATE `lingshi` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
+		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
 
-		Stream st(0x71);
+		Stream st(REP::LING_SHI);
         st << static_cast<UInt8>(0x14);
         st << fighterId << pos;
 		AppendLingshiData(st, lingshi);
@@ -8433,7 +8443,7 @@ namespace GObject
 		m_ItemsLS.erase(iter);
 		-- m_SizeLS;
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", id);
-		DB4().PushUpdateData("DELETE FROM `lingshi` WHERE `id` = %u", id);
+		DB4().PushUpdateData("DELETE FROM `lingshiAttr` WHERE `id` = %u", id);
 		if(toWhere != 0 && item->getQuality() >= 4)
 		{
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), item->getId(), toWhere, TimeUtil::Now());
@@ -8452,7 +8462,7 @@ namespace GObject
 		m_ItemsLS.erase(iter);
 		-- m_SizeLS;
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", lingshi->getId());
-		DB4().PushUpdateData("DELETE FROM `lingshi` WHERE `id` = %u", lingshi->getId());
+		DB4().PushUpdateData("DELETE FROM `lingshiAttr` WHERE `id` = %u", lingshi->getId());
 		if(toWhere != 0 && lingshi->getQuality() >= 4)
 		{
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), lingshi->GetItemType().getId(), lingshi->getId(), toWhere, TimeUtil::Now());
@@ -8462,9 +8472,19 @@ namespace GObject
 		return true;
 	}
 
+    void Package::SendLingshiTrainInfo()
+    {
+		Stream st(REP::LING_SHI);
+        st << static_cast<UInt8>(0x12);
+        st << static_cast<UInt16>(m_Owner->GetVar(VAR_LINGSHI_PEIYANG_CNT));
+        st << static_cast<UInt8>(m_Owner->GetVar(VAR_LINGSHI_PEIYANG_LUCKY));
+		st << Stream::eos;
+		m_Owner->send(st);
+    }
+
     void Package::SendSingleLingshiData(ItemLingshi * lingshi, UInt8 type)
 	{   //type: 0删除 1新增 2更新
-		Stream st(0x71);
+		Stream st(REP::LING_SHI);
         st << static_cast<UInt8>(0x11);
 		st << type;
         if(type)
@@ -8487,8 +8507,9 @@ namespace GObject
 	void Package::SendLSPackageItemInfor()
 	{
 		ItemCont::iterator cit = m_ItemsLS.begin();
-		Stream st(0x71);
+		Stream st(REP::LING_SHI);
         st << static_cast<UInt8>(0x10);
+        size_t offset = st.size();
 		st << static_cast<UInt16>(0);
 		UInt16 count = 0;
 		for (; cit != m_ItemsLS.end(); ++cit)
@@ -8500,65 +8521,52 @@ namespace GObject
 				AppendLingshiData(st, static_cast<ItemLingshi *>(item));
 			}
 		}
-		st.data<UInt16>(4) = count;
+		st.data<UInt16>(offset) = count;
 		st << Stream::eos;
 		m_Owner->send(st);
 	}
 
-    void Package::setLingshi(UInt16 fighterId, UInt32 lsId, bool type)
+    void Package::setLingshi(Fighter * fgt, UInt32 lsId, UInt8 opt)
     {
         if(GetRestPackageSize(2) < 1)
+        {
+			m_Owner->sendMsgCode(0, 1011);
             return;
-        Fighter * fgt = NULL;
+        }
+        if(!fgt || opt < 0x63 || opt > 0x65)
+            return;
         ItemEquip * old = NULL;
-        ItemEquip * lingshi = NULL;
-        if(type)
+        if(lsId == 0)
         {   //卸下
-            UInt8 pos = 0;
-            lingshi = FindEquip(fgt, pos, fighterId, lsId);
-            if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
-                return;
-            old = fgt->setLingshi(NULL, pos);
+            old = fgt->setLingshi(NULL, opt-0x63);
         }
         else
         {   //穿上
-            fgt = m_Owner->findFighter(fighterId);
-            lingshi = GetEquip(lsId);
-            if(!fgt || !lingshi)
+            item_elem_iter iter = m_ItemsLS.find(ItemKey(lsId));
+            if(iter == m_ItemsLS.end())
                 return;
-            if(fgt->getClass() != lingshi->getClass()-Item_LingShi+1)
+            ItemEquip * lingshi = static_cast<ItemLingshi *>(iter->second);
+            if(!lingshi || fgt->getClass() != lingshi->getClass()-Item_LingShi+1)
                 return;
             UInt8 tmpNum = 0;
-            if(fgt->getLevel() >= 75)
+            if(fgt->getLevel() >= 95)
                 tmpNum = 3;
-            else if(fgt->getLevel() >= 65)
+            else if(fgt->getLevel() >= 90)
                 tmpNum = 2;
-            else if(fgt->getLevel() >= 55)
+            else if(fgt->getLevel() >= 85)
                 tmpNum = 1;
             if(fgt->getLingshiNum() >= tmpNum)
                 return;
             lingshi->DoEquipBind();
             old = fgt->setLingshi(lingshi);
 
-			item_elem_iter iter = m_ItemsLS.find(ItemKey(lsId));
-			if(iter != m_ItemsLS.end())
-            {
-                SendSingleLingshiData(static_cast<ItemLingshi *>(lingshi), 0);
-                m_ItemsLS.erase(iter);
-                -- m_SizeLS;
-            }
+            SendSingleLingshiData(static_cast<ItemLingshi *>(lingshi), 0);
+            m_ItemsLS.erase(iter);
+            -- m_SizeLS;
         }
         if(old)
             AddExistEquip(old);
         fgt->setDirty();
-
-		Stream st(0x71);
-        st << static_cast<UInt8>(0x12);
-        st << static_cast<UInt8>(type ? 1 : 0) << fighterId;
-        if(!type)
-            AppendLingshiData(st, static_cast<ItemLingshi *>(lingshi));
-		st << Stream::eos;
-		m_Owner->send(st);
     }
     /**********灵侍end***********/
 

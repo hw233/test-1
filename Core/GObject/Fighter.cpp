@@ -594,6 +594,16 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             }
         }
     }
+    if(t >= 0x63 && t < 0x63 + LINGSHI_UPMAX)
+    {
+        UInt32 lss[LINGSHI_UPMAX] = {0};
+        if (getAllLingshiId(lss)) {
+            std::string str;
+            if (value2string(lss, LINGSHI_UPMAX, str)) {
+                DB2().PushUpdateData("UPDATE `fighter` SET `lingshi` = '%s' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", str.c_str(), _id, _owner->getId());
+            }
+        }
+    }
 
 	switch(t)
 	{ // 不保存hp, 每次重启都满血
@@ -845,6 +855,12 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 			if(writedb)
 				updateToDB(t[i], 0);
 		}
+        else if(t[i] >= 0x63 && t[i] <= 0x65)
+        {   //灵侍
+            Package::AppendLingshiData(st, static_cast<ItemLingshi *>(equip));
+			if(writedb)
+				updateToDB(t[i], equip->getId());
+        }
 		else
 		{
 			st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0)
@@ -1291,6 +1307,21 @@ UInt32 Fighter::getLingshiNum()
      return num;
 }
 
+int Fighter::getAllLingshiId( UInt32* lingshis, int size )
+{
+    if (!lingshis|| !size)
+        return 0;
+
+    for (int i = 0; i < LINGSHI_UPMAX; ++i)
+    {
+        if (_lingshi[i])
+            lingshis[i] = _lingshi[i]->getId();
+        else
+            lingshis[i] = 0;
+    }
+    return LINGSHI_UPMAX;
+}
+
 ItemEquip * Fighter::setLingshi(ItemEquip * lingshi)
 {
     if(!lingshi || !IsLingShi(lingshi->getClass()))
@@ -1331,12 +1362,14 @@ ItemEquip * Fighter::setLingshi(ItemEquip * lingshi, int idx, bool writedb)
         return NULL;
     for(int i = 0; i < LINGSHI_UPMAX; ++ i)
     {
-        if(_lingshi[i] == lingshi)
+        if(lingshi && _lingshi[i] == lingshi)
             return NULL;
     }
     ItemEquip * old = _lingshi[idx];
     _lingshi[idx] = lingshi;
-    //sendModification(0x0a+idx, _trump[idx], writedb);
+    if(lingshi)
+        lingshi->SetBindStatus(true);
+    sendModification(0x63+idx, lingshi, writedb);
     setDirty();
     return old;
 }
