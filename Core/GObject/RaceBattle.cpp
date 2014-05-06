@@ -192,7 +192,12 @@ namespace GObject
         };
 
         for(UInt8 i = 0; i < 3; i++)
-           pl->GetPackage()->Add(awardItem[index][i][0], awardItem[index][i][1], true, false);
+        {
+            if(awardItem[index][i][0] == 499)
+                pl->getCoupon(awardItem[index][i][1]);
+            else
+                pl->GetPackage()->Add(awardItem[index][i][0], awardItem[index][i][1], true, false);
+        }
 
         ++awardlevel;
         pl->setAwardLevel(awardlevel);
@@ -454,6 +459,7 @@ namespace GObject
             st << matchPlayer->getBattlePoint();
             st << matchPlayer->getRaceBattlePos();
             st << matchPlayer->getId();
+            pl->getMatchPlayer();
         }
         else
         {
@@ -686,6 +692,11 @@ namespace GObject
     {
         if(!pl)
             return;
+        Player* defender = globalPlayers[defenderId];
+        if(!defender)
+            return;
+        if(defender!= pl->getMatchPlayer())
+            return;
         UInt8 pos = pl->getRaceBattlePos();
         UInt8 level = pos / 10;
         UInt8 offset = pos % 10;
@@ -694,9 +705,6 @@ namespace GObject
         if(offset == 0)
             return;
         if(offset > gPerLeveCnt[level - 1])
-            return;
-        Player* defender = globalPlayers[defenderId];
-        if(!defender)
             return;
         if(pl->getStarCnt(offset - 1) >= 6 && !pl->getIsLastLevel())
         {

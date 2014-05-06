@@ -887,6 +887,7 @@ namespace GObject
         _continueLoseCnt = 0;
         _attackCd = 0;
         _isLastLevel = false;
+        _matchPlayer = NULL;
     }
 
 

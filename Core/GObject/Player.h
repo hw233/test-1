@@ -3337,6 +3337,8 @@ namespace GObject
         UInt32 _attackCd;
         //是否是最后一层
         bool _isLastLevel;
+        //匹配者ID
+        Player* _matchPlayer;
     public:
         UInt8 getRaceBattlePos() { return _playerPos; }
         void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
@@ -3370,6 +3372,8 @@ namespace GObject
         UInt32 getAttackCd() { return _attackCd; }
         void setIsLastLevel(bool flag) { _isLastLevel = flag; }
         bool getIsLastLevel() { return _isLastLevel; }
+        void setMatchPlayer(Player* player) { _matchPlayer = player; }
+        Player* getMatchPlayer() { return _matchPlayer; }
 	};
 
 
