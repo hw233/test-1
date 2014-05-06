@@ -54,9 +54,10 @@ class RaceBattle : public Singleton<RaceBattle>
         void insertContinueWinSort(Player* pl);
         void eraseContinueWinSort(Player* pl);
         void sendOwnerInfo(Player* pl);
+        void braodCancelContinueWin(Player* pl, Player* p2);
 
     private:
-        static UInt8 _status; //0（未开启），1（17：50~20：00），2（20：00~20：30）
+        static UInt8 _status; //0（未开启），1-3（17：50~20：00），4（20：00~20：30）
         static RBSortType _levelStarSort[5]; //每层星级数排名
         static RBSortType _contineWinSort;
 };

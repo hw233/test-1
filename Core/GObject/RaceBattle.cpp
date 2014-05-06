@@ -40,24 +40,41 @@ namespace GObject
 
         if(curTime < RACEBATTLE_STARTTIME - 600)
             _status = 0;
-        else if(curTime < RACEBATTLE_STARTTIME)
+        else if(curTime < RACEBATTLE_STARTTIME - 300)
         {
             if(_status == 1)
                 return;
             _status = 1;
+            SYSMSG_BROADCASTV(6005, RACEBATTLE_STARTTIME - curTime);
             raceBattleBroadcast(0, RACEBATTLE_STARTTIME - curTime);
         }
-        else if(curTime < RACEBATTLE_ENDTIME)
+        else if(curTime < RACEBATTLE_STARTTIME - 60)
         {
             if(_status == 2)
                 return;
             _status = 2;
+            SYSMSG_BROADCASTV(6005, RACEBATTLE_STARTTIME - curTime);
+        }
+        else if(curTime < RACEBATTLE_STARTTIME)
+        {
+            if(_status == 3)
+                return;
+            _status = 3;
+            SYSMSG_BROADCASTV(6005, RACEBATTLE_STARTTIME - curTime);
+        }
+        else if(curTime < RACEBATTLE_ENDTIME)
+        {
+            if(_status == 4)
+                return;
+            _status = 4;
+            SYSMSG_BROADCASTV(6006);
             raceBattleBroadcast(1, RACEBATTLE_ENDTIME - curTime);
         }
         else
         {
             if(_status == 2)
             {
+                SYSMSG_BROADCASTV(6007);
                 raceBattleBroadcast(1, 0);
                 awardLevelRank();
                 //awardContinueWinRank();
@@ -84,14 +101,31 @@ namespace GObject
         if(!rb)
             return;
 
+        if(level >= 2 && level >= 5)
+        {
+            UInt32 num = World::getRBTimeRank();
+            UInt32 rank = GET_BIT_3(num, level);
+            if(rank == 0)
+            {
+                ++rank;
+                SYSMSG_BROADCASTV(6008 + level - 2, pl->getCountry(), pl->getPName());
+                num = SET_BIT_3(num, level, rank);
+                World::setRBTimeRank(num);
+            }
+        }
+
         if(level == sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]) && !pl->getIsLastLevel())
         {
             pl->setIsLastLevel(true);
-            UInt32 rank = World::getRBTimeRank();
-            ++rank;
-            if(rank <= 3)
-                SYSMSG_BROADCASTV(6004, rank, pl->getCountry(), pl->getPName());
-            World::setRBTimeRank(rank);
+            UInt32 num = World::getRBTimeRank();
+            UInt32 rank = GET_BIT_3(num, level);
+            if(rank < 3)
+            {
+                ++rank;
+                SYSMSG_BROADCASTV(6012 + rank - 1, pl->getCountry(), pl->getPName());
+                num = SET_BIT_3(num, level, rank);
+                World::setRBTimeRank(num);
+            }
         }
 
         pl->setRaceBattlePos(pos);
@@ -255,7 +289,7 @@ namespace GObject
 
     bool RaceBattle::isStart()
     {
-        if(_status == 2)
+        if(_status == 4)
             return true;
         return false;
     }
@@ -436,17 +470,20 @@ namespace GObject
     {
         if(!pl || !matchPlayer)
             return 0;
-        if(pl->getExitCd() > TimeUtil::Now())
+
+        UInt32 now = TimeUtil::Now();
+        if(pl->getAttackCd() > now)
+        {
+            pl->sendMsgCode(0, 4045);
+            return 0;
+        }
+        pl->setAttackCd(now + 20);
+
+        if(pl->getExitCd() > now)
         {
             pl->sendMsgCode(0, 4040);
             return 0;
         }
-        if(pl->getBuffData(PLAYER_BUFF_ATTACKING))
-        {
-            pl->sendMsgCode(0, 1407);
-            return 0;
-        }
-		pl->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + 3);
 
         Battle::BattleSimulator bsim(Battle::BS_RACEBATTLE, pl, matchPlayer);
         pl->PutFighters( bsim, 0 );
@@ -556,8 +593,8 @@ namespace GObject
         if(!pl)
             return;
 
-        UInt8 type = 0;
-        if(type == 50)
+        UInt8 type;
+        if(num == 50)
             type = 5;
         else if(num == 40)
             type = 4;
@@ -571,6 +608,9 @@ namespace GObject
             type = 0;
         else
             return;
+
+        if(type <= 3)
+            SYSMSG_BROADCASTV(6015 + type, pl->getCountry(), pl->getPName());
 
         SYSMSG(title, 5137);
         SYSMSGV(content, 5138, num);
@@ -668,14 +708,6 @@ namespace GObject
         if(res == 0)
             return;
 
-        UInt32 now = TimeUtil::Now();
-        if(pl->getAttackCd() > now)
-        {
-            pl->sendMsgCode(0, 4045);
-            return;
-        }
-        pl->setAttackCd(now + 20);
-
         if(pl->getIsLastLevel())
             return;
 
@@ -693,6 +725,7 @@ namespace GObject
         {
             starAdd = 1;
             eraseContinueWinSort(pl);
+            braodCancelContinueWin(pl, defender);
             pl->setContinueWinCnt(0);
             pl->setContinueLoseCnt(pl->getContinueLoseCnt() + 1);
         }
@@ -770,14 +803,6 @@ namespace GObject
         UInt8 res = attackPlayer(pl, defender);
         if(res == 0)
             return;
-
-        UInt32 now = TimeUtil::Now();
-        if(pl->getAttackCd() > now)
-        {
-            pl->sendMsgCode(0, 4045);
-            return;
-        }
-        pl->setAttackCd(now + 20);
 
         if(pl->getIsLastLevel())
             return;
@@ -895,6 +920,25 @@ namespace GObject
         st << isDouble;
         st << Stream::eos;
         pl->send(st);
+    }
+
+    void RaceBattle::braodCancelContinueWin(Player* pl, Player* p2)
+    {
+        if(!pl || !p2)
+            return;
+
+        UInt8 contineWinCnt = pl->getContinueWinCnt();
+        UInt8 type = 0;
+        if(contineWinCnt >= 20)
+            type = 2;
+        else if(contineWinCnt >= 10)
+            type = 1;
+        else if(contineWinCnt >= 5)
+            type = 0;
+        else
+            return;
+
+        SYSMSG_BROADCASTV(6021 + type, pl->getCountry(), pl->getPName(), p2->getCountry(), p2->getPName());
     }
 }
 
