@@ -32,8 +32,9 @@ namespace GData
         UInt8 lvLimit;
         UInt16 skillId;//初始技能id
         UInt32 initExp;
+        std::string name;
 
-        CardInitInfo(): type(0),color(0),lvLimit(0),skillId(0){}
+        CardInitInfo(): type(0),color(0),lvLimit(0),skillId(0),name(""){}
     };
 
 

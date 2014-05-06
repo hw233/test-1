@@ -1618,7 +1618,7 @@ struct DBCard
     UInt32 id;
     UInt16 cid;
     UInt8 level;
-    UInt16 exp;
+    UInt32 exp;
     UInt8 pos;
 };
 
@@ -1628,7 +1628,7 @@ struct DBCardSuit
     UInt8 id;
     UInt8 suit_mark;
     UInt8 active;
-    UInt16 spe_mark;
+    UInt32 spe_mark;
     UInt8 collect_degree;
 };
 
@@ -3697,7 +3697,7 @@ SPECIALDEF(6)
     UInt32, id,
     UInt16, cid,
     UInt8, level,
-    UInt16, exp,
+    UInt32, exp,
     UInt8, pos
     )
 SPECIALEND()
@@ -3709,7 +3709,7 @@ SPECIALDEF(6)
     UInt8, id,
     UInt8, suit_mark,
     UInt8, active,
-    UInt16, spe_mark,
+    UInt32, spe_mark,
     UInt8, collect_degree
     )
 SPECIALEND()

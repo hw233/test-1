@@ -2735,6 +2735,13 @@ Fighter * Fighter::cloneWithOutDirty(Player * player)
 	return fgt;
 }
 
+ItemEquip * Fighter::findfashion( UInt32 id)
+{
+    if(_fashion != NULL && _fashion->getId() == id)
+        return _fashion;
+    return NULL;
+}
+
 
 ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
 {

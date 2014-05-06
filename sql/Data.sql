@@ -1218,6 +1218,7 @@ CREATE TABLE `cardInfo` (
     `color` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `lvLimit` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `skill` int(10) unsigned NOT NULL DEFAULT 0,
+    `name` varchar(255) NOT NULL DEFAULT '',
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
