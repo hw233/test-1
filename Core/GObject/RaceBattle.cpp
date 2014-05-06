@@ -311,7 +311,7 @@ namespace GObject
             return false;
         }
         UInt8 offset = pos % 10;
-        if(offset == 0)
+        if(offset == 0 && !pl->getIsLastLevel())
         {
             pl->sendMsgCode(0, 4044);
             return false;
