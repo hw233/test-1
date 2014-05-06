@@ -35,48 +35,65 @@ namespace GObject
         NETWORK()->Broadcast(st);
     }
 
-    void RaceBattle::raceBattleCheck(UInt32 time)
+    void RaceBattle::sendRBStatus(Player* pl)
     {
-        UInt32 curTime = time - TimeUtil::SharpDay(0, time);
+        if(!pl)
+            return;
+        if(!isStart())
+            return;
 
-        if(curTime < RACEBATTLE_STARTTIME - 600)
+        Stream st(REP::RACE_BATTLE);
+        UInt8 type = 1;
+        st << type;
+        UInt32 now = TimeUtil::Now();
+        st << static_cast<UInt32>(TimeUtil::SharpDay(0, now) + RACEBATTLE_ENDTIME - now);
+        st << Stream::eos;
+        pl->send(st);
+    }
+
+    void RaceBattle::raceBattleCheck()
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 startTime = TimeUtil::SharpDay(0, now) + RACEBATTLE_STARTTIME;
+
+        if(now < startTime - 600)
             _status = 0;
-        else if(curTime < RACEBATTLE_STARTTIME - 300)
+        else if(now < startTime - 300)
         {
             if(_status == 1)
                 return;
             _status = 1;
-            SYSMSG_BROADCASTV(6005, RACEBATTLE_STARTTIME - curTime);
-            raceBattleBroadcast(0, RACEBATTLE_STARTTIME - curTime);
+            SYSMSG_BROADCASTV(6005, startTime - now);
+            raceBattleBroadcast(0, startTime - now);
         }
-        else if(curTime < RACEBATTLE_STARTTIME - 60)
+        else if(now < startTime - 60)
         {
             if(_status == 2)
                 return;
             _status = 2;
-            SYSMSG_BROADCASTV(6005, RACEBATTLE_STARTTIME - curTime);
+            SYSMSG_BROADCASTV(6005, startTime - now);
         }
-        else if(curTime < RACEBATTLE_STARTTIME)
+        else if(now < startTime)
         {
             if(_status == 3)
                 return;
             _status = 3;
-            SYSMSG_BROADCASTV(6005, RACEBATTLE_STARTTIME - curTime);
+            SYSMSG_BROADCASTV(6005, startTime - now);
         }
-        else if(curTime < RACEBATTLE_ENDTIME)
+        else if(now < startTime + 1800)
         {
             if(_status == 4)
                 return;
             _status = 4;
             SYSMSG_BROADCASTV(6006);
-            raceBattleBroadcast(1, RACEBATTLE_ENDTIME - curTime);
+            raceBattleBroadcast(1, startTime + 1800 - now);
         }
         else
         {
             if(_status == 2)
             {
                 SYSMSG_BROADCASTV(6007);
-                raceBattleBroadcast(1, 0);
+                raceBattleBroadcast(2, 0);
                 awardLevelRank();
                 //awardContinueWinRank();
             }

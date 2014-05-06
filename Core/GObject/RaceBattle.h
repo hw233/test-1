@@ -27,7 +27,8 @@ class RaceBattle : public Singleton<RaceBattle>
     public:
         RaceBattle() {}
         ~RaceBattle() {}
-        void raceBattleCheck(UInt32 time);
+        void sendRBStatus(Player* pl);
+        void raceBattleCheck();
         UInt16 getLocation() { return RACEBATTLE_LOCATION; }
         void enterPos(Player* pl, UInt8 pos);
         void autoBattle(Player* pl);

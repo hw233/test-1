@@ -1465,6 +1465,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     //结拜邀请信息
     pl->sendFriendlyTimeAndCost();
+    GObject::raceBattle.sendRBStatus(pl);
 
     }
 
