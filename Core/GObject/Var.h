@@ -724,7 +724,6 @@ namespace GObject
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
 
         //781 - 790 for lijr
-<<<<<<< HEAD
         VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
         VAR_ERLKING_STATUSB = 782,               //妖王再临状态(17-32)
         VAR_ERLKING_STATUSC = 783,               //妖王再临状态(33-48)
@@ -732,10 +731,8 @@ namespace GObject
         VAR_ERLKING_USE_FREE_NUM_DAY = 785,      //妖王再临使用免费通关次数
         VAR_ERLKING_BUY_PASS_TOTAL_NUM = 786,    //妖王再临购买通关总次数
 
-=======
         VAR_KJTM_AWARD_MARK = 787, //抗击天魔奖励标志
         VAR_KJTM_LOGIN_NUM = 789,  // 抗击天魔登录次数
->>>>>>> 56588f3fb57eb3ddfe228c8b66946d2d83cf94b3
         VAR_MAX,
     };
 
