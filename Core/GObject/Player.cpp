@@ -681,6 +681,23 @@ namespace GObject
 		return count == 0;
     }
 
+	UInt64 EventAutoRaceBattle::calcExpEach()
+	{
+        UInt8 plvl = m_Player->GetLev();
+        UInt64 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
+        return exp;
+	}
+
+	void EventAutoRaceBattle::Process(UInt32)
+	{
+		UInt64 exp = calcExpEach();
+
+		if(m_Player->isOnline())
+			m_Player->AddExp(exp);
+		else
+			m_Player->pendExp(exp);
+	}
+
     bool EventPlayerTimeTick::Equal(UInt32 id, size_t playerid) const
     {
 		return 	id == GetID() && playerid == m_Player->getId();
@@ -888,6 +905,7 @@ namespace GObject
         _attackCd = 0;
         _isLastLevel = false;
         _matchPlayer = NULL;
+        _rbAutoTimer = NULL;
     }
 
 
@@ -32057,6 +32075,24 @@ void Player::specialUdpLog(UInt8 type)
             return;
         send(&(*r)[0], r->size());
     }
+
+    void Player::autoRaceBattle(UInt32 count)
+    {
+		EventAutoRaceBattle* event = new(std::nothrow)EventAutoRaceBattle(this, 60, count);
+		if(event == NULL)
+            return;
+		cancelAutoBattle();
+		PushTimerEvent(event);
+
+    }
+
+	void Player::cancelAutoRaceBattle()
+	{
+        EventBase* ev = eventWrapper.RemoveTimerEvent(this, EVENT_AUTORACEBATTLE, 0);
+        if(ev == NULL)
+            return;
+        ev->release();
+	}
 
 } // namespace GObject
 

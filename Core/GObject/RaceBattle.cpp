@@ -17,6 +17,7 @@
 
 #define RACEBATTLE_STARTTIME 20*3600
 #define RACEBATTLE_ENDTIME RACEBATTLE_STARTTIME+1800
+#define PAGE_MAX 5
 
 namespace GObject
 {
@@ -36,7 +37,7 @@ namespace GObject
 
     void RaceBattle::raceBattleCheck(UInt32 time)
     {
-        UInt32 curTime = TimeUtil::SharpDay(0, time);
+        UInt32 curTime = time - TimeUtil::SharpDay(0, time);
 
         if(curTime < RACEBATTLE_STARTTIME - 600)
             _status = 0;
@@ -160,10 +161,33 @@ namespace GObject
 
     void RaceBattle::autoBattle(Player* pl)
     {
+        UInt32 now = TimeUtil::Now();
+        UInt32 endTime = TimeUtil::SharpDay(0, now) + RACEBATTLE_ENDTIME;
+        UInt32 count = 0;
+        if(endTime > now)
+            count = (endTime - now) / 60;
+        if(count * 60 < endTime - now)
+            ++count;
+        if(count == 0)
+            return;
+        pl->autoRaceBattle(count);
+#if 0
+        void* timer = pl->getRBAutoTimer();
+        if(timer)
+            return;
+        pl->setRBAutoTimer(timer);
+#endif
     }
 
     void RaceBattle::cancelBattle(Player* pl)
     {
+        pl->cancelAutoRaceBattle();
+#if 0
+        void* timer = pl->getRBAutoTimer();
+        if(!timer)
+            return;
+        pl->setRBAutoTimer(timer);
+#endif
     }
 
     void RaceBattle::freshContinueWinRank(Player* pl)
@@ -221,6 +245,12 @@ namespace GObject
     {
         if(!pl)
             return false;
+        UInt32 now = TimeUtil::Now();
+        if(pl->getAttackCd() > now)
+        {
+            pl->sendMsgCode(0, 4045);
+            return false;
+        }
         if(pl->getExitCd() > TimeUtil::Now())
         {
             pl->sendMsgCode(0, 4040);
@@ -289,6 +319,7 @@ namespace GObject
         UInt32 index = uRand(count);
         Player* matchPlayer = vecPlayer[index];
         sendMatchPlayer(pl, matchPlayer);
+        pl->setMatchPlayer(matchPlayer);
         return true;
     }
 
@@ -372,7 +403,6 @@ namespace GObject
 
     void RaceBattle::sendContinueWinSort(Player* player, UInt8 page)
     {
-        #define PAGE_MAX 5
         if(player == NULL)
             return;
 
@@ -459,7 +489,6 @@ namespace GObject
             st << matchPlayer->getBattlePoint();
             st << matchPlayer->getRaceBattlePos();
             st << matchPlayer->getId();
-            pl->getMatchPlayer();
         }
         else
         {
@@ -772,6 +801,7 @@ namespace GObject
         sendContinueWinSort(pl, pl->getContinueWinPage());
         sendOwnerInfo(pl);
         sendBattleInfo(pl);
+        pl->setMatchPlayer(NULL);
     }
 
     void RaceBattle::attackContinueWinPlayer(Player* pl, UInt64 defenderId)
@@ -800,13 +830,25 @@ namespace GObject
             return;
 
         RBSortType::iterator it;
+        UInt32 continueRank = 0;
         for(it = _contineWinSort.begin(); it != _contineWinSort.end(); ++it)
         {
+            ++continueRank;
             if(it->player == defender)
                 break;
         }
         if(it == _contineWinSort.end())
             return;
+        UInt8 page = pl->getContinueWinPage();
+        UInt8 pageStart = page;
+        if(pageStart > 1)
+            pageStart -= 2;
+        UInt8 pageEnd = page + 1;
+        if(!(continueRank > pageStart * PAGE_MAX && continueRank < pageEnd * PAGE_MAX))
+        {
+            pl->sendMsgCode(0, 4046);
+            return;
+        }
 
         UInt8 res = attackPlayer(pl, defender);
         if(res == 0)
@@ -861,6 +903,8 @@ namespace GObject
         }
         pl->setCanContinueCnt(--continueCnt);
         pl->insertChallengePlayer(defender);
+        sendOwnerInfo(pl);
+        sendBattleInfo(pl);
     }
 
     void RaceBattle::insertContinueWinSort(Player* pl)
@@ -930,9 +974,9 @@ namespace GObject
         pl->send(st);
     }
 
-    void RaceBattle::braodCancelContinueWin(Player* pl, Player* p2)
+    void RaceBattle::braodCancelContinueWin(Player* pl, Player* player2)
     {
-        if(!pl || !p2)
+        if(!pl || !player2)
             return;
 
         UInt8 contineWinCnt = pl->getContinueWinCnt();
@@ -946,7 +990,7 @@ namespace GObject
         else
             return;
 
-        SYSMSG_BROADCASTV(6021 + type, pl->getCountry(), pl->getPName(), p2->getCountry(), p2->getPName());
+        SYSMSG_BROADCASTV(6021 + type, player2->getCountry(), player2->getPName(), pl->getCountry(), pl->getPName());
     }
 }
 

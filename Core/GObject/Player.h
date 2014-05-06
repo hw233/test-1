@@ -393,6 +393,23 @@ namespace GObject
         bool _writedb;
 	};
 
+	class EventAutoRaceBattle : public EventBase
+	{
+	public:
+		EventAutoRaceBattle(Player * player, UInt32 interval, UInt32 count)
+			: EventBase(player, interval, count)
+		{}
+
+        ~EventAutoRaceBattle()
+        {}
+
+		virtual UInt32 GetID() const { return EVENT_AUTORACEBATTLE; }
+		void Process(UInt32);
+
+	private:
+		UInt64 calcExpEach();
+	};
+
 	class EventFighterTrain : public EventBase
 	{
 	public:
@@ -3339,6 +3356,8 @@ namespace GObject
         bool _isLastLevel;
         //匹配者ID
         Player* _matchPlayer;
+        //是否自动挂机
+        void* _rbAutoTimer;
     public:
         UInt8 getRaceBattlePos() { return _playerPos; }
         void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
@@ -3374,6 +3393,10 @@ namespace GObject
         bool getIsLastLevel() { return _isLastLevel; }
         void setMatchPlayer(Player* player) { _matchPlayer = player; }
         Player* getMatchPlayer() { return _matchPlayer; }
+        void setRBAutoTimer(void* timer) { _rbAutoTimer = timer; }
+        void* getRBAutoTimer() { return _rbAutoTimer; }
+        void autoRaceBattle(UInt32 count);
+        void cancelAutoRaceBattle();
 	};
 
 
