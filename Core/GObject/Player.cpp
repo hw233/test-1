@@ -688,14 +688,17 @@ namespace GObject
         return exp;
 	}
 
-	void EventAutoRaceBattle::Process(UInt32)
+	void EventAutoRaceBattle::Process(UInt32 leftCount)
 	{
 		UInt64 exp = calcExpEach();
 
 		if(m_Player->isOnline())
-			m_Player->AddExp(exp);
+			m_Player->AddExp(exp * 8);
 		else
-			m_Player->pendExp(exp);
+			m_Player->pendExp(exp * 8);
+
+        if(!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTORACEBATTLE, m_Player->getId());
 	}
 
     bool EventPlayerTimeTick::Equal(UInt32 id, size_t playerid) const
@@ -32081,7 +32084,7 @@ void Player::specialUdpLog(UInt8 type)
 		EventAutoRaceBattle* event = new(std::nothrow)EventAutoRaceBattle(this, 60, count);
 		if(event == NULL)
             return;
-		cancelAutoBattle();
+		cancelAutoRaceBattle();
 		PushTimerEvent(event);
 
     }

@@ -6727,12 +6727,14 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
 void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
-	if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
-		return;
+	//if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+	//	return;
+    if(player->getLocation() != 1556)
+        return;
     if(player->GetLev() < 40)
         return;
-    //if(!GObject::raceBattle.isStart())
-    //    return;
+    if(!GObject::raceBattle.isStart())
+        return;
 
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;

@@ -26,10 +26,12 @@ namespace GObject
     RBSortType RaceBattle::_levelStarSort[5];
     RBSortType RaceBattle::_contineWinSort;
 
-    void raceBattleBroadcast(UInt8 type, UInt32 lefttime)
+    void raceBattleBroadcast(UInt8 status, UInt32 lefttime)
     {
         Stream st(REP::RACE_BATTLE);
+        UInt8 type = 1;
         st << type;
+        st << status;
         st << lefttime;
         st << Stream::eos;
         NETWORK()->Broadcast(st);
@@ -39,16 +41,38 @@ namespace GObject
     {
         if(!pl)
             return;
-        if(!isStart())
+        if(_status == 0)
             return;
+        UInt8 status;
+        UInt32 lefttime;
+        UInt32 now = TimeUtil::Now();
+        UInt32 startTime = TimeUtil::SharpDay(0, now) + RACEBATTLE_STARTTIME;
+        if(isStart())
+        {
+            status = 1;
+            lefttime = startTime + 1800 - now;
+        }
+        else
+        {
+            status = 0;
+            lefttime = startTime - now;
+        }
 
         Stream st(REP::RACE_BATTLE);
         UInt8 type = 1;
         st << type;
-        UInt32 now = TimeUtil::Now();
-        st << static_cast<UInt32>(TimeUtil::SharpDay(0, now) + RACEBATTLE_ENDTIME - now);
+        st << status;
+        st << lefttime;
         st << Stream::eos;
         pl->send(st);
+    }
+
+    UInt32 second2min(UInt32 second)
+    {
+        UInt32 min = second / 60;
+        if(min * 60 < second)
+            ++min;
+        return min;
     }
 
     void RaceBattle::raceBattleCheck()
@@ -63,7 +87,8 @@ namespace GObject
             if(_status == 1)
                 return;
             _status = 1;
-            SYSMSG_BROADCASTV(6005, startTime - now);
+            UInt32 min = second2min(startTime - now);
+            SYSMSG_BROADCASTV(6005, min);
             raceBattleBroadcast(0, startTime - now);
         }
         else if(now < startTime - 60)
@@ -71,14 +96,16 @@ namespace GObject
             if(_status == 2)
                 return;
             _status = 2;
-            SYSMSG_BROADCASTV(6005, startTime - now);
+            UInt32 min = second2min(startTime - now);
+            SYSMSG_BROADCASTV(6005, min);
         }
         else if(now < startTime)
         {
             if(_status == 3)
                 return;
             _status = 3;
-            SYSMSG_BROADCASTV(6005, startTime - now);
+            UInt32 min = second2min(startTime - now);
+            SYSMSG_BROADCASTV(6005, min);
         }
         else if(now < startTime + 1800)
         {
@@ -90,7 +117,7 @@ namespace GObject
         }
         else
         {
-            if(_status == 2)
+            if(_status == 4)
             {
                 SYSMSG_BROADCASTV(6007);
                 raceBattleBroadcast(2, 0);
