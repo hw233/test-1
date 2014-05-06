@@ -697,6 +697,8 @@ namespace GObject
             pl->setContinueLoseCnt(pl->getContinueLoseCnt() + 1);
         }
 
+        if(pl->getContinueLoseCnt() >= 5 * level)
+            starAdd *= 2;
         UInt16 starCnt = pl->getStarCnt(offset - 1) + starAdd;
         if(starCnt < 6)
             pl->setStarCnt(offset - 1, starCnt);
@@ -717,6 +719,7 @@ namespace GObject
                 pl->setStarCnt(i, 0);
             UInt8 pos = level * 10;
             pl->setRaceBattlePos(pos);
+            pl->setContinueLoseCnt(0);
             enterPos(pl, 0);
         }
         else
@@ -813,6 +816,7 @@ namespace GObject
                 pl->setStarCnt(i, 0);
             UInt8 pos = level * 10;
             pl->setRaceBattlePos(pos);
+            pl->setContinueLoseCnt(0);
             enterPos(pl, 0);
         }
         else
@@ -884,7 +888,7 @@ namespace GObject
         makeStarInfo(st, pl, level);
         st << pl->getAwardLevel();
         UInt8 isDouble;
-        if(pl->getContinueLoseCnt() > 5)
+        if(pl->getContinueLoseCnt() >= 5 * level)
             isDouble = 1;
         else
             isDouble = 0;
