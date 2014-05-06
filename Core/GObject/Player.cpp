@@ -884,6 +884,8 @@ namespace GObject
         _exitCd = 0;
         _starTotal = 0;
         _canContinueCnt = 0;
+        _continueLoseCnt = 0;
+        _attackCd = 0;
 	}
 
 

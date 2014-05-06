@@ -3331,6 +3331,10 @@ namespace GObject
         UInt32 _exitCd;
         UInt16 _starTotal;
         UInt8 _canContinueCnt;
+        //连输次数
+        UInt8 _continueLoseCnt;
+        //战斗冷却
+        UInt32 _attackCd;
     public:
         UInt8 getRaceBattlePos() { return _playerPos; }
         void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
@@ -3358,6 +3362,10 @@ namespace GObject
         void setStarTotal(UInt16 cnt) { _starTotal = cnt; }
         UInt8 getCanContinueCnt() { return _canContinueCnt; }
         void setCanContinueCnt(UInt8 cnt) { _canContinueCnt = cnt; }
+        UInt8 getContinueLoseCnt() { return _continueLoseCnt; }
+        void setContinueLoseCnt(UInt8 cnt) { _continueLoseCnt = cnt; }
+        void setAttackCd(UInt32 cd) { _attackCd = cd; }
+        UInt32 getAttackCd() { return _attackCd; }
 	};
 
 

@@ -658,6 +658,14 @@ namespace GObject
         if(res == 0)
             return;
 
+        UInt32 now = TimeUtil::Now();
+        if(pl->getAttackCd() > now)
+        {
+            pl->sendMsgCode(0, 4045);
+            return;
+        }
+        pl->setAttackCd(now + 20);
+
         UInt8 starAdd;
         if(res == 1)
         {
@@ -665,12 +673,14 @@ namespace GObject
             eraseContinueWinSort(pl);
             pl->setContinueWinCnt(pl->getContinueWinCnt() + 1);
             insertContinueWinSort(pl);
+            pl->setContinueLoseCnt(0);
         }
         else
         {
             starAdd = 1;
             eraseContinueWinSort(pl);
             pl->setContinueWinCnt(0);
+            pl->setContinueLoseCnt(pl->getContinueLoseCnt() + 1);
         }
 
         UInt16 starCnt = pl->getStarCnt(offset - 1) + starAdd;
@@ -744,6 +754,14 @@ namespace GObject
         if(res == 0)
             return;
 
+        UInt32 now = TimeUtil::Now();
+        if(pl->getAttackCd() > now)
+        {
+            pl->sendMsgCode(0, 4045);
+            return;
+        }
+        pl->setAttackCd(now + 20);
+
         UInt8 starAdd = 1;
         if(res == 1)
         {
@@ -795,9 +813,7 @@ namespace GObject
     {
         if(!pl)
             return;
-        //if(pl->getContinueWinCnt() < 3)
-        //    return;
-        if(pl->getContinueWinCnt() < 1)
+        if(pl->getContinueWinCnt() < 3)
             return;
 
         TSort tsort;
@@ -811,9 +827,7 @@ namespace GObject
     {
         if(!pl)
             return;
-        //if(pl->getContinueWinCnt() < 3)
-        //    return;
-        if(pl->getContinueWinCnt() < 1)
+        if(pl->getContinueWinCnt() < 3)
             return;
 
         for(RBSortType::iterator it = _contineWinSort.begin(); it != _contineWinSort.end(); ++it)
@@ -852,6 +866,12 @@ namespace GObject
         st << rb->next;
         makeStarInfo(st, pl, level);
         st << pl->getAwardLevel();
+        UInt8 isDouble;
+        if(pl->getContinueLoseCnt() > 5)
+            isDouble = 1;
+        else
+            isDouble = 0;
+        st << isDouble;
         st << Stream::eos;
         pl->send(st);
     }
