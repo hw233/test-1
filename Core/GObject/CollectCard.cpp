@@ -445,8 +445,8 @@ namespace GObject
             GData::CardInitInfo* ciitmp = GData::csys.getCardInitInfo(cid);
             if(ciitmp == NULL)
                 break;
-            if(ciitmp->type == 3)//特殊卡牌不能分解
-                break;
+            /*if(ciitmp->type == 3)//特殊卡牌不能分解
+                break;*/
             upcard->exp += ciitmp->initExp + MapFreeCardSlot.find(*it)->second->exp;
             while(GData::csys.checkUpgrade(upcard))
             {
