@@ -165,6 +165,7 @@ enum PurchaseType
     ZhenYuanCuiLian             = 1026, //阵元淬炼费
     JieBaiYinJiu                = 1027,
     erlking                     = 1028, //妖王再临
+    LingShiPeiYang              = 1029, //灵侍培养仙石消耗
     //繁体私有占150～200
 };
 

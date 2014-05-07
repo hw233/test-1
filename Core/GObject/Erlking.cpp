@@ -188,11 +188,11 @@ void Erlking::StartBattle(UInt8 copyId)
     if(0 == copyId || copyId > ERLKING_MAX_COPY_NUM)
         return;
 
-    /*if(m_owner->GetPackage()->GetRestPackageSize(2) < 2)
+    if(m_owner->GetPackage()->GetRestPackageSize(2) < 2)
     {
-        m_owner->sendMsgCode(0, 1011);
+        m_owner->sendMsgCode(0, 8050);
         return;
-    }*/
+    }
 
     if(0 == GetsurplusNum())
         return;
@@ -285,11 +285,11 @@ void Erlking::AutoBattle(UInt8 copyId, UInt16 num)
     if(0 == num || num > surplusNum)
         return;
 
-    /*if(m_owner->GetPackage()->GetRestPackageSize(2) < 2*num)
+    if(m_owner->GetPackage()->GetRestPackageSize(2) < 2*num)
     {
-        m_owner->sendMsgCode(0, 1011);
+        m_owner->sendMsgCode(0, 8050);
         return;
-    }*/
+    }
 
     UInt8 mark = GetErlkingStatus(copyId);
     if(mark != ERLKING_MARKC)
