@@ -6772,14 +6772,7 @@ void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
             GObject::raceBattle.getAward(player);
         }
         break;
-#if 0
-        case 9:
-        {
-            UInt32 reportId = 0;
-            GObject::raceBattle.readBattleReport(player, reportId);
-        }
-        break;
-#endif
+
         case 10:
         {
             bool bRet = GObject::raceBattle.requestMatch(player);

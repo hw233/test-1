@@ -122,7 +122,6 @@ namespace GObject
                 SYSMSG_BROADCASTV(6007);
                 raceBattleBroadcast(2, 0);
                 awardLevelRank();
-                //awardContinueWinRank();
             }
             _status = 0;
         }
@@ -175,14 +174,9 @@ namespace GObject
         }
 
         pl->setRaceBattlePos(pos);
-        //if(pl->GetVar(VAR_RCAE_BATTLE_SIGN) == 0)
-        //    pl->SetVar(VAR_RCAE_BATTLE_SIGN, 1);
 
         if(offset == 0)
         {
-            //if((origPos % 10) != 0)
-            //    return;
-            //    eraseLevelStarSort(pl, level);
             if(level == 6 && fromServer)
                 insertLevelStarSort(pl, level);
         }
@@ -212,23 +206,11 @@ namespace GObject
         if(count == 0)
             return;
         pl->autoRaceBattle(count);
-#if 0
-        void* timer = pl->getRBAutoTimer();
-        if(timer)
-            return;
-        pl->setRBAutoTimer(timer);
-#endif
     }
 
     void RaceBattle::cancelBattle(Player* pl)
     {
         pl->cancelAutoRaceBattle();
-#if 0
-        void* timer = pl->getRBAutoTimer();
-        if(!timer)
-            return;
-        pl->setRBAutoTimer(timer);
-#endif
     }
 
     void RaceBattle::freshContinueWinRank(Player* pl)
@@ -245,32 +227,6 @@ namespace GObject
         UInt8 level = pos / 10;
         if(awardlevel < 2 || awardlevel > 6 || awardlevel > level)
             return;
-#if 0
-        UInt8 index = level - 3;
-        if(index > 3)
-            return;
-#endif
-#if 0
-        static UInt32 awardItem[][3][2] = {
-            {{499, 20}, {499, 10}, {499, 5}},
-            {{499, 20}, {499, 10}, {499, 5}},
-            {{499, 20}, {499, 10}, {499, 5}},
-            {{499, 20}, {499, 10}, {499, 5}}
-        };
-
-        if(pl->GetPackage()->GetRestPackageSize() < 3)
-        {
-            pl->sendMsgCode(0, 1011);
-            return;
-        }
-        for(UInt8 i = 0; i < 3; i++)
-        {
-            if(awardItem[index][i][0] == 499)
-                pl->getCoupon(awardItem[index][i][1]);
-            else
-                pl->GetPackage()->Add(awardItem[index][i][0], awardItem[index][i][1], true, false);
-        }
-#endif
         if(awardlevel >= 4)
         {
             if(pl->GetPackage()->GetRestPackageSize() < 1)
@@ -298,14 +254,7 @@ namespace GObject
         st << Stream::eos;
         pl->send(st);
     }
-#if 0
-    void RaceBattle::readBattleReport(Player* pl, UInt32 reportId)
-    {
-        if(!pl)
-            return;
-        pl->readRandBattleReport(reportId);
-    }
-#endif
+
     bool RaceBattle::requestMatch(Player* pl)
     {
         if(!pl)
@@ -407,7 +356,6 @@ namespace GObject
         Int32 rank = 0;
         Int32 rankAdd = 0;
         RBSortType& starSort = _levelStarSort[level - 1];
-        //UInt32 sortSize = starSort.size();
         RBSortType::iterator it1;
         for(it1 = starSort.begin(); it1 != starSort.end(); ++it1)
         {
@@ -667,37 +615,11 @@ namespace GObject
         else
             return;
 
-#if 0
-        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-        if(mail)
-        {
-            static MailPackage::MailItem mitem[][1] = {
-                {{MailPackage::Achievement, 300}},
-                {{MailPackage::Achievement, 200}},
-                {{MailPackage::Achievement, 150}},
-                {{MailPackage::Achievement, 120}},
-                {{MailPackage::Achievement, 100}},
-                {{MailPackage::Achievement, 50}},
-            };
-            MailItemsInfo itemsInfo(mitem[type], RandBattleAward, 1);
-            mailPackageManager.push(mail->id, mitem[type], 1, true);
-            std::string strItems;
-            for (int i = 0; i < 1; ++i)
-            {
-                strItems += Itoa(mitem[type][i].id);
-                strItems += ",";
-                strItems += Itoa(mitem[type][i].count);
-                strItems += "|";
-            }
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
-        }
-#else
         static UInt32 achievement[] = {300, 200, 150, 120, 100, 50};
         pl->getAchievement(achievement[type]);
         SYSMSG(title, 5135);
         SYSMSGV(content, 5136, rank, achievement[type]);
         pl->GetMailBox()->newMail(NULL, 0x1, title, content, 0xFFFE0000);
-#endif
     }
 
     void RaceBattle::awardContinueWinRankOne(Player* pl, UInt8 num)
@@ -729,49 +651,17 @@ namespace GObject
         else
             return;
 
-        if(type > 3)
-            type = 3;
-        if(type <= 3)
-            SYSMSG_BROADCASTV(6015 + type, pl->getCountry(), pl->getPName());
+        UInt8 broad = type;
+        if(broad > 3)
+            broad = 3;
+        if(broad <= 3)
+            SYSMSG_BROADCASTV(6015 + broad, pl->getCountry(), pl->getPName());
 
-#if 0
-        SYSMSG(title, 5137);
-        SYSMSGV(content, 5138, num);
-        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-        if(mail)
-        {
-            static MailPackage::MailItem mitem[][1] = {
-                {{MailPackage::Achievement, 5}},
-                {{MailPackage::Achievement, 15}},
-                {{MailPackage::Achievement, 30}},
-                {{MailPackage::Achievement, 50}},
-                {{MailPackage::Achievement, 75}},
-                {{MailPackage::Achievement, 105}},
-                {{MailPackage::Achievement, 140}},
-                {{MailPackage::Achievement, 180}},
-                {{MailPackage::Achievement, 225}},
-                {{MailPackage::Achievement, 275}},
-            };
-            MailItemsInfo itemsInfo(mitem[type], RandBattleAward, 1);
-            mailPackageManager.push(mail->id, mitem[type], 1, true);
-            std::string strItems;
-            for (int i = 0; i < 1; ++i)
-            {
-                strItems += Itoa(mitem[type][i].id);
-                strItems += ",";
-                strItems += Itoa(mitem[type][i].count);
-                strItems += "|";
-            }
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
-        }
-#else
         static UInt32 achievement[] = {5, 15, 30, 50, 75, 105, 140, 180, 225, 275};
         pl->getAchievement(achievement[type]);
         SYSMSG(title, 5137);
         SYSMSGV(content, 5138, num, achievement[type]);
         pl->GetMailBox()->newMail(NULL, 0x1, title, content, 0xFFFE0000);
-
-#endif
     }
 
     void RaceBattle::eraseLevelStarSort(Player* pl, UInt8 level)
@@ -798,8 +688,6 @@ namespace GObject
             return;
         if(level == 0 || level > 6)
             return;
-        //if(pl->getStarTotal() < 1)
-        //    return;
 
         TSort tsort;
         tsort.player = pl;
@@ -815,7 +703,6 @@ namespace GObject
         pl->setExitCd(TimeUtil::Now() + 20);
         eraseContinueWinSort(pl);
         pl->setContinueWinCnt(0);
-        //eraseLevelStarSort(pl, pl->getRaceBattlePos() / 10);
     }
 
     void RaceBattle::attackLevelPlayer(Player* pl, UInt64 defenderId)
@@ -847,9 +734,16 @@ namespace GObject
             return;
 
         UInt8 starAdd;
+        UInt8 isDouble;
+        if(pl->getContinueLoseCnt() >= 5 * level)
+            isDouble = 1;
+        else
+            isDouble = 0;
         if(res == 1)
         {
             starAdd = 2;
+            if(isDouble)
+                starAdd *= 2;
             eraseContinueWinSort(pl);
             pl->setContinueWinCnt(pl->getContinueWinCnt() + 1);
             awardContinueWinRankOne(pl, pl->getContinueWinCnt());
@@ -859,6 +753,8 @@ namespace GObject
         else
         {
             starAdd = 1;
+            if(isDouble)
+                starAdd *= 2;
             eraseContinueWinSort(pl);
             braodCancelContinueWin(pl, defender);
             pl->setContinueWinCnt(0);
@@ -888,7 +784,7 @@ namespace GObject
             UInt8 pos = level * 10;
             pl->setRaceBattlePos(pos);
             pl->setContinueLoseCnt(0);
-            if(starCnt > rb->next * 2)
+            if(level == 6 && starCnt > rb->next * 2)
                 pl->setStarTotal(rb->next * 2);
             enterPos(pl, 0, true);
         }
@@ -939,10 +835,14 @@ namespace GObject
         }
         if(it == _contineWinSort.end())
             return;
+        if(pl->getChallengeStatus(defender) > 0)
+            return;
         UInt8 page = pl->getContinueWinPage();
         UInt8 pageStart = page;
         if(pageStart > 1)
             pageStart -= 2;
+        else if(pageStart > 0)
+            pageStart -= 1;
         UInt8 pageEnd = page + 1;
         if(!(continueRank > pageStart * PAGE_MAX && continueRank < pageEnd * PAGE_MAX))
         {
@@ -961,6 +861,7 @@ namespace GObject
         UInt8 starAdd = 1;
         if(res == 1)
         {
+            starAdd = 2;
             UInt8 contineWinCnt = defender->getContinueWinCnt();
             if(contineWinCnt < 3)
             {
@@ -985,7 +886,7 @@ namespace GObject
         pl->setStarTotal(starTotal);
         eraseLevelStarSort(pl, level);
         GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pl->getRaceBattlePos());
-        if(rb && starCnt >= rb->next * 2)
+        if(rb && starTotal >= rb->next * 2)
         {
             level = level + 1;
             for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
@@ -993,7 +894,7 @@ namespace GObject
             UInt8 pos = level * 10;
             pl->setRaceBattlePos(pos);
             pl->setContinueLoseCnt(0);
-            if(starCnt > rb->next * 2)
+            if(level == 6 && starTotal > rb->next * 2)
                 pl->setStarTotal(rb->next * 2);
             enterPos(pl, 0, true);
         }
@@ -1061,7 +962,6 @@ namespace GObject
         st << gPerLeveCnt[level - 1];
         for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
             st << pl->getStarCnt(i);
-        //st << pl->getCanChallengeCnt();
         st << pl->getCanContinueCnt();
         st << pl->getContinueWinCnt();
         st << rb->next;

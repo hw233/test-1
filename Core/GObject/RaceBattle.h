@@ -35,7 +35,6 @@ class RaceBattle : public Singleton<RaceBattle>
         void cancelBattle(Player* pl);
         void freshContinueWinRank(Player* pl);
         void getAward(Player* pl);
-        //void readBattleReport(Player* pl, UInt32 reportId);
         bool requestMatch(Player* pl);
         bool isStart();
         void makeStarInfo(Stream& st, Player* pl, UInt8 level);

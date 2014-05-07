@@ -895,7 +895,6 @@ namespace GObject
 
         _playerPos = 0;
         memset(_starCnt, 0, sizeof(_starCnt));
-        //_canChallengeCnt = 0;
         _continueWinCnt = 0;
         _awardLevel = 2;
         _continueWinPage = 1;

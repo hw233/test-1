@@ -1223,4 +1223,14 @@ CREATE TABLE `drinkAttr` (
     `hp` int(10) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`value`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `randbattle_attr`;
+CREATE TABLE `randbattle_attr` (
+    `lev` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `value` float(5,2) NOT NULL DEFAULT '0.00',
+    `next` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`lev`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 -- Dump completed
