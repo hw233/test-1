@@ -856,6 +856,14 @@ struct DBLingShiUp
     UInt32 exp;
 };
 
+struct DBErlkingConfig
+{
+    UInt8 copyId;
+    UInt8 conditionA;
+    UInt8 conditionB;
+    UInt32 npcgroup;
+};
+
 }
 
 namespace DB {
@@ -1820,6 +1828,16 @@ SPECIALDEF(3)
     UInt8, level,
     UInt32, consume,
     UInt32, exp
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBErlkingConfig)
+SPECIALDEF(4)
+	(
+    UInt8, copyId,
+    UInt8, conditionA,
+    UInt8, conditionB,
+    UInt32, npcgroup
     )
 SPECIALEND()
 

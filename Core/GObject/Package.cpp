@@ -8313,7 +8313,7 @@ namespace GObject
         ConsumeInfo ci(LingShiPeiYang, 0, 0);
         m_Owner->useTael(needTael, &ci);
 
-		Stream st(REP::LING_SHI);
+		Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x13);
         st << fighterId << pos;
 		AppendLingshiData(st, equip);
@@ -8416,7 +8416,7 @@ namespace GObject
         if(tmp != lsAttr.lv)
             fgt->setDirty();
 
-		Stream st(REP::LING_SHI);
+		Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x15);
         st << fighterId << pos;
 		AppendLingshiData(st, lingshi);
@@ -8464,7 +8464,7 @@ namespace GObject
 		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
         fgt->setDirty();
 
-		Stream st(REP::LING_SHI);
+		Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x14);
         st << fighterId << pos;
 		AppendLingshiData(st, lingshi);
@@ -8513,7 +8513,7 @@ namespace GObject
 
     void Package::SendLingshiTrainInfo()
     {
-		Stream st(REP::LING_SHI);
+		Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x12);
         st << static_cast<UInt16>(m_Owner->GetVar(VAR_LINGSHI_PEIYANG_CNT));
         st << static_cast<UInt8>(m_Owner->GetVar(VAR_LINGSHI_PEIYANG_LUCKY));
@@ -8523,7 +8523,7 @@ namespace GObject
 
     void Package::SendSingleLingshiData(ItemLingshi * lingshi, UInt8 type)
 	{   //type: 0删除 1新增 2更新
-		Stream st(REP::LING_SHI);
+		Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x11);
 		st << type;
         if(type)
@@ -8546,7 +8546,7 @@ namespace GObject
 	void Package::SendLSPackageItemInfor()
 	{
 		ItemCont::iterator cit = m_ItemsLS.begin();
-		Stream st(REP::LING_SHI);
+		Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x10);
         size_t offset = st.size();
 		st << static_cast<UInt16>(0);
@@ -8569,7 +8569,7 @@ namespace GObject
     {
         if(GetRestPackageSize(2) < 1)
         {
-			m_Owner->sendMsgCode(0, 1011);
+			m_Owner->sendMsgCode(0, 8050);
             return;
         }
         if(!fgt || opt < 0x63 || opt > 0x65)

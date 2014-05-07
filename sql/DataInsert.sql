@@ -263,4 +263,6 @@ LOCK TABLES `cardupgrade` WRITE;
 source cardupgrade;
 UNLOCK TABLES;
 
-
+LOCK TABLES `erlking` WRITE;
+source erlking;
+UNLOCK TABLES;

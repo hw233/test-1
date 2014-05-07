@@ -5,7 +5,6 @@
 
 namespace REQ
 {
-    const UInt8 LING_SHI            = 0x71;
     /**保持连接 */
     const UInt8 KEEP_ALIVE          = 0x00;
     /**自动重连 */
@@ -178,6 +177,8 @@ namespace REQ
     const UInt8 TASK_HOOK_STOP      = 0x9E;// 0x6E
     /**挂机加速 */
     const UInt8 TASK_HOOK_ADD       = 0x9F;// 0x6F
+    /**妖王再临 */
+    const UInt8 ERLKING_INFO        = 0x71;
     /**发起切磋请求 */
     const UInt8 LANCHCHALLENGE      = 0x72;
     /**回复切磋 */
@@ -468,7 +469,6 @@ namespace REQ
 
 namespace REP
 {
-    const UInt8 LING_SHI            = 0x71;
     const UInt8 KEEP_ALIVE          = 0x00;// 0x00
     const UInt8 RECONNECT           = 0x01;// 帐号被封
     const UInt8 ENTER_ARENA         = 0x02;
@@ -569,6 +569,7 @@ namespace REP
     const UInt8 ATTACK_NPC          = 0x9B;// 0x61
     const UInt8 TASK_RESPONSE_HOOK  = 0x9D;// 0x6D
 
+    const UInt8 ERLKING_INFO        = 0x71;
     const UInt8 LANCHCHALLENGE      = 0x72;
     const UInt8 REQUESTCHALLENGE    = 0x73;
     const UInt8 MARRYBOARD          = 0x74;
