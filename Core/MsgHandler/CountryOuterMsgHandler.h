@@ -1365,6 +1365,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendFairyPetResource(); //仙宠资源
     pl->sendFairyPetList(); //仙宠列表
     pl->GetPetPackage()->SendPackageItemInfor(); //仙宠背包列表
+    pl->GetPackage()->SendLSPackageItemInfor(); //灵侍背包列表
     if (pl->getClan() != NULL)
     {
         pl->getClan()->sendQQOpenid(pl);
@@ -1750,12 +1751,14 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-		static UInt8 p[17] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62, 0x70};
-		ItemEquip * e[17] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+		static UInt8 p[20] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62, 0x70, 0x63, 0x64, 0x65};
+		ItemEquip * e[20] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
             fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
             fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2),
-            fgt->getLingbao(0), fgt->getLingbao(1), fgt->getLingbao(2), fgt->getInnateTrump()};
-		fgt->sendModification(17, p, e, false);
+            fgt->getLingbao(0), fgt->getLingbao(1), fgt->getLingbao(2), fgt->getInnateTrump(),
+            fgt->getLingshi(0), fgt->getLingshi(1), fgt->getLingshi(2)
+        };
+		fgt->sendModification(20, p, e, false);
 		return;
 	}
 
@@ -1824,6 +1827,11 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
             else if (idx == 2)
                 fgt->delCitta(citta, true);
         }
+        break;
+    case 0x63:
+    case 0x64:
+    case 0x65:
+        player->GetPackage()->setLingshi(fgt, fer._equipId, fer._part);
         break;
     default:
         {
@@ -3594,7 +3602,6 @@ void OnXJFrontMapReq( GameMsgHdr& hdr, const void* data)
         default:
             break;
     }
-    
 }
 
 
@@ -7089,6 +7096,91 @@ void OnQueryTempItemReq( GameMsgHdr & hdr, const void * data )
     }
 }
 
+void OnErlkingReq(GameMsgHdr & hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+
+    if(player->GetLev() < 85)
+        return;
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    brd >> opt;
+
+    switch(opt)
+    {
+    case 0x00:
+        {
+            player->GetErlking()->ErlkingInfo();               
+        }
+        break;
+    case 0x01:
+        {
+            UInt8 copyId = 0;
+            brd >> copyId;
+
+            player->GetErlking()->StartBattle(copyId);
+        }
+        break;
+    case 0x02:
+        {
+            UInt8 copyId = 0;
+            UInt16 num = 0;
+            brd >> copyId >> num;
+
+            player->GetErlking()->AutoBattle(copyId, num);
+        }
+        break;
+    case 0x03:
+        {
+            if(!player->hasChecked())
+                return;
+
+            player->GetErlking()->BuyPassNum();
+        }
+        break;
+    case 0x10:
+        //player->GetPackage()->SendLSPackageItemInfor();
+        break;
+    case 0x12:
+        player->GetPackage()->SendLingshiTrainInfo();
+        break;
+    case 0x13:
+        {
+            if(!player->hasChecked())
+                return;
+            UInt16 fighterId = 0;
+            UInt32 lsId = 0;
+            std::string idStr;
+            brd >> fighterId >> lsId >> idStr;
+            player->GetPackage()->lingshiUpgrade(fighterId, lsId, idStr);
+        }
+        break;
+    case 0x14:
+        {
+            if(!player->hasChecked())
+                return;
+            UInt8 opt = 0;
+            UInt16 fighterId = 0;
+            UInt32 lsId = 0;
+            brd >> opt >> fighterId >> lsId;
+            player->GetPackage()->lingshiBreak(fighterId, lsId, opt > 0);
+        }
+        break;
+    case 0x15:
+        {
+            if(!player->hasChecked())
+                return;
+            UInt8 opt = 0;
+            UInt16 fighterId = 0;
+            UInt32 lsId = 0;
+            brd >> opt >> fighterId >> lsId;
+            player->GetPackage()->lingshiTrain(fighterId, lsId, opt > 0);
+        }
+        break;
+   }
+}
+
 void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -7413,6 +7505,8 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                     GameMsgHdr hdr(0x33A, threadId, invitee, sizeof(Player *));
                     GLOBAL().PushMsg(hdr, &player);
                 }
+
+                player->SetKJTMAwardMark(3);
             }
         }
         break;
@@ -7548,6 +7642,18 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
             KJTMManager->StartBattle(player);
         }
         break;
+    case 0x18:
+        {
+            player->GetKJTMAwardMark();
+        }
+        break;
+    case 0x19:
+        {
+            UInt8 type = 0;
+            br >> type;
+            player->GetKJTMAward(type);
+        }
+        break;
     case 0x1A:
         {
             if(NULL != player->getTeamMemberData())
@@ -7643,6 +7749,14 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                     GLOBAL().PushMsg(hdr, &player);
                 }
             }
+        }
+        break;
+    case 0x1D:
+        {
+            UInt32 status = player->GetVar(VAR_KJTM_STATUS);
+            UInt8 mark = GET_BIT(status, 0);
+            if(0 == mark)
+                player->SetKJTMAwardMark(2);
         }
         break;
     }
@@ -9412,8 +9526,6 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
 
     }
 }
-
-
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

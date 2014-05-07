@@ -29,6 +29,7 @@
 #include "FairyPet.h"
 #include "FairySpar.h"
 #include "MoFang.h"
+#include "Erlking.h"
 #include "ArenaTeam.h"
 #include "Marry.h"
 #include "ModifyMount.h"
@@ -343,6 +344,7 @@ namespace GObject
     class JobHunter;
     class Dreamer;
     class MoFang;
+    class Erlking;
     struct MarriageInfo;
     class KangJiTianMo;
 
@@ -767,7 +769,7 @@ namespace GObject
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), prestige(0), status(0), country(0),
 			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0),qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
-			newGuild(0), packSize(INIT_PACK_SIZE), packSizeSoul(INIT_PACK_SIZE+50), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),picCount(0) , nextPIcReset(0),
+			newGuild(0), packSize(INIT_PACK_SIZE), packSizeSoul(INIT_PACK_SIZE+50), packSizeLS(50), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),picCount(0) , nextPIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
 			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0), tavernOrangeCount(0),
@@ -829,6 +831,7 @@ namespace GObject
 		UInt64 newGuild;            // ????????????
 		UInt16 packSize;            // 玩家背包
 		UInt16 packSizeSoul;        // 魂魄背包
+		UInt16 packSizeLS;          // 灵侍背包
 		UInt8 mounts;               // ????
 		UInt8 gmLevel;              //
 		UInt8 icCount;              // ?һ????ٴ???
@@ -1555,7 +1558,16 @@ namespace GObject
         UInt8 getPIcCount();
         void checkPIcCount();
 
-		inline UInt16 getPacksize(UInt8 type = 0) { return type ? _playerData.packSizeSoul : _playerData.packSize; }
+		inline UInt16 getPacksize(UInt8 type = 0)
+        {
+            if(type == 0)
+                return _playerData.packSize;
+            else if(type == 1)
+                return _playerData.packSizeSoul;
+            else if(type == 2)
+                return _playerData.packSizeLS;
+            return 0;
+        }
 
         void setLineupDirty(bool = true);
         void setFightersDirty(bool bDirty=true);
@@ -1786,6 +1798,7 @@ namespace GObject
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
         MoFang * GetMoFang()        { return m_moFang; }
+        Erlking * GetErlking()        { return m_erlking; }
         MarriageInfo * GetMarriageInfo()  { return m_marriageInfo; }
         CollectCard * GetCollectCard()        { return m_collecCard; }
 	// ????ϵͳ
@@ -2267,6 +2280,10 @@ namespace GObject
         void ApplyToName(Player* leader);
         void ClearKJTMData();
         void KJTMUdpLog();
+        void SetKJTMAwardMark(UInt8 type);
+        void GetKJTMAwardMark();
+        void GetKJTMAward(UInt8 opt);
+        void BroadcastPower();
  
         //抗击天魔 end
 
@@ -3198,6 +3215,7 @@ namespace GObject
         void get7DayFundAward(UInt8 type);
     private:
         MoFang* m_moFang;
+        Erlking* m_erlking;
         MarriageInfo* m_marriageInfo;
         CollectCard * m_collecCard;
 

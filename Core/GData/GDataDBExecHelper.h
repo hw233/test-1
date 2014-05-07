@@ -834,6 +834,44 @@ struct DBZHYExtraAttr
     UInt16 maxVal;
 };
 
+struct DBLingShi
+{
+    UInt16 id;
+    UInt8 level;
+    UInt8 isUp;
+    UInt16 useItem;
+    UInt16 useGold;
+    float attack;
+    float magatk;
+    float defend;
+    float magdef;
+    float hp;
+    float toughlvl;
+    float action;
+    float hitrlvl;
+    float evdlvl;
+    float crilvl;
+    float criticaldmg;
+    float pirlvl;
+    float counterlvl;
+    float mreslvl;
+};
+
+struct DBLingShiUp
+{
+    UInt8 level;
+    UInt32 consume;
+    UInt32 exp;
+};
+
+struct DBErlkingConfig
+{
+    UInt8 copyId;
+    UInt8 conditionA;
+    UInt8 conditionB;
+    UInt32 npcgroup;
+};
+
 }
 
 namespace DB {
@@ -1774,6 +1812,50 @@ SPECIALDEF(4)
     Int8, id,
     float, value,
     UInt8, next
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBLingShi)
+SPECIALDEF(19)
+	(
+    UInt16, id,
+    UInt8, level,
+    UInt8, isUp,
+    UInt16, useItem,
+    UInt16, useGold,
+    float, attack,
+    float, magatk,
+    float, defend,
+    float, magdef,
+    float, hp,
+    float, toughlvl,
+    float, action,
+    float, hitrlvl,
+    float, evdlvl,
+    float, crilvl,
+    float, criticaldmg,
+    float, pirlvl,
+    float, counterlvl,
+    float, mreslvl
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBLingShiUp)
+SPECIALDEF(3)
+	(
+    UInt8, level,
+    UInt32, consume,
+    UInt32, exp
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBErlkingConfig)
+SPECIALDEF(4)
+	(
+    UInt8, copyId,
+    UInt8, conditionA,
+    UInt8, conditionB,
+    UInt32, npcgroup
     )
 SPECIALEND()
 

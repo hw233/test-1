@@ -53,6 +53,7 @@ namespace GObject
 #define ACUPOINTS_MAX 15
 #define ACUPOINTSGOLD_MAX 9    //本命金丹最大值
 #define LINGBAO_UPMAX 3
+#define LINGSHI_UPMAX 3
 
 #define PEERLESS_UPMAX 1
 
@@ -579,6 +580,11 @@ public:
 	ItemEquip ** setTrump(std::string& trumps, bool = true);
     ItemEquip* setTrump( UInt32 trump, int idx, bool = true);
     ItemEquip* setTrump( ItemEquip* trump, int idx, bool = true);
+    int getAllLingshiId( UInt32* lingshis, int size = LINGSHI_UPMAX);
+	inline ItemEquip * getLingshi(int idx) { return (idx >= 0 && idx < LINGSHI_UPMAX) ? _lingshi[idx] : 0; }
+    ItemEquip * setLingshi(ItemEquip *);
+	ItemEquip ** setLingshi(std::string&, bool = true);
+    ItemEquip * setLingshi(ItemEquip *, int idx, bool = true);
 	ItemEquip * findEquip(UInt32 id, UInt8& pos);
 	ItemEquip * findfashion(UInt32 id);
 	void findTrumpByTypeId(std::vector<ItemEquip*>& ret, UInt32 id);
@@ -788,6 +794,7 @@ protected:
     void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce );
     void addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
     void addAttrExtraXCGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
+    void addLingshiAttr( ItemEquip* );
 	virtual void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	void rebuildSkillBattlePoint();
@@ -868,6 +875,7 @@ protected:
 	ItemEquip * _trump[TRUMP_UPMAX];    // 法宝
 	ItemEquip * _lingbao[e_lb_max];// 灵宝
     ItemInnateTrump * _innateTrump; // 先天法宝
+	ItemEquip * _lingshi[LINGSHI_UPMAX];    // 灵侍
 
 	bool _attrDirty;
 	UInt32 _maxHP;
