@@ -164,6 +164,7 @@ enum PurchaseType
     EnterXJFrontMap             = 1025, //璇玑阵图
     ZhenYuanCuiLian             = 1026, //阵元淬炼费
     JieBaiYinJiu                = 1027,
+    erlking                     = 1028, //妖王再临
     //繁体私有占150～200
 };
 

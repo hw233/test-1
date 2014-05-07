@@ -6993,6 +6993,52 @@ void OnQueryTempItemReq( GameMsgHdr & hdr, const void * data )
     }
 }
 
+void OnErlkingReq(GameMsgHdr & hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+
+    if(player->GetLev() < 85)
+        return;
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+
+    switch(opt)
+    {
+    case 0x00:
+        {
+            player->GetErlking()->ErlkingInfo();               
+        }
+        break;
+    case 0x01:
+        {
+            UInt8 copyId = 0;
+            br >> copyId;
+
+            player->GetErlking()->StartBattle(copyId);
+        }
+        break;
+    case 0x02:
+        {
+            UInt8 copyId = 0;
+            UInt16 num = 0;
+            br >> copyId >> num;
+
+            player->GetErlking()->AutoBattle(copyId, num);
+        }
+        break;
+    case 0x03:
+        {
+            if(!player->hasChecked())
+                return;
+
+            player->GetErlking()->BuyPassNum();
+        }
+        break;
+   }
+}
+
 void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

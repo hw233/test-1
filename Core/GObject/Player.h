@@ -29,6 +29,7 @@
 #include "FairyPet.h"
 #include "FairySpar.h"
 #include "MoFang.h"
+#include "Erlking.h"
 #include "ArenaTeam.h"
 #include "Marry.h"
 #include "ModifyMount.h"
@@ -343,6 +344,7 @@ namespace GObject
     class JobHunter;
     class Dreamer;
     class MoFang;
+    class Erlking;
     struct MarriageInfo;
     class KangJiTianMo;
 
@@ -1762,6 +1764,7 @@ namespace GObject
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
         MoFang * GetMoFang()        { return m_moFang; }
+        Erlking * GetErlking()        { return m_erlking; }
         MarriageInfo * GetMarriageInfo()  { return m_marriageInfo; }
         CollectCard * GetCollectCard()        { return m_collecCard; }
 	// ????ϵͳ
@@ -3178,6 +3181,7 @@ namespace GObject
         void get7DayFundAward(UInt8 type);
     private:
         MoFang* m_moFang;
+        Erlking* m_erlking;
         MarriageInfo* m_marriageInfo;
         CollectCard * m_collecCard;
 

@@ -177,6 +177,8 @@ namespace REQ
     const UInt8 TASK_HOOK_STOP      = 0x9E;// 0x6E
     /**挂机加速 */
     const UInt8 TASK_HOOK_ADD       = 0x9F;// 0x6F
+    /**妖王再临 */
+    const UInt8 ERLKING_INFO        = 0x71;
     /**发起切磋请求 */
     const UInt8 LANCHCHALLENGE      = 0x72;
     /**回复切磋 */
@@ -567,6 +569,7 @@ namespace REP
     const UInt8 ATTACK_NPC          = 0x9B;// 0x61
     const UInt8 TASK_RESPONSE_HOOK  = 0x9D;// 0x6D
 
+    const UInt8 ERLKING_INFO        = 0x71;
     const UInt8 LANCHCHALLENGE      = 0x72;
     const UInt8 REQUESTCHALLENGE    = 0x73;
     const UInt8 MARRYBOARD          = 0x74;

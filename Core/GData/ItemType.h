@@ -33,7 +33,7 @@
 #define LPETARM_ID      12000
 #define RPETARM_ID      12999
 #define LPETGEM_ID      13000
-#define RPETGEM_ID      14999
+#define RPETGEM_ID      13999
 #define LZHENYAUN_ID    15001
 #define RZHENYUAN_ID    15499
 #define LOTHER_ID       15500

@@ -700,7 +700,7 @@ namespace GObject
         VAR_KJTM_KILL_NPC_STATUS = 719,     // 抗击天魔击杀怪物状态
         VAR_KJTM_LOGIN_STATUS = 720,     // 抗击天魔回归玩家连续登录两天状态
 
-        //721 - 740 for dtc 
+        //721 - 730 for dtc 
         VAR_TYSS_RECHARGE = 721,//天元神兽期间玩家兑换灵果剩余充值数(充值数满足条件自动兑换灵果)
         VAR_TYSS_CONTRIBUTE_PLAYER = 722,//天元神兽期间玩家个人总贡献 
         VAR_TYSS_CONTRIBUTE_PLAYER_DAY = 723,//天元神兽期间玩家个人当日贡献 
@@ -724,8 +724,15 @@ namespace GObject
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
 
         //781 - 790 for lijr
+        VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
+        VAR_ERLKING_STATUSB = 782,               //妖王再临状态(17-32)
+        VAR_ERLKING_STATUSC = 783,               //妖王再临状态(33-48)
+        VAR_ERLKING_BUY_PASS_NUM_DAY = 784,      //妖王再临购买通关次数
+        VAR_ERLKING_USE_FREE_NUM_DAY = 785,      //妖王再临使用免费通关次数
+        VAR_ERLKING_BUY_PASS_TOTAL_NUM = 786,    //妖王再临购买通关总次数
+
         VAR_KJTM_AWARD_MARK = 787, //抗击天魔奖励标志
-        VAR_KJTM_LOGIN_NUM = 789,  // 抗击天魔登录次数
+        VAR_KJTM_LOGIN_NUM = 788,  // 抗击天魔登录次数
         VAR_MAX,
     };
 
@@ -1379,6 +1386,13 @@ namespace GObject
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
             REGISTER_VAR(VAR_LIMIT_APPOINTMENT, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_ERLKING_STATUSA, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_STATUSB, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_STATUSC, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_BUY_PASS_NUM_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_ERLKING_BUY_PASS_TOTAL_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_USE_FREE_NUM_DAY, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

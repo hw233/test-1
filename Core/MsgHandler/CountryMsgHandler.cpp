@@ -198,6 +198,8 @@ MSG_REG_2(GameMsgHdr, REQ::TEMPITEM_INFO, OnQueryTempItemReq);
 
 MSG_REG_2(GameMsgHdr, REQ::MOFANG_INFO, OnMoFangInfo);
 
+MSG_REG_2(GameMsgHdr, REQ::ERLKING_INFO, OnErlkingReq);
+
 MSG_REG_2(GameMsgHdr, REQ::RP_SERVER, OnRPServerReq);
 
 
