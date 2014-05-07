@@ -1,4 +1,3 @@
-alter table `player` add `packSizeLS` smallint(4) unsigned NOT NULL DEFAULT '50' after `packSizeSoul`;
 alter table `fighter` add `lingshi` varchar(255) NOT NULL after `cittas`;
 
 CREATE TABLE IF NOT EXISTS `lingshiAttr` (

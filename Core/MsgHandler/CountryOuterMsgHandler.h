@@ -9344,6 +9344,8 @@ void OnLingShiReq( GameMsgHdr& hdr, const void* data)
             break;
         case 0x13:
             {
+                if(!player->hasChecked())
+                    return;
                 UInt16 fighterId = 0;
                 UInt32 lsId = 0;
                 std::string idStr;
@@ -9353,6 +9355,8 @@ void OnLingShiReq( GameMsgHdr& hdr, const void* data)
             break;
         case 0x14:
             {
+                if(!player->hasChecked())
+                    return;
                 UInt8 opt = 0;
                 UInt16 fighterId = 0;
                 UInt32 lsId = 0;
@@ -9362,6 +9366,8 @@ void OnLingShiReq( GameMsgHdr& hdr, const void* data)
             break;
         case 0x15:
             {
+                if(!player->hasChecked())
+                    return;
                 UInt8 opt = 0;
                 UInt16 fighterId = 0;
                 UInt32 lsId = 0;

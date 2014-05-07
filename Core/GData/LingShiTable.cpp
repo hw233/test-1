@@ -18,7 +18,7 @@ void LingshiCls::setLingshiTable(DBLingShi& dbls)
     lsd.useGold = dbls.useGold;
 
     lsd.attrs.attack = dbls.attack;
-    lsd.attrs.magatk = dbls.attack;
+    lsd.attrs.magatk = dbls.magatk;
     lsd.attrs.defend = dbls.defend;
     lsd.attrs.magdef = dbls.magdef;
     lsd.attrs.hp = dbls.hp;

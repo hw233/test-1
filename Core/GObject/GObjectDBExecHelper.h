@@ -1725,7 +1725,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(65)
+SPECIALDEF(64)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1751,7 +1751,6 @@ SPECIALDEF(65)
 	UInt64, pdata.newGuild,
 	UInt16, pdata.packSize,
 	UInt16, pdata.packSizeSoul,
-	UInt16, pdata.packSizeLS,
 	UInt8, pdata.mounts,
 	std::string, icCount,
     UInt8,  pdata.picCount,

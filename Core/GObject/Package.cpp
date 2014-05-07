@@ -8217,9 +8217,18 @@ namespace GObject
 	}
 
     /**********灵侍begin***********/
+	ItemLingshi* Package::GetLingshi(UInt32 id)
+	{
+		if (!IsEquipId(id)) return NULL;
+        item_elem_iter iter = m_ItemsLS.find(ItemKey(id));
+        if(iter == m_ItemsLS.end())
+            return NULL;
+        return static_cast<ItemLingshi *>(iter->second);
+	}
+
 	ItemBase* Package::AddLingShiN( UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere )
 	{
-		if((UInt32)(GetRestPackageSize(2)) + 50 < num)
+		if((UInt32)(GetRestPackageSize(2)) < num)
 			return NULL;
 		ItemBase * item = NULL;
 		for(UInt32 i = 0; i < num; ++ i)
@@ -8232,7 +8241,7 @@ namespace GObject
 	ItemBase* Package::AddLingShi(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere)
 	{
 		if (!IsLingShiItem(typeId)) return NULL;
-		if(m_SizeLS >= m_Owner->getPacksize(2) + 50)
+		if(m_SizeLS >= m_Owner->getPacksize(2))
 			return NULL;
 		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[typeId];
 		if(itype == NULL) return NULL;
@@ -8248,6 +8257,9 @@ namespace GObject
         ITEM_BIND_CHECK(itype->bindType, bind);
         lingshi->SetBindStatus(bind);
         ItemNotifyEquip(static_cast<ItemEquip *>(lingshi));
+		SendSingleLingshiData(lingshi, 1);
+        if(lingshi->getQuality() >= Item_Purple)
+            SYSMSG_BROADCASTV(4160, m_Owner->getCountry(), m_Owner->getName().c_str(), lingshi->getQuality(), lingshi->getName().c_str());
 
 	    DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %" I64_FMT "u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
         DB4().PushUpdateData("REPLACE INTO `lingshiAttr`(`id`, `itemId`, `level`, `exp`) VALUES(%u, %u, %u, %u)", id, itype->getId(), lsAttr.lv, lsAttr.exp);
@@ -8259,7 +8271,7 @@ namespace GObject
         Fighter * fgt = NULL;
         UInt8 pos = 0;
 		ItemLingshi * equip = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
-		if(!fighterId || !equip || !IsLingShi(equip->getClass()))
+		if(!fgt || !equip || !IsLingShi(equip->getClass()))
 			return;
         ItemLingshiAttr& lsAttr = equip->getLingshiAttr();
         if(!GData::lingshiCls.canUpgrade(equip->GetTypeId(), lsAttr.lv))
@@ -8269,11 +8281,7 @@ namespace GObject
         StringTokenizer tk(idStr, ",");
         for(UInt8 i = 0; i < tk.count(); ++ i)
         {
-            UInt32 id = atoi(tk[i].c_str());
-            item_elem_iter iter = m_ItemsLS.find(ItemKey(id));
-            if(iter == m_ItemsLS.end())
-                continue;
-            ItemLingshi * eatEq = static_cast<ItemLingshi *>(iter->second);
+            ItemLingshi * eatEq = GetLingshi(atoi(tk[i].c_str()));
             if(eatEq == NULL)
                 continue;
             UInt8 tmpLvl = eatEq->getLingshiAttr().lv;
@@ -8286,6 +8294,7 @@ namespace GObject
             return;
         }
         needTael = 0;
+        UInt8 tmp = lsAttr.lv;
         for(UInt8 i = 0; i < eatVec.size(); ++ i)
         {
             UInt32 res = lingshiUpgrade(equip, eatVec[i]);
@@ -8299,6 +8308,8 @@ namespace GObject
                     break;
             }
         }
+        if(tmp != lsAttr.lv)
+            fgt->setDirty();
         ConsumeInfo ci(LingShiPeiYang, 0, 0);
         m_Owner->useTael(needTael, &ci);
 
@@ -8332,7 +8343,6 @@ namespace GObject
             {
                 lsAttr.lv = maxLev;
                 lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
-                //SYSMSG_BROADCASTV(4157, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->getQuality(), equip->getName().c_str(), maxLev);
                 return 1;
             }
         }
@@ -8344,7 +8354,7 @@ namespace GObject
         Fighter * fgt = NULL;
         UInt8 pos = 0;
 		ItemLingshi * lingshi = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
-		if(!fighterId || !lingshi || !IsLingShi(lingshi->getClass()))
+		if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
 			return;
         ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
         if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv))
@@ -8401,9 +8411,10 @@ namespace GObject
         {
             lsAttr.lv = maxLev;
             lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
-            //SYSMSG_BROADCASTV(4157, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->getQuality(), equip->getName().c_str(), maxLev);
         }
 		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
+        if(tmp != lsAttr.lv)
+            fgt->setDirty();
 
 		Stream st(REP::LING_SHI);
         st << static_cast<UInt8>(0x15);
@@ -8419,7 +8430,7 @@ namespace GObject
         Fighter * fgt = NULL;
         UInt8 pos = 0;
 		ItemLingshi * lingshi = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
-		if(!fighterId || !lingshi || !IsLingShi(lingshi->getClass()))
+		if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
 			return;
         ItemLingshiAttr & lsAttr = lingshi->getLingshiAttr();
         if(!GData::lingshiCls.canBreak(lingshi->GetTypeId(), lsAttr.lv))
@@ -8451,6 +8462,7 @@ namespace GObject
         //突破时经验在临界值，升级
         ++ lsAttr.lv;
 		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
+        fgt->setDirty();
 
 		Stream st(REP::LING_SHI);
         st << static_cast<UInt8>(0x14);
@@ -8575,16 +8587,6 @@ namespace GObject
             ItemEquip * lingshi = static_cast<ItemLingshi *>(iter->second);
             if(!lingshi || fgt->getClass() != lingshi->getClass()-Item_LingShi+1)
                 return;
-            UInt8 tmpNum = 0;
-            if(fgt->getLevel() >= 95)
-                tmpNum = 3;
-            else if(fgt->getLevel() >= 90)
-                tmpNum = 2;
-            else if(fgt->getLevel() >= 85)
-                tmpNum = 1;
-            if(fgt->getLingshiNum() >= tmpNum)
-                return;
-            lingshi->DoEquipBind();
             old = fgt->setLingshi(lingshi);
 
             SendSingleLingshiData(static_cast<ItemLingshi *>(lingshi), 0);

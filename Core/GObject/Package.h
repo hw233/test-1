@@ -326,6 +326,8 @@ namespace GObject
         ItemZhenyuan * newZhenyuanToDB(const GData::ItemBaseType *, ItemZhenyuanAttr&, bool);
 	    ItemBase* AddZhenYuan(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere = 0);
 	    void MergeZhenyuan(UInt32* zhyIds, UInt8 count);
+        /**********灵侍begin***********/
+	    ItemLingshi* GetLingshi(UInt32 id);
 	    ItemBase* AddLingShiN(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere = 0);
 	    ItemBase* AddLingShi(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere);
 	    void lingshiUpgrade(UInt16 fighterId, UInt32 equipId, std::string& idStr);
@@ -339,6 +341,7 @@ namespace GObject
 	    static void AppendLingshiData(Stream&, ItemLingshi *);
 	    void SendLSPackageItemInfor();
         void setLingshi(Fighter *, UInt32, UInt8);
+        /**********灵侍end***********/
     protected:
 		typedef std::map<ItemKey, ItemBase *> ItemCont;
 		typedef ItemCont::iterator item_elem_iter;

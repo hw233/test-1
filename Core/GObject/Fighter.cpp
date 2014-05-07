@@ -1296,17 +1296,6 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
     return t;
 }
 
-UInt32 Fighter::getLingshiNum()
-{
-    UInt32 num = 0;
-     for (int i = 0; i < LINGSHI_UPMAX; ++i)
-     {
-        if (_lingshi[i])
-            num ++ ;
-     }
-     return num;
-}
-
 int Fighter::getAllLingshiId( UInt32* lingshis, int size )
 {
     if (!lingshis|| !size)
@@ -1326,8 +1315,17 @@ ItemEquip * Fighter::setLingshi(ItemEquip * lingshi)
 {
     if(!lingshi || !IsLingShi(lingshi->getClass()))
         return NULL;
+    UInt8 limitNum = 0;
+    if(getLevel() >= 95)
+        limitNum = 3;
+    else if(getLevel() >= 90)
+        limitNum = 2;
+    else if(getLevel() >= 85)
+        limitNum = 1;
+    if(!limitNum)
+        return NULL;
     UInt8 idx = 0xFF;
-    for(int i = 0; i < LINGSHI_UPMAX; ++ i)
+    for(int i = 0; i < limitNum; ++ i)
     {
         if(_lingshi[i] == NULL)
         {
@@ -1335,7 +1333,7 @@ ItemEquip * Fighter::setLingshi(ItemEquip * lingshi)
             break;
         }
     }
-    if(idx >= LINGSHI_UPMAX)
+    if(idx >= limitNum)
         idx = 0;
     return setLingshi(lingshi, idx);
 }
