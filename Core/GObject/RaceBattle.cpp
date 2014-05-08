@@ -161,6 +161,7 @@ namespace GObject
 
         if(level == sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]) && !pl->getIsLastLevel())
         {
+            pl->sendMsgCode(0, 4047);
             pl->setIsLastLevel(true);
             UInt32 num = World::getRBTimeRank();
             UInt32 rank = GET_BIT_3(num, level);
@@ -241,12 +242,12 @@ namespace GObject
         UInt8 awardlevel = pl->getAwardLevel();
         UInt8 pos = pl->getRaceBattlePos();
         UInt8 level = pos / 10;
-        if(level < 3 || level > 6 || awardlevel > level)
+        if(level < 2 || level > 6 || awardlevel > level)
             return;
         UInt8 index = level - 3;
         if(index > 3)
             return;
-
+#if 0
         static UInt32 awardItem[][3][2] = {
             {{499, 20}, {499, 10}, {499, 5}},
             {{499, 20}, {499, 10}, {499, 5}},
@@ -266,6 +267,13 @@ namespace GObject
             else
                 pl->GetPackage()->Add(awardItem[index][i][0], awardItem[index][i][1], true, false);
         }
+#endif
+        if(level >= 4 && pl->GetPackage()->GetRestPackageSize() < 1)
+        {
+            pl->sendMsgCode(0, 1011);
+            return;
+        }
+        pl->getAttainment(100 * (level - 1));
 
         ++awardlevel;
         pl->setAwardLevel(awardlevel);
@@ -306,12 +314,12 @@ namespace GObject
         {
             return false;
         }
-        if(level > sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]))
+        if(level >= sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]))
         {
             return false;
         }
         UInt8 offset = pos % 10;
-        if(offset == 0 && !pl->getIsLastLevel())
+        if(offset == 0)
         {
             pl->sendMsgCode(0, 4044);
             return false;
@@ -320,7 +328,7 @@ namespace GObject
         {
             return false;
         }
-        if(pl->getStarCnt(offset - 1) >= 6 && !pl->getIsLastLevel())
+        if(pl->getStarCnt(offset - 1) >= 6)
         {
             pl->sendMsgCode(0, 4043);
             return false;
@@ -587,6 +595,12 @@ namespace GObject
         stReport.win = res ? 0 : 1;
         stReport.reportId = reptid;
         pl->insertPlayerRecord(stReport);
+        UInt32 attainment;
+        if(res == 1)
+            attainment = 30;
+        else
+            attainment = 15;
+        pl->getAttainment(attainment);
 
         return res ? 1 : 2;
     }
@@ -645,18 +659,18 @@ namespace GObject
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
         {
-            static MailPackage::MailItem mitem[][3] = {
-                {{503, 2}, {515, 2}, {25, 1}},
-                {{503, 2}, {515, 2}, {25, 1}},
-                {{503, 2}, {515, 2}, {25, 1}},
-                {{503, 2}, {515, 2}, {25, 1}},
-                {{503, 2}, {515, 2}, {25, 1}},
-                {{503, 2}, {515, 2}, {25, 1}}
+            static MailPackage::MailItem mitem[][1] = {
+                {{MailPackage::Achievement, 300}},
+                {{MailPackage::Achievement, 200}},
+                {{MailPackage::Achievement, 150}},
+                {{MailPackage::Achievement, 120}},
+                {{MailPackage::Achievement, 100}},
+                {{MailPackage::Achievement, 50}},
             };
-            MailItemsInfo itemsInfo(mitem[type], RandBattleAward, 3);
-            mailPackageManager.push(mail->id, mitem[type], 3, true);
+            MailItemsInfo itemsInfo(mitem[type], RandBattleAward, 1);
+            mailPackageManager.push(mail->id, mitem[type], 1, true);
             std::string strItems;
-            for (int i = 0; i < 3; ++i)
+            for (int i = 0; i < 1; ++i)
             {
                 strItems += Itoa(mitem[type][i].id);
                 strItems += ",";
@@ -673,7 +687,15 @@ namespace GObject
             return;
 
         UInt8 type;
-        if(num == 50)
+        if(num == 90)
+            type = 9;
+        else if(num == 80)
+            type = 8;
+        else if(num == 70)
+            type = 7;
+        else if(num == 60)
+            type = 6;
+        else if(num == 50)
             type = 5;
         else if(num == 40)
             type = 4;
@@ -688,6 +710,8 @@ namespace GObject
         else
             return;
 
+        if(type > 3)
+            type = 3;
         if(type <= 3)
             SYSMSG_BROADCASTV(6015 + type, pl->getCountry(), pl->getPName());
 
@@ -696,18 +720,22 @@ namespace GObject
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
         {
-            static MailPackage::MailItem mitem[][3] = {
-                {{503, 2}, {515, 2}, {25, 1}},
-                {{503, 2}, {515, 2}, {25, 1}},
-                {{503, 2}, {515, 2}, {25, 1}},
-                {{503, 2}, {515, 2}, {25, 1}},
-                {{503, 2}, {515, 2}, {25, 1}},
-                {{503, 2}, {515, 2}, {25, 1}}
+            static MailPackage::MailItem mitem[][1] = {
+                {{MailPackage::Achievement, 5}},
+                {{MailPackage::Achievement, 15}},
+                {{MailPackage::Achievement, 30}},
+                {{MailPackage::Achievement, 50}},
+                {{MailPackage::Achievement, 75}},
+                {{MailPackage::Achievement, 105}},
+                {{MailPackage::Achievement, 140}},
+                {{MailPackage::Achievement, 180}},
+                {{MailPackage::Achievement, 225}},
+                {{MailPackage::Achievement, 275}},
             };
-            MailItemsInfo itemsInfo(mitem[type], RandBattleAward, 3);
-            mailPackageManager.push(mail->id, mitem[type], 3, true);
+            MailItemsInfo itemsInfo(mitem[type], RandBattleAward, 1);
+            mailPackageManager.push(mail->id, mitem[type], 1, true);
             std::string strItems;
-            for (int i = 0; i < 3; ++i)
+            for (int i = 0; i < 1; ++i)
             {
                 strItems += Itoa(mitem[type][i].id);
                 strItems += ",";
@@ -779,7 +807,7 @@ namespace GObject
             return;
         if(offset > gPerLeveCnt[level - 1])
             return;
-        if(pl->getStarCnt(offset - 1) >= 6 && !pl->getIsLastLevel())
+        if(pl->getStarCnt(offset - 1) >= 6)
         {
             pl->sendMsgCode(0, 4043);
             return;
@@ -787,9 +815,6 @@ namespace GObject
 
         UInt8 res = attackPlayer(pl, defender);
         if(res == 0)
-            return;
-
-        if(pl->getIsLastLevel())
             return;
 
         UInt8 starAdd;
@@ -855,9 +880,9 @@ namespace GObject
         UInt8 pos = pl->getRaceBattlePos();
         UInt8 level = pos / 10;
         UInt8 offset = pos % 10;
-        if(level == 0 || level > 5)
+        if(level == 0 || level > 6)
             return;
-        if(offset == 0)
+        if(offset == 0 && level != 6)
             return;
         if(offset > gPerLeveCnt[level - 1])
             return;
@@ -898,7 +923,7 @@ namespace GObject
         if(res == 0)
             return;
 
-        if(pl->getIsLastLevel())
+        if(level == 6)
             return;
 
         UInt8 starAdd = 1;
@@ -988,7 +1013,7 @@ namespace GObject
             return;
         UInt8 pos = pl->getRaceBattlePos();
         UInt8 level = pos / 10;
-        if(level == 0 || level > 5)
+        if(level == 0 || level >= 6)
             return;
         GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pos);
         if(!rb)
