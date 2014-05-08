@@ -8335,7 +8335,7 @@ namespace GObject
             {
                 if(!GData::lingshiCls.canUpgrade(equip->GetTypeId(), lsAttr.lv))
                     break;
-                if(lsAttr.exp <= GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
+                if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
                     break;
                 ++ lsAttr.lv;
             }
@@ -8362,7 +8362,7 @@ namespace GObject
         bool hasLucky = uRand(10000) < 1000;
         if(type)
         {
-            UInt32 cnt = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_CNT);
+            UInt32 cnt = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_CNT) + 1;
             static UInt32 moneys[3] = {50, 100, 200};
             static UInt32 tmpCnt[3] = {5, 30, 0xFFFFFFFF};
             int idx = 0;
@@ -8379,7 +8379,7 @@ namespace GObject
             }
             ConsumeInfo ci(LingShiPeiYang, 0, 0);
             m_Owner->useGold(moneys[idx] / (isHalf ? 2 : 1), &ci);
-            m_Owner->SetVar(VAR_LINGSHI_PEIYANG_CNT, cnt+1);
+            m_Owner->SetVar(VAR_LINGSHI_PEIYANG_CNT, cnt);
             lsAttr.exp += 3000 * (hasLucky ? 10 : 1);
         }
         else
@@ -8394,7 +8394,10 @@ namespace GObject
             m_Owner->udpLog("lingshi", "F_140509_2", "", "", "", "", "act");
         }
         if(hasLucky)
+        {
             m_Owner->SetVar(VAR_LINGSHI_PEIYANG_LUCKY, 1);
+            SYSMSG_SENDV(4161, m_Owner);
+        }
         else if(!hasLucky && type)
             m_Owner->SetVar(VAR_LINGSHI_PEIYANG_LUCKY, 0);
         UInt8 maxLev = GData::lingshiCls.getLingshiMaxLev(lingshi->GetTypeId(), lsAttr.lv);
@@ -8403,7 +8406,7 @@ namespace GObject
         {
             if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv))
                 break;
-            if(lsAttr.exp <= GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
+            if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
                 break;
             ++ lsAttr.lv;
         }

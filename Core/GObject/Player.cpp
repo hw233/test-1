@@ -3181,7 +3181,12 @@ namespace GObject
 				m_Package->EquipTo(0, fgt, t+0x0a, equip, true);
             m_Package->EquipTo(0, fgt, 0x1f, equip, true);
             for(UInt8 t = 0; t < 3; ++ t)
+            {
 				m_Package->EquipTo(0, fgt, t+0x60, equip, true);
+				ItemEquip * lingshi = fgt->setLingshi(NULL, t, false);
+                if(lingshi)
+                    m_Package->AddExistEquip(lingshi);
+            }
 		    m_Package->EquipTo(0, fgt, 0x70, equip, true);
 
 			_fighters.erase(it);
@@ -12213,11 +12218,13 @@ namespace GObject
 
         ItemBase* ib = NULL;
         ib = pk->FindItem(itemid, bind);
+        if(!ib)
+            pk->GetLingshi(itemid);
         if (ib)
         {
             if (ib->Count() < num)
                 return false;
-            if (ib->getClass() == Item_Mount || ib->getClass() == Item_MountChip)
+            if (IsLingShi(ib->getClass()) || ib->getClass() == Item_Mount || ib->getClass() == Item_MountChip)
                 return false;
 
             m_td.soul += (ib->getEnergy() * num);
@@ -26858,7 +26865,7 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
 {
     if(!World::getGGTime())
         return ; 
-    UInt32 now = TimeUtil::Now();
+    //UInt32 now = TimeUtil::Now();
     if(type == 0)
     {
         if( m_gginfo.task != task)
