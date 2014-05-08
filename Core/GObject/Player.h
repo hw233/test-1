@@ -3372,13 +3372,20 @@ namespace GObject
         bool _isLastLevel;
         //匹配者ID
         Player* _matchPlayer;
+        //最大连胜次数
+        UInt8 _continueWinMaxCnt;
+        UInt8 _totalWinCnt;
+        UInt8 _totalLoseCnt;
+        UInt32 _totalAchievement;
+        UInt8 _totalItemCnt;
+        UInt64 _totalExp;
     public:
         UInt8 getRaceBattlePos() { return _playerPos; }
         void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
         UInt16 getStarCnt(UInt8 i) { if(i < 7) return _starCnt[i]; else return 0; }
         void setStarCnt(UInt8 i, UInt16 cnt) { if(i < 7) _starCnt[i] = cnt; else _starCnt[i] = 0; }
         UInt8 getContinueWinCnt() { return _continueWinCnt; }
-        void setContinueWinCnt(UInt8 cnt) { _continueWinCnt = cnt; }
+        void setContinueWinCnt(UInt8 cnt) { _continueWinCnt = cnt; if(_continueWinMaxCnt < _continueWinCnt) _continueWinMaxCnt = _continueWinCnt; }
         UInt8 getAwardLevel() { return _awardLevel; }
         void setAwardLevel(UInt8 level) { _awardLevel = level; }
         UInt8 getChallengeStatus(Player* pl);
@@ -3409,6 +3416,21 @@ namespace GObject
         Player* getMatchPlayer() { return _matchPlayer; }
         void autoRaceBattle(UInt32 count);
         void cancelAutoRaceBattle();
+
+        //为了统计
+        UInt8 getContinueWinMaxCnt() { return _continueWinMaxCnt; }
+        void setContinueWinMaxCnt(UInt8 cnt) { _continueWinMaxCnt = cnt; }
+        UInt8 getTotalWinCnt() { return _totalWinCnt; }
+        void setTotalWinCnt(UInt8 cnt) { _totalWinCnt = cnt; }
+        UInt8 getTotalLoseCnt() { return _totalLoseCnt; }
+        void setTotalLoseCnt(UInt8 cnt) { _totalLoseCnt = cnt; }
+        UInt32 getTotalAchievement() { return _totalAchievement; }
+        void setTotalAchievement(UInt32 cnt) { _totalAchievement = cnt; }
+        UInt8 getTotalItemCnt() { return _totalItemCnt; }
+        void setTotalItemCnt(UInt8 cnt) { _totalItemCnt = cnt; }
+        UInt64 getTotalExp() { return _totalExp; }
+        void setTotalExp(UInt64 exp) { _totalExp = exp; }
+
 	};
 
 

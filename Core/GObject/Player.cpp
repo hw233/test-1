@@ -696,6 +696,7 @@ namespace GObject
 			m_Player->AddExp(exp * 8);
 		else
 			m_Player->pendExp(exp * 8);
+        m_Player->setTotalExp(m_Player->getTotalExp() + exp * 8);
 
         if(!leftCount)
 			PopTimerEvent(m_Player, EVENT_AUTORACEBATTLE, m_Player->getId());
@@ -908,6 +909,12 @@ namespace GObject
         _attackCd = 0;
         _isLastLevel = false;
         _matchPlayer = NULL;
+        _continueWinMaxCnt = 0;
+        _totalWinCnt = 0;
+        _totalLoseCnt = 0;
+        _totalAchievement = 0;
+        _totalItemCnt = 0;
+        _totalExp = 0;
     }
 
 

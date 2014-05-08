@@ -76,10 +76,118 @@ namespace GObject
         return min;
     }
 
+    void RaceBattle::totalAward(Player* pl)
+    {
+        if(!pl)
+            return;
+        UInt8 level = pl->getRaceBattlePos() / 10;
+        if((level == 0 || level == 1) && (pl->getRaceBattlePos() % 10) == 0)
+            return;
+
+        UInt32 rank = 0;
+        bool found = false;
+        for(UInt8 i = 6; i >= 1; i--)
+        {
+            RBSortType& levelSort = _levelStarSort[i - 1];
+            for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
+            {
+                ++rank;
+                if(it->player == pl)
+                {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if(found)
+        {
+            UInt8 type = 0xFF;
+            if(rank == 0)
+            {
+            }
+            else if(rank <= 1)
+                type = 0;
+            else if(rank <= 2)
+                type = 1;
+            else if(rank <= 3)
+                type = 2;
+            else if(rank <= 9)
+                type = 3;
+            else if(rank <= 29)
+                type = 4;
+            else if(rank <= 50)
+                type = 5;
+            else
+            {
+            }
+            if(type <= 5)
+            {
+                static UInt32 achievement[] = {300, 220, 180, 150, 120, 100};
+                pl->getAchievement(achievement[type]);
+                pl->setTotalAchievement(pl->getTotalAchievement() + achievement[type]);
+            }
+        }
+
+        UInt8 continueWinMaxCnt = pl->getContinueWinMaxCnt();
+        {
+            UInt8 num = continueWinMaxCnt;
+            UInt8 type = 0xFF;
+            if(num >= 90)
+                type = 9;
+            else if(num >= 80)
+                type = 8;
+            else if(num >= 70)
+                type = 7;
+            else if(num >= 60)
+                type = 6;
+            else if(num >= 50)
+                type = 5;
+            else if(num >= 40)
+                type = 4;
+            else if(num >= 30)
+                type = 3;
+            else if(num >= 20)
+                type = 2;
+            else if(num >= 10)
+                type = 1;
+            else if(num >= 5)
+                type = 0;
+            else
+            {
+            }
+            if(type <= 9)
+            {
+                static UInt32 achievement[] = {40, 45, 50, 55, 60, 65, 70, 75, 80, 85};
+                pl->getAchievement(achievement[type]);
+                pl->setTotalAchievement(pl->getTotalAchievement() + achievement[type]);
+            }
+        }
+
+        UInt8 totalWinCnt = pl->getTotalWinCnt();
+        UInt8 totalLoseCnt = pl->getTotalLoseCnt();
+        UInt32 totalAchievement = pl->getTotalAchievement();
+        UInt8 itemCnt = pl->getTotalItemCnt();
+        UInt64 totalExp = pl->getTotalExp();
+
+        SYSMSG(title, 5140);
+        if(found)
+        {
+            SYSMSGV(content, 5141, level, rank, continueWinMaxCnt, totalWinCnt, totalLoseCnt, totalAchievement, itemCnt, totalExp);
+            pl->GetMailBox()->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+        }
+        else
+        {
+            SYSMSGV(content, 5142, level, continueWinMaxCnt, totalWinCnt, totalLoseCnt, totalAchievement, itemCnt, totalExp);
+            pl->GetMailBox()->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+        }
+    }
+
     inline bool enum_reset_all(Player* pl, int)
     {
         if(!pl)
             return true;
+        raceBattle.totalAward(pl);
+
         pl->setRaceBattlePos(0);
         for(UInt8 i = 0; i < 7; i++)
             pl->setStarCnt(i, 0);
@@ -96,6 +204,12 @@ namespace GObject
         pl->setAttackCd(0);
         pl->setIsLastLevel(false);
         pl->setMatchPlayer(NULL);
+        pl->setContinueWinMaxCnt(0);
+        pl->setTotalWinCnt(0);
+        pl->setTotalLoseCnt(0);
+        pl->setTotalAchievement(0);
+        pl->setTotalItemCnt(0);
+        pl->setTotalExp(0);
         pl->cancelAutoRaceBattle();
         return true;
     }
@@ -146,8 +260,11 @@ namespace GObject
             {
                 SYSMSG_BROADCASTV(6007);
                 raceBattleBroadcast(2, 0);
-                awardLevelRank();
+                //awardLevelRank();
                 globalPlayers.enumerate(enum_reset_all, 0);
+                for(UInt8 i = 0; i < 6; i++)
+                    _levelStarSort[0].clear();
+                _contineWinSort.clear();
             }
             _status = 0;
         }
@@ -263,12 +380,14 @@ namespace GObject
             else
             {
                 pl->GetPackage()->Add(9457, awardlevel - 3, true, false);
+                pl->setTotalItemCnt(pl->getTotalItemCnt() + awardlevel - 3);
             }
         }
         UInt32 achievement = 100 * (awardlevel - 1);
         if(awardlevel == 6)
             achievement += 100;
         pl->getAchievement(achievement);
+        pl->setTotalAchievement(pl->getTotalAchievement() + achievement);
 
         ++awardlevel;
         pl->setAwardLevel(awardlevel);
@@ -588,12 +707,14 @@ namespace GObject
         else
             achievement = 15;
         pl->getAchievement(achievement);
+        pl->setTotalAchievement(pl->getTotalAchievement() + achievement);
 
         return res ? 1 : 2;
     }
 
     void RaceBattle::awardLevelRank()
     {
+#if 0
         UInt8 rank = 0;
         for(UInt8 i = 6; i >= 1; i--)
         {
@@ -606,20 +727,24 @@ namespace GObject
                 awardLevelRankOne(it->player, rank);
             }
         }
+#endif
     }
 
     void RaceBattle::awardContinueWinRank()
     {
+#if 0
         for(RBSortType::iterator it = _contineWinSort.begin(); it != _contineWinSort.end(); ++it)
         {
             if(it->total < 5)
                 return;
             awardContinueWinRankOne(it->player, it->total);
         }
+#endif
     }
 
     void RaceBattle::awardLevelRankOne(Player* pl, UInt8 rank)
     {
+#if 0
         if(!pl)
             return;
 
@@ -646,6 +771,7 @@ namespace GObject
         SYSMSG(title, 5135);
         SYSMSGV(content, 5136, rank, achievement[type]);
         pl->GetMailBox()->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+#endif
     }
 
     void RaceBattle::awardContinueWinRankOne(Player* pl, UInt8 num)
@@ -682,12 +808,13 @@ namespace GObject
             broad = 3;
         if(broad <= 3)
             SYSMSG_BROADCASTV(6015 + broad, pl->getCountry(), pl->getPName());
-
+#if 0
         static UInt32 achievement[] = {5, 15, 30, 50, 75, 105, 140, 180, 225, 275};
         pl->getAchievement(achievement[type]);
         SYSMSG(title, 5137);
         SYSMSGV(content, 5138, num, achievement[type]);
         pl->GetMailBox()->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+#endif
     }
 
     void RaceBattle::eraseLevelStarSort(Player* pl, UInt8 level)
@@ -775,6 +902,7 @@ namespace GObject
             awardContinueWinRankOne(pl, pl->getContinueWinCnt());
             insertContinueWinSort(pl);
             pl->setContinueLoseCnt(0);
+            pl->setTotalWinCnt(pl->getTotalWinCnt() + 1);
         }
         else
         {
@@ -782,9 +910,10 @@ namespace GObject
             if(isDouble)
                 starAdd *= 2;
             eraseContinueWinSort(pl);
-            braodCancelContinueWin(pl, defender);
+            broadCancelContinueWin(pl, defender);
             pl->setContinueWinCnt(0);
             pl->setContinueLoseCnt(pl->getContinueLoseCnt() + 1);
+            pl->setTotalLoseCnt(pl->getTotalLoseCnt() + 1);
         }
 
         if(pl->getContinueLoseCnt() >= 5 * level)
@@ -1003,7 +1132,7 @@ namespace GObject
         pl->send(st);
     }
 
-    void RaceBattle::braodCancelContinueWin(Player* pl, Player* player2)
+    void RaceBattle::broadCancelContinueWin(Player* pl, Player* player2)
     {
         if(!pl || !player2)
             return;

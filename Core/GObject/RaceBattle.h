@@ -28,6 +28,7 @@ class RaceBattle : public Singleton<RaceBattle>
         RaceBattle() {}
         ~RaceBattle() {}
         void sendRBStatus(Player* pl);
+        void totalAward(Player* pl);
         void raceBattleCheck();
         UInt16 getLocation() { return RACEBATTLE_LOCATION; }
         void enterPos(Player* pl, UInt8 pos, bool fromServer = false);
@@ -54,7 +55,7 @@ class RaceBattle : public Singleton<RaceBattle>
         void insertContinueWinSort(Player* pl);
         void eraseContinueWinSort(Player* pl);
         void sendOwnerInfo(Player* pl);
-        void braodCancelContinueWin(Player* pl, Player* p2);
+        void broadCancelContinueWin(Player* pl, Player* p2);
         void pageContinueWin(Player* pl, UInt8 flag);
 
     private:
