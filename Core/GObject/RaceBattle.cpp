@@ -98,6 +98,8 @@ namespace GObject
                     break;
                 }
             }
+            if(found)
+                break;
         }
         if(found)
         {
@@ -320,10 +322,10 @@ namespace GObject
 
         if(offset == 0)
         {
-            if(level == 6 && fromServer)
+            if(fromServer)
                 insertLevelStarSort(pl, level);
         }
-        else if((origPos % 10) == 0)
+        else if(level == 1 && (origPos % 10) == 0)
         {
             insertLevelStarSort(pl, level);
         }
@@ -1148,7 +1150,7 @@ namespace GObject
         else
             return;
 
-        SYSMSG_BROADCASTV(6021 + type, player2->getCountry(), player2->getPName(), pl->getCountry(), pl->getPName());
+        SYSMSG_BROADCASTV(6021 + type, player2->getCountry(), player2->getPName(), pl->getCountry(), pl->getPName(), contineWinCnt);
     }
 
     void RaceBattle::pageContinueWin(Player* pl, UInt8 flag)
