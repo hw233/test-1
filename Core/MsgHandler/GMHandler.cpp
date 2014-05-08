@@ -25,6 +25,7 @@
 #include "GData/NpcGroup.h"
 #include "GData/SkillTable.h"
 #include "GData/FairyPetTable.h"
+#include "GData/LingShiTable.h"
 #include "GObject/Dungeon.h"
 #include "GObject/Arena.h"
 #include "Script/GameActionLua.h"
@@ -58,7 +59,6 @@
 #include "GObject/Marry.h"
 #include "GObject/Married.h"
 #include "GObject/ArenaServerWar.h"
-
 #include "GObject/ClanBuilding.h"
 #include "GObject/RaceBattle.h"
 
@@ -115,6 +115,7 @@ GMHandler::GMHandler()
     Reg(3, "testlb", &GMHandler::testLingbao);
     Reg(2, "zhenyuan", &GMHandler::OnAddZhenyuan);
     Reg(3, "peteq", &GMHandler::OnPetEq);
+    Reg(2, "lsjy", &GMHandler::OnAddLingshiExp);
 
 
 
@@ -4942,6 +4943,45 @@ void GMHandler::OnPetEq(GObject::Player * player, std::vector<std::string>& args
         package->AddPetEquip(equip, true);
     }
 
+}
+
+void GMHandler::OnAddLingshiExp(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 3)
+        return;
+    UInt32 fgtId = atoi(args[0].c_str());
+    UInt8 pos = atoi(args[1].c_str());
+    Fighter * fgt = player->findFighter(fgtId);
+    if(!fgt || pos > 2)
+        return;
+    ItemLingshi * lingshi = static_cast<ItemLingshi *>(fgt->getLingshi(pos));
+    if(!lingshi || !IsLingShi(lingshi->getClass()))
+        return;
+    ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
+    if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv))
+        return;
+    UInt32 upExp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
+    if(upExp == 0) return;
+    lsAttr.exp += atoi(args[2].c_str());
+    UInt8 maxLev = GData::lingshiCls.getLingshiMaxLev(lingshi->GetTypeId(), lsAttr.lv);
+    UInt8 tmp = lsAttr.lv;
+    for(UInt8 i = tmp; i <= maxLev; ++ i)
+    {
+        if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv))
+            break;
+        if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
+            break;
+        ++ lsAttr.lv;
+    }
+    if(lsAttr.lv >= maxLev)
+    {
+        lsAttr.lv = maxLev;
+        lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
+    }
+    DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lingshi->getId());
+    if(tmp != lsAttr.lv)
+        fgt->setDirty();
+    fgt->sendModification(0x63+pos, static_cast<ItemEquip *>(lingshi), false);
 }
 
 void GMHandler::OnHandleTask(GObject::Player * player, std::vector<std::string>& args)
