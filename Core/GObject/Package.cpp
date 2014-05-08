@@ -8295,6 +8295,7 @@ namespace GObject
         }
         needTael = 0;
         UInt8 tmp = lsAttr.lv;
+        bool isUdp = true;
         for(UInt8 i = 0; i < eatVec.size(); ++ i)
         {
             UInt32 res = lingshiUpgrade(equip, eatVec[i]);
@@ -8302,8 +8303,12 @@ namespace GObject
             {
                 UInt8 tmpLvl = eatVec[i]->getLingshiAttr().lv;
                 needTael += GData::lingshiCls.getLevUpTael(tmpLvl);
+                if(eatVec[i]->getQuality() >= Item_Purple && isUdp)
+                {
+                    m_Owner->udpLog("lingshi", "F_140509_12", "", "", "", "", "act");
+                    isUdp = false;
+                }
                 DelLingshi2(eatVec[i], ToPetEquipUpgrade);
-                m_Owner->udpLog("lingshi", "F_140509_1", "", "", "", "", "act");
                 if(res == 1)
                     break;
             }
@@ -8391,7 +8396,7 @@ namespace GObject
             DelItemAny(XIAN_LING_GUO, 1, &isBind);
             DelItemSendMsg(XIAN_LING_GUO, m_Owner);
             lsAttr.exp += 2000 * (hasLucky ? 10 : 1);
-            m_Owner->udpLog("lingshi", "F_140509_2", "", "", "", "", "act");
+            m_Owner->udpLog("lingshi", "F_140509_11", "", "", "", "", "act");
         }
         if(hasLucky)
         {
@@ -8595,6 +8600,23 @@ namespace GObject
             SendSingleLingshiData(static_cast<ItemLingshi *>(lingshi), 0);
             m_ItemsLS.erase(iter);
             -- m_SizeLS;
+
+            if(lingshi->GetTypeId() == 14105)
+                m_Owner->udpLog("lingshi", "F_140509_13", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14115)
+                m_Owner->udpLog("lingshi", "F_140509_14", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14305)
+                m_Owner->udpLog("lingshi", "F_140509_15", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14315)
+                m_Owner->udpLog("lingshi", "F_140509_16", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14505)
+                m_Owner->udpLog("lingshi", "F_140509_17", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14515)
+                m_Owner->udpLog("lingshi", "F_140509_18", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14705)
+                m_Owner->udpLog("lingshi", "F_140509_19", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14715)
+                m_Owner->udpLog("lingshi", "F_140509_20", "", "", "", "", "act");
         }
         if(old)
             AddExistEquip(old);
