@@ -718,6 +718,12 @@ namespace GObject
         VAR_DRINK_COUNT = 733 ,    //饮酒次数 主动发起(8位) ,被动接受(8位) ,玩家总购买的次数 
         VAR_DRINK_VALUE = 734 ,    //豪饮值
         VAR_FRIEND_VALUE_DAY = 735 ,    //每日友情值
+
+        VAR_CUTTREE_BUY = 736 ,   //玩家购买的剩余伐木次数 
+        VAR_CUTTREE_COUNT = 737 ,    //伐木次数 主动发起(8位) ,玩家总购买的次数 
+        VAR_TREE_VALUE = 738 ,    //木片数
+        VAR_TREE_VALUE_DAY = 738 ,    //今日被邀请获得的木片数
+
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
         //771 - 780 for qimj
@@ -1369,6 +1375,10 @@ namespace GObject
             REGISTER_VAR(VAR_CLAN_FRIEND, CYCLE_NONE);
             REGISTER_VAR(VAR_DRINK_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_FRIEND_VALUE_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_CUTTREE_BUY, CYCLE_NONE);
+            REGISTER_VAR(VAR_CUTTREE_COUNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_TREE_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_TREE_VALUE_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);

@@ -4600,7 +4600,7 @@ namespace GObject
 		SYSMSG_SENDV(1034, this, pl->getCountry(), pl->getName().c_str());
 
         std::map<UInt64,FriendCount >::iterator it_count = _friendlyCount.find(pl->getId());
-        std::map<UInt64,UInt32>::iterator it_brother = _brothers.find(pl->getId());
+        std::map<UInt64,struct invitTime>::iterator it_brother = _brothers.find(pl->getId());
         //std::map<UInt64,FriendYellowBird >::iterator it_bird = _friendYB.find(pl->getId());
         //std::map<UInt64,FriendTaskNum >::iterator it_task = _friendTask.find(pl->getId());
 
@@ -30400,11 +30400,12 @@ void Player::InsertBrother(Player * pl)
         return ;
     if(!_hasFriend(pl))
         return ;
-    _brothers[pl->getId()] = 1;
+    struct invitTime it;
+    _brothers[pl->getId()] = it;
 }
 bool Player::_hasBrother( Player * pl ) const
 {
-    std::map<UInt64,UInt32>::const_iterator it = _brothers.find(pl->getId());
+    std::map<UInt64,struct invitTime>::const_iterator it = _brothers.find(pl->getId());
     if(it == _brothers.end())
         return false;
     return true;
@@ -31432,10 +31433,10 @@ void Player::InviteDrinking(Player * friendOne)   //邀请饮酒
         moveTo(9476,true);
 
     UInt32 now = TimeUtil::Now();
-    std::map<UInt64,UInt32>::const_iterator it = _brothers.find(friendOne->getId());
+    std::map<UInt64,struct invitTime>::const_iterator it = _brothers.find(friendOne->getId());
     if(it == _brothers.end())
         flag = false;
-    else if(now < it->second )
+    else if(now < it->second.drinkT )
     {
         flag = false ;
     }
@@ -31513,7 +31514,7 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
     if(count)
         result = res ;
     bool flag = false ;
-    std::map<UInt64,UInt32>::iterator it = _brothers.find(pl->getId());
+    std::map<UInt64,struct invitTime>::iterator it = _brothers.find(pl->getId());
     if(it != _brothers.end()) 
         flag = true ;
     if( GetVar(VAR_MARRY_STATUS) == 5 && pl->getId() == GetMarriageInfo()->lovers ) 
@@ -31526,7 +31527,7 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
         if(shenfen)    //主动方被拒绝，添加冷却时间
         {
             if(res ==0)
-                it->second = now + 300; 
+                it->second.drinkT = now + 300; 
             else if(res == 2)
                 sendMsgCode(2,4037);
         }
@@ -31983,6 +31984,127 @@ void Player::specialUdpLog(UInt8 type)
             udpLog("huodong", "F_140417_1", "", "", "", "", "act");
             break;
     }
+}
+
+bool Player::canInviteCutting()
+{
+    UInt32 TreeCount = GetVar(VAR_CUTTREE_COUNT);
+    UInt8 count = GET_BIT_8(drinkCount , 0 );
+    UInt32 TreeCount2 = GetVar(VAR_CUTTREE_BUY); 
+    if(TreeCount >= 2 && TreeCount2 < 1)
+        return false;
+    if(getCuttingInfo().cutter != NULL || getCuttingInfo().time != 0 )
+        return false;
+    return true;
+
+}
+UInt8 Player::InviteCutting(Player * pl)   //需要抛消息
+{
+    bool flag = true;
+
+    if(_playerData.location != 9476)
+        moveTo(9476,true);
+
+    UInt32 now = TimeUtil::Now();
+    std::map<UInt64,struct invitTime>::const_iterator it = _brothers.find(pl->getId());
+    if(it == _brothers.end())
+        flag = false;
+    else if(now < it->second.cutT )
+    {
+        flag = false ;
+    }
+
+    if( GetVar(VAR_MARRY_STATUS) == 5 && pl->getId() == GetMarriageInfo()->lovers ) 
+        flag = true ;
+    if(!flag)
+        return ;
+
+    getCuttingInfo().plset.insert(pl);
+    if(pl->getThreadId() == getThreadId())
+    {
+        pl->beInviteDrinking(this);
+    }
+    else 
+    {
+        struct st
+        {
+            UInt64 playerId ; 
+            UInt8 type ;
+        };
+        st _st ;
+        _st.playerId = getId();
+        _st.type = getCuttingInfo().type;
+        GameMsgHdr hdr(0x403, pl->getThreadId(), pl, sizeof(_st));
+        GLOBAL().PushMsg(hdr, &_st);
+    }
+
+}
+void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入据点
+{
+    if(res == 2)
+    {
+        sendMsgCode(2,4037);
+        return ;
+    }
+    bool flag = false ;
+    std::map<UInt64,struct invitTime>::iterator it = _brothers.find(pl->getId());
+    if(it != _brothers.end()) 
+        flag = true ;
+    if( GetVar(VAR_MARRY_STATUS) == 5 && pl->getId() == GetMarriageInfo()->lovers ) 
+        flag = true ;
+    if(!flag)
+        return ;
+    if(res == 1)
+    {
+        if(pl->getCuttingInfo().cutter != NULL)
+            return ;
+        setCutter(1,pl);
+        pl->setCutter(0,this);
+        sendCutterInfo();
+        pl->sendCutterInfo();
+    }
+    else
+    {
+        it->second.drinkT = now + 300; 
+    }
+}
+void Player::CutForOnce()
+{
+
+}
+void Player::quicklyCut(UInt8 type)
+{
+
+}
+void Player::beginCutting()
+{
+
+
+}
+void Player::beInviteCutting(Player * pl)
+{
+    if(getCuttingInfo().cutter != NULL)  
+    {
+        pl->beReplyForCutting(this,2);
+        return ;
+    }
+    Stream st(REP::BROTHER);
+    st << static_cast<UInt8>(0x14);
+    st << pl->getName();
+    st << Stream::eos;
+    send(st);
+}
+void Player::sendCutterInfo()
+{
+    Stream st(REP::BROTHER);
+    st << static_cast<UInt8>(0x11);
+    st << static_cast<UInt8>(getCuttingInfo().type);
+    st << getCuttingInfo().cutter->getName();
+    st << getCuttingInfo().time;
+    st << GetVar(VAR_TREE_VALUE);
+    st << GetVar(VAR_TREE_VALUE_DAY);
+    st <<Stream::eos;
+    send(st);
 }
 
 } // namespace GObject

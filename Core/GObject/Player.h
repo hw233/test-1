@@ -720,7 +720,23 @@ namespace GObject
            taskNum[5] = 0; 
         }
     };
+    struct invitTime
+    {
+        UInt32 drinkT;
+        UInt32 cutT;
+        invitTime():drinkT(0),cutT(0){}
+    };
 
+    struct CuttingInfo
+    {
+        Player * cutter;   //砍树对象
+        UInt32 time ;       //砍树时间
+        UInt8 type ;        //身份
+        UInt32 count ;      //本轮收集的木片数
+        std::set<Player *> plset;
+        CuttingInfo() : cutter(NULL) , time(0) , type(0) ,count(0){ plset.clear(); }
+        void reset(){ cutter = NULL ; time = 0 ; type = 0; count = 0; plset.clear();}
+    };
 
     struct MoBaoInfo
     {
@@ -2276,7 +2292,7 @@ namespace GObject
         std::map<UInt64,std::vector<StuPresentBox> >_bePresent; 
 
         std::map<UInt64, struct FriendCount >_friendlyCount;   //友好度
-		std::map<UInt64 , UInt32> _brothers; // 结拜兄弟(不分男女) 第二参数为发起饮酒的时间
+		std::map<UInt64 , struct invitTime> _brothers; // 结拜兄弟(不分男女) 第二参数为发起饮酒的时间
         std::map<UInt64, struct FriendYellowBird >_friendYB;   //黄色鸢尾赠送情况
         std::map<UInt64, struct FriendTaskNum >_friendTask;   //友好度任务
 
@@ -3203,6 +3219,7 @@ namespace GObject
         UInt32 _friendSum;
         //
         DrinkInfo drinkInfo ;
+        CuttingInfo cuttingInfo ;
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();
@@ -3272,6 +3289,19 @@ namespace GObject
         void AddClanFriend();
         //void AddFriendlyCount(Player * friender , UInt8 taskNum) ;
         //void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
+
+        //伐木
+        CuttingInfo& getCuttingInfo(){ return cuttingInfo;}
+        bool canInviteCutting(Player * pl);
+        UInt8 InviteCutting(Player * pl);   //需要抛消息
+        void beInviteCutting(Player * pl);
+        void beReplyForCutting(Player * pl ,UInt8 res);
+        void CutForOnce();
+        void quicklyCut(UInt8 type);
+        void beginCutting();
+        void setCutter(UInt8 type ,Player * cutter){ cuttingInfo.type =type; cuttingInfo.cutter = cutter;}
+        void setCutTime(UInt32 time){cuttingInfo.time = time ;}
+        void sendCutterInfo();
 
         void makeFighterSGList(Stream& st);
         void sendFighterSGListWithNoSkill();
