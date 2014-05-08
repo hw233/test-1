@@ -908,7 +908,6 @@ namespace GObject
         _attackCd = 0;
         _isLastLevel = false;
         _matchPlayer = NULL;
-        _rbAutoTimer = NULL;
     }
 
 
@@ -2376,15 +2375,7 @@ namespace GObject
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%" I64_FMT "u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %" I64_FMT "u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
 
-        if(getThreadId() == WORKER_THREAD_NEUTRAL)
-        {
-            cancelAutoRaceBattle();
-        }
-        else
-        {
-            GameMsgHdr hdr(0x1D1, WORKER_THREAD_NEUTRAL, this, 0);
-            GLOBAL().PushMsg(hdr, NULL);
-        }
+        cancelAutoRaceBattle();
 
         if(_isOnline && !hasFlag(Training))
         {
@@ -32081,6 +32072,11 @@ void Player::specialUdpLog(UInt8 type)
         _challengePlayer[pl] = 1;
     }
 
+    void Player::clearChallengePlayer()
+    {
+        _challengePlayer.clear();
+    }
+
     void Player::makeRBBattleInfo(Stream& st)
     {
         UInt8 reportCnt = _playerReport.size();
@@ -32100,6 +32096,11 @@ void Player::specialUdpLog(UInt8 type)
         _playerReport.push_back(record);
     }
 
+    void Player::clearPlayerRecord()
+    {
+        _playerReport.clear();
+    }
+#if 0
     void Player::readRandBattleReport(UInt32 reportId)
     {
         std::vector<PlayerReport>::iterator it;
@@ -32116,7 +32117,7 @@ void Player::specialUdpLog(UInt8 type)
             return;
         send(&(*r)[0], r->size());
     }
-
+#endif
     void Player::autoRaceBattle(UInt32 count)
     {
 		EventAutoRaceBattle* event = new(std::nothrow)EventAutoRaceBattle(this, 60, count);
@@ -32129,6 +32130,11 @@ void Player::specialUdpLog(UInt8 type)
 
 	void Player::cancelAutoRaceBattle()
 	{
+        if(getThreadId() != WORKER_THREAD_NEUTRAL)
+        {
+            GameMsgHdr hdr(0x1D1, WORKER_THREAD_NEUTRAL, this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
         EventBase* ev = eventWrapper.RemoveTimerEvent(this, EVENT_AUTORACEBATTLE, 0);
         if(ev == NULL)
             return;

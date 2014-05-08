@@ -3372,8 +3372,6 @@ namespace GObject
         bool _isLastLevel;
         //匹配者ID
         Player* _matchPlayer;
-        //是否自动挂机
-        void* _rbAutoTimer;
     public:
         UInt8 getRaceBattlePos() { return _playerPos; }
         void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
@@ -3385,11 +3383,13 @@ namespace GObject
         void setAwardLevel(UInt8 level) { _awardLevel = level; }
         UInt8 getChallengeStatus(Player* pl);
         void insertChallengePlayer(Player* pl);
+        void clearChallengePlayer();
         void makeRBBattleInfo(Stream &st);
         void insertPlayerRecord(PlayerReport record);
+        void clearPlayerRecord();
         UInt8 getContinueWinPage() { return _continueWinPage; }
         void setContinueWinPage(UInt8 page) { _continueWinPage = page; }
-        void readRandBattleReport(UInt32 reportId);
+        //void readRandBattleReport(UInt32 reportId);
         void setRBBuf(UInt8 id, float value) { _rbBufId = id; _rbValue = value; }
         UInt8 getRBBufId() { return _rbBufId; }
         float getRBBufValue() { return _rbValue; }

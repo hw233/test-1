@@ -16,7 +16,7 @@
 #include "RaceBattle.h"
 
 //#define RACEBATTLE_STARTTIME 20*3600
-#define RACEBATTLE_STARTTIME (TimeUtil::Now() - (TimeUtil::Now() % 3600))
+#define RACEBATTLE_STARTTIME ((TimeUtil::Now() - TimeUtil::SharpDay(0, now))/ 3600 * 3600)
 #define RACEBATTLE_ENDTIME RACEBATTLE_STARTTIME+1800
 #define PAGE_MAX 5
 
@@ -76,6 +76,30 @@ namespace GObject
         return min;
     }
 
+    inline bool enum_reset_all(Player* pl, int)
+    {
+        if(!pl)
+            return true;
+        pl->setRaceBattlePos(0);
+        for(UInt8 i = 0; i < 7; i++)
+            pl->setStarCnt(i, 0);
+        pl->setContinueWinCnt(0);
+        pl->setAwardLevel(2);
+        pl->clearChallengePlayer();
+        pl->clearPlayerRecord();
+        pl->setContinueWinPage(1);
+        pl->setRBBuf(0, 0);
+        pl->setExitCd(0);
+        pl->setStarTotal(0);
+        pl->setCanContinueCnt(0);
+        pl->setContinueLoseCnt(0);
+        pl->setAttackCd(0);
+        pl->setIsLastLevel(false);
+        pl->setMatchPlayer(NULL);
+        pl->cancelAutoRaceBattle();
+        return true;
+    }
+
     void RaceBattle::raceBattleCheck()
     {
         UInt32 now = TimeUtil::Now();
@@ -123,6 +147,7 @@ namespace GObject
                 SYSMSG_BROADCASTV(6007);
                 raceBattleBroadcast(2, 0);
                 awardLevelRank();
+                globalPlayers.enumerate(enum_reset_all, 0);
             }
             _status = 0;
         }
