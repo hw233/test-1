@@ -15,7 +15,8 @@
 
 #include "RaceBattle.h"
 
-#define RACEBATTLE_STARTTIME 20*3600
+//#define RACEBATTLE_STARTTIME 20*3600
+#define RACEBATTLE_STARTTIME (TimeUtil::Now() - (TimeUtil::Now() % 3600))
 #define RACEBATTLE_ENDTIME RACEBATTLE_STARTTIME+1800
 #define PAGE_MAX 5
 

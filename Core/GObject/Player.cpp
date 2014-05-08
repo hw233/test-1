@@ -3589,7 +3589,7 @@ namespace GObject
             //灵侍id
             UInt32 lss[3] = {0};
             fgt->getAllLingshiId(lss);
-            st << lss[0] << lss[1] << lss[2];
+            //st << lss[0] << lss[1] << lss[2];
 
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
