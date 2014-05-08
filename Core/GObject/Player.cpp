@@ -3543,10 +3543,12 @@ namespace GObject
                 << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
 				<< fgt->getAmuletId() << fgt->getRingId();
             fgt->getAllTrumps(st);
+            /* [暂时不上线]
             //灵侍id
             UInt32 lss[3] = {0};
             fgt->getAllLingshiId(lss);
             st << lss[0] << lss[1] << lss[2];
+            */
 
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);

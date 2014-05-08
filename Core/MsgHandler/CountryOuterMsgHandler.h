@@ -7004,6 +7004,7 @@ void OnErlkingReq(GameMsgHdr & hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
 
+    return; //暂时不上线
     if(player->GetLev() < 85)
         return;
 
