@@ -31986,11 +31986,15 @@ void Player::specialUdpLog(UInt8 type)
     }
 }
 
-bool Player::canInviteCutting()
+bool Player::canInviteCutting(Player *pl)
 {
     UInt32 TreeCount = GetVar(VAR_CUTTREE_COUNT);
     UInt8 count = GET_BIT_8(drinkCount , 0 );
     UInt32 TreeCount2 = GetVar(VAR_CUTTREE_BUY); 
+
+    std::set<Player *>::iterator it = getDrinkInfo().plset.find(pl);
+    if(it != getDrinkInfo().plset.end())
+        return false;
     if(TreeCount >= 2 && TreeCount2 < 1)
         return false;
     if(getCuttingInfo().cutter != NULL || getCuttingInfo().time != 0 )

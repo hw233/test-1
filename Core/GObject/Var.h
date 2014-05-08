@@ -712,7 +712,7 @@ namespace GObject
         
         VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 729,//璇玑阵图自动战斗使用金钱标志
         VAR_ATOXJFM = 730,     //自动璇玑阵图id
-        // 731 - 740 for lib
+        // 731 - 750 for lib
         VAR_FRIEND_ACHIEVEMENT  = 731,  //友好度成就奖励领取情况
         VAR_CLAN_FRIEND = 732 ,    //帮派玩家是否增加过友好度(8位) , 玩家购买的剩余饮酒次数 
         VAR_DRINK_COUNT = 733 ,    //饮酒次数 主动发起(8位) ,被动接受(8位) ,玩家总购买的次数 
@@ -723,6 +723,7 @@ namespace GObject
         VAR_CUTTREE_COUNT = 737 ,    //伐木次数 主动发起(8位) ,玩家总购买的次数 
         VAR_TREE_VALUE = 738 ,    //木片数
         VAR_TREE_VALUE_DAY = 738 ,    //今日被邀请获得的木片数
+        VAR_TREE_TIME = 739,      //砍树时间
 
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
