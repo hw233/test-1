@@ -736,7 +736,7 @@ namespace GData
             aextra->_extra.magres *= 100;
             aextra->_extra.criticaldmgimmune = 0;
 
-            StringTokenizer tk(ae.skill, ",");
+            StringTokenizer tk(ae.skill, "|");
             if (tk.count())
             {
                 for (size_t i=0; i<tk.count(); ++i)

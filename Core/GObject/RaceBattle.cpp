@@ -12,7 +12,8 @@
 #include "Mail.h"
 #include "Common/Itoa.h"
 #include "Common/TimeUtil.h"
-
+#include "Country.h"
+#include "Script/GameActionLua.h"
 #include "RaceBattle.h"
 
 #define RACEBATTLE_STARTTIME 20*3600
@@ -327,7 +328,7 @@ namespace GObject
         }
         else if(level == 1 && (origPos % 10) == 0)
         {
-            GameAction()->doStrong(player, SthZixiaozhidian, 0, 0);
+            GameAction()->doStrong(pl, SthZixiaozhidian, 0, 0);
             insertLevelStarSort(pl, level);
         }
         else
