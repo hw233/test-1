@@ -219,7 +219,7 @@ MSG_REG_2(GameMsgHdr, 0x1DD, OnSetCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DE, OnDelCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1DF, OnSendCFriendInvited);
 MSG_REG_2(GameMsgHdr, 0x1AF, OnSendDuoBaoBegin);
-MSG_REG_2(GameMsgHdr, 0x201, OnClearTYSS);
+MSG_REG_2(GameMsgHdr, 0x195, OnClearTYSS);
 MSG_REG_2(GameMsgHdr, 0x191, OnSendClanFriendsA);
 MSG_REG_2(GameMsgHdr, 0x192, OnSendClanFriendsB);
 //MSG_REG_2(GameMsgHdr, 0x193, OnSendInactive);

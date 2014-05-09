@@ -1047,7 +1047,7 @@ void OnClearGuankaActRank( GameMsgHdr& hdr, const void* data )
 void OnClearTYSS( GameMsgHdr& hdr, const void* data )
 {
     using namespace GObject;
-    MSG_QUERY_PLAYER(player);
+    //MSG_QUERY_PLAYER(player);
 
     World::tyss_PlayerSort.clear();
     World::tyss_ClanSort.clear();
