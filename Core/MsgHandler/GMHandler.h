@@ -193,6 +193,7 @@ private:
     void testLingbao(GObject::Player * player, std::vector<std::string>& args);
     void OnAddZhenyuan(GObject::Player * player, std::vector<std::string>& args);
     void OnPetEq(GObject::Player * player, std::vector<std::string>& args);
+    void OnAddLingshiExp(GObject::Player *player, std::vector<std::string>& args);
 
 
     void OnDreamerTimeSet(GObject::Player *player, std::vector<std::string>& args);
