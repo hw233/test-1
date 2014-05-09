@@ -8256,7 +8256,8 @@ namespace GObject
 		e = lingshi;
         ITEM_BIND_CHECK(itype->bindType, bind);
         lingshi->SetBindStatus(bind);
-        ItemNotifyEquip(static_cast<ItemEquip *>(lingshi));
+        if(notify)
+            ItemNotifyEquip(static_cast<ItemEquip *>(lingshi));
 		SendSingleLingshiData(lingshi, 1);
         if(lingshi->getQuality() >= Item_Purple)
             SYSMSG_BROADCASTV(4160, m_Owner->getCountry(), m_Owner->getName().c_str(), lingshi->getQuality(), lingshi->getName().c_str());

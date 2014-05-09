@@ -285,7 +285,7 @@ void Erlking::AutoBattle(UInt8 copyId, UInt16 num)
     if(0 == num || num > surplusNum)
         return;
 
-    if(m_owner->GetPackage()->GetRestPackageSize(2) < 2*num)
+    if(m_owner->GetPackage()->GetRestPackageSize() < ((7*num)/99+1) || m_owner->GetPackage()->GetRestPackageSize(2) < num)
     {
         m_owner->sendMsgCode(0, 8050);
         return;
