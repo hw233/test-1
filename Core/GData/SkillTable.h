@@ -55,6 +55,7 @@ enum    // 技能触发方式
     /*29*/ SKILL_ONWITHSTAND,    // 招架（可以反击状态下触发）
     /*30*/ SKILL_VIOLENT,    // 狂暴(怪物技能)
     /*31*/ SKILL_REVIVAL,    // 生生不息(怪物技能)
+    /*32*/ SKILL_LINGSHI,    // 灵侍技能
     SKILL_PASSIVES
 };
 

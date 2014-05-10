@@ -354,6 +354,9 @@ private:
         e_yehuoBleedMo = 129,    // 业火(墨流血)
         e_unYehuoBleedMo = 130,  // 解除业火
 
+        e_changeMode = 131,  //改变模型
+        e_unChangeMode = 132,  //恢复模型
+
         e_MAX_STATE,
     };
 
@@ -795,6 +798,7 @@ private:
 	UInt32 attackByJiuzi(BattleFighter * bf, bool& first, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, int counter_deny = -1, AttackPoint * counter_deny_list = NULL, std::vector<AttackAct>* atkAct = NULL, bool canProtect = false);
     void attackByJiuziSS(BattleFighter* bf, const GData::SkillBase* skill);
     bool doEffectAfterCount(BattleFighter* bf, const GData::SkillBase* skill, UInt16 actCnt);
+    UInt32 doLingshiModelAttack(BattleFighter* bf, UInt32 skillId);
 };
 
 }

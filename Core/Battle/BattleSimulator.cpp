@@ -15115,5 +15115,24 @@ bool BattleSimulator::doEffectAfterCount(BattleFighter* bf, const GData::SkillBa
     return bRet;
 }
 
+UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt32 skillId)
+{
+    if(!bf)
+        return 0;
+    const GData::SkillBase* passiveSkill = GData::skillManager[skillId];
+    if(!passiveSkill)
+        return 0;
+
+    //改变模型
+    appendDefStatus(e_changeMode, SKILL_ID(skillId), bf);
+
+    Int32 target_side;
+    Int32 target_pos;
+    Int32 cnt = 0;
+    getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
+    cnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
+    return cnt;
+}
+
 } // namespace Battle
 

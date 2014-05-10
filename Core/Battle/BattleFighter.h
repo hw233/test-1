@@ -1494,6 +1494,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillBLTY100;
     std::vector<GData::SkillItem> _passiveSkillViolent100;
     std::vector<GData::SkillItem> _passiveSkillRevival100;
+    std::vector<GData::SkillItem> _passiveSkillLingshi100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1504,6 +1505,7 @@ private:
     const GData::SkillBase* getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillLingshi100(size_t& idx, bool noPossibleTarget = false);
 
 private:
     float _2ndRateCoAtk;
