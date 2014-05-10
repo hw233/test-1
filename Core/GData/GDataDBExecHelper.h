@@ -838,7 +838,7 @@ struct DBLingShi
 {
     UInt16 id;
     UInt8 level;
-    UInt8 isUp;
+    UInt8 isBreak;
     UInt16 useItem;
     UInt16 useGold;
     float attack;
@@ -1820,7 +1820,7 @@ SPECIALDEF(19)
 	(
     UInt16, id,
     UInt8, level,
-    UInt8, isUp,
+    UInt8, isBreak,
     UInt16, useItem,
     UInt16, useGold,
     float, attack,

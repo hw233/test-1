@@ -13,7 +13,7 @@ void LingshiCls::setLingshiTable(DBLingShi& dbls)
     LingshiData lsd;
     lsd.id = dbls.id;
     lsd.level = dbls.level;
-    lsd.isUp = dbls.isUp > 0;
+    lsd.isBreak = dbls.isBreak > 0;
     lsd.useItem = dbls.useItem;
     lsd.useGold = dbls.useGold;
 
@@ -60,7 +60,7 @@ UInt8 LingshiCls::getLingshiMaxLev(UInt32 lid, UInt8 lvl)
     std::advance(it, lvl);
     for(; it != iter->second.end(); ++ it)
     {
-        if((*it).isUp)
+        if((*it).isBreak)
             return (*it).level;
     }
     return iter->second.size();
@@ -96,7 +96,7 @@ LingshiData * LingshiCls::getLingshiData(UInt32 lid, UInt8 lvl)
     return NULL;
 }
 
-bool LingshiCls::canUpgrade(UInt32 lid, UInt8 lvl)
+bool LingshiCls::canUpgrade(UInt32 lid, UInt8 lvl, UInt32& exp)
 {
     std::map<UInt32, LingshiDataVec>::iterator iter = _lingshiData.find(lid);
     if(iter == _lingshiData.end())
@@ -104,7 +104,20 @@ bool LingshiCls::canUpgrade(UInt32 lid, UInt8 lvl)
     if(lvl >= iter->second.size())
         return false;
     lvl = lvl >= 1 ? lvl - 1 : lvl;
-    return !iter->second[lvl].isUp;
+    bool isBreak = iter->second[lvl].isBreak;
+    if(isBreak)
+    {
+        std::map<UInt8, LingshiUpgrade>::iterator it = _lingshiUp.find(lvl);
+        if(it == _lingshiUp.end())
+            return false;
+        if(exp >= it->second.exp)
+        {
+            exp = it->second.exp;
+            return false;
+        }
+        return true;
+    }
+    return !isBreak;
 }
 
 bool LingshiCls::canBreak(UInt32 lid, UInt8 lvl)
@@ -115,7 +128,7 @@ bool LingshiCls::canBreak(UInt32 lid, UInt8 lvl)
     if(lvl >= iter->second.size())
         return false;
     lvl = lvl >= 1 ? lvl - 1 : lvl;
-    return iter->second[lvl].isUp;
+    return iter->second[lvl].isBreak;
 }
 
 }

@@ -11,12 +11,12 @@ struct LingshiData
 {
     UInt16 id;
     UInt8 level;
-    bool isUp;
+    bool isBreak;   //等级临界点时,若可突破就不可升级
     UInt16 useItem;
     UInt16 useGold;
     AttrExtra attrs;
 
-    LingshiData() : id(0), level(0), isUp(false), useItem(0), useGold(0) {}
+    LingshiData() : id(0), level(0), isBreak(false), useItem(0), useGold(0) {}
 };
 typedef std::vector<LingshiData> LingshiDataVec;
 struct LingshiUpgrade
@@ -37,7 +37,7 @@ public:
     LingshiData * getLingshiData(UInt32, UInt8);
     UInt32 getLingShiMaxExp(UInt8);
     UInt32 getLevUpTael(UInt8);
-    bool canUpgrade(UInt32, UInt8);
+    bool canUpgrade(UInt32, UInt8, UInt32&);
     bool canBreak(UInt32, UInt8);
 private:
     std::map<UInt32, LingshiDataVec> _lingshiData;

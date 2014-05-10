@@ -4958,7 +4958,7 @@ void GMHandler::OnAddLingshiExp(GObject::Player *player, std::vector<std::string
     if(!lingshi || !IsLingShi(lingshi->getClass()))
         return;
     ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
-    if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv))
+    if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
         return;
     UInt32 upExp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
     if(upExp == 0) return;
@@ -4967,7 +4967,7 @@ void GMHandler::OnAddLingshiExp(GObject::Player *player, std::vector<std::string
     UInt8 tmp = lsAttr.lv;
     for(UInt8 i = tmp; i <= maxLev; ++ i)
     {
-        if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv))
+        if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
             break;
         if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
             break;

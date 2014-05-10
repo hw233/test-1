@@ -8274,7 +8274,7 @@ namespace GObject
 		if(!fgt || !equip || !IsLingShi(equip->getClass()))
 			return;
         ItemLingshiAttr& lsAttr = equip->getLingshiAttr();
-        if(!GData::lingshiCls.canUpgrade(equip->GetTypeId(), lsAttr.lv))
+        if(!GData::lingshiCls.canUpgrade(equip->GetTypeId(), lsAttr.lv, lsAttr.exp))
             return;
         UInt32 needTael = 0;
         std::vector<ItemLingshi *> eatVec;
@@ -8338,7 +8338,7 @@ namespace GObject
             UInt8 maxLev = GData::lingshiCls.getLingshiMaxLev(equip->GetTypeId(), tmp);
             for(UInt8 i = tmp; i <= maxLev; ++ i)
             {
-                if(!GData::lingshiCls.canUpgrade(equip->GetTypeId(), lsAttr.lv))
+                if(!GData::lingshiCls.canUpgrade(equip->GetTypeId(), lsAttr.lv, lsAttr.exp))
                     break;
                 if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
                     break;
@@ -8362,7 +8362,7 @@ namespace GObject
 		if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
 			return;
         ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
-        if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv))
+        if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
             return;
         bool hasLucky = uRand(10000) < 1000;
         if(type)
@@ -8409,7 +8409,7 @@ namespace GObject
         UInt8 tmp = lsAttr.lv;
         for(UInt8 i = tmp; i <= maxLev; ++ i)
         {
-            if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv))
+            if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
                 break;
             if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
                 break;
@@ -8444,7 +8444,7 @@ namespace GObject
         if(!GData::lingshiCls.canBreak(lingshi->GetTypeId(), lsAttr.lv))
             return;
         GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lingshi->GetTypeId(), lsAttr.lv);
-        if(!lsd || !lsd->isUp)
+        if(!lsd)
             return;
         if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
             return;

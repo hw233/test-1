@@ -3108,7 +3108,7 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBLingShi dbls;
-		if(execu->Prepare("SELECT `id`, `level`, `isUp`, `useItem`, `useGold`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `toughlvl`, `action`, `hitrlvl`, `evdlvl`, `crilvl`, `criticaldmg`, `pirlvl`, `counterlvl`, `mreslvl` FROM `lingshi`", dbls) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `level`, `isBreak`, `useItem`, `useGold`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `toughlvl`, `action`, `hitrlvl`, `evdlvl`, `crilvl`, `criticaldmg`, `pirlvl`, `counterlvl`, `mreslvl` FROM `lingshi`", dbls) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
