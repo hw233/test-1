@@ -163,6 +163,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_dao_rose] = &BattleSimulator::doSkillEffectExtra_Dao_Rose;
         skillEffectExtraTable[GData::e_eft_mo_knot] = &BattleSimulator::doSkillEffectExtra_Mo_Knot;
         skillEffectExtraTable[GData::e_eft_prudent] = &BattleSimulator::doSkillEffectExtra_Prudent;
+        skillEffectExtraTable[GData::e_eft_chaos_world] = &BattleSimulator::doSkillEffectExtra_ChaosWorld;
     }
 }
 
@@ -291,6 +292,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_dao_rose] = &BattleSimulator::doSkillEffectExtra_Dao_Rose;
         skillEffectExtraTable[GData::e_eft_mo_knot] = &BattleSimulator::doSkillEffectExtra_Mo_Knot;
         skillEffectExtraTable[GData::e_eft_prudent] = &BattleSimulator::doSkillEffectExtra_Prudent;
+        skillEffectExtraTable[GData::e_eft_chaos_world] = &BattleSimulator::doSkillEffectExtra_ChaosWorld;
     }
 }
 
@@ -465,6 +467,8 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
     {
         _fgtlist[0].clear();
         _fgtlist[1].clear();
+        _listDirty[0] = false;
+        _listDirty[1] = false;
     }
 
     // [[ Make packet header data
@@ -571,6 +575,8 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
                 flag2 |= _player[i]->getAthlRivalBuff();
             }
         }
+        
+        // 将散仙信息放入战报中
         for(int j = 0; j < 25; ++ j)
         {
             BattleObject * bo = getObject(i, j);
@@ -753,11 +759,11 @@ void  BattleSimulator::SendAttainMsgToPlayer( GObject::Player* player, UInt32 id
 #ifdef NO_ATTAINMENT
      return;
 #endif
-                 stAttainMsg  msg;
-                 msg.attainID = id;
-                 msg.param = param;
-                 GameMsgHdr h(0x244,  player->getThreadId(), player, sizeof(msg));
-                 GLOBAL().PushMsg(h, & msg);
+     stAttainMsg  msg;
+     msg.attainID = id;
+     msg.param = param;
+     GameMsgHdr h(0x244,  player->getThreadId(), player, sizeof(msg));
+     GLOBAL().PushMsg(h, & msg);
 
 }
 void BattleSimulator::CheckAttain()
@@ -5487,13 +5493,13 @@ BattleFighter* BattleSimulator::getTherapyTarget3(BattleFighter* bf, UInt8 * exc
             pos = i;
         }
     }
-
     if(maxHpLost > 0.001f)
         retbo = static_cast<BattleFighter*>(getObject(side, pos));
 
     return retbo;
 }
 
+// 散仙入场，仅在开始正式行动前调用
 UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
 {
     UInt32 rcnt = 0;
@@ -8241,6 +8247,7 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
         {
             if(passiveSkill->effect == NULL)
                 continue;
+            doSkillEffectExtraAttack(bf, bf->getSide(), bf->getPos(), passiveSkill);
 
             if (!passiveSkill || !passiveSkill->effect)
                 passiveSkill = bf->getPassiveSkillOnHPChange(idx);
@@ -8248,7 +8255,6 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
             {
                 int target_side, target_pos, cnt;
                 getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-                //doSkillEffectExtraAttack(bf, target_side, target_pos, passiveSkill);
                 GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
                 if(ss)
                 {
@@ -8258,10 +8264,6 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
                     ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_ATKADD);
                     if (ef && bf->updateHPPAttackAdd(ef->value, ef->valueExt1 / 100, ef->valueExt2))
                     {
-                        /*
-                        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stAtk, bf->getHPAtkAdd(), 0, false);
-                        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stMagAtk, bf->getHPMagAtkAdd(), 0, false);
-                        */
                         appendDefStatus(e_skill, passiveSkill->getId(), bf);
                         appendStatusChange(e_stAtk, static_cast<UInt32>(bf->getAttack()), passiveSkill->getId(), bf);
                         appendStatusChange(e_stMagAtk, static_cast<UInt32>(bf->getMagAttack()), passiveSkill->getId(), bf);
@@ -8272,12 +8274,6 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
                     ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_DAMAG_REDUCE);
                     if (ef && bf->updateHPPAttackReduce(ef->value, ef->valueExt1 / 100, ef->valueExt2))
                     {
-                        /*
-                        UInt32 value = static_cast<UInt32>(bf->getAtkReduce()*100);
-                        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stAtkReduce, value, 0, false);
-                        value = static_cast<UInt32>(bf->getMagAtkReduce()*100);
-                        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, passiveSkill, e_stMagAtkReduce, value, 0, false);
-                        */
                         appendDefStatus(e_skill, passiveSkill->getId(), bf);
                         UInt32 value = static_cast<UInt32>(bf->getMagAtkReduce()*100);
                         appendStatusChange(e_stMagAtkReduce, value, passiveSkill->getId(), bf);
@@ -8290,7 +8286,6 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
                     ef = ss->getEffect(GData::ON_HPCHANGE, GData::TYPE_HPP_RECOVER);
                     if (ef)
                     {
-                        //hpr += bf->updateHPPRecover2Fake(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2);
                         hpr += bf->updateHPPRecover2Fake(ef->value / 100, ef->valueExt1 / 100, ef->valueExt2);
                         if (hpr)
                             passiveSkill2 = passiveSkill;
@@ -14231,6 +14226,41 @@ bool BattleSimulator::doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleF
     }
 
     return false;
+}
+
+void BattleSimulator::doSkillEffectExtra_ChaosWorld(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+
+    size_t cnt = eft.size();
+    if(cnt != efv.size() || cnt != efl.size())
+        return;
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        if(eft[i] == GData::e_eft_chaos_world)
+        {
+            if(bf)
+            {
+                if ((bf->getHPP() * 100) <= efv[i] && !bf->getChaosWorld())
+                {
+                    bf->setChaosWorld(true);
+                    appendDefStatus(e_chaosWorld, 0, bf);
+                }
+                else if (bf->getChaosWorld())
+                {
+                    bf->setChaosWorld(false);
+                    appendDefStatus(e_unChaosWorld, 0, bf);
+                }
+            }
+            return;
+        }
+    }
+
+    return;
 }
 
 void BattleSimulator::doPassiveSkillBePHYDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg)
