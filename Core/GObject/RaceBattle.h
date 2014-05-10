@@ -60,7 +60,7 @@ class RaceBattle : public Singleton<RaceBattle>
 
     private:
         static UInt8 _status; //0（未开启），1-3（17：50~20：00），4（20：00~20：30）
-        static RBSortType _levelStarSort[5]; //每层星级数排名
+        static RBSortType _levelStarSort[6]; //每层星级数排名
         static RBSortType _contineWinSort;
 };
 

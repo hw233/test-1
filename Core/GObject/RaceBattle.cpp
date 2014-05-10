@@ -23,7 +23,7 @@ namespace GObject
 {
     static UInt8 gPerLeveCnt[] = {2, 3, 4, 5, 7, 0};
     UInt8 RaceBattle::_status = 0;
-    RBSortType RaceBattle::_levelStarSort[5];
+    RBSortType RaceBattle::_levelStarSort[6];
     RBSortType RaceBattle::_contineWinSort;
 
     void raceBattleBroadcast(UInt8 status, UInt32 lefttime)
@@ -273,7 +273,7 @@ namespace GObject
             pl->sendMsgCode(0, 1011);
             return;
         }
-        pl->getAttainment(100 * (level - 1));
+        pl->getAttainment(100 * (level - 1), true);
 
         ++awardlevel;
         pl->setAwardLevel(awardlevel);
@@ -336,7 +336,7 @@ namespace GObject
 
         std::vector<Player* > vecPlayer;
         UInt32 count = 0;
-        for(UInt8 i = level; i <= 5; i++)
+        for(UInt8 i = level; i <= 6; i++)
         {
             RBSortType& levelSort = _levelStarSort[i - 1];
             for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
@@ -384,7 +384,7 @@ namespace GObject
 
 	void RaceBattle::makeStarInfo(Stream& st, Player* pl, UInt8 level)
     {
-        if(pl == NULL || level == 0 || level > 5)
+        if(pl == NULL || level == 0 || level > 6)
         {
             st << static_cast<UInt32>(0);
             st << static_cast<UInt8>(0);
@@ -600,7 +600,7 @@ namespace GObject
             attainment = 30;
         else
             attainment = 15;
-        pl->getAttainment(attainment);
+        pl->getAttainment(attainment, true);
 
         return res ? 1 : 2;
     }
@@ -608,7 +608,7 @@ namespace GObject
     void RaceBattle::awardLevelRank()
     {
         UInt8 rank = 0;
-        for(UInt8 i = 5; i >= 1; i--)
+        for(UInt8 i = 6; i >= 1; i--)
         {
             RBSortType& levelSort = _levelStarSort[i - 1];
             for(RBSortType::iterator it = levelSort.begin(); it != levelSort.end(); ++it)
@@ -750,7 +750,7 @@ namespace GObject
     {
         if(!pl)
             return;
-        if(level == 0 || level > 5)
+        if(level == 0 || level > 6)
             return;
 
         RBSortType& levelSort = _levelStarSort[level - 1];
@@ -768,7 +768,7 @@ namespace GObject
     {
         if(!pl)
             return;
-        if(level == 0 || level > 5)
+        if(level == 0 || level > 6)
             return;
         //if(pl->getStarTotal() < 1)
         //    return;
@@ -1013,7 +1013,7 @@ namespace GObject
             return;
         UInt8 pos = pl->getRaceBattlePos();
         UInt8 level = pos / 10;
-        if(level == 0 || level >= 6)
+        if(level == 0 || level > 6)
             return;
         GData::RandBattleData::stRandBattle* rb = GData::randBattleData.getRandBattleData(pos);
         if(!rb)

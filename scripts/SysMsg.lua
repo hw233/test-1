@@ -98,6 +98,7 @@ sysMsg:set(193, 1, "您获得镇魔值%u")
 sysMsg:set(194, 0x35, "获得镇魔值%u")
 sysMsg:set(195, 0x35, "获得玄天瑞露%u")
 sysMsg:set(196, 0x35, "消耗玄天瑞露%u")
+sysMsg:set(197, 0x35, "您获得%u点荣誉")
 
 sysMsg:set(1000, 1, "[f:%u:%s]获得经验值%llu")
 sysMsg:set(1001, 1, "[f:%u:%s]升级了，等级提升到了%u")
@@ -179,6 +180,7 @@ sysMsg:set(1082, 1, "您未通过防沉迷认证，获得银币减半%u")
 sysMsg:set(1083, 1, "您未通过防沉迷认证，获得减半铜钱%u")
 sysMsg:set(1084, 1, "您未通过防沉迷认证，没有获得收益")
 
+sysMsg:set(1089, 1, "您获得%u点荣誉")
 sysMsg:set(1090, 1, "您获得%u点声望")
 sysMsg:set(1091, 1, "您消费%u点声望")
 

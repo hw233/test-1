@@ -6317,10 +6317,16 @@ namespace GObject
 		return ;
 	}
 
-    UInt32  Player::getAttainment( UInt32 a)
+    UInt32  Player::getAttainment( UInt32 a, bool notify)
     {
         if(a == 0)
             return _playerData.attainment;
+
+        if(notify)
+        {
+            SYSMSG_SENDV(197, this, a);
+            SYSMSG_SENDV(1089, this, a);
+        }
 
         _playerData.attainment += a;
 

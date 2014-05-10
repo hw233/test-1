@@ -1540,7 +1540,7 @@ namespace GObject
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
 		void useAchievement2( UInt32 a, Player *attacker, ConsumeInfo * ci = NULL);
 
-        UInt32 getAttainment(UInt32 a = 0);
+        UInt32 getAttainment(UInt32 a = 0, bool notify = false);
         UInt32 useAttainment(UInt32 a, ConsumeInfo * ci=NULL);
 
 		UInt32 getPrestige(UInt32 a = 0, bool notify = true);
