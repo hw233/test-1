@@ -70,6 +70,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _shieldHP(0), _shieldHPLast(0), _petShieldHP(0), 
     _petProtect100(false), _petProtect100Last(0), _petProtect100Skill(NULL), _petAtk100(0), _petAtk100Last(0), _petMark(false),
     _flawCount(0), _flawDamageAdd(0), _flawLast(0), _withstandFactor(0), _withstandCount(0),
+    _chaosWorld(false),
     _atkAddSpecial(0), _atkSpecialLast(0), _magAtkAddSpecial(0), _magAtkSpecialLast(0), 
     _atkDecSpecial(0), _atkDecSpecialLast(0), _magAtkDecSpecial(0), _magAtkDecSpecialLast(0),
     _skillUsedChangeAttrValue(0), _skillUsedChangeAttrLast(0), _skillUsedChangeAttr(0),
@@ -526,69 +527,69 @@ void BattleFighter::updateBuffExtras()
         {
             case HP_ID:
                 _attrExtra.hp *= (1 + factor);
-            break;
+                break;
             case ACTION_ID:
                 _attrExtra.action *= (1 + factor);
-            break;
+                break;
             case HIT_ID:
                 _attrExtra.hitrate *= (1 + factor);
-            break;
+                break;
             case EVADE_ID:
                 _attrExtra.evade *= (1 + factor);
-            break;
+                break;
             case CRITICAL_ID:
                 _attrExtra.critical *= (1 + factor);
-            break;
+                break;
             case PIERCE_ID:
                 _attrExtra.pierce *= (1 + factor);
-            break;
+                break;
             case COUNTER_ID:
                 _attrExtra.counter *= (1 + factor);
-            break;
+                break;
             case TOUGH_ID:
                 _attrExtra.tough *= (1 + factor);
-            break;
+                break;
             case MAGRES_ID:
                 _attrExtra.magres *= (1 + factor);
-            break;
+                break;
             case STRENGTH_ID:
                 _attrExtra.strength *= (1 + factor);
-            break;
+                break;
             case PHYSIQUE_ID:
                 _attrExtra.physique *= (1 + factor);
-            break;
+                break;
             case AGILITY_ID:
                 _attrExtra.agility *= (1 + factor);
-            break;
+                break;
             case INTELLIGENCE_ID:
                 _attrExtra.intelligence *= (1 + factor);
-            break;
+                break;
             case WILL_ID:
                 _attrExtra.will *= (1 + factor);
-            break;
+                break;
             case ATTACK_ID:
                 _attrExtra.attack *= (1 + factor);
-            break;
+                break;
             case MAGATK_ID:
                 _attrExtra.magatk *= (1 + factor);
-            break;
+                break;
             case DEFEND_ID:
                 _attrExtra.defend *= (1 + factor);
-            break;
+                break;
             case MAGDEF_ID:
                 _attrExtra.magdef *= (1 + factor);
-            break;
+                break;
             case CRIDMG_ID:
                 _attrExtra.criticaldmg *= (1 + factor);
-            break;
+                break;
             case CRIIMMUNE_ID:
                 _attrExtra.criticaldmgimmune *= (1 + factor);
-            break;
+                break;
             case AURA_ID:
                 _attrExtra.aura += factor;
-            break;
+                break;
             default:
-            break;
+                break;
         }
     }
 }

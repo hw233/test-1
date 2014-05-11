@@ -43,7 +43,7 @@ class BattleFighter:
 {
 	friend class BattleSimulator;
 
-#define BLEED_TYPE_FLAG_NONE            0x00000000      // 没人
+#define BLEED_TYPE_FLAG_NONE            0x00000000      // 没流血
 #define BLEED_TYPE_FLAG_1               0x00000001      // 儒流血
 #define BLEED_TYPE_FLAG_2               0x00000002      // 释流血
 #define BLEED_TYPE_FLAG_3               0x00000004      // 道流血
@@ -233,6 +233,7 @@ public:
 	float getTough(BattleFighter* defgt);
     float getCriticalDmgImmune() { return _attrExtra.criticaldmgimmune+_fighter->getAcupointsGoldAttr(1); }
 	inline UInt32 getMaxHP() {Int64 ret = _maxhp + _maxhpAdd + _maxhpAdd2; return (ret > 0 ? ret : 0);}
+    float getHPP() { float ret = static_cast<float>(getHP())/ static_cast<float>(getMaxHP()); return ret; }
 	inline Int32 getAction() {Int32 ret = _maxAction + _maxActionAdd + _maxActionAdd2; return (ret > 0 ? ret : 0);}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
 
@@ -750,6 +751,8 @@ private:
 
     float _withstandFactor;
     UInt8 _withstandCount;
+
+    bool  _chaosWorld;
 
 
     // cotton add for skillstrengthen
@@ -1273,6 +1276,9 @@ public:
     float getWithstandFactor() { return _withstandFactor; }
     UInt8 getWithstandCount() { return _withstandCount; }
     void  resetWithstandCount() { _withstandCount = 0; }
+
+    bool  getChaosWorld () { return _chaosWorld; }
+    void  setChaosWorld(bool chaosWorld) { _chaosWorld = chaosWorld; }
 
 public:
     float _counter_spirit_atk_add;
