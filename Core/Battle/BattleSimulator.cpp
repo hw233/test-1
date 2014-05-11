@@ -5782,7 +5782,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         UInt32 confuse = bf->getConfuseRound();
         UInt32 forget = bf->getForgetRound();
         int target_pos;
-        int bleed_target_pos = -1;
+        int bleed_target_pos = -1; // 是否流血的目标
         int otherside = 1 - bf->getSide();
         if(!stun) // 不是昏迷状态，可以行动
         {
@@ -5986,14 +5986,11 @@ UInt32 BattleSimulator::doAttack( int pos )
 
 
                         // 攻击完毕，把临时增加的命中反击清除
-                        if(true)
+                        bf->setHitChangeByPeerless(0);
+                        if(ptarget)
                         {
-                            bf->setHitChangeByPeerless(0);
-                            if(ptarget)
-                            {
-                                bleed_target_pos = ptarget->getPos();
-                                ptarget->setCounterChangeByPeerless(0);
-                            }
+                            bleed_target_pos = ptarget->getPos();
+                            ptarget->setCounterChangeByPeerless(0);
                         }
 
                         size_t actCnt = atkAct.size();
@@ -6540,22 +6537,6 @@ UInt32 BattleSimulator::doAttack( int pos )
                     }
 
                 }
-                /*
-                std::vector<AttackAct> atkAct;
-                atkAct.clear();
-                if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct))
-                    ++ rcnt;
-
-                size_t actCnt = atkAct.size();
-                for(size_t idx = 0; idx < actCnt; idx++)
-                {
-                    if(atkAct[idx].bf->getHP() == 0)
-                        continue;
-                    if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
-                        ++ rcnt;
-                }
-                atkAct.clear();
-                */
             }
             while(NULL != (skill = bf->getPassiveSkillAftAction()))
             {
