@@ -61,7 +61,6 @@ public:
     void sendPetEvolve();
     UInt16 addPetEvolveInlua(UInt16);
     void initSkillUp();
-    void delSkills(std::string&);
     void AppendEquipData(Stream& st);
     void sendModification(ItemPetEq * equip, UInt8 pos);
     ItemPetEq * findEquip(UInt8 pos);
