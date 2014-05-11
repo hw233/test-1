@@ -2362,6 +2362,7 @@ namespace GObject
         int addr = inet_addr(m_clientIp);
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%" I64_FMT "u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %" I64_FMT "u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
+        cancelAutoRaceBattle();
         if(_isOnline && !hasFlag(Training))
         {
             //if(cfg.GMCheck)
@@ -6317,16 +6318,10 @@ namespace GObject
 		return ;
 	}
 
-    UInt32  Player::getAttainment( UInt32 a, bool notify)
+    UInt32  Player::getAttainment( UInt32 a)
     {
         if(a == 0)
             return _playerData.attainment;
-
-        if(notify)
-        {
-            SYSMSG_SENDV(197, this, a);
-            SYSMSG_SENDV(1089, this, a);
-        }
 
         _playerData.attainment += a;
 

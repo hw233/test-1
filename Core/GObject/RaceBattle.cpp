@@ -273,7 +273,7 @@ namespace GObject
             pl->sendMsgCode(0, 1011);
             return;
         }
-        pl->getAttainment(100 * (level - 1), true);
+        pl->getAchievement(100 * (level - 1));
 
         ++awardlevel;
         pl->setAwardLevel(awardlevel);
@@ -595,12 +595,12 @@ namespace GObject
         stReport.win = res ? 0 : 1;
         stReport.reportId = reptid;
         pl->insertPlayerRecord(stReport);
-        UInt32 attainment;
+        UInt32 achievement;
         if(res == 1)
-            attainment = 30;
+            achievement = 30;
         else
-            attainment = 15;
-        pl->getAttainment(attainment, true);
+            achievement = 15;
+        pl->getAchievement(achievement);
 
         return res ? 1 : 2;
     }
@@ -654,8 +654,7 @@ namespace GObject
         else
             return;
 
-        SYSMSG(title, 5135);
-        SYSMSGV(content, 5136, rank);
+#if 0
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
         {
@@ -679,6 +678,13 @@ namespace GObject
             }
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         }
+#else
+        static UInt32 achievement[] = {300, 200, 150, 120, 100, 50};
+        pl->getAchievement(achievement[type]);
+        SYSMSG(title, 5135);
+        SYSMSGV(content, 5136, rank, achievement[type]);
+        pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+#endif
     }
 
     void RaceBattle::awardContinueWinRankOne(Player* pl, UInt8 num)
@@ -715,6 +721,7 @@ namespace GObject
         if(type <= 3)
             SYSMSG_BROADCASTV(6015 + type, pl->getCountry(), pl->getPName());
 
+#if 0
         SYSMSG(title, 5137);
         SYSMSGV(content, 5138, num);
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
@@ -744,6 +751,14 @@ namespace GObject
             }
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
         }
+#else
+        static UInt32 achievement[] = {5, 15, 30, 50, 75, 105, 140, 180, 225, 275};
+        pl->getAchievement(achievement[type]);
+        SYSMSG(title, 5137);
+        SYSMSGV(content, 5138, num, achievement[type]);
+        pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+
+#endif
     }
 
     void RaceBattle::eraseLevelStarSort(Player* pl, UInt8 level)
