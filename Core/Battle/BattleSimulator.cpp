@@ -38,7 +38,8 @@ static UInt8 getPosition(UInt16 loc)
     return static_cast<UInt8>(pos);
 }
 
-BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, const std::string& name2, UInt8 level2, bool rpt, UInt32 fr): BattleField(), _id(rpt ? IDGenerator::gBattleOidGenerator.ID() : 0), _winner(0), _turns(0), _report(rpt), _fake_turns(fr), _formula(Script::BattleFormula::getCurrent())
+BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, const std::string& name2, UInt8 level2, bool rpt, UInt32 fr): 
+    BattleField(), _id(rpt ? IDGenerator::gBattleOidGenerator.ID() : 0), _winner(0), _turns(0), _report(rpt), _fake_turns(fr), _formula(Script::BattleFormula::getCurrent())
 {
     _position = getPosition(location);
     player->testBattlePunish();
@@ -1385,6 +1386,16 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     }
                 }
             }
+
+           {
+               size_t idx = 0;
+               const GData::SkillBase *skill;
+               while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
+               {
+                   if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_gaoneng)
+                       factor *= (1.0f + skill->effect->eft[0]);
+               }
+           }
 
             UInt8& defdeclast = area_target->getDefDecLast();
             if(defdeclast > 0 && bf->getSide() != area_target->getSide())
@@ -5557,7 +5568,7 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
 UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt)
 {
     UInt32 rcnt = 0;
-    if(skill->cond != GData::SKILL_ENTER || target_pos < 0)
+    if((skill->cond != GData::SKILL_ENTER && skill->cond != GData::SKILL_ENTER_LINGSHI) || target_pos < 0)
     {
         return rcnt;
     }
@@ -5761,6 +5772,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 
     insertFighterStatus(bf);
     _activeFgt = bf;
+    doLingshiModelAttack(bf, 3);
 
     UInt8 side = bf->getSide();
     UInt8 reiatsuType = 0;
@@ -5784,6 +5796,8 @@ UInt32 BattleSimulator::doAttack( int pos )
         int target_pos;
         int bleed_target_pos = -1;
         int otherside = 1 - bf->getSide();
+        bool target_is_stun = false;
+        bool target_is_blind = false;
         if(!stun) // 不是昏迷状态，可以行动
         {
             do 
@@ -5819,6 +5833,10 @@ UInt32 BattleSimulator::doAttack( int pos )
                         reiatsuType = e_reiatsu_normal_attack;
                     }
 
+                    if(mainTarget && (mainTarget->getDeepStunLast() > 0 || mainTarget->getStunRound() > 0))
+                        target_is_stun = true;
+                    if(mainTarget && (mainTarget->getDeepBlindDmgExtra() > 0.001f || mainTarget->getBlind() > 0.001f))
+                        target_is_blind = true;
                     size_t actCnt = atkAct.size();
                     for(size_t idx = 0; idx < actCnt; idx++)
                     {
@@ -5836,6 +5854,10 @@ UInt32 BattleSimulator::doAttack( int pos )
                 {
                     target_pos = getPossibleTarget(bf->getSide(), bf->getPos(), bf);
                     mainTarget = static_cast<BattleFighter*>(getObject(otherside, target_pos));
+                    if(mainTarget && (mainTarget->getDeepStunLast() > 0 || mainTarget->getStunRound() > 0))
+                        target_is_stun = true;
+                    if(mainTarget && (mainTarget->getDeepBlindDmgExtra() > 0.001f || mainTarget->getBlind() > 0.001f))
+                        target_is_blind = true;
 
                     if(target_pos < 0)
                         break;
@@ -5869,9 +5891,13 @@ UInt32 BattleSimulator::doAttack( int pos )
                     int cnt = 0;
                     target_pos = getPossibleTarget(bf->getSide(), bf->getPos(), bf);
                     mainTarget = static_cast<BattleFighter*>(getObject(otherside, target_pos));
+                    if(mainTarget && (mainTarget->getDeepStunLast() > 0 || mainTarget->getStunRound() > 0))
+                        target_is_stun = true;
+                    if(mainTarget && (mainTarget->getDeepBlindDmgExtra() > 0.001f || mainTarget->getBlind() > 0.001f))
+                        target_is_blind = true;
                     doItemLingSkillAttack(bf, mainTarget);
                     bool noPossibleTarget = (target_pos == -1);
-                    while(NULL != (skill = bf->getPassiveSkillPrvAtk100(skillIdx, noPossibleTarget)))
+                    while(NULL != (skill = bf->getPassiveSkillPreAtk100(skillIdx, noPossibleTarget)))
                     {
                         getSkillTarget(bf, skill, otherside, target_pos, cnt);
                         if(cnt < 1)
@@ -6090,6 +6116,49 @@ UInt32 BattleSimulator::doAttack( int pos )
 
                             if (bo->getHP() > 0)
                                 bleed_target_pos = bo->getPos();
+                        }
+                    }
+                }
+
+                if(target_is_stun)
+                {
+                    const GData::SkillBase *skill;
+                    size_t idx = 0;
+                    while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
+                    {
+                        if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_mojian)
+                        {
+                            StateType eType = e_MAX_STATE;
+                            UInt32 dmg = CalcNormalAttackDamage(bf, mainTarget, eType);
+                            if (eType != e_MAX_STATE)
+                            {
+                                dmg *= skill->effect->efv[0];
+                                if (eType == e_damNormal)
+                                {
+                                    makeDamage(mainTarget, dmg, eType, e_damagePhysic);
+                                }
+                            }
+                        }
+                    }
+                }
+                if(target_is_blind)
+                {
+                    const GData::SkillBase *skill;
+                    size_t idx = 0;
+                    while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
+                    {
+                        if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_mozhu)
+                        {
+                            StateType eType = e_MAX_STATE;
+                            UInt32 dmg = CalcNormalAttackDamage(bf, mainTarget, eType);
+                            if (eType != e_MAX_STATE)
+                            {
+                                dmg *= skill->effect->efv[0];
+                                if (eType == e_damNormal)
+                                {
+                                    makeDamage(mainTarget, dmg, eType, e_damagePhysic);
+                                }
+                            }
                         }
                     }
                 }
@@ -6759,302 +6828,7 @@ UInt32 BattleSimulator::doAttack( int pos )
     return rcnt;
 }
 
-// try to pre-use skill before attack
-UInt32 BattleSimulator::tryPreUseSkill( BattleFighter * bf, BattleObject * target_object )
-{
-    return 0;
-}
-
-struct _PosAndHP
-{
-    UInt32 hp;
-    UInt8 pos;
-    bool operator <(const _PosAndHP& other) const
-    {
-        return hp > other.hp;
-    }
-};
-
-// try to post-use skill after attack
-UInt32 BattleSimulator::tryDelayUseSkill( BattleFighter * bf, BattleObject * target_object )
-{
-#if 0
-    UInt16 skillId = bf->getFighter()->getSkill();
-    switch(skillId)
-    {
-    case 104:
-    case 105:
-    case 110:
-        {
-            Script::BattleFormula::SkillData& sd = _formula->skillData(0, skillId - 101, bf->getFighter()->getSkillLevel());
-            if(_rnd(100) >= sd.rate)
-                break;
-
-            float atk = sd.value1 * bf->getAttack();
-            UInt8 side = target_object->getSide();
-            UInt8 pos = target_object->getPos(), minpos = pos / 5 * 5, maxpos = minpos + 5;
-            size_t defCount = 0, scCount = 0;
-            DefStatus defList[5];
-            StatusChange scList[50];
-            for(UInt8 i = minpos; i < maxpos; ++ i)
-            {
-                BattleObject * bo = _objs[side][i];
-                if(bo == NULL || bo->getHP() == 0)
-                    continue;
-                UInt32 dmg;
-                if(bo->isChar())
-                    dmg = _formula->calcDamage(atk, static_cast<BattleFighter *>(bo)->getDefend());
-                else
-                    dmg = static_cast<UInt32>(atk);
-                bo->makeDamage(dmg);
-                defList[defCount].pos = i;
-                defList[defCount].damType = 0;
-                defList[defCount].damage = dmg;
-                defList[defCount].leftHP = bo->getHP();
-                ++ defCount;
-                if(bo->getHP() == 0)
-                    onDead(bo);
-                else if(_winner == 0)
-                    onDamage(bo, scList, scCount, true);
-            }
-            if(defCount > 0)
-            {
-                appendToPacket(bf->getSide(), bf->getPos(), pos, 2, skillId, false, false, defList, defCount, scList, scCount);
-                return 1;
-            }
-        }
-        return 0;
-    case 201:
-        {
-            if(target_object->getHP() == 0)
-                return 0;
-            Script::BattleFormula::SkillData& sd = _formula->skillData(1, skillId - 201, bf->getFighter()->getSkillLevel());
-            if(_rnd(100) >= sd.rate)
-                return 0;
-            UInt8 pos = target_object->getPos();
-            float atk = bf->getAttack();
-            UInt32 dmg;
-            if(target_object->isChar())
-            {
-                float def = static_cast<BattleFighter *>(target_object)->getDefend();
-                dmg = _formula->calcDamage(atk, def);
-            }
-            else
-            {
-                dmg = static_cast<UInt32>(atk);
-            }
-            size_t defCount = 0;
-            DefStatus defList[5];
-            for(UInt32 i = 0; i < sd.value3; ++ i)
-            {
-                UInt32 fdmg = static_cast<UInt32>((sd.value1 + _rnd(static_cast<UInt32>(sd.value2 - sd.value1) + 1)) / 100.0f * dmg);
-                target_object->makeDamage(fdmg);
-                defList[defCount].pos = pos;
-                defList[defCount].damType = 0;
-                defList[defCount].damage = fdmg;
-                defList[defCount].leftHP = target_object->getHP();
-                ++ defCount;
-                if(target_object->getHP() == 0)
-                    break;
-            }
-            StatusChange scList[50];
-            size_t scCount = 0;
-            if(target_object->isChar())
-            {
-                if(target_object->getHP() == 0)
-                    onDead(target_object);
-                else if(_winner == 0)
-                    onDamage(target_object, scList, scCount, true);
-            }
-            appendToPacket(bf->getSide(), bf->getPos(), pos, 2, skillId, false, false, defList, defCount, scList, scCount);
-            return 1;
-        }
-        return 0;
-    case 205:
-    case 208:
-        {
-            if(bf->hasFlag(BattleFighter::Mirrored))
-                return 0;
-            Script::BattleFormula::SkillData& sd = _formula->skillData(1, skillId - 201, bf->getFighter()->getSkillLevel());
-            if(_rnd(100) >= sd.rate)
-                return 0;
-            UInt8 posList[25];
-            size_t posCount = 0;
-            UInt8 side = bf->getSide();
-            UInt8 y = 0;
-            while(y < 5)
-            {
-                UInt8 p = y * 5;
-                for(UInt8 x = 0; x < 5; ++ x, ++ p)
-                {
-                    if(_objs[side][p] == NULL || _objs[side][p]->getHP() == 0)
-                        posList[posCount ++] = p;
-                }
-                if(posCount > 0)
-                    break;
-                ++ y;
-            }
-            if(posCount == 0)
-                return 0;
-            bf->addFlag(BattleFighter::Mirrored);
-            UInt8 pos = posList[_rnd(posCount)];
-            BattleFighter * newf = new(std::nothrow) Battle::BattleFighter(*bf);
-            if(newf == NULL)
-                return 0;
-            newf->setSideAndPos(side, pos);
-            newf->addFlag(BattleFighter::IsMirror);
-            setObject(side, pos, newf);
-            newf->_attack = newf->_attack * sd.value1;
-            newf->_attackAdd = newf->_attackAdd * sd.value1;
-            newf->_defendAdd = 0;
-            FighterStatus fs(newf);
-            fs.action = 0;
-            // insert fighter into queue by order
-            insertFighterStatus(fs);
-            appendToPacket(bf->getSide(), bf->getPos(), pos + 25, 2, skillId, false, false, NULL, 0, NULL, 0);
-            return 1;
-        }
-        return 0;
-    case 206:
-    case 207:
-    case 210:
-        {
-            Script::BattleFormula::SkillData& sd = _formula->skillData(1, skillId - 201, bf->getFighter()->getSkillLevel());
-            if(_rnd(100) >= sd.rate)
-                return 0;
-            float atk = sd.value1 * bf->getAttack();
-            UInt8 side = target_object->getSide();
-            size_t defCount = 0, scCount = 0;
-            DefStatus defList[25];
-            StatusChange scList[50];
-            for(UInt8 i = 0; i < 25; ++ i)
-            {
-                BattleObject * bo = _objs[side][i];
-                if(bo == NULL || bo->getHP() == 0)
-                    continue;
-                UInt32 dmg;
-                if(bo->isChar())
-                    dmg = _formula->calcDamage(atk, static_cast<BattleFighter *>(bo)->getDefend());
-                else
-                    dmg = static_cast<UInt32>(atk);
-                bo->makeDamage(dmg);
-                defList[defCount].pos = getSidePos(bo);
-                defList[defCount].damType = e_damNormal;
-                defList[defCount].damage = dmg;
-                defList[defCount].leftHP = bo->getHP();
-                ++ defCount;
-                if(bo->getHP() == 0)
-                    onDead(bo);
-                else if(_winner == 0)
-                    onDamage(bo, scList, scCount, true);
-            }
-            if(defCount > 0)
-            {
-                appendToPacket(bf->getSide(), bf->getPos(), target_object->getPos(), 2, skillId, false, false, defList, defCount, scList, scCount);
-                return 1;
-            }
-        }
-        return 0;
-    case 303:
-        {
-            Script::BattleFormula::SkillData& sd = _formula->skillData(2, 2, bf->getFighter()->getSkillLevel());
-            if(_rnd(100) >= sd.rate)
-                return 0;
-            UInt8 side = bf->getSide();
-            UInt32 rhp = sd.value3 + static_cast<UInt32>(sd.value1 * bf->getIntelligence());
-            UInt32 maxrcount = sd.value4;
-            _PosAndHP rlist[25];
-            UInt32 rcount = 0;
-            for(UInt8 pos = 0; pos < 25; ++ pos)
-            {
-                BattleObject * bo = _objs[side][pos];
-                if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
-                    continue;
-                rlist[rcount].hp = static_cast<BattleFighter *>(bo)->getLostHP();
-                if(rlist[rcount].hp == 0)
-                    continue;
-                rlist[rcount].pos = pos;
-                if(rcount >= maxrcount)
-                {
-                    std::push_heap(rlist, rlist + maxrcount + 1);
-                    std::pop_heap(rlist, rlist + maxrcount + 1);
-                }
-                else
-                {
-                    ++ rcount;
-                    std::push_heap(rlist, rlist + rcount);
-                }
-            }
-            DefStatus defList[25];
-            size_t defCount = 0;
-            for(UInt32 i = 0; i < rcount; ++ i)
-            {
-                BattleObject * bo = _objs[side][rlist[i].pos];
-                UInt32 hpr = static_cast<BattleFighter *>(bo)->regenHP(rhp);
-                if(hpr == 0)
-                    continue;
-                onHPChanged(bo);
-                defList[defCount].pos = getSidePos(bo);
-                defList[defCount].damType = e_damHpAdd;
-                defList[defCount].damage = hpr;
-                defList[defCount].leftHP = bo->getHP();
-                ++ defCount;
-            }
-            appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, 303, false, false, defList, defCount, NULL, 0);
-        }
-        return 1;
-    case 304:
-    case 308:
-        {
-            Script::BattleFormula::SkillData& sd = _formula->skillData(2, skillId - 301, bf->getFighter()->getSkillLevel());
-            if(_rnd(100) >= sd.rate)
-                return 0;
-            StatusChange scList[50];
-            size_t scCount = 0;
-            UInt8 side = target_object->getSide();
-            DefStatus defList[25];
-            float atk = sd.value1;
-            for(UInt32 i = 0; i < sd.value3; ++ i)
-            {
-                BattleFighter * tf = getRandomFighter(side, NULL, 0);
-                if(tf != NULL)
-                    defList[i].pos = tf->getPos();
-                else
-                    defList[i].pos = 12;
-                BattleObject * bo = _objs[side][defList[i].pos];
-                if(bo == NULL || bo->getHP() == 0)
-                {
-                    defList[i].damType = e_damNormal;
-                    defList[i].damage = 0;
-                    defList[i].leftHP = 0;
-                    continue;
-                }
-                UInt32 dmg;
-                if(bo->isChar())
-                {
-                    dmg = _formula->calcDamage(atk, static_cast<BattleFighter *>(bo)->getDefend());
-                    static_cast<BattleFighter *>(bo)->setStunRound(sd.value4 + 1);
-                }
-                else
-                    dmg = static_cast<UInt32>(atk);
-                bo->makeDamage(dmg);
-                defList[i].damType = e_damNormal;
-                defList[i].damage = dmg;
-                defList[i].leftHP = bo->getHP();
-                if(bo->getHP() == 0)
-                    onDead(bo);
-                else if(_winner == 0)
-                    onDamage(bo, scList, scCount, true);
-            }
-            appendToPacket(bf->getSide(), bf->getPos(), target_object->getPos(), 2, skillId, false, false, defList, sd.value3, scList, scCount);
-        }
-        return 1;
-    default:
-        return 0;
-    }
-#endif
-    return 0;
-}
+// XXX: 这里删除了一堆已经无效的代码
 
 int BattleSimulator::testWinner()
 {
@@ -7803,6 +7577,8 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
     {
         // remove from action queue
         BattleFighter* toremove = static_cast<BattleFighter *>(bo);
+        onDeadLingshi(toremove);
+
         removeFighterStatus(toremove);
         {
             BattleFighter* bo2 = static_cast<BattleFighter*>(bo);
@@ -8710,6 +8486,13 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             -- atkAdd_last;
            if(0 == atkAdd_last)
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAtk, 0, 0, false);
+           else
+           {
+               if (bf->addRoundAttack())
+                   appendDefStatus(e_skill, bf->getAttackRoundAddId(), bf);
+               if (bf->subRoundAttack())
+                   appendDefStatus(e_skill, bf->getAttackRoundSubId(), bf);
+           }
         }
 
         UInt8& magAtkAdd_last = bf->getMagAttackAddLast();
@@ -8718,6 +8501,11 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             -- magAtkAdd_last;
            if(0 == magAtkAdd_last)
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagAtk, 0, 0, false);
+           else
+           {
+               if (bf->addRoundMagAtk())
+                   appendDefStatus(e_skill, bf->getMagAtkRoundAddId(), bf);
+           }
         }
 
         bool clearDefDec = false;
@@ -8753,6 +8541,12 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
                     clearDefDec = true;
                 }
            }
+           else
+           {
+               if (bf->addRoundMagDef())
+                   appendDefStatus(e_skill, bf->getMagDefRoundAdd(), bf);
+           }
+
         }
 
         UInt8& defendChangeSSLast = bf->getDefendChangeSSLast();
@@ -8763,6 +8557,11 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             {
                 bf->setDefendChangeSS(0, 0);
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stDef, 0, 0, false);
+            }
+            else
+            {
+                if (bf->addRoundDef())
+                    appendDefStatus(e_skill, bf->getDefRoundAdd(), bf);
             }
         }
 
@@ -8836,6 +8635,11 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             -- pierceAdd_last;
            if(0 == pierceAdd_last)
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stPierce, 0, 0, false);
+           else
+           {
+               if (bf->addRoundPierce())
+                   appendDefStatus(e_skill, bf->getPierceRoundAddId(), bf);
+           }
         }
 
         UInt8& counterAdd_last = bf->getCounterAddLast();
@@ -8936,6 +8740,19 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
         }
         bf->resetWithstandCount();
+
+        UInt8& newModeLast = bf->getNewModeLast();
+        if(newModeLast > 0)
+        {
+            --newModeLast;
+            if(newModeLast == 0)
+            {
+                bf->setNewModeLast(0);
+                appendDefStatus(e_unChangeMode, 0 ,bf);
+                bf->setChangeStatus(2);
+                bf->unUpdateAllPassiveSkillLingshi();
+            }
+        }
     }while(false);
 
     if(_defList.size() > 0 || _scList.size() > 0)
@@ -9168,7 +8985,32 @@ void BattleSimulator::setStatusChange_Atk(BattleFighter * bf, UInt8 side, UInt8 
         skillId = skill->getId();
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<float>& efv = skill->effect->efv;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        if(!efv.empty())
+        {
+            for(size_t i = 0; i < eft.size(); ++ i)
+            {
+                if(eft[i] == GData::e_eft_round_add)
+                {
+                    bf->setAttackRoundAdd(efv[i], efl[i], skillId);
+                    break;
+                }
+                else if(eft[i] == GData::e_eft_round_sub)
+                {
+                    bf->setAttackRoundSub(efv[i], efl[i], skillId);
+                    break;
+                }
+            }
+        }
     }
+    else
+    {
+        bf->setAttackRoundAdd(0, 0);
+        bf->setAttackRoundSub(0, 0);
+    }
+
     bfgt->setAttackAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getAttack());
     appendStatusChange(e_stAtk, value2, skillId, bfgt);
@@ -9184,7 +9026,23 @@ void BattleSimulator::setStatusChange_Def(BattleFighter * bf, UInt8 side, UInt8 
         skillId = skill->getId();
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<float>& efv = skill->effect->efv;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        if(!efv.empty())
+        {
+            for(size_t i = 0; i < eft.size(); ++ i)
+            {
+                if(eft[i] == GData::e_eft_round_add)
+                {
+                    bf->setDefRoundAdd(efv[i], efl[i], skillId);
+                    break;
+                }
+            }
+        }
     }
+    else
+        bf->setDefRoundAdd(0, 0);
     bfgt->setDefendAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getDefend());
     appendStatusChange(e_stDef, value2, skillId, bfgt);
@@ -9232,7 +9090,23 @@ void BattleSimulator::setStatusChange_Pierce(BattleFighter * bf, UInt8 side, UIn
         skillId = skill->getId();
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<float>& efv = skill->effect->efv;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        if(!efv.empty())
+        {
+            for(size_t i = 0; i < eft.size(); ++ i)
+            {
+                if(eft[i] == GData::e_eft_round_add)
+                {
+                    bf->setPierceRoundAdd(efv[i], efl[i], skillId);
+                    break;
+                }
+            }
+        }
     }
+    else
+        bf->setPierceRoundAdd(0, 0);
     bfgt->setPierceAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getPierce(NULL)*100);
     appendStatusChange(e_stPierce, value2, skillId, bfgt);
@@ -9321,8 +9195,25 @@ void BattleSimulator::setStatusChange_MagAtk(BattleFighter * bf, UInt8 side, UIn
         skillId = skill->getId();
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<float>& efv = skill->effect->efv;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        if(!efv.empty())
+        {
+            for(size_t i = 0; i < eft.size(); ++ i)
+            {
+                if(eft[i] == GData::e_eft_round_add)
+                {
+                    bf->setMagAttackRoundAdd(efv[i], efl[i], skillId);
+                    break;
+                }
+            }
+        }
     }
-    bfgt->setMagAttackAdd(value, last);
+    else
+        bf->setMagAttackRoundAdd(0, 0);
+
+
     UInt32 value2 = static_cast<UInt32>(bfgt->getMagAttack());
     appendStatusChange(e_stMagAtk, value2, skillId, bfgt);
 }
@@ -9337,7 +9228,23 @@ void BattleSimulator::setStatusChange_MagDef(BattleFighter * bf, UInt8 side, UIn
         skillId = skill->getId();
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<float>& efv = skill->effect->efv;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        if(!efv.empty())
+        {
+            for(size_t i = 0; i < eft.size(); ++ i)
+            {
+                if(eft[i] == GData::e_eft_round_add)
+                {
+                    bf->setMagDefRoundAdd(efv[i], efl[i], skillId);
+                    break;
+                }
+            }
+        }
     }
+    else
+        bf->setMagDefRoundAdd(0, 0);
     if(isFireDefend(skill))
         bfgt->setFireDefend(value, last);
     else
@@ -10479,6 +10386,8 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
 
     do
     {
+        bf->setPreAtk();
+        doLingshiModelAttack(bf, 5);
         size_t skillIdx = 0;
         const GData::SkillBase* violentSKill;
         while(NULL != (violentSKill = bf->getPassiveSkillViolent100(skillIdx)))
@@ -12054,6 +11963,16 @@ void BattleSimulator::appendStatusChange(StatusType type, UInt32 value, UInt16 s
     sc.statusId = skillId;
 
     _scList.push_back(sc);
+    if(type == e_stCounter)
+    {
+        bf->setCounterCnt(bf->getCounterCnt() + 1);
+        doLingshiModelAttack(bf, 2);
+    }
+    else if(type == e_stCritical)
+    {
+        bf->setCriticalCnt(bf->getCriticalCnt() + 1);
+        doLingshiModelAttack(bf, 4);
+    }
 }
 
 void BattleSimulator::appendAttackRoundChange()
@@ -12810,6 +12729,17 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
     else if(_winner == 0)
     {
         onDamage(bf, true, u);
+        const GData::SkillBase *skill;
+        doLingshiModelAttack(bf, 1);
+        while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
+        {
+            if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_buqu)
+            {
+                setStatusChange_Def(bf, bf->getSide(), bf->getPos(), skill, getBFDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
+                setStatusChange_MagDef(bf, bf->getSide(), bf->getPos(), skill, getBFMagDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
+            }
+        }
+
     }
 
     if(type == e_damCounter)
@@ -15113,6 +15043,112 @@ bool BattleSimulator::doEffectAfterCount(BattleFighter* bf, const GData::SkillBa
     }
 
     return bRet;
+}
+
+UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
+{
+    if(!bf)
+        return 0;
+    if(bf->getChangeStatus() != 0)
+        return 0;
+
+    size_t idx = 0;
+    const GData::SkillBase* passiveSkill = bf->getPassiveSkillEnterLingshi100(idx);
+    if(!passiveSkill)
+        return 0;
+
+    //触发类型
+    UInt8 type = 0;
+    UInt8 last = 0;
+    if(passiveSkill->effect)
+    {
+        UInt8 count1 = passiveSkill->effect->eft.size();
+        UInt8 count2 = passiveSkill->effect->efv.size();
+        UInt8 count3 = passiveSkill->effect->efl.size();
+        if(count1 < 1)
+            return 0;
+        if(count1 != count2 || count1 != count3 || count2 != count3)
+            return 0;
+        if(passiveSkill->effect->eft[count1 - 1] != GData::e_eft_lingshi_enter)
+            return 0;
+        type = passiveSkill->effect->efv[count1 - 1];
+        last = passiveSkill->effect->efl[count1 - 1];
+    }
+    if(flag != type)
+        return 0;
+
+    switch(type)
+    {
+        case 1:
+            if(!bf->getHpLess())
+                return 0;
+            break;
+        case 2:
+            if(bf->getCounterCnt() < 3)
+                return 0;
+            break;
+        case 3:
+            if(_attackRound < 3)
+                return 0;
+            break;
+        case 4:
+            if(bf->getCriticalCnt() < 3)
+                return 0;
+            break;
+        case 5:
+            if(!bf->getPreAtk())
+                return 0;
+            break;
+        case 6:
+            if(bf->getFriendDeadCnt() < 3)
+                return 0;
+            break;
+        case 7:
+            if(bf->getEnemyDeadCnt() < 2)
+                return 0;
+            break;
+        default:
+            return 0;
+            break;
+    }
+    bf->setChangeStatus(1);
+    bf->setNewModeLast(last);
+
+    //改变模型
+    appendDefStatus(e_changeMode, SKILL_ID(passiveSkill->getId()), bf);
+    bf->updateAllPassiveSkillLingshiExceptEnter();
+
+    Int32 target_side;
+    Int32 target_pos;
+    Int32 cnt = 0;
+    getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
+    cnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
+    return cnt;
+}
+
+void BattleSimulator::onDeadLingshi(BattleFighter* bf)
+{
+    if(!bf)
+        return;
+    UInt8 side = bf->getSide();
+    for(UInt8 i = 0; i < 25; ++ i)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+        if(!bo || bo->getHP() == 0 || bo == bf)
+            continue;
+        bo->setFriendDeadCnt(bo->getFriendDeadCnt() + 1);
+        doLingshiModelAttack(bo, 6);
+    }
+
+    for(UInt8 i = 0; i < 25; ++ i)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(1 - side, i));
+        if(!bo || bo->getHP() == 0 || bo == bf)
+            continue;
+        bo->setEnemyDeadCnt(bo->getEnemyDeadCnt() + 1);
+        doLingshiModelAttack(bo, 7);
+    }
+
 }
 
 } // namespace Battle
