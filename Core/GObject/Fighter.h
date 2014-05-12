@@ -318,6 +318,8 @@ public:
     void setUpSkills(std::string& skill, bool = true);
     // 初始化可装备的技能
     void setSkills(std::string& skills, bool = true);
+    // 删除已装备的技能
+    void delSkills(std::string&, bool = true);
     // 更新被动技能表
     bool upPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
     // 装备被动技能
