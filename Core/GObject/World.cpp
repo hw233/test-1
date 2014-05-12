@@ -4364,10 +4364,6 @@ UInt16 World::GetRandomSpot()
 
 void World::SendGuangGunAward()    //待定
 {
-    UInt32 now = TimeUtil::Now();
-    if(now <( getOpenTime() + 7 * 86400) || now >( getOpenTime() + 15* 86400))
-        return ;
-    
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
