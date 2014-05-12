@@ -967,12 +967,14 @@ public:
     bool upCittaWithOutCheck( UInt16 citta, int idx );
     inline void setSoulSkillProtect(Int32 v) { _soulSkillProtect = v; }
     UInt16 getTrumpSkill(int i) { if(i >= TRUMP_UPMAX) return 0; else return _trumpSkill[i]; }
+    std::vector<UInt16>& getLingshiSkill(int i) { if(i >= LINGSHI_UPMAX) i = 0; return _lingshiSkill[i]; }
     Int32 _soulMax;
     UInt8 _soulExtraAura;
     UInt8 _soulAuraLeft;
     UInt16 _soulSkillSoulOut;
     UInt16 _trumpSkill[TRUMP_UPMAX];
     UInt16 _soulSkillProtect;
+    std::vector<UInt16> _lingshiSkill[LINGSHI_UPMAX];
 
     // 内丹系统
 public:

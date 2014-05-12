@@ -85,6 +85,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_trump, 0, sizeof(_trump));
 	memset(_trumpSkill, 0, sizeof(_trumpSkill));
 	memset(_lingshi, 0, sizeof(_lingshi));
+	memset(_lingshiSkill, 0, sizeof(_lingshiSkill));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
 	memset(_lingbao, 0, sizeof(_lingbao));
     m_2ndSoul = NULL;
@@ -1948,7 +1949,7 @@ void Fighter::addLingshiAttr( ItemEquip* lingshi )
         return;
     GData::ItemGemType * igt = GData::lingshiTypes[lingshi->GetTypeId() - LLINGSHI_ID];
     GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lingshi->GetTypeId(), static_cast<ItemLingshi *>(lingshi)->getLingshiAttr().lv);
-    if (!igt || !lsd)
+    if (!igt || !lsd || !igt->attrExtra)
         return;
 
 	addAttrExtra(_attrExtraEquip, igt->attrExtra);
@@ -2707,6 +2708,8 @@ Fighter * Fighter::cloneWithOutDirty(Player * player)
 	fgt->_weapon = NULL;
 	fgt->_ring = NULL;
 	fgt->_amulet = NULL;
+	fgt->_innateTrump = NULL;
+	fgt->_halo = NULL;
 	fgt->_attrDirty = false;
 	fgt->_bPDirty = false;
     fgt->_pexpMax = 100000; // XXX: 100000
@@ -2730,6 +2733,26 @@ Fighter * Fighter::cloneWithOutDirty(Player * player)
         }
     }
     memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
+    memset(fgt->_lingshi, 0, LINGSHI_UPMAX * sizeof(ItemEquip*));
+    for(int i = 0; i < LINGSHI_UPMAX; ++ i)
+    {
+        if(!_lingshi[i])
+            continue;
+        GData::ItemGemType * igt = GData::lingshiTypes[_lingshi[i]->GetTypeId() - LLINGSHI_ID];
+        if(igt && igt->attrExtra)
+        {
+            fgt->_lingshiSkill[i].clear();
+            for(size_t j = 0; j < igt->attrExtra->skills.size(); ++ j)
+            {
+                if(igt->attrExtra->skills[j])
+                {
+                    UInt16 skillId = igt->attrExtra->skills[j]->getId();
+                    ItemLingshiAttr& lsAttr = _lingshi[i]->getLingshiAttr();
+                    fgt->_lingshiSkill[i].push_back(SKILLANDLEVEL(SKILL_ID(skillId), lsAttr.lv / 10 + 1));
+                }
+            }
+        }
+    }
 	return fgt;
 }
 
