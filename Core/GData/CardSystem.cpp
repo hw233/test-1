@@ -25,7 +25,10 @@ void CalInitExp(UInt32& initExp ,UInt8 level, UInt8 color ,UInt8 type)
     float typeMark= 0.0f;
     
     //levelMark = static_cast<float>(level - 40) * 0.2 + lvlmark;
-    levelMark = static_cast<float>(level - 40) * 0.001 + lvlmark;
+    if(level == 20 || level == 30)
+        levelMark = 1;
+    else
+        levelMark = static_cast<float>(level - 40) * 0.001 + lvlmark;
     
     switch(color)
     {
@@ -97,7 +100,7 @@ void CardSystem::loadInitCardInfo(DBCardInfo& dbci)
     ci.lvLimit = dbci.lvLimit;
     ci.skillId = dbci.skillId;
     ci.name = dbci.name;
-    CalInitExp(ci.initExp,static_cast<UInt8>(dbci.id/10),ci.color,ci.type);
+    CalInitExp(ci.initExp,static_cast<UInt8>(dbci.id/100*10),ci.color,ci.type);
     
     _cardInitInfo.insert(std::make_pair(dbci.id,ci));          
 
