@@ -1534,7 +1534,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillRevival;
     std::vector<GData::SkillItem> _passiveSkillRevival100;
     std::vector<GData::SkillItem> _passiveSkillLingshi;
-    std::vector<GData::SkillItem> _passiveSkillLingshi100;
+    std::vector<GData::SkillItem> _passiveSkillEnterLingshi100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1545,7 +1545,7 @@ private:
     const GData::SkillBase* getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget = false);
-    const GData::SkillBase* getPassiveSkillLingshi100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillEnterLingshi100(size_t& idx, bool noPossibleTarget = false);
 
 private:
     float _2ndRateCoAtk;
@@ -1656,7 +1656,8 @@ private:
     UInt16 getCriticalCnt() { return _criticalCnt; }
     void setCriticalCnt(UInt16 cnt) { _criticalCnt = cnt; }
     bool _preAtk;
-    bool getPreAtk() { if(uRand(10000) < 3000) _preAtk = true; else _preAtk = false; return _preAtk; }
+    bool getPreAtk() { return _preAtk; }
+    bool setPreAtk() { if(uRand(10000) < 3000) _preAtk = true; else _preAtk = false; }
     UInt8 _friendDeadCnt;
     UInt8 getFriendDeadCnt() { return _friendDeadCnt; };
     void setFriendDeadCnt(UInt8 cnt) { _friendDeadCnt = cnt; }

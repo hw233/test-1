@@ -57,6 +57,7 @@ enum    // 技能触发方式
     /*31*/ SKILL_REVIVAL,    // 生生不息(怪物技能)
     /*32*/ SKILL_LINGSHI,    // 灵侍技能
     /*33*/ SKILL_ONOTHERCONFUSEFORGET,  // 其他人获得沉默和混乱
+    /*34*/ SKILL_ENTER_LS,  // 灵侍入场技能
     SKILL_PASSIVES
 };
 
@@ -137,8 +138,9 @@ enum
     e_eft_prudent = 53,    //谨慎，现在叫九霄风云变
     e_eft_silkworm = 54,    // 天蚕变，现在叫魔杀漩涡
     e_eft_chaos_world = 55,     // 混世状态
-    e_eft_lingshi_mojian = 56,    //魔剑
-    e_eft_lingshi_buqu = 57,    //不屈
+    e_eft_lingshi_enter = 56,    //灵侍入场
+    e_eft_lingshi_mojian = 57,    //魔剑
+    e_eft_lingshi_buqu = 58,    //不屈
 
     e_eft_max
 };

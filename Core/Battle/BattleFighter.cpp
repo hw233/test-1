@@ -194,7 +194,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkillBLTY100Status();
     updatePassiveSkill100(_fighter->getPassiveSkillViolent100(), _passiveSkillViolent100);
     updatePassiveSkill100(_fighter->getPassiveSkillRevival100(), _passiveSkillRevival100);
-    updatePassiveSkill100(_fighter->getPassiveSkillLingshi100(), _passiveSkillLingshi100);
+    updatePassiveSkill100(_fighter->getPassiveSkillEnterLingshi100(), _passiveSkillEnterLingshi100);
 
     initPassiveSkillByLingshi();
 
@@ -1262,9 +1262,9 @@ const GData::SkillBase* BattleFighter::getPassiveSkillRevival100(size_t& idx, bo
     return getPassiveSkill100(_passiveSkillRevival100, idx, noPossibleTarget);
 }
 
-const GData::SkillBase* BattleFighter::getPassiveSkillLingshi100(size_t& idx, bool noPossibleTarget)
+const GData::SkillBase* BattleFighter::getPassiveSkillEnterLingshi100(size_t& idx, bool noPossibleTarget)
 {
-    return getPassiveSkill100(_passiveSkillLingshi100, idx, noPossibleTarget);
+    return getPassiveSkill100(_passiveSkillEnterLingshi100, idx, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnHPChange100(size_t& idx, bool noPossibleTarget)
@@ -2400,7 +2400,7 @@ void BattleFighter::clearSkill()
     _passiveSkillBLTY100.clear();
     _passiveSkillViolent100.clear();
     _passiveSkillRevival100.clear();
-    _passiveSkillLingshi100.clear();
+    _passiveSkillEnterLingshi100.clear();
     _passiveSkillOnHPChange100.clear();
     _passiveSkillOnWithstand100.clear();
 
@@ -3335,8 +3335,8 @@ void BattleFighter::updatePassiveSkillLingshi100(UInt8 type, std::vector<GData::
         case GData::SKILL_REVIVAL:
             addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillRevival100);
             break;
-        case GData::SKILL_LINGSHI:
-            addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillLingshi100);
+        case GData::SKILL_ENTRE_LINGSHI:
+            addPassiveSkill100(_allPassiveSkillEnterLingshi100[type], _passiveSkillEnterLingshi100);
             break;
         case GData::SKILL_ONOTHERCONFUSEFORGET:
             addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnOtherConfuseForget100);
