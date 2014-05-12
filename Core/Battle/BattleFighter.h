@@ -43,7 +43,7 @@ class BattleFighter:
 {
 	friend class BattleSimulator;
 
-#define BLEED_TYPE_FLAG_NONE            0x00000000      // 没人
+#define BLEED_TYPE_FLAG_NONE            0x00000000      // 没流血
 #define BLEED_TYPE_FLAG_1               0x00000001      // 儒流血
 #define BLEED_TYPE_FLAG_2               0x00000002      // 释流血
 #define BLEED_TYPE_FLAG_3               0x00000004      // 道流血
@@ -83,8 +83,11 @@ class BattleFighter:
 
 public:
 	BattleFighter(Script::BattleFormula *, GObject::Fighter * = NULL, UInt8 side = 0, UInt8 pos = 0);
+    virtual ~BattleFighter();
 
 	void setFighter(GObject::Fighter * f);
+    void initPassiveSkillByLingshi();
+
 	inline void setFormationEffect(const GData::Formation::GridEffect * fe) {_formEffect = fe;}
 
 	inline UInt32 getId() { return _fighter->getId(); }
@@ -233,6 +236,7 @@ public:
 	float getTough(BattleFighter* defgt);
     float getCriticalDmgImmune() { return _attrExtra.criticaldmgimmune+_fighter->getAcupointsGoldAttr(1); }
 	inline UInt32 getMaxHP() {Int64 ret = _maxhp + _maxhpAdd + _maxhpAdd2; return (ret > 0 ? ret : 0);}
+    float getHPP() { float ret = static_cast<float>(getHP())/ static_cast<float>(getMaxHP()); return ret; }
 	inline Int32 getAction() {Int32 ret = _maxAction + _maxActionAdd + _maxActionAdd2; return (ret > 0 ? ret : 0);}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
 
@@ -366,7 +370,7 @@ public:
 
     const GData::SkillBase* getTherapySkill();
     const GData::SkillBase* getActiveSkill(bool need_therapy = false, bool noPossibleTarget = false);
-    const GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillPreAtk100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAction100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBeAtk100(size_t& idx, bool noPossibleTarget = false);
@@ -383,6 +387,7 @@ public:
     const GData::SkillBase* getPassiveSkillOnHP10P100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHPChange100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnWithstand100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnOtherConfuseAndForget100(size_t& idx, bool noPossibleTarget = false);
 
     const GData::SkillBase* getPassiveSkillPreAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk(bool noPossibleTarget = false);
@@ -405,6 +410,7 @@ public:
     const GData::SkillBase* getPassiveSkillOnHP10P(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHPChange(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnWithstand(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnOtherConfuseAndForget(bool noPossibleTarget = false);
 
     const GData::SkillBase* getSkillSoulProtect();
 
@@ -413,6 +419,15 @@ public:
 
     void updatePassiveSkill(std::vector<UInt16>& passiveSkillId, std::vector<GData::SkillItem>& passiveSkill);
     void updatePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
+
+    void updatePassiveSkillLingshi(UInt8 type, std::vector<GData::SkillItem>& passiveSkill);
+    void updatePassiveSkillLingshi100(UInt8 type, std::vector<GData::SkillItem>& passiveSkill100);
+
+    void addPassiveSkill(std::vector<UInt16>& passiveSkillId, std::vector<GData::SkillItem>& passiveSkill);
+    void addPassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
+
+    void removePassiveSkill(std::vector<UInt16>& passiveSkillId, std::vector<GData::SkillItem>& passiveSkill);
+    void removePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
 
     void updateSoulSkillDead(UInt16 skillId);
     void updateSoulSkillProtect(UInt16 skillId);
@@ -574,7 +589,7 @@ private:
     GData::SkillItem _peerlessSkill;
     std::vector<GData::SkillItem> _activeSkill;
     std::vector<GData::SkillItem> _therapySkill;
-    std::vector<GData::SkillItem> _passiveSkillPrvAtk100;
+    std::vector<GData::SkillItem> _passiveSkillPreAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftAction100;
     std::vector<GData::SkillItem> _passiveSkillBeAtk100;
@@ -586,6 +601,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillOnPetProtect100;
     std::vector<GData::SkillItem> _passiveSkillOnHPChange100;
     std::vector<GData::SkillItem> _passiveSkillOnWithstand100;
+    std::vector<GData::SkillItem> _passiveSkillOnOtherConfuseForget100;
 
     std::vector<GData::SkillItem> _passiveSkillPreAtk;
     std::vector<GData::SkillItem> _passiveSkillAftAtk;
@@ -599,10 +615,16 @@ private:
     std::vector<GData::SkillItem> _passiveSkillOnPetProtect;
     std::vector<GData::SkillItem> _passiveSkillOnHPChange;
     std::vector<GData::SkillItem> _passiveSkillOnWithstand;
+    std::vector<GData::SkillItem> _passiveSkillOnOtherConfuseForget;
 
     std::vector<GData::SkillItem> _passiveSkillOnTherapy;
     std::vector<GData::SkillItem> _passiveSkillOnSkillDmg;
     std::vector<GData::SkillItem> _passiveSkillOnOtherDead;
+
+    typedef std::vector<UInt16> VecPassiveSkillId;
+    typedef std::vector<VecPassiveSkillId> VecAllPassiveSkill;
+    VecAllPassiveSkill _allPassiveSkillLingshi;
+    VecAllPassiveSkill _allPassiveSkillLingshi100;
 
     std::map<UInt16, GData::SkillStrengthenBase*> _skillStrengthen;
 
@@ -750,6 +772,9 @@ private:
 
     float _withstandFactor;
     UInt8 _withstandCount;
+
+    UInt32  _chaosWorldId;
+    UInt8   _chaosWorldLast;
 
 
     // cotton add for skillstrengthen
@@ -1172,6 +1197,7 @@ public:
 private:
     std::vector<GData::SkillItem> _passiveSkillOnCounter;
     std::vector<GData::SkillItem> _passiveSkillOnCounter100;
+    std::vector<GData::SkillItem> _passiveSkillOnAttackBleed;
     std::vector<GData::SkillItem> _passiveSkillOnAttackBleed100;
     std::vector<GData::SkillItem> _passiveSkillOnAtkDmg;
     std::vector<GData::SkillItem> _passiveSkillOnAtkDmg100;
@@ -1274,6 +1300,14 @@ public:
     UInt8 getWithstandCount() { return _withstandCount; }
     void  resetWithstandCount() { _withstandCount = 0; }
 
+    UInt32 getChaosWorldId()    { return _chaosWorldId; }
+    bool  getChaosWorldLast () { return _chaosWorldLast; }
+    void  setChaosWorld(UInt8 chaosWorldId, UInt8 chaosWorldLast) { _chaosWorldId = chaosWorldId; } 
+    void  releaseChaosWorld() 
+    { 
+        if (_chaosWorldId && _chaosWorldLast && (!--_chaosWorldLast))
+            _chaosWorldId = _chaosWorldLast = 0;
+    }
 public:
     float _counter_spirit_atk_add;
     float _counter_spirit_magatk_add;
@@ -1487,13 +1521,20 @@ private:
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
     std::vector<GData::SkillItem> _passiveSkillSoulProtect;
+    std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg;
     std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;
+    std::vector<GData::SkillItem> _passiveSkillXMCZ;
     std::vector<GData::SkillItem> _passiveSkillXMCZ100;
+    std::vector<GData::SkillItem> _passiveSkillBLTY;
     std::vector<GData::SkillItem> _passiveSkillBLTY100;
+    std::vector<GData::SkillItem> _passiveSkillViolent;
     std::vector<GData::SkillItem> _passiveSkillViolent100;
+    std::vector<GData::SkillItem> _passiveSkillRevival;
     std::vector<GData::SkillItem> _passiveSkillRevival100;
+    std::vector<GData::SkillItem> _passiveSkillLingshi;
+    std::vector<GData::SkillItem> _passiveSkillLingshi100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1504,6 +1545,7 @@ private:
     const GData::SkillBase* getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillLingshi100(size_t& idx, bool noPossibleTarget = false);
 
 private:
     float _2ndRateCoAtk;
