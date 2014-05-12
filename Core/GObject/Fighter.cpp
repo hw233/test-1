@@ -2597,7 +2597,7 @@ Fighter * Fighter::cloneWithOutDirty(Player * player)
                 if(igt->attrExtra->skills[j])
                 {
                     UInt16 skillId = igt->attrExtra->skills[j]->getId();
-                    ItemLingshiAttr& lsAttr = _lingshi[i]->getLingshiAttr();
+                    ItemLingshiAttr& lsAttr = static_cast<ItemLingshi *>(_lingshi[i])->getLingshiAttr();
                     fgt->_lingshiSkill[i].push_back(SKILLANDLEVEL(SKILL_ID(skillId), lsAttr.lv / 10 + 1));
                 }
             }
