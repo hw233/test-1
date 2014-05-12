@@ -403,8 +403,6 @@ private:
 	int testWinner();
 	int testWinner2();
 	void appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 target_pos, UInt8 atk_type, UInt16 add_id, bool cs, bool pr);
-	UInt32 tryPreUseSkill(BattleFighter * bf, BattleObject * target_object);
-	UInt32 tryDelayUseSkill(BattleFighter * bf, BattleObject * target_object);
 	void setStatusChange(UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, UInt32 value, bool active);
 	void setStatusChange(BattleFighter * bf, UInt8 side, UInt8 pos, int cnt, const GData::SkillBase* skill, UInt8 type, float value, UInt16 last, bool active);
 	void setStatusChange2(BattleFighter* bf, UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, UInt16 last, bool active);
