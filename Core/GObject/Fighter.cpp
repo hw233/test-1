@@ -4289,9 +4289,11 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
     return ret;
 }
 
+/*
 bool Fighter::upPassiveSkillLingshi(UInt16 skill, UInt16 type, bool p100)
 {
 }
+*/
 
 
 /*

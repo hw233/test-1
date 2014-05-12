@@ -5889,7 +5889,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                         target_is_blind = true;
                     doItemLingSkillAttack(bf, mainTarget);
                     bool noPossibleTarget = (target_pos == -1);
-                    while(NULL != (skill = bf->getPassiveSkillPrvAtk100(skillIdx, noPossibleTarget)))
+                    while(NULL != (skill = bf->getPassiveSkillPreAtk100(skillIdx, noPossibleTarget)))
                     {
                         getSkillTarget(bf, skill, otherside, target_pos, cnt);
                         if(cnt < 1)

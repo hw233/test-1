@@ -51,7 +51,7 @@ class BattleSimulator:
 public:
 	BattleSimulator(UInt32, GObject::Player *, const std::string&, UInt8, bool report = true, UInt32 fake_turns = 500);
 	BattleSimulator(UInt32, GObject::Player *, GObject::Player *, bool report = true, UInt32 fake_turns = 500);
-    virtual ~BattleSimulator();
+    virtual ~BattleSimulator() {};
 	inline int getId() {return _id;}
 	inline int getTurns() {return _turns;}
 	inline int getRounds() {return _attackRound;}
