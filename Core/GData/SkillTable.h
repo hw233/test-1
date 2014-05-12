@@ -135,6 +135,8 @@ enum
     e_eft_mo_knot = 52,    // 墨：同心结
     e_eft_prudent = 53,    //谨慎，现在叫九霄风云变
     e_eft_silkworm = 54,    // 天蚕变，现在叫魔杀漩涡
+    e_eft_lingshi_mojian = 55,    //魔剑
+    e_eft_lingshi_buqu = 56,    //不屈
 
     e_eft_max
 };
