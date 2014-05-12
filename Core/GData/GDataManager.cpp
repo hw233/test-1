@@ -469,6 +469,13 @@ namespace GData
             fprintf (stderr, "Load LoadSkillEvConfig Error !\n");
             std::abort();
         }
+
+        if (!LoadRandBattleConfig())
+        {
+            fprintf (stderr, "Load LoadRandBattleConfig Error !\n");
+            std::abort();
+        }
+
         if (!LoadLingShiConfig())
         {
             fprintf (stderr, "Load LoadLingShiConfig Error !\n");
@@ -729,7 +736,7 @@ namespace GData
             aextra->_extra.magres *= 100;
             aextra->_extra.criticaldmgimmune = 0;
 
-            StringTokenizer tk(ae.skill, ",");
+            StringTokenizer tk(ae.skill, "|");
             if (tk.count())
             {
                 for (size_t i=0; i<tk.count(); ++i)
@@ -3075,13 +3082,33 @@ namespace GData
         return true;
     }
 
+    bool GDataManager::LoadRandBattleConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBRandBattleAttr dbattr;
+		if(execu->Prepare("SELECT `lev`, `id`, `value`, `next` FROM `randbattle_attr`", dbattr) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            RandBattleData::stRandBattle randBattle;
+            randBattle.id = dbattr.id;
+            randBattle.value = dbattr.value;
+            randBattle.next = dbattr.next;
+            GData::randBattleData.setRandBattleData(dbattr.lev, randBattle);
+        }
+        return true;
+    }
+
     bool GDataManager::LoadLingShiConfig()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBLingShi dbls;
-		if(execu->Prepare("SELECT `id`, `level`, `isUp`, `useItem`, `useGold`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `toughlvl`, `action`, `hitrlvl`, `evdlvl`, `crilvl`, `criticaldmg`, `pirlvl`, `counterlvl`, `mreslvl` FROM `lingshi`", dbls) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `level`, `isBreak`, `useItem`, `useGold`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `toughlvl`, `action`, `hitrlvl`, `evdlvl`, `crilvl`, `criticaldmg`, `pirlvl`, `counterlvl`, `mreslvl` FROM `lingshi`", dbls) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)

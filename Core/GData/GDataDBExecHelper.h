@@ -713,6 +713,14 @@ struct DBSkillEv
     UInt8 needLev;
 };
 
+struct DBRandBattleAttr
+{
+    UInt8 lev;
+    Int8 id;
+    float value;
+    UInt8 next;
+};
+
 struct DBKeyinConfig
 {
     UInt8 keyinId;
@@ -830,7 +838,7 @@ struct DBLingShi
 {
     UInt16 id;
     UInt8 level;
-    UInt8 isUp;
+    UInt8 isBreak;
     UInt16 useItem;
     UInt16 useGold;
     float attack;
@@ -1797,12 +1805,22 @@ SPECIALDEF(4)
 	)
 SPECIALEND()
 
+SPECIALBEGIN(GData::DBRandBattleAttr)
+SPECIALDEF(4)
+	(
+    UInt8, lev,
+    Int8, id,
+    float, value,
+    UInt8, next
+    )
+SPECIALEND()
+
 SPECIALBEGIN(GData::DBLingShi)
 SPECIALDEF(19)
 	(
     UInt16, id,
     UInt8, level,
-    UInt8, isUp,
+    UInt8, isBreak,
     UInt16, useItem,
     UInt16, useGold,
     float, attack,

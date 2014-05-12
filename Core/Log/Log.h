@@ -245,6 +245,7 @@ enum MailItemType
     ArenaAward,
     BuChangMarry,
 	DismissXinMo,
+	RandBattleAward,
 };
 enum ItemFrom
 {

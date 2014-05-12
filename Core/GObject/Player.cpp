@@ -92,6 +92,8 @@
 #include "ArenaServerWar.h"
 #include "GData/SevenSoul.h"
 #include "KangJiTianMo.h"
+#include "Battle/BattleReport.h"
+#include "GObject/RaceBattle.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -680,6 +682,29 @@ namespace GObject
 		return count == 0;
     }
 
+	UInt64 EventAutoRaceBattle::calcExpEach()
+	{
+        UInt8 plvl = m_Player->GetLev();
+        if(plvl < 40)
+            return 0;
+        UInt64 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
+        return exp;
+	}
+
+	void EventAutoRaceBattle::Process(UInt32 leftCount)
+	{
+		UInt64 exp = calcExpEach();
+
+		if(m_Player->isOnline())
+			m_Player->AddExp(exp * 8);
+		else
+			m_Player->pendExp(exp * 8);
+        m_Player->setTotalExp(m_Player->getTotalExp() + exp * 8);
+
+        if(!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTORACEBATTLE, m_Player->getId());
+	}
+
     bool EventPlayerTimeTick::Equal(UInt32 id, size_t playerid) const
     {
 		return 	id == GetID() && playerid == m_Player->getId();
@@ -872,7 +897,28 @@ namespace GObject
         m_curPageA = 0;
         _KJTM_factor = 1.0f;
         _ePhysicalTime = 0;
-	}
+
+        _playerPos = 0;
+        memset(_starCnt, 0, sizeof(_starCnt));
+        _continueWinCnt = 0;
+        _awardLevel = 2;
+        _continueWinPage = 1;
+        _rbBufId = 0;
+        _rbValue = 0;
+        _exitCd = 0;
+        _starTotal = 0;
+        _canContinueCnt = 0;
+        _continueLoseCnt = 0;
+        _attackCd = 0;
+        _isLastLevel = false;
+        _matchPlayer = NULL;
+        _continueWinMaxCnt = 0;
+        _totalWinCnt = 0;
+        _totalLoseCnt = 0;
+        _totalAchievement = 0;
+        _totalItemCnt = 0;
+        _totalExp = 0;
+    }
 
 
 	Player::~Player()
@@ -2338,6 +2384,7 @@ namespace GObject
         int addr = inet_addr(m_clientIp);
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%" I64_FMT "u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %" I64_FMT "u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
+
         if(_isOnline && !hasFlag(Training))
         {
             //if(cfg.GMCheck)
@@ -3543,10 +3590,12 @@ namespace GObject
                 << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
 				<< fgt->getAmuletId() << fgt->getRingId();
             fgt->getAllTrumps(st);
+            /*
             //灵侍id
             UInt32 lss[3] = {0};
             fgt->getAllLingshiId(lss);
             st << lss[0] << lss[1] << lss[2];
+            */
 
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
@@ -6581,6 +6630,10 @@ namespace GObject
             newHeroIsland.playerLeave(this);
             delFlag(Player::InHeroIsland);
         }
+        else if (_playerData.location == 1556)
+        {
+            cancelAutoRaceBattle();
+        }
         SpotData * spotData = GetMapSpot();
         if(spotData && spotData->m_CountryBattle && !(gClanCity && gClanCity->isOpen()))
         {
@@ -6655,6 +6708,12 @@ namespace GObject
 
 		_playerData.inCity = inCity ? 1 : 0;
 		_playerData.location = spot;
+        if (_playerData.location == 1556)
+        {
+            if(raceBattle.isStart())
+                raceBattle.autoBattle(this);
+        }
+
 		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %"  I64_FMT  "u", _playerData.inCity, _playerData.location, getId());
 
         ClanRankBattleMgr::Instance().PlayerEnter(this);
@@ -32012,6 +32071,98 @@ void Player::specialUdpLog(UInt8 type)
             break;
     }
 }
+
+    UInt8 Player::getChallengeStatus(Player* pl)
+    {
+        if(!pl)
+            return 0;
+        std::map <Player *, UInt8>::iterator it = _challengePlayer.find(pl);
+        if(it != _challengePlayer.end())
+            return it->second;
+        return 0;
+    }
+
+    void Player::insertChallengePlayer(Player* pl)
+    {
+        if(!pl)
+            return;
+        std::map <Player *, UInt8>::iterator it = _challengePlayer.find(pl);
+        if(it != _challengePlayer.end())
+            return;
+        _challengePlayer[pl] = 1;
+    }
+
+    void Player::clearChallengePlayer()
+    {
+        _challengePlayer.clear();
+    }
+
+    void Player::makeRBBattleInfo(Stream& st)
+    {
+        UInt8 reportCnt = _playerReport.size();
+        st << reportCnt;
+        for(UInt8 i = 0; i < reportCnt; i++)
+        {
+            Player* pl = _playerReport[i].pl;
+            st << pl->getName();
+            st << pl->getCountry();
+            st << _playerReport[i].win;
+            st << _playerReport[i].reportId;
+        }
+    }
+
+    void Player::insertPlayerRecord(PlayerReport record)
+    {
+        _playerReport.push_back(record);
+    }
+
+    void Player::clearPlayerRecord()
+    {
+        _playerReport.clear();
+    }
+#if 0
+    void Player::readRandBattleReport(UInt32 reportId)
+    {
+        std::vector<PlayerReport>::iterator it;
+        for(it = _playerReport.begin(); it != _playerReport.end(); ++it)
+        {
+            if(it->reportId == reportId)
+                break;
+        }
+        if(it == _playerReport.end())
+            return;
+
+        std::vector<UInt8> *r = Battle::battleReport[reportId];
+        if(r == NULL)
+            return;
+        send(&(*r)[0], r->size());
+    }
+#endif
+    void Player::autoRaceBattle(UInt32 count)
+    {
+		EventAutoRaceBattle* event = new(std::nothrow)EventAutoRaceBattle(this, 60, count);
+		if(event == NULL)
+            return;
+		cancelAutoRaceBattle();
+		PushTimerEvent(event);
+
+    }
+
+	void Player::cancelAutoRaceBattle()
+	{
+#if 0
+        if(getThreadId() != WORKER_THREAD_NEUTRAL)
+        {
+            GameMsgHdr hdr(0x1D1, WORKER_THREAD_NEUTRAL, this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+            return;
+        }
+#endif
+        EventBase* ev = eventWrapper.RemoveTimerEvent(this, EVENT_AUTORACEBATTLE, 0);
+        if(ev == NULL)
+            return;
+        ev->release();
+	}
 
 void Player::SetKJTMAwardMark(UInt8 type)
 {

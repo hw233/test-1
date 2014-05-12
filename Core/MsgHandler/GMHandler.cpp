@@ -60,6 +60,7 @@
 #include "GObject/Married.h"
 #include "GObject/ArenaServerWar.h"
 #include "GObject/ClanBuilding.h"
+#include "GObject/RaceBattle.h"
 
 GMHandler gmHandler;
 
@@ -319,6 +320,7 @@ GMHandler::GMHandler()
     Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
     Reg(2, "settyss", &GMHandler::OnSetTYSS);
     Reg(3, "clanrank", &GMHandler::TestClanRank);
+    Reg(3, "rb", &GMHandler::OnRaceBattle);
     Reg(2, "addkapai", &GMHandler::OnAddCard);
     Reg(2, "addkapaiexp", &GMHandler::OnAddCardExp);
 
@@ -4956,7 +4958,7 @@ void GMHandler::OnAddLingshiExp(GObject::Player *player, std::vector<std::string
     if(!lingshi || !IsLingShi(lingshi->getClass()))
         return;
     ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
-    if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv))
+    if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
         return;
     UInt32 upExp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
     if(upExp == 0) return;
@@ -4965,7 +4967,7 @@ void GMHandler::OnAddLingshiExp(GObject::Player *player, std::vector<std::string
     UInt8 tmp = lsAttr.lv;
     for(UInt8 i = tmp; i <= maxLev; ++ i)
     {
-        if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv))
+        if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
             break;
         if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
             break;
@@ -5562,6 +5564,35 @@ void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& 
     GObject::Clan *clan = player->getClan();
     if(clan != NULL)
         clan->sendMemberBuf(pos);
+}
+
+void GMHandler::OnRaceBattle(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt8 type;
+    type = atoi(args[0].c_str());
+    if(type == 4)
+    {
+        if(args.size() < 2)
+            return;
+        UInt8 pos = atoi(args[1].c_str());
+        GObject::raceBattle.enterPos(player, pos);
+    }
+    else if(type == 12)
+    {
+        if(args.size() < 2)
+            return;
+        UInt64 defenderId = (1LL << 48) + atoll(args[1].c_str());
+        GObject::raceBattle.attackLevelPlayer(player, defenderId);
+    }
+    else if(type == 13)
+    {
+        if(args.size() < 2)
+            return;
+        UInt64 defenderId = (1LL << 48) + atoll(args[1].c_str());
+        GObject::raceBattle.attackContinueWinPlayer(player, defenderId);
+    }
 }
 
 void GMHandler::OnAddCard(GObject::Player *player, std::vector<std::string>& args)

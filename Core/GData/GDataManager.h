@@ -74,6 +74,7 @@ namespace GData
         static bool LoadXinMoConfig();
         static bool LoadDrinkAttrConfig();
         static bool LoadSkillEvConfig();
+        static bool LoadRandBattleConfig();
         static bool LoadJiguanshuConfig();
         static bool LoadJiguanyuConfig();
         static bool LoadTuzhiConfig();

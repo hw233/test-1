@@ -168,6 +168,7 @@ public:
 	inline UInt32 ThisDay() { return _today; }
 	inline UInt32 Now() { return _now; }
 	inline bool isNewCountryBattle() { return !(_wday % 2); }
+	inline bool isRaceBattle() { return (_wday == 3 || _wday == 5 || _wday == 7); }
 
     inline static bool isFBVersion() { return cfg.fbVersion; }
     inline static bool isVTVersion() { return cfg.vtVersion; }
@@ -1155,6 +1156,9 @@ public:
 
         return !(opTime >= actTime_new1 && opTime <= actTime_new2);
     }
+
+    inline static UInt32 getRBTimeRank() { return _rbTimeRank; }
+    inline static void setRBTimeRank(UInt32 rank) { _rbTimeRank = rank; }
  
 public:
 	inline static UInt8 getWeekDay()
@@ -1319,6 +1323,7 @@ public:
     static bool _miluzhijiao;
     static bool _buyfund;
     static bool _duobaoOpen;
+    static UInt32 _rbTimeRank;
 public:
     static RCSortType qishibanScoreSort;     //七石板积分排名
     static RCSortType guankaScoreSort;     //关卡活动积分排名

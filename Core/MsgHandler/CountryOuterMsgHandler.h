@@ -75,6 +75,7 @@
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
 #include "GObject/ClanBuilding.h"
+#include "GObject/RaceBattle.h"
 #include "GObject/CollectCard.h"
 
 struct NullReq
@@ -1465,6 +1466,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     //结拜邀请信息
     pl->sendFriendlyTimeAndCost();
+    GObject::raceBattle.sendRBStatus(pl);
 
     }
 
@@ -6726,6 +6728,101 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
         default:
             return;
             break;
+    }
+}
+
+void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	//if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+	//	return;
+    if(player->getLocation() != 1556)
+        return;
+    if(player->GetLev() < 40)
+        return;
+    if(!GObject::raceBattle.isStart())
+        return;
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    switch(type)
+    {
+        case 4:
+        {
+            UInt8 pos = 0;
+            brd >> pos;
+            GObject::raceBattle.enterPos(player, pos);
+        }
+        break;
+#if 0
+        case 5:
+        {
+            GObject::raceBattle.autoBattle(player);
+        }
+        break;
+#endif
+#if 0
+        case 6:
+        {
+            GObject::raceBattle.cancelBattle(player);
+        }
+        break;
+#endif
+        case 7:
+        {
+            GObject::raceBattle.freshContinueWinRank(player);
+        }
+        break;
+
+        case 8:
+        {
+            GObject::raceBattle.getAward(player);
+        }
+        break;
+
+        case 10:
+        {
+            bool bRet = GObject::raceBattle.requestMatch(player);
+            if(!bRet)
+                GObject::raceBattle.sendMatchPlayer(player, NULL);
+        }
+        break;
+
+        case 11:
+            GObject::raceBattle.exitRB(player);
+        break;
+
+        case 12:
+        {
+            UInt64 defenderId = 0;
+            brd >> defenderId;
+            GObject::raceBattle.attackLevelPlayer(player, defenderId);
+        }
+        break;
+
+        case 13:
+        {
+            UInt64 defenderId = 0;
+            brd >> defenderId;
+            GObject::raceBattle.attackContinueWinPlayer(player, defenderId);
+        }
+        break;
+
+        case 14:
+        {
+            GObject::raceBattle.pageContinueWin(player, 0);
+        }
+        break;
+
+        case 15:
+        {
+            GObject::raceBattle.pageContinueWin(player, 1);
+        }
+        break;
+
+        default:
+        break;
     }
 }
 

@@ -1220,6 +1220,12 @@ void OnDailyReq2(GameMsgHdr& hdr, const void * data)
 	player->sendDailyInfo();
 }
 
+void OnCancelAutoRaceBattle(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	player->cancelAutoRaceBattle();
+}
+
 void OnAddAwardGold(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);

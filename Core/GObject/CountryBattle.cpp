@@ -18,6 +18,7 @@
 #include "ShuoShuo.h"
 #include "Package.h"
 #include "ClanCityBattle.h"
+#include "RaceBattle.h"
 
 namespace GObject
 {

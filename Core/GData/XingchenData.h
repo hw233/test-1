@@ -80,9 +80,27 @@ class SkillEvData
 
 };
 
+class RandBattleData
+{
+    public:
+        struct stRandBattle
+        {
+            UInt8 id;
+            float value;
+            UInt8 next;
+            stRandBattle() : id(0), value(0), next(0) {}
+        };
+    private:
+        std::map<UInt8, stRandBattle> _randBattle;
+    public:
+        void setRandBattleData(UInt8 lev, stRandBattle& randBattle);
+        stRandBattle* getRandBattleData(UInt8 lev);
+};
+
 extern XinMoData xinmoData;
 extern XingchenData xingchenData;
 extern SkillEvData skillEvData;
+extern RandBattleData randBattleData;
 }
 
 #endif // _XINGCHENDATA_H_

@@ -3698,6 +3698,9 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
         {
             _owner->sendFighterSSListWithNoSkill();
             _owner->sendFighterSGListWithNoSkill();
+            Stream st;
+            _owner->makeFighterSGList(st);
+            _owner->send(st);
         }
     }
     else
@@ -6344,6 +6347,9 @@ void Fighter::PeerlessSSNotify(UInt16 id, bool writedb)
     {
         _owner->sendFighterSSListWithNoSkill();
         _owner->sendFighterSGListWithNoSkill();
+        Stream st;
+        _owner->makeFighterSGList(st);
+        _owner->send(st);
     }
 }
 

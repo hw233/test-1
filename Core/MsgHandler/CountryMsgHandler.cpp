@@ -168,10 +168,11 @@ MSG_REG_2(GameMsgHdr, REQ::MO_BAO, OnMoBaoReq);
 MSG_REG_2(GameMsgHdr, REQ::NEWRELATION, OnNewRelationReq);
 MSG_REG_2(GameMsgHdr, REQ::SKILLSTRENGTHEN, OnSkillStrengthen);
 
-MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_LIST, OnActivityList);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_REWARD,OnActivityReward);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_SIGNIN, OnActivitySignIn);
 MSG_REG_2(GameMsgHdr, REQ::STRENGTHEN_LIST, OnMakeStrong);
+
+MSG_REG_2(GameMsgHdr, REQ::RACE_BATTLE, OnRaceBattleReq);
 
 MSG_REG_2(GameMsgHdr, REQ::SECOND_SOUL, OnSecondSoulReq);
 MSG_REG_2(GameMsgHdr, REQ::RC7DAY, OnRC7Day);
@@ -216,6 +217,7 @@ MSG_REG_2(GameMsgHdr, REQ::MARRYBOARD, OnMarryBoard2);
 MSG_REG_2(GameMsgHdr, REQ::KANGJITIANMO_REQ, OnKangJiTianMoReq);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
+MSG_REG_2(GameMsgHdr, 0x1D1, OnCancelAutoRaceBattle);
 
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReLoadLuaReq);
 MSG_REG_2(GameMsgHdr, 0x1ED, OnRunScriptReq);
