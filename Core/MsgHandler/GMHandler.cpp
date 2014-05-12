@@ -2112,7 +2112,8 @@ void GMHandler::OnUpPasSkill( GObject::Player * player, std::vector<std::string>
 
         UInt16 skill = SKILLANDLEVEL(skillId, skillLevel);
         UInt16 skills[1] = {skill};
-        fgt->upPassiveSkill(skills, 1);
+        // FIXME: 这里先禁用这个GM指令
+        //fgt->upPassiveSkill(skills, 1);
 	}
 }
 

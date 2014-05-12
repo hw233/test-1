@@ -51,6 +51,7 @@ class BattleSimulator:
 public:
 	BattleSimulator(UInt32, GObject::Player *, const std::string&, UInt8, bool report = true, UInt32 fake_turns = 500);
 	BattleSimulator(UInt32, GObject::Player *, GObject::Player *, bool report = true, UInt32 fake_turns = 500);
+    virtual ~BattleSimulator();
 	inline int getId() {return _id;}
 	inline int getTurns() {return _turns;}
 	inline int getRounds() {return _attackRound;}
@@ -652,6 +653,7 @@ private:
 	std::vector<BattleFighter*> _onOtherDead;
     std::vector<BattleFighter*> _onPetProtect;
     std::vector<BattleFighter*> _onPetAtk;
+    std::vector<BattleFighter*> _onOtherConfuseAndForget;
 
     UInt8 _cur_round_except[25];
     UInt8 _except_count;

@@ -56,6 +56,7 @@ enum    // 技能触发方式
     /*30*/ SKILL_VIOLENT,    // 狂暴(怪物技能)
     /*31*/ SKILL_REVIVAL,    // 生生不息(怪物技能)
     /*32*/ SKILL_LINGSHI,    // 灵侍技能
+    /*33*/ SKILL_ONOTHERCONFUSEFORGET,  // 其他人获得沉默和混乱
     SKILL_PASSIVES
 };
 
