@@ -3241,7 +3241,16 @@ void BattleFighter::updatePassiveSkill(std::vector<UInt16>& passiveSkillId, std:
     }
 }
 
-void BattleFighter::updatePassiveSkillLingshi100(UInt8 type, std::vector<GData::SkillItem>& passiveSkill100)
+void BattleFighter::updateAllPassiveSkillLingshi()
+{
+    for (UInt8 type = GData::SKILL_PASSSTART; type < GData::SKILL_PASSIVES; ++ type)
+    {
+        updatePassiveSkillLingshi100(type);
+        updatePassiveSkillLingshi(type);
+    }
+}
+
+void BattleFighter::updatePassiveSkillLingshi100(UInt8 type)
 {
     switch (type)
     {
@@ -3344,7 +3353,7 @@ void BattleFighter::updatePassiveSkillLingshi100(UInt8 type, std::vector<GData::
     }
 }
 
-void BattleFighter::updatePassiveSkillLingshi(UInt8 type, std::vector<GData::SkillItem>& passiveSkill)
+void BattleFighter::updatePassiveSkillLingshi(UInt8 type)
 {
     switch (type)
     {
@@ -3443,6 +3452,221 @@ void BattleFighter::updatePassiveSkillLingshi(UInt8 type, std::vector<GData::Ski
             break;
         case GData::SKILL_ONOTHERCONFUSEFORGET:
             addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnOtherConfuseForget);
+            break;
+    }
+}
+
+void BattleFighter::unUpdateAllPassiveSkillLingshi()
+{
+    for (UInt8 type = GData::SKILL_PASSSTART; type < GData::SKILL_PASSIVES; ++ type)
+    {
+        unUpdatePassiveSkillLingshi100(type);
+        unUpdatePassiveSkillLingshi(type);
+    }
+}
+
+void BattleFighter::unUpdatePassiveSkillLingshi(UInt8 type)
+{
+    switch (type)
+    {
+        case GData::SKILL_PREATK:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillPreAtk);
+            break;
+        case GData::SKILL_AFTATK:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillAftAtk);
+            break;
+        case GData::SKILL_BEATKED:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillBeAtk);
+            break;
+        case GData::SKILL_AFTEVD:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillAftEvd);
+            break;
+        case GData::SKILL_AFTRES:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillAftRes);
+            break;
+        case GData::SKILL_ENTER:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillEnter);
+            break;
+        case GData::SKILL_DEAD:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnOtherDead);
+            break;
+        case GData::SKILL_AFTNATK:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillAftNAtk);
+            break;
+        case GData::SKILL_ONTHERAPY:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnTherapy);
+            break;
+        case GData::SKILL_ONSKILLDMG:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnSkillDmg);
+            break;
+        case GData::SKILL_ONOTHERDEAD:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnOtherDead);
+            break;
+        case GData::SKILL_ONCOUNTER:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnCounter);
+            break;
+        case GData::SKILL_ONATKBLEED:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnAttackBleed);
+            break;
+        case GData::SKILL_ONATKDMG:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnAtkDmg);
+            break;
+        case GData::SKILL_ONPETPROTECT:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnPetProtect);
+            break;
+        case GData::SKILL_ONGETDMG:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnGetDmg);
+            break;
+        case GData::SKILL_ONBEDMG:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnBeDmg);
+            break;
+        case GData::SKILL_ONBEPHYDMG:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnBePHYDmg);
+            break;
+        case GData::SKILL_ONBEMAGDMG:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnBeMagDmg);
+            break;
+        case GData::SKILL_ONHP10P:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnHP10P);
+            break;
+        case GData::SKILL_DEAD_FAKE:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillDeadFake);
+            break;
+        case GData::SKILL_ABNORMAL_TYPE_DMG:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillAbnormalTypeDmg);
+            break;
+        case GData::SKILL_BLEED_TYPE_DMG:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillBleedTypeDmg);
+            break;
+        case GData::SKILL_XMCZ:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillXMCZ);
+            break;
+        case GData::SKILL_BLTY:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillBLTY);
+            break;
+        case GData::SKILL_AFTACTION:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillAftAction);
+            break;
+        case GData::SKILL_ONHPCHANGE:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnHPChange);
+            break;
+        case GData::SKILL_ONWITHSTAND:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnWithstand);
+            break;
+        case GData::SKILL_VIOLENT:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillViolent);
+            break;
+        case GData::SKILL_REVIVAL:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillRevival);
+            break;
+        case GData::SKILL_LINGSHI:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillLingshi);
+            break;
+        case GData::SKILL_ONOTHERCONFUSEFORGET:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnOtherConfuseForget);
+            break;
+    }
+}
+
+void BattleFighter::unUpdatePassiveSkillLingshi100(UInt8 type)
+{
+    switch (type)
+    {
+        case GData::SKILL_PREATK:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillPreAtk100);
+            break;
+        case GData::SKILL_AFTATK:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillAftAtk100);
+            break;
+        case GData::SKILL_BEATKED:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillBeAtk100);
+            break;
+        case GData::SKILL_AFTEVD:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillAftEvd100);
+            break;
+        case GData::SKILL_AFTRES:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillAftRes100);
+            break;
+        case GData::SKILL_ENTER:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillEnter100);
+            break;
+        case GData::SKILL_DEAD:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnOtherDead);
+            break;
+        case GData::SKILL_AFTNATK:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillAftNAtk100);
+            break;
+        case GData::SKILL_ONTHERAPY:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnTherapy);
+            break;
+        case GData::SKILL_ONSKILLDMG:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnSkillDmg);
+            break;
+        case GData::SKILL_ONOTHERDEAD:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnOtherDead);
+            break;
+        case GData::SKILL_ONCOUNTER:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnCounter100);
+            break;
+        case GData::SKILL_ONATKBLEED:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnAttackBleed100);
+            break;
+        case GData::SKILL_ONATKDMG:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnAtkDmg100);
+            break;
+        case GData::SKILL_ONPETPROTECT:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnPetProtect100);
+            break;
+        case GData::SKILL_ONGETDMG:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnGetDmg100);
+            break;
+        case GData::SKILL_ONBEDMG:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnBeDmg100);
+            break;
+        case GData::SKILL_ONBEPHYDMG:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnBePHYDmg100);
+            break;
+        case GData::SKILL_ONBEMAGDMG:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnBeMagDmg100);
+            break;
+        case GData::SKILL_ONHP10P:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnHP10P100);
+            break;
+        case GData::SKILL_DEAD_FAKE:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillDeadFake100);
+            break;
+        case GData::SKILL_ABNORMAL_TYPE_DMG:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillAbnormalTypeDmg100);
+            break;
+        case GData::SKILL_BLEED_TYPE_DMG:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillBleedTypeDmg100);
+            break;
+        case GData::SKILL_XMCZ:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillXMCZ100);
+            break;
+        case GData::SKILL_BLTY:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillBLTY100);
+            break;
+        case GData::SKILL_AFTACTION:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillAftAction100);
+            break;
+        case GData::SKILL_ONHPCHANGE:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnHPChange100);
+            break;
+        case GData::SKILL_ONWITHSTAND:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnWithstand100);
+            break;
+        case GData::SKILL_VIOLENT:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillViolent100);
+            break;
+        case GData::SKILL_REVIVAL:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillRevival100);
+            break;
+        case GData::SKILL_LINGSHI:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillLingshi100);
+            break;
+        case GData::SKILL_ONOTHERCONFUSEFORGET:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnOtherConfuseForget100);
             break;
     }
 }

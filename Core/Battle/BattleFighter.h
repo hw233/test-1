@@ -420,8 +420,12 @@ public:
     void updatePassiveSkill(std::vector<UInt16>& passiveSkillId, std::vector<GData::SkillItem>& passiveSkill);
     void updatePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
 
-    void updatePassiveSkillLingshi(UInt8 type, std::vector<GData::SkillItem>& passiveSkill);
-    void updatePassiveSkillLingshi100(UInt8 type, std::vector<GData::SkillItem>& passiveSkill100);
+    void updateAllPassiveSkillLingshi();
+    void updatePassiveSkillLingshi(UInt8 type);
+    void updatePassiveSkillLingshi100(UInt8 type);
+    void unUpdateAllPassiveSkillLingshi();
+    void unUpdatePassiveSkillLingshi(UInt8 type);
+    void unUpdatePassiveSkillLingshi100(UInt8 type);
 
     void addPassiveSkill(std::vector<UInt16>& passiveSkillId, std::vector<GData::SkillItem>& passiveSkill);
     void addPassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
