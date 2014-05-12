@@ -169,21 +169,6 @@ namespace GObject
         setDirty();
     }
 
-    void FairyPet::delSkills(std::string& skills)
-    {
-        StringTokenizer tk(skills, ",");
-        const GData::SkillBase* s = NULL;
-        std::vector<const GData::SkillBase*> vt_skills;
-        for (size_t i = 0; i < tk.count(); ++i)
-        {
-            s = GData::skillManager[::atoi(tk[i].c_str())];
-            if (s)
-                vt_skills.push_back(s);
-        }
-        if (vt_skills.size())
-            delSkillsFromCT(vt_skills, false);
-    }
-
     void FairyPet::addChongNum(int num)
     {
         if(_chong + num <= 0)

@@ -19,6 +19,7 @@
 #include "Common/URandom.h"
 #include "Common/TimeUtil.h"
 #include "Common/StringTokenizer.h"
+#include "Common/Itoa.h"
 #include "Script/GameActionLua.h"
 #include "Script/BattleFormula.h"
 #include "GData/FighterProb.h"
@@ -1216,10 +1217,42 @@ ItemEquip * Fighter::setLingshi(ItemEquip * lingshi, int idx, bool writedb)
     }
     ItemEquip * old = _lingshi[idx];
     _lingshi[idx] = lingshi;
-    if(lingshi)
-        lingshi->SetBindStatus(true);
     sendModification(0x63+idx, lingshi, writedb);
+    if(lingshi)
+    {
+        lingshi->SetBindStatus(true);
+        //setLingshiSkill
+        std::string lsStr;
+        for(size_t j = 0; j < _lingshiSkill[idx].size(); ++ j)
+        {
+            lsStr += Itoa(_lingshiSkill[idx][j]);
+            if(j < _lingshiSkill[idx].size() - 1)
+                lsStr += ",";
+        }
+        delSkills(lsStr, false);
+        lsStr.clear();
+        std::vector<const GData::SkillBase*> vt_skills;
+        GData::ItemGemType * igt = GData::lingshiTypes[lingshi->GetTypeId() - LLINGSHI_ID];
+        ItemLingshiAttr& lsAttr = static_cast<ItemLingshi *>(lingshi)->getLingshiAttr();
+        if(igt && igt->attrExtra)
+        {
+            _lingshiSkill[idx].clear();
+            for(size_t j = 0; j < igt->attrExtra->skills.size(); ++ j)
+            {
+                if(igt->attrExtra->skills[j])
+                {
+                    UInt16 skillId = igt->attrExtra->skills[j]->getId();
+                    if(j > 0)   //第一个技能(入场技能)不升级
+                        skillId = SKILLANDLEVEL(SKILL_ID(skillId), lsAttr.lv / 10 + 1);
+                    _lingshiSkill[idx].push_back(skillId);
+                    lsStr += Itoa(skillId) + ",";
+                }
+            }
+            setSkills(lsStr, false);
+        }
+    }
     setDirty();
+
     return old;
 }
 
@@ -2592,13 +2625,15 @@ Fighter * Fighter::cloneWithOutDirty(Player * player)
         if(igt && igt->attrExtra)
         {
             fgt->_lingshiSkill[i].clear();
+            ItemLingshiAttr& lsAttr = static_cast<ItemLingshi *>(_lingshi[i])->getLingshiAttr();
             for(size_t j = 0; j < igt->attrExtra->skills.size(); ++ j)
             {
                 if(igt->attrExtra->skills[j])
                 {
                     UInt16 skillId = igt->attrExtra->skills[j]->getId();
-                    ItemLingshiAttr& lsAttr = static_cast<ItemLingshi *>(_lingshi[i])->getLingshiAttr();
-                    fgt->_lingshiSkill[i].push_back(SKILLANDLEVEL(SKILL_ID(skillId), lsAttr.lv / 10 + 1));
+                    if(j > 0)   //第一个技能(入场技能)不升级
+                        skillId = SKILLANDLEVEL(SKILL_ID(skillId), lsAttr.lv / 10 + 1);
+                    fgt->_lingshiSkill[i].push_back(skillId);
                 }
             }
         }
@@ -3730,6 +3765,21 @@ void Fighter::setSkills( std::string& skills, bool writedb )
 
     if (vt_skills.size())
         addSkillsFromCT(vt_skills, writedb, up, false);
+}
+
+void Fighter::delSkills(std::string& skills, bool writedb)
+{
+    StringTokenizer tk(skills, ",");
+    const GData::SkillBase* s = NULL;
+    std::vector<const GData::SkillBase*> vt_skills;
+    for (size_t i = 0; i < tk.count(); ++i)
+    {
+        s = GData::skillManager[::atoi(tk[i].c_str())];
+        if (s)
+            vt_skills.push_back(s);
+    }
+    if (vt_skills.size())
+        delSkillsFromCT(vt_skills, writedb);
 }
 
 bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up, bool online )
