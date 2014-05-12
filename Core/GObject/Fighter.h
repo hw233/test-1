@@ -319,7 +319,7 @@ public:
     // 初始化可装备的技能
     void setSkills(std::string& skills, bool = true);
     // 更新被动技能表
-    bool upPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
+    bool upPassiveSkill(UInt16 skill, UInt16 type, bool, bool = true);
     // 装备被动技能
     bool upPassiveSkill(UInt16* skill, UInt8 size, bool = true);
     // 更新被动技能
