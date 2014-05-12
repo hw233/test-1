@@ -51,6 +51,7 @@ class BattleSimulator:
 public:
 	BattleSimulator(UInt32, GObject::Player *, const std::string&, UInt8, bool report = true, UInt32 fake_turns = 500);
 	BattleSimulator(UInt32, GObject::Player *, GObject::Player *, bool report = true, UInt32 fake_turns = 500);
+    virtual ~BattleSimulator();
 	inline int getId() {return _id;}
 	inline int getTurns() {return _turns;}
 	inline int getRounds() {return _attackRound;}
@@ -353,6 +354,8 @@ private:
         e_unBleedFieldGape3 = 128, // 解除地裂效果3
         e_yehuoBleedMo = 129,    // 业火(墨流血)
         e_unYehuoBleedMo = 130,  // 解除业火
+        e_chaosWorld = 131,  // 混世状态(攻击必定附带眩晕)
+        e_unChaosWorld = 132,  // 混世状态消失(攻击必定附带眩晕)
 
         e_changeMode = 131,  //改变模型
         e_unChangeMode = 132,  //恢复模型
@@ -595,6 +598,7 @@ private:
     void doSkillEffectExtra_HpLostP(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_Flaw(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
     void doSkillEffectExtra_Withstand(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
+    void doSkillEffectExtra_ChaosWorld(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx);
 
     bool doSkillEffectExtra_Dead(BattleFighter* bf, const GData::SkillBase* skill);
     void doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, const GData::SkillBase* skill, bool& cs, bool& pr);
@@ -613,8 +617,6 @@ private:
     void getSkillEffectExtraBlind(BattleFighter* bf, BattleFighter* target_bo, const GData::SkillBase* skill, UInt16& effect_state);
 
     bool doSkillStrengthenDeepBlind(BattleFighter* bf, BattleFighter* bo, GData::SkillStrengthenBase* ss);
-
-
 
     bool doDarkVigorAttack(BattleFighter* bf, float darkVigor);
     void doSkillEffectExtraCounter(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill);
@@ -636,6 +638,7 @@ private:
 	UInt32 _fake_turns;
 	//std::vector<FighterStatus> _fgtlist[2];
 	std::vector<BattleFighter*> _fgtlist[2];
+    bool _listDirty[2];
     Int8 _cur_fgtlist_idx;
 	Stream _packet;
 	Script::BattleFormula * _formula;
@@ -650,6 +653,7 @@ private:
 	std::vector<BattleFighter*> _onOtherDead;
     std::vector<BattleFighter*> _onPetProtect;
     std::vector<BattleFighter*> _onPetAtk;
+    std::vector<BattleFighter*> _onOtherConfuseAndForget;
 
     UInt8 _cur_round_except[25];
     UInt8 _except_count;
@@ -668,7 +672,7 @@ private:
     doSkillEffectExtraFunc skillEffectExtraTable[GData::e_eft_max];
 
     //成就记录
-    UInt32   _evadeNum[2]; //连续闪避次数
+    UInt32  _evadeNum[2]; //连续闪避次数
     UInt32  _csNum[2]; //连续暴击次数
     UInt32  _prNum[2]; //连续破击次数
     UInt32  _fjNum[2]; //反击次数

@@ -16,6 +16,7 @@ public:
 	};
 public:
 	BattleObject(Class c, UInt8 s, UInt8 p): _cls(c), _hp(0), _side(s), _pos(p), _hide(false), _shieldObj(NULL), _protectObj(NULL), _protectProb(0) {}
+    virtual ~BattleObject() {};
 
 	inline void setSideAndPos(UInt8 s, UInt8 p) { _side = s; _pos = p; }
 

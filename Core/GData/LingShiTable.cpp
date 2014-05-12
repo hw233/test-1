@@ -103,8 +103,8 @@ bool LingshiCls::canUpgrade(UInt32 lid, UInt8 lvl, UInt32& exp)
         return false;
     if(lvl >= iter->second.size())
         return false;
-    lvl = lvl >= 1 ? lvl - 1 : lvl;
-    bool isBreak = iter->second[lvl].isBreak;
+    UInt8 tmpLvl = lvl >= 1 ? lvl - 1 : lvl;
+    bool isBreak = iter->second[tmpLvl].isBreak;
     if(isBreak)
     {
         std::map<UInt8, LingshiUpgrade>::iterator it = _lingshiUp.find(lvl);
