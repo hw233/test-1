@@ -8476,6 +8476,13 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             -- atkAdd_last;
            if(0 == atkAdd_last)
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAtk, 0, 0, false);
+           else
+           {
+               if (bf->addRoundAttack())
+                   appendDefStatus(e_skill, bf->getAttackRoundAddId(), bf);
+               if (bf->subRoundAttack())
+                   appendDefStatus(e_skill, bf->getAttackRoundSubId(), bf);
+           }
         }
 
         UInt8& magAtkAdd_last = bf->getMagAttackAddLast();
@@ -8484,6 +8491,11 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             -- magAtkAdd_last;
            if(0 == magAtkAdd_last)
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stMagAtk, 0, 0, false);
+           else
+           {
+               if (bf->addRoundMagAtk())
+                   appendDefStatus(e_skill, bf->getMagAtkRoundAddId(), bf);
+           }
         }
 
         bool clearDefDec = false;
@@ -8519,6 +8531,12 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
                     clearDefDec = true;
                 }
            }
+           else
+           {
+               if (bf->addRoundMagDef())
+                   appendDefStatus(e_skill, bf->getMagDefRoundAdd(), bf);
+           }
+
         }
 
         UInt8& defendChangeSSLast = bf->getDefendChangeSSLast();
@@ -8529,6 +8547,11 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             {
                 bf->setDefendChangeSS(0, 0);
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stDef, 0, 0, false);
+            }
+            else
+            {
+                if (bf->addRoundDef())
+                    appendDefStatus(e_skill, bf->getDefRoundAdd(), bf);
             }
         }
 
@@ -8602,6 +8625,11 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             -- pierceAdd_last;
            if(0 == pierceAdd_last)
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stPierce, 0, 0, false);
+           else
+           {
+               if (bf->addRoundPierce())
+                   appendDefStatus(e_skill, bf->getPierceRoundAddId(), bf);
+           }
         }
 
         UInt8& counterAdd_last = bf->getCounterAddLast();
@@ -8934,7 +8962,32 @@ void BattleSimulator::setStatusChange_Atk(BattleFighter * bf, UInt8 side, UInt8 
         skillId = skill->getId();
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<float>& efv = skill->effect->efv;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        if(!efv.empty())
+        {
+            for(size_t i = 0; i < eft.size(); ++ i)
+            {
+                if(eft[i] == GData::e_eft_round_add)
+                {
+                    bf->setAttackRoundAdd(efv[i], efl[i], skillId);
+                    break;
+                }
+                else if(eft[i] == GData::e_eft_round_sub)
+                {
+                    bf->setAttackRoundSub(efv[i], efl[i], skillId);
+                    break;
+                }
+            }
+        }
     }
+    else
+    {
+        bf->setAttackRoundAdd(0, 0);
+        bf->setAttackRoundSub(0, 0);
+    }
+
     bfgt->setAttackAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getAttack());
     appendStatusChange(e_stAtk, value2, skillId, bfgt);
@@ -8950,7 +9003,23 @@ void BattleSimulator::setStatusChange_Def(BattleFighter * bf, UInt8 side, UInt8 
         skillId = skill->getId();
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<float>& efv = skill->effect->efv;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        if(!efv.empty())
+        {
+            for(size_t i = 0; i < eft.size(); ++ i)
+            {
+                if(eft[i] == GData::e_eft_round_add)
+                {
+                    bf->setDefRoundAdd(efv[i], efl[i], skillId);
+                    break;
+                }
+            }
+        }
     }
+    else
+        bf->setDefRoundAdd(0, 0);
     bfgt->setDefendAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getDefend());
     appendStatusChange(e_stDef, value2, skillId, bfgt);
@@ -8998,7 +9067,23 @@ void BattleSimulator::setStatusChange_Pierce(BattleFighter * bf, UInt8 side, UIn
         skillId = skill->getId();
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<float>& efv = skill->effect->efv;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        if(!efv.empty())
+        {
+            for(size_t i = 0; i < eft.size(); ++ i)
+            {
+                if(eft[i] == GData::e_eft_round_add)
+                {
+                    bf->setPierceRoundAdd(efv[i], efl[i], skillId);
+                    break;
+                }
+            }
+        }
     }
+    else
+        bf->setPierceRoundAdd(0, 0);
     bfgt->setPierceAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getPierce(NULL)*100);
     appendStatusChange(e_stPierce, value2, skillId, bfgt);
@@ -9087,8 +9172,25 @@ void BattleSimulator::setStatusChange_MagAtk(BattleFighter * bf, UInt8 side, UIn
         skillId = skill->getId();
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<float>& efv = skill->effect->efv;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        if(!efv.empty())
+        {
+            for(size_t i = 0; i < eft.size(); ++ i)
+            {
+                if(eft[i] == GData::e_eft_round_add)
+                {
+                    bf->setMagAttackRoundAdd(efv[i], efl[i], skillId);
+                    break;
+                }
+            }
+        }
     }
-    bfgt->setMagAttackAdd(value, last);
+    else
+        bf->setMagAttackRoundAdd(0, 0);
+
+
     UInt32 value2 = static_cast<UInt32>(bfgt->getMagAttack());
     appendStatusChange(e_stMagAtk, value2, skillId, bfgt);
 }
@@ -9103,7 +9205,23 @@ void BattleSimulator::setStatusChange_MagDef(BattleFighter * bf, UInt8 side, UIn
         skillId = skill->getId();
         if(skill->cond == GData::SKILL_BEATKED && bf != bfgt)
             ++last;
+        const std::vector<UInt16>& eft = skill->effect->eft;
+        const std::vector<float>& efv = skill->effect->efv;
+        const std::vector<UInt8>& efl = skill->effect->efl;
+        if(!efv.empty())
+        {
+            for(size_t i = 0; i < eft.size(); ++ i)
+            {
+                if(eft[i] == GData::e_eft_round_add)
+                {
+                    bf->setMagDefRoundAdd(efv[i], efl[i], skillId);
+                    break;
+                }
+            }
+        }
     }
+    else
+        bf->setMagDefRoundAdd(0, 0);
     if(isFireDefend(skill))
         bfgt->setFireDefend(value, last);
     else

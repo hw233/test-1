@@ -139,6 +139,8 @@ enum
     e_eft_chaos_world = 55,     // 混世状态
     e_eft_lingshi_mojian = 56,    //魔剑
     e_eft_lingshi_buqu = 57,    //不屈
+    e_eft_round_add  = 58,      // 每回合增加的buff
+    e_eft_round_sub  = 59,      // 每回合减少的buff
 
     e_eft_max
 };

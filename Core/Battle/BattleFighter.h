@@ -258,6 +258,12 @@ public:
     inline float getToughAdd() { return _toughAdd;}
     inline float getAtkReduce() { return _atkreduce + _atkreduce2 + _atkreduce3 + _moAtkReduce + _hpAtkReduce - (_flawDamageAdd * _flawCount); }
     inline float getMagAtkReduce() { return _magatkreduce + _magatkreduce2 + _magatkreduce3 + _moMagAtkReduce + _hpMagAtkReduce - (_flawDamageAdd * _flawCount); }
+    inline float getAttackRoundAdd() { return _attackRoundAdd; }
+    inline float getAttackRoundSub() { return _attackRoundSub; }
+    inline float getMagAttackRoundAdd() { return _magAtkRoundAdd; }
+    inline float getDefRoundAdd() { return _defRoundAdd; }
+    inline float getMagDefRoundAdd() { return _magDefRoundAdd; }
+    inline float gePierceRoundAdd() { return _pierceRoundAdd; }
 
 	void setAttackAdd(float v, UInt16 last = 0);
 	void setMagAttackAdd(float v, UInt16 last = 0);
@@ -280,6 +286,20 @@ public:
     inline void AddAura(Int32 v) {_aura += v; if(_aura > _auraMax) _aura = _auraMax; else if(_aura < 0) _aura = 0;}
     inline void setAura(Int32 v) {_aura = v > _auraMax ? _auraMax : v;}
 
+    void setAttackRoundAdd(float v, UInt16 last = 0, UInt16 skillId = 0);
+    void setAttackRoundSub(float v, UInt16 last = 0, UInt16 skillId = 0);
+    void setMagAttackRoundAdd(float v, UInt16 last = 0, UInt16 skillId = 0);
+    void setDefRoundAdd(float v, UInt16 last = 0, UInt16 skillId = 0);
+    void setMagDefRoundAdd(float v, UInt16 last = 0, UInt16 skillId = 0);
+    void setPierceRoundAdd(float v, UInt16 last = 0, UInt16 skillId = 0);
+
+    bool addRoundAttack();
+    bool subRoundAttack();
+    bool addRoundDef();
+    bool addRoundMagAtk();
+    bool addRoundMagDef();
+    bool addRoundPierce();
+
 	inline UInt8& getAttackAddLast() {return _atkAdd_last;}
     inline UInt8& getMagAttackAddLast() {return _magAtkAdd_last;}
 	inline UInt8& getDefendAddLast() {return _defAdd_last;}
@@ -301,9 +321,23 @@ public:
     inline UInt8& getAtkReduce3Last() { return _atkreduce3_last;}
     inline UInt8& getMagAtkReduce3Last() { return _magatkreduce3_last;}
 
+    inline UInt16 getAttackRoundAddLast() { return _attackRoundAddLast; }
+    inline UInt16 getAttackRoundSubLast() { return _attackRoundSubLast; }
+    inline UInt16 getMagAttackRoundAddLast() { return _magAtkRoundAddLast; }
+    inline UInt16 getDefRoundAddLast() { return _defRoundAddLast; }
+    inline UInt16 getMagDefRoundAddLast() { return _magDefRoundAddLast; }
+    inline UInt16 getPierceRoundAddLast() { return _pierceRoundAdd_last; }
+
     void setAtkReduce3(float v, UInt16 last);
     void setMagAtkReduce3(float v, UInt16 last);
     void setPuduDebuf(float v, UInt16 last);
+
+    inline UInt16 getAttackRoundAddId() { return _attackRoundAddId; }
+    inline UInt16 getAttackRoundSubId() { return _attackRoundSubId; }
+    inline UInt16 getMagAtkRoundAddId() { return _magAtkRoundAddId; }
+    inline UInt16 getDefRoundAddId() { return _defRoundAddId; }
+    inline UInt16 getMagDefRoundAddId() { return _magDefRoundAddId; }
+    inline UInt16 getPierceRoundAddId() { return _pierceRoundAddId; }
 
 	inline UInt32 getLostHP() { Int64 tmp = _maxhp + _maxhpAdd + _maxhpAdd2; UInt32 mhp = (tmp > 0 ? tmp : 0); if(mhp > _hp) return mhp - _hp; return 0; }
 
@@ -558,14 +592,22 @@ private:
 	UInt32 _maxhp;
     Int32 _maxAction;
 	float _attackAdd, _magAtkAdd, _defAdd, _magDefAdd, _hitrateAdd, _evadeAdd;
+    float _attackRoundAdd, _attackRoundSub, _magAtkRoundAdd, _defRoundAdd, _magDefRoundAdd;
     float _defendChangeSS, _magDefendChangeSS;
     float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd, _toughAdd;
+    float _pierceRoundAdd;
 	Int32 _maxhpAdd, _maxActionAdd;
     UInt8 _atkAdd_last, _magAtkAdd_last, _defAdd_last, _magDefAdd_last, _hitrateAdd_last, _evadeAdd_last;
+    UInt8 _attackRoundAddLast, _attackRoundSubLast, _magAtkRoundAddLast, _defRoundAddLast, _magDefRoundAddLast;
     UInt8 _defendChangeSSLast, _magDefendChangeSSLast;
     UInt8 _criticalAdd_last, _criticalDmgAdd_last, _pierceAdd_last, _counterAdd_last, _magResAdd_last, _toughAdd_last;
+    UInt8 _pierceRoundAdd_last;
     UInt8 _maxhpAdd_last, _maxActionAdd_last;
     UInt8 _atkreduce_last, _magatkreduce_last;
+
+    UInt16 _attackRoundAddId, _attackRoundSubId, _magAtkRoundAddId, _defRoundAddId, _magDefRoundAddId;
+    UInt16 _pierceRoundAddId;
+
 	const GData::Formation::GridEffect * _formEffect;
 	Script::BattleFormula * _formula;
     UInt8 _forgetLevel, _forgetRound;
