@@ -4289,11 +4289,74 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
     return ret;
 }
 
-/*
 bool Fighter::upPassiveSkillLingshi(UInt16 skill, UInt16 type, bool p100)
 {
+    if (type < GData::SKILL_PASSSTART || type >= GData::SKILL_PASSIVES)
+        return false;
+
+    bool ret = false;
+    UInt16 idx = type - GData::SKILL_PASSSTART;
+    if (p100)
+    { // 100%
+        for (size_t j = 0; j < _rpassklLingshi[idx].size(); ++j)
+        {
+            if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skill))
+            { // off
+                std::vector<UInt16>::iterator i = _rpassklLingshi[idx].begin();
+                std::advance(i, j);
+                _rpassklLingshi[idx].erase(i);
+            }
+        }
+        for (size_t j = 0; j < _passklLingshi[idx].size(); ++j)
+        {
+            if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skill))
+            {
+                ret = true;
+                if (skill != _passklLingshi[idx][j]) // upgrade
+                    _passklLingshi[idx][j] = skill;
+                break;
+            }
+        }
+
+        if(!ret)
+        {  // up
+            ret = true;
+            _passklLingshi[idx].push_back(skill);
+        }
+    }
+    else
+    {
+        for (size_t j = 0; j < _passklLingshi[idx].size(); ++j)
+        {
+            if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skill))
+            {
+                ret = true;
+                break;
+            }
+        }
+
+        for (size_t j = 0; j < _rpassklLingshi[idx].size(); ++j)
+        {
+            if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skill))
+            {
+                ret = true;
+                if (skill != _rpassklLingshi[idx][j])
+                { // upgrade
+                    _rpassklLingshi[idx][j] = skill;
+                    break;
+                }
+            }
+        }
+
+        if (!ret)
+        { // up
+            ret = true;
+            _rpassklLingshi[idx].push_back(skill);
+        }
+    }
+
+    return ret;
 }
-*/
 
 
 /*
