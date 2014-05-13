@@ -1523,7 +1523,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
                {
                    if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_gaoneng)
-                       factor *= (1.0f + skill->effect->eft[0]);
+                       factor *= (1.0f + skill->effect->efv[0]);
                }
            }
 
