@@ -5917,7 +5917,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 
     insertFighterStatus(bf);
     _activeFgt = bf;
-    doLingshiModelAttack(bf);
+    doLingshiModelAttack(bf, 3);
 
     UInt8 side = bf->getSide();
     UInt8 reiatsuType = 0;
@@ -7703,6 +7703,8 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
     {
         // remove from action queue
         BattleFighter* toremove = static_cast<BattleFighter *>(bo);
+        onDeadLingshi(toremove);
+
         removeFighterStatus(toremove);
         {
             BattleFighter* bo2 = static_cast<BattleFighter*>(bo);
@@ -10535,7 +10537,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
     do
     {
         bf->setPreAtk();
-        doLingshiModelAttack(bf);
+        doLingshiModelAttack(bf, 5);
         size_t skillIdx = 0;
         const GData::SkillBase* violentSKill;
         while(NULL != (violentSKill = bf->getPassiveSkillViolent100(skillIdx)))
@@ -12114,12 +12116,12 @@ void BattleSimulator::appendStatusChange(StatusType type, UInt32 value, UInt16 s
     if(type == e_stCounter)
     {
         bf->setCounterCnt(bf->getCounterCnt() + 1);
-        doLingshiModelAttack(bf);
+        doLingshiModelAttack(bf, 2);
     }
     else if(type == e_stCritical)
     {
         bf->setCriticalCnt(bf->getCriticalCnt() + 1);
-        doLingshiModelAttack(bf);
+        doLingshiModelAttack(bf, 4);
     }
 }
 
@@ -12878,13 +12880,13 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
     {
         onDamage(bf, true, u);
         const GData::SkillBase *skill;
-        doLingshiModelAttack(bf);
+        doLingshiModelAttack(bf, 1);
         while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
         {
             if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_buqu)
             {
-                setStatusChange_Def(bf, bf->getSide(), bf->getPos(), skill, getBFDefend(bf) * skill->effect->defP, bf->getNewModeLast(), true);
-                setStatusChange_MagDef(bf, bf->getSide(), bf->getPos(), skill, getBFMagDefend(bf) * skill->effect->magdef, bf->getNewModeLast(), true);
+                setStatusChange_Def(bf, bf->getSide(), bf->getPos(), skill, getBFDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
+                setStatusChange_MagDef(bf, bf->getSide(), bf->getPos(), skill, getBFMagDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
             }
         }
 
@@ -15193,7 +15195,7 @@ bool BattleSimulator::doEffectAfterCount(BattleFighter* bf, const GData::SkillBa
     return bRet;
 }
 
-UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf)
+UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
 {
     if(!bf)
         return 0;
@@ -15222,6 +15224,8 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf)
         type = passiveSkill->effect->efv[count1 - 1];
         last = passiveSkill->effect->efl[count1 - 1];
     }
+    if(flag != type)
+        return 0;
 
     switch(type)
     {
@@ -15250,7 +15254,7 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf)
                 return 0;
             break;
         case 7:
-            if(bf->getEnemyDeadCnt() < 3)
+            if(bf->getEnemyDeadCnt() < 2)
                 return 0;
             break;
         default:
@@ -15273,6 +15277,31 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf)
     getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
     cnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
     return cnt;
+}
+
+void BattleSimulator::onDeadLingshi(BattleFighter* bf)
+{
+    if(!bf)
+        return;
+    UInt8 side = bf->getSide();
+    for(UInt8 i = 0; i < 25; ++ i)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+        if(!bo || bo->getHP() == 0 || bo == bf)
+            continue;
+        bo->setFriendDeadCnt(bo->getFriendDeadCnt() + 1);
+        doLingshiModelAttack(bo, 6);
+    }
+
+    for(UInt8 i = 0; i < 25; ++ i)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(1 - side, i));
+        if(!bo || bo->getHP() == 0 || bo == bf)
+            continue;
+        bo->setEnemyDeadCnt(bo->getEnemyDeadCnt() + 1);
+        doLingshiModelAttack(bo, 7);
+    }
+
 }
 
 } // namespace Battle

@@ -202,6 +202,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillViolent100(), _passiveSkillViolent100);
     updatePassiveSkill100(_fighter->getPassiveSkillRevival100(), _passiveSkillRevival100);
 
+    updatePassiveSkill100(_fighter->getPassiveSkillByLingshi(GData::SKILL_ENTER_LINGSHI), _passiveSkillEnterLingshi100);
     initPassiveSkillByLingshi();
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
