@@ -4310,7 +4310,7 @@ bool Fighter::upPassiveSkillLingshi()
         { // 100%
             for (size_t j = 0; j < _rpassklLingshi[idx].size(); ++j)
             {
-                if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skill))
+                if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skillId))
                 { // off
                     std::vector<UInt16>::iterator i = _rpassklLingshi[idx].begin();
                     std::advance(i, j);
@@ -4319,11 +4319,11 @@ bool Fighter::upPassiveSkillLingshi()
             }
             for (size_t j = 0; j < _passklLingshi[idx].size(); ++j)
             {
-                if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skill))
+                if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skillId))
                 {
                     ret = true;
-                    if (skill != _passklLingshi[idx][j]) // upgrade
-                        _passklLingshi[idx][j] = skill;
+                    if (skillId != _passklLingshi[idx][j]) // upgrade
+                        _passklLingshi[idx][j] = skillId;
                     break;
                 }
             }
@@ -4331,14 +4331,14 @@ bool Fighter::upPassiveSkillLingshi()
             if(!ret)
             {  // up
                 ret = true;
-                _passklLingshi[idx].push_back(skill);
+                _passklLingshi[idx].push_back(skillId);
             }
         }
         else
         {
             for (size_t j = 0; j < _passklLingshi[idx].size(); ++j)
             {
-                if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skill))
+                if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skillId))
                 {
                     ret = true;
                     break;
@@ -4347,12 +4347,12 @@ bool Fighter::upPassiveSkillLingshi()
 
             for (size_t j = 0; j < _rpassklLingshi[idx].size(); ++j)
             {
-                if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skill))
+                if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skillId))
                 {
                     ret = true;
-                    if (skill != _rpassklLingshi[idx][j])
+                    if (skillId != _rpassklLingshi[idx][j])
                     { // upgrade
-                        _rpassklLingshi[idx][j] = skill;
+                        _rpassklLingshi[idx][j] = skillId;
                         break;
                     }
                 }
@@ -4361,7 +4361,7 @@ bool Fighter::upPassiveSkillLingshi()
             if (!ret)
             { // up
                 ret = true;
-                _rpassklLingshi[idx].push_back(skill);
+                _rpassklLingshi[idx].push_back(skillId);
             }
         }
     }
