@@ -201,7 +201,6 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkillBLTY100Status();
     updatePassiveSkill100(_fighter->getPassiveSkillViolent100(), _passiveSkillViolent100);
     updatePassiveSkill100(_fighter->getPassiveSkillRevival100(), _passiveSkillRevival100);
-    updatePassiveSkill100(_fighter->getPassiveSkillLingshi100(), _passiveSkillLingshi100);
 
     initPassiveSkillByLingshi();
 
@@ -1272,6 +1271,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillRevival100(size_t& idx, bo
 const GData::SkillBase* BattleFighter::getPassiveSkillLingshi100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillLingshi100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillEnterLingshi100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillEnterLingshi100, idx, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnHPChange100(size_t& idx, bool noPossibleTarget)
@@ -2516,6 +2520,7 @@ void BattleFighter::clearSkill()
     _passiveSkillViolent100.clear();
     _passiveSkillRevival100.clear();
     _passiveSkillLingshi100.clear();
+    _passiveSkillEnterLingshi100.clear();
     _passiveSkillOnHPChange100.clear();
     _passiveSkillOnWithstand100.clear();
 
@@ -3365,6 +3370,17 @@ void BattleFighter::updateAllPassiveSkillLingshi()
     }
 }
 
+void BattleFighter::updateAllPassiveSkillLingshiExceptEnter()
+{
+    for (UInt8 type = GData::SKILL_PASSSTART; type < GData::SKILL_PASSIVES; ++ type)
+    {
+        if(type == GData::SKILL_ENTER_LINGSHI)
+            continue;
+        updatePassiveSkillLingshi100(type);
+        updatePassiveSkillLingshi(type);
+    }
+}
+
 void BattleFighter::updatePassiveSkillLingshi100(UInt8 type)
 {
     switch (type)
@@ -3461,6 +3477,9 @@ void BattleFighter::updatePassiveSkillLingshi100(UInt8 type)
             break;
         case GData::SKILL_LINGSHI:
             addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillLingshi100);
+            break;
+        case GData::SKILL_ENTER_LINGSHI:
+            addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillEnterLingshi100);
             break;
         case GData::SKILL_ONOTHERCONFUSEFORGET:
             addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnOtherConfuseForget100);
@@ -3564,6 +3583,9 @@ void BattleFighter::updatePassiveSkillLingshi(UInt8 type)
             break;
         case GData::SKILL_LINGSHI:
             addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillLingshi);
+            break;
+        case GData::SKILL_ENTER_LINGSHI:
+            addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillEnterLingshi);
             break;
         case GData::SKILL_ONOTHERCONFUSEFORGET:
             addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnOtherConfuseForget);
@@ -3677,6 +3699,9 @@ void BattleFighter::unUpdatePassiveSkillLingshi(UInt8 type)
         case GData::SKILL_LINGSHI:
             removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillLingshi);
             break;
+        case GData::SKILL_ENTER_LINGSHI:
+            removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillEnterLingshi);
+            break;
         case GData::SKILL_ONOTHERCONFUSEFORGET:
             removePassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnOtherConfuseForget);
             break;
@@ -3779,6 +3804,9 @@ void BattleFighter::unUpdatePassiveSkillLingshi100(UInt8 type)
             break;
         case GData::SKILL_LINGSHI:
             removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillLingshi100);
+            break;
+        case GData::SKILL_ENTER_LINGSHI:
+            removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillEnterLingshi100);
             break;
         case GData::SKILL_ONOTHERCONFUSEFORGET:
             removePassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnOtherConfuseForget100);

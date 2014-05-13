@@ -426,7 +426,6 @@ public:
     inline std::vector<UInt16>& getPassiveSkillBLTY100() { return _passkl[GData::SKILL_BLTY-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillViolent100() { return _passkl[GData::SKILL_VIOLENT-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillRevival100() { return _passkl[GData::SKILL_REVIVAL-GData::SKILL_PASSSTART]; }
-    inline std::vector<UInt16>& getPassiveSkillLingshi100() { return _passkl[GData::SKILL_LINGSHI-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillOnOtherConfuseForget100() { return _passkl[GData::SKILL_ONOTHERCONFUSEFORGET-GData::SKILL_PASSSTART]; }
 
     inline std::vector<UInt16>& getPassiveSkillByLingshi(UInt8 type) { return _rpassklLingshi[type-GData::SKILL_PASSSTART]; }

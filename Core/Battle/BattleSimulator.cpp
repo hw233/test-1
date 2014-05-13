@@ -1387,8 +1387,15 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 }
             }
 
-            if(bf->getHP() > static_cast<UInt32>(0.2f * bf->getMaxHP()))
-                factor *= (1 + 0.2f);
+           {
+               size_t idx = 0;
+               const GData::SkillBase *skill;
+               while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
+               {
+                   if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_gaoneng)
+                       factor *= (1.0f + skill->effect->eft[0]);
+               }
+           }
 
             UInt8& defdeclast = area_target->getDefDecLast();
             if(defdeclast > 0 && bf->getSide() != area_target->getSide())
@@ -5561,7 +5568,7 @@ UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
 UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt)
 {
     UInt32 rcnt = 0;
-    if(skill->cond != GData::SKILL_ENTER || target_pos < 0)
+    if((skill->cond != GData::SKILL_ENTER && skill->cond != GData::SKILL_ENTER_LINGSHI) || target_pos < 0)
     {
         return rcnt;
     }
@@ -5765,6 +5772,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 
     insertFighterStatus(bf);
     _activeFgt = bf;
+    doLingshiModelAttack(bf);
 
     UInt8 side = bf->getSide();
     UInt8 reiatsuType = 0;
@@ -6139,7 +6147,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                     size_t idx = 0;
                     while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
                     {
-                        if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_buqu)
+                        if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_mozhu)
                         {
                             StateType eType = e_MAX_STATE;
                             UInt32 dmg = CalcNormalAttackDamage(bf, mainTarget, eType);
@@ -8730,6 +8738,19 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
         }
         bf->resetWithstandCount();
+
+        UInt8& newModeLast = bf->getNewModeLast();
+        if(newModeLast > 0)
+        {
+            --newModeLast;
+            if(newModeLast == 0)
+            {
+                bf->setNewModeLast(0);
+                appendDefStatus(e_unChangeMode, 0 ,bf);
+                bf->setChangeStatus(2);
+                bf->unUpdateAllPassiveSkillLingshi();
+            }
+        }
     }while(false);
 
     if(_defList.size() > 0 || _scList.size() > 0)
@@ -10363,6 +10384,8 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
 
     do
     {
+        bf->setPreAtk();
+        doLingshiModelAttack(bf);
         size_t skillIdx = 0;
         const GData::SkillBase* violentSKill;
         while(NULL != (violentSKill = bf->getPassiveSkillViolent100(skillIdx)))
@@ -11939,9 +11962,15 @@ void BattleSimulator::appendStatusChange(StatusType type, UInt32 value, UInt16 s
 
     _scList.push_back(sc);
     if(type == e_stCounter)
+    {
         bf->setCounterCnt(bf->getCounterCnt() + 1);
+        doLingshiModelAttack(bf);
+    }
     else if(type == e_stCritical)
+    {
         bf->setCriticalCnt(bf->getCriticalCnt() + 1);
+        doLingshiModelAttack(bf);
+    }
 }
 
 void BattleSimulator::appendAttackRoundChange()
@@ -12698,10 +12727,15 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
     else if(_winner == 0)
     {
         onDamage(bf, true, u);
-        if(u > 0 && bf->getHP() < static_cast<UInt32>(0.2f * bf->getMaxHP()))
+        const GData::SkillBase *skill;
+        doLingshiModelAttack(bf);
+        while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
         {
-            setStatusChange_Def(bf, bf->getSide(), bf->getPos(), /*skill*/NULL, /*value*/99, /*last*/1, true);
-            setStatusChange_MagDef(bf, bf->getSide(), bf->getPos(), /*skill*/NULL, /*value*/NULL, /*last*/1, true);
+            if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_buqu)
+            {
+                setStatusChange_Def(bf, bf->getSide(), bf->getPos(), skill, getBFDefend(bf) * skill->effect->defP, bf->getNewModeLast(), true);
+                setStatusChange_MagDef(bf, bf->getSide(), bf->getPos(), skill, getBFMagDefend(bf) * skill->effect->magdef, bf->getNewModeLast(), true);
+            }
         }
 
     }
@@ -15009,16 +15043,76 @@ bool BattleSimulator::doEffectAfterCount(BattleFighter* bf, const GData::SkillBa
     return bRet;
 }
 
-UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt32 skillId)
+UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf)
 {
     if(!bf)
         return 0;
-    const GData::SkillBase* passiveSkill = GData::skillManager[skillId];
+    if(bf->getChangeStatus() != 0)
+        return 0;
+
+    size_t idx = 0;
+    const GData::SkillBase* passiveSkill = bf->getPassiveSkillEnterLingshi100(idx);
     if(!passiveSkill)
         return 0;
 
+    //触发类型
+    UInt8 type = 0;
+    UInt8 last = 0;
+    if(passiveSkill->effect)
+    {
+        UInt8 count1 = passiveSkill->effect->eft.size();
+        UInt8 count2 = passiveSkill->effect->efv.size();
+        UInt8 count3 = passiveSkill->effect->efl.size();
+        if(count1 < 1)
+            return 0;
+        if(count1 != count2 || count1 != count3 || count2 != count3)
+            return 0;
+        if(passiveSkill->effect->eft[count1 - 1] != GData::e_eft_lingshi_enter)
+            return 0;
+        type = passiveSkill->effect->efv[count1 - 1];
+        last = passiveSkill->effect->efl[count1 - 1];
+    }
+
+    switch(type)
+    {
+        case 1:
+            if(!bf->getHpLess())
+                return 0;
+            break;
+        case 2:
+            if(bf->getCounterCnt() < 3)
+                return 0;
+            break;
+        case 3:
+            if(_attackRound < 3)
+                return 0;
+            break;
+        case 4:
+            if(bf->getCriticalCnt() < 3)
+                return 0;
+            break;
+        case 5:
+            if(!bf->getPreAtk())
+                return 0;
+            break;
+        case 6:
+            if(bf->getFriendDeadCnt() < 3)
+                return 0;
+            break;
+        case 7:
+            if(bf->getEnemyDeadCnt() < 3)
+                return 0;
+            break;
+        default:
+            return 0;
+            break;
+    }
+    bf->setChangeStatus(1);
+    bf->setNewModeLast(last);
+
     //改变模型
-    appendDefStatus(e_changeMode, SKILL_ID(skillId), bf);
+    appendDefStatus(e_changeMode, SKILL_ID(passiveSkill->getId()), bf);
+    bf->updateAllPassiveSkillLingshiExceptEnter();
 
     Int32 target_side;
     Int32 target_pos;

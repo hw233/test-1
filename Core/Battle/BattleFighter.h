@@ -455,6 +455,7 @@ public:
     void updatePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
 
     void updateAllPassiveSkillLingshi();
+    void updateAllPassiveSkillLingshiExceptEnter();
     void updatePassiveSkillLingshi(UInt8 type);
     void updatePassiveSkillLingshi100(UInt8 type);
     void unUpdateAllPassiveSkillLingshi();
@@ -1581,6 +1582,8 @@ private:
     std::vector<GData::SkillItem> _passiveSkillRevival100;
     std::vector<GData::SkillItem> _passiveSkillLingshi;
     std::vector<GData::SkillItem> _passiveSkillLingshi100;
+    std::vector<GData::SkillItem> _passiveSkillEnterLingshi;
+    std::vector<GData::SkillItem> _passiveSkillEnterLingshi100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1592,6 +1595,7 @@ private:
     const GData::SkillBase* getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillLingshi100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillEnterLingshi100(size_t& idx, bool noPossibleTarget = false);
 
 private:
     float _2ndRateCoAtk;
@@ -1693,6 +1697,9 @@ private:
     UInt8 _changeStatus; //1-already change
     UInt8 getChangeStatus() { return _changeStatus; }
     void setChangeStatus(UInt8 status) { _changeStatus = status; }
+    UInt8 _newModeLast;
+    UInt8& getNewModeLast() { return _newModeLast; }
+    void setNewModeLast(UInt8 last) { _newModeLast = last; }
 
     bool getHpLess() { if(getHP() < static_cast<UInt32>(0.3f * getMaxHP())) return true; else return false; }
     UInt16 _counterCnt;
@@ -1702,7 +1709,8 @@ private:
     UInt16 getCriticalCnt() { return _criticalCnt; }
     void setCriticalCnt(UInt16 cnt) { _criticalCnt = cnt; }
     bool _preAtk;
-    bool getPreAtk() { if(uRand(10000) < 3000) _preAtk = true; else _preAtk = false; return _preAtk; }
+    bool getPreAtk() { return _preAtk; }
+    void setPreAtk() { if(uRand(10000) < 3000) _preAtk = true; else _preAtk = false; }
     UInt8 _friendDeadCnt;
     UInt8 getFriendDeadCnt() { return _friendDeadCnt; };
     void setFriendDeadCnt(UInt8 cnt) { _friendDeadCnt = cnt; }
