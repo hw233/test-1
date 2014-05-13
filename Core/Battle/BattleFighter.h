@@ -1710,7 +1710,7 @@ private:
     void setCriticalCnt(UInt16 cnt) { _criticalCnt = cnt; }
     bool _preAtk;
     bool getPreAtk() { return _preAtk; }
-    void setPreAtk() { if(uRand(10000) < 3000) _preAtk = true; else _preAtk = false; }
+    void setPreAtk() { if(uRand(10000) < 1500) _preAtk = true; else _preAtk = false; }
     UInt8 _friendDeadCnt;
     UInt8 getFriendDeadCnt() { return _friendDeadCnt; };
     void setFriendDeadCnt(UInt8 cnt) { _friendDeadCnt = cnt; }
