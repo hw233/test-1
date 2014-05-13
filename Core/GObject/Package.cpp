@@ -8315,7 +8315,10 @@ namespace GObject
             }
         }
         if(tmp != lsAttr.lv)
+        {
             fgt->setDirty();
+            fgt->updateLingshiSkillId(equip, pos);
+        }
         ConsumeInfo ci(LingShiPeiYang, 0, 0);
         m_Owner->useTael(needTael, &ci);
 
@@ -8425,7 +8428,10 @@ namespace GObject
         }
 		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
         if(tmp != lsAttr.lv)
+        {
             fgt->setDirty();
+            fgt->updateLingshiSkillId(lingshi, pos);
+        }
 
 		Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x15);
@@ -8474,6 +8480,7 @@ namespace GObject
         ++ lsAttr.lv;
 		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
         fgt->setDirty();
+        fgt->updateLingshiSkillId(lingshi, pos);
 
 		Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x14);

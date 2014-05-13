@@ -1221,39 +1221,35 @@ ItemEquip * Fighter::setLingshi(ItemEquip * lingshi, int idx, bool writedb)
     if(lingshi)
     {
         lingshi->SetBindStatus(true);
-        //setLingshiSkill
-        std::string lsStr;
-        for(size_t j = 0; j < _lingshiSkill[idx].size(); ++ j)
-        {
-            lsStr += Itoa(_lingshiSkill[idx][j]);
-            if(j < _lingshiSkill[idx].size() - 1)
-                lsStr += ",";
-        }
-        delSkills(lsStr, false);
-        lsStr.clear();
-        std::vector<const GData::SkillBase*> vt_skills;
-        GData::ItemGemType * igt = GData::lingshiTypes[lingshi->GetTypeId() - LLINGSHI_ID];
-        ItemLingshiAttr& lsAttr = static_cast<ItemLingshi *>(lingshi)->getLingshiAttr();
-        if(igt && igt->attrExtra)
-        {
-            _lingshiSkill[idx].clear();
-            for(size_t j = 0; j < igt->attrExtra->skills.size(); ++ j)
-            {
-                if(igt->attrExtra->skills[j])
-                {
-                    UInt16 skillId = igt->attrExtra->skills[j]->getId();
-                    if(j > 0)   //第一个技能(入场技能)不升级
-                        skillId = SKILLANDLEVEL(SKILL_ID(skillId), lsAttr.lv / 10 + 1);
-                    _lingshiSkill[idx].push_back(skillId);
-                    lsStr += Itoa(skillId) + ",";
-                }
-            }
-            setSkills(lsStr, false);
-        }
+        updateLingshiSkillId(lingshi, idx);
     }
     setDirty();
 
     return old;
+}
+
+void Fighter::updateLingshiSkillId(ItemEquip * lingshi, UInt8 idx)
+{
+    if(idx >= LINGSHI_UPMAX || !lingshi)
+        return;
+    GData::ItemGemType * igt = GData::lingshiTypes[lingshi->GetTypeId() - LLINGSHI_ID];
+    ItemLingshiAttr& lsAttr = static_cast<ItemLingshi *>(lingshi)->getLingshiAttr();
+    if(igt && igt->attrExtra)
+    {
+        _lingshiSkill[idx].clear();
+        for(size_t j = 0; j < igt->attrExtra->skills.size(); ++ j)
+        {
+            if(igt->attrExtra->skills[j])
+            {
+                UInt16 skillId = igt->attrExtra->skills[j]->getId();
+                if(j > 0)   //第一个技能(入场技能)不升级
+                    skillId = SKILLANDLEVEL(SKILL_ID(skillId), lsAttr.lv / 10 + 1);
+                _lingshiSkill[idx].push_back(skillId);
+            }
+        }
+        if(idx == 0)
+            upPassiveSkillLingshi();
+    }
 }
 
 int Fighter::getAllTrumpId( UInt32* trumps, int size )

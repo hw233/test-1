@@ -594,6 +594,7 @@ public:
     ItemEquip * setLingshi(ItemEquip *);
 	ItemEquip ** setLingshi(std::string&, bool = true);
     ItemEquip * setLingshi(ItemEquip *, int idx, bool = true);
+    void updateLingshiSkillId(ItemEquip *, UInt8);
 	ItemEquip * findEquip(UInt32 id, UInt8& pos);
 	ItemEquip * findfashion(UInt32 id);
 	void findTrumpByTypeId(std::vector<ItemEquip*>& ret, UInt32 id);
