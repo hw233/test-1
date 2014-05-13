@@ -592,7 +592,7 @@ namespace GObject
             if(newskill == 0 || newskill != oldskill)
             {
                 skills = Itoa(oldskill);
-                delSkills(skills);
+                delSkills(skills, false);
             }
         }
         if (eq)
@@ -1223,7 +1223,7 @@ namespace GObject
             petSSErase(oldSkillId);
             UInt16 old_skill_id = SKILLANDLEVEL(oldSkillId, sLevel);
             oldSkill = Itoa(old_skill_id);
-            delSkills(oldSkill);
+            delSkills(oldSkill, false);
 
             UInt16 new_skill_id = SKILLANDLEVEL(newSkillId, sLevel);
             newSkill = Itoa(new_skill_id);
@@ -1304,7 +1304,7 @@ namespace GObject
             if(sLevel == 0) 
                 sLevel = 1;
             std::string oldSkill = Itoa(SKILLANDLEVEL(conflictSkillId, sLevel));
-            delSkills(oldSkill);
+            delSkills(oldSkill, false);
             std::string newSkill = Itoa(SKILLANDLEVEL(skillId, sLevel));
             setSkills(newSkill, false);
         }
@@ -1353,7 +1353,7 @@ namespace GObject
             if(sLevel == 0)
                 sLevel = 1;
             std::string oldSkill = Itoa(SKILLANDLEVEL(conflictSkillId, sLevel));
-            delSkills(oldSkill);
+            delSkills(oldSkill, false);
             std::string newSkill = Itoa(SKILLANDLEVEL(skillId, sLevel));
             setSkills(newSkill, false);
         }
@@ -1407,7 +1407,7 @@ namespace GObject
                     if(skillId)
                     {
                         std::string skills = Itoa(SKILLANDLEVEL(skillId, 1));
-                        delSkills(skills);
+                        delSkills(skills, false);
                         petSSErase(skillId);
                     }
                 }
