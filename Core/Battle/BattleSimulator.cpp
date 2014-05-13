@@ -401,6 +401,17 @@ UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
                 break;
             }
         }
+        for(idx = 0; idx < _onOtherConfuseAndForget.size(); ++ idx)
+        {
+            if(_onOtherConfuseAndForget[idx]->getSide() == side)
+            {
+                _onOtherConfuseAndForget.erase(_onOtherConfuseAndForget.begin() + idx);
+                break;
+            }
+        }
+        _onOtherConfuseAndForgetAtkList[0].clear();
+        _onOtherConfuseAndForgetAtkList[1].clear();
+
 
         for(int i = 0; i < 25; ++ i)
         {
@@ -1134,6 +1145,123 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
         if(dmg > 0)
         {
             makeDamage(bo, dmg, e_damNormal, e_damagePhysic);
+        }
+    }
+    else if(!defend100 && !enterEvade)
+    {
+        appendDefStatus(e_damEvade, 0, bo);
+        if(bo->getSneakStatus() == e_sneak_on)
+        {
+            _sneak_atker.push_back(bo);
+            bo->nextSneakStatus();
+        }
+    }
+    else
+    {
+        if(!defend100)
+        {
+            appendDefStatus(e_damEvade, 0, bo);
+            bo->setEvad100(false);
+            if(bo->getSneakStatus() == e_sneak_on)
+            {
+                _sneak_atker.push_back(bo);
+                bo->nextSneakStatus();
+            }
+        }
+        else
+        {
+            appendDefStatus(e_damOut, 0, bo);
+            bo->setDefend100(false);
+        }
+    }
+    if(first)
+    {
+        pr = pr2;
+        cs = cs2;
+        first = false;
+    }
+
+    return dmg;
+}
+
+void BattleSimulator::doOtherConfuseForgetAttack(BattleFighter* bf, UInt32& rcnt)
+{
+    if (!bf)
+        return;
+    BattleFighter* tmp = _activeFgt;
+    _activeFgt = bf;
+    int side = 1 - bf->getSide();
+    bool cs = false;
+    bool pr = false;
+    bool first = true;
+    int i = 0;
+    for(int pos = 0; pos < 25; ++ pos)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, pos));
+        if(!bo || bo->getHP() == 0)
+            continue;
+        doOtherConfuseForgetAttackOnce(bf, bo, 1.0f, pr, cs, first);
+        ++ i;
+    }
+    if(_defList.size() > 0 || _scList.size() > 0)
+    {
+
+        UInt16 skillId = 0;
+        size_t idx = 0;
+        const GData::SkillBase* skill = bf->getPassiveSkillOnOtherConfuseAndForget100(idx);
+        if (skill)
+            skillId = skill->getId();
+        appendToPacket( bf->getSide(), bf->getPos(), 0, 2, skillId, cs, pr);
+        ++ rcnt;
+    }
+    _activeFgt = tmp;
+}
+
+UInt32 BattleSimulator::doOtherConfuseForgetAttackOnce(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first)
+{
+    if(!bf || !bo || bf->getHP() == 0 || bo->getHP() == 0 || bo->isSoulOut())
+        return 0;
+
+    UInt32 dmg = 0;
+    UInt8 target_stun = bo->getStunRound();
+    bool enterEvade = bo->getEvad100();
+    bool defend100 = bo->getDefend100();
+
+    bool pr2 = false;
+    bool cs2 = false;
+    if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(bo, NULL) && !bo->getMoEvade100())))
+    {
+        pr2 = bf->calcPierce(bo);
+        float rate = bf->getCritical(bo);
+        if(uRand(10000) < (rate > 0 ? rate : 0) * 100)
+        {
+            float factor = bf->getCriticalDmg() - bo->getCriticalDmgImmune() - bo->getTough(bf);
+            if(factor < 1.25)
+                factor = 1.25;
+            atk = atk * factor;
+            cs2 = true;
+        }
+
+        float toughFactor = pr2 ? bo->getTough(bf) : 1.0f;
+        float def = getBFDefend(bo);
+        float atkreduce = getBFAtkReduce(bo);
+
+        if(bo->hasFlag(BattleFighter::IsMirror))
+        {
+            dmg = bo->getHP();
+        }
+        else
+        {
+            atk *= (1 - bo->getDecWaveDmg());
+            dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor, atkreduce);
+            dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+            dmg = dmg > 0 ? dmg : 1;
+        }
+
+        doShieldHPAttack(bo, dmg);
+        if(dmg > 0)
+        {
+            makeDamage(bo, dmg, e_damNormal, e_damageMagic);
         }
     }
     else if(!defend100 && !enterEvade)
@@ -2715,6 +2843,14 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
                 calcAbnormalTypeCnt(bo);
                 calcSilkwormCnt(bo);
             }
+            for (std::vector<BattleFighter*>::iterator it = _onOtherConfuseAndForget.begin(); it != _onOtherConfuseAndForget.end(); ++it)
+            {
+                BattleFighter* atk = *it;
+                if (!atk || atk->getHP() <= 0 || atk->getSide() == target_bo->getSide() ||
+                        atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
+                    continue;
+                _onOtherConfuseAndForgetAtkList[atk->getSide()].push_back(atk);
+            }
         }
     }
     if(effect_state & GData::e_state_stun)
@@ -2752,6 +2888,7 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
                 appendDefStatus(e_Stun, 0, target_bo);
                 calcAbnormalTypeCnt(bo);
                 calcSilkwormCnt(bo);
+
             }
         }
     }
@@ -2789,6 +2926,14 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
                 appendDefStatus(e_Forget, 0, target_bo);
                 calcAbnormalTypeCnt(bo);
                 calcSilkwormCnt(bo);
+            }
+            for (std::vector<BattleFighter*>::iterator it = _onOtherConfuseAndForget.begin(); it != _onOtherConfuseAndForget.end(); ++it)
+            {
+                BattleFighter* atk = *it;
+                if (!atk || atk->getHP() <= 0 || atk->getSide() == target_bo->getSide() ||
+                        atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
+                    continue;
+                _onOtherConfuseAndForgetAtkList[atk->getSide()].push_back(atk);
             }
         }
     }
@@ -6609,22 +6754,6 @@ UInt32 BattleSimulator::doAttack( int pos )
                     }
 
                 }
-                /*
-                std::vector<AttackAct> atkAct;
-                atkAct.clear();
-                if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct))
-                    ++ rcnt;
-
-                size_t actCnt = atkAct.size();
-                for(size_t idx = 0; idx < actCnt; idx++)
-                {
-                    if(atkAct[idx].bf->getHP() == 0)
-                        continue;
-                    if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
-                        ++ rcnt;
-                }
-                atkAct.clear();
-                */
             }
             while(NULL != (skill = bf->getPassiveSkillAftAction()))
             {
@@ -6652,22 +6781,6 @@ UInt32 BattleSimulator::doAttack( int pos )
                     }
 
                 }
-                /*
-                std::vector<AttackAct> atkAct;
-                atkAct.clear();
-                if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct))
-                    ++ rcnt;
-
-                size_t actCnt = atkAct.size();
-                for(size_t idx = 0; idx < actCnt; idx++)
-                {
-                    if(atkAct[idx].bf->getHP() == 0)
-                        continue;
-                    if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
-                        ++ rcnt;
-                }
-                atkAct.clear();
-                */
             }
         }
     }
@@ -6790,6 +6903,19 @@ UInt32 BattleSimulator::doAttack( int pos )
                 _activeFgt = NULL;
             }
         }
+    }
+
+    for (size_t i = 0; i < _onOtherConfuseAndForgetAtkList[side].size();)
+    {
+        BattleFighter* atk = _onOtherConfuseAndForgetAtkList[side][i];
+        if (!atk || atk->getHP() < 0 ||  atk->getSide() == side ||
+                atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
+        {
+            _onOtherConfuseAndForgetAtkList[side].erase(_onOtherConfuseAndForgetAtkList[side].begin() + i);
+            continue;
+        }
+        doOtherConfuseForgetAttack(atk, rcnt);
+        ++i;
     }
 
     if(bf->getHP() > 0 && _winner == 0 && bf->getAbnormalTypeCnt() >= 3)
@@ -7634,6 +7760,30 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
             if (_onPetAtk[idx] == toremove)
             {
                 _onPetAtk.erase(_onPetAtk.begin() + idx);
+                break;
+            }
+        }
+        for(idx = 0; idx < _onOtherConfuseAndForget.size(); ++ idx)
+        {
+            if (_onOtherConfuseAndForget[idx] == toremove)
+            {
+                _onOtherConfuseAndForget.erase(_onOtherConfuseAndForget.begin() + idx);
+                break;
+            }
+        }
+        for(idx = 0; idx < _onOtherConfuseAndForgetAtkList[0].size(); ++ idx)
+        {
+            if (_onOtherConfuseAndForgetAtkList[0][idx] == toremove)
+            {
+                _onOtherConfuseAndForgetAtkList[0].erase(_onOtherConfuseAndForgetAtkList[0].begin() + idx);
+                break;
+            }
+        }
+        for(idx = 0; idx < _onOtherConfuseAndForgetAtkList[1].size(); ++ idx)
+        {
+            if (_onOtherConfuseAndForgetAtkList[1][idx] == toremove)
+            {
+                _onOtherConfuseAndForgetAtkList[1].erase(_onOtherConfuseAndForgetAtkList[1].begin() + idx);
                 break;
             }
         }
@@ -15113,6 +15263,9 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf)
     //改变模型
     appendDefStatus(e_changeMode, SKILL_ID(passiveSkill->getId()), bf);
     bf->updateAllPassiveSkillLingshiExceptEnter();
+    idx = 0;
+    if (bf->getPassiveSkillOnOtherConfuseAndForget100(idx))
+        _onOtherConfuseAndForget.push_back(bf);
 
     Int32 target_side;
     Int32 target_pos;
