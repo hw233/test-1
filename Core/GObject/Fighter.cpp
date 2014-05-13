@@ -4289,72 +4289,82 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
     return ret;
 }
 
-bool Fighter::upPassiveSkillLingshi(UInt16 skill, UInt16 type, bool p100)
+bool Fighter::upPassiveSkillLingshi()
 {
-    if (type < GData::SKILL_PASSSTART || type >= GData::SKILL_PASSIVES)
-        return false;
-
     bool ret = false;
-    UInt16 idx = type - GData::SKILL_PASSSTART;
-    if (p100)
-    { // 100%
-        for (size_t j = 0; j < _rpassklLingshi[idx].size(); ++j)
-        {
-            if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skill))
-            { // off
-                std::vector<UInt16>::iterator i = _rpassklLingshi[idx].begin();
-                std::advance(i, j);
-                _rpassklLingshi[idx].erase(i);
-            }
-        }
-        for (size_t j = 0; j < _passklLingshi[idx].size(); ++j)
-        {
-            if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skill))
-            {
-                ret = true;
-                if (skill != _passklLingshi[idx][j]) // upgrade
-                    _passklLingshi[idx][j] = skill;
-                break;
-            }
-        }
-
-        if(!ret)
-        {  // up
-            ret = true;
-            _passklLingshi[idx].push_back(skill);
-        }
-    }
-    else
+    for (std::vector<UInt16>::iterator it = _lingshiSkill[0].begin(); it != _lingshiSkill[0].end(); ++it)
     {
-        for (size_t j = 0; j < _passklLingshi[idx].size(); ++j)
-        {
-            if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skill))
-            {
-                ret = true;
-                break;
-            }
-        }
+        UInt16 skillId = *it;
+        if (!skillId)
+            continue;
+        const GData::SkillBase* skill = GData::skillManager[skillId];
+        if (!skill)
+            continue;
+        UInt16 type = skill->cond;
+        bool p100 = (skill->prob >= 100.0f)? true: false;
+        if (type < GData::SKILL_PASSSTART || type >= GData::SKILL_PASSIVES)
+            return false;
 
-        for (size_t j = 0; j < _rpassklLingshi[idx].size(); ++j)
-        {
-            if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skill))
+        UInt16 idx = type - GData::SKILL_PASSSTART;
+        if (p100)
+        { // 100%
+            for (size_t j = 0; j < _rpassklLingshi[idx].size(); ++j)
             {
-                ret = true;
-                if (skill != _rpassklLingshi[idx][j])
-                { // upgrade
-                    _rpassklLingshi[idx][j] = skill;
+                if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skill))
+                { // off
+                    std::vector<UInt16>::iterator i = _rpassklLingshi[idx].begin();
+                    std::advance(i, j);
+                    _rpassklLingshi[idx].erase(i);
+                }
+            }
+            for (size_t j = 0; j < _passklLingshi[idx].size(); ++j)
+            {
+                if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skill))
+                {
+                    ret = true;
+                    if (skill != _passklLingshi[idx][j]) // upgrade
+                        _passklLingshi[idx][j] = skill;
                     break;
                 }
             }
-        }
 
-        if (!ret)
-        { // up
-            ret = true;
-            _rpassklLingshi[idx].push_back(skill);
+            if(!ret)
+            {  // up
+                ret = true;
+                _passklLingshi[idx].push_back(skill);
+            }
+        }
+        else
+        {
+            for (size_t j = 0; j < _passklLingshi[idx].size(); ++j)
+            {
+                if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skill))
+                {
+                    ret = true;
+                    break;
+                }
+            }
+
+            for (size_t j = 0; j < _rpassklLingshi[idx].size(); ++j)
+            {
+                if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skill))
+                {
+                    ret = true;
+                    if (skill != _rpassklLingshi[idx][j])
+                    { // upgrade
+                        _rpassklLingshi[idx][j] = skill;
+                        break;
+                    }
+                }
+            }
+
+            if (!ret)
+            { // up
+                ret = true;
+                _rpassklLingshi[idx].push_back(skill);
+            }
         }
     }
-
     return ret;
 }
 
