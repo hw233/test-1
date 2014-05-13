@@ -652,6 +652,7 @@ private:
     std::vector<BattleFighter*> _onPetProtect;
     std::vector<BattleFighter*> _onPetAtk;
     std::vector<BattleFighter*> _onOtherConfuseAndForget;
+    std::vector<BattleFighter*> _onOtherConfuseAndForgetAtkList[2];
 
     UInt8 _cur_round_except[25];
     UInt8 _except_count;
@@ -768,6 +769,8 @@ private:
     static  bool isBehindPos(BattleObject* bo, UInt8 targetPos, UInt8 maxLength);
     UInt32 upPetObject(UInt8, bool = true);
     UInt32 doSpiritAttack(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first);
+    void doOtherConfuseForgetAttack(BattleFighter* bf, UInt32& rcnt);
+    UInt32 doOtherConfuseForgetAttackOnce(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first);
 
 private:
     // 记录每回合命中次数

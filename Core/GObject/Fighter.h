@@ -323,7 +323,7 @@ public:
     // 更新被动技能表
     bool upPassiveSkill(UInt16 skill, UInt16 type, bool, bool = true);
     // 更新灵侍技能表
-    bool upPassiveSkillLingshi(UInt16 skill, UInt16 type, bool p100);
+    bool upPassiveSkillLingshi();
     // 装备被动技能
     //bool upPassiveSkill(UInt16* skill, UInt8 size, bool = true);
     // 更新被动技能
