@@ -19,9 +19,11 @@ struct FrontMapFighter
 
 typedef std::map<UInt16, std::vector<FrontMapFighter> > FrontMapManager;
 extern FrontMapManager frontMapManager;
+extern FrontMapManager xjfrontMapManager;
 
 typedef std::map<UInt8, UInt8> FrontMapMaxManager;
 extern FrontMapMaxManager frontMapMaxManager;
+extern FrontMapMaxManager xjfrontMapMaxManager;
 
 } // namespace GData
 

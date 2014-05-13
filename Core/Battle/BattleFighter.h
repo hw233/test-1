@@ -1576,6 +1576,10 @@ private:
 
     std::map<UInt16, Int32> _sg_v;
 
+    UInt8 _jiuziDmgCnt;
+    void setJiuziDmgCnt(UInt8 count) { _jiuziDmgCnt = count; }
+    UInt8 getJiuziDmgCnt() { return _jiuziDmgCnt; }
+
 public:
 	enum StatusFlag
 	{

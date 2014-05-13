@@ -693,7 +693,7 @@ namespace GObject
         VAR_CLAN_DUOBAO_SCORE = 713,        // 夺宝奇兵点数
         VAR_CLAN_DUOBAO_SUCCESS_NUM = 714,  // 夺宝奇兵成功次数
         VAR_CLAN_DUOBAO_STATUS = 715,       // 夺宝奇兵状态
-        //721 - 730 for dtc 
+        //721 - 740 for dtc 
         VAR_TYSS_RECHARGE = 721,//天元神兽期间玩家兑换灵果剩余充值数(充值数满足条件自动兑换灵果)
         VAR_TYSS_CONTRIBUTE_PLAYER = 722,//天元神兽期间玩家个人总贡献 
         VAR_TYSS_CONTRIBUTE_PLAYER_DAY = 723,//天元神兽期间玩家个人当日贡献 
@@ -702,9 +702,14 @@ namespace GObject
         VAR_TYSS_DISCOUNT_CONSUME2 = 726,//天元神兽期间限购栏2(购买次数)
         VAR_TYSS_DISCOUNT_CONSUME3 = 727,//天元神兽期间限购栏3(购买次数)
         VAR_TYSS_CONTRIBUTE_CLAN_SUM = 728,//天元神兽期间玩家帮派总贡献(帮主身上) 
+        
+        VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 729,//璇玑阵图自动战斗使用金钱标志
+        VAR_ATOXJFM = 730,     //自动璇玑阵图id
         //731 - 751 for lib
-        //752 - 760 for qimj
-        VAR_CUR_CLAN_TITLE = 752,
+        //752 - 770 for dtc
+        VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
+        //771 - 780 for qimj
+        VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
 
         VAR_MAX,
     };
@@ -1336,6 +1341,10 @@ namespace GObject
             REGISTER_VAR(VAR_TYSS_DISCOUNT_CONSUME3, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_CLAN_SUM, CYCLE_NONE);
             REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
+            REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
+            REGISTER_VAR(VAR_LIMIT_APPOINTMENT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

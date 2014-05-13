@@ -468,6 +468,23 @@ namespace GObject
         UInt8 spot;
     };
 
+    class EventAutoXJFrontMap : public EventBase
+    {
+    public:
+		EventAutoXJFrontMap(Player * player, UInt32 interval, UInt32 count, UInt8 id, UInt8 spot)
+			: EventBase(player, interval, count), id(id), spot(spot)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_AUTOXJFRONTMAP; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+
+    private:
+        UInt8 id;
+        UInt8 spot;
+    };
+
     class EventPlayerTimeTick : public EventBase
     {
     public:
@@ -675,7 +692,7 @@ namespace GObject
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonCnt1(0), dungeonEnd(0),
-            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0), teamArena(NULL)
+            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0), teamArena(NULL), xjfrontFreeCnt(0), xjfrontGoldCnt(0), xjfrontUpdate(0)
 #ifdef _ARENA_SERVER
             , entered(0)
 #endif
@@ -796,6 +813,9 @@ namespace GObject
         std::map<UInt8, UInt32> titleAll;      //玩家所有的称号id
         std::vector<UInt32> canHirePet;     //玩家未招募的仙宠
         TeamArenaData * teamArena;  //组队跨服战
+        UInt8 xjfrontFreeCnt;         // ??ͼ???Ѵ???
+        UInt8 xjfrontGoldCnt;         // ??ͼ?շѴ???
+        UInt32 xjfrontUpdate;         // ??ͼ????????ʱ??
     };
 
 	class Player:
@@ -831,6 +851,7 @@ namespace GObject
             ClanRankBattle  = 0x00000200,
             AutoTlz         = 0x00000400,
             InPetCopyTeam   = 0x00000800,
+            AutoXJFrontMap  = 0x00001000,
             AthleticsBuff   = 0x80000000,
 			AllFlags		= 0xFFFFFFFF
 		};
@@ -1578,6 +1599,11 @@ namespace GObject
         void cancelAutoFrontMap(UInt8 id);
         void instantAutoFrontMap(UInt8 id);
         void sendAutoFrontMap();
+
+        void startAutoXJFrontMap(UInt8 id, UInt8 mtype);
+        void cancelAutoXJFrontMap(UInt8 id);
+        void instantAutoXJFrontMap(UInt8 id);
+        void sendAutoXJFrontMap();
 
 		inline UInt32 getNextExtraReward()
 		{ return _playerData.nextExtraReward; }

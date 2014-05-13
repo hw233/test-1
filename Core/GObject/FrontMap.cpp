@@ -322,6 +322,10 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
         // pl->sendMsgCode(0, 1414);
         return 0;
     }
+    if (pl->hasFlag(Player::AutoXJFrontMap) && !ato) {
+        pl->sendMsgCode(0, 1414);
+        return 0;
+    }
 
     if (spot >= tmp.size()) {
         tmp.resize(spot+1);
@@ -605,6 +609,10 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
             {
                 if (!init) {
                     if (pl->hasFlag(Player::AutoFrontMap)) {
+                        pl->sendMsgCode(0, 1414);
+                        return;
+                    }
+                    if (pl->hasFlag(Player::AutoXJFrontMap)) {
                         pl->sendMsgCode(0, 1414);
                         return;
                     }
