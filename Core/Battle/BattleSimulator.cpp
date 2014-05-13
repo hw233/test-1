@@ -164,6 +164,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_dao_rose] = &BattleSimulator::doSkillEffectExtra_Dao_Rose;
         skillEffectExtraTable[GData::e_eft_mo_knot] = &BattleSimulator::doSkillEffectExtra_Mo_Knot;
         skillEffectExtraTable[GData::e_eft_prudent] = &BattleSimulator::doSkillEffectExtra_Prudent;
+        skillEffectExtraTable[GData::e_eft_chaos_world] = &BattleSimulator::doSkillEffectExtra_ChaosWorld;
     }
 }
 
@@ -292,6 +293,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_dao_rose] = &BattleSimulator::doSkillEffectExtra_Dao_Rose;
         skillEffectExtraTable[GData::e_eft_mo_knot] = &BattleSimulator::doSkillEffectExtra_Mo_Knot;
         skillEffectExtraTable[GData::e_eft_prudent] = &BattleSimulator::doSkillEffectExtra_Prudent;
+        skillEffectExtraTable[GData::e_eft_chaos_world] = &BattleSimulator::doSkillEffectExtra_ChaosWorld;
     }
 }
 
@@ -6360,6 +6362,13 @@ UInt32 BattleSimulator::doAttack( int pos )
                         }
                         atkAct.clear();
                     }
+                    bo = static_cast<BattleFighter*>(getObject(otherside, bleed_target_pos));
+                    if (bf->getChaosWorldLast() && bo && bo->getHP() && (bo->getSide() != bf->getSide()) && !bo->isSoulOut() && !bo->getStunRound())
+                    {
+                        bo->setStunRound(1);
+                        appendDefStatus(e_skill, bf->getChaosWorldId(), bf);
+                        appendDefStatus(e_Stun, 0, bo);
+                    }
 
                     bo = static_cast<BattleFighter*>(getObject(otherside, bleed_target_pos));
                     while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBleed100(idx, noPossibleTarget)))
@@ -8890,6 +8899,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
         }
         bf->resetWithstandCount();
+        bf->releaseChaosWorld();
 
         UInt8& newModeLast = bf->getNewModeLast();
         if(newModeLast > 0)
@@ -14311,6 +14321,43 @@ bool BattleSimulator::doSkillEffectExtra_LingShiBleed(BattleFighter* bf, BattleF
     }
 
     return false;
+}
+
+void BattleSimulator::doSkillEffectExtra_ChaosWorld(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+
+    size_t cnt = eft.size();
+    if(cnt != efv.size() || cnt != efl.size())
+        return;
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        if(eft[i] == GData::e_eft_chaos_world)
+        {
+            if(bf)
+            {
+                if ((bf->getHPP() * 100) <= efv[i] && !bf->getChaosWorldId())
+                {
+                    bf->setChaosWorld(skill->getId(), efl[i]);
+                    appendDefStatus(e_chaosWorld, 0, bf);
+                }
+                /*
+                else if (bf->getChaosWorldId())
+                {
+                    bf->setChaosWorld(false);
+                    appendDefStatus(e_unChaosWorld, 0, bf);
+                }
+                */
+            }
+            return;
+        }
+    }
+
+    return;
 }
 
 void BattleSimulator::doPassiveSkillBePHYDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg)
