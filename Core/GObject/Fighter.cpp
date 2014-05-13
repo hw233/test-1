@@ -1218,10 +1218,16 @@ ItemEquip * Fighter::setLingshi(ItemEquip * lingshi, int idx, bool writedb)
     ItemEquip * old = _lingshi[idx];
     _lingshi[idx] = lingshi;
     sendModification(0x63+idx, lingshi, writedb);
+    _lingshiSkill[idx].clear();
     if(lingshi)
     {
         lingshi->SetBindStatus(true);
         updateLingshiSkillId(lingshi, idx);
+    }
+    else
+    {
+        if(idx == 0)
+            upPassiveSkillLingshi();
     }
     setDirty();
 
