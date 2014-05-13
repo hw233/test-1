@@ -1221,7 +1221,7 @@ ItemEquip * Fighter::setLingshi(ItemEquip * lingshi, int idx, bool writedb)
     if(lingshi)
     {
         lingshi->SetBindStatus(true);
-        updateLingshiSkill(lingshi, idx);
+        updateLingshiSkillId(lingshi, idx);
     }
     setDirty();
 
