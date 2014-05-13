@@ -357,8 +357,8 @@ private:
         e_chaosWorld = 131,  // 混世状态(攻击必定附带眩晕)
         e_unChaosWorld = 132,  // 混世状态消失(攻击必定附带眩晕)
 
-        e_changeMode = 131,  //改变模型
-        e_unChangeMode = 132,  //恢复模型
+        e_changeMode = 133,  //改变模型
+        e_unChangeMode = 134,  //恢复模型
 
         e_MAX_STATE,
     };

@@ -8901,13 +8901,13 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
         bf->resetWithstandCount();
         bf->releaseChaosWorld();
 
-        UInt8& newModeLast = bf->getNewModeLast();
+        UInt8 newModeLast = bf->getNewModeLast();
         if(newModeLast > 0)
         {
             --newModeLast;
+            bf->setNewModeLast(newModeLast);
             if(newModeLast == 0)
             {
-                bf->setNewModeLast(0);
                 appendDefStatus(e_unChangeMode, 0 ,bf);
                 bf->setChangeStatus(2);
                 bf->unUpdateAllPassiveSkillLingshi();
@@ -15312,7 +15312,8 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     bf->setNewModeLast(last);
 
     //改变模型
-    appendDefStatus(e_changeMode, SKILL_ID(passiveSkill->getId()), bf);
+    //if(passiveSkill->color == 5)
+        appendDefStatus(e_changeMode, SKILL_ID(passiveSkill->getId()), bf);
     bf->updateAllPassiveSkillLingshiExceptEnter();
     idx = 0;
     if (bf->getPassiveSkillOnOtherConfuseAndForget100(idx))
