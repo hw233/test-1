@@ -1349,7 +1349,7 @@ public:
 
     UInt32 getChaosWorldId()    { return _chaosWorldId; }
     bool  getChaosWorldLast () { return _chaosWorldLast; }
-    void  setChaosWorld(UInt8 chaosWorldId, UInt8 chaosWorldLast) { _chaosWorldId = chaosWorldId; } 
+    void  setChaosWorld(UInt16 chaosWorldId, UInt8 chaosWorldLast) { _chaosWorldId = chaosWorldId; } 
     void  releaseChaosWorld() 
     { 
         if (_chaosWorldId && _chaosWorldLast && (!--_chaosWorldLast))

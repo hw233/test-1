@@ -6371,11 +6371,11 @@ UInt32 BattleSimulator::doAttack( int pos )
                         atkAct.clear();
                     }
                     bo = static_cast<BattleFighter*>(getObject(otherside, bleed_target_pos));
-                    if (bf->getChaosWorldId() && bo && bo->getHP() && (bo->getSide() != bf->getSide()) && !bo->isSoulOut() && !bo->getStunRound())
+                    if (bf->getChaosWorldId() && bo && bo->getHP() && (bo->getSide() != bf->getSide()) && !bf->isSoulOut() && !bo->getConfuseRound())
                     {
-                        bo->setStunRound(1);
+                        bo->setConfuseRound(1);
                         appendDefStatus(e_skill, bf->getChaosWorldId(), bf);
-                        appendDefStatus(e_Stun, 0, bo);
+                        appendDefStatus(e_Confuse, 0, bo);
                     }
 
                     bo = static_cast<BattleFighter*>(getObject(otherside, bleed_target_pos));
@@ -14372,12 +14372,12 @@ void BattleSimulator::doSkillEffectExtra_ChaosWorld(BattleFighter* bf, int targe
             {
                 if (((bf->getHPP() * 100) <= efv[i]) && !bf->getChaosWorldId())
                 {
-                    bf->setChaosWorld(skill->getId());
+                    bf->setChaosWorld(skill->getId(), 0);
                     appendDefStatus(e_chaosWorld, 0, bf);
                 }
                 else if (bf->getChaosWorldId())
                 {
-                    bf->setChaosWorld(0);
+                    bf->setChaosWorld(0, 0);
                     appendDefStatus(e_unChaosWorld, 0, bf);
                 }
             }
@@ -15352,6 +15352,7 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     Int32 cnt = 0;
     getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
     cnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
+    onHPChanged(bf); // 判断血量变化引起的技能
     return cnt;
 }
 
