@@ -1698,10 +1698,10 @@ private:
     UInt8 getChangeStatus() { return _changeStatus; }
     void setChangeStatus(UInt8 status) { _changeStatus = status; }
     UInt8 _newModeLast;
-    UInt8& getNewModeLast() { return _newModeLast; }
+    UInt8 getNewModeLast() { return _newModeLast; }
     void setNewModeLast(UInt8 last) { _newModeLast = last; }
 
-    bool getHpLess() { if(getHP() < static_cast<UInt32>(0.3f * getMaxHP())) return true; else return false; }
+    bool getHpLess() { if(getHPP() < 0.3f) return true; else return false; }
     UInt16 _counterCnt;
     UInt16 getCounterCnt() { return _counterCnt; }
     void setCounterCnt(UInt16 cnt) { _counterCnt = cnt; }
