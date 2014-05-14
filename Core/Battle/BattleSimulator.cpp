@@ -1523,7 +1523,11 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
                {
                    if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_gaoneng)
+                   {
                        factor *= (1.0f + skill->effect->efv[0]);
+                       appendDefStatus(e_skill, skill->getId(), bf);
+                       break;
+                   }
                }
            }
 
@@ -6285,6 +6289,8 @@ UInt32 BattleSimulator::doAttack( int pos )
                                     makeDamage(mainTarget, dmg, eType, e_damagePhysic);
                                 }
                             }
+                            appendDefStatus(e_skill, skill->getId(), bf);
+                            break;
                         }
                     }
                 }
@@ -6306,6 +6312,8 @@ UInt32 BattleSimulator::doAttack( int pos )
                                     makeDamage(mainTarget, dmg, eType, e_damagePhysic);
                                 }
                             }
+                            appendDefStatus(e_skill, skill->getId(), bf);
+                            break;
                         }
                     }
                 }
@@ -12889,6 +12897,7 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
     else if(_winner == 0)
     {
         onDamage(bf, true, u);
+        size_t idx = 0;
         const GData::SkillBase *skill;
         doLingshiModelAttack(bf, 1);
         while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
@@ -12897,6 +12906,8 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
             {
                 setStatusChange_Def(bf, bf->getSide(), bf->getPos(), skill, getBFDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
                 setStatusChange_MagDef(bf, bf->getSide(), bf->getPos(), skill, getBFMagDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
+                appendDefStatus(e_skill, skill->getId(), bf);
+                break;
             }
         }
 
@@ -13842,12 +13853,32 @@ bool BattleSimulator::doSkillEffectExtra_Dead(BattleFighter* bf, const GData::Sk
     {
         if(eft[i] == GData::e_eft_lingqu)
         {
+            UInt8 newModeLast = bf->getNewModeLast();
+            if(newModeLast > 0)
+            {
+                bf->setNewModeLast(0);
+                appendDefStatus(e_unChangeMode, 0 ,bf);
+                bf->setChangeStatus(2);
+                bf->unUpdateAllPassiveSkillLingshi();
+            }
+            onDeadLingshi(bf);
+
             bf->setLingQu(true, efl[i]);
             appendDefStatus(e_lingQu, 0, bf);
             return true;
         }
         else if(eft[i] == GData::e_eft_soul_out)
         {
+            UInt8 newModeLast = bf->getNewModeLast();
+            if(newModeLast > 0)
+            {
+                bf->setNewModeLast(0);
+                appendDefStatus(e_unChangeMode, 0 ,bf);
+                bf->setChangeStatus(2);
+                bf->unUpdateAllPassiveSkillLingshi();
+            }
+            onDeadLingshi(bf);
+
             bf->setSoulOut(efv[i], efl[i]);
             appendDefStatus(e_soulout, 0, bf);
             return true;
@@ -15330,6 +15361,8 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
 void BattleSimulator::onDeadLingshi(BattleFighter* bf)
 {
     if(!bf)
+        return;
+    if(bf->isSoulOut())
         return;
     UInt8 side = bf->getSide();
     for(UInt8 i = 0; i < 25; ++ i)
