@@ -1202,7 +1202,7 @@ void BattleSimulator::doOtherConfuseForgetAttack(BattleFighter* bf, UInt32& rcnt
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, pos));
         if(!bo || bo->getHP() == 0)
             continue;
-        doOtherConfuseForgetAttackOnce(bf, bo, 1.0f, pr, cs, first);
+        doOtherConfuseForgetAttackOnce(bf, bo, bf->getMagAttack(), pr, cs, first);
         ++ i;
     }
     if(_defList.size() > 0 || _scList.size() > 0)
@@ -6376,11 +6376,11 @@ UInt32 BattleSimulator::doAttack( int pos )
                         atkAct.clear();
                     }
                     bo = static_cast<BattleFighter*>(getObject(otherside, bleed_target_pos));
-                    if (bf->getChaosWorldLast() && bo && bo->getHP() && (bo->getSide() != bf->getSide()) && !bo->isSoulOut() && !bo->getStunRound())
+                    if (bf->getChaosWorldId() && bo && bo->getHP() && (bo->getSide() != bf->getSide()) && !bf->isSoulOut() && !bo->getConfuseRound())
                     {
-                        bo->setStunRound(1);
+                        bo->setConfuseRound(1);
                         appendDefStatus(e_skill, bf->getChaosWorldId(), bf);
-                        appendDefStatus(e_Stun, 0, bo);
+                        appendDefStatus(e_Confuse, 0, bo);
                     }
 
                     bo = static_cast<BattleFighter*>(getObject(otherside, bleed_target_pos));
@@ -6388,6 +6388,75 @@ UInt32 BattleSimulator::doAttack( int pos )
                     {
                         if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) && !bo->isSoulOut() &&
                                 bo->isBleeding())
+                        {
+                            int cnt = 0;
+                            getSkillTarget(bf, passiveSkill, otherside, bleed_target_pos, cnt);
+                            std::vector<AttackAct> atkAct;
+                            atkAct.clear();
+                            if(doSkillAttack(bf, passiveSkill, otherside, bleed_target_pos, cnt, &atkAct))
+                                ++ rcnt;
+
+                            size_t actCnt = atkAct.size();
+                            for(size_t idx = 0; idx < actCnt; idx++)
+                            {
+                                if(atkAct[idx].bf->getHP() == 0)
+                                    continue;
+                                if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                                    ++ rcnt;
+                            }
+                            atkAct.clear();
+                        }
+                    }
+                    while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackConfuseForget100(idx, noPossibleTarget)))
+                    {
+                        if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) && !bo->isSoulOut() &&
+                                (bo->getConfuseRound() || bo->getForgetRound()))
+                        {
+                            int cnt = 0;
+                            getSkillTarget(bf, passiveSkill, otherside, bleed_target_pos, cnt);
+                            std::vector<AttackAct> atkAct;
+                            atkAct.clear();
+                            if(doSkillAttack(bf, passiveSkill, otherside, bleed_target_pos, cnt, &atkAct))
+                                ++ rcnt;
+
+                            size_t actCnt = atkAct.size();
+                            for(size_t idx = 0; idx < actCnt; idx++)
+                            {
+                                if(atkAct[idx].bf->getHP() == 0)
+                                    continue;
+                                if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                                    ++ rcnt;
+                            }
+                            atkAct.clear();
+                        }
+                    }
+                    while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackStun100(idx, noPossibleTarget)))
+                    {
+                        if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) && !bo->isSoulOut() &&
+                                bo->getStunRound())
+                        {
+                            int cnt = 0;
+                            getSkillTarget(bf, passiveSkill, otherside, bleed_target_pos, cnt);
+                            std::vector<AttackAct> atkAct;
+                            atkAct.clear();
+                            if(doSkillAttack(bf, passiveSkill, otherside, bleed_target_pos, cnt, &atkAct))
+                                ++ rcnt;
+
+                            size_t actCnt = atkAct.size();
+                            for(size_t idx = 0; idx < actCnt; idx++)
+                            {
+                                if(atkAct[idx].bf->getHP() == 0)
+                                    continue;
+                                if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                                    ++ rcnt;
+                            }
+                            atkAct.clear();
+                        }
+                    }
+                    while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBlind100(idx, noPossibleTarget)))
+                    {
+                        if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) && !bo->isSoulOut() &&
+                                bo->getBlind())
                         {
                             int cnt = 0;
                             getSkillTarget(bf, passiveSkill, otherside, bleed_target_pos, cnt);
@@ -6930,14 +6999,14 @@ UInt32 BattleSimulator::doAttack( int pos )
     for (size_t i = 0; i < _onOtherConfuseAndForgetAtkList[side].size();)
     {
         BattleFighter* atk = _onOtherConfuseAndForgetAtkList[side][i];
-        if (!atk || atk->getHP() < 0 ||  atk->getSide() == side ||
+        if (!atk || atk->getHP() < 0 || 
                 atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
         {
-            _onOtherConfuseAndForgetAtkList[side].erase(_onOtherConfuseAndForgetAtkList[side].begin() + i);
             continue;
         }
-        doOtherConfuseForgetAttack(atk, rcnt);
-        ++i;
+        else
+            doOtherConfuseForgetAttack(atk, rcnt);
+        _onOtherConfuseAndForgetAtkList[side].erase(_onOtherConfuseAndForgetAtkList[side].begin() + i);
     }
 
     if(bf->getHP() > 0 && _winner == 0 && bf->getAbnormalTypeCnt() >= 3)
@@ -8912,7 +8981,6 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
         }
         bf->resetWithstandCount();
-        bf->releaseChaosWorld();
 
         UInt8 newModeLast = bf->getNewModeLast();
         if(newModeLast > 0)
@@ -14376,18 +14444,19 @@ void BattleSimulator::doSkillEffectExtra_ChaosWorld(BattleFighter* bf, int targe
         {
             if(bf)
             {
-                if (((bf->getHPP() * 100) <= efv[i]) && !bf->getChaosWorldId())
+                if (((bf->getHPP() * 100) <= efv[i]))
                 {
-                    bf->setChaosWorld(skill->getId(), efl[i]);
-                    appendDefStatus(e_chaosWorld, 0, bf);
+                    if (!bf->getChaosWorldId())
+                    {
+                        bf->setChaosWorld(skill->getId(), 0);
+                        appendDefStatus(e_chaosWorld, 0, bf);
+                    }
                 }
-                /*
                 else if (bf->getChaosWorldId())
                 {
-                    bf->setChaosWorld(false);
+                    bf->setChaosWorld(0, 0);
                     appendDefStatus(e_unChaosWorld, 0, bf);
                 }
-                */
             }
             return;
         }
@@ -15360,6 +15429,7 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     Int32 cnt = 0;
     getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
     cnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
+    onHPChanged(bf); // 判断血量变化引起的技能
     return cnt;
 }
 

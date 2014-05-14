@@ -1251,6 +1251,13 @@ private:
     std::vector<GData::SkillItem> _passiveSkillOnGetDmg100;
     std::vector<GData::SkillItem> _passiveSkillOnGetDmg;
 
+    std::vector<GData::SkillItem> _passiveSkillOnAttackConfuseForget;
+    std::vector<GData::SkillItem> _passiveSkillOnAttackConfuseForget100;
+    std::vector<GData::SkillItem> _passiveSkillOnAttackStun;
+    std::vector<GData::SkillItem> _passiveSkillOnAttackStun100;
+    std::vector<GData::SkillItem> _passiveSkillOnAttackBlind;
+    std::vector<GData::SkillItem> _passiveSkillOnAttackBlind100;
+
     std::vector<GData::SkillItem> _passiveSkillOnBeDmg100;
     std::vector<GData::SkillItem> _passiveSkillOnBePHYDmg100;
     std::vector<GData::SkillItem> _passiveSkillOnBeMagDmg100;
@@ -1271,8 +1278,14 @@ public:
     bool releaseDarkVigor();
     const GData::SkillBase* getPassiveSkillOnCounter100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnAttackBleed100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAttackConfuseForget100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAttackStun100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAttackBlind100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnCounter(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnAttackBleed(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAttackConfuseForget(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAttackStun(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnAttackBlind(bool noPossibleTarget = false);
 
 private:
     std::vector<GData::LBSkillItem> _onSkillCond;
@@ -1349,7 +1362,7 @@ public:
 
     UInt32 getChaosWorldId()    { return _chaosWorldId; }
     bool  getChaosWorldLast () { return _chaosWorldLast; }
-    void  setChaosWorld(UInt8 chaosWorldId, UInt8 chaosWorldLast) { _chaosWorldId = chaosWorldId; } 
+    void  setChaosWorld(UInt16 chaosWorldId, UInt8 chaosWorldLast) { _chaosWorldId = chaosWorldId; } 
     void  releaseChaosWorld() 
     { 
         if (_chaosWorldId && _chaosWorldLast && (!--_chaosWorldLast))

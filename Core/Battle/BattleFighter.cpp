@@ -156,6 +156,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillOnOtherDead(), _passiveSkillOnOtherDead);
     updatePassiveSkill100(_fighter->getPassiveSkillOnCounter100(), _passiveSkillOnCounter100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAttackBleed100(), _passiveSkillOnAttackBleed100);
+    updatePassiveSkill100(_fighter->getPassiveSkillOnAttackConfuseForget100(), _passiveSkillOnAttackConfuseForget100);
+    updatePassiveSkill100(_fighter->getPassiveSkillOnAttackStun100(), _passiveSkillOnAttackStun100);
+    updatePassiveSkill100(_fighter->getPassiveSkillOnAttackBlind100(), _passiveSkillOnAttackBlind100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAtkDmg100(), _passiveSkillOnAtkDmg100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnPetProtect100(), _passiveSkillOnPetProtect100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnGetDmg100(), _passiveSkillOnGetDmg100);
@@ -183,6 +186,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill(_fighter->getPassiveSkillAftNAtk(), _passiveSkillAftNAtk);
     updatePassiveSkill(_fighter->getPassiveSkillOnPetProtect(), _passiveSkillOnPetProtect);
     updatePassiveSkill(_fighter->getPassiveSkillOnCounter(), _passiveSkillOnCounter);
+    updatePassiveSkill(_fighter->getPassiveSkillOnAttackConfuseForget(), _passiveSkillOnAttackConfuseForget);
+    updatePassiveSkill(_fighter->getPassiveSkillOnAttackStun(), _passiveSkillOnAttackStun);
+    updatePassiveSkill(_fighter->getPassiveSkillOnAttackBlind(), _passiveSkillOnAttackBlind);
     updatePassiveSkill(_fighter->getPassiveSkillOnAtkDmg(), _passiveSkillOnAtkDmg);
     updatePassiveSkill(_fighter->getPassiveSkillOnGetDmg(), _passiveSkillOnGetDmg);
     updatePassiveSkill(_fighter->getPassiveSkillOnBeDmg(), _passiveSkillOnBeDmg);
@@ -1209,6 +1215,21 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBleed100(size_t& i
     return getPassiveSkill100(_passiveSkillOnAttackBleed100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackConfuseForget100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnAttackConfuseForget100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackStun100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnAttackStun100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBlind100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnAttackBlind100, idx, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmg100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillOnAtkDmg100, idx, noPossibleTarget);
@@ -1291,7 +1312,7 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnWithstand100(size_t& idx
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnOtherConfuseAndForget100(size_t& idx, bool noPossibleTarget)
 {
-    return getPassiveSkill100(_passiveSkillOnOtherConfuseForget, idx, noPossibleTarget);
+    return getPassiveSkill100(_passiveSkillOnOtherConfuseForget100, idx, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
@@ -1420,6 +1441,21 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnCounter(bool noPossibleT
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBleed(bool noPossibleTarget)
 {
     return getPassiveSkill( _passiveSkillOnAttackBleed, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackConfuseForget(bool noPossibleTarget)
+{
+    return getPassiveSkill( _passiveSkillOnAttackConfuseForget, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackStun(bool noPossibleTarget)
+{
+    return getPassiveSkill( _passiveSkillOnAttackStun, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBlind(bool noPossibleTarget)
+{
+    return getPassiveSkill( _passiveSkillOnAttackBlind, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmgForce(bool noPossibleTarget)

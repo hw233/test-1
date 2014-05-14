@@ -58,6 +58,9 @@ enum    // 技能触发方式
     /*32*/ SKILL_LINGSHI,    // 灵侍技能
     /*33*/ SKILL_ONOTHERCONFUSEFORGET,  // 其他人获得沉默和混乱
     /*34*/ SKILL_ENTER_LINGSHI,  // 灵侍入场技能
+    /*35*/ SKILL_ONATKSTUN,         // 攻击带眩晕的主目标后
+    /*36*/ SKILL_ONATKCONFUSEFORGET,// 攻击带混乱沉默的主目标后
+    /*37*/ SKILL_ONATKBLIND,        // 攻击带致盲的主目标后
     SKILL_PASSIVES
 };
 
