@@ -8191,7 +8191,7 @@ void BattleSimulator::onHPChanged(BattleObject * bo)
             {
                 int target_side, target_pos, cnt;
                 getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-                //doSkillEffectExtraAttack(bf, target_side, target_pos, passiveSkill);
+                doSkillEffectExtraAttack(bf, target_side, target_pos, passiveSkill);
                 GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(passiveSkill->getId()));
                 if(ss)
                 {
@@ -14371,7 +14371,7 @@ void BattleSimulator::doSkillEffectExtra_ChaosWorld(BattleFighter* bf, int targe
         {
             if(bf)
             {
-                if ((bf->getHPP() * 100) <= efv[i] && !bf->getChaosWorldId())
+                if (((bf->getHPP() * 100) <= efv[i]) && !bf->getChaosWorldId())
                 {
                     bf->setChaosWorld(skill->getId(), efl[i]);
                     appendDefStatus(e_chaosWorld, 0, bf);
