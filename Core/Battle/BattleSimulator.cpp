@@ -5803,7 +5803,7 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             }
             else if(skill->effect->state & GData::e_state_poison || skill->effect->damage || skill->effect->damageP || skill->effect->adddam
                     || skill->effect->magdam || skill->effect->magdamP || skill->effect->addmag
-                    || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr || (skill->cond == GData::SKILL_ENTER_LINGSHI && (skill->effect->state & GData::e_state_stun || skill->effect->state & GData::e_state_blind || skill->effect->state & GData::e_state_forget)))
+                    || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr || (skill->cond == GData::SKILL_ENTER_LINGSHI && (skill->effect->state & GData::e_state_stun || skill->effect->state & GData::e_state_blind || skill->effect->state & GData::e_state_forget || skill->effect->state & GData::e_state_confuse)))
             {
                 if (doSkillAttack(bf, skill, target_side, target_pos, 1))
                 {
@@ -12996,6 +12996,9 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
     size_t idx2 = 0;
     const GData::SkillBase *skill;
     doLingshiModelAttack(bf, 1);
+
+    BattleFighter* tmp = _activeFgt;
+    _activeFgt = bf;
     while(NULL != (skill = bf->getPassiveSkillLingshi100(idx2)))
     {
         if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_buqu)
@@ -13006,6 +13009,7 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
             break;
         }
     }
+    _activeFgt = tmp;
 
     return uShow;
 }
@@ -15431,10 +15435,13 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     bf->setChangeStatus(1);
     bf->setNewModeLast(last);
 
+    BattleFighter* tmp = _activeFgt;
+    _activeFgt = bf;
     //改变模型
     //if(passiveSkill->color == 5)
         appendDefStatus(e_changeMode, SKILL_ID(passiveSkill->getId()), bf);
     bf->updateAllPassiveSkillLingshiExceptEnter();
+
     idx = 0;
     if (bf->getPassiveSkillOnOtherConfuseAndForget100(idx))
         _onOtherConfuseAndForget.push_back(bf);
@@ -15444,7 +15451,10 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     Int32 cnt = 0;
     getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
     _lingshiActCnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
+
     onHPChanged(bf); // 判断血量变化引起的技能
+    _activeFgt = tmp;
+
     return 0;
 }
 
