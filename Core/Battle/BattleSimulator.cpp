@@ -480,6 +480,7 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
         _fgtlist[0].clear();
         _fgtlist[1].clear();
     }
+    _lingshiActCnt = 0;
 
     // [[ Make packet header data
     _packet.init(REP::FIGHT_START);
@@ -735,7 +736,7 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
         _winner = testWinner2();
 
     _packet << static_cast<UInt8>(_winner);
-    _packet.data<UInt32>(cnt_pos) = act_count;
+    _packet.data<UInt32>(cnt_pos) = act_count + _lingshiActCnt;
     _packet << Stream::eos;
     //printf("Winner is: %d,  actions: %d\n", _winner, act_count);
 #ifdef _DEBUG
@@ -5795,7 +5796,7 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             }
             else if(skill->effect->state & GData::e_state_poison || skill->effect->damage || skill->effect->damageP || skill->effect->adddam
                     || skill->effect->magdam || skill->effect->magdamP || skill->effect->addmag
-                    || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr)
+                    || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr || (skill->cond == GData::SKILL_ENTER_LINGSHI && (skill->effect->state & GData::e_state_stun || skill->effect->state & GData::e_state_blind || skill->effect->state & GData::e_state_forget)))
             {
                 if (doSkillAttack(bf, skill, target_side, target_pos, 1))
                 {
@@ -12977,26 +12978,26 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
     else if(_winner == 0)
     {
         onDamage(bf, true, u);
-        size_t idx = 0;
-        const GData::SkillBase *skill;
-        doLingshiModelAttack(bf, 1);
-        while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
-        {
-            if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_buqu)
-            {
-                setStatusChange_Def(bf, bf->getSide(), bf->getPos(), skill, getBFDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
-                setStatusChange_MagDef(bf, bf->getSide(), bf->getPos(), skill, getBFMagDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
-                appendDefStatus(e_skill, skill->getId(), bf);
-                break;
-            }
-        }
-
     }
 
     if(type == e_damCounter)
     {
         _defList[idx].counterDmg = uShow;
         _defList[idx].counterLeft = bf->getHP();
+    }
+
+    size_t idx2 = 0;
+    const GData::SkillBase *skill;
+    doLingshiModelAttack(bf, 1);
+    while(NULL != (skill = bf->getPassiveSkillLingshi100(idx2)))
+    {
+        if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_buqu)
+        {
+            setStatusChange_Def(bf, bf->getSide(), bf->getPos(), skill, getBFDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
+            setStatusChange_MagDef(bf, bf->getSide(), bf->getPos(), skill, getBFMagDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
+            appendDefStatus(e_skill, skill->getId(), bf);
+            break;
+        }
     }
 
     return uShow;
@@ -15435,9 +15436,9 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     Int32 target_pos;
     Int32 cnt = 0;
     getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-    cnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
+    _lingshiActCnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
     onHPChanged(bf); // 判断血量变化引起的技能
-    return cnt;
+    return 0;
 }
 
 void BattleSimulator::onDeadLingshi(BattleFighter* bf)

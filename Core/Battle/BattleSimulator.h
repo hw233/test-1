@@ -688,6 +688,8 @@ private:
     bool  _firstPLDmg[2]; //第一回合打出无双技能
     UInt8   _getDamageSkillCount[2]; // 每回合受伤触发技能的最大数目
 
+    UInt32 _lingshiActCnt;
+
     /*
     bool    _evade3OK[2]; //达成次数
     bool    _evade9ok[2]; //达成次数
