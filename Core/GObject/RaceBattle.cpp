@@ -183,6 +183,8 @@ namespace GObject
             //if((origPos % 10) != 0)
             //    return;
             //    eraseLevelStarSort(pl, level);
+            if(level == 6)
+                insertLevelStarSort(pl, level);
         }
         else if((origPos % 10) == 0)
         {
@@ -242,11 +244,13 @@ namespace GObject
         UInt8 awardlevel = pl->getAwardLevel();
         UInt8 pos = pl->getRaceBattlePos();
         UInt8 level = pos / 10;
-        if(level < 2 || level > 6 || awardlevel > level)
+        if(awardlevel < 2 || awardlevel > 6 || awardlevel <= level)
             return;
+#if 0
         UInt8 index = level - 3;
         if(index > 3)
             return;
+#endif
 #if 0
         static UInt32 awardItem[][3][2] = {
             {{499, 20}, {499, 10}, {499, 5}},
@@ -268,12 +272,19 @@ namespace GObject
                 pl->GetPackage()->Add(awardItem[index][i][0], awardItem[index][i][1], true, false);
         }
 #endif
-        if(level >= 4 && pl->GetPackage()->GetRestPackageSize() < 1)
+        if(awardlevel >= 4)
         {
-            pl->sendMsgCode(0, 1011);
-            return;
+            if(pl->GetPackage()->GetRestPackageSize() < 1)
+            {
+                pl->sendMsgCode(0, 1011);
+                return;
+            }
+            else
+            {
+                pl->GetPackage()->Add(9457, awardlevel - 3, true, false);
+            }
         }
-        pl->getAchievement(100 * (level - 1));
+        pl->getAchievement(100 * (awardlevel - 1));
 
         ++awardlevel;
         pl->setAwardLevel(awardlevel);
@@ -683,7 +694,7 @@ namespace GObject
         pl->getAchievement(achievement[type]);
         SYSMSG(title, 5135);
         SYSMSGV(content, 5136, rank, achievement[type]);
-        pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        pl->GetMailBox()->newMail(NULL, 0x1, title, content, 0xFFFE0000);
 #endif
     }
 
@@ -756,7 +767,7 @@ namespace GObject
         pl->getAchievement(achievement[type]);
         SYSMSG(title, 5137);
         SYSMSGV(content, 5138, num, achievement[type]);
-        pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        pl->GetMailBox()->newMail(NULL, 0x1, title, content, 0xFFFE0000);
 
 #endif
     }
@@ -931,6 +942,7 @@ namespace GObject
         if(!(continueRank > pageStart * PAGE_MAX && continueRank < pageEnd * PAGE_MAX))
         {
             pl->sendMsgCode(0, 4046);
+            sendContinueWinSort(pl, pl->getContinueWinPage());
             return;
         }
 
