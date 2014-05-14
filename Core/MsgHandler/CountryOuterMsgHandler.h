@@ -6755,19 +6755,20 @@ void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
             GObject::raceBattle.enterPos(player, pos);
         }
         break;
-
+#if 0
         case 5:
         {
             GObject::raceBattle.autoBattle(player);
         }
         break;
-
+#endif
+#if 0
         case 6:
         {
             GObject::raceBattle.cancelBattle(player);
         }
         break;
-
+#endif
         case 7:
         {
             GObject::raceBattle.freshContinueWinRank(player);

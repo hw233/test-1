@@ -213,7 +213,8 @@ namespace GObject
         pl->setTotalAchievement(0);
         pl->setTotalItemCnt(0);
         pl->setTotalExp(0);
-        pl->cancelAutoRaceBattle();
+        if(pl->getLocation() == 1556)
+            pl->cancelAutoRaceBattle();
         return true;
     }
 
@@ -330,6 +331,7 @@ namespace GObject
         {
             GameAction()->doStrong(pl, SthZixiaozhidian, 0, 0);
             insertLevelStarSort(pl, level);
+            autoBattle(pl);
         }
         else
         {

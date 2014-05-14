@@ -93,6 +93,7 @@
 #include "GData/SevenSoul.h"
 #include "KangJiTianMo.h"
 #include "Battle/BattleReport.h"
+#include "GObject/RaceBattle.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -684,6 +685,8 @@ namespace GObject
 	UInt64 EventAutoRaceBattle::calcExpEach()
 	{
         UInt8 plvl = m_Player->GetLev();
+        if(plvl < 40)
+            return 0;
         UInt64 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
         return exp;
 	}
@@ -2381,8 +2384,6 @@ namespace GObject
         int addr = inet_addr(m_clientIp);
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%" I64_FMT "u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %" I64_FMT "u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
-
-        cancelAutoRaceBattle();
 
         if(_isOnline && !hasFlag(Training))
         {
@@ -6629,6 +6630,10 @@ namespace GObject
             newHeroIsland.playerLeave(this);
             delFlag(Player::InHeroIsland);
         }
+        else if (_playerData.location == 1556)
+        {
+            cancelAutoRaceBattle();
+        }
         SpotData * spotData = GetMapSpot();
         if(spotData && spotData->m_CountryBattle && !(gClanCity && gClanCity->isOpen()))
         {
@@ -6703,6 +6708,12 @@ namespace GObject
 
 		_playerData.inCity = inCity ? 1 : 0;
 		_playerData.location = spot;
+        if (_playerData.location == 1556)
+        {
+            if(raceBattle.isStart())
+                raceBattle.autoBattle(this);
+        }
+
 		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %"  I64_FMT  "u", _playerData.inCity, _playerData.location, getId());
 
         ClanRankBattleMgr::Instance().PlayerEnter(this);
@@ -32139,11 +32150,14 @@ void Player::specialUdpLog(UInt8 type)
 
 	void Player::cancelAutoRaceBattle()
 	{
+#if 0
         if(getThreadId() != WORKER_THREAD_NEUTRAL)
         {
             GameMsgHdr hdr(0x1D1, WORKER_THREAD_NEUTRAL, this, 0);
             GLOBAL().PushMsg(hdr, NULL);
+            return;
         }
+#endif
         EventBase* ev = eventWrapper.RemoveTimerEvent(this, EVENT_AUTORACEBATTLE, 0);
         if(ev == NULL)
             return;
