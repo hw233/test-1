@@ -6371,7 +6371,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                         atkAct.clear();
                     }
                     bo = static_cast<BattleFighter*>(getObject(otherside, bleed_target_pos));
-                    if (bf->getChaosWorldLast() && bo && bo->getHP() && (bo->getSide() != bf->getSide()) && !bo->isSoulOut() && !bo->getStunRound())
+                    if (bf->getChaosWorldId() && bo && bo->getHP() && (bo->getSide() != bf->getSide()) && !bo->isSoulOut() && !bo->getStunRound())
                     {
                         bo->setStunRound(1);
                         appendDefStatus(e_skill, bf->getChaosWorldId(), bf);
@@ -8907,7 +8907,6 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
         }
         bf->resetWithstandCount();
-        bf->releaseChaosWorld();
 
         UInt8 newModeLast = bf->getNewModeLast();
         if(newModeLast > 0)
@@ -14373,16 +14372,14 @@ void BattleSimulator::doSkillEffectExtra_ChaosWorld(BattleFighter* bf, int targe
             {
                 if (((bf->getHPP() * 100) <= efv[i]) && !bf->getChaosWorldId())
                 {
-                    bf->setChaosWorld(skill->getId(), efl[i]);
+                    bf->setChaosWorld(skill->getId());
                     appendDefStatus(e_chaosWorld, 0, bf);
                 }
-                /*
                 else if (bf->getChaosWorldId())
                 {
-                    bf->setChaosWorld(false);
+                    bf->setChaosWorld(0);
                     appendDefStatus(e_unChaosWorld, 0, bf);
                 }
-                */
             }
             return;
         }
