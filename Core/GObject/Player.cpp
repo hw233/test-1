@@ -3590,12 +3590,10 @@ namespace GObject
                 << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
 				<< fgt->getAmuletId() << fgt->getRingId();
             fgt->getAllTrumps(st);
-            /*
             //灵侍id
             UInt32 lss[3] = {0};
             fgt->getAllLingshiId(lss);
             st << lss[0] << lss[1] << lss[2];
-            */
 
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
@@ -32306,6 +32304,18 @@ void Player::BroadcastPower()
             continue;
 
         member->send(st);
+    }
+}
+
+void Player::getFireContributionBag(Player * pl)
+{
+    SYSMSG(title, 955);
+    SYSMSGV(content, 956, getName().c_str());
+    Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem = {9476, 1};
+        mailPackageManager.push(mail->id, &mitem, 1, true);
     }
 }
 

@@ -661,6 +661,18 @@ public:
         else
             return false;
     } 
+
+    inline static bool getFireSacrificeTime()
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 _fireTimeBegin = TimeUtil::SharpDay(0, now) + 8 * 60 * 60;
+        UInt32 _fireTimeEnd = TimeUtil::SharpDay(0, now) + 21 * 60 * 60 + 60;
+        if(now >= _fireTimeBegin && now <= _fireTimeEnd)
+            return true;
+        else
+            return false;
+    }
+
     inline static void setNeedRechargeRank(bool v)
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()
@@ -1358,6 +1370,7 @@ private:
     static void World_Store_Check(void *);
 	static void World_Multi_Check( World * );
 	static void World_Midnight_Check( World * );
+	static void World_Fire_Sacrifice_Check( World * );
     static void World_CreateNewDB_Check();
 	static void World_Online_Log( void * );
 	static void World_Athletics_Check( void * );

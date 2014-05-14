@@ -318,10 +318,14 @@ public:
     void setUpSkills(std::string& skill, bool = true);
     // 初始化可装备的技能
     void setSkills(std::string& skills, bool = true);
+    // 删除已装备的技能
+    void delSkills(std::string&, bool = true);
     // 更新被动技能表
-    bool upPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
+    bool upPassiveSkill(UInt16 skill, UInt16 type, bool, bool = true);
+    // 更新灵侍技能表
+    bool upPassiveSkillLingshi(UInt16 skill, UInt16 type, bool p100);
     // 装备被动技能
-    bool upPassiveSkill(UInt16* skill, UInt8 size, bool = true);
+    //bool upPassiveSkill(UInt16* skill, UInt8 size, bool = true);
     // 更新被动技能
     bool offPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
 
@@ -384,7 +388,8 @@ public:
     inline std::vector<UInt16>& getPassiveSkillOnHPChange() { return _rpasskl[GData::SKILL_ONHPCHANGE - GData::SKILL_PASSSTART]; }
     // 取得招架时100%触发技能
     inline std::vector<UInt16>& getPassiveSkillOnWithstand() { return _rpasskl[GData::SKILL_ONWITHSTAND - GData::SKILL_PASSSTART]; }
-
+    // 取得对方获得封印沉默触发的技能
+    inline std::vector<UInt16>& getPassiveSkillOnOtherConfuseForget() { return _rpasskl[GData::SKILL_ONOTHERCONFUSEFORGET - GData::SKILL_PASSSTART]; }
 
     // 神农宝鼎
     inline std::vector<UInt16>& getPassiveSkillOnTherapy() { return _passkl[GData::SKILL_ONTHERAPY-GData::SKILL_PASSSTART]; }
@@ -421,6 +426,10 @@ public:
     inline std::vector<UInt16>& getPassiveSkillBLTY100() { return _passkl[GData::SKILL_BLTY-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillViolent100() { return _passkl[GData::SKILL_VIOLENT-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillRevival100() { return _passkl[GData::SKILL_REVIVAL-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnOtherConfuseForget100() { return _passkl[GData::SKILL_ONOTHERCONFUSEFORGET-GData::SKILL_PASSSTART]; }
+
+    inline std::vector<UInt16>& getPassiveSkillByLingshi(UInt8 type) { return _rpassklLingshi[type-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillByLingshi100(UInt8 type) { return _passklLingshi[type-GData::SKILL_PASSSTART]; }
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
@@ -861,8 +870,11 @@ protected:
     std::vector<UInt16> _peerless;  // 可装备的无双技能
 
     // 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
-    std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];
+    std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 概率触发被动技能
     std::vector<UInt16> _passkl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%触发技能
+
+    std::vector<UInt16> _rpassklLingshi[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];  // 概率触发被动技能(灵侍变身状态下才会触发)
+    std::vector<UInt16> _passklLingshi[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%触发技能(灵侍变身状态下才会触发)
 
     std::vector<LBSkill> _lbSkill;
 

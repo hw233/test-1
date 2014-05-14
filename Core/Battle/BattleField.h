@@ -35,7 +35,7 @@ class BattleField
 
 public:
 	BattleField();
-	~BattleField();
+	virtual ~BattleField();
 	void clear();
 	void reset();
 	void setObject(int, int, BattleObject *, UInt8 = 0);
