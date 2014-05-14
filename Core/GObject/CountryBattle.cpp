@@ -1008,13 +1008,6 @@ void GlobalCountryBattle::end( )
 
 bool GlobalCountryBattle::process(UInt32 curtime)
 {
-#if 0
-    if(WORLD().isRaceBattle())
-    {
-        GObject::raceBattle.raceBattleCheck();
-        return true;
-    }
-#endif
     if (WORLD().isNewCountryBattle() && !_NewcountryBattle)
     {
         ERROR_LOG("NewCountryBattle Init Error !");

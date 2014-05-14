@@ -15,8 +15,8 @@
 
 #include "RaceBattle.h"
 
-//#define RACEBATTLE_STARTTIME 20*3600
-#define RACEBATTLE_STARTTIME ((TimeUtil::Now() - TimeUtil::SharpDay(0, now))/ 3600 * 3600)
+#define RACEBATTLE_STARTTIME 20*3600
+//#define RACEBATTLE_STARTTIME ((TimeUtil::Now() - TimeUtil::SharpDay(0, now))/ 3600 * 3600)
 #define RACEBATTLE_ENDTIME RACEBATTLE_STARTTIME+1800
 #define PAGE_MAX 5
 
@@ -327,6 +327,7 @@ namespace GObject
         }
         else if(level == 1 && (origPos % 10) == 0)
         {
+            GameAction()->doStrong(player, SthZixiaozhidian, 0, 0);
             insertLevelStarSort(pl, level);
         }
         else

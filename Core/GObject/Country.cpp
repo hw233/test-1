@@ -44,6 +44,8 @@ void Country::Country_Battle_Check(void *)
 {
     if(gClanCity && gClanCity->isOpen())
         gClanCity->process(TimeUtil::Now());
+    else if(WORLD().isRaceBattle())
+        GObject::raceBattle.raceBattleCheck();
     else
         globalCountryBattle.process(TimeUtil::Now());
 }
@@ -160,7 +162,7 @@ bool Country::Init()
 
         GObject::ClanBoss::instance().init();
 	    AddTimer(1000, ClanBoss_Refresh, static_cast<void*>(NULL));
-        AddTimer(1000, raceBattleCheck);
+        //AddTimer(1000, raceBattleCheck);
 
 	}
 
