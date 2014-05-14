@@ -2889,6 +2889,8 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
                 target_bo->setStunLevel(SKILL_LEVEL(skill->getId()));
                 if(skill->cond == GData::SKILL_BEATKED)
                     target_bo->setStunRound(skill->last + 1);
+                else if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+                    target_bo->setStunRound(1);
                 else
                     target_bo->setStunRound(skill->last);
 
@@ -2915,6 +2917,8 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
                 target_bo->setForgetLevel(SKILL_LEVEL(skill->getId()));
                 if(skill->cond == GData::SKILL_BEATKED)
                     target_bo->setForgetRound(skill->last + 1);
+                else if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+                    target_bo->setForgetRound(1);
                 else
                     target_bo->setForgetRound(skill->last);
 
@@ -2987,7 +2991,10 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
             float value = skill->effect->hitrate/100;
             if(value < -0.001f)
                 value = -value;
-            target_bo->setBlind(value, skill->last);
+            if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+                target_bo->setBlind(value, 1);
+            else
+                target_bo->setBlind(value, skill->last);
             calcAbnormalTypeCnt(bo);
             if(!doSkillStrengthenDeepBlind(bf, target_bo, ss))
                 appendDefStatus(e_blind, 0, target_bo);
