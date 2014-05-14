@@ -430,6 +430,15 @@ public:
 
     inline std::vector<UInt16>& getPassiveSkillByLingshi(UInt8 type) { return _rpassklLingshi[type-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillByLingshi100(UInt8 type) { return _passklLingshi[type-GData::SKILL_PASSSTART]; }
+
+    inline std::vector<UInt16>& getPassiveSkillOnAttackConfuseForget() { return _rpasskl[GData::SKILL_ONATKCONFUSEFORGET-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnAttackConfuseForget100() { return _passkl[GData::SKILL_ONATKCONFUSEFORGET-GData::SKILL_PASSSTART]; }
+
+    inline std::vector<UInt16>& getPassiveSkillOnAttackStun() { return _rpasskl[GData::SKILL_ONATKSTUN-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnAttackStun100() { return _passkl[GData::SKILL_ONATKSTUN-GData::SKILL_PASSSTART]; }
+
+    inline std::vector<UInt16>& getPassiveSkillOnAttackBlind() { return _rpasskl[GData::SKILL_ONATKBLIND-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnAttackBlind100() { return _passkl[GData::SKILL_ONATKBLIND-GData::SKILL_PASSSTART]; }
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
