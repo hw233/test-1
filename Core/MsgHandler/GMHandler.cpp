@@ -323,6 +323,7 @@ GMHandler::GMHandler()
     Reg(3, "rb", &GMHandler::OnRaceBattle);
     Reg(2, "addkapai", &GMHandler::OnAddCard);
     Reg(2, "addkapaiexp", &GMHandler::OnAddCardExp);
+    Reg(3, "setfirevalue", &GMHandler::OnSetFireValue);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -2112,7 +2113,8 @@ void GMHandler::OnUpPasSkill( GObject::Player * player, std::vector<std::string>
 
         UInt16 skill = SKILLANDLEVEL(skillId, skillLevel);
         UInt16 skills[1] = {skill};
-        fgt->upPassiveSkill(skills, 1);
+        // FIXME: 这里先禁用这个GM指令
+        //fgt->upPassiveSkill(skills, 1);
 	}
 }
 
@@ -5593,6 +5595,16 @@ void GMHandler::OnRaceBattle(GObject::Player *player, std::vector<std::string>& 
         UInt64 defenderId = (1LL << 48) + atoll(args[1].c_str());
         GObject::raceBattle.attackContinueWinPlayer(player, defenderId);
     }
+}
+
+void GMHandler::OnSetFireValue(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt32 fireValue = atoi(args[0].c_str());
+    GObject::Clan *clan = player->getClan();
+    if(clan != NULL)
+        clan->SetClanFireValue(fireValue, true);
 }
 
 void GMHandler::OnAddCard(GObject::Player *player, std::vector<std::string>& args)

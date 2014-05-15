@@ -43,7 +43,7 @@ class BattleFighter:
 {
 	friend class BattleSimulator;
 
-#define BLEED_TYPE_FLAG_NONE            0x00000000      // 没人
+#define BLEED_TYPE_FLAG_NONE            0x00000000      // 没流血
 #define BLEED_TYPE_FLAG_1               0x00000001      // 儒流血
 #define BLEED_TYPE_FLAG_2               0x00000002      // 释流血
 #define BLEED_TYPE_FLAG_3               0x00000004      // 道流血
@@ -83,8 +83,11 @@ class BattleFighter:
 
 public:
 	BattleFighter(Script::BattleFormula *, GObject::Fighter * = NULL, UInt8 side = 0, UInt8 pos = 0);
+    virtual ~BattleFighter();
 
 	void setFighter(GObject::Fighter * f);
+    void initPassiveSkillByLingshi();
+
 	inline void setFormationEffect(const GData::Formation::GridEffect * fe) {_formEffect = fe;}
 
 	inline UInt32 getId() { return _fighter->getId(); }
@@ -233,6 +236,7 @@ public:
 	float getTough(BattleFighter* defgt);
     float getCriticalDmgImmune() { return _attrExtra.criticaldmgimmune+_fighter->getAcupointsGoldAttr(1); }
 	inline UInt32 getMaxHP() {Int64 ret = _maxhp + _maxhpAdd + _maxhpAdd2; return (ret > 0 ? ret : 0);}
+    float getHPP() { float ret = static_cast<float>(getHP())/ static_cast<float>(getMaxHP()); return ret; }
 	inline Int32 getAction() {Int32 ret = _maxAction + _maxActionAdd + _maxActionAdd2; return (ret > 0 ? ret : 0);}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
 
@@ -254,6 +258,12 @@ public:
     inline float getToughAdd() { return _toughAdd;}
     inline float getAtkReduce() { return _atkreduce + _atkreduce2 + _atkreduce3 + _moAtkReduce + _hpAtkReduce - (_flawDamageAdd * _flawCount); }
     inline float getMagAtkReduce() { return _magatkreduce + _magatkreduce2 + _magatkreduce3 + _moMagAtkReduce + _hpMagAtkReduce - (_flawDamageAdd * _flawCount); }
+    inline float getAttackRoundAdd() { return _attackRoundAdd; }
+    inline float getAttackRoundSub() { return _attackRoundSub; }
+    inline float getMagAttackRoundAdd() { return _magAtkRoundAdd; }
+    inline float getDefRoundAdd() { return _defRoundAdd; }
+    inline float getMagDefRoundAdd() { return _magDefRoundAdd; }
+    inline float gePierceRoundAdd() { return _pierceRoundAdd; }
 
 	void setAttackAdd(float v, UInt16 last = 0);
 	void setMagAttackAdd(float v, UInt16 last = 0);
@@ -276,6 +286,20 @@ public:
     inline void AddAura(Int32 v) {_aura += v; if(_aura > _auraMax) _aura = _auraMax; else if(_aura < 0) _aura = 0;}
     inline void setAura(Int32 v) {_aura = v > _auraMax ? _auraMax : v;}
 
+    void setAttackRoundAdd(float v, UInt16 last = 0, UInt16 skillId = 0);
+    void setAttackRoundSub(float v, UInt16 last = 0, UInt16 skillId = 0);
+    void setMagAttackRoundAdd(float v, UInt16 last = 0, UInt16 skillId = 0);
+    void setDefRoundAdd(float v, UInt16 last = 0, UInt16 skillId = 0);
+    void setMagDefRoundAdd(float v, UInt16 last = 0, UInt16 skillId = 0);
+    void setPierceRoundAdd(float v, UInt16 last = 0, UInt16 skillId = 0);
+
+    bool addRoundAttack();
+    bool subRoundAttack();
+    bool addRoundDef();
+    bool addRoundMagAtk();
+    bool addRoundMagDef();
+    bool addRoundPierce();
+
 	inline UInt8& getAttackAddLast() {return _atkAdd_last;}
     inline UInt8& getMagAttackAddLast() {return _magAtkAdd_last;}
 	inline UInt8& getDefendAddLast() {return _defAdd_last;}
@@ -297,9 +321,23 @@ public:
     inline UInt8& getAtkReduce3Last() { return _atkreduce3_last;}
     inline UInt8& getMagAtkReduce3Last() { return _magatkreduce3_last;}
 
+    inline UInt16 getAttackRoundAddLast() { return _attackRoundAddLast; }
+    inline UInt16 getAttackRoundSubLast() { return _attackRoundSubLast; }
+    inline UInt16 getMagAttackRoundAddLast() { return _magAtkRoundAddLast; }
+    inline UInt16 getDefRoundAddLast() { return _defRoundAddLast; }
+    inline UInt16 getMagDefRoundAddLast() { return _magDefRoundAddLast; }
+    inline UInt16 getPierceRoundAddLast() { return _pierceRoundAdd_last; }
+
     void setAtkReduce3(float v, UInt16 last);
     void setMagAtkReduce3(float v, UInt16 last);
     void setPuduDebuf(float v, UInt16 last);
+
+    inline UInt16 getAttackRoundAddId() { return _attackRoundAddId; }
+    inline UInt16 getAttackRoundSubId() { return _attackRoundSubId; }
+    inline UInt16 getMagAtkRoundAddId() { return _magAtkRoundAddId; }
+    inline UInt16 getDefRoundAddId() { return _defRoundAddId; }
+    inline UInt16 getMagDefRoundAddId() { return _magDefRoundAddId; }
+    inline UInt16 getPierceRoundAddId() { return _pierceRoundAddId; }
 
 	inline UInt32 getLostHP() { Int64 tmp = _maxhp + _maxhpAdd + _maxhpAdd2; UInt32 mhp = (tmp > 0 ? tmp : 0); if(mhp > _hp) return mhp - _hp; return 0; }
 
@@ -366,7 +404,7 @@ public:
 
     const GData::SkillBase* getTherapySkill();
     const GData::SkillBase* getActiveSkill(bool need_therapy = false, bool noPossibleTarget = false);
-    const GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillPreAtk100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAction100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillBeAtk100(size_t& idx, bool noPossibleTarget = false);
@@ -383,6 +421,7 @@ public:
     const GData::SkillBase* getPassiveSkillOnHP10P100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHPChange100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnWithstand100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnOtherConfuseAndForget100(size_t& idx, bool noPossibleTarget = false);
 
     const GData::SkillBase* getPassiveSkillPreAtk(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillAftAtk(bool noPossibleTarget = false);
@@ -405,6 +444,7 @@ public:
     const GData::SkillBase* getPassiveSkillOnHP10P(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnHPChange(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnWithstand(bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillOnOtherConfuseAndForget(bool noPossibleTarget = false);
 
     const GData::SkillBase* getSkillSoulProtect();
 
@@ -413,6 +453,20 @@ public:
 
     void updatePassiveSkill(std::vector<UInt16>& passiveSkillId, std::vector<GData::SkillItem>& passiveSkill);
     void updatePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
+
+    void updateAllPassiveSkillLingshi();
+    void updateAllPassiveSkillLingshiExceptEnter();
+    void updatePassiveSkillLingshi(UInt8 type);
+    void updatePassiveSkillLingshi100(UInt8 type);
+    void unUpdateAllPassiveSkillLingshi();
+    void unUpdatePassiveSkillLingshi(UInt8 type);
+    void unUpdatePassiveSkillLingshi100(UInt8 type);
+
+    void addPassiveSkill(std::vector<UInt16>& passiveSkillId, std::vector<GData::SkillItem>& passiveSkill);
+    void addPassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
+
+    void removePassiveSkill(std::vector<UInt16>& passiveSkillId, std::vector<GData::SkillItem>& passiveSkill);
+    void removePassiveSkill100(std::vector<UInt16>& passiveSkill100Id, std::vector<GData::SkillItem>& passiveSkill100);
 
     void updateSoulSkillDead(UInt16 skillId);
     void updateSoulSkillProtect(UInt16 skillId);
@@ -539,14 +593,22 @@ private:
 	UInt32 _maxhp;
     Int32 _maxAction;
 	float _attackAdd, _magAtkAdd, _defAdd, _magDefAdd, _hitrateAdd, _evadeAdd;
+    float _attackRoundAdd, _attackRoundSub, _magAtkRoundAdd, _defRoundAdd, _magDefRoundAdd;
     float _defendChangeSS, _magDefendChangeSS;
     float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd, _toughAdd;
+    float _pierceRoundAdd;
 	Int32 _maxhpAdd, _maxActionAdd;
     UInt8 _atkAdd_last, _magAtkAdd_last, _defAdd_last, _magDefAdd_last, _hitrateAdd_last, _evadeAdd_last;
+    UInt8 _attackRoundAddLast, _attackRoundSubLast, _magAtkRoundAddLast, _defRoundAddLast, _magDefRoundAddLast;
     UInt8 _defendChangeSSLast, _magDefendChangeSSLast;
     UInt8 _criticalAdd_last, _criticalDmgAdd_last, _pierceAdd_last, _counterAdd_last, _magResAdd_last, _toughAdd_last;
+    UInt8 _pierceRoundAdd_last;
     UInt8 _maxhpAdd_last, _maxActionAdd_last;
     UInt8 _atkreduce_last, _magatkreduce_last;
+
+    UInt16 _attackRoundAddId, _attackRoundSubId, _magAtkRoundAddId, _defRoundAddId, _magDefRoundAddId;
+    UInt16 _pierceRoundAddId;
+
 	const GData::Formation::GridEffect * _formEffect;
 	Script::BattleFormula * _formula;
     UInt8 _forgetLevel, _forgetRound;
@@ -574,7 +636,7 @@ private:
     GData::SkillItem _peerlessSkill;
     std::vector<GData::SkillItem> _activeSkill;
     std::vector<GData::SkillItem> _therapySkill;
-    std::vector<GData::SkillItem> _passiveSkillPrvAtk100;
+    std::vector<GData::SkillItem> _passiveSkillPreAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftAction100;
     std::vector<GData::SkillItem> _passiveSkillBeAtk100;
@@ -586,6 +648,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillOnPetProtect100;
     std::vector<GData::SkillItem> _passiveSkillOnHPChange100;
     std::vector<GData::SkillItem> _passiveSkillOnWithstand100;
+    std::vector<GData::SkillItem> _passiveSkillOnOtherConfuseForget100;
 
     std::vector<GData::SkillItem> _passiveSkillPreAtk;
     std::vector<GData::SkillItem> _passiveSkillAftAtk;
@@ -599,10 +662,16 @@ private:
     std::vector<GData::SkillItem> _passiveSkillOnPetProtect;
     std::vector<GData::SkillItem> _passiveSkillOnHPChange;
     std::vector<GData::SkillItem> _passiveSkillOnWithstand;
+    std::vector<GData::SkillItem> _passiveSkillOnOtherConfuseForget;
 
     std::vector<GData::SkillItem> _passiveSkillOnTherapy;
     std::vector<GData::SkillItem> _passiveSkillOnSkillDmg;
     std::vector<GData::SkillItem> _passiveSkillOnOtherDead;
+
+    typedef std::vector<UInt16> VecPassiveSkillId;
+    typedef std::vector<VecPassiveSkillId> VecAllPassiveSkill;
+    VecAllPassiveSkill _allPassiveSkillLingshi;
+    VecAllPassiveSkill _allPassiveSkillLingshi100;
 
     std::map<UInt16, GData::SkillStrengthenBase*> _skillStrengthen;
 
@@ -750,6 +819,9 @@ private:
 
     float _withstandFactor;
     UInt8 _withstandCount;
+
+    UInt32  _chaosWorldId;
+    UInt8   _chaosWorldLast;
 
 
     // cotton add for skillstrengthen
@@ -1172,6 +1244,7 @@ public:
 private:
     std::vector<GData::SkillItem> _passiveSkillOnCounter;
     std::vector<GData::SkillItem> _passiveSkillOnCounter100;
+    std::vector<GData::SkillItem> _passiveSkillOnAttackBleed;
     std::vector<GData::SkillItem> _passiveSkillOnAttackBleed100;
     std::vector<GData::SkillItem> _passiveSkillOnAtkDmg;
     std::vector<GData::SkillItem> _passiveSkillOnAtkDmg100;
@@ -1274,6 +1347,14 @@ public:
     UInt8 getWithstandCount() { return _withstandCount; }
     void  resetWithstandCount() { _withstandCount = 0; }
 
+    UInt32 getChaosWorldId()    { return _chaosWorldId; }
+    bool  getChaosWorldLast () { return _chaosWorldLast; }
+    void  setChaosWorld(UInt8 chaosWorldId, UInt8 chaosWorldLast) { _chaosWorldId = chaosWorldId; } 
+    void  releaseChaosWorld() 
+    { 
+        if (_chaosWorldId && _chaosWorldLast && (!--_chaosWorldLast))
+            _chaosWorldId = _chaosWorldLast = 0;
+    }
 public:
     float _counter_spirit_atk_add;
     float _counter_spirit_magatk_add;
@@ -1487,13 +1568,22 @@ private:
     std::vector<GData::SkillItem> _passiveSkillDeadFake100;
     std::vector<GData::SkillItem> _passiveSkillDeadFake;
     std::vector<GData::SkillItem> _passiveSkillSoulProtect;
+    std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg;
     std::vector<GData::SkillItem> _passiveSkillAbnormalTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg100;
     std::vector<GData::SkillItem> _passiveSkillBleedTypeDmg;
+    std::vector<GData::SkillItem> _passiveSkillXMCZ;
     std::vector<GData::SkillItem> _passiveSkillXMCZ100;
+    std::vector<GData::SkillItem> _passiveSkillBLTY;
     std::vector<GData::SkillItem> _passiveSkillBLTY100;
+    std::vector<GData::SkillItem> _passiveSkillViolent;
     std::vector<GData::SkillItem> _passiveSkillViolent100;
+    std::vector<GData::SkillItem> _passiveSkillRevival;
     std::vector<GData::SkillItem> _passiveSkillRevival100;
+    std::vector<GData::SkillItem> _passiveSkillLingshi;
+    std::vector<GData::SkillItem> _passiveSkillLingshi100;
+    std::vector<GData::SkillItem> _passiveSkillEnterLingshi;
+    std::vector<GData::SkillItem> _passiveSkillEnterLingshi100;
 
     const GData::SkillBase* getPassiveSkillDeadFake100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillDeadFake(bool noPossibleTarget = false);
@@ -1504,6 +1594,8 @@ private:
     const GData::SkillBase* getPassiveSkillBLTY100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillViolent100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillRevival100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillLingshi100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillEnterLingshi100(size_t& idx, bool noPossibleTarget = false);
 
 private:
     float _2ndRateCoAtk;
@@ -1601,6 +1693,34 @@ private:
     UInt8 _jiuziDmgCnt;
     void setJiuziDmgCnt(UInt8 count) { _jiuziDmgCnt = count; }
     UInt8 getJiuziDmgCnt() { return _jiuziDmgCnt; }
+
+    UInt8 _changeStatus; //1-already change
+    UInt8 getChangeStatus() { return _changeStatus; }
+    void setChangeStatus(UInt8 status) { _changeStatus = status; }
+    UInt8 _newModeLast;
+    UInt8& getNewModeLast() { return _newModeLast; }
+    void setNewModeLast(UInt8 last) { _newModeLast = last; }
+
+    bool getHpLess() { if(getHP() < static_cast<UInt32>(0.3f * getMaxHP())) return true; else return false; }
+    UInt16 _counterCnt;
+    UInt16 getCounterCnt() { return _counterCnt; }
+    void setCounterCnt(UInt16 cnt) { _counterCnt = cnt; }
+    UInt16 _criticalCnt;
+    UInt16 getCriticalCnt() { return _criticalCnt; }
+    void setCriticalCnt(UInt16 cnt) { _criticalCnt = cnt; }
+    bool _preAtk;
+    bool getPreAtk() { return _preAtk; }
+    void setPreAtk() { if(uRand(10000) < 1500) _preAtk = true; else _preAtk = false; }
+    UInt8 _friendDeadCnt;
+    UInt8 getFriendDeadCnt() { return _friendDeadCnt; };
+    void setFriendDeadCnt(UInt8 cnt) { _friendDeadCnt = cnt; }
+    UInt8 _enemyDeadCnt;
+    UInt8 getEnemyDeadCnt() { return _enemyDeadCnt; };
+    void setEnemyDeadCnt(UInt8 cnt) { _enemyDeadCnt = cnt; }
+
+    UInt8 _mojianCnt;
+    UInt8 getMojianCnt() { return _mojianCnt; }
+    void setMojianCnt(UInt8 cnt) { _mojianCnt = cnt; }
 
 public:
 	enum StatusFlag
