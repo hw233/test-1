@@ -3515,11 +3515,20 @@ void BattleFighter::updatePassiveSkillLingshi100(UInt8 type)
         case GData::SKILL_LINGSHI:
             addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillLingshi100);
             break;
+        case GData::SKILL_ONOTHERCONFUSEFORGET:
+            addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnOtherConfuseForget100);
+            break;
         case GData::SKILL_ENTER_LINGSHI:
             addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillEnterLingshi100);
             break;
-        case GData::SKILL_ONOTHERCONFUSEFORGET:
-            addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnOtherConfuseForget100);
+        case GData::SKILL_ONATKSTUN:
+            addPassiveSkill(_allPassiveSkillLingshi100[type], _passiveSkillOnAttackStun100);
+            break;
+        case GData::SKILL_ONATKCONFUSEFORGET:
+            addPassiveSkill(_allPassiveSkillLingshi100[type], _passiveSkillOnAttackConfuseForget100);
+            break;
+        case GData::SKILL_ONATKBLIND:
+            addPassiveSkill(_allPassiveSkillLingshi100[type], _passiveSkillOnAttackBlind100);
             break;
     }
 }
@@ -3621,11 +3630,20 @@ void BattleFighter::updatePassiveSkillLingshi(UInt8 type)
         case GData::SKILL_LINGSHI:
             addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillLingshi);
             break;
+        case GData::SKILL_ONOTHERCONFUSEFORGET:
+            addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnOtherConfuseForget);
+            break;
         case GData::SKILL_ENTER_LINGSHI:
             addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillEnterLingshi);
             break;
-        case GData::SKILL_ONOTHERCONFUSEFORGET:
-            addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnOtherConfuseForget);
+        case GData::SKILL_ONATKSTUN:
+            addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnAttackStun);
+            break;
+        case GData::SKILL_ONATKCONFUSEFORGET:
+            addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnAttackConfuseForget);
+            break;
+        case GData::SKILL_ONATKBLIND:
+            addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnAttackBlind);
             break;
     }
 }
