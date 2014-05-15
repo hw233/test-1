@@ -1318,6 +1318,15 @@ inline bool player_enum_3(GObject::Player* pl, int)
 
     return true;
 }
+inline bool player_enum_4(GObject::Player* pl, int)
+{
+    if(pl->getLeftAddrEnter())
+    {
+        GameMsgHdr hdr(0x392, pl->getThreadId(), pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+    return true;
+}
 inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
 {
     UInt32 val = pl->GetVar(VAR_LEFTADDR_POWER) ;
@@ -2734,6 +2743,8 @@ void World::commitArenaForceOnce()
         teamArenaMgr.commitArenaForceOnce();
     else if(serverWarMgr.isOpen())
         serverWarMgr.commitArenaForceOnce();
+
+    globalPlayers.enumerate(player_enum_4, 0);  //仙界遗迹同步
 }
 
 void World::LoadQixiScore(Player* pl, Player* lover)
@@ -3942,11 +3953,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9498,40},{515,30},{16001,60},{503,60},{9022,40}},
-        {{9498,40},{515,25},{16001,60},{503,50},{9022,30}},
-        {{9498,40},{515,20},{16001,60},{503,40},{9022,20}},
+        {{9498,40},{515,30},{16001,60},{503,60},{9075,40}},
+        {{9498,40},{515,25},{16001,60},{503,50},{9075,30}},
+        {{9498,40},{515,20},{16001,60},{503,40},{9075,20}},
     };
-    static MailPackage::MailItem card = {9971,1};
+    static MailPackage::MailItem card = {9976,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -4683,7 +4694,6 @@ void World::SendTYSSPlayerAward()
     }
     return;
 }
-
 
 }
 
