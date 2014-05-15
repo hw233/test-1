@@ -578,6 +578,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 16)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -617,6 +625,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 26)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 3)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
         ))
     {
 #if 0
@@ -1570,6 +1579,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 15)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 16)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
 
          )
         bRechargeEnd = true;
@@ -2739,7 +2756,7 @@ void World::commitArenaForceOnce()
 {
     if(arena.isOpen())
         arena.commitArenaForceOnce();
-    if(serverWarMgr.isOpen())
+    else if(serverWarMgr.isOpen())
         teamArenaMgr.commitArenaForceOnce();
     else if(serverWarMgr.isOpen())
         serverWarMgr.commitArenaForceOnce();
