@@ -2851,6 +2851,7 @@ void TeamArenaMgr::commitArenaForceOnce()
 
         TeamArenaData * tad = it->second;
         if(!tad) continue;
+        resetTeamState(tad);
         commitLineup(tad->leader);
         for(UInt8 i = 0; i < tad->count; ++ i)
         {
