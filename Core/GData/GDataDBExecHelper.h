@@ -836,32 +836,16 @@ struct DBZHYExtraAttr
 
 struct DBLingShi
 {
-    UInt16 id;
     UInt8 level;
+    UInt32 consume;
+    UInt32 exp;
     UInt8 isBreak;
     UInt16 useItem;
     UInt16 useGold;
     float attack;
     float magatk;
-    float defend;
-    float magdef;
     float hp;
-    float toughlvl;
     float action;
-    float hitrlvl;
-    float evdlvl;
-    float crilvl;
-    float criticaldmg;
-    float pirlvl;
-    float counterlvl;
-    float mreslvl;
-};
-
-struct DBLingShiUp
-{
-    UInt8 level;
-    UInt32 consume;
-    UInt32 exp;
 };
 
 struct DBErlkingConfig
@@ -1816,37 +1800,19 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBLingShi)
-SPECIALDEF(19)
+SPECIALDEF(10)
 	(
-    UInt16, id,
     UInt8, level,
+    UInt32, consume,
+    UInt32, exp,
     UInt8, isBreak,
     UInt16, useItem,
     UInt16, useGold,
     float, attack,
     float, magatk,
-    float, defend,
-    float, magdef,
     float, hp,
-    float, toughlvl,
-    float, action,
-    float, hitrlvl,
-    float, evdlvl,
-    float, crilvl,
-    float, criticaldmg,
-    float, pirlvl,
-    float, counterlvl,
-    float, mreslvl
+    float, action
 	)
-SPECIALEND()
-
-SPECIALBEGIN(GData::DBLingShiUp)
-SPECIALDEF(3)
-	(
-    UInt8, level,
-    UInt32, consume,
-    UInt32, exp
-    )
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBErlkingConfig)

@@ -323,6 +323,7 @@ GMHandler::GMHandler()
     Reg(3, "rb", &GMHandler::OnRaceBattle);
     Reg(2, "addkapai", &GMHandler::OnAddCard);
     Reg(2, "addkapaiexp", &GMHandler::OnAddCardExp);
+    Reg(3, "setfirevalue", &GMHandler::OnSetFireValue);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -3581,7 +3582,7 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
             GObject::Lineup& lup = PLAYER_DATA(player, lineup)[i];
             Fighter* fighter = lup.fighter;
             if(fighter)
-                SYSMSG_SENDV(624, player, fighter->getName().c_str(), static_cast<UInt32>(fighter->getBattlePoint()));
+                SYSMSG_SENDV(624, player, fighter->getId(), fighter->getName().c_str(), static_cast<UInt32>(fighter->getBattlePoint()));
         }
         std::map<UInt32, FairyPet *>& fairyPet = player->getFairyPet();
         std::map<UInt32, FairyPet *>::iterator it = fairyPet.begin();
@@ -4958,26 +4959,37 @@ void GMHandler::OnAddLingshiExp(GObject::Player *player, std::vector<std::string
     ItemLingshi * lingshi = static_cast<ItemLingshi *>(fgt->getLingshi(pos));
     if(!lingshi || !IsLingShi(lingshi->getClass()))
         return;
+    static UInt8 ls_levels[6] = { 0, 0, 30, 50, 70, 90 };
+    UInt8 quality = lingshi->getQuality();
+    if(quality > 6)
+        quality = 0;
+    UInt8 maxLev = ls_levels[quality];
+
     ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
-    if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
+    if(lsAttr.lv >= maxLev)
         return;
-    UInt32 upExp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
+    GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+    if(!lsd || !lsd->canUpgrade(lsAttr.exp))
+        return;
+    UInt32 upExp = GData::lingshiCls.getLingShiExp(lsAttr.lv);
     if(upExp == 0) return;
     lsAttr.exp += atoi(args[2].c_str());
-    UInt8 maxLev = GData::lingshiCls.getLingshiMaxLev(lingshi->GetTypeId(), lsAttr.lv);
+
     UInt8 tmp = lsAttr.lv;
     for(UInt8 i = tmp; i <= maxLev; ++ i)
     {
-        if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
+        GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+        if(!lsd || !lsd->canUpgrade(lsAttr.exp))
             break;
-        if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
+        if(lsAttr.exp < lsd->exp)
             break;
         ++ lsAttr.lv;
     }
     if(lsAttr.lv >= maxLev)
     {
         lsAttr.lv = maxLev;
-        lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
+        if(!GData::lingshiCls.canBreak(lsAttr.lv))
+            lsAttr.exp = GData::lingshiCls.getLingShiExp(lsAttr.lv-1);
     }
     DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lingshi->getId());
     if(tmp != lsAttr.lv)
@@ -5596,8 +5608,19 @@ void GMHandler::OnRaceBattle(GObject::Player *player, std::vector<std::string>& 
     }
 }
 
+void GMHandler::OnSetFireValue(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt32 fireValue = atoi(args[0].c_str());
+    GObject::Clan *clan = player->getClan();
+    if(clan != NULL)
+        clan->SetClanFireValue(fireValue, true);
+}
+
 void GMHandler::OnAddCard(GObject::Player *player, std::vector<std::string>& args)
 {
+    player->addBuffData(PLAYER_BUFF_TYSS, TimeUtil::Now() + 3 * 86400);
     if (args.size() < 1)
         return ;
     UInt16 cid = atoi(args[0].c_str());

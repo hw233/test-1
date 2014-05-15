@@ -1435,7 +1435,9 @@ private:
 
     UInt8 _soulout_last;
     bool _soulout;
+public:
     inline bool isSoulOut() { return _soulout; }
+private:
     inline void setSoulOut(float v, UInt8 l)
     {
         _hp = 1;

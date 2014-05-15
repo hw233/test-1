@@ -160,6 +160,7 @@ namespace GObject
 #define PLAYER_BUFF_CLAN1           0x68 // （活动）第1帮派BUF
 #define PLAYER_BUFF_CLAN2           0x69 // （活动）第2帮派BUF
 #define PLAYER_BUFF_CLAN3           0x6A // （活动）第3帮派BUF
+#define PLAYER_BUFF_TYSS            0x6B // （TYSS活动）个人BUF
 #define PLAYER_BUFF_ATHL11          0x71 // 魔
 #define PLAYER_BUFF_ATHL22          0x72 // 神
 #define PLAYER_BUFF_ATHL33          0x73 // 虚
@@ -2284,6 +2285,7 @@ namespace GObject
         void GetKJTMAwardMark();
         void GetKJTMAward(UInt8 opt);
         void BroadcastPower();
+        void sendTYSSBuf();
  
         //抗击天魔 end
 
@@ -2843,6 +2845,7 @@ namespace GObject
         void setQTSign();
         void setQTSpecialMark();
         void GMSetQTNUM(UInt8 num);
+        void getFireContributionBag(Player * pl);
         // 帮派神像
         float getClanStatueHPEffect();
         float getClanStatueAtkEffect();
