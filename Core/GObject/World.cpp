@@ -2728,8 +2728,12 @@ void World::World_One_Min( World * world )
 
 void World::commitArenaForceOnce()
 {
-    GObject::arena.commitArenaForceOnce();
-    GObject::teamArenaMgr.commitArenaForceOnce();
+    if(arena.isOpen())
+        arena.commitArenaForceOnce();
+    if(serverWarMgr.isOpen())
+        teamArenaMgr.commitArenaForceOnce();
+    else if(serverWarMgr.isOpen())
+        serverWarMgr.commitArenaForceOnce();
 }
 
 void World::LoadQixiScore(Player* pl, Player* lover)
