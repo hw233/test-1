@@ -2851,10 +2851,11 @@ void TeamArenaMgr::commitArenaForceOnce()
 
         TeamArenaData * tad = it->second;
         if(!tad) continue;
+        commitLineup(tad->leader);
         for(UInt8 i = 0; i < tad->count; ++ i)
         {
             if(tad->members[i])
-                commitLineup(tad->members[i]);
+                commitLineup1(tad->members[i]);
         }
     }
 }

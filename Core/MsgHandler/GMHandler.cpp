@@ -3656,6 +3656,7 @@ void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& 
     if (args.size() < 1)
         return;
     UInt8 type = atoi(args[0].c_str());
+    //type 1:仙界至尊 0:仙界第一
     GameMsgHdr imh(0x1AB, WORKER_THREAD_WORLD, NULL, sizeof(type));
     GLOBAL().PushMsg(imh, &type);
 }
