@@ -6412,6 +6412,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                         appendDefStatus(e_Confuse, 0, bo);
                     }
 
+                    idx = 0;
                     bo = static_cast<BattleFighter*>(getObject(otherside, bleed_target_pos));
                     while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBleed100(idx, noPossibleTarget)))
                     {
@@ -6436,6 +6437,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                             atkAct.clear();
                         }
                     }
+                    idx = 0;
                     while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackConfuseForget100(idx, noPossibleTarget)))
                     {
                         if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) && !bo->isSoulOut() &&
@@ -6459,6 +6461,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                             atkAct.clear();
                         }
                     }
+                    idx = 0;
                     while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackStun100(idx, noPossibleTarget)))
                     {
                         if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) && !bo->isSoulOut() &&
@@ -6482,10 +6485,11 @@ UInt32 BattleSimulator::doAttack( int pos )
                             atkAct.clear();
                         }
                     }
+                    idx = 0;
                     while(NULL != (passiveSkill = bf->getPassiveSkillOnAttackBlind100(idx, noPossibleTarget)))
                     {
                         if(passiveSkill->target == GData::e_battle_target_otherside && bo && bo->getHP() &&  (bo->getSide() != bf->getSide()) && !bo->isSoulOut() &&
-                                bo->getBlind())
+                                bo->getBlind() > 0.001f)
                         {
                             int cnt = 0;
                             getSkillTarget(bf, passiveSkill, otherside, bleed_target_pos, cnt);
@@ -14969,9 +14973,6 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
         return;
     appendDefStatus(e_skill, skill->getId(), bf);
     bool first = true;
-    bool cs = false;
-    bool pr = false;
-
     for(size_t i = 0; i < cnt; ++ i)
     {
         AtkList atklist;
@@ -15010,11 +15011,7 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
                             _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
                     }
                     if(first)
-                    {
-                        cs = cs2;
-                        pr = pr2;
                         first = false;
-                    }
 
                     float atk = 0;
                     float def = 0;
