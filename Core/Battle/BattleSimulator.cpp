@@ -2843,6 +2843,8 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
                 target_bo->setConfuseLevel(SKILL_LEVEL(skill->getId()));
                 if(skill->cond == GData::SKILL_BEATKED)
                     target_bo->setConfuseRound(skill->last + 1);
+                else if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+                    target_bo->setConfuseRound(1);
                 else
                     target_bo->setConfuseRound(skill->last);
 
@@ -2917,8 +2919,6 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
                 target_bo->setForgetLevel(SKILL_LEVEL(skill->getId()));
                 if(skill->cond == GData::SKILL_BEATKED)
                     target_bo->setForgetRound(skill->last + 1);
-                else if(skill->cond == GData::SKILL_ENTER_LINGSHI)
-                    target_bo->setForgetRound(1);
                 else
                     target_bo->setForgetRound(skill->last);
 
@@ -2932,6 +2932,8 @@ bool BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
                 target_bo->setForgetLevel(SKILL_LEVEL(skill->getId()));
                 if(skill->cond == GData::SKILL_BEATKED)
                     target_bo->setForgetRound(skill->last + 1);
+                else if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+                    target_bo->setForgetRound(1);
                 else
                     target_bo->setForgetRound(skill->last);
                 appendDefStatus(e_Forget, 0, target_bo);
@@ -4948,11 +4950,17 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         if(value > 0 && bf->getSide() != target_side)
         {
             float value = bf->_defend * skill->effect->defP + skill->effect->def;
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stDef, value, skill->last, bf->getSide() != 0);
+            if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, skill, e_stDef, value, bf->getNewModeLast(), bf->getSide() != 0);
+            else
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stDef, value, skill->last, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stDef, value, skill->last, target_side != 0);
+            if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+                setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stDef, value, bf->getNewModeLast(), target_side != 0);
+            else
+                setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stDef, value, skill->last, target_side != 0);
         }
     }
 
@@ -5041,11 +5049,17 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = skill->effect->critical;
         if(value > 0 && bf->getSide() != target_side)
         {
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stCritical, value, skill->last, bf->getSide() != 0);
+            if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, skill, e_stCritical, value, bf->getNewModeLast(), bf->getSide() != 0);
+            else
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stCritical, value, skill->last, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stCritical, value, skill->last, target_side != 0);
+            if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+                setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stCritical, value, bf->getNewModeLast(), target_side != 0);
+            else
+                setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stCritical, value, skill->last, target_side != 0);
         }
     }
 
@@ -5943,7 +5957,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 
     insertFighterStatus(bf);
     _activeFgt = bf;
-    doLingshiModelAttack(bf, 3);
+    //doLingshiModelAttack(bf, 3);
 
     UInt8 side = bf->getSide();
     UInt8 reiatsuType = 0;
@@ -7052,6 +7066,27 @@ UInt32 BattleSimulator::doAttack( int pos )
             {
                 appendToPacket(bf->getSide(), bf->getPos(), 0, 2, passiveSkill->getId(), false, false);
                 ++ rcnt;
+            }
+            _activeFgt = NULL;
+        }
+    }
+
+    for(UInt8 side = 0; side < 2; side++)
+    {
+        for(UInt8 i = 0; i < 25; i++)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(bo == NULL || bo->getHP() == 0 || !bo->isChar() || bo->isSoulOut())
+                continue;
+            _activeFgt = bo;
+            UInt32 skillId = doLingshiModelAttack(bo, 0);
+            if(skillId > 0)
+            {
+                if(_defList.size() > 0 || _scList.size() > 0)
+                {
+                    appendToPacket(bo->getSide(), bo->getPos(), 0, 2, skillId, false, false);
+                    ++ rcnt;
+                }
             }
             _activeFgt = NULL;
         }
@@ -10643,7 +10678,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
     do
     {
         bf->setPreAtk();
-        doLingshiModelAttack(bf, 5);
+        //doLingshiModelAttack(bf, 5);
         size_t skillIdx = 0;
         const GData::SkillBase* violentSKill;
         while(NULL != (violentSKill = bf->getPassiveSkillViolent100(skillIdx)))
@@ -12222,12 +12257,12 @@ void BattleSimulator::appendStatusChange(StatusType type, UInt32 value, UInt16 s
     if(type == e_stCounter)
     {
         bf->setCounterCnt(bf->getCounterCnt() + 1);
-        doLingshiModelAttack(bf, 2);
+        //doLingshiModelAttack(bf, 2);
     }
     else if(type == e_stCritical)
     {
         bf->setCriticalCnt(bf->getCriticalCnt() + 1);
-        doLingshiModelAttack(bf, 4);
+        //doLingshiModelAttack(bf, 4);
     }
 }
 
@@ -12993,10 +13028,10 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
         _defList[idx].counterLeft = bf->getHP();
     }
 
+#if 0
     size_t idx2 = 0;
     const GData::SkillBase *skill;
-    doLingshiModelAttack(bf, 1);
-
+    //doLingshiModelAttack(bf, 1);
     BattleFighter* tmp = _activeFgt;
     _activeFgt = bf;
     while(NULL != (skill = bf->getPassiveSkillLingshi100(idx2)))
@@ -13010,7 +13045,7 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
         }
     }
     _activeFgt = tmp;
-
+#endif
     return uShow;
 }
 
@@ -15395,8 +15430,8 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
         type = passiveSkill->effect->efv[count1 - 1];
         last = passiveSkill->effect->efl[count1 - 1];
     }
-    if(flag != type)
-        return 0;
+    //if(flag != type)
+    //    return 0;
 
     switch(type)
     {
@@ -15435,8 +15470,8 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     bf->setChangeStatus(1);
     bf->setNewModeLast(last);
 
-    BattleFighter* tmp = _activeFgt;
-    _activeFgt = bf;
+    //BattleFighter* tmp = _activeFgt;
+    //_activeFgt = bf;
     //改变模型
     //if(passiveSkill->color == 5)
         appendDefStatus(e_changeMode, SKILL_ID(passiveSkill->getId()), bf);
@@ -15452,10 +15487,23 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
     _lingshiActCnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
 
-    onHPChanged(bf); // 判断血量变化引起的技能
-    _activeFgt = tmp;
+    size_t idx2 = 0;
+    const GData::SkillBase *skill;
+    while(NULL != (skill = bf->getPassiveSkillLingshi100(idx2)))
+    {
+        if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_buqu)
+        {
+            setStatusChange_Def(bf, bf->getSide(), bf->getPos(), skill, getBFDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
+            setStatusChange_MagDef(bf, bf->getSide(), bf->getPos(), skill, getBFMagDefend(bf) * skill->effect->efv[0], bf->getNewModeLast(), true);
+            appendDefStatus(e_skill, skill->getId(), bf);
+            break;
+        }
+    }
 
-    return 0;
+    onHPChanged(bf); // 判断血量变化引起的技能
+    //_activeFgt = tmp;
+
+    return passiveSkill->getId();
 }
 
 void BattleSimulator::onDeadLingshi(BattleFighter* bf)
@@ -15471,7 +15519,7 @@ void BattleSimulator::onDeadLingshi(BattleFighter* bf)
         if(!bo || bo->getHP() == 0 || bo == bf)
             continue;
         bo->setFriendDeadCnt(bo->getFriendDeadCnt() + 1);
-        doLingshiModelAttack(bo, 6);
+        //doLingshiModelAttack(bo, 6);
     }
 
     for(UInt8 i = 0; i < 25; ++ i)
@@ -15480,7 +15528,7 @@ void BattleSimulator::onDeadLingshi(BattleFighter* bf)
         if(!bo || bo->getHP() == 0 || bo == bf)
             continue;
         bo->setEnemyDeadCnt(bo->getEnemyDeadCnt() + 1);
-        doLingshiModelAttack(bo, 7);
+        //doLingshiModelAttack(bo, 7);
     }
 
 }
