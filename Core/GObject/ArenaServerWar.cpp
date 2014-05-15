@@ -2271,6 +2271,15 @@ void ServerWarMgr::sendLastLeaderBoard(Player* pl)
     pl->send(st);
 }
 
+void ServerWarMgr::commitArenaForceOnce()
+{
+    std::map<Player *, UInt8>::iterator it = _warSort.begin();
+    for(; it != _warSort.end(); ++ it)
+    {
+        commitLineup(it->first);
+    }
+}
+
 //SreverWar Boss
 static const UInt32 ServerWarBossId[] = { 7317, 7318};
 #define AWARD_AREA1 3
