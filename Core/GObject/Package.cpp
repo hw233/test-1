@@ -8385,13 +8385,13 @@ namespace GObject
             bool isHalf = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_LUCKY) > 0;
             if(m_Owner->getGold() < needGold / (isHalf ? 2 : 1))
             {
-                m_Owner->sendMsgCode(0, 1101);
+                m_Owner->sendMsgCode(0, 1104);
                 return;
             }
             ConsumeInfo ci(LingShiPeiYang, 0, 0);
             m_Owner->useGold(needGold / (isHalf ? 2 : 1), &ci);
             m_Owner->SetVar(VAR_LINGSHI_PEIYANG_CNT, count);
-            lsAttr.exp += 3000 * (hasLucky ? 10 : 1);
+            lsAttr.exp += 25 * (hasLucky ? 10 : 1);
         }
         else
         {
@@ -8401,7 +8401,7 @@ namespace GObject
             bool isBind = false;
             DelItemAny(XIAN_LING_GUO, 1, &isBind);
             DelItemSendMsg(XIAN_LING_GUO, m_Owner);
-            lsAttr.exp += 2000 * (hasLucky ? 10 : 1);
+            lsAttr.exp += 20 * (hasLucky ? 10 : 1);
             m_Owner->udpLog("lingshi", "F_140509_11", "", "", "", "", "act");
         }
         if(hasLucky)
