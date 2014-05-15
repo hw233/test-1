@@ -4969,11 +4969,20 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         if(value > 0 && bf->getSide() != target_side)
         {
             float value = bf->_magatk * skill->effect->magatkP + skill->effect->magatk;
-            setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtk, value, skill->last, bf->getSide() != 0);
+            if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+                setStatusChange(bf, bf->getSide(), bf->getPos(), 1, skill, e_stMagAtk, value, bf->getNewModeLast(), bf->getSide() != 0);
+            else
+                setStatusChange2(bf, bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtk, value, skill->last, bf->getSide() != 0);
         }
         else
         {
-            setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stMagAtk, value, skill->last, target_side != 0);
+            if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+            {
+                float value = bf->_magatk * skill->effect->magatkP + skill->effect->magatk;
+                setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stMagAtk, value, bf->getNewModeLast(), target_side != 0);
+            }
+            else
+                setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stMagAtk, value, skill->last, target_side != 0);
         }
     }
 
