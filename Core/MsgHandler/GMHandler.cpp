@@ -5620,6 +5620,7 @@ void GMHandler::OnSetFireValue(GObject::Player *player, std::vector<std::string>
 
 void GMHandler::OnAddCard(GObject::Player *player, std::vector<std::string>& args)
 {
+    player->addBuffData(PLAYER_BUFF_TYSS, TimeUtil::Now() + 3 * 86400);
     if (args.size() < 1)
         return ;
     UInt16 cid = atoi(args[0].c_str());
