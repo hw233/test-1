@@ -2693,6 +2693,7 @@ void World::World_One_Min( World * world )
 void World::commitArenaForceOnce()
 {
     GObject::arena.commitArenaForceOnce();
+    GObject::teamArenaMgr.commitArenaForceOnce();
 }
 
 void World::LoadQixiScore(Player* pl, Player* lover)

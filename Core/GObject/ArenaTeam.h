@@ -442,6 +442,8 @@ class TeamArenaMgr
         void declineApply(Player *, UInt64);
         void listAllTeam(Player *, UInt16, UInt8);
         void searchTeam(Player *, std::string&, UInt8);
+
+        void commitArenaForceOnce();    //强制同步仙界至尊
     private:
         bool _loaded;
         UInt8 _notified;
