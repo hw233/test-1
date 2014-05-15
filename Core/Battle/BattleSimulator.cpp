@@ -15507,7 +15507,6 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag, UInt
     UInt32 rcnt = doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
 
     size_t idx2 = 0;
-    const GData::SkillBase *skill;
     while(NULL != (skill = bf->getPassiveSkillLingshi100(idx2)))
     {
         if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_buqu)
