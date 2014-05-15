@@ -8369,24 +8369,25 @@ namespace GObject
         bool hasLucky = uRand(10000) < 1000;
         if(type)
         {
-            UInt32 cnt = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_CNT) + 1;
-            static UInt32 moneys[3] = {50, 100, 200};
-            static UInt32 tmpCnt[3] = {5, 30, 0xFFFFFFFF};
-            int idx = 0;
-            for(; idx < 3; ++ idx)
-            {
-                if(cnt <= tmpCnt[idx])
-                    break;
-            }
+            UInt32 count = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_CNT) + 1;
+            UInt32 needGold = 0;
+            if(count <= 5)
+                needGold = 6;
+            else if(count <= 10)
+                needGold = 12;
+            else if(count >= 40)
+                needGold = 192;
+            else
+                needGold = (count-10)*6 + 12;
             bool isHalf = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_LUCKY) > 0;
-            if(m_Owner->getGold() < moneys[idx] / (isHalf ? 2 : 1))
+            if(m_Owner->getGold() < needGold / (isHalf ? 2 : 1))
             {
                 m_Owner->sendMsgCode(0, 1101);
                 return;
             }
             ConsumeInfo ci(LingShiPeiYang, 0, 0);
-            m_Owner->useGold(moneys[idx] / (isHalf ? 2 : 1), &ci);
-            m_Owner->SetVar(VAR_LINGSHI_PEIYANG_CNT, cnt);
+            m_Owner->useGold(needGold / (isHalf ? 2 : 1), &ci);
+            m_Owner->SetVar(VAR_LINGSHI_PEIYANG_CNT, count);
             lsAttr.exp += 3000 * (hasLucky ? 10 : 1);
         }
         else
