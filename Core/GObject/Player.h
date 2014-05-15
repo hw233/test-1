@@ -2843,6 +2843,7 @@ namespace GObject
         void setQTSign();
         void setQTSpecialMark();
         void GMSetQTNUM(UInt8 num);
+        void getFireContributionBag(Player * pl);
         // 帮派神像
         float getClanStatueHPEffect();
         float getClanStatueAtkEffect();
