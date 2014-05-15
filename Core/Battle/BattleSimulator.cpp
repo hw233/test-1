@@ -15473,7 +15473,7 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     //BattleFighter* tmp = _activeFgt;
     //_activeFgt = bf;
     //改变模型
-    //if(passiveSkill->color == 5)
+    if(passiveSkill->color > 3)
         appendDefStatus(e_changeMode, SKILL_ID(passiveSkill->getId()), bf);
     bf->updateAllPassiveSkillLingshiExceptEnter();
 
