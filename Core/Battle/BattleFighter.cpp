@@ -536,6 +536,15 @@ void BattleFighter::updateBuffExtras()
             clanFactor = 1.03;
         else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN3) > 0)
             clanFactor = 1.02;
+        
+        if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_TYSS) > 0)
+        {
+            if(clanFactor == 0)
+                clanFactor = 1 + 0.01;
+            else
+                clanFactor += 0.01;
+        }
+
     }
     if(clanFactor > 0.001f)
     {

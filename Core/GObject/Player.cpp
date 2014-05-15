@@ -275,6 +275,9 @@ namespace GObject
         else if(m_Player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
             factorAdd = 0.2f;
 
+        if(m_Player->getBuffData(PLAYER_BUFF_TYSS) > 0)
+            factorAdd += 0.5f;
+
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp * factor + expBase * factorAdd), 0, extraExp, _writedb);
 		else
@@ -11407,7 +11410,10 @@ namespace GObject
         else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
             factor += 0.3f;
         else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
-            factor  += 0.2f;
+            factor += 0.2f;
+        
+        if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+            factor += 0.5f;
 
         return factor;
     }
@@ -11595,6 +11601,9 @@ namespace GObject
                         pexpAdd = pexpBase * 0.3f;
                     else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
                         pexpAdd = pexpBase * 0.2f;
+                    
+                    if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+                        pexpAdd += pexpBase * 0.5f;
 
                     fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }
@@ -11665,6 +11674,9 @@ namespace GObject
                         pexpAdd = pexpBase * 0.3f;
                     else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
                         pexpAdd = pexpBase * 0.2f;
+
+                    if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+                        pexpAdd += pexpBase * 0.5f;
 
                     fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }
