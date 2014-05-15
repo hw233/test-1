@@ -480,7 +480,6 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
         _fgtlist[0].clear();
         _fgtlist[1].clear();
     }
-    _lingshiActCnt = 0;
 
     // [[ Make packet header data
     _packet.init(REP::FIGHT_START);
@@ -736,7 +735,7 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
         _winner = testWinner2();
 
     _packet << static_cast<UInt8>(_winner);
-    _packet.data<UInt32>(cnt_pos) = act_count + _lingshiActCnt;
+    _packet.data<UInt32>(cnt_pos) = act_count;
     _packet << Stream::eos;
     //printf("Winner is: %d,  actions: %d\n", _winner, act_count);
 #ifdef _DEBUG
@@ -7083,7 +7082,8 @@ UInt32 BattleSimulator::doAttack( int pos )
             if(bo == NULL || bo->getHP() == 0 || !bo->isChar() || bo->isSoulOut())
                 continue;
             _activeFgt = bo;
-            UInt32 skillId = doLingshiModelAttack(bo, 0);
+            UInt32 skillId = 0;
+            rcnt += doLingshiModelAttack(bo, 0, skillId);
             if(skillId > 0)
             {
                 if(_defList.size() > 0 || _scList.size() > 0)
@@ -15398,7 +15398,7 @@ bool BattleSimulator::doEffectAfterCount(BattleFighter* bf, const GData::SkillBa
     return bRet;
 }
 
-UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
+UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag, UInt32& skillId)
 {
     if(!bf)
         return 0;
@@ -15470,6 +15470,7 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     //BattleFighter* tmp = _activeFgt;
     //_activeFgt = bf;
     //改变模型
+    skillId = passiveSkill->getId();
     if(passiveSkill->color > 3)
         appendDefStatus(e_changeMode, SKILL_ID(passiveSkill->getId()), bf);
     bf->updateAllPassiveSkillLingshiExceptEnter();
@@ -15482,7 +15483,7 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     Int32 target_pos;
     Int32 cnt = 0;
     getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-    _lingshiActCnt += doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
+    UInt32 rcnt = doSkillAttackAftEnter(bf, passiveSkill, target_side, target_pos, cnt);
 
     size_t idx2 = 0;
     const GData::SkillBase *skill;
@@ -15500,7 +15501,7 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag)
     onHPChanged(bf); // 判断血量变化引起的技能
     //_activeFgt = tmp;
 
-    return passiveSkill->getId();
+    return rcnt;
 }
 
 void BattleSimulator::onDeadLingshi(BattleFighter* bf)
