@@ -8838,9 +8838,9 @@ namespace GObject
                 addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
                 addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
                 break;
-            case 18: //前3 后3 右3 左1
+            case 18: //前3 后1 右3 左1
                 addZhenyuanAttr(ae, _playerData.zhenyuans[2], fgt);   //前3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[6], fgt);   //后1
 
                 addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
                 addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
