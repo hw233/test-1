@@ -92,6 +92,7 @@ namespace GData
         static bool LoadCoupleCopy();
         static bool LoadCardUpgrade();
         static bool LoadCardInfo();
+        static bool LoadLingShiConfig();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);

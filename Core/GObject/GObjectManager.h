@@ -513,6 +513,7 @@ namespace GObject
         static bool fixItem9383Leader();
         static bool loadPetEquipAttr();
 	    static bool loadZhenyuanAttr();
+	    static bool loadLingshiAttr();
         static bool loadFairySpar();
         static bool loadCollectCard();
         //static bool loadSanHun();
