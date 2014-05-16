@@ -215,6 +215,7 @@ MSG_REG_2(GameMsgHdr, REQ::MARRYBOARD, OnMarryBoard2);
 MSG_REG_2(GameMsgHdr, REQ::KANGJITIANMO_REQ, OnKangJiTianMoReq);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
+MSG_REG_2(GameMsgHdr, 0x1D1, OnCancelAutoRaceBattle);
 
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReLoadLuaReq);
 MSG_REG_2(GameMsgHdr, 0x1ED, OnRunScriptReq);

@@ -146,7 +146,7 @@ namespace GObject
         if(!rb)
             return;
 
-        if(level >= 2 && level >= 5)
+        if(level >= 2 && level <= 5)
         {
             UInt32 num = World::getRBTimeRank();
             UInt32 rank = GET_BIT_3(num, level);

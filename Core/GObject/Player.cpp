@@ -2362,7 +2362,17 @@ namespace GObject
         int addr = inet_addr(m_clientIp);
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%" I64_FMT "u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %" I64_FMT "u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
-        cancelAutoRaceBattle();
+
+        if(getThreadId() == WORKER_THREAD_NEUTRAL)
+        {
+            cancelAutoRaceBattle();
+        }
+        else
+        {
+            GameMsgHdr hdr(0x1D1, WORKER_THREAD_NEUTRAL, this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+
         if(_isOnline && !hasFlag(Training))
         {
             //if(cfg.GMCheck)
