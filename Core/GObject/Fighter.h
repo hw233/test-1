@@ -310,6 +310,7 @@ public:
     // 取得所有被动技能
     void getAllPSkillAndLevel(Stream& st);
     void getAllPSkillAndLevel4Arena(Stream& st);
+    void getAllLingshiSkillAndLevel2Arena(Stream& st);
     // 取得所有学习的技能和等级
     void getAllSkillsAndLevel(Stream& st);
     // 取得装备了的和学习了的技能和等级

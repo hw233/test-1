@@ -3062,6 +3062,29 @@ void Fighter::getAllPSkillAndLevel4Arena(Stream& st)
 }
 
 
+void Fighter::getAllLingshiSkillAndLevel2Arena(Stream& st)
+{
+    UInt8 size = 0;
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        size = _passklLingshi[i].size();
+        st << size;
+        for (size_t j = 0; j < _passklLingshi[i].size(); ++j)
+        {
+            st << _passklLingshi[i][j];
+        }
+    }
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        size = _rpassklLingshi[i].size();
+        st << size;
+        for (size_t j = 0; j < _rpassklLingshi[i].size(); ++j)
+        {
+            st << _rpassklLingshi[i][j];
+        }
+    }
+}
+
 UInt8 Fighter::getSkillsNum()
 {
     UInt8 c = 0;
