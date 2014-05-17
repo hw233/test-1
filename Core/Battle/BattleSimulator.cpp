@@ -4977,10 +4977,7 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         else
         {
             if(skill->cond == GData::SKILL_ENTER_LINGSHI)
-            {
-                float value = bf->_magatk * skill->effect->magatkP + skill->effect->magatk;
                 setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stMagAtk, value, bf->getNewModeLast(), target_side != 0);
-            }
             else
                 setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stMagAtk, value, skill->last, target_side != 0);
         }
@@ -9517,7 +9514,7 @@ void BattleSimulator::setStatusChange_MagAtk(BattleFighter * bf, UInt8 side, UIn
     else
         bf->setMagAttackRoundAdd(0, 0);
 
-
+    bfgt->setMagAttackAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getMagAttack());
     appendStatusChange(e_stMagAtk, value2, skillId, bfgt);
 }
