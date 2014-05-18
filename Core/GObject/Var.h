@@ -727,7 +727,7 @@ namespace GObject
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
 
-        //781 - 790 for lijr
+        //781 - 800 for lijr
         VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
         VAR_ERLKING_STATUSB = 782,               //妖王再临状态(17-32)
         VAR_ERLKING_STATUSC = 783,               //妖王再临状态(33-48)
@@ -735,8 +735,15 @@ namespace GObject
         VAR_ERLKING_USE_FREE_NUM_DAY = 785,      //妖王再临使用免费通关次数
         VAR_ERLKING_BUY_PASS_TOTAL_NUM = 786,    //妖王再临购买通关总次数
 
-        VAR_KJTM_AWARD_MARK = 787, //抗击天魔奖励标志
-        VAR_KJTM_LOGIN_NUM = 788,  // 抗击天魔登录次数
+        VAR_KJTM_AWARD_MARK = 787,               //抗击天魔奖励标志
+        VAR_KJTM_LOGIN_NUM = 788,                //抗击天魔登录次数
+        VAR_ANSWER_QUESTIONS_STATUS = 789,       //一战成名回答问题状态（0位代表当前这道题回答是否正确, 1-30位每一位代表是否参与该道题）
+        VAR_ANSWER_LITERARY_VALUE = 790,         //一战成名文采值
+        VAR_ANSWER_SUCCESSION_NUM = 791,         //一战成名连击数量
+        VAR_ANSWER_ATTACK_NUM = 792,             //一战成名天眼通数量
+        VAR_ANSWER_SKILL_STATUS = 793,           //一战成名技能状态 (每5位表示一种技能状态)
+        VAR_ANSWER_SKILL_MARK = 794,             //一战成名本题所用技能标志 (每1位表示一种技能使用标记)
+        VAR_ANSWER_SKILL_USE_NUM = 795,          //一战成名技能使用数量 (每2位表示一种技能已使用数量)
         VAR_MAX,
     };
 
@@ -1370,6 +1377,12 @@ namespace GObject
             REGISTER_VAR(VAR_KJTM_LOGIN_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_KJTM_LOGIN_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_KJTM_AWARD_MARK, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_QUESTIONS_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SUCCESSION_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_ATTACK_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SKILL_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SKILL_MARK, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SKILL_USE_NUM, CYCLE_DAY);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);

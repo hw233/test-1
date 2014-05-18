@@ -536,6 +536,9 @@ namespace GObject
         static bool loadApplyList();
         static bool loadTeamMember();
         static bool loadInactiveMember();
+        static bool loadQuestions();
+        static bool loadAnswerEnd();
+        static bool loadAnswerNum();
         static bool LoadPlayerModifyMounts();
         static bool loadFriendlyCount();
         static bool loadSkillGrade();

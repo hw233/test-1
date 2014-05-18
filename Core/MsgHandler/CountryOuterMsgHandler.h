@@ -1422,7 +1422,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
-   
+
+    {
+        GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+
     pl->MiLuZhiJiao();
     //pl->QiShiBanState();
     UInt32 flag = pl->GetVar(VAR_OLDMAN_SCORE_AWARD);
@@ -1464,6 +1469,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+
+    {
+        GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+
     //结拜邀请信息
     pl->sendFriendlyTimeAndCost();
     GObject::raceBattle.sendRBStatus(pl);

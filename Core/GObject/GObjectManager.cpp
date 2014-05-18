@@ -501,6 +501,24 @@ namespace GObject
             std::abort();
         }
 
+        if(!loadQuestions())
+        {
+            fprintf(stderr, "loadQuestions error!\n");
+            std::abort();
+        }
+
+        if(!loadAnswerEnd())
+        {
+            fprintf(stderr, "loadAnswerEnd error!\n");
+            std::abort();
+        }
+
+        if(!loadAnswerNum())
+        {
+            fprintf(stderr, "loadAnswerNum error!\n");
+            std::abort();
+        }
+
         if(!loadGoback())
         {
             fprintf(stderr, "loadGoback error!\n");
@@ -6351,6 +6369,74 @@ namespace GObject
 			lc.advance();
             if(data.playerId > 0)
                 KJTMManager->AddInactiveMemberFromDB(data.playerId);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadQuestions()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading questions:");
+		DBQuestions data;
+
+		if(execu->Prepare("SELECT `answerId`, `questionsId` FROM `questions` ORDER BY `answerId`", data) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            if(data.answerId > 0)
+                answerManager->AddQuestionsFromDB(answerId, questionsId);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadAnswerNum()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading answernum:");
+		DBAnswerNum data;
+
+		if(execu->Prepare("SELECT `answerId`, `retANum`, `retBNum`,`retCNum`,`retDNum`  FROM `answernum` ORDER BY `answerId`", data) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            if(data.answerId > 0)
+                answerManager->AddAnswerNumFromDB(data);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadAnswerEnd()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading answerend:");
+		DBAnswerEnd data;
+
+		if(execu->Prepare("SELECT `playerId`, `answerId`, `ret`, `valueA`, `valueB`, `valueC`, `valueD` FROM `answerend` ORDER BY `playerId`", data) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            answerManager->AddAnswerEndFromDB(data);
 		}
 		lc.finalize();
 

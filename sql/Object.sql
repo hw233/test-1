@@ -2587,4 +2587,32 @@ CREATE TABLE IF NOT EXISTS `cardsuit` (
     unique KEY id_playerid(`playerid`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `questions`;
+CREATE TABLE IF NOT EXISTS `questions` (
+    `answerId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `questionsId` smallint(5) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`answerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `answernum`;
+CREATE TABLE IF NOT EXISTS `answernum` (
+    `answerId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `retANum` int(10) unsigned NOT NULL DEFAULT '0',
+    `retBNum` int(10) unsigned NOT NULL DEFAULT '0',
+    `retCNum` int(10) unsigned NOT NULL DEFAULT '0',
+    `retDNum` int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`answerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `answerend`;
+CREATE TABLE IF NOT EXISTS `answerend` (
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `answerId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `ret` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `valueA` int(10) unsigned NOT NULL DEFAULT '0',
+    `valueB` int(10) unsigned NOT NULL DEFAULT '0',
+    `ValueC` int(10) unsigned NOT NULL DEFAULT '0',
+    `ValueD` int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -203,6 +203,7 @@ bool World::_summerFlow = false;
 bool World::_summerMeet = false;
 bool World::_qishiban = false;
 bool World::_guankaAct = false;
+RCSortType World::answerScoreSort;
 RCSortType World::qishibanScoreSort;
 RCSortType World::guankaScoreSort;
 RCSortType World::rechargeSort;
@@ -2231,6 +2232,105 @@ void World::ClanDuoBaoCheck(void *)
     }
 }
 
+inline bool enum_answer_send(GObject::Player* player, UInt8 mark)
+{
+    if(player == NULL || !player->isOnline())
+        return true;
+
+    switch(mark)
+    {
+        case 3:
+            {
+                answerManager->AnswerEnd(player);
+            }
+            break;
+        case 4:
+            {
+                answerManager->AwardEnd(player);
+            }
+            break;
+        case 5:
+            {
+                answerManager->AllAnswerEnd(player);
+            }
+            break;
+    }
+
+    if(1 == mark || 2 == mark)
+    {
+        Stream st(REP::ACT);
+        st << static_cast<UInt8>(0x32);
+        st << static_cast<UInt8>(0x00);
+        st << mark;
+        st << Stream::eos;
+        player->send(st);
+    }
+
+    return true;
+}
+
+void World::AnswerCheck(void *)
+{
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0, nowTime);
+    if(World::getPrepareTime())
+    {
+        if(!_answerOpenA)
+        {
+            GObject::globalPlayers.enumerate(enum_answer_send, 1);
+            _answerOpenA = true;
+        }
+    }
+    else if(World::getAnswerTime())
+    {
+        if(!_answerOpenB)
+        {
+            GObject::globalPlayers.enumerate(enum_answer_send, 2);
+            _answerOpenB = true;
+        }
+
+        if(nowTime >= GVAR.GetVar(GVAR_ANSWER_ENDTIME))
+        {
+            if(nowTime+5 < GVAR.GetVar(GVAR_ANSWER_END_DAY))
+            { 
+                UInt8 value = nowTime / 25 * 25 + 25;                    //本轮活动结束，时间设置到下一题的答题结束时间
+                GVAR.SetVar(GVAR_ANSWER_ENDTIME, value);
+            }
+            GObject::globalPlayers.enumerate(enum_answer_send, 3);
+        }
+        else if(nowTime >= GVAR.GetVar(GVAR_ANSWER_AWARDTIME))
+        {
+            if(nowTime >= GVAR.GetVar(GVAR_ANSWER_END_DAY))
+            {
+                UInt32 valueA = time + 19*60*60 + 30*60 + 86400 + 25;    //今天活动结束，时间设置到下一天第一题的答题结束时间
+                UInt32 valueB = time + 19*60*60 + 30*60 + 86400 + 30;    //今天活动结束，时间设置到下一天第一题的答题结算时间
+                UInt32 nextPrepare = time + 19*60*60 + 15*60 + 86400;    //今天活动结束，时间设置到下一天的准备时间
+                UInt32 nextBegin = time + 19*60*60 + 30*60 + 86400;      //今天活动结束，时间设置到下一天的开始时间
+                UInt32 nextEnd = time + 19*60*60 + 45*60 + 86400;        //今天活动结束，时间设置到下一天的结束时间
+                GVAR.SetVar(GVAR_ANSWER_PREPARE_DAY, nextPrepare);
+                GVAR.SetVar(GVAR_ANSWER_BEGIN_DAY, nextBegin);
+                GVAR.SetVar(GVAR_ANSWER_END_DAY, nextEnd);
+                GVAR.SetVar(GVAR_ANSWER_ENDTIME, valueA);
+                GVAR.SetVar(GVAR_ANSWER_AWARDTIME, valueB);
+
+                if(_answerOpenA)
+                    _answerOpenA = false;
+                if(_answerOpenB)
+                    _answerOpenB = false;
+
+                GObject::globalPlayers.enumerate(enum_answer_send, 5);
+            }
+            else
+            {
+                UInt32 valueC = nowTime / 30 * 30 + 30;                 //本轮活动结束，时间设置到下一题的答题结算时间
+                GVAR.SetVar(GVAR_ANSWER_AWARDTIME, valueC);
+                GObject::globalPlayers.enumerate(enum_answer_send, 4);
+            }
+        }
+    }
+}
+
+
 inline static bool enum_spread_send(Player* player, void* data)
 {
     if(player == NULL || !player->isOnline())
@@ -2403,6 +2503,7 @@ bool World::Init()
     }
     AddTimer(60 * 60 * 3 * 1000, World_Marry_Process, static_cast<void*>(NULL), 5 * 1000);
 
+    /**夺宝奇兵**/
     UInt32 nowTime = TimeUtil::Now();
     UInt32 time = TimeUtil::SharpDayT(0,nowTime);
     UInt32 start = time + 10*60*60;
@@ -2423,6 +2524,39 @@ bool World::Init()
     }
 
     AddTimer(5 * 1000, ClanDuoBaoCheck, static_cast<void*>(NULL));
+
+    /**一战成名**/
+    UInt32 nowTimeA = TimeUtil::Now();
+    UInt32 timeA = TimeUtil::SharpDayT(0,nowTimeA);
+    UInt32 prepareA = timeA + 19*60*60 + 15*60;
+    UInt32 startA = timeA + 19*60*60 + 30*60;
+    UInt32 endA = timeA + 19*60*60 + 45*60;
+    UInt32 valueTimeA = 0;
+    UInt32 valueTimeB = 0;
+
+    if(nowTimeA < endA)
+    {
+        GVAR.SetVar(GVAR_ANSWER_PREPARE_DAY, prepareA);
+        GVAR.SetVar(GVAR_ANSWER_BEGIN_DAY, startA);
+        GVAR.SetVar(GVAR_ANSWER_END_DAY, endA);
+
+        if(nowTimeA < GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY))
+        {
+            valueTimeA = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY) + 25;
+            valueTimeB = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY) + 30;
+        }
+        else
+        {
+            valueTimeA = nowTimeA / 25 * 25 + 25;
+            valueTimeB = nowTimeA / 30 * 30 + 30;
+        }
+
+        GVAR.SetVar(GVAR_ANSWER_ENDTIME, valueTimeA);
+        GVAR.SetVar(GVAR_ANSWER_AWARDTIME, valueTimeB);
+    }
+
+    AddTimer(1000, AnswerCheck, static_cast<void*>(NULL));
+
     return true;
 }
 
@@ -3307,6 +3441,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::qishibanScoreSort.insert(s);
         }
     }
+    if (World::getAnswerTime())
+    {
+        UInt32 score = p->GetVar(VAR_ANSWER_LITERARY_VALUE);
+        if (score)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = score;
+            World::answerScoreSort.insert(s);
+        }
+    }
     if (World::getGGTime())
     {
         if(p->getGGStatus()!=2)
@@ -3969,6 +4114,22 @@ void World::SendQiShiBanAward()
         }
     }
     World::qishibanScoreSort.clear();
+}
+
+void World::SendAnswerAward()
+{
+    World::initRCRank();
+    int pos = 0;
+
+    for (RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (!player)
+            continue;
+        ++pos;
+        if(pos > 7) break;
+    }
+    World::answerScoreSort.clear();
 }
 
 void World::Send11ClanRankAward()
