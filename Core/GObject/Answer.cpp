@@ -43,31 +43,6 @@ namespace GObject
         m_answer[answerId-1] = questionsId;
     }
 
-    /*void Answer::AddAnswerNumFromDB(DBAnswerNum& data)
-    {
-        answerNum info;
-        info.answerId = data.answerId;
-        info.retANum = data.retANum;
-        info.retBNum = data.retBNum;
-        info.retCNum = data.retCNum;
-        info.retDNum = data.retDNum;
-
-        m_answerNum.insert(std::make_pair(info.answerId, info));
-    }
-
-    void Answer::AddAnswerEndFromDB(DBAnswerEnd& data)
-    {
-        answerEnd info;
-        info.answerId = data.answerId;
-        info.ret = data.ret;
-        info.valueA = data.valueA;
-        info.valueB = data.valueB;
-        info.valueC = data.valueC;
-        info.valueD = data.valueD;
-
-        m_playerAnswerEnd.insert(std::make_pair(data.playerId, info));
-    }*/
-
     void Answer::SendAnswerInfo(Player* pl)
     {
         GData::NewQuestionsData::newquestionsInfo * info = GData::newquestionsData.getNewQuestionsInfo(m_answer[m_answerEnd.answerId]);

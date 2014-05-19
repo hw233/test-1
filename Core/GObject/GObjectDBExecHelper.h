@@ -1533,26 +1533,6 @@ struct DBQuestions
     UInt16 questionsId;
 };
 
-struct DBAnswerEnd
-{
-    UInt64 playerId;
-    UInt8 answerId;
-    UInt8 ret;
-    UInt32 valueA;
-    UInt32 valueB;
-    UInt32 valueC;
-    UInt32 valueD;
-};
-
-struct DBAnswerNum
-{
-    UInt8 answerId;
-    UInt32 retANum;
-    UInt32 retBNum;
-    UInt32 retCNum;
-    UInt32 retDNum;
-};
-
 struct DBPlayerNamed 
 {
     UInt16 serverNo;
@@ -3628,30 +3608,6 @@ SPECIALDEF(2)
     (
     UInt8, answerId,
     UInt16, questionsId
-    )
-SPECIALEND()
-
-SPECIALBEGIN(GObject::DBAnswerEnd)
-SPECIALDEF(7)
-    (
-    UInt64, playerId,
-    UInt8, answerId,
-    UInt8, ret,
-    UInt32, valueA,
-    UInt32, valueB,
-    UInt32, valueC,
-    UInt32, valueD
-    )
-SPECIALEND()
-
-SPECIALBEGIN(GObject::DBAnswerNum)
-SPECIALDEF(5)
-    (
-    UInt8, answerId,
-    UInt32, retANum,
-    UInt32, retBNum,
-    UInt32, retCNum,
-    UInt32, retDNum
     )
 SPECIALEND()
 

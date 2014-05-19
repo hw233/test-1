@@ -6398,51 +6398,6 @@ namespace GObject
         return true;
     }
 
-    bool GObjectManager::loadAnswerNum()
-    {
-		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-		if (execu.get() == NULL || !execu->isConnected()) return false;
-
-        LoadingCounter lc("Loading answernum:");
-		DBAnswerNum data;
-
-		if(execu->Prepare("SELECT `answerId`, `retANum`, `retBNum`,`retCNum`,`retDNum`  FROM `answernum` ORDER BY `answerId`", data) != DB::DB_OK)
-			return false;
-
-		lc.reset(20);
-		while(execu->Next() == DB::DB_OK)
-		{
-			lc.advance();
-            if(data.answerId > 0)
-                answerManager->AddAnswerNumFromDB(data);
-		}
-		lc.finalize();
-
-        return true;
-    }
-
-    bool GObjectManager::loadAnswerEnd()
-    {
-		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-		if (execu.get() == NULL || !execu->isConnected()) return false;
-
-        LoadingCounter lc("Loading answerend:");
-		DBAnswerEnd data;
-
-		if(execu->Prepare("SELECT `playerId`, `answerId`, `ret`, `valueA`, `valueB`, `valueC`, `valueD` FROM `answerend` ORDER BY `playerId`", data) != DB::DB_OK)
-			return false;
-
-		lc.reset(20);
-		while(execu->Next() == DB::DB_OK)
-		{
-			lc.advance();
-            answerManager->AddAnswerEndFromDB(data);
-		}
-		lc.finalize();
-
-        return true;
-    }
-
     bool GObjectManager::LoadSoulItemChance()
     {
         lua_State* L = lua_open();
