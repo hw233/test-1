@@ -9322,8 +9322,26 @@ function HappyFireLoot(player,lootlvl)
     package:AddItem(9458, itemNum[lootlvl], true,0,10); --欢乐礼包
 end
 
+function DropActLoot(player,lootlvl)
+    if not getDropAct() then
+        return
+    end
+    if lootlvl > 3 then
+        lootlvl = 0
+    end
+    local itemNum = {
+            [0] = 1,
+            [1] = 1,
+            [2] = 1,
+            [3] = 1,
+    };
+    local package = player:GetPackage();
+    package:AddItem(1527, itemNum[lootlvl], true,0,10);
+end
+
 --蜀山传奇掉落活动
 function SurnameLegendLoot(player,lootlvl)
+    DropActLoot()
     if not getSurnameLegend() then
         return
     end

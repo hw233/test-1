@@ -382,6 +382,10 @@ public:
     { _qixi = v; }
     inline static bool getQixi()
     { return _qixi; }
+    inline static void setDropAct(bool v)
+    { _dropact = v; }
+    inline static bool getDropAct()
+    { return _dropact; }
     inline static void setWansheng(bool v)
     { _wansheng= v; }
     inline static bool getWansheng()
@@ -1250,6 +1254,7 @@ public:
     static bool _june1;
     static bool _july;
     static bool _qixi;
+    static bool _dropact;
     static bool _wansheng;
     static bool _qingren;
     static bool _specialbook;
