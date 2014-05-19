@@ -54,9 +54,9 @@ qixitmpl:addLBAwards(99, 1325, 5)
 
 
 -- 蜀山之恋
-qixitmpl:setQixiItem(9450)
+qixitmpl:setQixiItem(16016)
 -- 称号卡
-qixitmpl:setTitleItem(9932)
+qixitmpl:setTitleItem(9975)
 -- 分手提示信息编码
 qixitmpl:setDivorceMsgCode(1035)
 qixitmpl:setRoamingFunc("onRoamingQueqiao")
@@ -66,12 +66,12 @@ qixitmpl:setScoreContent(4067)
 qixitmpl:setMinAwardScore(50)
 -- 1000分：五行精金(515)x7，凝神易筋丹(509)x7，补髓益元丹(507)x7
 qixitmpl:addScoreAwards(1000, 515, 7)
-qixitmpl:addScoreAwards(1000, 509, 7)
+qixitmpl:addScoreAwards(1000, 9498, 10)
 qixitmpl:addScoreAwards(1000, 134, 7)
 -- 800分：橙色星辰旗(1126)x7，仙缘石(9371)x7,高级打孔石(512)x7
 qixitmpl:addScoreAwards(800, 1126, 7)
-qixitmpl:addScoreAwards(800, 9418, 7)
-qixitmpl:addScoreAwards(800, 503, 7)
+qixitmpl:addScoreAwards(800, 16001, 7)
+qixitmpl:addScoreAwards(800, 9457, 7)
 -- 600分：洗炼符(500)x7，中级打孔石(511)x7，法灵结晶(133)x7
 qixitmpl:addScoreAwards(600, 501, 5)
 qixitmpl:addScoreAwards(600, 512, 7)
@@ -94,16 +94,34 @@ qixitmpl:setLBTitle(4056)
 qixitmpl:setLBContent(4057)
 qixitmpl:setMaxLBAwardPos(99)
 -- 第1名：对应性别称号卡（男：迢迢牵牛星，女：皎皎河汉女），技能符文熔炼诀(1325)x30
-qixitmpl:addLBAwards(1, 9932, 1)
-qixitmpl:addLBAwards(1, 1325, 30)
+qixitmpl:addLBAwards(1, 9975, 1)
+qixitmpl:addLBAwards(1, 9498, 30)
+qixitmpl:addLBAwards(1, 515, 25)
+qixitmpl:addLBAwards(1, 134, 30)
+qixitmpl:addLBAwards(1, 16001, 30)
 -- 第2名：技能符文熔炼诀(1325)x25
-qixitmpl:addLBAwards(2, 1325, 25)
+qixitmpl:addLBAwards(2, 9498, 25)
+qixitmpl:addLBAwards(2, 515, 20)
+qixitmpl:addLBAwards(2, 134, 25)
+qixitmpl:addLBAwards(2, 16001, 25)
 -- 第3名：技能符文熔炼诀(1325)x20
-qixitmpl:addLBAwards(3, 1325, 20)
+qixitmpl:addLBAwards(3, 9498, 20)
+qixitmpl:addLBAwards(3, 515, 15)
+qixitmpl:addLBAwards(3, 134, 20)
+qixitmpl:addLBAwards(3, 16001, 20)
 -- 第4-10名：技能符文熔炼诀(1325)x15
-qixitmpl:addLBAwards(10, 1325, 15)
+qixitmpl:addLBAwards(10, 9498, 10)
+qixitmpl:addLBAwards(10, 515, 8)
+qixitmpl:addLBAwards(10, 134, 10)
+qixitmpl:addLBAwards(10, 16001, 10)
 -- 第11-49名：技能符文熔炼诀(1325)x10
-qixitmpl:addLBAwards(49, 1325, 10)
+qixitmpl:addLBAwards(49, 9498, 8)
+qixitmpl:addLBAwards(49, 515, 5)
+qixitmpl:addLBAwards(49, 134, 8)
+qixitmpl:addLBAwards(49, 16001, 8)
 -- 第50-99名：技能符文熔炼诀(1325)x5
-qixitmpl:addLBAwards(99, 1325, 5)
+qixitmpl:addLBAwards(99, 9498, 5)
+qixitmpl:addLBAwards(99, 515, 3)
+qixitmpl:addLBAwards(99, 134, 5)
+qixitmpl:addLBAwards(99, 16001, 5)
 

@@ -291,6 +291,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear651.sql     #清空VAR651(大转盘)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_card.sql     #创建卡牌系统
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140510_1.sql     #创建帮派篝火
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_qixi.sql
 }
 
 #sh player_jiguan.sh
