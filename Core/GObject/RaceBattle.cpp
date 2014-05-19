@@ -128,7 +128,7 @@ namespace GObject
         }
     }
 
-    void RaceBattle::enterPos(Player* pl, UInt8 offset)
+    void RaceBattle::enterPos(Player* pl, UInt8 offset, bool fromServer)
     {
         UInt8 origPos = pl->getRaceBattlePos();
         UInt8 level = origPos / 10;
@@ -183,7 +183,7 @@ namespace GObject
             //if((origPos % 10) != 0)
             //    return;
             //    eraseLevelStarSort(pl, level);
-            if(level == 6)
+            if(level == 6 && fromServer)
                 insertLevelStarSort(pl, level);
         }
         else if((origPos % 10) == 0)
@@ -193,7 +193,6 @@ namespace GObject
         else
         {
         }
-
 
         UInt8 page = pl->getContinueWinPage();
         sendContinueWinSort(pl, page);
@@ -244,7 +243,7 @@ namespace GObject
         UInt8 awardlevel = pl->getAwardLevel();
         UInt8 pos = pl->getRaceBattlePos();
         UInt8 level = pos / 10;
-        if(awardlevel < 2 || awardlevel > 6 || awardlevel <= level)
+        if(awardlevel < 2 || awardlevel > 6 || awardlevel > level)
             return;
 #if 0
         UInt8 index = level - 3;
@@ -284,7 +283,10 @@ namespace GObject
                 pl->GetPackage()->Add(9457, awardlevel - 3, true, false);
             }
         }
-        pl->getAchievement(100 * (awardlevel - 1));
+        UInt32 achievement = 100 * (awardlevel - 1);
+        if(awardlevel == 6)
+            achievement += 100;
+        pl->getAchievement(achievement);
 
         ++awardlevel;
         pl->setAwardLevel(awardlevel);
@@ -811,8 +813,9 @@ namespace GObject
         if(!pl)
             return;
         pl->setExitCd(TimeUtil::Now() + 20);
+        eraseContinueWinSort(pl);
         pl->setContinueWinCnt(0);
-        eraseLevelStarSort(pl, pl->getRaceBattlePos() / 10);
+        //eraseLevelStarSort(pl, pl->getRaceBattlePos() / 10);
     }
 
     void RaceBattle::attackLevelPlayer(Player* pl, UInt64 defenderId)
@@ -885,7 +888,9 @@ namespace GObject
             UInt8 pos = level * 10;
             pl->setRaceBattlePos(pos);
             pl->setContinueLoseCnt(0);
-            enterPos(pl, 0);
+            if(starCnt > rb->next * 2)
+                pl->setStarTotal(rb->next * 2);
+            enterPos(pl, 0, true);
         }
         else
         {
@@ -988,7 +993,9 @@ namespace GObject
             UInt8 pos = level * 10;
             pl->setRaceBattlePos(pos);
             pl->setContinueLoseCnt(0);
-            enterPos(pl, 0);
+            if(starCnt > rb->next * 2)
+                pl->setStarTotal(rb->next * 2);
+            enterPos(pl, 0, true);
         }
         else
         {

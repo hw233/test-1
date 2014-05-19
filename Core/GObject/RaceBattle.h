@@ -30,7 +30,7 @@ class RaceBattle : public Singleton<RaceBattle>
         void sendRBStatus(Player* pl);
         void raceBattleCheck();
         UInt16 getLocation() { return RACEBATTLE_LOCATION; }
-        void enterPos(Player* pl, UInt8 pos);
+        void enterPos(Player* pl, UInt8 pos, bool fromServer = false);
         void autoBattle(Player* pl);
         void cancelBattle(Player* pl);
         void freshContinueWinRank(Player* pl);
