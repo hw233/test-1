@@ -25332,6 +25332,23 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             }
         }
     }
+    if(World::getDropAct())
+    {
+        if(flag == e_sla_none)
+        {
+            GetPackage()->Add(1527, 1, true, false, FromNpc);
+        }
+        else
+        {
+            UInt32 status = GetVar(VAR_DROP_ACT);
+            if(!(status & flag))
+            {
+                GetPackage()->Add(1527, 1, true, false, FromNpc);
+                status |= flag;
+                SetVar(VAR_DROP_ACT, status);
+            }
+        }
+    }
     if (WORLD().getQixi())
     {
         if (flag == e_sla_hi || flag == e_sla_mr)

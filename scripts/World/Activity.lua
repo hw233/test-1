@@ -1130,6 +1130,12 @@ function onActivityCheck(tm)
           setHalloweenAct(false)
       end
 
+      if tm >= actTimeq1 and tm < actTimeq1_1 then
+          setDropAct(true)
+      else
+          setDropAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -1369,7 +1375,7 @@ function initActTime(y, m, d)
   local  SerStartTm201= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 七夕
-  local  SerStartTm202= { ['year'] = 2014, ['month'] = 2, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm202= { ['year'] = 2014, ['month'] = 6, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --商城消费大酬宾(9/18-9/24)
   local  SerStartTm210= { ['year'] = 2012, ['month'] = 9, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 中秋国庆
@@ -1511,6 +1517,8 @@ function initActTime(y, m, d)
 
   local  SerStartTm257= { ['year'] = 2014, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm257_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  local  SerStartTmq1= { ['year'] = 2014, ['month'] = 6, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1997,6 +2005,9 @@ function initActTime(y, m, d)
 
   actTime_2013_1 = os.time(SerStartTm_2013_1);
   actTime_2013_1_1 = os.time(SerStartTm_2013_1) + 7*86400;
+
+  actTimeq1= os.time(SerStartTmq1)
+  actTimeq1_1= os.time(SerStartTmq1) + 86400;
 
   onActivityCheck(os.time() + 30);
 

@@ -694,7 +694,7 @@ void BattleSimulator::start(UInt8 prevWin, bool checkEnh)
     UInt32 oldAttackRount = _attackRound;
     if(_winner == 0)
         appendAttackRoundChange();
-    while(_winner == 0 && act_count < _fake_turns)
+    while(_winner == 0 && /*act_count < _fake_turns*/_attackRound < 100)
     {
         int pos = findFirstAttacker();
 
