@@ -313,7 +313,6 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
     if(pl->checkClientIP())
         pl->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
-    //pl->getSurnameLegendAward(e_sla_worldboss);
     return res;
 }
 

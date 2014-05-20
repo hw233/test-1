@@ -25317,7 +25317,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
             GetPackage()->AddItem(16010, 1, true, false, FromNpc);
         }
-        else/* if(flag != e_sla_worldboss)*/
+        else
         {
             UInt32 status = GetVar(VAR_SURNAME_LEGEND_STATUS);
             if(!(status & flag))
@@ -25351,7 +25351,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
     }
     if (WORLD().getQixi())
     {
-        if (flag == e_sla_hi || flag == e_sla_mr/* || flag == e_sla_worldboss*/)
+        if (flag == e_sla_hi || flag == e_sla_mr)
             return;
         if(flag == e_sla_none)
         {
