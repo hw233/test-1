@@ -874,52 +874,6 @@ void SendRechargeRank(Stream& st)
     SyncToLogin4IDIP();
 }
 
-void SetAnswerRank( GameMsgHdr& hdr,  const void* data )
-{
-    World::initRCRank();
-    using namespace GObject;
-    MSG_QUERY_PLAYER(player);
-
-    UInt32 total = *(UInt32*)data;
-    if(!total)
-        return;
-
-    for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
-    {
-        if(i->player == player)
-        {
-            World::answerScoreSort.erase(i);
-            break;
-        }
-    }
-
-    RCSort s;
-    s.player = player;
-    s.total = total;
-    World::answerScoreSort.insert(s);
-}
-void OnsendAnswerStatus( GameMsgHdr& hdr,  const void* data )
-{
-    using namespace GObject;
-    MSG_QUERY_PLAYER(player);
-
-    UInt8 mark = 0;
-    if(World::getPrepareTime())
-        mark = 1;
-    else if(World::getAnswerTime())
-        mark = 2;
-
-    if(1==mark || 2==mark)
-    {
-        Stream st(REP::ACT);
-        st << static_cast<UInt8>(0x32);
-        st << static_cast<UInt8>(0x00);
-        st << mark;
-        st << Stream::eos;
-        player->send(st);
-    }
-}
-
 void SetAnswerSkill( GameMsgHdr& hdr,  const void* data )
 {
     World::initRCRank();
@@ -956,6 +910,31 @@ void SetAnswerSkill( GameMsgHdr& hdr,  const void* data )
         iter2 = iter;
         iter++;
     }
+}
+
+void SetAnswerRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *(UInt32*)data;
+    if(!total)
+        return;
+
+    for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
+    {
+        if(i->player == player)
+        {
+            World::answerScoreSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::answerScoreSort.insert(s);
 }
 
 void SendAnswerRank( GameMsgHdr& hdr,  const void* data )
@@ -1000,8 +979,8 @@ void SendAnswerRank( GameMsgHdr& hdr,  const void* data )
     UInt32 mark = 0;
     UInt32 c1 = 0;
     UInt32 c2 = 0;
-    if(myRank > 5)
-        mark = myRank - 5;
+    if(myRank > 3)
+        mark = myRank - 3;
 
     for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
     {
@@ -1014,7 +993,7 @@ void SendAnswerRank( GameMsgHdr& hdr,  const void* data )
                 st << i->player->getName();
                 st << static_cast<UInt16>(i->total);
                 c2++;
-                if(c2 >= 5)
+                if(c2 >= 3)
                     break;
             }
         }
@@ -2824,6 +2803,7 @@ void OnSendAnswerBegin(GameMsgHdr& hdr,  const void* data )
 
         Stream st(REP::ACT);
         st << static_cast<UInt8>(0x32);
+        st << static_cast<UInt8>(0x00);
         st << mark;
         st << Stream::eos;
         player->send(st);

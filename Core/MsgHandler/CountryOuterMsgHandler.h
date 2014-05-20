@@ -1424,7 +1424,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
 
     {
-        GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);
+        GameMsgHdr hdr(0x168, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
 
@@ -1471,7 +1471,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
 
     {
-        GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
+        GameMsgHdr hdr(0x193, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
 

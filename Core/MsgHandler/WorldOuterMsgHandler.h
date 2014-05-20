@@ -3354,7 +3354,10 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     {
                         UInt8 skillId = 0;
                         UInt64 otherId = 0;
-                        brd >> skillId >> otherId;
+                        brd >> skillId;
+                        if(ANSWER_SKILL_D == skillId || ANSWER_SKILL_E == skillId)
+                            brd >> otherId;
+
                         answerManager->UseSkill(player, skillId, UInt64 otherId);                 
                     }
                     break;

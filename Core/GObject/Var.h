@@ -742,8 +742,9 @@ namespace GObject
         VAR_ANSWER_SUCCESSION_NUM = 791,         //一战成名连击数量
         VAR_ANSWER_ATTACK_NUM = 792,             //一战成名天眼通数量
         VAR_ANSWER_SKILL_STATUS = 793,           //一战成名技能状态 (每5位表示一种技能状态)
-        VAR_ANSWER_SKILL_MARK = 794,             //一战成名本题所用技能标志 (每1位表示一种技能使用标记)
+        VAR_ANSWER_SKILL_MARK = 794,             //一战成名本题所用技能标志 (每1位表示一种技能在本题中是否使用)
         VAR_ANSWER_SKILL_USE_NUM = 795,          //一战成名技能使用数量 (每2位表示一种技能已使用数量)
+        VAR_ANSWER_QUESTIONS_SUCCORFAIL = 796,   //一战成名回答问题成功失败（1-30位每一位代表是否回答成功该道题）
         VAR_MAX,
     };
 
@@ -1383,6 +1384,7 @@ namespace GObject
             REGISTER_VAR(VAR_ANSWER_SKILL_STATUS, CYCLE_DAY);
             REGISTER_VAR(VAR_ANSWER_SKILL_MARK, CYCLE_DAY);
             REGISTER_VAR(VAR_ANSWER_SKILL_USE_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_QUESTIONS_SUCCORFAIL, CYCLE_DAY);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);

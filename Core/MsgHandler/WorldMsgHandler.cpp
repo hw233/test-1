@@ -115,7 +115,6 @@ MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 MSG_REG_2(GameMsgHdr, 0x166, OnSetTYSSScore);
 MSG_REG_2(GameMsgHdr, 0x167, OnAddTYSSSum);
-MSG_REG_2(GameMsgHdr, 0x168, OnsendAnswerStatus);
 
 MSG_REG_2(GameMsgHdr, 0x171, OnClanTakeRewardResultReq);
 MSG_REG_2(GameMsgHdr, 0x172, OnTeamArenaAddMember);

@@ -56,6 +56,7 @@
 #include "GObject/TeamCopy.h"
 #include "GObject/PetTeamCopy.h"
 #include "GObject/KangJiTianMo.h"
+#include "GObject/Answer.h"
 #include "ActivityMgr.h"
 #include "HoneyFall.h"
 #include "TownDeamon.h"
@@ -504,18 +505,6 @@ namespace GObject
         if(!loadQuestions())
         {
             fprintf(stderr, "loadQuestions error!\n");
-            std::abort();
-        }
-
-        if(!loadAnswerEnd())
-        {
-            fprintf(stderr, "loadAnswerEnd error!\n");
-            std::abort();
-        }
-
-        if(!loadAnswerNum())
-        {
-            fprintf(stderr, "loadAnswerNum error!\n");
             std::abort();
         }
 
@@ -6391,7 +6380,7 @@ namespace GObject
 		{
 			lc.advance();
             if(data.answerId > 0)
-                answerManager->AddQuestionsFromDB(answerId, questionsId);
+                answerManager->AddQuestionsFromDB(data.answerId, data.questionsId);
 		}
 		lc.finalize();
 

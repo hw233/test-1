@@ -1,11 +1,13 @@
 #include "Answer.h"
-#include "GObject/World.h"
 #include "MsgID.h"
+#include "Package.h"
+#include "GVar.h"
 #include "Common/URandom.h"
 #include "Server/SysMsg.h"
-#include "Common/Itoa.h"
-#include "NewQuestionsTable.h"
-#include "GVar.h"
+#include "GData/NewQuestionsTable.h"
+#include "Common/Stream.h"
+#include "GObject/World.h"
+
 namespace GObject
 {
     Answer* answerManager = new Answer();
@@ -43,9 +45,14 @@ namespace GObject
         m_answer[answerId-1] = questionsId;
     }
 
+    void Answer::InitAnswerId(UInt8 answerId)
+    {
+        m_answerId = answerId;
+    }
+
     void Answer::SendAnswerInfo(Player* pl)
     {
-        GData::NewQuestionsData::newquestionsInfo * info = GData::newquestionsData.getNewQuestionsInfo(m_answer[m_answerEnd.answerId]);
+        GData::NewQuestionsData::newquestionsInfo * info = GData::newquestionsData.getNewQuestionsInfo(m_answer[m_answerId]);
         if(NULL == info)
             return;
 
@@ -54,11 +61,6 @@ namespace GObject
         st << static_cast<UInt8>(0x02);
 
         UInt32 nowTime = TimeUtil::Now();
-        UInt32 time = TimeUtil::SharpDayT(0, nowTime);
-        if(World::getPrepareTime())
-        {
-        }
-    
         UInt32 endTime = 0;
         UInt32 awardTime = 0;
         if(World::getAnswerTime())
@@ -70,7 +72,7 @@ namespace GObject
         }
 
         st << endTime;
-        st << m_answerEnd.answerId;
+        st << m_answerId;
         st << static_cast<UInt8>(info->answer);
         st << m_answerNum.retANum;
         st << m_answerNum.retBNum;
@@ -79,7 +81,7 @@ namespace GObject
 
         UInt32 qStatus = pl->GetVar(VAR_ANSWER_QUESTIONS_STATUS);
         UInt8 ret = 0;
-        if(1 == GET_BIT(qStatus, (m_answerEnd.answerId)))
+        if(1 == GET_BIT(qStatus, (m_answerId)))
         {
             if(0 == GET_BIT(qStatus, 0))
                 ret = 1;
@@ -104,7 +106,7 @@ namespace GObject
         for(UInt8 i=0; i<5; i++)
         {
             UInt8 id = GET_BIT_5(skillStatus, i);
-            if(id == m_answerEnd.answerId)
+            if(id == m_answerId)
             {
                 st << static_cast<UInt8>(i+1);
                 countA++;
@@ -117,7 +119,7 @@ namespace GObject
         for(UInt8 i=0; i<5; i++)
         {
             UInt8 num = GET_BIT_2(skillNum, i);
-            UInt8 mark = GET_BIT(skillNum, i);
+            UInt8 mark = GET_BIT(useMark, i);
             st << static_cast<UInt8>(i+1);
             st << static_cast<UInt8>(3-num);
             st << static_cast<UInt8>(mark);
@@ -132,20 +134,25 @@ namespace GObject
             else
                 countB = iter->second.size();
             st << countB;
-            for(UInt8 m=0; m<countB; m++)
+
+            UInt8 countC = 0;
+            std::list<answerLog>::iterator iterA = iter->second.begin();
+            for(iterA; iterA != iter->second.end()&&countC<10; ++iterA)
             {
-                answerLog log = iter->second[m];
-                if(1 == logType)
+                answerLog& log = (*iterA);
+                if(1 == log.logType)
                     st << log.logType << log.skillId;
-                if(2 == logType || 3 == logType)
+                if(2 == log.logType || 3 == log.logType)
                     st << log.logType << log.skillId << log.name;
-                else if(4 == logType)
+                else if(4 == log.logType)
                     st << log.answerId << log.value << log.ret;
+
+                countC++;
             }
         }
 
         st << Stream::eos;
-        player->send(st);
+        pl->send(st);
     }
             
     void Answer::SelectAnswer(Player* pl, UInt8 opt)
@@ -180,7 +187,7 @@ namespace GObject
             break;
         }
 
-        GData::NewQuestionsData::newquestionsInfo * info = GData::newquestionsData.getNewQuestionsInfo(m_answer[m_answerEnd.answerId]);
+        GData::NewQuestionsData::newquestionsInfo * info = GData::newquestionsData.getNewQuestionsInfo(m_answer[m_answerId]);
         if(NULL == info)
             return;
 
@@ -189,13 +196,15 @@ namespace GObject
         {
             status = SET_BIT(status, 0);
             pl->AddVar(VAR_ANSWER_SUCCESSION_NUM, 1);
+            UInt32 succorfail = pl->GetVar(VAR_ANSWER_QUESTIONS_SUCCORFAIL);
+            succorfail = SET_BIT(succorfail, m_answerId);
+            pl->SetVar(VAR_ANSWER_QUESTIONS_SUCCORFAIL, succorfail);
         }
         else
             pl->SetVar(VAR_ANSWER_SUCCESSION_NUM, 0);
 
-        status = SET_BIT(status, m_answerEnd.answerId);
+        status = SET_BIT(status, m_answerId);
         pl->SetVar(VAR_ANSWER_QUESTIONS_STATUS, status);
-        m_answerEnd.ret = opt;
     }
 
     void Answer::AnswerEnd(Player* pl)
@@ -204,13 +213,13 @@ namespace GObject
             return;
 
         UInt32 status = pl->GetVar(VAR_ANSWER_QUESTIONS_STATUS);
-        UInt8 mark = GET_BIT(status, m_answerEnd.answerId);
+        UInt8 mark = GET_BIT(status, m_answerId);
         if(1 == mark)
         {
             UInt8 awardA[5] = {8, 10, 12, 16, 20};
             UInt8 awardB[5] = {10, 20, 30, 40, 50};
 
-            GData::NewQuestionsData::newquestionsInfo * info = GData::newquestionsData.getNewQuestionsInfo(m_answer[m_answerEnd.answerId]);
+            GData::NewQuestionsData::newquestionsInfo * info = GData::newquestionsData.getNewQuestionsInfo(m_answer[m_answerId]);
             if(NULL == info)
                 return;
             
@@ -241,6 +250,7 @@ namespace GObject
                     case 5:
                         {
                             value += value * 0.2;  
+                            SYSMSG_BROADCASTV(5134, pl->getCountry(), pl->getName().c_str());
                         }
                         break;
                     case 7:
@@ -251,17 +261,27 @@ namespace GObject
                     case 10:
                         {
                             value += value * 0.5;  
+                            SYSMSG_BROADCASTV(5135, pl->getCountry(), pl->getName().c_str());
                         }
                         break;
                     case 15:
                         {
                             value += value;  
+                            SYSMSG_BROADCASTV(5136, pl->getCountry(), pl->getName().c_str());
+                        }
+                        break;
+                     case 20:
+                        {
+                            SYSMSG_BROADCASTV(5142, pl->getCountry(), pl->getName().c_str());
                         }
                         break;
                 }
+                if(num>15 && num<=30)
+                    value += value;
+
                 UInt32 skillStatus = pl->GetVar(VAR_ANSWER_SKILL_STATUS);
                 UInt8 special = GET_BIT_5(skillStatus, 1);
-                if(m_answerEnd.answerId == special) //幸运之星技能
+                if(m_answerId == special) //幸运之星技能
                 {
                     value += value;
                     exp += exp;
@@ -270,9 +290,6 @@ namespace GObject
                 }
                 pl->AddVar(VAR_ANSWER_LITERARY_VALUE, value);
                 m_answerEnd.valueA = value;
-                UInt32 score = pl->GetVar(VAR_ANSWER_LITERARY_VALUE);
-                GameMsgHdr hdr(0x194, WORKER_THREAD_WORLD, pl, sizeof(score));
-                GLOBAL().PushMsg(hdr, &score);
                 ret = 1;
             }
             else
@@ -288,9 +305,13 @@ namespace GObject
             m_answerEnd.valueC = pexp;
             m_answerEnd.valueD = awardA[lvl];
 
+            UInt32 score = pl->GetVar(VAR_ANSWER_LITERARY_VALUE);
+            GameMsgHdr hdr(0x194, WORKER_THREAD_WORLD, pl, sizeof(score));
+            GLOBAL().PushMsg(hdr, &score);
+
             answerLog log;
             log.logType = 4;
-            log.answerId = m_answerEnd.answerId;
+            log.answerId = m_answerId;
             log.value = value;
             log.ret = ret;
             std::map<UInt64, std::list<answerLog>>::iterator iter = m_playerAnswerLog.find(pl->getId());
@@ -307,11 +328,10 @@ namespace GObject
 
     void Answer::AwardEnd(Player* pl)
     {
-        if(m_answerEnd.answerId >= 30)
+        if(m_answerId >= 30)
             return;
 
-        m_answerEnd.answerId++;
-        m_answerEnd.ret = 0;
+        m_answerId++;
         m_answerEnd.valueA = 0;
         m_answerEnd.valueB = 0;
         m_answerEnd.valueC = 0;
@@ -320,41 +340,10 @@ namespace GObject
         UInt32 status = pl->GetVar(VAR_ANSWER_QUESTIONS_STATUS);
         status = CLR_BIT(status, 0);
         pl->SetVar(VAR_ANSWER_QUESTIONS_STATUS, status);
-    }
-    
-    void Answer::AllAnswerEnd(Player* pl)
-    {
-        UInt8 sMark = 0;
-        UInt8 fMark = 0;
-        UInt8 cMark = 0;
-        Uint8 mMark = 0;
-        UInt32 status = pl->GetVar(VAR_ANSWER_QUESTIONS_STATUS);
-        for(UInt8 i=1; i<=30; i++)
-        {
-            UInt8 mark = GET_BIT(status, i);
-            if(1 == mark)
-            {
-                sMark++;
-                cMark++;
-            }
-            else
-            {
-                fMark++;
-                if(cMark > mMark)
-                    mMark = cMark; 
-                cMark=0;
-            }
-        }
-        Stream st(REP::ACT);
-        st << static_cast<UInt8>(0x32);
-        st << static_cast<UInt8>(0x03);
-        st << sMark << fMark << cMark;
-        st << static_cast<UInt16>(pl->GetVar(VAR_ANSWER_LITERARY_VALUE));
-        st << Stream::eos;
-        player->send(st);
+        SendAnswerInfo(pl);
     }
 
-    void Answer::UseSkill(Player* pl, skillId, UInt64 otherId)
+    void Answer::UseSkill(Player* pl, UInt8 skillId, UInt64 otherId)
     {
         if(NULL == pl)
             return;
@@ -373,8 +362,8 @@ namespace GObject
         if(1 == mark)
             return;
 
-        UInt8 id = m_answerEnd.answerId;
-        UInt8 nextId = m_answerEnd.answerId + 1;
+        UInt8 id = m_answerId;
+        UInt8 nextId = m_answerId + 1;
 
         UInt32 skillStatus = pl->GetVar(VAR_ANSWER_SKILL_STATUS);
         UInt8 qId = GET_BIT_5(skillStatus, pos);
@@ -443,29 +432,29 @@ namespace GObject
             logA.logType = 2;
             logA.skillId = skillId;
             logA.name = other->getName();
-            std::map<UInt64, std::list<answerLog>>::iterator iter = m_playerAnswerLog.find(other->getId());
-            if(iter == m_playerAnswerLog.end())
+            std::map<UInt64, std::list<answerLog>>::iterator iterA = m_playerAnswerLog.find(other->getId());
+            if(iterA == m_playerAnswerLog.end())
             {
                 std::list<answerLog> _answerLog;
                 _answerLog.push_front(logA);
                 m_playerAnswerLog.insert(std::make_pair(other->getId(), _answerLog));
             }
             else
-                iter->second.push_front(logA);
+                iterA->second.push_front(logA);
 
             answerLog logB;
             logB.logType = 3;
             logB.skillId = skillId;
-            logB.name = player->getName();
-            std::map<UInt64, std::list<answerLog>>::iterator iter = m_playerAnswerLog.find(pl->getId());
-            if(iter == m_playerAnswerLog.end())
+            logB.name = pl->getName();
+            std::map<UInt64, std::list<answerLog>>::iterator iterB = m_playerAnswerLog.find(pl->getId());
+            if(iterB == m_playerAnswerLog.end())
             {
                 std::list<answerLog> _answerLog;
                 _answerLog.push_front(logB);
                 m_playerAnswerLog.insert(std::make_pair(pl->getId(), _answerLog));
             }
             else
-                iter->second.push_front(logB);
+                iterB->second.push_front(logB);
         }
    }
 }

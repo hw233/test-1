@@ -4031,6 +4031,30 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         return;
     }
+    else if (type == 21 && begin <= end )
+    {
+        /*curType = 21;
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_ANSWER_PREPARE_DAY, begin);
+        GObject::GVAR.SetVar(GObject::GObject::GVAR_ANSWER_END_DAY, end);
+
+        UInt32 valueTime = 0;
+        UInt32 nowTime = TimeUtil::Now();
+        if(nowTime < GObject::GVAR.GetVar(GObject::GVAR_ANSWER_PREPARE_DAY))
+            valueTime = GObject::GVAR.GetVar(GObject::GVAR_ANSWER_PREPARE_DAY) / (15 * 60) * (15 * 60) + 900;
+        else
+            valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
+
+        GObject::GVAR.SetVar(GObject::GVAR_DUOBAO_ENDTIME, valueTime);
+
+        return;*/
+    }
 
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;

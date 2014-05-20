@@ -1406,6 +1406,7 @@ private:
     static void ClanStatueCheck(void *);
     static void ClanDuoBaoCheck(void *);
     static void SendPopulatorRankAward(void*);
+    static void AnswerCheck(void *);
     //static void advancedHookTimer(void *para);
 public:
 	static void ReCalcWeekDay( World * );
@@ -1465,6 +1466,8 @@ public:
     void SendGuankaActAward();
     void SendTYSSClanAward();
     void SendTYSSPlayerAward();
+    void SendAllAnswerEnd();
+    void SendAnswerAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

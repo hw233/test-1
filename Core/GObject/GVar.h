@@ -153,7 +153,7 @@ namespace GObject
 
         GVAR_ANSWER_ENDTIME = 95,       // 答题每轮结束时间
         GVAR_ANSWER_AWARDTIME = 96,     // 答题每轮结算时间
-        GVAR_ANSWER_BEGIN_DAY = 97,     // 答题每天准备时间
+        GVAR_ANSWER_PREPARE_DAY = 97,   // 答题每天准备时间
         GVAR_ANSWER_BEGIN_DAY = 98,     // 答题每天开始时间
         GVAR_ANSWER_END_DAY = 99,       // 答题每天结束时间
 
@@ -258,7 +258,7 @@ namespace GObject
             GREGISTER_VAR(GVAR_MAX_TEAM_NUM, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_ANSWER_ENDTIME, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_ANSWER_AWARDTIME, GCYCLE_NONE);
-            GREGISTER_VAR(GVAR_ANSWER_PREPARE_DAY, GCYCLE_NONE);
+            //GREGISTER_VAR(GVAR_ANSWER_PREPARE_DAY, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_ANSWER_BEGIN_DAY, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_ANSWER_END_DAY, GCYCLE_NONE);
 

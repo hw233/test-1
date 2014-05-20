@@ -63,6 +63,7 @@
 #include "RechargeTmpl.h"
 #include "GVar.h"
 #include "Package.h"
+#include "Answer.h"
 
 static const UInt32 DAYSRANKTM = 23 * 3600+50*60;
 
@@ -2237,8 +2238,19 @@ inline bool enum_answer_send(GObject::Player* player, UInt8 mark)
     if(player == NULL || !player->isOnline())
         return true;
 
+    UInt8 status = 0;
     switch(mark)
     {
+        case 1:
+            {
+                status = 1;
+            }
+            break;
+        case 2:
+            {
+                status = 2;
+            }
+            break;
         case 3:
             {
                 answerManager->AnswerEnd(player);
@@ -2251,17 +2263,17 @@ inline bool enum_answer_send(GObject::Player* player, UInt8 mark)
             break;
         case 5:
             {
-                answerManager->AllAnswerEnd(player);
+                status = 3;
             }
             break;
     }
 
-    if(1 == mark || 2 == mark)
+    if(1 == mark || 2 == mark || 5 == mark)
     {
         Stream st(REP::ACT);
         st << static_cast<UInt8>(0x32);
         st << static_cast<UInt8>(0x00);
-        st << mark;
+        st << status;
         st << Stream::eos;
         player->send(st);
     }
@@ -2285,6 +2297,18 @@ void World::AnswerCheck(void *)
     {
         if(!_answerOpenB)
         {
+            UInt8 answerId = 0;
+            UInt32 temp = GVAR.GetVar(GVAR_ANSWER_END_DAY) - nowTime;
+            if(0 == temp % 30)
+                answerId = 30 - temp / 30 + 1;
+            else
+                answerId = 30 - temp / 30;
+
+            if(answerId > 30)
+                answerId = 30;
+
+            answerManager->InitAnswerId(answerId);
+
             GObject::globalPlayers.enumerate(enum_answer_send, 2);
             _answerOpenB = true;
         }
@@ -2317,6 +2341,9 @@ void World::AnswerCheck(void *)
                     _answerOpenA = false;
                 if(_answerOpenB)
                     _answerOpenB = false;
+
+                world->SendAnswerAward();
+                world->SendAllAnswerEnd();
 
                 GObject::globalPlayers.enumerate(enum_answer_send, 5);
             }
@@ -4116,20 +4143,119 @@ void World::SendQiShiBanAward()
     World::qishibanScoreSort.clear();
 }
 
+void World::SendAllAnswerEnd()
+{
+    World::initRCRank();
+
+    UInt8 tMark = 0;
+    UInt8 sMark = 0;
+    UInt8 fMark = 0;
+    UInt8 cMark = 0;
+    UInt8 mMark = 0;
+    UInt32 rank = 0;
+
+    for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
+    {
+        Player* pl = i->player;
+        if(NULL == pl)
+            continue;
+
+        rank++;
+        UInt32 status = pl->GetVar(VAR_ANSWER_QUESTIONS_STATUS);
+        UInt32 succorfail = pl->GetVar(VAR_ANSWER_QUESTIONS_SUCCORFAIL);
+        for(UInt8 i=1; i<=30; i++)
+        {
+            UInt8 mark = GET_BIT(succorfail, i);
+            if(1 == mark)
+            {
+                sMark++;
+                cMark++;
+            }
+            else
+            {
+                fMark++;
+                if(cMark > mMark)
+                    mMark = cMark; 
+                cMark=0;
+            }
+
+            UInt8 markA = GET_BIT(status, i);
+            if(1 == markA)
+                tMark++;
+        }
+        
+        Stream st(REP::ACT);
+        st << static_cast<UInt8>(0x32);
+        st << static_cast<UInt8>(0x03);
+        st << tMark << sMark << fMark << mMark;
+        st << static_cast<UInt16>(i->total);
+        st << static_cast<UInt32>(rank);
+        st << Stream::eos;
+        pl->send(st);
+    }
+}
+
 void World::SendAnswerAward()
 {
     World::initRCRank();
-    int pos = 0;
 
-    for (RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
+    static  MailPackage::MailItem s_item[][3] = {
+            {{0xA000,200},{16013,1}},
+            {{0xA000,150},{16014,1}},
+            {{0xA000,100},{16015,1}}
+        };
+
+    static MailPackage::MailItem c_item[1] = {{0xA000, 88}};
+
+    int rank = 0;
+    for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
     {
-        Player* player = i->player;
-        if (!player)
+        Player* pl = i->player;
+        if(NULL == pl)
             continue;
-        ++pos;
-        if(pos > 7) break;
+
+        rank++;
+        SYSMSG(title, 5140);
+        SYSMSGV(content, 5141, i->total, rank);
+        Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            if(rank>=1 && rank<=3)
+            {
+                UInt16 pTitle = 0;
+                UInt16 ach = 0;
+                if(1 == rank)
+                {
+                    pTitle = 207;
+                    ach = 666;
+                    SYSMSG_BROADCASTV(5137, pl->getCountry(), pl->getName().c_str(), i->total);
+                }
+                else if(2 == rank)
+                {
+                    pTitle = 208;
+                    ach = 450;
+                    SYSMSG_BROADCASTV(5138, pl->getCountry(), pl->getName().c_str(), i->total);
+                }
+                else
+                {
+                    pTitle = 209;
+                    ach = 300;
+                    SYSMSG_BROADCASTV(5139, pl->getCountry(), pl->getName().c_str(), i->total);
+                }
+
+                pl->getAchievement(ach);
+                pl->setTitle(pTitle, 3600 * 24);
+                mailPackageManager.push(mail->id, s_item[rank-1], 2, true);
+            }
+            else if(rank>=4 && rank<=7)
+            {
+                pl->getAchievement(250);
+                mailPackageManager.push(mail->id, c_item, 1, true);
+            }
+        }
+        if(rank >= 7)
+            break;
     }
-    World::answerScoreSort.clear();
 }
 
 void World::Send11ClanRankAward()
