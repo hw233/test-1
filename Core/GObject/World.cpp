@@ -2948,7 +2948,7 @@ void World::SendQixiAward()
                         bool bind = true;
                         if(mitems[i].id == qixiTmpl._titleItem)
                         {
-                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F);
+                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F) * 2;
                             bind = false;
                         }
                         else
