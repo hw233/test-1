@@ -48,6 +48,7 @@
 #include "CoupleCopy.h"
 #include "LingShiTable.h"
 #include "CardSystem.h"
+#include "NewQuestionsTable.h"
 
 namespace GData
 {

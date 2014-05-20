@@ -1000,7 +1000,7 @@ void SendAnswerRank( GameMsgHdr& hdr,  const void* data )
         c1++;
     }
 
-    st.data<UInt8>(offsetA) = countA;
+    st.data<UInt8>(offset) = count;
     st << Stream::eos;
     player->send(st);
 }

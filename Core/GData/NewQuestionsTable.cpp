@@ -4,7 +4,7 @@ namespace GData
 {
     NewQuestionsData newquestionsData;
 
-    void ErlkingData::setErlkingInfo(DBNewQuestionsConfig & data)
+    void NewQuestionsData::setNewQuestionsInfo(DBNewQuestionsConfig & data)
     {
         newquestionsInfo info;
 

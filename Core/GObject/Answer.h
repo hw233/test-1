@@ -1,7 +1,7 @@
 #ifndef _ANSWER_H_
 #define _ANSWER_H_
-#include "Player.h"
 #include "Config.h"
+#include "Player.h"
 #include "Common/Stream.h"
 
 namespace GObject

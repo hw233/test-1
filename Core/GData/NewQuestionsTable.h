@@ -21,10 +21,10 @@ class NewQuestionsData
         };
 
     private:
-        std::map<UInt32, newquestionsInfo> _newquestionsInfo;
+        std::map<UInt16, newquestionsInfo> _newquestionsInfo;
 
     public:
-        void setNewQuestionsInfo(DBErlkingConfig &);
+        void setNewQuestionsInfo(DBNewQuestionsConfig &);
 
         newquestionsInfo * getNewQuestionsInfo(UInt16 id);
 };

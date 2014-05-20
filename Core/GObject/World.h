@@ -1466,8 +1466,8 @@ public:
     void SendGuankaActAward();
     void SendTYSSClanAward();
     void SendTYSSPlayerAward();
-    void SendAllAnswerEnd();
-    void SendAnswerAward();
+    static void SendAllAnswerEnd();
+    static void SendAnswerAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

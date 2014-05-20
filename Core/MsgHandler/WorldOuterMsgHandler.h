@@ -43,6 +43,7 @@
 #else
 #include "GObject/Arena.h"
 #include "GObject/ArenaServerWar.h"
+#include "GObject/Answer.h"
 #endif
 
 #include <mysql.h>
@@ -3315,7 +3316,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             UInt8 op = 0;
             brd >> op;
 
-            if(1!=opt && !World::getAnswerTime())
+            if(1!=op && !World::getAnswerTime())
                 return;
 
             switch(op)
@@ -3345,9 +3346,9 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     break;
                 case 0x08:
                     {
-                        UInt8 type = 0;
-                        brd >> type;
-                        answerManager->SelectAnswer(Player, type);                 
+                        UInt8 selectId = 0;
+                        brd >> selectId;
+                        answerManager->SelectAnswer(player, selectId);                 
                     }
                     break;
                 case 0x09:
@@ -3358,7 +3359,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                         if(ANSWER_SKILL_D == skillId || ANSWER_SKILL_E == skillId)
                             brd >> otherId;
 
-                        answerManager->UseSkill(player, skillId, UInt64 otherId);                 
+                        answerManager->UseSkill(player, skillId, otherId);                 
                     }
                     break;
                 default:
@@ -3368,9 +3369,9 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
        break;
        case 0x45:
        {
-           UInt8 type = 0;
-           brd >> type;
-           player->specialUdpLog(type);
+           UInt8 logType = 0;
+           brd >> logType;
+           player->specialUdpLog(logType);
        }
        break;
        default:

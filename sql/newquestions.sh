@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 F=newquestions.txt
@@ -10,7 +9,7 @@ fi
 function newquestions()
 {
     f=$1
-    d=erlking
+    d=newquestions
     sed -i /ID/d $f
     sed -i /id/d $f
     sed -i /^$/d $f
