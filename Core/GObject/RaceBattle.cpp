@@ -161,7 +161,7 @@ namespace GObject
 
         if(level == sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]) && !pl->getIsLastLevel())
         {
-            pl->sendMsgCode(0, 4047);
+            pl->sendMsgCode(0, 8018);
             pl->setIsLastLevel(true);
             UInt32 num = World::getRBTimeRank();
             UInt32 rank = GET_BIT_3(num, level);
