@@ -26218,7 +26218,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,24000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
@@ -26265,7 +26265,7 @@ void Player::Send11GradeAward(UInt8 type)
 {
     if(type > 11)
         return ;
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
         {{9418,1}, {503,1}},
         {{501,2},{9497,2}},
@@ -26276,10 +26276,10 @@ void Player::Send11GradeAward(UInt8 type)
         {{16001,3},{9498,2},{509,2},{134,2},{9438,2}},
         {{1729,1},{8555,4}},
         {{9600,25},{9418,25},{9424,40}},
-        {{9498,50},{9022,10}},
-        {{9021,10},{9068,15},{9075,15}},
+        {{16001,50},{9075,15}},
+        {{9022,30},{1726,1}},
     };
-    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,2,3};
+    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,2,2};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -32304,6 +32304,18 @@ void Player::BroadcastPower()
             continue;
 
         member->send(st);
+    }
+}
+
+void Player::getFireContributionBag(Player * pl)
+{
+    SYSMSG(title, 955);
+    SYSMSGV(content, 956, getName().c_str());
+    Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem = {9476, 1};
+        mailPackageManager.push(mail->id, &mitem, 1, true);
     }
 }
 
