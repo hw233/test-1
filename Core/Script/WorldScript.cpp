@@ -258,6 +258,7 @@ void WorldScript::init()
     def("setGGTime",GObject::World::setGGTime);
     def("getGGTime",GObject::World::getGGTime);
     def("getTYSSTime",GObject::World::getTYSSTime);
+    def("get61CardActivity",GObject::World::get61CardActivity);
     def("setQZoneRechargeTime",GObject::World::setQZoneRechargeTime);
 
     def("setSurnameLegend",GObject::World::setSurnameLegend);

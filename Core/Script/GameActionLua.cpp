@@ -163,6 +163,7 @@ namespace Script
 		lua_tinker::def(_L, "inActive_opTime_20130531", GObject::World::inActive_opTime_20130531);
 		lua_tinker::def(_L, "get11TimeNum", GObject::World::get11TimeAirNum);  //天书奇缘计算天书
 		lua_tinker::def(_L, "getTYSSTime", GObject::World::getTYSSTime);  //天元神兽
+		lua_tinker::def(_L, "get61CardActivity", GObject::World::get61CardActivity);  //61卡牌活动
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -341,11 +342,15 @@ namespace Script
         CLASS_DEF(Player, EatLingGuo);
         CLASS_DEF(Player, sendUseRideItemInfo);
         CLASS_DEF(Player, getXuanTianNingLuLua);
+        CLASS_DEF(Player, GetCollectCard);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);
         CLASS_DEF(MoFang, addJGSExp);
         CLASS_DEF(MoFang, addMoney);
+        
+        CLASS_ADD(CollectCard);
+        CLASS_DEF(CollectCard, Add61Card);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1485,6 +1490,11 @@ namespace Script
         assert(player != NULL);
         return Call<UInt8>("GetCardByChance", player, cnt1, cnt2 ,cnt3);
     }
+    UInt8 GameActionLua::GetCardByChance61(Player* player ,UInt16 cnt1,UInt16 cnt2,UInt16 cnt3)
+    {
+        assert(player != NULL);
+        return Call<UInt8>("GetCardByChance61", player, cnt1, cnt2 ,cnt3);
+    }
     bool GameActionLua::RunNovLoginAward(Player* player, UInt8 val)
     {
         assert(player != NULL);
@@ -1914,7 +1924,7 @@ namespace Script
 		return Call<UInt16>("getSpeCard", itemId);
     }
 
-    UInt16 GameActionLua::getsuitAttr(UInt8 suitId)
+    UInt16 GameActionLua::getsuitAttr(UInt16 suitId)
     {
 		return Call<UInt16>("getsuitAttr", suitId);
     }
@@ -1922,6 +1932,12 @@ namespace Script
     UInt32 GameActionLua::getZhenyuanLootId(UInt8 idx)
     {
         return Call<UInt32>("getZhenyuanLootId", idx);
+    }
+    
+    bool GameActionLua::RunActCardAward(Player* player,UInt8 idx)
+    {
+        assert(player != NULL);
+        return Call<bool>("RunActCardAward", player, idx);
     }
 }
 

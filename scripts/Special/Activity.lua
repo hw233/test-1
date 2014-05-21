@@ -9127,6 +9127,19 @@ function onRoamingQueqiao(player, pos)
     i = roamPlace[pos2]
     j = math.random(1, #eventItem[i])
 
+    if eventItem[i][j][1] == 9896 then
+        player:GetCollectCard():Add61Card(305)
+    end
+    if eventItem[i][j][1] == 9897 then
+        player:GetCollectCard():Add61Card(306)
+    end
+    if eventItem[i][j][1] == 9898 then
+        player:GetCollectCard():Add61Card(307)
+    end
+    if eventItem[i][j][1] == 9899 then
+        player:GetCollectCard():Add61Card(308)
+    end
+
     package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
     player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
     player:postRoamResult(pos2, j, eventItem[i][j][3]);
