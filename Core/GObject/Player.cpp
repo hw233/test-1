@@ -23633,7 +23633,7 @@ void Player::doVipPrivilege(UInt8 idx)
 void Player::sendDirectPurInfo()
 {
     Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x42) << static_cast<UInt8>(GetVar(VAR_DIRECTPUROPEN)) << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT)) << _playerData.totalRecharge;
+    st << static_cast<UInt8>(0x42) << static_cast<UInt8>(GetVar(VAR_DIRECTPUROPEN)) << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT)) << _playerData.totalRecharge << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT2));
     st << Stream::eos;
     send(st);
 }
