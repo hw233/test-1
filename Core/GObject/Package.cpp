@@ -8348,7 +8348,8 @@ namespace GObject
             if(lsAttr.lv >= maxLev)
             {
                 lsAttr.lv = maxLev;
-                lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
+                if(!GData::lingshiCls.canBreak(equip->GetTypeId(), lsAttr.lv))
+                    lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
                 return 1;
             }
         }
@@ -8419,7 +8420,8 @@ namespace GObject
         if(lsAttr.lv >= maxLev)
         {
             lsAttr.lv = maxLev;
-            lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
+            if(!GData::lingshiCls.canBreak(lingshi->GetTypeId(), lsAttr.lv))
+                lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
         }
 		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
         if(tmp != lsAttr.lv)
