@@ -15302,94 +15302,94 @@ bool BattleSimulator::doEffectAfterCount(BattleFighter* bf, const GData::SkillBa
             continue;
 
         BattleFighter* bo = static_cast<BattleFighter *>(bo2);
-        if(effect->auraP > 0.001 || effect->aura > 0)
+        if((effect->auraP > 0.001f || effect->aura > 0) || (effect->auraP < -0.001f || effect->aura < 0))
         {
             float value = bo->_aura * effect->auraP + effect->aura;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Aura(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->atkP > 0.001f || effect->atk > 0)
+        else if((effect->atkP > 0.001f || effect->atk > 0) || (effect->atkP < -0.001f || effect->atk < 0))
         {
             float value = bo->_attack * effect->atkP + effect->atk;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Atk(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->defP > 0.001f || effect->def > 0)
+        else if((effect->defP > 0.001f || effect->def > 0) || (effect->defP < -0.001f || effect->def < 0))
         {
             float value = bo->_defend * effect->defP + effect->def;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Def(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->magatkP || effect->magatk > 0)
+        else if((effect->magatkP > 0.001f || effect->magatk > 0) || (effect->magatkP < -0.001f || effect->magatk < 0))
         {
             float value = bo->_magatk * effect->magatkP + effect->magatk;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_MagAtk(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->magdefP || effect->magdef > 0)
+        else if((effect->magdefP  > 0.001f || effect->magdef > 0) || (effect->magdefP  < -0.001f || effect->magdef < 0))
         {
             float value = bo->_magdef * effect->magdefP + effect->magdef;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_MagDef(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->tough > 0.001f)
+        else if(effect->tough > 0.001f || effect->tough < -0.001f)
         {
             float value = effect->tough;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Tough(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->actionP || effect->action > 0.001f)
+        else if((effect->actionP > 0.001f || effect->action > 0.001f) || (effect->actionP < -0.001f || effect->action < -0.001f))
         {
             float value = bo->_maxAction * effect->actionP + effect->action;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Action(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->hitrate > 0.001f)
+        else if(effect->hitrate > 0.001f || effect->hitrate < -0.001f)
         {
             float value = effect->hitrate;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_HitR(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->evade > 0.001f)
+        else if(effect->evade > 0.001f || effect->evade < -0.001f)
         {
             float value = effect->evade;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Evade(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->critical > 0.001f)
+        else if(effect->critical > 0.001f || effect->critical < -0.001f)
         {
             float value = effect->critical;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Critical(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->pierce > 0.001f)
+        else if(effect->pierce > 0.001f || effect->pierce < -0.001f)
         {
             float value = effect->pierce;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Pierce(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->counter > 0.001f)
+        else if(effect->counter > 0.001f || effect->counter < -0.001f)
         {
             float value = effect->counter;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Counter(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->magres > 0.001f)
+        else if(effect->magres > 0.001f || effect->magres < -0.001f)
         {
             float value = effect->magres;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_MagRes(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->atkreduce > 0.001f)
+        else if(effect->atkreduce > 0.001f || effect->atkreduce < -0.001f)
         {
             float value = effect->atkreduce;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_AtkReduce(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->magatkreduce > 0.001f)
+        else if(effect->magatkreduce > 0.001f || effect->magatkreduce < -0.001f)
         {
             float value = effect->magatkreduce;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_MagAtkReduce(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
         else
