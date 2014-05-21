@@ -1320,9 +1320,9 @@ inline bool player_enum_3(GObject::Player* pl, int)
 }
 inline bool player_enum_4(GObject::Player* pl, int)
 {
-    if(player->getLeftAddrEnter())
+    if(pl->getLeftAddrEnter())
     {
-        GameMsgHdr hdr(0x392, player->getThreadId(), player, 0);
+        GameMsgHdr hdr(0x392, pl->getThreadId(), pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
     return true;
