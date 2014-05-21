@@ -23633,7 +23633,7 @@ void Player::doVipPrivilege(UInt8 idx)
 void Player::sendDirectPurInfo()
 {
     Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x42) << static_cast<UInt8>(GetVar(VAR_DIRECTPUROPEN)) << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT)) << _playerData.totalRecharge;
+    st << static_cast<UInt8>(0x42) << static_cast<UInt8>(GetVar(VAR_DIRECTPUROPEN)) << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT)) << _playerData.totalRecharge << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT2));
     st << Stream::eos;
     send(st);
 }
@@ -25329,6 +25329,23 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 GetPackage()->AddItem(16010, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
+            }
+        }
+    }
+    if(World::getDropAct())
+    {
+        if(flag == e_sla_none)
+        {
+            GetPackage()->Add(1527, 1, true, false, FromNpc);
+        }
+        else
+        {
+            UInt32 status = GetVar(VAR_DROP_ACT);
+            if(!(status & flag))
+            {
+                GetPackage()->Add(1527, 1, true, false, FromNpc);
+                status |= flag;
+                SetVar(VAR_DROP_ACT, status);
             }
         }
     }
