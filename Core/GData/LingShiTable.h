@@ -31,6 +31,8 @@ public:
     bool canBreak(UInt8);
     UInt32 getLingShiExp(UInt8);
     UInt32 getLevUpTael(UInt8);
+    void breakLevelUp(UInt8&, UInt32);
+    UInt32 countBreakItemCnt(UInt8);
 private:
     std::map<UInt8, LingshiData> _lingshiData;
 };

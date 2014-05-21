@@ -4472,9 +4472,9 @@ namespace GObject
 		return true;
 	}
 
-	UInt16 Player::GetFreePackageSize()
+	UInt16 Player::GetFreePackageSize(UInt8 type)
 	{
-		return m_Package->GetRestPackageSize();
+		return m_Package->GetRestPackageSize(type);
 	}
 
 	bool Player::addFriend( Player * pl )
@@ -15714,7 +15714,7 @@ namespace GObject
         }
         if(m_dpData->itemNum != 0)
         {
-            if(GetFreePackageSize() > m_dpData->itemNum/99)
+            if(GetFreePackageSize(1) > m_dpData->itemNum/99)
             {
                 struct AddItemInfo
                 {

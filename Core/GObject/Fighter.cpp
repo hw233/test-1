@@ -1249,7 +1249,12 @@ void Fighter::updateLingshiSkillId(ItemEquip * lingshi, UInt8 idx)
             {
                 UInt16 skillId = igt->attrExtra->skills[j]->getId();
                 if(j > 0)   //第一个技能(入场技能)不升级
-                    skillId = SKILLANDLEVEL(SKILL_ID(skillId), lsAttr.lv / 10 + 1);
+                {
+                    UInt8 skillLvl = lsAttr.lv / 10 + 1;
+                    if(skillLvl > 9)
+                        skillLvl = 9;
+                    skillId = SKILLANDLEVEL(SKILL_ID(skillId), skillLvl);
+                }
                 _lingshiSkill[idx].push_back(skillId);
             }
         }
@@ -1877,6 +1882,10 @@ void Fighter::addLingshiAttr( ItemEquip* lingshi )
         ae.hp     *= 0.8f;
         ae.action *= 1.0f;
     }
+    ae.attack += 1.0f;
+    ae.magatk += 1.0f;
+    ae.hp     += 1.0f;
+    ae.action += 1.0f;
 	addAttrExtra(_attrExtraEquip, igt->attrExtra);
 	addAttrExtra(_attrExtraEquip, &ae);
 }
@@ -2369,9 +2378,9 @@ UInt32 Fighter::calcLingbaoBattlePoint()
             {
                 const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
                 bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
-                lingbao.skill[i] = lbattr.skill[i];
-                lingbao.factor[i] = lbattr.factor[i];
             }
+            lingbao.skill[i] = lbattr.skill[i];
+            lingbao.factor[i] = lbattr.factor[i];
         }
         if (bp != lbattr.battlePoint)
         {
@@ -2423,9 +2432,9 @@ UInt32 Fighter::recalcLingbao()
             {
                 const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
                 bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
-                lingbao.skill[i] = lbattr.skill[i];
-                lingbao.factor[i] = lbattr.factor[i];
             }
+            lingbao.skill[i] = lbattr.skill[i];
+            lingbao.factor[i] = lbattr.factor[i];
         }
         if (bp != lbattr.battlePoint)
         {
@@ -2474,9 +2483,9 @@ void Fighter::pushLingbaoInfo(ItemEquip* equip)
         {
             const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
             bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
-            lingbao.skill[i] = lbattr.skill[i];
-            lingbao.factor[i] = lbattr.factor[i];
         }
+        lingbao.skill[i] = lbattr.skill[i];
+        lingbao.factor[i] = lbattr.factor[i];
     }
     if (bp != lbattr.battlePoint)
     {
