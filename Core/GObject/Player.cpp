@@ -32307,6 +32307,18 @@ void Player::BroadcastPower()
     }
 }
 
+void Player::getFireContributionBag(Player * pl)
+{
+    SYSMSG(title, 955);
+    SYSMSGV(content, 956, getName().c_str());
+    Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem = {9476, 1};
+        mailPackageManager.push(mail->id, &mitem, 1, true);
+    }
+}
+
 } // namespace GObject
 
 

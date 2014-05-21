@@ -1762,6 +1762,38 @@ inline bool player_enum_AskOldMan(GObject::Player * p, int)
     return true;
 }
 
+inline bool player_enum_GetContributionBag(GObject::Player * pl, int)
+{
+    if(pl)
+    {
+        Stream st(REP::CLAN_COPY);
+        st << static_cast<UInt8>(0x20);
+        st << static_cast<UInt8>(4);
+        st << Stream::eos;
+        pl->send(st);
+
+        UInt32 AddFireTimes = (pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) & 0xFF);
+        if(AddFireTimes == 3)
+            pl->getFireContributionBag(pl);
+    }
+    return true;
+}
+
+inline bool clan_enum_GetFireGodBag(GObject::Clan * clan, int)
+{
+    if(clan)
+    {
+       clan->getFireGodBag();
+    }
+    return true;
+}
+
+void World::World_Fire_Sacrifice_Check( World * world )
+{
+    GObject::globalPlayers.enumerate(player_enum_GetContributionBag, 0);
+    GObject::globalClans.enumerate(clan_enum_GetFireGodBag, 0);
+}
+
 void World::World_OldMan_Refresh(void *)
 {
     if(!getOldManTime())
@@ -2366,6 +2398,10 @@ bool World::Init()
     AddTimer(5 * 60 * 1000, World_Online_Log, static_cast<void *>(NULL), ((now + 300) / 300 * 300 - now) * 1000);
     AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 5 * 1000);
 
+    UInt32 fireSacriDay = TimeUtil::SharpDay(1) - 3 * 3600 + 60;
+    if(fireSacriDay < now) fireSacriDay += 86400;
+    AddTimer(86400 * 1000, World_Fire_Sacrifice_Check, this, (fireSacriDay - now) * 1000);
+
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(&type), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
     if(cfg.merged)
@@ -2703,6 +2739,7 @@ void World::commitArenaForceOnce()
 {
     GObject::arena.commitArenaForceOnce();
     GObject::globalPlayers.enumerate(player_enum_4, 0);  //仙界遗迹同步
+    GObject::teamArenaMgr.commitArenaForceOnce();
 }
 
 void World::LoadQixiScore(Player* pl, Player* lover)
