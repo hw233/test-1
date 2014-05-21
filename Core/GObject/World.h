@@ -1093,6 +1093,16 @@ public:
         return _zcjbActivity;
     }
 
+    inline static bool get61CardActivity(UInt32 time = 0)
+    {
+        UInt32 now = TimeUtil::Now() + time;
+        UInt32 time20140601 = TimeUtil::MkTime(2014, 6, 1);
+        
+        if(now < time20140601 || now > time20140601 + 5 * 86400)
+            return false;
+        return true;
+    }
+
     inline static void setHalfGold(bool v)
     { _halfgold = v; }
     inline static bool getHalfGold()

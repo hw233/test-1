@@ -322,6 +322,7 @@ GMHandler::GMHandler()
     Reg(3, "clanrank", &GMHandler::TestClanRank);
     Reg(3, "rb", &GMHandler::OnRaceBattle);
     Reg(2, "addkapai", &GMHandler::OnAddCard);
+    Reg(2, "add61kapai", &GMHandler::OnAdd61Card);
     Reg(2, "addkapaiexp", &GMHandler::OnAddCardExp);
 
     //  帮派建筑相关指令
@@ -5608,6 +5609,15 @@ void GMHandler::OnAddCard(GObject::Player *player, std::vector<std::string>& arg
 
     player->GetCollectCard()->AddCard(cid);   
 
+}
+
+void GMHandler::OnAdd61Card(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return ;
+    UInt16 cid = atoi(args[0].c_str());
+    
+    player->GetCollectCard()->Add61Card(cid);   
 }
 
 void GMHandler::OnAddCardExp(GObject::Player *player, std::vector<std::string>& args)

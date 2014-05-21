@@ -293,6 +293,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_lingshi.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearautobattle.sql #清除自动挂机
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140515.sql     #五一劳动奖清空
 }
 
 #sh player_jiguan.sh

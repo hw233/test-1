@@ -1773,6 +1773,38 @@ local collectChance = {
 
 }
 local Card = {8,7,5,4,3,6,1,2}
+local Card_61 = {1,2,3,4}
+
+function GetCardByChance61(player ,cnt1,cnt2,cnt3)
+    local chance ={0,0,0,0}
+    local cnts = {0,0,0,0} 
+    local color = 1
+    cnts[1] = 0
+    cnts[2] = cnt1
+    cnts[3] = cnt2
+    cnts[4] = cnt3
+    for k = 1,#collectChance  do 
+        for j =1,#collectChance[k] do
+            if cnts[k] >= collectChance[k][j][1] then
+                chance[k] = collectChance[k][j][2]
+            end
+        end
+    end
+    local g = math.random(1, 10000)
+     
+    for k = 1,#chance do
+        if g < chance[k] then
+            color = k
+        end
+    end
+    if color ==0 or color > 4 then
+        return 0
+    end
+    
+    --print("color is ",color)
+    return Card_61[color]
+end
+
 function GetCardByChance(player ,cnt1,cnt2,cnt3)
     local chance ={0,0,0,0}
     local cnts = {0,0,0,0} 
@@ -1844,4 +1876,28 @@ function RunFriendlyGoods(player, cts ,count)
     player:SetVar(700 , value - item[cts][3] * count );
     return true
 end
+
+function RunActCardAward(player,cts)
+    local item = {
+        [1] = {{15,3},{500,3},{503,2}},
+        [2] = {{501,3},{513,3},{514,3}},
+        [3] = {{134,3},{1325,3},{515,3}},
+    };
+    
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < #item[cts] then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+   
+    for count = 1, #item[cts] do
+        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+    end
+
+    return true
+
+
+end
+
 

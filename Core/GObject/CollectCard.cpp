@@ -23,7 +23,10 @@ namespace GObject
     {
         m_owner = player;
         VecEquipSlot.resize(5);
-        memset(&_cnt, 0, sizeof(_cnt)); 
+        //memset(&_cnt, 0, sizeof(_cnt)); 
+        MapCntBlue.clear();
+        MapCntPurple.clear();
+        MapCntOrg.clear();
     }
     
     CollectCard::~CollectCard()
@@ -40,7 +43,7 @@ namespace GObject
 
     bool SuitCardInfo::checkExistSetBit(UInt16 cid,UInt8 color)
     {
-        if(id != 20)
+        if(id != 20 && id != 30)
         {
             UInt8 card_index = cid % 10;
             if(GET_BIT(suit_mark,(card_index-1)))
@@ -57,6 +60,24 @@ namespace GObject
             else if(color == 2)
                 collect_degree += 5;
             
+
+        }
+        else if(id == 30)
+        {
+            UInt8 card_index = cid % 10;
+            if(GET_BIT(suit_mark,(card_index-1)))
+                return false;  
+            
+            suit_mark = SET_BIT(suit_mark,(card_index-1)); 
+
+            if(color == 5)
+                collect_degree += 35;
+            else if(color == 4 )
+                collect_degree += 20;
+            else if(color == 3 )
+                collect_degree += 10;
+            else if(color == 2)
+                collect_degree += 5;
 
         }
         else
@@ -151,7 +172,7 @@ namespace GObject
         return;
     }
 
-    bool CollectCard::ReturnSuitInfo(Stream& st,UInt8 suit_lvl ,bool isSpe ,bool isRet)
+    bool CollectCard::ReturnSuitInfo(Stream& st,UInt16 suit_lvl ,bool isSpe ,bool isRet)
     {
         if(MapCardStamp.find(suit_lvl) == MapCardStamp.end())
             return false;
@@ -168,11 +189,12 @@ namespace GObject
             st << it->second->active;
         }
 
-        if(suit_lvl >= 40 && suit_lvl <= 130)
+        //if(suit_lvl >= 40 && suit_lvl <= 130)
+        if(suit_lvl != 20)
         {
-            st << _cnt[suit_lvl/10-4][0];
-            st << _cnt[suit_lvl/10-4][1];
-            st << _cnt[suit_lvl/10-4][2];
+            st << MapCntBlue[suit_lvl];
+            st << MapCntPurple[suit_lvl];
+            st << MapCntOrg[suit_lvl];
         }
         if(!isRet)
         {
@@ -237,7 +259,7 @@ namespace GObject
             if(MapFreeCardSlot.find(id) == MapFreeCardSlot.end())
                 return ;
             CardInfo* tmp = (MapFreeCardSlot.find(id))->second;
-            if(tmp->type != 2 && tmp->type != 3)//卡牌类型一定为装备卡牌和特殊卡牌
+            if(tmp->type != 2 && tmp->type != 3 && tmp->type != 5)//卡牌类型一定为装备卡牌和特殊卡牌
                 return ;
             if(tmp->type == 3)
             {
@@ -272,9 +294,9 @@ namespace GObject
             if(MapFreeCardSlot.find(id) == MapFreeCardSlot.end())
                 return ;
             CardInfo* tmp = (MapFreeCardSlot.find(id))->second;
-            if(tmp->type != 1 && tmp->type != 3)//卡牌类型一定为人物卡牌和特殊卡牌
+            if(tmp->type != 1 && tmp->type != 3 && tmp->type != 5)//卡牌类型一定为人物卡牌和特殊卡牌
                 return ;
-            if(tmp->type == 3)
+            if(tmp->type == 3)//特殊卡牌只能装备一张
             {
                 VecSlot::iterator it = VecEquipSlot.begin();
                 while(it != VecEquipSlot.end()) 
@@ -288,6 +310,20 @@ namespace GObject
                     it++;
                 }
             }
+            if(tmp->type == 5)//活动卡牌只能装备一张
+            {
+                VecSlot::iterator it = VecEquipSlot.begin();
+                while(it != VecEquipSlot.end()) 
+                {
+                    if((*it)->checkInfo())
+                    {
+                        if((*it)->type == 5)
+                            return;
+                    }
+
+                    it++;
+                }
+            }            
             tmp->pos = pos; 
             VecEquipSlot[pos - 1] = tmp; 
             MapFreeCardSlot.erase(MapFreeCardSlot.find(id)); 
@@ -312,13 +348,25 @@ namespace GObject
         return ;
     }
     
-    void CollectCard::ExchangeCard(UInt8 flag/* 0 - 手动 1- 自动*/,UInt8 level ,UInt8 color ,UInt16 count)//兑换卡牌
+    void CollectCard::ExchangeCard(UInt8 flag/* 0 - 手动 1- 自动*/,UInt16 level ,UInt8 color ,UInt16 count)//兑换卡牌
     {
-        UInt32 iid = 9457;
+        UInt32 iid = 0;
         if(flag == 0 )
             count = 1;
-        UInt16 mCount = m_owner->GetPackage()->GetItemAnyNum(iid) ;
-        if(mCount < count) //天界牌不足
+        UInt16 mCount = 0;
+        if(level != 30)
+        {
+            iid = 9457;//天界牌
+            mCount = m_owner->GetPackage()->GetItemAnyNum(iid) ;
+        }
+        else
+        {
+            if(!World::get61CardActivity())
+                return;
+            iid = 9895;//童心令
+            mCount = m_owner->GetPackage()->GetItemAnyNum(iid) ;
+        }
+        if(mCount < count) //天界牌,童心令不足
             return ;   
 
         ItemBase * item = m_owner->GetPackage()->FindItem(iid, true);
@@ -327,30 +375,66 @@ namespace GObject
         if(item ==NULL)
             return ;
 
-        if(level < 40 || level > 130 )
+        if((level < 30 || level > 130) && level != 400)
            return ;
         static UInt8 PCardChance[]= {5,5,4,3,3,4,2,2};
+        static UInt8 PCardChance61[]= {2,3,4,5};
         std::vector<UInt16> getCards ;
         UInt16 index = 0;
-        UInt8 lev = level/10-4;
         while(index < count)
         {
-            UInt8 CNum= GameAction()->GetCardByChance(m_owner,_cnt[lev][0],_cnt[lev][1],_cnt[lev][2]);    
+            UInt8 CNum = 0; 
+            if(level != 30)
+                CNum = GameAction()->GetCardByChance(m_owner,MapCntBlue[level],MapCntPurple[level],MapCntOrg[level]);    
+            else
+                CNum = GameAction()->GetCardByChance61(m_owner,MapCntBlue[level],MapCntPurple[level],MapCntOrg[level]);    
+
             if(CNum > 8 || CNum == 0)
                 break;
             getCards.push_back( (static_cast<UInt16>(level)) * 10 + CNum);
-            _cnt[lev][0] ++ ;
-            _cnt[lev][1] ++ ;
-            _cnt[lev][2] ++ ;
-            if(PCardChance[CNum-1] > 2)
+            MapCntBlue[level] ++ ;
+            MapCntPurple[level] ++ ;
+            MapCntOrg[level] ++ ;
+            if(level != 30)
             {
-               _cnt[lev][PCardChance[CNum-1]-3] = static_cast<UInt16>(0);
-               char str[32] = {0};
-               sprintf(str, "F_140506_%d",PCardChance[CNum-1]-2);
-               m_owner->udpLog("kapaixitong", str, "", "", "", "", "act");
+                if(PCardChance[CNum-1] > 2)
+                {
+                    if(PCardChance[CNum-1] == 3)
+                        MapCntBlue[level] = static_cast<UInt16>(0); 
+                    else if(PCardChance[CNum-1] == 4)
+                        MapCntPurple[level] = static_cast<UInt16>(0); 
+                    else if(PCardChance[CNum-1] == 5)
+                        MapCntOrg[level] = static_cast<UInt16>(0); 
+                    else
+                        break;
+
+                    char str[32] = {0};
+                    sprintf(str, "F_140506_%d",PCardChance[CNum-1]-2);
+                    m_owner->udpLog("kapaixitong", str, "", "", "", "", "act");
+                }
+                if(PCardChance[CNum - 1] == color)
+                    break;
             }
-            if(PCardChance[CNum - 1] == color)
-                break;
+            else
+            {
+                if(PCardChance61[CNum-1] > 2)
+                {
+                    if(PCardChance61[CNum-1] == 3)
+                        MapCntBlue[level] = static_cast<UInt16>(0); 
+                    else if(PCardChance61[CNum-1] == 4)
+                        MapCntPurple[level] = static_cast<UInt16>(0); 
+                    else if(PCardChance61[CNum-1] == 5)
+                        MapCntOrg[level] = static_cast<UInt16>(0); 
+                    else
+                        break;
+
+                    char str[32] = {0};
+                    sprintf(str, "F_140506_%d",PCardChance61[CNum-1]-2);
+                    m_owner->udpLog("kapaixitong", str, "", "", "", "", "act");
+                }
+                if(PCardChance61[CNum - 1] == color)
+                    break;
+            }
             ++index;
         }
 
@@ -387,7 +471,7 @@ namespace GObject
         return;
     }
     
-    void CollectCard::ActiveCardSet(UInt8 suit_lvl,UInt8 active_set)//激活卡组
+    void CollectCard::ActiveCardSet(UInt16 suit_lvl,UInt8 active_set)//激活卡组
     {
         if(MapCardStamp.find(suit_lvl) == MapCardStamp.end())
             return ;
@@ -397,8 +481,26 @@ namespace GObject
             return;
         else
         {
+            UInt8 org_active = sci->active;
             if(sci->checkActive(active_set))
                 sci->active = active_set;
+            if(suit_lvl == 30)
+            {
+                if(sci->active <= org_active)
+                    return;
+                if(sci->active != 1 && sci->active != 2 && sci->active != 3)
+                    return;
+                UInt8 cnt = sci->active - org_active; 
+                while(cnt != 0)
+                {
+                    if(!GameAction()->RunActCardAward(m_owner,org_active + cnt))
+                    {
+                        sci->active = org_active;
+                        return;
+                    }
+                    cnt --;
+                }
+            }
             //TODO DB
             DB4().PushUpdateData("UPDATE `cardsuit` SET `active` = '%u' WHERE `playerId` = %" I64_FMT "u and `id` = '%u'",sci->active,m_owner->getId(),sci->id);
 
@@ -644,21 +746,21 @@ namespace GObject
 
         return ci;
     }
-    void CollectCard::loadCollectCnt(UInt8 level ,UInt16 cnt1 ,UInt16 cnt2 ,UInt16 cnt3)
+    void CollectCard::loadCollectCnt(UInt16 level ,UInt16 cnt1 ,UInt16 cnt2 ,UInt16 cnt3)
     {
-        if(level < 40 || level > 130)
-            return ;
-        _cnt[level/10-4][0] = cnt1;
-        _cnt[level/10-4][1] = cnt2;
-        _cnt[level/10-4][2] = cnt3;
+        /*if(level < 40 || level > 130)
+            return ;*/
+        MapCntBlue[level] = cnt1;
+        MapCntPurple[level] = cnt2;
+        MapCntOrg[level] = cnt3;
     }
-    void CollectCard::updateCollectCnt(UInt8 level)
+    void CollectCard::updateCollectCnt(UInt16 level)
     {
-        if(level < 40 || level  > 130 )
-            return ;
+        /*if(level < 40 || level  > 130 )
+            return ;*/
         if(!m_owner)
             return ;
-        DB1().PushUpdateData("REPLACE INTO `collect_cnt` (`playerId`, `lev`, `bluecnt`,`purlecnt`,`orangecnt`) VALUES (%" I64_FMT "u, %u , %u , %u ,%u )", m_owner->getId(), level , _cnt[level/10-4][0],_cnt[level/10-4][1], _cnt[level/10-4][2]);
+        DB1().PushUpdateData("REPLACE INTO `collect_cnt` (`playerId`, `lev`, `bluecnt`,`purlecnt`,`orangecnt`) VALUES (%" I64_FMT "u, %u , %u , %u ,%u )", m_owner->getId(), level , MapCntBlue[level],MapCntPurple[level], MapCntOrg[level]);
     }
         
 
@@ -707,7 +809,7 @@ namespace GObject
         if(cid == 0)
             return;
         
-        std::map<UInt8,SuitCardInfo*>::iterator it = MapCardStamp.find(cid/100*10);
+        std::map<UInt16,SuitCardInfo*>::iterator it = MapCardStamp.find(cid/100*10);
         if(it != MapCardStamp.end())
         {
             SuitCardInfo* tmp = it->second;
@@ -785,5 +887,41 @@ namespace GObject
 
         return;
     }
+
+    void CollectCard::Add61Card(UInt16 cid)
+    {
+        if(MapCardStamp.find(cid/100*10) == MapCardStamp.end())
+        {
+            UInt8 card_index1 = cid % 10;
+            if(card_index1 < 5)
+                return;
+            AddCard(cid);
+            return;
+        }
+        
+        SuitCardInfo* tmp = MapCardStamp.find(cid/100*10)->second;
+        if(tmp == NULL)
+            return;
+        if(tmp->id != 30)
+            return;
+
+        UInt8 card_index = cid % 10;
+        if(card_index < 5)
+            return;
+        if(!GET_BIT(tmp->suit_mark,(card_index-1)))
+        {
+            CardInfo* citmp = AddCard(cid);
+            if(!citmp)
+                return;
+            Stream st(REP::COLLECTCARD);  
+            st << static_cast<UInt8>(2) ;//0x02套牌信息
+            ReturnSuitInfo(st,30,true);
+            st << citmp->id << citmp->cid << citmp->level << citmp->exp << citmp->pos;
+            st << Stream::eos; 
+            m_owner->send(st);
+        }
+        return;
+    }
+
 
 }
