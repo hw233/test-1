@@ -276,28 +276,27 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140408_1.sql   #修改strengthenData字段flag
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140328_1.sql   #被活跃玩家邀请过的回流玩家
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140328_2.sql   #回流玩家申请加入队伍列表
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140328_3.sql   #队伍数据
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140328_3.sql   #队伍数据
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140328_4.sql   #本次活动开启回流玩家数据
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140418_1.sql   #修改数据库世界boss血量
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140418_1.sql   #修改数据库世界boss血量
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140418_1.sql   #修改数据库世界boss血量
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_cardsystem.sql     #创建卡牌系统
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_CollectCnt_20140414.sql     #创建卡牌之魂
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_cardsystem.sql     #创建卡牌系统
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_CollectCnt_20140414.sql     #创建卡牌之魂
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140422_1.sql     #五一劳动奖清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #捉迷藏清空
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_3_24_CreateFriendlyCount.sql     #创建友好度表
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_3_24_CreateFriendlyCount.sql     #创建友好度表
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear651.sql     #清空VAR651(大转盘)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_card.sql     #创建卡牌系统
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_lingshi.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearautobattle.sql #清除自动挂机
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140515.sql     #卡牌优化
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140510_1.sql     #创建帮派篝火
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140515.sql     #卡牌优化
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_lingshi_bug.sql     #灵侍bug
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_qixi.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购),下次需要多清1个VAR
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearvar592_1211.sql   #清空var592（QQ大厅登录）
 }
