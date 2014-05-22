@@ -3313,6 +3313,9 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
        break;
        case 0x32:
        {
+            if(player->GetLev() < 30)
+                return;
+
             UInt8 op = 0;
             brd >> op;
 

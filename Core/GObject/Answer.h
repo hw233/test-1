@@ -63,17 +63,19 @@ namespace GObject
         void AddQuestionsFromDB(UInt8 answerId, UInt16 questionsId);
         void InitAnswerId(UInt8 answerId);
         void SendAnswerInfo(Player* pl);
+        void SelectNumInfo(Stream& st);
+        void SkillAndLogInfo(Player* pl, Stream& st);
         void SelectAnswer(Player* pl, UInt8 opt);
         void AnswerEnd(Player* pl);
+        void AwardEndClear();
         void AwardEnd(Player* pl);
         void UseSkill(Player* pl, UInt8 skillId, UInt64 otherId);
     private:
-        UInt8 m_answer[30];                             // 本次活动题目
+        UInt16 m_answer[30];                             // 本次活动题目
         UInt8 m_answerId;                               // 当前题号
 
         std::map<UInt64, answerEnd> m_playerAnswerEnd;  // 玩家答题信息
         std::map<UInt64, std::list<answerLog>> m_playerAnswerLog;
-        answerEnd m_answerEnd;
         answerNum m_answerNum;
 
     };

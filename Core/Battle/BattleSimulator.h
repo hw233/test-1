@@ -357,8 +357,8 @@ private:
         e_chaosWorld = 131,  // 混世状态(攻击必定附带眩晕)
         e_unChaosWorld = 132,  // 混世状态消失(攻击必定附带眩晕)
 
-        e_changeMode = 131,  //改变模型
-        e_unChangeMode = 132,  //恢复模型
+        e_changeMode = 133,  //改变模型
+        e_unChangeMode = 134,  //恢复模型
 
         e_MAX_STATE,
     };
@@ -652,6 +652,7 @@ private:
     std::vector<BattleFighter*> _onPetProtect;
     std::vector<BattleFighter*> _onPetAtk;
     std::vector<BattleFighter*> _onOtherConfuseAndForget;
+    std::vector<BattleFighter*> _onOtherConfuseAndForgetAtkList[2];
 
     UInt8 _cur_round_except[25];
     UInt8 _except_count;
@@ -768,6 +769,8 @@ private:
     static  bool isBehindPos(BattleObject* bo, UInt8 targetPos, UInt8 maxLength);
     UInt32 upPetObject(UInt8, bool = true);
     UInt32 doSpiritAttack(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first);
+    void doOtherConfuseForgetAttack(BattleFighter* bf, UInt32& rcnt);
+    UInt32 doOtherConfuseForgetAttackOnce(BattleFighter * bf, BattleFighter* bo, float atk, bool& pr, bool& cs, bool& first);
 
 private:
     // 记录每回合命中次数
@@ -800,7 +803,7 @@ private:
 	UInt32 attackByJiuzi(BattleFighter * bf, bool& first, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, int counter_deny = -1, AttackPoint * counter_deny_list = NULL, std::vector<AttackAct>* atkAct = NULL, bool canProtect = false);
     void attackByJiuziSS(BattleFighter* bf, const GData::SkillBase* skill);
     bool doEffectAfterCount(BattleFighter* bf, const GData::SkillBase* skill, UInt16 actCnt);
-    UInt32 doLingshiModelAttack(BattleFighter* bf, UInt8 flag);
+    UInt32 doLingshiModelAttack(BattleFighter* bf, UInt8 flag, UInt32& skillId);
     void onDeadLingshi(BattleFighter* bf);
 };
 

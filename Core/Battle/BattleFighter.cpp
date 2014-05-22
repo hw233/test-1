@@ -89,7 +89,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _lingyou_atk(0), _lingyou_magatk(0), _lingyou_def(0), _lingyou_magdef(0), _lingHpShield(false), _criticaldmgreduce(0), _abnormalTypeCnt(0), _bleedTypeCnt(0),_evadeCnt(0), _peerlessDisableLast(0), _soulProtectLast(0), _soulProtectCount(0), _xinMoCount(0), _2ndRateCoAtk(0), _2ndCoAtkSkill(NULL), _2ndRateProtect(0), _2ndProtectSkill(NULL), _dmg_deep(0), _dmg_deep_last(0), _dmg_ningshi(0), _dmg_ningshi_last(0), _ningshizhe(NULL)
    ,_ruRedCarpetLast(0), _shiFlowerLast(0), _shiFlowerAura(0), _daoRoseLast(0), _moKnotLast(0)
    ,_bActCnt(0), _immune3(0), _revivalCnt(0), _prudentLast(0),_prudentHitrate(0), _prudentHitrateLastOtherside(0), _silkwormCnt(0)
-   ,_yehuoLevel(0), _yehuo_ss_dmgRate(0), _yehuo_ss_upRate(0), _jiuziDmgCnt(0), _changeStatus(0), _counterCnt(0), _criticalCnt(0), _preAtk(false), _friendDeadCnt(0), _enemyDeadCnt(0), _mojianCnt(0xFF)
+   ,_yehuoLevel(0), _yehuo_ss_dmgRate(0), _yehuo_ss_upRate(0), _jiuziDmgCnt(0), _changeStatus(0), _newModeLast(0), _counterCnt(0), _criticalCnt(0), _preAtk(false), _friendDeadCnt(0), _enemyDeadCnt(0), _mojianCnt(0xFF)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -156,6 +156,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillOnOtherDead(), _passiveSkillOnOtherDead);
     updatePassiveSkill100(_fighter->getPassiveSkillOnCounter100(), _passiveSkillOnCounter100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAttackBleed100(), _passiveSkillOnAttackBleed100);
+    updatePassiveSkill100(_fighter->getPassiveSkillOnAttackConfuseForget100(), _passiveSkillOnAttackConfuseForget100);
+    updatePassiveSkill100(_fighter->getPassiveSkillOnAttackStun100(), _passiveSkillOnAttackStun100);
+    updatePassiveSkill100(_fighter->getPassiveSkillOnAttackBlind100(), _passiveSkillOnAttackBlind100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAtkDmg100(), _passiveSkillOnAtkDmg100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnPetProtect100(), _passiveSkillOnPetProtect100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnGetDmg100(), _passiveSkillOnGetDmg100);
@@ -183,6 +186,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill(_fighter->getPassiveSkillAftNAtk(), _passiveSkillAftNAtk);
     updatePassiveSkill(_fighter->getPassiveSkillOnPetProtect(), _passiveSkillOnPetProtect);
     updatePassiveSkill(_fighter->getPassiveSkillOnCounter(), _passiveSkillOnCounter);
+    updatePassiveSkill(_fighter->getPassiveSkillOnAttackConfuseForget(), _passiveSkillOnAttackConfuseForget);
+    updatePassiveSkill(_fighter->getPassiveSkillOnAttackStun(), _passiveSkillOnAttackStun);
+    updatePassiveSkill(_fighter->getPassiveSkillOnAttackBlind(), _passiveSkillOnAttackBlind);
     updatePassiveSkill(_fighter->getPassiveSkillOnAtkDmg(), _passiveSkillOnAtkDmg);
     updatePassiveSkill(_fighter->getPassiveSkillOnGetDmg(), _passiveSkillOnGetDmg);
     updatePassiveSkill(_fighter->getPassiveSkillOnBeDmg(), _passiveSkillOnBeDmg);
@@ -202,7 +208,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillViolent100(), _passiveSkillViolent100);
     updatePassiveSkill100(_fighter->getPassiveSkillRevival100(), _passiveSkillRevival100);
 
-    updatePassiveSkill100(_fighter->getPassiveSkillByLingshi(GData::SKILL_ENTER_LINGSHI), _passiveSkillEnterLingshi100);
+    updatePassiveSkill100(_fighter->getPassiveSkillByLingshi100(GData::SKILL_ENTER_LINGSHI), _passiveSkillEnterLingshi100);
     initPassiveSkillByLingshi();
 
     std::vector<GObject::LBSkill>& lbSkills =  _fighter->getLBSkill();
@@ -536,6 +542,15 @@ void BattleFighter::updateBuffExtras()
             clanFactor = 1.03;
         else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN3) > 0)
             clanFactor = 1.02;
+        
+        if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_TYSS) > 0)
+        {
+            if(clanFactor == 0)
+                clanFactor = 1 + 0.01;
+            else
+                clanFactor += 0.01;
+        }
+
     }
     if(clanFactor > 0.001f)
     {
@@ -1209,6 +1224,21 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBleed100(size_t& i
     return getPassiveSkill100(_passiveSkillOnAttackBleed100, idx, noPossibleTarget);
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackConfuseForget100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnAttackConfuseForget100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackStun100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnAttackStun100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBlind100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillOnAttackBlind100, idx, noPossibleTarget);
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmg100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillOnAtkDmg100, idx, noPossibleTarget);
@@ -1291,7 +1321,7 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnWithstand100(size_t& idx
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnOtherConfuseAndForget100(size_t& idx, bool noPossibleTarget)
 {
-    return getPassiveSkill100(_passiveSkillOnOtherConfuseForget, idx, noPossibleTarget);
+    return getPassiveSkill100(_passiveSkillOnOtherConfuseForget100, idx, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill, bool noPossibleTarget)
@@ -1420,6 +1450,21 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnCounter(bool noPossibleT
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBleed(bool noPossibleTarget)
 {
     return getPassiveSkill( _passiveSkillOnAttackBleed, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackConfuseForget(bool noPossibleTarget)
+{
+    return getPassiveSkill( _passiveSkillOnAttackConfuseForget, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackStun(bool noPossibleTarget)
+{
+    return getPassiveSkill( _passiveSkillOnAttackStun, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBlind(bool noPossibleTarget)
+{
+    return getPassiveSkill( _passiveSkillOnAttackBlind, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmgForce(bool noPossibleTarget)
@@ -3479,11 +3524,20 @@ void BattleFighter::updatePassiveSkillLingshi100(UInt8 type)
         case GData::SKILL_LINGSHI:
             addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillLingshi100);
             break;
+        case GData::SKILL_ONOTHERCONFUSEFORGET:
+            addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnOtherConfuseForget100);
+            break;
         case GData::SKILL_ENTER_LINGSHI:
             addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillEnterLingshi100);
             break;
-        case GData::SKILL_ONOTHERCONFUSEFORGET:
-            addPassiveSkill100(_allPassiveSkillLingshi100[type], _passiveSkillOnOtherConfuseForget100);
+        case GData::SKILL_ONATKSTUN:
+            addPassiveSkill(_allPassiveSkillLingshi100[type], _passiveSkillOnAttackStun100);
+            break;
+        case GData::SKILL_ONATKCONFUSEFORGET:
+            addPassiveSkill(_allPassiveSkillLingshi100[type], _passiveSkillOnAttackConfuseForget100);
+            break;
+        case GData::SKILL_ONATKBLIND:
+            addPassiveSkill(_allPassiveSkillLingshi100[type], _passiveSkillOnAttackBlind100);
             break;
     }
 }
@@ -3585,11 +3639,20 @@ void BattleFighter::updatePassiveSkillLingshi(UInt8 type)
         case GData::SKILL_LINGSHI:
             addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillLingshi);
             break;
+        case GData::SKILL_ONOTHERCONFUSEFORGET:
+            addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnOtherConfuseForget);
+            break;
         case GData::SKILL_ENTER_LINGSHI:
             addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillEnterLingshi);
             break;
-        case GData::SKILL_ONOTHERCONFUSEFORGET:
-            addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnOtherConfuseForget);
+        case GData::SKILL_ONATKSTUN:
+            addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnAttackStun);
+            break;
+        case GData::SKILL_ONATKCONFUSEFORGET:
+            addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnAttackConfuseForget);
+            break;
+        case GData::SKILL_ONATKBLIND:
+            addPassiveSkill(_allPassiveSkillLingshi[type], _passiveSkillOnAttackBlind);
             break;
     }
 }

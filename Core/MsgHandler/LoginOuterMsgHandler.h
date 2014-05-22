@@ -51,6 +51,7 @@
 #include "GObject/RechargeTmpl.h"
 #include "Version.h"
 #include "GObject/ClanBoss.h"
+#include "GObject/Answer.h"
 
 #ifndef _WIN32
 //#include <libmemcached/memcached.h>
@@ -3453,6 +3454,19 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 //pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_CLAN_SUM, 0);
             }
             break;
+        case 21:
+            {
+                pl->SetVar(GObject::VAR_ANSWER_QUESTIONS_SUCCORFAIL, 0);
+                pl->SetVar(GObject::VAR_ANSWER_SUCCESSION_NUM, 0);
+                pl->SetVar(GObject::VAR_ANSWER_ATTACK_NUM, 0);
+                pl->SetVar(GObject::VAR_ANSWER_SKILL_USE_NUM, 0);
+                pl->SetVar(GObject::VAR_ANSWER_QUESTIONS_STATUS, 0);
+                pl->SetVar(GObject::VAR_ANSWER_SKILL_STATUS, 0);
+                pl->SetVar(GObject::VAR_ANSWER_LITERARY_VALUE, 0);
+                pl->SetVar(GObject::VAR_ANSWER_SKILL_MARK, 0);
+                pl->SetVar(GObject::VAR_ANSWER_QUESTIONS_OPTION, 0);
+            }
+            break;
         default:
             return false;
     }
@@ -3764,7 +3778,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     UInt8 type = 0;
     br >> type >> begin >> end;
     static int curType;
-    if(type != 18)
+    if(type != 18 && type != 21)
     {
         begin = TimeUtil::SharpDay(0, begin);
         if(end > begin && (end - begin)%86400 > 0)
@@ -4033,27 +4047,38 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 21 && begin <= end )
     {
-        /*curType = 21;
+        curType = 21;
         ret = 1;
         Stream st(SPEP::ACTIVITYONOFF);
         st << ret << Stream::eos;
+
+        GObject::answerManager->AwardEndClear();
         NETWORK()->SendMsgToClient(hdr.sessionID, st);
         {
             GObject::globalPlayers.enumerate(player_enum_2, &curType);
         }
         GObject::GVAR.SetVar(GObject::GVAR_ANSWER_PREPARE_DAY, begin);
-        GObject::GVAR.SetVar(GObject::GObject::GVAR_ANSWER_END_DAY, end);
+        GObject::GVAR.SetVar(GObject::GVAR_ANSWER_BEGIN_DAY, (begin+900));
+        GObject::GVAR.SetVar(GObject::GVAR_ANSWER_END_DAY, end);
 
-        UInt32 valueTime = 0;
+        UInt32 valueTimeA = 0;
+        UInt32 valueTimeB = 0;
+        UInt32 valueTimeC = 0;
         UInt32 nowTime = TimeUtil::Now();
-        if(nowTime < GObject::GVAR.GetVar(GObject::GVAR_ANSWER_PREPARE_DAY))
-            valueTime = GObject::GVAR.GetVar(GObject::GVAR_ANSWER_PREPARE_DAY) / (15 * 60) * (15 * 60) + 900;
+        if(nowTime < GObject::GVAR.GetVar(GObject::GVAR_ANSWER_BEGIN_DAY))
+        {
+            valueTimeA = GObject::GVAR.GetVar(GObject::GVAR_ANSWER_BEGIN_DAY) + 25;
+            valueTimeB = GObject::GVAR.GetVar(GObject::GVAR_ANSWER_BEGIN_DAY) + 30;
+        }
         else
-            valueTime = nowTime / (15 * 60) * (15 * 60) + (15 * 60);
+        {
+            valueTimeA = nowTime / 30 * 30 + 25;
+            valueTimeB = nowTime / 30 * 30 + 30;
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_ANSWER_ENDTIME, valueTimeA);
+        GObject::GVAR.SetVar(GObject::GVAR_ANSWER_AWARDTIME, valueTimeB);
 
-        GObject::GVAR.SetVar(GObject::GVAR_DUOBAO_ENDTIME, valueTime);
-
-        return;*/
+        return;
     }
 
     Stream st(SPEP::ACTIVITYONOFF);

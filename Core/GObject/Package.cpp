@@ -8217,6 +8217,15 @@ namespace GObject
 	}
 
     /**********灵侍begin***********/
+#define XIAN_LING_GUO 9459
+    inline UInt8 GET_LS_MAXLEVEL(int quality)
+    {
+        static UInt8 ls_levels[6] = { 0, 0, 30, 50, 70, 90 };
+        if(quality > 6)
+            quality = 0;
+        return ls_levels[quality];
+    }
+
 	ItemLingshi* Package::GetLingshi(UInt32 id)
 	{
 		if (!IsEquipId(id)) return NULL;
@@ -8271,11 +8280,14 @@ namespace GObject
     {
         Fighter * fgt = NULL;
         UInt8 pos = 0;
-		ItemLingshi * equip = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
-		if(!fgt || !equip || !IsLingShi(equip->getClass()))
+		ItemLingshi * lingshi = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
+		if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
 			return;
-        ItemLingshiAttr& lsAttr = equip->getLingshiAttr();
-        if(!GData::lingshiCls.canUpgrade(equip->GetTypeId(), lsAttr.lv, lsAttr.exp))
+        ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
+        if(lsAttr.lv >= GET_LS_MAXLEVEL(lingshi->getQuality()))
+            return;
+        GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+        if(!lsd || !lsd->canUpgrade(lsAttr.exp))
             return;
         UInt32 needTael = 0;
         std::vector<ItemLingshi *> eatVec;
@@ -8299,7 +8311,7 @@ namespace GObject
         bool isUdp = true;
         for(UInt8 i = 0; i < eatVec.size(); ++ i)
         {
-            UInt32 res = lingshiUpgrade(equip, eatVec[i]);
+            UInt32 res = lingshiUpgrade(lingshi, eatVec[i]);
             if(res > 0)
             {
                 UInt8 tmpLvl = eatVec[i]->getLingshiAttr().lv;
@@ -8315,41 +8327,45 @@ namespace GObject
             }
         }
         if(tmp != lsAttr.lv)
+        {
             fgt->setDirty();
+            fgt->updateLingshiSkillId(lingshi, pos);
+        }
         ConsumeInfo ci(LingShiPeiYang, 0, 0);
         m_Owner->useTael(needTael, &ci);
 
 		Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x13);
         st << fighterId << pos;
-		AppendLingshiData(st, equip);
+		AppendLingshiData(st, lingshi);
 		st << Stream::eos;
 		m_Owner->send(st);
     }
 
-    UInt32 Package::lingshiUpgrade(ItemLingshi * equip, ItemLingshi * eatEq)
+    UInt32 Package::lingshiUpgrade(ItemLingshi * lingshi, ItemLingshi * eatEq)
     {
-        ItemLingshiAttr& lsAttr = equip->getLingshiAttr();
-        UInt32 upExp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
+        ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
+        UInt32 upExp = GData::lingshiCls.getLingShiExp(lsAttr.lv);
         if(upExp == 0) return 0;
         lsAttr.exp += (eatEq->GetItemType().trumpExp + eatEq->getLingshiAttr().exp);
         if(lsAttr.exp >= upExp)
         {
             UInt8 tmp = lsAttr.lv;
-            UInt8 maxLev = GData::lingshiCls.getLingshiMaxLev(equip->GetTypeId(), tmp);
+            UInt8 maxLev = GET_LS_MAXLEVEL(lingshi->getQuality());
             for(UInt8 i = tmp; i <= maxLev; ++ i)
             {
-                if(!GData::lingshiCls.canUpgrade(equip->GetTypeId(), lsAttr.lv, lsAttr.exp))
+                GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+                if(!lsd || !lsd->canUpgrade(lsAttr.exp))
                     break;
-                if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
+                if(lsAttr.exp < lsd->exp)
                     break;
                 ++ lsAttr.lv;
             }
             if(lsAttr.lv >= maxLev)
             {
                 lsAttr.lv = maxLev;
-                if(!GData::lingshiCls.canBreak(equip->GetTypeId(), lsAttr.lv))
-                    lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
+                if(!GData::lingshiCls.canBreak(lsAttr.lv))
+                    lsAttr.exp = GData::lingshiCls.getLingShiExp(lsAttr.lv-1);
                 return 1;
             }
         }
@@ -8364,40 +8380,41 @@ namespace GObject
 		if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
 			return;
         ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
-        if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
+        GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+        if(!lsd || !lsd->canUpgrade(lsAttr.exp))
             return;
         bool hasLucky = uRand(10000) < 1000;
         if(type)
         {
-            UInt32 cnt = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_CNT) + 1;
-            static UInt32 moneys[3] = {50, 100, 200};
-            static UInt32 tmpCnt[3] = {5, 30, 0xFFFFFFFF};
-            int idx = 0;
-            for(; idx < 3; ++ idx)
-            {
-                if(cnt <= tmpCnt[idx])
-                    break;
-            }
+            UInt32 count = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_CNT) + 1;
+            UInt32 needGold = 0;
+            if(count <= 5)
+                needGold = 6;
+            else if(count <= 10)
+                needGold = 12;
+            else if(count >= 40)
+                needGold = 192;
+            else
+                needGold = (count-10)*6 + 12;
             bool isHalf = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_LUCKY) > 0;
-            if(m_Owner->getGold() < moneys[idx] / (isHalf ? 2 : 1))
+            if(m_Owner->getGold() < needGold / (isHalf ? 2 : 1))
             {
-                m_Owner->sendMsgCode(0, 1101);
+                m_Owner->sendMsgCode(0, 1104);
                 return;
             }
             ConsumeInfo ci(LingShiPeiYang, 0, 0);
-            m_Owner->useGold(moneys[idx] / (isHalf ? 2 : 1), &ci);
-            m_Owner->SetVar(VAR_LINGSHI_PEIYANG_CNT, cnt);
-            lsAttr.exp += 3000 * (hasLucky ? 10 : 1);
+            m_Owner->useGold(needGold / (isHalf ? 2 : 1), &ci);
+            m_Owner->SetVar(VAR_LINGSHI_PEIYANG_CNT, count);
+            lsAttr.exp += 25 * (hasLucky ? 10 : 1);
         }
         else
         {
-#define XIAN_LING_GUO 9459
             if(GetItemAnyNum(XIAN_LING_GUO) < 1)
                 return;
             bool isBind = false;
             DelItemAny(XIAN_LING_GUO, 1, &isBind);
             DelItemSendMsg(XIAN_LING_GUO, m_Owner);
-            lsAttr.exp += 2000 * (hasLucky ? 10 : 1);
+            lsAttr.exp += 20 * (hasLucky ? 10 : 1);
             m_Owner->udpLog("lingshi", "F_140509_11", "", "", "", "", "act");
         }
         if(hasLucky)
@@ -8407,25 +8424,29 @@ namespace GObject
         }
         else if(!hasLucky && type)
             m_Owner->SetVar(VAR_LINGSHI_PEIYANG_LUCKY, 0);
-        UInt8 maxLev = GData::lingshiCls.getLingshiMaxLev(lingshi->GetTypeId(), lsAttr.lv);
+        UInt8 maxLev = GET_LS_MAXLEVEL(lingshi->getQuality());
         UInt8 tmp = lsAttr.lv;
         for(UInt8 i = tmp; i <= maxLev; ++ i)
         {
-            if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
+            lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+            if(!lsd || !lsd->canUpgrade(lsAttr.exp))
                 break;
-            if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
+            if(lsAttr.exp < lsd->exp)
                 break;
             ++ lsAttr.lv;
         }
         if(lsAttr.lv >= maxLev)
         {
             lsAttr.lv = maxLev;
-            if(!GData::lingshiCls.canBreak(lingshi->GetTypeId(), lsAttr.lv))
-                lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
+            if(!GData::lingshiCls.canBreak(lsAttr.lv))
+                lsAttr.exp = GData::lingshiCls.getLingShiExp(lsAttr.lv-1);
         }
 		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
         if(tmp != lsAttr.lv)
+        {
             fgt->setDirty();
+            fgt->updateLingshiSkillId(lingshi, pos);
+        }
 
 		Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x15);
@@ -8444,12 +8465,8 @@ namespace GObject
 		if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
 			return;
         ItemLingshiAttr & lsAttr = lingshi->getLingshiAttr();
-        if(!GData::lingshiCls.canBreak(lingshi->GetTypeId(), lsAttr.lv))
-            return;
-        GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lingshi->GetTypeId(), lsAttr.lv);
-        if(!lsd)
-            return;
-        if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
+        GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+        if(!lsd || !lsd->isBreak)
             return;
         if(type)
         {
@@ -8474,6 +8491,7 @@ namespace GObject
         ++ lsAttr.lv;
 		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
         fgt->setDirty();
+        fgt->updateLingshiSkillId(lingshi, pos);
 
 		Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x14);

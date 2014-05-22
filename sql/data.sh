@@ -139,6 +139,7 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from drinkAttr; source drinkAttr;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from lingshi; source lingshi;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from lingshi_upgrade; source lingshi_upgrade;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from lingshi_level; source lingshi_level;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from newquestions; source newquestions;";
 }
 

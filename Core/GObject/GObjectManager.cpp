@@ -3785,7 +3785,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum`, `clantitleAll` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum`, `clantitleAll`,`clanFireValue`  FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3844,6 +3844,7 @@ namespace GObject
                 if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
                     clan->SetTYSSSum(0,true);
                 clan->SetClanTitle(cl.clantitleAll);
+                clan->SetClanFireValue(cl.clanFireValue);
             }
 			else
 			{

@@ -884,6 +884,7 @@ void SetAnswerSkill( GameMsgHdr& hdr,  const void* data )
     {
         UInt8 index;
         UInt8 nextQuestionId;
+        UInt64 lastPlayerId;
     };
 
 	const skilldata * sd = reinterpret_cast<const skilldata *>(data);
@@ -895,16 +896,24 @@ void SetAnswerSkill( GameMsgHdr& hdr,  const void* data )
         if(iter->player==player && 0 != mark)
         {
             UInt32 skillStatus = iter2->player->GetVar(VAR_ANSWER_SKILL_STATUS);
-            UInt8 special = GET_BIT_5(skillStatus, 2);
+            /*UInt8 special = GET_BIT_5(skillStatus, 2);
             if((sd->nextQuestionId-1) == special) //复苏之风技能
-                return;
+                return;*/
 
             UInt8 nextId = GET_BIT_5(skillStatus, sd->index);
             if(sd->nextQuestionId == nextId)
                 return;
 
+            Player* lastPlayer = globalPlayers[sd->lastPlayerId];
+            if(iter2->player != lastPlayer)
+                return;
+
+            if(iter2->player->GetVar(VAR_ANSWER_ATTACK_NUM) >= 8)
+                return;
+
             skillStatus = SET_BIT_5(skillStatus, sd->index, sd->nextQuestionId);
             iter2->player->SetVar(VAR_ANSWER_SKILL_STATUS, skillStatus);
+            iter2->player->AddVar(VAR_ANSWER_ATTACK_NUM, 1);
         }
         mark++;
         iter2 = iter;
@@ -958,8 +967,8 @@ void SendAnswerRank( GameMsgHdr& hdr,  const void* data )
     }
 
     Stream st(REP::ACT);
-    st << static_cast<UInt8>(0x32) << static_cast<UInt16>(myRank) << static_cast<UInt16>(myScore);
-    UInt32 count = 0;
+    st << static_cast<UInt8>(0x32) << static_cast<UInt8>(0x10) << myRank << static_cast<UInt16>(myScore);
+    UInt8 count = 0;
     UInt32 offset = 0;
     offset = st.size();
     st << count;
@@ -968,9 +977,11 @@ void SendAnswerRank( GameMsgHdr& hdr,  const void* data )
     for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
     {
         count++;
-        st << static_cast<UInt16>(c+1);
+        st << static_cast<UInt32>(c+1);
         st << i->player->getName();
         st << static_cast<UInt16>(i->total);
+        st << static_cast<UInt8>(i->player->getCountry());
+        st << static_cast<UInt64>(i->player->getId());
         c++;
         if(c >= 3)
             break;
@@ -984,14 +995,16 @@ void SendAnswerRank( GameMsgHdr& hdr,  const void* data )
 
     for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
     {
-        if(count>3)
+        if(c1>=3)
         {
             if((c1+1)>=mark && (c1+1)<myRank)
             {
                 count++;
-                st << static_cast<UInt16>(c1+1);
+                st << static_cast<UInt32>(c1+1);
                 st << i->player->getName();
                 st << static_cast<UInt16>(i->total);
+                st << static_cast<UInt8>(i->player->getCountry());
+                st << static_cast<UInt64>(i->player->getId());
                 c2++;
                 if(c2 >= 3)
                     break;
@@ -2792,7 +2805,7 @@ void OnSendAnswerBegin(GameMsgHdr& hdr,  const void* data )
     UInt32 time = TimeUtil::SharpDayT(0,nowTime);
     UInt32 prepare = time + 19*60*60 + 15*60;     // 每天19点30开始
     UInt32 start = time + 19*60*60 + 30*60;       // 每天19点30开始
-    UInt32 end = time + 22*60*60 + 45*60;         // 每天19点45结束
+    UInt32 end = time + 19*60*60 + 45*60;         // 每天19点45结束
     UInt8 mark =  0;
     if(nowTime >= prepare && nowTime <= end)
     {

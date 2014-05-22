@@ -3133,22 +3133,13 @@ namespace GData
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         DBLingShi dbls;
-		if(execu->Prepare("SELECT `id`, `level`, `isBreak`, `useItem`, `useGold`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `toughlvl`, `action`, `hitrlvl`, `evdlvl`, `crilvl`, `criticaldmg`, `pirlvl`, `counterlvl`, `mreslvl` FROM `lingshi`", dbls) != DB::DB_OK)
+		if(execu->Prepare("SELECT `level`, `consume`, `exp`, `isBreak`, `useItem`, `useGold`, `attack`, `magatk`, `hp`, `action` FROM `lingshi_level`", dbls) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)
 		{
-            if(dbls.id > 0)
+            if(dbls.level > 0)
                 lingshiCls.setLingshiTable(dbls);
-        }
-
-        DBLingShiUp dblsu;
-		if(execu->Prepare("SELECT `level`, `consume`, `exp` FROM `lingshi_upgrade`", dblsu) != DB::DB_OK)
-			return false;
-		while(execu->Next() == DB::DB_OK)
-		{
-            if(dblsu.level > 0)
-                lingshiCls.setLingshiUpTable(dblsu);
         }
         return true;
     }

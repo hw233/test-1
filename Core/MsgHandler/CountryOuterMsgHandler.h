@@ -1423,11 +1423,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GLOBAL().PushMsg(hdr, NULL);
     }
 
-    {
-        GameMsgHdr hdr(0x168, WORKER_THREAD_WORLD, pl, 0);
-        GLOBAL().PushMsg(hdr, NULL);
-    }
-
     pl->MiLuZhiJiao();
     //pl->QiShiBanState();
     UInt32 flag = pl->GetVar(VAR_OLDMAN_SCORE_AWARD);
@@ -5252,6 +5247,11 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
             // 帮派副本的战斗操作
             clan->clanCopyBattleOperate(player, command, brd);
             break;
+        case 0x20:
+            // 帮派拜火祭天
+            if(World::getFireSacrificeTime())
+                clan->clanFireSacrificeOp(player, command);
+            break;
         default:
                 break;
     }
@@ -7111,7 +7111,6 @@ void OnQueryTempItemReq( GameMsgHdr & hdr, const void * data )
 void OnErlkingReq(GameMsgHdr & hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
-    return ;
 
     if(player->GetLev() < 85)
         return;

@@ -1218,42 +1218,44 @@ ItemEquip * Fighter::setLingshi(ItemEquip * lingshi, int idx, bool writedb)
     ItemEquip * old = _lingshi[idx];
     _lingshi[idx] = lingshi;
     sendModification(0x63+idx, lingshi, writedb);
+    _lingshiSkill[idx].clear();
     if(lingshi)
     {
         lingshi->SetBindStatus(true);
-        //setLingshiSkill
-        std::string lsStr;
-        for(size_t j = 0; j < _lingshiSkill[idx].size(); ++ j)
-        {
-            lsStr += Itoa(_lingshiSkill[idx][j]);
-            if(j < _lingshiSkill[idx].size() - 1)
-                lsStr += ",";
-        }
-        delSkills(lsStr, false);
-        lsStr.clear();
-        std::vector<const GData::SkillBase*> vt_skills;
-        GData::ItemGemType * igt = GData::lingshiTypes[lingshi->GetTypeId() - LLINGSHI_ID];
-        ItemLingshiAttr& lsAttr = static_cast<ItemLingshi *>(lingshi)->getLingshiAttr();
-        if(igt && igt->attrExtra)
-        {
-            _lingshiSkill[idx].clear();
-            for(size_t j = 0; j < igt->attrExtra->skills.size(); ++ j)
-            {
-                if(igt->attrExtra->skills[j])
-                {
-                    UInt16 skillId = igt->attrExtra->skills[j]->getId();
-                    if(j > 0)   //第一个技能(入场技能)不升级
-                        skillId = SKILLANDLEVEL(SKILL_ID(skillId), lsAttr.lv / 10 + 1);
-                    _lingshiSkill[idx].push_back(skillId);
-                    lsStr += Itoa(skillId) + ",";
-                }
-            }
-            setSkills(lsStr, false);
-        }
+        updateLingshiSkillId(lingshi, idx);
+    }
+    else
+    {
+        if(idx == 0)
+            upPassiveSkillLingshi();
     }
     setDirty();
 
     return old;
+}
+
+void Fighter::updateLingshiSkillId(ItemEquip * lingshi, UInt8 idx)
+{
+    if(idx >= LINGSHI_UPMAX || !lingshi)
+        return;
+    GData::ItemGemType * igt = GData::lingshiTypes[lingshi->GetTypeId() - LLINGSHI_ID];
+    ItemLingshiAttr& lsAttr = static_cast<ItemLingshi *>(lingshi)->getLingshiAttr();
+    if(igt && igt->attrExtra)
+    {
+        _lingshiSkill[idx].clear();
+        for(size_t j = 0; j < igt->attrExtra->skills.size(); ++ j)
+        {
+            if(igt->attrExtra->skills[j])
+            {
+                UInt16 skillId = igt->attrExtra->skills[j]->getId();
+                if(j > 0)   //第一个技能(入场技能)不升级
+                    skillId = SKILLANDLEVEL(SKILL_ID(skillId), lsAttr.lv / 10 + 1);
+                _lingshiSkill[idx].push_back(skillId);
+            }
+        }
+        if(idx == 0)
+            upPassiveSkillLingshi();
+    }
 }
 
 int Fighter::getAllTrumpId( UInt32* trumps, int size )
@@ -1831,12 +1833,52 @@ void Fighter::addLingshiAttr( ItemEquip* lingshi )
     if (!lingshi)
         return;
     GData::ItemGemType * igt = GData::lingshiTypes[lingshi->GetTypeId() - LLINGSHI_ID];
-    GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lingshi->GetTypeId(), static_cast<ItemLingshi *>(lingshi)->getLingshiAttr().lv);
+    GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(static_cast<ItemLingshi *>(lingshi)->getLingshiAttr().lv);
     if (!igt || !lsd || !igt->attrExtra)
         return;
 
+    GData::AttrExtra ae = lsd->attrs;
+    UInt8 q = lingshi->getQuality();
+    if(q == Item_Green)
+        ae = ae * 0.4f;
+    else if(q == Item_Blue)
+        ae = ae * 0.55f;
+    else if(q == Item_Purple)
+        ae = ae * 0.75f;
+    else if(q == Item_Yellow)
+        ae = ae * 1.0f;
+
+    UInt8 cls = getClass();
+    if(cls == e_cls_ru)
+    {
+        ae.attack *= 0.8f;
+        ae.magatk *= 1.1f;
+        ae.hp     *= 0.8f;
+        ae.action *= 0.9f;
+    }
+    else if(cls == e_cls_shi)
+    {
+        ae.attack *= 1.0f;
+        ae.magatk *= 1.0f;
+        ae.hp     *= 1.0f;
+        ae.action *= 1.0f;
+    }
+    else if(cls == e_cls_dao)
+    {
+        ae.attack *= 1.3f;
+        ae.magatk *= 0.6f;
+        ae.hp     *= 1.1f;
+        ae.action *= 0.8f;
+    }
+    else if(cls == e_cls_mo)
+    {
+        ae.attack *= 1.3f;
+        ae.magatk *= 0.6f;
+        ae.hp     *= 0.8f;
+        ae.action *= 1.0f;
+    }
 	addAttrExtra(_attrExtraEquip, igt->attrExtra);
-	addAttrExtra(_attrExtraEquip, &(lsd->attrs));
+	addAttrExtra(_attrExtraEquip, &ae);
 }
 
 void Fighter::rebuildEquipAttr()
@@ -3059,6 +3101,29 @@ void Fighter::getAllPSkillAndLevel4Arena(Stream& st)
     }
 }
 
+
+void Fighter::getAllLingshiSkillAndLevel2Arena(Stream& st)
+{
+    UInt8 size = 0;
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        size = _passklLingshi[i].size();
+        st << size;
+        for (size_t j = 0; j < _passklLingshi[i].size(); ++j)
+        {
+            st << _passklLingshi[i][j];
+        }
+    }
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        size = _rpassklLingshi[i].size();
+        st << size;
+        for (size_t j = 0; j < _rpassklLingshi[i].size(); ++j)
+        {
+            st << _rpassklLingshi[i][j];
+        }
+    }
+}
 
 UInt8 Fighter::getSkillsNum()
 {
@@ -4289,72 +4354,34 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
     return ret;
 }
 
-bool Fighter::upPassiveSkillLingshi(UInt16 skill, UInt16 type, bool p100)
+bool Fighter::upPassiveSkillLingshi()
 {
-    if (type < GData::SKILL_PASSSTART || type >= GData::SKILL_PASSIVES)
-        return false;
-
     bool ret = false;
-    UInt16 idx = type - GData::SKILL_PASSSTART;
-    if (p100)
-    { // 100%
-        for (size_t j = 0; j < _rpassklLingshi[idx].size(); ++j)
-        {
-            if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skill))
-            { // off
-                std::vector<UInt16>::iterator i = _rpassklLingshi[idx].begin();
-                std::advance(i, j);
-                _rpassklLingshi[idx].erase(i);
-            }
-        }
-        for (size_t j = 0; j < _passklLingshi[idx].size(); ++j)
-        {
-            if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skill))
-            {
-                ret = true;
-                if (skill != _passklLingshi[idx][j]) // upgrade
-                    _passklLingshi[idx][j] = skill;
-                break;
-            }
-        }
-
-        if(!ret)
-        {  // up
-            ret = true;
-            _passklLingshi[idx].push_back(skill);
-        }
-    }
-    else
+    for (UInt16 idx = 0; idx < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++idx)
     {
-        for (size_t j = 0; j < _passklLingshi[idx].size(); ++j)
-        {
-            if (SKILL_ID(_passklLingshi[idx][j]) == SKILL_ID(skill))
-            {
-                ret = true;
-                break;
-            }
-        }
-
-        for (size_t j = 0; j < _rpassklLingshi[idx].size(); ++j)
-        {
-            if (SKILL_ID(_rpassklLingshi[idx][j]) == SKILL_ID(skill))
-            {
-                ret = true;
-                if (skill != _rpassklLingshi[idx][j])
-                { // upgrade
-                    _rpassklLingshi[idx][j] = skill;
-                    break;
-                }
-            }
-        }
-
-        if (!ret)
-        { // up
-            ret = true;
-            _rpassklLingshi[idx].push_back(skill);
-        }
+        _passklLingshi[idx].clear();
+        _rpassklLingshi[idx].clear();
     }
+    for (std::vector<UInt16>::iterator it = _lingshiSkill[0].begin(); it != _lingshiSkill[0].end(); ++it)
+    {
+        UInt16 skillId = *it;
+        if (!skillId)
+            continue;
+        const GData::SkillBase* skill = GData::skillManager[skillId];
+        if (!skill)
+            continue;
+        UInt16 type = skill->cond;
+        bool p100 = (skill->prob >= 100.0f)? true: false;
+        if (type < GData::SKILL_PASSSTART || type >= GData::SKILL_PASSIVES)
+            return false;
 
+        UInt16 idx = type - GData::SKILL_PASSSTART;
+
+        if (p100) // 100%
+                _passklLingshi[idx].push_back(skillId);
+        else
+                _rpassklLingshi[idx].push_back(skillId);
+    }
     return ret;
 }
 

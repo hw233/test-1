@@ -726,6 +726,10 @@ namespace GObject
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
+        VAR_FIRE_SACRIFICE_TIMES = 772, //拜火祭天：0-7帮众添柴次数，8-15帮主诏令次数
+        VAR_FIRE_SACRIFICE_ADD_WOOD_TIME = 773, //拜火祭天添柴时间
+        VAR_FIRE_SACRIFICE_CALLING_TIME = 774, //拜火祭天召唤帮众时间
+        VAR_DUOBAO_ACTIVE_POINT = 775, //夺宝奇兵活跃值+1(一天一点) 
 
         //781 - 800 for lijr
         VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
@@ -745,6 +749,7 @@ namespace GObject
         VAR_ANSWER_SKILL_MARK = 794,             //一战成名本题所用技能标志 (每1位表示一种技能在本题中是否使用)
         VAR_ANSWER_SKILL_USE_NUM = 795,          //一战成名技能使用数量 (每2位表示一种技能已使用数量)
         VAR_ANSWER_QUESTIONS_SUCCORFAIL = 796,   //一战成名回答问题成功失败（1-30位每一位代表是否回答成功该道题）
+        VAR_ANSWER_QUESTIONS_OPTION = 797,       //一战成名题号和当前选项(一个5位表示题号，第二个题号表示选项)
         VAR_MAX,
     };
 
@@ -1385,6 +1390,7 @@ namespace GObject
             REGISTER_VAR(VAR_ANSWER_SKILL_MARK, CYCLE_DAY);
             REGISTER_VAR(VAR_ANSWER_SKILL_USE_NUM, CYCLE_DAY);
             REGISTER_VAR(VAR_ANSWER_QUESTIONS_SUCCORFAIL, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_QUESTIONS_OPTION, CYCLE_DAY);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);
@@ -1401,6 +1407,10 @@ namespace GObject
             REGISTER_VAR(VAR_DRINK_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_FRIEND_VALUE_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_TIMES, CYCLE_DAY);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_ADD_WOOD_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_CALLING_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_DUOBAO_ACTIVE_POINT, CYCLE_DAY);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);

@@ -310,6 +310,7 @@ public:
     // 取得所有被动技能
     void getAllPSkillAndLevel(Stream& st);
     void getAllPSkillAndLevel4Arena(Stream& st);
+    void getAllLingshiSkillAndLevel2Arena(Stream& st);
     // 取得所有学习的技能和等级
     void getAllSkillsAndLevel(Stream& st);
     // 取得装备了的和学习了的技能和等级
@@ -323,7 +324,7 @@ public:
     // 更新被动技能表
     bool upPassiveSkill(UInt16 skill, UInt16 type, bool, bool = true);
     // 更新灵侍技能表
-    bool upPassiveSkillLingshi(UInt16 skill, UInt16 type, bool p100);
+    bool upPassiveSkillLingshi();
     // 装备被动技能
     //bool upPassiveSkill(UInt16* skill, UInt8 size, bool = true);
     // 更新被动技能
@@ -430,6 +431,15 @@ public:
 
     inline std::vector<UInt16>& getPassiveSkillByLingshi(UInt8 type) { return _rpassklLingshi[type-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillByLingshi100(UInt8 type) { return _passklLingshi[type-GData::SKILL_PASSSTART]; }
+
+    inline std::vector<UInt16>& getPassiveSkillOnAttackConfuseForget() { return _rpasskl[GData::SKILL_ONATKCONFUSEFORGET-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnAttackConfuseForget100() { return _passkl[GData::SKILL_ONATKCONFUSEFORGET-GData::SKILL_PASSSTART]; }
+
+    inline std::vector<UInt16>& getPassiveSkillOnAttackStun() { return _rpasskl[GData::SKILL_ONATKSTUN-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnAttackStun100() { return _passkl[GData::SKILL_ONATKSTUN-GData::SKILL_PASSSTART]; }
+
+    inline std::vector<UInt16>& getPassiveSkillOnAttackBlind() { return _rpasskl[GData::SKILL_ONATKBLIND-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnAttackBlind100() { return _passkl[GData::SKILL_ONATKBLIND-GData::SKILL_PASSSTART]; }
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
@@ -594,6 +604,7 @@ public:
     ItemEquip * setLingshi(ItemEquip *);
 	ItemEquip ** setLingshi(std::string&, bool = true);
     ItemEquip * setLingshi(ItemEquip *, int idx, bool = true);
+    void updateLingshiSkillId(ItemEquip *, UInt8);
 	ItemEquip * findEquip(UInt32 id, UInt8& pos);
 	ItemEquip * findfashion(UInt32 id);
 	void findTrumpByTypeId(std::vector<ItemEquip*>& ret, UInt32 id);
