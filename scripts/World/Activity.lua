@@ -1136,6 +1136,12 @@ function onActivityCheck(tm)
           setDropAct(false)
       end
 
+      if tm >= actTimeq2 and tm < actTimeq2_1 then
+          setAnswerAct(true)
+      else
+          setAnswerAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -1519,6 +1525,7 @@ function initActTime(y, m, d)
   local  SerStartTm257_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTmq1= { ['year'] = 2014, ['month'] = 6, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTmq2= { ['year'] = 2014, ['month'] = 5, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -2008,6 +2015,9 @@ function initActTime(y, m, d)
 
   actTimeq1= os.time(SerStartTmq1)
   actTimeq1_1= os.time(SerStartTmq1) + 86400;
+
+  actTimeq2= os.time(SerStartTmq2)
+  actTimeq2_1= os.time(SerStartTmq2) + 5 * 86400;
 
   onActivityCheck(os.time() + 30);
 

@@ -152,6 +152,7 @@ bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
 bool World::_dropact = false;
+bool World::_answeract = false;
 bool World::_foolbao = false;
 bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
@@ -2386,6 +2387,8 @@ inline bool enum_answer_send(GObject::Player* player, UInt8 mark)
 
 void World::AnswerCheck(void *)
 {
+    if(!World::getAnswerAct())
+        return;
     UInt32 nowTime = TimeUtil::Now();
     UInt32 time = TimeUtil::SharpDayT(0, nowTime);
     if(World::getPrepareTime())
@@ -2434,8 +2437,8 @@ void World::AnswerCheck(void *)
                 UInt32 value = GVAR.GetVar(GVAR_ANSWER_AWARDTIME) + 25;    //本轮活动结束，时间设置到下一题的答题结束时间
                 GVAR.SetVar(GVAR_ANSWER_ENDTIME, value);
                 GObject::globalPlayers.enumerate(enum_answer_send, 3);
-                std::cout << "nowTimeAAA : " << nowTime << std::endl;
-                std::cout << "answerEnd : " << value << std::endl;
+                //std::cout << "nowTimeAAA : " << nowTime << std::endl;
+                //std::cout << "answerEnd : " << value << std::endl;
             }
         }
         else if(nowTime >= GVAR.GetVar(GVAR_ANSWER_AWARDTIME))
@@ -2469,8 +2472,8 @@ void World::AnswerCheck(void *)
                 GVAR.SetVar(GVAR_ANSWER_AWARDTIME, valueC);
                 answerManager->AwardEndClear();
 
-                std::cout << "nowTimeBBB : " << nowTime << std::endl;
-                std::cout << "awardEnd : " << valueC << std::endl;
+                //std::cout << "nowTimeBBB : " << nowTime << std::endl;
+                //std::cout << "awardEnd : " << valueC << std::endl;
                 GObject::globalPlayers.enumerate(enum_answer_send, 4);
             }
         }
@@ -4317,17 +4320,17 @@ void World::SendAllAnswerEnd()
             }
         }
        
-        if(fMark>=5 && fMark<10)
+        if(sMark>=5 && sMark<10)
             pl->udpLog("yzcm", "F_140523_2", "", "", "", "", "act");
-        else if(fMark>=10 && fMark<15)
+        else if(sMark>=10 && sMark<15)
             pl->udpLog("yzcm", "F_140523_3", "", "", "", "", "act");
-        else if(fMark>=15 && fMark<20)
+        else if(sMark>=15 && sMark<20)
             pl->udpLog("yzcm", "F_140523_4", "", "", "", "", "act");
-        else if(fMark>=20 && fMark<25)
+        else if(sMark>=20 && sMark<25)
             pl->udpLog("yzcm", "F_140523_5", "", "", "", "", "act");
-        else if(fMark>=25 && fMark<30)
+        else if(sMark>=25 && sMark<30)
             pl->udpLog("yzcm", "F_140523_6", "", "", "", "", "act");
-        else if(fMark==30)
+        else if(sMark==30)
             pl->udpLog("yzcm", "F_140523_7", "", "", "", "", "act");
 
         Stream st(REP::ACT);
@@ -4366,10 +4369,10 @@ void World::SendAnswerAward()
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
         {
+            UInt16 ach = 0;
             if(rank>=1 && rank<=3)
             {
                 UInt16 pTitle = 0;
-                UInt16 ach = 0;
                 if(1 == rank)
                 {
                     pTitle = 207;

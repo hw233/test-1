@@ -966,6 +966,17 @@ void SendAnswerRank( GameMsgHdr& hdr,  const void* data )
         }
     }
 
+    /*UInt32 a = 0;
+    if(3335 == player->getId())
+    {
+        for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
+        {
+            std::cout << "nowTime3335 : " << i->player->getId() << "xxxxx" << i->total << a++ << std::endl;
+        }
+        
+        std::cout << "nowTime3335 : " << "YYYYY"<< std::endl;
+    }*/
+
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x32) << static_cast<UInt8>(0x10) << myRank << static_cast<UInt16>(myScore);
     UInt8 count = 0;

@@ -52,6 +52,9 @@ namespace GObject
 
     void Answer::SendAnswerInfo(Player* pl)
     {
+        if(0==m_answerId || m_answerId>MAX_ANSWER_NUM)
+            return;
+
         GData::NewQuestionsData::newquestionsInfo * info = GData::newquestionsData.getNewQuestionsInfo(m_answer[m_answerId-1]);
         if(NULL == info)
             return;
@@ -65,16 +68,16 @@ namespace GObject
         UInt32 awardTime = 0;
         if(World::getAnswerTime())
         {
-            std::cout << "nowTime333 : " << nowTime << std::endl;
+            //std::cout << "nowTime333 : " << nowTime << std::endl;
             if(GVAR.GetVar(GVAR_ANSWER_ENDTIME) > nowTime)
             {
                 endTime = GVAR.GetVar(GVAR_ANSWER_ENDTIME) - nowTime;
-                std::cout << "AnswerEnd111 : " << endTime << std::endl;
+                //std::cout << "AnswerEnd111 : " << endTime << std::endl;
             }
             else
             {
                 awardTime = GVAR.GetVar(GVAR_ANSWER_AWARDTIME) - nowTime;
-                std::cout << "awardEnd222 : " << awardTime << std::endl;
+                //std::cout << "awardEnd222 : " << awardTime << std::endl;
             }
         }
 
@@ -133,17 +136,20 @@ namespace GObject
     void Answer::SelectNumInfo(Stream& st)
     {
         st << m_answerNum.retANum;
-        std::cout << "NUMAAA: " << static_cast<UInt32>(m_answerNum.retANum) << std::endl;
+        //std::cout << "NUMAAA: " << static_cast<UInt32>(m_answerNum.retANum) << std::endl;
         st << m_answerNum.retBNum;
-        std::cout << "NUMBBB: " << static_cast<UInt32>(m_answerNum.retBNum) << std::endl;
+        //std::cout << "NUMBBB: " << static_cast<UInt32>(m_answerNum.retBNum) << std::endl;
         st << m_answerNum.retCNum;
-        std::cout << "NUMCCC: " << static_cast<UInt32>(m_answerNum.retCNum) << std::endl;
+        //std::cout << "NUMCCC: " << static_cast<UInt32>(m_answerNum.retCNum) << std::endl;
         st << m_answerNum.retDNum;
-        std::cout << "NUMDDD: " << static_cast<UInt32>(m_answerNum.retDNum) << std::endl;
+        //std::cout << "NUMDDD: " << static_cast<UInt32>(m_answerNum.retDNum) << std::endl;
     }
 
     void Answer::SkillAndLogInfo(Player* pl, Stream& st)
     {
+        if(0==m_answerId || m_answerId>MAX_ANSWER_NUM)
+            return;
+
         UInt8 countA = 0;
         UInt32 offsetA = 0;
         offsetA = st.size();
@@ -220,6 +226,9 @@ namespace GObject
         if(0 == opt || opt > 4)
             return;
 
+        if(0==m_answerId || m_answerId>MAX_ANSWER_NUM)
+            return;
+
         UInt32 status = pl->GetVar(VAR_ANSWER_QUESTIONS_STATUS);
         UInt8 mark = GET_BIT(status, m_answerId);
         if(1 == mark)
@@ -277,6 +286,9 @@ namespace GObject
     void Answer::AnswerEnd(Player* pl)
     {
         if(NULL == pl)
+            return;
+
+        if(0==m_answerId || m_answerId>MAX_ANSWER_NUM)
             return;
 
         answerEnd answerEndInfo;
@@ -465,10 +477,13 @@ namespace GObject
         if(NULL == pl)
             return;
 
+        if(0==m_answerId || m_answerId>MAX_ANSWER_NUM)
+            return;
+
         if(0==skillId || skillId>5)
             return;
 
-        if(GVAR.GetVar(GVAR_ANSWER_ENDTIME) > GVAR.GetVar(GVAR_ANSWER_AWARDTIME)
+        if(GVAR.GetVar(GVAR_ANSWER_ENDTIME) > GVAR.GetVar(GVAR_ANSWER_AWARDTIME))
             return;
 
         UInt32 status = pl->GetVar(VAR_ANSWER_SKILL_USE_NUM);
@@ -550,7 +565,7 @@ namespace GObject
             if(NULL == other)
                 return;
 
-            std::cout << "nowTime666666666: " << otherId << std::endl;
+            //std::cout << "nowTime666666666: " << otherId << std::endl;
             answerLog logA;
             logA.logType = 2;
             logA.skillId = skillId;
