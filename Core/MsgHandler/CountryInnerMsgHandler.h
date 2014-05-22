@@ -1319,12 +1319,15 @@ void OnSetPropsReq( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     struct Props
     {
+        UInt32 exp;
         UInt32 pexp;
         UInt32 prestige;
         UInt32 honor;
     };
 
     Props* props = (Props*)(data);
+    if (props->exp)
+        player->AddExp(props->exp);
     if (props->pexp)
         player->AddPExp(props->pexp);
     if (props->honor)

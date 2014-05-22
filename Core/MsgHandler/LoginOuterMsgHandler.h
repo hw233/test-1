@@ -2667,10 +2667,12 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
     {
         struct Props
         {
+            UInt32 exp;
             UInt32 pexp;
             UInt32 prestige;
             UInt32 honor;
         } props;
+        memset(&props, 0, sizeof(Props));
 
         props.pexp = pexp;
         props.prestige = prestige;
