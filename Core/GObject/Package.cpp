@@ -8394,11 +8394,17 @@ namespace GObject
                 if(!hasBreak)
                     ++ lsAttr.lv;
             }
+            UInt32 maxExp = GData::lingshiCls.getLingShiExp(maxLev-1);
             if(lsAttr.lv >= maxLev)
             {
                 lsAttr.lv = maxLev;
                 if(!GData::lingshiCls.canBreak(lsAttr.lv))
-                    lsAttr.exp = GData::lingshiCls.getLingShiExp(lsAttr.lv-1);
+                    lsAttr.exp = maxExp;
+                return 1;
+            }
+            if(lsAttr.exp >= maxExp)
+            {
+                lsAttr.exp = maxExp;
                 return 1;
             }
         }
@@ -8444,8 +8450,7 @@ namespace GObject
         {
             if(GetItemAnyNum(XIAN_LING_GUO) < 1)
                 return;
-            bool isBind = false;
-            DelItemAny(XIAN_LING_GUO, 1, &isBind);
+            DelItemAny(XIAN_LING_GUO, 1, NULL, ToLingShiUpgrade);
             DelItemSendMsg(XIAN_LING_GUO, m_Owner);
             lsAttr.exp += 20 * (hasLucky ? 10 : 1);
             m_Owner->udpLog("lingshi", "F_140509_11", "", "", "", "", "act");
@@ -8513,14 +8518,18 @@ namespace GObject
                 m_Owner->sendMsgCode(0, 1101);
                 return;
             }
-            if(itemCount1 > 0)
+            if(lsd->useGold/10 <= itemCount1)
             {
-                bool isBind = false;
-                DelItemAny(BREAK_ITEM, itemCount1, &isBind);
+                DelItemAny(BREAK_ITEM, lsd->useGold/10, NULL, ToLingShiBreak);
                 DelItemSendMsg(BREAK_ITEM, m_Owner);
             }
-            if(lsd->useGold > itemCount1*10)
+            else
             {
+                if(itemCount1 > 0)
+                {
+                    DelItemAny(BREAK_ITEM, itemCount1, NULL, ToLingShiBreak);
+                    DelItemSendMsg(BREAK_ITEM, m_Owner);
+                }
                 ConsumeInfo ci(LingShiPeiYang, 0, 0);
                 m_Owner->useGold(lsd->useGold - itemCount1*10, &ci);
             }
@@ -8530,20 +8539,31 @@ namespace GObject
             UInt32 itemCount2 = GetItemAnyNum(XIAN_LING_GUO);
             if(!lsd->useItem || itemCount1 + itemCount2 < lsd->useItem)
                 return;
-            bool isBind = false;
-            if(itemCount1 > 0)
+            if(itemCount1 >= lsd->useItem)
             {
-                DelItemAny(BREAK_ITEM, itemCount1, &isBind);
+                DelItemAny(BREAK_ITEM, lsd->useItem, NULL, ToLingShiBreak);
                 DelItemSendMsg(BREAK_ITEM, m_Owner);
             }
-            if(lsd->useItem > itemCount1)
+            else
             {
+                if(itemCount1 > 0)
+                {
+                    DelItemAny(BREAK_ITEM, lsd->useItem, NULL, ToLingShiBreak);
+                    DelItemSendMsg(BREAK_ITEM, m_Owner);
+                }
                 DelItemSendMsg(XIAN_LING_GUO, m_Owner);
-                DelItemAny(XIAN_LING_GUO, lsd->useItem - itemCount1, &isBind);
+                DelItemAny(XIAN_LING_GUO, lsd->useItem - itemCount1, NULL, ToLingShiBreak);
             }
         }
         //突破时经验在临界值，升级
         GData::lingshiCls.breakLevelUp(lsAttr.lv, lsAttr.exp);
+        UInt8 maxLev = GET_LS_MAXLEVEL(lingshi->getQuality());
+        if(lsAttr.lv >= maxLev)
+        {
+            lsAttr.lv = maxLev;
+            if(!GData::lingshiCls.canBreak(lsAttr.lv))
+                lsAttr.exp = GData::lingshiCls.getLingShiExp(lsAttr.lv-1);
+        }
 
 		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
         DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), lingshi->getId(), lingshi->GetTypeId(), lsAttr.lv, TimeUtil::Now());

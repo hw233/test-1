@@ -371,7 +371,8 @@ enum ItemTo
     ToTunShiXingKong = 165, //吞噬星空
     ToServerWarJijian = 166, //仙界传奇祭剑
     ToZhenyuanMgerge = 167, //阵元合成
-    ToLingShiUpgrade = 168, //灵侍升级(吞噬)
+    ToLingShiUpgrade = 168, //灵侍升级(吞噬/培养)
+    ToLingShiBreak = 169, //灵侍突破
 };
 
 struct IncommingInfo
