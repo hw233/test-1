@@ -1180,7 +1180,7 @@ void Tianjie::process(UInt32 now)
     {
         m_isAutoTouched = false; //必须设置为false,否则将会循环所有天劫
 		DB1().PushUpdateData("update tianjie set is_touch=0 where level=%d", m_currOpenedTjLevel); 
-        printf("set is_touch=0 where level=%d", m_currOpenedTjLevel);
+        printf("--------------------set is_touch=0 where level=%d", m_currOpenedTjLevel);
         OpenTj();
     }
 }
