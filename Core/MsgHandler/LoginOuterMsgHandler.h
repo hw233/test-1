@@ -1145,7 +1145,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if(purchase.id == 72 || purchase.id == 79 || purchase.id == 9425)
+                    if(id == 72 || id == 79 || id == 9425)
                     {
                         if(player->GetVar(GObject::VAR_DIRECTPURCNT) >= 3)
                             purchase.code = 2;
