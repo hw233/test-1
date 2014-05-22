@@ -8548,7 +8548,7 @@ namespace GObject
             {
                 if(itemCount1 > 0)
                 {
-                    DelItemAny(BREAK_ITEM, lsd->useItem, NULL, ToLingShiBreak);
+                    DelItemAny(BREAK_ITEM, itemCount1, NULL, ToLingShiBreak);
                     DelItemSendMsg(BREAK_ITEM, m_Owner);
                 }
                 DelItemSendMsg(XIAN_LING_GUO, m_Owner);
