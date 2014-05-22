@@ -9349,7 +9349,7 @@ function DropActLoot(player,lootlvl)
             [3] = 1,
     };
     local package = player:GetPackage();
-    package:Add(1527, itemNum[lootlvl], true,0,10);
+    package:Add(138, itemNum[lootlvl], true,0,10);
 end
 
 --蜀山传奇掉落活动
