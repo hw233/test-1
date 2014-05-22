@@ -4472,9 +4472,9 @@ namespace GObject
 		return true;
 	}
 
-	UInt16 Player::GetFreePackageSize()
+	UInt16 Player::GetFreePackageSize(UInt8 type)
 	{
-		return m_Package->GetRestPackageSize();
+		return m_Package->GetRestPackageSize(type);
 	}
 
 	bool Player::addFriend( Player * pl )
@@ -15714,7 +15714,7 @@ namespace GObject
         }
         if(m_dpData->itemNum != 0)
         {
-            if(GetFreePackageSize() > m_dpData->itemNum/99)
+            if(GetFreePackageSize(1) > m_dpData->itemNum/99)
             {
                 struct AddItemInfo
                 {
@@ -20628,7 +20628,7 @@ void Player::sendCopyFrontAllAward()
 
 UInt8 Player::getCopyId()
 {
-    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871};
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871, 4628};
 
     UInt16 currentSpot = PLAYER_DATA(this, location);
     for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
@@ -25336,14 +25336,14 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
     {
         if(flag == e_sla_none)
         {
-            GetPackage()->Add(1527, 1, true, false, FromNpc);
+            GetPackage()->Add(138, 1, true, false, FromNpc);
         }
         else
         {
             UInt32 status = GetVar(VAR_DROP_ACT);
             if(!(status & flag))
             {
-                GetPackage()->Add(1527, 1, true, false, FromNpc);
+                GetPackage()->Add(138, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_DROP_ACT, status);
             }

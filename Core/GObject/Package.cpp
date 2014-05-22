@@ -66,14 +66,14 @@ namespace GObject
 
     UInt16 getRandOEquip(UInt8 lvl)
     {
-        static const UInt16* equips[] = {OEquip50, OEquip60, OEquip70, OEquip80, OEquip90, OEquip100, OEquip110, OEquip120, OEquip130};
+        static const UInt16* equips[] = {OEquip50, OEquip60, OEquip70, OEquip80, OEquip90, OEquip100, OEquip110, OEquip120, OEquip130, OEquip140};
 
         UInt16 equipid = 0;
 
         if (lvl < 50)
             lvl = 50;
-        if (lvl > 130)
-            lvl = 130;
+        if (lvl > 140)
+            lvl = 140;
 
         lvl -= 50;
         lvl /= 10;
@@ -8218,6 +8218,7 @@ namespace GObject
 
     /**********灵侍begin***********/
 #define XIAN_LING_GUO 9459
+#define BREAK_ITEM 17000
     inline UInt8 GET_LS_MAXLEVEL(int quality)
     {
         static UInt8 ls_levels[6] = { 0, 0, 30, 50, 70, 90 };
@@ -8273,6 +8274,7 @@ namespace GObject
 
 	    DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %" I64_FMT "u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
         DB4().PushUpdateData("REPLACE INTO `lingshiAttr`(`id`, `itemId`, `level`, `exp`) VALUES(%u, %u, %u, %u)", id, itype->getId(), lsAttr.lv, lsAttr.exp);
+	    DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, id, FromWhere, TimeUtil::Now());
 		return lingshi;
 	}
 
@@ -8287,7 +8289,7 @@ namespace GObject
         if(lsAttr.lv >= GET_LS_MAXLEVEL(lingshi->getQuality()))
             return;
         GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
-        if(!lsd || !lsd->canUpgrade(lsAttr.exp))
+        if(!lsd || lsd->exp <= lsAttr.exp)
             return;
         UInt32 needTael = 0;
         std::vector<ItemLingshi *> eatVec;
@@ -8297,6 +8299,8 @@ namespace GObject
             ItemLingshi * eatEq = GetLingshi(atoi(tk[i].c_str()));
             if(eatEq == NULL)
                 continue;
+            if(lingshi->getQuality() < eatEq->getQuality())
+                return;
             UInt8 tmpLvl = eatEq->getLingshiAttr().lv;
             needTael += GData::lingshiCls.getLevUpTael(tmpLvl);
             eatVec.push_back(eatEq);
@@ -8309,6 +8313,7 @@ namespace GObject
         needTael = 0;
         UInt8 tmp = lsAttr.lv;
         bool isUdp = true;
+        UInt32 backCnt = 0;
         for(UInt8 i = 0; i < eatVec.size(); ++ i)
         {
             UInt32 res = lingshiUpgrade(lingshi, eatVec[i]);
@@ -8316,12 +8321,13 @@ namespace GObject
             {
                 UInt8 tmpLvl = eatVec[i]->getLingshiAttr().lv;
                 needTael += GData::lingshiCls.getLevUpTael(tmpLvl);
+                backCnt += GData::lingshiCls.countBreakItemCnt(tmpLvl);
                 if(eatVec[i]->getQuality() >= Item_Purple && isUdp)
                 {
                     m_Owner->udpLog("lingshi", "F_140509_12", "", "", "", "", "act");
                     isUdp = false;
                 }
-                DelLingshi2(eatVec[i], ToPetEquipUpgrade);
+                DelLingshi2(eatVec[i], ToLingShiUpgrade);
                 if(res == 1)
                     break;
             }
@@ -8330,6 +8336,7 @@ namespace GObject
         {
             fgt->setDirty();
             fgt->updateLingshiSkillId(lingshi, pos);
+            DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), lingshi->getId(), lingshi->GetTypeId(), lsAttr.lv, TimeUtil::Now());
         }
         ConsumeInfo ci(LingShiPeiYang, 0, 0);
         m_Owner->useTael(needTael, &ci);
@@ -8340,6 +8347,27 @@ namespace GObject
 		AppendLingshiData(st, lingshi);
 		st << Stream::eos;
 		m_Owner->send(st);
+		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
+
+        if(backCnt > 0)
+        {
+            SYSMSG(title, 4162);
+            SYSMSGV(content, 4163);
+            int tmpCnt = backCnt/255;
+            for(; tmpCnt > 0; -- tmpCnt)
+            {
+                MailPackage::MailItem mitem[] = { {BREAK_ITEM, 255}, };
+                MailItemsInfo itemsInfo(mitem, LingShiEatBack, 1);
+                Mail * mail = m_Owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(mail)
+                    mailPackageManager.push(mail->id, mitem, 1, true);
+            }
+            MailPackage::MailItem mitem[] = { {BREAK_ITEM, backCnt%255}, };
+            MailItemsInfo itemsInfo(mitem, LingShiEatBack, 1);
+            Mail * mail = m_Owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+                mailPackageManager.push(mail->id, mitem, 1, true);
+        }
     }
 
     UInt32 Package::lingshiUpgrade(ItemLingshi * lingshi, ItemLingshi * eatEq)
@@ -8352,20 +8380,31 @@ namespace GObject
         {
             UInt8 tmp = lsAttr.lv;
             UInt8 maxLev = GET_LS_MAXLEVEL(lingshi->getQuality());
+            bool hasBreak = false;
             for(UInt8 i = tmp; i <= maxLev; ++ i)
             {
+                //吞噬时允许经验超出 等级不增加(因为突破功能)
                 GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
-                if(!lsd || !lsd->canUpgrade(lsAttr.exp))
+                if(!lsd)
                     break;
+                if(!hasBreak && lsd->isBreak)
+                    hasBreak = lsd->isBreak;
                 if(lsAttr.exp < lsd->exp)
                     break;
-                ++ lsAttr.lv;
+                if(!hasBreak)
+                    ++ lsAttr.lv;
             }
+            UInt32 maxExp = GData::lingshiCls.getLingShiExp(maxLev-1);
             if(lsAttr.lv >= maxLev)
             {
                 lsAttr.lv = maxLev;
                 if(!GData::lingshiCls.canBreak(lsAttr.lv))
-                    lsAttr.exp = GData::lingshiCls.getLingShiExp(lsAttr.lv-1);
+                    lsAttr.exp = maxExp;
+                return 1;
+            }
+            if(lsAttr.exp >= maxExp)
+            {
+                lsAttr.exp = maxExp;
                 return 1;
             }
         }
@@ -8381,7 +8420,7 @@ namespace GObject
 			return;
         ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
         GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
-        if(!lsd || !lsd->canUpgrade(lsAttr.exp))
+        if(!lsd || lsd->exp <= lsAttr.exp)
             return;
         bool hasLucky = uRand(10000) < 1000;
         if(type)
@@ -8411,8 +8450,7 @@ namespace GObject
         {
             if(GetItemAnyNum(XIAN_LING_GUO) < 1)
                 return;
-            bool isBind = false;
-            DelItemAny(XIAN_LING_GUO, 1, &isBind);
+            DelItemAny(XIAN_LING_GUO, 1, NULL, ToLingShiUpgrade);
             DelItemSendMsg(XIAN_LING_GUO, m_Owner);
             lsAttr.exp += 20 * (hasLucky ? 10 : 1);
             m_Owner->udpLog("lingshi", "F_140509_11", "", "", "", "", "act");
@@ -8428,6 +8466,7 @@ namespace GObject
         UInt8 tmp = lsAttr.lv;
         for(UInt8 i = tmp; i <= maxLev; ++ i)
         {
+            //培养时不允许经验超出 等级与经验同时增加
             lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
             if(!lsd || !lsd->canUpgrade(lsAttr.exp))
                 break;
@@ -8446,6 +8485,7 @@ namespace GObject
         {
             fgt->setDirty();
             fgt->updateLingshiSkillId(lingshi, pos);
+            DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), lingshi->getId(), lingshi->GetTypeId(), lsAttr.lv, TimeUtil::Now());
         }
 
 		Stream st(REP::ERLKING_INFO);
@@ -8468,28 +8508,65 @@ namespace GObject
         GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
         if(!lsd || !lsd->isBreak)
             return;
+        UInt32 itemCount1 = GetItemAnyNum(BREAK_ITEM);
         if(type)
         {
             if(!lsd->useGold) return;
-            if(m_Owner->getGold() < lsd->useGold)
+            UInt32 gold = m_Owner->getGold();
+            if(itemCount1*10 + gold < lsd->useGold)
             {
                 m_Owner->sendMsgCode(0, 1101);
                 return;
             }
-            ConsumeInfo ci(LingShiPeiYang, 0, 0);
-            m_Owner->useGold(lsd->useGold, &ci);
+            if(lsd->useGold/10 <= itemCount1)
+            {
+                DelItemAny(BREAK_ITEM, lsd->useGold/10, NULL, ToLingShiBreak);
+                DelItemSendMsg(BREAK_ITEM, m_Owner);
+            }
+            else
+            {
+                if(itemCount1 > 0)
+                {
+                    DelItemAny(BREAK_ITEM, itemCount1, NULL, ToLingShiBreak);
+                    DelItemSendMsg(BREAK_ITEM, m_Owner);
+                }
+                ConsumeInfo ci(LingShiPeiYang, 0, 0);
+                m_Owner->useGold(lsd->useGold - itemCount1*10, &ci);
+            }
         }
         else
         {
-            if(!lsd->useItem || GetItemAnyNum(XIAN_LING_GUO) < lsd->useItem)
+            UInt32 itemCount2 = GetItemAnyNum(XIAN_LING_GUO);
+            if(!lsd->useItem || itemCount1 + itemCount2 < lsd->useItem)
                 return;
-            bool isBind = false;
-            DelItemAny(XIAN_LING_GUO, lsd->useItem, &isBind);
-            DelItemSendMsg(XIAN_LING_GUO, m_Owner);
+            if(itemCount1 >= lsd->useItem)
+            {
+                DelItemAny(BREAK_ITEM, lsd->useItem, NULL, ToLingShiBreak);
+                DelItemSendMsg(BREAK_ITEM, m_Owner);
+            }
+            else
+            {
+                if(itemCount1 > 0)
+                {
+                    DelItemAny(BREAK_ITEM, lsd->useItem, NULL, ToLingShiBreak);
+                    DelItemSendMsg(BREAK_ITEM, m_Owner);
+                }
+                DelItemSendMsg(XIAN_LING_GUO, m_Owner);
+                DelItemAny(XIAN_LING_GUO, lsd->useItem - itemCount1, NULL, ToLingShiBreak);
+            }
         }
         //突破时经验在临界值，升级
-        ++ lsAttr.lv;
+        GData::lingshiCls.breakLevelUp(lsAttr.lv, lsAttr.exp);
+        UInt8 maxLev = GET_LS_MAXLEVEL(lingshi->getQuality());
+        if(lsAttr.lv >= maxLev)
+        {
+            lsAttr.lv = maxLev;
+            if(!GData::lingshiCls.canBreak(lsAttr.lv))
+                lsAttr.exp = GData::lingshiCls.getLingShiExp(lsAttr.lv-1);
+        }
+
 		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
+        DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), lingshi->getId(), lingshi->GetTypeId(), lsAttr.lv, TimeUtil::Now());
         fgt->setDirty();
         fgt->updateLingshiSkillId(lingshi, pos);
 
@@ -8512,10 +8589,8 @@ namespace GObject
 		-- m_SizeLS;
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", id);
 		DB4().PushUpdateData("DELETE FROM `lingshiAttr` WHERE `id` = %u", id);
-		if(toWhere != 0 && item->getQuality() >= 4)
-		{
-			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), item->getId(), toWhere, TimeUtil::Now());
-		}
+        if(item->getQuality() >= Item_Purple || static_cast<ItemLingshi *>(item)->getLingshiAttr().lv > 1)
+            DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), item->getId(), toWhere, TimeUtil::Now());
 
 		SendSingleLingshiData(static_cast<ItemLingshi *>(item), 0);
 		SAFE_DELETE(item);
@@ -8531,10 +8606,8 @@ namespace GObject
 		-- m_SizeLS;
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", lingshi->getId());
 		DB4().PushUpdateData("DELETE FROM `lingshiAttr` WHERE `id` = %u", lingshi->getId());
-		if(toWhere != 0 && lingshi->getQuality() >= 4)
-		{
-			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), lingshi->GetItemType().getId(), lingshi->getId(), toWhere, TimeUtil::Now());
-		}
+        if(lingshi->getQuality() >= Item_Purple || lingshi->getLingshiAttr().lv > 1)
+            DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), lingshi->GetItemType().getId(), lingshi->getId(), toWhere, TimeUtil::Now());
 		SendSingleLingshiData(lingshi, 0);
 		SAFE_DELETE(lingshi);
 		return true;
