@@ -9111,10 +9111,10 @@ function onRoamingQueqiao(player, pos)
         {{511, 1, 10}, {500, 1, 10}, {30, 1, 10}},
         {{56, 1, 20}, {500, 1, 20}, {57, 1, 20}},
         {{511, 2, 20}, {512, 1, 30}, {517, 1, 30}},
-        {{9450, 1, 10}, {9450, 1, 10}, {9450, 1, 10}},
+        {{16016, 1, 10}, {16016, 1, 10}, {16016, 1, 10}},
         {{503, 1, 30}, {514, 1, 30}, {501, 1, 30}},
         {{509, 1, 40}, {134, 1, 40}, {1325, 1, 40}},
-        {{1663, 1, 50}, {1664, 1, 50}, {1665, 1, 50}, {1666, 1, 50}},
+        {{9896, 1, 50}, {9898, 1, 50}, {9897, 1, 50}, {9899, 1, 50}},
     }
 
     step = math.random(1, 3)
@@ -9126,6 +9126,19 @@ function onRoamingQueqiao(player, pos)
     local package = player:GetPackage()
     i = roamPlace[pos2]
     j = math.random(1, #eventItem[i])
+
+    if eventItem[i][j][1] == 9896 then
+        player:GetCollectCard():Add61Card(305)
+    end
+    if eventItem[i][j][1] == 9897 then
+        player:GetCollectCard():Add61Card(306)
+    end
+    if eventItem[i][j][1] == 9898 then
+        player:GetCollectCard():Add61Card(307)
+    end
+    if eventItem[i][j][1] == 9899 then
+        player:GetCollectCard():Add61Card(308)
+    end
 
     package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
     player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
@@ -9257,7 +9270,7 @@ function Qixi(player, lootlvl)
     if getQixi() then
         -- 喜鹊
         local package = player:GetPackage();
-        package:AddItem(9450, 1, true, 0, 10);
+        package:AddItem(16016, 1, true, 0, 10);
     end
 end
 
@@ -9322,8 +9335,26 @@ function HappyFireLoot(player,lootlvl)
     package:AddItem(9458, itemNum[lootlvl], true,0,10); --欢乐礼包
 end
 
+function DropActLoot(player,lootlvl)
+    if not getDropAct() then
+        return
+    end
+    if lootlvl > 3 then
+        lootlvl = 0
+    end
+    local itemNum = {
+            [0] = 1,
+            [1] = 1,
+            [2] = 1,
+            [3] = 1,
+    };
+    local package = player:GetPackage();
+    package:Add(1527, itemNum[lootlvl], true,0,10);
+end
+
 --蜀山传奇掉落活动
 function SurnameLegendLoot(player,lootlvl)
+    DropActLoot(player,lootlvl)
     if not getSurnameLegend() then
         return
     end

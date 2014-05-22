@@ -275,7 +275,7 @@ namespace GObject
 
         VAR_TOTALRECHARGEACT = 217, // 活动期间充值总额
         VAR_DIRECTPUROPEN = 218, // 幸运星活动直购是否开启
-        VAR_DIRECTPURCNT = 219, // 幸运星活动直购次数
+        VAR_DIRECTPURCNT = 219, // 幸运星活动直购次数(低价专区)
         VAR_LEFTTIMES = 220, // 剩余挂机时间
 
         /*
@@ -584,6 +584,8 @@ namespace GObject
         VAR_SEVEN_SOUL_NUM = 603,  //玩家七魂仙魄数
         VAR_SEX_CHANGE = 604,  //使用变形卡的次数
         VAR_SKILL_GRADE_MONEY = 605,  //技能升阶货币
+        VAR_DROP_ACT = 606,  //掉落活动
+        VAR_DIRECTPURCNT2 = 607, // 幸运星活动直购次数(超值专区)
 
         //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,    //天书奇缘登陆
@@ -1254,6 +1256,8 @@ namespace GObject
             REGISTER_VAR(VAR_SEVEN_SOUL_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_SEX_CHANGE, CYCLE_NONE);
             REGISTER_VAR(VAR_SKILL_GRADE_MONEY, CYCLE_NONE);
+            REGISTER_VAR(VAR_DROP_ACT, CYCLE_NONE);
+            REGISTER_VAR(VAR_DIRECTPURCNT2, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);
