@@ -23,9 +23,9 @@ function teamcopy()
             print "INSERT INTO `team_copy` VALUES";
         } {
             printf("(%d,%d,%d,\x27%s\x27)",$1,$2,$3,$4);
-            if (NR <= ENVIRON["lines"]-1)
+            if (NR <= ENVIRON["lines"])
                 printf(",");
-            else if (NR >= ENVIRON["lines"])
+            else if (NR > ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }

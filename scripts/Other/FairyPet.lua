@@ -256,6 +256,7 @@ end
 
 --卡牌系统 套装属性
 local suitAttr= {
+    [30] = 0,
     [40] = 30010,
     [50] = 30010,
     [60] = 30010,
@@ -288,6 +289,7 @@ local suitAttr= {
     [219] = 31002,
     [220] = 31002,
     [221] = 31002,
+    [400] = 30010,
 }
 function getsuitAttr(suitId)
     if nil == suitId  then
