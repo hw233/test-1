@@ -431,6 +431,7 @@ namespace GObject
                     char str[32] = {0};
                     sprintf(str, "F_140506_%d",PCardChance61[CNum-1]-2);
                     m_owner->udpLog("kapaixitong", str, "", "", "", "", "act");
+                    m_owner->udpLog("kapaixitong", "F_140506_17", "", "", "", "", "act");
                 }
                 if(PCardChance61[CNum - 1] == color)
                     break;
@@ -736,6 +737,9 @@ namespace GObject
 		    DB4().PushUpdateData("REPLACE INTO `cardsuit`(`playerId`, `id`, `suit_mark`,`active`,`spe_mark`,`collect_degree`) VALUES(%" I64_FMT "u, %u,0,0,0,0)", m_owner->getId(), si->id);
         }
         SuitCardInfo* tmp = MapCardStamp.find(cid/100*10)->second;
+        UInt8 org_degree = 0;//初始收集度
+        if(tmp->id == 30)//童趣套组
+            org_degree = tmp->collect_degree;
         if(tmp->checkExistSetBit(ci->cid,ci->color))
             RebuildCardAttr();
         //TODO DB
@@ -743,6 +747,19 @@ namespace GObject
         
         if(ci->color == 5)
             SYSMSG_BROADCASTV(953, m_owner->getCountry(),m_owner->getName().c_str(),3,citmp->name.c_str());
+
+        if(tmp->id == 30)//童趣套组
+        {
+            if(tmp->collect_degree >= 30 && org_degree != 100 && tmp->collect_degree > org_degree)
+            {
+                if(org_degree < 30 && tmp->collect_degree >= 30) 
+                    m_owner->udpLog("kapaixitong", "F_140506_18", "", "", "", "", "act");
+                if(org_degree < 50 && tmp->collect_degree >= 50) 
+                    m_owner->udpLog("kapaixitong", "F_140506_19", "", "", "", "", "act");
+                if(org_degree < 100 && tmp->collect_degree >= 100) 
+                    m_owner->udpLog("kapaixitong", "F_140506_20", "", "", "", "", "act");
+            }
+        }
 
         return ci;
     }
@@ -928,6 +945,9 @@ namespace GObject
             st << Stream::eos; 
             m_owner->send(st);
         }
+        if(GET_BIT(tmp->suit_mark,4) && GET_BIT(tmp->suit_mark,5) && GET_BIT(tmp->suit_mark,6) && GET_BIT(tmp->suit_mark,7))
+            m_owner->udpLog("kapaixitong", "F_140506_21", "", "", "", "", "act");
+        
         return;
     }
 
