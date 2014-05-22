@@ -8669,16 +8669,16 @@ namespace GObject
 
     void Package::setLingshi(Fighter * fgt, UInt32 lsId, UInt8 opt)
     {
-        if(GetRestPackageSize(2) < 1)
-        {
-			m_Owner->sendMsgCode(0, 8050);
-            return;
-        }
         if(!fgt || opt < 0x63 || opt > 0x65)
             return;
         ItemEquip * old = NULL;
         if(lsId == 0)
         {   //卸下
+            if(GetRestPackageSize(2) < 1)
+            {
+                m_Owner->sendMsgCode(0, 8050);
+                return;
+            }
             old = fgt->setLingshi(NULL, opt-0x63);
         }
         else
