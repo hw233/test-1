@@ -4296,15 +4296,15 @@ void World::SendAllAnswerEnd()
         UInt8 mMark = 0;
         UInt32 status = pl->GetVar(VAR_ANSWER_QUESTIONS_STATUS);
         UInt32 succorfail = pl->GetVar(VAR_ANSWER_QUESTIONS_SUCCORFAIL);
-        for(UInt8 i=1; i<=30; i++)
+        for(UInt8 j=1; j<=30; j++)
         {
 
-            UInt8 markA = GET_BIT(status, i);
+            UInt8 markA = GET_BIT(status, j);
             if(1 == markA)
             {
                 tMark++;
 
-                UInt8 mark = GET_BIT(succorfail, i);
+                UInt8 mark = GET_BIT(succorfail, j);
                 if(1 == mark)
                 {
                     sMark++;
