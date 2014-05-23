@@ -4364,8 +4364,8 @@ void World::SendAnswerAward()
             continue;
 
         rank++;
-        SYSMSG(title, 5140);
-        SYSMSGV(content, 5141, i->total, rank);
+        SYSMSG(title, 5146);
+        SYSMSGV(content, 5145, i->total, rank);
         Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
         {
@@ -4377,13 +4377,13 @@ void World::SendAnswerAward()
                 {
                     pTitle = 207;
                     ach = 666;
-                    SYSMSG_BROADCASTV(5137, pl->getCountry(), pl->getName().c_str(), i->total);
+                    SYSMSG_BROADCASTV(5148, pl->getCountry(), pl->getName().c_str(), i->total);
                 }
                 else if(2 == rank)
                 {
                     pTitle = 208;
                     ach = 450;
-                    SYSMSG_BROADCASTV(5138, pl->getCountry(), pl->getName().c_str(), i->total);
+                    SYSMSG_BROADCASTV(5147, pl->getCountry(), pl->getName().c_str(), i->total);
                 }
                 else
                 {
