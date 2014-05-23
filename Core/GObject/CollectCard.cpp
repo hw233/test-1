@@ -821,6 +821,8 @@ namespace GObject
                 m_owner->GetPackage()->SendPackageItemInfor(); 
             }
         }
+        else
+            return;
 
         UInt16 cid = GameAction()->getSpeCard(itemid);        
         if(cid == 0)
