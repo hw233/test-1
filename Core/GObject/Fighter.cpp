@@ -1833,12 +1833,52 @@ void Fighter::addLingshiAttr( ItemEquip* lingshi )
     if (!lingshi)
         return;
     GData::ItemGemType * igt = GData::lingshiTypes[lingshi->GetTypeId() - LLINGSHI_ID];
-    GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lingshi->GetTypeId(), static_cast<ItemLingshi *>(lingshi)->getLingshiAttr().lv);
+    GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(static_cast<ItemLingshi *>(lingshi)->getLingshiAttr().lv);
     if (!igt || !lsd || !igt->attrExtra)
         return;
 
+    GData::AttrExtra ae = lsd->attrs;
+    UInt8 q = lingshi->getQuality();
+    if(q == Item_Green)
+        ae = ae * 0.4f;
+    else if(q == Item_Blue)
+        ae = ae * 0.55f;
+    else if(q == Item_Purple)
+        ae = ae * 0.75f;
+    else if(q == Item_Yellow)
+        ae = ae * 1.0f;
+
+    UInt8 cls = getClass();
+    if(cls == e_cls_ru)
+    {
+        ae.attack *= 0.8f;
+        ae.magatk *= 1.1f;
+        ae.hp     *= 0.8f;
+        ae.action *= 0.9f;
+    }
+    else if(cls == e_cls_shi)
+    {
+        ae.attack *= 1.0f;
+        ae.magatk *= 1.0f;
+        ae.hp     *= 1.0f;
+        ae.action *= 1.0f;
+    }
+    else if(cls == e_cls_dao)
+    {
+        ae.attack *= 1.3f;
+        ae.magatk *= 0.6f;
+        ae.hp     *= 1.1f;
+        ae.action *= 0.8f;
+    }
+    else if(cls == e_cls_mo)
+    {
+        ae.attack *= 1.3f;
+        ae.magatk *= 0.6f;
+        ae.hp     *= 0.8f;
+        ae.action *= 1.0f;
+    }
 	addAttrExtra(_attrExtraEquip, igt->attrExtra);
-	addAttrExtra(_attrExtraEquip, &(lsd->attrs));
+	addAttrExtra(_attrExtraEquip, &ae);
 }
 
 void Fighter::rebuildEquipAttr()

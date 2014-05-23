@@ -1737,6 +1737,10 @@ private:
     UInt8 getMojianCnt() { return _mojianCnt; }
     void setMojianCnt(UInt8 cnt) { _mojianCnt = cnt; }
 
+    std::vector<float>& getOtherConfuseForgetAttactFactor() { return _other_confuse_forget_attack_factor;}
+    void setOtherConfuseForgetAttackFactor(const std::vector<float>& factor) { _other_confuse_forget_attack_factor = factor;}
+    std::vector<float> _other_confuse_forget_attack_factor;
+
 public:
 	enum StatusFlag
 	{

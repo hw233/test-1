@@ -1197,12 +1197,19 @@ void BattleSimulator::doOtherConfuseForgetAttack(BattleFighter* bf, UInt32& rcnt
     bool pr = false;
     bool first = true;
     int i = 0;
+
+    std::vector<float>& factors = bf->getOtherConfuseForgetAttactFactor();
+    int fsize = factors.size();
     for(int pos = 0; pos < 25; ++ pos)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, pos));
         if(!bo || bo->getHP() == 0)
             continue;
-        doOtherConfuseForgetAttackOnce(bf, bo, bf->getMagAttack(), pr, cs, first);
+        float factor = 1;
+        int idx = std::min(abs(fsize-1), i);
+        if(fsize > 0)
+            factor = factors[idx];
+        doOtherConfuseForgetAttackOnce(bf, bo, bf->getMagAttack()*factor, pr, cs, first);
         ++ i;
     }
     if(_defList.size() > 0 || _scList.size() > 0)
@@ -15482,8 +15489,13 @@ UInt32 BattleSimulator::doLingshiModelAttack(BattleFighter* bf, UInt8 flag, UInt
     bf->updateAllPassiveSkillLingshiExceptEnter();
 
     idx = 0;
-    if (bf->getPassiveSkillOnOtherConfuseAndForget100(idx))
+    const GData::SkillBase* skill = NULL;
+    skill = bf->getPassiveSkillOnOtherConfuseAndForget100(idx);
+    if (skill && skill->effect)
+    {
         _onOtherConfuseAndForget.push_back(bf);
+        bf->setOtherConfuseForgetAttackFactor(skill->factor);
+    }
 
     Int32 target_side;
     Int32 target_pos;
