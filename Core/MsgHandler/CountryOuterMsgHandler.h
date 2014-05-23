@@ -9486,7 +9486,7 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
             break;
         case 2:
         {
-            UInt8 opt1 = 0;
+            UInt16 opt1 = 0;
             UInt8 opt2 = 0;
             br >> opt1 >> opt2;
             if(opt2 != 1 && opt2 != 2 && opt2 != 3)
@@ -9497,7 +9497,7 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
         case 3:
             {
                UInt8 flag = 0;
-               UInt8 level = 0;
+               UInt16 level = 0;
                UInt8 color = 0;
                UInt16 count = 0;
                br >> flag >> level >> color >> count;

@@ -143,6 +143,7 @@ void WorldScript::init()
 	def("getJuly", GObject::World::getJuly);
     def("setQixi", GObject::World::setQixi);
     def("getQixi", GObject::World::getQixi);
+    def("setDropAct", GObject::World::setDropAct);
     def("setWansheng", GObject::World::setWansheng);
     def("getWansheng", GObject::World::getWansheng);
     def("setQingren", GObject::World::setQingren);
@@ -257,6 +258,7 @@ void WorldScript::init()
     def("setGGTime",GObject::World::setGGTime);
     def("getGGTime",GObject::World::getGGTime);
     def("getTYSSTime",GObject::World::getTYSSTime);
+    def("get61CardActivity",GObject::World::get61CardActivity);
     def("setQZoneRechargeTime",GObject::World::setQZoneRechargeTime);
 
     def("setSurnameLegend",GObject::World::setSurnameLegend);

@@ -366,9 +366,25 @@ namespace GObject
                 achValue = achValue / 2;
                 retA = 1;
             }
-            pl->AddExp(exp);
+            /*pl->AddExp(exp);
             pl->AddPExp(pexp);
-            pl->getAchievement(achValue);
+            pl->getAchievement(achValue);*/
+            struct Props
+            {
+                UInt32 aexp;
+                UInt32 apexp;
+                UInt32 aprestige;
+                UInt32 ahonor;
+            } props;
+            memset(&props, 0, sizeof(Props));
+
+            props.aexp = exp;
+            props.apexp = pexp;
+            props.ahonor = achValue;
+
+            GameMsgHdr msg(0x321, pl->getThreadId(), pl, sizeof(props));
+            GLOBAL().PushMsg(msg, &props);
+
             answerEndInfo.valueB = exp;
             answerEndInfo.valueC = pexp;
             answerEndInfo.valueD = achValue;
@@ -452,6 +468,9 @@ namespace GObject
         if(0==skillId || skillId>5)
             return;
 
+        if(GVAR.GetVar(GVAR_ANSWER_ENDTIME) > GVAR.GetVar(GVAR_ANSWER_AWARDTIME)
+            return;
+
         UInt32 status = pl->GetVar(VAR_ANSWER_SKILL_USE_NUM);
         UInt8 num = GET_BIT_2(status, (skillId-1));
         if(num>=3)
@@ -531,6 +550,7 @@ namespace GObject
             if(NULL == other)
                 return;
 
+            std::cout << "nowTime666666666: " << otherId << std::endl;
             answerLog logA;
             logA.logType = 2;
             logA.skillId = skillId;

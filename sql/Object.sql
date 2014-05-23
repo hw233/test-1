@@ -2456,7 +2456,7 @@ CREATE TABLE `duobaolog` (
 DROP TABLE IF EXISTS `collect_cnt`;
 CREATE TABLE `collect_cnt` (
    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
-   `lev` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `lev` SMALLINT(5) unsigned NOT NULL DEFAULT '0',
    `bluecnt` int(10) unsigned NOT NULL DEFAULT '0',
    `purlecnt` int(10) unsigned NOT NULL DEFAULT '0',
    `orangecnt` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2580,7 +2580,7 @@ CREATE TABLE IF NOT EXISTS `card` (
 DROP TABLE IF EXISTS `cardsuit`;
 CREATE TABLE IF NOT EXISTS `cardsuit` (
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
-    `id` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `id` SMALLINT(5)  unsigned NOT NULL DEFAULT '0',
     `suit_mark` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `active` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `spe_mark` int(10) unsigned NOT NULL DEFAULT '0',

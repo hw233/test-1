@@ -1786,7 +1786,7 @@ namespace GObject
         void getFishUserPackage(UInt8);
         void getFishUserAward();
 	public:
-		UInt16   GetFreePackageSize();
+		UInt16   GetFreePackageSize(UInt8 type = 0);
 		bool     ExtendPackageSize(UInt8);
 
 		Package* GetPackage() { return m_Package; }

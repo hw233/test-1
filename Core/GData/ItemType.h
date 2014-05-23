@@ -40,7 +40,7 @@
 #define RZHENYUAN_ID    15499
 #define LOTHER_ID       15500
 #define LNORMAL2_ID     16000
-#define RNORMAL2_ID     16999
+#define RNORMAL2_ID     17999
 #define ROTHER_ID       65535
 
 #define COUPON_ID       499

@@ -9140,7 +9140,7 @@ end
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    local item = 1667;
+    local item = 8552;
 
     if package:GetRestPackageSize() < (1+(1*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
@@ -13160,6 +13160,38 @@ local ItemNormal_Table = {
     [9806] = ItemNormal_00009611,
     [9807] = ItemNormal_00009611,
     [9808] = ItemNormal_00009611,
+    [9811] = ItemNormal_00009611,
+    [9812] = ItemNormal_00009611,
+    [9813] = ItemNormal_00009611,
+    [9814] = ItemNormal_00009611,
+    [9815] = ItemNormal_00009611,
+    [9816] = ItemNormal_00009611,
+    [9817] = ItemNormal_00009611,
+    [9818] = ItemNormal_00009611,
+    [9821] = ItemNormal_00009611,
+    [9822] = ItemNormal_00009611,
+    [9823] = ItemNormal_00009611,
+    [9824] = ItemNormal_00009611,
+    [9825] = ItemNormal_00009611,
+    [9826] = ItemNormal_00009611,
+    [9827] = ItemNormal_00009611,
+    [9828] = ItemNormal_00009611,
+    [9831] = ItemNormal_00009611,
+    [9832] = ItemNormal_00009611,
+    [9833] = ItemNormal_00009611,
+    [9834] = ItemNormal_00009611,
+    [9835] = ItemNormal_00009611,
+    [9836] = ItemNormal_00009611,
+    [9837] = ItemNormal_00009611,
+    [9838] = ItemNormal_00009611,
+    [9841] = ItemNormal_00009611,
+    [9842] = ItemNormal_00009611,
+    [9843] = ItemNormal_00009611,
+    [9844] = ItemNormal_00009611,
+    [9845] = ItemNormal_00009611,
+    [9846] = ItemNormal_00009611,
+    [9847] = ItemNormal_00009611,
+    [9848] = ItemNormal_00009611,
 
     [9649] = ItemNormal_00009649,
     [9650] = ItemNormal_00009650,

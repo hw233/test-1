@@ -151,6 +151,7 @@ bool World::_june = false;
 bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
+bool World::_dropact = false;
 bool World::_foolbao = false;
 bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
@@ -590,6 +591,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 23)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 31)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -630,6 +639,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 3)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
         ))
     {
 #if 0
@@ -1591,6 +1601,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 23)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 31)
 
          )
         bRechargeEnd = true;
@@ -3152,7 +3170,7 @@ void World::SendQixiAward()
                         bool bind = true;
                         if(mitems[i].id == qixiTmpl._titleItem)
                         {
-                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F);
+                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F) * 2;
                             bind = false;
                         }
                         else
@@ -4288,20 +4306,17 @@ void World::SendAllAnswerEnd()
                 {
                     sMark++;
                     cMark++;
+                    if(cMark > mMark)
+                        mMark = cMark; 
                 }
                 else
                 {
                     fMark++;
-                    if(cMark > mMark)
-                        mMark = cMark; 
                     cMark=0;
                 }
             }
         }
        
-        if(cMark > mMark)
-            mMark = cMark;
-
         if(fMark>=5 && fMark<10)
             pl->udpLog("yzcm", "F_140523_2", "", "", "", "", "act");
         else if(fMark>=10 && fMark<15)
@@ -4374,15 +4389,28 @@ void World::SendAnswerAward()
                     SYSMSG_BROADCASTV(5139, pl->getCountry(), pl->getName().c_str(), i->total);
                 }
 
-                pl->getAchievement(ach);
+                //pl->getAchievement(ach);
                 pl->setTitle(pTitle, 3600 * 24);
                 mailPackageManager.push(mail->id, s_item[rank-1], 2, true);
             }
             else if(rank>=4 && rank<=7)
             {
-                pl->getAchievement(250);
+                ach = 250;
+                //pl->getAchievement(250);
                 mailPackageManager.push(mail->id, c_item, 1, true);
             }
+
+            struct Props
+            {
+                UInt32 aexp;
+                UInt32 apexp;
+                UInt32 aprestige;
+                UInt32 ahonor;
+            } props;
+            memset(&props, 0, sizeof(Props));
+            props.ahonor = ach;
+            GameMsgHdr msg(0x321, pl->getThreadId(), pl, sizeof(props));
+            GLOBAL().PushMsg(msg, &props);
         }
         if(rank >= 7)
             break;
