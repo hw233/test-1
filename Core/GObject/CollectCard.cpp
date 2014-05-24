@@ -811,13 +811,13 @@ namespace GObject
 
             if(!find)
             {
-                ItemBase * item = m_owner->GetPackage()->GetEquip(flowid);
-                if(item == NULL)
+                ItemEquip * equip = m_owner->GetPackage()->GetEquip(flowid);
+                if(equip == NULL)
                     return;
-                UInt32 typeId = item->GetTypeId();
+                UInt32 typeId = equip->GetTypeId();
                 if(itemid != typeId)
                     return;
-                item->SetBindStatus(true);
+                equip->DoEquipBind(true);
                 m_owner->GetPackage()->SendPackageItemInfor(); 
             }
         }
