@@ -320,6 +320,7 @@ GMHandler::GMHandler()
     Reg(3, "clanrank", &GMHandler::TestClanRank);
     Reg(2, "addkapai", &GMHandler::OnAddCard);
     Reg(2, "addkapaiexp", &GMHandler::OnAddCardExp);
+    Reg(3, "setfirevalue", &GMHandler::OnSetFireValue);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -5522,6 +5523,16 @@ void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& 
     GObject::Clan *clan = player->getClan();
     if(clan != NULL)
         clan->sendMemberBuf(pos);
+}
+
+void GMHandler::OnSetFireValue(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt32 fireValue = atoi(args[0].c_str());
+    GObject::Clan *clan = player->getClan();
+    if(clan != NULL)
+        clan->SetClanFireValue(fireValue, true);
 }
 
 void GMHandler::OnAddCard(GObject::Player *player, std::vector<std::string>& args)

@@ -5232,6 +5232,11 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
             // 帮派副本的战斗操作
             clan->clanCopyBattleOperate(player, command, brd);
             break;
+        case 0x20:
+            // 帮派拜火祭天
+            if(World::getFireSacrificeTime())
+                clan->clanFireSacrificeOp(player, command);
+            break;
         default:
                 break;
     }
