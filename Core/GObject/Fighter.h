@@ -53,6 +53,7 @@ namespace GObject
 #define ACUPOINTS_MAX 15
 #define ACUPOINTSGOLD_MAX 9    //本命金丹最大值
 #define LINGBAO_UPMAX 3
+#define LINGSHI_UPMAX 3
 
 #define PEERLESS_UPMAX 1
 
@@ -317,10 +318,14 @@ public:
     void setUpSkills(std::string& skill, bool = true);
     // 初始化可装备的技能
     void setSkills(std::string& skills, bool = true);
+    // 删除已装备的技能
+    void delSkills(std::string&, bool = true);
     // 更新被动技能表
-    bool upPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
+    bool upPassiveSkill(UInt16 skill, UInt16 type, bool, bool = true);
+    // 更新灵侍技能表
+    bool upPassiveSkillLingshi(UInt16 skill, UInt16 type, bool p100);
     // 装备被动技能
-    bool upPassiveSkill(UInt16* skill, UInt8 size, bool = true);
+    //bool upPassiveSkill(UInt16* skill, UInt8 size, bool = true);
     // 更新被动技能
     bool offPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
 
@@ -383,7 +388,8 @@ public:
     inline std::vector<UInt16>& getPassiveSkillOnHPChange() { return _rpasskl[GData::SKILL_ONHPCHANGE - GData::SKILL_PASSSTART]; }
     // 取得招架时100%触发技能
     inline std::vector<UInt16>& getPassiveSkillOnWithstand() { return _rpasskl[GData::SKILL_ONWITHSTAND - GData::SKILL_PASSSTART]; }
-
+    // 取得对方获得封印沉默触发的技能
+    inline std::vector<UInt16>& getPassiveSkillOnOtherConfuseForget() { return _rpasskl[GData::SKILL_ONOTHERCONFUSEFORGET - GData::SKILL_PASSSTART]; }
 
     // 神农宝鼎
     inline std::vector<UInt16>& getPassiveSkillOnTherapy() { return _passkl[GData::SKILL_ONTHERAPY-GData::SKILL_PASSSTART]; }
@@ -420,6 +426,10 @@ public:
     inline std::vector<UInt16>& getPassiveSkillBLTY100() { return _passkl[GData::SKILL_BLTY-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillViolent100() { return _passkl[GData::SKILL_VIOLENT-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillRevival100() { return _passkl[GData::SKILL_REVIVAL-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillOnOtherConfuseForget100() { return _passkl[GData::SKILL_ONOTHERCONFUSEFORGET-GData::SKILL_PASSSTART]; }
+
+    inline std::vector<UInt16>& getPassiveSkillByLingshi(UInt8 type) { return _rpassklLingshi[type-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillByLingshi100(UInt8 type) { return _passklLingshi[type-GData::SKILL_PASSSTART]; }
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
@@ -579,6 +589,11 @@ public:
 	ItemEquip ** setTrump(std::string& trumps, bool = true);
     ItemEquip* setTrump( UInt32 trump, int idx, bool = true);
     ItemEquip* setTrump( ItemEquip* trump, int idx, bool = true);
+    int getAllLingshiId( UInt32* lingshis, int size = LINGSHI_UPMAX);
+	inline ItemEquip * getLingshi(int idx) { return (idx >= 0 && idx < LINGSHI_UPMAX) ? _lingshi[idx] : 0; }
+    ItemEquip * setLingshi(ItemEquip *);
+	ItemEquip ** setLingshi(std::string&, bool = true);
+    ItemEquip * setLingshi(ItemEquip *, int idx, bool = true);
 	ItemEquip * findEquip(UInt32 id, UInt8& pos);
 	ItemEquip * findfashion(UInt32 id);
 	void findTrumpByTypeId(std::vector<ItemEquip*>& ret, UInt32 id);
@@ -788,6 +803,7 @@ protected:
     void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce );
     void addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
     void addAttrExtraXCGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
+    void addLingshiAttr( ItemEquip* );
 	virtual void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	void rebuildSkillBattlePoint();
@@ -854,8 +870,11 @@ protected:
     std::vector<UInt16> _peerless;  // 可装备的无双技能
 
     // 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
-    std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];
+    std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 概率触发被动技能
     std::vector<UInt16> _passkl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%触发技能
+
+    std::vector<UInt16> _rpassklLingshi[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];  // 概率触发被动技能(灵侍变身状态下才会触发)
+    std::vector<UInt16> _passklLingshi[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%触发技能(灵侍变身状态下才会触发)
 
     std::vector<LBSkill> _lbSkill;
 
@@ -868,6 +887,7 @@ protected:
 	ItemEquip * _trump[TRUMP_UPMAX];    // 法宝
 	ItemEquip * _lingbao[e_lb_max];// 灵宝
     ItemInnateTrump * _innateTrump; // 先天法宝
+	ItemEquip * _lingshi[LINGSHI_UPMAX];    // 灵侍
 
 	bool _attrDirty;
 	UInt32 _maxHP;
@@ -959,12 +979,14 @@ public:
     bool upCittaWithOutCheck( UInt16 citta, int idx );
     inline void setSoulSkillProtect(Int32 v) { _soulSkillProtect = v; }
     UInt16 getTrumpSkill(int i) { if(i >= TRUMP_UPMAX) return 0; else return _trumpSkill[i]; }
+    std::vector<UInt16>& getLingshiSkill(int i) { if(i >= LINGSHI_UPMAX) i = 0; return _lingshiSkill[i]; }
     Int32 _soulMax;
     UInt8 _soulExtraAura;
     UInt8 _soulAuraLeft;
     UInt16 _soulSkillSoulOut;
     UInt16 _trumpSkill[TRUMP_UPMAX];
     UInt16 _soulSkillProtect;
+    std::vector<UInt16> _lingshiSkill[LINGSHI_UPMAX];
 
     // 内丹系统
 public:

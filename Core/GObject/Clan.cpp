@@ -5987,14 +5987,14 @@ void Clan::sendFireSacrificeInfo(Player * pl, UInt8 type)
                 else
                     st << static_cast<UInt8>(0);
                 st << static_cast<UInt8>(3 - AddWoodTimes);
-                st << ((now - AddWoodTime) > 3 * 60 ? 0 : (3 * 60 - (now - AddWoodTime)));
+                st << ((now - AddWoodTime) > 15 * 60 ? 0 : (15 * 60 - (now - AddWoodTime)));
                 st << _clanFireValue;
                 if(pl == getLeader())
                 {
                     UInt8 CallingTimes = ((pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) >> 8) & 0xFF);
                     UInt32 CallingTime = pl->GetVar(VAR_FIRE_SACRIFICE_CALLING_TIME);
                     st << static_cast<UInt8>(3 - CallingTimes);
-                    st << ((now - CallingTime) > 3 * 60 ? 0 : (3 * 60 - (now - CallingTime)));
+                    st << ((now - CallingTime) > 15 * 60 ? 0 : (15 * 60 - (now - CallingTime)));
                 }
             }
             break;
@@ -6002,7 +6002,7 @@ void Clan::sendFireSacrificeInfo(Player * pl, UInt8 type)
             {
                 st << _clanFireValue;
                 st << static_cast<UInt8>(3 - AddWoodTimes);
-                st << ((now - AddWoodTime) > 3 * 60 ? 0 : (3 * 60 - (now - AddWoodTime)));
+                st << ((now - AddWoodTime) > 15 * 60 ? 0 : (15 * 60 - (now - AddWoodTime)));
             }
             break;
         case 2:
@@ -6010,7 +6010,7 @@ void Clan::sendFireSacrificeInfo(Player * pl, UInt8 type)
                 UInt8 CallingTimes = ((pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) >> 8) & 0xFF);
                 UInt32 CallingTime = pl->GetVar(VAR_FIRE_SACRIFICE_CALLING_TIME);
                 st << static_cast<UInt8>(3 - CallingTimes);
-                st << ((now - CallingTime) > 3 * 60 ? 0 : (3 * 60 - (now - CallingTime)));
+                st << ((now - CallingTime) > 15 * 60 ? 0 : (15 * 60 - (now - CallingTime)));
             }
             break;
         case 3:
@@ -6052,7 +6052,7 @@ bool Clan::addWoodToFire(Player * pl)
     }
     UInt32 addWoodTimes = pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) & 0xFF;
     UInt32 addWoodTime = pl->GetVar(VAR_FIRE_SACRIFICE_ADD_WOOD_TIME);
-    if(now - addWoodTime > 3 * 60 && addWoodTimes < 3)
+    if(now - addWoodTime > 15 * 60 && addWoodTimes < 3)
     {
         pl->SetVar(VAR_FIRE_SACRIFICE_TIMES, (addWoodTimes + 1) | (pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) & (~0xFF)));
         pl->SetVar(VAR_FIRE_SACRIFICE_ADD_WOOD_TIME, now);
@@ -6134,7 +6134,7 @@ bool Clan::callingaddWood(Player * pl)
 
     UInt32 CallingTime = pl->GetVar(VAR_FIRE_SACRIFICE_CALLING_TIME);
     UInt32 CallingTimes = ((pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) >> 8) & 0xFF);
-    if(now - CallingTime > 3 * 60 && CallingTimes < 3)
+    if(now - CallingTime > 15 * 60 && CallingTimes < 3)
     {
         CallingTimes++;
         CallingTimes = (CallingTimes << 8) | (pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) & (~(0xFF << 8)));

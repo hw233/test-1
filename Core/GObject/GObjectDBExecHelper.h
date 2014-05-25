@@ -531,6 +531,7 @@ struct DBFighter2
     std::string citta;      // 装备的心法
     std::string skills;     // 学会的技能, ID1,ID2,...
     std::string cittas;     // 学会的心法, ID1,ID2,...
+    std::string lingshi;    // 穿戴的灵侍, ID1,ID2,...
     UInt8 attrType1;
     UInt16 attrValue1;
     UInt8 attrType2;
@@ -1642,6 +1643,15 @@ struct DBZhenyuanAttr
     UInt8 bindType;
 };
 
+struct DBLingshiAttr
+{
+    UInt32 id;
+    UInt32 itemId;
+    UInt8  level;
+    UInt32 exp;
+    UInt8 bindType;
+};
+
 }
 
 namespace DB {
@@ -2168,7 +2178,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(58)
+SPECIALDEF(59)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -2199,6 +2209,7 @@ SPECIALDEF(58)
     std::string, citta,
     std::string, skills,
     std::string, cittas,
+    std::string, lingshi,
     UInt8, attrType1,
     UInt16, attrValue1,
     UInt8, attrType2,
@@ -3712,6 +3723,17 @@ SPECIALDEF(6)
     UInt8,  zycolor,
     std::string, types,
     std::string, values,
+	UInt8, bindType
+    )
+SPECIALEND()
+
+SPECIALBEGIN (GObject::DBLingshiAttr)
+SPECIALDEF(5)
+    (
+    UInt32, id,
+    UInt32, itemId,
+    UInt8,  level,
+    UInt32, exp,
 	UInt8, bindType
     )
 SPECIALEND()

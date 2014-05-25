@@ -257,6 +257,11 @@ void OnAthleticsReq( GameMsgHdr& hdr, const void * data )
     GameAction()->doStrong(player, SthAthletics1, 0,0);
     player->getSummerMeetScore(5);
     player->GuangGunCompleteTask(0,26);
+
+    UInt32 status = player->GetVar(VAR_KJTM_STATUS);
+    UInt8 mark = GET_BIT(status, 0);
+    if(1 == mark)
+        player->SetKJTMAwardMark(2);
 }
 
 void OnAthleticsMartialReq( GameMsgHdr& hdr, const void * data )
@@ -1215,6 +1220,12 @@ void OnDailyReq2(GameMsgHdr& hdr, const void * data)
 	player->sendDailyInfo();
 }
 
+void OnCancelAutoRaceBattle(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	player->cancelAutoRaceBattle();
+}
+
 void OnAddAwardGold(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -1511,6 +1522,13 @@ void  OnDoActivity( GameMsgHdr& hdr, const void* data)
         player->GuangGunCompleteTask(0,16);
         if(!player->GetVar(VAR_TOWNDEAMON))
             player->SetVar(VAR_TOWNDEAMON, 1);
+   }
+    else if(co->id == SthCHTownDeamon)
+    {
+        UInt32 status = player->GetVar(VAR_KJTM_STATUS);
+        UInt8 mark = GET_BIT(status, 0);
+        if(1 == mark)
+            player->SetKJTMAwardMark(1);
     }
     else if(co->id == SthAthletics1)
     {

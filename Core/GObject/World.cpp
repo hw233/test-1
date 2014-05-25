@@ -255,6 +255,7 @@ bool World::_memcinited = false;
 bool World::_miluzhijiao = false;
 bool World::_buyfund = false;
 bool World::_duobaoOpen = false;
+UInt32 World::_rbTimeRank = 0;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -569,6 +570,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 9)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -607,6 +616,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 19)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 26)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 3)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
         ))
     {
 #if 0
@@ -1543,6 +1553,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 8)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 9)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
 
          )
         bRechargeEnd = true;
@@ -4382,10 +4400,6 @@ UInt16 World::GetRandomSpot()
 
 void World::SendGuangGunAward()    //待定
 {
-    UInt32 now = TimeUtil::Now();
-    if(now <( getOpenTime() + 7 * 86400) || now >( getOpenTime() + 15* 86400))
-        return ;
-    
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {

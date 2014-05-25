@@ -713,6 +713,14 @@ struct DBSkillEv
     UInt8 needLev;
 };
 
+struct DBRandBattleAttr
+{
+    UInt8 lev;
+    Int8 id;
+    float value;
+    UInt8 next;
+};
+
 struct DBKeyinConfig
 {
     UInt8 keyinId;
@@ -824,6 +832,44 @@ struct DBZHYExtraAttr
     UInt8 type1;
     UInt8 type2;
     UInt16 maxVal;
+};
+
+struct DBLingShi
+{
+    UInt16 id;
+    UInt8 level;
+    UInt8 isBreak;
+    UInt16 useItem;
+    UInt16 useGold;
+    float attack;
+    float magatk;
+    float defend;
+    float magdef;
+    float hp;
+    float toughlvl;
+    float action;
+    float hitrlvl;
+    float evdlvl;
+    float crilvl;
+    float criticaldmg;
+    float pirlvl;
+    float counterlvl;
+    float mreslvl;
+};
+
+struct DBLingShiUp
+{
+    UInt8 level;
+    UInt32 consume;
+    UInt32 exp;
+};
+
+struct DBErlkingConfig
+{
+    UInt8 copyId;
+    UInt8 conditionA;
+    UInt8 conditionB;
+    UInt32 npcgroup;
 };
 
 }
@@ -1757,6 +1803,60 @@ SPECIALDEF(4)
     UInt32, consume,
     UInt8, needLev
 	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBRandBattleAttr)
+SPECIALDEF(4)
+	(
+    UInt8, lev,
+    Int8, id,
+    float, value,
+    UInt8, next
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBLingShi)
+SPECIALDEF(19)
+	(
+    UInt16, id,
+    UInt8, level,
+    UInt8, isBreak,
+    UInt16, useItem,
+    UInt16, useGold,
+    float, attack,
+    float, magatk,
+    float, defend,
+    float, magdef,
+    float, hp,
+    float, toughlvl,
+    float, action,
+    float, hitrlvl,
+    float, evdlvl,
+    float, crilvl,
+    float, criticaldmg,
+    float, pirlvl,
+    float, counterlvl,
+    float, mreslvl
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBLingShiUp)
+SPECIALDEF(3)
+	(
+    UInt8, level,
+    UInt32, consume,
+    UInt32, exp
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBErlkingConfig)
+SPECIALDEF(4)
+	(
+    UInt8, copyId,
+    UInt8, conditionA,
+    UInt8, conditionB,
+    UInt32, npcgroup
+    )
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBCardUpgrade)

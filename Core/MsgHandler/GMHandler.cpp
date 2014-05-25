@@ -25,6 +25,7 @@
 #include "GData/NpcGroup.h"
 #include "GData/SkillTable.h"
 #include "GData/FairyPetTable.h"
+#include "GData/LingShiTable.h"
 #include "GObject/Dungeon.h"
 #include "GObject/Arena.h"
 #include "Script/GameActionLua.h"
@@ -58,8 +59,8 @@
 #include "GObject/Marry.h"
 #include "GObject/Married.h"
 #include "GObject/ArenaServerWar.h"
-
 #include "GObject/ClanBuilding.h"
+#include "GObject/RaceBattle.h"
 
 GMHandler gmHandler;
 
@@ -114,6 +115,7 @@ GMHandler::GMHandler()
     Reg(3, "testlb", &GMHandler::testLingbao);
     Reg(2, "zhenyuan", &GMHandler::OnAddZhenyuan);
     Reg(3, "peteq", &GMHandler::OnPetEq);
+    Reg(2, "lsjy", &GMHandler::OnAddLingshiExp);
 
 
 
@@ -318,6 +320,7 @@ GMHandler::GMHandler()
     Reg(3, "tstrecharge", &GMHandler::TestSameTimeRecharge);
     Reg(2, "settyss", &GMHandler::OnSetTYSS);
     Reg(3, "clanrank", &GMHandler::TestClanRank);
+    Reg(3, "rb", &GMHandler::OnRaceBattle);
     Reg(2, "addkapai", &GMHandler::OnAddCard);
     Reg(2, "addkapaiexp", &GMHandler::OnAddCardExp);
     Reg(3, "setfirevalue", &GMHandler::OnSetFireValue);
@@ -2110,7 +2113,8 @@ void GMHandler::OnUpPasSkill( GObject::Player * player, std::vector<std::string>
 
         UInt16 skill = SKILLANDLEVEL(skillId, skillLevel);
         UInt16 skills[1] = {skill};
-        fgt->upPassiveSkill(skills, 1);
+        // FIXME: 这里先禁用这个GM指令
+        //fgt->upPassiveSkill(skills, 1);
 	}
 }
 
@@ -4943,6 +4947,45 @@ void GMHandler::OnPetEq(GObject::Player * player, std::vector<std::string>& args
 
 }
 
+void GMHandler::OnAddLingshiExp(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 3)
+        return;
+    UInt32 fgtId = atoi(args[0].c_str());
+    UInt8 pos = atoi(args[1].c_str());
+    Fighter * fgt = player->findFighter(fgtId);
+    if(!fgt || pos > 2)
+        return;
+    ItemLingshi * lingshi = static_cast<ItemLingshi *>(fgt->getLingshi(pos));
+    if(!lingshi || !IsLingShi(lingshi->getClass()))
+        return;
+    ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
+    if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
+        return;
+    UInt32 upExp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
+    if(upExp == 0) return;
+    lsAttr.exp += atoi(args[2].c_str());
+    UInt8 maxLev = GData::lingshiCls.getLingshiMaxLev(lingshi->GetTypeId(), lsAttr.lv);
+    UInt8 tmp = lsAttr.lv;
+    for(UInt8 i = tmp; i <= maxLev; ++ i)
+    {
+        if(!GData::lingshiCls.canUpgrade(lingshi->GetTypeId(), lsAttr.lv, lsAttr.exp))
+            break;
+        if(lsAttr.exp < GData::lingshiCls.getLingShiMaxExp(lsAttr.lv))
+            break;
+        ++ lsAttr.lv;
+    }
+    if(lsAttr.lv >= maxLev)
+    {
+        lsAttr.lv = maxLev;
+        lsAttr.exp = GData::lingshiCls.getLingShiMaxExp(lsAttr.lv);
+    }
+    DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lingshi->getId());
+    if(tmp != lsAttr.lv)
+        fgt->setDirty();
+    fgt->sendModification(0x63+pos, static_cast<ItemEquip *>(lingshi), false);
+}
+
 void GMHandler::OnHandleTask(GObject::Player * player, std::vector<std::string>& args)
 {
 	if(args.size() <= 1)
@@ -5523,6 +5566,35 @@ void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& 
     GObject::Clan *clan = player->getClan();
     if(clan != NULL)
         clan->sendMemberBuf(pos);
+}
+
+void GMHandler::OnRaceBattle(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    UInt8 type;
+    type = atoi(args[0].c_str());
+    if(type == 4)
+    {
+        if(args.size() < 2)
+            return;
+        UInt8 pos = atoi(args[1].c_str());
+        GObject::raceBattle.enterPos(player, pos);
+    }
+    else if(type == 12)
+    {
+        if(args.size() < 2)
+            return;
+        UInt64 defenderId = (1LL << 48) + atoll(args[1].c_str());
+        GObject::raceBattle.attackLevelPlayer(player, defenderId);
+    }
+    else if(type == 13)
+    {
+        if(args.size() < 2)
+            return;
+        UInt64 defenderId = (1LL << 48) + atoll(args[1].c_str());
+        GObject::raceBattle.attackContinueWinPlayer(player, defenderId);
+    }
 }
 
 void GMHandler::OnSetFireValue(GObject::Player *player, std::vector<std::string>& args)

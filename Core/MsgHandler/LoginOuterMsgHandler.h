@@ -1109,12 +1109,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                15, 2,
-                78, 1,
-                1126, 5,
-                9418, 4,
-                551, 2,
-                1325, 4,
+                9442, 1,
+                78,   1,
+                9418, 2,
+                9371, 2,
+                9498, 2,
+                9438, 2,
             };
 
             UInt8 idx = 0;
@@ -1144,7 +1144,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 5)
+                    if (player->GetVar(GObject::VAR_DIRECTPURCNT) >= 10)
                         purchase.code = 2;
 
                     purchase.id = id;
@@ -3451,8 +3451,6 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME2, 0);
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME3, 0);
                 //pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_CLAN_SUM, 0);
-                GameMsgHdr hdr(0x201, WORKER_THREAD_WORLD, pl, 0);
-                GLOBAL().PushMsg(hdr, NULL);
             }
             break;
         default:
@@ -4028,6 +4026,8 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::globalClans.enumerate(clan_enum_1, 0);
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_END, end);
+        GameMsgHdr hdr(0x195, WORKER_THREAD_WORLD, NULL, 0);
+        GLOBAL().PushMsg(hdr, NULL);
 
         return;
     }

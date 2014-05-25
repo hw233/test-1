@@ -74,12 +74,14 @@ namespace GData
         static bool LoadXinMoConfig();
         static bool LoadDrinkAttrConfig();
         static bool LoadSkillEvConfig();
+        static bool LoadRandBattleConfig();
         static bool LoadJiguanshuConfig();
         static bool LoadJiguanyuConfig();
         static bool LoadTuzhiConfig();
         static bool LoadKeyinConfig();
         static bool LoadZhenweiConfig();
         static bool LoadSanHunConfig();
+        static bool LoadErlkingConfig();
         static bool LoadTeamArenaSkillConfig();
         static bool LoadTeamArenaInspireConfig();
         static bool LoadPetSevenSoulLevel();
@@ -91,6 +93,7 @@ namespace GData
         static bool LoadCoupleCopy();
         static bool LoadCardUpgrade();
         static bool LoadCardInfo();
+        static bool LoadLingShiConfig();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);
