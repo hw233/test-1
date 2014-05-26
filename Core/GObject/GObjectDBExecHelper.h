@@ -531,6 +531,7 @@ struct DBFighter2
     std::string citta;      // 装备的心法
     std::string skills;     // 学会的技能, ID1,ID2,...
     std::string cittas;     // 学会的心法, ID1,ID2,...
+    std::string lingshi;    // 穿戴的灵侍, ID1,ID2,...
     UInt8 attrType1;
     UInt16 attrValue1;
     UInt8 attrType2;
@@ -660,6 +661,13 @@ struct DBFriendlyCount
     UInt8 task5;
     UInt8 task6;
 };
+struct DBPictureInfo
+{
+	UInt64 playerId;
+	UInt8 floor;
+    std::string cubeHave;
+    std::string cubeCover;
+};
 
 struct PrayRelation
 {
@@ -715,6 +723,7 @@ struct DBClan
     UInt32 duobaoAward;
     UInt32 tyssSum;
     std::string clantitleAll;
+    UInt32 clanFireValue;
 };
 
 struct DBClanRepo
@@ -1641,6 +1650,15 @@ struct DBZhenyuanAttr
     UInt8 bindType;
 };
 
+struct DBLingshiAttr
+{
+    UInt32 id;
+    UInt32 itemId;
+    UInt8  level;
+    UInt32 exp;
+    UInt8 bindType;
+};
+
 }
 
 namespace DB {
@@ -2167,7 +2185,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(58)
+SPECIALDEF(59)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -2198,6 +2216,7 @@ SPECIALDEF(58)
     std::string, citta,
     std::string, skills,
     std::string, cittas,
+    std::string, lingshi,
     UInt8, attrType1,
     UInt16, attrValue1,
     UInt8, attrType2,
@@ -2400,7 +2419,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(36)
+SPECIALDEF(37)
 (
 	UInt32, id,
 	std::string, name,
@@ -2437,7 +2456,8 @@ SPECIALDEF(36)
     UInt32, urge,
     UInt32, duobaoAward,
     UInt32,tyssSum, 
-    std::string, clantitleAll
+    std::string, clantitleAll,
+    UInt32, clanFireValue
 )
 SPECIALEND()
 
@@ -3712,6 +3732,26 @@ SPECIALDEF(6)
     std::string, values,
 	UInt8, bindType
     )
+SPECIALEND()
+
+SPECIALBEGIN (GObject::DBLingshiAttr)
+SPECIALDEF(5)
+    (
+    UInt32, id,
+    UInt32, itemId,
+    UInt8,  level,
+    UInt32, exp,
+	UInt8, bindType
+    )
+SPECIALEND()
+SPECIALBEGIN(GObject::DBPictureInfo)
+SPECIALDEF(4)
+(
+	UInt64, playerId,
+	UInt8, floor,
+    std::string, cubeHave,
+    std::string, cubeCover
+)
 SPECIALEND()
 
 }

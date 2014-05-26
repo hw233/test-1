@@ -255,6 +255,7 @@ bool World::_memcinited = false;
 bool World::_miluzhijiao = false;
 bool World::_buyfund = false;
 bool World::_duobaoOpen = false;
+UInt32 World::_rbTimeRank = 0;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -569,6 +570,22 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 9)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -607,6 +624,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 19)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 26)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 3)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
         ))
     {
 #if 0
@@ -1308,6 +1327,15 @@ inline bool player_enum_3(GObject::Player* pl, int)
 
     return true;
 }
+inline bool player_enum_4(GObject::Player* pl, int)
+{
+    if(pl->getLeftAddrEnter())
+    {
+        GameMsgHdr hdr(0x392, pl->getThreadId(), pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+    return true;
+}
 inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
 {
     UInt32 val = pl->GetVar(VAR_LEFTADDR_POWER) ;
@@ -1544,6 +1572,22 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 9)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1733,6 +1777,38 @@ inline bool player_enum_AskOldMan(GObject::Player * p, int)
         p->SetVar(VAR_OLDMAN_SCORE_AWARD,flag);
     }
     return true;
+}
+
+inline bool player_enum_GetContributionBag(GObject::Player * pl, int)
+{
+    if(pl)
+    {
+        Stream st(REP::CLAN_COPY);
+        st << static_cast<UInt8>(0x20);
+        st << static_cast<UInt8>(4);
+        st << Stream::eos;
+        pl->send(st);
+
+        UInt32 AddFireTimes = (pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) & 0xFF);
+        if(AddFireTimes == 3)
+            pl->getFireContributionBag(pl);
+    }
+    return true;
+}
+
+inline bool clan_enum_GetFireGodBag(GObject::Clan * clan, int)
+{
+    if(clan)
+    {
+       clan->getFireGodBag();
+    }
+    return true;
+}
+
+void World::World_Fire_Sacrifice_Check( World * world )
+{
+    GObject::globalPlayers.enumerate(player_enum_GetContributionBag, 0);
+    GObject::globalClans.enumerate(clan_enum_GetFireGodBag, 0);
 }
 
 void World::World_OldMan_Refresh(void *)
@@ -2339,6 +2415,10 @@ bool World::Init()
     AddTimer(5 * 60 * 1000, World_Online_Log, static_cast<void *>(NULL), ((now + 300) / 300 * 300 - now) * 1000);
     AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 5 * 1000);
 
+    UInt32 fireSacriDay = TimeUtil::SharpDay(1) - 3 * 3600 + 60;
+    if(fireSacriDay < now) fireSacriDay += 86400;
+    AddTimer(86400 * 1000, World_Fire_Sacrifice_Check, this, (fireSacriDay - now) * 1000);
+
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(&type), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
     if(cfg.merged)
@@ -2674,7 +2754,14 @@ void World::World_One_Min( World * world )
 
 void World::commitArenaForceOnce()
 {
-    GObject::arena.commitArenaForceOnce();
+    if(arena.isOpen())
+        arena.commitArenaForceOnce();
+    else if(teamArenaMgr.isOpen())
+        teamArenaMgr.commitArenaForceOnce();
+    else if(serverWarMgr.isOpen())
+        serverWarMgr.commitArenaForceOnce();
+
+    globalPlayers.enumerate(player_enum_4, 0);  //仙界遗迹同步
 }
 
 void World::LoadQixiScore(Player* pl, Player* lover)
@@ -3883,11 +3970,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9498,40},{515,30},{16001,60},{503,60},{9022,40}},
-        {{9498,40},{515,25},{16001,60},{503,50},{9022,30}},
-        {{9498,40},{515,20},{16001,60},{503,40},{9022,20}},
+        {{9498,40},{515,30},{16001,60},{503,60},{9075,40}},
+        {{9498,40},{515,25},{16001,60},{503,50},{9075,30}},
+        {{9498,40},{515,20},{16001,60},{503,40},{9075,20}},
     };
-    static MailPackage::MailItem card = {9971,1};
+    static MailPackage::MailItem card = {9976,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -4346,10 +4433,6 @@ UInt16 World::GetRandomSpot()
 
 void World::SendGuangGunAward()    //待定
 {
-    UInt32 now = TimeUtil::Now();
-    if(now <( getOpenTime() + 7 * 86400) || now >( getOpenTime() + 15* 86400))
-        return ;
-    
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
@@ -4628,7 +4711,6 @@ void World::SendTYSSPlayerAward()
     }
     return;
 }
-
 
 }
 

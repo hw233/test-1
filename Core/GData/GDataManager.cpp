@@ -37,14 +37,17 @@
 #include "FairyPetTable.h"
 #include "XingchenData.h"
 #include "DrinkAttr.h"
+#include "PictureAttr.h"
 #include "JiguanData.h"
 #include "HunPoData.h"
+#include "ErlkingTable.h"
 #include "TeamArenaSkill.h"
 #include "SevenSoul.h"
 #include "RideConfig.h"
 #include "GObject/Married.h"
 #include "CoupleUpgrade.h"
 #include "CoupleCopy.h"
+#include "LingShiTable.h"
 #include "CardSystem.h"
 
 namespace GData
@@ -55,6 +58,7 @@ namespace GData
 	std::vector<ItemGemType *> gemTypes(1000);
 	std::vector<ItemGemType *> petGemTypes(1000);
 	std::vector<ItemGemType *> mountTypes(400);
+	std::vector<ItemGemType *> lingshiTypes(1000);
 	ItemEquipSetTypeManager	itemEquipSetTypeManager;
     std::map<UInt16, UInt16> skill2item;
 
@@ -406,6 +410,12 @@ namespace GData
             std::abort();
         }
 
+        if (!LoadErlkingConfig())
+        {
+            fprintf (stderr, "Load LoadErlkingConfig Error !\n");
+            std::abort();
+        }
+
         if (!LoadTeamArenaSkillConfig())
         {
             fprintf (stderr, "Load LoadTeamArenaSkillConfig Error !\n");
@@ -460,6 +470,18 @@ namespace GData
             fprintf (stderr, "Load LoadSkillEvConfig Error !\n");
             std::abort();
         }
+
+        if (!LoadRandBattleConfig())
+        {
+            fprintf (stderr, "Load LoadRandBattleConfig Error !\n");
+            std::abort();
+        }
+
+        if (!LoadLingShiConfig())
+        {
+            fprintf (stderr, "Load LoadLingShiConfig Error !\n");
+            std::abort();
+        }
         if (!LoadCardUpgrade())
         {
             fprintf (stderr, "Load LoadCardUpgrade Error !\n");
@@ -468,6 +490,21 @@ namespace GData
         if (!LoadCardInfo())
         {
             fprintf (stderr, "Load LoadCardInfo Error !\n");
+            std::abort();
+        }
+        if (!LoadCubeAttr())
+        {
+            fprintf (stderr, "Load LoadCubeAttr Error !\n");
+            std::abort();
+        }
+        if (!LoadFloorAttr())
+        {
+            fprintf (stderr, "Load LoadFloorAttr Error !\n");
+            std::abort();
+        }
+        if (!LoadPicInfo())
+        {
+            fprintf (stderr, "Load LoadPicInfo Error !\n");
             std::abort();
         }
 
@@ -715,7 +752,7 @@ namespace GData
             aextra->_extra.magres *= 100;
             aextra->_extra.criticaldmgimmune = 0;
 
-            StringTokenizer tk(ae.skill, ",");
+            StringTokenizer tk(ae.skill, "|");
             if (tk.count())
             {
                 for (size_t i=0; i<tk.count(); ++i)
@@ -844,6 +881,16 @@ namespace GData
 					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
 					wt = igt;
 					mountTypes[wt->getId() - LMOUNT_ID] = igt;
+                }
+				break;
+            case Item_LingShi:
+            case Item_LingShi1:
+            case Item_LingShi2:
+            case Item_LingShi3:
+				{
+					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
+					wt = igt;
+					lingshiTypes[wt->getId() - LLINGSHI_ID] = igt;
                 }
 				break;
             case Item_PetEquip:
@@ -2468,6 +2515,24 @@ namespace GData
         return true;
     }
 
+    bool GDataManager::LoadErlkingConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBErlkingConfig db;
+
+		if(execu->Prepare("SELECT `copyId`, `conditionA`, `conditionB`, `npcgroup` FROM `erlking`", db) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            erlkingData.setErlkingInfo(db);
+        }
+
+        return true;
+    }
+
 	bool GDataManager::LoadMoney()
 	{
 			lua_State* L = lua_open();
@@ -3033,6 +3098,43 @@ namespace GData
         return true;
     }
 
+    bool GDataManager::LoadRandBattleConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBRandBattleAttr dbattr;
+		if(execu->Prepare("SELECT `lev`, `id`, `value`, `next` FROM `randbattle_attr`", dbattr) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            RandBattleData::stRandBattle randBattle;
+            randBattle.id = dbattr.id;
+            randBattle.value = dbattr.value;
+            randBattle.next = dbattr.next;
+            GData::randBattleData.setRandBattleData(dbattr.lev, randBattle);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadLingShiConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBLingShi dbls;
+		if(execu->Prepare("SELECT `level`, `consume`, `exp`, `isBreak`, `useItem`, `useGold`, `attack`, `magatk`, `hp`, `action` FROM `lingshi_level`", dbls) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbls.level > 0)
+                lingshiCls.setLingshiTable(dbls);
+        }
+        return true;
+    }
+
     bool GDataManager::LoadCardUpgrade()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
@@ -3056,7 +3158,45 @@ namespace GData
             csys.loadInitCardInfo(dbpn); 
 		return true;
     }
+    bool GDataManager::LoadCubeAttr()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCubeAttr dbpn;
+		if(execu->Prepare("SELECT `id`, `hp`, `attack`, `action` FROM `cubeAttr` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+        {
+             pictureAttrData.setVecInfoAttr(dbpn.id , dbpn.hp , dbpn.attack , dbpn.action);
+        }
+		return true;
+    }
+    bool GDataManager::LoadFloorAttr()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBFloorAttr dbpn;
+		if(execu->Prepare("SELECT `id`, `hp`, `attack`, `action` FROM `floorAttr` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+        {
+           pictureAttrData.setVecInfoAttr( dbpn.hp , dbpn.attack , dbpn.action , 1);
+        }
+		return true;
+    }
 
-
+    bool GDataManager::LoadPicInfo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBPicInfo dbpn;
+		if(execu->Prepare("SELECT `id`, `index`, `cost`, `buff` FROM `picInfo` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+        {
+            pictureAttrData.setFloorInfo( dbpn.id , dbpn.index , dbpn.cost , dbpn.buffId);
+        }
+		return true;
+    }
 }
 

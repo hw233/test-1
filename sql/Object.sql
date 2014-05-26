@@ -643,6 +643,7 @@ CREATE TABLE `fighter` (
   `citta` varchar(255) NOT NULL,
   `skills` varchar(255) NOT NULL,
   `cittas` varchar(255) NOT NULL,
+  `lingshi` varchar(255) NOT NULL,
   `summoned` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `hideFashion` tinyint(4) DEFAULT '0',
   UNIQUE KEY `id_playerId` (`id`,`playerId`),
@@ -888,6 +889,7 @@ CREATE TABLE `player` (
   `lastOnline` int(10) unsigned NOT NULL DEFAULT '0',
   `packSize` smallint(4) unsigned NOT NULL DEFAULT '100',
   `packSizeSoul` smallint(4) unsigned NOT NULL DEFAULT '200',
+  `packSizeLS` smallint(4) unsigned NOT NULL DEFAULT '50',
   `mounts` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `mainFighter` int(10) unsigned NOT NULL DEFAULT '0',
   `icCount` varchar(32) NOT NULL DEFAULT '',
@@ -1119,6 +1121,7 @@ CREATE TABLE `clan` (
   `duobaoAward` int(10) unsigned NOT NULL DEFAULT '0',
   `tyssSum` int(10) unsigned NOT NULL DEFAULT '0',
   `clantitleAll` varchar(1024) NOT NULL DEFAULT '',
+  `clanFireValue` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2545,6 +2548,15 @@ CREATE TABLE `zhenyuanAttr` (
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `lingshiAttr`;
+CREATE TABLE `lingshiAttr` (
+   `id` int(10) unsigned NOT NULL DEFAULT '0',
+   `itemId`  int(10) unsigned NOT NULL DEFAULT '0',
+   `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `exp`  int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `skill_grade`;
 CREATE TABLE `skill_grade` (
     `playerId` bigint(20) unsigned NOT NULL,
@@ -2576,4 +2588,12 @@ CREATE TABLE IF NOT EXISTS `cardsuit` (
     unique KEY id_playerid(`playerid`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `pictureAttr`;
+CREATE TABLE IF NOT EXISTS `pictureAttr` (
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `floor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `cubeHave` varchar(256) NOT NULL DEFAULT '',
+    `cubeCover` varchar(1024) NOT NULL DEFAULT '',
+    unique KEY id_playerid(`playerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

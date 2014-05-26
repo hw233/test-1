@@ -169,21 +169,6 @@ namespace GObject
         setDirty();
     }
 
-    void FairyPet::delSkills(std::string& skills)
-    {
-        StringTokenizer tk(skills, ",");
-        const GData::SkillBase* s = NULL;
-        std::vector<const GData::SkillBase*> vt_skills;
-        for (size_t i = 0; i < tk.count(); ++i)
-        {
-            s = GData::skillManager[::atoi(tk[i].c_str())];
-            if (s)
-                vt_skills.push_back(s);
-        }
-        if (vt_skills.size())
-            delSkillsFromCT(vt_skills, false);
-    }
-
     void FairyPet::addChongNum(int num)
     {
         if(_chong + num <= 0)
@@ -256,7 +241,6 @@ namespace GObject
             updateToDB(2, getLevel());
             if(GET_REMAINDER(getPetLev()))
                 _owner->sendMsgCode(0, 4000);
-            GameAction()->doStrong(_owner, SthPinJieUp, 0, 0); 
             _owner->GuangGunCompleteTask(0,13);
         }
         else
@@ -268,10 +252,10 @@ namespace GObject
                 _owner->sendMsgCode(0, 4001);
             UInt8 value = GET_REMAINDER(getPetLev()) + 10;
             _owner->fairyPetUdpLog(10000, value > 10 ? value : 20);
-            GameAction()->doStrong(_owner, SthPinJieUp, 0, 0); 
         }
         sendPinjieInfo();
         UpdateToDB();
+        GameAction()->doStrong(_owner, SthPinJieUp, 0, 0);
     }
 
     void FairyPet::upgradeLevAuto()
@@ -300,7 +284,6 @@ namespace GObject
                 updateToDB(2, getLevel());
                 isSucc = 1;
                 break;
-                GameAction()->doStrong(_owner, SthPinJieUp, 0, 0); 
             }
             else
             {   //失败
@@ -317,6 +300,7 @@ namespace GObject
         st << getId() << isSucc << num;
         st << Stream::eos;
         _owner->send(st);
+        GameAction()->doStrong(_owner, SthPinJieUp, 0, 0);
     }
 
     void FairyPet::upgradeBone()
@@ -408,7 +392,6 @@ namespace GObject
             int num = getChongNum() + chong - ggd->limit;
             if(num > 0)
                 addGenguBless(num * 100);
-            GameAction()->doStrong(_owner, SthGenguUp, 0, 0); 
             _owner->GuangGunCompleteTask(0,14);
         }
         else
@@ -437,11 +420,11 @@ namespace GObject
             int num = getChongNum() + chong - ggd->limit;
             if(num > 0)
                 addGenguBless(num * 100);
-            GameAction()->doStrong(_owner, SthGenguUp, 0, 0); 
         }
         addChongNum(chong);
         sendGenguInfo();
         UpdateToDB();
+        GameAction()->doStrong(_owner, SthGenguUp, 0, 0);
     }
 
     void FairyPet::sendPinjieInfo()
@@ -607,7 +590,7 @@ namespace GObject
             if(newskill == 0 || newskill != oldskill)
             {
                 skills = Itoa(oldskill);
-                delSkills(skills);
+                delSkills(skills, false);
             }
         }
         if (eq)
@@ -901,7 +884,7 @@ namespace GObject
         st << Stream::eos;
         _owner->send(st);
         _owner->GuangGunCompleteTask(0,12);
-        GameAction()->doStrong(_owner, SthPetSanHun, 0 ,0 );
+        GameAction()->doStrong(_owner, SthPetSanHun, 0 , 0);
     }
 
     bool FairyPet::checkSanHunUp(UInt8 sanhunId, UInt8 sanhunLvl)
@@ -1238,7 +1221,7 @@ namespace GObject
             petSSErase(oldSkillId);
             UInt16 old_skill_id = SKILLANDLEVEL(oldSkillId, sLevel);
             oldSkill = Itoa(old_skill_id);
-            delSkills(oldSkill);
+            delSkills(oldSkill, false);
 
             UInt16 new_skill_id = SKILLANDLEVEL(newSkillId, sLevel);
             newSkill = Itoa(new_skill_id);
@@ -1319,7 +1302,7 @@ namespace GObject
             if(sLevel == 0) 
                 sLevel = 1;
             std::string oldSkill = Itoa(SKILLANDLEVEL(conflictSkillId, sLevel));
-            delSkills(oldSkill);
+            delSkills(oldSkill, false);
             std::string newSkill = Itoa(SKILLANDLEVEL(skillId, sLevel));
             setSkills(newSkill, false);
         }
@@ -1368,7 +1351,7 @@ namespace GObject
             if(sLevel == 0)
                 sLevel = 1;
             std::string oldSkill = Itoa(SKILLANDLEVEL(conflictSkillId, sLevel));
-            delSkills(oldSkill);
+            delSkills(oldSkill, false);
             std::string newSkill = Itoa(SKILLANDLEVEL(skillId, sLevel));
             setSkills(newSkill, false);
         }
@@ -1422,7 +1405,7 @@ namespace GObject
                     if(skillId)
                     {
                         std::string skills = Itoa(SKILLANDLEVEL(skillId, 1));
-                        delSkills(skills);
+                        delSkills(skills, false);
                         petSSErase(skillId);
                     }
                 }

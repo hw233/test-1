@@ -87,6 +87,23 @@ void ChatItem::addZhenyuan( Player * player, UInt32 id )
 	cid.lastAccess = TimeUtil::Now();
 }
 
+void ChatItem::addLingshi( Player * player, UInt32 id, UInt32 fighterId)
+{
+    Fighter * fgt = NULL;
+    UInt8 pos = 0;
+    ItemEquip * equip = player->GetPackage()->FindEquip(fgt, pos, fighterId, id);
+	if(equip == NULL || !IsLingShi(equip->getClass()))
+		return;
+
+	ChatItemData& cid = _lingshiData[id];
+	cid.st.init(REP::FLAUNT_GOOD);
+	cid.st << static_cast<UInt8>(0x1C) << static_cast<UInt8>(player->IsMale() ? 0 : 1) << player->getCountry()
+		<< player->getName();
+    Package::AppendLingshiData(cid.st, static_cast<ItemLingshi *>(equip));
+	cid.st << Stream::eos;
+	cid.lastAccess = TimeUtil::Now();
+}
+
 void ChatItem::post( UInt8 type, UInt64 pid, UInt32 id, Player * player )
 {
 	switch(type)
@@ -131,6 +148,26 @@ void ChatItem::post( UInt8 type, UInt64 pid, UInt32 id, Player * player )
 			FastMutex::ScopedLock lk(_zhenyuanMutex);
 			std::map<UInt32, ChatItemData>::iterator it = _zhenyuanData.find(id);
 			if(it == _zhenyuanData.end())
+			{
+				return;
+			}
+			it->second.lastAccess = TimeUtil::Now();
+			player->send(it->second.st);
+			return;
+		}
+		break;
+	case 0x0C:
+		{
+			FastMutex::ScopedLock lk(_lingshiMutex);
+			addLingshi(player, id, pid);
+			return;
+		}
+		break;
+	case 0x1C:
+		{
+			FastMutex::ScopedLock lk(_lingshiMutex);
+			std::map<UInt32, ChatItemData>::iterator it = _lingshiData.find(id);
+			if(it == _lingshiData.end())
 			{
 				return;
 			}
@@ -285,6 +322,18 @@ void ChatItem::purge( UInt32 curtime )
 		{
 			if(curtime > it->second.lastAccess + 3600 * 3)
 				_zhenyuanData.erase(it ++);
+			else
+				++ it;
+		}
+	}
+
+    {
+		FastMutex::ScopedLock lk(_lingshiMutex);
+		std::map<UInt32, ChatItemData>::iterator it = _lingshiData.begin();
+		while(it != _lingshiData.end())
+		{
+			if(curtime > it->second.lastAccess + 3600 * 3)
+				_lingshiData.erase(it ++);
 			else
 				++ it;
 		}

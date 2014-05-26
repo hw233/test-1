@@ -237,6 +237,10 @@ namespace GObject
 		execu->Extract("SELECT max(`id`) FROM `zhenyuanAttr`", maxItemId);
         if(maxItemId > maxId)
             maxId = maxItemId;
+        maxItemId = 0;
+		execu->Extract("SELECT max(`id`) FROM `lingshiAttr`", maxItemId);
+        if(maxItemId > maxId)
+            maxId = maxItemId;
 		IDGenerator::gItemOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`tradeId`) FROM `trade`", maxId);
 		IDGenerator::gTradeOidGenerator.Init(maxId);
@@ -316,6 +320,11 @@ namespace GObject
         if(!loadZhenyuanAttr())
         {
             fprintf(stderr, "loadZhenyuanAttr error!\n");
+            std::abort();
+        }
+        if(!loadLingshiAttr())
+        {
+            fprintf(stderr, "loadLingshiAttr error!\n");
             std::abort();
         }
 		if(!loadEquipmentsSpirit())
@@ -729,6 +738,11 @@ namespace GObject
 		if(!loadFriendlyCount())
         {
             fprintf(stderr, "loadFriendlyCount error!\n");
+            std::abort();
+        }
+		if(!loadPictureInfo())
+        {
+            fprintf(stderr, "loadPictureInfo error!\n");
             std::abort();
         }
 
@@ -2223,7 +2237,7 @@ namespace GObject
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
         //if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `lingshi`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -2355,6 +2369,7 @@ namespace GObject
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
+            fgt2->setLingshi(specfgtobj.lingshi, false);
             if (fgt2->isPet())
                 fgt2->setSkills(specfgtobj.skill, false);
             else
@@ -3768,7 +3783,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum`, `clantitleAll` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum`, `clantitleAll`,`clanFireValue`  FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3827,6 +3842,7 @@ namespace GObject
                 if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
                     clan->SetTYSSSum(0,true);
                 clan->SetClanTitle(cl.clantitleAll);
+                clan->SetClanFireValue(cl.clanFireValue);
             }
 			else
 			{
@@ -7178,6 +7194,36 @@ namespace GObject
 		return true;
     }
 
+	bool GObjectManager::loadLingshiAttr()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading lingshi attr:");
+        DBLingshiAttr dblsa;
+        if(execu->Prepare("SELECT `lingshiAttr`.`id`, `itemId`, `level`, `exp`, `bindType` FROM `lingshiAttr` LEFT JOIN `item` ON `lingshiAttr`.`id` = `item`.`id` OR `item`.`id` = NULL", dblsa) != DB::DB_OK)
+            return false;
+
+        lc.reset(2000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            const GData::ItemBaseType * itype = GData::itemBaseTypeManager[dblsa.itemId];
+            if(itype == NULL)
+                continue;
+            ItemLingshiAttr lsattr;
+            ItemEquipData itemEquipData;
+            lsattr.lv = dblsa.level;
+            lsattr.exp = dblsa.exp;
+            ItemLingshi * lingshi = new ItemLingshi(dblsa.id, itype, itemEquipData, lsattr);
+	        lingshi->SetBindStatus(dblsa.bindType > 0);
+            pushEquipment(static_cast<ItemLingshi *>(lingshi));
+		}
+		lc.finalize();
+
+		return true;
+    }
+
     bool GObjectManager::fixItem9383Leader()
     {
         std::string path = cfg.scriptPath + "fixItem9383leader";
@@ -7750,6 +7796,59 @@ namespace GObject
             }
             if(dbfr.clearTime != 0)
                 pl->SetFriendTaskNum(friendOne ,dbfr.clearTime , dbfr.task1 , dbfr.task2, dbfr.task3, dbfr.task4, dbfr.task5, dbfr.task6);
+		}
+		lc.finalize();
+		return true;
+	}
+	bool GObjectManager::loadPictureInfo()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading PictureInfo:");
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		DBPictureInfo dbfr;
+		if(execu->Prepare("SELECT `playerId`, `floor`,`cubeHave`, `cubeCover`  FROM `pictureAttr` ORDER BY `playerId`", dbfr) != DB::DB_OK)
+			return false;
+		lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+            lc.advance();
+            if(dbfr.playerId != last_id)
+            {
+                last_id = dbfr.playerId;
+                pl = globalPlayers[last_id];
+            }
+            if(pl == NULL)
+                continue;
+            pl->getPictureInfo().floor = dbfr.floor;
+            if(dbfr.cubeHave != "")
+            {
+                StringTokenizer tokenizer(dbfr.cubeHave, "|");
+                for(size_t j = 0; j < tokenizer.count(); ++ j)
+                {
+                    pl->getPictureInfo().cubeHave.insert(atoi(tokenizer[j].c_str()));
+                    StringTokenizer tokenizer2(tokenizer[j], ",");
+                }
+            }
+            if(dbfr.cubeCover != "")
+            {
+                std::map<UInt8 , std::vector<UInt8> > map_vec;
+                StringTokenizer tokenizer(dbfr.cubeCover, "|");
+                for(size_t j = 0; j < tokenizer.count(); ++ j)
+                {
+                    StringTokenizer tokenizer2(tokenizer[j], ",");
+                    if(tokenizer2.count() < 2)
+                        continue;
+                    for(UInt8 k = 1; k < tokenizer2.count(); ++k)
+                    {
+                       map_vec[atoi(tokenizer2[0].c_str())].push_back(atoi(tokenizer2[k].c_str()));
+                    }
+                }
+                if(map_vec.size())
+                    pl->setPictureInfo(dbfr.floor ,map_vec );
+            }
 		}
 		lc.finalize();
 		return true;

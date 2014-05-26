@@ -168,7 +168,16 @@ namespace GObject
 
 	public:
 		UInt16 GetItemUsedGrids(UInt32 id, UInt16 num, bool bind = false);
-		inline UInt16 GetUsedPackageSize(UInt8 type = 0) const { return type ? m_SizeSoul : m_Size; }
+		inline UInt16 GetUsedPackageSize(UInt8 type = 0) const
+        {
+            if(type == 0)
+                return m_Size;
+            else if(type == 1)
+                return m_SizeSoul;
+            else if(type == 2)
+                return m_SizeLS;
+            return 0;
+        }
 		inline UInt16 GetMaxPackageSize() const { return m_Owner->getPacksize(); }
 		inline UInt16 GetRestPackageSize(UInt8 type = 0) const { return (m_Owner->getPacksize(type) > GetUsedPackageSize(type)) ? (m_Owner->getPacksize(type) - GetUsedPackageSize(type)) : 0; }
 		inline bool IsFull() const { return m_Owner->getPacksize() <= m_Size; }
@@ -317,6 +326,22 @@ namespace GObject
         ItemZhenyuan * newZhenyuanToDB(const GData::ItemBaseType *, ItemZhenyuanAttr&, bool);
 	    ItemBase* AddZhenYuan(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere = 0);
 	    void MergeZhenyuan(UInt32* zhyIds, UInt8 count);
+        /**********灵侍begin***********/
+	    ItemLingshi* GetLingshi(UInt32 id);
+	    ItemBase* AddLingShiN(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere = 0);
+	    ItemBase* AddLingShi(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere);
+	    void lingshiUpgrade(UInt16 fighterId, UInt32 equipId, std::string& idStr);
+        UInt32 lingshiUpgrade(ItemLingshi * equip, ItemLingshi * eatEq);
+        void lingshiTrain(UInt16 fighterId, UInt32 lsId, bool type);
+        void lingshiBreak(UInt16 fighterId, UInt32 lsId, bool type);
+	    bool DelLingshi(UInt32 id, UInt16 toWhere = 0);
+	    bool DelLingshi2(ItemLingshi * lingshi, UInt16 toWhere = 0);
+        void SendLingshiTrainInfo();
+        void SendSingleLingshiData(ItemLingshi *, UInt8);
+	    static void AppendLingshiData(Stream&, ItemLingshi *);
+	    void SendLSPackageItemInfor();
+        void setLingshi(Fighter *, UInt32, UInt8);
+        /**********灵侍end***********/
     protected:
 		typedef std::map<ItemKey, ItemBase *> ItemCont;
 		typedef ItemCont::iterator item_elem_iter;
@@ -327,9 +352,11 @@ namespace GObject
 
 		ItemCont m_Items;
 		ItemCont m_ItemsSoul;
+		ItemCont m_ItemsLS;     //灵侍背包
         ItemCont m_ItemsTemporary; //临时物品
 		UInt16 m_Size;		//already used grids
 		UInt16 m_SizeSoul;  //already used soul grids
+		UInt16 m_SizeLS;    //already used lingshi grids
         UInt16 m_TempItemSize;
 		UInt8 _lastActivateLv;
 		UInt8 _lastActivateQ;

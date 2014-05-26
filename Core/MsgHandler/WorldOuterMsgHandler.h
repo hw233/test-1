@@ -2929,7 +2929,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         {
             UInt8 flag = 0;
             brd >> flag;
-            if(flag && player->getTotalRecharge() >= 1000)
+            if(flag && player->getTotalRecharge() >= 3000)
                 return;
             player->SetVar(VAR_DIRECTPUROPEN, flag?1:0);
             if(flag > 0)

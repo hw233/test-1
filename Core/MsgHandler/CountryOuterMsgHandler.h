@@ -75,6 +75,7 @@
 #include "GObject/AthleticsRank.h"
 #include "GObject/ArenaServerWar.h"
 #include "GObject/ClanBuilding.h"
+#include "GObject/RaceBattle.h"
 #include "GObject/CollectCard.h"
 
 struct NullReq
@@ -1364,6 +1365,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendFairyPetResource(); //仙宠资源
     pl->sendFairyPetList(); //仙宠列表
     pl->GetPetPackage()->SendPackageItemInfor(); //仙宠背包列表
+    pl->GetPackage()->SendLSPackageItemInfor(); //灵侍背包列表
     if (pl->getClan() != NULL)
     {
         pl->getClan()->sendQQOpenid(pl);
@@ -1464,6 +1466,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     //结拜邀请信息
     pl->sendFriendlyTimeAndCost();
+    GObject::raceBattle.sendRBStatus(pl);
 
     }
 
@@ -1748,12 +1751,14 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-		static UInt8 p[17] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62, 0x70};
-		ItemEquip * e[17] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+		static UInt8 p[20] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62, 0x70, 0x63, 0x64, 0x65};
+		ItemEquip * e[20] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
             fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
             fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2),
-            fgt->getLingbao(0), fgt->getLingbao(1), fgt->getLingbao(2), fgt->getInnateTrump()};
-		fgt->sendModification(17, p, e, false);
+            fgt->getLingbao(0), fgt->getLingbao(1), fgt->getLingbao(2), fgt->getInnateTrump(),
+            fgt->getLingshi(0), fgt->getLingshi(1), fgt->getLingshi(2)
+        };
+		fgt->sendModification(20, p, e, false);
 		return;
 	}
 
@@ -1822,6 +1827,11 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
             else if (idx == 2)
                 fgt->delCitta(citta, true);
         }
+        break;
+    case 0x63:
+    case 0x64:
+    case 0x65:
+        player->GetPackage()->setLingshi(fgt, fer._equipId, fer._part);
         break;
     default:
         {
@@ -3592,7 +3602,6 @@ void OnXJFrontMapReq( GameMsgHdr& hdr, const void* data)
         default:
             break;
     }
-    
 }
 
 
@@ -5232,6 +5241,11 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
             // 帮派副本的战斗操作
             clan->clanCopyBattleOperate(player, command, brd);
             break;
+        case 0x20:
+            // 帮派拜火祭天
+            if(World::getFireSacrificeTime())
+                clan->clanFireSacrificeOp(player, command);
+            break;
         default:
                 break;
     }
@@ -6722,6 +6736,101 @@ void OnMakeStrong( GameMsgHdr& hdr, const void * data )
     }
 }
 
+void OnRaceBattleReq(GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	//if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+	//	return;
+    if(player->getLocation() != 1556)
+        return;
+    if(player->GetLev() < 40)
+        return;
+    if(!GObject::raceBattle.isStart())
+        return;
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+    switch(type)
+    {
+        case 4:
+        {
+            UInt8 pos = 0;
+            brd >> pos;
+            GObject::raceBattle.enterPos(player, pos);
+        }
+        break;
+#if 0
+        case 5:
+        {
+            GObject::raceBattle.autoBattle(player);
+        }
+        break;
+#endif
+#if 0
+        case 6:
+        {
+            GObject::raceBattle.cancelBattle(player);
+        }
+        break;
+#endif
+        case 7:
+        {
+            GObject::raceBattle.freshContinueWinRank(player);
+        }
+        break;
+
+        case 8:
+        {
+            GObject::raceBattle.getAward(player);
+        }
+        break;
+
+        case 10:
+        {
+            bool bRet = GObject::raceBattle.requestMatch(player);
+            if(!bRet)
+                GObject::raceBattle.sendMatchPlayer(player, NULL);
+        }
+        break;
+
+        case 11:
+            GObject::raceBattle.exitRB(player);
+        break;
+
+        case 12:
+        {
+            UInt64 defenderId = 0;
+            brd >> defenderId;
+            GObject::raceBattle.attackLevelPlayer(player, defenderId);
+        }
+        break;
+
+        case 13:
+        {
+            UInt64 defenderId = 0;
+            brd >> defenderId;
+            GObject::raceBattle.attackContinueWinPlayer(player, defenderId);
+        }
+        break;
+
+        case 14:
+        {
+            GObject::raceBattle.pageContinueWin(player, 0);
+        }
+        break;
+
+        case 15:
+        {
+            GObject::raceBattle.pageContinueWin(player, 1);
+        }
+        break;
+
+        default:
+        break;
+    }
+}
+
 void OnExJob( GameMsgHdr & hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -6991,6 +7100,91 @@ void OnQueryTempItemReq( GameMsgHdr & hdr, const void * data )
         }
         break;
     }
+}
+
+void OnErlkingReq(GameMsgHdr & hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+
+    if(player->GetLev() < 85)
+        return;
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    brd >> opt;
+
+    switch(opt)
+    {
+    case 0x00:
+        {
+            player->GetErlking()->ErlkingInfo();               
+        }
+        break;
+    case 0x01:
+        {
+            UInt8 copyId = 0;
+            brd >> copyId;
+
+            player->GetErlking()->StartBattle(copyId);
+        }
+        break;
+    case 0x02:
+        {
+            UInt8 copyId = 0;
+            UInt16 num = 0;
+            brd >> copyId >> num;
+
+            player->GetErlking()->AutoBattle(copyId, num);
+        }
+        break;
+    case 0x03:
+        {
+            if(!player->hasChecked())
+                return;
+
+            player->GetErlking()->BuyPassNum();
+        }
+        break;
+    case 0x10:
+        //player->GetPackage()->SendLSPackageItemInfor();
+        break;
+    case 0x12:
+        player->GetPackage()->SendLingshiTrainInfo();
+        break;
+    case 0x13:
+        {
+            if(!player->hasChecked())
+                return;
+            UInt16 fighterId = 0;
+            UInt32 lsId = 0;
+            std::string idStr;
+            brd >> fighterId >> lsId >> idStr;
+            player->GetPackage()->lingshiUpgrade(fighterId, lsId, idStr);
+        }
+        break;
+    case 0x14:
+        {
+            if(!player->hasChecked())
+                return;
+            UInt8 opt = 0;
+            UInt16 fighterId = 0;
+            UInt32 lsId = 0;
+            brd >> opt >> fighterId >> lsId;
+            player->GetPackage()->lingshiBreak(fighterId, lsId, opt > 0);
+        }
+        break;
+    case 0x15:
+        {
+            if(!player->hasChecked())
+                return;
+            UInt8 opt = 0;
+            UInt16 fighterId = 0;
+            UInt32 lsId = 0;
+            brd >> opt >> fighterId >> lsId;
+            player->GetPackage()->lingshiTrain(fighterId, lsId, opt > 0);
+        }
+        break;
+   }
 }
 
 void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
@@ -7317,6 +7511,8 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                     GameMsgHdr hdr(0x33A, threadId, invitee, sizeof(Player *));
                     GLOBAL().PushMsg(hdr, &player);
                 }
+
+                player->SetKJTMAwardMark(3);
             }
         }
         break;
@@ -7452,6 +7648,18 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
             KJTMManager->StartBattle(player);
         }
         break;
+    case 0x18:
+        {
+            player->GetKJTMAwardMark();
+        }
+        break;
+    case 0x19:
+        {
+            UInt8 type = 0;
+            br >> type;
+            player->GetKJTMAward(type);
+        }
+        break;
     case 0x1A:
         {
             if(NULL != player->getTeamMemberData())
@@ -7547,6 +7755,14 @@ void OnKangJiTianMoReq(GameMsgHdr& hdr, const void * data)
                     GLOBAL().PushMsg(hdr, &player);
                 }
             }
+        }
+        break;
+    case 0x1D:
+        {
+            UInt32 status = player->GetVar(VAR_KJTM_STATUS);
+            UInt8 mark = GET_BIT(status, 0);
+            if(0 == mark)
+                player->SetKJTMAwardMark(2);
         }
         break;
     }
@@ -9240,6 +9456,12 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
                br >>type ;
                player->setCutType(type);
            }
+           else
+           {
+               UInt32 now = TimeUtil::Now();
+               if(player->getCuttingInfo().time != 0 && player->getCuttingInfo().time + 65 < now)
+                   player->getCuttingInfo().reset();
+           }
            player->sendTreesInfo();
         }
         break;
@@ -9305,9 +9527,16 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
         {
            if(player->getCuttingInfo().cutter && player->getCuttingInfo().time == 0)
            {
-               player->getCuttingInfo().cutter->setCutter(1,NULL);
+               if(player->getCuttingInfo().shenfen)
+               {
+                    player->getCuttingInfo().cutter->getCuttingInfo().reset();
+               }
+               else 
+               {
+                   player->getCuttingInfo().cutter->setCutter(1,NULL);
+               }
                player->getCuttingInfo().cutter->sendCutterInfo();
-               player->setCutter(0,NULL);
+               player->getCuttingInfo().reset();
                player->sendCutterInfo();
            }
         }
@@ -9333,7 +9562,11 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
                     break;
                 case 1:
                 case 2:
-                    res = player->quicklyCut(type);
+                    {
+                        res = player->quicklyCut(type);
+                        player->sendTreesInfo();
+                    }
+                    break;
             }
             player->sendCutterInfo();
             Stream st(REP::BROTHER);
@@ -9344,6 +9577,48 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             player->send(st);
             if(type)
                 player->getCuttingInfo().reset();
+        }
+        break;
+    case 0x20:
+        {
+            player->sendPictureInfo(); 
+        }
+        break;
+    case 0x21:
+        {
+            UInt8 floor = 0;
+            UInt8 index = 0;
+            UInt8 count = 0;
+            br >> floor >> index >> count;
+            UInt8 res = player->buyCubeInPicture(floor,index,count);
+            Stream st(REP::BROTHER) ;
+            st << static_cast<UInt8>(0x21);
+            st << static_cast<UInt8>(res);
+            st << Stream::eos;
+            player->send(st);
+            player->sendPictureInfo();
+        }
+        break;
+    case 0x22:
+        {
+            UInt8 floor = 0; 
+            UInt8 cubeCount = 0;
+            br >> floor >> cubeCount ;
+            std::map<UInt8 ,std::vector<UInt8> > map_vec;
+            for(UInt8 i = 0; i < cubeCount ; ++i)
+            {
+                UInt8 index = 0;
+                UInt8 cnt = 0;
+                br >> index >> cnt;
+                for(UInt8 j = 0 ; j < cnt ; ++j)
+                {
+                    UInt8 cubeIndex = 0;
+                    br >> cubeIndex;
+                    map_vec[index].push_back(cubeIndex);
+                }
+            }
+            if(map_vec.size())
+                player->setPictureInfo(floor,map_vec);
         }
         break;
 	}
@@ -9432,8 +9707,6 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
 
     }
 }
-
-
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

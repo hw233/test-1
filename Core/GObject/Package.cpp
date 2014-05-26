@@ -25,6 +25,7 @@
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
 #include "GData/LBSkillTable.h"
+#include "GData/LingShiTable.h"
 #include "Common/Itoa.h"
 #include "LBNameTmpl.h"
 
@@ -523,7 +524,7 @@ namespace GObject
         }
     }
 
-	Package::Package(Player* player) : m_Owner(player), m_Size(0), m_SizeSoul(0), _lastActivateLv(0), _lastActivateQ(0), _lastActivateCount(0)
+	Package::Package(Player* player) : m_Owner(player), m_Size(0), m_SizeSoul(0), m_SizeLS(0), _lastActivateLv(0), _lastActivateQ(0), _lastActivateCount(0)
 	{
 	}
 
@@ -566,6 +567,8 @@ namespace GObject
 			return m_Owner->GetPetPackage()->AddPetEquipN(typeId, num, bind, silence, FromWhere);
         else if(IsZhenYuanItem(typeId))
 			return AddZhenYuanN(typeId, num, bind, silence, FromWhere);
+        else if(IsLingShiItem(typeId))
+			return AddLingShiN(typeId, num, bind, silence, FromWhere);
 		return AddItem(typeId, num, bind, silence, FromWhere);
 	}
 
@@ -650,6 +653,8 @@ namespace GObject
 			return AddZhenYuanN(typeId, num, bind, !notify, fromWhere);
         else if(IsPetItem(typeId))
 			return m_Owner->GetPetPackage()->AddPetItem(typeId, num, bind, notify, fromWhere);
+        else if(IsLingShiItem(typeId))
+			return AddLingShiN(typeId, num, bind, !notify, fromWhere);
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
 		if(itemType == NULL) return NULL;
 		ITEM_BIND_CHECK(itemType->bindType,bind);
@@ -836,6 +841,8 @@ namespace GObject
             return item;
         else if(IsPetItem(typeId))
 			return m_Owner->GetPetPackage()->AddPetItem(typeId, count, bind, false, fromWhere);
+        else if(IsLingShiItem(typeId))
+			return AddLingShiN(typeId, count, bind, false, fromWhere);
 		ItemBase * exist = FindItem(typeId, bind);
         
 		if (exist != NULL)
@@ -1039,12 +1046,24 @@ namespace GObject
 
 	ItemBase* Package::AddExistEquip( ItemEquip * equip )
 	{
-		ItemBase *& e = m_Items[ItemKey(equip->getId())];
-		if(e == NULL)
-			++ m_Size;
-		e = equip;
+        if(IsLingShiItem(equip->GetTypeId()))
+        {
+            ItemBase *& e = m_ItemsLS[ItemKey(equip->getId())];
+            if(e == NULL)
+                ++ m_SizeLS;
+		    e = equip;
+        }
+        else
+        {
+            ItemBase *& e = m_Items[ItemKey(equip->getId())];
+            if(e == NULL)
+                ++ m_Size;
+		    e = equip;
+        }
         if(IsZhenYuanItem(equip->GetTypeId()))
 		    SendSingleZhenyuanData(static_cast<ItemZhenyuan *>(equip));
+        else if(IsLingShiItem(equip->GetTypeId()))
+		    SendSingleLingshiData(static_cast<ItemLingshi *>(equip), 1);
         else
 		    SendSingleEquipData(equip);
 		return equip;
@@ -1407,6 +1426,13 @@ namespace GObject
 		equip->SetBindStatus(bind);
         if(IsPetEquipTypeId(equip->GetTypeId()))
             m_Owner->GetPetPackage()->AddExistEquip(static_cast<ItemPetEq *>(equip), true);
+        else if(IsLingShiItem(equip->GetTypeId()))
+        {
+            ItemBase *& e = m_ItemsLS[ItemKey(id)];
+            if(e == NULL)
+                ++ m_SizeLS;
+            e = equip;
+        }
         else
         {
             ItemBase *& e = m_Items[ItemKey(id)];
@@ -6033,11 +6059,6 @@ namespace GObject
 		return fgt->findEquip(id, pos);
 	}
 
-    bool eachFighter(Fighter* fgt)
-    {
-        return true;
-    }
-
     void Package::FindEquipByTypeId(std::vector<ItemEquip*>& ret, UInt32 id, bool bind)
     {
         if (!m_Owner)
@@ -8194,5 +8215,434 @@ namespace GObject
         st << Stream::eos;
         m_Owner->send(st);
 	}
+
+    /**********灵侍begin***********/
+#define XIAN_LING_GUO 9459
+    inline UInt8 GET_LS_MAXLEVEL(int quality)
+    {
+        static UInt8 ls_levels[6] = { 0, 0, 30, 50, 70, 90 };
+        if(quality > 6)
+            quality = 0;
+        return ls_levels[quality];
+    }
+
+	ItemLingshi* Package::GetLingshi(UInt32 id)
+	{
+		if (!IsEquipId(id)) return NULL;
+        item_elem_iter iter = m_ItemsLS.find(ItemKey(id));
+        if(iter == m_ItemsLS.end())
+            return NULL;
+        return static_cast<ItemLingshi *>(iter->second);
+	}
+
+	ItemBase* Package::AddLingShiN( UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere )
+	{
+		if((UInt32)(GetRestPackageSize(2)) < num)
+			return NULL;
+		ItemBase * item = NULL;
+		for(UInt32 i = 0; i < num; ++ i)
+		{
+			item = AddLingShi(typeId, bind, !silence, FromWhere);
+		}
+		return item;
+	}
+
+	ItemBase* Package::AddLingShi(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere)
+	{
+		if (!IsLingShiItem(typeId)) return NULL;
+		if(m_SizeLS >= m_Owner->getPacksize(2))
+			return NULL;
+		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[typeId];
+		if(itype == NULL) return NULL;
+        ItemEquipData itemEquipData;
+        ItemLingshiAttr lsAttr;
+        UInt32 id = IDGenerator::gItemOidGenerator.ID();
+
+        ItemLingshi * lingshi = new ItemLingshi(id, itype, itemEquipData, lsAttr);
+		ItemBase *& e = m_ItemsLS[ItemKey(lingshi->getId())];
+		if(e == NULL)
+			++ m_SizeLS;
+		e = lingshi;
+        ITEM_BIND_CHECK(itype->bindType, bind);
+        lingshi->SetBindStatus(bind);
+        if(notify)
+            ItemNotifyEquip(static_cast<ItemEquip *>(lingshi));
+		SendSingleLingshiData(lingshi, 1);
+        if(lingshi->getQuality() >= Item_Purple)
+            SYSMSG_BROADCASTV(4160, m_Owner->getCountry(), m_Owner->getName().c_str(), lingshi->getQuality(), lingshi->getName().c_str());
+
+	    DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %" I64_FMT "u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
+        DB4().PushUpdateData("REPLACE INTO `lingshiAttr`(`id`, `itemId`, `level`, `exp`) VALUES(%u, %u, %u, %u)", id, itype->getId(), lsAttr.lv, lsAttr.exp);
+		return lingshi;
+	}
+
+	void Package::lingshiUpgrade(UInt16 fighterId, UInt32 lsId, std::string& idStr)
+    {
+        Fighter * fgt = NULL;
+        UInt8 pos = 0;
+		ItemLingshi * lingshi = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
+		if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
+			return;
+        ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
+        if(lsAttr.lv >= GET_LS_MAXLEVEL(lingshi->getQuality()))
+            return;
+        GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+        if(!lsd || !lsd->canUpgrade(lsAttr.exp))
+            return;
+        UInt32 needTael = 0;
+        std::vector<ItemLingshi *> eatVec;
+        StringTokenizer tk(idStr, ",");
+        for(UInt8 i = 0; i < tk.count(); ++ i)
+        {
+            ItemLingshi * eatEq = GetLingshi(atoi(tk[i].c_str()));
+            if(eatEq == NULL)
+                continue;
+            UInt8 tmpLvl = eatEq->getLingshiAttr().lv;
+            needTael += GData::lingshiCls.getLevUpTael(tmpLvl);
+            eatVec.push_back(eatEq);
+        }
+        if(m_Owner->getTael() < needTael)
+        {
+            m_Owner->sendMsgCode(0, 1100);
+            return;
+        }
+        needTael = 0;
+        UInt8 tmp = lsAttr.lv;
+        bool isUdp = true;
+        for(UInt8 i = 0; i < eatVec.size(); ++ i)
+        {
+            UInt32 res = lingshiUpgrade(lingshi, eatVec[i]);
+            if(res > 0)
+            {
+                UInt8 tmpLvl = eatVec[i]->getLingshiAttr().lv;
+                needTael += GData::lingshiCls.getLevUpTael(tmpLvl);
+                if(eatVec[i]->getQuality() >= Item_Purple && isUdp)
+                {
+                    m_Owner->udpLog("lingshi", "F_140509_12", "", "", "", "", "act");
+                    isUdp = false;
+                }
+                DelLingshi2(eatVec[i], ToPetEquipUpgrade);
+                if(res == 1)
+                    break;
+            }
+        }
+        if(tmp != lsAttr.lv)
+        {
+            fgt->setDirty();
+            fgt->updateLingshiSkillId(lingshi, pos);
+        }
+        ConsumeInfo ci(LingShiPeiYang, 0, 0);
+        m_Owner->useTael(needTael, &ci);
+
+		Stream st(REP::ERLKING_INFO);
+        st << static_cast<UInt8>(0x13);
+        st << fighterId << pos;
+		AppendLingshiData(st, lingshi);
+		st << Stream::eos;
+		m_Owner->send(st);
+    }
+
+    UInt32 Package::lingshiUpgrade(ItemLingshi * lingshi, ItemLingshi * eatEq)
+    {
+        ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
+        UInt32 upExp = GData::lingshiCls.getLingShiExp(lsAttr.lv);
+        if(upExp == 0) return 0;
+        lsAttr.exp += (eatEq->GetItemType().trumpExp + eatEq->getLingshiAttr().exp);
+        if(lsAttr.exp >= upExp)
+        {
+            UInt8 tmp = lsAttr.lv;
+            UInt8 maxLev = GET_LS_MAXLEVEL(lingshi->getQuality());
+            for(UInt8 i = tmp; i <= maxLev; ++ i)
+            {
+                GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+                if(!lsd || !lsd->canUpgrade(lsAttr.exp))
+                    break;
+                if(lsAttr.exp < lsd->exp)
+                    break;
+                ++ lsAttr.lv;
+            }
+            if(lsAttr.lv >= maxLev)
+            {
+                lsAttr.lv = maxLev;
+                if(!GData::lingshiCls.canBreak(lsAttr.lv))
+                    lsAttr.exp = GData::lingshiCls.getLingShiExp(lsAttr.lv-1);
+                return 1;
+            }
+        }
+        return eatEq->getId();
+    }
+
+    void Package::lingshiTrain(UInt16 fighterId, UInt32 lsId, bool type)
+    {   //灵侍培养
+        Fighter * fgt = NULL;
+        UInt8 pos = 0;
+		ItemLingshi * lingshi = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
+		if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
+			return;
+        ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
+        GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+        if(!lsd || !lsd->canUpgrade(lsAttr.exp))
+            return;
+        bool hasLucky = uRand(10000) < 1000;
+        if(type)
+        {
+            UInt32 count = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_CNT) + 1;
+            UInt32 needGold = 0;
+            if(count <= 5)
+                needGold = 6;
+            else if(count <= 10)
+                needGold = 12;
+            else if(count >= 40)
+                needGold = 192;
+            else
+                needGold = (count-10)*6 + 12;
+            bool isHalf = m_Owner->GetVar(VAR_LINGSHI_PEIYANG_LUCKY) > 0;
+            if(m_Owner->getGold() < needGold / (isHalf ? 2 : 1))
+            {
+                m_Owner->sendMsgCode(0, 1104);
+                return;
+            }
+            ConsumeInfo ci(LingShiPeiYang, 0, 0);
+            m_Owner->useGold(needGold / (isHalf ? 2 : 1), &ci);
+            m_Owner->SetVar(VAR_LINGSHI_PEIYANG_CNT, count);
+            lsAttr.exp += 25 * (hasLucky ? 10 : 1);
+        }
+        else
+        {
+            if(GetItemAnyNum(XIAN_LING_GUO) < 1)
+                return;
+            bool isBind = false;
+            DelItemAny(XIAN_LING_GUO, 1, &isBind);
+            DelItemSendMsg(XIAN_LING_GUO, m_Owner);
+            lsAttr.exp += 20 * (hasLucky ? 10 : 1);
+            m_Owner->udpLog("lingshi", "F_140509_11", "", "", "", "", "act");
+        }
+        if(hasLucky)
+        {
+            m_Owner->SetVar(VAR_LINGSHI_PEIYANG_LUCKY, 1);
+            SYSMSG_SENDV(4161, m_Owner);
+        }
+        else if(!hasLucky && type)
+            m_Owner->SetVar(VAR_LINGSHI_PEIYANG_LUCKY, 0);
+        UInt8 maxLev = GET_LS_MAXLEVEL(lingshi->getQuality());
+        UInt8 tmp = lsAttr.lv;
+        for(UInt8 i = tmp; i <= maxLev; ++ i)
+        {
+            lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+            if(!lsd || !lsd->canUpgrade(lsAttr.exp))
+                break;
+            if(lsAttr.exp < lsd->exp)
+                break;
+            ++ lsAttr.lv;
+        }
+        if(lsAttr.lv >= maxLev)
+        {
+            lsAttr.lv = maxLev;
+            if(!GData::lingshiCls.canBreak(lsAttr.lv))
+                lsAttr.exp = GData::lingshiCls.getLingShiExp(lsAttr.lv-1);
+        }
+		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
+        if(tmp != lsAttr.lv)
+        {
+            fgt->setDirty();
+            fgt->updateLingshiSkillId(lingshi, pos);
+        }
+
+		Stream st(REP::ERLKING_INFO);
+        st << static_cast<UInt8>(0x15);
+        st << fighterId << pos;
+		AppendLingshiData(st, lingshi);
+		st << Stream::eos;
+		m_Owner->send(st);
+        SendLingshiTrainInfo();
+    }
+
+    void Package::lingshiBreak(UInt16 fighterId, UInt32 lsId, bool type)
+    {   //灵侍突破
+        Fighter * fgt = NULL;
+        UInt8 pos = 0;
+		ItemLingshi * lingshi = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
+		if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
+			return;
+        ItemLingshiAttr & lsAttr = lingshi->getLingshiAttr();
+        GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(lsAttr.lv);
+        if(!lsd || !lsd->isBreak)
+            return;
+        if(type)
+        {
+            if(!lsd->useGold) return;
+            if(m_Owner->getGold() < lsd->useGold)
+            {
+                m_Owner->sendMsgCode(0, 1101);
+                return;
+            }
+            ConsumeInfo ci(LingShiPeiYang, 0, 0);
+            m_Owner->useGold(lsd->useGold, &ci);
+        }
+        else
+        {
+            if(!lsd->useItem || GetItemAnyNum(XIAN_LING_GUO) < lsd->useItem)
+                return;
+            bool isBind = false;
+            DelItemAny(XIAN_LING_GUO, lsd->useItem, &isBind);
+            DelItemSendMsg(XIAN_LING_GUO, m_Owner);
+        }
+        //突破时经验在临界值，升级
+        ++ lsAttr.lv;
+		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
+        fgt->setDirty();
+        fgt->updateLingshiSkillId(lingshi, pos);
+
+		Stream st(REP::ERLKING_INFO);
+        st << static_cast<UInt8>(0x14);
+        st << fighterId << pos;
+		AppendLingshiData(st, lingshi);
+		st << Stream::eos;
+		m_Owner->send(st);
+    }
+
+	bool Package::DelLingshi(UInt32 id, UInt16 toWhere)
+	{
+		if(!IsEquipId(id)) return false;
+		item_elem_iter iter = m_ItemsLS.find(ItemKey(id));
+		if(iter == m_ItemsLS.end())
+			return false;
+		ItemBase * item = iter->second;
+		m_ItemsLS.erase(iter);
+		-- m_SizeLS;
+		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", id);
+		DB4().PushUpdateData("DELETE FROM `lingshiAttr` WHERE `id` = %u", id);
+		if(toWhere != 0 && item->getQuality() >= 4)
+		{
+			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), item->getId(), toWhere, TimeUtil::Now());
+		}
+
+		SendSingleLingshiData(static_cast<ItemLingshi *>(item), 0);
+		SAFE_DELETE(item);
+		return true;
+	}
+
+	bool Package::DelLingshi2(ItemLingshi * lingshi, UInt16 toWhere)
+	{
+		item_elem_iter iter = m_ItemsLS.find(lingshi->getId());
+		if(iter == m_ItemsLS.end())
+			return false;
+		m_ItemsLS.erase(iter);
+		-- m_SizeLS;
+		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", lingshi->getId());
+		DB4().PushUpdateData("DELETE FROM `lingshiAttr` WHERE `id` = %u", lingshi->getId());
+		if(toWhere != 0 && lingshi->getQuality() >= 4)
+		{
+			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %" I64_FMT "u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), lingshi->GetItemType().getId(), lingshi->getId(), toWhere, TimeUtil::Now());
+		}
+		SendSingleLingshiData(lingshi, 0);
+		SAFE_DELETE(lingshi);
+		return true;
+	}
+
+    void Package::SendLingshiTrainInfo()
+    {
+		Stream st(REP::ERLKING_INFO);
+        st << static_cast<UInt8>(0x12);
+        st << static_cast<UInt16>(m_Owner->GetVar(VAR_LINGSHI_PEIYANG_CNT));
+        st << static_cast<UInt8>(m_Owner->GetVar(VAR_LINGSHI_PEIYANG_LUCKY));
+		st << Stream::eos;
+		m_Owner->send(st);
+    }
+
+    void Package::SendSingleLingshiData(ItemLingshi * lingshi, UInt8 type)
+	{   //type: 0删除 1新增 2更新
+		Stream st(REP::ERLKING_INFO);
+        st << static_cast<UInt8>(0x11);
+		st << type;
+        if(type)
+		    AppendLingshiData(st, lingshi);
+        else
+            st << lingshi->getId();
+		st << Stream::eos;
+		m_Owner->send(st);
+    }
+
+	void Package::AppendLingshiData(Stream& st, ItemLingshi * lingshi)
+	{
+		st << lingshi->getId() << static_cast<UInt8>(lingshi->GetBindStatus() ? 1 : 0);
+		st << lingshi->GetTypeId();
+
+        ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
+        st << lsAttr.lv << lsAttr.exp;
+	}
+
+	void Package::SendLSPackageItemInfor()
+	{
+		ItemCont::iterator cit = m_ItemsLS.begin();
+		Stream st(REP::ERLKING_INFO);
+        st << static_cast<UInt8>(0x10);
+        size_t offset = st.size();
+		st << static_cast<UInt16>(0);
+		UInt16 count = 0;
+		for (; cit != m_ItemsLS.end(); ++cit)
+		{
+			ItemBase * item = cit->second;
+			if(IsLingShi(item->getClass()))
+			{
+				count ++;
+				AppendLingshiData(st, static_cast<ItemLingshi *>(item));
+			}
+		}
+		st.data<UInt16>(offset) = count;
+		st << Stream::eos;
+		m_Owner->send(st);
+	}
+
+    void Package::setLingshi(Fighter * fgt, UInt32 lsId, UInt8 opt)
+    {
+        if(GetRestPackageSize(2) < 1)
+        {
+			m_Owner->sendMsgCode(0, 8050);
+            return;
+        }
+        if(!fgt || opt < 0x63 || opt > 0x65)
+            return;
+        ItemEquip * old = NULL;
+        if(lsId == 0)
+        {   //卸下
+            old = fgt->setLingshi(NULL, opt-0x63);
+        }
+        else
+        {   //穿上
+            item_elem_iter iter = m_ItemsLS.find(ItemKey(lsId));
+            if(iter == m_ItemsLS.end())
+                return;
+            ItemEquip * lingshi = static_cast<ItemLingshi *>(iter->second);
+            if(!lingshi || fgt->getClass() != lingshi->getClass()-Item_LingShi+1)
+                return;
+            old = fgt->setLingshi(lingshi);
+
+            SendSingleLingshiData(static_cast<ItemLingshi *>(lingshi), 0);
+            m_ItemsLS.erase(iter);
+            -- m_SizeLS;
+
+            if(lingshi->GetTypeId() == 14105)
+                m_Owner->udpLog("lingshi", "F_140509_13", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14115)
+                m_Owner->udpLog("lingshi", "F_140509_14", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14305)
+                m_Owner->udpLog("lingshi", "F_140509_15", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14315)
+                m_Owner->udpLog("lingshi", "F_140509_16", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14505)
+                m_Owner->udpLog("lingshi", "F_140509_17", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14515)
+                m_Owner->udpLog("lingshi", "F_140509_18", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14705)
+                m_Owner->udpLog("lingshi", "F_140509_19", "", "", "", "", "act");
+            else if(lingshi->GetTypeId() == 14715)
+                m_Owner->udpLog("lingshi", "F_140509_20", "", "", "", "", "act");
+        }
+        if(old)
+            AddExistEquip(old);
+        fgt->setDirty();
+    }
+    /**********灵侍end***********/
 
 }

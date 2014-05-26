@@ -29,6 +29,7 @@
 #include "FairyPet.h"
 #include "FairySpar.h"
 #include "MoFang.h"
+#include "Erlking.h"
 #include "ArenaTeam.h"
 #include "Marry.h"
 #include "ModifyMount.h"
@@ -159,6 +160,7 @@ namespace GObject
 #define PLAYER_BUFF_CLAN1           0x68 // （活动）第1帮派BUF
 #define PLAYER_BUFF_CLAN2           0x69 // （活动）第2帮派BUF
 #define PLAYER_BUFF_CLAN3           0x6A // （活动）第3帮派BUF
+#define PLAYER_BUFF_TYSS            0x6B // （TYSS活动）个人BUF
 #define PLAYER_BUFF_ATHL11          0x71 // 魔
 #define PLAYER_BUFF_ATHL22          0x72 // 神
 #define PLAYER_BUFF_ATHL33          0x73 // 虚
@@ -343,6 +345,7 @@ namespace GObject
     class JobHunter;
     class Dreamer;
     class MoFang;
+    class Erlking;
     struct MarriageInfo;
     class KangJiTianMo;
 
@@ -391,6 +394,23 @@ namespace GObject
 		GData::NpcGroup * _npcGroup;
 		UInt32 _finalEnd;
         bool _writedb;
+	};
+
+	class EventAutoRaceBattle : public EventBase
+	{
+	public:
+		EventAutoRaceBattle(Player * player, UInt32 interval, UInt32 count)
+			: EventBase(player, interval, count)
+		{}
+
+        ~EventAutoRaceBattle()
+        {}
+
+		virtual UInt32 GetID() const { return EVENT_AUTORACEBATTLE; }
+		void Process(UInt32);
+
+	private:
+		UInt64 calcExpEach();
 	};
 
 	class EventFighterTrain : public EventBase
@@ -767,7 +787,7 @@ namespace GObject
         }
         UInt8 setTree(UInt8 num ,UInt8 shenfen = 0)
         {
-            if(num%100 > 1)
+            if(num >= TREEMAX )
                 return 3;
             if(shenfen > 1 )
                 return 3;
@@ -783,11 +803,18 @@ namespace GObject
             return tree[num];
         }
     };
+    struct PictureInfo
+    {
+        UInt8 floor ; 
+        std::set<UInt8>  cubeHave;  //拥有的木块
+        std::map<UInt8,std::vector<UInt8> > cubeCover; 
+        PictureInfo():floor(0){} 
+    };
 
     struct MoBaoInfo
     {
-        UInt16 status;          // 卡牌状态
-        UInt32 item[9];        // 卡牌对应的物品
+        UInt16 status;           // 卡牌状态
+        UInt32 item[9];         // 卡牌对应的物品
         UInt16 buyNum;          // 购买翻牌的次数
         UInt8 openFLMSNum;      // 翻开翡龙墨石个数
         UInt8 openFLMYNum;      // 翻开翡龙墨玉个数
@@ -798,6 +825,13 @@ namespace GObject
         MoBaoInfo() : status(0), buyNum(0), openFLMSNum(0), openFLMYNum(0), openJGBXNum(0), openBFMYNum(0), openPLMYNum(0), openCSRLBJNum(0) { memset(item, 0, sizeof(item)); }
     };
 
+    struct PlayerReport
+    {
+        Player* pl;
+        UInt8 win; //0赢，1输
+        UInt32 reportId;
+    };
+
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 150;
@@ -805,7 +839,7 @@ namespace GObject
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), prestige(0), status(0), country(0),
 			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0),qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
-			newGuild(0), packSize(INIT_PACK_SIZE), packSizeSoul(INIT_PACK_SIZE+50), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),picCount(0) , nextPIcReset(0),
+			newGuild(0), packSize(INIT_PACK_SIZE), packSizeSoul(INIT_PACK_SIZE+50), packSizeLS(50), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),picCount(0) , nextPIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
 			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0), tavernOrangeCount(0),
@@ -867,6 +901,7 @@ namespace GObject
 		UInt64 newGuild;            // ????????????
 		UInt16 packSize;            // 玩家背包
 		UInt16 packSizeSoul;        // 魂魄背包
+		UInt16 packSizeLS;          // 灵侍背包
 		UInt8 mounts;               // ????
 		UInt8 gmLevel;              //
 		UInt8 icCount;              // ?һ????ٴ???
@@ -1593,7 +1628,16 @@ namespace GObject
         UInt8 getPIcCount();
         void checkPIcCount();
 
-		inline UInt16 getPacksize(UInt8 type = 0) { return type ? _playerData.packSizeSoul : _playerData.packSize; }
+		inline UInt16 getPacksize(UInt8 type = 0)
+        {
+            if(type == 0)
+                return _playerData.packSize;
+            else if(type == 1)
+                return _playerData.packSizeSoul;
+            else if(type == 2)
+                return _playerData.packSizeLS;
+            return 0;
+        }
 
         void setLineupDirty(bool = true);
         void setFightersDirty(bool bDirty=true);
@@ -1824,6 +1868,7 @@ namespace GObject
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
         MoFang * GetMoFang()        { return m_moFang; }
+        Erlking * GetErlking()        { return m_erlking; }
         MarriageInfo * GetMarriageInfo()  { return m_marriageInfo; }
         CollectCard * GetCollectCard()        { return m_collecCard; }
 	// ????ϵͳ
@@ -2305,6 +2350,11 @@ namespace GObject
         void ApplyToName(Player* leader);
         void ClearKJTMData();
         void KJTMUdpLog();
+        void SetKJTMAwardMark(UInt8 type);
+        void GetKJTMAwardMark();
+        void GetKJTMAward(UInt8 opt);
+        void BroadcastPower();
+        void sendTYSSBuf();
  
         //抗击天魔 end
 
@@ -2865,6 +2915,7 @@ namespace GObject
         void setQTSign();
         void setQTSpecialMark();
         void GMSetQTNUM(UInt8 num);
+        void getFireContributionBag(Player * pl);
         // 帮派神像
         float getClanStatueHPEffect();
         float getClanStatueAtkEffect();
@@ -3237,6 +3288,7 @@ namespace GObject
         void get7DayFundAward(UInt8 type);
     private:
         MoFang* m_moFang;
+        Erlking* m_erlking;
         MarriageInfo* m_marriageInfo;
         CollectCard * m_collecCard;
 
@@ -3267,6 +3319,7 @@ namespace GObject
         //
         DrinkInfo drinkInfo ;
         CuttingInfo cuttingInfo ;
+        PictureInfo pictureInfo ; 
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();
@@ -3357,6 +3410,15 @@ namespace GObject
         void sendTreesInfo();
         bool subCuttingCount();
 
+        PictureInfo& getPictureInfo(){ return pictureInfo;}
+        void setPictureInfo(UInt8 id , std::map<UInt8 ,std::vector<UInt8>> map_vec);
+        void sendPictureInfo();
+        void loadPictureInfoFromDB();
+        void UpdatePictureToDB();
+        static UInt8 getCubeCountInSet(std::map<UInt8 , std::vector<UInt8> > map_vec);
+        void getPictureAttr(GData::AttrExtra& ae); 
+        UInt8 buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count);
+
         void makeFighterSGList(Stream& st);
         void sendFighterSGListWithNoSkill();
         void makeFighterSGListWithNoSkill(Stream& st);
@@ -3377,6 +3439,7 @@ namespace GObject
         void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
         void do_fighter_xinmo(Fighter* fgt, UInt32 oldId);
         void do_skill_grade(Fighter* fgt, UInt32 oldId);
+
     public:
         void makeClanTitleInfo(Stream & st);
         void changeClanTitle(UInt8 id);
@@ -3384,6 +3447,94 @@ namespace GObject
         UInt32 getCurClanTitle();
         void clearClanTitle();
         void checkClanTitle();
+
+    private:
+        //玩家位置（包括层数、当层位置）
+        UInt8 _playerPos;
+        //本层每个offset位置的星级数
+        UInt16 _starCnt[7]; //放大2倍
+        //连斩人数
+        UInt8 _continueWinCnt;
+        //第几层奖励可以领取
+        UInt8 _awardLevel;
+        //挑战（连斩榜）
+        std::map <Player *, UInt8> _challengePlayer;
+        //所有挑战记录
+        std::vector<PlayerReport> _playerReport;
+        UInt8 _continueWinPage;
+        //增益ID
+        UInt8 _rbBufId;
+        float _rbValue;
+        UInt32 _exitCd;
+        UInt16 _starTotal;
+        UInt8 _canContinueCnt;
+        //连输次数
+        UInt8 _continueLoseCnt;
+        //战斗冷却
+        UInt32 _attackCd;
+        //是否是最后一层
+        bool _isLastLevel;
+        //匹配者ID
+        Player* _matchPlayer;
+        //最大连胜次数
+        UInt8 _continueWinMaxCnt;
+        UInt8 _totalWinCnt;
+        UInt8 _totalLoseCnt;
+        UInt32 _totalAchievement;
+        UInt8 _totalItemCnt;
+        UInt64 _totalExp;
+    public:
+        UInt8 getRaceBattlePos() { return _playerPos; }
+        void setRaceBattlePos(UInt8 pos) { _playerPos = pos; }
+        UInt16 getStarCnt(UInt8 i) { if(i < 7) return _starCnt[i]; else return 0; }
+        void setStarCnt(UInt8 i, UInt16 cnt) { if(i < 7) _starCnt[i] = cnt; else _starCnt[i] = 0; }
+        UInt8 getContinueWinCnt() { return _continueWinCnt; }
+        void setContinueWinCnt(UInt8 cnt) { _continueWinCnt = cnt; if(_continueWinMaxCnt < _continueWinCnt) _continueWinMaxCnt = _continueWinCnt; }
+        UInt8 getAwardLevel() { return _awardLevel; }
+        void setAwardLevel(UInt8 level) { _awardLevel = level; }
+        UInt8 getChallengeStatus(Player* pl);
+        void insertChallengePlayer(Player* pl);
+        void clearChallengePlayer();
+        void makeRBBattleInfo(Stream &st);
+        void insertPlayerRecord(PlayerReport record);
+        void clearPlayerRecord();
+        UInt8 getContinueWinPage() { return _continueWinPage; }
+        void setContinueWinPage(UInt8 page) { _continueWinPage = page; }
+        //void readRandBattleReport(UInt32 reportId);
+        void setRBBuf(UInt8 id, float value) { _rbBufId = id; _rbValue = value; }
+        UInt8 getRBBufId() { return _rbBufId; }
+        float getRBBufValue() { return _rbValue; }
+        void setExitCd(UInt32 cd) { _exitCd = cd; }
+        UInt32 getExitCd() { return _exitCd; }
+        UInt16 getStarTotal() { return _starTotal; }
+        void setStarTotal(UInt16 cnt) { _starTotal = cnt; }
+        UInt8 getCanContinueCnt() { return _canContinueCnt; }
+        void setCanContinueCnt(UInt8 cnt) { _canContinueCnt = cnt; }
+        UInt8 getContinueLoseCnt() { return _continueLoseCnt; }
+        void setContinueLoseCnt(UInt8 cnt) { _continueLoseCnt = cnt; }
+        void setAttackCd(UInt32 cd) { _attackCd = cd; }
+        UInt32 getAttackCd() { return _attackCd; }
+        void setIsLastLevel(bool flag) { _isLastLevel = flag; }
+        bool getIsLastLevel() { return _isLastLevel; }
+        void setMatchPlayer(Player* player) { _matchPlayer = player; }
+        Player* getMatchPlayer() { return _matchPlayer; }
+        void autoRaceBattle(UInt32 count);
+        void cancelAutoRaceBattle();
+
+        //为了统计
+        UInt8 getContinueWinMaxCnt() { return _continueWinMaxCnt; }
+        void setContinueWinMaxCnt(UInt8 cnt) { _continueWinMaxCnt = cnt; }
+        UInt8 getTotalWinCnt() { return _totalWinCnt; }
+        void setTotalWinCnt(UInt8 cnt) { _totalWinCnt = cnt; }
+        UInt8 getTotalLoseCnt() { return _totalLoseCnt; }
+        void setTotalLoseCnt(UInt8 cnt) { _totalLoseCnt = cnt; }
+        UInt32 getTotalAchievement() { return _totalAchievement; }
+        void setTotalAchievement(UInt32 cnt) { _totalAchievement = cnt; }
+        UInt8 getTotalItemCnt() { return _totalItemCnt; }
+        void setTotalItemCnt(UInt8 cnt) { _totalItemCnt = cnt; }
+        UInt64 getTotalExp() { return _totalExp; }
+        void setTotalExp(UInt64 exp) { _totalExp = exp; }
+
 	};
 
 

@@ -21,6 +21,7 @@
 #include "MsgHandler/CountryMsgStruct.h"
 #include "Map.h"
 #include "GData/NpcGroup.h"
+#include "GData/PictureAttr.h"
 #include "GData/Title.h"
 #include "Clan.h"
 #include "ClanCopy.h"
@@ -92,6 +93,8 @@
 #include "ArenaServerWar.h"
 #include "GData/SevenSoul.h"
 #include "KangJiTianMo.h"
+#include "Battle/BattleReport.h"
+#include "GObject/RaceBattle.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -272,6 +275,9 @@ namespace GObject
             factorAdd = 0.3f;
         else if(m_Player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
             factorAdd = 0.2f;
+
+        if(m_Player->getBuffData(PLAYER_BUFF_TYSS) > 0)
+            factorAdd += 0.5f;
 
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp * factor + expBase * factorAdd), 0, extraExp, _writedb);
@@ -680,6 +686,29 @@ namespace GObject
 		return count == 0;
     }
 
+	UInt64 EventAutoRaceBattle::calcExpEach()
+	{
+        UInt8 plvl = m_Player->GetLev();
+        if(plvl < 40)
+            return 0;
+        UInt64 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
+        return exp;
+	}
+
+	void EventAutoRaceBattle::Process(UInt32 leftCount)
+	{
+		UInt64 exp = calcExpEach();
+
+		if(m_Player->isOnline())
+			m_Player->AddExp(exp * 8);
+		else
+			m_Player->pendExp(exp * 8);
+        m_Player->setTotalExp(m_Player->getTotalExp() + exp * 8);
+
+        if(!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTORACEBATTLE, m_Player->getId());
+	}
+
     bool EventPlayerTimeTick::Equal(UInt32 id, size_t playerid) const
     {
 		return 	id == GetID() && playerid == m_Player->getId();
@@ -818,6 +847,7 @@ namespace GObject
         m_hf = new HoneyFall(this);
         m_dpData = new DeamonPlayerData();
 		m_moFang = new MoFang(this);
+		m_erlking = new Erlking(this);
 		m_marriageInfo = new MarriageInfo();
 		m_collecCard= new CollectCard(this);
         m_csFlag = 0;
@@ -871,7 +901,28 @@ namespace GObject
         m_curPageA = 0;
         _KJTM_factor = 1.0f;
         _ePhysicalTime = 0;
-	}
+
+        _playerPos = 0;
+        memset(_starCnt, 0, sizeof(_starCnt));
+        _continueWinCnt = 0;
+        _awardLevel = 2;
+        _continueWinPage = 1;
+        _rbBufId = 0;
+        _rbValue = 0;
+        _exitCd = 0;
+        _starTotal = 0;
+        _canContinueCnt = 0;
+        _continueLoseCnt = 0;
+        _attackCd = 0;
+        _isLastLevel = false;
+        _matchPlayer = NULL;
+        _continueWinMaxCnt = 0;
+        _totalWinCnt = 0;
+        _totalLoseCnt = 0;
+        _totalAchievement = 0;
+        _totalItemCnt = 0;
+        _totalExp = 0;
+    }
 
 
 	Player::~Player()
@@ -1161,6 +1212,19 @@ namespace GObject
                 _offlineTime = 0;
             }
 		}
+    
+        SetKJTMAwardMark(0);
+        UInt32 status = GetVar(VAR_KJTM_STATUS);
+        UInt8 mark = GET_BIT(status, 0);
+        if(0 == mark)
+        {
+            TeamMemberData* tmd = getTeamMemberData();
+            if(NULL != tmd)
+            {
+                if(3 == tmd->memCnt)
+                    SetKJTMAwardMark(1);
+            }
+        }
 
         KJTMUdpLog();
 
@@ -2324,6 +2388,7 @@ namespace GObject
         int addr = inet_addr(m_clientIp);
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%" I64_FMT "u and login_time=%u", curtime, addr?addr:cfg.serverLogId, _id, _playerData.lastOnline);
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %" I64_FMT "u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
+
         if(_isOnline && !hasFlag(Training))
         {
             //if(cfg.GMCheck)
@@ -3167,7 +3232,12 @@ namespace GObject
 				m_Package->EquipTo(0, fgt, t+0x0a, equip, true);
             m_Package->EquipTo(0, fgt, 0x1f, equip, true);
             for(UInt8 t = 0; t < 3; ++ t)
+            {
 				m_Package->EquipTo(0, fgt, t+0x60, equip, true);
+				ItemEquip * lingshi = fgt->setLingshi(NULL, t, false);
+                if(lingshi)
+                    m_Package->AddExistEquip(lingshi);
+            }
 		    m_Package->EquipTo(0, fgt, 0x70, equip, true);
 
 			_fighters.erase(it);
@@ -3524,6 +3594,11 @@ namespace GObject
                 << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
 				<< fgt->getAmuletId() << fgt->getRingId();
             fgt->getAllTrumps(st);
+            //灵侍id
+            UInt32 lss[3] = {0};
+            fgt->getAllLingshiId(lss);
+            st << lss[0] << lss[1] << lss[2];
+
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
             fgt->getAllPeerlessAndLevel(st);
@@ -6557,6 +6632,10 @@ namespace GObject
             newHeroIsland.playerLeave(this);
             delFlag(Player::InHeroIsland);
         }
+        else if (_playerData.location == 1556)
+        {
+            cancelAutoRaceBattle();
+        }
         SpotData * spotData = GetMapSpot();
         if(spotData && spotData->m_CountryBattle && !(gClanCity && gClanCity->isOpen()))
         {
@@ -6631,6 +6710,12 @@ namespace GObject
 
 		_playerData.inCity = inCity ? 1 : 0;
 		_playerData.location = spot;
+        if (_playerData.location == 1556)
+        {
+            if(raceBattle.isStart())
+                raceBattle.autoBattle(this);
+        }
+
 		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %"  I64_FMT  "u", _playerData.inCity, _playerData.location, getId());
 
         ClanRankBattleMgr::Instance().PlayerEnter(this);
@@ -11326,7 +11411,10 @@ namespace GObject
         else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
             factor += 0.3f;
         else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
-            factor  += 0.2f;
+            factor += 0.2f;
+        
+        if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+            factor += 0.5f;
 
         return factor;
     }
@@ -11514,6 +11602,9 @@ namespace GObject
                         pexpAdd = pexpBase * 0.3f;
                     else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
                         pexpAdd = pexpBase * 0.2f;
+                    
+                    if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+                        pexpAdd += pexpBase * 0.5f;
 
                     fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }
@@ -11584,6 +11675,9 @@ namespace GObject
                         pexpAdd = pexpBase * 0.3f;
                     else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
                         pexpAdd = pexpBase * 0.2f;
+
+                    if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+                        pexpAdd += pexpBase * 0.5f;
 
                     fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }
@@ -12194,11 +12288,13 @@ namespace GObject
 
         ItemBase* ib = NULL;
         ib = pk->FindItem(itemid, bind);
+        if(!ib)
+            pk->GetLingshi(itemid);
         if (ib)
         {
             if (ib->Count() < num)
                 return false;
-            if (ib->getClass() == Item_Mount || ib->getClass() == Item_MountChip)
+            if (IsLingShi(ib->getClass()) || ib->getClass() == Item_Mount || ib->getClass() == Item_MountChip)
                 return false;
 
             m_td.soul += (ib->getEnergy() * num);
@@ -17657,6 +17753,7 @@ namespace GObject
                 fgt->getAllPSkillAndLevel4Arena(st);
                 fgt->getAllSSAndLevel(st);
                 fgt->getAllSGAndValue(st);
+                fgt->getAllLingshiSkillAndLevel2Arena(st);
                 fgt->getAllLbSkills(st);
 
                 fgt->getAttrExtraEquip(st);
@@ -17683,6 +17780,7 @@ namespace GObject
             _onBattlePet->getAllPSkillAndLevel4Arena(st);
             _onBattlePet->getAllSSAndLevel(st);
             _onBattlePet->getAllSGAndValue(st);
+            _onBattlePet->getAllLingshiSkillAndLevel2Arena(st);
             _onBattlePet->getAllLbSkills(st);
 
             _onBattlePet->getAttrExtraEquip(st);
@@ -26135,7 +26233,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,24000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
@@ -26182,7 +26280,7 @@ void Player::Send11GradeAward(UInt8 type)
 {
     if(type > 11)
         return ;
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
         {{9418,1}, {503,1}},
         {{501,2},{9497,2}},
@@ -26193,10 +26291,10 @@ void Player::Send11GradeAward(UInt8 type)
         {{16001,3},{9498,2},{509,2},{134,2},{9438,2}},
         {{1729,1},{8555,4}},
         {{9600,25},{9418,25},{9424,40}},
-        {{9498,50},{9022,10}},
-        {{9021,10},{9068,15},{9075,15}},
+        {{16001,50},{9075,15}},
+        {{9022,30},{1726,1}},
     };
-    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,2,3};
+    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,2,2};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -26839,7 +26937,7 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
 {
     if(!World::getGGTime())
         return ; 
-    UInt32 now = TimeUtil::Now();
+    //UInt32 now = TimeUtil::Now();
     if(type == 0)
     {
         if( m_gginfo.task != task)
@@ -31145,6 +31243,8 @@ void Player::ClearKJTMData()
     SetVar(VAR_KJTM_STATUS, 0); 
     SetVar(VAR_KJTM_KILL_NPC_STATUS, 0); 
     SetVar(VAR_KJTM_LOGIN_STATUS, 0); 
+    SetVar(VAR_KJTM_LOGIN_NUM, 0); 
+    SetVar(VAR_KJTM_AWARD_MARK, 0); 
 }
 
 void Player::KJTMUdpLog()
@@ -32082,7 +32182,7 @@ UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
     UInt32 lastTime = GetVar(VAR_TREE_TIME); 
     UInt32 now = TimeUtil::Now();
     UInt8 statue = 0;
-    if(!flag &&(  now < lastTime + getCuttingInfo().oneTime )) 
+    if(!flag &&(  now < (lastTime + getCuttingInfo().oneTime))) 
         return 1;
     if(!flag)
     {
@@ -32145,11 +32245,14 @@ void Player::beginCutting()
 }
 void Player::beInviteCutting(Player * pl)
 {
-    if(getCuttingInfo().cutter != NULL)  
+    UInt32 now = TimeUtil::Now();
+    if(getCuttingInfo().cutter != NULL && (getCuttingInfo().time + 65 < now) )
     {
         pl->beReplyForCutting(this,2);
         return ;
     }
+    if(getCuttingInfo().shenfen == 0)
+        getCuttingInfo().reset();
     Stream st(REP::BROTHER);
     st << static_cast<UInt8>(0x14);
     st << pl->getName();
@@ -32242,9 +32345,6 @@ void Player::setCutType(UInt8 type)
         return ;
     if(types[tool] < type)
         return ;
-    UInt32 now = TimeUtil::Now();
-    if(getCuttingInfo().time + 60 < now)
-        getCuttingInfo().reset();
     getCuttingInfo().type = type;
     getCuttingInfo().oneTime = times[tool];
     sendFirendlyCountTaskInfo();
@@ -32261,7 +32361,7 @@ void Player::CutEnd()
     if(getCuttingInfo().cutter == NULL)
         return ;
     UInt32 now = TimeUtil::Now();
-    if(getCuttingInfo().time +60 < now)
+    if(getCuttingInfo().time +65 < now)
         return ;
     Stream st(REP::BROTHER);
     st << static_cast<UInt8>(0x17);
@@ -32317,10 +32417,386 @@ bool Player::subCuttingCount()
     //GLOBAL().PushMsg( hdr, &id );
     return res;
 }
+    UInt8 Player::getChallengeStatus(Player* pl)
+    {
+        if(!pl)
+            return 0;
+        std::map <Player *, UInt8>::iterator it = _challengePlayer.find(pl);
+        if(it != _challengePlayer.end())
+            return it->second;
+        return 0;
+    }
+
+    void Player::insertChallengePlayer(Player* pl)
+    {
+        if(!pl)
+            return;
+        std::map <Player *, UInt8>::iterator it = _challengePlayer.find(pl);
+        if(it != _challengePlayer.end())
+            return;
+        _challengePlayer[pl] = 1;
+    }
+
+    void Player::clearChallengePlayer()
+    {
+        _challengePlayer.clear();
+    }
+
+    void Player::makeRBBattleInfo(Stream& st)
+    {
+        UInt8 reportCnt = _playerReport.size();
+        st << reportCnt;
+        for(UInt8 i = 0; i < reportCnt; i++)
+        {
+            Player* pl = _playerReport[i].pl;
+            st << pl->getName();
+            st << pl->getCountry();
+            st << _playerReport[i].win;
+            st << _playerReport[i].reportId;
+        }
+    }
+
+    void Player::insertPlayerRecord(PlayerReport record)
+    {
+        _playerReport.push_back(record);
+    }
+
+    void Player::clearPlayerRecord()
+    {
+        _playerReport.clear();
+    }
+#if 0
+    void Player::readRandBattleReport(UInt32 reportId)
+    {
+        std::vector<PlayerReport>::iterator it;
+        for(it = _playerReport.begin(); it != _playerReport.end(); ++it)
+        {
+            if(it->reportId == reportId)
+                break;
+        }
+        if(it == _playerReport.end())
+            return;
+
+        std::vector<UInt8> *r = Battle::battleReport[reportId];
+        if(r == NULL)
+            return;
+        send(&(*r)[0], r->size());
+    }
+#endif
+    void Player::autoRaceBattle(UInt32 count)
+    {
+		EventAutoRaceBattle* event = new(std::nothrow)EventAutoRaceBattle(this, 60, count);
+		if(event == NULL)
+            return;
+		cancelAutoRaceBattle();
+		PushTimerEvent(event);
+
+    }
+
+	void Player::cancelAutoRaceBattle()
+	{
+#if 0
+        if(getThreadId() != WORKER_THREAD_NEUTRAL)
+        {
+            GameMsgHdr hdr(0x1D1, WORKER_THREAD_NEUTRAL, this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+            return;
+        }
+#endif
+        EventBase* ev = eventWrapper.RemoveTimerEvent(this, EVENT_AUTORACEBATTLE, 0);
+        if(ev == NULL)
+            return;
+        ev->release();
+	}
+
+void Player::SetKJTMAwardMark(UInt8 type)
+{
+    UInt32 status = GetVar(VAR_KJTM_AWARD_MARK);
+    if(0 == GET_BIT_2(status, type))
+    {
+        status = SET_BIT(status, (type*2));
+        SetVar(VAR_KJTM_AWARD_MARK, status);
+        
+        GetKJTMAwardMark();
+    }
+}
+
+void Player::GetKJTMAwardMark()
+{
+    UInt32 status = GetVar(VAR_KJTM_AWARD_MARK);
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x18);
+    st << status;
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::GetKJTMAward(UInt8 opt)
+{
+    if(opt > 3)
+        return;
+
+    if (GetPackage()->GetRestPackageSize() < 6)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+
+    UInt32 status = GetVar(VAR_KJTM_AWARD_MARK);
+    if(1 == GET_BIT_2(status, opt))
+    {
+        status = CLR_BIT(status, (opt*2));
+        status = SET_BIT(status, ((opt*2)+1));
+        SetVar(VAR_KJTM_AWARD_MARK, status);
+
+        UInt32 statusA = GetVar(VAR_KJTM_STATUS);
+        UInt8 mark = GET_BIT(statusA, 0);
+        switch(opt)
+        {
+            case 0:
+                {
+                    if(0 == mark)
+                        GetPackage()->AddItem(15, 5, true, false, FromKJTM);
+                    else
+                        GetPackage()->AddItem(549, 1, true, false, FromKJTM);
+
+                    AddVar(VAR_KJTM_LOGIN_NUM, 1);
+                }
+                break;
+            case 1:
+                {
+                    if(0 == mark)
+                        GetPackage()->AddItem(15, 5, true, false, FromKJTM);
+                    else
+                    {
+                        GetPackage()->AddItem(549, 1, true, false, FromKJTM);
+                        GetPackage()->AddItem(9420, 2, true, false, FromKJTM);
+                    }
+                }
+                break;
+            case 2:
+                {
+                    if(0 == mark)
+                        GetPackage()->AddItem(503, 1, true, false, FromKJTM);
+                    else
+                    {
+                        GetPackage()->AddItem(503, 5, true, false, FromKJTM);
+                        GetPackage()->AddItem(5054, 1, true, false, FromKJTM);
+                    }
+                }
+                break;
+            case 3:
+                {
+                    if(0 == mark)
+                        GetPackage()->AddItem(503, 1, true, false, FromKJTM);
+                    else
+                    {
+                        GetPackage()->AddItem(30, 10, true, false, FromKJTM);
+                        GetPackage()->AddItem(9420, 2, true, false, FromKJTM);
+                    }
+                }
+                break;
+        }
+        GetKJTMAwardMark();
+        if(0 == opt)
+            BroadcastPower();
+    }
+}
+
+void Player::BroadcastPower()
+{
+    TeamMemberData* tmd = getTeamMemberData();
+    if(NULL == tmd)
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x1E);
+    st << static_cast<UInt8>(tmd->memCnt);
+
+    for(UInt8 i=0; i<tmd->memCnt; i++)
+    {
+        Player* member = tmd->members[i];
+        if(NULL == member)
+            continue;
+
+        st << static_cast<UInt8>(member->getVipLevel());
+        UInt32 power = member->GetVar(VAR_TOTAL_BATTLE_POINT);
+
+        float factor = 1.0f;
+        UInt16 value = 0;
+        UInt8 loginNum = member->GetVar(VAR_KJTM_LOGIN_NUM);
+        if(i==0)
+            value = 30;
+        else
+        {
+            value = 100;
+
+            if(member->getVipLevel() >= 1 && member->getVipLevel() <= 4)
+                value += 50;
+            else if(member->getVipLevel() >= 5)
+                value += 100;
+        }
+        factor = static_cast<float>(value+loginNum*10)/100.0f;
+        power = power * factor;
+
+        st << power;
+        st << static_cast<UInt8>(loginNum);
+    }
+    st << Stream::eos;
+
+    for(UInt8 i=0; i<tmd->memCnt; i++)
+    {
+        Player* member = tmd->members[i];
+        if(NULL == member)
+            continue;
+
+        member->send(st);
+    }
+}
+
+void Player::getFireContributionBag(Player * pl)
+{
+    SYSMSG(title, 955);
+    SYSMSGV(content, 956, getName().c_str());
+    Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem = {9476, 1};
+        mailPackageManager.push(mail->id, &mitem, 1, true);
+    }
+}
+void Player::setPictureInfo(UInt8 floor , std::map<UInt8 ,std::vector<UInt8> > map_vec)
+{
+    UInt32 treeCount = GetVar(VAR_CUBE_COUNT);
+    UInt32 oneCost =  GData::pictureAttrData.getFloorCost(floor);
+    if(oneCost == 0 || oneCost * getCubeCountInSet(map_vec) > treeCount)
+        return ;
+    if(GData::pictureAttrData.getFloorCubeCount(getPictureInfo().floor) == getCubeCountInSet(map_vec))
+    {
+        getPictureInfo().floor +=1; 
+        getPictureInfo().cubeHave.clear();
+        getPictureInfo().cubeCover.clear();
+        SetVar(VAR_CUBE_COUNT,0);
+    }
+    else
+    {
+        getPictureInfo().cubeCover = map_vec;
+    }
+    UpdatePictureToDB();
+    sendPictureInfo();
+}
+UInt8 Player::getCubeCountInSet(std::map<UInt8 , std::vector<UInt8> > map_vec)
+{
+    UInt8 count = 0;
+    std::map<UInt8, std::vector<UInt8> >::iterator it = map_vec.begin();
+    for(;it!= map_vec.end();++it)
+    {
+       count += it->second.size(); 
+    }
+    return count;
+}
+void Player::getPictureAttr(GData::AttrExtra& ae)
+{
+    //差前floor-1层属性
+    //XXX
+    GData::PictureAttr::stPictureAttr* attr = GData::pictureAttrData.getFloorAttrTable(getPictureInfo().floor);
+    if(attr == NULL)
+        return ;
+    ae.hp += attr->hp;
+    ae.attack += attr->attack;
+    ae.magatk += attr->attack;
+    ae.action += attr->action;
+
+    std::map<UInt8 , std::vector<UInt8> >::iterator it = getPictureInfo().cubeCover.begin();
+    for(;it != getPictureInfo().cubeCover.end();++it)
+    {
+        for(UInt8 i = 0; i < it->second.size();++i)
+        {
+            GData::PictureAttr::stPictureAttr* attr = GData::pictureAttrData.getPictureAttrTable(getPictureInfo().floor ,(it->second)[i] )    ;
+            if(attr == NULL)
+                continue;
+            ae.hp += attr->hp;
+            ae.attack += attr->attack;
+            ae.magatk += attr->attack;
+            ae.action += attr->action;
+        }
+    }
+}
+void Player::sendPictureInfo()
+{
+    Stream st(REP::BROTHER);
+    st <<static_cast<UInt8>(0x20);
+    st << static_cast<UInt8>(getPictureInfo().floor);
+    st << static_cast<UInt32>(GetVar(VAR_TREE_VALUE));
+    st << static_cast<UInt8>(getPictureInfo().cubeHave.size());
+    std::set<UInt8>::iterator it_set = getPictureInfo().cubeHave.begin();
+    for(;it_set != getPictureInfo().cubeHave.end(); ++it_set)
+    {
+        st << static_cast<UInt8>(*it_set);
+    }
+    st << static_cast<UInt8>(getPictureInfo().cubeCover.size()) ;
+
+    for(std::map<UInt8,std::vector<UInt8> >::iterator it = getPictureInfo().cubeCover.begin() ; it != getPictureInfo().cubeCover.end() ; ++it)
+    {
+        st << static_cast<UInt8>(it->first);
+        st << static_cast<UInt8>(it->second.size()) ;
+        for(UInt8 j = 0; j < it->second.size(); ++j)
+        {
+            st << static_cast<UInt8>(it->second.at(j));
+        }
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::UpdatePictureToDB()
+{
+    std::string strCubeHave ;
+    std::set<UInt8>::iterator it_set = getPictureInfo().cubeHave.begin();
+    for(;it_set != getPictureInfo().cubeHave.end(); ++it_set)
+    {
+        if(it_set != getPictureInfo().cubeHave.begin())
+            strCubeHave += ",";
+        strCubeHave += Itoa(*it_set);
+    }
+    std::string strCubeCover;
+    std::map<UInt8,std::vector<UInt8> >::iterator it = getPictureInfo().cubeCover.begin(); 
+    for(;it != getPictureInfo().cubeCover.end(); ++it)
+    {
+        strCubeCover += Itoa(it->first);
+        strCubeCover +=",";
+        for(UInt8 i =0 ;it->second.size(); ++i) 
+        {
+            strCubeCover += Itoa(it->second.at(i));
+            strCubeCover +=",";
+        }
+        strCubeCover +="|";
+    }
+    DB1().PushUpdateData("REPLACE INTO `pictureAttr`(`playerId`, `floor`, `cubeHave`, `cubeCover`) VALUES(%" I64_FMT "u, %d, %s, %s)", getId(), getPictureInfo().floor, strCubeHave.c_str(), strCubeCover.c_str());
+}
+
+UInt8 Player::buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count)
+{
+   if(getPictureInfo().floor != floor ) 
+       return 1;
+   if(count == 0)
+       return 1;
+    UInt32 oneCost =  GData::pictureAttrData.getFloorCost(floor);
+    std::set<UInt8>::iterator it = getPictureInfo().cubeHave.find(index);
+    if(it != getPictureInfo().cubeHave.end())
+        return 2;
+    //UInt32 treeCostCount = GetVar(VAR_CUBE_COUNT);
+    UInt32 treeCount = GetVar(VAR_TREE_VALUE);
+    if(treeCount < oneCost * count )
+        return 3;
+
+    getPictureInfo().cubeHave.insert(index);
+    treeCount -= (oneCost * count);
+    SetVar(VAR_TREE_VALUE,treeCount);   //设置剩余木片数
+    AddVar(VAR_CUBE_COUNT,oneCost * count); //增加当前层数木片消耗数
+    UpdatePictureToDB();
+    return 0;
+}
 
 } // namespace GObject
-
-
-
-
 

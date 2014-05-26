@@ -169,6 +169,11 @@ namespace GObject
             (*iter)->OnShuoShuo(SS_CLANRANK);
             (*iter)->setContinuousRFAward(2);
 
+            UInt32 status = (*iter)->GetVar(VAR_KJTM_STATUS);
+            UInt8 mark = GET_BIT(status, 0);
+            if(1 == mark)
+                (*iter)->SetKJTMAwardMark(3);
+
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA((*iter), created));
             if(thisDay <= endDay)
@@ -197,6 +202,11 @@ namespace GObject
             (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
             (*iter)->OnShuoShuo(SS_CLANRANK);
             (*iter)->setContinuousRFAward(2);
+
+            UInt32 status = (*iter)->GetVar(VAR_KJTM_STATUS);
+            UInt8 mark = GET_BIT(status, 0);
+            if(1 == mark)
+                (*iter)->SetKJTMAwardMark(3);
 
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA((*iter), created));

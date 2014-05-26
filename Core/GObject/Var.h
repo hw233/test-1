@@ -700,7 +700,7 @@ namespace GObject
         VAR_KJTM_KILL_NPC_STATUS = 719,     // 抗击天魔击杀怪物状态
         VAR_KJTM_LOGIN_STATUS = 720,     // 抗击天魔回归玩家连续登录两天状态
 
-        //721 - 740 for dtc 
+        //721 - 730 for dtc 
         VAR_TYSS_RECHARGE = 721,//天元神兽期间玩家兑换灵果剩余充值数(充值数满足条件自动兑换灵果)
         VAR_TYSS_CONTRIBUTE_PLAYER = 722,//天元神兽期间玩家个人总贡献 
         VAR_TYSS_CONTRIBUTE_PLAYER_DAY = 723,//天元神兽期间玩家个人当日贡献 
@@ -713,24 +713,42 @@ namespace GObject
         VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 729,//璇玑阵图自动战斗使用金钱标志
         VAR_ATOXJFM = 730,     //自动璇玑阵图id
         // 731 - 750 for lib
+
         VAR_FRIEND_ACHIEVEMENT  = 731,  //友好度成就奖励领取情况
         VAR_CLAN_FRIEND = 732 ,    //帮派玩家是否增加过友好度(8位) , 玩家购买的剩余饮酒次数 
         VAR_DRINK_COUNT = 733 ,    //饮酒次数 主动发起(8位) ,被动接受(8位) ,玩家总购买的次数 
         VAR_DRINK_VALUE = 734 ,    //豪饮值
         VAR_FRIEND_VALUE_DAY = 735 ,    //每日友情值
 
+        VAR_LINGSHI_PEIYANG_CNT = 736, //灵侍仙石培养次数
+        VAR_LINGSHI_PEIYANG_LUCKY = 737, //灵侍培养出现暴击记录
         VAR_TREE_VALUE = 738 ,    //木片数
         VAR_TREE_VALUE_DAY = 738 ,    //今日被邀请获得的木片数
         VAR_TREE_TIME = 739,      //砍树时间
         VAR_TREE_TOOL = 740,      //伐木工具
         VAR_CUTTREE_BUY = 741 ,   //玩家购买的剩余伐木次数 
         VAR_CUTTREE_COUNT = 742 ,    //伐木次数 主动发起(8位) ,玩家总购买的次数 
+        VAR_CUBE_COUNT = 743,      //当前积木消耗数  (每一层构造好的时候清零)
 
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
+        VAR_FIRE_SACRIFICE_TIMES = 772, //拜火祭天：0-7帮众添柴次数，8-15帮主诏令次数
+        VAR_FIRE_SACRIFICE_ADD_WOOD_TIME = 773, //拜火祭天添柴时间
+        VAR_FIRE_SACRIFICE_CALLING_TIME = 774, //拜火祭天召唤帮众时间
+        VAR_DUOBAO_ACTIVE_POINT = 775, //夺宝奇兵活跃值+1(一天一点) 
 
+        //781 - 790 for lijr
+        VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
+        VAR_ERLKING_STATUSB = 782,               //妖王再临状态(17-32)
+        VAR_ERLKING_STATUSC = 783,               //妖王再临状态(33-48)
+        VAR_ERLKING_BUY_PASS_NUM_DAY = 784,      //妖王再临购买通关次数
+        VAR_ERLKING_USE_FREE_NUM_DAY = 785,      //妖王再临使用免费通关次数
+        VAR_ERLKING_BUY_PASS_TOTAL_NUM = 786,    //妖王再临购买通关总次数
+
+        VAR_KJTM_AWARD_MARK = 787, //抗击天魔奖励标志
+        VAR_KJTM_LOGIN_NUM = 788,  // 抗击天魔登录次数
         VAR_MAX,
     };
 
@@ -1362,6 +1380,8 @@ namespace GObject
             REGISTER_VAR(VAR_KJTM_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_KJTM_KILL_NPC_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_KJTM_LOGIN_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_LOGIN_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_AWARD_MARK, CYCLE_DAY);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);
@@ -1382,10 +1402,24 @@ namespace GObject
             REGISTER_VAR(VAR_TREE_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_TREE_VALUE_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_TIMES, CYCLE_DAY);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_ADD_WOOD_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_CALLING_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_DUOBAO_ACTIVE_POINT, CYCLE_DAY);
+            REGISTER_VAR(VAR_CUBE_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
+            REGISTER_VAR(VAR_LINGSHI_PEIYANG_CNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_LINGSHI_PEIYANG_LUCKY, CYCLE_NONE);
             REGISTER_VAR(VAR_LIMIT_APPOINTMENT, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_ERLKING_STATUSA, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_STATUSB, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_STATUSC, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_BUY_PASS_NUM_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_ERLKING_BUY_PASS_TOTAL_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_USE_FREE_NUM_DAY, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
