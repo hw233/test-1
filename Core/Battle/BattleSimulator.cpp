@@ -5999,8 +5999,6 @@ UInt32 BattleSimulator::doAttack( int pos )
         int target_pos;
         int bleed_target_pos = -1;
         int otherside = 1 - bf->getSide();
-        bool target_is_stun = false;
-        bool target_is_blind = false;
         if(!stun) // 不是昏迷状态，可以行动
         {
             do 
@@ -6036,10 +6034,6 @@ UInt32 BattleSimulator::doAttack( int pos )
                         reiatsuType = e_reiatsu_normal_attack;
                     }
 
-                    if(mainTarget && (mainTarget->getDeepStunLast() > 0 || mainTarget->getStunRound() > 0))
-                        target_is_stun = true;
-                    if(mainTarget && (mainTarget->getDeepBlindDmgExtra() > 0.001f || mainTarget->getBlind() > 0.001f))
-                        target_is_blind = true;
                     size_t actCnt = atkAct.size();
                     for(size_t idx = 0; idx < actCnt; idx++)
                     {
@@ -6057,10 +6051,6 @@ UInt32 BattleSimulator::doAttack( int pos )
                 {
                     target_pos = getPossibleTarget(bf->getSide(), bf->getPos(), bf);
                     mainTarget = static_cast<BattleFighter*>(getObject(otherside, target_pos));
-                    if(mainTarget && (mainTarget->getDeepStunLast() > 0 || mainTarget->getStunRound() > 0))
-                        target_is_stun = true;
-                    if(mainTarget && (mainTarget->getDeepBlindDmgExtra() > 0.001f || mainTarget->getBlind() > 0.001f))
-                        target_is_blind = true;
 
                     if(target_pos < 0)
                         break;
@@ -6094,10 +6084,6 @@ UInt32 BattleSimulator::doAttack( int pos )
                     int cnt = 0;
                     target_pos = getPossibleTarget(bf->getSide(), bf->getPos(), bf);
                     mainTarget = static_cast<BattleFighter*>(getObject(otherside, target_pos));
-                    if(mainTarget && (mainTarget->getDeepStunLast() > 0 || mainTarget->getStunRound() > 0))
-                        target_is_stun = true;
-                    if(mainTarget && (mainTarget->getDeepBlindDmgExtra() > 0.001f || mainTarget->getBlind() > 0.001f))
-                        target_is_blind = true;
                     doItemLingSkillAttack(bf, mainTarget);
                     bool noPossibleTarget = (target_pos == -1);
                     while(NULL != (skill = bf->getPassiveSkillPreAtk100(skillIdx, noPossibleTarget)))
@@ -6323,52 +6309,6 @@ UInt32 BattleSimulator::doAttack( int pos )
                     }
                 }
 
-                if(target_is_stun)
-                {
-                    const GData::SkillBase *skill;
-                    size_t idx = 0;
-                    while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
-                    {
-                        if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_mojian)
-                        {
-                            StateType eType = e_MAX_STATE;
-                            UInt32 dmg = CalcNormalAttackDamage(bf, mainTarget, eType);
-                            if (eType != e_MAX_STATE)
-                            {
-                                dmg *= skill->effect->efv[0];
-                                if (eType == e_damNormal)
-                                {
-                                    makeDamage(mainTarget, dmg, eType, e_damagePhysic);
-                                }
-                            }
-                            appendDefStatus(e_skill, skill->getId(), bf);
-                            break;
-                        }
-                    }
-                }
-                if(target_is_blind)
-                {
-                    const GData::SkillBase *skill;
-                    size_t idx = 0;
-                    while(NULL != (skill = bf->getPassiveSkillLingshi100(idx)))
-                    {
-                        if(skill->effect && skill->effect->eft[0] ==  GData::e_eft_lingshi_mozhu)
-                        {
-                            StateType eType = e_MAX_STATE;
-                            UInt32 dmg = CalcNormalAttackDamage(bf, mainTarget, eType);
-                            if (eType != e_MAX_STATE)
-                            {
-                                dmg *= skill->effect->efv[0];
-                                if (eType == e_damNormal)
-                                {
-                                    makeDamage(mainTarget, dmg, eType, e_damagePhysic);
-                                }
-                            }
-                            appendDefStatus(e_skill, skill->getId(), bf);
-                            break;
-                        }
-                    }
-                }
 
                 // 攻击后的被动技能
                 if(bf->getHP() > 0 && _winner == 0)
@@ -7063,6 +7003,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         if (!atk || atk->getHP() < 0 || 
                 atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
         {
+            ++i;
             continue;
         }
         else
