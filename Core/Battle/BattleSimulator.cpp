@@ -7003,6 +7003,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         if (!atk || atk->getHP() < 0 || 
                 atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
         {
+            ++i;
             continue;
         }
         else
