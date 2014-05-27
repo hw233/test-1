@@ -3228,7 +3228,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679 || bo->isSoulOut())
+            if(bo->getId() == 5679 || bo->isSoulOut() || bo->isLingQu())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -3288,7 +3288,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             if(!bo)  // 雪人
                 continue;
 
-            if(bo->getId() == 5679 || bo->isSoulOut())
+            if(bo->getId() == 5679 || bo->isSoulOut() || bo->isLingQu())
             {
                 excepts[exceptCnt] = i;
                 ++ exceptCnt;
@@ -14047,7 +14047,7 @@ bool BattleSimulator::doSkillEffectExtra_Dead(BattleFighter* bf, const GData::Sk
                 bf->setChangeStatus(2);
                 bf->unUpdateAllPassiveSkillLingshi();
             }
-            onDeadLingshi(bf);
+            //onDeadLingshi(bf);
 
             bf->setLingQu(true, efl[i]);
             appendDefStatus(e_lingQu, 0, bf);
