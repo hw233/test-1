@@ -10380,7 +10380,8 @@ function ItemNormal_Lingbao(iid, num, bind, param)
         {11509, 11510, 11511},
         {11515, 11516, 11517},
         {11518, 11519, 11520},
-        {11521, 11522, 11523}
+        {11521, 11522, 11523},
+        {11524, 11525, 11526}
     }
 
     local idx = 1;
@@ -10398,6 +10399,8 @@ function ItemNormal_Lingbao(iid, num, bind, param)
         idx = 6;
     elseif 9448 == iid then
         idx = 7;
+    elseif 9477 == iid then
+        idx = 8;
     end
 
     --[[local idx = 1;
@@ -12935,6 +12938,7 @@ local ItemNormal_Table = {
     [9387] = ItemNormal_Lingbao,
     [9431] = ItemNormal_Lingbao,
     [9448] = ItemNormal_Lingbao,
+    [9477] = ItemNormal_Lingbao,
 
     [9360] = ItemNormal_00009360,
     [9361] = ItemNormal_00009361,
