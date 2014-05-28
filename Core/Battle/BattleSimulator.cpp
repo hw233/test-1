@@ -4120,7 +4120,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
         }
         //道、万剑诀
-        else if(SKILL_ID(skill->getId()) == 27 || SKILL_ID(skill->getId()) == 498)
+        else if(SKILL_ID(skill->getId()) == 27 || SKILL_ID(skill->getId()) == 498 || SKILL_ID(skill->getId()) == 200)
         {
             UInt8 excepts[25] = {0};
             UInt8 exceptCnt = 0;
@@ -4138,6 +4138,18 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
             UInt8 dmgCount[25] = {0};
             int cnt = 8;
+            if(SKILL_ID(skill->getId()) == 200)
+            {
+                cnt = 9;
+                const GData::SkillStrengthenEffect* ef = NULL;
+                if(ss)
+                    ef = ss->getEffect(GData::ON_DAMAGE,GData::TYPE_ADD_BUF);
+                if(ef)
+                {
+                    bf->setTyslSSCnt(5);
+                    bf->setTyslSSFactor(ef->value / 100.0f);
+                }
+            }
             for(int i = 0; i < cnt; ++ i)
             {
                 BattleFighter* rnd_bf = getRandomFighter(target_side, excepts, exceptCnt);
@@ -11381,6 +11393,55 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
             }
         }
 
+        if(bf->getHP() == 0)
+            break;
+        UInt8 dmgCnt = bf->getTyslSSCnt() / 5;
+        if(dmgCnt > 0)
+        {
+            UInt8 target_side = 1 - bf->getSide();
+            UInt8 excepts[25] = {0};
+            UInt8 exceptCnt = 0;
+            for(int i = 0; i < 25; i++)
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, i));
+                if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+                    continue;
+                if(bo->isSoulOut())
+                {
+                    excepts[exceptCnt] = bo->getPos();
+                    ++exceptCnt;
+                }
+            }
+
+            UInt32 atk = bf->getAttack();
+            float factor = bf->getTyslSSFactor();
+            for(int i = 0; i < dmgCnt; ++ i)
+            {
+                BattleFighter* rnd_bf = getRandomFighter(target_side, excepts, exceptCnt);
+                if(rnd_bf)
+                {
+                    rnd_bf->setTyslSSAddCnt(false);
+
+                    float def = getBFDefend(rnd_bf);
+                    bool pr = bf->calcPierce(rnd_bf);
+                    float toughFactor = pr ? rnd_bf->getTough(bf) : 1.0f;
+                    float atkreduce = getBFAtkReduce(rnd_bf);
+                    UInt32 dmg = _formula->calcDamage(atk * factor, def, bf->getLevel(), toughFactor, atkreduce);
+                    dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+                    dmg = dmg > 0 ? dmg : 1;
+                    makeDamage(rnd_bf, dmg, e_damNormal, e_damagePhysic);
+
+                    rnd_bf->setTyslSSAddCnt(true);
+                }
+            }
+            const GData::SkillBase* skill = bf->getBFPeerless();
+            if(skill)
+                appendDefStatus(e_skill, skill->getId(), bf);
+            bf->setTyslSSCnt(0);
+            bf->setTyslSSFactor(0);
+            appendDefStatus(e_unBiLanTianYi, 0, bf);
+        }
+
     }while(false);
 
     if(_defList.size() > 0 || _scList.size() > 0)
@@ -12295,7 +12356,7 @@ bool BattleSimulator::doDarkVigorAttack(BattleFighter* bf, float darkVigor)
             if(!bo || bo->getHP() == 0)
                 continue;
             UInt32 dmg2 = dmg * factor[i];
-            makeDamage(bo, dmg2, e_damNormal, e_damageTrue);
+          makeDamage(bo, dmg2, e_damNormal, e_damageTrue);
         }
     }
 
@@ -13041,6 +13102,28 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
     if(u > 0)
     {
         bf->makeDamage(u);
+
+        if(bf->getTyslSSAddCnt())
+        {
+            UInt8 target_side = 1 - bf->getSide();
+            for(UInt8 i = 0; i < 25; i++)
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, i));
+                if(bo == NULL || bo->getHP() == 0)
+                    continue;
+                if(bo->getTyslSSFactor() < 0.001f)
+                    continue;
+                const GData::SkillBase* skill = bo->getBFPeerless();
+                if(skill)
+                {
+                    UInt8 originCnt = bo->getTyslSSCnt() / 5;
+                    bo->setTyslSSCnt(bo->getTyslSSCnt() + 1);
+                    UInt8 newCnt = bo->getTyslSSCnt() / 5;
+                    if(newCnt > originCnt)
+                        appendDefStatus(e_biLanTianYi, newCnt, bo);
+                }
+            }
+        }
     }
 
     // 天佑技能

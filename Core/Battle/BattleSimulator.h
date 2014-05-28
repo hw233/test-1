@@ -360,6 +360,9 @@ private:
         e_changeMode = 133,  //改变模型
         e_unChangeMode = 134,  //恢复模型
 
+        e_jianZong = 135,  //剑宗效果
+        e_unJianZong = 136,  //剑宗效果消失
+
         e_MAX_STATE,
     };
 

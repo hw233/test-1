@@ -1741,6 +1741,17 @@ private:
     void setOtherConfuseForgetAttackFactor(const std::vector<float>& factor) { _other_confuse_forget_attack_factor = factor;}
     std::vector<float> _other_confuse_forget_attack_factor;
 
+    UInt8 _tyslSSCnt;
+    UInt8 getTyslSSCnt() { return _tyslSSCnt; }
+    void setTyslSSCnt(UInt8 count) { if(count > 40) count = 40; _tyslSSCnt = count; }
+    float _tyslSSFactor;
+    float getTyslSSFactor() { return _tyslSSFactor; }
+    void setTyslSSFactor(float factor) { _tyslSSFactor = factor; }
+    const GData::SkillBase* getBFPeerless() { return _peerlessSkill.base; }
+    bool _tyslSSAddCnt;
+    bool getTyslSSAddCnt() { return _tyslSSAddCnt; }
+    void setTyslSSAddCnt(bool flag) { _tyslSSAddCnt = flag; }
+
 public:
 	enum StatusFlag
 	{

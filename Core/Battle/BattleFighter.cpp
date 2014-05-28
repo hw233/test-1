@@ -90,6 +90,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
    ,_ruRedCarpetLast(0), _shiFlowerLast(0), _shiFlowerAura(0), _daoRoseLast(0), _moKnotLast(0)
    ,_bActCnt(0), _immune3(0), _revivalCnt(0), _prudentLast(0),_prudentHitrate(0), _prudentHitrateLastOtherside(0), _silkwormCnt(0)
    ,_yehuoLevel(0), _yehuo_ss_dmgRate(0), _yehuo_ss_upRate(0), _jiuziDmgCnt(0), _changeStatus(0), _newModeLast(0), _counterCnt(0), _criticalCnt(0), _preAtk(false), _friendDeadCnt(0), _enemyDeadCnt(0), _mojianCnt(0xFF)
+   ,_tyslSSCnt(0), _tyslSSFactor(0),_tyslSSAddCnt(true)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
