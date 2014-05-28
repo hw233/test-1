@@ -2812,6 +2812,12 @@ void OnSendAnswerBegin(GameMsgHdr& hdr,  const void* data )
 
     MSG_QUERY_PLAYER(player);   
 
+    if(!World::getAnswerAct())
+        return;
+
+    if(player->GetLev() < 30)
+        return;
+
     UInt32 nowTime = TimeUtil::Now();
     UInt32 time = TimeUtil::SharpDayT(0,nowTime);
     UInt32 prepare = time + 19*60*60 + 15*60;     // 每天19点30开始
