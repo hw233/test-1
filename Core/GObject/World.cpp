@@ -150,6 +150,7 @@ bool World::_june = false;
 bool World::_june1 = false;
 bool World::_july = false;
 bool World::_qixi= false;
+bool World::_dropact = false;
 bool World::_foolbao = false;
 bool World::_summerFlow3 = false;
 bool World::_halfgold = false;
@@ -2964,7 +2965,7 @@ void World::SendQixiAward()
                         bool bind = true;
                         if(mitems[i].id == qixiTmpl._titleItem)
                         {
-                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F);
+                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F) * 2;
                             bind = false;
                         }
                         else

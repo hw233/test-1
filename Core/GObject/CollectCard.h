@@ -93,13 +93,13 @@ namespace GObject
 
     struct SuitCardInfo
     {
-        UInt8 id;//套牌组名id(20 - 特殊卡牌 40 - 40级套牌 50 - 50级套牌...)
+        UInt16 id;//套牌组名id(20 - 特殊卡牌 40 - 40级套牌 50 - 50级套牌...)
         UInt8 suit_mark;//八张套牌标识位
         UInt8 active;//激活度(0 - 没激活 1 - 25% 2 - 50% 3 - 100%)
         UInt32 spe_mark;//特殊卡牌标识位
         UInt8 collect_degree;//收集度
 
-        SuitCardInfo(UInt8 num1 = 0,UInt8 num2 = 0,UInt8 num3 = 0,UInt32 num4 = 0,UInt8 num5 = 0)
+        SuitCardInfo(UInt16 num1 = 0,UInt8 num2 = 0,UInt8 num3 = 0,UInt32 num4 = 0,UInt8 num5 = 0)
         {
             id = num1;
             suit_mark = num2;
@@ -127,13 +127,13 @@ namespace GObject
 
         void ReturnCardInfo(UInt8 flag);
         
-        bool ReturnSuitInfo(Stream&,UInt8 suit_lvl,bool isSpe = false,bool isRet = false);
+        bool ReturnSuitInfo(Stream&,UInt16 suit_lvl,bool isSpe = false,bool isRet = false);
 
         void EquipCard(UInt32 id,UInt8 pos);//装备卡牌
         
-        void ExchangeCard(UInt8 flag/* 0 - 手动 1- 自动*/,UInt8 level ,UInt8 color ,UInt16 count);//兑换卡牌
+        void ExchangeCard(UInt8 flag/* 0 - 手动 1- 自动*/,UInt16 level ,UInt8 color ,UInt16 count);//兑换卡牌
         
-        void ActiveCardSet(UInt8 suit_lvl,UInt8 active_set);//激活卡组
+        void ActiveCardSet(UInt16 suit_lvl,UInt8 active_set);//激活卡组
         
         void UpGradeCard(UInt32 id,std::vector<UInt32>& vecid);//卡片升级
 
@@ -142,8 +142,8 @@ namespace GObject
         void RebuildCardAttr();//重算卡片属性
 
         //bool AddCard(UInt16 cid ,UInt8 type ,EAttrType type1,float attr_num1,EAttrType type2,float attr_num2,UInt16 skill_id);//增加卡牌
-        void loadCollectCnt(UInt8 level ,UInt16 cnt1 ,UInt16 cnt2 ,UInt16 cnt3);
-        void updateCollectCnt(UInt8 level);
+        void loadCollectCnt(UInt16 level ,UInt16 cnt1 ,UInt16 cnt2 ,UInt16 cnt3);
+        void updateCollectCnt(UInt16 level);
 
         //bool AddCard(UInt16 cid ,UInt8 type ,EAttrType type1 = ATTR_ATK,float attr_num1 = 0,EAttrType type2 = ATTR_ATK,float attr_num2 = 0,UInt16 skill_id = 0);//增加卡牌
         CardInfo* AddCard(UInt16 cid );//增加卡牌
@@ -157,13 +157,15 @@ namespace GObject
         void InsertCardSuit(DBCardSuit dbcs);
     
         void GMAddExp(UInt32 exp);
+    
+        void Add61Card(UInt16 cid);
 
     private:
         std::vector<CardInfo*> VecEquipSlot;//装备卡牌槽
         
         std::map<UInt32,CardInfo*> MapFreeCardSlot;//空闲卡牌槽
         
-        std::map<UInt8,SuitCardInfo*> MapCardStamp;//套牌集邮册
+        std::map<UInt16,SuitCardInfo*> MapCardStamp;//套牌集邮册
         
         Player* m_owner;//卡牌拥有者
             
@@ -171,8 +173,11 @@ namespace GObject
         
         typedef std::map<UInt32,CardInfo*> MSlot;//空闲卡牌槽
 
-        UInt16 _cnt[10][3];
-        typedef std::map<UInt8,SuitCardInfo*> MStamp;//空闲卡牌槽
+        //UInt16 _cnt[10][3];
+        std::map<UInt16/*等级*/,UInt16/*卡牌之蓝色魂数*/> MapCntBlue;
+        std::map<UInt16/*等级*/,UInt16/*卡牌之紫色魂数*/> MapCntPurple;
+        std::map<UInt16/*等级*/,UInt16/*卡牌之橙色魂数*/> MapCntOrg;
+        typedef std::map<UInt16,SuitCardInfo*> MStamp;//空闲卡牌槽
     };
 
 }

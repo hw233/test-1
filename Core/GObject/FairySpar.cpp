@@ -12,13 +12,13 @@ namespace GObject
 #define ATK_MAX       1
 #define MAG_ATK_MAX   2
 #define PHY_MAX       3
-#define FAIRY_SPAR_MAX 8
+#define FAIRY_SPAR_MAX 9
 
-    const Int32 statusLevel[FAIRY_SPAR_MAX] = {0,3,6,9,12,15,18,21};
-    const Int32 clanLevel[FAIRY_SPAR_MAX] = {0, 2, 3, 4, 5, 6, 7, 8};
-    const Int32 atkMax[FAIRY_SPAR_MAX] = {100,160,240,340,460,600,800,1000};
-    const Int32 magAtkMax[FAIRY_SPAR_MAX] = {100,160,240,340,460,600,800,1000};
-    const Int32 phyMax[FAIRY_SPAR_MAX] = {1000,1600,2400,3400,4600,6000,8000,10000};
+    //const Int32 statusLevel[FAIRY_SPAR_MAX] = {0,3,6,9,12,15,18,21};
+    const Int32 clanLevel[FAIRY_SPAR_MAX] = {0, 2, 3, 4, 5, 6, 7, 8, 9};
+    const Int32 atkMax[FAIRY_SPAR_MAX] = {100,160,240,340,460,600,800,1000, 1200};
+    const Int32 magAtkMax[FAIRY_SPAR_MAX] = {100,160,240,340,460,600,800,1000, 1200};
+    const Int32 phyMax[FAIRY_SPAR_MAX] = {1000,1600,2400,3400,4600,6000,8000,10000, 12000};
 
     FairySpar::FairySpar(Player* player) : m_owner(player), m_atk(0), m_magAtk(0), m_phy(0), m_complexPercent(0), m_curMark(0), m_breakoutCnt(0)
     {

@@ -4472,9 +4472,9 @@ namespace GObject
 		return true;
 	}
 
-	UInt16 Player::GetFreePackageSize()
+	UInt16 Player::GetFreePackageSize(UInt8 type)
 	{
-		return m_Package->GetRestPackageSize();
+		return m_Package->GetRestPackageSize(type);
 	}
 
 	bool Player::addFriend( Player * pl )
@@ -8838,9 +8838,9 @@ namespace GObject
                 addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
                 addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
                 break;
-            case 18: //前3 后3 右3 左1
+            case 18: //前3 后1 右3 左1
                 addZhenyuanAttr(ae, _playerData.zhenyuans[2], fgt);   //前3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[6], fgt);   //后1
 
                 addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
                 addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
@@ -15714,7 +15714,7 @@ namespace GObject
         }
         if(m_dpData->itemNum != 0)
         {
-            if(GetFreePackageSize() > m_dpData->itemNum/99)
+            if(GetFreePackageSize(1) > m_dpData->itemNum/99)
             {
                 struct AddItemInfo
                 {
@@ -20628,7 +20628,7 @@ void Player::sendCopyFrontAllAward()
 
 UInt8 Player::getCopyId()
 {
-    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871};
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871, 4628};
 
     UInt16 currentSpot = PLAYER_DATA(this, location);
     for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
@@ -23642,7 +23642,7 @@ void Player::doVipPrivilege(UInt8 idx)
 void Player::sendDirectPurInfo()
 {
     Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x42) << static_cast<UInt8>(GetVar(VAR_DIRECTPUROPEN)) << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT)) << _playerData.totalRecharge;
+    st << static_cast<UInt8>(0x42) << static_cast<UInt8>(GetVar(VAR_DIRECTPUROPEN)) << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT)) << _playerData.totalRecharge << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT2));
     st << Stream::eos;
     send(st);
 }
@@ -25360,6 +25360,23 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 GetPackage()->AddItem(16010, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
+            }
+        }
+    }
+    if(World::getDropAct())
+    {
+        if(flag == e_sla_none)
+        {
+            GetPackage()->Add(138, 1, true, false, FromNpc);
+        }
+        else
+        {
+            UInt32 status = GetVar(VAR_DROP_ACT);
+            if(!(status & flag))
+            {
+                GetPackage()->Add(138, 1, true, false, FromNpc);
+                status |= flag;
+                SetVar(VAR_DROP_ACT, status);
             }
         }
     }

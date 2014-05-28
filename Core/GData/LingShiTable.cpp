@@ -42,7 +42,7 @@ void LingshiCls::setLingshiTable(DBLingShi& dbls)
 
 LingshiData * LingshiCls::getLingshiData(UInt8 lvl)
 {
-    std::map<UInt8, LingshiData>::iterator iter = _lingshiData.find(lvl);
+    LingshiDataMap::iterator iter = _lingshiData.find(lvl);
     if(iter == _lingshiData.end())
         return NULL;
     return &(iter->second);
@@ -50,7 +50,7 @@ LingshiData * LingshiCls::getLingshiData(UInt8 lvl)
 
 bool LingshiCls::canUpgrade(UInt8 lvl, UInt32& exp)
 {
-    std::map<UInt8, LingshiData>::iterator iter = _lingshiData.find(lvl);
+    LingshiDataMap::iterator iter = _lingshiData.find(lvl);
     if(iter == _lingshiData.end())
         return false;
     bool isBreak = iter->second.isBreak;
@@ -68,7 +68,7 @@ bool LingshiCls::canUpgrade(UInt8 lvl, UInt32& exp)
 
 bool LingshiCls::canBreak(UInt8 lvl)
 {
-    std::map<UInt8, LingshiData>::iterator iter = _lingshiData.find(lvl);
+    LingshiDataMap::iterator iter = _lingshiData.find(lvl);
     if(iter == _lingshiData.end())
         return false;
     return iter->second.isBreak;
@@ -76,7 +76,7 @@ bool LingshiCls::canBreak(UInt8 lvl)
 
 UInt32 LingshiCls::getLingShiExp(UInt8 lvl)
 {
-    std::map<UInt8, LingshiData>::iterator iter = _lingshiData.find(lvl);
+    LingshiDataMap::iterator iter = _lingshiData.find(lvl);
     if(iter == _lingshiData.end())
         return 0;
     return iter->second.exp;
@@ -84,10 +84,55 @@ UInt32 LingshiCls::getLingShiExp(UInt8 lvl)
 
 UInt32 LingshiCls::getLevUpTael(UInt8 lvl)
 {
-    std::map<UInt8, LingshiData>::iterator iter = _lingshiData.find(lvl);
+    LingshiDataMap::iterator iter = _lingshiData.find(lvl);
     if(iter == _lingshiData.end())
         return 0;
     return iter->second.consume;
+}
+
+void LingshiCls::breakLevelUp(UInt8& lvl, UInt32 exp)
+{
+    LingshiDataMap::iterator iter = _lingshiData.find(lvl);
+    if(iter == _lingshiData.end() || !iter->second.isBreak)
+        return;
+    ++ lvl;
+    std::advance(iter, 1);
+    bool hasNext = false;
+    UInt8 tmpLvl = lvl;
+    for(; iter != _lingshiData.end(); ++ iter)
+    {
+        tmpLvl = iter->second.level;
+        if(iter->second.isBreak)
+        {
+            if(iter->second.exp <= exp)
+            {
+                lvl = iter->second.level;
+                hasNext = true;
+            }
+            break;
+        }
+        else
+        {
+            if(iter->second.exp > exp)
+                break;
+        }
+    }
+    if(!hasNext)
+        lvl = tmpLvl;
+}
+
+UInt32 LingshiCls::countBreakItemCnt(UInt8 lvl)
+{
+    UInt32 count = 0;
+    LingshiDataMap::iterator iter = _lingshiData.begin();
+    for(; iter != _lingshiData.end(); ++ iter)
+    {
+        if(iter->second.level >= lvl)
+            break;
+        if(iter->second.isBreak)
+            count += iter->second.useItem;
+    }
+    return count;
 }
 
 }
