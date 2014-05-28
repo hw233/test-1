@@ -483,6 +483,22 @@ namespace GObject
         UInt8 id;
     };
 
+    class EventAutoTeamCopy : public EventBase
+    {
+    public:
+		EventAutoTeamCopy(Player * player, UInt32 interval, UInt32 count, UInt32 id)
+			: EventBase(player, interval, count), id(id)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_AUTOTEAMCOPY; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+
+    private:
+        UInt32 id;
+    };
+
     class EventAutoFrontMap : public EventBase
     {
     public:
@@ -946,6 +962,7 @@ namespace GObject
             AutoTlz         = 0x00000400,
             InPetCopyTeam   = 0x00000800,
             AutoXJFrontMap  = 0x00001000,
+            AutoTeamCopy    = 0x00002000,
             AthleticsBuff   = 0x80000000,
 			AllFlags		= 0xFFFFFFFF
 		};
@@ -1700,7 +1717,16 @@ namespace GObject
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
         inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }
         inline void setCopyFailed() { m_autoCopyFailed = true; }
-		bool autoBattle(UInt32, UInt8);
+
+
+        inline UInt8 getAutoTeamCopyCurIndex() { return m_autoTeamCopyCurIndex; }
+        inline void setAutoTeamCopyCurIndex(UInt8 index) { m_autoTeamCopyCurIndex = index; }
+        inline UInt32 getAutoTeamCopyCnt() { return m_autoTeamCopyCnt; }
+        inline void setAutoTeamCopyCnt(UInt32 cnt) { m_autoTeamCopyCnt = cnt; }
+        inline UInt32 getAutoTeamCopyCurCnt() { return m_autoTeamCopyCurCnt; }
+        inline void setAutoTeamCopyCurCnt(UInt32 curCnt) { m_autoTeamCopyCurCnt = curCnt; }
+		
+        bool autoBattle(UInt32, UInt8);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
         //void advancedHookExp();
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
@@ -1720,6 +1746,11 @@ namespace GObject
         void cancelAutoCopy(UInt8 id);
         void instantAutoCopy(UInt8 id);
         void sendAutoCopy();
+
+        void startAutoTeamCopy(UInt32 id);
+        void cancelAutoTeamCopy(UInt32 id);
+        void instantAutoTeamCopy(UInt32 id);
+        void sendAutoTeamCopy();
 
         void startAutoFrontMap(UInt8 id, UInt8 mtype);
         void cancelAutoFrontMap(UInt8 id);
@@ -2435,6 +2466,9 @@ namespace GObject
 
         UInt32 _praplace;
         bool m_autoCopyFailed;
+        UInt8 m_autoTeamCopyCurIndex;
+        UInt32 m_autoTeamCopyCnt;
+        UInt32 m_autoTeamCopyCurCnt;
 
         // ͨ????????֮??
         UInt8 _justice_roar;

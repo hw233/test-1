@@ -138,6 +138,10 @@ class TeamCopy
         void recycleTeamNumber(UInt8 copyId, UInt8 t, UInt16 number);
         void addTeamCopyNpc(UInt8 copyId, UInt8 t, UInt16 location, UInt32 npcId);
         void sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid);
+        void autoBattle(Player* pl, UInt32 copyIndex, UInt8 type);
+        void sendAutoTeamCopy(Player* pl);
+        UInt8 fight(Player* pl, UInt32 copyIndex, bool ato=false, bool complete=false);
+        void autoClear(Player* pl, bool complete=false);
 
         void process(UInt32 now);
         void sendDaily(Player* player, UInt8 type = 7);

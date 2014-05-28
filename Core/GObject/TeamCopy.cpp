@@ -1464,7 +1464,289 @@ UInt8 TeamCopyPlayerInfo::getPassNum()
     }
     return num;
 }
+
+void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
+{
+    if(NULL==pl || 0==copyIndex)
+        return;
+
+    if(pl->hasFlag(Player::InCopyTeam))
+    {
+        pl->sendMsgCode(0, 2106);
+        return;
+    }
+
+    UInt32 autoCnt = 0;
+    switch (type) 
+    {
+    case 0:
+        {
+            if (pl->hasFlag(Player::AutoCopy)) 
+            {
+                pl->sendMsgCode(0, 1414);
+                return;
+            }
+
+            pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 1);
+
+            if (pl->getVipLevel() < 4)
+                return;
+           
+            UInt8 m = 0;
+            for(UInt8 i=0; i<TEAMCOPY_MAXCOPYCNT; i++)
+            {
+                for(UInt8 j=0; j<TEAMCOPY_MAXTYPECNT; j++)
+                {
+                    UInt8 autoMark = GET_BIT(copyIndex, m);
+                    if(1 == autoMark)
+                    {
+                        TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+                        if(!tcpInfo->checkTeamCopyPlayer(i, j))
+                        {
+                            pl->sendMsgCode(1, 2108);
+                            return;
+                        }
+
+                        TeamCopyNpc& npcIds = m_tcNpcId[j][i];
+                        TeamCopyNpcId& npcId = npcIds.npcId;
+                        UInt8 cnt = npcId.size();
+
+                        std::vector<GData::NpcGroup*> ngs;
+                        for(UInt8 k= 0; k<cnt; k++)
+                        {
+                            GData::NpcGroups::iterator it = GData::npcGroups.find(npcId[k]);
+                            if(it == GData::npcGroups.end())
+                                return;
+                            GData::NpcGroup * ng = it->second;
+                            if (!ng)
+                                return;
+                            
+                            autoCnt++;
+                        }
+                    }
+                    m++;
+                }
+            }
+
+            pl->setAutoTeamCopyCnt(autoCnt);
+
+            UInt8 secs = 0;
+            if (cfg.GMCheck)
+                secs = 60;
+            else
+                secs = 20;
+
+            EventAutoTeamCopy* event = new (std::nothrow) EventAutoTeamCopy(pl, secs, autoCnt, copyIndex);
+            if (!event) return;
+            PushTimerEvent(event);
+
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x15) << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(pl->getAutoTeamCopyCurIndex()) << static_cast<UInt32>(0); 
+            st << Stream::eos;
+            pl->send(st);
+        }
+        break;
+    case 1:
+        {
+            if(!pl->hasFlag(Player::AutoTeamCopy)) 
+            {
+                pl->sendMsgCode(0, 1415);
+                return;
+            }
+
+            autoClear(pl);
+
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x15) << static_cast<UInt8>(1);
+            st << static_cast<UInt8>(pl->getAutoTeamCopyCurIndex()) << static_cast<UInt32>(0); 
+            st << Stream::eos;
+            pl->send(st);
+        }
+        break;
+    case 2:
+        {
+            if(!pl->hasFlag(Player::AutoTeamCopy)) 
+            {
+                pl->sendMsgCode(0, 1415);
+                return;
+            }
+
+            if(!World::getAutoBattleAct() && !World::getNewYear() && !pl->isYD() && !pl->isBD() && !pl->isQQVIP())
+            {
+                // 限时vip特权
+                if(pl->getVipLevel() < 6 && !pl->inVipPrivilegeTime())
+                    return;
+            }
+
+            if(pl->GetPackage()->GetRestPackageSize() < 30)
+            {
+                pl->sendMsgCode(0, 1011);
+                return;
+            }
+
+            if(!pl->hasChecked())
+                return;
+
+            if(pl->getGoldOrCoupon() < 10)
+            {
+                pl->sendMsgCode(0, 1101);
+                return;
+            }
+
+            ConsumeInfo ci(AutoCopyComplete,0,0);
+            pl->useGoldOrCoupon(10, &ci);
+
+            autoClear(pl);
+            pl->addFlag(Player::AutoTeamCopy);
+
+            UInt8 m = 0;
+            UInt8 curIndex = pl->getAutoTeamCopyCurIndex();
+            for(UInt8 i=curIndex/2; i<TEAMCOPY_MAXCOPYCNT; i++)
+            {
+                for(UInt8 j=curIndex%2; j<TEAMCOPY_MAXTYPECNT; j++)
+                {
+                    UInt8 autoMark = GET_BIT(copyIndex, curIndex);
+                    if(1 == autoMark)
+                    {
+                        if(!fight(pl, copyIndex, true, true))
+                            break;
+                    }
+                }
+            }
+        }
+        break;
+    default:
+        break;
+    }
 }
 
+UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
+{
+    if(NULL==pl || 0==copyIndex || copyIndex>TEAMCOPY_MAXCOPYCNT)
+        return 0;
 
+    if (pl->hasFlag(Player::AutoTeamCopy) && !ato)
+    {
+        pl->sendMsgCode(0, 1414);
+        return 0;
+    }
 
+    if(pl->hasFlag(Player::InCopyTeam))
+    {
+        pl->sendMsgCode(0, 2106);
+        return 0;
+    }
+
+    if(pl->GetPackage()->GetRestPackageSize() < 2)
+    {
+        pl->sendMsgCode(0, 1011);
+        return false;
+    }
+
+    pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 0);
+
+    UInt8 curAutoIndex = pl->getAutoTeamCopyCurIndex();
+    if(0 > TEAMCOPY_MAXCOPYCNT*TEAMCOPY_MAXTYPECNT)
+        return 0;
+
+    UInt32 totalAutoCnt = pl->getAutoTeamCopyCnt();
+    if(0 == totalAutoCnt)
+        return 0;
+
+    UInt32 curAutoCnt = pl->getAutoTeamCopyCurCnt();
+    if(curAutoCnt >= totalAutoCnt)
+        return 0;
+
+    UInt32 autoCnt = 0;
+    UInt8 curAutoMark = 0;
+    GData::NpcGroup * ng = NULL;
+    for(UInt8 i=curAutoIndex/2; i<TEAMCOPY_MAXCOPYCNT; i++)
+    {
+        for(UInt8 j=curAutoIndex%2; j<TEAMCOPY_MAXTYPECNT; j++)
+        {
+            UInt8 autoMark = GET_BIT(copyIndex, curAutoIndex);
+            if(1 == autoMark)
+            {
+                TeamCopyNpc& npcIds = m_tcNpcId[j][i];
+                TeamCopyNpcId& npcId = npcIds.npcId;
+                UInt8 cnt = npcId.size();
+
+                std::vector<GData::NpcGroup*> ngs;
+                for(UInt8 k= 0; k<cnt; k++)
+                {
+                    GData::NpcGroups::iterator it = GData::npcGroups.find(npcId[k]);
+                    if(it == GData::npcGroups.end())
+                        return 0;
+                    ng = it->second;
+                    if (!ng)
+                        return 0;
+                    
+                    autoCnt++;
+                    if(curAutoCnt+1 == autoCnt)
+                    {
+                        if(k+1==cnt)
+                        {
+                            pl->pendExp(ng->getExp());
+                            ng->getLoots(pl, pl->_lastLoot, 0, NULL);
+                            if(curAutoCnt+1 == totalAutoCnt)
+                                curAutoMark = 4;
+                            else
+                                curAutoMark = 3;
+                        }
+                        else
+                            curAutoMark = 2;
+
+                        pl->setAutoTeamCopyCurCnt(curAutoCnt+1);
+                    }
+                }
+            }
+            curAutoIndex++;
+            if(curAutoMark > 0)
+            {
+                pl->setAutoTeamCopyCurIndex(curAutoIndex);
+                break;
+            }
+        }
+    }
+    Stream st(REP::TEAM_COPY_REQ);
+    st << static_cast<UInt8>(0x15);
+    st << curAutoMark << static_cast<UInt8>(pl->getAutoTeamCopyCurIndex()) << static_cast<UInt32>(ng->getId()); 
+    if(3==curAutoMark || 4==curAutoMark)
+    {
+        UInt8 sz = pl->_lastLoot.size();
+        st << sz;
+        for(UInt8 n=0; n<sz; n++)
+        {
+            st << static_cast<UInt32>(pl->_lastLoot[n].id) << static_cast<UInt8>(pl->_lastLoot[n].count);
+        }
+        st << static_cast<UInt64>(ng->getExp());
+    }
+    st << Stream::eos;
+    pl->send(st);
+}
+
+void TeamCopy::sendAutoTeamCopy(Player* pl)
+{
+    return;
+}
+
+void TeamCopy::autoClear(Player* pl, bool complete)
+{
+    if(NULL==pl)
+        return;
+
+    if(complete)
+    {
+        UInt8 curAutoIndex = pl->getAutoTeamCopyCurIndex();
+        Stream st(REP::TEAM_COPY_REQ);
+        st << static_cast<UInt8>(0x15);
+        st << static_cast<UInt8>(6) << static_cast<UInt8>(pl->getAutoTeamCopyCurIndex()) << static_cast<UInt8>(0) << Stream::eos;
+        pl->send(st);
+    }
+
+    PopTimerEvent(pl, EVENT_AUTOTEAMCOPY, pl->getId());
+    pl->delFlag(Player::AutoTeamCopy);
+}
+
+}
