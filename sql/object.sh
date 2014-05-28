@@ -299,6 +299,7 @@ function update_object()
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购),下次需要多清1个VAR
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearvar592_1211.sql   #清空var592（QQ大厅登录）
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_reset_newyeargift_var.sql  #清除春节礼包(var349)
 }
 
 #sh player_jiguan.sh
