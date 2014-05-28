@@ -7080,6 +7080,35 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
     }
 
+    for(UInt8 side = 0; side < 2; side++)
+    {
+        for(UInt8 i = 0; i < 25; i++)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(bo == NULL || bo->getHP() == 0)
+                continue;
+            if(bo->getTyslSSFactor() < 0.001f)
+                continue;
+            if(bo->getTyslSSCnt2() == 0)
+                continue;
+            UInt8 originCnt = bo->getTyslSSCnt() / 5;
+            bo->setTyslSSCnt(bo->getTyslSSCnt() + bo->getTyslSSCnt2());
+            UInt8 newCnt = bo->getTyslSSCnt() / 5;
+            if(newCnt > originCnt)
+            {
+                _activeFgt = bo;
+                appendDefStatus(e_biLanTianYi, newCnt, bo);
+                if(_defList.size() > 0 || _scList.size() > 0)
+                {
+                    appendToPacket(bo->getSide(), bo->getPos(), 0, 2, 0, false, false);
+                    ++ rcnt;
+                }
+                _activeFgt = NULL;
+            }
+            bo->setTyslSSCnt2(0);
+        }
+    }
+
     return rcnt;
 }
 
@@ -11413,7 +11442,6 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                 }
             }
 
-            UInt32 atk = bf->getAttack();
             float factor = bf->getTyslSSFactor();
             for(int i = 0; i < dmgCnt; ++ i)
             {
@@ -11421,16 +11449,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                 if(rnd_bf)
                 {
                     rnd_bf->setTyslSSAddCnt(false);
-
-                    float def = getBFDefend(rnd_bf);
-                    bool pr = bf->calcPierce(rnd_bf);
-                    float toughFactor = pr ? rnd_bf->getTough(bf) : 1.0f;
-                    float atkreduce = getBFAtkReduce(rnd_bf);
-                    UInt32 dmg = _formula->calcDamage(atk * factor, def, bf->getLevel(), toughFactor, atkreduce);
-                    dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
-                    dmg = dmg > 0 ? dmg : 1;
-                    makeDamage(rnd_bf, dmg, e_damNormal, e_damagePhysic);
-
+                    doSSMakeDamage(bf, rnd_bf, factor);
                     rnd_bf->setTyslSSAddCnt(true);
                 }
             }
@@ -13115,13 +13134,7 @@ UInt32 BattleSimulator::makeDamage(BattleFighter* bf, UInt32& u, StateType type,
                     continue;
                 const GData::SkillBase* skill = bo->getBFPeerless();
                 if(skill)
-                {
-                    UInt8 originCnt = bo->getTyslSSCnt() / 5;
-                    bo->setTyslSSCnt(bo->getTyslSSCnt() + 1);
-                    UInt8 newCnt = bo->getTyslSSCnt() / 5;
-                    if(newCnt > originCnt)
-                        appendDefStatus(e_biLanTianYi, newCnt, bo);
-                }
+                    bo->setTyslSSCnt2(bo->getTyslSSCnt2() + 1);
             }
         }
     }
@@ -15212,6 +15225,84 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
             }
         }
         return;
+    }
+}
+
+void BattleSimulator::doSSMakeDamage(BattleFighter* bf, BattleFighter* target, float factor)
+{
+    if(!bf || !target)
+        return;
+    if(factor < 0.001f)
+        return;
+
+    UInt8 target_stun = target->getStunRound();
+    bool enterEvade = target->getEvad100();
+    bool defend100 = target->getDefend100();
+
+    if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(target, NULL))))
+    {
+        float dmg;
+        UInt32 curDmg;
+        bool isPhysic;
+        if(target->hasFlag(BattleFighter::IsMirror))
+        {
+            curDmg = target->getHP();
+            dmg = curDmg;
+            if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
+                isPhysic = true;
+            else
+                isPhysic = false;
+        }
+        else
+        {
+            float atk = 0;
+            float def = 0;
+            float reduce = 0;
+            bool pr = bf->calcPierce(target);
+            if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
+            {
+                atk = bf->getAttack();
+                def = getBFDefend(target);
+                reduce = getBFAtkReduce(target);
+                isPhysic = true;
+            }
+            else
+            {
+                atk = bf->getMagAttack();
+                def = getBFMagDefend(target);
+                reduce = getBFMagAtkReduce(target);
+                isPhysic = false;
+            }
+
+            float toughFactor = pr ? target->getTough(bf) : 1.0f;
+            dmg = _formula->calcDamage(atk * factor, def, bf->getLevel(), toughFactor, reduce);
+            dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+            dmg = dmg > 0 ? dmg : 1;
+
+            curDmg = dmg;
+            doShieldHPAttack(target, curDmg);
+        }
+        if(curDmg > 0)
+        {
+            makeDamage(target, curDmg, e_damNormal, isPhysic ? e_damagePhysic : e_damageMagic);
+        }
+    }
+    else if(!defend100 && !enterEvade)
+    {
+        appendDefStatus(e_damEvade, 0, target);
+    }
+    else
+    {
+        if(!defend100)
+        {
+            appendDefStatus(e_damEvade, 0, target);
+            target->setEvad100(false);
+        }
+        else
+        {
+            appendDefStatus(e_damOut, 0, target);
+            target->setDefend100(false);
+        }
     }
 }
 

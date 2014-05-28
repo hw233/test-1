@@ -1751,6 +1751,9 @@ private:
     bool _tyslSSAddCnt;
     bool getTyslSSAddCnt() { return _tyslSSAddCnt; }
     void setTyslSSAddCnt(bool flag) { _tyslSSAddCnt = flag; }
+    UInt8 _tyslSSCnt2;
+    UInt8 getTyslSSCnt2() { return _tyslSSCnt2; }
+    void setTyslSSCnt2(UInt8 count) { _tyslSSCnt2 = count; }
 
 public:
 	enum StatusFlag

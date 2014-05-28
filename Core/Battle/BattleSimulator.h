@@ -628,6 +628,7 @@ private:
 
     void initBuddhaLight(BattleFighter* bf, bool auralAdd, bool dead);
     void doSkillAttackByCareer(BattleFighter *bf, const GData::SkillBase *skill);
+    void doSSMakeDamage(BattleFighter* bf, BattleFighter* target, float factor);
 
     void addSelfSideEvadeCnt(BattleFighter* bf);
     UInt32 doBufMakeDamage(BattleFighter* bf, UInt32& u);
