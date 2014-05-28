@@ -2314,7 +2314,7 @@ void World::ClanDuoBaoCheck(void *)
 
 inline bool enum_answer_send(GObject::Player* player, UInt8 mark)
 {
-    if(player == NULL || !player->isOnline())
+    if(player == NULL)
         return true;
 
     if(!player->isOnline() && 5 != mark)
