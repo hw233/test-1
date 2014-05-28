@@ -195,7 +195,7 @@ namespace GObject
 
             UInt8 countC = 0;
             std::list<answerLog>::iterator iterA = iter->second.begin();
-            for(iterA; iterA!=iter->second.end(); ++iterA)
+            for(; iterA!=iter->second.end(); ++iterA)
             {
                 answerLog& log = (*iterA);
                 if(log.logType>=1 && log.logType<=4)
