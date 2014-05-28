@@ -22901,8 +22901,11 @@ void Player::getQQGameOnlineAward()
 {
     if(!World::getQQGameOnlineAwardAct())
         return;
-    if(atoi(getDomain()) != 10)
+    if(atoi(getDomain()) != 10 && atoi(getDomain()) != 11)
+    {
+        sendMsgCode(0, 3504);
         return;
+    }
     if(GetVar(VAR_ONLINE_AWARD) > 0)
         return;
     if(getQQGameOnlineTotalTime() < QQ_GAME_NEED_TIME)
@@ -22913,10 +22916,10 @@ void Player::getQQGameOnlineAward()
         return;
     }
     SetVar(VAR_ONLINE_AWARD, 1);
-    GetPackage()->Add(134, 1, true, false);
-    GetPackage()->Add(1325, 1, true, false);
-    GetPackage()->Add(511, 1, true, false);
-    GetPackage()->Add(500, 1, true, false);
+    GetPackage()->Add(9371, 2, true, false);
+    GetPackage()->Add(9600, 2, true, false);
+    GetPackage()->Add(9438, 2, true, false);
+    GetPackage()->Add(9338, 2, true, false);
     sendQQGameOnlineAward();
 }
 
@@ -22924,8 +22927,11 @@ void Player::sendQQGameOnlineAward()
 {
     if(!World::getQQGameOnlineAwardAct())
         return;
-    if(atoi(getDomain())!= 10)
+    if(atoi(getDomain())!= 10 && atoi(getDomain()) != 11)
+    {
+        sendMsgCode(0, 3504);
         return;
+    }
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x0B);
     st << static_cast<UInt8>(GetVar(VAR_ONLINE_AWARD));
@@ -22944,8 +22950,11 @@ void Player::setQQGameOnlineTotalTime()
 {
     if(!World::getQQGameOnlineAwardAct())
         return;
-    if(atoi(getDomain()) != 10)
+    if(atoi(getDomain()) != 10 && atoi(getDomain()) != 11)
+    {
+        sendMsgCode(0, 3504);
         return;
+    }
     SetVar(VAR_ONLINE_TOTAL_TIME, getQQGameOnlineTotalTime());
 }
 
@@ -25682,7 +25691,11 @@ void Player::sendRandFriend()
 
 void Player::GetQQBoardAward( UInt8 type)
 {
-    
+    if(atoi(getDomain()) != 10 && atoi(getDomain()) != 11)
+    {
+        sendMsgCode(1, 3504);
+        return;
+    }
     if(!World::getQQBoardLoginTime())
         return ;
     if(type < 0 ||type >3 )
@@ -25740,7 +25753,7 @@ void Player::sendQQBoardOnlineTime()
     Stream st(REP::RC7DAY);  //协议
     st<<static_cast<UInt8>(20);
     st<<static_cast<UInt8>(OnlineAward);
-    st<<static_cast<UInt32>(20*60 - time)<<Stream::eos;
+    st<<static_cast<UInt32>(4*60 - time)<<Stream::eos;
     send(st);
 }
 void Player::sendQQBoardLogin()
@@ -25770,7 +25783,7 @@ void Player::SetQQBoardLogin()
     UInt32 now = TimeUtil::Now();
     if(now<(TimeUtil::SharpDayT( 0 , now) + 19 * 3600+30*60) || now > (TimeUtil::SharpDayT( 0 , now) + 21 * 3600+30*60) ) 
         return ;
-    UInt32 timeBegin = TimeUtil::MkTime(2013,12,11);
+    UInt32 timeBegin = TimeUtil::MkTime(2014,5,28);
     if(now < timeBegin )
         return ;
     UInt32 cts = static_cast<UInt8>((TimeUtil::SharpDayT( 0 , now) - timeBegin)/86400);

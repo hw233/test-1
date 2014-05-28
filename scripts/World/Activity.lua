@@ -807,7 +807,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+405*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+412*86400 then
           -- RECHARGE
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
@@ -1161,7 +1161,7 @@ function onActivityCheck(tm)
   end
 
   -- ACC
-  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 120*86400) then
+  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 127*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1454,7 +1454,7 @@ function initActTime(y, m, d)
   local  SerStartTm242 = { ['year'] = 2014, ['month'] = 5, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm242_1 = { ['year'] = 2014, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --大厅累积在线奖励
-  local  SerStartTm243 = { ['year'] = 2013, ['month'] = 12, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm243 = { ['year'] = 2014, ['month'] = 5, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --空间黄钻、大厅蓝钻礼包
   local  SerStartTm244 = { ['year'] = 2014, ['month'] = 1, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 五一活动(节日套装)
@@ -1474,8 +1474,8 @@ function initActTime(y, m, d)
   local  SerStartTm251= { ['year'] = 2013, ['month'] = 8, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm251_1= { ['year'] = 2013, ['month'] = 8, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   
-  local  SerStartTm252= { ['year'] = 2013, ['month'] = 12, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm252_1= { ['year'] = 2013, ['month'] = 12, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm252= { ['year'] = 2014, ['month'] = 5, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm252_1= { ['year'] = 2014, ['month'] = 5, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm253= { ['year'] = 2014, ['month'] = 5, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm253_1= { ['year'] = 2014, ['month'] = 5, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1929,7 +1929,7 @@ function initActTime(y, m, d)
   actTime242_1= os.time(SerStartTm242_1);
 
   actTime243_0= os.time(SerStartTm243);
-  actTime243_1= os.time(SerStartTm243) + 3 * 86400;
+  actTime243_1= os.time(SerStartTm243) + 2 * 86400;
 
   actTime244_0= os.time(SerStartTm244);
   actTime244_1= os.time(SerStartTm244) + 2 * 86400;

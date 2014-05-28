@@ -586,6 +586,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 23)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 31)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -626,6 +634,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 3)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
         ))
     {
 #if 0
@@ -1587,6 +1596,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 22)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 23)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 31)
 
          )
         bRechargeEnd = true;
