@@ -117,7 +117,9 @@ function loadStore()
     if get61CardActivity(300) then --童心令
         store:add(2 ,9895,20)
     end
-    --store:add(2 ,16016 ,10)
+    if getQixi() then
+        store:add(2 ,16016 ,10)
+    end
     store:add(2 ,9457 ,20)
 
     store:add(2,16004,2)
