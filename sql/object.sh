@@ -301,6 +301,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearvar592_1211.sql   #清空var592（QQ大厅登录）
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_reset_newyeargift_var.sql  #清除春节礼包(var349)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140523_1.sql #一战成名每天题目
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140418_1.sql   #修改数据库世界boss物攻、法功
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366礼包购买次数
 }
 
 #sh player_jiguan.sh

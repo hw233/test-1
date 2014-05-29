@@ -20762,7 +20762,10 @@ void Player::sendQzongPYGiftInfo()
 void Player::get3366GiftAward(UInt8 type)
 {
     if (getPlatform() != 11)
+    {
+        sendMsgCode(0, 3505);
         return;
+    }
     if (GetVar(VAR_3366GIFT) >= 12)
         return;
     if (GetFreePackageSize() < 6)
@@ -20781,7 +20784,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(48, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
-        static UInt32 itemId[] = {9600, 2, 9371, 2, 9082, 2, 503, 2, 9418, 2, 1126, 2};
+        static UInt32 itemId[] = {9082, 2, 9371, 2, 503, 2, 9498, 2, 9457, 2, 9418, 2};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -20798,10 +20801,10 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
-        static UInt32 itemId[] = {9229, 30, 9141, 9338, 9082, 500};
-        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
+        static UInt32 itemId[] = { 30, 2, 9600, 1, 9310, 1, 9425, 1, 9427, 1, 9141, 2 };
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
-            GetPackage()->Add(itemId[i], 1, true);
+            GetPackage()->Add(itemId[i], itemId[i+1], true);
         }
     }
     send3366GiftInfo();
@@ -20809,9 +20812,10 @@ void Player::get3366GiftAward(UInt8 type)
 
 void Player::send3366GiftInfo()
 {
+    /*
     if(getPlatform() != 11)
         return;
-    /*
+    
     if(!isBD())
         return;
     */
@@ -25076,6 +25080,11 @@ bool Player::getRPZCJBAward()
     if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return false;
 
+    if(World::getZCJBActivity() && atoi(getDomain()) != 11)
+    {
+        sendMsgCode(0, 3505);
+        return false;
+    }
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
     UInt8 left = ZCJB_LEFT(zcjb);
     UInt8 total = ZCJB_TOTAL(zcjb);
@@ -25154,6 +25163,8 @@ bool Player::getRPZCJBAward()
 void Player::checkZCJB(UInt32 recharge)
 {
     if(recharge && !World::inActive_opTime_20130531() && !World::getZCJBActivity())
+        return;
+    if(World::getZCJBActivity() && getPlatform() != 11)
         return;
     AddVar(VAR_ZCJB_RECHARGE_GOLD, recharge);
 
@@ -27816,6 +27827,8 @@ void Player::sendRealSpirit()
 
 void Player::getQZoneRechargeAward(UInt8 val)
 {
+    if(getPlatform() != 11)
+        return;
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27863,6 +27876,8 @@ void Player::getQZoneRechargeAward(UInt8 val)
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
+    if(getPlatform() != 11)
+        return;
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27900,6 +27915,8 @@ void Player::sendQZoneRechargeAwardInfo()
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
+    if(getPlatform() != 11)
+        return;
     if(World::getQZoneRechargeTime() && ( getPlatform() ==1 || getPlatform() ==2))
     {
         AddVar(VAR_QZONE_RECHARGE,r);

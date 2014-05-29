@@ -6681,7 +6681,7 @@ namespace GObject
         UInt8 lvIdx = (guji->getReqLev() - 70)/10;
         UInt8 gujiIdx = gujiClass - Item_Guji;
         UInt8 itemIdx = item->getQuality() == 2 ? 0 : 1;
-        if(colorIdx > 3 || lvIdx > 6 || gujiIdx > 16 || itemIdx > 1)
+        if(colorIdx > 3 || lvIdx > 7 || gujiIdx > 16 || itemIdx > 1)
             return 2;
 
         DelItem2(guji, 1, ToLingbao);
@@ -6720,7 +6720,7 @@ namespace GObject
             m_lbSmeltInfo.orangeAdjVal += 25;
         }
 
-        if((gujiId >= 11113 && gujiId <= 11118) || gujiId == 11203) //皇帝古籍
+        if((gujiId >= 11113 && gujiId <= 11118) || gujiId == 11203 || gujiId == 11232) //皇帝古籍
         {            
             m_lbSmeltInfo.counts += 2;
             m_lbSmeltInfo.orangeAdjVal += 75;
@@ -7000,18 +7000,19 @@ namespace GObject
 
         UInt8 lv = guji->vLev;
         UInt8 lvIdx = (lv - 70)/10;
-        if(lvIdx > 6) lvIdx = 6;
+        if(lvIdx > 7) lvIdx = 7;
 
         UInt16 gjIdx = guji->subClass - Item_Guji;
         UInt8 lbIdx[17] = {0xFF, 0, 1, 2, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 0xFF};
-        UInt16 lbids[7][3] = {
+        UInt16 lbids[8][3] = {
             {11500, 11501, 11502},
             {11503, 11504, 11505},
             {11506, 11507, 11508},
             {11509, 11510, 11511},
             {11515, 11516, 11517},
             {11518, 11519, 11520},
-            {11521, 11522, 11523}};
+            {11521, 11522, 11523},
+            {11524, 11525, 11526}};
 
         UInt8 itemIdx = lbIdx[gjIdx];
         if(lbIdx[gjIdx] == 0xFF)

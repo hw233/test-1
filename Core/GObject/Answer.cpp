@@ -341,19 +341,19 @@ namespace GObject
                 {
                     value += value * 0.5;
                     if(10 == num)
-                        SYSMSG_BROADCASTV(5135, pl->getCountry(), pl->getName().c_str());
+                        SYSMSG_BROADCASTV(5150, pl->getCountry(), pl->getName().c_str());
                 }
                 else if(num>=15 && num<20)
                 {
                     value += value;  
                     if(15 == num)
-                        SYSMSG_BROADCASTV(5136, pl->getCountry(), pl->getName().c_str());
+                        SYSMSG_BROADCASTV(5149, pl->getCountry(), pl->getName().c_str());
                 }
                 else if(num>=20 && num<=30)
                 {
                     value += value;  
                     if(20 == num)
-                        SYSMSG_BROADCASTV(5142, pl->getCountry(), pl->getName().c_str());
+                        SYSMSG_BROADCASTV(5144, pl->getCountry(), pl->getName().c_str());
                 }
 
                 UInt32 skillStatus = pl->GetVar(VAR_ANSWER_SKILL_STATUS);
