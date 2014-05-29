@@ -644,6 +644,9 @@ function loadStore()
         store:add(15,11585,13000)
         store:add(15,11586,13000)
         store:add(15,11587,13000)
+        store:add(15,11576,14000)
+        store:add(15,11577,14000)
+        store:add(15,11578,14000)
 
         -- 帮贡
         store:add(16,5041,300000)

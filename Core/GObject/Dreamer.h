@@ -56,7 +56,7 @@ static UInt8 spotMapType[] =
 };
 #endif
 
-static const UInt8 MAX_PROGRESS = 7;
+static const UInt8 MAX_PROGRESS = 8;
 static const UInt8 MAX_LEVEL = 5;
 
 static const UInt16 DREAMER_ITEM[MAX_PROGRESS + 1] =
@@ -69,6 +69,7 @@ static const UInt16 DREAMER_ITEM[MAX_PROGRESS + 1] =
     9460,
     9465,
     9470,
+    9886,
 };
 
 class Dreamer
@@ -110,6 +111,7 @@ class Dreamer
         PROGRESS_110     = 5,    // 110级副本梦境
         PROGRESS_120     = 6,    // 120级副本梦境
         PROGRESS_130     = 7,    // 130级副本梦境
+        PROGRESS_140     = 8,    // 140级副本梦境
         PROGRESS_MAX,
     };
 
@@ -123,6 +125,7 @@ class Dreamer
         LEVEL_5,            // 水晶梦境第五层
         LEVEL_6,            // 水晶梦境第六层
         LEVEL_7,            // 水晶梦境第七层
+        LEVEL_8,            // 水晶梦境第八层
     };
 
     struct GridInfo

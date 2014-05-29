@@ -20762,7 +20762,10 @@ void Player::sendQzongPYGiftInfo()
 void Player::get3366GiftAward(UInt8 type)
 {
     if (getPlatform() != 11)
+    {
+        sendMsgCode(0, 3505);
         return;
+    }
     if (GetVar(VAR_3366GIFT) >= 12)
         return;
     if (GetFreePackageSize() < 6)
@@ -20781,7 +20784,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(48, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
-        static UInt32 itemId[] = {9600, 2, 9371, 2, 9082, 2, 503, 2, 9418, 2, 1126, 2};
+        static UInt32 itemId[] = {9082, 2, 9371, 2, 503, 2, 9498, 2, 9457, 2, 9418, 2};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -20798,10 +20801,10 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
-        static UInt32 itemId[] = {9229, 30, 9141, 9338, 9082, 500};
-        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
+        static UInt32 itemId[] = { 30, 2, 9600, 1, 9310, 1, 9425, 1, 9427, 1, 9141, 2 };
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
-            GetPackage()->Add(itemId[i], 1, true);
+            GetPackage()->Add(itemId[i], itemId[i+1], true);
         }
     }
     send3366GiftInfo();
@@ -20809,9 +20812,10 @@ void Player::get3366GiftAward(UInt8 type)
 
 void Player::send3366GiftInfo()
 {
+    /*
     if(getPlatform() != 11)
         return;
-    /*
+    
     if(!isBD())
         return;
     */
@@ -21463,10 +21467,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 };
-//6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D};
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001};
+//6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页 317:太乙神雷
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317};
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -25076,6 +25080,11 @@ bool Player::getRPZCJBAward()
     if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return false;
 
+    if(World::getZCJBActivity() && atoi(getDomain()) != 11)
+    {
+        sendMsgCode(0, 3505);
+        return false;
+    }
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
     UInt8 left = ZCJB_LEFT(zcjb);
     UInt8 total = ZCJB_TOTAL(zcjb);
@@ -25154,6 +25163,8 @@ bool Player::getRPZCJBAward()
 void Player::checkZCJB(UInt32 recharge)
 {
     if(recharge && !World::inActive_opTime_20130531() && !World::getZCJBActivity())
+        return;
+    if(World::getZCJBActivity() && getPlatform() != 11)
         return;
     AddVar(VAR_ZCJB_RECHARGE_GOLD, recharge);
 
@@ -27816,6 +27827,8 @@ void Player::sendRealSpirit()
 
 void Player::getQZoneRechargeAward(UInt8 val)
 {
+    if(getPlatform() != 11)
+        return;
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27863,6 +27876,8 @@ void Player::getQZoneRechargeAward(UInt8 val)
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
+    if(getPlatform() != 11)
+        return;
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27900,6 +27915,8 @@ void Player::sendQZoneRechargeAwardInfo()
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
+    if(getPlatform() != 11)
+        return;
     if(World::getQZoneRechargeTime() && ( getPlatform() ==1 || getPlatform() ==2))
     {
         AddVar(VAR_QZONE_RECHARGE,r);

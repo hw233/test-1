@@ -6892,6 +6892,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 5:
                     case 6:
                     case 7:
+                    case 8:
                         jobHunter->OnRequestStart(val);
                         GameAction()->doStrong(player, SthSerachMo, 0, 0);
                         break;
