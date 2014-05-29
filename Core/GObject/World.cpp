@@ -4435,6 +4435,7 @@ void World::SendAnswerAward()
         if(rank >= 7)
             break;
     }
+    World::answerScoreSort.clear();
 }
 
 void World::Send11ClanRankAward()
