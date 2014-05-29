@@ -290,6 +290,7 @@ namespace GObject
         TIANGANG    = 19,   //天罡剑诀
         YEHUO       = 20,   //业火天雷
         JIUZI       = 21,   //九子神雷
+        TAIYI       = 22,   //太乙神雷
 
         DRAGONKING_MAX,
     };
