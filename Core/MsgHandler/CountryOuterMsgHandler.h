@@ -5232,6 +5232,9 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
             // 帮派副本的战斗操作
             clan->clanCopyBattleOperate(player, command, brd);
             break;
+        case 0x10:
+            clan->clanBigBossOperate(player,command ,brd);
+            break;
         default:
                 break;
     }

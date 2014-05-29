@@ -172,6 +172,7 @@ public:
 
     inline UInt32 getAppearTime() const { return _appearTime; }
     bool needAutoBattle(UInt16 spotId);
+    void calInitClanBigBoss(UInt32& lastHp,Int32& lastAtk,Int32& lastMAtk);
 
 private:
     UInt32 _prepareTime;

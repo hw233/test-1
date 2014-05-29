@@ -26,6 +26,7 @@ class ClanCopy;
 class KangJiTianMo;
 struct ClanCopyLog;
 class ClanBuildingOwner;
+class ClanBigBoss;
 
 #define BASE_MEMBER_COUNT 30
 struct AllocItem
@@ -280,6 +281,7 @@ private:
 	friend class ClanBattle;
 	friend class ClanCityBattle;
 	friend class ClanRobBattle;
+	friend class ClanBigBoss;
 
 	struct MemberLess
 	{
@@ -622,6 +624,7 @@ public:
 	ClanTech * getClanTech() { return _techs; }
 	ClanBattle * getClanBattle() { return _clanBattle; }
 	ClanDynamicMsg * getClanDynamicMsg() { return _clanDynamicMsg; }
+	ClanBigBoss * getClanBigBoss() { return _clanBigBoss; }
 
 public:
     // 帮派副本，帮派神像
@@ -663,6 +666,7 @@ public:
     void   clanCopyTabOperate(Player * player, UInt8 command, UInt8 val = 0);
     void   clanCopyMemberOperate(Player * player, UInt8 command, BinaryReader& brd);
     void   clanCopyBattleOperate(Player * player, UInt8 command, BinaryReader & brd);
+    void   clanBigBossOperate(Player * player, UInt8 command, BinaryReader & brd);
 
     void   addCopyLevel();
     void   addCopyWinLog(Player* player);
@@ -892,6 +896,7 @@ private:
 
 	ClanDynamicMsg * _clanDynamicMsg;
 	ClanBattle * _clanBattle;
+	ClanBigBoss * _clanBigBoss;
 
     UInt32 _funds;          // 帮派资金
 	UInt64 _watchman;       // 帮派修炼地护法

@@ -720,6 +720,8 @@ namespace GObject
         VAR_FRIEND_VALUE_DAY = 735 ,    //每日友情值
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
+        VAR_CLANBOSS_LUCKY_LIMIT = 754,//帮派BOSS幸运奖励个数
+        VAR_CLANBOSS_SECURE_LIMIT = 755,//帮派BOSS秘密奖励个数
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
 

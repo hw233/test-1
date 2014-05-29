@@ -151,6 +151,8 @@ namespace GObject
         GVAR_KANGJITIANMO_END = 93,     // 抗击天魔结束时间
         GVAR_MAX_TEAM_NUM = 94,         // 抗击天魔最大队伍数量
 
+        GVAR_CLAN_BIGBOSS_ENABLE = 95,         //帮派BOSS能否预约
+
         GVAR_MAX,
     };
 
@@ -278,6 +280,8 @@ namespace GObject
             GREGISTER_VAR(GVAR_TYSS_END, GCYCLE_NONE);
             
             GREGISTER_VAR(GVAR_REPAIRTYSSBUG, GCYCLE_NONE);
+            
+            GREGISTER_VAR(GVAR_CLAN_BIGBOSS_ENABLE, GCYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

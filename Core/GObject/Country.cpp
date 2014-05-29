@@ -21,6 +21,7 @@
 #include "HeroMemo.h"
 #include "ClanBoss.h"
 #include "ClanCityBattle.h"
+#include "ClanBigBoss.h"
 
 namespace GObject
 {
@@ -51,6 +52,15 @@ void Country::Hero_Island_Check(void *)
 {
     //heroIsland.process(TimeUtil::Now());
     newHeroIsland.process(TimeUtil::Now());
+}
+
+void Country::ClanBigBoss_Refesh(void *)
+{
+    UInt32 nowTime = TimeUtil::Now();
+    nowTime -= (nowTime % (5 * 60));//保证5分钟的整点
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+
+    ClanBigBossMgr::Instance().process(nowTime);
 }
 
 void Country::ClanRankBattleCheck(void *)
@@ -154,6 +164,7 @@ bool Country::Init()
 
         GObject::ClanBoss::instance().init();
 	    AddTimer(1000, ClanBoss_Refresh, static_cast<void*>(NULL));
+		AddTimer(5 * 60 * 1000, ClanBigBoss_Refesh, static_cast<void *>(NULL), (5 * 60 * 1000 - (now % (5 * 60))) * 1000);
 
 	}
 

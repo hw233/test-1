@@ -143,7 +143,8 @@ namespace GObject
 #define PLAYER_BUFF_ATHL9           0x59
 #define PLAYER_BUFF_QI_TIAN_CHU_MO  0x5B   //齐天除魔
 #define PLAYER_BUFF_EXPDOUBLE       0x5C    //回流服务器 经验双倍
-#define PLAYER_BUFF_CLANBOSS_CD     0x5D
+#define PLAYER_BUFF_CLANBOSS_CD     0x5D    
+#define PLAYER_BUFF_CBB_LAST        0x5E    //帮派BOSS最后一次攻击
 
 #define PLAYER_BUFF_CLANTREE1       0x60
 #define PLAYER_BUFF_CLANTREE2       0x61
