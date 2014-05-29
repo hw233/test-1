@@ -7097,7 +7097,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             if(newCnt > originCnt)
             {
                 _activeFgt = bo;
-                appendDefStatus(e_biLanTianYi, newCnt, bo);
+                appendDefStatus(e_jianZong, newCnt, bo);
                 if(_defList.size() > 0 || _scList.size() > 0)
                 {
                     appendToPacket(bo->getSide(), bo->getPos(), 0, 2, 0, false, false);
@@ -11458,7 +11458,7 @@ bool BattleSimulator::doDeBufAttack(BattleFighter* bf)
                 appendDefStatus(e_skill, skill->getId(), bf);
             bf->setTyslSSCnt(0);
             bf->setTyslSSFactor(0);
-            appendDefStatus(e_unBiLanTianYi, 0, bf);
+            appendDefStatus(e_unJianZong, 0, bf);
         }
 
     }while(false);

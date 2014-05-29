@@ -22,9 +22,9 @@ function equipmentset()
             print "INSERT INTO `equipment_set` VALUES";
         } {
             printf("(%d,\x27%s\x27,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6);
-            if (NR <= ENVIRON["lines"])
+            if (NR < ENVIRON["lines"])
                 printf(",");
-            else if (NR > ENVIRON["lines"])
+            else if (NR >= ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }

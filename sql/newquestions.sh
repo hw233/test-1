@@ -22,9 +22,9 @@ function newquestions()
             print "INSERT INTO `newquestions` VALUES";
         } {
             printf("(%d,%d,%d)",$1,$2,$3);
-            if (NR <= ENVIRON["lines"])
+            if (NR < ENVIRON["lines"])
                 printf(",");
-            else if (NR > ENVIRON["lines"])
+            else if (NR >= ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }
