@@ -167,6 +167,8 @@ void Erlking::BuyPassNum()
     m_owner->AddVar(VAR_ERLKING_BUY_PASS_NUM_DAY, 1);
     m_owner->AddVar(VAR_ERLKING_BUY_PASS_TOTAL_NUM, 1);
 
+    m_owner->udpLog("yaowangzailin", "F_140509_1", "", "", "", "", "act");
+
     Stream st(REP::ERLKING_INFO);
     st << static_cast<UInt8>(0x03);
     st << GetsurplusNum() << static_cast<UInt8>(m_owner->GetVar(VAR_ERLKING_BUY_PASS_NUM_DAY));

@@ -6997,6 +6997,9 @@ void OnErlkingReq(GameMsgHdr & hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
 
+    if(player->GetLev() < 85)
+        return;
+
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 opt = 0;
     br >> opt;
