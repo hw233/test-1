@@ -752,6 +752,10 @@ namespace GObject
         VAR_ANSWER_SKILL_USE_NUM = 795,          //一战成名技能使用数量 (每2位表示一种技能已使用数量)
         VAR_ANSWER_QUESTIONS_SUCCORFAIL = 796,   //一战成名回答问题成功失败（1-30位每一位代表是否回答成功该道题）
         VAR_ANSWER_QUESTIONS_OPTION = 797,       //一战成名题号和当前选项(一个5位表示题号，第二个题号表示选项)
+        VAR_AUTO_TEAMCOPY_INDEX = 798,           //组队副本本次需要自动的索引
+        VAR_AUTO_TEAMCOPY_CUR_INDEX = 799,       //自动组队副本当前所进行的副本索引
+        VAR_AUTO_TEAMCOPY_CNT = 800,             //自动组队副本总共需要战斗怪物的数量
+        VAR_AUTO_TEAMCOPY_CUR_CNT = 801,         //自动组队副本当前战斗到第几个怪物
         VAR_MAX,
     };
 
@@ -1395,6 +1399,10 @@ namespace GObject
             REGISTER_VAR(VAR_ANSWER_SKILL_USE_NUM, CYCLE_DAY);
             REGISTER_VAR(VAR_ANSWER_QUESTIONS_SUCCORFAIL, CYCLE_DAY);
             REGISTER_VAR(VAR_ANSWER_QUESTIONS_OPTION, CYCLE_DAY);
+            REGISTER_VAR(VAR_AUTO_TEAMCOPY_INDEX, CYCLE_NONE);
+            REGISTER_VAR(VAR_AUTO_TEAMCOPY_CUR_INDEX, CYCLE_NONE);
+            REGISTER_VAR(VAR_AUTO_TEAMCOPY_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_AUTO_TEAMCOPY_CUR_CNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);

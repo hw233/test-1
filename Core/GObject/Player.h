@@ -1719,12 +1719,12 @@ namespace GObject
         inline void setCopyFailed() { m_autoCopyFailed = true; }
 
 
-        inline UInt8 getAutoTeamCopyCurIndex() { return m_autoTeamCopyCurIndex; }
+        /*inline UInt8 getAutoTeamCopyCurIndex() { return m_autoTeamCopyCurIndex; }
         inline void setAutoTeamCopyCurIndex(UInt8 index) { m_autoTeamCopyCurIndex = index; }
         inline UInt32 getAutoTeamCopyCnt() { return m_autoTeamCopyCnt; }
         inline void setAutoTeamCopyCnt(UInt32 cnt) { m_autoTeamCopyCnt = cnt; }
         inline UInt32 getAutoTeamCopyCurCnt() { return m_autoTeamCopyCurCnt; }
-        inline void setAutoTeamCopyCurCnt(UInt32 curCnt) { m_autoTeamCopyCurCnt = curCnt; }
+        inline void setAutoTeamCopyCurCnt(UInt32 curCnt) { m_autoTeamCopyCurCnt = curCnt; }*/
 		
         bool autoBattle(UInt32, UInt8);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
@@ -2466,9 +2466,9 @@ namespace GObject
 
         UInt32 _praplace;
         bool m_autoCopyFailed;
-        UInt8 m_autoTeamCopyCurIndex;
+        /*UInt8 m_autoTeamCopyCurIndex;
         UInt32 m_autoTeamCopyCnt;
-        UInt32 m_autoTeamCopyCurCnt;
+        UInt32 m_autoTeamCopyCurCnt;*/
 
         // ͨ????????֮??
         UInt8 _justice_roar;

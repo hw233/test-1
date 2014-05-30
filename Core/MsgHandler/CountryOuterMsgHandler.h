@@ -1145,6 +1145,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendSecondInfo();
     }
+    {
+        pl->sendAutoTeamCopy();
+    }
     if(!pl->GetVar(VAR_ONCE_ONDAY))
     {
         pl->sendNovLoginInfo();
@@ -5903,6 +5906,35 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             player->send(st);
         }
         break;
+    case 0x06:
+        {
+            UInt8 optType = 0;
+            UInt32 copyIndex = 0;
+            br >> optType;
+            br >> copyIndex;
+
+            if((optType == 0 || optType == 2) && player->GetPackage()->GetRestPackageSize() < 1)
+            {
+                player->sendMsgCode(1, 1014);
+                return;
+            }
+
+            switch (optType)
+            {
+                case 0:
+                    player->startAutoTeamCopy(copyIndex);
+                    break;
+                case 1:
+                    player->cancelAutoTeamCopy(copyIndex);
+                    break;
+                case 2:
+                    player->instantAutoTeamCopy(copyIndex);
+                    break;
+                default:
+                    break;
+            }
+        }
+        break;
     case 0x10:
         {
             teamCopyManager->reqTeamInfo(player);
@@ -5938,34 +5970,6 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             teamCopyManager->teamBattleStart(player, type);
         }
         break;
-    case 0x15:
-        {
-            UInt8 optType = 0;
-            UInt32 copyIndex = 0;
-            br >> optType;
-            br >> copyIndex;
-
-            if((optType == 0 || optType == 2) && player->GetPackage()->GetRestPackageSize() < 1)
-            {
-                player->sendMsgCode(1, 1014);
-                return;
-            }
-
-            switch (optType)
-            {
-                case 0:
-                    player->startAutoTeamCopy(copyIndex);
-                    break;
-                case 1:
-                    player->cancelAutoTeamCopy(copyIndex);
-                    break;
-                case 2:
-                    player->instantAutoTeamCopy(copyIndex);
-                    break;
-                default:
-                    break;
-            }
-        }
     case 0x0F:
         {
             TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();

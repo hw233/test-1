@@ -946,9 +946,9 @@ namespace GObject
         _totalAchievement = 0;
         _totalItemCnt = 0;
         _totalExp = 0;
-        m_autoTeamCopyCnt = 0;
+        /*m_autoTeamCopyCnt = 0;
         m_autoTeamCopyCurCnt = 0;
-        m_autoTeamCopyCurIndex = 0;
+        m_autoTeamCopyCurIndex = 0;*/
     }
 
 
