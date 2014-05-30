@@ -1163,6 +1163,18 @@ namespace GObject
 		}
     
         SetKJTMAwardMark(0);
+        UInt32 status = GetVar(VAR_KJTM_STATUS);
+        UInt8 mark = GET_BIT(status, 0);
+        if(0 == mark)
+        {
+            TeamMemberData* tmd = getTeamMemberData();
+            if(NULL != tmd)
+            {
+                if(3 == tmd->memCnt)
+                    SetKJTMAwardMark(1);
+            }
+        }
+
         KJTMUdpLog();
 
         if(GetVar(VAR_RP_VALUE) > 0 && TimeUtil::SharpDay(0, TimeUtil::Now()) != TimeUtil::SharpDay(0, _playerData.lastOnline))
@@ -32015,6 +32027,12 @@ void Player::GetKJTMAward(UInt8 opt)
     if(opt > 3)
         return;
 
+    if (GetPackage()->GetRestPackageSize() < 6)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+
     UInt32 status = GetVar(VAR_KJTM_AWARD_MARK);
     if(1 == GET_BIT_2(status, opt))
     {
@@ -32071,9 +32089,61 @@ void Player::GetKJTMAward(UInt8 opt)
                 break;
         }
         GetKJTMAwardMark();
+        if(0 == opt)
+            BroadcastPower();
     }
 }
 
+void Player::BroadcastPower()
+{
+    TeamMemberData* tmd = getTeamMemberData();
+    if(NULL == tmd)
+        return;
+
+    Stream st(REP::KANGJITIANMO_REP);
+    st << static_cast<UInt8>(0x1E);
+    st << static_cast<UInt8>(tmd->memCnt);
+
+    for(UInt8 i=0; i<tmd->memCnt; i++)
+    {
+        Player* member = tmd->members[i];
+        if(NULL == member)
+            continue;
+
+        st << static_cast<UInt8>(member->getVipLevel());
+        UInt32 power = member->GetVar(VAR_TOTAL_BATTLE_POINT);
+
+        float factor = 1.0f;
+        UInt16 value = 0;
+        UInt8 loginNum = member->GetVar(VAR_KJTM_LOGIN_NUM);
+        if(i==0)
+            value = 30;
+        else
+        {
+            value = 100;
+
+            if(member->getVipLevel() >= 1 && member->getVipLevel() <= 4)
+                value += 50;
+            else if(member->getVipLevel() >= 5)
+                value += 100;
+        }
+        factor = static_cast<float>(value+loginNum*10)/100.0f;
+        power = power * factor;
+
+        st << power;
+        st << static_cast<UInt8>(loginNum);
+    }
+    st << Stream::eos;
+
+    for(UInt8 i=0; i<tmd->memCnt; i++)
+    {
+        Player* member = tmd->members[i];
+        if(NULL == member)
+            continue;
+
+        member->send(st);
+    }
+}
 
 } // namespace GObject
 

@@ -460,22 +460,31 @@ void KangJiTianMo::TeamMemberInfo(Player* pl, Stream& st)
         st << member->GetLev();
         st << static_cast<UInt8>(member->getVipLevel());
         UInt32 power = member->GetVar(VAR_TOTAL_BATTLE_POINT);
-       
-        if(0 == i)
-            power = power * 0.3f;
+
+        float factor = 1.0f;
+        UInt16 value = 0;
+        UInt8 loginNum = member->GetVar(VAR_KJTM_LOGIN_NUM);
+        if(i==0)
+            value = 30;
         else
         {
+            value = 100;
+
             if(member->getVipLevel() >= 1 && member->getVipLevel() <= 4)
-                power += power * 0.5f;
+                value += 50;
             else if(member->getVipLevel() >= 5)
-                power += power;
+                value += 100;
         }
+        factor = static_cast<float>(value+loginNum*10)/100.0f;
+        power = power * factor;
         st << power;
-    
+
         UInt8 isOnline = 0;
         if(member->isOnline())
             isOnline = 1;
         st << isOnline;
+
+        st << static_cast<UInt8>(loginNum);
 
         countA++;
     }
@@ -832,7 +841,7 @@ void KangJiTianMo::StartBattle(Player* pl)
             bsim.switchPlayer(member, 0);
 
         float factor = 1.0f;
-        UInt32 loginNum = member->GetVar(VAR_KJTM_LOGIN_NUM);
+        UInt8 loginNum = member->GetVar(VAR_KJTM_LOGIN_NUM);
         if(memIdx==0)
             factor = static_cast<float>(30+loginNum*5)/100.0f;
         else
