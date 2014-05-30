@@ -2480,6 +2480,7 @@ void World::AnswerCheck(void *)
 
                 World::SendAnswerAward();
                 World::SendAllAnswerEnd();
+                answerManager->AnswerLogClear();
 
                 GObject::globalPlayers.enumerate(enum_answer_send, 5);
             }
@@ -4359,6 +4360,7 @@ void World::SendAllAnswerEnd()
         st << Stream::eos;
         pl->send(st);
     }
+    World::answerScoreSort.clear();
 }
 
 void World::SendAnswerAward()
@@ -4435,7 +4437,6 @@ void World::SendAnswerAward()
         if(rank >= 7)
             break;
     }
-    World::answerScoreSort.clear();
 }
 
 void World::Send11ClanRankAward()
