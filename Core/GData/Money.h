@@ -56,6 +56,7 @@ enum
     COPY_AUTO8,
     COPY_AUTO9,
     COPY_AUTO10,
+    COPY_AUTO11,
 // 通天塔
     DUNGEON_IM,
     DUNGEON_AUTO,

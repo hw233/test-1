@@ -23,10 +23,10 @@
 namespace GObject
 {
 #define PRIVILEGE_COUNT 1
-#define MAX_COPY_ID 10
+#define MAX_COPY_ID 11
 
 UInt8 PlayerCopy::_activeCount = 0;
-static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871};
+static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871, 4628};
 
 static UInt8 GetCopyIdBySpots(UInt16 currentSpot)
 {
@@ -193,7 +193,7 @@ bool copyCheckLevel(Player* pl, UInt8 id)
     if (!id)
         return false;
 
-    static UInt8 lvls[] = {30, 45, 60, 70, 80, 90, 100, 110, 120, 130};
+    static UInt8 lvls[] = {30, 45, 60, 70, 80, 90, 100, 110, 120, 130, 140};
     //static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512};
 
     if (id > sizeof(lvls)/sizeof(UInt8))

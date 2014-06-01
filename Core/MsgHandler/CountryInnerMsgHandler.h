@@ -1058,7 +1058,10 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
     }
 
     pkg->AddItem(pur->id, pur->num, true, false, FromDirectPurchase);
-    player->AddVar(VAR_DIRECTPURCNT, 1);
+    if(pur->id == 72 || pur->id == 79 || pur->id == 9425)
+        player->AddVar(VAR_DIRECTPURCNT, 1);
+    else
+        player->AddVar(VAR_DIRECTPURCNT2, 1);
     player->sendDirectPurInfo();
 
     char action[32] = {0,};
