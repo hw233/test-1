@@ -7022,7 +7022,7 @@ void OnErlkingReq(GameMsgHdr & hdr, const void * data)
     case 0x02:
         {
             UInt8 copyId = 0;
-            UInt8 num = 0;
+            UInt16 num = 0;
             br >> copyId >> num;
 
             player->GetErlking()->AutoBattle(copyId, num);

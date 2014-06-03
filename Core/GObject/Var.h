@@ -732,7 +732,7 @@ namespace GObject
         VAR_ERLKING_BUY_PASS_TOTAL_NUM = 786,    //妖王再临购买通关总次数
 
         VAR_KJTM_AWARD_MARK = 787, //抗击天魔奖励标志
-        VAR_KJTM_LOGIN_NUM = 789,  // 抗击天魔登录次数
+        VAR_KJTM_LOGIN_NUM = 788,  // 抗击天魔登录次数
         VAR_MAX,
     };
 

@@ -22,11 +22,11 @@ namespace GObject
         Erlking(Player* pl);
 
     private:
-        UInt8 GetsurplusNum();
+        UInt16 GetsurplusNum();
 
         UInt8 GetErlkingStatus(UInt8 copyId);
 
-        void SetsurplusNum(UInt8 num = 1);
+        void SetsurplusNum(UInt16 num = 1);
 
         void SetErlkingStatus(UInt8 copyId, UInt8 type=0);
 
@@ -39,7 +39,7 @@ namespace GObject
 
         void StartBattle(UInt8 copyId);
 
-        void AutoBattle(UInt8 copyId, UInt8 num);
+        void AutoBattle(UInt8 copyId, UInt16 num);
 
         Player* m_owner;
     };

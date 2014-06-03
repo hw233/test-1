@@ -114,12 +114,12 @@ void Erlking::SetErlkingStatus(UInt8 copyId, UInt8 type)
         m_owner->SetVar(VAR_ERLKING_STATUSC, status);
 }
 
-UInt8 Erlking::GetsurplusNum()
+UInt16 Erlking::GetsurplusNum()
 {
-    UInt8 buyTotalNum = m_owner->GetVar(VAR_ERLKING_BUY_PASS_TOTAL_NUM);
+    UInt16 buyTotalNum = m_owner->GetVar(VAR_ERLKING_BUY_PASS_TOTAL_NUM);
     UInt8 freeNum = m_owner->GetVar(VAR_ERLKING_USE_FREE_NUM_DAY);
 
-    UInt8 surplusNum = 0;
+    UInt16 surplusNum = 0;
     if(freeNum < 8)
         surplusNum = 8 - freeNum;
 
@@ -128,26 +128,35 @@ UInt8 Erlking::GetsurplusNum()
     return surplusNum;
 }
 
-void Erlking::SetsurplusNum(UInt8 num)
+void Erlking::SetsurplusNum(UInt16 num)
 {
-    UInt8 buyTotalNum = m_owner->GetVar(VAR_ERLKING_BUY_PASS_TOTAL_NUM);
+    UInt16 buyTotalNum = m_owner->GetVar(VAR_ERLKING_BUY_PASS_TOTAL_NUM);
     UInt8 freeNum = m_owner->GetVar(VAR_ERLKING_USE_FREE_NUM_DAY);
+    UInt8 temp = freeNum;
     
+    if(freeNum < 8)
+        freeNum = 8 - freeNum;
+    else
+        freeNum = 0;
+
     if(num <= freeNum)
-        m_owner->SetVar(VAR_ERLKING_USE_FREE_NUM_DAY, freeNum-num);
+        m_owner->SetVar(VAR_ERLKING_USE_FREE_NUM_DAY, (temp+num));
     else
     {
-        num = num - freeNum;
-        m_owner->SetVar(VAR_ERLKING_USE_FREE_NUM_DAY, 0);
-        m_owner->SetVar(VAR_ERLKING_BUY_PASS_TOTAL_NUM, buyTotalNum-num);        
+        if(freeNum > 0)
+        {
+            num = num - freeNum;
+            m_owner->SetVar(VAR_ERLKING_USE_FREE_NUM_DAY, 8);
+        }
+        m_owner->SetVar(VAR_ERLKING_BUY_PASS_TOTAL_NUM, (buyTotalNum-num));        
     }
 }
 
 void Erlking::BuyPassNum()
 {
     UInt8 buyNumDay = m_owner->GetVar(VAR_ERLKING_BUY_PASS_NUM_DAY);
-    //if(buyNumDay >= 5)
-      //  return;
+    if(buyNumDay >= 5)
+        return;
 
     UInt8 money = 0;
     if(buyNumDay < 2)
@@ -167,8 +176,6 @@ void Erlking::BuyPassNum()
     m_owner->AddVar(VAR_ERLKING_BUY_PASS_NUM_DAY, 1);
     m_owner->AddVar(VAR_ERLKING_BUY_PASS_TOTAL_NUM, 1);
 
-    m_owner->udpLog("yaowangzailin", "F_140509_1", "", "", "", "", "act");
-
     Stream st(REP::ERLKING_INFO);
     st << static_cast<UInt8>(0x03);
     st << GetsurplusNum() << static_cast<UInt8>(m_owner->GetVar(VAR_ERLKING_BUY_PASS_NUM_DAY));
@@ -180,6 +187,12 @@ void Erlking::StartBattle(UInt8 copyId)
 {
     if(0 == copyId || copyId > ERLKING_MAX_COPY_NUM)
         return;
+
+    /*if(m_owner->GetPackage()->GetRestPackageSize(2) < 2)
+    {
+        m_owner->sendMsgCode(0, 1011);
+        return;
+    }*/
 
     if(0 == GetsurplusNum())
         return;
@@ -227,6 +240,7 @@ void Erlking::StartBattle(UInt8 copyId)
 
     if(ng && 1==res)
     {
+        m_owner->pendExp(ng->getExp());
         if(ERLKING_MARKB == mark)
         {
             ng->getLoots(m_owner, m_owner->_lastLoot, 1, NULL);
@@ -265,11 +279,17 @@ void Erlking::StartBattle(UInt8 copyId)
     m_owner->send(stA);
 }
 
-void Erlking::AutoBattle(UInt8 copyId, UInt8 num)
+void Erlking::AutoBattle(UInt8 copyId, UInt16 num)
 {
-    UInt8 surplusNum = GetsurplusNum();
+    UInt16 surplusNum = GetsurplusNum();
     if(0 == num || num > surplusNum)
         return;
+
+    /*if(m_owner->GetPackage()->GetRestPackageSize(2) < 2*num)
+    {
+        m_owner->sendMsgCode(0, 1011);
+        return;
+    }*/
 
     UInt8 mark = GetErlkingStatus(copyId);
     if(mark != ERLKING_MARKC)
@@ -291,6 +311,7 @@ void Erlking::AutoBattle(UInt8 copyId, UInt8 num)
 
     for(UInt8 i=0; i<num; i++)
     {
+        m_owner->pendExp(ng->getExp());
         ng->getLoots(m_owner, m_owner->_lastLoot, 0, NULL);
     }
 
