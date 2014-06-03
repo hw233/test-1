@@ -25317,7 +25317,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
             GetPackage()->AddItem(16010, 1, true, false, FromNpc);
         }
-        else
+        else/* if(flag != e_sla_worldboss)*/
         {
             UInt32 status = GetVar(VAR_SURNAME_LEGEND_STATUS);
             if(!(status & flag))
@@ -25332,9 +25332,26 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             }
         }
     }
+    if(World::getDropAct())
+    {
+        if(flag == e_sla_none)
+        {
+            GetPackage()->Add(1527, 1, true, false, FromNpc);
+        }
+        else
+        {
+            UInt32 status = GetVar(VAR_DROP_ACT);
+            if(!(status & flag))
+            {
+                GetPackage()->Add(1527, 1, true, false, FromNpc);
+                status |= flag;
+                SetVar(VAR_DROP_ACT, status);
+            }
+        }
+    }
     if (WORLD().getQixi())
     {
-        if (flag == e_sla_hi || flag == e_sla_mr)
+        if (flag == e_sla_hi || flag == e_sla_mr/* || flag == e_sla_worldboss*/)
             return;
         if(flag == e_sla_none)
         {
@@ -25348,23 +25365,6 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 status |= flag;
                 SetVar(VAR_QIXI_DROP_STATUS, status);
                 GameAction()->onDropAwardAct(this, 0);
-            }
-        }
-    }
-    if(World::getDropAct())
-    {
-        if(flag == e_sla_none)
-        {
-            GetPackage()->AddItem(1527, 1, true, false, FromNpc);
-        }
-        else
-        {
-            UInt32 status = GetVar(VAR_DROP_ACT);
-            if(!(status & flag))
-            {
-                GetPackage()->AddItem(1527, 1, true, false, FromNpc);
-                status |= flag;
-                SetVar(VAR_DROP_ACT, status);
             }
         }
     }

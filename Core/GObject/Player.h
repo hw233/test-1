@@ -250,6 +250,7 @@ namespace GObject
         e_sla_clb = 0x02,
         e_sla_hi = 0x04,
         e_sla_mr = 0x08,
+        //e_sla_worldboss = 0x10,
     };
 
     enum PEXP_HOOK_INFEX

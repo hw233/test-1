@@ -88,7 +88,7 @@ qixitmpl:addScoreAwards(50, 1326, 7)
 qixitmpl:setPartnerTitle(4058)
 qixitmpl:setPartnerContent(4059)
 -- 拥有冒险搭档：技能符文熔炼诀(1325)x7
-qixitmpl:addPartnerAwards(1325, 7)
+qixitmpl:addPartnerAwards(9498, 7)
 
 qixitmpl:setLBTitle(4056)
 qixitmpl:setLBContent(4057)

@@ -9114,7 +9114,7 @@ function onRoamingQueqiao(player, pos)
         {{16016, 1, 10}, {16016, 1, 10}, {16016, 1, 10}},
         {{503, 1, 30}, {514, 1, 30}, {501, 1, 30}},
         {{509, 1, 40}, {134, 1, 40}, {1325, 1, 40}},
-        {{1663, 1, 50}, {1664, 1, 50}, {1665, 1, 50}, {1666, 1, 50}},
+        {{9896, 1, 50}, {9898, 1, 50}, {9897, 1, 50}, {9899, 1, 50}},
     }
 
     step = math.random(1, 3)
@@ -9336,12 +9336,12 @@ function DropActLoot(player,lootlvl)
             [3] = 1,
     };
     local package = player:GetPackage();
-    package:AddItem(1527, itemNum[lootlvl], true,0,10);
+    package:Add(1527, itemNum[lootlvl], true,0,10);
 end
 
 --蜀山传奇掉落活动
 function SurnameLegendLoot(player,lootlvl)
-    DropActLoot()
+    DropActLoot(player,lootlvl)
     if not getSurnameLegend() then
         return
     end
