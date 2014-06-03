@@ -9180,6 +9180,13 @@ void BattleSimulator::setStatusChange2_Evade(BattleFighter* bf, UInt8 side, UInt
     BattleFighter * bfgt = static_cast<BattleFighter *>(bo);
     bfgt->setEvadeAdd2(value);
     UInt32 value2 = static_cast<UInt32>(bfgt->getEvade(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getEvadeMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stEvade, value2, skillId, bfgt);
 }
 
@@ -9189,6 +9196,13 @@ void BattleSimulator::setStatusChange2_Critical(BattleFighter* bf, UInt8 side, U
     BattleFighter * bfgt = static_cast<BattleFighter *>(bo);
     bfgt->setCriticalAdd2(value);
     UInt32 value2 = static_cast<UInt32>(bfgt->getCritical(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getCriticalMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stCritical, value2, skillId, bfgt);
 }
 
@@ -9198,6 +9212,13 @@ void BattleSimulator::setStatusChange2_Pierce(BattleFighter* bf, UInt8 side, UIn
     BattleFighter * bfgt = static_cast<BattleFighter *>(bo);
     bfgt->setPierceAdd2(value);
     UInt32 value2 = static_cast<UInt32>(bfgt->getPierce(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getPierceMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stPierce, value2, skillId, bfgt);
 }
 
@@ -9207,6 +9228,13 @@ void BattleSimulator::setStatusChange2_Counter(BattleFighter* bf, UInt8 side, UI
     BattleFighter * bfgt = static_cast<BattleFighter *>(bo);
     bfgt->setCounterAdd2(value);
     UInt32 value2 = static_cast<UInt32>(bfgt->getCounter(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getCounterMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stCounter, value2, skillId, bfgt);
 }
 
@@ -9225,6 +9253,13 @@ void BattleSimulator::setStatusChange2_Tough(BattleFighter* bf, UInt8 side, UInt
     BattleFighter * bfgt = static_cast<BattleFighter *>(bo);
     bfgt->setToughAdd2(value);
     UInt32 value2 = static_cast<UInt32>(bfgt->getTough(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getToughMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stTough, value2, skillId, bfgt);
 }
 
@@ -9252,6 +9287,13 @@ void BattleSimulator::setStatusChange2_MagRes(BattleFighter* bf, UInt8 side, UIn
     BattleFighter * bfgt = static_cast<BattleFighter *>(bo);
     bfgt->setMagResAdd2(value);
     UInt32 value2 = static_cast<UInt32>(bfgt->getMagRes(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getMagResMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stMagRes, value2, skillId, bfgt);
 }
 
@@ -9271,6 +9313,13 @@ void BattleSimulator::setStatusChange2_CriDmg(BattleFighter* bf, UInt8 side, UIn
     BattleFighter * bfgt = static_cast<BattleFighter *>(bo);
     bfgt->setCriticalDmgAdd2(value);
     UInt32 value2 = static_cast<UInt32>(bfgt->getCriticalDmg() * 100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getCriticalDmgMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stCriticalDmg, value2, skillId, bfgt);
 }
 
@@ -9280,6 +9329,13 @@ void BattleSimulator::setStatusChange2_HitR(BattleFighter* bf, UInt8 side, UInt8
     BattleFighter * bfgt = static_cast<BattleFighter *>(bo);
     bfgt->setHitrateAdd2(value);
     UInt32 value2 = static_cast<UInt32>(bfgt->getHitrate(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getHiterateMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stHitRate, value2, skillId, bfgt);
 }
 
@@ -9387,6 +9443,13 @@ void BattleSimulator::setStatusChange_Evade(BattleFighter * bf, UInt8 side, UInt
     }
     bfgt->setEvadeAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getEvade(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getEvadeMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stEvade, value2, skillId, bfgt);
 }
 
@@ -9403,6 +9466,13 @@ void BattleSimulator::setStatusChange_Critical(BattleFighter * bf, UInt8 side, U
     }
     bfgt->setCriticalAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getCritical(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getCriticalMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stCritical, value2, skillId, bfgt);
 }
 
@@ -9435,6 +9505,13 @@ void BattleSimulator::setStatusChange_Pierce(BattleFighter * bf, UInt8 side, UIn
         bf->setPierceRoundAdd(0, 0);
     bfgt->setPierceAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getPierce(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getPierceMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stPierce, value2, skillId, bfgt);
 }
 
@@ -9451,6 +9528,13 @@ void BattleSimulator::setStatusChange_Counter(BattleFighter * bf, UInt8 side, UI
     }
     bfgt->setCounterAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getCounter(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getCounterMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stCounter, value2, skillId, bfgt);
 }
 
@@ -9508,6 +9592,13 @@ void BattleSimulator::setStatusChange_Tough(BattleFighter * bf, UInt8 side, UInt
     }
     bfgt->setToughAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getTough(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getToughMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stTough, value2, skillId, bfgt);
 }
 
@@ -9592,6 +9683,13 @@ void BattleSimulator::setStatusChange_MagRes(BattleFighter * bf, UInt8 side, UIn
     }
     bfgt->setMagResAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getMagRes(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getMagResMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stMagRes, value2, skillId, bfgt);
 }
 
@@ -9625,6 +9723,13 @@ void BattleSimulator::setStatusChange_CriDmg(BattleFighter * bf, UInt8 side, UIn
     }
     bfgt->setCriticalDmgAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getCriticalDmg() * 100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getCriticalDmgMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stCriticalDmg, value2, skillId, bfgt);
 }
 
@@ -9641,6 +9746,13 @@ void BattleSimulator::setStatusChange_HitR(BattleFighter * bf, UInt8 side, UInt8
     }
     bfgt->setHitrateAdd(value, last);
     UInt32 value2 = static_cast<UInt32>(bfgt->getHitrate(NULL)*100);
+    if(value2 >= static_cast<UInt32>(GObject::GObjectManager::getHiterateMax() * 100) && bf && !bf->isNpc())
+    {
+        if(value > 0.001f)
+            value2 += 1;
+        else if(value < -0.001f)
+            value2 -= 1;
+    }
     appendStatusChange(e_stHitRate, value2, skillId, bfgt);
 }
 
@@ -15302,94 +15414,94 @@ bool BattleSimulator::doEffectAfterCount(BattleFighter* bf, const GData::SkillBa
             continue;
 
         BattleFighter* bo = static_cast<BattleFighter *>(bo2);
-        if(effect->auraP > 0.001 || effect->aura > 0)
+        if((effect->auraP > 0.001f || effect->aura > 0) || (effect->auraP < -0.001f || effect->aura < 0))
         {
             float value = bo->_aura * effect->auraP + effect->aura;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Aura(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->atkP > 0.001f || effect->atk > 0)
+        else if((effect->atkP > 0.001f || effect->atk > 0) || (effect->atkP < -0.001f || effect->atk < 0))
         {
             float value = bo->_attack * effect->atkP + effect->atk;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Atk(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->defP > 0.001f || effect->def > 0)
+        else if((effect->defP > 0.001f || effect->def > 0) || (effect->defP < -0.001f || effect->def < 0))
         {
             float value = bo->_defend * effect->defP + effect->def;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Def(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->magatkP || effect->magatk > 0)
+        else if((effect->magatkP > 0.001f || effect->magatk > 0) || (effect->magatkP < -0.001f || effect->magatk < 0))
         {
             float value = bo->_magatk * effect->magatkP + effect->magatk;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_MagAtk(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->magdefP || effect->magdef > 0)
+        else if((effect->magdefP  > 0.001f || effect->magdef > 0) || (effect->magdefP  < -0.001f || effect->magdef < 0))
         {
             float value = bo->_magdef * effect->magdefP + effect->magdef;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_MagDef(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->tough > 0.001f)
+        else if(effect->tough > 0.001f || effect->tough < -0.001f)
         {
             float value = effect->tough;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Tough(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->actionP || effect->action > 0.001f)
+        else if((effect->actionP > 0.001f || effect->action > 0.001f) || (effect->actionP < -0.001f || effect->action < -0.001f))
         {
             float value = bo->_maxAction * effect->actionP + effect->action;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Action(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->hitrate > 0.001f)
+        else if(effect->hitrate > 0.001f || effect->hitrate < -0.001f)
         {
             float value = effect->hitrate;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_HitR(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->evade > 0.001f)
+        else if(effect->evade > 0.001f || effect->evade < -0.001f)
         {
             float value = effect->evade;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Evade(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->critical > 0.001f)
+        else if(effect->critical > 0.001f || effect->critical < -0.001f)
         {
             float value = effect->critical;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Critical(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->pierce > 0.001f)
+        else if(effect->pierce > 0.001f || effect->pierce < -0.001f)
         {
             float value = effect->pierce;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Pierce(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->counter > 0.001f)
+        else if(effect->counter > 0.001f || effect->counter < -0.001f)
         {
             float value = effect->counter;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_Counter(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->magres > 0.001f)
+        else if(effect->magres > 0.001f || effect->magres < -0.001f)
         {
             float value = effect->magres;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_MagRes(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->atkreduce > 0.001f)
+        else if(effect->atkreduce > 0.001f || effect->atkreduce < -0.001f)
         {
             float value = effect->atkreduce;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_AtkReduce(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
-        else if(effect->magatkreduce > 0.001f)
+        else if(effect->magatkreduce > 0.001f || effect->magatkreduce < -0.001f)
         {
             float value = effect->magatkreduce;
-            if(value > 0.001f)
+            if(value > 0.001f || value < -0.001f)
                 setStatusChange_MagAtkReduce(bf, bo->getSide(), bo->getPos(), skill, value, last, true);
         }
         else
