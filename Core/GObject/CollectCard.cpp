@@ -895,7 +895,15 @@ namespace GObject
             UInt8 card_index1 = cid % 10;
             if(card_index1 < 5)
                 return;
-            AddCard(cid);
+            CardInfo* citmp = AddCard(cid);
+            if(!citmp)
+                return;
+            Stream st(REP::COLLECTCARD);  
+            st << static_cast<UInt8>(2) ;//0x02套牌信息
+            ReturnSuitInfo(st,30,true);
+            st << citmp->id << citmp->cid << citmp->level << citmp->exp << citmp->pos;
+            st << Stream::eos; 
+            m_owner->send(st);
             return;
         }
         
