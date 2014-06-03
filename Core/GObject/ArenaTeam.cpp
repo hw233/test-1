@@ -2836,4 +2836,29 @@ void TeamArenaMgr::searchTeam(Player * player, std::string& name, UInt8 type)
 	player->send(st);
 }
 
+void TeamArenaMgr::commitArenaForceOnce()
+{
+    Mutex::ScopedLock lk(globalTeamArena.getMutex());
+    std::unordered_map<UInt64, TeamArenaData *>& pm = globalTeamArena.getMap();
+
+    TeamPreliminaryPlayerListIterator pit = _preliminaryPlayers_list.begin();
+    for(; pit != _preliminaryPlayers_list.end(); ++ pit)
+    {
+        TeamPreliminaryPlayer& pp = *pit;
+        std::unordered_map<UInt64, TeamArenaData *>::const_iterator it = pm.find(pp.id);
+        if(it == pm.end())
+            continue;
+
+        TeamArenaData * tad = it->second;
+        if(!tad) continue;
+        resetTeamState(tad);
+        commitLineup(tad->leader);
+        for(UInt8 i = 0; i < tad->count; ++ i)
+        {
+            if(tad->members[i])
+                commitLineup1(tad->members[i]);
+        }
+    }
+}
+
 }

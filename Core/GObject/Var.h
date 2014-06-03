@@ -584,6 +584,7 @@ namespace GObject
         VAR_SEVEN_SOUL_NUM = 603,  //玩家七魂仙魄数
         VAR_SEX_CHANGE = 604,  //使用变形卡的次数
         VAR_SKILL_GRADE_MONEY = 605,  //技能升阶货币
+        VAR_DROP_ACT = 606,  //掉落活动
 
         //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,    //天书奇缘登陆
@@ -726,6 +727,10 @@ namespace GObject
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
+        VAR_FIRE_SACRIFICE_TIMES = 772, //拜火祭天：0-7帮众添柴次数，8-15帮主诏令次数
+        VAR_FIRE_SACRIFICE_ADD_WOOD_TIME = 773, //拜火祭天添柴时间
+        VAR_FIRE_SACRIFICE_CALLING_TIME = 774, //拜火祭天召唤帮众时间
+        VAR_DUOBAO_ACTIVE_POINT = 775, //夺宝奇兵活跃值+1(一天一点) 
 
         //781 - 790 for lijr
         VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
@@ -1250,6 +1255,7 @@ namespace GObject
             REGISTER_VAR(VAR_SEVEN_SOUL_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_SEX_CHANGE, CYCLE_NONE);
             REGISTER_VAR(VAR_SKILL_GRADE_MONEY, CYCLE_NONE);
+            REGISTER_VAR(VAR_DROP_ACT, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);
@@ -1386,6 +1392,10 @@ namespace GObject
             REGISTER_VAR(VAR_DRINK_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_FRIEND_VALUE_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_TIMES, CYCLE_DAY);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_ADD_WOOD_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_CALLING_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_DUOBAO_ACTIVE_POINT, CYCLE_DAY);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);

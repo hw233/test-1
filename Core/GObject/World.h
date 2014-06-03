@@ -382,6 +382,10 @@ public:
     { _qixi = v; }
     inline static bool getQixi()
     { return _qixi; }
+    inline static void setDropAct(bool v)
+    { _dropact = v; }
+    inline static bool getDropAct()
+    { return _dropact; }
     inline static void setWansheng(bool v)
     { _wansheng= v; }
     inline static bool getWansheng()
@@ -626,8 +630,8 @@ public:
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 4, 19);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 4, 24);
+        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 5, 17);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 5, 22);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
@@ -637,7 +641,7 @@ public:
             return -1;
        return (TimeUtil::SharpDay(0, now) - _11timeBegin )/86400+1; 
     }
-    inline static UInt32 get11TimeNum(UInt32 time = 0)
+    inline static UInt32 get11TimeNum(UInt32 time = 0)   //已经不用
     {
         return -1;
         UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
@@ -661,6 +665,18 @@ public:
         else
             return false;
     } 
+
+    inline static bool getFireSacrificeTime()
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 _fireTimeBegin = TimeUtil::SharpDay(0, now) + 8 * 60 * 60;
+        UInt32 _fireTimeEnd = TimeUtil::SharpDay(0, now) + 21 * 60 * 60 + 60;
+        if(now >= _fireTimeBegin && now <= _fireTimeEnd)
+            return true;
+        else
+            return false;
+    }
+
     inline static void setNeedRechargeRank(bool v)
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()
@@ -1248,6 +1264,7 @@ public:
     static bool _june1;
     static bool _july;
     static bool _qixi;
+    static bool _dropact;
     static bool _wansheng;
     static bool _qingren;
     static bool _specialbook;
@@ -1368,6 +1385,7 @@ private:
     static void World_Store_Check(void *);
 	static void World_Multi_Check( World * );
 	static void World_Midnight_Check( World * );
+	static void World_Fire_Sacrifice_Check( World * );
     static void World_CreateNewDB_Check();
 	static void World_Online_Log( void * );
 	static void World_Athletics_Check( void * );

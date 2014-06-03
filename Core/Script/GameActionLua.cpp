@@ -112,6 +112,7 @@ namespace Script
 		lua_tinker::def(_L, "getJune1", GObject::World::getJune1);
 		lua_tinker::def(_L, "getJuly", GObject::World::getJuly);
         lua_tinker::def(_L, "getQixi", GObject::World::getQixi);
+        lua_tinker::def(_L, "getDropAct", GObject::World::getDropAct);
         lua_tinker::def(_L, "getWansheng", GObject::World::getWansheng);
         lua_tinker::def(_L, "getQingren", GObject::World::getQingren);
         lua_tinker::def(_L, "getGuoqing", GObject::World::getGuoqing);
@@ -341,11 +342,15 @@ namespace Script
         CLASS_DEF(Player, EatLingGuo);
         CLASS_DEF(Player, sendUseRideItemInfo);
         CLASS_DEF(Player, getXuanTianNingLuLua);
+        CLASS_DEF(Player, GetCollectCard);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);
         CLASS_DEF(MoFang, addJGSExp);
         CLASS_DEF(MoFang, addMoney);
+        
+        CLASS_ADD(CollectCard);
+        CLASS_DEF(CollectCard, Add61Card);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

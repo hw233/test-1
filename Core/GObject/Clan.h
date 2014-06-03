@@ -612,6 +612,13 @@ public:
     std::map<UInt8, UInt32> & GetClanTitle();
     void addClanTitle(UInt8 titleId, UInt32 endTime/*, Player * pl*/);
     void writeClanTitleAll();
+
+    //拜火祭天
+    void clanFireSacrificeOp(Player * pl, UInt8 type);
+    void sendFireSacrificeInfo(Player * pl, UInt8 type);
+    bool addWoodToFire(Player * pl);
+    bool callingaddWood(Player * pl);
+    void getFireGodBag();
     
     UInt32 getGradeInAirBook(){return  _gradeInAirbook;}
     void SendClanMemberGrade(Player* player);
@@ -795,6 +802,13 @@ public:
 
     void SetDuoBaoAward(UInt32 itemId) { _duoBaoAward = itemId; }
     UInt32 GetDuoBaoAward() {return _duoBaoAward;}
+
+    void SetClanFireValue(UInt32 clanFireValue, bool toDB = false)
+    {
+        _clanFireValue = clanFireValue;
+        if(toDB)
+            DB5().PushUpdateData("UPDATE `clan` SET `clanFireValue` = %u WHERE `id` = %u", _clanFireValue, _id);
+    }
     
     void SetTYSSSum(UInt32 num,bool toDB=false) 
     {
@@ -908,6 +922,7 @@ private:
     UInt32 _duoBaoAward;
     UInt32 _tyssSum;
     std::map<UInt8, UInt32> _clanTitle;
+    UInt32 _clanFireValue;
 
     ClanSpiritTree m_spiritTree;
 

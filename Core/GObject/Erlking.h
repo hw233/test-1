@@ -5,7 +5,7 @@
 
 namespace GObject
 {
-    #define ERLKING_MAX_COPY_NUM   40
+    #define ERLKING_MAX_COPY_NUM   20
 
     enum
     {

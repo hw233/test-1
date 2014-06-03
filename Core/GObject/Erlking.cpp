@@ -120,8 +120,8 @@ UInt16 Erlking::GetsurplusNum()
     UInt8 freeNum = m_owner->GetVar(VAR_ERLKING_USE_FREE_NUM_DAY);
 
     UInt16 surplusNum = 0;
-    if(freeNum < 8)
-        surplusNum = 8 - freeNum;
+    if(freeNum < 5)
+        surplusNum = 5 - freeNum;
 
     surplusNum += buyTotalNum;
 
@@ -134,8 +134,8 @@ void Erlking::SetsurplusNum(UInt16 num)
     UInt8 freeNum = m_owner->GetVar(VAR_ERLKING_USE_FREE_NUM_DAY);
     UInt8 temp = freeNum;
     
-    if(freeNum < 8)
-        freeNum = 8 - freeNum;
+    if(freeNum < 5)
+        freeNum = 5 - freeNum;
     else
         freeNum = 0;
 
@@ -146,7 +146,7 @@ void Erlking::SetsurplusNum(UInt16 num)
         if(freeNum > 0)
         {
             num = num - freeNum;
-            m_owner->SetVar(VAR_ERLKING_USE_FREE_NUM_DAY, 8);
+            m_owner->SetVar(VAR_ERLKING_USE_FREE_NUM_DAY, 5);
         }
         m_owner->SetVar(VAR_ERLKING_BUY_PASS_TOTAL_NUM, (buyTotalNum-num));        
     }
@@ -155,16 +155,17 @@ void Erlking::SetsurplusNum(UInt16 num)
 void Erlking::BuyPassNum()
 {
     UInt8 buyNumDay = m_owner->GetVar(VAR_ERLKING_BUY_PASS_NUM_DAY);
-    if(buyNumDay >= 5)
-        return;
 
-    UInt8 money = 0;
-    if(buyNumDay < 2)
+    UInt32 money = 0;
+    if(buyNumDay<5)
         money = 20;
-    else if(buyNumDay < 4)
+    else if(buyNumDay>=5 && buyNumDay<10)
         money = 40;
+    else if(buyNumDay>=10 && buyNumDay<40)
+        money = 40 + (buyNumDay-9) * 20;
     else
-        money = 50;
+        money = 640;
+
     if(m_owner->getGold() < money)
     {
         m_owner->sendMsgCode(0, 1104);

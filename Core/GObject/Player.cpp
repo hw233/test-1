@@ -275,6 +275,9 @@ namespace GObject
         else if(m_Player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
             factorAdd = 0.2f;
 
+        if(m_Player->getBuffData(PLAYER_BUFF_TYSS) > 0)
+            factorAdd += 0.5f;
+
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp * factor + expBase * factorAdd), 0, extraExp, _writedb);
 		else
@@ -3590,12 +3593,10 @@ namespace GObject
                 << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
 				<< fgt->getAmuletId() << fgt->getRingId();
             fgt->getAllTrumps(st);
-            /*
             //灵侍id
             UInt32 lss[3] = {0};
             fgt->getAllLingshiId(lss);
             st << lss[0] << lss[1] << lss[2];
-            */
 
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
@@ -8837,9 +8838,9 @@ namespace GObject
                 addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
                 addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
                 break;
-            case 18: //前3 后3 右3 左1
+            case 18: //前3 后1 右3 左1
                 addZhenyuanAttr(ae, _playerData.zhenyuans[2], fgt);   //前3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[6], fgt);   //后1
 
                 addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
                 addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
@@ -11409,7 +11410,10 @@ namespace GObject
         else if(getBuffData(PLAYER_BUFF_CLAN2) > 0)
             factor += 0.3f;
         else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
-            factor  += 0.2f;
+            factor += 0.2f;
+        
+        if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+            factor += 0.5f;
 
         return factor;
     }
@@ -11597,6 +11601,9 @@ namespace GObject
                         pexpAdd = pexpBase * 0.3f;
                     else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
                         pexpAdd = pexpBase * 0.2f;
+                    
+                    if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+                        pexpAdd += pexpBase * 0.5f;
 
                     fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }
@@ -11667,6 +11674,9 @@ namespace GObject
                         pexpAdd = pexpBase * 0.3f;
                     else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
                         pexpAdd = pexpBase * 0.2f;
+
+                    if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+                        pexpAdd += pexpBase * 0.5f;
 
                     fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }
@@ -17742,6 +17752,7 @@ namespace GObject
                 fgt->getAllPSkillAndLevel4Arena(st);
                 fgt->getAllSSAndLevel(st);
                 fgt->getAllSGAndValue(st);
+                fgt->getAllLingshiSkillAndLevel2Arena(st);
                 fgt->getAllLbSkills(st);
 
                 fgt->getAttrExtraEquip(st);
@@ -17768,6 +17779,7 @@ namespace GObject
             _onBattlePet->getAllPSkillAndLevel4Arena(st);
             _onBattlePet->getAllSSAndLevel(st);
             _onBattlePet->getAllSGAndValue(st);
+            _onBattlePet->getAllLingshiSkillAndLevel2Arena(st);
             _onBattlePet->getAllLbSkills(st);
 
             _onBattlePet->getAttrExtraEquip(st);
@@ -25320,6 +25332,23 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             }
         }
     }
+    if(World::getDropAct())
+    {
+        if(flag == e_sla_none)
+        {
+            GetPackage()->Add(1527, 1, true, false, FromNpc);
+        }
+        else
+        {
+            UInt32 status = GetVar(VAR_DROP_ACT);
+            if(!(status & flag))
+            {
+                GetPackage()->Add(1527, 1, true, false, FromNpc);
+                status |= flag;
+                SetVar(VAR_DROP_ACT, status);
+            }
+        }
+    }
     if (WORLD().getQixi())
     {
         if (flag == e_sla_hi || flag == e_sla_mr)
@@ -26220,7 +26249,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,24000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
@@ -26267,7 +26296,7 @@ void Player::Send11GradeAward(UInt8 type)
 {
     if(type > 11)
         return ;
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2250,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
         {{9418,1}, {503,1}},
         {{501,2},{9497,2}},
@@ -26278,10 +26307,10 @@ void Player::Send11GradeAward(UInt8 type)
         {{16001,3},{9498,2},{509,2},{134,2},{9438,2}},
         {{1729,1},{8555,4}},
         {{9600,25},{9418,25},{9424,40}},
-        {{9498,50},{9022,10}},
-        {{9021,10},{9068,15},{9075,15}},
+        {{16001,50},{9075,15}},
+        {{9022,30},{1726,1}},
     };
-    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,2,3};
+    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,2,2};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -32306,6 +32335,18 @@ void Player::BroadcastPower()
             continue;
 
         member->send(st);
+    }
+}
+
+void Player::getFireContributionBag(Player * pl)
+{
+    SYSMSG(title, 955);
+    SYSMSGV(content, 956, getName().c_str());
+    Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem = {9476, 1};
+        mailPackageManager.push(mail->id, &mitem, 1, true);
     }
 }
 
