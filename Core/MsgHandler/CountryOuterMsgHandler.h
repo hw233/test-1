@@ -9543,7 +9543,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
                     else 
                     {
                         player->getCuttingInfo().cutter->setCutter(1,NULL);
-                        pl->getCuttingInfo().cutter->sendMsgCode(2,4039);
+                        player->getCuttingInfo().cutter->sendMsgCode(2,4039);
                     }
                     player->getCuttingInfo().cutter->sendCutterInfo();
                 }
