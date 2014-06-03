@@ -1240,7 +1240,7 @@ struct DBFairySpar
 struct DBCollectCnt
 {
     UInt64 playerId;
-    UInt8 level;
+    UInt16 level;
     UInt16 bluecnt;
     UInt16 purlecnt;
     UInt16 orangecnt;
@@ -1535,6 +1535,12 @@ struct DBInactiveMember
     UInt64 playerId;
 };
 
+struct DBQuestions
+{
+    UInt8 answerId;
+    UInt16 questionsId;
+};
+
 struct DBPlayerNamed 
 {
     UInt16 serverNo;
@@ -1633,7 +1639,7 @@ struct DBCard
 struct DBCardSuit
 {
     UInt64 playerId;
-    UInt8 id;
+    UInt16 id;
     UInt8 suit_mark;
     UInt8 active;
     UInt32 spe_mark;
@@ -3199,7 +3205,7 @@ SPECIALBEGIN(GObject::DBCollectCnt)
 SPECIALDEF(5)
 (
     UInt64, playerId,
-    UInt8, level,
+    UInt16, level,
     UInt16, bluecnt,
     UInt16, purlecnt,
     UInt16, orangecnt
@@ -3606,6 +3612,14 @@ SPECIALDEF(3)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBQuestions)
+SPECIALDEF(2)
+    (
+    UInt8, answerId,
+    UInt16, questionsId
+    )
+SPECIALEND()
+
 SPECIALBEGIN(GObject::DBMarriage)
 SPECIALDEF(5)
     (
@@ -3714,7 +3728,7 @@ SPECIALBEGIN (GObject::DBCardSuit)
 SPECIALDEF(6)
     (
     UInt64, playerId,
-    UInt8, id,
+    UInt16, id,
     UInt8, suit_mark,
     UInt8, active,
     UInt32, spe_mark,

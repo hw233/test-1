@@ -945,7 +945,7 @@ namespace GObject
             UInt8 pos = level * 10;
             pl->setRaceBattlePos(pos);
             pl->setContinueLoseCnt(0);
-            if(level == 6 && starCnt > rb->next * 2)
+            if(level == 6 && starTotal > rb->next * 2)
                 pl->setStarTotal(rb->next * 2);
             enterPos(pl, 0, true);
         }

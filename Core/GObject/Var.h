@@ -275,7 +275,7 @@ namespace GObject
 
         VAR_TOTALRECHARGEACT = 217, // 活动期间充值总额
         VAR_DIRECTPUROPEN = 218, // 幸运星活动直购是否开启
-        VAR_DIRECTPURCNT = 219, // 幸运星活动直购次数
+        VAR_DIRECTPURCNT = 219, // 幸运星活动直购次数(低价专区)
         VAR_LEFTTIMES = 220, // 剩余挂机时间
 
         /*
@@ -584,6 +584,8 @@ namespace GObject
         VAR_SEVEN_SOUL_NUM = 603,  //玩家七魂仙魄数
         VAR_SEX_CHANGE = 604,  //使用变形卡的次数
         VAR_SKILL_GRADE_MONEY = 605,  //技能升阶货币
+        VAR_DROP_ACT = 606,  //掉落活动
+        VAR_DIRECTPURCNT2 = 607, // 幸运星活动直购次数(超值专区)
 
         //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,    //天书奇缘登陆
@@ -723,12 +725,12 @@ namespace GObject
         VAR_LINGSHI_PEIYANG_CNT = 736, //灵侍仙石培养次数
         VAR_LINGSHI_PEIYANG_LUCKY = 737, //灵侍培养出现暴击记录
         VAR_TREE_VALUE = 738 ,    //木片数
-        VAR_TREE_VALUE_DAY = 738 ,    //今日被邀请获得的木片数
         VAR_TREE_TIME = 739,      //砍树时间
         VAR_TREE_TOOL = 740,      //伐木工具
         VAR_CUTTREE_BUY = 741 ,   //玩家购买的剩余伐木次数 
         VAR_CUTTREE_COUNT = 742 ,    //伐木次数 主动发起(8位) ,玩家总购买的次数 
         VAR_CUBE_COUNT = 743,      //当前积木消耗数  (每一层构造好的时候清零)
+        VAR_TREE_VALUE_DAY = 744 ,    //今日被邀请获得的木片数
 
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
@@ -739,7 +741,7 @@ namespace GObject
         VAR_FIRE_SACRIFICE_CALLING_TIME = 774, //拜火祭天召唤帮众时间
         VAR_DUOBAO_ACTIVE_POINT = 775, //夺宝奇兵活跃值+1(一天一点) 
 
-        //781 - 790 for lijr
+        //781 - 800 for lijr
         VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
         VAR_ERLKING_STATUSB = 782,               //妖王再临状态(17-32)
         VAR_ERLKING_STATUSC = 783,               //妖王再临状态(33-48)
@@ -747,8 +749,17 @@ namespace GObject
         VAR_ERLKING_USE_FREE_NUM_DAY = 785,      //妖王再临使用免费通关次数
         VAR_ERLKING_BUY_PASS_TOTAL_NUM = 786,    //妖王再临购买通关总次数
 
-        VAR_KJTM_AWARD_MARK = 787, //抗击天魔奖励标志
-        VAR_KJTM_LOGIN_NUM = 788,  // 抗击天魔登录次数
+        VAR_KJTM_AWARD_MARK = 787,               //抗击天魔奖励标志
+        VAR_KJTM_LOGIN_NUM = 788,                //抗击天魔登录次数
+        VAR_ANSWER_QUESTIONS_STATUS = 789,       //一战成名回答问题状态（0位代表当前这道题回答是否正确, 1-30位每一位代表是否参与该道题）
+        VAR_ANSWER_LITERARY_VALUE = 790,         //一战成名文采值
+        VAR_ANSWER_SUCCESSION_NUM = 791,         //一战成名连击数量
+        VAR_ANSWER_ATTACK_NUM = 792,             //一战成名天眼通数量
+        VAR_ANSWER_SKILL_STATUS = 793,           //一战成名技能状态 (每5位表示一种技能状态)
+        VAR_ANSWER_SKILL_MARK = 794,             //一战成名本题所用技能标志 (每1位表示一种技能在本题中是否使用)
+        VAR_ANSWER_SKILL_USE_NUM = 795,          //一战成名技能使用数量 (每2位表示一种技能已使用数量)
+        VAR_ANSWER_QUESTIONS_SUCCORFAIL = 796,   //一战成名回答问题成功失败（1-30位每一位代表是否回答成功该道题）
+        VAR_ANSWER_QUESTIONS_OPTION = 797,       //一战成名题号和当前选项(一个5位表示题号，第二个题号表示选项)
         VAR_MAX,
     };
 
@@ -1262,6 +1273,8 @@ namespace GObject
             REGISTER_VAR(VAR_SEVEN_SOUL_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_SEX_CHANGE, CYCLE_NONE);
             REGISTER_VAR(VAR_SKILL_GRADE_MONEY, CYCLE_NONE);
+            REGISTER_VAR(VAR_DROP_ACT, CYCLE_NONE);
+            REGISTER_VAR(VAR_DIRECTPURCNT2, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);
@@ -1382,6 +1395,14 @@ namespace GObject
             REGISTER_VAR(VAR_KJTM_LOGIN_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_KJTM_LOGIN_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_KJTM_AWARD_MARK, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_QUESTIONS_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SUCCESSION_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_ATTACK_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SKILL_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SKILL_MARK, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SKILL_USE_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_QUESTIONS_SUCCORFAIL, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_QUESTIONS_OPTION, CYCLE_DAY);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);

@@ -877,6 +877,13 @@ struct DBErlkingConfig
     UInt32 npcgroup;
 };
 
+struct DBNewQuestionsConfig
+{
+    UInt16 id;
+    UInt8 lvl;
+    UInt8 answer;
+};
+
 }
 
 namespace DB {
@@ -1843,6 +1850,15 @@ SPECIALDEF(4)
     UInt8, conditionA,
     UInt8, conditionB,
     UInt32, npcgroup
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBNewQuestionsConfig)
+SPECIALDEF(3)
+	(
+    UInt16, id,
+    UInt8, lvl,
+    UInt8, answer
     )
 SPECIALEND()
 

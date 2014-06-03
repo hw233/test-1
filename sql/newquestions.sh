@@ -1,27 +1,27 @@
-
 #!/bin/bash
 
-F=equipmentset.txt
+F=newquestions.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function equipmentset()
+function newquestions()
 {
     f=$1
-    d=equipmentset
-    sed -i /itemId/d $f
-    sed -i /REF/d $f
+    d=newquestions
+    sed -i /ID/d $f
+    sed -i /id/d $f
     sed -i /^$/d $f
+    sed -i /REF/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `equipment_set` VALUES";
+            print "INSERT INTO `newquestions` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6);
+            printf("(%d,%d,%d)",$1,$2,$3);
             if (NR <= ENVIRON["lines"])
                 printf(",");
             else if (NR > ENVIRON["lines"])
@@ -34,7 +34,7 @@ function equipmentset()
     sed -i s/\\r//g $d
     if [ $? -eq 0 ]
     then
-        iconv2utf8 $d
+        #iconv2utf8 $d
         echo "OK"
     else
         echo "ERROR"
@@ -50,7 +50,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    equipmentset $F
+    newquestions $F
 else
     echo "File $F is not exists"
 fi

@@ -1,6 +1,3 @@
-DROP TABLE IF EXISTS `lingshi`;
-DROP TABLE IF EXISTS `lingshi_upgrade`;
-
 DROP TABLE IF EXISTS `lingshi_level`;
 CREATE TABLE `lingshi_level` (
     `level` tinyint(3) unsigned NOT NULL DEFAULT 0,

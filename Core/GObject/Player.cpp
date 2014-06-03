@@ -4473,9 +4473,9 @@ namespace GObject
 		return true;
 	}
 
-	UInt16 Player::GetFreePackageSize()
+	UInt16 Player::GetFreePackageSize(UInt8 type)
 	{
-		return m_Package->GetRestPackageSize();
+		return m_Package->GetRestPackageSize(type);
 	}
 
 	bool Player::addFriend( Player * pl )
@@ -8402,6 +8402,12 @@ namespace GObject
                 it ++ ;
             }
         }
+        
+        if(nLev >= 30)
+        {
+            GameMsgHdr hdr(0x193, WORKER_THREAD_WORLD, this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
 
         if (nLev == 70)
         {
@@ -8839,9 +8845,9 @@ namespace GObject
                 addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
                 addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
                 break;
-            case 18: //前3 后3 右3 左1
+            case 18: //前3 后1 右3 左1
                 addZhenyuanAttr(ae, _playerData.zhenyuans[2], fgt);   //前3
-                addZhenyuanAttr(ae, _playerData.zhenyuans[8], fgt);   //后3
+                addZhenyuanAttr(ae, _playerData.zhenyuans[6], fgt);   //后1
 
                 addZhenyuanAttr(ae, _playerData.zhenyuans[5], fgt);   //右3
                 addZhenyuanAttr(ae, _playerData.zhenyuans[9], fgt);   //左1
@@ -15715,7 +15721,7 @@ namespace GObject
         }
         if(m_dpData->itemNum != 0)
         {
-            if(GetFreePackageSize() > m_dpData->itemNum/99)
+            if(GetFreePackageSize(1) > m_dpData->itemNum/99)
             {
                 struct AddItemInfo
                 {
@@ -20629,7 +20635,7 @@ void Player::sendCopyFrontAllAward()
 
 UInt8 Player::getCopyId()
 {
-    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871};
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871, 4628};
 
     UInt16 currentSpot = PLAYER_DATA(this, location);
     for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
@@ -20864,7 +20870,7 @@ void Player::sendFeastLoginAct()
         //MailPackage::MailItem mitem = {1763,1};
         //MailPackage::MailItem mitem = {1760,1};
         //MailPackage::MailItem mitem = {9422,1};
-        MailPackage::MailItem mitem = {1770,1};
+        MailPackage::MailItem mitem = {1766,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     //SetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY, 1);
@@ -21105,29 +21111,29 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
             UInt8 validMaxDay = 0;
             UInt8 serverDay = 0;
             UInt32 now = TimeUtil::Now();
-            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 5, 1))
+            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 6, 2))
             {
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 5, 1))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 6, 2))
             {
                 validMaxDay = 1;
                 serverDay = 1;
             }
-            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014,5, 2))
+            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014,6, 3))
             {
                 validMaxDay = 1;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 5, 2))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 6, 3))
             {
                 validMaxDay = 2;
                 serverDay = 2;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 5, 3))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 6, 4))
             {
                 validMaxDay = 3;
                 serverDay = 3;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 5, 4))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 6, 5))
             {
                 validMaxDay = 4;
                 serverDay = 4;
@@ -22902,8 +22908,11 @@ void Player::getQQGameOnlineAward()
 {
     if(!World::getQQGameOnlineAwardAct())
         return;
-    if(atoi(getDomain()) != 10)
+    if(atoi(getDomain()) != 10 && atoi(getDomain()) != 11)
+    {
+        sendMsgCode(0, 3504);
         return;
+    }
     if(GetVar(VAR_ONLINE_AWARD) > 0)
         return;
     if(getQQGameOnlineTotalTime() < QQ_GAME_NEED_TIME)
@@ -22914,10 +22923,10 @@ void Player::getQQGameOnlineAward()
         return;
     }
     SetVar(VAR_ONLINE_AWARD, 1);
-    GetPackage()->Add(134, 1, true, false);
-    GetPackage()->Add(1325, 1, true, false);
-    GetPackage()->Add(511, 1, true, false);
-    GetPackage()->Add(500, 1, true, false);
+    GetPackage()->Add(9371, 2, true, false);
+    GetPackage()->Add(9600, 2, true, false);
+    GetPackage()->Add(9438, 2, true, false);
+    GetPackage()->Add(9338, 2, true, false);
     sendQQGameOnlineAward();
 }
 
@@ -22925,8 +22934,11 @@ void Player::sendQQGameOnlineAward()
 {
     if(!World::getQQGameOnlineAwardAct())
         return;
-    if(atoi(getDomain())!= 10)
+    if(atoi(getDomain())!= 10 && atoi(getDomain()) != 11)
+    {
+        sendMsgCode(0, 3504);
         return;
+    }
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x0B);
     st << static_cast<UInt8>(GetVar(VAR_ONLINE_AWARD));
@@ -22945,8 +22957,11 @@ void Player::setQQGameOnlineTotalTime()
 {
     if(!World::getQQGameOnlineAwardAct())
         return;
-    if(atoi(getDomain()) != 10)
+    if(atoi(getDomain()) != 10 && atoi(getDomain()) != 11)
+    {
+        sendMsgCode(0, 3504);
         return;
+    }
     SetVar(VAR_ONLINE_TOTAL_TIME, getQQGameOnlineTotalTime());
 }
 
@@ -23634,7 +23649,7 @@ void Player::doVipPrivilege(UInt8 idx)
 void Player::sendDirectPurInfo()
 {
     Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x42) << static_cast<UInt8>(GetVar(VAR_DIRECTPUROPEN)) << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT)) << _playerData.totalRecharge;
+    st << static_cast<UInt8>(0x42) << static_cast<UInt8>(GetVar(VAR_DIRECTPUROPEN)) << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT)) << _playerData.totalRecharge << static_cast<UInt8>(GetVar(VAR_DIRECTPURCNT2));
     st << Stream::eos;
     send(st);
 }
@@ -24976,30 +24991,39 @@ static UInt32 zcjb_award[16][3] = {
     {8480, 8960, 13000}, {16000, 16500, 23000}, {32100, 33300, 50000}, {64200, 66600, 90000},
     {106000, 109000, 160000}, {216000, 222000, 350000}, {432000, 444000, 680000}, {880000, 896000, 999999}
 };
-static UInt32 zcjb_gold_new[34] = {
+static UInt32 zcjb_gold_new[47] = {
     100, 200, 400, 600,
-    800, 1200, 2000, 3000,
-    4000, 6000, 8000, 10000,
-    12500, 15000, 20000, 25000,
-    30000, 40000, 50000, 60000,
-    70000, 80000, 100000, 120000,
-    150000, 180000, 230000, 280000,
-    330000, 380000, 450000, 550000,
-    650000, 800000
+    800, 1000, 1200, 1500,
+    1800, 2200, 2600, 3000,
+    3500, 4000, 4500, 5000,
+    5500, 6000, 6500, 7000,
+    7500, 8000, 9000, 10000,
+    11000, 12500, 15000, 20000,
+    25000, 30000, 40000, 50000,
+    60000, 70000, 80000, 100000,
+    120000, 150000, 180000, 230000,
+    280000, 330000, 380000, 450000,
+    550000, 650000, 800000
 };
-static UInt32 zcjb_award_new[34][3] = {
-    {110, 113, 150}, {210, 213, 300}, {420, 462, 600}, {620, 626, 800},
-    {820, 826, 1100}, {1240, 1252, 1600}, {2080, 2104, 2800}, {3100, 3130, 4000},
-    {4100, 4130, 5000}, {6200, 6260, 8000}, {8200, 8260, 10000}, {10200, 10260, 12000},
-    {12750, 12825, 15000}, {15250, 15325, 17500}, {20500, 20650, 25000}, {25500, 25650, 30000},
-    {30500, 30650, 35000}, {41000, 41300, 50000}, {51000, 51300, 60000}, {61000, 61300, 70000},
-    {71000, 71300, 80000}, {81000, 81300, 90000}, {102000, 102600, 120000}, {122000, 122600, 140000},
-    {153000, 153900, 180000}, {183000, 183900, 210000}, {235000, 236500, 280000}, {285000, 286500, 330000},
-    {335000, 336500, 380000}, {385000, 386500, 430000}, {457000, 459100, 520000}, {560000, 563000, 650000},
-    {660000, 663000, 750000}, {815000, 819500, 950000}
+static UInt32 zcjb_award_new[47][3] = {
+    {110, 113, 150}, {210, 213, 300}, {420, 426, 600}, {620, 626, 800},
+    {820, 826, 1000}, {1020, 1026, 1200}, {1220, 1226, 1400}, {1530, 1539, 1800},
+    {1830, 1839, 2100}, {2240, 2252, 2600}, {2640, 2652, 3000},
+    {3040, 3052, 3400}, {3550, 3565, 4000}, {4050, 4065, 4500},
+    {4550, 4565, 5000}, {5050, 5065, 5500}, {5550, 5565, 6000},
+    {6050, 6065, 6500}, {6550, 6565, 7000}, {7050, 7065, 7500},
+    {7550, 7565, 8000}, {8050, 8065, 8500}, {9100, 9130, 10000},
+    {10100, 10130, 11000}, {11100, 11130, 12000}, {12650, 12695, 14000},
+    {15250, 15325, 17500}, {20500, 20650, 25000}, {25500, 25650, 30000},
+    {30500, 30650, 35000}, {41000, 41300, 50000}, {51000, 51300, 60000},
+    {61000, 61300, 70000}, {71000, 71300, 80000}, {81000, 81300, 90000},
+    {102000, 102600, 120000}, {122000, 122600, 140000}, {153000, 153900, 180000},
+    {183000, 183900, 210000}, {235000, 236500, 280000}, {285000, 286500, 330000},
+    {335000, 336500, 380000}, {385000, 386500, 430000}, {457000, 459100, 520000},
+    {560000, 563000, 650000}, {660000, 663000, 750000}, {815000, 819500, 950000},
 };
 
-static const char* zcjb_udplog[33] = {
+static const char* zcjb_udplog[46] = {
     "F_130613_1",
     "F_130613_2",
     "F_130613_3",
@@ -25033,6 +25057,19 @@ static const char* zcjb_udplog[33] = {
     "F_130613_31",
     "F_130613_32",
     "F_130613_33",
+    "F_130613_34",
+    "F_130613_35",
+    "F_130613_36",
+    "F_130613_37",
+    "F_130613_38",
+    "F_130613_39",
+    "F_130613_40",
+    "F_130613_41",
+    "F_130613_42",
+    "F_130613_43",
+    "F_130613_44",
+    "F_130613_45",
+    "F_130613_46",
 };
 
 bool Player::getRPZCJBAward()
@@ -25127,7 +25164,7 @@ void Player::checkZCJB(UInt32 recharge)
     UInt8 totalMax;
     UInt32 cur_gold;
     if(World::inActive_new())
-        totalMax = 34;
+        totalMax = 47;
     else
         totalMax = 16;
 
@@ -25170,19 +25207,19 @@ static UInt32 ryhb_items_1[15][4] = {
 static UInt32 ryhb_items_2[15][4] = {
     {8, 5, 78, 9},          // 升级优惠礼包
     {28, 28, 79, 9},        // 炼器优惠礼包
-    {99, 99, 5136, 9},         // 六级身法石
-    {99, 99, 1717, 2},       // 变身法宝
+    {99, 99, 1726, 1},         // 六级身法石
+    {99, 99, 1727, 1},       // 变身法宝
     {88, 88, 8555, 64},        //
     {8, 10, 9229, 64},        //
     {1, 3, 9371, 99},        //
-    {2, 6, 1126, 99},        //
+    {4, 7, 9498, 99},        //
     {7, 5, 9438, 99},        //
     {2, 2, 9390, 99},        //
     {5, 3, 503, 99},       //
-    {5, 13, 515, 99},      //
-    {3, 8, 1325, 99},    //
-    {3, 8, 9338, 99},    //
-    {3, 8, 134, 99},    //
+    {5, 13, 9418, 99},      //
+    {4, 6, 9600, 99},    //
+    {4, 6, 16001, 99},    //
+    {5, 8, 9427, 99},    //
 };
 
 static const char* ryhb_udplog[15] = {
@@ -25330,6 +25367,23 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 GetPackage()->AddItem(16010, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
+            }
+        }
+    }
+    if(World::getDropAct())
+    {
+        if(flag == e_sla_none)
+        {
+            GetPackage()->Add(138, 1, true, false, FromNpc);
+        }
+        else
+        {
+            UInt32 status = GetVar(VAR_DROP_ACT);
+            if(!(status & flag))
+            {
+                GetPackage()->Add(138, 1, true, false, FromNpc);
+                status |= flag;
+                SetVar(VAR_DROP_ACT, status);
             }
         }
     }
@@ -25661,7 +25715,11 @@ void Player::sendRandFriend()
 
 void Player::GetQQBoardAward( UInt8 type)
 {
-    
+    if(atoi(getDomain()) != 10 && atoi(getDomain()) != 11)
+    {
+        sendMsgCode(1, 3504);
+        return;
+    }
     if(!World::getQQBoardLoginTime())
         return ;
     if(type < 0 ||type >3 )
@@ -25719,7 +25777,7 @@ void Player::sendQQBoardOnlineTime()
     Stream st(REP::RC7DAY);  //协议
     st<<static_cast<UInt8>(20);
     st<<static_cast<UInt8>(OnlineAward);
-    st<<static_cast<UInt32>(20*60 - time)<<Stream::eos;
+    st<<static_cast<UInt32>(4*60 - time)<<Stream::eos;
     send(st);
 }
 void Player::sendQQBoardLogin()
@@ -25749,7 +25807,7 @@ void Player::SetQQBoardLogin()
     UInt32 now = TimeUtil::Now();
     if(now<(TimeUtil::SharpDayT( 0 , now) + 19 * 3600+30*60) || now > (TimeUtil::SharpDayT( 0 , now) + 21 * 3600+30*60) ) 
         return ;
-    UInt32 timeBegin = TimeUtil::MkTime(2013,12,11);
+    UInt32 timeBegin = TimeUtil::MkTime(2014,5,28);
     if(now < timeBegin )
         return ;
     UInt32 cts = static_cast<UInt8>((TimeUtil::SharpDayT( 0 , now) - timeBegin)/86400);
@@ -32151,8 +32209,15 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
         return ;
     if(res == 1)
     {
-        if(pl->getCuttingInfo().cutter != NULL)
+        if(pl->getCuttingInfo().shenfen ==1 )
             return ;
+        if(pl->getCuttingInfo().cutter != NULL)
+        {
+            pl->getCuttingInfo().cutter->setCutter(1,NULL);
+            pl->getCuttingInfo().cutter->sendMsgCode(2,4039);
+            pl->getCuttingInfo().cutter->sendCutterInfo();
+            pl->getCuttingInfo().reset();
+        }
         std::set<Player *>::iterator it = getCuttingInfo().plset.find(pl);
         if(it != getCuttingInfo().plset.end())
         {
@@ -32163,6 +32228,10 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
             pl->sendCutterInfo();
 
         }
+        else
+        {
+            pl->sendMsgCode(2,4038);
+        }
     }
     else
     {
@@ -32172,87 +32241,165 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
 UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
 {
     static UInt32 chance [][4] = {
-        {15,50,85,100},
-        {15,50,85,100},
-        { 5,45,80,100},
-        { 0,30,75,100},
-        { 0,15,70,100},
+        {10,30,80,101},
+        {10,30,80,101},
+        { 0,35,75,101},
+        { 0,0,75,101},
+        { 0,0,65,101},
     };
-    static UInt32 treeNum[] = {1,2,3,20};
+    static UInt32 treeNum[] = {1,2,3,25};
     UInt32 lastTime = GetVar(VAR_TREE_TIME); 
     UInt32 now = TimeUtil::Now();
     UInt8 statue = 0;
-    if(!flag &&(  now < (lastTime + getCuttingInfo().oneTime))) 
+    if(!flag &&(  now < (lastTime + getCuttingInfo().oneTime) || now > (getCuttingInfo().time + 35))) 
         return 1;
     if(!flag)
     {
         statue = getCuttingInfo().setTree(num,getCuttingInfo().shenfen);        
-        getCuttingInfo().cutter->getCuttingInfo().setTree(num,getCuttingInfo().shenfen);     
+        if(getCuttingInfo().cutter)
+            getCuttingInfo().cutter->getCuttingInfo().setTree(num,getCuttingInfo().shenfen);     
+        std::cout <<"playerId:"<<static_cast<UInt32>(getId()&0xffffffffff)<<  " tree:"<<static_cast<UInt32>(num)<< " statue:" <<static_cast<UInt32>(statue) << std::endl;
     }
+    if(statue%100 == 1 &&!flag)
+    {
+        SetVar(VAR_TREE_TIME,now);
+        return 0;
+    }
+    if(statue > 2)
+        return 2;
     UInt32 rnd = uRand(100);
     UInt8 type = getCuttingInfo().type; 
-    for(UInt8 i =0;i < 4 ;++i)
+    for(UInt8 i = 0;i < 4 ;++i)
     {
         if(rnd < chance[type][i])
         {
-            if(!getCuttingInfo().shenfen)
+            if(!getCuttingInfo().shenfen && !flag )
             {
-               getCuttingInfo().count += 1; 
+               if(GetVar(VAR_TREE_VALUE_DAY) + 3 <= 99)
+               {
+                    AddVar(VAR_TREE_VALUE_DAY , 3);
+                    AddVar(VAR_TREE_VALUE , 3);
+                    getCuttingInfo().count += 3; 
+               }
                if(!flag && getCuttingInfo().cutter)
-                   getCuttingInfo().cutter->getTreefromCutter(treeNum[i]);
+                   getCuttingInfo().cutter->getTreefromCutter((treeNum[i]+1)/2);
             }
             else
             {
                getCuttingInfo().count += treeNum[i];
+               AddVar(VAR_TREE_VALUE,treeNum[i]);
             }
-            if( type > 1 )
+            if( flag > 1 )
+            {
                 getCuttingInfo().count += (treeNum[i]+1)/2 ;
+                AddVar(VAR_TREE_VALUE,(treeNum[i]+1)/2);
+            }
             break;
         }            
     }
-    if(statue%100 == 1 && !flag)
-        SetVar(VAR_TREE_TIME,now);
     UInt32 rnd2 = uRand(100);
     if(rnd2 < 10)
     {
-        m_Package->AddItem(9375 ,1 ,true ,true);
+        m_Package->AddItem(16012 ,1 ,true ,true);
         getCuttingInfo().count2 ++;
     }
-    return 1;
+    std::cout <<" TreeCount: " <<static_cast<UInt32>(getCuttingInfo().count) << std::endl;
+    return 0;
 }
 UInt8 Player::quicklyCut(UInt8 type)
 {
-    if(!subCuttingCount())
+    if(!subCuttingCount(1))
         return 1;
-    UInt8 count = 60 / getCuttingInfo().oneTime;
+    if(type == 1)
+    {
+        UInt32 tael = 1000;
+        if(getTael() < tael)
+        {
+            sendMsgCode(0, 1100);
+            return 2;
+        }
+        ConsumeInfo ci(CutTree, 0, 0);
+        useTael(tael, &ci);
+    }
+    else if(type == 2)
+    {
+        UInt32 gold = 10 ;
+        if (getGold() < gold)
+        {
+            sendMsgCode(0, 1104);
+            return 2;
+        }
+        ConsumeInfo ci(CutTree,0,0);
+        useGold(gold,&ci);
+    }
+    if(getCuttingInfo().oneTime == 0)
+        return 2;
+    UInt8 count = 30 / getCuttingInfo().oneTime;
+    std::cout <<" id:" <<static_cast<UInt32>(getId()&0xffffffffff) << std::endl;
     for(UInt8 i = 0; i < count ;++i)
     {
-       CutForOnce(0,1);
+       CutForOnce(0,type);
     }
     return 0;
 }
 void Player::beginCutting()
 {
+    UInt32 now = TimeUtil::Now();
+    if(getCuttingInfo().shenfen && (getCuttingInfo().time  + 35) > now)
+        return ;
     if(!subCuttingCount())
         return ;
+    setCutTime(now);
+    sendCutterInfo();
+    getCuttingInfo().plset.clear();
     if(getCuttingInfo().cutter == NULL)
         return ;
-    UInt32 now = TimeUtil::Now();
-    setCutTime(now);
+    getCuttingInfo().cutter->getCuttingInfo().oneTime = getCuttingInfo().oneTime;  
     getCuttingInfo().cutter->setCutTime(now);
-    sendCutterInfo();
     getCuttingInfo().cutter->sendCutterInfo();
 }
 void Player::beInviteCutting(Player * pl)
 {
     UInt32 now = TimeUtil::Now();
-    if(getCuttingInfo().cutter != NULL && (getCuttingInfo().time + 65 < now) )
+    /*
+    if(getCuttingInfo().cutter)   //拥有伐木对象 （1、主动邀请方掉线 2、正常活动中）
+    {
+        if(getCuttingInfo().time + 35 < now)   //活动范围外(1)
+            getCuttingInfo().reset();
+        else                                    //活动范围外
+        {
+            pl->beReplyForCutting(this,2);
+            return ;
+        }
+    }
+    if(getCuttingInfo().time + 35 > now)   //活动范围)
     {
         pl->beReplyForCutting(this,2);
         return ;
     }
-    if(getCuttingInfo().shenfen == 0)
+    if(getCuttingInfo().cutter && getCuttingInfo().time == 0)  //有队友
+    {
+        pl->beReplyForCutting(this,2);
+        return ;
+    }
+    if(getCuttingInfo().time !=0 && getCuttingInfo().time + 35 < now && getCuttingInfo().shenfen == 0)
         getCuttingInfo().reset();
+
+*/
+    if(getCuttingInfo().shenfen)
+    {
+        if(getCuttingInfo().time !=0 && getCuttingInfo().time + 35 < now) 
+        {
+            getCuttingInfo().reset();
+            sendCutterInfo();
+        }
+        else
+        {
+            pl->beReplyForCutting(this,2);
+            return ;
+        }
+    }
+
     Stream st(REP::BROTHER);
     st << static_cast<UInt8>(0x14);
     st << pl->getName();
@@ -32271,24 +32418,41 @@ void Player::sendCutterInfo()
     else
         st << getCuttingInfo().cutter->getName();
     st << getCuttingInfo().time;
+    st << static_cast<UInt8>(getCuttingInfo().oneTime);
+    st << static_cast<UInt32>(GetVar(VAR_TREE_TIME));
     st << GetVar(VAR_TREE_VALUE);
     st << GetVar(VAR_TREE_VALUE_DAY);
-    st << static_cast<UInt8>(getCuttingInfo().count);
-    st << static_cast<UInt8>(getCuttingInfo().count2);
-    st << static_cast<UInt8>(getCuttingInfo().countOther);
+    st << static_cast<UInt8>(getCuttingInfo().count);   //本轮自己获得的木片就数量
+    if(getCuttingInfo().cutter)
+        st << static_cast<UInt8>(getCuttingInfo().cutter->getCuttingInfo().count);   //本轮好友获得的木片就数量
+    else 
+        st << static_cast<UInt8>(0);
+   
+    st << static_cast<UInt8>(getCuttingInfo().count2);  //好友帮助获得的
+    if(getCuttingInfo().cutter)
+        st << static_cast<UInt8>(getCuttingInfo().cutter->getCuttingInfo().count2);   //本轮好友获得的精粹数量
+    else
+        st << static_cast<UInt8>(0);
+
+    st << static_cast<UInt8>(getCuttingInfo().countOther); //偶也
+    std::cout << static_cast<UInt32>(getId()&0xffffffffff) << std::endl;
     for(UInt8 i = 0; i < TREEMAX ; ++i)
+    {
         st << getCuttingInfo().getTree(i);
+        std::cout << static_cast<UInt32>(getCuttingInfo().getTree(i)) << "  " ;
+    }
+    std::cout << std::endl;
     st << Stream::eos;
     send(st);
 }
 bool Player::CutToolLevelUp(UInt8 level)
 {
-   UInt16 iid = 9375;
+   UInt16 iid = 16012;
    static UInt8 nums[] = { 0,9,11,10,11,14,13,15};
    UInt32 curLevel = GetVar(VAR_TREE_TOOL); 
    if(level > 7 || level ==0)
        return false;
-   if( curLevel != static_cast<UInt32>(level-1) )
+   if( curLevel%10 != static_cast<UInt32>(level-1) )
        return false;
    UInt8 num = nums[level];
    UInt16 count = GetPackage()->GetItemAnyNum(iid) ;
@@ -32302,7 +32466,7 @@ bool Player::CutToolLevelUp(UInt8 level)
    GetPackage()->DelItemAny(iid, num );
    GetPackage()->AddItemHistoriesLog(iid , num);
 
-   SetVar(VAR_TREE_TOOL,level);
+   AddVar(VAR_TREE_TOOL,1);
    sendTreesInfo();
    return true;
 }
@@ -32339,38 +32503,70 @@ void Player::BuyCutCount()
 void Player::setCutType(UInt8 type)
 {
     static UInt8 types[] = {2,2,3,3,3,4,4,5};
-    static UInt32 times[] = {10,9,9,9,8,8,7,7};
+    static UInt32 times[] = {8,7,7,7,6,6,5,5};
     UInt32 tool = GetVar(VAR_TREE_TOOL);
-    if(tool > 7 || type < 1)
+    if(getCuttingInfo().cutter != NULL )
         return ;
-    if(types[tool] < type)
+    if(tool%10 > 7 || type < 1)
         return ;
+    if(types[tool%10] < type)
+        return ;
+    if(type == 2 && type < 10)
+    {
+        //std::map<UInt64,struct invitTime1500>::const_iterator it = _friendCount1500.find(pl->getId());
+        std::map<UInt64,FriendCount >::iterator it_count = _friendlyCount.begin();
+        for(;it_count!=_friendlyCount.end();++it_count)
+        {
+            if(it_count->second.value > 3500)
+            {
+                AddVar(VAR_TREE_TOOL,10);
+                break;
+            }
+        }
+    }
     getCuttingInfo().type = type;
-    getCuttingInfo().oneTime = times[tool];
+    getCuttingInfo().oneTime = times[tool%10];
+    getCuttingInfo().shenfen = 1;
     sendFirendlyCountTaskInfo();
     sendCutterInfo();
 }
-void Player::getTreefromCutter(UInt8 count)
+void Player::getTreefromCutter(UInt8 count)  //从好友处获得木片
 {
-    if(getCuttingInfo().type != 1 )
+    if(getCuttingInfo().shenfen != 1 )
         return ;
     getCuttingInfo().countOther +=count;
+    AddVar(VAR_TREE_VALUE,count);
 }
 void Player::CutEnd()
 {
-    if(getCuttingInfo().cutter == NULL)
-        return ;
+    UInt8 i = 0;
+    for( ; i < TREEMAX ; ++i)
+    {
+        if(getCuttingInfo().getTree(i) != 2)
+            break;
+    }
+    if( i == TREEMAX && getCuttingInfo().oneTime == 5)
+    {
+        getCuttingInfo().count += 10;
+        AddVar(VAR_TREE_VALUE,10);
+    }
     UInt32 now = TimeUtil::Now();
-    if(getCuttingInfo().time +65 < now)
+    if(getCuttingInfo().time  + 33 > now)
         return ;
+    if(!getCuttingInfo().shenfen && !getCuttingInfo().cutter)
+        return ;
+    Player *cutter = getCuttingInfo().cutter;
     Stream st(REP::BROTHER);
-    st << static_cast<UInt8>(0x17);
+    st << static_cast<UInt8>(0x18);
     st << getCuttingInfo().count;  
-    st << getCuttingInfo().countOther;  
+    if(getCuttingInfo().shenfen == 0 && cutter)
+        st << cutter->getCuttingInfo().countOther;
+    else
+        st << getCuttingInfo().countOther;  
     st << Stream::eos;
     send(st);
-    if(getCuttingInfo().shenfen)
-        getCuttingInfo().cutter->CutEnd();
+    if(getCuttingInfo().shenfen && cutter )
+        cutter->CutEnd();
     getCuttingInfo().reset();
 }
 void Player::sendTreesInfo()
@@ -32383,16 +32579,21 @@ void Player::sendTreesInfo()
     st << static_cast<UInt32>(GetVar(VAR_TREE_VALUE_DAY));
     st << static_cast<UInt8>(GetVar(VAR_CUTTREE_BUY));
     st << static_cast<UInt8>( GET_BIT_8(CountTree,1) );
-    st << static_cast<UInt8>(GetVar(VAR_TREE_TOOL));
+    st << static_cast<UInt8>(GetVar(VAR_TREE_TOOL)%10);
     st << Stream::eos;
     send(st);
 }
-bool Player::subCuttingCount()
+bool Player::subCuttingCount(UInt8 flag)
 {
+    if(!flag && !getCuttingInfo().shenfen)
+        return false;
     UInt32 var_val = GetVar(VAR_CUTTREE_COUNT);
     UInt8 val = GET_BIT_8( var_val , 0);
+    UInt8 freeCount = 2;
+    if(GetVar(VAR_TREE_TOOL)>=10)
+        freeCount = 3;
     bool res = true;
-    if(val < 2)
+    if(val < freeCount)
     {
         UInt32 value = SET_BIT_8(var_val , 0 , (val+1));
         SetVar(VAR_CUTTREE_COUNT,value);
@@ -32777,7 +32978,7 @@ void Player::UpdatePictureToDB()
 
 UInt8 Player::buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count)
 {
-   if(getPictureInfo().floor != floor ) 
+   if(getPictureInfo().floor != floor) 
        return 1;
    if(count == 0)
        return 1;

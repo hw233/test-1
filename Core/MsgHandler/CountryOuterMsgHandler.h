@@ -1422,7 +1422,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1DC, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
-   
+
     pl->MiLuZhiJiao();
     //pl->QiShiBanState();
     UInt32 flag = pl->GetVar(VAR_OLDMAN_SCORE_AWARD);
@@ -1464,6 +1464,12 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
+
+    {
+        GameMsgHdr hdr(0x193, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+
     //结拜邀请信息
     pl->sendFriendlyTimeAndCost();
     GObject::raceBattle.sendRBStatus(pl);
@@ -9459,7 +9465,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
            else
            {
                UInt32 now = TimeUtil::Now();
-               if(player->getCuttingInfo().time != 0 && player->getCuttingInfo().time + 65 < now)
+               if(player->getCuttingInfo().time != 0 && player->getCuttingInfo().time + 35 < now)
                    player->getCuttingInfo().reset();
            }
            player->sendTreesInfo();
@@ -9521,29 +9527,35 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
     case 0x16:   //开始伐木
         {
             player->beginCutting();  
+            std::cout << "开始伐木：" << static_cast<UInt32>(player->getId()&0xffffffffff) << std::endl;
         }
         break;
     case 0x17:  //退出伐木
         {
-           if(player->getCuttingInfo().cutter && player->getCuttingInfo().time == 0)
-           {
-               if(player->getCuttingInfo().shenfen)
-               {
-                    player->getCuttingInfo().cutter->getCuttingInfo().reset();
-               }
-               else 
-               {
-                   player->getCuttingInfo().cutter->setCutter(1,NULL);
-               }
-               player->getCuttingInfo().cutter->sendCutterInfo();
-               player->getCuttingInfo().reset();
-               player->sendCutterInfo();
-           }
+            if(player->getCuttingInfo().time == 0)
+            {
+                if(player->getCuttingInfo().cutter)
+                {
+                    if(player->getCuttingInfo().shenfen)
+                    {
+                        player->getCuttingInfo().cutter->getCuttingInfo().reset();
+                    }
+                    else 
+                    {
+                        player->getCuttingInfo().cutter->setCutter(1,NULL);
+                        pl->getCuttingInfo().cutter->sendMsgCode(2,4039);
+                    }
+                    player->getCuttingInfo().cutter->sendCutterInfo();
+                }
+                player->getCuttingInfo().reset();
+                player->sendCutterInfo();
+            }
         }
         break;
     case 0x18:  //结束伐木
         {
             player->CutEnd();
+            std::cout << "结束伐木：" << static_cast<UInt32>(player->getId()&0xffffffffff) << std::endl;
         }
         break;
     case 0x19:  //伐木
@@ -9558,6 +9570,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
                         UInt8 num = 0;
                         br >> num ;
                         res =  player->CutForOnce(num);
+                        std::cout << "伐木：" << static_cast<UInt32>(player->getId()&0xffffffffff) << " num:"<<static_cast<UInt32>(num) << " res:" << static_cast<UInt32>(res) << std::endl;
                     }
                     break;
                 case 1:
@@ -9569,12 +9582,17 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
                     break;
             }
             player->sendCutterInfo();
-            Stream st(REP::BROTHER);
-            st << static_cast<UInt8>(0x19);
-            st << static_cast<UInt8>(type);
-            st << static_cast<UInt8>(res);
-            st <<Stream::eos;
-            player->send(st);
+            if(player->getCuttingInfo().cutter)
+                player->getCuttingInfo().cutter->sendCutterInfo();
+            if(res < 2)
+            {
+                Stream st(REP::BROTHER);
+                st << static_cast<UInt8>(0x19);
+                st << static_cast<UInt8>(type);
+                st << static_cast<UInt8>(res);
+                st <<Stream::eos;
+                player->send(st);
+            }
             if(type)
                 player->getCuttingInfo().reset();
         }
@@ -9655,7 +9673,7 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
             break;
         case 2:
         {
-            UInt8 opt1 = 0;
+            UInt16 opt1 = 0;
             UInt8 opt2 = 0;
             br >> opt1 >> opt2;
             if(opt2 != 1 && opt2 != 2 && opt2 != 3)
@@ -9666,7 +9684,7 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
         case 3:
             {
                UInt8 flag = 0;
-               UInt8 level = 0;
+               UInt16 level = 0;
                UInt8 color = 0;
                UInt16 count = 0;
                br >> flag >> level >> color >> count;

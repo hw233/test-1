@@ -874,6 +874,161 @@ void SendRechargeRank(Stream& st)
     SyncToLogin4IDIP();
 }
 
+void SetAnswerSkill( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    struct skilldata
+    {
+        UInt8 index;
+        UInt8 nextQuestionId;
+        UInt64 lastPlayerId;
+    };
+
+	const skilldata * sd = reinterpret_cast<const skilldata *>(data);
+    UInt32 mark = 0;
+    RCSortType::iterator iter = World::answerScoreSort.begin();
+    RCSortType::iterator iter2;
+    for(; iter!= World::answerScoreSort.end(); )
+    {
+        if(iter->player==player && 0 != mark)
+        {
+            UInt32 skillStatus = iter2->player->GetVar(VAR_ANSWER_SKILL_STATUS);
+            /*UInt8 special = GET_BIT_5(skillStatus, 2);
+            if((sd->nextQuestionId-1) == special) //复苏之风技能
+                return;*/
+
+            UInt8 nextId = GET_BIT_5(skillStatus, sd->index);
+            if(sd->nextQuestionId == nextId)
+                return;
+
+            Player* lastPlayer = globalPlayers[sd->lastPlayerId];
+            if(iter2->player != lastPlayer)
+                return;
+
+            if(iter2->player->GetVar(VAR_ANSWER_ATTACK_NUM) >= 8)
+                return;
+
+            skillStatus = SET_BIT_5(skillStatus, sd->index, sd->nextQuestionId);
+            iter2->player->SetVar(VAR_ANSWER_SKILL_STATUS, skillStatus);
+            iter2->player->AddVar(VAR_ANSWER_ATTACK_NUM, 1);
+        }
+        mark++;
+        iter2 = iter;
+        iter++;
+    }
+}
+
+void SetAnswerRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = *(UInt32*)data;
+    if(!total)
+        return;
+
+    for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
+    {
+        if(i->player == player)
+        {
+            World::answerScoreSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::answerScoreSort.insert(s);
+}
+
+void SendAnswerRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 rank = 0;
+    UInt32 myRank = 0;
+    UInt32 myScore = 0;
+    for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
+    {
+        rank++;
+        if(i->player == player)
+        {
+            myScore = i->total;
+            myRank = rank;
+            break;
+        }
+    }
+
+    /*UInt32 a = 0;
+    if(3335 == player->getId())
+    {
+        for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
+        {
+            std::cout << "nowTime3335 : " << i->player->getId() << "xxxxx" << i->total << a++ << std::endl;
+        }
+        
+        std::cout << "nowTime3335 : " << "YYYYY"<< std::endl;
+    }*/
+
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x32) << static_cast<UInt8>(0x10) << myRank << static_cast<UInt16>(myScore);
+    UInt8 count = 0;
+    UInt32 offset = 0;
+    offset = st.size();
+    st << count;
+
+    UInt32 c = 0;
+    for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
+    {
+        count++;
+        st << static_cast<UInt32>(c+1);
+        st << i->player->getName();
+        st << static_cast<UInt16>(i->total);
+        st << static_cast<UInt8>(i->player->getCountry());
+        st << static_cast<UInt64>(i->player->getId());
+        c++;
+        if(c >= 3)
+            break;
+    }
+
+    UInt32 mark = 0;
+    UInt32 c1 = 0;
+    UInt32 c2 = 0;
+    if(myRank > 3)
+        mark = myRank - 3;
+
+    for(RCSortType::iterator i = World::answerScoreSort.begin(), e = World::answerScoreSort.end(); i != e; ++i)
+    {
+        if(c1>=3)
+        {
+            if((c1+1)>=mark && (c1+1)<myRank)
+            {
+                count++;
+                st << static_cast<UInt32>(c1+1);
+                st << i->player->getName();
+                st << static_cast<UInt16>(i->total);
+                st << static_cast<UInt8>(i->player->getCountry());
+                st << static_cast<UInt64>(i->player->getId());
+                c2++;
+                if(c2 >= 3)
+                    break;
+            }
+        }
+        c1++;
+    }
+
+    st.data<UInt8>(offset) = count;
+    st << Stream::eos;
+    player->send(st);
+}
+
 void SetQiShiBanRank( GameMsgHdr& hdr,  const void* data )
 {
     World::initRCRank();
@@ -2648,6 +2803,40 @@ void OnSendDuoBaoBegin(GameMsgHdr& hdr,  const void* data )
             st << Stream::eos;
             player->send(st);
         }
+    }
+}
+
+void OnSendAnswerBegin(GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+
+    MSG_QUERY_PLAYER(player);   
+
+    if(!World::getAnswerAct())
+        return;
+
+    if(player->GetLev() < 30)
+        return;
+
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    UInt32 prepare = time + 19*60*60 + 15*60;     // 每天19点30开始
+    UInt32 start = time + 19*60*60 + 30*60;       // 每天19点30开始
+    UInt32 end = time + 19*60*60 + 45*60;         // 每天19点45结束
+    UInt8 mark =  0;
+    if(nowTime >= prepare && nowTime <= end)
+    {
+        if(nowTime >= prepare && nowTime < start)
+            mark = 1;
+        else if(nowTime >= start && nowTime <= end)
+            mark = 2;
+
+        Stream st(REP::ACT);
+        st << static_cast<UInt8>(0x32);
+        st << static_cast<UInt8>(0x00);
+        st << mark;
+        st << Stream::eos;
+        player->send(st);
     }
 }
 

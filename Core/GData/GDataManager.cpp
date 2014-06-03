@@ -49,6 +49,7 @@
 #include "CoupleCopy.h"
 #include "LingShiTable.h"
 #include "CardSystem.h"
+#include "NewQuestionsTable.h"
 
 namespace GData
 {
@@ -413,6 +414,12 @@ namespace GData
         if (!LoadErlkingConfig())
         {
             fprintf (stderr, "Load LoadErlkingConfig Error !\n");
+            std::abort();
+        }
+
+        if (!LoadNewQuestionsConfig())
+        {
+            fprintf (stderr, "Load LoadNewQuestionsConfig Error !\n");
             std::abort();
         }
 
@@ -2528,6 +2535,24 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
 		{
             erlkingData.setErlkingInfo(db);
+        }
+
+        return true;
+    }
+
+    bool GDataManager::LoadNewQuestionsConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBNewQuestionsConfig db;
+
+		if(execu->Prepare("SELECT `id`, `lvl`, `answer` FROM `newquestions`", db) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            newquestionsData.setNewQuestionsInfo(db);
         }
 
         return true;

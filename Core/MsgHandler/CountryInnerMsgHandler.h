@@ -1058,7 +1058,10 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
     }
 
     pkg->AddItem(pur->id, pur->num, true, false, FromDirectPurchase);
-    player->AddVar(VAR_DIRECTPURCNT, 1);
+    if(pur->id == 72 || pur->id == 79 || pur->id == 9425)
+        player->AddVar(VAR_DIRECTPURCNT, 1);
+    else
+        player->AddVar(VAR_DIRECTPURCNT2, 1);
     player->sendDirectPurInfo();
 
     char action[32] = {0,};
@@ -1316,12 +1319,15 @@ void OnSetPropsReq( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     struct Props
     {
+        UInt32 exp;
         UInt32 pexp;
         UInt32 prestige;
         UInt32 honor;
     };
 
     Props* props = (Props*)(data);
+    if (props->exp)
+        player->AddExp(props->exp);
     if (props->pexp)
         player->AddPExp(props->pexp);
     if (props->honor)

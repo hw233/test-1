@@ -166,6 +166,7 @@ enum PurchaseType
     JieBaiYinJiu                = 1027,
     erlking                     = 1028, //妖王再临
     LingShiPeiYang              = 1029, //灵侍培养仙石消耗
+    CutTree                     = 1030, //伐木无损扫荡
     //繁体私有占150～200
 };
 
@@ -246,6 +247,7 @@ enum MailItemType
     BuChangMarry,
 	DismissXinMo,
 	RandBattleAward,
+    LingShiEatBack,
 };
 enum ItemFrom
 {
@@ -370,6 +372,8 @@ enum ItemTo
     ToTunShiXingKong = 165, //吞噬星空
     ToServerWarJijian = 166, //仙界传奇祭剑
     ToZhenyuanMgerge = 167, //阵元合成
+    ToLingShiUpgrade = 168, //灵侍升级(吞噬/培养)
+    ToLingShiBreak = 169, //灵侍突破
 };
 
 struct IncommingInfo

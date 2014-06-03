@@ -230,7 +230,13 @@ namespace GObject
 #define SET_BIT_3(X,Y,V) (CLR_BIT_3(X,Y) | V<<(Y*3))
 #define GET_BIT_3(X,Y)   ((X >> (Y*3)) & 0x07)
 
+#define SET_BIT_2(X,Y,V) (CLR_BIT_2(X,Y) | V<<(Y*2))
 #define GET_BIT_2(X,Y)   ((X >> (Y*2)) & 0x03)
+#define CLR_BIT_2(X,Y)   (X & ~(0x03<<(Y*2)))
+
+#define SET_BIT_5(X,Y,V) (CLR_BIT_5(X,Y) | V<<(Y*5))
+#define GET_BIT_5(X,Y)   ((X >> (Y*5)) & 0x1F)
+#define CLR_BIT_5(X,Y)   (X & ~(0x1F<<(Y*5)))
 
 //飞剑(坐骑)系统
 #define MOUNT_COSTID 9500
@@ -753,7 +759,7 @@ namespace GObject
 
     };
 
-#define TREEMAX 16
+#define TREEMAX 10
     struct CuttingInfo
     {
         Player * cutter;   //砍树对象
@@ -808,7 +814,7 @@ namespace GObject
         UInt8 floor ; 
         std::set<UInt8>  cubeHave;  //拥有的木块
         std::map<UInt8,std::vector<UInt8> > cubeCover; 
-        PictureInfo():floor(0){} 
+        PictureInfo():floor(1){} 
     };
 
     struct MoBaoInfo
@@ -1849,7 +1855,7 @@ namespace GObject
         void getFishUserPackage(UInt8);
         void getFishUserAward();
 	public:
-		UInt16   GetFreePackageSize();
+		UInt16   GetFreePackageSize(UInt8 type = 0);
 		bool     ExtendPackageSize(UInt8);
 
 		Package* GetPackage() { return m_Package; }
@@ -3408,7 +3414,7 @@ namespace GObject
         void getTreefromCutter(UInt8 count);
         void CutEnd();
         void sendTreesInfo();
-        bool subCuttingCount();
+        bool subCuttingCount(UInt8 flag = 0);
 
         PictureInfo& getPictureInfo(){ return pictureInfo;}
         void setPictureInfo(UInt8 id , std::map<UInt8 ,std::vector<UInt8>> map_vec);

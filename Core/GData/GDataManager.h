@@ -98,6 +98,7 @@ namespace GData
         static bool LoadFloorAttr();
         static bool LoadPicInfo();
 
+        static bool LoadNewQuestionsConfig();
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);
         static bool isInUdpItem(UInt32 id);
