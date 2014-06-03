@@ -2756,7 +2756,7 @@ void World::commitArenaForceOnce()
 {
     if(arena.isOpen())
         arena.commitArenaForceOnce();
-    if(serverWarMgr.isOpen())
+    else if(serverWarMgr.isOpen())
         teamArenaMgr.commitArenaForceOnce();
     else if(serverWarMgr.isOpen())
         serverWarMgr.commitArenaForceOnce();
