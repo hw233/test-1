@@ -80,6 +80,7 @@
 #include "GObject/Marry.h"
 #include "GObject/Married.h"
 #include "GData/SevenSoul.h"
+#include "GObject/ClanBigBoss.h"
 
 namespace GObject
 {
@@ -4390,6 +4391,27 @@ namespace GObject
             clan->loadBuildingsFromDB(clanBuildings.fairylandEnergy, 
                     clanBuildings.phyAtkLevel, clanBuildings.magAtkLevel, clanBuildings.actionLevel, clanBuildings.hpLevel,clanBuildings.oracleLevel,
                     clanBuildings.updateTime);
+        }
+        lc.finalize();
+
+        // 读取帮派Boss
+        lc.prepare("Loading clanbigboss:");
+        DBClanBigBoss dcbb;
+        if (execu->Prepare("SELECT `clanid`, `status`, `app_time`, `last`, `hp`, `atk`, `matk` FROM `clanbigboss` ", dcbb) != DB::DB_OK)
+            return false;
+        clan = NULL;
+        lc.reset(1000);
+        lastId = 0xFFFFFFFF;
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if (dcbb.clanid != lastId)
+            {
+                lastId = dcbb.clanid;
+                clan = globalClans[dcbb.clanid];
+            }
+            if (clan == NULL) continue;
+            clan->getClanBigBoss()->LoadFromDB(&dcbb);
         }
         lc.finalize();
 

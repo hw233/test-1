@@ -1964,6 +1964,34 @@ function ItemNormal_00009476(iid, num, bind, param)
     return num
 end
 
+function ItemNormal_00009478(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local items = {{1325,1,1}, {1326,1,1}, {134,1,1}, {135,1,1}, {1125,1,1}, {1126,1,1}, {9457,1,1}}
+    local prob = {500, 3400, 3900, 6600, 9300, 9800, 10000}
+
+    if package:GetRestPackageSize() < num then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+
+    for tmp = 1,num do
+        local i = 0
+        local p = math.random(1, 10000)
+        for n = 1,#prob do
+            if p <= prob[n] then
+                i = n
+                break
+            end
+        end
+        package:AddItem(items[i][1], items[i][2], true, false)
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num
+end
+
 function ItemNormal_00000038(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
@@ -9140,7 +9168,7 @@ end
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    local item = 8552;
+    local item = 1668;
 
     if package:GetRestPackageSize() < (1+(1*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
@@ -10380,7 +10408,8 @@ function ItemNormal_Lingbao(iid, num, bind, param)
         {11509, 11510, 11511},
         {11515, 11516, 11517},
         {11518, 11519, 11520},
-        {11521, 11522, 11523}
+        {11521, 11522, 11523},
+        {11524, 11525, 11526}
     }
 
     local idx = 1;
@@ -10398,6 +10427,8 @@ function ItemNormal_Lingbao(iid, num, bind, param)
         idx = 6;
     elseif 9448 == iid then
         idx = 7;
+    elseif 9477 == iid then
+        idx = 8;
     end
 
     --[[local idx = 1;
@@ -12935,6 +12966,7 @@ local ItemNormal_Table = {
     [9387] = ItemNormal_Lingbao,
     [9431] = ItemNormal_Lingbao,
     [9448] = ItemNormal_Lingbao,
+    [9477] = ItemNormal_Lingbao,
 
     [9360] = ItemNormal_00009360,
     [9361] = ItemNormal_00009361,
@@ -12983,6 +13015,7 @@ local ItemNormal_Table = {
 
     [9475] = ItemNormal_00009475,
     [9476] = ItemNormal_00009476,
+    [9478] = ItemNormal_00009478,
 
     [9492] = ItemNormal_00009492,
     [9495] = ItemNormal_00009495,

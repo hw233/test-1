@@ -261,6 +261,7 @@ private:
     void OnSkillTest(GObject::Player *player, std::vector<std::string>& args);
     void OnAddCardExp(GObject::Player *player, std::vector<std::string>& args);
     void OnSetFireValue(GObject::Player *player, std::vector<std::string>& args);
+    void OnAttackBoss(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

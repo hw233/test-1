@@ -157,6 +157,8 @@ namespace GObject
         GVAR_ANSWER_BEGIN_DAY = 98,     // 答题每天开始时间
         GVAR_ANSWER_END_DAY = 99,       // 答题每天结束时间
         GVAR_RAND_QUESTIONS_MARK = 100, // 选题标记
+        
+        GVAR_CLAN_BIGBOSS_ENABLE = 101,         //帮派BOSS能否预约
         GVAR_MAX,
     };
 
@@ -290,6 +292,8 @@ namespace GObject
             GREGISTER_VAR(GVAR_TYSS_END, GCYCLE_NONE);
             
             GREGISTER_VAR(GVAR_REPAIRTYSSBUG, GCYCLE_NONE);
+            
+            GREGISTER_VAR(GVAR_CLAN_BIGBOSS_ENABLE, GCYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

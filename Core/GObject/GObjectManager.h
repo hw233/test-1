@@ -231,8 +231,8 @@ namespace GObject
             float lvFactor[] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0};
             UInt8 lvIdx = (lv-70)/10;
             UInt16 skillExp = 100;
-            if(lvIdx > 6)
-                lvIdx = 6;
+            if(lvIdx > 7)
+                lvIdx = 7;
 
             for(int i = 0; i < size; ++ i)
             {
@@ -250,8 +250,8 @@ namespace GObject
         {
             float lvFactor[] = {1, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0};
             UInt8 lvIdx = (lv-70)/10;
-            if(lvIdx > 6)
-                lvIdx = 6;
+            if(lvIdx > 7)
+                lvIdx = 7;
 
             if(color < 2)
                 color = 2;

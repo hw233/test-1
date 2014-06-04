@@ -835,6 +835,7 @@ void ClanBoss::addBoss()
             nflist[0].fighter->setExtraAttack(extatk + atk);
             extmagatk = (WBOSS_BASE_TIME/(float)lastTime - 1.f) * WBOSS_ATK_FACTOR * (matk + basematk);
             nflist[0].fighter->setExtraMagAttack(extmagatk + matk);
+            nflist[0].fighter->setWBoss(true);
             nflist[0].fighter->setDirty();
         }
         m_bossMaxHp =  ohp * WBOSS_HP_FACTOR;

@@ -1626,6 +1626,17 @@ struct DBClanBuildings
     UInt16 updateTime;
 };
 
+struct DBClanBigBoss 
+{
+    UInt32 clanid;
+    UInt8 status;
+    UInt32 app_time;
+    UInt32 last;
+    UInt32 hp;
+    UInt32 atk;
+    UInt32 matk;
+};
+
 struct DBCard
 {
     UInt64 playerId;
@@ -3709,6 +3720,19 @@ SPECIALDEF(8)
     UInt16, hpLevel,
     UInt16, oracleLevel,
     UInt16, updateTime
+    )
+SPECIALEND()
+
+SPECIALBEGIN (GObject::DBClanBigBoss)
+SPECIALDEF(7)
+    (
+    UInt32, clanid,
+    UInt8, status,
+    UInt32, app_time,
+    UInt32, last,
+    UInt32, hp,
+    UInt32, atk,
+    UInt32, matk
     )
 SPECIALEND()
 

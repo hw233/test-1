@@ -20763,7 +20763,10 @@ void Player::sendQzongPYGiftInfo()
 void Player::get3366GiftAward(UInt8 type)
 {
     if (getPlatform() != 11)
+    {
+        sendMsgCode(0, 3505);
         return;
+    }
     if (GetVar(VAR_3366GIFT) >= 12)
         return;
     if (GetFreePackageSize() < 6)
@@ -20782,7 +20785,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(48, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
-        static UInt32 itemId[] = {9600, 2, 9371, 2, 9082, 2, 503, 2, 9418, 2, 1126, 2};
+        static UInt32 itemId[] = {9082, 2, 9371, 2, 503, 2, 9498, 2, 9457, 2, 9418, 2};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -20799,10 +20802,10 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
-        static UInt32 itemId[] = {9229, 30, 9141, 9338, 9082, 500};
-        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); ++ i)
+        static UInt32 itemId[] = { 30, 2, 9600, 1, 9310, 1, 9425, 1, 9427, 1, 9141, 2 };
+        for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
-            GetPackage()->Add(itemId[i], 1, true);
+            GetPackage()->Add(itemId[i], itemId[i+1], true);
         }
     }
     send3366GiftInfo();
@@ -20810,9 +20813,10 @@ void Player::get3366GiftAward(UInt8 type)
 
 void Player::send3366GiftInfo()
 {
+    /*
     if(getPlatform() != 11)
         return;
-    /*
+    
     if(!isBD())
         return;
     */
@@ -21464,10 +21468,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C };
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 };
-//6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 };
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D};
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001};
+//6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页 317:太乙神雷
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317};
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -25077,6 +25081,11 @@ bool Player::getRPZCJBAward()
     if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return false;
 
+    if(World::getZCJBActivity() && atoi(getDomain()) != 11)
+    {
+        sendMsgCode(0, 3505);
+        return false;
+    }
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
     UInt8 left = ZCJB_LEFT(zcjb);
     UInt8 total = ZCJB_TOTAL(zcjb);
@@ -25155,6 +25164,8 @@ bool Player::getRPZCJBAward()
 void Player::checkZCJB(UInt32 recharge)
 {
     if(recharge && !World::inActive_opTime_20130531() && !World::getZCJBActivity())
+        return;
+    if(World::getZCJBActivity() && getPlatform() != 11)
         return;
     AddVar(VAR_ZCJB_RECHARGE_GOLD, recharge);
 
@@ -27817,6 +27828,8 @@ void Player::sendRealSpirit()
 
 void Player::getQZoneRechargeAward(UInt8 val)
 {
+    if(getPlatform() != 11)
+        return;
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27864,6 +27877,8 @@ void Player::getQZoneRechargeAward(UInt8 val)
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
+    if(getPlatform() != 11)
+        return;
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27901,6 +27916,8 @@ void Player::sendQZoneRechargeAwardInfo()
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
+    if(getPlatform() != 11)
+        return;
     if(World::getQZoneRechargeTime() && ( getPlatform() ==1 || getPlatform() ==2))
     {
         AddVar(VAR_QZONE_RECHARGE,r);
@@ -32240,14 +32257,14 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
 }
 UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
 {
-    static UInt32 chance [][4] = {
-        {10,30,80,101},
-        {10,30,80,101},
-        { 0,35,75,101},
-        { 0,0,75,101},
-        { 0,0,65,101},
+    static UInt32 chance [][3] = {
+        {10,60,101},
+        {10,60,101},
+        {45,85,101},
+        {20,60,101},
+        {30,65,101},
     };
-    static UInt32 treeNum[] = {1,2,3,25};
+    static UInt32 treeNum[] = {5,7,10,12,14};
     UInt32 lastTime = GetVar(VAR_TREE_TIME); 
     UInt32 now = TimeUtil::Now();
     UInt8 statue = 0;
@@ -32269,7 +32286,8 @@ UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
         return 2;
     UInt32 rnd = uRand(100);
     UInt8 type = getCuttingInfo().type; 
-    for(UInt8 i = 0;i < 4 ;++i)
+    UInt8 baseNum = type / 2 ;
+    for(UInt8 i = 0;i < 3 ;++i)
     {
         if(rnd < chance[type][i])
         {
@@ -32282,17 +32300,17 @@ UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
                     getCuttingInfo().count += 3; 
                }
                if(!flag && getCuttingInfo().cutter)
-                   getCuttingInfo().cutter->getTreefromCutter((treeNum[i]+1)/2);
+                   getCuttingInfo().cutter->getTreefromCutter((treeNum[i+baseNum]+1)/2);
             }
             else
             {
-               getCuttingInfo().count += treeNum[i];
-               AddVar(VAR_TREE_VALUE,treeNum[i]);
+               getCuttingInfo().count += treeNum[i+baseNum];
+               AddVar(VAR_TREE_VALUE,treeNum[i+baseNum]);
             }
             if( flag > 1 )
             {
-                getCuttingInfo().count += (treeNum[i]+1)/2 ;
-                AddVar(VAR_TREE_VALUE,(treeNum[i]+1)/2);
+                getCuttingInfo().count += (treeNum[i+baseNum]+1)/2 ;
+                AddVar(VAR_TREE_VALUE,(treeNum[i+baseNum]+1)/2);
             }
             break;
         }            
@@ -32300,6 +32318,11 @@ UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
     UInt32 rnd2 = uRand(100);
     if(rnd2 < 10)
     {
+        if (GetPackage()->GetRestPackageSize() < 1)
+        {
+            sendMsgCode(0, 1011);
+            return 0;
+        }
         m_Package->AddItem(16012 ,1 ,true ,true);
         getCuttingInfo().count2 ++;
     }
@@ -32422,19 +32445,19 @@ void Player::sendCutterInfo()
     st << static_cast<UInt32>(GetVar(VAR_TREE_TIME));
     st << GetVar(VAR_TREE_VALUE);
     st << GetVar(VAR_TREE_VALUE_DAY);
-    st << static_cast<UInt8>(getCuttingInfo().count);   //本轮自己获得的木片就数量
+    st << static_cast<UInt32>(getCuttingInfo().count);   //本轮自己获得的木片就数量
     if(getCuttingInfo().cutter)
-        st << static_cast<UInt8>(getCuttingInfo().cutter->getCuttingInfo().count);   //本轮好友获得的木片就数量
+        st << static_cast<UInt32>(getCuttingInfo().cutter->getCuttingInfo().count);   //本轮好友获得的木片就数量
     else 
-        st << static_cast<UInt8>(0);
+        st << static_cast<UInt32>(0);
    
-    st << static_cast<UInt8>(getCuttingInfo().count2);  //好友帮助获得的
+    st << static_cast<UInt32>(getCuttingInfo().count2);  //好友帮助获得的
     if(getCuttingInfo().cutter)
-        st << static_cast<UInt8>(getCuttingInfo().cutter->getCuttingInfo().count2);   //本轮好友获得的精粹数量
+        st << static_cast<UInt32>(getCuttingInfo().cutter->getCuttingInfo().count2);   //本轮好友获得的精粹数量
     else
-        st << static_cast<UInt8>(0);
+        st << static_cast<UInt32>(0);
 
-    st << static_cast<UInt8>(getCuttingInfo().countOther); //偶也
+    st << static_cast<UInt32>(getCuttingInfo().countOther); //偶也
     std::cout << static_cast<UInt32>(getId()&0xffffffffff) << std::endl;
     for(UInt8 i = 0; i < TREEMAX ; ++i)
     {
@@ -32448,13 +32471,13 @@ void Player::sendCutterInfo()
 bool Player::CutToolLevelUp(UInt8 level)
 {
    UInt16 iid = 16012;
+   UInt8 num =  1 ;
    static UInt8 nums[] = { 0,9,11,10,11,14,13,15};
    UInt32 curLevel = GetVar(VAR_TREE_TOOL); 
    if(level > 7 || level ==0)
        return false;
    if( curLevel%10 != static_cast<UInt32>(level-1) )
        return false;
-   UInt8 num = nums[level];
    UInt16 count = GetPackage()->GetItemAnyNum(iid) ;
    ItemBase * item = GetPackage()->FindItem(iid, true);
    if (!item)
@@ -32465,8 +32488,12 @@ bool Player::CutToolLevelUp(UInt8 level)
        return false;
    GetPackage()->DelItemAny(iid, num );
    GetPackage()->AddItemHistoriesLog(iid , num);
-
-   AddVar(VAR_TREE_TOOL,1);
+   AddVar(VAR_TOOL_CNT,num);
+   if(GetVar(VAR_TOOL_CNT) == nums[level]) 
+   {
+       AddVar(VAR_TREE_TOOL,1);
+       SetVar(VAR_TOOL_CNT,0);
+   }
    sendTreesInfo();
    return true;
 }
@@ -32511,7 +32538,7 @@ void Player::setCutType(UInt8 type)
         return ;
     if(types[tool%10] < type)
         return ;
-    if(type == 2 && type < 10)
+    if(type == 2 && tool < 10)
     {
         //std::map<UInt64,struct invitTime1500>::const_iterator it = _friendCount1500.find(pl->getId());
         std::map<UInt64,FriendCount >::iterator it_count = _friendlyCount.begin();
@@ -32579,7 +32606,8 @@ void Player::sendTreesInfo()
     st << static_cast<UInt32>(GetVar(VAR_TREE_VALUE_DAY));
     st << static_cast<UInt8>(GetVar(VAR_CUTTREE_BUY));
     st << static_cast<UInt8>( GET_BIT_8(CountTree,1) );
-    st << static_cast<UInt8>(GetVar(VAR_TREE_TOOL)%10);
+    st << static_cast<UInt8>(GetVar(VAR_TREE_TOOL));
+    st << static_cast<UInt8>(GetVar(VAR_TOOL_CNT));
     st << Stream::eos;
     send(st);
 }
@@ -32973,7 +33001,7 @@ void Player::UpdatePictureToDB()
         }
         strCubeCover +="|";
     }
-    DB1().PushUpdateData("REPLACE INTO `pictureAttr`(`playerId`, `floor`, `cubeHave`, `cubeCover`) VALUES(%" I64_FMT "u, %d, %s, %s)", getId(), getPictureInfo().floor, strCubeHave.c_str(), strCubeCover.c_str());
+    DB1().PushUpdateData("REPLACE INTO `pictureAttr`(`playerId`, `floor`, `cubeHave`, `cubeCover`) VALUES(%" I64_FMT "u, %d, '%s', '%s')", getId(), getPictureInfo().floor, strCubeHave.c_str(), strCubeCover.c_str());
 }
 
 UInt8 Player::buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count)
@@ -32991,6 +33019,7 @@ UInt8 Player::buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count)
     if(treeCount < oneCost * count )
         return 3;
 
+    std::cout << "picture :" << static_cast<UInt32>(index) << std::endl;
     getPictureInfo().cubeHave.insert(index);
     treeCount -= (oneCost * count);
     SetVar(VAR_TREE_VALUE,treeCount);   //设置剩余木片数

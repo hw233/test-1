@@ -714,19 +714,19 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         float atk_factor = (WBOSS_BASE_TIME/(float)m_last - 1.f) * WBOSS_ATK_FACTOR;
         if(atk_factor > WBOSS_MAX_ASC_ATK_FACTOR)
             atk_factor = WBOSS_MAX_ASC_ATK_FACTOR;
-        extatk = atk_factor * (atk + baseatk) + atk;
+        extatk = atk_factor * (atk + baseatk);
         if(extatk > WBOSS_MAX_ATK)
             extatk = WBOSS_MAX_ATK;
         else if(extatk < 0)
             extatk = 0;
-        nflist[0].fighter->setExtraAttack(extatk);
+        nflist[0].fighter->setExtraAttack(extatk + atk);
 
-        extmagatk = atk_factor * (matk + basematk) + matk;
+        extmagatk = atk_factor * (matk + basematk);
         if(extmagatk > WBOSS_MAX_ATK)
             extmagatk = WBOSS_MAX_ATK;
         else if(extmagatk < 0)
             extmagatk = 0;
-        nflist[0].fighter->setExtraMagAttack(extmagatk);
+        nflist[0].fighter->setExtraMagAttack(extmagatk + matk);
 
         TRACE_LOG("BOSS: hp: %u, base attack: %u, extra attack: %d, magattack: %u, extra magattack: %d",
                 nflist[0].fighter->getBaseHP(), nflist[0].fighter->getBaseAttack(),
@@ -1367,6 +1367,14 @@ bool WBossMgr::needAutoBattle(UInt16 spotId)
     }
     return true;
 }
+
+void WBossMgr::calInitClanBigBoss(UInt32& lastHp,Int32& lastAtk,Int32& lastMAtk)
+{
+    lastHp = getLastHP(m_idx) * 0.6;
+    lastAtk = getLastAtk(m_idx) * 0.6;
+    lastMAtk = getLastMAtk(m_idx) * 0.6;
+}
+
 
 WBossMgr worldBoss;
 

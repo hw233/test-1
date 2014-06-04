@@ -5247,6 +5247,18 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
             // 帮派副本的战斗操作
             clan->clanCopyBattleOperate(player, command, brd);
             break;
+        case 0x10:
+            if(player->GetVar(VAR_CLANBOSS_CLANBIGBOSS_LIMIT))
+                return;
+            //if(CURRENT_THREAD_ID() != WORKER_THREAD_NEUTRAL)
+            {
+                hdr.msgHdr.desWorkerID = WORKER_THREAD_NEUTRAL;
+                hdr.msgHdr.cmdID = 0x1F5;
+                GLOBAL().PushMsg(hdr, (void*)data);
+                return;
+            }            
+            //clan->clanBigBossOperate(player,command ,brd);
+            break;
         case 0x20:
             // 帮派拜火祭天
             if(World::getFireSacrificeTime())
@@ -6892,6 +6904,7 @@ void OnExJob( GameMsgHdr & hdr, const void * data )
                     case 5:
                     case 6:
                     case 7:
+                    case 8:
                         jobHunter->OnRequestStart(val);
                         GameAction()->doStrong(player, SthSerachMo, 0, 0);
                         break;
