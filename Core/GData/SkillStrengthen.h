@@ -101,6 +101,7 @@ enum
     TYPE_DAMAG_PR = 53,       // (破击)波及后方单位伤害
     TYPE_FIELD_GAPE = 54,       // 地裂（地面裂开，每回合流血+概率眩晕）
     TYPE_YE_HUO = 55,    //无尽业火
+    TYPE_ADD_BUF = 56,    //增加属性
 
     TYPE_MAX,
 };

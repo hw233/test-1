@@ -1368,6 +1368,14 @@ bool WBossMgr::needAutoBattle(UInt16 spotId)
     return true;
 }
 
+void WBossMgr::calInitClanBigBoss(UInt32& lastHp,Int32& lastAtk,Int32& lastMAtk)
+{
+    lastHp = getLastHP(m_idx) * 0.6;
+    lastAtk = getLastAtk(m_idx) * 0.6;
+    lastMAtk = getLastMAtk(m_idx) * 0.6;
+}
+
+
 WBossMgr worldBoss;
 
 } // namespace GObject

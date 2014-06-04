@@ -229,6 +229,7 @@ MSG_REG_2(GameMsgHdr, 0x1F2, OnBroadcast);
 
 MSG_REG_2(GameMsgHdr, 0x1F3, OnClanRankBattleReqInitInner);
 MSG_REG_2(GameMsgHdr, 0x1F4, OnClanRankBattleSortListInner);
+MSG_REG_2(GameMsgHdr, 0x1F5, OnClanBigBossOperate);
 
 
 MSG_REG_2(GameMsgHdr, 0x200, PlayerLogout);

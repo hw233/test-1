@@ -36,6 +36,7 @@
 #include "GObject/ClanBoss.h"
 #include "KangJiTianMo.h"
 #include "ClanBuilding.h"
+#include "ClanBigBoss.h"
 
 namespace GObject
 {
@@ -274,6 +275,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	memset(_favorId, 0, sizeof(_favorId));
 	_clanDynamicMsg = new ClanDynamicMsg();
 	_clanBattle = new ClanCityBattle(this);
+	_clanBigBoss = new ClanBigBoss(this);
 
     m_BattleScore = 0;
     m_DailyBattleScore = 0;
@@ -298,6 +300,7 @@ Clan::~Clan()
     delete _statue;
 	delete _clanDynamicMsg;
 	delete _clanBattle;
+	delete _clanBigBoss;
 }
 
 bool Clan::accept(Player * player, UInt64 pid )
@@ -487,6 +490,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
         if(buffData1 > 0 || buffData2 > 0 || buffData3 > 0)
             player->rebuildBattleName();
     }
+    player->SetVar(VAR_CLANBOSS_CLANBIGBOSS_LIMIT,1);
 
     player->notifyClanTitle();
 	return true;
@@ -4202,6 +4206,41 @@ void   Clan::clanCopyBattleOperate(Player * player, UInt8 command, BinaryReader 
             break;
     }
 }
+
+void Clan::clanBigBossOperate(Player * player, UInt8 command, BinaryReader & brd)
+{
+    if(getLev() < 5)
+        return;
+
+    switch(command)
+    {
+        case 1:
+            this->getClanBigBoss()->ReturnBossInfoPl(player);
+            break;
+        case 2:
+            {
+                if (player->getId() != getLeaderId())
+                    return;
+                UInt8 appoint_hour = 0;
+                brd >> appoint_hour;
+                ClanBigBossMgr::Instance().playerReqStart(player,this,appoint_hour); 
+            }
+            break;
+        case 3:
+            this->getClanBigBoss()->attack(player);
+
+            break;
+        default:
+            break;
+    }
+
+
+    return;
+}
+
+
+
+
 
 bool   Clan::copyLevelAvailable()
 {

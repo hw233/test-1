@@ -61,6 +61,7 @@
 #include "GObject/ArenaServerWar.h"
 #include "GObject/ClanBuilding.h"
 #include "GObject/RaceBattle.h"
+#include "GObject/ClanBigBoss.h"
 
 GMHandler gmHandler;
 
@@ -326,6 +327,7 @@ GMHandler::GMHandler()
     Reg(2, "add61kapai", &GMHandler::OnAdd61Card);
     Reg(2, "addkapaiexp", &GMHandler::OnAddCardExp);
     Reg(3, "setfirevalue", &GMHandler::OnSetFireValue);
+    Reg(2, "atkcb", &GMHandler::OnAttackBoss);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -5724,3 +5726,11 @@ void GMHandler::OnSkillTest(GObject::Player *player, std::vector<std::string>& a
     }
 }
 
+void GMHandler::OnAttackBoss(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return ;
+    UInt32 damage = atoi(args[0].c_str());
+    player->getClan()->getClanBigBoss()->GMAttackBoss(damage);  
+
+}

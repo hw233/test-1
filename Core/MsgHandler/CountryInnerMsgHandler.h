@@ -2603,6 +2603,22 @@ void OnClanRankBattleSortListInner(GameMsgHdr& hdr, const void* data)
     ClanRankBattleMgr::Instance().SendSortList(player, startId, count);
 }
 
+void OnClanBigBossOperate(GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+    GObject::Clan *clan = player->getClan();
+	if(clan == NULL)
+        return;
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt8 command = 0;
+    brd >> type;
+    brd >> command;
+
+    clan->clanBigBossOperate(player,command ,brd);
+}
+
 void OnCompareBP( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

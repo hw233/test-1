@@ -68,6 +68,7 @@ namespace GObject
         void SelectAnswer(Player* pl, UInt8 opt);
         void AnswerEnd(Player* pl);
         void AwardEndClear();
+        void AnswerLogClear();
         void AwardEnd(Player* pl);
         void UseSkill(Player* pl, UInt8 skillId, UInt64 otherId);
     private:
