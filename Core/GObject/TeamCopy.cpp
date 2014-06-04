@@ -387,6 +387,12 @@ bool TeamCopy::quikJoinTeam(Player* pl)
 
 UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
 {
+    if(pl->hasFlag(Player::AutoTeamCopy)) 
+    {
+        pl->sendMsgCode(0, 8060);
+        return 0;
+    }
+
     if(pl->GetEnterPTCStatus())
         return 0;
 
