@@ -1887,6 +1887,8 @@ UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
 
     if(4==curAutoMark)
         autoClear(pl);
+
+    return 1;
 }
 
 void TeamCopy::sendAutoTeamCopy(Player* pl)
@@ -1913,7 +1915,6 @@ void TeamCopy::autoClear(Player* pl, bool complete)
 
     if(complete)
     {
-        UInt8 curAutoIndex = pl->GetVar(VAR_AUTO_TEAMCOPY_CUR_INDEX);
         Stream st(REP::TEAM_COPY_REQ);
         st << static_cast<UInt8>(0x06) << static_cast<UInt8>(6);
         st << static_cast<UInt8>(pl->GetVar(VAR_AUTO_TEAMCOPY_CUR_INDEX));

@@ -4073,7 +4073,6 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         UInt32 valueTimeA = 0;
         UInt32 valueTimeB = 0;
-        UInt32 valueTimeC = 0;
         UInt32 nowTime = TimeUtil::Now();
         if(nowTime < GObject::GVAR.GetVar(GObject::GVAR_ANSWER_BEGIN_DAY))
         {
