@@ -4121,7 +4121,6 @@ void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
     //    item_vec.push_back(item);
     //    itemNum_vec.push(itemNum);
         clan->AddItem(item,itemNum);
-        Stream st;
     }
 }
 void OnServerLeftGetSpirit(ServerLeftMsgHdr& hdr, const void * data)

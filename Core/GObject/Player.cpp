@@ -32265,6 +32265,10 @@ UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
         {30,65,101},
     };
     static UInt32 treeNum[] = {5,7,10,12,14};
+    UInt8 type = getCuttingInfo().type; 
+    if(type < 1 || type > 5)
+        return 1;
+
     UInt32 lastTime = GetVar(VAR_TREE_TIME); 
     UInt32 now = TimeUtil::Now();
     UInt8 statue = 0;
@@ -32285,12 +32289,12 @@ UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
     if(statue > 2)
         return 2;
     UInt32 rnd = uRand(100);
-    UInt8 type = getCuttingInfo().type; 
-    UInt8 baseNum = type / 2 ;
+    UInt8 baseNum = (type-1) / 2 ;
     for(UInt8 i = 0;i < 3 ;++i)
     {
-        if(rnd < chance[type][i])
+        if(rnd < chance[type-1][i])
         {
+            std::cout << "chance at " << static_cast<UInt32>(i)<< std::endl;
             if(!getCuttingInfo().shenfen && !flag )
             {
                if(GetVar(VAR_TREE_VALUE_DAY) + 3 <= 99)
@@ -32318,12 +32322,9 @@ UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
     UInt32 rnd2 = uRand(100);
     if(rnd2 < 10)
     {
-        if (GetPackage()->GetRestPackageSize() < 1)
-        {
-            sendMsgCode(0, 1011);
-            return 0;
-        }
         m_Package->AddItem(16012 ,1 ,true ,true);
+        SYSMSG_SENDV(2034,this);
+        SYSMSG_SENDV(2035,this);
         getCuttingInfo().count2 ++;
     }
     std::cout <<" TreeCount: " <<static_cast<UInt32>(getCuttingInfo().count) << std::endl;
@@ -32384,6 +32385,8 @@ void Player::beginCutting()
 void Player::beInviteCutting(Player * pl)
 {
     UInt32 now = TimeUtil::Now();
+    if(pl == NULL)
+        return ;
     /*
     if(getCuttingInfo().cutter)   //拥有伐木对象 （1、主动邀请方掉线 2、正常活动中）
     {
@@ -32426,7 +32429,7 @@ void Player::beInviteCutting(Player * pl)
     Stream st(REP::BROTHER);
     st << static_cast<UInt8>(0x14);
     st << pl->getName();
-    st <<pl->GetVar(VAR_TREE_VALUE_DAY);
+    st << GetVar(VAR_TREE_VALUE_DAY);
     st << Stream::eos;
     send(st);
 }
@@ -32534,6 +32537,12 @@ void Player::setCutType(UInt8 type)
     UInt32 tool = GetVar(VAR_TREE_TOOL);
     if(getCuttingInfo().cutter != NULL )
         return ;
+    if (GetPackage()->GetRestPackageSize() < 1)
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+
     if(tool%10 > 7 || type < 1)
         return ;
     if(types[tool%10] < type)
