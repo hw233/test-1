@@ -30391,7 +30391,9 @@ void Player::sendFirendlyCountTaskInfo()
         UInt8 count_num = GET_BIT_8(count_var_value , i%3);
         st << count_num ;
     }
+
     st << Stream::eos; 
+
     send(st);
 }
 void Player::InsertBrother(Player * pl)
@@ -31986,16 +31988,16 @@ void Player::specialUdpLog(UInt8 type)
     }
 }
 
-bool Player::canInviteCutting(Player *pl)
+bool Player::canInviteCutting( Player *pl)
 {
     UInt32 TreeCount = GetVar(VAR_CUTTREE_COUNT);
-    UInt8 count = GET_BIT_8(drinkCount , 0 );
+    UInt8 count = GET_BIT_8(TreeCount , 0 );
     UInt32 TreeCount2 = GetVar(VAR_CUTTREE_BUY); 
 
     std::set<Player *>::iterator it = getDrinkInfo().plset.find(pl);
     if(it != getDrinkInfo().plset.end())
         return false;
-    if(TreeCount >= 2 && TreeCount2 < 1)
+    if( count >= 2 && TreeCount2 < 1)
         return false;
     if(getCuttingInfo().cutter != NULL || getCuttingInfo().time != 0 )
         return false;
@@ -32004,44 +32006,32 @@ bool Player::canInviteCutting(Player *pl)
 }
 UInt8 Player::InviteCutting(Player * pl)   //需要抛消息
 {
-    bool flag = true;
-
     if(_playerData.location != 9476)
         moveTo(9476,true);
 
     UInt32 now = TimeUtil::Now();
-    std::map<UInt64,struct invitTime>::const_iterator it = _brothers.find(pl->getId());
-    if(it == _brothers.end())
-        flag = false;
-    else if(now < it->second.cutT )
+    UInt32 friendlyCount = getFriendlyCount(pl->getId());
+    if(friendlyCount < 1500 )
+        return 0;
+    std::map<UInt64,struct invitTime1500>::const_iterator it = _friendCount1500.find(pl->getId());
+    if(now < it->second.cutT )
     {
-        flag = false ;
+        return 0;
     }
-
-    if( GetVar(VAR_MARRY_STATUS) == 5 && pl->getId() == GetMarriageInfo()->lovers ) 
-        flag = true ;
-    if(!flag)
-        return ;
-
     getCuttingInfo().plset.insert(pl);
+    struct invitTime1500 iT(now);
+    _friendCount1500[pl->getId()] = iT ;
     if(pl->getThreadId() == getThreadId())
     {
-        pl->beInviteDrinking(this);
+        pl->beInviteCutting(this);
     }
     else 
     {
-        struct st
-        {
-            UInt64 playerId ; 
-            UInt8 type ;
-        };
-        st _st ;
-        _st.playerId = getId();
-        _st.type = getCuttingInfo().type;
-        GameMsgHdr hdr(0x403, pl->getThreadId(), pl, sizeof(_st));
-        GLOBAL().PushMsg(hdr, &_st);
+        UInt64 pid = getId();
+        GameMsgHdr hdr(0x409, pl->getThreadId(), pl, sizeof(pid));
+        GLOBAL().PushMsg(hdr, &pid);
     }
-
+    return 1;
 }
 void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入据点
 {
@@ -32050,9 +32040,10 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
         sendMsgCode(2,4037);
         return ;
     }
+    UInt32 now = TimeUtil::Now();
     bool flag = false ;
-    std::map<UInt64,struct invitTime>::iterator it = _brothers.find(pl->getId());
-    if(it != _brothers.end()) 
+    std::map<UInt64,struct invitTime1500>::iterator it = _friendCount1500.find(pl->getId());
+    if(it != _friendCount1500.end()) 
         flag = true ;
     if( GetVar(VAR_MARRY_STATUS) == 5 && pl->getId() == GetMarriageInfo()->lovers ) 
         flag = true ;
@@ -32062,28 +32053,95 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
     {
         if(pl->getCuttingInfo().cutter != NULL)
             return ;
-        setCutter(1,pl);
-        pl->setCutter(0,this);
-        sendCutterInfo();
-        pl->sendCutterInfo();
+        std::set<Player *>::iterator it = getCuttingInfo().plset.find(pl);
+        if(it != getCuttingInfo().plset.end())
+        {
+            setCutter(1,pl);
+            pl->setCutter(0,this);
+            pl->getCuttingInfo().type = getCuttingInfo().type;
+            sendCutterInfo();
+            pl->sendCutterInfo();
+
+        }
     }
     else
     {
-        it->second.drinkT = now + 300; 
+        it->second.cutT = now + 300; 
     }
 }
-void Player::CutForOnce()
+UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
 {
-
+    static UInt32 chance [][4] = {
+        {15,50,85,100},
+        {15,50,85,100},
+        { 5,45,80,100},
+        { 0,30,75,100},
+        { 0,15,70,100},
+    };
+    static UInt32 treeNum[] = {1,2,3,20};
+    UInt32 lastTime = GetVar(VAR_TREE_TIME); 
+    UInt32 now = TimeUtil::Now();
+    UInt8 statue = 0;
+    if(!flag &&(  now < lastTime + getCuttingInfo().oneTime )) 
+        return 1;
+    if(!flag)
+    {
+        statue = getCuttingInfo().setTree(num,getCuttingInfo().shenfen);        
+        getCuttingInfo().cutter->getCuttingInfo().setTree(num,getCuttingInfo().shenfen);     
+    }
+    UInt32 rnd = uRand(100);
+    UInt8 type = getCuttingInfo().type; 
+    for(UInt8 i =0;i < 4 ;++i)
+    {
+        if(rnd < chance[type][i])
+        {
+            if(!getCuttingInfo().shenfen)
+            {
+               getCuttingInfo().count += 1; 
+               if(!flag && getCuttingInfo().cutter)
+                   getCuttingInfo().cutter->getTreefromCutter(treeNum[i]);
+            }
+            else
+            {
+               getCuttingInfo().count += treeNum[i];
+            }
+            if( type > 1 )
+                getCuttingInfo().count += (treeNum[i]+1)/2 ;
+            break;
+        }            
+    }
+    if(statue%100 == 1 && !flag)
+        SetVar(VAR_TREE_TIME,now);
+    UInt32 rnd2 = uRand(100);
+    if(rnd2 < 10)
+    {
+        m_Package->AddItem(9375 ,1 ,true ,true);
+        getCuttingInfo().count2 ++;
+    }
+    return 1;
 }
-void Player::quicklyCut(UInt8 type)
+UInt8 Player::quicklyCut(UInt8 type)
 {
-
+    if(!subCuttingCount())
+        return 1;
+    UInt8 count = 60 / getCuttingInfo().oneTime;
+    for(UInt8 i = 0; i < count ;++i)
+    {
+       CutForOnce(0,1);
+    }
+    return 0;
 }
 void Player::beginCutting()
 {
-
-
+    if(!subCuttingCount())
+        return ;
+    if(getCuttingInfo().cutter == NULL)
+        return ;
+    UInt32 now = TimeUtil::Now();
+    setCutTime(now);
+    getCuttingInfo().cutter->setCutTime(now);
+    sendCutterInfo();
+    getCuttingInfo().cutter->sendCutterInfo();
 }
 void Player::beInviteCutting(Player * pl)
 {
@@ -32095,6 +32153,7 @@ void Player::beInviteCutting(Player * pl)
     Stream st(REP::BROTHER);
     st << static_cast<UInt8>(0x14);
     st << pl->getName();
+    st <<pl->GetVar(VAR_TREE_VALUE_DAY);
     st << Stream::eos;
     send(st);
 }
@@ -32103,12 +32162,160 @@ void Player::sendCutterInfo()
     Stream st(REP::BROTHER);
     st << static_cast<UInt8>(0x11);
     st << static_cast<UInt8>(getCuttingInfo().type);
-    st << getCuttingInfo().cutter->getName();
+    st <<static_cast<UInt8>(getCuttingInfo().shenfen);
+    if(!getCuttingInfo().cutter)
+        st <<"";
+    else
+        st << getCuttingInfo().cutter->getName();
     st << getCuttingInfo().time;
     st << GetVar(VAR_TREE_VALUE);
     st << GetVar(VAR_TREE_VALUE_DAY);
-    st <<Stream::eos;
+    st << static_cast<UInt8>(getCuttingInfo().count);
+    st << static_cast<UInt8>(getCuttingInfo().count2);
+    st << static_cast<UInt8>(getCuttingInfo().countOther);
+    for(UInt8 i = 0; i < TREEMAX ; ++i)
+        st << getCuttingInfo().getTree(i);
+    st << Stream::eos;
     send(st);
+}
+bool Player::CutToolLevelUp(UInt8 level)
+{
+   UInt16 iid = 9375;
+   static UInt8 nums[] = { 0,9,11,10,11,14,13,15};
+   UInt32 curLevel = GetVar(VAR_TREE_TOOL); 
+   if(level > 7 || level ==0)
+       return false;
+   if( curLevel != static_cast<UInt32>(level-1) )
+       return false;
+   UInt8 num = nums[level];
+   UInt16 count = GetPackage()->GetItemAnyNum(iid) ;
+   ItemBase * item = GetPackage()->FindItem(iid, true);
+   if (!item)
+       item =GetPackage()->FindItem(iid, false);
+   if(item ==NULL)
+       return false;
+   if(num > count)
+       return false;
+   GetPackage()->DelItemAny(iid, num );
+   GetPackage()->AddItemHistoriesLog(iid , num);
+
+   SetVar(VAR_TREE_TOOL,level);
+   sendTreesInfo();
+   return true;
+}
+void Player::BuyCutCount()
+{
+    UInt32 _buy = GetVar(VAR_CUTTREE_COUNT);   //购买次数
+    UInt8 buy_count =GET_BIT_8( _buy , 1 );  //购买次数
+
+    if( (buy_count + 1) > 255)
+        return ;
+
+    UInt32 gold = 10 * (buy_count + 1);
+    if (getGold() < gold)
+    {
+        sendMsgCode(0, 1104);
+        return ;
+    }
+
+    ConsumeInfo ci(ExtendPackage,0,0);
+    useGold(gold,&ci);
+
+    UInt32 buy_Count = SET_BIT_8(_buy,1,(buy_count+1));
+
+    AddVar(VAR_CUTTREE_BUY,1);
+    SetVar(VAR_CUTTREE_COUNT,buy_Count);
+    sendTreesInfo();
+
+    /*
+    char action[16] = "";
+    snprintf (action, 16, "F_140423_%d",5+((buy_count<3)?(buy_count+1):4) );
+    udpLog("jiebaixitong", action, "", "", "", "", "act");
+    */
+}
+void Player::setCutType(UInt8 type)
+{
+    static UInt8 types[] = {2,2,3,3,3,4,4,5};
+    static UInt32 times[] = {10,9,9,9,8,8,7,7};
+    UInt32 tool = GetVar(VAR_TREE_TOOL);
+    if(tool > 7 || type < 1)
+        return ;
+    if(types[tool] < type)
+        return ;
+    UInt32 now = TimeUtil::Now();
+    if(getCuttingInfo().time + 60 < now)
+        getCuttingInfo().reset();
+    getCuttingInfo().type = type;
+    getCuttingInfo().oneTime = times[tool];
+    sendFirendlyCountTaskInfo();
+    sendCutterInfo();
+}
+void Player::getTreefromCutter(UInt8 count)
+{
+    if(getCuttingInfo().type != 1 )
+        return ;
+    getCuttingInfo().countOther +=count;
+}
+void Player::CutEnd()
+{
+    if(getCuttingInfo().cutter == NULL)
+        return ;
+    UInt32 now = TimeUtil::Now();
+    if(getCuttingInfo().time +60 < now)
+        return ;
+    Stream st(REP::BROTHER);
+    st << static_cast<UInt8>(0x17);
+    st << getCuttingInfo().count;  
+    st << getCuttingInfo().countOther;  
+    st << Stream::eos;
+    send(st);
+    if(getCuttingInfo().shenfen)
+        getCuttingInfo().cutter->CutEnd();
+    getCuttingInfo().reset();
+}
+void Player::sendTreesInfo()
+{
+    Stream st(REP::BROTHER);
+    st << static_cast<UInt8>(0x10);
+    UInt32 CountTree = GetVar(VAR_CUTTREE_COUNT);
+    st << static_cast<UInt32>(GetVar(VAR_TREE_VALUE));
+    st << static_cast<UInt8>( GET_BIT_8(CountTree,0) );
+    st << static_cast<UInt32>(GetVar(VAR_TREE_VALUE_DAY));
+    st << static_cast<UInt8>(GetVar(VAR_CUTTREE_BUY));
+    st << static_cast<UInt8>( GET_BIT_8(CountTree,1) );
+    st << static_cast<UInt8>(GetVar(VAR_TREE_TOOL));
+    st << Stream::eos;
+    send(st);
+}
+bool Player::subCuttingCount()
+{
+    UInt32 var_val = GetVar(VAR_CUTTREE_COUNT);
+    UInt8 val = GET_BIT_8( var_val , 0);
+    bool res = true;
+    if(val < 2)
+    {
+        UInt32 value = SET_BIT_8(var_val , 0 , (val+1));
+        SetVar(VAR_CUTTREE_COUNT,value);
+    //    if(val == 0 )
+    //        udpLog("jiebaixitong", "F_140423_4", "", "", "", "", "act");
+    //    else
+    //        udpLog("jiebaixitong", "F_140423_5", "", "", "", "", "act");
+
+    }
+    else
+    {
+        UInt32 buy_count = GetVar(VAR_CUTTREE_BUY); 
+        if(buy_count != 0)
+        {
+            SetVar(VAR_CUTTREE_BUY,buy_count - 1);
+        }
+        else
+            res = false;
+    }
+    //UInt64 id = getId();
+    //GameMsgHdr hdr(0x406, friendOne->getThreadId(), friendOne , sizeof(id));
+    //GLOBAL().PushMsg( hdr, &id );
+    return res;
 }
 
 } // namespace GObject

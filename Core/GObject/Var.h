@@ -719,11 +719,12 @@ namespace GObject
         VAR_DRINK_VALUE = 734 ,    //豪饮值
         VAR_FRIEND_VALUE_DAY = 735 ,    //每日友情值
 
-        VAR_CUTTREE_BUY = 736 ,   //玩家购买的剩余伐木次数 
-        VAR_CUTTREE_COUNT = 737 ,    //伐木次数 主动发起(8位) ,玩家总购买的次数 
         VAR_TREE_VALUE = 738 ,    //木片数
         VAR_TREE_VALUE_DAY = 738 ,    //今日被邀请获得的木片数
         VAR_TREE_TIME = 739,      //砍树时间
+        VAR_TREE_TOOL = 740,      //伐木工具
+        VAR_CUTTREE_BUY = 741 ,   //玩家购买的剩余伐木次数 
+        VAR_CUTTREE_COUNT = 742 ,    //伐木次数 主动发起(8位) ,玩家总购买的次数 
 
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制

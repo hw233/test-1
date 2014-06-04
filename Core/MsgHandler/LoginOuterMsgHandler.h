@@ -3451,8 +3451,6 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME2, 0);
                 pl->SetVar(GObject::VAR_TYSS_DISCOUNT_CONSUME3, 0);
                 //pl->SetVar(GObject::VAR_TYSS_CONTRIBUTE_CLAN_SUM, 0);
-                GameMsgHdr hdr(0x201, WORKER_THREAD_WORLD, pl, 0);
-                GLOBAL().PushMsg(hdr, NULL);
             }
             break;
         default:
@@ -4026,6 +4024,8 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         curType = 20;
         GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::globalClans.enumerate(clan_enum_1, 0);
+        GameMsgHdr hdr(0x193, WORKER_THREAD_WORLD, NULL, 0);
+        GLOBAL().PushMsg(hdr, NULL);
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_TYSS_END, end);
 

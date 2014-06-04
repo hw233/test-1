@@ -2892,6 +2892,15 @@ void OnBeInviteDrinking(GameMsgHdr & hdr ,const void *data)
         return ;
     player->beInviteDrinking(pl,_st.type);
 }
+void OnBeInviteCutting(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 playerId  = *reinterpret_cast<const UInt64 *>(data);
+	GObject::Player * pl = GObject::globalPlayers[playerId];
+    if(pl==NULL)
+        return ;
+    player->beInviteCutting(pl);
+}
 
 void OnBeAcceptDrinking(GameMsgHdr & hdr ,const void *data)
 {
@@ -2933,6 +2942,20 @@ void OnBeginDrink(GameMsgHdr & hdr ,const void *data)
 {
     MSG_QUERY_PLAYER(player);
     player->BeginDrink();
+}
+void OnBeAcceptCutting(GameMsgHdr & hdr ,const void *data)
+{
+    struct st
+    {
+        UInt64 playerId; 
+        UInt8 res ;
+    };
+    MSG_QUERY_PLAYER(player);
+    struct st _st  = *reinterpret_cast<const struct st *>(data);
+	GObject::Player * pl = GObject::globalPlayers[_st.playerId];
+    if(pl==NULL)
+        return ;
+    player->beReplyForCutting(pl,_st.res);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

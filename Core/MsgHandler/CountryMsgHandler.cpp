@@ -469,5 +469,7 @@ MSG_REG_2(GameMsgHdr, 0x406, OnAfterDrink);   //被邀请对酒
 MSG_REG_2(GameMsgHdr, 0x407, OnCalcDrink);   //被邀请对酒
 MSG_REG_2(GameMsgHdr, 0x408, OnBeginDrink);   //被邀请对酒
 
+MSG_REG_2(GameMsgHdr, 0x409, OnBeInviteCutting);   //被邀请对酒
+MSG_REG_2(GameMsgHdr, 0x410, OnBeAcceptCutting);   //回复邀请对酒
 
 MSG_HANDLER_END()

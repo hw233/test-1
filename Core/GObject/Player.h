@@ -723,19 +723,65 @@ namespace GObject
     struct invitTime
     {
         UInt32 drinkT;
+        invitTime():drinkT(0){}
+    };
+    struct invitTime1500
+    {
         UInt32 cutT;
-        invitTime():drinkT(0),cutT(0){}
+        invitTime1500():cutT(0){}
+        invitTime1500(UInt32 time):cutT(time){}
+
     };
 
+#define TREEMAX 16
     struct CuttingInfo
     {
         Player * cutter;   //砍树对象
         UInt32 time ;       //砍树时间
-        UInt8 type ;        //身份
+        UInt8 type ;       // 竹林类型
+        UInt8 shenfen ;        //身份
         UInt32 count ;      //本轮收集的木片数
+        UInt32 count2;      //欧冶精粹获得数
+        UInt32 countOther;      //好友帮忙获得的木片数
+        UInt32 oneTime ;   //伐木一次的时间
+        UInt8 tree[TREEMAX];
         std::set<Player *> plset;
-        CuttingInfo() : cutter(NULL) , time(0) , type(0) ,count(0){ plset.clear(); }
-        void reset(){ cutter = NULL ; time = 0 ; type = 0; count = 0; plset.clear();}
+        CuttingInfo() : cutter(NULL) , time(0) , type(0),shenfen(0) ,count(0),count2(0),oneTime(0)
+        {
+            plset.clear(); 
+            for(UInt8 i = 0 ;i < TREEMAX ;++i)
+                tree[i] =0;
+        }
+        void reset()
+        {
+            cutter = NULL ; 
+            time = 0 ; 
+            type = 0;
+            shenfen = 0 ;
+            count = 0; 
+            count2 = 0; 
+            oneTime = 0; 
+            plset.clear();
+            for(UInt8 i = 0 ;i < TREEMAX ;++i)
+                tree[i] =0;
+        }
+        UInt8 setTree(UInt8 num ,UInt8 shenfen = 0)
+        {
+            if(num%100 > 1)
+                return 3;
+            if(shenfen > 1 )
+                return 3;
+            tree[num] = tree[num]%100+1;
+            if(tree[num] == 1)
+                tree[num] += shenfen * 100;
+            return tree[num];
+        }
+        UInt8 getTree(UInt8 num)
+        {
+            if(num >= TREEMAX) 
+                return 3;
+            return tree[num];
+        }
     };
 
     struct MoBaoInfo
@@ -2293,6 +2339,7 @@ namespace GObject
 
         std::map<UInt64, struct FriendCount >_friendlyCount;   //友好度
 		std::map<UInt64 , struct invitTime> _brothers; // 结拜兄弟(不分男女) 第二参数为发起饮酒的时间
+		std::map<UInt64 , struct invitTime1500> _friendCount1500; // 1500友好度
         std::map<UInt64, struct FriendYellowBird >_friendYB;   //黄色鸢尾赠送情况
         std::map<UInt64, struct FriendTaskNum >_friendTask;   //友好度任务
 
@@ -3293,15 +3340,22 @@ namespace GObject
         //伐木
         CuttingInfo& getCuttingInfo(){ return cuttingInfo;}
         bool canInviteCutting(Player * pl);
-        UInt8 InviteCutting(Player * pl);   //需要抛消息
+        UInt8 InviteCutting( Player * pl );   //需要抛消息
         void beInviteCutting(Player * pl);
         void beReplyForCutting(Player * pl ,UInt8 res);
-        void CutForOnce();
-        void quicklyCut(UInt8 type);
+        UInt32 CutForOnce(UInt8 num = 0 ,UInt8 flag = 0);
+        UInt8 quicklyCut(UInt8 type);
         void beginCutting();
-        void setCutter(UInt8 type ,Player * cutter){ cuttingInfo.type =type; cuttingInfo.cutter = cutter;}
+        void setCutter(UInt8 type ,Player * cutter){ cuttingInfo.shenfen =type; cuttingInfo.cutter = cutter;}
         void setCutTime(UInt32 time){cuttingInfo.time = time ;}
+        void setCutType(UInt8 type);
         void sendCutterInfo();
+        bool CutToolLevelUp(UInt8 level);
+        void BuyCutCount();
+        void getTreefromCutter(UInt8 count);
+        void CutEnd();
+        void sendTreesInfo();
+        bool subCuttingCount();
 
         void makeFighterSGList(Stream& st);
         void sendFighterSGListWithNoSkill();

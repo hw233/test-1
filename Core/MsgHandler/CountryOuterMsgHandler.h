@@ -9230,6 +9230,122 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
            player->BeginDrink();
         }
         break;
+    case 0x10:   //发起伐木
+        {
+           UInt8 opt = 0;
+           br >> opt ;
+           if(opt ==1)
+           {
+               UInt8 type = 0;
+               br >>type ;
+               player->setCutType(type);
+           }
+           player->sendTreesInfo();
+        }
+        break;
+    case 0x11:   //查询伐木信息
+        player->sendCutterInfo();
+        break;
+    case 0x12:  //升级伐木工具
+        {
+           UInt8 level = 0;
+           br >> level ;
+           UInt8 res = player->CutToolLevelUp(level);
+           Stream st(REP::BROTHER);
+           st << static_cast<UInt8>(0x12);
+           st <<static_cast<UInt8>(res);
+           st <<Stream::eos;
+           player->send(st);
+        } 
+        break;
+    case 0x13:   //购买伐木次数
+        {
+            player->BuyCutCount();
+        }
+        break;
+    case 0x14:   //邀请伐木
+        {
+            std::string name ;
+            br >> name ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(!friendOne)
+                return ;
+            player->InviteCutting(friendOne);
+        }
+        break;
+    case 0x15:   //回复伐木邀请
+        {
+            std::string name ;
+            br >> name ;
+            UInt8 res = 0;
+            br >> res ;
+            GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
+            if(friendOne == NULL)
+                return ;
+            if(res == 1)
+                player->moveTo(9476,true);
+            struct st 
+            {
+                UInt64 playerId;
+                UInt8 res ;
+            };
+            st _st ;
+            _st.playerId = player->getId();
+            _st.res = res;
+            GameMsgHdr hdr(0x410, friendOne->getThreadId(), friendOne, sizeof(_st));
+            GLOBAL().PushMsg( hdr, &_st );
+        }
+        break;
+    case 0x16:   //开始伐木
+        {
+            player->beginCutting();  
+        }
+        break;
+    case 0x17:  //退出伐木
+        {
+           if(player->getCuttingInfo().cutter && player->getCuttingInfo().time == 0)
+           {
+               player->getCuttingInfo().cutter->setCutter(1,NULL);
+               player->getCuttingInfo().cutter->sendCutterInfo();
+               player->setCutter(0,NULL);
+               player->sendCutterInfo();
+           }
+        }
+        break;
+    case 0x18:  //结束伐木
+        {
+            player->CutEnd();
+        }
+        break;
+    case 0x19:  //伐木
+        {
+            UInt8 type = 0;
+            br >>type ;
+            UInt8 res = 0;
+            switch(type)
+            {
+                case 0:
+                    {
+                        UInt8 num = 0;
+                        br >> num ;
+                        res =  player->CutForOnce(num);
+                    }
+                    break;
+                case 1:
+                case 2:
+                    res = player->quicklyCut(type);
+            }
+            player->sendCutterInfo();
+            Stream st(REP::BROTHER);
+            st << static_cast<UInt8>(0x19);
+            st << static_cast<UInt8>(type);
+            st << static_cast<UInt8>(res);
+            st <<Stream::eos;
+            player->send(st);
+            if(type)
+                player->getCuttingInfo().reset();
+        }
+        break;
 	}
 
 }
