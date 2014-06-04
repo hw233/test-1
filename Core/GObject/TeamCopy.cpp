@@ -1629,7 +1629,7 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
             if(curAutoCnt >= totalAutoCnt)
                 return;
 
-            if(pl->GetPackage()->GetRestPackageSize() < 30)
+            if(pl->GetPackage()->GetRestPackageSize() < 40)
             {
                 Stream st(REP::TEAM_COPY_REQ);
                 st << static_cast<UInt8>(0x06) << static_cast<UInt8>(5);
@@ -1703,7 +1703,7 @@ UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
     }
 
 
-    if(pl->GetPackage()->GetRestPackageSize() < 2)
+    if(pl->GetPackage()->GetRestPackageSize() < 4)
     {
         Stream st(REP::TEAM_COPY_REQ);
         st << static_cast<UInt8>(0x06) << static_cast<UInt8>(5);
@@ -1797,6 +1797,15 @@ UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
 
                             pl->pendExp(ng->getExp());
                             ng->getLoots(pl, pl->_lastLoot, 2, NULL);
+
+                            pl->pendExp(ng->getExp());
+                            ng->getLoots(pl, pl->_lastLoot, 2, NULL);
+                            if(1 == j)
+                            {
+                                UInt32 award[11][2] = {{519, 6}, {520, 6}, {521, 6}, {522, 6}, {523, 6}, {524, 6}, {525, 6}, {519, 12}, {520, 12}, {521, 12}, {522, 12}};
+                                pl->GetPackage()->AddItem(award[i][0], award[i][1], true, false, FromAutoTeamCopy);
+                            }
+
                             if(curAutoCnt+1 == totalAutoCnt)
                                 curAutoMark = 4;
                             else

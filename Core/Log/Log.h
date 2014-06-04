@@ -326,6 +326,7 @@ enum ItemFrom
     FromZhenyuanTiQu = 73, //阵元提取
     FromJieBai = 74 ,
     FromKJTM = 75 , //抗击天魔
+    FromAutoTeamCopy = 76 , //自动组队副本
     //80 ~ 100，繁体占用
 };
 
