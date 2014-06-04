@@ -756,6 +756,7 @@ namespace GObject
         VAR_AUTO_TEAMCOPY_CUR_INDEX = 799,       //自动组队副本当前所进行的副本索引
         VAR_AUTO_TEAMCOPY_CNT = 800,             //自动组队副本总共需要战斗怪物的数量
         VAR_AUTO_TEAMCOPY_CUR_CNT = 801,         //自动组队副本当前战斗到第几个怪物
+        VAR_AUTO_TEAMCOPY_TEMP_CNT = 802,        //自动组队副本已经打过的副本怪物数量
         VAR_MAX,
     };
 
@@ -1403,6 +1404,7 @@ namespace GObject
             REGISTER_VAR(VAR_AUTO_TEAMCOPY_CUR_INDEX, CYCLE_NONE);
             REGISTER_VAR(VAR_AUTO_TEAMCOPY_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_AUTO_TEAMCOPY_CUR_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_AUTO_TEAMCOPY_TEMP_CNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);

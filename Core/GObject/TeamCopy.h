@@ -99,6 +99,7 @@ class TeamCopyPlayerInfo
         void setPassTimes(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime);
         void incPass(UInt8 copyId, UInt8 t);
         bool checkTeamCopyPlayer(UInt8 copyId, UInt8 t);
+        bool checkAutoTeamCopyPlayer(UInt8 copyId, UInt8 t);
         void checkCopyPass(UInt32 taskId);
         void reqTeamCopyInfo();
         void sendUpdateTeamCopyInfo(UInt8 copyId);

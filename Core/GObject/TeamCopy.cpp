@@ -671,6 +671,12 @@ bool TeamCopy::enterTeamCopy(Player* pl, UInt8 copyId, UInt8 t)
         return false;
     }
 
+    if(pl->hasFlag(Player::AutoTeamCopy))
+    {
+        pl->sendMsgCode(0, 8060);
+        return 0;
+    }
+
     if (pl->hasFlag(GObject::Player::AutoCopy)) {
         pl->sendMsgCode(0, 1414);
         return false;
@@ -1262,6 +1268,16 @@ bool TeamCopyPlayerInfo::checkTeamCopyPlayer(UInt8 copyId, UInt8 t)
     return m_pass[t][copyIdx];
 }
 
+bool TeamCopyPlayerInfo::checkAutoTeamCopyPlayer(UInt8 copyId, UInt8 t)
+{
+    UInt8 copyIdx = copyId - 1;
+    UInt8 level = m_owner->GetLev();
+    if(copyId > TEAMCOPY_MAXCOPYCNT || level < TeamCopy::lvls[copyIdx] || t >= TEAMCOPY_MAXTYPECNT || !m_pass[0][copyIdx])
+        return false;
+
+    return true;
+}
+
 void TeamCopyPlayerInfo::checkCopyPass(UInt32 taskId)
 {
     switch(taskId)
@@ -1483,7 +1499,7 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
         {
             if(pl->hasFlag(Player::AutoTeamCopy)) 
             {
-                pl->sendMsgCode(0, 1414);
+                pl->sendMsgCode(0, 8060);
                 return;
             }
 
@@ -1503,7 +1519,7 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
                     if(1 == autoMark)
                     {
                         TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
-                        if(!tcpInfo->checkTeamCopyPlayer(i+1, j))
+                        if(!tcpInfo->checkAutoTeamCopyPlayer(i+1, j))
                         {
                             pl->sendMsgCode(1, 2108);
                             return;
@@ -1535,6 +1551,10 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
 
             pl->SetVar(VAR_AUTO_TEAMCOPY_CNT, autoCnt);
             pl->SetVar(VAR_AUTO_TEAMCOPY_INDEX, copyIndex);
+            pl->SetVar(VAR_AUTO_TEAMCOPY_CUR_INDEX, firstIndex);
+            std::cout << "autoCnt : " << autoCnt << std::endl;
+            std::cout << "copyIndex : " << copyIndex << std::endl;
+            std::cout << "firstIndex : " << static_cast<UInt32>(firstIndex) << std::endl;
 
             UInt8 secs = 0;
             if (cfg.GMCheck)
@@ -1563,7 +1583,7 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
         {
             if(!pl->hasFlag(Player::AutoTeamCopy)) 
             {
-                pl->sendMsgCode(0, 1415);
+                pl->sendMsgCode(0, 8061);
                 return;
             }
 
@@ -1584,7 +1604,7 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
         {
             if(!pl->hasFlag(Player::AutoTeamCopy)) 
             {
-                pl->sendMsgCode(0, 1415);
+                pl->sendMsgCode(0, 8061);
                 return;
             }
 
@@ -1594,6 +1614,14 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
                 if(pl->getVipLevel() < 6 && !pl->inVipPrivilegeTime())
                     return;
             }
+
+            UInt32 totalAutoCnt = pl->GetVar(VAR_AUTO_TEAMCOPY_CNT);
+            if(0 == totalAutoCnt)
+                return;
+
+            UInt32 curAutoCnt = pl->GetVar(VAR_AUTO_TEAMCOPY_CUR_CNT);
+            if(curAutoCnt >= totalAutoCnt)
+                return;
 
             if(pl->GetPackage()->GetRestPackageSize() < 30)
             {
@@ -1638,9 +1666,16 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
             autoClear(pl, true);
             pl->addFlag(Player::AutoTeamCopy);
 
-            UInt8 m = 0;
-            bool endMark = false;
+            copyIndex = pl->GetVar(VAR_AUTO_TEAMCOPY_INDEX);
+            for(UInt32 i=curAutoCnt; i<totalAutoCnt; i++)
+            {
+                if(!fight(pl, copyIndex, true, true))
+                    return;
+            }
+
+            /*bool endMark = false;
             UInt8 curIndex = pl->GetVar(VAR_AUTO_TEAMCOPY_CUR_INDEX);
+            copyIndex = pl->GetVar(VAR_AUTO_TEAMCOPY_INDEX);
             for(UInt8 i=curIndex/2; i<TEAMCOPY_MAXCOPYCNT; i++)
             {
                 for(UInt8 j=curIndex%2; j<TEAMCOPY_MAXTYPECNT; j++)
@@ -1649,10 +1684,13 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
                     if(1 == autoMark)
                     {
                         if(!fight(pl, copyIndex, true, true))
+                        {
+                            std::cout << "ERROREND : " << static_cast<UInt32>(pl->GetVar(copyIndex)) << std::endl;
                             return;
+                        }
                     }
                 }
-            }
+            }*/
         }
         break;
     default:
@@ -1667,7 +1705,7 @@ UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
 
     if(pl->hasFlag(Player::AutoTeamCopy) && !ato)
     {
-        pl->sendMsgCode(0, 1414);
+        pl->sendMsgCode(0, 8060);
         return 0;
     }
 
@@ -1710,11 +1748,15 @@ UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
     if(curAutoCnt >= totalAutoCnt)
         return 0;
 
-    UInt32 autoCnt = 0;
+    UInt32 tempAutoCnt = pl->GetVar(VAR_AUTO_TEAMCOPY_TEMP_CNT);
+    if(tempAutoCnt >= totalAutoCnt)
+        return 0;
+
     UInt8 curAutoMark = 0;
     UInt32 tcNpcId = 0;
     UInt8 nextIndex = 0;
     UInt32 nextTCNpcId = 0;
+    UInt32 autoCnt = tempAutoCnt;
     GData::NpcGroup * ng = NULL;
     for(UInt8 i=curAutoIndex/2; i<TEAMCOPY_MAXCOPYCNT; i++)
     {
@@ -1738,6 +1780,8 @@ UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
                         return 0;
                     
                     autoCnt++;
+                    std::cout << "fAAAAAAAA : " << static_cast<UInt32>(autoCnt) << std::endl;
+                    std::cout << "fBBBBBBBB : " << static_cast<UInt32>(curAutoCnt+1) << std::endl;
                     if(curAutoCnt+1 == autoCnt)
                     {
                         if(k+1==cnt)
@@ -1765,7 +1809,7 @@ UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
                             }
 
                             pl->pendExp(ng->getExp());
-                            ng->getLoots(pl, pl->_lastLoot, 0, NULL);
+                            ng->getLoots(pl, pl->_lastLoot, 2, NULL);
                             if(curAutoCnt+1 == totalAutoCnt)
                                 curAutoMark = 4;
                             else
@@ -1782,7 +1826,6 @@ UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
                             nextTCNpcId = npcId[k+1];
                         }
 
-                        pl->SetVar(VAR_AUTO_TEAMCOPY_CUR_INDEX, curAutoIndex);
                         pl->SetVar(VAR_AUTO_TEAMCOPY_CUR_CNT, (curAutoCnt+1));
                     }
                     if(curAutoMark > 0)
@@ -1816,14 +1859,22 @@ UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
             else
                 nextIndex++;
         }
+        pl->SetVar(VAR_AUTO_TEAMCOPY_CUR_INDEX, nextIndex);
+        pl->SetVar(VAR_AUTO_TEAMCOPY_TEMP_CNT, (curAutoCnt+1));
     }
     Stream st(REP::TEAM_COPY_REQ);
     st << static_cast<UInt8>(0x06) << curAutoMark;
-    st << static_cast<UInt8>(pl->GetVar(VAR_AUTO_TEAMCOPY_CUR_INDEX));
+    st << static_cast<UInt8>(curAutoIndex);
     st << static_cast<UInt32>(pl->GetVar(VAR_AUTO_TEAMCOPY_INDEX));
     st << static_cast<UInt32>(tcNpcId); 
     st << static_cast<UInt8>(nextIndex); 
     st << static_cast<UInt32>(nextTCNpcId); 
+    std::cout << "fcurAutoMark : " << static_cast<UInt32>(curAutoMark) << std::endl;
+    std::cout << "ftotalIndex : " << static_cast<UInt32>(pl->GetVar(VAR_AUTO_TEAMCOPY_INDEX)) << std::endl;
+    std::cout << "fcurIndex : " << static_cast<UInt32>(pl->GetVar(VAR_AUTO_TEAMCOPY_CUR_INDEX)) << std::endl;
+    std::cout << "fnextIndex : " << static_cast<UInt32>(nextIndex) << std::endl;
+    std::cout << "fcurNPCId : " << static_cast<UInt32>(tcNpcId) << std::endl;
+    std::cout << "fnextNPCId : " << static_cast<UInt32>(nextTCNpcId) << std::endl;
     if(3==curAutoMark || 4==curAutoMark)
     {
         UInt8 sz = pl->_lastLoot.size();
@@ -1844,8 +1895,12 @@ UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
 
 void TeamCopy::sendAutoTeamCopy(Player* pl)
 {
+    if((pl->hasFlag(Player::AutoTeamCopy) && pl->GetVar(VAR_AUTO_TEAMCOPY_INDEX)) ||
+            (!pl->hasFlag(Player::AutoTeamCopy) && !pl->GetVar(VAR_AUTO_TEAMCOPY_INDEX)))
+        return;
+
     Stream st(REP::TEAM_COPY_REQ);
-    st << static_cast<UInt8>(0x06) << static_cast<UInt8>(0);
+    st << static_cast<UInt8>(0x06) << static_cast<UInt8>(8);
     st << static_cast<UInt8>(pl->GetVar(VAR_AUTO_TEAMCOPY_CUR_INDEX));
     st << static_cast<UInt32>(pl->GetVar(VAR_AUTO_TEAMCOPY_INDEX));
     st << static_cast<UInt32>(0); 
@@ -1879,6 +1934,7 @@ void TeamCopy::autoClear(Player* pl, bool complete)
         pl->SetVar(VAR_AUTO_TEAMCOPY_CUR_INDEX, 0);
         pl->SetVar(VAR_AUTO_TEAMCOPY_CNT, 0);
         pl->SetVar(VAR_AUTO_TEAMCOPY_CUR_CNT, 0);
+        pl->SetVar(VAR_AUTO_TEAMCOPY_TEMP_CNT, 0);
     }
 
     PopTimerEvent(pl, EVENT_AUTOTEAMCOPY, pl->getId());
