@@ -29,10 +29,14 @@ void KangJiTianMo::GetKJTMStatus(Player* pl)
     if(NULL == pl)
         return;
 
+    UInt32 begin = GVAR.GetVar(GVAR_KANGJITIANMO_BEGIN);
+    UInt32 end = GVAR.GetVar(GVAR_KANGJITIANMO_END);
     UInt32 status = pl->GetVar(VAR_KJTM_STATUS);
     Stream st(REP::KANGJITIANMO_REP);
     st << static_cast<UInt8>(0x00) << static_cast<UInt8>(0x00);
     st << status;
+    st << begin;
+    st << end;
     st << Stream::eos;
     pl->send(st);
 }
