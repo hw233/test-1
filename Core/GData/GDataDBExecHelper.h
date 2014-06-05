@@ -830,6 +830,12 @@ struct DBPicInfo
     UInt32 cost ;
     UInt8 buffId;
 };
+struct DBCubeCount
+{
+    UInt8 id;
+    UInt8 index;
+    UInt8 cnt;
+};
 
 struct DBCardUpgrade
 {
@@ -1920,6 +1926,16 @@ SPECIALDEF(4)
     UInt8, buffId
 	)
 SPECIALEND()
+
+SPECIALBEGIN(GData::DBCubeCount)
+SPECIALDEF(3)
+	(
+    UInt8, id,
+    UInt8, index,
+    UInt8, cnt
+	)
+SPECIALEND()
+
 }
 
 #endif // _GDATADBEXECHELPER_H_

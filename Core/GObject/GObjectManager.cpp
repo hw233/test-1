@@ -7879,11 +7879,10 @@ namespace GObject
             pl->getPictureInfo().floor = dbfr.floor;
             if(dbfr.cubeHave != "")
             {
-                StringTokenizer tokenizer(dbfr.cubeHave, "|");
+                StringTokenizer tokenizer(dbfr.cubeHave, ",");
                 for(size_t j = 0; j < tokenizer.count(); ++ j)
                 {
                     pl->getPictureInfo().cubeHave.insert(atoi(tokenizer[j].c_str()));
-                    StringTokenizer tokenizer2(tokenizer[j], ",");
                 }
             }
             if(dbfr.cubeCover != "")
@@ -7901,7 +7900,7 @@ namespace GObject
                     }
                 }
                 if(map_vec.size())
-                    pl->setPictureInfo(dbfr.floor ,map_vec );
+                    pl->setPictureInfo(dbfr.floor ,&map_vec );
             }
 		}
 		lc.finalize();

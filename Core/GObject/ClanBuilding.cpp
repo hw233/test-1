@@ -515,7 +515,7 @@ namespace GObject
            return  _buildings[type].getAddVal();
         return 0;
     }
-    void ClanBuildingOwner::AddBattlesInfo(struct ClanBuildBattleInfo cbbi)
+    void ClanBuildingOwner::AddBattlesInfo(struct ClanBuildBattleInfo cbbi , UInt8 board)
     {
         if(battles_deque.size() == 20 )
             battles_deque.pop_front();
@@ -544,6 +544,7 @@ namespace GObject
                 return ;
             vec[i]->SetVar(VAR_LEFTADDR_POWER , val - 3);
             sendAttackTeamInfo(vec[i]);
+            if(board)
             {
                 if(cbbi.res == 0)
                 {

@@ -9512,6 +9512,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             if(!friendOne)
                 return ;
             player->InviteCutting(friendOne);
+
         }
         break;
     case 0x15:   //回复伐木邀请
@@ -9648,8 +9649,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
                     map_vec[index].push_back(cubeIndex);
                 }
             }
-            if(map_vec.size())
-                player->setPictureInfo(floor,map_vec);
+            player->setPictureInfo(floor,&map_vec);
         }
         break;
 	}

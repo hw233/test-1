@@ -65,6 +65,7 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140521_cCubeAttr.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140521_cFloorAttr.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140521_cPicInfo.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140521_cCubeCount.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140523_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
@@ -144,6 +145,7 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from cubeAttr; source cubeAttr;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from floorAttr; source floorAttr;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from picInfo; source picInfo;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from cubeCount; source cubeCount;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from newquestions; source newquestions;";
 }
 

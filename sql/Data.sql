@@ -1282,6 +1282,15 @@ CREATE TABLE `cubeAttr` (
     `buff` tinyint(3) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cubeCountn`;
+CREATE TABLE `cubeCount` (
+    `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `index` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `cnt` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`,`index`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `newquestions`;
 CREATE TABLE `newquestions` (
     `id` smallint(6) unsigned NOT NULL,

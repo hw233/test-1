@@ -3422,7 +3422,7 @@ namespace GObject
         bool subCuttingCount(UInt8 flag = 0);
 
         PictureInfo& getPictureInfo(){ return pictureInfo;}
-        void setPictureInfo(UInt8 id , std::map<UInt8 ,std::vector<UInt8>> map_vec);
+        void setPictureInfo(UInt8 id , std::map<UInt8 ,std::vector<UInt8> > *map_vec);
         void sendPictureInfo();
         void loadPictureInfoFromDB();
         void UpdatePictureToDB();

@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS `pictureAttr`;
 CREATE TABLE IF NOT EXISTS `pictureAttr` (
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `floor` tinyint(3) unsigned NOT NULL DEFAULT '0',

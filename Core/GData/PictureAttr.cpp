@@ -10,8 +10,8 @@ namespace GData
 
     PictureAttr::stPictureAttr*  PictureAttr::getPictureAttrTable(UInt8 floor , UInt8 index)
     {
-        if( /*(_pictureAttr[floor].size() )&&*/ index < _pictureAttr[floor].size() )
-            return &_vecCubeAttr[_pictureAttr[floor][index]];
+        if( /*(_pictureAttr[floor].size() )&&*/index > 0 && (index  - 1)< _pictureAttr[floor].size() )
+            return &_vecCubeAttr[_pictureAttr[floor][index - 1]];
         return NULL;
     }
     UInt32 PictureAttr::getFloorCost(UInt8 index)
@@ -19,11 +19,5 @@ namespace GData
         if(index == 0 || index > _floorCostVec.size())
             return -1;
         return _floorCostVec[index - 1];
-    }
-    void PictureAttr::setFloorCost(UInt8 index ,UInt32 value)
-    {
-        if( index ==0 || (index-1) != _floorCostVec.size()) 
-            return ;
-        _floorCostVec.push_back(value);
     }
 }

@@ -97,6 +97,7 @@ namespace GData
         static bool LoadCubeAttr();
         static bool LoadFloorAttr();
         static bool LoadPicInfo();
+        static bool LoadCubeCount();
 
         static bool LoadNewQuestionsConfig();
         static void clearUdpItem();

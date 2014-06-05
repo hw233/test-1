@@ -31846,6 +31846,12 @@ bool Player::AfterDrinking()
         shenfen = 1;    //1表示主动邀请
     if(shenfen && !UseMeiHuaJian(16005 + getDrinkInfo().type , 1))
         return false;
+    {
+    char action[16] = "";
+    snprintf (action, 16, "F_140423_%d",9+getDrinkInfo().type );
+    udpLog("jiebaixitong", action, "", "", "", "", "act");
+    }
+
     UInt32 var_val = GetVar(VAR_DRINK_COUNT);
     UInt8 val = GET_BIT_8( var_val , !shenfen);
     if(shenfen)
@@ -32186,10 +32192,10 @@ UInt8 Player::InviteCutting(Player * pl)   //需要抛消息
 
     UInt32 now = TimeUtil::Now();
     UInt32 friendlyCount = getFriendlyCount(pl->getId());
-    if(friendlyCount < 1500 )
+    if(friendlyCount < 500 )
         return 0;
     std::map<UInt64,struct invitTime1500>::const_iterator it = _friendCount1500.find(pl->getId());
-    if(now < it->second.cutT )
+    if(now < it->second.cutT && it != _friendCount1500.end())
     {
         return 0;
     }
@@ -32228,6 +32234,11 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
     {
         if(pl->getCuttingInfo().shenfen ==1 )
             return ;
+        if(getCuttingInfo().cutter != NULL)
+        {
+            pl->sendMsgCode(2,4038);
+            return ;
+        }
         if(pl->getCuttingInfo().cutter != NULL)
         {
             pl->getCuttingInfo().cutter->setCutter(1,NULL);
@@ -32279,7 +32290,7 @@ UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
         statue = getCuttingInfo().setTree(num,getCuttingInfo().shenfen);        
         if(getCuttingInfo().cutter)
             getCuttingInfo().cutter->getCuttingInfo().setTree(num,getCuttingInfo().shenfen);     
-        std::cout <<"playerId:"<<static_cast<UInt32>(getId()&0xffffffffff)<<  " tree:"<<static_cast<UInt32>(num)<< " statue:" <<static_cast<UInt32>(statue) << std::endl;
+        //std::cout <<"playerId:"<<static_cast<UInt32>(getId()&0xffffffffff)<<  " tree:"<<static_cast<UInt32>(num)<< " statue:" <<static_cast<UInt32>(statue) << std::endl;
     }
     if(statue%100 == 1 &&!flag)
     {
@@ -32294,7 +32305,7 @@ UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
     {
         if(rnd < chance[type-1][i])
         {
-            std::cout << "chance at " << static_cast<UInt32>(i)<< std::endl;
+            //std::cout << "chance at " << static_cast<UInt32>(i)<< std::endl;
             if(!getCuttingInfo().shenfen && !flag )
             {
                if(GetVar(VAR_TREE_VALUE_DAY) + 3 <= 99)
@@ -32322,12 +32333,16 @@ UInt32 Player::CutForOnce(UInt8 num ,UInt8 flag)
     UInt32 rnd2 = uRand(100);
     if(rnd2 < 10)
     {
-        m_Package->AddItem(16012 ,1 ,true ,true);
-        SYSMSG_SENDV(2034,this);
-        SYSMSG_SENDV(2035,this);
-        getCuttingInfo().count2 ++;
+        UInt32 tool = GetVar(VAR_TREE_TOOL);
+        if( tool%10 != 7)
+        {
+            m_Package->AddItem(16012 ,1 ,true ,true);
+            SYSMSG_SENDV(2034,this);
+            SYSMSG_SENDV(2035,this);
+            getCuttingInfo().count2 ++;
+        }
     }
-    std::cout <<" TreeCount: " <<static_cast<UInt32>(getCuttingInfo().count) << std::endl;
+    //std::cout <<" TreeCount: " <<static_cast<UInt32>(getCuttingInfo().count) << std::endl;
     return 0;
 }
 UInt8 Player::quicklyCut(UInt8 type)
@@ -32359,7 +32374,7 @@ UInt8 Player::quicklyCut(UInt8 type)
     if(getCuttingInfo().oneTime == 0)
         return 2;
     UInt8 count = 30 / getCuttingInfo().oneTime;
-    std::cout <<" id:" <<static_cast<UInt32>(getId()&0xffffffffff) << std::endl;
+    //std::cout <<" id:" <<static_cast<UInt32>(getId()&0xffffffffff) << std::endl;
     for(UInt8 i = 0; i < count ;++i)
     {
        CutForOnce(0,type);
@@ -32461,13 +32476,13 @@ void Player::sendCutterInfo()
         st << static_cast<UInt32>(0);
 
     st << static_cast<UInt32>(getCuttingInfo().countOther); //偶也
-    std::cout << static_cast<UInt32>(getId()&0xffffffffff) << std::endl;
+    //std::cout << static_cast<UInt32>(getId()&0xffffffffff) << std::endl;
     for(UInt8 i = 0; i < TREEMAX ; ++i)
     {
         st << getCuttingInfo().getTree(i);
-        std::cout << static_cast<UInt32>(getCuttingInfo().getTree(i)) << "  " ;
+        //std::cout << static_cast<UInt32>(getCuttingInfo().getTree(i)) << "  " ;
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
     st << Stream::eos;
     send(st);
 }
@@ -32475,7 +32490,7 @@ bool Player::CutToolLevelUp(UInt8 level)
 {
    UInt16 iid = 16012;
    UInt8 num =  1 ;
-   static UInt8 nums[] = { 0,9,11,10,11,14,13,15};
+   static UInt8 nums[] = { 0,15,8,10,5,10,15,15};
    UInt32 curLevel = GetVar(VAR_TREE_TOOL); 
    if(level > 7 || level ==0)
        return false;
@@ -32498,6 +32513,9 @@ bool Player::CutToolLevelUp(UInt8 level)
        SetVar(VAR_TOOL_CNT,0);
    }
    sendTreesInfo();
+   char action[16] = "";
+   snprintf (action, 16, "F_140528_%d",level + 5 );
+   udpLog("jingyulou", action, "", "", "", "", "act");
    return true;
 }
 void Player::BuyCutCount()
@@ -32523,12 +32541,9 @@ void Player::BuyCutCount()
     AddVar(VAR_CUTTREE_BUY,1);
     SetVar(VAR_CUTTREE_COUNT,buy_Count);
     sendTreesInfo();
-
-    /*
     char action[16] = "";
-    snprintf (action, 16, "F_140423_%d",5+((buy_count<3)?(buy_count+1):4) );
-    udpLog("jiebaixitong", action, "", "", "", "", "act");
-    */
+    snprintf (action, 16, "F_140528_%d",2+((buy_count< 2)?(buy_count+1):3) );
+    udpLog("jingyulou", action, "", "", "", "", "act");
 }
 void Player::setCutType(UInt8 type)
 {
@@ -32553,7 +32568,7 @@ void Player::setCutType(UInt8 type)
         std::map<UInt64,FriendCount >::iterator it_count = _friendlyCount.begin();
         for(;it_count!=_friendlyCount.end();++it_count)
         {
-            if(it_count->second.value > 3500)
+            if(it_count->second.value >= 1500)
             {
                 AddVar(VAR_TREE_TOOL,10);
                 break;
@@ -32634,7 +32649,13 @@ bool Player::subCuttingCount(UInt8 flag)
     {
         UInt32 value = SET_BIT_8(var_val , 0 , (val+1));
         SetVar(VAR_CUTTREE_COUNT,value);
-    //    if(val == 0 )
+        if(val < 2)
+        {
+            char action[16] = "";
+            snprintf (action, 16, "F_140528_%d",val+1 );
+            udpLog("jingyulou", action, "", "", "", "", "act");
+        }
+        //    if(val == 0 )
     //        udpLog("jiebaixitong", "F_140423_4", "", "", "", "", "act");
     //    else
     //        udpLog("jiebaixitong", "F_140423_5", "", "", "", "", "act");
@@ -32903,25 +32924,39 @@ void Player::getFireContributionBag(Player * pl)
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
 }
-void Player::setPictureInfo(UInt8 floor , std::map<UInt8 ,std::vector<UInt8> > map_vec)
+void Player::setPictureInfo(UInt8 floor , std::map<UInt8 ,std::vector<UInt8> > *map_vec)
 {
+    static UInt8 nums[]={1,1,2,2,2,2,3,3,2,3,3,3,2,2,3,3,3,3,4,4};
     UInt32 treeCount = GetVar(VAR_CUBE_COUNT);
     UInt32 oneCost =  GData::pictureAttrData.getFloorCost(floor);
-    if(oneCost == 0 || oneCost * getCubeCountInSet(map_vec) > treeCount)
+    if(oneCost == 0 || oneCost * getCubeCountInSet(*map_vec) > treeCount)
         return ;
-    if(GData::pictureAttrData.getFloorCubeCount(getPictureInfo().floor) == getCubeCountInSet(map_vec))
+    std::map<UInt8 ,std::vector<UInt8> >::iterator it = (*map_vec).begin();
+
+    for(;it!=map_vec->end();++it)
     {
+       if( getPictureInfo().cubeHave.find(it->first) == getPictureInfo().cubeHave.end()) 
+           return ;
+    }
+
+    if(GData::pictureAttrData.getFloorCubeCount(getPictureInfo().floor) == getCubeCountInSet(*map_vec))
+    {
+        if(getPictureInfo().floor > 100 )
+            return ;
         getPictureInfo().floor +=1; 
+        if(getPictureInfo().floor%5 == 1  && getPictureInfo().floor !=1)
+            AddVar(VAR_CUTTREE_BUY,nums[getPictureInfo().floor/5-1]);
         getPictureInfo().cubeHave.clear();
         getPictureInfo().cubeCover.clear();
         SetVar(VAR_CUBE_COUNT,0);
     }
     else
     {
-        getPictureInfo().cubeCover = map_vec;
+        getPictureInfo().cubeCover = *map_vec;
     }
     UpdatePictureToDB();
     sendPictureInfo();
+    setFightersDirty(true);
 }
 UInt8 Player::getCubeCountInSet(std::map<UInt8 , std::vector<UInt8> > map_vec)
 {
@@ -32935,16 +32970,16 @@ UInt8 Player::getCubeCountInSet(std::map<UInt8 , std::vector<UInt8> > map_vec)
 }
 void Player::getPictureAttr(GData::AttrExtra& ae)
 {
-    //差前floor-1层属性
-    //XXX
+    //前floor-1层属性
+    if(getPictureInfo().floor == 0 )
+        return ;
     GData::PictureAttr::stPictureAttr* attr = GData::pictureAttrData.getFloorAttrTable(getPictureInfo().floor);
     if(attr == NULL)
         return ;
     ae.hp += attr->hp;
     ae.attack += attr->attack;
-    ae.magatk += attr->attack;
-    ae.action += attr->action;
-
+    ae.magatk += attr->action;  //action含义被修改为魔法攻击
+    //当前层属性
     std::map<UInt8 , std::vector<UInt8> >::iterator it = getPictureInfo().cubeCover.begin();
     for(;it != getPictureInfo().cubeCover.end();++it)
     {
@@ -32955,8 +32990,7 @@ void Player::getPictureAttr(GData::AttrExtra& ae)
                 continue;
             ae.hp += attr->hp;
             ae.attack += attr->attack;
-            ae.magatk += attr->attack;
-            ae.action += attr->action;
+            ae.magatk += attr->action;  //action含义被修改为魔法攻击
         }
     }
 }
@@ -33003,7 +33037,7 @@ void Player::UpdatePictureToDB()
     {
         strCubeCover += Itoa(it->first);
         strCubeCover +=",";
-        for(UInt8 i =0 ;it->second.size(); ++i) 
+        for(UInt8 i =0 ; i < it->second.size(); ++i) 
         {
             strCubeCover += Itoa(it->second.at(i));
             strCubeCover +=",";
@@ -33019,7 +33053,14 @@ UInt8 Player::buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count)
        return 1;
    if(count == 0)
        return 1;
+   if(getPictureInfo().floor < 1)
+       return 1;
     UInt32 oneCost =  GData::pictureAttrData.getFloorCost(floor);
+    UInt8 cubeCount =  GData::pictureAttrData.getCubeCount((floor-1)%20+1,index);
+
+    if(cubeCount != count)
+        return 1;
+
     std::set<UInt8>::iterator it = getPictureInfo().cubeHave.find(index);
     if(it != getPictureInfo().cubeHave.end())
         return 2;
@@ -33028,7 +33069,7 @@ UInt8 Player::buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count)
     if(treeCount < oneCost * count )
         return 3;
 
-    std::cout << "picture :" << static_cast<UInt32>(index) << std::endl;
+    //std::cout << "picture :" << static_cast<UInt32>(index) << std::endl;
     getPictureInfo().cubeHave.insert(index);
     treeCount -= (oneCost * count);
     SetVar(VAR_TREE_VALUE,treeCount);   //设置剩余木片数
@@ -33036,6 +33077,5 @@ UInt8 Player::buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count)
     UpdatePictureToDB();
     return 0;
 }
-
 } // namespace GObject
 
