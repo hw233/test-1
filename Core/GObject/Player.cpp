@@ -632,6 +632,31 @@ namespace GObject
 		return count == 0;
     }
 
+    bool EventAutoTeamCopy::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoTeamCopy::Process(UInt32 leftCount)
+    {
+		GameMsgHdr hdr(0x279, m_Player->getThreadId(), m_Player, sizeof(id));
+		GLOBAL().PushMsg(hdr, &id);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTOTEAMCOPY, m_Player->getId());
+    }
+
+    bool EventAutoTeamCopy::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
     bool EventAutoFrontMap::Equal(UInt32 id, size_t playerid) const
     {
 		return 	id == GetID() && playerid == m_Player->getId();
@@ -922,6 +947,9 @@ namespace GObject
         _totalAchievement = 0;
         _totalItemCnt = 0;
         _totalExp = 0;
+        /*m_autoTeamCopyCnt = 0;
+        m_autoTeamCopyCurCnt = 0;
+        m_autoTeamCopyCurIndex = 0;*/
     }
 
 
@@ -8717,6 +8745,7 @@ namespace GObject
         UInt32 info = GetVar(VAR_ZHENYUAN_TIQU_CNT);
         UInt16 leftCnt = info;  //去除高16位
 
+        info = (info >> 16) << 16; //高16位值
         info |= leftCnt + num;
         SetVar(VAR_ZHENYUAN_TIQU_CNT, info);
         updateZhenyuanTiQu();
@@ -11521,6 +11550,26 @@ namespace GObject
     void Player::sendAutoCopy()
     {
         playerCopy.sendAutoCopy(this);
+    }
+
+    void Player::startAutoTeamCopy(UInt32 id)
+    {
+        teamCopyManager->autoBattle(this, id, 0);
+    }
+
+    void Player::cancelAutoTeamCopy(UInt32 id)
+    {
+        teamCopyManager->autoBattle(this, id, 1);
+    }
+
+    void Player::instantAutoTeamCopy(UInt32 id)
+    {
+        teamCopyManager->autoBattle(this, id, 2);
+    }
+
+    void Player::sendAutoTeamCopy()
+    {
+        teamCopyManager->sendAutoTeamCopy(this);
     }
 
     void Player::startAutoFrontMap(UInt8 id, UInt8 mtype = 0)

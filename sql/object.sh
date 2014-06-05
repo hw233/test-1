@@ -307,6 +307,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140418_1.sql   #修改数据库世界boss物攻、法功
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_clanbigboss.sql   #增加帮派boss
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366礼包购买次数
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
 }
 
 #sh player_jiguan.sh

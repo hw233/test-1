@@ -281,6 +281,7 @@ GMHandler::GMHandler()
     Reg(2, "sendmsg", &GMHandler::OnSendMsg);
     Reg(2, "setplvar", &GMHandler::OnSetPlayersVar);
     Reg(2, "setfc", &GMHandler::OnAddFriendlyCount);
+    Reg(2, "autotc", &GMHandler::OnAutoTeamCopy);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -2114,8 +2115,8 @@ void GMHandler::OnUpPasSkill( GObject::Player * player, std::vector<std::string>
 		if(skillLevel == 0 || skillLevel > 40)
 			return;
 
-        UInt16 skill = SKILLANDLEVEL(skillId, skillLevel);
-        UInt16 skills[1] = {skill};
+        //UInt16 skill = SKILLANDLEVEL(skillId, skillLevel);
+        //UInt16 skills[1] = {skill};
         // FIXME: 这里先禁用这个GM指令
         //fgt->upPassiveSkill(skills, 1);
 	}
@@ -4385,6 +4386,29 @@ void GMHandler::OnDreamerEyeSet(GObject::Player *player, std::vector<std::string
         return;
     UInt8 count = atoi(args[0].c_str());
     player->setDreamerEye(count);
+}
+
+void GMHandler::OnAutoTeamCopy(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 2)
+        return;
+
+    UInt8 type = atoi(args[0].c_str());
+    UInt32 copyIndex = atoi(args[1].c_str());
+    switch (type)
+    {
+        case 0:
+            player->startAutoTeamCopy(copyIndex);
+            break;
+        case 1:
+            player->cancelAutoTeamCopy(copyIndex);
+            break;
+        case 2:
+            player->instantAutoTeamCopy(copyIndex);
+            break;
+        default:
+            break;
+    }
 }
 
 void GMHandler::OnSomeAct(GObject::Player *player, std::vector<std::string>& args)

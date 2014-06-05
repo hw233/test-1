@@ -279,7 +279,14 @@ namespace GObject
         UInt8 origPos = pl->getRaceBattlePos();
         UInt8 level = origPos / 10;
         if(level == 0)
+        {
             level = 1;
+
+            char action[32] = "";
+            snprintf (action, 32, "F_140530_%u", level);
+            pl->udpLog("quanfuluandou", action, "", "", "", "", "act");
+        }
+
         if(level > sizeof(gPerLeveCnt) / sizeof(gPerLeveCnt[0]))
             return;
         if(offset == 0xFF || offset == 0)
@@ -317,6 +324,15 @@ namespace GObject
                 SYSMSG_BROADCASTV(6012 + rank - 1, pl->getCountry(), pl->getPName());
                 num = SET_BIT_3(num, level, rank);
                 World::setRBTimeRank(num);
+
+                if(rank == 1)
+                {
+                    UInt32 now = TimeUtil::Now();
+                    UInt32 totalTime = now - (TimeUtil::SharpDay(0, now) + RACEBATTLE_STARTTIME);
+                    char subAction[32] = "";
+                    snprintf (subAction, 32, "%u", totalTime);
+                    pl->udpLog("quanfuluandou", "F_140530_7", subAction, "", "", "", "act");
+                }
             }
         }
 
@@ -940,6 +956,11 @@ namespace GObject
         if(rb && starTotal >= rb->next * 2)
         {
             level = level + 1;
+
+            char action[32] = "";
+            snprintf (action, 32, "F_140530_%u", level);
+            pl->udpLog("quanfuluandou", action, "", "", "", "", "act");
+
             for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
                 pl->setStarCnt(i, 0);
             UInt8 pos = level * 10;
@@ -1050,6 +1071,11 @@ namespace GObject
         if(rb && starTotal >= rb->next * 2)
         {
             level = level + 1;
+
+            char action[32] = "";
+            snprintf (action, 32, "F_140530_%u", level);
+            pl->udpLog("quanfuluandou", action, "", "", "", "", "act");
+
             for(UInt8 i = 0; i < gPerLeveCnt[level - 1]; i++)
                 pl->setStarCnt(i, 0);
             UInt8 pos = level * 10;

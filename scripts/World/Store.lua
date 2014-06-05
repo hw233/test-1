@@ -134,7 +134,7 @@ function loadStore()
 
     store:add(2,9600,20)
     if getQixi() then
-        store:add(2,9450,10)
+        --store:add(2,9450,10)
     end
 
     if getSnowAct(300) then

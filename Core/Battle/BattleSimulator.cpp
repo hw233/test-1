@@ -7009,19 +7009,30 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
     }
 
-    for (size_t i = 0; i < _onOtherConfuseAndForgetAtkList[side].size();)
+    std::set<BattleFighter*> tmpatkers;
+    bool repeat = false;
+    do
     {
-        BattleFighter* atk = _onOtherConfuseAndForgetAtkList[side][i];
-        if (!atk || atk->getHP() < 0 || 
-                atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
+        repeat = false;
+        for (size_t i = 0; i < _onOtherConfuseAndForgetAtkList[side].size(); ++i)
         {
-            ++i;
-            continue;
-        }
-        else
+            BattleFighter* atk = _onOtherConfuseAndForgetAtkList[side][i];
+            if (!atk)
+                continue;
+
+            if (tmpatkers.find(atk) != tmpatkers.end())
+                continue;
+            tmpatkers.insert(atk);
+
+            if (atk->getHP() <= 0 || atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
+                continue;
+
+            _onOtherConfuseAndForgetAtkList[side].erase(_onOtherConfuseAndForgetAtkList[side].begin() + i);
             doOtherConfuseForgetAttack(atk, rcnt);
-        _onOtherConfuseAndForgetAtkList[side].erase(_onOtherConfuseAndForgetAtkList[side].begin() + i);
-    }
+            repeat = true;
+            break;
+        }
+    } while (repeat);
 
     if(bf->getHP() > 0 && _winner == 0 && bf->getAbnormalTypeCnt() >= 3)
     {

@@ -31,6 +31,7 @@
 #include "GObject/ShuoShuo.h"
 #include "GObject/ArenaServerWar.h"
 #include "Common/StringTokenizer.h"
+#include "GObject/TeamCopy.h"
 
 //Login thread -> Country thread
 void PlayerEnter( GameMsgHdr& hdr, const void * data )
@@ -901,6 +902,17 @@ void OnAutoCopyAttack( GameMsgHdr& hdr, const void * data )
         player->autoCopyFailed(id);
 }
 
+void OnAutoTeamCopyAttack( GameMsgHdr& hdr, const void * data )
+{
+    if (!data)
+        return;
+
+	MSG_QUERY_PLAYER(player);
+
+    UInt32 id = *(UInt32*)data;
+    teamCopyManager->fight(player, id, true);
+}
+
 void OnAutoFrontMapAttack( GameMsgHdr& hdr, const void * data )
 {
     if (!data)
@@ -1058,7 +1070,7 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
     }
 
     pkg->AddItem(pur->id, pur->num, true, false, FromDirectPurchase);
-    if(pur->id == 72 || pur->id == 79 || pur->id == 9425)
+    if(pur->id == 515 || pur->id == 79 || pur->id == 9141)
         player->AddVar(VAR_DIRECTPURCNT, 1);
     else
         player->AddVar(VAR_DIRECTPURCNT2, 1);

@@ -61,7 +61,7 @@ void Country::ClanBigBoss_Refesh(void *)
 {
     UInt32 nowTime = TimeUtil::Now();
     nowTime -= (nowTime % (5 * 60));//保证5分钟的整点
-    UInt32 time = TimeUtil::SharpDayT(0,nowTime);
+    //UInt32 time = TimeUtil::SharpDayT(0,nowTime);
 
     ClanBigBossMgr::Instance().process(nowTime);
 }

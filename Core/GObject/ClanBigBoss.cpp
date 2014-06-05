@@ -62,6 +62,7 @@ void ClanBigBoss::ReqBossAppointment(UInt8 app_time/* 时间点数 */,std::strin
     m_BossHP = getLastHP();
     _percent = 100;
     m_spirit = 10;
+    m_final = false;
     updateInfo();
 
     //TODO DB
@@ -715,8 +716,8 @@ void ClanBigBoss::ReturnBossInfo(Player* pl,UInt8 status)
     UInt32 now = TimeUtil::Now();
     if(_status == CLAN_BIGBOSS_OVER && TimeUtil::Day() != TimeUtil::Day(appointment_time))
     {
-        UInt32 nowday = now / 86400;
-        UInt32 appday = appointment_time / 86400;
+        UInt32 nowday = TimeUtil::SharpDay(0,now);
+        UInt32 appday = TimeUtil::SharpDay(0,appointment_time);
         if(nowday > appday)
             resetBossInfo();
     }
