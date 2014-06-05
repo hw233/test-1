@@ -1148,6 +1148,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendAutoTeamCopy();
     }
+    {
+        pl->sendPictureInfo();
+    }
     if(!pl->GetVar(VAR_ONCE_ONDAY))
     {
         pl->sendNovLoginInfo();
