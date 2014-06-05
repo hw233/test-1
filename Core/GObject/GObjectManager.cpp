@@ -56,6 +56,7 @@
 #include "GObject/TeamCopy.h"
 #include "GObject/PetTeamCopy.h"
 #include "GObject/KangJiTianMo.h"
+#include "GObject/Answer.h"
 #include "ActivityMgr.h"
 #include "HoneyFall.h"
 #include "TownDeamon.h"
@@ -498,6 +499,12 @@ namespace GObject
         if(!loadInactiveMember())
         {
             fprintf(stderr, "loadInactiveMember error!\n");
+            std::abort();
+        }
+
+        if(!loadQuestions())
+        {
+            fprintf(stderr, "loadQuestions error!\n");
             std::abort();
         }
 
@@ -6352,6 +6359,29 @@ namespace GObject
 			lc.advance();
             if(data.playerId > 0)
                 KJTMManager->AddInactiveMemberFromDB(data.playerId);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::loadQuestions()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading questions:");
+		DBQuestions data;
+
+		if(execu->Prepare("SELECT `answerId`, `questionsId` FROM `questions` ORDER BY `answerId`", data) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            if(data.answerId > 0)
+                answerManager->AddQuestionsFromDB(data.answerId, data.questionsId);
 		}
 		lc.finalize();
 

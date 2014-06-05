@@ -1528,6 +1528,12 @@ struct DBInactiveMember
     UInt64 playerId;
 };
 
+struct DBQuestions
+{
+    UInt8 answerId;
+    UInt16 questionsId;
+};
+
 struct DBPlayerNamed 
 {
     UInt16 serverNo;
@@ -3596,6 +3602,14 @@ SPECIALDEF(3)
     UInt16, serverNo,
     UInt64, id,
     std::string, name 
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBQuestions)
+SPECIALDEF(2)
+    (
+    UInt8, answerId,
+    UInt16, questionsId
     )
 SPECIALEND()
 

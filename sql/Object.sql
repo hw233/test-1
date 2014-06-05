@@ -2588,4 +2588,9 @@ CREATE TABLE IF NOT EXISTS `cardsuit` (
     unique KEY id_playerid(`playerid`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+DROP TABLE IF EXISTS `questions`;
+CREATE TABLE IF NOT EXISTS `questions` (
+    `answerId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `questionsId` smallint(5) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`answerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

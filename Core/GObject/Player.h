@@ -230,7 +230,13 @@ namespace GObject
 #define SET_BIT_3(X,Y,V) (CLR_BIT_3(X,Y) | V<<(Y*3))
 #define GET_BIT_3(X,Y)   ((X >> (Y*3)) & 0x07)
 
+#define SET_BIT_2(X,Y,V) (CLR_BIT_2(X,Y) | V<<(Y*2))
 #define GET_BIT_2(X,Y)   ((X >> (Y*2)) & 0x03)
+#define CLR_BIT_2(X,Y)   (X & ~(0x03<<(Y*2)))
+
+#define SET_BIT_5(X,Y,V) (CLR_BIT_5(X,Y) | V<<(Y*5))
+#define GET_BIT_5(X,Y)   ((X >> (Y*5)) & 0x1F)
+#define CLR_BIT_5(X,Y)   (X & ~(0x1F<<(Y*5)))
 
 //飞剑(坐骑)系统
 #define MOUNT_COSTID 9500

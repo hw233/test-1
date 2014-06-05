@@ -386,6 +386,10 @@ public:
     { _dropact = v; }
     inline static bool getDropAct()
     { return _dropact; }
+    inline static void setAnswerAct(bool v)
+    { _answeract = v; }
+    inline static bool getAnswerAct()
+    { return _answeract; }
     inline static void setWansheng(bool v)
     { _wansheng= v; }
     inline static bool getWansheng()
@@ -1021,8 +1025,32 @@ public:
             return true;
         else
             return false;
-    } 
-    
+    }
+
+    inline static bool getPrepareTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_ANSWER_PREPARE_DAY);
+        UInt32 end = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY);
+        UInt32 now = TimeUtil::Now();
+
+        if(now >= begin && now < end)
+            return true;
+        else
+            return false;
+    }
+
+    inline static bool getAnswerTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY);
+        UInt32 end = GVAR.GetVar(GVAR_ANSWER_END_DAY);
+        UInt32 now = TimeUtil::Now();
+
+        if(now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    }
+
     inline static bool getTYSSTime(UInt32 time = 0)
     {
         UInt32 begin = GVAR.GetVar(GVAR_TYSS_BEGIN);
@@ -1265,6 +1293,7 @@ public:
     static bool _july;
     static bool _qixi;
     static bool _dropact;
+    static bool _answeract;
     static bool _wansheng;
     static bool _qingren;
     static bool _specialbook;
@@ -1350,8 +1379,11 @@ public:
     static bool _miluzhijiao;
     static bool _buyfund;
     static bool _duobaoOpen;
+    static bool _answerOpenA;
+    static bool _answerOpenB;
     static UInt32 _rbTimeRank;
 public:
+    static RCSortType answerScoreSort;     //一战成名排名
     static RCSortType qishibanScoreSort;     //七石板积分排名
     static RCSortType guankaScoreSort;     //关卡活动积分排名
     static RCSortType rechargeSort;
@@ -1407,6 +1439,7 @@ private:
     static void ClanStatueCheck(void *);
     static void ClanDuoBaoCheck(void *);
     static void SendPopulatorRankAward(void*);
+    static void AnswerCheck(void *);
     //static void advancedHookTimer(void *para);
 public:
 	static void ReCalcWeekDay( World * );
@@ -1466,6 +1499,8 @@ public:
     void SendGuankaActAward();
     void SendTYSSClanAward();
     void SendTYSSPlayerAward();
+    static void SendAllAnswerEnd();
+    static void SendAnswerAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

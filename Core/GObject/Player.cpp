@@ -8401,6 +8401,12 @@ namespace GObject
                 it ++ ;
             }
         }
+        
+        if(nLev >= 30)
+        {
+            GameMsgHdr hdr(0x193, WORKER_THREAD_WORLD, this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
 
         if (nLev == 70)
         {
