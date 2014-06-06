@@ -3962,7 +3962,7 @@ void World::Send11CountryRankAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] ={
-         {{503,5},{515,3},{509,3},{134,3},{1325,3}},
+         {{9604,5},{515,3},{509,3},{9498,3},{16001,3}},
     };
     ClanGradeSort::iterator i = World::clanGradeSort.begin();
     UInt32 EM=0,KL=0;
