@@ -63,6 +63,7 @@ void ClanBigBoss::ReqBossAppointment(UInt8 app_time/* 时间点数 */,std::strin
     _percent = 100;
     m_spirit = 10;
     m_final = false;
+    s_pds.clear();
     updateInfo();
 
     //TODO DB

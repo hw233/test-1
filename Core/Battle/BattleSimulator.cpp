@@ -7942,21 +7942,19 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
                 break;
             }
         }
-        for(idx = 0; idx < _onOtherConfuseAndForgetAtkList[0].size(); ++ idx)
+        for(idx = 0; idx < _onOtherConfuseAndForgetAtkList[0].size();)
         {
             if (_onOtherConfuseAndForgetAtkList[0][idx] == toremove)
-            {
                 _onOtherConfuseAndForgetAtkList[0].erase(_onOtherConfuseAndForgetAtkList[0].begin() + idx);
-                break;
-            }
+            else
+                ++idx;
         }
-        for(idx = 0; idx < _onOtherConfuseAndForgetAtkList[1].size(); ++ idx)
+        for(idx = 0; idx < _onOtherConfuseAndForgetAtkList[1].size();)
         {
             if (_onOtherConfuseAndForgetAtkList[1][idx] == toremove)
-            {
                 _onOtherConfuseAndForgetAtkList[1].erase(_onOtherConfuseAndForgetAtkList[1].begin() + idx);
-                break;
-            }
+            else
+                ++idx;
         }
 
         if(!fSummonOrMirror)
