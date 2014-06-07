@@ -85,20 +85,38 @@ bool MailPackage::takeIt( Player * player, bool gm )
 	{
 		if(it->first >= 0x8000)
 		{
+            UInt32 num;
 			switch(it->first & 0xF000)
 			{
 			case Coin:
 				player->getCoin(it->second + ((it->first & 0x0FFF) << 16));
 				break;
 			case Tael:
-				player->getTael(it->second + ((it->first & 0x0FFF) << 16));
+                num = it->second + ((it->first & 0x0FFF) << 16);
+                if(num > 1000000)
+                {
+                    WARN_LOG("Tael: playerId = %" I64_FMT "u, num = %u", player->getId(), num);
+                    num = 1000000;
+                }
+				player->getTael(num);
 				break;
 			case Coupon:
-				player->getCoupon(it->second + ((it->first & 0x0FFF) << 16));
+                num = it->second + ((it->first & 0x0FFF) << 16);
+                if(num > 50000)
+                {
+                    WARN_LOG("Coupon: playerId = %" I64_FMT "u, num = %u", player->getId(), num);
+                    num = 50000;
+                }
+				player->getCoupon(num);
 				break;
 			case Gold:
                 {
                     UInt32 c = it->second + ((it->first & 0x0FFF) << 16);
+                    if(c > 20000)
+                    {
+                        WARN_LOG("Gold: playerId = %" I64_FMT "u, c = %u", player->getId(), c);
+                        c = 20000;
+                    }
                     IncommingInfo ii(InFromMail, 0, 0);
                     player->getGold(c, &ii);
 
@@ -111,10 +129,22 @@ bool MailPackage::takeIt( Player * player, bool gm )
                 }
 				break;
 			case Achievement:
-				player->getAchievement(it->second + ((it->first & 0x0FFF)<< 16));
+                num = it->second + ((it->first & 0x0FFF) << 16);
+                if(num > 100000)
+                {
+                    WARN_LOG("Achievement: playerId = %" I64_FMT "u, num = %u", player->getId(), num);
+                    num = 100000;
+                }
+				player->getAchievement(num);
 				break;
 			case Prestige:
-				player->getPrestige(it->second + ((it->first & 0x0FFF)<< 16));
+                num = it->second + ((it->first & 0x0FFF) << 16);
+                if(num > 100000)
+                {
+                    WARN_LOG("Prestige: playerId = %" I64_FMT "u, num = %u", player->getId(), num);
+                    num = 100000;
+                }
+				player->getPrestige(num);
 				break;
 			}
 		}
