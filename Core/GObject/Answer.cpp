@@ -472,6 +472,12 @@ namespace GObject
             m_playerAnswerEnd.clear();
     }
 
+    void Answer::AnswerLogClear()
+    {
+        if(m_playerAnswerLog.size() > 0)
+            m_playerAnswerLog.clear();
+    }
+
     void Answer::UseSkill(Player* pl, UInt8 skillId, UInt64 otherId)
     {
         if(NULL == pl)

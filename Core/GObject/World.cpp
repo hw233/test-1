@@ -600,6 +600,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 30)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 31)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 7)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -641,6 +649,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 31)
         ))
     {
 #if 0
@@ -1611,6 +1620,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 30)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 31)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 7)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -2463,6 +2480,7 @@ void World::AnswerCheck(void *)
 
                 World::SendAnswerAward();
                 World::SendAllAnswerEnd();
+                answerManager->AnswerLogClear();
 
                 GObject::globalPlayers.enumerate(enum_answer_send, 5);
             }
@@ -4342,6 +4360,7 @@ void World::SendAllAnswerEnd()
         st << Stream::eos;
         pl->send(st);
     }
+    World::answerScoreSort.clear();
 }
 
 void World::SendAnswerAward()
