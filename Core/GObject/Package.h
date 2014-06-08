@@ -19,6 +19,7 @@ namespace GObject
     static const UInt16 OEquip110[]= {2936,2937,2938,2939,2940,2941,2942,2943,2944,2945,2946,2947,2948,2949,2950,2951,2952,2953,2954,2955,2956,2957,2958,2959};
     static const UInt16 OEquip120[]= {3000,3001,3002,3003,3004,3005,3006,3007,3008,3009,3010,3011,3012,3013,3014,3015,3016,3017,3018,3019,3020,3021,3022,3023};
     static const UInt16 OEquip130[]= {3064,3065,3066,3067,3068,3069,3070,3071,3072,3073,3074,3075,3076,3077,3078,3079,3080,3081,3082,3083,3084,3085,3086,3087};
+    static const UInt16 OEquip140[]= {3128,3129,3130,3131,3132,3133,3134,3135,3136,3137,3138,3139,3140,3141,3142,3143,3144,3145,3146,3147,3148,3149,3150,3151};
 
     UInt16 getRandOEquip(UInt8 lvl);
     UInt16 getRandPEquip(UInt8 lvl);
@@ -168,7 +169,16 @@ namespace GObject
 
 	public:
 		UInt16 GetItemUsedGrids(UInt32 id, UInt16 num, bool bind = false);
-		inline UInt16 GetUsedPackageSize(UInt8 type = 0) const { return type ? m_SizeSoul : m_Size; }
+		inline UInt16 GetUsedPackageSize(UInt8 type = 0) const
+        {
+            if(type == 0)
+                return m_Size;
+            else if(type == 1)
+                return m_SizeSoul;
+            else if(type == 2)
+                return m_SizeLS;
+            return 0;
+        }
 		inline UInt16 GetMaxPackageSize() const { return m_Owner->getPacksize(); }
 		inline UInt16 GetRestPackageSize(UInt8 type = 0) const { return (m_Owner->getPacksize(type) > GetUsedPackageSize(type)) ? (m_Owner->getPacksize(type) - GetUsedPackageSize(type)) : 0; }
 		inline bool IsFull() const { return m_Owner->getPacksize() <= m_Size; }
@@ -317,6 +327,22 @@ namespace GObject
         ItemZhenyuan * newZhenyuanToDB(const GData::ItemBaseType *, ItemZhenyuanAttr&, bool);
 	    ItemBase* AddZhenYuan(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere = 0);
 	    void MergeZhenyuan(UInt32* zhyIds, UInt8 count);
+        /**********灵侍begin***********/
+	    ItemLingshi* GetLingshi(UInt32 id);
+	    ItemBase* AddLingShiN(UInt32 typeId, UInt32 num, bool bind, bool silence, UInt16 FromWhere = 0);
+	    ItemBase* AddLingShi(UInt32 typeId, bool bind, bool notify, UInt16 FromWhere);
+	    void lingshiUpgrade(UInt16 fighterId, UInt32 equipId, std::string& idStr);
+        UInt32 lingshiUpgrade(ItemLingshi * equip, ItemLingshi * eatEq);
+        void lingshiTrain(UInt16 fighterId, UInt32 lsId, bool type);
+        void lingshiBreak(UInt16 fighterId, UInt32 lsId, bool type);
+	    bool DelLingshi(UInt32 id, UInt16 toWhere = 0);
+	    bool DelLingshi2(ItemLingshi * lingshi, UInt16 toWhere = 0);
+        void SendLingshiTrainInfo();
+        void SendSingleLingshiData(ItemLingshi *, UInt8);
+	    static void AppendLingshiData(Stream&, ItemLingshi *);
+	    void SendLSPackageItemInfor();
+        void setLingshi(Fighter *, UInt32, UInt8);
+        /**********灵侍end***********/
     protected:
 		typedef std::map<ItemKey, ItemBase *> ItemCont;
 		typedef ItemCont::iterator item_elem_iter;
@@ -327,9 +353,11 @@ namespace GObject
 
 		ItemCont m_Items;
 		ItemCont m_ItemsSoul;
+		ItemCont m_ItemsLS;     //灵侍背包
         ItemCont m_ItemsTemporary; //临时物品
 		UInt16 m_Size;		//already used grids
 		UInt16 m_SizeSoul;  //already used soul grids
+		UInt16 m_SizeLS;    //already used lingshi grids
         UInt16 m_TempItemSize;
 		UInt8 _lastActivateLv;
 		UInt8 _lastActivateQ;

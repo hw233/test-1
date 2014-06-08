@@ -19,6 +19,7 @@
 #include "Common/URandom.h"
 #include "Common/TimeUtil.h"
 #include "Common/StringTokenizer.h"
+#include "Common/Itoa.h"
 #include "Script/GameActionLua.h"
 #include "Script/BattleFormula.h"
 #include "GData/FighterProb.h"
@@ -30,6 +31,7 @@
 #include "GObjectDBExecHelper.h"
 #include "GData/SoulExpTable.h"
 #include "GData/LBSkillTable.h"
+#include "GData/LingShiTable.h"
 #include "GObject/Leaderboard.h"
 #include "FairySpar.h"
 #include "HoneyFall.h" 
@@ -83,6 +85,8 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_armor, 0, 5 * sizeof(ItemEquip *));
 	memset(_trump, 0, sizeof(_trump));
 	memset(_trumpSkill, 0, sizeof(_trumpSkill));
+	memset(_lingshi, 0, sizeof(_lingshi));
+	memset(_lingshiSkill, 0, sizeof(_lingshiSkill));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
 	memset(_lingbao, 0, sizeof(_lingbao));
     m_2ndSoul = NULL;
@@ -97,156 +101,6 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _innateTrump = NULL;
     _soulSkillProtect = 0;
 }
-
-/*
-Fighter::Fighter(const Fighter& fighter)
-{
-    // TODO: 从Fighter模板获取一个新的fighter对象
-    memset(_acupoints, 0, sizeof(_acupoints));
-    memset(_skill, 0, sizeof(_skill));
-    //_skills.resize(32); // 默认为32个
-    memset(_citta, 0, sizeof(_citta));
-    //_cittas.resize(32); // 默认为32个
-    memset(_armor, 0, 5 * sizeof(ItemEquip *));
-    memset(_trump, 0, sizeof(_trump));
-    memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
-    m_2ndSoul = NULL;
-    _iswboss = false;
-    _wbextatk = 0;
-    _wbextmagatk = 0;
-
-    this->_id = fighter._id;
-    this->_owner = fighter._owner;
-    this->setName(fighter._name);
-    this->setClass(fighter._class);
-    this->setLevel(fighter._level);
-    this->setExp(GData::expTable.getLevelMin(this->getLevel()));
-    this->setSex(fighter._sex);
-    //ItemWeapon * nwp = GData::GDataManager::GetNpcWeapon(fighter._weapon);
-    //this->setWeapon(nwp, false);
-
-    std::string skills;
-    char skillString[16] = "";
-    bool firstFlag = true;
-
-    for (UInt8 i = 0; i < fighter._skills.size(); ++ i)
-    {
-        UInt16 skillId = fighter._skills[i] / SKILL_LEVEL_MAX;
-        if (skillId)
-        {
-            if (firstFlag)
-            {
-                snprintf(skillString, 16, "%u", skillId);
-                skills += skillString;
-                firstFlag = false;
-            }
-            else
-            {
-                snprintf(skillString, 16, ",%u", skillId);
-                skills += skillString;
-            }
-        }
-    }
-
-    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
-    {
-        for (size_t j = 0; j < fighter._passkl[i].size(); ++j)
-        {
-            UInt16 skillId = fighter._passkl[i][j];
-            if (skillId)
-            {
-                if (firstFlag)
-                {
-                    snprintf(skillString, 16, "%u", skillId);
-                    skills += skillString;
-                    firstFlag = false;
-                }
-                else
-                {
-                    snprintf(skillString, 16, ",%u", skillId);
-                    skills + skillString;
-                }
-            }
-        }
-    }
-    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
-    {
-        for (size_t j = 0; j < fighter._rpasskl[i].size(); ++j)
-        {
-            UInt16 skillId = fighter._rpasskl[i][j];
-            if (skillId)
-            {
-                if (firstFlag)
-                {
-                    snprintf(skillString, 16, "%u", skillId);
-                    skills + skillString;
-                    firstFlag = false;
-                }
-                else
-                {
-                    snprintf(skillString, 16, ",%u", skillId);
-                    skills += skillString;
-                }
-            }
-        }
-    }
-
-    UInt16 skillId = fighter.peerless / SKILL_LEVEL_MAX;
-    if (skillId)
-    {
-        if (firstFlag)
-        {
-            snprintf(skillString, 16, "%u", skillId);
-            skills += skillString;
-            firstFlag = false;
-        }
-        else
-        {
-            snprintf(skillString, 16, ",%u", skillId);
-            skills += skillString;
-        }
-    }
-    this->setSkills(skills, false);
-    this->_pexp = fighter._pexp;
-    this->_pexpAddTmp = fighter._pexpAddTmp;
-    this->_pexpMax = fighter._pexpMax;
-    this->setPotential(fighter._potential, false);
-    this->setCapacity(fighter._capacity, false);
-    this->_color = fighter._color;
-    this->strength = fighter.strength;
-    this->physique = fighter.physique;
-    this->agility = fighter.agility;
-    this->intelligence = fighter.intelligence;
-    this->will = fighter.will;
-    this->soulMax = fighter.soul;
-    this->baseSoul = fighter.soul;
-    this->aura = fighter.aura;
-    this->auraMax = fighter.auraMax;
-    this->tough = fighter.tough;
-    this->attack = fighter.attack;
-    this->magatk = fighter.magatk;
-    this->defend = fighter.defend;
-    this->magdef = fighter.magdef;
-    this->maxhp = fighter.maxhp;
-    this->action = fighter.action;
-    this->talent = fighter.talent;
-    this->hitrate = fighter.hitrate;
-    this->evade = fighter.evade;
-    this->critical = fighter.critical;
-    this->criticaldmg = fighter.criticaldmg;
-    this->pierce = fighter.pierce;
-    this->counter = fighter.counter;
-    this->magres = fighter.magres;
-
-    for (std::vector<Offset>::const_iterator it = fighter.extraPos.begin(); it != fighter.extraPos.end(); ++it)
-    {
-        Offset off;
-        off.x = it->x;
-        off.y = it->y;
-        this->extraPos.push_back(off);
-    }
-}
-*/
 
 Fighter::~Fighter()
 {
@@ -592,6 +446,16 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             }
         }
     }
+    if(t >= 0x63 && t < 0x63 + LINGSHI_UPMAX)
+    {
+        UInt32 lss[LINGSHI_UPMAX] = {0};
+        if (getAllLingshiId(lss)) {
+            std::string str;
+            if (value2string(lss, LINGSHI_UPMAX, str)) {
+                DB2().PushUpdateData("UPDATE `fighter` SET `lingshi` = '%s' WHERE `id` = %u AND `playerId` = %" I64_FMT "u", str.c_str(), _id, _owner->getId());
+            }
+        }
+    }
 
 	switch(t)
 	{ // 不保存hp, 每次重启都满血
@@ -843,6 +707,12 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 			if(writedb)
 				updateToDB(t[i], 0);
 		}
+        else if(t[i] >= 0x63 && t[i] <= 0x65)
+        {   //灵侍
+            Package::AppendLingshiData(st, static_cast<ItemLingshi *>(equip));
+			if(writedb)
+				updateToDB(t[i], equip->getId());
+        }
 		else
 		{
 			st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0)
@@ -1276,6 +1146,121 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
         }
     }
     return t;
+}
+
+int Fighter::getAllLingshiId( UInt32* lingshis, int size )
+{
+    if (!lingshis|| !size)
+        return 0;
+
+    for (int i = 0; i < LINGSHI_UPMAX; ++i)
+    {
+        if (_lingshi[i])
+            lingshis[i] = _lingshi[i]->getId();
+        else
+            lingshis[i] = 0;
+    }
+    return LINGSHI_UPMAX;
+}
+
+ItemEquip * Fighter::setLingshi(ItemEquip * lingshi)
+{
+    if(!lingshi || !IsLingShi(lingshi->getClass()))
+        return NULL;
+    UInt8 limitNum = 0;
+    if(getLevel() >= 95)
+        limitNum = 3;
+    else if(getLevel() >= 90)
+        limitNum = 2;
+    else if(getLevel() >= 85)
+        limitNum = 1;
+    if(!limitNum)
+        return NULL;
+    UInt8 idx = 0xFF;
+    for(int i = 0; i < limitNum; ++ i)
+    {
+        if(_lingshi[i] == NULL)
+        {
+            idx = i;
+            break;
+        }
+    }
+    if(idx >= limitNum)
+        idx = 0;
+    return setLingshi(lingshi, idx);
+}
+
+ItemEquip ** Fighter::setLingshi( std::string& lingshi, bool writedb )
+{
+    if (!lingshi.length())
+        return 0;
+
+    StringTokenizer tk(lingshi, ",");
+    for (size_t i = 0; i < tk.count() && static_cast<int>(i) < LINGSHI_UPMAX; ++ i)
+    {
+        ItemEquip* lshi = GObjectManager::fetchEquipment(atoi(tk[i].c_str()));
+        if (lshi)
+            setLingshi(lshi, i, writedb);
+    }
+
+    return &_lingshi[0];
+}
+
+ItemEquip * Fighter::setLingshi(ItemEquip * lingshi, int idx, bool writedb)
+{
+    if((lingshi && !IsLingShi(lingshi->getClass())) || idx >= LINGSHI_UPMAX)
+        return NULL;
+    for(int i = 0; i < LINGSHI_UPMAX; ++ i)
+    {
+        if(lingshi && _lingshi[i] == lingshi)
+            return NULL;
+    }
+    ItemEquip * old = _lingshi[idx];
+    _lingshi[idx] = lingshi;
+    sendModification(0x63+idx, lingshi, writedb);
+    _lingshiSkill[idx].clear();
+    if(lingshi)
+    {
+        lingshi->SetBindStatus(true);
+        updateLingshiSkillId(lingshi, idx);
+    }
+    else
+    {
+        if(idx == 0)
+            upPassiveSkillLingshi();
+    }
+    setDirty();
+
+    return old;
+}
+
+void Fighter::updateLingshiSkillId(ItemEquip * lingshi, UInt8 idx)
+{
+    if(idx >= LINGSHI_UPMAX || !lingshi)
+        return;
+    GData::ItemGemType * igt = GData::lingshiTypes[lingshi->GetTypeId() - LLINGSHI_ID];
+    ItemLingshiAttr& lsAttr = static_cast<ItemLingshi *>(lingshi)->getLingshiAttr();
+    if(igt && igt->attrExtra)
+    {
+        _lingshiSkill[idx].clear();
+        for(size_t j = 0; j < igt->attrExtra->skills.size(); ++ j)
+        {
+            if(igt->attrExtra->skills[j])
+            {
+                UInt16 skillId = igt->attrExtra->skills[j]->getId();
+                if(j > 0)   //第一个技能(入场技能)不升级
+                {
+                    UInt8 skillLvl = lsAttr.lv / 10 + 1;
+                    if(skillLvl > 9)
+                        skillLvl = 9;
+                    skillId = SKILLANDLEVEL(SKILL_ID(skillId), skillLvl);
+                }
+                _lingshiSkill[idx].push_back(skillId);
+            }
+        }
+        if(idx == 0)
+            upPassiveSkillLingshi();
+    }
 }
 
 int Fighter::getAllTrumpId( UInt32* trumps, int size )
@@ -1848,6 +1833,63 @@ void Fighter::addTrumpAttr( ItemEquip* trump )
 	addEquipAttr2(_attrExtraEquip, trump->getEquipAttr2(), _level);
 }
 
+void Fighter::addLingshiAttr( ItemEquip* lingshi )
+{
+    if (!lingshi)
+        return;
+    GData::ItemGemType * igt = GData::lingshiTypes[lingshi->GetTypeId() - LLINGSHI_ID];
+    GData::LingshiData * lsd = GData::lingshiCls.getLingshiData(static_cast<ItemLingshi *>(lingshi)->getLingshiAttr().lv);
+    if (!igt || !lsd || !igt->attrExtra)
+        return;
+
+    GData::AttrExtra ae = lsd->attrs;
+    UInt8 q = lingshi->getQuality();
+    if(q == Item_Green)
+        ae = ae * 0.4f;
+    else if(q == Item_Blue)
+        ae = ae * 0.55f;
+    else if(q == Item_Purple)
+        ae = ae * 0.75f;
+    else if(q == Item_Yellow)
+        ae = ae * 1.0f;
+
+    UInt8 cls = getClass();
+    if(cls == e_cls_ru)
+    {
+        ae.attack *= 0.8f;
+        ae.magatk *= 1.1f;
+        ae.hp     *= 0.8f;
+        ae.action *= 0.9f;
+    }
+    else if(cls == e_cls_shi)
+    {
+        ae.attack *= 1.0f;
+        ae.magatk *= 1.0f;
+        ae.hp     *= 1.0f;
+        ae.action *= 1.0f;
+    }
+    else if(cls == e_cls_dao)
+    {
+        ae.attack *= 1.3f;
+        ae.magatk *= 0.6f;
+        ae.hp     *= 1.1f;
+        ae.action *= 0.8f;
+    }
+    else if(cls == e_cls_mo)
+    {
+        ae.attack *= 1.3f;
+        ae.magatk *= 0.6f;
+        ae.hp     *= 0.8f;
+        ae.action *= 1.0f;
+    }
+    ae.attack += 1.0f;
+    ae.magatk += 1.0f;
+    ae.hp     += 1.0f;
+    ae.action += 1.0f;
+	addAttrExtra(_attrExtraEquip, igt->attrExtra);
+	addAttrExtra(_attrExtraEquip, &ae);
+}
+
 void Fighter::rebuildEquipAttr()
 {
 	_attrExtraEquip.reset();
@@ -2108,6 +2150,9 @@ void Fighter::rebuildEquipAttr()
         }
         //阵元系统加成
         _owner->addZhenyuanAttr(_attrExtraEquip, this);
+        //灵侍系统加成
+        for(UInt8 i = 0; i < LINGSHI_UPMAX; ++ i)
+            addLingshiAttr(_lingshi[i]);
     }
 
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
@@ -2333,9 +2378,9 @@ UInt32 Fighter::calcLingbaoBattlePoint()
             {
                 const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
                 bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
-                lingbao.skill[i] = lbattr.skill[i];
-                lingbao.factor[i] = lbattr.factor[i];
             }
+            lingbao.skill[i] = lbattr.skill[i];
+            lingbao.factor[i] = lbattr.factor[i];
         }
         if (bp != lbattr.battlePoint)
         {
@@ -2387,9 +2432,9 @@ UInt32 Fighter::recalcLingbao()
             {
                 const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
                 bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
-                lingbao.skill[i] = lbattr.skill[i];
-                lingbao.factor[i] = lbattr.factor[i];
             }
+            lingbao.skill[i] = lbattr.skill[i];
+            lingbao.factor[i] = lbattr.factor[i];
         }
         if (bp != lbattr.battlePoint)
         {
@@ -2438,9 +2483,9 @@ void Fighter::pushLingbaoInfo(ItemEquip* equip)
         {
             const GData::LBSkillBase* lbskill = GData::lbSkillManager[lbattr.skill[i]];
             bp += lbskill->battlepoint * (((float)(lbattr.factor[i]))/10000);
-            lingbao.skill[i] = lbattr.skill[i];
-            lingbao.factor[i] = lbattr.factor[i];
         }
+        lingbao.skill[i] = lbattr.skill[i];
+        lingbao.factor[i] = lbattr.factor[i];
     }
     if (bp != lbattr.battlePoint)
     {
@@ -2597,6 +2642,8 @@ Fighter * Fighter::cloneWithOutDirty(Player * player)
 	fgt->_weapon = NULL;
 	fgt->_ring = NULL;
 	fgt->_amulet = NULL;
+	fgt->_innateTrump = NULL;
+	fgt->_halo = NULL;
 	fgt->_attrDirty = false;
 	fgt->_bPDirty = false;
     fgt->_pexpMax = 100000; // XXX: 100000
@@ -2620,6 +2667,28 @@ Fighter * Fighter::cloneWithOutDirty(Player * player)
         }
     }
     memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
+    memset(fgt->_lingshi, 0, LINGSHI_UPMAX * sizeof(ItemEquip*));
+    for(int i = 0; i < LINGSHI_UPMAX; ++ i)
+    {
+        if(!_lingshi[i])
+            continue;
+        GData::ItemGemType * igt = GData::lingshiTypes[_lingshi[i]->GetTypeId() - LLINGSHI_ID];
+        if(igt && igt->attrExtra)
+        {
+            fgt->_lingshiSkill[i].clear();
+            ItemLingshiAttr& lsAttr = static_cast<ItemLingshi *>(_lingshi[i])->getLingshiAttr();
+            for(size_t j = 0; j < igt->attrExtra->skills.size(); ++ j)
+            {
+                if(igt->attrExtra->skills[j])
+                {
+                    UInt16 skillId = igt->attrExtra->skills[j]->getId();
+                    if(j > 0)   //第一个技能(入场技能)不升级
+                        skillId = SKILLANDLEVEL(SKILL_ID(skillId), lsAttr.lv / 10 + 1);
+                    fgt->_lingshiSkill[i].push_back(skillId);
+                }
+            }
+        }
+    }
 	return fgt;
 }
 
@@ -2679,6 +2748,14 @@ ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
         {
             pos = idx;
             return _trump[idx];
+        }
+    }
+    for(int idx = 0; idx < LINGSHI_UPMAX; ++ idx)
+    {
+        if(_lingshi[idx] != NULL && _lingshi[idx]->getId() == id)  // 灵侍
+        {
+            pos = idx;
+            return _lingshi[idx];
         }
     }
 	return NULL;
@@ -3033,6 +3110,29 @@ void Fighter::getAllPSkillAndLevel4Arena(Stream& st)
     }
 }
 
+
+void Fighter::getAllLingshiSkillAndLevel2Arena(Stream& st)
+{
+    UInt8 size = 0;
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        size = _passklLingshi[i].size();
+        st << size;
+        for (size_t j = 0; j < _passklLingshi[i].size(); ++j)
+        {
+            st << _passklLingshi[i][j];
+        }
+    }
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        size = _rpassklLingshi[i].size();
+        st << size;
+        for (size_t j = 0; j < _rpassklLingshi[i].size(); ++j)
+        {
+            st << _rpassklLingshi[i][j];
+        }
+    }
+}
 
 UInt8 Fighter::getSkillsNum()
 {
@@ -3580,6 +3680,9 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb, bool online )
         {
             _owner->sendFighterSSListWithNoSkill();
             _owner->sendFighterSGListWithNoSkill();
+            Stream st;
+            _owner->makeFighterSGList(st);
+            _owner->send(st);
         }
     }
     else
@@ -3736,6 +3839,21 @@ void Fighter::setSkills( std::string& skills, bool writedb )
 
     if (vt_skills.size())
         addSkillsFromCT(vt_skills, writedb, up, false);
+}
+
+void Fighter::delSkills(std::string& skills, bool writedb)
+{
+    StringTokenizer tk(skills, ",");
+    const GData::SkillBase* s = NULL;
+    std::vector<const GData::SkillBase*> vt_skills;
+    for (size_t i = 0; i < tk.count(); ++i)
+    {
+        s = GData::skillManager[::atoi(tk[i].c_str())];
+        if (s)
+            vt_skills.push_back(s);
+    }
+    if (vt_skills.size())
+        delSkillsFromCT(vt_skills, writedb);
 }
 
 bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up, bool online )
@@ -4056,19 +4174,15 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                     delPeerless(s->getId(), writedb);
                 else if (s->cond == GData::SKILL_ACTIVE)
                     delSkill(s->getId(), writedb);
+                /*
                 else if (s->cond == GData::SKILL_PREATK ||
                         s->cond == GData::SKILL_AFTATK ||
-                        s->cond == GData::SKILL_AFTNATK ||
                         s->cond == GData::SKILL_BEATKED ||
                         s->cond == GData::SKILL_AFTEVD ||
                         s->cond == GData::SKILL_AFTRES ||
-                        s->cond == GData::SKILL_DEAD ||
-                        s->cond == GData::SKILL_DEAD_FAKE ||
-                        s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
-                        s->cond == GData::SKILL_BLEED_TYPE_DMG ||
-                        s->cond == GData::SKILL_XMCZ ||
-                        s->cond == GData::SKILL_BLTY ||
                         s->cond == GData::SKILL_ENTER ||
+                        s->cond == GData::SKILL_DEAD ||
+                        s->cond == GData::SKILL_AFTNATK ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
                         s->cond == GData::SKILL_ONOTHERDEAD ||
@@ -4081,12 +4195,20 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONBEPHYDMG ||
                         s->cond == GData::SKILL_ONBEMAGDMG ||
                         s->cond == GData::SKILL_ONHP10P ||
+                        s->cond == GData::SKILL_DEAD_FAKE ||
+                        s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
+                        s->cond == GData::SKILL_BLEED_TYPE_DMG ||
+                        s->cond == GData::SKILL_XMCZ ||
+                        s->cond == GData::SKILL_BLTY ||
                         s->cond == GData::SKILL_AFTACTION ||
                         s->cond == GData::SKILL_ONHPCHANGE ||
                         s->cond == GData::SKILL_ONWITHSTAND
-                     || s->cond == GData::SKILL_VIOLENT
-                     || s->cond == GData::SKILL_REVIVAL
+                        s->cond == GData::SKILL_VIOLENT || 
+                        s->cond == GData::SKILL_REVIVAL || 
+                        s->cond == GData::SKILL_LINGSHI
                         )
+                        */
+                else if (s->cond >= GData::SKILL_PASSSTART && s->cond < GData::SKILL_PASSIVES)
                 {
                     offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
                 }
@@ -4113,19 +4235,15 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                     addNewPeerless(s->getId(), writedb, up);
                 else if (s->cond == GData::SKILL_ACTIVE)
                     addNewSkill(s->getId(), writedb, up, online);
+                /*
                 else if (s->cond == GData::SKILL_PREATK ||
                         s->cond == GData::SKILL_AFTATK ||
-                        s->cond == GData::SKILL_AFTNATK ||
                         s->cond == GData::SKILL_BEATKED ||
                         s->cond == GData::SKILL_AFTEVD ||
                         s->cond == GData::SKILL_AFTRES ||
-                        s->cond == GData::SKILL_DEAD ||
-                        s->cond == GData::SKILL_DEAD_FAKE ||
-                        s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
-                        s->cond == GData::SKILL_BLEED_TYPE_DMG ||
-                        s->cond == GData::SKILL_XMCZ ||
-                        s->cond == GData::SKILL_BLTY ||
                         s->cond == GData::SKILL_ENTER ||
+                        s->cond == GData::SKILL_DEAD ||
+                        s->cond == GData::SKILL_AFTNATK ||
                         s->cond == GData::SKILL_ONTHERAPY ||
                         s->cond == GData::SKILL_ONSKILLDMG ||
                         s->cond == GData::SKILL_ONOTHERDEAD ||
@@ -4138,12 +4256,20 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_ONBEPHYDMG ||
                         s->cond == GData::SKILL_ONBEMAGDMG ||
                         s->cond == GData::SKILL_ONHP10P ||
+                        s->cond == GData::SKILL_DEAD_FAKE ||
+                        s->cond == GData::SKILL_ABNORMAL_TYPE_DMG ||
+                        s->cond == GData::SKILL_BLEED_TYPE_DMG ||
+                        s->cond == GData::SKILL_XMCZ ||
+                        s->cond == GData::SKILL_BLTY ||
                         s->cond == GData::SKILL_AFTACTION ||
                         s->cond == GData::SKILL_ONHPCHANGE ||
-                        s->cond == GData::SKILL_ONWITHSTAND
-                     || s->cond == GData::SKILL_VIOLENT
-                     || s->cond == GData::SKILL_REVIVAL
+                        s->cond == GData::SKILL_ONWITHSTAND ||
+                        s->cond == GData::SKILL_VIOLENT || 
+                        s->cond == GData::SKILL_REVIVAL || 
+                        s->cond == GData::SKILL_LINGSHI 
                         )
+                        */
+                else if (s->cond >= GData::SKILL_PASSSTART && s->cond < GData::SKILL_PASSIVES)
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
                 }
@@ -4237,6 +4363,39 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
     return ret;
 }
 
+bool Fighter::upPassiveSkillLingshi()
+{
+    bool ret = false;
+    for (UInt16 idx = 0; idx < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++idx)
+    {
+        _passklLingshi[idx].clear();
+        _rpassklLingshi[idx].clear();
+    }
+    for (std::vector<UInt16>::iterator it = _lingshiSkill[0].begin(); it != _lingshiSkill[0].end(); ++it)
+    {
+        UInt16 skillId = *it;
+        if (!skillId)
+            continue;
+        const GData::SkillBase* skill = GData::skillManager[skillId];
+        if (!skill)
+            continue;
+        UInt16 type = skill->cond;
+        bool p100 = (skill->prob >= 100.0f)? true: false;
+        if (type < GData::SKILL_PASSSTART || type >= GData::SKILL_PASSIVES)
+            return false;
+
+        UInt16 idx = type - GData::SKILL_PASSSTART;
+
+        if (p100) // 100%
+                _passklLingshi[idx].push_back(skillId);
+        else
+                _rpassklLingshi[idx].push_back(skillId);
+    }
+    return ret;
+}
+
+
+/*
 bool Fighter::upPassiveSkill(UInt16* skill, UInt8 size, bool writedb)
 {
     if (!skill || !size)
@@ -4256,6 +4415,7 @@ bool Fighter::upPassiveSkill(UInt16* skill, UInt8 size, bool writedb)
         addSkillsFromCT(skills, writedb);
     return true;
 }
+*/
 
 bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
 {
@@ -6226,6 +6386,9 @@ void Fighter::PeerlessSSNotify(UInt16 id, bool writedb)
     {
         _owner->sendFighterSSListWithNoSkill();
         _owner->sendFighterSGListWithNoSkill();
+        Stream st;
+        _owner->makeFighterSGList(st);
+        _owner->send(st);
     }
 }
 

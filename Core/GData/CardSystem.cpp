@@ -14,9 +14,16 @@ static float blueMark = 0.6;//蓝色品质系数
 static float purpleMark = 0.8;//紫色品质系数
 static float orangeMark = 1;//橙色品质系数
 
+static float expgreenMark = 0.1;//经验绿色品质系数
+static float expblueMark = 0.2;//经验蓝色品质系数
+static float exppurpleMark = 0.5;//经验紫色品质系数
+static float exporangeMark = 1;//经验橙色品质系数
+
 static float equipMark = 1;//装备系数
 static float humanMark = 1.2;//人物系数
 static float speMark = 1;//特殊系数
+static float ExpMark = 2;//经验卡牌系数
+static float ActMark = 1;//活动卡牌系数
 
 void CalInitExp(UInt32& initExp ,UInt8 level, UInt8 color ,UInt8 type)
 {
@@ -25,25 +32,52 @@ void CalInitExp(UInt32& initExp ,UInt8 level, UInt8 color ,UInt8 type)
     float typeMark= 0.0f;
     
     //levelMark = static_cast<float>(level - 40) * 0.2 + lvlmark;
-    levelMark = static_cast<float>(level - 40) * 0.001 + lvlmark;
-    
-    switch(color)
+    if(type == 3 || type == 4 || type == 5)
+        levelMark = 1;
+    else
+        levelMark = static_cast<float>(level - 40) * 0.001 + lvlmark;
+   
+    if(type == 4)
     {
-        case 2:
-            colorMark = greenMark;
-            break;
-        case 3:
-            colorMark = blueMark;
-            break;
-        case 4:
-            colorMark = purpleMark;
-            break;
-        case 5:
-            colorMark = orangeMark;
-            break;
-        default:
-            colorMark = 0;
-            break;
+        switch(color)
+        {
+            case 2:
+                colorMark = expgreenMark;
+                break;
+            case 3:
+                colorMark = expblueMark;
+                break;
+            case 4:
+                colorMark = exppurpleMark;
+                break;
+            case 5:
+                colorMark = exporangeMark;
+                break;
+            default:
+                colorMark = 0;
+                break;
+        }
+    }
+    else
+    {
+        switch(color)
+        {
+            case 2:
+                colorMark = greenMark;
+                break;
+            case 3:
+                colorMark = blueMark;
+                break;
+            case 4:
+                colorMark = purpleMark;
+                break;
+            case 5:
+                colorMark = orangeMark;
+                break;
+            default:
+                colorMark = 0;
+                break;
+        }
     }
 
     switch(type)
@@ -56,6 +90,12 @@ void CalInitExp(UInt32& initExp ,UInt8 level, UInt8 color ,UInt8 type)
             break;
         case 3:
             typeMark = speMark;
+            break;
+        case 4:
+            typeMark = ExpMark;
+            break;
+        case 5:
+            typeMark = ActMark;
             break;
         default:
             break;
@@ -97,7 +137,7 @@ void CardSystem::loadInitCardInfo(DBCardInfo& dbci)
     ci.lvLimit = dbci.lvLimit;
     ci.skillId = dbci.skillId;
     ci.name = dbci.name;
-    CalInitExp(ci.initExp,static_cast<UInt8>(dbci.id/10),ci.color,ci.type);
+    CalInitExp(ci.initExp,static_cast<UInt8>(dbci.id/100*10),ci.color,ci.type);
     
     _cardInitInfo.insert(std::make_pair(dbci.id,ci));          
 
@@ -127,7 +167,7 @@ bool CardSystem::checkUpgrade(GObject::CardInfo* ci)
         return false;
     CardUpgradeTable tmp = (_cardUpgrade.find(ci->level))->second; 
                 
-    if(ci->type == 2 || ci->type == 3)
+    if(ci->type == 2 || ci->type == 3 || ci->type == 4 || ci->type == 5)
     {
         switch(ci->color)
         {
@@ -227,6 +267,9 @@ void CardSystem::AddCardAttr(GData::AttrExtra& ae, UInt16 attr_id,UInt8 level ,U
         case 3:
             typeMark = speMark;
             break;
+        case 5:
+            typeMark = ActMark;
+            break;
         default:
             break;
     }
@@ -240,6 +283,8 @@ void CardSystem::AddSuitCardAttr(GData::AttrExtra& ae,UInt16 attr_id,UInt8 activ
 {
     const AttrExtraItem * attr = attrExtraManager[attr_id];
     GData::AttrExtra tmp; 
+    if(attr == NULL)
+        return;
     tmp += *(*attr);
     float activeMark = 0.0f;
     switch(active_set)

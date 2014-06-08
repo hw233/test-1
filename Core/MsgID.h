@@ -177,6 +177,8 @@ namespace REQ
     const UInt8 TASK_HOOK_STOP      = 0x9E;// 0x6E
     /**挂机加速 */
     const UInt8 TASK_HOOK_ADD       = 0x9F;// 0x6F
+    /**妖王再临 */
+    const UInt8 ERLKING_INFO        = 0x71;
     /**发起切磋请求 */
     const UInt8 LANCHCHALLENGE      = 0x72;
     /**回复切磋 */
@@ -273,8 +275,8 @@ namespace REQ
     const UInt8 MAIL_SEND           = 0x44;// 0xA3
     /**邮件信息改变 */
     const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
-    /**活跃度请求 */
-    const UInt8 ACTIVITY_LIST       = 0x4A;
+    /** 全服乱斗 */
+    const UInt8 RACE_BATTLE         = 0x4A;
     /**活跃度领取奖励 */
     const UInt8 ACTIVITY_REWARD     = 0x4B;
     /**活跃度签到积分 */
@@ -567,6 +569,7 @@ namespace REP
     const UInt8 ATTACK_NPC          = 0x9B;// 0x61
     const UInt8 TASK_RESPONSE_HOOK  = 0x9D;// 0x6D
 
+    const UInt8 ERLKING_INFO        = 0x71;
     const UInt8 LANCHCHALLENGE      = 0x72;
     const UInt8 REQUESTCHALLENGE    = 0x73;
     const UInt8 MARRYBOARD          = 0x74;
@@ -633,8 +636,8 @@ namespace REP
     const UInt8 MAIL_NEW            = 0x45;// 0xA4
     const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
 
-    /** 活跃度请求 */
-    const UInt8 ACTIVITY_LIST       = 0x4A;
+    /** 全服乱斗 */
+    const UInt8 RACE_BATTLE         = 0x4A;
     /** 活跃度领取奖励 */
     const UInt8 ACTIVITY_REWARD     = 0x4B;
     const UInt8 ACTIVITY_SIGNIN     = 0x4C;

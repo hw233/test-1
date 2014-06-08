@@ -43,6 +43,7 @@
 #else
 #include "GObject/Arena.h"
 #include "GObject/ArenaServerWar.h"
+#include "GObject/Answer.h"
 #endif
 
 #include <mysql.h>
@@ -2929,7 +2930,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         {
             UInt8 flag = 0;
             brd >> flag;
-            if(flag && player->getTotalRecharge() >= 1000)
+            if(flag && player->getTotalRecharge() >= 3000)
                 return;
             player->SetVar(VAR_DIRECTPUROPEN, flag?1:0);
             if(flag > 0)
@@ -3310,11 +3311,70 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
        }
        break;
+       case 0x32:
+       {
+            if(player->GetLev() < 30)
+                return;
+
+            UInt8 op = 0;
+            brd >> op;
+
+            if(1!=op && !World::getAnswerTime())
+                return;
+
+            switch(op)
+            {
+                case 0x01:
+                    {
+                        if(!World::getPrepareTime())
+                            break;
+
+                        UInt32 nowTime = TimeUtil::Now();
+                        UInt32 time = TimeUtil::SharpDayT(0, nowTime);
+                        UInt32 start = time + 19*60*60 + 30*60;
+                        UInt32 prepare = start - nowTime;
+
+                        Stream st(REP::ACT);
+                        st << static_cast<UInt8>(0x32);
+                        st << static_cast<UInt8>(0x01);
+                        st << prepare;
+                        st << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
+                case 0x02:
+                    {
+                        answerManager->SendAnswerInfo(player);
+                    }
+                    break;
+                case 0x08:
+                    {
+                        UInt8 selectId = 0;
+                        brd >> selectId;
+                        answerManager->SelectAnswer(player, selectId);                 
+                    }
+                    break;
+                case 0x09:
+                    {
+                        UInt8 skillId = 0;
+                        UInt64 otherId = 0;
+                        brd >> skillId;
+                        if(ANSWER_SKILL_D == skillId || ANSWER_SKILL_E == skillId)
+                            brd >> otherId;
+
+                        answerManager->UseSkill(player, skillId, otherId);                 
+                    }
+                    break;
+                default:
+                    break;
+            }
+       }
+       break;
        case 0x45:
        {
-           UInt8 type = 0;
-           brd >> type;
-           player->specialUdpLog(type);
+           UInt8 logType = 0;
+           brd >> logType;
+           player->specialUdpLog(logType);
        }
        break;
        default:

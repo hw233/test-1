@@ -72,6 +72,7 @@ private:
     static void ClanCopyResetEnd(void *);
 
     static void ClanBoss_Refresh(void*);
+	static void raceBattleCheck(void* );
     
 private:
 	UInt8		m_ThreadID;					//?????߳?

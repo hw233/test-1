@@ -164,6 +164,8 @@ enum PurchaseType
     EnterXJFrontMap             = 1025, //璇玑阵图
     ZhenYuanCuiLian             = 1026, //阵元淬炼费
     JieBaiYinJiu                = 1027,
+    erlking                     = 1028, //妖王再临
+    LingShiPeiYang              = 1029, //灵侍培养仙石消耗
     //繁体私有占150～200
 };
 
@@ -243,6 +245,8 @@ enum MailItemType
     ArenaAward,
     BuChangMarry,
 	DismissXinMo,
+	RandBattleAward,
+    LingShiEatBack,
 };
 enum ItemFrom
 {
@@ -320,6 +324,7 @@ enum ItemFrom
     FromZhenyuanMerge = 72, //阵元合成
     FromZhenyuanTiQu = 73, //阵元提取
     FromJieBai = 74 ,
+    FromKJTM = 75 , //抗击天魔
     //80 ~ 100，繁体占用
 };
 
@@ -366,6 +371,8 @@ enum ItemTo
     ToTunShiXingKong = 165, //吞噬星空
     ToServerWarJijian = 166, //仙界传奇祭剑
     ToZhenyuanMgerge = 167, //阵元合成
+    ToLingShiUpgrade = 168, //灵侍升级(吞噬/培养)
+    ToLingShiBreak = 169, //灵侍突破
 };
 
 struct IncommingInfo

@@ -22,6 +22,7 @@
 #include "ClanBoss.h"
 #include "ClanCityBattle.h"
 #include "ClanBigBoss.h"
+#include "RaceBattle.h"
 
 namespace GObject
 {
@@ -44,6 +45,8 @@ void Country::Country_Battle_Check(void *)
 {
     if(gClanCity && gClanCity->isOpen())
         gClanCity->process(TimeUtil::Now());
+    else if(WORLD().isRaceBattle())
+        GObject::raceBattle.raceBattleCheck();
     else
         globalCountryBattle.process(TimeUtil::Now());
 }
@@ -122,6 +125,11 @@ void Country::ClanBoss_Refresh(void*)
 	GObject::ClanBoss::instance().refresh();
 }
 
+void Country::raceBattleCheck(void* )
+{
+    GObject::raceBattle.raceBattleCheck();
+}
+
 bool Country::Init()
 {
     //GameActionLua
@@ -164,7 +172,8 @@ bool Country::Init()
 
         GObject::ClanBoss::instance().init();
 	    AddTimer(1000, ClanBoss_Refresh, static_cast<void*>(NULL));
-		AddTimer(5 * 60 * 1000, ClanBigBoss_Refesh, static_cast<void *>(NULL), (5 * 60 * 1000 - (now % (5 * 60))) * 1000);
+		AddTimer(5 * 60 * 1000, ClanBigBoss_Refesh, static_cast<void *>(NULL), (5 * 60  - (now % (5 * 60))) * 1000);
+        //AddTimer(1000, raceBattleCheck);
 
 	}
 

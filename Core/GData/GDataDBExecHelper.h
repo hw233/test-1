@@ -713,6 +713,14 @@ struct DBSkillEv
     UInt8 needLev;
 };
 
+struct DBRandBattleAttr
+{
+    UInt8 lev;
+    Int8 id;
+    float value;
+    UInt8 next;
+};
+
 struct DBKeyinConfig
 {
     UInt8 keyinId;
@@ -824,6 +832,35 @@ struct DBZHYExtraAttr
     UInt8 type1;
     UInt8 type2;
     UInt16 maxVal;
+};
+
+struct DBLingShi
+{
+    UInt8 level;
+    UInt32 consume;
+    UInt32 exp;
+    UInt8 isBreak;
+    UInt16 useItem;
+    UInt16 useGold;
+    float attack;
+    float magatk;
+    float hp;
+    float action;
+};
+
+struct DBErlkingConfig
+{
+    UInt8 copyId;
+    UInt8 conditionA;
+    UInt8 conditionB;
+    UInt32 npcgroup;
+};
+
+struct DBNewQuestionsConfig
+{
+    UInt16 id;
+    UInt8 lvl;
+    UInt8 answer;
 };
 
 }
@@ -1757,6 +1794,51 @@ SPECIALDEF(4)
     UInt32, consume,
     UInt8, needLev
 	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBRandBattleAttr)
+SPECIALDEF(4)
+	(
+    UInt8, lev,
+    Int8, id,
+    float, value,
+    UInt8, next
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBLingShi)
+SPECIALDEF(10)
+	(
+    UInt8, level,
+    UInt32, consume,
+    UInt32, exp,
+    UInt8, isBreak,
+    UInt16, useItem,
+    UInt16, useGold,
+    float, attack,
+    float, magatk,
+    float, hp,
+    float, action
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBErlkingConfig)
+SPECIALDEF(4)
+	(
+    UInt8, copyId,
+    UInt8, conditionA,
+    UInt8, conditionB,
+    UInt32, npcgroup
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBNewQuestionsConfig)
+SPECIALDEF(3)
+	(
+    UInt16, id,
+    UInt8, lvl,
+    UInt8, answer
+    )
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBCardUpgrade)

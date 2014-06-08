@@ -282,6 +282,7 @@ namespace Script
         bool  RunNewRC7DayRechargeAward(Player* player, UInt8 val, UInt32 totalRecharge);
         bool  RunPrayAward(Player* player, UInt8 val);
         UInt8  GetCardByChance(Player* player, UInt16 cnt1 ,UInt16 cnt2 ,UInt16 cnt3);
+        UInt8  GetCardByChance61(Player* player, UInt16 cnt1 ,UInt16 cnt2 ,UInt16 cnt3);
         bool  RunNovLoginAward(Player* player, UInt8 val);
         bool  RunGameBoxDailyActionAward(Player* player, UInt8 val);
         UInt8 RunNewRC7DayTargetAward(Player* player);
@@ -413,8 +414,9 @@ namespace Script
         void getJiqirenAward_FrontMap(Player* player, UInt8 isFree);
         void getJiqirenAward_Dungeon(Player* player, UInt8 diff, UInt8 isFree);
         UInt16 getSpeCard(UInt16 itemId);
-        UInt16 getsuitAttr(UInt8 suitId);
+        UInt16 getsuitAttr(UInt16 suitId);
         UInt32 getZhenyuanLootId(UInt8 idx);
+        bool RunActCardAward(Player* player,UInt8 idx);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

@@ -168,6 +168,7 @@ public:
 	inline UInt32 ThisDay() { return _today; }
 	inline UInt32 Now() { return _now; }
 	inline bool isNewCountryBattle() { return !(_wday % 2); }
+	inline bool isRaceBattle() { return (_wday == 3 || _wday == 5 || _wday == 7); }
 
     inline static bool isFBVersion() { return cfg.fbVersion; }
     inline static bool isVTVersion() { return cfg.vtVersion; }
@@ -381,6 +382,14 @@ public:
     { _qixi = v; }
     inline static bool getQixi()
     { return _qixi; }
+    inline static void setDropAct(bool v)
+    { _dropact = v; }
+    inline static bool getDropAct()
+    { return _dropact; }
+    inline static void setAnswerAct(bool v)
+    { _answeract = v; }
+    inline static bool getAnswerAct()
+    { return _answeract; }
     inline static void setWansheng(bool v)
     { _wansheng= v; }
     inline static bool getWansheng()
@@ -625,8 +634,8 @@ public:
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 4, 19);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 4, 24);
+        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 5, 17);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 5, 22);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
@@ -636,7 +645,7 @@ public:
             return -1;
        return (TimeUtil::SharpDay(0, now) - _11timeBegin )/86400+1; 
     }
-    inline static UInt32 get11TimeNum(UInt32 time = 0)
+    inline static UInt32 get11TimeNum(UInt32 time = 0)   //已经不用
     {
         return -1;
         UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
@@ -660,6 +669,18 @@ public:
         else
             return false;
     } 
+
+    inline static bool getFireSacrificeTime()
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 _fireTimeBegin = TimeUtil::SharpDay(0, now) + 8 * 60 * 60;
+        UInt32 _fireTimeEnd = TimeUtil::SharpDay(0, now) + 21 * 60 * 60 + 60;
+        if(now >= _fireTimeBegin && now <= _fireTimeEnd)
+            return true;
+        else
+            return false;
+    }
+
     inline static void setNeedRechargeRank(bool v)
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()
@@ -1004,8 +1025,32 @@ public:
             return true;
         else
             return false;
-    } 
-    
+    }
+
+    inline static bool getPrepareTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_ANSWER_PREPARE_DAY);
+        UInt32 end = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY);
+        UInt32 now = TimeUtil::Now();
+
+        if(now >= begin && now < end)
+            return true;
+        else
+            return false;
+    }
+
+    inline static bool getAnswerTime(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY);
+        UInt32 end = GVAR.GetVar(GVAR_ANSWER_END_DAY);
+        UInt32 now = TimeUtil::Now();
+
+        if(now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    }
+
     inline static bool getTYSSTime(UInt32 time = 0)
     {
         UInt32 begin = GVAR.GetVar(GVAR_TYSS_BEGIN);
@@ -1092,6 +1137,16 @@ public:
         return _zcjbActivity;
     }
 
+    inline static bool get61CardActivity(UInt32 time = 0)
+    {
+        UInt32 now = TimeUtil::Now() + time;
+        UInt32 time20140601 = TimeUtil::MkTime(2014, 6, 1);
+        
+        if(now < time20140601 || now > time20140601 + 5 * 86400)
+            return false;
+        return true;
+    }
+
     inline static void setHalfGold(bool v)
     { _halfgold = v; }
     inline static bool getHalfGold()
@@ -1155,6 +1210,9 @@ public:
 
         return !(opTime >= actTime_new1 && opTime <= actTime_new2);
     }
+
+    inline static UInt32 getRBTimeRank() { return _rbTimeRank; }
+    inline static void setRBTimeRank(UInt32 rank) { _rbTimeRank = rank; }
  
 public:
 	inline static UInt8 getWeekDay()
@@ -1234,6 +1292,8 @@ public:
     static bool _june1;
     static bool _july;
     static bool _qixi;
+    static bool _dropact;
+    static bool _answeract;
     static bool _wansheng;
     static bool _qingren;
     static bool _specialbook;
@@ -1319,7 +1379,11 @@ public:
     static bool _miluzhijiao;
     static bool _buyfund;
     static bool _duobaoOpen;
+    static bool _answerOpenA;
+    static bool _answerOpenB;
+    static UInt32 _rbTimeRank;
 public:
+    static RCSortType answerScoreSort;     //一战成名排名
     static RCSortType qishibanScoreSort;     //七石板积分排名
     static RCSortType guankaScoreSort;     //关卡活动积分排名
     static RCSortType rechargeSort;
@@ -1353,6 +1417,7 @@ private:
     static void World_Store_Check(void *);
 	static void World_Multi_Check( World * );
 	static void World_Midnight_Check( World * );
+	static void World_Fire_Sacrifice_Check( World * );
     static void World_CreateNewDB_Check();
 	static void World_Online_Log( void * );
 	static void World_Athletics_Check( void * );
@@ -1374,6 +1439,7 @@ private:
     static void ClanStatueCheck(void *);
     static void ClanDuoBaoCheck(void *);
     static void SendPopulatorRankAward(void*);
+    static void AnswerCheck(void *);
     //static void advancedHookTimer(void *para);
 public:
 	static void ReCalcWeekDay( World * );
@@ -1433,6 +1499,8 @@ public:
     void SendGuankaActAward();
     void SendTYSSClanAward();
     void SendTYSSPlayerAward();
+    static void SendAllAnswerEnd();
+    static void SendAnswerAward();
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

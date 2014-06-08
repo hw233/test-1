@@ -275,7 +275,7 @@ namespace GObject
 
         VAR_TOTALRECHARGEACT = 217, // 活动期间充值总额
         VAR_DIRECTPUROPEN = 218, // 幸运星活动直购是否开启
-        VAR_DIRECTPURCNT = 219, // 幸运星活动直购次数
+        VAR_DIRECTPURCNT = 219, // 幸运星活动直购次数(低价专区)
         VAR_LEFTTIMES = 220, // 剩余挂机时间
 
         /*
@@ -584,6 +584,8 @@ namespace GObject
         VAR_SEVEN_SOUL_NUM = 603,  //玩家七魂仙魄数
         VAR_SEX_CHANGE = 604,  //使用变形卡的次数
         VAR_SKILL_GRADE_MONEY = 605,  //技能升阶货币
+        VAR_DROP_ACT = 606,  //掉落活动
+        VAR_DIRECTPURCNT2 = 607, // 幸运星活动直购次数(超值专区)
 
         //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,    //天书奇缘登陆
@@ -700,7 +702,7 @@ namespace GObject
         VAR_KJTM_KILL_NPC_STATUS = 719,     // 抗击天魔击杀怪物状态
         VAR_KJTM_LOGIN_STATUS = 720,     // 抗击天魔回归玩家连续登录两天状态
 
-        //721 - 740 for dtc 
+        //721 - 730 for dtc 
         VAR_TYSS_RECHARGE = 721,//天元神兽期间玩家兑换灵果剩余充值数(充值数满足条件自动兑换灵果)
         VAR_TYSS_CONTRIBUTE_PLAYER = 722,//天元神兽期间玩家个人总贡献 
         VAR_TYSS_CONTRIBUTE_PLAYER_DAY = 723,//天元神兽期间玩家个人当日贡献 
@@ -712,19 +714,47 @@ namespace GObject
         
         VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 729,//璇玑阵图自动战斗使用金钱标志
         VAR_ATOXJFM = 730,     //自动璇玑阵图id
+
         // 731 - 740 for lib
         VAR_FRIEND_ACHIEVEMENT  = 731,  //友好度成就奖励领取情况
         VAR_CLAN_FRIEND = 732 ,    //帮派玩家是否增加过友好度(8位) , 玩家购买的剩余饮酒次数 
         VAR_DRINK_COUNT = 733 ,    //饮酒次数 主动发起(8位) ,被动接受(8位) ,玩家总购买的次数 
         VAR_DRINK_VALUE = 734 ,    //豪饮值
         VAR_FRIEND_VALUE_DAY = 735 ,    //每日友情值
+        VAR_LINGSHI_PEIYANG_CNT = 736, //灵侍仙石培养次数
+        VAR_LINGSHI_PEIYANG_LUCKY = 737, //灵侍培养出现暴击记录
+
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
         VAR_CLANBOSS_LUCKY_LIMIT = 754,//帮派BOSS幸运奖励个数
         VAR_CLANBOSS_SECURE_LIMIT = 755,//帮派BOSS秘密奖励个数
+        VAR_CLANBOSS_CLANBIGBOSS_LIMIT = 756,//帮派BOSS换帮限制
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
+        VAR_FIRE_SACRIFICE_TIMES = 772, //拜火祭天：0-7帮众添柴次数，8-15帮主诏令次数
+        VAR_FIRE_SACRIFICE_ADD_WOOD_TIME = 773, //拜火祭天添柴时间
+        VAR_FIRE_SACRIFICE_CALLING_TIME = 774, //拜火祭天召唤帮众时间
+        VAR_DUOBAO_ACTIVE_POINT = 775, //夺宝奇兵活跃值+1(一天一点) 
 
+        //781 - 800 for lijr
+        VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
+        VAR_ERLKING_STATUSB = 782,               //妖王再临状态(17-32)
+        VAR_ERLKING_STATUSC = 783,               //妖王再临状态(33-48)
+        VAR_ERLKING_BUY_PASS_NUM_DAY = 784,      //妖王再临购买通关次数
+        VAR_ERLKING_USE_FREE_NUM_DAY = 785,      //妖王再临使用免费通关次数
+        VAR_ERLKING_BUY_PASS_TOTAL_NUM = 786,    //妖王再临购买通关总次数
+
+        VAR_KJTM_AWARD_MARK = 787,               //抗击天魔奖励标志
+        VAR_KJTM_LOGIN_NUM = 788,                //抗击天魔登录次数
+        VAR_ANSWER_QUESTIONS_STATUS = 789,       //一战成名回答问题状态（0位代表当前这道题回答是否正确, 1-30位每一位代表是否参与该道题）
+        VAR_ANSWER_LITERARY_VALUE = 790,         //一战成名文采值
+        VAR_ANSWER_SUCCESSION_NUM = 791,         //一战成名连击数量
+        VAR_ANSWER_ATTACK_NUM = 792,             //一战成名天眼通数量
+        VAR_ANSWER_SKILL_STATUS = 793,           //一战成名技能状态 (每5位表示一种技能状态)
+        VAR_ANSWER_SKILL_MARK = 794,             //一战成名本题所用技能标志 (每1位表示一种技能在本题中是否使用)
+        VAR_ANSWER_SKILL_USE_NUM = 795,          //一战成名技能使用数量 (每2位表示一种技能已使用数量)
+        VAR_ANSWER_QUESTIONS_SUCCORFAIL = 796,   //一战成名回答问题成功失败（1-30位每一位代表是否回答成功该道题）
+        VAR_ANSWER_QUESTIONS_OPTION = 797,       //一战成名题号和当前选项(一个5位表示题号，第二个题号表示选项)
         VAR_MAX,
     };
 
@@ -1238,6 +1268,8 @@ namespace GObject
             REGISTER_VAR(VAR_SEVEN_SOUL_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_SEX_CHANGE, CYCLE_NONE);
             REGISTER_VAR(VAR_SKILL_GRADE_MONEY, CYCLE_NONE);
+            REGISTER_VAR(VAR_DROP_ACT, CYCLE_NONE);
+            REGISTER_VAR(VAR_DIRECTPURCNT2, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);
@@ -1356,6 +1388,16 @@ namespace GObject
             REGISTER_VAR(VAR_KJTM_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_KJTM_KILL_NPC_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_KJTM_LOGIN_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_LOGIN_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_KJTM_AWARD_MARK, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_QUESTIONS_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SUCCESSION_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_ATTACK_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SKILL_STATUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SKILL_MARK, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_SKILL_USE_NUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_QUESTIONS_SUCCORFAIL, CYCLE_DAY);
+            REGISTER_VAR(VAR_ANSWER_QUESTIONS_OPTION, CYCLE_DAY);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);
@@ -1372,10 +1414,26 @@ namespace GObject
             REGISTER_VAR(VAR_DRINK_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_FRIEND_VALUE_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_TIMES, CYCLE_DAY);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_ADD_WOOD_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_FIRE_SACRIFICE_CALLING_TIME, CYCLE_DAY);
+            REGISTER_VAR(VAR_DUOBAO_ACTIVE_POINT, CYCLE_DAY);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
+            REGISTER_VAR(VAR_LINGSHI_PEIYANG_CNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_LINGSHI_PEIYANG_LUCKY, CYCLE_NONE);
             REGISTER_VAR(VAR_LIMIT_APPOINTMENT, CYCLE_NONE);
+            REGISTER_VAR(VAR_CLANBOSS_LUCKY_LIMIT, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLANBOSS_SECURE_LIMIT, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLANBOSS_CLANBIGBOSS_LIMIT, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_ERLKING_STATUSA, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_STATUSB, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_STATUSC, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_BUY_PASS_NUM_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_ERLKING_BUY_PASS_TOTAL_NUM, CYCLE_NONE);
+            REGISTER_VAR(VAR_ERLKING_USE_FREE_NUM_DAY, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

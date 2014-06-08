@@ -643,6 +643,7 @@ CREATE TABLE `fighter` (
   `citta` varchar(255) NOT NULL,
   `skills` varchar(255) NOT NULL,
   `cittas` varchar(255) NOT NULL,
+  `lingshi` varchar(255) NOT NULL,
   `summoned` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `hideFashion` tinyint(4) DEFAULT '0',
   UNIQUE KEY `id_playerId` (`id`,`playerId`),
@@ -888,6 +889,7 @@ CREATE TABLE `player` (
   `lastOnline` int(10) unsigned NOT NULL DEFAULT '0',
   `packSize` smallint(4) unsigned NOT NULL DEFAULT '100',
   `packSizeSoul` smallint(4) unsigned NOT NULL DEFAULT '200',
+  `packSizeLS` smallint(4) unsigned NOT NULL DEFAULT '50',
   `mounts` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `mainFighter` int(10) unsigned NOT NULL DEFAULT '0',
   `icCount` varchar(32) NOT NULL DEFAULT '',
@@ -1119,6 +1121,7 @@ CREATE TABLE `clan` (
   `duobaoAward` int(10) unsigned NOT NULL DEFAULT '0',
   `tyssSum` int(10) unsigned NOT NULL DEFAULT '0',
   `clantitleAll` varchar(1024) NOT NULL DEFAULT '',
+  `clanFireValue` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2453,7 +2456,7 @@ CREATE TABLE `duobaolog` (
 DROP TABLE IF EXISTS `collect_cnt`;
 CREATE TABLE `collect_cnt` (
    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
-   `lev` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `lev` SMALLINT(5) unsigned NOT NULL DEFAULT '0',
    `bluecnt` int(10) unsigned NOT NULL DEFAULT '0',
    `purlecnt` int(10) unsigned NOT NULL DEFAULT '0',
    `orangecnt` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2545,6 +2548,15 @@ CREATE TABLE `zhenyuanAttr` (
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `lingshiAttr`;
+CREATE TABLE `lingshiAttr` (
+   `id` int(10) unsigned NOT NULL DEFAULT '0',
+   `itemId`  int(10) unsigned NOT NULL DEFAULT '0',
+   `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `exp`  int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `skill_grade`;
 CREATE TABLE `skill_grade` (
     `playerId` bigint(20) unsigned NOT NULL,
@@ -2568,7 +2580,7 @@ CREATE TABLE IF NOT EXISTS `card` (
 DROP TABLE IF EXISTS `cardsuit`;
 CREATE TABLE IF NOT EXISTS `cardsuit` (
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
-    `id` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `id` SMALLINT(5)  unsigned NOT NULL DEFAULT '0',
     `suit_mark` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `active` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `spe_mark` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2576,4 +2588,33 @@ CREATE TABLE IF NOT EXISTS `cardsuit` (
     unique KEY id_playerid(`playerid`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `questions`;
+CREATE TABLE IF NOT EXISTS `questions` (
+    `answerId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `questionsId` smallint(5) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`answerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `questions`;
+CREATE TABLE IF NOT EXISTS `clanbigboss` (
+   `clanid` int(10) unsigned NOT NULL DEFAULT '0',
+   `status`  tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `app_time` int(10) unsigned NOT NULL DEFAULT '0',
+   `last` int(10) unsigned NOT NULL,
+   `hp` int(10) unsigned NOT NULL,
+   `atk` int(10) NOT NULL,
+   `matk` int(10) NOT NULL,
+   PRIMARY KEY (`clanid`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `clanbigboss`;
+CREATE TABLE IF NOT EXISTS `clanbigboss` (
+   `clanid` int(10) unsigned NOT NULL DEFAULT '0',
+   `status`  tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `app_time` int(10) unsigned NOT NULL DEFAULT '0',
+   `last` int(10) unsigned NOT NULL,
+   `hp` int(10) unsigned NOT NULL,
+   `atk` int(10) NOT NULL,
+   `matk` int(10) NOT NULL,
+   PRIMARY KEY (`clanid`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

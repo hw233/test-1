@@ -264,7 +264,7 @@ void ClanItemPkg::GetItems(Player* player)
 Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	GObjectBaseT<Clan>(id), _name(name), _rank(0), _level(lvl), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
-    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0),_tyssSum(0),
+    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0),_tyssSum(0), _clanFireValue(0),
     _buildingOwner(NULL)
 {
     _itemPkg.Init(_id, 0, GData::clanLvlTable.getPkgSize(_level));
@@ -490,6 +490,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
         if(buffData1 > 0 || buffData2 > 0 || buffData3 > 0)
             player->rebuildBattleName();
     }
+    player->SetVar(VAR_CLANBOSS_CLANBIGBOSS_LIMIT,1);
 
     player->notifyClanTitle();
 	return true;
@@ -5355,6 +5356,13 @@ void Clan::DuoBaoStart(Player * pl)
     msg.id = SthDuoBao;
     GameMsgHdr hdr(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
     GLOBAL().PushMsg(hdr, &msg);
+
+    //夺宝添加活跃值，一天最多一次
+    if(!pl->GetVar(VAR_DUOBAO_ACTIVE_POINT))
+    {
+        pl->SetVar(VAR_DUOBAO_ACTIVE_POINT, 1);
+        addMemberActivePoint_nolock(pl, 1, e_clan_actpt_none);
+    }
 }
 
 void Clan::SendDuoBaoAward()
@@ -5996,6 +6004,207 @@ void Clan::writeClanTitleAll()
     }
 
     DB1().PushUpdateData("UPDATE `clan` SET `clantitleAll` = '%s' WHERE `id` = %" I64_FMT "u", title.c_str(), getId());
+}
+
+void Clan::sendFireSacrificeInfo(Player * pl, UInt8 type)
+{
+    UInt32 now = TimeUtil::Now();
+    Stream st(REP::CLAN_COPY);
+    st << static_cast<UInt8>(0x20);
+    UInt8 AddWoodTimes = (pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) & 0xFF);
+    UInt32 AddWoodTime = pl->GetVar(VAR_FIRE_SACRIFICE_ADD_WOOD_TIME);
+    st << static_cast<UInt8>(type);
+    switch(type)
+    {
+        case 0:
+            {
+                if(pl == getLeader())
+                    st << static_cast<UInt8>(1);
+                else
+                    st << static_cast<UInt8>(0);
+                st << static_cast<UInt8>(3 - AddWoodTimes);
+                st << ((now - AddWoodTime) > 15 * 60 ? 0 : (15 * 60 - (now - AddWoodTime)));
+                st << _clanFireValue;
+                if(pl == getLeader())
+                {
+                    UInt8 CallingTimes = ((pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) >> 8) & 0xFF);
+                    UInt32 CallingTime = pl->GetVar(VAR_FIRE_SACRIFICE_CALLING_TIME);
+                    st << static_cast<UInt8>(3 - CallingTimes);
+                    st << ((now - CallingTime) > 15 * 60 ? 0 : (15 * 60 - (now - CallingTime)));
+                }
+            }
+            break;
+        case 1:
+            {
+                st << _clanFireValue;
+                st << static_cast<UInt8>(3 - AddWoodTimes);
+                st << ((now - AddWoodTime) > 15 * 60 ? 0 : (15 * 60 - (now - AddWoodTime)));
+            }
+            break;
+        case 2:
+            {
+                UInt8 CallingTimes = ((pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) >> 8) & 0xFF);
+                UInt32 CallingTime = pl->GetVar(VAR_FIRE_SACRIFICE_CALLING_TIME);
+                st << static_cast<UInt8>(3 - CallingTimes);
+                st << ((now - CallingTime) > 15 * 60 ? 0 : (15 * 60 - (now - CallingTime)));
+            }
+            break;
+        case 3:
+            {
+                st << static_cast<UInt8>(getCount());
+                Mutex::ScopedLock lk(_mutex);
+                ClanMember * mem = NULL;
+                Members::iterator offset;
+                for(offset = _members.begin(); offset != _members.end(); ++ offset)
+                {
+                    mem = *offset;
+                    if(!mem || !mem->player)
+                        continue;
+                    std::string plName = mem->player->getName();
+                    st << plName;
+                    st << static_cast<UInt8>(mem->player->isOnline());
+                    st << mem->cls;
+                    st << mem->player->GetLev();
+                    st << static_cast<UInt8>(mem->player->GetVar(VAR_FIRE_SACRIFICE_TIMES) & 0xFF);
+                    st << mem->player->getLastOnline();
+                }
+            }
+            break;
+        default:
+            break;
+    }
+    st << Stream::eos;
+    pl->send(st);
+}
+
+bool Clan::addWoodToFire(Player * pl)
+{
+    ClanMember * mem = getClanMember(pl);
+    UInt32 now = TimeUtil::Now();
+    if(now - mem->joinTime < 24 * 60 * 60)
+    {
+        pl->sendMsgCode(0, 1371);
+        return false;
+    }
+    UInt32 addWoodTimes = pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) & 0xFF;
+    UInt32 addWoodTime = pl->GetVar(VAR_FIRE_SACRIFICE_ADD_WOOD_TIME);
+    if(now - addWoodTime > 15 * 60 && addWoodTimes < 3)
+    {
+        pl->SetVar(VAR_FIRE_SACRIFICE_TIMES, (addWoodTimes + 1) | (pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) & (~0xFF)));
+        pl->SetVar(VAR_FIRE_SACRIFICE_ADD_WOOD_TIME, now);
+        addMemberActivePoint_nolock(pl, 1, e_clan_actpt_none);
+        _clanFireValue += 5;
+        SetClanFireValue( _clanFireValue, true);
+    }
+    if(addWoodTimes == 3)
+    {
+        pl->sendMsgCode(0, 1372);
+    }
+    return true;
+}
+
+void Clan::getFireGodBag()
+{
+    const UInt32 fireValue = _clanFireValue;
+    UInt8 bagType = 0;
+    if(fireValue >= 50 && fireValue < 150)
+    {
+            bagType = 1;
+    }
+    else if(fireValue >=150 && fireValue < 300)
+    {
+            bagType = 2;
+    }
+    else if(fireValue >= 300 && fireValue < 600)
+    {
+            bagType = 3;
+    }
+    else if(fireValue >= 600 && fireValue <= 900)
+    {
+            bagType = 4;
+    }
+
+    UInt32 now = TimeUtil::Now();
+    SYSMSG(title, 955);
+    SYSMSGV(content, 957, bagType);
+    UInt32 msgID[5] = { 958, 959, 960, 961, 962 };
+    Mutex::ScopedLock lk(_mutex);
+    ClanMember * mem = NULL;
+    Members::iterator offset;
+    if(bagType)
+    {
+        for(offset = _members.begin(); offset != _members.end(); ++ offset)
+        {
+            mem = *offset;
+            if(!mem || !mem->player)
+                continue;
+            if(now - mem->joinTime >= 24 * 60 * 60)
+            {
+                Mail * mail = mem->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail)
+                {
+                    MailPackage::MailItem mitem = {9476, bagType};
+                    mailPackageManager.push(mail->id, &mitem, 1, true);
+                }
+            }
+        }
+    }
+    Stream st;
+    SYSMSGVP(st , msgID[bagType], getName().c_str());
+    broadcast(st);
+    SetClanFireValue( 0, true);
+}
+
+bool Clan::callingaddWood(Player * pl)
+{
+    if(pl != getLeader())
+        return false;
+
+    ClanMember * mem = getClanMember(pl);
+    UInt32 now = TimeUtil::Now();
+    if(now - mem->joinTime < 24 * 60 * 60)
+    {
+        pl->sendMsgCode(0, 1371);
+        return false;
+    }
+
+    UInt32 CallingTime = pl->GetVar(VAR_FIRE_SACRIFICE_CALLING_TIME);
+    UInt32 CallingTimes = ((pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) >> 8) & 0xFF);
+    if(now - CallingTime > 15 * 60 && CallingTimes < 3)
+    {
+        CallingTimes++;
+        CallingTimes = (CallingTimes << 8) | (pl->GetVar(VAR_FIRE_SACRIFICE_TIMES) & (~(0xFF << 8)));
+        pl->SetVar(VAR_FIRE_SACRIFICE_TIMES, CallingTimes);
+        pl->SetVar(VAR_FIRE_SACRIFICE_CALLING_TIME, now);
+    }
+    if(CallingTimes == 3)
+    {
+        pl->sendMsgCode(0, 1373);
+    }
+    return true;
+}
+
+void Clan::clanFireSacrificeOp(Player * pl, UInt8 type)
+{
+    switch(type)
+    {
+        case 0:
+            sendFireSacrificeInfo(pl, 0);
+            break;
+        case 1:
+            if(addWoodToFire(pl))
+                sendFireSacrificeInfo(pl, 1);
+            break;
+        case 2:
+            if(callingaddWood(pl))
+                sendFireSacrificeInfo(pl, 2);
+            break;
+        case 3:
+            sendFireSacrificeInfo(pl, 3);
+            break;
+        default:
+            break;
+    }
 }
 
 }

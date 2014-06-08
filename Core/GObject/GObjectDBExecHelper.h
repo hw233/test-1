@@ -531,6 +531,7 @@ struct DBFighter2
     std::string citta;      // 装备的心法
     std::string skills;     // 学会的技能, ID1,ID2,...
     std::string cittas;     // 学会的心法, ID1,ID2,...
+    std::string lingshi;    // 穿戴的灵侍, ID1,ID2,...
     UInt8 attrType1;
     UInt16 attrValue1;
     UInt8 attrType2;
@@ -715,6 +716,7 @@ struct DBClan
     UInt32 duobaoAward;
     UInt32 tyssSum;
     std::string clantitleAll;
+    UInt32 clanFireValue;
 };
 
 struct DBClanRepo
@@ -1231,7 +1233,7 @@ struct DBFairySpar
 struct DBCollectCnt
 {
     UInt64 playerId;
-    UInt8 level;
+    UInt16 level;
     UInt16 bluecnt;
     UInt16 purlecnt;
     UInt16 orangecnt;
@@ -1526,6 +1528,12 @@ struct DBInactiveMember
     UInt64 playerId;
 };
 
+struct DBQuestions
+{
+    UInt8 answerId;
+    UInt16 questionsId;
+};
+
 struct DBPlayerNamed 
 {
     UInt16 serverNo;
@@ -1611,6 +1619,17 @@ struct DBClanBuildings
     UInt16 updateTime;
 };
 
+struct DBClanBigBoss 
+{
+    UInt32 clanid;
+    UInt8 status;
+    UInt32 app_time;
+    UInt32 last;
+    UInt32 hp;
+    UInt32 atk;
+    UInt32 matk;
+};
+
 struct DBCard
 {
     UInt64 playerId;
@@ -1624,7 +1643,7 @@ struct DBCard
 struct DBCardSuit
 {
     UInt64 playerId;
-    UInt8 id;
+    UInt16 id;
     UInt8 suit_mark;
     UInt8 active;
     UInt32 spe_mark;
@@ -1638,6 +1657,15 @@ struct DBZhenyuanAttr
     UInt8  zycolor;
     std::string types;
     std::string values;
+    UInt8 bindType;
+};
+
+struct DBLingshiAttr
+{
+    UInt32 id;
+    UInt32 itemId;
+    UInt8  level;
+    UInt32 exp;
     UInt8 bindType;
 };
 
@@ -2167,7 +2195,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(58)
+SPECIALDEF(59)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -2198,6 +2226,7 @@ SPECIALDEF(58)
     std::string, citta,
     std::string, skills,
     std::string, cittas,
+    std::string, lingshi,
     UInt8, attrType1,
     UInt16, attrValue1,
     UInt8, attrType2,
@@ -2400,7 +2429,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(36)
+SPECIALDEF(37)
 (
 	UInt32, id,
 	std::string, name,
@@ -2437,7 +2466,8 @@ SPECIALDEF(36)
     UInt32, urge,
     UInt32, duobaoAward,
     UInt32,tyssSum, 
-    std::string, clantitleAll
+    std::string, clantitleAll,
+    UInt32, clanFireValue
 )
 SPECIALEND()
 
@@ -3179,7 +3209,7 @@ SPECIALBEGIN(GObject::DBCollectCnt)
 SPECIALDEF(5)
 (
     UInt64, playerId,
-    UInt8, level,
+    UInt16, level,
     UInt16, bluecnt,
     UInt16, purlecnt,
     UInt16, orangecnt
@@ -3586,6 +3616,14 @@ SPECIALDEF(3)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBQuestions)
+SPECIALDEF(2)
+    (
+    UInt8, answerId,
+    UInt16, questionsId
+    )
+SPECIALEND()
+
 SPECIALBEGIN(GObject::DBMarriage)
 SPECIALDEF(5)
     (
@@ -3678,6 +3716,19 @@ SPECIALDEF(8)
     )
 SPECIALEND()
 
+SPECIALBEGIN (GObject::DBClanBigBoss)
+SPECIALDEF(7)
+    (
+    UInt32, clanid,
+    UInt8, status,
+    UInt32, app_time,
+    UInt32, last,
+    UInt32, hp,
+    UInt32, atk,
+    UInt32, matk
+    )
+SPECIALEND()
+
 SPECIALBEGIN (GObject::DBCard)
 SPECIALDEF(6)
     (
@@ -3694,7 +3745,7 @@ SPECIALBEGIN (GObject::DBCardSuit)
 SPECIALDEF(6)
     (
     UInt64, playerId,
-    UInt8, id,
+    UInt16, id,
     UInt8, suit_mark,
     UInt8, active,
     UInt32, spe_mark,
@@ -3710,6 +3761,17 @@ SPECIALDEF(6)
     UInt8,  zycolor,
     std::string, types,
     std::string, values,
+	UInt8, bindType
+    )
+SPECIALEND()
+
+SPECIALBEGIN (GObject::DBLingshiAttr)
+SPECIALDEF(5)
+    (
+    UInt32, id,
+    UInt32, itemId,
+    UInt8,  level,
+    UInt32, exp,
 	UInt8, bindType
     )
 SPECIALEND()

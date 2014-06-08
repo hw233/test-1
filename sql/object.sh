@@ -279,9 +279,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140328_3.sql   #队伍数据
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140328_4.sql   #本次活动开启回流玩家数据
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140418_1.sql   #修改数据库世界boss血量
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140418_1.sql   #修改数据库世界boss血量
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_cardsystem.sql     #创建卡牌系统
@@ -290,7 +288,21 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #捉迷藏清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_3_24_CreateFriendlyCount.sql     #创建友好度表
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear651.sql     #清空VAR651(大转盘)
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_card.sql     #创建卡牌系统
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_card.sql     #创建卡牌系统
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_lingshi.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearautobattle.sql #清除自动挂机
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140510_1.sql     #创建帮派篝火
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140515.sql     #卡牌优化
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_lingshi_bug.sql     #灵侍bug
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_qixi.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购),下次需要多清1个VAR
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearvar592_1211.sql   #清空var592（QQ大厅登录）
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_reset_newyeargift_var.sql  #清除春节礼包(var349)
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140523_1.sql #一战成名每天题目
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140418_1.sql   #修改数据库世界boss物攻、法功
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_clanbigboss.sql   #增加帮派boss
 }
 
 #sh player_jiguan.sh
