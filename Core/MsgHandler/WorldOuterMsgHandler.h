@@ -3992,7 +3992,7 @@ void OnServerLeftConnected( ServerLeftMsgHdr& hdr, const void * data )
 	brd >> r;
 	if(r == 1)
 	{
-		INFO_LOG("Failed to connect to ServerWar arena.");
+		INFO_LOG("Failed to connect to ServerPvp arena.");
         WORLD().setLeftAddrConnection(0);
 		NETWORK()->CloseServerLeft();
 		return;
