@@ -891,14 +891,14 @@ void ClanBigBossMgr::process(UInt32 nowTime)
 
     if(nowTime >= TimeUtil::SharpHour(9,nowday) - 10 * 60)//8点50以后
     {
-        for (MClanBB::iterator it = _clanBB.begin(); it != _clanBB.end();++it)
+        for (MClanBB::iterator it = _clanBB.begin(); it != _clanBB.end();)
         {
             if(it->second->getStatus() == CLAN_BIGBOSS_OVER)
-                _clanBB.erase(it);
+                _clanBB.erase(it++);
             else
             {
                 it->second->process(nowTime);
-                //++ it;
+                it++;
             }
             
         }
