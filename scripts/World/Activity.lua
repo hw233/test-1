@@ -1472,7 +1472,7 @@ function initActTime(y, m, d)
   -- 五一活动(节日套装)
   local  SerStartTm245 = { ['year'] = 2013, ['month'] = 4, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --落英秘典
-  local  SerStartTm246 = { ['year'] = 2014, ['month'] = 5, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm246 = { ['year'] = 2014, ['month'] = 7, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --消费抽奖活动
   local  SerStartTm247= { ['year'] = 2013, ['month'] = 5, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
