@@ -875,6 +875,7 @@ namespace GObject
 		m_erlking = new Erlking(this);
 		m_marriageInfo = new MarriageInfo();
 		m_collecCard= new CollectCard(this);
+		_wrapKey= new OrdinarireWrapKey();
         m_csFlag = 0;
         m_spreadInterval = 0;
         m_spreadCoolTime = 0;
@@ -1165,6 +1166,7 @@ namespace GObject
 		SAFE_DELETE(m_FairySpar);
 		SAFE_DELETE(m_moFang);
 		SAFE_DELETE(m_collecCard);
+		SAFE_DELETE(_wrapKey);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -33125,6 +33127,10 @@ UInt8 Player::buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count)
     AddVar(VAR_CUBE_COUNT,oneCost * count); //增加当前层数木片消耗数
     UpdatePictureToDB();
     return 0;
+}
+void Player::getWorldCupAward()
+{
+
 }
 } // namespace GObject
 

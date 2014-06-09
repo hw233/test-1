@@ -4318,5 +4318,18 @@ void SetMarryBoard(LoginMsgHdr& hdr,const void * data)
     st << static_cast<UInt8>(1)<< Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
+void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt8 res = 0;
+    br >> res ;
+    GameMsgHdr imh(0x1AC, WORKER_THREAD_WORLD, NULL, sizeof(res));
+    GLOBAL().PushMsg(imh, &res);
+
+    Stream st(SPEP::WORLDCUP);
+    st << static_cast<UInt8>(1)<< Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
 #endif // _LOGINOUTERMSGHANDLER_H_
 

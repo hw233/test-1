@@ -32,6 +32,7 @@
 #include "Erlking.h"
 #include "ArenaTeam.h"
 #include "Marry.h"
+#include "WrapKey.h"
 #include "ModifyMount.h"
 #include "CollectCard.h"
 #include "KangJiTianMo.h"
@@ -1199,6 +1200,7 @@ namespace GObject
         void selectPray(UInt8 index);
         void getPrayAward();
 		void Reconnect();
+        void getWorldCupAward();
 
 		void Logout(bool = false);	//???????߲???
 		void selfKick();
@@ -1845,6 +1847,8 @@ namespace GObject
 		const std::string& getClanName() const;
 		void setClan(Clan * c);
 		inline Clan * getClan() { return _clan; }
+		void setWrapKey(WrapKey * wk) { _wrapKey = wk;};
+		inline WrapKey * getWrapKey () { return _wrapKey; }
 		inline void setClanBattle(ClanBattle * c)  { _clanBattle = c; }
 		inline ClanBattle * getClanBattle() { return _clanBattle; }
 
@@ -2468,6 +2472,7 @@ namespace GObject
 		UInt32 _vipLevel;
 
 		Clan * _clan;
+        WrapKey * _wrapKey;
 		ClanBattle * _clanBattle;
 		std::string _battleName;
 		UInt32 _flag, _gflag;

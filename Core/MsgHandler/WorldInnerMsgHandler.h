@@ -146,6 +146,11 @@ void OnClanChatReq( GameMsgHdr& hdr, const void * data )
 	if(player->getClan() != NULL)
 		player->getClan()->broadcast(data, hdr.msgHdr.bodyLen);
 }
+void OnWorldCupResult( GameMsgHdr& hdr, const void * data )
+{
+	UInt16 flag = *static_cast<const UInt8 *>(data);
+    WORLD().WorldCupAward(UInt8 res);
+}
 
 void OnSpreadModifyVar(GameMsgHdr& hdr, const void* data)
 {

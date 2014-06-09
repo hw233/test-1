@@ -3700,6 +3700,12 @@ inline bool player_enum_rc(GObject::Player * p, int)
 
     return true;
 }
+inline bool player_worldcup_res(GObject::Player * p, int res)
+{
+    if(p->GetVar(VAR_WORLDCUP_RES) == static_cast<UInt32>(res)) 
+        p->getWorldCupAward();
+    return true;
+}
 inline bool clan_enum_grade(GObject::Clan *clan,int)
 {
     if(!clan)
@@ -3766,6 +3772,10 @@ void World::initRCRank()
     GObject::globalPlayers.enumerate(player_enum_rc, 0);
     GObject::globalClans.enumerate(clan_enum_grade, 0);
     init = true;
+}
+void World::WorldCupAward(UInt8 res)
+{
+    GObject::globalPlayers.enumerate(player_worldcup_res, res);
 }
 
 void World::initRP7RCRank()

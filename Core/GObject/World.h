@@ -1398,6 +1398,7 @@ public:
     static ClanGradeSort tyss_ClanSort;     //天元神兽帮派积分排名
     static void initRCRank();
     static void initRP7RCRank();
+    static void WorldCupAward(UInt8 res);
 
     static RCSortType killMonsterSort[4];
     static RCSortType rechargeRP7Sort;
