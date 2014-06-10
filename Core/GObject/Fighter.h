@@ -599,6 +599,7 @@ public:
 	ItemEquip ** setTrump(std::string& trumps, bool = true);
     ItemEquip* setTrump( UInt32 trump, int idx, bool = true);
     ItemEquip* setTrump( ItemEquip* trump, int idx, bool = true);
+    UInt8 getLingshiNum();
     int getAllLingshiId( UInt32* lingshis, int size = LINGSHI_UPMAX);
 	inline ItemEquip * getLingshi(int idx) { return (idx >= 0 && idx < LINGSHI_UPMAX) ? _lingshi[idx] : 0; }
     ItemEquip * setLingshi(ItemEquip *);
