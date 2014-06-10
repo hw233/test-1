@@ -505,9 +505,9 @@ void ClanBigBoss::addLevel()
         nflist[0].fighter->setWBoss(true);
         m_BossHP = _lastHp;
         nflist[0].fighter->setBaseHP(_lastHp);
-        if(_lastAtk > baseatk)
+        //if(_lastAtk > baseatk)
             nflist[0].fighter->setExtraAttack(_lastAtk - baseatk);
-        if(_lastMAtk > basematk)
+        //if(_lastMAtk > basematk)
             nflist[0].fighter->setExtraMagAttack(_lastMAtk - basematk);
     }
     else
@@ -800,7 +800,7 @@ void ClanBigBoss::LoadFromDB(DBClanBigBoss* dcbb)
     appointment_time = dcbb->app_time;
     m_BossHP = _lastHp;
     
-    if(_status != CLAN_BIGBOSS_NOINIT)
+    if(_status != CLAN_BIGBOSS_NOINIT && _status != CLAN_BIGBOSS_OVER)
         ClanBigBossMgr::Instance().insertMap(_clan->getId(),this); 
 
     GData::NpcGroups::iterator it1 = GData::npcGroups.find(BIGBOSS1);
