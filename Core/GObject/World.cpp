@@ -5214,7 +5214,7 @@ void World::SendWorldCupAward()
         {{515,10},{134,10},{503,15},{9068,5}},
         {{515,10},{134,10},{503,15},{9068,5}},
     };
-    static MailPackage::MailItem card = {9929,1};   //暂无白马王子
+    static MailPackage::MailItem card = {9979,1};   //暂无白马王子
     SYSMSG(title, 5151);
     int pos = 0;
     for (RCSortType::iterator i = World::worldCupSort.begin(), e = World::worldCupSort.end(); i != e; ++i)
