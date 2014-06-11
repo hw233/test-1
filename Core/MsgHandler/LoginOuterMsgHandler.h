@@ -4325,11 +4325,14 @@ void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
     struct WorldCupRes
     {
        UInt8 num;  
-       UInt8 res;
+       UInt32 res;
     };
     WorldCupRes wcr;
+    UInt8 result = 0;
+    UInt32 score = 0;
     br >> wcr.num ;
-    br >> wcr.res ;
+    br >> result >> score;
+    wcr.res =  result * 10000 + score ;
     GameMsgHdr imh(0x150, WORKER_THREAD_WORLD, NULL, sizeof(WorldCupRes));
     GLOBAL().PushMsg(imh, &wcr);
 

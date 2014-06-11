@@ -951,6 +951,7 @@ namespace GObject
         /*m_autoTeamCopyCnt = 0;
         m_autoTeamCopyCurCnt = 0;
         m_autoTeamCopyCurIndex = 0;*/
+        memset(&worldCupInfo, 0, sizeof(worldCupInfo));
     }
 
 
@@ -33132,7 +33133,7 @@ void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
 {
     if(num > 0 && num <= WC_MAX_COUNT )  //结算
         grade = worldCupInfo[num-1].supportNum * 100 ; 
-    static UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,24000};
+    static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
     UInt32 WCGrade = GetVar(VAR_WORLDCUP_RES);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
@@ -33147,7 +33148,7 @@ void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
 }
 void Player::SendWCGradeAward(UInt8 type)
 {
-    if(type > 6)
+    if(type > 6 || type == 0 )
         return ;
     static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
     static MailPackage::MailItem s_item[][6] = {
@@ -33213,7 +33214,6 @@ UInt8 Player::supportWorldCup(UInt8 num ,UInt8 res, UInt32 number)
 
     worldCupInfo[num].supportNum  += number ;
     worldCupInfo[num].supportTime = now;
-    AddVar(VAR_WORLDCUP_RES,100 * number );
 
 	struct WCSupportData
 	{

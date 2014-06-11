@@ -3621,6 +3621,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::LuckyBagSort.insert(s);
         }
     }
+    if (World::getWorldCupTime())
+    {
+        UInt32 used = p->GetVar(VAR_WORLDCUP_RES);
+        if (used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::worldCupSort.insert(s);
+        }
+    }
     if (World::get11Time())
     {
         UInt32 used = p->GetVar(VAR_11AIRBOOK_GRADE);
@@ -3782,9 +3793,10 @@ void World::initRCRank()
     GObject::globalClans.enumerate(clan_enum_grade, 0);
     init = true;
 }
-void World::WorldCupAward(UInt8 num , UInt8 res)
+void World::WorldCupAward(UInt8 num , UInt32 res)
 {
-    GObject::globalPlayers.enumerate(player_worldcup_res, num , res);
+    GObject::globalPlayers.enumerate(player_worldcup_res, num , res/10000);
+    _worldCup[num][3] = res ;
 }
 
 void World::initRP7RCRank()
@@ -5153,7 +5165,7 @@ void World::SupportWorldCup(Player * player , UInt8 num , UInt8 res ,UInt32 coun
     if( res == 0 || res > 3)
         return ;
 
-    _worldCup[num][res-1] += count * 10;
+    _worldCup[num][res-1] += count;
     sendWorldCupInfo(player);
     UpdateWorldCupToDB(num);
 }
@@ -5169,7 +5181,9 @@ void World::sendWorldCupInfo(Player *pl)
       st <<  _worldCup[i][0];
       st <<  _worldCup[i][1];
       st <<  _worldCup[i][2];
-      st << static_cast<UInt8>(_worldCup[i][3]);
+      st << static_cast<UInt8>(_worldCup[i][3]/10000);
+      st << static_cast<UInt8>(_worldCup[i][3]/100%100);
+      st << static_cast<UInt8>(_worldCup[i][3]%100);
    }
    st << Stream::eos;
    pl->send(st);

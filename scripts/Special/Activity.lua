@@ -259,6 +259,7 @@ function onDungeonWin(player, id, count, free)
     if free == true then
         FoolBaoLoot(player,0);
         HappyFireLoot(player,0);
+        WorldCupLoot(player,0);
         SurnameLegendLoot(player,0);
         FallActivity(player, 1)
         Guoqing(player, 0);
@@ -266,6 +267,7 @@ function onDungeonWin(player, id, count, free)
     else
         FoolBaoLoot(player,2);
         HappyFireLoot(player,1);
+        WorldCupLoot(player,1);
         SurnameLegendLoot(player,0);
         FallActivity(player, 2)
         Guoqing(player, 3);
@@ -1039,6 +1041,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     fairyPetLoot(player, lootlvl);
     FoolBaoLoot(player,lootlvl);
     HappyFireLoot(player,lootlvl);
+    WorldCupLoot(player,lootlvl);
     SurnameLegendLoot(player,lootlvl);
     Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
@@ -1094,6 +1097,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     fairyPetLoot(player, lootlvl);
     FoolBaoLoot(player,lootlvl);
     HappyFireLoot(player,lootlvl);
+    WorldCupLoot(player,lootlvl);
     SurnameLegendLoot(player,0);
     if lootlvl == 0 then
         FallActivity(player, 1)
@@ -9502,7 +9506,7 @@ function FoolBaoLoot(player,lootlvl)
     local package = player:GetPackage();
     package:AddItem(9375, itemNum[lootlvl], true,0,10);
 end
---欢乐爆竹掉落
+---欢乐爆竹掉落
 function HappyFireLoot(player,lootlvl)
    if not getHappyFireTime() then
        return
@@ -9518,6 +9522,24 @@ function HappyFireLoot(player,lootlvl)
     };
     local package = player:GetPackage();
     package:AddItem(9458, itemNum[lootlvl], true,0,10); --欢乐礼包
+end
+
+--欢乐爆竹掉落
+function WorldCupLoot(player,lootlvl)
+   if not getWorldCupTime() then
+       return
+   end
+    if lootlvl > 3 then
+        lootlvl = 0
+    end
+    local itemNum = {
+            [0] = 1,
+            [1] = 1,
+            [2] = 1,
+            [3] = 1,
+    };
+    local package = player:GetPackage();
+    package:AddItem(16017, itemNum[lootlvl], true,0,10); --欢乐礼包
 end
 
 function DropActLoot(player,lootlvl)

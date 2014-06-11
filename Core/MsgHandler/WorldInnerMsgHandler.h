@@ -151,7 +151,7 @@ void OnWorldCupResult( GameMsgHdr& hdr, const void * data )
     struct WorldCupRes
     {
        UInt8 num;  
-       UInt8 res;
+       UInt32 res;
     };
 	const  WorldCupRes* wc = reinterpret_cast<const WorldCupRes *>(data);
     WORLD().WorldCupAward(wc->num,wc->res);
@@ -3147,7 +3147,7 @@ void SendWorldCupRank(Stream& st)
         st << i->player->getName();
         st << i->total;
         ++c;
-        if (c >= CNT)
+        if (c >= cnt)
             break;
     }
     st << Stream::eos;

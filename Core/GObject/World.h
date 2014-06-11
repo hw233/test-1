@@ -1408,7 +1408,7 @@ public:
     static ClanGradeSort tyss_ClanSort;     //天元神兽帮派积分排名
     static void initRCRank();
     static void initRP7RCRank();
-    static void WorldCupAward(UInt8 num , UInt8 res);  //公布答案
+    static void WorldCupAward(UInt8 num , UInt32 res);  //公布答案
     void sendWorldCupInfo(Player * pl);
     void UpdateWorldCupToDB(UInt8 num);
     static void setWorldCupInfo(UInt8 num , UInt32 count1,UInt32 count2,UInt32 count3 ,UInt8 res)

@@ -753,6 +753,11 @@ namespace GObject
             fprintf(stderr, "loadPictureInfo error!\n");
             std::abort();
         }
+		if(!loadWorldCup())
+        {
+            fprintf(stderr, "loadWorldCup error!\n");
+            std::abort();
+        }
 
         if(!loadSkillGrade())
         {

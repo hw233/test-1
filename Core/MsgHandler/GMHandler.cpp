@@ -4839,7 +4839,7 @@ void GMHandler::OnWorldCup(GObject::Player *player, std::vector<std::string>& ar
     struct WorldCupRes
     {
        UInt8 num;  
-       UInt8 res;
+       UInt32 res;
     };
     WorldCupRes wcr;
     wcr.num = atoi(args[0].c_str());

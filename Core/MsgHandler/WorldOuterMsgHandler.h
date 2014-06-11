@@ -3380,11 +3380,12 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                 case 0x01:
                     {
                         player->sendMyWorldCupInfo();
+                        WORLD().sendWorldCupInfo(player);
                         break;
                     }        
                 case 0x02:
                     {
-                        GameMsgHdr hdr(0x152, WORKER_THREAD_WORLD, player, 0);
+                        GameMsgHdr hdr(0x153, WORKER_THREAD_WORLD, player, 0);
                         GLOBAL().PushMsg(hdr, NULL);
                         break;
                     }
