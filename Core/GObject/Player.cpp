@@ -33128,9 +33128,134 @@ UInt8 Player::buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count)
     UpdatePictureToDB();
     return 0;
 }
-void Player::getWorldCupAward()
+void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
 {
-
+    if(num > 0 && num <= WC_MAX_COUNT )  //结算
+        grade = worldCupInfo[num-1].supportNum * 100 ; 
+    static UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,24000};
+    UInt32 WCGrade = GetVar(VAR_WORLDCUP_RES);
+    for(UInt8 i =0 ; i< 11 ;i++)
+    {
+        if(WCGrade < gradeAward[i] &&( WCGrade + grade) >=gradeAward[i])
+            SendWCGradeAward(i+1);
+    }
+    AddVar(VAR_WORLDCUP_RES,grade);
+    //AddVar(VAR_11AIRBOOK_GRADE_DAY,grade);
+    UInt32 count = GetVar(VAR_WORLDCUP_RES);
+    GameMsgHdr hdr1(0x152, WORKER_THREAD_WORLD, this, sizeof(count));
+    GLOBAL().PushMsg(hdr1, &count);
 }
+void Player::SendWCGradeAward(UInt8 type)
+{
+    if(type > 6)
+        return ;
+    static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
+    static MailPackage::MailItem s_item[][6] = {
+        {{56,3},{57,3},{500,3},{15,3},{9371,3}},
+        {{503,3},{516,3},{513,3},{501,3}},
+        {{517,10},{551,10},{9424,10},{9414,8}},
+        {{9457,20},{16001,20},{9498,20},{9600,20},{9076,20}},
+        {{515,30},{9498,40},{9498,20},{9600,20},{9076,20}},
+        {{9022,15},{9075,15},{9069,15},{1732,1}},
+    };
+    static UInt32 count[] = {5,4,4,5,5,4};
+    SYSMSG(title, 4954);
+    if(type)
+    {
+        SYSMSGV(content, 4955,gradeAward[type-1]);
+        Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+                mailPackageManager.push(mail->id, s_item[type-1], count[type-1], true);
+        }
+        std::string strItems;
+        for(UInt8 index = 0; index < count[type-1]; ++ index)
+        {
+            strItems += Itoa(s_item[type-1][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[type-1][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+    }
+    char str[16] = {0};
+    sprintf(str, "F_130926_%d",type);
+    udpLog("tianshuqiyuan", str, "", "", "", "", "act");
+}
+UInt8 Player::supportWorldCup(UInt8 num ,UInt8 res, UInt32 number)
+{
+    if( num >= WC_MAX_COUNT)
+        return 1;
+    if(worldCupInfo[num].support == 0 && res != 0)
+       worldCupInfo[num].support = res ; 
+    if(worldCupInfo[num].support != res)
+        return 1;
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 limitTime = GameAction()->getWorldCupLimitTime(this,num);
+    if(now > limitTime)
+        return 2;
+
+    if(number == 0)
+        return 1 ;
+    UInt16 iid = 16017;
+    UInt16 count = GetPackage()->GetItemAnyNum(iid) ;
+    ItemBase * item = GetPackage()->FindItem(iid, true);
+    if (!item)
+        item =GetPackage()->FindItem(iid, false);
+    if(item ==NULL)
+        return 1;
+    if(number > count)
+        return 3;
+    GetPackage()->DelItemAny(iid, number );
+    GetPackage()->AddItemHistoriesLog(iid , number);
+
+    worldCupInfo[num].supportNum  += number ;
+    worldCupInfo[num].supportTime = now;
+    AddVar(VAR_WORLDCUP_RES,100 * number );
+
+	struct WCSupportData
+	{
+		UInt8 num;
+        UInt8 res;
+		UInt32  number;
+	};
+    WCSupportData wcs ;
+    wcs.num = num ;
+    wcs.res = res ;
+    wcs.number = number;
+
+    GameMsgHdr hdr(0x151, WORKER_THREAD_WORLD, this, sizeof(WCSupportData));
+    GLOBAL().PushMsg(hdr, &wcs);
+
+    AddWorldCupScore(number * 100 );
+    UpdateWorldCupToDB(num);
+    return 0;
+}
+void Player::sendMyWorldCupInfo()
+{
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x33);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(0);
+    st << static_cast<UInt8>(WC_MAX_COUNT);
+    for(UInt8 i = 0 ; i < WC_MAX_COUNT ; ++i)
+    {
+        st << worldCupInfo[i].support;
+        st << worldCupInfo[i].supportNum;
+        st << worldCupInfo[i].supportTime;
+    }
+    st << Stream::eos;
+    send(st);
+}
+void Player::UpdateWorldCupToDB(UInt8 num)
+{
+    if(num >= WC_MAX_COUNT)
+        return ;
+    DB1().PushUpdateData("REPLACE INTO `worldCup`(`playerId`, `num`, `count1`,`count2`,`count3`, `result`) VALUES(%" I64_FMT "u, %d, %u,%u,%u , %u)", getId(), num , worldCupInfo[num].supportNum ,worldCupInfo[num].supportTime , 0 , worldCupInfo[num].support);
+    
+}
+
 } // namespace GObject
 

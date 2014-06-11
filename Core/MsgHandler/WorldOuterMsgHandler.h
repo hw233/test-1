@@ -3371,6 +3371,32 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
        }
        break;
+       case 0x33:
+       {
+            UInt8 op = 0;
+            brd >> op;
+            switch(op)
+            {
+                case 0x01:
+                    {
+                        player->sendMyWorldCupInfo();
+                        break;
+                    }        
+                case 0x02:
+                    {
+                        GameMsgHdr hdr(0x152, WORKER_THREAD_WORLD, player, 0);
+                        GLOBAL().PushMsg(hdr, NULL);
+                        break;
+                    }
+                case 0x03:
+                    {
+                        hdr.msgHdr.desWorkerID = player->getThreadId();
+                        GLOBAL().PushMsg(hdr, (void*)data);
+                        break;
+                    }
+            }
+       }
+       break;
        case 0x45:
        {
            UInt8 logType = 0;

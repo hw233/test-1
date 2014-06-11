@@ -4322,10 +4322,16 @@ void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
 {
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     CHKKEY();
-    UInt8 res = 0;
-    br >> res ;
-    GameMsgHdr imh(0x1AC, WORKER_THREAD_WORLD, NULL, sizeof(res));
-    GLOBAL().PushMsg(imh, &res);
+    struct WorldCupRes
+    {
+       UInt8 num;  
+       UInt8 res;
+    };
+    WorldCupRes wcr;
+    br >> wcr.num ;
+    br >> wcr.res ;
+    GameMsgHdr imh(0x150, WORKER_THREAD_WORLD, NULL, sizeof(WorldCupRes));
+    GLOBAL().PushMsg(imh, &wcr);
 
     Stream st(SPEP::WORLDCUP);
     st << static_cast<UInt8>(1)<< Stream::eos;

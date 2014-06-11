@@ -1939,5 +1939,10 @@ namespace Script
         assert(player != NULL);
         return Call<bool>("RunActCardAward", player, idx);
     }
+    UInt32 GameActionLua::getWorldCupLimitTime(Player* player, UInt8 opt)
+	{
+		assert(player != NULL);
+		return Call<UInt32>("getWorldCupLimitTime", player, opt);
+	}
 }
 

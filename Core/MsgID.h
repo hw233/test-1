@@ -931,7 +931,7 @@ namespace SPEP
     const UInt8 SETVAR              = 0x4D;//设置var
     const UInt8 VIAPLAYERINFO       = 0x4E;// 查询导入玩家信息
     const UInt8 SETMARRYBOARD       = 0x4F;//设置婚礼
-    const UInt8 WORLDCUP            = 0x50;//设置婚礼
+    const UInt8 WORLDCUP            = 0x50;//设置世界杯押注结果
 
 }
 

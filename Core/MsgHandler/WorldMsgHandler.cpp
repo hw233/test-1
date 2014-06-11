@@ -112,6 +112,11 @@ MSG_REG_2(GameMsgHdr, 0x142, OnServerLeftAttackInfo);   //进攻小队信息
 MSG_REG_2(ServerLeftMsgHdr, 0x143, OnServerLeftAttr);   //帮派成员获得
 
 MSG_REG_2(GameMsgHdr, 0x150, OnWorldCupResult);
+MSG_REG_2(GameMsgHdr, 0x151, OnWorldCupSupport);
+MSG_REG_2(GameMsgHdr, 0x152, OnWorldCupRank);
+MSG_REG_2(GameMsgHdr, 0x153, OnSendWorldCupRank);
+//MSG_REG_2(GameMsgHdr, 0x154, OnSendWorldCupRank);
+
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);

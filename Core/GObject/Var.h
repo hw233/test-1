@@ -732,7 +732,7 @@ namespace GObject
         VAR_CUBE_COUNT = 743,      //当前积木消耗数  (每一层构造好的时候清零)
         VAR_TREE_VALUE_DAY = 744 ,    //今日被邀请获得的木片数
         VAR_TOOL_CNT = 745 ,    //当前欧耶精粹数量
-        VAR_WORLDCUP_RES = 746 ,    //世界杯 押注 
+        VAR_WORLDCUP_RES = 746 ,    //世界杯积分
 
 
 
