@@ -391,7 +391,7 @@ void ClanBigBoss::reward(Player* player,UInt8 type ,UInt8 idx)
         case 2 ://终结奖励1
             {
                 MailPackage::MailItem item1[] = {{9478,2}};
-                player->sendMailItem(973, 974, item1, 2, false);
+                player->sendMailItem(973, 974, item1, 1, false);
             }
             break;
         case 3 ://终结奖励2
@@ -413,8 +413,8 @@ void ClanBigBoss::reward(Player* player,UInt8 type ,UInt8 idx)
             {
                 if(idx != 1 && idx != 2 && idx != 3)
                     return;
-                MailPackage::MailItem item1[] = {{9478,static_cast<UInt32>(6 - idx)},};
-                player->sendMailItem(969, 970, item1, static_cast<UInt32>(6 - idx), false);
+                MailPackage::MailItem item1[] = {{9478,static_cast<UInt32>(6 - idx)}};
+                player->sendMailItem(969, 970, item1, 1, false);
                 Stream st;
                 SYSMSGVP(st, 978, player->getName().c_str(),idx);
                 _clan->broadcast(st);
@@ -422,8 +422,8 @@ void ClanBigBoss::reward(Player* player,UInt8 type ,UInt8 idx)
             break;
         case 6 ://宕机补偿
             {
-                MailPackage::MailItem item1[] = {{9478,3},};
-                player->sendMailItem(980, 981, item1, 3, false);
+                MailPackage::MailItem item1[] = {{9478,3}};
+                player->sendMailItem(980, 981, item1, 1, false);
             }
             break;
         default:
