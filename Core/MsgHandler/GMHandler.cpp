@@ -4844,6 +4844,8 @@ void GMHandler::OnWorldCup(GObject::Player *player, std::vector<std::string>& ar
     WorldCupRes wcr;
     wcr.num = atoi(args[0].c_str());
     wcr.res = atoi(args[1].c_str());
+    if(wcr.num == 0)
+        return ;
     GameMsgHdr imh(0x150, WORKER_THREAD_WORLD, NULL, sizeof(wcr));
     GLOBAL().PushMsg(imh, &wcr);
 }

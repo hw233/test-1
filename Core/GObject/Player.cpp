@@ -33156,14 +33156,14 @@ void Player::SendWCGradeAward(UInt8 type)
         {{503,3},{516,3},{513,3},{501,3}},
         {{517,10},{551,10},{9424,10},{9414,8}},
         {{9457,20},{16001,20},{9498,20},{9600,20},{9076,20}},
-        {{515,30},{9498,40},{9498,20},{9600,20},{9076,20}},
-        {{9022,15},{9075,15},{9069,15},{1732,1}},
+        {{515,30},{9498,40},{134,40},{1325,30}},
+        {{9022,15},{9075,15},{9068,15},{1732,1}},
     };
-    static UInt32 count[] = {5,4,4,5,5,4};
-    SYSMSG(title, 4954);
+    static UInt32 count[] = {5,4,4,5,4,4};
+    SYSMSG(title, 5153);
     if(type)
     {
-        SYSMSGV(content, 4955,gradeAward[type-1]);
+        SYSMSGV(content, 5154,gradeAward[type-1]);
         Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)

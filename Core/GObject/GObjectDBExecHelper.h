@@ -1663,7 +1663,7 @@ struct DBWorldCup
     UInt32 count1;
     UInt32 count2;
     UInt32 count3;
-    UInt8  result;
+    UInt32  result;
 };
 
 struct DBZhenyuanAttr
@@ -3777,7 +3777,7 @@ SPECIALDEF(6)
     UInt32, count1,
     UInt32, count2,
     UInt32, count3,
-    UInt8 , result
+    UInt32 , result
     )
 SPECIALEND()
 

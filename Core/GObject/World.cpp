@@ -263,6 +263,7 @@ bool World::_duobaoOpen = false;
 bool World::_answerOpenA = false;
 bool World::_answerOpenB = false;
 UInt32 World::_rbTimeRank = 0;
+UInt64 World::_worldCupAward;
 UInt32 World::_worldCup[MAX_WC_COUNT][4];
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
@@ -3720,9 +3721,9 @@ inline bool player_enum_rc(GObject::Player * p, int)
 }
 inline bool player_worldcup_res(GObject::Player * p, UInt8 num , UInt8  res)
 {
-    if(res ==0 || res > 3 || num >= WC_MAX_COUNT)
+    if(res ==0 || res > 3 || num > WC_MAX_COUNT || num == 0 )
         return true ;
-    if(p->GetVar(VAR_WORLDCUP_RES) == static_cast<UInt32>(res)) 
+    if(p->getMyWorldCupInfo(num-1)== res) 
         p->AddWorldCupScore(0,num);
     return true;
 }
@@ -3795,8 +3796,14 @@ void World::initRCRank()
 }
 void World::WorldCupAward(UInt8 num , UInt32 res)
 {
+    if( num ==0 || num > MAX_WC_COUNT)
+        return ;
+    if(_worldCupAward & (1 << (num -1) ) )
+        return ;
     GObject::globalPlayers.enumerate(player_worldcup_res, num , res/10000);
-    _worldCup[num][3] = res ;
+    _worldCup[num -1][3] = res ;
+    _worldCupAward |= (1 << (num -1) );
+    WORLD().UpdateWorldCupToDB(num - 1);
 }
 
 void World::initRP7RCRank()

@@ -1411,9 +1411,9 @@ public:
     static void WorldCupAward(UInt8 num , UInt32 res);  //公布答案
     void sendWorldCupInfo(Player * pl);
     void UpdateWorldCupToDB(UInt8 num);
-    static void setWorldCupInfo(UInt8 num , UInt32 count1,UInt32 count2,UInt32 count3 ,UInt8 res)
+    static void setWorldCupInfo(UInt8 num , UInt32 count1,UInt32 count2,UInt32 count3 ,UInt32 res)
     {
-       if(num >= MAX_WC_COUNT || res ==0 || res > 3) 
+       if(num >= MAX_WC_COUNT) 
            return ;
        _worldCup[num][0] = count1;
        _worldCup[num][1] = count2;

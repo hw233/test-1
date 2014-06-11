@@ -1219,6 +1219,12 @@ namespace GObject
             worldCupInfo[num].supportNum = count ;
             worldCupInfo[num].supportTime = time ;
         }
+        UInt8 getMyWorldCupInfo(UInt8 num)
+        {
+            if(num >= WC_MAX_COUNT)
+                return 0;
+            return worldCupInfo[num].support ;
+        }
         void UpdateWorldCupToDB(UInt8 num);
 
 		void Logout(bool = false);	//???????߲???
