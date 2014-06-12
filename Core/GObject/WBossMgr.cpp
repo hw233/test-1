@@ -1256,7 +1256,7 @@ void WBoss::RandomRefresh(Player* player)
                 if(rand)
                 {
                     st << (*i).player->getId() << (*i).player->getName() << (*i).player->getMainFighter()->getClass() << (*i).player->getMainFighter()->getSex() << (*i).player->getMainFighter()->getColor(); 
-                    i = atkTmp.erase(i); 
+                    atkTmp.erase(i++);
                     ++pos;
                 }
                 else
