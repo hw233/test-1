@@ -4329,9 +4329,11 @@ void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
        UInt32 res;
     };
     WorldCupRes wcr;
+    UInt8 num = 0;
     UInt8 result = 0;
     UInt32 score = 0;
-    br >> wcr.num ;
+
+    br >> num;
     br >> result >> score;
     if(wcr.num == 0 )
         return ;
