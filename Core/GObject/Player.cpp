@@ -33150,7 +33150,7 @@ void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
         grade = worldCupInfo[num-1].supportNum * 100 ; 
     static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
     UInt32 WCGrade = GetVar(VAR_WORLDCUP_RES);
-    for(UInt8 i =0 ; i< 11 ;i++)
+    for(UInt8 i =0 ; i< 6;i++)
     {
         if(WCGrade < gradeAward[i] &&( WCGrade + grade) >=gradeAward[i])
             SendWCGradeAward(i+1);

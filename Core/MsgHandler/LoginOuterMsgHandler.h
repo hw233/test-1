@@ -4364,7 +4364,7 @@ void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
 
     if(flag)
     {
-        wcr.res = num ;
+        wcr.num = num ;
         wcr.res =  result * 10000 + score ;
         GameMsgHdr imh(0x150, WORKER_THREAD_WORLD, NULL, sizeof(WorldCupRes));
         GLOBAL().PushMsg(imh, &wcr);
