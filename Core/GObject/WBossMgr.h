@@ -92,6 +92,18 @@ public:
     void sendId(Player* player = NULL);
     void sendCount(Player* player = NULL);
 
+    void sendFighteCD(Player* player );
+    void sendFighterNum(Player* player = NULL);
+    void sendLastTime(Player* player = NULL);
+    void sendInspireInfo(Player* player );
+    void sendAtkInfo(Player* player = NULL);
+    void sendSkipFlag(Player* player );
+    void sendSkipBattleReport(Player* player ,UInt32 damage,UInt32 exp,bool res);
+    void SetDirty(Player* player,bool _isInspire);
+    void RandomRefresh(Player* player);
+    void ReqBossId(Player* player);
+
+
 private:
     UInt32 m_id;
     UInt8 m_count;
@@ -173,6 +185,14 @@ public:
     inline UInt32 getAppearTime() const { return _appearTime; }
     bool needAutoBattle(UInt16 spotId);
     void calInitClanBigBoss(UInt32& lastHp,Int32& lastAtk,Int32& lastMAtk);
+    void Inspire(Player* player,UInt8 type);
+    void Relive(Player* player);
+    void SetSkipBattle(Player* player,bool isSkip);
+    void RefreshTenPlayer(Player* player);
+    void ReturnBaseInfo(Player* player);
+    void ReqBossId(Player* player,UInt32 loc);
+    void UpdateInspire(Player* player);
+    bool checkLocRight(Player* player,UInt16 loc);
 
 private:
     UInt32 _prepareTime;

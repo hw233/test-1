@@ -32322,7 +32322,6 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
             pl->getCuttingInfo().type = getCuttingInfo().type;
             sendCutterInfo();
             pl->sendCutterInfo();
-
         }
         else
         {
