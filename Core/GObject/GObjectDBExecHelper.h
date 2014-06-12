@@ -1510,6 +1510,13 @@ struct DBZhenwei
     UInt8 mark;
 };
 
+struct DBGear
+{
+    UInt64 playerId;
+    UInt16 gearId;
+    UInt8 mark;
+};
+
 struct DBGoback
 {
     UInt64 inviteeId;
@@ -3577,6 +3584,15 @@ SPECIALDEF(3)
     (
     UInt64, playerId,
     UInt16, keyId,
+    UInt8, mark
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBGear)
+SPECIALDEF(3)
+    (
+    UInt64, playerId,
+    UInt16, gearId,
     UInt8, mark
     )
 SPECIALEND()

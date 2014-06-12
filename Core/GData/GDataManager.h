@@ -80,6 +80,8 @@ namespace GData
         static bool LoadTuzhiConfig();
         static bool LoadKeyinConfig();
         static bool LoadZhenweiConfig();
+        static bool LoadGearConfig();
+        static bool LoadGearTreeConfig();
         static bool LoadSanHunConfig();
         static bool LoadErlkingConfig();
         static bool LoadTeamArenaSkillConfig();

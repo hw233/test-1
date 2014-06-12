@@ -2140,6 +2140,7 @@ void Fighter::rebuildEquipAttr()
     {
         _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
         _owner->GetMoFang()->addKYAttr(_attrExtraEquip);
+        _owner->GetMoFang()->addGearAttr(_attrExtraEquip);
 
         //坐骑加成
         _owner->addMountAttrExtra(_attrExtraEquip);

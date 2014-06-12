@@ -750,6 +750,38 @@ struct DBZhenweiConfig
     UInt32 award;
 };
 
+struct DBGearConfig
+{
+    UInt16 partId;
+    UInt32 needMoneyA;
+    UInt32 needMoneyB;
+    UInt32 needMoneyC;
+    UInt32 needMoneyD;
+    UInt32 needMoneyE;
+    float attrValueA;
+    float attrValueB;
+    float attrValueC;
+    float attrValueD;
+    float attrValueE;
+    float attrValueF;
+    float attrValueG;
+};
+
+struct DBGearTreeConfig
+{
+    UInt16 suiteId;
+    UInt16 lastSuiteId;
+    UInt16 partAId;
+    UInt16 componentAId;
+    UInt16 componentBId;
+    UInt16 partBId;
+    UInt16 componentCId;
+    UInt16 componentDId;
+    UInt16 partCId;
+    UInt16 componentEId;
+    UInt16 componentFId;
+};
+
 struct DBSanHunConfig
 {
     UInt8 sanhunLvl;
@@ -1674,6 +1706,42 @@ SPECIALDEF(12)
     UInt32, collect7,
     UInt32, collect8,
     UInt32, award
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBGearConfig)
+SPECIALDEF(13)
+    (
+    UInt16, partId,
+    UInt32, needMoneyA,
+    UInt32, needMoneyB,
+    UInt32, needMoneyC,
+    UInt32, needMoneyD,
+    UInt32, needMoneyE,
+    float, attrValueA,
+    float, attrValueB,
+    float, attrValueC,
+    float, attrValueD,
+    float, attrValueE,
+    float, attrValueF,
+    float, attrValueG
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBGearTreeConfig)
+SPECIALDEF(11)
+    (
+    UInt16, suiteId,
+    UInt16, lastSuiteId,
+    UInt16, partAId,
+    UInt16, componentAId,
+    UInt16, componentBId,
+    UInt16, partBId,
+    UInt16, componentCId,
+    UInt16, componentDId,
+    UInt16, partCId,
+    UInt16, componentEId,
+    UInt16, componentFId
     )
 SPECIALEND()
 

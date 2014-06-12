@@ -7326,7 +7326,29 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
             player->GetMoFang()->checkKey(keyId, opt);               
         }
         break;
+    case 13:
+        {
+            UInt8 type = 0;
+            br >> type;
 
+            if(1 != type && 2 != type)
+                return;
+
+            if(1 == type)
+                player->GetMoFang()->sendCommonGearInfo();
+            else
+                player->GetMoFang()->sendSpecialGearInfo();
+        }
+        break;
+    case 14:
+        {
+            UInt8 type = 0;
+            UInt16 gearId = 0;
+            br >> type >> gearId;
+
+            player->GetMoFang()->makeGear(gearId, type);               
+        }
+        break;
     }
 }
 

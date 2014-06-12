@@ -165,6 +165,17 @@ void MoFang::AddZhenweiFromDB(DBZhenwei &dbData)
     m_zhenwei.insert(std::make_pair(dbData.keyId, dbData.mark));
 }
 
+void MoFang::AddGearFromDB(UInt16 gearId, UInt8 mark)
+{
+    if(GEAR_COMMON != mark && GEAR_SPECIAL != mark)
+        return;
+
+    if(GEAR_COMMON == mark)
+        m_commonGear.push_back(gearId);
+    else
+        m_specialGear.push_back(gearId);
+}
+
 UInt32 MoFang::addTuzhi(UInt32 tuzhiId, bool mark)
 {
     if(!m_owner)
@@ -1737,6 +1748,262 @@ void MoFang::addjiguanyu(UInt32 jiguanyuId)
     DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u)",m_owner->getId(), jiguanyuId, 0);
 
     sendMoFangInfo();
+}
+
+void MoFang::sendCommonGearInfo()
+{
+    UInt16 sz = m_commonGear.size();
+    Stream st(REP::MOFANG_INFO);
+    st << static_cast<UInt8>(13);
+    st << static_cast<UInt8>(1);
+    st << sz;
+    std::vector<UInt16>::iterator iter = m_commonGear.begin();
+    for(; iter!=m_commonGear.end(); iter++)
+    {
+        st << *iter;
+    }
+    st << Stream::eos;
+    m_owner->send(st);
+}
+
+void MoFang::sendSpecialGearInfo()
+{
+    UInt16 sz = m_specialGear.size();
+    Stream st(REP::MOFANG_INFO);
+    st << static_cast<UInt8>(13);
+    st << static_cast<UInt8>(2);
+    st << sz;
+    std::vector<UInt16>::iterator iter = m_specialGear.begin();
+    for(; iter!=m_specialGear.end(); iter++)
+    {
+        st << *iter;
+    }
+    st << Stream::eos;
+    m_owner->send(st);
+}
+
+void MoFang::makeGear(UInt16 gearId, UInt8 mark)
+{
+    if(GEAR_COMMON != mark && GEAR_SPECIAL != mark)
+        return;
+
+    GData::JiguanData::gearInfo* gearInfo = GData::jiguanData.getGearInfo(gearId);
+    if(!gearInfo)
+        return;
+    
+    /*if(m_owner->GetVar(VAR_A)<gearInfo->ZYKNum
+            || m_owner->GetVar(VAR_A)<gearInfo->ZYMNum
+            || m_owner->GetVar(VAR_A)<gearInfo->ZYSNum
+            ||  m_owner->GetVar(VAR_A)<gearInfo->ZYLFNum)
+        return;*/
+
+    if(m_owner->getTael() < gearInfo->taelNum)
+    {
+        m_owner->sendMsgCode(0, 1100);
+        return;
+    }
+
+    if(GEAR_COMMON == mark)
+    {
+        if(checkCommonGear(gearId))
+            return;
+
+        if(!makeCommonGear(gearId))
+            return;
+    }
+    else
+    {
+        if(checkSpecialGear(gearId))
+            return;
+
+        if(!makeSpecialGear(gearId))
+            return;
+    }
+
+    ConsumeInfo ci(MakeGear, 0, 0);
+    m_owner->useTael(gearInfo->taelNum, &ci);
+   
+    if(GEAR_COMMON == mark)
+        m_commonGear.push_back(gearId);
+    else
+        m_specialGear.push_back(gearId);
+    DB4().PushUpdateData("REPLACE INTO `player_gear` VALUES(%" I64_FMT "u, %u, %u)", m_owner->getId(), gearId, mark);
+
+    Stream st(REP::MOFANG_INFO);
+    st << static_cast<UInt8>(14);
+    st << static_cast<UInt8>(mark);
+    st << gearId;
+    st << Stream::eos;
+    m_owner->send(st);
+
+    std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
+    for(std::map<UInt32, Fighter *>::iterator it=fighters.begin(); it!=fighters.end(); ++it)
+    {
+        it->second->setDirty();
+    }
+}
+
+bool MoFang::makeCommonGear(UInt16 gearId)
+{
+    UInt8 gearType = GData::jiguanData.getGearType(gearId);
+    if(0 == gearType)
+        return false;
+
+    switch(gearType)
+    {
+        case 1:
+            {
+                GData::JiguanData::needPart* needPartInfo = GData::jiguanData.getMakeSuiteInfo(gearId);
+                if(!needPartInfo)
+                    return false;
+
+                if(needPartInfo->lastSuiteId > 0)
+                    if(!checkCommonGear(needPartInfo->lastSuiteId))
+                        return false;
+
+                if(!checkCommonGear(needPartInfo->needPartAId)
+                        || !checkCommonGear(needPartInfo->needPartBId)
+                        || !checkCommonGear(needPartInfo->needPartCId))
+                    return false;
+            }
+            break;
+        case 2:
+            {
+                GData::JiguanData::needComponent* needComponentInfo = GData::jiguanData.getMakePartInfo(gearId);
+                if(!needComponentInfo)
+                    return false;
+
+                if(needComponentInfo->needComponentAId > 0)
+                    if(!checkCommonGear(needComponentInfo->needComponentAId))
+                        return false;
+
+                if(needComponentInfo->needComponentBId > 0)
+                    if(!checkCommonGear(needComponentInfo->needComponentBId))
+                        return false;
+            }
+            break;
+    }
+
+    return true;
+}
+
+bool MoFang::makeSpecialGear(UInt16 gearId)
+{
+    UInt8 gearType = GData::jiguanData.getGearType(gearId);
+    if(0 == gearType)
+        return false;
+
+    switch(gearType)
+    {
+        case 1:
+            {
+                GData::JiguanData::needPart* needPartInfo = GData::jiguanData.getMakeSuiteInfo(gearId);
+                if(!needPartInfo)
+                    return false;
+
+                if(!checkSpecialGear(needPartInfo->needPartAId)
+                        || !checkSpecialGear(needPartInfo->needPartBId)
+                        || !checkSpecialGear(needPartInfo->needPartCId))
+                    return false;
+            }
+            break;
+        case 2:
+            {
+                GData::JiguanData::needComponent* needComponentInfo = GData::jiguanData.getMakePartInfo(gearId);
+                if(!needComponentInfo)
+                    return false;
+
+                if(needComponentInfo->needComponentAId > 0)
+                    if(!checkSpecialGear(needComponentInfo->needComponentAId))
+                        return false;
+
+                if(needComponentInfo->needComponentBId > 0)
+                    if(!checkSpecialGear(needComponentInfo->needComponentBId))
+                        return false;
+            }
+            break;
+    }
+
+    return true;
+}
+
+bool MoFang::checkCommonGear(UInt16 gearId)
+{
+    std::vector<UInt16>::iterator iter = m_commonGear.begin();
+    for(; iter!=m_commonGear.end(); iter++)
+    {
+        if(gearId == *iter)
+            return true;
+    }
+
+    return false;
+}
+
+bool MoFang::checkSpecialGear(UInt16 gearId)
+{
+    std::vector<UInt16>::iterator iter = m_specialGear.begin();
+    for(; iter!=m_specialGear.end(); iter++)
+    {
+        if(gearId == *iter)
+            return true;
+    }
+
+    return false;
+}
+
+void MoFang::addGearAttr(GData::AttrExtra& ae)
+{
+    float addAttrA = 0.00;
+    float addAttrB = 0.00;
+    float addAttrC = 0.00;
+    float addAttrD = 0.00;
+    float addAttrE = 0.00;
+    float addAttrF = 0.00;
+    float addExp = 0.00;
+    std::vector<UInt16>::iterator iter = m_commonGear.begin();
+    for(; iter!=m_commonGear.end(); iter++)
+    {
+        GData::JiguanData::gearInfo* commonGearInfo = GData::jiguanData.getGearInfo(*iter);
+        if(!commonGearInfo)
+            continue;
+
+        addAttrA += commonGearInfo->attrValueA;
+        addAttrB += commonGearInfo->attrValueB;
+        addAttrC += commonGearInfo->attrValueC;
+        addAttrD += commonGearInfo->attrValueD;
+        addAttrE += commonGearInfo->attrValueE;
+        addAttrF += commonGearInfo->attrValueF;
+        addExp += commonGearInfo->attrValueG; 
+    }
+
+    std::vector<UInt16>::iterator iterA = m_specialGear.begin();
+    for(; iterA!=m_specialGear.end(); iterA++)
+    {
+        GData::JiguanData::gearInfo* specialGearInfo = GData::jiguanData.getGearInfo(*iterA);
+        if(!specialGearInfo)
+            continue;
+
+        addAttrA += specialGearInfo->attrValueA;
+        addAttrB += specialGearInfo->attrValueB;
+        addAttrC += specialGearInfo->attrValueC;
+        addAttrD += specialGearInfo->attrValueD;
+        addAttrE += specialGearInfo->attrValueE;
+        addAttrF += specialGearInfo->attrValueF;
+        addExp += specialGearInfo->attrValueG; 
+    }
+
+    ae.attack += addAttrA;
+    ae.magatk += addAttrB;
+    ae.defend += addAttrC;
+    ae.magdef += addAttrD;
+    ae.hp += addAttrE;
+    ae.action += addAttrF;
+
+    UInt8 plvl = m_owner->GetLev();
+    UInt32 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
+    exp = exp*60*addExp;
+
+    m_owner->AddExp(exp);
 }
 
 }

@@ -1164,6 +1164,7 @@ namespace GObject
         SAFE_DELETE(m_relation);
 		SAFE_DELETE(m_FairySpar);
 		SAFE_DELETE(m_moFang);
+		SAFE_DELETE(m_erlking);
 		SAFE_DELETE(m_collecCard);
 	}
 
