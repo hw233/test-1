@@ -277,6 +277,7 @@ GMHandler::GMHandler()
     Reg(2, "fool", &GMHandler::OnFoolsDayGM);
     Reg(2, "star", &GMHandler::OnLuckyStarGM);
     Reg(2, "acttm", &GMHandler::OnSurnameleg);
+    Reg(2, "worldcup", &GMHandler::OnWorldCup);
     Reg(2, "openclb", &GMHandler::OnOpenclb);
     Reg(2, "sendmsg", &GMHandler::OnSendMsg);
     Reg(2, "setplvar", &GMHandler::OnSetPlayersVar);
@@ -4841,6 +4842,23 @@ void GMHandler::OnOpenclb(GObject::Player *player, std::vector<std::string>& arg
         player->setClanRankBuffFlag(true);
     if(index == 2)
         player->setClanRankBuffFlag(false);
+}
+void GMHandler::OnWorldCup(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() != 2)
+		return;
+    struct WorldCupRes
+    {
+       UInt8 num;  
+       UInt32 res;
+    };
+    WorldCupRes wcr;
+    wcr.num = atoi(args[0].c_str());
+    wcr.res = atoi(args[1].c_str());
+    if(wcr.num == 0)
+        return ;
+    GameMsgHdr imh(0x150, WORKER_THREAD_WORLD, NULL, sizeof(wcr));
+    GLOBAL().PushMsg(imh, &wcr);
 }
 void GMHandler::OnClanBoss(GObject::Player *player, std::vector<std::string>& args)
 {

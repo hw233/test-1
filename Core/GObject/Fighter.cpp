@@ -1148,6 +1148,17 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
     return t;
 }
 
+UInt8 Fighter::getLingshiNum()
+{
+    UInt8 count = 0;
+    for (int i = 0; i < LINGSHI_UPMAX; ++i)
+    {
+        if (_lingshi[i])
+            ++ count;
+    }
+    return count;
+}
+
 int Fighter::getAllLingshiId( UInt32* lingshis, int size )
 {
     if (!lingshis|| !size)

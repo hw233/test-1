@@ -217,6 +217,7 @@ private:
     void OnMakeGear(GObject::Player *player, std::vector<std::string>& args);
 
     void OnOpenclb(GObject::Player *player, std::vector<std::string>& args);
+    void OnWorldCup(GObject::Player *player, std::vector<std::string>& args);
 
     void OnSetTownDeamonMaxLevel(GObject::Player *player, std::vector<std::string>& args);
     void OnFairySpar(GObject::Player *player, std::vector<std::string>& args);
