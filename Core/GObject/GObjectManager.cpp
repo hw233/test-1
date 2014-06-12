@@ -4491,6 +4491,11 @@ namespace GObject
 
                      lua_tinker::table t1 = table_tmp.get<lua_tinker::table>(j + 1);
                      UInt32  tSize = t1.size();
+                     UInt32 toId;
+                     if(tSize > 0)
+                         toId = t1.get<UInt32>(tSize);
+                     else
+                         toId = 0;
                      for (UInt32 i = 0 ; i< tSize; i++ )
                      {
                          if(i == tSize - 1)
@@ -4506,7 +4511,7 @@ namespace GObject
                              {
                                  stMergeS  ms;
                                  ms.id = c.get<UInt32>(1);
-                                 std::vector<UInt32>& v = _mMergeStfsIndex[ms.id];
+                                 std::vector<UInt32>& v = _mMergeStfsIndex[toId];
                                  v.push_back(j);
 
                                  ms.num = c.get<UInt32>(2);
@@ -4522,7 +4527,7 @@ namespace GObject
                                      for(;id1<= id2; id1++)
                                      {
                                          stMergeS ms;
-                                         std::vector<UInt32>& v = _mMergeStfsIndex[id1];
+                                         std::vector<UInt32>& v = _mMergeStfsIndex[toId];
                                          v.push_back(j);
                                          ms.id = id1;
                                          ms.num = num;
