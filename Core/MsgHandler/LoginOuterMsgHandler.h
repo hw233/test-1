@@ -4319,5 +4319,59 @@ void SetMarryBoard(LoginMsgHdr& hdr,const void * data)
     st << static_cast<UInt8>(1)<< Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
+void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
+{
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt8 flag = 1 ;
+    struct WorldCupRes
+    {
+       UInt8 num;  
+       UInt32 res;
+    };
+    WorldCupRes wcr;
+    UInt8 num = 0;
+    UInt8 result = 0;
+    UInt32 score = 0;
+
+    br >> num;
+    br >> result >> score;
+
+
+    if(num == 0 )
+        return ;
+    switch(result)
+    {
+        case 1:
+            {
+                if(score/100 <= score%100) 
+                    flag = 0;
+            }
+            break;
+        case 2:
+            {
+                if(score/100 >= score%100) 
+                    flag = 0;
+            }
+            break;
+        case 3:
+            {
+                if(score/100 != score%100) 
+                    flag = 0;
+            }
+            break;
+    }
+
+    if(flag)
+    {
+        wcr.res = num ;
+        wcr.res =  result * 10000 + score ;
+        GameMsgHdr imh(0x150, WORKER_THREAD_WORLD, NULL, sizeof(WorldCupRes));
+        GLOBAL().PushMsg(imh, &wcr);
+    }
+    Stream st(SPEP::WORLDCUP);
+    st << static_cast<UInt8>(flag)<< Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
 #endif // _LOGINOUTERMSGHANDLER_H_
 

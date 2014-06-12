@@ -9189,6 +9189,30 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     break;
             }
         }
+    case 0x33:
+        {
+            UInt8 op = 0;
+            brd >> op;
+            switch(op)
+            {
+                case 0x03:
+                {
+                    UInt8 num = 0;
+                    UInt8 res = 0 ;
+                    UInt32 number = 0;
+                    brd >> num >> res >> number;
+                    UInt8 result = player->supportWorldCup(num,res,number);
+                    Stream st(REP::ACT);
+                    st << static_cast<UInt8>(0x33);
+                    st << static_cast<UInt8>(0x03);
+                    st << static_cast<UInt8>(result);
+                    st << Stream::eos;
+                    player->send(st);
+                    player->sendMyWorldCupInfo();
+                }
+                break;
+            }
+        }
     default:
         break;
     }

@@ -543,6 +543,7 @@ namespace GObject
         static bool loadCard();
         static bool loadCardSuit();
         static	bool loadPictureInfo();
+        static	bool loadWorldCup();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

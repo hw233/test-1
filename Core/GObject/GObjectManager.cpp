@@ -753,6 +753,11 @@ namespace GObject
             fprintf(stderr, "loadPictureInfo error!\n");
             std::abort();
         }
+		if(!loadWorldCup())
+        {
+            fprintf(stderr, "loadWorldCup error!\n");
+            std::abort();
+        }
 
         if(!loadSkillGrade())
         {
@@ -7911,6 +7916,33 @@ namespace GObject
 		lc.finalize();
 		return true;
 	}
+    bool GObjectManager::loadWorldCup()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading WorldCup:");
+		DBWorldCup dbpn;
+		if(execu->Prepare("SELECT `playerId` ,`num`, `count1`, `count2`, `count3`, `result` FROM `worldCup` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            if(dbpn.playerId == 0)
+            {
+               World::setWorldCupInfo(dbpn.num , dbpn.count1 ,dbpn.count2 ,dbpn.count3 ,dbpn.result ) ;
+               continue ;
+            }
+		    Player* pl = globalPlayers[dbpn.playerId];
+			if(pl == NULL)
+				continue;
+            if(dbpn.count3 != 0 )
+                continue ;
+            pl->setMyWorldCupInfo(dbpn.num , dbpn.result , dbpn.count1 , dbpn.count2);
+        }
+		lc.finalize();
+		return true;
+    }
 }
 
 
