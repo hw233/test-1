@@ -31825,6 +31825,8 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
         send(st);
     if(shenfen || count == 0) //主动方要告知被动房斗酒开始
     {
+        pl->beReplyForDrinking(this,result ,type ,count + 1);
+        return ;
         struct st 
         {
             UInt64 playerId1;
@@ -32322,7 +32324,6 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
             pl->getCuttingInfo().type = getCuttingInfo().type;
             sendCutterInfo();
             pl->sendCutterInfo();
-
         }
         else
         {
