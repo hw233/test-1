@@ -19065,15 +19065,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
     }
     UInt8 Player::getSnowAward(UInt16 type)
     {
-        static  MailPackage::MailItem s_item1[4] = {{56,3},{57,3},{9371,3},{548,3}};
+        static  MailPackage::MailItem s_item1[4] = {{56,3},{57,3},{9371,3},{15,3}};
         static  MailPackage::MailItem s_item2[4] = {{514,3},{9371,3},{500,3},{15,3}};
         static  MailPackage::MailItem s_item3[4] = {{503,3},{512,3},{516,2},{513,3}};
         static  MailPackage::MailItem s_item4[4] = {{1325,2},{134,2},{547,3},{551,3}};
-        static  MailPackage::MailItem s_item5[4] = {{401,5},{547,5},{512,5},{514,5}};
+        static  MailPackage::MailItem s_item5[4] = {{56,5},{547,5},{512,5},{514,5}};
         static  MailPackage::MailItem s_item6[4] = {{509,3},{507,3},{501,5},{513,5}};
         static  MailPackage::MailItem s_item7[4] = {{503,5},{516,5},{501,5},{505,5}};
         static  MailPackage::MailItem s_item8[4] = {{134,8},{1325,8},{9076,8},{507,8}};
-        static  MailPackage::MailItem s_item9[4] = {{1325,15},{134,15},{9076,10},{509,15}};
+        static  MailPackage::MailItem s_item9[4] = {{9498,15},{134,15},{9076,10},{509,15}};
   
         if(GetPackage()->GetRestPackageSize() < 4)
         {

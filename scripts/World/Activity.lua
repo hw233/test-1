@@ -1417,8 +1417,8 @@ function initActTime(y, m, d)
   -- 节日套装人人拿(22~28)
   local  SerStartTm221 = { ['year'] = 2012, ['month'] = 12, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --圣诞堆雪人活动
-  local  SerStartTm230 = { ['year'] = 2013, ['month'] = 12, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm230_1 = { ['year'] = 2013, ['month'] = 12, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm230 = { ['year'] = 2014, ['month'] = 7, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm230_1 = { ['year'] = 2014, ['month'] = 7, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --金蛇迎新活动
   local  SerStartTm231 = { ['year'] = 2012, ['month'] = 12, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm231_1 = { ['year'] = 2013, ['month'] = 1, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
