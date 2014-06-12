@@ -159,6 +159,7 @@ namespace GObject
         GVAR_RAND_QUESTIONS_MARK = 100, // 选题标记
         
         GVAR_CLAN_BIGBOSS_ENABLE = 101,         //帮派BOSS能否预约
+        GVAR_MAX_LEVEL = 102 ,          //玩家最大等级 , 用于开启等级天劫判断
         GVAR_MAX,
     };
 

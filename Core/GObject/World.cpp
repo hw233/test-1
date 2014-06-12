@@ -216,6 +216,7 @@ RCSortType World::LuckyBagSort;
 RCSortType World::PlayerGradeSort;
 RCSortType World::guangGunSort;
 RCSortType World::happyFireSort;
+RCSortType World::worldCupSort;
 ClanGradeSort World::clanGradeSort;
 RCSortType World::tyss_PlayerSort;
 ClanGradeSort World::tyss_ClanSort;
@@ -262,6 +263,8 @@ bool World::_duobaoOpen = false;
 bool World::_answerOpenA = false;
 bool World::_answerOpenB = false;
 UInt32 World::_rbTimeRank = 0;
+UInt64 World::_worldCupAward;
+UInt32 World::_worldCup[MAX_WC_COUNT][4];
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -350,6 +353,7 @@ bool bItem9344End = false;
 bool bItem9343End = false;
 bool bQiShiBanEnd = false;
 bool bTYSSEnd = false;
+bool bWCTimeEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -1403,6 +1407,7 @@ void World::World_Midnight_Check( World * world )
     bool bhappyfirend = getHappyFireTime();
     bool bGuanka = getGuankaAct();
     bool b11time = get11Time();
+    bool bWCtime = getWorldCupTime();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
     bool bJune = getJune();
@@ -1451,6 +1456,7 @@ void World::World_Midnight_Check( World * world )
     bHappyFireEnd = bhappyfirend && !getHappyFireTime(300);
     bGuankaEnd = bGuanka && !getGuankaAct(300);
     b11TimeEnd = b11time && !get11Time();
+    bWCTimeEnd = bWCtime && !getWorldCupTime(300);
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
     bGGTimeEnd = bGGtime && !getGGTime(300);
@@ -1755,6 +1761,8 @@ void World::World_Midnight_Check( World * world )
         world->GObject::World::SendTYSSPlayerAward();
         world->GObject::World::SendTYSSClanAward();
     }
+    if(bWCTimeEnd)
+        world->SendWorldCupAward();
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
   //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
@@ -3631,6 +3639,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::LuckyBagSort.insert(s);
         }
     }
+    if (World::getWorldCupTime())
+    {
+        UInt32 used = p->GetVar(VAR_WORLDCUP_RES);
+        if (used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::worldCupSort.insert(s);
+        }
+    }
     if (World::get11Time())
     {
         UInt32 used = p->GetVar(VAR_11AIRBOOK_GRADE);
@@ -3717,6 +3736,14 @@ inline bool player_enum_rc(GObject::Player * p, int)
 
     return true;
 }
+inline bool player_worldcup_res(GObject::Player * p, UInt8 num , UInt8  res)
+{
+    if(res ==0 || res > 3 || num > WC_MAX_COUNT || num == 0 )
+        return true ;
+    if(p->getMyWorldCupInfo(num-1)== res) 
+        p->AddWorldCupScore(0,num);
+    return true;
+}
 inline bool clan_enum_grade(GObject::Clan *clan,int)
 {
     if(!clan)
@@ -3783,6 +3810,17 @@ void World::initRCRank()
     GObject::globalPlayers.enumerate(player_enum_rc, 0);
     GObject::globalClans.enumerate(clan_enum_grade, 0);
     init = true;
+}
+void World::WorldCupAward(UInt8 num , UInt32 res)
+{
+    if( num ==0 || num > MAX_WC_COUNT)
+        return ;
+    if(_worldCupAward & (1 << (num -1) ) )
+        return ;
+    GObject::globalPlayers.enumerate(player_worldcup_res, num , res/10000);
+    _worldCup[num -1][3] = res ;
+    _worldCupAward |= (1 << (num -1) );
+    WORLD().UpdateWorldCupToDB(num - 1);
 }
 
 void World::initRP7RCRank()
@@ -5144,6 +5182,85 @@ void World::SendTYSSPlayerAward()
     }
     return;
 }
+void World::SupportWorldCup(Player * player , UInt8 num , UInt8 res ,UInt32 count)
+{
+    if( num >= MAX_WC_COUNT )
+        return ;
+    if( res == 0 || res > 3)
+        return ;
 
+    _worldCup[num][res-1] += count;
+    sendWorldCupInfo(player);
+    UpdateWorldCupToDB(num);
+}
+void World::sendWorldCupInfo(Player *pl)
+{
+   Stream st(REP::ACTIVE );
+   st << static_cast<UInt8>(0x33);
+   st << static_cast<UInt8>(0x01);
+   st << static_cast<UInt8>(0x01);
+   st << static_cast<UInt8>(MAX_WC_COUNT);
+   for(UInt8 i = 0 ; i < MAX_WC_COUNT ; ++i)
+   {
+      st <<  _worldCup[i][0];
+      st <<  _worldCup[i][1];
+      st <<  _worldCup[i][2];
+      st << static_cast<UInt8>(_worldCup[i][3]/10000);
+      st << static_cast<UInt8>(_worldCup[i][3]/100%100);
+      st << static_cast<UInt8>(_worldCup[i][3]%100);
+   }
+   st << Stream::eos;
+   pl->send(st);
+}
+void World::UpdateWorldCupToDB(UInt8 num)
+{
+    if(num >= MAX_WC_COUNT)
+        return ;
+    DB1().PushUpdateData("REPLACE INTO `worldCup`(`playerId`, `num`, `count1`,`count2`,`count3`, `result`) VALUES(%" I64_FMT "u, %d ,%u ,%u ,%u ,%u)", 0, num , _worldCup[num][0],_worldCup[num][1], _worldCup[num][2] , _worldCup[num][3]);
+    
+}
+void World::SendWorldCupAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][5] = {
+        {{515,30},{134,30},{503,50},{9068,25}},
+        {{515,25},{134,25},{503,40},{9068,18}},
+        {{515,20},{134,20},{503,30},{9068,10}},
+        {{515,10},{134,10},{503,15},{9068,5}},
+        {{515,10},{134,10},{503,15},{9068,5}},
+        {{515,10},{134,10},{503,15},{9068,5}},
+        {{515,10},{134,10},{503,15},{9068,5}},
+    };
+    static MailPackage::MailItem card = {9979,1};   //暂无白马王子
+    SYSMSG(title, 5151);
+    int pos = 0;
+    for (RCSortType::iterator i = World::worldCupSort.begin(), e = World::worldCupSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (!player)
+            continue;
+        ++pos;
+        if(pos > 7) break;   // 1--7名
+        SYSMSGV(content, 5152, pos,i->total);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, s_item[pos-1], 4, true);  
+            if(pos ==1)
+                mailPackageManager.push(mail->id, &card, 1, true);
+        }
+        std::string strItems;
+        for(int index = 0; index < 4; ++ index)
+        {
+            strItems += Itoa(s_item[pos-1][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[pos-1][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+    }
+    worldCupSort.clear();
+}
 }
 

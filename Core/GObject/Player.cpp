@@ -875,6 +875,7 @@ namespace GObject
 		m_erlking = new Erlking(this);
 		m_marriageInfo = new MarriageInfo();
 		m_collecCard= new CollectCard(this);
+		_wrapKey= new OrdinarireWrapKey();
         m_csFlag = 0;
         m_spreadInterval = 0;
         m_spreadCoolTime = 0;
@@ -950,6 +951,7 @@ namespace GObject
         /*m_autoTeamCopyCnt = 0;
         m_autoTeamCopyCurCnt = 0;
         m_autoTeamCopyCurIndex = 0;*/
+        memset(&worldCupInfo, 0, sizeof(worldCupInfo));
     }
 
 
@@ -1165,6 +1167,7 @@ namespace GObject
 		SAFE_DELETE(m_FairySpar);
 		SAFE_DELETE(m_moFang);
 		SAFE_DELETE(m_collecCard);
+		SAFE_DELETE(_wrapKey);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -31670,7 +31673,8 @@ void Player::InviteDrinking(Player * friendOne)   //邀请饮酒
     bool flag = true;
 
     if(_playerData.location != 9476)
-        moveTo(9476,true);
+        //moveTo(9476,true);
+        return ;
 
     UInt32 now = TimeUtil::Now();
     std::map<UInt64,struct invitTime>::const_iterator it = _brothers.find(friendOne->getId());
@@ -31779,7 +31783,8 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
         return ;
     }
     if(_playerData.location != 9476)
-        moveTo(9476,true);
+        //moveTo(9476,true);
+        return ;
     if(shenfen &&( getDrinkInfo().drinker == NULL || getDrinkInfo().drinker == pl ))  //判断是否已经有人对酒
     {
         std::set<Player *>::iterator it = getDrinkInfo().plset.find(pl);
@@ -32251,8 +32256,8 @@ bool Player::canInviteCutting( Player *pl)
 UInt8 Player::InviteCutting(Player * pl)   //需要抛消息
 {
     if(_playerData.location != 9476)
-        moveTo(9476,true);
-
+        //moveTo(9476,true);
+        return 0;
     UInt32 now = TimeUtil::Now();
     UInt32 friendlyCount = getFriendlyCount(pl->getId());
     if(friendlyCount < 500 )
@@ -33140,5 +33145,133 @@ UInt8 Player::buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count)
     UpdatePictureToDB();
     return 0;
 }
+void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
+{
+    if(num > 0 && num <= WC_MAX_COUNT )  //结算
+        grade = worldCupInfo[num-1].supportNum * 100 ; 
+    static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
+    UInt32 WCGrade = GetVar(VAR_WORLDCUP_RES);
+    for(UInt8 i =0 ; i< 11 ;i++)
+    {
+        if(WCGrade < gradeAward[i] &&( WCGrade + grade) >=gradeAward[i])
+            SendWCGradeAward(i+1);
+    }
+    AddVar(VAR_WORLDCUP_RES,grade);
+    //AddVar(VAR_11AIRBOOK_GRADE_DAY,grade);
+    UInt32 count = GetVar(VAR_WORLDCUP_RES);
+    GameMsgHdr hdr1(0x152, WORKER_THREAD_WORLD, this, sizeof(count));
+    GLOBAL().PushMsg(hdr1, &count);
+}
+void Player::SendWCGradeAward(UInt8 type)
+{
+    if(type > 6 || type == 0 )
+        return ;
+    static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
+    static MailPackage::MailItem s_item[][6] = {
+        {{56,3},{57,3},{500,3},{15,3},{9371,3}},
+        {{503,3},{516,3},{513,3},{501,3}},
+        {{517,10},{551,10},{9424,10},{9414,8}},
+        {{9457,20},{16001,20},{9498,20},{9600,20},{9076,20}},
+        {{515,30},{9498,40},{134,40},{1325,30}},
+        {{9022,15},{9075,15},{9068,15},{1732,1}},
+    };
+    static UInt32 count[] = {5,4,4,5,4,4};
+    SYSMSG(title, 5153);
+    if(type)
+    {
+        SYSMSGV(content, 5154,gradeAward[type-1]);
+        Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+                mailPackageManager.push(mail->id, s_item[type-1], count[type-1], true);
+        }
+        std::string strItems;
+        for(UInt8 index = 0; index < count[type-1]; ++ index)
+        {
+            strItems += Itoa(s_item[type-1][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[type-1][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+    }
+    char str[16] = {0};
+    sprintf(str, "F_130926_%d",type);
+    udpLog("tianshuqiyuan", str, "", "", "", "", "act");
+}
+UInt8 Player::supportWorldCup(UInt8 num ,UInt8 res, UInt32 number)
+{
+    if( num >= WC_MAX_COUNT)
+        return 1;
+    if(worldCupInfo[num].support == 0 && res != 0)
+       worldCupInfo[num].support = res ; 
+    if(worldCupInfo[num].support != res)
+        return 1;
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 limitTime = GameAction()->getWorldCupLimitTime(this,num);
+    if(now > limitTime)
+        return 2;
+
+    if(number == 0)
+        return 1 ;
+    UInt16 iid = 16017;
+    UInt16 count = GetPackage()->GetItemAnyNum(iid) ;
+    ItemBase * item = GetPackage()->FindItem(iid, true);
+    if (!item)
+        item =GetPackage()->FindItem(iid, false);
+    if(item ==NULL)
+        return 1;
+    if(number > count)
+        return 3;
+    GetPackage()->DelItemAny(iid, number );
+    GetPackage()->AddItemHistoriesLog(iid , number);
+
+    worldCupInfo[num].supportNum  += number ;
+    worldCupInfo[num].supportTime = now;
+
+	struct WCSupportData
+	{
+		UInt8 num;
+        UInt8 res;
+		UInt32  number;
+	};
+    WCSupportData wcs ;
+    wcs.num = num ;
+    wcs.res = res ;
+    wcs.number = number;
+
+    GameMsgHdr hdr(0x151, WORKER_THREAD_WORLD, this, sizeof(WCSupportData));
+    GLOBAL().PushMsg(hdr, &wcs);
+
+    AddWorldCupScore(number * 100 );
+    UpdateWorldCupToDB(num);
+    return 0;
+}
+void Player::sendMyWorldCupInfo()
+{
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x33);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(0);
+    st << static_cast<UInt8>(WC_MAX_COUNT);
+    for(UInt8 i = 0 ; i < WC_MAX_COUNT ; ++i)
+    {
+        st << worldCupInfo[i].support;
+        st << worldCupInfo[i].supportNum;
+        st << worldCupInfo[i].supportTime;
+    }
+    st << Stream::eos;
+    send(st);
+}
+void Player::UpdateWorldCupToDB(UInt8 num)
+{
+    if(num >= WC_MAX_COUNT)
+        return ;
+    DB1().PushUpdateData("REPLACE INTO `worldCup`(`playerId`, `num`, `count1`,`count2`,`count3`, `result`) VALUES(%" I64_FMT "u, %d, %u,%u,%u , %u)", getId(), num , worldCupInfo[num].supportNum ,worldCupInfo[num].supportTime , 0 , worldCupInfo[num].support);
+    
+}
+
 } // namespace GObject
 
