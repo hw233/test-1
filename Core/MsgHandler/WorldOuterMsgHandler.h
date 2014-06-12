@@ -4122,6 +4122,7 @@ void OnServerLeftRevInfo(ServerLeftMsgHdr& hdr, const void * data)
     st << buf;
     st << Stream::eos;
     player->send(st);
+    TRACE_LOG("Rec leftaddrinfo (pid: %" I64_FMT "u , size : %u )", playerId , br.size());
 }
 void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
 {

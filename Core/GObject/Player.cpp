@@ -19068,15 +19068,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
     }
     UInt8 Player::getSnowAward(UInt16 type)
     {
-        static  MailPackage::MailItem s_item1[4] = {{56,3},{57,3},{9371,3},{548,3}};
+        static  MailPackage::MailItem s_item1[4] = {{56,3},{57,3},{9371,3},{15,3}};
         static  MailPackage::MailItem s_item2[4] = {{514,3},{9371,3},{500,3},{15,3}};
         static  MailPackage::MailItem s_item3[4] = {{503,3},{512,3},{516,2},{513,3}};
         static  MailPackage::MailItem s_item4[4] = {{1325,2},{134,2},{547,3},{551,3}};
-        static  MailPackage::MailItem s_item5[4] = {{401,5},{547,5},{512,5},{514,5}};
+        static  MailPackage::MailItem s_item5[4] = {{56,5},{547,5},{512,5},{514,5}};
         static  MailPackage::MailItem s_item6[4] = {{509,3},{507,3},{501,5},{513,5}};
         static  MailPackage::MailItem s_item7[4] = {{503,5},{516,5},{501,5},{505,5}};
         static  MailPackage::MailItem s_item8[4] = {{134,8},{1325,8},{9076,8},{507,8}};
-        static  MailPackage::MailItem s_item9[4] = {{1325,15},{134,15},{9076,10},{509,15}};
+        static  MailPackage::MailItem s_item9[4] = {{9498,15},{134,15},{9076,10},{509,15}};
   
         if(GetPackage()->GetRestPackageSize() < 4)
         {
@@ -19719,6 +19719,11 @@ void EventTlzAuto::notify(bool isBeginAuto)
     {
     //    if ((type & 0x01) && (tFgt->getLevel() >= GetLev()))
     //            return 4;
+        if (type & 0x01)
+        {
+            if (fFgt->getLingshiNum() > 0 || tFgt->getLingshiNum() > 0)
+                return 7;
+        }
         if ((type & 0x02 || type & 0x04) && GetPackage()->GetRestPackageSize() < 1)
             return 5;
         if ((type & 0x08) && (fFgt->getSecondSoul() == NULL || tFgt->getSecondSoul() == NULL))
@@ -20814,9 +20819,9 @@ void Player::sendQzongPYGiftInfo()
 
 void Player::get3366GiftAward(UInt8 type)
 {
-    if (getPlatform() != 11)
+    if (getPlatform() != 1 && getPlatform() != 2)
     {
-        sendMsgCode(0, 3505);
+        sendMsgCode(0, 3506);
         return;
     }
     if (GetVar(VAR_3366GIFT) >= 12)
@@ -27880,8 +27885,11 @@ void Player::sendRealSpirit()
 
 void Player::getQZoneRechargeAward(UInt8 val)
 {
-    if(getPlatform() != 11)
+    if(getPlatform() != 1 && getPlatform() != 2)
+    {
+        sendMsgCode(0, 3506);
         return;
+    }
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27929,8 +27937,11 @@ void Player::getQZoneRechargeAward(UInt8 val)
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
-    if(getPlatform() != 11)
+    if(getPlatform() != 1 && getPlatform() != 2)
+    {
+        sendMsgCode(0, 3506);
         return;
+    }
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27968,8 +27979,11 @@ void Player::sendQZoneRechargeAwardInfo()
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
-    if(getPlatform() != 11)
+    if(getPlatform() != 1 && getPlatform() != 2)
+    {
+        sendMsgCode(0, 3506);
         return;
+    }
     if(World::getQZoneRechargeTime() && ( getPlatform() ==1 || getPlatform() ==2))
     {
         AddVar(VAR_QZONE_RECHARGE,r);

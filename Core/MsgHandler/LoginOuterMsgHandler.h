@@ -4013,6 +4013,9 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
          st << ret << Stream::eos;
          NETWORK()->SendMsgToClient(hdr.sessionID, st);
 
+         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_BEGIN, begin);
+         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_END, end);
+
          curType = 19;
          {
               GObject::globalPlayers.enumerate(player_enum_2, &curType);
@@ -4026,8 +4029,6 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
               GObject::KJTMManager->AddInactiveMember();
          }
 
-         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_BEGIN, begin);
-         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_END, end);
          return;
     }
     else if (type == 20 && begin <= end )
