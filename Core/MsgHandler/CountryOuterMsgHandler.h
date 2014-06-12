@@ -9431,7 +9431,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
                         player->getDrinkInfo().reset();
                     player->setDrinking(friendOne , 0);
                 }
-                player->moveTo(9476,true);
+                //player->moveTo(9476,true);
             }
             struct st 
             {
@@ -9584,8 +9584,8 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
             if(friendOne == NULL)
                 return ;
-            if(res == 1)
-                player->moveTo(9476,true);
+            //if(res == 1)
+             //   player->moveTo(9476,true);
             struct st 
             {
                 UInt64 playerId;
