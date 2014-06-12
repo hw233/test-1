@@ -4209,6 +4209,9 @@ void   Clan::clanCopyBattleOperate(Player * player, UInt8 command, BinaryReader 
 
 void Clan::clanBigBossOperate(Player * player, UInt8 command, BinaryReader & brd)
 {
+    if(getLev() < 5)
+        return;
+
     switch(command)
     {
         case 1:
