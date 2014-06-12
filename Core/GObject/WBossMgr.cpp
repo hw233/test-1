@@ -1248,7 +1248,7 @@ void WBoss::RandomRefresh(Player* player)
     else
     {
         st << static_cast<UInt8>(10); 
-        while(pos > 10)
+        while(pos <= 10)
         {
             for (AtkInfoType::iterator i = atkTmp.begin(); i != atkTmp.end(); )
             {
