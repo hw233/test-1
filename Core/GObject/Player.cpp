@@ -31673,7 +31673,8 @@ void Player::InviteDrinking(Player * friendOne)   //邀请饮酒
     bool flag = true;
 
     if(_playerData.location != 9476)
-        moveTo(9476,true);
+        //moveTo(9476,true);
+        return ;
 
     UInt32 now = TimeUtil::Now();
     std::map<UInt64,struct invitTime>::const_iterator it = _brothers.find(friendOne->getId());
@@ -31782,7 +31783,8 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
         return ;
     }
     if(_playerData.location != 9476)
-        moveTo(9476,true);
+        //moveTo(9476,true);
+        return ;
     if(shenfen &&( getDrinkInfo().drinker == NULL || getDrinkInfo().drinker == pl ))  //判断是否已经有人对酒
     {
         std::set<Player *>::iterator it = getDrinkInfo().plset.find(pl);
@@ -32254,8 +32256,8 @@ bool Player::canInviteCutting( Player *pl)
 UInt8 Player::InviteCutting(Player * pl)   //需要抛消息
 {
     if(_playerData.location != 9476)
-        moveTo(9476,true);
-
+        //moveTo(9476,true);
+        return 0;
     UInt32 now = TimeUtil::Now();
     UInt32 friendlyCount = getFriendlyCount(pl->getId());
     if(friendlyCount < 500 )
