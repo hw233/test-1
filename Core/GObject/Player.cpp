@@ -20811,9 +20811,9 @@ void Player::sendQzongPYGiftInfo()
 
 void Player::get3366GiftAward(UInt8 type)
 {
-    if (getPlatform() != 11)
+    if (getPlatform() != 1 && getPlatform() != 2)
     {
-        sendMsgCode(0, 3505);
+        sendMsgCode(0, 3506);
         return;
     }
     if (GetVar(VAR_3366GIFT) >= 12)
@@ -27877,8 +27877,11 @@ void Player::sendRealSpirit()
 
 void Player::getQZoneRechargeAward(UInt8 val)
 {
-    if(getPlatform() != 11)
+    if(getPlatform() != 1 && getPlatform() != 2)
+    {
+        sendMsgCode(0, 3506);
         return;
+    }
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27926,8 +27929,11 @@ void Player::getQZoneRechargeAward(UInt8 val)
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
-    if(getPlatform() != 11)
+    if(getPlatform() != 1 && getPlatform() != 2)
+    {
+        sendMsgCode(0, 3506);
         return;
+    }
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27965,8 +27971,11 @@ void Player::sendQZoneRechargeAwardInfo()
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
-    if(getPlatform() != 11)
+    if(getPlatform() != 1 && getPlatform() != 2)
+    {
+        sendMsgCode(0, 3506);
         return;
+    }
     if(World::getQZoneRechargeTime() && ( getPlatform() ==1 || getPlatform() ==2))
     {
         AddVar(VAR_QZONE_RECHARGE,r);
