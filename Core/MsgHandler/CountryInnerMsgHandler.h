@@ -31,6 +31,7 @@
 #include "GObject/ShuoShuo.h"
 #include "GObject/ArenaServerWar.h"
 #include "Common/StringTokenizer.h"
+#include "GObject/TeamCopy.h"
 
 //Login thread -> Country thread
 void PlayerEnter( GameMsgHdr& hdr, const void * data )
@@ -899,6 +900,17 @@ void OnAutoCopyAttack( GameMsgHdr& hdr, const void * data )
     UInt8 ret = playerCopy.fight(player, id, true);
     if (ret == 0)
         player->autoCopyFailed(id);
+}
+
+void OnAutoTeamCopyAttack( GameMsgHdr& hdr, const void * data )
+{
+    if (!data)
+        return;
+
+	MSG_QUERY_PLAYER(player);
+
+    UInt32 id = *(UInt32*)data;
+    teamCopyManager->fight(player, id, true);
 }
 
 void OnAutoFrontMapAttack( GameMsgHdr& hdr, const void * data )

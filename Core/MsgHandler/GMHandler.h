@@ -213,6 +213,7 @@ private:
     void OnClanBossEmpower(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBossSetEm(GObject::Player *player, std::vector<std::string>& args);
     void OnClanBossOpen(GObject::Player *player, std::vector<std::string>& args);
+    void OnAutoTeamCopy(GObject::Player *player, std::vector<std::string>& args);
 
     void OnOpenclb(GObject::Player *player, std::vector<std::string>& args);
 
