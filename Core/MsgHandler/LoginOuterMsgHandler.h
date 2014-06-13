@@ -4339,7 +4339,7 @@ void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
     br >> num;
     br >> result >> score;
 
-    TRACE_LOG("Rec leftaddrinfo ( num : %u , result : %u , score : %u)", num  , result ,score);
+    TRACE_LOG("Rec WorldCup ( num : %u , result : %u , score : %u)", num  , result ,score);
 
     if(num == 0 )
         return ;
