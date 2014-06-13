@@ -30653,7 +30653,10 @@ bool Player::_hasBrother( Player * pl ) const
 }
 UInt32 Player::getFriendlyCount(UInt64 playerId)
 {
-    return _friendlyCount[playerId].value; 
+    std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(playerId);
+    if(it == _friendlyCount.end())
+        return 0;
+    return it->second.value;
 }
 void Player::getFriendlyAchievement(UInt8 opt)
 {
