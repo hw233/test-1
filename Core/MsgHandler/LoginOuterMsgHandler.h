@@ -4321,8 +4321,10 @@ void SetMarryBoard(LoginMsgHdr& hdr,const void * data)
 }
 void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
 {
+    TRACE_LOG("Rec worldCup Enter");
     BinaryReader br(data, hdr.msgHdr.bodyLen);
     CHKKEY();
+    TRACE_LOG("Rec worldCup After Check");
     UInt8 flag = 1 ;
     struct WorldCupRes
     {
@@ -4337,6 +4339,7 @@ void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
     br >> num;
     br >> result >> score;
 
+    TRACE_LOG("Rec leftaddrinfo ( num : %u , result : %u , score : %u)", num  , result ,score);
 
     if(num == 0 )
         return ;
@@ -4364,6 +4367,7 @@ void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
 
     if(flag)
     {
+        TRACE_LOG("Rec worldCup Send Success");
         wcr.num = num ;
         wcr.res =  result * 10000 + score ;
         GameMsgHdr imh(0x150, WORKER_THREAD_WORLD, NULL, sizeof(WorldCupRes));
