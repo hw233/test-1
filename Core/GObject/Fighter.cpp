@@ -91,6 +91,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_lingbao, 0, sizeof(_lingbao));
     m_2ndSoul = NULL;
     _iswboss = false;
+    _iswbossinspire = false;
     _wbextatk = 0;
     _wbextmagatk = 0;
     _soulMax = 0;
