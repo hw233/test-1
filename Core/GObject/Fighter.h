@@ -210,6 +210,8 @@ public:
 	inline bool isNpc() { return _id > GREAT_FIGHTER_MAX; }
     inline bool isWBoss() { return _iswboss; }
     inline void setWBoss(bool v) { _iswboss = v; }
+    inline bool isWBossInspire() { return _iswbossinspire; }
+    inline void setWBossInspire(bool v) { _iswbossinspire = v; }
 	inline UInt8 getLevel() {return _level;}
     inline UInt8 getLevelInLua() { if (isPet() && _level >= 50) return _level - 49;  return _level;}
 	inline UInt64 getExp() {return _exp;}
@@ -697,6 +699,9 @@ public:
     inline void setAttrExtraEquip(const GData::AttrExtra& other){ _attrExtraEquip += other; }
     inline void resetAttrExtraEquip(){setDirty(true); _attrExtraEquip.reset();}
     inline void resetAttrExtraEquip2(){setDirty(false); _attrExtraEquip.reset();}
+    
+    inline void setPlExtraAttack(Int32 atk) { _wbplextatk = atk; }
+	inline void setPlExtraMagAttack(Int32 atk) { _wbplextmagatk = atk; }
 
     UInt8 getToggleReiatsu();        // 返回出场所需灵压
     UInt8 getTargetPos();            // 返回备胎该出场的目标位置
@@ -977,8 +982,11 @@ private:
 
 private:
     bool _iswboss;
+    bool _iswbossinspire;
     Int32 _wbextatk;
     Int32 _wbextmagatk;
+    Int32 _wbplextatk;
+    Int32 _wbplextmagatk;
 
 public:
     // 仅仅用于内存拷贝出来的Fighter, 切勿她用

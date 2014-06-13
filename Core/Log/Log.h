@@ -168,7 +168,9 @@ enum PurchaseType
     LingShiPeiYang              = 1029, //灵侍培养仙石消耗
     AutoTeamCopy                = 1030, //自动组队消耗
     CutTree                     = 1031, //伐木无损扫荡
-    MakeGear                    = 1032, //打造机关库
+    WBRelive                    = 1032, //世界BOSS复活
+    WBInspire                   = 1033, //世界BOSS鼓舞
+    MakeGear                    = 1034, //打造机关库
     //繁体私有占150～200
 };
 

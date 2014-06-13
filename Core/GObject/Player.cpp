@@ -20860,7 +20860,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
-        static UInt32 itemId[] = { 30, 2, 9600, 1, 9310, 1, 9425, 1, 9427, 1, 9141, 2 };
+        static UInt32 itemId[] = { 30, 2, 9427, 2, 9600, 2, 9310, 2, 9438, 2, 9141, 2 };
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -31674,7 +31674,8 @@ void Player::InviteDrinking(Player * friendOne)   //邀请饮酒
     bool flag = true;
 
     if(_playerData.location != 9476)
-        moveTo(9476,true);
+        //moveTo(9476,true);
+        return ;
 
     UInt32 now = TimeUtil::Now();
     std::map<UInt64,struct invitTime>::const_iterator it = _brothers.find(friendOne->getId());
@@ -31783,7 +31784,8 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
         return ;
     }
     if(_playerData.location != 9476)
-        moveTo(9476,true);
+        //moveTo(9476,true);
+        return ;
     if(shenfen &&( getDrinkInfo().drinker == NULL || getDrinkInfo().drinker == pl ))  //判断是否已经有人对酒
     {
         std::set<Player *>::iterator it = getDrinkInfo().plset.find(pl);
@@ -32255,8 +32257,8 @@ bool Player::canInviteCutting( Player *pl)
 UInt8 Player::InviteCutting(Player * pl)   //需要抛消息
 {
     if(_playerData.location != 9476)
-        moveTo(9476,true);
-
+        //moveTo(9476,true);
+        return 0;
     UInt32 now = TimeUtil::Now();
     UInt32 friendlyCount = getFriendlyCount(pl->getId());
     if(friendlyCount < 500 )
@@ -32321,7 +32323,6 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
             pl->getCuttingInfo().type = getCuttingInfo().type;
             sendCutterInfo();
             pl->sendCutterInfo();
-
         }
         else
         {
@@ -33150,7 +33151,7 @@ void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
         grade = worldCupInfo[num-1].supportNum * 100 ; 
     static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
     UInt32 WCGrade = GetVar(VAR_WORLDCUP_RES);
-    for(UInt8 i =0 ; i< 11 ;i++)
+    for(UInt8 i =0 ; i< 6;i++)
     {
         if(WCGrade < gradeAward[i] &&( WCGrade + grade) >=gradeAward[i])
             SendWCGradeAward(i+1);

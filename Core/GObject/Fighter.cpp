@@ -100,6 +100,8 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _hideFashion = 0;
     _innateTrump = NULL;
     _soulSkillProtect = 0;
+    _wbplextatk = 0;
+    _wbplextmagatk = 0;
 }
 
 Fighter::~Fighter()
@@ -2095,6 +2097,12 @@ void Fighter::rebuildEquipAttr()
     {
         _attrExtraEquip.attack += _wbextatk;
         _attrExtraEquip.magatk += _wbextmagatk;
+    }
+
+    if(isWBossInspire())
+    {
+        _attrExtraEquip.attack += _wbplextatk;
+        _attrExtraEquip.magatk += _wbplextmagatk;
     }
 
     if(_owner/* && _owner->getClan()*/)
@@ -6552,6 +6560,10 @@ UInt16 Fighter::getPortrait()
             portrait = 1102;
         else if(getFashionTypeId() == 1730)
             portrait = 1105;
+        else if(getFashionTypeId() == 1732)
+            portrait = 1106;
+        else if(getFashionTypeId() == 1733)
+            portrait = 1107;
  
     }
 
