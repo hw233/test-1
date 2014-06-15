@@ -2864,6 +2864,7 @@ void OnServerLeftInfoReq(GameMsgHdr& hdr, const void* data)
     st << player->getId();
     st << Stream::eos;
     NETWORK()->SendToServerLeft(st);
+    TRACE_LOG("Req leftaddrinfo (pid: %" I64_FMT "u)", player->getId());
 }
 void OnServerLeftBattleReq(GameMsgHdr& hdr, const void* data)
 {
@@ -2874,6 +2875,7 @@ void OnServerLeftBattleReq(GameMsgHdr& hdr, const void* data)
     st << playerId1 << battleId ; 
     st << Stream::eos;
     NETWORK()->SendToServerLeft(st);
+    TRACE_LOG("Req battleInfo (pid: %" I64_FMT "u) , battleId : %u", player->getId(),battleId);
 }
 
 void OndoGuankaAct( GameMsgHdr &hdr, const void * data)

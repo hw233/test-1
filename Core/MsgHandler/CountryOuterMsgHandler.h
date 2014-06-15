@@ -503,7 +503,8 @@ struct UseItemReq
 	UInt16 m_ItemNum;
 	UInt32 m_Param;
     UInt8  m_Type;
-	MESSAGE_DEF5(REQ::PACK_USE, UInt32, m_ItemId, UInt8, m_ItemBindType, UInt16, m_ItemNum, UInt32, m_Param, UInt8, m_Type);
+    UInt32 m_ToItemId;
+	MESSAGE_DEF6(REQ::PACK_USE, UInt32, m_ItemId, UInt8, m_ItemBindType, UInt16, m_ItemNum, UInt32, m_Param, UInt8, m_Type, UInt32, m_ToItemId);
 };
 
 struct UseItemOtherReq
@@ -547,7 +548,7 @@ void OnUseItemReq( GameMsgHdr& hdr, UseItemReq& req )
 		pl->GetPackage()->UseTaskItem(req.m_ItemId, req.m_ItemBindType);
 	else
 	{
-		pl->GetPackage()->UseItem(req.m_ItemId, req.m_ItemNum, req.m_Type, req.m_Param, req.m_ItemBindType);
+		pl->GetPackage()->UseItem(req.m_ItemId, req.m_ItemNum, req.m_Type, req.m_Param, req.m_ItemBindType, req.m_ToItemId);
 	}
 }
 
@@ -9188,6 +9189,30 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     break;
             }
         }
+    case 0x33:
+        {
+            UInt8 op = 0;
+            brd >> op;
+            switch(op)
+            {
+                case 0x03:
+                {
+                    UInt8 num = 0;
+                    UInt8 res = 0 ;
+                    UInt32 number = 0;
+                    brd >> num >> res >> number;
+                    UInt8 result = player->supportWorldCup(num,res,number);
+                    Stream st(REP::ACT);
+                    st << static_cast<UInt8>(0x33);
+                    st << static_cast<UInt8>(0x03);
+                    st << static_cast<UInt8>(result);
+                    st << Stream::eos;
+                    player->send(st);
+                    player->sendMyWorldCupInfo();
+                }
+                break;
+            }
+        }
     default:
         break;
     }
@@ -9406,7 +9431,7 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
                         player->getDrinkInfo().reset();
                     player->setDrinking(friendOne , 0);
                 }
-                player->moveTo(9476,true);
+                //player->moveTo(9476,true);
             }
             struct st 
             {
@@ -9559,8 +9584,8 @@ void OnBrotherReq( GameMsgHdr& hdr, const void* data)
             GObject::Player *friendOne = globalNamedPlayers[player->fixName(name)];
             if(friendOne == NULL)
                 return ;
-            if(res == 1)
-                player->moveTo(9476,true);
+            //if(res == 1)
+             //   player->moveTo(9476,true);
             struct st 
             {
                 UInt64 playerId;

@@ -1150,6 +1150,17 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
     return t;
 }
 
+UInt8 Fighter::getLingshiNum()
+{
+    UInt8 count = 0;
+    for (int i = 0; i < LINGSHI_UPMAX; ++i)
+    {
+        if (_lingshi[i])
+            ++ count;
+    }
+    return count;
+}
+
 int Fighter::getAllLingshiId( UInt32* lingshis, int size )
 {
     if (!lingshis|| !size)
@@ -6548,6 +6559,10 @@ UInt16 Fighter::getPortrait()
             portrait = 1102;
         else if(getFashionTypeId() == 1730)
             portrait = 1105;
+        else if(getFashionTypeId() == 1732)
+            portrait = 1106;
+        else if(getFashionTypeId() == 1733)
+            portrait = 1107;
  
     }
 

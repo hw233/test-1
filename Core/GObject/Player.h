@@ -32,6 +32,7 @@
 #include "Erlking.h"
 #include "ArenaTeam.h"
 #include "Marry.h"
+#include "WrapKey.h"
 #include "ModifyMount.h"
 #include "CollectCard.h"
 #include "KangJiTianMo.h"
@@ -838,6 +839,13 @@ namespace GObject
         std::map<UInt8,std::vector<UInt8> > cubeCover; 
         PictureInfo():floor(1){} 
     };
+#define WC_MAX_COUNT 48
+    struct WorldCup
+    {
+        UInt8  support; 
+        UInt32 supportNum;
+        UInt32 supportTime;
+    };
 
     struct MoBaoInfo
     {
@@ -1200,6 +1208,25 @@ namespace GObject
         void selectPray(UInt8 index);
         void getPrayAward();
 		void Reconnect();
+        void AddWorldCupScore(UInt32 grade ,UInt8 flag = 0);
+        void SendWCGradeAward(UInt8 type);
+        UInt8 supportWorldCup(UInt8 num ,UInt8 res , UInt32 number);
+        void sendMyWorldCupInfo();
+        void setMyWorldCupInfo(UInt8 num , UInt8 res ,UInt32 count , UInt32 time)
+        {
+            if(num >= WC_MAX_COUNT) 
+                return ;
+            worldCupInfo[num].support = res ;
+            worldCupInfo[num].supportNum = count ;
+            worldCupInfo[num].supportTime = time ;
+        }
+        UInt8 getMyWorldCupInfo(UInt8 num)
+        {
+            if(num >= WC_MAX_COUNT)
+                return 0;
+            return worldCupInfo[num].support ;
+        }
+        void UpdateWorldCupToDB(UInt8 num);
 
 		void Logout(bool = false);	//???????߲???
 		void selfKick();
@@ -1846,6 +1873,8 @@ namespace GObject
 		const std::string& getClanName() const;
 		void setClan(Clan * c);
 		inline Clan * getClan() { return _clan; }
+		void setWrapKey(WrapKey * wk) { _wrapKey = wk;};
+		inline WrapKey * getWrapKey () { return _wrapKey; }
 		inline void setClanBattle(ClanBattle * c)  { _clanBattle = c; }
 		inline ClanBattle * getClanBattle() { return _clanBattle; }
 
@@ -2469,6 +2498,7 @@ namespace GObject
 		UInt32 _vipLevel;
 
 		Clan * _clan;
+        WrapKey * _wrapKey;
 		ClanBattle * _clanBattle;
 		std::string _battleName;
 		UInt32 _flag, _gflag;
@@ -3366,6 +3396,7 @@ namespace GObject
         DrinkInfo drinkInfo ;
         CuttingInfo cuttingInfo ;
         PictureInfo pictureInfo ; 
+        WorldCup worldCupInfo[WC_MAX_COUNT];
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();

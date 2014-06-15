@@ -1968,7 +1968,7 @@ namespace GObject
 		return 0;
 	}
 
-	bool Package::UseItem(UInt32 id, UInt16 num, UInt8 type, UInt32 param, UInt8 bind)
+	bool Package::UseItem(UInt32 id, UInt16 num, UInt8 type, UInt32 param, UInt8 bind, UInt32 toId)
 	{
         if(!m_Owner->hasChecked())
 			return false;
@@ -1991,7 +1991,7 @@ namespace GObject
             {
                 if (item && item->getClass() == Item_Formula5)
                 {
-                    ret2 = FormulaMerge(id, bind, num);
+                    ret2 = FormulaMerge(id, bind, num, toId);
                     if (1 == ret2){
                         multiMergeUdpLog(num);
                         m_Owner->sendMsgCode(0, 1800);
@@ -2011,7 +2011,7 @@ namespace GObject
             {
                 if (item && item->getClass() == Item_Citta5)
                 {
-                    ret2 = CittaMerge(id, bind, num);
+                    ret2 = CittaMerge(id, bind, num, toId);
                     if (1 == ret2){
                         m_Owner->sendMsgCode(0, 1800);
                         multiMergeUdpLog(num);
@@ -2037,7 +2037,7 @@ namespace GObject
                             item->getClass() == Item_SL1 ||
                             item->getClass() == Item_SL2))
                 {
-                    ret2 = TrumpMerge(id, bind, num);
+                    ret2 = TrumpMerge(id, bind, num, toId);
                     if (1 == ret2){
                         m_Owner->sendMsgCode(0, 1800);
                         multiMergeUdpLog(num);
@@ -2301,7 +2301,7 @@ namespace GObject
 		return ret;
 	}
 
-    UInt8 Package::FCMerge(UInt32 id, UInt8 bind, UInt32 Mnum)
+    UInt8 Package::FCMerge(UInt32 id, UInt8 bind, UInt32 Mnum, UInt32 toId)
     {
         /*
         static struct {
@@ -2352,7 +2352,7 @@ namespace GObject
             bind = 2;
         }
 
-        std::vector<stMergeStf> stfs = GObjectManager::getMergeStfs(id);
+        std::vector<stMergeStf> stfs = GObjectManager::getMergeStfs(toId);
         if(stfs.size()  == 0 )
             return 0;
 

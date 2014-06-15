@@ -247,6 +247,8 @@ local speCard = {
     [1728] = 219,
     [1729] = 220,
     [1730] = 221,
+    [1732] = 222,
+    [1733] = 223,
 }
 function getSpeCard(itemId)
     if nil == itemId then
@@ -293,6 +295,8 @@ local suitAttr= {
     [219] = 31002,
     [220] = 31002,
     [221] = 31002,
+    [222] = 31002,
+    [223] = 31002,
     [400] = 30010,
 }
 function getsuitAttr(suitId)
