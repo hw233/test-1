@@ -146,6 +146,7 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, // 0x120
 		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, // 0x130
 		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, // 0x140
+		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, // 0x150
 	};
 	if((size_t)cmd >= sizeof(cmdTypes) / sizeof(int))
 		return MAX_THREAD_NUM;

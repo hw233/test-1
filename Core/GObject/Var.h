@@ -732,6 +732,9 @@ namespace GObject
         VAR_CUBE_COUNT = 743,      //当前积木消耗数  (每一层构造好的时候清零)
         VAR_TREE_VALUE_DAY = 744 ,    //今日被邀请获得的木片数
         VAR_TOOL_CNT = 745 ,    //当前欧耶精粹数量
+        VAR_WORLDCUP_RES = 746 ,    //世界杯积分
+
+
 
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
@@ -745,7 +748,7 @@ namespace GObject
         VAR_FIRE_SACRIFICE_CALLING_TIME = 774, //拜火祭天召唤帮众时间
         VAR_DUOBAO_ACTIVE_POINT = 775, //夺宝奇兵活跃值+1(一天一点) 
 
-        //781 - 800 for lijr
+        //781 - 810 for lijr
         VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
         VAR_ERLKING_STATUSB = 782,               //妖王再临状态(17-32)
         VAR_ERLKING_STATUSC = 783,               //妖王再临状态(33-48)
@@ -769,6 +772,9 @@ namespace GObject
         VAR_AUTO_TEAMCOPY_CNT = 800,             //自动组队副本总共需要战斗怪物的数量
         VAR_AUTO_TEAMCOPY_CUR_CNT = 801,         //自动组队副本当前战斗到第几个怪物
         VAR_AUTO_TEAMCOPY_TEMP_CNT = 802,        //自动组队副本已经打过的副本怪物数量
+
+        //811-830 for libo
+            
         VAR_MAX,
     };
 

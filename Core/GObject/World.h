@@ -631,6 +631,12 @@ public:
         else
             return false;
     } 
+    inline static bool getWorldCupTime(UInt32 time = 0)
+    {
+        UInt32 end1 = TimeUtil::MkTime(2014, 6, 28);
+        UInt32 now = TimeUtil::Now() ;
+        return (now + time) < end1;
+    }
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
@@ -1382,6 +1388,9 @@ public:
     static bool _answerOpenA;
     static bool _answerOpenB;
     static UInt32 _rbTimeRank;
+    static UInt64 _worldCupAward;
+#define MAX_WC_COUNT 48
+    static UInt32 _worldCup[MAX_WC_COUNT][4];   //支持度  1-胜 2-负 3-平 4-结果 (注意标号需要-1)
 public:
     static RCSortType answerScoreSort;     //一战成名排名
     static RCSortType qishibanScoreSort;     //七石板积分排名
@@ -1394,10 +1403,23 @@ public:
     static ClanGradeSort clanGradeSort; // 十一活动
     static RCSortType guangGunSort; //十一活动
     static RCSortType happyFireSort;     //七石板积分排名
+    static RCSortType worldCupSort;     //世界杯押注
     static RCSortType tyss_PlayerSort;     //天元神兽个人积分排名
     static ClanGradeSort tyss_ClanSort;     //天元神兽帮派积分排名
     static void initRCRank();
     static void initRP7RCRank();
+    static void WorldCupAward(UInt8 num , UInt32 res);  //公布答案
+    void sendWorldCupInfo(Player * pl);
+    void UpdateWorldCupToDB(UInt8 num);
+    static void setWorldCupInfo(UInt8 num , UInt32 count1,UInt32 count2,UInt32 count3 ,UInt32 res)
+    {
+       if(num >= MAX_WC_COUNT) 
+           return ;
+       _worldCup[num][0] = count1;
+       _worldCup[num][1] = count2;
+       _worldCup[num][2] = count3;
+       _worldCup[num][3] = res;
+    }
 
     static RCSortType killMonsterSort[4];
     static RCSortType rechargeRP7Sort;
@@ -1496,6 +1518,7 @@ public:
     void SendGuangGunAward();
     static UInt16 GetRandomSpot();
     void SendHappyFireAward();
+    void SendWorldCupAward();
     void SendGuankaActAward();
     void SendTYSSClanAward();
     void SendTYSSPlayerAward();
@@ -1510,6 +1533,7 @@ public:
     void CreateMarryBoard(UInt64 man , UInt64 woman ,UInt8 type, UInt32 time);
     void setLeftAddrConnection(bool v){ _leftAddrConnect =v ;}
     bool getLeftAddrConnection(){return _leftAddrConnect;}
+    void SupportWorldCup(Player * pl , UInt8 count , UInt8 res ,UInt32 nums = 0);
     static void SendRechargeRP7RankAward();
 private:
 	void testUpdate();

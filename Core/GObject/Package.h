@@ -141,16 +141,16 @@ namespace GObject
 		bool   EquipTo(UInt32 id, Fighter * fgt, UInt8 part, ItemEquip *&, bool = false);
 		UInt32 SellItem(UInt32 id, UInt16 num, bool bind = false);
 		UInt32 SellEquip(UInt32 id);
-		bool   UseItem(UInt32 id, UInt16 num, UInt8 type, UInt32 param = 0, UInt8 bind = 0);
+		bool   UseItem(UInt32 id, UInt16 num, UInt8 type, UInt32 param = 0, UInt8 bind = 0, UInt32 toId = 0);
 		bool   UseItemOther(UInt32 id, UInt16 num, std::string& name, UInt8 bind = 0);
 		bool   UseTaskItem(UInt32 id, UInt8 bind = 0);
 		UInt16 Size() const  { return m_Size; }
 		ItemBase*  GetItem(UInt32 id, bool bind = false);
 		ItemEquip*  GetEquip(UInt32 id);
-        inline UInt8 FormulaMerge(UInt32 id, UInt8 bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); }
-        inline UInt8 CittaMerge(UInt32 id, UInt8 bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); }
-        inline UInt8 TrumpMerge(UInt32 id, UInt8 bind, UInt32 Mnum) { return FCMerge(id, bind, Mnum); }
-        UInt8 FCMerge(UInt32 id, UInt8 bind, UInt32 Mnum);
+        inline UInt8 FormulaMerge(UInt32 id, UInt8 bind, UInt32 Mnum, UInt32 toId) { return FCMerge(id, bind, Mnum, toId); }
+        inline UInt8 CittaMerge(UInt32 id, UInt8 bind, UInt32 Mnum, UInt32 toId) { return FCMerge(id, bind, Mnum, toId); }
+        inline UInt8 TrumpMerge(UInt32 id, UInt8 bind, UInt32 Mnum, UInt32 toId) { return FCMerge(id, bind, Mnum, toId); }
+        UInt8 FCMerge(UInt32 id, UInt8 bind, UInt32 Mnum, UInt32 toId);
 
 		UInt16 GetItemNum(UInt32 id, bool bind = false);
 		UInt16 GetItemAnyNum(UInt32 id);
