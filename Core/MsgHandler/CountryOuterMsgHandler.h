@@ -9774,5 +9774,57 @@ void OnCollectCardReq( GameMsgHdr & hdr, const void * data )
     }
 }
 
+void OnWBOSSOPTReq( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    UInt16 loc = player->getLocation();
+	GObject::Map * map = Map::FromSpot(loc);
+	if(map == NULL)
+	{
+		player->sendMsgCode(0, 1408);
+		return;
+	}
+    
+    if(!worldBoss.checkLocRight(player,loc))
+        return;
+
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt ; 
+
+    switch(opt)
+    {
+        case 1:
+            worldBoss.ReturnBaseInfo(player);
+            break;
+        case 2:
+            worldBoss.Inspire(player,0);
+            break;
+        case 3:
+            worldBoss.Inspire(player,1);
+            break;
+        case 4:
+            worldBoss.Relive(player);
+            break;
+        case 5:
+        {
+            UInt8 isSkip = 0;
+            br >> isSkip;
+            worldBoss.SetSkipBattle(player,static_cast<bool>(isSkip));
+        }
+            break;
+        case 6:
+            worldBoss.ReqBossId(player,loc);
+            break;
+        case 0x10:
+            worldBoss.RefreshTenPlayer(player);
+            break;
+
+    }
+
+}
+
+
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

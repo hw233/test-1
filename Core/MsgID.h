@@ -349,6 +349,8 @@ namespace REQ
     const UInt8 PRACTICE_STOP       = 0x35;// 0xE5
     /**修炼加速 */
     const UInt8 PRACTICE_HOOK_ADD   = 0x36;
+    /**世界BOSS优化*/
+    const UInt8 WBOSSOPT            = 0x3A;
     /**排行榜 */
     const UInt8 SORT_LIST           = 0xDA;// 0xE8
     /**玩家个人排行信息 */
@@ -697,6 +699,8 @@ namespace REP
     const UInt8 PRACTICE_START      = 0x34;// 0xE4
     const UInt8 PRACTICE_STOP       = 0x35;// 0xE5
     const UInt8 PRACTICE_HOOK_ADD   = 0x36;
+    
+    const UInt8 WBOSSOPT            = 0x3A;
 
     const UInt8 SORT_LIST           = 0xDA;// 0xE8
     const UInt8 SORT_PERSONAL       = 0xDB;// 0xE9

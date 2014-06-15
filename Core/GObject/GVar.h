@@ -159,6 +159,7 @@ namespace GObject
         GVAR_RAND_QUESTIONS_MARK = 100, // 选题标记
         
         GVAR_CLAN_BIGBOSS_ENABLE = 101,         //帮派BOSS能否预约
+        GVAR_MAX_LEVEL = 102,         //当前最高等级
         GVAR_MAX,
     };
 
@@ -294,6 +295,7 @@ namespace GObject
             GREGISTER_VAR(GVAR_REPAIRTYSSBUG, GCYCLE_NONE);
             
             GREGISTER_VAR(GVAR_CLAN_BIGBOSS_ENABLE, GCYCLE_DAY);
+            GREGISTER_VAR(GVAR_MAX_LEVEL, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

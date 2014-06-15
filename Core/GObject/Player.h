@@ -146,6 +146,7 @@ namespace GObject
 #define PLAYER_BUFF_EXPDOUBLE       0x5C    //回流服务器 经验双倍
 #define PLAYER_BUFF_CLANBOSS_CD     0x5D    
 #define PLAYER_BUFF_CBB_LAST        0x5E    //帮派BOSS最后一次攻击
+#define PLAYER_BUFF_WB              0x5F    //世界BOSS复活CD
 
 #define PLAYER_BUFF_CLANTREE1       0x60
 #define PLAYER_BUFF_CLANTREE2       0x61
