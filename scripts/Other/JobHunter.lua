@@ -451,6 +451,7 @@ function getStepAward(progress, step)
             return stepAwardID[progress][i]
         end
     end
+    return stepAwardID[progress][#stepCount]
     print ("error3")
     return 0
 end
