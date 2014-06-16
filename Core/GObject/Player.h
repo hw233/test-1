@@ -32,6 +32,7 @@
 #include "Erlking.h"
 #include "ArenaTeam.h"
 #include "Marry.h"
+#include "WrapKey.h"
 #include "ModifyMount.h"
 #include "CollectCard.h"
 #include "KangJiTianMo.h"
@@ -146,6 +147,7 @@ namespace GObject
 #define PLAYER_BUFF_EXPDOUBLE       0x5C    //回流服务器 经验双倍
 #define PLAYER_BUFF_CLANBOSS_CD     0x5D    
 #define PLAYER_BUFF_CBB_LAST        0x5E    //帮派BOSS最后一次攻击
+#define PLAYER_BUFF_WB              0x5F    //世界BOSS复活CD
 
 #define PLAYER_BUFF_CLANTREE1       0x60
 #define PLAYER_BUFF_CLANTREE2       0x61
@@ -485,6 +487,22 @@ namespace GObject
         UInt8 id;
     };
 
+    class EventAutoTeamCopy : public EventBase
+    {
+    public:
+		EventAutoTeamCopy(Player * player, UInt32 interval, UInt32 count, UInt32 id)
+			: EventBase(player, interval, count), id(id)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_AUTOTEAMCOPY; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+
+    private:
+        UInt32 id;
+    };
+
     class EventAutoFrontMap : public EventBase
     {
     public:
@@ -748,12 +766,91 @@ namespace GObject
            taskNum[5] = 0; 
         }
     };
+    struct invitTime
+    {
+        UInt32 drinkT;
+        invitTime():drinkT(0){}
+    };
+    struct invitTime1500
+    {
+        UInt32 cutT;
+        invitTime1500():cutT(0){}
+        invitTime1500(UInt32 time):cutT(time){}
 
+    };
+
+#define TREEMAX 10
+    struct CuttingInfo
+    {
+        Player * cutter;   //砍树对象
+        UInt32 time ;       //砍树时间
+        UInt8 type ;       // 竹林类型
+        UInt8 shenfen ;        //身份
+        UInt32 count ;      //本轮收集的木片数
+        UInt32 count2;      //欧冶精粹获得数
+        UInt32 countOther;      //好友帮忙获得的木片数
+        UInt32 oneTime ;   //伐木一次的时间
+        UInt8 tree[TREEMAX];
+        std::set<Player *> plset;
+        CuttingInfo() : cutter(NULL) , time(0) , type(0),shenfen(0) ,count(0),count2(0),oneTime(0)
+        {
+            plset.clear(); 
+            for(UInt8 i = 0 ;i < TREEMAX ;++i)
+                tree[i] =0;
+        }
+        void reset()
+        {
+            cutter = NULL ; 
+            time = 0 ; 
+            type = 0;
+            shenfen = 0 ;
+            count = 0; 
+            count2 = 0; 
+            countOther = 0;
+            oneTime = 0; 
+            plset.clear();
+            for(UInt8 i = 0 ;i < TREEMAX ;++i)
+                tree[i] =0;
+        }
+        UInt8 setTree(UInt8 num ,UInt8 shenfen = 0)
+        {
+            if(num >= TREEMAX )
+                return 3;
+            if(tree[num]%100 >= 2)
+                return 3;
+            if(shenfen > 1 )
+                return 3;
+            tree[num] = tree[num]%100+1;
+            if(tree[num] == 1)
+                tree[num] += shenfen * 100;
+            return tree[num];
+        }
+        UInt8 getTree(UInt8 num)
+        {
+            if(num >= TREEMAX) 
+                return 3;
+            return tree[num];
+        }
+    };
+    struct PictureInfo
+    {
+        UInt8 floor ; 
+        std::set<UInt8>  cubeHave;  //拥有的木块
+        std::map<UInt8,std::vector<UInt8> > cubeCover; 
+        PictureInfo():floor(1){} 
+    };
+#define WC_MAX_COUNT 48
+    struct WorldCup
+    {
+        UInt8  support; 
+        UInt32 supportNum;
+        UInt32 supportTime;
+    };
 
     struct MoBaoInfo
     {
-        UInt16 status;          // 卡牌状态
-        UInt32 item[9];        // 卡牌对应的物品
+        UInt16 status;           // 卡牌状态
+        UInt32 item[9];         // 卡牌对应的物品
         UInt16 buyNum;          // 购买翻牌的次数
         UInt8 openFLMSNum;      // 翻开翡龙墨石个数
         UInt8 openFLMYNum;      // 翻开翡龙墨玉个数
@@ -948,6 +1045,7 @@ namespace GObject
             AutoTlz         = 0x00000400,
             InPetCopyTeam   = 0x00000800,
             AutoXJFrontMap  = 0x00001000,
+            AutoTeamCopy    = 0x00002000,
             AthleticsBuff   = 0x80000000,
 			AllFlags		= 0xFFFFFFFF
 		};
@@ -1110,6 +1208,25 @@ namespace GObject
         void selectPray(UInt8 index);
         void getPrayAward();
 		void Reconnect();
+        void AddWorldCupScore(UInt32 grade ,UInt8 flag = 0);
+        void SendWCGradeAward(UInt8 type);
+        UInt8 supportWorldCup(UInt8 num ,UInt8 res , UInt32 number);
+        void sendMyWorldCupInfo();
+        void setMyWorldCupInfo(UInt8 num , UInt8 res ,UInt32 count , UInt32 time)
+        {
+            if(num >= WC_MAX_COUNT) 
+                return ;
+            worldCupInfo[num].support = res ;
+            worldCupInfo[num].supportNum = count ;
+            worldCupInfo[num].supportTime = time ;
+        }
+        UInt8 getMyWorldCupInfo(UInt8 num)
+        {
+            if(num >= WC_MAX_COUNT)
+                return 0;
+            return worldCupInfo[num].support ;
+        }
+        void UpdateWorldCupToDB(UInt8 num);
 
 		void Logout(bool = false);	//???????߲???
 		void selfKick();
@@ -1702,7 +1819,16 @@ namespace GObject
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
         inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }
         inline void setCopyFailed() { m_autoCopyFailed = true; }
-		bool autoBattle(UInt32, UInt8);
+
+
+        /*inline UInt8 getAutoTeamCopyCurIndex() { return m_autoTeamCopyCurIndex; }
+        inline void setAutoTeamCopyCurIndex(UInt8 index) { m_autoTeamCopyCurIndex = index; }
+        inline UInt32 getAutoTeamCopyCnt() { return m_autoTeamCopyCnt; }
+        inline void setAutoTeamCopyCnt(UInt32 cnt) { m_autoTeamCopyCnt = cnt; }
+        inline UInt32 getAutoTeamCopyCurCnt() { return m_autoTeamCopyCurCnt; }
+        inline void setAutoTeamCopyCurCnt(UInt32 curCnt) { m_autoTeamCopyCurCnt = curCnt; }*/
+		
+        bool autoBattle(UInt32, UInt8);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
         //void advancedHookExp();
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
@@ -1723,6 +1849,11 @@ namespace GObject
         void instantAutoCopy(UInt8 id);
         void sendAutoCopy();
 
+        void startAutoTeamCopy(UInt32 id);
+        void cancelAutoTeamCopy(UInt32 id);
+        void instantAutoTeamCopy(UInt32 id);
+        void sendAutoTeamCopy();
+
         void startAutoFrontMap(UInt8 id, UInt8 mtype);
         void cancelAutoFrontMap(UInt8 id);
         void instantAutoFrontMap(UInt8 id);
@@ -1742,6 +1873,8 @@ namespace GObject
 		const std::string& getClanName() const;
 		void setClan(Clan * c);
 		inline Clan * getClan() { return _clan; }
+		void setWrapKey(WrapKey * wk) { _wrapKey = wk;};
+		inline WrapKey * getWrapKey () { return _wrapKey; }
 		inline void setClanBattle(ClanBattle * c)  { _clanBattle = c; }
 		inline ClanBattle * getClanBattle() { return _clanBattle; }
 
@@ -2327,7 +2460,8 @@ namespace GObject
         std::map<UInt64,std::vector<StuPresentBox> >_bePresent; 
 
         std::map<UInt64, struct FriendCount >_friendlyCount;   //友好度
-		std::map<UInt64 , UInt32> _brothers; // 结拜兄弟(不分男女) 第二参数为发起饮酒的时间
+		std::map<UInt64 , struct invitTime> _brothers; // 结拜兄弟(不分男女) 第二参数为发起饮酒的时间
+		std::map<UInt64 , struct invitTime1500> _friendCount1500; // 1500友好度
         std::map<UInt64, struct FriendYellowBird >_friendYB;   //黄色鸢尾赠送情况
         std::map<UInt64, struct FriendTaskNum >_friendTask;   //友好度任务
 
@@ -2364,6 +2498,7 @@ namespace GObject
 		UInt32 _vipLevel;
 
 		Clan * _clan;
+        WrapKey * _wrapKey;
 		ClanBattle * _clanBattle;
 		std::string _battleName;
 		UInt32 _flag, _gflag;
@@ -2437,6 +2572,9 @@ namespace GObject
 
         UInt32 _praplace;
         bool m_autoCopyFailed;
+        /*UInt8 m_autoTeamCopyCurIndex;
+        UInt32 m_autoTeamCopyCnt;
+        UInt32 m_autoTeamCopyCurCnt;*/
 
         // ͨ????????֮??
         UInt8 _justice_roar;
@@ -3256,6 +3394,9 @@ namespace GObject
         UInt32 _friendSum;
         //
         DrinkInfo drinkInfo ;
+        CuttingInfo cuttingInfo ;
+        PictureInfo pictureInfo ; 
+        WorldCup worldCupInfo[WC_MAX_COUNT];
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();
@@ -3325,6 +3466,35 @@ namespace GObject
         void AddClanFriend();
         //void AddFriendlyCount(Player * friender , UInt8 taskNum) ;
         //void CompleteFriendlyTask(Player * friender , UInt8 taskNum);
+
+        //伐木
+        CuttingInfo& getCuttingInfo(){ return cuttingInfo;}
+        bool canInviteCutting(Player * pl);
+        UInt8 InviteCutting( Player * pl );   //需要抛消息
+        void beInviteCutting(Player * pl);
+        void beReplyForCutting(Player * pl ,UInt8 res);
+        UInt32 CutForOnce(UInt8 num = 0 ,UInt8 flag = 0);
+        UInt8 quicklyCut(UInt8 type);
+        void beginCutting();
+        void setCutter(UInt8 type ,Player * cutter){ cuttingInfo.shenfen =type; cuttingInfo.cutter = cutter;}
+        void setCutTime(UInt32 time){cuttingInfo.time = time ;}
+        void setCutType(UInt8 type);
+        void sendCutterInfo();
+        bool CutToolLevelUp(UInt8 level);
+        void BuyCutCount();
+        void getTreefromCutter(UInt8 count);
+        void CutEnd();
+        void sendTreesInfo();
+        bool subCuttingCount(UInt8 flag = 0);
+
+        PictureInfo& getPictureInfo(){ return pictureInfo;}
+        void setPictureInfo(UInt8 id , std::map<UInt8 ,std::vector<UInt8> > *map_vec);
+        void sendPictureInfo();
+        void loadPictureInfoFromDB();
+        void UpdatePictureToDB();
+        static UInt8 getCubeCountInSet(std::map<UInt8 , std::vector<UInt8> > map_vec);
+        void getPictureAttr(GData::AttrExtra& ae); 
+        UInt8 buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count);
 
         void makeFighterSGList(Stream& st);
         void sendFighterSGListWithNoSkill();

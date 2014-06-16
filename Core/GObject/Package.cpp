@@ -1968,7 +1968,7 @@ namespace GObject
 		return 0;
 	}
 
-	bool Package::UseItem(UInt32 id, UInt16 num, UInt8 type, UInt32 param, UInt8 bind)
+	bool Package::UseItem(UInt32 id, UInt16 num, UInt8 type, UInt32 param, UInt8 bind, UInt32 toId)
 	{
         if(!m_Owner->hasChecked())
 			return false;
@@ -1991,7 +1991,7 @@ namespace GObject
             {
                 if (item && item->getClass() == Item_Formula5)
                 {
-                    ret2 = FormulaMerge(id, bind, num);
+                    ret2 = FormulaMerge(id, bind, num, toId);
                     if (1 == ret2){
                         multiMergeUdpLog(num);
                         m_Owner->sendMsgCode(0, 1800);
@@ -2011,7 +2011,7 @@ namespace GObject
             {
                 if (item && item->getClass() == Item_Citta5)
                 {
-                    ret2 = CittaMerge(id, bind, num);
+                    ret2 = CittaMerge(id, bind, num, toId);
                     if (1 == ret2){
                         m_Owner->sendMsgCode(0, 1800);
                         multiMergeUdpLog(num);
@@ -2037,7 +2037,7 @@ namespace GObject
                             item->getClass() == Item_SL1 ||
                             item->getClass() == Item_SL2))
                 {
-                    ret2 = TrumpMerge(id, bind, num);
+                    ret2 = TrumpMerge(id, bind, num, toId);
                     if (1 == ret2){
                         m_Owner->sendMsgCode(0, 1800);
                         multiMergeUdpLog(num);
@@ -2301,7 +2301,7 @@ namespace GObject
 		return ret;
 	}
 
-    UInt8 Package::FCMerge(UInt32 id, UInt8 bind, UInt32 Mnum)
+    UInt8 Package::FCMerge(UInt32 id, UInt8 bind, UInt32 Mnum, UInt32 toId)
     {
         /*
         static struct {
@@ -2352,7 +2352,7 @@ namespace GObject
             bind = 2;
         }
 
-        std::vector<stMergeStf> stfs = GObjectManager::getMergeStfs(id);
+        std::vector<stMergeStf> stfs = GObjectManager::getMergeStfs(toId);
         if(stfs.size()  == 0 )
             return 0;
 
@@ -6908,7 +6908,7 @@ namespace GObject
     bool Package::FinishLBSmeltSpecial(const GData::ItemBaseType * itype, ItemLingbaoAttr &lbattr, UInt8& attrNum)
     {
         //黄帝卷宗（11113），炎帝卷宗（11114），神农卷宗（11115），女娲卷宗（11116）
-        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118, 11203 };
+        UInt16 lbids[] = { 11113, 11114, 11115, 11116, 11117, 11118, 11203, 11232 };
         bool hasSpe = false;
         for(UInt8 i = 0; i < sizeof(lbids) / sizeof(lbids[0]); ++i)
         {

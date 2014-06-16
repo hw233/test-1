@@ -1110,12 +1110,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                72, 1,
+                515, 5,
                 79,   1,
-                9425, 2,
+                9141, 2,
                 15, 2,
-                9418, 2,
-                8000, 2,
+                517, 2,
+                549, 1,
             };
 
             UInt8 idx = 0;
@@ -1145,7 +1145,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if(id == 72 || id == 79 || id == 9425)
+                    if(id == 515 || id == 79 || id == 9141)
                     {
                         if(player->GetVar(GObject::VAR_DIRECTPURCNT) >= 3)
                             purchase.code = 2;
@@ -4013,6 +4013,9 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
          st << ret << Stream::eos;
          NETWORK()->SendMsgToClient(hdr.sessionID, st);
 
+         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_BEGIN, begin);
+         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_END, end);
+
          curType = 19;
          {
               GObject::globalPlayers.enumerate(player_enum_2, &curType);
@@ -4026,8 +4029,6 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
               GObject::KJTMManager->AddInactiveMember();
          }
 
-         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_BEGIN, begin);
-         GObject::GVAR.SetVar(GObject::GVAR_KANGJITIANMO_END, end);
          return;
     }
     else if (type == 20 && begin <= end )
@@ -4073,7 +4074,6 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         UInt32 valueTimeA = 0;
         UInt32 valueTimeB = 0;
-        UInt32 valueTimeC = 0;
         UInt32 nowTime = TimeUtil::Now();
         if(nowTime < GObject::GVAR.GetVar(GObject::GVAR_ANSWER_BEGIN_DAY))
         {
@@ -4317,6 +4317,64 @@ void SetMarryBoard(LoginMsgHdr& hdr,const void * data)
         GObject::MarryBoard::instance().resetData();
     Stream st(SPEP::SETMARRYBOARD);
     st << static_cast<UInt8>(1)<< Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID, st);
+}
+void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
+{
+    TRACE_LOG("Rec worldCup Enter");
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    CHKKEY();
+    TRACE_LOG("Rec worldCup After Check");
+    UInt8 flag = 1 ;
+    struct WorldCupRes
+    {
+       UInt8 num;  
+       UInt32 res;
+    };
+    WorldCupRes wcr;
+    UInt8 num = 0;
+    UInt8 result = 0;
+    UInt32 score = 0;
+
+    br >> num;
+    br >> result >> score;
+
+    TRACE_LOG("Rec WorldCup ( num : %u , result : %u , score : %u)", num  , result ,score);
+
+    if(num == 0 )
+        return ;
+    switch(result)
+    {
+        case 1:
+            {
+                if(score/100 <= score%100) 
+                    flag = 0;
+            }
+            break;
+        case 2:
+            {
+                if(score/100 >= score%100) 
+                    flag = 0;
+            }
+            break;
+        case 3:
+            {
+                if(score/100 != score%100) 
+                    flag = 0;
+            }
+            break;
+    }
+
+    if(flag)
+    {
+        TRACE_LOG("Rec worldCup Send Success");
+        wcr.num = num ;
+        wcr.res =  result * 10000 + score ;
+        GameMsgHdr imh(0x150, WORKER_THREAD_WORLD, NULL, sizeof(WorldCupRes));
+        GLOBAL().PushMsg(imh, &wcr);
+    }
+    Stream st(SPEP::WORLDCUP);
+    st << static_cast<UInt8>(flag)<< Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 #endif // _LOGINOUTERMSGHANDLER_H_

@@ -110,12 +110,12 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 {
 	_fighter = f;
 
-    _peerlessSkill.base = GData::skillManager[_fighter->getPeerlessAndLevel()];
+    _peerlessSkill.base = GData::skillManager[_fighter->getPeerlessAndLevel()];  //无双技能
     // reg skillstrenghten
     updateSkillStrengthen(_fighter->getPeerlessAndLevel());
 
     std::vector<UInt16> activeSkill;
-    _fighter->getUpSkillAndLevel(activeSkill);
+    _fighter->getUpSkillAndLevel(activeSkill);    //获得设置的技能
 
     size_t idx;
     size_t cnt = activeSkill.size();
@@ -133,9 +133,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.cd = 0;
         bool isTherapy = (skillItem.base->effect->hp > 0 || skillItem.base->effect->hpP > 0.001) && skillItem.base->target == GData::e_battle_target_selfside;
         if(isTherapy)
-            _therapySkill.insert(_therapySkill.end(), skillItem);
+            _therapySkill.insert(_therapySkill.end(), skillItem);  //治疗性质技能
         else
-            _activeSkill.insert(_activeSkill.end(), skillItem);
+            _activeSkill.insert(_activeSkill.end(), skillItem);    //活动技能
 
         updateSkillStrengthen(activeSkill[idx]);
     }
@@ -1895,11 +1895,11 @@ GData::SkillStrengthenBase* BattleFighter::getSkillStrengthen(UInt16 skillId)
 
 void BattleFighter::updateSkillStrengthen(UInt16 skillId)
 {
-    UInt8 lvl = _fighter->SSGetLvl(skillId);
+    UInt8 lvl = _fighter->SSGetLvl(skillId);  
     if(lvl)
     {
         UInt16 skill_id = SKILL_ID(skillId);
-        UInt16 ssId = SKILLANDLEVEL(skill_id, lvl);
+        UInt16 ssId = SKILLANDLEVEL(skill_id, lvl);  
         _skillStrengthen[skill_id] = (GData::SkillStrengthenBase*)(GData::skillStrengthenManager[ssId]);
     }
 }

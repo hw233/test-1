@@ -277,10 +277,12 @@ GMHandler::GMHandler()
     Reg(2, "fool", &GMHandler::OnFoolsDayGM);
     Reg(2, "star", &GMHandler::OnLuckyStarGM);
     Reg(2, "acttm", &GMHandler::OnSurnameleg);
+    Reg(2, "worldcup", &GMHandler::OnWorldCup);
     Reg(2, "openclb", &GMHandler::OnOpenclb);
     Reg(2, "sendmsg", &GMHandler::OnSendMsg);
     Reg(2, "setplvar", &GMHandler::OnSetPlayersVar);
     Reg(2, "setfc", &GMHandler::OnAddFriendlyCount);
+    Reg(2, "autotc", &GMHandler::OnAutoTeamCopy);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -2114,8 +2116,8 @@ void GMHandler::OnUpPasSkill( GObject::Player * player, std::vector<std::string>
 		if(skillLevel == 0 || skillLevel > 40)
 			return;
 
-        UInt16 skill = SKILLANDLEVEL(skillId, skillLevel);
-        UInt16 skills[1] = {skill};
+        //UInt16 skill = SKILLANDLEVEL(skillId, skillLevel);
+        //UInt16 skills[1] = {skill};
         // FIXME: 这里先禁用这个GM指令
         //fgt->upPassiveSkill(skills, 1);
 	}
@@ -3652,6 +3654,40 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
         if(pet == NULL) return;
         pet->setDirty();
     }
+    else if(type == 5)
+    {
+        UInt32 fgtId = atoi(args[1].c_str());
+        Fighter * fgt = player->findFighter(fgtId);
+        if(fgt == NULL) return;
+        Script::BattleFormula * bformula = Script::BattleFormula::getCurrent();
+        UInt16 atk = static_cast<UInt16>(bformula->calcAttack(fgt));
+        UInt16 magatk = static_cast<UInt16>(bformula->calcMagAttack(fgt));
+        UInt16 def = static_cast<UInt16>(bformula->calcDefend(fgt));
+        UInt16 magdef = static_cast<UInt16>(bformula->calcMagDefend(fgt));
+        UInt32 hp = static_cast<UInt32>(bformula->calcHP(fgt));
+        UInt16 toughLevel = static_cast<float>(bformula->calcToughLevel(fgt));
+        UInt16 action = static_cast<UInt16>(bformula->calcAction(fgt));
+        UInt16 hitLevel = static_cast<float>(bformula->calcHitRateLevel(fgt));
+        UInt16 evdLevel = static_cast<float>(bformula->calcEvadeLevel(fgt));
+        UInt16 criLevel = static_cast<float>(bformula->calcCriticalLevel(fgt));
+        UInt16 prcLevel = static_cast<float>(bformula->calcPierceLevel(fgt));
+        UInt16 cntLevel = static_cast<float>(bformula->calcCounterLevel(fgt));
+        UInt16 magresLevel = static_cast<float>(bformula->calcMagResLevel(fgt));
+        UInt16 aura = static_cast<float>(bformula->calcAura(fgt));
+        UInt16 maxAura = static_cast<float>(bformula->calcAuraMax(fgt));
+        UInt16 cri = static_cast<float>(bformula->calcCritical(fgt, NULL)) * 100;
+        UInt16 tough = static_cast<float>(bformula->calcTough(fgt, NULL)) * 100;
+        UInt16 hit = static_cast<float>(bformula->calcHitrate(fgt, NULL)) * 100;
+        UInt16 evd = static_cast<float>(bformula->calcEvade(fgt, NULL)) * 100;
+        UInt16 cridmg = static_cast<float>(bformula->calcCriticalDmg(fgt)) * 100;
+        UInt16 prc = static_cast<float>(bformula->calcPierce(fgt, NULL)) * 100;
+        UInt16 cnt = static_cast<float>(bformula->calcCounter(fgt, NULL)) * 100;
+        UInt16 magres = static_cast<float>(bformula->calcMagRes(fgt, NULL)) * 100;
+
+
+        SYSMSG_SENDV(628, player, fgt->getName().c_str(), static_cast<UInt32>(fgt->getBattlePoint()),
+                atk, magatk, def, magdef, hp, toughLevel, action, hitLevel, evdLevel, criLevel, prcLevel, cntLevel, magresLevel, aura, maxAura, cri, tough, hit, evd, cridmg, prc, cnt, magres);
+    }
 }
 
 void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& args)
@@ -4387,6 +4423,29 @@ void GMHandler::OnDreamerEyeSet(GObject::Player *player, std::vector<std::string
     player->setDreamerEye(count);
 }
 
+void GMHandler::OnAutoTeamCopy(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 2)
+        return;
+
+    UInt8 type = atoi(args[0].c_str());
+    UInt32 copyIndex = atoi(args[1].c_str());
+    switch (type)
+    {
+        case 0:
+            player->startAutoTeamCopy(copyIndex);
+            break;
+        case 1:
+            player->cancelAutoTeamCopy(copyIndex);
+            break;
+        case 2:
+            player->instantAutoTeamCopy(copyIndex);
+            break;
+        default:
+            break;
+    }
+}
+
 void GMHandler::OnSomeAct(GObject::Player *player, std::vector<std::string>& args)
 {
     if (args.size() < 1)
@@ -4806,6 +4865,23 @@ void GMHandler::OnOpenclb(GObject::Player *player, std::vector<std::string>& arg
         player->setClanRankBuffFlag(true);
     if(index == 2)
         player->setClanRankBuffFlag(false);
+}
+void GMHandler::OnWorldCup(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() != 2)
+		return;
+    struct WorldCupRes
+    {
+       UInt8 num;  
+       UInt32 res;
+    };
+    WorldCupRes wcr;
+    wcr.num = atoi(args[0].c_str());
+    wcr.res = atoi(args[1].c_str());
+    if(wcr.num == 0)
+        return ;
+    GameMsgHdr imh(0x150, WORKER_THREAD_WORLD, NULL, sizeof(wcr));
+    GLOBAL().PushMsg(imh, &wcr);
 }
 void GMHandler::OnClanBoss(GObject::Player *player, std::vector<std::string>& args)
 {

@@ -37,6 +37,7 @@
 #include "FairyPetTable.h"
 #include "XingchenData.h"
 #include "DrinkAttr.h"
+#include "PictureAttr.h"
 #include "JiguanData.h"
 #include "HunPoData.h"
 #include "ErlkingTable.h"
@@ -496,6 +497,26 @@ namespace GData
         if (!LoadCardInfo())
         {
             fprintf (stderr, "Load LoadCardInfo Error !\n");
+            std::abort();
+        }
+        if (!LoadCubeAttr())
+        {
+            fprintf (stderr, "Load LoadCubeAttr Error !\n");
+            std::abort();
+        }
+        if (!LoadFloorAttr())
+        {
+            fprintf (stderr, "Load LoadFloorAttr Error !\n");
+            std::abort();
+        }
+        if (!LoadPicInfo())
+        {
+            fprintf (stderr, "Load LoadPicInfo Error !\n");
+            std::abort();
+        }
+        if (!LoadCubeCount())
+        {
+            fprintf (stderr, "Load LoadCubeCount Error !\n");
             std::abort();
         }
 
@@ -3167,6 +3188,59 @@ namespace GData
             csys.loadInitCardInfo(dbpn); 
 		return true;
     }
+    bool GDataManager::LoadCubeAttr()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCubeAttr dbpn;
+		if(execu->Prepare("SELECT `id`, `hp`, `attack`, `action` FROM `cubeAttr` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+        {
+             pictureAttrData.setVecInfoAttr( dbpn.hp , dbpn.attack , dbpn.action);
+        }
+		return true;
+    }
+    bool GDataManager::LoadFloorAttr()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBFloorAttr dbpn;
+		if(execu->Prepare("SELECT `id`, `hp`, `attack`, `action` FROM `floorAttr` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+        {
+          // if(dbpn.id != 0)
+               pictureAttrData.setVecInfoAttr( dbpn.hp , dbpn.attack , dbpn.action , 1);
+        }
+		return true;
+    }
 
+    bool GDataManager::LoadPicInfo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBPicInfo dbpn;
+		if(execu->Prepare("SELECT `id`, `index`, `cost`, `buff` FROM `picInfo` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+        {
+            pictureAttrData.setFloorInfo( dbpn.id , dbpn.index , dbpn.cost , dbpn.buffId);
+        }
+		return true;
+    }
+    bool GDataManager::LoadCubeCount()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCubeCount dbpn;
+		if(execu->Prepare("SELECT `id`, `index`, `cnt` FROM `cubeCount` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+        {
+            pictureAttrData.setCubeCount( dbpn.id , dbpn.index , dbpn.cnt);
+        }
+		return true;
+    }
 }
 

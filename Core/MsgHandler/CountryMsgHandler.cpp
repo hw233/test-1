@@ -96,6 +96,7 @@ MSG_REG_2(GameMsgHdr, REQ::AUTO_FRONTMAP, OnAutoFrontMap);
 
 MSG_REG_2(GameMsgHdr, REQ::XJFRONTMAP, OnXJFrontMapReq);
 MSG_REG_2(GameMsgHdr, REQ::COLLECTCARD, OnCollectCardReq);
+MSG_REG_2(GameMsgHdr, REQ::WBOSSOPT, OnWBOSSOPTReq);
 
 MSG_REG(GameMsgHdr, OnDayTaskAutoCompletedReq);
 MSG_REG(GameMsgHdr, OnQueryAutoCompletedTaskTimeReq);
@@ -273,6 +274,7 @@ MSG_REG_2(GameMsgHdr, 0x275, OnCompareBP);
 MSG_REG_2(GameMsgHdr, 0x276, OnAutoCopyAttack);
 MSG_REG_2(GameMsgHdr, 0x277, OnPlayerTimeTick);
 MSG_REG_2(GameMsgHdr, 0x278, OnAutoFrontMapAttack);
+MSG_REG_2(GameMsgHdr, 0x279, OnAutoTeamCopyAttack);
 
 //MSG_REG_2(GameMsgHdr, 0x279, OnCancelAutoBattleNotifyReq);
 
@@ -474,5 +476,7 @@ MSG_REG_2(GameMsgHdr, 0x406, OnAfterDrink);   //被邀请对酒
 MSG_REG_2(GameMsgHdr, 0x407, OnCalcDrink);   //被邀请对酒
 MSG_REG_2(GameMsgHdr, 0x408, OnBeginDrink);   //被邀请对酒
 
+MSG_REG_2(GameMsgHdr, 0x409, OnBeInviteCutting);   //被邀请对酒
+MSG_REG_2(GameMsgHdr, 0x410, OnBeAcceptCutting);   //回复邀请对酒
 
 MSG_HANDLER_END()

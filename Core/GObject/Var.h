@@ -714,21 +714,36 @@ namespace GObject
         
         VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK = 729,//璇玑阵图自动战斗使用金钱标志
         VAR_ATOXJFM = 730,     //自动璇玑阵图id
+        // 731 - 750 for lib
 
-        // 731 - 740 for lib
         VAR_FRIEND_ACHIEVEMENT  = 731,  //友好度成就奖励领取情况
         VAR_CLAN_FRIEND = 732 ,    //帮派玩家是否增加过友好度(8位) , 玩家购买的剩余饮酒次数 
         VAR_DRINK_COUNT = 733 ,    //饮酒次数 主动发起(8位) ,被动接受(8位) ,玩家总购买的次数 
         VAR_DRINK_VALUE = 734 ,    //豪饮值
         VAR_FRIEND_VALUE_DAY = 735 ,    //每日友情值
+
         VAR_LINGSHI_PEIYANG_CNT = 736, //灵侍仙石培养次数
         VAR_LINGSHI_PEIYANG_LUCKY = 737, //灵侍培养出现暴击记录
+        VAR_TREE_VALUE = 738 ,    //木片数
+        VAR_TREE_TIME = 739,      //砍树时间
+        VAR_TREE_TOOL = 740,      //伐木工具
+        VAR_CUTTREE_BUY = 741 ,   //玩家购买的剩余伐木次数 
+        VAR_CUTTREE_COUNT = 742 ,    //伐木次数 主动发起(8位) ,玩家总购买的次数 
+        VAR_CUBE_COUNT = 743,      //当前积木消耗数  (每一层构造好的时候清零)
+        VAR_TREE_VALUE_DAY = 744 ,    //今日被邀请获得的木片数
+        VAR_TOOL_CNT = 745 ,    //当前欧耶精粹数量
+        VAR_WORLDCUP_RES = 746 ,    //世界杯积分
+
+
 
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
         VAR_CLANBOSS_LUCKY_LIMIT = 754,//帮派BOSS幸运奖励个数
         VAR_CLANBOSS_SECURE_LIMIT = 755,//帮派BOSS秘密奖励个数
         VAR_CLANBOSS_CLANBIGBOSS_LIMIT = 756,//帮派BOSS换帮限制
+        VAR_WB_INSPIRE = 757,//世界BOSS鼓舞次数 银币(8位) 仙石(8位)
+        VAR_WB_SKIPBATTLE = 758,//世界BOSS跳过战斗标记
+        VAR_WB_EXPSUM = 759,//世界BOSS总经验
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
         VAR_FIRE_SACRIFICE_TIMES = 772, //拜火祭天：0-7帮众添柴次数，8-15帮主诏令次数
@@ -736,7 +751,7 @@ namespace GObject
         VAR_FIRE_SACRIFICE_CALLING_TIME = 774, //拜火祭天召唤帮众时间
         VAR_DUOBAO_ACTIVE_POINT = 775, //夺宝奇兵活跃值+1(一天一点) 
 
-        //781 - 800 for lijr
+        //781 - 810 for lijr
         VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
         VAR_ERLKING_STATUSB = 782,               //妖王再临状态(17-32)
         VAR_ERLKING_STATUSC = 783,               //妖王再临状态(33-48)
@@ -755,6 +770,14 @@ namespace GObject
         VAR_ANSWER_SKILL_USE_NUM = 795,          //一战成名技能使用数量 (每2位表示一种技能已使用数量)
         VAR_ANSWER_QUESTIONS_SUCCORFAIL = 796,   //一战成名回答问题成功失败（1-30位每一位代表是否回答成功该道题）
         VAR_ANSWER_QUESTIONS_OPTION = 797,       //一战成名题号和当前选项(一个5位表示题号，第二个题号表示选项)
+        VAR_AUTO_TEAMCOPY_INDEX = 798,           //组队副本本次需要自动的索引
+        VAR_AUTO_TEAMCOPY_CUR_INDEX = 799,       //自动组队副本当前所进行的副本索引
+        VAR_AUTO_TEAMCOPY_CNT = 800,             //自动组队副本总共需要战斗怪物的数量
+        VAR_AUTO_TEAMCOPY_CUR_CNT = 801,         //自动组队副本当前战斗到第几个怪物
+        VAR_AUTO_TEAMCOPY_TEMP_CNT = 802,        //自动组队副本已经打过的副本怪物数量
+
+        //811-830 for libo
+            
         VAR_MAX,
     };
 
@@ -1398,6 +1421,11 @@ namespace GObject
             REGISTER_VAR(VAR_ANSWER_SKILL_USE_NUM, CYCLE_DAY);
             REGISTER_VAR(VAR_ANSWER_QUESTIONS_SUCCORFAIL, CYCLE_DAY);
             REGISTER_VAR(VAR_ANSWER_QUESTIONS_OPTION, CYCLE_DAY);
+            REGISTER_VAR(VAR_AUTO_TEAMCOPY_INDEX, CYCLE_NONE);
+            REGISTER_VAR(VAR_AUTO_TEAMCOPY_CUR_INDEX, CYCLE_NONE);
+            REGISTER_VAR(VAR_AUTO_TEAMCOPY_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_AUTO_TEAMCOPY_CUR_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_AUTO_TEAMCOPY_TEMP_CNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);
@@ -1413,11 +1441,17 @@ namespace GObject
             REGISTER_VAR(VAR_CLAN_FRIEND, CYCLE_NONE);
             REGISTER_VAR(VAR_DRINK_VALUE, CYCLE_NONE);
             REGISTER_VAR(VAR_FRIEND_VALUE_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_CUTTREE_BUY, CYCLE_NONE);
+            REGISTER_VAR(VAR_CUTTREE_COUNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_TREE_VALUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_TREE_VALUE_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_TOOL_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_CUR_CLAN_TITLE, CYCLE_NONE);
             REGISTER_VAR(VAR_FIRE_SACRIFICE_TIMES, CYCLE_DAY);
             REGISTER_VAR(VAR_FIRE_SACRIFICE_ADD_WOOD_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_FIRE_SACRIFICE_CALLING_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_DUOBAO_ACTIVE_POINT, CYCLE_DAY);
+            REGISTER_VAR(VAR_CUBE_COUNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
@@ -1427,6 +1461,9 @@ namespace GObject
             REGISTER_VAR(VAR_CLANBOSS_LUCKY_LIMIT, CYCLE_DAY);
             REGISTER_VAR(VAR_CLANBOSS_SECURE_LIMIT, CYCLE_DAY);
             REGISTER_VAR(VAR_CLANBOSS_CLANBIGBOSS_LIMIT, CYCLE_DAY);
+            REGISTER_VAR(VAR_WB_INSPIRE, CYCLE_HOUR);
+            REGISTER_VAR(VAR_WB_SKIPBATTLE, CYCLE_HOUR);
+            REGISTER_VAR(VAR_WB_EXPSUM, CYCLE_HOUR);
 
             REGISTER_VAR(VAR_ERLKING_STATUSA, CYCLE_NONE);
             REGISTER_VAR(VAR_ERLKING_STATUSB, CYCLE_NONE);

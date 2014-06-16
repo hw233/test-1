@@ -661,6 +661,13 @@ struct DBFriendlyCount
     UInt8 task5;
     UInt8 task6;
 };
+struct DBPictureInfo
+{
+	UInt64 playerId;
+	UInt8 floor;
+    std::string cubeHave;
+    std::string cubeCover;
+};
 
 struct PrayRelation
 {
@@ -1648,6 +1655,15 @@ struct DBCardSuit
     UInt8 active;
     UInt32 spe_mark;
     UInt8 collect_degree;
+};
+struct DBWorldCup
+{
+    UInt64 playerId;
+    UInt8  num;
+    UInt32 count1;
+    UInt32 count2;
+    UInt32 count3;
+    UInt32  result;
 };
 
 struct DBZhenyuanAttr
@@ -3753,6 +3769,18 @@ SPECIALDEF(6)
     )
 SPECIALEND()
 
+SPECIALBEGIN (GObject::DBWorldCup)
+SPECIALDEF(6)
+    (
+    UInt64, playerId,
+    UInt8 , num,
+    UInt32, count1,
+    UInt32, count2,
+    UInt32, count3,
+    UInt32 , result
+    )
+SPECIALEND()
+
 SPECIALBEGIN (GObject::DBZhenyuanAttr)
 SPECIALDEF(6)
     (
@@ -3774,6 +3802,15 @@ SPECIALDEF(5)
     UInt32, exp,
 	UInt8, bindType
     )
+SPECIALEND()
+SPECIALBEGIN(GObject::DBPictureInfo)
+SPECIALDEF(4)
+(
+	UInt64, playerId,
+	UInt8, floor,
+    std::string, cubeHave,
+    std::string, cubeCover
+)
 SPECIALEND()
 
 }

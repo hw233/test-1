@@ -430,7 +430,7 @@ namespace GObject
         }
 
         UInt8 attrNumChance[4];
-        UInt8 extraSwitchChance[3];
+        UInt8 extraSwitchChance[4];
         UInt16 dis[4][11];
         UInt16 disChance[4][11];
         UInt16 colorVal[4];
@@ -542,6 +542,8 @@ namespace GObject
         static bool loadSkillGrade();
         static bool loadCard();
         static bool loadCardSuit();
+        static	bool loadPictureInfo();
+        static	bool loadWorldCup();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

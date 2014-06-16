@@ -88,26 +88,26 @@ public:
 	void setFighter(GObject::Fighter * f);
     void initPassiveSkillByLingshi();
 
-	inline void setFormationEffect(const GData::Formation::GridEffect * fe) {_formEffect = fe;}
+	inline void setFormationEffect(const GData::Formation::GridEffect * fe) {_formEffect = fe;}  //设置阵形对散仙的效果
 
-	inline UInt32 getId() { return _fighter->getId(); }
-	inline UInt8 getClass() { return _fighter->getClass(); }
-	inline UInt8 getLevel() { return _fighter->getLevel(); }
-	inline UInt8 getLevelInLua() { return _fighter->getLevelInLua(); }
-	inline UInt8 getColor() { return _fighter->getColor(); }
-	inline float getPotential() { return _fighter->getPotential(); }
-    inline UInt32 getBuffData( UInt8 idx, UInt32 now ) { return _fighter->getBuffData(idx, now); }
-    UInt8 getClassAndSex();
+	inline UInt32 getId() { return _fighter->getId(); }    //获得散仙ID
+	inline UInt8 getClass() { return _fighter->getClass(); }    //获得散仙职业
+	inline UInt8 getLevel() { return _fighter->getLevel(); }    //获得散仙等级
+	inline UInt8 getLevelInLua() { return _fighter->getLevelInLua(); }  //？lua中的散仙等级
+	inline UInt8 getColor() { return _fighter->getColor(); }        //获得散仙品质
+	inline float getPotential() { return _fighter->getPotential(); }    //散仙资质
+    inline UInt32 getBuffData( UInt8 idx, UInt32 now ) { return _fighter->getBuffData(idx, now); } //获得散仙对应buff的时间
+    UInt8 getClassAndSex();  //获得散仙，职业和性别
 
-	inline UInt16 getExtraStrength() { return _attrExtra.strength; }
-	inline UInt16 getExtraPhysique() { return _attrExtra.physique; }
-	inline UInt16 getExtraAgility() { return _attrExtra.agility; }
-	inline UInt16 getExtraIntelligence() { return _attrExtra.intelligence; }
-	inline UInt16 getExtraWill() { return _attrExtra.will; }
-	inline UInt16 getExtraSoul() { return _attrExtra.soul; }
-	inline UInt16 getExtraAura() { return _attrExtra.aura; }
-	inline UInt16 getExtraAuraMax() { return _attrExtra.auraMax; }
-	inline float getExtraTough() { return _attrExtra.tough; }
+	inline UInt16 getExtraStrength() { return _attrExtra.strength; }  //附加力量
+	inline UInt16 getExtraPhysique() { return _attrExtra.physique; }  //附加体力
+	inline UInt16 getExtraAgility() { return _attrExtra.agility; }    //附加敏捷
+	inline UInt16 getExtraIntelligence() { return _attrExtra.intelligence; }    //附加智力
+	inline UInt16 getExtraWill() { return _attrExtra.will; } //附加意志
+	inline UInt16 getExtraSoul() { return _attrExtra.soul; } //附加精神
+	inline UInt16 getExtraAura() { return _attrExtra.aura; } //附加灵气
+	inline UInt16 getExtraAuraMax() { return _attrExtra.auraMax; } //附加最大灵气
+	inline float getExtraTough() { return _attrExtra.tough; } //附加坚韧
 	inline float getExtraStrengthP() { return _attrExtra.strengthP; }
 	inline float getExtraPhysiqueP() { return _attrExtra.physiqueP; }
 	inline float getExtraAgilityP() { return _attrExtra.agilityP; }
@@ -115,10 +115,10 @@ public:
 	inline float getExtraWillP() { return _attrExtra.willP; }
 	inline float getExtraSoulP() { return _attrExtra.soulP; }
 	inline float getExtraAuraP() { return _attrExtra.auraP; }
-	inline float getExtraAuraMaxP() { return _attrExtra.auraMaxP; }
-	inline Int32 getExtraAttack() { return _attrExtra.attack; }
-	inline float getExtraAttackP() { return _attrExtra.attackP; }
-	inline Int32 getExtraMagAttack() { return _attrExtra.magatk; }
+	inline float getExtraAuraMaxP() { return _attrExtra.auraMaxP; }  
+	inline Int32 getExtraAttack() { return _attrExtra.attack; } //附加物理攻击
+	inline float getExtraAttackP() { return _attrExtra.attackP; } //附加物理攻击百分比
+	inline Int32 getExtraMagAttack() { return _attrExtra.magatk; }       
 	inline float getExtraMagAttackP() { return _attrExtra.magatkP; }
 	inline Int32 getExtraDefend() { return _attrExtra.defend; }
 	inline float getExtraDefendP() { return _attrExtra.defendP; }
@@ -128,19 +128,19 @@ public:
 	inline float getExtraHPP() { return _attrExtra.hpP; }
 	inline float getExtraAction() { return _attrExtra.action; }
 	inline float getExtraActionP() { return _attrExtra.actionP; }
-	inline float getExtraHitrate() { return _attrExtra.hitrate; }
-	inline float getExtraEvade() { return _attrExtra.evade; }
-	inline float getExtraCritical() { return _attrExtra.critical; }
-	inline float getExtraCriticalDmg() { return _attrExtra.criticaldmg; }
-	inline float getExtraPierce() { return _attrExtra.pierce; }
-	inline float getExtraCounter() { return _attrExtra.counter; }
-	inline float getExtraMagRes() { return _attrExtra.magres; }
+	inline float getExtraHitrate() { return _attrExtra.hitrate; }  //附加命中
+	inline float getExtraEvade() { return _attrExtra.evade; }       //附加回避
+	inline float getExtraCritical() { return _attrExtra.critical; } //附加暴击
+	inline float getExtraCriticalDmg() { return _attrExtra.criticaldmg; } //附加暴击伤害
+	inline float getExtraPierce() { return _attrExtra.pierce; } //附加破击
+	inline float getExtraCounter() { return _attrExtra.counter; } //附加反击
+	inline float getExtraMagRes() { return _attrExtra.magres; } //不明？
 
-    inline float getExtraHitrateLevel() { return _attrExtra.hitrlvl; }
-    inline float getExtraEvadeLevel() { return _attrExtra.evdlvl; }
-    inline float getExtraCriticalLevel() { return _attrExtra.crilvl; }
-    inline float getExtraPierceLevel() { return _attrExtra.pirlvl; }
-    inline float getExtraCounterLevel() { return _attrExtra.counterlvl; }
+    inline float getExtraHitrateLevel() { return _attrExtra.hitrlvl; }  //附加命中等级
+    inline float getExtraEvadeLevel() { return _attrExtra.evdlvl; }     //附加回避等级
+    inline float getExtraCriticalLevel() { return _attrExtra.crilvl; }  //附加暴击等级
+    inline float getExtraPierceLevel() { return _attrExtra.pirlvl; }    //附加破击等级
+    inline float getExtraCounterLevel() { return _attrExtra.counterlvl; } //附加反击等级
     inline float getExtraToughLevel() { return _attrExtra.toughlvl; }
     inline float getExtraMagResLevel() { return _attrExtra.mreslvl; }
     inline float getExtraCriticalDmgImmune() { return _attrExtra.criticaldmgimmune+_fighter->getAcupointsGoldAttr(1); }
@@ -579,7 +579,7 @@ public:
     inline void setMagAtkReduce2(float v) { _magatkreduce2 = v; }
 
     inline UInt8 getSoulExtraAura() { return _fighter->getSoulExtraAura(); }
-    // 通过天赋术额外保留部分灵力
+    // 通过天赋术附加保留部分灵力
     inline UInt8 getAuraLeft(){ return _fighter->getSoulAuraLeft(); } 
 private:
 	void updateBuffExtras();
@@ -888,7 +888,7 @@ public:
     inline void setAttackIndex(int nindex){ _nCurrentAttackIndex = nindex; }
 
 private:
-    float _atkAddSpecial;  // 技能符文吸收对方伤害额外增加的物攻
+    float _atkAddSpecial;  // 技能符文吸收对方伤害附加增加的物攻
     Int16 _atkSpecialLast;
     float _magAtkAddSpecial;
     Int16 _magAtkSpecialLast;
@@ -1242,31 +1242,31 @@ public:
     bool releaseShieldHPBuf();
 
 private:
-    std::vector<GData::SkillItem> _passiveSkillOnCounter;
-    std::vector<GData::SkillItem> _passiveSkillOnCounter100;
-    std::vector<GData::SkillItem> _passiveSkillOnAttackBleed;
-    std::vector<GData::SkillItem> _passiveSkillOnAttackBleed100;
-    std::vector<GData::SkillItem> _passiveSkillOnAtkDmg;
-    std::vector<GData::SkillItem> _passiveSkillOnAtkDmg100;
-    std::vector<GData::SkillItem> _passiveSkillOnGetDmg100;
-    std::vector<GData::SkillItem> _passiveSkillOnGetDmg;
+    std::vector<GData::SkillItem> _passiveSkillOnCounter;    //反击时发动的主动技能(概率)
+    std::vector<GData::SkillItem> _passiveSkillOnCounter100; //反击时发动的主动技能(必定)
+    std::vector<GData::SkillItem> _passiveSkillOnAttackBleed; //攻击流血对象概率触发
+    std::vector<GData::SkillItem> _passiveSkillOnAttackBleed100; //攻击流血对象一定触发
+    std::vector<GData::SkillItem> _passiveSkillOnAtkDmg;      //攻击产生伤害的时候概率触发
+    std::vector<GData::SkillItem> _passiveSkillOnAtkDmg100;   //攻击产生伤害的时候一定触发
+    std::vector<GData::SkillItem> _passiveSkillOnGetDmg100;   //受到伤害的时候一定触发
+    std::vector<GData::SkillItem> _passiveSkillOnGetDmg;      //受到伤害的时候概率触发
 
-    std::vector<GData::SkillItem> _passiveSkillOnAttackConfuseForget;
-    std::vector<GData::SkillItem> _passiveSkillOnAttackConfuseForget100;
-    std::vector<GData::SkillItem> _passiveSkillOnAttackStun;
-    std::vector<GData::SkillItem> _passiveSkillOnAttackStun100;
-    std::vector<GData::SkillItem> _passiveSkillOnAttackBlind;
-    std::vector<GData::SkillItem> _passiveSkillOnAttackBlind100;
+    std::vector<GData::SkillItem> _passiveSkillOnAttackConfuseForget; //攻击混乱沉默的敌人概率触发
+    std::vector<GData::SkillItem> _passiveSkillOnAttackConfuseForget100; //攻击混乱沉默的敌人一定触发
+    std::vector<GData::SkillItem> _passiveSkillOnAttackStun;            //攻击眩晕的敌人概率触发
+    std::vector<GData::SkillItem> _passiveSkillOnAttackStun100;         //攻击眩晕的敌人一定触发
+    std::vector<GData::SkillItem> _passiveSkillOnAttackBlind;           //攻击失明的敌人概率出发
+    std::vector<GData::SkillItem> _passiveSkillOnAttackBlind100;        //攻击失明的敌人一定触发
 
-    std::vector<GData::SkillItem> _passiveSkillOnBeDmg100;
-    std::vector<GData::SkillItem> _passiveSkillOnBePHYDmg100;
-    std::vector<GData::SkillItem> _passiveSkillOnBeMagDmg100;
-    std::vector<GData::SkillItem> _passiveSkillOnHP10P100;
+    std::vector<GData::SkillItem> _passiveSkillOnBeDmg100;              //被攻击一定触发
+    std::vector<GData::SkillItem> _passiveSkillOnBePHYDmg100;           //被物理攻击一定触发
+    std::vector<GData::SkillItem> _passiveSkillOnBeMagDmg100;           //被魔法攻击一定触发
+    std::vector<GData::SkillItem> _passiveSkillOnHP10P100;              //血量在10%以下时一定触发
 
-    std::vector<GData::SkillItem> _passiveSkillOnBeDmg;
-    std::vector<GData::SkillItem> _passiveSkillOnBePHYDmg;
-    std::vector<GData::SkillItem> _passiveSkillOnBeMagDmg;
-    std::vector<GData::SkillItem> _passiveSkillOnHP10P;
+    std::vector<GData::SkillItem> _passiveSkillOnBeDmg;                 //被攻击概率触发
+    std::vector<GData::SkillItem> _passiveSkillOnBePHYDmg;              //被物理攻击概率触发
+    std::vector<GData::SkillItem> _passiveSkillOnBeMagDmg;              //被魔法攻击概率触发
+    std::vector<GData::SkillItem> _passiveSkillOnHP10P;                 //血量在10%以下时概率触发
 
     float _darkVigor, _dvFactor;
     UInt8 _darkVigorLast;

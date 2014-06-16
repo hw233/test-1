@@ -302,6 +302,13 @@ bool Tianjie::isOpenTj(Player* pl)
 {
     int playerLevel = pl->GetLev();
     //在手动开启的天劫运行中,又达到了自动天劫的等级
+    UInt32 maxLevel = GVAR.GetVar(GVAR_MAX_LEVEL);
+    if(static_cast<UInt32>(playerLevel) > maxLevel )
+    {
+        maxLevel = playerLevel;
+        GVAR.SetVar(GVAR_MAX_LEVEL,maxLevel);
+    }
+
     if (m_isManualOpening && playerLevel == m_autoTjLevel)
     {
         m_isAutoTouched = true;
@@ -377,10 +384,18 @@ void Tianjie::OpenTj()
 {
     if (m_currOpenedTjLevel == 0)
         return;
+    if(m_currOpenedTjLevel!=999)
+    {
+        UInt32 maxLevel = GVAR.GetVar(GVAR_MAX_LEVEL);
+        if( maxLevel < static_cast<UInt32>(m_currOpenedTjLevel))
+            return ;
+    }
+
     m_notifyRate = 0;
 	m_isTjOpened = 1;
 	m_currTjRate = 1;
     m_isRankKeep = true;
+
 
     for (size_t i = 0; i < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0]); ++i)
 	{
@@ -1174,6 +1189,7 @@ void Tianjie::process(UInt32 now)
     }
     else if (m_isManualOpening && !m_isRankKeep) //正常天劫执行完后,进行手动开启的天劫
     {
+        m_isManualOpening = false ;
         OpenTj();
     }
     else if (m_isAutoTouched && !m_isRankKeep) //在手动开启天劫过程中,有玩家触发最高级天劫

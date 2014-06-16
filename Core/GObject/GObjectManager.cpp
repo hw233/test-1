@@ -748,6 +748,16 @@ namespace GObject
             fprintf(stderr, "loadFriendlyCount error!\n");
             std::abort();
         }
+		if(!loadPictureInfo())
+        {
+            fprintf(stderr, "loadPictureInfo error!\n");
+            std::abort();
+        }
+		if(!loadWorldCup())
+        {
+            fprintf(stderr, "loadWorldCup error!\n");
+            std::abort();
+        }
 
         if(!loadSkillGrade())
         {
@@ -4486,6 +4496,11 @@ namespace GObject
 
                      lua_tinker::table t1 = table_tmp.get<lua_tinker::table>(j + 1);
                      UInt32  tSize = t1.size();
+                     UInt32 toId;
+                     if(tSize > 0)
+                         toId = t1.get<UInt32>(tSize);
+                     else
+                         toId = 0;
                      for (UInt32 i = 0 ; i< tSize; i++ )
                      {
                          if(i == tSize - 1)
@@ -4501,7 +4516,7 @@ namespace GObject
                              {
                                  stMergeS  ms;
                                  ms.id = c.get<UInt32>(1);
-                                 std::vector<UInt32>& v = _mMergeStfsIndex[ms.id];
+                                 std::vector<UInt32>& v = _mMergeStfsIndex[toId];
                                  v.push_back(j);
 
                                  ms.num = c.get<UInt32>(2);
@@ -4517,7 +4532,7 @@ namespace GObject
                                      for(;id1<= id2; id1++)
                                      {
                                          stMergeS ms;
-                                         std::vector<UInt32>& v = _mMergeStfsIndex[id1];
+                                         std::vector<UInt32>& v = _mMergeStfsIndex[toId];
                                          v.push_back(j);
                                          ms.id = id1;
                                          ms.num = num;
@@ -7847,6 +7862,87 @@ namespace GObject
 		lc.finalize();
 		return true;
 	}
+	bool GObjectManager::loadPictureInfo()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading PictureInfo:");
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		Player * pl = NULL;
+		DBPictureInfo dbfr;
+		if(execu->Prepare("SELECT `playerId`, `floor`,`cubeHave`, `cubeCover`  FROM `pictureAttr` ORDER BY `playerId`", dbfr) != DB::DB_OK)
+			return false;
+		lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+            lc.advance();
+            if(dbfr.floor == 0)
+                continue;
+            if(dbfr.playerId != last_id)
+            {
+                last_id = dbfr.playerId;
+                pl = globalPlayers[last_id];
+            }
+            if(pl == NULL)
+                continue;
+            pl->getPictureInfo().floor = dbfr.floor;
+            if(dbfr.cubeHave != "")
+            {
+                StringTokenizer tokenizer(dbfr.cubeHave, ",");
+                for(size_t j = 0; j < tokenizer.count(); ++ j)
+                {
+                    pl->getPictureInfo().cubeHave.insert(atoi(tokenizer[j].c_str()));
+                }
+            }
+            if(dbfr.cubeCover != "")
+            {
+                std::map<UInt8 , std::vector<UInt8> > map_vec;
+                StringTokenizer tokenizer(dbfr.cubeCover, "|");
+                for(size_t j = 0; j < tokenizer.count(); ++ j)
+                {
+                    StringTokenizer tokenizer2(tokenizer[j], ",");
+                    if(tokenizer2.count() < 2)
+                        continue;
+                    for(UInt8 k = 1; k < tokenizer2.count(); ++k)
+                    {
+                       map_vec[atoi(tokenizer2[0].c_str())].push_back(atoi(tokenizer2[k].c_str()));
+                    }
+                }
+                if(map_vec.size())
+                    pl->setPictureInfo(dbfr.floor ,&map_vec );
+            }
+		}
+		lc.finalize();
+		return true;
+	}
+    bool GObjectManager::loadWorldCup()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading WorldCup:");
+		DBWorldCup dbpn;
+		if(execu->Prepare("SELECT `playerId` ,`num`, `count1`, `count2`, `count3`, `result` FROM `worldCup` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            if(dbpn.playerId == 0)
+            {
+               World::setWorldCupInfo(dbpn.num , dbpn.count1 ,dbpn.count2 ,dbpn.count3 ,dbpn.result ) ;
+               continue ;
+            }
+		    Player* pl = globalPlayers[dbpn.playerId];
+			if(pl == NULL)
+				continue;
+            if(dbpn.count3 != 0 )
+                continue ;
+            pl->setMyWorldCupInfo(dbpn.num , dbpn.result , dbpn.count1 , dbpn.count2);
+        }
+		lc.finalize();
+		return true;
+    }
 }
 
 

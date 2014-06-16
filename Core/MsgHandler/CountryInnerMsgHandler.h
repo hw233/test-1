@@ -31,6 +31,7 @@
 #include "GObject/ShuoShuo.h"
 #include "GObject/ArenaServerWar.h"
 #include "Common/StringTokenizer.h"
+#include "GObject/TeamCopy.h"
 
 //Login thread -> Country thread
 void PlayerEnter( GameMsgHdr& hdr, const void * data )
@@ -901,6 +902,17 @@ void OnAutoCopyAttack( GameMsgHdr& hdr, const void * data )
         player->autoCopyFailed(id);
 }
 
+void OnAutoTeamCopyAttack( GameMsgHdr& hdr, const void * data )
+{
+    if (!data)
+        return;
+
+	MSG_QUERY_PLAYER(player);
+
+    UInt32 id = *(UInt32*)data;
+    teamCopyManager->fight(player, id, true);
+}
+
 void OnAutoFrontMapAttack( GameMsgHdr& hdr, const void * data )
 {
     if (!data)
@@ -1058,7 +1070,7 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
     }
 
     pkg->AddItem(pur->id, pur->num, true, false, FromDirectPurchase);
-    if(pur->id == 72 || pur->id == 79 || pur->id == 9425)
+    if(pur->id == 515 || pur->id == 79 || pur->id == 9141)
         player->AddVar(VAR_DIRECTPURCNT, 1);
     else
         player->AddVar(VAR_DIRECTPURCNT2, 1);
@@ -2852,6 +2864,7 @@ void OnServerLeftInfoReq(GameMsgHdr& hdr, const void* data)
     st << player->getId();
     st << Stream::eos;
     NETWORK()->SendToServerLeft(st);
+    TRACE_LOG("Req leftaddrinfo (pid: %" I64_FMT "u)", player->getId());
 }
 void OnServerLeftBattleReq(GameMsgHdr& hdr, const void* data)
 {
@@ -2862,6 +2875,7 @@ void OnServerLeftBattleReq(GameMsgHdr& hdr, const void* data)
     st << playerId1 << battleId ; 
     st << Stream::eos;
     NETWORK()->SendToServerLeft(st);
+    TRACE_LOG("Req battleInfo (pid: %" I64_FMT "u) , battleId : %u", player->getId(),battleId);
 }
 
 void OndoGuankaAct( GameMsgHdr &hdr, const void * data)
@@ -2934,6 +2948,15 @@ void OnBeInviteDrinking(GameMsgHdr & hdr ,const void *data)
         return ;
     player->beInviteDrinking(pl,_st.type);
 }
+void OnBeInviteCutting(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt64 playerId  = *reinterpret_cast<const UInt64 *>(data);
+	GObject::Player * pl = GObject::globalPlayers[playerId];
+    if(pl==NULL)
+        return ;
+    player->beInviteCutting(pl);
+}
 
 void OnBeAcceptDrinking(GameMsgHdr & hdr ,const void *data)
 {
@@ -2975,6 +2998,20 @@ void OnBeginDrink(GameMsgHdr & hdr ,const void *data)
 {
     MSG_QUERY_PLAYER(player);
     player->BeginDrink();
+}
+void OnBeAcceptCutting(GameMsgHdr & hdr ,const void *data)
+{
+    struct st
+    {
+        UInt64 playerId; 
+        UInt8 res ;
+    };
+    MSG_QUERY_PLAYER(player);
+    struct st _st  = *reinterpret_cast<const struct st *>(data);
+	GObject::Player * pl = GObject::globalPlayers[_st.playerId];
+    if(pl==NULL)
+        return ;
+    player->beReplyForCutting(pl,_st.res);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

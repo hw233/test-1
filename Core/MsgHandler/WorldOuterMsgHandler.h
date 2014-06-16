@@ -3371,6 +3371,33 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
        }
        break;
+       case 0x33:
+       {
+            UInt8 op = 0;
+            brd >> op;
+            switch(op)
+            {
+                case 0x01:
+                    {
+                        player->sendMyWorldCupInfo();
+                        WORLD().sendWorldCupInfo(player);
+                        break;
+                    }        
+                case 0x02:
+                    {
+                        GameMsgHdr hdr(0x153, WORKER_THREAD_WORLD, player, 0);
+                        GLOBAL().PushMsg(hdr, NULL);
+                        break;
+                    }
+                case 0x03:
+                    {
+                        hdr.msgHdr.desWorkerID = player->getThreadId();
+                        GLOBAL().PushMsg(hdr, (void*)data);
+                        break;
+                    }
+            }
+       }
+       break;
        case 0x45:
        {
            UInt8 logType = 0;
@@ -3992,7 +4019,7 @@ void OnServerLeftConnected( ServerLeftMsgHdr& hdr, const void * data )
 	brd >> r;
 	if(r == 1)
 	{
-		INFO_LOG("Failed to connect to ServerWar arena.");
+		INFO_LOG("Failed to connect to ServerPvp arena.");
         WORLD().setLeftAddrConnection(0);
 		NETWORK()->CloseServerLeft();
 		return;
@@ -4024,8 +4051,9 @@ void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
     std::string name ;
     UInt8 res = 0;
     UInt32 rpid = 0; 
-    UInt32 battleTime;
-    UInt32 energy;
+    UInt32 battleTime = 0;
+    UInt32 energy = 0;
+    UInt8 board = 0 ;
     brd >> clanId ;
     brd >> type ;
     brd >> leftId;
@@ -4034,6 +4062,7 @@ void OnServerLeftPlayerEntered( ServerLeftMsgHdr& hdr, const void * data )
     brd >> rpid;
     brd >> battleTime;
     brd >> energy;
+    brd >> board;
     Clan * clan = globalClans[clanId];
     if(!clan)
         return ;
@@ -4093,6 +4122,7 @@ void OnServerLeftRevInfo(ServerLeftMsgHdr& hdr, const void * data)
     st << buf;
     st << Stream::eos;
     player->send(st);
+    TRACE_LOG("Rec leftaddrinfo (pid: %" I64_FMT "u , size : %u )", playerId , br.size());
 }
 void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
 {
@@ -4121,7 +4151,6 @@ void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
     //    item_vec.push_back(item);
     //    itemNum_vec.push(itemNum);
         clan->AddItem(item,itemNum);
-        Stream st;
     }
 }
 void OnServerLeftGetSpirit(ServerLeftMsgHdr& hdr, const void * data)

@@ -1256,6 +1256,41 @@ CREATE TABLE `randbattle_attr` (
     PRIMARY KEY (`lev`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cubeAttr`;
+CREATE TABLE `cubeAttr` (
+    `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `hp` int(10) unsigned NOT NULL DEFAULT 0,
+    `attack` float(6,2) NOT NULL DEFAULT '0.00',
+    `action` float(6,2) NOT NULL DEFAULT '0.00',
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `floorAttr`;
+CREATE TABLE `cubeAttr` (
+    `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `hp` int(10) unsigned NOT NULL DEFAULT 0,
+    `attack` float(6,2) NOT NULL DEFAULT '0.00',
+    `action` float(6,2) NOT NULL DEFAULT '0.00',
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `picInfo`;
+CREATE TABLE `cubeAttr` (
+    `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `index` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `cost` int(10) unsigned NOT NULL DEFAULT 0,
+    `buff` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cubeCountn`;
+CREATE TABLE `cubeCount` (
+    `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `index` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `cnt` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`,`index`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `newquestions`;
 CREATE TABLE `newquestions` (
     `id` smallint(6) unsigned NOT NULL,

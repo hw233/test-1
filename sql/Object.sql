@@ -2588,24 +2588,21 @@ CREATE TABLE IF NOT EXISTS `cardsuit` (
     unique KEY id_playerid(`playerid`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `pictureAttr`;
+CREATE TABLE IF NOT EXISTS `pictureAttr` (
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `floor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `cubeHave` varchar(256) NOT NULL DEFAULT '',
+    `cubeCover` varchar(1024) NOT NULL DEFAULT '',
+    unique KEY id_playerid(`playerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `questions`;
 CREATE TABLE IF NOT EXISTS `questions` (
     `answerId` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `questionsId` smallint(5) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY(`answerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `questions`;
-CREATE TABLE IF NOT EXISTS `clanbigboss` (
-   `clanid` int(10) unsigned NOT NULL DEFAULT '0',
-   `status`  tinyint(3) unsigned NOT NULL DEFAULT '0',
-   `app_time` int(10) unsigned NOT NULL DEFAULT '0',
-   `last` int(10) unsigned NOT NULL,
-   `hp` int(10) unsigned NOT NULL,
-   `atk` int(10) NOT NULL,
-   `matk` int(10) NOT NULL,
-   PRIMARY KEY (`clanid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `clanbigboss`;
 CREATE TABLE IF NOT EXISTS `clanbigboss` (
@@ -2618,3 +2615,14 @@ CREATE TABLE IF NOT EXISTS `clanbigboss` (
    `matk` int(10) NOT NULL,
    PRIMARY KEY (`clanid`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `worldCup`;
+CREATE TABLE IF NOT EXISTS `worldCup` (
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `num`  tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `count1` int(10) unsigned NOT NULL DEFAULT '0',
+    `count2` int(10) unsigned NOT NULL DEFAULT '0',
+    `count3` int(10) unsigned NOT NULL DEFAULT '0',
+    `result` int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`playerId`,`num`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

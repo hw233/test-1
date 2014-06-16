@@ -111,6 +111,13 @@ MSG_REG_2(ServerLeftMsgHdr, 0x141, OnServerLeftNotice);   //帮派成员获得
 MSG_REG_2(GameMsgHdr, 0x142, OnServerLeftAttackInfo);   //进攻小队信息
 MSG_REG_2(ServerLeftMsgHdr, 0x143, OnServerLeftAttr);   //帮派成员获得
 
+MSG_REG_2(GameMsgHdr, 0x150, OnWorldCupResult);
+MSG_REG_2(GameMsgHdr, 0x151, OnWorldCupSupport);
+MSG_REG_2(GameMsgHdr, 0x152, OnWorldCupRank);
+MSG_REG_2(GameMsgHdr, 0x153, OnSendWorldCupRank);
+//MSG_REG_2(GameMsgHdr, 0x154, OnSendWorldCupRank);
+
+
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 MSG_REG_2(GameMsgHdr, 0x166, OnSetTYSSScore);
@@ -222,6 +229,10 @@ MSG_REG_2(GameMsgHdr, 0x1AF, OnSendDuoBaoBegin);
 MSG_REG_2(GameMsgHdr, 0x195, OnClearTYSS);
 MSG_REG_2(GameMsgHdr, 0x191, OnSendClanFriendsA);
 MSG_REG_2(GameMsgHdr, 0x192, OnSendClanFriendsB);
+//ID >= 0X200  消息将被强制抛到国家线程处理
+
+//MSG_REG_2(GameMsgHdr, 0x193, OnSendInactive);
+//MSG_REG_2(GameMsgHdr, 0x194, OnSendActive);
 MSG_REG_2(GameMsgHdr, 0x193, OnSendAnswerBegin);
 MSG_REG_2(GameMsgHdr, 0x194, SetAnswerRank);
 MSG_REG_2(GameMsgHdr, 0x196, SendAnswerRank);

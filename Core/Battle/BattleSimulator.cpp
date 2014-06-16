@@ -1427,7 +1427,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
         // target fighter will do not counter while fighter is the same side
         bool can_counter = true;
-        if(target_stun > 0 || bf->getSide() == area_target->getSide())
+        if(target_stun > 0 || bf->getSide() == area_target->getSide())   //混乱状态，或被己方攻击
         {
             can_counter = false;
         }
@@ -7024,7 +7024,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 continue;
             tmpatkers.insert(atk);
 
-            if (atk->getHP() < 0 || atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
+            if (atk->getHP() <= 0 || atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
                 continue;
 
             _onOtherConfuseAndForgetAtkList[side].erase(_onOtherConfuseAndForgetAtkList[side].begin() + i);
@@ -7942,21 +7942,19 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
                 break;
             }
         }
-        for(idx = 0; idx < _onOtherConfuseAndForgetAtkList[0].size(); ++ idx)
+        for(idx = 0; idx < _onOtherConfuseAndForgetAtkList[0].size();)
         {
             if (_onOtherConfuseAndForgetAtkList[0][idx] == toremove)
-            {
                 _onOtherConfuseAndForgetAtkList[0].erase(_onOtherConfuseAndForgetAtkList[0].begin() + idx);
-                break;
-            }
+            else
+                ++idx;
         }
-        for(idx = 0; idx < _onOtherConfuseAndForgetAtkList[1].size(); ++ idx)
+        for(idx = 0; idx < _onOtherConfuseAndForgetAtkList[1].size();)
         {
             if (_onOtherConfuseAndForgetAtkList[1][idx] == toremove)
-            {
                 _onOtherConfuseAndForgetAtkList[1].erase(_onOtherConfuseAndForgetAtkList[1].begin() + idx);
-                break;
-            }
+            else
+                ++idx;
         }
 
         if(!fSummonOrMirror)
@@ -15504,6 +15502,15 @@ void BattleSimulator::attackByJiuziSS(BattleFighter* bf, const GData::SkillBase*
             bf2->setConfuseRound(1);
             appendDefStatus(e_Confuse, 0, bf2);
             calcAbnormalTypeCnt(bf2);
+
+            for (std::vector<BattleFighter*>::iterator it = _onOtherConfuseAndForget.begin(); it != _onOtherConfuseAndForget.end(); ++it)
+            {
+                BattleFighter* atk = *it;
+                if (!atk || atk->getHP() <= 0 || atk->getSide() == bf2->getSide() ||
+                        atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
+                    continue;
+                _onOtherConfuseAndForgetAtkList[atk->getSide()].push_back(atk);
+            }
         }
         bf2->setJiuziDmgCnt(0);
     }

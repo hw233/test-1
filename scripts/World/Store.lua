@@ -122,6 +122,10 @@ function loadStore()
     end
     store:add(2 ,9457 ,20)
 
+    if  getWorldCupTime(300) then
+        store:add(2 ,16017 ,20)
+    end
+    store:add(2,16012,10)
     store:add(2,16004,2)
     store:add(2,16005,10)
     store:add(2,16008,20)
@@ -133,7 +137,7 @@ function loadStore()
 
     store:add(2,9600,20)
     if getQixi() then
-        store:add(2,9450,10)
+        --store:add(2,9450,10)
     end
 
     if getSnowAct(300) then
@@ -148,6 +152,7 @@ function loadStore()
         store:add(2, 11117, 90)
         store:add(2, 11118, 100)
         store:add(2, 11203, 110)
+        store:add(2, 11232, 120)
     end
 
     if getSurnameLegend(30) then

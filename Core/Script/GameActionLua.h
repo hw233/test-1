@@ -417,6 +417,7 @@ namespace Script
         UInt16 getsuitAttr(UInt16 suitId);
         UInt32 getZhenyuanLootId(UInt8 idx);
         bool RunActCardAward(Player* player,UInt8 idx);
+        UInt32 getWorldCupLimitTime(Player* player,UInt8 opt);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
