@@ -20859,7 +20859,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
-        static UInt32 itemId[] = { 30, 2, 9600, 1, 9310, 1, 9425, 1, 9427, 1, 9141, 2 };
+        static UInt32 itemId[] = { 30, 2, 9427, 2, 9600, 2, 9310, 2, 9438, 2, 9141, 2 };
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -32322,7 +32322,6 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
             pl->getCuttingInfo().type = getCuttingInfo().type;
             sendCutterInfo();
             pl->sendCutterInfo();
-
         }
         else
         {
@@ -33151,7 +33150,7 @@ void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
         grade = worldCupInfo[num-1].supportNum * 100 ; 
     static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
     UInt32 WCGrade = GetVar(VAR_WORLDCUP_RES);
-    for(UInt8 i =0 ; i< 11 ;i++)
+    for(UInt8 i =0 ; i< 6;i++)
     {
         if(WCGrade < gradeAward[i] &&( WCGrade + grade) >=gradeAward[i])
             SendWCGradeAward(i+1);
