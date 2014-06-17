@@ -1755,6 +1755,10 @@ private:
     UInt8 getTyslSSCnt2() { return _tyslSSCnt2; }
     void setTyslSSCnt2(UInt8 count) { _tyslSSCnt2 = count; }
 
+    UInt8 _controlBallCnt;
+    UInt8 getControlBallCnt() { return _controlBallCnt; }
+    void setControlBallCnt(UInt8 cnt) { if(cnt > 5) cnt = 5; _controlBallCnt = cnt; }
+
 public:
 	enum StatusFlag
 	{
