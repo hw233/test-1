@@ -44,6 +44,7 @@ ClanBigBoss::ClanBigBoss(Clan* clan)
     _lastMAtk = 0;
     m_final = false;
     _percent = 100;
+    _flag = false;
     
 }
 
@@ -698,6 +699,19 @@ void ClanBigBoss::ReturnBossInfoPl(Player* pl)
 
 void ClanBigBoss::ReturnBossInfo(Player* pl,UInt8 status)
 {
+    if(getFlag())
+    {
+        std::vector<GData::NpcFData>& nflist = _ng->getList();
+        Int32 baseatk = Script::BattleFormula::getCurrent()->calcAttack(nflist[0].fighter);
+        Int32 basematk = Script::BattleFormula::getCurrent()->calcMagAttack(nflist[0].fighter);
+        nflist[0].fighter->setWBoss(true);
+        nflist[0].fighter->setBaseHP(_lastHp);
+        nflist[0].fighter->setExtraAttack(_lastAtk - baseatk);
+        nflist[0].fighter->setExtraMagAttack(_lastMAtk - basematk);
+                 
+        setFlag(false);
+    }
+    
     UInt32 now = TimeUtil::Now();
     if(_status == CLAN_BIGBOSS_OVER && TimeUtil::Day() != TimeUtil::Day(appointment_time))
     {
@@ -816,7 +830,10 @@ void ClanBigBoss::LoadFromDB(DBClanBigBoss* dcbb)
 
     _ng = it->second;
     if (!_ng) return;
-
+  
+    if(dcbb->status == CLAN_BIGBOSS_AWAIT)
+        setFlag(true);
+    
 }
 
 

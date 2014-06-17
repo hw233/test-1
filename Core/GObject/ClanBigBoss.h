@@ -93,6 +93,8 @@ namespace GObject
         inline UInt32 getLastHP() const { return _lastHp; }
         inline UInt32 getLastAtk() const { return _lastAtk; }
         inline UInt32 getLastMAtk() const { return _lastMAtk; }
+        inline bool getFlag() { return _flag; }
+        inline void setFlag(bool flag) { _flag = flag; }
 
     private:
     
@@ -112,6 +114,7 @@ namespace GObject
         UInt32 _lastHp;
         Int32 _lastAtk;
         Int32 _lastMAtk;
+        bool _flag;
     };
 
     class ClanBigBossMgr : public Singleton <ClanBigBossMgr>
