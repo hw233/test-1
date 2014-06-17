@@ -1631,6 +1631,9 @@ void MoFang::addKYAttr(GData::AttrExtra& ae)
 
 void MoFang::checkKey(UInt16 keyId, UInt8 opt)
 {
+    if(!m_owner)
+        return;
+
     GData::JiguanData::zhenweiInfo * zwInfo = GData::jiguanData.getZhenweiInfo(keyId);
     if(!zwInfo)
         return;
@@ -1729,6 +1732,9 @@ UInt32 MoFang::renzhiyue(UInt16 keyId)
 
 void MoFang::addjiguanyu(UInt32 jiguanyuId)
 {
+    if(!m_owner)
+        return;
+
     GData::JiguanData::jiguanyuInfo * jgyInfo = GData::jiguanData.getJiguanyuInfo(jiguanyuId);
     if(!jgyInfo)
         return;
@@ -1752,6 +1758,9 @@ void MoFang::addjiguanyu(UInt32 jiguanyuId)
 
 void MoFang::sendCommonGearInfo()
 {
+    if(!m_owner)
+        return;
+
     UInt16 sz = m_commonGear.size();
     Stream st(REP::MOFANG_INFO);
     st << static_cast<UInt8>(13);
@@ -1768,6 +1777,9 @@ void MoFang::sendCommonGearInfo()
 
 void MoFang::sendSpecialGearInfo()
 {
+    if(!m_owner)
+        return;
+
     UInt16 sz = m_specialGear.size();
     Stream st(REP::MOFANG_INFO);
     st << static_cast<UInt8>(13);
@@ -1784,6 +1796,9 @@ void MoFang::sendSpecialGearInfo()
 
 void MoFang::makeGear(UInt16 gearId, UInt8 mark)
 {
+    if(!m_owner)
+        return;
+
     if(GEAR_COMMON != mark && GEAR_SPECIAL != mark)
         return;
 
@@ -1835,6 +1850,8 @@ void MoFang::makeGear(UInt16 gearId, UInt8 mark)
     st << gearId;
     st << Stream::eos;
     m_owner->send(st);
+
+    m_owner->AddVar(VAR_GEAR_BUFF, (gearInfo->attrValueG*100));
 
     std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
     for(std::map<UInt32, Fighter *>::iterator it=fighters.begin(); it!=fighters.end(); ++it)
@@ -1959,7 +1976,6 @@ void MoFang::addGearAttr(GData::AttrExtra& ae)
     float addAttrD = 0.00;
     float addAttrE = 0.00;
     float addAttrF = 0.00;
-    float addExp = 0.00;
     std::vector<UInt16>::iterator iter = m_commonGear.begin();
     for(; iter!=m_commonGear.end(); iter++)
     {
@@ -1973,7 +1989,6 @@ void MoFang::addGearAttr(GData::AttrExtra& ae)
         addAttrD += commonGearInfo->attrValueD;
         addAttrE += commonGearInfo->attrValueE;
         addAttrF += commonGearInfo->attrValueF;
-        addExp += commonGearInfo->attrValueG; 
     }
 
     std::vector<UInt16>::iterator iterA = m_specialGear.begin();
@@ -1989,7 +2004,6 @@ void MoFang::addGearAttr(GData::AttrExtra& ae)
         addAttrD += specialGearInfo->attrValueD;
         addAttrE += specialGearInfo->attrValueE;
         addAttrF += specialGearInfo->attrValueF;
-        addExp += specialGearInfo->attrValueG; 
     }
 
     ae.attack += addAttrA;
@@ -1998,12 +2012,6 @@ void MoFang::addGearAttr(GData::AttrExtra& ae)
     ae.magdef += addAttrD;
     ae.hp += addAttrE;
     ae.action += addAttrF;
-
-    UInt8 plvl = m_owner->GetLev();
-    UInt32 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
-    exp = exp*60*addExp;
-
-    m_owner->AddExp(exp);
 }
 
 }

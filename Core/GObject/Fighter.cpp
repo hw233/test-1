@@ -91,6 +91,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_lingbao, 0, sizeof(_lingbao));
     m_2ndSoul = NULL;
     _iswboss = false;
+    _iswbossinspire = false;
     _wbextatk = 0;
     _wbextmagatk = 0;
     _soulMax = 0;
@@ -2157,8 +2158,11 @@ void Fighter::rebuildEquipAttr()
     }
     if(_owner)
     {
+        //机关玉属性加成
         _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
+        //刻印属性加成
         _owner->GetMoFang()->addKYAttr(_attrExtraEquip);
+        //机关库属性加成
         _owner->GetMoFang()->addGearAttr(_attrExtraEquip);
 
         //坐骑加成

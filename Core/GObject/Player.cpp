@@ -257,6 +257,10 @@ namespace GObject
             extraExp = static_cast<UInt32>(exp * 1.0f);
         }
 
+        UInt32 gearBuff = m_Player->GetVar(VAR_GEAR_BUFF);
+        if(gearBuff > 0)
+            factor += (static_cast<float>(gearBuff) / 10000.0f);
+
 		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
         //fprintf(stderr, "id: %lu => cnt: %u\n", m_Player->getId(), cnt);
         if (cnt % 10)
@@ -28370,19 +28374,19 @@ void Player::EatLingGuo(UInt32 num)
   
     UInt32 clan_sum = clan->GetTYSSSum();
     UInt8 flag = 0;//标记
-    if(clan_sum < 3000)
+    if(clan_sum < 2000)
         flag = 0;
     else
-        if(clan_sum < 19000)
+        if(clan_sum < 14000)
             flag = 1;
         else
-            if(clan_sum < 40000)
+            if(clan_sum < 23000)
                 flag = 2;
             else
-                if(clan_sum < 70000)
+                if(clan_sum < 46000)
                     flag = 3;
                 else
-                    if(clan_sum < 100000)
+                    if(clan_sum < 70000)
                         flag = 4;
                     else
                         flag = 5;
@@ -30654,7 +30658,10 @@ bool Player::_hasBrother( Player * pl ) const
 }
 UInt32 Player::getFriendlyCount(UInt64 playerId)
 {
-    return _friendlyCount[playerId].value; 
+    std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(playerId);
+    if(it == _friendlyCount.end())
+        return 0;
+    return it->second.value;
 }
 void Player::getFriendlyAchievement(UInt8 opt)
 {

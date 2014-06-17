@@ -3655,6 +3655,40 @@ void GMHandler::OnShowBattlePoint(GObject::Player* player, std::vector<std::stri
         if(pet == NULL) return;
         pet->setDirty();
     }
+    else if(type == 5)
+    {
+        UInt32 fgtId = atoi(args[1].c_str());
+        Fighter * fgt = player->findFighter(fgtId);
+        if(fgt == NULL) return;
+        Script::BattleFormula * bformula = Script::BattleFormula::getCurrent();
+        UInt16 atk = static_cast<UInt16>(bformula->calcAttack(fgt));
+        UInt16 magatk = static_cast<UInt16>(bformula->calcMagAttack(fgt));
+        UInt16 def = static_cast<UInt16>(bformula->calcDefend(fgt));
+        UInt16 magdef = static_cast<UInt16>(bformula->calcMagDefend(fgt));
+        UInt32 hp = static_cast<UInt32>(bformula->calcHP(fgt));
+        UInt16 toughLevel = static_cast<float>(bformula->calcToughLevel(fgt));
+        UInt16 action = static_cast<UInt16>(bformula->calcAction(fgt));
+        UInt16 hitLevel = static_cast<float>(bformula->calcHitRateLevel(fgt));
+        UInt16 evdLevel = static_cast<float>(bformula->calcEvadeLevel(fgt));
+        UInt16 criLevel = static_cast<float>(bformula->calcCriticalLevel(fgt));
+        UInt16 prcLevel = static_cast<float>(bformula->calcPierceLevel(fgt));
+        UInt16 cntLevel = static_cast<float>(bformula->calcCounterLevel(fgt));
+        UInt16 magresLevel = static_cast<float>(bformula->calcMagResLevel(fgt));
+        UInt16 aura = static_cast<float>(bformula->calcAura(fgt));
+        UInt16 maxAura = static_cast<float>(bformula->calcAuraMax(fgt));
+        UInt16 cri = static_cast<float>(bformula->calcCritical(fgt, NULL)) * 100;
+        UInt16 tough = static_cast<float>(bformula->calcTough(fgt, NULL)) * 100;
+        UInt16 hit = static_cast<float>(bformula->calcHitrate(fgt, NULL)) * 100;
+        UInt16 evd = static_cast<float>(bformula->calcEvade(fgt, NULL)) * 100;
+        UInt16 cridmg = static_cast<float>(bformula->calcCriticalDmg(fgt)) * 100;
+        UInt16 prc = static_cast<float>(bformula->calcPierce(fgt, NULL)) * 100;
+        UInt16 cnt = static_cast<float>(bformula->calcCounter(fgt, NULL)) * 100;
+        UInt16 magres = static_cast<float>(bformula->calcMagRes(fgt, NULL)) * 100;
+
+
+        SYSMSG_SENDV(628, player, fgt->getName().c_str(), static_cast<UInt32>(fgt->getBattlePoint()),
+                atk, magatk, def, magdef, hp, toughLevel, action, hitLevel, evdLevel, criLevel, prcLevel, cntLevel, magresLevel, aura, maxAura, cri, tough, hit, evd, cridmg, prc, cnt, magres);
+    }
 }
 
 void GMHandler::OnEnterArena(GObject::Player* player, std::vector<std::string>& args)
