@@ -312,6 +312,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140613_1.sql     #清除散仙等级小于85级穿戴的灵侍
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var291.sql   #清除3366礼包购买次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/GObject_GVar102.sql     #世界最高等级
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140617_1.sql     #帮贡商店
 }
 
 #sh player_jiguan.sh
