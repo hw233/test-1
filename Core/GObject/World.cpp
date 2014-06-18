@@ -4301,7 +4301,7 @@ void World::Send11PlayerRankAward()
         {{9498,40},{1325,25},{9457,60},{16001,50},{9076,30}},
         {{9498,40},{1325,20},{9457,60},{16001,40},{9076,20}},
     };
-    static MailPackage::MailItem card = {9976,1};
+    static MailPackage::MailItem card = {9980,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
