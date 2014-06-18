@@ -61,7 +61,7 @@ enum    // 技能触发方式
     /*35*/ SKILL_ONATKSTUN,         // 攻击带眩晕的主目标后
     /*36*/ SKILL_ONATKCONFUSEFORGET,// 攻击带混乱沉默的主目标后
     /*37*/ SKILL_ONATKBLIND,        // 攻击带致盲的主目标后
-    /*38*/ SKILL_CONTROLBALL,        // 足球法宝
+    /*38*/ SKILL_CONDITION,        // 达到条件100%触发
     SKILL_PASSIVES
 };
 
@@ -149,6 +149,7 @@ enum
     e_eft_lingshi_gaoneng = 60,    //高能
     e_eft_round_add  = 61,      // 每回合增加的buff
     e_eft_round_sub  = 62,      // 每回合减少的buff
+    e_eft_control_ball  = 63,      // 足球法宝
 
     e_eft_max
 };

@@ -7165,9 +7165,8 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
     if(bf->getHP() > 0 && _winner == 0 && bf->getControlBallCnt() >= 3)
     {
-        size_t idx = 0;
-        const GData::SkillBase* passiveSkill = NULL;
-        while(NULL != (passiveSkill = bf->getPassiveSkillControlBall100(idx)))
+        const GData::SkillBase* passiveSkill = bf->getSkillControlBall();
+        if(passiveSkill)
         {
             _activeFgt = bf;
             UInt8 controlBallCnt = bf->getControlBallCnt() - 3;
@@ -7189,7 +7188,6 @@ UInt32 BattleSimulator::doAttack( int pos )
                 ++ rcnt;
             }
             _activeFgt = NULL;
-            break;
         }
     }
 
@@ -15862,13 +15860,8 @@ void BattleSimulator::doControlBall(BattleFighter* bf)
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(bf->getSide(), i));
         if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
             continue;
-        size_t idx = 0;
-        const GData::SkillBase* passiveSkill = NULL;
-        while(NULL != (passiveSkill = bo->getPassiveSkillControlBall100(idx)))
-        {
+        if(bo->getSkillControlBall())
             bo->setControlBallCnt2(bo->getControlBallCnt2() + 1);
-            break;
-        }
     }
 }
 
