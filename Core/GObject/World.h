@@ -640,8 +640,8 @@ public:
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 5, 17);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 5, 22);
+        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 6, 21);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 6, 26);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
