@@ -28369,19 +28369,19 @@ void Player::EatLingGuo(UInt32 num)
   
     UInt32 clan_sum = clan->GetTYSSSum();
     UInt8 flag = 0;//标记
-    if(clan_sum < 3000)
+    if(clan_sum < 2000)
         flag = 0;
     else
-        if(clan_sum < 19000)
+        if(clan_sum < 14000)
             flag = 1;
         else
-            if(clan_sum < 40000)
+            if(clan_sum < 23000)
                 flag = 2;
             else
-                if(clan_sum < 70000)
+                if(clan_sum < 46000)
                     flag = 3;
                 else
-                    if(clan_sum < 100000)
+                    if(clan_sum < 70000)
                         flag = 4;
                     else
                         flag = 5;

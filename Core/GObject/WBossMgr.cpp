@@ -605,12 +605,13 @@ void WBoss::reward(Player* player)
 
         {
             float tmp_percent = static_cast<float>((*i).score) / static_cast<float>(m_lastHP);
-            UInt32 damage_percent = tmp_percent * 10000;
+            UInt32 damage_percent = tmp_percent * 100;
+            UInt32 damage_percent1 = tmp_percent * 10000;
             if(damage_percent >= 1)
             {
                 UInt32 tmp = GVAR.GetVar(GVAR_MAX_LEVEL);
                 SYSMSGV(title, 578);
-                SYSMSGV(content, 579, (*i).score, damage_percent/100,damage_percent%100);
+                SYSMSGV(content, 579, (*i).score, damage_percent1/100,damage_percent1%100);
                 MailPackage::MailItem item ;
                 if(tmp >= 90)
                 {
