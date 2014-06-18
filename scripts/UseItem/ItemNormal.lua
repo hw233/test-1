@@ -10978,7 +10978,7 @@ function ItemNormal_00009492(iid, num, bind, param)
         return;
     end
     
-    if not getTYSSTime() then
+    if getTYSSTime() == 0 then
         player:sendMsgCode(0,6030,0);
         return;
     end

@@ -602,7 +602,7 @@ public:
     void updataClanGradeInAirBook(Player * pl= NULL);
     
     //天元神兽
-    void SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str);
+    void SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str,UInt8);
     void LoadTYSSScore(Player* pl);
     void SetTYSSScore(Player * pl);
     void SendTYSSScore(Player* pl);
@@ -704,7 +704,7 @@ private:
     void BroadDuoBaoBegin(Player * player);
     void DuoBaoBroadcast(Stream& st);
 public:
-    void sendMemberBuf(UInt8 pos);
+    void sendMemberBuf(UInt8 pos,UInt8 actType);
 
 public:
     void SendClanFriendsA(Player* pl, UInt8 type, UInt8 page=1);
