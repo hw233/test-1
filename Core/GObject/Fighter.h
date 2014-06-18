@@ -442,6 +442,7 @@ public:
 
     inline std::vector<UInt16>& getPassiveSkillOnAttackBlind() { return _rpasskl[GData::SKILL_ONATKBLIND-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillOnAttackBlind100() { return _passkl[GData::SKILL_ONATKBLIND-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillControlBall100() { return _passkl[GData::SKILL_CONTROLBALL-GData::SKILL_PASSSTART]; }
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 

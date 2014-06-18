@@ -61,6 +61,7 @@ enum    // 技能触发方式
     /*35*/ SKILL_ONATKSTUN,         // 攻击带眩晕的主目标后
     /*36*/ SKILL_ONATKCONFUSEFORGET,// 攻击带混乱沉默的主目标后
     /*37*/ SKILL_ONATKBLIND,        // 攻击带致盲的主目标后
+    /*38*/ SKILL_CONTROLBALL,        // 足球法宝
     SKILL_PASSIVES
 };
 

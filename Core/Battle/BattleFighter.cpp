@@ -91,7 +91,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
    ,_bActCnt(0), _immune3(0), _revivalCnt(0), _prudentLast(0),_prudentHitrate(0), _prudentHitrateLastOtherside(0), _silkwormCnt(0)
    ,_yehuoLevel(0), _yehuo_ss_dmgRate(0), _yehuo_ss_upRate(0), _jiuziDmgCnt(0), _changeStatus(0), _newModeLast(0), _counterCnt(0), _criticalCnt(0), _preAtk(false), _friendDeadCnt(0), _enemyDeadCnt(0), _mojianCnt(0xFF)
    ,_tyslSSCnt(0), _tyslSSFactor(0),_tyslSSAddCnt(true), _tyslSSCnt2(0)
-   ,_controlBallCnt(0)
+   ,_controlBallCnt(0), _controlBallCnt2(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -161,6 +161,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillOnAttackConfuseForget100(), _passiveSkillOnAttackConfuseForget100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAttackStun100(), _passiveSkillOnAttackStun100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAttackBlind100(), _passiveSkillOnAttackBlind100);
+    updatePassiveSkill100(_fighter->getPassiveSkillControlBall100(), _passiveSkillControlBall100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAtkDmg100(), _passiveSkillOnAtkDmg100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnPetProtect100(), _passiveSkillOnPetProtect100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnGetDmg100(), _passiveSkillOnGetDmg100);
@@ -1239,6 +1240,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackStun100(size_t& id
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBlind100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillOnAttackBlind100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillControlBall100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillControlBall100, idx, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmg100(size_t& idx, bool noPossibleTarget)

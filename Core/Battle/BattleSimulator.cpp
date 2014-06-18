@@ -2033,6 +2033,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     _defList[idx].damType2 |= 0x80;
                     if(cs2)
                         _defList[idx].damType2 |= 0x40;
+                    if(cs2)
+                        doControlBall(target_fighter);
                     if(pr2)
                         _defList[idx].damType2 |= 0x20;
 
@@ -6342,19 +6344,6 @@ UInt32 BattleSimulator::doAttack( int pos )
                             continue;
                         }
 
-                        if(SKILL_ID(passiveSkill->getId()) == 274)
-                        {
-                            UInt8 controlBallCnt = bf->getControlBallCnt();
-                            if(controlBallCnt < 3)
-                                continue;
-                            controlBallCnt -= 3;
-                            bf->setControlBallCnt(controlBallCnt);
-                            if(controlBallCnt > 0)
-                                appendDefStatus(e_controlBall, controlBallCnt, bo);
-                            else
-                                appendDefStatus(e_unControlBall, controlBallCnt, bo);
-                        }
-
                         int cnt = 0;
                         getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
                         std::vector<AttackAct> atkAct;
@@ -7148,6 +7137,59 @@ UInt32 BattleSimulator::doAttack( int pos )
                 _activeFgt = NULL;
             }
             bo->setTyslSSCnt2(0);
+        }
+    }
+
+    for(UInt8 side = 0; side < 2; side++)
+    {
+        for(UInt8 i = 0; i < 25; i++)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(bo == NULL || bo->getHP() == 0)
+                continue;
+            UInt8 addCnt = bo->getControlBallCnt2();
+            if(addCnt == 0)
+                continue;
+            UInt8 originCnt = bo->getControlBallCnt();
+            bo->setControlBallCnt(originCnt + addCnt);
+            UInt8 newCnt = bo->getControlBallCnt();
+            if(newCnt > originCnt)
+                appendDefStatus(e_controlBall, newCnt, bo);
+            bo->setControlBallCnt2(0);
+        }
+        if(_defList.size() > 0 || _scList.size() > 0)
+        {
+            appendToPacket(0, -1, -1, 0, 0, false, false);
+            ++ rcnt;
+        }
+    }
+    if(bf->getHP() > 0 && _winner == 0 && bf->getControlBallCnt() >= 3)
+    {
+        size_t idx = 0;
+        const GData::SkillBase* passiveSkill = NULL;
+        while(NULL != (passiveSkill = bf->getPassiveSkillControlBall100(idx)))
+        {
+            _activeFgt = bf;
+            UInt8 controlBallCnt = bf->getControlBallCnt() - 3;
+            bf->setControlBallCnt(controlBallCnt);
+            if(controlBallCnt > 0)
+                appendDefStatus(e_controlBall, controlBallCnt, bf);
+            else
+                appendDefStatus(e_unControlBall, controlBallCnt, bf);
+
+            int target_side, target_pos, cnt;
+            getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
+            std::vector<AttackAct> atkAct;
+            atkAct.clear();
+            if(doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, &atkAct))
+                ++ rcnt;
+            if(_defList.size() > 0 || _scList.size() > 0)
+            {
+                appendToPacket(bf->getSide(), bf->getPos(), 0, 2, passiveSkill->getId(), false, false);
+                ++ rcnt;
+            }
+            _activeFgt = NULL;
+            break;
         }
     }
 
@@ -15822,15 +15864,10 @@ void BattleSimulator::doControlBall(BattleFighter* bf)
             continue;
         size_t idx = 0;
         const GData::SkillBase* passiveSkill = NULL;
-        while(NULL != (passiveSkill = bo->getPassiveSkillAftAtk100(idx)))
+        while(NULL != (passiveSkill = bo->getPassiveSkillControlBall100(idx)))
         {
-            if(SKILL_ID(passiveSkill->getId()) == 274)
-            {
-                bo->setControlBallCnt(bo->getControlBallCnt() + 1);
-                appendDefStatus(e_skill, passiveSkill->getId(), bo);
-                appendDefStatus(e_controlBall, bo->getControlBallCnt(), bo);
-                break;
-            }
+            bo->setControlBallCnt2(bo->getControlBallCnt2() + 1);
+            break;
         }
     }
 }
