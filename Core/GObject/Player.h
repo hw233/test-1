@@ -1227,6 +1227,14 @@ namespace GObject
             return worldCupInfo[num].support ;
         }
         void UpdateWorldCupToDB(UInt8 num);
+        void getXXLAward(UInt8 type);
+        void buyXXLCount();
+        void UpdateXXLToDB(UInt8 num);
+        UInt8 setXXLMapInfo(UInt8 step ,UInt8 type ,std::string mapInfo , UInt8 flag = 0);
+        void sendHappyXXLInfo();
+        void sendXXLMapInfo(UInt8 res = 0 ,UInt8 index = 0);
+        void getXXLScore(UInt8 type ,UInt8 count);
+        UInt8 subXXLCount(UInt8 step);
 
 		void Logout(bool = false);	//???????߲???
 		void selfKick();
@@ -3397,6 +3405,7 @@ namespace GObject
         CuttingInfo cuttingInfo ;
         PictureInfo pictureInfo ; 
         WorldCup worldCupInfo[WC_MAX_COUNT];
+        std::string xxlMapInfo[3];
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();

@@ -170,6 +170,8 @@ enum PurchaseType
     CutTree                     = 1031, //伐木无损扫荡
     WBRelive                    = 1032, //世界BOSS复活
     WBInspire                   = 1033, //世界BOSS鼓舞
+    MOFUMIZHEN1                   = 1034, //墨符迷阵一键消除
+    MOFUMIZHEN2                   = 1035, //墨符迷阵一键消除
     //繁体私有占150～200
 };
 

@@ -1963,4 +1963,10 @@ function getWorldCupLimitTime( player ,opt)
     end
     return os.time(WorldCup[opt+1])
 end
-
+local HappyXXLBuyCost = { 30 ,30 ,30 ,30 ,30 ,50 ,50 ,50 ,50 ,50 ,100 ,100 ,100 ,100 ,100 ,150 ,150 ,150 ,150 ,150 ,200 ,200 ,200 ,200 ,200 }  
+function getXXLCost(player , opt)
+    if opt > 25 then
+        opt = 25
+    end
+    return HappyXXLBuyCost[opt]
+end
