@@ -5301,7 +5301,7 @@ void World::SendWorldCupAward()
         {
             mailPackageManager.push(mail->id, s_item[pos-1], 4, true);  
             if(pos ==1)
-                mailPackageManager.push(mail->id, &card, 1, true);
+                mailPackageManager.push(mail->id, &card, 1, false);
         }
         std::string strItems;
         for(int index = 0; index < 4; ++ index)
