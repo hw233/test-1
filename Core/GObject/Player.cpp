@@ -21548,10 +21548,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D};
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001};
-//6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页 317:太乙神雷
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317};
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D,0x3E};
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001 ,17006};
+//6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页 317:太乙神雷 318:桑巴荣耀
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317,318};
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -25161,11 +25161,11 @@ bool Player::getRPZCJBAward()
     if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return false;
 
-    if(World::getZCJBActivity() && atoi(getDomain()) != 11)
+    /*if(World::getZCJBActivity() && atoi(getDomain()) != 11)
     {
         sendMsgCode(0, 3505);
         return false;
-    }
+    }*/
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
     UInt8 left = ZCJB_LEFT(zcjb);
     UInt8 total = ZCJB_TOTAL(zcjb);
@@ -25245,8 +25245,8 @@ void Player::checkZCJB(UInt32 recharge)
 {
     if(recharge && !World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return;
-    if(World::getZCJBActivity() && getPlatform() != 11)
-        return;
+    /*if(World::getZCJBActivity() && getPlatform() != 11)
+        return;*/
     AddVar(VAR_ZCJB_RECHARGE_GOLD, recharge);
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
@@ -26431,17 +26431,17 @@ void Player::Send11GradeAward(UInt8 type)
         return ;
     UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,24000};
     static MailPackage::MailItem s_item[][6] = {
-        {{9418,1}, {503,1}},
-        {{501,2},{9497,2}},
-        {{9603,3},{9438,2}},
-        {{9414,2},{16001,2},{1126,2}},
-        {{547,3},{9308,3},{517,3}},
-        {{549,1},{551,3},{8000,4}},
-        {{16001,3},{9498,2},{509,2},{134,2},{9438,2}},
-        {{1729,1},{8555,4}},
-        {{9600,25},{9418,25},{9424,40}},
-        {{16001,50},{9075,15}},
-        {{9022,30},{1726,1}},
+        {{9424,1}, {503,1}},
+        {{500,2},{9497,2}},
+        {{9604,3},{9414,2}},
+        {{516,2},{16001,2},{503,2}},
+        {{547,3},{1126,3},{517,3}},
+        {{549,1},{501,3},{551,6}},
+        {{9457,3},{9498,2},{507,2},{9338,2},{9438,2}},
+        {{1728,1},{8555,4}},
+        {{9600,25},{9418,25},{9371,40}},
+        {{1126,50},{9022,15}},
+        {{9076,60},{1727,1}},
     };
     static UInt32 count[] = {2,2,2,3,3,3,5,2,3,2,2};
     SYSMSG(title, 4954);
@@ -33391,6 +33391,10 @@ bool Player::buyClanShopItems(UInt8 offset)
 
     //根据物品在帮贡物品模版中找到对应价格，完成购买
     std::map<UInt32, GData::ClanShopInfo::ClanShopItems>::iterator it = _clanShopItemsTemplate.find(targetToBuy->first);
+
+    if(getClan()->getLev() < it->second.lvl)
+        return 0;
+
     if(targetToBuy != _clanShopItemsAll.end() && it != _clanShopItemsTemplate.end())
     {
         UInt32 price = it->second.price;
@@ -33506,8 +33510,11 @@ bool Player::flushClanShopItems(bool flag)
             UInt32 proffer = getClanProffer();
             if(proffer >= profferCost[flushTimes])
             {
-                ConsumeInfo ci(FlushClanShopItems, 0, 0);
-                useClanProffer(profferCost[flushTimes], &ci);
+                if(0 != profferCost[flushTimes])
+                {
+                    ConsumeInfo ci(FlushClanShopItems, 0, 0);
+                    useClanProffer(profferCost[flushTimes], &ci);
+                }
 
                 AddVar(VAR_CLAN_SHOP_FLUSH_TIMES, 1);
                 randomForClanShop(currentLvl);
