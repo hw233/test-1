@@ -33389,6 +33389,10 @@ bool Player::buyClanShopItems(UInt8 offset)
 
     //根据物品在帮贡物品模版中找到对应价格，完成购买
     std::map<UInt32, GData::ClanShopInfo::ClanShopItems>::iterator it = _clanShopItemsTemplate.find(targetToBuy->first);
+
+    if(getClan()->getLev() < it->second.lvl)
+        return 0;
+
     if(targetToBuy != _clanShopItemsAll.end() && it != _clanShopItemsTemplate.end())
     {
         UInt32 price = it->second.price;
@@ -33504,8 +33508,11 @@ bool Player::flushClanShopItems(bool flag)
             UInt32 proffer = getClanProffer();
             if(proffer >= profferCost[flushTimes])
             {
-                ConsumeInfo ci(FlushClanShopItems, 0, 0);
-                useClanProffer(profferCost[flushTimes], &ci);
+                if(0 != profferCost[flushTimes])
+                {
+                    ConsumeInfo ci(FlushClanShopItems, 0, 0);
+                    useClanProffer(profferCost[flushTimes], &ci);
+                }
 
                 AddVar(VAR_CLAN_SHOP_FLUSH_TIMES, 1);
                 randomForClanShop(currentLvl);
