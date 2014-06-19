@@ -1760,7 +1760,7 @@ private:
     UInt8 _controlBallCnt;
     UInt8 getControlBallCnt() { return _controlBallCnt; }
     void setControlBallCnt(UInt8 cnt) { if(cnt > 5) cnt = 5; _controlBallCnt = cnt; }
-    UInt8 _controlBallCnt2;
+    UInt8 _controlBallCnt2; //last time
     UInt8 getControlBallCnt2() { return _controlBallCnt2; }
     void setControlBallCnt2(UInt8 cnt) { _controlBallCnt2 = cnt; }
     const GData::SkillBase* _skillControlBall;
