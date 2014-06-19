@@ -6,7 +6,7 @@
 
 namespace GData
 {
-#define MAX_LVL 130
+#define MAX_LVL 80
     class ClanShopInfo
     {
         public:
