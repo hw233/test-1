@@ -5780,28 +5780,15 @@ void Clan::sendMemberBuf(UInt8 pos,UInt8 actType)
         if(pos == 1)
         {
             UInt32 server_id = (UInt32)cfg.serverNo;
-            if(cfg.serverNo == 467 || cfg.serverNo == 468)
-                pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
-            else
-                pl->setBuffData(PLAYER_BUFF_NEW_CLAN1, endTime);
+            pl->setBuffData(PLAYER_BUFF_NEW_CLAN1, endTime);
             //addClanTitle(1, 0, pl);
             if(pl->isOnline())
                 pl->notifyClanTitle();
         }
         else if(pos == 2)
-        {
-            if(cfg.serverNo == 467 || cfg.serverNo == 468)
-                pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
-            else
-                pl->setBuffData(PLAYER_BUFF_NEW_CLAN2, endTime);
-        }
+            pl->setBuffData(PLAYER_BUFF_NEW_CLAN2, endTime);
         else
-        {
-            if(cfg.serverNo == 467 || cfg.serverNo == 468)
-                pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
-            else
-                pl->setBuffData(PLAYER_BUFF_NEW_CLAN3, endTime);
-        }
+            pl->setBuffData(PLAYER_BUFF_NEW_CLAN3, endTime);
 
         pl->rebuildBattleName();
         SYSMSG(title, 947);
