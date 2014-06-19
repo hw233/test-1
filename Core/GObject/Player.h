@@ -294,6 +294,7 @@ namespace GObject
         YEHUO       = 20,   //业火天雷
         JIUZI       = 21,   //九子神雷
         TAIYI       = 22,   //太乙神雷
+        SANGBA       = 23,   //桑巴荣耀
 
         DRAGONKING_MAX,
     };
