@@ -25159,11 +25159,11 @@ bool Player::getRPZCJBAward()
     if(!World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return false;
 
-    if(World::getZCJBActivity() && atoi(getDomain()) != 11)
+    /*if(World::getZCJBActivity() && atoi(getDomain()) != 11)
     {
         sendMsgCode(0, 3505);
         return false;
-    }
+    }*/
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
     UInt8 left = ZCJB_LEFT(zcjb);
     UInt8 total = ZCJB_TOTAL(zcjb);
@@ -25243,8 +25243,8 @@ void Player::checkZCJB(UInt32 recharge)
 {
     if(recharge && !World::inActive_opTime_20130531() && !World::getZCJBActivity())
         return;
-    if(World::getZCJBActivity() && getPlatform() != 11)
-        return;
+    /*if(World::getZCJBActivity() && getPlatform() != 11)
+        return;*/
     AddVar(VAR_ZCJB_RECHARGE_GOLD, recharge);
 
     UInt32 zcjb = GetVar(VAR_ZCJB_TIMES);
