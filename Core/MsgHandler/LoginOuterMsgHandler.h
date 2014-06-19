@@ -4033,7 +4033,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 20 && begin <= end )
     {
-        if(GObject::World::getTYSSTime())
+        if(GObject::World::getTYSSTime() > 0)
         {
             Stream st(SPEP::ACTIVITYONOFF);
             st << ret << Stream::eos;

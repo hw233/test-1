@@ -6,12 +6,15 @@ namespace GData
 
     void ClanShopInfo::setClanShopInfo(UInt32 id, ClanShopItems its)
     {
-        _clanShopInfo.insert(std::make_pair(id , its));
+        if( id / 100 >= 40 && id /100 <= MAX_LVL)
+        {
+            _clanShopInfo[id/1000 - 4].insert(std::make_pair(id , its));
+        }
     }
  
-    std::map<UInt32, ClanShopInfo::ClanShopItems> ClanShopInfo::getClanShopInfo()
+    std::map<UInt32, ClanShopInfo::ClanShopItems> ClanShopInfo::getClanShopInfo(UInt8 id)
     {
-        return _clanShopInfo;
+        return _clanShopInfo[id/10 - 4];
     }
 
 }
