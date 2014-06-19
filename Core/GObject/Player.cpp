@@ -33382,13 +33382,13 @@ UInt8 Player::subXXLCount(UInt8 step)
 void Player::getXXLAward(UInt8 type)
 {
     static UInt8 ScoreAward[][4] = {
-        {0,0,0,5},
-        {3,3,3,3},
-        {5,5,5,7},
-        {11,11,11,11},
-        {19,19,19,19}
+        {0,0,0,4},
+        {10,0,0,0},
+        {0,18,0,0},
+        {0,0,35,0},
+        {0,62,0,0}
     };
-    static UInt32 Score[] = {200,500,1000,2000,3500};
+    static UInt32 Score[] = {200,500,1000,2000,3000};
     
     if(type > 4)
         return ;
