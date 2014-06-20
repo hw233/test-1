@@ -33337,28 +33337,26 @@ void Player::sendClanShopInfo()
 bool Player::clanShopLvlShift(UInt8 lvl)
 {
     std::multimap<UInt32, UInt8> & _clanShopItemsAll = _playerData.clanShopItemsAll;
-    if(GetLev() < lvl)
+    if(GetLev() < lvl || lvl > 80 || lvl < 40)
     {
-        //等级不足
+        //等级错误
         return 0;
     }
-    else
+
+    SetVar(VAR_CLAN_SHOP_CURRENT_LVL, lvl);
+    //判断该等级物品是否开启过
+    bool flag = false;
+    for(std::multimap<UInt32, UInt8>::iterator it = _clanShopItemsAll.begin(); it != _clanShopItemsAll.end(); ++ it)
     {
-        SetVar(VAR_CLAN_SHOP_CURRENT_LVL, lvl);
-        //判断该等级物品是否开启过
-        bool flag = false;
-        for(std::multimap<UInt32, UInt8>::iterator it = _clanShopItemsAll.begin(); it != _clanShopItemsAll.end(); ++ it)
+        if(it->first / 100 == lvl)
         {
-            if(it->first / 100 == lvl)
-            {
-                flag = true;
-                break;
-            }
+            flag = true;
+            break;
         }
-        //第一次打开该等级
-        if(!flag)
-            flushClanShopItems(true);
     }
+    //第一次打开该等级
+    if(!flag)
+        flushClanShopItems(true);
     return 1;
 }
 
@@ -33366,10 +33364,12 @@ bool Player::buyClanShopItems(UInt8 offset)
 {
     std::multimap<UInt32, UInt8> & _clanShopItemsAll = _playerData.clanShopItemsAll;
     UInt8 currentLvl = GetVar(VAR_CLAN_SHOP_CURRENT_LVL);
-    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo(currentLvl);
+    if(currentLvl == 0)
+        return 0;
+    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> & _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo(currentLvl);
     std::multimap<UInt32, UInt8>::iterator targetToBuy;
 
-    if(offset > 9)
+    if(offset < 1 || offset > 9)
         return 0;
 
     //遍历当前玩家帮贡物品，找到要买的物品
@@ -33430,8 +33430,10 @@ bool Player::buyClanShopItems(UInt8 offset)
 void Player::randomForClanShop(UInt8 lvl)
 {
     UInt8 currentLvl = GetVar(VAR_CLAN_SHOP_CURRENT_LVL);
+    if(currentLvl == 0)
+        return;
     std::multimap<UInt32, UInt8> & _clanShopItemsAll = _playerData.clanShopItemsAll;
-    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo(currentLvl);
+    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> & _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo(currentLvl);
 
     //如果当前等级有帮贡物品，则先删除
     for(std::multimap<UInt32, UInt8>::iterator it = _clanShopItemsAll.begin(); it!= _clanShopItemsAll.end(); )
@@ -33489,6 +33491,8 @@ bool Player::flushClanShopItems(bool flag)
 {
     //flag(ture:第一次打开，自动随机，不消耗次数,false:手动刷新)
     UInt8 currentLvl = GetVar(VAR_CLAN_SHOP_CURRENT_LVL);
+    if(currentLvl == 0)
+        return 0;
     //每天刷新次数共9次，其中前4次免费
     UInt32 profferCost[9] = {0, 0, 0, 0, 500, 1000, 3000, 5000, 10000};
     UInt8 flushTimes = GetVar(VAR_CLAN_SHOP_FLUSH_TIMES);
@@ -33505,27 +33509,24 @@ bool Player::flushClanShopItems(bool flag)
             //刷新次数用完
             return 0;
         }
+        UInt32 proffer = getClanProffer();
+        if(proffer >= profferCost[flushTimes])
+        {
+            if(0 != profferCost[flushTimes])
+            {
+                ConsumeInfo ci(FlushClanShopItems, 0, 0);
+                useClanProffer(profferCost[flushTimes], &ci);
+            }
+
+            AddVar(VAR_CLAN_SHOP_FLUSH_TIMES, 1);
+            randomForClanShop(currentLvl);
+            writeClanShopItems();
+            return 1;
+        }
         else
         {
-            UInt32 proffer = getClanProffer();
-            if(proffer >= profferCost[flushTimes])
-            {
-                if(0 != profferCost[flushTimes])
-                {
-                    ConsumeInfo ci(FlushClanShopItems, 0, 0);
-                    useClanProffer(profferCost[flushTimes], &ci);
-                }
-
-                AddVar(VAR_CLAN_SHOP_FLUSH_TIMES, 1);
-                randomForClanShop(currentLvl);
-                writeClanShopItems();
-                return 1;
-            }
-            else
-            {
-                sendMsgCode(0, 1360);
-                return 0;
-            }
+            sendMsgCode(0, 1360);
+            return 0;
         }
     }
 }
