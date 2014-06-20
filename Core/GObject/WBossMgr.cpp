@@ -163,6 +163,15 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         if(reliveLeft > now)
             return false;
     }
+    else
+    {
+        UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
+        if(cfg.GMCheck && buffLeft > now)
+        {
+            pl->sendMsgCode(0, 1407, buffLeft - now);
+            return false;
+        }
+    }
     ++sendflag;
     pl->checkLastBattled();
 
@@ -271,6 +280,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     _percent = 0;
                     _hp[0] = 0;
                     attackPre = 0;
+                    pl->AddVar(VAR_WB_EXPSUM,exp);
                     reward(pl);
                     res = true;
                     if (sendflag % 8)
@@ -337,8 +347,11 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     SetDirty(pl,false);
 
     //pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
-    pl->setBuffData(PLAYER_BUFF_WB, now + 30);
-    if(m_final)
+    if(final)
+        pl->setBuffData(PLAYER_BUFF_WB, now + 30);
+    else
+        pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+    if(final)
     {
         pl->AddVar(VAR_WB_EXPSUM,exp);
         sendAtkInfo(pl);
@@ -1042,6 +1055,12 @@ void WBoss::sendFighteCD(Player* player)
     st << static_cast<UInt32>(reliveLeft < now ? 0 : reliveLeft - now);
     st << Stream::eos;
     player->send(st);
+    Stream st1(REP::WBOSSOPT);
+    st1 << static_cast<UInt8>(1);
+    st1 << static_cast<UInt8>(8);
+    st1 << static_cast<UInt32>(getAppearTime() + 30 < now ? 0 : getAppearTime() + 30 - now);
+    st1 << Stream::eos;
+    player->send(st1);
 }
 
 void WBoss::sendFighterNum(Player* player)
@@ -1063,8 +1082,8 @@ void WBoss::sendLastTime(Player* player)
     Stream st(REP::WBOSSOPT);
     st << static_cast<UInt8>(1);
     st << static_cast<UInt8>(3);
-    if(getAppearTime() + 60 * 60 > now)
-        st << (getAppearTime() + 60 * 60 - now) ;
+    if(getAppearTime() + 60 * 60 - 60  > now)
+        st << (getAppearTime() + 60 * 60 - 60 - now) ;
     else
         st << static_cast<UInt32>(0);
     st << Stream::eos;
@@ -1092,7 +1111,7 @@ void WBoss::sendInspireInfo(Player* player)
     {
         UInt8 tael_cnt = GET_BIT_8(player->GetVar(VAR_WB_INSPIRE),0);
         UInt8 gold_cnt = GET_BIT_8(player->GetVar(VAR_WB_INSPIRE),1);
-        UInt8 add_percent = tael_cnt * 4 + gold_cnt * 8;
+        UInt8 add_percent = tael_cnt * 3 + gold_cnt * 6;
         
         st << static_cast<UInt8>(tael_cnt + gold_cnt) << add_percent ;  
         UInt32 allServerBuffer = tmp * tmp * tmp / 4 * tael_cnt + tmp * tmp * tmp / 2 * gold_cnt;
@@ -1755,7 +1774,7 @@ void WBossMgr::Inspire(Player* player,UInt8 type)
 
     UInt32 tmp = GVAR.GetVar(GVAR_MAX_LEVEL) / 10;
     UInt32 allServerBuffer = tmp * tmp * tmp / 4 * tael_cnt + tmp * tmp * tmp / 2 * gold_cnt;
-    UInt8 add_percent = tael_cnt * 4 + gold_cnt * 8;
+    UInt8 add_percent = tael_cnt * 3 + gold_cnt * 6;
     std::map<UInt32, Fighter *>& fighters = player->getFighterMap();
     for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
     {
@@ -1774,7 +1793,7 @@ void WBossMgr::UpdateInspire(Player* player)
     UInt8 tael_cnt = GET_BIT_8(player->GetVar(VAR_WB_INSPIRE),0);
     UInt8 gold_cnt = GET_BIT_8(player->GetVar(VAR_WB_INSPIRE),1);
     
-    UInt8 add_percent = tael_cnt * 4 + gold_cnt * 8;
+    UInt8 add_percent = tael_cnt * 3 + gold_cnt * 6;
     UInt32 tmp = GVAR.GetVar(GVAR_MAX_LEVEL) / 10;
     UInt32 allServerBuffer = tmp * tmp * tmp / 4 * (gold_cnt + tael_cnt);
     std::map<UInt32, Fighter *>& fighters = player->getFighterMap();

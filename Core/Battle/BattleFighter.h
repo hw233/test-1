@@ -1257,6 +1257,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillOnAttackStun100;         //攻击眩晕的敌人一定触发
     std::vector<GData::SkillItem> _passiveSkillOnAttackBlind;           //攻击失明的敌人概率出发
     std::vector<GData::SkillItem> _passiveSkillOnAttackBlind100;        //攻击失明的敌人一定触发
+    std::vector<GData::SkillItem> _passiveSkillCondition100;        //达到附加条件一定触发
 
     std::vector<GData::SkillItem> _passiveSkillOnBeDmg100;              //被攻击一定触发
     std::vector<GData::SkillItem> _passiveSkillOnBePHYDmg100;           //被物理攻击一定触发
@@ -1281,6 +1282,7 @@ public:
     const GData::SkillBase* getPassiveSkillOnAttackConfuseForget100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnAttackStun100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnAttackBlind100(size_t& idx, bool noPossibleTarget = false);
+    const GData::SkillBase* getPassiveSkillCondition100(size_t& idx, bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnCounter(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnAttackBleed(bool noPossibleTarget = false);
     const GData::SkillBase* getPassiveSkillOnAttackConfuseForget(bool noPossibleTarget = false);
@@ -1754,6 +1756,16 @@ private:
     UInt8 _tyslSSCnt2;
     UInt8 getTyslSSCnt2() { return _tyslSSCnt2; }
     void setTyslSSCnt2(UInt8 count) { _tyslSSCnt2 = count; }
+
+    UInt8 _controlBallCnt;
+    UInt8 getControlBallCnt() { return _controlBallCnt; }
+    void setControlBallCnt(UInt8 cnt) { if(cnt > 5) cnt = 5; _controlBallCnt = cnt; }
+    UInt8 _controlBallCnt2; //last time
+    UInt8 getControlBallCnt2() { return _controlBallCnt2; }
+    void setControlBallCnt2(UInt8 cnt) { _controlBallCnt2 = cnt; }
+    const GData::SkillBase* _skillControlBall;
+    const GData::SkillBase* getSkillControlBall() { return _skillControlBall; }
+    void setSkillControlBall(const GData::SkillBase* skill) { _skillControlBall = skill; }
 
 public:
 	enum StatusFlag

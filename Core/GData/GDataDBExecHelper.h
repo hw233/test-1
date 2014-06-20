@@ -842,6 +842,18 @@ struct DBCardInfo
     UInt16 skillId;
     std::string name;
 };
+
+struct DBClanShopInfo
+{
+    UInt32 id;
+    UInt32 itemid;
+    std::string name;
+    UInt32 price;
+    UInt32 prob;
+    UInt8 color;
+    UInt8 lvl;
+};
+
 struct DBCubeAttr
 {
     UInt8 id;
@@ -1964,6 +1976,19 @@ SPECIALDEF(6)
     UInt8, lvLimit,
     UInt16, skillId,
     std::string, name 
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBClanShopInfo)
+SPECIALDEF(7)
+	(
+    UInt32, id,
+    UInt32, itemid,
+    std::string, name,
+    UInt32, price,
+    UInt32, prob,
+    UInt8, color,
+    UInt8, lvl
 	)
 SPECIALEND()
 

@@ -729,7 +729,11 @@ function RunQZoneRechargeAward(player, cts)
     end
 
     for count = 1, #item[cts] do
-        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
     end
     return true
 end

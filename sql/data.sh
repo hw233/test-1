@@ -67,6 +67,7 @@ function update_data()
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140521_cPicInfo.sql
     #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140521_cCubeCount.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140523_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140609_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140627_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140627_2.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
@@ -149,6 +150,7 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from picInfo; source picInfo;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from cubeCount; source cubeCount;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from newquestions; source newquestions;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from clan_contribution_shop; source clanShop;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from gear; source gear;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from geartree; source geartree;";
 }

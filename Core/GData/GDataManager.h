@@ -105,6 +105,7 @@ namespace GData
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);
         static bool isInUdpItem(UInt32 id);
+        static bool LoadClanShopInfo();
 
 	public:
 		static const TaskType& GetTaskTypeData(UInt32 typeId);

@@ -164,6 +164,9 @@ namespace GObject
 #define PLAYER_BUFF_CLAN2           0x69 // （活动）第2帮派BUF
 #define PLAYER_BUFF_CLAN3           0x6A // （活动）第3帮派BUF
 #define PLAYER_BUFF_TYSS            0x6B // （TYSS活动）个人BUF
+#define PLAYER_BUFF_NEW_CLAN1       0x6C // （新活动）第1帮派BUF
+#define PLAYER_BUFF_NEW_CLAN2       0x6D // （新活动）第2帮派BUF
+#define PLAYER_BUFF_NEW_CLAN3       0x6E // （新活动）第3帮派BUF
 #define PLAYER_BUFF_ATHL11          0x71 // 魔
 #define PLAYER_BUFF_ATHL22          0x72 // 神
 #define PLAYER_BUFF_ATHL33          0x73 // 虚
@@ -294,6 +297,7 @@ namespace GObject
         YEHUO       = 20,   //业火天雷
         JIUZI       = 21,   //九子神雷
         TAIYI       = 22,   //太乙神雷
+        SANGBA       = 23,   //桑巴荣耀
 
         DRAGONKING_MAX,
     };
@@ -1009,6 +1013,7 @@ namespace GObject
         UInt8 xjfrontFreeCnt;         // ??ͼ???Ѵ???
         UInt8 xjfrontGoldCnt;         // ??ͼ?շѴ???
         UInt32 xjfrontUpdate;         // ??ͼ????????ʱ??
+        std::multimap<UInt32, UInt8> clanShopItemsAll;
     };
 
 	class Player:
@@ -3524,6 +3529,14 @@ namespace GObject
         UInt32 getCurClanTitle();
         void clearClanTitle();
         void checkClanTitle();
+
+        void clanShopOp(UInt8, UInt8);
+        void sendClanShopInfo();
+        void writeClanShopItems();
+        bool buyClanShopItems(UInt8);
+        bool flushClanShopItems(bool);
+        void randomForClanShop(UInt8);
+        bool clanShopLvlShift(UInt8);
 
     private:
         //玩家位置（包括层数、当层位置）

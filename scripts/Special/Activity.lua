@@ -277,7 +277,7 @@ function onDungeonWin(player, id, count, free)
         local package = player:GetPackage();
         package:Add(9416, 1, true)
     end
-    if getTYSSTime() == true then
+    if getTYSSTime() ~= 0 then
         local package = player:GetPackage();
         package:Add(9492, 1, true)
     end
@@ -1069,7 +1069,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Item9343Act(player, lootlvl);
     player:AddZRYJCount(20); -- 逐日印记
     _collectCardAct(player, lootlvl);
-    if getTYSSTime() == true then
+    if getTYSSTime() ~= 0 then
         local package = player:GetPackage();
         package:Add(9492, 1, true)
     end
@@ -1108,7 +1108,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
         local package = player:GetPackage();
         package:Add(9416, 1, true)
     end
-    if getTYSSTime() == true then
+    if getTYSSTime() ~= 0 then
         local package = player:GetPackage();
         package:Add(9492, 1, true)
     end
@@ -5287,6 +5287,26 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_05_24(player, ototal, ntotal)
     end
 
+    local t = { ['year'] = 2014, ['month'] = 6, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time() + 11
+
+    if n >= s and n < (s + 1*86400) then
+        sendRechargeMails_2013_05_18(player, ototal, ntotal)
+    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
+        sendRechargeMails_2013_05_19(player, ototal, ntotal)
+    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
+        sendRechargeMails_2013_05_20(player, ototal, ntotal)
+    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
+        sendRechargeMails_2013_05_21(player, ototal, ntotal)
+    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
+        sendRechargeMails_2013_05_22(player, ototal, ntotal)
+    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
+        sendRechargeMails_2013_05_23(player, ototal, ntotal)
+    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
+        sendRechargeMails_2013_05_24(player, ototal, ntotal)
+    end
+
 
 end
 
@@ -8838,6 +8858,26 @@ function sendRechargeRankAward(player, pos, total, f7)
         sendRechargeRankAward_2013_03_29(player, pos, total, f7)
     end
 
+    local t = { ['year'] = 2014, ['month'] = 6, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time()
+
+    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
+        sendRechargeRankAward_2013_09_06(player, pos, total, f7)
+    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
+        sendRechargeRankAward_2014_06_01(player, pos, total, f7)
+    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
+        sendRechargeRankAward_2014_05_26(player, pos, total, f7)
+    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
+        sendRechargeRankAward_2014_02_04(player, pos, total, f7)
+    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_18(player, pos, total, f7)
+    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_19(player, pos, total, f7)
+    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_18(player, pos, total, f7)
+    end
+
  end
 
 function sendConsumeRankAward_2012_10_19(player, pos)
@@ -10222,6 +10262,7 @@ function getDragonKingAward(step, flag)
             [20] = {{314,1}},
             [21] = {{315,1}},
             [22] = {{317,1}},
+            [23] = {{318,1}},
         },
     }
     local chances = {
@@ -11323,6 +11364,16 @@ function onAccRecharge_2014_06_14(player)
     sendAccRechargeAwards(player, awards)
 end
 
+function onAccRecharge_2014_06_21(player)
+    local awards = {
+        [1] = { 0xA000,100,1},
+        [3] = {514,5,1, 501,3,1, 5035,1,1},
+        [5] = {9371,5,1, 5025,1,1, 0xA000,100,1, 5005,1,1},
+        [7] = { 515,2,1, 5136,1,1},
+    }
+    sendAccRechargeAwards(player, awards)
+end
+
 -- ACCRECHARGE
 function onRecharge(player, r)
     if getAccRecharge() then
@@ -11504,6 +11555,13 @@ function onRecharge(player, r)
             local n = os.time() + 11
             if n >= s and n < (s + 7*86400) then
                 onAccRecharge_2014_06_14(player)
+            end
+
+            local t = { ['year'] = 2014, ['month'] = 6, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+            local s = os.time(t)
+            local n = os.time() + 11
+            if n >= s and n < (s + 7*86400) then
+                onAccRecharge_2014_06_21(player)
             end
 
         end
