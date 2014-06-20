@@ -1082,8 +1082,8 @@ void WBoss::sendLastTime(Player* player)
     Stream st(REP::WBOSSOPT);
     st << static_cast<UInt8>(1);
     st << static_cast<UInt8>(3);
-    if(getAppearTime() + 60 * 60 > now)
-        st << (getAppearTime() + 60 * 60 - now) ;
+    if(getAppearTime() + 60 * 60 - 60  > now)
+        st << (getAppearTime() + 60 * 60 - 60 - now) ;
     else
         st << static_cast<UInt32>(0);
     st << Stream::eos;
