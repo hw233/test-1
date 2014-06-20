@@ -19716,6 +19716,11 @@ void EventTlzAuto::notify(bool isBeginAuto)
     {
     //    if ((type & 0x01) && (tFgt->getLevel() >= GetLev()))
     //            return 4;
+        if (type & 0x01)
+        {
+            if (fFgt->getLingshiNum() > 0 || tFgt->getLingshiNum() > 0)
+                return 7;
+        }
         if ((type & 0x02 || type & 0x04) && GetPackage()->GetRestPackageSize() < 1)
             return 5;
         if ((type & 0x08) && (fFgt->getSecondSoul() == NULL || tFgt->getSecondSoul() == NULL))
