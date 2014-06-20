@@ -2529,7 +2529,7 @@ namespace GData
 
         DBGearConfig dbg;
 
-		if(execu->Prepare("SELECT `partId`, `needMoneyA`, `needMoneyB`, `needMoneyC`, `needMoneyD`, `needMoneyE`, `attrValueA`, `attrValueB`, `attrValueC`, `attrValueD`, `attrValueE`, `attrValueF`, `attrValueG` FROM `gear`", dbg) != DB::DB_OK)
+		if(execu->Prepare("SELECT `partId`, `name`, `needMoneyA`, `needMoneyB`, `needMoneyC`, `needMoneyD`, `needMoneyE`, `attrValueA`, `attrValueB`, `attrValueC`, `attrValueD`, `attrValueE`, `attrValueF`, `attrValueG` FROM `gear`", dbg) != DB::DB_OK)
 			return false;
 
 		while(execu->Next() == DB::DB_OK)

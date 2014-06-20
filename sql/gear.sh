@@ -22,7 +22,7 @@ function gear()
         BEGIN {
             print "INSERT INTO `gear` VALUES";
         } {
-            printf("(%d,%d,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13);
+            printf("(%d,\x27%s\x27,%d,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14);
             if (NR <= ENVIRON["lines"])
                 printf(",");
             else if (NR > ENVIRON["lines"])

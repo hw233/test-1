@@ -1302,6 +1302,7 @@ CREATE TABLE `newquestions` (
 DROP TABLE IF EXISTS `gear`;
 CREATE TABLE `gear` (
     `partId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `name` varchar(255) NOT NULL DEFAULT '',
     `needMoneyA` int(10) unsigned NOT NULL DEFAULT 0,
     `needMoneyB` int(10) unsigned NOT NULL DEFAULT 0,
     `needMoneyC` int(10) unsigned NOT NULL DEFAULT 0,

@@ -119,6 +119,7 @@ namespace GObject
     public:
         void sendCommonGearInfo();
         void sendSpecialGearInfo();
+        void sendZYValue(Stream& st);
         void makeGear(UInt16 gearId, UInt8 mark);
         bool makeCommonGear(UInt16 gearId);
         bool makeSpecialGear(UInt16 gearId);

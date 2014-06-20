@@ -753,6 +753,7 @@ struct DBZhenweiConfig
 struct DBGearConfig
 {
     UInt16 partId;
+    std::string name;
     UInt32 needMoneyA;
     UInt32 needMoneyB;
     UInt32 needMoneyC;
@@ -1710,9 +1711,10 @@ SPECIALDEF(12)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBGearConfig)
-SPECIALDEF(13)
+SPECIALDEF(14)
     (
     UInt16, partId,
+    std::string, name,
     UInt32, needMoneyA,
     UInt32, needMoneyB,
     UInt32, needMoneyC,

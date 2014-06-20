@@ -85,6 +85,7 @@ class JiguanData
 
         struct needComponent
         {
+            UInt16 lastSuiteId;      // 前一个套件Id
             UInt16 needComponentAId; // 需要元件A
             UInt16 needComponentBId; // 需要元件B
 
@@ -104,6 +105,7 @@ class JiguanData
         struct gearInfo
         {
             UInt16 partId;          // 零件Id
+            std::string name;       // 名字
             UInt32 ZYKNum;          // 需要紫云矿数量
             UInt32 ZYMNum;          // 需要紫云木数量
             UInt32 ZYSNum;          // 需要紫云索数量
@@ -130,6 +132,7 @@ class JiguanData
         std::map<UInt16, UInt8> _tempType;
         std::map<UInt16, needComponent> _makePart;
         std::map<UInt16, needPart> _makeSuite;
+        std::map<UInt16, UInt16> _makeComponent;
         std::map<UInt16, gearInfo> _gearInfo;
     public:
         void setJiguanyuInfo(DBJiguanyuConfig &);
@@ -161,6 +164,8 @@ class JiguanData
         zhenweiInfo * getZhenweiInfo(UInt16 keyId);
 
         UInt8 getGearType(UInt16 gearId);
+
+        UInt16 getMakeComponentInfo(UInt16 gearId);
 
         needComponent * getMakePartInfo(UInt16 gearId);
 

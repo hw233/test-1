@@ -1423,6 +1423,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendZhenyuansInfo();    //阵元
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
+    pl->GetMoFang()->sendCommonGearInfo();
+    pl->GetMoFang()->sendSpecialGearInfo();
     //pl->KJTMUdpLog();
     //pl->QiShiBanState();
     {
@@ -7329,6 +7331,9 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 13:
         {
+            if(player->GetLev() < 75)
+                return;
+
             UInt8 type = 0;
             br >> type;
 
@@ -7343,6 +7348,9 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
         break;
     case 14:
         {
+            if(player->GetLev() < 75)
+                return;
+
             UInt8 type = 0;
             UInt16 gearId = 0;
             br >> type >> gearId;

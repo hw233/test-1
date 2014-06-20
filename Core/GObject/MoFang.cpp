@@ -1761,9 +1761,13 @@ void MoFang::sendCommonGearInfo()
     if(!m_owner)
         return;
 
+    if(m_owner->GetLev() < 75)
+        return;
+
     UInt16 sz = m_commonGear.size();
     Stream st(REP::MOFANG_INFO);
     st << static_cast<UInt8>(13);
+    sendZYValue(st);
     st << static_cast<UInt8>(1);
     st << sz;
     std::vector<UInt16>::iterator iter = m_commonGear.begin();
@@ -1780,9 +1784,13 @@ void MoFang::sendSpecialGearInfo()
     if(!m_owner)
         return;
 
+    if(m_owner->GetLev() < 75)
+        return;
+
     UInt16 sz = m_specialGear.size();
     Stream st(REP::MOFANG_INFO);
     st << static_cast<UInt8>(13);
+    sendZYValue(st);
     st << static_cast<UInt8>(2);
     st << sz;
     std::vector<UInt16>::iterator iter = m_specialGear.begin();
@@ -1792,6 +1800,14 @@ void MoFang::sendSpecialGearInfo()
     }
     st << Stream::eos;
     m_owner->send(st);
+}
+
+void MoFang::sendZYValue(Stream& st)
+{
+    st << static_cast<UInt32>(9999);
+    st << static_cast<UInt32>(9999);
+    st << static_cast<UInt32>(9999);
+    st << static_cast<UInt32>(9999);
 }
 
 void MoFang::makeGear(UInt16 gearId, UInt8 mark)
@@ -1846,18 +1862,28 @@ void MoFang::makeGear(UInt16 gearId, UInt8 mark)
 
     Stream st(REP::MOFANG_INFO);
     st << static_cast<UInt8>(14);
+    sendZYValue(st);
     st << static_cast<UInt8>(mark);
     st << gearId;
     st << Stream::eos;
     m_owner->send(st);
 
-    m_owner->AddVar(VAR_GEAR_BUFF, (gearInfo->attrValueG*100));
+    UInt32 addValue = gearInfo->attrValueG;
+    std::cout << "0000000 : " << gearId << std::endl;
+    std::cout << "AAAAAAA : " << addValue << std::endl;
+    std::cout << "BBBBBBB : " << m_owner->GetVar(VAR_GEAR_BUFF) << std::endl;
+    m_owner->AddVar(VAR_GEAR_BUFF, addValue);
+    std::cout << "CCCCCCC : " << m_owner->GetVar(VAR_GEAR_BUFF) << std::endl;
 
     std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
     for(std::map<UInt32, Fighter *>::iterator it=fighters.begin(); it!=fighters.end(); ++it)
     {
         it->second->setDirty();
     }
+
+    UInt8 gearType = GData::jiguanData.getGearType(gearId);
+    if(1 == gearType)
+        SYSMSG_BROADCASTV(5155, m_owner->getCountry(), m_owner->getName().c_str(), 5, (gearInfo->name).c_str());
 }
 
 bool MoFang::makeCommonGear(UInt16 gearId)
@@ -1890,12 +1916,24 @@ bool MoFang::makeCommonGear(UInt16 gearId)
                 if(!needComponentInfo)
                     return false;
 
+                if(needComponentInfo->lastSuiteId > 0)
+                    if(!checkCommonGear(needComponentInfo->lastSuiteId))
+                        return false;
+
                 if(needComponentInfo->needComponentAId > 0)
                     if(!checkCommonGear(needComponentInfo->needComponentAId))
                         return false;
 
                 if(needComponentInfo->needComponentBId > 0)
                     if(!checkCommonGear(needComponentInfo->needComponentBId))
+                        return false;
+            }
+            break;
+        case 3:
+            {
+                UInt16 condition = GData::jiguanData.getMakeComponentInfo(gearId);
+                if(condition > 0)
+                    if(!checkCommonGear(condition))
                         return false;
             }
             break;
@@ -1970,6 +2008,9 @@ bool MoFang::checkSpecialGear(UInt16 gearId)
 
 void MoFang::addGearAttr(GData::AttrExtra& ae)
 {
+    if(m_owner->GetLev() < 75)
+        return;
+
     float addAttrA = 0.00;
     float addAttrB = 0.00;
     float addAttrC = 0.00;

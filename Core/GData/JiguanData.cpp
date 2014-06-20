@@ -122,6 +122,7 @@ namespace GData
             gearInfo info;
 
             info.partId = gearData.partId;
+            info.name = gearData.name;
             info.ZYKNum = gearData.needMoneyA;
             info.ZYMNum = gearData.needMoneyB;
             info.ZYSNum = gearData.needMoneyC;
@@ -152,14 +153,23 @@ namespace GData
             np.needPartAId = gearTreeData.partAId;
             np.needPartBId = gearTreeData.partBId;
             np.needPartCId = gearTreeData.partCId;
+            nc1.lastSuiteId = gearTreeData.lastSuiteId;
             nc1.needComponentAId = gearTreeData.componentAId;
             nc1.needComponentBId = gearTreeData.componentBId;
+            nc2.lastSuiteId = gearTreeData.lastSuiteId;
             nc2.needComponentAId = gearTreeData.componentCId;
             nc2.needComponentBId = gearTreeData.componentDId;
+            nc3.lastSuiteId = gearTreeData.lastSuiteId;
             nc3.needComponentAId = gearTreeData.componentEId;
             nc3.needComponentBId = gearTreeData.componentFId;
             
             /**套件由部件组成，部件由元件组成**/
+            _makeComponent.insert(std::make_pair(gearTreeData.componentAId, gearTreeData.lastSuiteId));
+            _makeComponent.insert(std::make_pair(gearTreeData.componentBId, gearTreeData.lastSuiteId));
+            _makeComponent.insert(std::make_pair(gearTreeData.componentCId, gearTreeData.lastSuiteId));
+            _makeComponent.insert(std::make_pair(gearTreeData.componentDId, gearTreeData.lastSuiteId));
+            _makeComponent.insert(std::make_pair(gearTreeData.componentEId, gearTreeData.lastSuiteId));
+            _makeComponent.insert(std::make_pair(gearTreeData.componentFId, gearTreeData.lastSuiteId));
             _makePart.insert(std::make_pair(np.needPartAId, nc1));
             _makePart.insert(std::make_pair(np.needPartBId, nc2));
             _makePart.insert(std::make_pair(np.needPartCId, nc3));
@@ -181,6 +191,15 @@ namespace GData
     {
         std::map<UInt16, UInt8>::iterator iter = _tempType.find(gearId);
         if(iter != _tempType.end())
+            return iter->second;
+
+        return 0;
+    }
+
+    UInt16 JiguanData::getMakeComponentInfo(UInt16 gearId)
+    {
+        std::map<UInt16, UInt16>::iterator iter = _makeComponent.find(gearId);
+        if(iter != _makeComponent.end())
             return iter->second;
 
         return 0;
