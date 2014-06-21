@@ -1219,7 +1219,7 @@ CREATE TABLE `cardInfo` (
     `type` tinyint(3) NOT NULL DEFAULT 0,
     `color` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `lvLimit` tinyint(3) unsigned NOT NULL DEFAULT 0,
-    `skill` int(10) unsigned NOT NULL DEFAULT 0,
+    `skillId` int(10) unsigned NOT NULL DEFAULT 0,
     `name` varchar(255) NOT NULL DEFAULT '',
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -1266,7 +1266,7 @@ CREATE TABLE `cubeAttr` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `floorAttr`;
-CREATE TABLE `cubeAttr` (
+CREATE TABLE `floorAttr` (
     `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `hp` int(10) unsigned NOT NULL DEFAULT 0,
     `attack` float(6,2) NOT NULL DEFAULT '0.00',
@@ -1275,15 +1275,15 @@ CREATE TABLE `cubeAttr` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `picInfo`;
-CREATE TABLE `cubeAttr` (
+CREATE TABLE `picInfo` (
     `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `index` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `cost` int(10) unsigned NOT NULL DEFAULT 0,
     `buff` tinyint(3) unsigned NOT NULL DEFAULT 0,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`,`index`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cubeCountn`;
+DROP TABLE IF EXISTS `cubeCount`;
 CREATE TABLE `cubeCount` (
     `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `index` tinyint(3) unsigned NOT NULL DEFAULT 0,
