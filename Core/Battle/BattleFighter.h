@@ -1257,7 +1257,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillOnAttackStun100;         //攻击眩晕的敌人一定触发
     std::vector<GData::SkillItem> _passiveSkillOnAttackBlind;           //攻击失明的敌人概率出发
     std::vector<GData::SkillItem> _passiveSkillOnAttackBlind100;        //攻击失明的敌人一定触发
-    std::vector<GData::SkillItem> _passiveSkillCondition100;        //攻击失明的敌人一定触发
+    std::vector<GData::SkillItem> _passiveSkillCondition100;        //达到附加条件一定触发
 
     std::vector<GData::SkillItem> _passiveSkillOnBeDmg100;              //被攻击一定触发
     std::vector<GData::SkillItem> _passiveSkillOnBePHYDmg100;           //被物理攻击一定触发
