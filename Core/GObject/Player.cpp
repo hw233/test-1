@@ -28608,7 +28608,7 @@ void Player::getInterestingAward(UInt8 type)
 {
     if(!World::getOldManTime())
         return ;
-    UInt32 scoreReq[] = {20,40,70,90};
+    UInt32 scoreReq[] = {30,180,350,550};
     UInt32 ScoreAward = 0;
     UInt32 Score = 0;
     if(type > 3 )
