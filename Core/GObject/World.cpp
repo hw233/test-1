@@ -4316,11 +4316,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9498,40},{515,30},{16001,60},{503,60},{9075,40}},
-        {{9498,40},{515,25},{16001,60},{503,50},{9075,30}},
-        {{9498,40},{515,20},{16001,60},{503,40},{9075,20}},
+        {{9498,40},{1325,30},{9457,60},{16001,60},{9076,40}},
+        {{9498,40},{1325,25},{9457,60},{16001,50},{9076,30}},
+        {{9498,40},{1325,20},{9457,60},{16001,40},{9076,20}},
     };
-    static MailPackage::MailItem card = {9976,1};
+    static MailPackage::MailItem card = {9980,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -4534,7 +4534,7 @@ void World::Send11ClanRankAward()
 {
     World::initRCRank();
     int pos = 0;
-    UInt32 ClanAwardID[5] = {134,1325,503,1126,9389};
+    UInt32 ClanAwardID[5] = {9338,1325,503,1126,9389};
     UInt32 ClanAwardNum[][5]={
         {180,150,180,150,180},
         {150,120,150,120,150},
@@ -4550,12 +4550,15 @@ void World::Send11ClanRankAward()
             continue;
         ++pos;
         UInt32 type = pos ; 
+        UInt32 ClanGrade = clan->getGradeInAirBook();
+        if(ClanGrade < 23000)
+            break;
+
         if(pos > 3 && pos <8)
             type = 4;
         if(pos > 7 )
         {
-            UInt32 ClanGrade = clan->getGradeInAirBook();
-            if(ClanGrade < 25000)
+            if(ClanGrade < 23000)   //曾经的判断
                 break;
             else 
                 type = 5;
@@ -4586,7 +4589,7 @@ void World::Send11CountryRankAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] ={
-         {{9604,5},{515,3},{509,3},{9498,3},{16001,3}},
+         {{9600,5},{134,3},{507,3},{9498,3},{16001,3}},
     };
     ClanGradeSort::iterator i = World::clanGradeSort.begin();
     UInt32 EM=0,KL=0;
