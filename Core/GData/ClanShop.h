@@ -37,7 +37,7 @@ namespace GData
         public:
                 ClanShopInfo() {}
                 void setClanShopInfo(UInt32 id, ClanShopItems its);
-                std::map<UInt32, ClanShopItems> getClanShopInfo(UInt8 id);
+                std::map<UInt32, ClanShopItems> getClanShopInfo(UInt8 lvl);
     };
     extern ClanShopInfo clanShopInfo;
 }
