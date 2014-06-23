@@ -19281,13 +19281,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {1652, 1655},
             {1541, 1541},
             {1542, 1542},
-            {1544, 1544}
+            {1544, 1544},
+            {1670, 1670}
         };
 
         if ((innateTrumpid >= 1529 && innateTrumpid <= 1534) ||
             (innateTrumpid >= 1650 && innateTrumpid <= 1655)
          || (innateTrumpid >= 1541 && innateTrumpid <= 1542)
          || (innateTrumpid >= 1544 && innateTrumpid <= 1544)
+         || (innateTrumpid >= 1670 && innateTrumpid <= 1670)
          )
         {
             size_t i = 0;
@@ -26380,7 +26382,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,23000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
@@ -26427,7 +26429,7 @@ void Player::Send11GradeAward(UInt8 type)
 {
     if(type > 11)
         return ;
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,24000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,23000};
     static MailPackage::MailItem s_item[][6] = {
         {{9424,1}, {503,1}},
         {{500,2},{9497,2}},
