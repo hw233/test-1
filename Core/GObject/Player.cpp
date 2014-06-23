@@ -33366,7 +33366,7 @@ bool Player::buyClanShopItems(UInt8 offset)
     UInt8 currentLvl = GetVar(VAR_CLAN_SHOP_CURRENT_LVL);
     if(currentLvl == 0)
         return 0;
-    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> & _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo(currentLvl);
+    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo(currentLvl);
     std::multimap<UInt32, UInt8>::iterator targetToBuy;
 
     if(offset < 1 || offset > 9)
@@ -33433,7 +33433,7 @@ void Player::randomForClanShop(UInt8 lvl)
     if(currentLvl == 0)
         return;
     std::multimap<UInt32, UInt8> & _clanShopItemsAll = _playerData.clanShopItemsAll;
-    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> & _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo(currentLvl);
+    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo(currentLvl);
 
     //如果当前等级有帮贡物品，则先删除
     for(std::multimap<UInt32, UInt8>::iterator it = _clanShopItemsAll.begin(); it!= _clanShopItemsAll.end(); )
