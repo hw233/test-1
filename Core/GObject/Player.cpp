@@ -33367,7 +33367,7 @@ bool Player::buyClanShopItems(UInt8 offset)
     if(currentLvl == 0)
         return 0;
     std::map<UInt32, GData::ClanShopInfo::ClanShopItems> _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo(currentLvl);
-    std::multimap<UInt32, UInt8>::iterator targetToBuy;
+    std::multimap<UInt32, UInt8>::iterator targetToBuy =  _clanShopItemsAll.end();
 
     if(offset < 1 || offset > 9)
         return 0;
@@ -33385,43 +33385,40 @@ bool Player::buyClanShopItems(UInt8 offset)
             break;
         }
     }
-
-    if(targetToBuy != _clanShopItemsAll.end() && targetToBuy->second == 1)
+    if(targetToBuy == _clanShopItemsAll.end())
+        return 0;
+    if(targetToBuy->second == 1)
         return 0;
 
     //根据物品在帮贡物品模版中找到对应价格，完成购买
     std::map<UInt32, GData::ClanShopInfo::ClanShopItems>::iterator it = _clanShopItemsTemplate.find(targetToBuy->first);
-
+    if(it == _clanShopItemsTemplate.end())
+        return 0;
     if(getClan()->getLev() < it->second.lvl)
         return 0;
 
-    if(targetToBuy != _clanShopItemsAll.end() && it != _clanShopItemsTemplate.end())
+    UInt32 price = it->second.price;
+    UInt32 proffer = getClanProffer();
+    if(proffer >= price)
     {
-        UInt32 price = it->second.price;
-        UInt32 proffer = getClanProffer();
-        if(proffer >= price)
-        {
-            ConsumeInfo ci(BuyClanShopItems, 0, 0);
-            useClanProffer(price, &ci);
+        ConsumeInfo ci(BuyClanShopItems, 0, 0);
+        useClanProffer(price, &ci);
 
-            if(GetPackage()->GetRestPackageSize() < 1)
-            {
-                sendMsgCode(2, 1011);
-                return 0;
-            }
-
-            GetPackage()->Add(it->second.itemid, 1 , true, false, FromClanShop);
-            //设置状态为已购买
-            targetToBuy->second = 1;
-        }
-        else
+        if(GetPackage()->GetRestPackageSize() < 1)
         {
-            sendMsgCode(0, 1360);
+            sendMsgCode(2, 1011);
             return 0;
         }
+
+        GetPackage()->Add(it->second.itemid, 1 , true, false, FromClanShop);
+        //设置状态为已购买
+        targetToBuy->second = 1;
     }
     else
+    {
+        sendMsgCode(0, 1360);
         return 0;
+    }
 
     writeClanShopItems();
     return 1;
