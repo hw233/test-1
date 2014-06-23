@@ -1,6 +1,6 @@
 --代码描述:此脚本仅处理天书奇缘的积分bug导致的情况 (被加载的地方似乎不合适，会被加载三次，影响效率)
 print("XXX")
-os.execute("zcat log/DB/TRACE20140622.gz |grep var |grep [^0-9]599[^0-9] |grep \"\\[0[0,1,2]:\" > test1.txt")  --需要修改cat语句已限制时间段
+os.execute("zcat log/DB/TRACE20140622.gz |grep var|grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[0[0,1,2]:\" > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep [^0-9]599[^0-9] > test1.txt")
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep [^0-9]599[^0-9] |grep \"\\[1[0-9]\" > test1.txt")  --需要修改cat语句已限制时间段
 os.execute("awk '{print $11,$12,$13,$14}' test1.txt > test2.txt ")  --产生文件的格式为(XXXX, XXXX, XXXX)]
@@ -51,7 +51,7 @@ for key,value in pairs(result) do
         opType = 2
         result[key] = -result[key]
     end
-    local strs = string.format("UPDATE var set data = data %s %d where id = 599 and playerId = %u and data >= %d;",option[opType],result[key],tonumber(key),result[key]*(opType-1))   --只影响总积分 
+    local strs = string.format("UPDATE var set data = data %s %d where id = 599 and playerId = %s and data >= %d;",option[opType],result[key],(key),result[key]*(opType-1))   --只影响总积分 
     print(strs)   --用于查看sql语句
     fileOpen:write(strs);
     fileOpen:write("\n")
