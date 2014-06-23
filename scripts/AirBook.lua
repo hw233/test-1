@@ -21,7 +21,7 @@ for i in file:lines() do
 
         if res[str1]== nil then    
             res[str1]= tonumber(str2)  --初始数值设为第一个出现的值
-            result[str1]= 0    --结果增量设置为0
+            result[str1]= 100    --结果增量设置为0
         end
 
         --条件刷分情况 10分的递进刷分，此时间内全部还原(处理刷分) ,问题(只要是10分递进的加分全部清楚)

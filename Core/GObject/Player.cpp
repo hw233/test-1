@@ -26430,6 +26430,12 @@ void Player::Send11GradeAward(UInt8 type)
     if(type > 11)
         return ;
     UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,23000};
+    UInt32 value = GetVar(VAR_11AIRBOOK_AWARDSCORE);
+    if(gradeAward[type-1] <= value)
+        return ;
+    else
+        SetVar(VAR_11AIRBOOK_AWARDSCORE,gradeAward[type-1]);
+
     static MailPackage::MailItem s_item[][6] = {
         {{9424,1}, {503,1}},
         {{500,2},{9497,2}},

@@ -779,6 +779,7 @@ namespace GObject
         VAR_AUTO_TEAMCOPY_TEMP_CNT = 802,        //自动组队副本已经打过的副本怪物数量
 
         //811-830 for libo
+        VAR_11AIRBOOK_AWARDSCORE = 817,  
             
         VAR_MAX,
     };
@@ -1475,6 +1476,7 @@ namespace GObject
             REGISTER_VAR(VAR_ERLKING_BUY_PASS_NUM_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_ERLKING_BUY_PASS_TOTAL_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_ERLKING_USE_FREE_NUM_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_11AIRBOOK_AWARDSCORE, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
