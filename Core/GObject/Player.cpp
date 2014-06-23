@@ -26386,7 +26386,7 @@ void Player::Add11grade(UInt32 grade)
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
-        if(airGrade < gradeAward[i] &&( airGrade + grade) >=gradeAward[i])
+        //if(airGrade < gradeAward[i] &&( airGrade + grade) >=gradeAward[i])
             Send11GradeAward(i+1);
     }
     AddVar(VAR_11AIRBOOK_GRADE,grade);
