@@ -62,6 +62,7 @@ void ClanBigBoss::ReqBossAppointment(UInt8 app_time/* 时间点数 */,std::strin
     m_BossHP = getLastHP();
     _percent = 100;
     m_spirit = 10;
+    m_final = false;
     updateInfo();
 
     //TODO DB
