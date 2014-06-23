@@ -10,7 +10,7 @@ local result = {}
 --获得此时间段 各玩家的积分变化情况
 for i in file:lines() do 
     first = string.find(i,",") 
-    str1 = string.sub(i,2,first-1)   --获取玩家ID   （XXX,XXXX,XXXX:玩家ID，数值，结束时间）
+    str1 = string.sub(i,2,first-1)   --获取玩家ID   （XXX,XXXX,XXXX,XXXX:玩家ID，数据ID,数值，结束时间）
 
     second = string.find(i,",",first+1) 
     str3 = string.sub(i,first+1,second - 1) --获取数据编号
