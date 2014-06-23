@@ -7024,7 +7024,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 continue;
             tmpatkers.insert(atk);
 
-            if (atk->getHP() < 0 || atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
+            if (atk->getHP() <= 0 || atk->getStunRound() || atk->getConfuseRound() || atk->getForgetRound())
                 continue;
 
             _onOtherConfuseAndForgetAtkList[side].erase(_onOtherConfuseAndForgetAtkList[side].begin() + i);

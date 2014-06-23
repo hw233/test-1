@@ -8716,6 +8716,7 @@ namespace GObject
         UInt32 info = GetVar(VAR_ZHENYUAN_TIQU_CNT);
         UInt16 leftCnt = info;  //去除高16位
 
+        info = (info >> 16) << 16; //高16位值
         info |= leftCnt + num;
         SetVar(VAR_ZHENYUAN_TIQU_CNT, info);
         updateZhenyuanTiQu();
