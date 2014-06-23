@@ -12,9 +12,9 @@ namespace GData
         }
     }
  
-    std::map<UInt32, ClanShopInfo::ClanShopItems> ClanShopInfo::getClanShopInfo(UInt8 id)
+    std::map<UInt32, ClanShopInfo::ClanShopItems> ClanShopInfo::getClanShopInfo(UInt8 lvl)
     {
-        return _clanShopInfo[id/10 - 4];
+        return _clanShopInfo[lvl/10 - 4];
     }
 
 }
