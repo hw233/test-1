@@ -1425,7 +1425,7 @@ void World::World_Midnight_Check( World * world )
     bool bItem9344 = getItem9344Act();
     bool bItem9343 = getItem9343Act();
     bool bQiShiBanTime = getQiShiBanTime();
-    bool bTYSSTime = getTYSSTime();
+    bool bTYSSTime = getTYSSTime() > 0;
 
 	world->_worldScript->onActivityCheck(curtime+300);
 
@@ -1758,8 +1758,9 @@ void World::World_Midnight_Check( World * world )
         world->SendGuankaActAward();
     if(bTYSSEnd)
     {
-        world->GObject::World::SendTYSSPlayerAward();
-        world->GObject::World::SendTYSSClanAward();
+        UInt8 actType = getTYSSTime(300);
+        world->GObject::World::SendTYSSPlayerAward(actType);
+        world->GObject::World::SendTYSSClanAward(actType);
     }
     if(bWCTimeEnd)
         world->SendWorldCupAward();
@@ -5116,7 +5117,7 @@ void World::SendGuankaActAward()
     }
 }
 
-void World::SendTYSSClanAward()
+void World::SendTYSSClanAward(UInt8 actType)
 {
     World::initRCRank();
         
@@ -5129,20 +5130,20 @@ void World::SendTYSSClanAward()
         ++pos;
         if(pos == 1 || pos == 2 || pos == 3)
             i->clan->sendMemberBuf(pos);
-        if(i->total >= 3000)
+        if(i->total >= 2000)
         {
-            i->clan->SendClanMemberAward(i->total,1,"幼年期神兽"); 
-            if(i->total >= 19000)
+            i->clan->SendClanMemberAward(i->total,1,"幼年期神兽",actType); 
+            if(i->total >= 14000)
             {
-                i->clan->SendClanMemberAward(i->total,2,"成长期神兽"); 
-                if(i->total >= 40000)
+                i->clan->SendClanMemberAward(i->total,2,"成长期神兽",actType); 
+                if(i->total >= 23000)
                 {
-                    i->clan->SendClanMemberAward(i->total,3,"青年期神兽"); 
-                    if(i->total >= 70000)
+                    i->clan->SendClanMemberAward(i->total,3,"青年期神兽",actType); 
+                    if(i->total >= 46000)
                     {
-                        i->clan->SendClanMemberAward(i->total,4,"亚神兽期"); 
-                        if(i->total >= 100000)
-                            i->clan->SendClanMemberAward(i->total,5,"天元神兽"); 
+                        i->clan->SendClanMemberAward(i->total,4,"亚神兽期",actType); 
+                        if(i->total >= 70000)
+                            i->clan->SendClanMemberAward(i->total,5,"天元神兽",actType); 
                     }
                 }
             }
@@ -5152,7 +5153,7 @@ void World::SendTYSSClanAward()
     return;
 }
 
-void World::SendTYSSPlayerAward()
+void World::SendTYSSPlayerAward(UInt8 actType)
 {
     World::initRCRank();
     int pos = 1;
@@ -5163,21 +5164,52 @@ void World::SendTYSSPlayerAward()
         {{134,20},{1325,20},{515,15},{9075,10}},
         {{134,15},{1325,15},{515,10},{9075,8}},
     };
+    static MailPackage::MailItem s_item1[][4] = {
+        {{16001,30},{9498,30},{515,25},{9075,25}},
+        {{16001,25},{9498,25},{515,20},{9075,20}},
+        {{16001,20},{9498,20},{515,15},{9075,15}},
+        {{16001,15},{9498,15},{515,10},{9075,10}},
+    };
     SYSMSG(title, 946);
     for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
     {
-        //UInt32 score = i->total;
+        UInt32 score = i->total;
+        if(score >= 20000)
+            udpLog("tianyuanshenshou", "F_140224_15", "", "", "", "", "act");
+        if(score >= 10000)
+            udpLog("tianyuanshenshou", "F_140224_14", "", "", "", "", "act");
+        if(score >= 5000)
+            udpLog("tianyuanshenshou", "F_140224_13", "", "", "", "", "act");
+        if(score >= 2000)
+            udpLog("tianyuanshenshou", "F_140224_12", "", "", "", "", "act");
+        if(score >= 1000)
+            udpLog("tianyuanshenshou", "F_140224_11", "", "", "", "", "act");
+        if(score >= 500)
+            udpLog("tianyuanshenshou", "F_140224_10", "", "", "", "", "act");
+        if(score >= 300)
+            udpLog("tianyuanshenshou", "F_140224_9", "", "", "", "", "act");
+        if(score >= 100)
+            udpLog("tianyuanshenshou", "F_140224_8", "", "", "", "", "act");
+
         str = i->player->getName();
         if(pos >= 1 && pos < 8)     //奖励前7名
         {
             int type = pos > 3 ? 4 : pos;
             SYSMSGV(content, 951, pos);
-            MailItemsInfo itemsInfo(s_item[type-1], Activity, 4);
+	        MailPackage::MailItem *items;
+            if(actType == 1)
+                items = s_item[type-1]; 
+            else
+                items = s_item1[type-1]; 
+            MailItemsInfo itemsInfo(items, Activity, 4);
             Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
             if(mail)
-                mailPackageManager.push(mail->id, s_item[type-1], 4, true);
+                mailPackageManager.push(mail->id, items, 4, true);
         }        
         pos++;
+        udpLog("tianyuanshenshou", "F_140224_7", "", "", "", "", "act");
+        if(actType == 2)
+            i->player->sendTYSSBuf();
         
     }
     return;

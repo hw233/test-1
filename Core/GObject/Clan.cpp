@@ -480,14 +480,24 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
         UInt32 buffData1 = leader->getBuffData(PLAYER_BUFF_CLAN1);
         UInt32 buffData2 = leader->getBuffData(PLAYER_BUFF_CLAN2);
         UInt32 buffData3 = leader->getBuffData(PLAYER_BUFF_CLAN3);
+        UInt32 buffData11 = leader->getBuffData(PLAYER_BUFF_NEW_CLAN1);
+        UInt32 buffData22 = leader->getBuffData(PLAYER_BUFF_NEW_CLAN2);
+        UInt32 buffData33 = leader->getBuffData(PLAYER_BUFF_NEW_CLAN3);
         if(buffData1 > 0)
             player->setBuffData(PLAYER_BUFF_CLAN1, buffData1);
         else if(buffData2 > 0)
             player->setBuffData(PLAYER_BUFF_CLAN2, buffData2);
         else if(buffData3 > 0)
             player->setBuffData(PLAYER_BUFF_CLAN3, buffData3);
+        
+        if(buffData11 > 0)
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN1, buffData1);
+        else if(buffData22 > 0)
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN2, buffData2);
+        else if(buffData33 > 0)
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN3, buffData3);
 
-        if(buffData1 > 0 || buffData2 > 0 || buffData3 > 0)
+        if(buffData1 > 0 || buffData2 > 0 || buffData3 > 0 || buffData11 > 0 || buffData22 > 0 || buffData33 > 0)
             player->rebuildBattleName();
     }
     player->SetVar(VAR_CLANBOSS_CLANBIGBOSS_LIMIT,1);
@@ -534,14 +544,24 @@ bool Clan::join(ClanMember * cm)
         UInt32 buffData1 = leader->getBuffData(PLAYER_BUFF_CLAN1);
         UInt32 buffData2 = leader->getBuffData(PLAYER_BUFF_CLAN2);
         UInt32 buffData3 = leader->getBuffData(PLAYER_BUFF_CLAN3);
+        UInt32 buffData11 = leader->getBuffData(PLAYER_BUFF_NEW_CLAN1);
+        UInt32 buffData22 = leader->getBuffData(PLAYER_BUFF_NEW_CLAN2);
+        UInt32 buffData33 = leader->getBuffData(PLAYER_BUFF_NEW_CLAN3);
         if(buffData1 > 0)
             player->setBuffData(PLAYER_BUFF_CLAN1, buffData1);
         else if(buffData2 > 0)
             player->setBuffData(PLAYER_BUFF_CLAN2, buffData2);
         else if(buffData3 > 0)
             player->setBuffData(PLAYER_BUFF_CLAN3, buffData3);
+        
+        if(buffData11 > 0)
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN1, buffData1);
+        else if(buffData22 > 0)
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN2, buffData2);
+        else if(buffData33 > 0)
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN3, buffData3);
 
-        if(buffData1 > 0 || buffData2 > 0 || buffData3 > 0)
+        if(buffData1 > 0 || buffData2 > 0 || buffData3 > 0 || buffData11 > 0 || buffData22 > 0 || buffData33 > 0)
             player->rebuildBattleName();
     }
 
@@ -675,6 +695,22 @@ bool Clan::kick(Player * player, UInt64 pid)
     if(kicker->getBuffData(PLAYER_BUFF_CLAN3) > 0)
     {
         kicker->setBuffData(PLAYER_BUFF_CLAN3, 0);
+        kicker->rebuildBattleName();
+    }
+    
+    if(kicker->getBuffData(PLAYER_BUFF_NEW_CLAN1) > 0)
+    {
+        kicker->setBuffData(PLAYER_BUFF_NEW_CLAN1, 0);
+        kicker->rebuildBattleName();
+    }
+    if(kicker->getBuffData(PLAYER_BUFF_NEW_CLAN2) > 0)
+    {
+        kicker->setBuffData(PLAYER_BUFF_NEW_CLAN2, 0);
+        kicker->rebuildBattleName();
+    }
+    if(kicker->getBuffData(PLAYER_BUFF_NEW_CLAN3) > 0)
+    {
+        kicker->setBuffData(PLAYER_BUFF_NEW_CLAN3, 0);
         kicker->rebuildBattleName();
     }
 
@@ -830,6 +866,22 @@ bool Clan::leave(Player * player)
     if(player->getBuffData(PLAYER_BUFF_CLAN3) > 0)
     {
         player->setBuffData(PLAYER_BUFF_CLAN3, 0);
+        player->rebuildBattleName();
+    }
+    
+    if(player->getBuffData(PLAYER_BUFF_NEW_CLAN1) > 0)
+    {
+        player->setBuffData(PLAYER_BUFF_NEW_CLAN1, 0);
+        player->rebuildBattleName();
+    }
+    if(player->getBuffData(PLAYER_BUFF_NEW_CLAN2) > 0)
+    {
+        player->setBuffData(PLAYER_BUFF_NEW_CLAN2, 0);
+        player->rebuildBattleName();
+    }
+    if(player->getBuffData(PLAYER_BUFF_NEW_CLAN3) > 0)
+    {
+        player->setBuffData(PLAYER_BUFF_NEW_CLAN3, 0);
         player->rebuildBattleName();
     }
 
@@ -5564,7 +5616,7 @@ void Clan::DuoBaoBroadcast(Stream& st)
 	}
 }
 
-void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str)
+void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str,UInt8 actType)
 {
     Mutex::ScopedLock lk(_mutex);
 	Members::iterator it = _members.begin();
@@ -5577,6 +5629,18 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str)
         {{134,3},{549,1},{9338,3},{513,3},{0,0}},
         {{9076,3},{509,3},{549,1},{515,3},{9418,3}},
     };
+    static MailPackage::MailItem s_item1[][5] = {
+        {{503,3},{514,3},{9371,5},{15,5},{0,0}},
+        {{512,3},{517,3},{500,3},{516,3},{0,0}},
+        {{501,3},{547,3},{9498,3},{1325,2},{0,0}},
+        {{134,3},{16001,3},{9457,3},{513,3},{0,0}},
+        {{5026,1},{5005,1},{5055,1},{5035,1},{0,0}},
+    };
+    MailPackage::MailItem *items;
+    if(actType == 1)
+        items = s_item[flag]; 
+    else
+        items = s_item1[flag]; 
 
     SYSMSG(title, 948);
     for (; it != _members.end(); ++it)
@@ -5585,10 +5649,10 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str)
         if( player == NULL )
             continue ; 
         SYSMSGV(content, 949, str.c_str());
-        MailItemsInfo itemsInfo(s_item[flag], Activity, 5);
+        MailItemsInfo itemsInfo(items, Activity, 5);
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
-            mailPackageManager.push(mail->id, s_item[flag], 5, true);
+            mailPackageManager.push(mail->id, items, 5, true);
 	}
 
 
@@ -5710,15 +5774,29 @@ void Clan::sendMemberBuf(UInt8 pos)
             continue;
         if(pos == 1)
         {
-            pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
+            UInt32 server_id = (UInt32)cfg.serverNo;
+            if(cfg.serverNo == 467 || cfg.serverNo == 468)
+                pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
+            else
+                pl->setBuffData(PLAYER_BUFF_NEW_CLAN1, endTime);
             //addClanTitle(1, 0, pl);
             if(pl->isOnline())
                 pl->notifyClanTitle();
         }
         else if(pos == 2)
-            pl->setBuffData(PLAYER_BUFF_CLAN2, endTime);
+        {
+            if(cfg.serverNo == 467 || cfg.serverNo == 468)
+                pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
+            else
+                pl->setBuffData(PLAYER_BUFF_NEW_CLAN2, endTime);
+        }
         else
-            pl->setBuffData(PLAYER_BUFF_CLAN3, endTime);
+        {
+            if(cfg.serverNo == 467 || cfg.serverNo == 468)
+                pl->setBuffData(PLAYER_BUFF_CLAN1, endTime);
+            else
+                pl->setBuffData(PLAYER_BUFF_NEW_CLAN3, endTime);
+        }
 
         pl->rebuildBattleName();
         SYSMSG(title, 947);

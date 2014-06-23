@@ -3258,7 +3258,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         break;
         case 0x31:
         {
-            if(!World::getTYSSTime())
+            UInt8 actType = World::getTYSSTime(); 
+            if(!actType)
                 return;
             UInt8 op = 0;
             UInt8 flag = 0;

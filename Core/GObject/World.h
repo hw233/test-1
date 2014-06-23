@@ -1057,18 +1057,18 @@ public:
             return false;
     }
 
-    inline static bool getTYSSTime(UInt32 time = 0)
+    inline static UInt8 getTYSSTime(UInt32 time = 0)
     {
         UInt32 begin = GVAR.GetVar(GVAR_TYSS_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_TYSS_END);
         UInt32 now = TimeUtil::Now() + time;
         if ((now > getOpenTime() + 7 * 86400) && (now  < getOpenTime() + 14 * 86400) )
-            return true;
+            return 2;
 
         if(now >= begin && now <= end)
-            return true;
+            return 1;
         else
-            return false;
+            return 0;
     } 
 
     inline static bool getGuankaAct(UInt32 time = 0)
@@ -1520,8 +1520,8 @@ public:
     void SendHappyFireAward();
     void SendWorldCupAward();
     void SendGuankaActAward();
-    void SendTYSSClanAward();
-    void SendTYSSPlayerAward();
+    void SendTYSSClanAward(UInt8);
+    void SendTYSSPlayerAward(UInt8);
     static void SendAllAnswerEnd();
     static void SendAnswerAward();
 
