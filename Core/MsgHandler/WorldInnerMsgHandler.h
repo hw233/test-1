@@ -3158,6 +3158,7 @@ void OnWorldCupRank ( GameMsgHdr& hdr,  const void* data )
     MSG_QUERY_PLAYER(player);
  
     UInt32 total = *((UInt32*)data);
+    total = player->GetVar(VAR_WORLDCUP_RES);
     if (!total)
         return;
 

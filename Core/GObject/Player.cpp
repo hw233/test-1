@@ -33566,7 +33566,12 @@ void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
     for(UInt8 i =0 ; i< 6;i++)
     {
         if(WCGrade < gradeAward[i] &&( WCGrade + grade) >=gradeAward[i])
-            SendWCGradeAward(i+1);
+        {
+            if(World::getWorldCupTime())
+                SendWCGradeAward(i+1);
+            else if(World::getWorldCupTime2())
+                SendWCGradeAward2(i+1);
+        }
     }
     AddVar(VAR_WORLDCUP_RES,grade);
     //AddVar(VAR_11AIRBOOK_GRADE_DAY,grade);
@@ -33612,10 +33617,53 @@ void Player::SendWCGradeAward(UInt8 type)
     sprintf(str, "F_130926_%d",type);
     udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 }
+void Player::SendWCGradeAward2(UInt8 type)
+{
+    if(type > 6 || type == 0 )
+        return ;
+    static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
+    static MailPackage::MailItem s_item[][6] = {
+        {{503,3},{500,3},{512,3},{505,3}},
+        {{503,3},{516,3},{9424,3},{9418,3}},
+        {{9498,10},{517,10},{1126,10},{9457,8}},
+        {{9457,20},{16001,20},{515,20},{9438,20},{9068,5}},
+        {{1733,1},{9498,50},{515,30},{501,50},{9076,25}},
+        {{9022,20},{9075,20},{9076,20}},
+    };
+    static UInt32 count[] = {4,4,4,5,5,3};
+    SYSMSG(title, 5153);
+    if(type)
+    {
+        SYSMSGV(content, 5154,gradeAward[type-1]);
+        Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+                mailPackageManager.push(mail->id, s_item[type-1], count[type-1], true);
+        }
+        std::string strItems;
+        for(UInt8 index = 0; index < count[type-1]; ++ index)
+        {
+            strItems += Itoa(s_item[type-1][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[type-1][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+    }
+    char str[16] = {0};
+    sprintf(str, "F_130926_%d",type);
+    udpLog("tianshuqiyuan", str, "", "", "", "", "act");
+}
 UInt8 Player::supportWorldCup(UInt8 num ,UInt8 res, UInt32 number)
 {
     if( num >= WC_MAX_COUNT)
         return 1;
+    if( num <=48 && !World::getWorldCupTime())
+        return 1;
+    if( num > 48 && !World::getWorldCupTime2())
+        return 1;
+
     if(worldCupInfo[num].support == 0 && res != 0)
        worldCupInfo[num].support = res ; 
     if(worldCupInfo[num].support != res)

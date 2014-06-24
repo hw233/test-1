@@ -843,7 +843,7 @@ namespace GObject
         std::map<UInt8,std::vector<UInt8> > cubeCover; 
         PictureInfo():floor(1){} 
     };
-#define WC_MAX_COUNT 48
+#define WC_MAX_COUNT 63
     struct WorldCup
     {
         UInt8  support; 
@@ -1215,6 +1215,7 @@ namespace GObject
 		void Reconnect();
         void AddWorldCupScore(UInt32 grade ,UInt8 flag = 0);
         void SendWCGradeAward(UInt8 type);
+        void SendWCGradeAward2(UInt8 type);
         UInt8 supportWorldCup(UInt8 num ,UInt8 res , UInt32 number);
         void sendMyWorldCupInfo();
         void setMyWorldCupInfo(UInt8 num , UInt8 res ,UInt32 count , UInt32 time)

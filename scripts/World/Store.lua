@@ -122,7 +122,7 @@ function loadStore()
     end
     store:add(2 ,9457 ,20)
 
-    if  getWorldCupTime(300) then
+    if  getWorldCupTime(30) then
         store:add(2 ,16017 ,20)
     end
     store:add(2,16012,10)
