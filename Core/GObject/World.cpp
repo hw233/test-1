@@ -3669,7 +3669,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::LuckyBagSort.insert(s);
         }
     }
-    if (World::getWorldCupTime())
+    if (World::getWorldCupTime() || World::getWorldCupTime2())
     {
         UInt32 used = p->GetVar(VAR_WORLDCUP_RES);
         if (used)
