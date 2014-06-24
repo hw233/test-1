@@ -1885,9 +1885,9 @@ inline bool player_enum_AskOldMan(GObject::Player * p, int)
     }
     return true;
 }
-inline bool player_enum_clearVar599(GObject::Player * p, int)
+inline bool player_enum_clearVar746(GObject::Player * p, int)
 {
-    p->SetVar(VAR_11AIRBOOK_GRADE,0);
+    p->SetVar(VAR_WORLDCUP_RES,0);
     return true;
 }
 
@@ -5326,7 +5326,7 @@ void World::SendWorldCupAward()
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
     }
     worldCupSort.clear();
-    GObject::globalPlayers.enumerate(player_enum_clearVar599, 0);
+    GObject::globalPlayers.enumerate(player_enum_clearVar746, 0);
 }
 void World::SendWorldCupAward2()
 {
