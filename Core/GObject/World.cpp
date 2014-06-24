@@ -5340,7 +5340,7 @@ void World::SendWorldCupAward2()
         {{515,12},{9498,12},{9600,12},{9075,5}},
         {{515,12},{9498,12},{9600,12},{9075,5}},
     };
-    static MailPackage::MailItem card = {9979,1};   //暂无白马王子
+    static MailPackage::MailItem card = {9982,1};   //大头称号
 
     SYSMSG(title, 5151);
     int pos = 0;
