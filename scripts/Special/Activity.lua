@@ -9606,7 +9606,7 @@ end
 
 --欢乐爆竹掉落
 function WorldCupLoot(player,lootlvl)
-   if not ( getWorldCupTime() and getWorldCupTime() )then
+   if not ( getWorldCupTime() and getWorldCupTime2() )then
        return
    end
     if lootlvl > 3 then
