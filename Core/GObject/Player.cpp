@@ -33815,6 +33815,12 @@ void Player::getXXLAward(UInt8 type)
     Award |= (1 << type);
     SetVar(VAR_HAPPY_XXL_AWARD,Award);
     sendHappyXXLInfo();
+    if(type == 4)
+    {
+        char str[16] = {0};
+        sprintf(str, "F_140627_3");
+        udpLog("mofumizhen", str, "", "", "", "", "act");
+    }
 }
 void Player::buyXXLCount()
 {
@@ -33827,6 +33833,9 @@ void Player::buyXXLCount()
     AddVar(VAR_HAPPY_XXL_BUYNUM,1);
     AddVar(VAR_HAPPY_XXL_BUYCOUNT,10);
     sendHappyXXLInfo();
+    char str[16] = {0};
+    sprintf(str, "F_140627_1");
+    udpLog("mofumizhen", str, "", "", "", "", "act");
 }
 void Player::UpdateXXLToDB(UInt8 num)
 {
