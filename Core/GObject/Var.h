@@ -733,6 +733,10 @@ namespace GObject
         VAR_TREE_VALUE_DAY = 744 ,    //今日被邀请获得的木片数
         VAR_TOOL_CNT = 745 ,    //当前欧耶精粹数量
         VAR_WORLDCUP_RES = 746 ,    //世界杯积分
+        VAR_ZIYUN_KUANG = 747 ,  //紫云矿
+        VAR_ZIYUN_MU = 748 ,     //紫云木
+        VAR_ZIYUN_PAI = 749 ,    //紫云牌
+        VAR_ZIYUN_LIANFU = 750 , //紫云炼符
 
 
 
@@ -779,6 +783,13 @@ namespace GObject
         VAR_AUTO_TEAMCOPY_TEMP_CNT = 802,        //自动组队副本已经打过的副本怪物数量
 
         //811-830 for libo
+        VAR_HAPPY_XXL_DAYCOUNT = 811 , //快乐消消乐 每日赠送(最大20)
+        VAR_HAPPY_XXL_BUYCOUNT = 812 , //快乐消消乐 购买获得
+        VAR_HAPPY_XXL_BUYNUM = 813 , //快乐消消乐 当日购买次数
+        VAR_HAPPY_XXL_AWARD = 814 , //快乐消消乐 每日奖励领取情况
+        VAR_HAPPY_XXL_SCORE = 815 , //快乐消消乐 每日积分
+        VAR_HAPPY_XXL_PAGE = 816 , //快乐消消乐 编号
+
         VAR_11AIRBOOK_AWARDSCORE = 817,  
             
         VAR_MAX,
@@ -1476,6 +1487,13 @@ namespace GObject
             REGISTER_VAR(VAR_ERLKING_BUY_PASS_NUM_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_ERLKING_BUY_PASS_TOTAL_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_ERLKING_USE_FREE_NUM_DAY, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_HAPPY_XXL_DAYCOUNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_HAPPY_XXL_BUYCOUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_HAPPY_XXL_BUYNUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_HAPPY_XXL_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_HAPPY_XXL_SCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_HAPPY_XXL_PAGE, CYCLE_NONE);
             REGISTER_VAR(VAR_11AIRBOOK_AWARDSCORE, CYCLE_NONE);
         }
 

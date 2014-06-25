@@ -953,6 +953,9 @@ namespace GObject
         m_autoTeamCopyCurCnt = 0;
         m_autoTeamCopyCurIndex = 0;*/
         memset(&worldCupInfo, 0, sizeof(worldCupInfo));
+        xxlMapInfo[0]="";
+        xxlMapInfo[1]="";
+        xxlMapInfo[2]="";
     }
 
 
@@ -33725,6 +33728,154 @@ void Player::UpdateWorldCupToDB(UInt8 num)
         return ;
     DB1().PushUpdateData("REPLACE INTO `worldCup`(`playerId`, `num`, `count1`,`count2`,`count3`, `result`) VALUES(%" I64_FMT "u, %d, %u,%u,%u , %u)", getId(), num , worldCupInfo[num].supportNum ,worldCupInfo[num].supportTime , 0 , worldCupInfo[num].support);
     
+}
+void Player::getXXLScore(UInt8 type ,UInt8 count)
+{
+   static UInt8 Award[][4][4] = {
+       {{1,1,1,1},{2,2,2,2},{5,5,5,5},{6,6,6,6}},
+       {{1,1,1,1},{2,2,2,2},{5,5,5,5},{6,6,6,6}},
+       {{1,1,1,1},{2,2,2,2},{5,5,5,5},{6,6,6,6}},
+   };
+   static UInt8 Score[]= { 10,20,50,60};
+   if(type > 2)
+       return ;
+   if(count < 3 )
+       return ;
+
+   if(count > 6)
+       count = 6;
+   UInt32 div1 = Award[type][count-3][1] - Award[type][count-3][0] + 1;
+   UInt32 div2 = Award[type][count-3][3] - Award[type][count-3][2] + 1;
+   UInt8 count1 = uRand(10000) / (10000/div1 + 1) ;
+   UInt8 count2 = uRand(10000) / (10000/div2 + 1) ;
+   AddVar(VAR_HAPPY_XXL_SCORE , Score[count - 3]);
+   AddVar(VAR_ZIYUN_LIANFU , Award[type][count-3][0] + count1);
+   AddVar(VAR_ZIYUN_KUANG + type , Award[type][count-3][2] + count2);
+}
+UInt8 Player::setXXLMapInfo(UInt8 step ,UInt8 type , std::string mapInfo , UInt8 flag)
+{
+    if(type > 2)    
+        return 1;
+    UInt32 goldUse = 0;
+    if(flag == 2)
+    {
+        goldUse = 30 ;
+        if (getGold() < goldUse)
+            return 3;
+    }
+    if(!subXXLCount(step))
+        return 2;
+
+    ConsumeInfo ci(MOFUMIZHEN1,0,0);
+    useGold(goldUse, &ci);
+    xxlMapInfo[type] = mapInfo;
+    if(flag)
+        getWrapKey()->InitTheKey(100,9900);
+    //sendHappyXXLInfo();
+    UpdateXXLToDB(type);
+    return 0;
+}
+void Player::sendHappyXXLInfo()
+{
+    Stream st(REP::ACTIVE) ;
+    st << static_cast<UInt8>(0x34);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt32>(20 + GetVar(VAR_HAPPY_XXL_BUYCOUNT) - GetVar(VAR_HAPPY_XXL_DAYCOUNT));
+    st << static_cast<UInt8>(GetVar(VAR_HAPPY_XXL_BUYNUM) );
+    st << static_cast<UInt32>(GetVar(VAR_ZIYUN_KUANG));
+    st << static_cast<UInt32>(GetVar(VAR_ZIYUN_MU));
+    st << static_cast<UInt32>(GetVar(VAR_ZIYUN_PAI));
+    st << static_cast<UInt32>(GetVar(VAR_ZIYUN_LIANFU));
+    st << static_cast<UInt32>(GetVar(VAR_HAPPY_XXL_SCORE));
+    st << static_cast<UInt8>(GetVar(VAR_HAPPY_XXL_AWARD));
+    st << static_cast<UInt32>(getWrapKey()->wrapTheKey());
+    st << Stream::eos;
+    send(st);
+}
+void Player::sendXXLMapInfo(UInt8 res ,UInt8 type)
+{
+    Stream st(REP::ACTIVE) ;
+    st << static_cast<UInt8>(0x34);
+    st << static_cast<UInt8>(0x02);
+    st << static_cast<UInt8>(res);
+    st << static_cast<UInt8>(type);
+    st << static_cast<UInt8>(GetVar(VAR_HAPPY_XXL_PAGE));
+    st << static_cast<UInt8>(3);
+    for(UInt8 i = 0; i < 3;++i)
+    {
+        st <<  static_cast<UInt8>(i); 
+        st << xxlMapInfo[i];
+    }
+    st << Stream::eos;
+    send(st);
+}
+UInt8 Player::subXXLCount(UInt8 step)
+{
+    if(step == 0)
+        return 1;
+    UInt32 stepFree = GetVar(VAR_HAPPY_XXL_DAYCOUNT) ;
+    if(stepFree > 20)
+        return 0;
+    if( (20 - stepFree) < step)
+    {
+        UInt32 need = step + stepFree - 20 ;
+        UInt32 stepBuy = GetVar(VAR_HAPPY_XXL_BUYCOUNT);
+        if( need > stepBuy)
+            return 0;
+        SetVar(VAR_HAPPY_XXL_DAYCOUNT,20);
+        SetVar(VAR_HAPPY_XXL_BUYCOUNT,stepBuy - need );
+    }
+    else
+    {
+       AddVar(VAR_HAPPY_XXL_DAYCOUNT,step);
+    }
+    return 1;
+}
+void Player::getXXLAward(UInt8 type)
+{
+    static UInt8 ScoreAward[][4] = {
+        {0,0,0,4},
+        {10,0,0,0},
+        {0,20,0,0},
+        {0,0,40,0},
+        {70,0,0,0}
+    };
+    static UInt32 Score[] = {200,500,1000,2000,3000};
+    
+    if(type > 4)
+        return ;
+    UInt32  Award = GetVar(VAR_HAPPY_XXL_AWARD);
+    if(Award & (1 << type))
+        return ;
+    UInt32 myScore = GetVar(VAR_HAPPY_XXL_SCORE);
+    if(myScore < Score[type])
+        return ;
+    for(UInt8 i = 0; i < 4 ; ++ i )
+    {
+        AddVar(VAR_ZIYUN_KUANG+i,ScoreAward[type][i]);
+    }
+    Award |= (1 << type);
+    SetVar(VAR_HAPPY_XXL_AWARD,Award);
+    sendHappyXXLInfo();
+}
+void Player::buyXXLCount()
+{
+    UInt32 buyCount = GetVar(VAR_HAPPY_XXL_BUYNUM) ;
+    UInt32 cost = GameAction()->getXXLCost(this,buyCount+1);
+    if (getGold() < cost)
+        return ;
+    ConsumeInfo ci(MOFUMIZHEN2,0,0);
+    useGold(cost, &ci);
+    AddVar(VAR_HAPPY_XXL_BUYNUM,1);
+    AddVar(VAR_HAPPY_XXL_BUYCOUNT,10);
+    sendHappyXXLInfo();
+}
+void Player::UpdateXXLToDB(UInt8 num)
+{
+    if(num >= 3)
+        return ;
+    DB1().PushUpdateData("REPLACE INTO `happyXXL`(`playerId`,`num`, `map`) VALUES(%" I64_FMT "u, %d, '%s')", getId(), num ,xxlMapInfo[num].c_str() );
+
 }
 
 } // namespace GObject
