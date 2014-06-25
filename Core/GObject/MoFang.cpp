@@ -1821,13 +1821,8 @@ void MoFang::makeGear(UInt16 gearId, UInt8 mark)
     GData::JiguanData::gearInfo* gearInfo = GData::jiguanData.getGearInfo(gearId);
     if(!gearInfo)
         return;
+   
     
-    /*if(m_owner->GetVar(VAR_A)<gearInfo->ZYKNum
-            || m_owner->GetVar(VAR_A)<gearInfo->ZYMNum
-            || m_owner->GetVar(VAR_A)<gearInfo->ZYSNum
-            ||  m_owner->GetVar(VAR_A)<gearInfo->ZYLFNum)
-        return;*/
-
     if(m_owner->getTael() < gearInfo->taelNum)
     {
         m_owner->sendMsgCode(0, 1100);
@@ -1851,9 +1846,25 @@ void MoFang::makeGear(UInt16 gearId, UInt8 mark)
             return;
     }
 
+    UInt32 zyk = m_owner->GetVar(VAR_ZIYUN_KUANG);
+    UInt32 zym = m_owner->GetVar(VAR_ZIYUN_MU);
+    UInt32 zys = m_owner->GetVar(VAR_ZIYUN_PAI);
+    UInt32 zylf = m_owner->GetVar(VAR_ZIYUN_LIANFU);
+
+    if(zyk<gearInfo->ZYKNum
+            || zym<gearInfo->ZYMNum
+            || zys<gearInfo->ZYSNum
+            || zylf<gearInfo->ZYLFNum)
+        return;
+
+    m_owner->SetVar(VAR_ZIYUN_KUANG, (zyk-gearInfo->ZYKNum));
+    m_owner->SetVar(VAR_ZIYUN_MU, (zym-gearInfo->ZYMNum));
+    m_owner->SetVar(VAR_ZIYUN_PAI, (zys-gearInfo->ZYSNum));
+    m_owner->SetVar(VAR_ZIYUN_LIANFU, (zylf-gearInfo->ZYLFNum));
+
     ConsumeInfo ci(MakeGear, 0, 0);
     m_owner->useTael(gearInfo->taelNum, &ci);
-   
+
     if(GEAR_COMMON == mark)
         m_commonGear.push_back(gearId);
     else

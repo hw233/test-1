@@ -764,6 +764,11 @@ namespace GObject
             fprintf(stderr, "loadWorldCup error!\n");
             std::abort();
         }
+		if(!loadHappyXXL())
+        {
+            fprintf(stderr, "loadHappyXXL error!\n");
+            std::abort();
+        }
 
         if(!loadSkillGrade())
         {
@@ -7989,6 +7994,28 @@ namespace GObject
             if(dbpn.count3 != 0 )
                 continue ;
             pl->setMyWorldCupInfo(dbpn.num , dbpn.result , dbpn.count1 , dbpn.count2);
+        }
+		lc.finalize();
+		return true;
+    }
+    bool GObjectManager::loadHappyXXL()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading WorldCup:");
+		DBHappyXXL dbpn;
+		if(execu->Prepare("SELECT `playerId` ,`num`, `map` FROM `happyXXL` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+		    Player* pl = globalPlayers[dbpn.playerId];
+			if(pl == NULL)
+				continue;
+            if(dbpn.num > 2)
+                continue;
+            pl->setXXLMapInfo(0,dbpn.num ,dbpn.map);
         }
 		lc.finalize();
 		return true;

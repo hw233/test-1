@@ -1152,6 +1152,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendPictureInfo();
     }
+    {
+      //  pl->sendHappyXXLInfo();
+      //  pl->sendXXLMapInfo();
+    }
     if(!pl->GetVar(VAR_ONCE_ONDAY))
     {
         pl->sendNovLoginInfo();
@@ -9249,6 +9253,77 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     player->sendMyWorldCupInfo();
                 }
                 break;
+            }
+            break;
+        }
+    case 0x34:
+        {
+            UInt8 op = 0;
+            brd >> op;
+            switch(op)
+            {
+                case 0x01:
+                    {
+                        player->sendHappyXXLInfo();
+                        break;
+                    }
+                case 0x02:
+                {
+                    UInt8 index = 0;
+                    brd >> index ;
+                    if(index == 0 )
+                    {
+                        player->sendXXLMapInfo();
+                    }
+                    else
+                    {
+                        UInt32 key = 0;
+                        brd >> key;
+                        UInt8 step = 0;
+                        brd >> step ;
+                        UInt8 type = 0;
+                        brd >> type ;
+                        UInt8 count = 0;
+                        brd >> count;
+                        std::string mapInfo ;   
+                        brd >> mapInfo;
+                        UInt8 res = 1;
+                        if(player->getWrapKey()->checkTheKey(key))
+                        {
+                            player->SetVar(VAR_HAPPY_XXL_PAGE,type);
+                            res = player->setXXLMapInfo(step , type , mapInfo , index);
+                            if(!res)
+                            {
+                                if(count != 25)
+                                {
+                                    player->getXXLScore(type,count);
+                                }
+                                else
+                                {
+                                    for(UInt8 i = 0; i < 5 ; ++i) 
+                                        player->getXXLScore(type,5);
+
+                                }
+
+                            }
+                        }
+                        player->sendXXLMapInfo(res,index);
+                        player->sendHappyXXLInfo();
+                    }
+                    break;
+                }
+                case 0x03:
+                {
+                    player->buyXXLCount();
+                    break;
+                }
+                case 0x05:
+                {
+                    UInt8 option = 0;
+                    brd >> option;
+                    player->getXXLAward(option);
+                    break;
+                }
             }
         }
     default:

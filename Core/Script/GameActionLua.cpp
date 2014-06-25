@@ -1945,5 +1945,10 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt32>("getWorldCupLimitTime", player, opt);
 	}
+    UInt32 GameActionLua::getXXLCost(Player* player, UInt32 opt)
+	{
+		assert(player != NULL);
+		return Call<UInt32>("getXXLCost", player, opt);
+	}
 }
 
