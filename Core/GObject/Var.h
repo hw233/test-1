@@ -754,6 +754,8 @@ namespace GObject
         VAR_FIRE_SACRIFICE_ADD_WOOD_TIME = 773, //拜火祭天添柴时间
         VAR_FIRE_SACRIFICE_CALLING_TIME = 774, //拜火祭天召唤帮众时间
         VAR_DUOBAO_ACTIVE_POINT = 775, //夺宝奇兵活跃值+1(一天一点) 
+        VAR_CLAN_SHOP_CURRENT_LVL = 776, //帮贡商店当前等级
+        VAR_CLAN_SHOP_FLUSH_TIMES = 777, //帮贡商店当天刷新次数
 
         //781 - 810 for lijr
         VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
@@ -787,6 +789,8 @@ namespace GObject
         VAR_HAPPY_XXL_AWARD = 814 , //快乐消消乐 每日奖励领取情况
         VAR_HAPPY_XXL_SCORE = 815 , //快乐消消乐 每日积分
         VAR_HAPPY_XXL_PAGE = 816 , //快乐消消乐 编号
+
+        VAR_11AIRBOOK_AWARDSCORE = 817,  
             
         VAR_MAX,
     };
@@ -1462,6 +1466,8 @@ namespace GObject
             REGISTER_VAR(VAR_FIRE_SACRIFICE_CALLING_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_DUOBAO_ACTIVE_POINT, CYCLE_DAY);
             REGISTER_VAR(VAR_CUBE_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_CLAN_SHOP_CURRENT_LVL, CYCLE_NONE);
+            REGISTER_VAR(VAR_CLAN_SHOP_FLUSH_TIMES, CYCLE_DAY);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
@@ -1488,6 +1494,7 @@ namespace GObject
             REGISTER_VAR(VAR_HAPPY_XXL_AWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_HAPPY_XXL_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_HAPPY_XXL_PAGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_11AIRBOOK_AWARDSCORE, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

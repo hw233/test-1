@@ -621,12 +621,12 @@ public:
 
     inline static bool  getOldManTime()
     {
-        //UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
-        UInt32 begin1 = TimeUtil::MkTime(2014, 4, 25);
-        UInt32 end1 = TimeUtil::MkTime(2014, 4, 27);
-        //UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        //UInt32 begin1 = TimeUtil::MkTime(2014, 4, 25);
+        //UInt32 end1 = TimeUtil::MkTime(2014, 4, 27);
         UInt32 now = TimeUtil::Now() ;
-        if((now >= begin1 && now <= end1))
+        if((now >= begin && now <= end))
             return true;
         else
             return false;
@@ -640,8 +640,8 @@ public:
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 5, 17);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 5, 22);
+        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 6, 21);
+        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 6, 26);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
         UInt32 now = TimeUtil::Now() ;
@@ -1057,18 +1057,18 @@ public:
             return false;
     }
 
-    inline static bool getTYSSTime(UInt32 time = 0)
+    inline static UInt8 getTYSSTime(UInt32 time = 0)
     {
         UInt32 begin = GVAR.GetVar(GVAR_TYSS_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_TYSS_END);
         UInt32 now = TimeUtil::Now() + time;
         if ((now > getOpenTime() + 7 * 86400) && (now  < getOpenTime() + 14 * 86400) )
-            return true;
+            return 1;
 
         if(now >= begin && now <= end)
-            return true;
+            return 2;
         else
-            return false;
+            return 0;
     } 
 
     inline static bool getGuankaAct(UInt32 time = 0)
@@ -1520,8 +1520,8 @@ public:
     void SendHappyFireAward();
     void SendWorldCupAward();
     void SendGuankaActAward();
-    void SendTYSSClanAward();
-    void SendTYSSPlayerAward();
+    void SendTYSSClanAward(UInt8);
+    void SendTYSSPlayerAward(UInt8);
     static void SendAllAnswerEnd();
     static void SendAnswerAward();
 

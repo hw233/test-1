@@ -234,6 +234,7 @@ struct DBPlayerData
     std::string atohicfg;
     std::string openid;
     std::string canHirePet;
+    std::string clanShopItems;
 };
 
 struct DBHoneyFall
@@ -1765,7 +1766,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(64)
+SPECIALDEF(65)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1830,7 +1831,8 @@ SPECIALDEF(64)
     UInt8,  pdata.dungeonCnt1,
 	UInt8, pdata.xjfrontFreeCnt,
 	UInt8, pdata.xjfrontGoldCnt,
-	UInt32, pdata.xjfrontUpdate
+	UInt32, pdata.xjfrontUpdate,
+    std::string, clanShopItems
     )
 SPECIALEND()
 

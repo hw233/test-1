@@ -729,16 +729,20 @@ function RunQZoneRechargeAward(player, cts)
     end
 
     for count = 1, #item[cts] do
-        package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        if item[cts][count][1] == 499 then
+            player:getCoupon(item[cts][count][2])
+        else
+            package:Add(item[cts][count][1], item[cts][count][2], true, 0, 59);
+        end
     end
     return true
 end
 function RunInterestingAward(player, cts)
     local item = {
-        [0] = {{500,3},{9424,3},{511,3}},
-        [1] = {{501,3},{503,3},{514,3},{516,3}},
-        [2] = {{547,3},{1325,3},{551,3},{517,3}},
-        [3] = {{134,3},{509,3},{549,1},{515,3}},
+        [0] = {{505,3},{500,3},{511,3}},
+        [1] = {{501,3},{503,3},{514,3},{16005,3}},
+        [2] = {{513,3},{9338,3},{9457,3},{9600,3}},
+        [3] = {{9498,3},{9425,3},{1325,1},{515,3}},
     };
     local package = player:GetPackage();
 --    package:DelItemSendMsg(9371, player)
