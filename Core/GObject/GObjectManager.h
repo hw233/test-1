@@ -530,6 +530,7 @@ namespace GObject
 	    static bool LoadMarriedCouple();
 	    static bool LoadSevenSoul();
         static bool loadZhenwei();
+        static bool loadGear();
         static bool loadQiShiBan();
 
         static bool loadGoback();
