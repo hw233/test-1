@@ -26389,9 +26389,11 @@ void Player::Add11grade(UInt32 grade)
 
     UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,23000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
+    UInt32 value = GetVar(VAR_11AIRBOOK_AWARDSCORE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
-        if(airGrade < gradeAward[i] &&( airGrade + grade) >=gradeAward[i])
+        //if(airGrade < gradeAward[i] &&( airGrade + grade) >=gradeAward[i])
+        if(value < gradeAward[i] && ( airGrade + grade) >=gradeAward[i])
             Send11GradeAward(i+1);
     }
     AddVar(VAR_11AIRBOOK_GRADE,grade);
@@ -26435,6 +26437,12 @@ void Player::Send11GradeAward(UInt8 type)
     if(type > 11)
         return ;
     UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,23000};
+    UInt32 value = GetVar(VAR_11AIRBOOK_AWARDSCORE);
+    if(gradeAward[type-1] <= value)
+        return ;
+    else
+        SetVar(VAR_11AIRBOOK_AWARDSCORE,gradeAward[type-1]);
+
     static MailPackage::MailItem s_item[][6] = {
         {{9424,1}, {503,1}},
         {{500,2},{9497,2}},
@@ -28613,7 +28621,7 @@ void Player::getInterestingAward(UInt8 type)
 {
     if(!World::getOldManTime())
         return ;
-    UInt32 scoreReq[] = {20,40,70,90};
+    UInt32 scoreReq[] = {30,180,350,550};
     UInt32 ScoreAward = 0;
     UInt32 Score = 0;
     if(type > 3 )

@@ -780,6 +780,7 @@ namespace GObject
         VAR_GEAR_BUFF = 803,                     //机关库挂机经验buff
 
         //811-830 for libo
+        VAR_11AIRBOOK_AWARDSCORE = 817,  
             
         VAR_MAX,
     };
@@ -1477,6 +1478,7 @@ namespace GObject
             REGISTER_VAR(VAR_ERLKING_BUY_PASS_NUM_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_ERLKING_BUY_PASS_TOTAL_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_ERLKING_USE_FREE_NUM_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_11AIRBOOK_AWARDSCORE, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
