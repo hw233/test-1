@@ -631,11 +631,36 @@ public:
         else
             return false;
     } 
-    inline static bool getWorldCupTime(UInt32 time = 0)
+    inline static bool getWorldCupTime(UInt32 time = 0 )
     {
         UInt32 end1 = TimeUtil::MkTime(2014, 6, 28);
         UInt32 now = TimeUtil::Now() ;
+        UInt32 FootBallEnd = TimeUtil::MkTime(2014, 7, 14);
+        if( time == 1 )
+            return ( now + 10 ) < FootBallEnd ;
         return (now + time) < end1;
+
+       // UInt32 end2 = TimeUtil::MkTime(2014, 7, 15);
+       // UInt32 FootBallEnd = TimeUtil::MkTime(2014, 7, 14);
+       // if( time == 300 )
+       // {
+       //     if(now < end1 + time)
+       //         return (now + time) < end1;
+       //     else 
+       //         return (now + time) < end2;
+       // } 
+       // if( time == 1 )
+       //     return ( now + 10 ) < FootBallEnd ;
+       // return (now+time) < end2;
+    }
+    inline static bool getWorldCupTime2(UInt32 time = 0 )
+    {
+        UInt32 begin1 = TimeUtil::MkTime(2014, 6, 28);
+        UInt32 now = TimeUtil::Now();
+
+        UInt32 end1 = TimeUtil::MkTime(2014, 7, 15);
+
+        return ( (now+time) > begin1 && (now+time) < end1 );
     }
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
@@ -1389,7 +1414,7 @@ public:
     static bool _answerOpenB;
     static UInt32 _rbTimeRank;
     static UInt64 _worldCupAward;
-#define MAX_WC_COUNT 48
+#define MAX_WC_COUNT 63
     static UInt32 _worldCup[MAX_WC_COUNT][4];   //支持度  1-胜 2-负 3-平 4-结果 (注意标号需要-1)
 public:
     static RCSortType answerScoreSort;     //一战成名排名
@@ -1519,6 +1544,7 @@ public:
     static UInt16 GetRandomSpot();
     void SendHappyFireAward();
     void SendWorldCupAward();
+    void SendWorldCupAward2();
     void SendGuankaActAward();
     void SendTYSSClanAward(UInt8);
     void SendTYSSPlayerAward(UInt8);
