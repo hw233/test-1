@@ -33613,9 +33613,6 @@ void Player::SendWCGradeAward(UInt8 type)
         }
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
     }
-    char str[16] = {0};
-    sprintf(str, "F_130926_%d",type);
-    udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 }
 void Player::SendWCGradeAward2(UInt8 type)
 {
@@ -33651,9 +33648,6 @@ void Player::SendWCGradeAward2(UInt8 type)
         }
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
     }
-    char str[16] = {0};
-    sprintf(str, "F_130926_%d",type);
-    udpLog("tianshuqiyuan", str, "", "", "", "", "act");
 }
 UInt8 Player::supportWorldCup(UInt8 num ,UInt8 res, UInt32 number)
 {
