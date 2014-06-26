@@ -418,7 +418,7 @@ function do11Grade(player, id, param1, param2)
     local curflag = mgr:GetFlag(id);
     for i = 1, #dayTask do
         if id == dayTask[i][1]  then
-            if curflag >= dayTask[i][2] then
+            if curflag >= dayTask[i][2] or curflag >=checkFlag[id] then
                 return ;
             end
             player:Add11grade(10);

@@ -739,10 +739,10 @@ function RunQZoneRechargeAward(player, cts)
 end
 function RunInterestingAward(player, cts)
     local item = {
-        [0] = {{500,3},{9424,3},{511,3}},
-        [1] = {{501,3},{503,3},{514,3},{516,3}},
-        [2] = {{547,3},{1325,3},{551,3},{517,3}},
-        [3] = {{134,3},{509,3},{549,1},{515,3}},
+        [0] = {{505,3},{500,3},{511,3}},
+        [1] = {{501,3},{503,3},{514,3},{16005,3}},
+        [2] = {{513,3},{9338,3},{9457,3},{9600,3}},
+        [3] = {{9498,3},{9425,3},{1325,3},{515,3}},
     };
     local package = player:GetPackage();
 --    package:DelItemSendMsg(9371, player)
@@ -1294,13 +1294,11 @@ function onGetQZoneQQGameAward(player, type)
 end
 
 local QzonecontinueAwards = {
-    [1] = {{56, 1},{57, 1}},
-    [2] = {{56, 2},{57, 2}},
-    [3] = {{56, 2},{57, 2},{134, 1}},
-    [4] = {{56, 2},{57, 2},{134, 2}},
-    [5] = {{56, 2},{57, 2},{134, 2},{30, 1}},
-    [6] = {{56, 2},{57, 2},{134, 2},{30, 2}},
-    [7] = {{56, 2},{57, 2},{134, 2},{30, 2},{9076,1}},
+    [1] = {{56, 2},{57, 2}, {15, 2}, {9371, 2}},
+    [2] = {{500, 2},{503, 2},{514, 2}, {511, 2}},
+    [3] = {{512, 2},{501, 2},{516, 2},{517, 2}},
+    [4] = {{547, 2},{134, 2},{1325, 2},{515, 2}, {16001, 2}},
+    [5] = {{499, 100},{515, 3},{509, 3},{9498, 3},{9457, 3}, {9600, 3}},
 }
 
 function onGetNewYearQzoneContinueAward(player, type)
@@ -1314,12 +1312,20 @@ function onGetNewYearQzoneContinueAward(player, type)
     end
 
     local package = player:GetPackage()
-    if package:GetRestPackageSize() < #awards then
+    local needSize = #awards
+    if type == 5 then
+        needSize = needSize - 1
+    end
+    if package:GetRestPackageSize() < needSize then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
     for i = 1, #awards do
-        package:Add(awards[i][1], awards[i][2], true, false, 2)
+        if awards[i][1] == 499 then
+            player:getCoupon(awards[i][2])
+        else
+            package:Add(awards[i][1], awards[i][2], true, false, 2)
+        end
     end
     return true
 end
@@ -1909,57 +1915,68 @@ local  WorldCup={
     { ['year'] = 2014, ['month'] = 6, ['day'] = 14, ['hour'] = 2, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 14, ['hour'] = 5, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 14, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
-
     { ['year'] = 2014, ['month'] = 6, ['day'] = 15, ['hour'] = 8, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 15, ['hour'] = 2, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 15, ['hour'] = 5, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 15, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 16, ['hour'] = 2, ['min'] = 0, ['sec'] = 0 },
-
     { ['year'] = 2014, ['month'] = 6, ['day'] = 16, ['hour'] = 5, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 17, ['hour'] = 2, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 16, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 17, ['hour'] = 5, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 17, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
-
     { ['year'] = 2014, ['month'] = 6, ['day'] = 18, ['hour'] = 5, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 18, ['hour'] = 2, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 19, ['hour'] = 5, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 19, ['hour'] = 2, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 18, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
-
     { ['year'] = 2014, ['month'] = 6, ['day'] = 19, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 20, ['hour'] = 5, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 20, ['hour'] = 2, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 20, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 21, ['hour'] = 2, ['min'] = 0, ['sec'] = 0 },
-
     { ['year'] = 2014, ['month'] = 6, ['day'] = 21, ['hour'] = 5, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 21, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 22, ['hour'] = 5, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 22, ['hour'] = 2, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 23, ['hour'] = 5, ['min'] = 0, ['sec'] = 0 },
-
     { ['year'] = 2014, ['month'] = 6, ['day'] = 22, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 23, ['hour'] = 2, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 24, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 24, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 23, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
-
     { ['year'] = 2014, ['month'] = 6, ['day'] = 23, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 25, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 25, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 24, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 24, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 26, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 26, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 25, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 25, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 26, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 26, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 27, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 27, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },    --48
 
-    { ['year'] = 2014, ['month'] = 6, ['day'] = 26, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
-    { ['year'] = 2014, ['month'] = 6, ['day'] = 26, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
-    { ['year'] = 2014, ['month'] = 6, ['day'] = 25, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
-    { ['year'] = 2014, ['month'] = 6, ['day'] = 25, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
-    { ['year'] = 2014, ['month'] = 6, ['day'] = 26, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
-    { ['year'] = 2014, ['month'] = 6, ['day'] = 26, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
-    { ['year'] = 2014, ['month'] = 6, ['day'] = 27, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
-    { ['year'] = 2014, ['month'] = 6, ['day'] = 27, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 27, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 29, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 29, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 30, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 30, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 1, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 1, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 2, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },    --1/8
+
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 4, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 5, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 3, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 6, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },    --1/4
+
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 9, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 10, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },   --1/2
+
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 14, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },    --last
 }
 function getWorldCupLimitTime( player ,opt)
     if opt >= #WorldCup then 
@@ -1967,4 +1984,10 @@ function getWorldCupLimitTime( player ,opt)
     end
     return os.time(WorldCup[opt+1])
 end
-
+local HappyXXLBuyCost = { 30 ,30 ,30 ,30 ,30 ,50 ,50 ,50 ,50 ,50 ,100 ,100 ,100 ,100 ,100 ,150 ,150 ,150 ,150 ,150 ,200 ,200 ,200 ,200 ,200 }  
+function getXXLCost(player , opt)
+    if opt > 25 then
+        opt = 25
+    end
+    return HappyXXLBuyCost[opt]
+end

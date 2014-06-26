@@ -258,6 +258,10 @@ namespace GObject
             extraExp = static_cast<UInt32>(exp * 1.0f);
         }
 
+        UInt32 gearBuff = m_Player->GetVar(VAR_GEAR_BUFF);
+        if(gearBuff > 0)
+            factor += (static_cast<float>(gearBuff) / 10000.0f);
+
 		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
         //fprintf(stderr, "id: %lu => cnt: %u\n", m_Player->getId(), cnt);
         if (cnt % 10)
@@ -953,6 +957,9 @@ namespace GObject
         m_autoTeamCopyCurCnt = 0;
         m_autoTeamCopyCurIndex = 0;*/
         memset(&worldCupInfo, 0, sizeof(worldCupInfo));
+        xxlMapInfo[0]="";
+        xxlMapInfo[1]="";
+        xxlMapInfo[2]="";
     }
 
 
@@ -1167,6 +1174,7 @@ namespace GObject
         SAFE_DELETE(m_relation);
 		SAFE_DELETE(m_FairySpar);
 		SAFE_DELETE(m_moFang);
+		SAFE_DELETE(m_erlking);
 		SAFE_DELETE(m_collecCard);
 		SAFE_DELETE(_wrapKey);
 	}
@@ -21472,17 +21480,17 @@ void Player::sendNewYearQQGameAct()
 
 void Player::getNewYearQzoneContinueAward(UInt8 type)
 {
-    if(type == 0 || type > 7)
+    if(type == 0 || type > 5)
         return;
-    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
-        return;
+    //if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+    //    return;
 
     UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
     UInt16 isGet = static_cast<UInt16>(tmp & 0xFFFF);
     if(isGet & (0x01 << (type - 1)))
         return;
     UInt8 continueDays = static_cast<UInt8>(tmp >> 16);
-    const static UInt8 needMinDay[] = {3, 5, 7, 10, 15, 21, 28};
+    const static UInt8 needMinDay[] = {1, 3, 5, 7, 9};
     if(continueDays < needMinDay[type - 1])
         return;
     bool bRet = GameAction()->onGetNewYearQzoneContinueAward(this, type);
@@ -21498,8 +21506,8 @@ void Player::sendNewYearQzoneContinueAct()
 {
     if(!World::getNewYearQzoneContinueAct())
         return;
-    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
-        return;
+    //if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+    //    return;
 
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(10);
@@ -21516,8 +21524,8 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
 {
     if(!World::getNewYearQzoneContinueAct())
         return;
-    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
-        return;
+    //if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+    //    return;
 
     UInt32 lasttime = GetVar(VAR_NEWYEAR_QZONECONTINUE_LASTTIME);
     if(lasttime == 0)
@@ -26384,9 +26392,11 @@ void Player::Add11grade(UInt32 grade)
 
     UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,23000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
+    UInt32 value = GetVar(VAR_11AIRBOOK_AWARDSCORE);
     for(UInt8 i =0 ; i< 11 ;i++)
     {
-        if(airGrade < gradeAward[i] &&( airGrade + grade) >=gradeAward[i])
+        //if(airGrade < gradeAward[i] &&( airGrade + grade) >=gradeAward[i])
+        if(value < gradeAward[i] && ( airGrade + grade) >=gradeAward[i])
             Send11GradeAward(i+1);
     }
     AddVar(VAR_11AIRBOOK_GRADE,grade);
@@ -26430,6 +26440,12 @@ void Player::Send11GradeAward(UInt8 type)
     if(type > 11)
         return ;
     UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,23000};
+    UInt32 value = GetVar(VAR_11AIRBOOK_AWARDSCORE);
+    if(gradeAward[type-1] <= value)
+        return ;
+    else
+        SetVar(VAR_11AIRBOOK_AWARDSCORE,gradeAward[type-1]);
+
     static MailPackage::MailItem s_item[][6] = {
         {{9424,1}, {503,1}},
         {{500,2},{9497,2}},
@@ -28002,11 +28018,11 @@ void Player::sendQZoneRechargeAwardInfo()
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
-    if(getPlatform() != 1 && getPlatform() != 2)
+    /*if(getPlatform() != 1 && getPlatform() != 2)
     {
         sendMsgCode(0, 3506);
         return;
-    }
+    }*/
     if(World::getQZoneRechargeTime() && ( getPlatform() ==1 || getPlatform() ==2))
     {
         AddVar(VAR_QZONE_RECHARGE,r);
@@ -33558,7 +33574,12 @@ void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
     for(UInt8 i =0 ; i< 6;i++)
     {
         if(WCGrade < gradeAward[i] &&( WCGrade + grade) >=gradeAward[i])
-            SendWCGradeAward(i+1);
+        {
+            if(World::getWorldCupTime())
+                SendWCGradeAward(i+1);
+            else if(World::getWorldCupTime2())
+                SendWCGradeAward2(i+1);
+        }
     }
     AddVar(VAR_WORLDCUP_RES,grade);
     //AddVar(VAR_11AIRBOOK_GRADE_DAY,grade);
@@ -33600,14 +33621,51 @@ void Player::SendWCGradeAward(UInt8 type)
         }
         DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
     }
-    char str[16] = {0};
-    sprintf(str, "F_130926_%d",type);
-    udpLog("tianshuqiyuan", str, "", "", "", "", "act");
+}
+void Player::SendWCGradeAward2(UInt8 type)
+{
+    if(type > 6 || type == 0 )
+        return ;
+    static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
+    static MailPackage::MailItem s_item[][6] = {
+        {{503,3},{500,3},{512,3},{505,3}},
+        {{503,3},{516,3},{9424,3},{9418,3}},
+        {{9498,10},{517,10},{1126,10},{9457,10}},
+        {{9457,20},{16001,20},{515,20},{9438,20},{9068,5}},
+        {{1733,1},{9498,50},{515,30},{501,50},{9076,25}},
+        {{9022,20},{9075,20},{9076,20}},
+    };
+    static UInt32 count[] = {4,4,4,5,5,3};
+    SYSMSG(title, 5153);
+    if(type)
+    {
+        SYSMSGV(content, 5154,gradeAward[type-1]);
+        Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+                mailPackageManager.push(mail->id, s_item[type-1], count[type-1], true);
+        }
+        std::string strItems;
+        for(UInt8 index = 0; index < count[type-1]; ++ index)
+        {
+            strItems += Itoa(s_item[type-1][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[type-1][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+    }
 }
 UInt8 Player::supportWorldCup(UInt8 num ,UInt8 res, UInt32 number)
 {
     if( num >= WC_MAX_COUNT)
         return 1;
+    if( num <=48 && !World::getWorldCupTime())
+        return 1;
+    if( num > 48 && !World::getWorldCupTime2())
+        return 1;
+
     if(worldCupInfo[num].support == 0 && res != 0)
        worldCupInfo[num].support = res ; 
     if(worldCupInfo[num].support != res)
@@ -33675,6 +33733,172 @@ void Player::UpdateWorldCupToDB(UInt8 num)
         return ;
     DB1().PushUpdateData("REPLACE INTO `worldCup`(`playerId`, `num`, `count1`,`count2`,`count3`, `result`) VALUES(%" I64_FMT "u, %d, %u,%u,%u , %u)", getId(), num , worldCupInfo[num].supportNum ,worldCupInfo[num].supportTime , 0 , worldCupInfo[num].support);
     
+}
+void Player::getXXLScore(UInt8 type ,UInt8 count)
+{
+   static UInt8 Award[][4][4] = {
+       {{1,1,1,1},{2,2,2,2},{5,5,5,5},{6,6,6,6}},
+       {{1,1,1,1},{2,2,2,2},{5,5,5,5},{6,6,6,6}},
+       {{1,1,1,1},{2,2,2,2},{5,5,5,5},{6,6,6,6}},
+   };
+   static UInt8 Score[]= { 10,20,50,60};
+   if(type > 2)
+       return ;
+   if(count < 3 )
+       return ;
+
+   if(count > 6)
+       count = 6;
+   UInt32 div1 = Award[type][count-3][1] - Award[type][count-3][0] + 1;
+   UInt32 div2 = Award[type][count-3][3] - Award[type][count-3][2] + 1;
+   UInt8 count1 = uRand(10000) / (10000/div1 + 1) ;
+   UInt8 count2 = uRand(10000) / (10000/div2 + 1) ;
+   AddVar(VAR_HAPPY_XXL_SCORE , Score[count - 3]);
+   AddVar(VAR_ZIYUN_LIANFU , Award[type][count-3][0] + count1);
+   AddVar(VAR_ZIYUN_KUANG + type , Award[type][count-3][2] + count2);
+}
+UInt8 Player::setXXLMapInfo(UInt8 step ,UInt8 type , std::string mapInfo , UInt8 flag)
+{
+    if(type > 2)    
+        return 1;
+    UInt32 goldUse = 0;
+    if(flag == 2)
+    {
+        goldUse = 30 ;
+        if (getGold() < goldUse)
+            return 3;
+    }
+    if(!subXXLCount(step))
+        return 2;
+
+    ConsumeInfo ci(MOFUMIZHEN1,0,0);
+    useGold(goldUse, &ci);
+    xxlMapInfo[type] = mapInfo;
+    if(flag)
+        getWrapKey()->InitTheKey(100,9900);
+    //sendHappyXXLInfo();
+    UpdateXXLToDB(type);
+    return 0;
+}
+void Player::sendHappyXXLInfo()
+{
+    Stream st(REP::ACTIVE) ;
+    st << static_cast<UInt8>(0x34);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt32>(20 + GetVar(VAR_HAPPY_XXL_BUYCOUNT) - GetVar(VAR_HAPPY_XXL_DAYCOUNT));
+    st << static_cast<UInt8>(GetVar(VAR_HAPPY_XXL_BUYNUM) );
+    st << static_cast<UInt32>(GetVar(VAR_ZIYUN_KUANG));
+    st << static_cast<UInt32>(GetVar(VAR_ZIYUN_MU));
+    st << static_cast<UInt32>(GetVar(VAR_ZIYUN_PAI));
+    st << static_cast<UInt32>(GetVar(VAR_ZIYUN_LIANFU));
+    st << static_cast<UInt32>(GetVar(VAR_HAPPY_XXL_SCORE));
+    st << static_cast<UInt8>(GetVar(VAR_HAPPY_XXL_AWARD));
+    st << static_cast<UInt32>(getWrapKey()->wrapTheKey());
+    st << Stream::eos;
+    send(st);
+
+    Stream stA(REP::MOFANG_INFO);
+    stA << static_cast<UInt8>(15);
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_KUANG));
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_MU));
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_PAI));
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_LIANFU));
+    stA << Stream::eos;
+    send(stA);
+}
+void Player::sendXXLMapInfo(UInt8 res ,UInt8 type)
+{
+    Stream st(REP::ACTIVE) ;
+    st << static_cast<UInt8>(0x34);
+    st << static_cast<UInt8>(0x02);
+    st << static_cast<UInt8>(res);
+    st << static_cast<UInt8>(type);
+    st << static_cast<UInt8>(GetVar(VAR_HAPPY_XXL_PAGE));
+    st << static_cast<UInt8>(3);
+    for(UInt8 i = 0; i < 3;++i)
+    {
+        st <<  static_cast<UInt8>(i); 
+        st << xxlMapInfo[i];
+    }
+    st << Stream::eos;
+    send(st);
+}
+UInt8 Player::subXXLCount(UInt8 step)
+{
+    if(step == 0)
+        return 1;
+    UInt32 stepFree = GetVar(VAR_HAPPY_XXL_DAYCOUNT) ;
+    if(stepFree > 20)
+        return 0;
+    if( (20 - stepFree) < step)
+    {
+        UInt32 need = step + stepFree - 20 ;
+        UInt32 stepBuy = GetVar(VAR_HAPPY_XXL_BUYCOUNT);
+        if( need > stepBuy)
+            return 0;
+        SetVar(VAR_HAPPY_XXL_DAYCOUNT,20);
+        SetVar(VAR_HAPPY_XXL_BUYCOUNT,stepBuy - need );
+    }
+    else
+    {
+       AddVar(VAR_HAPPY_XXL_DAYCOUNT,step);
+    }
+    return 1;
+}
+void Player::getXXLAward(UInt8 type)
+{
+    static UInt8 ScoreAward[][4] = {
+        {0,0,0,4},
+        {10,0,0,0},
+        {0,20,0,0},
+        {0,0,40,0},
+        {70,0,0,0}
+    };
+    static UInt32 Score[] = {200,500,1000,2000,3000};
+    
+    if(type > 4)
+        return ;
+    UInt32  Award = GetVar(VAR_HAPPY_XXL_AWARD);
+    if(Award & (1 << type))
+        return ;
+    UInt32 myScore = GetVar(VAR_HAPPY_XXL_SCORE);
+    if(myScore < Score[type])
+        return ;
+    for(UInt8 i = 0; i < 4 ; ++ i )
+    {
+        AddVar(VAR_ZIYUN_KUANG+i,ScoreAward[type][i]);
+    }
+    Award |= (1 << type);
+    SetVar(VAR_HAPPY_XXL_AWARD,Award);
+    sendHappyXXLInfo();
+    if(type == 4)
+    {
+        char str[16] = {0};
+        sprintf(str, "F_140627_3");
+        udpLog("mofumizhen", str, "", "", "", "", "act");
+    }
+}
+void Player::buyXXLCount()
+{
+    UInt32 buyCount = GetVar(VAR_HAPPY_XXL_BUYNUM) ;
+    UInt32 cost = GameAction()->getXXLCost(this,buyCount+1);
+    if (getGold() < cost)
+        return ;
+    ConsumeInfo ci(MOFUMIZHEN2,0,0);
+    useGold(cost, &ci);
+    AddVar(VAR_HAPPY_XXL_BUYNUM,1);
+    AddVar(VAR_HAPPY_XXL_BUYCOUNT,10);
+    sendHappyXXLInfo();
+    char str[16] = {0};
+    sprintf(str, "F_140627_1");
+    udpLog("mofumizhen", str, "", "", "", "", "act");
+}
+void Player::UpdateXXLToDB(UInt8 num)
+{
+    if(num >= 3)
+        return ;
+    DB1().PushUpdateData("REPLACE INTO `happyXXL`(`playerId`,`num`, `map`) VALUES(%" I64_FMT "u, %d, '%s')", getId(), num ,xxlMapInfo[num].c_str() );
+
 }
 
 } // namespace GObject
