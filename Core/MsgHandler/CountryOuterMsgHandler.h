@@ -9305,6 +9305,15 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                         std::string mapInfo ;   
                         brd >> mapInfo;
                         UInt8 res = 1;
+                        if(count == 25)
+                        {
+                            if(!player->hasChecked())
+                            {
+                                player->sendXXLMapInfo(res,index);
+                                player->sendHappyXXLInfo();
+                                return;
+                            }
+                        }
                         if(player->getWrapKey()->checkTheKey(key))
                         {
                             player->SetVar(VAR_HAPPY_XXL_PAGE,type);
@@ -9334,6 +9343,8 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                 }
                 case 0x03:
                 {
+                    if(!player->hasChecked())
+                        return;
                     player->buyXXLCount();
                     break;
                 }
