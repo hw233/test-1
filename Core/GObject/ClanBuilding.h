@@ -145,6 +145,7 @@ namespace GObject
             UInt32 getLeftAttr(UInt8 type) const;
             void AddLeftAttr(UInt8 opt , UInt8 type , UInt32 value);
             void resetLeftAttr();
+            void CheckInTheTeam(Player * pl);
             
         private:
             Clan * _clan;
