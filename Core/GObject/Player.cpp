@@ -33408,6 +33408,7 @@ void Player::clanShopOp(UInt8 type, UInt8 command)
         default:
             break;
     }
+}
 
 void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
 {
