@@ -15,6 +15,7 @@
 #include "ShuoShuo.h"
 #include "AthleticsRank.h"
 #include "Script/BattleFormula.h"
+#include "Common/URandom.h"
 
 namespace GObject
 {
@@ -136,23 +137,49 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
 {
     static UInt32 sendflag = 7;
     UInt64 exp = 0 ; //LIB   EXP
-
-    ++sendflag;
+    UInt32 damage = 0;
 
     if (!pl) return false;
     UInt32 now = TimeUtil::Now();
-    UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
-    if(cfg.GMCheck && buffLeft > now)
+    if(final)
     {
-        pl->sendMsgCode(0, 1407, buffLeft - now);
-        return false;
+        if(now < getAppearTime() + 30)
+        {
+            Stream st(REP::WBOSSOPT);
+            st << static_cast<UInt8>(8);
+            st << static_cast<UInt32>(getAppearTime() + 30 - now);
+            st << Stream::eos;
+            pl->send(st);
+            return false;
+        }
+
+        UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
+        if(cfg.GMCheck && buffLeft > now)
+        {
+            pl->sendMsgCode(0, 1407, buffLeft - now);
+            return false;
+        }
+        UInt32 reliveLeft = pl->getBuffData(PLAYER_BUFF_WB,now);//复活时间
+        if(reliveLeft > now)
+            return false;
     }
+    else
+    {
+        UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
+        if(cfg.GMCheck && buffLeft > now)
+        {
+            pl->sendMsgCode(0, 1407, buffLeft - now);
+            return false;
+        }
+    }
+    ++sendflag;
     pl->checkLastBattled();
 
     GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
     if(it == GData::npcGroups.end())
         return false;
 
+    SetDirty(pl,true);
     Battle::BattleSimulator bsim(Battle::BS_WBOSS, pl, _ng->getName(), _ng->getLevel(), false);
     pl->PutFighters(bsim, 0);
     _ng->putFighters(bsim);
@@ -218,7 +245,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             UInt32 newHP = (_hp[0] == 0xFFFFFFFF) ? 0 : _hp[0];
             if(oldHP > newHP)
             {
-                UInt32 damage = oldHP - newHP;
+                damage = oldHP - newHP;
                 exp = ((float)damage / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
                 if (exp < 1000)
                     exp = 1000;
@@ -253,6 +280,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     _percent = 0;
                     _hp[0] = 0;
                     attackPre = 0;
+                    pl->AddVar(VAR_WB_EXPSUM,exp);
                     reward(pl);
                     res = true;
                     if (sendflag % 8)
@@ -307,13 +335,49 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     st.append(&packet[8], packet.size() - 8);
     st << static_cast<UInt64>(exp);
     st << Stream::eos;
-    pl->send(st);
+    if(final && pl->GetVar(VAR_WB_SKIPBATTLE))
+    {
+        sendSkipBattleReport(pl,damage,exp,res);
+        pl->checkLastBattled();
+    }
+    else
+        pl->send(st);
     bsim.applyFighterHP(0, pl);
+    
+    SetDirty(pl,false);
 
-    pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+    //pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+    if(final)
+        pl->setBuffData(PLAYER_BUFF_WB, now + 30);
+    else
+        pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+    if(final)
+    {
+        pl->AddVar(VAR_WB_EXPSUM,exp);
+        sendAtkInfo(pl);
+        sendFighteCD(pl);
+    }
+    
     if(pl->checkClientIP())
         pl->SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     return res;
+}
+
+void WBoss::SetDirty(Player* player,bool _isInspire)
+{
+    std::map<UInt32, Fighter *>& fighters = player->getFighterMap();
+    if(_isInspire)
+    {
+        if(!player->GetVar(VAR_WB_INSPIRE))
+            return;
+    }
+    
+    for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
+    {
+        it->second->setWBossInspire(_isInspire); 
+        it->second->setDirty();
+    }
+
 }
 
 void WBoss::updateLastDB(UInt32 end)
@@ -396,6 +460,7 @@ void WBoss::reward(Player* player)
     std::set<UInt32> _515;
     std::set<UInt32> _507;
     std::set<UInt32> _509;
+    std::set<UInt32> bossbox;
 
     UInt32 luckynum = (float)10 * sz / 100;
     getRandList(sz, luckynum, gem); // 宝石
@@ -403,6 +468,7 @@ void WBoss::reward(Player* player)
     luckynum = (float)5 * sz / 100;
     getRandList(sz, luckynum, breath); // 凝神丹
     getRandList(sz, luckynum, comp); // 补髓丹
+    getRandList(sz, luckynum, bossbox); // BOSS宝箱 
 
     if (World::_wday == 7)
         tlvl = uRand(sizeof(trumpFrag)/sizeof(UInt16));
@@ -493,6 +559,36 @@ void WBoss::reward(Player* player)
                 MailPackage::MailItem item[] = {{509,1},};
                 (*i).player->sendMailItem(562, 563, item, 1);
             }
+
+            if (bossbox.find(j) != bossbox.end())
+            {
+                UInt32 tmp = GVAR.GetVar(GVAR_MAX_LEVEL);
+                if(tmp >= 90)
+                {
+                    MailPackage::MailItem item[] = {{17005,1},};
+                    (*i).player->sendMailItem(562, 563, item, 1);
+                    SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), 17002, 1);
+                }
+                else if(tmp >= 80)
+                {
+                    MailPackage::MailItem item[] = {{17004,1},};
+                    (*i).player->sendMailItem(562, 563, item, 1);
+                    SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), 17003, 1);
+                }
+                else if(tmp >= 70)
+                {
+                    MailPackage::MailItem item[] = {{17003,1},};
+                    (*i).player->sendMailItem(562, 563, item, 1);
+                    SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), 17004, 1);
+                }
+                else 
+                {
+                    MailPackage::MailItem item[] = {{17002,1},};
+                    (*i).player->sendMailItem(562, 563, item, 1);
+                    SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), 17005, 1);
+                }
+            }
+            
         }
 
         if (World::getOpenTest() && World::_wday != 7)
@@ -520,17 +616,63 @@ void WBoss::reward(Player* player)
             (*i).player->sendMailItem(568, 569, item, size);
         }
 
+        {
+            float tmp_percent = static_cast<float>((*i).score) / static_cast<float>(m_lastHP);
+            UInt32 damage_percent = tmp_percent * 100;
+            UInt32 damage_percent1 = tmp_percent * 10000;
+            if(damage_percent >= 1)
+            {
+                UInt32 tmp = GVAR.GetVar(GVAR_MAX_LEVEL);
+                SYSMSGV(title, 578);
+                SYSMSGV(content, 579, (*i).score, damage_percent1/100,damage_percent1%100);
+                MailPackage::MailItem item ;
+                if(tmp >= 90)
+                {
+                    item = {17005,2};
+                }
+                else if(tmp >= 80)
+                {
+                    item = {17004,2};
+                }
+                else if(tmp >= 70)
+                {
+                    item = {17003,2};
+                }
+                else 
+                {
+                    item = {17002,2};
+                }
+                MailItemsInfo itemsInfo(&item, Activity, 1);
+                Mail* mail = (*i).player->GetMailBox()->newMail(NULL, 0x21, title, content,0xFFFE0000, true, &itemsInfo);
+                GObject::mailPackageManager.push(mail->id, &item, 1, true);
+                SYSMSG_SENDV(580, (*i).player);
+            }
+        }
+
+        {
+            Stream st(REP::WBOSSOPT);
+            st << static_cast<UInt8>(6);
+            st << static_cast<UInt8>(j+1);
+            st << static_cast<UInt32>((*i).score);
+            UInt16 percent = (*i).score * 10000 / m_lastHP; 
+            st << percent;
+            st << (*i).player->GetVar(VAR_WB_EXPSUM);
+            st << Stream::eos;
+            (*i).player->send(st);
+        }
+
         GameAction()->doStrong((*i).player, SthBoss, 0, 0);
         (*i).player->setContinuousRFAward(6);
         (*i).player->getSurnameLegendAward(e_sla_none);
     }
-
+   
     if (player)
     {
         MailPackage::MailItem item[] = {{56,5},{MailPackage::Tael,20000},};
         player->sendMailItem(566, 567, item, 2);
         SYSMSG_BROADCASTV(559, player->getCountry(), player->getName().c_str(), 56, 5, 20000);
     }
+
     m_atkinfo.clear();
 }
 
@@ -903,6 +1045,163 @@ void WBoss::sendHp(Player* player)
         NETWORK()->Broadcast(st);
 }
 
+void WBoss::sendFighteCD(Player* player)
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 reliveLeft = player->getBuffData(PLAYER_BUFF_WB,now);
+    Stream st(REP::WBOSSOPT);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt32>(reliveLeft < now ? 0 : reliveLeft - now);
+    st << Stream::eos;
+    player->send(st);
+    Stream st1(REP::WBOSSOPT);
+    st1 << static_cast<UInt8>(1);
+    st1 << static_cast<UInt8>(8);
+    st1 << static_cast<UInt32>(getAppearTime() + 30 < now ? 0 : getAppearTime() + 30 - now);
+    st1 << Stream::eos;
+    player->send(st1);
+}
+
+void WBoss::sendFighterNum(Player* player)
+{
+    Stream st(REP::WBOSSOPT);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(2);
+    st << static_cast<UInt32>(m_atkinfo.size()); 
+    st << Stream::eos;
+    if (player)
+        player->send(st);
+    else
+        NETWORK()->Broadcast(st);
+}
+
+void WBoss::sendLastTime(Player* player)
+{
+    UInt32 now = TimeUtil::Now();
+    Stream st(REP::WBOSSOPT);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(3);
+    if(getAppearTime() + 60 * 60 - 60  > now)
+        st << (getAppearTime() + 60 * 60 - 60 - now) ;
+    else
+        st << static_cast<UInt32>(0);
+    st << Stream::eos;
+    if (player)
+        player->send(st);
+}
+
+void WBoss::sendInspireInfo(Player* player)
+{
+    Stream st(REP::WBOSSOPT);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(4);
+    //st << player->GetVar(VAR_WB_INSPIRE);
+   
+    UInt32 tmp = GVAR.GetVar(GVAR_MAX_LEVEL) / 10;
+    UInt32 nextAllServerBuffer_tael = 0;
+    UInt32 nextAllServerBuffer_gold = 0;
+    if(!player->GetVar(VAR_WB_INSPIRE))
+    {
+        st << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt32>(0);
+        nextAllServerBuffer_tael = tmp * tmp * tmp / 4 * 1;  
+        nextAllServerBuffer_gold = tmp * tmp * tmp / 2 * 1; 
+    }
+    else
+    {
+        UInt8 tael_cnt = GET_BIT_8(player->GetVar(VAR_WB_INSPIRE),0);
+        UInt8 gold_cnt = GET_BIT_8(player->GetVar(VAR_WB_INSPIRE),1);
+        UInt8 add_percent = tael_cnt * 3 + gold_cnt * 6;
+        
+        st << static_cast<UInt8>(tael_cnt + gold_cnt) << add_percent ;  
+        UInt32 allServerBuffer = tmp * tmp * tmp / 4 * tael_cnt + tmp * tmp * tmp / 2 * gold_cnt;
+        st << allServerBuffer;
+        if(gold_cnt + tael_cnt < 10)
+        {
+            nextAllServerBuffer_tael = tmp * tmp * tmp / 4 * 1;
+            nextAllServerBuffer_gold = tmp * tmp * tmp / 2 * 1;
+        }
+    }
+
+    st << Stream::eos;
+    player->send(st);
+
+    
+    Stream st1(REP::WBOSSOPT);
+    st1 << static_cast<UInt8>(9);
+    st1 << nextAllServerBuffer_tael << nextAllServerBuffer_gold;
+    st1 << Stream::eos;
+    player->send(st1);
+
+}
+
+void WBoss::sendAtkInfo(Player* player)
+{
+    Stream st(REP::WBOSSOPT);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(5);
+    UInt16 pos = 1;
+    size_t sz = m_atkinfo.size();
+    st << static_cast<UInt8>(sz > 10 ? 10 : sz);
+    for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(); i != m_atkinfo.rend(); ++i, ++pos)
+    {
+        if(pos > 10)
+            break;
+        st << pos << (*i).player->getName() << (*i).score;
+    }
+    if(player)
+    {
+        st << Stream::eos;
+        player->send(st); 
+       
+        Stream st1(REP::WBOSSOPT);
+        st1 << static_cast<UInt8>(1);
+        st1 << static_cast<UInt8>(7);
+
+        AtkInfoType::reverse_iterator i = m_atkinfo.rbegin();
+        UInt16 pos_pl = 1;
+        size_t size = st1.size();
+        while (i != m_atkinfo.rend())
+        {
+            if ((*i).player == player)
+                st1 << pos_pl << (*i).player->getName() << (*i).score; 
+            ++ pos_pl;
+            ++ i;
+        }
+        if(size == st1.size())
+            st1 << static_cast<UInt16>(0) << player->getName() << static_cast<UInt32>(0);
+        st1 << Stream::eos;
+        player->send(st1); 
+    }
+    else
+    {
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
+    }
+
+}
+
+void WBoss::sendSkipFlag(Player* player)
+{
+    Stream st(REP::WBOSSOPT);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(6);
+    st << static_cast<UInt8>(player->GetVar(VAR_WB_SKIPBATTLE));   
+    st << Stream::eos;
+    player->send(st); 
+
+}
+
+void WBoss::sendSkipBattleReport(Player* player,UInt32 damage,UInt32 exp,bool res)
+{
+    Stream st(REP::WBOSSOPT);
+    st << static_cast<UInt8>(5);
+    st << static_cast<UInt8>(res) << damage << exp ;
+    st << Stream::eos;
+    player->send(st); 
+}
+
+
 void WBoss::sendDmg(UInt32 damage)
 {
     Stream st(REP::DAILY_DATA);
@@ -950,6 +1249,55 @@ void WBoss::sendCount(Player* player)
         player->send(st);
     else
         NETWORK()->Broadcast(st);
+}
+
+void WBoss::RandomRefresh(Player* player)
+{
+    AtkInfoType atkTmp = m_atkinfo;
+    UInt8 pos = 1;
+    Stream st(REP::WBOSSOPT);
+    st << static_cast<UInt8>(0x10);
+    if(atkTmp.size() <= 10)
+    {
+        st << static_cast<UInt8>(atkTmp.size());
+        for (AtkInfoType::reverse_iterator i = atkTmp.rbegin(); i != atkTmp.rend(); ++i, ++pos)
+        {
+            st << (*i).player->getId() << (*i).player->getName() << (*i).player->getMainFighter()->getClass() << (*i).player->getMainFighter()->getSex() << (*i).player->getMainFighter()->getColor(); 
+        }
+    }
+    else
+    {
+        st << static_cast<UInt8>(10); 
+        while(pos <= 10)
+        {
+            for (AtkInfoType::iterator i = atkTmp.begin(); i != atkTmp.end(); )
+            {
+                UInt8 rand = uRand(2); 
+                if(rand)
+                {
+                    st << (*i).player->getId() << (*i).player->getName() << (*i).player->getMainFighter()->getClass() << (*i).player->getMainFighter()->getSex() << (*i).player->getMainFighter()->getColor(); 
+                    atkTmp.erase(i++);
+                    ++pos;
+                }
+                else
+                    i++;
+            }
+        }
+    }
+    
+
+    st << Stream::eos;
+    player->send(st);
+}
+
+void WBoss::ReqBossId(Player* player)
+{
+    Stream st(REP::WBOSSOPT);
+    st << static_cast<UInt8>(7);
+    st << getId();   
+    st << Stream::eos;
+    player->send(st); 
+
 }
 
 WBossMgr::WBossMgr()
@@ -1078,6 +1426,8 @@ void WBossMgr::process(UInt32 now)
     if (!_prepareTime)
         calcNext(now);
     broadcastTV(now);
+    if(_prepareStep == 5 && m_boss)
+        m_boss->sendAtkInfo();
     if (now >= _disapperTime && m_boss && !m_boss->isDisappered())
     {
         disapper(now);
@@ -1262,6 +1612,7 @@ void WBossMgr::sendDaily(Player* player)
         m_boss->sendCount(player);
         m_boss->sendId(player);
         m_boss->sendLoc(player);
+        UpdateInspire(player);
     }
 }
 
@@ -1373,6 +1724,144 @@ void WBossMgr::calInitClanBigBoss(UInt32& lastHp,Int32& lastAtk,Int32& lastMAtk)
     lastHp = getLastHP(m_idx) * 0.6;
     lastAtk = getLastAtk(m_idx) * 0.6;
     lastMAtk = getLastMAtk(m_idx) * 0.6;
+}
+
+void WBossMgr::ReturnBaseInfo(Player* player)
+{
+    m_boss->sendFighteCD(player);
+    m_boss->sendFighterNum(player);
+    m_boss->sendLastTime(player);
+    m_boss->sendInspireInfo(player);
+    m_boss->sendAtkInfo(player);
+    m_boss->sendSkipFlag(player);
+
+}
+
+void WBossMgr::Inspire(Player* player,UInt8 type)
+{
+
+    UInt8 tael_cnt = GET_BIT_8(player->GetVar(VAR_WB_INSPIRE),0);
+    UInt8 gold_cnt = GET_BIT_8(player->GetVar(VAR_WB_INSPIRE),1);
+    if(tael_cnt + gold_cnt >= 10)
+        return;
+
+    ConsumeInfo ci; 
+    ci.purchaseType = WBInspire; 
+    if(!type)
+    {
+        if(player->getTael() < 1000)
+        {
+            player->sendMsgCode(0, 1100);
+            return;
+        }
+        player->useTael(1000,&ci);
+        tael_cnt += 1;
+        UInt32 tmp_cnt = SET_BIT_8(player->GetVar(VAR_WB_INSPIRE),0,tael_cnt); 
+        player->SetVar(VAR_WB_INSPIRE,tmp_cnt);
+    }
+    else
+    {
+        if(player->getGold() < 10)
+        {
+            player->sendMsgCode(0, 1101);
+            return ;
+        }
+        player->useGold(10,&ci);
+        gold_cnt += 1;
+        UInt32 tmp_cnt = SET_BIT_8(player->GetVar(VAR_WB_INSPIRE),1,gold_cnt); 
+        player->SetVar(VAR_WB_INSPIRE,tmp_cnt);
+    }
+
+    UInt32 tmp = GVAR.GetVar(GVAR_MAX_LEVEL) / 10;
+    UInt32 allServerBuffer = tmp * tmp * tmp / 4 * tael_cnt + tmp * tmp * tmp / 2 * gold_cnt;
+    UInt8 add_percent = tael_cnt * 3 + gold_cnt * 6;
+    std::map<UInt32, Fighter *>& fighters = player->getFighterMap();
+    for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
+    {
+        Int32 baseatk = Script::BattleFormula::getCurrent()->calcAttack(it->second);
+        Int32 basematk = Script::BattleFormula::getCurrent()->calcMagAttack(it->second);
+        it->second->setPlExtraAttack(static_cast<Int32>(baseatk * add_percent / 100 + allServerBuffer));
+        it->second->setPlExtraMagAttack(static_cast<Int32>(basematk * add_percent / 100 + allServerBuffer));
+    }
+    m_boss->sendInspireInfo(player);
+}
+
+void WBossMgr::UpdateInspire(Player* player)
+{
+    if(!player->GetVar(VAR_WB_INSPIRE))
+        return;
+    UInt8 tael_cnt = GET_BIT_8(player->GetVar(VAR_WB_INSPIRE),0);
+    UInt8 gold_cnt = GET_BIT_8(player->GetVar(VAR_WB_INSPIRE),1);
+    
+    UInt8 add_percent = tael_cnt * 3 + gold_cnt * 6;
+    UInt32 tmp = GVAR.GetVar(GVAR_MAX_LEVEL) / 10;
+    UInt32 allServerBuffer = tmp * tmp * tmp / 4 * (gold_cnt + tael_cnt);
+    std::map<UInt32, Fighter *>& fighters = player->getFighterMap();
+    for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
+    {
+        Int32 baseatk = Script::BattleFormula::getCurrent()->calcAttack(it->second);
+        Int32 basematk = Script::BattleFormula::getCurrent()->calcMagAttack(it->second);
+        it->second->setPlExtraAttack(static_cast<Int32>(baseatk * add_percent / 100 + allServerBuffer));
+        it->second->setPlExtraMagAttack(static_cast<Int32>(basematk * add_percent / 100 + allServerBuffer));
+    }
+
+}
+
+void WBossMgr::Relive(Player* player)
+{
+    UInt32 now = TimeUtil::Now();
+    if(now < m_boss->getAppearTime() + 30)
+    {
+        Stream st(REP::WBOSSOPT);
+        st << static_cast<UInt8>(8);
+        st << static_cast<UInt32>(m_boss->getAppearTime() + 30 - now);
+        st << Stream::eos;
+        player->send(st);
+        return ;
+    }
+
+    UInt32 reliveLeft = player->getBuffData(PLAYER_BUFF_WB,now);//复活时间
+    if(reliveLeft <= now)
+        return ;
+        
+    ConsumeInfo ci; 
+    ci.purchaseType = WBRelive; 
+    
+    if(player->getGold() < 10)
+    {
+        player->sendMsgCode(0, 1101);
+        return ;
+    }
+    player->useGold(10,&ci);
+
+    player->setBuffData(PLAYER_BUFF_WB, now);
+
+    m_boss->sendFighteCD(player);
+}
+
+void WBossMgr::SetSkipBattle(Player* player,bool isSkip)
+{
+    player->SetVar(VAR_WB_SKIPBATTLE,static_cast<UInt8>(isSkip));
+    m_boss->sendSkipFlag(player);
+}
+
+void WBossMgr::RefreshTenPlayer(Player* player)
+{
+    m_boss->RandomRefresh(player);    
+}
+
+void WBossMgr::ReqBossId(Player* player,UInt32 loc)
+{
+    m_boss->ReqBossId(player);    
+}
+
+bool WBossMgr::checkLocRight(Player* player,UInt16 loc)
+{
+    if(!m_boss)
+        return false;
+    if(loc != m_boss->getLoc()) 
+        return false;
+    return true;
 }
 
 

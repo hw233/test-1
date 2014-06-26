@@ -732,12 +732,18 @@ namespace GObject
         VAR_CUBE_COUNT = 743,      //当前积木消耗数  (每一层构造好的时候清零)
         VAR_TREE_VALUE_DAY = 744 ,    //今日被邀请获得的木片数
         VAR_TOOL_CNT = 745 ,    //当前欧耶精粹数量
+        VAR_WORLDCUP_RES = 746 ,    //世界杯积分
+
+
 
         //752 - 770 for dtc
         VAR_LIMIT_APPOINTMENT = 752,//取消婚礼预约限制
         VAR_CLANBOSS_LUCKY_LIMIT = 754,//帮派BOSS幸运奖励个数
         VAR_CLANBOSS_SECURE_LIMIT = 755,//帮派BOSS秘密奖励个数
         VAR_CLANBOSS_CLANBIGBOSS_LIMIT = 756,//帮派BOSS换帮限制
+        VAR_WB_INSPIRE = 757,//世界BOSS鼓舞次数 银币(8位) 仙石(8位)
+        VAR_WB_SKIPBATTLE = 758,//世界BOSS跳过战斗标记
+        VAR_WB_EXPSUM = 759,//世界BOSS总经验
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
         VAR_FIRE_SACRIFICE_TIMES = 772, //拜火祭天：0-7帮众添柴次数，8-15帮主诏令次数
@@ -747,7 +753,7 @@ namespace GObject
         VAR_CLAN_SHOP_CURRENT_LVL = 776, //帮贡商店当前等级
         VAR_CLAN_SHOP_FLUSH_TIMES = 777, //帮贡商店当天刷新次数
 
-        //781 - 800 for lijr
+        //781 - 810 for lijr
         VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
         VAR_ERLKING_STATUSB = 782,               //妖王再临状态(17-32)
         VAR_ERLKING_STATUSC = 783,               //妖王再临状态(33-48)
@@ -771,6 +777,9 @@ namespace GObject
         VAR_AUTO_TEAMCOPY_CNT = 800,             //自动组队副本总共需要战斗怪物的数量
         VAR_AUTO_TEAMCOPY_CUR_CNT = 801,         //自动组队副本当前战斗到第几个怪物
         VAR_AUTO_TEAMCOPY_TEMP_CNT = 802,        //自动组队副本已经打过的副本怪物数量
+
+        //811-830 for libo
+            
         VAR_MAX,
     };
 
@@ -1456,6 +1465,9 @@ namespace GObject
             REGISTER_VAR(VAR_CLANBOSS_LUCKY_LIMIT, CYCLE_DAY);
             REGISTER_VAR(VAR_CLANBOSS_SECURE_LIMIT, CYCLE_DAY);
             REGISTER_VAR(VAR_CLANBOSS_CLANBIGBOSS_LIMIT, CYCLE_DAY);
+            REGISTER_VAR(VAR_WB_INSPIRE, CYCLE_HOUR);
+            REGISTER_VAR(VAR_WB_SKIPBATTLE, CYCLE_HOUR);
+            REGISTER_VAR(VAR_WB_EXPSUM, CYCLE_HOUR);
 
             REGISTER_VAR(VAR_ERLKING_STATUSA, CYCLE_NONE);
             REGISTER_VAR(VAR_ERLKING_STATUSB, CYCLE_NONE);

@@ -876,6 +876,7 @@ namespace GObject
 		m_erlking = new Erlking(this);
 		m_marriageInfo = new MarriageInfo();
 		m_collecCard= new CollectCard(this);
+		_wrapKey= new OrdinarireWrapKey();
         m_csFlag = 0;
         m_spreadInterval = 0;
         m_spreadCoolTime = 0;
@@ -951,6 +952,7 @@ namespace GObject
         /*m_autoTeamCopyCnt = 0;
         m_autoTeamCopyCurCnt = 0;
         m_autoTeamCopyCurIndex = 0;*/
+        memset(&worldCupInfo, 0, sizeof(worldCupInfo));
     }
 
 
@@ -1166,6 +1168,7 @@ namespace GObject
 		SAFE_DELETE(m_FairySpar);
 		SAFE_DELETE(m_moFang);
 		SAFE_DELETE(m_collecCard);
+		SAFE_DELETE(_wrapKey);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -19066,15 +19069,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
     }
     UInt8 Player::getSnowAward(UInt16 type)
     {
-        static  MailPackage::MailItem s_item1[4] = {{56,3},{57,3},{9371,3},{548,3}};
+        static  MailPackage::MailItem s_item1[4] = {{56,3},{57,3},{9371,3},{15,3}};
         static  MailPackage::MailItem s_item2[4] = {{514,3},{9371,3},{500,3},{15,3}};
         static  MailPackage::MailItem s_item3[4] = {{503,3},{512,3},{516,2},{513,3}};
         static  MailPackage::MailItem s_item4[4] = {{1325,2},{134,2},{547,3},{551,3}};
-        static  MailPackage::MailItem s_item5[4] = {{401,5},{547,5},{512,5},{514,5}};
+        static  MailPackage::MailItem s_item5[4] = {{56,5},{547,5},{512,5},{514,5}};
         static  MailPackage::MailItem s_item6[4] = {{509,3},{507,3},{501,5},{513,5}};
         static  MailPackage::MailItem s_item7[4] = {{503,5},{516,5},{501,5},{505,5}};
         static  MailPackage::MailItem s_item8[4] = {{134,8},{1325,8},{9076,8},{507,8}};
-        static  MailPackage::MailItem s_item9[4] = {{1325,15},{134,15},{9076,10},{509,15}};
+        static  MailPackage::MailItem s_item9[4] = {{9498,15},{134,15},{9076,10},{509,15}};
   
         if(GetPackage()->GetRestPackageSize() < 4)
         {
@@ -19717,6 +19720,11 @@ void EventTlzAuto::notify(bool isBeginAuto)
     {
     //    if ((type & 0x01) && (tFgt->getLevel() >= GetLev()))
     //            return 4;
+        if (type & 0x01)
+        {
+            if (fFgt->getLingshiNum() > 0 || tFgt->getLingshiNum() > 0)
+                return 7;
+        }
         if ((type & 0x02 || type & 0x04) && GetPackage()->GetRestPackageSize() < 1)
             return 5;
         if ((type & 0x08) && (fFgt->getSecondSoul() == NULL || tFgt->getSecondSoul() == NULL))
@@ -20812,9 +20820,9 @@ void Player::sendQzongPYGiftInfo()
 
 void Player::get3366GiftAward(UInt8 type)
 {
-    if (getPlatform() != 11)
+    if (getPlatform() != 1 && getPlatform() != 2)
     {
-        sendMsgCode(0, 3505);
+        sendMsgCode(0, 3506);
         return;
     }
     if (GetVar(VAR_3366GIFT) >= 12)
@@ -20852,7 +20860,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
-        static UInt32 itemId[] = { 30, 2, 9600, 1, 9310, 1, 9425, 1, 9427, 1, 9141, 2 };
+        static UInt32 itemId[] = { 30, 2, 9427, 2, 9600, 2, 9310, 2, 9438, 2, 9141, 2 };
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -27878,8 +27886,11 @@ void Player::sendRealSpirit()
 
 void Player::getQZoneRechargeAward(UInt8 val)
 {
-    if(getPlatform() != 11)
+    if(getPlatform() != 1 && getPlatform() != 2)
+    {
+        sendMsgCode(0, 3506);
         return;
+    }
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27927,8 +27938,11 @@ void Player::getQZoneRechargeAward(UInt8 val)
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
-    if(getPlatform() != 11)
+    if(getPlatform() != 1 && getPlatform() != 2)
+    {
+        sendMsgCode(0, 3506);
         return;
+    }
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -27966,8 +27980,11 @@ void Player::sendQZoneRechargeAwardInfo()
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
-    if(getPlatform() != 11)
+    if(getPlatform() != 1 && getPlatform() != 2)
+    {
+        sendMsgCode(0, 3506);
         return;
+    }
     if(World::getQZoneRechargeTime() && ( getPlatform() ==1 || getPlatform() ==2))
     {
         AddVar(VAR_QZONE_RECHARGE,r);
@@ -28353,19 +28370,19 @@ void Player::EatLingGuo(UInt32 num)
   
     UInt32 clan_sum = clan->GetTYSSSum();
     UInt8 flag = 0;//标记
-    if(clan_sum < 3000)
+    if(clan_sum < 2000)
         flag = 0;
     else
-        if(clan_sum < 19000)
+        if(clan_sum < 14000)
             flag = 1;
         else
-            if(clan_sum < 40000)
+            if(clan_sum < 23000)
                 flag = 2;
             else
-                if(clan_sum < 70000)
+                if(clan_sum < 46000)
                     flag = 3;
                 else
-                    if(clan_sum < 100000)
+                    if(clan_sum < 70000)
                         flag = 4;
                     else
                         flag = 5;
@@ -30637,7 +30654,10 @@ bool Player::_hasBrother( Player * pl ) const
 }
 UInt32 Player::getFriendlyCount(UInt64 playerId)
 {
-    return _friendlyCount[playerId].value; 
+    std::map<UInt64,FriendCount >::iterator it = _friendlyCount.find(playerId);
+    if(it == _friendlyCount.end())
+        return 0;
+    return it->second.value;
 }
 void Player::getFriendlyAchievement(UInt8 opt)
 {
@@ -31657,7 +31677,8 @@ void Player::InviteDrinking(Player * friendOne)   //邀请饮酒
     bool flag = true;
 
     if(_playerData.location != 9476)
-        moveTo(9476,true);
+        //moveTo(9476,true);
+        return ;
 
     UInt32 now = TimeUtil::Now();
     std::map<UInt64,struct invitTime>::const_iterator it = _brothers.find(friendOne->getId());
@@ -31766,7 +31787,8 @@ void Player::beReplyForDrinking(Player * pl , UInt8 res , UInt8 type , UInt8 cou
         return ;
     }
     if(_playerData.location != 9476)
-        moveTo(9476,true);
+        //moveTo(9476,true);
+        return ;
     if(shenfen &&( getDrinkInfo().drinker == NULL || getDrinkInfo().drinker == pl ))  //判断是否已经有人对酒
     {
         std::set<Player *>::iterator it = getDrinkInfo().plset.find(pl);
@@ -32238,8 +32260,8 @@ bool Player::canInviteCutting( Player *pl)
 UInt8 Player::InviteCutting(Player * pl)   //需要抛消息
 {
     if(_playerData.location != 9476)
-        moveTo(9476,true);
-
+        //moveTo(9476,true);
+        return 0;
     UInt32 now = TimeUtil::Now();
     UInt32 friendlyCount = getFriendlyCount(pl->getId());
     if(friendlyCount < 500 )
@@ -32304,7 +32326,6 @@ void Player::beReplyForCutting(Player * pl ,UInt8 res)   //调用之前 pl进入
             pl->getCuttingInfo().type = getCuttingInfo().type;
             sendCutterInfo();
             pl->sendCutterInfo();
-
         }
         else
         {
@@ -33387,6 +33408,133 @@ void Player::clanShopOp(UInt8 type, UInt8 command)
         default:
             break;
     }
+
+void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
+{
+    if(num > 0 && num <= WC_MAX_COUNT )  //结算
+        grade = worldCupInfo[num-1].supportNum * 100 ; 
+    static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
+    UInt32 WCGrade = GetVar(VAR_WORLDCUP_RES);
+    for(UInt8 i =0 ; i< 6;i++)
+    {
+        if(WCGrade < gradeAward[i] &&( WCGrade + grade) >=gradeAward[i])
+            SendWCGradeAward(i+1);
+    }
+    AddVar(VAR_WORLDCUP_RES,grade);
+    //AddVar(VAR_11AIRBOOK_GRADE_DAY,grade);
+    UInt32 count = GetVar(VAR_WORLDCUP_RES);
+    GameMsgHdr hdr1(0x152, WORKER_THREAD_WORLD, this, sizeof(count));
+    GLOBAL().PushMsg(hdr1, &count);
+}
+void Player::SendWCGradeAward(UInt8 type)
+{
+    if(type > 6 || type == 0 )
+        return ;
+    static UInt32 gradeAward[]={6000,12000,28000,60000,120000,200000};
+    static MailPackage::MailItem s_item[][6] = {
+        {{56,3},{57,3},{500,3},{15,3},{9371,3}},
+        {{503,3},{516,3},{513,3},{501,3}},
+        {{517,10},{551,10},{9424,10},{9414,8}},
+        {{9457,20},{16001,20},{9498,20},{9600,20},{9076,20}},
+        {{515,30},{9498,40},{134,40},{1325,30}},
+        {{9022,15},{9075,15},{9068,15},{1732,1}},
+    };
+    static UInt32 count[] = {5,4,4,5,4,4};
+    SYSMSG(title, 5153);
+    if(type)
+    {
+        SYSMSGV(content, 5154,gradeAward[type-1]);
+        Mail * mail = GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+                mailPackageManager.push(mail->id, s_item[type-1], count[type-1], true);
+        }
+        std::string strItems;
+        for(UInt8 index = 0; index < count[type-1]; ++ index)
+        {
+            strItems += Itoa(s_item[type-1][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[type-1][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+    }
+    char str[16] = {0};
+    sprintf(str, "F_130926_%d",type);
+    udpLog("tianshuqiyuan", str, "", "", "", "", "act");
+}
+UInt8 Player::supportWorldCup(UInt8 num ,UInt8 res, UInt32 number)
+{
+    if( num >= WC_MAX_COUNT)
+        return 1;
+    if(worldCupInfo[num].support == 0 && res != 0)
+       worldCupInfo[num].support = res ; 
+    if(worldCupInfo[num].support != res)
+        return 1;
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 limitTime = GameAction()->getWorldCupLimitTime(this,num);
+    if(now > limitTime)
+        return 2;
+
+    if(number == 0)
+        return 1 ;
+    UInt16 iid = 16017;
+    UInt16 count = GetPackage()->GetItemAnyNum(iid) ;
+    ItemBase * item = GetPackage()->FindItem(iid, true);
+    if (!item)
+        item =GetPackage()->FindItem(iid, false);
+    if(item ==NULL)
+        return 1;
+    if(number > count)
+        return 3;
+    GetPackage()->DelItemAny(iid, number );
+    GetPackage()->AddItemHistoriesLog(iid , number);
+
+    worldCupInfo[num].supportNum  += number ;
+    worldCupInfo[num].supportTime = now;
+
+	struct WCSupportData
+	{
+		UInt8 num;
+        UInt8 res;
+		UInt32  number;
+	};
+    WCSupportData wcs ;
+    wcs.num = num ;
+    wcs.res = res ;
+    wcs.number = number;
+
+    GameMsgHdr hdr(0x151, WORKER_THREAD_WORLD, this, sizeof(WCSupportData));
+    GLOBAL().PushMsg(hdr, &wcs);
+
+    AddWorldCupScore(number * 100 );
+    UpdateWorldCupToDB(num);
+    return 0;
+}
+void Player::sendMyWorldCupInfo()
+{
+    Stream st(REP::ACTIVE);
+    st << static_cast<UInt8>(0x33);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(0);
+    st << static_cast<UInt8>(WC_MAX_COUNT);
+    for(UInt8 i = 0 ; i < WC_MAX_COUNT ; ++i)
+    {
+        st << worldCupInfo[i].support;
+        st << worldCupInfo[i].supportNum;
+        st << worldCupInfo[i].supportTime;
+    }
+    st << Stream::eos;
+    send(st);
+}
+void Player::UpdateWorldCupToDB(UInt8 num)
+{
+    if(num >= WC_MAX_COUNT)
+        return ;
+    DB1().PushUpdateData("REPLACE INTO `worldCup`(`playerId`, `num`, `count1`,`count2`,`count3`, `result`) VALUES(%" I64_FMT "u, %d, %u,%u,%u , %u)", getId(), num , worldCupInfo[num].supportNum ,worldCupInfo[num].supportTime , 0 , worldCupInfo[num].support);
+    
 }
 
 } // namespace GObject

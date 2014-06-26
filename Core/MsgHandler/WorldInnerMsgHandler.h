@@ -146,6 +146,16 @@ void OnClanChatReq( GameMsgHdr& hdr, const void * data )
 	if(player->getClan() != NULL)
 		player->getClan()->broadcast(data, hdr.msgHdr.bodyLen);
 }
+void OnWorldCupResult( GameMsgHdr& hdr, const void * data )
+{
+    struct WorldCupRes
+    {
+       UInt8 num;  
+       UInt32 res;
+    };
+	const  WorldCupRes* wc = reinterpret_cast<const WorldCupRes *>(data);
+    WORLD().WorldCupAward(wc->num,wc->res);
+}
 
 void OnSpreadModifyVar(GameMsgHdr& hdr, const void* data)
 {
@@ -3104,5 +3114,119 @@ void OnSendHappyFireRank ( GameMsgHdr& hdr,  const void* data )
         }
     }
 }
+void OnWorldCupSupport ( GameMsgHdr& hdr,  const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	struct WCSupportData
+	{
+		UInt8 num;
+        UInt8 res;
+		UInt32  number;
+	};
+	const  WCSupportData* wc = reinterpret_cast<const WCSupportData *>(data);
+    if(wc->res == 0 || wc->res > 3 || wc->num >= MAX_WC_COUNT )
+        return ;
 
+    WORLD().SupportWorldCup(player , wc->num , wc->res , wc->number);
+}
+
+void SendWorldCupRank(Stream& st)
+{
+    World::initRCRank();
+    using namespace GObject;
+    st.init(REP::ACTIVE);    //lib待定
+    UInt32 cnt = World::worldCupSort.size();
+    if (cnt > CNT)
+        cnt = CNT;
+    st << static_cast<UInt8>(0x33) << static_cast<UInt8>(2) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::worldCupSort.begin(), e = World::worldCupSort.end(); i != e; ++i)
+    {
+        if(i->player == NULL)
+            continue;
+        st << i->player->getName();
+        st << i->total;
+        ++c;
+        if (c >= cnt)
+            break;
+    }
+    st << Stream::eos;
+}
+void OnWorldCupRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+ 
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::worldCupSort.begin(), e = World::worldCupSort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= CNT10)
+                inrank = true;
+            World::worldCupSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::worldCupSort.insert(s);
+
+    UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
+    for (RCSortType::iterator i = World::worldCupSort.begin(), e = World::worldCupSort.end(); i != e; ++i)
+    {
+       if (!stop)
+            ++myrank;
+
+        if (i->player == player)
+            stop = true;
+
+        ++rank;
+
+        Stream st(REP::ACT);  //lib待定
+        st << static_cast<UInt8>(0x33) << static_cast<UInt8>(2)<< static_cast<UInt8>(2);
+        st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+        i->player->send(st);
+    }
+
+    if (oldrank <= CNT || (!inrank && myrank <= CNT))
+    {
+        Stream st;
+        SendWorldCupRank(st);
+        NETWORK()->Broadcast(st);
+    }
+}
+void OnSendWorldCupRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+    Stream st;
+    SendWorldCupRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::worldCupSort.begin(), e = World::worldCupSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::ACT);
+            st << static_cast<UInt8>(0x33) << static_cast<UInt8>(2) << static_cast<UInt8>(2);
+            st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
+}
 #endif // _WORLDINNERMSGHANDLER_H_

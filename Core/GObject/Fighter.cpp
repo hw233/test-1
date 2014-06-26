@@ -91,6 +91,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_lingbao, 0, sizeof(_lingbao));
     m_2ndSoul = NULL;
     _iswboss = false;
+    _iswbossinspire = false;
     _wbextatk = 0;
     _wbextmagatk = 0;
     _soulMax = 0;
@@ -100,6 +101,8 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _hideFashion = 0;
     _innateTrump = NULL;
     _soulSkillProtect = 0;
+    _wbplextatk = 0;
+    _wbplextmagatk = 0;
 }
 
 Fighter::~Fighter()
@@ -1148,6 +1151,17 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
     return t;
 }
 
+UInt8 Fighter::getLingshiNum()
+{
+    UInt8 count = 0;
+    for (int i = 0; i < LINGSHI_UPMAX; ++i)
+    {
+        if (_lingshi[i])
+            ++ count;
+    }
+    return count;
+}
+
 int Fighter::getAllLingshiId( UInt32* lingshis, int size )
 {
     if (!lingshis|| !size)
@@ -2084,6 +2098,12 @@ void Fighter::rebuildEquipAttr()
     {
         _attrExtraEquip.attack += _wbextatk;
         _attrExtraEquip.magatk += _wbextmagatk;
+    }
+
+    if(isWBossInspire())
+    {
+        _attrExtraEquip.attack += _wbplextatk;
+        _attrExtraEquip.magatk += _wbplextmagatk;
     }
 
     if(_owner/* && _owner->getClan()*/)
@@ -6540,6 +6560,10 @@ UInt16 Fighter::getPortrait()
             portrait = 1102;
         else if(getFashionTypeId() == 1730)
             portrait = 1105;
+        else if(getFashionTypeId() == 1732)
+            portrait = 1106;
+        else if(getFashionTypeId() == 1733)
+            portrait = 1107;
  
     }
 

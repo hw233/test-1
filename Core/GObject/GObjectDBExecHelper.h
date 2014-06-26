@@ -1657,6 +1657,15 @@ struct DBCardSuit
     UInt32 spe_mark;
     UInt8 collect_degree;
 };
+struct DBWorldCup
+{
+    UInt64 playerId;
+    UInt8  num;
+    UInt32 count1;
+    UInt32 count2;
+    UInt32 count3;
+    UInt32  result;
+};
 
 struct DBZhenyuanAttr
 {
@@ -3759,6 +3768,18 @@ SPECIALDEF(6)
     UInt8, active,
     UInt32, spe_mark,
     UInt8, collect_degree
+    )
+SPECIALEND()
+
+SPECIALBEGIN (GObject::DBWorldCup)
+SPECIALDEF(6)
+    (
+    UInt64, playerId,
+    UInt8 , num,
+    UInt32, count1,
+    UInt32, count2,
+    UInt32, count3,
+    UInt32 , result
     )
 SPECIALEND()
 

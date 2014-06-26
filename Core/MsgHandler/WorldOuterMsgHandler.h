@@ -3371,6 +3371,33 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
        }
        break;
+       case 0x33:
+       {
+            UInt8 op = 0;
+            brd >> op;
+            switch(op)
+            {
+                case 0x01:
+                    {
+                        player->sendMyWorldCupInfo();
+                        WORLD().sendWorldCupInfo(player);
+                        break;
+                    }        
+                case 0x02:
+                    {
+                        GameMsgHdr hdr(0x153, WORKER_THREAD_WORLD, player, 0);
+                        GLOBAL().PushMsg(hdr, NULL);
+                        break;
+                    }
+                case 0x03:
+                    {
+                        hdr.msgHdr.desWorkerID = player->getThreadId();
+                        GLOBAL().PushMsg(hdr, (void*)data);
+                        break;
+                    }
+            }
+       }
+       break;
        case 0x45:
        {
            UInt8 logType = 0;
@@ -4095,6 +4122,7 @@ void OnServerLeftRevInfo(ServerLeftMsgHdr& hdr, const void * data)
     st << buf;
     st << Stream::eos;
     player->send(st);
+    TRACE_LOG("Rec leftaddrinfo (pid: %" I64_FMT "u , size : %u )", playerId , br.size());
 }
 void OnServerLeftGetAward(ServerLeftMsgHdr& hdr, const void * data)
 {

@@ -159,6 +159,7 @@ namespace GObject
         GVAR_RAND_QUESTIONS_MARK = 100, // 选题标记
         
         GVAR_CLAN_BIGBOSS_ENABLE = 101,         //帮派BOSS能否预约
+        GVAR_MAX_LEVEL = 102 ,          //玩家最大等级 , 用于开启等级天劫判断
         GVAR_MAX,
     };
 
@@ -269,8 +270,6 @@ namespace GObject
             GREGISTER_VAR(GVAR_SERVERWAR_JIJIANTAI, GCYCLE_WEEK);
             GREGISTER_VAR(GVAR_SERVERWAR_XIUWEI, GCYCLE_WEEK);
 
-            GREGISTER_VAR(GVAR_QZONE_RECHARGE_BEGIN, GCYCLE_NONE);
-            GREGISTER_VAR(GVAR_QZONE_RECHARGE_END, GCYCLE_NONE);
 
             GREGISTER_VAR(GVAR_CHRISTMAS_PILESNOW_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_CHRISTMAS_PILESNOW_END, GCYCLE_NONE);
@@ -294,6 +293,7 @@ namespace GObject
             GREGISTER_VAR(GVAR_REPAIRTYSSBUG, GCYCLE_NONE);
             
             GREGISTER_VAR(GVAR_CLAN_BIGBOSS_ENABLE, GCYCLE_DAY);
+            GREGISTER_VAR(GVAR_MAX_LEVEL, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
