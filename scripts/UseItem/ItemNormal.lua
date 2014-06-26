@@ -9280,7 +9280,7 @@ end
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    local item = 1384;
+    local item = 1514;
 
     if package:GetRestPackageSize() < (1+(1*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
@@ -11407,6 +11407,34 @@ function ItemNormal_00016015(id, num, bind, param)
     end
     package:AddItem(503, 1, 1, 0, 2);
     package:AddItem(134, 1, 1, 0, 2);
+    package:DelItemSendMsg(id, player);
+    return num;
+end
+
+function ItemNormal_00016018(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 2 + (2*num*2)/99 then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    local prob = {1500, 3000, 4100, 5200, 6300, 7100, 7900, 8400, 8900, 9400, 9700, 10000}
+    local items = {{500,2}, {1126,2}, {501,1}, {503,1}, {513,1}, {551,2}, {516,1}, {134,1}, {509,1}, {1325,1}, {9498,1}, {9457,1}}
+
+    for k = 1, num do
+        local p = math.random(1, 10000)
+        local i = 1
+        for n = 1, #prob do
+            if p <= prob[n] then
+                i = n
+                break
+            end
+        end
+
+        local item = items[i];
+        package:AddItem(item[1], item[2], 1, 0, 2);
+    end
     package:DelItemSendMsg(id, player);
     return num;
 end
@@ -13774,6 +13802,7 @@ local ItemNormal_Table = {
     [16013] = ItemNormal_00016013,
     [16014] = ItemNormal_00016014,
     [16015] = ItemNormal_00016015,
+    [16018] = ItemNormal_00016018,
 
     [17002] = ItemNormal_00017002,
     [17003] = ItemNormal_00017003,

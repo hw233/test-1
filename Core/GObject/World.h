@@ -631,6 +631,18 @@ public:
         else
             return false;
     } 
+
+    inline static bool getCoolSummer(UInt32 time = 0)
+    {
+        UInt32 begin = TimeUtil::MkTime(2014, 7, 1);
+        UInt32 end = TimeUtil::MkTime(2014, 7, 7);
+        UInt32 now = TimeUtil::Now() + time;
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    }
+
     inline static bool getWorldCupTime(UInt32 time = 0 )
     {
         UInt32 end1 = TimeUtil::MkTime(2014, 6, 28);
@@ -1431,6 +1443,7 @@ public:
     static RCSortType worldCupSort;     //世界杯押注
     static RCSortType tyss_PlayerSort;     //天元神兽个人积分排名
     static ClanGradeSort tyss_ClanSort;     //天元神兽帮派积分排名
+    static RCSortType coolSummerSort;     //酷爽一夏个人活跃排名
     static void initRCRank();
     static void initRP7RCRank();
     static void WorldCupAward(UInt8 num , UInt32 res);  //公布答案
@@ -1544,6 +1557,7 @@ public:
     static UInt16 GetRandomSpot();
     void SendHappyFireAward();
     void SendWorldCupAward();
+    void SendCoolSummerAward();
     void SendWorldCupAward2();
     void SendGuankaActAward();
     void SendTYSSClanAward(UInt8);

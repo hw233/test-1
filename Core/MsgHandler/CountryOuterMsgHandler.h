@@ -2315,6 +2315,23 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 0x11:
+        {
+            if(!World::getCoolSummer())
+                return;
+            UInt8 type = 0;
+            UInt8 randType = 0;
+            UInt8 flag = 0;
+            br >> type;
+            if(1 == type)
+            {
+                br >> randType;
+                br >> flag;
+            }
+            player->coolSummerOp(type, randType, flag);
+        }
+        break;
+
         default:
         break;
     }

@@ -120,6 +120,11 @@ function loadStore()
     if getQixi() then
         store:add(2 ,16016 ,10)
     end
+
+    if  getCoolSummer(300) then
+        store:add(2 ,16020 ,20)
+    end
+
     store:add(2 ,9457 ,20)
 
     if  getWorldCupTime(30) or getWorldCupTime2(30) then
@@ -141,7 +146,7 @@ function loadStore()
     end
 
     if getSnowAct(300) then
-        store:add(2, 9275, 10)
+        store:add(2, 16019, 10)
     end
 
     if getSpecialBookAct() then  --特殊古籍活动

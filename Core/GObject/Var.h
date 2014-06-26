@@ -748,6 +748,7 @@ namespace GObject
         VAR_WB_INSPIRE = 757,//世界BOSS鼓舞次数 银币(8位) 仙石(8位)
         VAR_WB_SKIPBATTLE = 758,//世界BOSS跳过战斗标记
         VAR_WB_EXPSUM = 759,//世界BOSS总经验
+        VAR_WB_RELIVENUM = 760,//世界BOSS复活次数
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
         VAR_FIRE_SACRIFICE_TIMES = 772, //拜火祭天：0-7帮众添柴次数，8-15帮主诏令次数
@@ -756,6 +757,9 @@ namespace GObject
         VAR_DUOBAO_ACTIVE_POINT = 775, //夺宝奇兵活跃值+1(一天一点) 
         VAR_CLAN_SHOP_CURRENT_LVL = 776, //帮贡商店当前等级
         VAR_CLAN_SHOP_FLUSH_TIMES = 777, //帮贡商店当天刷新次数
+        VAR_COOL_SUMMER_ACTIVE_POINT = 778, //酷爽一夏当天活跃值
+        VAR_COOL_SUMMER_STATUS = 779, //0-7位:酷爽一夏活跃领奖状态(0双倍，1单倍),8-15位：当前已领礼包编号1-5
+        VAR_COOL_SUMMER_RAND_TYPE = 780, //酷爽一夏抽奖类型
 
         //781 - 810 for lijr
         VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
@@ -793,6 +797,9 @@ namespace GObject
 
         VAR_11AIRBOOK_AWARDSCORE = 817,  
             
+        //831-850 for qimj
+        VAR_COOL_SUMMER_AWARD_TYPE = 831,        //酷爽一夏奖励类型
+        VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL = 832, //酷爽一夏累积活跃值
         VAR_MAX,
     };
 
@@ -1468,6 +1475,11 @@ namespace GObject
             REGISTER_VAR(VAR_FIRE_SACRIFICE_CALLING_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_DUOBAO_ACTIVE_POINT, CYCLE_DAY);
             REGISTER_VAR(VAR_CUBE_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_COOL_SUMMER_ACTIVE_POINT, CYCLE_DAY);
+            REGISTER_VAR(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL, CYCLE_NONE);
+            REGISTER_VAR(VAR_COOL_SUMMER_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_COOL_SUMMER_RAND_TYPE, CYCLE_NONE);
+            REGISTER_VAR(VAR_COOL_SUMMER_AWARD_TYPE, CYCLE_NONE);
             REGISTER_VAR(VAR_CLAN_SHOP_CURRENT_LVL, CYCLE_NONE);
             REGISTER_VAR(VAR_CLAN_SHOP_FLUSH_TIMES, CYCLE_DAY);
 
@@ -1482,6 +1494,7 @@ namespace GObject
             REGISTER_VAR(VAR_WB_INSPIRE, CYCLE_HOUR);
             REGISTER_VAR(VAR_WB_SKIPBATTLE, CYCLE_HOUR);
             REGISTER_VAR(VAR_WB_EXPSUM, CYCLE_HOUR);
+            REGISTER_VAR(VAR_WB_RELIVENUM, CYCLE_HOUR);
 
             REGISTER_VAR(VAR_ERLKING_STATUSA, CYCLE_NONE);
             REGISTER_VAR(VAR_ERLKING_STATUSB, CYCLE_NONE);

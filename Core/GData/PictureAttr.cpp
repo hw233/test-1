@@ -10,7 +10,7 @@ namespace GData
 
     PictureAttr::stPictureAttr*  PictureAttr::getPictureAttrTable(UInt8 floor , UInt8 index)
     {
-        if( /*(_pictureAttr[floor].size() )&&*/index > 0 && (index  - 1)< _pictureAttr[floor].size() )
+        if( /*(_pictureAttr[floor].size() )&&*/index > 0 && static_cast<UInt32>(index  - 1)< _pictureAttr[floor].size() )
             return &_vecCubeAttr[_pictureAttr[floor][index - 1]];
         return NULL;
     }
