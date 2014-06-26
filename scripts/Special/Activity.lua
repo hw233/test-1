@@ -159,15 +159,15 @@ function _snowAct(player, _type)
     end
     local package = player:GetPackage();
     if _type == 0 then
-        package:AddItem(9275, 1, true)
+        package:AddItem(16019, 1, true)
     elseif _type == 1 then
-        package:AddItem(9275, 2, true)
+        package:AddItem(16019, 2, true)
     elseif _type == 2 then
-        package:AddItem(9275, 4, true)
+        package:AddItem(16019, 4, true)
     elseif _type == 3 then
-        package:AddItem(9275, 6, true)
+        package:AddItem(16019, 6, true)
     elseif _type == 5 then
-        package:AddItem(9275, 5, true)
+        package:AddItem(16019, 5, true)
     end
 end
 
@@ -294,6 +294,7 @@ function onDungeonWin(player, id, count, free)
     _9215Act(player, count);
     _snowAct(player, count);
     _collectCardAct(player, count);
+    IceCreamLoot(player)
 end
 
 function onClanBattleAttend(player)
@@ -930,6 +931,14 @@ function Item9344Act(player, lootlvl)
         package:AddItem(9344, itemNum[lootlvl], true);
     end
 end
+
+function IceCreamLoot(player)
+    if getCoolSummer() then
+        local package = player:GetPackage()
+        package:AddItem(16020, 1, true)
+    end
+end
+
 function Item9343Act(player, lootlvl)
     if getItem9343Act() then
         if lootlvl > 3 then
@@ -1067,6 +1076,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
 --    CompassAct(player, lootlvl);
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
+    IceCreamLoot(player)
     player:AddZRYJCount(20); -- 逐日印记
     _collectCardAct(player, lootlvl);
     if getTYSSTime() ~= 0 then
@@ -1099,6 +1109,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     HappyFireLoot(player,lootlvl);
     WorldCupLoot(player,lootlvl);
     SurnameLegendLoot(player,0);
+    IceCreamLoot(player)
     if lootlvl == 0 then
         FallActivity(player, 1)
     else

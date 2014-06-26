@@ -117,6 +117,8 @@ MSG_REG_2(GameMsgHdr, 0x152, OnWorldCupRank);
 MSG_REG_2(GameMsgHdr, 0x153, OnSendWorldCupRank);
 //MSG_REG_2(GameMsgHdr, 0x154, OnSendWorldCupRank);
 
+MSG_REG_2(GameMsgHdr, 0x155, OnCoolSummerReturn);
+MSG_REG_2(GameMsgHdr, 0x156, SetCoolSummerRank);
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);

@@ -3230,4 +3230,72 @@ void OnSendWorldCupRank ( GameMsgHdr& hdr,  const void* data )
         }
     }
 }
+
+void SetCoolSummerRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = player->GetVar(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL);
+    if (!total)
+        return;
+
+    for (RCSortType::iterator i = World::coolSummerSort.begin(), e = World::coolSummerSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            World::coolSummerSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::coolSummerSort.insert(s);
+}
+
+void OnCoolSummerReturn(GameMsgHdr& hdr,  const void* data)
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x11);
+    st << static_cast<UInt8>(0);
+    st << player->GetVar(VAR_COOL_SUMMER_ACTIVE_POINT);
+    st << player->GetVar(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL);
+    st << static_cast<UInt8>(player->GetVar(VAR_COOL_SUMMER_STATUS));
+
+    UInt8 count = 0;
+    size_t offset = st.size();
+    st << static_cast<UInt8>(count);
+
+    UInt32 rank = 1;
+    for (RCSortType::iterator i = World::coolSummerSort.begin(), e = World::coolSummerSort.end(); i != e; ++i, ++rank)
+    {
+        if(i->player == player)
+            break;
+    }
+
+    if(!player->GetVar(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL))
+        rank = 0;
+    st << rank;
+
+    for (RCSortType::iterator i = World::coolSummerSort.begin(), e = World::coolSummerSort.end(); i != e; ++i)
+    {
+        ++count;
+        st << i->player->getName();
+        st << i->player->getCountry();
+        st << i->player->GetVar(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL);
+        if(7 == count)
+            break;
+    }
+    st.data<UInt8>(offset) = count;
+    st << Stream::eos;
+    player->send(st);
+}
+
 #endif // _WORLDINNERMSGHANDLER_H_

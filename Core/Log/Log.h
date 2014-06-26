@@ -336,6 +336,7 @@ enum ItemFrom
     FromKJTM = 75 , //抗击天魔
     FromAutoTeamCopy = 76 , //自动组队副本
     FromClanShop = 77 , //帮贡商店
+    FromCoolSummer = 78 , //酷爽一夏
     //80 ~ 100，繁体占用
 };
 

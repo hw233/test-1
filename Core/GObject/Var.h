@@ -757,6 +757,9 @@ namespace GObject
         VAR_DUOBAO_ACTIVE_POINT = 775, //夺宝奇兵活跃值+1(一天一点) 
         VAR_CLAN_SHOP_CURRENT_LVL = 776, //帮贡商店当前等级
         VAR_CLAN_SHOP_FLUSH_TIMES = 777, //帮贡商店当天刷新次数
+        VAR_COOL_SUMMER_ACTIVE_POINT = 778, //酷爽一夏当天活跃值
+        VAR_COOL_SUMMER_STATUS = 779, //0-7位:酷爽一夏活跃领奖状态(0双倍，1单倍),8-15位：当前已领礼包编号1-5
+        VAR_COOL_SUMMER_RAND_TYPE = 780, //酷爽一夏抽奖类型
 
         //781 - 810 for lijr
         VAR_ERLKING_STATUSA = 781,               //妖王再临状态(1-16)
@@ -794,6 +797,9 @@ namespace GObject
 
         VAR_11AIRBOOK_AWARDSCORE = 817,  
             
+        //831-850 for qimj
+        VAR_COOL_SUMMER_AWARD_TYPE = 831,        //酷爽一夏奖励类型
+        VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL = 832, //酷爽一夏累积活跃值
         VAR_MAX,
     };
 
@@ -1469,6 +1475,11 @@ namespace GObject
             REGISTER_VAR(VAR_FIRE_SACRIFICE_CALLING_TIME, CYCLE_DAY);
             REGISTER_VAR(VAR_DUOBAO_ACTIVE_POINT, CYCLE_DAY);
             REGISTER_VAR(VAR_CUBE_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_COOL_SUMMER_ACTIVE_POINT, CYCLE_DAY);
+            REGISTER_VAR(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL, CYCLE_NONE);
+            REGISTER_VAR(VAR_COOL_SUMMER_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_COOL_SUMMER_RAND_TYPE, CYCLE_NONE);
+            REGISTER_VAR(VAR_COOL_SUMMER_AWARD_TYPE, CYCLE_NONE);
             REGISTER_VAR(VAR_CLAN_SHOP_CURRENT_LVL, CYCLE_NONE);
             REGISTER_VAR(VAR_CLAN_SHOP_FLUSH_TIMES, CYCLE_DAY);
 
