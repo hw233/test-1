@@ -168,6 +168,8 @@ enum PurchaseType
     LingShiPeiYang              = 1029, //灵侍培养仙石消耗
     AutoTeamCopy                = 1030, //自动组队消耗
     CutTree                     = 1031, //伐木无损扫荡
+    BuyClanShopItems            = 1032, //购买帮贡商店物品
+    FlushClanShopItems          = 1033, //刷新帮贡商店物品
     //繁体私有占150～200
 };
 
@@ -328,6 +330,7 @@ enum ItemFrom
     FromJieBai = 74 ,
     FromKJTM = 75 , //抗击天魔
     FromAutoTeamCopy = 76 , //自动组队副本
+    FromClanShop = 77 , //帮贡商店
     //80 ~ 100，繁体占用
 };
 

@@ -931,6 +931,7 @@ CREATE TABLE `player` (
   `xjfrontFreeCnt` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `xjfrontGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `xjfrontUpdate` int(10) unsigned NOT NULL DEFAULT 0,
+  `clancontrishop` varchar(1024) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
   KEY `mainFighter` (`mainFighter`)

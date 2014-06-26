@@ -50,6 +50,7 @@
 #include "LingShiTable.h"
 #include "CardSystem.h"
 #include "NewQuestionsTable.h"
+#include "ClanShop.h"
 
 namespace GData
 {
@@ -492,6 +493,11 @@ namespace GData
         if (!LoadCardUpgrade())
         {
             fprintf (stderr, "Load LoadCardUpgrade Error !\n");
+            std::abort();
+        }
+        if (!LoadClanShopInfo())
+        {
+            fprintf (stderr, "Load LoadClanShopInfo Error !\n");
             std::abort();
         }
         if (!LoadCardInfo())
@@ -3188,6 +3194,29 @@ namespace GData
             csys.loadInitCardInfo(dbpn); 
 		return true;
     }
+
+    bool GDataManager::LoadClanShopInfo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBClanShopInfo dbpn;
+		if(execu->Prepare("SELECT `id`, `itemid`, `name`, `price`, `prob`, `color`,`lvl` FROM `clan_contribution_shop` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+        {
+            ClanShopInfo::ClanShopItems its;
+            its.id = dbpn.id;
+            its.itemid = dbpn.itemid;
+            its.name = dbpn.name;
+            its.price = dbpn.price;
+            its.prob = dbpn.prob;
+            its.color = dbpn.color;
+            its.lvl = dbpn.lvl;
+            clanShopInfo.setClanShopInfo(dbpn.id, its);
+        }
+		return true;
+    }
+
     bool GDataManager::LoadCubeAttr()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());

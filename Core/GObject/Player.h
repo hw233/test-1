@@ -1000,6 +1000,7 @@ namespace GObject
         UInt8 xjfrontFreeCnt;         // ??ͼ???Ѵ???
         UInt8 xjfrontGoldCnt;         // ??ͼ?շѴ???
         UInt32 xjfrontUpdate;         // ??ͼ????????ʱ??
+        std::multimap<UInt32, UInt8> clanShopItemsAll;
     };
 
 	class Player:
@@ -3492,6 +3493,14 @@ namespace GObject
         UInt32 getCurClanTitle();
         void clearClanTitle();
         void checkClanTitle();
+
+        void clanShopOp(UInt8, UInt8);
+        void sendClanShopInfo();
+        void writeClanShopItems();
+        bool buyClanShopItems(UInt8);
+        bool flushClanShopItems(bool);
+        void randomForClanShop(UInt8);
+        bool clanShopLvlShift(UInt8);
 
     private:
         //玩家位置（包括层数、当层位置）
