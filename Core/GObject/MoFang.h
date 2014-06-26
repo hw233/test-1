@@ -52,6 +52,22 @@ namespace GObject
         MOUNTAIN_ELEMENT    // 山
     };
 
+    //机关库套件统计
+    enum
+    {
+        JIGUANKU_A = 401,
+        JIGUANKU_B = 501,
+        JIGUANKU_C = 601,
+        JIGUANKU_D = 701,
+        JIGUANKU_E = 801,
+        JIGUANKU_F = 901,
+        JIGUANKU_G = 1001,
+        JIGUANKU_H = 1101,
+        JIGUANKU_I = 1201,
+        JIGUANKU_J = 1301,
+        JIGUANKU_K = 1401
+    };
+
     #define NORMAL_TUZHI   100000
     #define SPECIAL_TUZHI  200000
     #define JGS_MAXEXP     1525500

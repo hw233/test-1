@@ -1804,10 +1804,13 @@ void MoFang::sendSpecialGearInfo()
 
 void MoFang::sendZYValue(Stream& st)
 {
-    st << static_cast<UInt32>(9999);
-    st << static_cast<UInt32>(9999);
-    st << static_cast<UInt32>(9999);
-    st << static_cast<UInt32>(9999);
+    if(!m_owner)
+        return;
+
+    st << m_owner->GetVar(VAR_ZIYUN_KUANG);
+    st << m_owner->GetVar(VAR_ZIYUN_MU);
+    st << m_owner->GetVar(VAR_ZIYUN_PAI);
+    st << m_owner->GetVar(VAR_ZIYUN_LIANFU);
 }
 
 void MoFang::makeGear(UInt16 gearId, UInt8 mark)
@@ -1857,10 +1860,10 @@ void MoFang::makeGear(UInt16 gearId, UInt8 mark)
             || zylf<gearInfo->ZYLFNum)
         return;
 
-    m_owner->SetVar(VAR_ZIYUN_KUANG, (zyk-gearInfo->ZYKNum));
-    m_owner->SetVar(VAR_ZIYUN_MU, (zym-gearInfo->ZYMNum));
-    m_owner->SetVar(VAR_ZIYUN_PAI, (zys-gearInfo->ZYSNum));
-    m_owner->SetVar(VAR_ZIYUN_LIANFU, (zylf-gearInfo->ZYLFNum));
+    m_owner->SetVar(VAR_ZIYUN_KUANG, (zyk - gearInfo->ZYKNum));
+    m_owner->SetVar(VAR_ZIYUN_MU, (zym - gearInfo->ZYMNum));
+    m_owner->SetVar(VAR_ZIYUN_PAI, (zys - gearInfo->ZYSNum));
+    m_owner->SetVar(VAR_ZIYUN_LIANFU, (zylf - gearInfo->ZYLFNum));
 
     ConsumeInfo ci(MakeGear, 0, 0);
     m_owner->useTael(gearInfo->taelNum, &ci);
@@ -1880,11 +1883,11 @@ void MoFang::makeGear(UInt16 gearId, UInt8 mark)
     m_owner->send(st);
 
     UInt32 addValue = gearInfo->attrValueG;
-    std::cout << "0000000 : " << gearId << std::endl;
-    std::cout << "AAAAAAA : " << addValue << std::endl;
-    std::cout << "BBBBBBB : " << m_owner->GetVar(VAR_GEAR_BUFF) << std::endl;
+    //std::cout << "0000000 : " << gearId << std::endl;
+    //std::cout << "AAAAAAA : " << addValue << std::endl;
+    //std::cout << "BBBBBBB : " << m_owner->GetVar(VAR_GEAR_BUFF) << std::endl;
     m_owner->AddVar(VAR_GEAR_BUFF, addValue);
-    std::cout << "CCCCCCC : " << m_owner->GetVar(VAR_GEAR_BUFF) << std::endl;
+    //std::cout << "CCCCCCC : " << m_owner->GetVar(VAR_GEAR_BUFF) << std::endl;
 
     std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
     for(std::map<UInt32, Fighter *>::iterator it=fighters.begin(); it!=fighters.end(); ++it)
@@ -1895,6 +1898,43 @@ void MoFang::makeGear(UInt16 gearId, UInt8 mark)
     UInt8 gearType = GData::jiguanData.getGearType(gearId);
     if(1 == gearType)
         SYSMSG_BROADCASTV(5155, m_owner->getCountry(), m_owner->getName().c_str(), 5, (gearInfo->name).c_str());
+
+    switch(gearId)
+    {
+        case JIGUANKU_A:
+            m_owner->udpLog("jiguanku", "F_140627_21", "", "", "", "", "act");
+            break;
+        case JIGUANKU_B:
+            m_owner->udpLog("jiguanku", "F_140627_22", "", "", "", "", "act");
+            break;
+        case JIGUANKU_C:
+            m_owner->udpLog("jiguanku", "F_140627_23", "", "", "", "", "act");
+            break;
+        case JIGUANKU_D:
+            m_owner->udpLog("jiguanku", "F_140627_24", "", "", "", "", "act");
+            break;
+        case JIGUANKU_E:
+            m_owner->udpLog("jiguanku", "F_140627_25", "", "", "", "", "act");
+            break;
+        case JIGUANKU_F:
+            m_owner->udpLog("jiguanku", "F_140627_26", "", "", "", "", "act");
+            break;
+        case JIGUANKU_G:
+            m_owner->udpLog("jiguanku", "F_140627_27", "", "", "", "", "act");
+            break;
+        case JIGUANKU_H:
+            m_owner->udpLog("jiguanku", "F_140627_28", "", "", "", "", "act");
+            break;
+        case JIGUANKU_I:
+            m_owner->udpLog("jiguanku", "F_140627_29", "", "", "", "", "act");
+            break;
+        case JIGUANKU_J:
+            m_owner->udpLog("jiguanku", "F_140627_30", "", "", "", "", "act");
+            break;
+        case JIGUANKU_K:
+            m_owner->udpLog("jiguanku", "F_140627_31", "", "", "", "", "act");
+            break;
+    }
 }
 
 bool MoFang::makeCommonGear(UInt16 gearId)

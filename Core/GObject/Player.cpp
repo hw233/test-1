@@ -33754,6 +33754,15 @@ void Player::sendHappyXXLInfo()
     st << static_cast<UInt32>(getWrapKey()->wrapTheKey());
     st << Stream::eos;
     send(st);
+
+    Stream stA(REP::MOFANG_INFO);
+    stA << static_cast<UInt8>(15);
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_KUANG));
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_MU));
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_PAI));
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_LIANFU));
+    stA << Stream::eos;
+    send(stA);
 }
 void Player::sendXXLMapInfo(UInt8 res ,UInt8 type)
 {
