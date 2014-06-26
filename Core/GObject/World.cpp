@@ -354,6 +354,7 @@ bool bItem9343End = false;
 bool bQiShiBanEnd = false;
 bool bTYSSEnd = false;
 bool bWCTimeEnd = false;
+bool bWCTimeEnd2 = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -1417,6 +1418,7 @@ void World::World_Midnight_Check( World * world )
     bool bGuanka = getGuankaAct();
     bool b11time = get11Time();
     bool bWCtime = getWorldCupTime();
+    bool bWCtime2 = getWorldCupTime2();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
     bool bJune = getJune();
@@ -1466,6 +1468,7 @@ void World::World_Midnight_Check( World * world )
     bGuankaEnd = bGuanka && !getGuankaAct(300);
     b11TimeEnd = b11time && !get11Time();
     bWCTimeEnd = bWCtime && !getWorldCupTime(300);
+    bWCTimeEnd2 = bWCtime2 && !getWorldCupTime2(300);
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
     bGGTimeEnd = bGGtime && !getGGTime(300);
@@ -1782,6 +1785,9 @@ void World::World_Midnight_Check( World * world )
     }
     if(bWCTimeEnd)
         world->SendWorldCupAward();
+    if(bWCTimeEnd2)
+        world->SendWorldCupAward2();
+
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
   //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
@@ -1877,6 +1883,11 @@ inline bool player_enum_AskOldMan(GObject::Player * p, int)
         flag &= 255;
         p->SetVar(VAR_OLDMAN_SCORE_AWARD,flag);
     }
+    return true;
+}
+inline bool player_enum_clearVar746(GObject::Player * p, int)
+{
+    p->SetVar(VAR_WORLDCUP_RES,0);
     return true;
 }
 
@@ -3658,7 +3669,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::LuckyBagSort.insert(s);
         }
     }
-    if (World::getWorldCupTime())
+    if (World::getWorldCupTime() || World::getWorldCupTime2())
     {
         UInt32 used = p->GetVar(VAR_WORLDCUP_RES);
         if (used)
@@ -5285,6 +5296,52 @@ void World::SendWorldCupAward()
         {{515,10},{134,10},{503,15},{9068,5}},
     };
     static MailPackage::MailItem card = {9979,1};   //暂无白马王子
+
+    SYSMSG(title, 5151);
+    int pos = 0;
+    for (RCSortType::iterator i = World::worldCupSort.begin(), e = World::worldCupSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (!player)
+            continue;
+        ++pos;
+        if(pos > 7) break;   // 1--7名
+        SYSMSGV(content, 5152, pos,i->total);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, s_item[pos-1], 4, true);  
+            if(pos ==1)
+                mailPackageManager.push(mail->id, &card, 1, true);
+        }
+        std::string strItems;
+        for(int index = 0; index < 4; ++ index)
+        {
+            strItems += Itoa(s_item[pos-1][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[pos-1][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+    }
+    worldCupSort.clear();
+    GObject::globalPlayers.enumerate(player_enum_clearVar746, 0);
+}
+void World::SendWorldCupAward2()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][5] = {
+        {{515,40},{9498,40},{9600,40},{9075,20}},
+        {{515,30},{9498,30},{9600,30},{9075,15}},
+        {{515,20},{9498,20},{9600,20},{9075,10}},
+        {{515,12},{9498,12},{9600,12},{9075,5}},
+        {{515,12},{9498,12},{9600,12},{9075,5}},
+        {{515,12},{9498,12},{9600,12},{9075,5}},
+        {{515,12},{9498,12},{9600,12},{9075,5}},
+    };
+    static MailPackage::MailItem card = {9982,1};   //大头称号
+
     SYSMSG(title, 5151);
     int pos = 0;
     for (RCSortType::iterator i = World::worldCupSort.begin(), e = World::worldCupSort.end(); i != e; ++i)

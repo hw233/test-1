@@ -1,6 +1,6 @@
 --代码描述:此脚本仅处理天书奇缘的积分bug导致的情况 (被加载的地方似乎不合适，会被加载三次，影响效率)
 print("XXX")
---os.execute("zcat log/DB/TRACE20140622.gz |grep var|grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[0[0,1,2]:\" > test1.txt")  --需要修改cat语句已限制时间段
+os.execute("zcat log/DB/TRACE20140621.gz |grep var|grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[00:[0,1,2,3,4][0-9]:\" > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep [^0-9]599[^0-9] > test1.txt")
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[1[0-9]\" > test1.txt")  --需要修改cat语句已限制时间段
 os.execute("awk '{print $11,$12,$13,$14}' test1.txt > test2.txt ")  --产生文件的格式为(XXXX, XXXX, XXXX)]
@@ -21,20 +21,20 @@ for i in file:lines() do
 
         if res[str1]== nil then    
             res[str1]= tonumber(str2)  --初始数值设为第一个出现的值
-            result[str1]= 100    --结果增量设置为0
+            result[str1]= 0    --结果增量设置为0
         end
 
         --条件刷分情况 10分的递进刷分，此时间内全部还原(处理刷分) ,问题(只要是10分递进的加分全部清楚)
         --print(str1..tonumber(str2))
-        if  tonumber(str2) - res[str1] == 10 then 
-            result[str1] = result[str1] - 10     --结果：削减的积分（10分，若无条件削减，参见下文增加）
-        end
+       -- if  tonumber(str2) - res[str1] == 10 then 
+       --     result[str1] = result[str1] - 10     --结果：削减的积分（10分，若无条件削减，参见下文增加）
+       -- end
 
-        --    --此判断开放：表示该时间段积分重新增加（处理积分意外清零的情况）
-        --    if  tonumber(str2) > res[str1]  then 
-        --        result[str1] = result[str1] + tonumber(str2) - res[str1]  --结果：增加积分（无条件增加）
-        --    end
-        --
+       --此判断开放：表示该时间段积分重新增加（处理积分意外清零的情况）
+       if  tonumber(str2) > res[str1]  then 
+           result[str1] = result[str1] + tonumber(str2) - res[str1]  --结果：增加积分（无条件增加）
+       end
+
         res[str1] = tonumber(str2)
     else
         print(str3 .. "error")
