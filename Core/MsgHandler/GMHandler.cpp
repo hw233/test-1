@@ -283,6 +283,7 @@ GMHandler::GMHandler()
     Reg(2, "setplvar", &GMHandler::OnSetPlayersVar);
     Reg(2, "setfc", &GMHandler::OnAddFriendlyCount);
     Reg(2, "autotc", &GMHandler::OnAutoTeamCopy);
+    Reg(2, "makegear", &GMHandler::OnMakeGear);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -4446,6 +4447,16 @@ void GMHandler::OnAutoTeamCopy(GObject::Player *player, std::vector<std::string>
     }
 }
 
+void GMHandler::OnMakeGear(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 2)
+        return;
+
+    UInt16 gearId = atoi(args[0].c_str());
+    UInt8 type = atoi(args[1].c_str());
+    player->GetMoFang()->makeGear(gearId, type);
+}
+
 void GMHandler::OnSomeAct(GObject::Player *player, std::vector<std::string>& args)
 {
     if (args.size() < 1)
@@ -5656,7 +5667,7 @@ void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& 
     UInt8 pos = atoi(args[0].c_str());
     GObject::Clan *clan = player->getClan();
     if(clan != NULL)
-        clan->sendMemberBuf(pos);
+        clan->sendMemberBuf(pos,1);
 }
 
 void GMHandler::OnRaceBattle(GObject::Player *player, std::vector<std::string>& args)

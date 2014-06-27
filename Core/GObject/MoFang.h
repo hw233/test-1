@@ -40,10 +40,32 @@ namespace GObject
 
     enum
     {
+        GEAR_COMMON = 1,    // 普通机关库
+        GEAR_SPECIAL        // 特殊机关库
+    };
+
+    enum
+    {
         WIND_ELEMENT = 1,   // 风 
         FOREST_ELEMENT,     // 林
         FIRE_ELEMENT,       // 火
         MOUNTAIN_ELEMENT    // 山
+    };
+
+    //机关库套件统计
+    enum
+    {
+        JIGUANKU_A = 401,
+        JIGUANKU_B = 501,
+        JIGUANKU_C = 601,
+        JIGUANKU_D = 701,
+        JIGUANKU_E = 801,
+        JIGUANKU_F = 901,
+        JIGUANKU_G = 1001,
+        JIGUANKU_H = 1101,
+        JIGUANKU_I = 1201,
+        JIGUANKU_J = 1301,
+        JIGUANKU_K = 1401
     };
 
     #define NORMAL_TUZHI   100000
@@ -81,6 +103,7 @@ namespace GObject
         void AddTuzhiFromDB(DBTuzhi &);
         void AddKeyinFromDB(DBKeyin &);
         void AddZhenweiFromDB(DBZhenwei &);
+        void AddGearFromDB(UInt16 gearId, UInt8 mark);
 
         void randTuzhi(UInt16 num);
         void addJGSExp(UInt32 exp);
@@ -108,6 +131,18 @@ namespace GObject
 
         /**GM**/
         void addjiguanyu(UInt32 jiguanyuId);
+
+    public:
+        void sendCommonGearInfo();
+        void sendSpecialGearInfo();
+        void sendZYValue(Stream& st);
+        void makeGear(UInt16 gearId, UInt8 mark);
+        bool makeCommonGear(UInt16 gearId);
+        bool makeSpecialGear(UInt16 gearId);
+        bool checkCommonGear(UInt16 gearId);
+        bool checkSpecialGear(UInt16 gearId);
+        void addGearAttr(GData::AttrExtra& ae);
+
     private:
 
         std::map<UInt32, UInt8> m_equipJG;  // 装备的机关
@@ -121,6 +156,10 @@ namespace GObject
         std::map<UInt16, UInt8> m_zhenwei;  // 记录机关密钥所对应的状态
 
         std::vector<UInt32> m_jg;           // 记录未装备机关
+
+        std::vector<UInt16> m_commonGear;   // 记录普通机关库已经制造成功的零件
+
+        std::vector<UInt16> m_specialGear;  // 记录特殊机关库已经制造成功的零件
 
         int m_grids[49];                    // 记录网格占用情况
 

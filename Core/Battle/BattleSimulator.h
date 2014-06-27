@@ -363,6 +363,9 @@ private:
         e_jianZong = 135,  //剑宗效果
         e_unJianZong = 136,  //剑宗效果消失
 
+        e_controlBall = 137,    // 控球效果
+        e_unControlBall = 138,    // 控球效果消失
+
         e_MAX_STATE,
     };
 
@@ -809,6 +812,7 @@ private:
     bool doEffectAfterCount(BattleFighter* bf, const GData::SkillBase* skill, UInt16 actCnt);
     UInt32 doLingshiModelAttack(BattleFighter* bf, UInt8 flag, UInt32& skillId);
     void onDeadLingshi(BattleFighter* bf);
+    void doControlBall(BattleFighter* bf);
 };
 
 }

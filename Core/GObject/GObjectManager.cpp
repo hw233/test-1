@@ -426,6 +426,12 @@ namespace GObject
             std::abort();
         }
 
+		if(!loadGear())
+        {
+            fprintf(stderr, "load gear error!\n");
+            std::abort();
+        }
+
 		if(!loadTempItem())
         {
             fprintf(stderr, "load TempItem error!\n");
@@ -756,6 +762,11 @@ namespace GObject
 		if(!loadWorldCup())
         {
             fprintf(stderr, "loadWorldCup error!\n");
+            std::abort();
+        }
+		if(!loadHappyXXL())
+        {
+            fprintf(stderr, "loadHappyXXL error!\n");
             std::abort();
         }
 
@@ -1775,7 +1786,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1`,`xjfrontFreeCnt`, `xjfrontGoldCnt`, `xjfrontUpdate` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1`,`xjfrontFreeCnt`, `xjfrontGoldCnt`, `xjfrontUpdate`, `clancontrishop` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -2134,6 +2145,18 @@ namespace GObject
                     PLAYER_DATA(pl, canHirePet).push_back(atoi(tk[idx].c_str()));
                 }
             }
+
+            if (dbpd.clanShopItems.length())
+            {
+				StringTokenizer tk(dbpd.clanShopItems, "|");
+				size_t count = tk.count();
+                for(size_t idx = 0; idx < count; ++ idx)
+			    {
+                    StringTokenizer tk1(tk[idx].c_str(), ",");
+                    PLAYER_DATA(pl, clanShopItemsAll).insert(std::make_pair(atoi(tk1[0].c_str()), atoi(tk1[1].c_str())));
+                }
+            }
+
 		}
 		lc.finalize();
 
@@ -6284,6 +6307,38 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadGear()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading gear:");
+		DBGear gdata;
+        Player* pl = NULL;
+
+		if(execu->Prepare("SELECT `playerId`, `gearId`, `mark`  FROM `player_gear` ORDER BY `playerId`", gdata) != DB::DB_OK)
+			return false;
+
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(gdata.playerId != last_id)
+			{
+				last_id = gdata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+
+            pl->GetMoFang()->AddGearFromDB(gdata.gearId, gdata.mark);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
     bool GObjectManager::loadGoback()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -7939,6 +7994,28 @@ namespace GObject
             if(dbpn.count3 != 0 )
                 continue ;
             pl->setMyWorldCupInfo(dbpn.num , dbpn.result , dbpn.count1 , dbpn.count2);
+        }
+		lc.finalize();
+		return true;
+    }
+    bool GObjectManager::loadHappyXXL()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading WorldCup:");
+		DBHappyXXL dbpn;
+		if(execu->Prepare("SELECT `playerId` ,`num`, `map` FROM `happyXXL` ", dbpn) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+		    Player* pl = globalPlayers[dbpn.playerId];
+			if(pl == NULL)
+				continue;
+            if(dbpn.num > 2)
+                continue;
+            pl->setXXLMapInfo(0,dbpn.num ,dbpn.map);
         }
 		lc.finalize();
 		return true;

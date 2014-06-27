@@ -164,6 +164,9 @@ namespace GObject
 #define PLAYER_BUFF_CLAN2           0x69 // （活动）第2帮派BUF
 #define PLAYER_BUFF_CLAN3           0x6A // （活动）第3帮派BUF
 #define PLAYER_BUFF_TYSS            0x6B // （TYSS活动）个人BUF
+#define PLAYER_BUFF_NEW_CLAN1       0x6C // （新活动）第1帮派BUF
+#define PLAYER_BUFF_NEW_CLAN2       0x6D // （新活动）第2帮派BUF
+#define PLAYER_BUFF_NEW_CLAN3       0x6E // （新活动）第3帮派BUF
 #define PLAYER_BUFF_ATHL11          0x71 // 魔
 #define PLAYER_BUFF_ATHL22          0x72 // 神
 #define PLAYER_BUFF_ATHL33          0x73 // 虚
@@ -294,6 +297,7 @@ namespace GObject
         YEHUO       = 20,   //业火天雷
         JIUZI       = 21,   //九子神雷
         TAIYI       = 22,   //太乙神雷
+        SANGBA       = 23,   //桑巴荣耀
 
         DRAGONKING_MAX,
     };
@@ -853,7 +857,7 @@ namespace GObject
         std::map<UInt8,std::vector<UInt8> > cubeCover; 
         PictureInfo():floor(1){} 
     };
-#define WC_MAX_COUNT 48
+#define WC_MAX_COUNT 63
     struct WorldCup
     {
         UInt8  support; 
@@ -1023,6 +1027,7 @@ namespace GObject
         UInt8 xjfrontFreeCnt;         // ??ͼ???Ѵ???
         UInt8 xjfrontGoldCnt;         // ??ͼ?շѴ???
         UInt32 xjfrontUpdate;         // ??ͼ????????ʱ??
+        std::multimap<UInt32, UInt8> clanShopItemsAll;
     };
 
 	class Player:
@@ -1224,6 +1229,7 @@ namespace GObject
 		void Reconnect();
         void AddWorldCupScore(UInt32 grade ,UInt8 flag = 0);
         void SendWCGradeAward(UInt8 type);
+        void SendWCGradeAward2(UInt8 type);
         UInt8 supportWorldCup(UInt8 num ,UInt8 res , UInt32 number);
         void sendMyWorldCupInfo();
         void setMyWorldCupInfo(UInt8 num , UInt8 res ,UInt32 count , UInt32 time)
@@ -1241,6 +1247,14 @@ namespace GObject
             return worldCupInfo[num].support ;
         }
         void UpdateWorldCupToDB(UInt8 num);
+        void getXXLAward(UInt8 type);
+        void buyXXLCount();
+        void UpdateXXLToDB(UInt8 num);
+        UInt8 setXXLMapInfo(UInt8 step ,UInt8 type ,std::string mapInfo , UInt8 flag = 0);
+        void sendHappyXXLInfo();
+        void sendXXLMapInfo(UInt8 res = 0 ,UInt8 index = 0);
+        void getXXLScore(UInt8 type ,UInt8 count);
+        UInt8 subXXLCount(UInt8 step);
 
 		void Logout(bool = false);	//???????߲???
 		void selfKick();
@@ -3411,6 +3425,7 @@ namespace GObject
         CuttingInfo cuttingInfo ;
         PictureInfo pictureInfo ; 
         WorldCup worldCupInfo[WC_MAX_COUNT];
+        std::string xxlMapInfo[3];
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();
@@ -3543,6 +3558,14 @@ namespace GObject
         void sendCoolSummerAward(UInt8, UInt8);
         void useIceCream(UInt8, UInt8);
         void sendCoolSummerActPointGift(UInt8);
+
+        void clanShopOp(UInt8, UInt8);
+        void sendClanShopInfo();
+        void writeClanShopItems();
+        bool buyClanShopItems(UInt8);
+        bool flushClanShopItems(bool);
+        void randomForClanShop(UInt8);
+        bool clanShopLvlShift(UInt8);
 
     private:
         //玩家位置（包括层数、当层位置）

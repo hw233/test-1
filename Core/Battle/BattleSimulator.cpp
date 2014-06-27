@@ -1141,6 +1141,8 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
             dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor, atkreduce);
             dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
             dmg = dmg > 0 ? dmg : 1;
+            if(cs2)
+                doControlBall(bf);
         }
 
         doShieldHPAttack(bo, dmg);
@@ -1267,6 +1269,8 @@ UInt32 BattleSimulator::doOtherConfuseForgetAttackOnce(BattleFighter * bf, Battl
             dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor, atkreduce);
             dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
             dmg = dmg > 0 ? dmg : 1;
+            if(cs2)
+                doControlBall(bf);
         }
 
         doShieldHPAttack(bo, dmg);
@@ -1338,6 +1342,7 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
             if(s < 2)
                 _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
 
+            doControlBall(bf);
         }
 
         float toughFactor = pr ? area_target->getTough(bf) : 1.0f;
@@ -1710,6 +1715,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     dmgFlag = true;
                     dmg = doBufMakeDamage(area_target, dmg);
                 }
+                if(cs2)
+                    doControlBall(bf);
             }
 
             if(area_target->getMagAtkReduce3Last() > 0)
@@ -2014,6 +2021,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         if(s < 2)
                             _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
 
+                        doControlBall(target_fighter);
                     }
                     float def = getBFDefend(bf);
                     bool pr2 = target_fighter->calcPierce(bf);
@@ -2068,6 +2076,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
         dmg = static_cast<int>(factor * atk) * (950 + _rnd(100)) / 1000;
         makeDamage(static_cast<BattleFighter*>(area_target_obj), dmg, e_damNormal, e_damagePhysic);
         //printf("%u:%u %s ground object, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", dmg, area_target_obj->getHP());
+        if(cs2)
+            doControlBall(bf);
     }
 
     if(first)
@@ -7120,6 +7130,58 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
     }
 
+    if(bf->getHP() > 0 && _winner == 0 && bf->getControlBallCnt() >= 3)
+    {
+        const GData::SkillBase* passiveSkill = bf->getSkillControlBall();
+        if(passiveSkill)
+        {
+            _activeFgt = bf;
+            UInt8 curCnt = bf->getControlBallCnt() - 3;
+            bf->setControlBallCnt(curCnt);
+            if(curCnt > 0)
+                appendDefStatus(e_controlBall, curCnt, bf);
+            else
+                appendDefStatus(e_unControlBall, curCnt, bf);
+            bf->setControlBallCnt2(curCnt);
+
+            int target_side, target_pos, cnt;
+            getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
+            std::vector<AttackAct> atkAct;
+            atkAct.clear();
+            if(doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, &atkAct))
+                ++ rcnt;
+            if(_defList.size() > 0 || _scList.size() > 0)
+            {
+                appendToPacket(bf->getSide(), bf->getPos(), 0, 2, passiveSkill->getId(), false, false);
+                ++ rcnt;
+            }
+            _activeFgt = NULL;
+        }
+    }
+    for(UInt8 side = 0; side < 2; side++)
+    {
+        for(UInt8 i = 0; i < 25; i++)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(bo == NULL || bo->getHP() == 0)
+                continue;
+            UInt8 curCnt = bo->getControlBallCnt();
+            UInt8 lastCnt = bo->getControlBallCnt2();
+            if(curCnt == lastCnt)
+                continue;
+            if(curCnt > 0)
+                appendDefStatus(e_controlBall, curCnt, bo);
+            else
+                appendDefStatus(e_unControlBall, curCnt, bo);
+            bo->setControlBallCnt2(curCnt);
+        }
+        if(_defList.size() > 0 || _scList.size() > 0)
+        {
+            appendToPacket(0, -1, -1, 0, 0, false, false);
+            ++ rcnt;
+        }
+    }
+
     return rcnt;
 }
 
@@ -10103,6 +10165,7 @@ UInt32 BattleSimulator::CalcNormalAttackDamage(BattleFighter * bf, BattleObject*
             if(s < 2)
                 _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
 
+            doControlBall(bf);
         }
 
         float toughFactor = pr ? area_target->getTough(bf) : 1.0f;
@@ -14057,6 +14120,7 @@ void BattleSimulator::doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& 
             if(s < 2)
                 _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
 
+            doControlBall(bf);
         }
 
         float toughFactor = pr ? bo->getTough(bf) : 1.0f;
@@ -14251,6 +14315,8 @@ void BattleSimulator::doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, cons
                         reduce = getBFMagAtkReduce(target);
                         isPhysic = false;
                     }
+                    if(cs2)
+                        doControlBall(bf);
 
                     float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
                     float factor = atklist[j].factor;
@@ -15190,6 +15256,8 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
                         reduce = getBFMagAtkReduce(target);
                         isPhysic = false;
                     }
+                    if(cs2)
+                        doControlBall(bf);
 
                     float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
                     float factor = atklist[j].factor;
@@ -15778,6 +15846,20 @@ void BattleSimulator::onDeadLingshi(BattleFighter* bf)
         bo->setEnemyDeadCnt(bo->getEnemyDeadCnt() + 1);
     }
 
+}
+
+void BattleSimulator::doControlBall(BattleFighter* bf)
+{
+    if(!bf)
+        return;
+    for(UInt8 i = 0; i < 25; i++)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(bf->getSide(), i));
+        if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+            continue;
+        if(bo->getSkillControlBall())
+            bo->setControlBallCnt(bo->getControlBallCnt() + 1);
+    }
 }
 
 } // namespace Battle

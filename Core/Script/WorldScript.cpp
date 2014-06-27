@@ -250,6 +250,7 @@ void WorldScript::init()
     def("setHappyFireTime",GObject::World::setHappyFireTime);
     def("getHappyFireTime",GObject::World::getHappyFireTime);
     def("getWorldCupTime",GObject::World::getWorldCupTime);
+    def("getWorldCupTime2",GObject::World::getWorldCupTime2);
     def("setSummerFlow3Time",GObject::World::setSummerFlow3Time);
     def("getSummerFlow3Time",GObject::World::getSummerFlow3Time);
     def("setHalfGold",GObject::World::setHalfGold);

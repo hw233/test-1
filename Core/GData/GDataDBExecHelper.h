@@ -750,6 +750,39 @@ struct DBZhenweiConfig
     UInt32 award;
 };
 
+struct DBGearConfig
+{
+    UInt16 partId;
+    std::string name;
+    UInt32 needMoneyA;
+    UInt32 needMoneyB;
+    UInt32 needMoneyC;
+    UInt32 needMoneyD;
+    UInt32 needMoneyE;
+    float attrValueA;
+    float attrValueB;
+    float attrValueC;
+    float attrValueD;
+    float attrValueE;
+    float attrValueF;
+    float attrValueG;
+};
+
+struct DBGearTreeConfig
+{
+    UInt16 suiteId;
+    UInt16 lastSuiteId;
+    UInt16 partAId;
+    UInt16 componentAId;
+    UInt16 componentBId;
+    UInt16 partBId;
+    UInt16 componentCId;
+    UInt16 componentDId;
+    UInt16 partCId;
+    UInt16 componentEId;
+    UInt16 componentFId;
+};
+
 struct DBSanHunConfig
 {
     UInt8 sanhunLvl;
@@ -809,6 +842,18 @@ struct DBCardInfo
     UInt16 skillId;
     std::string name;
 };
+
+struct DBClanShopInfo
+{
+    UInt32 id;
+    UInt32 itemid;
+    std::string name;
+    UInt32 price;
+    UInt32 prob;
+    UInt8 color;
+    UInt8 lvl;
+};
+
 struct DBCubeAttr
 {
     UInt8 id;
@@ -1677,6 +1722,43 @@ SPECIALDEF(12)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GData::DBGearConfig)
+SPECIALDEF(14)
+    (
+    UInt16, partId,
+    std::string, name,
+    UInt32, needMoneyA,
+    UInt32, needMoneyB,
+    UInt32, needMoneyC,
+    UInt32, needMoneyD,
+    UInt32, needMoneyE,
+    float, attrValueA,
+    float, attrValueB,
+    float, attrValueC,
+    float, attrValueD,
+    float, attrValueE,
+    float, attrValueF,
+    float, attrValueG
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBGearTreeConfig)
+SPECIALDEF(11)
+    (
+    UInt16, suiteId,
+    UInt16, lastSuiteId,
+    UInt16, partAId,
+    UInt16, componentAId,
+    UInt16, componentBId,
+    UInt16, partBId,
+    UInt16, componentCId,
+    UInt16, componentDId,
+    UInt16, partCId,
+    UInt16, componentEId,
+    UInt16, componentFId
+    )
+SPECIALEND()
+
 SPECIALBEGIN(GData::DBSanHunConfig)
 SPECIALDEF(12)
     (
@@ -1894,6 +1976,19 @@ SPECIALDEF(6)
     UInt8, lvLimit,
     UInt16, skillId,
     std::string, name 
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBClanShopInfo)
+SPECIALDEF(7)
+	(
+    UInt32, id,
+    UInt32, itemid,
+    std::string, name,
+    UInt32, price,
+    UInt32, prob,
+    UInt8, color,
+    UInt8, lvl
 	)
 SPECIALEND()
 

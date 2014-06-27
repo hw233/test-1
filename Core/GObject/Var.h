@@ -733,6 +733,10 @@ namespace GObject
         VAR_TREE_VALUE_DAY = 744 ,    //今日被邀请获得的木片数
         VAR_TOOL_CNT = 745 ,    //当前欧耶精粹数量
         VAR_WORLDCUP_RES = 746 ,    //世界杯积分
+        VAR_ZIYUN_KUANG = 747 ,  //紫云矿
+        VAR_ZIYUN_MU = 748 ,     //紫云木
+        VAR_ZIYUN_PAI = 749 ,    //紫云牌
+        VAR_ZIYUN_LIANFU = 750 , //紫云炼符
 
 
 
@@ -750,6 +754,8 @@ namespace GObject
         VAR_FIRE_SACRIFICE_ADD_WOOD_TIME = 773, //拜火祭天添柴时间
         VAR_FIRE_SACRIFICE_CALLING_TIME = 774, //拜火祭天召唤帮众时间
         VAR_DUOBAO_ACTIVE_POINT = 775, //夺宝奇兵活跃值+1(一天一点) 
+        VAR_CLAN_SHOP_CURRENT_LVL = 776, //帮贡商店当前等级
+        VAR_CLAN_SHOP_FLUSH_TIMES = 777, //帮贡商店当天刷新次数
         VAR_COOL_SUMMER_ACTIVE_POINT = 778, //酷爽一夏当天活跃值
         VAR_COOL_SUMMER_STATUS = 779, //0-7位:酷爽一夏活跃领奖状态(0双倍，1单倍),8-15位：当前已领礼包编号1-5
         VAR_COOL_SUMMER_RAND_TYPE = 780, //酷爽一夏抽奖类型
@@ -778,8 +784,17 @@ namespace GObject
         VAR_AUTO_TEAMCOPY_CNT = 800,             //自动组队副本总共需要战斗怪物的数量
         VAR_AUTO_TEAMCOPY_CUR_CNT = 801,         //自动组队副本当前战斗到第几个怪物
         VAR_AUTO_TEAMCOPY_TEMP_CNT = 802,        //自动组队副本已经打过的副本怪物数量
+        VAR_GEAR_BUFF = 803,                     //机关库挂机经验buff
 
         //811-830 for libo
+        VAR_HAPPY_XXL_DAYCOUNT = 811 , //快乐消消乐 每日赠送(最大20)
+        VAR_HAPPY_XXL_BUYCOUNT = 812 , //快乐消消乐 购买获得
+        VAR_HAPPY_XXL_BUYNUM = 813 , //快乐消消乐 当日购买次数
+        VAR_HAPPY_XXL_AWARD = 814 , //快乐消消乐 每日奖励领取情况
+        VAR_HAPPY_XXL_SCORE = 815 , //快乐消消乐 每日积分
+        VAR_HAPPY_XXL_PAGE = 816 , //快乐消消乐 编号
+
+        VAR_11AIRBOOK_AWARDSCORE = 817,  
             
         //831-850 for qimj
         VAR_COOL_SUMMER_AWARD_TYPE = 831,        //酷爽一夏奖励类型
@@ -1432,6 +1447,7 @@ namespace GObject
             REGISTER_VAR(VAR_AUTO_TEAMCOPY_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_AUTO_TEAMCOPY_CUR_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_AUTO_TEAMCOPY_TEMP_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_GEAR_BUFF, CYCLE_NONE);
 
             REGISTER_VAR(VAR_TYSS_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_TYSS_CONTRIBUTE_PLAYER, CYCLE_NONE);
@@ -1463,6 +1479,8 @@ namespace GObject
             REGISTER_VAR(VAR_COOL_SUMMER_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_COOL_SUMMER_RAND_TYPE, CYCLE_NONE);
             REGISTER_VAR(VAR_COOL_SUMMER_AWARD_TYPE, CYCLE_NONE);
+            REGISTER_VAR(VAR_CLAN_SHOP_CURRENT_LVL, CYCLE_NONE);
+            REGISTER_VAR(VAR_CLAN_SHOP_FLUSH_TIMES, CYCLE_DAY);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
@@ -1482,6 +1500,14 @@ namespace GObject
             REGISTER_VAR(VAR_ERLKING_BUY_PASS_NUM_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_ERLKING_BUY_PASS_TOTAL_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_ERLKING_USE_FREE_NUM_DAY, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_HAPPY_XXL_DAYCOUNT, CYCLE_DAY);
+            REGISTER_VAR(VAR_HAPPY_XXL_BUYCOUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_HAPPY_XXL_BUYNUM, CYCLE_DAY);
+            REGISTER_VAR(VAR_HAPPY_XXL_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_HAPPY_XXL_SCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_HAPPY_XXL_PAGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_11AIRBOOK_AWARDSCORE, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

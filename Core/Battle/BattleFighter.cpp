@@ -91,6 +91,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
    ,_bActCnt(0), _immune3(0), _revivalCnt(0), _prudentLast(0),_prudentHitrate(0), _prudentHitrateLastOtherside(0), _silkwormCnt(0)
    ,_yehuoLevel(0), _yehuo_ss_dmgRate(0), _yehuo_ss_upRate(0), _jiuziDmgCnt(0), _changeStatus(0), _newModeLast(0), _counterCnt(0), _criticalCnt(0), _preAtk(false), _friendDeadCnt(0), _enemyDeadCnt(0), _mojianCnt(0xFF)
    ,_tyslSSCnt(0), _tyslSSFactor(0),_tyslSSAddCnt(true), _tyslSSCnt2(0)
+   ,_controlBallCnt(0), _controlBallCnt2(0), _skillControlBall(NULL)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -160,6 +161,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillOnAttackConfuseForget100(), _passiveSkillOnAttackConfuseForget100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAttackStun100(), _passiveSkillOnAttackStun100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAttackBlind100(), _passiveSkillOnAttackBlind100);
+    updatePassiveSkill100(_fighter->getPassiveSkillCondition100(), _passiveSkillCondition100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAtkDmg100(), _passiveSkillOnAtkDmg100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnPetProtect100(), _passiveSkillOnPetProtect100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnGetDmg100(), _passiveSkillOnGetDmg100);
@@ -249,6 +251,14 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 
     _sg_v.clear();
     _fighter->getAllSGInfo(_sg_v);
+
+    idx = 0;
+    const GData::SkillBase* passiveSkill = NULL;
+    while(NULL != (passiveSkill = getPassiveSkillCondition100(idx)))
+    {
+        if(passiveSkill && passiveSkill->effect && passiveSkill->effect->eft[0] == GData::e_eft_control_ball)
+            setSkillControlBall(passiveSkill);
+    }
 
 }
 
@@ -542,6 +552,13 @@ void BattleFighter::updateBuffExtras()
         else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN2) > 0)
             clanFactor = 1.03;
         else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_CLAN3) > 0)
+            clanFactor = 1.02;
+
+        if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_NEW_CLAN1) > 0)
+            clanFactor = 1.05;
+        else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_NEW_CLAN2) > 0)
+            clanFactor = 1.03;
+        else if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_NEW_CLAN3) > 0)
             clanFactor = 1.02;
         
         if(_fighter->getOwner()->getBuffData(PLAYER_BUFF_TYSS) > 0)
@@ -1238,6 +1255,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackStun100(size_t& id
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBlind100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillOnAttackBlind100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillCondition100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillCondition100, idx, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmg100(size_t& idx, bool noPossibleTarget)
@@ -2534,6 +2556,7 @@ BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
     setSelfSummon(bf);
     bf->setXiangMoChanZhangSkill(NULL);
     bf->setBiLanTianYiSkill(NULL);
+    bf->setSkillControlBall(NULL);
     return bf;
 }
 

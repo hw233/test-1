@@ -175,11 +175,11 @@ local grade11 = {
     [10] = {{ 14,3},{ 20,6},{ 37,1},{ 16,3},{ 13,10},{ 5,2}},
     [11] = {{ 14,3},{ 17,5},{ 10,5},{ 6,1},{ 20,6},{12,1}},
     ]]--
-    [1] = {{10,7},{17,5},{4,4},{40,1},{5,1},{18,1}}, --ok
-    [2] = {{10,5},{17,7},{4,4},{37,1},{40,1},{13,10}}, --ok
-    [3] = {{10,5},{17,5},{4,4},{19,1},{13,10},{16,3}},  --ok
-    [4] = {{10,5},{17,5},{4,4},{19,1},{12,5},{16,3}},
-    [5] = {{10,5},{17,5},{4,4},{18,1},{20,6},{14,3}},
+    [1] = {{10,7},{17,5},{4,4},{0,5},{37,1},{40,1}}, --ok
+    [2] = {{10,5},{17,7},{4,4},{18,5},{40,1},{19,1}}, --ok
+    [3] = {{10,5},{17,5},{4,4},{19,1},{13,10},{5,1}},  --ok
+    [4] = {{10,5},{17,5},{4,4},{18,5},{5,1},{19,1}}, --ok
+    [5] = {{10,5},{17,5},{4,4},{16,3},{12,5},{14,3}}, --ok
 ---华丽的分割线
     [6] = {{ 13,10},{ 37,1},{ 41,1},{ 11,1},{10 ,5},{ 4,4}},
     [7] = {{ 10,5},{ 13,10},{ 14,3},{ 4,6},{ 19,1},{ 17,5}},
@@ -240,12 +240,24 @@ function doStrong(player, id, param1, param2)
         if id == 37 then
             checkFlag[id] = 2
         end
+        if id == 18 then
+            checkFlag[id] = 5
+        end
+        if id == 12 then
+            checkFlag[id] = 5
+        end
         do11Grade(player, id, num, param2);
     else
         if id == 16 then
             checkFlag[id] = 1
         end
         if id == 37 then
+            checkFlag[id] = 1
+        end
+        if id == 18 then
+            checkFlag[id] = 1
+        end
+        if id == 12 then
             checkFlag[id] = 1
         end
     end
@@ -406,7 +418,7 @@ function do11Grade(player, id, param1, param2)
     local curflag = mgr:GetFlag(id);
     for i = 1, #dayTask do
         if id == dayTask[i][1]  then
-            if curflag >= dayTask[i][2] then
+            if curflag >= dayTask[i][2] or curflag >=checkFlag[id] then
                 return ;
             end
             player:Add11grade(10);

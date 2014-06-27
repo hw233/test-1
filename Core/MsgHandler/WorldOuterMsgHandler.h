@@ -2752,6 +2752,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x3B:
         case 0x3C:
         case 0x3D:
+        case 0x3E:
         {
             brd >> op;
             switch(op)
@@ -3258,7 +3259,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         break;
         case 0x31:
         {
-            if(!World::getTYSSTime())
+            UInt8 actType = World::getTYSSTime(); 
+            if(!actType)
                 return;
             UInt8 op = 0;
             UInt8 flag = 0;
@@ -3398,6 +3400,12 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             }
        }
        break;
+       case 0x34:
+       {
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            break;
+       }
        case 0x45:
        {
            UInt8 logType = 0;

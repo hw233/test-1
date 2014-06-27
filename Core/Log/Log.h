@@ -170,6 +170,11 @@ enum PurchaseType
     CutTree                     = 1031, //伐木无损扫荡
     WBRelive                    = 1032, //世界BOSS复活
     WBInspire                   = 1033, //世界BOSS鼓舞
+    BuyClanShopItems            = 1034, //购买帮贡商店物品
+    FlushClanShopItems          = 1035, //刷新帮贡商店物品
+    MOFUMIZHEN1                 = 1036, //墨符迷阵
+    MOFUMIZHEN2                 = 1037, //墨符迷阵
+    MakeGear                    = 1038, //打造机关库
     //繁体私有占150～200
 };
 
@@ -330,6 +335,7 @@ enum ItemFrom
     FromJieBai = 74 ,
     FromKJTM = 75 , //抗击天魔
     FromAutoTeamCopy = 76 , //自动组队副本
+    FromClanShop = 77 , //帮贡商店
     FromCoolSummer = 78 , //酷爽一夏
     //80 ~ 100，繁体占用
 };

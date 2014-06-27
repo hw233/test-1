@@ -863,6 +863,10 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
         exp *= 1 + extraFactor;
     }
 
+    UInt32 gearBuff = player->GetVar(VAR_GEAR_BUFF);
+    if(gearBuff > 0)
+        exp *= (1 + (static_cast<float>(gearBuff) / 10000.0f));
+
     if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
         exp += 0.5f * ecs->exp;
     else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)
@@ -1070,7 +1074,7 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
     }
 
     pkg->AddItem(pur->id, pur->num, true, false, FromDirectPurchase);
-    if(pur->id == 515 || pur->id == 79 || pur->id == 9141)
+    if(pur->id == 9425 || pur->id == 81 || pur->id == 9141)
         player->AddVar(VAR_DIRECTPURCNT, 1);
     else
         player->AddVar(VAR_DIRECTPURCNT2, 1);
