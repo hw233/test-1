@@ -734,6 +734,15 @@ namespace GObject
 			PopTimerEvent(m_Player, EVENT_AUTORACEBATTLE, m_Player->getId());
 	}
 
+	void EventCoolSummerGiveAward::Process(UInt32 leftCount)
+	{
+        UInt8 awardType = m_Player->GetVar(VAR_COOL_SUMMER_AWARD_TYPE);
+        UInt8 randType = m_Player->GetVar(VAR_COOL_SUMMER_RAND_TYPE);
+        m_Player->sendCoolSummerAward(awardType, randType);
+        if(!leftCount)
+			PopTimerEvent(m_Player, EVENT_COOLSUMMERAWARD, m_Player->getId());
+	}
+
     bool EventPlayerTimeTick::Equal(UInt32 id, size_t playerid) const
     {
 		return 	id == GetID() && playerid == m_Player->getId();
@@ -33273,6 +33282,219 @@ void Player::UpdateWorldCupToDB(UInt8 num)
         return ;
     DB1().PushUpdateData("REPLACE INTO `worldCup`(`playerId`, `num`, `count1`,`count2`,`count3`, `result`) VALUES(%" I64_FMT "u, %d, %u,%u,%u , %u)", getId(), num , worldCupInfo[num].supportNum ,worldCupInfo[num].supportTime , 0 , worldCupInfo[num].support);
     
+}
+
+void Player::sendCoolSummerActPointGift(UInt8 awardType)
+{
+    if(!(awardType >= 0 && awardType <= 5))
+        return;
+    UInt8 doubleOrNot = GetVar(VAR_COOL_SUMMER_STATUS);
+    UInt32 actPointLevel[] = {0, 100, 300, 600, 1000, 2000};
+    //0用来统一下表，无实际意义
+    static UInt32 awardArray[][2][2] = {
+        { {0, 0}, {0 ,0}},
+        { {503, 2}, {0, 0} },
+        { {500, 5}, {501, 5} },
+        { {9424, 5}, {9418, 5} },
+        { {9498, 5}, {16001, 5} },
+        { {9076, 5}, {0, 0} },
+    };
+    //活跃值第一次达到双倍，后面单倍
+    if(awardType)
+    {
+        if(!doubleOrNot)
+        {
+            SYSMSG(title, 5165);
+            SYSMSGV(content, 5166, actPointLevel[awardType]);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[2] = {
+                    {static_cast<UInt16>(awardArray[awardType][0][0]), awardArray[awardType][0][1] * 2},
+                    {static_cast<UInt16>(awardArray[awardType][1][0]), awardArray[awardType][1][1] * 2},
+                };
+                mailPackageManager.push(mail->id, mitem, 2, true);
+            }
+        }
+        else
+        {
+            SYSMSG(title, 5167);
+            SYSMSGV(content, 5168, actPointLevel[awardType]);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[2] = {
+                    {static_cast<UInt16>(awardArray[awardType][0][0]), awardArray[awardType][0][1]},
+                    {static_cast<UInt16>(awardArray[awardType][1][0]), awardArray[awardType][1][1]},
+                };
+                mailPackageManager.push(mail->id, mitem, 2, true);
+            }
+        }
+    }
+    UInt32 awardFlag = GetVar(VAR_COOL_SUMMER_STATUS);
+    awardFlag &= 0xFF;
+    awardFlag += awardType << 8;
+    SetVar(VAR_COOL_SUMMER_STATUS, awardFlag);
+}
+
+void Player::useIceCream(UInt8 randType, UInt8 flag)
+{
+    if(randType > 4 || randType < 1)
+        return;
+    UInt32 activePoint = GetVar(VAR_COOL_SUMMER_ACTIVE_POINT);
+    UInt32 activePointTotal = GetVar(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL);
+    static UInt32 useCount[][2] = {{1, 10}, {10, 110}, {20, 220}, {50, 530}};
+
+    if(GetPackage()->GetRestPackageSize() < 1 + 8*useCount[randType - 1][0] / 99)
+    {
+        sendMsgCode(2, 1011);
+        return;
+    }
+
+    //使用冰淇淋，增加活跃值
+    if(GetPackage()->GetItemAnyNum(16020) < useCount[randType - 1][0])
+    {
+        sendMsgCode(0, 8062);
+        return;
+    }
+    if(GetPackage()->GetItemNum(16020,true) >= useCount[randType - 1][0])
+        GetPackage()->UseItem(16020,static_cast<UInt16>(useCount[randType - 1][0]),0,0,1);
+    else
+    {
+        GetPackage()->UseItem(16020,GetPackage()->GetItemNum(16020,true),0,0,1);
+        GetPackage()->UseItem(16020,static_cast<UInt16>(useCount[randType - 1][0]) - GetPackage()->GetItemNum(16020,true),0,0,0);
+    }
+
+    activePoint += useCount[randType - 1][1];
+    activePointTotal += useCount[randType - 1][1];
+
+    //更新累积活跃值排行
+    SetVar(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL, activePointTotal);
+    GameMsgHdr hdr(0x156, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr, NULL);
+
+    if(randType == 3 || randType == 4)
+            SYSMSG_BROADCASTV(5162, getCountry(), getName().c_str(), useCount[randType - 1][0]);
+
+    //0用来统一下标，无实际意义
+    UInt32 actPointLevel[] = {0, 100, 300, 600, 1000, 2000};
+    UInt32 currentAwardFlag = GetVar(VAR_COOL_SUMMER_STATUS) >> 8;
+
+    UInt8 doubleOrNot = GetVar(VAR_COOL_SUMMER_STATUS);
+    for(int i = currentAwardFlag + 1; i < 6; i++)
+    {
+        if(activePoint < actPointLevel[i])
+            break;
+        sendCoolSummerActPointGift(i);
+
+        if(i == 5)
+        {
+            activePoint -= 2000;
+            if(!doubleOrNot)
+                AddVar(VAR_COOL_SUMMER_STATUS, 1);
+            i = -1;
+        }
+    }
+    SetVar(VAR_COOL_SUMMER_ACTIVE_POINT, activePoint);
+
+    //为拉把随机奖励
+    UInt8 awardType = 0;
+    static UInt32 awardProb[] = {7660, 8660, 9160, 9560, 9860, 9960, 9990, 10000};
+    UInt32 rand = uRand(10000);
+    for(UInt8 i = 0; i < 8; i++)
+    {
+        if(rand <= awardProb[i])
+        {
+            awardType = i;
+            break;
+        }
+    }
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x11);
+    st << static_cast<UInt8>(1);
+    st << randType << awardType << Stream::eos;
+    send(st);
+
+    //播放动画延迟发奖，跳过动画直接发奖
+    if(!flag)
+    {
+        SetVar(VAR_COOL_SUMMER_RAND_TYPE, randType);
+        SetVar(VAR_COOL_SUMMER_AWARD_TYPE, awardType);
+        EventCoolSummerGiveAward* event = new(std::nothrow)EventCoolSummerGiveAward(this, 5, 1);
+		if(event == NULL)
+            return;
+		PushTimerEvent(event);
+    }
+    else
+        sendCoolSummerAward(awardType, randType);
+}
+
+void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType)
+{
+    if(!(awardType >= 0 && awardType <= 7))
+        return;
+    static UInt8 awardCount[4] = {1, 11, 22, 53};
+    static UInt32 awardArray[][2] = {
+        {16018, 1},
+        {16018, 2},
+        {9600, 3},
+        {9457, 3},
+        {134, 3},
+        {515, 4},
+        {9075, 5},
+        {9022, 8},
+    };
+
+    UInt32 itemCount = awardArray[awardType][1] * awardCount[randType - 1];
+    if(awardType == 1)
+    {
+            SYSMSG_BROADCASTV(5155, getCountry(), getName().c_str(), itemCount);
+    }
+    else if(awardType == 2)
+    {
+            SYSMSG_BROADCASTV(5156, getCountry(), getName().c_str(), itemCount);
+    }
+    else if(awardType == 3)
+    {
+            SYSMSG_BROADCASTV(5157, getCountry(), getName().c_str(), itemCount);
+    }
+    else if(awardType == 4)
+    {
+            SYSMSG_BROADCASTV(5158, getCountry(), getName().c_str(), itemCount);
+    }
+    else if(awardType == 5)
+    {
+            SYSMSG_BROADCASTV(5159, getCountry(), getName().c_str(), itemCount);
+    }
+    else if(awardType == 6)
+    {
+            SYSMSG_BROADCASTV(5160, getCountry(), getName().c_str(), itemCount);
+    }
+    else if(awardType == 7)
+    {
+            SYSMSG_BROADCASTV(5161, getCountry(), getName().c_str(), itemCount);
+    }
+
+    GetPackage()->AddItem(awardArray[awardType][0], itemCount, true, false, FromCoolSummer);
+}
+
+void Player::coolSummerOp(UInt8 type, UInt8 randType, UInt8 flag)
+{
+    switch(type)
+    {
+        case 0:
+            {
+                GameMsgHdr hdr(0x155, WORKER_THREAD_WORLD, this, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            break;
+        case 1:
+            useIceCream(randType, flag);
+            break;
+        default:
+            break;
+    }
 }
 
 } // namespace GObject

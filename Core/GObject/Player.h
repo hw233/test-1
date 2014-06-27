@@ -423,6 +423,20 @@ namespace GObject
 		UInt64 calcExpEach();
 	};
 
+	class EventCoolSummerGiveAward : public EventBase
+	{
+	public:
+		EventCoolSummerGiveAward(Player * player, UInt32 interval, UInt32 count)
+			: EventBase(player, interval, count)
+		{}
+
+        ~EventCoolSummerGiveAward()
+        {}
+
+		virtual UInt32 GetID() const { return EVENT_COOLSUMMERAWARD; }
+		void Process(UInt32);
+	};
+
 	class EventFighterTrain : public EventBase
 	{
 	public:
@@ -3524,6 +3538,11 @@ namespace GObject
         UInt32 getCurClanTitle();
         void clearClanTitle();
         void checkClanTitle();
+
+        void coolSummerOp(UInt8, UInt8, UInt8);
+        void sendCoolSummerAward(UInt8, UInt8);
+        void useIceCream(UInt8, UInt8);
+        void sendCoolSummerActPointGift(UInt8);
 
     private:
         //玩家位置（包括层数、当层位置）

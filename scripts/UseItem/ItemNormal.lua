@@ -11362,6 +11362,33 @@ function ItemNormal_00016015(id, num, bind, param)
     return num;
 end
 
+function ItemNormal_00016018(id, num, bind, param)
+    local player = GetPlayer();
+    if package:GetRestPackageSize() < 2 + (2*num*2)/99 then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    local prob = {2350, 2500, 4850, 5000, 5200, 7400, 9200, 10000}
+    local items = {{503,1}, {503,2}, {500,2}, {501,2}, {513,2}, {517,2}, {551,2}, {516,1}}
+
+    for k = 1, num do
+        local p = math.random(1, 10000)
+        local i = 1
+        for n = 1, #prob do
+            if p <= prob[n] then
+                i = n
+                break
+            end
+        end
+
+        local item = items[i];
+        package:AddItem(item[1], item[2], 1, 0, 2);
+    end
+    package:DelItemSendMsg(id, player);
+    return num;
+end
+
 local ItemNormal_Table = {
     [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -13723,6 +13750,7 @@ local ItemNormal_Table = {
     [16013] = ItemNormal_00016013,
     [16014] = ItemNormal_00016014,
     [16015] = ItemNormal_00016015,
+    [16018] = ItemNormal_00016018,
 
     [17002] = ItemNormal_00017002,
     [17003] = ItemNormal_00017003,

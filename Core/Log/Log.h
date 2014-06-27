@@ -330,6 +330,7 @@ enum ItemFrom
     FromJieBai = 74 ,
     FromKJTM = 75 , //抗击天魔
     FromAutoTeamCopy = 76 , //自动组队副本
+    FromCoolSummer = 78 , //酷爽一夏
     //80 ~ 100，繁体占用
 };
 

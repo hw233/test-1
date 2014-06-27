@@ -120,6 +120,11 @@ function loadStore()
     if getQixi() then
         store:add(2 ,16016 ,10)
     end
+
+    if  getCoolSummer(300) then
+        store:add(2 ,16020 ,20)
+    end
+
     store:add(2 ,9457 ,20)
 
     if  getWorldCupTime(300) then
