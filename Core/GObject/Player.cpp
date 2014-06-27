@@ -33226,7 +33226,7 @@ bool Player::buyClanShopItems(UInt8 offset)
 {
     std::multimap<UInt32, UInt8> & _clanShopItemsAll = _playerData.clanShopItemsAll;
     UInt8 currentLvl = GetVar(VAR_CLAN_SHOP_CURRENT_LVL);
-    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo();
+    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo(currentLvl);
     std::multimap<UInt32, UInt8>::iterator targetToBuy;
 
     if(offset > 9)
@@ -33287,7 +33287,7 @@ void Player::randomForClanShop(UInt8 lvl)
 {
     UInt8 currentLvl = GetVar(VAR_CLAN_SHOP_CURRENT_LVL);
     std::multimap<UInt32, UInt8> & _clanShopItemsAll = _playerData.clanShopItemsAll;
-    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo();
+    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo(currentLvl);
 
     //如果当前等级有帮贡物品，则先删除
     for(std::multimap<UInt32, UInt8>::iterator it = _clanShopItemsAll.begin(); it!= _clanShopItemsAll.end(); )
@@ -33303,46 +33303,40 @@ void Player::randomForClanShop(UInt8 lvl)
 
     //计算概率基数
     UInt32 probSum = 0;
-    std::map<UInt32, GData::ClanShopInfo::ClanShopItems>::iterator tmp;
-    tmp = _clanShopItemsTemplate.find(currentLvl * 100 + 1);
-    for(UInt8 i = 0; i < 20; i++, tmp++)
+    for(std::map<UInt32, GData::ClanShopInfo::ClanShopItems>::iterator it = _clanShopItemsTemplate.begin(); it != _clanShopItemsTemplate.end(); ++it)
     {
-        probSum += tmp->second.prob;
+        probSum += it->second.prob;
     }
 
-    std::map<UInt32, GData::ClanShopInfo::ClanShopItems>::iterator target;
     //为当前等级随9个帮贡物品，并且物品重复不超过3次
     for(UInt8 i = 0; i < 9; i++)
     {
-        //target为当前等级物品第一个ID
-        target = _clanShopItemsTemplate.find(currentLvl * 100 + 1);
-        UInt32 probTmp = target->second.prob;
+        UInt32 probTmp = 0;
         UInt32 rand = uRand(probSum);
-        for(UInt8 j = 0; j < 20; j++)
+        for(std::map<UInt32, GData::ClanShopInfo::ClanShopItems>::iterator it=_clanShopItemsTemplate.begin(); it!=_clanShopItemsTemplate.end(); ++it)
         {
+            probTmp  += it->second.prob;
             if(rand <= probTmp)
             {
                 //如果重复3次以上，此次随机无效
-                std::pair<std::multimap<UInt32, UInt8>::iterator, std::multimap<UInt32, UInt8>::iterator> found = _clanShopItemsAll.equal_range(target->first);
+                std::pair<std::multimap<UInt32, UInt8>::iterator, std::multimap<UInt32, UInt8>::iterator> found = _clanShopItemsAll.equal_range(it->first);
                 UInt8 count = 0;
                 while(found.first != found.second)
                 {
                     count++;
                     ++found.first;
                 }
-                if(count > 3)
+                if(count > 2)
                 {
                     i --;
                     break;
                 }
                 else
                 {
-                    _clanShopItemsAll.insert(std::make_pair(target->first, 0));
+                    _clanShopItemsAll.insert(std::make_pair(it->first, 0));
                     break;
                 }
             }
-            ++target;
-            probTmp += target->second.prob;
         }
     }
 }

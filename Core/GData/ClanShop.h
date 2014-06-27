@@ -6,7 +6,7 @@
 
 namespace GData
 {
-
+#define MAX_LVL 130
     class ClanShopInfo
     {
         public:
@@ -32,12 +32,12 @@ namespace GData
                 };
 
         private:
-                std::map<UInt32, ClanShopItems> _clanShopInfo;
+                std::map<UInt32, ClanShopItems> _clanShopInfo[(MAX_LVL - 30)/10];
 
         public:
                 ClanShopInfo() {}
                 void setClanShopInfo(UInt32 id, ClanShopItems its);
-                std::map<UInt32, ClanShopItems> getClanShopInfo();
+                std::map<UInt32, ClanShopItems> getClanShopInfo(UInt8 id);
     };
     extern ClanShopInfo clanShopInfo;
 }
