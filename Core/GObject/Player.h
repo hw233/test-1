@@ -164,6 +164,9 @@ namespace GObject
 #define PLAYER_BUFF_CLAN2           0x69 // （活动）第2帮派BUF
 #define PLAYER_BUFF_CLAN3           0x6A // （活动）第3帮派BUF
 #define PLAYER_BUFF_TYSS            0x6B // （TYSS活动）个人BUF
+#define PLAYER_BUFF_NEW_CLAN1       0x6C // （新活动）第1帮派BUF
+#define PLAYER_BUFF_NEW_CLAN2       0x6D // （新活动）第2帮派BUF
+#define PLAYER_BUFF_NEW_CLAN3       0x6E // （新活动）第3帮派BUF
 #define PLAYER_BUFF_ATHL11          0x71 // 魔
 #define PLAYER_BUFF_ATHL22          0x72 // 神
 #define PLAYER_BUFF_ATHL33          0x73 // 虚

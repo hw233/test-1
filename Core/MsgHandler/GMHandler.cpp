@@ -5656,7 +5656,7 @@ void GMHandler::TestClanRank(GObject::Player *player, std::vector<std::string>& 
     UInt8 pos = atoi(args[0].c_str());
     GObject::Clan *clan = player->getClan();
     if(clan != NULL)
-        clan->sendMemberBuf(pos);
+        clan->sendMemberBuf(pos,1);
 }
 
 void GMHandler::OnRaceBattle(GObject::Player *player, std::vector<std::string>& args)
