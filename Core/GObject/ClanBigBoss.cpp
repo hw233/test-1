@@ -525,6 +525,8 @@ void ClanBigBoss::addLevel()
         atk = getLastAtk();
         matk = getLastMAtk();
 
+        if(_lastTime == 0)
+            _lastTime = 60 * 30;
         float hp_factor = (float)BOSS_BASE_TIME / (float)_lastTime;
         if(hp_factor > BOSS_MAX_ASC_HP_FACTOR)
             hp_factor = BOSS_MAX_ASC_HP_FACTOR;
