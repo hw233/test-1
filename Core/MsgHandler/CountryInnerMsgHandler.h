@@ -863,6 +863,10 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
         exp *= 1 + extraFactor;
     }
 
+    UInt32 gearBuff = player->GetVar(VAR_GEAR_BUFF);
+    if(gearBuff > 0)
+        exp *= (1 + (static_cast<float>(gearBuff) / 10000.0f));
+
     if(player->getBuffData(PLAYER_BUFF_CLAN1) > 0)
         exp += 0.5f * ecs->exp;
     else if(player->getBuffData(PLAYER_BUFF_CLAN2) > 0)

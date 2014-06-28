@@ -115,6 +115,123 @@ namespace GData
         }
     }
 
+    void JiguanData::setGearInfo(DBGearConfig & gearData)
+    {
+        if(gearData.partId > 0)
+        {
+            gearInfo info;
+
+            info.partId = gearData.partId;
+            info.name = gearData.name;
+            info.ZYKNum = gearData.needMoneyA;
+            info.ZYMNum = gearData.needMoneyB;
+            info.ZYSNum = gearData.needMoneyC;
+            info.ZYLFNum = gearData.needMoneyD;
+            info.taelNum = gearData.needMoneyE;
+            info.attrValueA = gearData.attrValueA;
+            info.attrValueB = gearData.attrValueB;
+            info.attrValueC = gearData.attrValueC;
+            info.attrValueD = gearData.attrValueD;
+            info.attrValueE = gearData.attrValueE;
+            info.attrValueF = gearData.attrValueF;
+            info.attrValueG = gearData.attrValueG;
+
+            _gearInfo.insert(std::make_pair(info.partId, info));
+        }
+    }
+
+    void JiguanData::setGearTreeInfo(DBGearTreeConfig & gearTreeData)
+    {
+        if(gearTreeData.suiteId > 0)
+        {
+            needPart np;
+            needComponent nc1;
+            needComponent nc2;
+            needComponent nc3;
+            
+            np.lastSuiteId = gearTreeData.lastSuiteId;
+            np.needPartAId = gearTreeData.partAId;
+            np.needPartBId = gearTreeData.partBId;
+            np.needPartCId = gearTreeData.partCId;
+            nc1.lastSuiteId = gearTreeData.lastSuiteId;
+            nc1.needComponentAId = gearTreeData.componentAId;
+            nc1.needComponentBId = gearTreeData.componentBId;
+            nc2.lastSuiteId = gearTreeData.lastSuiteId;
+            nc2.needComponentAId = gearTreeData.componentCId;
+            nc2.needComponentBId = gearTreeData.componentDId;
+            nc3.lastSuiteId = gearTreeData.lastSuiteId;
+            nc3.needComponentAId = gearTreeData.componentEId;
+            nc3.needComponentBId = gearTreeData.componentFId;
+            
+            /**套件由部件组成，部件由元件组成**/
+            _makeComponent.insert(std::make_pair(gearTreeData.componentAId, gearTreeData.lastSuiteId));
+            _makeComponent.insert(std::make_pair(gearTreeData.componentBId, gearTreeData.lastSuiteId));
+            _makeComponent.insert(std::make_pair(gearTreeData.componentCId, gearTreeData.lastSuiteId));
+            _makeComponent.insert(std::make_pair(gearTreeData.componentDId, gearTreeData.lastSuiteId));
+            _makeComponent.insert(std::make_pair(gearTreeData.componentEId, gearTreeData.lastSuiteId));
+            _makeComponent.insert(std::make_pair(gearTreeData.componentFId, gearTreeData.lastSuiteId));
+            _makePart.insert(std::make_pair(np.needPartAId, nc1));
+            _makePart.insert(std::make_pair(np.needPartBId, nc2));
+            _makePart.insert(std::make_pair(np.needPartCId, nc3));
+            _makeSuite.insert(std::make_pair(gearTreeData.suiteId, np));
+            _tempType.insert(std::make_pair(gearTreeData.suiteId, 1));      //套件
+            _tempType.insert(std::make_pair(gearTreeData.partAId, 2));      //部件
+            _tempType.insert(std::make_pair(gearTreeData.partBId, 2));
+            _tempType.insert(std::make_pair(gearTreeData.partCId, 2));
+            _tempType.insert(std::make_pair(gearTreeData.componentAId, 3)); //元件
+            _tempType.insert(std::make_pair(gearTreeData.componentBId, 3));
+            _tempType.insert(std::make_pair(gearTreeData.componentCId, 3));
+            _tempType.insert(std::make_pair(gearTreeData.componentDId, 3));
+            _tempType.insert(std::make_pair(gearTreeData.componentEId, 3));
+            _tempType.insert(std::make_pair(gearTreeData.componentFId, 3));
+        }
+    }
+
+    UInt8 JiguanData::getGearType(UInt16 gearId)
+    {
+        std::map<UInt16, UInt8>::iterator iter = _tempType.find(gearId);
+        if(iter != _tempType.end())
+            return iter->second;
+
+        return 0;
+    }
+
+    UInt16 JiguanData::getMakeComponentInfo(UInt16 gearId)
+    {
+        std::map<UInt16, UInt16>::iterator iter = _makeComponent.find(gearId);
+        if(iter != _makeComponent.end())
+            return iter->second;
+
+        return 0;
+    }
+
+    JiguanData::needComponent * JiguanData::getMakePartInfo(UInt16 gearId)
+    {
+        std::map<UInt16, needComponent>::iterator iter = _makePart.find(gearId);
+        if(iter != _makePart.end())
+            return &(iter->second);
+
+        return NULL;
+    }
+
+    JiguanData::needPart * JiguanData::getMakeSuiteInfo(UInt16 gearId)
+    {
+        std::map<UInt16, needPart>::iterator iter = _makeSuite.find(gearId);
+        if(iter != _makeSuite.end())
+            return &(iter->second);
+
+        return NULL;
+    }
+
+    JiguanData::gearInfo * JiguanData::getGearInfo(UInt16 gearId)
+    {
+        std::map<UInt16, gearInfo>::iterator iter = _gearInfo.find(gearId);
+        if(iter != _gearInfo.end())
+            return &(iter->second);
+
+        return NULL;
+    }
+
     JiguanData::keyinInfo * JiguanData::getKeyinInfo(UInt8 keyinId, UInt8 keyinLvl)
     {
         std::map<UInt8, std::map<UInt8, keyinInfo>>::iterator iter = _keyinInfo.find(keyinId);

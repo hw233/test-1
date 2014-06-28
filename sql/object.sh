@@ -319,6 +319,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_Bug.sql     #天书奇缘时间段积分还原
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140616_cXXL.sql     #快乐消消乐
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_ClanBigBossBug.sql     #帮派BossBug修复
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140627_1.sql #机关库
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var402_403.sql   #这“夏”有礼咯
 }
 
 #sh player_jiguan.sh

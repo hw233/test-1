@@ -1294,13 +1294,11 @@ function onGetQZoneQQGameAward(player, type)
 end
 
 local QzonecontinueAwards = {
-    [1] = {{56, 1},{57, 1}},
-    [2] = {{56, 2},{57, 2}},
-    [3] = {{56, 2},{57, 2},{134, 1}},
-    [4] = {{56, 2},{57, 2},{134, 2}},
-    [5] = {{56, 2},{57, 2},{134, 2},{30, 1}},
-    [6] = {{56, 2},{57, 2},{134, 2},{30, 2}},
-    [7] = {{56, 2},{57, 2},{134, 2},{30, 2},{9076,1}},
+    [1] = {{56, 2},{57, 2}, {15, 2}, {9371, 2}},
+    [2] = {{500, 2},{503, 2},{514, 2}, {511, 2}},
+    [3] = {{512, 2},{501, 2},{516, 2},{517, 2}},
+    [4] = {{547, 2},{134, 2},{1325, 2},{515, 2}, {16001, 2}},
+    [5] = {{499, 100},{515, 3},{509, 3},{9498, 3},{9457, 3}, {9600, 3}},
 }
 
 function onGetNewYearQzoneContinueAward(player, type)
@@ -1314,12 +1312,20 @@ function onGetNewYearQzoneContinueAward(player, type)
     end
 
     local package = player:GetPackage()
-    if package:GetRestPackageSize() < #awards then
+    local needSize = #awards
+    if type == 5 then
+        needSize = needSize - 1
+    end
+    if package:GetRestPackageSize() < needSize then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
     for i = 1, #awards do
-        package:Add(awards[i][1], awards[i][2], true, false, 2)
+        if awards[i][1] == 499 then
+            player:getCoupon(awards[i][2])
+        else
+            package:Add(awards[i][1], awards[i][2], true, false, 2)
+        end
     end
     return true
 end

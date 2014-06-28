@@ -1427,6 +1427,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendZhenyuansInfo();    //阵元
     pl->sendSummerMeetRechargeInfo();
     pl->GetMoFang()->sendMoFangInfo();
+    pl->GetMoFang()->sendCommonGearInfo();
+    pl->GetMoFang()->sendSpecialGearInfo();
     //pl->KJTMUdpLog();
     //pl->QiShiBanState();
     {
@@ -7339,7 +7341,35 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
             player->GetMoFang()->checkKey(keyId, opt);               
         }
         break;
+    case 13:
+        {
+            if(player->GetLev() < 75)
+                return;
 
+            UInt8 type = 0;
+            br >> type;
+
+            if(1 != type && 2 != type)
+                return;
+
+            if(1 == type)
+                player->GetMoFang()->sendCommonGearInfo();
+            else
+                player->GetMoFang()->sendSpecialGearInfo();
+        }
+        break;
+    case 14:
+        {
+            if(player->GetLev() < 75)
+                return;
+
+            UInt8 type = 0;
+            UInt16 gearId = 0;
+            br >> type >> gearId;
+
+            player->GetMoFang()->makeGear(gearId, type);               
+        }
+        break;
     }
 }
 
@@ -9273,6 +9303,9 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                                     for(UInt8 i = 0; i < 5 ; ++i) 
                                         player->getXXLScore(type,5);
 
+                                    char str[16] = {0};
+                                    sprintf(str, "F_140627_2");
+                                    player->udpLog("mofumizhen", str, "", "", "", "", "act");
                                 }
 
                             }

@@ -807,7 +807,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+440*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+447*86400 then
           -- RECHARGE
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
@@ -1173,7 +1173,7 @@ function onActivityCheck(tm)
   end
 
   -- ACC
-  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 155*86400) then
+  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 162*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1455,7 +1455,7 @@ function initActTime(y, m, d)
   -- 蓝钻新年回馈活动
   local  SerStartTm238 = { ['year'] = 2013, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 空间朋友连续登录奖励
-  local  SerStartTm239 = { ['year'] = 2013, ['month'] = 2, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm239 = { ['year'] = 2014, ['month'] = 7, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --金蛇献瑞,聚福兆祥活动
   local  SerStartTm240 = { ['year'] = 2013, ['month'] = 2, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm240_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1933,7 +1933,7 @@ function initActTime(y, m, d)
   actTime238_1= os.time(SerStartTm238) + 21 * 86400;
 
   actTime239_0= os.time(SerStartTm239);
-  actTime239_1= os.time(SerStartTm239) + 28 * 86400;
+  actTime239_1= os.time(SerStartTm239) + 10 * 86400;
 
   actTime240_0= os.time(SerStartTm240);
   actTime240_1= os.time(SerStartTm240_1);

@@ -258,6 +258,10 @@ namespace GObject
             extraExp = static_cast<UInt32>(exp * 1.0f);
         }
 
+        UInt32 gearBuff = m_Player->GetVar(VAR_GEAR_BUFF);
+        if(gearBuff > 0)
+            factor += (static_cast<float>(gearBuff) / 10000.0f);
+
 		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
         //fprintf(stderr, "id: %lu => cnt: %u\n", m_Player->getId(), cnt);
         if (cnt % 10)
@@ -1170,6 +1174,7 @@ namespace GObject
         SAFE_DELETE(m_relation);
 		SAFE_DELETE(m_FairySpar);
 		SAFE_DELETE(m_moFang);
+		SAFE_DELETE(m_erlking);
 		SAFE_DELETE(m_collecCard);
 		SAFE_DELETE(_wrapKey);
 	}
@@ -21475,17 +21480,17 @@ void Player::sendNewYearQQGameAct()
 
 void Player::getNewYearQzoneContinueAward(UInt8 type)
 {
-    if(type == 0 || type > 7)
+    if(type == 0 || type > 5)
         return;
-    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
-        return;
+    //if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+    //    return;
 
     UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
     UInt16 isGet = static_cast<UInt16>(tmp & 0xFFFF);
     if(isGet & (0x01 << (type - 1)))
         return;
     UInt8 continueDays = static_cast<UInt8>(tmp >> 16);
-    const static UInt8 needMinDay[] = {3, 5, 7, 10, 15, 21, 28};
+    const static UInt8 needMinDay[] = {1, 3, 5, 7, 9};
     if(continueDays < needMinDay[type - 1])
         return;
     bool bRet = GameAction()->onGetNewYearQzoneContinueAward(this, type);
@@ -21501,8 +21506,8 @@ void Player::sendNewYearQzoneContinueAct()
 {
     if(!World::getNewYearQzoneContinueAct())
         return;
-    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
-        return;
+    //if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+    //    return;
 
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(10);
@@ -21519,8 +21524,8 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
 {
     if(!World::getNewYearQzoneContinueAct())
         return;
-    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
-        return;
+    //if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+    //    return;
 
     UInt32 lasttime = GetVar(VAR_NEWYEAR_QZONECONTINUE_LASTTIME);
     if(lasttime == 0)
@@ -28013,11 +28018,11 @@ void Player::sendQZoneRechargeAwardInfo()
 }
 void Player::AddQZoneRecharge(UInt32 r)
 {
-    if(getPlatform() != 1 && getPlatform() != 2)
+    /*if(getPlatform() != 1 && getPlatform() != 2)
     {
         sendMsgCode(0, 3506);
         return;
-    }
+    }*/
     if(World::getQZoneRechargeTime() && ( getPlatform() ==1 || getPlatform() ==2))
     {
         AddVar(VAR_QZONE_RECHARGE,r);
@@ -33791,6 +33796,15 @@ void Player::sendHappyXXLInfo()
     st << static_cast<UInt32>(getWrapKey()->wrapTheKey());
     st << Stream::eos;
     send(st);
+
+    Stream stA(REP::MOFANG_INFO);
+    stA << static_cast<UInt8>(15);
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_KUANG));
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_MU));
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_PAI));
+    stA << static_cast<UInt32>(GetVar(VAR_ZIYUN_LIANFU));
+    stA << Stream::eos;
+    send(stA);
 }
 void Player::sendXXLMapInfo(UInt8 res ,UInt8 type)
 {
@@ -33857,6 +33871,12 @@ void Player::getXXLAward(UInt8 type)
     Award |= (1 << type);
     SetVar(VAR_HAPPY_XXL_AWARD,Award);
     sendHappyXXLInfo();
+    if(type == 4)
+    {
+        char str[16] = {0};
+        sprintf(str, "F_140627_3");
+        udpLog("mofumizhen", str, "", "", "", "", "act");
+    }
 }
 void Player::buyXXLCount()
 {
@@ -33869,6 +33889,9 @@ void Player::buyXXLCount()
     AddVar(VAR_HAPPY_XXL_BUYNUM,1);
     AddVar(VAR_HAPPY_XXL_BUYCOUNT,10);
     sendHappyXXLInfo();
+    char str[16] = {0};
+    sprintf(str, "F_140627_1");
+    udpLog("mofumizhen", str, "", "", "", "", "act");
 }
 void Player::UpdateXXLToDB(UInt8 num)
 {
