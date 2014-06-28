@@ -635,6 +635,7 @@ function printBattlePoint(fgt)
     print("Pierce:"..((fgt:getBasePierce() + fgt:getExtraPierce())/100).."__"..((fgt:getBasePierce() + fgt:getExtraPierce())/100 * bp_factor_pir))
     print("Counter:"..((fgt:getBaseCounter() + fgt:getExtraCounter())/100).."__"..((fgt:getBaseCounter() + fgt:getExtraCounter())/100 * bp_factor_counter))
     print("MagRes:"..((fgt:getBaseMagRes() + fgt:getExtraMagRes())/100).."__"..((fgt:getBaseMagRes() + fgt:getExtraMagRes())/100 * bp_factor_magres))
+    print("CriticalDmgImmune:"..fgt:getExtraCriticalDmgImmune().."__"..fgt:getExtraCriticalDmgImmune() * bp_factor_crtdmgimm)
     print("+++++++++++++++++++++End")
 end
 

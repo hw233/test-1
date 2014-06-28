@@ -2183,6 +2183,8 @@ void Fighter::rebuildEquipAttr()
         //灵侍系统加成
         for(UInt8 i = 0; i < LINGSHI_UPMAX; ++ i)
             addLingshiAttr(_lingshi[i]);
+        //凝结金丹  增加暴击伤害减免
+        _attrExtraEquip.criticaldmgimmune += getAcupointsGoldAttr(1);
     }
 
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
@@ -7188,6 +7190,8 @@ UInt32 Fighter::calcBaseBattlePoint()
     }
     //坐骑加成
     _owner->addMountAttrExtra(attrExtra);
+    //凝结金丹  增加暴击伤害减免
+    attrExtra.criticaldmgimmune += getAcupointsGoldAttr(1);
 
 	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
 	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);
@@ -7339,6 +7343,11 @@ UInt32 Fighter::calcEquipBattlePoint()
         }
     }
     fgt->isCanStrengthenSuit(setId, setNum, this);
+    //阵元系统加成
+    _owner->addZhenyuanAttr(attrExtra, this);
+    //灵侍系统加成
+    for(UInt8 i = 0; i < LINGSHI_UPMAX; ++ i)
+        fgt->addLingshiAttr(this->_lingshi[i]);
 
 	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
 	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);
