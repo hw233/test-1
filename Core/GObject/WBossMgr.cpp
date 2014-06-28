@@ -1823,7 +1823,12 @@ void WBossMgr::Relive(Player* player)
     UInt32 reliveLeft = player->getBuffData(PLAYER_BUFF_WB,now);//复活时间
     if(reliveLeft <= now)
         return ;
-        
+    if(player->GetVar(VAR_WB_RELIVENUM) > 4)
+    {
+        player->sendMsgCode(0, 1376);
+        return ;
+    }
+
     ConsumeInfo ci; 
     ci.purchaseType = WBRelive; 
     
@@ -1835,6 +1840,7 @@ void WBossMgr::Relive(Player* player)
     player->useGold(10,&ci);
 
     player->setBuffData(PLAYER_BUFF_WB, now);
+    player->AddVar(VAR_WB_RELIVENUM,1);
 
     m_boss->sendFighteCD(player);
 }
