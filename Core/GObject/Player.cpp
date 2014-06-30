@@ -34086,7 +34086,7 @@ void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType, UInt8 sendType
     {
         if(awardType == 1)
         {
-            SYSMSG_BROADCASTV(5155, getCountry(), getName().c_str(), itemCount);
+            SYSMSG_BROADCASTV(5169, getCountry(), getName().c_str(), itemCount);
         }
         else if(awardType == 2)
         {
