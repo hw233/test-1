@@ -1443,6 +1443,7 @@ struct DBJiguanyu
     UInt64 playerId;
     UInt32 jiguanId;
     UInt8  pos;
+    UInt8  scheme;
 };
 
 struct DBTuzhi
@@ -3516,11 +3517,12 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBJiguanyu)
-SPECIALDEF(3)
+SPECIALDEF(4)
     (
     UInt64, playerId,
     UInt32, jiguanId,
-    UInt8,  pos
+    UInt8,  pos,
+    UInt8,  scheme
     )
 SPECIALEND()
 
