@@ -321,7 +321,6 @@ function update_object()
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_ClanBigBossBug.sql     #帮派BossBug修复
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140627_1.sql #机关库
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var402_403.sql   #这“夏”有礼咯
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_snow.sql   #堆雪人
 }
 
 #sh player_jiguan.sh
