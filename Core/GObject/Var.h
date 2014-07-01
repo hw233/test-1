@@ -748,6 +748,7 @@ namespace GObject
         VAR_WB_INSPIRE = 757,//世界BOSS鼓舞次数 银币(8位) 仙石(8位)
         VAR_WB_SKIPBATTLE = 758,//世界BOSS跳过战斗标记
         VAR_WB_EXPSUM = 759,//世界BOSS总经验
+        VAR_WB_RELIVENUM = 760,//世界BOSS复活次数
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
         VAR_FIRE_SACRIFICE_TIMES = 772, //拜火祭天：0-7帮众添柴次数，8-15帮主诏令次数
@@ -1493,6 +1494,7 @@ namespace GObject
             REGISTER_VAR(VAR_WB_INSPIRE, CYCLE_HOUR);
             REGISTER_VAR(VAR_WB_SKIPBATTLE, CYCLE_HOUR);
             REGISTER_VAR(VAR_WB_EXPSUM, CYCLE_HOUR);
+            REGISTER_VAR(VAR_WB_RELIVENUM, CYCLE_HOUR);
 
             REGISTER_VAR(VAR_ERLKING_STATUSA, CYCLE_NONE);
             REGISTER_VAR(VAR_ERLKING_STATUSB, CYCLE_NONE);
