@@ -594,6 +594,7 @@ void NewCountryBattle::end()
 
         player->countryBattleUdpLog(1091, player->getCountry());
         //player->countryBattleUdpLog(1217, 1, Itoa(ncbpData->totalWin)+","+Itoa(ncbpData->totallose)+","+Itoa(ncbpData->totalAchievement + count));
+        delete iter->second;
     }
 	
     Stream st(REP::NEW_CAMPS_WAR_JOIN);
