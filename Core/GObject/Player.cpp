@@ -34031,7 +34031,7 @@ void Player::useIceCream(UInt8 randType, UInt8 flag)
 
     //为拉把随机奖励
     UInt8 awardType = 0;
-    static UInt32 awardProb[] = {8000, 9200, 9500, 9710, 9860, 9960, 9990, 10000};
+    static UInt32 awardProb[] = {8700, 9200, 9500, 9710, 9860, 9960, 9990, 10000};
     UInt32 rand = uRand(10000);
     for(UInt8 i = 0; i < 8; i++)
     {
