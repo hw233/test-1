@@ -5279,6 +5279,13 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
                 player->clanShopOp(command, arg);
             }
             break;
+        case 0x40:
+            {
+                if(player != clan->getLeader())
+                    return;
+                clan->SetClanAutoApply(command,true); 
+                clan->sendInfo(player);
+            }
         default:
                 break;
     }

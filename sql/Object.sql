@@ -1123,6 +1123,7 @@ CREATE TABLE `clan` (
   `tyssSum` int(10) unsigned NOT NULL DEFAULT '0',
   `clantitleAll` varchar(1024) NOT NULL DEFAULT '',
   `clanFireValue` int(10) unsigned NOT NULL DEFAULT '0',
+  `clanAutoApply` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

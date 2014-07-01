@@ -725,6 +725,7 @@ struct DBClan
     UInt32 tyssSum;
     std::string clantitleAll;
     UInt32 clanFireValue;
+    UInt8 clanAutoApply;
 };
 
 struct DBClanRepo
@@ -2447,7 +2448,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(37)
+SPECIALDEF(38)
 (
 	UInt32, id,
 	std::string, name,
@@ -2485,7 +2486,8 @@ SPECIALDEF(37)
     UInt32, duobaoAward,
     UInt32,tyssSum, 
     std::string, clantitleAll,
-    UInt32, clanFireValue
+    UInt32, clanFireValue,
+    UInt8, clanAutoApply
 )
 SPECIALEND()
 

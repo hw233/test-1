@@ -533,6 +533,9 @@ sysMsg:set(528, 0x26, "")
 sysMsg:set(529, 0x26, "")
 sysMsg:set(530, 0, "")
 
+sysMsg:set(531, 0, "帮派新成员加入")
+sysMsg:set(532, 0, "玩家[%s]成功加入帮派, 请在帮派成员列表中查看。 \n祝您游戏愉快！")
+
 sysMsg:set(540, 0, "")
 sysMsg:set(541, 0, "")
 
