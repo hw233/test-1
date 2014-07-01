@@ -157,6 +157,7 @@ namespace Script
 		lua_tinker::def(_L, "getSurnameLegend", GObject::World::getSurnameLegend);
 		lua_tinker::def(_L, "getHappyFireTime", GObject::World::getHappyFireTime);
 		lua_tinker::def(_L, "getWorldCupTime", GObject::World::getWorldCupTime);
+		lua_tinker::def(_L, "getWorldCupTime2", GObject::World::getWorldCupTime2);
 		lua_tinker::def(_L, "getOpenTime", GObject::World::getOpenTime);
 		lua_tinker::def(_L, "isRPServer", GObject::World::isRPServer);
 		lua_tinker::def(_L, "getAccRecharge", GObject::World::getAccRecharge);
@@ -165,6 +166,7 @@ namespace Script
 		lua_tinker::def(_L, "get11TimeNum", GObject::World::get11TimeAirNum);  //天书奇缘计算天书
 		lua_tinker::def(_L, "getTYSSTime", GObject::World::getTYSSTime);  //天元神兽
 		lua_tinker::def(_L, "get61CardActivity", GObject::World::get61CardActivity);  //61卡牌活动
+		lua_tinker::def(_L, "getCoolSummer", GObject::World::getCoolSummer);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1944,6 +1946,11 @@ namespace Script
 	{
 		assert(player != NULL);
 		return Call<UInt32>("getWorldCupLimitTime", player, opt);
+	}
+    UInt32 GameActionLua::getXXLCost(Player* player, UInt32 opt)
+	{
+		assert(player != NULL);
+		return Call<UInt32>("getXXLCost", player, opt);
 	}
 }
 

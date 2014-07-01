@@ -240,12 +240,24 @@ function doStrong(player, id, param1, param2)
         if id == 37 then
             checkFlag[id] = 2
         end
+        if id == 18 then
+            checkFlag[id] = 5
+        end
+        if id == 12 then
+            checkFlag[id] = 5
+        end
         do11Grade(player, id, num, param2);
     else
         if id == 16 then
             checkFlag[id] = 1
         end
         if id == 37 then
+            checkFlag[id] = 1
+        end
+        if id == 18 then
+            checkFlag[id] = 1
+        end
+        if id == 12 then
             checkFlag[id] = 1
         end
     end
@@ -406,7 +418,7 @@ function do11Grade(player, id, param1, param2)
     local curflag = mgr:GetFlag(id);
     for i = 1, #dayTask do
         if id == dayTask[i][1]  then
-            if curflag >= dayTask[i][2] then
+            if curflag >= dayTask[i][2] or curflag >=checkFlag[id] then
                 return ;
             end
             player:Add11grade(10);

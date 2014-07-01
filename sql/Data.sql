@@ -1219,7 +1219,7 @@ CREATE TABLE `cardInfo` (
     `type` tinyint(3) NOT NULL DEFAULT 0,
     `color` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `lvLimit` tinyint(3) unsigned NOT NULL DEFAULT 0,
-    `skill` int(10) unsigned NOT NULL DEFAULT 0,
+    `skillId` int(10) unsigned NOT NULL DEFAULT 0,
     `name` varchar(255) NOT NULL DEFAULT '',
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -1266,7 +1266,7 @@ CREATE TABLE `cubeAttr` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `floorAttr`;
-CREATE TABLE `cubeAttr` (
+CREATE TABLE `floorAttr` (
     `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `hp` int(10) unsigned NOT NULL DEFAULT 0,
     `attack` float(6,2) NOT NULL DEFAULT '0.00',
@@ -1275,15 +1275,15 @@ CREATE TABLE `cubeAttr` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `picInfo`;
-CREATE TABLE `cubeAttr` (
+CREATE TABLE `picInfo` (
     `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `index` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `cost` int(10) unsigned NOT NULL DEFAULT 0,
     `buff` tinyint(3) unsigned NOT NULL DEFAULT 0,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`,`index`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cubeCountn`;
+DROP TABLE IF EXISTS `cubeCount`;
 CREATE TABLE `cubeCount` (
     `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `index` tinyint(3) unsigned NOT NULL DEFAULT 0,
@@ -1297,6 +1297,41 @@ CREATE TABLE `newquestions` (
     `lvl` tinyint(3) unsigned NOT NULL DEFAULT 0,
     `answer` tinyint(3) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `gear`;
+CREATE TABLE `gear` (
+    `partId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `needMoneyA` int(10) unsigned NOT NULL DEFAULT 0,
+    `needMoneyB` int(10) unsigned NOT NULL DEFAULT 0,
+    `needMoneyC` int(10) unsigned NOT NULL DEFAULT 0,
+    `needMoneyD` int(10) unsigned NOT NULL DEFAULT 0,
+    `needMoneyE` int(10) unsigned NOT NULL DEFAULT 0,
+    `attrValueA` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
+    `attrValueB` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
+    `attrValueC` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
+    `attrValueD` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
+    `attrValueE` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
+    `attrValueF` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
+    `attrValueG` float(10, 2) unsigned NOT NULL DEFAULT '0.00',
+    PRIMARY KEY (`partId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `geartree`;
+CREATE TABLE `geartree` (
+    `suiteId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `lastSuiteId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `partAId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `componentAId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `componentBId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `partBId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `componentCId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `componentDId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `partCId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `componentEId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    `componentFId` smallint(5) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`suiteId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `clan_contribution_shop`;

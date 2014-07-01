@@ -369,7 +369,10 @@ namespace GObject
                     break;
                 case 0x0B:
                     if(!player->inLeftAddrCommitCD())
+                    {
+                        CheckInTheTeam(player);
                         LineUp(player);
+                    }
                     break;
                 case 0x0C:
                     {
@@ -882,6 +885,23 @@ namespace GObject
                 _leftAttr[type - 1] -= value;
         }
         _clan->notifyUpdateStatueAttr();
+    }
+    void ClanBuildingOwner::CheckInTheTeam(Player * pl)
+    {
+        if(!pl->getInLeftTeam())
+            return ;
+        for(std::map< LeftAttackLeader , std::vector<Player *> >::iterator it = leftAttackTeams.begin() ; it != leftAttackTeams.end() ; ++it)
+        {
+            std::vector<Player* > vec = it->second;
+            for(UInt8 i = 0 ; i < vec.size() ; ++i )
+            {
+                if(vec[i]==NULL)
+                    continue;
+                if(vec[i] == pl )
+                    return ;
+            }
+        }
+        pl->setInLeftTeam(false);
     }
 }
 

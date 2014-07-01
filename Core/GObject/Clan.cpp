@@ -5806,7 +5806,7 @@ void Clan::sendMemberBuf(UInt8 pos,UInt8 actType)
             continue;
         if(pos == 1)
         {
-            UInt32 server_id = (UInt32)cfg.serverNo;
+            //UInt32 server_id = (UInt32)cfg.serverNo;
             pl->setBuffData(PLAYER_BUFF_NEW_CLAN1, endTime);
             //addClanTitle(1, 0, pl);
             if(pl->isOnline())

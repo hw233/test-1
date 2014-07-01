@@ -621,21 +621,58 @@ public:
 
     inline static bool  getOldManTime()
     {
-        //UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
-        UInt32 begin1 = TimeUtil::MkTime(2014, 4, 25);
-        UInt32 end1 = TimeUtil::MkTime(2014, 4, 27);
-        //UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        //UInt32 begin1 = TimeUtil::MkTime(2014, 4, 25);
+        //UInt32 end1 = TimeUtil::MkTime(2014, 4, 27);
         UInt32 now = TimeUtil::Now() ;
-        if((now >= begin1 && now <= end1))
+        if((now >= begin && now <= end))
             return true;
         else
             return false;
     } 
-    inline static bool getWorldCupTime(UInt32 time = 0)
+
+    inline static bool getCoolSummer(UInt32 time = 0)
+    {
+        UInt32 begin = TimeUtil::MkTime(2014, 7, 1);
+        UInt32 end = TimeUtil::MkTime(2014, 7, 7);
+        UInt32 now = TimeUtil::Now() + time;
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    }
+
+    inline static bool getWorldCupTime(UInt32 time = 0 )
     {
         UInt32 end1 = TimeUtil::MkTime(2014, 6, 28);
         UInt32 now = TimeUtil::Now() ;
+        UInt32 FootBallEnd = TimeUtil::MkTime(2014, 7, 14);
+        if( time == 1 )
+            return ( now + 10 ) < FootBallEnd ;
         return (now + time) < end1;
+
+       // UInt32 end2 = TimeUtil::MkTime(2014, 7, 15);
+       // UInt32 FootBallEnd = TimeUtil::MkTime(2014, 7, 14);
+       // if( time == 300 )
+       // {
+       //     if(now < end1 + time)
+       //         return (now + time) < end1;
+       //     else 
+       //         return (now + time) < end2;
+       // } 
+       // if( time == 1 )
+       //     return ( now + 10 ) < FootBallEnd ;
+       // return (now+time) < end2;
+    }
+    inline static bool getWorldCupTime2(UInt32 time = 0 )
+    {
+        UInt32 begin1 = TimeUtil::MkTime(2014, 6, 28);
+        UInt32 now = TimeUtil::Now();
+
+        UInt32 end1 = TimeUtil::MkTime(2014, 7, 15);
+
+        return ( (now+time) > begin1 && (now+time) < end1 );
     }
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
@@ -1389,7 +1426,7 @@ public:
     static bool _answerOpenB;
     static UInt32 _rbTimeRank;
     static UInt64 _worldCupAward;
-#define MAX_WC_COUNT 48
+#define MAX_WC_COUNT 63
     static UInt32 _worldCup[MAX_WC_COUNT][4];   //支持度  1-胜 2-负 3-平 4-结果 (注意标号需要-1)
 public:
     static RCSortType answerScoreSort;     //一战成名排名
@@ -1406,6 +1443,7 @@ public:
     static RCSortType worldCupSort;     //世界杯押注
     static RCSortType tyss_PlayerSort;     //天元神兽个人积分排名
     static ClanGradeSort tyss_ClanSort;     //天元神兽帮派积分排名
+    static RCSortType coolSummerSort;     //酷爽一夏个人活跃排名
     static void initRCRank();
     static void initRP7RCRank();
     static void WorldCupAward(UInt8 num , UInt32 res);  //公布答案
@@ -1519,6 +1557,8 @@ public:
     static UInt16 GetRandomSpot();
     void SendHappyFireAward();
     void SendWorldCupAward();
+    void SendCoolSummerAward();
+    void SendWorldCupAward2();
     void SendGuankaActAward();
     void SendTYSSClanAward(UInt8);
     void SendTYSSPlayerAward(UInt8);

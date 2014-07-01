@@ -270,3 +270,11 @@ UNLOCK TABLES;
 LOCK TABLES `newquestions` WRITE;
 source newquestions;
 UNLOCK TABLES;
+
+LOCK TABLES `gear` WRITE;
+source gear;
+UNLOCK TABLES;
+
+LOCK TABLES `geartree` WRITE;
+source geartree;
+UNLOCK TABLES;

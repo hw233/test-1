@@ -525,6 +525,8 @@ void ClanBigBoss::addLevel()
         atk = getLastAtk();
         matk = getLastMAtk();
 
+        if(_lastTime == 0)
+            _lastTime = 60 * 30;
         float hp_factor = (float)BOSS_BASE_TIME / (float)_lastTime;
         if(hp_factor > BOSS_MAX_ASC_HP_FACTOR)
             hp_factor = BOSS_MAX_ASC_HP_FACTOR;
@@ -715,7 +717,8 @@ void ClanBigBoss::ReturnBossInfo(Player* pl,UInt8 status)
     }
     
     UInt32 now = TimeUtil::Now();
-    if(_status == CLAN_BIGBOSS_OVER && TimeUtil::Day() != TimeUtil::Day(appointment_time))
+    //if(_status == CLAN_BIGBOSS_OVER && TimeUtil::Day() != TimeUtil::Day(appointment_time))
+    if(_status == CLAN_BIGBOSS_OVER && !TimeUtil::SameDay(now,appointment_time))
     {
         UInt32 nowday = TimeUtil::SharpDay(0,now);
         UInt32 appday = TimeUtil::SharpDay(0,appointment_time);

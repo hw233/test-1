@@ -219,6 +219,7 @@ RCSortType World::happyFireSort;
 RCSortType World::worldCupSort;
 ClanGradeSort World::clanGradeSort;
 RCSortType World::tyss_PlayerSort;
+RCSortType World::coolSummerSort;
 ClanGradeSort World::tyss_ClanSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
@@ -354,6 +355,8 @@ bool bItem9343End = false;
 bool bQiShiBanEnd = false;
 bool bTYSSEnd = false;
 bool bWCTimeEnd = false;
+bool bCoolSummerTimeEnd = false;
+bool bWCTimeEnd2 = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -636,6 +639,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 28)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 5)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -681,6 +692,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 7)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 14)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 21)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 28)
         ))
     {
 #if 0
@@ -1417,6 +1429,8 @@ void World::World_Midnight_Check( World * world )
     bool bGuanka = getGuankaAct();
     bool b11time = get11Time();
     bool bWCtime = getWorldCupTime();
+    bool bCoolSummerTime = getCoolSummer();
+    bool bWCtime2 = getWorldCupTime2();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
     bool bJune = getJune();
@@ -1466,10 +1480,13 @@ void World::World_Midnight_Check( World * world )
     bGuankaEnd = bGuanka && !getGuankaAct(300);
     b11TimeEnd = b11time && !get11Time();
     bWCTimeEnd = bWCtime && !getWorldCupTime(300);
+    bWCTimeEnd2 = bWCtime2 && !getWorldCupTime2(300);
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
     bGGTimeEnd = bGGtime && !getGGTime(300);
     //天元神兽活动结束
+    //酷爽一夏活动结束
+    bCoolSummerTimeEnd = bCoolSummerTime && !getCoolSummer(300);
     UInt8 actType = getTYSSTime(300);
     bTYSSEnd = bTYSSTime && !actType;
 
@@ -1686,6 +1703,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 27)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 28)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 5)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1782,6 +1807,11 @@ void World::World_Midnight_Check( World * world )
     }
     if(bWCTimeEnd)
         world->SendWorldCupAward();
+    if(bCoolSummerTimeEnd)
+        world->SendCoolSummerAward();
+    if(bWCTimeEnd2)
+        world->SendWorldCupAward2();
+
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
   //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
@@ -1877,6 +1907,11 @@ inline bool player_enum_AskOldMan(GObject::Player * p, int)
         flag &= 255;
         p->SetVar(VAR_OLDMAN_SCORE_AWARD,flag);
     }
+    return true;
+}
+inline bool player_enum_clearVar746(GObject::Player * p, int)
+{
+    p->SetVar(VAR_WORLDCUP_RES,0);
     return true;
 }
 
@@ -3658,7 +3693,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::LuckyBagSort.insert(s);
         }
     }
-    if (World::getWorldCupTime())
+    if (World::getWorldCupTime() || World::getWorldCupTime2())
     {
         UInt32 used = p->GetVar(VAR_WORLDCUP_RES);
         if (used)
@@ -3751,6 +3786,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::tyss_PlayerSort.insert(s);
         }
 
+    }
+    if(World::getCoolSummer())
+    {
+        UInt32 used= p->GetVar(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL);
+        if(used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::coolSummerSort.insert(s);
+        }
     }
 
     return true;
@@ -4145,14 +4191,14 @@ void World::DivorceSnowPair(Player* pl)
 void World::SendSnowAward()
 {
     static MailPackage::MailItem s_item[][3] = {
-        {{515,30},{1325,30},{134,30}},
-        {{515,20},{1325,20},{134,20}},
-        {{515,15},{1325,15},{134,15}},
-        {{515,10},{1325,10},{134,10}},
-        {{514,15},{1325,5},{134,5}},
+        {{515,30},{9498,30},{134,30}},
+        {{515,20},{9498,20},{134,20}},
+        {{515,15},{9498,15},{134,15}},
+        {{515,10},{9498,10},{134,10}},
+        {{514,15},{9498,5},{134,5}},
         {{500,10},{503,5}}
     };
-    static MailPackage::MailItem s_card[2] = {{9927,1},{9928,1}};
+    static MailPackage::MailItem s_card[2] = {{9983,1},{9984,1}};
 
   //  globalPlayers.enumerate(enum_snow_score, static_cast<void *>(NULL));
     
@@ -5285,6 +5331,52 @@ void World::SendWorldCupAward()
         {{515,10},{134,10},{503,15},{9068,5}},
     };
     static MailPackage::MailItem card = {9979,1};   //暂无白马王子
+
+    SYSMSG(title, 5151);
+    int pos = 0;
+    for (RCSortType::iterator i = World::worldCupSort.begin(), e = World::worldCupSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (!player)
+            continue;
+        ++pos;
+        if(pos > 7) break;   // 1--7名
+        SYSMSGV(content, 5152, pos,i->total);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, s_item[pos-1], 4, true);  
+            if(pos ==1)
+                mailPackageManager.push(mail->id, &card, 1, true);
+        }
+        std::string strItems;
+        for(int index = 0; index < 4; ++ index)
+        {
+            strItems += Itoa(s_item[pos-1][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[pos-1][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+    }
+    worldCupSort.clear();
+    GObject::globalPlayers.enumerate(player_enum_clearVar746, 0);
+}
+void World::SendWorldCupAward2()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][5] = {
+        {{515,40},{9498,40},{9600,40},{9075,20}},
+        {{515,30},{9498,30},{9600,30},{9075,15}},
+        {{515,20},{9498,20},{9600,20},{9075,10}},
+        {{515,12},{9498,12},{9600,12},{9075,5}},
+        {{515,12},{9498,12},{9600,12},{9075,5}},
+        {{515,12},{9498,12},{9600,12},{9075,5}},
+        {{515,12},{9498,12},{9600,12},{9075,5}},
+    };
+    static MailPackage::MailItem card = {9982,1};   //大头称号
+
     SYSMSG(title, 5151);
     int pos = 0;
     for (RCSortType::iterator i = World::worldCupSort.begin(), e = World::worldCupSort.end(); i != e; ++i)
@@ -5315,5 +5407,35 @@ void World::SendWorldCupAward()
     }
     worldCupSort.clear();
 }
+
+void World::SendCoolSummerAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][5] = {
+        {{9498, 40}, {16001, 40}, {9022, 30}, {503, 50}, {9981, 1}},
+        {{9498, 30}, {16001, 30}, {9022, 25}, {503, 40}, {0 ,0}},
+        {{9498, 20}, {16001, 20}, {9022, 20}, {503, 30}, {0, 0}},
+        {{9498, 10}, {16001, 10}, {9022, 10}, {503, 15}, {0, 0}}
+    };
+
+    SYSMSG(title, 5163);
+    UInt8 pos = 1;
+    for (RCSortType::iterator i = World::coolSummerSort.begin(), e = World::coolSummerSort.end(); i != e; ++i)
+    {
+        UInt32 activePoint = i->player->GetVar(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL);
+        if(pos >= 1 && pos < 8)     //奖励前7名
+        {
+            int type = pos > 3 ? 4 : pos;
+            SYSMSGV(content, 5164, activePoint, pos);
+            MailItemsInfo itemsInfo(s_item[type-1], Activity, 5);
+            Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+                mailPackageManager.push(mail->id, s_item[type-1], 5, true);
+        }
+        pos++;
+    }
+    return;
+}
+
 }
 
