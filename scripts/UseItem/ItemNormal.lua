@@ -9280,7 +9280,7 @@ end
 function ItemNormal_00010246(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
-    local item = 1384;
+    local item = 1514;
 
     if package:GetRestPackageSize() < (1+(1*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
