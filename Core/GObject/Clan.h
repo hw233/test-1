@@ -814,6 +814,13 @@ public:
             DB5().PushUpdateData("UPDATE `clan` SET `clanFireValue` = %u WHERE `id` = %u", _clanFireValue, _id);
     }
     
+    void SetClanAutoApply(UInt8 clanAutoApply, bool toDB = false)
+    {
+        _clanAutoApply = clanAutoApply;
+        if(toDB)
+            DB5().PushUpdateData("UPDATE `clan` SET `clanAutoApply` = %u WHERE `id` = %u", _clanAutoApply, _id);
+    }
+
     void SetTYSSSum(UInt32 num,bool toDB=false) 
     {
         if(_tyssSum == num)
@@ -928,6 +935,7 @@ private:
     UInt32 _tyssSum;
     std::map<UInt8, UInt32> _clanTitle;
     UInt32 _clanFireValue;
+    UInt8 _clanAutoApply;
 
     ClanSpiritTree m_spiritTree;
 

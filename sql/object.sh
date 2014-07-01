@@ -314,6 +314,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/GObject_GVar102.sql     #世界最高等级
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140617_1.sql     #帮贡商店
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140623.sql     #帮派加入优化
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140620_1.sql #修复帮贡商店var776
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_201400623_Cp599To817.sql     #天书奇缘拷贝积分599到817
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_Bug.sql     #天书奇缘时间段积分还原
@@ -321,6 +322,7 @@ function update_object()
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_ClanBigBossBug.sql     #帮派BossBug修复
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140627_1.sql #机关库
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var402_403.sql   #这“夏”有礼咯
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguanyu.sql   #player_jiguanyu表中添加字段scheme
 }
 
 #sh player_jiguan.sh
