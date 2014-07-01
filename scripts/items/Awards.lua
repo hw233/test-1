@@ -1959,19 +1959,19 @@ local  WorldCup={
     { ['year'] = 2014, ['month'] = 6, ['day'] = 27, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 27, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },    --48
 
-    { ['year'] = 2014, ['month'] = 6, ['day'] = 27, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
-    { ['year'] = 2014, ['month'] = 6, ['day'] = 29, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 28, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 29, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 6, ['day'] = 29, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 30, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 6, ['day'] = 30, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
-    { ['year'] = 2014, ['month'] = 7, ['day'] = 1, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 7, ['day'] = 1, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 1, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 7, ['day'] = 2, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },    --1/8
 
-    { ['year'] = 2014, ['month'] = 7, ['day'] = 4, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 7, ['day'] = 5, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
-    { ['year'] = 2014, ['month'] = 7, ['day'] = 3, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
-    { ['year'] = 2014, ['month'] = 7, ['day'] = 6, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },    --1/4
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 6, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 4, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },
+    { ['year'] = 2014, ['month'] = 7, ['day'] = 5, ['hour'] = 23, ['min'] = 0, ['sec'] = 0 },    --1/4
 
     { ['year'] = 2014, ['month'] = 7, ['day'] = 9, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },
     { ['year'] = 2014, ['month'] = 7, ['day'] = 10, ['hour'] = 3, ['min'] = 0, ['sec'] = 0 },   --1/2

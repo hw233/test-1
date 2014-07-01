@@ -33670,9 +33670,9 @@ UInt8 Player::supportWorldCup(UInt8 num ,UInt8 res, UInt32 number)
 {
     if( num >= WC_MAX_COUNT)
         return 1;
-    if( num <=48 && !World::getWorldCupTime())
+    if( num <48 && !World::getWorldCupTime())
         return 1;
-    if( num > 48 && !World::getWorldCupTime2())
+    if( num >= 48 && !World::getWorldCupTime2())
         return 1;
 
     if(worldCupInfo[num].support == 0 && res != 0)
@@ -34086,7 +34086,7 @@ void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType, UInt8 sendType
     {
         if(awardType == 1)
         {
-            SYSMSG_BROADCASTV(5155, getCountry(), getName().c_str(), itemCount);
+            SYSMSG_BROADCASTV(5169, getCountry(), getName().c_str(), itemCount);
         }
         else if(awardType == 2)
         {
