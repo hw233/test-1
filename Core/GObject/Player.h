@@ -3555,7 +3555,7 @@ namespace GObject
         void checkClanTitle();
 
         void coolSummerOp(UInt8, UInt8, UInt8);
-        void sendCoolSummerAward(UInt8, UInt8);
+        void sendCoolSummerAward(UInt8, UInt8, UInt8);
         void useIceCream(UInt8, UInt8);
         void sendCoolSummerActPointGift(UInt8);
 

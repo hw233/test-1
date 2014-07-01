@@ -743,7 +743,7 @@ namespace GObject
 	{
         UInt8 awardType = m_Player->GetVar(VAR_COOL_SUMMER_AWARD_TYPE);
         UInt8 randType = m_Player->GetVar(VAR_COOL_SUMMER_RAND_TYPE);
-        m_Player->sendCoolSummerAward(awardType, randType);
+        m_Player->sendCoolSummerAward(awardType, randType, 2);
         if(!leftCount)
 			PopTimerEvent(m_Player, EVENT_COOLSUMMERAWARD, m_Player->getId());
 	}
@@ -34031,7 +34031,7 @@ void Player::useIceCream(UInt8 randType, UInt8 flag)
 
     //为拉把随机奖励
     UInt8 awardType = 0;
-    static UInt32 awardProb[] = {8500, 9000, 9400, 9710, 9860, 9960, 9990, 10000};
+    static UInt32 awardProb[] = {8000, 9200, 9500, 9710, 9860, 9960, 9990, 10000};
     UInt32 rand = uRand(10000);
     for(UInt8 i = 0; i < 8; i++)
     {
@@ -34051,6 +34051,8 @@ void Player::useIceCream(UInt8 randType, UInt8 flag)
     //播放动画延迟发奖，跳过动画直接发奖
     if(!flag)
     {
+        sendCoolSummerAward(awardType, randType, 0);
+        //先偷偷发物品，然后定时器公告和弹窗
         SetVar(VAR_COOL_SUMMER_RAND_TYPE, randType);
         SetVar(VAR_COOL_SUMMER_AWARD_TYPE, awardType);
         EventCoolSummerGiveAward* event = new(std::nothrow)EventCoolSummerGiveAward(this, 5, 1);
@@ -34059,10 +34061,10 @@ void Player::useIceCream(UInt8 randType, UInt8 flag)
 		PushTimerEvent(event);
     }
     else
-        sendCoolSummerAward(awardType, randType);
+        sendCoolSummerAward(awardType, randType, 1);
 }
 
-void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType)
+void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType, UInt8 sendType)
 {
     if(!(awardType >= 0 && awardType <= 7))
         return;
@@ -34079,40 +34081,49 @@ void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType)
     };
 
     UInt32 itemCount = awardArray[awardType][1] * awardCount[randType - 1];
-    if(awardType == 1)
+
+    if(sendType)
     {
-        SYSMSG_BROADCASTV(5155, getCountry(), getName().c_str(), itemCount);
-    }
-    else if(awardType == 2)
-    {
-        SYSMSG_BROADCASTV(5156, getCountry(), getName().c_str(), itemCount);
-    }
-    else if(awardType == 3)
-    {
-        SYSMSG_BROADCASTV(5157, getCountry(), getName().c_str(), itemCount);
-    }
-    else if(awardType == 4)
-    {
-        SYSMSG_BROADCASTV(5158, getCountry(), getName().c_str(), itemCount);
-    }
-    else if(awardType == 5)
-    {
-        SYSMSG_BROADCASTV(5159, getCountry(), getName().c_str(), itemCount);
-    }
-    else if(awardType == 6)
-    {
-        SYSMSG_BROADCASTV(5160, getCountry(), getName().c_str(), itemCount);
-    }
-    else if(awardType == 7)
-    {
-        SYSMSG_BROADCASTV(5161, getCountry(), getName().c_str(), itemCount);
+        if(awardType == 1)
+        {
+            SYSMSG_BROADCASTV(5155, getCountry(), getName().c_str(), itemCount);
+        }
+        else if(awardType == 2)
+        {
+            SYSMSG_BROADCASTV(5156, getCountry(), getName().c_str(), itemCount);
+        }
+        else if(awardType == 3)
+        {
+            SYSMSG_BROADCASTV(5157, getCountry(), getName().c_str(), itemCount);
+        }
+        else if(awardType == 4)
+        {
+            SYSMSG_BROADCASTV(5158, getCountry(), getName().c_str(), itemCount);
+        }
+        else if(awardType == 5)
+        {
+            SYSMSG_BROADCASTV(5159, getCountry(), getName().c_str(), itemCount);
+        }
+        else if(awardType == 6)
+        {
+            SYSMSG_BROADCASTV(5160, getCountry(), getName().c_str(), itemCount);
+        }
+        else if(awardType == 7)
+        {
+            SYSMSG_BROADCASTV(5161, getCountry(), getName().c_str(), itemCount);
+        }
+
+        char str[16] = {0};
+        sprintf(str, "F_140625_%d", 5+awardType);
+        udpLog("kushuangyixia", str, "", "", "", "", "act");
     }
 
-    GetPackage()->AddItem(awardArray[awardType][0], itemCount, true, false, FromCoolSummer);
-
-    char str[16] = {0};
-    sprintf(str, "F_140625_%d", 5+awardType);
-    udpLog("kushuangyixia", str, "", "", "", "", "act");
+    if(sendType == 0)
+        GetPackage()->AddItem(awardArray[awardType][0], itemCount, true, true, FromCoolSummer);
+    else if(sendType == 1)
+        GetPackage()->AddItem(awardArray[awardType][0], itemCount, true, false, FromCoolSummer);
+    else if(sendType == 2)
+        m_Package->ItemNotify(awardArray[awardType][0], itemCount);
 }
 
 void Player::coolSummerOp(UInt8 type, UInt8 randType, UInt8 flag)
