@@ -3337,5 +3337,4 @@ void OnCoolSummerReturn(GameMsgHdr& hdr,  const void* data)
     player->send(st);
 }
 
->>>>>>> 7ac35d09fcf4ccf7c2deb67fdff127d77748218d
 #endif // _WORLDINNERMSGHANDLER_H_
