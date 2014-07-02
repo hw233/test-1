@@ -7387,6 +7387,14 @@ void OnMoFangInfo( GameMsgHdr & hdr, const void * data )
             player->GetMoFang()->makeGear(gearId, type);               
         }
         break;
+    case 15:
+        {
+            UInt8 scheme = 0;
+
+            br >> scheme;
+            player->GetMoFang()->selectSchmem(scheme);               
+        }
+        break;
     }
 }
 

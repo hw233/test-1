@@ -68,10 +68,12 @@ namespace GObject
         JIGUANKU_K = 1401
     };
 
-    #define NORMAL_TUZHI   100000
-    #define SPECIAL_TUZHI  200000
-    #define JGS_MAXEXP     1525500
-    #define JGS_MAXLVL     60
+    #define NORMAL_TUZHI        100000
+    #define SPECIAL_TUZHI       200000
+    #define JGS_MAXEXP          1525500
+    #define JGS_MAXLVL          60
+    #define EQUIP_SCHEME_MAX    3
+    #define EQUIP_GRID_MAX      49
 
     class Player;
 	class Fighter;
@@ -108,11 +110,13 @@ namespace GObject
         void randTuzhi(UInt16 num);
         void addJGSExp(UInt32 exp);
         UInt32 addTuzhi(UInt32 tuzhiId, bool mark = false);
-        void makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark);                        // 制造机关
+        void makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark);                                      // 制造机关
+        void selectSchmem(UInt8 scheme);                                                              // 选择方案
         void equipJG(UInt32 jgId, UInt8 pos, UInt8 mark);                               // 装备机关
-        bool checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, std::vector<UInt8> &);      // 检测是否能够装备
-        void addJGYAttr(GData::AttrExtra& ae);                                          // 机关玉添加属性
-        UInt16 useJGQskill();                                                           // 使用机关器技能
+        bool checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, UInt8 scheme, std::vector<UInt8> &);      // 检测是否能够装备
+        void addJGYAttrFromSchmem(GData::AttrExtra& ae);                                // 机关玉根据方案添加属性
+        void addJGYAttr(GData::AttrExtra& ae, UInt32 jgyId);                            // 机关玉添加属性
+        //void useJGQskill();                                                           // 使用机关器技能
         void upgradeJGS();                                                              // 机关术升级
         void sendMoFangInfo(UInt8 mark = 0);                                            // 墨方信息
         void zhenweiInfo(Stream& st);                                                   // 震位信息
@@ -126,6 +130,7 @@ namespace GObject
         UInt32 yizhiyue(UInt16 keyId);                                                  // 义之鈅
         UInt32 renzhiyue(UInt16 keyId);                                                 // 仁之鈅
         inline bool findEquipJG(UInt32 jgId);
+        inline bool specialFindEquipJG(UInt32 jgId);
         inline bool findNoEquipJG(UInt32 jgId);
         inline bool findKey(UInt16 keyId);
 
@@ -145,7 +150,11 @@ namespace GObject
 
     private:
 
-        std::map<UInt32, UInt8> m_equipJG;  // 装备的机关
+        std::map<UInt32, UInt8> m_equipJGA;  // A装备的机关
+
+        std::map<UInt32, UInt8> m_equipJGB;  // B装备的机关
+
+        std::map<UInt32, UInt8> m_equipJGC;  // C装备的机关
 
         std::map<UInt32, UInt8> m_tuzhi;    // 记录图纸所对应的熟练度
 
@@ -161,7 +170,7 @@ namespace GObject
 
         std::vector<UInt16> m_specialGear;  // 记录特殊机关库已经制造成功的零件
 
-        int m_grids[49];                    // 记录网格占用情况
+        int m_grids[EQUIP_SCHEME_MAX][EQUIP_GRID_MAX]; // 记录网格占用情况[方案][占用情况]
 
         int m_kyQuality[4];                 // 刻印品质
 

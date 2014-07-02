@@ -6188,7 +6188,7 @@ namespace GObject
 		DBJiguanyu idata;
         Player* pl = NULL;
 
-		if(execu->Prepare("SELECT `playerId`, `jiguanId`, `pos`  FROM `player_jiguanyu` ORDER BY `playerId`", idata) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `jiguanId`, `pos`, `scheme`  FROM `player_jiguanyu` ORDER BY `playerId`", idata) != DB::DB_OK)
 			return false;
 
 		lc.reset(20);
