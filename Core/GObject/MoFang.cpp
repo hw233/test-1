@@ -94,9 +94,10 @@ void MoFang::AddJGYFromDB(DBJiguanyu & dbData)
 
     if(pos>0 && scheme==0) //老数据，默认放在第一方案
     {
-        m_owner->SetVar(VAR_JIGUAN_SCHEME, 1);
+        scheme = 1;
+        m_owner->SetVar(VAR_JIGUAN_SCHEME, scheme);
         m_equipJGA.insert(std::make_pair(dbData.jiguanId, dbData.pos));
-        DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u, %u)",m_owner->getId(), dbData.jiguanId, pos, 1);
+        DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u, %u)",m_owner->getId(), dbData.jiguanId, pos, scheme);
     }
 
     if(0!=pos && 0!=scheme)
@@ -661,17 +662,17 @@ void MoFang::upgradeJGS()
     }
     else
     {
-        UInt32 exp = 0;
+        //UInt32 exp = 0;
         GData::JiguanData::jiguanshuInfo * jgsInfo = NULL;
         if(m_jiguanshu.curExp > JGS_MAXEXP)
         {
-            exp = JGS_MAXEXP;
+            //exp = JGS_MAXEXP;
             jgsInfo = GData::jiguanData.getJiguanshuInfo(JGS_MAXLVL);
         }
         else
         {
-            exp = m_jiguanshu.curExp;
-            jgsInfo = GData::jiguanData.getUpgradeInfo(exp);
+            //exp = m_jiguanshu.curExp;
+            jgsInfo = GData::jiguanData.getUpgradeInfo(m_jiguanshu.curExp);
         }
 
         if(NULL==jgsInfo)
