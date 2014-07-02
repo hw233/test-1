@@ -1432,7 +1432,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
             ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
         // target fighter will do not counter while fighter is the same side
         bool can_counter = true;
-        if(target_stun > 0 || bf->getSide() == area_target->getSide())   //混乱状态，或被己方攻击
+        if(target_stun > 0 || bf->getSide() == area_target->getSide() || (skill != NULL && skill == bf->getSkillControlBall()))   //混乱状态，或被己方攻击
         {
             can_counter = false;
         }
