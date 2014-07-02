@@ -662,13 +662,19 @@ void MoFang::upgradeJGS()
     else
     {
         UInt32 exp = 0;
+        GData::JiguanData::jiguanshuInfo * jgsInfo = NULL;
         if(m_jiguanshu.curExp > JGS_MAXEXP)
+        {
             exp = JGS_MAXEXP;
+            jgsInfo = GData::jiguanData.getJiguanshuInfo(JGS_MAXLVL);
+        }
         else
+        {
             exp = m_jiguanshu.curExp;
+            jgsInfo = GData::jiguanData.getUpgradeInfo(exp);
+        }
 
-        GData::JiguanData::jiguanshuInfo * jgsInfo = GData::jiguanData.getUpgradeInfo(exp);
-        if(!jgsInfo)
+        if(NULL==jgsInfo)
             return;
         
         if(m_jiguanshu.curExp == jgsInfo->totalExp)
@@ -830,6 +836,12 @@ void MoFang::selectSchmem(UInt8 scheme)
         return;
 
     m_owner->SetVar(VAR_JIGUAN_SCHEME, scheme);
+
+    std::map<UInt32, Fighter *>& fighters = m_owner->getFighterMap();
+    for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
+    {
+        it->second->setDirty();
+    }
 }
 
 void MoFang::addJGYAttrFromSchmem(GData::AttrExtra& ae)
