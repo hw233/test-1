@@ -264,7 +264,7 @@ void ClanItemPkg::GetItems(Player* player)
 Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	GObjectBaseT<Clan>(id), _name(name), _rank(0), _level(lvl), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
-    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0),_tyssSum(0), _clanFireValue(0),
+    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0),_tyssSum(0), _clanFireValue(0),_clanAutoApply(0),
     _buildingOwner(NULL)
 {
     _itemPkg.Init(_id, 0, GData::clanLvlTable.getPkgSize(_level));
@@ -399,6 +399,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 		cmem->cls = 4;
 		cmem->proffer = 2000;
         setLeaderId(player->getId());
+        SetClanAutoApply(1,true);
 	}
 	if (cmem == NULL) return false;
 	_membersJoinTime.insert(joinTime);
@@ -1043,12 +1044,38 @@ UInt8 Clan::apply( Player * player, UInt32 optime, bool writedb )
 		if(_members.size() > 0)
 		{
 			ClanMember * leader = (*_members.begin());
-			SYSMSGV(title, 223, player->getName().c_str());
-			SYSMSGV(content, 224, player->getName().c_str());
-			leader->player->GetMailBox()->newMail(player, 0x23, title, content);
+			if(!_clanAutoApply)
+            {
+                SYSMSGV(title, 223, player->getName().c_str());
+                SYSMSGV(content, 224, player->getName().c_str());
+                leader->player->GetMailBox()->newMail(player, 0x23, title, content);
+            }
 		}
 	}
     player->setFightersDirty(true);
+
+    if(_clanAutoApply)
+    {
+        if (ClanCopyMgr::Instance().getClanCopyByClan(this))
+        {
+            player->sendMsgCode(0, 1371);
+            return 0;
+        }
+        if (_clanBattle->isInBattling())
+        {
+            player->sendMsgCode(0, 1372);
+            return 0;
+        }
+        Player* leader = getLeader();
+        struct playerInfo 
+        {
+            Player* player;
+            std::string name;
+        };
+	    playerInfo pi = {player, player->getName()};
+        GameMsgHdr hdr(0x154, WORKER_THREAD_WORLD, leader, sizeof(pi));
+        GLOBAL().PushMsg(hdr,&pi); 
+    }
 
 	return 0;
 }
@@ -1537,7 +1564,7 @@ void Clan::sendInfo( Player * player )
         <<  static_cast<UInt8>((pd.ctFinishCount << 4) | player->getClanTaskMax()) << static_cast<UInt32>(getConstruction())
         << getClanFunds() << member->proffer << static_cast<UInt8>(place-1)
         << _name << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
-        << _contact << _announce << _purpose << static_cast<UInt32>(getId()) <<static_cast<UInt64>(uid) << m_spiritTree.m_exp;
+        << _contact << _announce << _purpose << static_cast<UInt32>(getId()) <<static_cast<UInt64>(uid) << m_spiritTree.m_exp << _clanAutoApply;
 	st << Stream::eos;
 	player->send(st);
 }

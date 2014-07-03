@@ -725,6 +725,7 @@ struct DBClan
     UInt32 tyssSum;
     std::string clantitleAll;
     UInt32 clanFireValue;
+    UInt8 clanAutoApply;
 };
 
 struct DBClanRepo
@@ -1442,6 +1443,7 @@ struct DBJiguanyu
     UInt64 playerId;
     UInt32 jiguanId;
     UInt8  pos;
+    UInt8  scheme;
 };
 
 struct DBTuzhi
@@ -2460,7 +2462,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(37)
+SPECIALDEF(38)
 (
 	UInt32, id,
 	std::string, name,
@@ -2498,7 +2500,8 @@ SPECIALDEF(37)
     UInt32, duobaoAward,
     UInt32,tyssSum, 
     std::string, clantitleAll,
-    UInt32, clanFireValue
+    UInt32, clanFireValue,
+    UInt8, clanAutoApply
 )
 SPECIALEND()
 
@@ -3514,11 +3517,12 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBJiguanyu)
-SPECIALDEF(3)
+SPECIALDEF(4)
     (
     UInt64, playerId,
     UInt32, jiguanId,
-    UInt8,  pos
+    UInt8,  pos,
+    UInt8,  scheme
     )
 SPECIALEND()
 

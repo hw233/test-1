@@ -279,6 +279,7 @@ bool ClanBigBoss::attackBossFinal(Player* player)
     GData::NpcFData& nfdata = nflist[0];
     Battle::BattleFighter * bf = bsim.newFighter(1, nfdata.pos, nfdata.fighter);
     bf->setHP(m_BossHP);
+    TRACE_LOG("Clan_BOSS INSERT ret: %u (pid: %" I64_FMT "u, m_BossHP: %u, _lastHp: %u)", ret, player->getId(), m_BossHP, _lastHp);
     bsim.start();
     Stream& packet = bsim.getPacket();
     if(packet.size() <= 8)
