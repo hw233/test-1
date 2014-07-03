@@ -2612,7 +2612,7 @@ namespace GObject
 			if((exp & 0x80000000) > 0)
 			{
 				exp &= 0x7FFFFFFF;
-				moveTo(_playerData.location & 0xFF00, false);
+				moveTo(_playerData.location & 0xFF00, true);
 			}
 			AddExp(exp);
 			_playerData.lastExp = 0;
