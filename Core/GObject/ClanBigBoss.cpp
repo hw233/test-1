@@ -211,7 +211,7 @@ bool ClanBigBoss::attackBoss(Player* player)
 
     UInt16 ret = 0x0100;
 
-    Battle::BattleSimulator bsim(Battle::BS_WBOSS, player, _ng1->getName(), 255, false);
+    Battle::BattleSimulator bsim(Battle::BS_WBOSS, player, _ng1->getName(), 255, true);
     player->PutFighters(bsim, 0);
     _ng1->putFighters(bsim);
     
@@ -300,6 +300,8 @@ bool ClanBigBoss::attackBossFinal(Player* player)
     //player->pendExp(exp);
 
     TRACE_LOG("Clan_BOSS INSERT ret: %u (pid: %" I64_FMT "u, dmg: %u)", ret, player->getId(), damage);
+    if(damage > 20000000)
+        TRACE_LOG("Clan_BOSS reportid: %u (pid: %" I64_FMT "u, dmg: %u)", bsim.getId(), player->getId(), damage);
 
     UInt8 newPercent = ((float)m_BossHP / nflist[0].fighter->getMaxHP()) * 100;
 
