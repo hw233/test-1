@@ -19030,7 +19030,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
     UInt8 Player::useSnowItem(UInt32 num)
     {
         //9275
-        if (GetPackage()->DelItemAny(9275, num))
+        if (GetPackage()->DelItemAny(16019, num))
         {
             UInt32 oldScore = m_snow.score;
 
@@ -19110,7 +19110,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
         static  MailPackage::MailItem s_item2[4] = {{514,3},{9371,3},{500,3},{15,3}};
         static  MailPackage::MailItem s_item3[4] = {{503,3},{512,3},{516,2},{513,3}};
         static  MailPackage::MailItem s_item4[4] = {{1325,2},{134,2},{547,3},{551,3}};
-        static  MailPackage::MailItem s_item5[4] = {{56,5},{547,5},{512,5},{514,5}};
+        static  MailPackage::MailItem s_item5[4] = {{56,5},{547,5},{512,5},{503,5}};
         static  MailPackage::MailItem s_item6[4] = {{509,3},{507,3},{501,5},{513,5}};
         static  MailPackage::MailItem s_item7[4] = {{503,5},{516,5},{501,5},{505,5}};
         static  MailPackage::MailItem s_item8[4] = {{134,8},{1325,8},{9076,8},{507,8}};
@@ -19134,15 +19134,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
         switch (type)
         {
             case 0x01:
-                needScore = 60;
+                needScore = 40;
                 pItems = s_item1;
                 break;
             case 0x02:
-                needScore = 140;
+                needScore = 100;
                 pItems = s_item2;
                 break;
             case 0x04:
-                needScore = 220;
+                needScore = 180;
                 pItems = s_item3;
                 break;
             case 0x08:
@@ -33961,6 +33961,13 @@ void Player::sendCoolSummerActPointGift(UInt8 awardType)
     awardFlag &= 0xFF;
     awardFlag += awardType << 8;
     SetVar(VAR_COOL_SUMMER_STATUS, awardFlag);
+
+    if(awardType)
+    {
+         char str[16] = {0};
+         sprintf(str, "F_140625_%d", 12 + awardType);
+         udpLog("kushuangyixia", str, "", "", "", "", "act");
+    }
 }
 
 void Player::useIceCream(UInt8 randType, UInt8 flag)
@@ -33983,13 +33990,12 @@ void Player::useIceCream(UInt8 randType, UInt8 flag)
         sendMsgCode(0, 8062);
         return;
     }
-    if(GetPackage()->GetItemNum(16020,true) >= useCount[randType - 1][0])
-        GetPackage()->UseItem(16020,static_cast<UInt16>(useCount[randType - 1][0]),0,0,1);
-    else
-    {
-        GetPackage()->UseItem(16020,GetPackage()->GetItemNum(16020,true),0,0,1);
-        GetPackage()->UseItem(16020,static_cast<UInt16>(useCount[randType - 1][0]) - GetPackage()->GetItemNum(16020,true),0,0,0);
-    }
+
+    GetPackage()->DelItemAny(16020, useCount[randType - 1][0]);
+
+    char str[16] = {0};
+    sprintf(str, "F_140625_%d", randType);
+    udpLog("kushuangyixia", str, "", "", "", "", "act");
 
     activePoint += useCount[randType - 1][1];
     activePointTotal += useCount[randType - 1][1];
@@ -34025,7 +34031,7 @@ void Player::useIceCream(UInt8 randType, UInt8 flag)
 
     //为拉把随机奖励
     UInt8 awardType = 0;
-    static UInt32 awardProb[] = {7660, 8660, 9160, 9560, 9860, 9960, 9990, 10000};
+    static UInt32 awardProb[] = {8500, 9000, 9400, 9710, 9860, 9960, 9990, 10000};
     UInt32 rand = uRand(10000);
     for(UInt8 i = 0; i < 8; i++)
     {
@@ -34064,11 +34070,11 @@ void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType)
     static UInt32 awardArray[][2] = {
         {16018, 1},
         {16018, 2},
-        {9600, 3},
-        {9457, 3},
-        {134, 3},
-        {515, 4},
-        {9075, 5},
+        {9600, 2},
+        {9457, 2},
+        {134, 2},
+        {515, 2},
+        {9075, 4},
         {9022, 8},
     };
 
@@ -34103,6 +34109,10 @@ void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType)
     }
 
     GetPackage()->AddItem(awardArray[awardType][0], itemCount, true, false, FromCoolSummer);
+
+    char str[16] = {0};
+    sprintf(str, "F_140625_%d", 5+awardType);
+    udpLog("kushuangyixia", str, "", "", "", "", "act");
 }
 
 void Player::coolSummerOp(UInt8 type, UInt8 randType, UInt8 flag)

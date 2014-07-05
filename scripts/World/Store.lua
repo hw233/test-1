@@ -146,7 +146,7 @@ function loadStore()
     end
 
     if getSnowAct(300) then
-        store:add(2, 9275, 10)
+        store:add(2, 16019, 10)
     end
 
     if getSpecialBookAct() then  --特殊古籍活动

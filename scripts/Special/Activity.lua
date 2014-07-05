@@ -159,15 +159,15 @@ function _snowAct(player, _type)
     end
     local package = player:GetPackage();
     if _type == 0 then
-        package:AddItem(9275, 1, true)
+        package:AddItem(16019, 1, true)
     elseif _type == 1 then
-        package:AddItem(9275, 2, true)
+        package:AddItem(16019, 2, true)
     elseif _type == 2 then
-        package:AddItem(9275, 4, true)
+        package:AddItem(16019, 4, true)
     elseif _type == 3 then
-        package:AddItem(9275, 6, true)
+        package:AddItem(16019, 6, true)
     elseif _type == 5 then
-        package:AddItem(9275, 5, true)
+        package:AddItem(16019, 5, true)
     end
 end
 

@@ -11413,13 +11413,14 @@ end
 
 function ItemNormal_00016018(id, num, bind, param)
     local player = GetPlayer();
+    local package = player:GetPackage();
     if package:GetRestPackageSize() < 2 + (2*num*2)/99 then
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
 
-    local prob = {2350, 2500, 4850, 5000, 5200, 7400, 9200, 10000}
-    local items = {{503,1}, {503,2}, {500,2}, {501,2}, {513,2}, {517,2}, {551,2}, {516,1}}
+    local prob = {1500, 3000, 4100, 5200, 6300, 7100, 7900, 8400, 8900, 9400, 9700, 10000}
+    local items = {{500,1}, {1126,1}, {501,1}, {503,1}, {513,1}, {551,1}, {516,1}, {134,1}, {509,1}, {1325,1}, {9498,1}, {9457,1}}
 
     for k = 1, num do
         local p = math.random(1, 10000)
