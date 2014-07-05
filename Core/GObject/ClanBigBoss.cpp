@@ -56,7 +56,7 @@ ClanBigBoss::~ClanBigBoss()
 void ClanBigBoss::setNpcBoss()
 {
     GData::NpcGroup * s_ng = new GData::NpcGroup(static_cast<UInt32>(5509));
-    if(!s_ng)
+    if(!s_ng || !GData::npcGroup_5509)
         return;
     /*GData::NpcGroups::iterator it = GData::npcGroups.find(BIGBOSS);
     if(it == GData::npcGroups.end())
