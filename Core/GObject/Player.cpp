@@ -6243,7 +6243,7 @@ namespace GObject
 
     bool Player::isForeverTitle(UInt8 t)
     {   //38道尊 39释尊 40儒尊 201名震蜀山
-        if(t == 38 || t == 39 || t == 40 || (t >= 201 && t <= 206))
+        if(t == 38 || t == 39 || t == 40 || (t >= 201 && t <= 206) || t == 134)
             return false;
         return true;
     }
