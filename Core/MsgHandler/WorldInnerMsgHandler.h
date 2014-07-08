@@ -3231,6 +3231,45 @@ void OnSendWorldCupRank ( GameMsgHdr& hdr,  const void* data )
     }
 }
 
+void OnClanAutoAceept(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	
+    struct playerInfo 
+	{
+        Player* applier;
+        std::string name;
+	};
+	const playerInfo * pi = reinterpret_cast<const playerInfo*>(data);
+    
+    //GObject::Player * applier = reinterpret_cast<GObject::Player*>(const_cast<void *>(data));
+
+    GObject::Clan * clan = player->getClan();
+    if(clan == NULL)
+    {
+        player->sendMsgCode(2, 1371);
+        return;
+    }
+    if (clan->getClanBattle()->isInBattling())
+    {
+        player->sendMsgCode(2, 1372);
+        return;
+    }
+    if (pi->applier == NULL)
+        return;
+    if(!player->getClan()->accept(player, pi->applier->getId()))
+        return;
+    Stream st(REP::CLAN_MEMBER_OPERATE);
+    st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << pi->applier->getId() << Stream::eos;
+    player->send(st);
+
+    SYSMSG(title, 531);
+    SYSMSGV(content, 532, pi->name.c_str());
+    player->GetMailBox()->newMail(NULL, 0x01, title, content);
+
+}
+
+
 void SetCoolSummerRank( GameMsgHdr& hdr,  const void* data )
 {
     World::initRCRank();
