@@ -28164,11 +28164,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             UInt32 clan_contribute = GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
             UInt32 clan_sum = clan->GetTYSSSum();
 
-            UInt16 one_steps = 2000;
-            UInt16 two_steps = 14000;
-            UInt16 three_steps = 23000;
-            UInt16 third_steps = 46000;
-            UInt16 fifth_steps = 70000;
+            UInt32 one_steps = 2000;
+            UInt32 two_steps = 14000;
+            UInt32 three_steps = 23000;
+            UInt32 third_steps = 46000;
+            UInt32 fifth_steps = 70000;
             if(actType == 2) 
             {
                 one_steps = 2000;
@@ -28535,11 +28535,11 @@ void Player::EatLingGuo(UInt32 num)
     AddVar(VAR_TYSS_CONTRIBUTE_CLAN ,10*num); 
   
     UInt8 actType = World::getTYSSTime();
-    UInt16 one_steps = 2000;
-    UInt16 two_steps = 14000;
-    UInt16 three_steps = 23000;
-    UInt16 third_steps = 46000;
-    UInt16 fifth_steps = 70000;
+    UInt32 one_steps = 2000;
+    UInt32 two_steps = 14000;
+    UInt32 three_steps = 23000;
+    UInt32 third_steps = 46000;
+    UInt32 fifth_steps = 70000;
     if(actType == 2) 
     {
         one_steps = 2000;

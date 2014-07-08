@@ -5208,11 +5208,11 @@ void World::SendTYSSClanAward(UInt8 actType)
     ClanGradeSort::iterator i = World::tyss_ClanSort.begin();
     ClanGradeSort::iterator e = World::tyss_ClanSort.end();
 
-    UInt16 one_steps = 2000;
-    UInt16 two_steps = 14000;
-    UInt16 three_steps = 23000;
-    UInt16 third_steps = 46000;
-    UInt16 fifth_steps = 70000;
+    UInt32 one_steps = 2000;
+    UInt32 two_steps = 14000;
+    UInt32 three_steps = 23000;
+    UInt32 third_steps = 46000;
+    UInt32 fifth_steps = 70000;
     if(actType == 2) 
     {
         one_steps = 2000;
