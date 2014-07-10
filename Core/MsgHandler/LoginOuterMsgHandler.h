@@ -3914,7 +3914,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 13 && begin <= end )
     {
-        curType = 13;
+        curType = 11;
         if(GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_END) < TimeUtil::Now())
         {

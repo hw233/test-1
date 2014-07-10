@@ -69,7 +69,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0),  _pexpAddTmp(0) , _pexpMax(0), _potential(1.0f),
     _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _halo(NULL), _fashion(NULL), _weapon(NULL),
     _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false), _skillBPDirty(false),
-    _expMods(0), _expEnd(0), _pexpMods(0), _forceWrite(false), _battlePoint(0.0f), _skillBP(0.0f), _praadd(0),
+    _expMods(0), _expEnd(0), _pexpMods(0), _forceWrite(false), _battlePoint(0.0f), _skillBP(0.0f), _praadd(0),_powerUp(0),
     _attrType1(0), _attrValue1(0), _attrType2(0), _attrValue2(0), _attrType3(0), _attrValue3(0),
     favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
@@ -2156,6 +2156,15 @@ void Fighter::rebuildEquipAttr()
         _owner->getPictureAttr(ae);
         _attrExtraEquip += ae;
     }
+
+    if(_owner && _owner->getMonsterKettleMgr())
+    {
+        GData::AttrExtra ae ;
+        _owner->getMonsterKettleMgr()->GetKettleAttr(ae);
+        _attrExtraEquip += ae;
+    }
+
+
     if(_owner)
     {
         //机关玉属性加成

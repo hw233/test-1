@@ -134,7 +134,7 @@ namespace Script
 		inline Table GetNpcRelationTask(UInt32 npcId);
 		inline const char* GetPlayerName(Player* player);
 		inline const char* GetPlayerStateName(Player* player);
-
+        inline Player * GetPlayerPtr(UInt64 playerId);
 	public:
 		void Print() { std::cout << "Lua Test" << std::endl; }
 		void DoLuaTest(Player * player, const std::string& buffer);

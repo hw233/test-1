@@ -175,6 +175,7 @@ enum PurchaseType
     MOFUMIZHEN1                 = 1036, //墨符迷阵
     MOFUMIZHEN2                 = 1037, //墨符迷阵
     MakeGear                    = 1038, //打造机关库
+    KETTLE                    = 1039, //打造机关库
     //繁体私有占150～200
 };
 

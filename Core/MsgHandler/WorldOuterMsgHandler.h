@@ -3406,6 +3406,12 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             GLOBAL().PushMsg(hdr, (void*)data);
             break;
        }
+       case 0x35:
+       {
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            break;
+       }
        case 0x45:
        {
            UInt8 logType = 0;

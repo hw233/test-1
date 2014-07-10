@@ -890,6 +890,7 @@ namespace GObject
 		m_marriageInfo = new MarriageInfo();
 		m_collecCard= new CollectCard(this);
 		_wrapKey= new OrdinarireWrapKey();
+		m_MonsterKettleMgr = new MonsterKettleManager(this);
         m_csFlag = 0;
         m_spreadInterval = 0;
         m_spreadCoolTime = 0;
@@ -28756,6 +28757,11 @@ void Player::sendOldManPos(UInt8 type)
     UInt32 gold = 5;
     if(type==0)
     {
+        if(time % 3600 < 3)
+        {
+            sendMsgCode(0, 4053);
+            return ;
+        }
         UInt32 flag = GetVar(VAR_OLDMAN_SCORE_AWARD);
         if(flag & (1<<8))
             return ;
@@ -34145,6 +34151,37 @@ void Player::coolSummerOp(UInt8 type, UInt8 randType, UInt8 flag)
             break;
     }
 }
+void Player::UseCouponOrGoldInKettle(UInt8 num )
+{ 
+    UInt32 coupon = 0;
+    UInt32 gold = 0;
+    if(getCoupon() + getGold() < num * 20 )
+    {
+        coupon = getCoupon();
+        gold = getGold();
+    }
+    else
+    {
+       if(getCoupon() >= num * 20 ) 
+           coupon = num * 20;
+       else
+       {
+           coupon = getCoupon();
+           gold = num * 20 - coupon;
+       }
+    }
+
+    if(coupon > 0)
+    {
+        ConsumeInfo ci(KETTLE, 0, 0);
+        useCoupon(coupon, &ci);
+    }
+    if(gold > 0)
+    { 
+        ConsumeInfo ci(KETTLE, 0, 0);
+        useGold(gold, &ci);
+    } 
+} 
 
 } // namespace GObject
 

@@ -9372,6 +9372,50 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                 }
             }
         }
+    case 0x35:
+        {
+            if(!player->getMonsterKettleMgr())
+                return ;
+            UInt8 op = 0;
+            brd >> op;
+            switch(op)
+            {
+                case 0x01:
+                    {
+                        Stream st(REP::ACT);
+                        st << static_cast<UInt8>(0x35);
+                        player->getMonsterKettleMgr()->GetMonsterKettleInfo(st); 
+                        st << Stream::eos;
+                        player->send(st);
+                        break;
+                    }
+                case 0x02:
+                {
+                    UInt8 index = 0;
+                    UInt8 type = 0;
+                    UInt8 count = 0;
+                    brd >> index >>type >> count;
+                    if(PLAYER_DATA(player, coupon) + PLAYER_DATA(player, gold) < count * 20 )
+                    {
+                       player->sendMsgCode(2,1011);
+                       break;
+                    }
+                    UInt8 num = player->getMonsterKettleMgr()->RandomMonster(index,type,count);
+                    if( num > count )
+                        return ;
+                    player->UseCouponOrGoldInKettle(num);
+                    break;
+                }
+                case 0x03:
+                {
+                    UInt8 index = 0;
+                    UInt8 pos = 0;
+                    brd >> index >> pos ;
+                    player->getMonsterKettleMgr()->BattleMonster(index, pos);
+                    break;
+                }
+            }
+        }
     default:
         break;
     }

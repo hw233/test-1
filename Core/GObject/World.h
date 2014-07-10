@@ -631,7 +631,6 @@ public:
         else
             return false;
     } 
-
     inline static bool getCoolSummer(UInt32 time = 0)
     {
         UInt32 begin = TimeUtil::MkTime(2014, 7, 1);
