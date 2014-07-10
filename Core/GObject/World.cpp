@@ -5465,6 +5465,8 @@ void World::SendCoolSummerAward()
                 mailPackageManager.push(mail->id, s_item[type-1], 5, true);
         }
         pos++;
+        if (pos > 7)
+            break;
     }
     return;
 }
