@@ -28801,6 +28801,11 @@ void Player::sendOldManPos(UInt8 type)
     UInt32 gold = 5;
     if(type==0)
     {
+        if(time % 3600 < 3)
+        {
+            sendMsgCode(0, 4053);
+            return ;
+        }
         UInt32 flag = GetVar(VAR_OLDMAN_SCORE_AWARD);
         if(flag & (1<<8))
             return ;
