@@ -655,6 +655,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -702,6 +710,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 21)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 28)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 5)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
         ))
     {
 #if 0
@@ -1727,6 +1736,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
 
          )
         bRechargeEnd = true;
@@ -5265,9 +5282,9 @@ void World::SendTYSSPlayerAward(UInt8 actType)
     };
     static MailPackage::MailItem s_item1[][4] = {
         {{16001,30},{9498,30},{134,25},{9076,25}},
-        {{16001,25},{9498,25},{134,20},{9076,25}},
-        {{16001,20},{9498,20},{134,15},{9076,25}},
-        {{16001,15},{9498,15},{134,10},{9076,25}},
+        {{16001,25},{9498,25},{134,20},{9076,20}},
+        {{16001,20},{9498,20},{134,15},{9076,15}},
+        {{16001,15},{9498,15},{134,10},{9076,10}},
     };
     SYSMSG(title, 946);
     for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
@@ -5465,6 +5482,8 @@ void World::SendCoolSummerAward()
                 mailPackageManager.push(mail->id, s_item[type-1], 5, true);
         }
         pos++;
+        if (pos > 7)
+            break;
     }
     return;
 }
