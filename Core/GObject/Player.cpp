@@ -28801,7 +28801,7 @@ void Player::sendOldManPos(UInt8 type)
     UInt32 gold = 5;
     if(type==0)
     {
-        if(time % 3600 < 3)
+        if(time % 3600 < 5)
         {
             sendMsgCode(0, 4053);
             return ;
