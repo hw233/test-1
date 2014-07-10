@@ -21472,17 +21472,17 @@ void Player::sendNewYearQQGameAct()
 
 void Player::getNewYearQzoneContinueAward(UInt8 type)
 {
-    if(type == 0 || type > 7)
+    if(type == 0 || type > 5)
         return;
-    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
-        return;
+    //if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+    //    return;
 
     UInt32 tmp = GetVar(VAR_NEWYEAR_QZONECONTINUE_ACT);
     UInt16 isGet = static_cast<UInt16>(tmp & 0xFFFF);
     if(isGet & (0x01 << (type - 1)))
         return;
     UInt8 continueDays = static_cast<UInt8>(tmp >> 16);
-    const static UInt8 needMinDay[] = {3, 5, 7, 10, 15, 21, 28};
+    const static UInt8 needMinDay[] = {1, 3, 5, 7, 9};
     if(continueDays < needMinDay[type - 1])
         return;
     bool bRet = GameAction()->onGetNewYearQzoneContinueAward(this, type);
@@ -21498,8 +21498,8 @@ void Player::sendNewYearQzoneContinueAct()
 {
     if(!World::getNewYearQzoneContinueAct())
         return;
-    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
-        return;
+    //if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+    //    return;
 
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(10);
@@ -21516,8 +21516,8 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
 {
     if(!World::getNewYearQzoneContinueAct())
         return;
-    if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
-        return;
+    //if(atoi(m_domain) != 1 && atoi(m_domain) != 2)
+    //    return;
 
     UInt32 lasttime = GetVar(VAR_NEWYEAR_QZONECONTINUE_LASTTIME);
     if(lasttime == 0)
