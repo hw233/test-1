@@ -406,6 +406,18 @@ namespace GData
             std::abort();
         }
 
+        if (!LoadGearConfig())
+        {
+            fprintf (stderr, "Load LoadGearConfig Error !\n");
+            std::abort();
+        }
+
+        if (!LoadGearTreeConfig())
+        {
+            fprintf (stderr, "Load LoadGearTreeConfig Error !\n");
+            std::abort();
+        }
+
         if (!LoadSanHunConfig())
         {
             fprintf (stderr, "Load LoadSanHunConfig Error !\n");
@@ -2511,6 +2523,42 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
 		{
             jiguanData.setZhenweiInfo(dbzw);
+        }
+
+        return true;
+    }
+
+    bool GDataManager::LoadGearConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBGearConfig dbg;
+
+		if(execu->Prepare("SELECT `partId`, `name`, `needMoneyA`, `needMoneyB`, `needMoneyC`, `needMoneyD`, `needMoneyE`, `attrValueA`, `attrValueB`, `attrValueC`, `attrValueD`, `attrValueE`, `attrValueF`, `attrValueG` FROM `gear`", dbg) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            jiguanData.setGearInfo(dbg);
+        }
+
+        return true;
+    }
+
+    bool GDataManager::LoadGearTreeConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBGearTreeConfig dbgt;
+
+		if(execu->Prepare("SELECT `suiteId`, `lastSuiteId`, `partAId`, `componentAId`, `componentBId`, `partBId`, `componentCId`, `componentDId`, `partCId`, `componentEId`, `componentFId` FROM `geartree`", dbgt) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            jiguanData.setGearTreeInfo(dbgt);
         }
 
         return true;

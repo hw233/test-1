@@ -2158,8 +2158,12 @@ void Fighter::rebuildEquipAttr()
     }
     if(_owner)
     {
+        //机关玉属性加成
         _owner->GetMoFang()->addJGYAttr(_attrExtraEquip);
+        //刻印属性加成
         _owner->GetMoFang()->addKYAttr(_attrExtraEquip);
+        //机关库属性加成
+        _owner->GetMoFang()->addGearAttr(_attrExtraEquip);
 
         //坐骑加成
         _owner->addMountAttrExtra(_attrExtraEquip);

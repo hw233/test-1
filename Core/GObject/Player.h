@@ -843,7 +843,7 @@ namespace GObject
         std::map<UInt8,std::vector<UInt8> > cubeCover; 
         PictureInfo():floor(1){} 
     };
-#define WC_MAX_COUNT 48
+#define WC_MAX_COUNT 63
     struct WorldCup
     {
         UInt8  support; 
@@ -1215,6 +1215,7 @@ namespace GObject
 		void Reconnect();
         void AddWorldCupScore(UInt32 grade ,UInt8 flag = 0);
         void SendWCGradeAward(UInt8 type);
+        void SendWCGradeAward2(UInt8 type);
         UInt8 supportWorldCup(UInt8 num ,UInt8 res , UInt32 number);
         void sendMyWorldCupInfo();
         void setMyWorldCupInfo(UInt8 num , UInt8 res ,UInt32 count , UInt32 time)
@@ -1232,6 +1233,14 @@ namespace GObject
             return worldCupInfo[num].support ;
         }
         void UpdateWorldCupToDB(UInt8 num);
+        void getXXLAward(UInt8 type);
+        void buyXXLCount();
+        void UpdateXXLToDB(UInt8 num);
+        UInt8 setXXLMapInfo(UInt8 step ,UInt8 type ,std::string mapInfo , UInt8 flag = 0);
+        void sendHappyXXLInfo();
+        void sendXXLMapInfo(UInt8 res = 0 ,UInt8 index = 0);
+        void getXXLScore(UInt8 type ,UInt8 count);
+        UInt8 subXXLCount(UInt8 step);
 
 		void Logout(bool = false);	//???????߲???
 		void selfKick();
@@ -3402,6 +3411,7 @@ namespace GObject
         CuttingInfo cuttingInfo ;
         PictureInfo pictureInfo ; 
         WorldCup worldCupInfo[WC_MAX_COUNT];
+        std::string xxlMapInfo[3];
     public:
         void setMapId(UInt8 mapId);
         bool checkClientIP();

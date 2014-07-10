@@ -530,6 +530,7 @@ namespace GObject
 	    static bool LoadMarriedCouple();
 	    static bool LoadSevenSoul();
         static bool loadZhenwei();
+        static bool loadGear();
         static bool loadQiShiBan();
 
         static bool loadGoback();
@@ -544,6 +545,7 @@ namespace GObject
         static bool loadCardSuit();
         static	bool loadPictureInfo();
         static	bool loadWorldCup();
+        static	bool loadHappyXXL();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

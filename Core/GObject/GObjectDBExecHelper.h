@@ -1511,6 +1511,13 @@ struct DBZhenwei
     UInt8 mark;
 };
 
+struct DBGear
+{
+    UInt64 playerId;
+    UInt16 gearId;
+    UInt8 mark;
+};
+
 struct DBGoback
 {
     UInt64 inviteeId;
@@ -1665,6 +1672,12 @@ struct DBWorldCup
     UInt32 count2;
     UInt32 count3;
     UInt32  result;
+};
+struct DBHappyXXL
+{
+    UInt64 playerId;
+    UInt8  num;
+    std::string map;
 };
 
 struct DBZhenyuanAttr
@@ -3592,6 +3605,15 @@ SPECIALDEF(3)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBGear)
+SPECIALDEF(3)
+    (
+    UInt64, playerId,
+    UInt16, gearId,
+    UInt8, mark
+    )
+SPECIALEND()
+
 SPECIALBEGIN(GObject::DBGoback)
 SPECIALDEF(2)
     (
@@ -3812,6 +3834,14 @@ SPECIALDEF(4)
 	UInt8, floor,
     std::string, cubeHave,
     std::string, cubeCover
+)
+SPECIALEND()
+SPECIALBEGIN(GObject::DBHappyXXL)
+SPECIALDEF(3)
+(
+	UInt64, playerId,
+	UInt8, num,
+    std::string, map
 )
 SPECIALEND()
 
