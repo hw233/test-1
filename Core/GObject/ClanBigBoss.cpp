@@ -122,6 +122,13 @@ void ClanBigBoss::closeBossInfo(UInt8 flag)
     StreamVisitor visitor(flag+2,this);//Boss击退奖励
     _clan->VisitMembers(visitor);
 
+    if(flag)
+    {
+        _lastTime = 60 * 30;
+        //TODO DB
+        DB4().PushUpdateData("UPDATE `clanbigboss` SET `last` = %u WHERE `clanid` = %u ",_lastTime,_clan->getId());
+    }
+
     if(!flag)
     {
         UInt8 idx = 1;
