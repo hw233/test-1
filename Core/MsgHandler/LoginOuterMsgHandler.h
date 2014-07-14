@@ -3482,6 +3482,7 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_11AIRBOOK_GRADE, 0);
                 pl->SetVar(GObject::VAR_11AIRBOOK_AWARDSCORE, 0);
             }
+            break;
         default:
             return false;
     }
