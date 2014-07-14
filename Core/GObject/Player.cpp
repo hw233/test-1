@@ -26401,7 +26401,7 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1450,2500,5000,12000,23000,36000};
+    UInt32 gradeAward[]={100,200,400,500,780,1000,1450,2500,5000,12000,24000,36000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     UInt32 value = GetVar(VAR_11AIRBOOK_AWARDSCORE);
     for(UInt8 i =0 ; i< 12 ;i++)
@@ -26450,7 +26450,7 @@ void Player::Send11GradeAward(UInt8 type)
 {
     if(type > 12)
         return ;
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1450,2500,5000,12000,23000,3600};
+    UInt32 gradeAward[]={100,200,400,500,780,1000,1450,2500,5000,12000,24000,36000};
     UInt32 value = GetVar(VAR_11AIRBOOK_AWARDSCORE);
     if(gradeAward[type-1] <= value)
         return ;
@@ -26465,7 +26465,7 @@ void Player::Send11GradeAward(UInt8 type)
         {{547,3},{1126,3},{517,3}},
         {{549,1},{501,3},{551,5}},
         {{9457,3},{9498,2},{509,2},{515,2},{9438,2}},
-        {{1729,1},{9076,3}},
+        {{1729,1},{9076,5}},
         {{9600,25},{9418,25},{16001,20}},
         {{5137,1},{9498,30},{9075,15}},
         {{9022,20},{9075,20},{1732,1}},
