@@ -45,11 +45,23 @@ ClanBigBoss::ClanBigBoss(Clan* clan)
     m_final = false;
     _percent = 100;
     _flag = false;
+    _ng = NULL;    
     
 }
 
 ClanBigBoss::~ClanBigBoss()
 {
+}
+
+void ClanBigBoss::setNpcBoss()
+{
+    GData::NpcGroup * s_ng = new GData::NpcGroup(static_cast<UInt32>(5509));
+    GData::NpcGroups::iterator it = GData::npcGroups.find(BIGBOSS);
+    if(it == GData::npcGroups.end())
+        return;
+
+    *s_ng = *(it->second);
+    _ng = s_ng;
 }
 
 void ClanBigBoss::ReqBossAppointment(UInt8 app_time/* 时间点数 */,std::string str)
@@ -487,11 +499,11 @@ void ClanBigBoss::addLevel()
     _ng1 = it1->second;
     if (!_ng1) return;
 
-    GData::NpcGroups::iterator it = GData::npcGroups.find(BIGBOSS);
+    /*GData::NpcGroups::iterator it = GData::npcGroups.find(BIGBOSS);
     if(it == GData::npcGroups.end())
         return;
 
-    _ng = it->second;
+    _ng = it->second;*/
     if (!_ng) return;
 
     std::vector<GData::NpcFData>& nflist = _ng->getList();
@@ -715,6 +727,7 @@ void ClanBigBoss::ReturnBossInfo(Player* pl,UInt8 status)
 {
     if(getFlag())
     {
+        if (!_ng) return;
         std::vector<GData::NpcFData>& nflist = _ng->getList();
         Int32 baseatk = Script::BattleFormula::getCurrent()->calcAttack(nflist[0].fighter);
         Int32 basematk = Script::BattleFormula::getCurrent()->calcMagAttack(nflist[0].fighter);
@@ -842,9 +855,6 @@ void ClanBigBoss::LoadFromDB(DBClanBigBoss* dcbb)
     GData::NpcGroups::iterator it = GData::npcGroups.find(BIGBOSS);
     if(it == GData::npcGroups.end())
         return;
-
-    _ng = it->second;
-    if (!_ng) return;
   
     if(dcbb->status == CLAN_BIGBOSS_AWAIT)
         setFlag(true);
