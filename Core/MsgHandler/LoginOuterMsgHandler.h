@@ -4109,6 +4109,9 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_11TIME_END, end);
 
         DB5().PushUpdateData("DELETE FROM `AirBookData`");
+
+        GObject::World::PlayerGradeSort.clear();
+        GObject::World::clanGradeSort.clear();
         return;
     }
 
