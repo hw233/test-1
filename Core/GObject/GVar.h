@@ -297,6 +297,8 @@ namespace GObject
             
             GREGISTER_VAR(GVAR_CLAN_BIGBOSS_ENABLE, GCYCLE_DAY);
             GREGISTER_VAR(GVAR_MAX_LEVEL, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_11TIME_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_11TIME_END, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
