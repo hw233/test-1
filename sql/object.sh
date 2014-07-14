@@ -327,6 +327,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #捉迷藏清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearcarditem.sql     #清除称号卡物品
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguanyu_1.sql   #修改player_jiguanyu表主索引
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
 }
 
 #sh player_jiguan.sh

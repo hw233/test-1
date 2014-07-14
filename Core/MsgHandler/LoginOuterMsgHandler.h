@@ -4098,6 +4098,9 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     else if (type == 22 && begin <= end )
     {
         ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
         
         curType = 22;
         if(GObject::GVAR.GetVar(GObject::GVAR_11TIME_BEGIN) > TimeUtil::Now()
