@@ -26401,10 +26401,10 @@ void Player::Add11grade(UInt32 grade)
     if(!World::get11Time())
        return ;
 
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,23000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,23000,36000};
     UInt32 airGrade = GetVar(VAR_11AIRBOOK_GRADE);
     UInt32 value = GetVar(VAR_11AIRBOOK_AWARDSCORE);
-    for(UInt8 i =0 ; i< 11 ;i++)
+    for(UInt8 i =0 ; i< 12 ;i++)
     {
         //if(airGrade < gradeAward[i] &&( airGrade + grade) >=gradeAward[i])
         if(value < gradeAward[i] && ( airGrade + grade) >=gradeAward[i])
@@ -26448,9 +26448,9 @@ void Player::SendClanMemberGrade()
 }
 void Player::Send11GradeAward(UInt8 type)
 {
-    if(type > 11)
+    if(type > 12)
         return ;
-    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,23000};
+    UInt32 gradeAward[]={100,200,400,500,700,1000,1250,2350,5000,12000,23000,3600};
     UInt32 value = GetVar(VAR_11AIRBOOK_AWARDSCORE);
     if(gradeAward[type-1] <= value)
         return ;
@@ -26459,18 +26459,19 @@ void Player::Send11GradeAward(UInt8 type)
 
     static MailPackage::MailItem s_item[][6] = {
         {{9424,1}, {503,1}},
-        {{500,2},{9497,2}},
+        {{500,2},{56,2}},
         {{9604,3},{9414,2}},
         {{516,2},{16001,2},{503,2}},
         {{547,3},{1126,3},{517,3}},
-        {{549,1},{501,3},{551,6}},
-        {{9457,3},{9498,2},{507,2},{9338,2},{9438,2}},
-        {{1728,1},{8555,4}},
-        {{9600,25},{9418,25},{9371,40}},
-        {{1126,50},{9022,15}},
-        {{9076,60},{1727,1}},
+        {{549,1},{501,3},{551,5}},
+        {{9457,3},{9498,2},{509,2},{515,2},{9438,2}},
+        {{1729,1},{9076,3}},
+        {{9600,25},{9418,25},{16001,20}},
+        {{5137,1},{9498,30},{9075,15}},
+        {{9022,20},{9075,20},{1732,1}},
+        {{9021,20},{9068,20},{1733,1},{5067,1}},
     };
-    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,2,2};
+    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,3,3,4};
     SYSMSG(title, 4954);
     if(type)
     {

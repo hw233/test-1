@@ -4396,11 +4396,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9498,40},{1325,30},{9457,60},{16001,60},{9076,40}},
-        {{9498,40},{1325,25},{9457,60},{16001,50},{9076,30}},
-        {{9498,40},{1325,20},{9457,60},{16001,40},{9076,20}},
+        {{9498,40},{9600,30},{9457,60},{9068,30},{0,0}},
+        {{9498,40},{9600,25},{9457,60},{9068,20},{0,0}},
+        {{9498,40},{9600,20},{9457,60},{9068,15},{0,0}},
     };
-    static MailPackage::MailItem card = {9980,1};
+    static MailPackage::MailItem card = {9987,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -4414,7 +4414,7 @@ void World::Send11PlayerRankAward()
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)
         {
-            mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
+            mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
             if(pos ==1)
                 mailPackageManager.push(mail->id, &card, 1, false);
         }
@@ -4669,7 +4669,7 @@ void World::Send11CountryRankAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] ={
-         {{9600,5},{134,3},{507,3},{9498,3},{16001,3}},
+         {{9600,5},{134,3},{509,3},{9498,3},{16001,3}},
     };
     ClanGradeSort::iterator i = World::clanGradeSort.begin();
     UInt32 EM=0,KL=0;
