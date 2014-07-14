@@ -565,12 +565,12 @@ public:
     {   _summerMeet=v; } 
     inline static void  set11Time(bool v)
     {   _11time=v; } 
-    inline static bool  get11Time()
+    inline static bool  get11Time(UInt32 time = 0)
     //{return _11time; } 
     {
         UInt32 begin = GVAR.GetVar(GVAR_11TIME_BEGIN);
         UInt32 end = GVAR.GetVar(GVAR_11TIME_END);
-        UInt32 now = TimeUtil::Now() ;
+        UInt32 now = TimeUtil::Now()+time;
         if( now >= begin && now <= end)
             return true;
         else

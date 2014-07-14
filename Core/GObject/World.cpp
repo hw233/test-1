@@ -1496,7 +1496,7 @@ void World::World_Midnight_Check( World * world )
     //跨年大转盘
     bHappyFireEnd = bhappyfirend && !getHappyFireTime(300);
     bGuankaEnd = bGuanka && !getGuankaAct(300);
-    b11TimeEnd = b11time && !get11Time();
+    b11TimeEnd = b11time && !get11Time(300);
     bWCTimeEnd = bWCtime && !getWorldCupTime(300);
     bWCTimeEnd2 = bWCtime2 && !getWorldCupTime2(300);
     //七石斗法活动结束
