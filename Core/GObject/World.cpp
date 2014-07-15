@@ -1505,6 +1505,7 @@ void World::World_Midnight_Check( World * world )
     //天元神兽活动结束
     //酷爽一夏活动结束
     bCoolSummerTimeEnd = bCoolSummerTime && !getCoolSummer(300);
+    UInt8 TYSSType = getTYSSTime();
     UInt8 actType = getTYSSTime(300);
     bTYSSEnd = bTYSSTime && !actType;
 
@@ -1835,9 +1836,9 @@ void World::World_Midnight_Check( World * world )
         world->SendGuankaActAward();
     if(bTYSSEnd)
     {
-        UInt8 actType = getTYSSTime();
-        world->GObject::World::SendTYSSPlayerAward(actType);
-        world->GObject::World::SendTYSSClanAward(actType);
+        //UInt8 actType = getTYSSTime();
+        world->GObject::World::SendTYSSPlayerAward(TYSSType);
+        world->GObject::World::SendTYSSClanAward(TYSSType);
     }
     if(bWCTimeEnd)
         world->SendWorldCupAward();
