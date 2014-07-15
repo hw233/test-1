@@ -5436,7 +5436,7 @@ void World::SendCoolSummerAward()
     };
 
     SYSMSG(title, 5163);
-    UInt8 pos = 1;
+    size_t pos = 1;
     for (RCSortType::iterator i = World::coolSummerSort.begin(), e = World::coolSummerSort.end(); i != e; ++i)
     {
         UInt32 activePoint = i->player->GetVar(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL);
@@ -5450,6 +5450,8 @@ void World::SendCoolSummerAward()
                 mailPackageManager.push(mail->id, s_item[type-1], 5, true);
         }
         pos++;
+        if (pos > 7)
+            break;
     }
     return;
 }
