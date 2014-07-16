@@ -761,12 +761,14 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
                     if(jgId == *iter)
                     {
                         m_jg.erase(iter);
+                        DB4().PushUpdateData("DELETE FROM `player_jiguanyu` WHERE `jiguanId` = %u AND `scheme` = %u AND `playerId` = %" I64_FMT "u", jgId, 0, m_owner->getId());
                         break;
                     }
                 }
 
                 occupyMark = 1;
                 posMark = pos + 1;
+                DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u, %u)",m_owner->getId(), jgId, posMark, scheme);
             }
             else
             {
@@ -777,7 +779,7 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
                             std::map<UInt32, UInt8>::iterator iter = m_equipJGA.find(jgId);
                             if (iter != m_equipJGA.end())
                             {
-                                m_jg.push_back(jgId);
+                                //m_jg.push_back(jgId);
                                 m_equipJGA.erase(iter);
                             }
                         }
@@ -787,7 +789,7 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
                             std::map<UInt32, UInt8>::iterator iter = m_equipJGB.find(jgId);
                             if (iter != m_equipJGB.end())
                             {
-                                m_jg.push_back(jgId);
+                                //m_jg.push_back(jgId);
                                 m_equipJGB.erase(iter);
                             }
                         }
@@ -797,7 +799,7 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
                             std::map<UInt32, UInt8>::iterator iter = m_equipJGC.find(jgId);
                             if (iter != m_equipJGC.end())
                             {
-                                m_jg.push_back(jgId);
+                                //m_jg.push_back(jgId);
                                 m_equipJGC.erase(iter);
                             }
                         }
@@ -811,9 +813,14 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
             }
 
             if(DISMANT_JG == mark)
-                scheme = 0;
-
-            DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u, %u)",m_owner->getId(), jgId, posMark, scheme);
+            {
+                DB4().PushUpdateData("DELETE FROM `player_jiguanyu` WHERE `jiguanId` = %u AND `scheme` = %u AND `playerId` = %" I64_FMT "u", jgId, scheme, m_owner->getId());
+                if(!findTotalJG(jgId))
+                {
+                    m_jg.push_back(jgId);
+                    DB4().PushUpdateData("REPLACE INTO `player_jiguanyu` VALUES(%" I64_FMT "u, %u, %u, %u)",m_owner->getId(), jgId, 0, 0);
+                }
+            }
 
             st << jgId << pos;
             st << Stream::eos;
@@ -1138,14 +1145,15 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, UInt8 scheme, std::v
     UInt8 markA = 0;
     UInt8 markB = 0;
     bool markC = false;
-    bool findResA = false;
-
+    /*bool findResA = false;
+    
     if(EQUIP_JG == mark)
         findResA = findEquipJG(jgId);
     else
-        findResA = specialFindEquipJG(jgId);
+        findResA = specialFindEquipJG(jgId);*/
 
-    bool findResB = findNoEquipJG(jgId);
+    bool findResA = specialFindEquipJG(jgId);
+    //bool findResB = findNoEquipJG(jgId);
 
     GData::JiguanData::jiguanyuInfo * jgyInfo = GData::jiguanData.getJiguanyuInfo(jgId);
     if(!jgyInfo)
@@ -1159,6 +1167,10 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, UInt8 scheme, std::v
         if(findResA)
             return false;
 
+        /*if(!findResB)
+            return false;*/
+
+        bool findResB = findTotalJG(jgId);
         if(!findResB)
             return false;
 
@@ -1170,8 +1182,8 @@ bool MoFang::checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, UInt8 scheme, std::v
         if(!findResA)
             return false;
 
-        if(findResB)
-            return false;
+        /*if(findResB)
+            return false;*/
 
         markA = NOOCCUPY_MOFANG;
         markB = OCCUPY_MOFANG;
@@ -1288,6 +1300,33 @@ bool MoFang::specialFindEquipJG(UInt32 jgId)
     }
 
     return true;
+}
+
+bool MoFang::findTotalJG(UInt32 jgId)
+{
+    bool markA = false;
+    bool markB = false;
+    bool markC = false;
+    bool markD = false;
+    std::map<UInt32, UInt8>::iterator iterA = m_equipJGA.find(jgId);
+    if(iterA != m_equipJGA.end())
+        markA = true;
+
+    std::map<UInt32, UInt8>::iterator iterB = m_equipJGB.find(jgId);
+    if(iterB != m_equipJGB.end())
+        markB = true;
+
+    std::map<UInt32, UInt8>::iterator iterC = m_equipJGC.find(jgId);
+    if(iterC != m_equipJGC.end())
+        markC = true;
+
+    if(findNoEquipJG(jgId))
+        markD = true;
+
+    if(!markA && !markB && !markC && !markD)
+        return false;
+    else
+        return true;
 }
 
 bool MoFang::findNoEquipJG(UInt32 jgId)

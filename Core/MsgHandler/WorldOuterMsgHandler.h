@@ -3307,7 +3307,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                 case 0x13:
                     hdr.msgHdr.desWorkerID = player->getThreadId();//领取每日礼包
                     GLOBAL().PushMsg(hdr, (void*)data);
-                    player->ReturnTYSSInfo(9);
+                    //player->ReturnTYSSInfo(9);
                     break;
                 default:
                     break;

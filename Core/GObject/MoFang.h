@@ -112,7 +112,7 @@ namespace GObject
         UInt32 addTuzhi(UInt32 tuzhiId, bool mark = false);
         void makejiguan(UInt32 tuzhiId, UInt8 type, UInt8 mark);                                      // 制造机关
         void selectSchmem(UInt8 scheme);                                                              // 选择方案
-        void equipJG(UInt32 jgId, UInt8 pos, UInt8 mark);                               // 装备机关
+        void equipJG(UInt32 jgId, UInt8 pos, UInt8 mark);                                             // 装备机关
         bool checkPoint(UInt32 jgId, UInt8 pos, UInt8 mark, UInt8 scheme, std::vector<UInt8> &);      // 检测是否能够装备
         void addJGYAttrFromSchmem(GData::AttrExtra& ae);                                // 机关玉根据方案添加属性
         void addJGYAttr(GData::AttrExtra& ae, UInt32 jgyId);                            // 机关玉添加属性
@@ -131,6 +131,7 @@ namespace GObject
         UInt32 renzhiyue(UInt16 keyId);                                                 // 仁之鈅
         inline bool findEquipJG(UInt32 jgId);
         inline bool specialFindEquipJG(UInt32 jgId);
+        inline bool findTotalJG(UInt32 jgId);
         inline bool findNoEquipJG(UInt32 jgId);
         inline bool findKey(UInt16 keyId);
 

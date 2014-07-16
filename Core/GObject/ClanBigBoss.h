@@ -75,6 +75,7 @@ namespace GObject
         inline UInt32 getHP(){ return m_BossHP; }
         void process(UInt32 now);
         void GMAttackBoss(UInt32 attack_boss);
+        void SetDirty(Player* player,bool _iscbbbuf);
             
         inline bool setHP(UInt32 hp)
         {
@@ -116,6 +117,7 @@ namespace GObject
         Int32 _lastAtk;
         Int32 _lastMAtk;
         bool _flag;
+        UInt8 _buffer;
     };
 
     class ClanBigBossMgr : public Singleton <ClanBigBossMgr>

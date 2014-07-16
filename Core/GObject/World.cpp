@@ -5207,6 +5207,21 @@ void World::SendTYSSClanAward(UInt8 actType)
         
     ClanGradeSort::iterator i = World::tyss_ClanSort.begin();
     ClanGradeSort::iterator e = World::tyss_ClanSort.end();
+
+    UInt32 one_steps = 2000;
+    UInt32 two_steps = 14000;
+    UInt32 three_steps = 23000;
+    UInt32 third_steps = 46000;
+    UInt32 fifth_steps = 70000;
+    if(actType == 2) 
+    {
+        one_steps = 2000;
+        two_steps = 14000;
+        three_steps = 23000;
+        third_steps = 46000;
+        fifth_steps = 65000;
+    }
+
     for (UInt32 pos = 0; i != e; ++i)
     {
         if(i->clan == NULL)
@@ -5214,19 +5229,19 @@ void World::SendTYSSClanAward(UInt8 actType)
         ++pos;
         if(pos == 1 || pos == 2 || pos == 3)
             i->clan->sendMemberBuf(pos,actType);
-        if(i->total >= 2000)
+        if(i->total >= one_steps)
         {
             i->clan->SendClanMemberAward(i->total,1,"幼年期神兽",actType); 
-            if(i->total >= 14000)
+            if(i->total >= two_steps)
             {
                 i->clan->SendClanMemberAward(i->total,2,"成长期神兽",actType); 
-                if(i->total >= 23000)
+                if(i->total >= three_steps)
                 {
                     i->clan->SendClanMemberAward(i->total,3,"青年期神兽",actType); 
-                    if(i->total >= 46000)
+                    if(i->total >= third_steps)
                     {
                         i->clan->SendClanMemberAward(i->total,4,"亚神兽期",actType); 
-                        if(i->total >= 70000)
+                        if(i->total >= fifth_steps)
                             i->clan->SendClanMemberAward(i->total,5,"天元神兽",actType); 
                     }
                 }
@@ -5249,10 +5264,10 @@ void World::SendTYSSPlayerAward(UInt8 actType)
         {{134,15},{1325,15},{515,10},{9075,8}},
     };
     static MailPackage::MailItem s_item1[][4] = {
-        {{16001,30},{9498,30},{515,25},{9075,25}},
-        {{16001,25},{9498,25},{515,20},{9075,20}},
-        {{16001,20},{9498,20},{515,15},{9075,15}},
-        {{16001,15},{9498,15},{515,10},{9075,10}},
+        {{16001,30},{9498,30},{134,25},{9076,25}},
+        {{16001,25},{9498,25},{134,20},{9076,25}},
+        {{16001,20},{9498,20},{134,15},{9076,25}},
+        {{16001,15},{9498,15},{134,10},{9076,25}},
     };
     SYSMSG(title, 946);
     for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
