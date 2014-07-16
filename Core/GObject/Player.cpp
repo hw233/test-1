@@ -34191,5 +34191,169 @@ void Player::coolSummerOp(UInt8 type, UInt8 randType, UInt8 flag)
     }
 }
 
+void Player::shuShanWeiWei_XDPB(Player * player, UInt8 opt)
+{
+    if(!(opt >= 0 && opt <= 6))
+        return;
+    if(!player)
+        return;
+    UInt32 status = GetVar(VAR_SHU_SHAN_WEI_WEI_XDPB);
+    if(opt)
+    {
+        UInt8 tmp = GET_BIT(status, (opt - 1));
+        if(!tmp)
+        {
+            if(!GameAction()->getShuShanWeiWei_XDPB_Award(player, opt))
+                return;
+            status = SET_BIT(status, (opt - 1));
+            SetVar(VAR_SHU_SHAN_WEI_WEI_XDPB, status);
+        }
+    }
+    Stream st(REP::ACTIVITY_REWARD);
+    st << static_cast<UInt8>(20);
+    st << static_cast<UInt8>(status);
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::shuShanWeiWei_MSYJ(Player * player, UInt8 opt)
+{
+    if(!(opt >= 0 && opt <= 3))
+        return;
+    if(!player)
+        return;
+    UInt8 flag = GetVar(VAR_SHU_SHAN_WEI_WEI_MSYJ);
+
+    Stream st(REP::ACTIVITY_REWARD);
+    st << static_cast<UInt8>(21);
+    st << static_cast<UInt8>(opt);
+
+    if(0 == opt)
+    {
+        st << flag;
+        st << Stream::eos;
+        send(st);
+    }
+    else if(1 == opt)
+    {
+        if(flag)
+            return;
+        if(GetPackage()->GetRestPackageSize() < 1)
+        {
+            sendMsgCode(2, 1011);
+            return;
+        }
+        GetPackage()->AddItem(16022, 1, true, false, FromShuShanWeiWei);
+        SetVar(VAR_SHU_SHAN_WEI_WEI_MSYJ, 1);
+        st << static_cast<UInt8>(1);
+        st << Stream::eos;
+        send(st);
+    }
+    else if(2 == opt)
+    {
+        if(GetPackage()->GetItemAnyNum(16022) < 1)
+        {
+            sendMsgCode(0, 3507);
+            return;
+        }
+        if(GetPackage()->GetRestPackageSize() < 1)
+        {
+            sendMsgCode(2, 1011);
+            return;
+        }
+        lua_tinker::table result = GameAction()->getShuShanWeiWei_MSYJ_Award(player);
+        UInt32 item_id = result.get<UInt32>(1);
+        UInt32 item_count = result.get<UInt32>(2);
+        GetPackage()->DelItemAny(16022, 1);
+        SetVar(VAR_SHU_SHAN_WEI_WEI_MSYJ_AWARD, (item_id + (item_count << 16)));
+        st << item_id;
+        st << getName();
+        st << getCountry();
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
+    }
+    else if(3 == opt)
+    {
+        UInt32 itemId = GetVar(VAR_SHU_SHAN_WEI_WEI_MSYJ_AWARD) & 0xFFFF;
+        UInt32 itemCount = GetVar(VAR_SHU_SHAN_WEI_WEI_MSYJ_AWARD) >> 16;
+        m_Package->ItemNotify(itemId, itemCount);
+    }
+}
+
+void Player::shuShanWeiWei_WXSC(UInt8 opt, UInt8 pos, UInt32 count)
+{
+    if(!(opt >= 0 && opt <= 2))
+        return;
+    UInt32 item_status = GetVar(VAR_SHU_SHAN_WEI_WEI_WXSC);
+    UInt32 item_total = GameAction()->getWeiXinShopItemNum();
+    UInt8 tmp = GET_BIT(item_status, pos);
+
+    if(pos > item_total)
+        return;
+
+    if(1 == opt)
+    {
+        if(tmp)
+        {
+            sendMsgCode(0, 3510);
+            return;
+        }
+        if(GetPackage()->GetItemAnyNum(16023) < 1)
+        {
+            sendMsgCode(0, 3508);
+            return;
+        }
+        GetPackage()->DelItemAny(16023, 1);
+        item_status = SET_BIT(item_status, pos);
+        SetVar(VAR_SHU_SHAN_WEI_WEI_WXSC, item_status);
+    }
+    else if(2 == opt)
+    {
+        if(!tmp)
+        {
+            sendMsgCode(0, 3509);
+            return;
+        }
+        if(0 == pos && 0 == GetVar(VAR_SHU_SHAN_WEI_WEI_WXSC_COUPON))
+        {
+            getCoupon(100);
+            SetVar(VAR_SHU_SHAN_WEI_WEI_WXSC_COUPON, 1);
+        }
+        if(pos)
+        {
+            lua_tinker::table weixin = GameAction()->getWeiXinShop(pos);
+            UInt32 item_id = weixin.get<UInt32>(1);
+            UInt32 item_cost = weixin.get<UInt32>(2);
+            UInt32 item_num = weixin.get<UInt32>(3);
+            if(GetPackage()->GetRestPackageSize() < 1 + count/99)
+            {
+                sendMsgCode(0, 1011);
+                return;
+            }
+            ConsumeInfo ci(WeiWeiShop,0,0);
+            if(count > item_num)
+                return;
+            if(!hasChecked())
+                return;
+			if (getGold() < item_cost * count)
+			{
+				sendMsgCode(0, 1104);
+				return;
+			}
+			useGold(item_cost * count, &ci);
+            GetPackage()->AddItem(item_id, count, true, false, FromShuShanWeiWei);
+            item_status = CLR_BIT(item_status, pos);
+            SetVar(VAR_SHU_SHAN_WEI_WEI_WXSC, item_status);
+        }
+    }
+
+    Stream st(REP::ACTIVITY_REWARD);
+    st << static_cast<UInt8>(22);
+    st << static_cast<UInt8>(GetVar(VAR_SHU_SHAN_WEI_WEI_WXSC_COUPON));
+    st << static_cast<UInt16>(item_status);
+    st << Stream::eos;
+    send(st);
+}
+
 } // namespace GObject
 

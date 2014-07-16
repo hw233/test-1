@@ -9673,6 +9673,58 @@ function ItemNormal_00010265(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010266(iid, num, bind, param)
+    local items = {
+        {509, 3}, {507, 3}, {503, 3}, {500, 5}, {56, 3}, {9498, 3}, {47, 3}, {50, 3}, {49, 3}, {57, 3}, {501, 5}, {513, 3}, {5003, 1}, 
+        {5013, 1}, {5043, 1}, {5053, 1}, {5063, 1}, {5073, 1}, {9012, 3}, {9013, 3}, {9014, 3}, {9015, 3}, {9016, 3}, {9035, 3}, {1126, 3},
+        {1325, 3}, {551, 3}, {16001, 3}, {548, 3}, {134, 3}, {9371, 3}, {9600, 3}, {9076, 3}
+    }
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (num * 5) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    for m = 1, num do
+        package:Add(16023, 1, true, false, 2);
+        local first_index = 0
+        local second_index = 0
+        local third_index = 0
+        local forth_index = 0
+        first_index = math.random(1, #items)
+        while true do
+            second_index = math.random(1, #items)
+            if second_index ~= first_index then
+                break
+            end
+        end
+
+        while true do
+            third_index = math.random(1, #items)
+            if third_index ~= second_index and third_index ~= first_index then
+                break
+            end
+        end
+
+        while true do
+            forth_index = math.random(1, #items)
+            if forth_index ~= third_index and forth_index ~= second_index and forth_index ~= first_index then
+                break
+            end
+        end
+
+        package:Add(items[first_index][1], items[first_index][2], true, false, 2);
+        package:Add(items[second_index][1], items[second_index][2], true, false, 2);
+        package:Add(items[third_index][1], items[third_index][2], true, false, 2);
+        package:Add(items[forth_index][1], items[forth_index][2], true, false, 2);
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_00016000(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 75 then
@@ -13859,6 +13911,7 @@ local ItemNormal_Table = {
     [10263] = ItemNormal_00010263,
     [10264] = ItemNormal_00010264,
     [10265] = ItemNormal_00010265,
+    [10266] = ItemNormal_00010266,
 
     [16000] = ItemNormal_00016000,
     [16001] = ItemNormal_00016000,

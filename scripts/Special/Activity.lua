@@ -12439,3 +12439,20 @@ function getJiqirenAward_Dungeon(player, diff, isFree)
         package:Add(dungeonAward_diff[key1]["special"][math.random(1, specailNum)], 1, isFree, false, 69)
     end
 end
+
+local WeiXinShopItems = {
+    [1] = {5066, 388, 10},
+    [2] = {9076, 66, 10},
+    [3] = {509, 29, 199},
+    [4] = {515, 29, 199},
+    [5] = {9498, 20, 99},
+    [6] = {16001, 15, 99},
+}
+
+function getWeiXinShopItemNum()
+    return #WeiXinShopItems
+end
+
+function getWeiXinShop(index)
+    return WeiXinShopItems[index]
+end

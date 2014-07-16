@@ -175,6 +175,7 @@ enum PurchaseType
     MOFUMIZHEN1                 = 1036, //墨符迷阵
     MOFUMIZHEN2                 = 1037, //墨符迷阵
     MakeGear                    = 1038, //打造机关库
+    WeiWeiShop                  = 1039, //购买微信商店物品
     //繁体私有占150～200
 };
 
@@ -337,6 +338,7 @@ enum ItemFrom
     FromAutoTeamCopy = 76 , //自动组队副本
     FromClanShop = 77 , //帮贡商店
     FromCoolSummer = 78 , //酷爽一夏
+    FromShuShanWeiWei = 79 , //蜀山微微
     //80 ~ 100，繁体占用
 };
 
