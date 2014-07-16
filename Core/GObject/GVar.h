@@ -160,6 +160,9 @@ namespace GObject
         
         GVAR_CLAN_BIGBOSS_ENABLE = 101,         //帮派BOSS能否预约
         GVAR_MAX_LEVEL = 102 ,          //玩家最大等级 , 用于开启等级天劫判断
+
+        GVAR_11TIME_BEGIN = 103,  //天书奇缘开始时间
+        GVAR_11TIME_END  = 104,  //天书奇缘结束时间
         GVAR_MAX,
     };
 
@@ -294,6 +297,8 @@ namespace GObject
             
             GREGISTER_VAR(GVAR_CLAN_BIGBOSS_ENABLE, GCYCLE_DAY);
             GREGISTER_VAR(GVAR_MAX_LEVEL, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_11TIME_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_11TIME_END, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

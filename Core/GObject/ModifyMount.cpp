@@ -258,6 +258,9 @@ namespace GObject
                     pkg->Add(MOUNT_COSTID, cjd->otherNum, true, false, FromBox);
                 else
                 {
+                    const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[chipId];
+                    if(itemType && itemType->quality == Item_Yellow)
+                        SYSMSG_BROADCASTV(4159, _owner->getCountry(), _owner->getName().c_str(), chipId);
                     pkg->Add(chipId, 1, true, true, FromBox);
                     pkg->UseItem(chipId, 1, 0, 0, 1);
                 }

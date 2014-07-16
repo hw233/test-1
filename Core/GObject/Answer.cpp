@@ -22,7 +22,7 @@ namespace GObject
 
     void Answer::RandQuestions()
     {
-        UInt8 div = MAX_QUESTION_NUM / MAX_ANSWER_NUM + 1;     
+        /*UInt8 div = MAX_QUESTION_NUM / MAX_ANSWER_NUM + 1;     
         for(UInt8 i=0; i<MAX_ANSWER_NUM; ++i)
         {
             UInt8 rand = uRand(div);
@@ -31,6 +31,40 @@ namespace GObject
                 m_answer[i] = MAX_QUESTION_NUM;
 
             DB4().PushUpdateData("REPLACE INTO `questions` VALUES(%u, %u)", i+1, m_answer[i]);
+        }*/
+
+        std::vector<UInt16> _tempVector;
+        for(UInt16 i=0; i<MAX_QUESTION_NUM; ++i)
+        {
+            _tempVector.push_back(i);
+        }
+
+        UInt8 cnt = 0;
+        std::vector<UInt16> tempAnswer;
+        while(cnt<30)
+        {
+            UInt16 pos = uRand(_tempVector.size());
+            UInt16 answerId = _tempVector[pos];
+      
+            bool mark = false;
+            for(UInt16 j=0; j<tempAnswer.size(); j++)
+            {
+                if(answerId == tempAnswer[j])
+                {
+                    _tempVector.erase(_tempVector.begin()+pos);
+                    mark = false;
+                    break;
+                }
+                mark = true;
+            }
+            
+            if(mark || 0 == cnt)
+            {
+                m_answer[cnt] = answerId;
+                DB4().PushUpdateData("REPLACE INTO `questions` VALUES(%u, %u)", cnt+1, m_answer[cnt]);
+                tempAnswer.push_back(m_answer[cnt]);
+                cnt++;
+            }
         }
     }
 

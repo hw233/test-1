@@ -11499,15 +11499,19 @@ end
 function ItemNormal_00016013(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    if package:GetRestPackageSize() < 1 then
+    if package:GetRestPackageSize() < (4+(4*num*2)/99) + 1*num then
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
 
-    package:AddItem(503, 2, 1, 0, 2);
-    package:AddItem(134, 2, 1, 0, 2);
-    package:AddItem(1325, 2, 1, 0, 2);
-    package:AddItem(9076, 1, 1, 0, 2);
+    for i = 1, num do
+        package:AddItem(503, 2, 1, 0, 2);
+        package:AddItem(134, 2, 1, 0, 2);
+        package:AddItem(1325, 2, 1, 0, 2);
+        package:AddItem(9076, 1, 1, 0, 2);
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:"..id.."]"..msg_61.."[4:503]x2、[4:134]x2、[4:1325]x2、[4:9076]x1");
+    end
+
     package:DelItemSendMsg(id, player);
     return num;
 end
@@ -11515,13 +11519,18 @@ end
 function ItemNormal_00016014(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    if package:GetRestPackageSize() < 1 then
+    if package:GetRestPackageSize() < (3+(3*num*1)/99) + 1*num then
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
-    package:AddItem(503, 1, 1, 0, 2);
-    package:AddItem(134, 1, 1, 0, 2);
-    package:AddItem(1325, 1, 1, 0, 2);
+
+    for i = 1, num do
+        package:AddItem(503, 1, 1, 0, 2);
+        package:AddItem(134, 1, 1, 0, 2);
+        package:AddItem(1325, 1, 1, 0, 2);
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:"..id.."]"..msg_61.."[4:503]x1、[4:134]x1、[4:1325]x1");
+    end
+
     package:DelItemSendMsg(id, player);
     return num;
 end
@@ -11529,12 +11538,17 @@ end
 function ItemNormal_00016015(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    if package:GetRestPackageSize() < 1 then
+    if package:GetRestPackageSize() < (2+(2*num*1)/99) + 1*num then
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
-    package:AddItem(503, 1, 1, 0, 2);
-    package:AddItem(134, 1, 1, 0, 2);
+
+    for i = 1, num do
+        package:AddItem(503, 1, 1, 0, 2);
+        package:AddItem(134, 1, 1, 0, 2);
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:"..id.."]"..msg_61.."[4:503]x1、[4:134]x1");
+    end
+
     package:DelItemSendMsg(id, player);
     return num;
 end
@@ -13542,6 +13556,39 @@ local ItemNormal_Table = {
     [9846] = ItemNormal_00009611,
     [9847] = ItemNormal_00009611,
     [9848] = ItemNormal_00009611,
+
+    [9851] = ItemNormal_00009611,
+    [9852] = ItemNormal_00009611,
+    [9853] = ItemNormal_00009611,
+    [9854] = ItemNormal_00009611,
+    [9855] = ItemNormal_00009611,
+    [9856] = ItemNormal_00009611,
+    [9857] = ItemNormal_00009611,
+    [9858] = ItemNormal_00009611,
+    [9861] = ItemNormal_00009611,
+    [9862] = ItemNormal_00009611,
+    [9863] = ItemNormal_00009611,
+    [9864] = ItemNormal_00009611,
+    [9865] = ItemNormal_00009611,
+    [9866] = ItemNormal_00009611,
+    [9867] = ItemNormal_00009611,
+    [9868] = ItemNormal_00009611,
+    [9871] = ItemNormal_00009611,
+    [9872] = ItemNormal_00009611,
+    [9873] = ItemNormal_00009611,
+    [9874] = ItemNormal_00009611,
+    [9875] = ItemNormal_00009611,
+    [9876] = ItemNormal_00009611,
+    [9877] = ItemNormal_00009611,
+    [9878] = ItemNormal_00009611,
+    [9879] = ItemNormal_00009611,
+    [9880] = ItemNormal_00009611,
+    [9881] = ItemNormal_00009611,
+    [9882] = ItemNormal_00009611,
+    [9883] = ItemNormal_00009611,
+    [9884] = ItemNormal_00009611,
+    [9869] = ItemNormal_00009611,
+    [9870] = ItemNormal_00009611,
 
     [9649] = ItemNormal_00009649,
     [9650] = ItemNormal_00009650,

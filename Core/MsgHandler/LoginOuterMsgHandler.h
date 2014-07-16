@@ -3477,6 +3477,12 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_ANSWER_QUESTIONS_OPTION, 0);
             }
             break;
+        case 22:
+            {
+                pl->SetVar(GObject::VAR_11AIRBOOK_GRADE, 0);
+                pl->SetVar(GObject::VAR_11AIRBOOK_AWARDSCORE, 0);
+            }
+            break;
         default:
             return false;
     }
@@ -4088,6 +4094,28 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_ANSWER_ENDTIME, valueTimeA);
         GObject::GVAR.SetVar(GObject::GVAR_ANSWER_AWARDTIME, valueTimeB);
 
+        return;
+    }
+    else if (type == 22 && begin <= end )
+    {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+        
+        curType = 22;
+        if(GObject::GVAR.GetVar(GObject::GVAR_11TIME_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_11TIME_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_11TIME_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_11TIME_END, end);
+
+        DB5().PushUpdateData("DELETE FROM `AirBookData`");
+
+        GObject::World::PlayerGradeSort.clear();
+        GObject::World::clanGradeSort.clear();
         return;
     }
 

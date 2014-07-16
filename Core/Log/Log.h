@@ -172,8 +172,8 @@ enum PurchaseType
     WBInspire                   = 1033, //世界BOSS鼓舞
     BuyClanShopItems            = 1034, //购买帮贡商店物品
     FlushClanShopItems          = 1035, //刷新帮贡商店物品
-    MOFUMIZHEN1                 = 1036, //墨符迷阵
-    MOFUMIZHEN2                 = 1037, //墨符迷阵
+    MOFUMIZHEN1                 = 1036, //墨符迷阵一键消除
+    MOFUMIZHEN2                 = 1037, //墨符迷阵购买次数
     MakeGear                    = 1038, //打造机关库
     WeiWeiShop                  = 1039, //购买微信商店物品
     //繁体私有占150～200
