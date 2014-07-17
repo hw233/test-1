@@ -957,7 +957,7 @@ void OnGGAddTeamScore( GameMsgHdr& hdr, const void * data )
         if(tmp + score >= 50)
         {
             UInt8 addNum = 0;
-            UInt8 addNum1 = 0;
+            //UInt8 addNum1 = 0;
             if(tmp < 50 && (tmp + score) >= 50)
                 addNum++;      
             if(tmp < 70 && (tmp + score) >= 70)
