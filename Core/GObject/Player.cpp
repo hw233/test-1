@@ -27592,6 +27592,7 @@ void Player::RunFriendlyCompass(UInt8 type)
    {
        if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, 9)) )
            return;
+       char str[32] = {0};
        switch(idx)
        {
            case 11 :
@@ -27921,6 +27922,7 @@ void Player::getCompassChance(UInt8 flag)      //获取财富之星
             tmp_num = SET_BIT_8(tmp_num,1,todayRecivedNum);
             SetVar(VAR_GUANGGUN_TODAY_STAR,tmp_num); 
             UpdateGGInfo();
+            char str[32] = {0};
             sprintf(str, "F_140717_1");
             udpLog("sanrenyou", str, "", "", "", "", "act");
         }
@@ -27932,6 +27934,7 @@ void Player::getCompassChance(UInt8 flag)      //获取财富之星
             m_gginfo.counts += 1;
             SetVar(VAR_GUANGGUN_TEAMSTAR,tmp); 
             UpdateGGInfo();
+            char str[32] = {0};
             sprintf(str, "F_140717_2");
             udpLog("sanrenyou", str, "", "", "", "", "act");
         }
