@@ -182,12 +182,12 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     SetDirty(pl,true);
     Battle::BattleSimulator bsim(Battle::BS_WBOSS, pl, _ng->getName(), _ng->getLevel(), true);
     pl->PutFighters(bsim, 0);
-    _ng->putFighters(bsim);
+    //_ng->putFighters(bsim);
 
     std::vector<GData::NpcFData>& nflist = _ng->getList();
     size_t sz = nflist.size();
 
-    if (final)
+    //if (final)
     {
         for(size_t i = 0; i < sz; ++ i)
         {
