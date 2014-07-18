@@ -1174,6 +1174,7 @@ private:
 };
 
 extern GlobalFighters globalFighters;
+extern Fighter* fighter_5509;
 
 extern Fighter& getGreatFighter(UInt32 id);
 extern bool existGreatFighter(UInt32 id);

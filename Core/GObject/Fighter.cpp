@@ -41,6 +41,7 @@ namespace GObject
 {
 
 GlobalFighters globalFighters;
+Fighter* fighter_5509 = NULL;
 
 static float enc_factor[] = {0, 0.05f, 0.10f, 0.16f, 0.23f, 0.31f, 0.40f, 0.51f, 0.64f, 0.80f, 1.00f, 1.25f, 1.51f};
 #define SOUL_EXP_ITEM 8000

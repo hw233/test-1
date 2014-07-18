@@ -56,12 +56,20 @@ ClanBigBoss::~ClanBigBoss()
 void ClanBigBoss::setNpcBoss()
 {
     GData::NpcGroup * s_ng = new GData::NpcGroup(static_cast<UInt32>(5509));
-    GData::NpcGroups::iterator it = GData::npcGroups.find(BIGBOSS);
-    if(it == GData::npcGroups.end())
+    if(!s_ng)
         return;
+    /*GData::NpcGroups::iterator it = GData::npcGroups.find(BIGBOSS);
+    if(it == GData::npcGroups.end())
+        return;*/
 
-    *s_ng = *(it->second);
+    //*s_ng = *(it->second);
+    *s_ng = *(GData::npcGroup_5509);
     _ng = s_ng;
+    if(!fighter_5509)
+        return;
+    Fighter* fgt = fighter_5509->clone(NULL);
+    std::vector<GData::NpcFData>& npclist = _ng->getList();
+    npclist[0].fighter = fgt;
 }
 
 void ClanBigBoss::ReqBossAppointment(UInt8 app_time/* 时间点数 */,std::string str)

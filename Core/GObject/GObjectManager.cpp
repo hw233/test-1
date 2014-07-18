@@ -1164,6 +1164,14 @@ namespace GObject
 			ngroup->calcBattlePoints(&bform);
             ngroup->setType(dbng.type);
 			GData::npcGroups[dbng.id] = ngroup;
+            if(dbng.id == 5509)
+            {
+                GData::npcGroup_5509 = new GData::NpcGroup(static_cast<UInt32>(dbng.id));
+                *(GData::npcGroup_5509) = *ngroup;
+                std::vector<GData::NpcFData>& npclist = ngroup->getList(); 
+                fighter_5509 = npclist[0].fighter->clone(NULL);
+                //npclist[0].fighter = fgt;
+            }
 		}
 		lc.finalize();
 
