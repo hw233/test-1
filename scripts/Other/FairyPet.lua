@@ -303,6 +303,7 @@ local suitAttr= {
     [222] = 31002,
     [223] = 31002,
     [400] = 30010,
+    [500] = 30010,
 }
 function getsuitAttr(suitId)
     if nil == suitId  then

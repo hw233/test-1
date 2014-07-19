@@ -2266,7 +2266,7 @@ namespace GObject
         void LeaveGGTime();
         void beGGTeam(UInt64 id);
         void GGTeamPlayerLeave(UInt64 id);
-        void getGGTaskAward();
+        void getGGTaskAward(UInt8);
         void giveGGTeamMemberInfo(Stream& st);
         void BuyGuangGunAdvance();
         void BuyCompassChance(UInt8 counts = 1);

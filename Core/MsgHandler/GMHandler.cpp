@@ -5731,7 +5731,7 @@ void GMHandler::OnAdd61Card(GObject::Player *player, std::vector<std::string>& a
         return ;
     UInt16 cid = atoi(args[0].c_str());
     
-    player->GetCollectCard()->Add61Card(cid);   
+    player->GetCollectCard()->AddSummerCard(cid);   
 }
 
 void GMHandler::OnAddCardExp(GObject::Player *player, std::vector<std::string>& args)
