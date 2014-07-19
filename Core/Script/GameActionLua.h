@@ -419,6 +419,10 @@ namespace Script
         bool RunActCardAward(Player* player,UInt8 idx);
         UInt32 getWorldCupLimitTime(Player* player,UInt8 opt);
         UInt32 getXXLCost(Player* player,UInt32 opt);
+        lua_tinker::table getWeiXinShop(UInt8 index);
+        UInt32 getWeiXinShopItemNum();
+        bool getShuShanWeiWei_XDPB_Award(Player * player, UInt8 opt);
+        Table getShuShanWeiWei_MSYJ_Award(Player * player);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

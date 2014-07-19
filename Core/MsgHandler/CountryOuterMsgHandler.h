@@ -5537,6 +5537,36 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
                 player->getWeiboAward(opt, key);
             }
             break;
+        case 20:
+            {
+                UInt8 opt = 0;
+                brd >> opt;
+                player->shuShanWeiWei_XDPB(player, opt);
+            }
+            break;
+        case 21:
+            {
+                UInt8 opt = 0;
+                brd >> opt;
+                player->shuShanWeiWei_MSYJ(player, opt);
+            }
+            break;
+        case 22:
+            {
+                UInt8 opt = 0;
+                UInt8 pos = 0;
+                UInt32 count = 0;
+                brd >> opt;
+                if(1 == opt)
+                    brd >> pos;
+                if(2 == opt)
+                {
+                    brd >> pos;
+                    brd >> count;
+                }
+                player->shuShanWeiWei_WXSC(opt, pos, count);
+            }
+            break;
     }
  
 }

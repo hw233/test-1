@@ -807,7 +807,7 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+461*86400 then
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+468*86400 then
           -- RECHARGE
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
@@ -1173,7 +1173,7 @@ function onActivityCheck(tm)
   end
 
   -- ACC
-  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 176*86400) then
+  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 183*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
@@ -1463,8 +1463,8 @@ function initActTime(y, m, d)
   local  SerStartTm241 = { ['year'] = 2013, ['month'] = 2, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm241_1 = { ['year'] = 2013, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --特殊古籍活动
-  local  SerStartTm242 = { ['year'] = 2014, ['month'] = 6, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm242_1 = { ['year'] = 2014, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242 = { ['year'] = 2014, ['month'] = 7, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm242_1 = { ['year'] = 2014, ['month'] = 7, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --大厅累积在线奖励
   local  SerStartTm243 = { ['year'] = 2014, ['month'] = 5, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --空间黄钻、大厅蓝钻礼包
@@ -1524,8 +1524,8 @@ function initActTime(y, m, d)
   local  SerStartTm257= { ['year'] = 2014, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm257_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
-  local  SerStartTmq1= { ['year'] = 2014, ['month'] = 6, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTmq2= { ['year'] = 2014, ['month'] = 5, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTmq1= { ['year'] = 2014, ['month'] = 7, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTmq2= { ['year'] = 2014, ['month'] = 7, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
 
   --300-399越南版用了

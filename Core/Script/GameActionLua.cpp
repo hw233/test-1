@@ -1953,5 +1953,23 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt32>("getXXLCost", player, opt);
 	}
+    lua_tinker::table GameActionLua::getWeiXinShop(UInt8 index)
+    {
+        return Call<lua_tinker::table>("getWeiXinShop", index);
+    }
+    UInt32 GameActionLua::getWeiXinShopItemNum()
+    {
+        return Call<UInt32>("getWeiXinShopItemNum");
+    }
+    bool GameActionLua::getShuShanWeiWei_XDPB_Award(Player * player, UInt8 opt)
+    {
+		assert(player != NULL);
+        return Call<bool>("getShuShanWeiWei_XDPB_Award", player, opt);
+    }
+    Table GameActionLua::getShuShanWeiWei_MSYJ_Award(Player * player)
+    {
+		assert(player != NULL);
+        return Call<Table>("getShuShanWeiWei_MSYJ_Award", player);
+    }
 }
 
