@@ -14544,7 +14544,7 @@ void BattleSimulator::doSkillEffectExtra_Dispeerless(BattleFighter* bf, int targ
             if(bo == NULL || bo->getHP() == 0)
                 continue;
 
-            bo->setBuddhaLight(ef->prob, 1);
+            bo->setBuddhaLight(ef->prob, ef->last);
             bo->setBuddhaLightLauncher(bf);
         }
         appendDefStatus(e_buddhaLight, 0, bf);
