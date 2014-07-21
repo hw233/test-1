@@ -1436,8 +1436,10 @@ namespace GObject
                     itemId = 9391;
                 else if(level < 130) 
                     itemId = 9430;
-                else 
+                else if(level < 140)
                     itemId = 9491;
+                else
+                    itemId = 9885;
                 MailPackage::MailItem mitem[1] = {{itemId, 1}};
                 MailItemsInfo itemsInfo(mitem, BlueDiamondCmd, 1);
                 mailPackageManager.push(mail->id, mitem, 1, true);
@@ -2610,7 +2612,7 @@ namespace GObject
 			if((exp & 0x80000000) > 0)
 			{
 				exp &= 0x7FFFFFFF;
-				moveTo(_playerData.location & 0xFF00, false);
+				moveTo(_playerData.location & 0xFF00, true);
 			}
 			AddExp(exp);
 			_playerData.lastExp = 0;

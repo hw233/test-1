@@ -70,6 +70,7 @@ namespace GObject
         void offsetException();//异常补偿
         void closeBossInfo(UInt8 flag = 0/* 0 - 正常关闭 1 - 非正常关闭*/);//关闭Boss
         void addLevel();
+        void setNpcBoss();
         
         inline UInt32 getHP(){ return m_BossHP; }
         void process(UInt32 now);
@@ -98,7 +99,7 @@ namespace GObject
         inline void setFlag(bool flag) { _flag = flag; }
 
     private:
-    
+		//GData::NpcGroup s_ng;
 		GData::NpcGroup* _ng;
 		GData::NpcGroup* _ng1;
         UInt32 m_BossHP;//Boss当前血量

@@ -69,6 +69,7 @@ private:
 
 typedef std::map<UInt32, NpcGroup *> NpcGroups;
 extern NpcGroups npcGroups;
+extern NpcGroup* npcGroup_5509;
 
 }
 

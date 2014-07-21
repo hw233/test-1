@@ -15,6 +15,7 @@ namespace GData
 {
 
 NpcGroups npcGroups;
+NpcGroup* npcGroup_5509 = NULL;
 
 void NpcGroup::addFighter( UInt32 id, UInt8 pos )
 {

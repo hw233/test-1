@@ -321,8 +321,10 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_ClanBigBossBug.sql     #帮派BossBug修复
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140627_1.sql #机关库
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_var402_403.sql   #这“夏”有礼咯
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguanyu.sql   #player_jiguanyu表中添加字段scheme
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140623.sql     #帮派加入优化
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguanyu.sql   #player_jiguanyu表中添加字段scheme
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140623.sql     #帮派加入优化
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #捉迷藏清空
 }
 
 #sh player_jiguan.sh

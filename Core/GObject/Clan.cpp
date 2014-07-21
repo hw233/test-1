@@ -37,6 +37,7 @@
 #include "KangJiTianMo.h"
 #include "ClanBuilding.h"
 #include "ClanBigBoss.h"
+#include "GData/NpcGroup.h"
 
 namespace GObject
 {
@@ -276,6 +277,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	_clanDynamicMsg = new ClanDynamicMsg();
 	_clanBattle = new ClanCityBattle(this);
 	_clanBigBoss = new ClanBigBoss(this);
+    _clanBigBoss->setNpcBoss();
 
     m_BattleScore = 0;
     m_DailyBattleScore = 0;
