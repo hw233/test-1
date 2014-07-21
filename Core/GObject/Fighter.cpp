@@ -92,6 +92,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     m_2ndSoul = NULL;
     _iswboss = false;
     _iswbossinspire = false;
+    _iscbbbuf = false;
     _wbextatk = 0;
     _wbextmagatk = 0;
     _soulMax = 0;
@@ -103,6 +104,8 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _soulSkillProtect = 0;
     _wbplextatk = 0;
     _wbplextmagatk = 0;
+    _cbbplextatk = 0;
+    _cbbplextmagatk = 0;
 }
 
 Fighter::~Fighter()
@@ -2104,6 +2107,12 @@ void Fighter::rebuildEquipAttr()
     {
         _attrExtraEquip.attack += _wbplextatk;
         _attrExtraEquip.magatk += _wbplextmagatk;
+    }
+    
+    if(isClanBigBossBuf())
+    {
+        _attrExtraEquip.attack += _cbbplextatk;
+        _attrExtraEquip.magatk += _cbbplextmagatk;
     }
 
     if(_owner/* && _owner->getClan()*/)

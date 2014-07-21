@@ -212,6 +212,8 @@ public:
     inline void setWBoss(bool v) { _iswboss = v; }
     inline bool isWBossInspire() { return _iswbossinspire; }
     inline void setWBossInspire(bool v) { _iswbossinspire = v; }
+    inline bool isClanBigBossBuf() { return _iscbbbuf; }
+    inline void setClanBigBossBuf(bool v) { _iscbbbuf = v; }
 	inline UInt8 getLevel() {return _level;}
     inline UInt8 getLevelInLua() { if (isPet() && _level >= 50) return _level - 49;  return _level;}
 	inline UInt64 getExp() {return _exp;}
@@ -703,6 +705,8 @@ public:
     
     inline void setPlExtraAttack(Int32 atk) { _wbplextatk = atk; }
 	inline void setPlExtraMagAttack(Int32 atk) { _wbplextmagatk = atk; }
+    inline void setPlCBBExtraAttack(Int32 atk) { _cbbplextatk = atk; }
+	inline void setPlCBBExtraMagAttack(Int32 atk) { _cbbplextmagatk = atk; }
 
     UInt8 getToggleReiatsu();        // 返回出场所需灵压
     UInt8 getTargetPos();            // 返回备胎该出场的目标位置
@@ -984,10 +988,13 @@ private:
 private:
     bool _iswboss;
     bool _iswbossinspire;
+    bool _iscbbbuf;
     Int32 _wbextatk;
     Int32 _wbextmagatk;
     Int32 _wbplextatk;
     Int32 _wbplextmagatk;
+    Int32 _cbbplextatk;
+    Int32 _cbbplextmagatk;
 
 public:
     // 仅仅用于内存拷贝出来的Fighter, 切勿她用

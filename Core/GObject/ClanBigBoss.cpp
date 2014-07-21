@@ -45,6 +45,7 @@ ClanBigBoss::ClanBigBoss(Clan* clan)
     m_final = false;
     _percent = 100;
     _flag = false;
+    _buffer = 0;
     
 }
 
@@ -146,6 +147,7 @@ void ClanBigBoss::closeBossInfo(UInt8 flag)
     }
     
     //
+    _buffer = 0;
     setStatus(CLAN_BIGBOSS_OVER);
     updateInfo();
 }
@@ -202,7 +204,7 @@ bool ClanBigBoss::attackBoss(Player* player)
 
     UInt32 now = TimeUtil::Now();
     UInt32 buffLeft = player->getBuffData(PLAYER_BUFF_ATTACKING, now);
-    if(buffLeft > now)
+    if(cfg.GMCheck && buffLeft > now)
     {
         player->sendMsgCode(0, 1407, buffLeft - now);
         return false;
@@ -268,6 +270,7 @@ bool ClanBigBoss::attackBossFinal(Player* player)
     bool res = false;
     UInt16 ret = 0x0100;
 
+    SetDirty(player,true);
     Battle::BattleSimulator bsim(Battle::BS_WBOSS, player, _ng->getName(), 255, false);
     player->PutFighters(bsim, 0);
     //_ng->putFighters(bsim);
@@ -360,6 +363,7 @@ bool ClanBigBoss::attackBossFinal(Player* player)
     st << Stream::eos;
     player->send(st);
     bsim.applyFighterHP(0, player);
+    SetDirty(player,false);
 
     player->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
 
@@ -616,18 +620,24 @@ void ClanBigBoss::process(UInt32 now)
     class StreamVisitor : public Visitor<ClanMember>
     {
         public:
-            StreamVisitor(UInt32 sysMsgID)
+            StreamVisitor(UInt8 buffer_)
             {
-                MsgID = sysMsgID;
+                buffer = buffer_;
             }
 
             bool operator()(ClanMember* member)
             {
-                SYSMSG_SENDV(MsgID, member->player);
+                //SYSMSG_SENDV(MsgID, member->player);
+                if(member->player == NULL)
+                    return false;
+                Stream st(REP::CLAN_COPY);  
+                st << static_cast<UInt8>(0x10) << static_cast<UInt8>(5) << buffer;
+                st << Stream::eos;
+                member->player->send(st);
                 return true;
             }
         private:
-            UInt32 MsgID;
+            UInt8 buffer;
     };
 
     switch (_status)
@@ -678,10 +688,29 @@ void ClanBigBoss::process(UInt32 now)
 
         case CLAN_BIGBOSS_BEGIN:
         {
+            if(now == appointment_time + 5 * 60)
+            {
+                _buffer = 1; 
+                StreamVisitor visitor(_buffer);
+                _clan->VisitMembers(visitor);
+            }
+            if(now == appointment_time + 10 * 60)
+            {
+                _buffer = 2; 
+                StreamVisitor visitor(_buffer);
+                _clan->VisitMembers(visitor);
+            }
+            if(now == appointment_time + 15 * 60)
+            {
+                _buffer = 3; 
+                StreamVisitor visitor(_buffer);
+                _clan->VisitMembers(visitor);
+            }
+            
             if (now < appointment_time + 30 * 60)
                 return;
-            StreamVisitor visitor(1111);//Boss打完了
-            _clan->VisitMembers(visitor);
+            //StreamVisitor visitor(1111);//Boss打完了
+            //_clan->VisitMembers(visitor);
             closeBossInfo(1);
             //if(now > appointment_time + 30 * 60)
                // offsetException();
@@ -779,6 +808,16 @@ void ClanBigBoss::ReturnBossInfo(Player* pl,UInt8 status)
     st << Stream::eos;
    
     pl->send(st);
+
+    if(_buffer == 1 || _buffer == 2 || _buffer == 3) 
+    {
+        Stream st1(REP::CLAN_COPY);  
+        st1 << static_cast<UInt8>(0x10) << static_cast<UInt8>(5) << _buffer;
+        st1 << Stream::eos;
+        pl->send(st1);
+    }
+
+
     return;
 }
 
@@ -849,7 +888,38 @@ void ClanBigBoss::LoadFromDB(DBClanBigBoss* dcbb)
     
 }
 
+void ClanBigBoss::SetDirty(Player* player,bool _iscbbbuf)
+{
+    std::map<UInt32, Fighter *>& fighters = player->getFighterMap();
+    float factor = 0.0f; 
+    switch(_buffer)
+    {
+        case 1:
+            factor = 0.5; 
+            break;
+        case 2:
+            factor = 1.0; 
+            break;
+        case 3:
+            factor = 2.0; 
+            break;
+        default:
+            break;
+    }
 
+    for(std::map<UInt32, Fighter *>::iterator it = fighters.begin(); it != fighters.end(); ++it)
+    {
+        Int32 baseatk = Script::BattleFormula::getCurrent()->calcAttack(it->second);
+        Int32 basematk = Script::BattleFormula::getCurrent()->calcMagAttack(it->second);
+        
+        it->second->setPlCBBExtraAttack(static_cast<Int32>(baseatk * factor));
+        it->second->setPlCBBExtraMagAttack(static_cast<Int32>(basematk * factor));
+
+        it->second->setClanBigBossBuf(_iscbbbuf); 
+        it->second->setDirty();
+    }
+
+}
 
 
 ///////////////////////////

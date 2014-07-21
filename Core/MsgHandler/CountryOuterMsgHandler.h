@@ -5279,7 +5279,10 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
             break;
         case 0x10:
             if(player->GetVar(VAR_CLANBOSS_CLANBIGBOSS_LIMIT))
+            {
+                player->sendMsgCode(0, 1420);
                 return;
+            }
             //if(CURRENT_THREAD_ID() != WORKER_THREAD_NEUTRAL)
             {
                 hdr.msgHdr.desWorkerID = WORKER_THREAD_NEUTRAL;
