@@ -150,6 +150,7 @@ enum
     e_eft_round_add  = 61,      // 每回合增加的buff
     e_eft_round_sub  = 62,      // 每回合减少的buff
     e_eft_control_ball  = 63,      // 足球法宝
+    e_eft_dispeerless  = 64,      // 慈悲效果
 
     e_eft_max
 };
