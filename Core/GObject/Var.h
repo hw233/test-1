@@ -806,7 +806,7 @@ namespace GObject
         VAR_COOL_SUMMER_AWARD_TYPE = 831,        //酷爽一夏奖励类型
         VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL = 832, //酷爽一夏累积活跃值
         VAR_SHU_SHAN_WEI_WEI_XDPB = 833, //蜀山微微"喜大普奔"奖励状态(1-6位)
-        VAR_SHU_SHAN_WEI_WEI_MSYJ = 834, //蜀山微微"码上有奖"是否领取抽奖券(0：未领，1：已领,一周一次)
+        VAR_SHU_SHAN_WEI_WEI_MSYJ = 834, //蜀山微微"码上有奖"是否领取抽奖券(0：未领，1：已领,一天一次)
         VAR_SHU_SHAN_WEI_WEI_WXSC = 835, //蜀山微微"微信商城"奖励状态(1-7位,第一位为免费礼券)
         VAR_SHU_SHAN_WEI_WEI_WXSC_COUPON = 836, //蜀山微微"微信商城"免费礼券是否领取(0未领，1已领)
         VAR_SHU_SHAN_WEI_WEI_MSYJ_AWARD = 837, //蜀山微微"码上有奖",抽到奖励和数量(0-15为物品ID，16-31为物品数量)
@@ -1491,7 +1491,7 @@ namespace GObject
             REGISTER_VAR(VAR_COOL_SUMMER_ACTIVE_POINT, CYCLE_DAY);
             REGISTER_VAR(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL, CYCLE_NONE);
             REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_XDPB, CYCLE_NONE);
-            REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_MSYJ, CYCLE_WEEK);
+            REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_MSYJ, CYCLE_DAY);
             REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_WXSC, CYCLE_NONE);
             REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_WXSC_COUPON, CYCLE_NONE);
             REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_MSYJ_AWARD, CYCLE_NONE);
