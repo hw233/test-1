@@ -9083,6 +9083,7 @@ namespace GObject
         addRF7DayRecharge(r);
         addLuckyMeetRecharge(r);
         addSummerMeetRecharge(r);
+        firstPotOfGold(r);
         if(World::get11Time())
         {
             UInt32 goldLeft = GetVar(VAR_AIRBOOK_RECHARGE)%30;
@@ -34753,6 +34754,49 @@ void Player::shuShanWeiWei_WXSC(UInt8 opt, UInt8 pos, UInt32 count)
     st << static_cast<UInt16>(item_status);
     st << Stream::eos;
     send(st);
+}
+
+void Player::firstPotOfGold(UInt32 total)
+{
+    static UInt32 rechargeLvl[6] = {200, 800, 2000, 3000, 5000, 10000};
+    UInt32 now = TimeUtil::Now();
+    if(now - getCreated() > 7 * 24 *3600)
+        return;
+    for(size_t i = 0; i < 6; i++)
+    {
+        if(total == rechargeLvl[i])
+        {
+            UInt8 flag = GET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i);
+            if(flag)
+                return;
+            SYSMSG(title, 5187);
+            SYSMSGV(content, 5188, rechargeLvl[i], rechargeLvl[i]);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[1] = {
+                    {0xA000, rechargeLvl[i]},
+                };
+                mailPackageManager.push(mail->id, mitem, 1, true);
+            }
+            SYSMSG_BROADCASTV(5189, getCountry(), getName().c_str(), rechargeLvl[i]);
+            SetVar(VAR_FIRST_POT_GOLD_STATUS, SET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i));
+            firstPotOfGoldReturn(0);
+        }
+    }
+}
+
+void Player::firstPotOfGoldReturn(UInt8 type)
+{
+    if(type == 0)
+    {
+        Stream st(REP::COUNTRY_ACT);
+        st << static_cast<UInt8>(0x13);
+        st << type;
+        st << static_cast<UInt8>(GetVar(VAR_FIRST_POT_GOLD_STATUS));
+        st << Stream::eos;
+        send(st);
+    }
 }
 
 } // namespace GObject

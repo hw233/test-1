@@ -810,6 +810,7 @@ namespace GObject
         VAR_SHU_SHAN_WEI_WEI_WXSC = 835, //蜀山微微"微信商城"奖励状态(1-7位,第一位为免费礼券)
         VAR_SHU_SHAN_WEI_WEI_WXSC_COUPON = 836, //蜀山微微"微信商城"免费礼券是否领取(0未领，1已领)
         VAR_SHU_SHAN_WEI_WEI_MSYJ_AWARD = 837, //蜀山微微"码上有奖",抽到奖励和数量(0-15为物品ID，16-31为物品数量)
+        VAR_FIRST_POT_GOLD_STATUS = 841, //第一桶金充值状态
         VAR_MAX,
     };
 

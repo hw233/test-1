@@ -2332,6 +2332,14 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 0x13:
+        {
+            UInt8 type = 0;
+            br >> type;
+            player->firstPotOfGoldReturn(type);
+        }
+        break;
+
         default:
         break;
     }
