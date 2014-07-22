@@ -2536,8 +2536,27 @@ void World::AnswerCheck(void *)
 {
     if(!World::getAnswerAct())
         return;
+
     UInt32 nowTime = TimeUtil::Now();
     UInt32 time = TimeUtil::SharpDayT(0, nowTime);
+
+    if(nowTime == (time + (19*60*60) + (15*60)))
+    {
+        SYSMSG_BROADCASTV(5170);
+    }
+    else if(nowTime == (time + (19*60*60) + (20*60)))
+    {
+        SYSMSG_BROADCASTV(5171);
+    }
+    else if(nowTime == (time + (19*60*60) + (25*60)))
+    {
+        SYSMSG_BROADCASTV(5172);
+    }
+    else if(nowTime == (time + (19*60*60) + (30*60)))
+    {
+        SYSMSG_BROADCASTV(5173);
+    }
+
     if(World::getPrepareTime())
     {
         if(!_answerOpenA)
