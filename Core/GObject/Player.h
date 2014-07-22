@@ -298,6 +298,7 @@ namespace GObject
         JIUZI       = 21,   //九子神雷
         TAIYI       = 22,   //太乙神雷
         SANGBA       = 23,   //桑巴荣耀
+        PUDU        = 24,   //普渡众生
 
         DRAGONKING_MAX,
     };
