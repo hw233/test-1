@@ -114,6 +114,9 @@ function loadStore()
         store:clear()
 
         discount(store)
+    if getGGTime(300) == 2 then 
+        store:add(2,16021,30)
+    end
     if get61CardActivity(300) then --童心令
         store:add(2 ,9895,20)
     end

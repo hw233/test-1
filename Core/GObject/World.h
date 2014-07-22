@@ -569,20 +569,26 @@ public:
     {return _11time; } 
     inline static void  setGGTime(bool v)
     {   _ggtime=v; } 
-    inline static bool  getGGTime(UInt32 time =0 )
+    inline static UInt8 getGGTime(UInt32 time =0 )
     {
         UInt32 now = TimeUtil::Now() + time;
         if(cfg.serverNo >= 453)
         {
             if ((now > getOpenTime() + 14 * 86400) && (now  < getOpenTime() + 21 * 86400) )
-                return true;
+                return 1;
         }
         else
         {
             if ((now > getOpenTime() + 7 * 86400) && (now  < getOpenTime() + 14 * 86400) )
-                return true;
+                return 1;
         }
-        return false ;
+
+        UInt32 begin = GVAR.GetVar(GVAR_GG_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_GG_END);
+        if(now >= begin && now <= end)
+            return 2;
+
+        return 0;
         //return _ggtime; 
     } 
     inline static void  setQZoneRechargeTime(bool v)
@@ -1553,7 +1559,7 @@ public:
     void SendSnowAward();
     void SnowClear();
     void SendQiShiBanAward();
-    void SendGuangGunAward();
+    void SendGuangGunAward(UInt8);
     static UInt16 GetRandomSpot();
     void SendHappyFireAward();
     void SendWorldCupAward();

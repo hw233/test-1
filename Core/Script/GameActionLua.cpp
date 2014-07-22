@@ -167,6 +167,7 @@ namespace Script
 		lua_tinker::def(_L, "getTYSSTime", GObject::World::getTYSSTime);  //天元神兽
 		lua_tinker::def(_L, "get61CardActivity", GObject::World::get61CardActivity);  //61卡牌活动
 		lua_tinker::def(_L, "getCoolSummer", GObject::World::getCoolSummer);
+		lua_tinker::def(_L, "getGGTime", GObject::World::getGGTime);  //情义罗盘
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1601,6 +1602,11 @@ namespace Script
     UInt8 GameActionLua::onRoamingGuangGun(Player* pl, UInt8 pos)
     {
 		return Call<UInt8 >("onRoamingGuangGun", pl, pos);
+    }
+    
+    UInt8 GameActionLua::onNewRoamingGuangGun(Player* pl, UInt8 pos)
+    {
+		return Call<UInt8 >("onNewRoamingGuangGun", pl, pos);
     }
     
     UInt32 GameActionLua::GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed)

@@ -714,6 +714,18 @@ namespace GObject
         UInt8 taskCom;
         UInt32 counts;
         GuangGunInfo():status(0),player1(NULL),player2(NULL),pos(1),score(0),task(0),tasknum(0),taskCom(0),counts(0){}
+        void clear()
+        {
+            status = 0;
+            player1 = NULL;
+            player2 = NULL;
+            pos = 0;
+            score = 0;
+            task = 0;
+            tasknum = 0;
+            taskCom = 0;
+            counts = 0;
+        }
     };
     struct SnowInfo
     {
@@ -2250,6 +2262,7 @@ namespace GObject
 
         inline UInt8 getGGStatus(){return m_gginfo.status;}
         inline UInt32 getGGScore(){return m_gginfo.score;}
+        inline void clearGG(){ m_gginfo.clear(); }
         void AddGGTimes(Player* pl,UInt8 type,UInt8 flag = 0);
       //  std::vector<Player* > getGGPlayers(){return m_gginfo.ggplayer;}
         Player* getGGPlayer1() {return m_gginfo.player1;}
@@ -2257,7 +2270,7 @@ namespace GObject
         inline UInt8 getGuangGunPos() { return m_gginfo.pos; }
         UInt32 getGGTimeScore();
         UInt32 getGGTimeTodayScore();
-        void getCompassChance();
+        void getCompassChance(UInt8 flag);
         Player* getGGTimeCaptain(UInt64 captainId = 0);
         UInt8 CheckGGCanInvit(Player * pl);
         void UpdateGGInfo();
@@ -2266,7 +2279,7 @@ namespace GObject
         void LeaveGGTime();
         void beGGTeam(UInt64 id);
         void GGTeamPlayerLeave(UInt64 id);
-        void getGGTaskAward();
+        void getGGTaskAward(UInt8 );
         void giveGGTeamMemberInfo(Stream& st);
         void BuyGuangGunAdvance();
         void BuyCompassChance(UInt8 counts = 1);

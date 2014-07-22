@@ -941,6 +941,48 @@ void OnAutoXJFrontMapAttack( GameMsgHdr& hdr, const void * data )
     xjfrontMap.fight(player, (idspot>>8)&0xFF, idspot&0xFF, true);
 }
 
+void OnGGAddTeamScore( GameMsgHdr& hdr, const void * data )
+{
+    if (!data)
+        return;
+
+	MSG_QUERY_PLAYER(player);
+
+    UInt8 score = *(UInt8*)data;
+    if(score == 0)
+        player->SetVar(VAR_GUANGGUN_TODAY_TEAMSCORE,0);
+    else
+    {
+        UInt32 tmp = player->GetVar(VAR_GUANGGUN_TODAY_TEAMSCORE);
+        if(tmp + score >= 50)
+        {
+            UInt8 addNum = 0;
+            UInt8 addNum1 = 0;
+            if(tmp < 50 && (tmp + score) >= 50)
+                addNum++;      
+            if(tmp < 70 && (tmp + score) >= 70)
+                addNum++;      
+            if(tmp < 150 && (tmp + score) >= 150)
+                addNum++;      
+            if(tmp % 200 > (tmp + score) % 200)
+                player->AddVar(VAR_GUANGGUN_TEAMSTAR,1);
+            if(addNum)
+            {
+                UInt8 todayReciveNum = GET_BIT_8(player->GetVar(VAR_GUANGGUN_TODAY_STAR),0);
+                UInt32 tmp_num = player->GetVar(VAR_GUANGGUN_TODAY_STAR);
+                todayReciveNum += addNum;
+                tmp_num = SET_BIT_8(tmp_num,0,todayReciveNum);
+                player->SetVar(VAR_GUANGGUN_TODAY_STAR,tmp_num); 
+            }
+        }
+        
+        player->AddVar(VAR_GUANGGUN_TODAY_TEAMSCORE,score);   
+    }
+    
+    player->sendGuangGunInfo();
+    
+}
+
 void OnPlayerTimeTick( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

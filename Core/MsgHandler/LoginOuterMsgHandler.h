@@ -3477,6 +3477,13 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_ANSWER_QUESTIONS_OPTION, 0);
             }
             break;
+        case 23:
+            {
+                pl->SetVar(GObject::VAR_GUANGGUN_TODAY_TASK,0);
+                pl->SetVar(GObject::VAR_GUANGGUN_TEAMSTAR,0);
+                pl->SetVar(GObject::VAR_GUANGGUN_TENTIMES,0);
+                pl->clearGG();
+            }
         default:
             return false;
     }
@@ -4087,6 +4094,30 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         }
         GObject::GVAR.SetVar(GObject::GVAR_ANSWER_ENDTIME, valueTimeA);
         GObject::GVAR.SetVar(GObject::GVAR_ANSWER_AWARDTIME, valueTimeB);
+
+        return;
+    }
+    else if (type == 23 && begin <= end )
+    {
+        if(GObject::World::getGGTime() > 0)
+        {
+            Stream st(SPEP::ACTIVITYONOFF);
+            st << ret << Stream::eos;
+            NETWORK()->SendMsgToClient(hdr.sessionID, st);
+            return;
+        }
+
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
+        curType = 23;
+        GObject::globalPlayers.enumerate(player_enum_2, &curType);
+        DB5().PushUpdateData("DELETE FROM `guanggun`");
+        GObject::GVAR.SetVar(GObject::GVAR_GG_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_GG_END, end);
+        GLOBAL().PushMsg(hdr, NULL);
 
         return;
     }

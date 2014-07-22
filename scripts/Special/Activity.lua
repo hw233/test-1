@@ -255,6 +255,7 @@ function onDungeonWin(player, id, count, free)
     Wansheng(player, lootlvl);
     Qingren(player, 0);
     fairyPetLoot(player, 0);
+    GGLoot(player);
 
     if free == true then
         FoolBaoLoot(player,0);
@@ -1056,6 +1057,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Guoqing(player, lootlvl);
     LuckyDrawBox(player, id)
     ExJob(player, id, lootlvl)
+    GGLoot(player);
     if player:getQQVipPrivilege() == true then
         player:setQQVipPrivilege(false)
         FallActivity(player, 1)
@@ -1111,6 +1113,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     WorldCupLoot(player,lootlvl);
     SurnameLegendLoot(player,0);
     IceCreamLoot(player)
+    GGLoot(player);
     if lootlvl == 0 then
         FallActivity(player, 1)
     else
@@ -9552,6 +9555,57 @@ function onRoamingGuangGun(player, pos)
     player:setGuangGunTask( tasknum, eventItem[i][j]);
     return pos2;
 end
+function onNewRoamingGuangGun(player, pos)
+    local roamPlace = {
+        14,5,13,8,10,1,11,15,2,9,4,16,
+        3,2,7,9,10,1,17,4,6,7,     
+    }
+
+    local eventItem = {
+        [1]={3,2,2,3,2,5,3},--炼器 
+        [2]={3,2,5},--技能
+        [3]={1},--帮派
+        [4]={1,1,1,2},--灵宠
+        [5]={1,1},--锁妖塔
+        [6]={3,2},--上古龙界
+        [7]={5,2,2,3},--墨侠
+        [8]={3},--许愿树
+        [9]={2,3},--斗劍
+        [10]={3},--挂机
+        [11]={1,1,2},--人物
+        [12]={3},--九疑鼎
+        [13]={1},--修炼
+        [14]={0},--雪糕
+        [15]={0},--遮阳帽
+        [16]={0},--遮阳伞
+        [17]={0},--扇子
+    }
+
+    step = math.random(1, 6)
+    pos2 = pos + step
+    if pos2 > #roamPlace then
+        pos2 = pos2 - #roamPlace;
+    end
+
+    i = roamPlace[pos2]
+    j = math.random(1, #eventItem[i])
+    if (i == 4 or i == 7 )and player:GetLev() < 70 then
+        j = #eventItem[i]; 
+    end
+    if i == 6 and player:GetLev() < 50 then
+        j = #eventItem[i]; 
+    end
+
+    local tasknum =0 ;
+    for k=1,i-1 do
+        tasknum=tasknum+#eventItem[k];
+    end
+    tasknum=tasknum+j;
+    player:setGuangGunTask( tasknum, eventItem[i][j]);
+    return pos2;
+end
+
+
 
 -- 1:聊天 2:避开 3:遇险 4:糖果 5:奇观 6:击杀 7:补给站
 function onRoamingWansheng(player, pos)
@@ -9712,6 +9766,14 @@ function WorldCupLoot(player,lootlvl)
     };
     local package = player:GetPackage();
     package:AddItem(16017, itemNum[lootlvl], true,0,10); --欢乐礼包
+end
+
+function GGLoot(player)
+    if getGGTime() < 2 then
+        return
+    end
+    local package = player:GetPackage();
+    package:AddItem(16021, 1, true,0,10); --欢乐礼包
 end
 
 function DropActLoot(player,lootlvl)

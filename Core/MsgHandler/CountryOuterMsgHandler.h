@@ -4129,7 +4129,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         if(price>=1000 && player->getClan())
                             SYSMSG_BROADCASTV(4956,player->getClan()->getName().c_str(),player->getCountry() ,player->getPName());
                     }
-                    if(World::getGGTime())
+                    if(World::getGGTime() == 1)
                     {
                         UInt32 advanceOther = player->GetVar(VAR_GUANGGUN_ADVANCE_OTHER);
                         if(advanceOther<24)
@@ -4143,6 +4143,35 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                             player->AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
                             player->sendGuangGunInfo();
                         }
+                    }
+                    if(World::getGGTime() == 2 && lr._itemId != 16021)
+                    {
+                        UInt32 goldLeft =player->GetVar(VAR_GUANGGUN_CONSUME)%80;
+                        player->AddVar(VAR_GUANGGUN_CONSUME,price);
+                        UInt32 counts = (price+goldLeft)/80; 
+                        SYSMSGV(title, 5172);
+                        SYSMSGV(content, 5173);
+                        while(counts > 0)
+                        {
+                            MailPackage::MailItem mitem[] = {{16021, 1}};
+                            Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                            if(counts > 255)
+                            {
+                                mitem[0].count = 255;
+                                if(mail)
+                                    GObject::mailPackageManager.push(mail->id, mitem, 1, true);
+                                counts -= 255;
+                            }
+                            else
+                            {
+                                mitem[0].count = counts;
+                                if(mail)
+                                    GObject::mailPackageManager.push(mail->id, mitem, 1, true);
+                                counts = 0;
+                            }
+                        }
+                         
+
                     }
                     st << static_cast<UInt8>(0);
 
@@ -9043,6 +9072,9 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
         break;
     case 0x22:  // 光棍节活动
         {
+            UInt8 GG_status = World::getGGTime();
+            if(!GG_status)
+                return;
             brd >> op;
             switch(op)
             {
@@ -9078,8 +9110,17 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                         if(cap->CheckGGCanInvit(pl))
                             return;
                         SYSMSGV(title, 220, player->getCountry(), player->getName().c_str());
-                        SYSMSGV(content, 221, player->getCountry(), player->getName().c_str());
-                        pl->GetMailBox()->newMail(player, 0x15, title, content);
+                        if(GG_status == 1)
+                        {
+                            SYSMSGV(content, 221, player->getCountry(), player->getName().c_str());
+                            pl->GetMailBox()->newMail(player, 0x15, title, content);
+                        }
+                        else
+                        {
+                            SYSMSGV(content, 5174, player->getCountry(), player->getName().c_str());
+                            pl->GetMailBox()->newMail(player, 0x15, title, content);
+                        }
+
                     }
                     else if(form == 1)
                     {
@@ -9092,6 +9133,12 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     UInt8 pos = player->getGuangGunPos();
                     GameMsgHdr hdr1(0x381, player->getThreadId(), player, sizeof(pos));
                     GLOBAL().PushMsg(hdr1, &pos);
+                    if(GG_status == 2)
+                    {
+                        UInt8 isTimes = 0;
+                        brd >> isTimes; 
+                        player->SetVar(VAR_GUANGGUN_TENTIMES,isTimes);
+                    }
                 }
             case 0x04:
                 {
@@ -9114,6 +9161,8 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                             break;
                         case 3:
                             {
+                                if(GG_status != 1)
+                                    return;
                                 std::string name;
                                 brd >> name;
                                 GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
@@ -9131,8 +9180,13 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                             player->GuangGunCompleteTask(3);
                             break;
                         case 6:
-                            player->getCompassChance();
-                            break;
+                            {
+                                UInt8 op1 = 0;
+                                if(GG_status == 2)
+                                    brd >> op1;
+                                player->getCompassChance(op1);
+                                break;
+                            }
                         case 7:
                             UInt8 counts;
                             brd >> counts;
