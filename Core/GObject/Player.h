@@ -2241,7 +2241,7 @@ namespace GObject
         void roamingGuangGun(UInt8 pos) ;  
         void setGuangGunTask(UInt8 task,UInt8 taskmaxnum = 0);
         void GuangGunCompleteTask(UInt8 type ,UInt8 task = 0);
-        void AddGuangGunScore(UInt8 score = 10);
+        void AddGuangGunScore(UInt8 score = 10,UInt8 type = 0);
         void sendQixiInfo();
         void divorceQixi();
         void postQixiEyes(Player* pl);
