@@ -27752,15 +27752,19 @@ void Player::getGGTaskAward(UInt8 task)
                 break;
             case 33:
                 GetPackage()->AddItem(17012, 1 * times, true, false);
+                GetCollectCard()->AddSummerCard(5005);   
                 break;
             case 34:
                 GetPackage()->AddItem(17013, 1 * times, true, false);
+                GetCollectCard()->AddSummerCard(5006);   
                 break;
             case 35:
                 GetPackage()->AddItem(17014, 1 * times, true, false);
+                GetCollectCard()->AddSummerCard(5007);   
                 break;
             case 36:
                 GetPackage()->AddItem(17015, 1 * times, true, false);
+                GetCollectCard()->AddSummerCard(5008);   
                 break;
             default:
                 break;
