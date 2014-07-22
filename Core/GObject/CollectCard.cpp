@@ -438,7 +438,10 @@ namespace GObject
                     char str[32] = {0};
                     sprintf(str, "F_140506_%d",PCardChance61[CNum-1]-2);
                     m_owner->udpLog("kapaixitong", str, "", "", "", "", "act");
-                    m_owner->udpLog("kapaixitong", "F_140506_17", "", "", "", "", "act");
+                    if(level == 30)
+                        m_owner->udpLog("kapaixitong", "F_140506_17", "", "", "", "", "act");
+                    else
+                        m_owner->udpLog("kapaixitong", "F_140506_26", "", "", "", "", "act");
                 }
                 if(PCardChance61[CNum - 1] == color)
                     break;
@@ -760,11 +763,27 @@ namespace GObject
             if(tmp->collect_degree >= 30 && org_degree != 100 && tmp->collect_degree > org_degree)
             {
                 if(org_degree < 30 && tmp->collect_degree >= 30) 
-                    m_owner->udpLog("kapaixitong", "F_140506_18", "", "", "", "", "act");
+                {
+                    if(tmp->id == 30)
+                        m_owner->udpLog("kapaixitong", "F_140506_18", "", "", "", "", "act");
+                    else
+                        m_owner->udpLog("kapaixitong", "F_140506_22", "", "", "", "", "act");
+                }
                 if(org_degree < 50 && tmp->collect_degree >= 50) 
-                    m_owner->udpLog("kapaixitong", "F_140506_19", "", "", "", "", "act");
+                {
+                    if(tmp->id == 30)
+                        m_owner->udpLog("kapaixitong", "F_140506_19", "", "", "", "", "act");
+                    else
+                        m_owner->udpLog("kapaixitong", "F_140506_23", "", "", "", "", "act");
+                }
                 if(org_degree < 100 && tmp->collect_degree >= 100) 
-                    m_owner->udpLog("kapaixitong", "F_140506_20", "", "", "", "", "act");
+                {
+                    if(tmp->id == 30)
+                        m_owner->udpLog("kapaixitong", "F_140506_20", "", "", "", "", "act");
+                    else
+                        m_owner->udpLog("kapaixitong", "F_140506_24", "", "", "", "", "act");
+
+                }
             }
         }
 
@@ -1001,7 +1020,7 @@ namespace GObject
             m_owner->send(st);
         }
         if(GET_BIT(tmp->suit_mark,4) && GET_BIT(tmp->suit_mark,5) && GET_BIT(tmp->suit_mark,6) && GET_BIT(tmp->suit_mark,7))
-            m_owner->udpLog("kapaixitong", "F_140506_21", "", "", "", "", "act");
+            m_owner->udpLog("kapaixitong", "F_140506_25", "", "", "", "", "act");
         
         return;
     }

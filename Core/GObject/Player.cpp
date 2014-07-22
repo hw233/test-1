@@ -27592,6 +27592,27 @@ void Player::RunFriendlyCompass(UInt8 type)
    {
        if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, 9)) )
            return;
+       switch(idx)
+       {
+           case 11 :
+               sprintf(str, "F_140717_4");
+               udpLog("sanrenyou", str, "", "", "", "", "act");
+               break;
+           case 7 :
+               sprintf(str, "F_140717_5");
+               udpLog("sanrenyou", str, "", "", "", "", "act");
+               break;
+           case 9 :
+               sprintf(str, "F_140717_6");
+               udpLog("sanrenyou", str, "", "", "", "", "act");
+               break;
+           case 4:
+               sprintf(str, "F_140717_7");
+               udpLog("sanrenyou", str, "", "", "", "", "act");
+               break;
+           default:
+               break;
+       }
    }
    m_gginfo.counts--;
    Stream st(REP::ACTIVE);
@@ -27900,6 +27921,8 @@ void Player::getCompassChance(UInt8 flag)      //获取财富之星
             tmp_num = SET_BIT_8(tmp_num,1,todayRecivedNum);
             SetVar(VAR_GUANGGUN_TODAY_STAR,tmp_num); 
             UpdateGGInfo();
+            sprintf(str, "F_140717_1");
+            udpLog("sanrenyou", str, "", "", "", "", "act");
         }
         else//团队财富之星
         {
@@ -27909,6 +27932,8 @@ void Player::getCompassChance(UInt8 flag)      //获取财富之星
             m_gginfo.counts += 1;
             SetVar(VAR_GUANGGUN_TEAMSTAR,tmp); 
             UpdateGGInfo();
+            sprintf(str, "F_140717_2");
+            udpLog("sanrenyou", str, "", "", "", "", "act");
         }
 
     }
@@ -27939,8 +27964,8 @@ void Player::BuyCompassChance(UInt8 counts)
         m_gginfo.counts+=counts ; 
         UpdateGGInfo();
         char str[16] = {0};
-        sprintf(str, "F_131109_4");
-        udpLog("qingyiluopan", str, "", "", "", "", "act");
+        sprintf(str, "F_140717_3");
+        udpLog("sanrenyou", str, "", "", "", "", "act");
     }
 }
 void Player::SetNovLogin()
