@@ -166,6 +166,7 @@ namespace Script
 		lua_tinker::def(_L, "get11TimeNum", GObject::World::get11TimeAirNum);  //天书奇缘计算天书
 		lua_tinker::def(_L, "getTYSSTime", GObject::World::getTYSSTime);  //天元神兽
 		lua_tinker::def(_L, "get61CardActivity", GObject::World::get61CardActivity);  //61卡牌活动
+		lua_tinker::def(_L, "getSummerCardActivity", GObject::World::getSummerCardActivity);  //清凉卡牌活动
 		lua_tinker::def(_L, "getCoolSummer", GObject::World::getCoolSummer);
 		lua_tinker::def(_L, "getGGTime", GObject::World::getGGTime);  //情义罗盘
 
@@ -1958,5 +1959,23 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt32>("getXXLCost", player, opt);
 	}
+    lua_tinker::table GameActionLua::getWeiXinShop(UInt8 index)
+    {
+        return Call<lua_tinker::table>("getWeiXinShop", index);
+    }
+    UInt32 GameActionLua::getWeiXinShopItemNum()
+    {
+        return Call<UInt32>("getWeiXinShopItemNum");
+    }
+    bool GameActionLua::getShuShanWeiWei_XDPB_Award(Player * player, UInt8 opt)
+    {
+		assert(player != NULL);
+        return Call<bool>("getShuShanWeiWei_XDPB_Award", player, opt);
+    }
+    Table GameActionLua::getShuShanWeiWei_MSYJ_Award(Player * player)
+    {
+		assert(player != NULL);
+        return Call<Table>("getShuShanWeiWei_MSYJ_Award", player);
+    }
 }
 

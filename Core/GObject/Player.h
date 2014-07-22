@@ -3580,6 +3580,10 @@ namespace GObject
         void randomForClanShop(UInt8);
         bool clanShopLvlShift(UInt8);
 
+        void shuShanWeiWei_XDPB(Player *, UInt8);
+        void shuShanWeiWei_MSYJ(Player *, UInt8);
+        void shuShanWeiWei_WXSC(UInt8, UInt8, UInt32);
+
     private:
         //玩家位置（包括层数、当层位置）
         UInt8 _playerPos;

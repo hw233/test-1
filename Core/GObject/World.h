@@ -565,8 +565,17 @@ public:
     {   _summerMeet=v; } 
     inline static void  set11Time(bool v)
     {   _11time=v; } 
-    inline static bool  get11Time()
-    {return _11time; } 
+    inline static bool  get11Time(UInt32 time = 0)
+    //{return _11time; } 
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_11TIME_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_11TIME_END);
+        UInt32 now = TimeUtil::Now()+time;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    } 
     inline static void  setGGTime(bool v)
     {   _ggtime=v; } 
     inline static UInt8 getGGTime(UInt32 time =0 )
@@ -683,10 +692,13 @@ public:
    
     inline static UInt32 get11TimeAirNum(UInt32 time = 0)
     {
-        UInt32 _11timeBegin = TimeUtil::MkTime(2014, 6, 21);
-        UInt32 _11timeEnd = TimeUtil::MkTime(2014, 6, 26);
+        //UInt32 _11timeBegin = TimeUtil::MkTime(2014, 6, 21);
+        //UInt32 _11timeEnd = TimeUtil::MkTime(2014, 6, 26);
 //        UInt32 _11timeBegin = TimeUtil::MkTime(2013, 9, 28);
 //      UInt32 _11timeEnd = TimeUtil::MkTime(2013, 10, 12);
+
+        UInt32 _11timeBegin = GVAR.GetVar(GVAR_11TIME_BEGIN);
+        UInt32 _11timeEnd = GVAR.GetVar(GVAR_11TIME_END);
         UInt32 now = TimeUtil::Now() ;
         if(time !=0)
             now = time;
@@ -1190,6 +1202,16 @@ public:
     {
         UInt32 now = TimeUtil::Now() + time;
         UInt32 time20140601 = TimeUtil::MkTime(2014, 6, 1);
+        
+        if(now < time20140601 || now > time20140601 + 5 * 86400)
+            return false;
+        return true;
+    }
+
+    inline static bool getSummerCardActivity(UInt32 time = 0)
+    {
+        UInt32 now = TimeUtil::Now() + time;
+        UInt32 time20140601 = TimeUtil::MkTime(2014, 7, 21);
         
         if(now < time20140601 || now > time20140601 + 5 * 86400)
             return false;

@@ -1996,3 +1996,59 @@ function getXXLCost(player , opt)
     end
     return HappyXXLBuyCost[opt]
 end
+
+function getShuShanWeiWei_XDPB_Award(player, opt)
+    local XDPB_Award = {
+        [1] = {{500, 5}, {503, 5}, {134, 3}},
+        [2] = {{1325, 5}, {9457, 5}, {9424, 5}, {499, 100}},
+        [3] = {{16001, 5}, {9338, 5}, {1126, 5}, {9498, 5}, {499, 200}},
+        [4] = {{9600, 3}, {501, 3}, {15, 5}},
+        [5] = {{9457, 5}, {513, 5}, {9418, 5}, {499, 100}},
+        [6] = {{517, 8}, {16001, 8}, {9603, 8}, {551, 8}, {499, 200}},
+    }
+    local award = XDPB_Award[opt]
+    if award == nil then
+        return false
+    end
+
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < #award then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+
+    for i = 1, #award do
+        if award[i][1] == 499 then
+            player:getCoupon(award[i][2])
+        else
+            package:Add(award[i][1], award[i][2], true, 0, 79)
+        end
+    end
+    return true
+end
+
+function getShuShanWeiWei_MSYJ_Award(player)
+    local MSYJ_Award = {
+        [1] = {56, 2},
+        [2] = {511, 2},
+        [3] = {48, 1},
+        [4] = {9600, 1},
+        [5] = {503, 1},
+        [6] = {516, 1},
+        [7] = {514, 2},
+        [8] = {9388, 1},
+    }
+
+    local MSYJ_pro = {1700, 3400, 5100, 6300, 7500, 8700, 9800, 10000}
+    local p = math.random(1, 10000)
+    local i = 0
+    for n = 1, #MSYJ_pro do
+        if p <= MSYJ_pro[n] then
+            i = n
+            break
+        end
+    end
+    local package = player:GetPackage();
+    package:Add(MSYJ_Award[i][1], MSYJ_Award[i][2], true, true, 79)
+    return MSYJ_Award[i]
+end

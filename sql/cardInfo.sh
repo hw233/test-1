@@ -23,9 +23,9 @@ function cardInfo()
             print "INSERT INTO `cardInfo` VALUES";
         } {
             printf("(%d,%d,%d,%d,%d,\x27%s\x27)",$1,$3,$4,$5,$7,$2);
-            if (NR < ENVIRON["lines"])
+            if (NR <= ENVIRON["lines"])
                 printf(",");
-            else if (NR >= ENVIRON["lines"])
+            else if (NR > ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }

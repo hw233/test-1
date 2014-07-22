@@ -325,8 +325,11 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140623.sql     #帮派加入优化
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #捉迷藏清空
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearcarditem.sql     #清除称号卡物品
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguanyu_1.sql   #修改player_jiguanyu表主索引
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearcarditem.sql     #清除称号卡物品
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_jiguanyu_1.sql   #修改player_jiguanyu表主索引
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_tyss_buff6b.sql     #天元神兽阳光普照buff
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
 }
 
 #sh player_jiguan.sh

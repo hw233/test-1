@@ -4149,8 +4149,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         UInt32 goldLeft =player->GetVar(VAR_GUANGGUN_CONSUME)%80;
                         player->AddVar(VAR_GUANGGUN_CONSUME,price);
                         UInt32 counts = (price+goldLeft)/80; 
-                        SYSMSGV(title, 5172);
-                        SYSMSGV(content, 5173);
+                        SYSMSGV(title, 5182);
+                        SYSMSGV(content, 5183);
                         while(counts > 0)
                         {
                             MailPackage::MailItem mitem[] = {{16021, 1}};
@@ -5564,6 +5564,36 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
                 brd >> opt;
                 brd >> key;
                 player->getWeiboAward(opt, key);
+            }
+            break;
+        case 20:
+            {
+                UInt8 opt = 0;
+                brd >> opt;
+                player->shuShanWeiWei_XDPB(player, opt);
+            }
+            break;
+        case 21:
+            {
+                UInt8 opt = 0;
+                brd >> opt;
+                player->shuShanWeiWei_MSYJ(player, opt);
+            }
+            break;
+        case 22:
+            {
+                UInt8 opt = 0;
+                UInt8 pos = 0;
+                UInt32 count = 0;
+                brd >> opt;
+                if(1 == opt)
+                    brd >> pos;
+                if(2 == opt)
+                {
+                    brd >> pos;
+                    brd >> count;
+                }
+                player->shuShanWeiWei_WXSC(opt, pos, count);
             }
             break;
     }
@@ -9117,7 +9147,7 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                         }
                         else
                         {
-                            SYSMSGV(content, 5174, player->getCountry(), player->getName().c_str());
+                            SYSMSGV(content, 5184, player->getCountry(), player->getName().c_str());
                             pl->GetMailBox()->newMail(player, 0x15, title, content);
                         }
 

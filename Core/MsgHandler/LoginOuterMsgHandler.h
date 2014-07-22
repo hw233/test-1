@@ -1110,12 +1110,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                9427, 3,
-                549,  2,
+                9388, 1,
+                9414,  5,
                 9141, 2,
                 15, 2,
-                500, 5,
-                503, 4,
+                501, 4,
+                9498, 4,
             };
 
             UInt8 idx = 0;
@@ -1145,7 +1145,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if(id == 9427 || id == 549 || id == 9141)
+                    if(id == 9388 || id == 9414 || id == 9141)
                     {
                         if(player->GetVar(GObject::VAR_DIRECTPURCNT) >= 3)
                             purchase.code = 2;
@@ -3477,6 +3477,13 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_ANSWER_QUESTIONS_OPTION, 0);
             }
             break;
+        
+        case 22:
+            {
+                pl->SetVar(GObject::VAR_11AIRBOOK_GRADE, 0);
+                pl->SetVar(GObject::VAR_11AIRBOOK_AWARDSCORE, 0);
+            }
+            break;
         case 23:
             {
                 pl->SetVar(GObject::VAR_GUANGGUN_TODAY_TASK,0);
@@ -3484,6 +3491,7 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
                 pl->SetVar(GObject::VAR_GUANGGUN_TENTIMES,0);
                 pl->clearGG();
             }
+            break;
         default:
             return false;
     }
@@ -3921,7 +3929,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 13 && begin <= end )
     {
-        curType = 13;
+        curType = 11;
         if(GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_BEGIN) > TimeUtil::Now()
            || GObject::GVAR.GetVar(GObject::GVAR_OLDMAN_END) < TimeUtil::Now())
         {
@@ -4097,6 +4105,29 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         return;
     }
+    else if (type == 22 && begin <= end )
+    {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+        
+        curType = 22;
+        if(GObject::GVAR.GetVar(GObject::GVAR_11TIME_BEGIN) > TimeUtil::Now()
+           || GObject::GVAR.GetVar(GObject::GVAR_11TIME_END) < TimeUtil::Now())
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
+        }
+        GObject::GVAR.SetVar(GObject::GVAR_11TIME_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_11TIME_END, end);
+
+        DB5().PushUpdateData("DELETE FROM `AirBookData`");
+
+        GObject::World::PlayerGradeSort.clear();
+        GObject::World::clanGradeSort.clear();
+        return;
+    }
+
     else if (type == 23 && begin <= end )
     {
         if(GObject::World::getGGTime() > 0)
@@ -4105,13 +4136,12 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
             st << ret << Stream::eos;
             NETWORK()->SendMsgToClient(hdr.sessionID, st);
             return;
-        }
-
+        }        
         ret = 1;
         Stream st(SPEP::ACTIVITYONOFF);
         st << ret << Stream::eos;
         NETWORK()->SendMsgToClient(hdr.sessionID, st);
-
+        
         curType = 23;
         GObject::globalPlayers.enumerate(player_enum_2, &curType);
         DB5().PushUpdateData("DELETE FROM `guanggun`");
