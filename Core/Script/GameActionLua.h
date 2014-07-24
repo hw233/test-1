@@ -365,6 +365,7 @@ namespace Script
         lua_tinker::table GetdayExtraAward(UInt32 month, UInt32 day);
         UInt8 onRoamingQueqiao(Player* pl, UInt8 pos);
         UInt8 onRoamingGuangGun(Player* pl, UInt8 pos);
+        UInt8 onNewRoamingGuangGun(Player* pl, UInt8 pos);
         UInt32 GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed);
         void doStrong(Player* pl, UInt8 id, UInt32 param1, UInt32 param2);
         UInt8 GetSthCheckFlag(UInt8 idx);
@@ -419,6 +420,10 @@ namespace Script
         bool RunActCardAward(Player* player,UInt8 idx);
         UInt32 getWorldCupLimitTime(Player* player,UInt8 opt);
         UInt32 getXXLCost(Player* player,UInt32 opt);
+        lua_tinker::table getWeiXinShop(UInt8 index);
+        UInt32 getWeiXinShopItemNum();
+        bool getShuShanWeiWei_XDPB_Award(Player * player, UInt8 opt);
+        Table getShuShanWeiWei_MSYJ_Award(Player * player);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

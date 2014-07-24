@@ -655,6 +655,30 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
+         
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -702,6 +726,9 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 21)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 28)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 5)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
         ))
     {
 #if 0
@@ -1487,15 +1514,17 @@ void World::World_Midnight_Check( World * world )
     //跨年大转盘
     bHappyFireEnd = bhappyfirend && !getHappyFireTime(300);
     bGuankaEnd = bGuanka && !getGuankaAct(300);
-    b11TimeEnd = b11time && !get11Time();
+    b11TimeEnd = b11time && !get11Time(300);
     bWCTimeEnd = bWCtime && !getWorldCupTime(300);
     bWCTimeEnd2 = bWCtime2 && !getWorldCupTime2(300);
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
     bGGTimeEnd = bGGtime && !getGGTime(300);
+    UInt8 GG_status = getGGTime();
     //天元神兽活动结束
     //酷爽一夏活动结束
     bCoolSummerTimeEnd = bCoolSummerTime && !getCoolSummer(300);
+    UInt8 TYSSType = getTYSSTime();
     UInt8 actType = getTYSSTime(300);
     bTYSSEnd = bTYSSTime && !actType;
 
@@ -1728,6 +1757,30 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
+         
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1801,7 +1854,7 @@ void World::World_Midnight_Check( World * world )
     if(b11TimeEnd)
         world->Send11AirBookAward();
     if(bGGTimeEnd)
-        world->SendGuangGunAward();
+        world->SendGuangGunAward(GG_status);
     if (bSnowEnd)
         world->SendSnowAward();
     if (bGoldSnakeEnd)
@@ -1818,9 +1871,9 @@ void World::World_Midnight_Check( World * world )
         world->SendGuankaActAward();
     if(bTYSSEnd)
     {
-        UInt8 actType = getTYSSTime();
-        world->GObject::World::SendTYSSPlayerAward(actType);
-        world->GObject::World::SendTYSSClanAward(actType);
+        //UInt8 actType = getTYSSTime();
+        world->GObject::World::SendTYSSPlayerAward(TYSSType);
+        world->GObject::World::SendTYSSClanAward(TYSSType);
     }
     if(bWCTimeEnd)
         world->SendWorldCupAward();
@@ -2519,8 +2572,27 @@ void World::AnswerCheck(void *)
 {
     if(!World::getAnswerAct())
         return;
+
     UInt32 nowTime = TimeUtil::Now();
     UInt32 time = TimeUtil::SharpDayT(0, nowTime);
+
+    if(nowTime == (time + (19*60*60) + (15*60)))
+    {
+        SYSMSG_BROADCASTV(5170);
+    }
+    else if(nowTime == (time + (19*60*60) + (20*60)))
+    {
+        SYSMSG_BROADCASTV(5171);
+    }
+    else if(nowTime == (time + (19*60*60) + (25*60)))
+    {
+        SYSMSG_BROADCASTV(5172);
+    }
+    else if(nowTime == (time + (19*60*60) + (30*60)))
+    {
+        SYSMSG_BROADCASTV(5173);
+    }
+
     if(World::getPrepareTime())
     {
         if(!_answerOpenA)
@@ -4379,11 +4451,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9498,40},{1325,30},{9457,60},{16001,60},{9076,40}},
-        {{9498,40},{1325,25},{9457,60},{16001,50},{9076,30}},
-        {{9498,40},{1325,20},{9457,60},{16001,40},{9076,20}},
+        {{9498,40},{9600,30},{9457,40},{9068,30},{0,0}},
+        {{9498,35},{9600,25},{9457,35},{9068,20},{0,0}},
+        {{9498,30},{9600,20},{9457,30},{9068,15},{0,0}},
     };
-    static MailPackage::MailItem card = {9980,1};
+    static MailPackage::MailItem card = {9987,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -4397,7 +4469,7 @@ void World::Send11PlayerRankAward()
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)
         {
-            mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
+            mailPackageManager.push(mail->id, s_item[pos-1], 4, true);
             if(pos ==1)
                 mailPackageManager.push(mail->id, &card, 1, false);
         }
@@ -4652,7 +4724,7 @@ void World::Send11CountryRankAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] ={
-         {{9600,5},{134,3},{507,3},{9498,3},{16001,3}},
+         {{9600,5},{134,3},{509,3},{9498,3},{16001,3}},
     };
     ClanGradeSort::iterator i = World::clanGradeSort.begin();
     UInt32 EM=0,KL=0;
@@ -4987,7 +5059,7 @@ UInt16 World::GetRandomSpot()
     return 0;
 }
 
-void World::SendGuangGunAward()    //待定
+void World::SendGuangGunAward(UInt8 GG_status)    //待定
 {
     World::initRCRank();
     int pos = 0;
@@ -4996,14 +5068,26 @@ void World::SendGuangGunAward()    //待定
         {{515,25},{503,30},{134,20},{1325,20}},
         {{515,20},{503,25},{134,15},{1325,15}},
     };
+    static MailPackage::MailItem s_item1[][5] = {
+        {{515,30},{503,40},{9498,30},{9457,30},{9988,1}},
+        {{515,25},{503,30},{9498,25},{9457,25}},
+        {{515,20},{503,25},{9498,20},{9457,20}},
+    };
 	const UInt32 itemOrangeWeapon[3][5] = {
         {2544, 2568, 2592, 2616, 2640},//儒
         {2552, 2576, 2600, 2624, 2648},//释
         {2560, 2584, 2608, 2632, 2656}
     };
+    UInt32 content_id = 4965;
+    UInt32 title_id = 4981;
+    if(GG_status == 2)
+    {
+        content_id = 5185;
+        title_id = 5186;
+    }
     UInt8 type = 0;
     UInt8 lvl = 0;
-    SYSMSG(title, 4981);
+    SYSMSG(title, title_id);
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
         Player* play = i->player;
@@ -5013,7 +5097,7 @@ void World::SendGuangGunAward()    //待定
 	    Package * package = player->GetPackage();
         ++pos;
         if(pos > 3) break;
-        SYSMSGV(content, 4965, pos);
+        SYSMSGV(content, content_id, pos);
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)
@@ -5033,13 +5117,19 @@ void World::SendGuangGunAward()    //待定
                         else
                             lvl = 4;
 
-            mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
-            if(pos ==1)
-                package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
-            else if(pos == 2)
-                package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
-                else if(pos == 3)
-                    package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
+            if(GG_status == 1)
+                mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
+            else
+                mailPackageManager.push(mail->id, s_item1[pos-1], 5, true);
+            if(GG_status == 1)
+            {
+                if(pos ==1)
+                    package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+                else if(pos == 2)
+                    package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                    else if(pos == 3)
+                        package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
+            }
         }
 
         Player* player1 = player->getGGPlayer1();
@@ -5061,18 +5151,24 @@ void World::SendGuangGunAward()    //待定
                             lvl = 4;
 
             Package * package1 = player1->GetPackage();
-            SYSMSGV(content, 4965, pos);
+            SYSMSGV(content, content_id, pos);
             Mail * mail1 = player1->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
             if(mail1)
             {
-                mailPackageManager.push(mail1->id, s_item[pos-1], 5, true);
-                if(pos ==1)
-                    package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
-                else if(pos == 2)
-                    package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
-                    else if(pos == 3)
-                        package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
+                if(GG_status == 1)
+                {
+                    mailPackageManager.push(mail1->id, s_item[pos-1], 5, true);
+                    if(pos ==1)
+                        package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+                    else if(pos == 2)
+                        package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                        else if(pos == 3)
+                            package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);              
+                }
+                else
+                    mailPackageManager.push(mail1->id, s_item1[pos-1], 5, true);
+                  
             }
         }
         Player* player2 = player->getGGPlayer2();
@@ -5094,18 +5190,23 @@ void World::SendGuangGunAward()    //待定
                             lvl = 4;
 
             Package * package2 = player2->GetPackage();
-            SYSMSGV(content, 4965, pos);
+            SYSMSGV(content, content_id, pos);
             Mail * mail2 = player2->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
             if(mail2)
             {
-                mailPackageManager.push(mail2->id, s_item[pos-1], 5, true);
-                if(pos ==1)
-                    package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
-                else if(pos == 2)
-                    package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
-                    else if(pos == 3)
-                        package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
+                if(GG_status == 1)
+                {
+                    mailPackageManager.push(mail2->id, s_item[pos-1], 5, true);
+                    if(pos ==1)
+                        package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+                    else if(pos == 2)
+                        package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                        else if(pos == 3)
+                            package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
+                }
+                else
+                    mailPackageManager.push(mail2->id, s_item1[pos-1], 5, true);
             }
         }
     }
@@ -5207,6 +5308,21 @@ void World::SendTYSSClanAward(UInt8 actType)
         
     ClanGradeSort::iterator i = World::tyss_ClanSort.begin();
     ClanGradeSort::iterator e = World::tyss_ClanSort.end();
+
+    UInt32 one_steps = 2000;
+    UInt32 two_steps = 14000;
+    UInt32 three_steps = 23000;
+    UInt32 third_steps = 46000;
+    UInt32 fifth_steps = 70000;
+    if(actType == 2) 
+    {
+        one_steps = 2000;
+        two_steps = 14000;
+        three_steps = 23000;
+        third_steps = 46000;
+        fifth_steps = 65000;
+    }
+
     for (UInt32 pos = 0; i != e; ++i)
     {
         if(i->clan == NULL)
@@ -5214,19 +5330,19 @@ void World::SendTYSSClanAward(UInt8 actType)
         ++pos;
         if(pos == 1 || pos == 2 || pos == 3)
             i->clan->sendMemberBuf(pos,actType);
-        if(i->total >= 2000)
+        if(i->total >= one_steps)
         {
             i->clan->SendClanMemberAward(i->total,1,"幼年期神兽",actType); 
-            if(i->total >= 14000)
+            if(i->total >= two_steps)
             {
                 i->clan->SendClanMemberAward(i->total,2,"成长期神兽",actType); 
-                if(i->total >= 23000)
+                if(i->total >= three_steps)
                 {
                     i->clan->SendClanMemberAward(i->total,3,"青年期神兽",actType); 
-                    if(i->total >= 46000)
+                    if(i->total >= third_steps)
                     {
                         i->clan->SendClanMemberAward(i->total,4,"亚神兽期",actType); 
-                        if(i->total >= 70000)
+                        if(i->total >= fifth_steps)
                             i->clan->SendClanMemberAward(i->total,5,"天元神兽",actType); 
                     }
                 }
@@ -5249,10 +5365,10 @@ void World::SendTYSSPlayerAward(UInt8 actType)
         {{134,15},{1325,15},{515,10},{9075,8}},
     };
     static MailPackage::MailItem s_item1[][4] = {
-        {{16001,30},{9498,30},{515,25},{9075,25}},
-        {{16001,25},{9498,25},{515,20},{9075,20}},
-        {{16001,20},{9498,20},{515,15},{9075,15}},
-        {{16001,15},{9498,15},{515,10},{9075,10}},
+        {{16001,30},{9498,30},{134,25},{9076,25}},
+        {{16001,25},{9498,25},{134,20},{9076,20}},
+        {{16001,20},{9498,20},{134,15},{9076,15}},
+        {{16001,15},{9498,15},{134,10},{9076,10}},
     };
     SYSMSG(title, 946);
     for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
@@ -5436,7 +5552,7 @@ void World::SendCoolSummerAward()
     };
 
     SYSMSG(title, 5163);
-    UInt8 pos = 1;
+    UInt32 pos = 1;
     for (RCSortType::iterator i = World::coolSummerSort.begin(), e = World::coolSummerSort.end(); i != e; ++i)
     {
         UInt32 activePoint = i->player->GetVar(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL);
@@ -5450,6 +5566,8 @@ void World::SendCoolSummerAward()
                 mailPackageManager.push(mail->id, s_item[type-1], 5, true);
         }
         pos++;
+        if (pos > 7)
+            break;
     }
     return;
 }

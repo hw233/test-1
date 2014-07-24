@@ -37,6 +37,7 @@
 #include "KangJiTianMo.h"
 #include "ClanBuilding.h"
 #include "ClanBigBoss.h"
+#include "GData/NpcGroup.h"
 
 namespace GObject
 {
@@ -276,6 +277,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	_clanDynamicMsg = new ClanDynamicMsg();
 	_clanBattle = new ClanCityBattle(this);
 	_clanBigBoss = new ClanBigBoss(this);
+    _clanBigBoss->setNpcBoss();
 
     m_BattleScore = 0;
     m_DailyBattleScore = 0;
@@ -5657,11 +5659,11 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str,UInt8 a
         {{9076,3},{509,3},{549,1},{515,3},{9418,3}},
     };
     static MailPackage::MailItem s_item1[][5] = {
-        {{503,3},{514,3},{9371,5},{15,5},{0,0}},
-        {{512,3},{517,3},{500,3},{516,3},{0,0}},
-        {{501,3},{547,3},{9498,3},{1325,2},{0,0}},
-        {{134,3},{16001,3},{9457,3},{513,3},{0,0}},
-        {{5026,1},{5005,1},{5055,1},{5035,1},{0,0}},
+        {{500,3},{503,3},{501,2},{15,3},{0,0}},
+        {{9457,3},{516,2},{517,3},{9371,3},{0,0}},
+        {{9600,3},{9338,3},{8000,3},{513,3},{0,0}},
+        {{9498,3},{1325,3},{551,3},{5005,1},{0,0}},
+        {{5006,1},{5025,1},{5055,1},{5095,1},{0,0}},
     };
     MailPackage::MailItem *items;
     if(actType == 1)
@@ -5790,7 +5792,7 @@ void Clan::sendMemberBuf(UInt8 pos,UInt8 actType)
         if(actType == 1)
             addClanTitle(1, 0);
         else
-            addClanTitle(3, 0);
+            addClanTitle(4, 0);
     }
 	Mutex::ScopedLock lk(_mutex);
     UInt32 endTime = TimeUtil::Now() + 86400 * 14;

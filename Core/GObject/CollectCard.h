@@ -159,6 +159,8 @@ namespace GObject
         void GMAddExp(UInt32 exp);
     
         void Add61Card(UInt16 cid);
+        
+        void AddSummerCard(UInt16 cid);
 
     private:
         std::vector<CardInfo*> VecEquipSlot;//装备卡牌槽

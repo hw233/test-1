@@ -41,6 +41,7 @@ namespace GObject
 {
 
 GlobalFighters globalFighters;
+Fighter* fighter_5509 = NULL;
 
 static float enc_factor[] = {0, 0.05f, 0.10f, 0.16f, 0.23f, 0.31f, 0.40f, 0.51f, 0.64f, 0.80f, 1.00f, 1.25f, 1.51f};
 #define SOUL_EXP_ITEM 8000
@@ -92,6 +93,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     m_2ndSoul = NULL;
     _iswboss = false;
     _iswbossinspire = false;
+    _iscbbbuf = false;
     _wbextatk = 0;
     _wbextmagatk = 0;
     _soulMax = 0;
@@ -103,6 +105,8 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _soulSkillProtect = 0;
     _wbplextatk = 0;
     _wbplextmagatk = 0;
+    _cbbplextatk = 0;
+    _cbbplextmagatk = 0;
 }
 
 Fighter::~Fighter()
@@ -2104,6 +2108,12 @@ void Fighter::rebuildEquipAttr()
     {
         _attrExtraEquip.attack += _wbplextatk;
         _attrExtraEquip.magatk += _wbplextmagatk;
+    }
+    
+    if(isClanBigBossBuf())
+    {
+        _attrExtraEquip.attack += _cbbplextatk;
+        _attrExtraEquip.magatk += _cbbplextmagatk;
     }
 
     if(_owner/* && _owner->getClan()*/)

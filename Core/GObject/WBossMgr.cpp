@@ -180,14 +180,14 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         return false;
 
     SetDirty(pl,true);
-    Battle::BattleSimulator bsim(Battle::BS_WBOSS, pl, _ng->getName(), _ng->getLevel(), false);
+    Battle::BattleSimulator bsim(Battle::BS_WBOSS, pl, _ng->getName(), _ng->getLevel(), true);
     pl->PutFighters(bsim, 0);
-    _ng->putFighters(bsim);
+    //_ng->putFighters(bsim);
 
     std::vector<GData::NpcFData>& nflist = _ng->getList();
     size_t sz = nflist.size();
 
-    if (final)
+    //if (final)
     {
         for(size_t i = 0; i < sz; ++ i)
         {
@@ -267,6 +267,8 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 }
                 bool ret = m_atkinfo.insert(info).second;
                 TRACE_LOG("WBOSS INSERT ret: %u (pid: %" I64_FMT "u, dmg: %u)", ret, pl->getId(), damage);
+                if(damage > 20000000)
+                    TRACE_LOG("WBOSS reportid: %u (pid: %" I64_FMT "u, dmg: %u)", bsim.getId(), pl->getId(), damage);
 
                 UInt8 newPercent = ((float)newHP / nflist[0].fighter->getMaxHP()) * 100;
 

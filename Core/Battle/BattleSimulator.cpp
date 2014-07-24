@@ -165,6 +165,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
         skillEffectExtraTable[GData::e_eft_mo_knot] = &BattleSimulator::doSkillEffectExtra_Mo_Knot;
         skillEffectExtraTable[GData::e_eft_prudent] = &BattleSimulator::doSkillEffectExtra_Prudent;
         skillEffectExtraTable[GData::e_eft_chaos_world] = &BattleSimulator::doSkillEffectExtra_ChaosWorld;
+        skillEffectExtraTable[GData::e_eft_dispeerless] = &BattleSimulator::doSkillEffectExtra_Dispeerless;
     }
 }
 
@@ -294,6 +295,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
         skillEffectExtraTable[GData::e_eft_mo_knot] = &BattleSimulator::doSkillEffectExtra_Mo_Knot;
         skillEffectExtraTable[GData::e_eft_prudent] = &BattleSimulator::doSkillEffectExtra_Prudent;
         skillEffectExtraTable[GData::e_eft_chaos_world] = &BattleSimulator::doSkillEffectExtra_ChaosWorld;
+        skillEffectExtraTable[GData::e_eft_dispeerless] = &BattleSimulator::doSkillEffectExtra_Dispeerless;
     }
 }
 
@@ -14490,6 +14492,64 @@ void BattleSimulator::doSkillEffectExtra_OtherSidePeerlessDisable(BattleFighter*
         }
         return;
     }
+}
+
+void BattleSimulator::doSkillEffectExtra_Dispeerless(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)
+{
+    if(!skill || !skill->effect)
+        return;
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+
+    size_t cnt = eft.size();
+    if(cnt != efl.size() || efv.size() != cnt)
+        return;
+
+    target_side = 1 - bf->getSide();
+    for(size_t count = 0; count < cnt; ++count)
+    {
+        AtkList atklist;
+        getAtkList(bf, skill, atklist);
+        UInt8 cnt = atklist.size();
+        for(size_t j = 0; j < cnt; ++ j)
+        {
+            BattleFighter* bo = atklist[j].bf;
+            if(bo == NULL || bo->getHP() == 0)
+                continue;
+            if(bo->getPeerLessDisableLast() == 0 && static_cast<float>(uRand(10000)) < skill->effect->efv[0] * 100)
+            {
+                if(static_cast<float>(uRand(10000) < bf->getMagRes(bo) * 100))
+                    appendDefStatus(e_Res, 0, bo);
+                else
+                {
+                    bo->setPeerLessDisableLast(efl[count]);
+                    appendDefStatus(e_benevolent, 0, bo);
+                }
+            }
+        }
+        break;
+    }
+
+    target_side = bf->getSide();
+    GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
+    const GData::SkillStrengthenEffect* ef = NULL;
+    if(ss)
+        ef = ss->getEffect(GData::ON_SKILLUSED, GData::TYPE_ADDSTATE);
+    if(ef)
+    {
+        for(UInt8 i = 0; i < 25; i++)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, i));
+            if(bo == NULL || bo->getHP() == 0)
+                continue;
+
+            bo->setBuddhaLight(ef->prob, ef->last);
+            bo->setBuddhaLightLauncher(bf);
+        }
+        appendDefStatus(e_buddhaLight, 0, bf);
+    }
+
 }
 
 void BattleSimulator::doSkillEffectExtra_CheckMaxTrigger(BattleFighter* bf, int target_side, int target_pos, const GData::SkillBase* skill, size_t eftIdx)

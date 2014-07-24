@@ -172,10 +172,14 @@ enum PurchaseType
     WBInspire                   = 1033, //世界BOSS鼓舞
     BuyClanShopItems            = 1034, //购买帮贡商店物品
     FlushClanShopItems          = 1035, //刷新帮贡商店物品
-    MOFUMIZHEN1                 = 1036, //墨符迷阵
-    MOFUMIZHEN2                 = 1037, //墨符迷阵
+    MOFUMIZHEN1                 = 1036, //墨符迷阵一键消除
+    MOFUMIZHEN2                 = 1037, //墨符迷阵购买次数
     MakeGear                    = 1038, //打造机关库
+<<<<<<< HEAD
     KETTLE                    = 1039, //打造机关库
+=======
+    WeiWeiShop                  = 1039, //购买微信商店物品
+>>>>>>> 7409be5da12f4b7bec58743c2f4067a9a5197a68
     //繁体私有占150～200
 };
 
@@ -338,6 +342,7 @@ enum ItemFrom
     FromAutoTeamCopy = 76 , //自动组队副本
     FromClanShop = 77 , //帮贡商店
     FromCoolSummer = 78 , //酷爽一夏
+    FromShuShanWeiWei = 79 , //蜀山微微
     //80 ~ 100，繁体占用
 };
 

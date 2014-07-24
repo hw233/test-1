@@ -1,6 +1,7 @@
 --代码描述:此脚本仅处理天书奇缘的积分bug导致的情况 (被加载的地方似乎不合适，会被加载三次，影响效率)
 print("XXX")
 --os.execute("zcat log/DB/TRACE20140621.gz |grep var|grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[00:[0,1,2,3,4][0-9]:\" > test1.txt")  --需要修改cat语句已限制时间段
+<<<<<<< HEAD
 os.execute("cat log/DB/INFO20140707 |grep snow |grep REPLACE  > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("cat log/DB/INFO20140707 |grep snow |grep REPLACE |grep \"\\[0[0-9]:\" > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep [^0-9]599[^0-9] > test1.txt")
@@ -9,6 +10,13 @@ os.execute("cat log/DB/INFO20140707 |grep snow |grep REPLACE  > test1.txt")  --�
 reg = "VALUES%((%d*), (%d*), (%d*), (%d*)%)"
 
 file = io.open("test1.txt","r")
+=======
+--os.execute("cat log/DB/TRACE20140622 |grep var |grep [^0-9]599[^0-9] > test1.txt")
+--os.execute("cat log/DB/TRACE20140622 |grep var |grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[1[0-9]\" > test1.txt")  --需要修改cat语句已限制时间段
+
+os.execute("awk '{print $11,$12,$13,$14}' test1.txt > test2.txt ")  --产生文件的格式为(XXXX, XXXX, XXXX)]
+file = io.open("test2.txt","r")
+>>>>>>> 7409be5da12f4b7bec58743c2f4067a9a5197a68
 local res = {}
 local result = {}
 --获得此时间段 各玩家的积分变化情况

@@ -166,7 +166,9 @@ namespace Script
 		lua_tinker::def(_L, "get11TimeNum", GObject::World::get11TimeAirNum);  //天书奇缘计算天书
 		lua_tinker::def(_L, "getTYSSTime", GObject::World::getTYSSTime);  //天元神兽
 		lua_tinker::def(_L, "get61CardActivity", GObject::World::get61CardActivity);  //61卡牌活动
+		lua_tinker::def(_L, "getSummerCardActivity", GObject::World::getSummerCardActivity);  //清凉卡牌活动
 		lua_tinker::def(_L, "getCoolSummer", GObject::World::getCoolSummer);
+		lua_tinker::def(_L, "getGGTime", GObject::World::getGGTime);  //情义罗盘
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
@@ -1604,6 +1606,11 @@ namespace Script
 		return Call<UInt8 >("onRoamingGuangGun", pl, pos);
     }
     
+    UInt8 GameActionLua::onNewRoamingGuangGun(Player* pl, UInt8 pos)
+    {
+		return Call<UInt8 >("onNewRoamingGuangGun", pl, pos);
+    }
+    
     UInt32 GameActionLua::GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed)
     {
 		assert(player != NULL);
@@ -1956,6 +1963,25 @@ namespace Script
     Player * GameActionLua::GetPlayerPtr(UInt64 playerId)
     {
         return globalPlayers[playerId];
+    }
+    lua_tinker::table GameActionLua::getWeiXinShop(UInt8 index)
+    {
+        return Call<lua_tinker::table>("getWeiXinShop", index);
+    }
+    UInt32 GameActionLua::getWeiXinShopItemNum()
+    {
+        return Call<UInt32>("getWeiXinShopItemNum");
+    }
+    bool GameActionLua::getShuShanWeiWei_XDPB_Award(Player * player, UInt8 opt)
+    {
+		assert(player != NULL);
+        return Call<bool>("getShuShanWeiWei_XDPB_Award", player, opt);
+    }
+    Table GameActionLua::getShuShanWeiWei_MSYJ_Award(Player * player)
+    {
+		assert(player != NULL);
+        return Call<Table>("getShuShanWeiWei_MSYJ_Award", player);
+>>>>>>> 7409be5da12f4b7bec58743c2f4067a9a5197a68
     }
 }
 

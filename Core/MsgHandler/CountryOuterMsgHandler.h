@@ -1472,6 +1472,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->send(st1);
     }
     pl->getNewYearGiveGiftAward(0,0);
+    pl->firstPotOfGoldReturn(0);
 
     {
         GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
@@ -1543,6 +1544,13 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 UInt32 id;
                 br >> id;
                 player->changeClanTitle(static_cast<UInt8>(id));
+            }
+            break;
+        case 0x24:
+            {
+                UInt8 op;
+                br >> op;
+                player->hideVipLvlFlag(op);
             }
             break;
 
@@ -2329,6 +2337,14 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 br >> flag;
             }
             player->coolSummerOp(type, randType, flag);
+        }
+        break;
+
+        case 0x13:
+        {
+            UInt8 type = 0;
+            br >> type;
+            player->firstPotOfGoldReturn(type);
         }
         break;
 
@@ -4129,7 +4145,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         if(price>=1000 && player->getClan())
                             SYSMSG_BROADCASTV(4956,player->getClan()->getName().c_str(),player->getCountry() ,player->getPName());
                     }
-                    if(World::getGGTime())
+                    if(World::getGGTime() == 1)
                     {
                         UInt32 advanceOther = player->GetVar(VAR_GUANGGUN_ADVANCE_OTHER);
                         if(advanceOther<24)
@@ -4143,6 +4159,35 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                             player->AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
                             player->sendGuangGunInfo();
                         }
+                    }
+                    if(World::getGGTime() == 2 && lr._itemId != 16021)
+                    {
+                        UInt32 goldLeft =player->GetVar(VAR_GUANGGUN_CONSUME)%80;
+                        player->AddVar(VAR_GUANGGUN_CONSUME,price);
+                        UInt32 counts = (price+goldLeft)/80; 
+                        SYSMSGV(title, 5182);
+                        SYSMSGV(content, 5183);
+                        while(counts > 0)
+                        {
+                            MailPackage::MailItem mitem[] = {{16021, 1}};
+                            Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                            if(counts > 255)
+                            {
+                                mitem[0].count = 255;
+                                if(mail)
+                                    GObject::mailPackageManager.push(mail->id, mitem, 1, true);
+                                counts -= 255;
+                            }
+                            else
+                            {
+                                mitem[0].count = counts;
+                                if(mail)
+                                    GObject::mailPackageManager.push(mail->id, mitem, 1, true);
+                                counts = 0;
+                            }
+                        }
+                         
+
                     }
                     st << static_cast<UInt8>(0);
 
@@ -4195,13 +4240,14 @@ struct ChatRep
 {
 	UInt8 type;
 	std::string name;
+    UInt8 viplvl;
 	UInt8 cny;
 	UInt8 sex;
 	UInt8 office;
 	UInt8 guard;
 	std::string text;
     UInt8 level;
-	MESSAGE_DEF8(REP::CHAT, UInt8, type, std::string, name, UInt8, cny, UInt8, sex, UInt8, office, UInt8, guard, std::string, text, UInt8, level);
+	MESSAGE_DEF9(REP::CHAT, UInt8, type, std::string, name, UInt8, viplvl, UInt8, cny, UInt8, sex, UInt8, office, UInt8, guard, std::string, text, UInt8, level);
 };
 
 static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
@@ -4284,8 +4330,10 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 	Stream st(REP::CHAT);
 	UInt8 office = player->getTitle(), guard = 0;
     guard = player->getPF();
-	st << cr._type << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1) 
-        << office << guard << cr._text << player->GetLev() <<static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME)) <<Stream::eos;
+	st << cr._type << player->getName();
+    st << static_cast<UInt8>(player->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : player->getVipLevel());
+    st << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1) << office << guard << cr._text << player->GetLev();
+    st << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME)) <<Stream::eos;
 	switch(cr._type)
 	{
 	case 0xFF:
@@ -4364,6 +4412,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
 		rep.level = player->GetLev();
+        rep.viplvl = (player->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : player->getVipLevel());
 		pl->send(rep);
         player->CompleteFriendlyTask(pl , 0);
 	}
@@ -5279,7 +5328,10 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
             break;
         case 0x10:
             if(player->GetVar(VAR_CLANBOSS_CLANBIGBOSS_LIMIT))
+            {
+                player->sendMsgCode(0, 1420);
                 return;
+            }
             //if(CURRENT_THREAD_ID() != WORKER_THREAD_NEUTRAL)
             {
                 hdr.msgHdr.desWorkerID = WORKER_THREAD_NEUTRAL;
@@ -5532,6 +5584,36 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
                 brd >> opt;
                 brd >> key;
                 player->getWeiboAward(opt, key);
+            }
+            break;
+        case 20:
+            {
+                UInt8 opt = 0;
+                brd >> opt;
+                player->shuShanWeiWei_XDPB(player, opt);
+            }
+            break;
+        case 21:
+            {
+                UInt8 opt = 0;
+                brd >> opt;
+                player->shuShanWeiWei_MSYJ(player, opt);
+            }
+            break;
+        case 22:
+            {
+                UInt8 opt = 0;
+                UInt8 pos = 0;
+                UInt32 count = 0;
+                brd >> opt;
+                if(1 == opt)
+                    brd >> pos;
+                if(2 == opt)
+                {
+                    brd >> pos;
+                    brd >> count;
+                }
+                player->shuShanWeiWei_WXSC(opt, pos, count);
             }
             break;
     }
@@ -9040,6 +9122,9 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
         break;
     case 0x22:  // 光棍节活动
         {
+            UInt8 GG_status = World::getGGTime();
+            if(!GG_status)
+                return;
             brd >> op;
             switch(op)
             {
@@ -9075,8 +9160,17 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                         if(cap->CheckGGCanInvit(pl))
                             return;
                         SYSMSGV(title, 220, player->getCountry(), player->getName().c_str());
-                        SYSMSGV(content, 221, player->getCountry(), player->getName().c_str());
-                        pl->GetMailBox()->newMail(player, 0x15, title, content);
+                        if(GG_status == 1)
+                        {
+                            SYSMSGV(content, 221, player->getCountry(), player->getName().c_str());
+                            pl->GetMailBox()->newMail(player, 0x15, title, content);
+                        }
+                        else
+                        {
+                            SYSMSGV(content, 5184, player->getCountry(), player->getName().c_str());
+                            pl->GetMailBox()->newMail(player, 0x15, title, content);
+                        }
+
                     }
                     else if(form == 1)
                     {
@@ -9089,6 +9183,12 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                     UInt8 pos = player->getGuangGunPos();
                     GameMsgHdr hdr1(0x381, player->getThreadId(), player, sizeof(pos));
                     GLOBAL().PushMsg(hdr1, &pos);
+                    if(GG_status == 2)
+                    {
+                        UInt8 isTimes = 0;
+                        brd >> isTimes; 
+                        player->SetVar(VAR_GUANGGUN_TENTIMES,isTimes);
+                    }
                 }
             case 0x04:
                 {
@@ -9111,6 +9211,8 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                             break;
                         case 3:
                             {
+                                if(GG_status != 1)
+                                    return;
                                 std::string name;
                                 brd >> name;
                                 GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(name)];
@@ -9128,8 +9230,13 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                             player->GuangGunCompleteTask(3);
                             break;
                         case 6:
-                            player->getCompassChance();
-                            break;
+                            {
+                                UInt8 op1 = 0;
+                                if(GG_status == 2)
+                                    brd >> op1;
+                                player->getCompassChance(op1);
+                                break;
+                            }
                         case 7:
                             UInt8 counts;
                             brd >> counts;
@@ -9495,8 +9602,10 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
                 Stream st(REP::CHAT);
                 UInt8 office = player->getTitle();
                 UInt8 guard = player->getPF();
-                st << static_cast<UInt8>(11)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
-                    << office << guard << text.c_str()<< player->GetLev() << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME) )<< Stream::eos;
+                st << static_cast<UInt8>(11)<< player->getName();
+                st << static_cast<UInt8>(player->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : player->getVipLevel());
+                st << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1);
+                st << office << guard << text.c_str()<< player->GetLev() << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME) )<< Stream::eos;
                 NETWORK()->Broadcast(st);
             }
             break;

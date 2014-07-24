@@ -4792,6 +4792,26 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
                 GVAR.SetVar(GObject::GVAR_KANGJITIANMO_BEGIN, TimeUtil::SharpDayT(0));
                 GVAR.SetVar(GObject::GVAR_KANGJITIANMO_END, TimeUtil::SharpDayT(20));
             }
+         case 30:
+            GVAR.SetVar(GVAR_11TIME_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_11TIME_END, TimeUtil::SharpDayT(1));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 31:
+            GVAR.SetVar(GVAR_11TIME_BEGIN, 0);
+            GVAR.SetVar(GVAR_11TIME_END, 0);
+            GObject::globalPlayers.enumerate(player_enum_2, 0);
+            break;
+          case 32:
+            GVAR.SetVar(GVAR_GG_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_GG_END, TimeUtil::SharpDayT(1));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 33:
+            GVAR.SetVar(GVAR_GG_BEGIN, 0);
+            GVAR.SetVar(GVAR_GG_END, 0);
             break;
     }
 }
@@ -5732,7 +5752,7 @@ void GMHandler::OnAdd61Card(GObject::Player *player, std::vector<std::string>& a
         return ;
     UInt16 cid = atoi(args[0].c_str());
     
-    player->GetCollectCard()->Add61Card(cid);   
+    player->GetCollectCard()->AddSummerCard(cid);   
 }
 
 void GMHandler::OnAddCardExp(GObject::Player *player, std::vector<std::string>& args)
