@@ -295,8 +295,11 @@ namespace GObject
         std::cout<<"begin:" << static_cast<UInt32>(st.size()) << std::endl;
         if(monsterKettle[0].GetMonster(0).npcId == 0)
         {
-           monsterKettle[0].RandomMonster(NULL,0,1,1) ;
-           UpdateToDB(0);
+            for(UInt8 i = 0 ; i < KETTLE_COUNT ; ++i)
+            {
+                monsterKettle[i].RandomMonster(NULL,i,1,1) ;
+                UpdateToDB(i);
+            }
         }
         for(UInt8 i = 0; i < KETTLE_COUNT ; ++i)
         {
@@ -391,16 +394,16 @@ namespace GObject
     void MonsterKettleManager::GetKettleAttr(GData::AttrExtra& ae)
     { 
         static GData::KettleAttr kettleFloor [] = {
-            GData::KettleAttr( 59, 51, 136, 6),
-            GData::KettleAttr( 51, 59, 136, 6),
-            GData::KettleAttr( 36, 36, 306, 6),
-            GData::KettleAttr( 59, 51, 136, 6),
-            GData::KettleAttr( 59, 51, 136, 6),
-            GData::KettleAttr( 51, 59, 136, 6),
-            GData::KettleAttr( 36, 36, 306, 6),
-            GData::KettleAttr( 59, 51, 136, 6),
-            GData::KettleAttr( 51, 59, 136, 6),
-            GData::KettleAttr( 51, 59, 136, 6),
+            GData::KettleAttr( 58.65, 51, 136, 5.95),
+            GData::KettleAttr( 51, 58.65, 136, 5.95),
+            GData::KettleAttr( 35.7, 35.7, 306, 5.95),
+            GData::KettleAttr( 58.65, 51, 136, 5.95),
+            GData::KettleAttr( 58.65, 51, 136, 5.95),
+            GData::KettleAttr( 51, 58.65, 136, 5.95),
+            GData::KettleAttr( 35.7, 35.7, 306, 5.95),
+            GData::KettleAttr( 58.65, 51, 136, 5.95),
+            GData::KettleAttr( 51, 58.65, 136, 5.95),
+            GData::KettleAttr( 51, 58.65, 136, 5.95),
             // GData::KettleAttr(72.9,72.9,594.0,0.0 ),
             // GData::KettleAttr(63.0,63.0,150.0,33.3 )
         };
