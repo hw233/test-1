@@ -1225,7 +1225,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     if(World::getFourCopAct())
         pl->sendFourCopAct();
-
+    pl->sendKettleInfo();
     {
         UInt32 exp = pl->GetVar(VAR_OFFLINE_EXP);
         if (exp)
