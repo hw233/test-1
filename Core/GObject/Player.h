@@ -1257,6 +1257,7 @@ namespace GObject
         void sendXXLMapInfo(UInt8 res = 0 ,UInt8 index = 0);
         void getXXLScore(UInt8 type ,UInt8 count);
         UInt8 subXXLCount(UInt8 step);
+        void sendKettleInfo();
 
 		void Logout(bool = false);	//???????߲???
 		void selfKick();
@@ -3529,7 +3530,7 @@ namespace GObject
         void getPictureAttr(GData::AttrExtra& ae); 
         UInt8 buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count);
 
-        void UseCouponOrGoldInKettle(UInt8 num );
+        void UseCouponOrGoldInKettle(UInt32 num ,UInt8 flag = 1);
 
         void makeFighterSGList(Stream& st);
         void sendFighterSGListWithNoSkill();

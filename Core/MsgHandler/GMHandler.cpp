@@ -330,6 +330,7 @@ GMHandler::GMHandler()
     Reg(2, "addkapaiexp", &GMHandler::OnAddCardExp);
     Reg(3, "setfirevalue", &GMHandler::OnSetFireValue);
     Reg(2, "atkcb", &GMHandler::OnAttackBoss);
+    Reg(2, "kettleA", &GMHandler::OnAttackKettle);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -5796,4 +5797,12 @@ void GMHandler::OnAttackBoss(GObject::Player *player, std::vector<std::string>& 
     UInt32 damage = atoi(args[0].c_str());
     player->getClan()->getClanBigBoss()->GMAttackBoss(damage);  
 
+}
+void GMHandler::OnAttackKettle(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return ;
+    UInt8 index = atoi(args[0].c_str());
+    player->getMonsterKettleMgr()->RandomMonster(index , 0 , 1);
+    player->getMonsterKettleMgr()->BattleMonster(index , 0);
 }

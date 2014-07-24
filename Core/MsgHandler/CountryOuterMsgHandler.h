@@ -9382,27 +9382,59 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
             {
                 case 0x01:
                     {
-                        Stream st(REP::ACT);
-                        st << static_cast<UInt8>(0x35);
-                        player->getMonsterKettleMgr()->GetMonsterKettleInfo(st); 
-                        st << Stream::eos;
-                        player->send(st);
                         break;
                     }
                 case 0x02:
                 {
                     UInt8 index = 0;
-                    UInt8 type = 0;
-                    UInt8 count = 0;
+                    UInt8 type = 0;         //0手动 1自动
+                    UInt32 count = 0;       //刷新次数
                     brd >> index >>type >> count;
-                    if(PLAYER_DATA(player, coupon) + PLAYER_DATA(player, gold) < count * 20 )
+                    if(type && !player->hasChecked())
+                        return ;
+                    UInt32 now = TimeUtil::Now();
+                    if(!player->getMonsterKettleMgr()->CheckKettleRight(index))
+                        return ;
+                    UInt32 nextTime = player->GetVar(VAR_KETTLE_TIME) ;
+                    UInt32 lock = player->GetVar(VAR_KETTLE_LOCK);
+                    bool flag = false ;
                     {
-                       player->sendMsgCode(2,1011);
+                        if(( nextTime < now ) )
+                            flag = true ;   //冷却时间内
+                        else if(!type && lock)
+                            return ;
+                    }
+                    if(type && (PLAYER_DATA(player, coupon) + PLAYER_DATA(player, gold)) < count * 10 )
+                    {
+                       player->sendMsgCode(2,1104);
                        break;
                     }
-                    UInt8 num = player->getMonsterKettleMgr()->RandomMonster(index,type,count);
+                    UInt32 num = player->getMonsterKettleMgr()->RandomMonster(index,type,count);
                     if( num > count )
                         return ;
+                    if(flag)
+                    {
+                        player->SetVar(VAR_KETTLE_TIME,now);
+                        player->SetVar(VAR_KETTLE_LOCK,0);
+                        lock = 0;
+                    }
+                    if(!lock)
+                    {
+                        UInt32 advance = nextTime - now ;
+                        UInt8 cd = advance / (45 * 60) +1;   // 当前刷新次数
+                        if( num  < cd)
+                        { 
+                            player->AddVar(VAR_KETTLE_TIME,num * 45 * 60);
+                            num = 0;
+                        } 
+                        else
+                        {
+                            player->AddVar(VAR_KETTLE_TIME,cd * 45 * 60);
+                            num -= cd ;
+                        }
+                        if(player->GetVar(VAR_KETTLE_TIME) - now > 6*3600)
+                            player->SetVar(VAR_KETTLE_LOCK,1);
+                    }
                     player->UseCouponOrGoldInKettle(num);
                     break;
                 }
@@ -9410,11 +9442,25 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                 {
                     UInt8 index = 0;
                     UInt8 pos = 0;
-                    brd >> index >> pos ;
-                    player->getMonsterKettleMgr()->BattleMonster(index, pos);
+                    UInt8 count = 0;
+                    brd >> index >> pos >> count ;
+                    if(count && !player->hasChecked())
+                        return ;
+                    if(!player->getMonsterKettleMgr()->CheckKettleRight(index))
+                        return ;
+                    if(count > 2)
+                        return ;
+                    if( PLAYER_DATA(player, gold)< (count * 150) )
+                    {
+                       player->sendMsgCode(2,1104);
+                        return ;
+                    }
+                    player->getMonsterKettleMgr()->BattleMonster(index, pos , count );
+                    player->UseCouponOrGoldInKettle(count * 10,0);
                     break;
                 }
             }
+            player->sendKettleInfo();
         }
     default:
         break;

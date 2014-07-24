@@ -55,6 +55,7 @@
 
 namespace GData
 {
+    KettleNpc kettleAttrData;
 	ItemBaseTypeManager		itemBaseTypeManager;
 	ItemBaseTypeNameManager itemBaseTypeNameManager;
 	ObjectMapT<GObject::ItemWeapon> npcWeapons;
@@ -3330,11 +3331,11 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBKettleNpc dbk;
-		if(execu->Prepare("SELECT `monsterId`, `attack`, `magatk` , `hp`,`action` FROM `kettleNpc` ", dbk) != DB::DB_OK)
+		if(execu->Prepare("SELECT `monsterId`, `attack`, `magatk` , `hp`,`action`,`exp` FROM `kettleNpc` ", dbk) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
         {
-            KettleAttr ka(dbk.attack , dbk.magatk , dbk.hp ,dbk.action);
+            KettleAttr ka(dbk.attack , dbk.magatk , dbk.hp ,dbk.action ,dbk.exp);
             kettleAttrData.LoadKettleMonsterAttr( (dbk.monsterId-1)/7 , (dbk.monsterId-1)%7 ,ka);
         }
 		return true;

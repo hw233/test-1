@@ -797,6 +797,11 @@ namespace GObject
         VAR_HAPPY_XXL_PAGE = 816 , //快乐消消乐 编号
 
         VAR_11AIRBOOK_AWARDSCORE = 817,  
+        VAR_KETTLE_TIME = 818,  //炼妖壶刷新
+        VAR_KETTLE_COUNT = 819,  //炼妖值
+        VAR_KETTLE_4CNT = 820,  //4星刷新次数
+        VAR_KETTLE_5CNT = 821, //5星刷新次数
+        VAR_KETTLE_LOCK = 822,  //是否锁定
             
         //831-850 for qimj
         VAR_COOL_SUMMER_AWARD_TYPE = 831,        //酷爽一夏奖励类型
@@ -1512,6 +1517,11 @@ namespace GObject
             REGISTER_VAR(VAR_HAPPY_XXL_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_HAPPY_XXL_PAGE, CYCLE_NONE);
             REGISTER_VAR(VAR_11AIRBOOK_AWARDSCORE, CYCLE_NONE);
+            REGISTER_VAR(VAR_KETTLE_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_KETTLE_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_KETTLE_4CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_KETTLE_5CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_KETTLE_LOCK, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

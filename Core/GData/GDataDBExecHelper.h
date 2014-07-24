@@ -941,6 +941,7 @@ struct DBKettleNpc
     float magatk;
     float hp;
     float action;
+    UInt32 exp;
 };
 
 }
@@ -2040,13 +2041,14 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBKettleNpc)
-SPECIALDEF(5)
+SPECIALDEF(6)
 	(
      UInt32, monsterId,
     float, attack,
     float, magatk,
     float, hp,
-    float, action
+    float, action,
+    UInt32, exp
 	)
 SPECIALEND()
 }

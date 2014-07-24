@@ -7,7 +7,7 @@
 #include "GData/AttrExtra.h"
 
 #define INSIDE_KETTLE_MAX 3
-#define KETTLE_COUNT 12    //壶中界数
+#define KETTLE_COUNT 10    //壶中界数
 #define MONSTER_TYPE 7   //每层的怪物数量
 #define MONSTER_KING 5   //每层的怪物星数
 namespace GObject
@@ -39,7 +39,7 @@ namespace GObject
             }
             void SetMonster(UInt8 idx , UInt32 npcId , UInt8 king);
             MonsterKing GetMonster(UInt8 idx);
-            UInt8 RandomMonster(UInt8 num , UInt8 type , UInt8 count = 1);
+            UInt32 RandomMonster(Player * pl , UInt8 num , UInt8 type , UInt32 count = 1);
 
             void SetWin(UInt8 idx,UInt8 flag);
             UInt8 GetWin(UInt8 idx);
@@ -49,12 +49,13 @@ namespace GObject
 
             void GetMonsterInfo(Stream& st);
             void GetMonsterProcessInfo(Stream& st);
-            void AddMonsterProcess(UInt8 type , UInt8 king);
+            bool AddMonsterProcess(UInt8 type , UInt8 king);
 
-            UInt32 challenge(Player * pl ,UInt8 idx);
+            UInt32 challenge(Player * pl,Stream& st,UInt64 & exp ,UInt8 idx , UInt8 flag = 0);
 
             //void SetKettleHistory(UInt8 type , UInt8 king , UInt8 value);
             //void SetKettleOccupy(UInt8 idx , UInt8 npcId , UInt8 win);
+            UInt8 IsCompelete();
 
             void UpdateKettleToDB(UInt64 playerId , UInt8 num);
         private:
@@ -77,10 +78,10 @@ namespace GObject
             void SetKettleHistory(UInt8 idx,std::string history);
             void SetKettleOccupy(UInt8 idx,std::string occupy);
             void UpdateToDB(UInt8 idx);
-            UInt8 RandomMonster(UInt8 idx , UInt8 type , UInt8 count );
-            void BattleMonster(UInt8 idx , UInt8 num);
+            UInt32 RandomMonster(UInt8 idx , UInt8 type , UInt32 count );
+            void BattleMonster(UInt8 idx , UInt8 num , UInt8 count = 0);
             void GetKettleAttr(GData::AttrExtra &ae);
-
+            bool CheckKettleRight(UInt8 idx);
         private:
             MonsterKettle monsterKettle[KETTLE_COUNT];
             //std::deque<BattleInfo>  BattleInfoDeque;

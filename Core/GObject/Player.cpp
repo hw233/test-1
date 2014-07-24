@@ -27492,7 +27492,7 @@ void Player::giveGGTeamMemberInfo(Stream& st)
         else if(cap->getGGPlayer2()!=NULL && cap->getGGPlayer2()!=this)
             pl = cap->getGGPlayer2();
         else
-            st<<""<<static_cast<UInt8>(0)<<static_cast<UInt32>(0)<<static_cast<UInt32>(0);
+            st<<""<<static_cast<UInt8>(0)<<static_cast<UInt8>(0)<<static_cast<UInt32>(0);
         if(pl!=NULL)
             st<<pl->getName()<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TIMES)/20)<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TODAY_TASK))<<pl->getGGScore();
     }
@@ -34151,23 +34151,23 @@ void Player::coolSummerOp(UInt8 type, UInt8 randType, UInt8 flag)
             break;
     }
 }
-void Player::UseCouponOrGoldInKettle(UInt8 num )
+void Player::UseCouponOrGoldInKettle(UInt32 num , UInt8 flag )
 { 
     UInt32 coupon = 0;
     UInt32 gold = 0;
-    if(getCoupon() + getGold() < num * 20 )
+    if(getCoupon()*flag + getGold() < num * 15 )
     {
-        coupon = getCoupon();
+        coupon = getCoupon() *flag;
         gold = getGold();
     }
     else
     {
-       if(getCoupon() >= num * 20 ) 
-           coupon = num * 20;
+       if(getCoupon()*flag >= num * 15 ) 
+           coupon = num * 15;
        else
        {
-           coupon = getCoupon();
-           gold = num * 20 - coupon;
+           coupon = getCoupon()*flag;
+           gold = num * 15 - coupon;
        }
     }
 
@@ -34182,6 +34182,15 @@ void Player::UseCouponOrGoldInKettle(UInt8 num )
         useGold(gold, &ci);
     } 
 } 
+void Player::sendKettleInfo()
+{
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x35);
+    st << static_cast<UInt8>(0x01);
+    getMonsterKettleMgr()->GetMonsterKettleInfo(st); 
+    st << Stream::eos;
+    send(st);
+}
 
 } // namespace GObject
 
