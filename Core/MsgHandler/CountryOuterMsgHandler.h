@@ -1472,6 +1472,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->send(st1);
     }
     pl->getNewYearGiveGiftAward(0,0);
+    pl->firstPotOfGoldReturn(0);
 
     {
         GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
@@ -1543,6 +1544,13 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
                 UInt32 id;
                 br >> id;
                 player->changeClanTitle(static_cast<UInt8>(id));
+            }
+            break;
+        case 0x24:
+            {
+                UInt8 op;
+                br >> op;
+                player->hideVipLvlFlag(op);
             }
             break;
 
@@ -2329,6 +2337,14 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 br >> flag;
             }
             player->coolSummerOp(type, randType, flag);
+        }
+        break;
+
+        case 0x13:
+        {
+            UInt8 type = 0;
+            br >> type;
+            player->firstPotOfGoldReturn(type);
         }
         break;
 
@@ -4224,13 +4240,14 @@ struct ChatRep
 {
 	UInt8 type;
 	std::string name;
+    UInt8 viplvl;
 	UInt8 cny;
 	UInt8 sex;
 	UInt8 office;
 	UInt8 guard;
 	std::string text;
     UInt8 level;
-	MESSAGE_DEF8(REP::CHAT, UInt8, type, std::string, name, UInt8, cny, UInt8, sex, UInt8, office, UInt8, guard, std::string, text, UInt8, level);
+	MESSAGE_DEF9(REP::CHAT, UInt8, type, std::string, name, UInt8, viplvl, UInt8, cny, UInt8, sex, UInt8, office, UInt8, guard, std::string, text, UInt8, level);
 };
 
 static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
@@ -4313,8 +4330,10 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 	Stream st(REP::CHAT);
 	UInt8 office = player->getTitle(), guard = 0;
     guard = player->getPF();
-	st << cr._type << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1) 
-        << office << guard << cr._text << player->GetLev() <<static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME)) <<Stream::eos;
+	st << cr._type << player->getName();
+    st << static_cast<UInt8>(player->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : player->getVipLevel());
+    st << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1) << office << guard << cr._text << player->GetLev();
+    st << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME)) <<Stream::eos;
 	switch(cr._type)
 	{
 	case 0xFF:
@@ -4393,6 +4412,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
 		rep.level = player->GetLev();
+        rep.viplvl = (player->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : player->getVipLevel());
 		pl->send(rep);
         player->CompleteFriendlyTask(pl , 0);
 	}
@@ -9492,8 +9512,10 @@ void OnMarryBoard2(GameMsgHdr& hdr, const void * data)
                 Stream st(REP::CHAT);
                 UInt8 office = player->getTitle();
                 UInt8 guard = player->getPF();
-                st << static_cast<UInt8>(11)<< player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
-                    << office << guard << text.c_str()<< player->GetLev() << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME) )<< Stream::eos;
+                st << static_cast<UInt8>(11)<< player->getName();
+                st << static_cast<UInt8>(player->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : player->getVipLevel());
+                st << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1);
+                st << office << guard << text.c_str()<< player->GetLev() << static_cast<UInt8>(player->GetVar(VAR_COUPLE_NAME) )<< Stream::eos;
                 NETWORK()->Broadcast(st);
             }
             break;

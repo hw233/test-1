@@ -3527,6 +3527,7 @@ namespace GObject
         st << static_cast<UInt8>(GetVar(VAR_MAP_INDEX));
         checkClanTitle();
         makeClanTitleInfo(st);
+        st << static_cast<UInt8>(GetVar(VAR_HIDE_VIP_LEVEL_FLAG));
         st << Stream::eos;
 
         if(fchange)
@@ -4926,7 +4927,8 @@ namespace GObject
             for(UInt8 i = 0; i < cnt; ++ i)
             {
                 Player * pl = *it;
-                st << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
+                st << pl->getId() << pl->getName() << static_cast<UInt8>(pl->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : (pl->getVipLevel()))
+                    << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
                     << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl);
                 st << static_cast<UInt8>(pl->isOnline());
                 st << static_cast<UInt8>(pl->GetVar(VAR_PRAY_TYPE))<<static_cast<UInt8>(pl->GetVar(VAR_PRAY_VALUE));
@@ -9083,6 +9085,7 @@ namespace GObject
         addRF7DayRecharge(r);
         addLuckyMeetRecharge(r);
         addSummerMeetRecharge(r);
+        firstPotOfGold(r);
         if(World::get11Time())
         {
             UInt32 goldLeft = GetVar(VAR_AIRBOOK_RECHARGE)%30;
@@ -27210,9 +27213,9 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
     }
     UpdateGGInfo();
 }
-void Player::AddGuangGunScore(UInt8 score)
+void Player::AddGuangGunScore(UInt8 score,UInt8 type)
 {
-    if(World::getGGTime() == 2)
+    if(World::getGGTime() == 2 && type == 0)
     {
         if(GetVar(VAR_GUANGGUN_TENTIMES) == 1)
             score *= 10;
@@ -27595,19 +27598,19 @@ void Player::RunFriendlyCompass(UInt8 type)
        char str[32] = {0};
        switch(idx)
        {
-           case 11 :
+           case 12 :
                sprintf(str, "F_140717_4");
                udpLog("sanrenyou", str, "", "", "", "", "act");
                break;
-           case 7 :
+           case 8 :
                sprintf(str, "F_140717_5");
                udpLog("sanrenyou", str, "", "", "", "", "act");
                break;
-           case 9 :
+           case 10 :
                sprintf(str, "F_140717_6");
                udpLog("sanrenyou", str, "", "", "", "", "act");
                break;
-           case 4:
+           case 5:
                sprintf(str, "F_140717_7");
                udpLog("sanrenyou", str, "", "", "", "", "act");
                break;
@@ -27624,7 +27627,7 @@ void Player::RunFriendlyCompass(UInt8 type)
    send(st);
    UpdateGGInfo();
    sendGuangGunInfo();
-   AddGuangGunScore();
+   AddGuangGunScore(10,1);
    char str[16] = {0};
    sprintf(str, "F_131109_5");
    udpLog("qingyiluopan", str, "", "", "", "", "act");
@@ -34753,6 +34756,73 @@ void Player::shuShanWeiWei_WXSC(UInt8 opt, UInt8 pos, UInt32 count)
     st << static_cast<UInt16>(item_status);
     st << Stream::eos;
     send(st);
+}
+
+void Player::firstPotOfGold(UInt32 total)
+{
+    static UInt32 rechargeLvl[6] = {200, 800, 1500, 3000, 5000, 8000};
+    UInt32 now = TimeUtil::Now();
+    if(now > 7 * 24 *3600 + getCreated())
+        return;
+    for(size_t i = 0; i < 6; i++)
+    {
+        if(total == rechargeLvl[i])
+        {
+            UInt8 flag = GET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i);
+            if(flag)
+                return;
+            SYSMSG(title, 5187);
+            SYSMSGV(content, 5188, rechargeLvl[i], rechargeLvl[i]);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[1] = {
+                    {0xA000, rechargeLvl[i]},
+                };
+                mailPackageManager.push(mail->id, mitem, 1, true);
+            }
+            SYSMSG_BROADCASTV(5189, getCountry(), getName().c_str(), rechargeLvl[i]);
+            SetVar(VAR_FIRST_POT_GOLD_STATUS, SET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i));
+            firstPotOfGoldReturn(0);
+        }
+    }
+}
+
+void Player::firstPotOfGoldReturn(UInt8 type)
+{
+    UInt32 now = TimeUtil::Now();
+    if(now > 7 * 24 *3600 + getCreated())
+        return;
+
+    if(type == 0)
+    {
+        Stream st(REP::COUNTRY_ACT);
+        st << static_cast<UInt8>(0x13);
+        st << type;
+        st << static_cast<UInt8>(GetVar(VAR_FIRST_POT_GOLD_STATUS));
+        st << Stream::eos;
+        send(st);
+    }
+}
+
+void Player::hideVipLvlFlag(UInt8 op)
+{
+    UInt32 flag = GetVar(VAR_HIDE_VIP_LEVEL_FLAG);
+    if(0 == op)
+    {
+        if(!flag)
+        {
+            SetVar(VAR_HIDE_VIP_LEVEL_FLAG, 1);
+            udpLog("vipbiaoshi", "F_140801_1", "", "", "", "", "act");
+        }
+    }
+    else if(1 == op)
+    {
+        if(flag)
+        {
+            SetVar(VAR_HIDE_VIP_LEVEL_FLAG, 0);
+        }
+    }
 }
 
 } // namespace GObject
