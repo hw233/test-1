@@ -3585,6 +3585,11 @@ namespace GObject
         void shuShanWeiWei_MSYJ(Player *, UInt8);
         void shuShanWeiWei_WXSC(UInt8, UInt8, UInt32);
 
+        void firstPotOfGold(UInt32);
+        void firstPotOfGoldReturn(UInt8);
+
+        void hideVipLvlFlag(UInt8);
+
     private:
         //玩家位置（包括层数、当层位置）
         UInt8 _playerPos;

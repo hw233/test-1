@@ -1958,8 +1958,10 @@ void OnGetQQClanTalk(LoginMsgHdr &hdr, const void* data)
         Stream st(REP::CHAT);
         UInt8 office = player->getTitle(), guard = 0;
         guard = player->getPF();
-        st << static_cast<UInt8>(2) << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
-            << office << guard << talk_record << player->GetLev() <<static_cast<UInt8>(player->GetVar(GObject::VAR_COUPLE_NAME)) <<Stream::eos;
+        st << static_cast<UInt8>(2) << player->getName();
+        st << static_cast<UInt8>(player->GetVar(GObject::VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : player->getVipLevel());
+        st << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1);
+        st << office << guard << talk_record << player->GetLev() <<static_cast<UInt8>(player->GetVar(GObject::VAR_COUPLE_NAME)) <<Stream::eos;
 
         GameMsgHdr hdr(0x160, WORKER_THREAD_WORLD, player, st.size());
         GLOBAL().PushMsg(hdr, static_cast<UInt8 *>(st));
