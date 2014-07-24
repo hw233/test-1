@@ -175,11 +175,8 @@ enum PurchaseType
     MOFUMIZHEN1                 = 1036, //墨符迷阵一键消除
     MOFUMIZHEN2                 = 1037, //墨符迷阵购买次数
     MakeGear                    = 1038, //打造机关库
-<<<<<<< HEAD
-    KETTLE                    = 1039, //打造机关库
-=======
     WeiWeiShop                  = 1039, //购买微信商店物品
->>>>>>> 7409be5da12f4b7bec58743c2f4067a9a5197a68
+    KETTLE                    = 1040, //炼妖壶
     //繁体私有占150～200
 };
 

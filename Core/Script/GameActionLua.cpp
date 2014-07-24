@@ -1981,7 +1981,6 @@ namespace Script
     {
 		assert(player != NULL);
         return Call<Table>("getShuShanWeiWei_MSYJ_Award", player);
->>>>>>> 7409be5da12f4b7bec58743c2f4067a9a5197a68
     }
 }
 

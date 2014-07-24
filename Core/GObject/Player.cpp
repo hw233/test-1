@@ -27826,11 +27826,7 @@ void Player::giveGGTeamMemberInfo(Stream& st)
         else if(cap->getGGPlayer2()!=NULL && cap->getGGPlayer2()!=this)
             pl = cap->getGGPlayer2();
         else
-<<<<<<< HEAD
-            st<<""<<static_cast<UInt8>(0)<<static_cast<UInt8>(0)<<static_cast<UInt32>(0);
-=======
             st<< str <<static_cast<UInt8>(0)<<static_cast<UInt8>(0)<<static_cast<UInt32>(0);
->>>>>>> 7409be5da12f4b7bec58743c2f4067a9a5197a68
         if(pl!=NULL)
             st<<pl->getName()<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TIMES)/20)<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TODAY_TASK))<<pl->getGGScore();
     }
@@ -29204,11 +29200,7 @@ void Player::sendOldManPos(UInt8 type)
     UInt32 gold = 5;
     if(type==0)
     {
-<<<<<<< HEAD
-        if(time % 3600 < 3)
-=======
         if(time % 3600 < 5)
->>>>>>> 7409be5da12f4b7bec58743c2f4067a9a5197a68
         {
             sendMsgCode(0, 4053);
             return ;

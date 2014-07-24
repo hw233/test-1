@@ -146,6 +146,8 @@ namespace GObject
     {
         static UInt8 kingCount[5] = { 10, 15, 20, 25, 30 };
         static UInt8 kingNum[] = {1,2,3,80,240};
+        if(!pl)
+            return 0;
         if(_npcIds[idx].npcId == 0 || _npcIds[idx].king >= 5)
             return 0;
         if(GetWin(idx))
@@ -160,12 +162,16 @@ namespace GObject
         UInt32 rptid = 0;
         bool res = false;
         GData::NpcGroup * ng = it->second;
+        if(!ng)
+            return 0;
+
         if(!flag)
         {
             std::vector<GData::NpcFData> vec = ng->getList();
             for(UInt8 i = 0; i < vec.size(); ++i)
             {
-                vec[i].fighter->SetPowerUpByP((kingCount[_npcIds[idx].king] - 10)*1.0/10);
+                if(vec[i].fighter)
+                    vec[i].fighter->SetPowerUpByP((kingCount[_npcIds[idx].king] - 10)*1.0/10);
             }
             Battle::BattleSimulator bsim(0x7000, pl, ng->getName(), ng->getLevel(), false);
             pl->PutFighters( bsim, 0 );
@@ -177,12 +183,13 @@ namespace GObject
 
             for(UInt8 i = 0; i < vec.size(); ++i)
             {
-                vec[i].fighter->ClearPowerUp();
+                if(vec[i].fighter)
+                    vec[i].fighter->ClearPowerUp();
             }
         }
         //std::cout << "monsterId : " << static_cast<UInt32>(_npcIds[idx].npcId) << std::endl;
         //std::cout << "king : " << static_cast<UInt32>(_npcIds[idx].king) << std::endl;
-        std::cout << "playerId : " << static_cast<UInt32>(pl->getId()) << " monsterId:"<<_npcIds[idx].npcId % 1000 /10 * 7 + _npcIds[idx].npcId%10<<" monsterName:" << ng->getName() << " king:" <<static_cast<UInt32>(_npcIds[idx].king)<< " process:" << static_cast<UInt32>(GetMonsterProcess(_npcIds[idx].npcId %10 -1 , _npcIds[idx].king)) << std::endl;
+        //std::cout << "playerId : " << static_cast<UInt32>(pl->getId()) << " monsterId:"<<_npcIds[idx].npcId % 1000 /10 * 7 + _npcIds[idx].npcId%10<<" monsterName:" << ng->getName() << " king:" <<static_cast<UInt32>(_npcIds[idx].king)<< " process:" << static_cast<UInt32>(GetMonsterProcess(_npcIds[idx].npcId %10 -1 , _npcIds[idx].king)) << std::endl;
         UInt64 exp = 0;
         if(res || flag)
         {
@@ -308,7 +315,7 @@ namespace GObject
             monsterKettle[i].GetMonsterProcessInfo(st);
             //   std::cout<<"number:"<<static_cast<UInt32>(i)<<"  "<< static_cast<UInt32>(st.size()) << std::endl;
         }
-        std::cout<<"end:" << static_cast<UInt32>(st.size()) << std::endl;
+        //std::cout<<"end:" << static_cast<UInt32>(st.size()) << std::endl;
     }
     void MonsterKettleManager::SetKettleHistory(UInt8 idx, std::string history)
     {
@@ -407,9 +414,9 @@ namespace GObject
             // GData::KettleAttr(72.9,72.9,594.0,0.0 ),
             // GData::KettleAttr(63.0,63.0,150.0,33.3 )
         };
-        std::cout << "改变前:";
-        std::cout << ae.attack <<" "  << ae.magatk << "  ";
-        std::cout << ae.hp <<" "  << ae.action <<std::endl;
+        //std::cout << "改变前:";
+        //std::cout << ae.attack <<" "  << ae.magatk << "  ";
+        //std::cout << ae.hp <<" "  << ae.action <<std::endl;
         for(UInt8 i = 0; i < KETTLE_COUNT ; ++i)
         { 
             bool flag = true;
@@ -433,9 +440,9 @@ namespace GObject
                 ae.action += kettleFloor[i]._action;
             } 
         } 
-        std::cout << "改变后:";
-        std::cout << ae.attack <<" "  << ae.magatk << "  ";
-        std::cout << ae.hp <<" "  << ae.action <<std::endl;
+        //std::cout << "改变后:";
+        //std::cout << ae.attack <<" "  << ae.magatk << "  ";
+        //std::cout << ae.hp <<" "  << ae.action <<std::endl;
     } 
     bool MonsterKettleManager::CheckKettleRight(UInt8 idx)
     { 
