@@ -1187,6 +1187,7 @@ namespace GObject
 		SAFE_DELETE(m_erlking);
 		SAFE_DELETE(m_collecCard);
 		SAFE_DELETE(_wrapKey);
+		SAFE_DELETE(m_MonsterKettleMgr);
 	}
 
 	UInt8 Player::GetCountryThread()
