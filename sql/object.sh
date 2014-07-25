@@ -331,8 +331,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_tyss_buff6b.sql     #天元神兽阳光普照buff
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140721_1.sql #蜀山微微码上有奖发布微博周期一周变一天
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140707_cKettle.sql     
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140721_1.sql #蜀山微微码上有奖发布微博周期一周变一天
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140707_cKettle.sql     
 }
 
 #sh player_jiguan.sh
