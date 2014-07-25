@@ -34827,7 +34827,7 @@ void Player::firstPotOfGold(UInt32 total)
             SetVar(VAR_FIRST_POT_GOLD_STATUS, SET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i));
             firstPotOfGoldReturn(0);
             char str[16] = {0};
-            sprintf(str, "F_140726_%d", 1+i);
+            sprintf(str, "F_140726_%d", static_cast<Int32>(1+i));
             udpLog("diyitongjin", str, "", "", "", "", "act");
         }
     }
