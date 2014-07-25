@@ -10974,6 +10974,37 @@ function ItemNormal_00009382(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00016047(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 1 + (1*num*1)/99 then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+    local prob = {2000, 4000, 5500, 7000, 8000, 8500, 9000, 9500, 9750, 10000}
+    local items = {{9123,1}, {15,1}, {505,1}, {500,1}, {503,1}, {1647,1}, {1648,1}, {1649,1}, {9498,1}, {16037,1}}
+
+    for k = 1, num do
+        local p = math.random(1, 10000)
+        local i = 1
+        for n = 1, #prob do
+            if p <= prob[n] then
+                i = n
+                break
+            end
+        end
+
+        local item = items[i];
+        package:AddItem(item[1], item[2], 1, 0, 2);
+
+        if i >= 6 then
+            Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."] "..msg_142.."[4:"..id.."]"..msg_123.."[4:"..item[1].."]")
+        end
+    end
+    package:DelItemSendMsg(id, player);
+    return num;
+end
+
 function ItemNormal_00009497(iid, num, bind, param)
     local val = 100 ;
     if iid == 9498 then 
@@ -13966,6 +13997,7 @@ local ItemNormal_Table = {
     [16003] = ItemNormal_00016003,
     [16009] = ItemNormal_00009495,
     [16010] = ItemNormal_00009382,
+    [16047] = ItemNormal_00016047,
 
     [9494] = ItemNormal_00009494,
     [9480] = ItemNormal_0009480,

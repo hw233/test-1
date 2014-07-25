@@ -348,6 +348,7 @@ namespace GObject
             GameAction()->doStrong(pl, SthZixiaozhidian, 0, 0);
             insertLevelStarSort(pl, level);
             autoBattle(pl);
+            pl->getSurnameLegendAward(e_sla_rb);
         }
         else
         {

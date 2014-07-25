@@ -9590,13 +9590,13 @@ function onRoamingQueqiao(player, pos)
     }
 
     local eventItem = {
-        {{511, 1, 10}, {500, 1, 10}, {30, 1, 10}},
-        {{56, 1, 20}, {500, 1, 20}, {57, 1, 20}},
-        {{511, 2, 20}, {512, 1, 30}, {517, 1, 30}},
-        {{16016, 1, 10}, {16016, 1, 10}, {16016, 1, 10}},
-        {{503, 1, 30}, {514, 1, 30}, {501, 1, 30}},
-        {{509, 1, 40}, {134, 1, 40}, {1325, 1, 40}},
-        {{9896, 1, 50}, {9898, 1, 50}, {9897, 1, 50}, {9899, 1, 50}},
+        {{500, 1, 10}, {15, 1, 10}, {9341, 1, 10}},
+        {{56, 1, 20}, {9123, 1, 20}, {57, 1, 20}},
+        {{9371, 2, 20}, {9424, 1, 30}, {517, 1, 30}},
+        {{9122, 1, 10}, {9122, 1, 10}, {9122, 1, 10}},
+        {{503, 1, 30}, {513, 1, 30}, {501, 1, 30}},
+        {{509, 1, 40}, {507, 1, 40}, {515, 1, 40}},
+        {{16047, 1, 50}, {16047, 1, 50}, {16047, 1, 50}},
     }
 
     step = math.random(1, 3)
@@ -9609,7 +9609,7 @@ function onRoamingQueqiao(player, pos)
     i = roamPlace[pos2]
     j = math.random(1, #eventItem[i])
 
-    if eventItem[i][j][1] == 9896 then
+    --[[if eventItem[i][j][1] == 9896 then
         player:GetCollectCard():Add61Card(305)
     end
     if eventItem[i][j][1] == 9897 then
@@ -9620,7 +9620,7 @@ function onRoamingQueqiao(player, pos)
     end
     if eventItem[i][j][1] == 9899 then
         player:GetCollectCard():Add61Card(308)
-    end
+    end]]
 
     package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
     player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
@@ -9803,7 +9803,7 @@ function Qixi(player, lootlvl)
     if getQixi() then
         -- 喜鹊
         local package = player:GetPackage();
-        package:AddItem(16016, 1, true, 0, 10);
+        package:AddItem(9122, 1, true, 0, 10);
     end
 end
 

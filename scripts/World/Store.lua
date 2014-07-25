@@ -124,7 +124,7 @@ function loadStore()
         store:add(2 ,9895,20)
     end
     if getQixi() then
-        store:add(2 ,16016 ,10)
+        store:add(2 ,9122 ,10)
     end
 
     if  getCoolSummer(300) then

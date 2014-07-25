@@ -259,10 +259,11 @@ namespace GObject
     enum SurnameLegendAwardFlag
     {
         e_sla_none = 0x00,
-        e_sla_cb = 0x01,
-        e_sla_clb = 0x02,
-        e_sla_hi = 0x04,
-        e_sla_mr = 0x08,
+        e_sla_cb = 0x01, //阵营战或蜀山论剑
+        e_sla_clb = 0x02, //帮派战
+        e_sla_hi = 0x04, //英雄岛
+        e_sla_mr = 0x08, //末日之战
+        e_sla_rb = 0x10, //紫霄之巅
     };
 
     enum PEXP_HOOK_INFEX
