@@ -204,8 +204,8 @@ namespace GObject
         //    std::cout << "最终:" << static_cast<UInt32>(exp) << std::endl;
             //pl->AddExp(exp);
             pl->setFightersDirty(true);
-            if(_npcIds[idx].king == 4)
-                SYSMSG_BROADCASTV(5190, pl->getCountry(), pl->getName().c_str(), ng->getName().c_str()); 
+            //if(_npcIds[idx].king == 4)
+            //    SYSMSG_BROADCASTV(5190, pl->getCountry(), pl->getName().c_str(), 3 ,ng->getName().c_str()); 
         }
         st << static_cast<UInt32>(_npcIds[idx].npcId % 1000 /10 * 7 + _npcIds[idx].npcId%10);
         st << static_cast<UInt8>(_npcIds[idx].king);
