@@ -890,6 +890,7 @@ namespace GObject
 		m_marriageInfo = new MarriageInfo();
 		m_collecCard= new CollectCard(this);
 		_wrapKey= new OrdinarireWrapKey();
+		m_MonsterKettleMgr = new MonsterKettleManager(this);
         m_csFlag = 0;
         m_spreadInterval = 0;
         m_spreadCoolTime = 0;
@@ -1186,6 +1187,7 @@ namespace GObject
 		SAFE_DELETE(m_erlking);
 		SAFE_DELETE(m_collecCard);
 		SAFE_DELETE(_wrapKey);
+		SAFE_DELETE(m_MonsterKettleMgr);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -34593,6 +34595,46 @@ void Player::coolSummerOp(UInt8 type, UInt8 randType, UInt8 flag)
             break;
     }
 }
+void Player::UseCouponOrGoldInKettle(UInt32 num , UInt8 flag )
+{ 
+    UInt32 coupon = 0;
+    UInt32 gold = 0;
+    if(getCoupon()*flag + getGold() < num * 15 )
+    {
+        coupon = getCoupon() *flag;
+        gold = getGold();
+    }
+    else
+    {
+       if(getCoupon()*flag >= num * 15 ) 
+           coupon = num * 15;
+       else
+       {
+           coupon = getCoupon()*flag;
+           gold = num * 15 - coupon;
+       }
+    }
+
+    if(coupon > 0)
+    {
+        ConsumeInfo ci(KETTLE, 0, 0);
+        useCoupon(coupon, &ci);
+    }
+    if(gold > 0)
+    { 
+        ConsumeInfo ci(KETTLE, 0, 0);
+        useGold(gold, &ci);
+    } 
+} 
+void Player::sendKettleInfo()
+{
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x35);
+    st << static_cast<UInt8>(0x01);
+    getMonsterKettleMgr()->GetMonsterKettleInfo(st); 
+    st << Stream::eos;
+    send(st);
+}
 
 void Player::shuShanWeiWei_XDPB(Player * player, UInt8 opt)
 {
@@ -34784,6 +34826,9 @@ void Player::firstPotOfGold(UInt32 total)
             SYSMSG_BROADCASTV(5189, getCountry(), getName().c_str(), rechargeLvl[i]);
             SetVar(VAR_FIRST_POT_GOLD_STATUS, SET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i));
             firstPotOfGoldReturn(0);
+            char str[16] = {0};
+            sprintf(str, "F_140726_%d", static_cast<Int32>(1+i));
+            udpLog("diyitongjin", str, "", "", "", "", "act");
         }
     }
 }

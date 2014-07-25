@@ -546,6 +546,7 @@ namespace GObject
         static	bool loadPictureInfo();
         static	bool loadWorldCup();
         static	bool loadHappyXXL();
+        static	bool loadMonsterKettle();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

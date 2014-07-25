@@ -193,6 +193,7 @@ namespace Script
 		CLASS_DEF(GameActionLua, GetGreatFighterName);
 		CLASS_DEF(GameActionLua, RunItemTaskAction);
         CLASS_DEF(GameActionLua, GetSharpDay);
+		CLASS_DEF(GameActionLua, GetPlayerPtr);
 
 		CLASS_ADD(Player);
 		CLASS_DEF(Player, getPName);
@@ -1959,6 +1960,10 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt32>("getXXLCost", player, opt);
 	}
+    Player * GameActionLua::GetPlayerPtr(UInt64 playerId)
+    {
+        return globalPlayers[playerId];
+    }
     lua_tinker::table GameActionLua::getWeiXinShop(UInt8 index)
     {
         return Call<lua_tinker::table>("getWeiXinShop", index);

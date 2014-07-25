@@ -51,9 +51,11 @@
 #include "CardSystem.h"
 #include "NewQuestionsTable.h"
 #include "ClanShop.h"
+#include "KettleNpc.h"
 
 namespace GData
 {
+    KettleNpc kettleAttrData;
 	ItemBaseTypeManager		itemBaseTypeManager;
 	ItemBaseTypeNameManager itemBaseTypeNameManager;
 	ObjectMapT<GObject::ItemWeapon> npcWeapons;
@@ -535,6 +537,11 @@ namespace GData
         if (!LoadCubeCount())
         {
             fprintf (stderr, "Load LoadCubeCount Error !\n");
+            std::abort();
+        }
+        if (!LoadKettleNpc())
+        {
+            fprintf (stderr, "Load LoadKettleNpc Error !\n");
             std::abort();
         }
 
@@ -3316,6 +3323,20 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
         {
             pictureAttrData.setCubeCount( dbpn.id , dbpn.index , dbpn.cnt);
+        }
+		return true;
+    }
+    bool GDataManager::LoadKettleNpc()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBKettleNpc dbk;
+		if(execu->Prepare("SELECT `monsterId`, `attack`, `magatk` , `hp`,`action`,`exp` FROM `kettleNpc` ", dbk) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+        {
+            KettleAttr ka(dbk.attack , dbk.magatk , dbk.hp ,dbk.action ,dbk.exp);
+            kettleAttrData.LoadKettleMonsterAttr( (dbk.monsterId-1)/7 , (dbk.monsterId-1)%7 ,ka);
         }
 		return true;
     }

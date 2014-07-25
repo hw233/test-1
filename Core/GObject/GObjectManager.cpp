@@ -769,6 +769,11 @@ namespace GObject
             fprintf(stderr, "loadHappyXXL error!\n");
             std::abort();
         }
+		if(!loadMonsterKettle())
+        {
+            fprintf(stderr, "loadMonsterKettle error!\n");
+            std::abort();
+        }
 
         if(!loadSkillGrade())
         {
@@ -8025,6 +8030,29 @@ namespace GObject
             if(dbpn.num > 2)
                 continue;
             pl->setXXLMapInfo(0,dbpn.num ,dbpn.map);
+        }
+		lc.finalize();
+		return true;
+    }
+    bool GObjectManager::loadMonsterKettle()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading WorldCup:");
+		DBKettle dbk;
+		if(execu->Prepare("SELECT `playerId` ,`num`, `history`,`occupy` FROM `kettle` ", dbk) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+		    Player* pl = globalPlayers[dbk.playerId];
+			if(pl == NULL)
+				continue;
+            if(dbk.num >= 12)
+                continue;
+            pl->getMonsterKettleMgr()->SetKettleHistory(dbk.num ,dbk.history);
+            pl->getMonsterKettleMgr()->SetKettleOccupy(dbk.num , dbk.occupy);
         }
 		lc.finalize();
 		return true;

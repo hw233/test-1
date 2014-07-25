@@ -36,6 +36,7 @@
 #include "ModifyMount.h"
 #include "CollectCard.h"
 #include "KangJiTianMo.h"
+#include "MonsterKettle.h"
 
 
 namespace Battle
@@ -363,6 +364,7 @@ namespace GObject
     class Erlking;
     struct MarriageInfo;
     class KangJiTianMo;
+    class MonsterKettleManager;
 
     struct TripodData
     {
@@ -1268,6 +1270,7 @@ namespace GObject
         void sendXXLMapInfo(UInt8 res = 0 ,UInt8 index = 0);
         void getXXLScore(UInt8 type ,UInt8 count);
         UInt8 subXXLCount(UInt8 step);
+        void sendKettleInfo();
 
 		void Logout(bool = false);	//???????߲???
 		void selfKick();
@@ -1968,6 +1971,7 @@ namespace GObject
 		Package* GetPackage() { return m_Package; }
 		PetPackage* GetPetPackage() { return m_PetPackage; }
 		TaskMgr* GetTaskMgr() { return m_TaskMgr; }
+		MonsterKettleManager* getMonsterKettleMgr(){ return m_MonsterKettleMgr; }
 		MailBox* GetMailBox() { return m_MailBox; }
 		AttainMgr* GetAttainMgr() { return m_AttainMgr; }
         ActivityMgr* GetActivityMgr(){return m_ActivityMgr;}
@@ -2507,7 +2511,7 @@ namespace GObject
         std::map<UInt64, struct FriendYellowBird >_friendYB;   //黄色鸢尾赠送情况
         std::map<UInt64, struct FriendTaskNum >_friendTask;   //友好度任务
 
-		TaskMgr* m_TaskMgr;
+		TaskMgr*  m_TaskMgr;
 		Trade* m_Trade;
 		Sale* m_Sale;
 		Athletics* m_Athletics;
@@ -2521,6 +2525,7 @@ namespace GObject
         NewRelation* m_relation;
         FairySpar* m_FairySpar;
 		MailBox* m_MailBox;
+        MonsterKettleManager* m_MonsterKettleMgr;
 
         bool _loadMark;
 		bool _isOnline;
@@ -3538,6 +3543,8 @@ namespace GObject
         static UInt8 getCubeCountInSet(std::map<UInt8 , std::vector<UInt8> > map_vec);
         void getPictureAttr(GData::AttrExtra& ae); 
         UInt8 buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count);
+
+        void UseCouponOrGoldInKettle(UInt32 num ,UInt8 flag = 1);
 
         void makeFighterSGList(Stream& st);
         void sendFighterSGListWithNoSkill();
