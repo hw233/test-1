@@ -768,7 +768,7 @@ function RunInterestingBag(player, cts)
         [0] = {{33,1},{9371,1},{500,1}},
     };
     local package = player:GetPackage();
-    package:DelItemSendMsg(16011, player)   --需要修改
+    package:DelItemSendMsg(9451, player)   --需要修改
     if cts > 1  then
         return false
     end
