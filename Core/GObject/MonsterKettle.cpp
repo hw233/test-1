@@ -204,8 +204,10 @@ namespace GObject
         //    std::cout << "最终:" << static_cast<UInt32>(exp) << std::endl;
             //pl->AddExp(exp);
             pl->setFightersDirty(true);
-            //if(_npcIds[idx].king == 4)
-            //    SYSMSG_BROADCASTV(5190, pl->getCountry(), pl->getName().c_str(), 3 ,ng->getName().c_str()); 
+            if(_npcIds[idx].king == 4)
+            {
+                SYSMSG_BROADCASTV(5190, pl->getCountry(), pl->getName().c_str(), 3 ,ng->getName().c_str()); 
+            }
         }
         st << static_cast<UInt32>(_npcIds[idx].npcId % 1000 /10 * 7 + _npcIds[idx].npcId%10);
         st << static_cast<UInt8>(_npcIds[idx].king);
@@ -299,7 +301,7 @@ namespace GObject
         st << static_cast<UInt32>(m_player->GetVar(VAR_KETTLE_4CNT));
         st << static_cast<UInt32>(m_player->GetVar(VAR_KETTLE_5CNT));
         st << static_cast<UInt8>(KETTLE_COUNT);
-        std::cout<<"begin:" << static_cast<UInt32>(st.size()) << std::endl;
+        //std::cout<<"begin:" << static_cast<UInt32>(st.size()) << std::endl;
         if(monsterKettle[0].GetMonster(0).npcId == 0)
         {
             for(UInt8 i = 0 ; i < KETTLE_COUNT ; ++i)
@@ -446,7 +448,9 @@ namespace GObject
     } 
     bool MonsterKettleManager::CheckKettleRight(UInt8 idx)
     { 
-        static UInt32 limit[] = {0,0,0,0,700,875,1050,1225,1400,1575,1750,1925};
+        static UInt32 limit[] = {0,0,0,0,560,700,840,980,1120,1260,1750,1925};
+        if( idx >= KETTLE_COUNT)
+            return false;
         UInt32 kettleCnt = m_player->GetVar(VAR_KETTLE_COUNT);
         if(kettleCnt < limit[idx])
             return false;
