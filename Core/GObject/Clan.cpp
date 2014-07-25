@@ -3908,7 +3908,7 @@ void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
         for(UInt8 i = 0; i < cnt; ++ i)
         {
             Player * pl = (*it)->player;
-            st << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
+            st << pl->getId() << pl->getName() << static_cast<UInt8>(pl->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : (pl->getVipLevel())) << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
                 << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << gAthleticsRank.getAthleticsRank(pl);
             st << static_cast<UInt8>(pl->isOnline());
             st << static_cast<UInt8>(pl->GetVar(VAR_PRAY_TYPE))<< static_cast<UInt8>(pl->GetVar(VAR_PRAY_VALUE));
