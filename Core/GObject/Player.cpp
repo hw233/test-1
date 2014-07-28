@@ -34758,7 +34758,7 @@ void Player::shuShanWeiWei_WXSC(UInt8 opt, UInt8 pos, UInt32 count)
 
 void Player::firstPotOfGold(UInt32 total)
 {
-    static UInt32 rechargeLvl[6] = {200, 800, 2000, 3000, 5000, 10000};
+    static UInt32 rechargeLvl[6] = {200, 800, 1500, 3000, 5000, 8000};
     UInt32 now = TimeUtil::Now();
     if(now - getCreated() > 7 * 24 *3600)
         return;
@@ -34788,6 +34788,10 @@ void Player::firstPotOfGold(UInt32 total)
 
 void Player::firstPotOfGoldReturn(UInt8 type)
 {
+    UInt32 now = TimeUtil::Now();
+    if(now - getCreated() > 7 * 24 *3600)
+        return;
+
     if(type == 0)
     {
         Stream st(REP::COUNTRY_ACT);

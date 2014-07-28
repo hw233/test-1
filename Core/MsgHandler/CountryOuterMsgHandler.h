@@ -1472,6 +1472,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->send(st1);
     }
     pl->getNewYearGiveGiftAward(0,0);
+    pl->firstPotOfGoldReturn(0);
 
     {
         GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
