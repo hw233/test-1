@@ -2132,7 +2132,7 @@ CREATE TABLE IF NOT EXISTS `player_jiguanyu` (
     `jiguanId` int(10) unsigned NOT NULL DEFAULT '0',
     `pos` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `schmem` tinyint(3) unsigned NOT NULL DEFAULT '0',
-    PRIMARY KEY(`playerId`, `jiguanId`)
+    PRIMARY KEY(`playerId`, `jiguanId`, `scheme`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `player_tuzhi`;
