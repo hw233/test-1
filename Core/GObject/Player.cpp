@@ -27211,9 +27211,9 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
     }
     UpdateGGInfo();
 }
-void Player::AddGuangGunScore(UInt8 score)
+void Player::AddGuangGunScore(UInt8 score,UInt8 type)
 {
-    if(World::getGGTime() == 2)
+    if(World::getGGTime() == 2 && type == 0)
     {
         if(GetVar(VAR_GUANGGUN_TENTIMES) == 1)
             score *= 10;
@@ -27596,19 +27596,19 @@ void Player::RunFriendlyCompass(UInt8 type)
        char str[32] = {0};
        switch(idx)
        {
-           case 11 :
+           case 12 :
                sprintf(str, "F_140717_4");
                udpLog("sanrenyou", str, "", "", "", "", "act");
                break;
-           case 7 :
+           case 8 :
                sprintf(str, "F_140717_5");
                udpLog("sanrenyou", str, "", "", "", "", "act");
                break;
-           case 9 :
+           case 10 :
                sprintf(str, "F_140717_6");
                udpLog("sanrenyou", str, "", "", "", "", "act");
                break;
-           case 4:
+           case 5:
                sprintf(str, "F_140717_7");
                udpLog("sanrenyou", str, "", "", "", "", "act");
                break;
@@ -27625,7 +27625,7 @@ void Player::RunFriendlyCompass(UInt8 type)
    send(st);
    UpdateGGInfo();
    sendGuangGunInfo();
-   AddGuangGunScore();
+   AddGuangGunScore(10,1);
    char str[16] = {0};
    sprintf(str, "F_131109_5");
    udpLog("qingyiluopan", str, "", "", "", "", "act");
