@@ -96,6 +96,7 @@ MSG_REG_2(ServerWarMsgHdr, 0x127, OnServerWarSupport);
 MSG_REG_2(ServerWarMsgHdr, 0x128, OnServerWarBattlePoint);
 MSG_REG_2(ServerWarMsgHdr, 0x129, OnServerWarLeaderBoard);
 MSG_REG_2(ServerWarMsgHdr, 0x12A, OnServerRechargeRank);
+MSG_REG_2(ServerWarMsgHdr, 0x12B, OnServerSay);
 
 MSG_REG_2(ServerLeftMsgHdr, 0x131, OnServerLeftConnected);  //连接
 MSG_REG_2(ServerLeftMsgHdr, 0x132, OnServerLeftPlayerEntered); //组队攻击

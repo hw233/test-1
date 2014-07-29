@@ -845,11 +845,12 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         float hp_factor = (float)WBOSS_BASE_TIME / (float)m_last;
         if(hp_factor > WBOSS_MAX_ASC_HP_FACTOR)
             hp_factor = WBOSS_MAX_ASC_HP_FACTOR;
-        ohp = ohp * hp_factor;
-        if (ohp < WBOSS_MIN_HP)
-            ohp = WBOSS_MIN_HP;
-        if (ohp > WBOSS_MAX_HP)
-            ohp = WBOSS_MAX_HP;
+        UInt64 hptmp = ohp * hp_factor;
+        if (hptmp < WBOSS_MIN_HP)
+            hptmp = WBOSS_MIN_HP;
+        if (hptmp > WBOSS_MAX_HP)
+            hptmp = WBOSS_MAX_HP;
+        ohp = static_cast<UInt32>(hptmp);
 
         setHP(ohp);
         nflist[0].fighter->setBaseHP(ohp);
