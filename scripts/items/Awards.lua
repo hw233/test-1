@@ -764,7 +764,6 @@ function RunInterestingAward(player, cts)
     return true
 end
 function RunInterestingBag(player, cts)
-    print("x")
     local item = {
         [0] = {{33,1},{9371,1},{500,1}},
     };

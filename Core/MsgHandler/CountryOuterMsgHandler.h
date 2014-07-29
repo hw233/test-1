@@ -4374,6 +4374,15 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
             NETWORK()->Broadcast(st);
             break;
         }
+    case 12:
+        {
+            Stream st1(SERVERWARREQ::SAY_TO_WORLD, 0xEE);
+            st1 << player->getCountry();
+            st1 << player->getName();
+            st1 << cr._text;
+            st1 << Stream::eos;
+            NETWORK()->SendToServerWar(st1);
+        }
 	default:
 		NETWORK()->Broadcast(st);
 		break;
