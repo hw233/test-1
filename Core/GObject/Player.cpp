@@ -29294,6 +29294,9 @@ void Player::AddYearHappyValue(UInt32 val,UInt8 flag)
         SYSMSG_SENDV(2022,this,val);
         SYSMSG_SENDV(2023,this,val);
     }
+    char str[16] = {0};
+    sprintf(str, "F_140730_7");
+    udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
 }
 void Player::sendHappyValueInfo()
 {
@@ -29334,7 +29337,13 @@ void Player::getHappyValueAward(UInt8 val)
         SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, 0);
         SetVar(VAR_YEARHAPPY_LEFTVALUE,value - 1280);
         SetVar(VAR_YEARHAPPY_DAYVALUE,value - 1280);
+        char str[16] = {0};
+        sprintf(str, "F_140730_8");
+        udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
    }
+   char str[16] = {0};
+   sprintf(str, "F_140730_%d",val);
+   udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
 }
 
 void Player::joinAllServerRecharge(UInt32 num)
