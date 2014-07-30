@@ -969,6 +969,7 @@ namespace GObject
             if(level == 6 && starTotal > rb->next * 2)
                 pl->setStarTotal(rb->next * 2);
             enterPos(pl, 0, true);
+            getAward(pl);
         }
         else
         {
@@ -1084,6 +1085,7 @@ namespace GObject
             if(level == 6 && starTotal > rb->next * 2)
                 pl->setStarTotal(rb->next * 2);
             enterPos(pl, 0, true);
+            getAward(pl);
         }
         else
         {

@@ -333,6 +333,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140721_1.sql #蜀山微微码上有奖发布微博周期一周变一天
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140707_cKettle.sql     
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
 }
 
 #sh player_jiguan.sh
