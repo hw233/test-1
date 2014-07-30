@@ -256,6 +256,7 @@ function onDungeonWin(player, id, count, free)
     Qingren(player, 0);
     fairyPetLoot(player, 0);
     GGLoot(player);
+    FlyRoadLoot(player);
 
     if free == true then
         FoolBaoLoot(player,0);
@@ -1058,6 +1059,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     LuckyDrawBox(player, id)
     ExJob(player, id, lootlvl)
     GGLoot(player);
+    FlyRoadLoot(player);
     if player:getQQVipPrivilege() == true then
         player:setQQVipPrivilege(false)
         FallActivity(player, 1)
@@ -1114,6 +1116,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     SurnameLegendLoot(player,0);
     IceCreamLoot(player)
     GGLoot(player);
+    FlyRoadLoot(player);
     if lootlvl == 0 then
         FallActivity(player, 1)
     else
@@ -9590,13 +9593,13 @@ function onRoamingQueqiao(player, pos)
     }
 
     local eventItem = {
-        {{511, 1, 10}, {500, 1, 10}, {30, 1, 10}},
-        {{56, 1, 20}, {500, 1, 20}, {57, 1, 20}},
-        {{511, 2, 20}, {512, 1, 30}, {517, 1, 30}},
-        {{16016, 1, 10}, {16016, 1, 10}, {16016, 1, 10}},
-        {{503, 1, 30}, {514, 1, 30}, {501, 1, 30}},
-        {{509, 1, 40}, {134, 1, 40}, {1325, 1, 40}},
-        {{9896, 1, 50}, {9898, 1, 50}, {9897, 1, 50}, {9899, 1, 50}},
+        {{500, 1, 10}, {15, 1, 10}, {30, 1, 10}},
+        {{56, 1, 20}, {9123, 1, 20}, {57, 1, 20}},
+        {{9371, 1, 20}, {9424, 1, 30}, {517, 1, 30}},
+        {{9122, 1, 10}, {9122, 1, 10}, {9122, 1, 10}},
+        {{503, 1, 30}, {513, 1, 30}, {501, 1, 30}},
+        {{509, 1, 40}, {507, 1, 40}, {515, 1, 40}},
+        {{16047, 1, 50}, {16047, 1, 50}, {16047, 1, 50}},
     }
 
     step = math.random(1, 3)
@@ -9609,7 +9612,7 @@ function onRoamingQueqiao(player, pos)
     i = roamPlace[pos2]
     j = math.random(1, #eventItem[i])
 
-    if eventItem[i][j][1] == 9896 then
+    --[[if eventItem[i][j][1] == 9896 then
         player:GetCollectCard():Add61Card(305)
     end
     if eventItem[i][j][1] == 9897 then
@@ -9620,7 +9623,7 @@ function onRoamingQueqiao(player, pos)
     end
     if eventItem[i][j][1] == 9899 then
         player:GetCollectCard():Add61Card(308)
-    end
+    end]]
 
     package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 32)
     player:lastQueqiaoAwardPush(eventItem[i][j][1], eventItem[i][j][2]);
@@ -9803,7 +9806,7 @@ function Qixi(player, lootlvl)
     if getQixi() then
         -- 喜鹊
         local package = player:GetPackage();
-        package:AddItem(16016, 1, true, 0, 10);
+        package:AddItem(9122, 1, true, 0, 10);
     end
 end
 
@@ -9893,6 +9896,14 @@ function GGLoot(player)
     end
     local package = player:GetPackage();
     package:AddItem(16021, 1, true,0,10); --欢乐礼包
+end
+
+function FlyRoadLoot(player)
+    if not getFlyRoadActivity() then
+        return
+    end
+    local package = player:GetPackage();
+    package:AddItem(16042, 1, true,0,10); --玉灵仙碑
 end
 
 function DropActLoot(player,lootlvl)

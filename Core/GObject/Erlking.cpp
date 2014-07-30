@@ -166,6 +166,9 @@ void Erlking::BuyPassNum()
     else
         money = 640;
 
+    if(World::getMonsterAndPetTime())
+        money /= 2;
+
     if(m_owner->getGold() < money)
     {
         m_owner->sendMsgCode(0, 1104);

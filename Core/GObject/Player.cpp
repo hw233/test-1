@@ -25554,6 +25554,28 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             }
         }
     }
+    if (World::getFlyRoadActivity())
+    {
+        if (flag == e_sla_clb || flag == e_sla_none || flag == e_sla_cb || flag == e_sla_ncb || flag == e_sla_hi)
+        {
+            if(flag == e_sla_none)
+            {
+                GetPackage()->Add(16042, 1, true, false, FromNpc);
+            }
+            else
+            {
+                UInt32 status = GetVar(VAR_FLYROAD_DROP_STATUS);
+                if(!(status & flag))
+                {
+                    GetPackage()->Add(16042, 1, true, false, FromNpc);
+                    status |= flag;
+                    SetVar(VAR_FLYROAD_DROP_STATUS, status);
+                }
+            }
+        }
+        
+           
+    }
 }
 
 void Player::setSysUpDateDlg(UInt32 v)
@@ -29268,11 +29290,13 @@ void Player::AddYearHappyValue(UInt32 val,UInt8 flag)
         GameMsgHdr hdr1(0x1DB, WORKER_THREAD_WORLD, this, sizeof(grade));
         GLOBAL().PushMsg(hdr1, &grade);
     }
-    else
     {
         SYSMSG_SENDV(2022,this,val);
         SYSMSG_SENDV(2023,this,val);
     }
+    char str[16] = {0};
+    sprintf(str, "F_140730_7");
+    udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
 }
 void Player::sendHappyValueInfo()
 {
@@ -29294,7 +29318,8 @@ void Player::getHappyValueAward(UInt8 val)
     if (!World::getHappyFireTime())
         return;
     UInt32 score[]={20,80,160,320,640,1280};
-    UInt32 value = GetVar(VAR_YEARHAPPY_VALUE);   //非每日值
+    UInt32 value = GetVar(VAR_YEARHAPPY_LEFTVALUE);   
+    UInt32 value1 = GetVar(VAR_YEARHAPPY_DAYVALUE);   
     if(val < 1 || val > sizeof(score)/sizeof(score[0]))
         return;
     if(value < score[val-1])
@@ -29307,6 +29332,18 @@ void Player::getHappyValueAward(UInt8 val)
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
     }
+   if(ctslandingAward == 63 && value >= 1280 && value1 >= 1280)
+   {
+        SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, 0);
+        SetVar(VAR_YEARHAPPY_LEFTVALUE,value - 1280);
+        SetVar(VAR_YEARHAPPY_DAYVALUE,value - 1280);
+        char str[16] = {0};
+        sprintf(str, "F_140730_8");
+        udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
+   }
+   char str[16] = {0};
+   sprintf(str, "F_140730_%d",val);
+   udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
 }
 
 void Player::joinAllServerRecharge(UInt32 num)
@@ -34869,6 +34906,164 @@ void Player::hideVipLvlFlag(UInt8 op)
         }
     }
 }
+
+void Player::ReturnFlyRoadInfo()
+{
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x36);
+    st << static_cast<UInt8>(0x01);
+    st << GetVar(VAR_FLYROAD_SW);
+    st << GetVar(VAR_FLYROAD_FT);
+    st << GetVar(VAR_FLYROAD_ZZ);
+    st << GetVar(VAR_FLYROAD_DJ);
+    st << static_cast<UInt8>(GET_BIT_8(GetVar(VAR_FLYROAD_FLAG),0));
+    st << static_cast<UInt8>(GET_BIT_8(GetVar(VAR_FLYROAD_FLAG),1));
+    st << static_cast<UInt8>(GET_BIT_8(GetVar(VAR_FLYROAD_FLAG),2));
+    st << static_cast<UInt8>(GET_BIT_8(GetVar(VAR_FLYROAD_FLAG),3));
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::SacrificeFlyRoad(UInt8 type, UInt16 num)
+{
+    if(type > 3 ) 
+        return;
+    UInt16 mCount = GetPackage()->GetItemAnyNum(16042);
+    if(mCount == 0 || num == 0)     
+        return;
+    if(mCount < num) 
+        return; 
+    GetPackage()->DelItemAny(16042, num);
+    switch(type)
+    {
+        case 0:
+            AddVar(VAR_FLYROAD_SW,100 * num); 
+            break;
+        case 1:
+            AddVar(VAR_FLYROAD_FT,100 * num); 
+            break;
+        case 2:
+            AddVar(VAR_FLYROAD_ZZ,100 * num); 
+            break;
+        case 3:
+            AddVar(VAR_FLYROAD_DJ,100 * num); 
+            break;
+        default:
+            break;
+    }
+    ReturnFlyRoadInfo();
+    while(num--)
+        udpLog("feishengzhilu", "F_140731_1", "", "", "", "", "act");
+}
+
+void Player::ExchangeXG(UInt8 type)
+{
+    UInt16 itemid1 = 0;
+    UInt16 itemid2 = 0;
+    UInt16 item_dst = 0;
+    switch(type)
+    {
+        case 0:
+            itemid1 = 16033;
+            itemid2 = 16034;
+            item_dst = 16029;
+            break;
+        case 1:
+            itemid1 = 16035;
+            itemid2 = 16036;
+            item_dst = 16030;
+            break;
+        case 2:
+            itemid1 = 16037;
+            itemid2 = 16038;
+            item_dst = 16031;
+            break;
+        case 3:
+            itemid1 = 16038;
+            itemid2 = 16039;
+            item_dst = 16032;
+            break;
+        default:
+            return;
+    }
+    UInt8 flag_tmp = GET_BIT_8(GetVar(VAR_FLYROAD_FLAG),type);
+    if(flag_tmp == 1)
+        return;
+    
+    if(GetPackage()->GetItemAnyNum(itemid1) == 0 || GetPackage()->GetItemAnyNum(itemid2)== 0)
+        return;
+    GetPackage()->DelItemAny(itemid1, 1);
+    GetPackage()->DelItemAny(itemid2, 1);
+	GetPackage()->AddItem(item_dst, 1, true, false, FromFlyRoad);
+    UInt32 flag_tmp1 = SET_BIT_8(GetVar(VAR_FLYROAD_FLAG),type,1);
+    SetVar(VAR_FLYROAD_FLAG,flag_tmp1);
+    ReturnFlyRoadInfo();
+    switch(type)
+    {
+        case 0 :
+            udpLog("feishengzhilu", "F_140731_6", "", "", "", "", "act");
+            break;
+        case 1 :
+            udpLog("feishengzhilu", "F_140731_7", "", "", "", "", "act");
+            break;
+        case 2 :
+            udpLog("feishengzhilu", "F_140731_8", "", "", "", "", "act");
+            break;
+        case 3 :
+            udpLog("feishengzhilu", "F_140731_9", "", "", "", "", "act");
+            break;
+    }
+
+}
+
+void Player::ExchangeFlyRoadBox(UInt8 type)
+{
+    if (GetPackage()->IsFull())
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    UInt32 cur_num = 0; 
+    switch(type)
+    {
+        case 0:
+            cur_num = GetVar(VAR_FLYROAD_SW);
+            if(cur_num < 1000)
+                return;
+            GetPackage()->AddItem(16043, 1, true, false, FromFlyRoad);
+            cur_num = cur_num - 1000;
+            SetVar(VAR_FLYROAD_SW,cur_num);
+            break;
+        case 1:
+            cur_num = GetVar(VAR_FLYROAD_FT);
+            if(cur_num < 1000)
+                return;
+            GetPackage()->AddItem(16044, 1, true, false, FromFlyRoad);
+            cur_num = cur_num - 1000;
+            SetVar(VAR_FLYROAD_FT,cur_num);
+            break;
+        case 2:
+            cur_num = GetVar(VAR_FLYROAD_ZZ);
+            if(cur_num < 1000)
+                return;
+            GetPackage()->AddItem(16045, 1, true, false, FromFlyRoad);
+            cur_num = cur_num - 1000;
+            SetVar(VAR_FLYROAD_ZZ,cur_num);
+            break;
+        case 3:
+            cur_num = GetVar(VAR_FLYROAD_DJ);
+            if(cur_num < 1000)
+                return;
+            GetPackage()->AddItem(16046, 1, true, false, FromFlyRoad);
+            cur_num = cur_num - 1000;
+            SetVar(VAR_FLYROAD_DJ,cur_num);
+            break;
+        default:
+            return;
+    }
+    ReturnFlyRoadInfo();
+}
+
 
 } // namespace GObject
 
