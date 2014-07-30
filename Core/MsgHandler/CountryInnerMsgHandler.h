@@ -3073,6 +3073,17 @@ void OnBeAcceptCutting(GameMsgHdr & hdr ,const void *data)
         return ;
     player->beReplyForCutting(pl,_st.res);
 }
+void OnServerWorldSay(GameMsgHdr & hdr , const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    std::string word; 
+    brd >> word; 
+    Stream st(SERVERWARREQ::SAY_TO_WORLD, 0xEE);
+    st << word;
+    st << Stream::eos;
+    NETWORK()->SendToServerWar(st);
+}
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

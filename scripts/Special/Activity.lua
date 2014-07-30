@@ -9876,7 +9876,8 @@ function HappyFireLoot(player,lootlvl)
             [3] = 1,
     };
     local package = player:GetPackage();
-    package:AddItem(9458, itemNum[lootlvl], true,0,10); --欢乐礼包
+    --package:AddItem(9458, itemNum[lootlvl], true,0,10); --欢乐礼包
+    package:AddItem(16048, itemNum[lootlvl], true,0,10); --欢乐礼包
 end
 
 --欢乐爆竹掉落

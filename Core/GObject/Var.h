@@ -621,8 +621,8 @@ namespace GObject
 
         VAR_YEARHAPPY_DAYVALUE = 650,       //每日累计欢乐值 
         VAR_YEARHAPPY_VALUE = 651,       //累计欢乐值
-        VAR_YEARHAPPY_DAYVALUE_AWARD = 652,       //每日欢乐值奖励 
-        VAR_YEARHAPPY_LEFTVALUE = 653,       //每日剩余欢乐值 
+        VAR_YEARHAPPY_DAYVALUE_AWARD = 652,       //每日欢乐值奖励  ==>更改为NONE
+        VAR_YEARHAPPY_LEFTVALUE = 653,       //每日剩余欢乐值   ==> 
         //婚礼进行系统
         VAR_MARRYBOARD_LIVELY  = 654,       //个人热闹值
         VAR_MARRYBOARD3  = 655,             //吃宴席的盘数 0表示未入席 1-10表示吃了 0-9盘
@@ -1404,7 +1404,7 @@ namespace GObject
             REGISTER_VAR(VAR_OLDMAN_SCORE_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE, CYCLE_DAY);
             REGISTER_VAR(VAR_YEARHAPPY_VALUE, CYCLE_NONE);
-            REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE_AWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_YEARHAPPY_DAYVALUE_AWARD, CYCLE_NONE);
             REGISTER_VAR(VAR_YEARHAPPY_LEFTVALUE, CYCLE_DAY);
             REGISTER_VAR(VAR_MARRYBOARD_LIVELY, CYCLE_NONE);
             REGISTER_VAR(VAR_MARRYBOARD3, CYCLE_DAY);

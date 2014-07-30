@@ -2072,7 +2072,7 @@ void World::World_OldMan_Refresh(void *)
            UInt16 loc;
            UInt32 npcId;
        };
-       MapNpc mapNpc = {_oldMan._spot, 4245};
+       MapNpc mapNpc = {_oldMan._spot, 4246};
        GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
        GLOBAL().PushMsg(hdr1, &mapNpc);
        _oldMan._loc = 0;
@@ -2099,7 +2099,7 @@ void World::World_OldMan_Refresh(void *)
             UInt16 loc;
             UInt32 npcId;
         };
-        MapNpc mapNpc = {_oldMan._spot, 4245};
+        MapNpc mapNpc = {_oldMan._spot, 4246};
         GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
         GLOBAL().PushMsg(hdr, &mapNpc);
 
@@ -2107,7 +2107,7 @@ void World::World_OldMan_Refresh(void *)
         _oldMan._players.clear();
         GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
         GObject::MOData mo;
-        mo.m_ID = 4245;
+        mo.m_ID = 4246;
         mo.m_Hide = false;
         mo.m_Spot = _oldMan._spot;
         mo.m_Type = 100;
@@ -5267,10 +5267,10 @@ void World::SendHappyFireAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{9600,50},{503,50},{16001,50},{9438,50},{9075,50}},
-        {{9600,30},{503,30},{16001,30},{9438,30},{0,0}},
-        {{9600,20},{503,20},{16001,20},{9438,20},{0,0}},
-        {{9600,10},{503,10},{16001,10},{9438,10},{0,0}},
+        {{9457,50},{9498,50},{509,40},{515,30},{9022,40}},
+        {{9457,30},{9498,30},{509,30},{515,25},{0,0}},
+        {{9457,20},{9498,20},{509,20},{515,15},{0,0}},
+        {{9457,10},{9498,10},{509,10},{515,10},{0,0}},
     };
     //static MailPackage::MailItem card = {9929,1};   //暂无白马王子
     UInt8 mark = 0;
