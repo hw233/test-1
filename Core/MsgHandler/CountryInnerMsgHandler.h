@@ -1283,6 +1283,20 @@ void OnDailyReq2(GameMsgHdr& hdr, const void * data)
 	player->sendDailyInfo();
 }
 
+void OnSeekingHer_SendBeans(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    struct sendBean
+    {
+        UInt64 userId;
+        UInt8 beanType;
+        UInt32 beanCount;
+        std::string words;
+    };
+	struct sendBean * sb = reinterpret_cast<struct sendBean *>(const_cast<void *>(data));
+	player->seekingHer_SendBeans(sb->userId, sb->beanType, sb->beanCount, sb->words);
+}
+
 void OnCancelAutoRaceBattle(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);

@@ -287,6 +287,8 @@ MSG_REG_2(GameMsgHdr, 0x289, OnTimerEventCompletedNotify);
 MSG_REG_2(GameMsgHdr, 0x28C, OnSearchAutoBattleResult);
 MSG_REG_2(GameMsgHdr, 0x28D, OnSearchAutoDungeonResult);
 
+MSG_REG_2(GameMsgHdr, 0x28E, OnSeekingHer_SendBeans);
+
 MSG_REG_2(GameMsgHdr, 0x291, OnLaunchTradeNotify);
 MSG_REG_2(GameMsgHdr, 0x292, OnOperateTradeNotify);
 MSG_REG_2(GameMsgHdr, 0x293, OnConfirmTradeNotify);

@@ -3599,7 +3599,7 @@ namespace GObject
         void shuShanWeiWei_MSYJ(Player *, UInt8);
         void shuShanWeiWei_WXSC(UInt8, UInt8, UInt32);
 
-        void seekingHer_SendBeans(UInt32 , UInt8 , UInt32 , std::string );
+        void seekingHer_SendBeans(UInt64 , UInt8 , UInt32 , std::string );
         void seekingHer_Announce(std::string );
         void seekingHer_GetSendBeanLog();
         void SetSeekingHerSendBeanLog(UInt64 &, UInt32 &, UInt32 &, bool);

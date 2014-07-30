@@ -2367,23 +2367,26 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             }
             else if(0x04 == opt)
             {
-                UInt32 userId = 0;
+                UInt64 userId = 0;
                 br >> userId;
                 GameMsgHdr hdr2(0x185, WORKER_THREAD_WORLD, player, sizeof(userId));
                 GLOBAL().PushMsg(hdr2, &userId);
             }
             else if(0x11 == opt)
             {
-                UInt32 userId = 0;
-                UInt8 beanType = 0;
-                UInt32 beanCount = 0;
-                std::string words = "";
-                br >> userId >> beanType >> beanCount;
-                if(beanType == 3 || beanType == 4)
+                struct sendBean
                 {
-                    br >> words;
-                }
-                player->seekingHer_SendBeans(userId, beanType, beanCount, words);
+                    UInt64 userId;
+                    UInt8 beanType;
+                    UInt32 beanCount;
+                };
+                struct sendBean sb;
+                sb.userId = 0;
+                sb.beanType = 0;
+                sb.beanCount = 0;
+                br >> sb.userId >> sb.beanType >> sb.beanCount;
+                GameMsgHdr hdr2(0x28E, WORKER_THREAD_NEUTRAL, player, sizeof(sb));
+                GLOBAL().PushMsg(hdr2, &sb);
             }
             else if(0x12 == opt)
             {

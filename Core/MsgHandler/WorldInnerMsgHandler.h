@@ -3515,7 +3515,7 @@ void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
         {
             pos++;
             st << static_cast<UInt16>(pos);
-            st << static_cast<UInt32>(i->player->getId());
+            st << static_cast<UInt64>(i->player->getId());
             st << i->player->getName();
             st << i->player->IsMale();
             st << i->player->GetVar(VAR_SEEKING_HER_CHARM_POINT);
@@ -3529,7 +3529,7 @@ void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
         {
             pos++;
             st << static_cast<UInt16>(pos);
-            st << static_cast<UInt32>(i->player->getId());
+            st << static_cast<UInt64>(i->player->getId());
             st << i->player->getName();
             st << i->player->IsMale();
             st << i->player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
@@ -3543,7 +3543,7 @@ void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
         {
             pos++;
             st << static_cast<UInt16>(pos);
-            st << static_cast<UInt32>(i->player->getId());
+            st << static_cast<UInt64>(i->player->getId());
             st << i->player->getName();
             st << i->player->IsMale();
             st << i->player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
@@ -3560,7 +3560,7 @@ void OnSeekingHer_FriendInfo( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
-	const UInt32 * userId = reinterpret_cast<const UInt32*>(data);
+	const UInt64 * userId = reinterpret_cast<const UInt64*>(data);
     Player * target = globalPlayers[*userId];
     if(!target)
         return;
@@ -3568,7 +3568,7 @@ void OnSeekingHer_FriendInfo( GameMsgHdr& hdr,  const void* data )
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x12);
     st << static_cast<UInt8>(4);
-    st << static_cast<UInt8>(*userId);
+    st << static_cast<UInt64>(*userId);
     st << target->GetVar(VAR_SEEKING_HER_CHARM_POINT);
     st << static_cast<UInt16>(WORLD().getSeekingHerCharmRank(target));
     st << target->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);

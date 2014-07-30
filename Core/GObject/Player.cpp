@@ -34819,7 +34819,7 @@ void Player::shuShanWeiWei_WXSC(UInt8 opt, UInt8 pos, UInt32 count)
     send(st);
 }
 
-void Player::seekingHer_SendBeans(UInt32 userId, UInt8 beanType, UInt32 count, std::string words)
+void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, std::string words)
 {
     static UInt32 beanPoint[5][3] = {
         {1, 1, 16024},
@@ -34848,11 +34848,18 @@ void Player::seekingHer_SendBeans(UInt32 userId, UInt8 beanType, UInt32 count, s
     if(getId() == userId)
     {
         receiver->AddVar(VAR_SEEKING_HER_BEAN_TOTAL, beanPoint[beanType][1] * count);
+        GameMsgHdr hdr2(0x158, WORKER_THREAD_WORLD, receiver, 0);
+        GLOBAL().PushMsg(hdr2, NULL);
     }
     else
     {
         AddVar(VAR_SEEKING_HER_CHARM_POINT, beanPoint[beanType][0] * count);
+        GameMsgHdr hdr1(0x157, WORKER_THREAD_WORLD, this, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
+
         receiver->AddVar(VAR_SEEKING_HER_BEAN_TOTAL, beanPoint[beanType][1] * count);
+        GameMsgHdr hdr2(0x158, WORKER_THREAD_WORLD, receiver, 0);
+        GLOBAL().PushMsg(hdr2, NULL);
         getSeekingHerCharmAward();
     }
     GetPackage()->DelItemAny(beanPoint[beanType][2], count);
