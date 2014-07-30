@@ -11614,24 +11614,28 @@ function ItemNormal_00016043(id, num, bind, param)
             if g <= chance[1] then
                 package:AddItem(16033, 1, true, true, 40);
                 Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]".."开启了宝箱".."[4:"..id.."]获得了".."[4:16033]仙格残片一个");
+                player:luaUdpLog("feishengzhilu", "F_140731_1", "act")
             end
         end
         if id == 16044 then
             if g <= chance[2] then
                 package:AddItem(16034, 1, true, true, 40);
                 Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]".."开启了宝箱".."[4:"..id.."]获得了".."[4:16034]仙格残片一个");
+                player:luaUdpLog("feishengzhilu", "F_140731_2", "act")
             end
         end
         if id == 16045 then
             if g <= chance[3] then
                 package:AddItem(16035, 1, true, true, 40);
                 Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]".."开启了宝箱".."[4:"..id.."]获得了".."[4:16035]仙格残片一个");
+                player:luaUdpLog("feishengzhilu", "F_140731_3", "act")
             end
         end
         if id == 16046 then
             if g <= chance[4] then
                 package:AddItem(16036, 1, true, true, 40);
                 Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]".."开启了宝箱".."[4:"..id.."]获得了".."[4:16036]仙格残片一个");
+                player:luaUdpLog("feishengzhilu", "F_140731_4", "act")
             end
         end
     end

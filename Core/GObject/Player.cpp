@@ -34937,6 +34937,8 @@ void Player::SacrificeFlyRoad(UInt8 type, UInt16 num)
             break;
     }
     ReturnFlyRoadInfo();
+    while(num--)
+        udpLog("feishengzhilu", "F_140731_1", "", "", "", "", "act");
 }
 
 void Player::ExchangeXG(UInt8 type)
@@ -34981,6 +34983,22 @@ void Player::ExchangeXG(UInt8 type)
     UInt32 flag_tmp1 = SET_BIT_8(GetVar(VAR_FLYROAD_FLAG),type,1);
     SetVar(VAR_FLYROAD_FLAG,flag_tmp1);
     ReturnFlyRoadInfo();
+    switch(type)
+    {
+        case 0 :
+            udpLog("feishengzhilu", "F_140731_6", "", "", "", "", "act");
+            break;
+        case 1 :
+            udpLog("feishengzhilu", "F_140731_7", "", "", "", "", "act");
+            break;
+        case 2 :
+            udpLog("feishengzhilu", "F_140731_8", "", "", "", "", "act");
+            break;
+        case 3 :
+            udpLog("feishengzhilu", "F_140731_9", "", "", "", "", "act");
+            break;
+    }
+
 }
 
 void Player::ExchangeFlyRoadBox(UInt8 type)
