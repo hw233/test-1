@@ -559,8 +559,6 @@ void PetTeamCopy::refreshMonster(Player* pl)
 
         UInt8 goldNeed = 2;
 
-        if(World::getMonsterAndPetTime())
-            goldNeed /= 2;
         if(pl->getGold() < goldNeed)
         {
             pl->sendMsgCode(0, 1104);
