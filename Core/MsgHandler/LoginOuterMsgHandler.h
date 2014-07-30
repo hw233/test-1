@@ -3421,6 +3421,7 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
         case 13:
             {
                 pl->SetVar(GObject::VAR_YEARHAPPY_VALUE, 0);
+                pl->SetVar(GObject::VAR_YEARHAPPY_DAYVALUE, 0);
                 pl->SetVar(GObject::VAR_YEARHAPPY_DAYVALUE_AWARD, 0);
             }
             break;
