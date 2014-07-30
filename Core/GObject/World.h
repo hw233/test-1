@@ -1227,6 +1227,17 @@ public:
         return true;
     }
 
+    inline static bool getFlyRoadActivity(UInt32 time = 0)
+    {
+        UInt32 now = TimeUtil::Now() + time;
+        UInt32 time20140802 = TimeUtil::MkTime(2014, 8, 2);
+        UInt32 time20140916 = TimeUtil::MkTime(2014, 9, 16);
+        
+        if(now < time20140802 || now > time20140916)
+            return false;
+        return true;
+    }
+
     inline static void setHalfGold(bool v)
     { _halfgold = v; }
     inline static bool getHalfGold()

@@ -256,6 +256,7 @@ function onDungeonWin(player, id, count, free)
     Qingren(player, 0);
     fairyPetLoot(player, 0);
     GGLoot(player);
+    FlyRoadLoot(player);
 
     if free == true then
         FoolBaoLoot(player,0);
@@ -1058,6 +1059,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     LuckyDrawBox(player, id)
     ExJob(player, id, lootlvl)
     GGLoot(player);
+    FlyRoadLoot(player);
     if player:getQQVipPrivilege() == true then
         player:setQQVipPrivilege(false)
         FallActivity(player, 1)
@@ -1114,6 +1116,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     SurnameLegendLoot(player,0);
     IceCreamLoot(player)
     GGLoot(player);
+    FlyRoadLoot(player);
     if lootlvl == 0 then
         FallActivity(player, 1)
     else
@@ -9893,6 +9896,14 @@ function GGLoot(player)
     end
     local package = player:GetPackage();
     package:AddItem(16021, 1, true,0,10); --欢乐礼包
+end
+
+function FlyRoadLoot(player)
+    if not getFlyRoadActivity() then
+        return
+    end
+    local package = player:GetPackage();
+    package:AddItem(16042, 1, true,0,10); --玉灵仙碑
 end
 
 function DropActLoot(player,lootlvl)

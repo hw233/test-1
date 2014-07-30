@@ -174,6 +174,7 @@ namespace Script
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
         lua_tinker::def(_L, "getICAct", GObject::World::getICAct);
         lua_tinker::def(_L, "setLevelAwardEnd", GObject::World::setLevelAwardEnd);
+		lua_tinker::def(_L, "getFlyRoadActivity", GObject::World::getFlyRoadActivity);  //飞升之路
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
