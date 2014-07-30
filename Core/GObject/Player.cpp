@@ -29307,7 +29307,7 @@ void Player::getHappyValueAward(UInt8 val)
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
     }
-   if(ctslandingAward == 63 && value >= 1280 && value >= 1280)
+   if(ctslandingAward == 63 && value >= 1280 && value1 >= 1280)
    {
         SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, 0);
         SetVar(VAR_YEARHAPPY_LEFTVALUE,value - 1280);
