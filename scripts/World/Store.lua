@@ -174,7 +174,7 @@ function loadStore()
         store:add(2 ,16009, 100)
     end
     if getHappyFireTime(300) then
-        store:add(2, 9458, 10)
+        store:add(2, 16048, 20)
     end
 
     if getKillMonsterAct() then

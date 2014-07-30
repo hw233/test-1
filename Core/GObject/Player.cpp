@@ -29290,11 +29290,13 @@ void Player::AddYearHappyValue(UInt32 val,UInt8 flag)
         GameMsgHdr hdr1(0x1DB, WORKER_THREAD_WORLD, this, sizeof(grade));
         GLOBAL().PushMsg(hdr1, &grade);
     }
-    else
     {
         SYSMSG_SENDV(2022,this,val);
         SYSMSG_SENDV(2023,this,val);
     }
+    char str[16] = {0};
+    sprintf(str, "F_140730_7");
+    udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
 }
 void Player::sendHappyValueInfo()
 {
@@ -29316,7 +29318,8 @@ void Player::getHappyValueAward(UInt8 val)
     if (!World::getHappyFireTime())
         return;
     UInt32 score[]={20,80,160,320,640,1280};
-    UInt32 value = GetVar(VAR_YEARHAPPY_VALUE);   //非每日值
+    UInt32 value = GetVar(VAR_YEARHAPPY_LEFTVALUE);   
+    UInt32 value1 = GetVar(VAR_YEARHAPPY_DAYVALUE);   
     if(val < 1 || val > sizeof(score)/sizeof(score[0]))
         return;
     if(value < score[val-1])
@@ -29329,6 +29332,18 @@ void Player::getHappyValueAward(UInt8 val)
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
     }
+   if(ctslandingAward == 63 && value >= 1280 && value1 >= 1280)
+   {
+        SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, 0);
+        SetVar(VAR_YEARHAPPY_LEFTVALUE,value - 1280);
+        SetVar(VAR_YEARHAPPY_DAYVALUE,value - 1280);
+        char str[16] = {0};
+        sprintf(str, "F_140730_8");
+        udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
+   }
+   char str[16] = {0};
+   sprintf(str, "F_140730_%d",val);
+   udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
 }
 
 void Player::joinAllServerRecharge(UInt32 num)
