@@ -29268,7 +29268,6 @@ void Player::AddYearHappyValue(UInt32 val,UInt8 flag)
         GameMsgHdr hdr1(0x1DB, WORKER_THREAD_WORLD, this, sizeof(grade));
         GLOBAL().PushMsg(hdr1, &grade);
     }
-    else
     {
         SYSMSG_SENDV(2022,this,val);
         SYSMSG_SENDV(2023,this,val);
