@@ -284,6 +284,7 @@ GMHandler::GMHandler()
     Reg(2, "setfc", &GMHandler::OnAddFriendlyCount);
     Reg(2, "autotc", &GMHandler::OnAutoTeamCopy);
     Reg(2, "makegear", &GMHandler::OnMakeGear);
+    Reg(2, "stw", &GMHandler::OnSayToWorld);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -5826,3 +5827,14 @@ void GMHandler::OnAttackKettle(GObject::Player *player, std::vector<std::string>
     player->getMonsterKettleMgr()->RandomMonster(index , 0 , 1);
     player->getMonsterKettleMgr()->BattleMonster(index , 0);
 }
+void GMHandler::OnSayToWorld(GObject::Player *player, std::vector<std::string>& args)
+{ 
+    std::string word = "hello world"; 
+    Stream st(SERVERWARREQ::SAY_TO_WORLD, 0xEE);
+    st << player->getCountry();
+    st << player->getName();
+    st << word;
+    st << Stream::eos;
+    NETWORK()->SendToServerWar(st);
+} 
+

@@ -4351,4 +4351,13 @@ void OnServerLeftAttr(ServerLeftMsgHdr& hdr, const void * data)
         clan->broadcast(st); 
     }
 }
+void OnServerSay( ServerWarMsgHdr& hdr, const void * data )
+{ 
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 country = 0;
+    std::string name;
+    std::string word;
+    brd >> country >> name >> word;
+    SYSMSG_BROADCASTV(5191 , country , name.c_str(),word.c_str());
+} 
 #endif // _WORLDOUTERMSGHANDLER_H_

@@ -21011,7 +21011,7 @@ void Player::sendFeastLoginAct()
         //MailPackage::MailItem mitem = {1763,1};
         //MailPackage::MailItem mitem = {1760,1};
         //MailPackage::MailItem mitem = {9422,1};
-        MailPackage::MailItem mitem = {1766,1};
+        MailPackage::MailItem mitem = {1772,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     //SetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY, 1);
@@ -29088,7 +29088,7 @@ void Player::GetFindOldManAward(UInt32 type)
         num =2;
         SYSMSG_BROADCASTV(574, getCountry(), getPName(), type );
     }
-    GetPackage()->AddItem(16011, num, true, false);   //欢乐礼包(9439) 其他活动要修改
+    GetPackage()->AddItem(16041, num, true, false);   //欢乐礼包(9439) 其他活动要修改
     AddVar(VAR_OLDMAN_DAYSCORE,num*10);
     AddVar(VAR_OLDMAN_SCORE,num*10);
     SYSMSG_SENDV(2024,this,num*10);
@@ -29145,7 +29145,7 @@ void Player::sendInterestingBag(Player* pl)
         sendMsgCode(0, 2218);
         return ;
     }
-    ItemBase* item = GetPackage()->GetItem(16011, true);					
+    ItemBase* item = GetPackage()->GetItem(16041, true);					
     if(item ==NULL)
         return ;
     UInt16 count = item->Count();
@@ -29156,7 +29156,7 @@ void Player::sendInterestingBag(Player* pl)
         return;
     }
     GetPackage()->DelItem2(item, 1);
-    GetPackage()->AddItemHistoriesLog(16011, 1);
+    GetPackage()->AddItemHistoriesLog(16041, 1);
     UInt64 id = getId();
     GameMsgHdr hdr(0x356, pl->getThreadId(),pl,sizeof(id) );
     GLOBAL().PushMsg(hdr, &id);
@@ -29177,7 +29177,7 @@ void Player::getInteresingBag(UInt64 pid)
         Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
         {
-            MailPackage::MailItem mitem[] = {{56, 1},{15,1},{500,1},{9371,1},{511,1},{505,1},{503,1}};
+            MailPackage::MailItem mitem[] = {{15, 1},{500,1},{513,1},{516,1},{503,1},{9414,1},{9457,1}};
             UInt32 chance[] = {2500,5000,7000,8000,9000,9500,10000};
             UInt32 rand = uRand(10000);
             UInt8 k =0;
@@ -29315,8 +29315,8 @@ void Player::getHappyValueAward(UInt8 val)
 {
     if (!World::getHappyFireTime())
         return;
-    UInt32 score[]={20,40,60,80,100,300};
-    UInt32 value = GetVar(VAR_YEARHAPPY_DAYVALUE);
+    UInt32 score[]={20,80,160,320,640,1280};
+    UInt32 value = GetVar(VAR_YEARHAPPY_VALUE);   //非每日值
     if(val < 1 || val > sizeof(score)/sizeof(score[0]))
         return;
     if(value < score[val-1])
@@ -34848,6 +34848,9 @@ void Player::firstPotOfGold(UInt32 total)
             SYSMSG_BROADCASTV(5189, getCountry(), getName().c_str(), rechargeLvl[i]);
             SetVar(VAR_FIRST_POT_GOLD_STATUS, SET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i));
             firstPotOfGoldReturn(0);
+            char str[16] = {0};
+            sprintf(str, "F_140726_%d", static_cast<Int32>(1+i));
+            udpLog("diyitongjin", str, "", "", "", "", "act");
         }
     }
 }
