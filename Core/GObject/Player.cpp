@@ -29293,7 +29293,7 @@ void Player::getHappyValueAward(UInt8 val)
     if (!World::getHappyFireTime())
         return;
     UInt32 score[]={20,80,160,320,640,1280};
-    UInt32 value = GetVar(VAR_YEARHAPPY_DAYVALUE);   
+    UInt32 value = GetVar(VAR_YEARHAPPY_LEFTVALUE);   
     if(val < 1 || val > sizeof(score)/sizeof(score[0]))
         return;
     if(value < score[val-1])
@@ -29309,7 +29309,7 @@ void Player::getHappyValueAward(UInt8 val)
    if(ctslandingAward == 0x111111 && value >= 1280)
    {
         SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, 0);
-        SetVar(VAR_YEARHAPPY_DAYVALUE,value - 1280);
+        SetVar(VAR_YEARHAPPY_LEFTVALUE,value - 1280);
    }
 }
 
