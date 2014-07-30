@@ -656,6 +656,16 @@ public:
         else
             return false;
     }
+    inline static bool  getMonsterAndPetTime()  // 妖王，珍兽消费减半
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_MOSTER_PET_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_MOSTER_PET_END);
+        UInt32 now = TimeUtil::Now() ;
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    } 
 
     inline static bool getWorldCupTime(UInt32 time = 0 )
     {
@@ -1027,11 +1037,11 @@ public:
     }
     inline static bool getHappyFireTime(UInt32 time = 0)
     {
-        //UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
-        //UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
+        UInt32 begin = GVAR.GetVar(GVAR_YEARHAPPY_RANK_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_YEARHAPPY_RANK_END);
 
-        UInt32 begin = TimeUtil::MkTime(2014, 4, 30);
-        UInt32 end = TimeUtil::MkTime(2014, 5, 5);
+        // UInt32 begin = TimeUtil::MkTime(2014, 4, 30);
+        // UInt32 end = TimeUtil::MkTime(2014, 5, 5);
         UInt32 now = TimeUtil::Now()+time;
         if( now >= begin && now <= end)
             _happyFire = true;
@@ -1213,6 +1223,17 @@ public:
         UInt32 time20140601 = TimeUtil::MkTime(2014, 7, 21);
         
         if(now < time20140601 || now > time20140601 + 5 * 86400)
+            return false;
+        return true;
+    }
+
+    inline static bool getFlyRoadActivity(UInt32 time = 0)
+    {
+        UInt32 now = TimeUtil::Now() + time;
+        UInt32 time20140802 = TimeUtil::MkTime(2014, 8, 2);
+        UInt32 time20140916 = TimeUtil::MkTime(2014, 9, 16);
+        
+        if(now < time20140802 || now > time20140916)
             return false;
         return true;
     }

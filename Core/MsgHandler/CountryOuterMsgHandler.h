@@ -4374,6 +4374,15 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
             NETWORK()->Broadcast(st);
             break;
         }
+    case 12:
+        {
+            Stream st1(SERVERWARREQ::SAY_TO_WORLD, 0xEE);
+            st1 << player->getCountry();
+            st1 << player->getName();
+            st1 << cr._text;
+            st1 << Stream::eos;
+            NETWORK()->SendToServerWar(st1);
+        }
 	default:
 		NETWORK()->Broadcast(st);
 		break;
@@ -9568,6 +9577,47 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                 }
             }
             player->sendKettleInfo();
+        }
+    case 0x36:
+        {
+            UInt8 opt = 0;
+            brd >> opt;
+            switch(opt)
+            {
+                case 0x01 :
+                    player->ReturnFlyRoadInfo();
+                    break;
+                case 0x02 :
+                    {
+                        UInt8 opt1 = 0;
+                        UInt16 num = 0;
+                        brd >> opt1 >> num; 
+                        player->SacrificeFlyRoad(opt1,num);
+                    }
+
+                    break;
+                case 0x03 :
+                    {
+                        UInt8 type = 0;    
+                        brd >> type;
+                        if(type > 3)
+                            return;
+                        player->ExchangeXG(type);
+                    }
+
+                    break;
+                case 0x04 :
+                    {
+                        UInt8 type = 0;    
+                        brd >> type;
+                        player->ExchangeFlyRoadBox(type);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+
         }
     default:
         break;

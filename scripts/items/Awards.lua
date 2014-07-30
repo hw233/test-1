@@ -739,10 +739,10 @@ function RunQZoneRechargeAward(player, cts)
 end
 function RunInterestingAward(player, cts)
     local item = {
-        [0] = {{505,3},{500,3},{511,3}},
-        [1] = {{501,3},{503,3},{514,3},{16005,3}},
-        [2] = {{513,3},{9338,3},{9457,3},{9600,3}},
-        [3] = {{9498,3},{9425,3},{1325,3},{515,3}},
+        [0] = {{15,3},{500,3},{133,3}},
+        [1] = {{503,5},{501,5},{511,5}},
+        [2] = {{9457,5},{9603,5},{513,5},{134,5}},
+        [3] = {{1325,5},{9338,5},{515,5},{1126,5}},
     };
     local package = player:GetPackage();
 --    package:DelItemSendMsg(9371, player)
@@ -768,7 +768,7 @@ function RunInterestingBag(player, cts)
         [0] = {{33,1},{9371,1},{500,1}},
     };
     local package = player:GetPackage();
-    package:DelItemSendMsg(16011, player)   --需要修改
+    package:DelItemSendMsg(16041, player)   --需要修改
     if cts > 1  then
         return false
     end
@@ -872,7 +872,7 @@ function RunBlueDiamondAward(player, opt)
         [5] = {785,2833,4881,5823,7202,7987,9366,10000},
         [6] = {1180,2630,4080,6030,7980,9100,9400,10000},
         [7] = {2200,4150,5350,5850,5950,6450,6950,7050,7650,7700,9850,10000},
-        [8] = {100,2800,3000,5000,5200,7000,7200,10000},
+        [8] = {115,125,3125,6125,6825,9325,9975,10000},
         [9] = {2500,4450,5650,5850,5950,6510,7070,7120,7720,7820,9970,10000}
     };
     local item = {
@@ -883,7 +883,7 @@ function RunBlueDiamondAward(player, opt)
         [5] = {{515,6},{507,4},{509,4},{503,20},{1325,8},{47,6},{134,8},{5026,2}},
         [6] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{503,5},{1719,1},{5135,1}},
         [7] = {{503,1},{9414,1},{9438,1},{515,1},{9076,2},{1325,1},{9649,1},{8555,1},{134,1},{5065,1},{56,2},{5005,1}},
-        [8] = {{9076,1},{56,1},{515,1},{503,1},{9498,1},{514,1},{134,1},{9497,1}},
+        [8] = {{9022,1},{1732,1},{9418,1},{503,1},{509,1},{516,1},{134,1},{1733,1}},
         [9] = {{503,1},{500,2},{517,1},{515,1},{9076,2},{1325,1},{516,1},{1729,1},{134,1},{5065,1},{56,2},{1733,1}}
     };
     local item_id = {9190, 9191, 9217, 9284,10119};
@@ -904,11 +904,21 @@ function RunBlueDiamondAward(player, opt)
         end
     end
     if opt ==8 then 
-        local value = player:GetVar(653);
-        if value <20 then 
-            return 
-        end 
-        player:SetVar(653,value - 20)
+        iid = 16048
+        local val = math.random(1,5)
+        if  not package:DelItem(iid, 1, true) then
+            if  not package:DelItem(iid, 1, false) then
+                player:sendMsgCode(2, 1110, 0);
+                return 0;
+            end
+        end
+        package:DelItemSendMsg(iid, player);
+        player:AddYearHappyValue(val,1)
+        --local value = player:GetVar(653);
+        --if value <20 then 
+        --    return 
+        --end 
+        --player:SetVar(653,value - 20)
         player:sendHappyValueInfo();
     end
     
@@ -928,8 +938,8 @@ function RunBlueDiamondAward(player, opt)
         Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."通过财富罗盘获得了".."[4:"..items[j][1].."]x"..items[j][2])
     end
    
-   if opt ==8 and j%2 ==1 then 
-        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."在勤劳大转盘中幸运的获得了".."[4:"..items[j][1].."]x"..items[j][2])
+   if opt ==8 and (items[j][1] == 9022 or items[j][1] == 1732 or items[j][1] == 509 or items[j][1] == 134 or items[j][1] == 1733) then 
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."在激情大转盘中幸运的获得了".."[4:"..items[j][1].."]x"..items[j][2])
     end
     local extraAward_9191 = {
         [2] = {9191,1,1},
@@ -1729,12 +1739,12 @@ function RunGameBoxDailyActionAward(player, cts)
 end
 function RunHappyValueAward(player, cts)
     local item = {
-        [1] = {{56,2},{57,2},{15,2},{500,2},{9371,3}},
-        [2] = {{500,2},{9497,2},{501,2},{517,2}},
-        [3] = {{9600,3},{503,3},{547,3},{551,3}},
-        [4] = {{465,1},{514,1}},
-        [5] = {{515,2},{134,2},{16001,2}},
-        [6] = {{9022,2},{509,3},{9076,1}},
+        [1] = {{500,2},{503,1},{15,2},{9371,3}},
+        [2] = {{501,2},{9424,2},{1126,2},{517,2}},
+        [3] = {{9498,2},{9457,2},{551,2},{8000,2}},
+        [4] = {{134,2},{1325,2},{16001,2},{16039,1}},
+        [5] = {{9338,5},{9457,5},{9076,3}},
+        [6] = {{9022,3},{9075,3}},
     };
     local baoshi = {5005,5015,5025,5035,5045,5055,5065,5075,5085,5095,5105,5115,5125,5135,5145}
     local package = player:GetPackage();

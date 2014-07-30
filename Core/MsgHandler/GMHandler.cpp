@@ -284,6 +284,7 @@ GMHandler::GMHandler()
     Reg(2, "setfc", &GMHandler::OnAddFriendlyCount);
     Reg(2, "autotc", &GMHandler::OnAutoTeamCopy);
     Reg(2, "makegear", &GMHandler::OnMakeGear);
+    Reg(2, "stw", &GMHandler::OnSayToWorld);
 
     Reg(3, "opencb", &GMHandler::OnClanBossOpen);
     Reg(3, "cb", &GMHandler::OnClanBoss);
@@ -4803,7 +4804,7 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_11TIME_END, 0);
             GObject::globalPlayers.enumerate(player_enum_2, 0);
             break;
-          case 32:
+        case 32:
             GVAR.SetVar(GVAR_GG_BEGIN, TimeUtil::SharpDayT(0));
             GVAR.SetVar(GVAR_GG_END, TimeUtil::SharpDayT(1));
 		    GLOBAL().PushMsg(hdr4, &reloadFlag);
@@ -4812,6 +4813,16 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
         case 33:
             GVAR.SetVar(GVAR_GG_BEGIN, 0);
             GVAR.SetVar(GVAR_GG_END, 0);
+            break;
+        case 34:
+            GVAR.SetVar(GVAR_MOSTER_PET_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_MOSTER_PET_END, TimeUtil::SharpDayT(1));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 35:
+            GVAR.SetVar(GVAR_MOSTER_PET_BEGIN, 0);
+            GVAR.SetVar(GVAR_MOSTER_PET_END, 0);
             break;
     }
 }
@@ -5826,3 +5837,14 @@ void GMHandler::OnAttackKettle(GObject::Player *player, std::vector<std::string>
     player->getMonsterKettleMgr()->RandomMonster(index , 0 , 1);
     player->getMonsterKettleMgr()->BattleMonster(index , 0);
 }
+void GMHandler::OnSayToWorld(GObject::Player *player, std::vector<std::string>& args)
+{ 
+    std::string word = "hello world"; 
+    Stream st(SERVERWARREQ::SAY_TO_WORLD, 0xEE);
+    st << player->getCountry();
+    st << player->getName();
+    st << word;
+    st << Stream::eos;
+    NETWORK()->SendToServerWar(st);
+} 
+

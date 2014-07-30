@@ -287,7 +287,6 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140422_1.sql     #五一劳动奖清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #捉迷藏清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_3_24_CreateFriendlyCount.sql     #创建友好度表
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear651.sql     #清空VAR651(大转盘)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_card.sql     #创建卡牌系统
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140510_1.sql     #创建帮派篝火
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_alter_card.sql     #创建卡牌系统
@@ -334,6 +333,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140721_1.sql #蜀山微微码上有奖发布微博周期一周变一天
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140707_cKettle.sql     
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear_qixi.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #清除节日套装(var294)
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear651.sql     #清空VAR(大转盘)
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #捉迷藏清空
 }
 
 #sh player_jiguan.sh

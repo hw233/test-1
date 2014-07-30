@@ -281,6 +281,7 @@ void WorldScript::init()
 
 	def("getOpenTime", GObject::World::getOpenTime);
 	def("isRPServer", GObject::World::isRPServer);
+    def("getFlyRoadActivity",GObject::World::getFlyRoadActivity);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);
