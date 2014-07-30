@@ -10995,10 +10995,13 @@ function ItemNormal_00016047(id, num, bind, param)
         end
 
         local item = items[i];
-        package:AddItem(item[1], item[2], 1, 0, 2);
+        package:Add(item[1], item[2], 1, 0, 2);
 
         if i >= 6 then
             Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."] "..msg_142.."[4:"..id.."]"..msg_123.."[4:"..item[1].."]")
+            if i == 10 then
+                player:luaUdpLog("qixiqueqiaohui", "F_140802_1", "act")
+            end
         end
     end
     package:DelItemSendMsg(id, player);

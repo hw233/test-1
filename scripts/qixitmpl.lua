@@ -63,7 +63,7 @@ qixitmpl:setRoamingFunc("onRoamingQueqiao")
 
 qixitmpl:setScoreTitle(4066)
 qixitmpl:setScoreContent(4067)
-qixitmpl:setMinAwardScore(50)
+qixitmpl:setMinAwardScore(200)
 -- 
 qixitmpl:addScoreAwards(32000, 1732, 1)
 qixitmpl:addScoreAwards(32000, 9076, 5)
@@ -89,7 +89,7 @@ qixitmpl:addScoreAwards(5000, 516, 7)
 -- 800分：橙色星辰旗(1126)x7，仙缘石(9371)x7,高级打孔石(512)x7
 qixitmpl:addScoreAwards(2500, 551, 3)
 qixitmpl:addScoreAwards(2500, 503, 3)
-qixitmpl:addScoreAwards(2500, 9424, 3)
+qixitmpl:addScoreAwards(2500, 517, 3)
 qixitmpl:addScoreAwards(2500, 547, 3)
 -- 600分：洗炼符(500)x7，中级打孔石(511)x7，法灵结晶(133)x7
 qixitmpl:addScoreAwards(1200, 501, 3)
@@ -97,8 +97,8 @@ qixitmpl:addScoreAwards(1200, 512, 3)
 qixitmpl:addScoreAwards(1200, 9123, 5)
 -- 200分：高级挂机加速符(56)x7，修为加速符(57)x7，银票(15)x7
 qixitmpl:addScoreAwards(600, 500, 3)
-qixitmpl:addScoreAwards(600, 511, 3)
-qixitmpl:addScoreAwards(600, 1523, 5)
+qixitmpl:addScoreAwards(600, 513, 3)
+qixitmpl:addScoreAwards(600, 15, 5)
 -- 50分：太乙真金(502)x7，初级打孔石(510)x7，蓝色符文熔炼诀(1327)x7
 qixitmpl:addScoreAwards(200, 56, 3)
 qixitmpl:addScoreAwards(200, 57, 3)
