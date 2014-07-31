@@ -25516,6 +25516,25 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             }
         }
     }
+    if(WORLD().getSeekingHer())
+    {
+        if (flag == e_sla_hi || flag == e_sla_mr)
+            return;
+        if(flag == e_sla_none)
+        {
+            //GameAction()->onDropAwardAct(this, 0);
+        }
+        else
+        {
+            UInt32 status = GetVar(VAR_SEEKING_HER_LOOT_STATUS);
+            if(!(status & flag))
+            {
+                status |= flag;
+                SetVar(VAR_SEEKING_HER_LOOT_STATUS, status);
+                GameAction()->onDropAwardAct(this, 0);
+            }
+        }
+    }
 }
 
 void Player::setSysUpDateDlg(UInt32 v)
@@ -34359,6 +34378,157 @@ void Player::shuShanWeiWei_WXSC(UInt8 opt, UInt8 pos, UInt32 count)
     st << static_cast<UInt16>(item_status);
     st << Stream::eos;
     send(st);
+}
+
+void Player::seekingHer_SendBeans(UInt32 userId, UInt8 beanType, UInt32 count, std::string words)
+{
+    static UInt32 beanPoint[5][3] = {
+        {1, 1, 16024},
+        {10, 9, 16025},
+        {110, 99, 16026},
+        {550, 520, 16027},
+        {1500, 1314, 16028}
+    };
+    if(!(beanType >= 0 && beanType <= 4))
+        return;
+    if(GetPackage()->GetItemAnyNum(beanPoint[beanType][2]) < count)
+    {
+        //豆数不够
+        sendMsgCode(0, 3508);
+        return;
+    }
+    Player * receiver = globalPlayers[userId];
+    if(receiver == NULL)
+    {
+        //玩家不存在
+        sendMsgCode(0, 3508);
+        return;
+    }
+    if(!GameAction()->getRedBeanAward(this, beanType + 1))
+        return;
+    if(getId() == userId)
+    {
+        receiver->AddVar(VAR_SEEKING_HER_BEAN_TOTAL, beanPoint[beanType][1] * count);
+    }
+    else
+    {
+        AddVar(VAR_SEEKING_HER_CHARM_POINT, beanPoint[beanType][0] * count);
+        receiver->AddVar(VAR_SEEKING_HER_BEAN_TOTAL, beanPoint[beanType][1] * count);
+        getSeekingHerCharmAward();
+    }
+    GetPackage()->DelItemAny(beanPoint[beanType][2], count);
+
+    if(1 == beanType)
+    {
+            SYSMSG_BROADCASTV(5174, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
+
+    }
+    else if(2 == beanType)
+    {
+            SYSMSG_BROADCASTV(5175, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
+            SYSMSGV(title, 5183, count);
+            SYSMSGV(content, 5179, getCountry(), getName().c_str(), count);
+            receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+    }
+    else if(3 == beanType)
+    {
+            SYSMSG_BROADCASTV(5176, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count, words.c_str());
+            SYSMSGV(title, 5184, count);
+            SYSMSGV(content, 5186, getCountry(), getName().c_str(), count);
+            receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+    }
+    else if(4 == beanType)
+    {
+            SYSMSG_BROADCASTV(5177, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count, words.c_str());
+            SYSMSGV(title, 5185);
+            SYSMSGV(content, 5187, getCountry(), getName().c_str(), count);
+            receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+    }
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 total = 0;
+    total = beanPoint[beanType][1] * count;
+    UInt64 senderId = getId();
+    receiver->SetSeekingHerSendBeanLog(senderId, now, total, 1);
+}
+
+void Player::getSeekingHerCharmAward()
+{
+    static UInt32 charmlvl[] = {200, 500, 1500, 4000, 8000, 1600, 3200};
+    static MailPackage::MailItem charmPointAward[][7] = {
+        {{9123, 2}, {440, 2}, {503, 2}, {500, 2}, {15, 5}},
+        {{503, 3}, {517, 3}, {512, 3}, {511, 3}, {0, 0}},
+        {{9600, 3}, {16001, 3}, {551, 3}, {501, 3}, {9418, 3}},
+        {{134, 5}, {1325, 5}, {9600, 5}, {9438, 5}, {9424, 5}},
+        {{9498, 10}, {9600, 10}, {9414, 10}, {501, 10}, {0, 0}},
+        {{1734, 1}, {9076, 8}, {515, 8}, {9600, 10}, {0, 0}},
+        {{1735, 1}, {9022, 8}, {9075, 8}, {9021, 8}, {0, 0}},
+    };
+
+    UInt32 charmPoint = GetVar(VAR_SEEKING_HER_CHARM_POINT);
+    UInt32 awardStatus = GetVar(VAR_SEEKING_HER_CHARM_AWARD);
+    for(UInt8 i = 0; i < 7; i++)
+    {
+        if(charmPoint >= charmlvl[i])
+        {
+            UInt8 tmp = GET_BIT(awardStatus, i);
+            if(!tmp)
+            {
+                SYSMSGV(title, 5194);
+                SYSMSGV(content, 5195, charmlvl[i]);
+                Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail)
+                {
+                    mailPackageManager.push(mail->id, charmPointAward[i], 5, true);
+                }
+                awardStatus = SET_BIT(awardStatus, i);
+            }
+        }
+    }
+    SetVar(VAR_SEEKING_HER_CHARM_AWARD, awardStatus);
+}
+
+void Player::seekingHer_Announce(std::string words)
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 lastAnnounceTime = GetVar(VAR_SEEKING_HER_ANNOUNCE_TIME);
+    if(now < lastAnnounceTime + 10 * 60)
+    {
+        //提示冷却时间不到
+        sendMsgCode(0, 1200);
+        return;
+    }
+    setMyAnnouncement(words, 1);
+    SetVar(VAR_SEEKING_HER_ANNOUNCE_TIME, now);
+}
+
+void Player::seekingHer_GetSendBeanLog()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x12);
+    st << static_cast<UInt8>(0x13);
+    st << static_cast<UInt32>(_seekingHerSendBeanLog.size());
+    for(std::vector<SeekingHerSendBeanLog *>::iterator i = _seekingHerSendBeanLog.begin(), e = _seekingHerSendBeanLog.end(); i!=e ; ++i)
+    {
+        st << (*i)->date;
+        st << globalPlayers[(*i)->senderId]->getName();
+        st << (*i)->count;
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::SetSeekingHerSendBeanLog(UInt64 & senderId, UInt32 & date, UInt32 & count, bool toDB)
+{
+    SeekingHerSendBeanLog * lg = new SeekingHerSendBeanLog;
+    lg->senderId = senderId;
+    lg->date = date;
+    lg->count = count;
+    _seekingHerSendBeanLog.push_back(lg);
+
+    if(toDB)
+        DB1().PushUpdateData("insert into `sendbeans_log`(senderId, receiverId, data, count) values(%" I64_FMT "u, %" I64_FMT "u, %u, %u)", senderId, getId(), date, count);
+
 }
 
 } // namespace GObject

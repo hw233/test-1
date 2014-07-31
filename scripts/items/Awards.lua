@@ -2047,3 +2047,29 @@ function getShuShanWeiWei_MSYJ_Award(player)
     package:Add(MSYJ_Award[i][1], MSYJ_Award[i][2], true, true, 79)
     return MSYJ_Award[i]
 end
+
+function getRedBeanAward(player, index)
+    local redBeanAward = {
+        [1] = { {15, 1}, {56, 1}, {500, 1}, {57, 1}, {511, 1}},
+        [2] = { {503, 1}, {500, 2}, {9123, 1}, {440, 1}, {516, 1}},
+        [3] = { {440, 2}, {9123, 2}, {1325, 2}, {9338, 2}, {1126, 8}},
+        [4] = { {134, 12}, {515, 7}, {440, 12}, {9123, 12}, {9433, 1}, {9076, 5}, {1735, 1}, {1734, 1}},
+        [5] = { {503, 30}, {500, 30}, {501, 30}, {515, 17}, {509, 10}, {507, 10}, {9433, 1}, {9076, 7}, {9075, 6}, {9022, 6}, {9076, 12}, {1735, 1}, {1734, 1}},
+    }
+
+    local award = redBeanAward[index]
+    if award == nil then
+        return false
+    end
+
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < #award then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+
+    for i = 1, #award do
+        package:Add(award[i][1], award[i][2], true, 0, 101)
+    end
+    return true
+end

@@ -1794,7 +1794,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1`,`xjfrontFreeCnt`, `xjfrontGoldCnt`, `xjfrontUpdate`, `clancontrishop` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1`,`xjfrontFreeCnt`, `xjfrontGoldCnt`, `xjfrontUpdate`, `clancontrishop`,`announcement` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -2164,6 +2164,8 @@ namespace GObject
                     PLAYER_DATA(pl, clanShopItemsAll).insert(std::make_pair(atoi(tk1[0].c_str()), atoi(tk1[1].c_str())));
                 }
             }
+
+            pl->setMyAnnouncement(dbpd.announcement, 0);
 
 		}
 		lc.finalize();
@@ -3044,6 +3046,32 @@ namespace GObject
             }
             lc.finalize();
         }
+
+        // Load player SeekingHer sendBeans_log
+        {
+            lc.prepare("Loading player SeekingHer sendBeans_log:");
+            last_id = 0xFFFFFFFFFFFFFFFFull;
+            pl = NULL;
+            DBSeekingHerSendBeanLog sthdata;
+            if(execu->Prepare("SELECT `senderId`, `receiverId`, `data`, `count` FROM `sendbeans_log` ORDER BY  `senderId`", sthdata) != DB::DB_OK)
+                return false;
+            lc.reset(1000);
+            while(execu->Next() == DB::DB_OK)
+            {
+                lc.advance();
+                if(sthdata.receiverId != last_id)
+                {
+                    last_id = sthdata.receiverId;
+                    pl = globalPlayers[last_id];
+                }
+                if(pl == NULL)
+                    continue;
+                pl->SetSeekingHerSendBeanLog(sthdata.senderId, sthdata.date, sthdata.count, 0);
+            }
+        }
+
+        lc.finalize();
+
 		/*lc.prepare("Loading mail package:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		DBMailPackageData mpdata;

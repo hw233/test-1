@@ -502,6 +502,11 @@ public:
     inline static bool getGuoqing()
     { return _guoqing; }
 
+    inline static void setSeekingHer(bool v)
+    { _seekingher = v; }
+    inline static bool getSeekingHer()
+    { return _seekingher; }
+
     inline static void set9215Act(bool v)
     { _9215Act= v; }
     inline static bool get9215Act()
@@ -1369,6 +1374,7 @@ public:
     static bool _maydayloginAct;
     static UInt8 _towerloginAct;
     static bool _guoqing;
+    static bool _seekingher;
     static bool _9215Act;
     static bool _enchant_gt11;
     static bool _rechargenextret;
@@ -1456,6 +1462,9 @@ public:
     static RCSortType tyss_PlayerSort;     //天元神兽个人积分排名
     static ClanGradeSort tyss_ClanSort;     //天元神兽帮派积分排名
     static RCSortType coolSummerSort;     //酷爽一夏个人活跃排名
+    static RCSortType seekingHerNiuLangSort;     //众里寻她牛郎榜排名
+    static RCSortType seekingHerZhiNvSort;     //众里寻她织女榜排名
+    static RCSortType seekingHerCharmSort;     //众里寻她魅力值排名
     static void initRCRank();
     static void initRP7RCRank();
     static void WorldCupAward(UInt8 num , UInt32 res);  //公布答案
@@ -1490,6 +1499,7 @@ private:
 	static void World_Multi_Check( World * );
 	static void World_Midnight_Check( World * );
 	static void World_Fire_Sacrifice_Check( World * );
+    static void World_Seeking_Her_Check(void *);
     static void World_CreateNewDB_Check();
 	static void World_Online_Log( void * );
 	static void World_Athletics_Check( void * );
@@ -1587,6 +1597,13 @@ public:
     bool getLeftAddrConnection(){return _leftAddrConnect;}
     void SupportWorldCup(Player * pl , UInt8 count , UInt8 res ,UInt32 nums = 0);
     static void SendRechargeRP7RankAward();
+    UInt32 getSeekingHerCharmRank(Player * pl);
+    UInt32 getSeekingHerRank(Player * pl);
+    Player * getSeekingHerTopRank(UInt8);
+    void SendSeekingHerNiuLangAward();
+    void SendSeekingHerZhiNvAward();
+    void SendSeekingHerCharmAward();
+
 private:
 	void testUpdate();
 	Script::WorldScript * _worldScript;

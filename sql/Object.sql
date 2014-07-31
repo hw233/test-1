@@ -932,6 +932,7 @@ CREATE TABLE `player` (
   `xjfrontGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `xjfrontUpdate` int(10) unsigned NOT NULL DEFAULT 0,
   `clancontrishop` varchar(1024) NOT NULL DEFAULT '',
+  `announcement` varchar(1024) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
   KEY `mainFighter` (`mainFighter`)
@@ -2644,4 +2645,13 @@ CREATE TABLE IF NOT EXISTS `happyXXL` (
     `num`  tinyint(3) unsigned NOT NULL DEFAULT '0',
     `map` varchar(256) NOT NULL DEFAULT '',
     PRIMARY KEY(`playerId`,`num`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `sendbeans_log`;
+CREATE TABLE IF NOT EXISTS `sendbeans_log` (
+    `senderId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `receiverId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `data` int(10) unsigned NOT NULL,
+    `count` int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`senderId`,`receiverId`,`data`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

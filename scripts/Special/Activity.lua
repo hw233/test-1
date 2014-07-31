@@ -295,6 +295,7 @@ function onDungeonWin(player, id, count, free)
     _snowAct(player, count);
     _collectCardAct(player, count);
     IceCreamLoot(player)
+    RedBeanLoot(player)
 end
 
 function onClanBattleAttend(player)
@@ -939,6 +940,13 @@ function IceCreamLoot(player)
     end
 end
 
+function RedBeanLoot(player)
+    if getSeekingHer() then
+        local package = player:GetPackage()
+        package:AddItem(16024, 1, true)
+    end
+end
+
 function Item9343Act(player, lootlvl)
     if getItem9343Act() then
         if lootlvl > 3 then
@@ -1078,6 +1086,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     Item9344Act(player, lootlvl);
     Item9343Act(player, lootlvl);
     IceCreamLoot(player)
+    RedBeanLoot(player)
     player:AddZRYJCount(20); -- 逐日印记
     _collectCardAct(player, lootlvl);
     if getTYSSTime() ~= 0 then
@@ -1111,6 +1120,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     WorldCupLoot(player,lootlvl);
     SurnameLegendLoot(player,0);
     IceCreamLoot(player)
+    RedBeanLoot(player)
     if lootlvl == 0 then
         FallActivity(player, 1)
     else
@@ -1142,6 +1152,7 @@ end
 
 function onDropAwardAct(player, param)
     Qixi(player, 0);
+    RedBeanLoot(player)
 end
 
 local vippack = {

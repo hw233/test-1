@@ -1136,6 +1136,12 @@ function onActivityCheck(tm)
           setDropAct(false)
       end
 
+      if tm >= actTimeSeekingHer and tm < actTimeSeekingHer_1 then
+          setSeekingHer(true)
+      else
+          setSeekingHer(false)
+      end
+
       if tm >= actTimeq2 and tm < actTimeq2_1 then
           setAnswerAct(true)
       else
@@ -1527,6 +1533,9 @@ function initActTime(y, m, d)
   local  SerStartTmq1= { ['year'] = 2014, ['month'] = 7, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTmq2= { ['year'] = 2014, ['month'] = 7, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  --众里寻他
+  local  SerStartSeekingHer1= { ['year'] = 2014, ['month'] = 8, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartSeekingHer2= { ['year'] = 2014, ['month'] = 8, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -2016,6 +2025,9 @@ function initActTime(y, m, d)
 
   actTimeq1= os.time(SerStartTmq1)
   actTimeq1_1= os.time(SerStartTmq1) + 86400;
+
+  actTimeSeekingHer = os.time(SerStartSeekingHer1)
+  actTimeSeekingHer_1 = os.time(SerStartSeekingHer2)
 
   actTimeq2= os.time(SerStartTmq2)
   actTimeq2_1= os.time(SerStartTmq2) + 5 * 86400;

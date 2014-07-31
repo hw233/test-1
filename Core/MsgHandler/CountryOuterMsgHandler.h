@@ -2332,6 +2332,64 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 0x12:
+        {
+            if(!World::getSeekingHer())
+                return;
+            UInt8 opt = 0;
+            br >> opt;
+            if(0x01 == opt)
+            {
+                GameMsgHdr hdr2(0x182, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr2, NULL);
+            }
+            else if(0x02 == opt)
+            {
+                UInt8 flag = 0;
+                br >> flag;
+                GameMsgHdr hdr2(0x183, WORKER_THREAD_WORLD, player, sizeof(flag));
+                GLOBAL().PushMsg(hdr2, &flag);
+            }
+            else if(0x03 == opt)
+            {
+                UInt8 flag = 0;
+                br >> flag;
+                GameMsgHdr hdr2(0x184, WORKER_THREAD_WORLD, player, sizeof(flag));
+                GLOBAL().PushMsg(hdr2, &flag);
+            }
+            else if(0x04 == opt)
+            {
+                UInt32 userId = 0;
+                br >> userId;
+                GameMsgHdr hdr2(0x185, WORKER_THREAD_WORLD, player, sizeof(userId));
+                GLOBAL().PushMsg(hdr2, &userId);
+            }
+            else if(0x11 == opt)
+            {
+                UInt32 userId = 0;
+                UInt8 beanType = 0;
+                UInt32 beanCount = 0;
+                std::string words = "";
+                br >> userId >> beanType >> beanCount;
+                if(beanType == 3 || beanType == 4)
+                {
+                    br >> words;
+                }
+                player->seekingHer_SendBeans(userId, beanType, beanCount, words);
+            }
+            else if(0x12 == opt)
+            {
+                std::string announcement = "";
+                br >> announcement;
+                player->seekingHer_Announce(announcement);
+            }
+            else if(0x13 == opt)
+            {
+                player->seekingHer_GetSendBeanLog();
+            }
+        }
+        break;
+
         default:
         break;
     }

@@ -886,6 +886,13 @@ namespace GObject
         UInt32 reportId;
     };
 
+    struct SeekingHerSendBeanLog
+    {
+        UInt64 senderId;
+        UInt32 date;
+        UInt32 count;
+    };
+
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 150;
@@ -3570,6 +3577,22 @@ namespace GObject
         void shuShanWeiWei_XDPB(Player *, UInt8);
         void shuShanWeiWei_MSYJ(Player *, UInt8);
         void shuShanWeiWei_WXSC(UInt8, UInt8, UInt32);
+
+        void seekingHer_SendBeans(UInt32 , UInt8 , UInt32 , std::string );
+        void seekingHer_Announce(std::string );
+        void seekingHer_GetSendBeanLog();
+        void SetSeekingHerSendBeanLog(UInt64 &, UInt32 &, UInt32 &, bool);
+        void getSeekingHerCharmAward();
+        std::string _seekingHerMyAnnounce;
+        std::vector<SeekingHerSendBeanLog *> _seekingHerSendBeanLog;
+
+        inline std::string getMyAnnouncement() { return _seekingHerMyAnnounce; }
+        inline void setMyAnnouncement(std::string & an, bool toDB)
+        {
+            _seekingHerMyAnnounce = an;
+            if(toDB)
+                DB1().PushUpdateData("UPDATE `player` SET `announcement` = '%s' WHERE `id` = %" I64_FMT "u", _seekingHerMyAnnounce.c_str(), getId());
+        }
 
     private:
         //玩家位置（包括层数、当层位置）

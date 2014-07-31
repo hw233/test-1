@@ -235,6 +235,7 @@ struct DBPlayerData
     std::string openid;
     std::string canHirePet;
     std::string clanShopItems;
+    std::string announcement;
 };
 
 struct DBHoneyFall
@@ -1311,6 +1312,15 @@ struct DBStrengthenData
     std::string purpleBox;
     std::string orangeBox;
 };
+
+struct DBSeekingHerSendBeanLog
+{
+    UInt64 senderId;
+    UInt64 receiverId;
+    UInt32 date;
+    UInt32 count;
+};
+
 struct DBAirBookData
 {
     UInt64 playerId;
@@ -1775,7 +1785,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(65)
+SPECIALDEF(66)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -1841,7 +1851,8 @@ SPECIALDEF(65)
 	UInt8, pdata.xjfrontFreeCnt,
 	UInt8, pdata.xjfrontGoldCnt,
 	UInt32, pdata.xjfrontUpdate,
-    std::string, clanShopItems
+    std::string, clanShopItems,
+    std::string, announcement
     )
 SPECIALEND()
 
@@ -3313,6 +3324,16 @@ SPECIALDEF(9)
     std::string, blueBox,
     std::string, purpleBox,
     std::string, orangeBox
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSeekingHerSendBeanLog)
+SPECIALDEF(4)
+(
+    UInt64, senderId,
+    UInt64, receiverId,
+    UInt32, date,
+    UInt32, count
 )
 SPECIALEND()
 

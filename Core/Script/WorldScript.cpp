@@ -175,6 +175,8 @@ void WorldScript::init()
     def("setMiLuZhiJiaoAct", GObject::World::setMiLuZhiJiaoAct);
     def("setBuyFundAct", GObject::World::setBuyFundAct);
     def("getCoolSummer", GObject::World::getCoolSummer);
+    def("setSeekingHer", GObject::World::setSeekingHer);
+    def("getSeekingHer", GObject::World::getSeekingHer);
     
     def("setGuoqing", GObject::World::setGuoqing);
     def("getGuoqing", GObject::World::getGuoqing);
