@@ -9120,8 +9120,8 @@ namespace GObject
                 AddVar(VAR_GUANGGUN_RECHARGE,r);
                 UInt32 counts = (r+goldLeft)/80; 
                 //AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
-                SYSMSGV(title, 5180);
-                SYSMSGV(content, 5181);
+                SYSMSGV(title, 5206);
+                SYSMSGV(content, 5207);
                 while(counts > 0)
                 {
                     MailPackage::MailItem mitem[] = {{16021, 1}};
@@ -25537,13 +25537,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
     }
     if (WORLD().getQixi())
     {
-        if (flag == e_sla_hi || flag == e_sla_mr)
-            return;
-        if(flag == e_sla_none)
-        {
-            //GameAction()->onDropAwardAct(this, 0);
-        }
-        else
+        if (flag == e_sla_cb || flag == e_sla_ncb || flag == e_sla_clb || flag == e_sla_rb)
         {
             UInt32 status = GetVar(VAR_QIXI_DROP_STATUS);
             if(!(status & flag))
@@ -25551,6 +25545,26 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 status |= flag;
                 SetVar(VAR_QIXI_DROP_STATUS, status);
                 GameAction()->onDropAwardAct(this, 0);
+            }
+        }
+    }
+    if(WORLD().getSeekingHer())
+    {
+        if (flag == e_sla_none || flag == e_sla_ccb || flag == e_sla_ncb || flag == e_sla_clb || flag == e_sla_cb)
+        {
+            if(flag == e_sla_none)
+            {
+                GetPackage()->Add(16024, 1, true, false, FromNpc);
+            }
+            else
+            {
+                UInt32 status = GetVar(VAR_SEEKING_HER_LOOT_STATUS);
+                if(!(status & flag))
+                {
+                    GetPackage()->Add(16024, 1, true, false, FromNpc);
+                    status |= flag;
+                    SetVar(VAR_SEEKING_HER_LOOT_STATUS, status);
+                }
             }
         }
     }
@@ -25573,8 +25587,6 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 }
             }
         }
-        
-           
     }
 }
 
@@ -34837,6 +34849,178 @@ void Player::shuShanWeiWei_WXSC(UInt8 opt, UInt8 pos, UInt32 count)
     send(st);
 }
 
+void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, std::string words)
+{
+    static UInt32 beanPoint[5][3] = {
+        {1, 1, 16024},
+        {10, 9, 16025},
+        {110, 99, 16026},
+        {550, 520, 16027},
+        {1500, 1314, 16028}
+    };
+    if(!(beanType >= 0 && beanType <= 4))
+        return;
+    if(0 == count)
+        return;
+    if(GetPackage()->GetItemAnyNum(beanPoint[beanType][2]) < count)
+    {
+        sendMsgCode(0, 9000);
+        return;
+    }
+    Player * receiver = globalPlayers[userId];
+    if(receiver == NULL)
+    {
+        return;
+    }
+    if(!GameAction()->getRedBeanAward(this, beanType + 1, count))
+        return;
+    if(getId() == userId)
+    {
+        receiver->AddVar(VAR_SEEKING_HER_BEAN_TOTAL, beanPoint[beanType][1] * count);
+        GameMsgHdr hdr2(0x158, WORKER_THREAD_WORLD, receiver, 0);
+        GLOBAL().PushMsg(hdr2, NULL);
+    }
+    else
+    {
+        AddVar(VAR_SEEKING_HER_CHARM_POINT, beanPoint[beanType][0] * count);
+        GameMsgHdr hdr1(0x157, WORKER_THREAD_WORLD, this, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
+        GameMsgHdr hdr2(0x182, WORKER_THREAD_WORLD, this, 0);
+        GLOBAL().PushMsg(hdr2, NULL);
+
+        receiver->AddVar(VAR_SEEKING_HER_BEAN_TOTAL, beanPoint[beanType][1] * count);
+        GameMsgHdr hdr3(0x158, WORKER_THREAD_WORLD, receiver, 0);
+        GLOBAL().PushMsg(hdr3, NULL);
+        getSeekingHerCharmAward();
+    }
+    GetPackage()->DelItemAny(beanPoint[beanType][2], count);
+
+    if(1 == beanType)
+    {
+        SYSMSG_BROADCASTV(5222, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
+    }
+    else if(2 == beanType)
+    {
+        SYSMSG_BROADCASTV(5223, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
+        SYSMSGV(title, 5209, count);
+        SYSMSGV(content, 5205, getCountry(), getName().c_str(), count);
+        receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+    }
+    else if(3 == beanType)
+    {
+        SYSMSG_BROADCASTV(5224, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
+        SYSMSGV(title, 5210, count);
+        SYSMSGV(content, 5212, getCountry(), getName().c_str(), count);
+        receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+
+        Stream st(REP::COUNTRY_ACT);
+        st << static_cast<UInt8>(0x12);
+        st << static_cast<UInt8>(0x14);
+        st << static_cast<UInt8>(0);
+        st << words;
+        st << getName();
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
+    }
+    else if(4 == beanType)
+    {
+        SYSMSG_BROADCASTV(5203, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
+        SYSMSGV(title, 5211, count);
+        SYSMSGV(content, 5213, getCountry(), getName().c_str(), count);
+        receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+
+        Stream st(SERVERWARREQ::SAY_TO_WORLD, 0xEE);
+        st << words;
+        st << getName();
+        st << Stream::eos;
+        NETWORK()->SendToServerWar(st);
+    }
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 total = 0;
+    total = beanPoint[beanType][1] * count;
+    UInt64 senderId = getId();
+    receiver->SetSeekingHerSendBeanLog(senderId, now, total, 1);
+}
+
+void Player::getSeekingHerCharmAward()
+{
+    static UInt32 charmlvl[] = {200, 500, 1500, 4000, 8000, 16000, 32000};
+    static MailPackage::MailItem charmPointAward[][7] = {
+        {{9123, 2}, {440, 2}, {503, 2}, {500, 2}, {15, 5}},
+        {{503, 3}, {517, 3}, {512, 3}, {511, 3}, {0, 0}},
+        {{9600, 3}, {16001, 3}, {551, 3}, {501, 3}, {9418, 3}},
+        {{134, 5}, {1325, 5}, {9600, 5}, {9438, 5}, {9424, 5}},
+        {{9498, 10}, {9600, 10}, {9414, 10}, {501, 10}, {0, 0}},
+        {{1734, 1}, {9076, 8}, {515, 8}, {9600, 10}, {0, 0}},
+        {{1735, 1}, {9022, 8}, {9075, 8}, {9021, 8}, {0, 0}},
+    };
+
+    UInt32 charmPoint = GetVar(VAR_SEEKING_HER_CHARM_POINT);
+    UInt32 awardStatus = GetVar(VAR_SEEKING_HER_CHARM_AWARD);
+    for(UInt8 i = 0; i < 7; i++)
+    {
+        if(charmPoint >= charmlvl[i])
+        {
+            UInt8 tmp = GET_BIT(awardStatus, i);
+            if(!tmp)
+            {
+                SYSMSGV(title, 5220);
+                SYSMSGV(content, 5221, charmlvl[i]);
+                Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail)
+                {
+                    mailPackageManager.push(mail->id, charmPointAward[i], 5, true);
+                }
+                awardStatus = SET_BIT(awardStatus, i);
+            }
+        }
+    }
+    SetVar(VAR_SEEKING_HER_CHARM_AWARD, awardStatus);
+}
+
+void Player::seekingHer_Announce(std::string words)
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 lastAnnounceTime = GetVar(VAR_SEEKING_HER_ANNOUNCE_TIME);
+    if(now < lastAnnounceTime + 10 * 60)
+    {
+        sendMsgCode(0, 9001);
+        return;
+    }
+    setMyAnnouncement(words, 1);
+    SetVar(VAR_SEEKING_HER_ANNOUNCE_TIME, now);
+    sendMsgCode(0, 9002);
+}
+
+void Player::seekingHer_GetSendBeanLog()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x12);
+    st << static_cast<UInt8>(0x13);
+    st << static_cast<UInt32>(_seekingHerSendBeanLog.size());
+    for(std::vector<SeekingHerSendBeanLog *>::iterator i = _seekingHerSendBeanLog.begin(), e = _seekingHerSendBeanLog.end(); i!=e ; ++i)
+    {
+        st << (*i)->date;
+        st << globalPlayers[(*i)->senderId]->getName();
+        st << (*i)->count;
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::SetSeekingHerSendBeanLog(UInt64 & senderId, UInt32 & date, UInt32 & count, bool toDB)
+{
+    SeekingHerSendBeanLog * lg = new SeekingHerSendBeanLog;
+    lg->senderId = senderId;
+    lg->date = date;
+    lg->count = count;
+    _seekingHerSendBeanLog.push_back(lg);
+
+    if(toDB)
+        DB1().PushUpdateData("insert into `sendbeans_log`(senderId, receiverId, data, count) values(%" I64_FMT "u, %" I64_FMT "u, %u, %u)", senderId, getId(), date, count);
+}
+
 void Player::firstPotOfGold(UInt32 total)
 {
     static UInt32 rechargeLvl[6] = {200, 800, 1500, 3000, 5000, 8000};
@@ -34850,8 +35034,8 @@ void Player::firstPotOfGold(UInt32 total)
             UInt8 flag = GET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i);
             if(flag)
                 return;
-            SYSMSG(title, 5187);
-            SYSMSGV(content, 5188, rechargeLvl[i], rechargeLvl[i]);
+            SYSMSG(title, 5213);
+            SYSMSGV(content, 5214, rechargeLvl[i], rechargeLvl[i]);
             Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
@@ -34860,7 +35044,7 @@ void Player::firstPotOfGold(UInt32 total)
                 };
                 mailPackageManager.push(mail->id, mitem, 1, true);
             }
-            SYSMSG_BROADCASTV(5189, getCountry(), getName().c_str(), rechargeLvl[i]);
+            SYSMSG_BROADCASTV(5215, getCountry(), getName().c_str(), rechargeLvl[i]);
             SetVar(VAR_FIRST_POT_GOLD_STATUS, SET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i));
             firstPotOfGoldReturn(0);
             char str[16] = {0};
@@ -34952,6 +35136,8 @@ void Player::SacrificeFlyRoad(UInt8 type, UInt16 num)
             break;
     }
     ReturnFlyRoadInfo();
+    while(num--)
+        udpLog("feishengzhilu", "F_140731_1", "", "", "", "", "act");
 }
 
 void Player::ExchangeXG(UInt8 type)
@@ -34996,6 +35182,22 @@ void Player::ExchangeXG(UInt8 type)
     UInt32 flag_tmp1 = SET_BIT_8(GetVar(VAR_FLYROAD_FLAG),type,1);
     SetVar(VAR_FLYROAD_FLAG,flag_tmp1);
     ReturnFlyRoadInfo();
+    switch(type)
+    {
+        case 0 :
+            udpLog("feishengzhilu", "F_140731_6", "", "", "", "", "act");
+            break;
+        case 1 :
+            udpLog("feishengzhilu", "F_140731_7", "", "", "", "", "act");
+            break;
+        case 2 :
+            udpLog("feishengzhilu", "F_140731_8", "", "", "", "", "act");
+            break;
+        case 3 :
+            udpLog("feishengzhilu", "F_140731_9", "", "", "", "", "act");
+            break;
+    }
+
 }
 
 void Player::ExchangeFlyRoadBox(UInt8 type)

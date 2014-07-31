@@ -1295,6 +1295,47 @@ void OnUseVitalityItemInWorld( GameMsgHdr& hdr,  const void* data )
     GObject::townDeamonManager->useVitalityItemInWorld(player, need);
 }
 
+void SeekingHerChangeSex(Player * player)
+{
+    World::initRCRank();
+    using namespace GObject;
+
+    UInt32 total = player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
+    if (!total)
+        return;
+
+    if(player->IsMale())
+    {
+        for (RCSortType::iterator i = World::seekingHerZhiNvSort.begin(), e = World::seekingHerZhiNvSort.end(); i != e; ++i)
+        {
+            if (i->player == player)
+            {
+                World::seekingHerZhiNvSort.erase(i);
+                break;
+            }
+        }
+        RCSort s;
+        s.player = player;
+        s.total = total;
+        World::seekingHerNiuLangSort.insert(s);
+    }
+    else
+    {
+        for (RCSortType::iterator i = World::seekingHerNiuLangSort.begin(), e = World::seekingHerNiuLangSort.end(); i != e; ++i)
+        {
+            if (i->player == player)
+            {
+                World::seekingHerNiuLangSort.erase(i);
+                break;
+            }
+        }
+        RCSort s;
+        s.player = player;
+        s.total = total;
+        World::seekingHerZhiNvSort.insert(s);
+    }
+}
+
 void OnDoTableInWorld( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
@@ -1306,6 +1347,9 @@ void OnDoTableInWorld( GameMsgHdr& hdr,  const void* data )
     };
     const _stTable* sttable = reinterpret_cast<const _stTable *>(data);
     player->doTableInWorld(sttable->fgt, sttable->oldId);
+
+    if(World::getSeekingHer())
+        SeekingHerChangeSex(player);
 }
 
 void SendLuckyBagRank(Stream& st)
@@ -3336,5 +3380,214 @@ void OnCoolSummerReturn(GameMsgHdr& hdr,  const void* data)
     st << Stream::eos;
     player->send(st);
 }
+
+void SetSeekingHerCharmRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = player->GetVar(VAR_SEEKING_HER_CHARM_POINT);
+    if (!total)
+        return;
+
+    for (RCSortType::iterator i = World::seekingHerCharmSort.begin(), e = World::seekingHerCharmSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            World::seekingHerCharmSort.erase(i);
+            break;
+        }
+    }
+
+    if((World::seekingHerCharmSort.size()!=0 && total > World::seekingHerCharmSort.begin()->total && World::seekingHerCharmSort.begin()->player != player) || (World::seekingHerCharmSort.size()==0))
+        SYSMSG_BROADCASTV(5206, player->getCountry(), player->getName().c_str(), total);
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::seekingHerCharmSort.insert(s);
+}
+
+void SetSeekingHerBeanTotalRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
+    if (!total)
+        return;
+
+    if(player->IsMale())
+    {
+        for (RCSortType::iterator i = World::seekingHerNiuLangSort.begin(), e = World::seekingHerNiuLangSort.end(); i != e; ++i)
+        {
+            if (i->player == player)
+            {
+                World::seekingHerNiuLangSort.erase(i);
+                break;
+            }
+        }
+
+        if((World::seekingHerNiuLangSort.size()!=0 && total > World::seekingHerNiuLangSort.begin()->total && World::seekingHerNiuLangSort.begin()->player != player) || (World::seekingHerNiuLangSort.size()==0))
+            SYSMSG_BROADCASTV(5207, player->getCountry(), player->getName().c_str(), total);
+
+        RCSort s;
+        s.player = player;
+        s.total = total;
+        World::seekingHerNiuLangSort.insert(s);
+    }
+    else
+    {
+        for (RCSortType::iterator i = World::seekingHerZhiNvSort.begin(), e = World::seekingHerZhiNvSort.end(); i != e; ++i)
+        {
+            if (i->player == player)
+            {
+                World::seekingHerZhiNvSort.erase(i);
+                break;
+            }
+        }
+
+        if((World::seekingHerZhiNvSort.size()!=0 && total > World::seekingHerZhiNvSort.begin()->total && World::seekingHerZhiNvSort.begin()->player != player) || (World::seekingHerZhiNvSort.size()==0))
+            SYSMSG_BROADCASTV(5208, player->getCountry(), player->getName().c_str(), total);
+
+        RCSort s;
+        s.player = player;
+        s.total = total;
+        World::seekingHerZhiNvSort.insert(s);
+    }
+}
+
+void OnSeekingHer_ReturnStatus( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x12);
+    st << static_cast<UInt8>(1);
+    st << player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
+    st << static_cast<UInt16>(WORLD().getSeekingHerRank(player));
+    st << player->GetVar(VAR_SEEKING_HER_CHARM_POINT);
+    st << static_cast<UInt16>(WORLD().getSeekingHerCharmRank(player));
+    st << player->getMyAnnouncement();
+    st << Stream::eos;
+    player->send(st);
+}
+
+void OnSeekingHer_RankTopInfo( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+	const UInt8 * flag = reinterpret_cast<const UInt8*>(data);
+    Player * pl = WORLD().getSeekingHerTopRank(*flag);
+    if(!pl)
+        return;
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x12);
+    st << static_cast<UInt8>(2);
+    st << static_cast<UInt8>(*flag);
+    st << pl->GetVar(VAR_SEEKING_HER_CHARM_POINT);
+    st << static_cast<UInt16>(WORLD().getSeekingHerCharmRank(pl));
+    st << pl->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
+    st << static_cast<UInt16>(WORLD().getSeekingHerRank(pl));
+    st << Stream::eos;
+    player->send(st);
+}
+
+void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+	const UInt8 * flag = reinterpret_cast<const UInt8*>(data);
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x12);
+    st << static_cast<UInt8>(3);
+    st << static_cast<UInt8>(*flag);
+    size_t offset = st.size();
+    size_t pos = 0;
+    st << static_cast<UInt8>(pos);
+    if(1 == *flag)
+    {
+        for (RCSortType::iterator i = World::seekingHerCharmSort.begin(), e = World::seekingHerCharmSort.end(); i != e; ++i)
+        {
+            pos++;
+            st << static_cast<UInt16>(pos);
+            st << static_cast<UInt64>(i->player->getId());
+            st << i->player->getName();
+            st << static_cast<bool>(i->player->IsMale() ? 0 : 1);
+            st << i->player->GetVar(VAR_SEEKING_HER_CHARM_POINT);
+            st << cfg.serverNo;
+            st << i->player->getMainFighter()->getClass();
+            if(100 <= pos)
+                break;
+        }
+    }
+    else if(2 == *flag)
+    {
+         for (RCSortType::iterator i = World::seekingHerZhiNvSort.begin(), e = World::seekingHerZhiNvSort.end(); i != e; ++i)
+        {
+            pos++;
+            st << static_cast<UInt16>(pos);
+            st << static_cast<UInt64>(i->player->getId());
+            st << i->player->getName();
+            st << static_cast<bool>(i->player->IsMale() ? 0 : 1);
+            st << i->player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
+            st << cfg.serverNo;
+            st << i->player->getMainFighter()->getClass();
+            if(100 <= pos)
+                break;
+        }
+    }
+    else if(3 == *flag)
+    {
+          for (RCSortType::iterator i = World::seekingHerNiuLangSort.begin(), e = World::seekingHerNiuLangSort.end(); i != e; ++i)
+        {
+            pos++;
+            st << static_cast<UInt16>(pos);
+            st << static_cast<UInt64>(i->player->getId());
+            st << i->player->getName();
+            st << static_cast<bool>(i->player->IsMale() ? 0 : 1);
+            st << i->player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
+            st << cfg.serverNo;
+            st << i->player->getMainFighter()->getClass();
+            if(100 <= pos)
+                break;
+        }
+    }
+    st.data<UInt8>(offset) = pos;
+    st << Stream::eos;
+    player->send(st);
+}
+
+void OnSeekingHer_FriendInfo( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+	const UInt64 * userId = reinterpret_cast<const UInt64*>(data);
+    Player * target = globalPlayers[*userId];
+    if(!target)
+        return;
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x12);
+    st << static_cast<UInt8>(4);
+    st << static_cast<UInt64>(*userId);
+    st << target->GetVar(VAR_SEEKING_HER_CHARM_POINT);
+    st << static_cast<UInt16>(WORLD().getSeekingHerCharmRank(target));
+    st << target->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
+    st << static_cast<UInt16>(WORLD().getSeekingHerRank(target));
+    st << target->getMyAnnouncement();
+    st << target->getName();
+    st << Stream::eos;
+    player->send(st);
+}
+
 
 #endif // _WORLDINNERMSGHANDLER_H_

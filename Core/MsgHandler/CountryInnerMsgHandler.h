@@ -1116,7 +1116,7 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
     }
 
     pkg->AddItem(pur->id, pur->num, true, false, FromDirectPurchase);
-    if(pur->id == 9388 || pur->id == 9414 || pur->id == 9141)
+    if(pur->id == 9427 || pur->id == 5135 || pur->id == 9141)
         player->AddVar(VAR_DIRECTPURCNT, 1);
     else
         player->AddVar(VAR_DIRECTPURCNT2, 1);
@@ -1281,6 +1281,21 @@ void OnDailyReq2(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
 	player->sendDailyInfo();
+}
+
+void OnSeekingHer_SendBeans(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    struct sendBean
+    {
+        UInt64 userId;
+        UInt8 beanType;
+        UInt32 beanCount;
+        char words[128];
+    };
+	struct sendBean * sb = reinterpret_cast<struct sendBean *>(const_cast<void *>(data));
+    std::string wordstmp = sb->words;
+	player->seekingHer_SendBeans(sb->userId, sb->beanType, sb->beanCount, wordstmp);
 }
 
 void OnCancelAutoRaceBattle(GameMsgHdr& hdr, const void * data)

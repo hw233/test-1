@@ -168,6 +168,7 @@ namespace Script
 		lua_tinker::def(_L, "get61CardActivity", GObject::World::get61CardActivity);  //61卡牌活动
 		lua_tinker::def(_L, "getSummerCardActivity", GObject::World::getSummerCardActivity);  //清凉卡牌活动
 		lua_tinker::def(_L, "getCoolSummer", GObject::World::getCoolSummer);
+		lua_tinker::def(_L, "getSeekingHer", GObject::World::getSeekingHer);
 		lua_tinker::def(_L, "getGGTime", GObject::World::getGGTime);  //情义罗盘
 
         CLASS_DEF(GameActionLua, Print);
@@ -1982,6 +1983,11 @@ namespace Script
     {
 		assert(player != NULL);
         return Call<Table>("getShuShanWeiWei_MSYJ_Award", player);
+    }
+    bool GameActionLua::getRedBeanAward(Player * player, UInt8 index, UInt32 count)
+    {
+		assert(player != NULL);
+        return Call<bool>("getRedBeanAward", player, index, count);
     }
 }
 

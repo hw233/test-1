@@ -186,6 +186,7 @@ bool World::_newYearQzoneContinueAct= false;
 bool World::_maydayloginAct= false;
 UInt8 World::_towerloginAct= 0;
 bool World::_guoqing= false;
+bool World::_seekingher = false;
 bool World::_9215Act= false;
 bool World::_enchant_gt11 = false;
 bool World::_rechargenextret;
@@ -220,6 +221,9 @@ RCSortType World::worldCupSort;
 ClanGradeSort World::clanGradeSort;
 RCSortType World::tyss_PlayerSort;
 RCSortType World::coolSummerSort;
+RCSortType World::seekingHerNiuLangSort;
+RCSortType World::seekingHerZhiNvSort;
+RCSortType World::seekingHerCharmSort;
 ClanGradeSort World::tyss_ClanSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
@@ -356,6 +360,7 @@ bool bQiShiBanEnd = false;
 bool bTYSSEnd = false;
 bool bWCTimeEnd = false;
 bool bCoolSummerTimeEnd = false;
+bool bSeekingHerTimeEnd = false;
 bool bWCTimeEnd2 = false;
 
 bool enum_midnight(void * ptr, void* next)
@@ -679,6 +684,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 1)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -729,6 +742,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
         ))
     {
 #if 0
@@ -1466,6 +1480,7 @@ void World::World_Midnight_Check( World * world )
     bool b11time = get11Time();
     bool bWCtime = getWorldCupTime();
     bool bCoolSummerTime = getCoolSummer();
+    bool bSeekingHerTime = getSeekingHer();
     bool bWCtime2 = getWorldCupTime2();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
@@ -1524,6 +1539,8 @@ void World::World_Midnight_Check( World * world )
     //天元神兽活动结束
     //酷爽一夏活动结束
     bCoolSummerTimeEnd = bCoolSummerTime && !getCoolSummer(300);
+    //众里寻他活动结束
+    bSeekingHerTimeEnd = bSeekingHerTime && !getSeekingHer();
     UInt8 TYSSType = getTYSSTime();
     UInt8 actType = getTYSSTime(300);
     bTYSSEnd = bTYSSTime && !actType;
@@ -1781,6 +1798,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 1)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1879,6 +1904,12 @@ void World::World_Midnight_Check( World * world )
         world->SendWorldCupAward();
     if(bCoolSummerTimeEnd)
         world->SendCoolSummerAward();
+    if(bSeekingHerTimeEnd)
+    {
+        world->SendSeekingHerNiuLangAward();
+        world->SendSeekingHerZhiNvAward();
+        world->SendSeekingHerCharmAward();
+    }
     if(bWCTimeEnd2)
         world->SendWorldCupAward2();
 
@@ -2015,6 +2046,18 @@ void World::World_Fire_Sacrifice_Check( World * world )
 {
     GObject::globalPlayers.enumerate(player_enum_GetContributionBag, 0);
     GObject::globalClans.enumerate(clan_enum_GetFireGodBag, 0);
+}
+
+void World::World_Seeking_Her_Check(void *)
+{
+    if(World::seekingHerCharmSort.size() && World::seekingHerZhiNvSort.size() && World::seekingHerNiuLangSort.size())
+    {
+        RCSortType::iterator i = World::seekingHerCharmSort.begin();
+        RCSortType::iterator j = World::seekingHerZhiNvSort.begin();
+        RCSortType::iterator k = World::seekingHerNiuLangSort.begin();
+
+        SYSMSG_BROADCASTV(5204, i->player->getCountry(), i->player->getName().c_str(), i->player->GetVar(VAR_SEEKING_HER_CHARM_POINT), j->player->getCountry(), j->player->getName().c_str(), k->player->getCountry(), k->player->getName().c_str());
+    }
 }
 
 void World::World_OldMan_Refresh(void *)
@@ -2814,6 +2857,8 @@ bool World::Init()
     if(fireSacriDay < now) fireSacriDay += 86400;
     AddTimer(86400 * 1000, World_Fire_Sacrifice_Check, this, (fireSacriDay - now) * 1000);
 
+    AddTimer(3600 * 1000, World_Seeking_Her_Check, static_cast<void*>(NULL), 3600 * 1000);
+
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(&type), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
     if(cfg.merged)
@@ -3376,7 +3421,7 @@ void World::SendQixiAward()
                         bool bind = true;
                         if(mitems[i].id == qixiTmpl._titleItem)
                         {
-                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F) * 3;
+                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F);
                             bind = false;
                         }
                         else
@@ -3885,6 +3930,28 @@ inline bool player_enum_rc(GObject::Player * p, int)
             s.player = p;
             s.total = used;
             World::coolSummerSort.insert(s);
+        }
+    }
+    if(World::getSeekingHer())
+    {
+        UInt32 charmPoint = p->GetVar(VAR_SEEKING_HER_CHARM_POINT);
+        UInt32 beanCount = p->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
+        if(beanCount)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = beanCount;
+            if(p->IsMale())
+                World::seekingHerNiuLangSort.insert(s);
+            else
+                World::seekingHerZhiNvSort.insert(s);
+        }
+        if(charmPoint)
+        {
+            RCSort st;
+            st.player = p;
+            st.total = charmPoint;
+            World::seekingHerCharmSort.insert(st);
         }
     }
 
@@ -5570,6 +5637,184 @@ void World::SendCoolSummerAward()
             break;
     }
     return;
+}
+
+void World::SendSeekingHerNiuLangAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][6] = {
+        {{503, 20}, {134, 20}, {9018, 20}, {1734, 1}, {9991, 1}},
+        {{503, 15}, {134, 15}, {9498, 15}, {500, 15}, {0, 0}},
+        {{503, 10}, {134, 10}, {9498, 10}, {500, 10}, {0, 0}},
+        {{503,  8}, {134,  8}, {9498,  8}, {500,  8}, {0, 0}},
+        {{503,  6}, {134,  6}, {9498,  6}, {500,  3}, {0, 0}},
+        {{503,  3}, {134,  3}, {9498,  6}, {500,  3}, {0, 0}},
+    };
+
+    SYSMSG(title, 5218);
+    size_t pos = 1;
+    size_t index = 0;
+    for (RCSortType::iterator i = World::seekingHerNiuLangSort.begin(), e = World::seekingHerNiuLangSort.end(); i != e; ++i)
+    {
+        SYSMSGV(content, 5219, pos);
+        if(pos >= 1 && pos <=4)
+            index = pos - 1;
+        else if(pos >= 5 && pos <= 10)
+            index = 4;
+        else if(pos >= 11 && pos <= 20)
+            index = 5;
+        MailItemsInfo itemsInfo(s_item[index], Activity, 5);
+        Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(mail)
+            mailPackageManager.push(mail->id, s_item[index], 5, true);
+        pos++;
+        if (pos > 20)
+            break;
+    }
+    return;
+}
+
+void World::SendSeekingHerZhiNvAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][6] = {
+        {{503, 20}, {134, 20}, {9418, 20}, {1735, 1}, {9990, 1}},
+        {{503, 15}, {134, 15}, {9498, 15}, {500, 15}, {0, 0}},
+        {{503, 10}, {134, 10}, {9498, 10}, {500, 10}, {0, 0}},
+        {{503,  8}, {134,  8}, {9498,  8}, {500,  8}, {0, 0}},
+        {{503,  6}, {134,  6}, {9498,  6}, {500,  6}, {0, 0}},
+        {{503,  3}, {134,  3}, {9498,  3}, {500,  3}, {0, 0}},
+    };
+
+    SYSMSG(title, 5216);
+    size_t pos = 1;
+    size_t index = 0;
+    for (RCSortType::iterator i = World::seekingHerZhiNvSort.begin(), e = World::seekingHerZhiNvSort.end(); i != e; ++i)
+    {
+        SYSMSGV(content, 5217, pos);
+        if(pos >= 1 && pos <= 4)
+            index = pos - 1;
+        else if(pos >= 5 && pos <= 10)
+            index = 4;
+        else if(pos >= 11 && pos <= 20)
+            index = 5;
+
+        MailItemsInfo itemsInfo(s_item[index], Activity, 5);
+        Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(mail)
+            mailPackageManager.push(mail->id, s_item[index], 5, true);
+        pos++;
+        if (pos > 20)
+            break;
+    }
+    return;
+}
+
+void World::SendSeekingHerCharmAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][6] = {
+        {{9022, 20}, {515, 30}, {1734,  1}, {1735, 1}, {9989, 1}},
+        {{9022, 15}, {515, 25}, {9498, 25}, {1734, 1}, {0, 0}},
+        {{9022, 10}, {515, 20}, {9498, 20}, {1734, 1}, {0, 0}},
+        {{9022,  8}, {515, 15}, {9498, 15}, {1734, 1}, {0, 0}},
+        {{515,  10}, {503, 10}, {9498, 10}, {9022, 5}, {0, 0}},
+        {{515,   5}, {503,  5}, {9498,  5}, {9022, 3}, {0, 0}},
+    };
+
+    SYSMSG(title, 5214);
+    size_t pos = 1;
+    size_t index = 0;
+    for (RCSortType::iterator i = World::seekingHerCharmSort.begin(), e = World::seekingHerCharmSort.end(); i != e; ++i)
+    {
+        SYSMSGV(content, 5215, pos);
+        if(pos >= 1 && pos <= 4)
+            index = pos - 1;
+        else if(pos >= 5 && pos <= 10)
+            index = 4;
+        else if(pos >= 11 && pos <= 20)
+            index = 5;
+
+        MailItemsInfo itemsInfo(s_item[index], Activity, 5);
+        Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(mail)
+            mailPackageManager.push(mail->id, s_item[index], 5, true);
+        pos++;
+        if (pos > 20)
+            break;
+    }
+    return;
+}
+
+UInt32 World::getSeekingHerRank(Player * pl)
+{
+    UInt32 pos = 0;
+    UInt32 rank = 0;
+    if(pl->IsMale())
+    {
+        for (RCSortType::iterator i = World::seekingHerNiuLangSort.begin(), e = World::seekingHerNiuLangSort.end(); i != e; ++i)
+        {
+            pos++;
+            if(i->player == pl)
+            {
+                rank = pos;
+                break;
+            }
+        }
+    }
+    else
+    {
+         for (RCSortType::iterator i = World::seekingHerZhiNvSort.begin(), e = World::seekingHerZhiNvSort.end(); i != e; ++i)
+        {
+            pos++;
+            if(i->player == pl)
+            {
+                rank = pos;
+                break;
+            }
+        }
+    }
+    return rank;
+}
+
+UInt32 World::getSeekingHerCharmRank(Player * pl)
+{
+    UInt32 pos = 0;
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::seekingHerCharmSort.begin(), e = World::seekingHerCharmSort.end(); i != e; ++i)
+    {
+        pos++;
+        if(i->player == pl)
+        {
+            rank = pos;
+            break;
+        }
+    }
+    return rank;
+}
+
+Player * World::getSeekingHerTopRank(UInt8 flag)
+{
+    Player * target = NULL;
+    if(1 == flag)
+    {
+        RCSortType::iterator i = World::seekingHerCharmSort.begin();
+        if(World::seekingHerCharmSort.size())
+            target = i->player;
+    }
+    else if(2 == flag)
+    {
+        RCSortType::iterator i = World::seekingHerZhiNvSort.begin();
+        if(World::seekingHerZhiNvSort.size())
+            target = i->player;
+    }
+    else if(3 == flag)
+    {
+        RCSortType::iterator i = World::seekingHerNiuLangSort.begin();
+        if(World::seekingHerNiuLangSort.size())
+            target = i->player;
+    }
+    return target;
 }
 
 }

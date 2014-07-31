@@ -258,13 +258,14 @@ namespace GObject
 
     enum SurnameLegendAwardFlag
     {
-        e_sla_none = 0x00,
-        e_sla_cb = 0x01,
-        e_sla_clb = 0x02,
-        e_sla_hi = 0x04,
-        e_sla_mr = 0x08,
-        e_sla_ccb = 0x16,
-        e_sla_ncb = 0x32,
+        e_sla_none = 0x00, //世界BOSS
+        e_sla_cb = 0x01,  //阵营战
+        e_sla_clb = 0x02, //帮派战
+        e_sla_hi = 0x04,  //英雄岛
+        e_sla_mr = 0x08,  //末日之战
+        e_sla_ccb = 0x10, //墨守成规
+        e_sla_ncb = 0x20, //蜀山论剑
+        e_sla_rb = 0x40,  //紫霄之巅
     };
 
     enum PEXP_HOOK_INFEX
@@ -901,6 +902,13 @@ namespace GObject
         Player* pl;
         UInt8 win; //0赢，1输
         UInt32 reportId;
+    };
+
+    struct SeekingHerSendBeanLog
+    {
+        UInt64 senderId;
+        UInt32 date;
+        UInt32 count;
     };
 
 	struct PlayerData
@@ -3593,6 +3601,22 @@ namespace GObject
         void shuShanWeiWei_XDPB(Player *, UInt8);
         void shuShanWeiWei_MSYJ(Player *, UInt8);
         void shuShanWeiWei_WXSC(UInt8, UInt8, UInt32);
+
+        void seekingHer_SendBeans(UInt64 , UInt8 , UInt32 , std::string );
+        void seekingHer_Announce(std::string );
+        void seekingHer_GetSendBeanLog();
+        void SetSeekingHerSendBeanLog(UInt64 &, UInt32 &, UInt32 &, bool);
+        void getSeekingHerCharmAward();
+        std::string _seekingHerMyAnnounce;
+        std::vector<SeekingHerSendBeanLog *> _seekingHerSendBeanLog;
+
+        inline std::string getMyAnnouncement() { return _seekingHerMyAnnounce; }
+        inline void setMyAnnouncement(std::string & an, bool toDB)
+        {
+            _seekingHerMyAnnounce = an;
+            if(toDB)
+                DB1().PushUpdateData("UPDATE `player` SET `announcement` = '%s' WHERE `id` = %" I64_FMT "u", _seekingHerMyAnnounce.c_str(), getId());
+        }
 
         void firstPotOfGold(UInt32);
         void firstPotOfGoldReturn(UInt8);

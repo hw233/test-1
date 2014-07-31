@@ -2340,6 +2340,77 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 0x12:
+        {
+            if(!World::getSeekingHer())
+                return;
+            UInt8 opt = 0;
+            br >> opt;
+            if(0x01 == opt)
+            {
+                GameMsgHdr hdr2(0x182, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr2, NULL);
+            }
+            else if(0x02 == opt)
+            {
+                UInt8 flag = 0;
+                br >> flag;
+                GameMsgHdr hdr2(0x183, WORKER_THREAD_WORLD, player, sizeof(flag));
+                GLOBAL().PushMsg(hdr2, &flag);
+            }
+            else if(0x03 == opt)
+            {
+                UInt8 flag = 0;
+                br >> flag;
+                GameMsgHdr hdr2(0x184, WORKER_THREAD_WORLD, player, sizeof(flag));
+                GLOBAL().PushMsg(hdr2, &flag);
+            }
+            else if(0x04 == opt)
+            {
+                UInt64 userId = 0;
+                br >> userId;
+                GameMsgHdr hdr2(0x185, WORKER_THREAD_WORLD, player, sizeof(userId));
+                GLOBAL().PushMsg(hdr2, &userId);
+            }
+            else if(0x11 == opt)
+            {
+                struct sendBean
+                {
+                    UInt64 userId;
+                    UInt8 beanType;
+                    UInt32 beanCount;
+                    char words[128];
+                };
+                struct sendBean sb;
+                sb.userId = 0;
+                sb.beanType = 0;
+                sb.beanCount = 0;
+                std::string wordstmp = "";
+                br >> sb.userId >> sb.beanType >> sb.beanCount;
+                if(sb.beanType == 3 || sb.beanType == 4)
+                {
+                    br >> wordstmp;
+                    if(wordstmp.size() >= 128)
+                        return;
+                    strcpy(sb.words, wordstmp.c_str());
+                }
+                GameMsgHdr hdr2(0x28E, WORKER_THREAD_NEUTRAL, player, sizeof(sb));
+                GLOBAL().PushMsg(hdr2, &sb);
+            }
+            else if(0x12 == opt)
+            {
+                std::string announcement = "";
+                br >> announcement;
+                if(announcement.size() > 32)
+                    return;
+                player->seekingHer_Announce(announcement);
+            }
+            else if(0x13 == opt)
+            {
+                player->seekingHer_GetSendBeanLog();
+            }
+        }
+
         case 0x13:
         {
             UInt8 type = 0;
@@ -4165,8 +4236,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         UInt32 goldLeft =player->GetVar(VAR_GUANGGUN_CONSUME)%80;
                         player->AddVar(VAR_GUANGGUN_CONSUME,price);
                         UInt32 counts = (price+goldLeft)/80; 
-                        SYSMSGV(title, 5182);
-                        SYSMSGV(content, 5183);
+                        SYSMSGV(title, 5208);
+                        SYSMSGV(content, 5209);
                         while(counts > 0)
                         {
                             MailPackage::MailItem mitem[] = {{16021, 1}};
@@ -9176,7 +9247,7 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
                         }
                         else
                         {
-                            SYSMSGV(content, 5184, player->getCountry(), player->getName().c_str());
+                            SYSMSGV(content, 5210, player->getCountry(), player->getName().c_str());
                             pl->GetMailBox()->newMail(player, 0x15, title, content);
                         }
 
