@@ -749,6 +749,10 @@ namespace GObject
         VAR_WB_SKIPBATTLE = 758,//世界BOSS跳过战斗标记
         VAR_WB_EXPSUM = 759,//世界BOSS总经验
         VAR_WB_RELIVENUM = 760,//世界BOSS复活次数
+        VAR_GUANGGUN_TODAY_STAR = 761,     //每日财富之星 清除
+        VAR_GUANGGUN_TEAMSTAR = 762,     //团队财富之星 不清除
+        VAR_GUANGGUN_TODAY_TEAMSCORE = 763,     //每日小队积分
+        VAR_GUANGGUN_TENTIMES = 764,     //每日小队积分
         //771 - 780 for qimj
         VAR_CUR_CLAN_TITLE = 771, //帮派当前称号
         VAR_FIRE_SACRIFICE_TIMES = 772, //拜火祭天：0-7帮众添柴次数，8-15帮主诏令次数
@@ -797,20 +801,27 @@ namespace GObject
         VAR_HAPPY_XXL_PAGE = 816 , //快乐消消乐 编号
 
         VAR_11AIRBOOK_AWARDSCORE = 817,  
+        VAR_KETTLE_TIME = 818,  //炼妖壶刷新
+        VAR_KETTLE_COUNT = 819,  //炼妖值
+        VAR_KETTLE_4CNT = 820,  //4星刷新次数
+        VAR_KETTLE_5CNT = 821, //5星刷新次数
+        VAR_KETTLE_LOCK = 822,  //是否锁定
             
         //831-850 for qimj
         VAR_COOL_SUMMER_AWARD_TYPE = 831,        //酷爽一夏奖励类型
         VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL = 832, //酷爽一夏累积活跃值
         VAR_SHU_SHAN_WEI_WEI_XDPB = 833, //蜀山微微"喜大普奔"奖励状态(1-6位)
-        VAR_SHU_SHAN_WEI_WEI_MSYJ = 834, //蜀山微微"码上有奖"是否领取抽奖券(0：未领，1：已领,一周一次)
+        VAR_SHU_SHAN_WEI_WEI_MSYJ = 834, //蜀山微微"码上有奖"是否领取抽奖券(0：未领，1：已领,一天一次)
         VAR_SHU_SHAN_WEI_WEI_WXSC = 835, //蜀山微微"微信商城"奖励状态(1-7位,第一位为免费礼券)
         VAR_SHU_SHAN_WEI_WEI_WXSC_COUPON = 836, //蜀山微微"微信商城"免费礼券是否领取(0未领，1已领)
         VAR_SHU_SHAN_WEI_WEI_MSYJ_AWARD = 837, //蜀山微微"码上有奖",抽到奖励和数量(0-15为物品ID，16-31为物品数量)
         VAR_SEEKING_HER_BEAN_TOTAL = 838, //众里寻她收到豆的数量
         VAR_SEEKING_HER_CHARM_POINT = 839,  //众里寻她魅力值
         VAR_SEEKING_HER_ANNOUNCE_TIME = 840,  //众里寻她宣言时间
-        VAR_SEEKING_HER_CHARM_AWARD = 841, //众里寻她魅力值奖励领取情况(每位代表一个分数等级，0未领，1领取)
-        VAR_SEEKING_HER_LOOT_STATUS = 842,  //众里寻他掉落状态
+        VAR_SEEKING_HER_CHARM_AWARD = 843, //众里寻她魅力值奖励领取情况(每位代表一个分数等级，0未领，1领取)
+        VAR_SEEKING_HER_LOOT_STATUS = 844,  //众里寻他掉落状态
+        VAR_FIRST_POT_GOLD_STATUS = 841, //第一桶金充值状态
+        VAR_HIDE_VIP_LEVEL_FLAG = 842, //隐藏御剑等级标识(0未隐藏， 1隐藏)
         VAR_MAX,
     };
 
@@ -1491,7 +1502,7 @@ namespace GObject
             REGISTER_VAR(VAR_COOL_SUMMER_ACTIVE_POINT, CYCLE_DAY);
             REGISTER_VAR(VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL, CYCLE_NONE);
             REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_XDPB, CYCLE_NONE);
-            REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_MSYJ, CYCLE_WEEK);
+            REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_MSYJ, CYCLE_DAY);
             REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_WXSC, CYCLE_NONE);
             REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_WXSC_COUPON, CYCLE_NONE);
             REGISTER_VAR(VAR_SHU_SHAN_WEI_WEI_MSYJ_AWARD, CYCLE_NONE);
@@ -1504,6 +1515,8 @@ namespace GObject
             REGISTER_VAR(VAR_SEEKING_HER_CHARM_POINT, CYCLE_NONE);
             REGISTER_VAR(VAR_SEEKING_HER_ANNOUNCE_TIME, CYCLE_NONE);
             REGISTER_VAR(VAR_SEEKING_HER_CHARM_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_FIRST_POT_GOLD_STATUS, CYCLE_NONE);
+            REGISTER_VAR(VAR_HIDE_VIP_LEVEL_FLAG, CYCLE_NONE);
 
             REGISTER_VAR(VAR_XJFRONTMAP_AUTO_FIGHT_USE_MONEY_MARK, CYCLE_NONE);
             REGISTER_VAR(VAR_ATOXJFM, CYCLE_NONE);
@@ -1517,6 +1530,10 @@ namespace GObject
             REGISTER_VAR(VAR_WB_SKIPBATTLE, CYCLE_HOUR);
             REGISTER_VAR(VAR_WB_EXPSUM, CYCLE_HOUR);
             REGISTER_VAR(VAR_WB_RELIVENUM, CYCLE_HOUR);
+            REGISTER_VAR(VAR_GUANGGUN_TODAY_STAR, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANGGUN_TEAMSTAR, CYCLE_NONE);
+            REGISTER_VAR(VAR_GUANGGUN_TODAY_TEAMSCORE, CYCLE_DAY);
+            REGISTER_VAR(VAR_GUANGGUN_TENTIMES, CYCLE_NONE);
 
             REGISTER_VAR(VAR_ERLKING_STATUSA, CYCLE_NONE);
             REGISTER_VAR(VAR_ERLKING_STATUSB, CYCLE_NONE);
@@ -1532,6 +1549,11 @@ namespace GObject
             REGISTER_VAR(VAR_HAPPY_XXL_SCORE, CYCLE_DAY);
             REGISTER_VAR(VAR_HAPPY_XXL_PAGE, CYCLE_NONE);
             REGISTER_VAR(VAR_11AIRBOOK_AWARDSCORE, CYCLE_NONE);
+            REGISTER_VAR(VAR_KETTLE_TIME, CYCLE_NONE);
+            REGISTER_VAR(VAR_KETTLE_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_KETTLE_4CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_KETTLE_5CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_KETTLE_LOCK, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

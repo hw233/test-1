@@ -2753,6 +2753,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x3C:
         case 0x3D:
         case 0x3E:
+        case 0x3F:
         {
             brd >> op;
             switch(op)
@@ -3401,6 +3402,12 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
        }
        break;
        case 0x34:
+       {
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            break;
+       }
+       case 0x35:
        {
             hdr.msgHdr.desWorkerID = player->getThreadId();
             GLOBAL().PushMsg(hdr, (void*)data);

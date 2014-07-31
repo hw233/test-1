@@ -248,6 +248,10 @@ public:
     // 是否有pl这个可装备的无双技能
     int hasPeerless(UInt16 pl);
 
+    inline void SetPowerUpByP(float up) { _powerUp = up; }
+    inline float GetPowerUp(){ return _powerUp; }
+    inline void ClearPowerUp(){ _powerUp = 0; }
+
     inline UInt8 getAcupointsCntMax() { return 3; }
     UInt8 getAcupointCnt();
     bool setAcupoints(int idx, UInt8 v, bool = true, bool = false);
@@ -926,6 +930,7 @@ protected:
 	UInt32 _buffData[FIGHTER_BUFF_COUNT];
 
     Int32 _praadd;  // 穴道对修为增长的加成
+    float _powerUp;
 
     // 天赋属性
     UInt8 _attrType1;

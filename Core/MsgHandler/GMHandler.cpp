@@ -330,6 +330,7 @@ GMHandler::GMHandler()
     Reg(2, "addkapaiexp", &GMHandler::OnAddCardExp);
     Reg(3, "setfirevalue", &GMHandler::OnSetFireValue);
     Reg(2, "atkcb", &GMHandler::OnAttackBoss);
+    Reg(2, "kettleA", &GMHandler::OnAttackKettle);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -4802,6 +4803,15 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_11TIME_END, 0);
             GObject::globalPlayers.enumerate(player_enum_2, 0);
             break;
+          case 32:
+            GVAR.SetVar(GVAR_GG_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GVAR_GG_END, TimeUtil::SharpDayT(1));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
+        case 33:
+            GVAR.SetVar(GVAR_GG_BEGIN, 0);
+            GVAR.SetVar(GVAR_GG_END, 0);
             break;
     }
 }
@@ -5742,7 +5752,7 @@ void GMHandler::OnAdd61Card(GObject::Player *player, std::vector<std::string>& a
         return ;
     UInt16 cid = atoi(args[0].c_str());
     
-    player->GetCollectCard()->Add61Card(cid);   
+    player->GetCollectCard()->AddSummerCard(cid);   
 }
 
 void GMHandler::OnAddCardExp(GObject::Player *player, std::vector<std::string>& args)
@@ -5807,4 +5817,12 @@ void GMHandler::OnAttackBoss(GObject::Player *player, std::vector<std::string>& 
     UInt32 damage = atoi(args[0].c_str());
     player->getClan()->getClanBigBoss()->GMAttackBoss(damage);  
 
+}
+void GMHandler::OnAttackKettle(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return ;
+    UInt8 index = atoi(args[0].c_str());
+    player->getMonsterKettleMgr()->RandomMonster(index , 0 , 1);
+    player->getMonsterKettleMgr()->BattleMonster(index , 0);
 }

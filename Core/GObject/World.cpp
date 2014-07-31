@@ -668,6 +668,22 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 18)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
+         
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -716,6 +732,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 28)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 5)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
         ))
     {
 #if 0
@@ -1508,6 +1526,7 @@ void World::World_Midnight_Check( World * world )
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
     bGGTimeEnd = bGGtime && !getGGTime(300);
+    UInt8 GG_status = getGGTime();
     //天元神兽活动结束
     //酷爽一夏活动结束
     bCoolSummerTimeEnd = bCoolSummerTime && !getCoolSummer(300);
@@ -1754,6 +1773,22 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 18)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
+         
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1827,7 +1862,7 @@ void World::World_Midnight_Check( World * world )
     if(b11TimeEnd)
         world->Send11AirBookAward();
     if(bGGTimeEnd)
-        world->SendGuangGunAward();
+        world->SendGuangGunAward(GG_status);
     if (bSnowEnd)
         world->SendSnowAward();
     if (bGoldSnakeEnd)
@@ -2004,7 +2039,7 @@ void World::World_Seeking_Her_Check(void *)
         RCSortType::iterator j = World::seekingHerZhiNvSort.begin();
         RCSortType::iterator k = World::seekingHerNiuLangSort.begin();
 
-        SYSMSG_BROADCASTV(5178, i->player->getCountry(), i->player->getName().c_str(), i->player->GetVar(VAR_SEEKING_HER_CHARM_POINT), j->player->getCountry(), j->player->getName().c_str(), k->player->getCountry(), k->player->getName().c_str());
+        SYSMSG_BROADCASTV(5204, i->player->getCountry(), i->player->getName().c_str(), i->player->GetVar(VAR_SEEKING_HER_CHARM_POINT), j->player->getCountry(), j->player->getName().c_str(), k->player->getCountry(), k->player->getName().c_str());
     }
 }
 
@@ -5074,7 +5109,7 @@ UInt16 World::GetRandomSpot()
     return 0;
 }
 
-void World::SendGuangGunAward()    //待定
+void World::SendGuangGunAward(UInt8 GG_status)    //待定
 {
     World::initRCRank();
     int pos = 0;
@@ -5083,14 +5118,26 @@ void World::SendGuangGunAward()    //待定
         {{515,25},{503,30},{134,20},{1325,20}},
         {{515,20},{503,25},{134,15},{1325,15}},
     };
+    static MailPackage::MailItem s_item1[][5] = {
+        {{515,30},{503,40},{9498,30},{9457,30},{9988,1}},
+        {{515,25},{503,30},{9498,25},{9457,25}},
+        {{515,20},{503,25},{9498,20},{9457,20}},
+    };
 	const UInt32 itemOrangeWeapon[3][5] = {
         {2544, 2568, 2592, 2616, 2640},//儒
         {2552, 2576, 2600, 2624, 2648},//释
         {2560, 2584, 2608, 2632, 2656}
     };
+    UInt32 content_id = 4965;
+    UInt32 title_id = 4981;
+    if(GG_status == 2)
+    {
+        content_id = 5185;
+        title_id = 5186;
+    }
     UInt8 type = 0;
     UInt8 lvl = 0;
-    SYSMSG(title, 4981);
+    SYSMSG(title, title_id);
     for (RCSortType::iterator i = World::guangGunSort.begin(), e = World::guangGunSort.end(); i != e; ++i)
     {
         Player* play = i->player;
@@ -5100,7 +5147,7 @@ void World::SendGuangGunAward()    //待定
 	    Package * package = player->GetPackage();
         ++pos;
         if(pos > 3) break;
-        SYSMSGV(content, 4965, pos);
+        SYSMSGV(content, content_id, pos);
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
         if(mail)
@@ -5120,13 +5167,19 @@ void World::SendGuangGunAward()    //待定
                         else
                             lvl = 4;
 
-            mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
-            if(pos ==1)
-                package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
-            else if(pos == 2)
-                package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
-                else if(pos == 3)
-                    package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
+            if(GG_status == 1)
+                mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
+            else
+                mailPackageManager.push(mail->id, s_item1[pos-1], 5, true);
+            if(GG_status == 1)
+            {
+                if(pos ==1)
+                    package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+                else if(pos == 2)
+                    package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                    else if(pos == 3)
+                        package->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
+            }
         }
 
         Player* player1 = player->getGGPlayer1();
@@ -5148,18 +5201,24 @@ void World::SendGuangGunAward()    //待定
                             lvl = 4;
 
             Package * package1 = player1->GetPackage();
-            SYSMSGV(content, 4965, pos);
+            SYSMSGV(content, content_id, pos);
             Mail * mail1 = player1->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
             if(mail1)
             {
-                mailPackageManager.push(mail1->id, s_item[pos-1], 5, true);
-                if(pos ==1)
-                    package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
-                else if(pos == 2)
-                    package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
-                    else if(pos == 3)
-                        package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
+                if(GG_status == 1)
+                {
+                    mailPackageManager.push(mail1->id, s_item[pos-1], 5, true);
+                    if(pos ==1)
+                        package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+                    else if(pos == 2)
+                        package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                        else if(pos == 3)
+                            package1->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);              
+                }
+                else
+                    mailPackageManager.push(mail1->id, s_item1[pos-1], 5, true);
+                  
             }
         }
         Player* player2 = player->getGGPlayer2();
@@ -5181,18 +5240,23 @@ void World::SendGuangGunAward()    //待定
                             lvl = 4;
 
             Package * package2 = player2->GetPackage();
-            SYSMSGV(content, 4965, pos);
+            SYSMSGV(content, content_id, pos);
             Mail * mail2 = player2->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
             if(mail2)
             {
-                mailPackageManager.push(mail2->id, s_item[pos-1], 5, true);
-                if(pos ==1)
-                    package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
-                else if(pos == 2)
-                    package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
-                    else if(pos == 3)
-                        package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
+                if(GG_status == 1)
+                {
+                    mailPackageManager.push(mail2->id, s_item[pos-1], 5, true);
+                    if(pos ==1)
+                        package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 8, false, true);  
+                    else if(pos == 2)
+                        package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 7, false, true);  
+                        else if(pos == 3)
+                            package2->AddEquipEnchant(itemOrangeWeapon[type][lvl], 6, false, true);  
+                }
+                else
+                    mailPackageManager.push(mail2->id, s_item1[pos-1], 5, true);
             }
         }
     }
@@ -5569,12 +5633,12 @@ void World::SendSeekingHerNiuLangAward()
         {{515, 3}, {503, 3}, {9498, 6}, {500, 3}, {0, 0}, {0, 0}},
     };
 
-    SYSMSG(title, 5192);
+    SYSMSG(title, 5218);
     size_t pos = 1;
     size_t index = 0;
     for (RCSortType::iterator i = World::seekingHerNiuLangSort.begin(), e = World::seekingHerNiuLangSort.end(); i != e; ++i)
     {
-        SYSMSGV(content, 5193, pos);
+        SYSMSGV(content, 5219, pos);
         if(pos >= 1 && pos <=3)
             index = pos;
         else if(pos >= 4 && pos <= 10)
@@ -5603,12 +5667,12 @@ void World::SendSeekingHerZhiNvAward()
         {{515, 3}, {503, 3}, {9498, 3}, {500, 3}, {0 ,0}, {0, 0}},
     };
 
-    SYSMSG(title, 5190);
+    SYSMSG(title, 5216);
     size_t pos = 1;
     size_t index = 0;
     for (RCSortType::iterator i = World::seekingHerZhiNvSort.begin(), e = World::seekingHerZhiNvSort.end(); i != e; ++i)
     {
-        SYSMSGV(content, 5191, pos);
+        SYSMSGV(content, 5217, pos);
         if(pos >= 1 && pos <=3)
             index = pos;
         else if(pos >= 4 && pos <= 10)
@@ -5641,12 +5705,12 @@ void World::SendSeekingHerCharmAward()
         {{515, 20}, {503, 20}, {9498, 20}, {1735, 1}, {9022, 10}, {0, 0}},
     };
 
-    SYSMSG(title, 5188);
+    SYSMSG(title, 5214);
     size_t pos = 1;
     size_t index = 0;
     for (RCSortType::iterator i = World::seekingHerCharmSort.begin(), e = World::seekingHerCharmSort.end(); i != e; ++i)
     {
-        SYSMSGV(content, 5189, pos);
+        SYSMSGV(content, 5215, pos);
         if(pos >= 1 && pos <=3)
             index = ( i->player->IsMale() ? pos : pos + 5);
         else if(pos >= 4 && pos <= 10)

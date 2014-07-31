@@ -890,6 +890,7 @@ namespace GObject
 		m_marriageInfo = new MarriageInfo();
 		m_collecCard= new CollectCard(this);
 		_wrapKey= new OrdinarireWrapKey();
+		m_MonsterKettleMgr = new MonsterKettleManager(this);
         m_csFlag = 0;
         m_spreadInterval = 0;
         m_spreadCoolTime = 0;
@@ -1186,6 +1187,7 @@ namespace GObject
 		SAFE_DELETE(m_erlking);
 		SAFE_DELETE(m_collecCard);
 		SAFE_DELETE(_wrapKey);
+		SAFE_DELETE(m_MonsterKettleMgr);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -3527,6 +3529,7 @@ namespace GObject
         st << static_cast<UInt8>(GetVar(VAR_MAP_INDEX));
         checkClanTitle();
         makeClanTitleInfo(st);
+        st << static_cast<UInt8>(GetVar(VAR_HIDE_VIP_LEVEL_FLAG));
         st << Stream::eos;
 
         if(fchange)
@@ -4926,7 +4929,8 @@ namespace GObject
             for(UInt8 i = 0; i < cnt; ++ i)
             {
                 Player * pl = *it;
-                st << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
+                st << pl->getId() << pl->getName() << static_cast<UInt8>(pl->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : (pl->getVipLevel()))
+                    << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
                     << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl);
                 st << static_cast<UInt8>(pl->isOnline());
                 st << static_cast<UInt8>(pl->GetVar(VAR_PRAY_TYPE))<<static_cast<UInt8>(pl->GetVar(VAR_PRAY_VALUE));
@@ -9083,6 +9087,7 @@ namespace GObject
         addRF7DayRecharge(r);
         addLuckyMeetRecharge(r);
         addSummerMeetRecharge(r);
+        firstPotOfGold(r);
         if(World::get11Time())
         {
             UInt32 goldLeft = GetVar(VAR_AIRBOOK_RECHARGE)%30;
@@ -9093,16 +9098,49 @@ namespace GObject
         }
         if(World::getGGTime())
         {
-            UInt32 advanceOther = GetVar(VAR_GUANGGUN_ADVANCE_OTHER);
-            if(advanceOther<24)
+            if(World::getGGTime() == 1)
+            {
+                UInt32 advanceOther = GetVar(VAR_GUANGGUN_ADVANCE_OTHER);
+                if(advanceOther<24)
+                {
+                    sendGuangGunInfo();
+                    UInt32 goldLeft = GetVar(VAR_GUANGGUN_RECHARGE)%100;
+                    AddVar(VAR_GUANGGUN_RECHARGE,r);
+                    UInt32 counts = (r+goldLeft)/100; 
+                    counts = counts>24-advanceOther?24-advanceOther:counts;
+                    AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
+                    AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
+                    sendGuangGunInfo();
+                }
+            }
+            if(World::getGGTime() == 2)
             {
                 sendGuangGunInfo();
-                UInt32 goldLeft = GetVar(VAR_GUANGGUN_RECHARGE)%100;
+                UInt32 goldLeft = GetVar(VAR_GUANGGUN_RECHARGE)%80;
                 AddVar(VAR_GUANGGUN_RECHARGE,r);
-                UInt32 counts = (r+goldLeft)/100; 
-                counts = counts>24-advanceOther?24-advanceOther:counts;
-                AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
-                AddVar(VAR_GUANGGUN_ADVANCE_OTHER,counts);
+                UInt32 counts = (r+goldLeft)/80; 
+                //AddVar(VAR_GUANGGUN_ADVANCE_NUM,counts);
+                SYSMSGV(title, 5206);
+                SYSMSGV(content, 5207);
+                while(counts > 0)
+                {
+                    MailPackage::MailItem mitem[] = {{16021, 1}};
+                    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                    if(counts > 255)
+                    {
+                        mitem[0].count = 255;
+                        if(mail)
+                            mailPackageManager.push(mail->id, mitem, 1, true);
+                        counts -= 255;
+                    }
+                    else
+                    {
+                        mitem[0].count = counts;
+                        if(mail)
+                            mailPackageManager.push(mail->id, mitem, 1, true);
+                        counts = 0;
+                    }
+                }
                 sendGuangGunInfo();
             }
         }
@@ -21567,10 +21605,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D,0x3E};
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001 ,17006};
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D,0x3E,0x3F};
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001 ,17006,17016};
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页 317:太乙神雷 318:桑巴荣耀
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317,318};
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317,318 ,6253};
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -27117,7 +27155,7 @@ void Player::SetReqDataTime1(UInt8 mark)
 
 void Player::setGGValue()
 {
-    if(!World::getGGTime())
+    if(World::getGGTime() != 1)//开服活动才有初始10次
         return ;
     if(GetVar(VAR_GUANGGUN_ADVANCE_NUM)==0)
         SetVar(VAR_GUANGGUN_ADVANCE_NUM,11);
@@ -27144,20 +27182,34 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
     }
     else if(type == 1 && m_gginfo.task != 0)
     {
-        UInt32 gold = 10; 
-        if (getGold() < gold)
+        UInt8 tmpid = m_gginfo.task;
+        if(World::getGGTime() == 1)
         {
-            sendMsgCode(0, 1104);
-            return ;
+            UInt32 gold = 10; 
+            if (getGold() < gold)
+            {
+                sendMsgCode(0, 1104);
+                return ;
+            }
+            ConsumeInfo ci(GuangGun,0,0);
+            useGold(gold,&ci);       
         }
-        ConsumeInfo ci(GuangGun,0,0);
-        useGold(gold,&ci);
+        else
+        {
+            if(getGoldOrCoupon() < 1)
+            {
+                sendMsgCode(0, 1101);
+                return;
+            }
+            ConsumeInfo ci(GuangGun, 0, 0);
+            useGoldOrCoupon(1, &ci);
+        }
         m_gginfo.task =0;
         m_gginfo.taskCom = 0;
         m_gginfo.tasknum = 0;
         AddGuangGunScore();
         AddVar(VAR_GUANGGUN_TODAY_TASK,1);
-        getGGTaskAward();
+        getGGTaskAward(tmpid);
     }
     else if (type == 2)
     {
@@ -27169,24 +27221,90 @@ void Player::GuangGunCompleteTask(UInt8 type ,UInt8 task)
     {
         if(m_gginfo.tasknum !=m_gginfo.taskCom || m_gginfo.task == 0)
             return ;
+        UInt8 tmpid = m_gginfo.task;
         {
             m_gginfo.task =0;
             m_gginfo.taskCom = 0;
             m_gginfo.tasknum = 0;
             AddGuangGunScore();
             AddVar(VAR_GUANGGUN_TODAY_TASK,1);
-            getGGTaskAward();
+            getGGTaskAward(tmpid);
         }
         
     }
     UpdateGGInfo();
 }
-void Player::AddGuangGunScore(UInt8 score)
+void Player::AddGuangGunScore(UInt8 score,UInt8 type)
 {
+    if(World::getGGTime() == 2 && type == 0)
+    {
+        if(GetVar(VAR_GUANGGUN_TENTIMES) == 1)
+            score *= 10;
+    }
+
     AddVar(VAR_GUANGGUN_TODAY_SCORE,score);
     m_gginfo.score+=score;
     Player* pl = getGGTimeCaptain(); 
     UInt32 grade = getGGTimeScore(); 
+    if(World::getGGTime() == 2)
+    {
+        /*
+        if(score == 0 )
+        {
+            SetVar(VAR_GUANGGUN_TODAY_TEAMSCORE,0); 
+        }
+        else
+        {
+            UInt32 tmp = GetVar(VAR_GUANGGUN_TODAY_TEAMSCORE);
+            if(score != 0 && tmp + score >= 50)
+            {
+                UInt8 addNum = 0;
+                UInt8 addNum1 = 0;
+                if(tmp < 50 && (tmp + score) >= 50)
+                    addNum++;      
+                if(tmp < 70 && (tmp + score) >= 70)
+                    addNum++;      
+                if(tmp < 150 && (tmp + score) >= 150)
+                    addNum++;      
+                if(tmp % 200 > (tmp + score) % 200)
+                    AddVar(VAR_GUANGGUN_TEAMSTAR,1);
+                if(addNum)
+                {
+                    UInt8 todayReciveNum = GET_BIT_8(GetVar(VAR_GUANGGUN_TODAY_STAR),0);
+                    UInt32 tmp_num = GetVar(VAR_GUANGGUN_TODAY_STAR);
+                    todayReciveNum += addNum;
+                    tmp_num = SET_BIT_8(tmp_num,0,todayReciveNum);
+                    SetVar(VAR_GUANGGUN_TODAY_STAR,tmp_num); 
+                }
+            }
+            
+            AddVar(VAR_GUANGGUN_TODAY_TEAMSCORE,score);//增加团队积分      
+        }
+        */
+        if((score == 0 && pl == this) || (score != 0)) 
+        {
+            if(pl != NULL)
+            {
+                GameMsgHdr hdr(0x369,  pl->getThreadId(), pl, sizeof(score));
+                GLOBAL().PushMsg(hdr, &score);
+            }
+            if(m_gginfo.player1 != NULL || m_gginfo.player2 != NULL)
+            {
+                if(pl->getGGPlayer1() != NULL)
+                {
+                    GameMsgHdr hdr(0x369,  pl->getGGPlayer1()->getThreadId(), pl->getGGPlayer1(), sizeof(score));
+                    GLOBAL().PushMsg(hdr, &score);
+                }
+                if(pl->getGGPlayer2() != NULL)
+                {
+                    GameMsgHdr hdr(0x369,  pl->getGGPlayer2()->getThreadId(), pl->getGGPlayer2(), sizeof(score));
+                    GLOBAL().PushMsg(hdr, &score);
+                }
+
+            }
+        }
+    }
+
     GameMsgHdr hdr(0x1D5, WORKER_THREAD_WORLD, pl, sizeof(grade));
     GLOBAL().PushMsg(hdr, &grade);
     GameMsgHdr hdr1(0x1D6, WORKER_THREAD_WORLD, pl, sizeof(grade));
@@ -27196,26 +27314,54 @@ void Player::AddGuangGunScore(UInt8 score)
 
 void Player::roamingGuangGun(UInt8 pos)
 {
-//    udpLog("qixi", "I_9122_2", "", "", "", "", "act");
-    if(m_gginfo.tasknum != 0)
-        return ;
-    UInt32 advance = GetVar(VAR_GUANGGUN_ADVANCE_NUM);
-    if( advance < 2 || advance > 35 )
-        return ;
-    UInt8 pos2 = GameAction()->onRoamingGuangGun(this, pos);
- //   qixiUdpLog(1083);
-    m_gginfo.pos = pos2;
-    SetVar(VAR_GUANGGUN_ADVANCE_NUM,advance-1);
-    Stream st(REP::ACTIVE);   //GG
-    st << static_cast<UInt8>(0x22) << static_cast<UInt8>(0x03) << pos2;
-    st << Stream::eos;
-    send(st);
-    UpdateGGInfo();
-    sendGuangGunInfo();
-        
-    char str[16] = {0};
-    sprintf(str, "F_131109_1");
-    udpLog("qingyiluopan", str, "", "", "", "", "act");
+    if(World::getGGTime() == 1)
+    {
+        //    udpLog("qixi", "I_9122_2", "", "", "", "", "act");
+        if(m_gginfo.tasknum != 0)
+            return ;
+        UInt32 advance = GetVar(VAR_GUANGGUN_ADVANCE_NUM);
+        if( advance < 2 || advance > 35 )
+            return ;
+        UInt8 pos2 = GameAction()->onRoamingGuangGun(this, pos);
+        //   qixiUdpLog(1083);
+        m_gginfo.pos = pos2;
+        SetVar(VAR_GUANGGUN_ADVANCE_NUM,advance-1);
+        Stream st(REP::ACTIVE);   //GG
+        st << static_cast<UInt8>(0x22) << static_cast<UInt8>(0x03) << pos2;
+        st << Stream::eos;
+        send(st);
+        UpdateGGInfo();
+        sendGuangGunInfo();
+            
+        char str[16] = {0};
+        sprintf(str, "F_131109_1");
+        udpLog("qingyiluopan", str, "", "", "", "", "act");
+    }
+    else
+    {
+        if(m_gginfo.tasknum != 0)
+            return ;
+        UInt8 times = 1;
+        if(GetVar(VAR_GUANGGUN_TENTIMES) == 1)
+            times = 10;
+        UInt16 mCount = GetPackage()->GetItemAnyNum(16021) ;
+        if(mCount < times)
+            return;
+        UInt8 pos2 = GameAction()->onNewRoamingGuangGun(this, pos);
+        m_gginfo.pos = pos2;
+        GetPackage()->DelItemAny(16021, 1 * times);
+        Stream st(REP::ACTIVE);   //GG
+        st << static_cast<UInt8>(0x22) << static_cast<UInt8>(0x03) << pos2 << static_cast<UInt8>(GetVar(VAR_GUANGGUN_TENTIMES));
+        st << Stream::eos;
+        send(st);
+        UpdateGGInfo();
+        sendGuangGunInfo();
+            
+        char str[16] = {0};
+        sprintf(str, "F_131109_1");
+        udpLog("qingyiluopan", str, "", "", "", "", "act");  
+    }
+
 }
 UInt32 Player::getGGTimeScore()
 {
@@ -27309,6 +27455,13 @@ void Player::sendGuangGunInfo()
     st <<static_cast<UInt8>(m_gginfo.status);
     st<<static_cast<UInt8>(times/20)<<static_cast<UInt8>(getRoll)<<(m_gginfo.counts)<<static_cast<UInt8>(advanceNum-1)<<static_cast<UInt8>(11 + advanceNumLeft - advanceNum)<<static_cast<UInt8>(advanceBuy)<<static_cast<UInt8>(advanceNumLeft)<< getGGTimeTodayScore()<<getGGTimeScore()<<todayScore<<m_gginfo.score<<m_gginfo.pos<<m_gginfo.task<<m_gginfo.tasknum<<m_gginfo.taskCom<<static_cast<UInt8>(todaytaskNum);    
     giveGGTeamMemberInfo(st);
+    if(World::getGGTime() == 2)
+    {
+        st << static_cast<UInt8>(GET_BIT_8(GetVar(VAR_GUANGGUN_TODAY_STAR),0));
+        st << GetVar(VAR_GUANGGUN_TEAMSTAR);
+        st << GetVar(VAR_GUANGGUN_TODAY_TEAMSCORE);
+        st << GetVar(VAR_GUANGGUN_TENTIMES);
+    }
     st<<Stream::eos;
     send(st);
 }
@@ -27454,8 +27607,38 @@ void Player::RunFriendlyCompass(UInt8 type)
    if(num == 0)
        return ;
    UInt8 idx = 0;
-   if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, 7)) )
-       return;
+   if(World::getGGTime() == 1)
+   {
+       if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, 7)) )
+           return;
+   }
+   else
+   {
+       if( 0 == (idx = GameAction()->RunBlueDiamondAward(this, 9)) )
+           return;
+       char str[32] = {0};
+       switch(idx)
+       {
+           case 12 :
+               sprintf(str, "F_140717_4");
+               udpLog("sanrenyou", str, "", "", "", "", "act");
+               break;
+           case 8 :
+               sprintf(str, "F_140717_5");
+               udpLog("sanrenyou", str, "", "", "", "", "act");
+               break;
+           case 10 :
+               sprintf(str, "F_140717_6");
+               udpLog("sanrenyou", str, "", "", "", "", "act");
+               break;
+           case 5:
+               sprintf(str, "F_140717_7");
+               udpLog("sanrenyou", str, "", "", "", "", "act");
+               break;
+           default:
+               break;
+       }
+   }
    m_gginfo.counts--;
    Stream st(REP::ACTIVE);
    st << static_cast<UInt8>(0x22);
@@ -27465,31 +27648,183 @@ void Player::RunFriendlyCompass(UInt8 type)
    send(st);
    UpdateGGInfo();
    sendGuangGunInfo();
-   AddGuangGunScore();
+   AddGuangGunScore(10,1);
    char str[16] = {0};
    sprintf(str, "F_131109_5");
    udpLog("qingyiluopan", str, "", "", "", "", "act");
 }
-void Player::getGGTaskAward()
+void Player::getGGTaskAward(UInt8 task)
 {
-    UInt8 plvl = GetLev();
-    //UInt8 pos = getGuangGunPos();
-    UInt32 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
-    UInt32 exp_ = static_cast<float>(exp)*30;
-    UInt32 pexp = 5000;
-    UInt32 tael = 1000; 
-    UInt32 times = GetVar(VAR_GUANGGUN_TIMES);
-    getTael(tael*(100+times)/100); 
-    AddPExp(pexp*(100+times)/100);
-    AddExp(exp_*(100+times)/100);
-    //if(pos ==1 || pos == 8 ||pos == 12 ||pos ==19)
-        //m_Package->AddItem(9435, 1, true, false );
+    if(World::getGGTime() == 1)
+    {
+        UInt8 plvl = GetLev();
+        //UInt8 pos = getGuangGunPos();
+        UInt32 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
+        UInt32 exp_ = static_cast<float>(exp)*30;
+        UInt32 pexp = 5000;
+        UInt32 tael = 1000; 
+        UInt32 times = GetVar(VAR_GUANGGUN_TIMES);
+        getTael(tael*(100+times)/100); 
+        AddPExp(pexp*(100+times)/100);
+        AddExp(exp_*(100+times)/100);
+        //if(pos ==1 || pos == 8 ||pos == 12 ||pos ==19)
+            //m_Package->AddItem(9435, 1, true, false );
+    }
+    else
+    {
+        UInt8 times = 1;
+        if(GetVar(VAR_GUANGGUN_TENTIMES) == 1)
+            times = 10;
+        UInt8 plvl = GetLev();
+        UInt32 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
+        UInt32 exp_ = static_cast<float>(exp)*60 * times;
+        UInt32 pexp = 10000 * times;
+        UInt32 tael = 1000 * times; 
+        switch(task) 
+        {
+            case 1:
+                getTael(tael); 
+                AddPExp(pexp);
+                AddExp(exp_);
+                break;
+            case 2:
+                GetPackage()->AddItem(503, 1 * times, true, false);
+                break;
+            case 3:
+                GetPackage()->AddItem(500, 1 * times, true, false);
+                break;
+            case 4:
+                GetPackage()->AddItem(513, 1 * times, true, false);
+                break;
+            case 5:
+                GetPackage()->AddItem(512, 2 * times, true, false);
+                break;
+            case 6:
+                GetPackage()->AddItem(134, 1 * times, true, false);
+                break;
+            case 7:
+                getTael(tael); 
+                AddPExp(pexp);
+                AddExp(exp_);
+                break;
+            case 8:
+                GetPackage()->AddItem(30, 3 * times, true, false);
+                break;
+            case 9:
+                GetPackage()->AddItem(551, 2 * times, true, false);
+                break;
+            case 10:
+                GetPackage()->AddItem(1325, 1 * times, true, false);
+                break;
+            case 11:
+                GetPackage()->AddItem(16001, 1 * times, true, false);
+                break;
+            case 12:
+                GetPackage()->AddItem(9498, 1 * times, true, false);
+                break;
+            case 13:
+                GetPackage()->AddItem(9600, 1 * times, true, false);
+                break;
+            case 14:
+                GetPackage()->AddItem(9418, 1 * times, true, false);
+                break;
+            case 15:
+                getTael(tael); 
+                AddPExp(pexp);
+                AddExp(exp_);
+                break;
+            case 16:
+                GetPackage()->AddItem(466, 3 * times, true, false);
+                break;
+            case 17:
+                getTael(tael); 
+                AddPExp(pexp);
+                AddExp(exp_);
+                break;
+            case 18:
+                GetPackage()->AddItem(9371, 4 * times, true, false);
+                break;
+            case 19:
+                GetPackage()->AddItem(501, 1 * times, true, false);
+                break;
+            case 20:
+                GetPackage()->AddItem(9338, 1 * times, true, false);
+                break;
+            case 21:
+                GetPackage()->AddItem(9414, 1 * times, true, false);
+                break;
+            case 22:
+                getTael(tael); 
+                AddPExp(pexp);
+                AddExp(exp_);
+                break;
+            case 23:
+                GetPackage()->AddItem(503, 1 * times, true, false);
+                break;
+            case 24:
+                GetPackage()->AddItem(15, 3 * times, true, false);
+                break;
+            case 25:
+                GetPackage()->AddItem(516, 1 * times, true, false);
+                break;
+            case 26:
+                getTael(tael); 
+                AddPExp(pexp);
+                AddExp(exp_);
+                break;
+            case 27:
+                getTael(tael); 
+                AddPExp(pexp);
+                AddExp(exp_);
+                break;
+            case 28:
+                GetPackage()->AddItem(507, 1 * times, true, false);
+                break;
+            case 29:
+                GetPackage()->AddItem(509, 1 * times, true, false);
+                break;
+            case 30:
+                getTael(tael); 
+                AddPExp(pexp);
+                AddExp(exp_);
+                break;
+            case 31:
+                GetPackage()->AddItem(9457, 1 * times, true, false);
+                break;
+            case 32:
+                getTael(tael); 
+                AddPExp(pexp);
+                AddExp(exp_);
+                break;
+            case 33:
+                GetPackage()->AddItem(17012, 1 * times, true, false);
+                GetCollectCard()->AddSummerCard(5005);   
+                break;
+            case 34:
+                GetPackage()->AddItem(17013, 1 * times, true, false);
+                GetCollectCard()->AddSummerCard(5006);   
+                break;
+            case 35:
+                GetPackage()->AddItem(17014, 1 * times, true, false);
+                GetCollectCard()->AddSummerCard(5007);   
+                break;
+            case 36:
+                GetPackage()->AddItem(17015, 1 * times, true, false);
+                GetCollectCard()->AddSummerCard(5008);   
+                break;
+            default:
+                break;
+        }
+        SetVar(VAR_GUANGGUN_TENTIMES,0);
+
+    }
 
 }
 void Player::giveGGTeamMemberInfo(Stream& st)
 {
     Player *cap =this;
     Player * pl=NULL;
+    std::string str = "";
     if(getGGTimeCaptain()!=NULL)
         cap = getGGTimeCaptain();
     if(cap == this )
@@ -27497,11 +27832,11 @@ void Player::giveGGTeamMemberInfo(Stream& st)
         if(NULL != ( pl = getGGPlayer1()) )
             st<<pl->getName()<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TIMES)/20)<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TODAY_TASK))<<pl->getGGScore();
         else 
-            st<<""<<static_cast<UInt8>(0)<<static_cast<UInt8>(0)<<static_cast<UInt32>(0);
+            st<< str <<static_cast<UInt8>(0)<<static_cast<UInt8>(0)<<static_cast<UInt32>(0);
         if(NULL != ( pl = getGGPlayer2()) )
             st<<pl->getName()<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TIMES)/20)<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TODAY_TASK))<<pl->getGGScore();
         else 
-            st<<""<<static_cast<UInt8>(0)<<static_cast<UInt8>(0)<<static_cast<UInt32>(0);
+            st<< str <<static_cast<UInt8>(0)<<static_cast<UInt8>(0)<<static_cast<UInt32>(0);
     }
     else 
     {
@@ -27511,7 +27846,7 @@ void Player::giveGGTeamMemberInfo(Stream& st)
         else if(cap->getGGPlayer2()!=NULL && cap->getGGPlayer2()!=this)
             pl = cap->getGGPlayer2();
         else
-            st<<""<<static_cast<UInt8>(0)<<static_cast<UInt32>(0)<<static_cast<UInt32>(0);
+            st<< str <<static_cast<UInt8>(0)<<static_cast<UInt8>(0)<<static_cast<UInt32>(0);
         if(pl!=NULL)
             st<<pl->getName()<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TIMES)/20)<<static_cast<UInt8>(pl->GetVar(VAR_GUANGGUN_TODAY_TASK))<<pl->getGGScore();
     }
@@ -27541,6 +27876,8 @@ void Player::BuyGuangGunAdvance()
 
 void  Player::AddGGTimes(Player* pl,UInt8 type,UInt8 flag)
 {
+   if(World::getGGTime() != 1)
+       return;
     if(type < 1||type > 2)
         return ;
    UInt32 gold[]={0,40,80};
@@ -27569,32 +27906,94 @@ void  Player::AddGGTimes(Player* pl,UInt8 type,UInt8 flag)
    sprintf(str, "F_131109_%d",6+type);
    udpLog("qingyiluopan", str, "", "", "", "", "act");
 }
-void Player::getCompassChance()      //获取财富之星
+void Player::getCompassChance(UInt8 flag)      //获取财富之星
 {
-    UInt32 grade = getGGTimeTodayScore(); 
-    UInt32 todayNum = GetVar(VAR_GUANGGUN_GETROLL); 
-    UInt32 toNum = (grade>300?300:grade)/100;
-    if(toNum > 3 || todayNum >= toNum)
-        return ;
-    m_gginfo.counts += 1;
-    AddVar(VAR_GUANGGUN_GETROLL,1);
-    UpdateGGInfo();
-    char str[16] = {0};
-    sprintf(str, "F_131109_2");
-    udpLog("qingyiluopan", str, "", "", "", "", "act");
+    UInt8 GG_status = World::getGGTime();
+    if(GG_status == 1)
+    {
+        UInt32 grade = getGGTimeTodayScore(); 
+        UInt32 todayNum = GetVar(VAR_GUANGGUN_GETROLL); 
+        UInt32 toNum = (grade>300?300:grade)/100;
+        if(toNum > 3 || todayNum >= toNum)
+            return ;
+        m_gginfo.counts += 1;
+        AddVar(VAR_GUANGGUN_GETROLL,1);
+        UpdateGGInfo();
+        char str[16] = {0};
+        sprintf(str, "F_131109_2");
+        udpLog("qingyiluopan", str, "", "", "", "", "act");
+    }
+    else//GG_status == 2
+    {
+        if(flag != 0 && flag != 1)
+            return;
+        if(flag == 0)//每日财富之星
+        {
+            UInt8 todayReciveNum = GET_BIT_8(GetVar(VAR_GUANGGUN_TODAY_STAR),0);
+            UInt8 todayRecivedNum = GET_BIT_8(GetVar(VAR_GUANGGUN_TODAY_STAR),1);
+            if(todayRecivedNum >= 3)
+            {
+                sendMsgCode(0, 5010);
+                return; 
+            }
+            if(todayReciveNum == 0)
+                return; 
+            m_gginfo.counts += 1;
+            todayRecivedNum ++;
+            todayReciveNum --;
+            UInt32 tmp_num = GetVar(VAR_GUANGGUN_TODAY_STAR);
+            tmp_num = SET_BIT_8(tmp_num,0,todayReciveNum);
+            tmp_num = SET_BIT_8(tmp_num,1,todayRecivedNum);
+            SetVar(VAR_GUANGGUN_TODAY_STAR,tmp_num); 
+            UpdateGGInfo();
+            char str[32] = {0};
+            sprintf(str, "F_140717_1");
+            udpLog("sanrenyou", str, "", "", "", "", "act");
+        }
+        else//团队财富之星
+        {
+            if(GetVar(VAR_GUANGGUN_TEAMSTAR) <= 0)
+                return;
+            UInt32 tmp = GetVar(VAR_GUANGGUN_TEAMSTAR) - 1;
+            m_gginfo.counts += 1;
+            SetVar(VAR_GUANGGUN_TEAMSTAR,tmp); 
+            UpdateGGInfo();
+            char str[32] = {0};
+            sprintf(str, "F_140717_2");
+            udpLog("sanrenyou", str, "", "", "", "", "act");
+        }
+
+    }
 }
 void Player::BuyCompassChance(UInt8 counts)
 {
-   UInt32 gold =30 * counts;
-   if (getGold() < gold)
-       return ;
-   ConsumeInfo ci(GuangGun,0,0);
-   useGold(gold,&ci);
-   m_gginfo.counts+=counts ; 
-   UpdateGGInfo();
-   char str[16] = {0};
-   sprintf(str, "F_131109_4");
-   udpLog("qingyiluopan", str, "", "", "", "", "act");
+    UInt8 GG_status = World::getGGTime();
+    if(GG_status == 1)
+    {
+        UInt32 gold =30 * counts;
+        if (getGold() < gold)
+           return ;
+        ConsumeInfo ci(GuangGun,0,0);
+        useGold(gold,&ci);
+        m_gginfo.counts+=counts ; 
+        UpdateGGInfo();
+        char str[16] = {0};
+        sprintf(str, "F_131109_4");
+        udpLog("qingyiluopan", str, "", "", "", "", "act");
+    }
+    else//独立开情义罗盘
+    {
+        UInt32 gold =50 * counts;
+        if (getGold() < gold)
+           return ;
+        ConsumeInfo ci(GuangGun,0,0);
+        useGold(gold,&ci);
+        m_gginfo.counts+=counts ; 
+        UpdateGGInfo();
+        char str[16] = {0};
+        sprintf(str, "F_140717_3");
+        udpLog("sanrenyou", str, "", "", "", "", "act");
+    }
 }
 void Player::SetNovLogin()
 {
@@ -34215,6 +34614,46 @@ void Player::coolSummerOp(UInt8 type, UInt8 randType, UInt8 flag)
             break;
     }
 }
+void Player::UseCouponOrGoldInKettle(UInt32 num , UInt8 flag )
+{ 
+    UInt32 coupon = 0;
+    UInt32 gold = 0;
+    if(getCoupon()*flag + getGold() < num * 15 )
+    {
+        coupon = getCoupon() *flag;
+        gold = getGold();
+    }
+    else
+    {
+       if(getCoupon()*flag >= num * 15 ) 
+           coupon = num * 15;
+       else
+       {
+           coupon = getCoupon()*flag;
+           gold = num * 15 - coupon;
+       }
+    }
+
+    if(coupon > 0)
+    {
+        ConsumeInfo ci(KETTLE, 0, 0);
+        useCoupon(coupon, &ci);
+    }
+    if(gold > 0)
+    { 
+        ConsumeInfo ci(KETTLE, 0, 0);
+        useGold(gold, &ci);
+    } 
+} 
+void Player::sendKettleInfo()
+{
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x35);
+    st << static_cast<UInt8>(0x01);
+    getMonsterKettleMgr()->GetMonsterKettleInfo(st); 
+    st << Stream::eos;
+    send(st);
+}
 
 void Player::shuShanWeiWei_XDPB(Player * player, UInt8 opt)
 {
@@ -34420,28 +34859,28 @@ void Player::seekingHer_SendBeans(UInt32 userId, UInt8 beanType, UInt32 count, s
 
     if(1 == beanType)
     {
-            SYSMSG_BROADCASTV(5174, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
+            SYSMSG_BROADCASTV(5222, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
 
     }
     else if(2 == beanType)
     {
-            SYSMSG_BROADCASTV(5175, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
-            SYSMSGV(title, 5183, count);
-            SYSMSGV(content, 5179, getCountry(), getName().c_str(), count);
+            SYSMSG_BROADCASTV(5223, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
+            SYSMSGV(title, 5209, count);
+            SYSMSGV(content, 5205, getCountry(), getName().c_str(), count);
             receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
     }
     else if(3 == beanType)
     {
-            SYSMSG_BROADCASTV(5176, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count, words.c_str());
-            SYSMSGV(title, 5184, count);
-            SYSMSGV(content, 5186, getCountry(), getName().c_str(), count);
+            SYSMSG_BROADCASTV(5224, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count, words.c_str());
+            SYSMSGV(title, 5210, count);
+            SYSMSGV(content, 5212, getCountry(), getName().c_str(), count);
             receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
     }
     else if(4 == beanType)
     {
-            SYSMSG_BROADCASTV(5177, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count, words.c_str());
-            SYSMSGV(title, 5185);
-            SYSMSGV(content, 5187, getCountry(), getName().c_str(), count);
+            SYSMSG_BROADCASTV(5203, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count, words.c_str());
+            SYSMSGV(title, 5211);
+            SYSMSGV(content, 5213, getCountry(), getName().c_str(), count);
             receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
     }
 
@@ -34474,8 +34913,8 @@ void Player::getSeekingHerCharmAward()
             UInt8 tmp = GET_BIT(awardStatus, i);
             if(!tmp)
             {
-                SYSMSGV(title, 5194);
-                SYSMSGV(content, 5195, charmlvl[i]);
+                SYSMSGV(title, 5220);
+                SYSMSGV(content, 5221, charmlvl[i]);
                 Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
                 if(mail)
                 {
@@ -34528,7 +34967,76 @@ void Player::SetSeekingHerSendBeanLog(UInt64 & senderId, UInt32 & date, UInt32 &
 
     if(toDB)
         DB1().PushUpdateData("insert into `sendbeans_log`(senderId, receiverId, data, count) values(%" I64_FMT "u, %" I64_FMT "u, %u, %u)", senderId, getId(), date, count);
+}
 
+void Player::firstPotOfGold(UInt32 total)
+{
+    static UInt32 rechargeLvl[6] = {200, 800, 1500, 3000, 5000, 8000};
+    UInt32 now = TimeUtil::Now();
+    if(now > 7 * 24 *3600 + getCreated())
+        return;
+    for(size_t i = 0; i < 6; i++)
+    {
+        if(total == rechargeLvl[i])
+        {
+            UInt8 flag = GET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i);
+            if(flag)
+                return;
+            SYSMSG(title, 5213);
+            SYSMSGV(content, 5214, rechargeLvl[i], rechargeLvl[i]);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[1] = {
+                    {0xA000, rechargeLvl[i]},
+                };
+                mailPackageManager.push(mail->id, mitem, 1, true);
+            }
+            SYSMSG_BROADCASTV(5215, getCountry(), getName().c_str(), rechargeLvl[i]);
+            SetVar(VAR_FIRST_POT_GOLD_STATUS, SET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i));
+            firstPotOfGoldReturn(0);
+            char str[16] = {0};
+            sprintf(str, "F_140726_%d", static_cast<Int32>(1+i));
+            udpLog("diyitongjin", str, "", "", "", "", "act");
+        }
+    }
+}
+
+void Player::firstPotOfGoldReturn(UInt8 type)
+{
+    UInt32 now = TimeUtil::Now();
+    if(now > 7 * 24 *3600 + getCreated())
+        return;
+
+    if(type == 0)
+    {
+        Stream st(REP::COUNTRY_ACT);
+        st << static_cast<UInt8>(0x13);
+        st << type;
+        st << static_cast<UInt8>(GetVar(VAR_FIRST_POT_GOLD_STATUS));
+        st << Stream::eos;
+        send(st);
+    }
+}
+
+void Player::hideVipLvlFlag(UInt8 op)
+{
+    UInt32 flag = GetVar(VAR_HIDE_VIP_LEVEL_FLAG);
+    if(0 == op)
+    {
+        if(!flag)
+        {
+            SetVar(VAR_HIDE_VIP_LEVEL_FLAG, 1);
+            udpLog("vipbiaoshi", "F_140801_1", "", "", "", "", "act");
+        }
+    }
+    else if(1 == op)
+    {
+        if(flag)
+        {
+            SetVar(VAR_HIDE_VIP_LEVEL_FLAG, 0);
+        }
+    }
 }
 
 } // namespace GObject

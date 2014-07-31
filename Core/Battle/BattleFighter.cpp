@@ -283,6 +283,8 @@ void BattleFighter::updateAllAttr()
     float factor = 1.0f;
     if(_fighter && _fighter->getOwner())
         factor = _fighter->getOwner()->getSpiritFactor() * _fighter->getOwner()->getKJTMFactor();
+    if(_fighter&&_fighter->GetPowerUp() != 0)
+        factor += _fighter->GetPowerUp();
 
 	_strength = _formula->calcStrength(this);
 	_agility = _formula->calcAgility(this);

@@ -3401,7 +3401,7 @@ void SetSeekingHerCharmRank( GameMsgHdr& hdr,  const void* data )
     }
 
     if((World::seekingHerCharmSort.size()!=0 && total > World::seekingHerCharmSort.begin()->total) || (World::seekingHerCharmSort.size()==0))
-        SYSMSG_BROADCASTV(5180, player->getCountry(), player->getName().c_str(), total);
+        SYSMSG_BROADCASTV(5206, player->getCountry(), player->getName().c_str(), total);
 
     RCSort s;
     s.player = player;
@@ -3431,7 +3431,7 @@ void SetSeekingHerBeanTotalRank( GameMsgHdr& hdr,  const void* data )
         }
 
         if((World::seekingHerNiuLangSort.size()!=0 && total > World::seekingHerNiuLangSort.begin()->total) || (World::seekingHerNiuLangSort.size()==0))
-            SYSMSG_BROADCASTV(5181, player->getCountry(), player->getName().c_str(), total);
+            SYSMSG_BROADCASTV(5207, player->getCountry(), player->getName().c_str(), total);
 
         RCSort s;
         s.player = player;
@@ -3450,7 +3450,7 @@ void SetSeekingHerBeanTotalRank( GameMsgHdr& hdr,  const void* data )
         }
 
         if((World::seekingHerZhiNvSort.size()!=0 && total > World::seekingHerZhiNvSort.begin()->total) || (World::seekingHerZhiNvSort.size()==0))
-            SYSMSG_BROADCASTV(5182, player->getCountry(), player->getName().c_str(), total);
+            SYSMSG_BROADCASTV(5208, player->getCountry(), player->getName().c_str(), total);
 
         RCSort s;
         s.player = player;

@@ -1710,6 +1710,13 @@ struct DBLingshiAttr
     UInt32 exp;
     UInt8 bindType;
 };
+struct DBKettle
+{
+    UInt64 playerId;
+    UInt8  num;
+    std::string history;
+    std::string occupy;
+};
 
 }
 
@@ -3861,6 +3868,7 @@ SPECIALDEF(4)
     std::string, cubeCover
 )
 SPECIALEND()
+
 SPECIALBEGIN(GObject::DBHappyXXL)
 SPECIALDEF(3)
 (
@@ -3870,6 +3878,15 @@ SPECIALDEF(3)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBKettle)
+SPECIALDEF(4)
+(
+	UInt64, playerId,
+	UInt8, num,
+    std::string, history,
+    std::string, occupy
+)
+SPECIALEND()
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

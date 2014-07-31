@@ -934,6 +934,15 @@ struct DBNewQuestionsConfig
     UInt8 lvl;
     UInt8 answer;
 };
+struct DBKettleNpc
+{
+    UInt32 monsterId;
+    float attack;
+    float magatk;
+    float hp;
+    float action;
+    UInt32 exp;
+};
 
 }
 
@@ -2031,6 +2040,17 @@ SPECIALDEF(3)
 	)
 SPECIALEND()
 
+SPECIALBEGIN(GData::DBKettleNpc)
+SPECIALDEF(6)
+	(
+     UInt32, monsterId,
+    float, attack,
+    float, magatk,
+    float, hp,
+    float, action,
+    UInt32, exp
+	)
+SPECIALEND()
 }
 
 #endif // _GDATADBEXECHELPER_H_

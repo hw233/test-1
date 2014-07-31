@@ -1,31 +1,35 @@
 
+
+
 #!/bin/bash
 
-F=cardInfo.txt
+F=kettleNpc.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function cardInfo()
+echo $F
+function kettleNpc()
 {
+# 11,"302,2,3|303,1",0,40,"3,4"
     f=$1
-    d=cardInfo
-    sed -i /isPack/d $f
+    d=kettleNpc
+    sed -i /ID/d $f
     sed -i /id/d $f
-    sed -i /REF/d $f
     sed -i /^$/d $f
+    sed -i /REF/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `cardInfo` VALUES";
+            print "INSERT INTO `kettleNpc` VALUES";
         } {
-            printf("(%d,%d,%d,%d,%d,\x27%s\x27)",$1,$3,$4,$5,$7,$2);
+            printf("(%d,%.02f,%.02f,%.02f,%.02f,%d)",$1,$3,$4,$5,$6,$8);
             if (NR <= ENVIRON["lines"])
                 printf(",");
-            else if (NR > ENVIRON["lines"])
+            else if (NR >= ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }
@@ -41,7 +45,6 @@ function cardInfo()
         echo "ERROR"
     fi
 }
-
 function iconv2utf8()
 {
     iconv -f cp936 -t utf8 $1 -o $1.tmp
@@ -51,7 +54,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    cardInfo $F
+    kettleNpc $F
 else
     echo "File $F is not exists"
 fi

@@ -134,7 +134,7 @@ namespace Script
 		inline Table GetNpcRelationTask(UInt32 npcId);
 		inline const char* GetPlayerName(Player* player);
 		inline const char* GetPlayerStateName(Player* player);
-
+        inline Player * GetPlayerPtr(UInt64 playerId);
 	public:
 		void Print() { std::cout << "Lua Test" << std::endl; }
 		void DoLuaTest(Player * player, const std::string& buffer);
@@ -365,6 +365,7 @@ namespace Script
         lua_tinker::table GetdayExtraAward(UInt32 month, UInt32 day);
         UInt8 onRoamingQueqiao(Player* pl, UInt8 pos);
         UInt8 onRoamingGuangGun(Player* pl, UInt8 pos);
+        UInt8 onNewRoamingGuangGun(Player* pl, UInt8 pos);
         UInt32 GetBDSupermanPrice(Player* player, UInt32 itemId, bool isUsed);
         void doStrong(Player* pl, UInt8 id, UInt32 param1, UInt32 param2);
         UInt8 GetSthCheckFlag(UInt8 idx);
