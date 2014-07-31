@@ -1110,12 +1110,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                9388, 1,
-                9414,  5,
+                9427, 2,
+                5135,  1,
                 9141, 2,
                 15, 2,
-                501, 4,
-                9498, 4,
+                9457, 4,
+                9600, 4,
             };
 
             UInt8 idx = 0;
@@ -1145,7 +1145,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if(id == 9388 || id == 9414 || id == 9141)
+                    if(id == 9427 || id == 5135 || id == 9141)
                     {
                         if(player->GetVar(GObject::VAR_DIRECTPURCNT) >= 3)
                             purchase.code = 2;
