@@ -3587,6 +3587,8 @@ namespace GObject
         void firstPotOfGold(UInt32);
         void firstPotOfGoldReturn(UInt8);
 
+        void hideVipLvlFlag(UInt8);
+
     private:
         //玩家位置（包括层数、当层位置）
         UInt8 _playerPos;

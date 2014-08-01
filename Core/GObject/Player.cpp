@@ -3527,6 +3527,7 @@ namespace GObject
         st << static_cast<UInt8>(GetVar(VAR_MAP_INDEX));
         checkClanTitle();
         makeClanTitleInfo(st);
+        st << static_cast<UInt8>(GetVar(VAR_HIDE_VIP_LEVEL_FLAG));
         st << Stream::eos;
 
         if(fchange)
@@ -4926,7 +4927,8 @@ namespace GObject
             for(UInt8 i = 0; i < cnt; ++ i)
             {
                 Player * pl = *it;
-                st << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
+                st << pl->getId() << pl->getName() << static_cast<UInt8>(pl->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : (pl->getVipLevel()))
+                    << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
                     << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl);
                 st << static_cast<UInt8>(pl->isOnline());
                 st << static_cast<UInt8>(pl->GetVar(VAR_PRAY_TYPE))<<static_cast<UInt8>(pl->GetVar(VAR_PRAY_VALUE));
@@ -34760,7 +34762,7 @@ void Player::firstPotOfGold(UInt32 total)
 {
     static UInt32 rechargeLvl[6] = {200, 800, 1500, 3000, 5000, 8000};
     UInt32 now = TimeUtil::Now();
-    if(now - getCreated() > 7 * 24 *3600)
+    if(now > 7 * 24 *3600 + getCreated())
         return;
     for(size_t i = 0; i < 6; i++)
     {
@@ -34789,7 +34791,7 @@ void Player::firstPotOfGold(UInt32 total)
 void Player::firstPotOfGoldReturn(UInt8 type)
 {
     UInt32 now = TimeUtil::Now();
-    if(now - getCreated() > 7 * 24 *3600)
+    if(now > 7 * 24 *3600 + getCreated())
         return;
 
     if(type == 0)
@@ -34800,6 +34802,26 @@ void Player::firstPotOfGoldReturn(UInt8 type)
         st << static_cast<UInt8>(GetVar(VAR_FIRST_POT_GOLD_STATUS));
         st << Stream::eos;
         send(st);
+    }
+}
+
+void Player::hideVipLvlFlag(UInt8 op)
+{
+    UInt32 flag = GetVar(VAR_HIDE_VIP_LEVEL_FLAG);
+    if(0 == op)
+    {
+        if(!flag)
+        {
+            SetVar(VAR_HIDE_VIP_LEVEL_FLAG, 1);
+            udpLog("vipbiaoshi", "F_140801_1", "", "", "", "", "act");
+        }
+    }
+    else if(1 == op)
+    {
+        if(flag)
+        {
+            SetVar(VAR_HIDE_VIP_LEVEL_FLAG, 0);
+        }
     }
 }
 
