@@ -2063,13 +2063,21 @@ function getShuShanWeiWei_MSYJ_Award(player)
     return MSYJ_Award[i]
 end
 
-function getRedBeanAward(player, index)
+function getRedBeanAward(player, index, count)
     local redBeanAward = {
         [1] = { {15, 1}, {56, 1}, {500, 1}, {57, 1}, {511, 1}},
         [2] = { {503, 1}, {500, 2}, {9123, 1}, {440, 1}, {516, 1}},
         [3] = { {440, 2}, {9123, 2}, {1325, 2}, {9338, 2}, {1126, 8}},
-        [4] = { {134, 12}, {515, 7}, {440, 12}, {9123, 12}, {9433, 1}, {9076, 5}, {1735, 1}, {1734, 1}},
-        [5] = { {503, 30}, {500, 30}, {501, 30}, {515, 17}, {509, 10}, {507, 10}, {9433, 1}, {9076, 7}, {9075, 6}, {9022, 6}, {9076, 12}, {1735, 1}, {1734, 1}},
+        [4] = { {134, 12}, {515, 8}, {440, 12}, {9123, 12}, {9433, 1}, {9076, 6}, {1735, 1}, {1734, 1}},
+        [5] = { {{503, 30}, {500, 30}, {501, 30}}, {{515, 17}}, {{509, 10}, {507, 10}}, {{9076, 15}}, {{9075, 6}}, {{9022, 6}}, {{9068, 8}}, {{1735, 1}}, {{1734, 1}}},
+    }
+
+    local prob = {
+        [1] = {2000, 4000, 6000, 8000, 10000},
+        [2] = {2000, 4000, 6000, 8000, 10000},
+        [3] = {3000, 6000, 7300, 8600, 10000},
+        [4] = {2000, 3700, 5800, 7900, 8000, 9000, 9050, 10000},
+        [5] = {2000, 4000, 6000, 7200, 7800, 8400, 9200, 9600, 10000},
     }
 
     local award = redBeanAward[index]
@@ -2078,13 +2086,28 @@ function getRedBeanAward(player, index)
     end
 
     local package = player:GetPackage();
-    if package:GetRestPackageSize() < #award then
+    if package:GetRestPackageSize() < 3 * count then
         player:sendMsgCode(2, 1011, 0)
         return false
     end
 
-    for i = 1, #award do
-        package:Add(award[i][1], award[i][2], true, 0, 101)
+    local n = 1
+    for i = 1, count do
+        local p = math.random(1, 10000)
+        for j = 1, #award do
+            if p <= prob[index][i] then
+                n = i
+                break
+            end
+        end
+        if index == 5 then
+            for k = 1, #award[n] do
+                package:Add(award[n][k][1], award[n][k][2], true, 0, 101)
+            end
+        else
+            package:Add(award[n][1], award[n][2], true, 0, 101)
+        end
     end
+
     return true
 end

@@ -5626,11 +5626,12 @@ void World::SendSeekingHerNiuLangAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][6] = {
-        {{503, 20}, {134, 20}, {9018, 20}, {1731, 1}, {500, 20}, {9991, 1}},
-        {{515, 15}, {503, 15}, {9498, 15}, {500, 15}, {0 ,0}, {0, 0}},
-        {{515, 10}, {503, 10}, {9498, 10}, {500, 10}, {0, 0}, {0, 0}},
-        {{515, 6}, {503, 6}, {9498, 6}, {500, 3}, {0, 0}, {0, 0}},
-        {{515, 3}, {503, 3}, {9498, 6}, {500, 3}, {0, 0}, {0, 0}},
+        {{503, 20}, {134, 20}, {9018, 20}, {1734, 1}, {9991, 1}},
+        {{503, 15}, {134, 15}, {9498, 15}, {500, 15}, {0, 0}},
+        {{503, 10}, {134, 10}, {9498, 10}, {500, 10}, {0, 0}},
+        {{503,  8}, {134,  8}, {9498,  8}, {500,  8}, {0, 0}},
+        {{503,  6}, {134,  6}, {9498,  6}, {500,  3}, {0, 0}},
+        {{503,  3}, {134,  3}, {9498,  6}, {500,  3}, {0, 0}},
     };
 
     SYSMSG(title, 5218);
@@ -5639,16 +5640,16 @@ void World::SendSeekingHerNiuLangAward()
     for (RCSortType::iterator i = World::seekingHerNiuLangSort.begin(), e = World::seekingHerNiuLangSort.end(); i != e; ++i)
     {
         SYSMSGV(content, 5219, pos);
-        if(pos >= 1 && pos <=3)
-            index = pos;
-        else if(pos >= 4 && pos <= 10)
+        if(pos >= 1 && pos <=4)
+            index = pos - 1;
+        else if(pos >= 5 && pos <= 10)
             index = 4;
         else if(pos >= 11 && pos <= 20)
             index = 5;
-        MailItemsInfo itemsInfo(s_item[index-1], Activity, 6);
+        MailItemsInfo itemsInfo(s_item[index], Activity, 5);
         Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
-            mailPackageManager.push(mail->id, s_item[index-1], 6, true);
+            mailPackageManager.push(mail->id, s_item[index], 5, true);
         pos++;
         if (pos > 20)
             break;
@@ -5660,11 +5661,12 @@ void World::SendSeekingHerZhiNvAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][6] = {
-        {{503, 20}, {134, 20}, {9418, 20}, {1735, 1}, {500, 20}, {9990, 1}},
-        {{515, 15}, {503, 15}, {9498, 15}, {500, 15}, {0 ,0}, {0, 0}},
-        {{515, 10}, {503, 10}, {9498, 10}, {500, 10}, {0 ,0}, {0, 0}},
-        {{515, 6}, {503, 6}, {9498, 6}, {500, 6}, {0 ,0}, {0, 0}},
-        {{515, 3}, {503, 3}, {9498, 3}, {500, 3}, {0 ,0}, {0, 0}},
+        {{503, 20}, {134, 20}, {9418, 20}, {1735, 1}, {9990, 1}},
+        {{503, 15}, {134, 15}, {9498, 15}, {500, 15}, {0, 0}},
+        {{503, 10}, {134, 10}, {9498, 10}, {500, 10}, {0, 0}},
+        {{503,  8}, {134,  8}, {9498,  8}, {500,  8}, {0, 0}},
+        {{503,  6}, {134,  6}, {9498,  6}, {500,  6}, {0, 0}},
+        {{503,  3}, {134,  3}, {9498,  3}, {500,  3}, {0, 0}},
     };
 
     SYSMSG(title, 5216);
@@ -5673,17 +5675,17 @@ void World::SendSeekingHerZhiNvAward()
     for (RCSortType::iterator i = World::seekingHerZhiNvSort.begin(), e = World::seekingHerZhiNvSort.end(); i != e; ++i)
     {
         SYSMSGV(content, 5217, pos);
-        if(pos >= 1 && pos <=3)
-            index = pos;
-        else if(pos >= 4 && pos <= 10)
+        if(pos >= 1 && pos <= 4)
+            index = pos - 1;
+        else if(pos >= 5 && pos <= 10)
             index = 4;
         else if(pos >= 11 && pos <= 20)
             index = 5;
 
-        MailItemsInfo itemsInfo(s_item[index-1], Activity, 6);
+        MailItemsInfo itemsInfo(s_item[index], Activity, 5);
         Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
-            mailPackageManager.push(mail->id, s_item[index-1], 6, true);
+            mailPackageManager.push(mail->id, s_item[index], 5, true);
         pos++;
         if (pos > 20)
             break;
@@ -5695,14 +5697,12 @@ void World::SendSeekingHerCharmAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][6] = {
-        {{515, 30}, {503, 30}, {9498, 30}, {1734, 1}, {9022, 20}, {9989, 1}},
-        {{515, 25}, {503, 25}, {9498, 25}, {1734, 1}, {9022, 15}, {0, 0}},
-        {{515, 20}, {503, 20}, {9498, 20}, {1734, 1}, {9022, 10}, {0, 0}},
-        {{515, 10}, {503, 10}, {9498, 10}, {9022, 5}, {0, 0}, {0, 0}},
-        {{515, 5}, {503, 5}, {9498, 5}, {9022, 3}, {0, 0}, {0, 0}},
-        {{515, 30}, {503, 30}, {9498, 30}, {1735, 1}, {9022, 20}, {9989, 1}},
-        {{515, 25}, {503, 25}, {9498, 25}, {1735, 1}, {9022, 15}, {0, 0}},
-        {{515, 20}, {503, 20}, {9498, 20}, {1735, 1}, {9022, 10}, {0, 0}},
+        {{9022, 20}, {515, 30}, {1734,  1}, {1735, 1}, {9989, 1}},
+        {{9022, 15}, {515, 25}, {9498, 25}, {1734, 1}, {0, 0}},
+        {{9022, 10}, {515, 20}, {9498, 20}, {1734, 1}, {0, 0}},
+        {{9022,  8}, {515, 15}, {9498, 15}, {1734, 1}, {0, 0}},
+        {{515,  10}, {503, 10}, {9498, 10}, {9022, 5}, {0, 0}},
+        {{515,   5}, {503,  5}, {9498,  5}, {9022, 3}, {0, 0}},
     };
 
     SYSMSG(title, 5214);
@@ -5711,17 +5711,17 @@ void World::SendSeekingHerCharmAward()
     for (RCSortType::iterator i = World::seekingHerCharmSort.begin(), e = World::seekingHerCharmSort.end(); i != e; ++i)
     {
         SYSMSGV(content, 5215, pos);
-        if(pos >= 1 && pos <=3)
-            index = ( i->player->IsMale() ? pos : pos + 5);
-        else if(pos >= 4 && pos <= 10)
+        if(pos >= 1 && pos <= 4)
+            index = pos - 1;
+        else if(pos >= 5 && pos <= 10)
             index = 4;
         else if(pos >= 11 && pos <= 20)
             index = 5;
 
-        MailItemsInfo itemsInfo(s_item[index-1], Activity, 6);
+        MailItemsInfo itemsInfo(s_item[index], Activity, 5);
         Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
-            mailPackageManager.push(mail->id, s_item[index-1], 6, true);
+            mailPackageManager.push(mail->id, s_item[index], 5, true);
         pos++;
         if (pos > 20)
             break;

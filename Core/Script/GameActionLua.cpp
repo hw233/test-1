@@ -1983,10 +1983,10 @@ namespace Script
 		assert(player != NULL);
         return Call<Table>("getShuShanWeiWei_MSYJ_Award", player);
     }
-    bool GameActionLua::getRedBeanAward(Player * player, UInt8 index)
+    bool GameActionLua::getRedBeanAward(Player * player, UInt8 index, UInt32 count)
     {
 		assert(player != NULL);
-        return Call<bool>("getRedBeanAward", player, index);
+        return Call<bool>("getRedBeanAward", player, index, count);
     }
 }
 

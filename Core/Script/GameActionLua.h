@@ -424,7 +424,7 @@ namespace Script
         UInt32 getWeiXinShopItemNum();
         bool getShuShanWeiWei_XDPB_Award(Player * player, UInt8 opt);
         Table getShuShanWeiWei_MSYJ_Award(Player * player);
-        bool getRedBeanAward(Player * player, UInt8 index);
+        bool getRedBeanAward(Player * player, UInt8 index, UInt32 count);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

@@ -114,6 +114,14 @@ function loadStore()
         store:clear()
 
         discount(store)
+
+    if getSeekingHer() then
+        store:add(2, 16025, 9)
+        store:add(2, 16026, 99)
+        store:add(2, 16027, 520)
+        store:add(2, 16028, 1000)
+    end
+
     if getGGTime(300) == 2 then 
         store:add(2,16021,30)
     end

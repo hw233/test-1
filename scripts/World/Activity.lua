@@ -1534,8 +1534,8 @@ function initActTime(y, m, d)
   local  SerStartTmq2= { ['year'] = 2014, ['month'] = 7, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --众里寻他
-  local  SerStartSeekingHer1= { ['year'] = 2014, ['month'] = 7, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartSeekingHer2= { ['year'] = 2014, ['month'] = 8, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartSeekingHer1= { ['year'] = 2014, ['month'] = 8, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartSeekingHer2= { ['year'] = 2014, ['month'] = 8, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);

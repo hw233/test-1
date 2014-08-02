@@ -4348,10 +4348,15 @@ void OnServerLeftAttr(ServerLeftMsgHdr& hdr, const void * data)
 void OnServerSay( ServerWarMsgHdr& hdr, const void * data )
 { 
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
-    UInt8 country = 0;
-    std::string name;
-    std::string word;
-    brd >> country >> name >> word;
-    SYSMSG_BROADCASTV(5191 , country , name.c_str(),word.c_str());
+    std::string words = "";
+    brd >> words;
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x12);
+    st << static_cast<UInt8>(0x14);
+    st << static_cast<UInt8>(1);
+    st << words;
+    st << Stream::eos;
+    NETWORK()->Broadcast(st);
 } 
 #endif // _WORLDOUTERMSGHANDLER_H_

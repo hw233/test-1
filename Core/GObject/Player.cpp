@@ -34830,20 +34830,19 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
     };
     if(!(beanType >= 0 && beanType <= 4))
         return;
+    if(0 == count)
+        return;
     if(GetPackage()->GetItemAnyNum(beanPoint[beanType][2]) < count)
     {
-        //豆数不够
-        sendMsgCode(0, 3508);
+        sendMsgCode(0, 1203);
         return;
     }
     Player * receiver = globalPlayers[userId];
     if(receiver == NULL)
     {
-        //玩家不存在
-        sendMsgCode(0, 3508);
         return;
     }
-    if(!GameAction()->getRedBeanAward(this, beanType + 1))
+    if(!GameAction()->getRedBeanAward(this, beanType + 1, count))
         return;
     if(getId() == userId)
     {
@@ -34867,7 +34866,6 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
     if(1 == beanType)
     {
             SYSMSG_BROADCASTV(5222, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
-
     }
     else if(2 == beanType)
     {
@@ -34878,17 +34876,30 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
     }
     else if(3 == beanType)
     {
-            SYSMSG_BROADCASTV(5224, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count, words.c_str());
+            SYSMSG_BROADCASTV(5224, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
             SYSMSGV(title, 5210, count);
             SYSMSGV(content, 5212, getCountry(), getName().c_str(), count);
             receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+
+            Stream st(REP::COUNTRY_ACT);
+            st << static_cast<UInt8>(0x12);
+            st << static_cast<UInt8>(0x14);
+            st << static_cast<UInt8>(0);
+            st << words;
+            st << Stream::eos;
+            NETWORK()->Broadcast(st);
     }
     else if(4 == beanType)
     {
-            SYSMSG_BROADCASTV(5203, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count, words.c_str());
-            SYSMSGV(title, 5211);
+            SYSMSG_BROADCASTV(5203, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
+            SYSMSGV(title, 5211, count);
             SYSMSGV(content, 5213, getCountry(), getName().c_str(), count);
             receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+
+            Stream st(SERVERWARREQ::SAY_TO_WORLD, 0xEE);
+            st << words;
+            st << Stream::eos;
+            NETWORK()->SendToServerWar(st);
     }
 
     UInt32 now = TimeUtil::Now();
@@ -34900,7 +34911,7 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
 
 void Player::getSeekingHerCharmAward()
 {
-    static UInt32 charmlvl[] = {200, 500, 1500, 4000, 8000, 1600, 3200};
+    static UInt32 charmlvl[] = {200, 500, 1500, 4000, 8000, 16000, 32000};
     static MailPackage::MailItem charmPointAward[][7] = {
         {{9123, 2}, {440, 2}, {503, 2}, {500, 2}, {15, 5}},
         {{503, 3}, {517, 3}, {512, 3}, {511, 3}, {0, 0}},
@@ -34940,8 +34951,7 @@ void Player::seekingHer_Announce(std::string words)
     UInt32 lastAnnounceTime = GetVar(VAR_SEEKING_HER_ANNOUNCE_TIME);
     if(now < lastAnnounceTime + 10 * 60)
     {
-        //提示冷却时间不到
-        sendMsgCode(0, 1200);
+        sendMsgCode(0, 1204);
         return;
     }
     setMyAnnouncement(words, 1);

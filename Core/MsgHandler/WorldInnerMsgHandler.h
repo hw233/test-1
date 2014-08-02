@@ -3461,6 +3461,7 @@ void SetSeekingHerBeanTotalRank( GameMsgHdr& hdr,  const void* data )
 
 void OnSeekingHer_ReturnStatus( GameMsgHdr& hdr,  const void* data )
 {
+    World::initRCRank();
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
 
@@ -3478,6 +3479,7 @@ void OnSeekingHer_ReturnStatus( GameMsgHdr& hdr,  const void* data )
 
 void OnSeekingHer_RankTopInfo( GameMsgHdr& hdr,  const void* data )
 {
+    World::initRCRank();
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
 	const UInt8 * flag = reinterpret_cast<const UInt8*>(data);
@@ -3489,16 +3491,17 @@ void OnSeekingHer_RankTopInfo( GameMsgHdr& hdr,  const void* data )
     st << static_cast<UInt8>(0x12);
     st << static_cast<UInt8>(2);
     st << static_cast<UInt8>(*flag);
-    st << player->GetVar(VAR_SEEKING_HER_CHARM_POINT);
-    st << static_cast<UInt16>(WORLD().getSeekingHerCharmRank(player));
-    st << player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
-    st << static_cast<UInt16>(WORLD().getSeekingHerRank(player));
+    st << pl->GetVar(VAR_SEEKING_HER_CHARM_POINT);
+    st << static_cast<UInt16>(WORLD().getSeekingHerCharmRank(pl));
+    st << pl->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
+    st << static_cast<UInt16>(WORLD().getSeekingHerRank(pl));
     st << Stream::eos;
     player->send(st);
 }
 
 void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
 {
+    World::initRCRank();
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
 	const UInt8 * flag = reinterpret_cast<const UInt8*>(data);
@@ -3517,8 +3520,10 @@ void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
             st << static_cast<UInt16>(pos);
             st << static_cast<UInt64>(i->player->getId());
             st << i->player->getName();
-            st << i->player->IsMale();
+            st << static_cast<bool>(i->player->IsMale() ? 0 : 1);
             st << i->player->GetVar(VAR_SEEKING_HER_CHARM_POINT);
+            st << cfg.serverNo;
+            st << i->player->getMainFighter()->getClass();
             if(100 <= pos)
                 break;
         }
@@ -3531,8 +3536,10 @@ void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
             st << static_cast<UInt16>(pos);
             st << static_cast<UInt64>(i->player->getId());
             st << i->player->getName();
-            st << i->player->IsMale();
+            st << static_cast<bool>(i->player->IsMale() ? 0 : 1);
             st << i->player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
+            st << cfg.serverNo;
+            st << i->player->getMainFighter()->getClass();
             if(100 <= pos)
                 break;
         }
@@ -3545,8 +3552,10 @@ void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
             st << static_cast<UInt16>(pos);
             st << static_cast<UInt64>(i->player->getId());
             st << i->player->getName();
-            st << i->player->IsMale();
+            st << static_cast<bool>(i->player->IsMale() ? 0 : 1);
             st << i->player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
+            st << cfg.serverNo;
+            st << i->player->getMainFighter()->getClass();
             if(100 <= pos)
                 break;
         }
@@ -3558,6 +3567,7 @@ void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
 
 void OnSeekingHer_FriendInfo( GameMsgHdr& hdr,  const void* data )
 {
+    World::initRCRank();
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
 	const UInt64 * userId = reinterpret_cast<const UInt64*>(data);

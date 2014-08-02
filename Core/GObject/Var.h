@@ -818,10 +818,10 @@ namespace GObject
         VAR_SEEKING_HER_BEAN_TOTAL = 838, //众里寻她收到豆的数量
         VAR_SEEKING_HER_CHARM_POINT = 839,  //众里寻她魅力值
         VAR_SEEKING_HER_ANNOUNCE_TIME = 840,  //众里寻她宣言时间
-        VAR_SEEKING_HER_CHARM_AWARD = 843, //众里寻她魅力值奖励领取情况(每位代表一个分数等级，0未领，1领取)
-        VAR_SEEKING_HER_LOOT_STATUS = 844,  //众里寻他掉落状态
         VAR_FIRST_POT_GOLD_STATUS = 841, //第一桶金充值状态
         VAR_HIDE_VIP_LEVEL_FLAG = 842, //隐藏御剑等级标识(0未隐藏， 1隐藏)
+        VAR_SEEKING_HER_CHARM_AWARD = 843, //众里寻她魅力值奖励领取情况(每位代表一个分数等级，0未领，1领取)
+        VAR_SEEKING_HER_LOOT_STATUS = 844,  //众里寻他掉落状态
         VAR_MAX,
     };
 
@@ -1515,6 +1515,7 @@ namespace GObject
             REGISTER_VAR(VAR_SEEKING_HER_CHARM_POINT, CYCLE_NONE);
             REGISTER_VAR(VAR_SEEKING_HER_ANNOUNCE_TIME, CYCLE_NONE);
             REGISTER_VAR(VAR_SEEKING_HER_CHARM_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_SEEKING_HER_LOOT_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_FIRST_POT_GOLD_STATUS, CYCLE_NONE);
             REGISTER_VAR(VAR_HIDE_VIP_LEVEL_FLAG, CYCLE_NONE);
 
