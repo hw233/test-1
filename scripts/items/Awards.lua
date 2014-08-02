@@ -908,7 +908,7 @@ function RunBlueDiamondAward(player, opt)
         local val = math.random(1,5)
         if  not package:DelItem(iid, 1, true) then
             if  not package:DelItem(iid, 1, false) then
-                player:sendMsgCode(2, 1110, 0);
+                player:sendMsgCode(2, 1111, 0);
                 return 0;
             end
         end

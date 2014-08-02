@@ -35180,8 +35180,8 @@ void Player::ExchangeXG(UInt8 type)
             item_dst = 16031;
             break;
         case 3:
-            itemid1 = 16038;
-            itemid2 = 16039;
+            itemid1 = 16039;
+            itemid2 = 16040;
             item_dst = 16032;
             break;
         default:

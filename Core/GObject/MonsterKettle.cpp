@@ -206,7 +206,7 @@ namespace GObject
             pl->setFightersDirty(true);
             if(_npcIds[idx].king == 4)
             {
-                SYSMSG_BROADCASTV(5190, pl->getCountry(), pl->getName().c_str(), 3 ,ng->getName().c_str()); 
+               // SYSMSG_BROADCASTV(5190, pl->getCountry(), pl->getName().c_str(), 3 ,ng->getName().c_str()); 
             }
         }
         st << static_cast<UInt32>(_npcIds[idx].npcId % 1000 /10 * 7 + _npcIds[idx].npcId%10);

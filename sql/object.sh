@@ -338,8 +338,9 @@ function update_object()
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear651.sql     #清空VAR(大转盘)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearOldMan.sql     #捉迷藏清空
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_drop_packSizeLS.sql #drop column packSizeLS of player
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_seekingher.sql     #众里寻他送豆记录表,player表增加宣言字段
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140731_clear_var790.sql     #清除文采值
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_drop_packSizeLS.sql #drop column packSizeLS of player
 }
 
 #sh player_jiguan.sh
