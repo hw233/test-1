@@ -1319,6 +1319,7 @@ struct DBSeekingHerSendBeanLog
     UInt64 receiverId;
     UInt32 date;
     UInt32 count;
+    UInt8 beantype;
 };
 
 struct DBAirBookData
@@ -3335,12 +3336,13 @@ SPECIALDEF(9)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBSeekingHerSendBeanLog)
-SPECIALDEF(4)
+SPECIALDEF(5)
 (
     UInt64, senderId,
     UInt64, receiverId,
     UInt32, date,
-    UInt32, count
+    UInt32, count,
+    UInt8, beantype
 )
 SPECIALEND()
 

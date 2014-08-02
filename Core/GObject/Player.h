@@ -909,6 +909,7 @@ namespace GObject
         UInt64 senderId;
         UInt32 date;
         UInt32 count;
+        UInt8 beantype;
     };
 
 	struct PlayerData
@@ -3605,7 +3606,7 @@ namespace GObject
         void seekingHer_SendBeans(UInt64 , UInt8 , UInt32 , std::string );
         void seekingHer_Announce(std::string );
         void seekingHer_GetSendBeanLog();
-        void SetSeekingHerSendBeanLog(UInt64 &, UInt32 &, UInt32 &, bool);
+        void SetSeekingHerSendBeanLog(UInt64 &, UInt32 &, UInt32 &, UInt8 &, bool);
         void getSeekingHerCharmAward();
         std::string _seekingHerMyAnnounce;
         std::vector<SeekingHerSendBeanLog *> _seekingHerSendBeanLog;

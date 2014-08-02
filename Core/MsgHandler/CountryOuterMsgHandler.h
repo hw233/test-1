@@ -2401,7 +2401,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             {
                 std::string announcement = "";
                 br >> announcement;
-                if(announcement.size() > 32)
+                if(announcement.size() >= 128)
                     return;
                 player->seekingHer_Announce(announcement);
             }

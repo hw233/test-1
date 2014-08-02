@@ -34937,10 +34937,12 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
     }
 
     UInt32 now = TimeUtil::Now();
-    UInt32 total = 0;
-    total = beanPoint[beanType][1] * count;
     UInt64 senderId = getId();
-    receiver->SetSeekingHerSendBeanLog(senderId, now, total, 1);
+    receiver->SetSeekingHerSendBeanLog(senderId, now, count, beanType, 1);
+
+    char str[32] = {0};
+    sprintf(str, "F_140801_%d", static_cast<Int32>(12 + beanType));
+    udpLog("zhonglixunta", str, "", "", "", "", "act");
 }
 
 void Player::getSeekingHerCharmAward()
@@ -34973,6 +34975,10 @@ void Player::getSeekingHerCharmAward()
                     mailPackageManager.push(mail->id, charmPointAward[i], 5, true);
                 }
                 awardStatus = SET_BIT(awardStatus, i);
+
+                char str[32] = {0};
+                sprintf(str, "F_140801_%d", static_cast<Int32>(1+i));
+                udpLog("zhonglixunta", str, "", "", "", "", "act");
             }
         }
     }
@@ -34991,6 +34997,15 @@ void Player::seekingHer_Announce(std::string words)
     setMyAnnouncement(words, 1);
     SetVar(VAR_SEEKING_HER_ANNOUNCE_TIME, now);
     sendMsgCode(0, 9002);
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x12);
+    st << static_cast<UInt8>(0x12);
+    st << static_cast<UInt8>(1);
+    st << Stream::eos;
+    send(st);
+
+    udpLog("zhonglixunta", "F_140801_11", "", "", "", "", "act");
 }
 
 void Player::seekingHer_GetSendBeanLog()
@@ -35004,21 +35019,23 @@ void Player::seekingHer_GetSendBeanLog()
         st << (*i)->date;
         st << globalPlayers[(*i)->senderId]->getName();
         st << (*i)->count;
+        st << (*i)->beantype;
     }
     st << Stream::eos;
     send(st);
 }
 
-void Player::SetSeekingHerSendBeanLog(UInt64 & senderId, UInt32 & date, UInt32 & count, bool toDB)
+void Player::SetSeekingHerSendBeanLog(UInt64 & senderId, UInt32 & date, UInt32 & count, UInt8 & beantype, bool toDB)
 {
     SeekingHerSendBeanLog * lg = new SeekingHerSendBeanLog;
     lg->senderId = senderId;
     lg->date = date;
     lg->count = count;
+    lg->beantype = beantype;
     _seekingHerSendBeanLog.push_back(lg);
 
     if(toDB)
-        DB1().PushUpdateData("insert into `sendbeans_log`(senderId, receiverId, data, count) values(%" I64_FMT "u, %" I64_FMT "u, %u, %u)", senderId, getId(), date, count);
+        DB1().PushUpdateData("insert into `sendbeans_log`(senderId, receiverId, data, count, beantype) values(%" I64_FMT "u, %" I64_FMT "u, %u, %u, %u)", senderId, getId(), date, count, beantype);
 }
 
 void Player::firstPotOfGold(UInt32 total)
@@ -35047,7 +35064,7 @@ void Player::firstPotOfGold(UInt32 total)
             SYSMSG_BROADCASTV(5215, getCountry(), getName().c_str(), rechargeLvl[i]);
             SetVar(VAR_FIRST_POT_GOLD_STATUS, SET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i));
             firstPotOfGoldReturn(0);
-            char str[16] = {0};
+            char str[32] = {0};
             sprintf(str, "F_140726_%d", static_cast<Int32>(1+i));
             udpLog("diyitongjin", str, "", "", "", "", "act");
         }
