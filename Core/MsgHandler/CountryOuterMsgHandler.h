@@ -5271,6 +5271,14 @@ void OnClanCopyReq (GameMsgHdr& hdr, const void * data )
             if(World::getFireSacrificeTime())
                 clan->clanFireSacrificeOp(player, command);
             break;
+        case 0x30:
+            //帮贡商店
+            {
+                UInt8 arg = 0;
+                brd >> arg;
+                player->clanShopOp(command, arg);
+            }
+            break;
         default:
                 break;
     }

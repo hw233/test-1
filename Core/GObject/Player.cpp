@@ -95,6 +95,7 @@
 #include "KangJiTianMo.h"
 #include "Battle/BattleReport.h"
 #include "GObject/RaceBattle.h"
+#include "GData/ClanShop.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -33285,6 +33286,268 @@ UInt8 Player::buyCubeInPicture(UInt8 floor , UInt8 index , UInt8 count)
     UpdatePictureToDB();
     return 0;
 }
+
+void Player::writeClanShopItems()
+{
+    std::multimap<UInt32, UInt8> & _clanShopItemsAll = _playerData.clanShopItemsAll;
+    std::string items = "";
+
+    for(std::multimap<UInt32, UInt8>::iterator it = _clanShopItemsAll.begin(); it != _clanShopItemsAll.end(); ++ it)
+    {
+        items += Itoa(it->first);
+        items += ',';
+        items += Itoa(it->second);
+        items += '|';
+    }
+
+    DB1().PushUpdateData("UPDATE `player` SET `clancontrishop` = '%s' WHERE `id` = %" I64_FMT "u", items.c_str(), getId());
+}
+
+void Player::sendClanShopInfo()
+{
+    Stream st(REP::CLAN_COPY);
+    st << static_cast<UInt8>(0x30);
+    st << static_cast<UInt8>(0);
+
+    std::multimap<UInt32, UInt8> & _clanShopItemsAll = _playerData.clanShopItemsAll;
+    UInt8 currentLvl = GetVar(VAR_CLAN_SHOP_CURRENT_LVL);
+    UInt8 count = 0;
+
+    st << static_cast<UInt8>(GetVar(VAR_CLAN_SHOP_FLUSH_TIMES));
+    size_t offset = st.size();
+    st << static_cast<UInt8>(count);
+
+    for(std::multimap<UInt32, UInt8>::iterator it = _clanShopItemsAll.begin(); it != _clanShopItemsAll.end(); ++ it)
+    {
+        if(it->first / 100 == currentLvl)
+        {
+            st << static_cast<UInt32>(it->first);
+            st << static_cast<UInt8>(it->second);
+            count ++ ;
+        }
+    }
+    st.data<UInt8>(offset) = count;
+
+    st << Stream::eos;
+    send(st);
+}
+
+bool Player::clanShopLvlShift(UInt8 lvl)
+{
+    std::multimap<UInt32, UInt8> & _clanShopItemsAll = _playerData.clanShopItemsAll;
+    if(GetLev() < lvl)
+    {
+        //等级不足
+        return 0;
+    }
+    else
+    {
+        SetVar(VAR_CLAN_SHOP_CURRENT_LVL, lvl);
+        //判断该等级物品是否开启过
+        bool flag = false;
+        for(std::multimap<UInt32, UInt8>::iterator it = _clanShopItemsAll.begin(); it != _clanShopItemsAll.end(); ++ it)
+        {
+            if(it->first / 100 == lvl)
+            {
+                flag = true;
+                break;
+            }
+        }
+        //第一次打开该等级
+        if(!flag)
+            flushClanShopItems(true);
+    }
+    return 1;
+}
+
+bool Player::buyClanShopItems(UInt8 offset)
+{
+    std::multimap<UInt32, UInt8> & _clanShopItemsAll = _playerData.clanShopItemsAll;
+    UInt8 currentLvl = GetVar(VAR_CLAN_SHOP_CURRENT_LVL);
+    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo();
+    std::multimap<UInt32, UInt8>::iterator targetToBuy;
+
+    if(offset > 9)
+        return 0;
+
+    //遍历当前玩家帮贡物品，找到要买的物品
+    for(std::multimap<UInt32, UInt8>::iterator it = _clanShopItemsAll.begin(); it!= _clanShopItemsAll.end(); ++it)
+    {
+        if(it->first / 100 == currentLvl)
+        {
+            for(UInt8 i = 0; i < offset - 1; i++)
+            {
+                it++;
+            }
+            targetToBuy = it;
+            break;
+        }
+    }
+
+    if(targetToBuy != _clanShopItemsAll.end() && targetToBuy->second == 1)
+        return 0;
+
+    //根据物品在帮贡物品模版中找到对应价格，完成购买
+    std::map<UInt32, GData::ClanShopInfo::ClanShopItems>::iterator it = _clanShopItemsTemplate.find(targetToBuy->first);
+    if(targetToBuy != _clanShopItemsAll.end() && it != _clanShopItemsTemplate.end())
+    {
+        UInt32 price = it->second.price;
+        UInt32 proffer = getClanProffer();
+        if(proffer >= price)
+        {
+            ConsumeInfo ci(BuyClanShopItems, 0, 0);
+            useClanProffer(price, &ci);
+
+            if(GetPackage()->GetRestPackageSize() < 1)
+            {
+                sendMsgCode(2, 1011);
+                return 0;
+            }
+
+            GetPackage()->Add(it->second.itemid, 1 , true, false, FromClanShop);
+            //设置状态为已购买
+            targetToBuy->second = 1;
+        }
+        else
+        {
+            sendMsgCode(0, 1360);
+            return 0;
+        }
+    }
+    else
+        return 0;
+
+    writeClanShopItems();
+    return 1;
+}
+
+void Player::randomForClanShop(UInt8 lvl)
+{
+    UInt8 currentLvl = GetVar(VAR_CLAN_SHOP_CURRENT_LVL);
+    std::multimap<UInt32, UInt8> & _clanShopItemsAll = _playerData.clanShopItemsAll;
+    std::map<UInt32, GData::ClanShopInfo::ClanShopItems> _clanShopItemsTemplate = GData::clanShopInfo.getClanShopInfo();
+
+    //如果当前等级有帮贡物品，则先删除
+    for(std::multimap<UInt32, UInt8>::iterator it = _clanShopItemsAll.begin(); it!= _clanShopItemsAll.end(); )
+    {
+        std::multimap<UInt32, UInt8>::iterator tmp = it;
+        ++ tmp;
+        if(it->first / 100 == currentLvl)
+        {
+            _clanShopItemsAll.erase(it);
+        }
+        it = tmp;
+    }
+
+    //计算概率基数
+    UInt32 probSum = 0;
+    std::map<UInt32, GData::ClanShopInfo::ClanShopItems>::iterator tmp;
+    tmp = _clanShopItemsTemplate.find(currentLvl * 100 + 1);
+    for(UInt8 i = 0; i < 20; i++, tmp++)
+    {
+        probSum += tmp->second.prob;
+    }
+
+    std::map<UInt32, GData::ClanShopInfo::ClanShopItems>::iterator target;
+    //为当前等级随9个帮贡物品，并且物品重复不超过3次
+    for(UInt8 i = 0; i < 9; i++)
+    {
+        //target为当前等级物品第一个ID
+        target = _clanShopItemsTemplate.find(currentLvl * 100 + 1);
+        UInt32 probTmp = target->second.prob;
+        UInt32 rand = uRand(probSum);
+        for(UInt8 j = 0; j < 20; j++)
+        {
+            if(rand <= probTmp)
+            {
+                //如果重复3次以上，此次随机无效
+                std::pair<std::multimap<UInt32, UInt8>::iterator, std::multimap<UInt32, UInt8>::iterator> found = _clanShopItemsAll.equal_range(target->first);
+                UInt8 count = 0;
+                while(found.first != found.second)
+                {
+                    count++;
+                    ++found.first;
+                }
+                if(count > 3)
+                {
+                    i --;
+                    break;
+                }
+                else
+                {
+                    _clanShopItemsAll.insert(std::make_pair(target->first, 0));
+                    break;
+                }
+            }
+            ++target;
+            probTmp += target->second.prob;
+        }
+    }
+}
+
+bool Player::flushClanShopItems(bool flag)
+{
+    //flag(ture:第一次打开，自动随机，不消耗次数,false:手动刷新)
+    UInt8 currentLvl = GetVar(VAR_CLAN_SHOP_CURRENT_LVL);
+    //每天刷新次数共9次，其中前4次免费
+    UInt32 profferCost[9] = {0, 0, 0, 0, 500, 1000, 3000, 5000, 10000};
+    UInt8 flushTimes = GetVar(VAR_CLAN_SHOP_FLUSH_TIMES);
+    if(flag)
+    {
+        randomForClanShop(currentLvl);
+        writeClanShopItems();
+        return 1;
+    }
+    else
+    {
+        if(flushTimes > 9)
+        {
+            //刷新次数用完
+            return 0;
+        }
+        else
+        {
+            UInt32 proffer = getClanProffer();
+            if(proffer >= profferCost[flushTimes])
+            {
+                ConsumeInfo ci(FlushClanShopItems, 0, 0);
+                useClanProffer(profferCost[flushTimes], &ci);
+
+                AddVar(VAR_CLAN_SHOP_FLUSH_TIMES, 1);
+                randomForClanShop(currentLvl);
+                writeClanShopItems();
+                return 1;
+            }
+            else
+            {
+                sendMsgCode(0, 1360);
+                return 0;
+            }
+        }
+    }
+}
+
+void Player::clanShopOp(UInt8 type, UInt8 command)
+{
+    switch(type)
+    {
+        case 0:
+            clanShopLvlShift(command);
+            sendClanShopInfo();
+            break;
+        case 1:
+            buyClanShopItems(command);
+            sendClanShopInfo();
+            break;
+        case 2:
+            flushClanShopItems(false);
+            sendClanShopInfo();
+            break;
+        default:
+            break;
+    }
+}
+
 void Player::AddWorldCupScore(UInt32 grade ,UInt8 num)
 {
     if(num > 0 && num <= WC_MAX_COUNT )  //结算
