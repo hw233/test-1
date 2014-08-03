@@ -11450,9 +11450,6 @@ namespace GObject
             factor += 0.3f;
         else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
             factor += 0.2f;
-        
-        if(getBuffData(PLAYER_BUFF_TYSS) > 0)
-            factor += 0.5f;
 
         if(getBuffData(PLAYER_BUFF_NEW_CLAN1) > 0)
             factor += 0.5f;
@@ -11461,6 +11458,8 @@ namespace GObject
         else if(getBuffData(PLAYER_BUFF_NEW_CLAN3) > 0)
             factor += 0.2f;
 
+        if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+            factor += 0.5f;
         return factor;
     }
 
@@ -11668,15 +11667,15 @@ namespace GObject
                     else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
                         pexpAdd = pexpBase * 0.2f;
                     
-                    if(getBuffData(PLAYER_BUFF_TYSS) > 0)
-                        pexpAdd += pexpBase * 0.5f;
-                    
                     if(getBuffData(PLAYER_BUFF_NEW_CLAN1) > 0)
                         pexpAdd = pexpBase * 0.5f;
                     else if(getBuffData(PLAYER_BUFF_NEW_CLAN2) > 0)
                         pexpAdd = pexpBase * 0.3f;
                     else if(getBuffData(PLAYER_BUFF_NEW_CLAN3) > 0)
                         pexpAdd = pexpBase * 0.2f;
+                    
+                    if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+                        pexpAdd += pexpBase * 0.5f;
 
                     fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }
@@ -11747,9 +11746,6 @@ namespace GObject
                         pexpAdd = pexpBase * 0.3f;
                     else if(getBuffData(PLAYER_BUFF_CLAN3) > 0)
                         pexpAdd = pexpBase * 0.2f;
-
-                    if(getBuffData(PLAYER_BUFF_TYSS) > 0)
-                        pexpAdd += pexpBase * 0.5f;
                     
                     if(getBuffData(PLAYER_BUFF_NEW_CLAN1) > 0)
                         pexpAdd = pexpBase * 0.5f;
@@ -11757,6 +11753,9 @@ namespace GObject
                         pexpAdd = pexpBase * 0.3f;
                     else if(getBuffData(PLAYER_BUFF_NEW_CLAN3) > 0)
                         pexpAdd = pexpBase * 0.2f;
+                    
+                    if(getBuffData(PLAYER_BUFF_TYSS) > 0)
+                        pexpAdd += pexpBase * 0.5f;
 
                     fgt->addPExp(pExp + pexpAdd, true, false, extraPExp);
                 }

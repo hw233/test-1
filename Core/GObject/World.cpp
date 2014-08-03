@@ -1461,7 +1461,8 @@ void World::World_Midnight_Check( World * world )
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
     bGGTimeEnd = bGGtime && !getGGTime(300);
     //天元神兽活动结束
-    bTYSSEnd = bTYSSTime && !getTYSSTime(300);
+    UInt8 actType = getTYSSTime(300);
+    bTYSSEnd = bTYSSTime && !actType;
 
     bPExpItemsEnd = bPExpItems && !getPExpItems();
     bQixiEnd = bQixi && !getQixi();
@@ -1758,7 +1759,7 @@ void World::World_Midnight_Check( World * world )
         world->SendGuankaActAward();
     if(bTYSSEnd)
     {
-        UInt8 actType = getTYSSTime(300);
+        UInt8 actType = getTYSSTime();
         world->GObject::World::SendTYSSPlayerAward(actType);
         world->GObject::World::SendTYSSClanAward(actType);
     }
@@ -5129,7 +5130,7 @@ void World::SendTYSSClanAward(UInt8 actType)
             continue;
         ++pos;
         if(pos == 1 || pos == 2 || pos == 3)
-            i->clan->sendMemberBuf(pos);
+            i->clan->sendMemberBuf(pos,actType);
         if(i->total >= 2000)
         {
             i->clan->SendClanMemberAward(i->total,1,"幼年期神兽",actType); 
@@ -5208,7 +5209,7 @@ void World::SendTYSSPlayerAward(UInt8 actType)
         }        
         pos++;
         udpLog("tianyuanshenshou", "F_140224_7", "", "", "", "", "act");
-        if(actType == 2)
+        if(actType == 1 || actType == 2)
             i->player->sendTYSSBuf();
         
     }

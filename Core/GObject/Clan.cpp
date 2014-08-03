@@ -491,11 +491,11 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
             player->setBuffData(PLAYER_BUFF_CLAN3, buffData3);
         
         if(buffData11 > 0)
-            player->setBuffData(PLAYER_BUFF_NEW_CLAN1, buffData1);
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN1, buffData11);
         else if(buffData22 > 0)
-            player->setBuffData(PLAYER_BUFF_NEW_CLAN2, buffData2);
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN2, buffData22);
         else if(buffData33 > 0)
-            player->setBuffData(PLAYER_BUFF_NEW_CLAN3, buffData3);
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN3, buffData33);
 
         if(buffData1 > 0 || buffData2 > 0 || buffData3 > 0 || buffData11 > 0 || buffData22 > 0 || buffData33 > 0)
             player->rebuildBattleName();
@@ -555,11 +555,11 @@ bool Clan::join(ClanMember * cm)
             player->setBuffData(PLAYER_BUFF_CLAN3, buffData3);
         
         if(buffData11 > 0)
-            player->setBuffData(PLAYER_BUFF_NEW_CLAN1, buffData1);
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN1, buffData11);
         else if(buffData22 > 0)
-            player->setBuffData(PLAYER_BUFF_NEW_CLAN2, buffData2);
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN2, buffData22);
         else if(buffData33 > 0)
-            player->setBuffData(PLAYER_BUFF_NEW_CLAN3, buffData3);
+            player->setBuffData(PLAYER_BUFF_NEW_CLAN3, buffData33);
 
         if(buffData1 > 0 || buffData2 > 0 || buffData3 > 0 || buffData11 > 0 || buffData22 > 0 || buffData33 > 0)
             player->rebuildBattleName();
@@ -5754,12 +5754,17 @@ void Clan::DelTYSSScore(Player * pl)
     }
 }
 
-void Clan::sendMemberBuf(UInt8 pos)
+void Clan::sendMemberBuf(UInt8 pos,UInt8 actType)
 {
     if(pos == 0 || pos > 3)
         return;
     if(pos == 1)
-        addClanTitle(1, 0);
+    {
+        if(actType == 1)
+            addClanTitle(1, 0);
+        else
+            addClanTitle(3, 0);
+    }
 	Mutex::ScopedLock lk(_mutex);
     UInt32 endTime = TimeUtil::Now() + 86400 * 14;
 	ClanMember * mem = NULL;

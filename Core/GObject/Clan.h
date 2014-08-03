@@ -704,7 +704,7 @@ private:
     void BroadDuoBaoBegin(Player * player);
     void DuoBaoBroadcast(Stream& st);
 public:
-    void sendMemberBuf(UInt8 pos);
+    void sendMemberBuf(UInt8 pos,UInt8 actType);
 
 public:
     void SendClanFriendsA(Player* pl, UInt8 type, UInt8 page=1);

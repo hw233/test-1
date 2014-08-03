@@ -1063,10 +1063,10 @@ public:
         UInt32 end = GVAR.GetVar(GVAR_TYSS_END);
         UInt32 now = TimeUtil::Now() + time;
         if ((now > getOpenTime() + 7 * 86400) && (now  < getOpenTime() + 14 * 86400) )
-            return 2;
+            return 1;
 
         if(now >= begin && now <= end)
-            return 1;
+            return 2;
         else
             return 0;
     } 
