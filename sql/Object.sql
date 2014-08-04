@@ -889,7 +889,6 @@ CREATE TABLE `player` (
   `lastOnline` int(10) unsigned NOT NULL DEFAULT '0',
   `packSize` smallint(4) unsigned NOT NULL DEFAULT '100',
   `packSizeSoul` smallint(4) unsigned NOT NULL DEFAULT '200',
-  `packSizeLS` smallint(4) unsigned NOT NULL DEFAULT '50',
   `mounts` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `mainFighter` int(10) unsigned NOT NULL DEFAULT '0',
   `icCount` varchar(32) NOT NULL DEFAULT '',
@@ -2652,8 +2651,7 @@ CREATE TABLE IF NOT EXISTS `sendbeans_log` (
     `senderId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `receiverId` bigint(20) unsigned NOT NULL DEFAULT '0',
     `data` int(10) unsigned NOT NULL,
-    `count` int(10) unsigned NOT NULL DEFAULT '0',
-    PRIMARY KEY(`senderId`,`receiverId`,`data`)
+    `count` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `kettle`;

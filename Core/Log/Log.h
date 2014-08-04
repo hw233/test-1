@@ -342,6 +342,7 @@ enum ItemFrom
     FromShuShanWeiWei = 79 , //蜀山微微
     FromSeekingHer = 101 , //众里寻她
     //80 ~ 100，繁体占用
+    FromFlyRoad = 101, //飞升之路
 };
 
 enum ItemTo

@@ -21011,7 +21011,7 @@ void Player::sendFeastLoginAct()
         //MailPackage::MailItem mitem = {1763,1};
         //MailPackage::MailItem mitem = {1760,1};
         //MailPackage::MailItem mitem = {9422,1};
-        MailPackage::MailItem mitem = {1766,1};
+        MailPackage::MailItem mitem = {1772,1};
         mailPackageManager.push(mail->id, &mitem, 1, true);
     }
     //SetVar(VAR_FEAST_LOGIN_AWARD_PER_DAY, 1);
@@ -25537,13 +25537,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
     }
     if (WORLD().getQixi())
     {
-        if (flag == e_sla_hi || flag == e_sla_mr)
-            return;
-        if(flag == e_sla_none)
-        {
-            //GameAction()->onDropAwardAct(this, 0);
-        }
-        else
+        if (flag == e_sla_cb || flag == e_sla_ncb || flag == e_sla_clb || flag == e_sla_rb)
         {
             UInt32 status = GetVar(VAR_QIXI_DROP_STATUS);
             if(!(status & flag))
@@ -25556,20 +25550,41 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
     }
     if(WORLD().getSeekingHer())
     {
-        if (flag == e_sla_hi || flag == e_sla_mr)
-            return;
-        if(flag == e_sla_none)
+        if (flag == e_sla_none || flag == e_sla_ccb || flag == e_sla_ncb || flag == e_sla_clb || flag == e_sla_cb)
         {
-            //GameAction()->onDropAwardAct(this, 0);
-        }
-        else
-        {
-            UInt32 status = GetVar(VAR_SEEKING_HER_LOOT_STATUS);
-            if(!(status & flag))
+            if(flag == e_sla_none)
             {
-                status |= flag;
-                SetVar(VAR_SEEKING_HER_LOOT_STATUS, status);
-                GameAction()->onDropAwardAct(this, 0);
+                GetPackage()->Add(16024, 1, true, false, FromNpc);
+            }
+            else
+            {
+                UInt32 status = GetVar(VAR_SEEKING_HER_LOOT_STATUS);
+                if(!(status & flag))
+                {
+                    GetPackage()->Add(16024, 1, true, false, FromNpc);
+                    status |= flag;
+                    SetVar(VAR_SEEKING_HER_LOOT_STATUS, status);
+                }
+            }
+        }
+    }
+    if (World::getFlyRoadActivity())
+    {
+        if (flag == e_sla_clb || flag == e_sla_none || flag == e_sla_cb || flag == e_sla_ncb || flag == e_sla_hi)
+        {
+            if(flag == e_sla_none)
+            {
+                GetPackage()->Add(16042, 1, true, false, FromNpc);
+            }
+            else
+            {
+                UInt32 status = GetVar(VAR_FLYROAD_DROP_STATUS);
+                if(!(status & flag))
+                {
+                    GetPackage()->Add(16042, 1, true, false, FromNpc);
+                    status |= flag;
+                    SetVar(VAR_FLYROAD_DROP_STATUS, status);
+                }
             }
         }
     }
@@ -29287,11 +29302,13 @@ void Player::AddYearHappyValue(UInt32 val,UInt8 flag)
         GameMsgHdr hdr1(0x1DB, WORKER_THREAD_WORLD, this, sizeof(grade));
         GLOBAL().PushMsg(hdr1, &grade);
     }
-    else
     {
         SYSMSG_SENDV(2022,this,val);
         SYSMSG_SENDV(2023,this,val);
     }
+    char str[16] = {0};
+    sprintf(str, "F_140730_7");
+    udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
 }
 void Player::sendHappyValueInfo()
 {
@@ -29313,7 +29330,8 @@ void Player::getHappyValueAward(UInt8 val)
     if (!World::getHappyFireTime())
         return;
     UInt32 score[]={20,80,160,320,640,1280};
-    UInt32 value = GetVar(VAR_YEARHAPPY_VALUE);   //非每日值
+    UInt32 value = GetVar(VAR_YEARHAPPY_LEFTVALUE);   
+    UInt32 value1 = GetVar(VAR_YEARHAPPY_DAYVALUE);   
     if(val < 1 || val > sizeof(score)/sizeof(score[0]))
         return;
     if(value < score[val-1])
@@ -29326,6 +29344,18 @@ void Player::getHappyValueAward(UInt8 val)
         ctslandingAward |= (1<<(val - 1));
         SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, ctslandingAward);
     }
+   if(ctslandingAward == 63 && value >= 1280 && value1 >= 1280)
+   {
+        SetVar(VAR_YEARHAPPY_DAYVALUE_AWARD, 0);
+        SetVar(VAR_YEARHAPPY_LEFTVALUE,value - 1280);
+        SetVar(VAR_YEARHAPPY_DAYVALUE,value - 1280);
+        char str[16] = {0};
+        sprintf(str, "F_140730_8");
+        udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
+   }
+   char str[16] = {0};
+   sprintf(str, "F_140730_%d",val);
+   udpLog("jiqingdazhuanpan", str, "", "", "", "", "act");
 }
 
 void Player::joinAllServerRecharge(UInt32 num)
@@ -34834,7 +34864,7 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
         return;
     if(GetPackage()->GetItemAnyNum(beanPoint[beanType][2]) < count)
     {
-        sendMsgCode(0, 1203);
+        sendMsgCode(0, 9000);
         return;
     }
     Player * receiver = globalPlayers[userId];
@@ -34855,51 +34885,55 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
         AddVar(VAR_SEEKING_HER_CHARM_POINT, beanPoint[beanType][0] * count);
         GameMsgHdr hdr1(0x157, WORKER_THREAD_WORLD, this, 0);
         GLOBAL().PushMsg(hdr1, NULL);
+        GameMsgHdr hdr2(0x182, WORKER_THREAD_WORLD, this, 0);
+        GLOBAL().PushMsg(hdr2, NULL);
 
         receiver->AddVar(VAR_SEEKING_HER_BEAN_TOTAL, beanPoint[beanType][1] * count);
-        GameMsgHdr hdr2(0x158, WORKER_THREAD_WORLD, receiver, 0);
-        GLOBAL().PushMsg(hdr2, NULL);
+        GameMsgHdr hdr3(0x158, WORKER_THREAD_WORLD, receiver, 0);
+        GLOBAL().PushMsg(hdr3, NULL);
         getSeekingHerCharmAward();
     }
     GetPackage()->DelItemAny(beanPoint[beanType][2], count);
 
     if(1 == beanType)
     {
-            SYSMSG_BROADCASTV(5222, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
+        SYSMSG_BROADCASTV(5222, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
     }
     else if(2 == beanType)
     {
-            SYSMSG_BROADCASTV(5223, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
-            SYSMSGV(title, 5209, count);
-            SYSMSGV(content, 5205, getCountry(), getName().c_str(), count);
-            receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+        SYSMSG_BROADCASTV(5223, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
+        SYSMSGV(title, 5209, count);
+        SYSMSGV(content, 5205, getCountry(), getName().c_str(), count);
+        receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
     }
     else if(3 == beanType)
     {
-            SYSMSG_BROADCASTV(5224, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
-            SYSMSGV(title, 5210, count);
-            SYSMSGV(content, 5212, getCountry(), getName().c_str(), count);
-            receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+        SYSMSG_BROADCASTV(5224, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
+        SYSMSGV(title, 5210, count);
+        SYSMSGV(content, 5212, getCountry(), getName().c_str(), count);
+        receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
 
-            Stream st(REP::COUNTRY_ACT);
-            st << static_cast<UInt8>(0x12);
-            st << static_cast<UInt8>(0x14);
-            st << static_cast<UInt8>(0);
-            st << words;
-            st << Stream::eos;
-            NETWORK()->Broadcast(st);
+        Stream st(REP::COUNTRY_ACT);
+        st << static_cast<UInt8>(0x12);
+        st << static_cast<UInt8>(0x14);
+        st << static_cast<UInt8>(0);
+        st << words;
+        st << getName();
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
     }
     else if(4 == beanType)
     {
-            SYSMSG_BROADCASTV(5203, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
-            SYSMSGV(title, 5211, count);
-            SYSMSGV(content, 5213, getCountry(), getName().c_str(), count);
-            receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
+        SYSMSG_BROADCASTV(5203, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
+        SYSMSGV(title, 5211, count);
+        SYSMSGV(content, 5213, getCountry(), getName().c_str(), count);
+        receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
 
-            Stream st(SERVERWARREQ::SAY_TO_WORLD, 0xEE);
-            st << words;
-            st << Stream::eos;
-            NETWORK()->SendToServerWar(st);
+        Stream st(SERVERWARREQ::SAY_TO_WORLD, 0xEE);
+        st << words;
+        st << getName();
+        st << Stream::eos;
+        NETWORK()->SendToServerWar(st);
     }
 
     UInt32 now = TimeUtil::Now();
@@ -34951,11 +34985,12 @@ void Player::seekingHer_Announce(std::string words)
     UInt32 lastAnnounceTime = GetVar(VAR_SEEKING_HER_ANNOUNCE_TIME);
     if(now < lastAnnounceTime + 10 * 60)
     {
-        sendMsgCode(0, 1204);
+        sendMsgCode(0, 9001);
         return;
     }
     setMyAnnouncement(words, 1);
     SetVar(VAR_SEEKING_HER_ANNOUNCE_TIME, now);
+    sendMsgCode(0, 9002);
 }
 
 void Player::seekingHer_GetSendBeanLog()
@@ -35055,6 +35090,164 @@ void Player::hideVipLvlFlag(UInt8 op)
         }
     }
 }
+
+void Player::ReturnFlyRoadInfo()
+{
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x36);
+    st << static_cast<UInt8>(0x01);
+    st << GetVar(VAR_FLYROAD_SW);
+    st << GetVar(VAR_FLYROAD_FT);
+    st << GetVar(VAR_FLYROAD_ZZ);
+    st << GetVar(VAR_FLYROAD_DJ);
+    st << static_cast<UInt8>(GET_BIT_8(GetVar(VAR_FLYROAD_FLAG),0));
+    st << static_cast<UInt8>(GET_BIT_8(GetVar(VAR_FLYROAD_FLAG),1));
+    st << static_cast<UInt8>(GET_BIT_8(GetVar(VAR_FLYROAD_FLAG),2));
+    st << static_cast<UInt8>(GET_BIT_8(GetVar(VAR_FLYROAD_FLAG),3));
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::SacrificeFlyRoad(UInt8 type, UInt16 num)
+{
+    if(type > 3 ) 
+        return;
+    UInt16 mCount = GetPackage()->GetItemAnyNum(16042);
+    if(mCount == 0 || num == 0)     
+        return;
+    if(mCount < num) 
+        return; 
+    GetPackage()->DelItemAny(16042, num);
+    switch(type)
+    {
+        case 0:
+            AddVar(VAR_FLYROAD_SW,100 * num); 
+            break;
+        case 1:
+            AddVar(VAR_FLYROAD_FT,100 * num); 
+            break;
+        case 2:
+            AddVar(VAR_FLYROAD_ZZ,100 * num); 
+            break;
+        case 3:
+            AddVar(VAR_FLYROAD_DJ,100 * num); 
+            break;
+        default:
+            break;
+    }
+    ReturnFlyRoadInfo();
+    while(num--)
+        udpLog("feishengzhilu", "F_140731_1", "", "", "", "", "act");
+}
+
+void Player::ExchangeXG(UInt8 type)
+{
+    UInt16 itemid1 = 0;
+    UInt16 itemid2 = 0;
+    UInt16 item_dst = 0;
+    switch(type)
+    {
+        case 0:
+            itemid1 = 16033;
+            itemid2 = 16034;
+            item_dst = 16029;
+            break;
+        case 1:
+            itemid1 = 16035;
+            itemid2 = 16036;
+            item_dst = 16030;
+            break;
+        case 2:
+            itemid1 = 16037;
+            itemid2 = 16038;
+            item_dst = 16031;
+            break;
+        case 3:
+            itemid1 = 16038;
+            itemid2 = 16039;
+            item_dst = 16032;
+            break;
+        default:
+            return;
+    }
+    UInt8 flag_tmp = GET_BIT_8(GetVar(VAR_FLYROAD_FLAG),type);
+    if(flag_tmp == 1)
+        return;
+    
+    if(GetPackage()->GetItemAnyNum(itemid1) == 0 || GetPackage()->GetItemAnyNum(itemid2)== 0)
+        return;
+    GetPackage()->DelItemAny(itemid1, 1);
+    GetPackage()->DelItemAny(itemid2, 1);
+	GetPackage()->AddItem(item_dst, 1, true, false, FromFlyRoad);
+    UInt32 flag_tmp1 = SET_BIT_8(GetVar(VAR_FLYROAD_FLAG),type,1);
+    SetVar(VAR_FLYROAD_FLAG,flag_tmp1);
+    ReturnFlyRoadInfo();
+    switch(type)
+    {
+        case 0 :
+            udpLog("feishengzhilu", "F_140731_6", "", "", "", "", "act");
+            break;
+        case 1 :
+            udpLog("feishengzhilu", "F_140731_7", "", "", "", "", "act");
+            break;
+        case 2 :
+            udpLog("feishengzhilu", "F_140731_8", "", "", "", "", "act");
+            break;
+        case 3 :
+            udpLog("feishengzhilu", "F_140731_9", "", "", "", "", "act");
+            break;
+    }
+
+}
+
+void Player::ExchangeFlyRoadBox(UInt8 type)
+{
+    if (GetPackage()->IsFull())
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    UInt32 cur_num = 0; 
+    switch(type)
+    {
+        case 0:
+            cur_num = GetVar(VAR_FLYROAD_SW);
+            if(cur_num < 1000)
+                return;
+            GetPackage()->AddItem(16043, 1, true, false, FromFlyRoad);
+            cur_num = cur_num - 1000;
+            SetVar(VAR_FLYROAD_SW,cur_num);
+            break;
+        case 1:
+            cur_num = GetVar(VAR_FLYROAD_FT);
+            if(cur_num < 1000)
+                return;
+            GetPackage()->AddItem(16044, 1, true, false, FromFlyRoad);
+            cur_num = cur_num - 1000;
+            SetVar(VAR_FLYROAD_FT,cur_num);
+            break;
+        case 2:
+            cur_num = GetVar(VAR_FLYROAD_ZZ);
+            if(cur_num < 1000)
+                return;
+            GetPackage()->AddItem(16045, 1, true, false, FromFlyRoad);
+            cur_num = cur_num - 1000;
+            SetVar(VAR_FLYROAD_ZZ,cur_num);
+            break;
+        case 3:
+            cur_num = GetVar(VAR_FLYROAD_DJ);
+            if(cur_num < 1000)
+                return;
+            GetPackage()->AddItem(16046, 1, true, false, FromFlyRoad);
+            cur_num = cur_num - 1000;
+            SetVar(VAR_FLYROAD_DJ,cur_num);
+            break;
+        default:
+            return;
+    }
+    ReturnFlyRoadInfo();
+}
+
 
 } // namespace GObject
 

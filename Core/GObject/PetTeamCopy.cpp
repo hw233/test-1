@@ -557,14 +557,16 @@ void PetTeamCopy::refreshMonster(Player* pl)
         if(!pl->hasChecked())
             return;
 
-        if(pl->getGold() < 2)
+        UInt8 goldNeed = 2;
+
+        if(pl->getGold() < goldNeed)
         {
             pl->sendMsgCode(0, 1104);
             return;
         }
 
         ConsumeInfo ci(RefreshMonster, 0, 0);
-        pl->useGold(2, &ci);
+        pl->useGold(goldNeed, &ci);
         
         if(0 == t)
             pl->udpLog("chongwufuben", "F_55500", "", "", "", "", "act");
@@ -794,6 +796,9 @@ UInt32 PetTeamCopy::createTeam(Player* pl, UInt32 NPCId, UInt32 monsterId)
     {
         if(!pl->hasChecked())
             return 0;
+
+        if(World::getMonsterAndPetTime())
+            money /= 2;
 
         if(money > pl->getGold())
         {

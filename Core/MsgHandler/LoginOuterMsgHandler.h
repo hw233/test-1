@@ -1110,12 +1110,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                9388, 1,
-                9414,  5,
+                9427, 2,
+                5135,  1,
                 9141, 2,
                 15, 2,
-                501, 4,
-                9498, 4,
+                9457, 4,
+                9600, 4,
             };
 
             UInt8 idx = 0;
@@ -1145,7 +1145,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if(id == 9388 || id == 9414 || id == 9141)
+                    if(id == 9427 || id == 5135 || id == 9141)
                     {
                         if(player->GetVar(GObject::VAR_DIRECTPURCNT) >= 3)
                             purchase.code = 2;
@@ -3421,6 +3421,8 @@ inline bool player_enum_2(GObject::Player* pl, int* curType)
         case 13:
             {
                 pl->SetVar(GObject::VAR_YEARHAPPY_VALUE, 0);
+                pl->SetVar(GObject::VAR_YEARHAPPY_LEFTVALUE, 0);
+                pl->SetVar(GObject::VAR_YEARHAPPY_DAYVALUE, 0);
                 pl->SetVar(GObject::VAR_YEARHAPPY_DAYVALUE_AWARD, 0);
             }
             break;
@@ -4151,6 +4153,19 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         GObject::GVAR.SetVar(GObject::GVAR_GG_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_GG_END, end);
         GLOBAL().PushMsg(hdr, NULL);
+
+        return;
+    }
+    else if (type == 24 && begin <= end )
+    {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
+        curType = 24;
+        GObject::GVAR.SetVar(GObject::GVAR_MOSTER_PET_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_MOSTER_PET_END, end);
 
         return;
     }

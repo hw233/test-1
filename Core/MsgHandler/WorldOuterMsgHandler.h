@@ -3413,6 +3413,12 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             GLOBAL().PushMsg(hdr, (void*)data);
             break;
        }
+       case 0x36:
+       {
+            hdr.msgHdr.desWorkerID = player->getThreadId();
+            GLOBAL().PushMsg(hdr, (void*)data);
+            break;
+       }
        case 0x45:
        {
            UInt8 logType = 0;
@@ -4349,13 +4355,16 @@ void OnServerSay( ServerWarMsgHdr& hdr, const void * data )
 { 
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     std::string words = "";
+    std::string name = "";
     brd >> words;
+    brd >> name;
 
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x12);
     st << static_cast<UInt8>(0x14);
     st << static_cast<UInt8>(1);
     st << words;
+    st << name;
     st << Stream::eos;
     NETWORK()->Broadcast(st);
 } 

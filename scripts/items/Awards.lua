@@ -1740,11 +1740,11 @@ end
 function RunHappyValueAward(player, cts)
     local item = {
         [1] = {{500,2},{503,1},{15,2},{9371,3}},
-        [2] = {{501,2},{9424,2},{1126,2},{517,2},{16039,1}},
+        [2] = {{501,2},{9424,2},{1126,2},{517,2}},
         [3] = {{9498,2},{9457,2},{551,2},{8000,2}},
-        [4] = {{134,2},{1325,2},{16001,2}},
+        [4] = {{134,2},{1325,2},{16001,2},{16039,1}},
         [5] = {{9338,5},{9457,5},{9076,3}},
-        [6] = {{9022,3},{9075,1}},
+        [6] = {{9022,3},{9075,3}},
     };
     local baoshi = {5005,5015,5025,5035,5045,5055,5065,5075,5085,5095,5105,5115,5125,5135,5145}
     local package = player:GetPackage();
@@ -2086,17 +2086,24 @@ function getRedBeanAward(player, index, count)
     end
 
     local package = player:GetPackage();
-    if package:GetRestPackageSize() < 3 * count then
-        player:sendMsgCode(2, 1011, 0)
-        return false
+    if index == 5 then
+        if package:GetRestPackageSize() < 3 * count then
+            player:sendMsgCode(2, 1011, 0)
+            return false
+        end
+    else
+        if package:GetRestPackageSize() < count then
+            player:sendMsgCode(2, 1011, 0)
+            return false
+        end
     end
 
     local n = 1
     for i = 1, count do
         local p = math.random(1, 10000)
         for j = 1, #award do
-            if p <= prob[index][i] then
-                n = i
+            if p <= prob[index][j] then
+                n = j
                 break
             end
         end

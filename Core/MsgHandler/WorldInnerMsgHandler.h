@@ -3400,7 +3400,7 @@ void SetSeekingHerCharmRank( GameMsgHdr& hdr,  const void* data )
         }
     }
 
-    if((World::seekingHerCharmSort.size()!=0 && total > World::seekingHerCharmSort.begin()->total) || (World::seekingHerCharmSort.size()==0))
+    if((World::seekingHerCharmSort.size()!=0 && total > World::seekingHerCharmSort.begin()->total && World::seekingHerCharmSort.begin()->player != player) || (World::seekingHerCharmSort.size()==0))
         SYSMSG_BROADCASTV(5206, player->getCountry(), player->getName().c_str(), total);
 
     RCSort s;
@@ -3430,7 +3430,7 @@ void SetSeekingHerBeanTotalRank( GameMsgHdr& hdr,  const void* data )
             }
         }
 
-        if((World::seekingHerNiuLangSort.size()!=0 && total > World::seekingHerNiuLangSort.begin()->total) || (World::seekingHerNiuLangSort.size()==0))
+        if((World::seekingHerNiuLangSort.size()!=0 && total > World::seekingHerNiuLangSort.begin()->total && World::seekingHerNiuLangSort.begin()->player != player) || (World::seekingHerNiuLangSort.size()==0))
             SYSMSG_BROADCASTV(5207, player->getCountry(), player->getName().c_str(), total);
 
         RCSort s;
@@ -3449,7 +3449,7 @@ void SetSeekingHerBeanTotalRank( GameMsgHdr& hdr,  const void* data )
             }
         }
 
-        if((World::seekingHerZhiNvSort.size()!=0 && total > World::seekingHerZhiNvSort.begin()->total) || (World::seekingHerZhiNvSort.size()==0))
+        if((World::seekingHerZhiNvSort.size()!=0 && total > World::seekingHerZhiNvSort.begin()->total && World::seekingHerZhiNvSort.begin()->player != player) || (World::seekingHerZhiNvSort.size()==0))
             SYSMSG_BROADCASTV(5208, player->getCountry(), player->getName().c_str(), total);
 
         RCSort s;
@@ -3584,6 +3584,7 @@ void OnSeekingHer_FriendInfo( GameMsgHdr& hdr,  const void* data )
     st << target->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
     st << static_cast<UInt16>(WORLD().getSeekingHerRank(target));
     st << target->getMyAnnouncement();
+    st << target->getName();
     st << Stream::eos;
     player->send(st);
 }

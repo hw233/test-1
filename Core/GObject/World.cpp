@@ -684,6 +684,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 1)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -734,6 +742,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
         ))
     {
 #if 0
@@ -1788,6 +1797,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 31)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 1)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
 
          )
         bRechargeEnd = true;
@@ -3404,7 +3421,7 @@ void World::SendQixiAward()
                         bool bind = true;
                         if(mitems[i].id == qixiTmpl._titleItem)
                         {
-                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F) * 3;
+                            mitem.id = mitems[i].id + (pl->GetClassAndSex() & 0x0F);
                             bind = false;
                         }
                         else
