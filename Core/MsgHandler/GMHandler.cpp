@@ -5841,7 +5841,6 @@ void GMHandler::OnSayToWorld(GObject::Player *player, std::vector<std::string>& 
 { 
     std::string word = "hello world"; 
     Stream st(SERVERWARREQ::SAY_TO_WORLD, 0xEE);
-    st << player->getCountry();
     st << player->getName();
     st << word;
     st << Stream::eos;
