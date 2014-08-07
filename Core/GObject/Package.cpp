@@ -44,7 +44,7 @@
 #define TRUMP_LORDER_ITEM       517      // 玲珑冰晶
 #define MAX_TRUMP_LORDER_ITEM   9        // 最高阶
 #define SPIRIT_TRANS_ITEM   548    // 转魂符
-#define SPIRIT_LEVEL_MAX    100    // 最大注灵等级
+#define SPIRIT_LEVEL_MAX    110    // 最大注灵等级
 
 namespace GObject
 {
