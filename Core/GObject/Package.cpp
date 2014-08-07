@@ -8746,14 +8746,14 @@ namespace GObject
             //UInt32 exEnchant = hf->getHftValue(hft);
             UInt32 chance = 0;
             if(enLevel >= 10)
-                return 0;
+                break;
             GData::lingbaoL lbl = GData::lingbaoLevelData.getLingbaoLevel(type,enLevel);
             if(lbl.itemNum == 0|| lbl.itemCount ==0)
                 return 0;
 
             if(!DelItemAny(lbl.itemNum, lbl.itemCount))
             {
-                return 0;
+                break;
             }
             //chance = lbl.probability;
 	        chance = GameAction()->getLingbaoLevelChance(enLevel+1,bless+1);
