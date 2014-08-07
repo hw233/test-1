@@ -1141,9 +1141,9 @@ function onFrontMapWin(player, id, spot, lootlvl)
         package:Add(9492, 1, true)
     end
     --if id >= 9 then
-     --   local package = player:GetPackage();
-      --  print("XX")
-       -- package:Add(9497, 1, true)
+    --    local package = player:GetPackage();
+    --    print("XX")
+    --    package:Add(554, 1, true)
     --end
     sendWinReward(player, lootlvl, 2);
     TgcEvent(player, 2)

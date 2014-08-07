@@ -18,6 +18,7 @@ function kettleNpc()
     sed -i /ID/d $f
     sed -i /id/d $f
     sed -i /^$/d $f
+#    sed -i /^[[:space:]]*$/d $f   #lb
     sed -i /REF/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
@@ -27,7 +28,7 @@ function kettleNpc()
             print "INSERT INTO `kettleNpc` VALUES";
         } {
             printf("(%d,%.02f,%.02f,%.02f,%.02f,%d)",$1,$3,$4,$5,$6,$8);
-            if (NR <= ENVIRON["lines"])
+            if (NR < ENVIRON["lines"])
                 printf(",");
             else if (NR >= ENVIRON["lines"])
                 printf(";");

@@ -1441,6 +1441,20 @@ struct DBXinmo
 	UInt8  level;
 	UInt32 curVal;
 };
+struct DBLingbaoLevel
+{
+	UInt32 fighterId;
+	UInt64 playerId;
+	UInt8  lingbaoType;
+	UInt8 enLevel;
+};
+struct DBLingbaoFall
+{
+	UInt32 fighterId;
+	UInt64 playerId;
+	UInt8  type;
+	UInt32  fall;
+};
 
 struct DBJiguanshu
 {
@@ -3421,7 +3435,7 @@ SPECIALDEF(9)
     std::string, skills,
     std::string, factors,
     UInt32, battlePoint,
-    UInt32, itemId 
+    UInt32, itemId
 )
 SPECIALEND()
 
@@ -3887,6 +3901,26 @@ SPECIALDEF(4)
 	UInt8, num,
     std::string, history,
     std::string, occupy
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBLingbaoLevel)
+SPECIALDEF(4)
+(
+	UInt32, fighterId,
+	UInt64, playerId,
+	UInt8,  lingbaoType,
+	UInt8, enLevel
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBLingbaoFall)
+SPECIALDEF(4)
+(
+	UInt32, fighterId,
+	UInt64, playerId,
+	UInt8,  type,
+	UInt32, fall
 )
 SPECIALEND()
 }

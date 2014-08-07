@@ -13,8 +13,11 @@ namespace GObject
         e_HFT_None = 0,
         e_HFT_Equip_Enchant = 1,
         e_HFT_Trump_Enchant = 2,
-        e_HFT_Trump_SJ = 3,
-        e_HFT_Trump_JF = 4,
+        e_HFT_Trump_SJ = 3,    //升阶
+        e_HFT_Trump_JF = 4,   //解封
+     //   e_HFT_lingbao_Ling = 5,   //宝具精炼 灵
+     //   e_HFT_lingbao_Wu = 6,   //宝具精炼   悟
+     //   e_HFT_lingbao_Xin = 7,   //宝具精炼  信
         e_HFT_Max,
     };
 

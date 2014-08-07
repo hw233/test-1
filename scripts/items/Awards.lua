@@ -2118,3 +2118,24 @@ function getRedBeanAward(player, index, count)
 
     return true
 end
+local EnchantlingbaoLevel ={
+    [1] = {10000},
+    [2] = {5000},
+    [3] = {3000,4000,5000,6000,7000},
+    [4] = {1500,2000,3000,4000,5000,6000},
+    [5] = {1500,2000,3000,4000,5000,6000},
+    [6] = {10,30,30,3000,3000,6000},
+    [7] = {10,30,30,3000,3000,6000},
+    [8] = {10,30,30,2000,2000,2000,2000,6000},
+    [9] = {10,30,30,2000,2000,2000,2000,3000,6000},
+    [10] = {10,10,10,30,30,30,30,30,2000,3000,4000},
+}
+function getLingbaoLevelChance( level , fall)
+    if level == 0 or level > #EnchantlingbaoLevel or fall ==0 then
+        return 0;
+    end
+    if fall > #EnchantlingbaoLevel[level] then
+        fall = #EnchantlingbaoLevel[level]
+    end
+    return EnchantlingbaoLevel[level][fall];
+end

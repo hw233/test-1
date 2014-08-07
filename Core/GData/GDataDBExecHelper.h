@@ -943,6 +943,16 @@ struct DBKettleNpc
     float action;
     UInt32 exp;
 };
+struct DBLingbaoLevel
+{
+    UInt32 id;
+    UInt32 itemNum;
+    UInt32 itemCount;
+    float percent;
+    UInt32 probability;
+    UInt32 honeyFall;
+    UInt32 honeyFallP;
+};
 
 }
 
@@ -2049,6 +2059,18 @@ SPECIALDEF(6)
     float, hp,
     float, action,
     UInt32, exp
+	)
+SPECIALEND()
+SPECIALBEGIN(GData::DBLingbaoLevel)
+SPECIALDEF(7)
+	(
+    UInt32, id         ,
+    UInt32, itemNum    ,
+    UInt32, itemCount  ,
+    float , percent    ,
+    UInt32, probability,
+    UInt32, honeyFall  ,
+    UInt32, honeyFallP 
 	)
 SPECIALEND()
 }
