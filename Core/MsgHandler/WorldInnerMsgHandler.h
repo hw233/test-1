@@ -3522,7 +3522,10 @@ void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
             st << i->player->getName();
             st << static_cast<bool>(i->player->IsMale() ? 0 : 1);
             st << i->player->GetVar(VAR_SEEKING_HER_CHARM_POINT);
-            st << cfg.serverNo;
+            if(cfg.merged)
+                st << static_cast<UInt32>(i->player->getServerNo());
+            else
+                st << cfg.serverNo;
             st << i->player->getMainFighter()->getClass();
             if(100 <= pos)
                 break;
@@ -3538,7 +3541,10 @@ void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
             st << i->player->getName();
             st << static_cast<bool>(i->player->IsMale() ? 0 : 1);
             st << i->player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
-            st << cfg.serverNo;
+            if(cfg.merged)
+                st << static_cast<UInt32>(i->player->getServerNo());
+            else
+                st << cfg.serverNo;
             st << i->player->getMainFighter()->getClass();
             if(100 <= pos)
                 break;
@@ -3554,7 +3560,10 @@ void OnSeekingHer_RankInfo( GameMsgHdr& hdr,  const void* data )
             st << i->player->getName();
             st << static_cast<bool>(i->player->IsMale() ? 0 : 1);
             st << i->player->GetVar(VAR_SEEKING_HER_BEAN_TOTAL);
-            st << cfg.serverNo;
+            if(cfg.merged)
+                st << static_cast<UInt32>(i->player->getServerNo());
+            else
+                st << cfg.serverNo;
             st << i->player->getMainFighter()->getClass();
             if(100 <= pos)
                 break;
