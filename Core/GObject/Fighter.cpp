@@ -92,6 +92,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
 	memset(_lingbao, 0, sizeof(_lingbao));
 	memset(lingbaoLevel, 0, sizeof(lingbaoLevel));
+	memset(lingbaoFall, 0, sizeof(lingbaoFall));
     m_2ndSoul = NULL;
     _iswboss = false;
     _iswbossinspire = false;
