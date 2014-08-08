@@ -264,7 +264,7 @@ public:
     void getAllAcupointsGoldBits(Stream& st);
     void setAcupoints(std::string& acupoints, bool = true);
     void setAcupointsGold(std::string& acupoints, bool = true);
-
+    void getAllLingbaoLevelAndFall(Stream& st);
     bool setToAcupoints(int idx, bool writedb);
 
     // XXX: 由心法和法宝带出技能，且技能不需要升级
@@ -1106,12 +1106,24 @@ public:
 private:
     Xingchenzhen m_xingchen;
     XinMoData m_xinmo;
+    UInt8 lingbaoLevel[3];
+    UInt32 lingbaoFall[3];  //祝福值
 public:
     inline Xingchenzhen& getXingchen() { return m_xingchen; }
     inline UInt8 getXingchenLvl()  {return m_xingchen.lvl;}
 
+    inline UInt8 getLingbaoLevel(UInt8 type) { if (type > 2) return 0; return lingbaoLevel[type];}
+    inline void setLingbaoLevel(UInt8 type ,UInt8 val){ if(type > 2) return; lingbaoLevel[type] = val; }
+
+    inline UInt32 getLingbaoFall(UInt8 type) { if(type > 2) return 0; return lingbaoFall[type];}
+    inline void setLingbaoFall(UInt8 type , UInt32 val){ if(type > 2) return; lingbaoFall[type] = val; }
+
+
     inline XinMoData getXinMo() { return m_xinmo; }
     void setXinMo(UInt8 lev , UInt32 val);
+
+    void updateLingbaoLevelToDB(UInt8 type) ;
+    void updateLingbaoFallToDB(UInt8 type) ;
 
     void setXingchenFromDB(DBXingchen&);
     bool upgradeXingchen(UInt8 type);

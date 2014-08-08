@@ -52,6 +52,7 @@
 #include "NewQuestionsTable.h"
 #include "ClanShop.h"
 #include "KettleNpc.h"
+#include "lingbaoLevel.h"
 
 namespace GData
 {
@@ -542,6 +543,11 @@ namespace GData
         if (!LoadKettleNpc())
         {
             fprintf (stderr, "Load LoadKettleNpc Error !\n");
+            std::abort();
+        }
+        if (!LoadLingbaoLevel())
+        {
+            fprintf (stderr, "Load LoadLingbaoLevel Error !\n");
             std::abort();
         }
 
@@ -3337,6 +3343,19 @@ namespace GData
         {
             KettleAttr ka(dbk.attack , dbk.magatk , dbk.hp ,dbk.action ,dbk.exp);
             kettleAttrData.LoadKettleMonsterAttr( (dbk.monsterId-1)/7 , (dbk.monsterId-1)%7 ,ka);
+        }
+		return true;
+    }
+    bool GDataManager::LoadLingbaoLevel()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBLingbaoLevel dblbl;
+		if(execu->Prepare("SELECT `id`, `itemNum`, `itemCount` , `percent`,`probability`,`HoneyFall`,`HoneyFallP` FROM `lingbaoLevel` ", dblbl) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+        {
+            lingbaoLevelData.SetLingbaoLevelData( dblbl.id/100-1 , dblbl.id%100-1,dblbl.itemNum ,dblbl.itemCount , dblbl.percent , dblbl.probability , dblbl.honeyFall , dblbl.honeyFallP);
         }
 		return true;
     }

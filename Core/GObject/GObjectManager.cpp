@@ -774,6 +774,16 @@ namespace GObject
             fprintf(stderr, "loadMonsterKettle error!\n");
             std::abort();
         }
+		if(!loadFighterLingbaoLevel())
+        {
+            fprintf(stderr, "loadFighterLingbaoLevel error!\n");
+            std::abort();
+        }
+		if(!loadFighterLingbaoFall())
+        {
+            fprintf(stderr, "loadFighterLingbaoFall error!\n");
+            std::abort();
+        }
 
         if(!loadSkillGrade())
         {
@@ -7196,7 +7206,6 @@ namespace GObject
                             }
                         }
                     }
-
                     checkLingbaoAttrType(lb);
 				}
 				break;
@@ -8084,6 +8093,76 @@ namespace GObject
         }
 		lc.finalize();
 		return true;
+    }
+    bool GObjectManager::loadFighterLingbaoLevel()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Fighter lingbaoLevel:");
+		DBLingbaoLevel dbxc;
+        Player* pl = NULL;
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `lingbaoType`, `enLevel` FROM `fighter_lingbaoLevel`", dbxc) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbxc.playerId != last_id)
+			{
+				last_id = dbxc.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(dbxc.fighterId);
+			if(fgt == NULL)
+            {
+                continue;
+            }
+
+            fgt->setLingbaoLevel(dbxc.lingbaoType,dbxc.enLevel);
+
+		}
+		lc.finalize();
+
+        return true;
+    }
+    bool GObjectManager::loadFighterLingbaoFall()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Fighter lingbaoFall:");
+		DBLingbaoFall dbxc;
+        Player* pl = NULL;
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `type`, `fall` FROM `fighter_lingbaoFall`", dbxc) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbxc.playerId != last_id)
+			{
+				last_id = dbxc.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(dbxc.fighterId);
+			if(fgt == NULL)
+            {
+                continue;
+            }
+
+            fgt->setLingbaoFall(dbxc.type,dbxc.fall);
+
+		}
+		lc.finalize();
+
+        return true;
     }
 }
 

@@ -101,6 +101,7 @@ namespace GData
         static bool LoadPicInfo();
         static bool LoadCubeCount();
         static bool LoadKettleNpc();
+        static bool LoadLingbaoLevel();
 
         static bool LoadNewQuestionsConfig();
         static void clearUdpItem();

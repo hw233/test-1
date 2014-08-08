@@ -692,6 +692,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 8)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 16)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -743,6 +751,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
         ))
     {
 #if 0
@@ -1805,6 +1814,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 7)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 8)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 16)
 
          )
         bRechargeEnd = true;
@@ -5383,11 +5400,11 @@ void World::SendTYSSClanAward(UInt8 actType)
     UInt32 fifth_steps = 70000;
     if(actType == 2) 
     {
-        one_steps = 2000;
-        two_steps = 14000;
-        three_steps = 23000;
-        third_steps = 46000;
-        fifth_steps = 65000;
+        one_steps = 1000;
+        two_steps = 6000;
+        three_steps = 16000;
+        third_steps = 30000;
+        fifth_steps = 46000;
     }
 
     for (UInt32 pos = 0; i != e; ++i)
@@ -5432,10 +5449,16 @@ void World::SendTYSSPlayerAward(UInt8 actType)
         {{134,15},{1325,15},{515,10},{9075,8}},
     };
     static MailPackage::MailItem s_item1[][4] = {
-        {{16001,30},{515,25},{9338,25},{9498,25}},
-        {{16001,25},{515,20},{9338,20},{9498,20}},
-        {{16001,20},{515,15},{9338,15},{9498,15}},
-        {{16001,15},{515,10},{9338,10},{9498,10}},
+        {{16001,30},{1733,1},{9338,25},{9498,30}},
+        {{16001,25},{515,20},{9338,20},{9498,25}},
+        {{16001,20},{515,15},{9338,15},{9498,20}},
+        {{16001,15},{515,10},{9338,10},{9498,15}},
+    };
+    static MailPackage::MailItem s_item2[][4] = {
+        {{9995,1}},
+        {{9996,1}},
+        {{9997,1}},
+        {{0,0}},
     };
     SYSMSG(title, 946);
     for (RCSortType::iterator i = World::tyss_PlayerSort.begin(), e = World::tyss_PlayerSort.end(); i != e; ++i)
@@ -5464,14 +5487,25 @@ void World::SendTYSSPlayerAward(UInt8 actType)
             int type = pos > 3 ? 4 : pos;
             SYSMSGV(content, 951, pos);
 	        MailPackage::MailItem *items;
+	        MailPackage::MailItem *tmp_items;
             if(actType == 1)
                 items = s_item[type-1]; 
             else
+            {
                 items = s_item1[type-1]; 
+                tmp_items = s_item2[type-1];
+            }
             MailItemsInfo itemsInfo(items, Activity, 4);
             Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
             if(mail)
                 mailPackageManager.push(mail->id, items, 4, true);
+            if(actType == 2 && type < 4)
+            {
+                MailItemsInfo tmp_itemsInfo(tmp_items, Activity, 4);
+                Mail * tmp_mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &tmp_itemsInfo);
+                if(tmp_mail)
+                    mailPackageManager.push(tmp_mail->id, tmp_items, 4, false);
+            }
         }        
         pos++;
         udpLog("tianyuanshenshou", "F_140224_7", "", "", "", "", "act");

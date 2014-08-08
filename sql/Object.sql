@@ -2039,6 +2039,15 @@ CREATE TABLE IF NOT EXISTS `fighter_xinmo` (
     PRIMARY KEY(`fighterId`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `fighter_lingbaoLevel`;
+CREATE TABLE IF NOT EXISTS `fighter_lingbaoLevel` (
+    `fighterId` int(10) unsigned NOT NULL,
+    `playerId` bigint(20) unsigned NOT NULL,
+    `lingbaoType` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `enLevel` tinyint(3) unsigned NOT NULL DEFAULT 1,
+    PRIMARY KEY(`fighterId`, `playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `clancity`;
 CREATE TABLE IF NOT EXISTS `clancity` (
     `id`   tinyint(3) unsigned NOT NULL DEFAULT 1,
@@ -2662,4 +2671,22 @@ CREATE TABLE IF NOT EXISTS `kettle` (
     `history` varchar(1024) NOT NULL DEFAULT '',  
     `occupy` varchar(256) NOT NULL DEFAULT '',  
     PRIMARY KEY(`playerId`,`num`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `fighter_lingbaoLevel`;
+CREATE TABLE IF NOT EXISTS `fighter_lingbaoLevel` (
+    `fighterId` int(10) unsigned NOT NULL,
+    `playerId` bigint(20) unsigned NOT NULL,
+    `lingbaoType` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `enLevel` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY(`fighterId`, `playerId`,`lingbaoType`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `fighter_lingbaoFall`;
+CREATE TABLE IF NOT EXISTS `fighter_lingbaoFall` (
+    `fighterId` int(10) unsigned NOT NULL,
+    `playerId` bigint(20) unsigned NOT NULL,
+    `type` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    `fall` tinyint(3) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY(`fighterId`, `playerId`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
