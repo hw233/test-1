@@ -10327,6 +10327,55 @@ void OnWBOSSOPTReq( GameMsgHdr & hdr, const void * data )
     }
 
 }
+void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+     
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt ; 
+    switch(opt)
+    {
+        case 1:
+            {
+                //MSG_QUERY_PLAYER(player);
+                //if(!player->hasChecked())
+                //    return;
+                UInt16 fighterId = 0;
+                UInt8 type = 0;
+                UInt16 count = 0;
+                UInt8 level = 0;
+                UInt8 index = 0;
+                br >> index;
+                if( index == 1)
+                { 
+                    br >> fighterId;
+                    br >> type ;
+                } 
+                else
+                    br >> fighterId /*>>itemId*/ >> type >> level >>count;
+                UInt16 success = 0;
+                UInt16 failed = 0;
+                UInt16 bless = 0;
+                UInt8 enLevel;
+                UInt8 res = player->GetPackage()->lingBaoUpLevel(fighterId, type-1, count, level, success, failed,enLevel, bless/*, er._protect > 0*/);
+                Stream st(REP::EXTEND_PROTOCAOL);
+                st << static_cast<UInt8>(0x01);
+                st << static_cast<UInt8>(index);
+                st << res;
+                st << fighterId << type <<enLevel << static_cast<UInt8>(bless);
+
+                if(count != 0)
+                    st << static_cast<UInt8>(success) << failed;
+
+                st << Stream::eos;
+
+                player->send(st);
+                //GameAction()->RunOperationTaskAction1(player, 1, 2);
+                break;
+            }
+    }
+}
 
 
 

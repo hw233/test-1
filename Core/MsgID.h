@@ -374,6 +374,8 @@ namespace REQ
     /**BUG投诉 */
     const UInt8 BUG                 = 0x25;// 0xF8
     /***领取国庆礼包 */
+    const UInt8 EXTEND_PROTOCAOL         = 0x27;
+
     const UInt8 YD_GETPACKS         = 0x2D;
     /**黄钻信息 */
     const UInt8 YD_INFO             = 0x2E;
@@ -713,6 +715,8 @@ namespace REP
     const UInt8 FLAUNT_GOOD         = 0x23;// 0xF3
     const UInt8 SYSTEM_INFO         = 0x24;// 0xF7
     const UInt8 BUG_INFO            = 0x25;// 0xF8
+
+    const UInt8 EXTEND_PROTOCAOL    = 0x27;//  扩展协议
     const UInt8 YD_GETPACKS         = 0x2D;
     const UInt8 YD_INFO             = 0x2E;
     const UInt8 YD_AWARD_RCV        = 0x2F;

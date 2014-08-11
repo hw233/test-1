@@ -1716,6 +1716,10 @@ namespace Script
     {
         return Call<UInt16>("getSpecialItem", id, index);
     }
+    UInt16 GameActionLua::getLingbaoLevelChance(UInt8 id, UInt8 index)
+    {
+        return Call<UInt16>("getLingbaoLevelChance", id, index);
+    }
 
     lua_tinker::table GameActionLua::getCopyFrontmapAward(UInt8 step, UInt16 localtion, UInt8 cf)
     {

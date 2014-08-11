@@ -2792,6 +2792,7 @@ namespace GObject
         UInt8 transformSoul(Fighter * fFgt, Fighter * tFgt);
         UInt8 transfromXingchen(Fighter * fFgt, Fighter * tFgt);
         void transformElixir(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transfromLingbaoLevel(Fighter * fFgt, Fighter * tFgt);
         void sendXinMoInfo(); 
             
     private:
@@ -3577,6 +3578,8 @@ namespace GObject
         void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
         void do_fighter_xinmo(Fighter* fgt, UInt32 oldId);
         void do_skill_grade(Fighter* fgt, UInt32 oldId);
+        void do_fighter_lingbaoLevel(Fighter* fgt, UInt32 oldId);
+        void do_fighter_lingbaoFall(Fighter* fgt, UInt32 oldId);
 
     public:
         void makeClanTitleInfo(Stream & st);

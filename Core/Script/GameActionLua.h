@@ -313,6 +313,7 @@ namespace Script
         bool RunVipPrivilegeAward(Player* player, UInt8 idx, UInt8 dayth);
         bool RunLevelAward(Player* player,UInt8 opt =0 );
         void onRecharge(Player* player, UInt32 r);
+		UInt16 getLingbaoLevelChance(UInt8 r, UInt8 t);
 
     public:
 

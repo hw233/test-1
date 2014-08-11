@@ -28,6 +28,7 @@
 #include "GData/LingShiTable.h"
 #include "Common/Itoa.h"
 #include "LBNameTmpl.h"
+#include "GData/lingbaoLevel.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
@@ -43,7 +44,7 @@
 #define TRUMP_LORDER_ITEM       517      // 玲珑冰晶
 #define MAX_TRUMP_LORDER_ITEM   9        // 最高阶
 #define SPIRIT_TRANS_ITEM   548    // 转魂符
-#define SPIRIT_LEVEL_MAX    100    // 最大注灵等级
+#define SPIRIT_LEVEL_MAX    110    // 最大注灵等级
 
 namespace GObject
 {
@@ -8718,5 +8719,72 @@ namespace GObject
         fgt->setDirty();
     }
     /**********灵侍end***********/
+
+    /* ***************** */
+    /* *****宝具精炼**** */
+    /* ***************** */
+    UInt8 Package::lingBaoUpLevel( UInt16 fighterId, UInt8 type /* 灵，悟，信*/, UInt16 count, UInt8 level, UInt16& success, UInt16& failed,UInt8& enLevel, UInt16& bless /*, bool protect*/ )
+    { 
+        if(type >2)
+            return 0;
+        if(level ==0 && count ==0)
+            count =1;
+        if(fighterId == 0)
+            return 0;
+        Fighter *fgt = m_Owner->findFighter(fighterId);
+        if(!fgt)
+            return 0;
+        bool wlevel = false;
+        bool wfall = false;
+
+        UInt16 cnt = 0;
+        bless = fgt->getLingbaoFall(type);
+        enLevel = fgt->getLingbaoLevel(type);
+        UInt8 res = 0;
+        while(cnt < count)
+        { 
+            //UInt32 exEnchant = hf->getHftValue(hft);
+            UInt32 chance = 0;
+            if(enLevel >= 10)
+                break;
+            GData::lingbaoL lbl = GData::lingbaoLevelData.getLingbaoLevel(type,enLevel);
+            if(lbl.itemNum == 0|| lbl.itemCount ==0)
+                return 0;
+
+            if(!DelItemAny(lbl.itemNum, lbl.itemCount))
+            {
+                break;
+            }
+            //chance = lbl.probability;
+	        chance = GameAction()->getLingbaoLevelChance(enLevel+1,bless+1);
+            //chance= lua_tinker::call<lua_tinker::table>(L, "getLingbaoLevelChance", enLevel + 1, bless + 1);
+            //std::cout << "chance : " << chance <<std::endl;
+            if(uRand(10000) < chance)
+            {
+                fgt->setLingbaoLevel(type , enLevel+1);
+                fgt->setLingbaoFall(type ,0);
+                enLevel ++;
+                success ++;
+                bless = 0;
+                wlevel = true;
+                res = 1;
+            } 
+            else
+            {
+                fgt->setLingbaoFall(type ,bless + lbl.honeyFall);
+                failed ++;
+                bless+= lbl.honeyFall;
+                wfall = true;
+            }
+            if(enLevel== level)
+                 break;
+            cnt ++;
+        } 
+        if(wlevel)
+            fgt->updateLingbaoLevelToDB(type);
+        if(wfall)
+            fgt->updateLingbaoFallToDB(type);
+        return res;
+    } 
 
 }

@@ -3682,6 +3682,7 @@ namespace GObject
 
             fgt->xingchenInfo(st);
             fgt->getAllAcupointsGoldBits(st);
+            fgt->getAllLingbaoLevelAndFall(st);
 		}
 	}
 
@@ -19792,6 +19793,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             transformElixir(fFgt, tFgt);
         if ((type &0x20) && res==0)
             transfromXingchen(fFgt, tFgt);
+        if ((type &0x40) && res==0)
+            transfromLingbaoLevel(fFgt, tFgt);
 
         return res;
     }
@@ -20089,6 +20092,37 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
          return 0;
     }
+    UInt8 Player::transfromLingbaoLevel(Fighter * fFgt, Fighter * tFgt)
+    {
+         for(UInt8 i = 0; i< fFgt->getMaxLingbaos() ; ++i)
+         {
+             UInt8 swapLevel = tFgt->getLingbaoLevel(i); 
+             tFgt->setLingbaoLevel(i,fFgt->getLingbaoLevel(i));
+             fFgt->setLingbaoLevel(i,swapLevel);
+
+             UInt32 swapFall = tFgt->getLingbaoFall(i); 
+             tFgt->setLingbaoFall(i,fFgt->getLingbaoFall(i));
+             fFgt->setLingbaoFall(i,swapFall);
+             tFgt->updateLingbaoLevelToDB(i);
+             fFgt->updateLingbaoLevelToDB(i);
+             tFgt->updateLingbaoFallToDB(i);
+             fFgt->updateLingbaoFallToDB(i);
+         }
+         fFgt->setDirty();
+         tFgt->setDirty();
+
+         Stream st(REP::EXTEND_PROTOCAOL);
+         st <<static_cast<UInt8>(0x01);
+         st <<static_cast<UInt8>(0x03);
+         st << static_cast<UInt16>(fFgt->getId());
+         fFgt->getAllLingbaoLevelAndFall(st);
+         st << static_cast<UInt16>(tFgt->getId());
+         tFgt->getAllLingbaoLevelAndFall(st);
+         st <<Stream::eos;
+         send(st);
+        
+         return 0;
+    }
 
     void Player::transformElixir(Fighter * fFgt, Fighter * tFgt)
     {
@@ -20108,7 +20142,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             }
         }
     }
-    
+
     void Player::ArenaExtraAct(UInt8 type, UInt8 opt)
     {
         UInt32 now = TimeUtil::Now();
@@ -28369,11 +28403,11 @@ void Player::sendRealSpirit()
 
 void Player::getQZoneRechargeAward(UInt8 val)
 {
-    if(getPlatform() != 1 && getPlatform() != 2)
+    /*if(getPlatform() != 1 && getPlatform() != 2)
     {
         sendMsgCode(0, 3506);
         return;
-    }
+    }*/
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -28421,11 +28455,11 @@ void Player::getQZoneRechargeAward(UInt8 val)
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
-    if(getPlatform() != 1 && getPlatform() != 2)
+    /*if(getPlatform() != 1 && getPlatform() != 2)
     {
         sendMsgCode(0, 3506);
         return;
-    }
+    }*/
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -28585,14 +28619,14 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             static UInt32 awards1[10][4][2] = {
                 {{503,5},  {500,1}, {501,1}, {49,20}},
                 {{9360,5},  {9093,5}, {0,0}, {50,10}},
-                {{9418,5}, {9414,5}, {9424,5}, {90,10}},
-                {{9649,10}, {9427,5}, {0,0}, {135,20}},
+                {{9418,5}, {9414,5}, {9424,5}, {100,10}},
+                {{9649,10}, {9427,5}, {0,0}, {135,10}},
                 {{515,5}, {514,5}, {0,0},{200,20}},
                 {{16001,5}, {16000,5}, {0,0},{75,10}},
-                {{9498,10}, {9497,10}, {0,0},{268,10}},
-                {{9604,5}, {9603,5}, {9600,5},{150,10}},
-                {{9017,5}, {9075,5}, {0,0},{999,5}},
-                {{1726,1}, {1724,1}, {0,0},{1198,2}},
+                {{9498,10}, {9497,5}, {0,0},{180,10}},
+                {{9600,10}, {9500,5}, {0,0},{100,10}},
+                {{9022,5}, {9075,5}, {0,0},{1500,5}},
+                {{1726,1}, {1729,1}, {0,0},{1198,2}},
             };
 
             UInt32 clan_contribute = GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
@@ -28828,7 +28862,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 st << static_cast<UInt8>(20 - GET_BIT_8(consume1,0));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume1,1));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume1,2));
-                st << static_cast<UInt8>(20 - GET_BIT_8(consume1,3));
+                st << static_cast<UInt8>(10 - GET_BIT_8(consume1,3));
                 st << static_cast<UInt8>(20 - GET_BIT_8(consume2,0));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume2,1));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume2,2));
@@ -28869,10 +28903,10 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             };
             static UInt32 everydayAward1[5][7][2] = {
                 { {15, 3}, {500, 3}, {512, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {501, 2}, {503, 3}, {56, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {501, 3}, {503, 3}, {56, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
                 { {517, 3}, {9424, 3}, {551, 3}, {0, 0}, {0, 0}, {0, 0}, {0 ,0} },
-                { {9457, 5}, {134, 3}, {1325, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {9017, 5}, {9019, 5}, {9068, 5}, {9075, 5}, {9022, 5}, {0, 0}, {0, 0} },
+                { {9457, 3}, {134, 3}, {1325, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {9075, 5}, {9068, 5}, {9022, 5}, {9075, 5}, {9068, 5}, {0, 0}, {0, 0} },
             };
  
             UInt8 totalPackageSize = 0;
@@ -28937,6 +28971,12 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 }
                 SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY), (26 + flag)));//打上当日领取奖品的标记
                 udpLog("tianyuanshenshou", "F_140224_26", "", "", "", "", "act");
+                if(actType == 2)
+                {
+                    UInt32 curtodayContribution = GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY);
+                    if(todayContribution >= needContriLevel[4] && curtodayContribution >> 27 == 31)
+                        SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,todayContribution - needContriLevel[4]);
+                }
                 ReturnTYSSInfo(9); 
             }
             else
@@ -28976,11 +29016,11 @@ void Player::EatLingGuo(UInt32 num)
     UInt32 fifth_steps = 70000;
     if(actType == 2) 
     {
-        one_steps = 2000;
-        two_steps = 14000;
-        three_steps = 23000;
-        third_steps = 46000;
-        fifth_steps = 65000;
+        one_steps = 1000;
+        two_steps = 6000;
+        three_steps = 16000;
+        third_steps = 30000;
+        fifth_steps = 46000;
     }
 
     UInt32 clan_sum = clan->GetTYSSSum();
@@ -30953,6 +30993,8 @@ UInt8 Player::useChangeSexCard()
     do_fighter_xingchen(fgt, oldId);
     do_fighter_xinmo(fgt, oldId);
     do_skill_grade(fgt, oldId);
+    do_fighter_lingbaoLevel(fgt, oldId);
+    do_fighter_lingbaoFall(fgt, oldId);
 
     struct _stTable
     {
@@ -31167,6 +31209,16 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
 void Player::do_skill_grade(Fighter* fgt, UInt32 oldId)
 {
     DB1().PushUpdateData("UPDATE `skill_grade` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_lingbaoLevel(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_lingbaoLevel` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_lingbaoFall(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_lingbaoFall` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
 }
 
 void Player::BuyLeftPower()
