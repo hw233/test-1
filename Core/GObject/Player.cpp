@@ -30993,6 +30993,8 @@ UInt8 Player::useChangeSexCard()
     do_fighter_xingchen(fgt, oldId);
     do_fighter_xinmo(fgt, oldId);
     do_skill_grade(fgt, oldId);
+    do_fighter_lingbaoLevel(fgt, oldId);
+    do_fighter_lingbaoFall(fgt, oldId);
 
     struct _stTable
     {
@@ -31207,6 +31209,16 @@ void Player::CompleteFriendlyTask(Player * friendOne , UInt8 taskNum , UInt8 fla
 void Player::do_skill_grade(Fighter* fgt, UInt32 oldId)
 {
     DB1().PushUpdateData("UPDATE `skill_grade` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_lingbaoLevel(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_lingbaoLevel` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_lingbaoFall(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_lingbaoFall` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
 }
 
 void Player::BuyLeftPower()
