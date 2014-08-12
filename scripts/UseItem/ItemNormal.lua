@@ -10741,7 +10741,7 @@ function ItemNormal_00009349(iid, num, bind, param)
 end
 
 function ItemNormal_NameCard(iid, num, bind, param)
-    if iid == 9960 or iid < 9900 or (iid > 9999 and iid < 17800) or iid >= 18000 then
+    if iid == 9960 or iid < 9900 or (iid > 9999 and iid < 17800) or iid > 18000 then
         return false
     end
     --9960:新手御剑特权卡 客户端占用
@@ -10749,9 +10749,9 @@ function ItemNormal_NameCard(iid, num, bind, param)
     local package = player:GetPackage();
     if iid < 9960 then
         player:setTitle(iid-9900+54, 0)
-    else if iid <= 9999 then
+    elseif iid <= 9999 then
         player:setTitle(iid-9900+54-1, 0)
-    else if iid >= 17800 and iid <= 18000 then
+    elseif iid >= 17800 and iid <= 18000 then
         player:setTitle(iid-17800+153, 0)
     end
     package:DelItemSendMsg(iid, player);
