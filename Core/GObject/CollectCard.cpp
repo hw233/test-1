@@ -382,7 +382,7 @@ namespace GObject
         if(item ==NULL)
             return ;
 
-        if((level < 30 || level > 130) && level != 400 && level != 500)
+        if((level < 30 || level > 140) && level != 400 && level != 500)
             return ;
         static UInt8 PCardChance[]= {5,5,4,3,3,4,2,2};
         static UInt8 PCardChance61[]= {2,3,4,5};
