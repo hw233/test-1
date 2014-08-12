@@ -115,6 +115,7 @@ function loadStore()
 
         discount(store)
 
+    store:add(2, 17017, 50)
     if getSeekingHer() then
         store:add(2, 16025, 9)
         store:add(2, 16026, 99)
