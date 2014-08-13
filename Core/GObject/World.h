@@ -1236,9 +1236,9 @@ public:
     {
         UInt32 now = TimeUtil::Now() + time;
         UInt32 time20140802 = TimeUtil::MkTime(2014, 8, 2);
-        UInt32 time20140916 = TimeUtil::MkTime(2014, 9, 16);
+        UInt32 time20140920 = TimeUtil::MkTime(2014, 9, 20);
         
-        if(now < time20140802 || now > time20140916)
+        if(now < time20140802 || now > time20140920)
             return false;
         return true;
     }

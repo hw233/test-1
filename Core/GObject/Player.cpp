@@ -35103,8 +35103,8 @@ void Player::firstPotOfGold(UInt32 total)
             UInt8 flag = GET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i);
             if(flag)
                 return;
-            SYSMSG(title, 5213);
-            SYSMSGV(content, 5214, rechargeLvl[i], rechargeLvl[i]);
+            SYSMSG(title, 5187);
+            SYSMSGV(content, 5188, rechargeLvl[i], rechargeLvl[i]);
             Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
@@ -35113,7 +35113,7 @@ void Player::firstPotOfGold(UInt32 total)
                 };
                 mailPackageManager.push(mail->id, mitem, 1, true);
             }
-            SYSMSG_BROADCASTV(5215, getCountry(), getName().c_str(), rechargeLvl[i]);
+            SYSMSG_BROADCASTV(5189, getCountry(), getName().c_str(), rechargeLvl[i]);
             SetVar(VAR_FIRST_POT_GOLD_STATUS, SET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i));
             firstPotOfGoldReturn(0);
             char str[32] = {0};
