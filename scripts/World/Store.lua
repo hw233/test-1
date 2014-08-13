@@ -115,6 +115,9 @@ function loadStore()
 
         discount(store)
 
+    if getKillMonsterAct() then
+        store:add(2, 16049, 10)
+    end
     store:add(2, 17017, 50)
     if getSeekingHer() then
         store:add(2, 16025, 9)
@@ -185,10 +188,6 @@ function loadStore()
     end
     if getHappyFireTime(300) then
         store:add(2, 16048, 20)
-    end
-
-    if getKillMonsterAct() then
-        store:add(2, 9416, 10)
     end
 
     if getCollectCardAct() then

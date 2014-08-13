@@ -18062,11 +18062,11 @@ namespace GObject
             sendMsgCode(0, 1011);
             return;
         }
-        if(GetPackage()->GetItemAnyNum(9416) < 1)
+        if(GetPackage()->GetItemAnyNum(16049) < 1)
         {
             return;
         }
-        GetPackage()->DelItemAny(9416, 1);
+        GetPackage()->DelItemAny(16049, 1);
         GameAction()->onGetKillMonsterReward(this);
         udpLog("916", "F_1099", "", "", "", "", "act");
     }
