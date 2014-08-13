@@ -11790,6 +11790,41 @@ function ItemNormal_00016043(id, num, bind, param)
     return num;
 end
 
+function ItemNormal_00016051(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 1 + num/99 then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    local prob = {800, 1600, 2400, 3100, 3800, 4500, 5100, 5700, 6200, 6700, 7200, 7600, 8000, 8400, 8800, 9100, 9400, 9600, 9800, 10000}
+    local items = {{500,1}, {15,1}, {511,1}, {512,1}, {33,1}, {8000,1}, {513,1}, {517,1}, {516,1}, {547,1}, {551,1}, {9498,1}, {16001,1}, {9438,1}, {9414,1}, {9600,1}, {9457,1}, {134,1}, {1325,1}, {499,100}}
+
+    for k = 1, num do
+        local p = math.random(1, 10000)
+        local i = 1
+        for n = 1, #prob do
+            if p <= prob[n] then
+                i = n
+                break
+            end
+        end
+
+        local item = items[i];
+        if item[1] == 499 then
+            player:getCoupon(item[1][2])
+        else
+            package:AddItem(item[1], item[2], 1, 0, 2);
+        end
+
+        if i > 7 then
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_143.."[4:"..item[1]..msg_144);
+        end
+
+    package:DelItemSendMsg(id, player);
+    return num;
+end
 
 
 local ItemNormal_Table = {
@@ -14262,6 +14297,7 @@ local ItemNormal_Table = {
     [16044] = ItemNormal_00016043,
     [16045] = ItemNormal_00016043,
     [16046] = ItemNormal_00016043,
+    [16051] = ItemNormal_00016051,
 
     [17002] = ItemNormal_00017002,
     [17003] = ItemNormal_00017003,

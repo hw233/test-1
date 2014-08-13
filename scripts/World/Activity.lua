@@ -1530,7 +1530,7 @@ function initActTime(y, m, d)
   local  SerStartTm257= { ['year'] = 2014, ['month'] = 1, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm257_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
-  local  SerStartTmq1= { ['year'] = 2014, ['month'] = 6, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTmq1= { ['year'] = 2014, ['month'] = 9, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTmq2= { ['year'] = 2014, ['month'] = 7, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --众里寻他
@@ -2024,7 +2024,7 @@ function initActTime(y, m, d)
   actTime_2013_1_1 = os.time(SerStartTm_2013_1) + 7*86400;
 
   actTimeq1= os.time(SerStartTmq1)
-  actTimeq1_1= os.time(SerStartTmq1) + 86400;
+  actTimeq1_1= os.time(SerStartTmq1) + 86400 * 3;
 
   actTimeSeekingHer = os.time(SerStartSeekingHer1)
   actTimeSeekingHer_1 = os.time(SerStartSeekingHer2)

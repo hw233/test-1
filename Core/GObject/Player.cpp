@@ -25556,14 +25556,14 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
     {
         if(flag == e_sla_none)
         {
-            GetPackage()->Add(138, 1, true, false, FromNpc);
+            GetPackage()->Add(16051, 1, true, false, FromNpc);
         }
-        else
+        else if(flag == e_sla_cb || flag == e_sla_clb || flag == e_sla_hi || flag == e_sla_ncb || flag == e_sla_rb || flag == e_sla_mr || flag == e_sla_ccb)
         {
             UInt32 status = GetVar(VAR_DROP_ACT);
             if(!(status & flag))
             {
-                GetPackage()->Add(138, 1, true, false, FromNpc);
+                GetPackage()->Add(16051, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_DROP_ACT, status);
             }
