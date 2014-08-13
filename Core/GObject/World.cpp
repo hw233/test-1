@@ -2067,6 +2067,8 @@ void World::World_Fire_Sacrifice_Check( World * world )
 
 void World::World_Seeking_Her_Check(void *)
 {
+    if(!getSeekingHer())
+        return;
     if(World::seekingHerCharmSort.size() && World::seekingHerZhiNvSort.size() && World::seekingHerNiuLangSort.size())
     {
         RCSortType::iterator i = World::seekingHerCharmSort.begin();
