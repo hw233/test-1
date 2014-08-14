@@ -786,28 +786,7 @@ function onActivityCheck(tm)
           setNeedConsumeRank(false)
       end
 
-      if tm >= actTime534 and tm < actTime534_1 then
-          setRechargeActive(true, 16)
-          setNeedRechargeRank(true)
-      elseif tm >= actTime539 and tm < actTime539_1 then
-          setRechargeActive(true, 16)
-          setNeedRechargeRank(true)
-      elseif tm >= actTime560 and tm < actTime560_1 then
-          setRechargeActive(true, 16)
-          setNeedRechargeRank(true)
-      elseif tm >= actTime561 and tm < actTime561_1 then
-          setRechargeActive(true, 16)
-          setNeedRechargeRank(false)
-      elseif tm >= actTime562 and tm < actTime562_1 then
-          setRechargeActive(true, 16)
-          setNeedRechargeRank(true)
-      elseif tm >= actTime563 and tm < actTime563_1 then
-          setRechargeActive(true, 16)
-          setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
-          setRechargeActive(true, 16)
-          setNeedRechargeRank(true)
-      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+489*86400 then
+      if tm >= actTime2013_04_14 and tm < actTime2013_04_14+496*86400 then
           -- RECHARGE
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
