@@ -4537,11 +4537,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9498,40},{9600,30},{9457,40},{9068,30},{0,0}},
-        {{9498,35},{9600,25},{9457,35},{9068,20},{0,0}},
-        {{9498,30},{9600,20},{9457,30},{9068,15},{0,0}},
+        {{9498,40},{554,30},{9457,40},{9075,30},{0,0}},
+        {{9498,35},{554,25},{9457,35},{9075,20},{0,0}},
+        {{9498,30},{554,20},{9457,30},{9075,15},{0,0}},
     };
-    static MailPackage::MailItem card = {9987,1};
+    static MailPackage::MailItem card = {9998,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
