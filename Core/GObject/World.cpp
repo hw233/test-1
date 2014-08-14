@@ -5506,7 +5506,7 @@ void World::SendTYSSPlayerAward(UInt8 actType)
             int type = pos > 3 ? 4 : pos;
             SYSMSGV(content, 951, pos);
 	        MailPackage::MailItem *items;
-	        MailPackage::MailItem *tmp_items;
+	        MailPackage::MailItem *tmp_items = NULL;
             if(actType == 1)
                 items = s_item[type-1]; 
             else
