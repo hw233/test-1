@@ -345,6 +345,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140804_aLingbaoFall.sql #create fighter_lingbaoFall
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_modify_clan_founder.sql #modify clan founder
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar182_187.sql        #清除仗剑江湖蜀山路
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #中秋节节日套装(var294)
 }

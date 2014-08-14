@@ -28639,11 +28639,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             UInt32 fifth_steps = 70000;
             if(actType == 2) 
             {
-                one_steps = 2000;
-                two_steps = 14000;
-                three_steps = 23000;
-                third_steps = 46000;
-                fifth_steps = 65000;
+                one_steps = 1000;
+                two_steps = 6000;
+                three_steps = 16000;
+                third_steps = 30000;
+                fifth_steps = 46000;
             }
 
             if(clan_contribute < 100 && clan_sum < one_steps)
