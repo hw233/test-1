@@ -1158,7 +1158,7 @@ function onActivityCheck(tm)
   end
 
   -- ACC
-  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 204*86400) then
+  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 211*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)
