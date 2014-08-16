@@ -2660,6 +2660,31 @@ namespace GObject
             }
         }
     }
+
+    void ClanRankBattleMgr::clanLocalRankInit()
+    {
+        m_ClanRanking.clear();
+        class GetClansVisitor : public Visitor<Clan>
+        {
+        public:
+            GetClansVisitor(ClanVec& list)
+                :m_ClanList(list){}
+
+            bool operator()(Clan* clan)
+            {
+                if(clan->GetBattleScore() != 0){
+                    m_ClanList.push_back(clan);
+                }
+                return true;
+            }
+
+        private:
+            ClanVec& m_ClanList;
+        };
+        GetClansVisitor visitor(m_ClanRanking);
+        globalClans.enumerate(visitor);
+        SortClans(false);
+    }
 }
 
 

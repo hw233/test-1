@@ -437,6 +437,7 @@ namespace GObject
         const ClanVec& getClanRanking() const { return m_ClanRanking; }
         void removeClanRank(Clan* clan);
         void clanLocalRank();
+        void clanLocalRankInit();
 
         void sendDaily(Player* player);
 

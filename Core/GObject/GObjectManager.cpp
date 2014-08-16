@@ -3964,11 +3964,6 @@ namespace GObject
 			clanBattle->setHallEdurance(cl.hallEdurance);
 		}
 		lc.finalize();
-        if(GVAR.GetVar(GVAR_CLAN_LOCAL_RANK) == 0)
-        {
-            GVAR.SetVar(GVAR_CLAN_LOCAL_RANK, 1);
-            ClanRankBattleMgr::Instance().clanLocalRank();
-        }
 
 		UInt32 now = TimeUtil::Now();
 		UInt32 thisDay = TimeUtil::SharpDay(0, now);
@@ -4067,6 +4062,12 @@ namespace GObject
 		globalClans.enumerate(cacheClan, 0);
         if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
             GVAR.SetVar(GVAR_REPAIRTYSSBUG,1);
+        if(GVAR.GetVar(GVAR_CLAN_LOCAL_RANK) == 0)
+        {
+            GVAR.SetVar(GVAR_CLAN_LOCAL_RANK, 1);
+            ClanRankBattleMgr::Instance().clanLocalRankInit();
+            ClanRankBattleMgr::Instance().clanLocalRank();
+        }
 
         lc.prepare("Loading clan item:");
         DBClanItem ci;
