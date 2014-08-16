@@ -3336,14 +3336,14 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             UInt8 op = 0;
             brd >> op;
 
-            if(1!=op && !World::getAnswerTime())
+            if(1!=op && !World::getAnswerTime_Day())
                 return;
 
             switch(op)
             {
                 case 0x01:
                     {
-                        if(!World::getPrepareTime())
+                        if(!World::getPrepareTime_Day())
                             break;
 
                         UInt32 nowTime = TimeUtil::Now();

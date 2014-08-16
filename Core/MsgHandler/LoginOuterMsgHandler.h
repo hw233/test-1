@@ -4078,7 +4078,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 21 && begin <= end )
     {
-        curType = 21;
+        /*curType = 21;
         ret = 1;
         Stream st(SPEP::ACTIVITYONOFF);
         st << ret << Stream::eos;
@@ -4107,6 +4107,21 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         }
         GObject::GVAR.SetVar(GObject::GVAR_ANSWER_ENDTIME, valueTimeA);
         GObject::GVAR.SetVar(GObject::GVAR_ANSWER_AWARDTIME, valueTimeB);
+
+        return;*/
+
+        curType = 21;
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
+        }
+
+        GObject::GVAR.SetVar(GObject::GVAR_ANSWER_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_ANSWER_END, end);
 
         return;
     }

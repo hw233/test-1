@@ -386,10 +386,10 @@ public:
     { _dropact = v; }
     inline static bool getDropAct()
     { return _dropact; }
-    inline static void setAnswerAct(bool v)
+    /*inline static void setAnswerAct(bool v)
     { _answeract = v; }
     inline static bool getAnswerAct()
-    { return _answeract; }
+    { return _answeract; }*/
     inline static void setWansheng(bool v)
     { _wansheng= v; }
     inline static bool getWansheng()
@@ -1102,25 +1102,36 @@ public:
             return false;
     }
 
-    inline static bool getPrepareTime(UInt32 time = 0)
+    // 一战成名活动时间
+    inline static bool getAnswerTime_Act(UInt32 time = 0)
     {
-        UInt32 begin = GVAR.GetVar(GVAR_ANSWER_PREPARE_DAY);
-        UInt32 end = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY);
+        UInt32 begin = GVAR.GetVar(GVAR_ANSWER_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_ANSWER_END);
         UInt32 now = TimeUtil::Now();
 
-        if(now >= begin && now < end)
+        if(now >= begin && now <= end)
             return true;
         else
             return false;
     }
 
-    inline static bool getAnswerTime(UInt32 time = 0)
+    // 一战成名每天准备时间
+    inline static bool getPrepareTime_Day(UInt32 time = 0)
     {
-        UInt32 begin = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY);
-        UInt32 end = GVAR.GetVar(GVAR_ANSWER_END_DAY);
         UInt32 now = TimeUtil::Now();
 
-        if(now >= begin && now <= end)
+        if(now >= _gAnswerPrepareTime && now <= _gAnswerBeginTime)
+            return true;
+        else
+            return false;
+    }
+
+    // 一战成名每天答题时间
+    inline static bool getAnswerTime_Day(UInt32 time = 0)
+    {
+        UInt32 now = TimeUtil::Now();
+
+        if(now >= _gAnswerBeginTime && now <= _gAllAnswerEndTime_Day)
             return true;
         else
             return false;
@@ -1478,10 +1489,22 @@ public:
     static bool _duobaoOpen;
     static bool _answerOpenA;
     static bool _answerOpenB;
+    static bool _answerOpenC;
     static UInt32 _rbTimeRank;
     static UInt64 _worldCupAward;
+    static UInt32 _gAnswerPrepareTime;
+    static UInt32 _gAnswerBeginTime;
+    static UInt32 _gAnswerEndTime;
+    static UInt32 _gAnswerFinalTime;
+    static UInt32 _gAllAnswerEndTime_Day;
 #define MAX_WC_COUNT 63
     static UInt32 _worldCup[MAX_WC_COUNT][4];   //支持度  1-胜 2-负 3-平 4-结果 (注意标号需要-1)
+#define ANSWER_PREPARE_TIME    19*60*60 + 15*60 
+#define ANSWER_BROADCASTA_TIME 19*60*60 + 20*60 
+#define ANSWER_BROADCASTB_TIME 19*60*60 + 25*60 
+#define ANSWER_BEGIN_TIME      19*60*60 + 30*60
+#define ANSWER_ALLEND_TIME     19*60*60 + 45*60
+
 public:
     static RCSortType answerScoreSort;     //一战成名排名
     static RCSortType qishibanScoreSort;     //七石板积分排名

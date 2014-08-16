@@ -1142,11 +1142,11 @@ function onActivityCheck(tm)
           setSeekingHer(false)
       end
 
-      if tm >= actTimeq2 and tm < actTimeq2_1 then
+      --[[if tm >= actTimeq2 and tm < actTimeq2_1 then
           setAnswerAct(true)
       else
           setAnswerAct(false)
-      end
+      end--]]
 
       setShuoShuo(true);
   end
@@ -1531,7 +1531,7 @@ function initActTime(y, m, d)
   local  SerStartTm257_1= { ['year'] = 2014, ['month'] = 2, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTmq1= { ['year'] = 2014, ['month'] = 6, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTmq2= { ['year'] = 2014, ['month'] = 7, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --local  SerStartTmq2= { ['year'] = 2014, ['month'] = 7, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --众里寻他
   local  SerStartSeekingHer1= { ['year'] = 2014, ['month'] = 8, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -2029,8 +2029,8 @@ function initActTime(y, m, d)
   actTimeSeekingHer = os.time(SerStartSeekingHer1)
   actTimeSeekingHer_1 = os.time(SerStartSeekingHer2)
 
-  actTimeq2= os.time(SerStartTmq2)
-  actTimeq2_1= os.time(SerStartTmq2) + 5 * 86400;
+  --actTimeq2= os.time(SerStartTmq2)
+  --actTimeq2_1= os.time(SerStartTmq2) + 5 * 86400;
 
   onActivityCheck(os.time() + 30);
 
