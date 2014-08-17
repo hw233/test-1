@@ -173,7 +173,7 @@ public:
     static UInt8 _picCnt[16];
 private:
     PlaceData m_places[PPLACE_MAX];
-    std::map<UInt16, PlaceData*> vec_places;
+    std::map<UInt16, PlaceData*> map_places;
     std::map<UInt64, PracticeData*> m_pradata;
     static UInt8 _maxCount;
 };

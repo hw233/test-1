@@ -20,7 +20,7 @@ local addons = {
     [13] = 0.1
 }
 
-function calcPracticeInc( fgt )
+function calcPracticeInc( fgt , merged)
     if fgt == nil then
         return 0
     end
@@ -34,13 +34,11 @@ function calcPracticeInc( fgt )
         placeadd = 0
     end
 
-    --[[if place ~= 7 then
-        if not merged then
-            if place < 7 then
-                placeadd = addons[place + 7]
-            end
+    if not merged then
+        if place < 7 then
+            placeadd = addons[place + 7]
         end
-    end]]
+    end
 
     if place ~= 7 then
         clantechaddon = fgt:getClanTechAddon(place)

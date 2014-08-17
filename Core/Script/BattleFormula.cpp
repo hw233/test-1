@@ -574,9 +574,9 @@ float BattleFormula::calcAutoBattle( float mybp, float theirbp )
 	return call<float>("calcAutoBattle", mybp, theirbp);
 }
 
-float BattleFormula::calcPracticeInc( GObject::Fighter * fgt /*,bool merged*/)
+float BattleFormula::calcPracticeInc( GObject::Fighter * fgt ,bool merged)
 {
-	return call<float>("calcPracticeInc", fgt/*, merged*/);
+	return call<float>("calcPracticeInc", fgt, merged);
 }
 
 float BattleFormula::calcBasePExp( GObject::Fighter * fgt )

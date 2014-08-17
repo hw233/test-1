@@ -2321,6 +2321,42 @@ bool Clan::setWatchmanId(UInt64 watchman, bool writedb)
     return true;
 }
 
+bool Clan::impeachLeader(Player* player, UInt8 state)
+{
+#define IMPEACH_ITEM_ID 17017
+    if(!player)
+        return false;
+    ClanMember* mem = getClanMember(player);
+    if(!mem)
+        return false;
+    UInt32 joinTime = mem->joinTime;
+    UInt32 now = TimeUtil::Now();
+    if(now < joinTime + 86400 * 7)
+    {
+        player->sendMsgCode(0, 1377);
+        return false;
+    }
+
+    Player* leader = getLeader();
+    if(!leader)
+        return false;
+    if(now < leader->getLastOnline() + 86400 * 7)
+    {
+        player->sendMsgCode(0, 1378);
+        return false;
+    }
+
+    if(state == 0)
+        return true;
+
+    if(player->GetPackage()->GetItemAnyNum(IMPEACH_ITEM_ID) < 1)
+        return false;
+    player->GetPackage()->DelItemAny(IMPEACH_ITEM_ID, 1);
+    handoverLeader(leader, player->getId());
+    sendImpeachMail(player, leader);
+    return true;
+}
+
 void Clan::setConstruction(UInt64 cons, bool writedb)
 {
     if (cons == _construction)
@@ -2871,7 +2907,7 @@ void Clan::patchMergedName( UInt32 id, std::string& name )
 void Clan::patchMergedName( UInt16 serverId, std::string& name )
 {
     if(cfg.merged && serverId > 0)
-        Player::patchMergedName(static_cast<UInt64>(serverId) >> 48, name);
+        Player::patchMergedName(static_cast<UInt64>(serverId) << 48, name);
 }
 #endif
 float Clan::getClanTechAddon()
@@ -6307,6 +6343,19 @@ void Clan::clanFireSacrificeOp(Player * pl, UInt8 type)
         default:
             break;
     }
+}
+
+void Clan::sendImpeachMail(Player* player, Player* leader)
+{
+    if(!player || !leader)
+        return;
+	Mutex::ScopedLock lk(_mutex);
+	SYSMSG(title, 365);
+	SYSMSGV(content, 366, player->getName().c_str(), leader->getName().c_str(), getName().c_str());
+	for (Members::iterator offset = _members.begin(); offset != _members.end(); ++offset)
+	{
+		(*offset)->player->GetMailBox()->newMail(NULL, 0x01, title, content);
+	}
 }
 
 }

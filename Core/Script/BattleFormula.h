@@ -114,7 +114,7 @@ public:
 	float calcAction(Battle::BattleFighter *);
 
 	float calcDamage(float, float, float, float, float);
-    float calcPracticeInc(GObject::Fighter * /*, bool merged*/);
+    float calcPracticeInc(GObject::Fighter * , bool merged);
     float calcBasePExp(GObject::Fighter *);
     float calcPExpNoBuf(GObject::Fighter *);
     float calcClanTechAddon(UInt16 id, UInt8 lvl);

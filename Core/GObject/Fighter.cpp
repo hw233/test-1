@@ -4852,7 +4852,7 @@ float Fighter::getBasePExpEach()
 
 float Fighter::getPracticeInc()
 {
-    float ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this/*, cfg.merged*/);
+    float ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this, cfg.merged);
     return ret;
 }
 

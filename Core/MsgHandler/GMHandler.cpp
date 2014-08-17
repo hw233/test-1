@@ -4824,6 +4824,12 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_MOSTER_PET_BEGIN, 0);
             GVAR.SetVar(GVAR_MOSTER_PET_END, 0);
             break;
+        case 36:
+            GVAR.SetVar(GObject::GVAR_ANSWER_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GObject::GVAR_ANSWER_END, TimeUtil::SharpDayT(2));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
     }
 }
 

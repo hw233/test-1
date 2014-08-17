@@ -26564,20 +26564,20 @@ void Player::Send11GradeAward(UInt8 type)
         SetVar(VAR_11AIRBOOK_AWARDSCORE,gradeAward[type-1]);
 
     static MailPackage::MailItem s_item[][6] = {
-        {{9424,1}, {503,1}},
-        {{500,2},{56,2}},
-        {{9604,3},{9414,2}},
+        {{9418,1}, {503,1}},
+        {{500,2},{57,2},{9371,2}},
+        {{501,3},{9414,2}},
         {{516,2},{16001,2},{503,2}},
         {{547,3},{1126,3},{517,3}},
-        {{549,1},{501,3},{551,5}},
+        {{549,1},{554,3},{551,5}},
         {{9457,3},{9498,2},{509,2},{515,2},{9438,2}},
-        {{1729,1},{9076,5}},
-        {{9600,25},{9418,25},{16001,20}},
-        {{5137,1},{9498,30},{9075,15}},
-        {{9022,20},{9075,20},{1732,1}},
-        {{9021,20},{9068,20},{1733,1},{5067,1}},
+        {{1726,1},{9076,4}},
+        {{554,25},{9418,25},{16001,20}},
+        {{5067,1},{9498,30},{9068,15}},
+        {{9021,20},{9075,20},{1734,1}},
+        {{9022,20},{9068,20},{1735,1},{5057,1},{5037,1}},
     };
-    static UInt32 count[] = {2,2,2,3,3,3,5,2,3,3,3,4};
+    static UInt32 count[] = {2,3,2,3,3,3,5,2,3,3,3,5};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -28639,11 +28639,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             UInt32 fifth_steps = 70000;
             if(actType == 2) 
             {
-                one_steps = 2000;
-                two_steps = 14000;
-                three_steps = 23000;
-                third_steps = 46000;
-                fifth_steps = 65000;
+                one_steps = 1000;
+                two_steps = 6000;
+                three_steps = 16000;
+                third_steps = 30000;
+                fifth_steps = 46000;
             }
 
             if(clan_contribute < 100 && clan_sum < one_steps)
@@ -35103,8 +35103,8 @@ void Player::firstPotOfGold(UInt32 total)
             UInt8 flag = GET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i);
             if(flag)
                 return;
-            SYSMSG(title, 5213);
-            SYSMSGV(content, 5214, rechargeLvl[i], rechargeLvl[i]);
+            SYSMSG(title, 5187);
+            SYSMSGV(content, 5188, rechargeLvl[i], rechargeLvl[i]);
             Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
@@ -35113,7 +35113,7 @@ void Player::firstPotOfGold(UInt32 total)
                 };
                 mailPackageManager.push(mail->id, mitem, 1, true);
             }
-            SYSMSG_BROADCASTV(5215, getCountry(), getName().c_str(), rechargeLvl[i]);
+            SYSMSG_BROADCASTV(5189, getCountry(), getName().c_str(), rechargeLvl[i]);
             SetVar(VAR_FIRST_POT_GOLD_STATUS, SET_BIT(GetVar(VAR_FIRST_POT_GOLD_STATUS), i));
             firstPotOfGoldReturn(0);
             char str[32] = {0};

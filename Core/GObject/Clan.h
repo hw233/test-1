@@ -401,6 +401,7 @@ public:
 	inline std::string getFounderName() { return _founderName; }
 	void setLeaderId(UInt64, bool = true);
 	bool setWatchmanId(UInt64, bool = true);
+    bool impeachLeader(Player* player, UInt8 state);
 	inline UInt64 getWatchmanId() { return _watchman; }
 	void fixLeaderId();
 	inline UInt64 getLeaderId() { return _leader; }
@@ -628,6 +629,8 @@ public:
     UInt32 getGradeInAirBook(){return  _gradeInAirbook;}
     void SendClanMemberGrade(Player* player);
     UInt8 skillLevelUp(Player* pl, UInt8 skillId);
+    void sendImpeachMail(Player* player, Player* leader);
+
 public:
 	inline UInt8 getLev() { return _level; }
 

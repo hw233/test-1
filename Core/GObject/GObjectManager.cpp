@@ -3936,7 +3936,6 @@ namespace GObject
                 clan->SetClanTitle(cl.clantitleAll);
                 clan->SetClanFireValue(cl.clanFireValue);
                 clan->SetClanAutoApply(cl.clanAutoApply);
-
                 if(cfg.merged && cl.serverId == 0)
                 {
                     cl.serverId = cl.founder >> 48;

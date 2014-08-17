@@ -41,8 +41,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             Clan * cl = pl->getClan();
             if(!cl)
                 return false;
-            std::map<UInt16, PlaceData*>::iterator target = vec_places.find(cl->GetClanServerId());
-            if(target == vec_places.end())
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(cl->GetClanServerId());
+            if(target == map_places.end())
                 return false;
             m_places_T = target->second;
         }
@@ -327,8 +327,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             Clan * cl = pl->getClan();
             if(!cl)
                 return false;
-            std::map<UInt16, PlaceData*>::iterator target = vec_places.find(cl->GetClanServerId());
-            if(target == vec_places.end())
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(cl->GetClanServerId());
+            if(target == map_places.end())
                 return false;
             m_places_T = target->second;
         }
@@ -613,8 +613,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             if(!cl)
             {
                 UInt16 serverId = pl->getServerNo();
-                std::map<UInt16, PlaceData*>::iterator target = vec_places.find(serverId);
-                if(target != vec_places.end())
+                std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+                if(target != map_places.end())
                 {
                     for (int i = 0; i < PPLACE_MAX - 1; ++i) 
                     {
@@ -688,8 +688,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             else
             {
                 UInt16 serverId = cl->GetClanServerId();
-                std::map<UInt16, PlaceData*>::iterator target = vec_places.find(serverId);
-                if(target != vec_places.end())
+                std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+                if(target != map_places.end())
                 {
                     for (int i = 0; i < PPLACE_MAX - 1; ++i) 
                     {
@@ -1222,8 +1222,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         PlaceData * m_places_T;
         if(serverId)
         {
-            std::map<UInt16, PlaceData*>::iterator target = vec_places.find(serverId);
-            if(target == vec_places.end())
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+            if(target == map_places.end())
                 return false;
             m_places_T = target->second;
         }
@@ -1293,9 +1293,9 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         }
         else
         {
-            if(vec_places.count(place.serverId))
+            if(map_places.count(place.serverId))
             {
-                std::map<UInt16, PlaceData*>::iterator target = vec_places.find(place.serverId);
+                std::map<UInt16, PlaceData*>::iterator target = map_places.find(place.serverId);
                 PlaceData& pd = target->second[idx];
                 pd.place = place;
                 pd.data.resize(place.maxslot);
@@ -1305,7 +1305,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                 PlaceData * pd = new PlaceData[PPLACE_MAX];
                 pd[idx].place = place;
                 pd[idx].data.resize(place.maxslot);
-                vec_places.insert(std::make_pair(place.serverId, pd));
+                map_places.insert(std::make_pair(place.serverId, pd));
             }
         }
         return true;
@@ -1320,8 +1320,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             Clan * cl = pl->getClan();
             if(!cl)
                 return false;
-            std::map<UInt16, PlaceData*>::iterator target = vec_places.find(cl->GetClanServerId());
-            if(target == vec_places.end())
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(cl->GetClanServerId());
+            if(target == map_places.end())
                 return false;
             m_places_T = target->second;
         }
@@ -1458,8 +1458,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
     {
         if(serverId)
         {
-            std::map<UInt16, PlaceData*>::iterator target = vec_places.find(serverId);
-            if(target == vec_places.end())
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+            if(target == map_places.end())
                 return 0;
             else
                 return target->second[place - 1].place.ownerid;
@@ -1475,18 +1475,44 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
     {
         if (!newpl || !oldpl)
             return false;
+        UInt8 localPlace = 0;
+        UInt8 globalPlace = 0;
 
         UInt8 idx = 0;
         for(; idx < PPLACE_MAX; ++idx)
         {
             if(oldpl->getId() == m_places[idx].place.ownerid)
+            {
+                localPlace = idx;
                 break;
+            }
         }
 
-        if(idx >= PPLACE_MAX - 1)
-            return false;
+        Clan * cl = oldpl->getClan();
+        if(cfg.merged && cl)
+        {
+            UInt16 serverId = cl->GetClanServerId();
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+            if(target != map_places.end())
+            {
+                for(idx = 0; idx < PPLACE_MAX; ++idx)
+                {
+                    if(oldpl->getId() == target->second[idx].place.ownerid)
+                    {
+                        globalPlace = idx;
+                        break;
+                    }
+                }
+            }
+        }
 
-        return replaceOwner(newpl, idx+1);
+        bool bRet = false;
+        if(localPlace != 0)
+            bRet = replaceOwner(newpl, localPlace + 1);
+        if(globalPlace != 0)
+            bRet |= replaceOwner(newpl, globalPlace + 8);
+
+        return bRet;
     }
 
     bool PracticePlace::replaceOwner(Player* newpl, UInt8 place)
@@ -1558,8 +1584,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         {
             if (oldpl)
             { // 易主易帮
-                std::map<UInt16, PlaceData*>::iterator target = vec_places.find(serverId);
-                if(target == vec_places.end())
+                std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+                if(target == map_places.end())
                     return false;
 
                 PlaceData& pd = target->second[place-1];
@@ -1590,8 +1616,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             else
             { // 设主
 
-                std::map<UInt16, PlaceData*>::iterator target = vec_places.find(serverId);
-                if(target != vec_places.end())
+                std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+                if(target != map_places.end())
                 {
                     PPlace place_t;
                     place_t.id = place;
@@ -1612,9 +1638,9 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                     PlaceData * pd = new PlaceData[PPLACE_MAX];
                     pd[place - 1].place = place_t;
                     pd[place - 1].data.resize(place_t.maxslot);
-                    vec_places.insert(std::make_pair(serverId, pd));
-                    target = vec_places.find(serverId);
-                    if(target == vec_places.end())
+                    map_places.insert(std::make_pair(serverId, pd));
+                    target = map_places.find(serverId);
+                    if(target == map_places.end())
                         return false;
                 }
 
@@ -1744,7 +1770,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             m_places[idx].place.protincoming = 0;
         }
 
-        for(std::map<UInt16, PlaceData*>::iterator i = vec_places.begin(), e = vec_places.end(); i != e; i++)
+        for(std::map<UInt16, PlaceData*>::iterator i = map_places.begin(), e = map_places.end(); i != e; i++)
         {
             idx = 0;
             for(; idx < PPLACE_MAX; idx ++)
