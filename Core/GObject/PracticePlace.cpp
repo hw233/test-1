@@ -1451,6 +1451,15 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
 
         DB1().PushUpdateData("UPDATE `practice_data` SET `place` = %u, `slot` = 0, `type` = 0, `slotprice` = 0, `protprice` = 0, `prot` = 0 WHERE `place` = %u", PPLACE_MAX, place);
         DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = 0, `protid` = 0, `maxslot` = 30, `openslot` = 0, `protmoney` = 0, `slotmoney` = 0, `enemyCount` = 0, `winCount` = 0, `slotincoming` = 0, `protincoming` = 0 WHERE id = %u", place);
+        if(cfg.merged)
+        {
+            for(std::map<UInt16, PlaceData*>::iterator it = map_places.begin(); it != map_places.end(); it ++)
+            {
+                it->second[place - 1].reset();
+            }
+            DB1().PushUpdateData("UPDATE `practice_data` SET `place` = %u, `slot` = 0, `type` = 0, `slotprice` = 0, `protprice` = 0, `prot` = 0 WHERE `place` = %u", PPLACE_MAX, place + 7);
+        }
+
         return;
     }
 
