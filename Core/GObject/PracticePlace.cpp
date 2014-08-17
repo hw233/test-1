@@ -1624,6 +1624,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                     place_t.ownerid = newpl->getId();
                     place_t.maxslot = 30;
                     place_t.serverId = serverId;
+                    place_t.open = 0;
+                    place_t.protid = 0;
                     PlaceData& pd = target->second[place - 1];
                     pd.place = place_t;
                     pd.data.resize(place_t.maxslot);
@@ -1635,6 +1637,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                     place_t.ownerid = newpl->getId();
                     place_t.maxslot = 30;
                     place_t.serverId = serverId;
+                    place_t.open = 0;
+                    place_t.protid = 0;
                     PlaceData * pd = new PlaceData[PPLACE_MAX];
                     pd[place - 1].place = place_t;
                     pd[place - 1].data.resize(place_t.maxslot);

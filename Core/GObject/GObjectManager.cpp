@@ -3892,7 +3892,7 @@ namespace GObject
 				clan->addEnemyClanFromDB(cl.enemyClan2);
 				//clan->patchMergedName();
                 clan->setClanFunds(cl.funds);
-                if(cl.founder == 0)
+                if(cl.founder == 0 && cl.leader != 0)
                 {
                     cl.founder = cl.leader;
                     DB5().PushUpdateData("UPDATE `clan` SET `founder` = %u WHERE `id` = %u", cl.founder, cl.id);
