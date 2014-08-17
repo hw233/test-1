@@ -34,6 +34,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot)
     {
         PlaceData * m_places_T;
+        UInt8 place_tmp = place;
         if(place >= 8 && place <= 13)
         {
             place -= 7;
@@ -283,12 +284,12 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         pp->cdend = now + pp->traintime * 60 + 60 * 60;
         pp->winnerid = 0;
 
-        DB1().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %" I64_FMT "u, '')", pl->getId(), place + 7, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
+        DB1().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %" I64_FMT "u, '')", pl->getId(), place_tmp, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
 
-        pl->setPracticingPlaceSlot(place << 16 | slot);
+        pl->setPracticingPlaceSlot(place_tmp << 16 | slot);
         addPractice(pl, pp, place, slot); // XXX: must be here after setPracticingPlaceSlot
 
-        st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << pl->getPIcCount() << static_cast<UInt8>(place - 1) << static_cast<UInt8>(0) << Stream::eos;
+        st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << pl->getPIcCount() << static_cast<UInt8>(place_tmp - 1) << static_cast<UInt8>(0) << Stream::eos;
         pl->send(st);
         //抢占修炼之后自动将玩家参战将领加入修炼位
         for(int idx = 0; idx < 5; ++idx){
@@ -318,8 +319,11 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         UInt16 slot = pl->getPracticeSlot();
 
         PlaceData * m_places_T;
-        if(place != 7)
+        if(place > 7)
         {
+            if(place > PPLACE_MAX + 6)
+                return false;
+            place -= 7;
             Clan * cl = pl->getClan();
             if(!cl)
                 return false;
@@ -539,7 +543,19 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             if (i >= static_cast<int>(addons.size()))
                 st << static_cast<UInt16>(100);
             else
-                st << static_cast<UInt16>(addons[i]);
+            {
+                UInt32 factor;
+                if(i == 6)
+                    factor = addons[i];
+                else
+                {
+                    if(!cfg.merged)
+                        factor = addons[i + 7];
+                    else
+                        factor = addons[i];
+                }
+                st << static_cast<UInt16>(factor);
+            }
 
             PPlace& data = m_places[i].place;
             st << data.slotmoney;
@@ -1582,7 +1598,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                     place_t.ownerid = newpl->getId();
                     place_t.maxslot = 30;
                     place_t.serverId = serverId;
-                    PlaceData& pd = target->second[place];
+                    PlaceData& pd = target->second[place - 1];
                     pd.place = place_t;
                     pd.data.resize(place_t.maxslot);
                 }
@@ -1594,8 +1610,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                     place_t.maxslot = 30;
                     place_t.serverId = serverId;
                     PlaceData * pd = new PlaceData[PPLACE_MAX];
-                    pd[place].place = place_t;
-                    pd[place].data.resize(place_t.maxslot);
+                    pd[place - 1].place = place_t;
+                    pd[place - 1].data.resize(place_t.maxslot);
                     vec_places.insert(std::make_pair(serverId, pd));
                     target = vec_places.find(serverId);
                     if(target == vec_places.end())

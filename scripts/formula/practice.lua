@@ -34,6 +34,14 @@ function calcPracticeInc( fgt )
         placeadd = 0
     end
 
+    --[[if place ~= 7 then
+        if not merged then
+            if place < 7 then
+                placeadd = addons[place + 7]
+            end
+        end
+    end]]
+
     if place ~= 7 then
         clantechaddon = fgt:getClanTechAddon(place)
     else

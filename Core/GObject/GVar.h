@@ -168,6 +168,9 @@ namespace GObject
 
         GVAR_MOSTER_PET_BEGIN = 107,          //妖王，珍兽收费减半
         GVAR_MOSTER_PET_END = 108,          
+
+        GVAR_CLAN_LOCAL_RANK = 109,
+
         GVAR_MAX,
     };
 
@@ -306,6 +309,7 @@ namespace GObject
             GREGISTER_VAR(GVAR_11TIME_END, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_MOSTER_PET_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_MOSTER_PET_END, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_CLAN_LOCAL_RANK, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

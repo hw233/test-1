@@ -2350,8 +2350,7 @@ namespace GObject
                 if(TimeUtil::GetWeekDay(m_Now) == 7 && TimeUtil::GetWeekDay(m_StartTime) != 7)
                 {
                     GiveWeeklyRewards();
-                    if(cfg.merged)
-                        clanLocalRank();
+                    clanLocalRank();
                 }
 
                 //每天比赛结束发布前六名
@@ -2640,6 +2639,8 @@ namespace GObject
 
     void ClanRankBattleMgr::clanLocalRank()
     {
+        if(!cfg.merged)
+            return;
         //各本服单独排名，并且分山头
         for(ClanVec::iterator iter = m_ClanRanking.begin(); iter != m_ClanRanking.end(); ++iter)
         {

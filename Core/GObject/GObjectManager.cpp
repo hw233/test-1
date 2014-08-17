@@ -81,6 +81,7 @@
 #include "GObject/Married.h"
 #include "GData/SevenSoul.h"
 #include "GObject/ClanBigBoss.h"
+#include "GObject/ClanRankBattle.h"
 
 namespace GObject
 {
@@ -3891,6 +3892,11 @@ namespace GObject
 				clan->addEnemyClanFromDB(cl.enemyClan2);
 				//clan->patchMergedName();
                 clan->setClanFunds(cl.funds);
+                if(cl.founder == 0)
+                {
+                    cl.founder = cl.leader;
+                    DB5().PushUpdateData("UPDATE `clan` SET `founder` = %u WHERE `id` = %u", cl.founder, cl.id);
+                }
 				clan->setFounder(cl.founder);
 				clan->setLeaderId(cl.leader, false);
 				clan->setWatchmanId(cl.watchman, false);
@@ -3933,11 +3939,7 @@ namespace GObject
 
                 if(cfg.merged && cl.serverId == 0)
                 {
-                    if(cl.founder)
-                        cl.serverId = cl.founder >> 48; 
-                    else if(cl.leader)
-                        cl.serverId = cl.leader >> 48;
-
+                    cl.serverId = cl.founder >> 48;
                     if(cl.serverId != 0)
                         DB5().PushUpdateData("UPDATE `clan` SET `serverId` = %u WHERE `id` = %u", cl.serverId, cl.id);
                 }
@@ -3963,6 +3965,11 @@ namespace GObject
 			clanBattle->setHallEdurance(cl.hallEdurance);
 		}
 		lc.finalize();
+        if(GVAR.GetVar(GVAR_CLAN_LOCAL_RANK) == 0)
+        {
+            GVAR.SetVar(GVAR_CLAN_LOCAL_RANK, 1);
+            ClanRankBattleMgr::Instance().clanLocalRank();
+        }
 
 		UInt32 now = TimeUtil::Now();
 		UInt32 thisDay = TimeUtil::SharpDay(0, now);
