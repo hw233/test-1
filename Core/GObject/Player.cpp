@@ -96,6 +96,7 @@
 #include "Battle/BattleReport.h"
 #include "GObject/RaceBattle.h"
 #include "GData/ClanShop.h"
+#include "GObject/DarkDargon.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -2406,6 +2407,7 @@ namespace GObject
         }
         if(GetVar(GObject::VAR_MARRY_STATUS) == 5 || GetVar(GObject::VAR_MARRY_STATUS) == 6)
             gMarriedMgr.ProcessOnlineAward(this,1);
+        DarkDargon::Instance().QuitDarkDargon(this);
 
         SetVar(VAR_OFFLINE, curtime);
         PopTimerEvent(this, EVENT_AUTOBATTLE, 0);
@@ -2555,6 +2557,7 @@ namespace GObject
             gMarriedMgr.ProcessOnlineAward(this,1);
             gMarriedMgr.EnterCoupleCopy(this,0);
         }
+        DarkDargon::Instance().QuitDarkDargon(this);
         if(getDrinkInfo().drinker !=NULL )
         {
             if(getDrinkInfo().time != 0 )

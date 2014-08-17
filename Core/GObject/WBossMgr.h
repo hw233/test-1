@@ -193,6 +193,7 @@ public:
     void ReqBossId(Player* player,UInt32 loc);
     void UpdateInspire(Player* player);
     bool checkLocRight(Player* player,UInt16 loc);
+    void calInitDarkDargon(UInt32& lastHp,Int32& lastAtk,Int32& lastMAtk);
 
 private:
     UInt32 _prepareTime;
