@@ -1483,7 +1483,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         {
             if(oldpl->getId() == m_places[idx].place.ownerid)
             {
-                localPlace = idx;
+                localPlace = idx + 1;
                 break;
             }
         }
@@ -1499,7 +1499,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                 {
                     if(oldpl->getId() == target->second[idx].place.ownerid)
                     {
-                        globalPlace = idx;
+                        globalPlace = idx + 1;
                         break;
                     }
                 }
@@ -1508,9 +1508,9 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
 
         bool bRet = false;
         if(localPlace != 0)
-            bRet = replaceOwner(newpl, localPlace + 1);
+            bRet = replaceOwner(newpl, localPlace);
         if(globalPlace != 0)
-            bRet |= replaceOwner(newpl, globalPlace + 8);
+            bRet |= replaceOwner(newpl, globalPlace + 7);
 
         return bRet;
     }
