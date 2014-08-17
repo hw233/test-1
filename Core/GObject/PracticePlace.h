@@ -8,6 +8,7 @@
 #include <map>
 #include <list>
 #include <vector>
+#include "Config.h"
 
 #define PPLACE_MAX 7
 
@@ -19,6 +20,7 @@ class Player;
 // 山头信息
 struct PPlace
 {
+    UInt8 id;
     UInt64 ownerid;
     UInt64 protid;
     UInt16 maxslot;
@@ -31,9 +33,11 @@ struct PPlace
     UInt16 winCount;
     UInt32 protincoming;
     UInt32 slotincoming;
+    UInt16 serverId;
 
     void reset()
     {
+        id = 0;
         ownerid = 0;
         protid = 0;
         maxslot = 30;
@@ -46,6 +50,7 @@ struct PPlace
         winCount = 0;
         protincoming = 0;
         slotincoming = 0;
+        serverId = 0;
     }
 };
 
@@ -138,7 +143,7 @@ public:
     bool addSlot(Player* pl);
 
     // 通过帮派科技增加修炼空间
-    bool addSlotFromTech(Player* pl, UInt8 place = 0);
+    bool addSlotFromTech(Player* pl, UInt8 place = 0, UInt16 serverId = 0);
 
     // 山头易主
     bool replaceOwner(Player* newpl, Player* oldpl);
@@ -155,7 +160,7 @@ public:
     PracticeData* getPracticeData(UInt64 playerid);
     PracticeData* getPracticeData(Player* pl);
     bool delPracticeData(Player* pl);
-    UInt64 getPlaceOwnerId(UInt8 place);
+    UInt64 getPlaceOwnerId(UInt8 place, UInt16 serverId);
 
     PlaceData* getPlaceData(Player* pl, UInt8& place);
     PlaceData* getPlaceData(UInt64 playerId, UInt8& place);
@@ -168,6 +173,7 @@ public:
     static UInt8 _picCnt[16];
 private:
     PlaceData m_places[PPLACE_MAX];
+    std::map<UInt16, PlaceData*> vec_places;
     std::map<UInt64, PracticeData*> m_pradata;
     static UInt8 _maxCount;
 };

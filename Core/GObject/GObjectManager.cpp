@@ -3870,7 +3870,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum`, `clantitleAll`,`clanFireValue`,`clanAutoApply`  FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum`, `clantitleAll`,`clanFireValue`,`clanAutoApply`, `serverId`  FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -3893,7 +3893,6 @@ namespace GObject
                 clan->setClanFunds(cl.funds);
 				clan->setFounder(cl.founder);
 				clan->setLeaderId(cl.leader, false);
-                clan->patchMergedName();
 				clan->setWatchmanId(cl.watchman, false);
 				clan->setConstruction(cl.construction, false);
                 clan->LoadBattleScore(cl.battleScore);
@@ -3931,6 +3930,19 @@ namespace GObject
                 clan->SetClanTitle(cl.clantitleAll);
                 clan->SetClanFireValue(cl.clanFireValue);
                 clan->SetClanAutoApply(cl.clanAutoApply);
+
+                if(cfg.merged && cl.serverId == 0)
+                {
+                    if(cl.founder)
+                        cl.serverId = cl.founder >> 48; 
+                    else if(cl.leader)
+                        cl.serverId = cl.leader >> 48;
+
+                    if(cl.serverId != 0)
+                        DB5().PushUpdateData("UPDATE `clan` SET `serverId` = %u WHERE `id` = %u", cl.serverId, cl.id);
+                }
+                clan->SetClanServerId(cl.serverId);
+                clan->patchMergedName();
             }
 			else
 			{
@@ -5498,15 +5510,15 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Practice Place");
 		DBPracticePlace pp;
-		if(execu->Prepare("SELECT `id`, `ownerid`, `protid`, `maxslot`, `openslot`, `protmoney`, `slotmoney`, `open`, `enemyCount`, `winCount`, `slotincoming`, `protincoming` FROM `practice_place` ORDER BY `id`", pp)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `ownerid`, `protid`, `maxslot`, `openslot`, `protmoney`, `slotmoney`, `open`, `enemyCount`, `winCount`, `slotincoming`, `protincoming`, `serverId` FROM `practice_place` ORDER BY `id`", pp)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
-        UInt8 i = 0;
 		while(execu->Next() == DB::DB_OK)
 		{
             if (!pp.id)
                 continue;
             GObject::PPlace place;
+            place.id = pp.id;
             place.ownerid = pp.ownerid;
             place.protid = pp.protid;
             place.maxslot = pp.maxslot;
@@ -5518,7 +5530,8 @@ namespace GObject
             place.winCount = pp.winCount;
             place.slotincoming = pp.slotincoming;
             place.protincoming = pp.protincoming;
-            practicePlace.addPlace(place, i++);
+            place.serverId = pp.serverId;
+            practicePlace.addPlace(place, pp.id);
         }
 		lc.finalize();
         return true;

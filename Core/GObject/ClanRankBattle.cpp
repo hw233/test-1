@@ -2350,6 +2350,8 @@ namespace GObject
                 if(TimeUtil::GetWeekDay(m_Now) == 7 && TimeUtil::GetWeekDay(m_StartTime) != 7)
                 {
                     GiveWeeklyRewards();
+                    if(cfg.merged)
+                        clanLocalRank();
                 }
 
                 //每天比赛结束发布前六名
@@ -2633,6 +2635,28 @@ namespace GObject
         {
             if(*it == clan)
                 m_ClanRanking.erase(it);
+        }
+    }
+
+    void ClanRankBattleMgr::clanLocalRank()
+    {
+        //各本服单独排名，并且分山头
+        for(ClanVec::iterator iter = m_ClanRanking.begin(); iter != m_ClanRanking.end(); ++iter)
+        {
+            Clan* clan = *iter;
+            if(!clan)
+                continue;
+            UInt16 serverId = clan->GetClanServerId();
+            UInt32 rank = m_LocalRank.count(serverId);
+            UInt32 place = 0;
+            if(rank < 6)
+            {
+                rank ++;
+                place = rank + 7;
+                m_LocalRank.insert(std::make_pair(serverId, clan->getOwner()));
+                GameMsgHdr hdr(0x1F5, WORKER_THREAD_WORLD, clan->getOwner(), sizeof(place));
+                GLOBAL().PushMsg(hdr, &place);
+            }
         }
     }
 }
