@@ -733,7 +733,7 @@ bool Clan::kick(Player * player, UInt64 pid)
         GLOBAL().PushMsg(hdr, &tc);
         _buildingOwner->LeaveTeam(NULL,kicker,kicker,1);
     }
-    practicePlace.stop(player);
+    practicePlace.stop(kicker);
 
 	return true;
 }
