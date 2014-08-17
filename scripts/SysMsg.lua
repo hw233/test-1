@@ -376,6 +376,8 @@ sysMsg:set(361, 0, "")
 sysMsg:set(362, 0x27, "")
 sysMsg:set(363, 0, "")
 sysMsg:set(364, 0, "")
+sysMsg:set(365, 0, "弹劾帮主通过")
+sysMsg:set(366, 0, "%s弹劾帮主%s成功，成为%s帮新任帮主。")
 
 sysMsg:set(370, 0x27, "")
 sysMsg:set(371, 0x27, "")

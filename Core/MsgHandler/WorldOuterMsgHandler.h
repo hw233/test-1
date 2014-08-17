@@ -375,6 +375,10 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 		id |= (svno << 24);
 	}
     */
+    UInt16 serverId = 0;
+    if(cfg.merged)
+        serverId = player->getId() >> 48;
+
 	GObject::Clan * clan = new(std::nothrow) GObject::Clan(id, ccr._name);
 	if(clan == NULL)
 	{
@@ -402,7 +406,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	mysql_escape_string(contact2, ccr._contact.c_str(), ccr._contact.length()>1022?1022:ccr._contact.length());
 	mysql_escape_string(purpose2, ccr._purpose.c_str(), ccr._purpose.length()>1022?1022:ccr._purpose.length());
 	mysql_escape_string(name2, strNametmp.c_str(), strNametmp.length()>1022?1022:strNametmp.length());
-	DB5().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `purpose`, `level`) VALUES (%u, '%s', %u, %" I64_FMT "u, %" I64_FMT "u, 0, '%s', '%s', %u)", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), contact2, purpose2, clan->getLev());
+	DB5().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `purpose`, `level`, serverId) VALUES (%u, '%s', %u, %" I64_FMT "u, %" I64_FMT "u, 0, '%s', '%s', %u, %u)", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), contact2, purpose2, clan->getLev(), serverId);
 	ConsumeInfo ci(ClanCreate,0,0);
 	player->useTael(GData::moneyNeed[GData::CLAN_CREATE].tael,&ci);
 	clan->initBuildClan();
@@ -492,6 +496,19 @@ void OnClanOpReq( GameMsgHdr& hdr, const void * data )
             brd >> inviteeId;
             r = clan->setWatchmanId(inviteeId);
             break;
+        case 8:
+            {
+                UInt8 state;
+                brd >> state;
+                if(state == 0 || state == 1)
+                {
+                    r = clan->impeachLeader(player, state); 
+	                Stream st(REP::CLAN_MEMBER_OPERATE);
+		            st << op << state << static_cast<UInt8>(r ? 1 : 0) << Stream::eos;
+                    player->send(st);
+                }
+                return;
+            }
 		}
 	}
 	Stream st(REP::CLAN_MEMBER_OPERATE);
@@ -3323,14 +3340,14 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             UInt8 op = 0;
             brd >> op;
 
-            if(1!=op && !World::getAnswerTime())
+            if(1!=op && !World::getAnswerTime_Day())
                 return;
 
             switch(op)
             {
                 case 0x01:
                     {
-                        if(!World::getPrepareTime())
+                        if(!World::getPrepareTime_Day())
                             break;
 
                         UInt32 nowTime = TimeUtil::Now();

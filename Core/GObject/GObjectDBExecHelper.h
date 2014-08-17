@@ -441,6 +441,7 @@ struct DBPracticePlace
     UInt16 winCount;    // 赢的次数
     UInt32 slotincoming; // 一周洞府总收入
     UInt32 protincoming; // 一周保护费总收入
+    UInt16 serverId;     //服务器ID
 };
 
 struct DBPracticeData
@@ -727,6 +728,7 @@ struct DBClan
     std::string clantitleAll;
     UInt32 clanFireValue;
     UInt8 clanAutoApply;
+    UInt16 serverId;
 };
 
 struct DBClanRepo
@@ -2172,7 +2174,7 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPracticePlace)
-SPECIALDEF(12)
+SPECIALDEF(13)
 	(
         UInt8, id,
         UInt64, ownerid,
@@ -2185,7 +2187,8 @@ SPECIALDEF(12)
         UInt16, enemyCount,
         UInt16, winCount,
         UInt32, slotincoming,
-        UInt32, protincoming
+        UInt32, protincoming,
+        UInt16, serverId
     )
 SPECIALEND()
 
@@ -2495,7 +2498,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(38)
+SPECIALDEF(39)
 (
 	UInt32, id,
 	std::string, name,
@@ -2534,7 +2537,8 @@ SPECIALDEF(38)
     UInt32,tyssSum, 
     std::string, clantitleAll,
     UInt32, clanFireValue,
-    UInt8, clanAutoApply
+    UInt8, clanAutoApply,
+    UInt16, serverId
 )
 SPECIALEND()
 

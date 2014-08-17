@@ -268,7 +268,7 @@ class Clan:
 {
 public:
     //帮会排名战报名数下限
-    const static UInt32 RANK_BATTLE_MIN_SIGNUP_NUM = 5;
+    const static UInt32 RANK_BATTLE_MIN_SIGNUP_NUM = 1;
     //帮会排名战单个战役人数
     const static UInt32 RANK_BATTLE_FIELD_PLAYERNUM = 15;
 
@@ -375,8 +375,8 @@ public:
     inline void patchMergedName() { patchMergedName(_id, _name); }
 	static void patchMergedName(UInt32 id, std::string& name);
 #else
-    inline void patchMergedName() { patchMergedName(_founder, _name); }
-	static void patchMergedName(UInt64 id, std::string& name);
+    inline void patchMergedName() { patchMergedName(_serverId, _name); }
+	static void patchMergedName(UInt16 serverId, std::string& name);
 #endif
 public:
 	UInt16 getFavorItemId(UInt8 skilId);
@@ -401,6 +401,7 @@ public:
 	inline std::string getFounderName() { return _founderName; }
 	void setLeaderId(UInt64, bool = true);
 	bool setWatchmanId(UInt64, bool = true);
+    bool impeachLeader(Player* player, UInt8 state);
 	inline UInt64 getWatchmanId() { return _watchman; }
 	void fixLeaderId();
 	inline UInt64 getLeaderId() { return _leader; }
@@ -621,10 +622,15 @@ public:
     bool addWoodToFire(Player * pl);
     bool callingaddWood(Player * pl);
     void getFireGodBag();
+
+    inline void SetClanServerId(UInt16 ser_id) { _serverId = ser_id; }
+    inline UInt16 GetClanServerId() { return _serverId; }
     
     UInt32 getGradeInAirBook(){return  _gradeInAirbook;}
     void SendClanMemberGrade(Player* player);
     UInt8 skillLevelUp(Player* pl, UInt8 skillId);
+    void sendImpeachMail(Player* player, Player* leader);
+
 public:
 	inline UInt8 getLev() { return _level; }
 
@@ -940,6 +946,7 @@ private:
     ClanSpiritTree m_spiritTree;
 
     ClanBuildingOwner *_buildingOwner;
+    UInt16 _serverId;
 public:
     void raiseSpiritTree(Player* pl, UInt8 type);   // 培养 type(甘露:0 冰晶:1)
     void refreshColorAward();

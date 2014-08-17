@@ -2137,6 +2137,7 @@ function getRedBeanAward(player, index, count)
         end
     end
 
+
     return true
 end
 local EnchantlingbaoLevel ={

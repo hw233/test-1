@@ -267,6 +267,13 @@ bool World::_buyfund = false;
 bool World::_duobaoOpen = false;
 bool World::_answerOpenA = false;
 bool World::_answerOpenB = false;
+bool World::_answerOpenC = false;
+UInt32 World::_gAnswerPrepareTime = 0;
+UInt32 World::_gAnswerBeginTime = 0;
+UInt32 World::_gAnswerEndTime = 0;
+UInt32 World::_gAnswerFinalTime = 0;
+UInt32 World::_gAllAnswerEndTime_Day = 0;
+
 UInt32 World::_rbTimeRank = 0;
 UInt64 World::_worldCupAward;
 UInt32 World::_worldCup[MAX_WC_COUNT][4];
@@ -700,6 +707,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 15)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 16)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 23)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -752,6 +767,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 16)
         ))
     {
 #if 0
@@ -1823,6 +1839,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 15)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 16)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 23)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -2067,6 +2091,8 @@ void World::World_Fire_Sacrifice_Check( World * world )
 
 void World::World_Seeking_Her_Check(void *)
 {
+    if(!getSeekingHer())
+        return;
     if(World::seekingHerCharmSort.size() && World::seekingHerZhiNvSort.size() && World::seekingHerNiuLangSort.size())
     {
         RCSortType::iterator i = World::seekingHerCharmSort.begin();
@@ -2592,15 +2618,6 @@ inline bool enum_answer_send(GObject::Player* player, UInt8 mark)
         case 5:
             {
                 status = 3;
-                player->SetVar(VAR_ANSWER_QUESTIONS_SUCCORFAIL, 0);
-                player->SetVar(VAR_ANSWER_SUCCESSION_NUM, 0);
-                player->SetVar(VAR_ANSWER_ATTACK_NUM, 0);
-                player->SetVar(VAR_ANSWER_SKILL_USE_NUM, 0);
-                player->SetVar(VAR_ANSWER_QUESTIONS_STATUS, 0);
-                player->SetVar(VAR_ANSWER_SKILL_STATUS, 0);
-                player->SetVar(VAR_ANSWER_LITERARY_VALUE, 0);
-                player->SetVar(VAR_ANSWER_SKILL_MARK, 0);
-                player->SetVar(VAR_ANSWER_QUESTIONS_OPTION, 0);
             }
             break;
         case 6:
@@ -2628,7 +2645,7 @@ inline bool enum_answer_send(GObject::Player* player, UInt8 mark)
     return true;
 }
 
-void World::AnswerCheck(void *)
+/*void World::AnswerCheck(void *)
 {
     if(!World::getAnswerAct())
         return;
@@ -2741,8 +2758,138 @@ void World::AnswerCheck(void *)
             }
         }
     }
-}
+}*/
 
+void World::AnswerCheck(void *)
+{
+    if(!World::getAnswerTime_Act())
+        return;
+
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0, nowTime);
+
+    // 世界频道定时广播
+    if(nowTime == time + ANSWER_PREPARE_TIME)
+    {
+        SYSMSG_BROADCASTV(5170);
+    }
+    else if(nowTime == time + ANSWER_BROADCASTA_TIME)
+    {
+        SYSMSG_BROADCASTV(5171);
+    }
+    else if(nowTime == time + ANSWER_BROADCASTB_TIME)
+    {
+        SYSMSG_BROADCASTV(5172);
+    }
+    else if(nowTime == time + ANSWER_BEGIN_TIME)
+    {
+        SYSMSG_BROADCASTV(5173);
+    }
+
+    if(0 == GVAR.GetVar(GVAR_RAND_QUESTIONS_MARK))
+    {
+        // 每天重置题目
+        answerManager->RandQuestions();
+                
+        // 每天清楚缓存日志
+        answerManager->AnswerLogClear();
+
+        // 每天重置状态
+        if(_answerOpenA)
+            _answerOpenA = false;
+        if(_answerOpenB)
+            _answerOpenB = false;
+        if(_answerOpenC)
+            _answerOpenC = false;
+
+        GVAR.SetVar(GVAR_RAND_QUESTIONS_MARK, 1);
+    }
+
+    // 每天重置时间
+    if(!_answerOpenC)
+    {
+        if(nowTime < time + ANSWER_ALLEND_TIME)
+        {
+            _gAnswerPrepareTime = time + ANSWER_PREPARE_TIME;
+            _gAnswerBeginTime = time + ANSWER_BEGIN_TIME;
+            _gAllAnswerEndTime_Day = time + ANSWER_ALLEND_TIME;
+
+            if(nowTime < _gAnswerBeginTime)
+            {
+                _gAnswerEndTime = _gAnswerBeginTime + 25;
+                _gAnswerFinalTime = _gAnswerBeginTime + 30;
+            }
+            else
+            {
+                _gAnswerEndTime = nowTime / 30 * 30 + 25;
+                _gAnswerFinalTime = nowTime / 30 * 30 + 30;
+            }
+        }
+        _answerOpenC = true;
+    }
+
+    if(World::getPrepareTime_Day())
+    {
+        if(!_answerOpenA)
+        {
+            GObject::globalPlayers.enumerate(enum_answer_send, 1);
+            _answerOpenA = true;
+        }
+    }
+    else if(World::getAnswerTime_Day())
+    {
+        if(!_answerOpenB)
+        {
+            UInt8 answerId = 0;
+            UInt32 temp = _gAllAnswerEndTime_Day - nowTime;
+            if(0 == temp % 30)
+                answerId = 30 - temp / 30 + 1;
+            else
+                answerId = 30 - temp / 30;
+
+            if(answerId > 30)
+                answerId = 30;
+
+            answerManager->InitAnswerId(answerId);
+
+            GObject::globalPlayers.enumerate(enum_answer_send, 2);
+            _answerOpenB = true;
+        }
+    
+        if(nowTime < _gAllAnswerEndTime_Day)
+        {
+            GObject::globalPlayers.enumerate(enum_answer_send, 6);
+        }
+
+        if(nowTime >= _gAnswerEndTime)
+        {
+            if(nowTime+5 >= _gAnswerFinalTime)
+            {
+                //本题结束，时间设置到下一题的答题结束时间
+                _gAnswerEndTime = _gAnswerFinalTime + 25;
+                GObject::globalPlayers.enumerate(enum_answer_send, 3);
+            }
+        }
+        else if(nowTime >= _gAnswerFinalTime)
+        {
+            if(nowTime >= _gAllAnswerEndTime_Day)
+            {
+                World::SendAnswerAward();
+                World::SendAllAnswerEnd();
+
+                GObject::globalPlayers.enumerate(enum_answer_send, 5);
+            }
+            else
+            {
+                 //本题结束，时间设置到下一题的答题结算时间
+                _gAnswerFinalTime = nowTime / 30 * 30 + 30;
+                answerManager->AwardEndClear();
+
+                GObject::globalPlayers.enumerate(enum_answer_send, 4);
+            }
+        }
+    }
+}
 
 inline static bool enum_spread_send(Player* player, void* data)
 {
@@ -2943,37 +3090,7 @@ bool World::Init()
     }
 
     AddTimer(5 * 1000, ClanDuoBaoCheck, static_cast<void*>(NULL));
-
-    /**一战成名**/
-    UInt32 nowTimeA = TimeUtil::Now();
-    UInt32 timeA = TimeUtil::SharpDayT(0,nowTimeA);
-    UInt32 prepareA = timeA + 19*60*60 + 15*60;
-    UInt32 startA = timeA + 19*60*60 + 30*60;
-    UInt32 endA = timeA + 19*60*60 + 45*60;
-    UInt32 valueTimeA = 0;
-    UInt32 valueTimeB = 0;
-
-    if(nowTimeA < endA)
-    {
-        GVAR.SetVar(GVAR_ANSWER_PREPARE_DAY, prepareA);
-        GVAR.SetVar(GVAR_ANSWER_BEGIN_DAY, startA);
-        GVAR.SetVar(GVAR_ANSWER_END_DAY, endA);
-
-        if(nowTimeA < GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY))
-        {
-            valueTimeA = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY) + 25;
-            valueTimeB = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY) + 30;
-        }
-        else
-        {
-            valueTimeA = nowTimeA / 30 * 30 + 25;
-            valueTimeB = nowTimeA / 30 * 30 + 30;
-        }
-
-        GVAR.SetVar(GVAR_ANSWER_ENDTIME, valueTimeA);
-        GVAR.SetVar(GVAR_ANSWER_AWARDTIME, valueTimeB);
-    }
-
+    
     AddTimer(1000, AnswerCheck, static_cast<void*>(NULL));
 
     return true;
@@ -3878,7 +3995,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::qishibanScoreSort.insert(s);
         }
     }
-    if (World::getAnswerTime())
+    if (World::getAnswerTime_Day())
     {
         UInt32 score = p->GetVar(VAR_ANSWER_LITERARY_VALUE);
         if (score)
@@ -4535,11 +4652,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9498,40},{9600,30},{9457,40},{9068,30},{0,0}},
-        {{9498,35},{9600,25},{9457,35},{9068,20},{0,0}},
-        {{9498,30},{9600,20},{9457,30},{9068,15},{0,0}},
+        {{9498,40},{554,30},{9457,40},{9075,30},{0,0}},
+        {{9498,35},{554,25},{9457,35},{9075,20},{0,0}},
+        {{9498,30},{554,20},{9457,30},{9075,15},{0,0}},
     };
-    static MailPackage::MailItem card = {9987,1};
+    static MailPackage::MailItem card = {9998,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -5487,7 +5604,7 @@ void World::SendTYSSPlayerAward(UInt8 actType)
             int type = pos > 3 ? 4 : pos;
             SYSMSGV(content, 951, pos);
 	        MailPackage::MailItem *items;
-	        MailPackage::MailItem *tmp_items;
+	        MailPackage::MailItem *tmp_items = NULL;
             if(actType == 1)
                 items = s_item[type-1]; 
             else
