@@ -733,6 +733,7 @@ bool Clan::kick(Player * player, UInt64 pid)
         GLOBAL().PushMsg(hdr, &tc);
         _buildingOwner->LeaveTeam(NULL,kicker,kicker,1);
     }
+    practicePlace.stop(player);
 
 	return true;
 }
@@ -887,6 +888,7 @@ bool Clan::leave(Player * player)
         player->setBuffData(PLAYER_BUFF_NEW_CLAN3, 0);
         player->rebuildBattleName();
     }
+    practicePlace.stop(player);
 
 	return true;
 }

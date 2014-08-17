@@ -1303,6 +1303,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             else
             {
                 PlaceData * pd = new PlaceData[PPLACE_MAX];
+                memset(pd, 0, sizeof(PlaceData) * PPLACE_MAX);
                 pd[idx].place = place;
                 pd[idx].data.resize(place.maxslot);
                 map_places.insert(std::make_pair(place.serverId, pd));
@@ -1495,7 +1496,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
             if(target != map_places.end())
             {
-                for(idx = 0; idx < PPLACE_MAX; ++idx)
+                for(idx = 0; idx < PPLACE_MAX - 1; ++idx)
                 {
                     if(oldpl->getId() == target->second[idx].place.ownerid)
                     {
@@ -1640,6 +1641,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                     place_t.open = 0;
                     place_t.protid = 0;
                     PlaceData * pd = new PlaceData[PPLACE_MAX];
+                    memset(pd, 0, sizeof(PlaceData) * PPLACE_MAX);
                     pd[place - 1].place = place_t;
                     pd[place - 1].data.resize(place_t.maxslot);
                     map_places.insert(std::make_pair(serverId, pd));
