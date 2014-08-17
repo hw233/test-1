@@ -2648,6 +2648,8 @@ namespace GObject
             if(!clan)
                 continue;
             UInt16 serverId = clan->GetClanServerId();
+            if(!serverId)
+                continue;
             UInt32 rank = m_LocalRank.count(serverId);
             UInt32 place = 0;
             if(rank < 6)
