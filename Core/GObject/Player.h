@@ -2792,6 +2792,7 @@ namespace GObject
         UInt8 transformSoul(Fighter * fFgt, Fighter * tFgt);
         UInt8 transfromXingchen(Fighter * fFgt, Fighter * tFgt);
         void transformElixir(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transfromLingbaoLevel(Fighter * fFgt, Fighter * tFgt);
         void sendXinMoInfo(); 
             
     private:

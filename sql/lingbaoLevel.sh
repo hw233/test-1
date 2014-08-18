@@ -3,31 +3,31 @@
 
 #!/bin/bash
 
-F=kettleNpc.txt
+F=refine.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
 echo $F
-function kettleNpc()
+function lingbaoLevel()
 {
 # 11,"302,2,3|303,1",0,40,"3,4"
     f=$1
-    d=kettleNpc
+    d=lingbaoLevel
     sed -i /ID/d $f
     sed -i /id/d $f
     sed -i /^$/d $f
-#    sed -i /^[[:space:]]*$/d $f   #lb
+    sed -i /^[[:space:]]*$/d $f   #lb
     sed -i /REF/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `kettleNpc` VALUES";
+            print "INSERT INTO `lingbaoLevel` VALUES";
         } {
-            printf("(%d,%.02f,%.02f,%.02f,%.02f,%d)",$1,$3,$4,$5,$6,$8);
+            printf("(%d,%d,%d,%.02f,%d,%d,%d)",$1,$3,$4,$5,$6,$7,$8);
             if (NR < ENVIRON["lines"])
                 printf(",");
             else if (NR >= ENVIRON["lines"])
@@ -55,7 +55,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    kettleNpc $F
+    lingbaoLevel $F
 else
     echo "File $F is not exists"
 fi
