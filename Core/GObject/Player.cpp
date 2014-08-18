@@ -28585,14 +28585,14 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             static UInt32 awards1[10][4][2] = {
                 {{503,5},  {500,1}, {501,1}, {49,20}},
                 {{9360,5},  {9093,5}, {0,0}, {50,10}},
-                {{9418,5}, {9414,5}, {0,0}, {75,10}},
-                {{9649,10}, {9427,5}, {0,0}, {135,20}},
+                {{9418,5}, {9414,5}, {9424,5}, {100,10}},
+                {{9649,10}, {9427,5}, {0,0}, {135,10}},
                 {{515,5}, {514,5}, {0,0},{200,20}},
                 {{16001,5}, {16000,5}, {0,0},{75,10}},
-                {{9498,10}, {9497,10}, {0,0},{268,10}},
-                {{9604,5}, {9603,5}, {0,0},{100,10}},
-                {{9019,5}, {9022,5}, {0,0},{1100,5}},
-                {{1727,1}, {1728,1}, {0,0},{1198,2}},
+                {{9498,10}, {9497,5}, {0,0},{180,10}},
+                {{9600,10}, {9500,5}, {0,0},{100,10}},
+                {{9022,5}, {9075,5}, {0,0},{1500,5}},
+                {{1726,1}, {1729,1}, {0,0},{1198,2}},
             };
 
             UInt32 clan_contribute = GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
@@ -28828,7 +28828,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 st << static_cast<UInt8>(20 - GET_BIT_8(consume1,0));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume1,1));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume1,2));
-                st << static_cast<UInt8>(20 - GET_BIT_8(consume1,3));
+                st << static_cast<UInt8>(10 - GET_BIT_8(consume1,3));
                 st << static_cast<UInt8>(20 - GET_BIT_8(consume2,0));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume2,1));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume2,2));
@@ -28868,11 +28868,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 { {1719, 1}, {1717, 1}, {1700, 1}, {1711, 1}, {1709, 1}, {1701, 1}, {1703, 1} },
             };
             static UInt32 everydayAward1[5][7][2] = {
-                { {503, 3}, {9424, 3}, {500, 2}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {9371, 2}, {1126, 2}, {57, 2}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {501, 3}, {513, 3}, {551, 3}, {0, 0}, {0, 0}, {0, 0}, {0 ,0} },
-                { {9498, 5}, {1325, 3}, {9338, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {9017, 5}, {9019, 5}, {9068, 5}, {9075, 5}, {9022, 5}, {0, 0}, {0, 0} },
+                { {15, 3}, {500, 3}, {512, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {501, 3}, {503, 3}, {56, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {517, 3}, {9424, 3}, {551, 3}, {0, 0}, {0, 0}, {0, 0}, {0 ,0} },
+                { {9457, 3}, {134, 3}, {1325, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {9075, 5}, {9068, 5}, {9022, 5}, {9075, 5}, {9068, 5}, {0, 0}, {0, 0} },
             };
  
             UInt8 totalPackageSize = 0;
@@ -28937,6 +28937,12 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 }
                 SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY), (26 + flag)));//打上当日领取奖品的标记
                 udpLog("tianyuanshenshou", "F_140224_26", "", "", "", "", "act");
+                if(actType == 2)
+                {
+                    UInt32 curtodayContribution = GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY);
+                    if(todayContribution >= needContriLevel[4] && curtodayContribution >> 27 == 31)
+                        SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,todayContribution - needContriLevel[4]);
+                }
                 ReturnTYSSInfo(9); 
             }
             else
@@ -28976,11 +28982,11 @@ void Player::EatLingGuo(UInt32 num)
     UInt32 fifth_steps = 70000;
     if(actType == 2) 
     {
-        one_steps = 2000;
-        two_steps = 14000;
-        three_steps = 23000;
-        third_steps = 46000;
-        fifth_steps = 65000;
+        one_steps = 1000;
+        two_steps = 6000;
+        three_steps = 16000;
+        third_steps = 30000;
+        fifth_steps = 46000;
     }
 
     UInt32 clan_sum = clan->GetTYSSSum();
@@ -29031,25 +29037,25 @@ void Player::EatLingGuo(UInt32 num)
             if(clan_sum >= two_steps)
             {
                 SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"成长期神兽");
-                udpLog("tianyuanshenshou", "F_140224_2", "", "", "", "", "act");
+                udpLog("tianyuanshenshou", "F_140224_3", "", "", "", "", "act");
             }
         case 2:
             if(clan_sum >= three_steps)
             {
                 SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"青年期神兽");
-                udpLog("tianyuanshenshou", "F_140224_2", "", "", "", "", "act");
+                udpLog("tianyuanshenshou", "F_140224_4", "", "", "", "", "act");
             }
         case 3:
             if(clan_sum >= third_steps)
             {
                 SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"亚圣兽期");
-                udpLog("tianyuanshenshou", "F_140224_2", "", "", "", "", "act");
+                udpLog("tianyuanshenshou", "F_140224_5", "", "", "", "", "act");
             }
         case 4:
             if(clan_sum >= fifth_steps)
             {
                 SYSMSG_BROADCASTV(952, clan->getName().c_str(),leader->getName().c_str(),"天元神兽");
-                udpLog("tianyuanshenshou", "F_140224_2", "", "", "", "", "act");
+                udpLog("tianyuanshenshou", "F_140224_6", "", "", "", "", "act");
             }
         default:
             break;
