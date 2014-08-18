@@ -28369,11 +28369,11 @@ void Player::sendRealSpirit()
 
 void Player::getQZoneRechargeAward(UInt8 val)
 {
-    if(getPlatform() != 1 && getPlatform() != 2)
+    /*if(getPlatform() != 1 && getPlatform() != 2)
     {
         sendMsgCode(0, 3506);
         return;
-    }
+    }*/
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
@@ -28421,11 +28421,11 @@ void Player::getQZoneRechargeAward(UInt8 val)
 }
 void Player::sendQZoneRechargeAwardInfo()
 {
-    if(getPlatform() != 1 && getPlatform() != 2)
+    /*if(getPlatform() != 1 && getPlatform() != 2)
     {
         sendMsgCode(0, 3506);
         return;
-    }
+    }*/
     if ((getPlatform()==1 || getPlatform() ==2) )
     {
        if(!World::getQZoneRechargeTime())
