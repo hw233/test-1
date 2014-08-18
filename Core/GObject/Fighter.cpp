@@ -13,6 +13,7 @@
 #include "GData/AcuPraTable.h"
 #include "GData/XingchenData.h"
 #include "GData/DrinkAttr.h"
+#include "GData/lingbaoLevel.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
 #include "Common/Stream.h"
@@ -90,6 +91,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_lingshiSkill, 0, sizeof(_lingshiSkill));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
 	memset(_lingbao, 0, sizeof(_lingbao));
+	memset(lingbaoLevel, 0, sizeof(lingbaoLevel));
     m_2ndSoul = NULL;
     _iswboss = false;
     _iswbossinspire = false;
@@ -1534,7 +1536,7 @@ inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value, UInt8
 	}
 }
 
-inline void AddLingbaoAttr(GData::AttrExtra& ae, ItemLingbao* lb)
+inline void AddLingbaoAttr(GData::AttrExtra& ae, ItemLingbao* lb,float f = 1)
 {
     if(!lb)
         return;
@@ -1548,41 +1550,41 @@ inline void AddLingbaoAttr(GData::AttrExtra& ae, ItemLingbao* lb)
         switch(lbattr.type[i])
         {
         case 1:
-            ae.attack += lbattr.value[i];
-            ae.magatk += lbattr.value[i];
+            ae.attack += lbattr.value[i]*f;
+            ae.magatk += lbattr.value[i]*f;
             break;
         case 2:
-            ae.magatk += lbattr.value[i];
+            ae.magatk += lbattr.value[i]*f;
             break;
         case 3:
-            ae.defend += lbattr.value[i];
+            ae.defend += lbattr.value[i]*f;
             break;
         case 4:
-            ae.magdef += lbattr.value[i];
+            ae.magdef += lbattr.value[i]*f;
             break;
         case 5:
-            ae.hp += lbattr.value[i];
+            ae.hp += lbattr.value[i]*f;
             break;
         case 6:
-            ae.toughlvl += lbattr.value[i];
+            ae.toughlvl += lbattr.value[i]*f;
             break;
         case 7:
-            ae.action += lbattr.value[i];
+            ae.action += lbattr.value[i]*f;
             break;
         case 8:
-            ae.hitrlvl += lbattr.value[i];
+            ae.hitrlvl += lbattr.value[i]*f;
             break;
         case 9:
-            ae.evdlvl += lbattr.value[i];
+            ae.evdlvl += lbattr.value[i]*f;
             break;
         case 10:
-            ae.crilvl += lbattr.value[i];
+            ae.crilvl += lbattr.value[i]*f;
             break;
         case 11:
-            ae.pirlvl += lbattr.value[i];
+            ae.pirlvl += lbattr.value[i]*f;
             break;
         case 12:
-            ae.counterlvl += lbattr.value[i];
+            ae.counterlvl += lbattr.value[i]*f;
             break;
         }
     }
@@ -2051,7 +2053,10 @@ void Fighter::rebuildEquipAttr()
 		ItemLingbao* lb = static_cast<ItemLingbao*>(getLingbao(idx));
         if(!lb)
             continue;
-        AddLingbaoAttr(_attrExtraEquip, lb);
+        //std::cout<<"type:" << idx <<" level:" << static_cast<UInt32>(getLingbaoLevel(idx));
+        GData::lingbaoL lbl = GData::lingbaoLevelData.getLingbaoLevel(idx,getLingbaoLevel(idx)-1);
+        //std::cout << " percent :"<<(1+lbl.percent/100) << std::endl;
+        AddLingbaoAttr(_attrExtraEquip, lb ,1+lbl.percent/100);
     }
 
     if (_owner)
@@ -3395,6 +3400,17 @@ void Fighter::getAllAcupointsGoldBits( Stream& st )
     for (int i = 0; i < ACUPOINTSGOLD_MAX; ++i)
     {
         st << _acupointsGold[i];
+    }
+}
+void Fighter::getAllLingbaoLevelAndFall( Stream& st )
+{
+    for (int i = 0; i < getMaxLingbaos(); ++i)
+    {
+        st << getLingbaoLevel(i);
+    }
+    for (int i = 0; i < getMaxLingbaos(); ++i)
+    {
+        st << static_cast<UInt8>(getLingbaoFall(i));
     }
 }
 
@@ -8172,6 +8188,23 @@ void Fighter::getAllSGInfo(std::map<UInt16, Int32>& sg_v)
         ++it;
     }
 }
+void Fighter::updateLingbaoLevelToDB(UInt8 type)
+{ 
+    if(type > 2)
+        return ;
+    if(!_owner)
+        return ;
+    DB1().PushUpdateData("REPLACE INTO `fighter_lingbaoLevel` (`playerId`, `fighterId`, `lingbaoType`, `enLevel`) VALUES(%" I64_FMT "u, %u, %u, %u)", _owner->getId(), getId(),type,lingbaoLevel[type]);
+} 
+void Fighter::updateLingbaoFallToDB(UInt8 type)
+{ 
+    if(type > 2)
+        return ;
+    if(!_owner)
+        return ;
+    DB1().PushUpdateData("REPLACE INTO `fighter_lingbaoFall` (`playerId`, `fighterId`, `type`, `fall`) VALUES(%" I64_FMT "u, %u, %u, %u)", _owner->getId(), getId(),type,lingbaoFall[type]);
+
+} 
 
 /*
  *end分别计算散仙的战斗力

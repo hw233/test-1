@@ -3682,6 +3682,7 @@ namespace GObject
 
             fgt->xingchenInfo(st);
             fgt->getAllAcupointsGoldBits(st);
+            fgt->getAllLingbaoLevelAndFall(st);
 		}
 	}
 
@@ -19792,6 +19793,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             transformElixir(fFgt, tFgt);
         if ((type &0x20) && res==0)
             transfromXingchen(fFgt, tFgt);
+        if ((type &0x40) && res==0)
+            transfromLingbaoLevel(fFgt, tFgt);
 
         return res;
     }
@@ -20089,6 +20092,37 @@ void EventTlzAuto::notify(bool isBeginAuto)
 
          return 0;
     }
+    UInt8 Player::transfromLingbaoLevel(Fighter * fFgt, Fighter * tFgt)
+    {
+         for(UInt8 i = 0; i< fFgt->getMaxLingbaos() ; ++i)
+         {
+             UInt8 swapLevel = tFgt->getLingbaoLevel(i); 
+             tFgt->setLingbaoLevel(i,fFgt->getLingbaoLevel(i));
+             fFgt->setLingbaoLevel(i,swapLevel);
+
+             UInt32 swapFall = tFgt->getLingbaoFall(i); 
+             tFgt->setLingbaoFall(i,fFgt->getLingbaoFall(i));
+             fFgt->setLingbaoFall(i,swapFall);
+             tFgt->updateLingbaoLevelToDB(i);
+             fFgt->updateLingbaoLevelToDB(i);
+             tFgt->updateLingbaoFallToDB(i);
+             fFgt->updateLingbaoFallToDB(i);
+         }
+         fFgt->setDirty();
+         tFgt->setDirty();
+
+         Stream st(REP::EXTEND_PROTOCAOL);
+         st <<static_cast<UInt8>(0x01);
+         st <<static_cast<UInt8>(0x03);
+         st << static_cast<UInt16>(fFgt->getId());
+         fFgt->getAllLingbaoLevelAndFall(st);
+         st << static_cast<UInt16>(tFgt->getId());
+         tFgt->getAllLingbaoLevelAndFall(st);
+         st <<Stream::eos;
+         send(st);
+        
+         return 0;
+    }
 
     void Player::transformElixir(Fighter * fFgt, Fighter * tFgt)
     {
@@ -20108,7 +20142,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
             }
         }
     }
-    
+
     void Player::ArenaExtraAct(UInt8 type, UInt8 opt)
     {
         UInt32 now = TimeUtil::Now();
