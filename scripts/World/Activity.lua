@@ -1127,6 +1127,12 @@ function onActivityCheck(tm)
           setAnswerAct(false)
       end--]]
 
+      if tm >= actTimeq3 and tm < actTimeq3_1 then
+          setFeastGiftLoginAct(true)
+      else
+          setFeastGiftLoginAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -1436,7 +1442,7 @@ function initActTime(y, m, d)
   local  SerStartTm2013_03_15 = { ['year'] = 2013, ['month'] = 3, ['day'] = 15, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 迎新纳福 红包入袋
-  local  SerStartTm237 = { ['year'] = 2014, ['month'] = 6, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm237 = { ['year'] = 2014, ['month'] = 9, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 蓝钻新年回馈活动
   local  SerStartTm238 = { ['year'] = 2013, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 空间朋友连续登录奖励
@@ -1515,6 +1521,8 @@ function initActTime(y, m, d)
   --众里寻他
   local  SerStartSeekingHer1= { ['year'] = 2014, ['month'] = 8, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartSeekingHer2= { ['year'] = 2014, ['month'] = 8, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  local  SerStartTmq3= { ['year'] = 2014, ['month'] = 9, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -1915,7 +1923,7 @@ function initActTime(y, m, d)
   actTime236_1= os.time(SerStartTm236_1);
 
   actTime237_0= os.time(SerStartTm237);
-  actTime237_1= os.time(SerStartTm237) + 4 * 86400;
+  actTime237_1= os.time(SerStartTm237) + 20 * 86400;
 
   actTime238_0= os.time(SerStartTm238);
   actTime238_1= os.time(SerStartTm238) + 21 * 86400;
@@ -2010,6 +2018,9 @@ function initActTime(y, m, d)
 
   --actTimeq2= os.time(SerStartTmq2)
   --actTimeq2_1= os.time(SerStartTmq2) + 5 * 86400;
+
+  actTimeq3= os.time(SerStartTmq3)
+  actTimeq3_1= os.time(SerStartTmq3) + 10 * 86400;
 
   onActivityCheck(os.time() + 30);
 

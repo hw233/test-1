@@ -179,6 +179,7 @@ bool World::_heroIslandAct= false;
 bool World::_dragonKingAct= false;
 bool World::_saveGoldAct= false;
 bool World::_feastloginAct= false;
+bool World::_feastgiftloginAct= false;
 bool World::_newYearGiveGiftAct= false;
 bool World::_newYearQQGameAct= false;
 bool World::_QZoneQQGameAct= false;

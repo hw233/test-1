@@ -350,6 +350,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140811_1.sql     #跨服修炼地修改clan,practicce_place表
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar182_187.sql        #清除仗剑江湖蜀山路
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #中秋节节日套装(var294)
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140422_1.sql     #周年好礼送不停
 }
 
 #sh player_jiguan.sh

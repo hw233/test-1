@@ -11813,13 +11813,13 @@ function ItemNormal_00016051(id, num, bind, param)
 
         local item = items[i];
         if item[1] == 499 then
-            player:getCoupon(item[1][2])
+            player:getCoupon(item[2])
         else
             package:AddItem(item[1], item[2], 1, 0, 2);
         end
 
         if i > 7 then
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_143.."[4:"..item[1]..msg_144);
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_143.."[4:"..item[1].."]"..msg_144);
         end
     end
 

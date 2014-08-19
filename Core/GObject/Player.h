@@ -3249,6 +3249,7 @@ namespace GObject
         void send3366GiftInfo();
         void sendQQGameGift1218();
         void sendFeastLoginAct();
+        void sendFeastGiftLoginAct();
         void sendTowerLoginAct();
         void getFeastGiftAward(UInt8 type);
         void sendFeastGiftAct();

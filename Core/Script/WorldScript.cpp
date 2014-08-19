@@ -155,6 +155,7 @@ void WorldScript::init()
     def("get11Act", GObject::World::get11Act);
     def("setSSToolbarAct", GObject::World::setSSToolbarAct);
     def("setFeastLoginAct", GObject::World::setFeastLoginAct);
+    def("setFeastGiftLoginAct", GObject::World::setFeastGiftLoginAct);
     def("setMayDayLoginAct", GObject::World::setMayDayLoginAct);
     def("setNewYearGiveGiftAct", GObject::World::setNewYearGiveGiftAct);
     def("setNewYearQQGameAct", GObject::World::setNewYearQQGameAct);
