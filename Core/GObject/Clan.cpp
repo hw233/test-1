@@ -266,7 +266,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	GObjectBaseT<Clan>(id), _name(name), _rank(0), _level(lvl), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
     _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0),_tyssSum(0), _clanFireValue(0),_clanAutoApply(0),
-    _buildingOwner(NULL)
+    _buildingOwner(NULL), _serverId(0)
 {
     _itemPkg.Init(_id, 0, GData::clanLvlTable.getPkgSize(_level));
 
@@ -733,6 +733,7 @@ bool Clan::kick(Player * player, UInt64 pid)
         GLOBAL().PushMsg(hdr, &tc);
         _buildingOwner->LeaveTeam(NULL,kicker,kicker,1);
     }
+    practicePlace.stop(kicker);
 
 	return true;
 }
@@ -887,6 +888,7 @@ bool Clan::leave(Player * player)
         player->setBuffData(PLAYER_BUFF_NEW_CLAN3, 0);
         player->rebuildBattleName();
     }
+    practicePlace.stop(player);
 
 	return true;
 }
@@ -2904,10 +2906,10 @@ void Clan::patchMergedName( UInt32 id, std::string& name )
 }
 
 #else
-void Clan::patchMergedName( UInt64 id, std::string& name )
+void Clan::patchMergedName( UInt16 serverId, std::string& name )
 {
-    if(cfg.merged)
-        Player::patchMergedName(id, name);
+    if(cfg.merged && serverId > 0)
+        Player::patchMergedName(static_cast<UInt64>(serverId) << 48, name);
 }
 #endif
 float Clan::getClanTechAddon()

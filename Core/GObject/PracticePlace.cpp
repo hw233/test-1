@@ -33,8 +33,32 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
     bool PracticePlace::pay(Player* pl, UInt8 place, UInt16 slot,
             UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot)
     {
-        if (!pl || !time || !place || place > PPLACE_MAX || ((place != PPLACE_MAX) && slot > m_places[place-1].place.maxslot))
+        PlaceData * m_places_T;
+        UInt8 place_tmp = place;
+        if(place >= 8 && place <= 13)
+        {
+            place -= 7;
+            Clan * cl = pl->getClan();
+            if(!cl)
+                return false;
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(cl->GetClanServerId());
+            if(target == map_places.end())
+                return false;
+            m_places_T = target->second;
+        }
+        else
+            m_places_T = m_places;
+
+        if (!pl || !time || !place || place > PPLACE_MAX || ((place != PPLACE_MAX) && slot > m_places_T[place-1].place.maxslot))
             return false;
+
+        UInt16 serverId = 0;
+        if(cfg.merged)
+        {
+            Clan * clan = pl->getClan();
+            if(clan)
+                serverId = clan->GetClanServerId();
+        }
 
         Stream st(REP::PRACTICE_OCCUPY);
 
@@ -47,7 +71,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
 
         if (place != PPLACE_MAX)
         {
-            if (!m_places[place-1].data.size()) { // XXX: no configuration
+            if (!m_places_T[place-1].data.size()) { // XXX: no configuration
                 st << static_cast<UInt8>(1) << Stream::eos;
                 pl->send(st);
                 return false;
@@ -66,7 +90,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         }
 #endif
 
-        PPlace& data = m_places[place-1].place;
+        PPlace& data = m_places_T[place-1].place;
         Player* owner = globalPlayers[data.ownerid];
 
         if(place != PPLACE_MAX && NULL == owner)
@@ -90,7 +114,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                 // TODO: 目前不支持非本帮人修炼
                 return false;
 
-                PracticeData*& pd = m_places[place-1].data[slot];
+                PracticeData*& pd = m_places_T[place-1].data[slot];
                 if (pd)
                 {
                     if (pd->winnerid != pl->getId())
@@ -114,13 +138,13 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                     def->getTael(money + money2);
                     data.slotincoming += (pd->slotprice - money);
                     data.protincoming += (pd->protprice - money2);
-                    DB1().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u", data.protincoming, data.slotincoming, place);
+                    DB1().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u and `serverId` = %u", data.protincoming, data.slotincoming, place, serverId);
 
                     pd->winnerid = 0;
-                    m_places[PPLACE_MAX-1].data.push_back(pd);
+                    m_places_T[PPLACE_MAX-1].data.push_back(pd);
                     def->setPracticingPlaceSlot(PPLACE_MAX << 16);
-                    --m_places[place-1].used;
-                    ++m_places[PPLACE_MAX-1].used;
+                    --m_places_T[place-1].used;
+                    ++m_places_T[PPLACE_MAX-1].used;
 
                     if(clan)
                     {
@@ -129,7 +153,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                         UInt8 cnt = 2;
                         st << cnt;
                         UInt8 offset = st.size();
-                        st << static_cast<UInt8>(2) << static_cast<UInt8>(m_places[place - 1].used);
+                        st << static_cast<UInt8>(2) << static_cast<UInt8>(m_places_T[place - 1].used);
                         st << static_cast<UInt8>(3) << data.slotincoming;
                         if(money2)
                         {
@@ -260,12 +284,12 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         pp->cdend = now + pp->traintime * 60 + 60 * 60;
         pp->winnerid = 0;
 
-        DB1().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %" I64_FMT "u, '')", pl->getId(), place, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
+        DB1().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %" I64_FMT "u, '')", pl->getId(), place_tmp, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
 
-        pl->setPracticingPlaceSlot(place << 16 | slot);
+        pl->setPracticingPlaceSlot(place_tmp << 16 | slot);
         addPractice(pl, pp, place, slot); // XXX: must be here after setPracticingPlaceSlot
 
-        st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << pl->getPIcCount() << static_cast<UInt8>(place - 1) << static_cast<UInt8>(0) << Stream::eos;
+        st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << pl->getPIcCount() << static_cast<UInt8>(place_tmp - 1) << static_cast<UInt8>(0) << Stream::eos;
         pl->send(st);
         //抢占修炼之后自动将玩家参战将领加入修炼位
         for(int idx = 0; idx < 5; ++idx){
@@ -294,7 +318,25 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         UInt8 place = pl->getPracticePlace();
         UInt16 slot = pl->getPracticeSlot();
 
-        PPlace& data = m_places[place-1].place;
+        PlaceData * m_places_T;
+        if(place > 7)
+        {
+            if(place > PPLACE_MAX + 6)
+                return false;
+            place -= 7;
+            Clan * cl = pl->getClan();
+            if(!cl)
+                return false;
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(cl->GetClanServerId());
+            if(target == map_places.end())
+                return false;
+            m_places_T = target->second;
+        }
+        else
+            m_places_T = m_places;
+
+        PPlace& data = m_places_T[place-1].place;
+
         Player* owner = globalPlayers[data.ownerid];
         Clan* clan = NULL;
         if(NULL != owner)
@@ -312,7 +354,9 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                     PPLACE_MAX, pd->cdend, pl->getId());
 
             if(place == PPLACE_MAX || clan != pl->getClan())
-                --m_places[place-1].used;
+            {
+                --m_places_T[place-1].used;
+            }
 
             UInt32 trained = pd->traintime - pd->checktime;
             UInt16 money = ((float)(trained)/pd->traintime)*pd->slotprice;
@@ -321,8 +365,8 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             pl->getTael(remain);
             data.slotincoming += money;
             data.protincoming += money2;
-            DB1().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u",
-                    data.protincoming, data.slotincoming, place);
+            DB1().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u and `serverId` = %u ",
+                    data.protincoming, data.slotincoming, place, data.serverId);
 
             pd->checktime = 0; // XXX:
 
@@ -333,7 +377,9 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                 UInt8 cnt = 2;
                 st << cnt;
                 UInt8 offset = st.size();
-                st << static_cast<UInt8>(2) << static_cast<UInt8>(m_places[place - 1].used);
+                st << static_cast<UInt8>(2) ;
+                st << static_cast<UInt8>(m_places_T[place - 1].used);
+
                 st << static_cast<UInt8>(3) << data.slotincoming;
                 if(money2)
                 {
@@ -353,7 +399,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             st << static_cast<UInt32>(0) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
         }
         pl->setPracticingPlaceSlot(0);
-        m_places[place-1].data[slot] = 0;
+        m_places_T[place-1].data[slot] = 0;
 
         pl->send(st);
         return true;
@@ -471,6 +517,16 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                 fighters << ",";
         }
 
+        Player * pl = globalPlayers[id];
+
+        UInt16 serverId = 0;
+        if(cfg.merged)
+        {
+            Clan * clan = pl->getClan();
+            if(clan)
+                serverId = clan->GetClanServerId();
+        }
+
         DB1().PushUpdateData("UPDATE `practice_data` SET `fighters` = '%s' WHERE `id` = %" I64_FMT "u",
                 fighters.str().c_str(), id);
     }
@@ -478,19 +534,33 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
     void PracticePlace::getAllPlaceInfo(Player* pl)
     {
         Stream st(REP::PRACTICE_PLACE_IFNO);
+        size_t offset = st.size();
         const std::vector<UInt32>& addons = GData::GDataManager::GetPlaceAddons();
         st << static_cast<UInt8>(PPLACE_MAX);
+
         for (int i = 0; i < PPLACE_MAX; ++i) {
             st << static_cast<UInt8>(i);
             if (i >= static_cast<int>(addons.size()))
                 st << static_cast<UInt16>(100);
             else
-                st << static_cast<UInt16>(addons[i]);
+            {
+                UInt32 factor;
+                if(i == 6)
+                    factor = addons[i];
+                else
+                {
+                    if(!cfg.merged)
+                        factor = addons[i + 7];
+                    else
+                        factor = addons[i];
+                }
+                st << static_cast<UInt16>(factor);
+            }
 
             PPlace& data = m_places[i].place;
             st << data.slotmoney;
 
-            UInt64 ownerid = getPlaceOwnerId(i+1);
+            UInt64 ownerid = getPlaceOwnerId(i+1, 0);
             if (ownerid)
             {
                 Player* owner = globalPlayers[ownerid];
@@ -537,12 +607,166 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             st << data.winCount;
         }
 
+        if(cfg.merged)
+        {
+            Clan * cl = pl->getClan();
+            if(!cl)
+            {
+                UInt16 serverId = pl->getServerNo();
+                std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+                if(target != map_places.end())
+                {
+                    for (int i = 0; i < PPLACE_MAX - 1; ++i) 
+                    {
+                        st << static_cast<UInt8>(i + 7);
+                        if (i >= static_cast<int>(addons.size()))
+                            st << static_cast<UInt16>(100);
+                        else
+                            st << static_cast<UInt16>(addons[i + 7]);
+
+                        PPlace& data = target->second[i].place;
+                        st << data.slotmoney;
+
+                        UInt64 ownerid = getPlaceOwnerId(i+1, serverId);
+                        if (ownerid)
+                        {
+                            Player* owner = globalPlayers[ownerid];
+                            if (owner)
+                            {
+                                st << owner->getClanName();
+                            }
+                            else
+                                st << "";
+                        } else {
+                            st << "";
+                        }
+
+                        st << static_cast<UInt8>(data.maxslot);
+                        st << static_cast<UInt8>(target->second[i].used);
+
+                        if (data.protid)
+                        {
+                            Player* prot = globalPlayers[data.protid];
+                            if (prot)
+                            {
+                                UInt8 cls_sex = prot->GetClassAndSex();
+                                st << prot->getName();
+                                st << prot->GetLev();
+                                st << static_cast<UInt8>((cls_sex >> 4) & 0x0F);
+                                st << static_cast<UInt8>(cls_sex & 0x0F);
+                            }
+                            else
+                            {
+                                st << "";
+                                st << static_cast<UInt8>(0);
+                                st << static_cast<UInt8>(0);
+                                st << static_cast<UInt8>(0);
+                            }
+                        }
+                        else
+                        {
+                            st << "";
+                            st << static_cast<UInt8>(0);
+                            st << static_cast<UInt8>(0);
+                            st << static_cast<UInt8>(0);
+                        }
+                        st << data.enemyCount;
+                        st << data.winCount;
+                    }
+                }
+                else
+                {
+                    for (UInt32 i = 0; i < PPLACE_MAX - 1; ++i) 
+                    {
+                        st << static_cast<UInt8>(i + 7) << static_cast<UInt16>(addons[i + 7]) << static_cast<UInt16>(0);
+                        st << "" << static_cast<UInt8>(30) << static_cast<UInt8>(0);
+                        st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+                        st << static_cast<UInt16>(0) << static_cast<UInt16>(0);
+                    }
+                }
+            }
+            else
+            {
+                UInt16 serverId = cl->GetClanServerId();
+                std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+                if(target != map_places.end())
+                {
+                    for (int i = 0; i < PPLACE_MAX - 1; ++i) 
+                    {
+                        st << static_cast<UInt8>(i + 7);
+                        if (i >= static_cast<int>(addons.size()))
+                            st << static_cast<UInt16>(100);
+                        else
+                            st << static_cast<UInt16>(addons[i + 7]);
+
+                        PPlace& data = target->second[i].place;
+                        st << data.slotmoney;
+
+                        UInt64 ownerid = getPlaceOwnerId(i+1, serverId);
+                        if (ownerid)
+                        {
+                            Player* owner = globalPlayers[ownerid];
+                            if (owner)
+                            {
+                                st << owner->getClanName();
+                            }
+                            else
+                                st << "";
+                        } else {
+                            st << "";
+                        }
+
+                        st << static_cast<UInt8>(data.maxslot);
+                        st << static_cast<UInt8>(target->second[i].used);
+
+                        if (data.protid)
+                        {
+                            Player* prot = globalPlayers[data.protid];
+                            if (prot)
+                            {
+                                UInt8 cls_sex = prot->GetClassAndSex();
+                                st << prot->getName();
+                                st << prot->GetLev();
+                                st << static_cast<UInt8>((cls_sex >> 4) & 0x0F);
+                                st << static_cast<UInt8>(cls_sex & 0x0F);
+                            }
+                            else
+                            {
+                                st << "";
+                                st << static_cast<UInt8>(0);
+                                st << static_cast<UInt8>(0);
+                                st << static_cast<UInt8>(0);
+                            }
+                        }
+                        else
+                        {
+                            st << "";
+                            st << static_cast<UInt8>(0);
+                            st << static_cast<UInt8>(0);
+                            st << static_cast<UInt8>(0);
+                        }
+                        st << data.enemyCount;
+                        st << data.winCount;
+                    }
+                }
+                else
+                {
+                    for (UInt32 i = 0; i < PPLACE_MAX - 1; ++i) 
+                    {
+                        st << static_cast<UInt8>(i + 7) << static_cast<UInt16>(addons[i + 7]) << static_cast<UInt16>(0);
+                        st << "" << static_cast<UInt8>(30) << static_cast<UInt8>(0);
+                        st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+                        st << static_cast<UInt16>(0) << static_cast<UInt16>(0);
+                    }
+                }
+            }
+            st.data<UInt8>(offset) = static_cast<UInt8>(13);
+        }
+
         st << Stream::eos;
         pl->send(st);
-
         if(!pl->isPracticing())
             return;
-
         PracticeData* p = getPracticeData(pl);
         if (p)
         {
@@ -963,7 +1187,11 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         ++pd.place.openslot;
         pd.data.resize(pd.place.maxslot);
 
-        DB1().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u, `openslot` = %u WHERE ownerid = %" I64_FMT "u", pd.place.maxslot, pd.place.openslot, pd.place.ownerid);
+        UInt16 serverId = 0;
+        if(cfg.merged)
+            serverId = pl->getClan()->GetClanServerId();
+
+        DB1().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u, `openslot` = %u WHERE ownerid = %" I64_FMT "u and serverId = %u", pd.place.maxslot, pd.place.openslot, pd.place.ownerid, serverId);
 
         // TODO: notify client
         Clan* clan = pl->getClan();
@@ -982,7 +1210,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         return true;
     }
 
-    bool PracticePlace::addSlotFromTech(Player* pl, UInt8 place)
+    bool PracticePlace::addSlotFromTech(Player* pl, UInt8 place, UInt16 serverId)
     {
         UInt8 idx = 0;
         if (!pl || place > PPLACE_MAX)
@@ -991,6 +1219,17 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         GObject::Clan* clan = pl->getClan();
         if(clan == NULL)
             return false;
+        PlaceData * m_places_T;
+        if(serverId)
+        {
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+            if(target == map_places.end())
+                return false;
+            m_places_T = target->second;
+        }
+        else
+            m_places_T = m_places;
+
 
         if(0 != place)
         {
@@ -1001,7 +1240,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             UInt64 ownerid = clan->getOwner()->getId();
             for(; idx < PPLACE_MAX; idx ++)
             {
-                if(ownerid == m_places[idx].place.ownerid)
+                if(ownerid == m_places_T[idx].place.ownerid)
                     break;
             }
 
@@ -1009,7 +1248,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
                 return false;
         }
 
-        PlaceData& pd = m_places[idx];
+        PlaceData& pd = m_places_T[idx];
         if (pd.place.ownerid != pl->getId())
             return false;
 
@@ -1020,7 +1259,7 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         pd.place.techslot += techslot;
         pd.data.resize(pd.place.maxslot);
 
-        DB1().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u WHERE ownerid = %" I64_FMT "u", pd.place.maxslot, pd.place.ownerid);
+        DB1().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u WHERE ownerid = %" I64_FMT "u and serverId = %u", pd.place.maxslot, pd.place.ownerid, serverId);
 
         UInt32 openPrice = 0;
         const std::vector<UInt32>& golds = GData::GDataManager::GetGoldOpenSlot();
@@ -1038,22 +1277,58 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
 
     bool PracticePlace::addPlace(PPlace& place, UInt8 idx)
     {
-        if (idx > PPLACE_MAX)
+        if (idx > PPLACE_MAX || idx < 1)
             return false;
-        PlaceData& pd = m_places[idx];
-        pd.place = place;
-        pd.data.resize(place.maxslot);
-        Player* pl = globalPlayers[pd.place.ownerid];
-        if(!pl)
+        idx --;
+        if(!place.serverId)
         {
-            addSlotFromTech(pl, idx+1);
+            PlaceData& pd = m_places[idx];
+            pd.place = place;
+            pd.data.resize(place.maxslot);
+            Player* pl = globalPlayers[pd.place.ownerid];
+            if(!pl)
+            {
+                addSlotFromTech(pl, idx+1, place.serverId);
+            }
         }
-
+        else
+        {
+            if(map_places.count(place.serverId))
+            {
+                std::map<UInt16, PlaceData*>::iterator target = map_places.find(place.serverId);
+                PlaceData& pd = target->second[idx];
+                pd.place = place;
+                pd.data.resize(place.maxslot);
+            }
+            else
+            {
+                PlaceData * pd = new PlaceData[PPLACE_MAX];
+                memset(pd, 0, sizeof(PlaceData) * PPLACE_MAX);
+                pd[idx].place = place;
+                pd[idx].data.resize(place.maxslot);
+                map_places.insert(std::make_pair(place.serverId, pd));
+            }
+        }
         return true;
     }
 
     bool PracticePlace::addPractice(Player* pl, PracticeData* pd, UInt8 place, UInt8 slot)
     {
+        PlaceData * m_places_T;
+        if(place >= 8 && place <= 13)
+        {
+            place -= 7;
+            Clan * cl = pl->getClan();
+            if(!cl)
+                return false;
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(cl->GetClanServerId());
+            if(target == map_places.end())
+                return false;
+            m_places_T = target->second;
+        }
+        else
+            m_places_T = m_places;
+
         if (!pl || !pd)
             return false;
         PracticeData*& oldpd = m_pradata[pd->getId()];
@@ -1074,7 +1349,9 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             if (event == NULL) return false;
             PushTimerEvent(event);
 
-            Player* owner = globalPlayers[m_places[place-1].place.ownerid];
+            Player * owner = NULL;
+            owner = globalPlayers[m_places_T[place-1].place.ownerid];
+
             GObject::Clan* clan = NULL;
             if(NULL != owner)
             {
@@ -1084,16 +1361,17 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
             if(place == PPLACE_MAX || clan != pl->getClan())
             {
                 if(place == PPLACE_MAX)
-                    m_places[place-1].data.push_back(pd);
+                    m_places_T[place-1].data.push_back(pd);
                 else
-                    m_places[place-1].data[slot] = pd;
-                ++m_places[place-1].used;
+                    m_places_T[place-1].data[slot] = pd;
+                ++m_places_T[place-1].used;
             }
 
             if(clan && clan != pl->getClan())
             {
                 Stream st(REP::CLAN_BUILD);
-                st << static_cast<UInt8>(1) << static_cast<UInt8>(2) << static_cast<UInt8>(m_places[place - 1].used);
+                st << static_cast<UInt8>(1) << static_cast<UInt8>(2);
+                st << static_cast<UInt8>(m_places_T[place - 1].used);
                 st << Stream::eos;
                 clan->broadcast(st);
             }
@@ -1177,82 +1455,215 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
     }
 
 
-    UInt64 PracticePlace::getPlaceOwnerId(UInt8 place)
+    UInt64 PracticePlace::getPlaceOwnerId(UInt8 place, UInt16 serverId)
     {
-        PlaceData& pd = m_places[place-1];
-        return pd.place.ownerid;
+        if(serverId)
+        {
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+            if(target == map_places.end())
+                return 0;
+            else
+                return target->second[place - 1].place.ownerid;
+        }
+        else
+        {
+            PlaceData& pd = m_places[place-1];
+            return pd.place.ownerid;
+        }
     }
 
     bool PracticePlace::replaceOwner(Player* newpl, Player* oldpl)
     {
         if (!newpl || !oldpl)
             return false;
+        UInt8 localPlace = 0;
+        UInt8 globalPlace = 0;
 
         UInt8 idx = 0;
         for(; idx < PPLACE_MAX; ++idx)
         {
             if(oldpl->getId() == m_places[idx].place.ownerid)
+            {
+                localPlace = idx + 1;
                 break;
+            }
         }
 
-        if(idx >= PPLACE_MAX - 1)
-            return false;
+        Clan * cl = oldpl->getClan();
+        if(cfg.merged && cl)
+        {
+            UInt16 serverId = cl->GetClanServerId();
+            std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+            if(target != map_places.end())
+            {
+                for(idx = 0; idx < PPLACE_MAX - 1; ++idx)
+                {
+                    if(oldpl->getId() == target->second[idx].place.ownerid)
+                    {
+                        globalPlace = idx + 1;
+                        break;
+                    }
+                }
+            }
+        }
 
-        return replaceOwner(newpl, idx+1);
+        bool bRet = false;
+        if(localPlace != 0)
+            bRet = replaceOwner(newpl, localPlace);
+        if(globalPlace != 0)
+            bRet |= replaceOwner(newpl, globalPlace + 7);
+
+        return bRet;
     }
 
     bool PracticePlace::replaceOwner(Player* newpl, UInt8 place)
     {
-        if (!newpl || place >= PPLACE_MAX)
+        if (!newpl || place >= PPLACE_MAX + 7)
             return false;
 
         GObject::Clan* clan = newpl->getClan();
         if(!clan)
             return false;
 
-        Player* oldpl = globalPlayers[getPlaceOwnerId(place)];
-        if (oldpl)
-        { // 易主易帮
-            PlaceData& pd = m_places[place-1];
-            GObject::Clan* oldclan = oldpl->getClan();
-            if(oldclan != clan) // 易帮
-            {
+        UInt16 serverId = 0;
+        if(place > PPLACE_MAX)
+        {
+            place -= PPLACE_MAX;
+            serverId = clan->GetClanServerId();
+        }
+
+        Player* oldpl = globalPlayers[getPlaceOwnerId(place, serverId)];
+
+        if(!serverId)
+        {
+            if (oldpl)
+            { // 易主易帮
+                PlaceData& pd = m_places[place-1];
+                GObject::Clan* oldclan = oldpl->getClan();
+                if(oldclan != clan) // 易帮
+                {
+                    pd.place.openslot = 0;
+                    UInt8 techslot = clan->getPracticeSlot();
+                    UInt8 slotadd = techslot - pd.place.techslot;
+
+                    pd.place.maxslot += slotadd;
+                    pd.place.techslot += techslot;
+                    pd.data.resize(pd.place.maxslot);
+                }
+                else // 易主
+                {
+                    // XXX:
+                }
+                pd.place.ownerid = newpl->getId();
+
+                clan->broadcastPracticePlaceInfo();
+                if (oldclan)
+                    oldclan->broadcastPracticePlaceInfo();
+
+                DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %" I64_FMT "u, `maxslot` = %u WHERE id = %u and serverId = %u",
+                        pd.place.ownerid, pd.place.maxslot, place, serverId);
+            }
+            else
+            { // 设主
+                PlaceData& pd = m_places[place-1];
+
                 pd.place.openslot = 0;
                 UInt8 techslot = clan->getPracticeSlot();
                 UInt8 slotadd = techslot - pd.place.techslot;
-
                 pd.place.maxslot += slotadd;
                 pd.place.techslot += techslot;
                 pd.data.resize(pd.place.maxslot);
-            }
-            else // 易主
-            {
-                // XXX:
-            }
-            pd.place.ownerid = newpl->getId();
 
-            clan->broadcastPracticePlaceInfo();
-            if (oldclan)
-                oldclan->broadcastPracticePlaceInfo();
+                pd.place.ownerid = newpl->getId();
+                clan->broadcastPracticePlaceInfo();
 
-            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %" I64_FMT "u, `maxslot` = %u WHERE id = %u",
-                    pd.place.ownerid, pd.place.maxslot, place);
+                DB1().PushUpdateData("REPLACE INTO practice_place(id, ownerid, protid, maxslot, slotincoming, protincoming, serverId) VALUES(%u, %" I64_FMT "u,%u,%u, %u, %u, %u)",place, pd.place.ownerid, 0, pd.place.maxslot, 0, 0, serverId);
+
+            }
         }
         else
-        { // 设主
-            PlaceData& pd = m_places[place-1];
-            pd.place.openslot = 0;
-            UInt8 techslot = clan->getPracticeSlot();
-            UInt8 slotadd = techslot - pd.place.techslot;
-            pd.place.maxslot += slotadd;
-            pd.place.techslot += techslot;
-            pd.data.resize(pd.place.maxslot);
+        {
+            if (oldpl)
+            { // 易主易帮
+                std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+                if(target == map_places.end())
+                    return false;
 
-            pd.place.ownerid = newpl->getId();
-            clan->broadcastPracticePlaceInfo();
+                PlaceData& pd = target->second[place-1];
+                GObject::Clan* oldclan = oldpl->getClan();
+                if(oldclan != clan) // 易帮
+                {
+                    pd.place.openslot = 0;
+                    UInt8 techslot = clan->getPracticeSlot();
+                    UInt8 slotadd = techslot - pd.place.techslot;
 
-            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %" I64_FMT "u, `maxslot` = %u WHERE id = %u",
-                    pd.place.ownerid, pd.place.maxslot, place);
+                    pd.place.maxslot += slotadd;
+                    pd.place.techslot += techslot;
+                    pd.data.resize(pd.place.maxslot);
+                }
+                else // 易主
+                {
+                    // XXX:
+                }
+                pd.place.ownerid = newpl->getId();
+
+                clan->broadcastPracticePlaceInfo();
+                if (oldclan)
+                    oldclan->broadcastPracticePlaceInfo();
+
+                DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %" I64_FMT "u, `maxslot` = %u WHERE id = %u and serverId = %u",
+                        pd.place.ownerid, pd.place.maxslot, place, serverId);
+            }
+            else
+            { // 设主
+
+                std::map<UInt16, PlaceData*>::iterator target = map_places.find(serverId);
+                if(target != map_places.end())
+                {
+                    PPlace place_t;
+                    place_t.id = place;
+                    place_t.ownerid = newpl->getId();
+                    place_t.maxslot = 30;
+                    place_t.serverId = serverId;
+                    place_t.open = 0;
+                    place_t.protid = 0;
+                    PlaceData& pd = target->second[place - 1];
+                    pd.place = place_t;
+                    pd.data.resize(place_t.maxslot);
+                }
+                else
+                {
+                    PPlace place_t;
+                    place_t.id = place;
+                    place_t.ownerid = newpl->getId();
+                    place_t.maxslot = 30;
+                    place_t.serverId = serverId;
+                    place_t.open = 0;
+                    place_t.protid = 0;
+                    PlaceData * pd = new PlaceData[PPLACE_MAX];
+                    memset(pd, 0, sizeof(PlaceData) * PPLACE_MAX);
+                    pd[place - 1].place = place_t;
+                    pd[place - 1].data.resize(place_t.maxslot);
+                    map_places.insert(std::make_pair(serverId, pd));
+                    target = map_places.find(serverId);
+                    if(target == map_places.end())
+                        return false;
+                }
+
+                PlaceData& pd = target->second[place-1];
+                pd.place.openslot = 0;
+                UInt8 techslot = clan->getPracticeSlot();
+                UInt8 slotadd = techslot - pd.place.techslot;
+                pd.place.maxslot += slotadd;
+                pd.place.techslot += techslot;
+                pd.data.resize(pd.place.maxslot);
+
+                pd.place.ownerid = newpl->getId();
+                clan->broadcastPracticePlaceInfo();
+
+                DB1().PushUpdateData("REPLACE INTO practice_place(id, ownerid, protid, maxslot, slotincoming, protincoming,serverId) VALUES(%u, %" I64_FMT "u,%u,%u, %u, %u, %u)",place, pd.place.ownerid, 0, pd.place.maxslot, 0, 0, serverId);
+
+            }
         }
 
         return true;
@@ -1363,6 +1774,16 @@ UInt8 PracticePlace::_picCnt[16] = {2, 4, 4, 4, 4, 6, 6, 6, 8, 10, 12, 12, 12, 1
         {
             m_places[idx].place.slotincoming = 0;
             m_places[idx].place.protincoming = 0;
+        }
+
+        for(std::map<UInt16, PlaceData*>::iterator i = map_places.begin(), e = map_places.end(); i != e; i++)
+        {
+            idx = 0;
+            for(; idx < PPLACE_MAX; idx ++)
+            {
+                i->second[idx].place.slotincoming = 0;
+                i->second[idx].place.protincoming = 0;
+            }
         }
     }
 } // namespace GObject

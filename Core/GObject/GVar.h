@@ -151,11 +151,13 @@ namespace GObject
         GVAR_KANGJITIANMO_END = 93,     // 抗击天魔结束时间
         GVAR_MAX_TEAM_NUM = 94,         // 抗击天魔最大队伍数量
 
-        GVAR_ANSWER_ENDTIME = 95,       // 答题每轮结束时间
+        /*GVAR_ANSWER_ENDTIME = 95,       // 答题每轮结束时间
         GVAR_ANSWER_AWARDTIME = 96,     // 答题每轮结算时间
         GVAR_ANSWER_PREPARE_DAY = 97,   // 答题每天准备时间
         GVAR_ANSWER_BEGIN_DAY = 98,     // 答题每天开始时间
-        GVAR_ANSWER_END_DAY = 99,       // 答题每天结束时间
+        GVAR_ANSWER_END_DAY = 99,       // 答题每天结束时间*/
+        GVAR_ANSWER_BEGIN = 98,         // 一战成名活动开启时间
+        GVAR_ANSWER_END = 99,           // 一战成名活动结束时间
         GVAR_RAND_QUESTIONS_MARK = 100, // 选题标记
         
         GVAR_CLAN_BIGBOSS_ENABLE = 101,         //帮派BOSS能否预约
@@ -168,6 +170,9 @@ namespace GObject
 
         GVAR_MOSTER_PET_BEGIN = 107,          //妖王，珍兽收费减半
         GVAR_MOSTER_PET_END = 108,          
+
+        GVAR_CLAN_LOCAL_RANK = 109,
+
         GVAR_MAX,
     };
 
@@ -267,11 +272,13 @@ namespace GObject
             GREGISTER_VAR(GVAR_KANGJITIANMO_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_KANGJITIANMO_END, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_MAX_TEAM_NUM, GCYCLE_NONE);
-            GREGISTER_VAR(GVAR_ANSWER_ENDTIME, GCYCLE_NONE);
+            /*GREGISTER_VAR(GVAR_ANSWER_ENDTIME, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_ANSWER_AWARDTIME, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_ANSWER_PREPARE_DAY, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_ANSWER_BEGIN_DAY, GCYCLE_NONE);
-            GREGISTER_VAR(GVAR_ANSWER_END_DAY, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_ANSWER_END_DAY, GCYCLE_NONE);*/
+            GREGISTER_VAR(GVAR_ANSWER_BEGIN, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_ANSWER_END, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_RAND_QUESTIONS_MARK, GCYCLE_DAY);
 
             GREGISTER_VAR(GVAR_SERVERWAR_ISENTER, GCYCLE_WEEK);
@@ -306,6 +313,7 @@ namespace GObject
             GREGISTER_VAR(GVAR_11TIME_END, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_MOSTER_PET_BEGIN, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_MOSTER_PET_END, GCYCLE_NONE);
+            GREGISTER_VAR(GVAR_CLAN_LOCAL_RANK, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

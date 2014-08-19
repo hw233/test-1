@@ -100,17 +100,19 @@ namespace GObject
         UInt32 nowTime = TimeUtil::Now();
         UInt32 endTime = 0;
         UInt32 awardTime = 0;
-        if(World::getAnswerTime())
+        if(World::getAnswerTime_Day())
         {
             //std::cout << "nowTime333 : " << nowTime << std::endl;
-            if(GVAR.GetVar(GVAR_ANSWER_ENDTIME) > nowTime)
+            if(/*GVAR.GetVar(GVAR_ANSWER_ENDTIME)*/World::_gAnswerEndTime > nowTime)
             {
-                endTime = GVAR.GetVar(GVAR_ANSWER_ENDTIME) - nowTime;
+                endTime = World::_gAnswerEndTime - nowTime;
+                //endTime = GVAR.GetVar(GVAR_ANSWER_ENDTIME) - nowTime;
                 //std::cout << "AnswerEnd111 : " << endTime << std::endl;
             }
             else
             {
-                awardTime = GVAR.GetVar(GVAR_ANSWER_AWARDTIME) - nowTime;
+                awardTime = World::_gAnswerFinalTime - nowTime;
+                //awardTime = GVAR.GetVar(GVAR_ANSWER_AWARDTIME) - nowTime;
                 //std::cout << "awardEnd222 : " << awardTime << std::endl;
             }
         }
@@ -523,7 +525,8 @@ namespace GObject
         if(0==skillId || skillId>5)
             return;
 
-        if(GVAR.GetVar(GVAR_ANSWER_ENDTIME) > GVAR.GetVar(GVAR_ANSWER_AWARDTIME))
+        //if(GVAR.GetVar(GVAR_ANSWER_ENDTIME) > GVAR.GetVar(GVAR_ANSWER_AWARDTIME))
+        if(World::_gAnswerEndTime > World::_gAnswerFinalTime)
             return;
 
         UInt32 status = pl->GetVar(VAR_ANSWER_SKILL_USE_NUM);

@@ -11821,6 +11821,7 @@ function ItemNormal_00016051(id, num, bind, param)
         if i > 7 then
             Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_143.."[4:"..item[1]..msg_144);
         end
+    end
 
     package:DelItemSendMsg(id, player);
     return num;
