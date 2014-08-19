@@ -3631,6 +3631,7 @@ namespace GObject
         void SacrificeFlyRoad(UInt8 type, UInt16 num);
         void ExchangeXG(UInt8 type);
         void ExchangeFlyRoadBox(UInt8 type);
+        void getLuckyBagExtraAward();
 
     private:
         //玩家位置（包括层数、当层位置）

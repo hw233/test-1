@@ -1379,14 +1379,14 @@ void World::SendSurnameLegendAward()
     if(bSurnameLegendEnd)
     {
         World::initRCRank();
-        static MailPackage::MailItem s_item[][3] = {
-            {{5068,1},{5138,1},{5108,1}},
-            {{5068,1},{5138,1},{5107,1}},
-            {{5068,1},{5137,1},{5107,1}},
-            {{5067,1},{5137,1},{5107,1}},
-            {{5067,1},{5137,1},{5106,1}},
-            {{5067,1},{5136,1},{5106,1}},
-            {{5066,1},{5136,1},{5106,1}},
+        static MailPackage::MailItem s_item[][5] = {
+            {{9498,30},{134,30},{16001,30},{9338,30},{17800,1}},
+            {{9498,25},{134,25},{16001,25},{9338,20},{0,0}},
+            {{9498,20},{134,20},{16001,20},{9338,20},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
         };
         int pos = 0;
         for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
@@ -1399,14 +1399,14 @@ void World::SendSurnameLegendAward()
             if(pos > 7)
                 break;
             //UInt32 score = i->total;
-            if(pos > 0 && pos <= 7)     //奖励前10名
+            if(pos > 0 && pos <= 7)     //奖励前7名
             {
                 SYSMSGV(content, 4174, pos);
-                MailItemsInfo itemsInfo(s_item[pos-1], Activity, 3);
+                MailItemsInfo itemsInfo(s_item[pos-1], Activity, 5);
                 Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(mail)
                 {
-                    mailPackageManager.push(mail->id, s_item[pos-1], 3, true);
+                    mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
                 }
             }
         }

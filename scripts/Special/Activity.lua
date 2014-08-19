@@ -8862,12 +8862,7 @@ function SurnameLegendLoot(player,lootlvl)
             [3] = 1,
     };
     local package = player:GetPackage();
-    --package:AddItem(9383, itemNum[lootlvl], true,0,10);
-    --package:AddItem(9397, itemNum[lootlvl], true,0,10);
-    --package:AddItem(9401, itemNum[lootlvl], true,0,10);
-    --package:AddItem(9422, itemNum[lootlvl], true,0,10);
-    --package:AddItem(9437, itemNum[lootlvl], true,0,10);
-    package:AddItem(16010, itemNum[lootlvl], true,0,10);
+    package:AddItem(16050, itemNum[lootlvl], true,0,10);
 end
 
 -- 万圣节套装
@@ -9610,7 +9605,7 @@ function onGetNewYearGiveGiftAward(player, index, times)
         {{505, 2}, {516, 2}, {466, 2}, {33, 2}},
         {{1325, 2}, {9424, 2}, {508, 2}, {512, 2}},
 
-        {{9398, 2}, {16001, 2}, {8000, 2}, {499, 88}},
+        {{9498, 2}, {16001, 2}, {8000, 2}, {499, 88}},
         {{134, 2}, {9600, 2}, {500, 2}, {499, 50}},
         {{9338, 2}, {501, 2}, {50, 2}, {9371, 2}},
         {{515, 2}, {9308, 2}, {503, 2}, {15, 2}},
@@ -9817,7 +9812,7 @@ function GetLuckyBagAward(player)
     end
 
     local items = {
-       { 513,6}, {505,6}, {511,6}, {512,6}, {510,6}
+       {9371,5}, {134,2}, {9457,2}, {9338,2}, {9600,6}, {1325,2}
     }
     for i = 1 , 5  do
         local num = player:GetVar(452+i);

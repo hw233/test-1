@@ -25558,22 +25558,14 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
     {
         if(flag == e_sla_none)
         {
-            //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
-            //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
-            //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
-            //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-            GetPackage()->AddItem(16010, 1, true, false, FromNpc);
+            GetPackage()->AddItem(16050, 1, true, false, FromNpc);
         }
-        else
+        else if(flag == e_sla_cb || flag == e_sla_clb || flag == e_sla_hi || flag == e_sla_ncb || flag == e_sla_rb || flag == e_sla_mr || flag == e_sla_ccb)
         {
             UInt32 status = GetVar(VAR_SURNAME_LEGEND_STATUS);
             if(!(status & flag))
             {
-                //GetPackage()->AddItem(9397, 1, true, false, FromNpc);
-                //GetPackage()->AddItem(9401, 1, true, false, FromNpc);
-                //GetPackage()->AddItem(9422, 1, true, false, FromNpc);
-                //GetPackage()->AddItem(9437, 1, true, false, FromNpc);
-                GetPackage()->AddItem(16010, 1, true, false, FromNpc);
+                GetPackage()->AddItem(16050, 1, true, false, FromNpc);
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }
@@ -35342,6 +35334,18 @@ void Player::ExchangeFlyRoadBox(UInt8 type)
             return;
     }
     ReturnFlyRoadInfo();
+}
+
+void Player::getLuckyBagExtraAward()
+{
+    SYSMSGV(title, 4166);
+    SYSMSGV(content, 4167);
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(mail)
+    {
+        MailPackage::MailItem mitem = {16038,1};
+        mailPackageManager.push(mail->id, &mitem, 1, true);
+    }
 }
 
 
