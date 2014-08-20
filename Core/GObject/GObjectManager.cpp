@@ -4062,13 +4062,14 @@ namespace GObject
 		globalClans.enumerate(cacheClan, 0);
         if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
             GVAR.SetVar(GVAR_REPAIRTYSSBUG,1);
+#if 0
         if(GVAR.GetVar(GVAR_CLAN_LOCAL_RANK) == 0)
         {
             GVAR.SetVar(GVAR_CLAN_LOCAL_RANK, 1);
             ClanRankBattleMgr::Instance().clanLocalRankInit();
             ClanRankBattleMgr::Instance().clanLocalRank();
         }
-
+#endif
         lc.prepare("Loading clan item:");
         DBClanItem ci;
         if(execu->Prepare("SELECT `clanid`, `playerid`, `itemid`, `itemnum` FROM `clan_item` ORDER BY `clanid`", ci) != DB::DB_OK)
