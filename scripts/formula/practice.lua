@@ -5,27 +5,39 @@ potentialbase = 5 --
 
 -- TODO: 山头据点
 local addons = {
-    [1] = 0.3,
-    [2] = 0.2,
-    [3] = 0.2,
-    [4] = 0.1,
-    [5] = 0.1,
-    [6] = 0.1,
-    [7] = 0
+    [1] = 0.5,
+    [2] = 0.4,
+    [3] = 0.4,
+    [4] = 0.3,
+    [5] = 0.3,
+    [6] = 0.3,
+    [7] = 0,
+    [8] = 0.3,
+    [9] = 0.2,
+    [10] = 0.2,
+    [11] = 0.1,
+    [12] = 0.1,
+    [13] = 0.1
 }
 
-function calcPracticeInc( fgt )
+function calcPracticeInc( fgt , merged)
     if fgt == nil then
         return 0
     end
 
     place = fgt:getPracticePlace();
-    if not place or place > 7 then
+    if not place or place > 13 then
         return 0
     end
     placeadd = addons[place]
     if placeadd == nil then
         placeadd = 0
+    end
+
+    if not merged then
+        if place < 7 then
+            placeadd = addons[place + 7]
+        end
     end
 
     if place ~= 7 then

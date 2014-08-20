@@ -490,7 +490,8 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 6:
         {
             ++_pexpMods;
-            if (_pexpMods >= 3 || _forceWrite) // XXX: 半小时一次
+            //以前3次写1次，现在每次都写
+            if (_pexpMods >= 1 || _forceWrite) // XXX: 半小时一次
             {
                 DB2().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %" I64_FMT "u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", v, _id, _owner->getId());
                 _pexpMods = 0;
@@ -4855,7 +4856,7 @@ float Fighter::getBasePExpEach()
 
 float Fighter::getPracticeInc()
 {
-    float ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this);
+    float ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this, cfg.merged);
     return ret;
 }
 

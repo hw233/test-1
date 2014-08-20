@@ -705,7 +705,8 @@ CREATE TABLE `practice_place` (
   `winCount` smallint(5) unsigned NOT NULL DEFAULT '0',
   `slotincoming` int(11) NOT NULL,
   `protincoming` int(11) NOT NULL,
-   PRIMARY KEY (`id`)
+  `serverId` smallint(5) unsigned NOT NULL DEFAULT '0',
+   PRIMARY KEY (`id`, `serverId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `practice_data`;
@@ -1125,6 +1126,7 @@ CREATE TABLE `clan` (
   `clantitleAll` varchar(1024) NOT NULL DEFAULT '',
   `clanFireValue` int(10) unsigned NOT NULL DEFAULT '0',
   `clanAutoApply` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `serverId` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

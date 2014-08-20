@@ -1111,11 +1111,11 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             static UInt16 ids[] =
             {
                 9427, 2,
-                5135,  1,
+                5035,  1,
                 9141, 2,
                 15, 2,
-                9457, 4,
-                9600, 4,
+                503, 4,
+                501, 4,
             };
 
             UInt8 idx = 0;
@@ -1145,7 +1145,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if(id == 9427 || id == 5135 || id == 9141)
+                    if(id == 9427 || id == 5035 || id == 9141)
                     {
                         if(player->GetVar(GObject::VAR_DIRECTPURCNT) >= 3)
                             purchase.code = 2;
@@ -4082,7 +4082,7 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 21 && begin <= end )
     {
-        curType = 21;
+        /*curType = 21;
         ret = 1;
         Stream st(SPEP::ACTIVITYONOFF);
         st << ret << Stream::eos;
@@ -4111,6 +4111,21 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
         }
         GObject::GVAR.SetVar(GObject::GVAR_ANSWER_ENDTIME, valueTimeA);
         GObject::GVAR.SetVar(GObject::GVAR_ANSWER_AWARDTIME, valueTimeB);
+
+        return;*/
+
+        curType = 21;
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
+        {
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
+        }
+
+        GObject::GVAR.SetVar(GObject::GVAR_ANSWER_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_ANSWER_END, end);
 
         return;
     }

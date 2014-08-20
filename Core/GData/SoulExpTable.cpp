@@ -10,6 +10,7 @@ SoulExpTable soulExpTable;
 SoulExpTable::SoulExpTable()
 {
 	memset(_exp, 0, sizeof(_exp));
+	memset(_pexp, 0, sizeof(_pexp));
 }
 
 bool SoulExpTable::testLevelUp( UInt8& lvl, UInt32& exp )

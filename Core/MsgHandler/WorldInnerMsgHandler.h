@@ -2866,7 +2866,7 @@ void OnSendAnswerBegin(GameMsgHdr& hdr,  const void* data )
 
     MSG_QUERY_PLAYER(player);   
 
-    if(!World::getAnswerAct())
+    if(!World::getAnswerTime_Act)
         return;
 
     if(player->GetLev() < 30)
@@ -2874,7 +2874,7 @@ void OnSendAnswerBegin(GameMsgHdr& hdr,  const void* data )
 
     UInt32 nowTime = TimeUtil::Now();
     UInt32 time = TimeUtil::SharpDayT(0,nowTime);
-    UInt32 prepare = time + 19*60*60 + 15*60;     // 每天19点30开始
+    UInt32 prepare = time + 19*60*60 + 15*60;     // 每天19点15准备
     UInt32 start = time + 19*60*60 + 30*60;       // 每天19点30开始
     UInt32 end = time + 19*60*60 + 45*60;         // 每天19点45结束
     UInt8 mark =  0;

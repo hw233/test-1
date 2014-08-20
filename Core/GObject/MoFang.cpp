@@ -728,6 +728,7 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
         return;
 
     UInt8 scheme = m_owner->GetVar(VAR_JIGUAN_SCHEME);
+    TRACE_LOG("equipJG  jgId: %u, pos: %u, scheme:%u, mark:%u", jgId, pos, scheme, mark);
 
     if(EQUIP_JG == mark || DISMANT_JG == mark)
     {
