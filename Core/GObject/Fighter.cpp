@@ -13,6 +13,7 @@
 #include "GData/AcuPraTable.h"
 #include "GData/XingchenData.h"
 #include "GData/DrinkAttr.h"
+#include "GData/IncenseTable.h"
 #include "GData/lingbaoLevel.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
@@ -110,6 +111,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _wbplextmagatk = 0;
     _cbbplextatk = 0;
     _cbbplextmagatk = 0;
+    _incense = 0;
 }
 
 Fighter::~Fighter()
@@ -1465,7 +1467,8 @@ void Fighter::addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce )
 {
 	if(ce == NULL)
 		return;
-	ae += *ce;
+    float up = GData::incenseData.getIncenseAttr(getIncense());
+	ae += ce->getIncenseUp(1+up/100);
 }
 
 void Fighter::addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt )
@@ -8206,6 +8209,10 @@ void Fighter::updateLingbaoFallToDB(UInt8 type)
     DB1().PushUpdateData("REPLACE INTO `fighter_lingbaoFall` (`playerId`, `fighterId`, `type`, `fall`) VALUES(%" I64_FMT "u, %u, %u, %u)", _owner->getId(), getId(),type,lingbaoFall[type]);
 
 } 
+void Fighter::UpdateIncenseToDB()
+{
+    DB2().PushUpdateData("UPDATE `fighter` SET `incense` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", _incense, _id, _owner->getId());
+}
 
 /*
  *end分别计算散仙的战斗力

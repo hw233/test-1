@@ -345,6 +345,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140804_aLingbaoFall.sql #create fighter_lingbaoFall
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_modify_clan_founder.sql #modify clan founder
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140818_addInsensevim.sql     #添加心法增幅(燃香)
 }
 
 #sh player_jiguan.sh

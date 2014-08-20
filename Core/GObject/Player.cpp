@@ -29416,16 +29416,16 @@ bool Player::giveFlower(UInt8 type ,UInt32 num)
         return false;
     UInt8 ret = 0;
     {
-        UInt16 count = GetPackage()->GetItemAnyNum(9442+type) ;
-        ItemBase * item = GetPackage()->FindItem(9442+type, true);
+        UInt16 count = GetPackage()->GetItemAnyNum(555+type) ;
+        ItemBase * item = GetPackage()->FindItem(555+type, true);
         if (!item)
-            item =GetPackage()->FindItem(9442+type, false);
+            item =GetPackage()->FindItem(555+type, false);
         if(item ==NULL)
             return false;
         if(num > count)
             return false;
-        GetPackage()->DelItemAny(9442+type, type ==0 ? 1:num );
-        GetPackage()->AddItemHistoriesLog(9442+type, type == 0 ? 1:num );
+        GetPackage()->DelItemAny(555+type, type ==0 ? 1:num );
+        GetPackage()->AddItemHistoriesLog(555+type, type == 0 ? 1:num );
         AddVar(VAR_MARRYBOARD_LIVELY,!type * 100 + num * 5);
         ret = 1;
         char str[16] = {0};
@@ -35317,6 +35317,35 @@ void Player::ExchangeFlyRoadBox(UInt8 type)
     ReturnFlyRoadInfo();
 }
 
+UInt32 Player::UseIncenseGood(UInt8 type , UInt8 num)
+{ 
+    if(type > 1 || !num)
+        return 0;
+    {
+        UInt16 count = GetPackage()->GetItemAnyNum(555+type) ;
+        ItemBase * item = GetPackage()->FindItem(555+type, true);
+        if (!item)
+            item =GetPackage()->FindItem(555+type, false);
+        if(item ==NULL)
+            return 0;
+        if(num > count)
+            return 0;
+        GetPackage()->DelItemAny(555+type, num );
+        GetPackage()->AddItemHistoriesLog(555+type, type == 0 ? 1:num );
+    }
+    UInt32 once = type*40 + !type*10;
+    UInt32 sum = once * num;
+    if(type)
+    {
+        for(UInt8 i = 0; i < num ; ++i)
+        { 
+            if(uRand(10000) < 1000)
+                sum += once;
+        } 
+    }
+    return sum;
+
+} 
 
 } // namespace GObject
 

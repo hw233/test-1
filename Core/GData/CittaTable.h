@@ -77,6 +77,59 @@ struct CittaEffect : public ObjectBaseNT<UInt16>
     float mreslvl;
     float toughlvl;
     float criticaldmgimmune;
+	CittaEffect getIncenseUp(const float rate) const
+	{
+        CittaEffect aet = *this;
+		aet.strength *= rate;
+		aet.physique *= rate;
+		aet.agility *= rate;
+		aet.intelligence *= rate;
+		aet.will *= rate;
+		aet.soul *= rate;
+		aet.aura *= rate;
+		aet.auraMax *= rate;
+		aet.attack *= rate;
+        aet.magatk *= rate;
+		aet.defend *= rate;
+        aet.magdef *= rate;
+		aet.hp *= rate;
+		aet.tough *= rate;
+		aet.action *= rate;
+		aet.hitrate *= rate;
+		aet.evade *= rate;
+		aet.critical *= rate;
+		aet.criticaldmg *= rate;
+		aet.pierce *= rate;
+		aet.counter *= rate;
+        aet.magres *= rate;
+
+		aet.strengthP *= rate;
+		aet.physiqueP *= rate;
+		aet.agilityP *= rate;
+		aet.intelligenceP *= rate;
+		aet.willP *= rate;
+		aet.soulP *= rate;
+		aet.attackP *= rate;
+        aet.magatkP *= rate;
+		aet.defendP *= rate;
+        aet.magdefP *= rate;
+
+		aet.hpP *= rate;
+		aet.actionP *= rate;
+		//aet.criticaldmgP *= rate;   //暴击伤害不加成
+		aet.counterP *= rate;
+        aet.magresP *= rate;
+
+        aet.hitrlvl *= rate;
+        aet.evdlvl *= rate;
+        aet.crilvl *= rate;
+        aet.pirlvl *= rate;
+        aet.counterlvl *= rate;
+        aet.mreslvl *= rate;
+        aet.toughlvl *= rate;
+        aet.criticaldmgimmune *= rate;
+        return aet;
+	}
 
     std::vector<const SkillBase*> skill;  // 带出技能
 };

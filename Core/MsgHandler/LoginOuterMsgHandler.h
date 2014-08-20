@@ -1396,17 +1396,21 @@ inline bool player_enum_setvar(GObject::Player* p, void* msg)
 {
     struct Msg
     {
+        UInt16 serverNo;
         UInt32 var;
         UInt32 value;
         UInt8 type;
     };
 
     Msg* _msg = (Msg*)msg;
+    UInt16 serverNo = _msg->serverNo;
     UInt32 var = _msg->var;
     UInt32 value = _msg->value;
     UInt8 type = _msg->type;
     UInt32 v = p->GetVar(var); 
     UInt32 value1 = 0 ;
+    if(p->getServerNo()!= serverNo)
+        return true;
     if(type == 1 )
         value1 = value ;
     else if(type ==2)
@@ -4265,10 +4269,12 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
         {
             struct Msg
             {
+                UInt16 serverNo;
                 UInt32 var;
                 UInt32 value;
                 UInt8 type;
             } _msg;
+            _msg.serverNo = serverNo;
             _msg.var = var;
             _msg.value = value;
             _msg.type = type;

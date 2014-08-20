@@ -3479,6 +3479,7 @@ namespace GObject
         void sendJiqirenInfo();
         void sevensoul_fixed();
         void BuyLeftPower();
+        UInt32 UseIncenseGood(UInt8 type , UInt8 num = 0);
 
         //友好度
         void AddFriendlyCount(Player * friender , UInt32 value) ; //增加友好度

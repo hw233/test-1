@@ -1108,6 +1108,7 @@ private:
     XinMoData m_xinmo;
     UInt8 lingbaoLevel[3];
     UInt32 lingbaoFall[3];  //祝福值
+    UInt32 _incense;
 public:
     inline Xingchenzhen& getXingchen() { return m_xingchen; }
     inline UInt8 getXingchenLvl()  {return m_xingchen.lvl;}
@@ -1118,6 +1119,10 @@ public:
     inline UInt32 getLingbaoFall(UInt8 type) { if(type > 2) return 0; return lingbaoFall[type];}
     inline void setLingbaoFall(UInt8 type , UInt32 val){ if(type > 2) return; lingbaoFall[type] = val; }
 
+    inline UInt32 getIncense(){ return _incense;}
+    inline void setIncense(UInt32 incense){ _incense = incense;}
+    void addIncense(UInt32 count) { _incense+=count; }
+    void UpdateIncenseToDB();
 
     inline XinMoData getXinMo() { return m_xinmo; }
     void setXinMo(UInt8 lev , UInt32 val);
