@@ -97,6 +97,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _iswboss = false;
     _iswbossinspire = false;
     _iscbbbuf = false;
+    _isddbuf = false;
     _wbextatk = 0;
     _wbextmagatk = 0;
     _soulMax = 0;
@@ -110,6 +111,12 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _wbplextmagatk = 0;
     _cbbplextatk = 0;
     _cbbplextmagatk = 0;
+    _ddplextatk = 0;
+    _ddplextmagatk = 0;
+    _ddplextdef = 0;
+    _ddplextaction = 0;
+    _ddplextcritical = 0;
+    _ddplexthp = 0;
 }
 
 Fighter::~Fighter()
@@ -2120,6 +2127,16 @@ void Fighter::rebuildEquipAttr()
     {
         _attrExtraEquip.attack += _cbbplextatk;
         _attrExtraEquip.magatk += _cbbplextmagatk;
+    }
+
+    if(isDarkDargonBuf())
+    {
+        _attrExtraEquip.attack += _ddplextatk;
+        _attrExtraEquip.magatk += _ddplextmagatk;
+        _attrExtraEquip.defend += _ddplextdef;
+        _attrExtraEquip.action += _ddplextaction;
+        _attrExtraEquip.critical += _ddplextcritical;
+        _attrExtraEquip.hp += _ddplexthp;
     }
 
     if(_owner/* && _owner->getClan()*/)

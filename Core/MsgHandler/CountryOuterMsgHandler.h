@@ -10378,6 +10378,10 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
             }
         case 2://黯龙王之怒
             {
+                if (pl->getLocation() != 1158)//雪浪峰
+                    return ;
+                if (pl->getThreadId() != WORKER_THREAD_NEUTRAL)
+                    return ;
                 UInt8 opt1 = 0;
                 br >> opt1; 
                 switch(opt1)
@@ -10435,7 +10439,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                             {
                                 UInt8 t_type = 0;
                                 br >> t_type;
-                                DarkDargon::Instance().SetBufferFlag(player,t_type);
+                                DarkDargon::Instance().SetBufferFlag(player,t_type - 1);
                                 DarkDargon::Instance().ReturnStarMapInfo(player,t_opt);
                                 break;
                             }
@@ -10444,7 +10448,6 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                                 UInt8 t_idx = 0;
                                 br >> t_idx;
                                 DarkDargon::Instance().AttackStarMap(player,t_idx,0);
-                                DarkDargon::Instance().ReturnStarMapInfo(player,t_opt,t_idx);
                                 break;
                             }
                             case 4:
@@ -10452,12 +10455,35 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                                 UInt8 t_idx = 0;
                                 br >> t_idx;
                                 DarkDargon::Instance().AttackStarMap(player,t_idx,1);
-                                DarkDargon::Instance().ReturnStarMapInfo(player,t_opt,t_idx);
                                 break;
                             }
                             default:
                                 break;
                         }
+                        break;
+                    }
+                    case 4:
+                    {
+                        UInt8 t_opt = 0;
+                        br >> t_opt;
+                        switch(t_opt)
+                        {
+                            case 1:
+                                DarkDargon::Instance().OptBoss(player,t_opt);
+                                break;
+                            case 2:
+                                DarkDargon::Instance().OptBoss(player,t_opt);
+                                break;
+                            case 3:
+                                DarkDargon::Instance().OptBoss(player,t_opt);
+                                break;
+                            case 4:
+                                DarkDargon::Instance().AttackBoss(player);
+                                break;
+                            default:
+                                break;
+                        }
+
                         break;
                     }
                     default :

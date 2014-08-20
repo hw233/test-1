@@ -52,7 +52,7 @@ namespace GObject
 
     struct DDPlayer
     {
-        DDPlayer() : ePlStatus(PLAYER_LEAVE),score(0),driveCD(0),singleBuffer(0),toweridx(0),towerpos(0) 
+        DDPlayer() : ePlStatus(PLAYER_LEAVE),score(0),driveCD(0),singleBuffer(0),toweridx(0),towerpos(0),thunderCD(0),recoverCD(0) 
         {
             player = NULL;
         }
@@ -63,7 +63,9 @@ namespace GObject
         UInt8 towerpos;//塔位置
         UInt32 score;//功德 
         UInt32 driveCD;//主动行动CD
-        UInt8 singleBuffer;//单人BUFFER 0~3bit 圣佛尊帝 4bit 仙力加持
+        UInt8 singleBuffer;//单人BUFFER 0~3bit 圣佛尊帝 4 ~ 7bit 仙力加持
+        UInt32 thunderCD;//天雷CD
+        UInt32 recoverCD;//恢复活力CD
 
         void clearCD() { driveCD = 0; }
 
@@ -93,12 +95,12 @@ namespace GObject
         RoundTower(UInt8 i) : durability(100),status(0) 
         {
             idx = i; 
-            vector<UInt8> tmpvector(6,10);
+            vector<UInt8> tmpvector(6,30);
             monsterNum.swap(tmpvector);
         }
-        void resetMonster() 
+        void resetMonster(UInt8 num = 30) 
         {
-            vector<UInt8> tmpvector(6,10);
+            vector<UInt8> tmpvector(6,num);
             monsterNum.swap(tmpvector);
         }
         float calcDmg()
@@ -107,7 +109,7 @@ namespace GObject
             for(vector<UInt8>::iterator it = monsterNum.begin(); it != monsterNum.end();it++)
             {
                 if(*it)
-                    dmg += static_cast<float>(0.5f * (*it));
+                    dmg += static_cast<float>(0.05f * (*it));
             }
             return dmg;
         }
@@ -120,8 +122,9 @@ namespace GObject
         UInt32 arriveTS;//来临时间戳
         UInt8 arriveNum;//来临次数
         UInt8 status;//状态 0 - 未初始化 1 - 开启 2 - 已攻破
-        StarMap(UInt8 i) : mapHp(100),arriveTS(0),arriveNum(0),status(0) { idx = i; }     
-        void resetCD() { arriveTS = MAXTIMESTAMP; }
+        StarMap(UInt8 i) : mapHp(100),arriveTS(0xFF),arriveNum(0),status(0) { idx = i; }     
+        void overCD() { arriveTS = MAXTIMESTAMP; }
+        void resetCD(UInt32 time) { arriveTS = time; }
     };
 
     typedef map<Player*,DDPlayer *> DDMap;
@@ -137,6 +140,8 @@ namespace GObject
         void RetAwaitInfo(Player* pl = NULL);
         void RetFirstStepInfo(Player* pl);
         void RetSecStepInfo(Player* pl);
+        void RefreshBossInfo(Player* pl);
+        void RetDargonArrive(Player* pl);
         void EnterDarkDargon(Player* pl);
         void QuitDarkDargon(Player* pl);
 
@@ -144,13 +149,23 @@ namespace GObject
         void DefRoundTower(Player* pl,UInt8 idx, UInt8 pos);//驻防
         void QuitRoundTower(Player* pl);
         void PKRoundTower(Player* pl,UInt8 idx, UInt8 pos,UInt64 playerId);
-        void RefreshTowerMonster();
+        void RefreshTowerMonster(UInt8 num = 10);
         void AccountTowerMonster();
+        void SendDefAccountInfo(UInt8 idx,Stream& st);
+        void DestroyTower(UInt8 i);
         void AttackTowerMonster();
-        void ReturnStarMapInfo(Player* pl,UInt8 opt,UInt8 idx = 1);
+        void ReturnStarMapInfo(Player* pl,UInt8 opt,UInt8 idx = 1,UInt32 ext1 = 0,UInt8 ext2 = 0);
         UInt8 GetBufferFlag(DDPlayer* ddpl,bool isStarMap);
         void SetBufferFlag(Player* pl, UInt8 bit_num);
         void AttackStarMap(Player* pl,UInt8 idx,UInt8 opt/* 0 - 破坏阵眼 1 - 延滞降临 */);
+        void CheckDargonArrive(UInt8 idx);
+        void InitStarMap(UInt8 idx = 0);
+
+        void OptBoss(Player* pl,UInt8 opt);
+        void AttackBoss(Player* pl);
+        void DamageBoss(DDPlayer* ddpl,UInt32 dmg);
+        void AutoDamageBoss();
+        void ReturnBossInfo(Player* pl,UInt8 type,UInt32 ext1 = 0);
 
         bool attackPlayer(DDPlayer* atker,DDPlayer* defer);
         bool attackNpc(DDPlayer* atker,GData::NpcGroup* n_ng , bool b_extend = false,UInt8 idx = 0xFF);
@@ -162,10 +177,17 @@ namespace GObject
         void broadcast(Stream& st,bool isIn = true);
         void broadcast(Func1 func,bool isIn = true);
         void AddDDScore(DDPlayer* ddpl,Int32 score);
+        void AddAllDDScore(Int32 score);
+        void AddDargonArriveTime(DDPlayer* ddpl,UInt8 idx,UInt32 add_tm);
         void rebuildNpc();
+        bool CheckStartAct();
             
-        void rebuildFgtAttr();
+        void rebuildFgtAttr(Player* player,bool isddbuf);
         inline EBBStatus getStatus() { return _status; }
+        void GMDestroyStarMap();
+        void AccountFirstStepTask();
+        void AccountFinalScore();
+        void DestroyStarMap();
 
     private:
 		GData::NpcGroup* _ng;//塔怪
@@ -184,8 +206,7 @@ namespace GObject
         Int32 _lastAtk;
         Int32 _lastMAtk;
 
-        UInt32 _hp[4]; //0~2 三星阵 3 boss 
-
+        UInt32 _hp; // boss 
 
     };
 
