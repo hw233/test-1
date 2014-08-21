@@ -1211,7 +1211,10 @@ void DarkDargon::AddDDScore(DDPlayer* ddpl,Int32 score)
         s_pss.insert(ps);
         ddpl->score = ps.score; 
         if(score > 0)
+        {
             SYSMSG_SENDV(5194, ddpl->player, score);
+            SYSMSG_SENDV(5199, ddpl->player, score);
+        }
     }
     /*else
     {
