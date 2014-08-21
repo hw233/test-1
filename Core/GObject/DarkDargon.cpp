@@ -10,7 +10,7 @@
 #include <algorithm>
 #include "WBossMgr.h"
 
-#define TEST_VECSION
+#define _TEST_VECSION
 
 const UInt16 MONSTER = 13200;
 const UInt16 MAPMONSTER = 13201;
@@ -36,7 +36,7 @@ DarkDargon::DarkDargon()
     else
         beginTime = day6;
 
-#ifdef TEST_VECSION
+#ifdef _TEST_VECSION
     beginTime = TimeUtil::SharpDay() + 20 * 60 * 60;
     beginTime = now + 15 * 60;
 #endif
@@ -134,10 +134,11 @@ void DarkDargon::process(UInt32 now)
             break;
         case DARKDARGON_OVER:
             {
-#ifdef TEST_VECSION
+                beginTime += 7 * 86400;
+#ifdef _TEST_VECSION
                 beginTime = now + 15 * 60;
-                _status = DARKDARGON_NOINIT; 
 #endif              
+                _status = DARKDARGON_NOINIT; 
                 ReserAllFunc();
             }
             break;
