@@ -91,7 +91,7 @@ namespace GObject
         UInt8 status;//状态 0 - 未初始化 1 - 开启 2 - 已攻破
         vector<UInt8> monsterNum;//怪物数 6组
         UInt8 defenceSum;//驻防总人数
-        RoundTower(UInt8 i) : durability(100),status(0) 
+        RoundTower(UInt8 i) : durability(100),status(0),defenceSum(0) 
         {
             idx = i; 
             vector<UInt8> tmpvector(6,30);
