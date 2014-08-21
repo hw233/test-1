@@ -112,6 +112,16 @@ namespace GObject
             }
             return dmg;
         }
+        void resetAll()
+        {
+            for (size_t m = 0; m < 6; m++)//遍历每一层
+                defPlayer[m].clear();
+            durability = 0.0f;
+            status = 0;
+            vector<UInt8> tmpvector(6,30);
+            monsterNum.swap(tmpvector);
+            defenceSum = 0;
+        }
     };
 
     struct StarMap
@@ -124,6 +134,13 @@ namespace GObject
         StarMap(UInt8 i) : mapHp(100),arriveTS(0xFF),arriveNum(0),status(0) { idx = i; }     
         void overCD() { arriveTS = MAXTIMESTAMP; }
         void resetCD(UInt32 time) { arriveTS = time; }
+        void resetAll()
+        {
+            mapHp = 100;
+            arriveTS = 0xFF;
+            arriveNum = 0;
+            status = 0;
+        }
     };
 
     typedef map<Player*,DDPlayer *> DDMap;
@@ -187,6 +204,7 @@ namespace GObject
         void AccountFirstStepTask();
         void AccountFinalScore();
         void DestroyStarMap();
+        void ReserAllFunc();
 
     private:
 		GData::NpcGroup* _ng;//塔怪

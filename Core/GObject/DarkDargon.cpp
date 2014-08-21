@@ -10,6 +10,8 @@
 #include <algorithm>
 #include "WBossMgr.h"
 
+#define TEST_VECSION
+
 const UInt16 MONSTER = 13200;
 const UInt16 MAPMONSTER = 13201;
 const UInt16 BOSSMONSTER = 13202;
@@ -27,8 +29,18 @@ DarkDargon::DarkDargon()
     {
         starMaps[m] = new StarMap(m);
     }
-    //beginTime = TimeUtil::SharpDay() + 20 * 60 * 60;
-    beginTime = TimeUtil::Now() + 45 * 60;
+    UInt32 day6 = TimeUtil::SharpWeek(6) + 14 * 3600;
+    UInt32 now = TimeUtil::Now();
+    if(day6 < now)
+        beginTime = day6 + 7 * 86400;
+    else
+        beginTime = day6;
+
+#ifdef TEST_VECSION
+    beginTime = TimeUtil::SharpDay() + 20 * 60 * 60;
+    beginTime = now + 15 * 60;
+#endif
+    std::cout << "DarkDargon beginTime= " << beginTime << std::endl;
 
     GData::NpcGroups::iterator it = GData::npcGroups.find(MONSTER);
     if(it == GData::npcGroups.end())
@@ -112,7 +124,7 @@ void DarkDargon::process(UInt32 now)
             break;
         case DARKDARGON_TWOSTEP:
             {
-                if(now >= beginTime + 10 * 60 + 10 * 60)
+                if(now >= beginTime + 15 * 60 + 10 * 60)
                 {
                     if(now % 60 == 0)
                         AutoDamageBoss();
@@ -121,6 +133,13 @@ void DarkDargon::process(UInt32 now)
             }
             break;
         case DARKDARGON_OVER:
+            {
+#ifdef TEST_VECSION
+                beginTime = now + 15 * 60;
+                _status = DARKDARGON_NOINIT; 
+#endif              
+                ReserAllFunc();
+            }
             break;
         default:
             break;
@@ -1545,6 +1564,26 @@ void DarkDargon::DestroyStarMap()
     }
 }
 
+void DarkDargon::ReserAllFunc()
+{
+    globalBuffer = 0x0F;    
+    m_pMap.clear();
+    s_pss.clear();
+
+    for (DDMap::iterator it = m_ddMap.begin(); it != m_ddMap.end(); it++)
+        delete it->second;
+
+    m_ddMap.clear();
+    for (size_t i = 0; i < 4; i++)
+    {
+        roundTowers[i]->resetAll();
+    }
+    for (size_t m = 0; m < 3; m++)
+    {
+        starMaps[m]->resetAll();
+    }
+
+}
 
 
 }
