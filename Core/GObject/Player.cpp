@@ -25325,6 +25325,8 @@ bool Player::getRPZCJBAward()
     st << newFlag;
     st << Stream::eos;
     send(st);
+    if(awardIdx > 45)
+        awardIdx = 45;
     udpLog("xschoujiang", zcjb_udplog[awardIdx], "", "", "", "", "act");
 
     if(awardGold > cur_gold)
