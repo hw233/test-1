@@ -29,7 +29,7 @@ DarkDargon::DarkDargon()
     {
         starMaps[m] = new StarMap(m);
     }
-    UInt32 day6 = TimeUtil::SharpWeek(6) + 14 * 3600;
+    UInt32 day6 = TimeUtil::SharpWeek(0) + 86400 * 5 + 14 * 3600;
     UInt32 now = TimeUtil::Now();
     now = now - (now % 10);
     if(day6 < now)
