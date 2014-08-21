@@ -31,6 +31,7 @@ DarkDargon::DarkDargon()
     }
     UInt32 day6 = TimeUtil::SharpWeek(6) + 14 * 3600;
     UInt32 now = TimeUtil::Now();
+    now = now - (now % 10);
     if(day6 < now)
         beginTime = day6 + 7 * 86400;
     else
@@ -38,9 +39,9 @@ DarkDargon::DarkDargon()
 
 #ifdef _TEST_VECSION
     beginTime = TimeUtil::SharpDay() + 20 * 60 * 60;
-    beginTime = now + 15 * 60;
+    beginTime = now + 5 * 60;
 #endif
-    std::cout << "DarkDargon beginTime= " << beginTime << std::endl;
+    std::cout << "DarkDargon Current beginTime= " << beginTime << std::endl;
 
     GData::NpcGroups::iterator it = GData::npcGroups.find(MONSTER);
     if(it == GData::npcGroups.end())
@@ -138,6 +139,7 @@ void DarkDargon::process(UInt32 now)
 #ifdef _TEST_VECSION
                 beginTime = now + 15 * 60;
 #endif              
+                std::cout << "DarkDargon Next beginTime= " << beginTime << std::endl;
                 _status = DARKDARGON_NOINIT; 
                 ReserAllFunc();
             }
@@ -184,7 +186,7 @@ void DarkDargon::RetFirstStepInfo(Player* pl)
         st << static_cast<UInt8>(roundTowers[i]->durability) << roundTowers[i]->defenceSum;
     for (size_t i = 0; i < 3; i++)
     {
-        st << starMaps[i]->mapHp  << static_cast<UInt32>(_lastHP * 0.7) << static_cast<UInt8>((starMaps[i]->arriveTS > now)?(starMaps[i]->arriveTS - now):0xFF);
+        st << starMaps[i]->mapHp  << static_cast<UInt32>(_lastHP * 1) << static_cast<UInt8>((starMaps[i]->arriveTS > now)?(starMaps[i]->arriveTS - now):0xFF);
         arriveSum += starMaps[i]->arriveNum;
     }
     
@@ -226,7 +228,7 @@ void DarkDargon::RetSecStepInfo(Player* pl)
         st << static_cast<UInt8>(roundTowers[i]->durability) << roundTowers[i]->defenceSum;
     for (size_t i = 0; i < 3; i++)
     {
-        st << starMaps[i]->mapHp  << static_cast<UInt32>(_lastHP * 0.7) << static_cast<UInt8>((starMaps[i]->arriveTS > now)?(starMaps[i]->arriveTS - now):0xFF);
+        st << starMaps[i]->mapHp  << static_cast<UInt32>(_lastHP * 1) << static_cast<UInt8>((starMaps[i]->arriveTS > now)?(starMaps[i]->arriveTS - now):0xFF);
         arriveSum += starMaps[i]->arriveNum;
     }
 
@@ -302,7 +304,7 @@ void DarkDargon::RetDargonArrive(Player* pl)
         st << static_cast<UInt8>(roundTowers[i]->durability) << roundTowers[i]->defenceSum;
     for (size_t i = 0; i < 3; i++)
     {
-        st << starMaps[i]->mapHp  << static_cast<UInt32>(_lastHP * 0.7) << static_cast<UInt8>((starMaps[i]->arriveTS > now)?(starMaps[i]->arriveTS - now):0xFF);
+        st << starMaps[i]->mapHp  << static_cast<UInt32>(_lastHP * 1) << static_cast<UInt8>((starMaps[i]->arriveTS > now)?(starMaps[i]->arriveTS - now):0xFF);
         arriveSum += starMaps[i]->arriveNum;
     }
 
@@ -401,7 +403,7 @@ void DarkDargon::ReturnRoundTowerInfo(Player* pl,UInt8 idx, UInt8 pos,UInt8 opt,
         {
             if(pl == NULL)
                 return;
-            st << pl->getName();
+            st << objpl->getName();
         }
         if(opt == 6)
         {
@@ -537,7 +539,7 @@ void DarkDargon::PKRoundTower(Player* pl,UInt8 idx, UInt8 pos,UInt64 playerId)
         QuitRoundTower(objpl);
     }
 
-    ReturnRoundTowerInfo(pl,idx,pos,5,res);
+    ReturnRoundTowerInfo(pl,idx,pos,5,res,objpl);
     ReturnRoundTowerInfo(objpl,idx,pos,6,res,pl);
 }
 
@@ -695,11 +697,11 @@ void DarkDargon::ReturnStarMapInfo(Player* pl,UInt8 opt,UInt8 idx, UInt32 ext1, 
             break;
         case 3:
             st << idx ;
-            st << starMaps[idx - 1]->mapHp << static_cast<UInt32>(_lastHP * 0.7) << static_cast<UInt8>((starMaps[idx - 1]->arriveTS > now)?(starMaps[idx - 1]->arriveTS - now):0xFF) << ext1 << ext2 ;
+            st << starMaps[idx - 1]->mapHp << static_cast<UInt32>(_lastHP * 1) << static_cast<UInt8>((starMaps[idx - 1]->arriveTS > now)?(starMaps[idx - 1]->arriveTS - now):0xFF) << ext1 << ext2 ;
             break;
         case 4:
             st << idx ;
-            st << starMaps[idx - 1]->mapHp << static_cast<UInt32>(_lastHP * 0.7) << static_cast<UInt8>((starMaps[idx - 1]->arriveTS > now)?(starMaps[idx - 1]->arriveTS - now):0xFF) << static_cast<UInt8>(ext1) << ext2;
+            st << starMaps[idx - 1]->mapHp << static_cast<UInt32>(_lastHP * 1) << static_cast<UInt8>((starMaps[idx - 1]->arriveTS > now)?(starMaps[idx - 1]->arriveTS - now):0xFF) << static_cast<UInt8>(ext1) << ext2;
             break;
         default:
             break;
@@ -773,6 +775,7 @@ void DarkDargon::AttackStarMap(Player* pl,UInt8 idx,UInt8 opt/* 0 - 破坏阵眼
         bool res = attackNpc(ddpl,_ng1,true,(idx - 1));
         if(res == true)
         {
+            starMaps[idx - 1]->overCD();            
             starMaps[idx - 1]->status = 2;            
             globalBuffer = SET_BIT(globalBuffer,(idx + 3));
             AddAllDDScore(100);
@@ -783,7 +786,7 @@ void DarkDargon::AttackStarMap(Player* pl,UInt8 idx,UInt8 opt/* 0 - 破坏阵眼
         /*bool res = */attackNpc(ddpl,_ng1,true,(idx - 1));
     }
     UInt32 damage = oldHP - starMaps[idx - 1]->mapHp;
-    float dmg_percent = damage * 100 / static_cast<UInt32>(_lastHP * 0.7);
+    float dmg_percent = damage * 100 / static_cast<UInt32>(_lastHP * 1);
 
     UInt8 add_time = 0;//延滞时间
     UInt8 add_score = 0;//加的功德
@@ -971,7 +974,7 @@ void DarkDargon::AttackBoss(Player* pl)
 
 void DarkDargon::DamageBoss(DDPlayer* ddpl,UInt32 dmg)
 {
-    float dmg_percent = dmg / _lastHP * 100;
+    float dmg_percent = dmg * 100 / _lastHP;
     UInt32 add_score = dmg_percent * 120; 
     AddDDScore(ddpl, (add_score > 20 ? add_score : 20));    
 }
@@ -1186,6 +1189,7 @@ void DarkDargon::AddDDScore(DDPlayer* ddpl,Int32 score)
     if(ddpl->player != NULL)
     {
         DDPlayerScore ps;    
+        ps.score = 0;
         for(DDPlayerScoreSort::iterator i = s_pss.begin(); i != s_pss.end(); ++i)
         {
             if(i->player == NULL)
@@ -1193,7 +1197,7 @@ void DarkDargon::AddDDScore(DDPlayer* ddpl,Int32 score)
 
             if(i->player == ddpl->player)    
             {
-                ps.player = i->player;  
+                //ps.player = i->player;  
                 ps.score = i->score;  
                 s_pss.erase(i);
                 break;
@@ -1258,22 +1262,22 @@ void DarkDargon::rebuildNpc()
     Int32 baseatk1 = Script::BattleFormula::getCurrent()->calcAttack(nflist1[0].fighter);
     Int32 basematk1 = Script::BattleFormula::getCurrent()->calcMagAttack(nflist1[0].fighter);
     nflist1[0].fighter->setWBoss(true);
-    nflist1[0].fighter->setBaseHP(static_cast<UInt32>(_lastHP * 0.7));
-    nflist1[0].fighter->setExtraAttack(_lastAtk * 0.7 - baseatk1);
-    nflist1[0].fighter->setExtraMagAttack(_lastMAtk * 0.7 - basematk1);
+    nflist1[0].fighter->setBaseHP(static_cast<UInt32>(_lastHP * 1));
+    nflist1[0].fighter->setExtraAttack(_lastAtk * 3 - baseatk1);
+    nflist1[0].fighter->setExtraMagAttack(_lastMAtk * 3 - basematk1);
     
     std::vector<GData::NpcFData>& nflist2 = _ng2->getList();
     Int32 baseatk2 = Script::BattleFormula::getCurrent()->calcAttack(nflist2[0].fighter);
     Int32 basematk2 = Script::BattleFormula::getCurrent()->calcMagAttack(nflist2[0].fighter);
     nflist2[0].fighter->setWBoss(true);
     nflist2[0].fighter->setBaseHP(_lastHP);
-    nflist2[0].fighter->setExtraAttack(_lastAtk - baseatk2);
-    nflist2[0].fighter->setExtraMagAttack(_lastMAtk - basematk2);
+    nflist2[0].fighter->setExtraAttack(_lastAtk* 4 - baseatk2);
+    nflist2[0].fighter->setExtraMagAttack(_lastMAtk * 4 - basematk2);
 
     for (size_t i = 0; i < 4; i++)
     {
         if(i < 3)
-            starMaps[i]->mapHp = static_cast<UInt32>(_lastHP * 0.7);
+            starMaps[i]->mapHp = static_cast<UInt32>(_lastHP * 1);
         else
             _hp = _lastHP;
     }
@@ -1468,13 +1472,13 @@ void DarkDargon::AccountFinalScore()
             DDPlayer* t_ddpl = getDDPlayer(i->player);
             if(t_ddpl == NULL)
                 continue;
-            UInt32 box_num = i->score / 500;
+            UInt32 box_num = i->score / 150;
             UInt32 p_num = i->score / 5;
             if(pos == 1)
             {
                 p_num += 1000;
                 SYSMSGV(content, 5193, pos, p_num);
-                MailPackage::MailItem item1[2] = {{17022,3},{17025,box_num}};
+                MailPackage::MailItem item1[2] = {{17022,6},{17025,box_num}};
                 MailItemsInfo itemsInfo(item1, DarkDargonAward, 2);
                 Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(mail)
@@ -1484,7 +1488,7 @@ void DarkDargon::AccountFinalScore()
             {
                 p_num += 700;
                 SYSMSGV(content, 5193, pos, p_num);
-                MailPackage::MailItem item2[2] = {{17022,2},{17025,box_num}};
+                MailPackage::MailItem item2[2] = {{17022,4},{17025,box_num}};
                 MailItemsInfo itemsInfo(item2, DarkDargonAward, 2);
                 Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(mail)
@@ -1494,7 +1498,7 @@ void DarkDargon::AccountFinalScore()
             {
                 p_num += 500;
                 SYSMSGV(content, 5193, pos, p_num);
-                MailPackage::MailItem item3[2] = {{17023,3},{17025,box_num}};
+                MailPackage::MailItem item3[2] = {{17023,6},{17025,box_num}};
                 MailItemsInfo itemsInfo(item3, DarkDargonAward, 2);
                 Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(mail)
@@ -1504,7 +1508,7 @@ void DarkDargon::AccountFinalScore()
             {
                 p_num += 300;
                 SYSMSGV(content, 5193, pos, p_num);
-                MailPackage::MailItem item4[2] = {{17023,2},{17025,box_num}};
+                MailPackage::MailItem item4[2] = {{17023,4},{17025,box_num}};
                 MailItemsInfo itemsInfo(item4, DarkDargonAward, 2);
                 Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(mail)
@@ -1514,7 +1518,7 @@ void DarkDargon::AccountFinalScore()
             {
                 p_num += 200;
                 SYSMSGV(content, 5193, pos, p_num);
-                MailPackage::MailItem item5[2] = {{17024,3},{17025,box_num}};
+                MailPackage::MailItem item5[2] = {{17024,4},{17025,box_num}};
                 MailItemsInfo itemsInfo(item5, DarkDargonAward, 2);
                 Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(mail)

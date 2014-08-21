@@ -116,7 +116,7 @@ namespace GObject
         {
             for (size_t m = 0; m < 6; m++)//遍历每一层
                 defPlayer[m].clear();
-            durability = 0.0f;
+            durability = 100;
             status = 0;
             vector<UInt8> tmpvector(6,30);
             monsterNum.swap(tmpvector);

@@ -2108,7 +2108,7 @@ function ItemNormal_00017022(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    local items = {{9414,2,1}, {9425,2,1},{9338,3,1}}
+    local items = {{9414,3,1}, {9425,2,1},{9338,4,1}}
     local prob = {5600, 6400, 10000}
 
     if package:GetRestPackageSize() < num then
@@ -2136,7 +2136,7 @@ function ItemNormal_00017023(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    local items = {{9418,2,1}, {9414,2,1},{9338,1,1}}
+    local items = {{9418,3,1}, {9414,2,1},{9338,1,1}}
     local prob = {4000, 7500, 10000}
 
     if package:GetRestPackageSize() < num then
