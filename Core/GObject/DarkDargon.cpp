@@ -136,7 +136,7 @@ void DarkDargon::process(UInt32 now)
             {
                 beginTime += 7 * 86400;
 #ifdef _TEST_VECSION
-                beginTime = now + 15 * 60;
+                beginTime = now + 5 * 60;
 #endif              
                 std::cout << "DarkDargon Next beginTime= " << beginTime << std::endl;
                 _status = DARKDARGON_NOINIT; 
