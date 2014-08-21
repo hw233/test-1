@@ -10,7 +10,7 @@
 #include <algorithm>
 #include "WBossMgr.h"
 
-#define _TEST_VECSION
+//#define _TEST_VECSION
 
 const UInt16 MONSTER = 13200;
 const UInt16 MAPMONSTER = 13201;
