@@ -37,7 +37,6 @@ DarkDargon::DarkDargon()
         beginTime = day6;
 
 #ifdef _TEST_VECSION
-    beginTime = TimeUtil::SharpDay() + 20 * 60 * 60;
     beginTime = now + 15 * 60;
 #endif
     std::cout << "DarkDargon beginTime= " << beginTime << std::endl;
