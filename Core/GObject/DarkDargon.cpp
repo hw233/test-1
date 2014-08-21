@@ -28,7 +28,7 @@ DarkDargon::DarkDargon()
         starMaps[m] = new StarMap(m);
     }
     //beginTime = TimeUtil::SharpDay() + 20 * 60 * 60;
-    beginTime = TimeUtil::Now() + 45 * 60 * 60;
+    beginTime = TimeUtil::Now() + 45 * 60;
 
     GData::NpcGroups::iterator it = GData::npcGroups.find(MONSTER);
     if(it == GData::npcGroups.end())
