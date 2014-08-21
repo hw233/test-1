@@ -101,7 +101,7 @@ void DarkDargon::process(UInt32 now)
                 AttackTowerMonster();
                 CheckDargonArrive(0);
                 broadcast(&DarkDargon::RetFirstStepInfo);
-                if (now == beginTime + 10 * 60)
+                if (now == beginTime + 15 * 60)
                 {
                     _status = DARKDARGON_TWOSTEP;
                     broadcast(&DarkDargon::RetSecStepInfo);
