@@ -52,9 +52,8 @@ namespace GObject
 
     struct DDPlayer
     {
-        DDPlayer() : ePlStatus(PLAYER_LEAVE),score(0),driveCD(0),singleBuffer(0),toweridx(0),towerpos(0),thunderCD(0),recoverCD(0) 
+        DDPlayer() : player(NULL),ePlStatus(PLAYER_LEAVE),toweridx(0),towerpos(0),score(0),driveCD(0),singleBuffer(0),thunderCD(0),recoverCD(0) 
         {
-            player = NULL;
         }
         
         Player* player;

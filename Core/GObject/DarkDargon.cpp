@@ -17,7 +17,7 @@ const UInt16 BOSSMONSTER = 13202;
 namespace GObject
 {
 DarkDargon::DarkDargon()
-    : _status(DARKDARGON_NOINIT) ,globalBuffer(0x0F), beginTime(0)
+    : beginTime(0), _status(DARKDARGON_NOINIT), globalBuffer(0x0F)
 {
     for (size_t i = 0; i < 4; i++)
     {
@@ -611,7 +611,7 @@ void DarkDargon::AttackTowerMonster()
         {
             if(roundTowers[i]->monsterNum[m] == 0 || roundTowers[i]->defPlayer[m].size() == 0)
                 continue;
-            UInt8 defer_num = roundTowers[i]->defPlayer[m].size();
+            //UInt8 defer_num = roundTowers[i]->defPlayer[m].size();
             vector<Player*> defTmp = roundTowers[i]->defPlayer[m];
             std::random_shuffle(roundTowers[i]->defPlayer[m].begin(), roundTowers[i]->defPlayer[m].end());
             UInt8 tmp_num = roundTowers[i]->monsterNum[m];
@@ -754,13 +754,13 @@ void DarkDargon::AttackStarMap(Player* pl,UInt8 idx,UInt8 opt/* 0 - 破坏阵眼
         if(res == true)
         {
             starMaps[idx - 1]->status = 2;            
-            globalBuffer = SET_BIT(globalBuffer,idx + 3);
+            globalBuffer = SET_BIT(globalBuffer,(idx + 3));
             AddAllDDScore(100);
         }
     }
     else
     {
-        bool res = attackNpc(ddpl,_ng1,true,(idx - 1));
+        /*bool res = */attackNpc(ddpl,_ng1,true,(idx - 1));
     }
     UInt32 damage = oldHP - starMaps[idx - 1]->mapHp;
     float dmg_percent = damage * 100 / static_cast<UInt32>(_lastHP * 0.7);
@@ -912,7 +912,7 @@ void DarkDargon::OptBoss(Player* pl,UInt8 opt)
             }
             pl->useGold(10,&ci);
 
-            ddpl->singleBuffer = SET_BIT_4(ddpl->singleBuffer,1,buf_num+1);
+            ddpl->singleBuffer = SET_BIT_4(ddpl->singleBuffer,1,(buf_num+1));
             ReturnBossInfo(pl,opt);
             break;
         }
@@ -1139,7 +1139,7 @@ void DarkDargon::broadcast(Stream& st,bool isIn/* 是否在活动中 */)
             continue;
         if(isIn)
         {
-            if(it->second->ePlStatus == DARKDARGON_NOINIT)
+            if(it->second->ePlStatus == PLAYER_LEAVE)
                 continue;
         }
         it->second->player->send(st);
@@ -1154,7 +1154,7 @@ void DarkDargon::broadcast(Func1 func,bool isIn/* 是否在活动中 */)
             continue;
         if(isIn)
         {
-            if(it->second->ePlStatus == DARKDARGON_NOINIT)
+            if(it->second->ePlStatus == PLAYER_LEAVE)
                 continue;
         }
         (this->*func)(it->second->player);
@@ -1541,7 +1541,7 @@ void DarkDargon::DestroyStarMap()
         starMaps[i]->status = 2;
         //starMaps[i]->mapHp = 0;
         starMaps[i]->overCD();
-        globalBuffer = SET_BIT(globalBuffer,i + 3);
+        globalBuffer = SET_BIT(globalBuffer,(i + 3));
     }
 }
 
