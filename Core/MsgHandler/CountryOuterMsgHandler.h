@@ -10378,7 +10378,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
             }
         case 2://黯龙王之怒
             {
-                if (player->getLocation() != 1158)//雪浪峰
+                if (player->getLocation() != 6152)//雪浪峰
                     return ;
                 if (player->getThreadId() != WORKER_THREAD_NEUTRAL)
                     return ;
