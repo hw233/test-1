@@ -21351,7 +21351,7 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
             {
                 validMaxDay = 5;
             }
-            else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 9, 18))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 18))
             {
                 validMaxDay = 6;
                 serverDay = 6;
