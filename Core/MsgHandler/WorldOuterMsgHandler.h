@@ -492,6 +492,19 @@ void OnClanOpReq( GameMsgHdr& hdr, const void * data )
             brd >> inviteeId;
             r = clan->setWatchmanId(inviteeId);
             break;
+        case 8:
+            {
+                UInt8 state;
+                brd >> state;
+                if(state == 0 || state == 1)
+                {
+                    r = clan->impeachLeader(player, state); 
+	                Stream st(REP::CLAN_MEMBER_OPERATE);
+		            st << op << state << static_cast<UInt8>(r ? 1 : 0) << Stream::eos;
+                    player->send(st);
+                }
+                return;
+            }
 		}
 	}
 	Stream st(REP::CLAN_MEMBER_OPERATE);

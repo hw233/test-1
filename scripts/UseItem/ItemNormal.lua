@@ -10741,16 +10741,19 @@ function ItemNormal_00009349(iid, num, bind, param)
 end
 
 function ItemNormal_NameCard(iid, num, bind, param)
-    if iid == 9960 or iid < 9900 or iid >= 10000 then
+    if iid == 9960 or iid < 9900 or (iid > 9999 and iid < 17800) or iid > 17856 then
         return false
     end
     --9960:新手御剑特权卡 客户端占用
+    --XXX 201~209为临时称号卡Id 被占用
     local player = GetPlayer()
     local package = player:GetPackage();
     if iid < 9960 then
         player:setTitle(iid-9900+54, 0)
-    else
+    elseif iid <= 9999 then
         player:setTitle(iid-9900+54-1, 0)
+    elseif iid >= 17800 and iid <= 17856 then
+        player:setTitle(iid-17800+153, 0)
     end
     package:DelItemSendMsg(iid, player);
     return num;
@@ -13900,6 +13903,64 @@ local ItemNormal_Table = {
     [9997] = ItemNormal_NameCard,
     [9998] = ItemNormal_NameCard,
     [9999] = ItemNormal_NameCard,
+
+    [17800] = ItemNormal_NameCard,
+    [17801] = ItemNormal_NameCard,
+    [17802] = ItemNormal_NameCard,
+    [17803] = ItemNormal_NameCard,
+    [17804] = ItemNormal_NameCard,
+    [17805] = ItemNormal_NameCard,
+    [17806] = ItemNormal_NameCard,
+    [17807] = ItemNormal_NameCard,
+    [17808] = ItemNormal_NameCard,
+    [17809] = ItemNormal_NameCard,
+    [17810] = ItemNormal_NameCard,
+    [17811] = ItemNormal_NameCard,
+    [17812] = ItemNormal_NameCard,
+    [17813] = ItemNormal_NameCard,
+    [17814] = ItemNormal_NameCard,
+    [17815] = ItemNormal_NameCard,
+    [17816] = ItemNormal_NameCard,
+    [17817] = ItemNormal_NameCard,
+    [17818] = ItemNormal_NameCard,
+    [17819] = ItemNormal_NameCard,
+    [17820] = ItemNormal_NameCard,
+    [17821] = ItemNormal_NameCard,
+    [17822] = ItemNormal_NameCard,
+    [17823] = ItemNormal_NameCard,
+    [17824] = ItemNormal_NameCard,
+    [17825] = ItemNormal_NameCard,
+    [17826] = ItemNormal_NameCard,
+    [17827] = ItemNormal_NameCard,
+    [17828] = ItemNormal_NameCard,
+    [17829] = ItemNormal_NameCard,
+    [17830] = ItemNormal_NameCard,
+    [17831] = ItemNormal_NameCard,
+    [17832] = ItemNormal_NameCard,
+    [17833] = ItemNormal_NameCard,
+    [17834] = ItemNormal_NameCard,
+    [17835] = ItemNormal_NameCard,
+    [17836] = ItemNormal_NameCard,
+    [17837] = ItemNormal_NameCard,
+    [17838] = ItemNormal_NameCard,
+    [17839] = ItemNormal_NameCard,
+    [17840] = ItemNormal_NameCard,
+    [17841] = ItemNormal_NameCard,
+    [17842] = ItemNormal_NameCard,
+    [17843] = ItemNormal_NameCard,
+    [17844] = ItemNormal_NameCard,
+    [17845] = ItemNormal_NameCard,
+    [17846] = ItemNormal_NameCard,
+    [17847] = ItemNormal_NameCard,
+    [17848] = ItemNormal_NameCard,
+    [17849] = ItemNormal_NameCard,
+    [17850] = ItemNormal_NameCard,
+    [17851] = ItemNormal_NameCard,
+    [17852] = ItemNormal_NameCard,
+    [17853] = ItemNormal_NameCard,
+    [17854] = ItemNormal_NameCard,
+    [17855] = ItemNormal_NameCard,
+    [17856] = ItemNormal_NameCard,
 
     [10000] = ItemNormal_00010000,
     [10001] = ItemNormal_00010001,
