@@ -62,6 +62,7 @@
 #include "GObject/ClanBuilding.h"
 #include "GObject/RaceBattle.h"
 #include "GObject/ClanBigBoss.h"
+#include "GObject/DarkDargon.h"
 
 GMHandler gmHandler;
 
@@ -332,6 +333,7 @@ GMHandler::GMHandler()
     Reg(3, "setfirevalue", &GMHandler::OnSetFireValue);
     Reg(2, "atkcb", &GMHandler::OnAttackBoss);
     Reg(2, "kettleA", &GMHandler::OnAttackKettle);
+    Reg(2, "atkdd", &GMHandler::OnAttackDarkDargon);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -5853,3 +5855,9 @@ void GMHandler::OnSayToWorld(GObject::Player *player, std::vector<std::string>& 
     NETWORK()->SendToServerWar(st);
 } 
 
+void GMHandler::OnAttackDarkDargon(GObject::Player *player, std::vector<std::string>& args)
+{
+    /*if (args.size() < 1)
+        return ;*/
+    DarkDargon::Instance().GMDestroyStarMap();
+}

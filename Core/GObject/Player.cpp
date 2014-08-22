@@ -96,6 +96,7 @@
 #include "Battle/BattleReport.h"
 #include "GObject/RaceBattle.h"
 #include "GData/ClanShop.h"
+#include "GObject/DarkDargon.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -2407,6 +2408,7 @@ namespace GObject
         }
         if(GetVar(GObject::VAR_MARRY_STATUS) == 5 || GetVar(GObject::VAR_MARRY_STATUS) == 6)
             gMarriedMgr.ProcessOnlineAward(this,1);
+        DarkDargon::Instance().QuitDarkDargon(this);
 
         SetVar(VAR_OFFLINE, curtime);
         PopTimerEvent(this, EVENT_AUTOBATTLE, 0);
@@ -2556,6 +2558,7 @@ namespace GObject
             gMarriedMgr.ProcessOnlineAward(this,1);
             gMarriedMgr.EnterCoupleCopy(this,0);
         }
+        DarkDargon::Instance().QuitDarkDargon(this);
         if(getDrinkInfo().drinker !=NULL )
         {
             if(getDrinkInfo().time != 0 )
@@ -25349,6 +25352,8 @@ bool Player::getRPZCJBAward()
     st << newFlag;
     st << Stream::eos;
     send(st);
+    if(awardIdx > 45)
+        awardIdx = 45;
     udpLog("xschoujiang", zcjb_udplog[awardIdx], "", "", "", "", "act");
 
     if(awardGold > cur_gold)
@@ -25416,18 +25421,18 @@ static UInt32 ryhb_items_1[15][4] = {
 static UInt32 ryhb_items_2[15][4] = {
     {8, 5, 78, 9},          // 升级优惠礼包
     {28, 28, 79, 9},        // 炼器优惠礼包
-    {99, 99, 1726, 1},         // 六级身法石
-    {99, 99, 1727, 1},       // 变身法宝
+    {99, 99, 1732, 1},         // 六级身法石
+    {99, 99, 1733, 1},       // 变身法宝
     {88, 88, 8555, 64},        //
     {8, 10, 9229, 64},        //
     {1, 3, 9371, 99},        //
     {4, 7, 9498, 99},        //
     {7, 5, 9438, 99},        //
-    {2, 2, 9390, 99},        //
+    {4, 6, 9457, 99},        //
     {5, 3, 503, 99},       //
     {5, 13, 9418, 99},      //
     {4, 6, 9600, 99},    //
-    {4, 6, 16001, 99},    //
+    {15, 25, 9425, 99},    //
     {5, 8, 9427, 99},    //
 };
 
