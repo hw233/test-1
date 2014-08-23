@@ -1506,7 +1506,7 @@ void DarkDargon::AccountFinalScore()
                 if(mail)
                      mailPackageManager.push(mail->id, item3, 2, true);
             }
-            else if(pos >= 4 || pos <= 9)
+            else if(pos >= 4 && pos <= 9)
             {
                 p_num += 300;
                 SYSMSGV(content, 5193, pos, p_num);
@@ -1516,7 +1516,7 @@ void DarkDargon::AccountFinalScore()
                 if(mail)
                      mailPackageManager.push(mail->id, item4, 2, true);
             }
-            else if(pos >= 10 || pos <= 29)
+            else if(pos >= 10 && pos <= 29)
             {
                 p_num += 200;
                 SYSMSGV(content, 5193, pos, p_num);
@@ -1526,7 +1526,7 @@ void DarkDargon::AccountFinalScore()
                 if(mail)
                      mailPackageManager.push(mail->id, item5, 2, true);
             }
-            else if(pos >= 30 || pos <= 50)
+            else if(pos >= 30 && pos <= 50)
             {
                 p_num += 100;
                 SYSMSGV(content, 5193, pos, p_num);
