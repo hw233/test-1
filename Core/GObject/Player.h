@@ -263,6 +263,8 @@ namespace GObject
         e_sla_clb = 0x02,
         e_sla_hi = 0x04,
         e_sla_mr = 0x08,
+        e_sla_ccb = 0x16,
+        e_sla_ncb = 0x32,
     };
 
     enum PEXP_HOOK_INFEX
@@ -3596,6 +3598,10 @@ namespace GObject
         void firstPotOfGoldReturn(UInt8);
 
         void hideVipLvlFlag(UInt8);
+        void ReturnFlyRoadInfo();
+        void SacrificeFlyRoad(UInt8 type, UInt16 num);
+        void ExchangeXG(UInt8 type);
+        void ExchangeFlyRoadBox(UInt8 type);
 
     private:
         //玩家位置（包括层数、当层位置）

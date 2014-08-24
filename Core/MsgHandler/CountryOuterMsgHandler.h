@@ -9569,6 +9569,47 @@ void OnQixiReq2(GameMsgHdr& hdr, const void * data)
             }
             player->sendKettleInfo();
         }
+    case 0x36:
+        {
+            UInt8 opt = 0;
+            brd >> opt;
+            switch(opt)
+            {
+                case 0x01 :
+                    player->ReturnFlyRoadInfo();
+                    break;
+                case 0x02 :
+                    {
+                        UInt8 opt1 = 0;
+                        UInt16 num = 0;
+                        brd >> opt1 >> num; 
+                        player->SacrificeFlyRoad(opt1,num);
+                    }
+
+                    break;
+                case 0x03 :
+                    {
+                        UInt8 type = 0;    
+                        brd >> type;
+                        if(type > 3)
+                            return;
+                        player->ExchangeXG(type);
+                    }
+
+                    break;
+                case 0x04 :
+                    {
+                        UInt8 type = 0;    
+                        brd >> type;
+                        player->ExchangeFlyRoadBox(type);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+
+        }
     default:
         break;
     }

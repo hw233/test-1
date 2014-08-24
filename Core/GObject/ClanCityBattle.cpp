@@ -1810,7 +1810,7 @@ bool ClanCity::playerEnter(Player * player)
 		player->sendMsgCode(0, 2300);
 		return false;
 	}
-    player->getSurnameLegendAward(e_sla_cb);
+    player->getSurnameLegendAward(e_sla_ccb);
     cl->addMemberActivePoint(player, 15, e_clan_actpt_clan_city);
 	player->setInClanCity(true);
     GameAction()->doStrong(player, SthMSCG, 0, 0);  

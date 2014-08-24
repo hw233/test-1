@@ -11581,6 +11581,69 @@ function ItemNormal_00016018(id, num, bind, param)
     return num;
 end
 
+function ItemNormal_00016043(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 2 + (2*num*2)/99 then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    local prob = {2300, 3600, 5000, 5600, 6200, 6800, 7400, 7900, 8400, 8900, 9400, 10000}
+    local items = {{500,2}, {503,1}, {514,2}, {509,1}, {134,1}, {1325,1}, {9338,1}, {9498,1}, {16001,1}, {9418,1}, {9457,1}, {501,1}}
+    local chance = {10, 8, 10, 8}
+
+    for k = 1, num do
+        local p = math.random(1, 10000)
+        local i = 1
+        for n = 1, #prob do
+            if p <= prob[n] then
+                i = n
+                break
+            end
+        end
+
+        local item = items[i];
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        if i > 3 then
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]".."开启了宝箱".."[4:"..id.."]获得了".."[4:"..items[i][1].."]x1");
+        end
+
+        local g = math.random(1, 100)
+        if id == 16043 then
+            if g <= chance[1] then
+                package:AddItem(16033, 1, true, true, 40);
+                Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]".."开启了宝箱".."[4:"..id.."]获得了".."[4:16033]仙格残片一个");
+            end
+        end
+        if id == 16044 then
+            if g <= chance[2] then
+                package:AddItem(16034, 1, true, true, 40);
+                Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]".."开启了宝箱".."[4:"..id.."]获得了".."[4:16034]仙格残片一个");
+            end
+        end
+        if id == 16045 then
+            if g <= chance[3] then
+                package:AddItem(16035, 1, true, true, 40);
+                Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]".."开启了宝箱".."[4:"..id.."]获得了".."[4:16035]仙格残片一个");
+            end
+        end
+        if id == 16046 then
+            if g <= chance[4] then
+                package:AddItem(16036, 1, true, true, 40);
+                Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]".."开启了宝箱".."[4:"..id.."]获得了".."[4:16036]仙格残片一个");
+            end
+        end
+    end
+
+    
+
+    package:DelItemSendMsg(id, player);
+    return num;
+end
+
+
+
 local ItemNormal_Table = {
     [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -13983,6 +14046,10 @@ local ItemNormal_Table = {
     [16014] = ItemNormal_00016014,
     [16015] = ItemNormal_00016015,
     [16018] = ItemNormal_00016018,
+    [16043] = ItemNormal_00016043,
+    [16044] = ItemNormal_00016043,
+    [16045] = ItemNormal_00016043,
+    [16046] = ItemNormal_00016043,
 
     [17002] = ItemNormal_00017002,
     [17003] = ItemNormal_00017003,
