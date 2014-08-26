@@ -9944,6 +9944,72 @@ function ItemNormal_00010271(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010272(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    player:getCoupon(num*100)
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010273(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (1+(1*num*10)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(16001, num*10, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010274(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (1+(1*num*12)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(9498, num*12, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010275(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (1+(1*num*15)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(515, num*15, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010276(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (1+(1*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:Add(5067, num*1, true, false, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_00016000(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 75 then
@@ -14385,6 +14451,11 @@ local ItemNormal_Table = {
     [10269] = ItemNormal_00010269,
     [10270] = ItemNormal_00010270,
     [10271] = ItemNormal_00010271,
+    [10272] = ItemNormal_00010272,
+    [10273] = ItemNormal_00010273,
+    [10274] = ItemNormal_00010274,
+    [10275] = ItemNormal_00010275,
+    [10276] = ItemNormal_00010276,
 
     [16000] = ItemNormal_00016000,
     [16001] = ItemNormal_00016000,

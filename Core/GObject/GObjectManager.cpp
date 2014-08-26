@@ -8075,7 +8075,7 @@ namespace GObject
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
-		LoadingCounter lc("Loading WorldCup:");
+		LoadingCounter lc("Loading happyXXL:");
 		DBHappyXXL dbpn;
 		if(execu->Prepare("SELECT `playerId` ,`num`, `map` FROM `happyXXL` ", dbpn) != DB::DB_OK)
 			return false;
@@ -8097,7 +8097,7 @@ namespace GObject
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
-		LoadingCounter lc("Loading WorldCup:");
+		LoadingCounter lc("Loading kettle:");
 		DBKettle dbk;
 		if(execu->Prepare("SELECT `playerId` ,`num`, `history`,`occupy` FROM `kettle` ", dbk) != DB::DB_OK)
 			return false;
