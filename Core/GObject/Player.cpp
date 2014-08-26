@@ -3061,6 +3061,7 @@ namespace GObject
 			DB2().PushUpdateData("INSERT INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
                     VALUES(%u, %" I64_FMT "u, %u.%02u, %u.%02u, %u, %u)",
                     id, getId(), p / 100, p % 100, c / 100, c % 100, fgt->getLevel(), fgt->getExp());
+            fgt->setSummoned(TimeUtil::Now());
 
             //招募散仙荣誉
            if(!load && CURRENT_THREAD_ID() <= WORKER_THREAD_NEUTRAL)
@@ -22316,6 +22317,7 @@ UInt8 Player::toQQGroup(bool isJoin)
                     VALUES(%u, %" I64_FMT "u, %u.%02u, %u.%02u, %u, %u)",
                     pet->getId(), getId(), p / 100, p % 100, c / 100, c % 100, pet->getLevel(), pet->getExp());
             pet->updateToDBPetSkill();
+            pet->setSummoned(TimeUtil::Now());
         }
     }
 
@@ -35353,6 +35355,40 @@ void Player::getLuckyBagExtraAward()
     }
 }
 
+UInt32 Player::getClanJoinTime()
+{
+    Clan* clan = getClan();
+    if(clan)
+    {
+        ClanMember* mem = clan->getClanMember(this);
+        if(mem)
+            return mem->joinTime;
+    }
+    return 0;
+}
+
+void Player::getFighterMinTimeAndCount(UInt32& petTime, UInt32& fighterTime, UInt8& fighterCount)
+{
+    for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+    {
+        Fighter* fgt = it->second;
+        if(!fgt)
+            continue;
+        if(fighterTime == 0 || fighterTime > fgt->getSummoned())
+            fighterTime = fgt->getSummoned();
+        ++fighterCount;
+    }
+
+    for(std::map<UInt32, FairyPet *>::iterator it = _fairyPets.begin(); it != _fairyPets.end(); ++ it)
+    {
+        FairyPet* pet = it->second;
+        Fighter* fgt = static_cast<Fighter* >(pet);
+        if(!fgt)
+            continue;
+        if(petTime == 0 || petTime > fgt->getSummoned())
+            petTime = fgt->getSummoned();
+    }
+}
 
 } // namespace GObject
 

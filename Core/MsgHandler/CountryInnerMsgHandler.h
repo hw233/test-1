@@ -1298,6 +1298,58 @@ void OnSeekingHer_SendBeans(GameMsgHdr& hdr, const void * data)
 	player->seekingHer_SendBeans(sb->userId, sb->beanType, sb->beanCount, wordstmp);
 }
 
+void OnThreeYearInfo(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	Int32 sessionID = *reinterpret_cast<Int32 *>(const_cast<void *>(data));
+    Stream st(SPEP::THREEYEARINFO);
+    if(cfg.merged)
+    {
+        UInt64 playerId = player->getId();
+        playerId = (playerId & 0x0000ffffffffffff);
+        st << playerId;
+    }
+    else
+    {
+        st << player->getId();
+    }
+    st << player->getNameNoSuffix(player->getName());
+    st << player->getCreated();
+
+    UInt32 marryTime = player->GetMarriageInfo()->yuyueTime;
+    st << marryTime;
+
+    UInt32 clanTime = player->getClanJoinTime();
+    st << clanTime;
+
+    UInt32 petTime = 0;
+    UInt32 fighterTime = 0;
+    UInt8 fighterCount = 0;
+    player->getFighterMinTimeAndCount(petTime, fighterTime, fighterCount);
+    st << petTime;
+    st << fighterTime;
+    st << fighterCount;
+
+    UInt32 localRank = 0;
+    if(cfg.merged)
+        localRank = player->GetVar(GObject::VAR_LOCAL_RANK);
+    else
+        localRank = gAthleticsRank.getAthleticsRank(player);
+    st << static_cast<UInt16>(localRank);
+
+    UInt32 battlePoint = player->GetVar(GObject::VAR_TOTAL_BATTLE_POINT);
+    st << battlePoint;
+
+    UInt16 deamonLevel = 0;
+    DeamonPlayerData * dpd = player->getDeamonPlayerData();
+    if(dpd)
+        deamonLevel = dpd->maxLevel;
+    st << static_cast<UInt8>(deamonLevel);
+
+    st << Stream::eos;
+    NETWORK()->SendMsgToClient(sessionID, st);
+}
+
 void OnCancelAutoRaceBattle(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);

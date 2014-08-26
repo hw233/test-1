@@ -11120,7 +11120,7 @@ function ItemNormal_00009382(iid, num, bind, param)
     local itmeId = 16050;
     local player = GetPlayer()
     local package = player:GetPackage()
-    local items = { 1500, 15, 501, 33, 9424, 551, 503, 8000, 9457, 1325, 1126, 134, 515, 16038 }
+    local items = { 500, 15, 501, 33, 9424, 551, 503, 8000, 9457, 1325, 1126, 134, 515, 16038 }
     local chance = { 1500,3000,3900,4800,5700,6600,7400,8200,8800,9100,9400,9600,9800,10000 }
     local card_num = 0;
     local used_num = player:GetVar(452);
