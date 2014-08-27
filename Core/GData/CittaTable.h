@@ -98,7 +98,8 @@ struct CittaEffect : public ObjectBaseNT<UInt16>
 		aet.hitrate *= rate;
 		aet.evade *= rate;
 		aet.critical *= rate;
-		aet.criticaldmg *= rate;
+        //std::cout << "暴击伤害不加成:" << rate << std::endl;
+		//aet.criticaldmg *= rate;
 		aet.pierce *= rate;
 		aet.counter *= rate;
         aet.magres *= rate;
@@ -116,6 +117,7 @@ struct CittaEffect : public ObjectBaseNT<UInt16>
 
 		aet.hpP *= rate;
 		aet.actionP *= rate;
+        //std::cout << "暴击伤害不加成:" << rate << std::endl;
 		//aet.criticaldmgP *= rate;   //暴击伤害不加成
 		aet.counterP *= rate;
         aet.magresP *= rate;

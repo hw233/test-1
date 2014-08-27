@@ -2793,6 +2793,7 @@ namespace GObject
         UInt8 transfromXingchen(Fighter * fFgt, Fighter * tFgt);
         void transformElixir(Fighter * fFgt, Fighter * tFgt);
         UInt8 transfromLingbaoLevel(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transfromIncense(Fighter * fFgt, Fighter * tFgt);
         void sendXinMoInfo(); 
             
     private:
@@ -3479,7 +3480,7 @@ namespace GObject
         void sendJiqirenInfo();
         void sevensoul_fixed();
         void BuyLeftPower();
-        UInt32 UseIncenseGood(UInt8 type , UInt8 num = 0);
+        UInt32 UseIncenseGood(UInt32 oldExp , UInt8 type , UInt8 num = 0);
 
         //友好度
         void AddFriendlyCount(Player * friender , UInt32 value) ; //增加友好度

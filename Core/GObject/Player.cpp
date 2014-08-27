@@ -3683,6 +3683,7 @@ namespace GObject
             fgt->xingchenInfo(st);
             fgt->getAllAcupointsGoldBits(st);
             fgt->getAllLingbaoLevelAndFall(st);
+            st << static_cast<UInt32>(fgt->getIncense()); 
 		}
 	}
 
@@ -19795,6 +19796,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             transfromXingchen(fFgt, tFgt);
         if ((type &0x40) && res==0)
             transfromLingbaoLevel(fFgt, tFgt);
+        if ((type &0x80) && res==0)
+            transfromIncense(fFgt, tFgt);
 
         return res;
     }
@@ -20124,7 +20127,24 @@ void EventTlzAuto::notify(bool isBeginAuto)
          return 0;
     }
 
-    void Player::transformElixir(Fighter * fFgt, Fighter * tFgt)
+    UInt8 Player::transfromIncense(Fighter * fFgt, Fighter * tFgt)
+    { 
+        UInt32 value = fFgt ->getIncense();
+        fFgt->setIncense(tFgt->getIncense());
+        tFgt->setIncense(value);
+        Stream st(REP::EXTEND_PROTOCAOL);
+        st <<static_cast<UInt8>(0x04);
+        st <<static_cast<UInt8>(0x03);
+        st << static_cast<UInt16>(fFgt->getId());
+        st << static_cast<UInt32>(fFgt->getIncense());
+        st << static_cast<UInt16>(tFgt->getId());
+        st << static_cast<UInt32>(tFgt->getIncense());
+        st <<Stream::eos;
+        send(st);
+        return 0;
+    } 
+
+void Player::transformElixir(Fighter * fFgt, Fighter * tFgt)
     {
         for (UInt8 i = 0; i < 14; ++i)
         {
@@ -29401,13 +29421,13 @@ void Player::getHappyValueAward(UInt8 val)
 void Player::joinAllServerRecharge(UInt32 num)
 {
     if(num == 0) return;
-    //Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
-    Stream st(ARENAREQ::RECHARGE_ACTIVE, 0xEF);
+    //Stream st(ARENAREQ::RECHARGE_ACTIVE, 0xEF);
+    Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
     st << getId() << getName() << num << TimeUtil::Now();
     st << static_cast<UInt8>(getCountry()<<4 | (IsMale()?0:1));
     st << Stream::eos;
-    //NETWORK()->SendToServerWar(st);
-	NETWORK()->SendToArena(st);
+    NETWORK()->SendToServerWar(st);
+	//NETWORK()->SendToArena(st);
 }
 
 bool Player::giveFlower(UInt8 type ,UInt32 num)
@@ -35317,10 +35337,11 @@ void Player::ExchangeFlyRoadBox(UInt8 type)
     ReturnFlyRoadInfo();
 }
 
-UInt32 Player::UseIncenseGood(UInt8 type , UInt8 num)
+UInt32 Player::UseIncenseGood(UInt32 oldexp ,UInt8 type , UInt8 num)
 { 
     if(type > 1 || !num)
         return 0;
+    
     {
         UInt16 count = GetPackage()->GetItemAnyNum(555+type) ;
         ItemBase * item = GetPackage()->FindItem(555+type, true);
@@ -35330,19 +35351,24 @@ UInt32 Player::UseIncenseGood(UInt8 type , UInt8 num)
             return 0;
         if(num > count)
             return 0;
-        GetPackage()->DelItemAny(555+type, num );
-        GetPackage()->AddItemHistoriesLog(555+type, type == 0 ? 1:num );
     }
     UInt32 once = type*40 + !type*10;
-    UInt32 sum = once * num;
-    if(type)
-    {
-        for(UInt8 i = 0; i < num ; ++i)
-        { 
-            if(uRand(10000) < 1000)
-                sum += once;
-        } 
-    }
+    UInt32 sum = 0;
+
+    for(UInt8 i = 0; i < num ; ++i)
+    { 
+        if(oldexp >= 37571)
+            return sum;
+        GetPackage()->DelItemAny(555+type, 1 );
+        GetPackage()->AddItemHistoriesLog(555+type ,1 );
+        sum += once;
+        oldexp += once;
+        if(type && uRand(10000) < 1000)
+        {
+            sum += once;
+            oldexp += once;
+        }
+    } 
     return sum;
 
 } 

@@ -10406,7 +10406,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                             br >>flag;
                             UInt8 count = 0;
                             br >> count ;
-                            UInt32 exp = player->UseIncenseGood(flag,count);
+                            UInt32 exp = player->UseIncenseGood(fgt->getIncense(),flag,count);
                             if(exp)
                             {
                                 fgt->addIncense(exp);
@@ -10416,7 +10416,12 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                             Stream st(REP::EXTEND_PROTOCAOL);
                             st << static_cast<UInt8>(0x04);
                             st << static_cast<UInt8>(0x02);
-                            st << static_cast<UInt8>(!!exp);
+                            st << static_cast<UInt16>(fgt->getId());
+                            if(type && exp > 40*count)
+                                st << static_cast<UInt8>(2);
+                            else
+                                st << static_cast<UInt8>(!exp);
+                            st << fgt->getIncense();
                             st << Stream::eos;
                             player->send(st);
                         }
