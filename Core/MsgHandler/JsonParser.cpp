@@ -994,6 +994,90 @@ int query_role_growth_data_req(JsonHead* head, json_t* body, json_t* retbody, st
     return 0;
 }
 
+int query_usr_threeyears_data_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    char openid[36] = {0};
+    char playerId[32] = {0};
+    UInt32 areaid = 0;
+
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
+    GET_STRING(body, "szOpenId", openid, 36);
+    GET_STRING(body, "playerId", playerId, 32);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
+
+    UInt64 playerid = atoll(playerId);
+    GObject::Player* player = GObject::globalPlayers[playerid];
+    if (!player)
+    {
+        err += "player not exist!";
+        return EPLAYER_NOT_EXIST;
+    }
+
+    json_insert_pair_into_object(retbody, "szRoleId", json_new_string(playerId));
+
+    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(fixPlayerName(player->getName()).c_str()));
+
+    char buf[1024] = {0};
+    snprintf(buf, sizeof(buf), "%u", player->getCreated());
+    json_insert_pair_into_object(retbody, "szCreateTime", json_new_string(buf));
+
+    memset(buf, 0x00, sizeof(buf));
+    snprintf(buf, sizeof(buf), "%u", player->GetMarriageInfo()->yuyueTime);
+    json_insert_pair_into_object(retbody, "szMarryTime", json_new_string(buf));
+
+    memset(buf, 0x00, sizeof(buf));
+    snprintf(buf, sizeof(buf), "%u", player->getClanJoinTime());
+    json_insert_pair_into_object(retbody, "szLastJoinTime", json_new_string(buf));
+
+    UInt32 petTime = 0;
+    UInt32 fighterTime = 0;
+    UInt8 fighterCount = 0;
+    player->getFighterMinTimeAndCount(petTime, fighterTime, fighterCount);
+
+    memset(buf, 0x00, sizeof(buf));
+    snprintf(buf, sizeof(buf), "%u", petTime);
+    json_insert_pair_into_object(retbody, "szGetPetTime", json_new_string(buf));
+
+    memset(buf, 0x00, sizeof(buf));
+    snprintf(buf, sizeof(buf), "%u", fighterTime);
+    json_insert_pair_into_object(retbody, "szSummonTime", json_new_string(buf));
+
+    memset(buf, 0x00, sizeof(buf));
+    snprintf(buf, sizeof(buf), "%u", fighterCount);
+    json_insert_pair_into_object(retbody, "szSummonNum", json_new_string(buf));
+
+    memset(buf, 0x00, sizeof(buf));
+    snprintf(buf, sizeof(buf), "%u", GObject::gAthleticsRank.getAthleticsRankLocal(player));
+    json_insert_pair_into_object(retbody, "szSwordRank", json_new_string(buf));
+
+    memset(buf, 0x00, sizeof(buf));
+    UInt32 point = 0;
+    for (int i = 0; i < 5; ++i)
+    {
+        GObject::Lineup& lp= player->getLineup(i);
+        GObject::Fighter* fgt = lp.fighter;
+        if (fgt)
+            point += fgt->getBattlePoint_Dirty();
+    }
+    snprintf(buf, sizeof(buf), "%u", point);
+    json_insert_pair_into_object(retbody, "szBattleEnergy", json_new_string(buf));
+
+    memset(buf, 0x00, sizeof(buf));
+    snprintf(buf, sizeof(buf), "%u", player->getDeamonPlayerData()?player->getDeamonPlayerData()->maxLevel:0);
+    json_insert_pair_into_object(retbody, "szPagodaLayers", json_new_string(buf));
+
+    head->cmd = 122;
+    return 0;
+}
+
 void jsonParser2(void * buf, int len, Stream& st)
 {
 	BinaryReader br(buf, len);
@@ -1105,6 +1189,8 @@ void jsonParser2(void * buf, int len, Stream& st)
         case 119:
             ret = query_role_growth_data_req(&head, body, retbody, err);
             break;
+        case 121:
+            ret = query_usr_threeyears_data_req(&head, body, retbody, err);
        
         default:
             break;

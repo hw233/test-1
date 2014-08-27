@@ -1297,7 +1297,7 @@ void OnSeekingHer_SendBeans(GameMsgHdr& hdr, const void * data)
     std::string wordstmp = sb->words;
 	player->seekingHer_SendBeans(sb->userId, sb->beanType, sb->beanCount, wordstmp);
 }
-
+#if 0
 void OnThreeYearInfo(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -1349,7 +1349,7 @@ void OnThreeYearInfo(GameMsgHdr& hdr, const void * data)
     st << Stream::eos;
     NETWORK()->SendMsgToClient(sessionID, st);
 }
-
+#endif
 void OnCancelAutoRaceBattle(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);

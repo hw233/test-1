@@ -4471,7 +4471,7 @@ void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
     st << static_cast<UInt8>(flag)<< Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
-
+#if 0
 void ThreeYearInfoReturn(LoginMsgHdr& hdr, const void* data)
 {
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
@@ -4513,6 +4513,6 @@ void ThreeYearInfoReturn(LoginMsgHdr& hdr, const void* data)
     GameMsgHdr imh(0x28F, player->getThreadId(), player, sizeof(sessionID));
     GLOBAL().PushMsg(imh, &sessionID);
 }
-
+#endif
 #endif // _LOGINOUTERMSGHANDLER_H_
 
