@@ -1418,7 +1418,7 @@ void Leaderboard::sendGoldLvlAward(BinaryReader& brd)
     static MailPackage::MailItem s_items[][6][5] ={
         //1
         {
-        { {503, 5},   {500, 5},  {514, 5},   {0, 0} },
+        { {503, 5},  {500, 5},  {514, 5},   {0, 0} },
         { {516, 5},  {547, 5}, {9418, 5},  {9424, 5} },
         { {509, 5},  {9338, 5},  {134, 5},   {1325, 5} },
         { {134, 6}, {9600, 6}, {9414, 6},  {9310, 6} },
@@ -1507,7 +1507,7 @@ void Leaderboard::sendGoldLvlAward(BinaryReader& brd)
         { {9075, 20},  {0, 0}, {0, 0}, {0, 0} },
         },
     }; 
-    UInt32 begin = TimeUtil::MkTime(2014, 8, 25);
+    UInt32 begin = TimeUtil::MkTime(2014, 9, 16);
     UInt32 now = TimeUtil::Now();
     if(now < begin)
         return ;

@@ -35392,7 +35392,7 @@ UInt32 Player::UseIncenseGood(UInt32 oldexp ,UInt8 type , UInt8 num)
         GetPackage()->AddItemHistoriesLog(555+type ,1 );
         sum += once;
         oldexp += once;
-        if(type && uRand(10000) < 1000)
+        if(type && uRand(10000) < 800)
         {
             sum += once;
             oldexp += once;
