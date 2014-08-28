@@ -10422,6 +10422,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                             else
                                 st << static_cast<UInt8>(!exp);
                             st << fgt->getIncense();
+                            st << static_cast<UInt8>(type);
                             st << Stream::eos;
                             player->send(st);
                         }

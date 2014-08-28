@@ -20141,6 +20141,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
         st << static_cast<UInt32>(tFgt->getIncense());
         st <<Stream::eos;
         send(st);
+        tFgt->UpdateIncenseToDB();
+        fFgt->UpdateIncenseToDB();
         return 0;
     } 
 
