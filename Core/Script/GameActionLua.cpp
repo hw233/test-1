@@ -331,6 +331,7 @@ namespace Script
         CLASS_DEF(Player, SetVipPrivilege);
         CLASS_DEF(Player, sendVipPrivilege);
         CLASS_DEF(Player, sendLuckyBagInfo);
+        CLASS_DEF(Player, getLuckyBagExtraAward);
         CLASS_DEF(Player, sendHappyValueInfo);
 		CLASS_DEF(Player, LuckyBagRank);
 		CLASS_DEF(Player, findFairyPet);

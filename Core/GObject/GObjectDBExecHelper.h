@@ -565,6 +565,7 @@ struct DBFighter2
     UInt8 hideFashion;
     UInt32 incense;
     UInt32 innateTrump;     //先天法宝
+    UInt32 summoned;
 };
 
 
@@ -2265,7 +2266,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(60)
+SPECIALDEF(61)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -2326,7 +2327,8 @@ SPECIALDEF(60)
     Int32, action,
     UInt8, hideFashion,
     UInt32, incense,
-    UInt32, innateTrump
+    UInt32, innateTrump,
+    UInt32, summoned
 	)
 SPECIALEND()
 

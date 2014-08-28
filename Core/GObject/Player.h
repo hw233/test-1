@@ -245,6 +245,10 @@ namespace GObject
 #define GET_BIT_5(X,Y)   ((X >> (Y*5)) & 0x1F)
 #define CLR_BIT_5(X,Y)   (X & ~(0x1F<<(Y*5)))
 
+#define CLR_BIT_4(X,Y)   (X & ~(0x0F<<(Y*4)))
+#define SET_BIT_4(X,Y,V) (CLR_BIT_4(X,Y) | V<<(Y*4))
+#define GET_BIT_4(X,Y)   ((X >> (Y*4)) & 0x0F)
+
 //飞剑(坐骑)系统
 #define MOUNT_COSTID 9500
 #define MOUNT_CANGJIANID 9600
@@ -3250,6 +3254,7 @@ namespace GObject
         void send3366GiftInfo();
         void sendQQGameGift1218();
         void sendFeastLoginAct();
+        void sendFeastGiftLoginAct();
         void sendTowerLoginAct();
         void getFeastGiftAward(UInt8 type);
         void sendFeastGiftAct();
@@ -3632,6 +3637,9 @@ namespace GObject
         void SacrificeFlyRoad(UInt8 type, UInt16 num);
         void ExchangeXG(UInt8 type);
         void ExchangeFlyRoadBox(UInt8 type);
+        void getLuckyBagExtraAward();
+        UInt32 getClanJoinTime();
+        void getFighterMinTimeAndCount(UInt32& petTime, UInt32& fighterTime, UInt8& fighterCount);
 
     private:
         //玩家位置（包括层数、当层位置）

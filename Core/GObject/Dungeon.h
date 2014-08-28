@@ -116,6 +116,7 @@ public:
     void doJusticeRoar(Player*);
 public:
 	void pushEnterCountBS(UInt32 now);
+    UInt16 getLocation() { return _dungeon->location; }
 
 private:
 	void takeLoot(Player *, DungeonPlayerInfo&, UInt32&);

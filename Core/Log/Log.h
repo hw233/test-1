@@ -177,6 +177,7 @@ enum PurchaseType
     MakeGear                    = 1038, //打造机关库
     WeiWeiShop                  = 1039, //购买微信商店物品
     KETTLE                    = 1040, //炼妖壶
+    DARKDARGON                  = 1041, //黯龙王
     //繁体私有占150～200
 };
 
@@ -258,6 +259,7 @@ enum MailItemType
 	DismissXinMo,
 	RandBattleAward,
     LingShiEatBack,
+    DarkDargonAward,
 };
 enum ItemFrom
 {

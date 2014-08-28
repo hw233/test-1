@@ -214,6 +214,8 @@ public:
     inline void setWBossInspire(bool v) { _iswbossinspire = v; }
     inline bool isClanBigBossBuf() { return _iscbbbuf; }
     inline void setClanBigBossBuf(bool v) { _iscbbbuf = v; }
+    inline bool isDarkDargonBuf() { return _isddbuf; }
+    inline void setDarkDargonBuf(bool v) { _isddbuf= v; }
 	inline UInt8 getLevel() {return _level;}
     inline UInt8 getLevelInLua() { if (isPet() && _level >= 50) return _level - 49;  return _level;}
 	inline UInt64 getExp() {return _exp;}
@@ -598,6 +600,8 @@ public:
 	inline UInt8 getColor() { return _color; }
 	static UInt8 getColor2(float);
 
+    void setSummoned(UInt32 summoned) { _summoned = summoned; }
+    UInt32 getSummoned() { return _summoned; }
 	ItemEquip * setInnateTrump(ItemInnateTrump* r, bool = true);
 	ItemEquip * setHalo(ItemHalo* r, bool = true);
 	ItemEquip * setFashion(ItemFashion* r, bool = true);
@@ -711,6 +715,13 @@ public:
 	inline void setPlExtraMagAttack(Int32 atk) { _wbplextmagatk = atk; }
     inline void setPlCBBExtraAttack(Int32 atk) { _cbbplextatk = atk; }
 	inline void setPlCBBExtraMagAttack(Int32 atk) { _cbbplextmagatk = atk; }
+    
+    inline void setPlDDExtraAttack(Int32 atk) { _ddplextatk = atk; }
+	inline void setPlDDExtraMagAttack(Int32 atk) { _ddplextmagatk = atk; }
+	inline void setPlDDExtraDef(Int32 def) { _ddplextdef = def; }
+	inline void setPlDDExtraAction(Int32 action) { _ddplextaction = action; }
+	inline void setPlDDExtraCritical(Int32 critical) { _ddplextcritical = critical; }
+	inline void setPlDDExtraHp(Int32 hp) { _ddplexthp = hp; }
 
     UInt8 getToggleReiatsu();        // 返回出场所需灵压
     UInt8 getTargetPos();            // 返回备胎该出场的目标位置
@@ -881,6 +892,7 @@ protected:
 	float _potential;   // 潜力
 	float _capacity;    // 资质
 	UInt8 _color;
+    UInt32 _summoned;
 	UInt32 _hp;
 
     UInt8 _acupoints[ACUPOINTS_MAX];    // 穴道
@@ -994,12 +1006,19 @@ private:
     bool _iswboss;
     bool _iswbossinspire;
     bool _iscbbbuf;
+    bool _isddbuf;
     Int32 _wbextatk;
     Int32 _wbextmagatk;
     Int32 _wbplextatk;
     Int32 _wbplextmagatk;
     Int32 _cbbplextatk;
     Int32 _cbbplextmagatk;
+    Int32 _ddplextatk;
+    Int32 _ddplextmagatk;
+    Int32 _ddplextdef;
+    Int32 _ddplextaction;
+    Int32 _ddplextcritical;
+    Int32 _ddplexthp;
 
 public:
     // 仅仅用于内存拷贝出来的Fighter, 切勿她用

@@ -2209,9 +2209,11 @@ namespace GObject
             
             while(it != m_yuyueList.end())
             {
+                int it_day = TimeUtil::GetYYMMDD(it->first);
+                int now_day = TimeUtil::GetYYMMDD(now); 
                 if(it->first < now)
                 {
-                    if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD(now))
+                    if(it_day == now_day)
                         break;  
                     it1 = it->second;
                     player = GObject::globalPlayers[it1.first];
@@ -2231,7 +2233,7 @@ namespace GObject
                     }
                 }
                 
-                if(TimeUtil::GetYYMMDD(it->first) == TimeUtil::GetYYMMDD(now)  && !GVAR.GetVar(GVAR_CREATMARRY_TIMES))
+                if(it_day == now_day && !GVAR.GetVar(GVAR_CREATMARRY_TIMES))
                 {
                     it1 = it->second;
                     player = GObject::globalPlayers[it1.first];

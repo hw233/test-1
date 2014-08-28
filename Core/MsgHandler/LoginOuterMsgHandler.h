@@ -4477,5 +4477,6 @@ void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
     st << static_cast<UInt8>(flag)<< Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
+
 #endif // _LOGINOUTERMSGHANDLER_H_
 

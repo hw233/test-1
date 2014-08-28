@@ -77,6 +77,7 @@
 #include "GObject/ClanBuilding.h"
 #include "GObject/RaceBattle.h"
 #include "GObject/CollectCard.h"
+#include "GObject/DarkDargon.h"
 
 struct NullReq
 {
@@ -1487,6 +1488,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     //结拜邀请信息
     pl->sendFriendlyTimeAndCost();
     GObject::raceBattle.sendRBStatus(pl);
+    DarkDargon::Instance().RetAwaitInfo(pl);
 
     }
 
@@ -2189,7 +2191,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             if(!player->hasChecked())
                 return;
             UInt8 type;
-            if(!World::getFeastLoginAct())
+            if(false/*!World::getFeastLoginAct()*/)
                 return;
             br >> type;
             player->getFeastGiftAward(type);
@@ -2771,6 +2773,8 @@ void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 	GObject::Dungeon * dg = GObject::dungeonManager[dir.type];
 	if(dg == NULL)
 		return;
+    if(pl->getLocation() != dg->getLocation())
+        return;
     UInt8 result = 0;
     Stream st(REP::COPY_DATA_UPDATE);
 	switch(dir.op)
@@ -2850,6 +2854,8 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 	GObject::Dungeon * dg = GObject::dungeonManager[dar.type];
 	if(dg == NULL)
 		return;
+    if(pl->getLocation() != dg->getLocation())
+        return;
 	dg->autoChallenge(pl, dar.mtype, dar.difficulty);
     pl->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 1);
 }
@@ -10374,6 +10380,121 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                 //GameAction()->RunOperationTaskAction1(player, 1, 2);
                 break;
             }
+        case 2://黯龙王之怒
+            {
+                if (player->getLocation() != 6152)//雪浪峰
+                    return ;
+                if (player->getThreadId() != WORKER_THREAD_NEUTRAL)
+                    return ;
+                UInt8 opt1 = 0;
+                br >> opt1; 
+                switch(opt1)
+                {
+                    case 1:
+                    {
+                        UInt8 t_opt= 0;
+                        br >> t_opt;
+                        if(t_opt == 1)
+                            DarkDargon::Instance().EnterDarkDargon(player);
+                        if(t_opt == 2)
+                            DarkDargon::Instance().QuitDarkDargon(player);
+                        break;
+                    }
+                    case 2://四方之塔请求
+                    {
+                        UInt8 t_opt = 0;
+                        UInt8 t_idx = 0;
+                        UInt8 t_pos = 0;
+                        br >> t_opt >> t_idx >> t_pos;
+                        switch(t_opt)
+                        {
+                            case 1:
+                                DarkDargon::Instance().ReturnRoundTowerInfo(player,t_idx,t_pos);
+                                break;
+                            case 2:
+                                DarkDargon::Instance().DefRoundTower(player,t_idx,t_pos);
+                                break;
+                            case 4:
+                                DarkDargon::Instance().QuitRoundTower(player);
+                                break;
+                            case 5:
+                                {
+                                    UInt64 playerId = 0;
+                                    br >> playerId;
+                                    DarkDargon::Instance().PKRoundTower(player,t_idx,t_pos,playerId);
+                                    break;
+                                }
+                            default:
+                                break;
+                        }
+
+                        break;
+                    }
+                    case 3://三星阵请求
+                    {
+                        UInt8 t_opt = 0;
+                        br >> t_opt;                        
+                        switch(t_opt)
+                        {
+                            case 1:
+                                DarkDargon::Instance().ReturnStarMapInfo(player,t_opt);
+                                break;
+                            case 2:
+                            {
+                                UInt8 t_type = 0;
+                                br >> t_type;
+                                DarkDargon::Instance().SetBufferFlag(player,t_type - 1);
+                                DarkDargon::Instance().ReturnStarMapInfo(player,t_opt);
+                                break;
+                            }
+                            case 3:
+                            {
+                                UInt8 t_idx = 0;
+                                br >> t_idx;
+                                DarkDargon::Instance().AttackStarMap(player,t_idx,0);
+                                break;
+                            }
+                            case 4:
+                            {
+                                UInt8 t_idx = 0;
+                                br >> t_idx;
+                                DarkDargon::Instance().AttackStarMap(player,t_idx,1);
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+                        break;
+                    }
+                    case 4:
+                    {
+                        UInt8 t_opt = 0;
+                        br >> t_opt;
+                        switch(t_opt)
+                        {
+                            case 1:
+                                DarkDargon::Instance().OptBoss(player,t_opt);
+                                break;
+                            case 2:
+                                DarkDargon::Instance().OptBoss(player,t_opt);
+                                break;
+                            case 3:
+                                DarkDargon::Instance().OptBoss(player,t_opt);
+                                break;
+                            case 4:
+                                DarkDargon::Instance().AttackBoss(player);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        break;
+                    }
+                    default :
+                        break;
+                }
+            }
+            break;
         case 4:
             {
                 UInt8 type = 0;
@@ -10428,6 +10549,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                         }
                 } 
             }
+            break;
     }
 }
 
