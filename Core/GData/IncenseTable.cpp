@@ -5,6 +5,8 @@ namespace GData
     void IncenseTable::setIncenseAttrTable(UInt32 val,float value)
     { 
         _incenseAttr.insert(std::make_pair(val,value));
+        if(val > incenseMax )
+            incenseMax = val;
     } 
     float IncenseTable::getIncenseAttr(UInt32 val)
     { 
