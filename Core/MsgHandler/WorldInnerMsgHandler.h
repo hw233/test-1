@@ -2255,9 +2255,10 @@ inline bool enterArena(GObject::Player* p, UInt32* cnt)
 {
     if(!p)
         return true;
+    /*
     if(*cnt > 100)
         return false;
-
+    */
     ++(*cnt);
     GObject::arena.enterArena(p);
     return true;

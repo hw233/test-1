@@ -8766,6 +8766,8 @@ namespace GObject
                 fgt->setLingbaoFall(type ,0);
                 enLevel ++;
                 success ++;
+                if(bless != 0)
+                    wfall = true;
                 bless = 0;
                 wlevel = true;
                 res = 1;
