@@ -20504,6 +20504,7 @@ void Player::copyFrontWinAward(UInt8 index, bool unBind)
         unBindFlag = 0;
     SetVar(VAR_CF_UNBIND, unBindFlag);
     SetVar(VAR_CF_FLAG, index);
+    SetVar(VAR_CF_LOCATION, PLAYER_DATA(this, location));
     resetCopyFrontWinAward();
     sendCopyFrontAllAward();
 }
@@ -20687,8 +20688,8 @@ void Player::resetCopyFrontWinAward(bool fresh)
         }
         else
             step = 0;
-        if(GetVar(VAR_CF_LOCATION) == 0)
-            SetVar(VAR_CF_LOCATION, PLAYER_DATA(this, location));
+        //if(GetVar(VAR_CF_LOCATION) == 0)
+        //    SetVar(VAR_CF_LOCATION, PLAYER_DATA(this, location));
         Table award = GameAction()->getCopyFrontmapAward(step, GetVar(VAR_CF_LOCATION), GetVar(VAR_CF_FLAG));
         if (award.size() < 2)
         {
