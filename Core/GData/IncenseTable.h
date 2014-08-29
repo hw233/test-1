@@ -9,9 +9,12 @@ namespace GData
     class IncenseTable
     {
         public:
+            IncenseTable():incenseMax(0){ }
             void setIncenseAttrTable(UInt32 val , float value);
             float getIncenseAttr(UInt32);
+            UInt32 getIncenseMax() {return incenseMax;}
         private:
+            UInt32 incenseMax;
             std::map<UInt32,float>  _incenseAttr;
     };
     extern IncenseTable incenseData;

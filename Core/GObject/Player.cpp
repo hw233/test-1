@@ -97,6 +97,7 @@
 #include "GObject/RaceBattle.h"
 #include "GData/ClanShop.h"
 #include "GObject/DarkDargon.h"
+#include "GData/IncenseTable.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -29466,16 +29467,16 @@ bool Player::giveFlower(UInt8 type ,UInt32 num)
         return false;
     UInt8 ret = 0;
     {
-        UInt16 count = GetPackage()->GetItemAnyNum(555+type) ;
-        ItemBase * item = GetPackage()->FindItem(555+type, true);
+        UInt16 count = GetPackage()->GetItemAnyNum(9442+type) ;
+        ItemBase * item = GetPackage()->FindItem(9442+type, true);
         if (!item)
-            item =GetPackage()->FindItem(555+type, false);
+            item =GetPackage()->FindItem(9442+type, false);
         if(item ==NULL)
             return false;
         if(num > count)
             return false;
-        GetPackage()->DelItemAny(555+type, type ==0 ? 1:num );
-        GetPackage()->AddItemHistoriesLog(555+type, type == 0 ? 1:num );
+        GetPackage()->DelItemAny(9442+type, type ==0 ? 1:num );
+        GetPackage()->AddItemHistoriesLog(9442+type, type == 0 ? 1:num );
         AddVar(VAR_MARRYBOARD_LIVELY,!type * 100 + num * 5);
         ret = 1;
         char str[16] = {0};
@@ -35384,10 +35385,11 @@ UInt32 Player::UseIncenseGood(UInt32 oldexp ,UInt8 type , UInt8 num)
     }
     UInt32 once = type*40 + !type*10;
     UInt32 sum = 0;
+    UInt32 max  = GData::incenseData.getIncenseMax();
 
     for(UInt8 i = 0; i < num ; ++i)
     { 
-        if(oldexp >= 44587)
+        if(oldexp >= max)
             return sum;
         GetPackage()->DelItemAny(555+type, 1 );
         GetPackage()->AddItemHistoriesLog(555+type ,1 );
