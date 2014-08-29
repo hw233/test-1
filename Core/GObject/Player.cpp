@@ -35388,7 +35388,7 @@ UInt32 Player::UseIncenseGood(UInt32 oldexp ,UInt8 type , UInt8 num)
 
     for(UInt8 i = 0; i < num ; ++i)
     { 
-        if(oldexp >= max)
+        if(oldexp >= 44587)
             return sum;
         GetPackage()->DelItemAny(555+type, 1 );
         GetPackage()->AddItemHistoriesLog(555+type ,1 );
