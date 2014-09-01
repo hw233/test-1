@@ -29191,7 +29191,7 @@ void Player::GetFindOldManAward(UInt32 type)
         num =2;
         SYSMSG_BROADCASTV(574, getCountry(), getPName(), type );
     }
-    GetPackage()->AddItem(16041, num, true, false);   //欢乐礼包(9439) 其他活动要修改
+    GetPackage()->AddItem(16011, num, true, false);   //欢乐礼包(9439) 其他活动要修改
     AddVar(VAR_OLDMAN_DAYSCORE,num*10);
     AddVar(VAR_OLDMAN_SCORE,num*10);
     SYSMSG_SENDV(2024,this,num*10);
@@ -29248,7 +29248,7 @@ void Player::sendInterestingBag(Player* pl)
         sendMsgCode(0, 2218);
         return ;
     }
-    ItemBase* item = GetPackage()->GetItem(16041, true);					
+    ItemBase* item = GetPackage()->GetItem(16011, true);					
     if(item ==NULL)
         return ;
     UInt16 count = item->Count();
@@ -29259,7 +29259,7 @@ void Player::sendInterestingBag(Player* pl)
         return;
     }
     GetPackage()->DelItem2(item, 1);
-    GetPackage()->AddItemHistoriesLog(16041, 1);
+    GetPackage()->AddItemHistoriesLog(16011, 1);
     UInt64 id = getId();
     GameMsgHdr hdr(0x356, pl->getThreadId(),pl,sizeof(id) );
     GLOBAL().PushMsg(hdr, &id);
