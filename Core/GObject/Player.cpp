@@ -29280,7 +29280,7 @@ void Player::getInteresingBag(UInt64 pid)
         Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
         {
-            MailPackage::MailItem mitem[] = {{15, 1},{500,1},{513,1},{516,1},{503,1},{9414,1},{9457,1}};
+            MailPackage::MailItem mitem[] = {{57, 1},{15,1},{500,1},{9371,1},{501,1},{9600,1},{503,1}};
             UInt32 chance[] = {2500,5000,7000,8000,9000,9500,10000};
             UInt32 rand = uRand(10000);
             UInt8 k =0;
@@ -29326,7 +29326,7 @@ void Player::sendOldManPos(UInt8 type)
     UInt32 gold = 5;
     if(type==0)
     {
-        if(time % 3600 < 5)
+        if(time % 3600 < 5 || time % 3600 > 3595)
         {
             sendMsgCode(0, 4053);
             return ;
