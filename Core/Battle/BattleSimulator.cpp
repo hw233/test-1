@@ -4962,7 +4962,10 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
             }
             else
             {
-                setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAura, value, skill->last, target_side != 0);
+                if(skill->cond == GData::SKILL_ENTER_LINGSHI)
+                    setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stAura, value, bf->getNewModeLast(), bf->getSide() != 0);
+                else
+                    setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAura, value, skill->last, target_side != 0);
             }
         }
     }
@@ -5910,6 +5913,17 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             appendDefStatus(e_damNormal, 0, bo);
         }
 
+        if(SKILL_ID(skill->getId()) == 650)
+        {
+            if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
+            {
+                if (doSkillAttack(bf, skill, target_side, target_pos, 1))
+                {
+                    ++ rcnt;
+                }
+            }
+        }
+
     } while(false);
     doSkillEffectExtraAttack(bf, target_side, target_pos, skill);
     if(useSkillStrengthen)
@@ -6842,6 +6856,23 @@ UInt32 BattleSimulator::doAttack( int pos )
             {
                 int cnt = 0;
                 getSkillTarget(bf, skill, otherside, target_pos, cnt);
+
+                if(SKILL_ID(skill->getId()) == 651)
+                {
+                    std::vector<AttackAct> atkAct;
+                    if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct))
+                        ++ rcnt;
+
+                    size_t actCnt = atkAct.size();
+                    for(size_t idx = 0; idx < actCnt; idx++)
+                    {
+                        if(atkAct[idx].bf->getHP() == 0)
+                            continue;
+                        if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                            ++ rcnt;
+                    }
+                }
+
                 GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
                 if(ss)
                 {
