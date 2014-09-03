@@ -938,7 +938,7 @@ end
 function IceCreamLoot(player)
     if getCoolSummer() then
         local package = player:GetPackage()
-        package:AddItem(16020, 1, true)
+        package:AddItem(16052, 1, true)
     end
 end
 

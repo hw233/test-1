@@ -18151,6 +18151,15 @@ namespace GObject
             AddVar(VAR_CONSUME, c);
             sendConsumeAwardInfo(0);
         }
+        if(World::getCarnivalConsume())
+        {
+            giveCarnivalDailyAward(c);
+            AddVar(VAR_CARNIVAL_CONSUME_TOTAL, c);
+            AddVar(VAR_CARNIVAL_CONSUME_TODAY_TOTAL, c);
+
+            GameMsgHdr hdr(0x159, WORKER_THREAD_WORLD, this, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
     }
 
     static const UInt32 s_task1ColorScore[] = {100, 200, 300, 400}; //日常任务的积分
@@ -34525,9 +34534,9 @@ void Player::sendCoolSummerActPointGift(UInt8 awardType)
         { {0, 0}, {0 ,0}},
         { {503, 2}, {0, 0} },
         { {500, 5}, {501, 5} },
-        { {9424, 5}, {9418, 5} },
-        { {9498, 5}, {16001, 5} },
-        { {9076, 5}, {0, 0} },
+        { {9424, 5}, {9413, 5} },
+        { {554, 5}, {9600, 5} },
+        { {9022, 3}, {0, 0} },
     };
     //活跃值第一次达到双倍，后面单倍
     if(awardType)
@@ -34589,13 +34598,13 @@ void Player::useIceCream(UInt8 randType, UInt8 flag)
     }
 
     //使用冰淇淋，增加活跃值
-    if(GetPackage()->GetItemAnyNum(16020) < useCount[randType - 1][0])
+    if(GetPackage()->GetItemAnyNum(16052) < useCount[randType - 1][0])
     {
         sendMsgCode(0, 8062);
         return;
     }
 
-    GetPackage()->DelItemAny(16020, useCount[randType - 1][0]);
+    GetPackage()->DelItemAny(16052, useCount[randType - 1][0]);
 
     char str[16] = {0};
     sprintf(str, "F_140625_%d", randType);
@@ -34635,7 +34644,7 @@ void Player::useIceCream(UInt8 randType, UInt8 flag)
 
     //为拉把随机奖励
     UInt8 awardType = 0;
-    static UInt32 awardProb[] = {8700, 9200, 9500, 9710, 9860, 9960, 9990, 10000};
+    static UInt32 awardProb[] = {3000, 5300, 7600, 8500, 9270, 9970, 9990, 10000};
     UInt32 rand = uRand(10000);
     for(UInt8 i = 0; i < 8; i++)
     {
@@ -34675,13 +34684,13 @@ void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType, UInt8 sendType
     static UInt8 awardCount[4] = {1, 11, 22, 53};
     static UInt32 awardArray[][2] = {
         {16018, 1},
-        {16018, 2},
-        {9600, 2},
-        {9457, 2},
+        {503, 1},
+        {501, 2},
+        {1325, 2},
         {134, 2},
-        {515, 2},
-        {9075, 4},
-        {9022, 8},
+        {515, 3},
+        {1734, 1},
+        {1735, 1},
     };
 
     UInt32 itemCount = awardArray[awardType][1] * awardCount[randType - 1];
@@ -35366,6 +35375,180 @@ void Player::ExchangeFlyRoadBox(UInt8 type)
             return;
     }
     ReturnFlyRoadInfo();
+}
+
+void Player::giveCarnivalDailyAward(UInt32 addTotal)
+{
+    static MailPackage::MailItem CarnivalDailyAward[][7][5] = {
+        {
+            {{503, 5}, {500, 5}, {0, 0}, {0, 0}, {0, 0}},
+            {{513, 3}, {547, 3}, {517, 3}, {0, 0}, {0, 0}},
+            {{9418, 3}, {9414, 3}, {551, 3}, {513, 3}, {0, 0}},
+            {{134, 5}, {9338, 5}, {9604, 5}, {9498, 6}, {0, 0}},
+            {{9438, 6}, {16001, 6}, {1126, 6}, {501, 6}, {1325, 5}},
+            {{9600, 10}, {9457, 10}, {9498, 10}, {16001, 10}, {0, 0}},
+            {{1733, 1}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
+        },
+        {
+            {{501, 5}, {514, 5}, {0, 0}, {0, 0}, {0, 0}},
+            {{1126, 3}, {9424, 3}, {9308, 3}, {0, 0}, {0, 0}},
+            {{503, 3}, {9457, 3}, {505, 3}, {512, 3}, {0, 0}},
+            {{9425, 3}, {9310, 5}, {551, 5}, {134, 5}, {0, 0}},
+            {{1325, 6}, {9600, 6}, {16001, 6}, {9418, 6}, {9424, 6}},
+            {{9438, 8}, {9498, 8}, {9600, 8}, {9425, 8}, {134, 8}},
+            {{1732, 1}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
+        },
+        {
+            {{9425, 5}, {511, 5}, {0, 0}, {0, 0}, {0, 0}},
+            {{513, 3}, {512, 3}, {500, 3}, {0, 0}, {0, 0}},
+            {{8000, 3}, {9418, 3}, {1126, 3}, {9427, 2}, {0, 0}},
+            {{9414, 5}, {9498, 5}, {551, 5}, {505, 3}, {0, 0}},
+            {{516, 5}, {547, 5}, {16001, 5}, {9457, 5}, {9414, 5}},
+            {{515, 8}, {509, 8}, {134, 8}, {9600, 8}, {0, 0}},
+            {{7720, 20}, {7020, 20}, {7420, 20}, {0, 0}, {0, 0}}
+        },
+        {
+            {{503, 5}, {500, 5}, {0, 0}, {0, 0}, {0, 0}},
+            {{513, 3}, {547, 3}, {517, 3}, {0, 0}, {0, 0}},
+            {{9418, 3}, {9414, 3}, {551, 3}, {513, 3}, {0, 0}},
+            {{134, 5}, {9338, 5}, {9604, 5}, {9498, 6}, {0, 0}},
+            {{9498, 6}, {16001, 6}, {1126, 6}, {501, 6}, {1325, 5}},
+            {{9600, 10}, {9457, 10}, {9498, 10}, {0, 0}, {0, 0}},
+            {{1734, 1}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
+        },
+        {
+            {{501, 5}, {514, 5}, {0, 0}, {0, 0}, {0, 0}},
+            {{1126, 3}, {9425, 3}, {9308, 3}, {0, 0}, {0, 0}},
+            {{503, 3}, {9457, 3}, {505, 3}, {512, 3}, {0, 0}},
+            {{9425, 3}, {9310, 5}, {551, 5}, {134, 5}, {0, 0}},
+            {{1325, 6}, {9600, 6}, {16001, 6}, {9418, 6}, {9425, 6}},
+            {{9438, 8}, {9498, 8}, {9600, 8}, {9425, 8}, {134, 8}},
+            {{1735, 1}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
+        }
+    };
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 beginTime = TimeUtil::MkTime(2014, 9, 11);
+    UInt8 day_index = (now - beginTime)/(3600 * 24);
+    static UInt32 awardLvl[] = {299, 599, 1299, 3999, 6999, 12999, 20000};
+    UInt32 oldTotal = GetVar(VAR_CARNIVAL_CONSUME_TODAY_TOTAL);
+    UInt8 begin = 0;
+    for(size_t i = 0; i < 7; i++)
+    {
+        if(oldTotal < awardLvl[i])
+        {
+            begin = i;
+            break;
+        }
+    }
+    UInt32 newTotal = oldTotal + addTotal;
+    for(size_t i = begin; i < 7; i++)
+    {
+        if(newTotal >= awardLvl[i])
+        {
+            SYSMSGV(title, 5230);
+            SYSMSGV(content, 5231, awardLvl[i]);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                mailPackageManager.push(mail->id, CarnivalDailyAward[day_index][i], 5, true);
+            }
+        }
+        else
+            break;
+    }
+}
+
+void Player::shakeMoneyBag()
+{
+    if(10 >= GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES))
+        return;
+    UInt32 total = GetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE);
+    if(!total)
+        return;
+    if(GetVar(VAR_CARNIVAL_CONSUME_TOTAL) < 10000)
+        getCoupon(total/10);
+    else
+    {
+        IncommingInfo ii(CarnivalRebate, 0, 0);
+        getGold(total/10, &ii);
+    }
+    AddVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES, 1);
+
+    GameMsgHdr hdr(0x189, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr, NULL);
+}
+
+void Player::gratitudeReturnInfo()
+{
+        Stream st(REP::COUNTRY_ACT);
+        st << static_cast<UInt8>(0x14);
+        st << static_cast<UInt8>(GetVar(VAR_GRATITUDE_GIVING_AWARD_STATUS));
+        st << getCreated();
+        if(World::getGratitudeGiving())
+        {
+            st << GetLev();
+            st << getTotalRecharge();
+        }
+        else
+        {
+            st << static_cast<UInt8>(GetVar(VAR_GRATITUDE_GIVING_LEVEL));
+            st << GetVar(VAR_GRATITUDE_GIVING_RECHARGE);
+        }
+        st << Stream::eos;
+        send(st);
+}
+
+void Player::getGratitudeAward(UInt8 flag)
+{
+    if(flag > 3 || flag < 1)
+        return;
+    UInt32 now = TimeUtil::Now();
+    if(getCreated() > now)
+        return;
+    UInt32 status = GetVar(VAR_GRATITUDE_GIVING_AWARD_STATUS);
+    if(GET_BIT(status, (flag - 1)))
+        return;
+    UInt32 endDay = TimeUtil::MkTime(2014, 9, 17);
+    if(getCreated() > endDay)
+        return;
+    if(World::getGratitudeGiving())
+    {
+        if(1 == flag)
+        {
+            UInt32 days = (now - getCreated()) / (24 * 3600);
+            getTael(days * 1000);
+        }
+        else if(2 == flag)
+        {
+            getCoupon(GetLev() * 10);
+        }
+        else
+        {
+            UInt32 total = (getTotalRecharge() > 100000 ? 100000 : getTotalRecharge());
+            AddPExp(total * 10);
+        }
+    }
+    else
+    {
+         if(1 == flag)
+        {
+            UInt32 days = (endDay - getCreated()) / (24 * 3600);
+            getTael(days * 1000);
+        }
+        else if(2 == flag)
+        {
+            getCoupon(GetVar(VAR_GRATITUDE_GIVING_LEVEL) * 10);
+        }
+        else
+        {
+             UInt32 total = (GetVar(VAR_GRATITUDE_GIVING_RECHARGE) > 100000 ? 100000 : GetVar(VAR_GRATITUDE_GIVING_RECHARGE));
+             AddPExp(total * 10);
+        }
+    }
+    status = SET_BIT(status, (flag - 1));
+    SetVar(VAR_GRATITUDE_GIVING_AWARD_STATUS, status);
+    gratitudeReturnInfo();
 }
 
 UInt32 Player::UseIncenseGood(UInt32 oldexp ,UInt8 type , UInt8 num)

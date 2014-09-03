@@ -225,6 +225,7 @@ RCSortType World::coolSummerSort;
 RCSortType World::seekingHerNiuLangSort;
 RCSortType World::seekingHerZhiNvSort;
 RCSortType World::seekingHerCharmSort;
+RCSortType World::carnivalConsumeSort;
 ClanGradeSort World::tyss_ClanSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
@@ -369,7 +370,9 @@ bool bTYSSEnd = false;
 bool bWCTimeEnd = false;
 bool bCoolSummerTimeEnd = false;
 bool bSeekingHerTimeEnd = false;
+bool bGratirudeTimeEnd = false;
 bool bWCTimeEnd2 = false;
+bool bCarnivalTimeEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -1232,6 +1235,45 @@ inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
     return true;
 }
 
+inline bool player_enum_CarnivalConsume(GObject::Player * pl, int)
+{
+    UInt32 total = pl->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
+    UInt32 rebate = 0;
+    if(total)
+    {
+        if(total >= 60000)
+            rebate = total / 100 * 15;
+        else if(total >= 40000 && total < 60000)
+            rebate = total / 100 * 12;
+        else if(total >= 20000 && total < 40000)
+            rebate = total / 100 * 10;
+        else if(total >= 15000 && total < 20000)
+            rebate = total / 100 * 8;
+        else if(total >= 10000 && total < 15000)
+            rebate = total / 100 * 5;
+        else if(total >= 3000 && total < 10000)
+            rebate = 1000;
+        else if(total >= 2000 && total < 3000)
+            rebate = 800;
+        else if(total >= 1000 && total < 2000)
+            rebate = 500;
+        else if(total >= 500 && total < 1000)
+            rebate = 300;
+        pl->SetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE, rebate);
+    }
+    return true;
+}
+
+inline bool player_enum_SetGratitudeInfo(GObject::Player * pl, int)
+{
+    if(pl)
+    {
+        pl->SetVar(VAR_GRATITUDE_GIVING_LEVEL, pl->GetLev());
+        pl->SetVar(VAR_GRATITUDE_GIVING_RECHARGE, pl->getTotalRecharge());
+    }
+    return true;
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -1250,6 +1292,8 @@ void World::World_Midnight_Check( World * world )
     bool bWCtime = getWorldCupTime();
     bool bCoolSummerTime = getCoolSummer();
     bool bSeekingHerTime = getSeekingHer();
+    bool bbCarnivalTime = getCarnivalConsume();
+    bool bGratitudeTime = getGratitudeGiving();
     bool bWCtime2 = getWorldCupTime2();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
@@ -1310,6 +1354,8 @@ void World::World_Midnight_Check( World * world )
     bCoolSummerTimeEnd = bCoolSummerTime && !getCoolSummer(300);
     //众里寻他活动结束
     bSeekingHerTimeEnd = bSeekingHerTime && !getSeekingHer();
+    bCarnivalTimeEnd = bbCarnivalTime && !getCarnivalConsume(300);
+    bGratirudeTimeEnd = bGratitudeTime && !getGratitudeGiving(300);
     UInt8 TYSSType = getTYSSTime();
     UInt8 actType = getTYSSTime(300);
     bTYSSEnd = bTYSSTime && !actType;
@@ -1469,6 +1515,15 @@ void World::World_Midnight_Check( World * world )
     }
     if(bWCTimeEnd2)
         world->SendWorldCupAward2();
+    if(bCarnivalTimeEnd)
+    {
+        world->SendCarnivalConsumeAward();
+        GObject::globalPlayers.enumerate(player_enum_CarnivalConsume, 0);
+    }
+    if(bGratirudeTimeEnd)
+    {
+        GObject::globalPlayers.enumerate(player_enum_SetGratitudeInfo, 0);
+    }
 
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
@@ -3605,6 +3660,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::seekingHerCharmSort.insert(st);
         }
     }
+    if(World::getCarnivalConsume())
+    {
+        UInt32 total = p->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
+        if(total)
+        {
+            RCSort s;
+            s.player  = p;
+            s.total = total;
+            World::carnivalConsumeSort.insert(s);
+        }
+    }
 
     return true;
 }
@@ -5280,10 +5346,10 @@ void World::SendCoolSummerAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{9498, 40}, {16001, 40}, {9022, 30}, {503, 50}, {9981, 1}},
-        {{9498, 30}, {16001, 30}, {9022, 25}, {503, 40}, {0 ,0}},
-        {{9498, 20}, {16001, 20}, {9022, 20}, {503, 30}, {0, 0}},
-        {{9498, 10}, {16001, 10}, {9022, 10}, {503, 15}, {0, 0}}
+        {{554, 40}, {9600, 40}, {9022, 25}, {9075, 25}, {9999, 1}},
+        {{554, 30}, {9600, 30}, {9022, 18}, {9075, 18}, {0 ,0}},
+        {{554, 20}, {9600, 20}, {9022, 12}, {9075, 12}, {0, 0}},
+        {{554,  8}, {9600,  8}, {9022,  5}, {9075,  5}, {0, 0}}
     };
 
     SYSMSG(title, 5163);
@@ -5483,6 +5549,60 @@ Player * World::getSeekingHerTopRank(UInt8 flag)
             target = i->player;
     }
     return target;
+}
+
+void rankFixedFunction(UInt32 & rank, UInt32 total)
+{
+    static UInt32 totalLvl[] = {60000, 40000, 20000, 15000, 10000, 3000, 2000, 1000};
+    static UInt32 rankLvl[] = {1, 2, 3, 4, 5, 10, 20, 50};
+    for(size_t i = 0; i < 8; i++)
+    {
+        if(rank <= rankLvl[i] && total < totalLvl[i])
+            rank = rankLvl[i] + 1;
+        if(rank <= rankLvl[i] && total >= totalLvl[i])
+            break;
+    }
+}
+
+void World::SendCarnivalConsumeAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][4] = {
+        {{554, 60}, {9600, 60}, {134, 60}, {17802,  1} },
+        {{554, 40}, {9600, 40}, {134, 40}, {17803,  1} },
+        {{554, 30}, {9600, 30}, {134, 30}, {17804,  1} },
+        {{554, 20}, {9600, 20}, {134, 20}, {16001, 20} },
+        {{554, 10}, {9600, 10}, {134, 10}, {16001, 10} },
+        {{554,  7}, {9600,  7}, {134,  7}, {16001,  7} },
+        {{554,  5}, {9600,  5}, {134,  5}, {16001,  5} },
+        {{554,  3}, {9600,  3}, {134,  3}, {16001,  3} },
+    };
+
+    SYSMSG(title, 5232);
+    UInt32 pos = 1;
+    UInt32 index = 0;
+    for (RCSortType::iterator i = World::carnivalConsumeSort.begin(), e = World::carnivalConsumeSort.end(); i != e; ++i)
+    {
+        rankFixedFunction(pos, i->total);
+        SYSMSGV(content, 5233, i->total, pos);
+        if(pos >= 1 && pos <= 5)
+            index = pos - 1;
+        else if(pos >= 6 && pos <= 10)
+            index = 5;
+        else if(pos >= 11 && pos <= 20)
+            index = 6;
+        else if(pos >= 21 && pos <= 50)
+            index = 7;
+
+        MailItemsInfo itemsInfo(s_item[index], Activity, 4);
+        Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(mail)
+            mailPackageManager.push(mail->id, s_item[index], 4, true);
+        pos++;
+        if (pos > 50)
+            break;
+    }
+    return;
 }
 
 }

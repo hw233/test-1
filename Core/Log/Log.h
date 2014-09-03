@@ -208,6 +208,7 @@ enum IncomingType
     XianpoFromUseItem           = 150, //使用物品仙魄丹
     XTYLFromUseItem             = 151, //使用物品凝露宝瓶、凝露玉盅
     XTYLFromDismiss             = 152, //散去技能升阶
+    CarnivalRebate              = 153, //狂欢购物返利
 };
 
 enum MoneyType
