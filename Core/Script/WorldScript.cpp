@@ -267,6 +267,7 @@ void WorldScript::init()
     def("getTYSSTime",GObject::World::getTYSSTime);
     def("get61CardActivity",GObject::World::get61CardActivity);
     def("getSummerCardActivity",GObject::World::getSummerCardActivity);
+    def("getCelebrateCardActivity",GObject::World::getCelebrateCardActivity);
     def("setQZoneRechargeTime",GObject::World::setQZoneRechargeTime);
 
     def("setSurnameLegend",GObject::World::setSurnameLegend);

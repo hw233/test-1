@@ -2421,6 +2421,43 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 0x14:
+        {
+            if(!World::getGratitudeGiving(0, 5 * 24 * 3600))
+                return;
+            UInt8 type = 0;
+            br >> type;
+            if(type)
+            {
+                UInt8 flag = 0;
+                br >> flag;
+                player->getGratitudeAward(flag);
+            }
+            else
+                player->gratitudeReturnInfo();
+        }
+        break;
+
+        case 0x15:
+        {
+            UInt8 type = 0;
+            br >> type;
+            if(2 == type)
+                player->shakeMoneyBag();
+            if(!World::getCarnivalConsume())
+                return;
+            if(0 == type)
+            {
+                GameMsgHdr hdr(0x189, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            else if(1 == type)
+            {
+                GameMsgHdr hdr(0x188, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+        }
+
         default:
         break;
     }
