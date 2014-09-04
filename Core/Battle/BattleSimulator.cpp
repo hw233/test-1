@@ -7204,7 +7204,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 
 
 
-    //必须放在doAttack函数的最后面
+    //必须放在doAttack函数的最后面，牵涉到回合数的计算
     for(UInt8 side = 0; side < 2; side++)
     {
         for(UInt8 i = 0; i < 25; i++)
