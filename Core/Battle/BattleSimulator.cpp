@@ -960,6 +960,11 @@ int BattleSimulator::findFirstAttacker()
     if(_fgtlist[_cur_fgtlist_idx].size() == 0)
     {
         _cur_fgtlist_idx = _cur_fgtlist_idx == 0 ? 1 : 0;
+        //_attackRound ++ ;
+        //appendAttackRoundChange();
+    }
+    else if(_fgtlist[_cur_fgtlist_idx].size() == 1)
+    {
         _attackRound ++ ;
         appendAttackRoundChange();
     }
