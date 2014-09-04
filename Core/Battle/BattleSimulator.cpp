@@ -7120,28 +7120,6 @@ UInt32 BattleSimulator::doAttack( int pos )
         for(UInt8 i = 0; i < 25; i++)
         {
             BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
-            if(bo == NULL || bo->getHP() == 0 || !bo->isChar() || bo->isSoulOut())
-                continue;
-            _activeFgt = bo;
-            UInt32 skillId = 0;
-            rcnt += doLingshiModelAttack(bo, 0, skillId);
-            if(skillId > 0)
-            {
-                if(_defList.size() > 0 || _scList.size() > 0)
-                {
-                    appendToPacket(bo->getSide(), bo->getPos(), 0, 2, skillId, false, false);
-                    ++ rcnt;
-                }
-            }
-            _activeFgt = NULL;
-        }
-    }
-
-    for(UInt8 side = 0; side < 2; side++)
-    {
-        for(UInt8 i = 0; i < 25; i++)
-        {
-            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
             if(bo == NULL || bo->getHP() == 0)
                 continue;
             if(bo->getTyslSSFactor() < 0.001f)
@@ -7218,6 +7196,36 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
     }
 
+
+
+
+
+
+
+
+
+    //必须放在doAttack函数的最后面
+    for(UInt8 side = 0; side < 2; side++)
+    {
+        for(UInt8 i = 0; i < 25; i++)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(bo == NULL || bo->getHP() == 0 || !bo->isChar() || bo->isSoulOut())
+                continue;
+            _activeFgt = bo;
+            UInt32 skillId = 0;
+            rcnt += doLingshiModelAttack(bo, 0, skillId);
+            if(skillId > 0)
+            {
+                if(_defList.size() > 0 || _scList.size() > 0)
+                {
+                    appendToPacket(bo->getSide(), bo->getPos(), 0, 2, skillId, false, false);
+                    ++ rcnt;
+                }
+            }
+            _activeFgt = NULL;
+        }
+    }
     return rcnt;
 }
 
