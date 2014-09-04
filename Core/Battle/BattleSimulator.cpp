@@ -4962,10 +4962,7 @@ bool BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
             }
             else
             {
-                if(skill->cond == GData::SKILL_ENTER_LINGSHI)
-                    setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stAura, value, bf->getNewModeLast(), bf->getSide() != 0);
-                else
-                    setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAura, value, skill->last, target_side != 0);
+                setStatusChange2(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAura, value, skill->last, target_side != 0);
             }
         }
     }
@@ -5882,6 +5879,18 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             break;
         }
 
+        if(SKILL_ID(skill->getId()) == 650)
+        {
+            if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
+            {
+                if (doSkillAttack(bf, skill, target_side, target_pos, cnt))
+                {
+                    ++ rcnt;
+                }
+            }
+            break;
+        }
+
         for(int pos = 0; pos < cnt; pos++)
         {
             BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, pos));
@@ -5911,17 +5920,6 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             }
 
             appendDefStatus(e_damNormal, 0, bo);
-        }
-
-        if(SKILL_ID(skill->getId()) == 650)
-        {
-            if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
-            {
-                if (doSkillAttack(bf, skill, target_side, target_pos, 1))
-                {
-                    ++ rcnt;
-                }
-            }
         }
 
     } while(false);
