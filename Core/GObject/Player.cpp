@@ -28680,13 +28680,13 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 {{503,5},  {500,1}, {501,1}, {49,20}},
                 {{9360,5},  {9093,5}, {0,0}, {50,10}},
                 {{9418,5}, {9414,5}, {9424,5}, {100,10}},
-                {{9649,10}, {9427,5}, {0,0}, {135,10}},
-                {{515,5}, {514,5}, {0,0},{200,20}},
+                {{555,10}, {556,5}, {0,0}, {200,10}},
+                {{9338,5}, {554,5}, {0,0},{220,10}},
                 {{16001,5}, {16000,5}, {0,0},{75,10}},
                 {{9498,10}, {9497,5}, {0,0},{180,10}},
                 {{9600,10}, {9500,5}, {0,0},{100,10}},
-                {{9022,5}, {9075,5}, {0,0},{1500,5}},
-                {{1726,1}, {1729,1}, {0,0},{1198,2}},
+                {{9021,5}, {9068,5}, {0,0},{1198,5}},
+                {{1733,1}, {0,0}, {0,0},{999,2}},
             };
 
             UInt32 clan_contribute = GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
@@ -28923,7 +28923,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume1,1));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume1,2));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume1,3));
-                st << static_cast<UInt8>(20 - GET_BIT_8(consume2,0));
+                st << static_cast<UInt8>(10 - GET_BIT_8(consume2,0));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume2,1));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume2,2));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume2,3));
@@ -28943,7 +28943,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 return;*/
             UInt32 todayContribution = GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY);
             UInt8 awardStatus[5] = {0};
-            UInt32 needContriLevel[5] = { 50, 100, 300, 700, 1800};
+            UInt32 needContriLevel[5] = { 50, 100, 300, 700, 2500};
             for(UInt8 i = 0; i < 5; i++)
             {
                 awardStatus[i] = GET_BIT(todayContribution, (27 + i));
@@ -28962,11 +28962,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 { {1719, 1}, {1717, 1}, {1700, 1}, {1711, 1}, {1709, 1}, {1701, 1}, {1703, 1} },
             };
             static UInt32 everydayAward1[5][7][2] = {
-                { {15, 3}, {500, 3}, {512, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {501, 3}, {503, 3}, {56, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {517, 3}, {9424, 3}, {551, 3}, {0, 0}, {0, 0}, {0, 0}, {0 ,0} },
-                { {9457, 3}, {134, 3}, {1325, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {9075, 5}, {9068, 5}, {9022, 5}, {9075, 5}, {9068, 5}, {0, 0}, {0, 0} },
+                { {15, 3}, {500, 3}, {501, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {9424, 3}, {503, 3}, {513, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {547, 3}, {9424, 3}, {551, 3}, {0, 0}, {0, 0}, {0, 0}, {0 ,0} },
+                { {9457, 3}, {134, 3}, {554, 5}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {13236, 1}, {13136, 1}, {13016, 1}, {13036, 1}, {13196, 1}, {0, 0}, {0, 0} },
             };
  
             UInt8 totalPackageSize = 0;
@@ -29026,7 +29026,33 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                         UInt8 dayChoice = (TimeUtil::Now() - GVAR.GetVar(GVAR_TYSS_BEGIN)) / 86400;
                         if(dayChoice > 5)
                                 return;
+                        if(GetPetPackage()->GetPetGemPgRestSize() < 1)
+                        {
+                            sendMsgCode(0, 1094);
+                            return;
+                        }
                         GetPackage()->Add(everydayAward1[flag - 1][dayChoice][0], everydayAward1[flag - 1][dayChoice][1] , true, false, FromTYSS);
+                        UInt8 op_color = 3;
+                        switch(dayChoice)
+                        {
+                            case 0:
+                                SYSMSG_BROADCASTV(5225, getCountry(), getName().c_str(),op_color);
+                                break;
+                            case 1:
+                                SYSMSG_BROADCASTV(5226, getCountry(), getName().c_str(),op_color);
+                                break;
+                            case 2:
+                                SYSMSG_BROADCASTV(5227, getCountry(), getName().c_str(),op_color);
+                                break;
+                            case 3:
+                                SYSMSG_BROADCASTV(5228, getCountry(), getName().c_str(),op_color);
+                                break;
+                            case 4:
+                                SYSMSG_BROADCASTV(5229, getCountry(), getName().c_str(),op_color);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
                 SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY), (26 + flag)));//打上当日领取奖品的标记
@@ -35526,7 +35552,7 @@ void Player::getGratitudeAward(UInt8 flag)
         else
         {
             UInt32 total = (getTotalRecharge() > 100000 ? 100000 : getTotalRecharge());
-            AddPExp(total * 10);
+            AddPExp(total * 50);
         }
     }
     else
@@ -35543,7 +35569,7 @@ void Player::getGratitudeAward(UInt8 flag)
         else
         {
              UInt32 total = (GetVar(VAR_GRATITUDE_GIVING_RECHARGE) > 100000 ? 100000 : GetVar(VAR_GRATITUDE_GIVING_RECHARGE));
-             AddPExp(total * 10);
+             AddPExp(total * 50);
         }
     }
     status = SET_BIT(status, (flag - 1));
