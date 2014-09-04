@@ -3088,6 +3088,29 @@ namespace GObject
             }
         }
 
+        // Load player SeekingHer shake_moneybag_log
+        {
+            lc.prepare("Loading player CarnivalConsume shake_moneybag_log:");
+            lc.reset(1000);
+            last_id = 0xFFFFFFFFFFFFFFFFull;
+            pl = NULL;
+            DBShakeMoneyBagLog sthdata;
+            if(execu->Prepare("SELECT `playerId`, `data`, `count` FROM `shake_moneybag_log` ORDER BY  `playerId`", sthdata) != DB::DB_OK)
+                return false;
+            while(execu->Next() == DB::DB_OK)
+            {
+                lc.advance();
+                if(sthdata.playerId != last_id)
+                {
+                    last_id = sthdata.playerId;
+                    pl = globalPlayers[last_id];
+                }
+                if(pl == NULL)
+                    continue;
+                pl->SetShakeMoneyBagLog(sthdata.date, sthdata.count, 0);
+            }
+        }
+
         lc.finalize();
 
 		/*lc.prepare("Loading mail package:");
