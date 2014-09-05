@@ -2421,6 +2421,27 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 0x15:
+        {
+            UInt8 type = 0;
+            br >> type;
+            if(2 == type)
+                player->shakeMoneyBag();
+            if(!World::getCarnivalConsume())
+                return;
+            if(0 == type)
+            {
+                GameMsgHdr hdr(0x189, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            else if(1 == type)
+            {
+                GameMsgHdr hdr(0x188, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+        }
+        break;
+
         default:
         break;
     }

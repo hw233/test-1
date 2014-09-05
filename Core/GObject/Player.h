@@ -3629,6 +3629,9 @@ namespace GObject
         void firstPotOfGold(UInt32);
         void firstPotOfGoldReturn(UInt8);
 
+        void giveCarnivalDailyAward(UInt32);
+        void shakeMoneyBag();
+
         void hideVipLvlFlag(UInt8);
         void ReturnFlyRoadInfo();
         void SacrificeFlyRoad(UInt8 type, UInt16 num);
