@@ -74,7 +74,11 @@ void DarkDargon::process(UInt32 now)
             if ( now < beginTime - 10 * 60) 
                 return;
             if(!CheckStartAct())
+            {
+                beginTime += 7 * 86400;
+                std::cout << "DarkDargon Next beginTime= " << beginTime << std::endl;
                 return; 
+            }
             Stream st;
             if (now == beginTime - 10 * 60)
                 SYSMSG_BROADCASTV(5191,10);
