@@ -3253,6 +3253,7 @@ namespace GObject
         void send3366GiftInfo();
         void sendQQGameGift1218();
         void sendFeastLoginAct();
+        void sendFeastGiftLoginAct();
         void sendTowerLoginAct();
         void getFeastGiftAward(UInt8 type);
         void sendFeastGiftAct();
@@ -3634,6 +3635,9 @@ namespace GObject
         void SacrificeFlyRoad(UInt8 type, UInt16 num);
         void ExchangeXG(UInt8 type);
         void ExchangeFlyRoadBox(UInt8 type);
+        void getLuckyBagExtraAward();
+        UInt32 getClanJoinTime();
+        void getFighterMinTimeAndCount(UInt32& petTime, UInt32& fighterTime, UInt8& fighterCount);
 
     private:
         //玩家位置（包括层数、当层位置）

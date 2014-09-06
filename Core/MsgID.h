@@ -870,6 +870,7 @@ namespace SPEQ
     const UInt16 VIAPLAYERINFO       = 0x14E;// 查询导入玩家信息
     const UInt16 SETMARRYBOARD          = 0x14F;// 设置婚礼 
     const UInt16 WORLDCUP          = 0x151;// 设置世界杯答案
+    const UInt16 THREEYEARINFO          = 0x152;// 三周年个人信息返回
 }
 
 namespace SPEP
@@ -940,6 +941,7 @@ namespace SPEP
     const UInt8 VIAPLAYERINFO       = 0x4E;// 查询导入玩家信息
     const UInt8 SETMARRYBOARD       = 0x4F;//设置婚礼
     const UInt8 WORLDCUP            = 0x51;//设置世界杯押注结果
+    const UInt16 THREEYEARINFO      = 0x52;// 三周年个人信息返回
 
 }
 

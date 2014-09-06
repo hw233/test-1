@@ -2191,7 +2191,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             if(!player->hasChecked())
                 return;
             UInt8 type;
-            if(!World::getFeastLoginAct())
+            if(false/*!World::getFeastLoginAct()*/)
                 return;
             br >> type;
             player->getFeastGiftAward(type);

@@ -600,6 +600,8 @@ public:
 	inline UInt8 getColor() { return _color; }
 	static UInt8 getColor2(float);
 
+    void setSummoned(UInt32 summoned) { _summoned = summoned; }
+    UInt32 getSummoned() { return _summoned; }
 	ItemEquip * setInnateTrump(ItemInnateTrump* r, bool = true);
 	ItemEquip * setHalo(ItemHalo* r, bool = true);
 	ItemEquip * setFashion(ItemFashion* r, bool = true);
@@ -890,6 +892,7 @@ protected:
 	float _potential;   // 潜力
 	float _capacity;    // 资质
 	UInt8 _color;
+    UInt32 _summoned;
 	UInt32 _hp;
 
     UInt8 _acupoints[ACUPOINTS_MAX];    // 穴道
