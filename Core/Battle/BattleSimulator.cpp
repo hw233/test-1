@@ -960,6 +960,11 @@ int BattleSimulator::findFirstAttacker()
     if(_fgtlist[_cur_fgtlist_idx].size() == 0)
     {
         _cur_fgtlist_idx = _cur_fgtlist_idx == 0 ? 1 : 0;
+        //_attackRound ++ ;
+        //appendAttackRoundChange();
+    }
+    else if(_fgtlist[_cur_fgtlist_idx].size() == 1)
+    {
         _attackRound ++ ;
         appendAttackRoundChange();
     }
@@ -5879,6 +5884,18 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             break;
         }
 
+        if(SKILL_ID(skill->getId()) == 650)
+        {
+            if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
+            {
+                if (doSkillAttack(bf, skill, target_side, target_pos, cnt))
+                {
+                    ++ rcnt;
+                }
+            }
+            break;
+        }
+
         for(int pos = 0; pos < cnt; pos++)
         {
             BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, pos));
@@ -6842,6 +6859,23 @@ UInt32 BattleSimulator::doAttack( int pos )
             {
                 int cnt = 0;
                 getSkillTarget(bf, skill, otherside, target_pos, cnt);
+
+                if(SKILL_ID(skill->getId()) == 651)
+                {
+                    std::vector<AttackAct> atkAct;
+                    if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct))
+                        ++ rcnt;
+
+                    size_t actCnt = atkAct.size();
+                    for(size_t idx = 0; idx < actCnt; idx++)
+                    {
+                        if(atkAct[idx].bf->getHP() == 0)
+                            continue;
+                        if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                            ++ rcnt;
+                    }
+                }
+
                 GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
                 if(ss)
                 {
@@ -7086,28 +7120,6 @@ UInt32 BattleSimulator::doAttack( int pos )
         for(UInt8 i = 0; i < 25; i++)
         {
             BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
-            if(bo == NULL || bo->getHP() == 0 || !bo->isChar() || bo->isSoulOut())
-                continue;
-            _activeFgt = bo;
-            UInt32 skillId = 0;
-            rcnt += doLingshiModelAttack(bo, 0, skillId);
-            if(skillId > 0)
-            {
-                if(_defList.size() > 0 || _scList.size() > 0)
-                {
-                    appendToPacket(bo->getSide(), bo->getPos(), 0, 2, skillId, false, false);
-                    ++ rcnt;
-                }
-            }
-            _activeFgt = NULL;
-        }
-    }
-
-    for(UInt8 side = 0; side < 2; side++)
-    {
-        for(UInt8 i = 0; i < 25; i++)
-        {
-            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
             if(bo == NULL || bo->getHP() == 0)
                 continue;
             if(bo->getTyslSSFactor() < 0.001f)
@@ -7184,6 +7196,36 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
     }
 
+
+
+
+
+
+
+
+
+    //必须放在doAttack函数的最后面，牵涉到回合数的计算
+    for(UInt8 side = 0; side < 2; side++)
+    {
+        for(UInt8 i = 0; i < 25; i++)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(bo == NULL || bo->getHP() == 0 || !bo->isChar() || bo->isSoulOut())
+                continue;
+            _activeFgt = bo;
+            UInt32 skillId = 0;
+            rcnt += doLingshiModelAttack(bo, 0, skillId);
+            if(skillId > 0)
+            {
+                if(_defList.size() > 0 || _scList.size() > 0)
+                {
+                    appendToPacket(bo->getSide(), bo->getPos(), 0, 2, skillId, false, false);
+                    ++ rcnt;
+                }
+            }
+            _activeFgt = NULL;
+        }
+    }
     return rcnt;
 }
 

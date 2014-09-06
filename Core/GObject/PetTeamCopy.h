@@ -67,6 +67,7 @@ struct PetTeamData
     bool mark;                                  // 是否设置阵形标志
     bool start;                                 // 是否倒计时开始标志
     bool useMoney;                              // 创建房间是否是否花费仙石标志
+    std::string pwd;                            // 创建房间时的密码
 };
 
 class PetTeamCopyPlayerInfo
@@ -104,8 +105,8 @@ class PetTeamCopy
         bool enterTeamCopy(Player* pl, UInt8 copyId, UInt8 t);
         void refreshMonster(Player* pl);
         void addMonster(Player* pl, UInt8 copyId, UInt8 type, UInt32 oldNPCId);
-        UInt32 createTeam(Player* pl, UInt32 NPCId, UInt32 npcGroupId);
-        UInt32 joinTeam(Player* pl, UInt32 teamId);
+        UInt32 createTeam(Player* pl, UInt32 NPCId, UInt32 npcGroupId, std::string pwd);
+        UInt32 joinTeam(Player* pl, UInt32 teamId, std::string pwd);
         void teamKick(Player* pl, UInt64 playerId, UInt8 mark=0);
         void leaveTeam(Player* pl, UInt8 mark=0/*0:被踢退出队伍；1:主动退出队伍；2:退出游戏; 3:顶号退出游戏*/);
         void dismissTeam(Player* pl, UInt8 mark=0);

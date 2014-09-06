@@ -5392,6 +5392,8 @@ namespace GObject
         if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
             SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
         setLuckyStarCondition();
+        if(ci && ci->purchaseType != Discount3  && ci->purchaseType != Discount5 && ci->purchaseType != Discount8 && ci->purchaseType != DiscountSp1 && ci->purchaseType != DiscountSp2 && ci->purchaseType != DiscountSp3)
+            CarnivalConsumeAct(c);
         return _playerData.gold;
 	}
 
@@ -18151,15 +18153,6 @@ namespace GObject
             AddVar(VAR_CONSUME, c);
             sendConsumeAwardInfo(0);
         }
-        if(World::getCarnivalConsume())
-        {
-            giveCarnivalDailyAward(c);
-            AddVar(VAR_CARNIVAL_CONSUME_TOTAL, c);
-            AddVar(VAR_CARNIVAL_CONSUME_TODAY_TOTAL, c);
-
-            GameMsgHdr hdr(0x159, WORKER_THREAD_WORLD, this, 0);
-            GLOBAL().PushMsg(hdr, NULL);
-        }
     }
 
     static const UInt32 s_task1ColorScore[] = {100, 200, 300, 400}; //日常任务的积分
@@ -21704,10 +21697,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D,0x3E,0x3F};
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001 ,17006,17016};
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D,0x3E,0x3F, 0x50};
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001 ,17006,17016, 17031};
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页 317:太乙神雷 318:桑巴荣耀
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317,318 ,6253};
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317,318 ,6253, 17032};
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -21761,7 +21754,15 @@ void Player::postDragonKing(UInt8 count)
     UInt32 XBLing = Dragon_Ling[flag];
     if (GetPackage()->GetItemAnyNum(XBLing) < count)
         return;
-    if (GetPackage()->GetRestPackageSize() < count)
+    if(XBLing == 17032)
+    {
+        if(GetPackage()->GetRestPackageSize(2) < count)
+        {
+            sendMsgCode(0, 8050);
+            return;
+        }
+    }
+    else if (GetPackage()->GetRestPackageSize() < count)
     {
         sendMsgCode(0, 1011);
         return;
@@ -23337,7 +23338,8 @@ void Player::buyRP7Treasure(UInt8 idx)
             {
             	//ConsumeInfo ci(RP7Treasure,0,0);
         	    //useGold(gold,&ci);
-                useGold(gold);
+            	ConsumeInfo ci(UNKNOWN,0,0);
+                useGold(gold, &ci);
                 v |= (1<<idx);
                 SetVar(VAR_RP7_TREASURE, v);
 
@@ -28943,7 +28945,9 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 return;*/
             UInt32 todayContribution = GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY);
             UInt8 awardStatus[5] = {0};
-            UInt32 needContriLevel[5] = { 50, 100, 300, 700, 2500};
+            UInt32 needContriLevel[5] = { 50, 100, 300, 700, 1800};
+            if(actType == 2)
+                needContriLevel[4] = 2500;
             for(UInt8 i = 0; i < 5; i++)
             {
                 awardStatus[i] = GET_BIT(todayContribution, (27 + i));
@@ -35447,7 +35451,7 @@ void Player::giveCarnivalDailyAward(UInt32 addTotal)
             {{1126, 3}, {9425, 3}, {9308, 3}, {0, 0}, {0, 0}},
             {{503, 3}, {9457, 3}, {505, 3}, {512, 3}, {0, 0}},
             {{9425, 3}, {9310, 5}, {551, 5}, {134, 5}, {0, 0}},
-            {{1325, 6}, {9600, 6}, {16001, 6}, {9418, 6}, {9425, 6}},
+            {{1325, 6}, {9600, 6}, {16001, 6}, {9418, 6}, {9424, 6}},
             {{9438, 8}, {9498, 8}, {9600, 8}, {9425, 8}, {134, 8}},
             {{1735, 1}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
         }
@@ -35458,19 +35462,10 @@ void Player::giveCarnivalDailyAward(UInt32 addTotal)
     UInt8 day_index = (now - beginTime)/(3600 * 24);
     static UInt32 awardLvl[] = {299, 599, 1299, 3999, 6999, 12999, 20000};
     UInt32 oldTotal = GetVar(VAR_CARNIVAL_CONSUME_TODAY_TOTAL);
-    UInt8 begin = 0;
-    for(size_t i = 0; i < 7; i++)
-    {
-        if(oldTotal < awardLvl[i])
-        {
-            begin = i;
-            break;
-        }
-    }
     UInt32 newTotal = oldTotal + addTotal;
-    for(size_t i = begin; i < 7; i++)
+    for(size_t i = 0; i < 7 && day_index < 5; i++)
     {
-        if(newTotal >= awardLvl[i])
+        if(oldTotal < awardLvl[i] && newTotal >= awardLvl[i])
         {
             SYSMSGV(title, 5230);
             SYSMSGV(content, 5231, awardLvl[i]);
@@ -35480,26 +35475,44 @@ void Player::giveCarnivalDailyAward(UInt32 addTotal)
                 mailPackageManager.push(mail->id, CarnivalDailyAward[day_index][i], 5, true);
             }
         }
-        else
-            break;
     }
 }
 
 void Player::shakeMoneyBag()
 {
-    if(10 >= GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES))
+    if(10 <= GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES))
         return;
     UInt32 total = GetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE);
-    if(!total)
-        return;
-    if(GetVar(VAR_CARNIVAL_CONSUME_TOTAL) < 10000)
-        getCoupon(total/10);
-    else
+    if(total && GetVar(VAR_CARNIVAL_CONSUME_SHAKE_STATUS) == 0)
     {
-        IncommingInfo ii(CarnivalRebate, 0, 0);
-        getGold(total/10, &ii);
+        UInt32 now = TimeUtil::Now();
+        if(GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES) == 9)
+        {
+            UInt32 tmp = 0;
+            tmp = total/10;
+            if(!GetVar(VAR_CARNIVAL_CONSUME_REBATE_FLAG))
+                getCoupon(total - tmp * 9);
+            else
+            {
+                IncommingInfo ii(CarnivalRebate, 0, 0);
+                getGold(total - tmp * 9, &ii);
+            }
+            SetShakeMoneyBagLog(now, total - tmp * 9, 1);
+        }
+        else
+        {
+            if(!GetVar(VAR_CARNIVAL_CONSUME_REBATE_FLAG))
+                getCoupon(total/10);
+            else
+            {
+                IncommingInfo ii(CarnivalRebate, 0, 0);
+                getGold(total/10, &ii);
+            }
+            SetShakeMoneyBagLog(now, total/10, 1);
+        }
+        SetVar(VAR_CARNIVAL_CONSUME_SHAKE_STATUS, 1);
+        AddVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES, 1);
     }
-    AddVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES, 1);
 
     GameMsgHdr hdr(0x189, WORKER_THREAD_WORLD, this, 0);
     GLOBAL().PushMsg(hdr, NULL);
@@ -35594,7 +35607,7 @@ UInt32 Player::UseIncenseGood(UInt32 oldexp ,UInt8 type , UInt8 num)
     }
     UInt32 once = type*40 + !type*10;
     UInt32 sum = 0;
-    UInt32 max  = GData::incenseData.getIncenseMax();
+    //UInt32 max  = GData::incenseData.getIncenseMax();
 
     for(UInt8 i = 0; i < num ; ++i)
     { 
@@ -35658,6 +35671,58 @@ void Player::getFighterMinTimeAndCount(UInt32& petTime, UInt32& fighterTime, UIn
         if(petTime == 0 || petTime > fgt->getSummoned())
             petTime = fgt->getSummoned();
     }
+}
+
+void Player::SetShakeMoneyBagLog(UInt32 date, UInt32 count, bool toDB)
+{
+    ShakeMoneyBagLog * lg = new ShakeMoneyBagLog;
+    lg->date = date;
+    lg->count = count;
+    _shakeMoneyBagLog.push_back(lg);
+
+    if(toDB)
+        DB1().PushUpdateData("insert into `shake_moneybag_log`(playerId, data, count) values(%" I64_FMT "u, %u, %u)", getId(), date, count);
+}
+
+void Player::getShakeMoneyBagLog()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x15);
+    st << static_cast<UInt8>(3);
+    st << static_cast<UInt8>(_shakeMoneyBagLog.size());
+    for(std::vector<ShakeMoneyBagLog *>::iterator i = _shakeMoneyBagLog.begin(), e = _shakeMoneyBagLog.end(); i!=e ; ++i)
+    {
+        st << (*i)->date;
+        st << (*i)->count;
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::CarnivalConsumeAct(UInt32 c)
+{
+    if(!World::getCarnivalConsume())
+        return;
+    giveCarnivalDailyAward(c);
+    AddVar(VAR_CARNIVAL_CONSUME_TOTAL, c);
+    AddVar(VAR_CARNIVAL_CONSUME_TODAY_TOTAL, c);
+
+    GameMsgHdr hdr(0x159, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr, NULL);
+
+    GameMsgHdr hdr1(0x189, WORKER_THREAD_WORLD, this, 0);
+    GLOBAL().PushMsg(hdr1, NULL);
+}
+
+void Player::sendShakeMoneyBagInfo()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x15);
+    st << static_cast<UInt8>(4);
+    st << static_cast<UInt8>(GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES));
+    st << GetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE);
+    st << Stream::eos;
+    send(st);
 }
 
 } // namespace GObject

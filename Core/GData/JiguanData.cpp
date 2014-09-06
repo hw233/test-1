@@ -265,10 +265,11 @@ namespace GData
 
     JiguanData::jiguanshuInfo * JiguanData::getUpgradeInfo(UInt32 curExp)
     {
+    #define JGS_MAXLVL          70
         std::map<UInt8, jiguanshuInfo>::iterator iter = _jiguanshuInfo.begin();
         for(; iter!=_jiguanshuInfo.end(); iter++)
         {
-            if((iter->second.jgshuLvl == 60) || (iter->second.totalExp >= curExp))
+            if((iter->second.jgshuLvl == JGS_MAXLVL) || (iter->second.totalExp >= curExp))
             {
                 return &(iter->second);
             }

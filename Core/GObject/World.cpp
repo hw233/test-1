@@ -491,6 +491,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -515,6 +523,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 16)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 23)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 30)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
         ))
     {
 #if 0
@@ -1235,33 +1244,32 @@ inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
     return true;
 }
 
-inline bool player_enum_CarnivalConsume(GObject::Player * pl, int)
+inline void SetCarnivalConsumeRebate(Player * pl, UInt32 rank, UInt32 total)
 {
-    UInt32 total = pl->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
     UInt32 rebate = 0;
-    if(total)
-    {
-        if(total >= 60000)
-            rebate = total / 100 * 15;
-        else if(total >= 40000 && total < 60000)
-            rebate = total / 100 * 12;
-        else if(total >= 20000 && total < 40000)
-            rebate = total / 100 * 10;
-        else if(total >= 15000 && total < 20000)
-            rebate = total / 100 * 8;
-        else if(total >= 10000 && total < 15000)
-            rebate = total / 100 * 5;
-        else if(total >= 3000 && total < 10000)
-            rebate = 1000;
-        else if(total >= 2000 && total < 3000)
-            rebate = 800;
-        else if(total >= 1000 && total < 2000)
-            rebate = 500;
-        else if(total >= 500 && total < 1000)
-            rebate = 300;
-        pl->SetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE, rebate);
-    }
-    return true;
+    if(rank == 1)
+        rebate = total * 15 / 100;
+    else if(rank == 2)
+        rebate = total * 12 / 100;
+    else if(rank == 3)
+        rebate = total * 10 / 100;
+    else if(rank == 4)
+        rebate = total * 8 / 100;
+    else if(rank == 5)
+        rebate = total * 5 / 100;
+    else if(rank >= 6 && rank < 10)
+        rebate = 1000;
+    else if(rank >= 11 && rank < 20)
+        rebate = 800;
+    else if(rank >= 21 && rank < 50)
+        rebate = 500;
+    else if(rank >= 51 && rank < 100)
+        rebate = 300;
+
+    pl->SetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE, rebate);
+
+    if(rank >= 1 && rank <= 5)
+        pl->SetVar(VAR_CARNIVAL_CONSUME_REBATE_FLAG, 1);
 }
 
 inline bool player_enum_SetGratitudeInfo(GObject::Player * pl, int)
@@ -1409,6 +1417,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1518,7 +1534,6 @@ void World::World_Midnight_Check( World * world )
     if(bCarnivalTimeEnd)
     {
         world->SendCarnivalConsumeAward();
-        GObject::globalPlayers.enumerate(player_enum_CarnivalConsume, 0);
     }
     if(bGratirudeTimeEnd)
     {
@@ -3660,7 +3675,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::seekingHerCharmSort.insert(st);
         }
     }
-    if(World::getCarnivalConsume())
+    //if(World::getCarnivalConsume())
     {
         UInt32 total = p->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
         if(total)
@@ -5553,7 +5568,7 @@ Player * World::getSeekingHerTopRank(UInt8 flag)
 
 void rankFixedFunction(UInt32 & rank, UInt32 total)
 {
-    static UInt32 totalLvl[] = {60000, 40000, 20000, 15000, 10000, 3000, 2000, 1000};
+    static UInt32 totalLvl[] = {30000, 20000, 15000, 10000, 8000, 3000, 2000, 1000};
     static UInt32 rankLvl[] = {1, 2, 3, 4, 5, 10, 20, 50};
     for(size_t i = 0; i < 8; i++)
     {
@@ -5575,7 +5590,7 @@ void World::SendCarnivalConsumeAward()
         {{554, 10}, {9600, 10}, {134, 10}, {16001, 10} },
         {{554,  7}, {9600,  7}, {134,  7}, {16001,  7} },
         {{554,  5}, {9600,  5}, {134,  5}, {16001,  5} },
-        {{554,  3}, {9600,  3}, {134,  3}, {16001,  3} },
+        {{554,  3}, {9600,  3}, {134,  3}, {0,  0} },
     };
 
     SYSMSG(title, 5232);
@@ -5584,22 +5599,26 @@ void World::SendCarnivalConsumeAward()
     for (RCSortType::iterator i = World::carnivalConsumeSort.begin(), e = World::carnivalConsumeSort.end(); i != e; ++i)
     {
         rankFixedFunction(pos, i->total);
-        SYSMSGV(content, 5233, i->total, pos);
-        if(pos >= 1 && pos <= 5)
-            index = pos - 1;
-        else if(pos >= 6 && pos <= 10)
-            index = 5;
-        else if(pos >= 11 && pos <= 20)
-            index = 6;
-        else if(pos >= 21 && pos <= 50)
-            index = 7;
+        SetCarnivalConsumeRebate(i->player, pos, i->total);
+        if(pos <= 50)
+        {
+            SYSMSGV(content, 5233, i->total, pos);
+            if(pos >= 1 && pos <= 5)
+                index = pos - 1;
+            else if(pos >= 6 && pos <= 10)
+                index = 5;
+            else if(pos >= 11 && pos <= 20)
+                index = 6;
+            else if(pos >= 21 && pos <= 50)
+                index = 7;
 
-        MailItemsInfo itemsInfo(s_item[index], Activity, 4);
-        Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-        if(mail)
-            mailPackageManager.push(mail->id, s_item[index], 4, true);
+            MailItemsInfo itemsInfo(s_item[index], Activity, 4);
+            Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+                mailPackageManager.push(mail->id, s_item[index], 4, true);
+        }
         pos++;
-        if (pos > 50)
+        if(pos > 100)
             break;
     }
     return;
