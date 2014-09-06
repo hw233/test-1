@@ -637,6 +637,7 @@ CREATE TABLE `fighter` (
   `talent` mediumint(5) unsigned NOT NULL DEFAULT '0',
   `trump` varchar(255) NOT NULL,
   `lingbao` varchar(255) NOT NULL DEFAULT '',
+  `evolution` varchar(255) NOT NULL DEFAULT '',
   `acupoints` varchar(255) NOT NULL,
   `acupointsgold` varchar(255) NOT NULL,
   `skill` varchar(255) NOT NULL,
@@ -2690,3 +2691,16 @@ CREATE TABLE IF NOT EXISTS `fighter_lingbaoFall` (
     `fall` tinyint(3) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY(`fighterId`, `playerId`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `fighter_evolution`;
+CREATE TABLE IF NOT EXISTS `fighter_evolution` (
+    `fighterId` int(10) unsigned NOT NULL,
+    `playerId` bigint(20) unsigned NOT NULL,
+    `process` int(10) unsigned NOT NULL DEFAULT 0,
+    `award` int(10) unsigned NOT NULL DEFAULT 0,
+    `task9` varchar(256) NOT NULL DEFAULT '',  
+    `rTime` int(10) unsigned NOT NULL DEFAULT 0,
+    `success`  tinyint(3) unsigned NOT NULL DEFAULT '0',  
+    PRIMARY KEY(`fighterId`, `playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

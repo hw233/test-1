@@ -212,7 +212,6 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar630.sql        #清除可前进次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131112_1.sql     #修复168区玩家仙宠根骨异常问题(id:33569705)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearguanggun.sql     #修复光棍bug
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20131101_1.sql    #七石斗法
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_add_acuGold_1125.sql     #武将添加本命金丹
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clan_battlescore.sql     #重置帮战积分
@@ -341,8 +340,12 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_seekingher.sql     #众里寻他送豆记录表,player表增加宣言字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140731_clear_var790.sql     #清除文采值
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_drop_packSizeLS.sql #drop column packSizeLS of player
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140804_aLingbao.sql #drop column packSizeLS of player
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140804_aLingbaoFall.sql #drop column packSizeLS of player
+
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140804_aLingbao.sql #drop column packSizeLS of player
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140804_aLingbaoFall.sql #drop column packSizeLS of player
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140812_cEvolution.sql #飞升
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140818_addXianEq.sql     #天书奇缘清空
 }
 
 #sh player_jiguan.sh

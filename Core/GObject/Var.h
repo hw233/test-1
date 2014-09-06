@@ -812,6 +812,9 @@ namespace GObject
         VAR_KETTLE_4CNT = 820,  //4星刷新次数
         VAR_KETTLE_5CNT = 821, //5星刷新次数
         VAR_KETTLE_LOCK = 822,  //是否锁定
+
+        VAR_FAIRYCOPY_FREE = 823, //仙界副本免费次数
+        VAR_FAIRYCOPY_GOLD = 824, //仙界副本付费次数
             
         //831-850 for qimj
         VAR_COOL_SUMMER_AWARD_TYPE = 831,        //酷爽一夏奖励类型
@@ -828,6 +831,7 @@ namespace GObject
         VAR_HIDE_VIP_LEVEL_FLAG = 842, //隐藏御剑等级标识(0未隐藏， 1隐藏)
         VAR_SEEKING_HER_CHARM_AWARD = 843, //众里寻她魅力值奖励领取情况(每位代表一个分数等级，0未领，1领取)
         VAR_SEEKING_HER_LOOT_STATUS = 844,  //众里寻他掉落状态
+
         VAR_MAX,
     };
 

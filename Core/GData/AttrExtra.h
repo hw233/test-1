@@ -19,7 +19,8 @@ struct AttrExtra
     agilityP(0), intelligenceP(0), willP(0), soulP(0), auraP(0), auraMaxP(0),
     attackP(0), magatkP(0), defendP(0), magdefP(0), hpP(0), toughP(0),
     actionP(0), hitrateP(0), evadeP(0), criticalP(0), criticaldmgP(0), pierceP(0), counterP(0), magresP(0),
-    hitrlvl(0), evdlvl(0), crilvl(0), pirlvl(0), counterlvl(0), mreslvl(0), toughlvl(0), criticaldmgimmune(0)
+    hitrlvl(0), evdlvl(0), crilvl(0), pirlvl(0), counterlvl(0), mreslvl(0), toughlvl(0), criticaldmgimmune(0),
+    fairyAck(0),fairyDef(0)
 	{}
 	AttrExtra& operator +=(const AttrExtra& other)
 	{
@@ -80,6 +81,8 @@ struct AttrExtra
         mreslvl += other.mreslvl;
         toughlvl += other.toughlvl;
         criticaldmgimmune += other.criticaldmgimmune;
+        fairyAck += other.fairyAck;
+        fairyDef += other.fairyDef;
 
 		return *this;
 	}
@@ -198,6 +201,9 @@ struct AttrExtra
         toughlvl += other.toughlvl;
         criticaldmgimmune += other.criticaldmgimmune;
 
+        fairyAck += other.fairyAck;
+        fairyDef += other.fairyDef;
+
 		return *this;
 	}
 
@@ -252,6 +258,8 @@ struct AttrExtra
         aet.mreslvl *= rate;
         aet.toughlvl *= rate;
         aet.criticaldmgimmune *= rate;
+        aet.fairyAck *= rate;
+        aet.fairyDef *= rate;
         return aet;
 	}
 
@@ -306,8 +314,141 @@ struct AttrExtra
         aet.mreslvl *= rate;
         aet.toughlvl *= rate;
         aet.criticaldmgimmune *= rate;
+        aet.fairyAck *= rate;
+        aet.fairyDef *= rate;
         return aet;
 	}
+    inline AttrExtra getFairyEquipInfo(const AttrExtra& other)
+    {
+		strength += other.strength;
+		physique += other.physique;
+		agility += other.agility;
+		intelligence += other.intelligence;
+		will += other.will;
+		soul += other.soul;
+		aura += other.aura;
+		auraMax += other.auraMax;
+        //仙术攻击防御，对物攻、法攻、物防、法防加成为0.3  (仙术攻击防御值 写在 法攻，法防之上)
+		attack += other.magatk * 0.3;
+        magatk += other.magatk * 0.3;
+		defend += other.magdef * 0.3;
+        magdef += other.magdef * 0.3;
+		hp += other.hp;
+		tough += other.tough;
+		action += other.action;
+		hitrate += other.hitrate;
+		evade += other.evade;
+		critical += other.critical;
+		criticaldmg += other.criticaldmg;
+		pierce += other.pierce;
+		counter += other.counter;
+        magres += other.magres;
+
+		strengthP += other.strengthP;
+		physiqueP += other.physiqueP;
+		agilityP += other.agilityP;
+		intelligenceP += other.intelligenceP;
+		willP += other.willP;
+		soulP += other.soulP;
+		auraP += other.auraP;
+		auraMaxP += other.auraMaxP;
+		attackP += other.attackP;
+        magatkP += other.magatkP;
+		defendP += other.defendP;
+        magdefP += other.magdefP;
+
+		hpP += other.hpP;
+		actionP += other.actionP;
+		criticaldmgP += other.criticaldmgP;
+		counterP += other.counterP;
+        magresP += other.magresP;
+#if 0
+		toughP += other.toughP;
+		hitrateP += other.hitrateP;
+		evadeP += other.evadeP;
+		criticalP += other.criticalP;
+		pierceP += other.pierceP;
+#endif
+
+        hitrlvl += other.hitrlvl;
+        evdlvl += other.evdlvl;
+        crilvl += other.crilvl;
+        pirlvl += other.pirlvl;
+        counterlvl += other.counterlvl;
+        mreslvl += other.mreslvl;
+        toughlvl += other.toughlvl;
+        criticaldmgimmune += other.criticaldmgimmune;
+
+        fairyAck += other.magatk;
+        fairyDef += other.magdef;
+
+		return *this;
+    }
+    inline AttrExtra getFairyEquipInfo(const CittaEffect& other)
+    {
+		strength += other.strength;
+		physique += other.physique;
+		agility += other.agility;
+		intelligence += other.intelligence;
+		will += other.will;
+		soul += other.soul;
+		aura += other.aura;
+		auraMax += other.auraMax;
+		attack += other.attack;
+        magatk += other.magatk;
+		defend += other.defend;
+        magdef += other.magdef;
+		hp += other.hp;
+		tough += other.tough;
+		action += other.action;
+		hitrate += other.hitrate;
+		evade += other.evade;
+		critical += other.critical;
+		criticaldmg += other.criticaldmg;
+		pierce += other.pierce;
+		counter += other.counter;
+        magres += other.magres;
+
+		strengthP += other.strengthP;
+		physiqueP += other.physiqueP;
+		agilityP += other.agilityP;
+		intelligenceP += other.intelligenceP;
+		willP += other.willP;
+		soulP += other.soulP;
+		auraP += other.auraP;
+		auraMaxP += other.auraMaxP;
+		attackP += other.attackP;
+        magatkP += other.magatkP;
+		defendP += other.defendP;
+        magdefP += other.magdefP;
+
+		hpP += other.hpP;
+		actionP += other.actionP;
+		criticaldmgP += other.criticaldmgP;
+		counterP += other.counterP;
+        magresP += other.magresP;
+#if 0
+		toughP += other.toughP;
+		hitrateP += other.hitrateP;
+		evadeP += other.evadeP;
+		criticalP += other.criticalP;
+		pierceP += other.pierceP;
+#endif
+
+        hitrlvl += other.hitrlvl;
+        evdlvl += other.evdlvl;
+        crilvl += other.crilvl;
+        pirlvl += other.pirlvl;
+        counterlvl += other.counterlvl;
+        mreslvl += other.mreslvl;
+        toughlvl += other.toughlvl;
+        criticaldmgimmune += other.criticaldmgimmune;
+
+        fairyAck += other.magatk;
+        fairyDef += other.magdef;
+
+		return *this;
+    }
 	inline void reset()
 	{
         strength = 0;
@@ -364,6 +505,8 @@ struct AttrExtra
         mreslvl = 0;
         toughlvl = 0;
         criticaldmgimmune = 0;
+        fairyAck = 0;
+        fairyDef = 0;
     }
 
 	float strength;
@@ -420,6 +563,9 @@ struct AttrExtra
     float mreslvl;
     float toughlvl;
     float criticaldmgimmune;
+
+    float fairyAck;
+    float fairyDef;
 
     std::vector<const SkillBase*> skills;
 };

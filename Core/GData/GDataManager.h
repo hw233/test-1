@@ -183,6 +183,7 @@ namespace GData
         static std::vector<UInt16>       m_petGems[20];
         static std::vector<UInt16>       m_petEqSkills;
         static std::vector<UInt16>       m_zhenyuanItem[20];
+        static std::vector<UInt16>       m_evolutionGems[20];
 	};
 
     extern std::map<UInt16, UInt16> skill2item;

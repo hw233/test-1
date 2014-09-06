@@ -96,6 +96,7 @@
 #include "Battle/BattleReport.h"
 #include "GObject/RaceBattle.h"
 #include "GData/ClanShop.h"
+#include "GObject/Evolution.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -3652,6 +3653,13 @@ namespace GObject
             UInt32 lss[3] = {0};
             fgt->getAllLingshiId(lss);
             st << lss[0] << lss[1] << lss[2];
+            for(UInt8 i = 0 ; i < 3; ++i)
+            {
+                if(fgt->getEvolution()->getEquip(i))
+                    st << static_cast<UInt32>(fgt->getEvolution()->getEquip(i)->getId());
+                else
+                    st << static_cast<UInt32>(0);
+            }
 
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
@@ -3683,6 +3691,7 @@ namespace GObject
             fgt->xingchenInfo(st);
             fgt->getAllAcupointsGoldBits(st);
             fgt->getAllLingbaoLevelAndFall(st);
+            st << static_cast<UInt8>(fgt->getEvolution()->IsComplete());
 		}
 	}
 
@@ -4389,12 +4398,14 @@ namespace GObject
 		evab->notify();
 	}
 
-	void Player::PutFighters( Battle::BattleSimulator& bsim, int side, bool fullhp )
+	void Player::PutFighters( Battle::BattleSimulator& bsim, int side, bool fullhp ,UInt16 fighterId )
 	{
 		bsim.setFormation(side, getFormation());
 		for(int i = 0; i < 5; ++ i)
 		{
 			Lineup& lup = getLineup(i);
+            if(fighterId != 0 && lup.fid != fighterId)
+                continue ;
 			if(lup.fid != 0 && lup.fighter == NULL)
 			{
 				std::map<UInt32, Fighter *>::iterator it = _fighters.find(lup.fid);
@@ -4428,10 +4439,11 @@ namespace GObject
 			}
 		}
 		bsim.setPortrait(side, _fighters.empty() ? 0 : _fighters.begin()->second->getId());
-        PutPets(bsim, side);
-	}
+        if(!fighterId)
+            PutPets(bsim, side);
+    }
 
-	void Player::PutPets( Battle::BattleSimulator& bsim, int side, bool init /* = true */)
+    void Player::PutPets( Battle::BattleSimulator& bsim, int side, bool init /* = true */)
     {
         // 战斗模拟器中加载宠物
         if (_onBattlePet)
@@ -4451,16 +4463,16 @@ namespace GObject
         }
     }
 
-	Fighter * Player::takeFighter( UInt32 id, bool writedb )
-	{
-		if(id > GREAT_FIGHTER_MAX || (writedb && id < 10))
-			return NULL;
-		if(hasFighter(id))
-			return NULL;
-		Fighter * fgt = globalFighters[id];
-		if(fgt == NULL)
-			return NULL;
-		Fighter * fgt2 = fgt->clone(this);
+    Fighter * Player::takeFighter( UInt32 id, bool writedb )
+    {
+        if(id > GREAT_FIGHTER_MAX || (writedb && id < 10))
+            return NULL;
+        if(hasFighter(id))
+            return NULL;
+        Fighter * fgt = globalFighters[id];
+        if(fgt == NULL)
+            return NULL;
+        Fighter * fgt2 = fgt->clone(this);
 		addFighter(fgt2, writedb);
 		if (_clan != NULL)
 		{
@@ -9719,6 +9731,7 @@ namespace GObject
         {
             playerCopy.buildInfo(this, st);
         }
+        UInt8 cnt_xianjie = cnt;
 
         checkDungeonTimeout(TimeUtil::Now());
         /*
@@ -9755,6 +9768,11 @@ namespace GObject
             xjfrontMap.buildInfo(this, st);
         }
 
+        st << cnt_xianjie << static_cast<UInt8>(GetVar(VAR_FAIRYCOPY_FREE) + GetVar(VAR_FAIRYCOPY_GOLD) + currentDiamondCnt + currentCnt2) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt) << static_cast<UInt8>(totalCnt2);
+        if(cnt_xianjie)
+        {
+            playerCopy.buildInfo(this, st);
+        }
 #if 0
 		size_t sz;
 		UInt16 * prices = Dungeon::getPrice(sz);

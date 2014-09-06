@@ -1,19 +1,21 @@
 --代码描述:此脚本仅处理天书奇缘的积分bug导致的情况 (被加载的地方似乎不合适，会被加载三次，影响效率)
 print("XXX")
 --os.execute("zcat log/DB/TRACE20140621.gz |grep var|grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[00:[0,1,2,3,4][0-9]:\" > test1.txt")  --需要修改cat语句已限制时间段
-os.execute("cat log/DB/INFO20140707 |grep snow |grep REPLACE  > test1.txt")  --需要修改cat语句已限制时间段
+--os.execute("cat log/DB/INFO20140707 |grep snow |grep REPLACE  > test1.txt")  --需要修改cat语句已限制时间段
+os.execute("cat log/DB/TRACE20140814 |grep strengthenData |grep REPLACE  > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("cat log/DB/INFO20140707 |grep snow |grep REPLACE |grep \"\\[0[0-9]:\" > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep [^0-9]599[^0-9] > test1.txt")
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[1[0-9]\" > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("awk '{print $11,$12,$13,$14}' test1.txt > test2.txt ")  --产生文件的格式为(XXXX, XXXX, XXXX)]
-reg = "VALUES%((%d*), (%d*), (%d*), (%d*)%)"
+--reg = "VALUES %((%d*), (%d*), (%d*), (%d*)%)"
+reg = "%d, '(.-)',"
 
 file = io.open("test1.txt","r")
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep [^0-9]599[^0-9] > test1.txt")
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[1[0-9]\" > test1.txt")  --需要修改cat语句已限制时间段
 
-os.execute("awk '{print $11,$12,$13,$14}' test1.txt > test2.txt ")  --产生文件的格式为(XXXX, XXXX, XXXX)]
-file = io.open("test2.txt","r")
+--os.execute("awk '{print $11,$12,$13,$14}' test1.txt > test2.txt ")  --产生文件的格式为(XXXX, XXXX, XXXX)]
+--file = io.open("test2.txt","r")
 local res = {}
 local result = {}
 --获得此时间段 各玩家的积分变化情况
@@ -54,9 +56,9 @@ function getTheResult()
 end
 function getTheResultInSnow2()
     for i in file:lines() do 
-        x,y,a,b,c,d = string.find(i,reg)
-        print(x,y,a,b,c,d)
-        result[d]= a    --结果增量设置为0
+        x,y,a,b = string.find(i,reg)
+        print(x,y,a,b)
+        result[a]= b    --结果增量设置为0
     end
     file:close()
 end

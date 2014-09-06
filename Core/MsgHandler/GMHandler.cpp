@@ -62,6 +62,7 @@
 #include "GObject/ClanBuilding.h"
 #include "GObject/RaceBattle.h"
 #include "GObject/ClanBigBoss.h"
+#include "GObject/Evolution.h"
 
 GMHandler gmHandler;
 
@@ -332,6 +333,7 @@ GMHandler::GMHandler()
     Reg(3, "setfirevalue", &GMHandler::OnSetFireValue);
     Reg(2, "atkcb", &GMHandler::OnAttackBoss);
     Reg(2, "kettleA", &GMHandler::OnAttackKettle);
+    Reg(2, "feisheng", &GMHandler::OnComEvolution);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -4848,8 +4850,8 @@ void GMHandler::OnSendMsg(GObject::Player *player, std::vector<std::string>& arg
 	if(args.size() < 1)
 		return;
     UInt32 type = atoi(args[0].c_str());
-    UInt8 value[5] = {0,0,0,0,0};
-    if(args.size()>6)
+    UInt8 value[20] = {};
+    if(args.size()>20)
         return ;
     for(UInt8 i=1;i<args.size();++i)
     {
@@ -5847,3 +5849,14 @@ void GMHandler::OnSayToWorld(GObject::Player *player, std::vector<std::string>& 
     NETWORK()->SendToServerWar(st);
 } 
 
+void GMHandler::OnComEvolution(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return ;
+    UInt16 fighterId = atoi(args[0].c_str());
+    GObject::Fighter* fgt;
+    fgt = player->findFighter(fighterId);
+    if(!fgt)
+        return ;
+    fgt->getEvolution()->SetProcess(0x5FF);
+}

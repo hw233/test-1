@@ -136,6 +136,9 @@ public:
 	inline float getExtraCounter() { return _attrExtra.counter; } //附加反击
 	inline float getExtraMagRes() { return _attrExtra.magres; } //不明？
 
+    inline float getExtraFairyAtk() { return _fighter->getExtraFairyAtk();}   //仙术攻击
+    inline float getExtraFairyDef() { return _fighter->getExtraFairyDef();}   //仙术防御
+
     inline float getExtraHitrateLevel() { return _attrExtra.hitrlvl; }  //附加命中等级
     inline float getExtraEvadeLevel() { return _attrExtra.evdlvl; }     //附加回避等级
     inline float getExtraCriticalLevel() { return _attrExtra.crilvl; }  //附加暴击等级
@@ -175,6 +178,7 @@ public:
 	inline float getBaseMagRes() {return _fighter->getBaseMagRes();}
 	inline Int32 getBaseHP() {return _fighter->getBaseHP();}
 	inline Int32 getBaseAction() {return _fighter->getBaseAction();}
+
 
 	inline float getStrength() { return _strength; }
 	inline float getAgility() { return _agility; }
@@ -1766,6 +1770,16 @@ private:
     const GData::SkillBase* _skillControlBall;
     const GData::SkillBase* getSkillControlBall() { return _skillControlBall; }
     void setSkillControlBall(const GData::SkillBase* skill) { _skillControlBall = skill; }
+
+    UInt8 _evolutionCnt;   //仙气累计
+    UInt8 getEvolutionCnt() { return _evolutionCnt; }
+    void setEvolutionCnt(UInt8 cnt) { if(cnt > 5) cnt = 5; _evolutionCnt = cnt; }
+    UInt8 _evolutionCnt2; //last time
+    UInt8 getEvolutionCnt2() { return _evolutionCnt2; }
+    void setEvolutionCnt2(UInt8 cnt) { _evolutionCnt2 = cnt; }
+    const GData::SkillBase* _skillEvolution;
+    const GData::SkillBase* getSkillEvolution() { return _skillEvolution; }
+    void setSkillEvolution(const GData::SkillBase* skill) { _skillEvolution = skill; }
 
 public:
 	enum StatusFlag

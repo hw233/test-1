@@ -366,6 +366,9 @@ private:
         e_controlBall = 137,    // 控球效果
         e_unControlBall = 138,    // 控球效果消失
 
+        e_evolution = 139,    // 控球效果
+        e_unEvolution = 140,    // 控球效果消失
+
         e_MAX_STATE,
     };
 
@@ -633,6 +636,7 @@ private:
     void initBuddhaLight(BattleFighter* bf, bool auralAdd, bool dead);
     void doSkillAttackByCareer(BattleFighter *bf, const GData::SkillBase *skill);
     void doSSMakeDamage(BattleFighter* bf, BattleFighter* target, float factor);
+    void doSkillAttackByEvolution(BattleFighter *bf, const GData::SkillBase *skill);
 
     void addSelfSideEvadeCnt(BattleFighter* bf);
     UInt32 doBufMakeDamage(BattleFighter* bf, UInt32& u);
@@ -794,12 +798,14 @@ private:
     float calcMaxTherapy(BattleFighter* bf, const GData::SkillBase* skill);
     float calcTherapy(BattleFighter* bf, bool& isCritical, bool& first, const GData::SkillBase* skill);
     float calcMagAttack(BattleFighter* bf, bool& isCritical, BattleFighter* defender , float* pCf);
+    float calcEvolutionAttack(BattleFighter* bf, bool& isCritical, BattleFighter* defender , float* pCf);
     float calcAttack(BattleFighter* bf, bool& isCritical, BattleFighter* defender, float* pCf);
     void calcSkillAttack(BattleFighter* bf, bool& isCritical, BattleFighter* defender, float& atk, float& magatk, float* pCf);
     float getBFMagAtk(BattleFighter* bf);
     float getBFAttack(BattleFighter* bf);
     float getBFMagDefend(BattleFighter* bf);
     float getBFDefend(BattleFighter* bf);
+    float getBFEvolutionDefend(BattleFighter* bf);
     float getBFAtkReduce(BattleFighter* bf);
     float getBFMagAtkReduce(BattleFighter* bf);
     void doPassiveSkillBeMagDmg(BattleFighter* bf, BattleFighter* bo, UInt32 dmg);
@@ -814,6 +820,7 @@ private:
     UInt32 doLingshiModelAttack(BattleFighter* bf, UInt8 flag, UInt32& skillId);
     void onDeadLingshi(BattleFighter* bf);
     void doControlBall(BattleFighter* bf);
+    void doEvolution(BattleFighter* bf);
 };
 
 }

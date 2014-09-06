@@ -37,6 +37,7 @@
 #include "FairySpar.h"
 #include "HoneyFall.h" 
 #include "GObject/Married.h"
+#include "Evolution.h"
 
 namespace GObject
 {
@@ -76,7 +77,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
     attack(0), defend(0), maxhp(0), action(0), peerless(0), talent(0),
-    hitrate(0), evade(0), critical(0), criticaldmg(0), pierce(0), counter(0), magres(0)
+    hitrate(0), evade(0), critical(0), criticaldmg(0), pierce(0), counter(0), magres(0),_evl(NULL)
 {
     memset(_acupoints, 0, sizeof(_acupoints));
     memset(_acupointsGold, 0, sizeof(_acupointsGold));
@@ -133,6 +134,8 @@ Fighter::~Fighter()
     }
     if(m_2ndSoul)
         SAFE_DELETE(m_2ndSoul);
+    if(!_evl)
+        SAFE_DELETE(_evl);
 }
 
 const std::string& Fighter::getName()
@@ -466,7 +469,6 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             }
         }
     }
-
 	switch(t)
 	{ // 不保存hp, 每次重启都满血
 	//case 1: field = "hp"; break;
@@ -738,14 +740,14 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 
             UInt8 itemClass = equip->getClass();
             UInt8 q = equip->getQuality();
-            if(itemClass >= Item_Weapon && itemClass <= Item_Ring && q == 5)
+            if(((itemClass >= Item_Weapon && itemClass <= Item_Ring) || ( itemClass >= Item_Evolution1 && itemClass<= Item_Evolution2))&& q == 5)
             {
                 ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
                 esa.appendAttrToStream(st);
             }
 
             if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion ||
-               equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+                equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump||equip->getClass()==Item_Evolution3)
             {
                 st << ied.maxTRank << ied.trumpExp;
             }
@@ -1454,18 +1456,24 @@ void Fighter::setCapacity( float c, bool writedb )
     }
 }
 
-void Fighter::addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext )
+void Fighter::addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext , UInt8 flag )
 {
 	if(ext == NULL)
 		return;
-	ae += *ext;
+    if(!flag)
+        ae += *ext;
+    else
+        ae.getFairyEquipInfo(*ext);
 }
 
-void Fighter::addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce )
+void Fighter::addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce ,UInt8 flag)
 {
 	if(ce == NULL)
 		return;
-	ae += *ce;
+    if(!flag)
+        ae += *ce;
+    else
+        ae.getFairyEquipInfo(*ce);
 }
 
 void Fighter::addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt )
@@ -1752,6 +1760,23 @@ inline void addEquipSpiritAttr( GData::AttrExtra& ae, const ItemEquipSpiritAttr&
         if(lev3 > 0)
             ae.criticaldmg += ((double)GData::spiritAttrTable[lev3-1].critical_dmg/100.f);
         break;
+    //XXX LIBO 
+    case Item_Evolution1:
+    case Item_Evolution2:
+    case Item_Evolution3:
+        if(lev0 > 0)
+        {
+            ae.fairyAck += GData::spiritAttrTable[lev0-1].attack;
+            ae.fairyDef += GData::spiritAttrTable[lev0-1].defend;
+            //ae.fairyDef += GData::spiritAttrTable[lev0-1].attack;
+        }
+        if(lev1 > 0)
+            ae.hp += GData::spiritAttrTable[lev1-1].hp;
+        if(lev2 > 0)
+            ae.crilvl += GData::spiritAttrTable[lev2-1].critical_lvl;
+        if(lev3 > 0)
+            ae.criticaldmg += ((double)GData::spiritAttrTable[lev3-1].critical_dmg/100.f);
+        break;
     default:
         return;
     }
@@ -1805,11 +1830,11 @@ void Fighter::addAttr( const GData::CittaEffect* ce )
 	addEquipAttr2(_attrExtraEquip, ce, _level);
 }
 
-void Fighter::addAttr( ItemEquip * equip )
+void Fighter::addAttr( ItemEquip * equip,UInt8 flag )
 {
     if (!equip)
         return;
-	addAttrExtra(_attrExtraEquip, equip->getAttrExtra());
+	addAttrExtra(_attrExtraEquip, equip->getAttrExtra(),flag);
 	addEquipAttr2(_attrExtraEquip, equip->getEquipAttr2(), _level);
     addEquipSpiritAttr(_attrExtraEquip, equip->getEquipSpiritAttr(), equip->getClass());
 	ItemEquipData& ied = equip->getItemEquipData();
@@ -1817,7 +1842,11 @@ void Fighter::addAttr( ItemEquip * equip )
 	{
 		if(ied.gems[i] != 0)
 		{
-            GData::ItemGemType * igt = GData::gemTypes[ied.gems[i] - LGEM_ID];
+            GData::ItemGemType * igt = NULL ;
+            if(!flag)
+                igt = GData::gemTypes[ied.gems[i] - (LGEM_ID)];
+            else
+                igt = GData::evolutionTypes[ied.gems[i] - (LXIANGEM_ID)];
 			//addAttrExtra(_attrExtraEquip, igt->attrExtra);
             addAttrExtraGem(_attrExtraEquip, igt);
 		}
@@ -1967,9 +1996,9 @@ void Fighter::rebuildEquipAttr()
 	equip = getRing();
 	if(equip != NULL)
 	{
-		if(equip->getQuality() >= 4)
-			testEquipInSet(setId, setNum, equip->GetItemType().getId());
-		addAttr(equip);
+        if(equip->getQuality() >= 4)
+            testEquipInSet(setId, setNum, equip->GetItemType().getId());
+        addAttr(equip);
 
         _attrExtraEquip.hp += GObjectManager::getRingHpFromEnchant(equip->getValueLev(), equip->GetCareer(), equip->getItemEquipData().enchant);
 	}
@@ -1982,35 +2011,71 @@ void Fighter::rebuildEquipAttr()
 		addAttr(equip);
         _attrExtraEquip.hp += GObjectManager::getRingHpFromEnchant(equip->getValueLev(), equip->GetCareer(), equip->getItemEquipData().enchant);
 	}
+    
+    { 
+        UInt16 equipType = 0;
+        for(UInt8 i = 0 ; i < 3 ; ++i)
+        { 
+            equip = getEvolution()->getEquip(i);
+            if(equip)
+            {
+                addAttr(equip,1);
+                if(i != 2)
+                {
+                    if(!equipType)
+                    {
+                        equipType = equip->GetTypeId();
+                    }
+                    else
+                    {
+                        UInt32 setId = 0;
+                        if(equip->GetTypeId() == (equipType+1) && equipType > 2000)
+                             setId = (equipType-2000)/8;
+                        const GData::ItemEquipSetType * iest = GData::itemEquipSetTypeManager[setId];
+                        if(iest != NULL)
+                        {
+                            for(UInt8 i =0; i < 4; ++i)
+                            {
+                                if(iest->attrExtra[i])
+                                {
+                                    _attrExtraEquip += *iest->attrExtra[i];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } 
+    } 
 
     isCanStrengthenSuit(setId, setNum, this);
 
-	/*for(int i = 0; i < 8; ++ i)
-	{
-		if(setId[i] == 0)
-			break;
-		if(setNum[i] < 2)
-			continue;
-		const GData::ItemEquipSetType * iest = GData::itemEquipSetTypeManager[setId[i]];
-		if(iest == NULL)
-			continue;
-		int idx = setNum[i] / 2 - 1;
-        while(idx >= 0)
-        {
-            if(iest->attrExtra[idx])
-                _attrExtraEquip += *iest->attrExtra[idx];
-            --idx;
-        }
-		//_attrExtraEquip += *iest->attrExtra[idx];
-	}*/
+    /*for(int i = 0; i < 8; ++ i)
+      {
+      if(setId[i] == 0)
+      break;
+      if(setNum[i] < 2)
+      continue;
+      const GData::ItemEquipSetType * iest = GData::itemEquipSetTypeManager[setId[i]];
+      if(iest == NULL)
+      continue;
+      int idx = setNum[i] / 2 - 1;
+      while(idx >= 0)
+      {
+      if(iest->attrExtra[idx])
+      _attrExtraEquip += *iest->attrExtra[idx];
+      --idx;
+      }
+    //_attrExtraEquip += *iest->attrExtra[idx];
+    }*/
 #if 0
-	_attrExtraEquip.attack += getWeaponAttack();
-	_attrExtraEquip.magatk += getWeaponAttack();
-	UInt16 armorDefend, armorHP;
-	getArmorDefendAndHP(armorDefend, armorHP);
-	_attrExtraEquip.defend += armorDefend;
-	_attrExtraEquip.magdef += armorDefend;
-	_attrExtraEquip.hp += armorHP;
+    _attrExtraEquip.attack += getWeaponAttack();
+    _attrExtraEquip.magatk += getWeaponAttack();
+    UInt16 armorDefend, armorHP;
+    getArmorDefendAndHP(armorDefend, armorHP);
+    _attrExtraEquip.defend += armorDefend;
+    _attrExtraEquip.magdef += armorDefend;
+    _attrExtraEquip.hp += armorHP;
 #endif
 
     addTalentAttr(_attrExtraEquip, getAttrType1(), getAttrValue1());
@@ -2033,9 +2098,9 @@ void Fighter::rebuildEquipAttr()
     bool hasActiveTrump = false;
     for(int i = 0; i < getMaxTrumps(); ++i)
     {
-		ItemTrump* trump = static_cast<ItemTrump*>(getTrump(i));
+        ItemTrump* trump = static_cast<ItemTrump*>(getTrump(i));
 
-		if(trump != NULL)
+        if(trump != NULL)
         {
             if(!hasActiveTrump && trump->getId() >= 1600)
             {
@@ -2815,6 +2880,14 @@ ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
             return _lingshi[idx];
         }
     }
+    for(UInt8 idx = 0 ; idx < 3 ; ++idx)
+    { 
+        if(getEvolution()->getEquip(idx) && getEvolution()->getEquip(idx)->getId() == id)
+        {
+            pos = idx;
+            return getEvolution()->getEquip(idx);
+        }
+    } 
 	return NULL;
 }
 
@@ -6680,6 +6753,24 @@ void Fighter::loadLingbao(std::string& lbs)
         }
     }
 }
+void Fighter::loadEvolutionEquip(std::string& ee)
+{
+    if (!ee.length())
+        return;
+
+    StringTokenizer tk(ee, ",");
+    for (size_t i = 0; i < tk.count() && static_cast<int>(i) < 3; ++i)
+    {
+        UInt32 lb = ::atoi(tk[i].c_str());
+        if (lb)
+        {
+            ItemEquip* t = 0;
+            t = GObjectManager::fetchEquipment(lb);
+            //setLingbao(i, t, false);
+            getEvolution()->SetEvolutionEquip(i,t,1);
+        }
+    }
+}
 
 bool Fighter::addLBSkill(UInt32 lbid, UInt16 skillid, UInt16 factor)
 {
@@ -8206,6 +8297,12 @@ void Fighter::updateLingbaoFallToDB(UInt8 type)
     DB1().PushUpdateData("REPLACE INTO `fighter_lingbaoFall` (`playerId`, `fighterId`, `type`, `fall`) VALUES(%" I64_FMT "u, %u, %u, %u)", _owner->getId(), getId(),type,lingbaoFall[type]);
 
 } 
+Evolution * Fighter::getEvolution()
+{ 
+    if(!_evl) 
+        _evl = new Evolution(this);
+    return _evl;
+}
 
 /*
  *end分别计算散仙的战斗力

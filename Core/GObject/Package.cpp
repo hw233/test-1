@@ -29,6 +29,7 @@
 #include "Common/Itoa.h"
 #include "LBNameTmpl.h"
 #include "GData/lingbaoLevel.h"
+#include "GObject/Evolution.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
@@ -55,13 +56,13 @@ namespace GObject
 
     // 注灵类型 spiritType[属性条][装备类型]
     // 属性条:1, 2, 3, 4
-    // 装备类洗:1-武器，2-护头，3-护胸，4-护肩，5-护腰，6-护腿，7-项链，8-戒指
+    // 装备类洗:1-武器，2-护头，3-护胸，4-护肩，5-护腰，6-护腿，7-项链，8-戒指 9-仙兵 10-仙衣
     // spiritType:0-攻击，1-防御，2-暴击，3-破击，4-身法，5-坚韧，6-暴击伤害，7-生命
-    static int spiritType[4][8] = {
-        {0, 1, 1, 1, 1, 1, 0, 0},
-        {3, 4, 4, 4, 4, 4, 7, 7},
-        {2, 3, 5, 2, 5, 5, 3, 2},
-        {4, 7, 7, 7, 7, 7, 6, 6}
+    static int spiritType[4][10] = {
+        {0, 1, 1, 1, 1, 1, 0, 0 ,0 ,1},
+        {3, 4, 4, 4, 4, 4, 7, 7 ,3 ,4},
+        {2, 3, 5, 2, 5, 5, 3, 2 ,2 ,5},
+        {4, 7, 7, 7, 7, 7, 6, 6 ,4 ,7}
     };
     static UInt32 baseSpiritItem = 7000;
 
@@ -1100,6 +1101,9 @@ namespace GObject
         case Item_LBling:
         case Item_LBwu:
         case Item_LBxin:
+        case Item_Evolution1:
+        case Item_Evolution2:
+        case Item_Evolution3:
 			{
 				ItemEquip * equip;
 				ItemEquipData edata;
@@ -1116,6 +1120,7 @@ namespace GObject
                 case Item_LBling:
                 case Item_LBwu:
                 case Item_LBxin:
+                case Item_Evolution3:
                     break;
                 default:
                     if(itype->quality > 2)
@@ -1153,12 +1158,15 @@ namespace GObject
 				case Item_Armor3:
 				case Item_Armor4:
 				case Item_Armor5:
+                case Item_Evolution1:
+                case Item_Evolution2:
                     equip = new ItemArmor(id, itype, edata);
 					break;
                 case Item_Halo:
                 case Item_InnateTrump:
                 case Item_Fashion:
                 case Item_Trump:
+                case Item_Evolution3:
                     {
                         UInt16 roll = uRand(1000);
                         edata.maxTRank = 1;
@@ -1756,6 +1764,15 @@ namespace GObject
 
             case Item_InnateTrump:
                 return 0x70;
+
+            case Item_Evolution1:
+                return 0x66;
+
+            case Item_Evolution2:
+                return 0x67;
+
+            case Item_Evolution3:
+                return 0x68;
         }
         return 0;
     }
@@ -1871,6 +1888,13 @@ namespace GObject
                 old = fgt->setLingbao(part-0x60, static_cast<GObject::ItemLingbao*>(item));
                 fgt->eraseLingbaoInfo(old);
                 break;
+            case 0x66:
+            case 0x67:
+            case 0x68:
+                if(item->getClass()  <= Item_Evolution || item->getClass() > Item_Evolution3)
+                    return false;
+                old  = fgt->getEvolution()->SetEvolutionEquip(part - 0x66 ,static_cast<GObject::ItemEquip *>(item));
+                break;
             default:
                 return false;
 			}
@@ -1924,6 +1948,11 @@ namespace GObject
             case 0x62:
                 old = fgt->setLingbao(part-0x60, static_cast<GObject::ItemLingbao*>(NULL));
                 fgt->eraseLingbaoInfo(old);
+                break;
+            case 0x66:
+            case 0x67:
+            case 0x68:
+                old = fgt->getEvolution()->SetEvolutionEquip(part - 0x66 , NULL);
                 break;
             case 0x70:
 				old = fgt->setInnateTrump(NULL);
@@ -2541,6 +2570,7 @@ namespace GObject
 
 	void Package::AppendEquipData( Stream& st, ItemEquip * equip, bool hascount )
 	{
+        UInt32 itemId = equip->getId();
 		st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0);
 		if(hascount)
 			st << equip->Count();
@@ -2556,13 +2586,13 @@ namespace GObject
 
         UInt8 itemClass = equip->getClass();
         UInt8 q = equip->getQuality();
-		if(itemClass >= Item_Weapon && itemClass <= Item_Ring && q == 5)
+		if(((itemClass >= Item_Weapon && itemClass <= Item_Ring) || ( itemClass >= Item_Evolution1 && itemClass<= Item_Evolution2))&& q == 5)
         {
             ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
             esa.appendAttrToStream(st);
         }
         else if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion ||
-                equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+                equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump||equip->getClass()==Item_Evolution3)
         {
             st << ied.maxTRank << ied.trumpExp;
         }
@@ -2925,7 +2955,7 @@ namespace GObject
         {
             quality = 1;
         }
-        else if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+        else if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump || equip->getClass() == Item_Evolution3 )
         {
             maxEnchantLevel = TRUMP_ENCHANT_LEVEL_MAX;
             item_enchant_l = TRUMP_ENCHANT_L1;
@@ -3196,6 +3226,7 @@ namespace GObject
                     fgt->sendModification(0x0a+ pos, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
+
 			}
 			else
 				SendSingleEquipData(equip);
@@ -3476,7 +3507,7 @@ namespace GObject
 
 	UInt8 Package::AttachGem( UInt16 fighterId, UInt32 itemId, UInt32 gemId, bool bind )
 	{
-		if (GetItemSubClass(gemId) != Item_Gem) return 1;
+		if (GetItemSubClass(gemId) != Item_Gem && GetItemSubClass(gemId) != Item_EvolutionGem ) return 1;
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
@@ -3543,13 +3574,33 @@ namespace GObject
             {1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0}
         };
 
+        static UInt8 equip_gem2[2][19] = {
+            {1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+            {1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+    //        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+        };
+
         GData::ItemGemType * igt = NULL;
-        igt = GData::gemTypes[gemId - LGEM_ID];
+        if(gemId < XIAN_ID)
+            igt = GData::gemTypes[gemId - LGEM_ID];
+        else 
+            igt = GData::evolutionTypes[gemId - LXIANGEM_ID];
         if(!igt)
             return 1;
-
-        if(!equip_gem[equip->getClass() - Item_Weapon][igt->subClass - Item_Gem])
+        if(equip->getClass() <= Item_Evolution && igt->subClass > Item_EvolutionGem)
             return 1;
+        if(equip->getClass() > Item_Evolution && igt->subClass < Item_EvolutionGem )
+            return 1;
+
+        UInt8 flag = 1;
+        if(equip->getClass() <= Item_Evolution && equip_gem[equip->getClass() - Item_Weapon][igt->subClass - Item_Gem])
+            flag = 0;
+        if(equip->getClass() > Item_Evolution && equip_gem2[equip->getClass() - Item_Evolution1][igt->subClass - Item_EvolutionGem])
+            flag = 0;
+        if(flag)
+            return 1;
+        
+        //仙界装备判断 TODO Evolution
 
 		ItemEquipData& ied = equip->getItemEquipData();
 		UInt8 fempty = 0xFF;
@@ -3830,7 +3881,7 @@ namespace GObject
                     if (!esa.spLev[i])
                         continue;
                     UInt8 lev = (esa.spLev[i]-1)/5 + 1;
-                    UInt32 tmpId = baseSpiritItem + spiritType[i][itemClass - 1] * 100 + lev;
+                    UInt32 tmpId = baseSpiritItem + spiritType[i][ (itemClass < Item_Evolution?itemClass:(itemClass - Item_Evolution + 8)) - 1] * 100 + lev;
                     UInt32 count = (esa.spLev[i]%5)?((esa.spLev[i]%5)+1):6;
                     if (tmpId && tmpId >= LSOUL_ID && tmpId <= RSOUL_ID)
                     {
@@ -4177,7 +4228,7 @@ namespace GObject
 		URandom& rnd = static_cast<BaseThread *>(Thread::current())->uRandom;
 		UInt8 result = 0;
 
-        if (GetItemSubClass(gemId) != Item_Gem)
+        if (GetItemSubClass(gemId) != Item_Gem && GetItemSubClass(gemId) != Item_EvolutionGem)
             return 3;
         UInt32 lvl;
         if(IsGemId2(gemId))
@@ -4196,7 +4247,9 @@ namespace GObject
         unbindGemsOut = 0;
         bindGemsOut = 0;
         if(9 == lvl)
+        {
             gemIdOut = gemId + 491;
+        }
         else
             gemIdOut = gemId + 1;
         succTimes = 0;
@@ -4652,7 +4705,9 @@ namespace GObject
                 (equip->GetItemType().subClass == Item_Trump ||
                 equip->GetItemType().subClass == Item_Fashion ||
                 equip->GetItemType().subClass == Item_Halo ||
-                equip->GetItemType().subClass == Item_InnateTrump))
+                equip->GetItemType().subClass == Item_InnateTrump||
+                equip->GetItemType().subClass == Item_Evolution3
+                ))
         {
             return 1;
         }
@@ -6173,7 +6228,9 @@ namespace GObject
            (trump->getClass() != Item_Trump &&
             trump->getClass() != Item_Fashion &&
             trump->getClass() != Item_Halo &&
-            trump->getClass() != Item_InnateTrump))
+            trump->getClass() != Item_InnateTrump &&
+            trump->getClass() != Item_Evolution3
+            ))
 			return 2;
 
 		ItemEquipData& ied_trump = trump->getItemEquipData();
@@ -6339,7 +6396,9 @@ namespace GObject
            (trump->getClass() != Item_Trump &&
             trump->getClass() != Item_Fashion &&
             trump->getClass() != Item_Halo &&
-            trump->getClass() != Item_InnateTrump))
+            trump->getClass() != Item_InnateTrump &&
+            trump->getClass() != Item_Evolution3
+            ))
 			return 2;
 
         UInt8 q = trump->getQuality();
@@ -6405,7 +6464,7 @@ namespace GObject
         if(equip == NULL)
             return;
         UInt8 itemClass = equip->getClass();
-		if(itemClass > Item_Ring || itemClass < Item_Weapon)
+		if((itemClass > Item_Ring || itemClass < Item_Weapon) && (itemClass < Item_Evolution || itemClass > Item_Evolution3))
 			return;
 
         UInt8 q = equip->getQuality();
@@ -6433,7 +6492,7 @@ namespace GObject
                     if(ied_equip.spiritAttr.spLev[form - 1] == SPIRIT_LEVEL_MAX)
                         lev = SPIRIT_LEVEL_MAX / 5;
 
-                    UInt32 tmpId = baseSpiritItem + spiritType[form - 1][itemClass - 1] * 100 + lev;
+                    UInt32 tmpId = baseSpiritItem + spiritType[form - 1][(itemClass < Item_Evolution?itemClass:(itemClass - Item_Evolution + 8)) - 1] * 100 + lev;
                     UInt32 same = 1;
                     for (UInt8 i = 0; i < 3; ++i)
                     {
@@ -7898,13 +7957,13 @@ namespace GObject
 
         UInt8 itemClass = equip->getClass();
         UInt8 q = equip->getQuality();
-		if(itemClass >= Item_Weapon && itemClass <= Item_Ring && q == 5)
+		if(((itemClass >= Item_Weapon && itemClass <= Item_Ring)||(itemClass > Item_Evolution &&itemClass < Item_Evolution3)) && q == 5)
         {
             ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
             esa.appendAttrToStream(st);
         }
         else if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion ||
-                equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+                equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump || equip->getClass() == Item_Evolution3)
         {
             st << ied.maxTRank << ied.trumpExp;
         }
@@ -8755,8 +8814,8 @@ namespace GObject
             {
                 break;
             }
-            //chance = lbl.probability;
 	        chance = GameAction()->getLingbaoLevelChance(enLevel+1,bless+1);
+            //chance += lbl.honeyFallP * bless;
             //chance= lua_tinker::call<lua_tinker::table>(L, "getLingbaoLevelChance", enLevel + 1, bless + 1);
             //std::cout << "chance : " << chance <<std::endl;
             if(uRand(10000) < chance)

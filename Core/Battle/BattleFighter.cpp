@@ -9,6 +9,7 @@
 #include "GObject/Clan.h"
 #include "GObject/GObjectManager.h"
 #include "GObject/HeroMemo.h"
+#include "GObject/Evolution.h"
 
 namespace Battle
 {
@@ -91,7 +92,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
    ,_bActCnt(0), _immune3(0), _revivalCnt(0), _prudentLast(0),_prudentHitrate(0), _prudentHitrateLastOtherside(0), _silkwormCnt(0)
    ,_yehuoLevel(0), _yehuo_ss_dmgRate(0), _yehuo_ss_upRate(0), _jiuziDmgCnt(0), _changeStatus(0), _newModeLast(0), _counterCnt(0), _criticalCnt(0), _preAtk(false), _friendDeadCnt(0), _enemyDeadCnt(0), _mojianCnt(0xFF)
    ,_tyslSSCnt(0), _tyslSSFactor(0),_tyslSSAddCnt(true), _tyslSSCnt2(0)
-   ,_controlBallCnt(0), _controlBallCnt2(0), _skillControlBall(NULL)
+   ,_controlBallCnt(0), _controlBallCnt2(0), _skillControlBall(NULL),_evolutionCnt(0),_skillEvolution(NULL)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -112,6 +113,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 	_fighter = f;
 
     _peerlessSkill.base = GData::skillManager[_fighter->getPeerlessAndLevel()];  //无双技能
+
+    //_fairySkill.base = GData::skillManager[_fighter->getEvolution()->getFairySkillAndLevel()];  //仙界技能
+
     // reg skillstrenghten
     updateSkillStrengthen(_fighter->getPeerlessAndLevel());
 
@@ -259,6 +263,9 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         if(passiveSkill && passiveSkill->effect && passiveSkill->effect->eft[0] == GData::e_eft_control_ball)
             setSkillControlBall(passiveSkill);
     }
+    const GData::SkillBase* fairySkill = GData::skillManager[_fighter->getEvolution()->getFairySkillAndLevel()];  //无双技能
+    if(fairySkill)
+            setSkillEvolution(fairySkill);
 
 }
 
@@ -1043,6 +1050,14 @@ void BattleFighter::postInit()
 const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool noPossibleTarget)
 {
     GData::SkillItem* resSkillItem = NULL;
+    if(0 && NULL!= getSkillEvolution())   //仙界技能
+    {
+        if(getEvolutionCnt() >=2)       
+        {
+            std::cout<< "EvolutionSkill"<< std::endl;
+            return getSkillEvolution();
+        }
+    }
     if(NULL != _peerlessSkill.base)
     {
         bool isValid = false;
@@ -1062,7 +1077,13 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool no
                 // peerless skill first
                 if (_fighter->getOwner())
                     _fighter->getOwner()->OnHeroMemo(GObject::MC_SKILL, GObject::MD_ADVANCED, 0, 2);
+
+                //仙器技能累计
+                if(getSkillEvolution())
+                    setEvolutionCnt(getEvolutionCnt() + 1);
+
                 return _peerlessSkill.base;
+                std::cout <<"无双技能触发" << std::endl;
             }
         }
     }

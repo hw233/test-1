@@ -71,6 +71,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getExtraPierce", &GObject::Fighter::getExtraPierce);
 	class_def<GObject::Fighter>("getExtraCounter", &GObject::Fighter::getExtraCounter);
 	class_def<GObject::Fighter>("getExtraMagRes", &GObject::Fighter::getExtraMagRes);
+
 	class_def<GObject::Fighter>("isNpc", &GObject::Fighter::isNpc);
 	class_def<GObject::Fighter>("isPet", &GObject::Fighter::isPet);
 	class_def<GObject::Fighter>("isMale", &GObject::Fighter::isMale);
@@ -117,6 +118,9 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getSoulPracticeAddOn", &GObject::Fighter::getSoulPracticeAddOn);
 	class_def<GObject::Fighter>("getSoulPracticeFactor", &GObject::Fighter::getSoulPracticeFactor);
 	class_def<GObject::Fighter>("getExtraCriticalDmgImmune", &GObject::Fighter::getExtraCriticalDmgImmune);
+
+	class_def<GObject::Fighter>("getExtraFairyAtk", &GObject::Fighter::getExtraFairyAtk);
+	class_def<GObject::Fighter>("getExtraFairyDef", &GObject::Fighter::getExtraFairyDef);
 
 	class_add<Battle::BattleFighter>("BattleFighter");
 	class_def<Battle::BattleFighter>("getId", &Battle::BattleFighter::getId);

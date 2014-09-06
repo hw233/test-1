@@ -77,6 +77,7 @@
 #include "GObject/ClanBuilding.h"
 #include "GObject/RaceBattle.h"
 #include "GObject/CollectCard.h"
+#include "GObject/Evolution.h"
 
 struct NullReq
 {
@@ -1778,14 +1779,15 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-		static UInt8 p[20] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62, 0x70, 0x63, 0x64, 0x65};
-		ItemEquip * e[20] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+		static UInt8 p[23] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62, 0x70, 0x63, 0x64, 0x65,0x66,0x67,0x68};
+		ItemEquip * e[23] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
             fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
             fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2),
             fgt->getLingbao(0), fgt->getLingbao(1), fgt->getLingbao(2), fgt->getInnateTrump(),
-            fgt->getLingshi(0), fgt->getLingshi(1), fgt->getLingshi(2)
+            fgt->getLingshi(0), fgt->getLingshi(1), fgt->getLingshi(2),
+            fgt->getEvolution()->getEquip(0),fgt->getEvolution()->getEquip(1),fgt->getEvolution()->getEquip(2)
         };
-		fgt->sendModification(20, p, e, false);
+		fgt->sendModification(23, p, e, false);
 		return;
 	}
 
@@ -10374,6 +10376,113 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                 //GameAction()->RunOperationTaskAction1(player, 1, 2);
                 break;
             }
+        case 3:
+            { 
+                UInt8 index = 0;
+                br >> index;
+                switch(index)
+                {
+                    case 1:
+                        { 
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < 120)
+                                return ;
+                            if(!fgt->getEvolution())
+                                return ;
+                            {
+                                fgt->getEvolution()->SendProcess();
+                            }
+                        } 
+                        break;
+                    case 2:
+                        { 
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            UInt8 taskId = 0;
+                            br >> taskId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < 120)
+                                return ;
+                            if(!fgt->getEvolution())
+                                return ;
+                            { 
+                                fgt->getEvolution()->SendTaskInfo(taskId);
+                            } 
+                        } 
+                        break;
+                    case 3:
+                        { 
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            UInt8 taskId = 0;
+                            UInt8 flag = 1;
+                            UInt8 pos = 0; 
+                            br >> taskId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < 120)
+                                return ;
+                            if(!fgt->getEvolution())
+                                return ;
+                            if(taskId == 9)
+                            {
+                                br >> flag ;
+                                br >> pos;
+                                if(!flag)
+                                    fgt->getEvolution()->RandomTask9Player(pos);
+                            }
+                            if(taskId == 3 || taskId == 7)
+                            {
+                                br >> flag ; 
+                                if(!flag)
+                                    GameAction()->getFeiShengDan(player, taskId==3?1:2 );
+                            }
+                            if(flag && taskId)
+                            { 
+                                fgt->getEvolution()->CompleteTask(taskId-1,pos);
+                            } 
+                            fgt->getEvolution()->SendProcess();
+                            fgt->getEvolution()->SendTaskInfo(taskId);
+                        } 
+                        break;
+                    case 4:
+                        { 
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < 120)
+                                return ;
+                            if(!fgt->getEvolution())
+                                return ;
+                            UInt8 index = 0;
+                            br >> index;
+                            if(index)
+                            {
+                                fgt->getEvolution()->GetTaskAward(index - 1);
+                                fgt->getEvolution()->SendProcess();
+                            }
+                        } 
+                        break;
+                    case 5:
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < 120)
+                                return ;
+                            if(!fgt->getEvolution())
+                                return ;
+                            UInt8 res = fgt->getEvolution()->FeiSheng();
+                            Stream st(REP::EXTEND_PROTOCAOL);
+                            st << static_cast<UInt8>(0x03);
+                            st << static_cast<UInt8>(0x05);
+                            st << static_cast<UInt16>(fighterId);
+                            st << static_cast<UInt8>(res);
+                            st << Stream::eos;
+                            player->send(st);
+                        break;
+                }
+            } 
     }
 }
 

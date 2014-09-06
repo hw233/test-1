@@ -2161,3 +2161,30 @@ function getLingbaoLevelChance( level , fall)
     end
     return EnchantlingbaoLevel[level][fall];
 end
+
+local FeiShengDanNeed = {
+   { 47,20},{ 48,20},{ 49,20},{ 50,20},{ 51,20},
+   {56,5},{5003,20},{5013,20},{5023,20},{5033,20}
+}
+local FeiShengDanGoods = { 17000,17001}
+function getFeiShengDan(player,opt)
+    print("opt"..opt)
+    local package = player:GetPackage();
+    for i = 1,#FeiShengDanNeed do
+        local count = package:GetItemAnyNum(FeiShengDanNeed[i][1])
+        if count < FeiShengDanNeed[i][2] then
+            print("id: "..FeiShengDanNeed[i][1])
+            print("count: "..count)
+            print("need: "..FeiShengDanNeed[i][2])
+            return 0;
+        end
+    end
+
+    print("XXXX")
+    for i = 1,#FeiShengDanNeed do
+        --if ~package:DelItemAny(FeiShengDanNeed[i][1],FeiShengDanNeed[i][2]) then
+        print("XXXX")
+        package:DelItem(FeiShengDanNeed[i][1],FeiShengDanNeed[i][2])
+    end
+    package:AddItem(FeiShengDanGoods[opt], 1, true, 0, 39);
+end

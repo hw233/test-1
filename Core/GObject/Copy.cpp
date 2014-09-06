@@ -24,9 +24,11 @@ namespace GObject
 {
 #define PRIVILEGE_COUNT 1
 #define MAX_COPY_ID 11
+#define MAX_COPY_ID2 115
 
 UInt8 PlayerCopy::_activeCount = 0;
 static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871, 4628};
+static UInt16 spots2[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871, 4628};  //仙界副本
 
 static UInt8 GetCopyIdBySpots(UInt16 currentSpot)
 {
@@ -34,6 +36,11 @@ static UInt8 GetCopyIdBySpots(UInt16 currentSpot)
     {
         if(spots[i] == currentSpot)
             return (i+1);
+    }
+    for(UInt8 i = 0; i < sizeof(spots2)/sizeof(spots2[0]); i++)
+    {
+        if(spots2[i] == currentSpot)
+            return (i+100);
     }
     return 1;
 }
@@ -196,16 +203,24 @@ bool copyCheckLevel(Player* pl, UInt8 id)
     static UInt8 lvls[] = {30, 45, 60, 70, 80, 90, 100, 110, 120, 130, 140};
     //static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512};
 
-    if (id > sizeof(lvls)/sizeof(UInt8))
+    if (id < 100 && id > sizeof(lvls)/sizeof(UInt8))
         return false;
 
-    if (pl->getLocation() != spots[id-1])
+    if(id < 100)
+    {
+        if (pl->getLocation() != spots[id-1])
+        {
+            SYSMSG_SENDV(2243, pl);
+            return false;
+        }
+    }
+    else if(pl->getLocation() != spots2[id-100])
     {
         SYSMSG_SENDV(2243, pl);
-        return false;
+        //return false;   //XXX
     }
 
-    if (pl->GetLev() < lvls[id-1]) {
+    if (id < 100 && pl->GetLev() < lvls[id-1]) {
         SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
         return false;
     }
@@ -252,14 +267,30 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         SYSMSG_SENDV(2000, pl);
         return 1;
     }
-
-    if (PLAYER_DATA(pl, copyFreeCnt) < getFreeCount()) {
-        ++PLAYER_DATA(pl, copyFreeCnt);
-        DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %" I64_FMT "u",
-                PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
+    UInt8 copyFreeCnt = PLAYER_DATA(pl, copyFreeCnt);
+    UInt8 copyGoldCnt = PLAYER_DATA(pl, copyGoldCnt);
+    if(id >= 100)
+    { 
+        copyFreeCnt = pl->GetVar(VAR_FAIRYCOPY_FREE);
+        copyGoldCnt = pl->GetVar(VAR_FAIRYCOPY_GOLD);
+    } 
+    if ( /*PLAYER_DATA(pl, copyFreeCnt)*/ copyFreeCnt  < getFreeCount()) {
+        //++PLAYER_DATA(pl, copyFreeCnt);
+        copyFreeCnt++;
+        //PLAYER_DATA(pl, copyFreeCnt) = copyFreeCnt +1;
+        if(id < 100)
+        {
+            DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %" I64_FMT "u",
+                    /*PLAYER_DATA(pl, copyFreeCnt)*/copyFreeCnt, /*PLAYER_DATA(pl, copyGoldCnt)*/ copyFreeCnt, pl->getId());
+            PLAYER_DATA(pl, copyFreeCnt) = copyFreeCnt;
+        }
+        else
+        {
+           pl->SetVar(VAR_FAIRYCOPY_FREE,copyFreeCnt);
+        }
         pl->copyUdpLog(id, 1);
         return 0;
-    } else if (PLAYER_DATA(pl, copyGoldCnt) < getGoldCount(pl->getVipLevel())) {
+    } else if (/*PLAYER_DATA(pl, copyGoldCnt)*/ copyGoldCnt < getGoldCount(pl->getVipLevel())) {
         UInt32 gold = getEnterGold(pl);
         if (pl->getGold() < gold) {
             pl->sendMsgCode(0, 1104);
@@ -269,14 +300,23 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         ConsumeInfo ci(EnterCopy,0,0);
         pl->useGold(gold, &ci);
 
-        ++PLAYER_DATA(pl, copyGoldCnt);
+        //++PLAYER_DATA(pl, copyGoldCnt);
+        ++copyGoldCnt;
          
-        if(PLAYER_DATA(pl, copyGoldCnt) == getGoldCount(pl->getVipLevel()) && World::get11Time() && pl->getClan()!=NULL)
+        if(/*PLAYER_DATA(pl, copyGoldCnt)*/ copyGoldCnt == getGoldCount(pl->getVipLevel()) && World::get11Time() && pl->getClan()!=NULL)
             SYSMSG_BROADCASTV(4957, pl->getClan()->getName().c_str(),pl->getCountry(), pl->getPName());
        
-        DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %" I64_FMT "u",
-                PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
-        lootlvl = PLAYER_DATA(pl, copyGoldCnt);
+        if(id < 100)
+        {
+            PLAYER_DATA(pl, copyGoldCnt) = copyGoldCnt;
+            DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %" I64_FMT "u",
+                    PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
+            lootlvl = PLAYER_DATA(pl, copyGoldCnt);
+        }
+        else
+        { 
+            pl->SetVar(VAR_FAIRYCOPY_GOLD,copyGoldCnt);
+        } 
         pl->copyUdpLog(id, 3);
         return 0;
     } else {
@@ -377,7 +417,10 @@ UInt8 PlayerCopy::getCopyFloors(UInt8 id)
 
 UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 {
-    if (!pl || !id || id > MAX_COPY_ID)
+    if (!pl || !id || !(id <= MAX_COPY_ID || (id >= 100 && id < MAX_COPY_ID2)))
+        return 0;
+
+    if(id >= 100 && pl->GetLev() < 120 )
         return 0;
 
 	FastMutex::ScopedLock lk(_mutex); // XXX:

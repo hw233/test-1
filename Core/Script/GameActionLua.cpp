@@ -1993,5 +1993,10 @@ namespace Script
 		assert(player != NULL);
         return Call<bool>("getRedBeanAward", player, index, count);
     }
+    bool GameActionLua::getFeiShengDan(Player * player, UInt8 index)
+    {
+		assert(player != NULL);
+        return Call<bool>("getFeiShengDan", player, index);
+    }
 }
 

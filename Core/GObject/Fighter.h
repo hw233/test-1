@@ -171,6 +171,7 @@ struct ElixirAttr
 };
 
 class Player;
+class Evolution;
 class Fighter
 {
 public:
@@ -247,7 +248,8 @@ public:
     inline bool isPeerlessUp(UInt16 pl) { return SKILL_ID(peerless) == SKILL_ID(pl); }
     // 是否有pl这个可装备的无双技能
     int hasPeerless(UInt16 pl);
-
+    
+  
     inline void SetPowerUpByP(float up) { _powerUp = up; }
     inline float GetPowerUp(){ return _powerUp; }
     inline void ClearPowerUp(){ _powerUp = 0; }
@@ -541,6 +543,7 @@ public:
     inline std::vector<LBSkill>& getLBSkill() { return _lbSkill; }
     ItemEquip* setLingbao( UInt8 idx , ItemEquip* lingbao, bool = true);
     void loadLingbao(std::string& lb);
+    void loadEvolutionEquip(std::string& ee);
     void loadLBSkill(std::string& lbSkill);
     bool addLBSkill(UInt32 lbid, UInt16 skillid, UInt16 factor);
     bool delLBSkill(UInt32 lbid);
@@ -700,6 +703,9 @@ public:
     inline float getExtraMagResLevel() { checkDirty(); return _attrExtraEquip.mreslvl; }
     inline float getExtraCriticalDmgImmune() { checkDirty(); return _attrExtraEquip.criticaldmgimmune; }
 
+    inline float getExtraFairyAtk(){ checkDirty(); return _attrExtraEquip.fairyAck;}
+    inline float getExtraFairyDef(){ checkDirty(); return _attrExtraEquip.fairyDef;}
+
 public:
     inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }
 	inline void setExtraMagAttack(Int32 atk) { setDirty(true); _wbextmagatk = atk; }
@@ -816,7 +822,7 @@ public:
     UInt16 getPracticePlace();
     bool isGoldPractice() { return false; }
 
-	void addAttr( ItemEquip * );
+	void addAttr( ItemEquip *,UInt8 flag = 0 );
 	void addTrumpAttr( ItemEquip* );
 	void addLingbaoAttr( ItemEquip* );
     void addAttr( const GData::CittaEffect* ce );
@@ -825,8 +831,8 @@ public:
 
     void getAttrExtraEquip(Stream& st);
 protected:
-    void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext );
-    void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce );
+    void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext ,UInt8 flag = 0 );
+    void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce ,UInt8 flag = 0);
     void addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
     void addAttrExtraXCGem( GData::AttrExtra& ae, GData::ItemGemType * igt );
     void addLingshiAttr( ItemEquip* );
@@ -1108,10 +1114,12 @@ private:
     XinMoData m_xinmo;
     UInt8 lingbaoLevel[3];
     UInt32 lingbaoFall[3];  //祝福值
+    Evolution * _evl;
 public:
     inline Xingchenzhen& getXingchen() { return m_xingchen; }
     inline UInt8 getXingchenLvl()  {return m_xingchen.lvl;}
 
+    Evolution * getEvolution();
     inline UInt8 getLingbaoLevel(UInt8 type) { if (type > 2) return 0; return lingbaoLevel[type];}
     inline void setLingbaoLevel(UInt8 type ,UInt8 val){ if(type > 2) return; lingbaoLevel[type] = val; }
 
