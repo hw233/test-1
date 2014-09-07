@@ -2773,7 +2773,7 @@ void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 	GObject::Dungeon * dg = GObject::dungeonManager[dir.type];
 	if(dg == NULL)
 		return;
-    if(pl->getLocation() != dg->location)
+    if(pl->getLocation() != dg->getLocation())
         return;
     UInt8 result = 0;
     Stream st(REP::COPY_DATA_UPDATE);
@@ -2854,7 +2854,7 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 	GObject::Dungeon * dg = GObject::dungeonManager[dar.type];
 	if(dg == NULL)
 		return;
-    if(pl->getLocation() != dg->location)
+    if(pl->getLocation() != dg->getLocation())
         return;
 	dg->autoChallenge(pl, dar.mtype, dar.difficulty);
     pl->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 1);
