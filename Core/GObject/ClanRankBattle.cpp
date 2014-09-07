@@ -2641,6 +2641,10 @@ namespace GObject
     {
         if(!cfg.merged)
             return;
+        /* 所有人移走
+        GameMsgHdr hdr(0x1F4, WORKER_THREAD_WORLD, NULL, 0);
+        GLOBAL().PushMsg(hdr, NULL);*/
+
         //各本服单独排名，并且分山头
         for(ClanVec::iterator iter = m_ClanRanking.begin(); iter != m_ClanRanking.end(); ++iter)
         {

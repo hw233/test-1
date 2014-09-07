@@ -123,6 +123,7 @@ MSG_REG_2(GameMsgHdr, 0x155, OnCoolSummerReturn);
 MSG_REG_2(GameMsgHdr, 0x156, SetCoolSummerRank);
 MSG_REG_2(GameMsgHdr, 0x157, SetSeekingHerCharmRank);
 MSG_REG_2(GameMsgHdr, 0x158, SetSeekingHerBeanTotalRank);
+MSG_REG_2(GameMsgHdr, 0x159, SetCarnivalConsumeRank);
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
@@ -153,6 +154,9 @@ MSG_REG_2(GameMsgHdr, 0x182, OnSeekingHer_ReturnStatus);
 MSG_REG_2(GameMsgHdr, 0x183, OnSeekingHer_RankTopInfo);
 MSG_REG_2(GameMsgHdr, 0x184, OnSeekingHer_RankInfo);
 MSG_REG_2(GameMsgHdr, 0x185, OnSeekingHer_FriendInfo);
+
+MSG_REG_2(GameMsgHdr, 0x188, OnCarnivalRankReturn);
+MSG_REG_2(GameMsgHdr, 0x189, OnCarnivalMoneyBagReturn);
 
 MSG_REG_2(GameMsgHdr, 0x198, OnPopTimerEvent);
 MSG_REG_2(GameMsgHdr, 0x199, OnPushTimerEvent);

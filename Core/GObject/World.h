@@ -657,14 +657,35 @@ public:
     } 
     inline static bool getCoolSummer(UInt32 time = 0)
     {
-        UInt32 begin = TimeUtil::MkTime(2014, 7, 1);
-        UInt32 end = TimeUtil::MkTime(2014, 7, 7);
+        UInt32 begin = TimeUtil::MkTime(2014, 9, 21);
+        UInt32 end = TimeUtil::MkTime(2014, 9, 26);
         UInt32 now = TimeUtil::Now() + time;
         if((now >= begin && now <= end))
             return true;
         else
             return false;
     }
+    inline static bool getGratitudeGiving(UInt32 time = 0, UInt32 time1 = 0)
+    {
+        UInt32 begin = TimeUtil::MkTime(2014, 9, 11);
+        UInt32 end = TimeUtil::MkTime(2014, 9, 17) + time1;
+        UInt32 now = TimeUtil::Now() + time;
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    }
+    inline static bool getCarnivalConsume(UInt32 time = 0)
+    {
+        UInt32 begin = TimeUtil::MkTime(2014, 9, 11);
+        UInt32 end = TimeUtil::MkTime(2014, 9, 16);
+        UInt32 now = TimeUtil::Now() + time;
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    }
+
     inline static bool  getMonsterAndPetTime()  // 妖王，珍兽消费减半
     {
         UInt32 begin = GVAR.GetVar(GVAR_MOSTER_PET_BEGIN);
@@ -1539,6 +1560,7 @@ public:
     static RCSortType seekingHerNiuLangSort;     //众里寻她牛郎榜排名
     static RCSortType seekingHerZhiNvSort;     //众里寻她织女榜排名
     static RCSortType seekingHerCharmSort;     //众里寻她魅力值排名
+    static RCSortType carnivalConsumeSort;     //狂欢购物排名
     static void initRCRank();
     static void initRP7RCRank();
     static void WorldCupAward(UInt8 num , UInt32 res);  //公布答案
@@ -1677,6 +1699,7 @@ public:
     void SendSeekingHerNiuLangAward();
     void SendSeekingHerZhiNvAward();
     void SendSeekingHerCharmAward();
+    void SendCarnivalConsumeAward();
 
 private:
 	void testUpdate();
