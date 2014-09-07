@@ -10493,12 +10493,63 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                     default :
                         break;
                 }
-
-
-
             }
-
-
+            break;
+        case 4:
+            {
+                UInt8 type = 0;
+                br >> type;
+                switch(type)
+                { 
+                    case 1:
+                        { 
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt) 
+                                return ;
+                            Stream st(REP::EXTEND_PROTOCAOL);
+                            st << static_cast<UInt8>(0x04);
+                            st << static_cast<UInt8>(0x01);
+                            st << static_cast<UInt16>(fgt->getId());
+                            st << fgt->getIncense();
+                            st << Stream::eos;
+                            player->send(st);
+                        } 
+                    case 2:
+                        {
+                            UInt16 fighterId = 0; 
+                            br >> fighterId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt) 
+                                return ;
+                            UInt8 flag = 0;
+                            br >>flag;
+                            UInt8 count = 0;
+                            br >> count ;
+                            UInt32 exp = player->UseIncenseGood(fgt->getIncense(),flag,count);
+                            if(exp)
+                            {
+                                fgt->addIncense(exp);
+                                fgt->UpdateIncenseToDB();
+                                player->setFightersDirty(true);
+                            }
+                            Stream st(REP::EXTEND_PROTOCAOL);
+                            st << static_cast<UInt8>(0x04);
+                            st << static_cast<UInt8>(0x02);
+                            st << static_cast<UInt16>(fgt->getId());
+                            if(type && exp > 40*count)
+                                st << static_cast<UInt8>(2);
+                            else
+                                st << static_cast<UInt8>(!exp);
+                            st << fgt->getIncense();
+                            st << static_cast<UInt8>(flag);
+                            st << Stream::eos;
+                            player->send(st);
+                        }
+                } 
+            }
+            break;
     }
 }
 

@@ -617,6 +617,11 @@ struct DBDrinkAttrConfig
     UInt32 value;
     UInt32 hp;
 };
+struct DBIncenseAttrConfig
+{
+    UInt32 val;
+    UInt32 up;
+};
 struct DBJiguanyuConfig
 {
     UInt32 jiguanyuId;
@@ -1666,6 +1671,13 @@ SPECIALDEF(2)
 (
     UInt32 , value,
     UInt32 , hp
+)
+SPECIALEND()
+SPECIALBEGIN(GData::DBIncenseAttrConfig)
+SPECIALDEF(2)
+(
+    UInt32 , val,
+    UInt32 , up
 )
 SPECIALEND()
 

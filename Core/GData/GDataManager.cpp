@@ -37,6 +37,7 @@
 #include "FairyPetTable.h"
 #include "XingchenData.h"
 #include "DrinkAttr.h"
+#include "IncenseTable.h"
 #include "PictureAttr.h"
 #include "JiguanData.h"
 #include "HunPoData.h"
@@ -548,6 +549,12 @@ namespace GData
         if (!LoadLingbaoLevel())
         {
             fprintf (stderr, "Load LoadLingbaoLevel Error !\n");
+            std::abort();
+        }
+
+        if (!LoadIncenseAttrConfig())
+        {
+            fprintf (stderr, "Load LoadIncenseAttrConfig Error !\n");
             std::abort();
         }
 
@@ -3171,6 +3178,22 @@ namespace GData
             DrinkAttr::stDrinkAttr da;
             da.hp = dbda.hp;
             drinkAttrData.setDrinkAttrTable(dbda.value , da);
+        }
+        return true;
+    }
+    bool GDataManager::LoadIncenseAttrConfig()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBIncenseAttrConfig  dbda;
+		if(execu->Prepare("SELECT `val`, `up`  FROM `incenseAttr`", dbda) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbda.val)
+                incenseData.setIncenseAttrTable(dbda.val , dbda.up);
         }
         return true;
     }

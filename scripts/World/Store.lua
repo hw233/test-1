@@ -145,6 +145,7 @@ function loadStore()
 
     store:add(2 ,9457 ,20)
     store:add(2,554,20)
+    store:add(2,556,30)
 
     if  getWorldCupTime(30) or getWorldCupTime2(30) then
         store:add(2 ,16017 ,20)
