@@ -4472,47 +4472,5 @@ void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
 
-void ThreeYearInfoReturn(LoginMsgHdr& hdr, const void* data)
-{
-	BinaryReader br(data, hdr.msgHdr.bodyLen);
-    CHKKEY();
-    UInt8 type = 0;
-    br >> type;
-    UInt16 serverNo = 0;
-
-    GObject::Player* player = NULL;
-    if(type == 1)
-    {
-        UInt64 pid;
-        br >> pid;
-        if(cfg.merged)
-        {
-            br>>serverNo;
-            pid += (static_cast<UInt64>(serverNo) << 48);
-        }
-        player = GObject::globalPlayers[pid];
-    }
-    else if(type == 2)
-    {
-        std::string playerName;
-        br >> playerName;
-        if(cfg.merged)
-        {
-            br>>serverNo;
-            serverNameToGlobalName(playerName, serverNo);
-        }
-        player = GObject::globalNamedPlayers[playerName];
-    }
-    else
-        return;
-
-    if(!player)
-        return;
-
-    Int32 sessionID = hdr.sessionID;
-    GameMsgHdr imh(0x28F, player->getThreadId(), player, sizeof(sessionID));
-    GLOBAL().PushMsg(imh, &sessionID);
-}
-
 #endif // _LOGINOUTERMSGHANDLER_H_
 

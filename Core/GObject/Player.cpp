@@ -20670,7 +20670,7 @@ void Player::resetCopyFrontWinAward(bool fresh)
         Table award = GameAction()->getCopyFrontmapAward(step, GetVar(VAR_CF_LOCATION), GetVar(VAR_CF_FLAG));
         if (award.size() < 2)
         {
-            printf("award.size() < 2\n");
+            printf("award.size() < 2(%u)\n", award.size());
             continue;
         }
         cf_itemId[i] = award.get<UInt32>(1);
