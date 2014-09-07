@@ -28672,11 +28672,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 {{9360,5},  {9093,5}, {0,0}, {50,10}},
                 {{9418,5}, {9414,5}, {9424,5}, {100,10}},
                 {{555,10}, {556,5}, {0,0}, {200,10}},
-                {{9338,5}, {554,5}, {0,0},{280,10}},
+                {{9338,5}, {554,5}, {0,0},{220,10}},
                 {{16001,5}, {16000,5}, {0,0},{75,10}},
                 {{9498,10}, {9497,5}, {0,0},{180,10}},
                 {{9600,10}, {9500,5}, {0,0},{100,10}},
-                {{9021,5}, {9075,5}, {0,0},{1198,5}},
+                {{9021,5}, {9068,5}, {0,0},{1198,5}},
                 {{1733,1}, {0,0}, {0,0},{999,2}},
             };
 
@@ -29017,7 +29017,33 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                         UInt8 dayChoice = (TimeUtil::Now() - GVAR.GetVar(GVAR_TYSS_BEGIN)) / 86400;
                         if(dayChoice > 5)
                                 return;
+                        if(GetPetPackage()->GetPetGemPgRestSize() < 1)
+                        {
+                            sendMsgCode(0, 1094);
+                            return;
+                        }
                         GetPackage()->Add(everydayAward1[flag - 1][dayChoice][0], everydayAward1[flag - 1][dayChoice][1] , true, false, FromTYSS);
+                        UInt8 op_color = 3;
+                        switch(dayChoice)
+                        {
+                            case 0:
+                                SYSMSG_BROADCASTV(5225, getCountry(), getName().c_str(),op_color);
+                                break;
+                            case 1:
+                                SYSMSG_BROADCASTV(5226, getCountry(), getName().c_str(),op_color);
+                                break;
+                            case 2:
+                                SYSMSG_BROADCASTV(5227, getCountry(), getName().c_str(),op_color);
+                                break;
+                            case 3:
+                                SYSMSG_BROADCASTV(5228, getCountry(), getName().c_str(),op_color);
+                                break;
+                            case 4:
+                                SYSMSG_BROADCASTV(5229, getCountry(), getName().c_str(),op_color);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
                 SetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY,SET_BIT(GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY), (26 + flag)));//打上当日领取奖品的标记
