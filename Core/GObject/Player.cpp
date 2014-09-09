@@ -28943,7 +28943,9 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 return;*/
             UInt32 todayContribution = GetVar(VAR_TYSS_CONTRIBUTE_PLAYER_DAY);
             UInt8 awardStatus[5] = {0};
-            UInt32 needContriLevel[5] = { 50, 100, 300, 700, 2500};
+            UInt32 needContriLevel[5] = { 50, 100, 300, 700, 1800};
+            if(actType == 2)
+                needContriLevel[4] = 2500;
             for(UInt8 i = 0; i < 5; i++)
             {
                 awardStatus[i] = GET_BIT(todayContribution, (27 + i));
