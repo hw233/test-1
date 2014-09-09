@@ -356,6 +356,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20130429_1.sql   #中秋节节日套装(var294)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140818_addInsensevim.sql     #添加心法增幅(燃香)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140820_clearGvar95_99.sql     #清除一战成名时间控制
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140422_1.sql     #周年好礼送不停
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_shakemoneybag.sql     #创建狂欢大购物摇钱袋记录表
 }
 
 #sh player_jiguan.sh

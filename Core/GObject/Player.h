@@ -307,6 +307,7 @@ namespace GObject
         TAIYI       = 22,   //太乙神雷
         SANGBA       = 23,   //桑巴荣耀
         PUDU        = 24,   //普渡众生
+        QTDS        = 25,   //齐天大圣
 
         DRAGONKING_MAX,
     };
@@ -914,6 +915,12 @@ namespace GObject
         UInt32 date;
         UInt32 count;
         UInt8 beantype;
+    };
+
+    struct ShakeMoneyBagLog
+    {
+        UInt32 date;
+        UInt32 count;
     };
 
 	struct PlayerData
@@ -3616,10 +3623,15 @@ namespace GObject
         void seekingHer_SendBeans(UInt64 , UInt8 , UInt32 , std::string );
         void seekingHer_Announce(std::string );
         void seekingHer_GetSendBeanLog();
+        void getShakeMoneyBagLog();
+        void sendShakeMoneyBagInfo();
         void SetSeekingHerSendBeanLog(UInt64 &, UInt32 &, UInt32 &, UInt8 &, bool);
+        void SetShakeMoneyBagLog(UInt32 , UInt32 , bool);
         void getSeekingHerCharmAward();
+        void CarnivalConsumeAct(UInt32);
         std::string _seekingHerMyAnnounce;
         std::vector<SeekingHerSendBeanLog *> _seekingHerSendBeanLog;
+        std::vector<ShakeMoneyBagLog *> _shakeMoneyBagLog;
 
         inline std::string getMyAnnouncement() { return _seekingHerMyAnnounce; }
         inline void setMyAnnouncement(std::string & an, bool toDB)

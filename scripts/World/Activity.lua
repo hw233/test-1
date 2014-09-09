@@ -786,7 +786,7 @@ function onActivityCheck(tm)
           setNeedConsumeRank(false)
       end
 
-      if tm >= actTime2013_04_14 and tm < actTime2013_04_14+510*86400 then
+      if tm >= actTime2013_04_14 and tm < actTime2013_04_14+517*86400 then
           -- RECHARGE
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
@@ -1164,7 +1164,7 @@ function onActivityCheck(tm)
   end
 
   -- ACC
-  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 225*86400) then
+  if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 232*86400) then
       setAccRecharge(true)
   else
       setAccRecharge(false)

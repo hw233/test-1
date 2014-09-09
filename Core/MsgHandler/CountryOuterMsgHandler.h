@@ -1474,6 +1474,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->getNewYearGiveGiftAward(0,0);
     pl->firstPotOfGoldReturn(0);
+    pl->sendShakeMoneyBagInfo();
 
     {
         GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
@@ -2444,9 +2445,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             br >> type;
             if(2 == type)
                 player->shakeMoneyBag();
-            if(!World::getCarnivalConsume())
-                return;
-            if(0 == type)
+            else if(0 == type)
             {
                 GameMsgHdr hdr(0x189, WORKER_THREAD_WORLD, player, 0);
                 GLOBAL().PushMsg(hdr, NULL);
@@ -2456,6 +2455,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 GameMsgHdr hdr(0x188, WORKER_THREAD_WORLD, player, 0);
                 GLOBAL().PushMsg(hdr, NULL);
             }
+            else if(3 == type)
+                player->getShakeMoneyBagLog();
         }
 
         default:
@@ -5946,14 +5947,18 @@ void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
             UInt32 npcGroupId = 0;
             UInt32 monsterId = 0;
             br >> npcGroupId >> monsterId;
-            petTeamCopyManager->createTeam(player, npcGroupId, monsterId);
+            std::string pwd;
+            br >> pwd;
+            petTeamCopyManager->createTeam(player, npcGroupId, monsterId, pwd);
         }
         break;
     case 0x07:
         {
             UInt32 teamId = 0;
             br >> teamId;
-            petTeamCopyManager->joinTeam(player, teamId);
+            std::string pwd;
+            br >> pwd;
+            petTeamCopyManager->joinTeam(player, teamId, pwd);
         }
         break;
     case 0x08:

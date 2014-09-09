@@ -176,8 +176,9 @@ enum PurchaseType
     MOFUMIZHEN2                 = 1037, //墨符迷阵购买次数
     MakeGear                    = 1038, //打造机关库
     WeiWeiShop                  = 1039, //购买微信商店物品
-    KETTLE                    = 1040, //炼妖壶
+    KETTLE                      = 1040, //炼妖壶
     DARKDARGON                  = 1041, //黯龙王
+    UNKNOWN                     = 1042, //不明确消费类型
     //繁体私有占150～200
 };
 

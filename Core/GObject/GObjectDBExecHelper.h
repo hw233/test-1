@@ -1326,6 +1326,13 @@ struct DBSeekingHerSendBeanLog
     UInt8 beantype;
 };
 
+struct DBShakeMoneyBagLog
+{
+    UInt64 playerId;
+    UInt32 date;
+    UInt32 count;
+};
+
 struct DBAirBookData
 {
     UInt64 playerId;
@@ -3365,6 +3372,15 @@ SPECIALDEF(5)
     UInt32, date,
     UInt32, count,
     UInt8, beantype
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBShakeMoneyBagLog)
+SPECIALDEF(3)
+(
+    UInt64, playerId,
+    UInt32, date,
+    UInt32, count
 )
 SPECIALEND()
 

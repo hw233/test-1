@@ -3661,18 +3661,22 @@ void OnCarnivalMoneyBagReturn( GameMsgHdr& hdr,  const void* data )
     st << static_cast<UInt8>(0x15);
     st << static_cast<UInt8>(0);
     st << player->GetVar(VAR_CARNIVAL_CONSUME_TODAY_TOTAL);
+    st << player->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
     UInt32 rank = 0;
+    UInt32 pos = 1;
 
     for (RCSortType::iterator i = World::carnivalConsumeSort.begin(), e = World::carnivalConsumeSort.end(); i != e; ++i)
     {
-        rank ++;
         if (i->player == player)
         {
+            rank = pos;
             break;
         }
+        pos ++;
     }
     st << rank;
-    st << player->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
+    st << player->GetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE);
+    st << static_cast<UInt8>(player->GetVar(VAR_CARNIVAL_CONSUME_REBATE_FLAG));
     st << static_cast<UInt8>(player->GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES));
     st << Stream::eos;
     player->send(st);
