@@ -3104,15 +3104,15 @@ void OnPaperQuestion(GameMsgHdr & hdr ,const void *data)
         case 2:
         {
             UInt16 option = 0;
-            string str;
+            std::string str;
             UInt8 flag = 0;
             br >> option >> flag;
             if(flag)
             {
                 br >> str; 
-                string str_sql= "'";
-                string str_sql1= "|";
-                string str_sql2= ";";
+                std::string str_sql= "'";
+                std::string str_sql1= "|";
+                std::string str_sql2= ";";
                 while(str.find(str_sql) != std::string::npos)
                     str.replace(str.find(str_sql),str_sql.length(),"//");
                 while(str.find(str_sql1) != std::string::npos)

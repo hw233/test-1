@@ -190,7 +190,7 @@ void QuestionPaper::AnswerQuestion(Player* pl,UInt16 option,string ext_answer)
         
         DB4().PushUpdateData("UPDATE `questionpaper` SET `answer` = '%s', `award` = '%s' WHERE `playerid` = %" I64_FMT "u", str_answer.c_str(), str_award.c_str(),pl->getId());
         char str[32] = {0};
-        sprintf(str, "F_140912_%d",(idx+1));
+        sprintf(str, "F_140912_%d",(idx));
         pl->udpLog("yonghudiaoyan", str, "", "", "", "", "act");
         UInt16 bit_num = 0;
         while(option != 0)
@@ -198,7 +198,7 @@ void QuestionPaper::AnswerQuestion(Player* pl,UInt16 option,string ext_answer)
             if(GET_BIT(option,0))
             {
                 char str1[32] = {0};
-                sprintf(str1, "F_140912_%d_%d",(idx+1),(bit_num+1));
+                sprintf(str1, "F_140912_%d_%d",(idx),(bit_num+1));
                 pl->udpLog("yonghudiaoyan", str1, "", "", "", "", "act");
             }
             option = option >> 1;
