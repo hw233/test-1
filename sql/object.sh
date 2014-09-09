@@ -360,6 +360,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140422_1.sql     #周年好礼送不停
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_shakemoneybag.sql     #创建狂欢大购物摇钱袋记录表
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar606.sql        #清除掉落活动
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar844.sql        #众里寻他掉落状态
 }
 
 #sh player_jiguan.sh
