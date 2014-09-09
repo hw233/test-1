@@ -29230,7 +29230,7 @@ void Player::GetFindOldManAward(UInt32 type)
         num =2;
         SYSMSG_BROADCASTV(574, getCountry(), getPName(), type );
     }
-    GetPackage()->AddItem(16041, num, true, false);   //欢乐礼包(9439) 其他活动要修改
+    GetPackage()->AddItem(16011, num, true, false);   //欢乐礼包(9439) 其他活动要修改
     AddVar(VAR_OLDMAN_DAYSCORE,num*10);
     AddVar(VAR_OLDMAN_SCORE,num*10);
     SYSMSG_SENDV(2024,this,num*10);
@@ -29287,7 +29287,7 @@ void Player::sendInterestingBag(Player* pl)
         sendMsgCode(0, 2218);
         return ;
     }
-    ItemBase* item = GetPackage()->GetItem(16041, true);					
+    ItemBase* item = GetPackage()->GetItem(16011, true);					
     if(item ==NULL)
         return ;
     UInt16 count = item->Count();
@@ -29298,7 +29298,7 @@ void Player::sendInterestingBag(Player* pl)
         return;
     }
     GetPackage()->DelItem2(item, 1);
-    GetPackage()->AddItemHistoriesLog(16041, 1);
+    GetPackage()->AddItemHistoriesLog(16011, 1);
     UInt64 id = getId();
     GameMsgHdr hdr(0x356, pl->getThreadId(),pl,sizeof(id) );
     GLOBAL().PushMsg(hdr, &id);
@@ -29319,7 +29319,7 @@ void Player::getInteresingBag(UInt64 pid)
         Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
         if(mail)
         {
-            MailPackage::MailItem mitem[] = {{15, 1},{500,1},{513,1},{516,1},{503,1},{9414,1},{9457,1}};
+            MailPackage::MailItem mitem[] = {{57, 1},{15,1},{500,1},{9371,1},{501,1},{9600,1},{503,1}};
             UInt32 chance[] = {2500,5000,7000,8000,9000,9500,10000};
             UInt32 rand = uRand(10000);
             UInt8 k =0;
@@ -29365,7 +29365,7 @@ void Player::sendOldManPos(UInt8 type)
     UInt32 gold = 5;
     if(type==0)
     {
-        if(time % 3600 < 5)
+        if(time % 3600 < 5 || time % 3600 > 3595)
         {
             sendMsgCode(0, 4053);
             return ;
