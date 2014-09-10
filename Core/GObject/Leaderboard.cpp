@@ -1266,7 +1266,7 @@ void Leaderboard::sendMyRechargeRank(Player * player)
     st << static_cast<UInt8>(2) << static_cast<UInt8>(6) << static_cast<UInt8>(1);
     std::map<UInt64, AllServersRecharge>::iterator it = _rechargeSelf.find(player->getId());
     if(it != _rechargeSelf.end())
-        st << player->GetVar(VAR_RECHARGE_TOTAL) << it->second.rank;
+        st << player->GetVar(VAR_PRIVATE_RECHARGE) << it->second.rank;
     else
         st << static_cast<UInt32>(0) << static_cast<UInt32>(0);
     st << Stream::eos;
@@ -1310,7 +1310,7 @@ void Leaderboard::giveRechargeRankAward()
     std::vector<AllServersRecharge>::iterator it;
     for(it = _rechargeRank100.begin(); it != _rechargeRank100.end(); ++ it)
     {
-        if((*it).rank && (*it).rank <= 10)
+        if((*it).rank && (*it).rank <= 3)
         {
             SYSMSGV(buf, 835, (*it).rank, (*it).country >> 4, (*it).name.c_str(), (*it).total);
             str += buf;
@@ -1323,57 +1323,117 @@ void Leaderboard::giveRechargeRankAward()
         UInt16 count1 = 0, count2 = 0, count3 = 0, count4 = 0;
         if((*it).rank == 1)
         {
-            count1 = 150; count2 = 150;
-            count3 = 88; count4 = 88;
+            count1 = 180; count2 = 180;
+            count3 = 100; count4 = 100;
         }
         else if((*it).rank == 2)
         {
-            count1 = 130; count2 = 130;
-            count3 = 68; count4 = 68;
+            count1 = 160; count2 = 160;
+            count3 = 88; count4 = 88;
         }
         else if((*it).rank == 3)
         {
-            count1 = 100; count2 = 100;
+            count1 = 140; count2 = 140;
+            count3 = 66;  count4 = 66;
+        }
+        else if((*it).rank >= 4 && (*it).rank <= 10)
+        {
+            count1 = 120; count2 = 120;
             count3 = 50;  count4 = 50;
         }
-        else if((*it).rank >= 4 && (*it).rank <= 7)
+        else if((*it).rank >= 11 && (*it).rank <= 20)
+        {
+            count1 = 100; count2 = 100;
+            count3 = 40;  count4 = 40;
+        }
+        else if((*it).rank >= 21 && (*it).rank <= 50)
         {
             count1 = 80; count2 = 80;
-            count3 = 35;  count4 = 35;
+            count3 = 30; count4 = 30;
         }
-        else if((*it).rank >= 8 && (*it).rank <= 14)
+        else if((*it).rank >= 51 && (*it).rank <= 60)
         {
             count1 = 60; count2 = 60;
-            count3 = 25;  count4 = 25;
+            count3 = 20; count4 = 20;
         }
-        else if((*it).rank >= 14 && (*it).rank <= 20)
+        else if((*it).rank >= 61 && (*it).rank <= 80)
         {
             count1 = 40; count2 = 40;
-            count3 = 15; count4 = 15;
+            count3 = 20; count4 = 20;
         }
-        else if((*it).rank >= 21 && (*it).rank <= 30)
+        else if((*it).rank >= 81 && (*it).rank <= 100)
         {
             count1 = 20; count2 = 20;
             count3 = 10; count4 = 10;
         }
-        else if((*it).rank >= 31 && (*it).rank <= 50)
-        {
-            count1 = 10; count2 = 10;
-            count3 = 5; count4 = 5;
-        }
         else
             continue;
         SYSMSGV(content2, 830, player->getCountry(), player->getName().c_str(), (*it).rank, (*it).total);
-        MailPackage::MailItem item[] = {{9424, count1}, {9414, count2}, {9022, count3}, {9068, count4},};
+        MailPackage::MailItem item[] = {{9600, count1}, {9498, count2}, {9022, count3}, {9075, count4},};
         MailItemsInfo itemsInfo(item, Activity, 4);
         Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title2, content2, 0xFFFE0000, true, &itemsInfo);
         if(mail)
              mailPackageManager.push(mail->id, item, 4, true);
+
+        //定制法宝或称号卡提示
         if((*it).rank == 1)
         {
             SYSMSGV(title, 833);
             SYSMSGV(content, 834, player->getCountry(), player->getName().c_str());
             Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title, content);
+            if(mail)
+                mail->writeMailLog(player, Activity);
+        }
+        else if((*it).rank == 2)
+        {
+            SYSMSGV(title, 836);
+            SYSMSGV(content, 837, player->getCountry(), player->getName().c_str());
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title, content);
+            if(mail)
+                mail->writeMailLog(player, Activity);
+        }
+
+        //实物奖励提示
+        SYSMSGV(title3, 838);
+        if((*it).rank == 1)
+        {
+            SYSMSGV(content, 839, player->getCountry(), player->getName().c_str(), (*it).rank);
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title3, content);
+            if(mail)
+                mail->writeMailLog(player, Activity);
+        }
+        else if((*it).rank == 2)
+        {
+            SYSMSGV(content, 840, player->getCountry(), player->getName().c_str(), (*it).rank);
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title3, content);
+            if(mail)
+                mail->writeMailLog(player, Activity);
+        }
+        else if((*it).rank == 3)
+        {
+            SYSMSGV(content, 841, player->getCountry(), player->getName().c_str(), (*it).rank);
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title3, content);
+            if(mail)
+                mail->writeMailLog(player, Activity);
+        }
+        else if((*it).rank >= 4 && (*it).rank <= 10)
+        {
+            SYSMSGV(content, 842, player->getCountry(), player->getName().c_str(), (*it).rank);
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title3, content);
+            if(mail)
+                mail->writeMailLog(player, Activity);
+        }
+        else if((*it).rank >= 11 && (*it).rank <= 20)
+        {
+            SYSMSGV(content, 843, player->getCountry(), player->getName().c_str(), (*it).rank);
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title3, content);
+            if(mail)
+                mail->writeMailLog(player, Activity);
+        }
+        else if((*it).rank >= 21 && (*it).rank <= 50)
+        {
+            SYSMSGV(content, 844, player->getCountry(), player->getName().c_str(), (*it).rank);
+            Mail * mail = player->GetMailBox()->newMail(NULL, 0x01, title3, content);
             if(mail)
                 mail->writeMailLog(player, Activity);
         }
@@ -1436,7 +1496,7 @@ void Leaderboard::sendGoldLvlAward(BinaryReader& brd)
         },
         //3
         {
-        { {514, 4},   {0, 0},  {0, 0},   {0, 0}, {0, 0} },
+        { {515, 4},   {0, 0},  {0, 0},   {0, 0}, {0, 0} },
         { {8000, 5},  {551, 5}, {9438, 5},  {56, 5},  {57, 5} },
         { {9649, 10},  {1325, 8},  {547, 8},   {517, 8}, {0, 0} },
         { {515, 10}, {9076, 10}, {0, 0},  {0, 0}, {0, 0} },
@@ -1457,7 +1517,7 @@ void Leaderboard::sendGoldLvlAward(BinaryReader& brd)
         { {503, 5},   {500, 5},  {514, 5},   {0, 0}, {0, 0} },
         { {516, 5},  {547, 5}, {9418, 5},  {9424, 5}, {0, 0} },
         { {509, 5},  {9338, 5},  {134, 5},   {1325, 5}, {0, 0} },
-        { {134, 6}, {9600, 6}, {9414, 6},  {9310, 6}, {0, 0} },
+        { {134, 6}, {9600, 6}, {9414, 6},  {9310, 6}, {9457, 6} },
         { {554, 8}, {9600, 8}, {9498, 8}, {9425, 8}, {9438, 8} },
         { {1732, 1},  {0, 0}, {0, 0}, {0, 0}, {0, 0} },
         },
@@ -1472,7 +1532,7 @@ void Leaderboard::sendGoldLvlAward(BinaryReader& brd)
         },
         //7
         {
-        { {514, 4},   {0, 0},  {0, 0},   {0, 0}, {0, 0} },
+        { {515, 4},   {0, 0},  {0, 0},   {0, 0}, {0, 0} },
         { {8000, 5},  {551, 5}, {9438, 5},  {56, 5},  {57, 5} },
         { {9649, 10},  {1325, 8},  {547, 8},   {517, 8}, {0, 0} },
         { {515, 10}, {9076, 10}, {0, 0},  {0, 0}, {0, 0} },
@@ -1484,7 +1544,7 @@ void Leaderboard::sendGoldLvlAward(BinaryReader& brd)
         { {503, 5},   {500, 5},  {514, 5},   {0, 0}, {0, 0} },
         { {516, 5},  {547, 5}, {9418, 5},  {9424, 5}, {0, 0} },
         { {509, 5},  {9338, 5},  {134, 5},   {1325, 5}, {0, 0} },
-        { {134, 6}, {9600, 6}, {9414, 6},  {9310, 6}, {0, 0} },
+        { {134, 6}, {9600, 6}, {9414, 6},  {9310, 6}, {9457, 6} },
         { {554, 8}, {9600, 8}, {9498, 8}, {9425, 8}, {9438, 8} },
         { {9022, 20},  {0, 0}, {0, 0}, {0, 0}, {0, 0} },
         },
