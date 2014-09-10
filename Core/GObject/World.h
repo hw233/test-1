@@ -1247,6 +1247,16 @@ public:
         return true;
     }
 
+    inline static bool getCelebrateCardActivity(UInt32 time = 0)
+    {
+        UInt32 now = TimeUtil::Now() + time;
+        UInt32 time20140916 = TimeUtil::MkTime(2014, 9, 16);
+        
+        if(now < time20140916 || now > time20140916 + 5 * 86400)
+            return false;
+        return true;
+    }
+
     inline static bool getFlyRoadActivity(UInt32 time = 0)
     {
         UInt32 now = TimeUtil::Now() + time;

@@ -167,6 +167,7 @@ namespace Script
 		lua_tinker::def(_L, "getTYSSTime", GObject::World::getTYSSTime);  //天元神兽
 		lua_tinker::def(_L, "get61CardActivity", GObject::World::get61CardActivity);  //61卡牌活动
 		lua_tinker::def(_L, "getSummerCardActivity", GObject::World::getSummerCardActivity);  //清凉卡牌活动
+		lua_tinker::def(_L, "getCelebrateCardActivity", GObject::World::getCelebrateCardActivity);  //庆典卡牌活动
 		lua_tinker::def(_L, "getCoolSummer", GObject::World::getCoolSummer);
 		lua_tinker::def(_L, "getSeekingHer", GObject::World::getSeekingHer);
 		lua_tinker::def(_L, "getGGTime", GObject::World::getGGTime);  //情义罗盘
