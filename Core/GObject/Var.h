@@ -587,6 +587,7 @@ namespace GObject
         VAR_DROP_ACT = 606,  //掉落活动
         VAR_DIRECTPURCNT2 = 607, // 幸运星活动直购次数(超值专区)
         VAR_FEAST_GIFT_LOGIN = 608, //周年庆套装——生辰宝甲
+        VAR_PRIVATE_RECHARGE = 609, //私人定制对应的每日充值
 
         //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,    //天书奇缘登陆
@@ -1357,6 +1358,7 @@ namespace GObject
             REGISTER_VAR(VAR_DROP_ACT, CYCLE_DAY);
             REGISTER_VAR(VAR_DIRECTPURCNT2, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_GIFT_LOGIN, CYCLE_NONE);
+            REGISTER_VAR(VAR_PRIVATE_RECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);

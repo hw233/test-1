@@ -9103,13 +9103,13 @@ function onGetKillMonsterReward(player)
     local j = math.random(1, #eventItem[i])
 
     if eventItem[i][j][1] == 17018 then
-        player:GetCollectCard():Add61Card(305)
+        player:GetCollectCard():AddCelebrationCard(6005)
     elseif eventItem[i][j][1] == 17019 then
-        player:GetCollectCard():Add61Card(306)
+        player:GetCollectCard():AddCelebrationCard(6006)
     elseif eventItem[i][j][1] == 17020 then
-        player:GetCollectCard():Add61Card(307)
+        player:GetCollectCard():AddCelebrationCard(6007)
     elseif eventItem[i][j][1] == 17021 then
-        player:GetCollectCard():Add61Card(308)
+        player:GetCollectCard():AddCelebrationCard(6008)
     end
     package:Add(eventItem[i][j][1], eventItem[i][j][2], true, true, 33)
     player:lastKillMonsterAwardPush(eventItem[i][j][1], eventItem[i][j][2]);

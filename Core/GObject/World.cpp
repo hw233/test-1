@@ -180,6 +180,7 @@ bool World::_dragonKingAct= false;
 bool World::_saveGoldAct= false;
 bool World::_feastloginAct= false;
 bool World::_feastgiftloginAct= false;
+bool World::_privateAct= false;
 bool World::_newYearGiveGiftAct= false;
 bool World::_newYearQQGameAct= false;
 bool World::_QZoneQQGameAct= false;
@@ -458,7 +459,7 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) < TimeUtil::SharpDay(0, World::_rechargenextretend)+13*24*60*60+2*24*60*60)
         pl->sendRNR(nextday);
 
-    if (pl->GetVar(VAR_RECHARGE_TOTAL) && (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
+    if ((pl->GetVar(VAR_RECHARGE_TOTAL) || pl->GetVar(VAR_PRIVATE_RECHARGE))&& (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 12)
@@ -499,6 +500,22 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  12)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -513,6 +530,8 @@ bool enum_midnight(void * ptr, void* next)
                 pl->SetVar(VAR_RECHARGE_TOTAL, 0);
             if (pl->GetVar(VAR_RECHARGE_SCORE))
                 pl->SetVar(VAR_RECHARGE_SCORE, 0);
+            if (pl->GetVar(VAR_PRIVATE_RECHARGE))
+                pl->SetVar(VAR_PRIVATE_RECHARGE, 0);
         }
         GObject::RechargeTmpl::instance().clear();
     }

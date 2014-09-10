@@ -1136,6 +1136,12 @@ function onActivityCheck(tm)
       setShuoShuo(true);
   end
 
+  if tm >= actTimeq4 and tm < actTimeq4_1 then
+      setPrivateRechargeAct(true)
+  else
+      setPrivateRechargeAct(false)
+  end
+
   if tm >= actTime222 and tm < actTime223 then
       set11Act(true)
   else
@@ -1522,7 +1528,7 @@ function initActTime(y, m, d)
   local  SerStartSeekingHer1= { ['year'] = 2014, ['month'] = 8, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartSeekingHer2= { ['year'] = 2014, ['month'] = 8, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
-  local  SerStartTmq3= { ['year'] = 2014, ['month'] = 9, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTmq4= { ['year'] = 2014, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
@@ -2021,6 +2027,9 @@ function initActTime(y, m, d)
 
   actTimeq3= os.time(SerStartTmq3)
   actTimeq3_1= os.time(SerStartTmq3) + 10 * 86400;
+
+  actTimeq4= os.time(SerStartTmq4)
+  actTimeq4_1= os.time(SerStartTmq4) + 10 * 86400;
 
   onActivityCheck(os.time() + 30);
 

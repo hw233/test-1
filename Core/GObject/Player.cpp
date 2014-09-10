@@ -9064,7 +9064,8 @@ namespace GObject
 	{
 		if(r == 0)
 			return;
-        joinAllServerRecharge(r);
+        if(World::getPrivateRechargeAct())
+            joinAllServerRecharge(r);
         setLuckyStarCondition();
         if(getLuckyStarAct())
         {
@@ -15747,10 +15748,10 @@ namespace GObject
             return;
         MailPackage::MailItem item[4][1] =
         {
-            {{1369, 1},},
-            {{1370, 1},},
-            {{1371, 1},},
-            {{1372, 1},},
+            {{1395, 1},},
+            {{1396, 1},},
+            {{1397, 1},},
+            {{1398, 1},},
         };
         sendMailItem(2372, 2373, &item[index][0], 1, false);
     }
@@ -29491,10 +29492,17 @@ void Player::getHappyValueAward(UInt8 val)
 void Player::joinAllServerRecharge(UInt32 num)
 {
     if(num == 0) return;
+    UInt32 dayStart = GetVar(VAR_PRIVATE_RECHARGE);
+    AddVar(VAR_PRIVATE_RECHARGE, num);
+    UInt32 dayTotal = GetVar(VAR_PRIVATE_RECHARGE);
+    if(dayStart > dayTotal)
+        dayStart = 0;
     //Stream st(ARENAREQ::RECHARGE_ACTIVE, 0xEF);
     Stream st(SERVERWARREQ::RECHARGE_ACTIVE, 0xEE);
     st << getId() << getName() << num << TimeUtil::Now();
     st << static_cast<UInt8>(getCountry()<<4 | (IsMale()?0:1));
+    st << dayStart;
+    st << dayTotal;
     st << Stream::eos;
     NETWORK()->SendToServerWar(st);
 	//NETWORK()->SendToArena(st);

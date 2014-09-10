@@ -2615,7 +2615,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         {
             UInt8 flag = 0;
             brd >> op >> flag;
-            if(op != 6)     //跨服充值排行活动
+            if(!World::getPrivateRechargeAct() || op != 6)     //跨服充值排行活动
                 return;
             if(0 == flag)
             {
@@ -4022,6 +4022,7 @@ void OnMarryBard( GameMsgHdr& hdr, const void* data)
 
 void OnServerRechargeRank( ArenaMsgHdr& hdr, const void * data )
 {
+#if 0
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     brd >> type;
@@ -4033,6 +4034,7 @@ void OnServerRechargeRank( ArenaMsgHdr& hdr, const void * data )
         GObject::leaderboard.readRechargeSelf(brd);
     else if(type == 3)
         GObject::leaderboard.sendGoldLvlAward(brd);
+#endif
 }
 
 void OnServerRechargeRank( ServerWarMsgHdr& hdr, const void * data )

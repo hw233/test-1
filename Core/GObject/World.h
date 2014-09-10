@@ -450,6 +450,10 @@ public:
     { _feastgiftloginAct= v; }
     inline static bool getFeastGiftLoginAct()
     { return _feastgiftloginAct; }
+    inline static void setPrivateRechargeAct(bool v)
+    { _privateAct= v; }
+    inline static bool getPrivateRechargeAct()
+    { return _privateAct; }
     inline static void setNewYearGiveGiftAct(bool v)
     { _newYearGiveGiftAct= v; }
     inline static bool getNewYearGiveGiftAct()
@@ -1450,6 +1454,7 @@ public:
     static bool _saveGoldAct;
     static bool _feastloginAct;
     static bool _feastgiftloginAct;
+    static bool _privateAct;
     static bool _newYearGiveGiftAct;
     static bool _newYearQQGameAct;
     static bool _QZoneQQGameAct;

@@ -154,6 +154,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_shakemoneybag.sql     #创建狂欢大购物摇钱袋记录表
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar606.sql        #清除掉落活动
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar844.sql        #众里寻他掉落状态
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar182_187.sql        #清除仗剑江湖蜀山路
 }
 
 #sh player_jiguan.sh

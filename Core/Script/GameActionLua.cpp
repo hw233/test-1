@@ -361,6 +361,7 @@ namespace Script
         
         CLASS_ADD(CollectCard);
         CLASS_DEF(CollectCard, Add61Card);
+        CLASS_DEF(CollectCard, AddCelebrationCard);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
