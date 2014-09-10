@@ -318,6 +318,9 @@ void DarkDargon::RetDargonArrive(Player* pl)
 
 void DarkDargon::EnterDarkDargon(Player* pl)
 {
+    if(_status == DARKDARGON_OVER)
+        return;
+
     if(m_ddMap.find(pl) == m_ddMap.end())
     {
         DDPlayer* ddpl = new DDPlayer(); 
@@ -879,6 +882,8 @@ void DarkDargon::InitStarMap(UInt8 idx)
 
 void DarkDargon::OptBoss(Player* pl,UInt8 opt)
 {
+    if(_status != GObject::DARKDARGON_TWOSTEP)
+        return;
     DDPlayer* ddpl = NULL;
     ddpl = getDDPlayer(pl);
     if(ddpl == NULL)
@@ -886,7 +891,7 @@ void DarkDargon::OptBoss(Player* pl,UInt8 opt)
     UInt32 now = TimeUtil::Now();
 
     ConsumeInfo ci; 
-    ci.purchaseType = WBInspire; 
+    ci.purchaseType = DARKDARGON; 
     switch(opt) 
     {
         case 1://天雷
