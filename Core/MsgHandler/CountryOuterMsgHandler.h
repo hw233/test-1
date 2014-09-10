@@ -1474,7 +1474,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->getNewYearGiveGiftAward(0,0);
     pl->firstPotOfGoldReturn(0);
-    pl->sendShakeMoneyBagInfo();
+
+    {
+        GameMsgHdr hdr(0x188, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
 
     {
         GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);

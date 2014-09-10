@@ -35722,16 +35722,5 @@ void Player::CarnivalConsumeAct(UInt32 c)
     GLOBAL().PushMsg(hdr1, NULL);
 }
 
-void Player::sendShakeMoneyBagInfo()
-{
-    Stream st(REP::COUNTRY_ACT);
-    st << static_cast<UInt8>(0x15);
-    st << static_cast<UInt8>(4);
-    st << static_cast<UInt8>(GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES));
-    st << GetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE);
-    st << Stream::eos;
-    send(st);
-}
-
 } // namespace GObject
 
