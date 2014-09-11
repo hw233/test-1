@@ -428,6 +428,7 @@ namespace Script
         bool getRedBeanAward(Player * player, UInt8 index, UInt32 count);
         bool getFeiShengDan(Player * player, UInt8 index);
         bool getFeiShengAward(Player * player, UInt8 index);
+        bool getFlyRoadAward(Player * player, UInt8 index, UInt8 isdouble);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
