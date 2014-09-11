@@ -62,6 +62,7 @@
 #include "GObject/ClanBuilding.h"
 #include "GObject/RaceBattle.h"
 #include "GObject/ClanBigBoss.h"
+#include "GObject/DarkDargon.h"
 
 GMHandler gmHandler;
 
@@ -332,6 +333,7 @@ GMHandler::GMHandler()
     Reg(3, "setfirevalue", &GMHandler::OnSetFireValue);
     Reg(2, "atkcb", &GMHandler::OnAttackBoss);
     Reg(2, "kettleA", &GMHandler::OnAttackKettle);
+    Reg(2, "atkdd", &GMHandler::OnAttackDarkDargon);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -5769,7 +5771,8 @@ void GMHandler::OnAdd61Card(GObject::Player *player, std::vector<std::string>& a
         return ;
     UInt16 cid = atoi(args[0].c_str());
     
-    player->GetCollectCard()->AddSummerCard(cid);   
+    player->GetCollectCard()->AddCelebrationCard(cid);   
+    //player->GetCollectCard()->AddSummerCard(cid);   
 }
 
 void GMHandler::OnAddCardExp(GObject::Player *player, std::vector<std::string>& args)
@@ -5853,3 +5856,9 @@ void GMHandler::OnSayToWorld(GObject::Player *player, std::vector<std::string>& 
     NETWORK()->SendToServerWar(st);
 } 
 
+void GMHandler::OnAttackDarkDargon(GObject::Player *player, std::vector<std::string>& args)
+{
+    /*if (args.size() < 1)
+        return ;*/
+    DarkDargon::Instance().GMDestroyStarMap();
+}

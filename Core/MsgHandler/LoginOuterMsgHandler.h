@@ -1110,12 +1110,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             static UInt16 ids[] =
             {
-                9427, 2,
-                5035,  1,
-                9141, 2,
-                15, 2,
-                503, 4,
-                501, 4,
+                503, 3,
+                549,  1,
+                5135, 1,
+                500, 2,
+                516, 3,
+                515, 2,
             };
 
             UInt8 idx = 0;
@@ -1145,7 +1145,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     if (!player->GetVar(GObject::VAR_DIRECTPUROPEN))
                         purchase.code = 1;
 
-                    if(id == 9427 || id == 5035 || id == 9141)
+                    if(id == 503 || id == 549 || id == 5135)
                     {
                         if(player->GetVar(GObject::VAR_DIRECTPURCNT) >= 3)
                             purchase.code = 2;
@@ -1396,17 +1396,21 @@ inline bool player_enum_setvar(GObject::Player* p, void* msg)
 {
     struct Msg
     {
+        UInt16 serverNo;
         UInt32 var;
         UInt32 value;
         UInt8 type;
     };
 
     Msg* _msg = (Msg*)msg;
+    UInt16 serverNo = _msg->serverNo;
     UInt32 var = _msg->var;
     UInt32 value = _msg->value;
     UInt8 type = _msg->type;
     UInt32 v = p->GetVar(var); 
     UInt32 value1 = 0 ;
+    if(p->getServerNo()!= serverNo)
+        return true;
     if(type == 1 )
         value1 = value ;
     else if(type ==2)
@@ -4280,10 +4284,12 @@ void SetPlayersVar(LoginMsgHdr& hdr,const void * data)
         {
             struct Msg
             {
+                UInt16 serverNo;
                 UInt32 var;
                 UInt32 value;
                 UInt8 type;
             } _msg;
+            _msg.serverNo = serverNo;
             _msg.var = var;
             _msg.value = value;
             _msg.type = type;
@@ -4471,5 +4477,6 @@ void SetWorldCupResult(LoginMsgHdr& hdr,const void * data)
     st << static_cast<UInt8>(flag)<< Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID, st);
 }
+
 #endif // _LOGINOUTERMSGHANDLER_H_
 

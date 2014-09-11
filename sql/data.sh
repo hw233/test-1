@@ -72,6 +72,7 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140627_2.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140710_cKettle.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140804_cLingbaoLevel.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140819_cIncense.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from item_template; source itemtemplate;";
@@ -157,6 +158,7 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from geartree; source geartree;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from kettleNpc; source kettleNpc;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from lingbaoLevel; source lingbaoLevel;";
+    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from incenseAttr; source incenseAttr;";
 }
 
 update_data

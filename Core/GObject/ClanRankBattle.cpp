@@ -2669,6 +2669,8 @@ namespace GObject
 
     void ClanRankBattleMgr::clanLocalRankInit()
     {
+        if(!cfg.merged)
+            return;
         m_ClanRanking.clear();
         class GetClansVisitor : public Visitor<Clan>
         {

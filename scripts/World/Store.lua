@@ -115,6 +115,9 @@ function loadStore()
 
         discount(store)
 
+    if getKillMonsterAct() then
+        store:add(2, 16049, 10)
+    end
     store:add(2, 17017, 50)
     if getSeekingHer() then
         store:add(2, 16025, 9)
@@ -129,6 +132,9 @@ function loadStore()
     if getSummerCardActivity(300) then --清凉令
         store:add(2 ,17011,20)
     end
+    if getCelebrateCardActivity(300) then --庆典令
+        store:add(2 ,17026,20)
+    end
     if get61CardActivity(300) then --童心令
         store:add(2 ,9895,20)
     end
@@ -142,6 +148,7 @@ function loadStore()
 
     store:add(2 ,9457 ,20)
     store:add(2,554,20)
+    store:add(2,556,30)
 
     if  getWorldCupTime(30) or getWorldCupTime2(30) then
         store:add(2 ,16017 ,20)
@@ -181,14 +188,10 @@ function loadStore()
         --store:add(2 ,9397, 20)
         --store:add(2 ,9401, 20)
         --store:add(2 ,9422, 20)
-        store:add(2 ,16009, 100)
+        store:add(2 ,16050, 20)
     end
     if getHappyFireTime(300) then
         store:add(2, 16048, 20)
-    end
-
-    if getKillMonsterAct() then
-        store:add(2, 9416, 10)
     end
 
     if getCollectCardAct() then

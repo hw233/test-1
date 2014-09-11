@@ -586,6 +586,7 @@ namespace GObject
         VAR_SKILL_GRADE_MONEY = 605,  //技能升阶货币
         VAR_DROP_ACT = 606,  //掉落活动
         VAR_DIRECTPURCNT2 = 607, // 幸运星活动直购次数(超值专区)
+        VAR_FEAST_GIFT_LOGIN = 608, //周年庆套装——生辰宝甲
 
         //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,    //天书奇缘登陆
@@ -1346,6 +1347,7 @@ namespace GObject
             REGISTER_VAR(VAR_SKILL_GRADE_MONEY, CYCLE_NONE);
             REGISTER_VAR(VAR_DROP_ACT, CYCLE_NONE);
             REGISTER_VAR(VAR_DIRECTPURCNT2, CYCLE_NONE);
+            REGISTER_VAR(VAR_FEAST_GIFT_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);

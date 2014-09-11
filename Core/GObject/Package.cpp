@@ -8757,6 +8757,7 @@ namespace GObject
             }
             //chance = lbl.probability;
 	        chance = GameAction()->getLingbaoLevelChance(enLevel+1,bless+1);
+            //chance += lbl.honeyFallP * bless;
             //chance= lua_tinker::call<lua_tinker::table>(L, "getLingbaoLevelChance", enLevel + 1, bless + 1);
             //std::cout << "chance : " << chance <<std::endl;
             if(uRand(10000) < chance)
@@ -8765,6 +8766,8 @@ namespace GObject
                 fgt->setLingbaoFall(type ,0);
                 enLevel ++;
                 success ++;
+                if(bless != 0)
+                    wfall = true;
                 bless = 0;
                 wlevel = true;
                 res = 1;

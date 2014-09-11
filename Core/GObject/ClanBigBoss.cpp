@@ -344,6 +344,7 @@ bool ClanBigBoss::attackBossFinal(Player* player)
         _lastTime = now - appointment_time; 
         //TODO DB
         DB4().PushUpdateData("UPDATE `clanbigboss` SET `last` = %u WHERE `clanid` = %u ",_lastTime,_clan->getId());
+        res = true;
 
     }else if(_percent > 75 && newPercent <= 75)
     {

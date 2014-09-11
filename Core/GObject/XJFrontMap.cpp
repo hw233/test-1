@@ -250,6 +250,10 @@ namespace GObject
             return 0;
 
         FastMutex::ScopedLock lk(_mutex);
+
+        if (!checkLevel(pl, id))
+            return 0;
+
         // 是否在次数范围内
         if (PLAYER_DATA(pl, xjfrontFreeCnt) > getFreeCount() &&
                 PLAYER_DATA(pl, xjfrontGoldCnt) > getGoldCount())
