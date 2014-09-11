@@ -366,8 +366,8 @@ private:
         e_controlBall = 137,    // 控球效果
         e_unControlBall = 138,    // 控球效果消失
 
-        e_evolution = 139,    // 控球效果
-        e_unEvolution = 140,    // 控球效果消失
+        e_evolution = 139,    // 仙火
+        e_unEvolution = 140,    // 仙火消失
 
         e_MAX_STATE,
     };
@@ -796,7 +796,7 @@ private:
 
     float calcPoison(BattleFighter* bf, const GData::SkillBase* skill, BattleFighter* defender, bool cs);
     float calcMaxTherapy(BattleFighter* bf, const GData::SkillBase* skill);
-    float calcTherapy(BattleFighter* bf, bool& isCritical, bool& first, const GData::SkillBase* skill);
+    float calcTherapy(BattleFighter* bf, bool& isCritical, bool& first, const GData::SkillBase* skill,UInt8 flag = 0);
     float calcMagAttack(BattleFighter* bf, bool& isCritical, BattleFighter* defender , float* pCf);
     float calcEvolutionAttack(BattleFighter* bf, bool& isCritical, BattleFighter* defender , float* pCf);
     float calcAttack(BattleFighter* bf, bool& isCritical, BattleFighter* defender, float* pCf);

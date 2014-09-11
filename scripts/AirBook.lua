@@ -1,14 +1,12 @@
 --代码描述:此脚本仅处理天书奇缘的积分bug导致的情况 (被加载的地方似乎不合适，会被加载三次，影响效率)
 print("XXX")
 --os.execute("zcat log/DB/TRACE20140621.gz |grep var|grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[00:[0,1,2,3,4][0-9]:\" > test1.txt")  --需要修改cat语句已限制时间段
---os.execute("cat log/DB/INFO20140707 |grep snow |grep REPLACE  > test1.txt")  --需要修改cat语句已限制时间段
-os.execute("cat log/DB/TRACE20140814 |grep strengthenData |grep REPLACE  > test1.txt")  --需要修改cat语句已限制时间段
+os.execute("cat log/DBLog/TRACE20140911 |grep consume_gold |grep \",27,\"  > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("cat log/DB/INFO20140707 |grep snow |grep REPLACE |grep \"\\[0[0-9]:\" > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep [^0-9]599[^0-9] > test1.txt")
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[1[0-9]\" > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("awk '{print $11,$12,$13,$14}' test1.txt > test2.txt ")  --产生文件的格式为(XXXX, XXXX, XXXX)]
---reg = "VALUES %((%d*), (%d*), (%d*), (%d*)%)"
-reg = "%d, '(.-)',"
+reg = "values%((%d*),(%d*),(%d*),(%d*),(%d*),(%d*),(%d*)%)"
 
 file = io.open("test1.txt","r")
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep [^0-9]599[^0-9] > test1.txt")
@@ -56,9 +54,13 @@ function getTheResult()
 end
 function getTheResultInSnow2()
     for i in file:lines() do 
-        x,y,a,b = string.find(i,reg)
-        print(x,y,a,b)
-        result[a]= b    --结果增量设置为0
+        x,y,a,b,c,d,e,f,g = string.find(i,reg)
+        print(x,y,a,b,c,d,e,f,g)
+        if result[b] == nil then
+            result[b] = 0;
+        end
+        result[b]= result[b] + tonumber(f)    --结果增量设置为0
+        print(result[b])
     end
     file:close()
 end
@@ -93,14 +95,30 @@ end
 getTheResultInSnow2()
 
 --写入sql语句完成数据还原
-fileOpen = io.open("sql/updates/Object_Snow_Bug.sql","w")
+fileOpen = io.open("sql/updates/Object_0911.sql","w")
 
 for key,value in pairs(result) do
-    print(key)
-    print(value)
-    local strs = string.format("UPDATE snow set score = score + %s where playerId = %s;",result[key],key)   --只影响总积分 
+    --local strs = string.format("UPDATE snow set score = score + %s where playerId = %s;",result[key],key)   --只影响总积分 
+    local strs = string.format("UPDATE var set data = data - %s where playerId = %s and id = 846 and data >= %s;",result[key],key,result[key])   --只影响总积分 
     print(strs)   --用于查看sql语句
     fileOpen:write(strs);
     fileOpen:write("\n")
+
+    pl = _GameActionLua:GetPlayerPtr(tonumber(key))
+    if pl == nil then
+        return 
+    end
+    local value = pl:GetVar(846)
+    print("value:" .. value)
+    print("cha"..result[key])
+    if value < result[key] then 
+       -- return 
+    end
+    if pl == nil then
+        print("XXXX")
+    else  
+        print("!!!!")
+        pl:SetVar(846,100);
+    end
 end
 fileOpen:close()

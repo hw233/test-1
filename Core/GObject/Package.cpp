@@ -32,15 +32,23 @@
 #include "GObject/Evolution.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
+#define ITEM_FORGE_L2 17109    //仙装洗炼符
+
 #define ITEM_SOCKET_L1 510
+
 #define ITEM_SOCKET_L2 511
 #define ITEM_SOCKET_L3 512
 #define ITEM_GEM_PROTECT 513    // 宝石保护符
+#define ITEM_GEM_PROTECT2 17111    // 仙界宝石保护符
+
 #define ITEM_SPLIT_PROTECT 8925
 #define ITEM_DETACH_PROTECT 505 // 精致拆卸石
 #define ITEM_ENCHANT_PROTECT 8927
 #define ITEM_DETACH_RUNE 504    // 粗制拆卸石
+
 #define ITEM_FORGE_PROTECT 501  // 洗炼保护符
+#define ITEM_FORGE_PROTECT2 17110    //仙装洗炼保护符
+
 #define ITEM_ACTIVATE_ATTR 549
 #define TRUMP_LORDER_ITEM       517      // 玲珑冰晶
 #define MAX_TRUMP_LORDER_ITEM   9        // 最高阶
@@ -2944,6 +2952,8 @@ namespace GObject
             return 2;
 
         UInt32 item_enchant_l = ITEM_ENCHANT_L1;
+        if(equip->getClass() == Item_Evolution1 || equip->getClass() == Item_Evolution2)
+            item_enchant_l = ITEM_ENCHANT_L3;
         UInt8 quality = 0;
         UInt8 maxEnchantLevel = ENCHANT_LEVEL_MAX;
         if (m_Owner->getVipLevel() >= 11 || World::getEnchantGt11()) // XXX: ==VIP11 -> 11
@@ -2959,6 +2969,8 @@ namespace GObject
         {
             maxEnchantLevel = TRUMP_ENCHANT_LEVEL_MAX;
             item_enchant_l = TRUMP_ENCHANT_L1;
+            if(equip->getClass() == Item_Evolution3)
+                item_enchant_l = TRUMP_ENCHANT_L3;
             quality = equip->getQuality();
         }
 
@@ -3389,6 +3401,8 @@ namespace GObject
 		bool isBound = equip->GetBindStatus();
 		if(ied.sockets >= 6)
 			return 2;
+        if(equip->GetItemType().subClass >= Item_Evolution1 && equip->GetItemType().subClass <= Item_Evolution3 && ied.sockets >=4)
+            return 2;
 		else if(ied.sockets >= 4)
 		{
 			if(!DelItemAny(ITEM_SOCKET_L3, 1, &isBound))
@@ -3437,7 +3451,8 @@ namespace GObject
 
 	UInt8 Package::MergeGem( UInt32 gemId, UInt8 bindCount, bool protect, UInt32& ogid )
 	{
-		if (GetItemSubClass(gemId) != Item_Gem) return 2;
+		if (GetItemSubClass(gemId) != Item_Gem && GetItemSubClass(gemId) != Item_EvolutionGem)
+            return 2;
 		UInt32 lvl;
 
         if(IsGemId2(gemId))
@@ -3476,7 +3491,10 @@ namespace GObject
 		ConsumeInfo ci(MergeGems,0,0);
 		m_Owner->useTael(amount,&ci);
 		bool isBound = bindCount > 0;
-		if(protect && !DelItemAny(ITEM_GEM_PROTECT, 1, &isBound))
+        UInt32 itemUse = ITEM_GEM_PROTECT;
+        if(GetItemSubClass(gemId) == Item_EvolutionGem)
+            itemUse = ITEM_GEM_PROTECT2;
+		if(protect && !DelItemAny(itemUse, 1, &isBound))
 		{
 			protect = false;
 		}
@@ -3848,7 +3866,9 @@ namespace GObject
         if(IsEquip(t.subClass))
         {
             if(t.subClass == Item_Trump || t.subClass == Item_Fashion ||
-               t.subClass == Item_Halo || t.subClass == Item_InnateTrump)
+               t.subClass == Item_Halo || t.subClass == Item_InnateTrump||
+               t.subClass == Item_Evolution3
+               )
             {
                 UInt32 n = m_Owner->GetVar(VAR_SPLIT_THRUMP);
                 n ++ ;
@@ -3906,6 +3926,8 @@ namespace GObject
 		if(got)
 		{
 			UInt32 itemOutId = ITEM_ENCHANT_L1 + got - 1;
+            if(t.subClass >= Item_Evolution1 && t.subClass <= Item_Evolution3)
+                itemOutId = ITEM_ENCHANT_L3 + got -1;
             UInt32 count = 1;
             if(item != NULL)
                 DelEquip2(static_cast<ItemEquip *>(item), ToSplit);
@@ -4216,8 +4238,11 @@ namespace GObject
 
     UInt8 Package::BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& gemIdOut, UInt16& unbindGemsOut, UInt16& bindGemsOut, UInt16& succTimes, UInt16& failedTimes)
     {
-		UInt16 protectUnbindNum = GetItemNum(ITEM_GEM_PROTECT, false);
-		UInt16 protectBindNum = GetItemNum(ITEM_GEM_PROTECT, true);
+        UInt32 itemUse = ITEM_GEM_PROTECT;
+        if(GetItemSubClass(gemId) == Item_EvolutionGem)
+            itemUse = ITEM_GEM_PROTECT2;
+		UInt16 protectUnbindNum = GetItemNum(itemUse, false);
+		UInt16 protectBindNum = GetItemNum(itemUse, true);
 		if(protect && protectUnbindNum == 0 && protectBindNum == 0)
 			return 1;
 
@@ -4424,9 +4449,9 @@ namespace GObject
 		ConsumeInfo ci(MergeGems,0,0);
 		m_Owner->useTael(coinAmount, &ci);
 		if(protectBindUsed > 0)
-			DelItem(ITEM_GEM_PROTECT, protectBindUsed, true, ToGemMgerge);
+			DelItem(itemUse, protectBindUsed, true, ToGemMgerge);
 		if(protectUnbindUsed > 0)
-			DelItem(ITEM_GEM_PROTECT, protectUnbindUsed, false, ToGemMgerge);
+			DelItem(itemUse, protectUnbindUsed, false, ToGemMgerge);
 
         GameAction()->doStrong(this->m_Owner, SthMergeGem, 0, 0);
         m_Owner->GuangGunCompleteTask(0,4);
@@ -4779,7 +4804,7 @@ namespace GObject
         const GData::ItemBaseType * itype = GData::itemBaseTypeManager[typeId];
         if(itype == NULL)
             return NULL;
-        if(itype->subClass < Item_Weapon || itype->subClass > Item_Ring )
+        if(!(itype->subClass >= Item_Weapon && itype->subClass <= Item_Ring) && !(itype->subClass >=Item_Evolution1 && itype->subClass <= Item_Evolution2 ))
             return NULL;
         if(m_Size >= m_Owner->getPacksize() + 50)
             return NULL;
@@ -5111,6 +5136,7 @@ namespace GObject
             if (fIed.enchant-1 <= tIed.enchant)
                 return 5;
             if ((fromEquip->getClass() < Item_Weapon) || (fromEquip->getClass() > Item_Ring)) 
+            if(fromEquip->getClass() < Item_Weapon || (fromEquip->getClass() > Item_Ring && fromEquip->getClass() < Item_Evolution1) || fromEquip->getClass() > Item_Evolution3)
                 return 6;
         }
         if (type & 2)
@@ -5778,22 +5804,31 @@ namespace GObject
         if((equip->GetItemType().subClass == Item_Trump ||
                     equip->GetItemType().subClass == Item_Fashion ||
                     equip->GetItemType().subClass == Item_Halo ||
-                    equip->GetItemType().subClass == Item_InnateTrump) && 
+                    equip->GetItemType().subClass == Item_InnateTrump ||
+                    equip->GetItemType().subClass == Item_Evolution3
+                    ) && 
                     ied.tRank < 1)
             return 2;
 		bool isBound = equip->GetBindStatus();
+        UInt32 itemUse = ITEM_FORGE_L1;
+        UInt32 protectItem = ITEM_FORGE_PROTECT;
+        if(equip->GetItemType().subClass >= Item_Evolution1 && equip->GetItemType().subClass <= Item_Evolution3)
+        {
+            itemUse = ITEM_FORGE_L2;
+            protectItem = ITEM_FORGE_PROTECT2;
+        }
 		switch(equip->getQuality())
 		{
 		case 3:
 		case 4:
 		case 5:
-			if(!DelItemAny(ITEM_FORGE_L1, 1, &isBound))
+			if(!DelItemAny(itemUse, 1, &isBound))
 				return 2;
 			break;
 		default:
 			return 2;
 		}
-        AddItemHistoriesLog(ITEM_FORGE_L1,  1);
+        AddItemHistoriesLog(itemUse,  1);
         //
         //装备洗练成就
         GameAction()->doAttainment(this->m_Owner, 10175, 0);
@@ -5812,13 +5847,13 @@ namespace GObject
 				++ c;
 			if(protect & 4)
 				++ c;
-			if(!DelItemAny(ITEM_FORGE_PROTECT, c))
+			if(!DelItemAny(protectItem, c))
             {
 				protect = 0;
                 return 2;
             }
             else
-                AddItemHistoriesLog(ITEM_FORGE_PROTECT,  c);
+                AddItemHistoriesLog(protectItem,  c);
 		}
 		types[0] = ied.extraAttr2.type1;
 		values[0] = ied.extraAttr2.value1;
@@ -6174,7 +6209,7 @@ namespace GObject
     }
 
     // get item trump exp and delelte item
-    UInt8 Package::SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt32& exp)
+    UInt8 Package::SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt32& exp , UInt8 flag)
     {
         if(itemId > 30000)
         {
@@ -6184,7 +6219,11 @@ namespace GObject
                (item->getClass() != Item_Trump && 
                 item->getClass() != Item_Fashion &&
                 item->getClass() != Item_Halo &&
-                item->getClass() != Item_InnateTrump))
+                item->getClass() != Item_InnateTrump &&
+                item->getClass() != Item_Evolution3
+                ))
+                return 2;
+            if(flag && item->getClass() != Item_Evolution3)
                 return 2;
 
             bind = item->GetBindStatus();
@@ -6204,6 +6243,8 @@ namespace GObject
         {
             ItemBase* item = GetItem(itemId, bind);
             if(item == NULL || item->getClass() != Item_Normal29)
+                return 2;
+            if(flag && (item->getId() < TRUMP_RONGLIAN_XIAN_GEGIN || item->getId() > TRUMP_RONGLIAN_XIAN_END) )
                 return 2;
             const GData::ItemBaseType& ibt = item->GetItemType();
             exp = ibt.trumpExp;
@@ -6244,7 +6285,7 @@ namespace GObject
 
         UInt32 exp = 0;
         bool isBound = (bind > 0);
-        UInt8 res = SmeltItemTrumpExp(fgt, itemId, isBound, exp);
+        UInt8 res = SmeltItemTrumpExp(fgt, itemId, isBound, exp ,trump->getClass() == Item_Evolution3 );
         if(res != 0)
             return res;
 
@@ -6359,6 +6400,8 @@ namespace GObject
                 fgt->sendModification(0x70, trump, false);
             else if (trump->getClass() == Item_Fashion)
                 fgt->sendModification(0x20, trump, false);
+            else if (trump->getClass() == Item_Evolution3)
+                fgt->sendModification(0x68, trump, false);
             else
                 fgt->sendModification(0x0a+ pos, trump, false);
         }

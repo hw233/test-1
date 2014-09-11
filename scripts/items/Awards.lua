@@ -2163,28 +2163,62 @@ function getLingbaoLevelChance( level , fall)
 end
 
 local FeiShengDanNeed = {
-   { 47,20},{ 48,20},{ 49,20},{ 50,20},{ 51,20},
-   {56,5},{5003,20},{5013,20},{5023,20},{5033,20}
+    {
+        { 5005,2},
+        { 5015,2},
+        { 5025,2},
+        { 5035,2},
+        { 5045,2},
+        { 5055,2},
+    },{
+        { 20005,1},
+        { 20015,1},
+        { 20025,1},
+        { 20035,1},
+        { 20045,1},
+        { 20055,1},
+        { 20065,1}
+    },
+    {
+        {502,20} , 
+        {503,10}, 
+        {514,20}, 
+        {515,10}, 
+        {133,20}, 
+        {134,10}, 
+    },{
+        {17102,10},
+        {17103,5},
+        {17104,10},
+        {17105,5},
+        {17108,10},
+        {17107,5},
+    },
 }
-local FeiShengDanGoods = { 17000,17001}
+local FeiShengDanGoods = { 17100,17101}
 function getFeiShengDan(player,opt)
     print("opt"..opt)
+    if opt > 2 then 
+        return
+    end
+
     local package = player:GetPackage();
-    for i = 1,#FeiShengDanNeed do
-        local count = package:GetItemAnyNum(FeiShengDanNeed[i][1])
-        if count < FeiShengDanNeed[i][2] then
-            print("id: "..FeiShengDanNeed[i][1])
+    for i = 1,#FeiShengDanNeed[opt*2-1] do
+        local count = package:GetItemAnyNum(FeiShengDanNeed[opt*2-1][i][1])
+        if count < FeiShengDanNeed[opt*2-1][i][2] then
+            print("id: "..FeiShengDanNeed[opt*2-1][i][1])
             print("count: "..count)
-            print("need: "..FeiShengDanNeed[i][2])
+            print("need: "..FeiShengDanNeed[opt*2-1][i][2])
             return 0;
         end
     end
 
     print("XXXX")
-    for i = 1,#FeiShengDanNeed do
-        --if ~package:DelItemAny(FeiShengDanNeed[i][1],FeiShengDanNeed[i][2]) then
-        print("XXXX")
-        package:DelItem(FeiShengDanNeed[i][1],FeiShengDanNeed[i][2])
+    for i = 1,#FeiShengDanNeed[opt*2-1] do
+        package:DelItem(FeiShengDanNeed[opt*2-1][i][1],FeiShengDanNeed[opt*2-1][i][2])
     end
     package:AddItem(FeiShengDanGoods[opt], 1, true, 0, 39);
+    for i = 1,#FeiShengDanNeed[opt*2] do
+        package:AddItem(FeiShengDanNeed[opt*2][i][1], FeiShengDanNeed[opt*2][i][2], true, 0, 39);
+    end
 end

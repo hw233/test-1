@@ -27,4 +27,5 @@ function forceCommitArena()
 end
 
 --forceCommitArena()
+--require("World/AirBook")
 

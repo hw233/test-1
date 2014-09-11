@@ -8189,7 +8189,7 @@ namespace GObject
         LoadingCounter lc("Loading Fighter Evolution:");
 		DBEvolution dbxc;
         Player* pl = NULL;
-		if(execu->Prepare("SELECT `fighterId`, `playerId`,`process`,`award`,`task9`, `rTime` FROM `fighter_evolution`", dbxc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighterId`, `playerId`,`process`,`award`,`task9`, `rTime`,`success` FROM `fighter_evolution`", dbxc) != DB::DB_OK)
 			return false;
 		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -8212,6 +8212,7 @@ namespace GObject
             fgt->getEvolution()->setRandomTime(dbxc.rTime);
             fgt->getEvolution()->SetProcess(dbxc.process);
             fgt->getEvolution()->SetAward(dbxc.award);
+            fgt->getEvolution()->setSuccessValue(dbxc.success);
 		}
 		lc.finalize();
 

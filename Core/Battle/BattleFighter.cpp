@@ -1079,8 +1079,8 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool no
                     _fighter->getOwner()->OnHeroMemo(GObject::MC_SKILL, GObject::MD_ADVANCED, 0, 2);
 
                 //仙器技能累计
-                if(getSkillEvolution())
-                    setEvolutionCnt(getEvolutionCnt() + 1);
+                //if(getSkillEvolution())
+                //    setEvolutionCnt(getEvolutionCnt() + 1);
 
                 return _peerlessSkill.base;
                 std::cout <<"无双技能触发" << std::endl;

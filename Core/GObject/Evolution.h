@@ -35,6 +35,7 @@ namespace GObject
                 _fighter = fgt;
                 memset(&_evolution,0,sizeof(_evolution)) ;
                 memset(&_task9,0,sizeof(_task9)) ;
+                randomTime = 0;
             }
             UInt8 CompleteTask(UInt8 number,UInt8 task4 = 0);
             UInt8 TryTask0(UInt8 flag = 0,UInt32 npcId = 0);

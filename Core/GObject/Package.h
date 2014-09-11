@@ -26,8 +26,17 @@ namespace GObject
     UInt32 getRandGem(UInt8 lev);
 #define ITEM_ENCHANT_L1 502   //Ì«ÒÒÕæ½ð
 #define ITEM_ENCHANT_L2 503   //Ì«ÒÒ¾«½ð
+#define ITEM_ENCHANT_L3 17102  //仙兵仙衣专用强化材料
+#define ITEM_ENCHANT_L4 17103  //仙兵仙衣专用强化材料
+
 #define TRUMP_ENCHANT_L1 514   //ÎåÐÐ¾«Ó¢
 #define TRUMP_ENCHANT_L2 515  //ÎåÐÐ¾«»ª
+
+#define TRUMP_ENCHANT_L3 17104  //仙兵仙衣专用强化材料
+#define TRUMP_ENCHANT_L4 17105  //仙兵仙衣专用强化材料
+
+#define TRUMP_RONGLIAN_XIAN_GEGIN 17106
+#define TRUMP_RONGLIAN_XIAN_END 17108
 
 #define ARENA_BET_ITEM1    9081
 #define ARENA_BET_ITEM2    9082
@@ -209,7 +218,7 @@ namespace GObject
 		UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId);
         UInt8 TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId, UInt8 bind);
 		UInt8 TrumpLOrder(UInt16 fighterId, UInt32 trumpId ,UInt8 opt = 0);
-        UInt8 SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt32& exp);
+        UInt8 SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt32& exp, UInt8 flag = 0);
 
 		void AutoRegen(Fighter *);
 

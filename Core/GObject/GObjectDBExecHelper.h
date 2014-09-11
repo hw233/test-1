@@ -1465,6 +1465,7 @@ struct DBEvolution
 	UInt32 award;
     std::string task9;
 	UInt32 rTime;
+    UInt8 success;
 };
 
 struct DBJiguanshu
@@ -3937,14 +3938,15 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBEvolution)
-SPECIALDEF(6)
+SPECIALDEF(7)
 (
 	UInt32, fighterId,
 	UInt64, playerId,
 	UInt32, process,
 	UInt32, award,
     std::string, task9,
-	UInt32, rTime
+	UInt32, rTime,
+    UInt8 , success
 )
 SPECIALEND()
 }

@@ -420,7 +420,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
     if (!pl || !id || !(id <= MAX_COPY_ID || (id >= 100 && id < MAX_COPY_ID2)))
         return 0;
 
-    if(id >= 100 && pl->GetLev() < 120 )
+    if(id >= 100 && pl->GetLev() < 80 )
         return 0;
 
 	FastMutex::ScopedLock lk(_mutex); // XXX:
@@ -835,12 +835,12 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                         }
                         else
                         {
-                            if ((GData::moneyNeed[GData::COPY_AUTO1+id-1].tael - pref)/div > pl->getTael()) {
+                            if ((GData::moneyNeed[GData::COPY_AUTO1+(id >11 ? 11:id)-1].tael - pref)/div > pl->getTael()) {
                                 pl->sendMsgCode(0, 1100);
                                 return;
                             } else {
                                 ConsumeInfo ci(EnterAutoCopy,0,0);
-                                pl->useTael((GData::moneyNeed[GData::COPY_AUTO1+id-1].tael - pref)/div, &ci);
+                                pl->useTael((GData::moneyNeed[GData::COPY_AUTO1+(id >11 ? 11:id)-1].tael - pref)/div, &ci);
                             }
                         }
 

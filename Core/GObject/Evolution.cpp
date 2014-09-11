@@ -10,7 +10,7 @@
 #include "Battle/BattleReport.h"
 namespace GObject
 {
-    UInt32 Evolution::npcIds[EVOLUTION_TASKMAX] = {14000,0,0,14003,14006,0,14009,14012,14003};        
+    UInt32 Evolution::npcIds[EVOLUTION_TASKMAX] = {19901,0,0,19901,19912,19902,0,19911,19912};        
     UInt8 Evolution::GetProcess(UInt8 type) 
     { 
         if(type < EVOLUTION_TASKMAX -1)
@@ -30,23 +30,23 @@ namespace GObject
         else if(cnt >=5)
             return 1;
         UInt8 res = 1;
-        switch(number)
+        switch(number)   //与客户端ID差1
         {
-            case 0:
+            case 0:     //战斗
             case 3: 
             case 4:
-            case 6: 
+            case 5: 
             case 7: 
                 res = TryTask0(number);
                 break;
-            case 1: 
+            case 1:    //修为
                 res = TryTask1();
                 break;
-            case 2:
+            case 2:   //收集道具   飞升丹
                 res = TryTask2();
                 break;
-            case 5: 
-                res = TryTask5();
+            case 6:    //收集道具   虚无散
+                res = TryTask6();
                 break;
             case 8:     //5次
                 res = TryTask8(task9);
@@ -79,7 +79,7 @@ namespace GObject
         {
             std::cout<<"class :" << static_cast<UInt32>(_fighter->getClass()); 
             std::cout<< "sex :" << static_cast<UInt32>(_fighter->getSex()) << std::endl;
-            npcId += 0;   //待定
+            npcId += (_fighter->getClass()*2 + _fighter->getSex()) ;   //待定
         }
         GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
         if(it == GData::npcGroups.end())
@@ -131,7 +131,7 @@ namespace GObject
     { 
         if(!getOwner())
             return 1;
-        UInt32 itemId = 17000;
+        UInt32 itemId = 17100;
         UInt16 count = _fighter->getOwner()->GetPackage()->GetItemAnyNum(itemId) ;
         ItemBase * item = _fighter->getOwner()->GetPackage()->FindItem(itemId, true);
         if (!item)
@@ -166,11 +166,11 @@ namespace GObject
     /* ****************** */
     /* *****道具收集***** */
     /* ****************** */
-    UInt8 Evolution::TryTask5()
+    UInt8 Evolution::TryTask6()
     { 
         if(!getOwner())
             return 1;
-        UInt32 itemId = 17001;
+        UInt32 itemId = 17101;
         UInt16 count = _fighter->getOwner()->GetPackage()->GetItemAnyNum(itemId) ;
         ItemBase * item = _fighter->getOwner()->GetPackage()->FindItem(itemId, true);
         if (!item)
@@ -181,14 +181,14 @@ namespace GObject
             return 1;
         _fighter->getOwner()->GetPackage()->DelItemAny(itemId, 1 );
         _fighter->getOwner()->GetPackage()->AddItemHistoriesLog(itemId,1 );
-        _process |= (1<<5);
+        _process |= (1<<6);
         return 0;
     } 
 
     /* ****************** */
     /* ******火元素****** */
     /* ****************** */
-    UInt8 Evolution::TryTask6()
+    UInt8 Evolution::TryTask5()
     { 
         return 0;
 
@@ -329,7 +329,7 @@ namespace GObject
         } 
         else
         {
-            UInt32 gold = 20; 
+            UInt32 gold = 10; 
             if (getOwner()->getGold() < gold)
                 return ;
             ConsumeInfo ci(ExtendPackage,0,0);
@@ -415,7 +415,7 @@ namespace GObject
             case 1:
             case 4: 
             case 5:
-            case 7:
+            case 6:
             case 8:
                 st << npcIds[taskId-1];
                 break;
@@ -487,6 +487,8 @@ namespace GObject
     void Evolution::GetTaskAward(UInt8 index)
     { 
         static UInt32 AwardExp[EVOLUTION_TASKMAX] = {100,200,300,400,500,600,700,800,900} ;
+        static UInt32 Exp = 72320; 
+        static UInt32 tael = 1244;
         UInt8  cnt = GetProcess(index);
         if(index < EVOLUTION_TASKMAX-1 )
         {
@@ -497,12 +499,15 @@ namespace GObject
             return ;
         if(_award& (1 << index))
             return ;
-        _fighter->addExp(AwardExp[index]);
+        _fighter->addExp(Exp);
+        getOwner()->getTael(tael);
         _award|= (1 << index);
         UpdateEvolutionToDB();
     } 
     UInt8 Evolution::FeiSheng()
     {
+        if(_fighter->getLevel()<120)
+            return 0;
         if(!success && _process == 0x5FF)
         {
             setSuccessValue(1);

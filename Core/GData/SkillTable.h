@@ -153,6 +153,11 @@ enum
     e_eft_control_ball  = 63,      // 足球法宝
     e_eft_dispeerless  = 64,      // 慈悲效果
 
+    e_eft_evolution1 = 65,       //仙器技能概率随机伤害一次
+    e_eft_evolution2 = 66,       //仙器技能回复HP最低同伴血量
+    e_eft_evolution3 = 67,       //仙器技能回复自身血量
+    e_eft_evolution4 = 68,      //仙器技能对对方血量最少3次伤害
+    e_eft_evolution5 = 69,      //伤害技能参数填充
     e_eft_max
 };
 

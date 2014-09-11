@@ -10380,6 +10380,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
             { 
                 UInt8 index = 0;
                 br >> index;
+                const UInt8 limitLev = 80;
                 switch(index)
                 {
                     case 1:
@@ -10387,7 +10388,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                             UInt16 fighterId = 0;
                             br >> fighterId;
                             GObject::Fighter * fgt = player->findFighter(fighterId);
-                            if(!fgt || fgt->getLevel() < 120)
+                            if(!fgt || fgt->getLevel() < limitLev)
                                 return ;
                             if(!fgt->getEvolution())
                                 return ;
@@ -10403,7 +10404,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                             UInt8 taskId = 0;
                             br >> taskId;
                             GObject::Fighter * fgt = player->findFighter(fighterId);
-                            if(!fgt || fgt->getLevel() < 120)
+                            if(!fgt || fgt->getLevel() < limitLev)
                                 return ;
                             if(!fgt->getEvolution())
                                 return ;
@@ -10421,7 +10422,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                             UInt8 pos = 0; 
                             br >> taskId;
                             GObject::Fighter * fgt = player->findFighter(fighterId);
-                            if(!fgt || fgt->getLevel() < 120)
+                            if(!fgt || fgt->getLevel() < limitLev)
                                 return ;
                             if(!fgt->getEvolution())
                                 return ;
@@ -10451,7 +10452,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                             UInt16 fighterId = 0;
                             br >> fighterId;
                             GObject::Fighter * fgt = player->findFighter(fighterId);
-                            if(!fgt || fgt->getLevel() < 120)
+                            if(!fgt || fgt->getLevel() < limitLev)
                                 return ;
                             if(!fgt->getEvolution())
                                 return ;
@@ -10468,7 +10469,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                             UInt16 fighterId = 0;
                             br >> fighterId;
                             GObject::Fighter * fgt = player->findFighter(fighterId);
-                            if(!fgt || fgt->getLevel() < 120)
+                            if(!fgt || fgt->getLevel() < limitLev)
                                 return ;
                             if(!fgt->getEvolution())
                                 return ;

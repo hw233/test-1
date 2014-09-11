@@ -17415,7 +17415,7 @@ namespace GObject
         UInt32 now = TimeUtil::Now();
         UInt32 rf =GVAR.GetVar(GVAR_SUMMER_MEET_BEGIN);
         UInt32 rf2 = GVAR.GetVar(GVAR_SUMMER_MEET_END);
-        if (!rf || now < rf ||rf > rf2)
+        if (!rf || now < rf ||now > rf2)
             return;
         AddVar(VAR_SUMMER_MEET_RECHARGE, r);
         getSummerMeetScore(10,r);

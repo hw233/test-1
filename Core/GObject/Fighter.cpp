@@ -2013,13 +2013,13 @@ void Fighter::rebuildEquipAttr()
 	}
     
     { 
-        UInt16 equipType = 0;
         for(UInt8 i = 0 ; i < 3 ; ++i)
         { 
             equip = getEvolution()->getEquip(i);
             if(equip)
             {
                 addAttr(equip,1);
+                /*
                 if(i != 2)
                 {
                     if(!equipType)
@@ -2044,6 +2044,7 @@ void Fighter::rebuildEquipAttr()
                         }
                     }
                 }
+                */
             }
         } 
     } 
