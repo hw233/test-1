@@ -100,7 +100,7 @@ fileOpen = io.open("sql/updates/Object_0911.sql","w")
 
 for key,value in pairs(result) do
     --local strs = string.format("UPDATE snow set score = score + %s where playerId = %s;",result[key],key)   --只影响总积分 
-    local strs = string.format("UPDATE var set data = data - %s where playerId = %s and id = 846 and data >= %s;",result[key],key,result[key])   --只影响总积分 
+    local strs = string.format("UPDATE var set data = data - %s where playerId = %s and id = 845 and data >= %s;",result[key],key,result[key])   --只影响总积分 
     print(strs)   --用于查看sql语句
     fileOpen:write(strs);
     fileOpen:write("\n")
@@ -109,7 +109,7 @@ for key,value in pairs(result) do
     --if pl == nil then
     --    return 
     --end
-    --local value = pl:GetVar(846)
+    --local value = pl:GetVar(84)
     --print("value:" .. value)
     --print("cha"..result[key])
     --if value < result[key] then 
@@ -119,7 +119,7 @@ for key,value in pairs(result) do
     --    print("XXXX")
     --else  
     --    print("!!!!")
-    --    pl:SetVar(846,value - result[key]);
+    --    pl:SetVar(845,value - result[key]);
     --end
 end
 fileOpen:close()
